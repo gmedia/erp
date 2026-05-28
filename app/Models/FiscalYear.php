@@ -2,23 +2,26 @@
 
 namespace App\Models;
 
+use Database\Factories\FiscalYearFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property string $name
- * @property \Illuminate\Support\Carbon $start_date
- * @property \Illuminate\Support\Carbon $end_date
+ * @property Carbon $start_date
+ * @property Carbon $end_date
  * @property string $status
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\CoaVersion|null $activeCoaVersion
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CoaVersion> $coaVersions
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read CoaVersion|null $activeCoaVersion
+ * @property-read Collection<int, CoaVersion> $coaVersions
  * @property-read int|null $coa_versions_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\JournalEntry> $journalEntries
+ * @property-read Collection<int, JournalEntry> $journalEntries
  * @property-read int|null $journal_entries_count
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|FiscalYear current()
@@ -39,7 +42,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  */
 class FiscalYear extends Model
 {
-    /** @use HasFactory<\Database\Factories\FiscalYearFactory> */
+    /** @use HasFactory<FiscalYearFactory> */
     use HasFactory;
 
     /**

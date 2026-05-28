@@ -2,10 +2,11 @@
 
 namespace App\Http\Resources\AccountMappings;
 
+use App\Models\AccountMapping;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @mixin \App\Models\AccountMapping
+ * @mixin AccountMapping
  */
 class AccountMappingResource extends JsonResource
 {

@@ -3,6 +3,7 @@
 namespace App\Exports\Concerns;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -126,7 +127,7 @@ abstract class SimpleCrudExport implements FromQuery, ShouldAutoSize, WithHeadin
     /**
      * Get the model class for the entity.
      *
-     * @return class-string<\Illuminate\Database\Eloquent\Model>
+     * @return class-string<Model>
      */
     abstract protected function getModelClass(): string;
 

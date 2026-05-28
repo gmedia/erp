@@ -3,6 +3,7 @@
 namespace App\Domain\Products;
 
 use App\Domain\Concerns\BaseFilterService;
+use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder;
 
 class ProductFilterService
@@ -12,7 +13,7 @@ class ProductFilterService
     }
 
     /**
-     * @param  Builder<\App\Models\Product>  $query
+     * @param  Builder<Product>  $query
      * @param  array<int, string>  $searchFields
      */
     public function applySearch(Builder $query, string $search, array $searchFields): void
@@ -21,7 +22,7 @@ class ProductFilterService
     }
 
     /**
-     * @param  Builder<\App\Models\Product>  $query
+     * @param  Builder<Product>  $query
      * @param  array<string, mixed>  $filters
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void
@@ -37,7 +38,7 @@ class ProductFilterService
     }
 
     /**
-     * @param  Builder<\App\Models\Product>  $query
+     * @param  Builder<Product>  $query
      * @param  array<int, string>  $allowedSorts
      */
     public function applySorting(Builder $query, string $sortBy, string $sortDirection, array $allowedSorts): void

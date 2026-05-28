@@ -3,6 +3,7 @@
 namespace App\Actions\Concerns;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 
 trait ExecutesConfiguredMappedIndexRequest
@@ -12,7 +13,7 @@ trait ExecutesConfiguredMappedIndexRequest
     /**
      * @param  object{applySearch: callable, applyAdvancedFilters: callable, applySorting: callable}  $filterService
      * @param  array{
-     *      model_class: class-string<\Illuminate\Database\Eloquent\Model>,
+     *      model_class: class-string<Model>,
      *      with: array<int, string>,
      *      search_fields: array<int, string>,
      *      filter_keys: array<int, string>,

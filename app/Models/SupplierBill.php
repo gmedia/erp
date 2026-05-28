@@ -4,11 +4,14 @@ namespace App\Models;
 
 use App\Models\Concerns\BuildsAttributeCasts;
 use App\Models\Concerns\HasSupplierRelation;
+use Database\Factories\SupplierBillFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -19,9 +22,9 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property int|null $purchase_order_id
  * @property int|null $goods_receipt_id
  * @property string|null $supplier_invoice_number
- * @property \Illuminate\Support\Carbon|null $supplier_invoice_date
- * @property \Illuminate\Support\Carbon $bill_date
- * @property \Illuminate\Support\Carbon $due_date
+ * @property Carbon|null $supplier_invoice_date
+ * @property Carbon $bill_date
+ * @property Carbon $due_date
  * @property string|null $payment_terms
  * @property string $currency
  * @property numeric $subtotal
@@ -35,23 +38,23 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property int|null $journal_entry_id
  * @property int|null $created_by
  * @property int|null $confirmed_by
- * @property \Illuminate\Support\Carbon|null $confirmed_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Branch $branch
- * @property-read \App\Models\User|null $confirmer
- * @property-read \App\Models\User|null $creator
- * @property-read \App\Models\FiscalYear $fiscalYear
- * @property-read \App\Models\GoodsReceipt|null $goodsReceipt
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SupplierBillItem> $items
+ * @property Carbon|null $confirmed_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Branch $branch
+ * @property-read User|null $confirmer
+ * @property-read User|null $creator
+ * @property-read FiscalYear $fiscalYear
+ * @property-read GoodsReceipt|null $goodsReceipt
+ * @property-read Collection<int, SupplierBillItem> $items
  * @property-read int|null $items_count
- * @property-read \App\Models\JournalEntry|null $journalEntry
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ApPaymentAllocation> $paymentAllocations
+ * @property-read JournalEntry|null $journalEntry
+ * @property-read Collection<int, ApPaymentAllocation> $paymentAllocations
  * @property-read int|null $payment_allocations_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ApPayment> $payments
+ * @property-read Collection<int, ApPayment> $payments
  * @property-read int|null $payments_count
- * @property-read \App\Models\PurchaseOrder|null $purchaseOrder
- * @property-read \App\Models\Supplier $supplier
+ * @property-read PurchaseOrder|null $purchaseOrder
+ * @property-read Supplier $supplier
  *
  * @method static \Database\Factories\SupplierBillFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBill newModelQuery()
@@ -89,7 +92,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  */
 class SupplierBill extends Model
 {
-    /** @use HasFactory<\Database\Factories\SupplierBillFactory> */
+    /** @use HasFactory<SupplierBillFactory> */
     use BuildsAttributeCasts, HasFactory, HasSupplierRelation;
 
     /**

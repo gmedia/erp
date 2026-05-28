@@ -4,13 +4,14 @@ namespace App\Http\Resources\StockMonitor;
 
 use App\Http\Resources\Concerns\BuildsStockMovementInventoryResourceData;
 use App\Models\StockMovement;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * @property StockMovement $resource
  */
 /**
- * @mixin mixed|\Illuminate\Database\Eloquent\Model
+ * @mixin mixed|Model
  */
 class StockMonitorResource extends JsonResource
 {

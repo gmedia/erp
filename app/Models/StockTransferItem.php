@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Database\Factories\StockTransferItemFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -15,11 +17,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property numeric $quantity_received
  * @property numeric $unit_cost
  * @property string|null $notes
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Product $product
- * @property-read \App\Models\StockTransfer $stockTransfer
- * @property-read \App\Models\Unit $unit
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Product $product
+ * @property-read StockTransfer $stockTransfer
+ * @property-read Unit $unit
  *
  * @method static \Database\Factories\StockTransferItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransferItem newModelQuery()
@@ -40,7 +42,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class StockTransferItem extends Model
 {
-    /** @use HasFactory<\Database\Factories\StockTransferItemFactory> */
+    /** @use HasFactory<StockTransferItemFactory> */
     use HasFactory;
 
     /**

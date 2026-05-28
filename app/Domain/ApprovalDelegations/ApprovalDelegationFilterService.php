@@ -3,6 +3,7 @@
 namespace App\Domain\ApprovalDelegations;
 
 use App\Domain\Concerns\BaseFilterService;
+use App\Models\ApprovalDelegation;
 use Illuminate\Database\Eloquent\Builder;
 
 class ApprovalDelegationFilterService
@@ -12,7 +13,7 @@ class ApprovalDelegationFilterService
     /**
      * Apply advanced filters to the ApprovalDelegation query.
      *
-     * @param  Builder<\App\Models\ApprovalDelegation>  $query
+     * @param  Builder<ApprovalDelegation>  $query
      * @param  array<string, mixed>  $filters
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void

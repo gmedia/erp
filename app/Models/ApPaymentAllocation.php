@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use App\Models\Concerns\BuildsAttributeCasts;
+use Database\Factories\ApPaymentAllocationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -14,10 +16,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property numeric $allocated_amount
  * @property numeric $discount_taken
  * @property string|null $notes
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\ApPayment $payment
- * @property-read \App\Models\SupplierBill $supplierBill
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read ApPayment $payment
+ * @property-read SupplierBill $supplierBill
  *
  * @method static \Database\Factories\ApPaymentAllocationFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApPaymentAllocation newModelQuery()
@@ -36,7 +38,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class ApPaymentAllocation extends Model
 {
-    /** @use HasFactory<\Database\Factories\ApPaymentAllocationFactory> */
+    /** @use HasFactory<ApPaymentAllocationFactory> */
     use BuildsAttributeCasts, HasFactory;
 
     /**

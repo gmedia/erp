@@ -1,8 +1,9 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class)->group('auth');
+uses(RefreshDatabase::class)->group('auth');
 
 test('login endpoint is available', function () {
     $response = $this->postJson('/api/login', [

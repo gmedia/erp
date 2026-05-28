@@ -16,7 +16,7 @@ beforeEach(function () {
 
     // Create pipeline setup
     $this->pipeline = Pipeline::factory()->create([
-        'entity_type' => App\Models\Asset::class,
+        'entity_type' => Asset::class,
         'is_active' => true,
     ]);
 

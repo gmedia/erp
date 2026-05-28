@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Database\Factories\AccountBalanceFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -17,11 +19,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property numeric $credit_total
  * @property numeric $closing_balance
  * @property numeric $movement
- * @property \Illuminate\Support\Carbon|null $last_recalculated_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Account $account
- * @property-read \App\Models\FiscalYear $fiscalYear
+ * @property Carbon|null $last_recalculated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Account $account
+ * @property-read FiscalYear $fiscalYear
  *
  * @method static \Database\Factories\AccountBalanceFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountBalance newModelQuery()
@@ -45,7 +47,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class AccountBalance extends Model
 {
-    /** @use HasFactory<\Database\Factories\AccountBalanceFactory> */
+    /** @use HasFactory<AccountBalanceFactory> */
     use HasFactory;
 
     /**

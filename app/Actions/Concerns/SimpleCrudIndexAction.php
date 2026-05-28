@@ -5,6 +5,7 @@ namespace App\Actions\Concerns;
 use App\Domain\Concerns\BaseFilterService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
@@ -44,7 +45,7 @@ abstract class SimpleCrudIndexAction
     /**
      * Get the model class for the entity.
      *
-     * @return class-string<\Illuminate\Database\Eloquent\Model>
+     * @return class-string<Model>
      */
     abstract protected function getModelClass(): string;
 

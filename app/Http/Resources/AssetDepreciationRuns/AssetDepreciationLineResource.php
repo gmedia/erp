@@ -2,11 +2,12 @@
 
 namespace App\Http\Resources\AssetDepreciationRuns;
 
+use App\Models\AssetDepreciationLine;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @mixin \App\Models\AssetDepreciationLine
+ * @mixin AssetDepreciationLine
  */
 class AssetDepreciationLineResource extends JsonResource
 {

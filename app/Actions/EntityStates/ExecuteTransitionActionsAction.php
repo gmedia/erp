@@ -4,6 +4,7 @@ namespace App\Actions\EntityStates;
 
 use App\Actions\Approvals\TriggerApprovalAction;
 use App\Models\PipelineTransition;
+use App\Models\PipelineTransitionAction;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
@@ -30,7 +31,7 @@ class ExecuteTransitionActionsAction
         $results = [];
 
         foreach ($actions as $actionDefinition) {
-            /** @var \App\Models\PipelineTransitionAction $actionDefinition */
+            /** @var PipelineTransitionAction $actionDefinition */
             $type = $actionDefinition->action_type;
             $params = $actionDefinition->config ?? [];
             $onFailure = $actionDefinition->on_failure ?? 'abort';

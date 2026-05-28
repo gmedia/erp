@@ -19,10 +19,11 @@ export function LanguageSwitcher() {
     const { locale, availableLocales, setLocale } = useLocale();
     useTranslation();
 
-    const currentLocale = localeLabels[locale] ?? localeLabels.en ?? {
-        label: locale,
-        flag: '🌐',
-    };
+    const currentLocale = localeLabels[locale] ??
+        localeLabels.en ?? {
+            label: locale,
+            flag: '🌐',
+        };
 
     return (
         <DropdownMenu>

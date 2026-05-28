@@ -4,6 +4,7 @@ use App\Actions\Customers\ExportCustomersAction;
 use App\Http\Requests\Customers\ExportCustomerRequest;
 use App\Models\Customer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -23,7 +24,7 @@ test('execute exports customers and returns file info', function () {
 
     $result = $action->execute($request);
 
-    expect($result)->toBeInstanceOf(\Illuminate\Http\JsonResponse::class);
+    expect($result)->toBeInstanceOf(JsonResponse::class);
 
     $data = $result->getData(true);
     expect($data)->toHaveKeys(['url', 'filename'])
@@ -46,5 +47,5 @@ test('execute exports with search filter', function () {
 
     $result = $action->execute($request);
 
-    expect($result)->toBeInstanceOf(\Illuminate\Http\JsonResponse::class);
+    expect($result)->toBeInstanceOf(JsonResponse::class);
 });

@@ -9,7 +9,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property InventoryStocktake $resource
  */
 /**
- * @mixin \App\Models\InventoryStocktake
+ * @mixin InventoryStocktake
  */
 class InventoryStocktakeResource extends JsonResource
 {

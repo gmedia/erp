@@ -4,9 +4,11 @@ namespace App\Models;
 
 use App\Models\Concerns\BuildsAttributeCasts;
 use App\Models\Concerns\HasProductRelation;
+use Database\Factories\StockMovementFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -22,13 +24,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int|null $reference_id
  * @property string|null $reference_number
  * @property string|null $notes
- * @property \Illuminate\Support\Carbon $moved_at
+ * @property Carbon $moved_at
  * @property int|null $created_by
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\User|null $createdBy
- * @property-read \App\Models\Product $product
- * @property-read \App\Models\Warehouse $warehouse
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read User|null $createdBy
+ * @property-read Product $product
+ * @property-read Warehouse $warehouse
  *
  * @method static \Database\Factories\StockMovementFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockMovement newModelQuery()
@@ -56,7 +58,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class StockMovement extends Model
 {
-    /** @use HasFactory<\Database\Factories\StockMovementFactory> */
+    /** @use HasFactory<StockMovementFactory> */
     use BuildsAttributeCasts, HasFactory, HasProductRelation;
 
     /**

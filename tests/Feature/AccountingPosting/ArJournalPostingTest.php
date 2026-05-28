@@ -9,6 +9,7 @@ use App\Models\CustomerInvoice;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -167,7 +168,7 @@ test('PostCustomerInvoiceJournalAction throws when no items exist', function () 
     $action = app(PostCustomerInvoiceJournalAction::class);
 
     expect(fn () => $action->execute($invoice->fresh()))
-        ->toThrow(Illuminate\Validation\ValidationException::class);
+        ->toThrow(ValidationException::class);
 });
 
 test('PostCustomerInvoiceJournalAction throws when no active COA version exists', function () {
@@ -188,7 +189,7 @@ test('PostCustomerInvoiceJournalAction throws when no active COA version exists'
     $action = app(PostCustomerInvoiceJournalAction::class);
 
     expect(fn () => $action->execute($invoice->fresh()))
-        ->toThrow(Illuminate\Validation\ValidationException::class);
+        ->toThrow(ValidationException::class);
 });
 
 test('PostArReceiptJournalAction creates a balanced posted journal entry', function () {
@@ -271,7 +272,7 @@ test('PostArReceiptJournalAction throws on non-positive total amount', function 
     $action = app(PostArReceiptJournalAction::class);
 
     expect(fn () => $action->execute($arReceipt->fresh()))
-        ->toThrow(Illuminate\Validation\ValidationException::class);
+        ->toThrow(ValidationException::class);
 });
 
 test('CustomerInvoiceController update triggers journal posting on sent transition', function () {

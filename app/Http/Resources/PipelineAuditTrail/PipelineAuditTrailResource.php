@@ -2,12 +2,13 @@
 
 namespace App\Http\Resources\PipelineAuditTrail;
 
+use App\Models\PipelineStateLog;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Str;
 
 /**
- * @mixin \App\Models\PipelineStateLog
+ * @mixin PipelineStateLog
  */
 class PipelineAuditTrailResource extends JsonResource
 {

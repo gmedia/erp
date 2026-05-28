@@ -3,6 +3,7 @@
 namespace App\Domain\Employees;
 
 use App\Domain\Concerns\BaseFilterService;
+use App\Models\Employee;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -17,7 +18,7 @@ class EmployeeFilterService
     /**
      * Apply advanced filters for employees (department, position, salary, hire date).
      *
-     * @param  \Illuminate\Database\Eloquent\Builder<\App\Models\Employee>  $query
+     * @param  Builder<Employee>  $query
      * @param  array<string, mixed>  $filters
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void

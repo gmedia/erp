@@ -3,11 +3,12 @@
 namespace App\Http\Resources\AssetStocktakes;
 
 use App\Http\Resources\Assets\AssetResource;
+use App\Models\AssetStocktakeItem;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @mixin \App\Models\AssetStocktakeItem
+ * @mixin AssetStocktakeItem
  */
 class AssetStocktakeItemResource extends JsonResource
 {

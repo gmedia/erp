@@ -3,11 +3,12 @@
 namespace Database\Factories;
 
 use App\Models\Account;
+use App\Models\AccountBalance;
 use App\Models\FiscalYear;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\AccountBalance>
+ * @extends Factory<AccountBalance>
  */
 class AccountBalanceFactory extends Factory
 {

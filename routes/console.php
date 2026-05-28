@@ -31,7 +31,7 @@ Artisan::command('recurring-journals:execute', function () {
             $action->execute($journal);
             $executed++;
             $this->line("  ✓ Executed: {$journal->name} (#{$journal->id})");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $failed++;
             $this->error("  ✗ Failed: {$journal->name} (#{$journal->id}) — {$e->getMessage()}");
             Log::error('Recurring journal execution failed', [

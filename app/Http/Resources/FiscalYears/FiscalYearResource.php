@@ -3,13 +3,14 @@
 namespace App\Http\Resources\FiscalYears;
 
 use App\Http\Resources\SimpleCrudResource;
+use Illuminate\Http\Request;
 
 class FiscalYearResource extends SimpleCrudResource
 {
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return array<string, mixed>
      */
     public function toArray($request): array

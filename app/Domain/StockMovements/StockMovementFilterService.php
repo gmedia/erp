@@ -3,6 +3,7 @@
 namespace App\Domain\StockMovements;
 
 use App\Domain\Concerns\BaseFilterService;
+use App\Models\StockMovement;
 use Illuminate\Database\Eloquent\Builder;
 
 class StockMovementFilterService
@@ -26,7 +27,7 @@ class StockMovementFilterService
     }
 
     /**
-     * @param  Builder<\App\Models\StockMovement>  $query
+     * @param  Builder<StockMovement>  $query
      * @param  array<string, mixed>  $filters
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void
@@ -46,7 +47,7 @@ class StockMovementFilterService
     }
 
     /**
-     * @param  Builder<\App\Models\StockMovement>  $query
+     * @param  Builder<StockMovement>  $query
      * @param  array<int, string>  $allowedSorts
      */
     public function applySorting(Builder $query, string $sortBy, string $sortDirection, array $allowedSorts): void

@@ -3,10 +3,11 @@
 namespace Database\Factories;
 
 use App\Models\Pipeline;
+use App\Models\PipelineState;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\PipelineState>
+ * @extends Factory<PipelineState>
  */
 class PipelineStateFactory extends Factory
 {

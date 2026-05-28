@@ -2,18 +2,21 @@
 
 namespace App\Models;
 
+use Database\Factories\BankReconciliationFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property int $account_id
  * @property int $fiscal_year_id
- * @property \Illuminate\Support\Carbon $reconciliation_date
- * @property \Illuminate\Support\Carbon $period_start
- * @property \Illuminate\Support\Carbon $period_end
+ * @property Carbon $reconciliation_date
+ * @property Carbon $period_start
+ * @property Carbon $period_end
  * @property numeric $statement_balance
  * @property numeric $book_balance
  * @property numeric $reconciled_balance
@@ -22,17 +25,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $notes
  * @property int|null $journal_entry_id
  * @property int|null $completed_by
- * @property \Illuminate\Support\Carbon|null $completed_at
+ * @property Carbon|null $completed_at
  * @property int|null $created_by
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Account $account
- * @property-read \App\Models\User|null $completedBy
- * @property-read \App\Models\User|null $creator
- * @property-read \App\Models\FiscalYear $fiscalYear
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BankReconciliationItem> $items
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Account $account
+ * @property-read User|null $completedBy
+ * @property-read User|null $creator
+ * @property-read FiscalYear $fiscalYear
+ * @property-read Collection<int, BankReconciliationItem> $items
  * @property-read int|null $items_count
- * @property-read \App\Models\JournalEntry|null $journalEntry
+ * @property-read JournalEntry|null $journalEntry
  *
  * @method static \Database\Factories\BankReconciliationFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliation newModelQuery()
@@ -61,7 +64,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class BankReconciliation extends Model
 {
-    /** @use HasFactory<\Database\Factories\BankReconciliationFactory> */
+    /** @use HasFactory<BankReconciliationFactory> */
     use HasFactory;
 
     /**

@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Database\Factories\ReportConfigurationFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -16,10 +19,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property array<array-key, mixed>|null $layout_config
  * @property bool $is_active
  * @property int|null $created_by
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\User|null $creator
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ReportSection> $sections
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read User|null $creator
+ * @property-read Collection<int, ReportSection> $sections
  * @property-read int|null $sections_count
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReportConfiguration active()
@@ -43,7 +46,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class ReportConfiguration extends Model
 {
-    /** @use HasFactory<\Database\Factories\ReportConfigurationFactory> */
+    /** @use HasFactory<ReportConfigurationFactory> */
     use HasFactory;
 
     public const TYPE_BALANCE_SHEET = 'balance_sheet';

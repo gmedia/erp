@@ -4,11 +4,14 @@ namespace App\Models;
 
 use App\Models\Concerns\BuildsAttributeCasts;
 use App\Models\Concerns\HasCustomerRelation;
+use Database\Factories\CustomerInvoiceFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -16,8 +19,8 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property int $customer_id
  * @property int $branch_id
  * @property int $fiscal_year_id
- * @property \Illuminate\Support\Carbon $invoice_date
- * @property \Illuminate\Support\Carbon $due_date
+ * @property Carbon $invoice_date
+ * @property Carbon $due_date
  * @property string|null $payment_terms
  * @property string $currency
  * @property numeric $subtotal
@@ -32,23 +35,23 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property int|null $journal_entry_id
  * @property int|null $created_by
  * @property int|null $sent_by
- * @property \Illuminate\Support\Carbon|null $sent_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Branch $branch
- * @property-read \App\Models\User|null $creator
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CreditNote> $creditNotes
+ * @property Carbon|null $sent_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Branch $branch
+ * @property-read User|null $creator
+ * @property-read Collection<int, CreditNote> $creditNotes
  * @property-read int|null $credit_notes_count
- * @property-read \App\Models\Customer $customer
- * @property-read \App\Models\FiscalYear $fiscalYear
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CustomerInvoiceItem> $items
+ * @property-read Customer $customer
+ * @property-read FiscalYear $fiscalYear
+ * @property-read Collection<int, CustomerInvoiceItem> $items
  * @property-read int|null $items_count
- * @property-read \App\Models\JournalEntry|null $journalEntry
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ArReceiptAllocation> $receiptAllocations
+ * @property-read JournalEntry|null $journalEntry
+ * @property-read Collection<int, ArReceiptAllocation> $receiptAllocations
  * @property-read int|null $receipt_allocations_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ArReceipt> $receipts
+ * @property-read Collection<int, ArReceipt> $receipts
  * @property-read int|null $receipts_count
- * @property-read \App\Models\User|null $sender
+ * @property-read User|null $sender
  *
  * @method static \Database\Factories\CustomerInvoiceFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerInvoice newModelQuery()
@@ -83,7 +86,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  */
 class CustomerInvoice extends Model
 {
-    /** @use HasFactory<\Database\Factories\CustomerInvoiceFactory> */
+    /** @use HasFactory<CustomerInvoiceFactory> */
     use BuildsAttributeCasts, HasCustomerRelation, HasFactory;
 
     /**

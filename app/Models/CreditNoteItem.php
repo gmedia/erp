@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use App\Models\Concerns\BuildsAttributeCasts;
+use Database\Factories\CreditNoteItemFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -18,11 +20,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property numeric $tax_percent
  * @property numeric $line_total
  * @property string|null $notes
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Account $account
- * @property-read \App\Models\CreditNote $creditNote
- * @property-read \App\Models\Product|null $product
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Account $account
+ * @property-read CreditNote $creditNote
+ * @property-read Product|null $product
  *
  * @method static \Database\Factories\CreditNoteItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNoteItem newModelQuery()
@@ -45,7 +47,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class CreditNoteItem extends Model
 {
-    /** @use HasFactory<\Database\Factories\CreditNoteItemFactory> */
+    /** @use HasFactory<CreditNoteItemFactory> */
     use BuildsAttributeCasts, HasFactory;
 
     /**

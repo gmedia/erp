@@ -12,7 +12,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property StockTransfer $resource
  */
 /**
- * @mixin \App\Models\StockTransfer
+ * @mixin StockTransfer
  */
 class StockTransferResource extends JsonResource
 {

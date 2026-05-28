@@ -2,16 +2,18 @@
 
 namespace App\Models;
 
+use Database\Factories\BankReconciliationItemFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property int $bank_reconciliation_id
  * @property int|null $journal_entry_line_id
  * @property int|null $account_id
- * @property \Illuminate\Support\Carbon $transaction_date
+ * @property Carbon $transaction_date
  * @property string $description
  * @property numeric $debit
  * @property numeric $credit
@@ -19,11 +21,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property bool $is_reconciled
  * @property string|null $reference
  * @property string|null $notes
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Account|null $account
- * @property-read \App\Models\BankReconciliation $bankReconciliation
- * @property-read \App\Models\JournalEntryLine|null $journalEntryLine
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Account|null $account
+ * @property-read BankReconciliation $bankReconciliation
+ * @property-read JournalEntryLine|null $journalEntryLine
  *
  * @method static \Database\Factories\BankReconciliationItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BankReconciliationItem newModelQuery()
@@ -48,7 +50,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class BankReconciliationItem extends Model
 {
-    /** @use HasFactory<\Database\Factories\BankReconciliationItemFactory> */
+    /** @use HasFactory<BankReconciliationItemFactory> */
     use HasFactory;
 
     /**

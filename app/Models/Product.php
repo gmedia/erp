@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use App\Models\Concerns\BuildsAttributeCasts;
+use Database\Factories\ProductFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -22,24 +25,24 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $billing_model How this product is billed
  * @property string $status
  * @property string|null $notes
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BillOfMaterial> $billOfMaterials
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Collection<int, BillOfMaterial> $billOfMaterials
  * @property-read int|null $bill_of_materials_count
- * @property-read \App\Models\Branch|null $branch
- * @property-read \App\Models\ProductCategory $category
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductDependency> $dependencies
+ * @property-read Branch|null $branch
+ * @property-read ProductCategory $category
+ * @property-read Collection<int, ProductDependency> $dependencies
  * @property-read int|null $dependencies_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductPrice> $prices
+ * @property-read Collection<int, ProductPrice> $prices
  * @property-read int|null $prices_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductionOrder> $productionOrders
+ * @property-read Collection<int, ProductionOrder> $productionOrders
  * @property-read int|null $production_orders_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductDependency> $relatedTo
+ * @property-read Collection<int, ProductDependency> $relatedTo
  * @property-read int|null $related_to_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SubscriptionPlan> $subscriptionPlans
+ * @property-read Collection<int, SubscriptionPlan> $subscriptionPlans
  * @property-read int|null $subscription_plans_count
- * @property-read \App\Models\Unit $unit
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BillOfMaterial> $usedInBillOfMaterials
+ * @property-read Unit $unit
+ * @property-read Collection<int, BillOfMaterial> $usedInBillOfMaterials
  * @property-read int|null $used_in_bill_of_materials_count
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product active()
@@ -68,7 +71,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Product extends Model
 {
-    /** @use HasFactory<\Database\Factories\ProductFactory> */
+    /** @use HasFactory<ProductFactory> */
     use BuildsAttributeCasts, HasFactory;
 
     /**

@@ -2,26 +2,29 @@
 
 namespace App\Models;
 
+use Database\Factories\AssetStocktakeFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property string $ulid
  * @property int $branch_id
  * @property string $reference
- * @property \Illuminate\Support\Carbon $planned_at
- * @property \Illuminate\Support\Carbon|null $performed_at
+ * @property Carbon $planned_at
+ * @property Carbon|null $performed_at
  * @property string $status
  * @property int|null $created_by
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Branch $branch
- * @property-read \App\Models\User|null $createdBy
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AssetStocktakeItem> $items
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Branch $branch
+ * @property-read User|null $createdBy
+ * @property-read Collection<int, AssetStocktakeItem> $items
  * @property-read int|null $items_count
  *
  * @method static \Database\Factories\AssetStocktakeFactory factory($count = null, $state = [])
@@ -43,7 +46,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class AssetStocktake extends Model
 {
-    /** @use HasFactory<\Database\Factories\AssetStocktakeFactory> */
+    /** @use HasFactory<AssetStocktakeFactory> */
     use HasFactory, HasUlids;
 
     /**

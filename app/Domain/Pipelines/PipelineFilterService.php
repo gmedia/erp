@@ -3,6 +3,7 @@
 namespace App\Domain\Pipelines;
 
 use App\Domain\Concerns\BaseFilterService;
+use App\Models\Pipeline;
 use Illuminate\Database\Eloquent\Builder;
 
 class PipelineFilterService
@@ -12,7 +13,7 @@ class PipelineFilterService
     }
 
     /**
-     * @param  Builder<\App\Models\Pipeline>  $query
+     * @param  Builder<Pipeline>  $query
      * @param  array<int, string>  $searchFields
      */
     public function applySearch(Builder $query, string $search, array $searchFields): void
@@ -21,7 +22,7 @@ class PipelineFilterService
     }
 
     /**
-     * @param  Builder<\App\Models\Pipeline>  $query
+     * @param  Builder<Pipeline>  $query
      * @param  array<string, mixed>  $filters
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void
@@ -41,7 +42,7 @@ class PipelineFilterService
     }
 
     /**
-     * @param  Builder<\App\Models\Pipeline>  $query
+     * @param  Builder<Pipeline>  $query
      * @param  array<int, string>  $allowedSorts
      */
     public function applySorting(Builder $query, string $sortBy, string $sortDirection, array $allowedSorts): void

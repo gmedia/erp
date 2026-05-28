@@ -16,6 +16,7 @@ use App\Http\Requests\ApPayments\UpdateApPaymentRequest;
 use App\Http\Resources\ApPayments\ApPaymentCollection;
 use App\Http\Resources\ApPayments\ApPaymentResource;
 use App\Models\ApPayment;
+use App\Models\ApPaymentAllocation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -104,7 +105,7 @@ class ApPaymentController extends Controller
     public function destroy(ApPayment $apPayment): JsonResponse
     {
         DB::transaction(function () use ($apPayment): void {
-            /** @var \App\Models\ApPaymentAllocation $allocation */
+            /** @var ApPaymentAllocation $allocation */
             foreach ($apPayment->allocations()->with('supplierBill')->get() as $allocation) {
                 $bill = $allocation->supplierBill;
 

@@ -4,6 +4,7 @@ namespace App\Actions\EntityStates;
 
 use App\Models\Pipeline;
 use App\Models\PipelineEntityState;
+use App\Models\PipelineState;
 use App\Models\PipelineStateLog;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -40,7 +41,7 @@ class AssignPipelineAction
         }
 
         // 3. Find the initial state for the configured pipeline
-        /** @var \App\Models\PipelineState|null $initialState */
+        /** @var PipelineState|null $initialState */
         $initialState = $pipeline->states()->where('type', 'initial')->first();
 
         if (! $initialState) {

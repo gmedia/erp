@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasSupplierRelation;
+use Database\Factories\SupplierReturnFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -15,25 +18,25 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int|null $goods_receipt_id
  * @property int $supplier_id
  * @property int $warehouse_id
- * @property \Illuminate\Support\Carbon $return_date
+ * @property Carbon $return_date
  * @property string $reason
  * @property string $status
  * @property string|null $notes
  * @property int|null $confirmed_by
- * @property \Illuminate\Support\Carbon|null $confirmed_at
+ * @property Carbon|null $confirmed_at
  * @property int|null $journal_entry_id
  * @property int|null $created_by
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\User|null $confirmer
- * @property-read \App\Models\User|null $creator
- * @property-read \App\Models\GoodsReceipt|null $goodsReceipt
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SupplierReturnItem> $items
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read User|null $confirmer
+ * @property-read User|null $creator
+ * @property-read GoodsReceipt|null $goodsReceipt
+ * @property-read Collection<int, SupplierReturnItem> $items
  * @property-read int|null $items_count
- * @property-read \App\Models\JournalEntry|null $journalEntry
- * @property-read \App\Models\PurchaseOrder $purchaseOrder
- * @property-read \App\Models\Supplier $supplier
- * @property-read \App\Models\Warehouse $warehouse
+ * @property-read JournalEntry|null $journalEntry
+ * @property-read PurchaseOrder $purchaseOrder
+ * @property-read Supplier $supplier
+ * @property-read Warehouse $warehouse
  *
  * @method static \Database\Factories\SupplierReturnFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturn newModelQuery()
@@ -60,7 +63,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class SupplierReturn extends Model
 {
-    /** @use HasFactory<\Database\Factories\SupplierReturnFactory> */
+    /** @use HasFactory<SupplierReturnFactory> */
     use HasFactory, HasSupplierRelation;
 
     /**

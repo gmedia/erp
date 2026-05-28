@@ -2,17 +2,19 @@
 
 namespace App\Http\Resources;
 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @mixin mixed|\Illuminate\Database\Eloquent\Model
+ * @mixin mixed|Model
  */
 class SimpleCrudResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return array<string, mixed>
      */
     public function toArray($request): array

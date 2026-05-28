@@ -4,6 +4,7 @@ namespace App\Http\Requests\ApprovalDelegations;
 
 use App\Http\Requests\AuthorizedFormRequest;
 use App\Http\Requests\Concerns\HasSometimesArrayRules;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 abstract class AbstractApprovalDelegationRequest extends AuthorizedFormRequest
 {
@@ -12,7 +13,7 @@ abstract class AbstractApprovalDelegationRequest extends AuthorizedFormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {

@@ -3,6 +3,7 @@
 namespace App\Domain\ApprovalFlows;
 
 use App\Domain\Concerns\BaseFilterService;
+use App\Models\ApprovalFlow;
 use Illuminate\Database\Eloquent\Builder;
 
 class ApprovalFlowFilterService
@@ -10,7 +11,7 @@ class ApprovalFlowFilterService
     use BaseFilterService;
 
     /**
-     * @param  Builder<\App\Models\ApprovalFlow>  $query
+     * @param  Builder<ApprovalFlow>  $query
      * @param  array<string, mixed>  $filters
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void

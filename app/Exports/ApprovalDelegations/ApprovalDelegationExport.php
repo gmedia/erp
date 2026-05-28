@@ -2,6 +2,7 @@
 
 namespace App\Exports\ApprovalDelegations;
 
+use App\Models\ApprovalDelegation;
 use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -15,7 +16,7 @@ class ApprovalDelegationExport implements FromQuery, ShouldAutoSize, WithHeading
     ) {}
 
     /**
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return Builder
      */
     public function query()
     {
@@ -38,7 +39,7 @@ class ApprovalDelegationExport implements FromQuery, ShouldAutoSize, WithHeading
     }
 
     /**
-     * @param  \App\Models\ApprovalDelegation  $row
+     * @param  ApprovalDelegation  $row
      */
     public function map($row): array
     {

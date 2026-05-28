@@ -5,10 +5,13 @@ namespace App\Models;
 use App\Models\Concerns\BuildsAttributeCasts;
 use App\Models\Concerns\HasCustomerRelation;
 use App\Models\Concerns\HasFinancialTransactionRelations;
+use Database\Factories\ArReceiptFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -16,7 +19,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property int $customer_id
  * @property int $branch_id
  * @property int $fiscal_year_id
- * @property \Illuminate\Support\Carbon $receipt_date
+ * @property Carbon $receipt_date
  * @property string $payment_method
  * @property int $bank_account_id
  * @property string $currency
@@ -29,20 +32,20 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property int|null $journal_entry_id
  * @property int|null $created_by
  * @property int|null $confirmed_by
- * @property \Illuminate\Support\Carbon|null $confirmed_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ArReceiptAllocation> $allocations
+ * @property Carbon|null $confirmed_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Collection<int, ArReceiptAllocation> $allocations
  * @property-read int|null $allocations_count
- * @property-read \App\Models\Account $bankAccount
- * @property-read \App\Models\Branch $branch
- * @property-read \App\Models\User|null $confirmer
- * @property-read \App\Models\User|null $creator
- * @property-read \App\Models\Customer $customer
- * @property-read \App\Models\FiscalYear $fiscalYear
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CustomerInvoice> $invoices
+ * @property-read Account $bankAccount
+ * @property-read Branch $branch
+ * @property-read User|null $confirmer
+ * @property-read User|null $creator
+ * @property-read Customer $customer
+ * @property-read FiscalYear $fiscalYear
+ * @property-read Collection<int, CustomerInvoice> $invoices
  * @property-read int|null $invoices_count
- * @property-read \App\Models\JournalEntry|null $journalEntry
+ * @property-read JournalEntry|null $journalEntry
  *
  * @method static \Database\Factories\ArReceiptFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ArReceipt newModelQuery()
@@ -74,7 +77,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  */
 class ArReceipt extends Model
 {
-    /** @use HasFactory<\Database\Factories\ArReceiptFactory> */
+    /** @use HasFactory<ArReceiptFactory> */
     use BuildsAttributeCasts, HasCustomerRelation, HasFactory, HasFinancialTransactionRelations;
 
     /**

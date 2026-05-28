@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use Database\Factories\ApprovalFlowStepFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -19,12 +22,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property int|null $escalate_after_hours
  * @property int|null $escalation_user_id
  * @property bool $can_reject
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Department|null $department
- * @property-read \App\Models\User|null $escalationUser
- * @property-read \App\Models\ApprovalFlow $flow
- * @property-read \App\Models\User|null $user
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Department|null $department
+ * @property-read User|null $escalationUser
+ * @property-read ApprovalFlow $flow
+ * @property-read User|null $user
  *
  * @method static \Database\Factories\ApprovalFlowStepFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalFlowStep newModelQuery()
@@ -50,7 +53,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ApprovalFlowStep extends Model
 {
-    /** @use HasFactory<\Database\Factories\ApprovalFlowStepFactory> */
+    /** @use HasFactory<ApprovalFlowStepFactory> */
     use HasFactory;
 
     /**
@@ -87,22 +90,22 @@ class ApprovalFlowStep extends Model
         'can_reject' => 'boolean',
     ];
 
-    public function flow(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function flow(): BelongsTo
     {
         return $this->belongsTo(ApprovalFlow::class, 'approval_flow_id');
     }
 
-    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approver_user_id');
     }
 
-    public function department(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class, 'approver_department_id');
     }
 
-    public function escalationUser(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function escalationUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'escalation_user_id');
     }

@@ -5,25 +5,27 @@ namespace App\Models;
 use App\Models\Concerns\BuildsAttributeCasts;
 use App\Models\Concerns\HasAssetAndCreatorRelations;
 use App\Models\Concerns\HasSupplierRelation;
+use Database\Factories\AssetMaintenanceFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property int $asset_id
  * @property string $maintenance_type
  * @property string $status
- * @property \Illuminate\Support\Carbon|null $scheduled_at
- * @property \Illuminate\Support\Carbon|null $performed_at
+ * @property Carbon|null $scheduled_at
+ * @property Carbon|null $performed_at
  * @property int|null $supplier_id
  * @property numeric $cost
  * @property string|null $notes
  * @property int|null $created_by
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Asset $asset
- * @property-read \App\Models\User|null $createdBy
- * @property-read \App\Models\Supplier|null $supplier
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Asset $asset
+ * @property-read User|null $createdBy
+ * @property-read Supplier|null $supplier
  *
  * @method static \Database\Factories\AssetMaintenanceFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetMaintenance newModelQuery()
@@ -46,7 +48,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class AssetMaintenance extends Model
 {
-    /** @use HasFactory<\Database\Factories\AssetMaintenanceFactory> */
+    /** @use HasFactory<AssetMaintenanceFactory> */
     use BuildsAttributeCasts, HasAssetAndCreatorRelations, HasFactory, HasSupplierRelation;
 
     /**

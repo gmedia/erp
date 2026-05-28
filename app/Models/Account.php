@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Database\Factories\AccountFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -23,13 +25,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $description
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Account> $children
+ * @property-read Collection<int, Account> $children
  * @property-read int|null $children_count
- * @property-read \App\Models\CoaVersion $coaVersion
+ * @property-read CoaVersion $coaVersion
  * @property-read float $balance
  * @property-read float $total_credit
  * @property-read float $total_debit
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\JournalEntryLine> $journalLines
+ * @property-read Collection<int, JournalEntryLine> $journalLines
  * @property-read int|null $journal_lines_count
  * @property-read Account|null $parent
  *
@@ -58,7 +60,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Account extends Model
 {
-    /** @use HasFactory<\Database\Factories\AccountFactory> */
+    /** @use HasFactory<AccountFactory> */
     use HasFactory;
 
     /**

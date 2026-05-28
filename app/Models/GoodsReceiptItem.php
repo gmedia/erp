@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Database\Factories\GoodsReceiptItemFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -17,12 +19,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property numeric $quantity_rejected
  * @property numeric $unit_price
  * @property string|null $notes
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\GoodsReceipt $goodsReceipt
- * @property-read \App\Models\Product $product
- * @property-read \App\Models\PurchaseOrderItem $purchaseOrderItem
- * @property-read \App\Models\Unit $unit
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read GoodsReceipt $goodsReceipt
+ * @property-read Product $product
+ * @property-read PurchaseOrderItem $purchaseOrderItem
+ * @property-read Unit $unit
  *
  * @method static \Database\Factories\GoodsReceiptItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsReceiptItem newModelQuery()
@@ -45,7 +47,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class GoodsReceiptItem extends Model
 {
-    /** @use HasFactory<\Database\Factories\GoodsReceiptItemFactory> */
+    /** @use HasFactory<GoodsReceiptItemFactory> */
     use HasFactory;
 
     /**

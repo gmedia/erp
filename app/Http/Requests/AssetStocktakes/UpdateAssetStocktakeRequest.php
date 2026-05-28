@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\AssetStocktakes;
 
+use Illuminate\Validation\Rules\Unique;
+
 class UpdateAssetStocktakeRequest extends AbstractAssetStocktakeRequest
 {
     protected function branchRules(): array
@@ -38,7 +40,7 @@ class UpdateAssetStocktakeRequest extends AbstractAssetStocktakeRequest
         ];
     }
 
-    protected function assetStocktakeReferenceUniqueRule(): \Illuminate\Validation\Rules\Unique
+    protected function assetStocktakeReferenceUniqueRule(): Unique
     {
         return parent::assetStocktakeReferenceUniqueRule()->ignore($this->route('asset_stocktake'));
     }

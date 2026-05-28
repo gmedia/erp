@@ -4,6 +4,7 @@ use App\Models\ReportConfiguration;
 use App\Models\ReportSection;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('financial-reports');
@@ -64,7 +65,7 @@ test('code is unique per configuration', function () {
     ReportSection::factory()->create(['report_configuration_id' => $config->id, 'code' => 'current_assets']);
 
     expect(fn () => ReportSection::factory()->create(['report_configuration_id' => $config->id, 'code' => 'current_assets']))
-        ->toThrow(Illuminate\Database\QueryException::class);
+        ->toThrow(QueryException::class);
 });
 
 test('same code can exist across different configurations', function () {

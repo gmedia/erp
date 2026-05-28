@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('permission:employee,true')->group(function () {
@@ -24,6 +25,6 @@ Route::middleware('permission:employee,true')->group(function () {
 Route::middleware('permission:user,true')->group(function () {
     Route::get('employees/{employee}/permissions', [EmployeeController::class, 'permissions']);
     Route::post('employees/{employee}/permissions', [EmployeeController::class, 'syncPermissions']);
-    Route::get('employees/{employee}/user', [\App\Http\Controllers\UserController::class, 'getUserByEmployee']);
-    Route::post('employees/{employee}/user', [\App\Http\Controllers\UserController::class, 'updateUser']);
+    Route::get('employees/{employee}/user', [UserController::class, 'getUserByEmployee']);
+    Route::post('employees/{employee}/user', [UserController::class, 'updateUser']);
 });

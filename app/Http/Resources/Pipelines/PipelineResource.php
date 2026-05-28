@@ -7,7 +7,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 /** @property Pipeline $resource */
 /**
- * @mixin \App\Models\Pipeline
+ * @mixin Pipeline
  */
 class PipelineResource extends JsonResource
 {

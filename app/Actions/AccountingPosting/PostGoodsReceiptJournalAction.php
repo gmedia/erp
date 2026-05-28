@@ -4,6 +4,7 @@ namespace App\Actions\AccountingPosting;
 
 use App\Actions\JournalEntries\CreateJournalEntryAction;
 use App\Models\GoodsReceipt;
+use App\Models\GoodsReceiptItem;
 use App\Models\JournalEntry;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -47,7 +48,7 @@ class PostGoodsReceiptJournalAction
             $total = 0.0;
 
             foreach ($goodsReceipt->items as $item) {
-                /** @var \App\Models\GoodsReceiptItem $item */
+                /** @var GoodsReceiptItem $item */
                 $total += (float) $item->quantity_accepted * (float) $item->unit_price;
             }
 

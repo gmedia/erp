@@ -4,10 +4,11 @@ namespace Database\Factories;
 
 use App\Models\Account;
 use App\Models\RecurringJournal;
+use App\Models\RecurringJournalLine;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\RecurringJournalLine>
+ * @extends Factory<RecurringJournalLine>
  */
 class RecurringJournalLineFactory extends Factory
 {

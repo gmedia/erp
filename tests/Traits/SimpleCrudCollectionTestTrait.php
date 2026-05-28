@@ -2,6 +2,9 @@
 
 namespace Tests\Traits;
 
+use App\Http\Resources\SimpleCrudResource;
+use Illuminate\Http\Request;
+
 /**
  * Trait for testing Simple CRUD Collection classes.
  *
@@ -26,7 +29,7 @@ trait SimpleCrudCollectionTestTrait
 
         $collectionClass = $this->getCollectionClass();
         $collection = new $collectionClass($models);
-        $request = new \Illuminate\Http\Request;
+        $request = new Request;
 
         $result = $collection->toArray($request);
 
@@ -49,7 +52,7 @@ trait SimpleCrudCollectionTestTrait
     {
         $collectionClass = $this->getCollectionClass();
         $collection = new $collectionClass(collect());
-        $request = new \Illuminate\Http\Request;
+        $request = new Request;
 
         $result = $collection->toArray($request);
 
@@ -78,6 +81,6 @@ trait SimpleCrudCollectionTestTrait
      */
     protected function getResourceClass(): string
     {
-        return \App\Http\Resources\SimpleCrudResource::class;
+        return SimpleCrudResource::class;
     }
 }

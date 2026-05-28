@@ -4,11 +4,12 @@ namespace App\Http\Controllers\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Collection;
 
 trait HandlesNestedItemsResponse
 {
     /**
-     * @param  Model&object{items: \Illuminate\Support\Collection<int, mixed>}  $entity
+     * @param  Model&object{items: Collection<int, mixed>}  $entity
      */
     protected function nestedItemsResponse(Model $entity, array $relations, callable $mapper): JsonResponse
     {

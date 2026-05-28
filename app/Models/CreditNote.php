@@ -4,10 +4,13 @@ namespace App\Models;
 
 use App\Models\Concerns\BuildsAttributeCasts;
 use App\Models\Concerns\HasCustomerRelation;
+use Database\Factories\CreditNoteFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -16,7 +19,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int|null $customer_invoice_id
  * @property int $branch_id
  * @property int $fiscal_year_id
- * @property \Illuminate\Support\Carbon $credit_note_date
+ * @property Carbon $credit_note_date
  * @property string $reason
  * @property numeric $subtotal
  * @property numeric $tax_amount
@@ -26,18 +29,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int|null $journal_entry_id
  * @property int|null $created_by
  * @property int|null $confirmed_by
- * @property \Illuminate\Support\Carbon|null $confirmed_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Branch $branch
- * @property-read \App\Models\User|null $confirmer
- * @property-read \App\Models\User|null $creator
- * @property-read \App\Models\Customer $customer
- * @property-read \App\Models\CustomerInvoice|null $customerInvoice
- * @property-read \App\Models\FiscalYear $fiscalYear
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CreditNoteItem> $items
+ * @property Carbon|null $confirmed_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Branch $branch
+ * @property-read User|null $confirmer
+ * @property-read User|null $creator
+ * @property-read Customer $customer
+ * @property-read CustomerInvoice|null $customerInvoice
+ * @property-read FiscalYear $fiscalYear
+ * @property-read Collection<int, CreditNoteItem> $items
  * @property-read int|null $items_count
- * @property-read \App\Models\JournalEntry|null $journalEntry
+ * @property-read JournalEntry|null $journalEntry
  *
  * @method static \Database\Factories\CreditNoteFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CreditNote newModelQuery()
@@ -67,7 +70,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class CreditNote extends Model
 {
-    /** @use HasFactory<\Database\Factories\CreditNoteFactory> */
+    /** @use HasFactory<CreditNoteFactory> */
     use BuildsAttributeCasts, HasCustomerRelation, HasFactory;
 
     /**

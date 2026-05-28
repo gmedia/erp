@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Database\Factories\StockAdjustmentItemFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -17,11 +19,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property numeric $unit_cost
  * @property numeric $total_cost
  * @property string|null $reason
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Product $product
- * @property-read \App\Models\StockAdjustment $stockAdjustment
- * @property-read \App\Models\Unit $unit
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Product $product
+ * @property-read StockAdjustment $stockAdjustment
+ * @property-read Unit $unit
  *
  * @method static \Database\Factories\StockAdjustmentItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockAdjustmentItem newModelQuery()
@@ -44,7 +46,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class StockAdjustmentItem extends Model
 {
-    /** @use HasFactory<\Database\Factories\StockAdjustmentItemFactory> */
+    /** @use HasFactory<StockAdjustmentItemFactory> */
     use HasFactory;
 
     /**

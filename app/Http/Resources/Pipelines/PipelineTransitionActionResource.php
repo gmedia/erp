@@ -2,11 +2,12 @@
 
 namespace App\Http\Resources\Pipelines;
 
+use App\Models\PipelineTransitionAction;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @mixin \App\Models\PipelineTransitionAction
+ * @mixin PipelineTransitionAction
  */
 class PipelineTransitionActionResource extends JsonResource
 {

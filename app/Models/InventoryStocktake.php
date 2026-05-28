@@ -2,30 +2,33 @@
 
 namespace App\Models;
 
+use Database\Factories\InventoryStocktakeFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property string|null $stocktake_number
  * @property int $warehouse_id
- * @property \Illuminate\Support\Carbon $stocktake_date
+ * @property Carbon $stocktake_date
  * @property string $status
  * @property int|null $product_category_id
  * @property string|null $notes
  * @property int|null $created_by
  * @property int|null $completed_by
- * @property \Illuminate\Support\Carbon|null $completed_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\User|null $completedBy
- * @property-read \App\Models\User|null $createdBy
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\InventoryStocktakeItem> $items
+ * @property Carbon|null $completed_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read User|null $completedBy
+ * @property-read User|null $createdBy
+ * @property-read Collection<int, InventoryStocktakeItem> $items
  * @property-read int|null $items_count
- * @property-read \App\Models\ProductCategory|null $productCategory
- * @property-read \App\Models\Warehouse $warehouse
+ * @property-read ProductCategory|null $productCategory
+ * @property-read Warehouse $warehouse
  *
  * @method static \Database\Factories\InventoryStocktakeFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|InventoryStocktake newModelQuery()
@@ -48,7 +51,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class InventoryStocktake extends Model
 {
-    /** @use HasFactory<\Database\Factories\InventoryStocktakeFactory> */
+    /** @use HasFactory<InventoryStocktakeFactory> */
     use HasFactory;
 
     /**

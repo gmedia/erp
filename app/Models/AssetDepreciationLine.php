@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Database\Factories\AssetDepreciationLineFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -15,10 +17,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property numeric $accumulated_before
  * @property numeric $accumulated_after
  * @property numeric $book_value_after
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Asset $asset
- * @property-read \App\Models\AssetDepreciationRun $run
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Asset $asset
+ * @property-read AssetDepreciationRun $run
  *
  * @method static \Database\Factories\AssetDepreciationLineFactory factory($count = null, $state = [])
  * @method static Builder<static>|AssetDepreciationLine newModelQuery()
@@ -38,7 +40,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class AssetDepreciationLine extends Model
 {
-    /** @use HasFactory<\Database\Factories\AssetDepreciationLineFactory> */
+    /** @use HasFactory<AssetDepreciationLineFactory> */
     use HasFactory;
 
     /**

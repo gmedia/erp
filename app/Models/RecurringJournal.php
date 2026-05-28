@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Database\Factories\RecurringJournalFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -13,20 +16,20 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $description
  * @property int|null $fiscal_year_id
  * @property string $frequency
- * @property \Illuminate\Support\Carbon $next_run_date
- * @property \Illuminate\Support\Carbon|null $last_run_date
- * @property \Illuminate\Support\Carbon|null $end_date
+ * @property Carbon $next_run_date
+ * @property Carbon|null $last_run_date
+ * @property Carbon|null $end_date
  * @property numeric $total_amount
  * @property bool $auto_post
  * @property bool $is_active
  * @property int|null $created_by
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\User|null $creator
- * @property-read \App\Models\FiscalYear|null $fiscalYear
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\JournalEntry> $generatedEntries
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read User|null $creator
+ * @property-read FiscalYear|null $fiscalYear
+ * @property-read Collection<int, JournalEntry> $generatedEntries
  * @property-read int|null $generated_entries_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\RecurringJournalLine> $lines
+ * @property-read Collection<int, RecurringJournalLine> $lines
  * @property-read int|null $lines_count
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournal active()
@@ -54,7 +57,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class RecurringJournal extends Model
 {
-    /** @use HasFactory<\Database\Factories\RecurringJournalFactory> */
+    /** @use HasFactory<RecurringJournalFactory> */
     use HasFactory;
 
     /**

@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Database\Factories\PipelineStateFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -17,9 +19,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $description
  * @property int $sort_order
  * @property array<array-key, mixed>|null $metadata
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Pipeline $pipeline
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Pipeline $pipeline
  *
  * @method static \Database\Factories\PipelineStateFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineState newModelQuery()
@@ -42,7 +44,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class PipelineState extends Model
 {
-    /** @use HasFactory<\Database\Factories\PipelineStateFactory> */
+    /** @use HasFactory<PipelineStateFactory> */
     use HasFactory;
 
     /**

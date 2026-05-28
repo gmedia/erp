@@ -2,21 +2,24 @@
 
 namespace App\Models;
 
+use Database\Factories\CoaVersionFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property string $name
  * @property int|null $fiscal_year_id
  * @property string $status
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Account> $accounts
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Collection<int, Account> $accounts
  * @property-read int|null $accounts_count
- * @property-read \App\Models\FiscalYear|null $fiscalYear
+ * @property-read FiscalYear|null $fiscalYear
  *
  * @method static \Database\Factories\CoaVersionFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CoaVersion newModelQuery()
@@ -33,7 +36,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class CoaVersion extends Model
 {
-    /** @use HasFactory<\Database\Factories\CoaVersionFactory> */
+    /** @use HasFactory<CoaVersionFactory> */
     use HasFactory;
 
     /**

@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\PipelineEntityStateFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -15,16 +18,16 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property int $entity_id
  * @property int $current_state_id
  * @property int|null $last_transitioned_by
- * @property \Illuminate\Support\Carbon|null $last_transitioned_at
+ * @property Carbon|null $last_transitioned_at
  * @property array<array-key, mixed>|null $metadata
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\PipelineState $currentState
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read PipelineState $currentState
  * @property-read Model|Eloquent $entity
- * @property-read \App\Models\User|null $lastTransitionedBy
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PipelineStateLog> $logs
+ * @property-read User|null $lastTransitionedBy
+ * @property-read Collection<int, PipelineStateLog> $logs
  * @property-read int|null $logs_count
- * @property-read \App\Models\Pipeline $pipeline
+ * @property-read Pipeline $pipeline
  *
  * @method static \Database\Factories\PipelineEntityStateFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineEntityState newModelQuery()
@@ -45,7 +48,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  */
 class PipelineEntityState extends Model
 {
-    /** @use HasFactory<\Database\Factories\PipelineEntityStateFactory> */
+    /** @use HasFactory<PipelineEntityStateFactory> */
     use HasFactory;
 
     /**

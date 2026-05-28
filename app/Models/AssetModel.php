@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use App\Models\Concerns\BuildsAttributeCasts;
+use Database\Factories\AssetModelFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -14,11 +17,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $manufacturer
  * @property string $model_name
  * @property array<array-key, mixed>|null $specs
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Asset> $assets
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Collection<int, Asset> $assets
  * @property-read int|null $assets_count
- * @property-read \App\Models\AssetCategory $category
+ * @property-read AssetCategory $category
  *
  * @method static \Database\Factories\AssetModelFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetModel newModelQuery()
@@ -36,7 +39,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class AssetModel extends Model
 {
-    /** @use HasFactory<\Database\Factories\AssetModelFactory> */
+    /** @use HasFactory<AssetModelFactory> */
     use BuildsAttributeCasts, HasFactory;
 
     /**

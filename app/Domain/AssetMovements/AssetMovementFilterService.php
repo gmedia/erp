@@ -3,6 +3,7 @@
 namespace App\Domain\AssetMovements;
 
 use App\Domain\Concerns\BaseFilterService;
+use App\Models\AssetMovement;
 use Illuminate\Database\Eloquent\Builder;
 
 class AssetMovementFilterService
@@ -15,7 +16,7 @@ class AssetMovementFilterService
     }
 
     /**
-     * @param  Builder<\App\Models\AssetMovement>  $query
+     * @param  Builder<AssetMovement>  $query
      * @param  array<string, mixed>  $filters
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void

@@ -2,9 +2,10 @@
 
 use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class)->group('auth');
+uses(RefreshDatabase::class)->group('auth');
 
 test('reset password link endpoint is available', function () {
     $response = $this->postJson('/api/forgot-password', ['email' => 'invalid@example.com']);

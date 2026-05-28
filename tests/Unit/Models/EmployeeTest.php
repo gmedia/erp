@@ -2,6 +2,7 @@
 
 use App\Models\Employee;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 
 use function Pest\Laravel\assertDatabaseHas;
 
@@ -35,7 +36,7 @@ test('casts are applied correctly', function () {
         ->and($employee->salary)->toBe('12345.67');
 
     // hire_date should be a Carbon instance
-    expect($employee->hire_date)->toBeInstanceOf(\Illuminate\Support\Carbon::class);
+    expect($employee->hire_date)->toBeInstanceOf(Carbon::class);
 });
 
 test('fillable attributes are defined correctly', function () {

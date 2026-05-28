@@ -2,19 +2,22 @@
 
 namespace App\Models;
 
+use Database\Factories\UnitFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property string $name
  * @property string|null $symbol
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BillOfMaterial> $billOfMaterials
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Collection<int, BillOfMaterial> $billOfMaterials
  * @property-read int|null $bill_of_materials_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Product> $products
+ * @property-read Collection<int, Product> $products
  * @property-read int|null $products_count
  *
  * @method static \Database\Factories\UnitFactory factory($count = null, $state = [])
@@ -31,7 +34,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Unit extends Model
 {
-    /** @use HasFactory<\Database\Factories\UnitFactory> */
+    /** @use HasFactory<UnitFactory> */
     use HasFactory;
 
     /**

@@ -2,11 +2,12 @@
 
 namespace App\Http\Resources\EntityStates;
 
+use App\Models\PipelineStateLog;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @mixin \App\Models\PipelineStateLog
+ * @mixin PipelineStateLog
  */
 class StateTimelineResource extends JsonResource
 {

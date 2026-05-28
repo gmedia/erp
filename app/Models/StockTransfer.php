@@ -2,39 +2,42 @@
 
 namespace App\Models;
 
+use Database\Factories\StockTransferFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property string|null $transfer_number
  * @property int $from_warehouse_id
  * @property int $to_warehouse_id
- * @property \Illuminate\Support\Carbon $transfer_date
- * @property \Illuminate\Support\Carbon|null $expected_arrival_date
+ * @property Carbon $transfer_date
+ * @property Carbon|null $expected_arrival_date
  * @property string $status
  * @property string|null $notes
  * @property int|null $requested_by
  * @property int|null $approved_by
- * @property \Illuminate\Support\Carbon|null $approved_at
+ * @property Carbon|null $approved_at
  * @property int|null $shipped_by
- * @property \Illuminate\Support\Carbon|null $shipped_at
+ * @property Carbon|null $shipped_at
  * @property int|null $received_by
- * @property \Illuminate\Support\Carbon|null $received_at
+ * @property Carbon|null $received_at
  * @property int|null $created_by
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\User|null $approvedBy
- * @property-read \App\Models\User|null $createdBy
- * @property-read \App\Models\Warehouse $fromWarehouse
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\StockTransferItem> $items
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read User|null $approvedBy
+ * @property-read User|null $createdBy
+ * @property-read Warehouse $fromWarehouse
+ * @property-read Collection<int, StockTransferItem> $items
  * @property-read int|null $items_count
- * @property-read \App\Models\User|null $receivedBy
- * @property-read \App\Models\Employee|null $requestedBy
- * @property-read \App\Models\User|null $shippedBy
- * @property-read \App\Models\Warehouse $toWarehouse
+ * @property-read User|null $receivedBy
+ * @property-read Employee|null $requestedBy
+ * @property-read User|null $shippedBy
+ * @property-read Warehouse $toWarehouse
  *
  * @method static \Database\Factories\StockTransferFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StockTransfer newModelQuery()
@@ -63,7 +66,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class StockTransfer extends Model
 {
-    /** @use HasFactory<\Database\Factories\StockTransferFactory> */
+    /** @use HasFactory<StockTransferFactory> */
     use HasFactory;
 
     /**

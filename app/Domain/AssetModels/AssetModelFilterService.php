@@ -3,6 +3,7 @@
 namespace App\Domain\AssetModels;
 
 use App\Domain\Concerns\BaseFilterService;
+use App\Models\AssetModel;
 use Illuminate\Database\Eloquent\Builder;
 
 class AssetModelFilterService
@@ -10,7 +11,7 @@ class AssetModelFilterService
     use BaseFilterService;
 
     /**
-     * @param  Builder<\App\Models\AssetModel>  $query
+     * @param  Builder<AssetModel>  $query
      * @param  array<string, mixed>  $filters
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void
@@ -21,7 +22,7 @@ class AssetModelFilterService
     }
 
     /**
-     * @param  Builder<\App\Models\AssetModel>  $query
+     * @param  Builder<AssetModel>  $query
      * @param  array<int, string>  $allowedSorts
      */
     public function applySorting(Builder $query, string $sortBy, string $sortDirection, array $allowedSorts): void

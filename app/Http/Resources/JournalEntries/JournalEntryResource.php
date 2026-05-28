@@ -8,7 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 /** @property JournalEntry $resource */
 /**
- * @mixin \App\Models\JournalEntry
+ * @mixin JournalEntry
  */
 class JournalEntryResource extends JsonResource
 {

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Resources\ApprovalFlows\ApprovalFlowCollection;
+use App\Http\Resources\ApprovalFlows\ApprovalFlowResource;
 use App\Models\ApprovalFlow;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -28,5 +29,5 @@ test('collection transforms paginated approval flows correctly', function () {
     $firstItem = collect($data)->first();
 
     expect($firstItem)
-        ->toBeInstanceOf(\App\Http\Resources\ApprovalFlows\ApprovalFlowResource::class);
+        ->toBeInstanceOf(ApprovalFlowResource::class);
 });

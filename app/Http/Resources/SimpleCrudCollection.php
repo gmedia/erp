@@ -2,10 +2,11 @@
 
 namespace App\Http\Resources;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
 /**
- * @mixin mixed|\Illuminate\Database\Eloquent\Model
+ * @mixin mixed|Model
  */
 class SimpleCrudCollection extends ResourceCollection
 {

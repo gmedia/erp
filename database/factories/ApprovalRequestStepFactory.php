@@ -4,10 +4,11 @@ namespace Database\Factories;
 
 use App\Models\ApprovalFlowStep;
 use App\Models\ApprovalRequest;
+use App\Models\ApprovalRequestStep;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ApprovalRequestStep>
+ * @extends Factory<ApprovalRequestStep>
  */
 class ApprovalRequestStepFactory extends Factory
 {

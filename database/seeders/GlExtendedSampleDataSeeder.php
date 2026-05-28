@@ -10,6 +10,7 @@ use App\Models\PeriodClosing;
 use App\Models\RecurringJournal;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class GlExtendedSampleDataSeeder extends Seeder
@@ -34,9 +35,9 @@ class GlExtendedSampleDataSeeder extends Seeder
     }
 
     /**
-     * @return \Illuminate\Support\Collection<int, Account>
+     * @return Collection<int, Account>
      */
-    private function accounts(): \Illuminate\Support\Collection
+    private function accounts(): Collection
     {
         $accounts = Account::query()->take(5)->get();
 
@@ -47,7 +48,7 @@ class GlExtendedSampleDataSeeder extends Seeder
         return $accounts->merge(Account::factory()->count(5 - $accounts->count())->create());
     }
 
-    private function seedRecurringJournals(FiscalYear $fiscalYear, \Illuminate\Support\Collection $accounts, User $user): void
+    private function seedRecurringJournals(FiscalYear $fiscalYear, Collection $accounts, User $user): void
     {
         foreach ([750000, 1250000, 2500000, 3750000] as $index => $amount) {
             $name = 'Recurring Journal Sample ' . ($index + 1);
@@ -70,7 +71,7 @@ class GlExtendedSampleDataSeeder extends Seeder
         }
     }
 
-    private function seedBankReconciliations(FiscalYear $fiscalYear, \Illuminate\Support\Collection $accounts, User $user): void
+    private function seedBankReconciliations(FiscalYear $fiscalYear, Collection $accounts, User $user): void
     {
         foreach ([['in_progress', null], ['completed', now()]] as $index => [$status, $completedAt]) {
             $periodStart = now()->startOfMonth()->addMonths($index);
@@ -104,7 +105,7 @@ class GlExtendedSampleDataSeeder extends Seeder
         }
     }
 
-    private function seedPeriodClosings(FiscalYear $fiscalYear, \Illuminate\Support\Collection $accounts, User $user): void
+    private function seedPeriodClosings(FiscalYear $fiscalYear, Collection $accounts, User $user): void
     {
         $periodYear = (int) $fiscalYear->start_date->format('Y');
 
@@ -141,7 +142,7 @@ class GlExtendedSampleDataSeeder extends Seeder
         );
     }
 
-    private function seedAccountBalances(FiscalYear $fiscalYear, \Illuminate\Support\Collection $accounts): void
+    private function seedAccountBalances(FiscalYear $fiscalYear, Collection $accounts): void
     {
         $periodYear = (int) $fiscalYear->start_date->format('Y');
 

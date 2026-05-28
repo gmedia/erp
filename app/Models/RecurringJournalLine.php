@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Database\Factories\RecurringJournalLineFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -13,10 +15,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property numeric $debit
  * @property numeric $credit
  * @property string|null $memo
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Account $account
- * @property-read \App\Models\RecurringJournal $recurringJournal
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Account $account
+ * @property-read RecurringJournal $recurringJournal
  *
  * @method static \Database\Factories\RecurringJournalLineFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|RecurringJournalLine newModelQuery()
@@ -35,7 +37,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class RecurringJournalLine extends Model
 {
-    /** @use HasFactory<\Database\Factories\RecurringJournalLineFactory> */
+    /** @use HasFactory<RecurringJournalLineFactory> */
     use HasFactory;
 
     /**

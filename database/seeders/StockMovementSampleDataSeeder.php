@@ -2,8 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Models\StockAdjustment;
 use App\Models\StockAdjustmentItem;
 use App\Models\StockMovement;
+use App\Models\StockTransfer;
 use App\Models\StockTransferItem;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -27,7 +29,7 @@ class StockMovementSampleDataSeeder extends Seeder
             StockMovement::updateOrCreate(
                 [
                     'movement_type' => $movementType,
-                    'reference_type' => \App\Models\StockAdjustment::class,
+                    'reference_type' => StockAdjustment::class,
                     'reference_id' => $adjustment->id,
                     'warehouse_id' => $adjustment->warehouse_id,
                     'product_id' => $adjustmentItem->product_id,
@@ -60,7 +62,7 @@ class StockMovementSampleDataSeeder extends Seeder
             StockMovement::updateOrCreate(
                 [
                     'movement_type' => 'transfer_out',
-                    'reference_type' => \App\Models\StockTransfer::class,
+                    'reference_type' => StockTransfer::class,
                     'reference_id' => $transfer->id,
                     'warehouse_id' => $transfer->from_warehouse_id,
                     'product_id' => $transferItem->product_id,
@@ -81,7 +83,7 @@ class StockMovementSampleDataSeeder extends Seeder
             StockMovement::updateOrCreate(
                 [
                     'movement_type' => 'transfer_in',
-                    'reference_type' => \App\Models\StockTransfer::class,
+                    'reference_type' => StockTransfer::class,
                     'reference_id' => $transfer->id,
                     'warehouse_id' => $transfer->to_warehouse_id,
                     'product_id' => $transferItem->product_id,

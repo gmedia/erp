@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Resources\StockAdjustments\StockAdjustmentCollection;
+use App\Http\Resources\StockAdjustments\StockAdjustmentResource;
 use App\Models\StockAdjustment;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -11,5 +12,5 @@ test('collection uses StockAdjustmentResource', function () {
 
     $collection = new StockAdjustmentCollection($items);
 
-    expect($collection->collects)->toBe(\App\Http\Resources\StockAdjustments\StockAdjustmentResource::class);
+    expect($collection->collects)->toBe(StockAdjustmentResource::class);
 });

@@ -8,7 +8,7 @@ use App\Models\Unit;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\BillOfMaterial>
+ * @extends Factory<BillOfMaterial>
  */
 class BillOfMaterialFactory extends Factory
 {

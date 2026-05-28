@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Database\Factories\ProductionOrderItemFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -16,11 +18,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property numeric $unit_cost Cost per unit at time of production
  * @property numeric $cost quantity_used * unit_cost
  * @property string|null $notes
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Product $product
- * @property-read \App\Models\ProductionOrder $productionOrder
- * @property-read \App\Models\Unit $unit
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Product $product
+ * @property-read ProductionOrder $productionOrder
+ * @property-read Unit $unit
  *
  * @method static \Database\Factories\ProductionOrderItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrderItem newModelQuery()
@@ -42,7 +44,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class ProductionOrderItem extends Model
 {
-    /** @use HasFactory<\Database\Factories\ProductionOrderItemFactory> */
+    /** @use HasFactory<ProductionOrderItemFactory> */
     use HasFactory;
 
     /**

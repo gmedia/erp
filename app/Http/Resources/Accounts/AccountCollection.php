@@ -2,11 +2,12 @@
 
 namespace App\Http\Resources\Accounts;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
 /**
- * @mixin mixed|\Illuminate\Database\Eloquent\Model
+ * @mixin mixed|Model
  */
 class AccountCollection extends ResourceCollection
 {

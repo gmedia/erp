@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Database\Factories\InventoryStocktakeItemFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -17,13 +19,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $result
  * @property string|null $notes
  * @property int|null $counted_by
- * @property \Illuminate\Support\Carbon|null $counted_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\User|null $countedBy
- * @property-read \App\Models\InventoryStocktake $inventoryStocktake
- * @property-read \App\Models\Product $product
- * @property-read \App\Models\Unit $unit
+ * @property Carbon|null $counted_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read User|null $countedBy
+ * @property-read InventoryStocktake $inventoryStocktake
+ * @property-read Product $product
+ * @property-read Unit $unit
  *
  * @method static \Database\Factories\InventoryStocktakeItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|InventoryStocktakeItem newModelQuery()
@@ -47,7 +49,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class InventoryStocktakeItem extends Model
 {
-    /** @use HasFactory<\Database\Factories\InventoryStocktakeItemFactory> */
+    /** @use HasFactory<InventoryStocktakeItemFactory> */
     use HasFactory;
 
     /**

@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Database\Factories\PeriodClosingFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -18,18 +20,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property numeric $net_income
  * @property string|null $notes
  * @property int|null $closed_by
- * @property \Illuminate\Support\Carbon|null $closed_at
+ * @property Carbon|null $closed_at
  * @property int|null $reopened_by
- * @property \Illuminate\Support\Carbon|null $reopened_at
+ * @property Carbon|null $reopened_at
  * @property int|null $created_by
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\User|null $closedBy
- * @property-read \App\Models\JournalEntry|null $closingJournalEntry
- * @property-read \App\Models\User|null $creator
- * @property-read \App\Models\FiscalYear $fiscalYear
- * @property-read \App\Models\User|null $reopenedBy
- * @property-read \App\Models\Account|null $retainedEarningsAccount
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read User|null $closedBy
+ * @property-read JournalEntry|null $closingJournalEntry
+ * @property-read User|null $creator
+ * @property-read FiscalYear $fiscalYear
+ * @property-read User|null $reopenedBy
+ * @property-read Account|null $retainedEarningsAccount
  *
  * @method static \Database\Factories\PeriodClosingFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PeriodClosing newModelQuery()
@@ -57,7 +59,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class PeriodClosing extends Model
 {
-    /** @use HasFactory<\Database\Factories\PeriodClosingFactory> */
+    /** @use HasFactory<PeriodClosingFactory> */
     use HasFactory;
 
     /**

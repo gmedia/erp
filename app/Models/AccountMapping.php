@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -12,10 +13,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $target_account_id
  * @property string $type
  * @property string|null $notes
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Account $sourceAccount
- * @property-read \App\Models\Account $targetAccount
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Account $sourceAccount
+ * @property-read Account $targetAccount
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountMapping newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountMapping newQuery()

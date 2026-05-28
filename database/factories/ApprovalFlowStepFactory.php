@@ -3,11 +3,12 @@
 namespace Database\Factories;
 
 use App\Models\ApprovalFlow;
+use App\Models\ApprovalFlowStep;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ApprovalFlowStep>
+ * @extends Factory<ApprovalFlowStep>
  */
 class ApprovalFlowStepFactory extends Factory
 {

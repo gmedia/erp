@@ -2,23 +2,25 @@
 
 namespace App\Models;
 
+use Database\Factories\ApprovalDelegationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property int $delegator_user_id
  * @property int $delegate_user_id
  * @property string|null $approvable_type
- * @property \Illuminate\Support\Carbon $start_date
- * @property \Illuminate\Support\Carbon $end_date
+ * @property Carbon $start_date
+ * @property Carbon $end_date
  * @property string|null $reason
  * @property bool $is_active
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\User $delegate
- * @property-read \App\Models\User $delegator
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read User $delegate
+ * @property-read User $delegator
  *
  * @method static \Database\Factories\ApprovalDelegationFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalDelegation newModelQuery()
@@ -39,7 +41,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class ApprovalDelegation extends Model
 {
-    /** @use HasFactory<\Database\Factories\ApprovalDelegationFactory> */
+    /** @use HasFactory<ApprovalDelegationFactory> */
     use HasFactory;
 
     /**

@@ -2,26 +2,29 @@
 
 namespace App\Models;
 
+use Database\Factories\CustomerSubscriptionFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property int $customer_id
  * @property int $subscription_plan_id
- * @property \Illuminate\Support\Carbon $start_date
- * @property \Illuminate\Support\Carbon|null $end_date
- * @property \Illuminate\Support\Carbon $next_billing_date
+ * @property Carbon $start_date
+ * @property Carbon|null $end_date
+ * @property Carbon $next_billing_date
  * @property string $status
  * @property string|null $notes
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SubscriptionBillingRecord> $billingRecords
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Collection<int, SubscriptionBillingRecord> $billingRecords
  * @property-read int|null $billing_records_count
- * @property-read \App\Models\Customer $customer
- * @property-read \App\Models\SubscriptionPlan $subscriptionPlan
+ * @property-read Customer $customer
+ * @property-read SubscriptionPlan $subscriptionPlan
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription active()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CustomerSubscription cancelled()
@@ -46,7 +49,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class CustomerSubscription extends Model
 {
-    /** @use HasFactory<\Database\Factories\CustomerSubscriptionFactory> */
+    /** @use HasFactory<CustomerSubscriptionFactory> */
     use HasFactory;
 
     /**

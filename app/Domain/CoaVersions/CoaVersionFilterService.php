@@ -3,6 +3,7 @@
 namespace App\Domain\CoaVersions;
 
 use App\Domain\Concerns\BaseFilterService;
+use App\Models\CoaVersion;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -15,7 +16,7 @@ class CoaVersionFilterService
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Builder<\App\Models\CoaVersion>  $query
+     * @param  Builder<CoaVersion>  $query
      * @param  array<int, string>  $searchFields
      */
     public function applySearch(Builder $query, string $search, array $searchFields): void
@@ -26,7 +27,7 @@ class CoaVersionFilterService
     /**
      * Apply advanced filters for COA versions.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder<\App\Models\CoaVersion>  $query
+     * @param  Builder<CoaVersion>  $query
      * @param  array<string, mixed>  $filters
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void
@@ -38,7 +39,7 @@ class CoaVersionFilterService
     }
 
     /**
-     * @param  \Illuminate\Database\Eloquent\Builder<\App\Models\CoaVersion>  $query
+     * @param  Builder<CoaVersion>  $query
      * @param  array<int, string>  $allowedSorts
      */
     public function applySorting(Builder $query, string $sortBy, string $sortDirection, array $allowedSorts): void

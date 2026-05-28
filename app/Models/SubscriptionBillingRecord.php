@@ -2,24 +2,26 @@
 
 namespace App\Models;
 
+use Database\Factories\SubscriptionBillingRecordFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property int $customer_subscription_id
- * @property \Illuminate\Support\Carbon $billing_period_start
- * @property \Illuminate\Support\Carbon $billing_period_end
+ * @property Carbon $billing_period_start
+ * @property Carbon $billing_period_end
  * @property numeric $amount
  * @property numeric $tax_amount
  * @property numeric $discount_amount
  * @property numeric $total
  * @property string $status
- * @property \Illuminate\Support\Carbon|null $paid_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\CustomerSubscription $customerSubscription
+ * @property Carbon|null $paid_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read CustomerSubscription $customerSubscription
  *
  * @method static \Database\Factories\SubscriptionBillingRecordFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SubscriptionBillingRecord newModelQuery()
@@ -45,7 +47,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class SubscriptionBillingRecord extends Model
 {
-    /** @use HasFactory<\Database\Factories\SubscriptionBillingRecordFactory> */
+    /** @use HasFactory<SubscriptionBillingRecordFactory> */
     use HasFactory;
 
     /**

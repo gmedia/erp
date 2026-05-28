@@ -6,6 +6,7 @@ use App\Http\Requests\AccountMappings\IndexAccountMappingRequest;
 use App\Models\Account;
 use App\Models\AccountMapping;
 use App\Models\CoaVersion;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('account-mappings');
@@ -43,7 +44,7 @@ test('it paginates and filters by type', function () {
     $action = new IndexAccountMappingsAction(new AccountMappingFilterService);
     $result = $action->execute($request);
 
-    expect($result)->toBeInstanceOf(\Illuminate\Contracts\Pagination\LengthAwarePaginator::class)
+    expect($result)->toBeInstanceOf(LengthAwarePaginator::class)
         ->and($result->total())->toBe(1)
         ->and($result->items()[0]->type)->toBe('rename');
 });

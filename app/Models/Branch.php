@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
+use Database\Factories\BranchFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property string $name
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  *
  * @method static \Database\Factories\BranchFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Branch newModelQuery()
@@ -24,7 +26,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Branch extends Model
 {
-    /** @use HasFactory<\Database\Factories\BranchFactory> */
+    /** @use HasFactory<BranchFactory> */
     use HasFactory;
 
     /**

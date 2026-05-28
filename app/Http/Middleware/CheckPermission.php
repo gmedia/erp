@@ -11,7 +11,7 @@ class CheckPermission
     /**
      * Handle an incoming request.
      *
-     * @param  Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  Closure(Request): (Response)  $next
      * @param  string  $permission  The permission name to check
      */
     public function handle(Request $request, Closure $next, string $permission, bool $isApi = false): Response

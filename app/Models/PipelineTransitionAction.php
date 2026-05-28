@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Database\Factories\PipelineTransitionActionFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -15,9 +17,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property bool $is_async
  * @property string $on_failure
  * @property bool $is_active
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\PipelineTransition $transition
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read PipelineTransition $transition
  *
  * @method static \Database\Factories\PipelineTransitionActionFactory factory($count = null, $state = [])
  * @method static Builder<static>|PipelineTransitionAction newModelQuery()
@@ -38,7 +40,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class PipelineTransitionAction extends Model
 {
-    /** @use HasFactory<\Database\Factories\PipelineTransitionActionFactory> */
+    /** @use HasFactory<PipelineTransitionActionFactory> */
     use HasFactory;
 
     /**

@@ -5,6 +5,7 @@ namespace App\Actions\JournalEntries;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
 use Exception;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -114,7 +115,7 @@ class CreateJournalEntryAction
 
                     return $journalEntry;
                 });
-            } catch (\Illuminate\Database\QueryException $e) {
+            } catch (QueryException $e) {
                 // Check for unique duplicate error (SQLSTATE 23000)
                 if ($e->getCode() == 23000 && str_contains($e->getMessage(), 'journal_entries_entry_number_unique')) {
                     $attempts++;

@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Database\Factories\PurchaseRequestFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -13,25 +16,25 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $branch_id
  * @property int|null $department_id
  * @property int|null $requested_by
- * @property \Illuminate\Support\Carbon $request_date
- * @property \Illuminate\Support\Carbon|null $required_date
+ * @property Carbon $request_date
+ * @property Carbon|null $required_date
  * @property string $priority
  * @property string $status
  * @property numeric|null $estimated_amount
  * @property string|null $notes
  * @property int|null $approved_by
- * @property \Illuminate\Support\Carbon|null $approved_at
+ * @property Carbon|null $approved_at
  * @property string|null $rejection_reason
  * @property int|null $created_by
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\User|null $approver
- * @property-read \App\Models\Branch $branch
- * @property-read \App\Models\User|null $creator
- * @property-read \App\Models\Department|null $department
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\PurchaseRequestItem> $items
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read User|null $approver
+ * @property-read Branch $branch
+ * @property-read User|null $creator
+ * @property-read Department|null $department
+ * @property-read Collection<int, PurchaseRequestItem> $items
  * @property-read int|null $items_count
- * @property-read \App\Models\Employee|null $requester
+ * @property-read Employee|null $requester
  *
  * @method static \Database\Factories\PurchaseRequestFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseRequest newModelQuery()
@@ -59,7 +62,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class PurchaseRequest extends Model
 {
-    /** @use HasFactory<\Database\Factories\PurchaseRequestFactory> */
+    /** @use HasFactory<PurchaseRequestFactory> */
     use HasFactory;
 
     /**

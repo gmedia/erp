@@ -2,17 +2,20 @@
 
 namespace App\Models;
 
+use Database\Factories\JournalEntryFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property int $fiscal_year_id
  * @property string $entry_number
- * @property \Illuminate\Support\Carbon $entry_date
+ * @property Carbon $entry_date
  * @property string|null $reference
  * @property string $description
  * @property string $status
@@ -21,16 +24,16 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property int|null $source_id
  * @property int|null $created_by
  * @property int|null $posted_by
- * @property \Illuminate\Support\Carbon|null $posted_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\User|null $createdBy
- * @property-read \App\Models\FiscalYear $fiscalYear
+ * @property Carbon|null $posted_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read User|null $createdBy
+ * @property-read FiscalYear $fiscalYear
  * @property-read float $total_credit
  * @property-read float $total_debit
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\JournalEntryLine> $lines
+ * @property-read Collection<int, JournalEntryLine> $lines
  * @property-read int|null $lines_count
- * @property-read \App\Models\User|null $postedBy
+ * @property-read User|null $postedBy
  * @property-read Model|Eloquent|null $source
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntry draft()
@@ -59,7 +62,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  */
 class JournalEntry extends Model
 {
-    /** @use HasFactory<\Database\Factories\JournalEntryFactory> */
+    /** @use HasFactory<JournalEntryFactory> */
     use HasFactory;
 
     /**

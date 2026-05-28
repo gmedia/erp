@@ -2,29 +2,32 @@
 
 namespace App\Models;
 
+use Database\Factories\AssetDepreciationRunFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property int $fiscal_year_id
- * @property \Illuminate\Support\Carbon $period_start
- * @property \Illuminate\Support\Carbon $period_end
+ * @property Carbon $period_start
+ * @property Carbon $period_end
  * @property string $status
  * @property int|null $journal_entry_id
  * @property int|null $created_by
  * @property int|null $posted_by
- * @property \Illuminate\Support\Carbon|null $posted_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\User|null $createdBy
- * @property-read \App\Models\FiscalYear $fiscalYear
- * @property-read \App\Models\JournalEntry|null $journalEntry
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AssetDepreciationLine> $lines
+ * @property Carbon|null $posted_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read User|null $createdBy
+ * @property-read FiscalYear $fiscalYear
+ * @property-read JournalEntry|null $journalEntry
+ * @property-read Collection<int, AssetDepreciationLine> $lines
  * @property-read int|null $lines_count
- * @property-read \App\Models\User|null $postedBy
+ * @property-read User|null $postedBy
  *
  * @method static \Database\Factories\AssetDepreciationRunFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetDepreciationRun newModelQuery()
@@ -46,7 +49,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class AssetDepreciationRun extends Model
 {
-    /** @use HasFactory<\Database\Factories\AssetDepreciationRunFactory> */
+    /** @use HasFactory<AssetDepreciationRunFactory> */
     use HasFactory;
 
     /**

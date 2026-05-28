@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Permission;
+use Illuminate\Http\JsonResponse;
 
 /**
  * Controller for permission management operations.
@@ -17,7 +18,7 @@ class PermissionController extends Controller
      * Returns all permissions for the permission management interface.
      * Ordered by name for better readability.
      */
-    public function index(): \Illuminate\Http\JsonResponse
+    public function index(): JsonResponse
     {
         $permissions = Permission::query()
             ->orderBy('name')

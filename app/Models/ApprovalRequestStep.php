@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Database\Factories\ApprovalRequestStepFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -17,14 +19,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int|null $delegated_from
  * @property string|null $action
  * @property string|null $comments
- * @property \Illuminate\Support\Carbon|null $acted_at
- * @property \Illuminate\Support\Carbon|null $due_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\User|null $actor
- * @property-read \App\Models\User|null $delegator
- * @property-read \App\Models\ApprovalFlowStep $flowStep
- * @property-read \App\Models\ApprovalRequest $request
+ * @property Carbon|null $acted_at
+ * @property Carbon|null $due_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read User|null $actor
+ * @property-read User|null $delegator
+ * @property-read ApprovalFlowStep $flowStep
+ * @property-read ApprovalRequest $request
  *
  * @method static Builder<static>|ApprovalRequestStep assignedToUser(int $userId)
  * @method static Builder<static>|ApprovalRequestStep currentRequestStep()
@@ -52,7 +54,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class ApprovalRequestStep extends Model
 {
-    /** @use HasFactory<\Database\Factories\ApprovalRequestStepFactory> */
+    /** @use HasFactory<ApprovalRequestStepFactory> */
     use HasFactory;
 
     /**

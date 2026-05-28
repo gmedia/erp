@@ -3,12 +3,13 @@
 namespace Database\Factories;
 
 use App\Models\Account;
+use App\Models\BankReconciliation;
 use App\Models\FiscalYear;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\BankReconciliation>
+ * @extends Factory<BankReconciliation>
  */
 class BankReconciliationFactory extends Factory
 {

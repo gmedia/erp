@@ -22,7 +22,7 @@ trait BaseFilterService
      *
      * @template TModel of \Illuminate\Database\Eloquent\Model
      *
-     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  Builder<TModel>  $query
      * @param  array<int, string>  $searchFields
      * @param  array<string, array<int, string>>  $relationSearchFields
      */
@@ -54,7 +54,7 @@ trait BaseFilterService
      *
      * @template TModel of \Illuminate\Database\Eloquent\Model
      *
-     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  Builder<TModel>  $query
      * @param  array<int, string>  $searchFields
      * @param  array<string, array{relation: string, column: string}>  $relationFieldAliases
      */
@@ -85,7 +85,7 @@ trait BaseFilterService
      *
      * @template TModel of \Illuminate\Database\Eloquent\Model
      *
-     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  Builder<TModel>  $query
      * @param  array<int, string>  $searchFields
      */
     public function applyAssetAliasSearch(Builder $query, string $search, array $searchFields): void
@@ -115,7 +115,7 @@ trait BaseFilterService
      *
      * @template TModel of \Illuminate\Database\Eloquent\Model
      *
-     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  Builder<TModel>  $query
      * @param  array<string, array{table: string, local_column: string, foreign_column: string, order_column: string, join?: 'join'|'leftJoin'}>  $relationSortMap
      */
     public function applyMappedRelationSorting(
@@ -144,7 +144,7 @@ trait BaseFilterService
      *
      * @template TModel of \Illuminate\Database\Eloquent\Model
      *
-     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  Builder<TModel>  $query
      * @param  array<int, string>  $allowedSorts
      */
     public function applySorting(Builder $query, string $sortBy, string $sortDirection, array $allowedSorts): void
@@ -159,7 +159,7 @@ trait BaseFilterService
      *
      * @template TModel of \Illuminate\Database\Eloquent\Model
      *
-     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  Builder<TModel>  $query
      * @param  array<int, string>  $allowedSorts
      * @param  array<string, array{table: string, local_column: string, foreign_column: string, order_column: string, join?: 'join'|'leftJoin'}>  $relationSortMap
      */
@@ -187,7 +187,7 @@ trait BaseFilterService
      *
      * @template TModel of \Illuminate\Database\Eloquent\Model
      *
-     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  Builder<TModel>  $query
      * @param  array<string, mixed>  $filters
      * @param  array<string, string>  $fieldMap  Request key => column name
      */
@@ -205,7 +205,7 @@ trait BaseFilterService
      *
      * @template TModel of \Illuminate\Database\Eloquent\Model
      *
-     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  Builder<TModel>  $query
      * @param  array<string, mixed>  $filters
      * @param  array<string, array{relation: string, column: string}>  $relationFieldMap  Request key => relation config
      */
@@ -225,7 +225,7 @@ trait BaseFilterService
      *
      * @template TModel of \Illuminate\Database\Eloquent\Model
      *
-     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  Builder<TModel>  $query
      * @param  array<string, mixed>  $filters
      */
     public function applyBooleanFilter(
@@ -252,7 +252,7 @@ trait BaseFilterService
      *
      * @template TModel of \Illuminate\Database\Eloquent\Model
      *
-     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  Builder<TModel>  $query
      * @param  array<string, mixed>  $filters
      * @param  callable(mixed): ?bool  $resolver
      */
@@ -286,7 +286,7 @@ trait BaseFilterService
      *
      * @template TModel of \Illuminate\Database\Eloquent\Model
      *
-     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  Builder<TModel>  $query
      * @param  array<string, mixed>  $filters
      * @param  array<string, array{from: string, to: string}>  $dateRanges  Column => keys
      */
@@ -308,7 +308,7 @@ trait BaseFilterService
      *
      * @template TModel of \Illuminate\Database\Eloquent\Model
      *
-     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  Builder<TModel>  $query
      * @param  array<string, mixed>  $filters
      * @param  array<string, array{min: string, max: string}>  $numericRanges  Column => keys
      */
@@ -330,7 +330,7 @@ trait BaseFilterService
      *
      * @template TModel of \Illuminate\Database\Eloquent\Model
      *
-     * @param  \Illuminate\Database\Eloquent\Builder<TModel>  $query
+     * @param  Builder<TModel>  $query
      * @param  array<string, mixed>  $filters
      * @param  array<string, string>  $exactFilters
      * @param  array<string, array{from: string, to: string}>  $dateRanges

@@ -5,6 +5,7 @@ namespace App\Exports;
 use App\Actions\ApprovalAuditTrail\IndexApprovalAuditTrailAction;
 use App\Exports\Concerns\AbstractActionCollectionExport;
 use App\Http\Requests\ApprovalAuditTrail\IndexApprovalAuditTrailRequest;
+use App\Models\ApprovalAuditLog;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -27,7 +28,7 @@ class ApprovalAuditTrailExport extends AbstractActionCollectionExport implements
     }
 
     /**
-     * @param  \App\Models\ApprovalAuditLog  $log
+     * @param  ApprovalAuditLog  $log
      */
     public function map($log): array
     {

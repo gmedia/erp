@@ -2,11 +2,12 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Menu;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @mixin \App\Models\Menu
+ * @mixin Menu
  */
 class MenuResource extends JsonResource
 {

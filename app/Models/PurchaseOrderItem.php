@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Database\Factories\PurchaseOrderItemFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -19,12 +21,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property numeric $tax_percent
  * @property numeric $line_total
  * @property string|null $notes
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Product $product
- * @property-read \App\Models\PurchaseOrder $purchaseOrder
- * @property-read \App\Models\PurchaseRequestItem|null $purchaseRequestItem
- * @property-read \App\Models\Unit $unit
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Product $product
+ * @property-read PurchaseOrder $purchaseOrder
+ * @property-read PurchaseRequestItem|null $purchaseRequestItem
+ * @property-read Unit $unit
  *
  * @method static \Database\Factories\PurchaseOrderItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PurchaseOrderItem newModelQuery()
@@ -49,7 +51,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class PurchaseOrderItem extends Model
 {
-    /** @use HasFactory<\Database\Factories\PurchaseOrderItemFactory> */
+    /** @use HasFactory<PurchaseOrderItemFactory> */
     use HasFactory;
 
     /**

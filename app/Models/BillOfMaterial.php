@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Database\Factories\BillOfMaterialFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -14,11 +16,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property numeric $waste_percentage
  * @property int $unit_id
  * @property string|null $notes
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Product $finishedProduct
- * @property-read \App\Models\Product $rawMaterial
- * @property-read \App\Models\Unit $unit
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Product $finishedProduct
+ * @property-read Product $rawMaterial
+ * @property-read Unit $unit
  *
  * @method static \Database\Factories\BillOfMaterialFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BillOfMaterial newModelQuery()
@@ -38,7 +40,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class BillOfMaterial extends Model
 {
-    /** @use HasFactory<\Database\Factories\BillOfMaterialFactory> */
+    /** @use HasFactory<BillOfMaterialFactory> */
     use HasFactory;
 
     /**

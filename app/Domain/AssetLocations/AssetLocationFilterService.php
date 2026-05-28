@@ -3,6 +3,7 @@
 namespace App\Domain\AssetLocations;
 
 use App\Domain\Concerns\BaseFilterService;
+use App\Models\AssetLocation;
 use Illuminate\Database\Eloquent\Builder;
 
 class AssetLocationFilterService
@@ -12,7 +13,7 @@ class AssetLocationFilterService
     }
 
     /**
-     * @param  Builder<\App\Models\AssetLocation>  $query
+     * @param  Builder<AssetLocation>  $query
      * @param  array<int, string>  $searchFields
      */
     public function applySearch(Builder $query, string $search, array $searchFields): void
@@ -21,7 +22,7 @@ class AssetLocationFilterService
     }
 
     /**
-     * @param  Builder<\App\Models\AssetLocation>  $query
+     * @param  Builder<AssetLocation>  $query
      * @param  array<string, mixed>  $filters
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void
@@ -40,7 +41,7 @@ class AssetLocationFilterService
     }
 
     /**
-     * @param  Builder<\App\Models\AssetLocation>  $query
+     * @param  Builder<AssetLocation>  $query
      * @param  array<int, string>  $allowedSorts
      */
     public function applySorting(Builder $query, string $sortBy, string $sortDirection, array $allowedSorts): void

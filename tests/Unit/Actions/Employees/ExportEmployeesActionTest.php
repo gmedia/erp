@@ -4,6 +4,7 @@ use App\Actions\Employees\ExportEmployeesAction;
 use App\Http\Requests\Employees\ExportEmployeeRequest;
 use App\Models\Employee;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
@@ -25,7 +26,7 @@ test('execute exports employees and returns file info', function () {
 
     $result = $action->execute($request);
 
-    expect($result)->toBeInstanceOf(\Illuminate\Http\JsonResponse::class);
+    expect($result)->toBeInstanceOf(JsonResponse::class);
 
     $data = $result->getData(true);
     expect($data)->toHaveKeys(['url', 'filename'])
@@ -49,7 +50,7 @@ test('execute exports with search filter', function () {
 
     $result = $action->execute($request);
 
-    expect($result)->toBeInstanceOf(\Illuminate\Http\JsonResponse::class);
+    expect($result)->toBeInstanceOf(JsonResponse::class);
 });
 
 test('execute exports with department and position filters', function () {
@@ -71,7 +72,7 @@ test('execute exports with department and position filters', function () {
 
     $result = $action->execute($request);
 
-    expect($result)->toBeInstanceOf(\Illuminate\Http\JsonResponse::class);
+    expect($result)->toBeInstanceOf(JsonResponse::class);
 });
 
 test('execute exports with custom sort parameters', function () {
@@ -91,7 +92,7 @@ test('execute exports with custom sort parameters', function () {
 
     $result = $action->execute($request);
 
-    expect($result)->toBeInstanceOf(\Illuminate\Http\JsonResponse::class);
+    expect($result)->toBeInstanceOf(JsonResponse::class);
 });
 
 test('execute filters out null values from filters', function () {
@@ -114,5 +115,5 @@ test('execute filters out null values from filters', function () {
 
     $result = $action->execute($request);
 
-    expect($result)->toBeInstanceOf(\Illuminate\Http\JsonResponse::class);
+    expect($result)->toBeInstanceOf(JsonResponse::class);
 });

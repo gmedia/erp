@@ -7,7 +7,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 /** @property AssetLocation $resource */
 /**
- * @mixin \App\Models\AssetLocation
+ * @mixin AssetLocation
  */
 class AssetLocationResource extends JsonResource
 {

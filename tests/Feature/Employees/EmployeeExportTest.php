@@ -4,6 +4,7 @@ use App\Exports\EmployeeExport;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Position;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('employees');
@@ -189,7 +190,7 @@ describe('EmployeeExport', function () {
         $query = $export->query();
 
         // Should not throw error, just ignore invalid sort
-        expect($query)->toBeInstanceOf(\Illuminate\Database\Eloquent\Builder::class);
+        expect($query)->toBeInstanceOf(Builder::class);
         expect($query->get())->toHaveCount(1);
     });
 

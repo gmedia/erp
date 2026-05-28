@@ -3,6 +3,7 @@
 namespace App\Domain\FiscalYears;
 
 use App\Domain\Concerns\BaseFilterService;
+use App\Models\FiscalYear;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -15,7 +16,7 @@ class FiscalYearFilterService
     /**
      * Apply advanced filters for fiscal years.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder<\App\Models\FiscalYear>  $query
+     * @param  Builder<FiscalYear>  $query
      * @param  array<string, mixed>  $filters
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void

@@ -3,11 +3,12 @@
 namespace Database\Factories;
 
 use App\Models\BankReconciliation;
+use App\Models\BankReconciliationItem;
 use App\Models\JournalEntryLine;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\BankReconciliationItem>
+ * @extends Factory<BankReconciliationItem>
  */
 class BankReconciliationItemFactory extends Factory
 {

@@ -2,12 +2,13 @@
 
 namespace App\Http\Resources\ApprovalAuditTrail;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Str;
 
 /**
- * @mixin mixed|\Illuminate\Database\Eloquent\Model
+ * @mixin mixed|Model
  */
 class ApprovalAuditTrailResource extends JsonResource
 {

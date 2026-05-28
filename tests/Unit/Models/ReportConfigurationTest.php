@@ -4,6 +4,7 @@ use App\Models\ReportConfiguration;
 use App\Models\ReportSection;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('financial-reports');
@@ -62,7 +63,7 @@ test('code is unique', function () {
     ReportConfiguration::factory()->create(['code' => 'balance_sheet']);
 
     expect(fn () => ReportConfiguration::factory()->create(['code' => 'balance_sheet']))
-        ->toThrow(Illuminate\Database\QueryException::class);
+        ->toThrow(QueryException::class);
 });
 
 test('deleting a configuration cascade deletes its sections', function () {

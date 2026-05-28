@@ -2,12 +2,13 @@
 
 namespace App\Http\Resources\AssetMovements;
 
+use App\Models\AssetMovement;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\MissingValue;
 
 /**
- * @mixin \App\Models\AssetMovement
+ * @mixin AssetMovement
  */
 class AssetMovementResource extends JsonResource
 {

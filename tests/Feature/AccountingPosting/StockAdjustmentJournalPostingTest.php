@@ -9,6 +9,7 @@ use App\Models\StockAdjustment;
 use App\Models\StockAdjustmentItem;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -201,7 +202,7 @@ test('PostStockAdjustmentJournalAction throws when no items exist', function () 
     $action = app(PostStockAdjustmentJournalAction::class);
 
     expect(fn () => $action->execute($adjustment->fresh()))
-        ->toThrow(Illuminate\Validation\ValidationException::class);
+        ->toThrow(ValidationException::class);
 });
 
 test('StockAdjustmentController update triggers journal posting on approve transition', function () {

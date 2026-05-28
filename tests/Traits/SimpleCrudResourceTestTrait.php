@@ -2,6 +2,8 @@
 
 namespace Tests\Traits;
 
+use Illuminate\Http\Request;
+
 /**
  * Trait for testing Simple CRUD Resource classes.
  *
@@ -22,7 +24,7 @@ trait SimpleCrudResourceTestTrait
 
         $resourceClass = $this->getResourceClass();
         $resource = new $resourceClass($model);
-        $request = new \Illuminate\Http\Request;
+        $request = new Request;
 
         $result = $resource->toArray($request);
 
@@ -41,7 +43,7 @@ trait SimpleCrudResourceTestTrait
 
         $resourceClass = $this->getResourceClass();
         $resource = new $resourceClass($model);
-        $request = new \Illuminate\Http\Request;
+        $request = new Request;
 
         $result = $resource->toArray($request);
 
@@ -62,7 +64,7 @@ trait SimpleCrudResourceTestTrait
 
         $resourceClass = $this->getResourceClass();
         $resource = new $resourceClass($model);
-        $request = new \Illuminate\Http\Request;
+        $request = new Request;
 
         $result = $resource->toArray($request);
 

@@ -3,6 +3,7 @@
 namespace App\Domain\InventoryStocktakes;
 
 use App\Domain\Concerns\BaseFilterService;
+use App\Models\InventoryStocktake;
 use Illuminate\Database\Eloquent\Builder;
 
 class InventoryStocktakeFilterService
@@ -10,7 +11,7 @@ class InventoryStocktakeFilterService
     use BaseFilterService;
 
     /**
-     * @param  Builder<\App\Models\InventoryStocktake>  $query
+     * @param  Builder<InventoryStocktake>  $query
      * @param  array<string, mixed>  $filters
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void

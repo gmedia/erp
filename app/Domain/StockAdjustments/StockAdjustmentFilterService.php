@@ -3,6 +3,7 @@
 namespace App\Domain\StockAdjustments;
 
 use App\Domain\Concerns\BaseFilterService;
+use App\Models\StockAdjustment;
 use Illuminate\Database\Eloquent\Builder;
 
 class StockAdjustmentFilterService
@@ -10,7 +11,7 @@ class StockAdjustmentFilterService
     use BaseFilterService;
 
     /**
-     * @param  Builder<\App\Models\StockAdjustment>  $query
+     * @param  Builder<StockAdjustment>  $query
      * @param  array<string, mixed>  $filters
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void

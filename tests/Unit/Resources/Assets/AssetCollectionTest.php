@@ -6,6 +6,7 @@ use App\Http\Resources\Assets\AssetCollection;
 use App\Models\Asset;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 uses(RefreshDatabase::class)->group('assets');
 
@@ -23,7 +24,7 @@ test('asset collection transforms assets correctly', function () {
     $items = $data['data'];
 
     // In Pest/PHPUnit, if 'data' is a collection object, we want it as an array to test keys.
-    if ($items instanceof \Illuminate\Support\Collection) {
+    if ($items instanceof Collection) {
         $items = $items->toArray();
     }
 

@@ -25,7 +25,7 @@ class AccountMappingExport extends SimpleCrudExport
     }
 
     /**
-     * @param  \App\Models\AccountMapping  $model
+     * @param  AccountMapping  $model
      */
     public function map($model): array
     {

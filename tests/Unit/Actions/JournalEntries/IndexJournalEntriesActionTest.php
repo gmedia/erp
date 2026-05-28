@@ -3,6 +3,7 @@
 use App\Actions\JournalEntries\IndexJournalEntriesAction;
 use App\Http\Requests\JournalEntries\IndexJournalEntryRequest;
 use App\Models\JournalEntry;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('journal-entries');
@@ -15,7 +16,7 @@ test('it returns paginated journal entries', function () {
 
     $result = $action->execute($request);
 
-    expect($result)->toBeInstanceOf(\Illuminate\Contracts\Pagination\LengthAwarePaginator::class);
+    expect($result)->toBeInstanceOf(LengthAwarePaginator::class);
     expect($result->total())->toBe(15);
     expect($result->perPage())->toBe(10);
 });

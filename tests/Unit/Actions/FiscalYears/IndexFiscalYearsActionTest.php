@@ -4,6 +4,7 @@ use App\Actions\FiscalYears\IndexFiscalYearsAction;
 use App\Domain\FiscalYears\FiscalYearFilterService;
 use App\Http\Requests\FiscalYears\IndexFiscalYearRequest;
 use App\Models\FiscalYear;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('fiscal-years');
@@ -38,7 +39,7 @@ test('execute returns paginated fiscal years', function () {
 
     $result = $action->execute($request);
 
-    expect($result)->toBeInstanceOf(\Illuminate\Contracts\Pagination\LengthAwarePaginator::class)
+    expect($result)->toBeInstanceOf(LengthAwarePaginator::class)
         ->and($result->total())->toBe(5);
 });
 

@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests\Employees;
 
+use App\Models\Employee;
+
 /**
- * @property \App\Models\Employee $employee
+ * @property Employee $employee
  *
  * @method \Illuminate\Routing\Route route($param = null)
  */

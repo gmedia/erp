@@ -5,6 +5,7 @@ namespace App\Exports;
 use App\Actions\Reports\IndexBookValueDepreciationReportAction;
 use App\Exports\Concerns\AbstractActionCollectionExport;
 use App\Http\Requests\Reports\IndexBookValueDepreciationRequest;
+use App\Models\Asset;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -29,7 +30,7 @@ class BookValueDepreciationExport extends AbstractActionCollectionExport impleme
     }
 
     /**
-     * @param  \App\Models\Asset  $asset
+     * @param  Asset  $asset
      */
     public function map($asset): array
     {

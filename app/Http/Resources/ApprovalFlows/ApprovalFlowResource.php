@@ -2,11 +2,12 @@
 
 namespace App\Http\Resources\ApprovalFlows;
 
+use App\Models\ApprovalFlow;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @mixin \App\Models\ApprovalFlow
+ * @mixin ApprovalFlow
  */
 class ApprovalFlowResource extends JsonResource
 {

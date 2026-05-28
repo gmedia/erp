@@ -2,10 +2,11 @@
 
 namespace App\Http\Resources\AssetLocations;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
 /**
- * @mixin mixed|\Illuminate\Database\Eloquent\Model
+ * @mixin mixed|Model
  */
 class AssetLocationCollection extends ResourceCollection
 {

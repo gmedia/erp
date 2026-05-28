@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Database\Factories\JournalEntryLineFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -13,13 +15,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property numeric $debit
  * @property numeric $credit
  * @property string|null $memo
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Account $account
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Account $account
  * @property-read float $amount
  * @property-read float $net_amount
  * @property-read string $type
- * @property-read \App\Models\JournalEntry $journalEntry
+ * @property-read JournalEntry $journalEntry
  *
  * @method static \Database\Factories\JournalEntryLineFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntryLine newModelQuery()
@@ -38,7 +40,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class JournalEntryLine extends Model
 {
-    /** @use HasFactory<\Database\Factories\JournalEntryLineFactory> */
+    /** @use HasFactory<JournalEntryLineFactory> */
     use HasFactory;
 
     /**

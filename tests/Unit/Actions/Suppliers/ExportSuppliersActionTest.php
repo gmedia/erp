@@ -4,6 +4,7 @@ use App\Actions\Suppliers\ExportSuppliersAction;
 use App\Http\Requests\Suppliers\ExportSupplierRequest;
 use App\Models\Supplier;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -23,7 +24,7 @@ test('execute exports suppliers and returns file info', function () {
 
     $result = $action->execute($request);
 
-    expect($result)->toBeInstanceOf(\Illuminate\Http\JsonResponse::class);
+    expect($result)->toBeInstanceOf(JsonResponse::class);
 
     $data = $result->getData(true);
     expect($data)->toHaveKeys(['url', 'filename'])

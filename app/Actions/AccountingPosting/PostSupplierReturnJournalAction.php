@@ -5,6 +5,7 @@ namespace App\Actions\AccountingPosting;
 use App\Actions\JournalEntries\CreateJournalEntryAction;
 use App\Models\JournalEntry;
 use App\Models\SupplierReturn;
+use App\Models\SupplierReturnItem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -47,7 +48,7 @@ class PostSupplierReturnJournalAction
             $total = 0.0;
 
             foreach ($supplierReturn->items as $item) {
-                /** @var \App\Models\SupplierReturnItem $item */
+                /** @var SupplierReturnItem $item */
                 $total += (float) $item->quantity_returned * (float) $item->unit_price;
             }
 

@@ -3,6 +3,7 @@
 use App\Models\JournalEntry;
 use App\Models\JournalEntryLine;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 
 uses(RefreshDatabase::class)->group('journal-entries');
 
@@ -12,7 +13,7 @@ test('factory creates a valid journal entry', function () {
     $this->assertDatabaseHas('journal_entries', ['id' => $journalEntry->id]);
 
     expect($journalEntry->entry_number)->toBeString();
-    expect($journalEntry->entry_date)->toBeInstanceOf(\Illuminate\Support\Carbon::class);
+    expect($journalEntry->entry_date)->toBeInstanceOf(Carbon::class);
 });
 
 test('it calculates total debit and credit correctly', function () {

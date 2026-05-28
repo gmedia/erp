@@ -3,20 +3,21 @@
 namespace App\Http\Resources\ApprovalDelegations;
 
 use App\Models\ApprovalDelegation;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * @property ApprovalDelegation $resource
  */
 /**
- * @mixin \App\Models\ApprovalDelegation
+ * @mixin ApprovalDelegation
  */
 class ApprovalDelegationResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return array<string, mixed>
      */
     public function toArray($request): array

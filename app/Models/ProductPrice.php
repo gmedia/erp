@@ -2,21 +2,23 @@
 
 namespace App\Models;
 
+use Database\Factories\ProductPriceFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property int $product_id
  * @property int|null $customer_category_id
  * @property numeric $price
- * @property \Illuminate\Support\Carbon $effective_from
- * @property \Illuminate\Support\Carbon|null $effective_until
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\CustomerCategory|null $customerCategory
- * @property-read \App\Models\Product $product
+ * @property Carbon $effective_from
+ * @property Carbon|null $effective_until
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read CustomerCategory|null $customerCategory
+ * @property-read Product $product
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductPrice effective()
  * @method static \Database\Factories\ProductPriceFactory factory($count = null, $state = [])
@@ -36,7 +38,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class ProductPrice extends Model
 {
-    /** @use HasFactory<\Database\Factories\ProductPriceFactory> */
+    /** @use HasFactory<ProductPriceFactory> */
     use HasFactory;
 
     /**

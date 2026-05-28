@@ -9,20 +9,21 @@ use App\Models\PipelineTransition;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 use function Pest\Laravel\actingAs;
 
 /**
- * @mixin \Tests\TestCase
+ * @mixin TestCase
  *
- * @property \App\Models\User $user
- * @property \App\Models\Pipeline $pipeline
- * @property \App\Models\PipelineState $stateDraft
- * @property \App\Models\PipelineState $stateReview
- * @property \App\Models\PipelineState $stateActive
- * @property \App\Models\PipelineTransition $transitionSubmit
- * @property \App\Models\PipelineTransition $transitionApprove
- * @property \App\Models\Asset $asset
+ * @property User $user
+ * @property Pipeline $pipeline
+ * @property PipelineState $stateDraft
+ * @property PipelineState $stateReview
+ * @property PipelineState $stateActive
+ * @property PipelineTransition $transitionSubmit
+ * @property PipelineTransition $transitionApprove
+ * @property Asset $asset
  */
 uses(RefreshDatabase::class)->group('entity-state-timeline');
 

@@ -3,6 +3,7 @@
 use App\Actions\Customers\IndexCustomersAction;
 use App\Domain\Customers\CustomerFilterService;
 use App\Http\Requests\Customers\IndexCustomerRequest;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Stringable;
 
@@ -61,7 +62,7 @@ test('execute calls filter service with correct parameters', function () {
 
     $result = $action->execute($request);
 
-    expect($result)->toBeInstanceOf(\Illuminate\Contracts\Pagination\LengthAwarePaginator::class);
+    expect($result)->toBeInstanceOf(LengthAwarePaginator::class);
 });
 
 test('getPaginationParams returns default values', function () {

@@ -8,7 +8,7 @@ use App\Models\SubscriptionPlan;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\CustomerSubscription>
+ * @extends Factory<CustomerSubscription>
  */
 class CustomerSubscriptionFactory extends Factory
 {

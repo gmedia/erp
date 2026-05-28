@@ -3,6 +3,7 @@
 namespace App\Domain\StockTransfers;
 
 use App\Domain\Concerns\BaseFilterService;
+use App\Models\StockTransfer;
 use Illuminate\Database\Eloquent\Builder;
 
 class StockTransferFilterService
@@ -10,7 +11,7 @@ class StockTransferFilterService
     use BaseFilterService;
 
     /**
-     * @param  Builder<\App\Models\StockTransfer>  $query
+     * @param  Builder<StockTransfer>  $query
      * @param  array<string, mixed>  $filters
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void

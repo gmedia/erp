@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use App\Models\Concerns\BuildsAttributeCasts;
+use Database\Factories\SupplierBillItemFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -20,12 +22,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property numeric $line_total
  * @property int|null $goods_receipt_item_id
  * @property string|null $notes
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Account $account
- * @property-read \App\Models\GoodsReceiptItem|null $goodsReceiptItem
- * @property-read \App\Models\Product|null $product
- * @property-read \App\Models\SupplierBill $supplierBill
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Account $account
+ * @property-read GoodsReceiptItem|null $goodsReceiptItem
+ * @property-read Product|null $product
+ * @property-read SupplierBill $supplierBill
  *
  * @method static \Database\Factories\SupplierBillItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierBillItem newModelQuery()
@@ -50,7 +52,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class SupplierBillItem extends Model
 {
-    /** @use HasFactory<\Database\Factories\SupplierBillItemFactory> */
+    /** @use HasFactory<SupplierBillItemFactory> */
     use BuildsAttributeCasts, HasFactory;
 
     /**

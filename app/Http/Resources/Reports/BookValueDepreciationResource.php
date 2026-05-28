@@ -2,11 +2,12 @@
 
 namespace App\Http\Resources\Reports;
 
+use App\Models\Asset;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @mixin \App\Models\Asset
+ * @mixin Asset
  */
 class BookValueDepreciationResource extends JsonResource
 {

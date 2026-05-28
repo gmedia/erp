@@ -3,11 +3,12 @@
 namespace App\Http\Requests\ApprovalDelegations;
 
 use App\Http\Requests\BaseListingRequest;
+use Illuminate\Contracts\Validation\ValidationRule;
 
 abstract class AbstractApprovalDelegationListingRequest extends BaseListingRequest
 {
     /**
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     protected function approvalDelegationBaseRules(string $delegatorKey, string $delegateKey): array
     {
@@ -20,7 +21,7 @@ abstract class AbstractApprovalDelegationListingRequest extends BaseListingReque
     }
 
     /**
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     protected function approvalDelegationSortRules(string $sortBy): array
     {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Employees\ExportEmployeesAction;
+use App\Actions\Employees\ImportEmployeesAction;
 use App\Actions\Employees\IndexEmployeesAction;
 use App\Actions\Employees\SyncEmployeePermissionsAction;
 use App\Domain\Employees\EmployeeFilterService;
@@ -89,7 +90,7 @@ class EmployeeController extends Controller
      */
     public function import(ImportEmployeeRequest $request): JsonResponse
     {
-        $summary = (new \App\Actions\Employees\ImportEmployeesAction)->execute($request->file('file'));
+        $summary = (new ImportEmployeesAction)->execute($request->file('file'));
 
         return response()->json($summary);
     }

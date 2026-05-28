@@ -16,6 +16,7 @@ use App\Http\Resources\Assets\AssetResource;
 use App\Models\Asset;
 use App\Models\AssetMovement;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\UploadedFile;
 
 class AssetController extends Controller
 {
@@ -137,7 +138,7 @@ class AssetController extends Controller
 
     public function import(ImportAssetRequest $request, ImportAssetsAction $action): JsonResponse
     {
-        /** @var \Illuminate\Http\UploadedFile $file */
+        /** @var UploadedFile $file */
         $file = $request->file('file');
 
         $summary = $action->execute($file);

@@ -4,6 +4,7 @@ use App\Actions\Products\IndexProductsAction;
 use App\Domain\Products\ProductFilterService;
 use App\Http\Requests\Products\IndexProductRequest;
 use App\Models\Product;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('products');
@@ -56,7 +57,7 @@ test('execute returns paginated products without filters', function () {
 
     $result = $action->execute($request);
 
-    expect($result)->toBeInstanceOf(\Illuminate\Contracts\Pagination\LengthAwarePaginator::class)
+    expect($result)->toBeInstanceOf(LengthAwarePaginator::class)
         ->and($result->total())->toBe(5);
 });
 
@@ -117,5 +118,5 @@ test('execute applies search filter when provided', function () {
 
     $result = $action->execute($request);
 
-    expect($result)->toBeInstanceOf(\Illuminate\Contracts\Pagination\LengthAwarePaginator::class);
+    expect($result)->toBeInstanceOf(LengthAwarePaginator::class);
 });

@@ -2,11 +2,13 @@
 
 namespace App\Http\Resources\Reports;
 
+use App\Models\StockMovement;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Carbon;
 
 /**
- * @mixin \App\Models\StockMovement
+ * @mixin StockMovement
  *
  * @property int $product_entity_id
  * @property string $product_code
@@ -21,7 +23,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property float $total_in
  * @property float $total_out
  * @property float $ending_balance
- * @property \Illuminate\Support\Carbon|null $last_moved_at
+ * @property Carbon|null $last_moved_at
  */
 class StockMovementReportResource extends JsonResource
 {

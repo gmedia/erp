@@ -4,6 +4,7 @@ use App\Models\AssetStocktake;
 use App\Models\Branch;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 
 use function Pest\Laravel\assertDatabaseHas;
 
@@ -26,8 +27,8 @@ test('casts are applied correctly', function () {
         'performed_at' => '2024-01-02',
     ]);
 
-    expect($stocktake->planned_at)->toBeInstanceOf(\Illuminate\Support\Carbon::class)
-        ->and($stocktake->performed_at)->toBeInstanceOf(\Illuminate\Support\Carbon::class);
+    expect($stocktake->planned_at)->toBeInstanceOf(Carbon::class)
+        ->and($stocktake->performed_at)->toBeInstanceOf(Carbon::class);
 });
 
 test('fillable attributes are defined correctly', function () {

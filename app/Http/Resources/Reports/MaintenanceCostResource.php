@@ -2,11 +2,12 @@
 
 namespace App\Http\Resources\Reports;
 
+use App\Models\AssetMaintenance;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @mixin \App\Models\AssetMaintenance
+ * @mixin AssetMaintenance
  */
 class MaintenanceCostResource extends JsonResource
 {

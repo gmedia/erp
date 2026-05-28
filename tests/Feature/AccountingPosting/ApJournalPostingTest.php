@@ -9,6 +9,7 @@ use App\Models\FiscalYear;
 use App\Models\JournalEntry;
 use App\Models\SupplierBill;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -166,7 +167,7 @@ test('PostSupplierBillJournalAction throws when no items exist', function () {
     $action = app(PostSupplierBillJournalAction::class);
 
     expect(fn () => $action->execute($supplierBill->fresh()))
-        ->toThrow(Illuminate\Validation\ValidationException::class);
+        ->toThrow(ValidationException::class);
 });
 
 test('PostSupplierBillJournalAction throws when no active COA version exists', function () {
@@ -187,7 +188,7 @@ test('PostSupplierBillJournalAction throws when no active COA version exists', f
     $action = app(PostSupplierBillJournalAction::class);
 
     expect(fn () => $action->execute($supplierBill->fresh()))
-        ->toThrow(Illuminate\Validation\ValidationException::class);
+        ->toThrow(ValidationException::class);
 });
 
 test('PostApPaymentJournalAction creates a balanced posted journal entry', function () {
@@ -270,7 +271,7 @@ test('PostApPaymentJournalAction throws on non-positive total amount', function 
     $action = app(PostApPaymentJournalAction::class);
 
     expect(fn () => $action->execute($apPayment->fresh()))
-        ->toThrow(Illuminate\Validation\ValidationException::class);
+        ->toThrow(ValidationException::class);
 });
 
 test('SupplierBillController update triggers journal posting on confirm transition', function () {

@@ -7,7 +7,7 @@ use App\Models\SubscriptionBillingRecord;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\SubscriptionBillingRecord>
+ * @extends Factory<SubscriptionBillingRecord>
  */
 class SubscriptionBillingRecordFactory extends Factory
 {

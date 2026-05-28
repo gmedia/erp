@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Database\Factories\EmployeeFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -15,9 +18,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property string $department
  * @property string $position
  * @property string $salary
- * @property \Illuminate\Support\Carbon $hire_date
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon $hire_date
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  *
  * @method static \Database\Factories\EmployeeFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee newModelQuery()
@@ -51,17 +54,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property int|null $branch_id
  * @property int|null $user_id
  * @property string $salary
- * @property \Illuminate\Support\Carbon $hire_date
+ * @property Carbon $hire_date
  * @property string $employment_status
- * @property \Illuminate\Support\Carbon|null $termination_date
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Branch|null $branch
- * @property-read \App\Models\Department|null $department
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Permission> $permissions
+ * @property Carbon|null $termination_date
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Branch|null $branch
+ * @property-read Department|null $department
+ * @property-read Collection<int, Permission> $permissions
  * @property-read int|null $permissions_count
- * @property-read \App\Models\Position|null $position
- * @property-read \App\Models\User|null $user
+ * @property-read Position|null $position
+ * @property-read User|null $user
  *
  * @method static \Database\Factories\EmployeeFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee newModelQuery()
@@ -87,7 +90,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  */
 class Employee extends Model
 {
-    /** @use HasFactory<\Database\Factories\EmployeeFactory> */
+    /** @use HasFactory<EmployeeFactory> */
     use HasFactory;
 
     /**

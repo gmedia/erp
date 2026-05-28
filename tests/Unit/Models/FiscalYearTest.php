@@ -2,6 +2,7 @@
 
 use App\Models\FiscalYear;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 
 uses(RefreshDatabase::class)->group('fiscal-years');
 
@@ -10,8 +11,8 @@ test('factory creates a valid fiscal year', function () {
 
     expect($fiscalYear->id)->not->toBeNull()
         ->and($fiscalYear->name)->not->toBeEmpty()
-        ->and($fiscalYear->start_date)->toBeInstanceOf(\Illuminate\Support\Carbon::class)
-        ->and($fiscalYear->end_date)->toBeInstanceOf(\Illuminate\Support\Carbon::class)
+        ->and($fiscalYear->start_date)->toBeInstanceOf(Carbon::class)
+        ->and($fiscalYear->end_date)->toBeInstanceOf(Carbon::class)
         ->and($fiscalYear->status)->not->toBeEmpty();
 });
 

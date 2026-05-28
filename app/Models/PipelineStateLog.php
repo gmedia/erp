@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Database\Factories\PipelineStateLogFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -20,13 +22,13 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property array<array-key, mixed>|null $metadata
  * @property string|null $ip_address
  * @property string|null $user_agent
- * @property \Illuminate\Support\Carbon $created_at
+ * @property Carbon $created_at
  * @property-read Model|Eloquent $entity
- * @property-read \App\Models\PipelineState|null $fromState
- * @property-read \App\Models\User|null $performedBy
- * @property-read \App\Models\PipelineEntityState $pipelineEntityState
- * @property-read \App\Models\PipelineState $toState
- * @property-read \App\Models\PipelineTransition|null $transition
+ * @property-read PipelineState|null $fromState
+ * @property-read User|null $performedBy
+ * @property-read PipelineEntityState $pipelineEntityState
+ * @property-read PipelineState $toState
+ * @property-read PipelineTransition|null $transition
  *
  * @method static \Database\Factories\PipelineStateLogFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PipelineStateLog newModelQuery()
@@ -50,7 +52,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  */
 class PipelineStateLog extends Model
 {
-    /** @use HasFactory<\Database\Factories\PipelineStateLogFactory> */
+    /** @use HasFactory<PipelineStateLogFactory> */
     use HasFactory;
 
     const UPDATED_AT = null; // Logs shouldn't be updated

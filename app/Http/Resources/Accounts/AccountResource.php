@@ -2,11 +2,12 @@
 
 namespace App\Http\Resources\Accounts;
 
+use App\Models\Account;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @mixin \App\Models\Account
+ * @mixin Account
  */
 class AccountResource extends JsonResource
 {

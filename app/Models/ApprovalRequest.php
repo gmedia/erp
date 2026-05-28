@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\ApprovalRequestFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -16,15 +19,15 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property int $current_step_order
  * @property string $status
  * @property int $submitted_by
- * @property \Illuminate\Support\Carbon $submitted_at
- * @property \Illuminate\Support\Carbon|null $completed_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon $submitted_at
+ * @property Carbon|null $completed_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * @property-read Model|Eloquent $approvable
- * @property-read \App\Models\ApprovalFlow $flow
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ApprovalRequestStep> $steps
+ * @property-read ApprovalFlow $flow
+ * @property-read Collection<int, ApprovalRequestStep> $steps
  * @property-read int|null $steps_count
- * @property-read \App\Models\User $submitter
+ * @property-read User $submitter
  *
  * @method static \Database\Factories\ApprovalRequestFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalRequest newModelQuery()
@@ -46,7 +49,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  */
 class ApprovalRequest extends Model
 {
-    /** @use HasFactory<\Database\Factories\ApprovalRequestFactory> */
+    /** @use HasFactory<ApprovalRequestFactory> */
     use HasFactory;
 
     /**

@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Database\Factories\AssetStocktakeItemFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -16,17 +18,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int|null $found_location_id
  * @property string $result
  * @property string|null $notes
- * @property \Illuminate\Support\Carbon|null $checked_at
+ * @property Carbon|null $checked_at
  * @property int|null $checked_by
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Asset $asset
- * @property-read \App\Models\User|null $checkedBy
- * @property-read \App\Models\Branch|null $expectedBranch
- * @property-read \App\Models\AssetLocation|null $expectedLocation
- * @property-read \App\Models\Branch|null $foundBranch
- * @property-read \App\Models\AssetLocation|null $foundLocation
- * @property-read \App\Models\AssetStocktake $stocktake
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Asset $asset
+ * @property-read User|null $checkedBy
+ * @property-read Branch|null $expectedBranch
+ * @property-read AssetLocation|null $expectedLocation
+ * @property-read Branch|null $foundBranch
+ * @property-read AssetLocation|null $foundLocation
+ * @property-read AssetStocktake $stocktake
  *
  * @method static \Database\Factories\AssetStocktakeItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetStocktakeItem newModelQuery()
@@ -50,7 +52,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class AssetStocktakeItem extends Model
 {
-    /** @use HasFactory<\Database\Factories\AssetStocktakeItemFactory> */
+    /** @use HasFactory<AssetStocktakeItemFactory> */
     use HasFactory;
 
     /**

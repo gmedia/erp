@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Database\Factories\ProductionOrderFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -14,22 +17,22 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int|null $branch_id
  * @property numeric $quantity
  * @property int $unit_id
- * @property \Illuminate\Support\Carbon|null $planned_start_date
- * @property \Illuminate\Support\Carbon|null $planned_end_date
- * @property \Illuminate\Support\Carbon|null $actual_start_date
- * @property \Illuminate\Support\Carbon|null $actual_end_date
+ * @property Carbon|null $planned_start_date
+ * @property Carbon|null $planned_end_date
+ * @property Carbon|null $actual_start_date
+ * @property Carbon|null $actual_end_date
  * @property string $status
  * @property numeric $total_cost
  * @property string|null $notes
  * @property int|null $created_by
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Branch|null $branch
- * @property-read \App\Models\User|null $creator
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductionOrderItem> $items
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Branch|null $branch
+ * @property-read User|null $creator
+ * @property-read Collection<int, ProductionOrderItem> $items
  * @property-read int|null $items_count
- * @property-read \App\Models\Product $product
- * @property-read \App\Models\Unit $unit
+ * @property-read Product $product
+ * @property-read Unit $unit
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder completed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductionOrder draft()
@@ -59,7 +62,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class ProductionOrder extends Model
 {
-    /** @use HasFactory<\Database\Factories\ProductionOrderFactory> */
+    /** @use HasFactory<ProductionOrderFactory> */
     use HasFactory;
 
     /**

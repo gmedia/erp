@@ -11,7 +11,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 /** @property Asset $resource */
 /**
- * @mixin \App\Models\Asset
+ * @mixin Asset
  */
 class AssetResource extends JsonResource
 {

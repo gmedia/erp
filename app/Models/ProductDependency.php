@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Database\Factories\ProductDependencyFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -12,10 +14,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $related_product_id
  * @property string $type
  * @property string|null $notes Explanation of the dependency
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Product $product
- * @property-read \App\Models\Product $relatedProduct
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Product $product
+ * @property-read Product $relatedProduct
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency addOns()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductDependency alternatives()
@@ -37,7 +39,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class ProductDependency extends Model
 {
-    /** @use HasFactory<\Database\Factories\ProductDependencyFactory> */
+    /** @use HasFactory<ProductDependencyFactory> */
     use HasFactory;
 
     /**

@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Database\Factories\SupplierFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -15,10 +17,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int|null $branch_id
  * @property int $category_id
  * @property string $status
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Branch|null $branch
- * @property-read \App\Models\SupplierCategory $category
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Branch|null $branch
+ * @property-read SupplierCategory $category
  *
  * @method static \Database\Factories\SupplierFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Supplier newModelQuery()
@@ -39,7 +41,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class Supplier extends Model
 {
-    /** @use HasFactory<\Database\Factories\SupplierFactory> */
+    /** @use HasFactory<SupplierFactory> */
     use HasFactory;
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use LogicException;
 
@@ -31,7 +32,7 @@ abstract class SimpleCrudNameRequest extends AuthorizedFormRequest
     }
 
     /**
-     * @return class-string<\Illuminate\Database\Eloquent\Model>
+     * @return class-string<Model>
      */
     protected function getModelClass(): string
     {

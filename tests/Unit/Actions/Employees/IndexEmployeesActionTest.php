@@ -4,6 +4,7 @@ use App\Actions\Employees\IndexEmployeesAction;
 use App\Domain\Employees\EmployeeFilterService;
 use App\Http\Requests\Employees\IndexEmployeeRequest;
 use App\Models\Employee;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('employees');
@@ -61,7 +62,7 @@ test('execute returns paginated employees without filters', function () {
 
     $result = $action->execute($request);
 
-    expect($result)->toBeInstanceOf(\Illuminate\Contracts\Pagination\LengthAwarePaginator::class)
+    expect($result)->toBeInstanceOf(LengthAwarePaginator::class)
         ->and($result->total())->toBe(5);
 });
 
@@ -128,7 +129,7 @@ test('execute applies search filter when provided', function () {
 
     $result = $action->execute($request);
 
-    expect($result)->toBeInstanceOf(\Illuminate\Contracts\Pagination\LengthAwarePaginator::class);
+    expect($result)->toBeInstanceOf(LengthAwarePaginator::class);
 });
 
 test('execute applies advanced filters when no search provided', function () {
@@ -198,7 +199,7 @@ test('execute applies advanced filters when no search provided', function () {
 
     $result = $action->execute($request);
 
-    expect($result)->toBeInstanceOf(\Illuminate\Contracts\Pagination\LengthAwarePaginator::class);
+    expect($result)->toBeInstanceOf(LengthAwarePaginator::class);
 });
 
 test('getPaginationParams returns default values', function () {

@@ -4,6 +4,7 @@ namespace App\Actions\Concerns;
 
 use App\Domain\Concerns\BaseFilterService;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
@@ -71,7 +72,7 @@ abstract class SimpleCrudExportAction
     /**
      * Get the model class for the entity.
      *
-     * @return class-string<\Illuminate\Database\Eloquent\Model>
+     * @return class-string<Model>
      */
     abstract protected function getModelClass(): string;
 

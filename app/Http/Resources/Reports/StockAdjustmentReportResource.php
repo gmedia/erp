@@ -2,11 +2,12 @@
 
 namespace App\Http\Resources\Reports;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @mixin mixed|\Illuminate\Database\Eloquent\Model
+ * @mixin mixed|Model
  */
 class StockAdjustmentReportResource extends JsonResource
 {

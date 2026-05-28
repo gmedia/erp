@@ -3,6 +3,7 @@
 namespace App\Domain\Accounts;
 
 use App\Domain\Concerns\BaseFilterService;
+use App\Models\Account;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -15,7 +16,7 @@ class AccountFilterService
     /**
      * Apply advanced filters for accounts.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder<\App\Models\Account>  $query
+     * @param  Builder<Account>  $query
      * @param  array<string, mixed>  $filters
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void

@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Database\Factories\ApprovalAuditLogFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -18,10 +20,10 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property array<array-key, mixed>|null $metadata
  * @property string|null $ip_address
  * @property string|null $user_agent
- * @property \Illuminate\Support\Carbon $created_at
- * @property-read \App\Models\User|null $actor
+ * @property Carbon $created_at
+ * @property-read User|null $actor
  * @property-read Model|Eloquent $approvable
- * @property-read \App\Models\ApprovalRequest|null $request
+ * @property-read ApprovalRequest|null $request
  *
  * @method static \Database\Factories\ApprovalAuditLogFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApprovalAuditLog newModelQuery()
@@ -43,7 +45,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  */
 class ApprovalAuditLog extends Model
 {
-    /** @use HasFactory<\Database\Factories\ApprovalAuditLogFactory> */
+    /** @use HasFactory<ApprovalAuditLogFactory> */
     use HasFactory;
 
     public const UPDATED_AT = null; // Spec says no updated_at

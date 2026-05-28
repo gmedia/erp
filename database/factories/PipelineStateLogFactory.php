@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\PipelineStateLog;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\PipelineStateLog>
+ * @extends Factory<PipelineStateLog>
  */
 class PipelineStateLogFactory extends Factory
 {

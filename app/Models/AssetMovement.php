@@ -3,15 +3,17 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasAssetAndCreatorRelations;
+use Database\Factories\AssetMovementFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property int $asset_id
  * @property string $movement_type
- * @property \Illuminate\Support\Carbon $moved_at
+ * @property Carbon $moved_at
  * @property int|null $from_branch_id
  * @property int|null $to_branch_id
  * @property int|null $from_location_id
@@ -23,18 +25,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $reference
  * @property string|null $notes
  * @property int|null $created_by
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Asset $asset
- * @property-read \App\Models\User|null $createdBy
- * @property-read \App\Models\Branch|null $fromBranch
- * @property-read \App\Models\Department|null $fromDepartment
- * @property-read \App\Models\Employee|null $fromEmployee
- * @property-read \App\Models\AssetLocation|null $fromLocation
- * @property-read \App\Models\Branch|null $toBranch
- * @property-read \App\Models\Department|null $toDepartment
- * @property-read \App\Models\Employee|null $toEmployee
- * @property-read \App\Models\AssetLocation|null $toLocation
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Asset $asset
+ * @property-read User|null $createdBy
+ * @property-read Branch|null $fromBranch
+ * @property-read Department|null $fromDepartment
+ * @property-read Employee|null $fromEmployee
+ * @property-read AssetLocation|null $fromLocation
+ * @property-read Branch|null $toBranch
+ * @property-read Department|null $toDepartment
+ * @property-read Employee|null $toEmployee
+ * @property-read AssetLocation|null $toLocation
  *
  * @method static \Database\Factories\AssetMovementFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetMovement newModelQuery()
@@ -62,7 +64,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class AssetMovement extends Model
 {
-    /** @use HasFactory<\Database\Factories\AssetMovementFactory> */
+    /** @use HasFactory<AssetMovementFactory> */
     use HasAssetAndCreatorRelations, HasFactory;
 
     /**

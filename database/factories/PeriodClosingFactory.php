@@ -4,11 +4,12 @@ namespace Database\Factories;
 
 use App\Models\Account;
 use App\Models\FiscalYear;
+use App\Models\PeriodClosing;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\PeriodClosing>
+ * @extends Factory<PeriodClosing>
  */
 class PeriodClosingFactory extends Factory
 {

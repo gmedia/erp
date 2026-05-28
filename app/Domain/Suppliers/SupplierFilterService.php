@@ -4,6 +4,7 @@ namespace App\Domain\Suppliers;
 
 use App\Domain\Concerns\AppliesPartyExactFilters;
 use App\Domain\Concerns\BaseFilterService;
+use App\Models\Supplier;
 use Illuminate\Database\Eloquent\Builder;
 
 class SupplierFilterService
@@ -14,7 +15,7 @@ class SupplierFilterService
     /**
      * Apply all filters to the query.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder<\App\Models\Supplier>  $query
+     * @param  Builder<Supplier>  $query
      * @param  array<string, mixed>  $filters
      */
     public function apply(Builder $query, array $filters): void
@@ -49,7 +50,7 @@ class SupplierFilterService
     /**
      * Apply advanced filters for suppliers.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder<\App\Models\Supplier>  $query
+     * @param  Builder<Supplier>  $query
      * @param  array<string, mixed>  $filters
      */
     public function applyAdvancedFilters(Builder $query, array $filters): void

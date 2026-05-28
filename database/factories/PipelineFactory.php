@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\Pipeline;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Pipeline>
+ * @extends Factory<Pipeline>
  */
 class PipelineFactory extends Factory
 {

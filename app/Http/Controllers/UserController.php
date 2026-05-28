@@ -8,6 +8,7 @@ use App\Http\Resources\Users\UserResource;
 use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 /**
  * Controller for user management operations.
@@ -19,7 +20,7 @@ class UserController extends Controller
     /**
      * Get users for API dropdowns
      */
-    public function apiIndex(\Illuminate\Http\Request $request): JsonResponse
+    public function apiIndex(Request $request): JsonResponse
     {
         $query = User::query();
 

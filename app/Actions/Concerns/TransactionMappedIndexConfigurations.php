@@ -11,13 +11,14 @@ use App\Models\PurchaseOrder;
 use App\Models\PurchaseRequest;
 use App\Models\SupplierBill;
 use App\Models\SupplierReturn;
+use Illuminate\Database\Eloquent\Model;
 use InvalidArgumentException;
 
 final class TransactionMappedIndexConfigurations
 {
     /**
      * @var array<string, array{
-     *     model_class: class-string<\Illuminate\Database\Eloquent\Model>,
+     *     model_class: class-string<Model>,
      *     with: array<int, string>,
      *     search_fields: array<int, string>,
      *     filter_keys: array<int, string>,
@@ -442,7 +443,7 @@ final class TransactionMappedIndexConfigurations
 
     /**
      * @return array{
-     *     model_class: class-string<\Illuminate\Database\Eloquent\Model>,
+     *     model_class: class-string<Model>,
      *     with: array<int, string>,
      *     search_fields: array<int, string>,
      *     filter_keys: array<int, string>,

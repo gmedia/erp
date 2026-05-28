@@ -23,7 +23,7 @@ class CoaVersionExport extends SimpleCrudExport
     }
 
     /**
-     * @param  \App\Models\CoaVersion  $model
+     * @param  CoaVersion  $model
      */
     public function map($model): array
     {

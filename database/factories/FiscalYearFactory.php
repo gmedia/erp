@@ -6,7 +6,7 @@ use App\Models\FiscalYear;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\FiscalYear>
+ * @extends Factory<FiscalYear>
  */
 class FiscalYearFactory extends Factory
 {

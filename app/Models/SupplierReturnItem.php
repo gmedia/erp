@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Database\Factories\SupplierReturnItemFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -15,12 +17,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property numeric $quantity_returned
  * @property numeric $unit_price
  * @property string|null $notes
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\GoodsReceiptItem $goodsReceiptItem
- * @property-read \App\Models\Product $product
- * @property-read \App\Models\SupplierReturn $supplierReturn
- * @property-read \App\Models\Unit|null $unit
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read GoodsReceiptItem $goodsReceiptItem
+ * @property-read Product $product
+ * @property-read SupplierReturn $supplierReturn
+ * @property-read Unit|null $unit
  *
  * @method static \Database\Factories\SupplierReturnItemFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SupplierReturnItem newModelQuery()
@@ -41,7 +43,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class SupplierReturnItem extends Model
 {
-    /** @use HasFactory<\Database\Factories\SupplierReturnItemFactory> */
+    /** @use HasFactory<SupplierReturnItemFactory> */
     use HasFactory;
 
     /**
