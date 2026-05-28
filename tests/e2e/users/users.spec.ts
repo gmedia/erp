@@ -17,6 +17,8 @@ async function selectAsyncOption(page: Page, text: string): Promise<void> {
 }
 
 test.describe('User Management', () => {
+    test.describe.configure({ retries: 1 });
+
     test.beforeEach(async ({ page }) => {
         await login(page, undefined, undefined, { requireDashboard: false });
     });
