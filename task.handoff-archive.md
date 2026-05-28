@@ -84,6 +84,29 @@ This file stores condensed historical checkpoints that were moved out of `task.m
   - `.github/skills/session-handoff/SKILL.md`
   - `.github/skills/session-handoff/resources/handoff.template.md`
 
+## 2026-05-28
+
+- Six items shipped:
+  1. Pipeline-dashboard smoke spec (`ca1ae199`) — CI subset 77 → 78 modules.
+  2. `GetPreferredFiscalYearAction` (`420b7c7b`) — financial reports default to latest FY with posted journal entries. Affects 5 reports via `InteractsWithFinancialReportRequest` trait. Zero frontend change.
+  3. Extended preferred-FY to Trial Balance Detailed + General Ledger (`3aa557c2`, `810a2d98`):
+     - Backend: `FiscalYearCollection` returns `preferred_fiscal_year_id` in meta.
+     - Frontend: `AsyncSelect` gained `preferredMetaKey` prop for auto-select.
+     - Zero per-page edits — only filter definitions changed.
+  4. Defensive locator audit (`60ee5925`): 8 locators fixed with `exact: true` in 3 specs.
+  5. Sonar issues resolved: 1 CRITICAL (cognitive complexity refactor in `ImportBankStatementDialog.tsx`) + 4 MEDIUM (line length in `BankReconciliationController` + `CompleteBankReconciliationAction`).
+  6. Users E2E flaky fix (`f657812d`): added `retries: 1` to User Management describe block.
+- Fiscal Years re-inclusion fix (`4e036b23`, `4f13056a`, `a51d043f`): empty financial reports now emit full totals shape; Export button no longer disabled on empty data.
+- Wave 8 strict-mode fix (`186f1652`): pinned Export button locator with `exact: true` in 3 specs.
+- Validation:
+  - `sail test --group reports` → 31 passed
+  - `sail test --group fiscal-years --group reports` → 71 passed
+  - PHPStan: 0 errors, TypeScript: 0 errors, Duster: PASS
+  - Playwright (fiscal-years + 6 financial reports): 29 passed
+  - CI runs verified green: `26484564047`, `26500231032`, `26506366687`, `26565168691`
+- Sonar metrics (pre-fix scan): 91.2% coverage, 0.7% duplication, 91k ncloc.
+- CI E2E subset: 78 of 80 dirs (remaining: `misc/`, `test-results/`).
+
 ## Persistent Historical Notes
 
 - Do not run the full E2E suite in chat; full suite remains user-side.
