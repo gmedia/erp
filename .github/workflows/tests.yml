@@ -196,11 +196,11 @@ jobs:
 
       - name: Run tests with coverage
         if: ${{ steps.autofix.outputs.changed != 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
-        run: ./vendor/bin/sail test --colors=always --coverage-clover=coverage.xml
+        run: ./vendor/bin/sail test --parallel --colors=always --coverage-clover=coverage.xml
 
       - name: Run tests
         if: ${{ steps.autofix.outputs.changed != 'true' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
-        run: ./vendor/bin/sail test --colors=always
+        run: ./vendor/bin/sail test --parallel --colors=always
 
       - name: Run SonarQube Cloud scan
         if: ${{ success() && steps.autofix.outputs.changed != 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
