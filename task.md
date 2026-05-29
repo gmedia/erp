@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-05-28 23:09 UTC
+Last updated: 2026-05-29 10:11 UTC
 
 ## Document Roles
 
@@ -11,11 +11,11 @@ Last updated: 2026-05-28 23:09 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `5e1906c9 test(e2e): add E2E tests for 6 new financial reports`
+- HEAD: `876a6276 fix(ci): revert parallel for coverage run, keep for PR-only`
 - Working tree: clean.
 - Remote: pushed (up to date).
 - CI E2E is **required gate** (no `continue-on-error`).
-- Latest verified-green CI run: `26572562234` (HEAD `483c7e7d`).
+- Latest verified-green CI run: `26616510440` (HEAD `876a6276`).
   - `Quality checks via Sail`: `success`
   - `Playwright E2E via Sail`: `success`
   - `Test suite via Sail`: `success`
@@ -41,8 +41,10 @@ Last updated: 2026-05-28 23:09 UTC
 1. Pushed 6 prior commits to remote (was 6 ahead, now up to date).
 2. Verified all task.md claims against actual repo state — all accurate.
 3. Discovered 6 new reports already fully implemented (AP Aging, AP Outstanding, AP Payment History, AR Aging, AR Outstanding, Customer Statement).
-4. Confirmed `GetPreferredFiscalYearAction` already wired end-to-end (Action → `InteractsWithFinancialReportRequest` trait → `ReportController` → all 5 financial report pages via `FinancialReportPageShell` / `SingleYearFinancialReportPageShell`).
-5. Created E2E tests for all 6 new reports (24 test cases total: view, sort, export, filters dialog per report). TypeScript clean.
+4. Confirmed `GetPreferredFiscalYearAction` already wired end-to-end.
+5. Created E2E tests for all 6 new reports (24 test cases total). TypeScript clean.
+6. Fixed npm uuid vulnerability via override (exceljs uuid 8.3.2 → 11.1.1). 0 npm vulns.
+7. Enabled parallel CI tests: sequential for coverage (main), parallel for PR-only runs. CI green.
 
 ## Recommended Next Steps (AI-autonomous)
 
@@ -50,10 +52,8 @@ Prioritized by value/effort. All can be done without product decisions from user
 
 | # | Task | Effort | Value | Notes |
 |---|------|--------|-------|-------|
-| 1 | npm uuid vuln in exceljs | Low | Medium | Requires exceljs major version bump (3.x breaking). Test Excel exports after. |
-| 2 | Paratest setup | Low | Medium | 1714+ tests — parallel run could cut CI time 50%+. |
-| 3 | Dead code scan | Low | Low | Depwire re-scan. Last attempt had Laravel DI false positives. |
-| 4 | PHPStan level 6 (deferred) | High | Medium | 3219 generic-type annotation errors. Not viable without massive PHPDoc effort. |
+| 1 | Dead code scan | Low | Low | Depwire re-scan. Last attempt had Laravel DI false positives. |
+| 2 | PHPStan level 6 (deferred) | High | Medium | 3219 generic-type annotation errors. Not viable without massive PHPDoc effort. |
 
 **Product features** (require user scope):
 - Financial Dashboard with KPI cards
@@ -81,13 +81,14 @@ gh run view <run_id> --json status,conclusion,jobs
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo on `main` at `5e1906c9`. Working tree clean, remote up to date.
+Read task.md first. Repo on `main` at `876a6276`. Working tree clean, remote up to date.
 
-CI green (run 26572562234). Sonar Quality Gate OK.
-TypeScript strict mode fully enabled. Composer 0 vulns, npm 2 remaining (exceljs uuid).
+CI green (run 26616510440). Sonar Quality Gate OK.
+TypeScript strict mode fully enabled. npm 0 vulns. Composer 0 vulns.
 1714+ Pest tests pass. PHPStan level 5 clean.
-6 new reports fully tested (AP Aging, AP Outstanding, AP Payment History, AR Aging, AR Outstanding, Customer Statement) — Pest 5 each + E2E 4 each.
+CI uses parallel for PR runs, sequential+coverage for main.
+6 new reports fully tested (Pest 5 each + E2E 4 each).
 
-Autonomous tasks remaining: exceljs uuid bump, Paratest setup, dead code scan.
+Autonomous tasks exhausted (remaining: dead code scan — low value).
 Provide a product feature scope for next session (Financial Dashboard, Budget, Sales).
 ```
