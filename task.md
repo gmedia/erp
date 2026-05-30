@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-05-30 09:00 UTC
+Last updated: 2026-05-30 09:33 UTC
 
 ## Document Roles
 
@@ -11,11 +11,11 @@ Last updated: 2026-05-30 09:00 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `be8e84c9 test: backfill show endpoint coverage for stock-adjustments and stock-transfers`
+- HEAD: `52ade106 test: cover TriggerApprovalAction (resolveFlow paths and full create flow)`
 - Working tree: clean.
 - Remote: pushed (up to date).
 - CI E2E is **required gate** (no `continue-on-error`).
-- Sonar: Quality Gate **OK** (overall coverage ~91.9%, 0 HIGH/BLOCKER issues at last scan).
+- Sonar: Quality Gate **OK** (overall coverage ~91.9%, 0 HIGH/BLOCKER issues at last scan; rescan pending for waves 6-8).
 - Module registry: 76 entries + financial-dashboard.
 
 ### CI Note — Autofix Supersede Pattern (read this before reacting to red runs)
@@ -46,7 +46,7 @@ Implementation complete in earlier session, fully verified:
 
 ## Coverage Backfill Progress (this multi-session work)
 
-The codebase had several files at 0% or mid coverage despite endpoints being live in production. Backfilled with pure additive Pest tests — no behavior changes:
+The codebase had several files at 0% or mid coverage despite endpoints being live in production. Backfilled with pure additive Pest tests and unit tests — no behavior changes:
 
 | Wave | Commit | Files moved to ~100% |
 |---|---|---|
@@ -55,16 +55,20 @@ The codebase had several files at 0% or mid coverage despite endpoints being liv
 | 3 | `ecffac0d` | (Sonar refactor — 7 MAJOR fixes, no coverage change) |
 | 4 | `11e1ba41` | `AssetStocktakeController::show`, `SupplierController::show` |
 | 5 | `be8e84c9` | `StockAdjustmentController::show`, `StockTransferController::show` |
+| 6 | `1e3be7f2` | `EvaluateGuardAction` 40% → ~100% (+ 3 fixture rule classes) |
+| 7 | `d0ecde17` | `ExecuteTransitionActionsAction` 32% → ~100% (+ 1 fixture custom action) |
+| 8 | `52ade106` | `TriggerApprovalAction` (full path coverage: resolveFlow + create transaction) |
 
-**Cumulative: 21 new Pest test cases, 9 PHP files moved from 0%/mid to ~100% coverage, 0 regressions.**
+**Cumulative: 45+ new Pest test cases, 12+ PHP files moved from 0%/mid to ~100% coverage, 4 small test fixture classes, 0 regressions.**
 
 ## What changed this session
 
 1. Synced HEAD pointer in `task.md` (was stale at `08f400e5`).
 2. Added explicit "CI Autofix Supersede Pattern" section so future sessions don't panic at red runs.
 3. Added `financial-dashboard` entry to `docs/module-registry.md`.
-4. Backfilled coverage for 5 controllers and 2 actions (waves 1, 2, 4, 5).
+4. Backfilled coverage for 5 controllers, 3 actions, and 1 trait helper across waves 1, 2, 4, 5, 6, 7, 8.
 5. Resolved 7 SonarCloud MAJOR issues in financial-dashboard files (wave 3).
+6. Added `tests/Unit/Actions/EntityStates/` and `tests/Unit/Actions/Approvals/` directories with reusable fixture rule/action classes.
 
 ## Important: Files NOT to write tests for
 
@@ -94,10 +98,8 @@ These files appear in Sonar's 0%-coverage list because they exist on disk, but w
 
 | # | Task | Effort | Notes |
 |---|------|--------|-------|
-| 2 | Coverage for `EvaluateGuardAction` (currently 40%) | Medium | Pipeline guard logic with multiple condition types. Must read `HandlesConditions` trait first. |
-| 3 | Coverage for `ExecuteTransitionActionsAction` (currently 32%) | Medium | Transition side-effects engine. Touches multiple action types. |
-| 4 | Coverage for `TriggerApprovalAction` | Medium | Approval flow trigger — multiple entity types. |
-| 5 | Update graceful-degrade for stock adjustment journal posting | Medium | Hard to reproduce realistically (items min 1 validation blocks the failure path). May need unit-test-level mocking of `PostStockAdjustmentJournalAction`. |
+| 2 | Update graceful-degrade for stock adjustment journal posting | Medium | Hard to reproduce realistically (items min 1 validation blocks the failure path). May need unit-test-level mocking of `PostStockAdjustmentJournalAction`. |
+| 3 | Verify Sonar rescan picks up `HandlesConditions` trait coverage indirectly | Low | Trait is now exercised by both `EvaluateGuardActionTest` and `TriggerApprovalActionTest` (via the conditional flow tests). Sonar may auto-resolve from 15% to high. |
 
 ### Requires user decision
 
@@ -139,11 +141,13 @@ gh run list --branch main --limit 5
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo on `main` at HEAD `be8e84c9` or later.
+Read task.md first. Repo on `main` at HEAD `52ade106` or later.
 
-Status: Financial Dashboard fully shipped + Sonar-clean. 5 waves of
-coverage backfill landed (21 new Pest cases, 9 files at 0% → ~100%).
-PHPStan / Pest / Duster all clean locally before each push.
+Status: Financial Dashboard fully shipped + Sonar-clean. 8 waves of
+coverage backfill landed (45+ new Pest cases, 12+ files at 0%/mid → ~100%,
+including all three pipeline/approval action engines: EvaluateGuardAction,
+ExecuteTransitionActionsAction, and TriggerApprovalAction). PHPStan / Pest /
+Duster all clean locally before each push.
 
 Before reacting to red CI runs: read the "CI Autofix Supersede Pattern"
 section. Most reds and cancels in `gh run list` are concurrency-cancels
@@ -156,9 +160,13 @@ Inertia → API migration with no live routes.
 Easy autonomous task remaining: seed dev DB to activate financial-dashboard
 nav (requires explicit go-ahead since DB state changes).
 
-Medium tasks (require investigation): coverage for EvaluateGuardAction,
-ExecuteTransitionActionsAction, TriggerApprovalAction. These have complex
-branch logic — read HandlesConditions and existing pipeline tests first.
+Coverage backfill is now in diminishing-returns territory. The remaining
+Sonar low-coverage files either need user product decisions, or are dead
+code to be deleted (Fortify scaffold), or will auto-resolve once the next
+Sonar scan picks up the indirect coverage from waves 6-8 (e.g.
+HandlesConditions trait at 15% — now exercised indirectly by both
+EvaluateGuardActionTest and TriggerApprovalActionTest conditional-flow
+tests).
 
 Product feature options if user wants to expand domain: Profit & Loss
 by Department, Aging Dashboard, Budget Management, Sales/Invoicing.
