@@ -70,6 +70,7 @@ class MenuSeeder extends Seeder
                 'name' => 'accounting',
                 'display_name' => 'Accounting',
                 'permissions' => [
+                    'financial_dashboard',
                     'journal_entry',
                     'posting_journal',
                     'recurring_journal',
@@ -79,6 +80,16 @@ class MenuSeeder extends Seeder
                 'icon' => 'Calculator',
                 'url' => null,
                 'child' => [
+                    [
+                        'name' => 'financial_dashboard',
+                        'display_name' => 'Financial Dashboard',
+                        'permissions' => [
+                            'financial_dashboard',
+                        ],
+                        'icon' => 'BarChart3',
+                        'url' => 'financial-dashboard',
+                        'child' => [],
+                    ],
                     [
                         'name' => 'journal_entry',
                         'display_name' => 'Journal Entry',

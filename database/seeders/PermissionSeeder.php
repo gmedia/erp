@@ -441,6 +441,11 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'financial_dashboard',
+                'display_name' => 'Financial Dashboard',
+                'child' => [],
+            ],
+            [
                 'name' => 'asset_dashboard',
                 'display_name' => 'Asset Dashboard',
                 'child' => [],
