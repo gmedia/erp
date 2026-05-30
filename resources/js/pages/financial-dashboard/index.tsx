@@ -65,8 +65,8 @@ export default function FinancialDashboard() {
                             Financial Overview
                         </h1>
                         <p className="mt-1 text-muted-foreground">
-                            Monitor key financial metrics, cash flow, and expense
-                            trends.
+                            Monitor key financial metrics, cash flow, and
+                            expense trends.
                         </p>
                     </div>
                     <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">

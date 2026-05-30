@@ -48,16 +48,20 @@ interface UseFinancialDashboardParams {
     comparisonYearId?: number | null;
 }
 
-export function useFinancialDashboard(
-    params?: UseFinancialDashboardParams,
-) {
+export function useFinancialDashboard(params?: UseFinancialDashboardParams) {
     const fetchDashboardData = async (): Promise<FinancialDashboardData> => {
         const queryParams = new URLSearchParams();
         if (params?.fiscalYearId) {
-            queryParams.append('fiscal_year_id', params.fiscalYearId.toString());
+            queryParams.append(
+                'fiscal_year_id',
+                params.fiscalYearId.toString(),
+            );
         }
         if (params?.comparisonYearId) {
-            queryParams.append('comparison_year_id', params.comparisonYearId.toString());
+            queryParams.append(
+                'comparison_year_id',
+                params.comparisonYearId.toString(),
+            );
         }
 
         const url = `/api/financial-dashboard${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
@@ -66,7 +70,11 @@ export function useFinancialDashboard(
     };
 
     const query = useQuery({
-        queryKey: ['financial-dashboard', params?.fiscalYearId, params?.comparisonYearId],
+        queryKey: [
+            'financial-dashboard',
+            params?.fiscalYearId,
+            params?.comparisonYearId,
+        ],
         queryFn: fetchDashboardData,
         staleTime: 60000,
     });

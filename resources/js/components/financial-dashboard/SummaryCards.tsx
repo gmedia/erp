@@ -1,14 +1,14 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatCurrency } from '@/lib/utils';
 import {
-    TrendingUp,
-    TrendingDown,
-    DollarSign,
+    Banknote,
     Building2,
     CreditCard,
+    DollarSign,
     PiggyBank,
-    Banknote,
+    TrendingDown,
+    TrendingUp,
 } from 'lucide-react';
 import { memo } from 'react';
 import type { FinancialDashboardData } from '../../hooks/useFinancialDashboard';
