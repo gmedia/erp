@@ -45,8 +45,19 @@ class SupplierImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                 'status' => 'required|in:active,inactive',
             ],
             [
-                ['lookup' => $this->categories, 'source' => 'category', 'entity' => 'Category', 'target' => 'category_id'],
-                ['lookup' => $this->branches, 'source' => 'branch', 'entity' => 'Branch', 'target' => 'branch_id', 'required' => false],
+                [
+                    'lookup' => $this->categories,
+                    'source' => 'category',
+                    'entity' => 'Category',
+                    'target' => 'category_id',
+                ],
+                [
+                    'lookup' => $this->branches,
+                    'source' => 'branch',
+                    'entity' => 'Branch',
+                    'target' => 'branch_id',
+                    'required' => false,
+                ],
             ],
             function (array $rowData, array $resolvedLookups): void {
                 $matchAttributes = [];

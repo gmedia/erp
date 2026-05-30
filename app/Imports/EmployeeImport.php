@@ -53,9 +53,24 @@ class EmployeeImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                 'termination_date' => 'nullable|date_format:Y-m-d',
             ],
             [
-                ['lookup' => $this->departments, 'source' => 'department', 'entity' => 'Department', 'target' => 'department_id'],
-                ['lookup' => $this->positions, 'source' => 'position', 'entity' => 'Position', 'target' => 'position_id'],
-                ['lookup' => $this->branches, 'source' => 'branch', 'entity' => 'Branch', 'target' => 'branch_id'],
+                [
+                    'lookup' => $this->departments,
+                    'source' => 'department',
+                    'entity' => 'Department',
+                    'target' => 'department_id',
+                ],
+                [
+                    'lookup' => $this->positions,
+                    'source' => 'position',
+                    'entity' => 'Position',
+                    'target' => 'position_id',
+                ],
+                [
+                    'lookup' => $this->branches,
+                    'source' => 'branch',
+                    'entity' => 'Branch',
+                    'target' => 'branch_id',
+                ],
             ],
             function (array $rowData, array $resolvedLookups): void {
                 Employee::updateOrCreate(

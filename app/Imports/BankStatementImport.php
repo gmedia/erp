@@ -78,7 +78,11 @@ class BankStatementImport implements SkipsEmptyRows, ToCollection, WithHeadingRo
 
         $date = $this->parseDate($dateRaw);
         if ($date === null) {
-            $this->errors[] = ['row' => $rowNumber, 'field' => 'date', 'message' => "Invalid date format: '{$dateRaw}'."];
+            $this->errors[] = [
+                'row' => $rowNumber,
+                'field' => 'date',
+                'message' => "Invalid date format: '{$dateRaw}'.",
+            ];
             $this->skippedCount++;
 
             return null;
@@ -92,7 +96,11 @@ class BankStatementImport implements SkipsEmptyRows, ToCollection, WithHeadingRo
             $amount = $this->parseNumeric($amountRaw);
 
             if ($amount === null) {
-                $this->errors[] = ['row' => $rowNumber, 'field' => 'amount', 'message' => "Invalid amount: '{$amountRaw}'."];
+                $this->errors[] = [
+                    'row' => $rowNumber,
+                    'field' => 'amount',
+                    'message' => "Invalid amount: '{$amountRaw}'.",
+                ];
                 $this->skippedCount++;
 
                 return null;
@@ -111,7 +119,11 @@ class BankStatementImport implements SkipsEmptyRows, ToCollection, WithHeadingRo
         }
 
         if ($debit == 0 && $credit == 0) {
-            $this->errors[] = ['row' => $rowNumber, 'field' => 'amount', 'message' => 'At least one of debit or credit must be greater than zero.'];
+            $this->errors[] = [
+                'row' => $rowNumber,
+                'field' => 'amount',
+                'message' => 'At least one of debit or credit must be greater than zero.',
+            ];
             $this->skippedCount++;
 
             return null;

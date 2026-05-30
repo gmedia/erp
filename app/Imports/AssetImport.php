@@ -76,13 +76,13 @@ class AssetImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                 'notes' => 'nullable|string',
             ],
             [
-                ['lookup' => $this->categories, 'source' => 'asset_category', 'entity' => 'Category', 'target' => 'category_id', 'required' => false, 'incrementSkippedOnFailure' => true],
-                ['lookup' => $this->models, 'source' => 'asset_model', 'entity' => 'Model', 'target' => 'model_id', 'required' => false, 'incrementSkippedOnFailure' => true],
-                ['lookup' => $this->branches, 'source' => 'branch', 'entity' => 'Branch', 'target' => 'branch_id', 'required' => false, 'incrementSkippedOnFailure' => true],
-                ['lookup' => $this->locations, 'source' => 'location', 'entity' => 'Location', 'target' => 'location_id', 'required' => false, 'incrementSkippedOnFailure' => true],
-                ['lookup' => $this->departments, 'source' => 'department', 'entity' => 'Department', 'target' => 'department_id', 'required' => false, 'incrementSkippedOnFailure' => true],
-                ['lookup' => $this->employees, 'source' => 'employee', 'entity' => 'Employee', 'target' => 'employee_id', 'required' => false, 'incrementSkippedOnFailure' => true],
-                ['lookup' => $this->suppliers, 'source' => 'supplier', 'entity' => 'Supplier', 'target' => 'supplier_id', 'required' => false, 'incrementSkippedOnFailure' => true],
+                $this->lookupConfig($this->categories, 'asset_category', 'Category', 'category_id'),
+                $this->lookupConfig($this->models, 'asset_model', 'Model', 'model_id'),
+                $this->lookupConfig($this->branches, 'branch', 'Branch', 'branch_id'),
+                $this->lookupConfig($this->locations, 'location', 'Location', 'location_id'),
+                $this->lookupConfig($this->departments, 'department', 'Department', 'department_id'),
+                $this->lookupConfig($this->employees, 'employee', 'Employee', 'employee_id'),
+                $this->lookupConfig($this->suppliers, 'supplier', 'Supplier', 'supplier_id'),
             ],
             function (array $rowData, array $resolvedLookups): void {
                 Asset::updateOrCreate(
@@ -113,5 +113,22 @@ class AssetImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
             true,
             true
         );
+    }
+
+    /**
+     * Build a lookup config row for performImportFromRows.
+     *
+     * @return array<string, mixed>
+     */
+    private function lookupConfig($lookup, string $source, string $entity, string $target): array
+    {
+        return [
+            'lookup' => $lookup,
+            'source' => $source,
+            'entity' => $entity,
+            'target' => $target,
+            'required' => false,
+            'incrementSkippedOnFailure' => true,
+        ];
     }
 }

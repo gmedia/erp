@@ -25,7 +25,7 @@ trait InteractsWithImportRows
     }
 
     /**
-     * @param  array<int, array{lookup: Collection, source: string, entity: string, target?: string, required?: bool, incrementSkippedOnFailure?: bool}>  $configs
+     * @param  array<int, array<string, mixed>>  $configs
      * @return array<string, mixed>|null
      */
     protected function resolveLookupAssignments(array $rowData, int $rowNumber, array $configs): ?array
@@ -73,7 +73,7 @@ trait InteractsWithImportRows
 
     /**
      * @param  array<string, string|array<int, string>>  $rules
-     * @param  array<int, array{lookup: Collection, source: string, entity: string, target?: string, required?: bool, incrementSkippedOnFailure?: bool}>  $lookupConfigs
+     * @param  array<int, array<string, mixed>>  $lookupConfigs
      * @param  callable(array<string, mixed>, array<string, mixed>): void  $operation
      */
     protected function processImportCollection(
@@ -134,8 +134,11 @@ trait InteractsWithImportRows
     /**
      * @param  callable(): mixed  $operation
      */
-    protected function performImportUpsert(int $rowNumber, callable $operation, bool $incrementSkippedOnError = false): void
-    {
+    protected function performImportUpsert(
+        int $rowNumber,
+        callable $operation,
+        bool $incrementSkippedOnError = false,
+    ): void {
         try {
             $operation();
             $this->importedCount++;
