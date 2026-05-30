@@ -17,9 +17,9 @@ export const ExpenseBreakdown = memo<ExpenseBreakdownProps>(
                 <Card className="flex h-[300px] w-full items-center justify-center">
                     <div className="flex flex-col items-center space-y-4">
                         <div className="flex h-24 w-full flex-col space-y-3 px-8 opacity-20">
-                            {EXPENSE_PLACEHOLDER_HEIGHTS.map((width, idx) => (
+                            {EXPENSE_PLACEHOLDER_HEIGHTS.map((width) => (
                                 <div
-                                    key={`expense-placeholder-${idx}`}
+                                    key={`expense-placeholder-${width}`}
                                     className="h-4 animate-pulse rounded bg-muted-foreground"
                                     style={{ width: `${width}%` }}
                                 ></div>

@@ -85,8 +85,16 @@ class FinancialReportService
             ->where('accounts.coa_version_id', $coaVersion->id)
             ->whereIn('accounts.type', ['revenue', 'expense'])
             ->selectRaw('MONTH(journal_entries.entry_date) as month')
-            ->selectRaw("SUM(CASE WHEN accounts.type = 'revenue' THEN journal_entry_lines.credit - journal_entry_lines.debit ELSE 0 END) as revenue")
-            ->selectRaw("SUM(CASE WHEN accounts.type = 'expense' THEN journal_entry_lines.debit - journal_entry_lines.credit ELSE 0 END) as expenses")
+            ->selectRaw(
+                "SUM(CASE WHEN accounts.type = 'revenue' "
+                . 'THEN journal_entry_lines.credit - journal_entry_lines.debit '
+                . 'ELSE 0 END) as revenue'
+            )
+            ->selectRaw(
+                "SUM(CASE WHEN accounts.type = 'expense' "
+                . 'THEN journal_entry_lines.debit - journal_entry_lines.credit '
+                . 'ELSE 0 END) as expenses'
+            )
             ->groupByRaw('MONTH(journal_entries.entry_date)')
             ->orderByRaw('MONTH(journal_entries.entry_date)')
             ->get();

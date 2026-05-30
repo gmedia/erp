@@ -15,9 +15,9 @@ export const CashFlowSummary = memo<CashFlowSummaryProps>(
                 <Card className="flex h-[300px] w-full items-center justify-center">
                     <div className="flex flex-col items-center space-y-4">
                         <div className="flex h-24 w-full flex-col space-y-3 px-8 opacity-20">
-                            {[60, 80, 40].map((width, idx) => (
+                            {[60, 80, 40].map((width) => (
                                 <div
-                                    key={`cash-flow-placeholder-${idx}`}
+                                    key={`cash-flow-placeholder-${width}`}
                                     className="h-6 animate-pulse rounded bg-muted-foreground"
                                     style={{ width: `${width}%` }}
                                 ></div>

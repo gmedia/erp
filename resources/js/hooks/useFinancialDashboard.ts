@@ -73,7 +73,10 @@ export function useFinancialDashboard(params?: UseFinancialDashboardParams) {
             );
         }
 
-        const url = `/api/financial-dashboard${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+        const queryString = queryParams.toString();
+        const url = queryString
+            ? `/api/financial-dashboard?${queryString}`
+            : '/api/financial-dashboard';
         const response = await axios.get(url);
         return response.data;
     };

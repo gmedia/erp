@@ -15,8 +15,19 @@ interface MonthlyTrendChartProps {
     readonly isLoading: boolean;
 }
 
-const PLACEHOLDER_HEIGHTS = [
-    40, 70, 55, 85, 60, 75, 50, 90, 65, 80, 45, 70,
+const PLACEHOLDER_BARS = [
+    { month: 1, height: 40 },
+    { month: 2, height: 70 },
+    { month: 3, height: 55 },
+    { month: 4, height: 85 },
+    { month: 5, height: 60 },
+    { month: 6, height: 75 },
+    { month: 7, height: 50 },
+    { month: 8, height: 90 },
+    { month: 9, height: 65 },
+    { month: 10, height: 80 },
+    { month: 11, height: 45 },
+    { month: 12, height: 70 },
 ] as const;
 
 function formatCompact(value: number): string {
@@ -27,6 +38,12 @@ function formatCompact(value: number): string {
     return `${(absValue / 1000000).toFixed(1)}M`;
 }
 
+function netIncomeColorClass(value: number): string {
+    if (value > 0) return 'text-emerald-600';
+    if (value < 0) return 'text-rose-600';
+    return 'text-muted-foreground';
+}
+
 export const MonthlyTrendChart = memo<MonthlyTrendChartProps>(
     function MonthlyTrendChart({ data, isLoading }) {
         if (isLoading) {
@@ -34,9 +51,9 @@ export const MonthlyTrendChart = memo<MonthlyTrendChartProps>(
                 <Card className="flex h-[400px] w-full items-center justify-center">
                     <div className="flex flex-col items-center space-y-4">
                         <div className="flex h-40 items-end space-x-2 opacity-20">
-                            {PLACEHOLDER_HEIGHTS.map((height, idx) => (
+                            {PLACEHOLDER_BARS.map(({ month, height }) => (
                                 <div
-                                    key={`trend-placeholder-${idx}`}
+                                    key={`trend-placeholder-${month}`}
                                     className="flex w-8 items-end space-x-0.5"
                                 >
                                     <div
@@ -120,12 +137,9 @@ export const MonthlyTrendChart = memo<MonthlyTrendChartProps>(
                                     2,
                                 );
 
-                                const netIncomeColor =
-                                    item.net_income > 0
-                                        ? 'text-emerald-600'
-                                        : item.net_income < 0
-                                          ? 'text-rose-600'
-                                          : 'text-muted-foreground';
+                                const netIncomeColor = netIncomeColorClass(
+                                    item.net_income,
+                                );
 
                                 return (
                                     <div
