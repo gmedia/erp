@@ -188,3 +188,127 @@ test('destroy removes credit note', function () {
 
     assertDatabaseMissing('credit_notes', ['id' => $creditNote->id]);
 });
+
+test('apply transitions confirmed credit note to applied and reduces invoice amount_due', function () {
+    [$customer, $fiscalYear] = createCreditNoteWithItem();
+
+    $invoice = CustomerInvoice::factory()->create([
+        'customer_id' => $customer->id,
+        'fiscal_year_id' => $fiscalYear->id,
+        'status' => 'sent',
+        'grand_total' => 1000000,
+        'amount_received' => 0,
+        'credit_note_amount' => 0,
+        'amount_due' => 1000000,
+    ]);
+
+    $creditNote = CreditNote::factory()->confirmed()->create([
+        'customer_id' => $customer->id,
+        'fiscal_year_id' => $fiscalYear->id,
+        'customer_invoice_id' => $invoice->id,
+        'grand_total' => 250000,
+    ]);
+
+    postJson('/api/credit-notes/' . $creditNote->id . '/apply')
+        ->assertOk()
+        ->assertJsonPath('data.status', 'applied');
+
+    assertDatabaseHas('credit_notes', [
+        'id' => $creditNote->id,
+        'status' => 'applied',
+    ]);
+
+    $invoice->refresh();
+    expect((float) $invoice->credit_note_amount)->toBe(250000.0);
+    expect((float) $invoice->amount_due)->toBe(750000.0);
+    expect($invoice->status)->toBe('partially_paid');
+});
+
+test('apply settles invoice to paid when credit note covers full outstanding', function () {
+    [$customer, $fiscalYear] = createCreditNoteWithItem();
+
+    $invoice = CustomerInvoice::factory()->create([
+        'customer_id' => $customer->id,
+        'fiscal_year_id' => $fiscalYear->id,
+        'status' => 'sent',
+        'grand_total' => 500000,
+        'amount_received' => 0,
+        'credit_note_amount' => 0,
+        'amount_due' => 500000,
+    ]);
+
+    $creditNote = CreditNote::factory()->confirmed()->create([
+        'customer_id' => $customer->id,
+        'fiscal_year_id' => $fiscalYear->id,
+        'customer_invoice_id' => $invoice->id,
+        'grand_total' => 500000,
+    ]);
+
+    postJson('/api/credit-notes/' . $creditNote->id . '/apply')
+        ->assertOk()
+        ->assertJsonPath('data.status', 'applied');
+
+    $invoice->refresh();
+    expect((float) $invoice->amount_due)->toBe(0.0);
+    expect($invoice->status)->toBe('paid');
+});
+
+test('apply rejects credit note that is not confirmed', function () {
+    [$customer, $fiscalYear, $invoice] = createCreditNoteWithItem();
+
+    $creditNote = CreditNote::factory()->create([
+        'customer_id' => $customer->id,
+        'fiscal_year_id' => $fiscalYear->id,
+        'customer_invoice_id' => $invoice->id,
+        'status' => 'draft',
+    ]);
+
+    postJson('/api/credit-notes/' . $creditNote->id . '/apply')
+        ->assertStatus(422)
+        ->assertJsonPath('message', 'Only confirmed credit notes can be applied.');
+
+    assertDatabaseHas('credit_notes', [
+        'id' => $creditNote->id,
+        'status' => 'draft',
+    ]);
+});
+
+test('apply rejects credit note without linked invoice', function () {
+    $creditNote = CreditNote::factory()->confirmed()->create([
+        'customer_invoice_id' => null,
+    ]);
+
+    postJson('/api/credit-notes/' . $creditNote->id . '/apply')
+        ->assertStatus(422)
+        ->assertJsonPath('message', 'Credit note must be linked to an invoice.');
+});
+
+test('apply rejects credit note that exceeds invoice outstanding amount', function () {
+    [$customer, $fiscalYear] = createCreditNoteWithItem();
+
+    $invoice = CustomerInvoice::factory()->create([
+        'customer_id' => $customer->id,
+        'fiscal_year_id' => $fiscalYear->id,
+        'status' => 'sent',
+        'grand_total' => 100000,
+        'amount_received' => 0,
+        'credit_note_amount' => 0,
+        'amount_due' => 100000,
+    ]);
+
+    $creditNote = CreditNote::factory()->confirmed()->create([
+        'customer_id' => $customer->id,
+        'fiscal_year_id' => $fiscalYear->id,
+        'customer_invoice_id' => $invoice->id,
+        'grand_total' => 250000,
+    ]);
+
+    postJson('/api/credit-notes/' . $creditNote->id . '/apply')
+        ->assertStatus(422)
+        ->assertJsonPath('message', 'Credit note amount exceeds invoice outstanding.');
+
+    assertDatabaseHas('credit_notes', [
+        'id' => $creditNote->id,
+        'status' => 'confirmed',
+    ]);
+});

@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\InventoryStocktake;
+use App\Models\InventoryStocktakeItem;
 use App\Models\Product;
 use App\Models\Unit;
 use App\Models\Warehouse;
@@ -8,6 +9,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\deleteJson;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
@@ -160,5 +162,107 @@ describe('Inventory Stocktake API Endpoints', function () {
             'id' => $stocktake->id,
             'status' => 'cancelled',
         ]);
+    });
+
+    test('getItems returns nested items with product and unit relations', function () {
+        $stocktake = InventoryStocktake::factory()->create(['status' => 'draft']);
+        $product = Product::factory()->create(['name' => 'Widget A']);
+        $unit = Unit::factory()->create(['name' => 'pcs']);
+
+        InventoryStocktakeItem::factory()->create([
+            'inventory_stocktake_id' => $stocktake->id,
+            'product_id' => $product->id,
+            'unit_id' => $unit->id,
+            'system_quantity' => 12,
+            'counted_quantity' => 10,
+            'variance' => -2,
+            'result' => 'deficit',
+        ]);
+
+        $response = getJson('/api/inventory-stocktakes/' . $stocktake->id . '/items');
+
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'id',
+                        'product' => ['id', 'name'],
+                        'unit' => ['id', 'name'],
+                        'system_quantity',
+                        'counted_quantity',
+                        'variance',
+                        'result',
+                        'notes',
+                        'counted_by',
+                        'counted_at',
+                    ],
+                ],
+            ])
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.product.name', 'Widget A')
+            ->assertJsonPath('data.0.unit.name', 'pcs')
+            ->assertJsonPath('data.0.result', 'deficit');
+    });
+
+    test('getItems returns empty data array when stocktake has no items', function () {
+        $stocktake = InventoryStocktake::factory()->create(['status' => 'draft']);
+
+        getJson('/api/inventory-stocktakes/' . $stocktake->id . '/items')
+            ->assertOk()
+            ->assertJsonPath('data', []);
+    });
+
+    test('syncItems upserts items, computes variance, and removes missing ones', function () {
+        $stocktake = InventoryStocktake::factory()->create(['status' => 'draft']);
+        $unit = Unit::factory()->create();
+        $existingProduct = Product::factory()->create();
+        $newProduct = Product::factory()->create();
+
+        InventoryStocktakeItem::factory()->create([
+            'inventory_stocktake_id' => $stocktake->id,
+            'product_id' => $existingProduct->id,
+            'unit_id' => $unit->id,
+            'system_quantity' => 10,
+            'counted_quantity' => 10,
+            'result' => 'match',
+        ]);
+
+        $payload = [
+            'items' => [
+                [
+                    'product_id' => $newProduct->id,
+                    'unit_id' => $unit->id,
+                    'system_quantity' => 5,
+                    'counted_quantity' => 8,
+                    'notes' => 'Found extras',
+                ],
+            ],
+        ];
+
+        $response = postJson('/api/inventory-stocktakes/' . $stocktake->id . '/items', $payload);
+
+        $response->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.product.id', $newProduct->id)
+            ->assertJsonPath('data.0.result', 'surplus');
+
+        assertDatabaseHas('inventory_stocktake_items', [
+            'inventory_stocktake_id' => $stocktake->id,
+            'product_id' => $newProduct->id,
+            'result' => 'surplus',
+        ]);
+
+        assertDatabaseMissing('inventory_stocktake_items', [
+            'inventory_stocktake_id' => $stocktake->id,
+            'product_id' => $existingProduct->id,
+        ]);
+    });
+
+    test('syncItems validates payload', function () {
+        $stocktake = InventoryStocktake::factory()->create(['status' => 'draft']);
+
+        postJson('/api/inventory-stocktakes/' . $stocktake->id . '/items', ['items' => []])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['items']);
     });
 });
