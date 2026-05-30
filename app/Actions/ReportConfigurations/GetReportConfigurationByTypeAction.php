@@ -7,7 +7,14 @@ use App\Models\ReportConfiguration;
 class GetReportConfigurationByTypeAction
 {
     /**
-     * @return array{id: int, code: string, name: string, description: ?string, report_type: string, sections: array<int, array<string, mixed>>}|null
+     * @return array{
+     *     id: int,
+     *     code: string,
+     *     name: string,
+     *     description: ?string,
+     *     report_type: string,
+     *     sections: array<int, array<string, mixed>>,
+     * }|null
      */
     public function execute(string $reportType): ?array
     {

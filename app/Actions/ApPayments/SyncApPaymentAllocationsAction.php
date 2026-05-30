@@ -15,14 +15,18 @@ class SyncApPaymentAllocationsAction
     public function execute(ApPayment $apPayment, array $allocations): void
     {
         DB::transaction(function () use ($apPayment, $allocations): void {
-            $normalized = $this->recreateItems($apPayment->allocations(), $allocations, static function (array $allocation): array {
-                return [
-                    'supplier_bill_id' => (int) $allocation['supplier_bill_id'],
-                    'allocated_amount' => (float) $allocation['allocated_amount'],
-                    'discount_taken' => (float) ($allocation['discount_taken'] ?? 0),
-                    'notes' => $allocation['notes'] ?? null,
-                ];
-            });
+            $normalized = $this->recreateItems(
+                $apPayment->allocations(),
+                $allocations,
+                static function (array $allocation): array {
+                    return [
+                        'supplier_bill_id' => (int) $allocation['supplier_bill_id'],
+                        'allocated_amount' => (float) $allocation['allocated_amount'],
+                        'discount_taken' => (float) ($allocation['discount_taken'] ?? 0),
+                        'notes' => $allocation['notes'] ?? null,
+                    ];
+                },
+            );
 
             $totalAllocated = collect($normalized)->sum(static fn (array $row) => (float) $row['allocated_amount']);
             $totalAmount = (float) $apPayment->total_amount;

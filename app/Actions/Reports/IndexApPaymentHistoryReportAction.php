@@ -50,7 +50,13 @@ class IndexApPaymentHistoryReportAction
         $this->applyStringFilter($request, $query, 'payment_method', 'ap.payment_method');
         $this->applyStringFilter($request, $query, 'status', 'ap.status');
         $this->applyDateRangeFilter($request, $query, 'ap.payment_date', 'start_date', 'end_date');
-        $this->applySearchFilter($request, $query, ['ap.payment_number', 's.name', 'b.name', 'ba.name', 'ap.reference']);
+        $this->applySearchFilter($request, $query, [
+            'ap.payment_number',
+            's.name',
+            'b.name',
+            'ba.name',
+            'ap.reference',
+        ]);
 
         $sortBy = $request->string('sort_by', 'payment_date')->toString();
         $sortDirection = $request->string('sort_direction', 'desc')->toString();

@@ -10,13 +10,19 @@ class RecalculateAccountBalancesAction
 {
     public function execute(int $fiscalYearId, int $periodMonth, int $periodYear): void
     {
-        Account::query()->each(function (Account $account) use ($fiscalYearId, $periodMonth, $periodYear): void {
+        Account::query()->each(function (Account $account) use (
+            $fiscalYearId,
+            $periodMonth,
+            $periodYear,
+        ): void {
             $opening = AccountBalance::query()
                 ->where('account_id', $account->id)
                 ->where('fiscal_year_id', $fiscalYearId)
                 ->where(function ($query) use ($periodMonth, $periodYear): void {
                     $query->where('period_year', '<', $periodYear)
-                        ->orWhere(fn ($q) => $q->where('period_year', $periodYear)->where('period_month', '<', $periodMonth));
+                        ->orWhere(fn ($q) => $q
+                            ->where('period_year', $periodYear)
+                            ->where('period_month', '<', $periodMonth));
                 })
                 ->orderByDesc('period_year')
                 ->orderByDesc('period_month')
@@ -37,8 +43,20 @@ class RecalculateAccountBalancesAction
             $movement = $account->normal_balance === 'credit' ? $credit - $debit : $debit - $credit;
 
             AccountBalance::updateOrCreate(
-                ['account_id' => $account->id, 'fiscal_year_id' => $fiscalYearId, 'period_month' => $periodMonth, 'period_year' => $periodYear],
-                ['opening_balance' => $opening, 'debit_total' => $debit, 'credit_total' => $credit, 'movement' => $movement, 'closing_balance' => (float) $opening + $movement, 'last_recalculated_at' => now()],
+                [
+                    'account_id' => $account->id,
+                    'fiscal_year_id' => $fiscalYearId,
+                    'period_month' => $periodMonth,
+                    'period_year' => $periodYear,
+                ],
+                [
+                    'opening_balance' => $opening,
+                    'debit_total' => $debit,
+                    'credit_total' => $credit,
+                    'movement' => $movement,
+                    'closing_balance' => (float) $opening + $movement,
+                    'last_recalculated_at' => now(),
+                ],
             );
         });
     }

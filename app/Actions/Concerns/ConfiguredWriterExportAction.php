@@ -53,7 +53,10 @@ abstract class ConfiguredWriterExportAction
 
     protected function buildFilename(string $extension): string
     {
-        return $this->filenamePrefix() . '_' . now()->format($this->timestampFormat()) . '_' . Str::ulid() . '.' . $extension;
+        return $this->filenamePrefix()
+            . '_' . now()->format($this->timestampFormat())
+            . '_' . Str::ulid()
+            . '.' . $extension;
     }
 
     protected function supportsCsvExport(): bool

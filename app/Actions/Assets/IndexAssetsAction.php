@@ -33,7 +33,17 @@ class IndexAssetsAction
             $query,
             $this->filterService,
             ['name', 'asset_code', 'serial_number', 'barcode'],
-            ['asset_category_id', 'asset_model_id', 'branch_id', 'asset_location_id', 'department_id', 'employee_id', 'supplier_id', 'status', 'condition'],
+            [
+                'asset_category_id',
+                'asset_model_id',
+                'branch_id',
+                'asset_location_id',
+                'department_id',
+                'employee_id',
+                'supplier_id',
+                'status',
+                'condition',
+            ],
             [],
             'created_at',
             [

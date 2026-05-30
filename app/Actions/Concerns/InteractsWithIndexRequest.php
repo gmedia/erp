@@ -41,13 +41,21 @@ trait InteractsWithIndexRequest
      * @param  object{applySearch: callable}  $filterService
      * @param  array<int, string>  $searchFields
      */
-    private function applyRequestSearch(Request $request, Builder $query, object $filterService, array $searchFields): void
-    {
+    private function applyRequestSearch(
+        Request $request,
+        Builder $query,
+        object $filterService,
+        array $searchFields,
+    ): void {
         if (! $request->filled('search')) {
             return;
         }
 
-        $filterService->applySearch($query, $request->string('search')->toString(), $searchFields);
+        $filterService->applySearch(
+            $query,
+            $request->string('search')->toString(),
+            $searchFields,
+        );
     }
 
     /**
@@ -68,16 +76,26 @@ trait InteractsWithIndexRequest
             return;
         }
 
-        $filterService->applyAdvancedFilters($query, $this->extractRequestFilters($request, $primaryFilterKeys));
+        $filterService->applyAdvancedFilters(
+            $query,
+            $this->extractRequestFilters($request, $primaryFilterKeys),
+        );
     }
 
     /**
      * @param  object{applyAdvancedFilters: callable}  $filterService
      * @param  array<int, string>  $filterKeys
      */
-    private function applyRequestFilters(Request $request, Builder $query, object $filterService, array $filterKeys): void
-    {
-        $filterService->applyAdvancedFilters($query, $this->extractRequestFilters($request, $filterKeys));
+    private function applyRequestFilters(
+        Request $request,
+        Builder $query,
+        object $filterService,
+        array $filterKeys,
+    ): void {
+        $filterService->applyAdvancedFilters(
+            $query,
+            $this->extractRequestFilters($request, $filterKeys),
+        );
     }
 
     private function excludeStatusWhenFilterMissing(

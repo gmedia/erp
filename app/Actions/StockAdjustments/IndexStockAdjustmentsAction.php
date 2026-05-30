@@ -20,26 +20,35 @@ class IndexStockAdjustmentsAction
     {
         $query = StockAdjustment::query()->with(['warehouse', 'inventoryStocktake']);
 
-        return $this->handleIndexRequestWithStatusExclusion($request, $query, $this->filterService, ['adjustment_number', 'notes'], [
-            'warehouse_id',
-            'status',
-            'adjustment_type',
-            'inventory_stocktake_id',
-            'adjustment_date_from',
-            'adjustment_date_to',
-        ], 'created_at', [
-            'id',
-            'adjustment_number',
-            'warehouse_id',
-            'adjustment_date',
-            'adjustment_type',
-            'status',
-            'inventory_stocktake_id',
-            'journal_entry_id',
-            'approved_by',
-            'approved_at',
+        return $this->handleIndexRequestWithStatusExclusion(
+            $request,
+            $query,
+            $this->filterService,
+            ['adjustment_number', 'notes'],
+            [
+                'warehouse_id',
+                'status',
+                'adjustment_type',
+                'inventory_stocktake_id',
+                'adjustment_date_from',
+                'adjustment_date_to',
+            ],
             'created_at',
-            'updated_at',
-        ], 'cancelled');
+            [
+                'id',
+                'adjustment_number',
+                'warehouse_id',
+                'adjustment_date',
+                'adjustment_type',
+                'status',
+                'inventory_stocktake_id',
+                'journal_entry_id',
+                'approved_by',
+                'approved_at',
+                'created_at',
+                'updated_at',
+            ],
+            'cancelled',
+        );
     }
 }

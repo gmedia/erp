@@ -120,8 +120,12 @@ abstract class SimpleCrudExportAction
      * @param  array<string, mixed>  $validated
      * @param  array<int|string, string>  $filters
      */
-    protected function applyFilledEqualsFilters(Builder $query, array $validated, FormRequest $request, array $filters): void
-    {
+    protected function applyFilledEqualsFilters(
+        Builder $query,
+        array $validated,
+        FormRequest $request,
+        array $filters,
+    ): void {
         foreach ($filters as $field => $column) {
             $requestField = is_int($field) ? $column : $field;
 

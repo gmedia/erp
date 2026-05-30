@@ -11,7 +11,14 @@ class EvaluateReportSectionsAction
     /**
      * @param  array<int, array<string, mixed>>  $sections
      * @param  array<string, float|int>  $reportTotals
-     * @return array<int, array{code: string, name: string, section_type: string, value: float, formula: string|null, sort_order: int}>
+     * @return array<int, array{
+     *     code: string,
+     *     name: string,
+     *     section_type: string,
+     *     value: float,
+     *     formula: string|null,
+     *     sort_order: int,
+     * }>
      */
     public function execute(array $sections, array $reportTotals): array
     {

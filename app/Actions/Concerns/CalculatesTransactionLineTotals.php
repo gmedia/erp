@@ -4,8 +4,12 @@ namespace App\Actions\Concerns;
 
 trait CalculatesTransactionLineTotals
 {
-    protected function calculateLineTotal(float $quantity, float $unitPrice, float $discountPercent, float $taxPercent): float
-    {
+    protected function calculateLineTotal(
+        float $quantity,
+        float $unitPrice,
+        float $discountPercent,
+        float $taxPercent,
+    ): float {
         $lineBeforeTax = $quantity * $unitPrice * (1 - ($discountPercent / 100));
 
         return $lineBeforeTax * (1 + ($taxPercent / 100));

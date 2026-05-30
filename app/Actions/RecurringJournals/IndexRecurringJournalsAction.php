@@ -25,7 +25,16 @@ class IndexRecurringJournalsAction
             ['name', 'description'],
             ['frequency', 'is_active', 'fiscal_year_id', 'next_run_from', 'next_run_to'],
             'next_run_date',
-            ['name', 'frequency', 'next_run_date', 'last_run_date', 'total_amount', 'is_active', 'auto_post', 'created_at'],
+            [
+                'name',
+                'frequency',
+                'next_run_date',
+                'last_run_date',
+                'total_amount',
+                'is_active',
+                'auto_post',
+                'created_at',
+            ],
         );
     }
 }

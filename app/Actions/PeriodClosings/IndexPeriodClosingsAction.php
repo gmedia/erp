@@ -16,8 +16,32 @@ class IndexPeriodClosingsAction
 
     public function execute(IndexPeriodClosingRequest $request): LengthAwarePaginator
     {
-        $query = PeriodClosing::query()->with(['fiscalYear', 'closingJournalEntry', 'retainedEarningsAccount', 'closedBy', 'reopenedBy', 'creator']);
+        $query = PeriodClosing::query()->with([
+            'fiscalYear',
+            'closingJournalEntry',
+            'retainedEarningsAccount',
+            'closedBy',
+            'reopenedBy',
+            'creator',
+        ]);
 
-        return $this->handleIndexRequest($request, $query, $this->filterService, ['notes'], ['status', 'closing_type', 'fiscal_year_id', 'period_year', 'period_month'], 'period_year', ['period_year', 'period_month', 'closing_type', 'status', 'net_income', 'fiscal_year_id', 'closed_at', 'created_at']);
+        return $this->handleIndexRequest(
+            $request,
+            $query,
+            $this->filterService,
+            ['notes'],
+            ['status', 'closing_type', 'fiscal_year_id', 'period_year', 'period_month'],
+            'period_year',
+            [
+                'period_year',
+                'period_month',
+                'closing_type',
+                'status',
+                'net_income',
+                'fiscal_year_id',
+                'closed_at',
+                'created_at',
+            ],
+        );
     }
 }

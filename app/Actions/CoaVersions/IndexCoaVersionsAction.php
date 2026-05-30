@@ -46,6 +46,15 @@ class IndexCoaVersionsAction extends SimpleCrudIndexAction
 
     protected function getSortableFields(): array
     {
-        return ['id', 'name', 'fiscal_year_id', 'fiscal_year.name', 'fiscal_year_name', 'status', 'created_at', 'updated_at'];
+        return [
+            'id',
+            'name',
+            'fiscal_year_id',
+            'fiscal_year.name',
+            'fiscal_year_name',
+            'status',
+            'created_at',
+            'updated_at',
+        ];
     }
 }

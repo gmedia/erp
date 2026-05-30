@@ -16,8 +16,31 @@ class IndexBankReconciliationsAction
 
     public function execute(IndexBankReconciliationRequest $request): LengthAwarePaginator
     {
-        $query = BankReconciliation::query()->with(['account', 'fiscalYear', 'completedBy', 'creator']);
+        $query = BankReconciliation::query()->with([
+            'account',
+            'fiscalYear',
+            'completedBy',
+            'creator',
+        ]);
 
-        return $this->handleIndexRequest($request, $query, $this->filterService, ['notes'], ['status', 'account_id', 'fiscal_year_id', 'date_from', 'date_to'], 'reconciliation_date', ['account_id', 'reconciliation_date', 'period_start', 'period_end', 'statement_balance', 'book_balance', 'difference', 'status', 'created_at']);
+        return $this->handleIndexRequest(
+            $request,
+            $query,
+            $this->filterService,
+            ['notes'],
+            ['status', 'account_id', 'fiscal_year_id', 'date_from', 'date_to'],
+            'reconciliation_date',
+            [
+                'account_id',
+                'reconciliation_date',
+                'period_start',
+                'period_end',
+                'statement_balance',
+                'book_balance',
+                'difference',
+                'status',
+                'created_at',
+            ],
+        );
     }
 }
