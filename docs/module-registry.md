@@ -769,6 +769,14 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   tests:
     - tests/e2e/general-ledger-report/general-ledger-report.spec.ts
 
+- slug: financial-dashboard
+  route: /financial-dashboard
+  api: /api/financial-dashboard
+  view_type: page
+  note: "Non-CRUD financial dashboard. 7 KPI cards with YoY badges (revenue, expenses, net income, assets, liabilities, equity, cash balance), monthly revenue vs expenses bar chart (12 months), cash flow summary, top expense breakdown, fiscal year selector with auto-comparison. Backed by GetFinancialDashboardDataAction + FinancialReportService::getMonthlyTrends. Requires `financial_dashboard` permission."
+  tests:
+    - tests/e2e/financial-dashboard/financial-dashboard.spec.ts
+
 ## Testing
 
 E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
