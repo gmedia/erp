@@ -177,6 +177,91 @@ export default function XxxReportPage() {
 
 ---
 
+## Default Fiscal Year Auto-Select Pattern
+
+> Setiap form atau report yang punya `fiscal_year_id` field harus auto-select FY paling relevan saat user buka form. Pola ini sudah landed di 7 financial report pages + 8 transaction forms.
+
+Pola ini terdiri dari 3 lapisan terkoordinasi:
+
+### 1. Backend Action (Source of Truth)
+
+`app/Actions/FiscalYears/GetPreferredFiscalYearAction` punya satu method `execute(Collection $fiscalYears): ?FiscalYear` yang pure:
+
+1. Pilih FY paling baru yang punya posted journal entry.
+2. Fallback ke FY pertama dengan status `open`.
+3. Fallback ke FY pertama di koleksi.
+
+Jangan modifikasi action — pattern stabil. Cukup pass collection FY yang sudah difilter sesuai kebutuhan.
+
+### 2. Backend Wiring (pilih satu)
+
+**Untuk financial report pages**: pakai `App\Http\Controllers\Concerns\InteractsWithFinancialReportRequest` trait.
+
+```php
+use InteractsWithFinancialReportRequest;
+
+public function index(Request $request): JsonResponse
+{
+    [
+        'fiscalYears' => $fiscalYears,
+        'selectedYearId' => $selectedYearId,
+        'comparisonYearId' => $comparisonYearId,
+    ] = $this->resolveFiscalYearContext($request, withComparison: true);
+
+    // Build report from $selectedYearId / $comparisonYearId
+}
+```
+
+Trait otomatis: kalau request tidak kirim `fiscal_year_id`, fallback ke preferred FY. Aman untuk single-year (`withComparison: false`) maupun comparison (`withComparison: true`).
+
+**Untuk form yang fetch FY via `/api/fiscal-years`**: backend tidak perlu ada perubahan. `FiscalYearCollection` otomatis attach `meta.preferred_fiscal_year_id` di response. Mendukung filter `?status=open` agar preferred ID match dengan list yang difilter.
+
+### 3. Frontend Wiring (Async Select dengan `preferredMetaKey`)
+
+```tsx
+// Standard pattern di transaction form
+<AsyncSelectField
+    name="fiscal_year_id"
+    label="Fiscal Year"
+    url="/api/fiscal-years"
+    placeholder="Select fiscal year"
+    preferredMetaKey="preferred_fiscal_year_id"
+/>
+
+// Atau dengan filter status (mis. period closing & bank reconciliation)
+<AsyncSelectField
+    name="fiscal_year_id"
+    label="Fiscal Year"
+    url="/api/fiscal-years?status=open"
+    preferredMetaKey="preferred_fiscal_year_id"
+/>
+
+// Filter descriptor untuk report page (general-ledger / trial-balance-detailed)
+{
+    name: 'fiscal_year_id',
+    label: 'Fiscal Year',
+    component: (
+        <AsyncSelect
+            url="/api/fiscal-years"
+            placeholder="Select fiscal year"
+            preferredMetaKey="preferred_fiscal_year_id"
+        />
+    ),
+}
+```
+
+`preferredMetaKey` membaca `response.data.meta[key]` lalu auto-emit `onValueChange` saat value masih kosong. Aman dipanggil ulang — flag `preferredResolved` mencegah override pilihan user.
+
+### Checklist saat menambah FY field baru
+
+- [ ] Form pakai `AsyncSelectField` (atau `AsyncSelect` di filter descriptor) dengan `url="/api/fiscal-years"`.
+- [ ] Tambah `preferredMetaKey="preferred_fiscal_year_id"`.
+- [ ] Jika butuh filter (`?status=open`), pakai filter — `FiscalYearCollection` otomatis hormati saat compute meta.
+- [ ] Untuk report page baru di `Reports` controller, pakai trait `InteractsWithFinancialReportRequest`.
+- [ ] Jangan duplikasi default-resolution logic di tempat lain.
+
+---
+
 ## Backend: Model
 
 ```php
