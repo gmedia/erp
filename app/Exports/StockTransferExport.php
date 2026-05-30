@@ -50,9 +50,9 @@ class StockTransferExport implements FromQuery, ShouldAutoSize, WithHeadings, Wi
         return $this->exportHeadings($this->columns());
     }
 
-    public function map($stockTransfer): array
+    public function map($item): array
     {
-        return $this->mapExportRow($stockTransfer, $this->columns());
+        return $this->mapExportRow($item, $this->columns());
     }
 
     /**
@@ -61,14 +61,21 @@ class StockTransferExport implements FromQuery, ShouldAutoSize, WithHeadings, Wi
     protected function columns(): array
     {
         return [
-            'ID' => fn (StockTransfer $stockTransfer): mixed => $stockTransfer->id,
-            'Transfer Number' => fn (StockTransfer $stockTransfer): mixed => $stockTransfer->transfer_number,
-            'From Warehouse' => fn (StockTransfer $stockTransfer): mixed => $this->relatedAttribute($stockTransfer, 'fromWarehouse', 'name'),
-            'To Warehouse' => fn (StockTransfer $stockTransfer): mixed => $this->relatedAttribute($stockTransfer, 'toWarehouse', 'name'),
-            'Transfer Date' => fn (StockTransfer $stockTransfer): mixed => $this->formatDateValue($stockTransfer->transfer_date, 'Y-m-d'),
-            'Expected Arrival Date' => fn (StockTransfer $stockTransfer): mixed => $this->formatDateValue($stockTransfer->expected_arrival_date, 'Y-m-d'),
-            'Status' => fn (StockTransfer $stockTransfer): mixed => $stockTransfer->status,
-            'Created At' => fn (StockTransfer $stockTransfer): mixed => $this->formatIso8601($stockTransfer->created_at),
+            'ID' => fn (StockTransfer $item): mixed => $item->id,
+            'Transfer Number' => fn (StockTransfer $item): mixed => $item->transfer_number,
+            'From Warehouse' => fn (StockTransfer $item): mixed => $this->relatedAttribute(
+                $item,
+                'fromWarehouse',
+                'name',
+            ),
+            'To Warehouse' => fn (StockTransfer $item): mixed => $this->relatedAttribute($item, 'toWarehouse', 'name'),
+            'Transfer Date' => fn (StockTransfer $item): mixed => $this->formatDateValue($item->transfer_date, 'Y-m-d'),
+            'Expected Arrival Date' => fn (StockTransfer $item): mixed => $this->formatDateValue(
+                $item->expected_arrival_date,
+                'Y-m-d',
+            ),
+            'Status' => fn (StockTransfer $item): mixed => $item->status,
+            'Created At' => fn (StockTransfer $item): mixed => $this->formatIso8601($item->created_at),
         ];
     }
 }

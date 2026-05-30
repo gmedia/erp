@@ -25,7 +25,13 @@ class PeriodClosingExport implements FromQuery, ShouldAutoSize, WithHeadings, Wi
             $query,
             $this->filters,
             [],
-            ['status' => 'status', 'closing_type' => 'closing_type', 'fiscal_year_id' => 'fiscal_year_id', 'period_year' => 'period_year', 'period_month' => 'period_month'],
+            [
+                'status' => 'status',
+                'closing_type' => 'closing_type',
+                'fiscal_year_id' => 'fiscal_year_id',
+                'period_year' => 'period_year',
+                'period_month' => 'period_month',
+            ],
         );
 
         return $query->orderByDesc('period_year')->orderByDesc('period_month');

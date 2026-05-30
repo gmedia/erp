@@ -47,8 +47,15 @@ class BankReconciliationExport implements FromQuery, ShouldAutoSize, WithHeading
         return [
             'ID' => fn (BankReconciliation $item): mixed => $item->id,
             'Account' => fn (BankReconciliation $item): mixed => $this->relatedAttribute($item, 'account', 'name'),
-            'Fiscal Year' => fn (BankReconciliation $item): mixed => $this->relatedAttribute($item, 'fiscalYear', 'name'),
-            'Date' => fn (BankReconciliation $item): mixed => $this->formatDateValue($item->reconciliation_date, 'Y-m-d'),
+            'Fiscal Year' => fn (BankReconciliation $item): mixed => $this->relatedAttribute(
+                $item,
+                'fiscalYear',
+                'name',
+            ),
+            'Date' => fn (BankReconciliation $item): mixed => $this->formatDateValue(
+                $item->reconciliation_date,
+                'Y-m-d',
+            ),
             'Statement Balance' => fn (BankReconciliation $item): mixed => (float) $item->statement_balance,
             'Book Balance' => fn (BankReconciliation $item): mixed => (float) $item->book_balance,
             'Reconciled Balance' => fn (BankReconciliation $item): mixed => (float) $item->reconciled_balance,

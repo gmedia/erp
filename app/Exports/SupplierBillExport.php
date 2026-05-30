@@ -23,25 +23,32 @@ class SupplierBillExport implements FromQuery, ShouldAutoSize, WithHeadings, Wit
     {
         $query = SupplierBill::query()->with(['supplier', 'branch']);
 
-        $this->applyConfiguredFilters($query, $this->filters, ['bill_number', 'supplier_invoice_number', 'payment_terms', 'notes'], [
-            'supplier' => 'supplier_id',
-            'branch' => 'branch_id',
-            'status' => 'status',
-            'currency' => 'currency',
-        ], [
-            'bill_date' => ['from' => 'bill_date_from', 'to' => 'bill_date_to'],
-            'due_date' => ['from' => 'due_date_from', 'to' => 'due_date_to'],
-        ], [
-            'bill_number',
-            'bill_date',
-            'due_date',
-            'currency',
-            'status',
-            'grand_total',
-            'amount_paid',
-            'amount_due',
-            'created_at',
-        ]);
+        $this->applyConfiguredFilters(
+            $query,
+            $this->filters,
+            ['bill_number', 'supplier_invoice_number', 'payment_terms', 'notes'],
+            [
+                'supplier' => 'supplier_id',
+                'branch' => 'branch_id',
+                'status' => 'status',
+                'currency' => 'currency',
+            ],
+            [
+                'bill_date' => ['from' => 'bill_date_from', 'to' => 'bill_date_to'],
+                'due_date' => ['from' => 'due_date_from', 'to' => 'due_date_to'],
+            ],
+            [
+                'bill_number',
+                'bill_date',
+                'due_date',
+                'currency',
+                'status',
+                'grand_total',
+                'amount_paid',
+                'amount_due',
+                'created_at',
+            ]
+        );
 
         return $query;
     }

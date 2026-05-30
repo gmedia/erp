@@ -74,8 +74,16 @@ class AssetMovementExport implements FromQuery, ShouldAutoSize, WithHeadings, Wi
             'Destination Branch' => fn (AssetMovement $m): mixed => $this->relatedAttribute($m, 'toBranch', 'name'),
             'Origin Location' => fn (AssetMovement $m): mixed => $this->relatedAttribute($m, 'fromLocation', 'name'),
             'Destination Location' => fn (AssetMovement $m): mixed => $this->relatedAttribute($m, 'toLocation', 'name'),
-            'Origin Department' => fn (AssetMovement $m): mixed => $this->relatedAttribute($m, 'fromDepartment', 'name'),
-            'Destination Department' => fn (AssetMovement $m): mixed => $this->relatedAttribute($m, 'toDepartment', 'name'),
+            'Origin Department' => fn (AssetMovement $m): mixed => $this->relatedAttribute(
+                $m,
+                'fromDepartment',
+                'name',
+            ),
+            'Destination Department' => fn (AssetMovement $m): mixed => $this->relatedAttribute(
+                $m,
+                'toDepartment',
+                'name',
+            ),
             'Origin Employee' => fn (AssetMovement $m): mixed => $this->relatedAttribute($m, 'fromEmployee', 'name'),
             'Destination Employee' => fn (AssetMovement $m): mixed => $this->relatedAttribute($m, 'toEmployee', 'name'),
             'Reference' => fn (AssetMovement $m): mixed => $m->reference,

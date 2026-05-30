@@ -50,9 +50,9 @@ class StockAdjustmentExport implements FromQuery, ShouldAutoSize, WithHeadings, 
         return $this->exportHeadings($this->columns());
     }
 
-    public function map($stockAdjustment): array
+    public function map($item): array
     {
-        return $this->mapExportRow($stockAdjustment, $this->columns());
+        return $this->mapExportRow($item, $this->columns());
     }
 
     /**
@@ -61,14 +61,21 @@ class StockAdjustmentExport implements FromQuery, ShouldAutoSize, WithHeadings, 
     protected function columns(): array
     {
         return [
-            'ID' => fn (StockAdjustment $stockAdjustment): mixed => $stockAdjustment->id,
-            'Adjustment Number' => fn (StockAdjustment $stockAdjustment): mixed => $stockAdjustment->adjustment_number,
-            'Warehouse' => fn (StockAdjustment $stockAdjustment): mixed => $this->relatedAttribute($stockAdjustment, 'warehouse', 'name'),
-            'Adjustment Date' => fn (StockAdjustment $stockAdjustment): mixed => $this->formatDateValue($stockAdjustment->adjustment_date, 'Y-m-d'),
-            'Adjustment Type' => fn (StockAdjustment $stockAdjustment): mixed => $stockAdjustment->adjustment_type,
-            'Status' => fn (StockAdjustment $stockAdjustment): mixed => $stockAdjustment->status,
-            'Stocktake Number' => fn (StockAdjustment $stockAdjustment): mixed => $this->relatedAttribute($stockAdjustment, 'inventoryStocktake', 'stocktake_number'),
-            'Created At' => fn (StockAdjustment $stockAdjustment): mixed => $this->formatIso8601($stockAdjustment->created_at),
+            'ID' => fn (StockAdjustment $item): mixed => $item->id,
+            'Adjustment Number' => fn (StockAdjustment $item): mixed => $item->adjustment_number,
+            'Warehouse' => fn (StockAdjustment $item): mixed => $this->relatedAttribute($item, 'warehouse', 'name'),
+            'Adjustment Date' => fn (StockAdjustment $item): mixed => $this->formatDateValue(
+                $item->adjustment_date,
+                'Y-m-d',
+            ),
+            'Adjustment Type' => fn (StockAdjustment $item): mixed => $item->adjustment_type,
+            'Status' => fn (StockAdjustment $item): mixed => $item->status,
+            'Stocktake Number' => fn (StockAdjustment $item): mixed => $this->relatedAttribute(
+                $item,
+                'inventoryStocktake',
+                'stocktake_number',
+            ),
+            'Created At' => fn (StockAdjustment $item): mixed => $this->formatIso8601($item->created_at),
         ];
     }
 }

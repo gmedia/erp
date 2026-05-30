@@ -31,7 +31,14 @@ class AssetStocktakeExport implements FromQuery, ShouldAutoSize, WithHeadings, W
             'branch' => 'branch_id',
             'status' => 'status',
         ]);
-        $this->applySorting($query, $this->filters, ['reference', 'branch_id', 'planned_at', 'performed_at', 'status', 'created_at']);
+        $this->applySorting($query, $this->filters, [
+            'reference',
+            'branch_id',
+            'planned_at',
+            'performed_at',
+            'status',
+            'created_at',
+        ]);
 
         return $query;
     }

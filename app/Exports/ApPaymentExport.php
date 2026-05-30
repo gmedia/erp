@@ -65,7 +65,11 @@ class ApPaymentExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMa
             'Payment Number' => fn (ApPayment $payment): mixed => $payment->payment_number,
             'Supplier' => fn (ApPayment $payment): mixed => $this->relatedAttribute($payment, 'supplier', 'name'),
             'Branch' => fn (ApPayment $payment): mixed => $this->relatedAttribute($payment, 'branch', 'name'),
-            'Bank Account' => fn (ApPayment $payment): mixed => $this->relatedAttribute($payment, 'bankAccount', 'name'),
+            'Bank Account' => fn (ApPayment $payment): mixed => $this->relatedAttribute(
+                $payment,
+                'bankAccount',
+                'name',
+            ),
             'Payment Date' => fn (ApPayment $payment): mixed => $this->formatDateValue($payment->payment_date, 'Y-m-d'),
             'Payment Method' => fn (ApPayment $payment): mixed => $payment->payment_method,
             'Currency' => fn (ApPayment $payment): mixed => $payment->currency,

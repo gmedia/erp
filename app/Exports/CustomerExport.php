@@ -60,7 +60,10 @@ class CustomerExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
             'Category' => fn (Customer $customer): mixed => $this->relatedAttribute($customer, 'category', 'name'),
             'Status' => fn (Customer $customer): mixed => ucfirst($customer->status),
             'Notes' => fn (Customer $customer): mixed => $customer->notes,
-            'Created At' => fn (Customer $customer): mixed => $this->formatDateValue($customer->created_at, 'Y-m-d H:i:s'),
+            'Created At' => fn (Customer $customer): mixed => $this->formatDateValue(
+                $customer->created_at,
+                'Y-m-d H:i:s',
+            ),
         ];
     }
 }
