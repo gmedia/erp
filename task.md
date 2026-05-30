@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-05-30 23:19 UTC
+Last updated: 2026-05-30 23:30 UTC
 
 ## Document Roles
 
@@ -11,8 +11,8 @@ Last updated: 2026-05-30 23:19 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `2e9d9c24 docs(task): cross-session handoff for fresh OpenCode session takeover` (pre-wave 13)
-- Working tree: 11 modified files staged for wave 13 commit (1 backend resource, 1 backend test, 1 frontend wrapper, 8 transaction forms).
+- HEAD: `a53ca8a3 feat(fiscal-years): propagate preferred FY default to 8 transaction forms`
+- Working tree: clean.
 - Remote: pushed (up to date — `git rev-list --count origin/main..HEAD` returns 0).
 - CI E2E is **required gate** (no `continue-on-error`).
 - Sonar: Quality Gate **OK** at last scan; rescan pending for waves 6-13.
@@ -75,7 +75,7 @@ The codebase had several files at 0% or mid coverage despite endpoints being liv
 | 10 | `1b3c62be` | Long-line refactor: 3 financial report exports (BalanceSheet, IncomeStatement, TrialBalance) |
 | 11 | `bcb52563` | Long-line sweep: remaining 14 Export files (~36 lines) |
 | 12 | `6a079f9d` | Long-line sweep: 5 Import files (17 lines) |
-| 13 | (pending commit) | Preferred fiscal year propagation: `FiscalYearCollection` becomes status-filter-aware, `AsyncSelectField` exposes `preferredMetaKey`, 8 transaction forms (`ApPayment`, `ArReceipt`, `CustomerInvoice`, `SupplierBill`, `CreditNote`, `PeriodClosing`, `BankReconciliation`, `AssetDepreciationRun`) auto-default fiscal year |
+| 13 | `a53ca8a3` | Preferred fiscal year propagation: `FiscalYearCollection` becomes status-filter-aware, `AsyncSelectField` exposes `preferredMetaKey`, 8 transaction forms (`ApPayment`, `ArReceipt`, `CustomerInvoice`, `SupplierBill`, `CreditNote`, `PeriodClosing`, `BankReconciliation`, `AssetDepreciationRun`) auto-default fiscal year |
 
 **Cumulative: 60 new Pest test cases (+2 in wave 13), 12 PHP files moved from 0%/mid to ~100% coverage, 4 small test fixture classes, 17 dead files removed (-519 lines), ~57 `php:S103` long-line violations fixed across `app/Exports/` and `app/Imports/`, 0 regressions.**
 
@@ -169,7 +169,8 @@ gh run list --branch main --limit 5
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo on `main` at HEAD `2e9d9c24` or later (wave 13 commit pending).
+Read task.md first. Repo on `main` at HEAD `a53ca8a3` or later (wave 13
+committed and pushed).
 
 Wave 13 just landed: Preferred fiscal year propagation across all financial
 transaction forms. Backend FiscalYearCollection now respects ?status= filter
