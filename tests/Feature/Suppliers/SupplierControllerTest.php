@@ -154,6 +154,37 @@ describe('Supplier API Endpoints', function () {
             ->and($supplier->status)->toBe('inactive');
     });
 
+    test('show returns supplier detail with branch and category loaded', function () {
+        $branch = Branch::factory()->create();
+        $category = SupplierCategory::factory()->create();
+        $supplier = Supplier::factory()->create([
+            'branch_id' => $branch->id,
+            'category_id' => $category->id,
+            'name' => 'Detailed Supplier',
+        ]);
+
+        $response = getJson("/api/suppliers/{$supplier->id}");
+
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'name',
+                    'branch' => ['id', 'name'],
+                    'category' => ['id', 'name'],
+                ],
+            ])
+            ->assertJsonPath('data.id', $supplier->id)
+            ->assertJsonPath('data.name', 'Detailed Supplier')
+            ->assertJsonPath('data.branch.id', $branch->id)
+            ->assertJsonPath('data.category.id', $category->id);
+    });
+
+    test('show returns 404 for non-existent supplier', function () {
+        getJson('/api/suppliers/999999')
+            ->assertStatus(404);
+    });
+
     test('destroy removes supplier', function () {
         $supplier = Supplier::factory()->create();
 

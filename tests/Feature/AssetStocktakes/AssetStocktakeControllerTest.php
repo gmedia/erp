@@ -75,3 +75,24 @@ test('it can delete asset stocktake', function () {
     $response->assertNoContent();
     assertDatabaseMissing('asset_stocktakes', ['id' => $stocktake->id]);
 });
+
+test('it can show a single asset stocktake with branch and creator loaded', function () {
+    $stocktake = AssetStocktake::factory()->create([
+        'branch_id' => $this->branch->id,
+        'reference' => 'ST-SHOW-0001',
+    ]);
+
+    $response = getJson("/api/asset-stocktakes/{$stocktake->ulid}");
+
+    $response->assertOk()
+        ->assertJsonStructure([
+            'data' => [
+                'id',
+                'reference',
+                'branch' => ['id', 'name'],
+                'created_by',
+            ],
+        ])
+        ->assertJsonPath('data.reference', 'ST-SHOW-0001')
+        ->assertJsonPath('data.branch.id', $this->branch->id);
+});
