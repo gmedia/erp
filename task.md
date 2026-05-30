@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-05-30 09:33 UTC
+Last updated: 2026-05-30 10:26 UTC
 
 ## Document Roles
 
@@ -11,11 +11,11 @@ Last updated: 2026-05-30 09:33 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `52ade106 test: cover TriggerApprovalAction (resolveFlow paths and full create flow)`
+- HEAD: `512f3c93 chore: remove dead Inertia/Fortify scaffold left over from API migration`
 - Working tree: clean.
 - Remote: pushed (up to date).
 - CI E2E is **required gate** (no `continue-on-error`).
-- Sonar: Quality Gate **OK** (overall coverage ~91.9%, 0 HIGH/BLOCKER issues at last scan; rescan pending for waves 6-8).
+- Sonar: Quality Gate **OK** at last scan; rescan pending for waves 6-9. The 12+ files Sonar reported at 0% (auth/settings scaffold) no longer exist on disk after wave 9, so the coverage gauge should jump.
 - Module registry: 76 entries + financial-dashboard.
 
 ### CI Note — Autofix Supersede Pattern (read this before reacting to red runs)
@@ -58,8 +58,9 @@ The codebase had several files at 0% or mid coverage despite endpoints being liv
 | 6 | `1e3be7f2` | `EvaluateGuardAction` 40% → ~100% (+ 3 fixture rule classes) |
 | 7 | `d0ecde17` | `ExecuteTransitionActionsAction` 32% → ~100% (+ 1 fixture custom action) |
 | 8 | `52ade106` | `TriggerApprovalAction` (full path coverage: resolveFlow + create transaction) |
+| 9 | `512f3c93` | Dead-code cleanup: removed 17 Inertia/Fortify scaffold files (-519 lines) |
 
-**Cumulative: 45+ new Pest test cases, 12+ PHP files moved from 0%/mid to ~100% coverage, 4 small test fixture classes, 0 regressions.**
+**Cumulative: 58 new Pest test cases, 12 PHP files moved from 0%/mid to ~100% coverage, 4 small test fixture classes, 17 dead files removed (-519 lines), 0 regressions.**
 
 ## What changed this session
 
@@ -69,22 +70,17 @@ The codebase had several files at 0% or mid coverage despite endpoints being liv
 4. Backfilled coverage for 5 controllers, 3 actions, and 1 trait helper across waves 1, 2, 4, 5, 6, 7, 8.
 5. Resolved 7 SonarCloud MAJOR issues in financial-dashboard files (wave 3).
 6. Added `tests/Unit/Actions/EntityStates/` and `tests/Unit/Actions/Approvals/` directories with reusable fixture rule/action classes.
+7. Wave 9: deleted 17 Inertia/Fortify scaffold files that were unreachable since the API migration. Verification protocol used: depwire impact analysis (zero direct + transitive dependents per file) + cross-codebase grep + PHPStan + full Pest suite (1778 pass, 8040 assertions).
 
 ## Important: Files NOT to write tests for
 
-After investigation, the following files are **dead code from the Inertia → API-only migration**. Do NOT write tests for them:
+The Inertia/Fortify scaffold left over from the API migration was **deleted in wave 9** (commit `512f3c93`). The directories `app/Http/Controllers/Auth/`, `app/Http/Controllers/Settings/`, `app/Http/Requests/Auth/`, and `app/Http/Requests/Settings/` no longer exist. If a future framework upgrade re-creates any of these stub files, do NOT add tests for them — verify they have at least one live route first.
 
-- `app/Http/Controllers/Auth/AuthenticatedSessionController.php`
-- `app/Http/Controllers/Auth/EmailVerificationNotificationController.php`
-- `app/Http/Controllers/Auth/NewPasswordController.php`
-- `app/Http/Controllers/LocaleController.php`
-- `app/Http/Controllers/Settings/PasswordController.php`
-- `app/Providers/FortifyServiceProvider.php` (only 2 lines anyway)
-- `app/Http/Requests/Auth/LoginRequest.php`
+Files kept (intentionally, because they are live):
 
-Evidence: no route in `routes/api/*.php` or `routes/api.php` references these classes. Project uses `App\Http\Controllers\Api\AuthController` instead. `tests/Feature/Settings/PasswordUpdateTest.php` is a 1-line stub: *"Web test removed since it is obsolete in the SPA architecture"*.
-
-These files appear in Sonar's 0%-coverage list because they exist on disk, but writing tests for them = pretend coverage. The right action is **delete**, but that requires user approval since it could affect anyone still using Fortify scaffolding accidentally.
+- `app/Providers/FortifyServiceProvider.php` — boots a live `RateLimiter::for('two-factor')` rule used by Fortify package internals.
+- `composer.json` Fortify dep — kept; the package is still active for rate-limit primitives even though the SPA uses `App\Http\Controllers\Api\AuthController` for the actual auth endpoints.
+- Live API auth tests: `tests/Feature/Auth/AuthMeTest.php`, `tests/Feature/Auth/AuthenticationTest.php`, `tests/Feature/Auth/PasswordResetTest.php` — these hit `/api/login`, `/api/logout`, etc. and remain green after wave 9.
 
 ## Recommended Next Steps
 
@@ -105,8 +101,7 @@ These files appear in Sonar's 0%-coverage list because they exist on disk, but w
 
 | # | Task | Notes |
 |---|------|-------|
-| 6 | Delete dead Fortify scaffold | Touches 6 files. Verify nothing in `bootstrap/app.php` or middleware aliases references them first. |
-| 7 | Product features (P&L by Department, Aging Dashboard, Budget, Sales/Invoicing) | All new domains. |
+| 4 | Product features (P&L by Department, Aging Dashboard, Budget, Sales/Invoicing) | All new domains. |
 
 ## Useful Commands
 
@@ -141,32 +136,34 @@ gh run list --branch main --limit 5
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo on `main` at HEAD `52ade106` or later.
+Read task.md first. Repo on `main` at HEAD `512f3c93` or later.
 
-Status: Financial Dashboard fully shipped + Sonar-clean. 8 waves of
-coverage backfill landed (45+ new Pest cases, 12+ files at 0%/mid → ~100%,
-including all three pipeline/approval action engines: EvaluateGuardAction,
-ExecuteTransitionActionsAction, and TriggerApprovalAction). PHPStan / Pest /
-Duster all clean locally before each push.
+Status: Financial Dashboard fully shipped + Sonar-clean. 9 waves landed:
+8 coverage backfill waves (58 new Pest cases, 12 files at 0%/mid -> ~100%
+including all three flagship pipeline/approval engines), plus 1 dead-code
+cleanup wave that removed 17 Inertia/Fortify scaffold files (-519 lines)
+after defense-in-depth verification (depwire + grep + PHPStan + full
+1778-test Pest suite). PHPStan / Pest / Duster all clean.
 
 Before reacting to red CI runs: read the "CI Autofix Supersede Pattern"
 section. Most reds and cancels in `gh run list` are concurrency-cancels
 or autofix-supersedes, NOT failures. Verify via the latest run on HEAD.
 
-Do NOT write tests for the Auth/Fortify scaffold files listed in the
-"Files NOT to write tests for" section — they are dead code from the
-Inertia → API migration with no live routes.
+The auth/settings scaffold directories (Controllers/Auth, Controllers/Settings,
+Requests/Auth, Requests/Settings) NO LONGER EXIST. Auth flow is handled by
+App\Http\Controllers\Api\AuthController. Live tests:
+tests/Feature/Auth/AuthMeTest.php, AuthenticationTest.php, PasswordResetTest.php.
+
+If a future framework upgrade re-creates any scaffold stub, do NOT add tests
+to it — first verify it has at least one live route in routes/api/*.php.
 
 Easy autonomous task remaining: seed dev DB to activate financial-dashboard
 nav (requires explicit go-ahead since DB state changes).
 
-Coverage backfill is now in diminishing-returns territory. The remaining
-Sonar low-coverage files either need user product decisions, or are dead
-code to be deleted (Fortify scaffold), or will auto-resolve once the next
-Sonar scan picks up the indirect coverage from waves 6-8 (e.g.
-HandlesConditions trait at 15% — now exercised indirectly by both
-EvaluateGuardActionTest and TriggerApprovalActionTest conditional-flow
-tests).
+Coverage backfill is now in diminishing-returns territory. Sonar rescan may
+auto-improve overall coverage gauge significantly because:
+- 13 0%-coverage files no longer exist (deleted in wave 9)
+- HandlesConditions trait is now indirectly exercised
 
 Product feature options if user wants to expand domain: Profit & Loss
 by Department, Aging Dashboard, Budget Management, Sales/Invoicing.
