@@ -22,10 +22,28 @@ class IncomeStatementReportExport extends AbstractFinancialReportExport
 
         $totals = $report['totals'];
 
-        $rows[] = ['Revenues', '', 'Total Revenues', 0, $totals['revenue'], $totals['comparison_revenue'], $totals['change_revenue'], $totals['change_percentage_revenue']];
-        $rows[] = ['Expenses', '', 'Total Expenses', 0, $totals['expense'], $totals['comparison_expense'], $totals['change_expense'], $totals['change_percentage_expense']];
-        $rows[] = ['Net Income', '', 'Net Income', 0, $totals['net_income'], $totals['comparison_net_income'], $totals['change_net_income'], $totals['change_percentage_net_income']];
+        $rows[] = $this->summaryRow('Revenues', 'Total Revenues', $totals, 'revenue');
+        $rows[] = $this->summaryRow('Expenses', 'Total Expenses', $totals, 'expense');
+        $rows[] = $this->summaryRow('Net Income', 'Net Income', $totals, 'net_income');
 
         return collect($rows);
+    }
+
+    /**
+     * @param  array<string, mixed>  $totals
+     * @return array<int, mixed>
+     */
+    private function summaryRow(string $section, string $label, array $totals, string $key): array
+    {
+        return [
+            $section,
+            '',
+            $label,
+            0,
+            $totals[$key],
+            $totals['comparison_' . $key],
+            $totals['change_' . $key],
+            $totals['change_percentage_' . $key],
+        ];
     }
 }

@@ -31,11 +31,43 @@ class BalanceSheetReportExport extends AbstractFinancialReportExport
 
         $totals = $report['totals'];
 
-        $rows[] = ['Assets', '', 'Total Assets', 0, $totals['assets'], $totals['comparison_assets'], $totals['change_assets'], $totals['change_percentage_assets']];
-        $rows[] = ['Liabilities', '', 'Total Liabilities', 0, $totals['liabilities'], $totals['comparison_liabilities'], $totals['change_liabilities'], $totals['change_percentage_liabilities']];
-        $rows[] = ['Equity', '', 'Total Equity', 0, $totals['equity'], $totals['comparison_equity'], $totals['change_equity'], $totals['change_percentage_equity']];
-        $rows[] = ['Total', '', 'Grand Total (Assets = Liabilities + Equity)', 0, $totals['liabilities'] + $totals['equity'], $totals['comparison_liabilities'] + $totals['comparison_equity'], ($totals['change_liabilities'] ?? 0) + ($totals['change_equity'] ?? 0), 0];
+        $rows[] = $this->summaryRow('Assets', 'Total Assets', $totals, 'assets');
+        $rows[] = $this->summaryRow('Liabilities', 'Total Liabilities', $totals, 'liabilities');
+        $rows[] = $this->summaryRow('Equity', 'Total Equity', $totals, 'equity');
+
+        $liabilitiesPlusEquity = $totals['liabilities'] + $totals['equity'];
+        $comparisonLiabilitiesPlusEquity = $totals['comparison_liabilities'] + $totals['comparison_equity'];
+        $changeLiabilitiesPlusEquity = ($totals['change_liabilities'] ?? 0) + ($totals['change_equity'] ?? 0);
+
+        $rows[] = [
+            'Total',
+            '',
+            'Grand Total (Assets = Liabilities + Equity)',
+            0,
+            $liabilitiesPlusEquity,
+            $comparisonLiabilitiesPlusEquity,
+            $changeLiabilitiesPlusEquity,
+            0,
+        ];
 
         return collect($rows);
+    }
+
+    /**
+     * @param  array<string, mixed>  $totals
+     * @return array<int, mixed>
+     */
+    private function summaryRow(string $section, string $label, array $totals, string $key): array
+    {
+        return [
+            $section,
+            '',
+            $label,
+            0,
+            $totals[$key],
+            $totals['comparison_' . $key],
+            $totals['change_' . $key],
+            $totals['change_percentage_' . $key],
+        ];
     }
 }
