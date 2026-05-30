@@ -215,10 +215,8 @@ class FinancialReportService
             ->orderBy('code')
             ->get();
 
-        ['comparisonBalanceByCurrentAccountId' => $comparisonBalanceByCurrentAccountId] = $this->prepareComparisonContext(
-            $accounts,
-            $comparisonFiscalYearId,
-        );
+        ['comparisonBalanceByCurrentAccountId' => $comparisonBalanceByCurrentAccountId]
+            = $this->prepareComparisonContext($accounts, $comparisonFiscalYearId);
 
         ['buckets' => $buckets, 'totals' => $totals] = $this->collectAccountBuckets(
             $accounts,
@@ -262,10 +260,8 @@ class FinancialReportService
             ->orderBy('code')
             ->get();
 
-        ['comparisonBalanceByCurrentAccountId' => $comparisonBalanceByCurrentAccountId] = $this->prepareComparisonContext(
-            $accounts,
-            $comparisonFiscalYearId,
-        );
+        ['comparisonBalanceByCurrentAccountId' => $comparisonBalanceByCurrentAccountId]
+            = $this->prepareComparisonContext($accounts, $comparisonFiscalYearId);
 
         ['buckets' => $buckets, 'totals' => $totals] = $this->collectAccountBuckets(
             $accounts,
