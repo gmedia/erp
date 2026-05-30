@@ -2,12 +2,14 @@
 
 use App\Models\Product;
 use App\Models\StockAdjustment;
+use App\Models\StockAdjustmentItem;
 use App\Models\Unit;
 use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\deleteJson;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
@@ -183,5 +185,109 @@ describe('Stock Adjustment API Endpoints', function () {
 
         $response->assertNoContent();
         assertDatabaseHas('stock_adjustments', ['id' => $adjustment->id, 'status' => 'cancelled']);
+    });
+
+    test('getItems returns nested items with product and unit relations', function () {
+        $adjustment = StockAdjustment::factory()->create(['status' => 'draft']);
+        $product = Product::factory()->create(['name' => 'Widget A']);
+        $unit = Unit::factory()->create(['name' => 'pcs']);
+
+        StockAdjustmentItem::factory()->create([
+            'stock_adjustment_id' => $adjustment->id,
+            'product_id' => $product->id,
+            'unit_id' => $unit->id,
+            'quantity_before' => 10,
+            'quantity_adjusted' => -2,
+            'quantity_after' => 8,
+            'unit_cost' => 100,
+            'total_cost' => 200,
+            'reason' => 'damaged',
+        ]);
+
+        $response = getJson("/api/stock-adjustments/{$adjustment->id}/items");
+
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'id',
+                        'product' => ['id', 'name'],
+                        'unit' => ['id', 'name'],
+                        'quantity_before',
+                        'quantity_adjusted',
+                        'quantity_after',
+                        'unit_cost',
+                        'total_cost',
+                        'reason',
+                    ],
+                ],
+            ])
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.product.name', 'Widget A')
+            ->assertJsonPath('data.0.unit.name', 'pcs')
+            ->assertJsonPath('data.0.reason', 'damaged');
+    });
+
+    test('getItems returns empty data array when adjustment has no items', function () {
+        $adjustment = StockAdjustment::factory()->create(['status' => 'draft']);
+
+        getJson("/api/stock-adjustments/{$adjustment->id}/items")
+            ->assertOk()
+            ->assertJsonPath('data', []);
+    });
+
+    test('syncItems upserts items and removes missing ones', function () {
+        $adjustment = StockAdjustment::factory()->create(['status' => 'draft']);
+        $unit = Unit::factory()->create();
+        $existingProduct = Product::factory()->create();
+        $newProduct = Product::factory()->create();
+
+        StockAdjustmentItem::factory()->create([
+            'stock_adjustment_id' => $adjustment->id,
+            'product_id' => $existingProduct->id,
+            'unit_id' => $unit->id,
+            'quantity_before' => 10,
+            'quantity_adjusted' => -2,
+            'quantity_after' => 8,
+        ]);
+
+        $payload = [
+            'items' => [
+                [
+                    'product_id' => $newProduct->id,
+                    'unit_id' => $unit->id,
+                    'quantity_before' => 5,
+                    'quantity_adjusted' => 3,
+                    'unit_cost' => 100,
+                    'reason' => 'recount',
+                ],
+            ],
+        ];
+
+        $response = postJson("/api/stock-adjustments/{$adjustment->id}/items", $payload);
+
+        $response->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.product.id', $newProduct->id)
+            ->assertJsonPath('data.0.reason', 'recount');
+
+        assertDatabaseHas('stock_adjustment_items', [
+            'stock_adjustment_id' => $adjustment->id,
+            'product_id' => $newProduct->id,
+            'reason' => 'recount',
+        ]);
+
+        assertDatabaseMissing('stock_adjustment_items', [
+            'stock_adjustment_id' => $adjustment->id,
+            'product_id' => $existingProduct->id,
+        ]);
+    });
+
+    test('syncItems validates payload', function () {
+        $adjustment = StockAdjustment::factory()->create(['status' => 'draft']);
+
+        postJson("/api/stock-adjustments/{$adjustment->id}/items", ['items' => []])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['items']);
     });
 });

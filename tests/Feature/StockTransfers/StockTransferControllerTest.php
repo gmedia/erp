@@ -2,12 +2,14 @@
 
 use App\Models\Product;
 use App\Models\StockTransfer;
+use App\Models\StockTransferItem;
 use App\Models\Unit;
 use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\deleteJson;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
@@ -190,5 +192,103 @@ describe('Stock Transfer API Endpoints', function () {
 
         $response->assertNoContent();
         assertDatabaseHas('stock_transfers', ['id' => $transfer->id, 'status' => 'cancelled']);
+    });
+
+    test('getItems returns nested items with product and unit relations', function () {
+        $transfer = StockTransfer::factory()->create(['status' => 'draft']);
+        $product = Product::factory()->create(['name' => 'Widget A']);
+        $unit = Unit::factory()->create(['name' => 'pcs']);
+
+        StockTransferItem::factory()->create([
+            'stock_transfer_id' => $transfer->id,
+            'product_id' => $product->id,
+            'unit_id' => $unit->id,
+            'quantity' => 5,
+            'quantity_received' => 0,
+            'unit_cost' => 100,
+            'notes' => 'Initial transfer',
+        ]);
+
+        $response = getJson("/api/stock-transfers/{$transfer->id}/items");
+
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'id',
+                        'product' => ['id', 'name'],
+                        'unit' => ['id', 'name'],
+                        'quantity',
+                        'quantity_received',
+                        'unit_cost',
+                        'notes',
+                    ],
+                ],
+            ])
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.product.name', 'Widget A')
+            ->assertJsonPath('data.0.unit.name', 'pcs')
+            ->assertJsonPath('data.0.notes', 'Initial transfer');
+    });
+
+    test('getItems returns empty data array when transfer has no items', function () {
+        $transfer = StockTransfer::factory()->create(['status' => 'draft']);
+
+        getJson("/api/stock-transfers/{$transfer->id}/items")
+            ->assertOk()
+            ->assertJsonPath('data', []);
+    });
+
+    test('syncItems upserts items and removes missing ones', function () {
+        $transfer = StockTransfer::factory()->create(['status' => 'draft']);
+        $unit = Unit::factory()->create();
+        $existingProduct = Product::factory()->create();
+        $newProduct = Product::factory()->create();
+
+        StockTransferItem::factory()->create([
+            'stock_transfer_id' => $transfer->id,
+            'product_id' => $existingProduct->id,
+            'unit_id' => $unit->id,
+            'quantity' => 5,
+        ]);
+
+        $payload = [
+            'items' => [
+                [
+                    'product_id' => $newProduct->id,
+                    'unit_id' => $unit->id,
+                    'quantity' => 7,
+                    'quantity_received' => 0,
+                    'unit_cost' => 150,
+                    'notes' => 'Replacement transfer',
+                ],
+            ],
+        ];
+
+        $response = postJson("/api/stock-transfers/{$transfer->id}/items", $payload);
+
+        $response->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.product.id', $newProduct->id)
+            ->assertJsonPath('data.0.notes', 'Replacement transfer');
+
+        assertDatabaseHas('stock_transfer_items', [
+            'stock_transfer_id' => $transfer->id,
+            'product_id' => $newProduct->id,
+            'notes' => 'Replacement transfer',
+        ]);
+
+        assertDatabaseMissing('stock_transfer_items', [
+            'stock_transfer_id' => $transfer->id,
+            'product_id' => $existingProduct->id,
+        ]);
+    });
+
+    test('syncItems validates payload', function () {
+        $transfer = StockTransfer::factory()->create(['status' => 'draft']);
+
+        postJson("/api/stock-transfers/{$transfer->id}/items", ['items' => []])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['items']);
     });
 });
