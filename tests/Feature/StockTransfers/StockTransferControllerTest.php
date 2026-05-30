@@ -185,6 +185,52 @@ describe('Stock Transfer API Endpoints', function () {
         ]);
     });
 
+    test('show returns transfer with all relations and items loaded', function () {
+        $fromWarehouse = Warehouse::factory()->create();
+        $toWarehouse = Warehouse::factory()->create();
+        $product = Product::factory()->create();
+        $unit = Unit::factory()->create();
+
+        $transfer = StockTransfer::factory()->create([
+            'from_warehouse_id' => $fromWarehouse->id,
+            'to_warehouse_id' => $toWarehouse->id,
+            'status' => 'draft',
+        ]);
+
+        StockTransferItem::factory()->create([
+            'stock_transfer_id' => $transfer->id,
+            'product_id' => $product->id,
+            'unit_id' => $unit->id,
+            'quantity' => 4,
+            'unit_cost' => 100,
+        ]);
+
+        $response = getJson("/api/stock-transfers/{$transfer->id}");
+
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'transfer_number',
+                    'from_warehouse' => ['id', 'name'],
+                    'to_warehouse' => ['id', 'name'],
+                    'created_by',
+                    'items' => [
+                        '*' => [
+                            'id',
+                            'product' => ['id', 'name'],
+                            'unit' => ['id', 'name'],
+                            'quantity',
+                        ],
+                    ],
+                ],
+            ])
+            ->assertJsonPath('data.id', $transfer->id)
+            ->assertJsonPath('data.from_warehouse.id', $fromWarehouse->id)
+            ->assertJsonPath('data.to_warehouse.id', $toWarehouse->id)
+            ->assertJsonCount(1, 'data.items');
+    });
+
     test('destroy cancels transfer', function () {
         $transfer = StockTransfer::factory()->create(['status' => 'draft']);
 

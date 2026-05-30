@@ -178,6 +178,51 @@ describe('Stock Adjustment API Endpoints', function () {
         ]);
     });
 
+    test('show returns adjustment with all relations loaded', function () {
+        $warehouse = Warehouse::factory()->create();
+        $product = Product::factory()->create();
+        $unit = Unit::factory()->create();
+
+        $adjustment = StockAdjustment::factory()->create([
+            'warehouse_id' => $warehouse->id,
+            'status' => 'draft',
+        ]);
+
+        StockAdjustmentItem::factory()->create([
+            'stock_adjustment_id' => $adjustment->id,
+            'product_id' => $product->id,
+            'unit_id' => $unit->id,
+            'quantity_before' => 5,
+            'quantity_adjusted' => -1,
+            'quantity_after' => 4,
+        ]);
+
+        $response = getJson("/api/stock-adjustments/{$adjustment->id}");
+
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'adjustment_number',
+                    'warehouse' => ['id', 'name'],
+                    'created_by',
+                    'items' => [
+                        '*' => [
+                            'id',
+                            'product' => ['id', 'name'],
+                            'unit' => ['id', 'name'],
+                            'quantity_before',
+                            'quantity_adjusted',
+                            'quantity_after',
+                        ],
+                    ],
+                ],
+            ])
+            ->assertJsonPath('data.id', $adjustment->id)
+            ->assertJsonPath('data.warehouse.id', $warehouse->id)
+            ->assertJsonCount(1, 'data.items');
+    });
+
     test('destroy cancels adjustment', function () {
         $adjustment = StockAdjustment::factory()->create(['status' => 'draft']);
 
