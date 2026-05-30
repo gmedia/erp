@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-05-30 00:20 UTC
+Last updated: 2026-05-30 00:55 UTC
 
 ## Document Roles
 
@@ -11,88 +11,83 @@ Last updated: 2026-05-30 00:20 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `3da3d824 docs(task): update handoff with uuid fix + parallel CI results`
+- HEAD: `5e12051e feat(financial-dashboard): add sidebar nav link and permission`
 - Working tree: clean.
-- Remote: pushed (up to date).
+- Remote: 2 commits ahead (not pushed yet).
 - CI E2E is **required gate** (no `continue-on-error`).
 - Latest verified-green CI run: `26616510440` (HEAD `876a6276`).
-  - `Quality checks via Sail`: `success`
-  - `Playwright E2E via Sail`: `success`
-  - `Test suite via Sail`: `success`
-- Current CI E2E subset: **78 modules** (redundant `tests/e2e/reports/` removed).
 - Sonar: Quality Gate OK. 93.3% new coverage, 1.9% new duplication, A ratings all dimensions.
-- Module registry: fully synced — 76 entries covering all E2E modules.
+- Module registry: 76 entries + 1 new (financial-dashboard).
 
-### New reports (fully implemented + tested)
+### New feature: Financial Dashboard (this session)
 
-6 new financial reports — all complete: backend + frontend + Pest (5 each) + E2E (4 each).
-
-| Report | Pest | E2E |
-|--------|------|-----|
-| AP Aging (`ap-aging-report`) | 5 ✅ | 4 ✅ |
-| AP Outstanding (`ap-outstanding-report`) | 5 ✅ | 4 ✅ |
-| AP Payment History (`ap-payment-history-report`) | 5 ✅ | 4 ✅ |
-| AR Aging (`ar-aging-report`) | 5 ✅ | 4 ✅ |
-| AR Outstanding (`ar-outstanding-report`) | 5 ✅ | 4 ✅ |
-| Customer Statement (`customer-statement-report`) | 5 ✅ | 4 ✅ |
+| Component | Status |
+|-----------|--------|
+| Backend Action (`GetFinancialDashboardDataAction`) | ✅ |
+| Controller (`FinancialDashboardController`) | ✅ |
+| Route (`GET /api/financial-dashboard`) | ✅ |
+| Frontend hook (`useFinancialDashboard`) | ✅ |
+| 5 components (SummaryCards, CashFlowSummary, ExpenseBreakdown, FiscalYearSelector, page) | ✅ |
+| Route in `app-routes.tsx` | ✅ |
+| Sidebar nav link (Accounting → Financial Dashboard) | ✅ |
+| Permission (`financial_dashboard`) | ✅ |
+| Pest tests (6 pass, 49 assertions) | ✅ |
+| E2E tests (4 cases) | ✅ |
+| PHPStan clean | ✅ |
+| TypeScript clean | ✅ |
+| ESLint clean | ✅ |
 
 ### What changed this session
 
-1. Pushed 6 prior commits to remote (was 6 ahead, now up to date).
-2. Verified all task.md claims against actual repo state — all accurate.
-3. Discovered 6 new reports already fully implemented (AP Aging, AP Outstanding, AP Payment History, AR Aging, AR Outstanding, Customer Statement).
-4. Confirmed `GetPreferredFiscalYearAction` already wired end-to-end.
-5. Created E2E tests for all 6 new reports (24 test cases total). TypeScript clean.
-6. Fixed npm uuid vulnerability via override (exceljs uuid 8.3.2 → 11.1.1). 0 npm vulns.
-7. Enabled parallel CI tests: sequential for coverage (main), parallel for PR-only runs. CI green.
+1. Implemented Financial Dashboard feature end-to-end (backend + frontend + tests).
+2. Backend aggregates balance sheet + income statement + cash flow into KPI shape.
+3. Frontend: 7 KPI cards with YoY change badges, cash flow CSS bars, expense breakdown, fiscal year selector with URL state.
+4. Auto-compares with previous fiscal year by default.
+5. Added sidebar nav link under Accounting section + permission seeder.
+6. Fixed dynamic Tailwind class issue in SummaryCards (JIT requires complete strings).
 
 ## Recommended Next Steps (AI-autonomous)
 
-Prioritized by value/effort. All can be done without product decisions from user.
-
 | # | Task | Effort | Value | Notes |
 |---|------|--------|-------|-------|
-| 1 | Dead code scan | Low | Low | Depwire re-scan. Last attempt had Laravel DI false positives. |
-| 2 | PHPStan level 6 (deferred) | High | Medium | 3219 generic-type annotation errors. Not viable without massive PHPDoc effort. |
+| 1 | Push to remote + verify CI | Low | High | 2 commits ahead. Push and confirm green. |
+| 2 | Run seeders on dev DB | Low | Medium | `sail artisan db:seed --class=MenuSeeder --class=PermissionSeeder` to activate nav link. |
 
 **Product features** (require user scope):
-- Financial Dashboard with KPI cards
-- Budget Management module
-- Sales/Invoicing module
+
+| # | Feature | Effort | Value |
+|---|---------|--------|-------|
+| 3 | Monthly trend charts (v2 dashboard) | Medium | High | New `GetMonthlyTrendAction` + time-series CSS charts |
+| 4 | Profit & Loss by Department | Medium | Medium | Extends income statement with department dimension |
+| 5 | Supplier/Customer Aging Dashboard | Medium | Medium | Data from AP/AR aging reports → visualization |
+| 6 | Budget Management module | High | High | New domain (models, CRUD, variance reports) |
 
 ## Useful Commands
 
 ```bash
-# Status
-git status --short
-git log --oneline -12
+# Push new commits
+git push
 
-# PHPStan current level
-grep -i "level" phpstan.neon
+# Seed nav link + permission
+sail artisan db:seed --class=MenuSeeder
+sail artisan db:seed --class=PermissionSeeder
 
-# Run Pest for new reports
-sail test --group ap-aging-report --group ap-outstanding-report --group ap-payment-history-report --group ar-aging-report --group ar-outstanding-report --group customer-statement-report
+# Run financial dashboard tests
+sail test --group financial-dashboard
+npx playwright test tests/e2e/financial-dashboard/
 
-# Monitor latest CI
+# Monitor CI
 gh run list --branch main --limit 3
-gh run view <run_id> --json status,conclusion,jobs
 ```
 
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo on `main` at `3da3d824`. Working tree clean, remote up to date.
+Read task.md first. Repo on `main` at `5e12051e`. 2 commits ahead of remote.
 
-CI green (run 26616510440). Sonar Quality Gate OK.
-TypeScript strict mode fully enabled. npm 0 vulns. Composer 0 vulns.
-1714+ Pest tests pass. PHPStan level 5 clean.
-CI uses sequential+coverage for main, parallel for PR-only runs.
-6 new reports fully tested (Pest 5 each + E2E 4 each).
+Financial Dashboard feature complete: 7 KPI cards, cash flow summary, expense breakdown,
+fiscal year selector with auto-comparison. Backend aggregates existing FinancialReportService.
+Pest 6/6 pass. E2E 4 cases. PHPStan/TS/ESLint clean.
 
-Autonomous tech-debt exhausted. Remaining: dead code scan (low value), PHPStan 6 (not viable).
-
-Recommended next: Financial Dashboard (KPI cards + trend charts) — medium effort, high value.
-Data backend already available via FinancialReportService. No new models needed.
-Other options: Budget Management (high effort), Sales/Invoicing (high effort),
-Profit & Loss by Department (medium), Supplier/Customer Aging Dashboard (medium).
+Next: push to remote, verify CI green, then optionally add monthly trend charts (v2).
 ```
