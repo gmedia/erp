@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-05-29 10:11 UTC
+Last updated: 2026-05-30 00:20 UTC
 
 ## Document Roles
 
@@ -11,7 +11,7 @@ Last updated: 2026-05-29 10:11 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `876a6276 fix(ci): revert parallel for coverage run, keep for PR-only`
+- HEAD: `3da3d824 docs(task): update handoff with uuid fix + parallel CI results`
 - Working tree: clean.
 - Remote: pushed (up to date).
 - CI E2E is **required gate** (no `continue-on-error`).
@@ -81,14 +81,18 @@ gh run view <run_id> --json status,conclusion,jobs
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo on `main` at `876a6276`. Working tree clean, remote up to date.
+Read task.md first. Repo on `main` at `3da3d824`. Working tree clean, remote up to date.
 
 CI green (run 26616510440). Sonar Quality Gate OK.
 TypeScript strict mode fully enabled. npm 0 vulns. Composer 0 vulns.
 1714+ Pest tests pass. PHPStan level 5 clean.
-CI uses parallel for PR runs, sequential+coverage for main.
+CI uses sequential+coverage for main, parallel for PR-only runs.
 6 new reports fully tested (Pest 5 each + E2E 4 each).
 
-Autonomous tasks exhausted (remaining: dead code scan — low value).
-Provide a product feature scope for next session (Financial Dashboard, Budget, Sales).
+Autonomous tech-debt exhausted. Remaining: dead code scan (low value), PHPStan 6 (not viable).
+
+Recommended next: Financial Dashboard (KPI cards + trend charts) — medium effort, high value.
+Data backend already available via FinancialReportService. No new models needed.
+Other options: Budget Management (high effort), Sales/Invoicing (high effort),
+Profit & Loss by Department (medium), Supplier/Customer Aging Dashboard (medium).
 ```
