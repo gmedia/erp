@@ -117,6 +117,7 @@ export const BankReconciliationForm = memo<BankReconciliationFormProps>(
                         placeholder="Select Fiscal Year"
                         labelFn={(fy) => fy.name}
                         initialLabel={fiscalYearName || ''}
+                        preferredMetaKey="preferred_fiscal_year_id"
                     />
                 </div>
 

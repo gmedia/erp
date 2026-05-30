@@ -103,6 +103,7 @@ export const PeriodClosingForm = memo<PeriodClosingFormProps>(
                         placeholder="Select Fiscal Year"
                         labelFn={(fy) => fy.name}
                         initialLabel={fiscalYearName || ''}
+                        preferredMetaKey="preferred_fiscal_year_id"
                     />
                     <SelectField
                         name="closing_type"

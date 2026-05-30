@@ -190,6 +190,7 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
                         label="Fiscal Year"
                         placeholder="Select Fiscal Year"
                         url="/api/fiscal-years"
+                        preferredMetaKey="preferred_fiscal_year_id"
                     />
                     <DatePickerField name="receipt_date" label="Receipt Date" />
                     <SelectField

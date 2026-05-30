@@ -195,6 +195,7 @@ export const CustomerInvoiceForm = memo<CustomerInvoiceFormProps>(
                             label="Fiscal Year"
                             placeholder="Select Fiscal Year"
                             url="/api/fiscal-years"
+                            preferredMetaKey="preferred_fiscal_year_id"
                         />
                         <DatePickerField
                             name="invoice_date"

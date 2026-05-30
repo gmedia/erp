@@ -212,6 +212,7 @@ export const ApPaymentForm = memo<ApPaymentFormProps>(function ApPaymentForm({
                     label="Fiscal Year"
                     url="/api/fiscal-years"
                     placeholder="Select fiscal year"
+                    preferredMetaKey="preferred_fiscal_year_id"
                 />
 
                 <DatePickerField name="payment_date" label="Payment Date" />

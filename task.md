@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-05-30 22:44 UTC
+Last updated: 2026-05-30 23:19 UTC
 
 ## Document Roles
 
@@ -11,11 +11,11 @@ Last updated: 2026-05-30 22:44 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `7075bdad docs(task): handoff summary covering 12 waves through long-line sweep`
-- Working tree: clean.
+- HEAD: `2e9d9c24 docs(task): cross-session handoff for fresh OpenCode session takeover` (pre-wave 13)
+- Working tree: 11 modified files staged for wave 13 commit (1 backend resource, 1 backend test, 1 frontend wrapper, 8 transaction forms).
 - Remote: pushed (up to date — `git rev-list --count origin/main..HEAD` returns 0).
 - CI E2E is **required gate** (no `continue-on-error`).
-- Sonar: Quality Gate **OK** at last scan; rescan pending for waves 6-12. Sweeping long-line fixes across `app/Exports/` (27 files) and `app/Imports/` (5 files) eliminated ~57 `php:S103` violations.
+- Sonar: Quality Gate **OK** at last scan; rescan pending for waves 6-13.
 - Module registry: 76 entries + financial-dashboard.
 
 ## Handoff to New Session (read first)
@@ -75,19 +75,19 @@ The codebase had several files at 0% or mid coverage despite endpoints being liv
 | 10 | `1b3c62be` | Long-line refactor: 3 financial report exports (BalanceSheet, IncomeStatement, TrialBalance) |
 | 11 | `bcb52563` | Long-line sweep: remaining 14 Export files (~36 lines) |
 | 12 | `6a079f9d` | Long-line sweep: 5 Import files (17 lines) |
+| 13 | (pending commit) | Preferred fiscal year propagation: `FiscalYearCollection` becomes status-filter-aware, `AsyncSelectField` exposes `preferredMetaKey`, 8 transaction forms (`ApPayment`, `ArReceipt`, `CustomerInvoice`, `SupplierBill`, `CreditNote`, `PeriodClosing`, `BankReconciliation`, `AssetDepreciationRun`) auto-default fiscal year |
 
-**Cumulative: 58 new Pest test cases, 12 PHP files moved from 0%/mid to ~100% coverage, 4 small test fixture classes, 17 dead files removed (-519 lines), ~57 `php:S103` long-line violations fixed across `app/Exports/` and `app/Imports/`, 0 regressions.**
+**Cumulative: 60 new Pest test cases (+2 in wave 13), 12 PHP files moved from 0%/mid to ~100% coverage, 4 small test fixture classes, 17 dead files removed (-519 lines), ~57 `php:S103` long-line violations fixed across `app/Exports/` and `app/Imports/`, 0 regressions.**
 
 ## What changed this session
 
-1. Synced HEAD pointer in `task.md` (was stale at `08f400e5`).
-2. Added explicit "CI Autofix Supersede Pattern" section so future sessions don't panic at red runs.
-3. Added `financial-dashboard` entry to `docs/module-registry.md`.
-4. Backfilled coverage for 5 controllers, 3 actions, and 1 trait helper across waves 1, 2, 4, 5, 6, 7, 8.
-5. Resolved 7 SonarCloud MAJOR issues in financial-dashboard files (wave 3).
-6. Added `tests/Unit/Actions/EntityStates/` and `tests/Unit/Actions/Approvals/` directories with reusable fixture rule/action classes.
-7. Wave 9: deleted 17 Inertia/Fortify scaffold files that were unreachable since the API migration. Verification protocol used: depwire impact analysis (zero direct + transitive dependents per file) + cross-codebase grep + PHPStan + full Pest suite (1778 pass, 8040 assertions).
-8. Waves 10-12: Sonar `php:S103` long-line cleanup. Refactored 22 files (17 Exports + 5 Imports) to bring all lines under 120 chars without behavior change. Patterns used: split inline array literals one-per-line, rename long parameter names (`$purchaseOrder` -> `$po`, `$inventoryStocktake` -> `$item`, etc.), extract `lookupConfig()` helper in `AssetImport`, simplify verbose PHPDoc generic types in `InteractsWithImportRows`.
+1. Wave 13: **Preferred fiscal year propagation across all financial transaction forms.**
+   - Backend: `FiscalYearCollection::with()` now reads `?status=` from request and filters the FY pool before computing `meta.preferred_fiscal_year_id`. So `GET /api/fiscal-years?status=open` returns a preferred ID that actually exists in the filtered list. `GetPreferredFiscalYearAction` stays pure (collection-in, FY-out).
+   - Frontend: `AsyncSelectField` wrapper now forwards a new optional `preferredMetaKey` prop down to `AsyncSelect`. Previously only the raw `AsyncSelect` exposed it.
+   - 8 transaction forms wired up: `ApPaymentForm`, `ArReceiptForm`, `CustomerInvoiceForm`, `SupplierBillForm`, `CreditNoteForm`, `PeriodClosingForm`, `BankReconciliationForm`, `CalculateFormModal` (asset-depreciation-runs). Each now passes `preferredMetaKey="preferred_fiscal_year_id"` to its fiscal year `AsyncSelectField`.
+   - Result: any new financial transaction now auto-selects the most relevant fiscal year (latest with posted entries → fallback open → fallback first), respecting per-form filters like `?status=open`. Single backend change + one wrapper prop propagated to 8 forms with no per-form logic duplication.
+   - Tests: added 2 Pest cases covering filter-aware preferred + empty-status fallback in `FiscalYearCollectionTest`. All affected groups stay green: 44+12+8+8+8+13+13+32+12 = 150 pass, 642 assertions.
+   - Verifications: `tsc --noEmit` clean, `eslint . --fix` clean, PHPStan clean (1048 files, 0 errors), Duster clean (no autofixes touched edited files).
 
 ## Important: Files NOT to write tests for
 
@@ -103,19 +103,23 @@ Files kept (intentionally, because they are live):
 
 ### My recommendation for the new session
 
-If the user has not given new direction, **ask them** which of these to proceed with rather than picking unilaterally — coverage and Sonar work has hit diminishing returns, and the remaining options diverge in goal:
+Wave 13 just shipped the preferred-fiscal-year propagation. Highest-leverage remaining options diverge in goal:
 
-1. **Seed dev DB** to activate the financial-dashboard nav. Low risk but mutates DB state — needs explicit go-ahead.
-2. **Pivot to a new product feature** (P&L by Department, Aging Dashboard, Budget Management, Sales/Invoicing). Highest user value but needs domain decisions.
-3. **Continue the long-line sweep into `app/Domain/`, `app/Actions/`, `app/Services/`**. ~85 files left. Lower value/risk ratio than the prior sweep — many are chained query builders that need per-file inspection.
+1. **E2E coverage for default FY** — add Playwright spec verifying default FY auto-selected in financial transaction forms (open `New AP Payment`, assert `fiscal_year_id` filled). Regression safety for the wave 13 change.
+2. **Document pattern** — add snippet in `docs/development-patterns.md` for "How to default fiscal year in a form" with `AsyncSelectField preferredMetaKey` + status filter caveat. Onboarding clarity.
+3. **Pivot to product feature** (P&L by Department, Aging Dashboard, Budget Management, Sales/Invoicing). Highest user value, needs domain decisions.
+4. **Continue long-line sweep** into `app/Domain/`, `app/Actions/`, `app/Services/` (~85 files). Lower value/risk than prior sweeps.
+5. **Seed dev DB** to activate financial-dashboard nav. Low risk but mutates DB state.
 
-If the user just says "lanjutkan" or similar, the previous session ended with that exact answer (recommended option 1 with a request for confirmation). Stay consistent.
+If user just says "lanjutkan" without direction, ASK rather than picking — wave 13 closed a coherent unit so any branch is reasonable.
 
-### Easy (AI-autonomous, but value diminishing)
+### Easy (AI-autonomous)
 
 | # | Task | Effort | Notes |
 |---|------|--------|-------|
 | 1 | Seed dev DB | Low | `sail artisan db:seed --class=MenuSeeder --class=PermissionSeeder` to activate financial-dashboard nav link. Requires DB state change. |
+| 2 | Document `preferredMetaKey` pattern | Low | One-paragraph snippet in `docs/development-patterns.md` with `AsyncSelectField` example. |
+| 3 | E2E spec for default-FY auto-select | Medium | Playwright case verifying `fiscal_year_id` pre-filled on `New AP Payment` / `New AR Receipt` / etc. |
 
 ### Medium (require domain investigation, not pure backfill)
 
@@ -165,59 +169,39 @@ gh run list --branch main --limit 5
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo on `main` at HEAD `7075bdad` or later.
+Read task.md first. Repo on `main` at HEAD `2e9d9c24` or later (wave 13 commit pending).
 
-The previous OpenCode session closed cleanly. Working tree clean,
-remote up to date, all CI checks expected to be green or pending.
-There is NO in-flight work to resume — start fresh from user input.
+Wave 13 just landed: Preferred fiscal year propagation across all financial
+transaction forms. Backend FiscalYearCollection now respects ?status= filter
+when computing meta.preferred_fiscal_year_id. Frontend AsyncSelectField wrapper
+now forwards preferredMetaKey to AsyncSelect. 8 forms wired: ApPayment,
+ArReceipt, CustomerInvoice, SupplierBill, CreditNote, PeriodClosing,
+BankReconciliation, AssetDepreciationRun calculate modal.
 
-Status: Financial Dashboard fully shipped + Sonar-clean. 12 waves landed:
-8 coverage backfill waves (58 new Pest cases, 12 files at 0%/mid -> ~100%
-including all three flagship pipeline/approval engines), 1 dead-code
-cleanup wave that removed 17 Inertia/Fortify scaffold files (-519 lines),
-and 3 long-line sweep waves that fixed ~57 Sonar php:S103 violations
-across all of app/Exports/ (27 files) and app/Imports/ (5 files).
-PHPStan / Pest / Duster all clean.
+Single backend change + one wrapper prop = 8 forms auto-default FY without
+per-form duplication. Memory context "single backend + minimal frontend
+propagates without per-page edits" achieved for both report pages (already
+done) and now transaction forms.
+
+Verifications green: tsc, eslint, PHPStan, Duster, Pest groups
+fiscal-years/ap-payments/ar-receipts/customer-invoices/supplier-bills/
+credit-notes/period-closings/bank-reconciliations/asset-depreciation-runs
+(150 pass, 642 assertions, +2 new cases in FiscalYearCollectionTest).
 
 Before reacting to red CI runs: read the "CI Autofix Supersede Pattern"
-section. Most reds and cancels in `gh run list` are concurrency-cancels
-or autofix-supersedes, NOT failures. Verify via the latest run on HEAD.
+section. Most reds in `gh run list` are concurrency-cancels or
+autofix-supersedes. Verify via the latest run on HEAD.
 
-The auth/settings scaffold directories (Controllers/Auth, Controllers/Settings,
-Requests/Auth, Requests/Settings) NO LONGER EXIST. Auth flow is handled by
-App\Http\Controllers\Api\AuthController. Live tests:
-tests/Feature/Auth/AuthMeTest.php, AuthenticationTest.php, PasswordResetTest.php.
+Suggested next steps if user wants more autonomous work:
+1. E2E spec verifying default FY auto-selected in transaction forms
+   (Playwright case opening New AP Payment, asserting fiscal_year_id filled).
+2. Document the preferredMetaKey pattern in docs/development-patterns.md.
+3. Seed dev DB to activate financial-dashboard nav (needs go-ahead).
+4. Pivot to product feature (P&L by Department, Aging, Budget,
+   Sales/Invoicing) — needs domain decisions.
+5. Continue long-line sweep into Domain/Actions/Services — ~85 files,
+   lower value/risk ratio than prior sweeps.
 
-If a future framework upgrade re-creates any scaffold stub, do NOT add tests
-to it - first verify it has at least one live route in routes/api/*.php.
-
-The autonomous-work backlog is now in diminishing-returns territory:
-- ~85 files in app/Domain/, app/Actions/, app/Services/ still have at
-  least one >120 char line, but each requires per-file inspection
-  because they are domain-specific chained query builders or business
-  logic. Lower value/risk ratio than the Exports/Imports sweep.
-- app/Models/SubscriptionBillingRecord.php has 2 long PHPDoc @method
-  lines but those are auto-generated by `ide-helper:models -RW`.
-  Manual edits will be overwritten. Skip unless ide-helper config is
-  changed.
-- Easy autonomous task remaining: seed dev DB to activate the
-  financial-dashboard nav (requires explicit go-ahead since DB state
-  changes).
-
-If the user input is "lanjutkan" or similar without new direction,
-ASK which of these branches to take rather than picking unilaterally.
-The three options are:
-1. Seed dev DB (low risk, needs go-ahead).
-2. Pivot to product feature (P&L by Department, Aging, Budget,
-   Sales/Invoicing) - needs domain decisions.
-3. Continue the long-line sweep into Domain/Actions/Services - lower
-   value/risk than the prior sweep.
-
-Sonar rescan should auto-improve overall coverage gauge significantly:
-- 13 0%-coverage files no longer exist (deleted in wave 9)
-- HandlesConditions trait is now indirectly exercised
-- ~57 php:S103 violations fixed across Exports + Imports
-
-Product feature options if user wants to expand domain: Profit & Loss
-by Department, Aging Dashboard, Budget Management, Sales/Invoicing.
+If user input is "lanjutkan" or similar without new direction, ASK
+which branch to take rather than picking unilaterally.
 ```

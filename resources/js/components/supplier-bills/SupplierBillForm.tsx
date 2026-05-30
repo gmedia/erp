@@ -245,6 +245,7 @@ export const SupplierBillForm = memo<SupplierBillFormProps>(
                         label="Fiscal Year"
                         url="/api/fiscal-years"
                         placeholder="Select fiscal year"
+                        preferredMetaKey="preferred_fiscal_year_id"
                     />
 
                     <AsyncSelectField

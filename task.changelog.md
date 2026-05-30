@@ -51,6 +51,7 @@ Catatan penamaan: heading modul memakai pola `Nama Modul di Kode (Label Bisnis)`
 - [x] Cakupan tes: 36 Pest financial-reports, 12 Pest reports, 7 E2E Playwright report-configurations.
 - [x] Auto-select preferred fiscal year (FY dengan posted journal entries) untuk 5 laporan keuangan utama (Income Statement, Balance Sheet, Comparative, Cash Flow, Trial Balance) via `GetPreferredFiscalYearAction` + `InteractsWithFinancialReportRequest` trait. Zero frontend change.
 - [x] Extend preferred FY auto-select ke Trial Balance Detailed + General Ledger via `AsyncSelect.preferredMetaKey` prop + `FiscalYearCollection` meta response. Zero per-page edits.
+- [x] Extend preferred FY auto-select ke 8 form transaksi keuangan (`ApPayment`, `ArReceipt`, `CustomerInvoice`, `SupplierBill`, `CreditNote`, `PeriodClosing`, `BankReconciliation`, `AssetDepreciationRun`). Backend `FiscalYearCollection` sekarang status-filter aware (mendukung `?status=open`); frontend `AsyncSelectField` wrapper meneruskan prop `preferredMetaKey` ke `AsyncSelect`. Single backend tweak + satu prop wrapper menyebar ke 8 form tanpa duplikasi logic per-form.
 - [x] Fix empty financial report export (FY tanpa CoA → 500) dengan mengisi template `comparison_*`/`change_*` keys.
 - [x] Fix Export button disabled saat data kosong — hapus guard `!hasData` agar user tetap bisa export header-only xlsx.
 

@@ -173,6 +173,7 @@ export const CreditNoteForm = memo<CreditNoteFormProps>(
                             label="Fiscal Year"
                             placeholder="Select Fiscal Year"
                             url="/api/fiscal-years"
+                            preferredMetaKey="preferred_fiscal_year_id"
                         />
                         <DatePickerField
                             name="credit_note_date"

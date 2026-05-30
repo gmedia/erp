@@ -108,6 +108,7 @@ export function CalculateFormModal({
                                 placeholder="Select Fiscal Year..."
                                 labelFn={(fy: FiscalYear) => fy.name}
                                 valueFn={(fy: FiscalYear) => fy.id.toString()}
+                                preferredMetaKey="preferred_fiscal_year_id"
                             />
 
                             <div className="grid grid-cols-2 gap-4">
