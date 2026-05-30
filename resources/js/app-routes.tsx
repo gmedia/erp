@@ -71,6 +71,7 @@ const AssetDepreciationRuns = lazy(
     () => import('./pages/asset-depreciation-runs/index'),
 );
 const AssetDashboard = lazy(() => import('./pages/asset-dashboard/index'));
+const FinancialDashboard = lazy(() => import('./pages/financial-dashboard/index'));
 
 // Accounting
 const Accounts = lazy(() => import('./pages/accounts/index'));
@@ -494,6 +495,14 @@ export default function AppRoutes() {
                     element={
                         <P>
                             <AssetDashboard />
+                        </P>
+                    }
+                />
+                <Route
+                    path="/financial-dashboard"
+                    element={
+                        <P>
+                            <FinancialDashboard />
                         </P>
                     }
                 />
