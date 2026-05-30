@@ -18,6 +18,14 @@ export interface ExpenseBreakdownItem {
     value: number;
 }
 
+export interface MonthlyTrendItem {
+    month: number;
+    label: string;
+    revenue: number;
+    expenses: number;
+    net_income: number;
+}
+
 export interface FiscalYear {
     id: number;
     name: string;
@@ -41,6 +49,7 @@ export interface FinancialDashboardData {
     };
     cash_flow_summary: CashFlowSummary;
     expense_breakdown: ExpenseBreakdownItem[];
+    monthly_trends: MonthlyTrendItem[];
 }
 
 interface UseFinancialDashboardParams {

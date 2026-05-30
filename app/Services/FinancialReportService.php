@@ -6,6 +6,7 @@ use App\Models\Account;
 use App\Models\AccountMapping;
 use App\Models\CoaVersion;
 use App\Models\FiscalYear;
+use App\Models\JournalEntryLine;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
@@ -59,6 +60,64 @@ class FinancialReportService
                 'outflow' => $netDebit,
             ]
         );
+    }
+
+    /**
+     * Get monthly revenue vs expense trends for a fiscal year.
+     *
+     * @return array<int, array{month: int, label: string, revenue: float, expenses: float, net_income: float}>
+     */
+    public function getMonthlyTrends(int $fiscalYearId): array
+    {
+        $fiscalYear = FiscalYear::findOrFail($fiscalYearId);
+        $coaVersion = $this->resolveCoaVersionForFiscalYear($fiscalYear);
+
+        if (! $coaVersion) {
+            return [];
+        }
+
+        /** @var \Illuminate\Support\Collection<int, object{month: int, revenue: string, expenses: string}> $results */
+        $results = JournalEntryLine::query()
+            ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+            ->join('accounts', 'accounts.id', '=', 'journal_entry_lines.account_id')
+            ->where('journal_entries.fiscal_year_id', $fiscalYearId)
+            ->where('journal_entries.status', 'posted')
+            ->where('accounts.coa_version_id', $coaVersion->id)
+            ->whereIn('accounts.type', ['revenue', 'expense'])
+            ->selectRaw('MONTH(journal_entries.entry_date) as month')
+            ->selectRaw("SUM(CASE WHEN accounts.type = 'revenue' THEN journal_entry_lines.credit - journal_entry_lines.debit ELSE 0 END) as revenue")
+            ->selectRaw("SUM(CASE WHEN accounts.type = 'expense' THEN journal_entry_lines.debit - journal_entry_lines.credit ELSE 0 END) as expenses")
+            ->groupByRaw('MONTH(journal_entries.entry_date)')
+            ->orderByRaw('MONTH(journal_entries.entry_date)')
+            ->get();
+
+        $dataByMonth = [];
+        /** @var object $row */
+        foreach ($results as $row) {
+            $dataByMonth[(int) $row->month] = [
+                'revenue' => (float) $row->revenue,
+                'expenses' => (float) $row->expenses,
+            ];
+        }
+
+        $months = [];
+        $startMonth = (int) $fiscalYear->start_date->format('n');
+
+        for ($i = 0; $i < 12; $i++) {
+            $monthNum = (($startMonth - 1 + $i) % 12) + 1;
+            $revenue = $dataByMonth[$monthNum]['revenue'] ?? 0.0;
+            $expenses = $dataByMonth[$monthNum]['expenses'] ?? 0.0;
+
+            $months[] = [
+                'month' => $monthNum,
+                'label' => date('M', mktime(0, 0, 0, $monthNum, 1)),
+                'revenue' => $revenue,
+                'expenses' => $expenses,
+                'net_income' => $revenue - $expenses,
+            ];
+        }
+
+        return $months;
     }
 
     /**

@@ -8,6 +8,7 @@ import { useSearchParams } from 'react-router-dom';
 import { CashFlowSummary } from '../../components/financial-dashboard/CashFlowSummary';
 import { ExpenseBreakdown } from '../../components/financial-dashboard/ExpenseBreakdown';
 import { FiscalYearSelector } from '../../components/financial-dashboard/FiscalYearSelector';
+import { MonthlyTrendChart } from '../../components/financial-dashboard/MonthlyTrendChart';
 import { SummaryCards } from '../../components/financial-dashboard/SummaryCards';
 import { useFinancialDashboard } from '../../hooks/useFinancialDashboard';
 
@@ -109,6 +110,11 @@ export default function FinancialDashboard() {
 
                 <div className="space-y-6">
                     <SummaryCards data={data?.kpis} isLoading={isLoading} />
+
+                    <MonthlyTrendChart
+                        data={data?.monthly_trends}
+                        isLoading={isLoading}
+                    />
 
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                         <CashFlowSummary

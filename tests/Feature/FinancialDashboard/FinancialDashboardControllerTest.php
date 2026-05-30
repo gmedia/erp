@@ -39,6 +39,7 @@ describe('Financial Dashboard API', function () {
                 ],
                 'cash_flow_summary' => ['inflow', 'outflow', 'net'],
                 'expense_breakdown',
+                'monthly_trends',
             ]);
     });
 
@@ -135,5 +136,50 @@ describe('Financial Dashboard API', function () {
         $response = getJson('/api/financial-dashboard');
 
         $response->assertUnauthorized();
+    });
+
+    test('returns monthly trends with correct structure', function () {
+        $fiscalYear = FiscalYear::factory()->create([
+            'status' => 'open',
+            'start_date' => '2024-01-01',
+            'end_date' => '2024-12-31',
+        ]);
+        $coaVersion = CoaVersion::factory()->create([
+            'fiscal_year_id' => $fiscalYear->id,
+            'status' => 'active',
+        ]);
+
+        $revenueAccount = Account::factory()->create([
+            'coa_version_id' => $coaVersion->id,
+            'type' => 'revenue',
+            'normal_balance' => 'credit',
+            'level' => 1,
+            'parent_id' => null,
+        ]);
+
+        $journalEntry = JournalEntry::factory()->create([
+            'fiscal_year_id' => $fiscalYear->id,
+            'status' => 'posted',
+            'entry_date' => '2024-03-15',
+        ]);
+
+        JournalEntryLine::factory()->create([
+            'journal_entry_id' => $journalEntry->id,
+            'account_id' => $revenueAccount->id,
+            'debit' => 0,
+            'credit' => 100000,
+        ]);
+
+        $response = getJson("/api/financial-dashboard?fiscal_year_id={$fiscalYear->id}");
+
+        $response->assertOk();
+        $trends = $response->json('monthly_trends');
+
+        expect($trends)->toHaveCount(12)
+            ->and($trends[2]['month'])->toBe(3)
+            ->and($trends[2]['label'])->toBe('Mar')
+            ->and((float) $trends[2]['revenue'])->toBe(100000.0)
+            ->and((float) $trends[2]['expenses'])->toBe(0.0)
+            ->and((float) $trends[2]['net_income'])->toBe(100000.0);
     });
 });

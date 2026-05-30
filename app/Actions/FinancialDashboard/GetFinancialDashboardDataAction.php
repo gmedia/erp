@@ -70,6 +70,7 @@ class GetFinancialDashboardDataAction
                 'net' => $cashBalance,
             ],
             'expense_breakdown' => $this->extractTopExpenses($incomeStatement['expenses'] ?? []),
+            'monthly_trends' => $this->reportService->getMonthlyTrends($fiscalYearId),
         ];
     }
 
