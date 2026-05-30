@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-05-30 22:40 UTC
+Last updated: 2026-05-30 22:44 UTC
 
 ## Document Roles
 
@@ -11,12 +11,25 @@ Last updated: 2026-05-30 22:40 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `6a079f9d refactor(imports): split long lines across Import classes (Sonar php:S103)`
+- HEAD: `7075bdad docs(task): handoff summary covering 12 waves through long-line sweep`
 - Working tree: clean.
-- Remote: pushed (up to date).
+- Remote: pushed (up to date — `git rev-list --count origin/main..HEAD` returns 0).
 - CI E2E is **required gate** (no `continue-on-error`).
 - Sonar: Quality Gate **OK** at last scan; rescan pending for waves 6-12. Sweeping long-line fixes across `app/Exports/` (27 files) and `app/Imports/` (5 files) eliminated ~57 `php:S103` violations.
 - Module registry: 76 entries + financial-dashboard.
+
+## Handoff to New Session (read first)
+
+The previous OpenCode session closed cleanly at HEAD `7075bdad`. There is **no in-flight work** to resume:
+
+- All edits committed and pushed.
+- Full local test suite green (1778 pass, 8040 assertions).
+- PHPStan clean. Duster clean.
+- No pending todos in this document — only future suggestions in the "Recommended Next Action" tables.
+
+If you (the new session) want to continue autonomous work without user direction, the highest-leverage remaining items are listed under "Recommended Next Action" and "Diminishing-returns backlog". If the user has given new direction, follow that and ignore the suggestions.
+
+**Do not** re-do the explore/research pass for the items already documented here — the previous session already did the depwire impact analysis, Sonar scans, and codebase grep. Trust this document and move directly to action.
 
 ### CI Note — Autofix Supersede Pattern (read this before reacting to red runs)
 
@@ -88,6 +101,16 @@ Files kept (intentionally, because they are live):
 
 ## Recommended Next Steps
 
+### My recommendation for the new session
+
+If the user has not given new direction, **ask them** which of these to proceed with rather than picking unilaterally — coverage and Sonar work has hit diminishing returns, and the remaining options diverge in goal:
+
+1. **Seed dev DB** to activate the financial-dashboard nav. Low risk but mutates DB state — needs explicit go-ahead.
+2. **Pivot to a new product feature** (P&L by Department, Aging Dashboard, Budget Management, Sales/Invoicing). Highest user value but needs domain decisions.
+3. **Continue the long-line sweep into `app/Domain/`, `app/Actions/`, `app/Services/`**. ~85 files left. Lower value/risk ratio than the prior sweep — many are chained query builders that need per-file inspection.
+
+If the user just says "lanjutkan" or similar, the previous session ended with that exact answer (recommended option 1 with a request for confirmation). Stay consistent.
+
 ### Easy (AI-autonomous, but value diminishing)
 
 | # | Task | Effort | Notes |
@@ -142,7 +165,11 @@ gh run list --branch main --limit 5
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo on `main` at HEAD `6a079f9d` or later.
+Read task.md first. Repo on `main` at HEAD `7075bdad` or later.
+
+The previous OpenCode session closed cleanly. Working tree clean,
+remote up to date, all CI checks expected to be green or pending.
+There is NO in-flight work to resume — start fresh from user input.
 
 Status: Financial Dashboard fully shipped + Sonar-clean. 12 waves landed:
 8 coverage backfill waves (58 new Pest cases, 12 files at 0%/mid -> ~100%
@@ -176,6 +203,15 @@ The autonomous-work backlog is now in diminishing-returns territory:
 - Easy autonomous task remaining: seed dev DB to activate the
   financial-dashboard nav (requires explicit go-ahead since DB state
   changes).
+
+If the user input is "lanjutkan" or similar without new direction,
+ASK which of these branches to take rather than picking unilaterally.
+The three options are:
+1. Seed dev DB (low risk, needs go-ahead).
+2. Pivot to product feature (P&L by Department, Aging, Budget,
+   Sales/Invoicing) - needs domain decisions.
+3. Continue the long-line sweep into Domain/Actions/Services - lower
+   value/risk than the prior sweep.
 
 Sonar rescan should auto-improve overall coverage gauge significantly:
 - 13 0%-coverage files no longer exist (deleted in wave 9)
