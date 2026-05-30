@@ -76,7 +76,7 @@ class FinancialReportService
             return [];
         }
 
-        /** @var \Illuminate\Support\Collection<int, object{month: int, revenue: string, expenses: string}> $results */
+        /** @var Collection<int, object{month: int, revenue: string, expenses: string}> $results */
         $results = JournalEntryLine::query()
             ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
             ->join('accounts', 'accounts.id', '=', 'journal_entry_lines.account_id')

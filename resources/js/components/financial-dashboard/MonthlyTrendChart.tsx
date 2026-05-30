@@ -15,7 +15,9 @@ interface MonthlyTrendChartProps {
     readonly isLoading: boolean;
 }
 
-const PLACEHOLDER_HEIGHTS = [40, 70, 55, 85, 60, 75, 50, 90, 65, 80, 45, 70] as const;
+const PLACEHOLDER_HEIGHTS = [
+    40, 70, 55, 85, 60, 75, 50, 90, 65, 80, 45, 70,
+] as const;
 
 function formatCompact(value: number): string {
     const absValue = Math.abs(value);
@@ -92,11 +94,15 @@ export const MonthlyTrendChart = memo<MonthlyTrendChartProps>(
                         <div className="flex items-center space-x-4 text-sm">
                             <div className="flex items-center space-x-2">
                                 <div className="h-3 w-3 rounded-full bg-emerald-500"></div>
-                                <span className="text-muted-foreground">Revenue</span>
+                                <span className="text-muted-foreground">
+                                    Revenue
+                                </span>
                             </div>
                             <div className="flex items-center space-x-2">
                                 <div className="h-3 w-3 rounded-full bg-rose-500"></div>
-                                <span className="text-muted-foreground">Expenses</span>
+                                <span className="text-muted-foreground">
+                                    Expenses
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -129,20 +135,28 @@ export const MonthlyTrendChart = memo<MonthlyTrendChartProps>(
                                         <div className="flex h-[160px] items-end space-x-1">
                                             <div
                                                 className="group relative w-6 rounded-t bg-emerald-500 transition-all hover:opacity-80"
-                                                style={{ height: `${revenueHeight}px` }}
+                                                style={{
+                                                    height: `${revenueHeight}px`,
+                                                }}
                                                 title={`Revenue: ${formatCurrency(item.revenue)}`}
                                             >
-                                                <div className="absolute -top-8 left-1/2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white group-hover:block">
-                                                    {formatCurrency(item.revenue)}
+                                                <div className="absolute -top-8 left-1/2 hidden -translate-x-1/2 rounded bg-gray-900 px-2 py-1 text-xs whitespace-nowrap text-white group-hover:block">
+                                                    {formatCurrency(
+                                                        item.revenue,
+                                                    )}
                                                 </div>
                                             </div>
                                             <div
                                                 className="group relative w-6 rounded-t bg-rose-500 transition-all hover:opacity-80"
-                                                style={{ height: `${expensesHeight}px` }}
+                                                style={{
+                                                    height: `${expensesHeight}px`,
+                                                }}
                                                 title={`Expenses: ${formatCurrency(item.expenses)}`}
                                             >
-                                                <div className="absolute -top-8 left-1/2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white group-hover:block">
-                                                    {formatCurrency(item.expenses)}
+                                                <div className="absolute -top-8 left-1/2 hidden -translate-x-1/2 rounded bg-gray-900 px-2 py-1 text-xs whitespace-nowrap text-white group-hover:block">
+                                                    {formatCurrency(
+                                                        item.expenses,
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
@@ -150,7 +164,9 @@ export const MonthlyTrendChart = memo<MonthlyTrendChartProps>(
                                             <span className="text-xs font-medium text-muted-foreground">
                                                 {item.label}
                                             </span>
-                                            <span className={`text-xs font-semibold ${netIncomeColor}`}>
+                                            <span
+                                                className={`text-xs font-semibold ${netIncomeColor}`}
+                                            >
                                                 {formatCompact(item.net_income)}
                                             </span>
                                         </div>
