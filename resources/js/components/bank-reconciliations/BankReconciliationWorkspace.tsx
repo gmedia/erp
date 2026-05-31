@@ -107,9 +107,6 @@ export const BankReconciliationWorkspace =
             const [currentDifference, setCurrentDifference] = useState<number>(
                 bankReconciliation.difference,
             );
-            const [, setCurrentReconciledBalance] = useState<number>(
-                bankReconciliation.reconciled_balance,
-            );
 
             const [assigningItemId, setAssigningItemId] = useState<
                 number | null
@@ -141,9 +138,6 @@ export const BankReconciliationWorkspace =
                         if (cancelled) return;
                         setItems(res.data.data.items ?? []);
                         setCurrentDifference(res.data.data.difference);
-                        setCurrentReconciledBalance(
-                            res.data.data.reconciled_balance,
-                        );
                     })
                     .catch(() => {
                         if (!cancelled)
@@ -229,9 +223,6 @@ export const BankReconciliationWorkspace =
                     );
                     setItems(fresh.data.data.items);
                     setCurrentDifference(fresh.data.data.difference);
-                    setCurrentReconciledBalance(
-                        fresh.data.data.reconciled_balance,
-                    );
                 } catch {
                     toast.error('Auto match failed. Please try again.');
                 } finally {
@@ -287,9 +278,6 @@ export const BankReconciliationWorkspace =
                         data: BankReconciliation;
                     }>(`/api/bank-reconciliations/${bankReconciliation.id}`);
                     setCurrentDifference(freshAssign.data.data.difference);
-                    setCurrentReconciledBalance(
-                        freshAssign.data.data.reconciled_balance,
-                    );
                 } catch (err: unknown) {
                     const msg =
                         rawAxios.isAxiosError(err) &&
@@ -324,9 +312,6 @@ export const BankReconciliationWorkspace =
                         data: BankReconciliation;
                     }>(`/api/bank-reconciliations/${bankReconciliation.id}`);
                     setCurrentDifference(freshMatch.data.data.difference);
-                    setCurrentReconciledBalance(
-                        freshMatch.data.data.reconciled_balance,
-                    );
                 } catch (err: unknown) {
                     const msg =
                         rawAxios.isAxiosError(err) &&
@@ -358,9 +343,6 @@ export const BankReconciliationWorkspace =
                         data: BankReconciliation;
                     }>(`/api/bank-reconciliations/${bankReconciliation.id}`);
                     setCurrentDifference(freshUnmatch.data.data.difference);
-                    setCurrentReconciledBalance(
-                        freshUnmatch.data.data.reconciled_balance,
-                    );
                 } catch (err: unknown) {
                     const msg =
                         rawAxios.isAxiosError(err) &&
