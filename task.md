@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-05-31 06:08 UTC
+Last updated: 2026-05-31 07:24 UTC
 
 ## Document Roles
 
@@ -11,11 +11,11 @@ Last updated: 2026-05-31 06:08 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `a3ca0665 docs(task): document Sonar php:S103 sweep waves 14-17`
+- HEAD: `04e0e39f refactor(frontend): replace nested ternaries with extracted variables (Sonar typescript:S3358)`
 - Working tree: clean (will have 1 modified after this update).
 - Remote: pushed (up to date).
 - CI E2E is **required gate** (no `continue-on-error`).
-- Sonar Quality Gate: **OK** (verified 2026-05-31 via API; coverage 94.9%, ncloc 93,096, dup 0.7%, 83 OPEN code smells).
+- Sonar Quality Gate: **OK** (verified 2026-05-31; coverage 94.9%, ncloc 93,096, dup 0.7%; OPEN code smells dropped from 83 → ~24 after waves 18-20).
 - Module registry: 77 entries.
 
 ## Research Snapshot — 2026-05-31 (this session)
@@ -38,15 +38,15 @@ Read-only audit results, gathered via Sonar API + Depwire MCP + filesystem audit
 
 | Rule | Count | Severity | Effort | Origin |
 |---|---|---|---|---|
-| `php:S1808` | 45 | MINOR | 45min | Introduced by waves 14-17 (mixed inline/newline arg patterns) |
-| `typescript:S4325` | 14 | MINOR | 14min | Pre-existing — redundant TS type assertions |
-| `typescript:S3358` | 8 | MINOR | 8min | Pre-existing — nested ternary |
+| `php:S1808` | 0 | MINOR | — | ✅ Wave 18 closed all 45 (commit `9caa14cb`) |
+| `typescript:S4325` | 2 | MINOR | 2min | ✅ Wave 19 closed 12/14 (commit `c7ca491b`); 2 kept in AccountForm (genuine generic bridge) |
+| `typescript:S3358` | 4 | MINOR | 4min | ✅ Wave 20 closed 4/8 (commit `04e0e39f`); 4 in BankReconciliationWorkspace deferred (deeply nested JSX) |
 | `typescript:S6759` | 6 | MINOR | 6min | Pre-existing |
 | `typescript:S6606` | 3 | MINOR | 3min | Pre-existing |
 | `typescript:S7735` | 2 | MINOR | 2min | Pre-existing |
 | `php:S103` | 2 | MAJOR | 2min | Auto-generated ide-helper — cannot fix |
 | Other TS | ~3 | MINOR | 3min | Pre-existing |
-| **Total** | **83** | | **165min** | |
+| **Total** | **~22** | | **~22min** | |
 
 **php:S103 net result**: 195 violations closed across 75 files in waves 14-17. Only 2 OPEN remain (auto-generated, intentionally skipped).
 
@@ -166,7 +166,12 @@ The codebase had several files at 0% or mid coverage despite endpoints being liv
 
 ## What changed this session
 
-1. Wave 13: **Preferred fiscal year propagation across all financial transaction forms.**
+1. **Sonar cleanup waves 18-20** — closed 61/67 OPEN issues across 3 commits.
+   - **Wave 18** (`9caa14cb`): 45 `php:S1808` violations across 21 PHP files. Promoted-property constructors (6 Action + 9 Export) reformatted to multi-line param style so Duster's `single_line_empty_body` does not collapse `) {}` into something Sonar flags. `whenLoaded(name, fn () => [...])` calls in 7 Resources rewritten with each argument on its own line. Empty wrapper `StoreAccountMappingRequest` / `UpdateAccountMappingRequest` expanded with mandatory intent comment per AGENTS.md "Empty Wrapper Class" rule. Verified: PHPStan clean, Duster clean, Pest groups bank-reconciliations / period-closings / recurring-journals / stock-adjustments / stock-transfers / account-mappings / ar-receipts / reports all green (207 tests).
+   - **Wave 19** (`c7ca491b`): 12/14 `typescript:S4325` redundant casts removed across 10 files. Removed `as UseCrudQueryReturn`, `as Partial<T>`, `as Record<string, string>`, `as unknown as Date`, and `form as unknown as UseFormReturn<...>` boilerplate from forms. Cleaned up unused `UseFormReturn` / `FieldValues` imports. Kept 2 in `AccountForm` (genuine bridge — removal causes `TS2322 'Two different types with this name exist'`). Verified: `tsc --noEmit` clean, `eslint . --fix` clean.
+   - **Wave 20** (`04e0e39f`): 4/8 `typescript:S3358` nested ternaries converted to `let content: ReactNode` + if/else early-assign pattern in `FinancialReportPageShell`, `FinancialTableReportPage`, `useEntityFormItemDialog`, and `user-guide/index.tsx`. Skipped 4 in `BankReconciliationWorkspace.tsx` — deeply nested JSX cells (~50+ lines each) tightly coupled to component-local handlers (`openAssignDialog`, `handleUnmatch`); refactor risk exceeds value. Verified: `tsc --noEmit` clean, `eslint . --fix` clean.
+
+2. Wave 13 (prior session): **Preferred fiscal year propagation across all financial transaction forms.**
    - Backend: `FiscalYearCollection::with()` now reads `?status=` from request and filters the FY pool before computing `meta.preferred_fiscal_year_id`. So `GET /api/fiscal-years?status=open` returns a preferred ID that actually exists in the filtered list. `GetPreferredFiscalYearAction` stays pure (collection-in, FY-out).
    - Frontend: `AsyncSelectField` wrapper now forwards a new optional `preferredMetaKey` prop down to `AsyncSelect`. Previously only the raw `AsyncSelect` exposed it.
    - 8 transaction forms wired up: `ApPaymentForm`, `ArReceiptForm`, `CustomerInvoiceForm`, `SupplierBillForm`, `CreditNoteForm`, `PeriodClosingForm`, `BankReconciliationForm`, `CalculateFormModal` (asset-depreciation-runs). Each now passes `preferredMetaKey="preferred_fiscal_year_id"` to its fiscal year `AsyncSelectField`.
