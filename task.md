@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-05-31 13:57 UTC
+Last updated: 2026-05-31 15:31 UTC
 
 ## Document Roles
 
@@ -11,11 +11,12 @@ Last updated: 2026-05-31 13:57 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `b12ddfc4 refactor(bank-reconciliations): remove dead currentReconciledBalance state` (3 commits this session: FY auto-select E2E, handoff doc, dead state removal). Working tree has 8 staged deletions awaiting commit (see "What changed this session" below).
-- Working tree: 8 staged deletions (orphan files audit) + untracked `.depwire/`.
-- Remote: pushed up through `b12ddfc4`. Audit deletion commit still pending user approval.
+- HEAD: `7ca7e387 chore: remove orphan e2e test helpers (-265 LOC) + ignore .depwire/` (7 commits this session: waves 22-25 + this handoff).
+- Working tree: clean.
+- Remote: pushed up through `7ca7e387`. CI run `26715694961` **all 3 jobs green ✅** (Quality 14:55Z, Playwright E2E 15:28Z, Test suite 15:28Z).
 - CI E2E is **required gate** (no `continue-on-error`).
-- Sonar Quality Gate: **OK** (verified 2026-05-31; coverage 94.9%, ncloc 93,096, dup 0.7%; OPEN code smells dropped 83 → 9 after wave 22 typescript:S6754 closed in `b12ddfc4`).
+- Sonar Quality Gate: **OK** (verified 2026-05-31; coverage 94.9%, ncloc 93,096, dup 0.7%; OPEN code smells dropped 83 → 4 across waves 18-24, all 4 remaining are deferred typescript:S3358 ternaries in BankReconciliationWorkspace).
+- Sonar Security Hotspots: 0 TO_REVIEW.
 - Module registry: 78 entries (added `fiscal-year-auto-select` cross-cutting entry in `467e916a`).
 
 ## Research Snapshot — 2026-05-31 (this session)
@@ -172,7 +173,7 @@ The codebase had several files at 0% or mid coverage despite endpoints being liv
 
 2. **Wave 22 — typescript:S6754 closed** (`b12ddfc4`): `BankReconciliationWorkspace.tsx` had `const [, setCurrentReconciledBalance] = useState<number>(...)` — destructured value omitted, only setter called from 5 sites, value never read. Removed the useState + all 5 setter calls (-18 LOC). Safe because `setCurrentDifference` already triggers re-render on every same code path. Verified: TS/ESLint/Prettier clean, Pest `bank-reconciliations` 32/32 pass (109 assertions), E2E `bank-reconciliations` + `fiscal-year-auto-select` 17/17 pass. Sonar OPEN drops 10 → 9 (verified manually; will reflect in next rescan).
 
-3. **Wave 23 — Dead code audit** (PENDING COMMIT, 8 staged deletions, -491 LOC): Audited orphan files via depwire `find_dead_code` → pivoted to scoped per-directory grep (depwire results too noisy with Laravel reflection false positives). Each candidate verified individually with broader symbol grep (catching `extends`, type annotations, named imports) and `depwire_simulate_change` (0 broken imports across all 8). Removed:
+3. **Wave 23 — Dead code audit** (`44d20327`, `b6b708a1`): Audited orphan files via depwire `find_dead_code` → pivoted to scoped per-directory grep (depwire results too noisy with Laravel reflection false positives). Each candidate verified individually with broader symbol grep (catching `extends`, type annotations, named imports) and `depwire_simulate_change` (0 broken imports across all 8). Removed (-491 LOC across 8 files):
    - `app/DTOs/Products/UpdateProductData.php` (initial scaffold orphan, never wired to controller)
    - `resources/js/components/common/CheckboxField.tsx`
    - `resources/js/components/common/ExportButton.tsx`
@@ -182,9 +183,15 @@ The codebase had several files at 0% or mid coverage despite endpoints being liv
    - `resources/js/components/common/StyledSelect.tsx`
    - `resources/js/hooks/useEntityFilters.ts`
 
-   Also re-checked Concerns/Traits, Requests, Resources, Actions, Models, Services, Domain — all alive. Verified: `tsc --noEmit` clean, PHPStan `[OK] No errors`, ESLint full repo clean, Vite build `✓ built in 16.36s`, E2E `dashboards` + `fiscal-year-auto-select` 8/8 pass, Pest `products` 53/53 pass (242 assertions). Awaiting user approval to commit.
+   Also re-checked Concerns/Traits, Requests, Resources, Actions, Models, Services, Domain — all alive. Verified: `tsc --noEmit` clean, PHPStan `[OK] No errors`, ESLint full repo clean, Vite build `✓ built in 16.36s`, E2E `dashboards` + `fiscal-year-auto-select` 8/8 pass, Pest `products` 53/53 pass (242 assertions).
 
-4. **Sonar cleanup waves 18-21** — closed 72/74 actionable OPEN issues across 4 commits (Sonar OPEN drops from 83 → 10 verified via API, all 10 with rationale skip).
+5. **Wave 24 — Sonar php:S103 noise** (`f81975ad`): Added `sonar.issue.ignore.multicriteria` to `.sonarcloud.properties` scoping `php:S103` exclusion to `app/Models/**`. Reasoning: `ide-helper:models -RW` emits PHPDoc method/property lines that frequently exceed 120 chars (Eloquent\Builder generics + long `whereXxx` scope names). Manual line-breaks would be reverted on next regen. Also marked the 2 existing OPEN `php:S103` issues in `SubscriptionBillingRecord.php` as `accept` via Sonar API (`AZ5dn1pZle0EgQmwrVe3`, `AZ5dn1pZle0EgQmwrVe4`) — they leave OPEN list immediately. Sonar OPEN: 9 → 4.
+
+6. **Wave 25 — Orphan e2e helpers + .gitignore hygiene** (`7ca7e387`): `tests/e2e/{period-closings,recurring-journals}/helpers.ts` each exported 2-3 helper functions but no spec ever imported them. The private `selectAsyncOption` inside both files is redundantly redefined across 12 sibling helpers.ts files — not a shared utility worth preserving. Removed both (-265 LOC). Also added `.depwire/` to `.gitignore` (depwire MCP cache, was showing up as untracked across all session commits). Verified: TS clean, depwire simulate 0 broken imports, E2E `period-closings` + `recurring-journals` 14/14 pass.
+
+7. **CI verification (15:30Z)**: Latest CI run `26715694961` for `7ca7e387` finished — all 3 jobs green ✅ (Quality 14:55Z, Playwright E2E 15:28Z, Test suite 15:28Z). All prior session commits cancelled by concurrency group as new pushes superseded — normal pattern, not failures.
+
+8. **Sonar cleanup waves 18-21** — closed 72/74 actionable OPEN issues across 4 commits (Sonar OPEN drops from 83 → 10 verified via API, all 10 with rationale skip).
    - **Wave 18** (`9caa14cb`): 45 `php:S1808` violations across 21 PHP files. Promoted-property constructors (6 Action + 9 Export) reformatted to multi-line param style so Duster's `single_line_empty_body` does not collapse `) {}` into something Sonar flags. `whenLoaded(name, fn () => [...])` calls in 7 Resources rewritten with each argument on its own line. Empty wrapper `StoreAccountMappingRequest` / `UpdateAccountMappingRequest` expanded with mandatory intent comment per AGENTS.md "Empty Wrapper Class" rule. Verified: PHPStan clean, Duster clean, Pest groups bank-reconciliations / period-closings / recurring-journals / stock-adjustments / stock-transfers / account-mappings / ar-receipts / reports all green (207 tests).
    - **Wave 19** (`c7ca491b`): 12/14 `typescript:S4325` redundant casts removed across 10 files. Removed `as UseCrudQueryReturn`, `as Partial<T>`, `as Record<string, string>`, `as unknown as Date`, and `form as unknown as UseFormReturn<...>` boilerplate from forms. Cleaned up unused `UseFormReturn` / `FieldValues` imports. Kept 2 in `AccountForm` (genuine bridge — removal causes `TS2322 'Two different types with this name exist'`). Verified: `tsc --noEmit` clean, `eslint . --fix` clean.
    - **Wave 20** (`04e0e39f`): 4/8 `typescript:S3358` nested ternaries converted to `let content: ReactNode` + if/else early-assign pattern in `FinancialReportPageShell`, `FinancialTableReportPage`, `useEntityFormItemDialog`, and `user-guide/index.tsx`. Skipped 4 in `BankReconciliationWorkspace.tsx` — deeply nested JSX cells (~50+ lines each) tightly coupled to component-local handlers (`openAssignDialog`, `handleUnmatch`); refactor risk exceeds value. Verified: `tsc --noEmit` clean, `eslint . --fix` clean.
@@ -230,15 +237,17 @@ Inventory transaction forms (stock-transfers, inventory-stocktakes, stock-adjust
 
 ### My recommendation for the new session
 
-The Sonar maintenance debt is essentially closed (~9 OPEN issues remain, all with rationale skip). The FY propagation feature is complete end-to-end with E2E regression coverage. Three rounds of autonomous cleanup landed this session (FY E2E spec, dead state removal, dead code audit). Remaining highest-leverage options:
+Tier A autonomous queue is fully exhausted as of 2026-05-31 15:31 UTC. Sonar maintenance debt is at hard floor (4 OPEN, all deferred ternaries with rationale). Sonar Security Hotspots: 0 TO_REVIEW. Sonar duplications: 0.7% (sub-threshold, gate OK). All app/ subdirs audited for orphans. CI green on `7ca7e387`.
 
 1. ~~**E2E coverage for default FY**~~ — ✅ DONE in `467e916a`. 4/4 cases pass.
 2. ~~**Document pattern**~~ — ✅ DONE in `467e916a`. Regression test subsection added to `docs/development-patterns.md`.
 3. ~~**typescript:S6754 in BankReconciliationWorkspace**~~ — ✅ DONE in `b12ddfc4`. -18 LOC.
-4. ~~**Dead code audit**~~ — ✅ DONE (PENDING COMMIT). 8 orphan files removed, -491 LOC.
-5. **Pivot to product feature** (P&L by Department, Aging Dashboard, Budget Management, Sales/Invoicing). Highest user value, needs domain decisions.
-6. **Continue long-line sweep** into `app/Domain/`, `app/Actions/`, `app/Services/` (~85 files). Lower value/risk than prior sweeps.
-7. **Seed dev DB** to activate financial-dashboard nav. Low risk but mutates DB state.
+4. ~~**Dead code audit (8 orphan source files)**~~ — ✅ DONE in `44d20327`. -491 LOC.
+5. ~~**Sonar php:S103 model PHPDoc noise**~~ — ✅ DONE in `f81975ad`. 9 → 4 OPEN.
+6. ~~**Orphan e2e test helpers**~~ — ✅ DONE in `7ca7e387`. -265 LOC.
+7. **Sonar duplications refactor candidate** — `AbstractApPaymentRequest` + `AbstractArReceiptRequest` share ~20 lines of transaction header validation (branch_id, fiscal_year_id, payment_date, bank_account_id, currency). Trait extraction possible (-10 LOC net) but not autonomous-eligible: modifies validation surface, sub-threshold metric (gate OK), and clean extraction needs `array_merge` orchestration that hurts the flat-rule readability. Defer to explicit user direction.
+8. **Pivot to product feature** (P&L by Department, Aging Dashboard, Budget Management, Sales/Invoicing). Highest user value, needs domain decisions.
+9. **Seed dev DB** to activate financial-dashboard nav. Low risk but mutates DB state.
 
 If user just says "lanjutkan" without direction, ASK rather than picking — autonomous Tier A work is exhausted; remaining choices need product/domain input.
 
