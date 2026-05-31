@@ -529,17 +529,25 @@ export const ImportBankStatementDialog = memo<ImportBankStatementDialogProps>(
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {previewRows.map((row, idx) => (
-                                            <TableRow key={idx}>
-                                                {headers.map((header) => (
-                                                    <TableCell key={header}>
-                                                        {String(
-                                                            row[header] ?? '',
-                                                        )}
-                                                    </TableCell>
-                                                ))}
-                                            </TableRow>
-                                        ))}
+                                        {previewRows.map((row, idx) => {
+                                            const rowKey = `preview-${idx}-${headers
+                                                .map((h) => String(row[h] ?? ''))
+                                                .join('|')}`;
+                                            return (
+                                                <TableRow key={rowKey}>
+                                                    {headers.map((header) => (
+                                                        <TableCell
+                                                            key={header}
+                                                        >
+                                                            {String(
+                                                                row[header] ??
+                                                                    '',
+                                                            )}
+                                                        </TableCell>
+                                                    ))}
+                                                </TableRow>
+                                            );
+                                        })}
                                     </TableBody>
                                 </Table>
                             </ScrollArea>

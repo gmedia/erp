@@ -161,7 +161,7 @@ export function useComparisonFinancialReportPage<TReport>({
     const fiscalYears = data?.fiscalYears || [];
     const selectedYearId = data?.selectedYearId || 0;
     const comparisonYearId = data?.comparisonYearId;
-    const report = data?.report || emptyReport;
+    const report = data?.report ?? emptyReport;
     const computedSections = data?.computed_sections || [];
     const { selectedFiscalYear, selectedComparisonFiscalYear } =
         resolveComparisonFiscalYears(

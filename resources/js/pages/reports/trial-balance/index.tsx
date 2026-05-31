@@ -120,7 +120,7 @@ export default function TrialBalance() {
                 ]}
                 emptyMessage="No data available for the selected fiscal year."
                 scrollAreaClassName="max-h-[calc(100vh-18rem)]"
-                footerClassName={!isBalanced ? 'text-destructive' : undefined}
+                footerClassName={isBalanced ? undefined : 'text-destructive'}
             >
                 {!isBalanced && report.length > 0 && (
                     <div className="mt-3 rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">

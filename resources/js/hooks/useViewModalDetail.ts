@@ -44,5 +44,5 @@ export function useViewModalDetail<TItem extends ViewModalDetailItem>({
         load();
     }, [endpoint, open, item]);
 
-    return detail || item;
+    return detail ?? item;
 }

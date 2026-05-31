@@ -12,7 +12,7 @@ export function EntityAuditFooter({
     createdBy,
     confirmedBy,
     confirmedAt,
-}: EntityAuditFooterProps) {
+}: Readonly<EntityAuditFooterProps>) {
     return (
         <div className="pt-4 text-sm text-muted-foreground">
             <div>Created by: {createdBy?.name || 'System'}</div>

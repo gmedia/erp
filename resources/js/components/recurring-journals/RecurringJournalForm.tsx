@@ -147,10 +147,10 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
         };
 
         const handleSaveLine = (data: RecurringJournalLine) => {
-            if (editingIndex !== null) {
-                update(editingIndex, data);
-            } else {
+            if (editingIndex === null) {
                 append(data);
+            } else {
+                update(editingIndex, data);
             }
             setIsItemDialogOpen(false);
             setEditingIndex(null);

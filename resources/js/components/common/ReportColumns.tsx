@@ -83,10 +83,10 @@ export function formatWarehouseCodeLabel(
 export function SummaryCell({
     primary,
     secondary,
-}: {
+}: Readonly<{
     primary: DisplayValue;
     secondary: DisplayValue;
-}) {
+}>) {
     return (
         <div className="space-y-0.5">
             <div className="font-medium">{resolveDisplayValue(primary)}</div>
@@ -100,18 +100,18 @@ export function SummaryCell({
 export function TextCell({
     value,
     className,
-}: {
+}: Readonly<{
     value: DisplayValue;
     className?: string;
-}) {
+}>) {
     return <div className={className}>{resolveDisplayValue(value)}</div>;
 }
 
 export function WarehouseSummaryCell({
     warehouse,
-}: {
+}: Readonly<{
     warehouse: WarehouseSummary;
-}) {
+}>) {
     return (
         <SummaryCell
             primary={warehouse?.name}
@@ -126,10 +126,10 @@ export function WarehouseSummaryCell({
 export function StatusBadgeCell({
     value,
     variant = 'outline',
-}: {
+}: Readonly<{
     value: string | null | undefined;
     variant?: ComponentProps<typeof Badge>['variant'];
-}) {
+}>) {
     return (
         <Badge variant={variant} className="capitalize">
             {formatReportLabel(value)}

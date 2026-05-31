@@ -78,7 +78,7 @@ export function TransactionLineItemsTable<T extends TransactionLineItem>({
     onEdit,
     onRemove,
     emptyMessage = "No items added yet. Click 'Add Item' to start.",
-}: TransactionLineItemsTableProps<T>) {
+}: Readonly<TransactionLineItemsTableProps<T>>) {
     const colSpan = includeDiscount ? 9 : 8;
 
     if (items.length === 0) {

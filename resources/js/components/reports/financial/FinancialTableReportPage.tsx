@@ -153,7 +153,7 @@ export function useSingleYearFinancialReportPage<TReport>({
         ? data.fiscalYears
         : [];
     const selectedYearId = data?.selectedYearId || 0;
-    const report = data?.report || emptyReport;
+    const report = data?.report ?? emptyReport;
     const computedSections = data?.computed_sections || [];
     const selectedFiscalYear = resolveSelectedFiscalYear(
         fiscalYears,
