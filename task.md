@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-05-31 12:21 UTC
+Last updated: 2026-05-31 13:11 UTC
 
 ## Document Roles
 
@@ -11,12 +11,12 @@ Last updated: 2026-05-31 12:21 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `9b4c7265 chore: remove dead trial-balance Columns + Filters` (post waves 18-21 + dead code cleanup).
-- Working tree: clean (will have 1 modified after this update).
-- Remote: pushed (up to date). CI status `e36e0ed8` = success (full pipeline lulus); `9b4c7265` queued.
+- HEAD: `467e916a test(e2e): add fiscal year auto-select regression spec` (post waves 18-21 + dead code cleanup + FY auto-select regression spec).
+- Working tree: clean (only untracked `.depwire/` cache dir).
+- Remote: pushed (up to date).
 - CI E2E is **required gate** (no `continue-on-error`).
 - Sonar Quality Gate: **OK** (verified 2026-05-31; coverage 94.9%, ncloc 93,096, dup 0.7%; OPEN code smells dropped 83 → 10 after waves 18-21).
-- Module registry: 77 entries.
+- Module registry: 78 entries (added `fiscal-year-auto-select` cross-cutting entry).
 
 ## Research Snapshot — 2026-05-31 (this session)
 
@@ -168,7 +168,9 @@ The codebase had several files at 0% or mid coverage despite endpoints being liv
 
 ## What changed this session
 
-1. **Sonar cleanup waves 18-21** — closed 72/74 actionable OPEN issues across 4 commits (Sonar OPEN drops from 83 → 10 verified via API, all 10 with rationale skip).
+1. **FY auto-select E2E regression spec** (`467e916a`): added `tests/e2e/fiscal-year-auto-select/fiscal-year-auto-select.spec.ts` (90 LOC, 4 cases). Covers AP Payment, AR Receipt, Period Closing, Bank Reconciliation — one per backend filter shape (no filter for AP/AR, `?status=open` for period-closings/bank-reconciliations). Each case opens the `Add` dialog, waits for `/api/fiscal-years`, polls the FY combobox text until the placeholder is gone (`/^select/i`). Guards `FiscalYearCollection.meta.preferred_fiscal_year_id` + `AsyncSelectField.preferredMetaKey` wiring landed in wave 13. Run via `PLAYWRIGHT_USE_SAIL=1 ./vendor/bin/sail npx playwright test tests/e2e/fiscal-year-auto-select/`. Also added Regression test subsection in `docs/development-patterns.md` and cross-cutting entry in `docs/module-registry.md`. Verified: TS clean, ESLint clean, Prettier clean, 4/4 spec pass in ~27s. **Bug caught during dev**: initial fixture had hardcoded lowercase placeholder `'Select fiscal year'` copied from AP Payment, but AR/Period/Bank forms use Title Case `'Select Fiscal Year'`. Would have produced silent false-green on AP and false-red on others. Fixed by polling for `/^select/i` mismatch instead of literal placeholder.
+
+2. **Sonar cleanup waves 18-21** — closed 72/74 actionable OPEN issues across 4 commits (Sonar OPEN drops from 83 → 10 verified via API, all 10 with rationale skip).
    - **Wave 18** (`9caa14cb`): 45 `php:S1808` violations across 21 PHP files. Promoted-property constructors (6 Action + 9 Export) reformatted to multi-line param style so Duster's `single_line_empty_body` does not collapse `) {}` into something Sonar flags. `whenLoaded(name, fn () => [...])` calls in 7 Resources rewritten with each argument on its own line. Empty wrapper `StoreAccountMappingRequest` / `UpdateAccountMappingRequest` expanded with mandatory intent comment per AGENTS.md "Empty Wrapper Class" rule. Verified: PHPStan clean, Duster clean, Pest groups bank-reconciliations / period-closings / recurring-journals / stock-adjustments / stock-transfers / account-mappings / ar-receipts / reports all green (207 tests).
    - **Wave 19** (`c7ca491b`): 12/14 `typescript:S4325` redundant casts removed across 10 files. Removed `as UseCrudQueryReturn`, `as Partial<T>`, `as Record<string, string>`, `as unknown as Date`, and `form as unknown as UseFormReturn<...>` boilerplate from forms. Cleaned up unused `UseFormReturn` / `FieldValues` imports. Kept 2 in `AccountForm` (genuine bridge — removal causes `TS2322 'Two different types with this name exist'`). Verified: `tsc --noEmit` clean, `eslint . --fix` clean.
    - **Wave 20** (`04e0e39f`): 4/8 `typescript:S3358` nested ternaries converted to `let content: ReactNode` + if/else early-assign pattern in `FinancialReportPageShell`, `FinancialTableReportPage`, `useEntityFormItemDialog`, and `user-guide/index.tsx`. Skipped 4 in `BankReconciliationWorkspace.tsx` — deeply nested JSX cells (~50+ lines each) tightly coupled to component-local handlers (`openAssignDialog`, `handleUnmatch`); refactor risk exceeds value. Verified: `tsc --noEmit` clean, `eslint . --fix` clean.
@@ -214,10 +216,10 @@ Inventory transaction forms (stock-transfers, inventory-stocktakes, stock-adjust
 
 ### My recommendation for the new session
 
-The Sonar maintenance debt is essentially closed (~9 OPEN issues remain, all with rationale skip). The FY propagation feature is complete end-to-end. Highest-leverage remaining options diverge in goal:
+The Sonar maintenance debt is essentially closed (~9 OPEN issues remain, all with rationale skip). The FY propagation feature is complete end-to-end **and now has E2E regression coverage** (`467e916a`). Highest-leverage remaining options diverge in goal:
 
-1. **E2E coverage for default FY** — add Playwright spec verifying default FY auto-selected in financial transaction forms (open `New AP Payment`, assert `fiscal_year_id` filled). Regression safety for the wave 13 change.
-2. **Document pattern** — add snippet in `docs/development-patterns.md` for "How to default fiscal year in a form" with `AsyncSelectField preferredMetaKey` + status filter caveat. Onboarding clarity.
+1. ~~**E2E coverage for default FY**~~ — ✅ DONE in `467e916a`. 4/4 cases pass.
+2. ~~**Document pattern**~~ — ✅ DONE in `467e916a`. Regression test subsection added to `docs/development-patterns.md`.
 3. **Pivot to product feature** (P&L by Department, Aging Dashboard, Budget Management, Sales/Invoicing). Highest user value, needs domain decisions.
 4. **Continue long-line sweep** into `app/Domain/`, `app/Actions/`, `app/Services/` (~85 files). Lower value/risk than prior sweeps.
 5. **Seed dev DB** to activate financial-dashboard nav. Low risk but mutates DB state.
