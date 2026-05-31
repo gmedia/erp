@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo } from 'react';
-import { useForm, type UseFormReturn } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
@@ -177,21 +177,11 @@ export const ProductForm = memo<ProductFormProps>(function ProductForm({
 
     return (
         <EntityForm
-            form={
-                form as unknown as UseFormReturn<
-                    ProductFormData,
-                    unknown,
-                    ProductFormData
-                >
-            }
+            form={form}
             open={open}
             onOpenChange={onOpenChange}
             title={entity ? 'Edit Product/Service' : 'Add New Product/Service'}
-            onSubmit={
-                onSubmit as unknown as (
-                    data: z.input<typeof productFormSchema>,
-                ) => void
-            }
+            onSubmit={onSubmit}
             isLoading={isLoading}
         >
             {renderGeneralInfoSection()}

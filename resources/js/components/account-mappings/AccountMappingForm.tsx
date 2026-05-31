@@ -13,7 +13,7 @@ import {
 } from '@/utils/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useMemo, useRef } from 'react';
-import { useForm, type FieldValues, type UseFormReturn } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 interface AccountMappingFormProps {
@@ -121,14 +121,8 @@ export function AccountMappingForm({
             title={
                 activeEntity ? 'Edit Account Mapping' : 'Create Account Mapping'
             }
-            form={
-                form as unknown as UseFormReturn<
-                    AccountMappingFormData,
-                    unknown,
-                    AccountMappingFormData
-                >
-            }
-            onSubmit={onSubmit as unknown as (values: FieldValues) => void}
+            form={form}
+            onSubmit={onSubmit}
             isLoading={isLoading}
         >
             <AsyncSelectField<CoaVersion>

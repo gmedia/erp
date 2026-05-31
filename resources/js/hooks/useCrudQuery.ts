@@ -97,5 +97,5 @@ export function useCrudQuery<Entity>({
             total: 0,
             last_page: 1,
         },
-    } as UseCrudQueryReturn<Entity>;
+    };
 }

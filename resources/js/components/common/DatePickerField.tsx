@@ -51,7 +51,7 @@ export function DatePickerField({
                                 >
                                     {field.value ? (
                                         formatDateByRegionalSettings(
-                                            field.value as unknown as Date,
+                                            field.value,
                                         )
                                     ) : (
                                         <span>{placeholder}</span>

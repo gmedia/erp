@@ -103,7 +103,7 @@ export const AssetModelForm = memo<AssetModelFormProps>(
                 ...data,
                 specs: data.specs ? JSON.parse(data.specs) : null,
             };
-            onSubmit(submitData as unknown as AssetModelFormData);
+            onSubmit(submitData);
         };
 
         return (

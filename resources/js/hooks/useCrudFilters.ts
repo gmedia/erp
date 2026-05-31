@@ -126,7 +126,7 @@ export function useCrudFilters<T extends FilterState = FilterState>({
 
     const handleSearchChange = useCallback(
         (search: string) => {
-            setFiltersWithReset({ ...filters, search } as Partial<T>);
+            setFiltersWithReset({ ...filters, search });
         },
         [filters, setFiltersWithReset],
     );

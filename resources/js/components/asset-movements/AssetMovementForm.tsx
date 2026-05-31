@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { memo, useEffect, useMemo } from 'react';
-import { useForm, type UseFormReturn } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
@@ -134,13 +134,7 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
 
         return (
             <EntityForm<AssetMovementFormData>
-                form={
-                    form as unknown as UseFormReturn<
-                        AssetMovementFormData,
-                        unknown,
-                        AssetMovementFormData
-                    >
-                }
+                form={form}
                 open={open}
                 onOpenChange={onOpenChange}
                 title={formTitle}

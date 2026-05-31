@@ -158,7 +158,7 @@ export default function StockMonitorPage() {
             meta={meta}
             isLoading={isLoading}
             filterValue={String(filters.search ?? '')}
-            filters={filters as Record<string, string>}
+            filters={filters}
             filterFields={filterFields}
             exportEndpoint="/api/stock-monitor/export"
             entityName="Stock Monitor"

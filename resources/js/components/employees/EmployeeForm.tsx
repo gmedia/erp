@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo } from 'react';
-import { useForm, type UseFormReturn } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 import { format } from 'date-fns';
@@ -197,13 +197,7 @@ export const EmployeeForm = memo<EmployeeFormProps>(function EmployeeForm({
 
     return (
         <EntityForm<EmployeeFormData>
-            form={
-                form as unknown as UseFormReturn<
-                    EmployeeFormData,
-                    unknown,
-                    EmployeeFormData
-                >
-            }
+            form={form}
             open={open}
             onOpenChange={onOpenChange}
             title={entity ? 'Edit Employee' : 'Add New Employee'}

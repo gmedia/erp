@@ -1,6 +1,5 @@
 'use client';
 
-import { type UseFormReturn } from 'react-hook-form';
 import * as z from 'zod';
 
 import { DatePickerField } from '@/components/common/DatePickerField';
@@ -60,13 +59,7 @@ export function FiscalYearForm({
 
     return (
         <EntityForm<FiscalYearFormData>
-            form={
-                form as unknown as UseFormReturn<
-                    FiscalYearFormData,
-                    unknown,
-                    FiscalYearFormData
-                >
-            }
+            form={form}
             open={open}
             onOpenChange={onOpenChange}
             title={entity ? 'Edit Fiscal Year' : 'Add New Fiscal Year'}
