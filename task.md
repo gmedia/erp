@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-05-31 05:25 UTC
+Last updated: 2026-05-31 06:08 UTC
 
 ## Document Roles
 
@@ -11,12 +11,68 @@ Last updated: 2026-05-31 05:25 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `b47da14a refactor(controllers): split long lines across 15 Controller files (Sonar php:S103)`
-- Working tree: clean.
-- Remote: pushed (up to date — `git rev-list --count origin/main..HEAD` returns 0).
+- HEAD: `a3ca0665 docs(task): document Sonar php:S103 sweep waves 14-17`
+- Working tree: clean (will have 1 modified after this update).
+- Remote: pushed (up to date).
 - CI E2E is **required gate** (no `continue-on-error`).
-- Sonar: Quality Gate **OK** at last scan; rescan pending for waves 6-17.
-- Module registry: 76 entries + financial-dashboard.
+- Sonar Quality Gate: **OK** (verified 2026-05-31 via API; coverage 94.9%, ncloc 93,096, dup 0.7%, 83 OPEN code smells).
+- Module registry: 77 entries.
+
+## Research Snapshot — 2026-05-31 (this session)
+
+Read-only audit results, gathered via Sonar API + Depwire MCP + filesystem audit. No production files changed.
+
+### Sonar Quality Gate
+
+| Metric | Value |
+|---|---|
+| Quality Gate | **OK** |
+| Coverage | 94.9% |
+| Duplicated lines density | 0.7% |
+| ncloc | 93,096 |
+| Bugs | 0 |
+| Vulnerabilities | 0 |
+| Code smells (OPEN) | 83 |
+
+### OPEN issue breakdown
+
+| Rule | Count | Severity | Effort | Origin |
+|---|---|---|---|---|
+| `php:S1808` | 45 | MINOR | 45min | Introduced by waves 14-17 (mixed inline/newline arg patterns) |
+| `typescript:S4325` | 14 | MINOR | 14min | Pre-existing — redundant TS type assertions |
+| `typescript:S3358` | 8 | MINOR | 8min | Pre-existing — nested ternary |
+| `typescript:S6759` | 6 | MINOR | 6min | Pre-existing |
+| `typescript:S6606` | 3 | MINOR | 3min | Pre-existing |
+| `typescript:S7735` | 2 | MINOR | 2min | Pre-existing |
+| `php:S103` | 2 | MAJOR | 2min | Auto-generated ide-helper — cannot fix |
+| Other TS | ~3 | MINOR | 3min | Pre-existing |
+| **Total** | **83** | | **165min** | |
+
+**php:S103 net result**: 195 violations closed across 75 files in waves 14-17. Only 2 OPEN remain (auto-generated, intentionally skipped).
+
+### Depwire architecture summary
+
+- Health score: 56/100, grade F (typical Laravel false positive — heavy reflection-based callable resolution)
+- Files: 2,560 total (PHP 1,885, TS 671, JS 4)
+- Symbols: 27,592 | Edges: 9,194
+- Circular deps: **0**
+- Coupling: avg 1.8 connections per file (grade A)
+- Most-connected: `Branch.php` (123), `User.php` (104), `FiscalYear.php` (95)
+- God files (>14 conn): 92 — typical for Laravel models with many `belongsTo`/`hasMany`
+- Orphan files: 545 (21%) — includes legitimate `_ide_helper.php`, abstract Request bases, factories
+- Note: "dead code 90.9%" is a false positive for Laravel (closure-based routing, factory states, model accessors are not statically detectable)
+
+### Test inventory
+
+| Type | Count |
+|---|---|
+| Pest test files | 553 |
+| E2E spec files | 100 |
+| E2E directories (modules covered) | 87 |
+| Modules with single E2E spec | 78 |
+| Modules with multiple E2E specs | 8 |
+
+Multi-spec modules: `accounts` (5), `pipelines` (3), `assets` (3), `asset-stocktakes` (2), `employees` (2), `entity-state-actions` (2), `misc` (2), `suppliers` (2). Most modules rely on a single `{slug}.spec.ts` covering the 9-10 standard CRUD test cases.
 
 ## Sonar php:S103 Sweep — Waves 14-17 (this session)
 
