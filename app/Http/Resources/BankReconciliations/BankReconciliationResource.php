@@ -22,8 +22,15 @@ class BankReconciliationResource extends JsonResource
             'difference' => (float) $this->resource->difference,
             'status' => $this->resource->status,
             'notes' => $this->resource->notes,
-            'account' => $this->whenLoaded('account', fn () => ['id' => $this->resource->account->id, 'code' => $this->resource->account->code, 'name' => $this->resource->account->name]),
-            'fiscal_year' => $this->whenLoaded('fiscalYear', fn () => ['id' => $this->resource->fiscalYear->id, 'name' => $this->resource->fiscalYear->name]),
+            'account' => $this->whenLoaded('account', fn () => [
+                'id' => $this->resource->account->id,
+                'code' => $this->resource->account->code,
+                'name' => $this->resource->account->name,
+            ]),
+            'fiscal_year' => $this->whenLoaded('fiscalYear', fn () => [
+                'id' => $this->resource->fiscalYear->id,
+                'name' => $this->resource->fiscalYear->name,
+            ]),
             'items' => $this->whenLoaded('items', fn () => $this->resource->items->map(fn ($item) => [
                 'id' => $item->id,
                 'journal_entry_line_id' => $item->journal_entry_line_id,
@@ -43,7 +50,10 @@ class BankReconciliationResource extends JsonResource
                 ] : null,
                 'journal_entry_number' => $item->journalEntryLine?->journalEntry?->entry_number,
             ])->values()->all()),
-            'completed_by' => $this->whenLoaded('completedBy', fn () => ['id' => $this->resource->completed_by, 'name' => $this->resource->completedBy?->name]),
+            'completed_by' => $this->whenLoaded('completedBy', fn () => [
+                'id' => $this->resource->completed_by,
+                'name' => $this->resource->completedBy?->name,
+            ]),
             'completed_at' => $this->resource->completed_at?->toIso8601String(),
             'created_at' => $this->resource->created_at?->toIso8601String(),
             'updated_at' => $this->resource->updated_at?->toIso8601String(),
