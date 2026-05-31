@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-05-31 09:16 UTC
+Last updated: 2026-05-31 12:21 UTC
 
 ## Document Roles
 
@@ -11,11 +11,11 @@ Last updated: 2026-05-31 09:16 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `<wave-21-or-later> + style: apply CI autofixes` (post wave 21).
+- HEAD: `9b4c7265 chore: remove dead trial-balance Columns + Filters` (post waves 18-21 + dead code cleanup).
 - Working tree: clean (will have 1 modified after this update).
-- Remote: pushed (up to date).
+- Remote: pushed (up to date). CI status `e36e0ed8` = success (full pipeline lulus); `9b4c7265` queued.
 - CI E2E is **required gate** (no `continue-on-error`).
-- Sonar Quality Gate: **OK** (verified 2026-05-31; coverage 94.9%, ncloc 93,096, dup 0.7%; OPEN code smells dropped from 83 → ~9 after waves 18-21).
+- Sonar Quality Gate: **OK** (verified 2026-05-31; coverage 94.9%, ncloc 93,096, dup 0.7%; OPEN code smells dropped 83 → 10 after waves 18-21).
 - Module registry: 77 entries.
 
 ## Research Snapshot — 2026-05-31 (this session)
@@ -168,13 +168,16 @@ The codebase had several files at 0% or mid coverage despite endpoints being liv
 
 ## What changed this session
 
-1. **Sonar cleanup waves 18-21** — closed 72/74 actionable OPEN issues across 4 commits (Sonar OPEN drops from 83 → ~9, mostly auto-generated ide-helper or genuinely-skip-rationale).
+1. **Sonar cleanup waves 18-21** — closed 72/74 actionable OPEN issues across 4 commits (Sonar OPEN drops from 83 → 10 verified via API, all 10 with rationale skip).
    - **Wave 18** (`9caa14cb`): 45 `php:S1808` violations across 21 PHP files. Promoted-property constructors (6 Action + 9 Export) reformatted to multi-line param style so Duster's `single_line_empty_body` does not collapse `) {}` into something Sonar flags. `whenLoaded(name, fn () => [...])` calls in 7 Resources rewritten with each argument on its own line. Empty wrapper `StoreAccountMappingRequest` / `UpdateAccountMappingRequest` expanded with mandatory intent comment per AGENTS.md "Empty Wrapper Class" rule. Verified: PHPStan clean, Duster clean, Pest groups bank-reconciliations / period-closings / recurring-journals / stock-adjustments / stock-transfers / account-mappings / ar-receipts / reports all green (207 tests).
    - **Wave 19** (`c7ca491b`): 12/14 `typescript:S4325` redundant casts removed across 10 files. Removed `as UseCrudQueryReturn`, `as Partial<T>`, `as Record<string, string>`, `as unknown as Date`, and `form as unknown as UseFormReturn<...>` boilerplate from forms. Cleaned up unused `UseFormReturn` / `FieldValues` imports. Kept 2 in `AccountForm` (genuine bridge — removal causes `TS2322 'Two different types with this name exist'`). Verified: `tsc --noEmit` clean, `eslint . --fix` clean.
    - **Wave 20** (`04e0e39f`): 4/8 `typescript:S3358` nested ternaries converted to `let content: ReactNode` + if/else early-assign pattern in `FinancialReportPageShell`, `FinancialTableReportPage`, `useEntityFormItemDialog`, and `user-guide/index.tsx`. Skipped 4 in `BankReconciliationWorkspace.tsx` — deeply nested JSX cells (~50+ lines each) tightly coupled to component-local handlers (`openAssignDialog`, `handleUnmatch`); refactor risk exceeds value. Verified: `tsc --noEmit` clean, `eslint . --fix` clean.
-   - **Wave 21**: 11/14 frontend lint issues across 9 files. Mechanical fixes: `Readonly<...>` wrap on inline component prop types (S6759 ×6), `||`→`??` on nullable fallback expressions (S6606 ×3), flipped negated conditions (S7735 ×2), composite stable key replacing array-index in `ImportBankStatementDialog` preview (S6479 ×1). Skipped: 1 `S6754` (semantics change risk), 1 `S6478` (Sonar false positive on render prop closure). Verified: `tsc --noEmit` clean, `eslint . --fix` clean.
+   - **Wave 21** (`246f9403`): 11/14 frontend lint issues across 9 files. Mechanical fixes: `Readonly<...>` wrap on inline component prop types (S6759 ×6), `||`→`??` on nullable fallback expressions (S6606 ×3), flipped negated conditions (S7735 ×2), composite stable key replacing array-index in `ImportBankStatementDialog` preview (S6479 ×1). Skipped: 1 `S6754` (semantics change risk), 1 `S6478` (Sonar false positive on render prop closure). Verified: `tsc --noEmit` clean, `eslint . --fix` clean.
+   - **Dead code cleanup** (`9b4c7265`): removed `resources/js/components/reports/trial-balance/Columns.tsx` + `Filters.tsx` (96 LOC). Both files defined symbols (`createTrialBalanceFilterFields`, `trialBalanceColumns`, `TrialBalanceItem`) but were never imported anywhere. The actual trial-balance report page uses `FinancialReportPageShell` + inline `AccountItem` type instead. Verified via `git grep` that only self-references existed. TS + ESLint stay clean post-deletion.
 
-2. Wave 13 (prior session): **Preferred fiscal year propagation across all financial transaction forms.**
+2. **FY propagation audit** (`e36e0ed8`): documented the audit conclusion that all 8 financial transaction forms (`ApPaymentForm`, `ArReceiptForm`, `CustomerInvoiceForm`, `SupplierBillForm`, `CreditNoteForm`, `PeriodClosingForm`, `BankReconciliationForm`, `CalculateFormModal`) already have `preferredMetaKey="preferred_fiscal_year_id"` wired since wave 13. Inventory transaction forms (stock-transfers, inventory-stocktakes, stock-adjustments, purchase-orders, purchase-requests, goods-receipts, supplier-returns) intentionally do NOT have a `fiscal_year_id` field — they derive FY backend-side from transaction date. The remaining FY references in the frontend are filter contexts (CoaVersionFilters, PeriodClosingFilters — intentional skip, default = "all"), backend-resolved report shells (FinancialReportPageShell uses `InteractsWithFinancialReportRequest` trait), or static SelectField create form (CoaVersionForm — explicit user choice intentional). No actionable gap remained.
+
+3. Wave 13 (prior session): **Preferred fiscal year propagation across all financial transaction forms.**
    - Backend: `FiscalYearCollection::with()` now reads `?status=` from request and filters the FY pool before computing `meta.preferred_fiscal_year_id`. So `GET /api/fiscal-years?status=open` returns a preferred ID that actually exists in the filtered list. `GetPreferredFiscalYearAction` stays pure (collection-in, FY-out).
    - Frontend: `AsyncSelectField` wrapper now forwards a new optional `preferredMetaKey` prop down to `AsyncSelect`. Previously only the raw `AsyncSelect` exposed it.
    - 8 transaction forms wired up: `ApPaymentForm`, `ArReceiptForm`, `CustomerInvoiceForm`, `SupplierBillForm`, `CreditNoteForm`, `PeriodClosingForm`, `BankReconciliationForm`, `CalculateFormModal` (asset-depreciation-runs). Each now passes `preferredMetaKey="preferred_fiscal_year_id"` to its fiscal year `AsyncSelectField`.
@@ -277,40 +280,69 @@ gh run list --branch main --limit 5
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo on `main` at HEAD `a53ca8a3` or later (wave 13
-committed and pushed).
+Read task.md first. Repo on `main` at HEAD `9b4c7265` or later
+(post waves 18-21 + dead code cleanup).
 
-Wave 13 just landed: Preferred fiscal year propagation across all financial
-transaction forms. Backend FiscalYearCollection now respects ?status= filter
-when computing meta.preferred_fiscal_year_id. Frontend AsyncSelectField wrapper
-now forwards preferredMetaKey to AsyncSelect. 8 forms wired: ApPayment,
-ArReceipt, CustomerInvoice, SupplierBill, CreditNote, PeriodClosing,
-BankReconciliation, AssetDepreciationRun calculate modal.
+This session (2026-05-31) closed 73/74 actionable Sonar OPEN issues
+across 4 cleanup waves + dead code removal:
 
-Single backend change + one wrapper prop = 8 forms auto-default FY without
-per-form duplication. Memory context "single backend + minimal frontend
-propagates without per-page edits" achieved for both report pages (already
-done) and now transaction forms.
+- Wave 18 (9caa14cb): 45 php:S1808 across 21 PHP files (promoted-property
+  constructors, whenLoaded() calls, empty wrapper requests reformatted).
+- Wave 19 (c7ca491b): 12/14 typescript:S4325 redundant casts in 10 files.
+  Kept 2 in AccountForm (genuine generic bridge, TS2322 if removed).
+- Wave 20 (04e0e39f): 4/8 typescript:S3358 nested ternaries in 4 files.
+  Skipped 4 in BankReconciliationWorkspace (deeply nested JSX, refactor
+  risk exceeds value).
+- Wave 21 (246f9403): 11/14 frontend lint (S6759 ×6, S6606 ×3, S7735 ×2,
+  S6479 ×1) in 9 files. Skipped 1 S6754 (semantics risk) + 1 S6478
+  (Sonar false positive on render prop closure).
+- Dead code (9b4c7265): removed resources/js/components/reports/trial-balance/
+  Columns.tsx + Filters.tsx (96 LOC). Both defined but never imported;
+  page uses FinancialReportPageShell + inline AccountItem instead.
 
-Verifications green: tsc, eslint, PHPStan, Duster, Pest groups
-fiscal-years/ap-payments/ar-receipts/customer-invoices/supplier-bills/
-credit-notes/period-closings/bank-reconciliations/asset-depreciation-runs
-(150 pass, 642 assertions, +2 new cases in FiscalYearCollectionTest).
+Sonar OPEN dropped from 83 → 10. Remaining 10 all have rationale skip:
+- 2 php:S103 (auto-generated ide-helper, cannot fix)
+- 2 typescript:S4325 (AccountForm generic bridge)
+- 4 typescript:S3358 (BankReconciliationWorkspace JSX cells)
+- 1 typescript:S6754 (useState semantic risk)
+- 1 typescript:S6478 (Sonar false positive render prop)
+
+FY propagation audit completed (e36e0ed8): all 8 financial transaction
+forms already wired correctly with preferredMetaKey since wave 13.
+Inventory transaction forms don't have a fiscal_year_id field (FY
+derived backend-side from transaction date). No actionable gaps.
+
+CI status verification: e36e0ed8 = success (full pipeline pass).
+9b4c7265 push triggered new run, may still be queued.
 
 Before reacting to red CI runs: read the "CI Autofix Supersede Pattern"
 section. Most reds in `gh run list` are concurrency-cancels or
 autofix-supersedes. Verify via the latest run on HEAD.
 
-Suggested next steps if user wants more autonomous work:
+Repo is in a stable state. Sonar maintenance debt practically closed.
+No autonomous work remaining without user decisions on direction.
+
+Suggested next steps if user wants to keep going:
 1. E2E spec verifying default FY auto-selected in transaction forms
-   (Playwright case opening New AP Payment, asserting fiscal_year_id filled).
-2. Document the preferredMetaKey pattern in docs/development-patterns.md.
-3. Seed dev DB to activate financial-dashboard nav (needs go-ahead).
-4. Pivot to product feature (P&L by Department, Aging, Budget,
-   Sales/Invoicing) — needs domain decisions.
-5. Continue long-line sweep into Domain/Actions/Services — ~85 files,
-   lower value/risk ratio than prior sweeps.
+   (Playwright case opening New AP Payment, asserting fiscal_year_id
+   filled). Regression safety. Requires user choice on scope (cover
+   all 8 forms or representative subset like AP+AR only).
+2. Pivot to product feature: P&L by Department, Aging Dashboard,
+   Budget Management, Sales/Invoicing. Highest user value but needs
+   domain priority pick.
+3. Seed dev DB to activate financial-dashboard nav
+   (`sail artisan db:seed --class=MenuSeeder --class=PermissionSeeder`).
+   Mutates state, reversible via fresh migrate.
+4. Refactor 1 remaining typescript:S6754 in BankReconciliationWorkspace.
+   useState setter-only used 5×, value never read. Convert to useRef.
+   Risk: changes re-render semantics if any consumer relied on state
+   tracking. Requires careful read of all 5 setter call sites.
+5. Wider dead code audit beyond trial-balance. Depwire reports 7000+
+   "dead" symbols but most are Laravel reflection false positives
+   (closure routes, factory states, model accessors). Need manual
+   per-file verification with grep, similar to trial-balance approach.
 
 If user input is "lanjutkan" or similar without new direction, ASK
-which branch to take rather than picking unilaterally.
+which branch to take rather than picking unilaterally. The session
+2026-05-31 already exhausted the obvious autonomous tasks.
 ```
