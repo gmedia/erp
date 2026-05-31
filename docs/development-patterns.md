@@ -38,6 +38,7 @@ export default createEntityCrudPage(config);
 Registrasi di `resources/js/utils/entityConfigs.ts`:
 
 **Simple CRUD** (hanya name field):
+
 ```tsx
 export const xxxConfig = createSimpleEntityConfig({
     entityName: 'Xxx',
@@ -48,6 +49,7 @@ export const xxxConfig = createSimpleEntityConfig({
 ```
 
 **Complex CRUD** (custom columns, filters, form, view modal):
+
 ```tsx
 export const xxxConfig = createComplexEntityConfig<Xxx>({
     entityName: 'Xxx',
@@ -78,7 +80,7 @@ import { xxxFormSchema, type XxxFormData } from '@/utils/schemas';
 interface XxxFormProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    entity?: Xxx | null;          // ← selalu gunakan 'entity' sebagai prop name
+    entity?: Xxx | null; // ← selalu gunakan 'entity' sebagai prop name
     onSubmit: (data: XxxFormData) => void;
     isLoading?: boolean;
 }
@@ -89,7 +91,11 @@ const getDefaults = (entity?: Xxx | null): XxxFormData => ({
 });
 
 export const XxxForm = memo<XxxFormProps>(function XxxForm({
-    open, onOpenChange, entity, onSubmit, isLoading = false,
+    open,
+    onOpenChange,
+    entity,
+    onSubmit,
+    isLoading = false,
 }) {
     const form = useEntityForm<XxxFormData, Xxx>({
         schema: xxxFormSchema,
@@ -98,9 +104,13 @@ export const XxxForm = memo<XxxFormProps>(function XxxForm({
     });
 
     return (
-        <EntityForm form={form} open={open} onOpenChange={onOpenChange}
+        <EntityForm
+            form={form}
+            open={open}
+            onOpenChange={onOpenChange}
             title={entity ? 'Edit Xxx' : 'Add New Xxx'}
-            onSubmit={onSubmit} isLoading={isLoading}
+            onSubmit={onSubmit}
+            isLoading={isLoading}
         >
             {/* form fields here */}
         </EntityForm>
@@ -117,29 +127,35 @@ import { ViewField } from '@/components/common/ViewField';
 import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { useTranslation } from '@/contexts/i18n-context';
 
-export const XxxViewModal = memo<XxxViewModalProps>(
-    function XxxViewModal({ open, onClose, item }) {
-        const { t } = useTranslation();
-        if (!item) return null;
+export const XxxViewModal = memo<XxxViewModalProps>(function XxxViewModal({
+    open,
+    onClose,
+    item,
+}) {
+    const { t } = useTranslation();
+    if (!item) return null;
 
-        return (
-            <ViewModalShell open={open} onClose={onClose}
-                title="View Xxx" description={t('common.view_details')}
-            >
-                <div className="space-y-4 py-4">
-                    <ViewField label="Name" value={item.name} />
-                    <ViewField label="Status" value={<Badge>...</Badge>} />
-                    {/* more fields */}
-                </div>
-            </ViewModalShell>
-        );
-    },
-);
+    return (
+        <ViewModalShell
+            open={open}
+            onClose={onClose}
+            title="View Xxx"
+            description={t('common.view_details')}
+        >
+            <div className="space-y-4 py-4">
+                <ViewField label="Name" value={item.name} />
+                <ViewField label="Status" value={<Badge>...</Badge>} />
+                {/* more fields */}
+            </div>
+        </ViewModalShell>
+    );
+});
 ```
 
 ### Sibling File Structure
 
 Setiap complex CRUD module punya 4 sibling files:
+
 ```
 resources/js/components/{module}/
 ├── XxxColumns.tsx      # Column definitions using createTextColumn, createSelectColumn, etc.
@@ -154,7 +170,11 @@ resources/js/components/{module}/
 
 ```tsx
 // resources/js/pages/reports/{report-slug}/index.tsx
-import { createEmptyReportFilters, createReportBreadcrumbs, ReportDataTablePage } from '@/components/common/ReportDataTablePage';
+import {
+    createEmptyReportFilters,
+    createReportBreadcrumbs,
+    ReportDataTablePage,
+} from '@/components/common/ReportDataTablePage';
 import { xxxColumns } from '@/components/reports/{report-slug}/Columns';
 import { createXxxFilterFields } from '@/components/reports/{report-slug}/Filters';
 
@@ -165,7 +185,10 @@ export default function XxxReportPage() {
             breadcrumbs={createReportBreadcrumbs('Xxx', '/reports/xxx')}
             columns={xxxColumns}
             filterFields={createXxxFilterFields()}
-            initialFilters={createEmptyReportFilters(['field1', 'field2'] as const)}
+            initialFilters={createEmptyReportFilters([
+                'field1',
+                'field2',
+            ] as const)}
             endpoint="/reports/xxx"
             queryKey={['xxx-report']}
             entityName="Xxx"
@@ -259,6 +282,16 @@ Trait otomatis: kalau request tidak kirim `fiscal_year_id`, fallback ke preferre
 - [ ] Jika butuh filter (`?status=open`), pakai filter — `FiscalYearCollection` otomatis hormati saat compute meta.
 - [ ] Untuk report page baru di `Reports` controller, pakai trait `InteractsWithFinancialReportRequest`.
 - [ ] Jangan duplikasi default-resolution logic di tempat lain.
+
+### Regression test
+
+`tests/e2e/fiscal-year-auto-select/fiscal-year-auto-select.spec.ts` covers 4 representative forms (AP Payment, AR Receipt, Period Closing, Bank Reconciliation) — one per backend filter shape. The spec opens each `Add` dialog, waits for `/api/fiscal-years`, and asserts the FY combobox no longer shows a `Select…` placeholder. If the wave 13 wiring regresses (backend stops attaching the meta key, or `AsyncSelectField` stops forwarding `preferredMetaKey`), every case fails.
+
+Run via:
+
+```bash
+PLAYWRIGHT_USE_SAIL=1 ./vendor/bin/sail npx playwright test tests/e2e/fiscal-year-auto-select/
+```
 
 ---
 
@@ -371,6 +404,7 @@ class XxxExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping,
 ## Checklist: Membuat Module Baru
 
 ### Frontend
+
 - [ ] Config di `entityConfigs.ts` (simple atau complex)
 - [ ] Page file di `pages/{module-slug}/index.tsx`
 - [ ] Route di `app-routes.tsx`
@@ -379,14 +413,16 @@ class XxxExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping,
 - [ ] `npm run types` clean
 
 ### Backend
+
 - [ ] Model: `@use HasFactory`, `@var list<string>`, `@var array<string, string>`, no redundant timestamp casts
 - [ ] Controller: `destroyModel()` di `destroy()`, `loadResourceRelations()` di `show()`
 - [ ] Export: `ShouldAutoSize`, typed `$filters`, `columns()` pattern
-- [ ] Request/Resource/Collection sesuai family (SimpleCrud* atau custom)
+- [ ] Request/Resource/Collection sesuai family (SimpleCrud\* atau custom)
 - [ ] PHPStan clean
 - [ ] Pest tests: Controller + Export + Model
 
 ### Testing
+
 - [ ] Pest group: `->group('{module-slug}')` (kebab-case)
 - [ ] E2E: `tests/e2e/{module-slug}/{module}.spec.ts`
 
@@ -394,17 +430,17 @@ class XxxExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping,
 
 ## Helper Reference
 
-| Helper | Location | Purpose |
-|--------|----------|---------|
-| `useEntityForm` | `hooks/useEntityForm.ts` | Eliminates form setup boilerplate |
-| `createSimpleEntityConfig` | `utils/entityConfigs.ts` | Config for name-only entities |
-| `createComplexEntityConfig` | `utils/entityConfigs.ts` | Config for multi-field entities |
-| `createEntityCrudPage` | `components/common/EntityCrudPage.tsx` | Page factory from config |
-| `ReportDataTablePage` | `components/common/ReportDataTablePage.tsx` | Report page shell |
-| `ViewField` | `components/common/ViewField.tsx` | Consistent field display |
-| `ViewModalShell` | `components/common/ViewModalShell.tsx` | Modal wrapper |
-| `EntityForm` | `components/common/EntityForm.tsx` | Form dialog wrapper |
-| `InteractsWithExportFilters` | `Exports/Concerns/InteractsWithExportFilters.php` | Export helpers (columns, filters, dates) |
-| `LoadsResourceRelations` | `Controllers/Concerns/LoadsResourceRelations.php` | Relation loading trait |
-| `StoresItemsInTransaction` | `Controllers/Concerns/StoresItemsInTransaction.php` | Transaction form pattern |
-| `destroyModel()` | `Controller.php` (base) | Standard delete response |
+| Helper                       | Location                                            | Purpose                                  |
+| ---------------------------- | --------------------------------------------------- | ---------------------------------------- |
+| `useEntityForm`              | `hooks/useEntityForm.ts`                            | Eliminates form setup boilerplate        |
+| `createSimpleEntityConfig`   | `utils/entityConfigs.ts`                            | Config for name-only entities            |
+| `createComplexEntityConfig`  | `utils/entityConfigs.ts`                            | Config for multi-field entities          |
+| `createEntityCrudPage`       | `components/common/EntityCrudPage.tsx`              | Page factory from config                 |
+| `ReportDataTablePage`        | `components/common/ReportDataTablePage.tsx`         | Report page shell                        |
+| `ViewField`                  | `components/common/ViewField.tsx`                   | Consistent field display                 |
+| `ViewModalShell`             | `components/common/ViewModalShell.tsx`              | Modal wrapper                            |
+| `EntityForm`                 | `components/common/EntityForm.tsx`                  | Form dialog wrapper                      |
+| `InteractsWithExportFilters` | `Exports/Concerns/InteractsWithExportFilters.php`   | Export helpers (columns, filters, dates) |
+| `LoadsResourceRelations`     | `Controllers/Concerns/LoadsResourceRelations.php`   | Relation loading trait                   |
+| `StoresItemsInTransaction`   | `Controllers/Concerns/StoresItemsInTransaction.php` | Transaction form pattern                 |
+| `destroyModel()`             | `Controller.php` (base)                             | Standard delete response                 |

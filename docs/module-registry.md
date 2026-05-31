@@ -55,17 +55,17 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   route: /departments
   api: /api/departments
   export_api: /api/departments/export
-  search_placeholder: "Search departments..."
+  search_placeholder: 'Search departments...'
   sortable_columns: [Name, Created At, Updated At]
   view_type: dialog
-  view_dialog_title: "Department Details"
+  view_dialog_title: 'Department Details'
   checkbox_header: false
 
 - slug: positions
   route: /positions
   api: /api/positions
   export_api: /api/positions/export
-  search_placeholder: "Search positions..."
+  search_placeholder: 'Search positions...'
   sortable_columns: [Name, Created At, Updated At]
   view_type: dialog
   checkbox_header: false
@@ -74,7 +74,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   route: /branches
   api: /api/branches
   export_api: /api/branches/export
-  search_placeholder: "Search branches..."
+  search_placeholder: 'Search branches...'
   sortable_columns: [Name, Created At, Updated At]
   view_type: dialog
   checkbox_header: false
@@ -83,7 +83,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   route: /supplier-categories
   api: /api/supplier-categories
   export_api: /api/supplier-categories/export
-  search_placeholder: "Search supplier categories..."
+  search_placeholder: 'Search supplier categories...'
   sortable_columns: [Name, Created At, Updated At]
   view_type: dialog
   checkbox_header: false
@@ -92,7 +92,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   route: /customer-categories
   api: /api/customer-categories
   export_api: /api/customer-categories/export
-  search_placeholder: "Search customer categories..."
+  search_placeholder: 'Search customer categories...'
   sortable_columns: [Name, Created At, Updated At]
   view_type: dialog
   checkbox_header: false
@@ -668,7 +668,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   note: "Non-CRUD component embedded in entity profiles to show the timeline of approval requests and steps."
   tests:
     - tests/e2e/approval-history/approval-history.spec.ts
-    
+
 - slug: approval-monitoring
   route: /approval-monitoring
   api: GET /api/approval-monitoring/data
@@ -777,6 +777,14 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   tests:
     - tests/e2e/financial-dashboard/financial-dashboard.spec.ts
 
+- slug: fiscal-year-auto-select
+  route: (cross-cutting — covers /ap-payments, /ar-receipts, /period-closings, /bank-reconciliations)
+  api: /api/fiscal-years (and /api/fiscal-years?status=open)
+  view_type: cross-cutting
+  note: "Regression spec for the preferred fiscal year auto-select pattern. Opens each Add dialog, waits for /api/fiscal-years, asserts the FY combobox no longer renders a placeholder string. Covers both backend filter shapes (no filter for AP/AR, ?status=open for period-closings/bank-reconciliations). Guards FiscalYearCollection meta + AsyncSelectField preferredMetaKey wiring landed in wave 13."
+  tests:
+    - tests/e2e/fiscal-year-auto-select/fiscal-year-auto-select.spec.ts
+
 ## Testing
 
 E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
@@ -866,20 +874,22 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 ## Struktur Test Target
 
 ```
+
 tests/
 ├── Feature/{ModuleName}/
-│   ├── {Module}ControllerTest.php
-│   └── {Module}ExportTest.php
+│ ├── {Module}ControllerTest.php
+│ └── {Module}ExportTest.php
 ├── Unit/
-│   ├── Models/{Module}Test.php
-│   ├── Actions/{ModuleName}/*Test.php
-│   ├── Domain/{ModuleName}/*Test.php
-│   ├── Requests/{ModuleName}/*Test.php
-│   └── Resources/{ModuleName}/*Test.php
+│ ├── Models/{Module}Test.php
+│ ├── Actions/{ModuleName}/*Test.php
+│ ├── Domain/{ModuleName}/*Test.php
+│ ├── Requests/{ModuleName}/*Test.php
+│ └── Resources/{ModuleName}/*Test.php
 └── e2e/{module-slug}/
-    ├── helpers.ts
-    └── {module}.spec.ts
-```
+├── helpers.ts
+└── {module}.spec.ts
+
+````
 
 ### Standar Group Naming
 
@@ -895,24 +905,24 @@ tests/
 
 # E2E — semua test untuk satu modul
 npx playwright test tests/e2e/{module-slug}/
-```
+````
 
 ---
 
 ## 9 E2E Test Cases per Modul
 
-| # | Test Case | Assertion Kunci |
-|---|-----------|-----------------|
-| 1 | Search | Row dengan identifier terlihat |
-| 2 | Filters | Hasil tabel berubah sesuai filter |
-| 3 | Add | Dialog tertutup, entity muncul |
-| 4 | View | Dialog/page menampilkan data |
-| 5 | Edit | Data terupdate setelah save |
-| 6 | Export | Kolom Excel ⊇ kolom DataTable |
-| 7 | Checkbox | Body punya checkbox, header TIDAK punya |
-| 8 | Sorting | Semua sortable columns bisa diklik |
-| 9 | Delete | Entity terhapus dari tabel |
-| 10 | Import | Dialog import tampil dan berhasil memicu notifikasi hasil/error |
+| #   | Test Case | Assertion Kunci                                                 |
+| --- | --------- | --------------------------------------------------------------- |
+| 1   | Search    | Row dengan identifier terlihat                                  |
+| 2   | Filters   | Hasil tabel berubah sesuai filter                               |
+| 3   | Add       | Dialog tertutup, entity muncul                                  |
+| 4   | View      | Dialog/page menampilkan data                                    |
+| 5   | Edit      | Data terupdate setelah save                                     |
+| 6   | Export    | Kolom Excel ⊇ kolom DataTable                                   |
+| 7   | Checkbox  | Body punya checkbox, header TIDAK punya                         |
+| 8   | Sorting   | Semua sortable columns bisa diklik                              |
+| 9   | Delete    | Entity terhapus dari tabel                                      |
+| 10  | Import    | Dialog import tampil dan berhasil memicu notifikasi hasil/error |
 
 ---
 
