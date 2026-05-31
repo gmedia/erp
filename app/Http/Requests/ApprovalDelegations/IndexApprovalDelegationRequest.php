@@ -23,7 +23,8 @@ class IndexApprovalDelegationRequest extends AbstractApprovalDelegationListingRe
                 'start_date_to' => ['nullable', 'date'],
             ],
             $this->approvalDelegationSortRules(
-                'id,delegator_user_id,delegate_user_id,approvable_type,start_date,end_date,is_active,created_at,updated_at',
+                'id,delegator_user_id,delegate_user_id,approvable_type,start_date,'
+                    . 'end_date,is_active,created_at,updated_at',
             ),
             [
                 'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],

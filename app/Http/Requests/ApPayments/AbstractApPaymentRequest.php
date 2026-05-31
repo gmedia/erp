@@ -66,7 +66,13 @@ abstract class AbstractApPaymentRequest extends AuthorizedFormRequest
                 }
 
                 $existingAllocated = ApPaymentAllocation::where('supplier_bill_id', $bill->id)
-                    ->when($paymentId, fn ($q) => $q->whereHas('payment', fn ($q2) => $q2->where('id', '!=', $paymentId)))
+                    ->when(
+                        $paymentId,
+                        fn ($q) => $q->whereHas(
+                            'payment',
+                            fn ($q2) => $q2->where('id', '!=', $paymentId),
+                        ),
+                    )
                     ->sum('allocated_amount');
 
                 $newTotal = $existingAllocated + (float) $allocation['allocated_amount'];
@@ -74,7 +80,8 @@ abstract class AbstractApPaymentRequest extends AuthorizedFormRequest
                 if ($newTotal > (float) $bill->grand_total) {
                     $validator->errors()->add(
                         "allocations.{$index}.allocated_amount",
-                        'Allocation exceeds bill outstanding amount. Maximum: ' . ((float) $bill->grand_total - $existingAllocated)
+                        'Allocation exceeds bill outstanding amount. Maximum: '
+                            . ((float) $bill->grand_total - $existingAllocated)
                     );
                 }
             }

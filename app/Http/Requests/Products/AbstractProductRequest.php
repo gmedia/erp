@@ -17,7 +17,10 @@ abstract class AbstractProductRequest extends AuthorizedFormRequest
             'code' => $this->withSometimes(['required', 'string', 'max:255', $this->codeUniqueRule()]),
             'name' => $this->withSometimes(['required', 'string', 'max:255']),
             'description' => $this->withSometimes(['nullable', 'string']),
-            'type' => $this->withSometimes(['required', 'in:raw_material,work_in_progress,finished_good,purchased_good,service']),
+            'type' => $this->withSometimes([
+                'required',
+                'in:raw_material,work_in_progress,finished_good,purchased_good,service',
+            ]),
             'product_category_id' => $this->withSometimes(['required', 'exists:product_categories,id']),
             'unit_id' => $this->withSometimes(['required', 'exists:units,id']),
             'branch_id' => $this->withSometimes(['nullable', 'exists:branches,id']),

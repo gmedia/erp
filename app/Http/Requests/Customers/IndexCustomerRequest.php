@@ -10,7 +10,10 @@ class IndexCustomerRequest extends AbstractCustomerListingRequest
     public function rules(): array
     {
         return array_merge(
-            $this->customerListingRules('id,name,email,phone,address,branch_id,category_id,status,created_at,updated_at'),
+            $this->customerListingRules(
+                'id,name,email,phone,address,branch_id,category_id,'
+                    . 'status,created_at,updated_at',
+            ),
             $this->paginationRules(),
         );
     }

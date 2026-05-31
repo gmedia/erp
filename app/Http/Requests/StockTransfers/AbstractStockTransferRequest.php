@@ -18,7 +18,11 @@ abstract class AbstractStockTransferRequest extends AuthorizedFormRequest
                 'max:255',
                 $this->transferNumberUniqueRule(),
             ]),
-            'from_warehouse_id' => $this->withSometimes(['required', 'exists:warehouses,id', 'different:to_warehouse_id']),
+            'from_warehouse_id' => $this->withSometimes([
+                'required',
+                'exists:warehouses,id',
+                'different:to_warehouse_id',
+            ]),
             'to_warehouse_id' => $this->withSometimes(['required', 'exists:warehouses,id']),
             'transfer_date' => $this->withSometimes(['required', 'date']),
             'expected_arrival_date' => $this->withSometimes(['nullable', 'date']),

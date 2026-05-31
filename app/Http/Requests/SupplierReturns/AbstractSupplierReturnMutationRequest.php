@@ -24,7 +24,11 @@ abstract class AbstractSupplierReturnMutationRequest extends AuthorizedFormReque
             'supplier_id' => $this->withSometimes(['required', 'integer', 'exists:suppliers,id']),
             'warehouse_id' => $this->withSometimes(['required', 'integer', 'exists:warehouses,id']),
             'return_date' => $this->withSometimes(['required', 'date']),
-            'reason' => $this->withSometimes(['required', 'string', 'in:defective,wrong_item,excess_quantity,damaged,other']),
+            'reason' => $this->withSometimes([
+                'required',
+                'string',
+                'in:defective,wrong_item,excess_quantity,damaged,other',
+            ]),
             'status' => $this->withSometimes(['required', 'string', 'in:draft,confirmed,cancelled']),
             'notes' => $this->withSometimes(['nullable', 'string']),
 

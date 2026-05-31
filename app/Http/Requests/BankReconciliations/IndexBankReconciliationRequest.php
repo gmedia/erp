@@ -18,7 +18,10 @@ class IndexBankReconciliationRequest extends BaseListingRequest
                 'date_from' => ['nullable', 'date'],
                 'date_to' => ['nullable', 'date', 'after_or_equal:date_from'],
             ],
-            $this->listingSortRules('account_id,reconciliation_date,period_start,period_end,statement_balance,book_balance,difference,status,created_at'),
+            $this->listingSortRules(
+                'account_id,reconciliation_date,period_start,period_end,'
+                    . 'statement_balance,book_balance,difference,status,created_at',
+            ),
             $this->paginationRules(),
         );
     }

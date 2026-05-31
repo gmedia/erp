@@ -8,7 +8,10 @@ class ExportApPaymentRequest extends AbstractApPaymentListingRequest
     {
         return array_merge(
             $this->apPaymentListingRules('supplier', 'branch'),
-            $this->listingSortRules('payment_number,payment_date,payment_method,currency,status,total_amount,total_allocated,created_at'),
+            $this->listingSortRules(
+                'payment_number,payment_date,payment_method,currency,status,'
+                    . 'total_amount,total_allocated,created_at',
+            ),
         );
     }
 }

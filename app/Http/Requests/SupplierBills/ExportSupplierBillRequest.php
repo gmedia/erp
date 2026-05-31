@@ -8,7 +8,10 @@ class ExportSupplierBillRequest extends AbstractSupplierBillListingRequest
     {
         return array_merge(
             $this->supplierBillListingRules('supplier', 'branch'),
-            $this->listingSortRules('bill_number,bill_date,due_date,currency,status,grand_total,amount_paid,amount_due,created_at'),
+            $this->listingSortRules(
+                'bill_number,bill_date,due_date,currency,status,'
+                    . 'grand_total,amount_paid,amount_due,created_at',
+            ),
         );
     }
 }
