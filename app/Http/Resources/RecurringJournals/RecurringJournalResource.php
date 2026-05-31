@@ -22,23 +22,32 @@ class RecurringJournalResource extends JsonResource
             'total_amount' => (float) $this->resource->total_amount,
             'auto_post' => $this->resource->auto_post,
             'is_active' => $this->resource->is_active,
-            'fiscal_year' => $this->whenLoaded('fiscalYear', fn () => [
-                'id' => $this->resource->fiscalYear?->id,
-                'name' => $this->resource->fiscalYear?->name,
-            ]),
-            'lines' => $this->whenLoaded('lines', fn () => $this->resource->lines->map(fn ($line) => [
-                'id' => $line->id,
-                'account_id' => $line->account_id,
-                'account_code' => $line->account->code,
-                'account_name' => $line->account->name,
-                'debit' => (float) $line->debit,
-                'credit' => (float) $line->credit,
-                'memo' => $line->memo,
-            ])->values()->all()),
-            'created_by' => $this->whenLoaded('creator', fn () => [
-                'id' => $this->resource->created_by,
-                'name' => $this->resource->creator?->name,
-            ]),
+            'fiscal_year' => $this->whenLoaded(
+                'fiscalYear',
+                fn () => [
+                    'id' => $this->resource->fiscalYear?->id,
+                    'name' => $this->resource->fiscalYear?->name,
+                ],
+            ),
+            'lines' => $this->whenLoaded(
+                'lines',
+                fn () => $this->resource->lines->map(fn ($line) => [
+                    'id' => $line->id,
+                    'account_id' => $line->account_id,
+                    'account_code' => $line->account->code,
+                    'account_name' => $line->account->name,
+                    'debit' => (float) $line->debit,
+                    'credit' => (float) $line->credit,
+                    'memo' => $line->memo,
+                ])->values()->all(),
+            ),
+            'created_by' => $this->whenLoaded(
+                'creator',
+                fn () => [
+                    'id' => $this->resource->created_by,
+                    'name' => $this->resource->creator?->name,
+                ],
+            ),
             'created_at' => $this->resource->created_at?->toIso8601String(),
             'updated_at' => $this->resource->updated_at?->toIso8601String(),
         ];

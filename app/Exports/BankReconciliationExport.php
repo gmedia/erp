@@ -15,7 +15,9 @@ class BankReconciliationExport implements FromQuery, ShouldAutoSize, WithHeading
 {
     use InteractsWithExportFilters;
 
-    public function __construct(protected array $filters = []) {}
+    public function __construct(
+        protected array $filters = [],
+    ) {}
 
     public function query(): Builder
     {

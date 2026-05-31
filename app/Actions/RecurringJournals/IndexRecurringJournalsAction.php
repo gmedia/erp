@@ -12,7 +12,9 @@ class IndexRecurringJournalsAction
 {
     use InteractsWithIndexRequest;
 
-    public function __construct(private RecurringJournalFilterService $filterService) {}
+    public function __construct(
+        private RecurringJournalFilterService $filterService,
+    ) {}
 
     public function execute(IndexRecurringJournalRequest $request): LengthAwarePaginator
     {

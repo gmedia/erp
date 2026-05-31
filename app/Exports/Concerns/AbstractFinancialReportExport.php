@@ -9,7 +9,9 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 
 abstract class AbstractFinancialReportExport implements FromCollection, ShouldAutoSize, WithHeadings
 {
-    public function __construct(protected array $filters) {}
+    public function __construct(
+        protected array $filters,
+    ) {}
 
     abstract public function collection(): Collection;
 

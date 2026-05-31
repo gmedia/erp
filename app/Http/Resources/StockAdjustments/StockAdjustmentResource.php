@@ -26,14 +26,17 @@ class StockAdjustmentResource extends JsonResource
             /** @var EloquentCollection<int, StockAdjustmentItem> $stockAdjustmentItems */
             $stockAdjustmentItems = $this->resource->items;
 
-            $items = $this->productUnitItemsResourceData($stockAdjustmentItems, fn ($item) => [
-                'quantity_before' => (string) $item->quantity_before,
-                'quantity_adjusted' => (string) $item->quantity_adjusted,
-                'quantity_after' => (string) $item->quantity_after,
-                'unit_cost' => (string) $item->unit_cost,
-                'total_cost' => (string) $item->total_cost,
-                'reason' => $item->reason,
-            ]);
+            $items = $this->productUnitItemsResourceData(
+                $stockAdjustmentItems,
+                fn ($item) => [
+                    'quantity_before' => (string) $item->quantity_before,
+                    'quantity_adjusted' => (string) $item->quantity_adjusted,
+                    'quantity_after' => (string) $item->quantity_after,
+                    'unit_cost' => (string) $item->unit_cost,
+                    'total_cost' => (string) $item->total_cost,
+                    'reason' => $item->reason,
+                ],
+            );
         }
 
         return [

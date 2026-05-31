@@ -18,7 +18,9 @@ class ReportConfigurationExport implements FromQuery, ShouldAutoSize, WithHeadin
     /**
      * @param  array<string, mixed>  $filters
      */
-    public function __construct(protected array $filters = []) {}
+    public function __construct(
+        protected array $filters = [],
+    ) {}
 
     public function query(): Builder
     {

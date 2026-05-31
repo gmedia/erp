@@ -12,7 +12,9 @@ class IndexReportConfigurationsAction
 {
     use InteractsWithIndexRequest;
 
-    public function __construct(private ReportConfigurationFilterService $filterService) {}
+    public function __construct(
+        private ReportConfigurationFilterService $filterService,
+    ) {}
 
     public function execute(IndexReportConfigurationRequest $request): LengthAwarePaginator
     {

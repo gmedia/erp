@@ -45,13 +45,16 @@ trait BuildsProductUnitItemResourceData
         $resourceItems = [];
 
         foreach ($items as $item) {
-            $resourceItems[] = $this->productUnitItemResourceData($item, array_merge(
-                $attributesResolver($item),
-                [
-                    'created_at' => $this->iso8601Timestamp($item->getAttribute('created_at')),
-                    'updated_at' => $this->iso8601Timestamp($item->getAttribute('updated_at')),
-                ],
-            ));
+            $resourceItems[] = $this->productUnitItemResourceData(
+                $item,
+                array_merge(
+                    $attributesResolver($item),
+                    [
+                        'created_at' => $this->iso8601Timestamp($item->getAttribute('created_at')),
+                        'updated_at' => $this->iso8601Timestamp($item->getAttribute('updated_at')),
+                    ],
+                ),
+            );
         }
 
         return $resourceItems;

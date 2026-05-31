@@ -12,7 +12,9 @@ use Illuminate\Validation\ValidationException;
 
 class ClosePeriodAction
 {
-    public function __construct(private RecalculateAccountBalancesAction $recalculate) {}
+    public function __construct(
+        private RecalculateAccountBalancesAction $recalculate,
+    ) {}
 
     public function execute(PeriodClosing $periodClosing): PeriodClosing
     {

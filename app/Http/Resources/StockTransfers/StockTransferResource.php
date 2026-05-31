@@ -26,12 +26,15 @@ class StockTransferResource extends JsonResource
             /** @var EloquentCollection<int, StockTransferItem> $stockTransferItems */
             $stockTransferItems = $this->resource->items;
 
-            $items = $this->productUnitItemsResourceData($stockTransferItems, fn ($item) => [
-                'quantity' => (string) $item->quantity,
-                'quantity_received' => (string) $item->quantity_received,
-                'unit_cost' => (string) $item->unit_cost,
-                'notes' => $item->notes,
-            ]);
+            $items = $this->productUnitItemsResourceData(
+                $stockTransferItems,
+                fn ($item) => [
+                    'quantity' => (string) $item->quantity,
+                    'quantity_received' => (string) $item->quantity_received,
+                    'unit_cost' => (string) $item->unit_cost,
+                    'notes' => $item->notes,
+                ],
+            );
         }
 
         return [

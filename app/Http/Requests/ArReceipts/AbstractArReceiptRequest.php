@@ -96,10 +96,13 @@ abstract class AbstractArReceiptRequest extends AuthorizedFormRequest
         }
 
         $existingAllocated = ArReceiptAllocation::where('customer_invoice_id', $invoice->id)
-            ->when($receiptId, fn ($q) => $q->whereHas(
-                'receipt',
-                fn ($q2) => $q2->where('id', '!=', $receiptId),
-            ))
+            ->when(
+                $receiptId,
+                fn ($q) => $q->whereHas(
+                    'receipt',
+                    fn ($q2) => $q2->where('id', '!=', $receiptId),
+                ),
+            )
             ->sum('allocated_amount');
 
         return (float) $invoice->grand_total

@@ -15,7 +15,9 @@ class RecurringJournalExport implements FromQuery, ShouldAutoSize, WithHeadings,
 {
     use InteractsWithExportFilters;
 
-    public function __construct(protected array $filters = []) {}
+    public function __construct(
+        protected array $filters = [],
+    ) {}
 
     public function query(): Builder
     {

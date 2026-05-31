@@ -9,7 +9,9 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class GeneralLedgerReportExport implements FromCollection, ShouldAutoSize, WithHeadings
 {
-    public function __construct(private array $filters) {}
+    public function __construct(
+        private array $filters,
+    ) {}
 
     public function collection()
     {

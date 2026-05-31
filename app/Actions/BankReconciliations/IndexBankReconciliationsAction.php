@@ -12,7 +12,9 @@ class IndexBankReconciliationsAction
 {
     use InteractsWithIndexRequest;
 
-    public function __construct(private BankReconciliationFilterService $filterService) {}
+    public function __construct(
+        private BankReconciliationFilterService $filterService,
+    ) {}
 
     public function execute(IndexBankReconciliationRequest $request): LengthAwarePaginator
     {

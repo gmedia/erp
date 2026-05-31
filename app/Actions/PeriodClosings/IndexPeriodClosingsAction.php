@@ -12,7 +12,9 @@ class IndexPeriodClosingsAction
 {
     use InteractsWithIndexRequest;
 
-    public function __construct(private PeriodClosingFilterService $filterService) {}
+    public function __construct(
+        private PeriodClosingFilterService $filterService,
+    ) {}
 
     public function execute(IndexPeriodClosingRequest $request): LengthAwarePaginator
     {

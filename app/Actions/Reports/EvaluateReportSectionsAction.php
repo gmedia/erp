@@ -6,7 +6,9 @@ use App\Services\FormulaEvaluatorService;
 
 class EvaluateReportSectionsAction
 {
-    public function __construct(private FormulaEvaluatorService $evaluator) {}
+    public function __construct(
+        private FormulaEvaluatorService $evaluator,
+    ) {}
 
     /**
      * @param  array<int, array<string, mixed>>  $sections

@@ -15,7 +15,9 @@ class PeriodClosingExport implements FromQuery, ShouldAutoSize, WithHeadings, Wi
 {
     use InteractsWithExportFilters;
 
-    public function __construct(protected array $filters = []) {}
+    public function __construct(
+        protected array $filters = [],
+    ) {}
 
     public function query(): Builder
     {
