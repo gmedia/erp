@@ -19,8 +19,10 @@ class ReportConfigurationController extends Controller
 {
     use StoresItemsInTransaction;
 
-    public function index(IndexReportConfigurationRequest $request, IndexReportConfigurationsAction $action): JsonResponse
-    {
+    public function index(
+        IndexReportConfigurationRequest $request,
+        IndexReportConfigurationsAction $action,
+    ): JsonResponse {
         return (new ReportConfigurationCollection($action->execute($request)))->response();
     }
 
@@ -49,8 +51,10 @@ class ReportConfigurationController extends Controller
         return (new ReportConfigurationResource($reportConfiguration->load(['creator', 'sections'])))->response();
     }
 
-    public function update(UpdateReportConfigurationRequest $request, ReportConfiguration $reportConfiguration): JsonResponse
-    {
+    public function update(
+        UpdateReportConfigurationRequest $request,
+        ReportConfiguration $reportConfiguration,
+    ): JsonResponse {
         $data = $request->validated();
         $sections = $data['sections'] ?? null;
         unset($data['sections']);
@@ -63,7 +67,9 @@ class ReportConfigurationController extends Controller
             fn (ReportConfiguration $config, array $items): null => $this->syncSections($config, $items),
         );
 
-        return (new ReportConfigurationResource($reportConfiguration->refresh()->load(['creator', 'sections'])))->response();
+        return (new ReportConfigurationResource(
+            $reportConfiguration->refresh()->load(['creator', 'sections']),
+        ))->response();
     }
 
     public function destroy(ReportConfiguration $reportConfiguration): JsonResponse
@@ -71,8 +77,10 @@ class ReportConfigurationController extends Controller
         return $this->destroyModel($reportConfiguration);
     }
 
-    public function export(ExportReportConfigurationRequest $request, ExportReportConfigurationsAction $action): JsonResponse
-    {
+    public function export(
+        ExportReportConfigurationRequest $request,
+        ExportReportConfigurationsAction $action,
+    ): JsonResponse {
         return $action->execute($request);
     }
 

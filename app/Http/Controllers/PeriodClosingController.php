@@ -23,14 +23,29 @@ class PeriodClosingController extends Controller
 
     public function store(StorePeriodClosingRequest $request): JsonResponse
     {
-        $periodClosing = PeriodClosing::create($request->validated() + ['status' => 'draft', 'net_income' => 0, 'created_by' => auth()->id()]);
+        $periodClosing = PeriodClosing::create($request->validated() + [
+            'status' => 'draft',
+            'net_income' => 0,
+            'created_by' => auth()->id(),
+        ]);
 
-        return (new PeriodClosingResource($periodClosing->load(['fiscalYear', 'retainedEarningsAccount', 'creator'])))->response()->setStatusCode(201);
+        return (new PeriodClosingResource($periodClosing->load([
+            'fiscalYear',
+            'retainedEarningsAccount',
+            'creator',
+        ])))->response()->setStatusCode(201);
     }
 
     public function show(PeriodClosing $periodClosing): JsonResponse
     {
-        return (new PeriodClosingResource($periodClosing->load(['fiscalYear', 'closingJournalEntry', 'retainedEarningsAccount', 'closedBy', 'reopenedBy', 'creator'])))->response();
+        return (new PeriodClosingResource($periodClosing->load([
+            'fiscalYear',
+            'closingJournalEntry',
+            'retainedEarningsAccount',
+            'closedBy',
+            'reopenedBy',
+            'creator',
+        ])))->response();
     }
 
     public function close(PeriodClosing $periodClosing, ClosePeriodAction $action): JsonResponse

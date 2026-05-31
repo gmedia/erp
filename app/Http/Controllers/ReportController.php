@@ -32,7 +32,10 @@ class ReportController extends Controller
 
     public function trialBalance(Request $request): JsonResponse
     {
-        ['fiscalYears' => $fiscalYears, 'selectedYearId' => $selectedYearId] = $this->resolveFiscalYearContext($request);
+        [
+            'fiscalYears' => $fiscalYears,
+            'selectedYearId' => $selectedYearId,
+        ] = $this->resolveFiscalYearContext($request);
 
         $report = [];
         $computedSections = [];
@@ -117,7 +120,10 @@ class ReportController extends Controller
 
     public function cashFlow(Request $request): JsonResponse
     {
-        ['fiscalYears' => $fiscalYears, 'selectedYearId' => $selectedYearId] = $this->resolveFiscalYearContext($request);
+        [
+            'fiscalYears' => $fiscalYears,
+            'selectedYearId' => $selectedYearId,
+        ] = $this->resolveFiscalYearContext($request);
 
         $report = [];
         $computedSections = [];
@@ -166,18 +172,24 @@ class ReportController extends Controller
         ]);
     }
 
-    public function exportTrialBalance(TrialBalanceFinancialReportRequest $request, ExportTrialBalanceFinancialReportAction $action): JsonResponse
-    {
+    public function exportTrialBalance(
+        TrialBalanceFinancialReportRequest $request,
+        ExportTrialBalanceFinancialReportAction $action,
+    ): JsonResponse {
         return $action->execute($request->validated());
     }
 
-    public function exportBalanceSheet(BalanceSheetReportRequest $request, ExportBalanceSheetReportAction $action): JsonResponse
-    {
+    public function exportBalanceSheet(
+        BalanceSheetReportRequest $request,
+        ExportBalanceSheetReportAction $action,
+    ): JsonResponse {
         return $action->execute($request->validated());
     }
 
-    public function exportIncomeStatement(IncomeStatementReportRequest $request, ExportIncomeStatementReportAction $action): JsonResponse
-    {
+    public function exportIncomeStatement(
+        IncomeStatementReportRequest $request,
+        ExportIncomeStatementReportAction $action,
+    ): JsonResponse {
         return $action->execute($request->validated());
     }
 
@@ -186,8 +198,10 @@ class ReportController extends Controller
         return $action->execute($request->validated());
     }
 
-    public function exportComparative(ComparativeReportRequest $request, ExportComparativeReportAction $action): JsonResponse
-    {
+    public function exportComparative(
+        ComparativeReportRequest $request,
+        ExportComparativeReportAction $action,
+    ): JsonResponse {
         return $action->execute($request->validated());
     }
 }

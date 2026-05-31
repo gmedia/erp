@@ -94,7 +94,9 @@ class PurchaseRequestController extends Controller
             model: $purchaseRequest,
             attributes: $validated,
             items: $items,
-            payloadResolver: static fn (array $attributes): array => UpdatePurchaseRequestData::fromArray($attributes)->toArray(),
+            payloadResolver: static function (array $attributes): array {
+                return UpdatePurchaseRequestData::fromArray($attributes)->toArray();
+            },
             syncItems: function (PurchaseRequest $purchaseRequest, array $items) use ($syncItems): void {
                 $syncItems->execute($purchaseRequest, $items);
             },

@@ -85,7 +85,9 @@ class StockTransferController extends Controller
             model: $stockTransfer,
             attributes: $validated,
             items: $items,
-            payloadResolver: static fn (array $attributes): array => UpdateStockTransferData::fromArray($attributes)->toArray(),
+            payloadResolver: static function (array $attributes): array {
+                return UpdateStockTransferData::fromArray($attributes)->toArray();
+            },
             syncItems: function (StockTransfer $stockTransfer, array $items) use ($syncItems): void {
                 $syncItems->execute($stockTransfer, $items);
             },

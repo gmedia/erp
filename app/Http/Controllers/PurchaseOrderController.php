@@ -50,7 +50,9 @@ class PurchaseOrderController extends Controller
             },
         );
 
-        return (new PurchaseOrderResource($this->loadResourceRelations($purchaseOrder)))->response()->setStatusCode(201);
+        return (new PurchaseOrderResource($this->loadResourceRelations($purchaseOrder)))
+            ->response()
+            ->setStatusCode(201);
     }
 
     public function show(PurchaseOrder $purchaseOrder): JsonResponse
@@ -76,7 +78,9 @@ class PurchaseOrderController extends Controller
             model: $purchaseOrder,
             attributes: $validated,
             items: $items,
-            payloadResolver: static fn (array $attributes): array => UpdatePurchaseOrderData::fromArray($attributes)->toArray(),
+            payloadResolver: static function (array $attributes): array {
+                return UpdatePurchaseOrderData::fromArray($attributes)->toArray();
+            },
             syncItems: function (PurchaseOrder $purchaseOrder, array $items) use ($syncItems): void {
                 $syncItems->execute($purchaseOrder, $items);
             },

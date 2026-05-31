@@ -48,7 +48,9 @@ class RecurringJournalController extends Controller
 
     public function show(RecurringJournal $recurringJournal): JsonResponse
     {
-        return (new RecurringJournalResource($recurringJournal->load(['fiscalYear', 'creator', 'lines.account'])))->response();
+        return (new RecurringJournalResource(
+            $recurringJournal->load(['fiscalYear', 'creator', 'lines.account']),
+        ))->response();
     }
 
     public function update(UpdateRecurringJournalRequest $request, RecurringJournal $recurringJournal): JsonResponse
@@ -66,7 +68,9 @@ class RecurringJournalController extends Controller
             fn (RecurringJournal $journal, array $items): null => $this->syncLines($journal, $items),
         );
 
-        return (new RecurringJournalResource($recurringJournal->refresh()->load(['fiscalYear', 'creator', 'lines.account'])))->response();
+        return (new RecurringJournalResource(
+            $recurringJournal->refresh()->load(['fiscalYear', 'creator', 'lines.account']),
+        ))->response();
     }
 
     public function destroy(RecurringJournal $recurringJournal): JsonResponse

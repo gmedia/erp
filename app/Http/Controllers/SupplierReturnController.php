@@ -100,7 +100,9 @@ class SupplierReturnController extends Controller
             model: $supplierReturn,
             attributes: $validated,
             items: $items,
-            payloadResolver: static fn (array $attributes): array => UpdateSupplierReturnData::fromArray($attributes)->toArray(),
+            payloadResolver: static function (array $attributes): array {
+                return UpdateSupplierReturnData::fromArray($attributes)->toArray();
+            },
             syncItems: function (SupplierReturn $supplierReturn, array $items) use ($syncItems): void {
                 $syncItems->execute($supplierReturn, $items);
             },

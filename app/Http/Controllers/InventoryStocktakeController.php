@@ -98,7 +98,9 @@ class InventoryStocktakeController extends Controller
             model: $inventoryStocktake,
             attributes: $validated,
             items: $items,
-            payloadResolver: static fn (array $attributes): array => UpdateInventoryStocktakeData::fromArray($attributes)->toArray(),
+            payloadResolver: static function (array $attributes): array {
+                return UpdateInventoryStocktakeData::fromArray($attributes)->toArray();
+            },
             syncItems: function (InventoryStocktake $inventoryStocktake, array $items) use ($syncItems): void {
                 $syncItems->execute($inventoryStocktake, $items);
             },

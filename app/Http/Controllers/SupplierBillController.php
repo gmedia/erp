@@ -80,7 +80,9 @@ class SupplierBillController extends Controller
             model: $supplierBill,
             attributes: $validated,
             items: $items,
-            payloadResolver: static fn (array $attributes): array => UpdateSupplierBillData::fromArray($attributes)->toArray(),
+            payloadResolver: static function (array $attributes): array {
+                return UpdateSupplierBillData::fromArray($attributes)->toArray();
+            },
             syncItems: function (SupplierBill $supplierBill, array $items) use ($syncItems): void {
                 $syncItems->execute($supplierBill, $items);
             },

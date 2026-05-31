@@ -89,7 +89,9 @@ class ApPaymentController extends Controller
             model: $apPayment,
             attributes: $validated,
             items: $allocations,
-            payloadResolver: static fn (array $attributes): array => UpdateApPaymentData::fromArray($attributes)->toArray(),
+            payloadResolver: static function (array $attributes): array {
+                return UpdateApPaymentData::fromArray($attributes)->toArray();
+            },
             syncItems: function (ApPayment $apPayment, array $allocations) use ($syncAllocations): void {
                 $syncAllocations->execute($apPayment, $allocations);
             },

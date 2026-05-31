@@ -87,7 +87,9 @@ class GoodsReceiptController extends Controller
             model: $goodsReceipt,
             attributes: $validated,
             items: $items,
-            payloadResolver: static fn (array $attributes): array => UpdateGoodsReceiptData::fromArray($attributes)->toArray(),
+            payloadResolver: static function (array $attributes): array {
+                return UpdateGoodsReceiptData::fromArray($attributes)->toArray();
+            },
             syncItems: function (GoodsReceipt $goodsReceipt, array $items) use ($syncItems): void {
                 $syncItems->execute($goodsReceipt, $items);
             },
@@ -119,6 +121,14 @@ class GoodsReceiptController extends Controller
 
     protected function resourceRelations(): array
     {
-        return ['purchaseOrder.supplier', 'warehouse', 'receiver', 'confirmer', 'creator', 'items.product', 'items.unit'];
+        return [
+            'purchaseOrder.supplier',
+            'warehouse',
+            'receiver',
+            'confirmer',
+            'creator',
+            'items.product',
+            'items.unit',
+        ];
     }
 }

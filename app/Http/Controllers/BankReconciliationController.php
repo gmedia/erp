@@ -67,8 +67,10 @@ class BankReconciliationController extends Controller
         ])))->response();
     }
 
-    public function update(UpdateBankReconciliationRequest $request, BankReconciliation $bankReconciliation): JsonResponse
-    {
+    public function update(
+        UpdateBankReconciliationRequest $request,
+        BankReconciliation $bankReconciliation,
+    ): JsonResponse {
         $data = $request->validated();
         $items = $data['items'] ?? null;
         unset($data['items']);
@@ -99,13 +101,17 @@ class BankReconciliationController extends Controller
         return response()->json(null, 204);
     }
 
-    public function export(ExportBankReconciliationRequest $request, ExportBankReconciliationsAction $action): JsonResponse
-    {
+    public function export(
+        ExportBankReconciliationRequest $request,
+        ExportBankReconciliationsAction $action,
+    ): JsonResponse {
         return $action->execute($request);
     }
 
-    public function complete(BankReconciliation $bankReconciliation, CompleteBankReconciliationAction $action): JsonResponse
-    {
+    public function complete(
+        BankReconciliation $bankReconciliation,
+        CompleteBankReconciliationAction $action,
+    ): JsonResponse {
         return (new BankReconciliationResource($action->execute($bankReconciliation)))->response();
     }
 
@@ -142,8 +148,10 @@ class BankReconciliationController extends Controller
         return response()->json($result);
     }
 
-    public function importStatement(ImportBankStatementRequest $request, BankReconciliation $bankReconciliation): JsonResponse
-    {
+    public function importStatement(
+        ImportBankStatementRequest $request,
+        BankReconciliation $bankReconciliation,
+    ): JsonResponse {
         $summary = (new ImportBankStatementAction)->execute(
             $bankReconciliation,
             $request->file('file'),
@@ -154,8 +162,10 @@ class BankReconciliationController extends Controller
         return response()->json($summary);
     }
 
-    public function autoMatch(BankReconciliation $bankReconciliation, AutoMatchBankReconciliationAction $action): JsonResponse
-    {
+    public function autoMatch(
+        BankReconciliation $bankReconciliation,
+        AutoMatchBankReconciliationAction $action,
+    ): JsonResponse {
         $summary = $action->execute($bankReconciliation);
         $bankReconciliation->recalculateBalances();
 

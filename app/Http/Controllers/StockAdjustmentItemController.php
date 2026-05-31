@@ -14,7 +14,11 @@ class StockAdjustmentItemController extends Controller
 
     public function getItems(StockAdjustment $stockAdjustment): JsonResponse
     {
-        return $this->nestedItemsResponse($stockAdjustment, ['items.product', 'items.unit'], $this->mapAdjustmentItem(...));
+        return $this->nestedItemsResponse(
+            $stockAdjustment,
+            ['items.product', 'items.unit'],
+            $this->mapAdjustmentItem(...),
+        );
     }
 
     public function syncItems(
@@ -24,7 +28,11 @@ class StockAdjustmentItemController extends Controller
     ): JsonResponse {
         $action->execute($stockAdjustment, $request->validated()['items']);
 
-        return $this->nestedItemsResponse($stockAdjustment, ['items.product', 'items.unit'], $this->mapAdjustmentItem(...));
+        return $this->nestedItemsResponse(
+            $stockAdjustment,
+            ['items.product', 'items.unit'],
+            $this->mapAdjustmentItem(...),
+        );
     }
 
     private function mapAdjustmentItem(mixed $item): array

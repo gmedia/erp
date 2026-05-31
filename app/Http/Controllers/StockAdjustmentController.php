@@ -94,7 +94,9 @@ class StockAdjustmentController extends Controller
             model: $stockAdjustment,
             attributes: $validated,
             items: $items,
-            payloadResolver: static fn (array $attributes): array => UpdateStockAdjustmentData::fromArray($attributes)->toArray(),
+            payloadResolver: static function (array $attributes): array {
+                return UpdateStockAdjustmentData::fromArray($attributes)->toArray();
+            },
             syncItems: function (StockAdjustment $stockAdjustment, array $items) use ($syncItems): void {
                 $syncItems->execute($stockAdjustment, $items);
             },
