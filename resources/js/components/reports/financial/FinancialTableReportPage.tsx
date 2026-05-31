@@ -200,44 +200,44 @@ export function SingleYearFinancialReportPageShell({
         );
     } else {
         content = (
-                <div className="flex h-full flex-1 flex-col gap-4 p-4">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <div className="flex flex-col gap-1">
-                            <h1 className="text-2xl font-bold tracking-tight">
-                                {title}
-                            </h1>
-                            {headerMeta}
-                        </div>
-                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-                            <div className="w-full sm:w-[240px]">
-                                <Select
-                                    value={String(selectedYearId)}
-                                    onValueChange={onYearChange}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select Fiscal Year" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {fiscalYears.map((fiscalYear) => (
-                                            <SelectItem
-                                                key={fiscalYear.id}
-                                                value={String(fiscalYear.id)}
-                                            >
-                                                {fiscalYear.name} (
-                                                {fiscalYear.status})
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            {headerActions}
-                        </div>
+            <div className="flex h-full flex-1 flex-col gap-4 p-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex flex-col gap-1">
+                        <h1 className="text-2xl font-bold tracking-tight">
+                            {title}
+                        </h1>
+                        {headerMeta}
                     </div>
-
-                    {preContent}
-                    {children}
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+                        <div className="w-full sm:w-[240px]">
+                            <Select
+                                value={String(selectedYearId)}
+                                onValueChange={onYearChange}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select Fiscal Year" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {fiscalYears.map((fiscalYear) => (
+                                        <SelectItem
+                                            key={fiscalYear.id}
+                                            value={String(fiscalYear.id)}
+                                        >
+                                            {fiscalYear.name} (
+                                            {fiscalYear.status})
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        {headerActions}
+                    </div>
                 </div>
-            );
+
+                {preContent}
+                {children}
+            </div>
+        );
     }
 
     return (

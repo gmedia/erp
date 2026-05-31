@@ -146,9 +146,7 @@ export default function UserGuidePage() {
 
                     <Separator className="my-6 lg:hidden" />
 
-                    <div className="min-w-0 flex-1">
-                        {mainContent}
-                    </div>
+                    <div className="min-w-0 flex-1">{mainContent}</div>
                 </div>
             </div>
         </AppLayout>
