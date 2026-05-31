@@ -7,7 +7,7 @@ import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import { type BreadcrumbItem } from '@/types';
 import { BookOpen, Loader2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Helmet } from 'react-helmet-async';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -79,6 +79,30 @@ export default function UserGuidePage() {
         );
     }
 
+    let mainContent: ReactNode;
+    if (contentLoading) {
+        mainContent = (
+            <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+        );
+    } else if (content) {
+        mainContent = (
+            <article className="prose max-w-none dark:prose-invert prose-headings:scroll-mt-20 prose-headings:text-foreground prose-h1:text-2xl prose-h2:border-b prose-h2:border-border prose-h2:pb-2 prose-h2:text-lg prose-h3:text-base prose-p:text-foreground/90 prose-a:text-primary prose-a:underline prose-blockquote:border-l-primary/50 prose-blockquote:text-muted-foreground prose-strong:text-foreground prose-code:rounded prose-code:border prose-code:border-border prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:text-sm prose-code:text-foreground prose-pre:rounded-lg prose-pre:border prose-pre:border-border prose-pre:bg-muted prose-pre:p-4 prose-pre:text-foreground prose-li:text-foreground/90 prose-table:text-sm prose-th:bg-muted/50 prose-th:px-3 prose-th:py-2 prose-th:text-foreground prose-td:border prose-td:border-border prose-td:px-3 prose-td:py-2">
+                <Markdown remarkPlugins={[remarkGfm]}>
+                    {content.content}
+                </Markdown>
+            </article>
+        );
+    } else {
+        mainContent = (
+            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                <BookOpen className="mb-4 h-12 w-12" />
+                <p>Pilih panduan dari menu di samping</p>
+            </div>
+        );
+    }
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Helmet>
@@ -123,22 +147,7 @@ export default function UserGuidePage() {
                     <Separator className="my-6 lg:hidden" />
 
                     <div className="min-w-0 flex-1">
-                        {contentLoading ? (
-                            <div className="flex items-center justify-center py-12">
-                                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                            </div>
-                        ) : content ? (
-                            <article className="prose max-w-none dark:prose-invert prose-headings:scroll-mt-20 prose-headings:text-foreground prose-h1:text-2xl prose-h2:border-b prose-h2:border-border prose-h2:pb-2 prose-h2:text-lg prose-h3:text-base prose-p:text-foreground/90 prose-a:text-primary prose-a:underline prose-blockquote:border-l-primary/50 prose-blockquote:text-muted-foreground prose-strong:text-foreground prose-code:rounded prose-code:border prose-code:border-border prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:text-sm prose-code:text-foreground prose-pre:rounded-lg prose-pre:border prose-pre:border-border prose-pre:bg-muted prose-pre:p-4 prose-pre:text-foreground prose-li:text-foreground/90 prose-table:text-sm prose-th:bg-muted/50 prose-th:px-3 prose-th:py-2 prose-th:text-foreground prose-td:border prose-td:border-border prose-td:px-3 prose-td:py-2">
-                                <Markdown remarkPlugins={[remarkGfm]}>
-                                    {content.content}
-                                </Markdown>
-                            </article>
-                        ) : (
-                            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-                                <BookOpen className="mb-4 h-12 w-12" />
-                                <p>Pilih panduan dari menu di samping</p>
-                            </div>
-                        )}
+                        {mainContent}
                     </div>
                 </div>
             </div>

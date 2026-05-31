@@ -237,21 +237,21 @@ export function FinancialReportPageShell({
 }: Readonly<FinancialReportPageShellProps>) {
     const breadcrumbs = buildBreadcrumbs(title, path);
 
-    return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Helmet>
-                <title>{title}</title>
-            </Helmet>
-
-            {isLoading ? (
-                <div className="flex h-full items-center justify-center p-4">
-                    Loading report...
-                </div>
-            ) : hasError ? (
-                <div className="flex h-full items-center justify-center p-4 text-destructive">
-                    Error loading report.
-                </div>
-            ) : (
+    let content: ReactNode;
+    if (isLoading) {
+        content = (
+            <div className="flex h-full items-center justify-center p-4">
+                Loading report...
+            </div>
+        );
+    } else if (hasError) {
+        content = (
+            <div className="flex h-full items-center justify-center p-4 text-destructive">
+                Error loading report.
+            </div>
+        );
+    } else {
+        content = (
                 <div className="flex h-full flex-1 flex-col gap-4 p-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex flex-col gap-1">
@@ -322,7 +322,16 @@ export function FinancialReportPageShell({
 
                     {children}
                 </div>
-            )}
+            );
+    }
+
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Helmet>
+                <title>{title}</title>
+            </Helmet>
+
+            {content}
         </AppLayout>
     );
 }

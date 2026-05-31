@@ -16,12 +16,19 @@ export function useEntityFormItemDialog<TItem, TDialogItem = TItem>({
     const [isItemDialogOpen, setIsItemDialogOpen] = useState(false);
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
-    const item =
-        editingIndex === null
-            ? null
-            : mapEditingItem
-              ? mapEditingItem(items?.[editingIndex])
-              : ((items?.[editingIndex] ?? null) as TDialogItem | null);
+    const resolveItem = (): TDialogItem | null => {
+        if (editingIndex === null) {
+            return null;
+        }
+
+        if (mapEditingItem) {
+            return mapEditingItem(items?.[editingIndex]);
+        }
+
+        return (items?.[editingIndex] ?? null) as TDialogItem | null;
+    };
+
+    const item = resolveItem();
 
     const handleCreateNewItem = () => {
         setEditingIndex(null);
