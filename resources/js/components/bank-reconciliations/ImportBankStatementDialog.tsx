@@ -531,14 +531,14 @@ export const ImportBankStatementDialog = memo<ImportBankStatementDialogProps>(
                                     <TableBody>
                                         {previewRows.map((row, idx) => {
                                             const rowKey = `preview-${idx}-${headers
-                                                .map((h) => String(row[h] ?? ''))
+                                                .map((h) =>
+                                                    String(row[h] ?? ''),
+                                                )
                                                 .join('|')}`;
                                             return (
                                                 <TableRow key={rowKey}>
                                                     {headers.map((header) => (
-                                                        <TableCell
-                                                            key={header}
-                                                        >
+                                                        <TableCell key={header}>
                                                             {String(
                                                                 row[header] ??
                                                                     '',
