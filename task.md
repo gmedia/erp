@@ -194,9 +194,24 @@ Files kept (intentionally, because they are live):
 
 ## Recommended Next Steps
 
+### Audit complete (2026-05-31 09:28 UTC) — FY propagation already complete
+
+This session audited all `fiscal_year_id` references across the frontend codebase. Result: no actionable gaps. Wave 13 + earlier work covered every create-form FY field correctly. Remaining FY references fall into three categories:
+
+| Category | Files | Why no preferredMetaKey |
+|---|---|---|
+| Wave 13 financial transaction forms (8) | ApPayment, ArReceipt, CustomerInvoice, SupplierBill, CreditNote, PeriodClosing, BankReconciliation, CalculateFormModal | ✅ All wired |
+| Report filters using preferredMetaKey | general-ledger/Filters, trial-balance-detailed/Filters | ✅ All wired (per pattern docs L246) |
+| Filter contexts (intentional skip) | CoaVersionFilters, PeriodClosingFilters | Filter default should be "all", not pre-filtered |
+| Static `<SelectField>` create form | CoaVersionForm | Pre-resolves FY upfront; explicit user choice intentional |
+| Backend-trait resolution | FinancialReportPageShell, FinancialTableReportPage | `InteractsWithFinancialReportRequest` resolves server-side |
+| Dead code | trial-balance/Filters.tsx | `createTrialBalanceFilterFields` defined but not imported |
+
+Inventory transaction forms (stock-transfers, inventory-stocktakes, stock-adjustments, purchase-orders, etc.) **do not have a `fiscal_year_id` field** — they derive FY backend-side from transaction date.
+
 ### My recommendation for the new session
 
-Wave 13 just shipped the preferred-fiscal-year propagation. Highest-leverage remaining options diverge in goal:
+The Sonar maintenance debt is essentially closed (~9 OPEN issues remain, all with rationale skip). The FY propagation feature is complete end-to-end. Highest-leverage remaining options diverge in goal:
 
 1. **E2E coverage for default FY** — add Playwright spec verifying default FY auto-selected in financial transaction forms (open `New AP Payment`, assert `fiscal_year_id` filled). Regression safety for the wave 13 change.
 2. **Document pattern** — add snippet in `docs/development-patterns.md` for "How to default fiscal year in a form" with `AsyncSelectField preferredMetaKey` + status filter caveat. Onboarding clarity.
