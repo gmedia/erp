@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-05-31 17:24 UTC
+Last updated: 2026-05-31 18:10 UTC
 
 ## Document Roles
 
@@ -12,10 +12,10 @@ Last updated: 2026-05-31 17:24 UTC
 
 User is switching to a new opencode session. Read this section first.
 
-1. **Verify baseline**: `git rev-parse HEAD` → expect `b3d9b6bb`. `git status --short` → expect empty (only `.depwire/` is gitignored cache).
-2. **No unfinished work** — last 10 commits all pushed. Working tree clean.
+1. **Verify baseline**: `git rev-parse HEAD` → expect `107104ae`. `git status --short` → expect empty (only `.depwire/` is gitignored cache).
+2. **No unfinished work** — last 11 commits all pushed. Working tree clean.
 3. **Tier A autonomous queue is exhausted.** Do NOT auto-continue more refactor/cleanup unless user explicitly asks. Next moves all need user direction.
-4. **Pending CI**: run `26719224576` for HEAD `b3d9b6bb` was `in_progress` at 17:24Z (docs-only commit, predecessor `a6ec6c74` of similar scope succeeded — minimal risk). Last verified-green code commit: `7ca7e387` via run `26715694961` (Quality + E2E + Test suite all success).
+4. **CI verified GREEN on HEAD**: run `26719382228` for `107104ae` finished at 18:08Z — all 3 jobs success ✅ (Quality 17:37Z, Playwright E2E 18:08Z, Test suite 18:08Z). Earlier runs `26719224576` and `26719011930` show `X` because of concurrency-cancel / autofix-supersede pattern (see CI Note below) — not real failures.
 5. **If user says "lanjutkan" without direction**: ASK which option. Do NOT pick autonomously — autonomous Tier A is exhausted; remaining options diverge in goals.
 
 ### Recommended next-session options (need user input)
@@ -28,17 +28,18 @@ User is switching to a new opencode session. Read this section first.
 ## Current State
 
 - Branch: `main`
-- HEAD: `b3d9b6bb docs(task): refresh HEAD reference to 80fa981d post-sonar-doc` (10 commits this session: waves 22-25 + 5 doc updates).
+- HEAD: `107104ae docs(task): handoff for new opencode session` (11 commits this session: waves 22-25 + 6 doc updates).
 - Working tree: clean.
-- Remote: pushed up through `b3d9b6bb`. CI run `26719224576` for latest `in_progress` (docs-only, low risk). Last verified-green run: `26715694961` for `7ca7e387` — all 3 jobs green ✅ (Quality 14:55Z, Playwright E2E 15:28Z, Test suite 15:28Z). Earlier run `26719011930` for `80fa981d` shows `cancelled/failure` but the failure is only the meta "Reflect combined CI result" step reflecting that Quality+E2E got concurrency-cancelled — not a real test failure (docs-only commit, no code touched).
+- Remote: pushed up through `107104ae`. **CI run `26719382228` for HEAD = success** (Quality 17:37Z, Playwright E2E 18:08Z, Test suite 18:08Z, all green ✅). Earlier runs `26719224576` (HEAD `b3d9b6bb`) and `26719011930` (HEAD `80fa981d`) show `X` due to concurrency-cancel / autofix-supersede on docs-only commits — not real regressions.
 - CI E2E is **required gate** (no `continue-on-error`).
 - Sonar Quality Gate: **OK** (verified 2026-05-31 17:12 UTC; coverage 94.9%, ncloc 93,096, dup 0.7%; OPEN code smells dropped 83 → 4 across waves 18-24, all 4 remaining are deferred typescript:S3358 ternaries in BankReconciliationWorkspace).
 - Sonar Security Hotspots: 0 TO_REVIEW.
 - Module registry: 78 entries (added `fiscal-year-auto-select` cross-cutting entry in `467e916a`).
 
-## This Session's Commits (10 total, all on `main`, all pushed)
+## This Session's Commits (11 total, all on `main`, all pushed)
 
 ```
+107104ae docs(task): handoff for new opencode session
 b3d9b6bb docs(task): refresh HEAD reference to 80fa981d post-sonar-doc
 80fa981d docs(sonar): record waves 22-25 in refactor progress doc
 a6ec6c74 docs(task): final session handoff (waves 22-25, CI green)
@@ -51,7 +52,7 @@ ed1dd45e docs(task): record FY auto-select E2E spec landing
 467e916a test(e2e): add fiscal year auto-select regression spec
 ```
 
-**Cumulative deltas:** -774 LOC across 11 files removed, +147 LOC added (E2E spec + 4 doc updates), +4 new E2E cases (FY auto-select), Sonar OPEN 10 → 4, all verifications green.
+**Cumulative deltas:** -774 LOC across 11 files removed, +147 LOC added (E2E spec + 4 doc updates), +4 new E2E cases (FY auto-select), Sonar OPEN 10 → 4, all verifications green. **CI verified green on HEAD `107104ae` via run `26719382228` (18:08Z).**
 
 ## Research Snapshot — 2026-05-31 (this session)
 
@@ -341,11 +342,12 @@ gh run list --branch main --limit 5
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo on `main` at HEAD `9b4c7265` or later
-(post waves 18-21 + dead code cleanup).
+Read task.md first. Repo on `main` at HEAD `107104ae` (post waves 18-25
++ doc handoffs). CI verified GREEN on this HEAD via run `26719382228`
+(Quality 17:37Z, Playwright E2E 18:08Z, Test suite 18:08Z).
 
-This session (2026-05-31) closed 73/74 actionable Sonar OPEN issues
-across 4 cleanup waves + dead code removal:
+This session (2026-05-31) closed 79/83 actionable Sonar OPEN issues
+across 8 cleanup waves + dead code removal:
 
 - Wave 18 (9caa14cb): 45 php:S1808 across 21 PHP files (promoted-property
   constructors, whenLoaded() calls, empty wrapper requests reformatted).
@@ -360,48 +362,50 @@ across 4 cleanup waves + dead code removal:
 - Dead code (9b4c7265): removed resources/js/components/reports/trial-balance/
   Columns.tsx + Filters.tsx (96 LOC). Both defined but never imported;
   page uses FinancialReportPageShell + inline AccountItem instead.
+- Wave 22 (b12ddfc4): typescript:S6754 in BankReconciliationWorkspace
+  closed. Removed dead currentReconciledBalance useState + 5 setter
+  calls (-18 LOC). Setter-only, value never read.
+- Wave 23 (44d20327): 8 orphan files removed (-491 LOC). UpdateProductData
+  DTO + 7 frontend components (CheckboxField, ExportButton, ErrorBoundary,
+  GenericDataTable, ColumnVisibilityToggle, StyledSelect, useEntityFilters).
+  Each verified individually with depwire_simulate_change (0 broken imports).
+- Wave 24 (f81975ad): added .sonarcloud.properties scoping php:S103
+  exclusion to app/Models/** (auto-generated ide-helper PHPDoc). Marked
+  the 2 OPEN php:S103 in SubscriptionBillingRecord.php as `accept` via
+  Sonar API. Sonar OPEN: 9 → 4.
+- Wave 25 (7ca7e387): orphan e2e test helpers removed (-265 LOC).
+  tests/e2e/{period-closings,recurring-journals}/helpers.ts had no
+  importing spec. Also added .depwire/ to .gitignore.
 
-Sonar OPEN dropped from 83 → 10. Remaining 10 all have rationale skip:
-- 2 php:S103 (auto-generated ide-helper, cannot fix)
-- 2 typescript:S4325 (AccountForm generic bridge)
-- 4 typescript:S3358 (BankReconciliationWorkspace JSX cells)
-- 1 typescript:S6754 (useState semantic risk)
-- 1 typescript:S6478 (Sonar false positive render prop)
+Sonar OPEN at 4. All 4 remaining are deferred typescript:S3358 ternaries
+in BankReconciliationWorkspace (deeply nested JSX cells, refactor risk
+> value, explicit skip with rationale).
 
 FY propagation audit completed (e36e0ed8): all 8 financial transaction
 forms already wired correctly with preferredMetaKey since wave 13.
 Inventory transaction forms don't have a fiscal_year_id field (FY
-derived backend-side from transaction date). No actionable gaps.
+derived backend-side from transaction date). E2E regression spec landed
+(467e916a) — 4 cases covering AP Payment, AR Receipt, Period Closing,
+Bank Reconciliation, all green.
 
-CI status verification: e36e0ed8 = success (full pipeline pass).
-9b4c7265 push triggered new run, may still be queued.
-
-Before reacting to red CI runs: read the "CI Autofix Supersede Pattern"
-section. Most reds in `gh run list` are concurrency-cancels or
-autofix-supersedes. Verify via the latest run on HEAD.
+CI status: 107104ae verified GREEN at 18:08Z. Earlier docs-only commits
+b3d9b6bb and 80fa981d show `X` due to autofix-supersede / concurrency-
+cancel pattern — not real failures. Read "CI Autofix Supersede Pattern"
+section if reacting to red runs in `gh run list`.
 
 Repo is in a stable state. Sonar maintenance debt practically closed.
 No autonomous work remaining without user decisions on direction.
 
-Suggested next steps if user wants to keep going:
-1. E2E spec verifying default FY auto-selected in transaction forms
-   (Playwright case opening New AP Payment, asserting fiscal_year_id
-   filled). Regression safety. Requires user choice on scope (cover
-   all 8 forms or representative subset like AP+AR only).
-2. Pivot to product feature: P&L by Department, Aging Dashboard,
-   Budget Management, Sales/Invoicing. Highest user value but needs
-   domain priority pick.
+Suggested next steps if user wants to keep going (all NEED user input):
+1. Pivot to product feature: Aging Dashboard AR/AP (recommended — reuses
+   existing customer-invoices + supplier-bills, follows financial-dashboard
+   pattern), P&L by Department, Budget Management, or Sales/Invoicing.
+2. Sonar duplications refactor (AbstractApPaymentRequest +
+   AbstractArReceiptRequest trait extraction). Net -10 LOC. Sub-threshold
+   metric (gate already OK at 0.7%). Modifies validation surface.
 3. Seed dev DB to activate financial-dashboard nav
    (`sail artisan db:seed --class=MenuSeeder --class=PermissionSeeder`).
    Mutates state, reversible via fresh migrate.
-4. Refactor 1 remaining typescript:S6754 in BankReconciliationWorkspace.
-   useState setter-only used 5×, value never read. Convert to useRef.
-   Risk: changes re-render semantics if any consumer relied on state
-   tracking. Requires careful read of all 5 setter call sites.
-5. Wider dead code audit beyond trial-balance. Depwire reports 7000+
-   "dead" symbols but most are Laravel reflection false positives
-   (closure routes, factory states, model accessors). Need manual
-   per-file verification with grep, similar to trial-balance approach.
 
 If user input is "lanjutkan" or similar without new direction, ASK
 which branch to take rather than picking unilaterally. The session
