@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-05-31 15:31 UTC
+Last updated: 2026-05-31 17:13 UTC
 
 ## Document Roles
 
@@ -11,11 +11,11 @@ Last updated: 2026-05-31 15:31 UTC
 ## Current State
 
 - Branch: `main`
-- HEAD: `7ca7e387 chore: remove orphan e2e test helpers (-265 LOC) + ignore .depwire/` (7 commits this session: waves 22-25 + this handoff).
+- HEAD: `80fa981d docs(sonar): record waves 22-25 in refactor progress doc` (9 commits this session: waves 22-25 + 4 doc updates).
 - Working tree: clean.
-- Remote: pushed up through `7ca7e387`. CI run `26715694961` **all 3 jobs green ✅** (Quality 14:55Z, Playwright E2E 15:28Z, Test suite 15:28Z).
+- Remote: pushed up through `80fa981d`. CI run `26719011930` for latest commit `in_progress` (docs-only change, low risk; identical-scope commit `a6ec6c74` succeeded earlier — verified via `gh run view 26717532676`). CI run `26715694961` for `7ca7e387` (last code-touching commit) **all 3 jobs green ✅** (Quality 14:55Z, Playwright E2E 15:28Z, Test suite 15:28Z).
 - CI E2E is **required gate** (no `continue-on-error`).
-- Sonar Quality Gate: **OK** (verified 2026-05-31; coverage 94.9%, ncloc 93,096, dup 0.7%; OPEN code smells dropped 83 → 4 across waves 18-24, all 4 remaining are deferred typescript:S3358 ternaries in BankReconciliationWorkspace).
+- Sonar Quality Gate: **OK** (verified 2026-05-31 17:12 UTC; coverage 94.9%, ncloc 93,096, dup 0.7%; OPEN code smells dropped 83 → 4 across waves 18-24, all 4 remaining are deferred typescript:S3358 ternaries in BankReconciliationWorkspace).
 - Sonar Security Hotspots: 0 TO_REVIEW.
 - Module registry: 78 entries (added `fiscal-year-auto-select` cross-cutting entry in `467e916a`).
 
