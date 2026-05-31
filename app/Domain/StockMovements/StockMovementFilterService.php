@@ -58,9 +58,24 @@ class StockMovementFilterService
             $sortDirection,
             $allowedSorts,
             [
-                'product_name' => $this->relationSortConfig('products', 'stock_movements.product_id', 'name', join: 'leftJoin'),
-                'warehouse_name' => $this->relationSortConfig('warehouses', 'stock_movements.warehouse_id', 'name', join: 'leftJoin'),
-                'created_by' => $this->relationSortConfig('users', 'stock_movements.created_by', 'name', join: 'leftJoin'),
+                'product_name' => $this->relationSortConfig(
+                    'products',
+                    'stock_movements.product_id',
+                    'name',
+                    join: 'leftJoin',
+                ),
+                'warehouse_name' => $this->relationSortConfig(
+                    'warehouses',
+                    'stock_movements.warehouse_id',
+                    'name',
+                    join: 'leftJoin',
+                ),
+                'created_by' => $this->relationSortConfig(
+                    'users',
+                    'stock_movements.created_by',
+                    'name',
+                    join: 'leftJoin',
+                ),
             ],
             'stock_movements'
         );

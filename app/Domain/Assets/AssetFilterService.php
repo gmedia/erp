@@ -42,7 +42,13 @@ class AssetFilterService
     }
 
     /**
-     * @return array<string, array{table: string, local_column: string, foreign_column: string, order_column: string, join?: 'join'|'leftJoin'}>
+     * @return array<string, array{
+     *     table: string,
+     *     local_column: string,
+     *     foreign_column: string,
+     *     order_column: string,
+     *     join?: 'join'|'leftJoin',
+     * }>
      */
     protected function assetRelationSortMap(): array
     {

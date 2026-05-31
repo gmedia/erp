@@ -22,7 +22,10 @@ class PurchaseOrderFilterService
             ],
             [
                 'order_date' => ['from' => 'order_date_from', 'to' => 'order_date_to'],
-                'expected_delivery_date' => ['from' => 'expected_delivery_date_from', 'to' => 'expected_delivery_date_to'],
+                'expected_delivery_date' => [
+                    'from' => 'expected_delivery_date_from',
+                    'to' => 'expected_delivery_date_to',
+                ],
             ],
             [
                 'grand_total' => ['min' => 'grand_total_min', 'max' => 'grand_total_max'],

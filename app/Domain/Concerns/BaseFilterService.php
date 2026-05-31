@@ -116,7 +116,13 @@ trait BaseFilterService
      * @template TModel of \Illuminate\Database\Eloquent\Model
      *
      * @param  Builder<TModel>  $query
-     * @param  array<string, array{table: string, local_column: string, foreign_column: string, order_column: string, join?: 'join'|'leftJoin'}>  $relationSortMap
+     * @param  array<string, array{
+     *     table: string,
+     *     local_column: string,
+     *     foreign_column: string,
+     *     order_column: string,
+     *     join?: 'join'|'leftJoin',
+     * }>  $relationSortMap
      */
     public function applyMappedRelationSorting(
         Builder $query,
@@ -161,7 +167,13 @@ trait BaseFilterService
      *
      * @param  Builder<TModel>  $query
      * @param  array<int, string>  $allowedSorts
-     * @param  array<string, array{table: string, local_column: string, foreign_column: string, order_column: string, join?: 'join'|'leftJoin'}>  $relationSortMap
+     * @param  array<string, array{
+     *     table: string,
+     *     local_column: string,
+     *     foreign_column: string,
+     *     order_column: string,
+     *     join?: 'join'|'leftJoin',
+     * }>  $relationSortMap
      */
     public function applySortingWithRelationFallback(
         Builder $query,
@@ -213,9 +225,12 @@ trait BaseFilterService
     {
         foreach ($relationFieldMap as $filterKey => $config) {
             if (! empty($filters[$filterKey])) {
-                $query->whereHas($config['relation'], function (Builder $relationQuery) use ($config, $filters, $filterKey): void {
-                    $relationQuery->where($config['column'], $filters[$filterKey]);
-                });
+                $query->whereHas(
+                    $config['relation'],
+                    function (Builder $relationQuery) use ($config, $filters, $filterKey): void {
+                        $relationQuery->where($config['column'], $filters[$filterKey]);
+                    },
+                );
             }
         }
     }
@@ -359,7 +374,13 @@ trait BaseFilterService
     /**
      * Build a normalized relation sort config entry.
      *
-     * @return array{table: string, local_column: string, foreign_column: string, order_column: string, join?: 'join'|'leftJoin'}
+     * @return array{
+     *     table: string,
+     *     local_column: string,
+     *     foreign_column: string,
+     *     order_column: string,
+     *     join?: 'join'|'leftJoin',
+     * }
      */
     public function relationSortConfig(
         string $table,

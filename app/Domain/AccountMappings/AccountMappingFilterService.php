@@ -47,8 +47,18 @@ class AccountMappingFilterService
             $sortDirection,
             $allowedSorts,
             [
-                'source' => $this->relationSortConfig('accounts', 'account_mappings.source_account_id', 'code', tableAlias: 'source_acc'),
-                'target' => $this->relationSortConfig('accounts', 'account_mappings.target_account_id', 'code', tableAlias: 'target_acc'),
+                'source' => $this->relationSortConfig(
+                    'accounts',
+                    'account_mappings.source_account_id',
+                    'code',
+                    tableAlias: 'source_acc',
+                ),
+                'target' => $this->relationSortConfig(
+                    'accounts',
+                    'account_mappings.target_account_id',
+                    'code',
+                    tableAlias: 'target_acc',
+                ),
             ],
             'account_mappings',
         );

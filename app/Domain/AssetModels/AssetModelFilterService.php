@@ -33,7 +33,12 @@ class AssetModelFilterService
             $sortDirection,
             $allowedSorts,
             [
-                'category' => $this->relationSortConfig('asset_categories', 'asset_models.asset_category_id', 'name', join: 'leftJoin'),
+                'category' => $this->relationSortConfig(
+                    'asset_categories',
+                    'asset_models.asset_category_id',
+                    'name',
+                    join: 'leftJoin',
+                ),
             ],
             'asset_models'
         );

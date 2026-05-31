@@ -53,7 +53,12 @@ class PipelineFilterService
             $sortDirection,
             $allowedSorts,
             [
-                'created_by' => $this->relationSortConfig('users', 'pipelines.created_by', join: 'leftJoin', tableAlias: 'creator'),
+                'created_by' => $this->relationSortConfig(
+                    'users',
+                    'pipelines.created_by',
+                    join: 'leftJoin',
+                    tableAlias: 'creator',
+                ),
             ],
             'pipelines',
         );

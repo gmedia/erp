@@ -45,7 +45,11 @@ class AssetMaintenanceFilterService
             $allowedSorts,
             [
                 'asset' => $this->relationSortConfig('assets', 'asset_maintenances.asset_id', 'asset_code'),
-                'supplier' => $this->relationSortConfig('suppliers', 'asset_maintenances.supplier_id', join: 'leftJoin'),
+                'supplier' => $this->relationSortConfig(
+                    'suppliers',
+                    'asset_maintenances.supplier_id',
+                    join: 'leftJoin',
+                ),
             ],
             'asset_maintenances'
         );

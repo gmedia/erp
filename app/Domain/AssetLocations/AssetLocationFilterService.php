@@ -53,7 +53,12 @@ class AssetLocationFilterService
             $allowedSorts,
             [
                 'branch' => $this->relationSortConfig('branches', 'asset_locations.branch_id', join: 'leftJoin'),
-                'parent' => $this->relationSortConfig('asset_locations', 'asset_locations.parent_id', join: 'leftJoin', tableAlias: 'parents'),
+                'parent' => $this->relationSortConfig(
+                    'asset_locations',
+                    'asset_locations.parent_id',
+                    join: 'leftJoin',
+                    tableAlias: 'parents',
+                ),
             ],
             'asset_locations',
         );

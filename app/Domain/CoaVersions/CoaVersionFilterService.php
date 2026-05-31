@@ -50,8 +50,16 @@ class CoaVersionFilterService
             $sortDirection,
             $allowedSorts,
             [
-                'fiscal_year.name' => $this->relationSortConfig('fiscal_years', 'coa_versions.fiscal_year_id', join: 'leftJoin'),
-                'fiscal_year_name' => $this->relationSortConfig('fiscal_years', 'coa_versions.fiscal_year_id', join: 'leftJoin'),
+                'fiscal_year.name' => $this->relationSortConfig(
+                    'fiscal_years',
+                    'coa_versions.fiscal_year_id',
+                    join: 'leftJoin',
+                ),
+                'fiscal_year_name' => $this->relationSortConfig(
+                    'fiscal_years',
+                    'coa_versions.fiscal_year_id',
+                    join: 'leftJoin',
+                ),
             ],
             'coa_versions',
         );

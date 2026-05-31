@@ -49,7 +49,11 @@ class ProductFilterService
             $sortDirection,
             $allowedSorts,
             [
-                'category' => $this->relationSortConfig('product_categories', 'products.product_category_id', join: 'leftJoin'),
+                'category' => $this->relationSortConfig(
+                    'product_categories',
+                    'products.product_category_id',
+                    join: 'leftJoin',
+                ),
             ],
             'products',
         );
