@@ -294,4 +294,141 @@ describe('Aging Dashboard API', function () {
 
         $response->assertUnauthorized();
     });
+
+    test('requires aging_dashboard permission', function () {
+        Sanctum::actingAs($this->createTestUserWithPermissions([]), ['*']);
+
+        $response = getJson('/api/aging-dashboard');
+
+        $response->assertForbidden();
+    });
+
+    test('sum of five buckets equals total outstanding', function () {
+        Sanctum::actingAs($this->createTestUserWithPermissions(['aging_dashboard']), ['*']);
+
+        $branch = Branch::factory()->create();
+        $customer = Customer::factory()->create(['branch_id' => $branch->id]);
+
+        foreach (['2026-06-15', '2026-05-17', '2026-04-17', '2026-03-18', '2026-02-01'] as $i => $dueDate) {
+            CustomerInvoice::factory()->create([
+                'customer_id' => $customer->id,
+                'branch_id' => $branch->id,
+                'due_date' => $dueDate,
+                'grand_total' => 1000 + ($i * 250),
+                'amount_received' => 0,
+                'credit_note_amount' => 0,
+                'amount_due' => 1000 + ($i * 250),
+                'status' => 'sent',
+            ]);
+        }
+
+        $response = getJson('/api/aging-dashboard');
+
+        $summary = $response->assertOk()->json('ar_summary');
+        $bucketSum = (float) $summary['current']
+            + (float) $summary['1_30']
+            + (float) $summary['31_60']
+            + (float) $summary['61_90']
+            + (float) $summary['over_90'];
+
+        expect(round($bucketSum, 2))->toBe(round((float) $summary['total_outstanding'], 2));
+    });
+
+    test('bucket boundary dates are inclusive on both ends with no overlap', function () {
+        Sanctum::actingAs($this->createTestUserWithPermissions(['aging_dashboard']), ['*']);
+
+        $branch = Branch::factory()->create();
+        $customer = Customer::factory()->create(['branch_id' => $branch->id]);
+
+        // Carbon::setTestNow is 2026-06-01.
+        // Boundaries: today=2026-06-01 → Current: due >= 2026-06-01
+        //             1-30: 2026-05-02 to 2026-05-31
+        //             31-60: 2026-04-02 to 2026-05-01
+        //             61-90: 2026-03-03 to 2026-04-01
+        //             >90: < 2026-03-03
+        $boundaries = [
+            ['due_date' => '2026-06-01', 'bucket' => 'current'],   // exactly today
+            ['due_date' => '2026-05-31', 'bucket' => '1_30'],      // today-1
+            ['due_date' => '2026-05-02', 'bucket' => '1_30'],      // today-30
+            ['due_date' => '2026-05-01', 'bucket' => '31_60'],     // today-31
+            ['due_date' => '2026-04-02', 'bucket' => '31_60'],     // today-60
+            ['due_date' => '2026-04-01', 'bucket' => '61_90'],     // today-61
+            ['due_date' => '2026-03-03', 'bucket' => '61_90'],     // today-90
+            ['due_date' => '2026-03-02', 'bucket' => 'over_90'],   // today-91
+        ];
+
+        foreach ($boundaries as $case) {
+            CustomerInvoice::factory()->create([
+                'customer_id' => $customer->id,
+                'branch_id' => $branch->id,
+                'due_date' => $case['due_date'],
+                'grand_total' => 100,
+                'amount_received' => 0,
+                'credit_note_amount' => 0,
+                'amount_due' => 100,
+                'status' => 'sent',
+            ]);
+        }
+
+        $response = getJson('/api/aging-dashboard');
+        $summary = $response->assertOk()->json('ar_summary');
+
+        // Each invoice = 100 → bucket totals should match counts × 100.
+        expect((float) $summary['current'])->toBe(100.0)        // 1 invoice
+            ->and((float) $summary['1_30'])->toBe(200.0)        // 2 invoices
+            ->and((float) $summary['31_60'])->toBe(200.0)       // 2 invoices
+            ->and((float) $summary['61_90'])->toBe(200.0)       // 2 invoices
+            ->and((float) $summary['over_90'])->toBe(100.0)     // 1 invoice
+            ->and((float) $summary['total_outstanding'])->toBe(800.0);
+    });
+
+    test('overdue percentage handles zero outstanding without division error', function () {
+        Sanctum::actingAs($this->createTestUserWithPermissions(['aging_dashboard']), ['*']);
+
+        $response = getJson('/api/aging-dashboard');
+
+        $response->assertOk()
+            ->assertJsonPath('ar_summary.overdue_percentage', 0)
+            ->assertJsonPath('ap_summary.overdue_percentage', 0);
+    });
+
+    test('respects custom as_of_date parameter for bucketing', function () {
+        Sanctum::actingAs($this->createTestUserWithPermissions(['aging_dashboard']), ['*']);
+
+        $branch = Branch::factory()->create();
+        $customer = Customer::factory()->create(['branch_id' => $branch->id]);
+
+        // Invoice due 2026-03-15. With as_of=2026-06-01 (default) it's >78 days = 61_90 bucket.
+        // With as_of=2026-04-01 it's only 17 days late = 1_30 bucket.
+        CustomerInvoice::factory()->create([
+            'customer_id' => $customer->id,
+            'branch_id' => $branch->id,
+            'due_date' => '2026-03-15',
+            'grand_total' => 500,
+            'amount_received' => 0,
+            'credit_note_amount' => 0,
+            'amount_due' => 500,
+            'status' => 'sent',
+        ]);
+
+        $defaultResponse = getJson('/api/aging-dashboard');
+        $defaultSummary = $defaultResponse->assertOk()->json('ar_summary');
+        expect((float) $defaultSummary['61_90'])->toBe(500.0)
+            ->and((float) $defaultSummary['1_30'])->toBe(0.0);
+
+        $customResponse = getJson('/api/aging-dashboard?as_of_date=2026-04-01');
+        $customSummary = $customResponse->assertOk()->json('ar_summary');
+        expect((float) $customSummary['1_30'])->toBe(500.0)
+            ->and((float) $customSummary['61_90'])->toBe(0.0)
+            ->and($customResponse->json('as_of_date'))->toBe('2026-04-01');
+    });
+
+    test('invalid as_of_date falls back to today gracefully', function () {
+        Sanctum::actingAs($this->createTestUserWithPermissions(['aging_dashboard']), ['*']);
+
+        $response = getJson('/api/aging-dashboard?as_of_date=not-a-real-date');
+
+        $response->assertOk()
+            ->assertJsonPath('as_of_date', '2026-06-01');
+    });
 });

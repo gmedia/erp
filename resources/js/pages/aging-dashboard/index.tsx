@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { AlertCircle, RefreshCw } from 'lucide-react';
+import { useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
 import { AgingBucketChart } from '../../components/aging-dashboard/AgingBucketChart';
@@ -10,7 +11,12 @@ import { AgingFilters } from '../../components/aging-dashboard/AgingFilters';
 import { AgingSummaryCards } from '../../components/aging-dashboard/AgingSummaryCards';
 import { TopOverdueCustomers } from '../../components/aging-dashboard/TopOverdueCustomers';
 import { TopOverdueSuppliers } from '../../components/aging-dashboard/TopOverdueSuppliers';
-import { useAgingDashboard } from '../../hooks/useAgingDashboard';
+import {
+    type AgingBucket,
+    type TopOverdueCustomer,
+    type TopOverdueSupplier,
+    useAgingDashboard,
+} from '../../hooks/useAgingDashboard';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -19,10 +25,14 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+const EMPTY_BUCKETS: AgingBucket[] = [];
+const EMPTY_CUSTOMERS: TopOverdueCustomer[] = [];
+const EMPTY_SUPPLIERS: TopOverdueSupplier[] = [];
+
 export default function AgingDashboard() {
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const today = new Date().toISOString().split('T')[0] || '2026-06-01';
+    const today = new Date().toISOString().slice(0, 10);
     const asOfDate: string = searchParams.get('as_of_date') || today;
     const branchId = searchParams.get('branch_id')
         ? Number(searchParams.get('branch_id'))
@@ -33,25 +43,35 @@ export default function AgingDashboard() {
         branchId,
     });
 
-    const handleAsOfDateChange = (date: string) => {
-        const newParams = new URLSearchParams(searchParams);
-        if (date) {
-            newParams.set('as_of_date', date);
-        } else {
-            newParams.delete('as_of_date');
-        }
-        setSearchParams(newParams);
-    };
+    const handleAsOfDateChange = useCallback(
+        (date: string) => {
+            setSearchParams((prev) => {
+                const newParams = new URLSearchParams(prev);
+                if (date) {
+                    newParams.set('as_of_date', date);
+                } else {
+                    newParams.delete('as_of_date');
+                }
+                return newParams;
+            });
+        },
+        [setSearchParams],
+    );
 
-    const handleBranchChange = (newBranchId: number | null) => {
-        const newParams = new URLSearchParams(searchParams);
-        if (newBranchId) {
-            newParams.set('branch_id', newBranchId.toString());
-        } else {
-            newParams.delete('branch_id');
-        }
-        setSearchParams(newParams);
-    };
+    const handleBranchChange = useCallback(
+        (newBranchId: number | null) => {
+            setSearchParams((prev) => {
+                const newParams = new URLSearchParams(prev);
+                if (newBranchId) {
+                    newParams.set('branch_id', newBranchId.toString());
+                } else {
+                    newParams.delete('branch_id');
+                }
+                return newParams;
+            });
+        },
+        [setSearchParams],
+    );
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -116,18 +136,18 @@ export default function AgingDashboard() {
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                         <AgingBucketChart
                             title="Receivables (AR)"
-                            buckets={data?.ar_buckets || []}
+                            buckets={data?.ar_buckets ?? EMPTY_BUCKETS}
                             totalOutstanding={
-                                data?.ar_summary.total_outstanding || 0
+                                data?.ar_summary?.total_outstanding ?? 0
                             }
                             isLoading={isLoading}
                             accentColor="emerald"
                         />
                         <AgingBucketChart
                             title="Payables (AP)"
-                            buckets={data?.ap_buckets || []}
+                            buckets={data?.ap_buckets ?? EMPTY_BUCKETS}
                             totalOutstanding={
-                                data?.ap_summary.total_outstanding || 0
+                                data?.ap_summary?.total_outstanding ?? 0
                             }
                             isLoading={isLoading}
                             accentColor="rose"
@@ -136,11 +156,15 @@ export default function AgingDashboard() {
 
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                         <TopOverdueCustomers
-                            customers={data?.top_overdue_customers || []}
+                            customers={
+                                data?.top_overdue_customers ?? EMPTY_CUSTOMERS
+                            }
                             isLoading={isLoading}
                         />
                         <TopOverdueSuppliers
-                            suppliers={data?.top_overdue_suppliers || []}
+                            suppliers={
+                                data?.top_overdue_suppliers ?? EMPTY_SUPPLIERS
+                            }
                             isLoading={isLoading}
                         />
                     </div>
