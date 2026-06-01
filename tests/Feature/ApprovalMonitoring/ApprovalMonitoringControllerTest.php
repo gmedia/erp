@@ -5,16 +5,16 @@ use App\Models\ApprovalFlowStep;
 use App\Models\ApprovalRequest;
 use App\Models\ApprovalRequestStep;
 use App\Models\Asset;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
+use Tests\Traits\CreatesTestUserWithPermissions;
 
 use function Pest\Laravel\getJson;
 
-uses(RefreshDatabase::class)->group('approval-monitoring');
+uses(RefreshDatabase::class, CreatesTestUserWithPermissions::class)->group('approval-monitoring');
 
 beforeEach(function () {
-    $this->user = User::factory()->create();
+    $this->user = $this->createTestUserWithPermissions(['approval_monitoring']);
 
     // Create some test data
     $this->flow = ApprovalFlow::create([
@@ -150,4 +150,13 @@ test('can filter overdue approvals by document type', function () {
 
     expect($responseFilter['overdue_approvals'])->toHaveCount(1);
     expect($responseFilter['overdue_approvals'][0]['document_type'])->toBe('Asset');
+});
+
+test('requires approval_monitoring permission', function () {
+    $userWithoutPermission = $this->createTestUserWithPermissions([]);
+    Sanctum::actingAs($userWithoutPermission, ['*']);
+
+    $response = getJson('/api/approval-monitoring/data');
+
+    $response->assertForbidden();
 });

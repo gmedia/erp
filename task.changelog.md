@@ -1,6 +1,6 @@
 # Changelog Tugas
 
-Terakhir diperbarui: 2026-05-27
+Terakhir diperbarui: 2026-06-01
 
 File ini menyimpan catatan perubahan produk dan fitur.
 Baca `task.md` untuk status handoff aktif dan `task.handoff-archive.md` untuk riwayat checkpoint E2E lama.
@@ -76,7 +76,24 @@ Catatan penamaan: heading modul memakai pola `Nama Modul di Kode (Label Bisnis)`
 - [x] `JournalEntry.source_type/source_id` di-set ke dokumen sumber (`App\Models\CustomerInvoice` / `App\Models\ArReceipt`) untuk audit trail.
 - [x] Cakupan tes: 13 Pest ar-journal-posting (action-level + controller PUT integration), regresi clean pada customer-invoices, ar-receipts, credit-notes, dan ap-journal-posting.
 
+### Modul Aging Dashboard (Dashboard Umur Piutang/Hutang)
+
+- [x] Endpoint baru `GET /api/aging-dashboard` mengembalikan ringkasan AR + AP dengan 5 bucket umur (Current, 1-30, 31-60, 61-90, Over 90 days), Top-10 customer/supplier paling overdue, dan filter `as_of_date` + `branch_id`.
+- [x] Backend `GetAgingDashboardDataAction` murni agregasi dengan `selectRaw` + parameterized bindings (tanpa `DATEDIFF`/`CURDATE`) sehingga lintas-DB (MySQL/MariaDB/PostgreSQL/SQLite). Carbon date math untuk semua cutoff bucket.
+- [x] Filter status outstanding: AR (`sent`, `partially_paid`, `overdue`), AP (`confirmed`, `partially_paid`, `overdue`). `amount_due` dibaca langsung dari kolom (selalu sinkron via `SyncArReceiptAllocationsAction` / `SyncApPaymentAllocationsAction`).
+- [x] Permission baru `aging_dashboard` + entry menu "Aging Dashboard" di grup Accounting (icon `Hourglass`, url `aging-dashboard`).
+- [x] Halaman frontend `/aging-dashboard` dengan 4 KPI card (Total Receivables, AR Overdue, Total Payables, AP Overdue dengan badge persentase overdue), 2 chart bucket horizontal (intensitas warna emerald untuk AR, rose untuk AP), 2 tabel Top-10 overdue (customers + suppliers). Tanpa dependensi chart library — bar visual murni Tailwind.
+- [x] Cakupan tes: 13 Pest aging-dashboard (107 assertions termasuk invariant jumlah 5 bucket = total outstanding, kasus boundary date inklusif untuk semua 8 edge, custom `as_of_date`, fallback `as_of_date` invalid, guard zero-percentage), 7 E2E Playwright (navigasi, KPI cards, bucket charts, tabel top overdue, filter `as_of_date`, filter branch, refresh, lima label bucket).
+
+### Hardening Keamanan Dashboard (Permission Gate)
+
+- [x] Tutup gap permission middleware di route dashboard yang sebelumnya hanya gated oleh `auth:sanctum`. Sebelum fix, user authenticated apapun (tanpa permission yang relevan) bisa membaca data sensitif.
+- [x] `/api/aging-dashboard` di-wrap `permission:aging_dashboard,true` (mirror pola `pipeline-dashboard.php`). Regression test 403 ditambahkan.
+- [x] `/api/financial-dashboard` di-wrap `permission:financial_dashboard,true`. Pest beforeEach diperbaiki dari permission `report` (yang bypass karena gate belum ada) menjadi `financial_dashboard`. Regression test 403 ditambahkan.
+- [x] `/api/approval-monitoring/data` di-wrap `permission:approval_monitoring,true`. Test refactor pakai trait `CreatesTestUserWithPermissions`. Regression test 403 ditambahkan.
+
 ## Dokumen Terkait
 
 - Status handoff aktif: `task.md`
 - Arsip historis handoff E2E: `task.handoff-archive.md`
+- Pre-implementation research: `docs/profit-loss-by-department-design.md`
