@@ -18,6 +18,7 @@ Route::middleware('auth:sanctum')->group(function () {
     require __DIR__ . '/api/account-mappings.php';
     require __DIR__ . '/api/accounts.php';
     require __DIR__ . '/api/admin-settings.php';
+    require __DIR__ . '/api/aging-dashboard.php';
     require __DIR__ . '/api/approval-audit-trail.php';
     require __DIR__ . '/api/approval-delegations.php';
     require __DIR__ . '/api/approval-flows.php';

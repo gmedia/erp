@@ -71,6 +71,7 @@ class MenuSeeder extends Seeder
                 'display_name' => 'Accounting',
                 'permissions' => [
                     'financial_dashboard',
+                    'aging_dashboard',
                     'journal_entry',
                     'posting_journal',
                     'recurring_journal',
@@ -88,6 +89,16 @@ class MenuSeeder extends Seeder
                         ],
                         'icon' => 'BarChart3',
                         'url' => 'financial-dashboard',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'aging_dashboard',
+                        'display_name' => 'Aging Dashboard',
+                        'permissions' => [
+                            'aging_dashboard',
+                        ],
+                        'icon' => 'Hourglass',
+                        'url' => 'aging-dashboard',
                         'child' => [],
                     ],
                     [

@@ -777,6 +777,14 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   tests:
     - tests/e2e/financial-dashboard/financial-dashboard.spec.ts
 
+- slug: aging-dashboard
+  route: /aging-dashboard
+  api: /api/aging-dashboard
+  view_type: page
+  note: "Non-CRUD AR/AP aging dashboard. 4 KPI cards (Total Receivables, AR Overdue, Total Payables, AP Overdue with overdue percentage badges), 2 horizontal bar charts (AR/AP buckets: Current, 1-30, 31-60, 61-90, Over 90 days, color-scaled emerald/rose), 2 top-10 overdue tables (customers + suppliers). Filters: as_of_date (default today), branch_id (default all). Cross-DB compatible (no DATEDIFF — Carbon date math + parameterized bindings). Backed by GetAgingDashboardDataAction. Requires `aging_dashboard` permission."
+  tests:
+    - tests/e2e/aging-dashboard/aging-dashboard.spec.ts
+
 - slug: fiscal-year-auto-select
   route: (cross-cutting — covers /ap-payments, /ar-receipts, /period-closings, /bank-reconciliations)
   api: /api/fiscal-years (and /api/fiscal-years?status=open)
@@ -868,6 +876,7 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 27 | Purchase Order Status Report | `purchase-order-status-report` | `Feature/Reports/PurchaseOrderStatusReportTest.php` | Laporan monitoring status PO (outstanding, partially received, closed) + export |
 | 28 | Purchase History Report | `purchase-history-report` | `Feature/Reports/PurchaseHistoryReportTest.php` | Laporan riwayat pembelian per supplier/produk/periode + export |
 | 29 | Goods Receipt Report | `goods-receipt-report` | `Feature/Reports/GoodsReceiptReportTest.php` | Laporan penerimaan barang per periode/supplier/gudang + export |
+| 30 | Aging Dashboard | `aging-dashboard` | `Feature/AgingDashboard/AgingDashboardControllerTest.php` | AR/AP aging dashboard with 5 buckets + top 10 overdue customers/suppliers + branch filter |
 
 ---
 

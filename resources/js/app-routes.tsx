@@ -74,6 +74,7 @@ const AssetDashboard = lazy(() => import('./pages/asset-dashboard/index'));
 const FinancialDashboard = lazy(
     () => import('./pages/financial-dashboard/index'),
 );
+const AgingDashboard = lazy(() => import('./pages/aging-dashboard/index'));
 
 // Accounting
 const Accounts = lazy(() => import('./pages/accounts/index'));
@@ -505,6 +506,14 @@ export default function AppRoutes() {
                     element={
                         <P>
                             <FinancialDashboard />
+                        </P>
+                    }
+                />
+                <Route
+                    path="/aging-dashboard"
+                    element={
+                        <P>
+                            <AgingDashboard />
                         </P>
                     }
                 />

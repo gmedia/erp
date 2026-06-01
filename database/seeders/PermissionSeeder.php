@@ -446,6 +446,11 @@ class PermissionSeeder extends Seeder
                 'child' => [],
             ],
             [
+                'name' => 'aging_dashboard',
+                'display_name' => 'Aging Dashboard',
+                'child' => [],
+            ],
+            [
                 'name' => 'asset_dashboard',
                 'display_name' => 'Asset Dashboard',
                 'child' => [],
