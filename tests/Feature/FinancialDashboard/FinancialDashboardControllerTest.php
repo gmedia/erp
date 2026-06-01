@@ -15,7 +15,7 @@ uses(RefreshDatabase::class, CreatesTestUserWithPermissions::class)->group('fina
 
 describe('Financial Dashboard API', function () {
     beforeEach(function () {
-        Sanctum::actingAs($this->createTestUserWithPermissions(['report']), ['*']);
+        Sanctum::actingAs($this->createTestUserWithPermissions(['financial_dashboard']), ['*']);
     });
 
     test('returns correct JSON structure', function () {
@@ -136,6 +136,14 @@ describe('Financial Dashboard API', function () {
         $response = getJson('/api/financial-dashboard');
 
         $response->assertUnauthorized();
+    });
+
+    test('requires financial_dashboard permission', function () {
+        Sanctum::actingAs($this->createTestUserWithPermissions([]), ['*']);
+
+        $response = getJson('/api/financial-dashboard');
+
+        $response->assertForbidden();
     });
 
     test('returns monthly trends with correct structure', function () {
