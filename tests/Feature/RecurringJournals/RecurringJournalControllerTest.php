@@ -117,3 +117,10 @@ test('it validates lines must be balanced', function () {
         ->assertUnprocessable()
         ->assertJsonValidationErrors('lines');
 });
+
+test('it returns 403 without recurring_journal permission', function () {
+    $user = createTestUserWithPermissions([]);
+    Sanctum::actingAs($user, ['*']);
+
+    getJson('/api/recurring-journals')->assertForbidden();
+});

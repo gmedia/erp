@@ -15,7 +15,7 @@ use function Pest\Laravel\putJson;
 uses(RefreshDatabase::class)->group('financial-reports');
 
 beforeEach(function () {
-    $this->user = createTestUserWithPermissions([]);
+    $this->user = createTestUserWithPermissions(['report_configuration', 'report_configuration.create', 'report_configuration.edit', 'report_configuration.delete']);
     Sanctum::actingAs($this->user, ['*']);
 });
 
@@ -164,4 +164,11 @@ test('it sorts by name by default', function () {
     $response = getJson('/api/report-configurations?sort_by=name&sort_direction=asc')->assertOk();
 
     expect($response->json('data.0.name'))->toBe('Alpha');
+});
+
+test('it returns 403 without report_configuration permission', function () {
+    $user = createTestUserWithPermissions([]);
+    Sanctum::actingAs($user, ['*']);
+
+    getJson('/api/report-configurations')->assertForbidden();
 });

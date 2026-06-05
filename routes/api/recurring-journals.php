@@ -3,7 +3,7 @@
 use App\Http\Controllers\RecurringJournalController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth:sanctum'])->group(function () {
+Route::middleware(['auth:sanctum', 'permission:recurring_journal,true'])->group(function () {
     Route::get('recurring-journals', [RecurringJournalController::class, 'index']);
     Route::get('recurring-journals/{recurring_journal}', [RecurringJournalController::class, 'show']);
     Route::post('recurring-journals', [RecurringJournalController::class, 'store']);

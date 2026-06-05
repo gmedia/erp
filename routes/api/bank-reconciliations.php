@@ -3,7 +3,7 @@
 use App\Http\Controllers\BankReconciliationController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth:sanctum'])->group(function () {
+Route::middleware(['auth:sanctum', 'permission:bank_reconciliation,true'])->group(function () {
     Route::post('bank-reconciliations/import-preview', [BankReconciliationController::class, 'importPreview']);
     Route::get('bank-reconciliations', [BankReconciliationController::class, 'index']);
     Route::get('bank-reconciliations/{bank_reconciliation}', [BankReconciliationController::class, 'show']);

@@ -633,3 +633,10 @@ test('completing without unmatched items does not create journal entry', functio
     $reconciliation->refresh();
     expect($reconciliation->journal_entry_id)->toBeNull();
 });
+
+test('it returns 403 without bank_reconciliation permission', function () {
+    $user = createTestUserWithPermissions([]);
+    Sanctum::actingAs($user, ['*']);
+
+    getJson('/api/bank-reconciliations')->assertForbidden();
+});

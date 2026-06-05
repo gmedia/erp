@@ -73,3 +73,10 @@ test('it can export general ledger report', function () {
 
     expect($response->json('filename'))->toEndWith('.xlsx');
 });
+
+test('it returns 403 without general_ledger_report permission', function () {
+    $user = createTestUserWithPermissions([]);
+    Sanctum::actingAs($user, ['*']);
+
+    getJson('/api/reports/general-ledger')->assertForbidden();
+});

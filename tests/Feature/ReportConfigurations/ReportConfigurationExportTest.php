@@ -13,7 +13,7 @@ uses(RefreshDatabase::class)->group('financial-reports');
 test('it exports report configurations to xlsx', function () {
     Excel::fake();
     Storage::fake('public');
-    Sanctum::actingAs(createTestUserWithPermissions([]), ['*']);
+    Sanctum::actingAs(createTestUserWithPermissions(['report_configuration']), ['*']);
     ReportConfiguration::factory()->count(2)->create();
 
     $response = postJson('/api/report-configurations/export', [])->assertOk();
@@ -25,7 +25,7 @@ test('it exports report configurations to xlsx', function () {
 test('it applies filters to export', function () {
     Excel::fake();
     Storage::fake('public');
-    Sanctum::actingAs(createTestUserWithPermissions([]), ['*']);
+    Sanctum::actingAs(createTestUserWithPermissions(['report_configuration']), ['*']);
     ReportConfiguration::factory()->ofType(ReportConfiguration::TYPE_BALANCE_SHEET)->create();
     ReportConfiguration::factory()->ofType(ReportConfiguration::TYPE_INCOME_STATEMENT)->create();
 

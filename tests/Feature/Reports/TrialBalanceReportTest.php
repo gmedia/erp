@@ -95,3 +95,10 @@ test('it validates fiscal_year_id when exporting trial balance financial report'
     ])->assertStatus(422)
         ->assertJsonValidationErrors(['fiscal_year_id']);
 });
+
+test('it returns 403 without trial_balance_report permission', function () {
+    $user = createTestUserWithPermissions([]);
+    Sanctum::actingAs($user, ['*']);
+
+    getJson('/api/reports/trial-balance-detailed')->assertForbidden();
+});
