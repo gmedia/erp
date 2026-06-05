@@ -7,7 +7,9 @@ import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { type ColumnDef } from '@tanstack/react-table';
 
-function getVarianceStatusVariant(status: BudgetVarianceItem['status']): 'default' | 'secondary' | 'destructive' {
+function getVarianceStatusVariant(
+    status: BudgetVarianceItem['status'],
+): 'default' | 'secondary' | 'destructive' {
     if (status === 'within_budget') return 'default';
     if (status === 'warning') return 'secondary';
     return 'destructive';
@@ -42,7 +44,9 @@ export const budgetVarianceColumns: ColumnDef<BudgetVarianceItem>[] = [
         accessorKey: 'period_start',
         ...createSortingHeader('Period Start'),
         cell: ({ row }) =>
-            formatDateByRegionalSettings(row.getValue('period_start') as string),
+            formatDateByRegionalSettings(
+                row.getValue('period_start') as string,
+            ),
     },
     {
         accessorKey: 'period_end',
@@ -54,10 +58,13 @@ export const budgetVarianceColumns: ColumnDef<BudgetVarianceItem>[] = [
         accessorKey: 'allocated',
         ...createSortingHeader('Allocated'),
         cell: ({ row }) =>
-            formatCurrencyByRegionalSettings(row.getValue('allocated') as number, {
-                locale: 'id-ID',
-                currency: 'IDR',
-            }),
+            formatCurrencyByRegionalSettings(
+                row.getValue('allocated') as number,
+                {
+                    locale: 'id-ID',
+                    currency: 'IDR',
+                },
+            ),
     },
     {
         accessorKey: 'actual',
@@ -72,10 +79,13 @@ export const budgetVarianceColumns: ColumnDef<BudgetVarianceItem>[] = [
         accessorKey: 'available',
         ...createSortingHeader('Available'),
         cell: ({ row }) =>
-            formatCurrencyByRegionalSettings(row.getValue('available') as number, {
-                locale: 'id-ID',
-                currency: 'IDR',
-            }),
+            formatCurrencyByRegionalSettings(
+                row.getValue('available') as number,
+                {
+                    locale: 'id-ID',
+                    currency: 'IDR',
+                },
+            ),
     },
     {
         accessorKey: 'variance_percent',
@@ -89,7 +99,9 @@ export const budgetVarianceColumns: ColumnDef<BudgetVarianceItem>[] = [
         accessorKey: 'status',
         ...createSortingHeader('Status'),
         cell: ({ row }) => {
-            const status = row.getValue('status') as BudgetVarianceItem['status'];
+            const status = row.getValue(
+                'status',
+            ) as BudgetVarianceItem['status'];
             return (
                 <Badge variant={getVarianceStatusVariant(status)}>
                     {getVarianceStatusLabel(status)}

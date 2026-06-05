@@ -24,13 +24,20 @@ export function createBudgetVarianceFilterFields(): FieldDescriptor[] {
             name: 'budget_id',
             label: 'Budget',
             component: (
-                <AsyncSelect
-                    url="/api/budgets"
-                    placeholder="Select budget"
-                />
+                <AsyncSelect url="/api/budgets" placeholder="Select budget" />
             ),
         },
-        createSelectFilterField('status', 'Status', varianceStatusOptions, 'All statuses'),
-        createSelectFilterField('account_type', 'Account Type', accountTypeOptions, 'All types'),
+        createSelectFilterField(
+            'status',
+            'Status',
+            varianceStatusOptions,
+            'All statuses',
+        ),
+        createSelectFilterField(
+            'account_type',
+            'Account Type',
+            accountTypeOptions,
+            'All types',
+        ),
     ];
 }

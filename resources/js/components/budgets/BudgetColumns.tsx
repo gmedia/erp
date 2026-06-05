@@ -13,7 +13,10 @@ import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { type ColumnDef } from '@tanstack/react-table';
 
 function getBudgetTypeBadgeVariant(type: string) {
-    const variants: Record<string, 'default' | 'secondary' | 'outline' | 'destructive'> = {
+    const variants: Record<
+        string,
+        'default' | 'secondary' | 'outline' | 'destructive'
+    > = {
         operational: 'default',
         capital: 'secondary',
         project: 'outline',
@@ -32,8 +35,13 @@ function getBudgetTypeLabel(type: string) {
     return labels[type] ?? type;
 }
 
-function getBudgetStatusVariant(status: string): 'default' | 'secondary' | 'outline' | 'destructive' {
-    const variants: Record<string, 'default' | 'secondary' | 'outline' | 'destructive'> = {
+function getBudgetStatusVariant(
+    status: string,
+): 'default' | 'secondary' | 'outline' | 'destructive' {
+    const variants: Record<
+        string,
+        'default' | 'secondary' | 'outline' | 'destructive'
+    > = {
         draft: 'secondary',
         approved: 'default',
         locked: 'outline',
@@ -68,7 +76,9 @@ export const budgetColumns: ColumnDef<Budget>[] = [
         accessorKey: 'budget_type',
         ...createSortingHeader('Budget Type'),
         cell: ({ row }) => (
-            <Badge variant={getBudgetTypeBadgeVariant(row.getValue('budget_type'))}>
+            <Badge
+                variant={getBudgetTypeBadgeVariant(row.getValue('budget_type'))}
+            >
                 {getBudgetTypeLabel(row.getValue('budget_type'))}
             </Badge>
         ),

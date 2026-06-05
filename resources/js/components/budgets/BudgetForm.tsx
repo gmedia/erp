@@ -12,7 +12,8 @@ import {
 import * as z from 'zod';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
-import EntityForm from '@/components/common/EntityForm';import { InputField } from '@/components/common/InputField';
+import EntityForm from '@/components/common/EntityForm';
+import { InputField } from '@/components/common/InputField';
 import SelectField from '@/components/common/SelectField';
 import { Button } from '@/components/ui/button';
 import {
@@ -81,7 +82,10 @@ export const BudgetForm = memo<BudgetFormProps>(function BudgetForm({
 }) {
     const isEdit = !!entity;
 
-    const defaultValues = useMemo(() => getBudgetFormDefaults(entity), [entity]);
+    const defaultValues = useMemo(
+        () => getBudgetFormDefaults(entity),
+        [entity],
+    );
 
     const form = useForm<z.input<typeof budgetFormSchema>>({
         resolver: zodResolver(budgetFormSchema),
@@ -105,7 +109,11 @@ export const BudgetForm = memo<BudgetFormProps>(function BudgetForm({
     }, [open, defaultValues, form]);
 
     const totalAllocated = useMemo(
-        () => lines?.reduce((sum, l) => sum + (Number(l.allocated_amount) || 0), 0) ?? 0,
+        () =>
+            lines?.reduce(
+                (sum, l) => sum + (Number(l.allocated_amount) || 0),
+                0,
+            ) ?? 0,
         [lines],
     );
 
@@ -164,7 +172,9 @@ export const BudgetForm = memo<BudgetFormProps>(function BudgetForm({
 
                     <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-semibold">Budget Lines</h3>
+                            <h3 className="text-lg font-semibold">
+                                Budget Lines
+                            </h3>
                             <Button
                                 type="button"
                                 variant="outline"
@@ -180,11 +190,21 @@ export const BudgetForm = memo<BudgetFormProps>(function BudgetForm({
                             <Table className="min-w-[800px]">
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead className="w-[25%]">Account</TableHead>
-                                        <TableHead className="w-[18%]">Period Start</TableHead>
-                                        <TableHead className="w-[18%]">Period End</TableHead>
-                                        <TableHead className="w-[20%] text-right">Allocated Amount</TableHead>
-                                        <TableHead className="w-[15%]">Notes</TableHead>
+                                        <TableHead className="w-[25%]">
+                                            Account
+                                        </TableHead>
+                                        <TableHead className="w-[18%]">
+                                            Period Start
+                                        </TableHead>
+                                        <TableHead className="w-[18%]">
+                                            Period End
+                                        </TableHead>
+                                        <TableHead className="w-[20%] text-right">
+                                            Allocated Amount
+                                        </TableHead>
+                                        <TableHead className="w-[15%]">
+                                            Notes
+                                        </TableHead>
                                         <TableHead className="w-[4%]"></TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -200,8 +220,10 @@ export const BudgetForm = memo<BudgetFormProps>(function BudgetForm({
                                         </TableRow>
                                     ) : (
                                         fields.map((field, index) => {
-                                            const current = lines?.[index] ?? field;
-                                            const isRowEditing = editingIndex === index;
+                                            const current =
+                                                lines?.[index] ?? field;
+                                            const isRowEditing =
+                                                editingIndex === index;
 
                                             if (isRowEditing) {
                                                 return (
@@ -250,7 +272,11 @@ export const BudgetForm = memo<BudgetFormProps>(function BudgetForm({
                                                                 type="button"
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                onClick={() => setEditingIndex(null)}
+                                                                onClick={() =>
+                                                                    setEditingIndex(
+                                                                        null,
+                                                                    )
+                                                                }
                                                             >
                                                                 <Pencil className="h-4 w-4 text-green-500" />
                                                             </Button>
@@ -265,24 +291,42 @@ export const BudgetForm = memo<BudgetFormProps>(function BudgetForm({
                                                         {current.account_code
                                                             ? `${current.account_code} - `
                                                             : ''}
-                                                        {current.account_name || 'Selected Account'}
+                                                        {current.account_name ||
+                                                            'Selected Account'}
                                                     </TableCell>
-                                                    <TableCell>{current.period_start || '-'}</TableCell>
-                                                    <TableCell>{current.period_end || '-'}</TableCell>
+                                                    <TableCell>
+                                                        {current.period_start ||
+                                                            '-'}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {current.period_end ||
+                                                            '-'}
+                                                    </TableCell>
                                                     <TableCell className="text-right">
                                                         {formatCurrencyByRegionalSettings(
-                                                            Number(current.allocated_amount) || 0,
-                                                            { locale: 'id-ID', currency: 'IDR' },
+                                                            Number(
+                                                                current.allocated_amount,
+                                                            ) || 0,
+                                                            {
+                                                                locale: 'id-ID',
+                                                                currency: 'IDR',
+                                                            },
                                                         )}
                                                     </TableCell>
-                                                    <TableCell>{current.notes || '-'}</TableCell>
+                                                    <TableCell>
+                                                        {current.notes || '-'}
+                                                    </TableCell>
                                                     <TableCell>
                                                         <div className="flex items-center justify-end gap-1">
                                                             <Button
                                                                 type="button"
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                onClick={() => setEditingIndex(index)}
+                                                                onClick={() =>
+                                                                    setEditingIndex(
+                                                                        index,
+                                                                    )
+                                                                }
                                                             >
                                                                 <Pencil className="h-4 w-4 text-muted-foreground" />
                                                             </Button>
@@ -290,7 +334,11 @@ export const BudgetForm = memo<BudgetFormProps>(function BudgetForm({
                                                                 type="button"
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                onClick={() => remove(index)}
+                                                                onClick={() =>
+                                                                    remove(
+                                                                        index,
+                                                                    )
+                                                                }
                                                             >
                                                                 <Trash className="h-4 w-4 text-red-500" />
                                                             </Button>
@@ -303,14 +351,20 @@ export const BudgetForm = memo<BudgetFormProps>(function BudgetForm({
                                 </TableBody>
                                 <TableFooter>
                                     <TableRow>
-                                        <TableCell colSpan={3} className="font-bold">
+                                        <TableCell
+                                            colSpan={3}
+                                            className="font-bold"
+                                        >
                                             Total
                                         </TableCell>
                                         <TableCell className="text-right font-bold">
-                                            {formatCurrencyByRegionalSettings(totalAllocated, {
-                                                locale: 'id-ID',
-                                                currency: 'IDR',
-                                            })}
+                                            {formatCurrencyByRegionalSettings(
+                                                totalAllocated,
+                                                {
+                                                    locale: 'id-ID',
+                                                    currency: 'IDR',
+                                                },
+                                            )}
                                         </TableCell>
                                         <TableCell colSpan={2} />
                                     </TableRow>
@@ -318,9 +372,14 @@ export const BudgetForm = memo<BudgetFormProps>(function BudgetForm({
                             </Table>
                             {form.formState.errors.lines && (
                                 <p className="p-4 text-sm text-red-500">
-                                    {typeof form.formState.errors.lines === 'object' &&
+                                    {typeof form.formState.errors.lines ===
+                                        'object' &&
                                     'message' in form.formState.errors.lines
-                                        ? (form.formState.errors.lines as { message?: string }).message
+                                        ? (
+                                              form.formState.errors.lines as {
+                                                  message?: string;
+                                              }
+                                          ).message
                                         : 'Please fix the errors in the lines.'}
                                 </p>
                             )}

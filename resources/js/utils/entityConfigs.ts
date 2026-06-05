@@ -1280,7 +1280,12 @@ export const budgetConfig = createComplexEntityConfig<Budget>({
     exportEndpoint: '/api/budgets/export',
     queryKey: ['budgets'],
     breadcrumbs: [{ title: 'Budgets', href: '/budgets' }],
-    initialFilters: { search: '', status: '', fiscal_year_id: '', budget_type: '' },
+    initialFilters: {
+        search: '',
+        status: '',
+        fiscal_year_id: '',
+        budget_type: '',
+    },
     columns: budgetColumns,
     filterFields: createBudgetFilterFields(),
     formComponent: BudgetForm,

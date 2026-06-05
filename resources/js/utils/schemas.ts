@@ -1227,16 +1227,22 @@ export const budgetLineFormSchema = z.object({
     account_code: z.string().optional(),
     period_start: z.string().min(1, { message: 'Period start is required.' }),
     period_end: z.string().min(1, { message: 'Period end is required.' }),
-    allocated_amount: z.coerce.number().min(0, { message: 'Amount must be non-negative.' }),
+    allocated_amount: z.coerce
+        .number()
+        .min(0, { message: 'Amount must be non-negative.' }),
     notes: z.string().nullable().optional(),
 });
 
 export const budgetFormSchema = z.object({
     name: z.string().min(1, { message: 'Name is required.' }),
     description: z.string().nullable().optional(),
-    fiscal_year_id: z.coerce.number().min(1, { message: 'Fiscal year is required.' }),
+    fiscal_year_id: z.coerce
+        .number()
+        .min(1, { message: 'Fiscal year is required.' }),
     budget_type: z.enum(['operational', 'capital', 'project', 'revenue']),
-    lines: z.array(budgetLineFormSchema).min(1, { message: 'At least one line is required.' }),
+    lines: z
+        .array(budgetLineFormSchema)
+        .min(1, { message: 'At least one line is required.' }),
 });
 
 export type BudgetLineFormData = z.infer<typeof budgetLineFormSchema>;

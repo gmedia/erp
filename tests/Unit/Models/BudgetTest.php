@@ -5,6 +5,7 @@ use App\Models\BudgetLine;
 use App\Models\FiscalYear;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 
 uses(RefreshDatabase::class)->group('budgets');
 
@@ -43,5 +44,5 @@ test('it casts total_amount to decimal', function () {
 test('it casts approved_at to datetime', function () {
     $budget = Budget::factory()->approved()->create();
 
-    expect($budget->approved_at)->toBeInstanceOf(\Illuminate\Support\Carbon::class);
+    expect($budget->approved_at)->toBeInstanceOf(Carbon::class);
 });

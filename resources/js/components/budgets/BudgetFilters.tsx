@@ -22,8 +22,18 @@ const budgetTypeOptions = [
 export function createBudgetFilterFields(): FieldDescriptor[] {
     return [
         createTextFilterField('search', 'Search', 'Search budgets...'),
-        createSelectFilterField('status', 'Status', budgetStatusOptions, 'All statuses'),
-        createSelectFilterField('budget_type', 'Budget Type', budgetTypeOptions, 'All types'),
+        createSelectFilterField(
+            'status',
+            'Status',
+            budgetStatusOptions,
+            'All statuses',
+        ),
+        createSelectFilterField(
+            'budget_type',
+            'Budget Type',
+            budgetTypeOptions,
+            'All types',
+        ),
         {
             name: 'fiscal_year_id',
             label: 'Fiscal Year',
