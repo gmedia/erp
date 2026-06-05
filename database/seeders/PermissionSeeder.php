@@ -383,6 +383,37 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'budget',
+                'display_name' => 'Budget',
+                'child' => [
+                    [
+                        'name' => 'budget.create',
+                        'display_name' => 'Create Budget',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'budget.edit',
+                        'display_name' => 'Edit Budget',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'budget.delete',
+                        'display_name' => 'Delete Budget',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'budget.approve',
+                        'display_name' => 'Approve Budget',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
+                'name' => 'budget_variance_report',
+                'display_name' => 'Budget Variance Report',
+                'child' => [],
+            ],
+            [
                 'name' => 'period_closing',
                 'display_name' => 'Period Closing',
                 'child' => [

@@ -76,6 +76,7 @@ class MenuSeeder extends Seeder
                     'posting_journal',
                     'recurring_journal',
                     'bank_reconciliation',
+                    'budget',
                     'period_closing',
                 ],
                 'icon' => 'Calculator',
@@ -148,6 +149,20 @@ class MenuSeeder extends Seeder
                         ],
                         'icon' => 'Banknote',
                         'url' => 'bank-reconciliations',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'budget',
+                        'display_name' => 'Budgets',
+                        'permissions' => [
+                            'budget',
+                            'budget.create',
+                            'budget.edit',
+                            'budget.delete',
+                            'budget.approve',
+                        ],
+                        'icon' => 'PiggyBank',
+                        'url' => 'budgets',
                         'child' => [],
                     ],
                     [

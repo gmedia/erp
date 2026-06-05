@@ -1158,10 +1158,15 @@ export const creditNoteConfig = createComplexEntityConfig<CreditNote>({
         `This action cannot be undone. This will permanently delete credit note ${item.credit_note_number}.`,
 });
 
+import { budgetColumns } from '@/components/budgets/BudgetColumns';
+import { createBudgetFilterFields } from '@/components/budgets/BudgetFilters';
+import { BudgetForm } from '@/components/budgets/BudgetForm';
+import { BudgetViewModal } from '@/components/budgets/BudgetViewModal';
 import { recurringJournalColumns } from '@/components/recurring-journals/RecurringJournalColumns';
 import { createRecurringJournalFilterFields } from '@/components/recurring-journals/RecurringJournalFilters';
 import { RecurringJournalForm } from '@/components/recurring-journals/RecurringJournalForm';
 import { RecurringJournalViewModal } from '@/components/recurring-journals/RecurringJournalViewModal';
+import { type Budget } from '@/types/budget';
 import { type RecurringJournal } from '@/types/recurring-journal';
 
 export const recurringJournalConfig =
@@ -1267,3 +1272,21 @@ export const reportConfigurationConfig =
         getDeleteMessage: (item: { name?: string }) =>
             `This action cannot be undone. This will permanently delete report configuration ${item.name}.`,
     });
+
+export const budgetConfig = createComplexEntityConfig<Budget>({
+    entityName: 'Budget',
+    entityNamePlural: 'Budgets',
+    apiEndpoint: '/api/budgets',
+    exportEndpoint: '/api/budgets/export',
+    queryKey: ['budgets'],
+    breadcrumbs: [{ title: 'Budgets', href: '/budgets' }],
+    initialFilters: { search: '', status: '', fiscal_year_id: '', budget_type: '' },
+    columns: budgetColumns,
+    filterFields: createBudgetFilterFields(),
+    formComponent: BudgetForm,
+    formType: 'complex',
+    entityNameForSearch: 'budget',
+    viewModalComponent: BudgetViewModal,
+    getDeleteMessage: (item: { name?: string }) =>
+        `This action cannot be undone. This will permanently delete budget "${item.name}".`,
+});

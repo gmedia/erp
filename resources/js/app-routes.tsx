@@ -203,6 +203,11 @@ const TrialBalanceDetailed = lazy(
 );
 const UserGuide = lazy(() => import('./pages/user-guide/index'));
 
+const Budgets = lazy(() => import('./pages/budgets/index'));
+const ReportBudgetVariance = lazy(
+    () => import('./pages/reports/budget-variance/index'),
+);
+
 // Helper to wrap protected routes
 const P = ({ children }: { children: React.ReactNode }) => (
     <ProtectedRoute>{children}</ProtectedRoute>
@@ -990,6 +995,23 @@ export default function AppRoutes() {
                     element={
                         <P>
                             <TrialBalanceDetailed />
+                        </P>
+                    }
+                />
+
+                <Route
+                    path="/budgets"
+                    element={
+                        <P>
+                            <Budgets />
+                        </P>
+                    }
+                />
+                <Route
+                    path="/reports/budget-variance"
+                    element={
+                        <P>
+                            <ReportBudgetVariance />
                         </P>
                     }
                 />

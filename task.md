@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-06-01 12:45 UTC
+Last updated: 2026-06-05 06:24 UTC
 
 ## Document Roles
 
@@ -12,107 +12,104 @@ Last updated: 2026-06-01 12:45 UTC
 
 User is switching to a new opencode session. Read this section first.
 
-1. **Verify baseline**: `git rev-parse HEAD` → expect the latest dashboard-permission-audit commit. `git status --short` → expect empty.
-2. **Aging Dashboard AR/AP shipped earlier this session.** Backend Action + Controller + Route + 2 Seeders + 13 Pest + 7 Playwright + 5 frontend components + permission gate. CI verified green.
-3. **Dashboard permission audit completed this session.** Closed identical security gap on aging-dashboard, financial-dashboard, and approval-monitoring routes (3 commits). Each got a regression 403 test.
-4. **P&L by Department research done.** See `docs/profit-loss-by-department-design.md`. Recommendation: defer (LARGE 5-7 day lift, no real driver yet). Pivot to Budget Management likely better value-to-effort.
+1. **Verify baseline**: `git rev-parse HEAD` → expect `fe6844e5`. `git status --short` → expect empty (or in-progress Sonar refactor).
+2. **Route permission audit COMPLETE.** 8 total route files hardened across 2 sessions (3 dashboards + 5 modules). All 62 route files verified. See §Route Permission Audit below.
+3. **Budget Management design doc READY.** `docs/budget-management-design.md` — 278 lines, 4-phase roadmap, 5 decision points pending user input (§9 of doc).
+4. **Sonar AP/AR Request trait extraction** — in-progress or just completed (check git log).
 5. **If user says "lanjutkan" without direction**: ASK which next option. Do NOT pick autonomously.
 
 ### Recommended next-session options (need user input)
 
-1. **Pivot product feature**: Budget Management (Recommended), Sales/Invoicing, or Multi-currency. Avoid P&L by Department until business driver confirmed.
-2. **Multi-currency cross-cutting fix** (Oracle H3 from aging-dashboard review): same blind spot in `IndexArAgingReportAction`, dashboards, reports — one ticket spanning all financial reports.
-3. **Branch tenant isolation** (Oracle H2): non-admin users currently see all branches' data on dashboards.
-4. **Sonar duplications refactor**: `AbstractApPaymentRequest` + `AbstractArReceiptRequest` trait extraction (-10 LOC, gate OK).
-5. **Seed dev DB**: `sail artisan db:seed --class=MenuSeeder --class=PermissionSeeder` to activate financial-dashboard + aging-dashboard nav links + new aging_dashboard / approval_monitoring permissions.
+1. **Implement Budget Management** — design doc ready, needs 5 decisions answered first (see `docs/budget-management-design.md` §9)
+2. **Multi-currency cross-cutting fix** (Oracle H3): same blind spot in aging/AR/AP reports
+3. **Branch tenant isolation** (Oracle H2): non-admin users see all branches on dashboards
+4. **Seed dev DB**: `sail artisan db:seed --class=MenuSeeder --class=PermissionSeeder` to activate all new permissions + nav links
 
 ## Current State
 
 - Branch: `main`
-- Working tree: clean (all changes pushed).
-- This session lands a complete Aging Dashboard feature + 3 dashboard permission gates + 1 design research doc.
-- Sonar Quality Gate: OK (last verified 2026-05-31, no significant changes after).
-- Module registry: 79 entries (added `aging-dashboard`).
+- HEAD: `fe6844e5`
+- Working tree: clean (all changes pushed)
+- CI: green on all 7 commits
+- Sonar Quality Gate: OK
+- Module registry: 79 entries
 
-## This Session's Commits (in order)
+## This Session's Commits (7 total)
 
 | Commit | Subject |
 |---|---|
 | `331d4d15` | feat(aging-dashboard): AR/AP aging dashboard with 5 buckets + top-10 overdue |
 | `956cd64e` | fix(aging-dashboard): gate route by permission + apply oracle review fixes |
 | `e97ae4bb` | fix(financial-dashboard): gate route by financial_dashboard permission |
-| `8ed62cd6` | docs(research): P&L by Department pre-implementation design doc |
-| (this commit) | fix(approval-monitoring): gate route by approval_monitoring permission + changelog/task.md refresh |
+| `fb701764` | docs(research): P&L by Department pre-implementation design doc |
+| `70c6c0db` | fix(approval-monitoring): gate route by approval_monitoring permission |
+| `34027524` | fix(security): gate 5 route files by permission middleware |
+| `fe6844e5` | docs(research): Budget Management pre-implementation design |
 
-## Aging Dashboard AR/AP — feature summary
+## Route Permission Audit — COMPLETE
 
-`GET /api/aging-dashboard?as_of_date=YYYY-MM-DD&branch_id=N` returns AR + AP outstanding bucketed by overdue age (Current, 1-30, 31-60, 61-90, Over 90 days), as-of date filter (default today), branch filter (default all), plus top-10 overdue customers/suppliers.
+Comprehensive sweep of all 62 `routes/api/*.php` files. **8 gaps closed** across 2 commits:
 
-Cross-DB safe (parameterized SUM(CASE) bindings + Carbon date math, no MySQL DATEDIFF/CURDATE).
-
-Files:
-- Backend: `app/Actions/AgingDashboard/GetAgingDashboardDataAction.php`, `app/Http/Controllers/AgingDashboardController.php`, `routes/api/aging-dashboard.php`
-- Seeders: `database/seeders/PermissionSeeder.php`, `database/seeders/MenuSeeder.php` (icon `Hourglass`)
-- Tests: `tests/Feature/AgingDashboard/AgingDashboardControllerTest.php` (13 cases / 107 assertions), `tests/e2e/aging-dashboard/aging-dashboard.spec.ts` (7 cases)
-- Frontend: `resources/js/hooks/useAgingDashboard.ts`, `resources/js/pages/aging-dashboard/index.tsx`, 5 components in `resources/js/components/aging-dashboard/`
-- Module registry: new YAML entry + Pest registry row 30
-
-## Dashboard Permission Gate Audit — 3 routes hardened
-
-All three previously had only `auth:sanctum` middleware (no permission check). Closed in this session:
-
-| Route | Permission | Pest 403 case | Notes |
-|---|---|---|---|
-| `/api/aging-dashboard` | `aging_dashboard` | added | mirrors pipeline-dashboard.php pattern |
-| `/api/financial-dashboard` | `financial_dashboard` | added | beforeEach permission corrected from `report` (was bypassing because no gate existed) |
-| `/api/approval-monitoring/data` | `approval_monitoring` | added | tests refactored to use `CreatesTestUserWithPermissions` trait |
-
-Routes already correctly gated (verified): `/api/asset-dashboard/data` (under `permission:asset,true`), `/api/pipeline-dashboard/data` (`permission:pipeline_dashboard,true`), `/api/stock-monitor` (`permission:stock_monitor,true`).
-
-`/api/dashboard` (main home dashboard) intentionally left ungated — returns only Customer/Employee/Supplier/Asset counts (low sensitivity, no permission key defined).
-
-## P&L by Department Research
-
-`docs/profit-loss-by-department-design.md`. Key finding: `journal_entry_lines` has zero dimension columns (no `department_id`, `branch_id`, `cost_center_id`, `project_id`). Adding department to GL is genuinely new architecture. Three options documented:
-
-| Option | Effort | Value |
+### Commit `70c6c0db` (dashboards)
+| Route | Permission | Risk |
 |---|---|---|
-| A. Tag manual journals only | ~1 day | Low (most lines come from system posting → null) |
-| B. Doc-level + propagation through 8 posting actions | 5-7 days | High but requires business modeling decisions |
-| C. Defer (Recommended) | 0 days | Pivot to Budget Management (better value-to-effort) |
+| `/api/aging-dashboard` | `aging_dashboard` | HIGH |
+| `/api/financial-dashboard` | `financial_dashboard` | HIGH |
+| `/api/approval-monitoring/data` | `approval_monitoring` | HIGH |
 
-## Verification State (last verified locally)
+### Commit `34027524` (modules + reports)
+| Route | Permission | Risk |
+|---|---|---|
+| `bank-reconciliations.php` | `bank_reconciliation` | HIGH |
+| `recurring-journals.php` | `recurring_journal` | HIGH |
+| `general-ledger-report.php` | `general_ledger_report` | HIGH |
+| `trial-balance-report.php` | `trial_balance_report` | HIGH |
+| `report-configurations.php` | `report_configuration` | MEDIUM |
 
-| Gate | Result |
-|------|--------|
-| TypeScript (`npm run types`) | clean |
-| ESLint (`sail npm run lint`) | clean |
-| Duster (`sail bin duster fix`) | clean (1788 files) |
-| PHPStan (`sail bin phpstan analyze`) | `[OK] No errors` |
-| Pest aging-dashboard | 13 passed, 107 assertions, 13.93s |
-| Pest financial-dashboard | 8 passed, 58 assertions, 11.58s |
-| Pest approval-monitoring | 3 passed, 25 assertions, 12.25s |
-| Playwright aging-dashboard | 7 passed, 53.2s |
-| Playwright financial-dashboard | 4 passed, 27.7s |
+### Verified OK (no action)
+- 50+ CRUD route files (group-level permission middleware)
+- `reports.php` (per-route permission middleware)
+- `asset-dashboard/data`, `pipeline-dashboard/data`, `stock-monitor`
+
+### Intentionally ungated
+- `/api/dashboard` — aggregate counts, low sensitivity, no permission key
+- `/api/my-approvals` — user-scoped by controller logic
+- `/api/user-guide` — static documentation
+
+## Design Docs Available
+
+| Doc | Status | Key Finding |
+|-----|--------|-------------|
+| `docs/profit-loss-by-department-design.md` | Research complete, DEFER | journal_entry_lines lacks dimension columns; 5-7 day lift |
+| `docs/budget-management-design.md` | Ready for implementation | 3-4 day lift; schema + variance + API + frontend; 5 decisions pending |
+
+## Verification State
+
+| Gate | Result | When |
+|------|--------|------|
+| PHPStan | `[OK] No errors` | 2026-06-05 |
+| Pest (5 affected groups) | 99 passed, 302 assertions | 2026-06-05 |
+| CI (all 7 commits) | green | 2026-06-05 |
 
 ## Useful Commands
 
 ```bash
 # Run focused tests
-sail test --group aging-dashboard
-sail test --group financial-dashboard
-sail test --group approval-monitoring
-PLAYWRIGHT_USE_SAIL=1 ./vendor/bin/sail npx playwright test tests/e2e/aging-dashboard/
+sail test --group bank-reconciliations
+sail test --group recurring-journals
+sail test --group general-ledger-report
+sail test --group trial-balance-report
+sail test --group financial-reports
 
-# Activate new nav links + permissions in dev DB
-sail artisan db:seed --class=MenuSeeder
-sail artisan db:seed --class=PermissionSeeder
-
-# Quality gates
+# All quality gates
 sail bin phpstan analyze
 sail bin duster fix
 npm run types
 sail npm run lint
+
+# Activate new permissions in dev DB
+sail artisan db:seed --class=MenuSeeder
+sail artisan db:seed --class=PermissionSeeder
 
 # Monitor CI
 gh run list --branch main --limit 5
@@ -121,18 +118,17 @@ gh run list --branch main --limit 5
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo on `main`. Last session shipped Aging Dashboard
-AR/AP feature plus closed permission gaps on 3 dashboard routes
-(aging-dashboard, financial-dashboard, approval-monitoring). All quality
-gates green locally. CI verified on commits up to 8ed62cd6.
+Read task.md first. Repo on `main`, HEAD `fe6844e5`. Session shipped:
+- Aging Dashboard AR/AP (full feature + 13 Pest + 7 E2E)
+- Route permission audit: 8 gaps closed (all 62 route files verified)
+- Budget Management design doc (ready for implementation, 5 decisions pending)
+- P&L by Department research (recommendation: defer)
 
-Next options need user direction:
-1. Budget Management (Recommended pivot — see profit-loss-by-department
-   research doc that suggests this)
+CI green on all 7 commits. Next action needs user direction:
+1. Implement Budget Management (answer 5 design decisions first)
 2. Multi-currency cross-cutting fix (Oracle H3)
 3. Branch tenant isolation (Oracle H2)
-4. Sonar duplications refactor (AP/AR Request trait, -10 LOC)
-5. Seed dev DB to activate nav links
+4. Seed dev DB for new permissions
 
 If user says "lanjutkan" without direction, ASK which path.
 ```

@@ -33,6 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
     require __DIR__ . '/api/assets.php';
     require __DIR__ . '/api/bank-reconciliations.php';
     require __DIR__ . '/api/branches.php';
+    require __DIR__ . '/api/budgets.php';
     require __DIR__ . '/api/coa-versions.php';
     require __DIR__ . '/api/customer-categories.php';
     require __DIR__ . '/api/customers.php';
