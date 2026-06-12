@@ -202,6 +202,13 @@ jobs:
         if: ${{ steps.autofix.outputs.changed != 'true' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
         run: ./vendor/bin/sail test --parallel --recreate-databases --colors=always
 
+      - name: Setup Java for Sonar scanner
+        if: ${{ success() && steps.autofix.outputs.changed != 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+        uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4.8.0
+        with:
+          distribution: temurin
+          java-version: '21'
+
       - name: Run SonarQube Cloud scan
         if: ${{ success() && steps.autofix.outputs.changed != 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
         uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6
@@ -214,6 +221,7 @@ jobs:
             -Dproject.settings=.sonarcloud.properties
             -Dsonar.organization=gmedia
             -Dsonar.projectKey=gmedia_erp
+            -Dsonar.scanner.skipJreProvisioning=true
 
       - name: Upload failure logs
         if: failure() && steps.autofix.outputs.changed != 'true'
