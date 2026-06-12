@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-06-05 06:24 UTC
+Last updated: 2026-06-12 16:15 UTC
 
 ## Document Roles
 
@@ -12,27 +12,27 @@ Last updated: 2026-06-05 06:24 UTC
 
 User is switching to a new opencode session. Read this section first.
 
-1. **Verify baseline**: `git rev-parse HEAD` → expect `fe6844e5`. `git status --short` → expect empty (or in-progress Sonar refactor).
-2. **Route permission audit COMPLETE.** 8 total route files hardened across 2 sessions (3 dashboards + 5 modules). All 62 route files verified. See §Route Permission Audit below.
-3. **Budget Management design doc READY.** `docs/budget-management-design.md` — 278 lines, 4-phase roadmap, 5 decision points pending user input (§9 of doc).
-4. **Sonar AP/AR Request trait extraction** — in-progress or just completed (check git log).
+1. **Verify baseline**: `git rev-parse HEAD` → expect `4fd78e8d`. `git status --short` → expect empty.
+2. **Budget Management module FULLY SHIPPED** (`f0c8e3c0`): 39 files, full-stack (backend + frontend + tests + seeders). All quality gates green locally. Pest 23/23.
+3. **CI fully green** on run `27425796853` — Sonar JRE-download 403 resolved (`4fd78e8d`): JDK 21 provisioned via setup-java + `sonar.scanner.skipJreProvisioning=true`.
+4. **Route permission audit COMPLETE.** 8 route files hardened. All 62 route files verified.
 5. **If user says "lanjutkan" without direction**: ASK which next option. Do NOT pick autonomously.
 
 ### Recommended next-session options (need user input)
 
-1. **Implement Budget Management** — design doc ready, needs 5 decisions answered first (see `docs/budget-management-design.md` §9)
-2. **Multi-currency cross-cutting fix** (Oracle H3): same blind spot in aging/AR/AP reports
-3. **Branch tenant isolation** (Oracle H2): non-admin users see all branches on dashboards
-4. **Seed dev DB**: `sail artisan db:seed --class=MenuSeeder --class=PermissionSeeder` to activate all new permissions + nav links
+1. **Seed dev DB**: `sail artisan db:seed --class=MenuSeeder --class=PermissionSeeder` to activate budget permissions + nav links
+2. **Budget Variance E2E + BudgetVarianceService unit tests** — no dedicated coverage yet
+3. **Multi-currency cross-cutting fix** (Oracle H3): same blind spot in aging/AR/AP reports
+4. **Branch tenant isolation** (Oracle H2): non-admin users see all branches on dashboards
 
 ## Current State
 
 - Branch: `main`
-- HEAD: `fe6844e5`
+- HEAD: `4fd78e8d`
 - Working tree: clean (all changes pushed)
-- CI: green on all 7 commits
-- Sonar Quality Gate: OK
-- Module registry: 79 entries
+- CI: GREEN on run `27425796853` (Quality + E2E + Test suite all success)
+- Sonar Quality Gate: scan now runs (403 JRE-download fix landed)
+- Module registry: 80 entries (Budget Management added)
 
 ## This Session's Commits (7 total)
 
@@ -45,6 +45,8 @@ User is switching to a new opencode session. Read this section first.
 | `70c6c0db` | fix(approval-monitoring): gate route by approval_monitoring permission |
 | `34027524` | fix(security): gate 5 route files by permission middleware |
 | `fe6844e5` | docs(research): Budget Management pre-implementation design |
+| `f0c8e3c0` | feat(budgets): full Budget Management module (39 files, backend+frontend+tests) |
+| `4fd78e8d` | ci: provision JDK 21 and skip scanner JRE download |
 
 ## Route Permission Audit — COMPLETE
 
