@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-06-12 16:15 UTC
+Last updated: 2026-06-13 13:23 UTC
 
 ## Document Roles
 
@@ -12,7 +12,7 @@ Last updated: 2026-06-12 16:15 UTC
 
 User is switching to a new opencode session. Read this section first.
 
-1. **Verify baseline**: `git rev-parse HEAD` → expect `5f94a87f`. `git status --short` → expect empty.
+1. **Verify baseline**: `git rev-parse HEAD` → expect `addbd040`. `git status --short` → expect empty.
 2. **Budget Management module FULLY SHIPPED** (`f0c8e3c0`): 39 files, full-stack. Activated in dev DB (budget menu + 6 permissions seeded). Tests now cover variance service + report endpoint (`5f94a87f`).
 3. **CI fully green** on run `27455288134` — Sonar JRE-download 403 resolved (`4fd78e8d`): JDK 21 provisioned via setup-java + `sonar.scanner.skipJreProvisioning=true`.
 4. **Route permission audit COMPLETE.** 8 route files hardened. All 62 route files verified.
@@ -27,14 +27,14 @@ User is switching to a new opencode session. Read this section first.
 ## Current State
 
 - Branch: `main`
-- HEAD: `5f94a87f`
+- HEAD: `addbd040`
 - Working tree: clean (all changes pushed)
 - CI: GREEN on run `27455288134` (Quality + E2E + Test suite all success)
 - Sonar Quality Gate: scan now runs (403 JRE-download fix landed)
 - Module registry: 80 entries (Budget Management added)
 - Budget tests: 12 unit (BudgetVarianceService) + 9 feature (variance report endpoint), all green
 
-## This Session's Commits (7 total)
+## This Session's Commits (11 total)
 
 | Commit | Subject |
 |---|---|
@@ -48,6 +48,7 @@ User is switching to a new opencode session. Read this section first.
 | `f0c8e3c0` | feat(budgets): full Budget Management module (39 files, backend+frontend+tests) |
 | `4fd78e8d` | ci: provision JDK 21 and skip scanner JRE download |
 | `5f94a87f` | test(budgets): cover BudgetVarianceService and variance report endpoint |
+| `addbd040` | docs(handoff): record budget test coverage + green CI run |
 
 ## Route Permission Audit — COMPLETE
 
@@ -90,9 +91,11 @@ Comprehensive sweep of all 62 `routes/api/*.php` files. **8 gaps closed** across
 
 | Gate | Result | When |
 |------|--------|------|
-| PHPStan | `[OK] No errors` | 2026-06-05 |
-| Pest (5 affected groups) | 99 passed, 302 assertions | 2026-06-05 |
-| CI (all 7 commits) | green | 2026-06-05 |
+| PHPStan | `[OK] No errors` (1065 files) | 2026-06-13 |
+| Duster | clean (new test files) | 2026-06-13 |
+| Pest `budgets` group | 35 passed, 83 assertions | 2026-06-13 |
+| Pest `budget-variance-report` group | 9 passed, 44 assertions | 2026-06-13 |
+| CI run `27455288134` | GREEN (Quality + E2E + Test suite) | 2026-06-13 |
 
 ## Useful Commands
 
@@ -121,17 +124,22 @@ gh run list --branch main --limit 5
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo on `main`, HEAD `fe6844e5`. Session shipped:
-- Aging Dashboard AR/AP (full feature + 13 Pest + 7 E2E)
-- Route permission audit: 8 gaps closed (all 62 route files verified)
-- Budget Management design doc (ready for implementation, 5 decisions pending)
-- P&L by Department research (recommendation: defer)
+Read task.md first. Repo on `main`, HEAD `addbd040`, working tree clean.
+CI fully green on run 27455288134 (Quality + E2E + Test suite).
 
-CI green on all 7 commits. Next action needs user direction:
-1. Implement Budget Management (answer 5 design decisions first)
-2. Multi-currency cross-cutting fix (Oracle H3)
-3. Branch tenant isolation (Oracle H2)
-4. Seed dev DB for new permissions
+This session shipped:
+- Budget Management module (full-stack, 39 files) — activated in dev DB
+  (budget menu + 6 permissions seeded)
+- Budget test coverage: 12 unit (BudgetVarianceService sign-aware variance,
+  posted-only/period/FY scoping, status thresholds) + 9 feature
+  (BudgetVarianceReportController permission gate, validation, filtering, export)
+- CI Sonar 403 fix: JDK 21 via setup-java + sonar.scanner.skipJreProvisioning=true
+- Route permission audit: 8 gaps closed (all 62 route files verified)
+
+Next action needs USER DIRECTION (do NOT auto-pick):
+1. Multi-currency cross-cutting fix (Oracle H3) — affects aging/AR/AP/budget reports
+2. Branch tenant isolation (Oracle H2) — non-admin users see all branches
+3. Timezone drift (Oracle M3)
 
 If user says "lanjutkan" without direction, ASK which path.
 ```
