@@ -1067,6 +1067,11 @@ class PermissionSeeder extends Seeder
                     ],
                 ],
             ],
+            [
+                'name' => 'view_all_branches',
+                'display_name' => 'View All Branches (Cross-Branch Admin)',
+                'child' => [],
+            ],
         ];
 
         $this->createPermissions($permissions);

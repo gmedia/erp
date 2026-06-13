@@ -3,16 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Actions\AssetDashboard\GetAssetDashboardDataAction;
+use App\Http\Controllers\Concerns\ResolvesBranchScope;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class AssetDashboardController extends Controller
 {
-    /**
-     * Get aggregate data for the asset dashboard.
-     */
-    public function getData(GetAssetDashboardDataAction $action): JsonResponse
+    use ResolvesBranchScope;
+
+    public function getData(Request $request, GetAssetDashboardDataAction $action): JsonResponse
     {
-        $data = $action->execute();
+        $branchIdRaw = $request->query('branch_id');
+        $requestedBranchId = is_numeric($branchIdRaw) ? (int) $branchIdRaw : null;
+        $branchId = $this->resolveBranchScope($requestedBranchId);
+
+        $data = $action->execute($branchId);
 
         return response()->json($data);
     }

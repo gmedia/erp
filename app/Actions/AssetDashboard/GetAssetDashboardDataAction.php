@@ -5,15 +5,14 @@ namespace App\Actions\AssetDashboard;
 use App\Models\Asset;
 use App\Models\AssetMaintenance;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 class GetAssetDashboardDataAction
 {
-    public function execute(): array
+    public function execute(?int $branchId = null): array
     {
-        // 1. Summary Totals
-        // Use single query to get counts and sums
-        $summaryStats = Asset::query()
+        $summaryStats = $this->scopeBranch(Asset::query(), $branchId)
             ->selectRaw('
                 COUNT(*) as total_assets,
                 SUM(purchase_cost) as total_purchase_cost,
@@ -22,18 +21,17 @@ class GetAssetDashboardDataAction
             ')
             ->first();
 
-        // 2. Status Distribution (from enum)
-        $statusCounts = Asset::query()
+        $statusCounts = $this->scopeBranch(Asset::query(), $branchId)
             ->select('status', DB::raw('count(*) as count'))
             ->groupBy('status')
             ->pluck('count', 'status');
 
         $statusMapping = [
-            'draft' => ['name' => 'Draft', 'color' => '#6B7280'],       // Gray
-            'active' => ['name' => 'Active', 'color' => '#10B981'],     // Emerald
-            'maintenance' => ['name' => 'Maintenance', 'color' => '#F59E0B'], // Amber
-            'disposed' => ['name' => 'Disposed', 'color' => '#EF4444'], // Red
-            'lost' => ['name' => 'Lost', 'color' => '#DC2626'],         // Darker Red
+            'draft' => ['name' => 'Draft', 'color' => '#6B7280'],
+            'active' => ['name' => 'Active', 'color' => '#10B981'],
+            'maintenance' => ['name' => 'Maintenance', 'color' => '#F59E0B'],
+            'disposed' => ['name' => 'Disposed', 'color' => '#EF4444'],
+            'lost' => ['name' => 'Lost', 'color' => '#DC2626'],
         ];
 
         $statusDistribution = [];
@@ -46,17 +44,15 @@ class GetAssetDashboardDataAction
             ];
         }
 
-        // 3. Category Distribution
-        $categoryDistribution = Asset::query()
+        $categoryDistribution = $this->scopeBranch(Asset::query(), $branchId)
             ->join('asset_categories', 'assets.asset_category_id', '=', 'asset_categories.id')
             ->select('asset_categories.name', DB::raw('count(*) as count'))
             ->groupBy('asset_categories.id', 'asset_categories.name')
             ->orderByDesc('count')
-            ->limit(10) // Top 10 categories
+            ->limit(10)
             ->get();
 
-        // 4. Condition Overview
-        $conditionCounts = Asset::query()
+        $conditionCounts = $this->scopeBranch(Asset::query(), $branchId)
             ->select('condition', DB::raw('count(*) as count'))
             ->whereNotNull('condition')
             ->groupBy('condition')
@@ -78,11 +74,18 @@ class GetAssetDashboardDataAction
             ];
         }
 
-        // 5. Recent Maintenances
-        $recentMaintenances = AssetMaintenance::with(['asset' => function ($query) {
-            $query->select('id', 'name', 'asset_code');
+        $recentMaintenancesQuery = AssetMaintenance::with(['asset' => function ($query) {
+            $query->select('id', 'name', 'asset_code', 'branch_id');
         }])
-            ->whereIn('status', ['scheduled', 'in_progress'])
+            ->whereIn('status', ['scheduled', 'in_progress']);
+
+        if ($branchId !== null) {
+            $recentMaintenancesQuery->whereHas('asset', function (Builder $query) use ($branchId): void {
+                $query->where('branch_id', $branchId);
+            });
+        }
+
+        $recentMaintenances = $recentMaintenancesQuery
             ->orderBy('scheduled_at', 'asc')
             ->limit(5)
             ->get()
@@ -97,9 +100,8 @@ class GetAssetDashboardDataAction
                 ];
             });
 
-        // 6. Warranty Alerts (Active assets with warranty ending in next 30 days)
         $thirtyDaysFromNow = Carbon::now()->addDays(30);
-        $warrantyAlerts = Asset::query()
+        $warrantyAlerts = $this->scopeBranch(Asset::query(), $branchId)
             ->select('id', 'asset_code', 'name', 'warranty_end_date', 'status')
             ->where('status', 'active')
             ->whereNotNull('warranty_end_date')
@@ -136,5 +138,18 @@ class GetAssetDashboardDataAction
             'recent_maintenances' => $recentMaintenances,
             'warranty_alerts' => $warrantyAlerts,
         ];
+    }
+
+    /**
+     * @param  Builder<Asset>  $query
+     * @return Builder<Asset>
+     */
+    private function scopeBranch(Builder $query, ?int $branchId): Builder
+    {
+        if ($branchId !== null) {
+            $query->where('assets.branch_id', $branchId);
+        }
+
+        return $query;
     }
 }
