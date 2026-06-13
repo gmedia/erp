@@ -12,27 +12,27 @@ Last updated: 2026-06-12 16:15 UTC
 
 User is switching to a new opencode session. Read this section first.
 
-1. **Verify baseline**: `git rev-parse HEAD` → expect `4fd78e8d`. `git status --short` → expect empty.
-2. **Budget Management module FULLY SHIPPED** (`f0c8e3c0`): 39 files, full-stack (backend + frontend + tests + seeders). All quality gates green locally. Pest 23/23.
-3. **CI fully green** on run `27425796853` — Sonar JRE-download 403 resolved (`4fd78e8d`): JDK 21 provisioned via setup-java + `sonar.scanner.skipJreProvisioning=true`.
+1. **Verify baseline**: `git rev-parse HEAD` → expect `5f94a87f`. `git status --short` → expect empty.
+2. **Budget Management module FULLY SHIPPED** (`f0c8e3c0`): 39 files, full-stack. Activated in dev DB (budget menu + 6 permissions seeded). Tests now cover variance service + report endpoint (`5f94a87f`).
+3. **CI fully green** on run `27455288134` — Sonar JRE-download 403 resolved (`4fd78e8d`): JDK 21 provisioned via setup-java + `sonar.scanner.skipJreProvisioning=true`.
 4. **Route permission audit COMPLETE.** 8 route files hardened. All 62 route files verified.
 5. **If user says "lanjutkan" without direction**: ASK which next option. Do NOT pick autonomously.
 
 ### Recommended next-session options (need user input)
 
-1. **Seed dev DB**: `sail artisan db:seed --class=MenuSeeder --class=PermissionSeeder` to activate budget permissions + nav links
-2. **Budget Variance E2E + BudgetVarianceService unit tests** — no dedicated coverage yet
-3. **Multi-currency cross-cutting fix** (Oracle H3): same blind spot in aging/AR/AP reports
-4. **Branch tenant isolation** (Oracle H2): non-admin users see all branches on dashboards
+1. **Multi-currency cross-cutting fix** (Oracle H3): same blind spot in aging/AR/AP/budget reports
+2. **Branch tenant isolation** (Oracle H2): non-admin users see all branches on dashboards
+3. **Timezone drift** (Oracle M3)
 
 ## Current State
 
 - Branch: `main`
-- HEAD: `4fd78e8d`
+- HEAD: `5f94a87f`
 - Working tree: clean (all changes pushed)
-- CI: GREEN on run `27425796853` (Quality + E2E + Test suite all success)
+- CI: GREEN on run `27455288134` (Quality + E2E + Test suite all success)
 - Sonar Quality Gate: scan now runs (403 JRE-download fix landed)
 - Module registry: 80 entries (Budget Management added)
+- Budget tests: 12 unit (BudgetVarianceService) + 9 feature (variance report endpoint), all green
 
 ## This Session's Commits (7 total)
 
@@ -47,6 +47,7 @@ User is switching to a new opencode session. Read this section first.
 | `fe6844e5` | docs(research): Budget Management pre-implementation design |
 | `f0c8e3c0` | feat(budgets): full Budget Management module (39 files, backend+frontend+tests) |
 | `4fd78e8d` | ci: provision JDK 21 and skip scanner JRE download |
+| `5f94a87f` | test(budgets): cover BudgetVarianceService and variance report endpoint |
 
 ## Route Permission Audit — COMPLETE
 
