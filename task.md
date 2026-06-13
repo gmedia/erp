@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-06-13 13:23 UTC
+Last updated: 2026-06-13 15:30 UTC
 
 ## Document Roles
 
@@ -12,43 +12,34 @@ Last updated: 2026-06-13 13:23 UTC
 
 User is switching to a new opencode session. Read this section first.
 
-1. **Verify baseline**: `git rev-parse HEAD` → expect `addbd040`. `git status --short` → expect empty.
-2. **Budget Management module FULLY SHIPPED** (`f0c8e3c0`): 39 files, full-stack. Activated in dev DB (budget menu + 6 permissions seeded). Tests now cover variance service + report endpoint (`5f94a87f`).
-3. **CI fully green** on run `27455288134` — Sonar JRE-download 403 resolved (`4fd78e8d`): JDK 21 provisioned via setup-java + `sonar.scanner.skipJreProvisioning=true`.
-4. **Route permission audit COMPLETE.** 8 route files hardened. All 62 route files verified.
+1. **Verify baseline**: `git rev-parse HEAD` → expect `5f2cb816`. `git status --short` → expect empty.
+2. **Branch tenant isolation SHIPPED** (`5f2cb816`): 4 dashboard endpoints scoped by user branch. New `ResolvesBranchScope` trait + `view_all_branches` permission. 8 isolation tests pass. Full suite 1852 tests green.
+3. **Budget Management module FULLY SHIPPED** (`f0c8e3c0`): 39 files, full-stack.
+4. **CI fully green** on run `27455288134` (pre-branch-isolation). Push just done — await new CI run.
 5. **If user says "lanjutkan" without direction**: ASK which next option. Do NOT pick autonomously.
 
 ### Recommended next-session options (need user input)
 
 1. **Multi-currency cross-cutting fix** (Oracle H3): same blind spot in aging/AR/AP/budget reports
-2. **Branch tenant isolation** (Oracle H2): non-admin users see all branches on dashboards
-3. **Timezone drift** (Oracle M3)
+2. **Timezone drift** (Oracle M3)
+3. **Financial dashboard branch scoping** (DEFERRED): requires `branch_id` on `journal_entries` table (schema change, 3-5 day lift)
+4. **Pipeline/Approval dashboard branch scoping** (DEFERRED): polymorphic resolution needed
 
 ## Current State
 
 - Branch: `main`
-- HEAD: `addbd040`
+- HEAD: `5f2cb816`
 - Working tree: clean (all changes pushed)
-- CI: GREEN on run `27455288134` (Quality + E2E + Test suite all success)
+- CI: awaiting new run (push just done)
 - Sonar Quality Gate: scan now runs (403 JRE-download fix landed)
 - Module registry: 80 entries (Budget Management added)
-- Budget tests: 12 unit (BudgetVarianceService) + 9 feature (variance report endpoint), all green
+- Branch isolation: 4 dashboards scoped, 8 new tests, 1852 total tests green
 
-## This Session's Commits (11 total)
+## This Session's Commits (1 total)
 
 | Commit | Subject |
 |---|---|
-| `331d4d15` | feat(aging-dashboard): AR/AP aging dashboard with 5 buckets + top-10 overdue |
-| `956cd64e` | fix(aging-dashboard): gate route by permission + apply oracle review fixes |
-| `e97ae4bb` | fix(financial-dashboard): gate route by financial_dashboard permission |
-| `fb701764` | docs(research): P&L by Department pre-implementation design doc |
-| `70c6c0db` | fix(approval-monitoring): gate route by approval_monitoring permission |
-| `34027524` | fix(security): gate 5 route files by permission middleware |
-| `fe6844e5` | docs(research): Budget Management pre-implementation design |
-| `f0c8e3c0` | feat(budgets): full Budget Management module (39 files, backend+frontend+tests) |
-| `4fd78e8d` | ci: provision JDK 21 and skip scanner JRE download |
-| `5f94a87f` | test(budgets): cover BudgetVarianceService and variance report endpoint |
-| `addbd040` | docs(handoff): record budget test coverage + green CI run |
+| `5f2cb816` | fix(security): enforce branch tenant isolation on 4 dashboard endpoints |
 
 ## Route Permission Audit — COMPLETE
 
@@ -87,15 +78,34 @@ Comprehensive sweep of all 62 `routes/api/*.php` files. **8 gaps closed** across
 | `docs/profit-loss-by-department-design.md` | Research complete, DEFER | journal_entry_lines lacks dimension columns; 5-7 day lift |
 | `docs/budget-management-design.md` | Ready for implementation | 3-4 day lift; schema + variance + API + frontend; 5 decisions pending |
 
+## Branch Isolation — Scoping Policy
+
+| User Type | Behavior |
+|---|---|
+| Has `view_all_branches` permission | Honor requested `branch_id` (null = all) |
+| Employee with `branch_id` set | Forced to own branch (request ignored) |
+| Employee with `branch_id` null | Unscoped (backward compat, legacy admin) |
+
+### Scoped Endpoints
+
+| Endpoint | Controller | Status |
+|---|---|---|
+| `/api/dashboard` | `DashboardController` | ✅ Scoped |
+| `/api/aging-dashboard` | `AgingDashboardController` | ✅ Scoped |
+| `/api/asset-dashboard/data` | `AssetDashboardController` | ✅ Scoped |
+| `/api/stock-monitor` | `StockMonitorController` | ✅ Scoped |
+| `/api/financial-dashboard` | `FinancialDashboardController` | ⏳ DEFERRED (journal_entries lacks branch_id) |
+| `/api/pipeline-dashboard/data` | `PipelineDashboardController` | ⏳ DEFERRED (polymorphic) |
+| `/api/approval-monitoring/data` | `ApprovalMonitoringController` | ⏳ DEFERRED (polymorphic) |
+
 ## Verification State
 
 | Gate | Result | When |
 |------|--------|------|
-| PHPStan | `[OK] No errors` (1065 files) | 2026-06-13 |
-| Duster | clean (new test files) | 2026-06-13 |
-| Pest `budgets` group | 35 passed, 83 assertions | 2026-06-13 |
-| Pest `budget-variance-report` group | 9 passed, 44 assertions | 2026-06-13 |
-| CI run `27455288134` | GREEN (Quality + E2E + Test suite) | 2026-06-13 |
+| PHPStan | `[OK] No errors` (1066 files) | 2026-06-13 |
+| Duster | clean | 2026-06-13 |
+| Pest full suite | 1852 passed, 8302 assertions | 2026-06-13 |
+| Pest `branch-isolation` group | 8 passed, 19 assertions | 2026-06-13 |
 
 ## Useful Commands
 
@@ -124,22 +134,21 @@ gh run list --branch main --limit 5
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo on `main`, HEAD `addbd040`, working tree clean.
-CI fully green on run 27455288134 (Quality + E2E + Test suite).
+Read task.md first. Repo on `main`, HEAD `5f2cb816`, working tree clean.
+Full test suite 1852 passed. CI run pending (just pushed).
 
 This session shipped:
-- Budget Management module (full-stack, 39 files) — activated in dev DB
-  (budget menu + 6 permissions seeded)
-- Budget test coverage: 12 unit (BudgetVarianceService sign-aware variance,
-  posted-only/period/FY scoping, status thresholds) + 9 feature
-  (BudgetVarianceReportController permission gate, validation, filtering, export)
-- CI Sonar 403 fix: JDK 21 via setup-java + sonar.scanner.skipJreProvisioning=true
-- Route permission audit: 8 gaps closed (all 62 route files verified)
+- Branch tenant isolation (Oracle H2 fix): 4 dashboard endpoints scoped
+  via ResolvesBranchScope trait + view_all_branches permission.
+  Files: 6 modified + 2 new (trait + test). 8 isolation tests.
+- DEFERRED: financial-dashboard (needs branch_id on journal_entries),
+  pipeline/approval dashboards (polymorphic resolution).
 
 Next action needs USER DIRECTION (do NOT auto-pick):
 1. Multi-currency cross-cutting fix (Oracle H3) — affects aging/AR/AP/budget reports
-2. Branch tenant isolation (Oracle H2) — non-admin users see all branches
-3. Timezone drift (Oracle M3)
+2. Timezone drift (Oracle M3)
+3. Financial dashboard branch scoping (schema change: branch_id on journal_entries)
+4. Seed view_all_branches permission to admin role in dev DB
 
 If user says "lanjutkan" without direction, ASK which path.
 ```
