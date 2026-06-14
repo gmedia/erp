@@ -1,6 +1,6 @@
 # Changelog Tugas
 
-Terakhir diperbarui: 2026-06-01
+Terakhir diperbarui: 2026-06-14
 
 File ini menyimpan catatan perubahan produk dan fitur.
 Baca `task.md` untuk status handoff aktif dan `task.handoff-archive.md` untuk riwayat checkpoint E2E lama.
@@ -91,6 +91,17 @@ Catatan penamaan: heading modul memakai pola `Nama Modul di Kode (Label Bisnis)`
 - [x] `/api/aging-dashboard` di-wrap `permission:aging_dashboard,true` (mirror pola `pipeline-dashboard.php`). Regression test 403 ditambahkan.
 - [x] `/api/financial-dashboard` di-wrap `permission:financial_dashboard,true`. Pest beforeEach diperbaiki dari permission `report` (yang bypass karena gate belum ada) menjadi `financial_dashboard`. Regression test 403 ditambahkan.
 - [x] `/api/approval-monitoring/data` di-wrap `permission:approval_monitoring,true`. Test refactor pakai trait `CreatesTestUserWithPermissions`. Regression test 403 ditambahkan.
+
+### Hardening Keamanan Multi-Currency (Oracle H3 Wave 0) — PR #16
+
+- [x] Tutup celah silent-corruption multi-currency pada agregasi laporan (aging, AR/AP, dashboard). Sebelum fix, API menerima `currency=USD` di 6 endpoint transaksional + Excel import asset tanpa validasi whitelist. Single POST ill-typed bisa menyebabkan `SUM(amount_due)` mencampur IDR dan USD sebagai angka mentah.
+- [x] Konfigurasi baru `config/app.php`: `base_currency='IDR'`, `supported_transaction_currencies=['IDR']` sebagai single source of truth whitelist. Wave 2 (full FX subsystem) akan memperluas list ini saat customer non-IDR pertama tanda tangan.
+- [x] Trait baru `HasSupportedCurrencyRules` (sibling `HasTransactionAmountRules`) untuk validasi field `currency` di FormRequest. Diaplikasikan ke 6 AbstractRequest write (Purchase Order, Supplier Bill, Customer Invoice, AP Payment, AR Receipt, Asset) — cover Store + Update via inheritance.
+- [x] `AssetImport` Excel uploader juga pakai trait (menutup bypass `/api/assets/import` yang ditemukan oleh review keamanan Oracle, sebelum push).
+- [x] 3 regression test memastikan rejection USD: `PurchaseOrderControllerTest::store rejects unsupported currency`, `SupplierBillControllerTest::store rejects unsupported currency`, `AssetImportTest::rejects rows with unsupported currency` (422 / `imported=0,skipped=1`).
+- [x] Refactor follow-up untuk Sonar quality gate (commit `96cf4e19`): ekstrak 2 trait baru `HasBankPaymentRules` (parametrized date field + payment method enum, dipakai AP Payment + AR Receipt) dan `HasInvoiceLikeRules` (header + items.* common, dipakai Customer Invoice + Supplier Bill). Net `-44` baris. Duplicated lines density: `8.5%` → `0.0%`.
+- [x] Verifikasi: PHPStan clean, Duster clean, Pest full suite 1854 pass (8308 assertions), Sonar Quality Gate OK (semua 6 kondisi pass, coverage 100%, ratings A).
+- [ ] Wave 1 (deferred): `AssertsSingleCurrency` aggregation guard untuk Aging/Financial dashboard + AP Payment History report. Blocked pada 5 keputusan UX/API yang ditunggu user (lihat `task.md`).
 
 ## Dokumen Terkait
 
