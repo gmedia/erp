@@ -4,11 +4,13 @@ namespace App\Http\Requests\PurchaseOrders;
 
 use App\Http\Requests\AuthorizedFormRequest;
 use App\Http\Requests\Concerns\HasSometimesArrayRules;
+use App\Http\Requests\Concerns\HasSupportedCurrencyRules;
 use App\Http\Requests\Concerns\HasTransactionAmountRules;
 
 abstract class AbstractPurchaseOrderRequest extends AuthorizedFormRequest
 {
     use HasSometimesArrayRules;
+    use HasSupportedCurrencyRules;
     use HasTransactionAmountRules;
 
     public function rules(): array
@@ -25,7 +27,7 @@ abstract class AbstractPurchaseOrderRequest extends AuthorizedFormRequest
             'order_date' => $this->withSometimes(['required', 'date']),
             'expected_delivery_date' => $this->withSometimes($this->expectedDeliveryDateRules()),
             'payment_terms' => $this->withSometimes(['nullable', 'string', 'max:255']),
-            'currency' => $this->withSometimes(['required', 'string', 'max:3']),
+            'currency' => $this->withSometimes(['required', ...$this->supportedCurrencyRules()]),
             'status' => $this->withSometimes([
                 'required',
                 'string',

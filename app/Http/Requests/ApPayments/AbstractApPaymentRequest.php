@@ -3,6 +3,7 @@
 namespace App\Http\Requests\ApPayments;
 
 use App\Http\Requests\AuthorizedFormRequest;
+use App\Http\Requests\Concerns\HasBankPaymentRules;
 use App\Http\Requests\Concerns\HasSometimesArrayRules;
 use App\Models\ApPaymentAllocation;
 use App\Models\SupplierBill;
@@ -10,6 +11,7 @@ use Illuminate\Contracts\Validation\Validator;
 
 abstract class AbstractApPaymentRequest extends AuthorizedFormRequest
 {
+    use HasBankPaymentRules;
     use HasSometimesArrayRules;
 
     public function rules(): array
@@ -22,24 +24,16 @@ abstract class AbstractApPaymentRequest extends AuthorizedFormRequest
                 $this->paymentNumberUniqueRule(),
             ]),
             'supplier_id' => $this->withSometimes(['required', 'integer', 'exists:suppliers,id']),
-            'branch_id' => $this->withSometimes(['required', 'integer', 'exists:branches,id']),
-            'fiscal_year_id' => $this->withSometimes(['required', 'integer', 'exists:fiscal_years,id']),
-            'payment_date' => $this->withSometimes(['required', 'date']),
-            'payment_method' => $this->withSometimes([
-                'required',
-                'string',
-                'in:bank_transfer,cash,check,giro,other',
-            ]),
-            'bank_account_id' => $this->withSometimes(['required', 'integer', 'exists:accounts,id']),
-            'currency' => $this->withSometimes(['required', 'string', 'max:3']),
+            ...$this->bankPaymentSharedRules(
+                'payment_date',
+                ['bank_transfer', 'cash', 'check', 'giro', 'other'],
+            ),
             'total_amount' => $this->withSometimes(['required', 'numeric', 'gt:0']),
-            'reference' => $this->withSometimes(['nullable', 'string', 'max:255']),
             'status' => $this->withSometimes([
                 'required',
                 'string',
                 'in:draft,pending_approval,confirmed,reconciled,cancelled,void',
             ]),
-            'notes' => $this->withSometimes(['nullable', 'string']),
 
             'allocations' => $this->itemsRules(),
             'allocations.*.supplier_bill_id' => [$this->itemRequiredRule(), 'integer', 'exists:supplier_bills,id'],

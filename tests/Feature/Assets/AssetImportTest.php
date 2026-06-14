@@ -172,3 +172,26 @@ test('validates file type', function () {
     $response->assertStatus(422)
         ->assertJsonValidationErrors(['file']);
 })->group('assets');
+
+test('rejects rows with unsupported currency', function () {
+    $csvContent = implode("\n", [
+        $this->csvHeader,
+        str_replace(',IDR,', ',USD,', $this->csvRowValid),
+    ]);
+
+    $file = UploadedFile::fake()->createWithContent('assets_usd.csv', $csvContent);
+
+    $response = $this->postJson('/api/assets/import', [
+        'file' => $file,
+    ]);
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'imported' => 0,
+            'skipped' => 1,
+        ]);
+
+    $errors = collect($response->json('errors'));
+    expect($errors->contains(fn ($e) => $e['field'] === 'Validation'))->toBeTrue();
+    $this->assertDatabaseMissing('assets', ['asset_code' => 'AST-001']);
+})->group('assets');
