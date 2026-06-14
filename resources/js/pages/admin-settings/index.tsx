@@ -66,14 +66,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 const CURRENCY_OPTIONS = [
     { value: 'IDR', label: 'IDR - Indonesian Rupiah' },
-    { value: 'USD', label: 'USD - US Dollar' },
-    { value: 'EUR', label: 'EUR - Euro' },
-    { value: 'SGD', label: 'SGD - Singapore Dollar' },
-    { value: 'MYR', label: 'MYR - Malaysian Ringgit' },
-    { value: 'JPY', label: 'JPY - Japanese Yen' },
-    { value: 'GBP', label: 'GBP - British Pound' },
-    { value: 'AUD', label: 'AUD - Australian Dollar' },
-    { value: 'CNY', label: 'CNY - Chinese Yuan' },
 ] as const;
 
 async function submitJsonAdminSettings(
