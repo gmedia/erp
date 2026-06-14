@@ -106,7 +106,7 @@ describe('AdminSettingController@update', function () {
         Sanctum::actingAs($user, ['*']);
         $response = $this->putJson('/api/admin-settings', [
             'timezone' => 'Asia/Makassar',
-            'currency' => 'USD',
+            'currency' => 'IDR',
             'date_format' => 'Y-m-d',
             'number_format_decimal' => '.',
             'number_format_thousand' => ',',
@@ -116,11 +116,23 @@ describe('AdminSettingController@update', function () {
         $response->assertOk();
 
         expect(Setting::get('timezone'))->toBe('Asia/Makassar');
-        expect(Setting::get('currency'))->toBe('USD');
+        expect(Setting::get('currency'))->toBe('IDR');
         expect(Setting::get('date_format'))->toBe('Y-m-d');
         expect(Setting::get('number_format_decimal'))->toBe('.');
         expect(Setting::get('number_format_thousand'))->toBe(',');
         expect(Setting::get('number_format_hide_decimal'))->toBeTrue();
+    });
+
+    test('rejects unsupported currency aligned with config', function () {
+        $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
+
+        Sanctum::actingAs($user, ['*']);
+        $response = $this->putJson('/api/admin-settings', [
+            'currency' => 'USD',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['currency']);
     });
 
     test('update validates email format', function () {

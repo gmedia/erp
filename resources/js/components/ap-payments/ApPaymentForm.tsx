@@ -238,12 +238,6 @@ export const ApPaymentForm = memo<ApPaymentFormProps>(function ApPaymentForm({
                 />
 
                 <InputField
-                    name="currency"
-                    label="Currency"
-                    placeholder="IDR"
-                />
-
-                <InputField
                     name="total_amount"
                     label="Total Amount"
                     type="number"

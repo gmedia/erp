@@ -2,6 +2,7 @@
 
 namespace App\Actions\AgingDashboard;
 
+use App\Actions\Concerns\AssertsSingleCurrency;
 use App\Models\CustomerInvoice;
 use App\Models\SupplierBill;
 use Illuminate\Database\Query\Builder;
@@ -10,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 
 class GetAgingDashboardDataAction
 {
+    use AssertsSingleCurrency;
+
     /**
      * Outstanding invoice statuses for AR.
      *
@@ -67,6 +70,9 @@ class GetAgingDashboardDataAction
         $d60 = $asOf->copy()->subDays(60)->toDateString();
         $d61 = $asOf->copy()->subDays(61)->toDateString();
         $d90 = $asOf->copy()->subDays(90)->toDateString();
+
+        $this->guardHomogeneousCurrency('customer_invoices', self::AR_OUTSTANDING_STATUSES, $branchId, 'aging-dashboard:ar');
+        $this->guardHomogeneousCurrency('supplier_bills', self::AP_OUTSTANDING_STATUSES, $branchId, 'aging-dashboard:ap');
 
         $arRow = $this->aggregateBuckets(
             CustomerInvoice::query()->getQuery(),
@@ -326,5 +332,23 @@ class GetAgingDashboardDataAction
                 'max_days_overdue' => $maxDaysOverdue,
             ];
         })->all();
+    }
+
+    /**
+     * @param  list<string>  $statuses
+     */
+    private function guardHomogeneousCurrency(
+        string $table,
+        array $statuses,
+        ?int $branchId,
+        string $context,
+    ): void {
+        $query = DB::table($table)->whereIn('status', $statuses);
+
+        if ($branchId !== null) {
+            $query->where('branch_id', $branchId);
+        }
+
+        $this->assertSingleCurrency($query, $context);
     }
 }
