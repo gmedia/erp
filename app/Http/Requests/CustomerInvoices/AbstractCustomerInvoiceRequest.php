@@ -3,13 +3,11 @@
 namespace App\Http\Requests\CustomerInvoices;
 
 use App\Http\Requests\AuthorizedFormRequest;
-use App\Http\Requests\Concerns\HasSometimesArrayRules;
-use App\Http\Requests\Concerns\HasSupportedCurrencyRules;
+use App\Http\Requests\Concerns\HasInvoiceLikeRules;
 
 abstract class AbstractCustomerInvoiceRequest extends AuthorizedFormRequest
 {
-    use HasSometimesArrayRules;
-    use HasSupportedCurrencyRules;
+    use HasInvoiceLikeRules;
 
     public function rules(): array
     {
@@ -21,30 +19,18 @@ abstract class AbstractCustomerInvoiceRequest extends AuthorizedFormRequest
                 $this->invoiceNumberUniqueRule(),
             ]),
             'customer_id' => $this->withSometimes(['required', 'integer', 'exists:customers,id']),
-            'branch_id' => $this->withSometimes(['required', 'integer', 'exists:branches,id']),
-            'fiscal_year_id' => $this->withSometimes(['required', 'integer', 'exists:fiscal_years,id']),
             'invoice_date' => $this->withSometimes(['required', 'date']),
             'due_date' => $this->withSometimes(['required', 'date']),
-            'payment_terms' => $this->withSometimes(['nullable', 'string', 'max:255']),
-            'currency' => $this->withSometimes(['required', ...$this->supportedCurrencyRules()]),
+            ...$this->invoiceLikeHeaderRules(),
             'status' => $this->withSometimes([
                 'required',
                 'string',
                 'in:draft,sent,partially_paid,paid,overdue,cancelled,void',
             ]),
-            'notes' => $this->withSometimes(['nullable', 'string']),
             ...$this->totalAmountRules(),
 
-            'items' => $this->itemsRules(),
-            'items.*.product_id' => ['nullable', 'integer', 'exists:products,id'],
-            'items.*.account_id' => [$this->itemRequiredRule(), 'integer', 'exists:accounts,id'],
+            ...$this->invoiceLikeItemRules(),
             'items.*.unit_id' => ['nullable', 'integer', 'exists:units,id'],
-            'items.*.description' => [$this->itemRequiredRule(), 'string', 'max:255'],
-            'items.*.quantity' => [$this->itemRequiredRule(), 'numeric', 'gt:0'],
-            'items.*.unit_price' => [$this->itemRequiredRule(), 'numeric', 'min:0'],
-            'items.*.discount_percent' => ['nullable', 'numeric', 'min:0', 'max:100'],
-            'items.*.tax_percent' => ['nullable', 'numeric', 'min:0', 'max:100'],
-            'items.*.notes' => ['nullable', 'string'],
         ];
     }
 
