@@ -204,3 +204,34 @@ test('destroy removes supplier bill', function () {
 
     assertDatabaseMissing('supplier_bills', ['id' => $supplierBill->id]);
 });
+
+test('store rejects unsupported currency', function () {
+    $supplier = Supplier::factory()->create();
+    $branch = Branch::factory()->create();
+    $fiscalYear = FiscalYear::factory()->create();
+    $product = Product::factory()->create();
+    $account = Account::factory()->create();
+
+    $payload = [
+        'supplier_id' => $supplier->id,
+        'branch_id' => $branch->id,
+        'fiscal_year_id' => $fiscalYear->id,
+        'bill_date' => '2026-03-05',
+        'due_date' => '2026-04-05',
+        'currency' => 'USD',
+        'status' => 'draft',
+        'items' => [
+            [
+                'product_id' => $product->id,
+                'account_id' => $account->id,
+                'description' => 'Item',
+                'quantity' => 1,
+                'unit_price' => 1000,
+            ],
+        ],
+    ];
+
+    postJson('/api/supplier-bills', $payload)
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['currency']);
+});

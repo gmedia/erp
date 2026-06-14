@@ -138,4 +138,28 @@ return [
 
     'admin' => env('APP_ADMIN', 'admin@dokfin.id'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Base Currency & Supported Transaction Currencies
+    |--------------------------------------------------------------------------
+    |
+    | `base_currency` is the canonical currency for all aggregated reports,
+    | dashboards, and journal entries until a full FX subsystem ships
+    | (see Oracle H3 — task.handoff-archive.md).
+    |
+    | `supported_transaction_currencies` is the whitelist applied at the
+    | FormRequest layer for transactional `currency` fields on:
+    | purchase_orders, supplier_bills, customer_invoices, ap_payments,
+    | ar_receipts, assets. Only values in this list may be persisted.
+    |
+    | TODO(H3-Wave2): widen this list when the full FX subsystem
+    | (currency_rates table + exchange_rate columns + ConvertsCurrency trait)
+    | ships. Until then, mixed-currency aggregations would silently miscount.
+    |
+    */
+
+    'base_currency' => env('APP_BASE_CURRENCY', 'IDR'),
+
+    'supported_transaction_currencies' => ['IDR'],
+
 ];

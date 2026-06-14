@@ -4,10 +4,12 @@ namespace App\Http\Requests\CustomerInvoices;
 
 use App\Http\Requests\AuthorizedFormRequest;
 use App\Http\Requests\Concerns\HasSometimesArrayRules;
+use App\Http\Requests\Concerns\HasSupportedCurrencyRules;
 
 abstract class AbstractCustomerInvoiceRequest extends AuthorizedFormRequest
 {
     use HasSometimesArrayRules;
+    use HasSupportedCurrencyRules;
 
     public function rules(): array
     {
@@ -24,7 +26,7 @@ abstract class AbstractCustomerInvoiceRequest extends AuthorizedFormRequest
             'invoice_date' => $this->withSometimes(['required', 'date']),
             'due_date' => $this->withSometimes(['required', 'date']),
             'payment_terms' => $this->withSometimes(['nullable', 'string', 'max:255']),
-            'currency' => $this->withSometimes(['required', 'string', 'max:3']),
+            'currency' => $this->withSometimes(['required', ...$this->supportedCurrencyRules()]),
             'status' => $this->withSometimes([
                 'required',
                 'string',

@@ -4,6 +4,7 @@ namespace App\Http\Requests\ApPayments;
 
 use App\Http\Requests\AuthorizedFormRequest;
 use App\Http\Requests\Concerns\HasSometimesArrayRules;
+use App\Http\Requests\Concerns\HasSupportedCurrencyRules;
 use App\Models\ApPaymentAllocation;
 use App\Models\SupplierBill;
 use Illuminate\Contracts\Validation\Validator;
@@ -11,6 +12,7 @@ use Illuminate\Contracts\Validation\Validator;
 abstract class AbstractApPaymentRequest extends AuthorizedFormRequest
 {
     use HasSometimesArrayRules;
+    use HasSupportedCurrencyRules;
 
     public function rules(): array
     {
@@ -31,7 +33,7 @@ abstract class AbstractApPaymentRequest extends AuthorizedFormRequest
                 'in:bank_transfer,cash,check,giro,other',
             ]),
             'bank_account_id' => $this->withSometimes(['required', 'integer', 'exists:accounts,id']),
-            'currency' => $this->withSometimes(['required', 'string', 'max:3']),
+            'currency' => $this->withSometimes(['required', ...$this->supportedCurrencyRules()]),
             'total_amount' => $this->withSometimes(['required', 'numeric', 'gt:0']),
             'reference' => $this->withSometimes(['nullable', 'string', 'max:255']),
             'status' => $this->withSometimes([

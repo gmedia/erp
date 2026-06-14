@@ -4,6 +4,7 @@ namespace App\Http\Requests\ArReceipts;
 
 use App\Http\Requests\AuthorizedFormRequest;
 use App\Http\Requests\Concerns\HasSometimesArrayRules;
+use App\Http\Requests\Concerns\HasSupportedCurrencyRules;
 use App\Http\Requests\Concerns\ValidatesAllocationOverflow;
 use App\Models\ArReceiptAllocation;
 use App\Models\CustomerInvoice;
@@ -12,6 +13,7 @@ use Illuminate\Contracts\Validation\Validator;
 abstract class AbstractArReceiptRequest extends AuthorizedFormRequest
 {
     use HasSometimesArrayRules;
+    use HasSupportedCurrencyRules;
     use ValidatesAllocationOverflow;
 
     public function rules(): array
@@ -33,7 +35,7 @@ abstract class AbstractArReceiptRequest extends AuthorizedFormRequest
                 'in:bank_transfer,cash,check,giro,credit_card,other',
             ]),
             'bank_account_id' => $this->withSometimes(['required', 'integer', 'exists:accounts,id']),
-            'currency' => $this->withSometimes(['required', 'string', 'max:3']),
+            'currency' => $this->withSometimes(['required', ...$this->supportedCurrencyRules()]),
             'reference' => $this->withSometimes(['nullable', 'string', 'max:255']),
             'status' => $this->withSometimes([
                 'required',

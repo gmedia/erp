@@ -163,3 +163,30 @@ test('destroy removes purchase order', function () {
 
     assertDatabaseMissing('purchase_orders', ['id' => $purchaseOrder->id]);
 });
+
+test('store rejects unsupported currency', function () {
+    $supplier = Supplier::factory()->create();
+    $warehouse = Warehouse::factory()->create();
+    $product = Product::factory()->create();
+    $unit = Unit::factory()->create();
+
+    $payload = [
+        'supplier_id' => $supplier->id,
+        'warehouse_id' => $warehouse->id,
+        'order_date' => '2026-03-05',
+        'currency' => 'USD',
+        'status' => 'draft',
+        'items' => [
+            [
+                'product_id' => $product->id,
+                'unit_id' => $unit->id,
+                'quantity' => 1,
+                'unit_price' => 1000,
+            ],
+        ],
+    ];
+
+    postJson('/api/purchase-orders', $payload)
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['currency']);
+});

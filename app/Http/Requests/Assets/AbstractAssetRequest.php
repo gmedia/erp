@@ -4,12 +4,14 @@ namespace App\Http\Requests\Assets;
 
 use App\Http\Requests\AuthorizedFormRequest;
 use App\Http\Requests\Concerns\HasSometimesArrayRules;
+use App\Http\Requests\Concerns\HasSupportedCurrencyRules;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Unique;
 
 abstract class AbstractAssetRequest extends AuthorizedFormRequest
 {
     use HasSometimesArrayRules;
+    use HasSupportedCurrencyRules;
 
     public function rules(): array
     {
@@ -27,7 +29,7 @@ abstract class AbstractAssetRequest extends AuthorizedFormRequest
             'supplier_id' => $this->withSometimes(['nullable', 'exists:suppliers,id']),
             'purchase_date' => $this->withSometimes(['required', 'date']),
             'purchase_cost' => $this->withSometimes(['required', 'numeric', 'min:0']),
-            'currency' => $this->withSometimes(['required', 'string', 'size:3']),
+            'currency' => $this->withSometimes(['required', ...$this->supportedCurrencyRules()]),
             'warranty_end_date' => $this->withSometimes(['nullable', 'date', 'after_or_equal:purchase_date']),
             'status' => $this->withSometimes(['required', 'string', 'in:draft,active,maintenance,disposed,lost']),
             'condition' => $this->withSometimes(['nullable', 'string', 'in:good,needs_repair,damaged']),

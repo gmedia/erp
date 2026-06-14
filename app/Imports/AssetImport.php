@@ -2,6 +2,7 @@
 
 namespace App\Imports;
 
+use App\Http\Requests\Concerns\HasSupportedCurrencyRules;
 use App\Imports\Concerns\InteractsWithImportRows;
 use App\Models\Asset;
 use App\Models\AssetCategory;
@@ -18,6 +19,7 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
 class AssetImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
 {
+    use HasSupportedCurrencyRules;
     use InteractsWithImportRows;
 
     public int $importedCount = 0;
@@ -69,7 +71,7 @@ class AssetImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                 'barcode' => 'nullable|string|max:255',
                 'purchase_date' => 'required|date',
                 'purchase_cost' => 'required|numeric',
-                'currency' => 'required|string|max:3',
+                'currency' => ['required', ...$this->supportedCurrencyRules()],
                 'warranty_end_date' => 'nullable|date',
                 'status' => 'required|in:draft,active,maintenance,disposed,lost',
                 'condition' => 'nullable|in:good,needs_repair,damaged',
