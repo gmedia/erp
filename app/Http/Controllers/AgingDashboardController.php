@@ -19,9 +19,7 @@ class AgingDashboardController extends Controller
         GetAgingDashboardDataAction $action,
     ): JsonResponse {
         $asOfDate = $this->resolveAsOfDate($request->query('as_of_date'));
-        $branchIdRaw = $request->query('branch_id');
-        $requestedBranchId = is_numeric($branchIdRaw) ? (int) $branchIdRaw : null;
-        $branchId = $this->resolveBranchScope($requestedBranchId);
+        $branchId = $this->resolveBranchFromRequest($request);
 
         $branches = Branch::orderBy('name')->get(['id', 'name']);
 
