@@ -3,16 +3,21 @@
 namespace App\Actions\BankReconciliations;
 
 use App\Models\BankReconciliationItem;
+use Illuminate\Support\Facades\DB;
 
 class UnmatchBankReconciliationItemAction
 {
     public function execute(BankReconciliationItem $item): BankReconciliationItem
     {
-        $item->update([
-            'journal_entry_line_id' => null,
-            'is_reconciled' => false,
-        ]);
+        return DB::transaction(function () use ($item): BankReconciliationItem {
+            $item->update([
+                'journal_entry_line_id' => null,
+                'is_reconciled' => false,
+            ]);
 
-        return $item->refresh();
+            $item->bankReconciliation->recalculateBalances();
+
+            return $item->refresh();
+        });
     }
 }

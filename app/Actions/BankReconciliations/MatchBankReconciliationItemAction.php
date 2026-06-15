@@ -4,22 +4,27 @@ namespace App\Actions\BankReconciliations;
 
 use App\Models\BankReconciliationItem;
 use App\Models\JournalEntryLine;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class MatchBankReconciliationItemAction
 {
     public function execute(BankReconciliationItem $item, int $journalEntryLineId): BankReconciliationItem
     {
-        $line = JournalEntryLine::with('journalEntry')->findOrFail($journalEntryLineId);
+        return DB::transaction(function () use ($item, $journalEntryLineId): BankReconciliationItem {
+            $line = JournalEntryLine::with('journalEntry')->findOrFail($journalEntryLineId);
 
-        $this->validate($item, $line);
+            $this->validate($item, $line);
 
-        $item->update([
-            'journal_entry_line_id' => $line->id,
-            'is_reconciled' => true,
-        ]);
+            $item->update([
+                'journal_entry_line_id' => $line->id,
+                'is_reconciled' => true,
+            ]);
 
-        return $item->refresh();
+            $item->bankReconciliation->recalculateBalances();
+
+            return $item->refresh();
+        });
     }
 
     private function validate(BankReconciliationItem $item, JournalEntryLine $line): void

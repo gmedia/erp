@@ -42,6 +42,8 @@ class AutoMatchBankReconciliationAction
                 }
             }
 
+            $bankReconciliation->recalculateBalances();
+
             return [
                 'matched' => $matched,
                 'unmatched' => $unmatchedItems->count() - $matched,
