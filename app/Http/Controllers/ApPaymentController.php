@@ -95,11 +95,12 @@ class ApPaymentController extends Controller
             syncItems: function (ApPayment $apPayment, array $allocations) use ($syncAllocations): void {
                 $syncAllocations->execute($apPayment, $allocations);
             },
+            afterCommit: $isNewlyConfirmed
+                ? function (ApPayment $apPayment) use ($postJournal): void {
+                    $postJournal->execute($apPayment->refresh());
+                }
+            : null,
         );
-
-        if ($isNewlyConfirmed) {
-            $postJournal->execute($apPayment->refresh());
-        }
 
         return (new ApPaymentResource($this->loadResourceRelations($apPayment)))->response();
     }

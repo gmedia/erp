@@ -63,21 +63,32 @@ trait StoresItemsInTransaction
      * @param  array<int, array<string, mixed>>|null  $items
      * @param  callable(array<string, mixed>): array<string, mixed>  $payloadResolver
      * @param  callable(TModel, array<int, array<string, mixed>>): void  $syncItems
+     * @param  (callable(TModel): void)|null  $afterCommit  Optional hook executed inside
+     *                                                      the same transaction after items
+     *                                                      sync. Use this to atomically pair
+     *                                                      state mutations with side effects
+     *                                                      like journal posting so the change
+     *                                                      and its effect rollback together.
      */
     protected function updateWithSyncedItems(
         Model $model,
         array $attributes,
         ?array $items,
         callable $payloadResolver,
-        callable $syncItems
+        callable $syncItems,
+        ?callable $afterCommit = null
     ): void {
         $payload = $payloadResolver($attributes);
 
-        DB::transaction(function () use ($model, $payload, $items, $syncItems): void {
+        DB::transaction(function () use ($model, $payload, $items, $syncItems, $afterCommit): void {
             $model->update($payload);
 
             if (is_array($items)) {
                 $syncItems($model, $items);
+            }
+
+            if ($afterCommit !== null) {
+                $afterCommit($model);
             }
         });
     }

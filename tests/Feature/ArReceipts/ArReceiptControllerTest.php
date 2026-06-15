@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\AccountingPosting\PostArReceiptJournalAction;
 use App\Models\Account;
 use App\Models\ArReceipt;
 use App\Models\Branch;
@@ -199,4 +200,30 @@ test('destroy removes ar receipt', function () {
         ->assertNoContent();
 
     assertDatabaseMissing('ar_receipts', ['id' => $receipt->id]);
+});
+
+test('confirming ar receipt rolls back state when journal posting fails', function () {
+    $receipt = ArReceipt::factory()->create([
+        'status' => 'draft',
+        'confirmed_at' => null,
+        'confirmed_by' => null,
+    ]);
+
+    $this->app->bind(PostArReceiptJournalAction::class, function () {
+        return new class
+        {
+            public function execute(ArReceipt $arReceipt): void
+            {
+                throw new RuntimeException('Simulated journal posting failure');
+            }
+        };
+    });
+
+    putJson('/api/ar-receipts/' . $receipt->id, ['status' => 'confirmed'])
+        ->assertStatus(500);
+
+    $receipt->refresh();
+    expect($receipt->status)->toBe('draft');
+    expect($receipt->confirmed_at)->toBeNull();
+    expect($receipt->confirmed_by)->toBeNull();
 });
