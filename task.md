@@ -12,7 +12,7 @@ Last updated: 2026-06-15 (handoff for new session) UTC
 
 User is switching to a new opencode session. Read this section first.
 
-1. **Verify baseline**: `git rev-parse HEAD` → expect `922b31f9`. `git status --short` → expect empty.
+1. **Verify baseline**: `git status --short` → expect empty. `git log --oneline -1` → expect a `docs(handoff)` commit at the top (latest may be this commit or a fresher handoff refresh).
 2. **Last 3 PRs all MERGED** (this session's work):
    - PR #18 (`96879e3d` merge, `ae3cd085` feature) — Oracle audit polish quick wins
    - PR #17 (`4df36b76` merge) — Wave 1 H3 multi-currency aggregation guard
@@ -94,7 +94,7 @@ Net `-54 lines` polish.
 ## Current State
 
 - Branch: `main`
-- HEAD: `922b31f9` (handoff refresh for new session)
+- HEAD: latest `docs(handoff)` commit (refresh for new session)
 - Working tree: clean
 - CI on `main`: green
 - Sonar Quality Gate: OK (all conditions pass)
@@ -106,7 +106,7 @@ Net `-54 lines` polish.
 
 | Commit | Subject |
 |---|---|
-| `922b31f9` | docs(handoff): refresh task.md for new session continuation |
+| (HEAD) | docs(handoff): refresh task.md for new session continuation |
 | `f8cbe83c` | docs(handoff): record quick wins ship + PR #18 merge + Oracle audit findings |
 | `96879e3d` | Merge pull request #18 from gmedia/feat/h3-polish-quick-wins |
 | `ae3cd085` | refactor: H3 polish quick wins (Oracle audit follow-up) |
@@ -164,7 +164,8 @@ gh pr view <num> --json statusCheckRollup
 ## Continuation Prompt for New Session
 
 ```text
-Read task.md first. Repo on `main`, HEAD `922b31f9`, working tree clean.
+Read task.md first. Repo on `main`, working tree clean, latest commit
+is a `docs(handoff)` refresh.
 Last session shipped 3 PRs (#16 Wave 0, #17 Wave 1, #18 polish quick wins).
 H3 multi-currency fully closed for current schema. Sonar QG OK.
 Full Pest suite 1864 pass.
