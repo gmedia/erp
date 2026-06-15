@@ -95,13 +95,15 @@ test.describe('Admin Settings', () => {
     test('can update regional settings', async ({ page }) => {
         await page.goto('/admin-settings?group=regional');
 
-        // Update currency
-        const currencySelect = page.getByTestId('currency-select-trigger');
-        await currencySelect.click();
-        await page.getByRole('option', { name: 'USD - US Dollar' }).click();
-
-        // Enable hide decimal
+        // Currency dropdown is locked to IDR until full FX subsystem ships
+        // (see docs/user-guide-multi-currency.md). Toggle hide_decimal as
+        // the writable regional setting for this regression coverage.
         const hideDecimalInput = page.getByTestId('hide-decimal-checkbox');
+        const initialState =
+            (await hideDecimalInput.getAttribute('data-state')) ?? 'unchecked';
+        const targetState =
+            initialState === 'checked' ? 'unchecked' : 'checked';
+
         await hideDecimalInput.click();
 
         // Save
@@ -111,14 +113,12 @@ test.describe('Admin Settings', () => {
         await page.reload();
         await expect(
             page.locator('input[type="hidden"][name="currency"]'),
-        ).toHaveValue('USD');
-        await expect(hideDecimalInput).toHaveAttribute('data-state', 'checked');
+        ).toHaveValue('IDR');
+        await expect(hideDecimalInput).toHaveAttribute(
+            'data-state',
+            targetState,
+        );
 
-        // Reset back to defaults to not affect other tests
-        await currencySelect.click();
-        await page
-            .getByRole('option', { name: 'IDR - Indonesian Rupiah' })
-            .click();
         await hideDecimalInput.click();
         await saveAdminSettings(page, 'save-regional-settings');
     });

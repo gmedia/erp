@@ -365,11 +365,6 @@ export const AssetForm = memo<AssetFormProps>(function AssetForm({
                             type="number"
                             placeholder="0"
                         />
-                        <InputField
-                            name="currency"
-                            label="Currency"
-                            placeholder="IDR"
-                        />
                         <DatePickerField
                             name="warranty_end_date"
                             label="Warranty End Date"

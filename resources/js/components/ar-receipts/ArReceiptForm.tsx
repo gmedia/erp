@@ -144,11 +144,6 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
         { value: 'credit_card', label: 'Credit Card' },
         { value: 'other', label: 'Other' },
     ];
-    const currencyOptions = [
-        { value: 'IDR', label: 'IDR' },
-        { value: 'USD', label: 'USD' },
-        { value: 'EUR', label: 'EUR' },
-    ];
     const handleSubmit = (data: ArReceiptFormData) => {
         onSubmit({
             ...data,
@@ -204,12 +199,6 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
                         label="Bank Account"
                         placeholder="Select Bank Account"
                         url="/api/accounts"
-                    />
-                    <SelectField
-                        name="currency"
-                        label="Currency"
-                        options={currencyOptions}
-                        placeholder="Select Currency"
                     />
                     <InputField
                         name="total_amount"

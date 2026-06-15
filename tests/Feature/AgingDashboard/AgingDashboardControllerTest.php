@@ -431,4 +431,52 @@ describe('Aging Dashboard API', function () {
         $response->assertOk()
             ->assertJsonPath('as_of_date', '2026-06-01');
     });
+
+    test('rejects with 422 when AR invoices have mixed currencies', function () {
+        Sanctum::actingAs($this->createTestUserWithPermissions(['aging_dashboard']), ['*']);
+
+        $customer = Customer::factory()->create();
+
+        CustomerInvoice::factory()->create([
+            'customer_id' => $customer->id,
+            'status' => 'sent',
+            'currency' => 'IDR',
+            'amount_due' => 100,
+        ]);
+        CustomerInvoice::factory()->create([
+            'customer_id' => $customer->id,
+            'status' => 'sent',
+            'currency' => 'USD',
+            'amount_due' => 50,
+        ]);
+
+        $response = getJson('/api/aging-dashboard');
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['currency']);
+    });
+
+    test('rejects with 422 when AP bills have mixed currencies', function () {
+        Sanctum::actingAs($this->createTestUserWithPermissions(['aging_dashboard']), ['*']);
+
+        $supplier = Supplier::factory()->create();
+
+        SupplierBill::factory()->create([
+            'supplier_id' => $supplier->id,
+            'status' => 'confirmed',
+            'currency' => 'IDR',
+            'amount_due' => 100,
+        ]);
+        SupplierBill::factory()->create([
+            'supplier_id' => $supplier->id,
+            'status' => 'confirmed',
+            'currency' => 'USD',
+            'amount_due' => 50,
+        ]);
+
+        $response = getJson('/api/aging-dashboard');
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['currency']);
+    });
 });

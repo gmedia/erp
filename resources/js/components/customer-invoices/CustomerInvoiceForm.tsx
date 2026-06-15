@@ -149,12 +149,6 @@ export const CustomerInvoiceForm = memo<CustomerInvoiceFormProps>(
             { value: 'void', label: 'Void' },
         ];
 
-        const currencyOptions = [
-            { value: 'IDR', label: 'IDR' },
-            { value: 'USD', label: 'USD' },
-            { value: 'EUR', label: 'EUR' },
-        ];
-
         const handleSubmit = (data: CustomerInvoiceFormData) => {
             onSubmit({
                 ...data,
@@ -206,12 +200,6 @@ export const CustomerInvoiceForm = memo<CustomerInvoiceFormProps>(
                             name="payment_terms"
                             label="Payment Terms"
                             placeholder="e.g., Net 30"
-                        />
-                        <SelectField
-                            name="currency"
-                            label="Currency"
-                            options={currencyOptions}
-                            placeholder="Select Currency"
                         />
                         <SelectField
                             name="status"

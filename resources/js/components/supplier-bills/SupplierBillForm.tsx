@@ -281,11 +281,6 @@ export const SupplierBillForm = memo<SupplierBillFormProps>(
                         label="Payment Terms"
                         placeholder="Net 30"
                     />
-                    <InputField
-                        name="currency"
-                        label="Currency"
-                        placeholder="IDR"
-                    />
 
                     <div className="md:col-span-2">
                         <TextareaField
