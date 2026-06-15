@@ -10,8 +10,11 @@ trait BuildsCustomerInvoiceReportQuery
 {
     /**
      * Build base customer invoice report query with common joins and columns.
+     *
+     * @param  array<int, string>  $additionalColumns
+     * @param  array<int, mixed>  $additionalBindings
      */
-    protected function buildBaseCustomerInvoiceQuery(array $additionalColumns = []): Builder
+    protected function buildBaseCustomerInvoiceQuery(array $additionalColumns = [], array $additionalBindings = []): Builder
     {
         $baseColumns = [
             'ci.id as customer_invoice_id',
@@ -35,7 +38,7 @@ trait BuildsCustomerInvoiceReportQuery
             ->from('customer_invoices as ci')
             ->join('customers as c', 'ci.customer_id', '=', 'c.id')
             ->leftJoin('branches as b', 'ci.branch_id', '=', 'b.id')
-            ->selectRaw($this->compileSelectColumns($allColumns))
+            ->selectRaw($this->compileSelectColumns($allColumns), $additionalBindings)
             ->withCasts($this->getBaseCasts());
     }
 

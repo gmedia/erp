@@ -8,6 +8,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Carbon;
 
 class IndexArOutstandingReportAction
 {
@@ -34,10 +35,14 @@ class IndexArOutstandingReportAction
 
     protected function buildQuery(): Builder
     {
-        return $this->buildBaseCustomerInvoiceQuery([$this->daysOverdueSelectSql()])
-            ->withCasts(array_merge($this->getBaseCasts(), [
-                'days_overdue' => 'integer',
-            ]));
+        $today = Carbon::today()->toDateString();
+
+        return $this->buildBaseCustomerInvoiceQuery(
+            [$this->daysOverdueSelectSql()],
+            [$today, $today],
+        )->withCasts(array_merge($this->getBaseCasts(), [
+            'days_overdue' => 'integer',
+        ]));
     }
 
     protected function defaultSortBy(): string
@@ -70,8 +75,8 @@ class IndexArOutstandingReportAction
     private function daysOverdueSelectSql(): string
     {
         return "CASE
-            WHEN ci.status IN ('sent', 'partially_paid', 'overdue') AND ci.due_date < CURDATE()
-            THEN DATEDIFF(CURDATE(), ci.due_date)
+            WHEN ci.status IN ('sent', 'partially_paid', 'overdue') AND ci.due_date < ?
+            THEN DATEDIFF(?, ci.due_date)
             ELSE 0
         END as days_overdue";
     }

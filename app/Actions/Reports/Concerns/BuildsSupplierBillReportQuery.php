@@ -13,9 +13,13 @@ trait BuildsSupplierBillReportQuery
     /**
      * @param  array<int, string>  $extraSelectColumns
      * @param  array<string, string>  $extraCasts
+     * @param  array<int, mixed>  $extraSelectBindings
      */
-    protected function buildBaseSupplierBillQuery(array $extraSelectColumns = [], array $extraCasts = []): Builder
-    {
+    protected function buildBaseSupplierBillQuery(
+        array $extraSelectColumns = [],
+        array $extraCasts = [],
+        array $extraSelectBindings = [],
+    ): Builder {
         $baseSelectColumns = [
             'sb.id',
             'sb.bill_number',
@@ -48,7 +52,7 @@ trait BuildsSupplierBillReportQuery
             ->from('supplier_bills as sb')
             ->join('suppliers as s', 'sb.supplier_id', '=', 's.id')
             ->join('branches as b', 'sb.branch_id', '=', 'b.id')
-            ->selectRaw(implode(",\n                ", $allSelectColumns))
+            ->selectRaw(implode(",\n                ", $allSelectColumns), $extraSelectBindings)
             ->whereIn('sb.status', ['confirmed', 'partially_paid', 'overdue'])
             ->withCasts($allCasts);
     }
