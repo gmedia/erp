@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-06-15 (Oracle audit findings #1, #3, #4 all SHIPPED) UTC
+Last updated: 2026-06-15 (3 Oracle PRs merged + Depwire scan no-findings + handoff finalized) UTC
 
 ## Document Roles
 
@@ -53,19 +53,32 @@ If dev DB seems empty after pulling: `sail artisan db:seed`. Schema is intact.
 ### Current State
 
 - Branch: `main`
-- HEAD: `8c076305` (PR #19 squash-merge, "Merge pull request #19 from gmedia/feat/finding4-resolve-branch-from-…")
+- HEAD: `2f549470` (`docs(handoff): record Oracle audit findings #1, #3, #4 ship`)
 - Working tree: clean
-- CI on `main`: latest run `27530038109` was `in_progress` at last check; 2 prior runs cancelled by GitHub workflow concurrency (not failures — newer merges superseded them). Verify `gh run list --branch main --limit 3` before relying on green status.
-- Sonar Quality Gate: expect OK (no logic changes that move duplication; new traits add abstraction).
-- Pest full suite: 1864+ pass (verified per-group during ship).
+- CI on `main`: latest run `27531047741` (HEAD `2f549470`) was `in_progress` at session close. 3 prior runs (PR #19/#20/#21 merges) all `cancelled` by GitHub workflow concurrency — NOT failures, just newer commits superseded them. Verify with `gh run list --branch main --limit 3` next session.
+- Sonar Quality Gate: expect OK (no logic changes that move duplication; new traits add abstraction). Verify after CI green.
+- Pest: 33 (bank-reconciliations) + 5 (ar-aging) + 5 (ap-aging) + 5 (ar-outstanding) + 5 (ap-outstanding) + 15 (aging-dashboard regression) + 5 (customer-statement regression) + dashboard/asset-dashboard/stock-monitor groups all green per-group during ship. Full suite 1864+ pass on prior baseline.
 - Module registry: 80 entries.
 - Permission seeded: admin emp has `view_all_branches`.
+
+### Post-merge investigation (no quick wins found)
+
+After 3 PRs merged, attempted to find more quick-win refactors via Depwire + Sonar:
+
+- **Depwire health score** = 56/F. ALL findings false positive for Laravel:
+  - 8,415 dead symbols dominated by `_ide_helper.php` (gitignored, IDE-only).
+  - 546 orphan files = Laravel auto-discovery (migrations, factories, seeders, configs, abstract base classes, sibling components loaded via `createEntityCrudPage(config)` factory pattern).
+  - 93 god files = Laravel models with relations; normal.
+  - Cohesion 20/F = Laravel structure (controllers/models/etc by concern) inherently low cohesion per dir.
+- **Sonar MCP** = blocked (`organization` parameter missing in MCP config; not a code issue).
+
+**Conclusion**: Depwire/Sonar produced no actionable refactor for a Laravel codebase. Skip these tools next session unless config improves.
 
 ### Recent Commits On Main
 
 | Commit | Subject |
 |---|---|
-| (HEAD) | docs(handoff): record Oracle audit findings #1, #3, #4 ship |
+| `2f549470` (HEAD) | docs(handoff): record Oracle audit findings #1, #3, #4 ship |
 | `8c076305` | Merge pull request #19 — Finding #4 |
 | `07d37688` | Merge pull request #20 — Finding #1 |
 | `87ddea11` | Merge pull request #21 — Finding #3 |
@@ -126,18 +139,23 @@ gh pr view <num> --json statusCheckRollup
 ## Continuation Prompt for New Session
 
 ```text
-Read task.md first. Repo on `main`, working tree clean. Latest 3 PRs (#19, #20, #21)
-all merged this session — Oracle audit findings #1, #3, #4 all SHIPPED.
+Read task.md first. Repo on `main`, working tree clean. Latest 3 Oracle audit
+PRs (#19, #20, #21) all merged in the previous session.
 
 Quick verify:
-  git rev-parse HEAD          # expect 8c076305 or fresher
+  git rev-parse HEAD          # expect 2f549470 or fresher
   git status --short          # expect empty
-  gh run list --branch main --limit 3   # expect latest run green
+  gh run list --branch main --limit 3   # last run was in_progress at handoff;
+                                          # verify it landed green
 
 If dev DB seems empty: `sail artisan db:seed`. Schema is intact.
 
-ALL OPEN FINDINGS REQUIRE SCHEMA CHANGES — there are NO more quick-win
-refactors from the Oracle post-H3 audit.
+PREVIOUS SESSION ALSO RAN Depwire + Sonar scans on main post-merge — found
+NO actionable quick-win refactors. Findings were Laravel false positives
+(_ide_helper, auto-discovery orphans). Don't re-run those tools without
+config improvement.
+
+ALL REMAINING OPEN ITEMS REQUIRE EITHER SCHEMA CHANGES OR USER DIRECTION.
 
 Next action needs USER DIRECTION (do NOT auto-pick):
 
