@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-06-15 (post-Wave-1-merge) UTC
+Last updated: 2026-06-15 (post-quick-wins-merge) UTC
 
 ## Document Roles
 
@@ -12,17 +12,17 @@ Last updated: 2026-06-15 (post-Wave-1-merge) UTC
 
 User is switching to a new opencode session. Read this section first.
 
-1. **Verify baseline**: `git rev-parse HEAD` → expect `4df36b76`. `git status --short` → expect empty.
-2. **PR #17 MERGED** (Wave 1 H3 multi-currency aggregation guard):
-   - Merge commit: `4df36b76`
-   - Feature commits: `4c61d95d` (Wave 1 main), `907edf38` (admin-settings UI/E2E fix)
-   - Sonar QG: PASSED (duplication 0.0%, coverage 100%, ratings A)
-   - All CI checks green
-3. **Earlier session work** (still relevant):
-   - PR #16 MERGED Wave 0 H3 (`6b78c29c`): currency lock + dedup refactor
+1. **Verify baseline**: `git rev-parse HEAD` → expect `96879e3d`. `git status --short` → expect empty.
+2. **PR #18 MERGED** (Oracle audit polish quick wins):
+   - Merge commit: `96879e3d`
+   - Feature commit: `ae3cd085` (4 quick wins bundle)
+   - Sonar QG: PASSED, all CI checks green
+3. **PR #17 MERGED** (Wave 1 H3 multi-currency aggregation guard, `4df36b76`)
+4. **PR #16 MERGED** (Wave 0 H3 currency lock + dedup refactor, `6b78c29c`)
+5. **Earlier session work** (still relevant):
    - Branch tenant isolation SHIPPED (`5f2cb816`)
    - Budget Management module SHIPPED (`f0c8e3c0`)
-4. **If user says "lanjutkan" without direction**: ASK which path. Do NOT pick autonomously.
+6. **If user says "lanjutkan" without direction**: ASK which path. Do NOT pick autonomously.
 
 ### Status H3 Multi-Currency — COMPLETE for Wave 0+1
 
@@ -61,19 +61,32 @@ Full FX subsystem:
 
 Pull only when first non-IDR customer is signed.
 
-### Other deferred options (if user reroutes)
+### Open findings from Oracle post-H3 audit
 
-| # | Item | Effort | Severity |
-|---|---|---|---|
-| 1 | Timezone drift (Oracle M3) | TBD (needs Oracle deepdive first) | Medium |
-| 2 | Financial dashboard branch scoping | 3-5d (needs `branch_id` on `journal_entries`) | High |
-| 3 | Pipeline/Approval dashboard branch scoping | TBD (polymorphic resolution) | Medium |
-| 4 | Other Oracle finding | TBD | TBD |
+| # | Item | Severity | Effort | Notes |
+|---|---|---|---|---|
+| Finding #1 | Legacy AR/AP aging reports use raw `CURDATE()`/`DATEDIFF()` (4 actions) | HIGH | 1-2d | **Closes M3 timezone too**. Files: `IndexArAgingReportAction`, `IndexApAgingReportAction`, `IndexArOutstandingReportAction`, `IndexApOutstandingReportAction`. Port pattern from `GetAgingDashboardDataAction` (already cross-DB Carbon). |
+| Finding #3 | `BankReconciliationController` 218 lines, no DB::transaction wrap on update+recreate items | MEDIUM | 3-5h | Race window where rec has zero items. Extract 5 actions, add FormRequests. |
+| Finding #4 | `branch_id` parsing boilerplate 3× across dashboard controllers | LOW | 45 min | Add `resolveBranchFromRequest(Request)` to `ResolvesBranchScope` trait. Do this BEFORE pulling Pipeline/Approval polymorphic dashboard scoping. |
+| M3 timezone (standalone) | KILLED — folded into Finding #1 | n/a | n/a | Verified: `regional.timezone` setting was orphan UI (closed via QW#1). All Carbon usage is UTC. |
+| Financial dashboard branch scoping | DEFERRED | 3-5d | High | Needs `branch_id` on `journal_entries` table (schema change). |
+| Pipeline/Approval dashboard branch scoping | DEFERRED | TBD | Medium | Polymorphic resolution. Do Finding #4 FIRST. |
+
+### Polish Quick Wins SHIPPED (PR #18, merge `96879e3d`)
+
+Oracle post-H3 audit recommended 4 quick wins. All landed:
+- **QW#1**: killed orphan `regional.timezone` setting (stored, never read) — removed UI input, seeder row, validation rule, and 3 test references
+- **QW#2**: AssetImport `strtolower(null)` PHP 8.1+ deprecation guard
+- **QW#3**: TopOverdueCustomers/Suppliers replaced hardcoded `Intl('en-US')` with shared `formatDateByRegionalSettings`
+- **QW#5**: AdminSettingRequest reuses `HasSupportedCurrencyRules` trait (single source of truth)
+- **QW#6**: skipped (`_ide_helper.php` already gitignored)
+
+Net `-54 lines` polish.
 
 ## Current State
 
 - Branch: `main`
-- HEAD: `4df36b76` (merge of PR #17)
+- HEAD: `96879e3d` (merge of PR #18)
 - Working tree: clean
 - CI on `main`: green
 - Sonar Quality Gate: OK (all conditions pass)
@@ -84,6 +97,8 @@ Pull only when first non-IDR customer is signed.
 
 | Commit | Subject |
 |---|---|
+| `96879e3d` | Merge pull request #18 from gmedia/feat/h3-polish-quick-wins |
+| `ae3cd085` | refactor: H3 polish quick wins (Oracle audit follow-up) |
 | `4df36b76` | Merge pull request #17 from gmedia/feat/h3-wave1-currency-guard |
 | `907edf38` | fix(admin-settings): narrow currency dropdown to IDR + update E2E |
 | `4c61d95d` | feat(security): add multi-currency aggregation guard (H3 Wave 1) |
@@ -138,18 +153,21 @@ gh pr view <num> --json statusCheckRollup
 ## Continuation Prompt
 
 ```text
-Read task.md first. Repo on `main`, HEAD `4df36b76`, working tree clean.
-PR #17 (H3 Wave 1 currency aggregation guard) MERGED. Sonar QG OK.
-Full Pest suite 1865 pass.
+Read task.md first. Repo on `main`, HEAD `96879e3d`, working tree clean.
+PR #18 (Oracle audit polish quick wins) MERGED. Sonar QG OK.
+Full Pest suite 1864 pass.
 
-H3 multi-currency is now fully shipped (Wave 0 + Wave 1). Next action
+H3 multi-currency fully shipped (Wave 0 + Wave 1 + polish). Next action
 needs USER DIRECTION (do NOT auto-pick):
 
-1. Timezone drift (Oracle M3) — Medium severity, needs Oracle deepdive
-2. Financial dashboard branch scoping — High severity, schema change
-   (3-5d): add branch_id to journal_entries
-3. Pipeline/Approval dashboard branch scoping — Medium, polymorphic
-4. Other Oracle finding (request fresh audit)
+1. Finding #1: Legacy AR/AP aging reports CURDATE() port (HIGH, 1-2d)
+   — closes M3 timezone too via the same fix
+2. Finding #3: BankReconciliationController thinning (MEDIUM, 3-5h)
+   — race window on update+recreate items, no DB::transaction wrap
+3. Finding #4: extract branch_id parsing to trait (LOW, 45min)
+   — do BEFORE pulling Pipeline/Approval dashboard scoping
+4. Financial dashboard branch scoping (HIGH, 3-5d schema change)
+5. Other Oracle finding (request fresh audit)
 
 If user says "lanjutkan" without direction, ASK which path.
 ```

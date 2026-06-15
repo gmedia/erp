@@ -1,6 +1,6 @@
 # Changelog Tugas
 
-Terakhir diperbarui: 2026-06-15
+Terakhir diperbarui: 2026-06-15 (post-quick-wins)
 
 File ini menyimpan catatan perubahan produk dan fitur.
 Baca `task.md` untuk status handoff aktif dan `task.handoff-archive.md` untuk riwayat checkpoint E2E lama.
@@ -117,6 +117,17 @@ Catatan penamaan: heading modul memakai pola `Nama Modul di Kode (Label Bisnis)`
 - [x] Verifikasi: PHPStan clean, Duster clean, Pest full suite 1865 pass (8335 assertions, was 1854 + 11 new tests), Sonar Quality Gate OK (semua 6 kondisi pass, coverage 100%, ratings A).
 - [x] Test baru: 7 unit (CurrencyGuard + Exception), 2 feature (Aging mixed-currency rejection AR + AP), 1 admin-settings (USD reject), 1 admin-settings (regression update IDR).
 - [x] Scope intentionally tidak dicover (verified by code investigation): `FinancialDashboard` baca `journal_entries` yang tidak punya kolom `currency`; AP/AR aging report + ApPaymentHistoryReport adalah listing per-row bukan agregasi; Budget actions baca journal_entry_lines saja. Semua menunggu Wave 2 (full FX subsystem).
+
+### Polish Quick Wins (Oracle Audit Follow-Up) — PR #18
+
+- [x] Bundle 4 quick wins dari Oracle post-H3 audit. No new features atau contract changes — pure polish/dead-code removal. Net `-54 lines`.
+- [x] **QW#1**: Bersihkan orphan `regional.timezone` setting. Setting tersimpan di seeder dan editable dari halaman Admin Settings, tapi NOL kali dibaca di `app/` atau `resources/js/`. Pure dishonest UI plumbing. Dihapus dari: UI input + label + heading description, seeder row, validation rule di `AdminSettingRequest`, 2 test case Pest, 2 sample assertion `SettingTest`, 1 visibility check E2E. Existing DB row tidak bahaya (no reader). Wave 2 nanti bisa di-add kembali kalau per-user TZ jadi feature beneran.
+- [x] **QW#2**: `app/Imports/AssetImport.php:110` — `strtolower($rowData['condition'])` pada field `nullable|in:...`. PHP 8.1+ deprecate `strtolower(null)` dan return `''` (silent corruption: empty string ke DB, bukan NULL). Diwrap dengan `isset` guard.
+- [x] **QW#3**: `TopOverdueCustomers.tsx` + `TopOverdueSuppliers.tsx` ganti hardcoded `Intl.DateTimeFormat('en-US', ...)` dengan shared helper `formatDateByRegionalSettings` (default locale `'id-ID'`, hormati regional `date_format` setting). Konsistensi dengan rest of dashboard yang sudah pakai `formatCurrencyByRegionalSettings`.
+- [x] **QW#5**: `AdminSettingRequest::currency` reuse `HasSupportedCurrencyRules` trait alih-alih inline `['nullable', 'string', 'max:10', Rule::in(...)]`. Single source of truth dengan validasi 6 transactional FormRequest. Drop `max:10` foot-gun (akan biarkan 4-10 char garbage sat Wave 2 widen whitelist).
+- [x] **QW#6**: skipped — `_ide_helper.php` sudah di `.gitignore` line 38, tidak tracked.
+- [x] **M3 timezone**: KILLED dari queue. Oracle audit verifikasi `regional.timezone` setting orphan + semua Carbon pakai `config('app.timezone')='UTC'`. Real timezone bug ada di legacy AR/AP aging reports yang masih pakai raw `CURDATE()`/`DATEDIFF()` (Finding #1, HIGH severity, 1-2 hari) — di-defer untuk PR berikutnya.
+- [x] Verifikasi: PHPStan clean, Duster clean, npm types clean, npm lint clean, Pest full suite 1864 pass (was 1865 -1 deleted timezone test), Sonar Quality Gate OK (semua 6 kondisi pass).
 
 ## Dokumen Terkait
 
