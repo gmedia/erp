@@ -2,15 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\BankReconciliations\AddBankReconciliationItemAction;
+use App\Actions\BankReconciliations\AssignBankReconciliationItemAccountAction;
 use App\Actions\BankReconciliations\AutoMatchBankReconciliationAction;
 use App\Actions\BankReconciliations\CompleteBankReconciliationAction;
+use App\Actions\BankReconciliations\DestroyBankReconciliationAction;
 use App\Actions\BankReconciliations\ExportBankReconciliationsAction;
 use App\Actions\BankReconciliations\GetUnmatchedJournalLinesAction;
 use App\Actions\BankReconciliations\ImportBankStatementAction;
 use App\Actions\BankReconciliations\IndexBankReconciliationsAction;
 use App\Actions\BankReconciliations\MatchBankReconciliationItemAction;
 use App\Actions\BankReconciliations\PreviewBankStatementAction;
+use App\Actions\BankReconciliations\StoreBankReconciliationAction;
 use App\Actions\BankReconciliations\UnmatchBankReconciliationItemAction;
+use App\Actions\BankReconciliations\UpdateBankReconciliationAction;
+use App\Http\Controllers\Concerns\LoadsResourceRelations;
+use App\Http\Requests\BankReconciliations\AddBankReconciliationItemRequest;
+use App\Http\Requests\BankReconciliations\AssignBankReconciliationItemAccountRequest;
 use App\Http\Requests\BankReconciliations\ExportBankReconciliationRequest;
 use App\Http\Requests\BankReconciliations\ImportBankStatementRequest;
 use App\Http\Requests\BankReconciliations\IndexBankReconciliationRequest;
@@ -25,78 +33,49 @@ use Illuminate\Http\Request;
 
 class BankReconciliationController extends Controller
 {
+    use LoadsResourceRelations;
+
     public function index(IndexBankReconciliationRequest $request, IndexBankReconciliationsAction $action): JsonResponse
     {
         return (new BankReconciliationCollection($action->execute($request)))->response();
     }
 
-    public function store(StoreBankReconciliationRequest $request): JsonResponse
+    public function store(StoreBankReconciliationRequest $request, StoreBankReconciliationAction $action): JsonResponse
     {
-        $data = $request->validated();
-        $items = $data['items'] ?? [];
-        unset($data['items']);
-        $data['status'] ??= 'draft';
-        $data['reconciled_balance'] ??= 0;
-        $data['difference'] ??= (float) $data['statement_balance'] - (float) $data['book_balance'];
-        $data['created_by'] = auth()->id();
+        $bankReconciliation = $action->execute($request);
 
-        $bankReconciliation = BankReconciliation::create($data);
-        foreach ($items as $item) {
-            $bankReconciliation->items()->create($item);
-        }
+        /** @var BankReconciliation $loaded */
+        $loaded = $this->loadResourceRelations($bankReconciliation);
 
-        return (new BankReconciliationResource($bankReconciliation->load([
-            'account',
-            'fiscalYear',
-            'items.account',
-            'items.journalEntryLine.journalEntry',
-            'completedBy',
-            'creator',
-        ])))->response()->setStatusCode(201);
+        return (new BankReconciliationResource($loaded))->response()->setStatusCode(201);
     }
 
     public function show(BankReconciliation $bankReconciliation): JsonResponse
     {
-        return (new BankReconciliationResource($bankReconciliation->load([
-            'account',
-            'fiscalYear',
-            'items.account',
-            'items.journalEntryLine.journalEntry',
-            'completedBy',
-            'creator',
-        ])))->response();
+        /** @var BankReconciliation $loaded */
+        $loaded = $this->loadResourceRelations($bankReconciliation);
+
+        return (new BankReconciliationResource($loaded))->response();
     }
 
     public function update(
         UpdateBankReconciliationRequest $request,
         BankReconciliation $bankReconciliation,
+        UpdateBankReconciliationAction $action,
     ): JsonResponse {
-        $data = $request->validated();
-        $items = $data['items'] ?? null;
-        unset($data['items']);
-        $bankReconciliation->update($data);
+        $bankReconciliation = $action->execute($request, $bankReconciliation);
 
-        if (is_array($items)) {
-            $bankReconciliation->items()->delete();
-            foreach ($items as $item) {
-                $bankReconciliation->items()->create($item);
-            }
-        }
+        /** @var BankReconciliation $loaded */
+        $loaded = $this->loadResourceRelations($bankReconciliation);
 
-        return (new BankReconciliationResource($bankReconciliation->refresh()->load([
-            'account',
-            'fiscalYear',
-            'items.account',
-            'items.journalEntryLine.journalEntry',
-            'completedBy',
-            'creator',
-        ])))->response();
+        return (new BankReconciliationResource($loaded))->response();
     }
 
-    public function destroy(BankReconciliation $bankReconciliation): JsonResponse
-    {
-        $bankReconciliation->items()->delete();
-        $bankReconciliation->delete();
+    public function destroy(
+        BankReconciliation $bankReconciliation,
+        DestroyBankReconciliationAction $action,
+    ): JsonResponse {
+        $action->execute($bankReconciliation);
 
         return response()->json(null, 204);
     }
@@ -115,19 +94,12 @@ class BankReconciliationController extends Controller
         return (new BankReconciliationResource($action->execute($bankReconciliation)))->response();
     }
 
-    public function addItem(Request $request, BankReconciliation $bankReconciliation): JsonResponse
-    {
-        $item = $bankReconciliation->items()->create($request->validate([
-            'journal_entry_line_id' => ['nullable', 'integer', 'exists:journal_entry_lines,id'],
-            'transaction_date' => ['required', 'date'],
-            'description' => ['required', 'string', 'max:255'],
-            'debit' => ['nullable', 'numeric', 'min:0'],
-            'credit' => ['nullable', 'numeric', 'min:0'],
-            'type' => ['nullable', 'string', 'max:30'],
-            'is_reconciled' => ['boolean'],
-            'reference' => ['nullable', 'string', 'max:255'],
-            'notes' => ['nullable', 'string'],
-        ]));
+    public function addItem(
+        AddBankReconciliationItemRequest $request,
+        BankReconciliation $bankReconciliation,
+        AddBankReconciliationItemAction $action,
+    ): JsonResponse {
+        $item = $action->execute($request, $bankReconciliation);
 
         return response()->json(['data' => $item], 201);
     }
@@ -204,15 +176,29 @@ class BankReconciliationController extends Controller
         return response()->json(['data' => $lines]);
     }
 
-    public function assignItemAccount(Request $request, BankReconciliation $bankReconciliation, int $item): JsonResponse
+    public function assignItemAccount(
+        AssignBankReconciliationItemAccountRequest $request,
+        BankReconciliation $bankReconciliation,
+        int $item,
+        AssignBankReconciliationItemAccountAction $action,
+    ): JsonResponse {
+        $bankItem = $action->execute($request, $bankReconciliation, $item);
+
+        return response()->json(['data' => $bankItem]);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function resourceRelations(): array
     {
-        $validated = $request->validate([
-            'account_id' => ['required', 'integer', 'exists:accounts,id'],
-        ]);
-
-        $bankItem = $bankReconciliation->items()->findOrFail($item);
-        $bankItem->update(['account_id' => $validated['account_id']]);
-
-        return response()->json(['data' => $bankItem->refresh()]);
+        return [
+            'account',
+            'fiscalYear',
+            'items.account',
+            'items.journalEntryLine.journalEntry',
+            'completedBy',
+            'creator',
+        ];
     }
 }
