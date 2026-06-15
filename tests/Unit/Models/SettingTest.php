@@ -23,8 +23,8 @@ describe('Setting Model', function () {
     });
 
     test('get returns value for existing key', function () {
-        $result = Setting::get('timezone');
-        expect($result)->toBe('Asia/Jakarta');
+        $result = Setting::get('currency');
+        expect($result)->toBe('IDR');
     });
 
     test('set updates existing setting value', function () {
@@ -46,8 +46,8 @@ describe('Setting Model', function () {
             ->toHaveKeys(['general', 'regional']);
         expect($grouped['general'])->toHaveKey('company_name');
         expect($grouped['general']['company_name'])->toBe('Test Company');
-        expect($grouped['regional'])->toHaveKey('timezone');
-        expect($grouped['regional']['timezone'])->toBe('Asia/Jakarta');
+        expect($grouped['regional'])->toHaveKey('currency');
+        expect($grouped['regional']['currency'])->toBe('IDR');
         expect($grouped['regional'])->toHaveKey('number_format_hide_decimal');
         expect($grouped['regional']['number_format_hide_decimal'])->toBeFalse();
     });

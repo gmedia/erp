@@ -9,22 +9,13 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { formatCurrency } from '@/lib/utils';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { memo } from 'react';
 import type { TopOverdueCustomer } from '../../hooks/useAgingDashboard';
 
 interface TopOverdueCustomersProps {
     readonly customers: TopOverdueCustomer[];
     readonly isLoading?: boolean;
-}
-
-function formatDate(dateString: string | null): string {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: '2-digit',
-    }).format(date);
 }
 
 export const TopOverdueCustomers = memo<TopOverdueCustomersProps>(
@@ -118,7 +109,9 @@ export const TopOverdueCustomers = memo<TopOverdueCustomersProps>(
                                         {customer.invoice_count}
                                     </TableCell>
                                     <TableCell className="text-right tabular-nums">
-                                        {formatDate(customer.oldest_due_date)}
+                                        {formatDateByRegionalSettings(
+                                            customer.oldest_due_date,
+                                        )}
                                     </TableCell>
                                     <TableCell className="text-right tabular-nums">
                                         {customer.max_days_overdue}

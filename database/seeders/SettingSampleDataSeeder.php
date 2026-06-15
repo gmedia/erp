@@ -49,12 +49,6 @@ class SettingSampleDataSeeder extends Seeder
             // Regional settings
             [
                 'group' => 'regional',
-                'key' => 'timezone',
-                'value' => 'Asia/Jakarta',
-                'type' => 'string',
-            ],
-            [
-                'group' => 'regional',
                 'key' => 'currency',
                 'value' => 'IDR',
                 'type' => 'string',

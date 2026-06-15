@@ -61,7 +61,6 @@ describe('AdminSettingController@index', function () {
                     'company_logo_url',
                 ],
                 'regional' => [
-                    'timezone',
                     'currency',
                     'date_format',
                     'number_format_decimal',
@@ -105,7 +104,6 @@ describe('AdminSettingController@update', function () {
 
         Sanctum::actingAs($user, ['*']);
         $response = $this->putJson('/api/admin-settings', [
-            'timezone' => 'Asia/Makassar',
             'currency' => 'IDR',
             'date_format' => 'Y-m-d',
             'number_format_decimal' => '.',
@@ -115,7 +113,6 @@ describe('AdminSettingController@update', function () {
 
         $response->assertOk();
 
-        expect(Setting::get('timezone'))->toBe('Asia/Makassar');
         expect(Setting::get('currency'))->toBe('IDR');
         expect(Setting::get('date_format'))->toBe('Y-m-d');
         expect(Setting::get('number_format_decimal'))->toBe('.');
@@ -145,18 +142,6 @@ describe('AdminSettingController@update', function () {
 
         $response->assertStatus(422);
         $response->assertJsonValidationErrors('company_email');
-    });
-
-    test('update validates timezone', function () {
-        $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
-
-        Sanctum::actingAs($user, ['*']);
-        $response = $this->putJson('/api/admin-settings', [
-            'timezone' => 'Invalid/Timezone',
-        ]);
-
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors('timezone');
     });
 
     test('update validates max length', function () {

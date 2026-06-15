@@ -107,7 +107,7 @@ class AssetImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                         'currency' => strtoupper($rowData['currency']),
                         'warranty_end_date' => $rowData['warranty_end_date'] ?? null,
                         'status' => strtolower($rowData['status']),
-                        'condition' => strtolower($rowData['condition']),
+                        'condition' => isset($rowData['condition']) ? strtolower($rowData['condition']) : null,
                         'notes' => $rowData['notes'] ?? null,
                     ]
                 );

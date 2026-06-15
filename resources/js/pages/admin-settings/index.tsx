@@ -342,7 +342,7 @@ function RegionalSettings({
         <div className="space-y-6">
             <HeadingSmall
                 title="Regional Settings"
-                description="Configure timezone, currency, and format preferences"
+                description="Configure currency and format preferences"
             />
 
             <form
@@ -350,22 +350,6 @@ function RegionalSettings({
                 data-testid="regional-settings-form"
                 className="space-y-6"
             >
-                <div className="grid gap-2">
-                    <Label htmlFor="timezone">Timezone</Label>
-                    <Input
-                        id="timezone"
-                        name="timezone"
-                        defaultValue={settings?.timezone ?? 'Asia/Jakarta'}
-                        placeholder="e.g. Asia/Jakarta"
-                        className="mt-1 block w-full"
-                    />
-                    {errors.timezone && (
-                        <p className="text-sm text-destructive">
-                            {errors.timezone}
-                        </p>
-                    )}
-                </div>
-
                 <div className="grid gap-2">
                     <Label htmlFor="currency">Currency</Label>
                     <Select value={currency} onValueChange={setCurrency}>

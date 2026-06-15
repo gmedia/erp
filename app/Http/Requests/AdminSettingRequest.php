@@ -2,11 +2,13 @@
 
 namespace App\Http\Requests;
 
+use App\Http\Requests\Concerns\HasSupportedCurrencyRules;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Validation\Rule;
 
 class AdminSettingRequest extends AuthorizedFormRequest
 {
+    use HasSupportedCurrencyRules;
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -14,9 +16,6 @@ class AdminSettingRequest extends AuthorizedFormRequest
      */
     public function rules(): array
     {
-        /** @var array<int, string> $supportedCurrencies */
-        $supportedCurrencies = config('app.supported_transaction_currencies', ['IDR']);
-
         return [
             'company_name' => ['nullable', 'string', 'max:255'],
             'company_address' => ['nullable', 'string', 'max:1000'],
@@ -24,8 +23,7 @@ class AdminSettingRequest extends AuthorizedFormRequest
             'company_email' => ['nullable', 'string', 'email', 'max:255'],
             'company_logo' => ['nullable', 'file', 'mimetypes:image/svg+xml', 'max:2048'],
             'company_logo_svg' => ['nullable', 'string', 'max:262144'],
-            'timezone' => ['nullable', 'string', 'max:100', 'timezone:all'],
-            'currency' => ['nullable', 'string', 'max:10', Rule::in($supportedCurrencies)],
+            'currency' => ['nullable', ...$this->supportedCurrencyRules()],
             'date_format' => ['nullable', 'string', 'max:20'],
             'number_format_decimal' => ['nullable', 'string', 'max:5'],
             'number_format_thousand' => ['nullable', 'string', 'max:5'],
