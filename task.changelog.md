@@ -1,6 +1,6 @@
 # Changelog Tugas
 
-Terakhir diperbarui: 2026-06-14
+Terakhir diperbarui: 2026-06-15
 
 File ini menyimpan catatan perubahan produk dan fitur.
 Baca `task.md` untuk status handoff aktif dan `task.handoff-archive.md` untuk riwayat checkpoint E2E lama.
@@ -101,7 +101,22 @@ Catatan penamaan: heading modul memakai pola `Nama Modul di Kode (Label Bisnis)`
 - [x] 3 regression test memastikan rejection USD: `PurchaseOrderControllerTest::store rejects unsupported currency`, `SupplierBillControllerTest::store rejects unsupported currency`, `AssetImportTest::rejects rows with unsupported currency` (422 / `imported=0,skipped=1`).
 - [x] Refactor follow-up untuk Sonar quality gate (commit `96cf4e19`): ekstrak 2 trait baru `HasBankPaymentRules` (parametrized date field + payment method enum, dipakai AP Payment + AR Receipt) dan `HasInvoiceLikeRules` (header + items.* common, dipakai Customer Invoice + Supplier Bill). Net `-44` baris. Duplicated lines density: `8.5%` → `0.0%`.
 - [x] Verifikasi: PHPStan clean, Duster clean, Pest full suite 1854 pass (8308 assertions), Sonar Quality Gate OK (semua 6 kondisi pass, coverage 100%, ratings A).
-- [ ] Wave 1 (deferred): `AssertsSingleCurrency` aggregation guard untuk Aging/Financial dashboard + AP Payment History report. Blocked pada 5 keputusan UX/API yang ditunggu user (lihat `task.md`).
+
+### Hardening Keamanan Multi-Currency (Oracle H3 Wave 1) — PR #17
+
+- [x] Wave 1 melengkapi Wave 0: tambah defense-in-depth pada lapisan agregasi laporan agar mixed-currency mustahil lolos walaupun ada raw DB write atau future importer yang bypass FormRequest. Setelah Wave 1, blind spot Oracle H3 ditutup penuh untuk skema saat ini.
+- [x] Service baru `app/Services/Currency/CurrencyGuard.php` dengan dua method: `assertHomogeneousQuery(Builder, context, column='currency')` untuk live DB query dan `assertHomogeneousRows(iterable, context, column='currency')` untuk in-memory iterable.
+- [x] Exception baru `app/Exceptions/Currency/MixedCurrencyException` extends `HttpResponseException`. Mengembalikan HTTP 422 + JSON validation error pada field `currency` (Oracle decision #3 picked: 422, bukan 500+Sentry).
+- [x] Trait baru `app/Actions/Concerns/AssertsSingleCurrency` (sibling pattern `ResolvesBranchScope`) wrapping the guard.
+- [x] Diaplikasikan ke `GetAgingDashboardDataAction`: pre-flight homogeneity check pada `customer_invoices` + `supplier_bills` (filter status + branch_id) sebelum `SUM(amount_due)`. Dua regression test memastikan rejection sat AR atau AP punya mixed-currency.
+- [x] `AdminSettingRequest` membaca whitelist dari `config('app.supported_transaction_currencies')` (sebelumnya hardcoded 9 mata uang). Eliminasi desync whitelist yang ditemukan oleh Oracle security review (decision #2 picked: lock to IDR via config).
+- [x] 6 form frontend menyembunyikan field `<InputField name="currency">` (Purchase Order, Supplier Bill, Customer Invoice, AP Payment, AR Receipt, Asset). Form state tetap submit `currency: 'IDR'` dari getDefaults — react-hook-form preserve default values walaupun field tidak dirender. Cleanup juga 2 dead `currencyOptions` array. Decision #1 picked: hide entirely.
+- [x] Halaman `/admin-settings` dropdown `CURRENCY_OPTIONS` dipersempit ke IDR-only agar konsisten dengan backend whitelist. E2E test "can update regional settings" diperbarui untuk toggle `hide_decimal` (writable regional setting) sat ini, bukan pilih USD lagi.
+- [x] Doc baru `docs/user-guide-multi-currency.md` menjelaskan status sat ini, apa yang berubah, FAQ, dan roadmap Wave 2 (decision #4 picked: yes release note).
+- [x] Naming aligned dengan precedent `ResolvesBranchScope`: trait `AssertsSingleCurrency` + service `CurrencyGuard` (decision #5 picked).
+- [x] Verifikasi: PHPStan clean, Duster clean, Pest full suite 1865 pass (8335 assertions, was 1854 + 11 new tests), Sonar Quality Gate OK (semua 6 kondisi pass, coverage 100%, ratings A).
+- [x] Test baru: 7 unit (CurrencyGuard + Exception), 2 feature (Aging mixed-currency rejection AR + AP), 1 admin-settings (USD reject), 1 admin-settings (regression update IDR).
+- [x] Scope intentionally tidak dicover (verified by code investigation): `FinancialDashboard` baca `journal_entries` yang tidak punya kolom `currency`; AP/AR aging report + ApPaymentHistoryReport adalah listing per-row bukan agregasi; Budget actions baca journal_entry_lines saja. Semua menunggu Wave 2 (full FX subsystem).
 
 ## Dokumen Terkait
 
