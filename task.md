@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-06-15 (3 Oracle PRs merged + Depwire scan no-findings + handoff finalized) UTC
+Last updated: 2026-06-15 (Oracle audit refresh — PR #22 + #23 MERGED, CI green on main) UTC
 
 ## Document Roles
 
@@ -12,17 +12,21 @@ Last updated: 2026-06-15 (3 Oracle PRs merged + Depwire scan no-findings + hando
 
 User is switching to a new 0pencode session. Read this section first.
 
-1. **Verify baseline**: `git status --short` → expect empty. `git log --oneline -1` → expect a `docs(handoff)` commit (this refresh) or a fresher one.
-2. **3 Oracle audit findings SHIPPED & MERGED** (this session's work):
-   - PR #21 (merge `87ddea11`) — Finding #3: BankReconciliation thinning + DB::transaction race fix
-   - PR #20 (merge `07d37688`) — Finding #1: AR/AP aging Carbon port + M3 timezone
-   - PR #19 (merge `8c076305`) — Finding #4: `resolveBranchFromRequest` trait extraction
-3. **Earlier session work** (still relevant):
+1. **Verify baseline**: `git status --short` → expect empty on `main`. `git log --oneline -1` on main → expect `2fe1b5f2` (or fresher).
+2. **2 Oracle audit refresh PRs MERGED this session, CI on main green:**
+   - **PR #23** (squash `ff426b1e`) — Findings #1, #2: DATEDIFF + MONTH cross-DB port
+   - **PR #22** (squash `2fe1b5f2`) — Findings #3, #5, #9: BR controller race close + 5 action unit tests
+   - CI run `27552559377` on main: Quality + Playwright + Test suite all SUCCESS
+3. **Previous session 3 PRs merged (still relevant):**
+   - PR #21 (`87ddea11`) — Finding #3: BR thinning + DB::transaction race fix
+   - PR #20 (`07d37688`) — Finding #1: AR/AP aging Carbon port + M3 timezone
+   - PR #19 (`8c076305`) — Finding #4: `resolveBranchFromRequest` trait extraction
+4. **Earlier session work** (still relevant):
    - H3 multi-currency Wave 0+1 SHIPPED (#16, #17)
    - H3 polish quick wins SHIPPED (#18)
    - Branch tenant isolation SHIPPED (`5f2cb816`)
    - Budget Management module SHIPPED (`f0c8e3c0`)
-4. **If user says "lanjutkan" without direction**: ASK which path. Do NOT pick autonomously.
+5. **If user says "lanjutkan" without direction**: ASK which path. Do NOT pick autonomously.
 
 ### Dev environment state (verified end of last session)
 
@@ -34,13 +38,34 @@ User is switching to a new 0pencode session. Read this section first.
 
 If dev DB seems empty after pulling: `sail artisan db:seed`. Schema is intact.
 
-### Status — Oracle post-H3 audit fully closed for current schema
+### Status — Oracle audit refresh wave 2 (this session, ALL MERGED)
+
+Oracle re-audit found **PR #20 and PR #21 left work incomplete**. Two new PRs opened and merged to close those gaps:
+
+| Finding | Severity | PR | Squash | What it does |
+|---|---|---|---|---|
+| #1, #2 | HIGH | **#23** | `ff426b1e` | Removes last `DATEDIFF()` + `MONTH()` MariaDB-only SQL. PHP-side Carbon bucketing in resources + Service. New trait `app/Exports/Concerns/ComputesDaysOverdue`. 32 tests pass. |
+| #3, #5, #9 | MED+LOW | **#22** | `2fe1b5f2` | Closes BR race window in 4 actions (Import/AutoMatch/Match/Unmatch — `recalculateBalances()` moved INSIDE `DB::transaction`). AddItem action gains transaction wrap + recalc. 5 new action unit tests. 50 tests pass. |
+
+### Earlier wave (already merged):
 
 | Finding | Severity | PR | Effort | What landed |
 |---|---|---|---|---|
 | #4 | LOW | #19 | 45 min | `resolveBranchFromRequest(Request)` on `ResolvesBranchScope` trait, eliminating 3× boilerplate in `AgingDashboardController`, `AssetDashboardController`, `StockMonitorController` |
-| #1 | HIGH | #20 | ~2h | `AgingReportBoundaries` trait with parameterized Carbon date math; ports 4 legacy actions away from MariaDB-only `CURDATE()`/`DATEDIFF()`; folds in M3 timezone closure |
-| #3 | MEDIUM | #21 | ~1.5h | 5 new actions + 2 new FormRequests; `BankReconciliationController` adopts `LoadsResourceRelations`; `update()` race window closed via `DB::transaction` |
+| #1 (initial) | HIGH | #20 | ~2h | `AgingReportBoundaries` trait — but missed Outstanding actions + `MONTH()`; addressed in #23 |
+| #3 (initial) | MEDIUM | #21 | ~1.5h | 5 new actions + 2 new FormRequests — but missed controller-side `recalculateBalances()` race; addressed in #22 |
+
+### Audit refresh remaining findings
+
+Findings #4, #6, #7, #8, #10 — all LOW polish or MEDIUM follow-ups:
+
+| # | Item | Severity | Effort | Status |
+|---|---|---|---|---|
+| #4 | 8 controllers post journal OUTSIDE update transaction (race: status flip without journal post) — ApPayment, ArReceipt, CustomerInvoice, GoodsReceipt, StockAdjustment, SupplierBill, SupplierReturn | MEDIUM | ~2h+ per pair | DEFERRED — recommend AP+AR first |
+| #6 | `CurrencyGuard` adopted only in `AgingDashboard` — missing on aging/outstanding reports + FinancialReportService + BudgetVarianceService | MEDIUM | ~3h | DEFERRED |
+| #7 | `IndexApAgingReportAction` reinlines aging CASE; can adopt trait helper | LOW | ~20m | DEFERRED |
+| #8 | `ApprovalFlowController::store/update` duplicates step-create payload | LOW | ~30m | DEFERRED |
+| #10 | `MyApprovalController` not thinned (~165 lines, 2 fat methods) | LOW | ~1.5h | DEFERRED |
 
 ### Findings remaining (all DEFERRED — schema work)
 
@@ -52,39 +77,36 @@ If dev DB seems empty after pulling: `sail artisan db:seed`. Schema is intact.
 
 ### Current State
 
-- Branch: `main`
-- HEAD: `2f549470` (`docs(handoff): record Oracle audit findings #1, #3, #4 ship`)
-- Working tree: clean
-- CI on `main`: latest run `27531047741` (HEAD `2f549470`) was `in_progress` at session close. 3 prior runs (PR #19/#20/#21 merges) all `cancelled` by GitHub workflow concurrency — NOT failures, just newer commits superseded them. Verify with `gh run list --branch main --limit 3` next session.
-- Sonar Quality Gate: expect OK (no logic changes that move duplication; new traits add abstraction). Verify after CI green.
-- Pest: 33 (bank-reconciliations) + 5 (ar-aging) + 5 (ap-aging) + 5 (ar-outstanding) + 5 (ap-outstanding) + 15 (aging-dashboard regression) + 5 (customer-statement regression) + dashboard/asset-dashboard/stock-monitor groups all green per-group during ship. Full suite 1864+ pass on prior baseline.
+- Branch: `main` at HEAD `2fe1b5f2` (working tree: only `task.md` for handoff)
+- 2 PRs from this session BOTH MERGED, branches deleted on remote.
+- CI on main: run `27552559377` SUCCESS (Quality + Playwright + Test suite all green).
+- Pest local (this session):
+  - PR #22 → `bank-reconciliations` group: **50 passed**, 152 assertions
+  - PR #23 → `ap-aging-report` 5 + `ar-aging-report` 5 + `ap-outstanding-report` 6 + `ar-outstanding-report` 7 + `financial-dashboard` 9 = **32 passed**
+- Quality gates both PRs: phpstan clean, duster clean.
 - Module registry: 80 entries.
 - Permission seeded: admin emp has `view_all_branches`.
 
-### Post-merge investigation (no quick wins found)
+### Notes from this session
 
-After 3 PRs merged, attempted to find more quick-win refactors via Depwire + Sonar:
-
-- **Depwire health score** = 56/F. ALL findings false positive for Laravel:
-  - 8,415 dead symbols dominated by `_ide_helper.php` (gitignored, IDE-only).
-  - 546 orphan files = Laravel auto-discovery (migrations, factories, seeders, configs, abstract base classes, sibling components loaded via `createEntityCrudPage(config)` factory pattern).
-  - 93 god files = Laravel models with relations; normal.
-  - Cohesion 20/F = Laravel structure (controllers/models/etc by concern) inherently low cohesion per dir.
-- **Sonar MCP** = blocked (`organization` parameter missing in MCP config; not a code issue).
-
-**Conclusion**: Depwire/Sonar produced no actionable refactor for a Laravel codebase. Skip these tools next session unless config improves.
+- Oracle audit refresh (4m33s) found PR #20 + #21 incomplete. Identified 10 findings; shipped Findings #1, #2 (PR #23) + #3, #5, #9 (PR #22) in same session.
+- Parallel subagent execution had a credit-exhaustion incident: PR A subagent died at 25m, PR B subagent ran 26m. Both work was salvageable — recovered manually:
+  - PR A: subagent had committed AND pushed before dying; only PR creation step missed.
+  - PR B: subagent had staged 11 files but not committed. Recovered, ran quality gates manually (duster + phpstan + tests all green), committed + pushed + opened PR.
+- PR A's worktree at `/tmp/erp-pr-a` was removed during cleanup.
+- Depwire/Sonar still produce false positives for Laravel structure — confirmed prior session's note still holds. Skip those tools next session unless config improves.
 
 ### Recent Commits On Main
 
 | Commit | Subject |
 |---|---|
-| `2f549470` (HEAD) | docs(handoff): record Oracle audit findings #1, #3, #4 ship |
+| `2fe1b5f2` (HEAD) | fix(bank-reconciliations): close mutation races + add action unit tests (#22) |
+| `ff426b1e` | fix(reports): port DATEDIFF + MONTH SQL to cross-DB Carbon/EXTRACT (#23) |
+| `b06aec05` | docs(handoff): finalize session handoff with post-merge state |
+| `2f549470` | docs(handoff): record Oracle audit findings #1, #3, #4 ship |
 | `8c076305` | Merge pull request #19 — Finding #4 |
 | `07d37688` | Merge pull request #20 — Finding #1 |
 | `87ddea11` | Merge pull request #21 — Finding #3 |
-| `d7fa58d9` | docs(handoff): drop self-referential hash from task.md |
-| `6ec6b7aa` | docs(handoff): refresh task.md for new session continuation |
-| `f8cbe83c` | docs(handoff): record quick wins ship + PR #18 merge + Oracle audit findings |
 | `96879e3d` | Merge pull request #18 (H3 polish quick wins) |
 | `4df36b76` | Merge pull request #17 (H3 Wave 1) |
 | `6b78c29c` | Merge pull request #16 (H3 Wave 0) |
@@ -139,41 +161,45 @@ gh pr view <num> --json statusCheckRollup
 ## Continuation Prompt for New Session
 
 ```text
-Read task.md first. Repo on `main`, working tree clean. Latest 3 Oracle audit
-PRs (#19, #20, #21) all merged in the previous session.
+Read task.md first. Repo on `main` at HEAD `2fe1b5f2`, working tree clean.
+2 PRs from previous session MERGED, CI on main green.
 
 Quick verify:
-  git rev-parse HEAD          # expect 2f549470 or fresher
+  git rev-parse HEAD          # expect 2fe1b5f2 or fresher
   git status --short          # expect empty
-  gh run list --branch main --limit 3   # last run was in_progress at handoff;
-                                          # verify it landed green
+  gh run list --branch main --limit 3   # verify latest is green
+  gh pr list --base main --state open   # expect empty unless new work started
 
 If dev DB seems empty: `sail artisan db:seed`. Schema is intact.
 
-PREVIOUS SESSION ALSO RAN Depwire + Sonar scans on main post-merge — found
-NO actionable quick-win refactors. Findings were Laravel false positives
-(_ide_helper, auto-discovery orphans). Don't re-run those tools without
-config improvement.
+NEXT ACTION needs USER DIRECTION (do NOT auto-pick):
 
-ALL REMAINING OPEN ITEMS REQUIRE EITHER SCHEMA CHANGES OR USER DIRECTION.
+1. Finding #4 (postJournal race in 8 controllers)
+   MEDIUM, ~2h+ per pair. Recommend AP+AR first.
+   Same pattern as PR #21 thinning.
+   Files: ApPaymentController, ArReceiptController, CustomerInvoiceController,
+   GoodsReceiptController, StockAdjustmentController, SupplierBillController,
+   SupplierReturnController.
 
-Next action needs USER DIRECTION (do NOT auto-pick):
+2. Polish wave — Findings #6 #7 #8 #10:
+   #6 CurrencyGuard coverage on remaining money-aggregation surfaces (~3h)
+   #7 IndexApAgingReportAction adopt trait helper (~20m)
+   #8 ApprovalFlowController step-create dedupe (~30m)
+   #10 MyApprovalController thin to actions (~1.5h)
 
-1. Financial dashboard branch scoping (HIGH, 3-5d schema change)
-   — Needs branch_id on journal_entries table.
-   — Coordinate with H3 Wave 2 currency col addition.
+3. Refresh Oracle audit again (after Finding #4 lands)
 
-2. Pipeline/Approval polymorphic dashboard scoping (MEDIUM, TBD)
-   — Finding #4 (PR #19) shipped the trait helper that unblocks this.
-   — Polymorphic resolution still needed.
-
-3. H3 Wave 2 (multi-currency FX subsystem, weeks)
-   — Only pull when first non-IDR customer signs.
-
-4. Refresh Oracle audit (request a fresh pass)
-   — All current findings are closed or deferred for schema reasons.
+4. Schema-blocked items still deferred:
+   - Financial dashboard branch scoping (HIGH, 3-5d, needs branch_id on
+     journal_entries; coordinate with H3 Wave 2 currency col)
+   - Pipeline/Approval polymorphic dashboard scoping (MEDIUM)
+   - H3 Wave 2 multi-currency FX subsystem (weeks, await first non-IDR
+     customer)
 
 5. Other product feature work (request from user)
+
+Depwire/Sonar tools still produce false positives for Laravel auto-discovery
+patterns. Skip unless config improves.
 
 CONVENTIONS REMINDER:
 - Never commit without explicit user request (AGENTS.md §3)
