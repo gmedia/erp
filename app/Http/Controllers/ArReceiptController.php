@@ -90,11 +90,12 @@ class ArReceiptController extends Controller
             syncItems: function (ArReceipt $arReceipt, array $allocations) use ($syncAllocations): void {
                 $syncAllocations->execute($arReceipt, $allocations);
             },
+            afterCommit: $isNewlyConfirmed
+                ? function (ArReceipt $arReceipt) use ($postJournal): void {
+                    $postJournal->execute($arReceipt->refresh());
+                }
+            : null,
         );
-
-        if ($isNewlyConfirmed) {
-            $postJournal->execute($arReceipt->refresh());
-        }
 
         return (new ArReceiptResource($this->loadResourceRelations($arReceipt)))->response();
     }

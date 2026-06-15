@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\AccountingPosting\PostApPaymentJournalAction;
 use App\Models\Account;
 use App\Models\ApPayment;
 use App\Models\Branch;
@@ -183,4 +184,30 @@ test('destroy removes ap payment', function () {
         ->assertNoContent();
 
     assertDatabaseMissing('ap_payments', ['id' => $apPayment->id]);
+});
+
+test('confirming ap payment rolls back state when journal posting fails', function () {
+    $apPayment = ApPayment::factory()->create([
+        'status' => 'draft',
+        'confirmed_at' => null,
+        'confirmed_by' => null,
+    ]);
+
+    $this->app->bind(PostApPaymentJournalAction::class, function () {
+        return new class
+        {
+            public function execute(ApPayment $apPayment): void
+            {
+                throw new RuntimeException('Simulated journal posting failure');
+            }
+        };
+    });
+
+    putJson('/api/ap-payments/' . $apPayment->id, ['status' => 'confirmed'])
+        ->assertStatus(500);
+
+    $apPayment->refresh();
+    expect($apPayment->status)->toBe('draft');
+    expect($apPayment->confirmed_at)->toBeNull();
+    expect($apPayment->confirmed_by)->toBeNull();
 });
