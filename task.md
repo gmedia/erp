@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-06-15 (handoff for new session) UTC
+Last updated: 2026-06-15 (Oracle audit findings #1, #3, #4 all SHIPPED) UTC
 
 ## Document Roles
 
@@ -10,14 +10,16 @@ Last updated: 2026-06-15 (handoff for new session) UTC
 
 ## ⚡ Quick Start for Next Session
 
-User is switching to a new opencode session. Read this section first.
+User is switching to a new 0pencode session. Read this section first.
 
-1. **Verify baseline**: `git status --short` → expect empty. `git log --oneline -1` → expect a `docs(handoff)` commit at the top (latest may be this commit or a fresher handoff refresh).
-2. **Last 3 PRs all MERGED** (this session's work):
-   - PR #18 (`96879e3d` merge, `ae3cd085` feature) — Oracle audit polish quick wins
-   - PR #17 (`4df36b76` merge) — Wave 1 H3 multi-currency aggregation guard
-   - PR #16 (`6b78c29c` merge) — Wave 0 H3 currency lock + dedup refactor
+1. **Verify baseline**: `git status --short` → expect empty. `git log --oneline -1` → expect a `docs(handoff)` commit (this refresh) or a fresher one.
+2. **3 Oracle audit findings SHIPPED & MERGED** (this session's work):
+   - PR #21 (merge `87ddea11`) — Finding #3: BankReconciliation thinning + DB::transaction race fix
+   - PR #20 (merge `07d37688`) — Finding #1: AR/AP aging Carbon port + M3 timezone
+   - PR #19 (merge `8c076305`) — Finding #4: `resolveBranchFromRequest` trait extraction
 3. **Earlier session work** (still relevant):
+   - H3 multi-currency Wave 0+1 SHIPPED (#16, #17)
+   - H3 polish quick wins SHIPPED (#18)
    - Branch tenant isolation SHIPPED (`5f2cb816`)
    - Budget Management module SHIPPED (`f0c8e3c0`)
 4. **If user says "lanjutkan" without direction**: ASK which path. Do NOT pick autonomously.
@@ -27,96 +29,52 @@ User is switching to a new opencode session. Read this section first.
 - Admin employee has `view_all_branches` permission attached (215 total perms).
 - All 6 transactional currency tables: 0 non-IDR rows.
 - Setting `currency` = `IDR`.
-- DB sample data fully seeded (5 users, 4 employees, 215 permissions).
+- DB sample data fully seeded.
 - DB connection: `mariadb` host, database `laravel`.
 
-If dev DB seems empty after pulling: `sail artisan db:seed`. Schema is intact (98 tables); only sample data may have drifted.
+If dev DB seems empty after pulling: `sail artisan db:seed`. Schema is intact.
 
-### Status H3 Multi-Currency — COMPLETE for Wave 0+1
+### Status — Oracle post-H3 audit fully closed for current schema
 
-Both Wave 0 (write path lock) + Wave 1 (aggregation guard) shipped. The blind spot Oracle flagged is fully closed for current schema.
+| Finding | Severity | PR | Effort | What landed |
+|---|---|---|---|---|
+| #4 | LOW | #19 | 45 min | `resolveBranchFromRequest(Request)` on `ResolvesBranchScope` trait, eliminating 3× boilerplate in `AgingDashboardController`, `AssetDashboardController`, `StockMonitorController` |
+| #1 | HIGH | #20 | ~2h | `AgingReportBoundaries` trait with parameterized Carbon date math; ports 4 legacy actions away from MariaDB-only `CURDATE()`/`DATEDIFF()`; folds in M3 timezone closure |
+| #3 | MEDIUM | #21 | ~1.5h | 5 new actions + 2 new FormRequests; `BankReconciliationController` adopts `LoadsResourceRelations`; `update()` race window closed via `DB::transaction` |
 
-**Wave 0 (PR #16, merge `6b78c29c`)**:
-- `config/app.supported_transaction_currencies = ['IDR']` whitelist
-- `HasSupportedCurrencyRules` trait on 6 AbstractRequest write classes (PO, SB, CI, AP, AR, Asset) + AssetImport Excel uploader
-- Dedup refactor: `HasBankPaymentRules` + `HasInvoiceLikeRules` traits to drive Sonar duplication density to 0%
-
-**Wave 1 (PR #17, merge `4df36b76`)**:
-- `app/Services/Currency/CurrencyGuard` service (`assertHomogeneousQuery`, `assertHomogeneousRows`)
-- `app/Exceptions/Currency/MixedCurrencyException` (HTTP 422 + JSON validation error)
-- `app/Actions/Concerns/AssertsSingleCurrency` trait (sibling to `ResolvesBranchScope`)
-- Applied to `GetAgingDashboardDataAction` (AR + AP pre-flight homogeneity check)
-- `AdminSettingRequest` reads currency whitelist from config
-- 6 frontend forms: `<InputField name="currency">` removed; admin-settings `CURRENCY_OPTIONS` narrowed to IDR
-- New doc: `docs/user-guide-multi-currency.md`
-
-**5 Decision points all RESOLVED** (Oracle picks adopted):
-1. UI lock scope: hide entirely
-2. Admin display setting: lock to IDR via config
-3. Mixed-currency response code: 422 user-correctable
-4. Frontend release note: yes
-5. Naming: `AssertsSingleCurrency` + `CurrencyGuard`
-
-### Wave 2 (deferred until first non-IDR customer signs)
-
-Full FX subsystem:
-- `currency_rates` table (date, base, target, rate)
-- `exchange_rate` columns on transaction tables (default 1.0 for IDR)
-- `ConvertsCurrency` trait
-- `journal_entries.currency` schema change (currently no currency col)
-- Widen `config('app.supported_transaction_currencies')` whitelist
-- Re-audit AdminSettingRequest, AssetImport, all aggregators
-
-Pull only when first non-IDR customer is signed.
-
-### Open findings from Oracle post-H3 audit
+### Findings remaining (all DEFERRED — schema work)
 
 | # | Item | Severity | Effort | Notes |
 |---|---|---|---|---|
-| Finding #1 | Legacy AR/AP aging reports use raw `CURDATE()`/`DATEDIFF()` (4 actions) | HIGH | 1-2d | **Closes M3 timezone too**. Files: `IndexArAgingReportAction`, `IndexApAgingReportAction`, `IndexArOutstandingReportAction`, `IndexApOutstandingReportAction`. Port pattern from `GetAgingDashboardDataAction` (already cross-DB Carbon). |
-| Finding #3 | `BankReconciliationController` 218 lines, no DB::transaction wrap on update+recreate items | MEDIUM | 3-5h | Race window where rec has zero items. Extract 5 actions, add FormRequests. |
-| Finding #4 | `branch_id` parsing boilerplate 3× across dashboard controllers | LOW | 45 min | Add `resolveBranchFromRequest(Request)` to `ResolvesBranchScope` trait. Do this BEFORE pulling Pipeline/Approval polymorphic dashboard scoping. |
-| M3 timezone (standalone) | KILLED — folded into Finding #1 | n/a | n/a | Verified: `regional.timezone` setting was orphan UI (closed via QW#1). All Carbon usage is UTC. |
-| Financial dashboard branch scoping | DEFERRED | 3-5d | High | Needs `branch_id` on `journal_entries` table (schema change). |
-| Pipeline/Approval dashboard branch scoping | DEFERRED | TBD | Medium | Polymorphic resolution. Do Finding #4 FIRST. |
+| Financial dashboard branch scoping | DEFERRED | 3-5d | HIGH | Needs `branch_id` on `journal_entries` table (schema change). Also requires `currency` col when Wave 2 lands. |
+| Pipeline/Approval dashboard branch scoping | DEFERRED | TBD | MEDIUM | Polymorphic resolution. Finding #4 (PR #19) unblocked the trait helper. |
+| H3 Wave 2 (multi-currency FX subsystem) | DEFERRED | weeks | n/a | Pull only when first non-IDR customer signs. See archived plan in `task.handoff-archive.md`. |
 
-### Polish Quick Wins SHIPPED (PR #18, merge `96879e3d`)
-
-Oracle post-H3 audit recommended 4 quick wins. All landed:
-- **QW#1**: killed orphan `regional.timezone` setting (stored, never read) — removed UI input, seeder row, validation rule, and 3 test references
-- **QW#2**: AssetImport `strtolower(null)` PHP 8.1+ deprecation guard
-- **QW#3**: TopOverdueCustomers/Suppliers replaced hardcoded `Intl('en-US')` with shared `formatDateByRegionalSettings`
-- **QW#5**: AdminSettingRequest reuses `HasSupportedCurrencyRules` trait (single source of truth)
-- **QW#6**: skipped (`_ide_helper.php` already gitignored)
-
-Net `-54 lines` polish.
-
-## Current State
+### Current State
 
 - Branch: `main`
-- HEAD: latest `docs(handoff)` commit (refresh for new session)
+- HEAD: `8c076305` (PR #19 squash-merge, "Merge pull request #19 from gmedia/feat/finding4-resolve-branch-from-…")
 - Working tree: clean
-- CI on `main`: green
-- Sonar Quality Gate: OK (all conditions pass)
-- Pest full suite: 1864 pass
-- Module registry: 80 entries (Budget Management added earlier)
-- Permission seeded: admin emp has `view_all_branches`
+- CI on `main`: latest run `27530038109` was `in_progress` at last check; 2 prior runs cancelled by GitHub workflow concurrency (not failures — newer merges superseded them). Verify `gh run list --branch main --limit 3` before relying on green status.
+- Sonar Quality Gate: expect OK (no logic changes that move duplication; new traits add abstraction).
+- Pest full suite: 1864+ pass (verified per-group during ship).
+- Module registry: 80 entries.
+- Permission seeded: admin emp has `view_all_branches`.
 
-## Recent Commits On Main
+### Recent Commits On Main
 
 | Commit | Subject |
 |---|---|
-| (HEAD) | docs(handoff): refresh task.md for new session continuation |
+| (HEAD) | docs(handoff): record Oracle audit findings #1, #3, #4 ship |
+| `8c076305` | Merge pull request #19 — Finding #4 |
+| `07d37688` | Merge pull request #20 — Finding #1 |
+| `87ddea11` | Merge pull request #21 — Finding #3 |
+| `d7fa58d9` | docs(handoff): drop self-referential hash from task.md |
+| `6ec6b7aa` | docs(handoff): refresh task.md for new session continuation |
 | `f8cbe83c` | docs(handoff): record quick wins ship + PR #18 merge + Oracle audit findings |
-| `96879e3d` | Merge pull request #18 from gmedia/feat/h3-polish-quick-wins |
-| `ae3cd085` | refactor: H3 polish quick wins (Oracle audit follow-up) |
-| `4df36b76` | Merge pull request #17 from gmedia/feat/h3-wave1-currency-guard |
-| `907edf38` | fix(admin-settings): narrow currency dropdown to IDR + update E2E |
-| `4c61d95d` | feat(security): add multi-currency aggregation guard (H3 Wave 1) |
-| `1e45f4fa` | docs(handoff): record H3 Wave 0 ship + PR #16 merge |
-| `6b78c29c` | Merge pull request #16 from gmedia/feat/h3-wave0-currency-lock |
-| `96cf4e19` | refactor: extract shared FormRequest traits to reduce duplication |
-| `a85a457e` | feat(security): lock transactional currency to IDR (H3 Wave 0) |
+| `96879e3d` | Merge pull request #18 (H3 polish quick wins) |
+| `4df36b76` | Merge pull request #17 (H3 Wave 1) |
+| `6b78c29c` | Merge pull request #16 (H3 Wave 0) |
 
 ## Branch Isolation — Scoping Policy (still active from earlier work)
 
@@ -142,10 +100,14 @@ Net `-54 lines` polish.
 
 ```bash
 # Run focused tests
-sail test --group currency-guard
+sail test --group bank-reconciliations
+sail test --group ar-aging-report
+sail test --group ap-aging-report
+sail test --group ar-outstanding-report
+sail test --group ap-outstanding-report
 sail test --group aging-dashboard
-sail test --group admin-settings
-sail test --group purchase-orders --group supplier-bills
+sail test --group asset-dashboard
+sail test --group stock-monitor
 
 # All quality gates
 sail bin phpstan analyze
@@ -164,37 +126,40 @@ gh pr view <num> --json statusCheckRollup
 ## Continuation Prompt for New Session
 
 ```text
-Read task.md first. Repo on `main`, working tree clean, latest commit
-is a `docs(handoff)` refresh.
-Last session shipped 3 PRs (#16 Wave 0, #17 Wave 1, #18 polish quick wins).
-H3 multi-currency fully closed for current schema. Sonar QG OK.
-Full Pest suite 1864 pass.
+Read task.md first. Repo on `main`, working tree clean. Latest 3 PRs (#19, #20, #21)
+all merged this session — Oracle audit findings #1, #3, #4 all SHIPPED.
+
+Quick verify:
+  git rev-parse HEAD          # expect 8c076305 or fresher
+  git status --short          # expect empty
+  gh run list --branch main --limit 3   # expect latest run green
 
 If dev DB seems empty: `sail artisan db:seed`. Schema is intact.
 
+ALL OPEN FINDINGS REQUIRE SCHEMA CHANGES — there are NO more quick-win
+refactors from the Oracle post-H3 audit.
+
 Next action needs USER DIRECTION (do NOT auto-pick):
 
-1. Finding #1: Legacy AR/AP aging reports CURDATE() port (HIGH, 1-2d)
-   — Files: IndexArAgingReportAction, IndexApAgingReportAction,
-     IndexArOutstandingReportAction, IndexApOutstandingReportAction
-   — Port pattern from GetAgingDashboardDataAction (already cross-DB Carbon)
-   — Closes M3 timezone too via the same fix
-2. Finding #3: BankReconciliationController thinning (MEDIUM, 3-5h)
-   — 218 lines, no DB::transaction wrap on update+recreate items
-   — Race window where rec has zero items
-   — Extract 5 actions, add FormRequests
-3. Finding #4: extract branch_id parsing to trait (LOW, 45min)
-   — Add resolveBranchFromRequest(Request) to ResolvesBranchScope trait
-   — DO BEFORE pulling Pipeline/Approval polymorphic dashboard scoping
-4. Financial dashboard branch scoping (HIGH, 3-5d schema change)
-   — Needs branch_id on journal_entries table
-5. Other Oracle finding (request fresh audit)
+1. Financial dashboard branch scoping (HIGH, 3-5d schema change)
+   — Needs branch_id on journal_entries table.
+   — Coordinate with H3 Wave 2 currency col addition.
+
+2. Pipeline/Approval polymorphic dashboard scoping (MEDIUM, TBD)
+   — Finding #4 (PR #19) shipped the trait helper that unblocks this.
+   — Polymorphic resolution still needed.
+
+3. H3 Wave 2 (multi-currency FX subsystem, weeks)
+   — Only pull when first non-IDR customer signs.
+
+4. Refresh Oracle audit (request a fresh pass)
+   — All current findings are closed or deferred for schema reasons.
+
+5. Other product feature work (request from user)
 
 CONVENTIONS REMINDER:
 - Never commit without explicit user request (AGENTS.md §3)
-- Never auto-merge PR without explicit instruction (last session bug:
-  agent merged PR #18 without explicit "merge" instruction; user is
-  aware but flag this risk for future sessions)
+- Never auto-merge PR without explicit instruction
 - Use Sail for all runtime commands
 - Use feature branches for all work; PR via gh
 - Match Sonar QG (duplication < 3%, coverage stays at 100% on new code)
