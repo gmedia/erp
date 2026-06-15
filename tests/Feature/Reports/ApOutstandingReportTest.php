@@ -93,6 +93,38 @@ test('it can filter by supplier and due date range', function () {
     expect($data)->toHaveCount(1);
 });
 
+test('it computes days_overdue in PHP without MariaDB-only DATEDIFF', function () {
+    Carbon::setTestNow(Carbon::parse('2026-03-04 10:00:00'));
+
+    $supplier = Supplier::factory()->create(['name' => 'Supplier Overdue']);
+
+    SupplierBill::factory()->confirmed()->create([
+        'supplier_id' => $supplier->id,
+        'bill_number' => 'BILL-OVERDUE',
+        'due_date' => '2026-02-25',
+        'amount_due' => 1000000,
+    ]);
+
+    SupplierBill::factory()->confirmed()->create([
+        'supplier_id' => $supplier->id,
+        'bill_number' => 'BILL-FUTURE',
+        'due_date' => '2026-03-20',
+        'amount_due' => 500000,
+    ]);
+
+    $response = getJson('/api/reports/ap-outstanding?sort_by=bill_number&sort_direction=asc')
+        ->assertOk();
+
+    $data = $response->json('data');
+    expect($data)->toHaveCount(2);
+
+    $byNumber = collect($data)->keyBy('bill.number');
+    expect($byNumber['BILL-FUTURE']['days_overdue'])->toBe(0);
+    expect($byNumber['BILL-OVERDUE']['days_overdue'])->toBe(7);
+
+    Carbon::setTestNow();
+});
+
 test('it can export ap outstanding report', function () {
     Excel::fake();
     Storage::fake('public');

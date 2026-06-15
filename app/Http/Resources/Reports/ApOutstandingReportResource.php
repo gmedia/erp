@@ -6,6 +6,7 @@ use App\Http\Resources\Reports\Concerns\FormatsBillReportData;
 use DateTimeInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -26,7 +27,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property string $branch_name
  * @property string|null $purchase_order_number
  * @property string|null $goods_receipt_number
- * @property int $days_overdue
  */
 class ApOutstandingReportResource extends JsonResource
 {
@@ -35,7 +35,24 @@ class ApOutstandingReportResource extends JsonResource
     public function toArray(Request $request): array
     {
         return array_merge($this->baseBillReportData(), [
-            'days_overdue' => $this->days_overdue,
+            'days_overdue' => $this->computeDaysOverdue(),
         ]);
+    }
+
+    private function computeDaysOverdue(): int
+    {
+        $dueDate = $this->due_date;
+
+        if ($dueDate === null) {
+            return 0;
+        }
+
+        $due = $dueDate instanceof DateTimeInterface
+            ? Carbon::instance($dueDate)
+            : Carbon::parse((string) $dueDate);
+
+        $today = Carbon::today();
+
+        return $due->lt($today) ? $due->diffInDays($today) : 0;
     }
 }

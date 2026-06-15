@@ -8,7 +8,6 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Carbon;
 
 class IndexArOutstandingReportAction
 {
@@ -20,29 +19,16 @@ class IndexArOutstandingReportAction
         $query = $this->buildQuery();
 
         $this->applyBaseCustomerInvoiceFilters($request, $query);
-        $this->applyRequestSorting(
-            $request,
-            $query,
-            $this->defaultSortBy(),
-            $this->sortAliases(),
-            $this->plainSortableColumns(),
-            $this->aggregateSortableColumns(),
-            $this->fallbackSortBy(),
-        );
+        $this->applyOutstandingSorting($request, $query);
 
         return $this->exportOrPaginate($request, $query);
     }
 
     protected function buildQuery(): Builder
     {
-        $today = Carbon::today()->toDateString();
-
-        return $this->buildBaseCustomerInvoiceQuery(
-            [$this->daysOverdueSelectSql()],
-            [$today, $today],
-        )->withCasts(array_merge($this->getBaseCasts(), [
-            'days_overdue' => 'integer',
-        ]));
+        // days_overdue computed in PHP via Carbon (cross-DB). See ArOutstandingReportResource.
+        return $this->buildBaseCustomerInvoiceQuery()
+            ->withCasts($this->getBaseCasts());
     }
 
     protected function defaultSortBy(): string
@@ -62,22 +48,39 @@ class IndexArOutstandingReportAction
 
     protected function aggregateSortableColumns(): array
     {
-        return [
-            'days_overdue',
-        ];
+        return [];
     }
 
     protected function fallbackSortBy(): string
     {
-        return $this->defaultSortBy();
+        return 'due_date';
     }
 
-    private function daysOverdueSelectSql(): string
+    /**
+     * Resolves days_overdue sort to due_date with inverted direction:
+     * "most overdue first" (desc) == "oldest due first" (asc).
+     * All other sort keys delegate to the standard request sorting.
+     */
+    private function applyOutstandingSorting(FormRequest $request, Builder $query): void
     {
-        return "CASE
-            WHEN ci.status IN ('sent', 'partially_paid', 'overdue') AND ci.due_date < ?
-            THEN DATEDIFF(?, ci.due_date)
-            ELSE 0
-        END as days_overdue";
+        $sortBy = $request->string('sort_by', $this->defaultSortBy())->toString();
+
+        if ($sortBy === 'days_overdue') {
+            $sortDirection = $request->string('sort_direction', 'desc')->toString();
+            $invertedDirection = strtolower($sortDirection) === 'asc' ? 'desc' : 'asc';
+            $query->orderBy('due_date', $invertedDirection);
+
+            return;
+        }
+
+        $this->applyRequestSorting(
+            $request,
+            $query,
+            $this->defaultSortBy(),
+            $this->sortAliases(),
+            $this->plainSortableColumns(),
+            $this->aggregateSortableColumns(),
+            $this->fallbackSortBy(),
+        );
     }
 }

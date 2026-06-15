@@ -8,6 +8,7 @@ use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use App\Models\JournalEntryLine;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 class FinancialReportService
@@ -76,36 +77,36 @@ class FinancialReportService
             return [];
         }
 
-        /** @var Collection<int, object{month: int, revenue: string, expenses: string}> $results */
-        $results = JournalEntryLine::query()
+        // PHP-side month bucketing keeps query cross-DB safe (avoids MariaDB-only MONTH()).
+        /** @var Collection<int, object{entry_date: string, account_type: string, debit: string, credit: string}> $rows */
+        $rows = JournalEntryLine::query()
             ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
             ->join('accounts', 'accounts.id', '=', 'journal_entry_lines.account_id')
             ->where('journal_entries.fiscal_year_id', $fiscalYearId)
             ->where('journal_entries.status', 'posted')
             ->where('accounts.coa_version_id', $coaVersion->id)
             ->whereIn('accounts.type', ['revenue', 'expense'])
-            ->selectRaw('MONTH(journal_entries.entry_date) as month')
-            ->selectRaw(
-                "SUM(CASE WHEN accounts.type = 'revenue' "
-                . 'THEN journal_entry_lines.credit - journal_entry_lines.debit '
-                . 'ELSE 0 END) as revenue'
-            )
-            ->selectRaw(
-                "SUM(CASE WHEN accounts.type = 'expense' "
-                . 'THEN journal_entry_lines.debit - journal_entry_lines.credit '
-                . 'ELSE 0 END) as expenses'
-            )
-            ->groupByRaw('MONTH(journal_entries.entry_date)')
-            ->orderByRaw('MONTH(journal_entries.entry_date)')
+            ->select([
+                'journal_entries.entry_date as entry_date',
+                'accounts.type as account_type',
+                'journal_entry_lines.debit as debit',
+                'journal_entry_lines.credit as credit',
+            ])
             ->get();
 
         $dataByMonth = [];
-        /** @var object $row */
-        foreach ($results as $row) {
-            $dataByMonth[(int) $row->month] = [
-                'revenue' => (float) $row->revenue,
-                'expenses' => (float) $row->expenses,
-            ];
+        foreach ($rows as $row) {
+            $month = Carbon::parse((string) $row->entry_date)->month;
+            $debit = (float) $row->debit;
+            $credit = (float) $row->credit;
+
+            $dataByMonth[$month] ??= ['revenue' => 0.0, 'expenses' => 0.0];
+
+            if ($row->account_type === 'revenue') {
+                $dataByMonth[$month]['revenue'] += $credit - $debit;
+            } else {
+                $dataByMonth[$month]['expenses'] += $debit - $credit;
+            }
         }
 
         $months = [];
