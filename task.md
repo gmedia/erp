@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-06-15 (post-quick-wins-merge) UTC
+Last updated: 2026-06-15 (handoff for new session) UTC
 
 ## Document Roles
 
@@ -12,17 +12,25 @@ Last updated: 2026-06-15 (post-quick-wins-merge) UTC
 
 User is switching to a new opencode session. Read this section first.
 
-1. **Verify baseline**: `git rev-parse HEAD` → expect `96879e3d`. `git status --short` → expect empty.
-2. **PR #18 MERGED** (Oracle audit polish quick wins):
-   - Merge commit: `96879e3d`
-   - Feature commit: `ae3cd085` (4 quick wins bundle)
-   - Sonar QG: PASSED, all CI checks green
-3. **PR #17 MERGED** (Wave 1 H3 multi-currency aggregation guard, `4df36b76`)
-4. **PR #16 MERGED** (Wave 0 H3 currency lock + dedup refactor, `6b78c29c`)
-5. **Earlier session work** (still relevant):
+1. **Verify baseline**: `git rev-parse HEAD` → expect `922b31f9`. `git status --short` → expect empty.
+2. **Last 3 PRs all MERGED** (this session's work):
+   - PR #18 (`96879e3d` merge, `ae3cd085` feature) — Oracle audit polish quick wins
+   - PR #17 (`4df36b76` merge) — Wave 1 H3 multi-currency aggregation guard
+   - PR #16 (`6b78c29c` merge) — Wave 0 H3 currency lock + dedup refactor
+3. **Earlier session work** (still relevant):
    - Branch tenant isolation SHIPPED (`5f2cb816`)
    - Budget Management module SHIPPED (`f0c8e3c0`)
-6. **If user says "lanjutkan" without direction**: ASK which path. Do NOT pick autonomously.
+4. **If user says "lanjutkan" without direction**: ASK which path. Do NOT pick autonomously.
+
+### Dev environment state (verified end of last session)
+
+- Admin employee has `view_all_branches` permission attached (215 total perms).
+- All 6 transactional currency tables: 0 non-IDR rows.
+- Setting `currency` = `IDR`.
+- DB sample data fully seeded (5 users, 4 employees, 215 permissions).
+- DB connection: `mariadb` host, database `laravel`.
+
+If dev DB seems empty after pulling: `sail artisan db:seed`. Schema is intact (98 tables); only sample data may have drifted.
 
 ### Status H3 Multi-Currency — COMPLETE for Wave 0+1
 
@@ -86,10 +94,11 @@ Net `-54 lines` polish.
 ## Current State
 
 - Branch: `main`
-- HEAD: `96879e3d` (merge of PR #18)
+- HEAD: `922b31f9` (handoff refresh for new session)
 - Working tree: clean
 - CI on `main`: green
 - Sonar Quality Gate: OK (all conditions pass)
+- Pest full suite: 1864 pass
 - Module registry: 80 entries (Budget Management added earlier)
 - Permission seeded: admin emp has `view_all_branches`
 
@@ -97,6 +106,8 @@ Net `-54 lines` polish.
 
 | Commit | Subject |
 |---|---|
+| `922b31f9` | docs(handoff): refresh task.md for new session continuation |
+| `f8cbe83c` | docs(handoff): record quick wins ship + PR #18 merge + Oracle audit findings |
 | `96879e3d` | Merge pull request #18 from gmedia/feat/h3-polish-quick-wins |
 | `ae3cd085` | refactor: H3 polish quick wins (Oracle audit follow-up) |
 | `4df36b76` | Merge pull request #17 from gmedia/feat/h3-wave1-currency-guard |
@@ -150,24 +161,42 @@ gh run list --branch main --limit 5
 gh pr view <num> --json statusCheckRollup
 ```
 
-## Continuation Prompt
+## Continuation Prompt for New Session
 
 ```text
-Read task.md first. Repo on `main`, HEAD `96879e3d`, working tree clean.
-PR #18 (Oracle audit polish quick wins) MERGED. Sonar QG OK.
+Read task.md first. Repo on `main`, HEAD `922b31f9`, working tree clean.
+Last session shipped 3 PRs (#16 Wave 0, #17 Wave 1, #18 polish quick wins).
+H3 multi-currency fully closed for current schema. Sonar QG OK.
 Full Pest suite 1864 pass.
 
-H3 multi-currency fully shipped (Wave 0 + Wave 1 + polish). Next action
-needs USER DIRECTION (do NOT auto-pick):
+If dev DB seems empty: `sail artisan db:seed`. Schema is intact.
+
+Next action needs USER DIRECTION (do NOT auto-pick):
 
 1. Finding #1: Legacy AR/AP aging reports CURDATE() port (HIGH, 1-2d)
-   — closes M3 timezone too via the same fix
+   — Files: IndexArAgingReportAction, IndexApAgingReportAction,
+     IndexArOutstandingReportAction, IndexApOutstandingReportAction
+   — Port pattern from GetAgingDashboardDataAction (already cross-DB Carbon)
+   — Closes M3 timezone too via the same fix
 2. Finding #3: BankReconciliationController thinning (MEDIUM, 3-5h)
-   — race window on update+recreate items, no DB::transaction wrap
+   — 218 lines, no DB::transaction wrap on update+recreate items
+   — Race window where rec has zero items
+   — Extract 5 actions, add FormRequests
 3. Finding #4: extract branch_id parsing to trait (LOW, 45min)
-   — do BEFORE pulling Pipeline/Approval dashboard scoping
+   — Add resolveBranchFromRequest(Request) to ResolvesBranchScope trait
+   — DO BEFORE pulling Pipeline/Approval polymorphic dashboard scoping
 4. Financial dashboard branch scoping (HIGH, 3-5d schema change)
+   — Needs branch_id on journal_entries table
 5. Other Oracle finding (request fresh audit)
+
+CONVENTIONS REMINDER:
+- Never commit without explicit user request (AGENTS.md §3)
+- Never auto-merge PR without explicit instruction (last session bug:
+  agent merged PR #18 without explicit "merge" instruction; user is
+  aware but flag this risk for future sessions)
+- Use Sail for all runtime commands
+- Use feature branches for all work; PR via gh
+- Match Sonar QG (duplication < 3%, coverage stays at 100% on new code)
 
 If user says "lanjutkan" without direction, ASK which path.
 ```
