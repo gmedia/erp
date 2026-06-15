@@ -34,8 +34,7 @@ class StockMonitorController extends Controller
 
     private function forceBranchScope(IndexStockMonitorRequest|ExportStockMonitorRequest $request): void
     {
-        $requestedBranchId = $request->integer('branch_id') ?: null;
-        $effective = $this->resolveBranchScope($requestedBranchId);
+        $effective = $this->resolveBranchFromRequest($request);
 
         if ($effective === null) {
             $request->offsetUnset('branch_id');

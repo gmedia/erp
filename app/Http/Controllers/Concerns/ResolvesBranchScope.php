@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Concerns;
 
 use App\Models\User;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -15,6 +17,27 @@ use Illuminate\Support\Facades\Auth;
  */
 trait ResolvesBranchScope
 {
+    /**
+     * Parses the `branch_id` query param from a request and resolves it
+     * through the branch-scope policy in a single call.
+     *
+     * Accepts both raw {@see Request} (query string parsing) and
+     * {@see FormRequest} (validated input parsing).
+     *
+     * @return int|null null = unscoped; int = forced branch
+     */
+    protected function resolveBranchFromRequest(Request $request): ?int
+    {
+        if ($request instanceof FormRequest) {
+            $requestedBranchId = $request->integer('branch_id') ?: null;
+        } else {
+            $branchIdRaw = $request->query('branch_id');
+            $requestedBranchId = is_numeric($branchIdRaw) ? (int) $branchIdRaw : null;
+        }
+
+        return $this->resolveBranchScope($requestedBranchId);
+    }
+
     /**
      * @param  int|null  $requestedBranchId  branch_id from request query
      * @return int|null null = unscoped; int = forced branch

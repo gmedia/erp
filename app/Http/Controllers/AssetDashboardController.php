@@ -13,9 +13,7 @@ class AssetDashboardController extends Controller
 
     public function getData(Request $request, GetAssetDashboardDataAction $action): JsonResponse
     {
-        $branchIdRaw = $request->query('branch_id');
-        $requestedBranchId = is_numeric($branchIdRaw) ? (int) $branchIdRaw : null;
-        $branchId = $this->resolveBranchScope($requestedBranchId);
+        $branchId = $this->resolveBranchFromRequest($request);
 
         $data = $action->execute($branchId);
 
