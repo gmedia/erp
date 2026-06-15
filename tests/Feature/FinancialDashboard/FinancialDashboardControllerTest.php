@@ -129,6 +129,80 @@ describe('Financial Dashboard API', function () {
             ->and((float) $kpis['net_income']['value'])->toBe(200000.0);
     });
 
+    test('returns monthly trends bucketed by entry_date across multiple months without MariaDB MONTH()', function () {
+        $fiscalYear = FiscalYear::factory()->create([
+            'status' => 'open',
+            'start_date' => '2024-01-01',
+            'end_date' => '2024-12-31',
+        ]);
+        $coaVersion = CoaVersion::factory()->create([
+            'fiscal_year_id' => $fiscalYear->id,
+            'status' => 'active',
+        ]);
+
+        $revenueAccount = Account::factory()->create([
+            'coa_version_id' => $coaVersion->id,
+            'type' => 'revenue',
+            'normal_balance' => 'credit',
+            'level' => 1,
+            'parent_id' => null,
+        ]);
+
+        $expenseAccount = Account::factory()->create([
+            'coa_version_id' => $coaVersion->id,
+            'type' => 'expense',
+            'normal_balance' => 'debit',
+            'level' => 1,
+            'parent_id' => null,
+        ]);
+
+        $entries = [
+            ['date' => '2024-01-15', 'revenue' => 100000.0, 'expense' => 30000.0],
+            ['date' => '2024-03-10', 'revenue' => 250000.0, 'expense' => 75000.0],
+            ['date' => '2024-03-25', 'revenue' => 50000.0, 'expense' => 25000.0],
+            ['date' => '2024-07-01', 'revenue' => 0.0, 'expense' => 200000.0],
+        ];
+
+        foreach ($entries as $entry) {
+            $journal = JournalEntry::factory()->create([
+                'fiscal_year_id' => $fiscalYear->id,
+                'status' => 'posted',
+                'entry_date' => $entry['date'],
+            ]);
+
+            JournalEntryLine::factory()->create([
+                'journal_entry_id' => $journal->id,
+                'account_id' => $revenueAccount->id,
+                'debit' => 0,
+                'credit' => $entry['revenue'],
+            ]);
+
+            JournalEntryLine::factory()->create([
+                'journal_entry_id' => $journal->id,
+                'account_id' => $expenseAccount->id,
+                'debit' => $entry['expense'],
+                'credit' => 0,
+            ]);
+        }
+
+        $response = getJson("/api/financial-dashboard?fiscal_year_id={$fiscalYear->id}");
+        $response->assertOk();
+
+        $trends = $response->json('monthly_trends');
+        $byMonth = collect($trends)->keyBy('month');
+
+        expect($trends)->toHaveCount(12);
+        expect((float) $byMonth[1]['revenue'])->toBe(100000.0);
+        expect((float) $byMonth[1]['expenses'])->toBe(30000.0);
+        expect((float) $byMonth[3]['revenue'])->toBe(300000.0);
+        expect((float) $byMonth[3]['expenses'])->toBe(100000.0);
+        expect((float) $byMonth[7]['revenue'])->toBe(0.0);
+        expect((float) $byMonth[7]['expenses'])->toBe(200000.0);
+        expect((float) $byMonth[2]['revenue'])->toBe(0.0);
+        expect((float) $byMonth[2]['expenses'])->toBe(0.0);
+        expect($byMonth[3]['label'])->toBe('Mar');
+    });
+
     test('requires authentication', function () {
         // Reset auth
         app('auth')->forgetGuards();
