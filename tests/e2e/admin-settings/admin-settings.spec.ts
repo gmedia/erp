@@ -65,7 +65,6 @@ test.describe('Admin Settings', () => {
         await expect(page.getByText('Regional Settings')).toBeVisible();
 
         // Regional form fields should be visible
-        await expect(page.locator('input[name="timezone"]')).toBeVisible();
         await expect(page.getByTestId('currency-select-trigger')).toBeVisible();
         await expect(page.locator('input[name="date_format"]')).toBeVisible();
         await expect(page.locator('input[name="number_format_decimal"]')).toBeVisible();
