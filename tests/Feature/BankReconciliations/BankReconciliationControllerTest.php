@@ -1,5 +1,7 @@
 <?php
 
+use App\Actions\AccountingPosting\PostBankReconciliationJournalAction;
+use App\Actions\JournalEntries\CreateJournalEntryAction;
 use App\Models\Account;
 use App\Models\BankReconciliation;
 use App\Models\BankReconciliationItem;
@@ -109,6 +111,33 @@ test('it cannot complete when difference is not zero', function () {
     postJson("/api/bank-reconciliations/{$reconciliation->id}/complete")
         ->assertUnprocessable()
         ->assertJsonValidationErrors('difference');
+});
+
+test('completing a bank reconciliation keeps state completed when journal posting fails (best-effort)', function () {
+    $reconciliation = BankReconciliation::factory()->create([
+        'difference' => 0,
+        'status' => 'in_progress',
+        'completed_at' => null,
+        'completed_by' => null,
+    ]);
+
+    $this->app->bind(PostBankReconciliationJournalAction::class, function ($app) {
+        return new class($app->make(CreateJournalEntryAction::class)) extends PostBankReconciliationJournalAction
+        {
+            public function execute(BankReconciliation $bankReconciliation): ?JournalEntry
+            {
+                throw new RuntimeException('Simulated journal posting failure');
+            }
+        };
+    });
+
+    postJson("/api/bank-reconciliations/{$reconciliation->id}/complete")
+        ->assertOk()
+        ->assertJsonPath('data.status', 'completed');
+
+    $reconciliation->refresh();
+    expect($reconciliation->status)->toBe('completed');
+    expect($reconciliation->completed_at)->not->toBeNull();
 });
 
 test('it can add an item to a bank reconciliation', function () {
