@@ -88,11 +88,12 @@ class CustomerInvoiceController extends Controller
             syncItems: function (CustomerInvoice $customerInvoice, array $items) use ($syncItems): void {
                 $syncItems->execute($customerInvoice, $items);
             },
+            afterCommit: $isNewlySent
+                ? function (CustomerInvoice $customerInvoice) use ($postJournal): void {
+                    $postJournal->execute($customerInvoice->refresh());
+                }
+            : null,
         );
-
-        if ($isNewlySent) {
-            $postJournal->execute($customerInvoice->refresh());
-        }
 
         return (new CustomerInvoiceResource($this->loadResourceRelations($customerInvoice)))->response();
     }

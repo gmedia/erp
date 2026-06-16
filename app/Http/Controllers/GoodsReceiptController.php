@@ -93,18 +93,23 @@ class GoodsReceiptController extends Controller
             syncItems: function (GoodsReceipt $goodsReceipt, array $items) use ($syncItems): void {
                 $syncItems->execute($goodsReceipt, $items);
             },
+            afterCommit: $isNewlyConfirmed
+                ? function (GoodsReceipt $goodsReceipt) use ($postJournal): void {
+                    try {
+                        $postJournal->execute($goodsReceipt->refresh());
+                    } catch (ValidationException $e) {
+                        // Validation failures (e.g. missing COA mapping) are intentionally
+                        // swallowed so the goods receipt itself stays confirmed; user can
+                        // post the journal later. Non-validation errors propagate and
+                        // roll back the entire transaction (status flip included).
+                        Log::warning('Goods receipt journal posting skipped', [
+                            'goods_receipt_id' => $goodsReceipt->id,
+                            'reason' => $e->getMessage(),
+                        ]);
+                    }
+                }
+            : null,
         );
-
-        if ($isNewlyConfirmed) {
-            try {
-                $postJournal->execute($goodsReceipt->refresh());
-            } catch (ValidationException $e) {
-                Log::warning('Goods receipt journal posting skipped', [
-                    'goods_receipt_id' => $goodsReceipt->id,
-                    'reason' => $e->getMessage(),
-                ]);
-            }
-        }
 
         return (new GoodsReceiptResource($this->loadResourceRelations($goodsReceipt)))->response();
     }
