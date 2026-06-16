@@ -1,6 +1,10 @@
 <?php
 
+use App\Actions\AccountingPosting\PostSupplierReturnJournalAction;
+use App\Actions\AccountingPosting\ResolveControlAccountAction;
+use App\Actions\JournalEntries\CreateJournalEntryAction;
 use App\Models\GoodsReceipt;
+use App\Models\JournalEntry;
 use App\Models\Product;
 use App\Models\PurchaseOrder;
 use App\Models\Supplier;
@@ -8,6 +12,7 @@ use App\Models\SupplierReturn;
 use App\Models\Unit;
 use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -212,6 +217,60 @@ test('update modifies supplier return and items', function () {
         ->assertOk()
         ->assertJsonPath('data.status', 'confirmed')
         ->assertJsonCount(1, 'data.items');
+});
+
+test('confirming supplier return rolls back state when journal posting fails with non-validation error', function () {
+    $supplierReturn = SupplierReturn::factory()->create([
+        'status' => 'draft',
+        'confirmed_at' => null,
+        'confirmed_by' => null,
+    ]);
+
+    $this->app->bind(PostSupplierReturnJournalAction::class, function ($app) {
+        return new class($app->make(CreateJournalEntryAction::class), $app->make(ResolveControlAccountAction::class)) extends PostSupplierReturnJournalAction
+        {
+            public function execute(SupplierReturn $supplierReturn): ?JournalEntry
+            {
+                throw new RuntimeException('Simulated journal posting failure');
+            }
+        };
+    });
+
+    putJson('/api/supplier-returns/' . $supplierReturn->id, ['status' => 'confirmed'])
+        ->assertStatus(500);
+
+    $supplierReturn->refresh();
+    expect($supplierReturn->status)->toBe('draft');
+    expect($supplierReturn->confirmed_at)->toBeNull();
+    expect($supplierReturn->confirmed_by)->toBeNull();
+});
+
+test('confirming supplier return swallows validation errors and keeps state confirmed', function () {
+    $supplierReturn = SupplierReturn::factory()->create([
+        'status' => 'draft',
+        'confirmed_at' => null,
+        'confirmed_by' => null,
+    ]);
+
+    $this->app->bind(PostSupplierReturnJournalAction::class, function ($app) {
+        return new class($app->make(CreateJournalEntryAction::class), $app->make(ResolveControlAccountAction::class)) extends PostSupplierReturnJournalAction
+        {
+            public function execute(SupplierReturn $supplierReturn): ?JournalEntry
+            {
+                throw ValidationException::withMessages([
+                    'coa' => 'Missing COA mapping for journal posting',
+                ]);
+            }
+        };
+    });
+
+    putJson('/api/supplier-returns/' . $supplierReturn->id, ['status' => 'confirmed'])
+        ->assertOk()
+        ->assertJsonPath('data.status', 'confirmed');
+
+    $supplierReturn->refresh();
+    expect($supplierReturn->status)->toBe('confirmed');
+    expect($supplierReturn->confirmed_at)->not->toBeNull();
 });
 
 test('destroy removes supplier return', function () {

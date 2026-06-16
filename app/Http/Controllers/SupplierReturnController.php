@@ -106,18 +106,23 @@ class SupplierReturnController extends Controller
             syncItems: function (SupplierReturn $supplierReturn, array $items) use ($syncItems): void {
                 $syncItems->execute($supplierReturn, $items);
             },
+            afterCommit: $isNewlyConfirmed
+                ? function (SupplierReturn $supplierReturn) use ($postJournal): void {
+                    try {
+                        $postJournal->execute($supplierReturn->refresh());
+                    } catch (ValidationException $e) {
+                        // Validation failures (e.g. missing COA mapping) are intentionally
+                        // swallowed so the supplier return itself stays confirmed; user can
+                        // post the journal later. Non-validation errors propagate and
+                        // roll back the entire transaction (status flip included).
+                        Log::warning('Supplier return journal posting skipped', [
+                            'supplier_return_id' => $supplierReturn->id,
+                            'reason' => $e->getMessage(),
+                        ]);
+                    }
+                }
+            : null,
         );
-
-        if ($isNewlyConfirmed) {
-            try {
-                $postJournal->execute($supplierReturn->refresh());
-            } catch (ValidationException $e) {
-                Log::warning('Supplier return journal posting skipped', [
-                    'supplier_return_id' => $supplierReturn->id,
-                    'reason' => $e->getMessage(),
-                ]);
-            }
-        }
 
         $supplierReturn->load([
             'purchaseOrder',

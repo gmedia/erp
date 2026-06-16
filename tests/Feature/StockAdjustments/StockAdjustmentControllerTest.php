@@ -1,11 +1,16 @@
 <?php
 
+use App\Actions\AccountingPosting\PostStockAdjustmentJournalAction;
+use App\Actions\AccountingPosting\ResolveControlAccountAction;
+use App\Actions\JournalEntries\CreateJournalEntryAction;
+use App\Models\JournalEntry;
 use App\Models\Product;
 use App\Models\StockAdjustment;
 use App\Models\StockAdjustmentItem;
 use App\Models\Unit;
 use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
@@ -334,5 +339,59 @@ describe('Stock Adjustment API Endpoints', function () {
         postJson("/api/stock-adjustments/{$adjustment->id}/items", ['items' => []])
             ->assertStatus(422)
             ->assertJsonValidationErrors(['items']);
+    });
+
+    test('approving stock adjustment rolls back state when journal posting fails with non-validation error', function () {
+        $adjustment = StockAdjustment::factory()->create([
+            'status' => 'draft',
+            'approved_at' => null,
+            'approved_by' => null,
+        ]);
+
+        $this->app->bind(PostStockAdjustmentJournalAction::class, function ($app) {
+            return new class($app->make(CreateJournalEntryAction::class), $app->make(ResolveControlAccountAction::class)) extends PostStockAdjustmentJournalAction
+            {
+                public function execute(StockAdjustment $stockAdjustment): ?JournalEntry
+                {
+                    throw new RuntimeException('Simulated journal posting failure');
+                }
+            };
+        });
+
+        putJson('/api/stock-adjustments/' . $adjustment->id, ['status' => 'approved'])
+            ->assertStatus(500);
+
+        $adjustment->refresh();
+        expect($adjustment->status)->toBe('draft');
+        expect($adjustment->approved_at)->toBeNull();
+        expect($adjustment->approved_by)->toBeNull();
+    });
+
+    test('approving stock adjustment swallows validation errors and keeps state approved', function () {
+        $adjustment = StockAdjustment::factory()->create([
+            'status' => 'draft',
+            'approved_at' => null,
+            'approved_by' => null,
+        ]);
+
+        $this->app->bind(PostStockAdjustmentJournalAction::class, function ($app) {
+            return new class($app->make(CreateJournalEntryAction::class), $app->make(ResolveControlAccountAction::class)) extends PostStockAdjustmentJournalAction
+            {
+                public function execute(StockAdjustment $stockAdjustment): ?JournalEntry
+                {
+                    throw ValidationException::withMessages([
+                        'coa' => 'Missing COA mapping for journal posting',
+                    ]);
+                }
+            };
+        });
+
+        putJson('/api/stock-adjustments/' . $adjustment->id, ['status' => 'approved'])
+            ->assertOk()
+            ->assertJsonPath('data.status', 'approved');
+
+        $adjustment->refresh();
+        expect($adjustment->status)->toBe('approved');
+        expect($adjustment->approved_at)->not->toBeNull();
     });
 });

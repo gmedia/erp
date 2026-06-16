@@ -86,11 +86,12 @@ class SupplierBillController extends Controller
             syncItems: function (SupplierBill $supplierBill, array $items) use ($syncItems): void {
                 $syncItems->execute($supplierBill, $items);
             },
+            afterCommit: $isNewlyConfirmed
+                ? function (SupplierBill $supplierBill) use ($postJournal): void {
+                    $postJournal->execute($supplierBill->refresh());
+                }
+            : null,
         );
-
-        if ($isNewlyConfirmed) {
-            $postJournal->execute($supplierBill->refresh());
-        }
 
         return (new SupplierBillResource($this->loadResourceRelations($supplierBill)))->response();
     }
