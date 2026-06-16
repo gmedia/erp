@@ -19,11 +19,13 @@ class IndexApAgingReportAction
 
         $query = $this->buildBaseSupplierBillQuery(
             extraSelectColumns: [
-                'CASE WHEN sb.due_date >= ? THEN sb.amount_due ELSE 0 END as current_amount',
-                'CASE WHEN sb.due_date BETWEEN ? AND ? THEN sb.amount_due ELSE 0 END as days_1_30',
-                'CASE WHEN sb.due_date BETWEEN ? AND ? THEN sb.amount_due ELSE 0 END as days_31_60',
-                'CASE WHEN sb.due_date BETWEEN ? AND ? THEN sb.amount_due ELSE 0 END as days_61_90',
-                'CASE WHEN sb.due_date < ? THEN sb.amount_due ELSE 0 END as days_over_90',
+                $this->agingBucketSelectSqlWithAliases('sb', [
+                    'current' => 'current_amount',
+                    '1_30' => 'days_1_30',
+                    '31_60' => 'days_31_60',
+                    '61_90' => 'days_61_90',
+                    'over_90' => 'days_over_90',
+                ]),
             ],
             extraCasts: [
                 'current_amount' => 'decimal:2',
@@ -32,13 +34,7 @@ class IndexApAgingReportAction
                 'days_61_90' => 'decimal:2',
                 'days_over_90' => 'decimal:2',
             ],
-            extraSelectBindings: [
-                $boundaries['today'],
-                $boundaries['d30'], $boundaries['d1'],
-                $boundaries['d60'], $boundaries['d31'],
-                $boundaries['d90'], $boundaries['d61'],
-                $boundaries['d90'],
-            ],
+            extraSelectBindings: $this->agingBucketBindings($boundaries),
         );
 
         $this->applySupplierBillFilters($request, $query);
