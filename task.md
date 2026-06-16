@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-06-15 (Finding #4 wave 2 MERGED — PR #26 CI+GR, CI green on main) UTC
+Last updated: 2026-06-15 (Finding #4 wave 3 MERGED — PR #27 SA+SB+SR, 7/8 controllers closed) UTC
 
 ## Document Roles
 
@@ -12,9 +12,10 @@ Last updated: 2026-06-15 (Finding #4 wave 2 MERGED — PR #26 CI+GR, CI green on
 
 User is switching to a new 0pencode session. Read this section first.
 
-1. **Verify baseline**: `git status --short` → expect only `task.md` (or empty). `git log --oneline -1` on main → expect `a0aaca72` (or fresher).
-2. **4 Oracle audit PRs MERGED this session, CI on main green:**
-   - **PR #26** (squash `a0aaca72`) — Finding #4 wave 2: CustomerInvoice + GoodsReceipt postJournal race close (preserves GR ValidationException swallow semantic)
+1. **Verify baseline**: `git status --short` → expect only `task.md` (or empty). `git log --oneline -1` on main → expect `3e68adcc` (or fresher).
+2. **5 Oracle audit PRs MERGED this session, CI on main green:**
+   - **PR #27** (squash `3e68adcc`) — Finding #4 wave 3: StockAdjustment + SupplierBill + SupplierReturn (7/8 controllers closed)
+   - **PR #26** (squash `a0aaca72`) — Finding #4 wave 2: CustomerInvoice + GoodsReceipt postJournal race close
    - **PR #25** (squash `460072f4`) — Finding #4 AP+AR wave 1: postJournal race close via `afterCommit` hook in `StoresItemsInTransaction`
    - **PR #23** (squash `ff426b1e`) — Findings #1, #2: DATEDIFF + MONTH cross-DB port
    - **PR #22** (squash `2fe1b5f2`) — Findings #3, #5, #9: BR controller race close + 5 action unit tests
@@ -41,12 +42,13 @@ If dev DB seems empty after pulling: `sail artisan db:seed`. Schema is intact.
 
 ### Status — Oracle audit refresh wave 2 + Finding #4 progressive (this session, ALL MERGED)
 
-Oracle re-audit found PR #20/#21 left work incomplete. 2 PRs closed those gaps. Then 2 more PRs shipped Finding #4 in two waves (4 of original 8 controllers closed):
+Oracle re-audit found PR #20/#21 left work incomplete. 2 PRs closed those gaps. Then 3 more PRs shipped Finding #4 across three waves (7 of original 8 controllers closed):
 
 | Finding | Severity | PR | Squash | What it does |
 |---|---|---|---|---|
-| #4 (CI+GR) | MEDIUM | **#26** | `a0aaca72` | Wave 2: replays the afterCommit hook on CustomerInvoiceController + GoodsReceiptController. GR preserves the ValidationException swallow semantic INSIDE the hook (validation errors keep state confirmed; non-validation errors propagate + rollback). 3 regression tests. |
-| #4 (AP+AR) | MEDIUM | **#25** | `460072f4` | Wave 1: extends `StoresItemsInTransaction::updateWithSyncedItems` with `?callable $afterCommit` parameter. AP+AR controllers use it to wrap `postJournal->execute()` inside the same DB::transaction. 2 regression tests verify status/confirmed_at rollback when journal posting fails. |
+| #4 (SA+SB+SR) | MEDIUM | **#27** | `3e68adcc` | Wave 3: replays afterCommit hook on StockAdjustment, SupplierBill, SupplierReturn. SA + SR preserve ValidationException swallow semantic INSIDE the hook. 5 regression tests. |
+| #4 (CI+GR) | MEDIUM | **#26** | `a0aaca72` | Wave 2: CustomerInvoiceController + GoodsReceiptController. GR preserves the ValidationException swallow semantic INSIDE the hook. 3 regression tests. |
+| #4 (AP+AR) | MEDIUM | **#25** | `460072f4` | Wave 1: extends `StoresItemsInTransaction::updateWithSyncedItems` with `?callable $afterCommit` parameter. AP+AR controllers use it to wrap `postJournal->execute()` inside the same DB::transaction. 2 regression tests. |
 | #1, #2 | HIGH | **#23** | `ff426b1e` | Removes last `DATEDIFF()` + `MONTH()` MariaDB-only SQL. PHP-side Carbon bucketing in resources + Service. New trait `app/Exports/Concerns/ComputesDaysOverdue`. 32 tests pass. |
 | #3, #5, #9 | MED+LOW | **#22** | `2fe1b5f2` | Closes BR race window in 4 actions (Import/AutoMatch/Match/Unmatch — `recalculateBalances()` moved INSIDE `DB::transaction`). AddItem action gains transaction wrap + recalc. 5 new action unit tests. 50 tests pass. |
 
@@ -62,7 +64,7 @@ Oracle re-audit found PR #20/#21 left work incomplete. 2 PRs closed those gaps. 
 
 | # | Item | Severity | Effort | Status |
 |---|---|---|---|---|
-| #4 | 4 remaining controllers (StockAdjustment, SupplierBill, SupplierReturn — plus any other with same shape) — adopt same `afterCommit` hook pattern from PR #25/#26 | MEDIUM | ~1h per controller (~4h total) | PARTIALLY DONE — AP+AR (PR #25) + CI+GR (PR #26) shipped, 4 of 8 closed |
+| #4 | Sweep follow-up — any further controller with same `isNewlyConfirmed/Approved/Sent + postJournal` shape NOT yet covered by Oracle's original list | MEDIUM | ~1h each if found | MOSTLY DONE — 7 of 8 controllers closed via PRs #25, #26, #27. Only sweep verification remains. |
 | #6 | `CurrencyGuard` adopted only in `AgingDashboard` — missing on aging/outstanding reports + FinancialReportService + BudgetVarianceService | MEDIUM | ~3h | DEFERRED |
 | #7 | `IndexApAgingReportAction` reinlines aging CASE; can adopt trait helper | LOW | ~20m | DEFERRED |
 | #8 | `ApprovalFlowController::store/update` duplicates step-create payload | LOW | ~30m | DEFERRED |
@@ -78,14 +80,15 @@ Oracle re-audit found PR #20/#21 left work incomplete. 2 PRs closed those gaps. 
 
 ### Current State
 
-- Branch: `main` at HEAD `a0aaca72` (working tree: only `task.md` for handoff)
-- 4 PRs from this session ALL MERGED, branches deleted on remote.
-- CI on main: PR #26 run `27606220399` SUCCESS (Quality + Playwright + Test suite all green).
+- Branch: `main` at HEAD `3e68adcc` (working tree: only `task.md` for handoff)
+- 5 PRs from this session ALL MERGED, branches deleted on remote.
+- CI on main: PR #27 run `27611711830` SUCCESS (Quality + Playwright + Test suite all green).
 - Pest local (this session):
   - PR #22 → `bank-reconciliations` group: **50 passed**, 152 assertions
-  - PR #23 → `ap-aging-report` 5 + `ar-aging-report` 5 + `ap-outstanding-report` 6 + `ar-outstanding-report` 7 + `financial-dashboard` 9 = **32 passed**
-  - PR #25 → `ap-payments` 13 + `ar-receipts` 9 + `ap-journal-posting` 13 + `ar-journal-posting` 13 + `purchase-orders` smoke 18 = **66 passed**
-  - PR #26 → `customer-invoices` 9 + `goods-receipts` 24 + `ar-journal-posting` 13 + `gr-sr-journal-posting` 8 = **54 passed**
+  - PR #23 → 5 report groups: **32 passed**
+  - PR #25 → AP+AR + journal-posting + smoke: **66 passed**
+  - PR #26 → CI+GR + journal-posting: **54 passed**
+  - PR #27 → SA 42 + SB 10 + SR 21 + journal-posting smoke 28 = **101 passed**
 - Quality gates all PRs: phpstan clean, duster clean.
 - Module registry: 80 entries.
 - Permission seeded: admin emp has `view_all_branches`.
@@ -103,16 +106,16 @@ Oracle re-audit found PR #20/#21 left work incomplete. 2 PRs closed those gaps. 
 
 | Commit | Subject |
 |---|---|
-| `a0aaca72` (HEAD) | fix(customer-invoices,goods-receipts): close postJournal race via afterCommit hook (#26) |
+| `3e68adcc` (HEAD) | fix(stock-adjustments,supplier-bills,supplier-returns): close postJournal race via afterCommit hook (#27) |
+| `fe7f2785` | docs(handoff): record PR #26 merge (Finding #4 wave 2 — CI+GR) |
+| `a0aaca72` | fix(customer-invoices,goods-receipts): close postJournal race via afterCommit hook (#26) |
 | `82d900d7` | docs(handoff): record PR #25 merge (Finding #4 AP+AR wave) |
 | `460072f4` | fix(ap-ar-payments): close postJournal race via afterCommit hook in StoresItemsInTransaction (#25) |
 | `85d4da80` | docs(handoff): record PR #22 + #23 merge + CI green on main |
 | `2fe1b5f2` | fix(bank-reconciliations): close mutation races + add action unit tests (#22) |
 | `ff426b1e` | fix(reports): port DATEDIFF + MONTH SQL to cross-DB Carbon/EXTRACT (#23) |
-| `b06aec05` | docs(handoff): finalize session handoff with post-merge state |
 | `8c076305` | Merge pull request #19 — Finding #4 (initial trait extraction) |
 | `07d37688` | Merge pull request #20 — Finding #1 (initial aging port) |
-| `87ddea11` | Merge pull request #21 — Finding #3 (initial BR thinning) |
 
 ## Branch Isolation — Scoping Policy (still active from earlier work)
 
@@ -164,11 +167,12 @@ gh pr view <num> --json statusCheckRollup
 ## Continuation Prompt for New Session
 
 ```text
-Read task.md first. Repo on `main` at HEAD `a0aaca72`, working tree clean.
-4 PRs from previous session ALL MERGED, CI on main green.
+Read task.md first. Repo on `main` at HEAD `3e68adcc`, working tree clean.
+5 PRs from previous session ALL MERGED, CI on main green.
+Finding #4: 7 of 8 originally-flagged controllers closed.
 
 Quick verify:
-  git rev-parse HEAD          # expect a0aaca72 or fresher
+  git rev-parse HEAD          # expect 3e68adcc or fresher
   git status --short          # expect empty
   gh run list --branch main --limit 3   # verify latest is green
   gh pr list --base main --state open   # expect empty unless new work started
@@ -177,17 +181,11 @@ If dev DB seems empty: `sail artisan db:seed`. Schema is intact.
 
 NEXT ACTION needs USER DIRECTION (do NOT auto-pick):
 
-1. Finding #4 — 4 remaining controllers (MEDIUM, ~1h each)
-   Apply same afterCommit hook pattern from PR #25/#26 to:
-   - StockAdjustmentController::update
-   - SupplierBillController::update
-   - SupplierReturnController::update
-   - Any other controller with same isNewlyConfirmed + postJournal shape
-   Pattern: pass `afterCommit: $isNewlyConfirmed ? fn => $postJournal->execute(...) : null`
-   to `updateWithSyncedItems`. Trait already supports it. Add rollback regression test.
-   For tests: use container extending pattern (extends OriginalAction) with proper
-   ctor injection — avoid anonymous class without inheritance (type-hint mismatch).
-   See `tests/Feature/GoodsReceipts/GoodsReceiptControllerTest.php:237` for template.
+1. Finding #4 sweep verification (LOW, ~30m)
+   Grep for any remaining controller calling postJournal->execute() OUTSIDE
+   updateWithSyncedItems / DB::transaction. If found, apply the
+   afterCommit hook pattern. Likely empty — sweep is just due diligence.
+   Pattern reference: PRs #25, #26, #27.
 
 2. Polish wave — Findings #6 #7 #8 #10:
    #6 CurrencyGuard coverage on remaining money-aggregation surfaces (~3h)
