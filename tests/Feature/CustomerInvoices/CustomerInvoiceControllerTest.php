@@ -1,11 +1,15 @@
 <?php
 
+use App\Actions\AccountingPosting\PostCustomerInvoiceJournalAction;
+use App\Actions\AccountingPosting\ResolveControlAccountAction;
+use App\Actions\JournalEntries\CreateJournalEntryAction;
 use App\Models\Account;
 use App\Models\Branch;
 use App\Models\CoaVersion;
 use App\Models\Customer;
 use App\Models\CustomerInvoice;
 use App\Models\FiscalYear;
+use App\Models\JournalEntry;
 use App\Models\Product;
 use App\Models\Unit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -204,6 +208,32 @@ test('update modifies customer invoice and sets sent_by when status changes to s
 
     $invoice->refresh();
     expect($invoice->sent_by)->not->toBeNull();
+});
+
+test('marking customer invoice sent rolls back state when journal posting fails', function () {
+    $invoice = CustomerInvoice::factory()->create([
+        'status' => 'draft',
+        'sent_at' => null,
+        'sent_by' => null,
+    ]);
+
+    $this->app->bind(PostCustomerInvoiceJournalAction::class, function ($app) {
+        return new class($app->make(CreateJournalEntryAction::class), $app->make(ResolveControlAccountAction::class)) extends PostCustomerInvoiceJournalAction
+        {
+            public function execute(CustomerInvoice $invoice): ?JournalEntry
+            {
+                throw new RuntimeException('Simulated journal posting failure');
+            }
+        };
+    });
+
+    putJson('/api/customer-invoices/' . $invoice->id, ['status' => 'sent'])
+        ->assertStatus(500);
+
+    $invoice->refresh();
+    expect($invoice->status)->toBe('draft');
+    expect($invoice->sent_at)->toBeNull();
+    expect($invoice->sent_by)->toBeNull();
 });
 
 test('destroy removes customer invoice', function () {

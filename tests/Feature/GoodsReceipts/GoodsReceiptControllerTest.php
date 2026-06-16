@@ -1,12 +1,17 @@
 <?php
 
+use App\Actions\AccountingPosting\PostGoodsReceiptJournalAction;
+use App\Actions\AccountingPosting\ResolveControlAccountAction;
+use App\Actions\JournalEntries\CreateJournalEntryAction;
 use App\Models\Employee;
 use App\Models\GoodsReceipt;
+use App\Models\JournalEntry;
 use App\Models\Product;
 use App\Models\PurchaseOrder;
 use App\Models\Unit;
 use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -222,6 +227,60 @@ test('update keeps current goods receipt number unique', function () {
     ])
         ->assertOk()
         ->assertJsonPath('data.gr_number', 'GR-KEEP-001');
+});
+
+test('confirming goods receipt rolls back state when journal posting fails with non-validation error', function () {
+    $goodsReceipt = GoodsReceipt::factory()->create([
+        'status' => 'draft',
+        'confirmed_at' => null,
+        'confirmed_by' => null,
+    ]);
+
+    $this->app->bind(PostGoodsReceiptJournalAction::class, function ($app) {
+        return new class($app->make(CreateJournalEntryAction::class), $app->make(ResolveControlAccountAction::class)) extends PostGoodsReceiptJournalAction
+        {
+            public function execute(GoodsReceipt $goodsReceipt): ?JournalEntry
+            {
+                throw new RuntimeException('Simulated journal posting failure');
+            }
+        };
+    });
+
+    putJson('/api/goods-receipts/' . $goodsReceipt->id, ['status' => 'confirmed'])
+        ->assertStatus(500);
+
+    $goodsReceipt->refresh();
+    expect($goodsReceipt->status)->toBe('draft');
+    expect($goodsReceipt->confirmed_at)->toBeNull();
+    expect($goodsReceipt->confirmed_by)->toBeNull();
+});
+
+test('confirming goods receipt swallows validation errors and keeps state confirmed', function () {
+    $goodsReceipt = GoodsReceipt::factory()->create([
+        'status' => 'draft',
+        'confirmed_at' => null,
+        'confirmed_by' => null,
+    ]);
+
+    $this->app->bind(PostGoodsReceiptJournalAction::class, function ($app) {
+        return new class($app->make(CreateJournalEntryAction::class), $app->make(ResolveControlAccountAction::class)) extends PostGoodsReceiptJournalAction
+        {
+            public function execute(GoodsReceipt $goodsReceipt): ?JournalEntry
+            {
+                throw ValidationException::withMessages([
+                    'coa' => 'Missing COA mapping for journal posting',
+                ]);
+            }
+        };
+    });
+
+    putJson('/api/goods-receipts/' . $goodsReceipt->id, ['status' => 'confirmed'])
+        ->assertOk()
+        ->assertJsonPath('data.status', 'confirmed');
+
+    $goodsReceipt->refresh();
+    expect($goodsReceipt->status)->toBe('confirmed');
+    expect($goodsReceipt->confirmed_at)->not->toBeNull();
 });
 
 test('destroy removes goods receipt', function () {
