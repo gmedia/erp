@@ -100,18 +100,23 @@ class StockAdjustmentController extends Controller
             syncItems: function (StockAdjustment $stockAdjustment, array $items) use ($syncItems): void {
                 $syncItems->execute($stockAdjustment, $items);
             },
+            afterCommit: $isNewlyApproved
+                ? function (StockAdjustment $stockAdjustment) use ($postJournal): void {
+                    try {
+                        $postJournal->execute($stockAdjustment->refresh());
+                    } catch (ValidationException $e) {
+                        // Validation failures (e.g. missing COA mapping) are intentionally
+                        // swallowed so the stock adjustment itself stays approved; user can
+                        // post the journal later. Non-validation errors propagate and
+                        // roll back the entire transaction (status flip included).
+                        Log::warning('Stock adjustment journal posting skipped', [
+                            'stock_adjustment_id' => $stockAdjustment->id,
+                            'reason' => $e->getMessage(),
+                        ]);
+                    }
+                }
+            : null,
         );
-
-        if ($isNewlyApproved) {
-            try {
-                $postJournal->execute($stockAdjustment->refresh());
-            } catch (ValidationException $e) {
-                Log::warning('Stock adjustment journal posting skipped', [
-                    'stock_adjustment_id' => $stockAdjustment->id,
-                    'reason' => $e->getMessage(),
-                ]);
-            }
-        }
 
         $stockAdjustment->load(['warehouse', 'inventoryStocktake', 'journalEntry', 'items.product', 'items.unit']);
 

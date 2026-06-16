@@ -1,9 +1,13 @@
 <?php
 
+use App\Actions\AccountingPosting\PostSupplierBillJournalAction;
+use App\Actions\AccountingPosting\ResolveControlAccountAction;
+use App\Actions\JournalEntries\CreateJournalEntryAction;
 use App\Models\Account;
 use App\Models\Branch;
 use App\Models\CoaVersion;
 use App\Models\FiscalYear;
+use App\Models\JournalEntry;
 use App\Models\Product;
 use App\Models\Supplier;
 use App\Models\SupplierBill;
@@ -234,4 +238,30 @@ test('store rejects unsupported currency', function () {
     postJson('/api/supplier-bills', $payload)
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['currency']);
+});
+
+test('confirming supplier bill rolls back state when journal posting fails', function () {
+    $supplierBill = SupplierBill::factory()->create([
+        'status' => 'draft',
+        'confirmed_at' => null,
+        'confirmed_by' => null,
+    ]);
+
+    $this->app->bind(PostSupplierBillJournalAction::class, function ($app) {
+        return new class($app->make(CreateJournalEntryAction::class), $app->make(ResolveControlAccountAction::class)) extends PostSupplierBillJournalAction
+        {
+            public function execute(SupplierBill $supplierBill): ?JournalEntry
+            {
+                throw new RuntimeException('Simulated journal posting failure');
+            }
+        };
+    });
+
+    putJson('/api/supplier-bills/' . $supplierBill->id, ['status' => 'confirmed'])
+        ->assertStatus(500);
+
+    $supplierBill->refresh();
+    expect($supplierBill->status)->toBe('draft');
+    expect($supplierBill->confirmed_at)->toBeNull();
+    expect($supplierBill->confirmed_by)->toBeNull();
 });
