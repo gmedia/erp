@@ -12,11 +12,11 @@ Last updated: 2026-06-17 (Oracle design for financial-dashboard branch scoping r
 
 User is switching to a new 0pencode session. Read this section first.
 
-1. **Verify baseline**: `git status --short` → expect only `task.md` (or empty). `git log --oneline -1` on main → expect `a97a4b67` (or fresher).
+1. **Verify baseline**: `git status --short` → expect empty (or only `task.md`). `git log --oneline -1` on main → expect `e3ad1029` (or fresher). No open PRs. Latest main CI green (`27679994418`).
 2. **ALL Oracle audit findings CLOSED.** Latest 2 PRs:
    - **PR #32** (squash `a97a4b67`) — Finding #6: CurrencyGuard on 4 AP/AR aging+outstanding report actions (last original finding)
    - **PR #31** (squash `f6bbcf82`) — Audit-refresh Findings #1-#3: BankReconciliation removeItem recalc + match/remove thinned + addItem refreshed parent
-   - **Post-audit:** Oracle design recorded for financial-dashboard branch scoping — impl DEFERRED, blocked on an accounting-policy decision. See the "Financial dashboard branch scoping — Oracle design + the blocker" section. No code written.
+   - **Post-audit (no code):** Oracle design recorded for financial-dashboard branch scoping — impl DEFERRED, blocked on an accounting-policy decision. See the "Financial dashboard branch scoping — Oracle design + the blocker" section.
 3. **Earlier this session — 8 more Oracle audit PRs MERGED:**
    - **PR #30** (squash `aa9e4b12`) — Finding #10: MyApprovalController thin
    - **PR #29** (squash `3e67b479`) — Findings #7, #8: aging trait dedupe + approval flow step extract
@@ -26,16 +26,16 @@ User is switching to a new 0pencode session. Read this section first.
    - **PR #25** (squash `460072f4`) — Finding #4 wave 1: AP+AR `afterCommit` hook
    - **PR #23** (squash `ff426b1e`) — Findings #1, #2 (original): DATEDIFF + MONTH cross-DB
    - **PR #22** (squash `2fe1b5f2`) — Findings #3, #5, #9 (original): BR race close + unit tests
-3. **Previous session 3 PRs merged (still relevant):**
+4. **Previous session 3 PRs merged (still relevant):**
    - PR #21 (`87ddea11`) — Finding #3: BR thinning + DB::transaction race fix
    - PR #20 (`07d37688`) — Finding #1: AR/AP aging Carbon port + M3 timezone
    - PR #19 (`8c076305`) — Finding #4: `resolveBranchFromRequest` trait extraction
-4. **Earlier session work** (still relevant):
+5. **Earlier session work** (still relevant):
    - H3 multi-currency Wave 0+1 SHIPPED (#16, #17)
    - H3 polish quick wins SHIPPED (#18)
    - Branch tenant isolation SHIPPED (`5f2cb816`)
    - Budget Management module SHIPPED (`f0c8e3c0`)
-5. **If user says "lanjutkan" without direction**: ASK which path. Do NOT pick autonomously.
+6. **If user says "lanjutkan" without direction**: ASK which path. Do NOT pick autonomously.
 
 ### Dev environment state (verified end of last session)
 
@@ -121,14 +121,13 @@ Resolution requires a deliberate accounting-policy choice (whoever owns accounti
 
 ### Current State
 
-- Branch: `main` at HEAD `a97a4b67` (working tree: only `task.md` for handoff)
-- 11 PRs shipped this session ALL MERGED, branches deleted on remote.
-- CI on main: PR #32 run `27675727800` SUCCESS (Quality + Playwright + Test suite all green).
-- Latest local test: `ap-aging-report` 6 + `ar-aging-report` 6 + `ap-outstanding-report` 6 + `ar-outstanding-report` 7 + `aging-dashboard` 15 (PR #32, 2 new regression).
+- Branch: `main` at HEAD `e3ad1029` (working tree clean; will be `e3ad1029` or fresher after this handoff commit)
+- 12 PRs shipped this session ALL MERGED, branches deleted on remote (#22, #23, #25-#32). Orphan PR #24 closed.
+- CI on main: latest run `27679994418` SUCCESS (Quality + Playwright + Test suite all green).
+- Post-audit: Oracle design consultation for financial-dashboard branch scoping recorded (no code) — see design+blocker section above.
 - Quality gates all PRs: phpstan clean, duster clean.
 - Module registry: 80 entries.
 - Permission seeded: admin emp has `view_all_branches`.
-- Orphan PR #24 (duplicate of merged PR #23) closed + branch deleted.
 
 ### Audit status — ALL FINDINGS CLOSED
 
@@ -147,8 +146,9 @@ All 10 original Oracle audit findings (#1-#10) + 3 audit-refresh findings closed
 
 | Commit | Subject |
 |---|---|
-| `a97a4b67` (HEAD) | fix(reports): enforce single-currency guard on AP/AR aging + outstanding (Oracle Finding #6) (#32) |
-| `e77bd336` | docs(handoff): record PR #31 merge (audit-refresh Findings #1-#3) |
+| `e3ad1029` (HEAD) | docs(handoff): record Oracle design + accounting-policy blocker for financial-dashboard branch scoping |
+| `90931c1e` | docs(handoff): record PR #32 merge — Finding #6 closed, audit backlog drained |
+| `a97a4b67` | fix(reports): enforce single-currency guard on AP/AR aging + outstanding (Oracle Finding #6) (#32) |
 | `f6bbcf82` | fix(bank-reconciliations): recalc on removeItem + thin match/remove to actions (#31) |
 | `aa9e4b12` | refactor(my-approvals): thin controller via action extract (Oracle Finding #10) (#30) |
 | `3e67b479` | refactor(aging-reports,approval-flows): polish dedupe per Oracle Findings #7 + #8 (#29) |
@@ -156,7 +156,6 @@ All 10 original Oracle audit findings (#1-#10) + 3 audit-refresh findings closed
 | `3e68adcc` | fix(stock-adjustments,supplier-bills,supplier-returns): close postJournal race via afterCommit hook (#27) |
 | `a0aaca72` | fix(customer-invoices,goods-receipts): close postJournal race via afterCommit hook (#26) |
 | `460072f4` | fix(ap-ar-payments): close postJournal race via afterCommit hook in StoresItemsInTransaction (#25) |
-| `2fe1b5f2` | fix(bank-reconciliations): close mutation races + add action unit tests (#22) |
 
 ## Branch Isolation — Scoping Policy (still active from earlier work)
 
@@ -208,12 +207,14 @@ gh pr view <num> --json statusCheckRollup
 ## Continuation Prompt for New Session
 
 ```text
-Read task.md first. Repo on `main` at HEAD `a97a4b67`, working tree clean.
-11 PRs shipped this session ALL MERGED, CI on main green.
+Read task.md first. Repo on `main` at HEAD `e3ad1029`, working tree clean.
+12 PRs shipped this session ALL MERGED, CI on main green.
 ALL Oracle audit findings (#1-#10 + 3 refresh findings) CLOSED.
+Post-audit: financial-dashboard branch scoping has an Oracle design recorded
+but is BLOCKED on an accounting-policy decision (no code written).
 
 Quick verify:
-  git rev-parse HEAD          # expect a97a4b67 or fresher
+  git rev-parse HEAD          # expect e3ad1029 or fresher
   git status --short          # expect empty
   gh run list --branch main --limit 3   # verify latest is green
   gh pr list --base main --state open   # expect empty unless new work started
