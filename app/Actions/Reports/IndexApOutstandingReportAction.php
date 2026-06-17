@@ -13,6 +13,8 @@ class IndexApOutstandingReportAction
 
     public function execute(FormRequest $request): LengthAwarePaginator|Collection
     {
+        $this->guardSupplierBillCurrency($request, 'AP Outstanding Report');
+
         // days_overdue computed in PHP via Carbon (cross-DB). See ApOutstandingReportResource.
         $query = $this->buildBaseSupplierBillQuery();
 

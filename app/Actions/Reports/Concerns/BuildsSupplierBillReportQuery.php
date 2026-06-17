@@ -2,12 +2,14 @@
 
 namespace App\Actions\Reports\Concerns;
 
+use App\Actions\Concerns\AssertsSingleCurrency;
 use App\Models\SupplierBill;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Http\FormRequest;
 
 trait BuildsSupplierBillReportQuery
 {
+    use AssertsSingleCurrency;
     use HandlesReportQuery;
 
     /**
@@ -63,6 +65,28 @@ trait BuildsSupplierBillReportQuery
         $this->applyIntegerFilter($request, $query, 'branch_id', 'sb.branch_id');
         $this->applyStringFilter($request, $query, 'status', 'sb.status');
         $this->applySearchFilter($request, $query, ['sb.bill_number', 's.name', 'b.name']);
+    }
+
+    protected function guardSupplierBillCurrency(FormRequest $request, string $context): void
+    {
+        $query = SupplierBill::query()
+            ->getQuery()
+            ->from('supplier_bills')
+            ->whereIn('status', ['confirmed', 'partially_paid', 'overdue']);
+
+        if (($supplierId = $request->integer('supplier_id')) > 0) {
+            $query->where('supplier_id', $supplierId);
+        }
+
+        if (($branchId = $request->integer('branch_id')) > 0) {
+            $query->where('branch_id', $branchId);
+        }
+
+        if (($status = $request->string('status')->toString()) !== '') {
+            $query->where('status', $status);
+        }
+
+        $this->assertSingleCurrency($query, $context);
     }
 
     /**

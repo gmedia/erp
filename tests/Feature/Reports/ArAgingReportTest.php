@@ -127,3 +127,20 @@ test('it can export ar aging report', function () {
     Excel::assertStored('exports/' . $filename, 'public');
     Carbon::setTestNow();
 });
+
+test('it rejects mixed currencies in the aggregated scope', function () {
+    Sanctum::actingAs($this->user, ['*']);
+
+    CustomerInvoice::factory()->create([
+        'currency' => 'IDR',
+        'due_date' => Carbon::now()->addDays(10)->format('Y-m-d'),
+    ]);
+    CustomerInvoice::factory()->create([
+        'currency' => 'USD',
+        'due_date' => Carbon::now()->subDays(35)->format('Y-m-d'),
+    ]);
+
+    getJson('/api/reports/ar-aging')
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('currency');
+});

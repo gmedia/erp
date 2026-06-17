@@ -113,3 +113,18 @@ test('it can export ap aging report', function () {
     expect($filename)->toContain('ap_aging_report_');
     Excel::assertStored('exports/' . $filename, 'public');
 });
+
+test('it rejects mixed currencies in the aggregated scope', function () {
+    SupplierBill::factory()->confirmed()->create([
+        'currency' => 'IDR',
+        'due_date' => Carbon::now()->addDays(10)->format('Y-m-d'),
+    ]);
+    SupplierBill::factory()->confirmed()->create([
+        'currency' => 'USD',
+        'due_date' => Carbon::now()->subDays(35)->format('Y-m-d'),
+    ]);
+
+    getJson('/api/reports/ap-aging')
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('currency');
+});

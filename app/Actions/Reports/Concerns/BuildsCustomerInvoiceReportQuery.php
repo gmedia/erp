@@ -2,12 +2,15 @@
 
 namespace App\Actions\Reports\Concerns;
 
+use App\Actions\Concerns\AssertsSingleCurrency;
 use App\Models\CustomerInvoice;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Http\FormRequest;
 
 trait BuildsCustomerInvoiceReportQuery
 {
+    use AssertsSingleCurrency;
+
     /**
      * Build base customer invoice report query with common joins and columns.
      *
@@ -69,6 +72,27 @@ trait BuildsCustomerInvoiceReportQuery
         $this->applyStringFilter($request, $query, 'status', 'ci.status');
         $this->applyDateRangeFilter($request, $query, 'ci.invoice_date');
         $this->applySearchFilter($request, $query, $this->getBaseSearchColumns());
+    }
+
+    protected function guardCustomerInvoiceCurrency(FormRequest $request, string $context): void
+    {
+        $query = CustomerInvoice::query()
+            ->getQuery()
+            ->from('customer_invoices');
+
+        if (($customerId = $request->integer('customer_id')) > 0) {
+            $query->where('customer_id', $customerId);
+        }
+
+        if (($branchId = $request->integer('branch_id')) > 0) {
+            $query->where('branch_id', $branchId);
+        }
+
+        if (($status = $request->string('status')->toString()) !== '') {
+            $query->where('status', $status);
+        }
+
+        $this->assertSingleCurrency($query, $context);
     }
 
     /**

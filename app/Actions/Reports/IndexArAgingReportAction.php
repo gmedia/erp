@@ -18,6 +18,8 @@ class IndexArAgingReportAction
 
     public function execute(FormRequest $request): LengthAwarePaginator|Collection
     {
+        $this->guardCustomerInvoiceCurrency($request, 'AR Aging Report');
+
         $query = $this->buildQuery();
 
         $this->applyBaseCustomerInvoiceFilters($request, $query);
