@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ApprovalAuditLog;
+use App\Actions\Approvals\ApproveApprovalRequestAction;
+use App\Actions\Approvals\RejectApprovalRequestAction;
+use App\Http\Requests\MyApprovals\ApproveMyApprovalRequest;
+use App\Http\Requests\MyApprovals\RejectMyApprovalRequest;
 use App\Models\ApprovalRequest;
 use App\Models\ApprovalRequestStep;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class MyApprovalController extends Controller
 {
-    public function index()
+    public function index(): JsonResponse
     {
         $userId = Auth::id();
 
@@ -52,96 +54,36 @@ class MyApprovalController extends Controller
         ]);
     }
 
-    public function approve(Request $request, ApprovalRequest $approvalRequest)
-    {
-        $request->validate(['comments' => 'nullable|string']);
-
+    public function approve(
+        ApproveMyApprovalRequest $request,
+        ApprovalRequest $approvalRequest,
+        ApproveApprovalRequestAction $action,
+    ): JsonResponse {
         $userId = Auth::id();
-
         $currentStep = $this->findCurrentPendingAssignedStep($approvalRequest, $userId);
 
         if (! $currentStep instanceof ApprovalRequestStep) {
             abort(403, 'You are not authorized to act on this approval step.');
         }
 
-        DB::transaction(function () use ($approvalRequest, $userId, $request, $currentStep) {
-            $currentStep->update([
-                'status' => 'approved',
-                'acted_by' => $userId,
-                'action' => 'approve',
-                'comments' => $request->comments,
-                'acted_at' => now(),
-            ]);
-
-            ApprovalAuditLog::create([
-                'approval_request_id' => $approvalRequest->id,
-                'approvable_type' => $approvalRequest->approvable_type,
-                'approvable_id' => $approvalRequest->approvable_id,
-                'event' => 'step_approved',
-                'actor_user_id' => $userId,
-                'step_order' => $currentStep->step_order,
-                'metadata' => json_encode(['comments' => $request->comments]),
-            ]);
-
-            // Check if there are more steps
-            /** @var ApprovalRequestStep|null $nextStep */
-            $nextStep = $approvalRequest->steps()
-                ->where('step_order', '>', $currentStep->step_order)
-                ->orderBy('step_order', 'asc')
-                ->first();
-
-            if ($nextStep) {
-                $approvalRequest->update(['current_step_order' => $nextStep->step_order, 'status' => 'in_progress']);
-            } else {
-                $approvalRequest->update(['status' => 'approved', 'completed_at' => now()]);
-
-                ApprovalAuditLog::create([
-                    'approval_request_id' => $approvalRequest->id,
-                    'approvable_type' => $approvalRequest->approvable_type,
-                    'approvable_id' => $approvalRequest->approvable_id,
-                    'event' => 'completed',
-                    'actor_user_id' => $userId,
-                    'metadata' => json_encode([]),
-                ]);
-            }
-        });
+        $action->execute($approvalRequest, $currentStep, $userId, $request->validated('comments'));
 
         return response()->json(['message' => 'Request approved successfully.']);
     }
 
-    public function reject(Request $request, ApprovalRequest $approvalRequest)
-    {
-        $request->validate(['comments' => 'required|string']);
-
+    public function reject(
+        RejectMyApprovalRequest $request,
+        ApprovalRequest $approvalRequest,
+        RejectApprovalRequestAction $action,
+    ): JsonResponse {
         $userId = Auth::id();
-
         $currentStep = $this->findCurrentPendingAssignedStep($approvalRequest, $userId);
 
         if (! $currentStep instanceof ApprovalRequestStep) {
             abort(403, 'You are not authorized to act on this approval step.');
         }
 
-        DB::transaction(function () use ($approvalRequest, $userId, $request, $currentStep) {
-            $currentStep->update([
-                'status' => 'rejected',
-                'acted_by' => $userId,
-                'action' => 'reject',
-                'comments' => $request->comments,
-                'acted_at' => now(),
-            ]);
-
-            $approvalRequest->update(['status' => 'rejected', 'completed_at' => now()]);
-
-            ApprovalAuditLog::create([
-                'approval_request_id' => $approvalRequest->id,
-                'approvable_type' => $approvalRequest->approvable_type,
-                'approvable_id' => $approvalRequest->approvable_id,
-                'event' => 'step_rejected',
-                'actor_user_id' => $userId,
-                'step_order' => $currentStep->step_order,
-                'metadata' => json_encode(['comments' => $request->comments]),
-            ]);
-        });
+        $action->execute($approvalRequest, $currentStep, $userId, $request->validated('comments'));
 
         return response()->json(['message' => 'Request rejected.']);
     }
