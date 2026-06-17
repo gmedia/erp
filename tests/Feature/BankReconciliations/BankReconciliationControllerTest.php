@@ -164,6 +164,41 @@ test('it can remove an item from a bank reconciliation', function () {
     assertDatabaseMissing('bank_reconciliation_items', ['id' => $item->id]);
 });
 
+test('removing a reconciled item recalculates the reconciliation difference', function () {
+    $reconciliation = BankReconciliation::factory()->create([
+        'book_balance' => 1000,
+        'statement_balance' => 1500,
+    ]);
+
+    BankReconciliationItem::factory()->create([
+        'bank_reconciliation_id' => $reconciliation->id,
+        'is_reconciled' => true,
+        'debit' => 0,
+        'credit' => 500,
+    ]);
+
+    $reconciliation->recalculateBalances();
+    $reconciliation->refresh();
+    expect((float) $reconciliation->difference)->toBe(0.0);
+
+    $item = BankReconciliationItem::factory()->create([
+        'bank_reconciliation_id' => $reconciliation->id,
+        'is_reconciled' => true,
+        'debit' => 0,
+        'credit' => 200,
+    ]);
+
+    $reconciliation->recalculateBalances();
+    $reconciliation->refresh();
+    expect((float) $reconciliation->difference)->toBe(-200.0);
+
+    deleteJson("/api/bank-reconciliations/{$reconciliation->id}/items/{$item->id}")->assertNoContent();
+
+    $reconciliation->refresh();
+    expect((float) $reconciliation->difference)->toBe(0.0);
+    expect((float) $reconciliation->reconciled_balance)->toBe(1500.0);
+});
+
 // ─── Import Preview ───────────────────────────────────────────────────────────
 
 test('it can preview a bank statement file', function () {
