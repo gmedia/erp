@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-06-15 (Polish wave #7+#8 MERGED — PR #29 aging trait + approval flow dedupe) UTC
+Last updated: 2026-06-15 (Finding #10 MERGED — PR #30 MyApproval thin via action extract) UTC
 
 ## Document Roles
 
@@ -12,8 +12,9 @@ Last updated: 2026-06-15 (Polish wave #7+#8 MERGED — PR #29 aging trait + appr
 
 User is switching to a new 0pencode session. Read this section first.
 
-1. **Verify baseline**: `git status --short` → expect only `task.md` (or empty). `git log --oneline -1` on main → expect `3e67b479` (or fresher).
-2. **7 Oracle audit PRs MERGED this session, CI on main green:**
+1. **Verify baseline**: `git status --short` → expect only `task.md` (or empty). `git log --oneline -1` on main → expect `aa9e4b12` (or fresher).
+2. **8 Oracle audit PRs MERGED this session, CI on main green:**
+   - **PR #30** (squash `aa9e4b12`) — Finding #10: MyApprovalController thin via Approve/Reject action extracts
    - **PR #29** (squash `3e67b479`) — Findings #7, #8: aging trait dedupe + approval flow step extract
    - **PR #28** (squash `73ea60ca`) — Finding #4 sweep: CompleteBankReconciliationAction race close
    - **PR #27** (squash `3e68adcc`) — Finding #4 wave 3: StockAdjustment + SupplierBill + SupplierReturn
@@ -44,10 +45,11 @@ If dev DB seems empty after pulling: `sail artisan db:seed`. Schema is intact.
 
 ### Status — Oracle audit refresh + polish wave (this session, ALL MERGED)
 
-Oracle re-audit found PR #20/#21 left work incomplete. 2 PRs closed those gaps. Then 4 PRs shipped Finding #4 across 3 waves + 1 sweep (all 8 originally-flagged controllers + 1 sweep-discovered action closed). Then a polish wave PR addressed 2 LOW dedupe findings:
+Oracle re-audit found PR #20/#21 left work incomplete. 2 PRs closed those gaps. Then 4 PRs shipped Finding #4 across 3 waves + 1 sweep (all 8 originally-flagged controllers + 1 sweep-discovered action closed). Then 2 polish wave PRs addressed 3 LOW findings:
 
 | Finding | Severity | PR | Squash | What it does |
 |---|---|---|---|---|
+| #10 | LOW | **#30** | `aa9e4b12` | MyApprovalController thinning: extract ApproveApprovalRequestAction + RejectApprovalRequestAction + 2 FormRequests. Controller 165→105 lines. 5 new unit tests (atomicity + happy/edge paths). |
 | #7, #8 | LOW | **#29** | `3e67b479` | Polish dedupe: AgingReportBoundaries trait gains `agingBucketSelectSqlWithAliases()` so AP can share the bucket SQL without breaking its `current_amount`/`days_*_*` API contract. ApprovalFlowController extracts `createStep()` private method. ~27 lines saved across 3 files. |
 | #4 (sweep) | MEDIUM | **#28** | `73ea60ca` | Sweep follow-up: `CompleteBankReconciliationAction` wrapped in `DB::transaction`. Best-effort Throwable swallow preserved INSIDE the wrap. 1 regression test. |
 | #4 (SA+SB+SR) | MEDIUM | **#27** | `3e68adcc` | Wave 3: StockAdjustment, SupplierBill, SupplierReturn. SA + SR preserve ValidationException swallow semantic INSIDE the hook. 5 regression tests. |
@@ -71,6 +73,7 @@ Oracle re-audit found PR #20/#21 left work incomplete. 2 PRs closed those gaps. 
 | #4 | Sweep verified — no further race sites found via grep `postJournal->execute` across `app/` (7 controllers + 1 action covered in PRs #25-#28) | — | — | DONE |
 | #7 | IndexApAgingReportAction adopt trait helper | LOW | DONE | Closed in PR #29 |
 | #8 | ApprovalFlowController step-create dedupe | LOW | DONE | Closed in PR #29 |
+| #10 | MyApprovalController thin to actions | LOW | DONE | Closed in PR #30 |
 | #6 | `CurrencyGuard` adopted only in `AgingDashboard` — missing on aging/outstanding reports + FinancialReportService + BudgetVarianceService | MEDIUM | ~3h | DEFERRED |
 | #7 | `IndexApAgingReportAction` reinlines aging CASE; can adopt trait helper | LOW | ~20m | DEFERRED |
 | #8 | `ApprovalFlowController::store/update` duplicates step-create payload | LOW | ~30m | DEFERRED |
@@ -86,17 +89,18 @@ Oracle re-audit found PR #20/#21 left work incomplete. 2 PRs closed those gaps. 
 
 ### Current State
 
-- Branch: `main` at HEAD `3e67b479` (working tree: only `task.md` for handoff)
-- 7 PRs from this session ALL MERGED, branches deleted on remote.
-- CI on main: PR #29 run `27656060310` SUCCESS (Quality + Playwright + Test suite all green).
+- Branch: `main` at HEAD `aa9e4b12` (working tree: only `task.md` for handoff)
+- 8 PRs from this session ALL MERGED, branches deleted on remote.
+- CI on main: PR #30 run `27660797343` SUCCESS (Quality + Playwright + Test suite all green).
 - Pest local (this session):
-  - PR #22 → `bank-reconciliations`: **50 passed**
+  - PR #22 → bank-reconciliations: **50 passed**
   - PR #23 → 5 report groups: **32 passed**
   - PR #25 → AP+AR + journal-posting + smoke: **66 passed**
   - PR #26 → CI+GR + journal-posting: **54 passed**
   - PR #27 → SA+SB+SR + journal-posting: **101 passed**
   - PR #28 → bank-reconciliations post-fix: **51 passed**
   - PR #29 → ap-aging 5 + ar-aging 5 + approval-flows 46 = **56 passed**
+  - PR #30 → my-approvals 12 + approval-flows 46 + approval-audit-trail 12 + approval-monitoring 3 = **73 passed**
 - Quality gates all PRs: phpstan clean, duster clean.
 - Module registry: 80 entries.
 - Permission seeded: admin emp has `view_all_branches`.
@@ -114,10 +118,10 @@ Oracle re-audit found PR #20/#21 left work incomplete. 2 PRs closed those gaps. 
 
 | Commit | Subject |
 |---|---|
-| `3e67b479` (HEAD) | refactor(aging-reports,approval-flows): polish dedupe per Oracle Findings #7 + #8 (#29) |
-| `90c6c777` | docs(handoff): record PR #28 merge (Finding #4 fully closed via sweep) |
+| `aa9e4b12` (HEAD) | refactor(my-approvals): thin controller via action extract (Oracle Finding #10) (#30) |
+| `62b57122` | docs(handoff): record PR #29 merge (Findings #7 + #8 polish dedupe) |
+| `3e67b479` | refactor(aging-reports,approval-flows): polish dedupe per Oracle Findings #7 + #8 (#29) |
 | `73ea60ca` | fix(bank-reconciliations): close postJournal race on complete via DB::transaction wrap (#28) |
-| `60e59193` | docs(handoff): record PR #27 merge (Finding #4 wave 3 — SA+SB+SR) |
 | `3e68adcc` | fix(stock-adjustments,supplier-bills,supplier-returns): close postJournal race via afterCommit hook (#27) |
 | `a0aaca72` | fix(customer-invoices,goods-receipts): close postJournal race via afterCommit hook (#26) |
 | `460072f4` | fix(ap-ar-payments): close postJournal race via afterCommit hook in StoresItemsInTransaction (#25) |
@@ -174,12 +178,13 @@ gh pr view <num> --json statusCheckRollup
 ## Continuation Prompt for New Session
 
 ```text
-Read task.md first. Repo on `main` at HEAD `3e67b479`, working tree clean.
-7 PRs from previous session ALL MERGED, CI on main green.
-Finding #4 FULLY CLOSED. Findings #7 + #8 closed via PR #29.
+Read task.md first. Repo on `main` at HEAD `aa9e4b12`, working tree clean.
+8 PRs from previous session ALL MERGED, CI on main green.
+Findings #1, #2, #3, #4 (FULL), #5, #7, #8, #9, #10 all closed.
+Only Oracle Finding #6 (CurrencyGuard coverage) remains.
 
 Quick verify:
-  git rev-parse HEAD          # expect 3e67b479 or fresher
+  git rev-parse HEAD          # expect aa9e4b12 or fresher
   git status --short          # expect empty
   gh run list --branch main --limit 3   # verify latest is green
   gh pr list --base main --state open   # expect empty unless new work started
@@ -188,12 +193,19 @@ If dev DB seems empty: `sail artisan db:seed`. Schema is intact.
 
 NEXT ACTION needs USER DIRECTION (do NOT auto-pick):
 
-1. Remaining polish — Findings #6, #10:
-   #6 CurrencyGuard coverage on remaining money-aggregation surfaces (~3h)
-   #10 MyApprovalController thin to actions (~1.5h)
+1. Finding #6 — CurrencyGuard coverage (MEDIUM, ~3h)
+   Apply AssertsSingleCurrency trait to money-aggregation surfaces:
+   - IndexApAgingReportAction
+   - IndexArAgingReportAction
+   - IndexApOutstandingReportAction
+   - IndexArOutstandingReportAction
+   - FinancialReportService (income statement, balance sheet, monthly trends, comparative)
+   - BudgetVarianceService
+   Pattern: import trait, derive query, call assertSingleCurrency()
+   immediately after building base query. Skip if currency column absent.
 
-2. Refresh Oracle audit (Findings #1, #2, #3, #4, #5, #7, #8, #9 closed.
-   Fresh pass may reveal new surfaces.).
+2. Refresh Oracle audit (only Finding #6 left from original wave —
+   fresh pass likely reveals new surfaces post-refactor).
 
 3. Schema-blocked items still deferred:
    - Financial dashboard branch scoping (HIGH, 3-5d, needs branch_id on
