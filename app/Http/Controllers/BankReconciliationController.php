@@ -13,6 +13,7 @@ use App\Actions\BankReconciliations\ImportBankStatementAction;
 use App\Actions\BankReconciliations\IndexBankReconciliationsAction;
 use App\Actions\BankReconciliations\MatchBankReconciliationItemAction;
 use App\Actions\BankReconciliations\PreviewBankStatementAction;
+use App\Actions\BankReconciliations\RemoveBankReconciliationItemAction;
 use App\Actions\BankReconciliations\StoreBankReconciliationAction;
 use App\Actions\BankReconciliations\UnmatchBankReconciliationItemAction;
 use App\Actions\BankReconciliations\UpdateBankReconciliationAction;
@@ -22,6 +23,7 @@ use App\Http\Requests\BankReconciliations\AssignBankReconciliationItemAccountReq
 use App\Http\Requests\BankReconciliations\ExportBankReconciliationRequest;
 use App\Http\Requests\BankReconciliations\ImportBankStatementRequest;
 use App\Http\Requests\BankReconciliations\IndexBankReconciliationRequest;
+use App\Http\Requests\BankReconciliations\MatchBankReconciliationItemRequest;
 use App\Http\Requests\BankReconciliations\StoreBankReconciliationRequest;
 use App\Http\Requests\BankReconciliations\UpdateBankReconciliationRequest;
 use App\Http\Resources\BankReconciliations\BankReconciliationCollection;
@@ -101,12 +103,18 @@ class BankReconciliationController extends Controller
     ): JsonResponse {
         $item = $action->execute($request, $bankReconciliation);
 
-        return response()->json(['data' => $item], 201);
+        return response()->json([
+            'data' => $item,
+            'reconciliation' => $bankReconciliation->only(['id', 'reconciled_balance', 'difference', 'status']),
+        ], 201);
     }
 
-    public function removeItem(BankReconciliation $bankReconciliation, int $item): JsonResponse
-    {
-        $bankReconciliation->items()->whereKey($item)->delete();
+    public function removeItem(
+        BankReconciliation $bankReconciliation,
+        int $item,
+        RemoveBankReconciliationItemAction $action,
+    ): JsonResponse {
+        $action->execute($bankReconciliation, $item);
 
         return response()->json(null, 204);
     }
@@ -140,24 +148,27 @@ class BankReconciliationController extends Controller
         return response()->json($action->execute($bankReconciliation));
     }
 
-    public function matchItem(Request $request, BankReconciliation $bankReconciliation, int $item): JsonResponse
-    {
-        $validated = $request->validate([
-            'journal_entry_line_id' => ['required', 'integer', 'exists:journal_entry_lines,id'],
-        ]);
-
+    public function matchItem(
+        MatchBankReconciliationItemRequest $request,
+        BankReconciliation $bankReconciliation,
+        int $item,
+        MatchBankReconciliationItemAction $action,
+    ): JsonResponse {
         /** @var BankReconciliationItem $bankItem */
         $bankItem = $bankReconciliation->items()->findOrFail($item);
-        $result = (new MatchBankReconciliationItemAction)->execute($bankItem, $validated['journal_entry_line_id']);
+        $result = $action->execute($bankItem, $request->validated('journal_entry_line_id'));
 
         return response()->json(['data' => $result]);
     }
 
-    public function unmatchItem(BankReconciliation $bankReconciliation, int $item): JsonResponse
-    {
+    public function unmatchItem(
+        BankReconciliation $bankReconciliation,
+        int $item,
+        UnmatchBankReconciliationItemAction $action,
+    ): JsonResponse {
         /** @var BankReconciliationItem $bankItem */
         $bankItem = $bankReconciliation->items()->findOrFail($item);
-        $result = (new UnmatchBankReconciliationItemAction)->execute($bankItem);
+        $result = $action->execute($bankItem);
 
         return response()->json(['data' => $result]);
     }
