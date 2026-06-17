@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-06-17 (Finding #6 MERGED — PR #32 CurrencyGuard on AP/AR reports; ALL audit findings closed) UTC
+Last updated: 2026-06-17 (Oracle design for financial-dashboard branch scoping recorded; impl DEFERRED on accounting-policy blocker) UTC
 
 ## Document Roles
 
@@ -16,6 +16,7 @@ User is switching to a new 0pencode session. Read this section first.
 2. **ALL Oracle audit findings CLOSED.** Latest 2 PRs:
    - **PR #32** (squash `a97a4b67`) — Finding #6: CurrencyGuard on 4 AP/AR aging+outstanding report actions (last original finding)
    - **PR #31** (squash `f6bbcf82`) — Audit-refresh Findings #1-#3: BankReconciliation removeItem recalc + match/remove thinned + addItem refreshed parent
+   - **Post-audit:** Oracle design recorded for financial-dashboard branch scoping — impl DEFERRED, blocked on an accounting-policy decision. See the "Financial dashboard branch scoping — Oracle design + the blocker" section. No code written.
 3. **Earlier this session — 8 more Oracle audit PRs MERGED:**
    - **PR #30** (squash `aa9e4b12`) — Finding #10: MyApprovalController thin
    - **PR #29** (squash `3e67b479`) — Findings #7, #8: aging trait dedupe + approval flow step extract
@@ -88,9 +89,35 @@ First Oracle re-audit found PR #20/#21 left work incomplete. Over the session, 9
 
 | # | Item | Severity | Effort | Notes |
 |---|---|---|---|---|
-| Financial dashboard branch scoping | DEFERRED | 3-5d | HIGH | Needs `branch_id` on `journal_entries` table (schema change). Also requires `currency` col when Wave 2 lands. |
+| Financial dashboard branch scoping | DEFERRED | 4 PRs | HIGH | **Oracle design done (2026-06-17). BLOCKED on an accounting-policy decision — see below.** |
 | Pipeline/Approval dashboard branch scoping | DEFERRED | TBD | MEDIUM | Polymorphic resolution. Finding #4 (PR #19) unblocked the trait helper. |
 | H3 Wave 2 (multi-currency FX subsystem) | DEFERRED | weeks | n/a | Pull only when first non-IDR customer signs. See archived plan in `task.handoff-archive.md`. |
+
+#### Financial dashboard branch scoping — Oracle design + the blocker (2026-06-17)
+
+Consulted Oracle on the `journal_entries.branch_id` design before writing any code. Two explore agents mapped all 11 journal-entry creation sites + the dashboard data flow first. Key outcome: this is **not** a clean 3-5d task — the headline metric (per-branch balance sheet) is **accounting-unsound** without a policy decision, so implementation was deliberately deferred.
+
+**THE BLOCKER (accounting policy, not engineering):**
+A per-branch balance sheet built with `WHERE journal_entries.branch_id = ?` will arithmetically balance (every entry is balanced + header-single-branch) but be **materially misleading**: period-closing entries and depreciation runs are null-branch (company-wide) and drop out of a branch filter → branch P&L accounts appear un-zeroed after close, branch profit is overstated (no depreciation), accumulated depreciation missing from branch BS. "Balanced but wrong."
+
+Resolution requires a deliberate accounting-policy choice (whoever owns accounting policy, NOT the agent):
+- **Option 1 — Head-Office/Corporate branch:** every entry gets a branch; company-wide entries post to "Head Office" (null→head office). No nulls → `Σ branches = consolidated`, per-branch BS is complete. This is a policy decision + its own design, not a column add.
+- **Option 2 — Inter-branch clearing accounts** (Due-to/Due-from). Heavier; only if single source docs span branches.
+- **Option 3 (Oracle-recommended for this iteration) — Segment reporting:** branch is a P&L *dimension* only. Ship branch-filtered **income statement / monthly trends / cash flow** as management views WITH a visible "excludes unallocated/corporate costs" disclosure. **Do NOT ship a per-branch balance sheet.** Defer that until Option 1 is chosen.
+
+**Oracle's approved design (when work resumes), staged as 4 independent PRs:**
+1. **PR1 (schema, <1h, inert):** nullable `branch_id` FK to branches, `restrictOnDelete`, composite index `(fiscal_year_id, status, branch_id)`. Zero behavior change, fully reversible. Min safe increment — unblocks everything.
+2. **PR2 (backfill command, 1-4h):** idempotent artisan command `journals:backfill-branch --dry-run`, chunked, guarded `WHERE branch_id IS NULL`, per-source counts, uses morph map (NOT hardcoded class strings). Derives branch from polymorphic `source_type`/`source_id`. Warehouse-indirect sources (GR/SA/SR) set from `warehouse.branch_id`, leave null where that is null. No-branch sources (bank recon, depreciation, recurring, period closing) stay null by design. NOT inside the migration.
+3. **PR3 (write-path wiring, 1-2d):** add optional `branch_id` to `CreateJournalEntryAction::execute($data)` — **resolved BEFORE the DB::transaction/retry closure** (retry only re-rolls entry_number; branch must be a stable captured scalar). 9 posting actions resolve own branch:
+   - direct `->branch_id`: ApPayment, ArReceipt, CustomerInvoice, SupplierBill
+   - `->warehouse->branch_id` (nullable, null-guard): GoodsReceipt, StockAdjustment
+   - inferred via PO/GR chain: SupplierReturn
+   - explicit null: BankReconciliation, AssetDepreciation + the 2 bypass paths (ExecuteRecurringJournalAction, ClosePeriodAction — assert null in a test)
+   **MANDATORY authz gate:** manual `JournalEntryController::store` must NOT accept a request `branch_id` without `ResolvesBranchScope` gating — a branch employee posting into another branch is a financial-integrity hole.
+   **Reversal/void inheritance:** reversing/void entries MUST copy the original's `branch_id` or branch nets break silently — check the void path.
+4. **PR4 (read path, 1-2d):** dashboard/report branch filter scoped to **P&L / income-statement / trend metrics ONLY**, null-excluded-from-specific-branch / included-in-all-branches (additive segment model — including-null-in-every-branch double-counts on consolidation), with the "unallocated/corporate excluded" disclosure. **Explicitly NOT per-branch balance sheet** (the blocker above). `FinancialDashboardController` adopts `ResolvesBranchScope` (Pattern A like AgingDashboardController); `GetFinancialDashboardDataAction` + `FinancialReportService` gain an optional `?int $branchId` filtering `journal_entries.branch_id` at the header level.
+
+**Out of scope / future:** cost allocation of company-wide overhead across branches (the real fix for "incomplete branch P&L"); routing recurring + period-closing through the choke point for a single creation path.
 
 ### Current State
 
@@ -195,33 +222,33 @@ If dev DB seems empty: `sail artisan db:seed`. Schema is intact.
 
 NEXT ACTION needs USER DIRECTION (do NOT auto-pick):
 
-The Oracle audit backlog is now fully drained. Remaining options are all
-either large/schema-blocked or require fresh user direction:
+The Oracle audit backlog is fully drained. The most-requested deferred item
+(financial dashboard branch scoping) now has an Oracle design recorded but is
+BLOCKED on an accounting-policy decision. Remaining options:
 
-1. Schema-blocked items (DEFERRED — need migrations / business trigger):
-   - Financial dashboard branch scoping (HIGH, 3-5d) — needs branch_id on
-     journal_entries; coordinate with H3 Wave 2 currency col.
-   - Pipeline/Approval polymorphic dashboard scoping (MEDIUM).
-   - H3 Wave 2 multi-currency FX subsystem (weeks) — pull when first
-     non-IDR customer signs.
+1. Financial dashboard branch scoping — DESIGN DONE, POLICY-BLOCKED.
+   See "Financial dashboard branch scoping — Oracle design + the blocker"
+   section above for the full 4-PR plan. Before resuming, an accounting-policy
+   owner must decide how per-branch balance sheets handle null-branch
+   (company-wide) entries:
+     - Option 1: Head-Office branch (every entry branch-attributed)
+     - Option 3 (Oracle-recommended): P&L-segment views only, NO per-branch
+       balance sheet, with "excludes unallocated/corporate" disclosure.
+   PR1 (inert nullable column + index, <1h) is safe to ship anytime and
+   unblocks the rest — but only start it once the policy direction is set,
+   since the read-path (PR4) shape depends on the decision.
 
-2. Fresh Oracle audit pass (diminishing returns — 2 passes already done
-   this cycle; last refresh found only the 3 BankReconciliation issues
-   now closed). Probably not worth it until more feature work lands.
+2. Pipeline/Approval polymorphic dashboard scoping (MEDIUM) — trait helper
+   from PR #19 available; polymorphic resolution still needed.
 
-3. Product feature work (request specs from user).
+3. H3 Wave 2 multi-currency FX subsystem (weeks) — pull when first non-IDR
+   customer signs.
 
-If user says "lanjutkan" without direction, ASK which path — there is no
-obvious next quick win left in the audit backlog.
+4. Fresh Oracle audit pass — diminishing returns (2 passes done this cycle;
+   last found only the 3 BankReconciliation issues now closed). Probably not
+   worth it until more feature work lands.
 
-3. Schema-blocked items still deferred:
-   - Financial dashboard branch scoping (HIGH, 3-5d, needs branch_id on
-     journal_entries; coordinate with H3 Wave 2 currency col)
-   - Pipeline/Approval polymorphic dashboard scoping (MEDIUM)
-   - H3 Wave 2 multi-currency FX subsystem (weeks, await first non-IDR
-     customer)
-
-4. Other product feature work (request from user)
+5. Product feature work (request specs from user).
 
 Depwire/Sonar tools still produce false positives for Laravel auto-discovery
 patterns. Skip unless config improves.
