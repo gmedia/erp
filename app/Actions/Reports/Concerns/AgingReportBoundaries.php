@@ -35,16 +35,35 @@ trait AgingReportBoundaries
     }
 
     /**
-     * Aliases: aging_current, aging_1_30, aging_31_60, aging_61_90, aging_over_90.
+     * Default AR-style aliases: aging_current, aging_1_30, aging_31_60, aging_61_90, aging_over_90.
      * Pair with {@see agingBucketBindings()} when calling selectRaw().
      */
     protected function agingBucketSelectSql(string $tableAlias): string
     {
-        return "CASE WHEN {$tableAlias}.due_date >= ? THEN {$tableAlias}.amount_due ELSE 0 END as aging_current,
-        CASE WHEN {$tableAlias}.due_date BETWEEN ? AND ? THEN {$tableAlias}.amount_due ELSE 0 END as aging_1_30,
-        CASE WHEN {$tableAlias}.due_date BETWEEN ? AND ? THEN {$tableAlias}.amount_due ELSE 0 END as aging_31_60,
-        CASE WHEN {$tableAlias}.due_date BETWEEN ? AND ? THEN {$tableAlias}.amount_due ELSE 0 END as aging_61_90,
-        CASE WHEN {$tableAlias}.due_date < ? THEN {$tableAlias}.amount_due ELSE 0 END as aging_over_90";
+        return $this->agingBucketSelectSqlWithAliases($tableAlias, [
+            'current' => 'aging_current',
+            '1_30' => 'aging_1_30',
+            '31_60' => 'aging_31_60',
+            '61_90' => 'aging_61_90',
+            'over_90' => 'aging_over_90',
+        ]);
+    }
+
+    /**
+     * Renders the aging bucket CASE expressions with caller-provided column aliases
+     * so consumers that need a different output shape (e.g. AP uses
+     * `current_amount`, `days_1_30`, etc.) can share the same SQL logic without
+     * forcing an API contract change. Pair with {@see agingBucketBindings()}.
+     *
+     * @param  array{current: string, '1_30': string, '31_60': string, '61_90': string, over_90: string}  $aliases
+     */
+    protected function agingBucketSelectSqlWithAliases(string $tableAlias, array $aliases): string
+    {
+        return "CASE WHEN {$tableAlias}.due_date >= ? THEN {$tableAlias}.amount_due ELSE 0 END as {$aliases['current']},
+        CASE WHEN {$tableAlias}.due_date BETWEEN ? AND ? THEN {$tableAlias}.amount_due ELSE 0 END as {$aliases['1_30']},
+        CASE WHEN {$tableAlias}.due_date BETWEEN ? AND ? THEN {$tableAlias}.amount_due ELSE 0 END as {$aliases['31_60']},
+        CASE WHEN {$tableAlias}.due_date BETWEEN ? AND ? THEN {$tableAlias}.amount_due ELSE 0 END as {$aliases['61_90']},
+        CASE WHEN {$tableAlias}.due_date < ? THEN {$tableAlias}.amount_due ELSE 0 END as {$aliases['over_90']}";
     }
 
     /**
