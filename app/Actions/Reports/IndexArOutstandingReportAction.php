@@ -16,6 +16,8 @@ class IndexArOutstandingReportAction
 
     public function execute(FormRequest $request): LengthAwarePaginator|Collection
     {
+        $this->guardCustomerInvoiceCurrency($request, 'AR Outstanding Report');
+
         $query = $this->buildQuery();
 
         $this->applyBaseCustomerInvoiceFilters($request, $query);

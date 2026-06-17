@@ -15,6 +15,8 @@ class IndexApAgingReportAction
 
     public function execute(FormRequest $request): LengthAwarePaginator|Collection
     {
+        $this->guardSupplierBillCurrency($request, 'AP Aging Report');
+
         $boundaries = $this->agingBoundaries();
 
         $query = $this->buildBaseSupplierBillQuery(
