@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-06-17 (Oracle design for financial-dashboard branch scoping recorded; impl DEFERRED on accounting-policy blocker) UTC
+Last updated: 2026-06-18 (PR #33 MERGED — financial-dashboard branch scoping PR1: inert journal_entries.branch_id schema. PR2 backfill command in progress) UTC
 
 ## Document Roles
 
@@ -12,8 +12,12 @@ Last updated: 2026-06-17 (Oracle design for financial-dashboard branch scoping r
 
 User is switching to a new 0pencode session. Read this section first.
 
-1. **Verify baseline**: `git status --short` → expect empty (or only `task.md`). `git log --oneline -1` on main → expect `e3ad1029` (or fresher). No open PRs. Latest main CI green (`27679994418`).
-2. **ALL Oracle audit findings CLOSED.** Latest 2 PRs:
+1. **Verify baseline**: `git status --short` → expect empty (or only `task.md`). `git log --oneline -1` on main → expect `dfde121e` (or fresher). Latest main CI green.
+2. **ALL Oracle audit findings CLOSED.** Financial-dashboard branch scoping NOW IN PROGRESS:
+   - **PR #33** (squash `dfde121e`) — branch-scoping **PR1**: inert nullable `journal_entries.branch_id` FK (restrictOnDelete) + composite index `(fiscal_year_id, status, branch_id)` + model wiring (fillable, `branch()` relation, PHPDoc). Zero behavior change, all rows null by design. Unblocks PR2-PR4.
+   - **PR2 (backfill command) IN PROGRESS this session** — idempotent `journals:backfill-branch --dry-run`, morph-map driven, per-source branch resolution. Policy-independent.
+   - **STILL BLOCKED:** PR4 (read path) shape depends on the accounting-policy decision (Option 1 Head-Office branch vs Option 3 P&L-segment-only). PR2 + PR3 do NOT need it.
+   - Latest audit PRs:
    - **PR #32** (squash `a97a4b67`) — Finding #6: CurrencyGuard on 4 AP/AR aging+outstanding report actions (last original finding)
    - **PR #31** (squash `f6bbcf82`) — Audit-refresh Findings #1-#3: BankReconciliation removeItem recalc + match/remove thinned + addItem refreshed parent
    - **Post-audit (no code):** Oracle design recorded for financial-dashboard branch scoping — impl DEFERRED, blocked on an accounting-policy decision. See the "Financial dashboard branch scoping — Oracle design + the blocker" section.
