@@ -81,6 +81,7 @@ class PostSupplierBillJournalAction
                 'journal_type' => 'system',
                 'source_type' => SupplierBill::class,
                 'source_id' => $supplierBill->id,
+                'branch_id' => $supplierBill->branch_id,
                 'lines' => array_merge($debitLines, [$creditLine]),
             ]);
 

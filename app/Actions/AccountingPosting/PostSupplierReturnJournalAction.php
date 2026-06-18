@@ -34,7 +34,7 @@ class PostSupplierReturnJournalAction
         }
 
         return DB::transaction(function () use ($supplierReturn): JournalEntry {
-            $supplierReturn->loadMissing('items');
+            $supplierReturn->loadMissing('items', 'warehouse');
 
             if ($supplierReturn->items->isEmpty()) {
                 throw ValidationException::withMessages([
@@ -85,6 +85,7 @@ class PostSupplierReturnJournalAction
                 'journal_type' => 'system',
                 'source_type' => SupplierReturn::class,
                 'source_id' => $supplierReturn->id,
+                'branch_id' => $supplierReturn->warehouse->branch_id,
                 'lines' => $lines,
             ]);
 

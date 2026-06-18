@@ -19,6 +19,7 @@ class CreateJournalEntryAction
      * - status: 'draft'|'posted' (default 'draft'). When 'posted', posted_by/posted_at are
      *   filled and the entry is balance-verified before saving.
      * - journal_type: e.g. 'general', 'adjusting', 'closing', 'recurring', 'system'.
+     * - branch_id: owning branch resolved by the caller; null for company-wide entries.
      * - source_type, source_id: morph reference to the originating document.
      */
     public function execute(array $data): JournalEntry
@@ -92,6 +93,7 @@ class CreateJournalEntryAction
                         'description' => $data['description'],
                         'status' => $status,
                         'journal_type' => $data['journal_type'] ?? 'general',
+                        'branch_id' => $data['branch_id'] ?? null,
                         'source_type' => $data['source_type'] ?? null,
                         'source_id' => $data['source_id'] ?? null,
                         'created_by' => $userId,
