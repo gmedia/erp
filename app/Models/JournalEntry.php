@@ -20,6 +20,7 @@ use Illuminate\Support\Carbon;
  * @property string $description
  * @property string $status
  * @property string $journal_type
+ * @property int|null $branch_id
  * @property string|null $source_type
  * @property int|null $source_id
  * @property int|null $created_by
@@ -29,6 +30,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property-read User|null $createdBy
  * @property-read FiscalYear $fiscalYear
+ * @property-read Branch|null $branch
  * @property-read float $total_credit
  * @property-read float $total_debit
  * @property-read Collection<int, JournalEntryLine> $lines
@@ -50,6 +52,7 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntry whereFiscalYearId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntry whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntry whereJournalType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntry whereBranchId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntry wherePostedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntry wherePostedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntry whereReference($value)
@@ -78,6 +81,7 @@ class JournalEntry extends Model
         'description',
         'status',
         'journal_type',
+        'branch_id',
         'source_type',
         'source_id',
         'created_by',
@@ -96,6 +100,11 @@ class JournalEntry extends Model
     public function fiscalYear(): BelongsTo
     {
         return $this->belongsTo(FiscalYear::class);
+    }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
     }
 
     public function lines(): HasMany
