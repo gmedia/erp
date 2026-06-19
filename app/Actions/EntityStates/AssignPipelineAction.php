@@ -2,6 +2,7 @@
 
 namespace App\Actions\EntityStates;
 
+use App\Domain\Branch\BranchResolverRegistry;
 use App\Models\Pipeline;
 use App\Models\PipelineEntityState;
 use App\Models\PipelineState;
@@ -11,6 +12,10 @@ use Illuminate\Support\Facades\DB;
 
 class AssignPipelineAction
 {
+    public function __construct(
+        private readonly BranchResolverRegistry $branchResolver,
+    ) {}
+
     /**
      * Assign an entity to its appropriate pipeline and set its initial state.
      *
@@ -49,11 +54,16 @@ class AssignPipelineAction
         }
 
         return DB::transaction(function () use ($pipeline, $entityType, $entity, $initialState) {
+            $branchId = $this->branchResolver->isRegistered($entityType)
+                ? $this->branchResolver->resolve($entity)
+                : null;
+
             // 4. Create the entity state record
             $entityState = PipelineEntityState::create([
                 'pipeline_id' => $pipeline->id,
                 'entity_type' => $entityType,
                 'entity_id' => $entity->getKey(),
+                'branch_id' => $branchId,
                 'current_state_id' => $initialState->id,
                 'last_transitioned_by' => auth()->id(),
                 'last_transitioned_at' => now(),

@@ -4,6 +4,7 @@ namespace App\Domain\Branch;
 
 use App\Models\ApPayment;
 use App\Models\ArReceipt;
+use App\Models\Asset;
 use App\Models\AssetDepreciationRun;
 use App\Models\BankReconciliation;
 use App\Models\CustomerInvoice;
@@ -27,6 +28,7 @@ class BranchResolverRegistry
     private const STRATEGIES = [
         ApPayment::class => BranchResolutionStrategy::Direct,
         ArReceipt::class => BranchResolutionStrategy::Direct,
+        Asset::class => BranchResolutionStrategy::Direct,
         CustomerInvoice::class => BranchResolutionStrategy::Direct,
         SupplierBill::class => BranchResolutionStrategy::Direct,
         GoodsReceipt::class => BranchResolutionStrategy::Warehouse,

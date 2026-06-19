@@ -14,6 +14,7 @@ class GetPipelineDashboardDataAction
         $pipelineId = $filters['pipeline_id'] ?? null;
         $entityType = $filters['entity_type'] ?? null;
         $staleDays = (int) ($filters['stale_days'] ?? 7);
+        $branchId = $filters['branch_id'] ?? null;
 
         // Fetch Pipeline to get States structure
         $pipelineQuery = Pipeline::with(['states' => function ($query) {
@@ -60,6 +61,10 @@ class GetPipelineDashboardDataAction
             $query->where('entity_type', $entityType);
         }
 
+        if ($branchId !== null) {
+            $query->where('branch_id', $branchId);
+        }
+
         $aggregatedStateCounts = $query->groupBy('current_state_id')->pluck('count', 'current_state_id');
 
         foreach ($aggregatedStateCounts as $stateId => $count) {
@@ -86,6 +91,10 @@ class GetPipelineDashboardDataAction
 
         if ($entityType) {
             $staleQuery->where('entity_type', $entityType);
+        }
+
+        if ($branchId !== null) {
+            $staleQuery->where('branch_id', $branchId);
         }
 
         $staleEntitiesModels = $staleQuery->orderBy('last_transitioned_at', 'asc')

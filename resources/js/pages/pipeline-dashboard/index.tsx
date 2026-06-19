@@ -67,6 +67,10 @@ export default function PipelineDashboard() {
         handleFilterChange('stale_days', Number(val));
     };
 
+    const onBranchChange = (val: string) => {
+        handleFilterChange('branch_id', val ? Number(val) : undefined);
+    };
+
     const summaryData = Array.isArray(data?.summary) ? data.summary : [];
     const staleEntitiesData = Array.isArray(data?.stale_entities)
         ? data.stale_entities
@@ -98,6 +102,8 @@ export default function PipelineDashboard() {
                     onChange={onPipelineChange}
                     staleDays={filters.stale_days || 7}
                     onStaleDaysChange={onStaleDaysChange}
+                    selectedBranchId={filters.branch_id}
+                    onBranchChange={onBranchChange}
                 />
 
                 <StateSummaryCards data={summaryData} isLoading={isLoading} />

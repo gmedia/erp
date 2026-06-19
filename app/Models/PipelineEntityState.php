@@ -60,6 +60,7 @@ class PipelineEntityState extends Model
         'pipeline_id',
         'entity_type',
         'entity_id',
+        'branch_id',
         'current_state_id',
         'last_transitioned_by',
         'last_transitioned_at',
@@ -77,6 +78,11 @@ class PipelineEntityState extends Model
     public function pipeline(): BelongsTo
     {
         return $this->belongsTo(Pipeline::class);
+    }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
     }
 
     public function currentState(): BelongsTo

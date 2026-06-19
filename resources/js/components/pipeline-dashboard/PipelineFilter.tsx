@@ -1,3 +1,4 @@
+import { AsyncSelect } from '@/components/common/AsyncSelect';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import {
@@ -14,6 +15,8 @@ interface PipelineFilterProps {
     onChange: (pipelineId: string) => void;
     staleDays: number;
     onStaleDaysChange: (days: string) => void;
+    selectedBranchId?: number | string;
+    onBranchChange: (branchId: string) => void;
 }
 
 export function PipelineFilter({
@@ -22,10 +25,31 @@ export function PipelineFilter({
     onChange,
     staleDays,
     onStaleDaysChange,
+    selectedBranchId,
+    onBranchChange,
 }: Readonly<PipelineFilterProps>) {
     return (
         <Card className="shadow-sm">
             <CardContent className="flex flex-col items-end gap-6 p-4 sm:flex-row">
+                <div className="w-full space-y-2 sm:w-64">
+                    <Label
+                        htmlFor="branch-filter"
+                        className="text-xs font-semibold text-muted-foreground uppercase"
+                    >
+                        Branch
+                    </Label>
+                    <AsyncSelect
+                        url="/api/branches"
+                        placeholder="All Branches"
+                        value={
+                            selectedBranchId
+                                ? String(selectedBranchId)
+                                : undefined
+                        }
+                        onValueChange={onBranchChange}
+                    />
+                </div>
+
                 <div className="w-full space-y-2 sm:w-64">
                     <Label
                         htmlFor="pipeline-filter"

@@ -6,6 +6,7 @@ export interface PipelineDashboardFilters {
     pipeline_id?: number | string;
     entity_type?: string;
     stale_days?: number;
+    branch_id?: number | string;
 }
 
 export interface StateSummary {
@@ -51,6 +52,8 @@ export function usePipelineDashboard(
             params.append('entity_type', filters.entity_type);
         if (filters.stale_days)
             params.append('stale_days', String(filters.stale_days));
+        if (filters.branch_id)
+            params.append('branch_id', String(filters.branch_id));
 
         const response = await axios.get(
             `/api/pipeline-dashboard/data?${params.toString()}`,
