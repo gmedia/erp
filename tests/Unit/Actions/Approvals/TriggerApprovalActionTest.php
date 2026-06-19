@@ -15,7 +15,7 @@ use Laravel\Sanctum\Sanctum;
 uses(RefreshDatabase::class)->group('approvals');
 
 beforeEach(function () {
-    $this->action = new TriggerApprovalAction;
+    $this->action = app(TriggerApprovalAction::class);
     $this->actor = User::factory()->create();
     Sanctum::actingAs($this->actor, ['*']);
     $this->entity = PurchaseRequest::factory()->create();

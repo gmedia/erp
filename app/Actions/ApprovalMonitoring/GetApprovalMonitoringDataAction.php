@@ -15,11 +15,16 @@ class GetApprovalMonitoringDataAction
         $approverId = $filters['approver_id'] ?? null;
         $startDate = $filters['start_date'] ?? null;
         $endDate = $filters['end_date'] ?? null;
+        $branchId = $filters['branch_id'] ?? null;
 
         $query = ApprovalRequest::with(['approvable', 'submitter', 'flow']);
 
         if ($documentType) {
             $query->where('approvable_type', $documentType);
+        }
+
+        if ($branchId !== null) {
+            $query->where('branch_id', $branchId);
         }
 
         if ($status) {
@@ -83,6 +88,12 @@ class GetApprovalMonitoringDataAction
         if ($documentType) {
             $overdueQuery->whereHas('request', function ($q) use ($documentType) {
                 $q->where('approvable_type', $documentType);
+            });
+        }
+
+        if ($branchId !== null) {
+            $overdueQuery->whereHas('request', function ($q) use ($branchId) {
+                $q->where('branch_id', $branchId);
             });
         }
 

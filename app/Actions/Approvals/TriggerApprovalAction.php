@@ -2,6 +2,7 @@
 
 namespace App\Actions\Approvals;
 
+use App\Domain\Branch\BranchResolverRegistry;
 use App\Models\ApprovalAuditLog;
 use App\Models\ApprovalFlow;
 use App\Models\ApprovalRequest;
@@ -15,6 +16,10 @@ use Illuminate\Support\Facades\Log;
 class TriggerApprovalAction
 {
     use HandlesConditions;
+
+    public function __construct(
+        private readonly BranchResolverRegistry $branchResolver,
+    ) {}
 
     /**
      * Trigger an approval flow for a given entity.
@@ -44,11 +49,16 @@ class TriggerApprovalAction
         }
 
         return DB::transaction(function () use ($entity, $flow) {
+            $branchId = $this->branchResolver->isRegistered($entity->getMorphClass())
+                ? $this->branchResolver->resolve($entity)
+                : null;
+
             // 1. Create the Approval Request
             $request = ApprovalRequest::create([
                 'approval_flow_id' => $flow->id,
                 'approvable_type' => $entity->getMorphClass(),
                 'approvable_id' => $entity->getKey(),
+                'branch_id' => $branchId,
                 'current_step_order' => 1,
                 'status' => 'pending',
                 'submitted_by' => Auth::id(),

@@ -10,6 +10,8 @@ use App\Models\BankReconciliation;
 use App\Models\CustomerInvoice;
 use App\Models\GoodsReceipt;
 use App\Models\PeriodClosing;
+use App\Models\PurchaseOrder;
+use App\Models\PurchaseRequest;
 use App\Models\RecurringJournal;
 use App\Models\StockAdjustment;
 use App\Models\SupplierBill;
@@ -30,10 +32,12 @@ class BranchResolverRegistry
         ArReceipt::class => BranchResolutionStrategy::Direct,
         Asset::class => BranchResolutionStrategy::Direct,
         CustomerInvoice::class => BranchResolutionStrategy::Direct,
+        PurchaseRequest::class => BranchResolutionStrategy::Direct,
         SupplierBill::class => BranchResolutionStrategy::Direct,
         GoodsReceipt::class => BranchResolutionStrategy::Warehouse,
         StockAdjustment::class => BranchResolutionStrategy::Warehouse,
         SupplierReturn::class => BranchResolutionStrategy::Warehouse,
+        PurchaseOrder::class => BranchResolutionStrategy::Warehouse,
         BankReconciliation::class => BranchResolutionStrategy::None,
         RecurringJournal::class => BranchResolutionStrategy::None,
         PeriodClosing::class => BranchResolutionStrategy::None,

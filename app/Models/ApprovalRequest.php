@@ -58,7 +58,7 @@ class ApprovalRequest extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'approval_flow_id', 'approvable_type', 'approvable_id', 'current_step_order',
+        'approval_flow_id', 'approvable_type', 'approvable_id', 'branch_id', 'current_step_order',
         'status', 'submitted_by', 'submitted_at', 'completed_at',
     ];
 
@@ -73,6 +73,11 @@ class ApprovalRequest extends Model
     public function approvable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
     }
 
     public function flow(): BelongsTo

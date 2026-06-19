@@ -1,5 +1,6 @@
 import { OverdueApprovalsList } from '@/components/approval-monitoring/OverdueApprovalsList';
 import { SummaryCards } from '@/components/approval-monitoring/SummaryCards';
+import { AsyncSelect } from '@/components/common/AsyncSelect';
 import {
     Select,
     SelectContent,
@@ -72,6 +73,19 @@ export default function ApprovalMonitoringDashboard() {
                                     </SelectItem>
                                 </SelectContent>
                             </Select>
+                        </div>
+                        <div className="w-full sm:w-64">
+                            <AsyncSelect
+                                url="/api/branches"
+                                placeholder="All Branches"
+                                value={filters.branch_id}
+                                onValueChange={(val) =>
+                                    handleFilterChange(
+                                        'branch_id',
+                                        val || undefined,
+                                    )
+                                }
+                            />
                         </div>
                     </div>
 
