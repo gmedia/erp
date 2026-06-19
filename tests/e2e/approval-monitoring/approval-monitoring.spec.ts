@@ -105,4 +105,27 @@ test.describe('Approval Monitoring Dashboard', () => {
             await expect(page.getByRole('columnheader', { name: 'Submitter' })).toBeVisible();
         }
     });
+
+    test('branch filter scopes the dashboard request', async ({ page }) => {
+        await page.goto('/approval-monitoring');
+        await page.waitForResponse(r => r.url().includes('/api/approval-monitoring/data') && r.status() < 400);
+
+        const branchSelect = page.getByRole('combobox').filter({ hasText: 'All Branches' });
+        await expect(branchSelect).toBeVisible();
+        await branchSelect.click();
+
+        await expect(page.getByPlaceholder('Search...')).toBeVisible();
+        const firstBranch = page.locator('ul[aria-busy="false"] button').first();
+        await expect(firstBranch).toBeVisible({ timeout: 10000 });
+
+        const scopedRequest = page.waitForResponse(
+            r =>
+                r.url().includes('/api/approval-monitoring/data') &&
+                r.url().includes('branch_id=') &&
+                r.status() < 400,
+            { timeout: 15000 },
+        );
+        await firstBranch.click();
+        await scopedRequest;
+    });
 });
