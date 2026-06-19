@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-06-19 (PR #37 MERGED squash `81e97e84` — manual journal branch attribution + financial-dashboard segment disclosure UI. Closes the last two tails of the branch-scoping initiative. Branch deleted, CI green.) UTC
+Last updated: 2026-06-19 (Pipeline/Approval dashboard branch-scoping initiative COMPLETE — PR #38 registry, #39 pipeline, #40 approval all MERGED. Every dashboard now branch-scoped. All DEFERRED polymorphic scoping items closed.) UTC
 
 ## Document Roles
 
@@ -12,12 +12,16 @@ Last updated: 2026-06-19 (PR #37 MERGED squash `81e97e84` — manual journal bra
 
 User is switching to a new 0pencode session. Read this section first.
 
-1. **Verify baseline**: `git status --short` → expect empty (or only `task.md`). `git log --oneline -1` on main → expect `81e97e84` (or fresher). Latest main CI green. **No open PRs.**
-2. **THIS SESSION — PR #37 (MERGED squash `81e97e84`):** closed the last two optional tails of the branch-scoping initiative:
-   - **Backend** — manual journal-entry branch attribution. `JournalEntryController::store` now wires `branch_id` gated through `ResolvesBranchScope` (branch-scoped employee forced to own branch; `view_all_branches` admin picks any/null; legacy admin unscoped). `AbstractJournalEntryRequest` validates `branch_id`; `JournalEntryResource` exposes null-safe `branch`; `show` eager-loads `branch`. New `JournalEntryBranchScopeTest` (7 cases). This was the PR3 deferral.
-   - **Frontend** — financial-dashboard segment disclosure UI. Consumes existing per-KPI `scope` tags + `branch_scope` summary (no backend change). Branch selector (reuses `AsyncSelect` + `/api/branches`), informational banner when a branch is selected, per-card Segment/Company-wide pills.
-   - **Verified before merge:** journal-entries 48 pass, financial-dashboard 11 pass, E2E financial-dashboard 4 pass, phpstan/duster/types/lint clean, all 5 PR CI checks green (Quality, Playwright, Test suite, SonarCloud x2).
-3. **PREVIOUS — financial-dashboard branch scoping (PR1-PR4) ALL MERGED:**
+1. **Verify baseline**: `git status --short` → expect empty (or only `task.md`). `git log --oneline -1` on main → expect `cc5621b8` (or fresher). Latest main CI green. **No open PRs.**
+2. **THIS SESSION — Pipeline/Approval dashboard branch-scoping initiative COMPLETE (3 PRs, Oracle-designed, all MERGED):**
+   - **PR #38** (squash `888843a2`) — shared `BranchResolverRegistry` (app/Domain/Branch/). FQCN→strategy map (Direct | Warehouse | None), `resolve(Model): ?int`, `relationsFor()`, `branchBearingTypes()`, `isRegistered()`. Throws on unregistered types. Refactored `journals:backfill-branch` onto it (no behavior change). No-branch journal sources registered as None first-class.
+   - **PR #39** (squash `d071e552`) — pipeline dashboard scoping. Denormalized `pipeline_entity_states.branch_id` (nullable FK + index). Populated on write in `AssignPipelineAction` (isRegistered guard → unregistered = null). Registered Asset (Direct). `pipeline-states:backfill-branch` command. Dashboard action+controller scoped via ResolvesBranchScope (EXCLUDE). Frontend branch selector.
+   - **PR #40** (squash `cc5621b8`) — approval monitoring scoping. Denormalized `approval_requests.branch_id`. Populated on write in `TriggerApprovalAction`. Registered PurchaseRequest (Direct) + PurchaseOrder (Warehouse). `approval-requests:backfill-branch` command. Summary + overdue scoped (overdue via `whereHas('request')` since steps have no branch_id). Frontend branch selector.
+   - **Semantics (your decision):** EXCLUDE uniform — a selected branch shows only rows that positively resolve to it; null-branch rows drop out. Structurally-unscopable types are visible only via the all-branches (null) view.
+   - **CI gotchas hit + fixed (for next time):** (a) a unit test instantiated `new TriggerApprovalAction` — broke when the registry ctor dep was added; fix = `app(TriggerApprovalAction::class)`. Lesson: focused `--group` runs miss cross-group tests; run full `sail test` before pushing a constructor change. (b) approval-monitoring E2E used `getByRole('combobox').first()` for Status — adding a branch combobox BEFORE it stole `.first()`; fix = keep Status first. Pipeline E2E was safe (uses `#id` selectors).
+   - **DEPLOYMENT NOTE:** both new columns are nullable + populated-on-write. Run the two backfill commands for historical rows: `sail artisan pipeline-states:backfill-branch` and `sail artisan approval-requests:backfill-branch` (both idempotent, support `--dry-run`).
+3. **PREVIOUS — PR #37 (squash `81e97e84`):** manual journal branch attribution + financial-dashboard segment disclosure UI.
+4. **PREVIOUS — financial-dashboard branch scoping (PR1-PR4) ALL MERGED:**
    - **PR #33** (squash `dfde121e`) — branch-scoping **PR1**: inert nullable `journal_entries.branch_id` FK (restrictOnDelete) + composite index `(fiscal_year_id, status, branch_id)` + model wiring (fillable, `branch()` relation, PHPDoc). Zero behavior change.
    - **PR #34** (squash `ce90750a`) — branch-scoping **PR2**: idempotent `journals:backfill-branch [--dry-run] [--chunk]` artisan command (app/Console/Commands/BackfillJournalEntryBranch.php). Per-source resolution keyed by `::class` (no morph map registered → source_type stores FQCNs). Direct branch: ApPayment/ArReceipt/CustomerInvoice/SupplierBill. Via warehouse->branch_id: GoodsReceipt/StockAdjustment/SupplierReturn. No-branch sources stay null. 6 tests.
    - **PR #35** (squash `7db69f39`) — branch-scoping **PR3**: write-path wiring. `CreateJournalEntryAction` reads optional `branch_id` from `$data` (captured before entry_number retry loop). 7 posting actions resolve+pass source branch (4 direct, 3 via `warehouse->branch_id` with `loadMissing('warehouse')`). BankReconciliation + ClosePeriod + ExecuteRecurringJournal stay null. **Manual JournalEntryController::store DEFERRED null** (avoids cross-branch authz hole; gate via ResolvesBranchScope when added). NO void/reversal paths exist. Oracle-reviewed GO. 6 tests incl. $fillable contract guard.
@@ -183,9 +187,9 @@ All 10 original Oracle audit findings (#1-#10) + 3 audit-refresh findings closed
 | `/api/aging-dashboard` | ✅ Scoped + currency-guarded |
 | `/api/asset-dashboard/data` | ✅ Scoped |
 | `/api/stock-monitor` | ✅ Scoped |
-| `/api/financial-dashboard` | ⏳ DEFERRED (journal_entries lacks branch_id + currency) |
-| `/api/pipeline-dashboard/data` | ⏳ DEFERRED (polymorphic) |
-| `/api/approval-monitoring/data` | ⏳ DEFERRED (polymorphic) |
+| `/api/financial-dashboard` | ✅ Scoped (segment P&L; balance sheet + cash company-wide) |
+| `/api/pipeline-dashboard/data` | ✅ Scoped (denormalized branch_id, EXCLUDE) |
+| `/api/approval-monitoring/data` | ✅ Scoped (denormalized branch_id, EXCLUDE) |
 
 ## Useful Commands
 
@@ -217,39 +221,50 @@ gh pr view <num> --json statusCheckRollup
 ## Continuation Prompt for New Session
 
 ```text
-Read task.md first. Repo on `main` at HEAD `81e97e84` (or fresher), working
-tree clean. PR #37 MERGED (squash `81e97e84`): backend manual journal branch
-attribution + frontend financial-dashboard segment disclosure UI. This closed
-the last two optional tails of the branch-scoping initiative. All prior work
-(PR1-PR4 branch scoping, all Oracle audit findings) already MERGED. No open PRs.
+Read task.md first. Repo on `main` at HEAD `cc5621b8` (or fresher), working
+tree clean. The Pipeline/Approval dashboard branch-scoping initiative is COMPLETE
+— PR #38 (registry), #39 (pipeline), #40 (approval) all MERGED. Every dashboard
+in the app is now branch-scoped. All prior branch work (financial PR1-PR4, manual
+journal attribution #37) also merged. No open PRs.
 
 Quick verify:
-  git rev-parse HEAD          # expect 81e97e84 or fresher
+  git rev-parse HEAD          # expect cc5621b8 or fresher
   git status --short          # expect empty (or only task.md)
   gh run list --branch main --limit 3   # verify latest is green
   gh pr list --base main --state open   # expect empty unless new work started
 
 If dev DB seems empty: `sail artisan db:seed`. Schema is intact.
 
-NEXT ACTION needs USER DIRECTION (do NOT auto-pick). The branch-scoping
-initiative is fully complete (schema, backfill, write-path, read-path, manual
-attribution, and frontend disclosure all shipped). Remaining options (all
-optional / future — none blocking):
+DEPLOYMENT TODO (when shipping to an env with existing data): run the two
+idempotent backfills for historical rows:
+  sail artisan pipeline-states:backfill-branch
+  sail artisan approval-requests:backfill-branch
+(both support --dry-run). New-write population is already wired.
 
-1. Pipeline/Approval polymorphic dashboard scoping (MEDIUM) — trait helper
-   from PR #19 available; polymorphic resolution still needed. Last DEFERRED
-   dashboard scoping item.
+NEXT ACTION needs USER DIRECTION (do NOT auto-pick). Branch-scoping is fully done
+end to end (every dashboard + every write path + backfills). Remaining options
+(all optional / future — none blocking):
 
-2. Per-branch cash flow (future) — would require line-level branch tagging or a
+1. Per-branch cash flow (future) — needs line-level branch tagging or a
    documented treasury-allocation method. Separate initiative.
 
-3. Option 1 (Head-Office branch) — only if a TRUE per-branch balance sheet is
-   ever required. Bigger design; not needed for the segment-reporting model.
+2. Option 1 (Head-Office branch) — only if a TRUE per-branch balance sheet is
+   ever required. Bigger accounting-policy design.
 
-4. H3 Wave 2 multi-currency FX subsystem (weeks) — pull when first non-IDR
+3. H3 Wave 2 multi-currency FX subsystem (weeks) — pull when first non-IDR
    customer signs.
 
-5. Product feature work (request specs from user).
+4. Product feature work (request specs from user).
+
+KNOWN GOTCHAS (this session):
+- BranchResolverRegistry throws on unregistered types — intentional (fail loud).
+  Write paths guard with isRegistered() so unregistered = null (safe under
+  EXCLUDE). When adding a new pipeline/approval entity type, register it in
+  app/Domain/Branch/BranchResolverRegistry.php::STRATEGIES.
+- Focused `--group` test runs miss cross-group tests. Run full `sail test`
+  before pushing any constructor-signature change (DI breaks `new X` in tests).
+- E2E specs using `getByRole('combobox').first()` are position-sensitive — don't
+  prepend a new combobox before the one a spec targets.
 
 KNOWN GOTCHA (learned in PR4): the Account model defines
 getTotalDebitAttribute/getTotalCreditAttribute accessors that recompute
