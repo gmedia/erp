@@ -43,19 +43,6 @@ export default function ApprovalMonitoringDashboard() {
                 <div className="flex flex-col gap-4">
                     <div className="flex flex-wrap items-center gap-4">
                         <div className="w-full sm:w-64">
-                            <AsyncSelect
-                                url="/api/branches"
-                                placeholder="All Branches"
-                                value={filters.branch_id}
-                                onValueChange={(val) =>
-                                    handleFilterChange(
-                                        'branch_id',
-                                        val || undefined,
-                                    )
-                                }
-                            />
-                        </div>
-                        <div className="w-full sm:w-64">
                             <Select
                                 value={filters.status || 'all'}
                                 onValueChange={(val) =>
@@ -86,6 +73,19 @@ export default function ApprovalMonitoringDashboard() {
                                     </SelectItem>
                                 </SelectContent>
                             </Select>
+                        </div>
+                        <div className="w-full sm:w-64">
+                            <AsyncSelect
+                                url="/api/branches"
+                                placeholder="All Branches"
+                                value={filters.branch_id}
+                                onValueChange={(val) =>
+                                    handleFilterChange(
+                                        'branch_id',
+                                        val || undefined,
+                                    )
+                                }
+                            />
                         </div>
                     </div>
 
