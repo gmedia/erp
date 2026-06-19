@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-06-19 (PR #33+#34+#35 MERGED — financial-dashboard branch scoping PR1+PR2+PR3 done: schema + backfill + write-path. PR4 read-path BLOCKED on accounting-policy decision) UTC
+Last updated: 2026-06-19 (PR #33+#34+#35+#36 MERGED — financial-dashboard branch scoping COMPLETE: schema + backfill + write-path + read-path. Option 3 segment reporting shipped. Initiative done) UTC
 
 ## Document Roles
 
@@ -12,12 +12,13 @@ Last updated: 2026-06-19 (PR #33+#34+#35 MERGED — financial-dashboard branch s
 
 User is switching to a new 0pencode session. Read this section first.
 
-1. **Verify baseline**: `git status --short` → expect empty (or only `task.md`). `git log --oneline -1` on main → expect `7db69f39` (or fresher). Latest main CI green.
-2. **ALL Oracle audit findings CLOSED.** Financial-dashboard branch scoping: PR1+PR2+PR3 SHIPPED, PR4 BLOCKED:
+1. **Verify baseline**: `git status --short` → expect empty (or only `task.md`). `git log --oneline -1` on main → expect `88e78d2c` (or fresher). Latest main CI green.
+2. **ALL Oracle audit findings CLOSED.** Financial-dashboard branch scoping COMPLETE (PR1-PR4 all SHIPPED):
    - **PR #33** (squash `dfde121e`) — branch-scoping **PR1**: inert nullable `journal_entries.branch_id` FK (restrictOnDelete) + composite index `(fiscal_year_id, status, branch_id)` + model wiring (fillable, `branch()` relation, PHPDoc). Zero behavior change.
    - **PR #34** (squash `ce90750a`) — branch-scoping **PR2**: idempotent `journals:backfill-branch [--dry-run] [--chunk]` artisan command (app/Console/Commands/BackfillJournalEntryBranch.php). Per-source resolution keyed by `::class` (no morph map registered → source_type stores FQCNs). Direct branch: ApPayment/ArReceipt/CustomerInvoice/SupplierBill. Via warehouse->branch_id: GoodsReceipt/StockAdjustment/SupplierReturn. No-branch sources stay null. 6 tests.
    - **PR #35** (squash `7db69f39`) — branch-scoping **PR3**: write-path wiring. `CreateJournalEntryAction` reads optional `branch_id` from `$data` (captured before entry_number retry loop). 7 posting actions resolve+pass source branch (4 direct, 3 via `warehouse->branch_id` with `loadMissing('warehouse')`). BankReconciliation + ClosePeriod + ExecuteRecurringJournal stay null. **Manual JournalEntryController::store DEFERRED null** (avoids cross-branch authz hole; gate via ResolvesBranchScope when added). NO void/reversal paths exist. Oracle-reviewed GO. 6 tests incl. $fillable contract guard.
-   - **STILL BLOCKED: PR4 (read path).** Shape depends on the accounting-policy decision (Option 1 Head-Office branch vs Option 3 P&L-segment-only). See "Financial dashboard branch scoping — Oracle design + the blocker" section. PR4 = `FinancialDashboardController` adopts `ResolvesBranchScope`; `GetFinancialDashboardDataAction` + `FinancialReportService` gain optional `?int $branchId` filtering `journal_entries.branch_id` — for P&L/income-statement/trend metrics ONLY, NOT per-branch balance sheet. Additive segment model (null excluded from specific-branch, included in all-branches).
+   - **PR #36** (squash `88e78d2c`) — branch-scoping **PR4** (read path, Option 3 segment reporting): `FinancialDashboardController` adopts `ResolvesBranchScope`; `GetFinancialDashboardDataAction` + `FinancialReportService` scope **income statement + monthly trends + comparison chain** by `?int $branchId` (P&L only). Balance sheet + cash flow stay COMPANY-WIDE (cash pooled at null-branch → leakage; same reason Option 3 rejected per-branch BS). Per-KPI `scope` tags + `branch_scope` disclosure summary. Additive segment model (specific branch excludes null-branch; null includes all). **ROOT-CAUSE FIX**: `Account::getTotalDebitAttribute/getTotalCreditAttribute` accessors SHADOWED the `total_debit`/`total_credit` SELECT aliases (also latently broke FY scoping, masked by single-FY tests) → rewrote `accountsWithPostedSums` as pre-grouped `leftJoinSub`, aliased to non-colliding `posted_debit_sum`/`posted_credit_sum`. 11 financial-dashboard tests + 42 financial report regression + 31 reports group all green.
+   - **OPTIONAL FUTURE (none blocking):** per-branch cash flow (needs line-level branch tagging / treasury allocation); manual-entry branch attribution (PR3 deferral, gate via ResolvesBranchScope); Option 1 Head-Office branch if a true per-branch balance sheet is ever required; frontend two-section disclosure rendering using the per-KPI `scope` tags.
    - Latest audit PRs:
    - **PR #32** (squash `a97a4b67`) — Finding #6: CurrencyGuard on 4 AP/AR aging+outstanding report actions (last original finding)
    - **PR #31** (squash `f6bbcf82`) — Audit-refresh Findings #1-#3: BankReconciliation removeItem recalc + match/remove thinned + addItem refreshed parent
@@ -212,14 +213,13 @@ gh pr view <num> --json statusCheckRollup
 ## Continuation Prompt for New Session
 
 ```text
-Read task.md first. Repo on `main` at HEAD `7db69f39`, working tree clean.
-Latest this session: financial-dashboard branch scoping PR1+PR2+PR3 MERGED
-(#33 schema, #34 backfill command, #35 write-path wiring). CI on main green.
-ALL Oracle audit findings (#1-#10 + 3 refresh findings) CLOSED.
-PR4 (read-path scoping) is BLOCKED on an accounting-policy decision.
+Read task.md first. Repo on `main` at HEAD `88e78d2c`, working tree clean.
+Latest this session: financial-dashboard branch scoping COMPLETE — PR1-PR4 all
+MERGED (#33 schema, #34 backfill, #35 write-path, #36 read-path Option 3 segment
+reporting). CI on main green. ALL Oracle audit findings CLOSED.
 
 Quick verify:
-  git rev-parse HEAD          # expect 7db69f39 or fresher
+  git rev-parse HEAD          # expect 88e78d2c or fresher
   git status --short          # expect empty
   gh run list --branch main --limit 3   # verify latest is green
   gh pr list --base main --state open   # expect empty unless new work started
@@ -228,36 +228,43 @@ If dev DB seems empty: `sail artisan db:seed`. Schema is intact.
 
 NEXT ACTION needs USER DIRECTION (do NOT auto-pick):
 
-Financial-dashboard branch scoping PR1-PR3 are done (schema + backfill + write
-path). journal_entries.branch_id is now populated on all automated posting.
-The ONLY remaining piece is PR4 (read path), which is POLICY-BLOCKED.
+The financial-dashboard branch-scoping initiative is fully shipped (PR1-PR4).
+journal_entries.branch_id is schema-backed, backfillable, populated on all
+automated posting, and the dashboard P&L metrics are branch-segmentable
+(Option 3: income statement + monthly trends scoped; balance sheet + cash flow
+stay company-wide; per-KPI scope tags + disclosure). No blockers remain.
 
-1. PR4 — financial dashboard read-path branch scoping. BLOCKED.
-   An accounting-policy owner must first decide how per-branch reporting handles
-   null-branch (company-wide) entries:
-     - Option 1: Head-Office branch (every entry branch-attributed; enables a
-       true per-branch balance sheet)
-     - Option 3 (Oracle-recommended): P&L-segment views only, NO per-branch
-       balance sheet, with "excludes unallocated/corporate" disclosure.
-   Once decided, PR4 = FinancialDashboardController adopts ResolvesBranchScope
-   (Pattern A like AgingDashboardController); GetFinancialDashboardDataAction +
-   FinancialReportService gain optional ?int $branchId filtering
-   journal_entries.branch_id at the header level. Additive segment model
-   (null excluded from a specific branch, included in all-branches). Scope to
-   P&L / income-statement / trend metrics ONLY — NOT per-branch balance sheet.
-   See "Financial dashboard branch scoping — Oracle design + the blocker".
+Remaining options (all optional / future — none blocking):
 
-2. Manual-entry branch attribution (deferred from PR3) — add branch_id to the
+1. Manual-entry branch attribution (deferred from PR3) — add branch_id to the
    manual JournalEntryController::store path, GATED via ResolvesBranchScope so a
-   branch employee cannot post cross-branch. Smaller follow-up.
+   branch employee cannot post cross-branch. Smallest, policy-independent.
+
+2. Frontend disclosure rendering — consume the per-KPI `scope` tags + the
+   `branch_scope` summary from /api/financial-dashboard to render a two-section
+   view ("Segment — Branch X" vs "Company-wide") with the excludes-unallocated
+   note. Backend already emits everything needed.
 
 3. Pipeline/Approval polymorphic dashboard scoping (MEDIUM) — trait helper
    from PR #19 available; polymorphic resolution still needed.
 
-4. H3 Wave 2 multi-currency FX subsystem (weeks) — pull when first non-IDR
+4. Per-branch cash flow (future) — would require line-level branch tagging or a
+   documented treasury-allocation method. Separate initiative.
+
+5. Option 1 (Head-Office branch) — only if a TRUE per-branch balance sheet is
+   ever required. Bigger design; not needed for the segment-reporting model now
+   shipped.
+
+6. H3 Wave 2 multi-currency FX subsystem (weeks) — pull when first non-IDR
    customer signs.
 
-5. Product feature work (request specs from user).
+7. Product feature work (request specs from user).
+
+KNOWN GOTCHA (learned in PR4): the Account model defines
+getTotalDebitAttribute/getTotalCreditAttribute accessors that recompute
+UNFILTERED sums. Eloquent accessors SHADOW query-aliased columns of the same
+name. Never alias a withSum/selectSub column `total_debit`/`total_credit` on the
+Account model — use a distinct name (we use posted_debit_sum/posted_credit_sum).
 
 Depwire/Sonar tools still produce false positives for Laravel auto-discovery
 patterns. Skip unless config improves.
