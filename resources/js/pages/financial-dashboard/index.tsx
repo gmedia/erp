@@ -69,8 +69,7 @@ export default function FinancialDashboard() {
         setSearchParams(newParams);
     };
 
-    const showSegmentBanner =
-        data?.branch_scope?.excludes_unallocated === true;
+    const showSegmentBanner = data?.branch_scope?.excludes_unallocated === true;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

@@ -26,7 +26,7 @@ function getScopePill(scope?: KpiItem['scope']) {
         return (
             <Badge
                 variant="outline"
-                className="text-[10px] font-normal text-muted-foreground px-1.5 py-0"
+                className="px-1.5 py-0 text-[10px] font-normal text-muted-foreground"
             >
                 Segment
             </Badge>
@@ -35,7 +35,7 @@ function getScopePill(scope?: KpiItem['scope']) {
     return (
         <Badge
             variant="outline"
-            className="text-[10px] font-normal text-muted-foreground px-1.5 py-0"
+            className="px-1.5 py-0 text-[10px] font-normal text-muted-foreground"
         >
             Company-wide
         </Badge>
