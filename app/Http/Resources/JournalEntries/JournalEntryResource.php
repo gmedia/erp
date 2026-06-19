@@ -25,6 +25,10 @@ class JournalEntryResource extends JsonResource
                 'id' => $this->resource->fiscal_year_id,
                 'name' => $this->resource->fiscalYear?->name,
             ],
+            'branch' => $this->resource->branch_id === null ? null : [
+                'id' => $this->resource->branch_id,
+                'name' => $this->resource->branch?->name,
+            ],
             'lines' => $this->resource->lines->map(fn ($line) => [
                 'id' => $line->id,
                 'account_id' => $line->account_id,
