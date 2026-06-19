@@ -11,11 +11,35 @@ import {
     TrendingUp,
 } from 'lucide-react';
 import { memo } from 'react';
-import type { FinancialDashboardData } from '../../hooks/useFinancialDashboard';
+import type {
+    FinancialDashboardData,
+    KpiItem,
+} from '../../hooks/useFinancialDashboard';
 
 interface SummaryCardsProps {
     readonly data?: FinancialDashboardData['kpis'];
     readonly isLoading: boolean;
+}
+
+function getScopePill(scope?: KpiItem['scope']) {
+    if (scope === 'branch') {
+        return (
+            <Badge
+                variant="outline"
+                className="px-1.5 py-0 text-[10px] font-normal text-muted-foreground"
+            >
+                Segment
+            </Badge>
+        );
+    }
+    return (
+        <Badge
+            variant="outline"
+            className="px-1.5 py-0 text-[10px] font-normal text-muted-foreground"
+        >
+            Company-wide
+        </Badge>
+    );
 }
 
 function getChangeBadge(change: number, isExpenseOrLiability: boolean = false) {
@@ -81,6 +105,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             value: data.revenue.value,
             change: data.revenue.change,
             isExpenseOrLiability: false,
+            scope: data.revenue.scope,
         },
         {
             title: 'Expenses',
@@ -90,6 +115,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             value: data.expenses.value,
             change: data.expenses.change,
             isExpenseOrLiability: true,
+            scope: data.expenses.scope,
         },
         {
             title: 'Net Income',
@@ -99,6 +125,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             value: data.net_income.value,
             change: data.net_income.change,
             isExpenseOrLiability: false,
+            scope: data.net_income.scope,
         },
         {
             title: 'Total Assets',
@@ -108,6 +135,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             value: data.total_assets.value,
             change: data.total_assets.change,
             isExpenseOrLiability: false,
+            scope: data.total_assets.scope,
         },
         {
             title: 'Total Liabilities',
@@ -117,6 +145,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             value: data.total_liabilities.value,
             change: data.total_liabilities.change,
             isExpenseOrLiability: true,
+            scope: data.total_liabilities.scope,
         },
         {
             title: 'Equity',
@@ -126,6 +155,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             value: data.equity.value,
             change: data.equity.change,
             isExpenseOrLiability: false,
+            scope: data.equity.scope,
         },
         {
             title: 'Cash Balance',
@@ -135,6 +165,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             value: data.cash_balance.value,
             change: data.cash_balance.change,
             isExpenseOrLiability: false,
+            scope: data.cash_balance.scope,
         },
     ];
 
@@ -166,6 +197,9 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
                                 <span className="text-xs text-muted-foreground">
                                     vs comparison period
                                 </span>
+                            </div>
+                            <div className="mt-1.5">
+                                {getScopePill(card.scope)}
                             </div>
                         </CardContent>
                     </Card>

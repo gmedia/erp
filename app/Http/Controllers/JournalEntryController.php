@@ -6,6 +6,7 @@ use App\Actions\JournalEntries\CreateJournalEntryAction;
 use App\Actions\JournalEntries\ExportJournalEntriesAction;
 use App\Actions\JournalEntries\IndexJournalEntriesAction;
 use App\Actions\JournalEntries\UpdateJournalEntryAction;
+use App\Http\Controllers\Concerns\ResolvesBranchScope;
 use App\Http\Requests\JournalEntries\IndexJournalEntryRequest;
 use App\Http\Requests\JournalEntries\StoreJournalEntryRequest;
 use App\Http\Requests\JournalEntries\UpdateJournalEntryRequest;
@@ -16,6 +17,8 @@ use Illuminate\Http\JsonResponse;
 
 class JournalEntryController extends Controller
 {
+    use ResolvesBranchScope;
+
     public function index(IndexJournalEntryRequest $request, IndexJournalEntriesAction $action): JsonResponse
     {
         $journalEntries = $action->execute($request);
@@ -25,7 +28,17 @@ class JournalEntryController extends Controller
 
     public function store(StoreJournalEntryRequest $request, CreateJournalEntryAction $action): JsonResponse
     {
-        $journalEntry = $action->execute($request->validated());
+        $data = $request->validated();
+
+        // Gate branch attribution: a branch-scoped employee may only post into
+        // their own branch. Users with `view_all_branches` keep the requested
+        // branch (null = company-wide). Legacy admins (no employee branch) are
+        // unscoped. This prevents a cross-branch financial-integrity hole.
+        $data['branch_id'] = $this->resolveBranchScope(
+            isset($data['branch_id']) ? (int) $data['branch_id'] : null,
+        );
+
+        $journalEntry = $action->execute($data);
 
         return (new JournalEntryResource($journalEntry))
             ->response()
@@ -34,7 +47,7 @@ class JournalEntryController extends Controller
 
     public function show(JournalEntry $journalEntry): JsonResponse
     {
-        $journalEntry->load(['lines.account', 'fiscalYear', 'createdBy', 'postedBy']);
+        $journalEntry->load(['lines.account', 'fiscalYear', 'branch', 'createdBy', 'postedBy']);
 
         return (new JournalEntryResource($journalEntry))->response();
     }

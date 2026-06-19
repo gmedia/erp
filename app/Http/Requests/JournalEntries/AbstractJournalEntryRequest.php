@@ -12,6 +12,7 @@ abstract class AbstractJournalEntryRequest extends AuthorizedFormRequest
             'entry_date' => ['required', 'date'],
             'reference' => ['nullable', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:255'],
+            'branch_id' => ['nullable', 'integer', 'exists:branches,id'],
             'lines' => ['required', 'array', 'min:2'],
             'lines.*.account_id' => ['required', 'exists:accounts,id'],
             'lines.*.debit' => ['required', 'numeric', 'min:0'],
