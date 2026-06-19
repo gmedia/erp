@@ -8,6 +8,7 @@ export interface ApprovalMonitoringFilters {
     approver_id?: string;
     start_date?: string;
     end_date?: string;
+    branch_id?: string;
 }
 
 export interface ApprovalSummary {
@@ -50,6 +51,7 @@ export function useApprovalMonitoring(
             params.append('approver_id', filters.approver_id);
         if (filters.start_date) params.append('start_date', filters.start_date);
         if (filters.end_date) params.append('end_date', filters.end_date);
+        if (filters.branch_id) params.append('branch_id', filters.branch_id);
 
         const response = await axios.get(
             `/api/approval-monitoring/data?${params.toString()}`,
