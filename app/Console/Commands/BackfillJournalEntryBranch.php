@@ -2,42 +2,13 @@
 
 namespace App\Console\Commands;
 
-use App\Models\ApPayment;
-use App\Models\ArReceipt;
-use App\Models\CustomerInvoice;
-use App\Models\GoodsReceipt;
+use App\Domain\Branch\BranchResolverRegistry;
 use App\Models\JournalEntry;
-use App\Models\StockAdjustment;
-use App\Models\SupplierBill;
-use App\Models\SupplierReturn;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
 
 class BackfillJournalEntryBranch extends Command
 {
-    /**
-     * Source models that resolve a branch directly via their own branch_id column.
-     *
-     * @var list<class-string<Model>>
-     */
-    private const DIRECT_BRANCH_SOURCES = [
-        ApPayment::class,
-        ArReceipt::class,
-        CustomerInvoice::class,
-        SupplierBill::class,
-    ];
-
-    /**
-     * Source models that resolve a branch indirectly via warehouse->branch_id (nullable).
-     *
-     * @var list<class-string<Model>>
-     */
-    private const WAREHOUSE_BRANCH_SOURCES = [
-        GoodsReceipt::class,
-        StockAdjustment::class,
-        SupplierReturn::class,
-    ];
-
     /**
      * @var string
      */
@@ -48,7 +19,7 @@ class BackfillJournalEntryBranch extends Command
      */
     protected $description = 'Backfill journal_entries.branch_id from each entry polymorphic source. Idempotent: only touches rows where branch_id is null.';
 
-    public function handle(): int
+    public function handle(BranchResolverRegistry $registry): int
     {
         $dryRun = (bool) $this->option('dry-run');
         $chunkSize = max(1, (int) $this->option('chunk'));
@@ -57,14 +28,17 @@ class BackfillJournalEntryBranch extends Command
             $this->warn('DRY RUN — no rows will be written.');
         }
 
-        $resolvers = $this->branchResolvers();
+        $branchBearingTypes = $registry->branchBearingTypes();
 
         /** @var array<string, array{matched: int, resolved: int, unresolved: int}> $stats */
         $stats = [];
         $totalUpdated = 0;
 
-        foreach ($resolvers as $sourceType => $resolver) {
-            $relation = $this->eagerLoadFor($sourceType);
+        foreach ($branchBearingTypes as $sourceType) {
+            $relation = array_map(
+                static fn (string $relation): string => "source.{$relation}",
+                $registry->relationsFor($sourceType),
+            );
 
             $stats[$sourceType] = ['matched' => 0, 'resolved' => 0, 'unresolved' => 0];
 
@@ -72,8 +46,8 @@ class BackfillJournalEntryBranch extends Command
                 ->whereNull('branch_id')
                 ->where('source_type', $sourceType)
                 ->whereNotNull('source_id')
-                ->with($relation)
-                ->chunkById($chunkSize, function ($entries) use ($resolver, &$stats, &$totalUpdated, $sourceType, $dryRun): void {
+                ->with(array_merge(['source'], $relation))
+                ->chunkById($chunkSize, function ($entries) use ($registry, &$stats, &$totalUpdated, $sourceType, $dryRun): void {
                     foreach ($entries as $entry) {
                         $stats[$sourceType]['matched']++;
 
@@ -85,7 +59,7 @@ class BackfillJournalEntryBranch extends Command
                             continue;
                         }
 
-                        $branchId = $resolver($source);
+                        $branchId = $registry->resolve($source);
 
                         if ($branchId === null) {
                             $stats[$sourceType]['unresolved']++;
@@ -109,7 +83,7 @@ class BackfillJournalEntryBranch extends Command
 
         $nullSkipped = JournalEntry::query()
             ->whereNull('branch_id')
-            ->whereNotIn('source_type', array_keys($resolvers))
+            ->whereNotIn('source_type', $branchBearingTypes)
             ->count();
 
         $this->line('');
@@ -124,55 +98,6 @@ class BackfillJournalEntryBranch extends Command
         ));
 
         return self::SUCCESS;
-    }
-
-    /**
-     * Map each branch-bearing source_type (FQCN) to a closure returning its branch id or null.
-     *
-     * source_type stores FQCNs (no morph map registered); keys are ::class to avoid string literals.
-     *
-     * @return array<string, callable(Model): ?int>
-     */
-    private function branchResolvers(): array
-    {
-        $resolvers = [];
-
-        foreach (self::DIRECT_BRANCH_SOURCES as $sourceClass) {
-            $resolvers[$sourceClass] = static fn (Model $source): ?int => $source->getAttribute('branch_id') !== null
-                ? (int) $source->getAttribute('branch_id')
-                : null;
-        }
-
-        foreach (self::WAREHOUSE_BRANCH_SOURCES as $sourceClass) {
-            $resolvers[$sourceClass] = static function (Model $source): ?int {
-                $warehouse = $source->getAttribute('warehouse');
-
-                if (! $warehouse instanceof Model) {
-                    return null;
-                }
-
-                return $warehouse->getAttribute('branch_id') !== null
-                    ? (int) $warehouse->getAttribute('branch_id')
-                    : null;
-            };
-        }
-
-        return $resolvers;
-    }
-
-    /**
-     * The eager-load path needed to resolve a branch for the given source_type.
-     *
-     * @param  class-string<Model>  $sourceType
-     * @return list<string>
-     */
-    private function eagerLoadFor(string $sourceType): array
-    {
-        if (in_array($sourceType, self::WAREHOUSE_BRANCH_SOURCES, true)) {
-            return ['source.warehouse'];
-        }
-
-        return ['source'];
     }
 
     /**
