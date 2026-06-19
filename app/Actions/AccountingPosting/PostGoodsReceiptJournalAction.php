@@ -34,7 +34,7 @@ class PostGoodsReceiptJournalAction
         }
 
         return DB::transaction(function () use ($goodsReceipt): JournalEntry {
-            $goodsReceipt->loadMissing('items');
+            $goodsReceipt->loadMissing('items', 'warehouse');
 
             if ($goodsReceipt->items->isEmpty()) {
                 throw ValidationException::withMessages([
@@ -85,6 +85,7 @@ class PostGoodsReceiptJournalAction
                 'journal_type' => 'system',
                 'source_type' => GoodsReceipt::class,
                 'source_id' => $goodsReceipt->id,
+                'branch_id' => $goodsReceipt->warehouse->branch_id,
                 'lines' => $lines,
             ]);
 

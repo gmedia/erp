@@ -49,6 +49,7 @@ class PostApPaymentJournalAction
                 'journal_type' => 'system',
                 'source_type' => ApPayment::class,
                 'source_id' => $apPayment->id,
+                'branch_id' => $apPayment->branch_id,
                 'lines' => [
                     [
                         'account_id' => $apAccount->id,

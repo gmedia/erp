@@ -49,6 +49,7 @@ class PostArReceiptJournalAction
                 'journal_type' => 'system',
                 'source_type' => ArReceipt::class,
                 'source_id' => $arReceipt->id,
+                'branch_id' => $arReceipt->branch_id,
                 'lines' => [
                     [
                         'account_id' => (int) $arReceipt->bank_account_id,

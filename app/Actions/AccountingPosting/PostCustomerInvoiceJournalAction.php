@@ -81,6 +81,7 @@ class PostCustomerInvoiceJournalAction
                 'journal_type' => 'system',
                 'source_type' => CustomerInvoice::class,
                 'source_id' => $invoice->id,
+                'branch_id' => $invoice->branch_id,
                 'lines' => array_merge([$debitLine], $creditLines),
             ]);
 

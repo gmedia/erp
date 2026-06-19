@@ -33,7 +33,7 @@ class PostStockAdjustmentJournalAction
         }
 
         return DB::transaction(function () use ($stockAdjustment): JournalEntry {
-            $stockAdjustment->loadMissing('items');
+            $stockAdjustment->loadMissing('items', 'warehouse');
 
             if ($stockAdjustment->items->isEmpty()) {
                 throw ValidationException::withMessages([
@@ -101,6 +101,7 @@ class PostStockAdjustmentJournalAction
                 'journal_type' => 'system',
                 'source_type' => StockAdjustment::class,
                 'source_id' => $stockAdjustment->id,
+                'branch_id' => $stockAdjustment->warehouse->branch_id,
                 'lines' => $lines,
             ]);
 
