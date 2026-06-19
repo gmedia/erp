@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-06-19 (Pipeline/Approval dashboard branch-scoping initiative COMPLETE — PR #38 registry, #39 pipeline, #40 approval all MERGED. Every dashboard now branch-scoped. All DEFERRED polymorphic scoping items closed.) UTC
+Last updated: 2026-06-19 (Pipeline/Approval dashboard branch-scoping initiative COMPLETE — PR #38 registry, #39 pipeline, #40 approval all MERGED. Dev data backfilled (27 pipeline + 8 approval, 0 null), EXCLUDE verified at runtime. E2E branch-filter coverage added for both dashboards (PR #41, squash `92bc2b3a`). Every dashboard now branch-scoped + regression-locked.) UTC
 
 ## Document Roles
 
@@ -188,8 +188,8 @@ All 10 original Oracle audit findings (#1-#10) + 3 audit-refresh findings closed
 | `/api/asset-dashboard/data` | ✅ Scoped |
 | `/api/stock-monitor` | ✅ Scoped |
 | `/api/financial-dashboard` | ✅ Scoped (segment P&L; balance sheet + cash company-wide) |
-| `/api/pipeline-dashboard/data` | ✅ Scoped (denormalized branch_id, EXCLUDE) |
-| `/api/approval-monitoring/data` | ✅ Scoped (denormalized branch_id, EXCLUDE) |
+| `/api/pipeline-dashboard/data` | ✅ Scoped (denormalized branch_id, EXCLUDE) + E2E branch-filter spec (#41) |
+| `/api/approval-monitoring/data` | ✅ Scoped (denormalized branch_id, EXCLUDE) + E2E branch-filter spec (#41) |
 
 ## Useful Commands
 
@@ -221,14 +221,16 @@ gh pr view <num> --json statusCheckRollup
 ## Continuation Prompt for New Session
 
 ```text
-Read task.md first. Repo on `main` at HEAD `cc5621b8` (or fresher), working
+Read task.md first. Repo on `main` at HEAD `92bc2b3a` (or fresher), working
 tree clean. The Pipeline/Approval dashboard branch-scoping initiative is COMPLETE
-— PR #38 (registry), #39 (pipeline), #40 (approval) all MERGED. Every dashboard
-in the app is now branch-scoped. All prior branch work (financial PR1-PR4, manual
-journal attribution #37) also merged. No open PRs.
+— PR #38 (registry), #39 (pipeline), #40 (approval) all MERGED, plus PR #41
+(E2E branch-filter coverage for both dashboards). Dev data backfilled (27
+pipeline + 8 approval, 0 null), EXCLUDE verified at runtime. Every dashboard in
+the app is now branch-scoped AND regression-locked. All prior branch work
+(financial PR1-PR4, manual journal attribution #37) also merged. No open PRs.
 
 Quick verify:
-  git rev-parse HEAD          # expect cc5621b8 or fresher
+  git rev-parse HEAD          # expect 92bc2b3a or fresher
   git status --short          # expect empty (or only task.md)
   gh run list --branch main --limit 3   # verify latest is green
   gh pr list --base main --state open   # expect empty unless new work started
