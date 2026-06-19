@@ -5,12 +5,14 @@ export interface KpiItem {
     value: number;
     change: number;
     comparison_value: number;
+    scope: 'branch' | 'company';
 }
 
 export interface CashFlowSummary {
     inflow: number;
     outflow: number;
     net: number;
+    scope: 'branch' | 'company';
 }
 
 export interface ExpenseBreakdownItem {
@@ -34,10 +36,18 @@ export interface FiscalYear {
     status: string;
 }
 
+export interface BranchScope {
+    branch_id: number | null;
+    segment_scope: 'branch' | 'company';
+    excludes_unallocated: boolean;
+}
+
 export interface FinancialDashboardData {
     fiscal_years: FiscalYear[];
     selected_year_id: number | null;
     comparison_year_id: number | null;
+    selected_branch_id: number | null;
+    branch_scope: BranchScope;
     kpis: {
         revenue: KpiItem;
         expenses: KpiItem;
@@ -55,6 +65,7 @@ export interface FinancialDashboardData {
 interface UseFinancialDashboardParams {
     fiscalYearId?: number | null;
     comparisonYearId?: number | null;
+    branchId?: number | null;
 }
 
 export function useFinancialDashboard(params?: UseFinancialDashboardParams) {
@@ -72,6 +83,9 @@ export function useFinancialDashboard(params?: UseFinancialDashboardParams) {
                 params.comparisonYearId.toString(),
             );
         }
+        if (params?.branchId) {
+            queryParams.append('branch_id', params.branchId.toString());
+        }
 
         const queryString = queryParams.toString();
         const url = queryString
@@ -86,6 +100,7 @@ export function useFinancialDashboard(params?: UseFinancialDashboardParams) {
             'financial-dashboard',
             params?.fiscalYearId,
             params?.comparisonYearId,
+            params?.branchId,
         ],
         queryFn: fetchDashboardData,
         staleTime: 60000,
