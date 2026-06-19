@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Account;
+use App\Models\Branch;
 use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
@@ -28,18 +29,20 @@ describe('Financial Dashboard API', function () {
                 'fiscal_years',
                 'selected_year_id',
                 'comparison_year_id',
+                'selected_branch_id',
                 'kpis' => [
-                    'revenue' => ['value', 'change', 'comparison_value'],
-                    'expenses' => ['value', 'change', 'comparison_value'],
-                    'net_income' => ['value', 'change', 'comparison_value'],
-                    'total_assets' => ['value', 'change', 'comparison_value'],
-                    'total_liabilities' => ['value', 'change', 'comparison_value'],
-                    'equity' => ['value', 'change', 'comparison_value'],
-                    'cash_balance' => ['value', 'change', 'comparison_value'],
+                    'revenue' => ['value', 'change', 'comparison_value', 'scope'],
+                    'expenses' => ['value', 'change', 'comparison_value', 'scope'],
+                    'net_income' => ['value', 'change', 'comparison_value', 'scope'],
+                    'total_assets' => ['value', 'change', 'comparison_value', 'scope'],
+                    'total_liabilities' => ['value', 'change', 'comparison_value', 'scope'],
+                    'equity' => ['value', 'change', 'comparison_value', 'scope'],
+                    'cash_balance' => ['value', 'change', 'comparison_value', 'scope'],
                 ],
                 'cash_flow_summary' => ['inflow', 'outflow', 'net'],
                 'expense_breakdown',
                 'monthly_trends',
+                'branch_scope' => ['branch_id', 'segment_scope', 'excludes_unallocated'],
             ]);
     });
 
@@ -263,5 +266,116 @@ describe('Financial Dashboard API', function () {
             ->and((float) $trends[2]['revenue'])->toBe(100000.0)
             ->and((float) $trends[2]['expenses'])->toBe(0.0)
             ->and((float) $trends[2]['net_income'])->toBe(100000.0);
+    });
+
+    test('branch filter scopes P&L to the branch and excludes null-branch entries', function () {
+        $branch = Branch::factory()->create();
+        $fiscalYear = FiscalYear::factory()->create(['status' => 'open']);
+        $coaVersion = CoaVersion::factory()->create([
+            'fiscal_year_id' => $fiscalYear->id,
+            'status' => 'active',
+        ]);
+
+        $revenueAccount = Account::factory()->create([
+            'coa_version_id' => $coaVersion->id,
+            'type' => 'revenue',
+            'normal_balance' => 'credit',
+            'level' => 1,
+            'parent_id' => null,
+        ]);
+
+        $branchEntry = JournalEntry::factory()->create([
+            'fiscal_year_id' => $fiscalYear->id,
+            'status' => 'posted',
+            'branch_id' => $branch->id,
+        ]);
+        JournalEntryLine::factory()->create([
+            'journal_entry_id' => $branchEntry->id,
+            'account_id' => $revenueAccount->id,
+            'debit' => 0,
+            'credit' => 400000,
+        ]);
+
+        $companyWideEntry = JournalEntry::factory()->create([
+            'fiscal_year_id' => $fiscalYear->id,
+            'status' => 'posted',
+            'branch_id' => null,
+        ]);
+        JournalEntryLine::factory()->create([
+            'journal_entry_id' => $companyWideEntry->id,
+            'account_id' => $revenueAccount->id,
+            'debit' => 0,
+            'credit' => 600000,
+        ]);
+
+        $unscoped = getJson("/api/financial-dashboard?fiscal_year_id={$fiscalYear->id}");
+        $unscoped->assertOk();
+        expect((float) $unscoped->json('kpis.revenue.value'))->toBe(1000000.0)
+            ->and($unscoped->json('kpis.revenue.scope'))->toBe('company')
+            ->and($unscoped->json('selected_branch_id'))->toBeNull()
+            ->and($unscoped->json('branch_scope.excludes_unallocated'))->toBeFalse();
+
+        $scoped = getJson("/api/financial-dashboard?fiscal_year_id={$fiscalYear->id}&branch_id={$branch->id}");
+        $scoped->assertOk();
+        expect((float) $scoped->json('kpis.revenue.value'))->toBe(400000.0)
+            ->and($scoped->json('kpis.revenue.scope'))->toBe('branch')
+            ->and($scoped->json('selected_branch_id'))->toBe($branch->id)
+            ->and($scoped->json('branch_scope.excludes_unallocated'))->toBeTrue();
+    });
+
+    test('balance sheet KPIs stay company-wide and unchanged under a branch filter', function () {
+        $branch = Branch::factory()->create();
+        $fiscalYear = FiscalYear::factory()->create(['status' => 'open']);
+        $coaVersion = CoaVersion::factory()->create([
+            'fiscal_year_id' => $fiscalYear->id,
+            'status' => 'active',
+        ]);
+
+        $assetAccount = Account::factory()->create([
+            'coa_version_id' => $coaVersion->id,
+            'type' => 'asset',
+            'normal_balance' => 'debit',
+            'level' => 1,
+            'parent_id' => null,
+        ]);
+        $equityAccount = Account::factory()->create([
+            'coa_version_id' => $coaVersion->id,
+            'type' => 'equity',
+            'normal_balance' => 'credit',
+            'level' => 1,
+            'parent_id' => null,
+        ]);
+
+        $companyWideEntry = JournalEntry::factory()->create([
+            'fiscal_year_id' => $fiscalYear->id,
+            'status' => 'posted',
+            'branch_id' => null,
+        ]);
+        JournalEntryLine::factory()->create([
+            'journal_entry_id' => $companyWideEntry->id,
+            'account_id' => $assetAccount->id,
+            'debit' => 800000,
+            'credit' => 0,
+        ]);
+        JournalEntryLine::factory()->create([
+            'journal_entry_id' => $companyWideEntry->id,
+            'account_id' => $equityAccount->id,
+            'debit' => 0,
+            'credit' => 800000,
+        ]);
+
+        $unscoped = getJson("/api/financial-dashboard?fiscal_year_id={$fiscalYear->id}");
+        $scoped = getJson("/api/financial-dashboard?fiscal_year_id={$fiscalYear->id}&branch_id={$branch->id}");
+
+        $unscoped->assertOk();
+        $scoped->assertOk();
+
+        expect((float) $scoped->json('kpis.total_assets.value'))
+            ->toBe((float) $unscoped->json('kpis.total_assets.value'))
+            ->and((float) $scoped->json('kpis.total_assets.value'))->toBe(800000.0)
+            ->and($scoped->json('kpis.total_assets.scope'))->toBe('company')
+            ->and($scoped->json('kpis.equity.scope'))->toBe('company')
+            ->and((float) $scoped->json('cash_flow_summary.net'))
+            ->toBe((float) $unscoped->json('cash_flow_summary.net'));
     });
 });
