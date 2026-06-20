@@ -1,3 +1,4 @@
+import { AsyncSelect } from '@/components/common/AsyncSelect';
 import { Badge } from '@/components/ui/badge';
 import {
     Select,
@@ -50,6 +51,8 @@ type FinancialReportPageShellProps = {
     comparisonYearId?: number;
     onYearChange: (value: string) => void;
     onComparisonChange: (value: string) => void;
+    branchId?: string | null;
+    onBranchChange?: (value: string) => void;
     headerMeta?: ReactNode;
     headerActions?: ReactNode;
     isLoading?: boolean;
@@ -66,12 +69,17 @@ export function useComparisonReportSearchParams() {
     const [searchParams, setSearchParams] = useSearchParams();
     const urlYearId = searchParams.get('fiscal_year_id');
     const urlComparisonId = searchParams.get('comparison_year_id');
+    const urlBranchId = searchParams.get('branch_id');
 
     const handleYearChange = (value: string) => {
         const params: Record<string, string> = { fiscal_year_id: value };
 
         if (urlComparisonId) {
             params.comparison_year_id = urlComparisonId;
+        }
+
+        if (urlBranchId) {
+            params.branch_id = urlBranchId;
         }
 
         setSearchParams(params);
@@ -86,14 +94,36 @@ export function useComparisonReportSearchParams() {
             params.comparison_year_id = value;
         }
 
+        if (urlBranchId) {
+            params.branch_id = urlBranchId;
+        }
+
+        setSearchParams(params);
+    };
+
+    const handleBranchChange = (value: string, selectedYearId: number) => {
+        const params: Record<string, string> = {
+            fiscal_year_id: String(selectedYearId),
+        };
+
+        if (urlComparisonId) {
+            params.comparison_year_id = urlComparisonId;
+        }
+
+        if (value) {
+            params.branch_id = value;
+        }
+
         setSearchParams(params);
     };
 
     return {
         urlYearId,
         urlComparisonId,
+        urlBranchId,
         handleYearChange,
         handleComparisonChange,
+        handleBranchChange,
     };
 }
 
@@ -102,9 +132,10 @@ export function useComparisonFinancialReportQuery<TReport>(
     endpoint: string,
     urlYearId: string | null,
     urlComparisonId: string | null,
+    urlBranchId: string | null,
 ) {
     return useQuery<ComparisonReportResponse<TReport>>({
-        queryKey: [queryKey, urlYearId, urlComparisonId],
+        queryKey: [queryKey, urlYearId, urlComparisonId, urlBranchId],
         queryFn: async () => {
             const params = new URLSearchParams();
 
@@ -114,6 +145,10 @@ export function useComparisonFinancialReportQuery<TReport>(
 
             if (urlComparisonId) {
                 params.append('comparison_year_id', urlComparisonId);
+            }
+
+            if (urlBranchId) {
+                params.append('branch_id', urlBranchId);
             }
 
             const response = await axios.get(
@@ -146,8 +181,10 @@ export function useComparisonFinancialReportPage<TReport>({
     const {
         urlYearId,
         urlComparisonId,
+        urlBranchId,
         handleYearChange,
         handleComparisonChange,
+        handleBranchChange,
     } = useComparisonReportSearchParams();
 
     const { data, isLoading, error } =
@@ -156,6 +193,7 @@ export function useComparisonFinancialReportPage<TReport>({
             endpoint,
             urlYearId,
             urlComparisonId,
+            urlBranchId,
         );
 
     const fiscalYears = data?.fiscalYears || [];
@@ -174,12 +212,14 @@ export function useComparisonFinancialReportPage<TReport>({
         fiscalYears,
         selectedYearId,
         comparisonYearId,
+        branchId: urlBranchId,
         report,
         computedSections,
         selectedFiscalYear,
         selectedComparisonFiscalYear,
         handleYearChange,
         handleComparisonChange,
+        handleBranchChange,
         isLoading,
         error,
     };
@@ -229,6 +269,8 @@ export function FinancialReportPageShell({
     comparisonYearId,
     onYearChange,
     onComparisonChange,
+    branchId,
+    onBranchChange,
     headerMeta,
     headerActions,
     isLoading = false,
@@ -312,6 +354,17 @@ export function FinancialReportPageShell({
                                 </SelectContent>
                             </Select>
                         </div>
+                        {onBranchChange && (
+                            <div className="w-full sm:w-[200px]">
+                                <AsyncSelect
+                                    url="/api/branches"
+                                    placeholder="All Branches"
+                                    value={branchId ?? ''}
+                                    onValueChange={onBranchChange}
+                                    label="Branch"
+                                />
+                            </div>
+                        )}
                         {headerActions}
                     </div>
                 </div>

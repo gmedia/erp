@@ -1,3 +1,4 @@
+import { AsyncSelect } from '@/components/common/AsyncSelect';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import {
@@ -66,6 +67,8 @@ type SingleYearFinancialReportPageShellProps = {
     fiscalYears: FinancialReportFiscalYear[];
     selectedYearId: number;
     onYearChange: (value: string) => void;
+    branchId?: string | null;
+    onBranchChange?: (value: string) => void;
     headerMeta?: ReactNode;
     headerActions?: ReactNode;
     preContent?: ReactNode;
@@ -95,14 +98,37 @@ const buildBreadcrumbs = (title: string, path: string): BreadcrumbItem[] => [
 export function useSingleYearReportSearchParams() {
     const [searchParams, setSearchParams] = useSearchParams();
     const urlYearId = searchParams.get('fiscal_year_id');
+    const urlBranchId = searchParams.get('branch_id');
 
     const handleYearChange = (value: string) => {
-        setSearchParams({ fiscal_year_id: value });
+        const params: Record<string, string> = { fiscal_year_id: value };
+
+        if (urlBranchId) {
+            params.branch_id = urlBranchId;
+        }
+
+        setSearchParams(params);
+    };
+
+    const handleBranchChange = (value: string) => {
+        const params: Record<string, string> = {};
+
+        if (urlYearId) {
+            params.fiscal_year_id = urlYearId;
+        }
+
+        if (value) {
+            params.branch_id = value;
+        }
+
+        setSearchParams(params);
     };
 
     return {
         urlYearId,
+        urlBranchId,
         handleYearChange,
+        handleBranchChange,
     };
 }
 
@@ -110,14 +136,19 @@ export function useSingleYearFinancialReportQuery<TReport>(
     queryKey: string,
     endpoint: string,
     urlYearId: string | null,
+    urlBranchId: string | null,
 ) {
     return useQuery<SingleYearFinancialReportResponse<TReport>>({
-        queryKey: [queryKey, urlYearId],
+        queryKey: [queryKey, urlYearId, urlBranchId],
         queryFn: async () => {
             const params = new URLSearchParams();
 
             if (urlYearId) {
                 params.append('fiscal_year_id', urlYearId);
+            }
+
+            if (urlBranchId) {
+                params.append('branch_id', urlBranchId);
             }
 
             const response = await axios.get(
@@ -141,12 +172,14 @@ export function useSingleYearFinancialReportPage<TReport>({
     endpoint,
     emptyReport,
 }: SingleYearFinancialReportPageOptions<TReport>) {
-    const { urlYearId, handleYearChange } = useSingleYearReportSearchParams();
+    const { urlYearId, urlBranchId, handleYearChange, handleBranchChange } =
+        useSingleYearReportSearchParams();
     const { data, isLoading, error } =
         useSingleYearFinancialReportQuery<TReport>(
             queryKey,
             endpoint,
             urlYearId,
+            urlBranchId,
         );
 
     const fiscalYears = Array.isArray(data?.fiscalYears)
@@ -163,10 +196,12 @@ export function useSingleYearFinancialReportPage<TReport>({
     return {
         fiscalYears,
         selectedYearId,
+        branchId: urlBranchId,
         report,
         computedSections,
         selectedFiscalYear,
         handleYearChange,
+        handleBranchChange,
         isLoading,
         error,
     };
@@ -178,6 +213,8 @@ export function SingleYearFinancialReportPageShell({
     fiscalYears,
     selectedYearId,
     onYearChange,
+    branchId,
+    onBranchChange,
     headerMeta,
     headerActions,
     preContent,
@@ -230,6 +267,17 @@ export function SingleYearFinancialReportPageShell({
                                 </SelectContent>
                             </Select>
                         </div>
+                        {onBranchChange && (
+                            <div className="w-full sm:w-[200px]">
+                                <AsyncSelect
+                                    url="/api/branches"
+                                    placeholder="All Branches"
+                                    value={branchId ?? ''}
+                                    onValueChange={onBranchChange}
+                                    label="Branch"
+                                />
+                            </div>
+                        )}
                         {headerActions}
                     </div>
                 </div>

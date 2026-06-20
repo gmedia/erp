@@ -39,10 +39,12 @@ export default function TrialBalance() {
     const {
         fiscalYears,
         selectedYearId,
+        branchId,
         report,
         computedSections,
         selectedFiscalYear,
         handleYearChange,
+        handleBranchChange,
         isLoading,
         error,
     } = useSingleYearFinancialReportPage<TrialBalanceResponse['report']>({
@@ -70,6 +72,8 @@ export default function TrialBalance() {
             fiscalYears={fiscalYears}
             selectedYearId={selectedYearId}
             onYearChange={handleYearChange}
+            branchId={branchId}
+            onBranchChange={handleBranchChange}
             isLoading={isLoading}
             hasError={!!error}
             headerMeta={
@@ -91,6 +95,7 @@ export default function TrialBalance() {
                     onClick={() =>
                         exportData({
                             fiscal_year_id: String(selectedYearId),
+                            ...(branchId && { branch_id: branchId }),
                         })
                     }
                 >

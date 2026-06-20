@@ -61,12 +61,14 @@ export default function BalanceSheet() {
         fiscalYears,
         selectedYearId,
         comparisonYearId,
+        branchId,
         report,
         computedSections,
         selectedFiscalYear,
         selectedComparisonFiscalYear,
         handleYearChange,
         handleComparisonChange,
+        handleBranchChange,
         isLoading,
         error,
     } = useComparisonFinancialReportPage<BalanceSheetResponse['report']>({
@@ -96,6 +98,10 @@ export default function BalanceSheet() {
             onComparisonChange={(value) =>
                 handleComparisonChange(value, selectedYearId)
             }
+            branchId={branchId}
+            onBranchChange={(value) =>
+                handleBranchChange(value, selectedYearId)
+            }
             isLoading={isLoading}
             hasError={!!error}
             headerMeta={
@@ -122,6 +128,7 @@ export default function BalanceSheet() {
                             ...(comparisonYearId && {
                                 comparison_year_id: String(comparisonYearId),
                             }),
+                            ...(branchId && { branch_id: branchId }),
                         })
                     }
                 >
