@@ -15,6 +15,7 @@ class CashFlowReportRequest extends FormRequest
     {
         return [
             'fiscal_year_id' => ['required', 'integer', 'exists:fiscal_years,id'],
+            'branch_id' => ['nullable', 'integer', 'exists:branches,id'],
         ];
     }
 }

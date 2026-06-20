@@ -40,7 +40,8 @@ class ReportController extends Controller
         $report = [];
         $computedSections = [];
         if ($selectedYearId) {
-            $report = $this->reportService->getTrialBalance($selectedYearId);
+            $branchId = $this->resolveBranchId($request);
+            $report = $this->reportService->getTrialBalance($selectedYearId, $branchId);
             $config = $this->configurationResolver->execute(ReportConfiguration::TYPE_TRIAL_BALANCE);
             if ($config) {
                 $computedSections = $this->evaluateSections->execute($config['sections'], $report['totals'] ?? []);
@@ -67,9 +68,11 @@ class ReportController extends Controller
         $report = [];
         $computedSections = [];
         if ($selectedYearId) {
+            $branchId = $this->resolveBranchId($request);
             $report = $this->reportService->getBalanceSheet(
                 $selectedYearId,
                 $comparisonYearId,
+                $branchId,
             );
             $config = $this->configurationResolver->execute(ReportConfiguration::TYPE_BALANCE_SHEET);
             if ($config) {
@@ -128,7 +131,8 @@ class ReportController extends Controller
         $report = [];
         $computedSections = [];
         if ($selectedYearId) {
-            $report = $this->reportService->getCashFlow($selectedYearId);
+            $branchId = $this->resolveBranchId($request);
+            $report = $this->reportService->getCashFlow($selectedYearId, $branchId);
             $config = $this->configurationResolver->execute(ReportConfiguration::TYPE_CASH_FLOW);
             if ($config) {
                 $computedSections = $this->evaluateSections->execute($config['sections'], $report['totals'] ?? []);

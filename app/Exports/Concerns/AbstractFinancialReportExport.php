@@ -57,4 +57,15 @@ abstract class AbstractFinancialReportExport implements FromCollection, ShouldAu
     {
         return (int) $this->filters['fiscal_year_id'];
     }
+
+    protected function resolveBranchId(): ?int
+    {
+        $branchId = $this->filters['branch_id'] ?? null;
+
+        if ($branchId === null || $branchId === '') {
+            return null;
+        }
+
+        return (int) $branchId;
+    }
 }

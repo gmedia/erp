@@ -16,7 +16,7 @@ class FinancialReportService
     /**
      * Get Trial Balance Report
      */
-    public function getTrialBalance(int $fiscalYearId): array
+    public function getTrialBalance(int $fiscalYearId, ?int $branchId = null): array
     {
         $coaVersion = $this->resolveRequiredCoaVersion($fiscalYearId);
 
@@ -24,7 +24,7 @@ class FinancialReportService
             return [];
         }
 
-        $accounts = $this->accountsWithPostedSums($coaVersion->id, $fiscalYearId)
+        $accounts = $this->accountsWithPostedSums($coaVersion->id, $fiscalYearId, $branchId)
             ->orderBy('code')
             ->get();
 
@@ -40,7 +40,7 @@ class FinancialReportService
         );
     }
 
-    public function getCashFlow(int $fiscalYearId): array
+    public function getCashFlow(int $fiscalYearId, ?int $branchId = null): array
     {
         $coaVersion = $this->resolveRequiredCoaVersion($fiscalYearId);
 
@@ -48,7 +48,7 @@ class FinancialReportService
             return [];
         }
 
-        $accounts = $this->accountsWithPostedSums($coaVersion->id, $fiscalYearId)
+        $accounts = $this->accountsWithPostedSums($coaVersion->id, $fiscalYearId, $branchId)
             ->where('is_cash_flow', true)
             ->orderBy('code')
             ->get();
@@ -133,7 +133,7 @@ class FinancialReportService
     /**
      * Get Balance Sheet Report
      */
-    public function getBalanceSheet(int $fiscalYearId, ?int $comparisonFiscalYearId = null): array
+    public function getBalanceSheet(int $fiscalYearId, ?int $comparisonFiscalYearId = null, ?int $branchId = null): array
     {
         $coaVersion = $this->resolveRequiredCoaVersion($fiscalYearId);
 
@@ -149,7 +149,7 @@ class FinancialReportService
         // Design doc says: "Sistem akan mencoba mencocokkan akun berdasarkan kolom code."
 
         /** @var Collection<int, Account> $accounts */
-        $accounts = $this->accountsWithPostedSums($coaVersion->id, $fiscalYearId)
+        $accounts = $this->accountsWithPostedSums($coaVersion->id, $fiscalYearId, $branchId)
             ->whereIn('type', ['asset', 'liability', 'equity'])
             ->orderBy('code')
             ->get();
@@ -157,15 +157,15 @@ class FinancialReportService
         [
             'comparisonCoaVersion' => $comparisonCoaVersion,
             'comparisonBalanceByCurrentAccountId' => $comparisonBalanceByCurrentAccountId,
-        ] = $this->prepareComparisonContext($accounts, $comparisonFiscalYearId);
+        ] = $this->prepareComparisonContext($accounts, $comparisonFiscalYearId, $branchId);
 
         // 2. Calculate Net Income for Current Year
-        $netIncome = $this->calculateNetIncome($fiscalYearId, $coaVersion->id);
+        $netIncome = $this->calculateNetIncome($fiscalYearId, $coaVersion->id, $branchId);
 
         // 3. Calculate Net Income for Comparison Year (if exists)
         $comparisonNetIncome = 0;
         if ($comparisonFiscalYearId && $comparisonCoaVersion) {
-            $comparisonNetIncome = $this->calculateNetIncome($comparisonFiscalYearId, $comparisonCoaVersion->id);
+            $comparisonNetIncome = $this->calculateNetIncome($comparisonFiscalYearId, $comparisonCoaVersion->id, $branchId);
         }
 
         ['buckets' => $buckets, 'totals' => $totals] = $this->collectAccountBuckets(
@@ -335,10 +335,10 @@ class FinancialReportService
         ];
     }
 
-    private function calculateNetIncome(int $fiscalYearId, int $coaVersionId): float
+    private function calculateNetIncome(int $fiscalYearId, int $coaVersionId, ?int $branchId = null): float
     {
         /** @var Collection<int, Account> $accounts */
-        $accounts = $this->accountsWithPostedSums($coaVersionId, $fiscalYearId)
+        $accounts = $this->accountsWithPostedSums($coaVersionId, $fiscalYearId, $branchId)
             ->whereIn('type', ['revenue', 'expense'])
             ->get();
 
