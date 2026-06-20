@@ -12,12 +12,14 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property int $journal_entry_id
  * @property int $account_id
+ * @property int|null $branch_id
  * @property numeric $debit
  * @property numeric $credit
  * @property string|null $memo
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Account $account
+ * @property-read Branch|null $branch
  * @property-read float $amount
  * @property-read float $net_amount
  * @property-read string $type
@@ -28,6 +30,7 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntryLine newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntryLine query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntryLine whereAccountId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntryLine whereBranchId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntryLine whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntryLine whereCredit($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JournalEntryLine whereDebit($value)
@@ -51,6 +54,7 @@ class JournalEntryLine extends Model
     protected $fillable = [
         'journal_entry_id',
         'account_id',
+        'branch_id',
         'debit',
         'credit',
         'memo',
@@ -72,6 +76,11 @@ class JournalEntryLine extends Model
     public function account(): BelongsTo
     {
         return $this->belongsTo(Account::class);
+    }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
     }
 
     /**
