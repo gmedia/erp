@@ -16,7 +16,11 @@ class CashFlowReportExport implements FromCollection, ShouldAutoSize, WithHeadin
 
     public function collection(): Collection
     {
-        $rows = app(FinancialReportService::class)->getCashFlow((int) $this->filters['fiscal_year_id']);
+        $branchId = isset($this->filters['branch_id']) && $this->filters['branch_id'] !== ''
+            ? (int) $this->filters['branch_id']
+            : null;
+
+        $rows = app(FinancialReportService::class)->getCashFlow((int) $this->filters['fiscal_year_id'], $branchId);
 
         return collect($rows)->map(fn (array $row): array => [
             $row['code'],

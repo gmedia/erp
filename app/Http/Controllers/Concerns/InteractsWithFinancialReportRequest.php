@@ -55,6 +55,17 @@ trait InteractsWithFinancialReportRequest
         return (int) $selectedYearId;
     }
 
+    protected function resolveBranchId(Request $request): ?int
+    {
+        $branchId = $request->input('branch_id');
+
+        if ($branchId === null || $branchId === '') {
+            return null;
+        }
+
+        return (int) $branchId;
+    }
+
     /**
      * @param  Collection<int, FiscalYear>  $fiscalYears
      */

@@ -13,6 +13,7 @@ class BalanceSheetReportExport extends AbstractFinancialReportExport
         $report = app(FinancialReportService::class)->getBalanceSheet(
             $this->resolveFiscalYearId(),
             $this->resolveComparisonYearId(),
+            $this->resolveBranchId(),
         );
 
         $rows = [];

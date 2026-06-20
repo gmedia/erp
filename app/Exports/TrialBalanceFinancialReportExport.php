@@ -16,7 +16,11 @@ class TrialBalanceFinancialReportExport implements FromCollection, ShouldAutoSiz
 
     public function collection(): Collection
     {
-        $rows = app(FinancialReportService::class)->getTrialBalance((int) $this->filters['fiscal_year_id']);
+        $branchId = isset($this->filters['branch_id']) && $this->filters['branch_id'] !== ''
+            ? (int) $this->filters['branch_id']
+            : null;
+
+        $rows = app(FinancialReportService::class)->getTrialBalance((int) $this->filters['fiscal_year_id'], $branchId);
 
         return collect($rows)->map(fn (array $row): array => [
             $row['code'],
