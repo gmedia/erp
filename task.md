@@ -1,6 +1,18 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-06-19 (Pipeline/Approval dashboard branch-scoping initiative COMPLETE — PR #38 registry, #39 pipeline, #40 approval all MERGED. Dev data backfilled (27 pipeline + 8 approval, 0 null), EXCLUDE verified at runtime. E2E branch-filter coverage added for both dashboards (PR #41, squash `92bc2b3a`). Every dashboard now branch-scoped + regression-locked.) UTC
+Last updated: 2026-06-20 (Per-branch financial statements **reduced 2b** COMPLETE — PR #42 schema (`d97c8c7a`), #43 backend per-branch BS/TB/CF (`99b70ce2`), #44 frontend branch selector + E2E (`c5f4ccfd`) all MERGED. Balance Sheet, Trial Balance, Cash Flow now scope per branch via header `journal_entries.branch_id` (Oracle Option B — no clearing engine, single-branch invariant). main HEAD `c5f4ccfd`.) UTC
+
+## THIS SESSION — Per-branch financial statements (reduced 2b), 3 PRs MERGED
+
+User chose scope **2b** then **reduced** (after detection showed zero cross-branch journals). Oracle ruled **Option B**: under the single-branch invariant, filtering the existing header `journal_entries.branch_id` is mathematically identical to line-level filtering, so NO inter-branch clearing engine / journal write-path change is needed.
+
+- **PR #42** (squash `d97c8c7a`) — schema: nullable `journal_entry_lines.branch_id` FK + composite index `(branch_id, account_id)`, model fillable + `branch()` relation. **Inert forward-compat** (nothing reads/writes it under reduced 2b; reserved for a future clearing engine). `down()` drops FK before index (MariaDB 1553).
+- **PR #43** (squash `99b70ce2`) — backend: threaded `?branchId` into `FinancialReportService::getTrialBalance/getCashFlow/getBalanceSheet/calculateNetIncome`. `getBalanceSheet` injects **per-branch** CYE (`calculateNetIncome(branchId)`) so each branch's sheet balances (A=L+E) — this is the single highest-risk line (company-wide CYE while filtering A/L/E = guaranteed imbalance). `branchId=null` keeps prior company-wide behavior byte-identical. ReportController + `InteractsWithFinancialReportRequest::resolveBranchId` thread `branch_id`; requests validate `nullable|integer|exists:branches,id`; 3 exports thread branch_id. New `PerBranchFinancialReportTest` (7 tests): per-branch TB self-balances, per-branch BS balances w/ per-branch CYE, CYE==net income, null-branch robustness, omitting branchId==company-wide. Full reports group 38 green.
+- **PR #44** (squash `c5f4ccfd`) — frontend: "All Branches" AsyncSelect (`/api/branches`) on Balance Sheet / Trial Balance / Cash Flow shells, rendered AFTER existing fiscal-year/comparison selectors (preserves existing specs' positional combobox indices). branch_id preserved in URL params + threaded into report query + export payload. New `per-branch-financial-reports` E2E (3 pass) + 9 existing report specs still pass.
+
+**Semantics:** specific branch shows only journals whose header branch resolves to it; null-branch (manual/closing) journals form an implicit "unassigned" bucket excluded from any selected branch (does NOT break per-branch balancing — every excluded journal is itself balanced). Σbranches ≠ company-wide when null-branch journals exist (documented, not a bug).
+
+**Escalation trigger for full 2b:** the moment production books a real cross-branch journal (centralized HQ payment for another branch's bill, or cross-branch stock transfer posting to GL), header≠line and Option B breaks → switch to line-level filter + clearing engine (PR3/4/6 in `.sisyphus/plans/per-branch-financial-statements-2b.md`). Detection on current data = 0, so deferred.
 
 ## Document Roles
 
@@ -190,6 +202,9 @@ All 10 original Oracle audit findings (#1-#10) + 3 audit-refresh findings closed
 | `/api/financial-dashboard` | ✅ Scoped (segment P&L; balance sheet + cash company-wide) |
 | `/api/pipeline-dashboard/data` | ✅ Scoped (denormalized branch_id, EXCLUDE) + E2E branch-filter spec (#41) |
 | `/api/approval-monitoring/data` | ✅ Scoped (denormalized branch_id, EXCLUDE) + E2E branch-filter spec (#41) |
+| `/api/reports/balance-sheet` | ✅ Per-branch (header branch_id, per-branch CYE; reduced 2b #43/#44) |
+| `/api/reports/trial-balance` | ✅ Per-branch (header branch_id; reduced 2b #43/#44) |
+| `/api/reports/cash-flow` | ✅ Per-branch (header branch_id; reduced 2b #43/#44) |
 
 ## Useful Commands
 
@@ -221,37 +236,33 @@ gh pr view <num> --json statusCheckRollup
 ## Continuation Prompt for New Session
 
 ```text
-Read task.md first. Repo on `main` at HEAD `92bc2b3a` (or fresher), working
-tree clean. The Pipeline/Approval dashboard branch-scoping initiative is COMPLETE
-— PR #38 (registry), #39 (pipeline), #40 (approval) all MERGED, plus PR #41
-(E2E branch-filter coverage for both dashboards). Dev data backfilled (27
-pipeline + 8 approval, 0 null), EXCLUDE verified at runtime. Every dashboard in
-the app is now branch-scoped AND regression-locked. All prior branch work
-(financial PR1-PR4, manual journal attribution #37) also merged. No open PRs.
+Read task.md first. Repo on `main` at HEAD `c5f4ccfd` (or fresher), working
+tree clean. Per-branch financial statements **reduced 2b** is COMPLETE — PR #42
+(schema, inert forward-compat), #43 (backend per-branch BS/TB/CF via header
+branch_id + per-branch CYE, Oracle Option B), #44 (frontend branch selector +
+E2E) all MERGED. Balance Sheet, Trial Balance, Cash Flow now scope per branch.
+All prior branch work (dashboards #38-#41, financial PR1-PR4, manual journal
+attribution #37) also merged. No open PRs.
 
 Quick verify:
-  git rev-parse HEAD          # expect 92bc2b3a or fresher
+  git rev-parse HEAD          # expect c5f4ccfd or fresher
   git status --short          # expect empty (or only task.md)
   gh run list --branch main --limit 3   # verify latest is green
   gh pr list --base main --state open   # expect empty unless new work started
 
 If dev DB seems empty: `sail artisan db:seed`. Schema is intact.
 
-DEPLOYMENT TODO (when shipping to an env with existing data): run the two
-idempotent backfills for historical rows:
-  sail artisan pipeline-states:backfill-branch
-  sail artisan approval-requests:backfill-branch
-(both support --dry-run). New-write population is already wired.
+NEXT ACTION needs USER DIRECTION (do NOT auto-pick). Reduced 2b is done. Remaining
+options (all optional / future — none blocking):
 
-NEXT ACTION needs USER DIRECTION (do NOT auto-pick). Branch-scoping is fully done
-end to end (every dashboard + every write path + backfills). Remaining options
-(all optional / future — none blocking):
+1. FULL 2b (inter-branch clearing engine + per-branch period closing) — ONLY if
+   production starts booking real cross-branch journals (centralized HQ payment
+   for another branch's bill, or cross-branch stock transfer posting to GL). Plan
+   + Oracle design staged in .sisyphus/plans/per-branch-financial-statements-2b.md
+   (PR3/4/6). Detection on current data = 0, so deferred.
 
-1. Per-branch cash flow (future) — needs line-level branch tagging or a
-   documented treasury-allocation method. Separate initiative.
-
-2. Option 1 (Head-Office branch) — only if a TRUE per-branch balance sheet is
-   ever required. Bigger accounting-policy design.
+2. Extend per-branch scoping to income-statement/comparative report PAGES (backend
+   getIncomeStatement already accepts branchId; just needs the selector wired).
 
 3. H3 Wave 2 multi-currency FX subsystem (weeks) — pull when first non-IDR
    customer signs.
@@ -273,6 +284,11 @@ getTotalDebitAttribute/getTotalCreditAttribute accessors that recompute
 UNFILTERED sums. Eloquent accessors SHADOW query-aliased columns of the same
 name. Never alias a withSum/selectSub column `total_debit`/`total_credit` on the
 Account model — use a distinct name (we use posted_debit_sum/posted_credit_sum).
+
+KNOWN GOTCHA (reduced 2b, PR #43): per-branch balance sheet ONLY balances if the
+synthetic 9999-CYE row is computed PER BRANCH (`calculateNetIncome(branchId)`).
+Filtering A/L/E by branch while leaving CYE company-wide guarantees imbalance.
+Guarded by PerBranchFinancialReportTest.
 
 Depwire/Sonar tools still produce false positives for Laravel auto-discovery
 patterns. Skip unless config improves.
