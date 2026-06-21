@@ -42,6 +42,21 @@ class InterBranchClearingService
             return $lines;
         }
 
+        $branchIds = array_map('intval', array_keys($netByBranch));
+        sort($branchIds);
+
+        $needsInjection = false;
+        foreach ($netByBranch as $net) {
+            if ($net !== 0) {
+                $needsInjection = true;
+                break;
+            }
+        }
+
+        if (! $needsInjection) {
+            return $lines;
+        }
+
         if ($hasNullBranch) {
             throw new RuntimeException(
                 'Cannot inject inter-branch clearing: a journal line has an unresolved branch '
@@ -55,9 +70,6 @@ class InterBranchClearingService
                 . 'is not configured for this fiscal year.',
             );
         }
-
-        $branchIds = array_map('intval', array_keys($netByBranch));
-        sort($branchIds);
 
         $injected = [];
         foreach ($branchIds as $branchId) {
