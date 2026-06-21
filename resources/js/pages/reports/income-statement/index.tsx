@@ -55,12 +55,14 @@ export default function IncomeStatement() {
         fiscalYears,
         selectedYearId,
         comparisonYearId,
+        branchId,
         report,
         computedSections,
         selectedFiscalYear,
         selectedComparisonFiscalYear,
         handleYearChange,
         handleComparisonChange,
+        handleBranchChange,
         isLoading,
         error,
     } = useComparisonFinancialReportPage<IncomeStatementResponse['report']>({
@@ -92,6 +94,10 @@ export default function IncomeStatement() {
             onComparisonChange={(value) =>
                 handleComparisonChange(value, selectedYearId)
             }
+            branchId={branchId}
+            onBranchChange={(value) =>
+                handleBranchChange(value, selectedYearId)
+            }
             isLoading={isLoading}
             hasError={!!error}
             headerMeta={
@@ -118,6 +124,7 @@ export default function IncomeStatement() {
                             ...(comparisonYearId && {
                                 comparison_year_id: String(comparisonYearId),
                             }),
+                            ...(branchId && { branch_id: branchId }),
                         })
                     }
                 >

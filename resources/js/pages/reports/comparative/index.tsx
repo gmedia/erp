@@ -72,11 +72,13 @@ export default function ComparativeReport() {
         fiscalYears,
         selectedYearId,
         comparisonYearId,
+        branchId,
         report,
         selectedFiscalYear,
         selectedComparisonFiscalYear,
         handleYearChange,
         handleComparisonChange,
+        handleBranchChange,
         isLoading,
         error,
     } = useComparisonFinancialReportPage<ComparativeReportResponse['report']>({
@@ -100,6 +102,10 @@ export default function ComparativeReport() {
             onComparisonChange={(value) =>
                 handleComparisonChange(value, selectedYearId)
             }
+            branchId={branchId}
+            onBranchChange={(value) =>
+                handleBranchChange(value, selectedYearId)
+            }
             isLoading={isLoading}
             hasError={!!error}
             headerMeta={
@@ -120,6 +126,7 @@ export default function ComparativeReport() {
                             ...(comparisonYearId && {
                                 comparison_year_id: String(comparisonYearId),
                             }),
+                            ...(branchId && { branch_id: branchId }),
                         })
                     }
                 >

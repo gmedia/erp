@@ -13,6 +13,7 @@ class ComparativeReportExport extends AbstractFinancialReportExport
         $report = app(FinancialReportService::class)->getComparativeReport(
             $this->resolveFiscalYearId(),
             $this->resolveComparisonYearId(),
+            $this->resolveBranchId(),
         );
 
         $rows = [];
