@@ -71,6 +71,7 @@ class PostBankReconciliationJournalAction
                 'description' => "Bank Reconciliation - {$bankReconciliation->account->code}",
                 'status' => 'posted',
                 'journal_type' => 'system',
+                'branch_id' => $bankReconciliation->branch_id,
                 'source_type' => BankReconciliation::class,
                 'source_id' => $bankReconciliation->id,
                 'lines' => $lines,

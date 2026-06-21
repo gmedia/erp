@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property int $account_id
+ * @property int|null $branch_id
  * @property int $fiscal_year_id
  * @property Carbon $reconciliation_date
  * @property Carbon $period_start
@@ -30,6 +31,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Account $account
+ * @property-read Branch|null $branch
  * @property-read User|null $completedBy
  * @property-read User|null $creator
  * @property-read FiscalYear $fiscalYear
@@ -74,6 +76,7 @@ class BankReconciliation extends Model
      */
     protected $fillable = [
         'account_id',
+        'branch_id',
         'fiscal_year_id',
         'reconciliation_date',
         'period_start',
@@ -107,6 +110,11 @@ class BankReconciliation extends Model
     public function account(): BelongsTo
     {
         return $this->belongsTo(Account::class);
+    }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
     }
 
     public function fiscalYear(): BelongsTo

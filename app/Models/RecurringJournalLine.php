@@ -12,12 +12,14 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property int $recurring_journal_id
  * @property int $account_id
+ * @property int|null $branch_id
  * @property numeric $debit
  * @property numeric $credit
  * @property string|null $memo
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Account $account
+ * @property-read Branch|null $branch
  * @property-read RecurringJournal $recurringJournal
  *
  * @method static \Database\Factories\RecurringJournalLineFactory factory($count = null, $state = [])
@@ -48,6 +50,7 @@ class RecurringJournalLine extends Model
     protected $fillable = [
         'recurring_journal_id',
         'account_id',
+        'branch_id',
         'debit',
         'credit',
         'memo',
@@ -64,6 +67,11 @@ class RecurringJournalLine extends Model
     public function recurringJournal(): BelongsTo
     {
         return $this->belongsTo(RecurringJournal::class);
+    }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
     }
 
     public function account(): BelongsTo
