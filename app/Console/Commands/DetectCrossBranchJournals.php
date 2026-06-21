@@ -6,6 +6,7 @@ use App\Services\InterBranchClearingService;
 use Illuminate\Console\Command;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class DetectCrossBranchJournals extends Command
 {
@@ -83,6 +84,14 @@ class DetectCrossBranchJournals extends Command
                 '%d multi-branch journal entries detected. Evaluate whether retro-correction (PR8) is now warranted.',
                 $multiBranchCount,
             ));
+
+            Log::warning('Cross-branch journals detected by scheduled monitor.', [
+                'scope' => $postedOnly ? 'posted' : 'all',
+                'multi_branch_entries' => $multiBranchCount,
+                'clearing_entries' => $clearingEntryCount,
+                'clearing_lines' => $clearingLineCount,
+                'null_branch_lines' => $nullBranchLineCount,
+            ]);
         }
 
         return self::SUCCESS;
