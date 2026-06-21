@@ -6,6 +6,8 @@ export interface JournalEntryLine {
     debit: number;
     credit: number;
     memo?: string;
+    branch_id?: string;
+    branch_name?: string;
 }
 
 export interface JournalEntry {

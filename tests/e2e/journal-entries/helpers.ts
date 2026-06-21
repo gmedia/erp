@@ -57,7 +57,7 @@ export async function createJournalEntry(
     const lineDialog = page.getByRole('dialog', { name: /Add Line/i }).first();
     await expect(lineDialog).toBeVisible();
 
-    const accountTrigger = lineDialog.locator('button[role="combobox"]');
+    const accountTrigger = lineDialog.locator('button[role="combobox"]').first();
     await accountTrigger.click();
 
     const searchInput = page.getByPlaceholder('Search...');

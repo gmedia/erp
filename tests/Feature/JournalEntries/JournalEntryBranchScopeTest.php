@@ -158,4 +158,46 @@ describe('Manual journal entry branch attribution gate', function () {
             ->assertJsonPath('data.branch.id', $branch->id)
             ->assertJsonPath('data.branch.name', $branch->name);
     });
+
+    test('accepts per-line branch_id and persists it on the journal lines', function () {
+        $accounts = makeBalancedJournalLines();
+        $branchA = Branch::factory()->create();
+        $user = makeJournalUserInBranch(null, ['journal_entry', 'journal_entry.create', 'view_all_branches']);
+        actingAs($user);
+
+        $payload = [
+            'entry_date' => '2026-03-15',
+            'description' => 'Per-line branch entry',
+            'lines' => [
+                ['account_id' => $accounts[0]->id, 'branch_id' => $branchA->id, 'debit' => 1000, 'credit' => 0],
+                ['account_id' => $accounts[1]->id, 'branch_id' => $branchA->id, 'debit' => 0, 'credit' => 1000],
+            ],
+        ];
+
+        postJson('/api/journal-entries', $payload)->assertCreated();
+
+        $entry = JournalEntry::latest('id')->first();
+        $lines = $entry->lines()->get();
+        expect($lines->firstWhere('account_id', $accounts[0]->id)->branch_id)->toBe($branchA->id);
+        expect($lines->firstWhere('account_id', $accounts[1]->id)->branch_id)->toBe($branchA->id);
+    });
+
+    test('rejects a per-line branch_id that does not exist', function () {
+        $accounts = makeBalancedJournalLines();
+        $user = makeJournalUserInBranch(null, ['journal_entry', 'journal_entry.create', 'view_all_branches']);
+        actingAs($user);
+
+        $payload = [
+            'entry_date' => '2026-03-15',
+            'description' => 'Bad per-line branch',
+            'lines' => [
+                ['account_id' => $accounts[0]->id, 'branch_id' => 999999, 'debit' => 1000, 'credit' => 0],
+                ['account_id' => $accounts[1]->id, 'debit' => 0, 'credit' => 1000],
+            ],
+        ];
+
+        postJson('/api/journal-entries', $payload)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['lines.0.branch_id']);
+    });
 });

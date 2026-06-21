@@ -27,6 +27,8 @@ const journalEntryLineSchema = z
         debit: z.coerce.number().min(0).optional().default(0),
         credit: z.coerce.number().min(0).optional().default(0),
         memo: z.string().optional(),
+        branch_id: z.string().optional(),
+        branch_name: z.string().optional(),
     })
     .refine(
         () => {
@@ -67,6 +69,8 @@ export function JournalEntryLineFormDialog({
                 debit: 0,
                 credit: 0,
                 memo: '',
+                branch_id: '',
+                branch_name: '',
             };
         }
 
@@ -77,6 +81,8 @@ export function JournalEntryLineFormDialog({
             debit: Number(item.debit || 0),
             credit: Number(item.credit || 0),
             memo: item.memo || '',
+            branch_id: item.branch_id || '',
+            branch_name: item.branch_name || '',
         };
     }, [item]);
 
@@ -147,6 +153,21 @@ export function JournalEntryLineFormDialog({
                                     form.setValue(
                                         'account_code',
                                         account?.code || '',
+                                        { shouldDirty: true },
+                                    );
+                                }}
+                            />
+                            <AsyncSelectField<{ name: string }>
+                                key={`branch-${defaultValues.branch_id || 'new'}-${open ? 'open' : 'closed'}`}
+                                name="branch_id"
+                                label="Branch"
+                                url="/api/branches"
+                                placeholder="Select branch"
+                                initialLabel={defaultValues.branch_name || ''}
+                                onItemSelect={(branch) => {
+                                    form.setValue(
+                                        'branch_name',
+                                        branch?.name || '',
                                         { shouldDirty: true },
                                     );
                                 }}

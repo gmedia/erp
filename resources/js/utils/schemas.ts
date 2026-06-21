@@ -245,6 +245,8 @@ export const journalEntryFormSchema = z.object({
                 memo: z.string().optional(),
                 account_name: z.string().optional(),
                 account_code: z.string().optional(),
+                branch_id: z.string().optional(),
+                branch_name: z.string().optional(),
             }),
         )
         .min(2, { message: 'At least 2 lines are required.' })
