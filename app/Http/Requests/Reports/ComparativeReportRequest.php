@@ -16,6 +16,7 @@ class ComparativeReportRequest extends FormRequest
         return [
             'fiscal_year_id' => ['required', 'integer', 'exists:fiscal_years,id'],
             'comparison_year_id' => ['nullable', 'integer', 'exists:fiscal_years,id', 'different:fiscal_year_id'],
+            'branch_id' => ['nullable', 'integer', 'exists:branches,id'],
         ];
     }
 }

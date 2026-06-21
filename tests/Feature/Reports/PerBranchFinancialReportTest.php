@@ -174,3 +174,91 @@ test('balance sheet export validates branch_id', function () {
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['branch_id']);
 });
+
+test('per-branch income statement scopes revenue, expense, and net income', function () {
+    seedTwoBranchFixtures($this);
+
+    $reportA = $this->service->getIncomeStatement($this->fiscalYear->id, null, $this->branchA->id);
+    expect(round($reportA['totals']['revenue'], 2))->toBe(1000000.0);
+    expect(round($reportA['totals']['expense'], 2))->toBe(0.0);
+    expect(round($reportA['totals']['net_income'], 2))->toBe(1000000.0);
+
+    $reportB = $this->service->getIncomeStatement($this->fiscalYear->id, null, $this->branchB->id);
+    expect(round($reportB['totals']['revenue'], 2))->toBe(600000.0);
+    expect(round($reportB['totals']['expense'], 2))->toBe(200000.0);
+    expect(round($reportB['totals']['net_income'], 2))->toBe(400000.0);
+});
+
+test('per-branch comparative report scopes all sections', function () {
+    seedTwoBranchFixtures($this);
+
+    $reportA = $this->service->getComparativeReport($this->fiscalYear->id, null, $this->branchA->id);
+    expect(round($reportA['totals']['assets'], 2))->toBe(1400000.0);
+    expect(round($reportA['totals']['liabilities'], 2))->toBe(400000.0);
+    expect(round($reportA['totals']['revenues'], 2))->toBe(1000000.0);
+    expect(round($reportA['totals']['expenses'], 2))->toBe(0.0);
+
+    $reportB = $this->service->getComparativeReport($this->fiscalYear->id, null, $this->branchB->id);
+    expect(round($reportB['totals']['assets'], 2))->toBe(400000.0);
+    expect(round($reportB['totals']['revenues'], 2))->toBe(600000.0);
+    expect(round($reportB['totals']['expenses'], 2))->toBe(200000.0);
+});
+
+test('omitting branchId reproduces company-wide income statement', function () {
+    seedTwoBranchFixtures($this);
+
+    $scopedSum = $this->service->getIncomeStatement($this->fiscalYear->id, null, $this->branchA->id)['totals']['net_income']
+        + $this->service->getIncomeStatement($this->fiscalYear->id, null, $this->branchB->id)['totals']['net_income'];
+    $companyWide = $this->service->getIncomeStatement($this->fiscalYear->id);
+
+    // Branch fixtures contribute net income 1,400,000; company-wide also includes NULL-branch journals.
+    expect(round($companyWide['totals']['net_income'], 2))
+        ->toBeGreaterThanOrEqual(round($scopedSum, 2));
+});
+
+test('income statement endpoint accepts branch_id and scopes the report', function () {
+    seedTwoBranchFixtures($this);
+    $user = createTestUserWithPermissions(['income_statement_report']);
+
+    Sanctum::actingAs($user, ['*']);
+    $this->getJson('/api/reports/income-statement?fiscal_year_id=' . $this->fiscalYear->id . '&branch_id=' . $this->branchA->id)
+        ->assertOk()
+        ->assertJsonPath('report.totals.revenue', 1000000)
+        ->assertJsonPath('report.totals.expense', 0)
+        ->assertJsonPath('report.totals.net_income', 1000000);
+});
+
+test('comparative endpoint accepts branch_id and scopes the report', function () {
+    seedTwoBranchFixtures($this);
+    $user = createTestUserWithPermissions(['comparative_report']);
+
+    Sanctum::actingAs($user, ['*']);
+    $this->getJson('/api/reports/comparative?fiscal_year_id=' . $this->fiscalYear->id . '&branch_id=' . $this->branchB->id)
+        ->assertOk()
+        ->assertJsonPath('report.totals.revenues', 600000)
+        ->assertJsonPath('report.totals.expenses', 200000);
+});
+
+test('income statement export validates branch_id', function () {
+    $user = createTestUserWithPermissions(['income_statement_report']);
+
+    Sanctum::actingAs($user, ['*']);
+    $this->postJson('/api/reports/income-statement/export', [
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'branch_id' => 999999,
+    ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['branch_id']);
+});
+
+test('comparative export validates branch_id', function () {
+    $user = createTestUserWithPermissions(['comparative_report']);
+
+    Sanctum::actingAs($user, ['*']);
+    $this->postJson('/api/reports/comparative/export', [
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'branch_id' => 999999,
+    ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['branch_id']);
+});

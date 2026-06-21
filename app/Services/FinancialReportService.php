@@ -242,7 +242,7 @@ class FinancialReportService
         ];
     }
 
-    public function getComparativeReport(int $fiscalYearId, ?int $comparisonFiscalYearId = null): array
+    public function getComparativeReport(int $fiscalYearId, ?int $comparisonFiscalYearId = null, ?int $branchId = null): array
     {
         $coaVersion = $this->resolveRequiredCoaVersion($fiscalYearId);
 
@@ -258,12 +258,12 @@ class FinancialReportService
         }
 
         /** @var Collection<int, Account> $accounts */
-        $accounts = $this->accountsWithPostedSums($coaVersion->id, $fiscalYearId)
+        $accounts = $this->accountsWithPostedSums($coaVersion->id, $fiscalYearId, $branchId)
             ->orderBy('code')
             ->get();
 
         ['comparisonBalanceByCurrentAccountId' => $comparisonBalanceByCurrentAccountId]
-            = $this->prepareComparisonContext($accounts, $comparisonFiscalYearId);
+            = $this->prepareComparisonContext($accounts, $comparisonFiscalYearId, $branchId);
 
         ['buckets' => $buckets, 'totals' => $totals] = $this->collectAccountBuckets(
             $accounts,

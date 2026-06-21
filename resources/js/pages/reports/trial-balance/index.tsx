@@ -1,4 +1,5 @@
 import { ComputedSectionsCard } from '@/components/reports/financial/ComputedSectionsCard';
+import { FinancialReportExportButton } from '@/components/reports/financial/FinancialReportExportButton';
 import {
     FinancialReportHeaderMeta,
     type FinancialReportFiscalYear,
@@ -10,10 +11,8 @@ import {
     useSingleYearFinancialReportPage,
     type FinancialTableRow,
 } from '@/components/reports/financial/FinancialTableReportPage';
-import { Button } from '@/components/ui/button';
 import { useExport } from '@/hooks/useExport';
 import { formatCurrency } from '@/lib/utils';
-import { Download, Loader2 } from 'lucide-react';
 
 interface AccountItem extends FinancialTableRow {
     id: number;
@@ -88,24 +87,12 @@ export default function TrialBalance() {
                 </FinancialReportHeaderMeta>
             }
             headerActions={
-                <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={!selectedYearId || exporting}
-                    onClick={() =>
-                        exportData({
-                            fiscal_year_id: String(selectedYearId),
-                            ...(branchId && { branch_id: branchId }),
-                        })
-                    }
-                >
-                    {exporting ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                        <Download className="mr-2 h-4 w-4" />
-                    )}
-                    {exporting ? 'Exporting...' : 'Export'}
-                </Button>
+                <FinancialReportExportButton
+                    exporting={exporting}
+                    selectedYearId={selectedYearId}
+                    branchId={branchId}
+                    onExport={exportData}
+                />
             }
         >
             <FinancialTableCard

@@ -23,6 +23,16 @@ const reports: ReportTarget[] = [
         route: '/reports/cash-flow',
         api: '/api/reports/cash-flow',
     },
+    {
+        name: 'Income Statement',
+        route: '/reports/income-statement',
+        api: '/api/reports/income-statement',
+    },
+    {
+        name: 'Comparative Report',
+        route: '/reports/comparative',
+        api: '/api/reports/comparative',
+    },
 ];
 
 test.describe('Per-branch financial report filter', () => {

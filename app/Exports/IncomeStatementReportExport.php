@@ -13,6 +13,7 @@ class IncomeStatementReportExport extends AbstractFinancialReportExport
         $report = app(FinancialReportService::class)->getIncomeStatement(
             $this->resolveFiscalYearId(),
             $this->resolveComparisonYearId(),
+            $this->resolveBranchId(),
         );
 
         $rows = [];

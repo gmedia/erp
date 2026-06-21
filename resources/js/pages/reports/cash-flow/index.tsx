@@ -1,4 +1,5 @@
 import { ComputedSectionsCard } from '@/components/reports/financial/ComputedSectionsCard';
+import { FinancialReportExportButton } from '@/components/reports/financial/FinancialReportExportButton';
 import {
     FinancialReportHeaderMeta,
     type FinancialReportFiscalYear,
@@ -9,11 +10,9 @@ import {
     useSingleYearFinancialReportPage,
     type FinancialTableRow,
 } from '@/components/reports/financial/FinancialTableReportPage';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useExport } from '@/hooks/useExport';
 import { formatCurrency } from '@/lib/utils';
-import { Download, Loader2 } from 'lucide-react';
 
 interface CashFlowItem extends FinancialTableRow {
     id: number;
@@ -82,24 +81,12 @@ export default function CashFlow() {
                 <FinancialReportHeaderMeta fiscalYear={selectedFiscalYear} />
             }
             headerActions={
-                <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={!selectedYearId || exporting}
-                    onClick={() =>
-                        exportData({
-                            fiscal_year_id: String(selectedYearId),
-                            ...(branchId && { branch_id: branchId }),
-                        })
-                    }
-                >
-                    {exporting ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                        <Download className="mr-2 h-4 w-4" />
-                    )}
-                    {exporting ? 'Exporting...' : 'Export'}
-                </Button>
+                <FinancialReportExportButton
+                    exporting={exporting}
+                    selectedYearId={selectedYearId}
+                    branchId={branchId}
+                    onExport={exportData}
+                />
             }
             preContent={
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-3">

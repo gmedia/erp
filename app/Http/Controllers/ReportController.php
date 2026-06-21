@@ -101,9 +101,11 @@ class ReportController extends Controller
         $report = [];
         $computedSections = [];
         if ($selectedYearId) {
+            $branchId = $this->resolveBranchId($request);
             $report = $this->reportService->getIncomeStatement(
                 $selectedYearId,
                 $comparisonYearId,
+                $branchId,
             );
             $config = $this->configurationResolver->execute(ReportConfiguration::TYPE_INCOME_STATEMENT);
             if ($config) {
@@ -162,9 +164,11 @@ class ReportController extends Controller
 
         $report = [];
         if ($selectedYearId) {
+            $branchId = $this->resolveBranchId($request);
             $report = $this->reportService->getComparativeReport(
                 $selectedYearId,
                 $comparisonYearId,
+                $branchId,
             );
         }
 
