@@ -26,6 +26,7 @@ class StoreRecurringJournalRequest extends FormRequest
             'is_active' => ['boolean'],
             'lines' => ['required', 'array', 'min:2'],
             'lines.*.account_id' => ['required', 'integer', 'exists:accounts,id'],
+            'lines.*.branch_id' => ['nullable', 'integer', 'exists:branches,id'],
             'lines.*.debit' => ['required', 'numeric', 'min:0'],
             'lines.*.credit' => ['required', 'numeric', 'min:0'],
             'lines.*.memo' => ['nullable', 'string', 'max:255'],

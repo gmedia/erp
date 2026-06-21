@@ -21,6 +21,7 @@ const bankReconciliationFormSchema = z
         statement_balance: z.coerce.number({
             message: 'Statement balance is required.',
         }),
+        branch_id: z.string().optional(),
     })
     .refine((data) => data.period_end >= data.period_start, {
         message: 'Period end must be after or equal to period start.',
@@ -47,6 +48,7 @@ const getBankReconciliationFormDefaults = (
             period_start: new Date(),
             period_end: new Date(),
             statement_balance: 0,
+            branch_id: '',
         };
     }
     return {
@@ -55,6 +57,7 @@ const getBankReconciliationFormDefaults = (
         period_start: new Date(entity.period_start),
         period_end: new Date(entity.period_end),
         statement_balance: Number(entity.statement_balance),
+        branch_id: entity.branch_id ? String(entity.branch_id) : '',
     };
 };
 
@@ -78,6 +81,7 @@ export const BankReconciliationForm = memo<BankReconciliationFormProps>(
         const accountCode = entity?.account?.code;
         const accountName = entity?.account?.name;
         const fiscalYearName = entity?.fiscal_year?.name;
+        const branchName = entity?.branch?.name;
 
         return (
             <EntityForm
@@ -126,13 +130,22 @@ export const BankReconciliationForm = memo<BankReconciliationFormProps>(
                     <DatePickerField name="period_end" label="Period End" />
                 </div>
 
-                <InputField
-                    name="statement_balance"
-                    label="Statement Balance"
-                    type="number"
-                    step="0.01"
-                    placeholder="0.00"
-                />
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <InputField
+                        name="statement_balance"
+                        label="Statement Balance"
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                    />
+                    <AsyncSelectField<{ name: string }>
+                        name="branch_id"
+                        label="Branch"
+                        url="/api/branches"
+                        placeholder="Select branch"
+                        initialLabel={branchName || ''}
+                    />
+                </div>
             </EntityForm>
         );
     },

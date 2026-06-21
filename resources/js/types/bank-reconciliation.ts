@@ -45,6 +45,11 @@ export interface BankReconciliation {
         id: number;
         name: string;
     };
+    branch_id?: number | null;
+    branch?: {
+        id: number;
+        name: string;
+    } | null;
     period_start: string;
     period_end: string;
     statement_balance: number;
