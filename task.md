@@ -1,6 +1,18 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-06-20 (Per-branch financial statements **reduced 2b** COMPLETE — PR #42 schema (`d97c8c7a`), #43 backend per-branch BS/TB/CF (`99b70ce2`), #44 frontend branch selector + E2E (`c5f4ccfd`) all MERGED. Balance Sheet, Trial Balance, Cash Flow now scope per branch via header `journal_entries.branch_id` (Oracle Option B — no clearing engine, single-branch invariant). main HEAD `c5f4ccfd`.) UTC
+Last updated: 2026-06-21 (Per-branch financial reports EXTENDED — PR #45 (`5d57b6cf`) MERGED: Income Statement + Comparative now branch-scoped, closing the selector gap. Also extracted shared `FinancialReportExportButton` (dedup across all 5 financial report pages, Sonar new-code duplication 8.0%→0.0%). main HEAD `5d57b6cf`. All 5 financial reports now per-branch.) UTC
+
+## SESSION 2026-06-21 — Per-branch Income Statement & Comparative (PR #45 MERGED)
+
+Extended reduced-2b per-branch filtering to the two remaining financial report pages, following the exact #43/#44 pattern. Squash `5d57b6cf`, branch deleted, main synced.
+
+- **Backend**: `ReportController::incomeStatement/comparative` resolve+pass `branch_id`; `FinancialReportService::getComparativeReport` gained `?branchId` and threads it into `accountsWithPostedSums`+`prepareComparisonContext` (`getIncomeStatement` already accepted it pre-#43, now actually wired); both requests validate `branch_id` (nullable|integer|exists:branches,id); both exports thread `resolveBranchId()`.
+- **Frontend**: income-statement + comparative pages pass `branchId`+`onBranchChange` into the shared shell and add `branch_id` to export payload + URL params.
+- **Refactor (dedup)**: extracted `resources/js/components/reports/financial/FinancialReportExportButton.tsx` and replaced the duplicated 26-28 line export-button block across ALL FIVE financial report pages (balance-sheet, cash-flow, trial-balance, income-statement, comparative). `comparisonYearId` optional → single-year pages reuse it. Net −28 lines. This resolved the SonarCloud new-code duplication gate (8.0% fail → 0.0% pass).
+- **Tests**: +7 Pest (PerBranchFinancialReportTest now covers IS+comparative invariants/endpoints/export-validation; reports group 45 green); +2 E2E (per-branch-financial-reports now 5 cases green).
+- **CI**: all 5 checks green (Quality, Playwright E2E, Test suite, both SonarCloud). Sonar quality gate OK (coverage new code 100%, duplication 0.0%).
+
+Semantics unchanged & backward-compatible: `branchId=null` = byte-identical company-wide; specific branch filters by header `journal_entries.branch_id`. Escalation trigger for full 2b unchanged (first real cross-branch journal).
 
 ## THIS SESSION — Per-branch financial statements (reduced 2b), 3 PRs MERGED
 
@@ -205,6 +217,8 @@ All 10 original Oracle audit findings (#1-#10) + 3 audit-refresh findings closed
 | `/api/reports/balance-sheet` | ✅ Per-branch (header branch_id, per-branch CYE; reduced 2b #43/#44) |
 | `/api/reports/trial-balance` | ✅ Per-branch (header branch_id; reduced 2b #43/#44) |
 | `/api/reports/cash-flow` | ✅ Per-branch (header branch_id; reduced 2b #43/#44) |
+| `/api/reports/income-statement` | ✅ Per-branch (header branch_id; #45) |
+| `/api/reports/comparative` | ✅ Per-branch (header branch_id; #45) |
 
 ## Useful Commands
 
@@ -236,38 +250,34 @@ gh pr view <num> --json statusCheckRollup
 ## Continuation Prompt for New Session
 
 ```text
-Read task.md first. Repo on `main` at HEAD `c5f4ccfd` (or fresher), working
-tree clean. Per-branch financial statements **reduced 2b** is COMPLETE — PR #42
-(schema, inert forward-compat), #43 (backend per-branch BS/TB/CF via header
-branch_id + per-branch CYE, Oracle Option B), #44 (frontend branch selector +
-E2E) all MERGED. Balance Sheet, Trial Balance, Cash Flow now scope per branch.
+Read task.md first. Repo on `main` at HEAD `5d57b6cf` (or fresher), working
+tree clean. Per-branch financial reports are COMPLETE for ALL FIVE statements —
+Balance Sheet, Trial Balance, Cash Flow (#42-#44) plus Income Statement &
+Comparative (#45). Every financial report page has a branch selector + export
+support. A shared `FinancialReportExportButton` now backs all five pages.
 All prior branch work (dashboards #38-#41, financial PR1-PR4, manual journal
 attribution #37) also merged. No open PRs.
 
 Quick verify:
-  git rev-parse HEAD          # expect c5f4ccfd or fresher
+  git rev-parse HEAD          # expect 5d57b6cf or fresher
   git status --short          # expect empty (or only task.md)
   gh run list --branch main --limit 3   # verify latest is green
   gh pr list --base main --state open   # expect empty unless new work started
 
 If dev DB seems empty: `sail artisan db:seed`. Schema is intact.
 
-NEXT ACTION needs USER DIRECTION (do NOT auto-pick). Reduced 2b is done. Remaining
-options (all optional / future — none blocking):
+NEXT ACTION needs USER DIRECTION (do NOT auto-pick). Per-branch financial reports
+are fully done. Remaining options (all optional / future — none blocking):
 
 1. FULL 2b (inter-branch clearing engine + per-branch period closing) — ONLY if
-   production starts booking real cross-branch journals (centralized HQ payment
-   for another branch's bill, or cross-branch stock transfer posting to GL). Plan
-   + Oracle design staged in .sisyphus/plans/per-branch-financial-statements-2b.md
-   (PR3/4/6). Detection on current data = 0, so deferred.
+   production starts booking real cross-branch journals. Plan + Oracle design in
+   .sisyphus/plans/per-branch-financial-statements-2b.md (PR3/4/6). Detection on
+   current data = 0, so deferred.
 
-2. Extend per-branch scoping to income-statement/comparative report PAGES (backend
-   getIncomeStatement already accepts branchId; just needs the selector wired).
-
-3. H3 Wave 2 multi-currency FX subsystem (weeks) — pull when first non-IDR
+2. H3 Wave 2 multi-currency FX subsystem (weeks) — pull when first non-IDR
    customer signs.
 
-4. Product feature work (request specs from user).
+3. Product feature work (request specs from user).
 
 KNOWN GOTCHAS (this session):
 - BranchResolverRegistry throws on unregistered types — intentional (fail loud).
