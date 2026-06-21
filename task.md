@@ -1,6 +1,17 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-06-21 (FULL 2b COMPLETE — entire inter-branch per-branch financial statements initiative shipped. PRs #46-#54 all MERGED. main HEAD `aa2bbaa3`. Clearing engine + line-level reports + per-branch balance sheet (Due-From/Due-To) + per-asset-branch depreciation + per-branch period closing + bank-rec/recurring branch schema + per-line branch pickers UI all live. Only optional PR8 (retro-correction of historical multi-branch journals) deferred — gated on cross-branch detection which is currently 0. Engine is dormant-but-correct on all current single-branch data.) UTC
+Last updated: 2026-06-21 (FULL 2b COMPLETE + operational validation. PRs #46-#54 (initiative) + #55 (smoke test & cross-branch detection command) all MERGED. main HEAD `92e292e8`. Detection on dev = 0 multi-branch journals → engine dormant-but-correct confirmed; PR8 still NOT warranted. Clearing engine + line-level reports + per-branch balance sheet (Due-From/Due-To) + per-asset-branch depreciation + per-branch period closing + bank-rec/recurring branch schema + per-line branch pickers UI all live. Only optional PR8 (retro-correction of historical multi-branch journals) deferred — gated on cross-branch detection which is currently 0. Engine is dormant-but-correct on all current single-branch data.) UTC
+
+## SESSION 2026-06-21 (cont.) — 2b operational validation (PR #55 merged)
+
+Dua follow-up validasi operasional setelah full 2b selesai. Tidak mengubah jalur kode produksi — hanya menambah bukti end-to-end + alat monitoring read-only. main HEAD `92e292e8`. CI 5/5 green, Sonar PASS.
+
+| Item | File | Isi |
+|------|------|-----|
+| #1 Smoke test E2E | `tests/Feature/JournalEntries/MultiBranchJournalSmokeTest.php` | Jurnal multi-branch via write-path asli (CreateJournalEntryAction) → clearing auto-inject → persist → FinancialReportService per branch. Assert per-branch TB dr==cr, Due-From (A)/Due-To (B), BS A==L+E, income statement di branch penerima, clearing nets 0 company-wide. 3 tests, 18 assertions. |
+| #2 Detection command | `app/Console/Commands/DetectCrossBranchJournals.php` + `tests/Feature/Console/DetectCrossBranchJournalsTest.php` | `journals:detect-cross-branch [--posted-only] [--limit=N]`. Hitung entry multi-branch ekonomis, clearing lines (1999-IBC), null-branch lines. GATE untuk PR8. 3 tests. |
+
+**Hasil di dev: 0 entry multi-branch** → engine dormant-but-correct terkonfirmasi; PR8 tetap NOT warranted. Grup `inter-branch-clearing` penuh: 22 passed / 232 assertions. duster + phpstan clean.
 
 ## SESSION 2026-06-21 (cont.) — FULL 2b COMPLETE (PR #46-#54 all merged)
 
@@ -286,20 +297,19 @@ gh pr view <num> --json statusCheckRollup
 ## Continuation Prompt for New Session
 
 ```text
-Read task.md first. Repo on `main` at HEAD `aa2bbaa3` (or fresher), working
-tree clean. FULL 2b is COMPLETE — the entire inter-branch per-branch financial
-statements initiative shipped (PRs #46-#54 merged): clearing engine, line-level
-reports, per-branch balance sheet (Due-From/Due-To), per-asset-branch
-depreciation, per-branch period closing, bank-rec/recurring branch schema, and
-per-line branch pickers UI. Engine is dormant-but-correct on current
-single-branch data (0 cross-branch journals). All prior branch work + the
-reduced-2b reports (#42-#45) also merged. No open PRs.
+Read task.md first. Repo on `main` at HEAD `92e292e8` (or fresher), working
+tree clean. FULL 2b is COMPLETE and operationally validated. The inter-branch
+initiative (PRs #46-#54) plus a follow-up (#55: end-to-end smoke test +
+`journals:detect-cross-branch` monitoring command) are all merged. The clearing
+engine is dormant-but-correct: `journals:detect-cross-branch` reports 0
+economically multi-branch journals on current data. No open PRs.
 
 Quick verify:
-  git rev-parse HEAD          # expect aa2bbaa3 or fresher
+  git rev-parse HEAD          # expect 92e292e8 or fresher
   git status --short          # expect empty (or only task.md)
   gh run list --branch main --limit 3   # verify latest is green
   gh pr list --base main --state open   # expect empty unless new work started
+  sail artisan journals:detect-cross-branch   # gate for PR8: expect 0 multi-branch
 
 If dev DB seems empty: `sail artisan db:seed`. Schema is intact.
 
