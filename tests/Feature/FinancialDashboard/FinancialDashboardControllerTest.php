@@ -292,6 +292,7 @@ describe('Financial Dashboard API', function () {
         JournalEntryLine::factory()->create([
             'journal_entry_id' => $branchEntry->id,
             'account_id' => $revenueAccount->id,
+            'branch_id' => $branch->id,
             'debit' => 0,
             'credit' => 400000,
         ]);
@@ -304,6 +305,7 @@ describe('Financial Dashboard API', function () {
         JournalEntryLine::factory()->create([
             'journal_entry_id' => $companyWideEntry->id,
             'account_id' => $revenueAccount->id,
+            'branch_id' => null,
             'debit' => 0,
             'credit' => 600000,
         ]);

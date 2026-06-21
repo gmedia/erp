@@ -57,6 +57,7 @@ function seedBranchJournal(FiscalYear $fiscalYear, array $accountMap, User $user
         JournalEntryLine::create([
             'journal_entry_id' => $journal->id,
             'account_id' => $accountMap[$code],
+            'branch_id' => $branchId,
             'debit' => $debit,
             'credit' => $credit,
             'memo' => 'fixture',
@@ -161,6 +162,47 @@ test('balance sheet endpoint accepts branch_id and scopes the report', function 
         ->assertJsonPath('report.totals.assets', 1400000)
         ->assertJsonPath('report.totals.liabilities', 400000)
         ->assertJsonPath('report.totals.equity', 1000000);
+});
+
+test('reports filter by line-level branch, not header branch', function () {
+    $journal = JournalEntry::create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'entry_number' => 'JV-SPLIT-1',
+        'entry_date' => '2026-02-01',
+        'reference' => 'JV-SPLIT-1',
+        'description' => 'Header A, lines split A/B',
+        'status' => 'posted',
+        'branch_id' => $this->branchA->id,
+        'created_by' => $this->user->id,
+        'posted_by' => $this->user->id,
+        'posted_at' => now(),
+    ]);
+
+    JournalEntryLine::create([
+        'journal_entry_id' => $journal->id,
+        'account_id' => $this->accountMap['11110'],
+        'branch_id' => $this->branchB->id,
+        'debit' => 700000,
+        'credit' => 0,
+        'memo' => 'split line to B',
+    ]);
+    JournalEntryLine::create([
+        'journal_entry_id' => $journal->id,
+        'account_id' => $this->accountMap['41000'],
+        'branch_id' => $this->branchA->id,
+        'debit' => 0,
+        'credit' => 700000,
+        'memo' => 'split line to A',
+    ]);
+
+    $reportB = $this->service->getTrialBalance($this->fiscalYear->id, $this->branchB->id);
+    $cashRowB = collect($reportB)->firstWhere('code', '11110');
+    expect($cashRowB)->not->toBeNull();
+    expect(round($cashRowB['debit'], 2))->toBe(700000.0);
+
+    $reportA = $this->service->getTrialBalance($this->fiscalYear->id, $this->branchA->id);
+    $cashRowA = collect($reportA)->firstWhere('code', '11110');
+    expect(round((float) ($cashRowA['debit'] ?? 0), 2))->toBe(0.0);
 });
 
 test('balance sheet export validates branch_id', function () {

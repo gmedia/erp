@@ -86,7 +86,7 @@ class FinancialReportService
             ->where('journal_entries.status', 'posted')
             ->where('accounts.coa_version_id', $coaVersion->id)
             ->whereIn('accounts.type', ['revenue', 'expense'])
-            ->when($branchId !== null, fn ($query) => $query->where('journal_entries.branch_id', $branchId))
+            ->when($branchId !== null, fn ($query) => $query->where('journal_entry_lines.branch_id', $branchId))
             ->select([
                 'journal_entries.entry_date as entry_date',
                 'accounts.type as account_type',
@@ -723,7 +723,7 @@ class FinancialReportService
             ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
             ->where('journal_entries.fiscal_year_id', $fiscalYearId)
             ->where('journal_entries.status', 'posted')
-            ->when($branchId !== null, fn ($q) => $q->where('journal_entries.branch_id', $branchId))
+            ->when($branchId !== null, fn ($q) => $q->where('journal_entry_lines.branch_id', $branchId))
             ->groupBy('journal_entry_lines.account_id')
             ->select('journal_entry_lines.account_id')
             ->selectRaw('SUM(journal_entry_lines.debit) as posted_debit_sum')
