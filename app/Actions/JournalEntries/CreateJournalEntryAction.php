@@ -4,6 +4,7 @@ namespace App\Actions\JournalEntries;
 
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
+use App\Services\InterBranchClearingService;
 use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
@@ -12,6 +13,10 @@ use Illuminate\Validation\ValidationException;
 
 class CreateJournalEntryAction
 {
+    public function __construct(
+        private InterBranchClearingService $clearing,
+    ) {}
+
     /**
      * Create a journal entry with its lines.
      *
@@ -106,9 +111,26 @@ class CreateJournalEntryAction
 
                     $journalEntry = JournalEntry::create($attributes);
 
-                    foreach ($data['lines'] as $lineData) {
+                    $headerBranchId = $data['branch_id'] ?? null;
+                    $resolvedLines = array_map(
+                        fn (array $line): array => [
+                            'account_id' => $line['account_id'],
+                            'branch_id' => $line['branch_id'] ?? $headerBranchId,
+                            'debit' => $line['debit'],
+                            'credit' => $line['credit'],
+                            'memo' => $line['memo'] ?? null,
+                        ],
+                        $data['lines'],
+                    );
+
+                    $clearingAccountId = $this->clearing->resolveAccountIdForFiscalYear($fiscalYear->id);
+                    $resolvedLines = $this->clearing->inject($resolvedLines, $clearingAccountId);
+                    $this->clearing->assertBalancedPerBranch($resolvedLines);
+
+                    foreach ($resolvedLines as $lineData) {
                         $journalEntry->lines()->create([
                             'account_id' => $lineData['account_id'],
+                            'branch_id' => $lineData['branch_id'] ?? null,
                             'debit' => $lineData['debit'],
                             'credit' => $lineData['credit'],
                             'memo' => $lineData['memo'] ?? null,

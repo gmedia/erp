@@ -4,11 +4,16 @@ namespace App\Actions\JournalEntries;
 
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
+use App\Services\InterBranchClearingService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class UpdateJournalEntryAction
 {
+    public function __construct(
+        private InterBranchClearingService $clearing,
+    ) {}
+
     public function execute(JournalEntry $journalEntry, array $data): JournalEntry
     {
         if ($journalEntry->status === 'posted' || $journalEntry->status === 'void') {
@@ -51,34 +56,28 @@ class UpdateJournalEntryAction
                 'description' => $data['description'],
             ]);
 
-            // Sync Lines
-            // 1. Get existing line IDs
-            $existingLines = $journalEntry->lines->keyBy('id');
-            $newLinesData = collect($data['lines']);
-
-            // 2. Identify IDs to keep/update
-            $linesToUpdate = $newLinesData->whereNotNull('id'); // Assuming frontend sends ID for existing lines?
-            // Wait, standard FE might send all lines. If ID exists, update. If not, create.
-            // But we don't have ID in StoreRequest/UpdateRequests rules for lines.
-            // We should assume complete replacement or smart diff.
-            // Easier: Delete all and recreate? Or diff by content?
-            // "Sync" by ID is safest if FE sends it.
-
-            // Let's assume we delete all and recreate for simplicity in this iteration,
-            // unless we want to preserve IDs.
-            // Preserving IDs is better.
-            // Let's update lines.* request rule to include ID if possible
-
-            // Re-visiting UpdateJournalEntryRequest...
-            // I didn't verify if I added ID there. I didn't.
-            // So for now, I will DELETE ALL and RECREATE lines.
-            // This is acceptable for simple Journal Entry CRUD where lines are child entities.
-
             $journalEntry->lines()->delete();
 
-            foreach ($data['lines'] as $lineData) {
+            $headerBranchId = $journalEntry->branch_id;
+            $resolvedLines = array_map(
+                fn (array $line): array => [
+                    'account_id' => $line['account_id'],
+                    'branch_id' => $line['branch_id'] ?? $headerBranchId,
+                    'debit' => $line['debit'],
+                    'credit' => $line['credit'],
+                    'memo' => $line['memo'] ?? null,
+                ],
+                $data['lines'],
+            );
+
+            $clearingAccountId = $this->clearing->resolveAccountIdForFiscalYear($journalEntry->fiscal_year_id);
+            $resolvedLines = $this->clearing->inject($resolvedLines, $clearingAccountId);
+            $this->clearing->assertBalancedPerBranch($resolvedLines);
+
+            foreach ($resolvedLines as $lineData) {
                 $journalEntry->lines()->create([
                     'account_id' => $lineData['account_id'],
+                    'branch_id' => $lineData['branch_id'] ?? null,
                     'debit' => $lineData['debit'],
                     'credit' => $lineData['credit'],
                     'memo' => $lineData['memo'] ?? null,
