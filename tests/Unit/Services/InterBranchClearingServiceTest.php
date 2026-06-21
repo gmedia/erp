@@ -137,6 +137,20 @@ test('injection is idempotent (run twice equals once)', function () {
     expect($twice)->toEqual($once);
 });
 
+test('multi-branch entry where each branch self-balances injects nothing', function () {
+    $lines = [
+        ['account_id' => 10, 'branch_id' => 1, 'debit' => 100, 'credit' => 0, 'memo' => null],
+        ['account_id' => 11, 'branch_id' => 1, 'debit' => 0, 'credit' => 100, 'memo' => null],
+        ['account_id' => 12, 'branch_id' => 2, 'debit' => 200, 'credit' => 0, 'memo' => null],
+        ['account_id' => 13, 'branch_id' => 2, 'debit' => 0, 'credit' => 200, 'memo' => null],
+    ];
+
+    $result = $this->service->inject($lines, null);
+
+    expect($result)->toHaveCount(4);
+    expect(collect($result)->where('account_id', $this->clearingId))->toHaveCount(0);
+});
+
 test('throws when multi-branch entry has an unresolved branch line', function () {
     $lines = [
         ['account_id' => 10, 'branch_id' => 1, 'debit' => 100, 'credit' => 0, 'memo' => null],

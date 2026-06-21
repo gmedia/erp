@@ -34,7 +34,6 @@ class PostDepreciationToJournalAction
             $journalLines = [];
             $summary = [];
 
-            // Group by expense and accumulated accounts
             foreach ($run->lines as $line) {
                 $asset = $line->asset;
                 $expenseAccount = $asset->depreciation_expense_account_id;
@@ -46,27 +45,31 @@ class PostDepreciationToJournalAction
                     ]);
                 }
 
-                if (! isset($summary[$expenseAccount])) {
-                    $summary[$expenseAccount] = ['debit' => 0, 'credit' => 0];
-                }
-                $summary[$expenseAccount]['debit'] += $line->amount;
+                $branchId = $asset->branch_id;
+                $expenseKey = $expenseAccount . '-' . $branchId;
+                $accumulatedKey = $accumulatedAccount . '-' . $branchId;
 
-                if (! isset($summary[$accumulatedAccount])) {
-                    $summary[$accumulatedAccount] = ['debit' => 0, 'credit' => 0];
+                if (! isset($summary[$expenseKey])) {
+                    $summary[$expenseKey] = ['account_id' => $expenseAccount, 'branch_id' => $branchId, 'debit' => 0, 'credit' => 0];
                 }
-                $summary[$accumulatedAccount]['credit'] += $line->amount;
+                $summary[$expenseKey]['debit'] += $line->amount;
 
-                // Update asset cache
+                if (! isset($summary[$accumulatedKey])) {
+                    $summary[$accumulatedKey] = ['account_id' => $accumulatedAccount, 'branch_id' => $branchId, 'debit' => 0, 'credit' => 0];
+                }
+                $summary[$accumulatedKey]['credit'] += $line->amount;
+
                 $asset->update([
                     'accumulated_depreciation' => $line->accumulated_after,
                     'book_value' => $line->book_value_after,
                 ]);
             }
 
-            foreach ($summary as $accountId => $amounts) {
+            foreach ($summary as $amounts) {
                 if ($amounts['debit'] > 0) {
                     $journalLines[] = [
-                        'account_id' => $accountId,
+                        'account_id' => $amounts['account_id'],
+                        'branch_id' => $amounts['branch_id'],
                         'debit' => $amounts['debit'],
                         'credit' => 0,
                         'memo' => 'Depreciation Expense',
@@ -74,7 +77,8 @@ class PostDepreciationToJournalAction
                 }
                 if ($amounts['credit'] > 0) {
                     $journalLines[] = [
-                        'account_id' => $accountId,
+                        'account_id' => $amounts['account_id'],
+                        'branch_id' => $amounts['branch_id'],
                         'debit' => 0,
                         'credit' => $amounts['credit'],
                         'memo' => 'Accumulated Depreciation',

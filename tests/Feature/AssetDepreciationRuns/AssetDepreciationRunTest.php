@@ -4,7 +4,9 @@ use App\Models\Account;
 use App\Models\Asset;
 use App\Models\AssetDepreciationLine;
 use App\Models\AssetDepreciationRun;
+use App\Models\Branch;
 use App\Models\FiscalYear;
+use App\Models\JournalEntryLine;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 
@@ -160,4 +162,59 @@ test('user can post depreciation run to journal', function () {
         'id' => $run->journal_entry_id,
         'status' => 'draft',
     ]);
+});
+
+test('depreciation posting attributes journal lines per asset branch and injects clearing', function () {
+    $branchA = Branch::factory()->create();
+    $branchB = Branch::factory()->create();
+    $expenseAccount = Account::factory()->create();
+    $accumulatedAccount = Account::factory()->create();
+    $clearingAccount = Account::factory()->create(['code' => '1999-IBC']);
+
+    $assetA = Asset::factory()->create([
+        'branch_id' => $branchA->id,
+        'depreciation_expense_account_id' => $expenseAccount->id,
+        'accumulated_depr_account_id' => $accumulatedAccount->id,
+    ]);
+    $assetB = Asset::factory()->create([
+        'branch_id' => $branchB->id,
+        'depreciation_expense_account_id' => $expenseAccount->id,
+        'accumulated_depr_account_id' => $accumulatedAccount->id,
+    ]);
+
+    $run = AssetDepreciationRun::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'period_start' => '2024-01-01',
+        'period_end' => '2024-01-31',
+        'status' => 'calculated',
+    ]);
+
+    foreach ([$assetA, $assetB] as $asset) {
+        AssetDepreciationLine::factory()->create([
+            'asset_depreciation_run_id' => $run->id,
+            'asset_id' => $asset->id,
+            'amount' => 100000,
+            'accumulated_before' => 0,
+            'accumulated_after' => 100000,
+            'book_value_after' => 0,
+        ]);
+    }
+
+    postJson("/api/asset-depreciation-runs/{$run->id}/post")->assertStatus(200);
+
+    $run->refresh();
+    $lines = JournalEntryLine::where('journal_entry_id', $run->journal_entry_id)->get();
+
+    // Each branch's depreciation expense + accumulated lines are tagged to that branch.
+    expect($lines->where('branch_id', $branchA->id)->where('account_id', $expenseAccount->id))->toHaveCount(1);
+    expect($lines->where('branch_id', $branchB->id)->where('account_id', $expenseAccount->id))->toHaveCount(1);
+
+    // Per branch the entry self-balances (expense debit == accumulated credit), so
+    // no clearing line is needed for this symmetric case.
+    foreach ([$branchA->id, $branchB->id] as $branchId) {
+        $branchLines = $lines->where('branch_id', $branchId);
+        $debit = $branchLines->sum(fn ($l) => (int) round(((float) $l->debit) * 100));
+        $credit = $branchLines->sum(fn ($l) => (int) round(((float) $l->credit) * 100));
+        expect($debit)->toBe($credit);
+    }
 });
