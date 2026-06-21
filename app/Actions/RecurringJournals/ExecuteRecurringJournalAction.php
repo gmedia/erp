@@ -4,12 +4,17 @@ namespace App\Actions\RecurringJournals;
 
 use App\Models\JournalEntry;
 use App\Models\RecurringJournal;
+use App\Services\InterBranchClearingService;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class ExecuteRecurringJournalAction
 {
+    public function __construct(
+        private InterBranchClearingService $clearing,
+    ) {}
+
     public function execute(RecurringJournal $recurringJournal): JournalEntry
     {
         return DB::transaction(function () use ($recurringJournal): JournalEntry {
@@ -38,12 +43,25 @@ class ExecuteRecurringJournalAction
                 'posted_at' => $recurringJournal->auto_post ? now() : null,
             ]);
 
-            foreach ($recurringJournal->lines as $line) {
+            $resolvedLines = $recurringJournal->lines->map(fn ($line): array => [
+                'account_id' => $line->account_id,
+                'branch_id' => $line->branch_id ?? null,
+                'debit' => $line->debit,
+                'credit' => $line->credit,
+                'memo' => $line->memo,
+            ])->all();
+
+            $clearingAccountId = $this->clearing->resolveAccountIdForFiscalYear($recurringJournal->fiscal_year_id);
+            $resolvedLines = $this->clearing->inject($resolvedLines, $clearingAccountId);
+            $this->clearing->assertBalancedPerBranch($resolvedLines);
+
+            foreach ($resolvedLines as $line) {
                 $entry->lines()->create([
-                    'account_id' => $line->account_id,
-                    'debit' => $line->debit,
-                    'credit' => $line->credit,
-                    'memo' => $line->memo,
+                    'account_id' => $line['account_id'],
+                    'branch_id' => $line['branch_id'] ?? null,
+                    'debit' => $line['debit'],
+                    'credit' => $line['credit'],
+                    'memo' => $line['memo'] ?? null,
                 ]);
             }
 

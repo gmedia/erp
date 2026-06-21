@@ -7,6 +7,7 @@ use App\Models\Account;
 use App\Models\AccountBalance;
 use App\Models\JournalEntry;
 use App\Models\PeriodClosing;
+use App\Services\InterBranchClearingService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -14,6 +15,7 @@ class ClosePeriodAction
 {
     public function __construct(
         private RecalculateAccountBalancesAction $recalculate,
+        private InterBranchClearingService $clearing,
     ) {}
 
     public function execute(PeriodClosing $periodClosing): PeriodClosing
@@ -73,6 +75,7 @@ class ClosePeriodAction
             'posted_at' => now(),
         ]);
         $netIncome = 0.0;
+        $lines = [];
 
         foreach ($accounts as $account) {
             $balance = (float) AccountBalance::query()
@@ -85,20 +88,37 @@ class ClosePeriodAction
                 continue;
             }
             $netIncome += $account->type === 'revenue' ? $balance : -$balance;
-            $entry->lines()->create([
+            $lines[] = [
                 'account_id' => $account->id,
+                'branch_id' => null,
                 'debit' => $account->type === 'revenue' ? abs($balance) : 0,
                 'credit' => $account->type === 'expense' ? abs($balance) : 0,
                 'memo' => 'Close ' . $account->name,
-            ]);
+            ];
         }
 
-        $entry->lines()->create([
+        $lines[] = [
             'account_id' => $periodClosing->retained_earnings_account_id,
+            'branch_id' => null,
             'debit' => $netIncome < 0 ? abs($netIncome) : 0,
             'credit' => $netIncome > 0 ? $netIncome : 0,
             'memo' => 'Close net income to retained earnings',
-        ]);
+        ];
+
+        $clearingAccountId = $this->clearing->resolveAccountIdForFiscalYear($periodClosing->fiscal_year_id);
+        $lines = $this->clearing->inject($lines, $clearingAccountId);
+        $this->clearing->assertBalancedPerBranch($lines);
+
+        foreach ($lines as $line) {
+            $entry->lines()->create([
+                'account_id' => $line['account_id'],
+                'branch_id' => $line['branch_id'] ?? null,
+                'debit' => $line['debit'],
+                'credit' => $line['credit'],
+                'memo' => $line['memo'] ?? null,
+            ]);
+        }
+
         $periodClosing->update(['net_income' => $netIncome]);
 
         return $entry;
