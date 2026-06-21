@@ -168,6 +168,14 @@ class FinancialReportService
             $comparisonNetIncome = $this->calculateNetIncome($comparisonFiscalYearId, $comparisonCoaVersion->id, $branchId);
         }
 
+        $clearingReclass = $this->extractClearingReclassification(
+            $accounts,
+            $branchId,
+            $comparisonFiscalYearId,
+            $comparisonBalanceByCurrentAccountId,
+        );
+        $accounts = $clearingReclass['accounts'];
+
         ['buckets' => $buckets, 'totals' => $totals] = $this->collectAccountBuckets(
             $accounts,
             $comparisonFiscalYearId,
@@ -178,6 +186,13 @@ class FinancialReportService
                 'equity' => ['bucket' => 'equity', 'total' => 'equity'],
             ]
         );
+
+        if ($clearingReclass['item'] !== null) {
+            $bucket = $clearingReclass['bucket'];
+            $buckets[$bucket][] = $clearingReclass['item'];
+            $totals[$bucket] += $clearingReclass['item']['balance'];
+            $totals["comparison_{$bucket}"] += $clearingReclass['item']['comparison_balance'];
+        }
 
         // Add Current Year Earnings to Equity
         $buckets['equity'][] = [
@@ -427,6 +442,65 @@ class FinancialReportService
                 $comparisonCoaVersion,
                 $branchId,
             ),
+        ];
+    }
+
+    /**
+     * @param  Collection<int, Account>  $accounts
+     * @param  array<int, float>  $comparisonBalanceByCurrentAccountId
+     * @return array{accounts: Collection<int, Account>, item: array<string, mixed>|null, bucket: string}
+     */
+    private function extractClearingReclassification(
+        Collection $accounts,
+        ?int $branchId,
+        ?int $comparisonFiscalYearId,
+        array $comparisonBalanceByCurrentAccountId,
+    ): array {
+        if ($branchId === null) {
+            return ['accounts' => $accounts, 'item' => null, 'bucket' => 'assets'];
+        }
+
+        /** @var Account|null $clearing */
+        $clearing = $accounts->firstWhere('code', InterBranchClearingService::CLEARING_CODE);
+
+        if (! $clearing) {
+            return ['accounts' => $accounts, 'item' => null, 'bucket' => 'assets'];
+        }
+
+        $remaining = $accounts->reject(
+            fn (Account $account): bool => $account->code === InterBranchClearingService::CLEARING_CODE,
+        )->values();
+
+        $balance = $this->computeAccountBalance(
+            $clearing->normal_balance,
+            $clearing->posted_debit_sum ?? 0,
+            $clearing->posted_credit_sum ?? 0,
+        );
+        $comparisonBalance = $comparisonFiscalYearId
+            ? (float) ($comparisonBalanceByCurrentAccountId[$clearing->id] ?? 0)
+            : 0.0;
+
+        if (round($balance, 2) === 0.0 && round($comparisonBalance, 2) === 0.0) {
+            return ['accounts' => $remaining, 'item' => null, 'bucket' => 'assets'];
+        }
+
+        $isDueFrom = $balance >= 0;
+
+        $item = [
+            'id' => $clearing->id,
+            'code' => $clearing->code,
+            'name' => $isDueFrom ? 'Due From Branches' : 'Due To Branches',
+            'level' => 1,
+            'parent_id' => null,
+            'balance' => $isDueFrom ? $balance : -$balance,
+            'comparison_balance' => $isDueFrom ? $comparisonBalance : -$comparisonBalance,
+            'sub_type' => $isDueFrom ? 'current_asset' : 'current_liability',
+        ];
+
+        return [
+            'accounts' => $remaining,
+            'item' => $item,
+            'bucket' => $isDueFrom ? 'assets' : 'liabilities',
         ];
     }
 

@@ -205,6 +205,67 @@ test('reports filter by line-level branch, not header branch', function () {
     expect(round((float) ($cashRowA['debit'] ?? 0), 2))->toBe(0.0);
 });
 
+test('balance sheet reclassifies clearing slice as Due From / Due To per branch', function () {
+    $entry = JournalEntry::create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'entry_number' => 'JV-IBC-1',
+        'entry_date' => '2026-02-01',
+        'reference' => 'JV-IBC-1',
+        'description' => 'Inter-branch cash transfer A -> B',
+        'status' => 'posted',
+        'branch_id' => null,
+        'created_by' => $this->user->id,
+        'posted_by' => $this->user->id,
+        'posted_at' => now(),
+    ]);
+
+    // Branch A sends cash (net credit) -> clearing net debit for A (Due From).
+    // Branch B receives cash (net debit) -> clearing net credit for B (Due To).
+    $rows = [
+        ['11110', $this->branchA->id, 0, 500000],
+        ['1999-IBC', $this->branchA->id, 500000, 0],
+        ['11110', $this->branchB->id, 500000, 0],
+        ['1999-IBC', $this->branchB->id, 0, 500000],
+    ];
+    foreach ($rows as [$code, $branchId, $debit, $credit]) {
+        JournalEntryLine::create([
+            'journal_entry_id' => $entry->id,
+            'account_id' => $this->accountMap[$code],
+            'branch_id' => $branchId,
+            'debit' => $debit,
+            'credit' => $credit,
+            'memo' => 'fixture',
+        ]);
+    }
+
+    $reportA = $this->service->getBalanceSheet($this->fiscalYear->id, null, $this->branchA->id);
+    $dueFromA = collect($reportA['assets'])->firstWhere('code', '1999-IBC');
+    expect($dueFromA)->not->toBeNull();
+    expect($dueFromA['name'])->toBe('Due From Branches');
+    expect(round($dueFromA['balance'], 2))->toBe(500000.0);
+    expect(collect($reportA['liabilities'])->firstWhere('code', '1999-IBC'))->toBeNull();
+    expect(round($reportA['totals']['assets'], 2))
+        ->toBe(round($reportA['totals']['liabilities'] + $reportA['totals']['equity'], 2));
+
+    $reportB = $this->service->getBalanceSheet($this->fiscalYear->id, null, $this->branchB->id);
+    $dueToB = collect($reportB['liabilities'])->firstWhere('code', '1999-IBC');
+    expect($dueToB)->not->toBeNull();
+    expect($dueToB['name'])->toBe('Due To Branches');
+    expect(round($dueToB['balance'], 2))->toBe(500000.0);
+    expect(collect($reportB['assets'])->firstWhere('code', '1999-IBC'))->toBeNull();
+    expect(round($reportB['totals']['assets'], 2))
+        ->toBe(round($reportB['totals']['liabilities'] + $reportB['totals']['equity'], 2));
+});
+
+test('company-wide balance sheet does not reclassify clearing (byte-identical)', function () {
+    seedTwoBranchFixtures($this);
+
+    $companyWide = $this->service->getBalanceSheet($this->fiscalYear->id);
+
+    expect(collect($companyWide['liabilities'])->firstWhere('code', '1999-IBC'))->toBeNull();
+    expect(collect($companyWide['assets'])->firstWhere('name', 'Due From Branches'))->toBeNull();
+});
+
 test('balance sheet export validates branch_id', function () {
     $user = createTestUserWithPermissions(['balance_sheet_report']);
 
