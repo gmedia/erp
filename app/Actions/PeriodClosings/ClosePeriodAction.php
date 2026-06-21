@@ -3,8 +3,6 @@
 namespace App\Actions\PeriodClosings;
 
 use App\Actions\AccountBalances\RecalculateAccountBalancesAction;
-use App\Models\Account;
-use App\Models\AccountBalance;
 use App\Models\JournalEntry;
 use App\Models\PeriodClosing;
 use App\Services\InterBranchClearingService;
@@ -25,6 +23,11 @@ class ClosePeriodAction
                 throw ValidationException::withMessages([
                     'status' => 'Period is already closed.',
                 ]);
+            }
+
+            if ($periodClosing->closing_journal_entry_id) {
+                JournalEntry::where('id', $periodClosing->closing_journal_entry_id)->delete();
+                $periodClosing->update(['closing_journal_entry_id' => null]);
             }
 
             $month = $periodClosing->period_month ?? 12;
@@ -57,12 +60,9 @@ class ClosePeriodAction
 
     private function createAnnualClosingEntry(PeriodClosing $periodClosing): JournalEntry
     {
-        $accounts = Account::query()
-            ->whereIn('type', ['revenue', 'expense'])
-            ->get();
         $entry = JournalEntry::create([
             'fiscal_year_id' => $periodClosing->fiscal_year_id,
-            'entry_number' => 'CL-' . now()->format('YmdHis'),
+            'entry_number' => 'CL-' . now()->format('YmdHis') . '-' . $periodClosing->id,
             'entry_date' => now()->toDateString(),
             'reference' => 'Period Closing #' . $periodClosing->id,
             'description' => 'Annual closing entry',
@@ -74,36 +74,54 @@ class ClosePeriodAction
             'posted_by' => auth()->id(),
             'posted_at' => now(),
         ]);
-        $netIncome = 0.0;
-        $lines = [];
 
-        foreach ($accounts as $account) {
-            $balance = (float) AccountBalance::query()
-                ->where('account_id', $account->id)
-                ->where('fiscal_year_id', $periodClosing->fiscal_year_id)
-                ->where('period_year', $periodClosing->period_year)
-                ->orderByDesc('period_month')
-                ->value('closing_balance');
-            if ($balance == 0.0) {
+        $rows = DB::table('journal_entry_lines')
+            ->join('journal_entries', 'journal_entry_lines.journal_entry_id', '=', 'journal_entries.id')
+            ->join('accounts', 'accounts.id', '=', 'journal_entry_lines.account_id')
+            ->where('journal_entries.fiscal_year_id', $periodClosing->fiscal_year_id)
+            ->where('journal_entries.status', 'posted')
+            ->where('journal_entries.journal_type', '<>', 'closing')
+            ->whereIn('accounts.type', ['revenue', 'expense'])
+            ->groupBy('journal_entry_lines.account_id', 'journal_entry_lines.branch_id', 'accounts.name')
+            ->select('journal_entry_lines.account_id', 'journal_entry_lines.branch_id', 'accounts.name')
+            ->selectRaw('COALESCE(SUM(journal_entry_lines.debit), 0) as debit_total')
+            ->selectRaw('COALESCE(SUM(journal_entry_lines.credit), 0) as credit_total')
+            ->get();
+
+        $lines = [];
+        $netByBranch = [];
+
+        foreach ($rows as $row) {
+            $netCents = $this->toCents($row->debit_total) - $this->toCents($row->credit_total);
+            if ($netCents === 0) {
                 continue;
             }
-            $netIncome += $account->type === 'revenue' ? $balance : -$balance;
+
+            $branchKey = $row->branch_id === null ? 'null' : (string) $row->branch_id;
+            $netByBranch[$branchKey] = ($netByBranch[$branchKey] ?? 0) + $netCents;
+
             $lines[] = [
-                'account_id' => $account->id,
-                'branch_id' => null,
-                'debit' => $account->type === 'revenue' ? abs($balance) : 0,
-                'credit' => $account->type === 'expense' ? abs($balance) : 0,
-                'memo' => 'Close ' . $account->name,
+                'account_id' => $row->account_id,
+                'branch_id' => $row->branch_id,
+                'debit' => $netCents < 0 ? $this->fromCents(-$netCents) : '0.00',
+                'credit' => $netCents > 0 ? $this->fromCents($netCents) : '0.00',
+                'memo' => 'Close ' . $row->name,
             ];
         }
 
-        $lines[] = [
-            'account_id' => $periodClosing->retained_earnings_account_id,
-            'branch_id' => null,
-            'debit' => $netIncome < 0 ? abs($netIncome) : 0,
-            'credit' => $netIncome > 0 ? $netIncome : 0,
-            'memo' => 'Close net income to retained earnings',
-        ];
+        $netIncomeCents = 0;
+        foreach ($netByBranch as $branchKey => $branchNet) {
+            $netIncomeCents -= $branchNet;
+            $branchId = $branchKey === 'null' ? null : (int) $branchKey;
+
+            $lines[] = [
+                'account_id' => $periodClosing->retained_earnings_account_id,
+                'branch_id' => $branchId,
+                'debit' => $branchNet > 0 ? $this->fromCents($branchNet) : '0.00',
+                'credit' => $branchNet < 0 ? $this->fromCents(-$branchNet) : '0.00',
+                'memo' => 'Close net income to retained earnings',
+            ];
+        }
 
         $clearingAccountId = $this->clearing->resolveAccountIdForFiscalYear($periodClosing->fiscal_year_id);
         $lines = $this->clearing->inject($lines, $clearingAccountId);
@@ -119,8 +137,18 @@ class ClosePeriodAction
             ]);
         }
 
-        $periodClosing->update(['net_income' => $netIncome]);
+        $periodClosing->update(['net_income' => $netIncomeCents / 100]);
 
         return $entry;
+    }
+
+    private function toCents(mixed $value): int
+    {
+        return (int) round(((float) $value) * 100);
+    }
+
+    private function fromCents(int $cents): string
+    {
+        return number_format($cents / 100, 2, '.', '');
     }
 }
