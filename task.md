@@ -1,6 +1,20 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-06-21 (Per-branch financial reports EXTENDED — PR #45 (`5d57b6cf`) MERGED: Income Statement + Comparative now branch-scoped, closing the selector gap. Also extracted shared `FinancialReportExportButton` (dedup across all 5 financial report pages, Sonar new-code duplication 8.0%→0.0%). main HEAD `5d57b6cf`. All 5 financial reports now per-branch.) UTC
+Last updated: 2026-06-21 (FULL 2b CORE COMPLETE — inter-branch clearing engine + line-level per-branch financial statements live on main. PRs #46 (`77ef04b2` line backfill), #47 (`094864b0` clearing acct), #48 (`dad775ab` clearing engine), #49 (`bba42f29` line-level reports), #50 (`55cce84a` clearing reclassification) all MERGED. main HEAD `55cce84a`. Remaining full-2b PRs: #4 derivation extensions, #6 per-branch closing, #7 frontend per-line picker, #8 optional retro-correction.) UTC
+
+## SESSION 2026-06-21 (cont.) — FULL 2b core (clearing engine + line-level statements), 5 PRs MERGED
+
+User chose **full 2b** (forward-capability for cross-branch journals; detection on current data = 0, so the engine is provably dormant but correct). Oracle reviewed the PR3 engine design before any code (`ses_11732ec8affepPNKdniqBdrXbp`).
+
+- **PR #46** (`77ef04b2`) — data migration: backfill `journal_entry_lines.branch_id = parent journal_entries.branch_id` (chunked, idempotent, reversible). Establishes the line=header invariant. Zero behavior change (reports still read header at this point).
+- **PR #47** (`094864b0`) — seed single `1999-IBC` "Inter-Branch Clearing" account (asset/current_asset/debit/not-cashflow) under Current Assets in CoaSeeder (both COA trees) + idempotent migration for existing COA versions. DEVIATION from plan §3-Q1: resolved by CODE per COA version at runtime, NOT a settings id (version-safe). Inert until PR3.
+- **PR #48** (`dad775ab`) — `InterBranchClearingService` (pure, DB-free, integer-cents): `inject()` strips existing clearing lines, groups by resolved branch, injects one clearing line per imbalanced branch (sorted, deterministic), fail-closed on null branch when multi-branch; `assertBalancedPerBranch()` post-injection guard (throws→rollback, the anti-corruption net); `resolveAccountIdForFiscalYear()`. Wired into ALL 4 write paths: CreateJournalEntryAction (threads per-line branch line→header→default, inject+guard inside txn), UpdateJournalEntryAction (draft delete/recreate), ExecuteRecurringJournalAction + ClosePeriodAction (the 2 funnel bypasses — single-branch → provable no-op + inherit guard). 12 unit + 3 feature tests. Per-branch period closing deferred to PR6 (closing stays single-branch = no-op).
+- **PR #49** (`bba42f29`) — switch `accountsWithPostedSums` + `getMonthlyTrends` from header `journal_entries.branch_id` to LINE `journal_entry_lines.branch_id`. Byte-identical for all single-branch data (PR1 backfill). New regression test: header-A/lines-split-A/B proves line-level attribution. Updated 2 fixtures to tag line branch_id (post-PR3 reality).
+- **PR #50** (`55cce84a`) — balance-sheet clearing sign-reclassification: when branchId != null, `1999-IBC` net-debit slice → "Due From Branches" (asset), net-credit → "Due To Branches" (liability). Company-wide / zero-slice = byte-identical (skipped). Per-branch CYE already line-level via PR5a.
+
+**Master invariant (locked by tests):** per-branch trial balance dr==cr; clearing nets to 0 company-wide; each branch BS: A==L+E. `branchId=null` everywhere = byte-identical company-wide behavior. All 5 PRs CI 5/5 green; Sonar gates OK (new-code coverage 95.7–100%, duplication 0%).
+
+**Remaining full-2b PRs (not started):** PR4 (per-line branch derivation for asset depreciation per-asset, recurring per-template-line [needs recurring_journal_lines.branch_id column], bank-rec bank→branch map), PR6 (per-branch period closing + per-branch RE/opening — RISKY), PR7 (frontend per-line branch picker for manual+recurring + clearing preview), PR8 (optional retro-correction, only if detection material).
 
 ## SESSION 2026-06-21 — Per-branch Income Statement & Comparative (PR #45 MERGED)
 
