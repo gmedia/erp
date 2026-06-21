@@ -1,6 +1,28 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-06-21 (FULL 2b CORE COMPLETE — inter-branch clearing engine + line-level per-branch financial statements live on main. PRs #46 (`77ef04b2` line backfill), #47 (`094864b0` clearing acct), #48 (`dad775ab` clearing engine), #49 (`bba42f29` line-level reports), #50 (`55cce84a` clearing reclassification) all MERGED. main HEAD `55cce84a`. Remaining full-2b PRs: #4 derivation extensions, #6 per-branch closing, #7 frontend per-line picker, #8 optional retro-correction.) UTC
+Last updated: 2026-06-21 (FULL 2b COMPLETE — entire inter-branch per-branch financial statements initiative shipped. PRs #46-#54 all MERGED. main HEAD `aa2bbaa3`. Clearing engine + line-level reports + per-branch balance sheet (Due-From/Due-To) + per-asset-branch depreciation + per-branch period closing + bank-rec/recurring branch schema + per-line branch pickers UI all live. Only optional PR8 (retro-correction of historical multi-branch journals) deferred — gated on cross-branch detection which is currently 0. Engine is dormant-but-correct on all current single-branch data.) UTC
+
+## SESSION 2026-06-21 (cont.) — FULL 2b COMPLETE (PR #46-#54 all merged)
+
+The full inter-branch initiative is done end to end. All PRs CI 5/5 green, Sonar gates OK (new-code coverage 95.6-100%, duplication 0%). Two Oracle design consults (PR3 engine `ses_11732ec8`, PR6 closing `ses_1161bc0c`).
+
+| PR | Commit | Scope |
+|----|--------|-------|
+| #46 | `77ef04b2` | Backfill journal_entry_lines.branch_id = header (data migration) |
+| #47 | `094864b0` | Seed 1999-IBC Inter-Branch Clearing account (seeder + idempotent migration) |
+| #48 | `dad775ab` | InterBranchClearingService (pure, integer-cents) + wired into all 4 write paths + per-branch guard |
+| #49 | `bba42f29` | Switch reports (accountsWithPostedSums, getMonthlyTrends) from header to LINE branch_id |
+| #50 | `55cce84a` | Balance-sheet clearing sign-reclassification (Due-From asset / Due-To liability) |
+| #51 | `79b1f041` | Per-asset-branch depreciation posting + clearing no-op refinement (each-branch-balances) |
+| #52 | `5c54524f` | Per-branch period closing (Option A: derive per-branch P&L from posted lines) + reopen/reclose double-close fix |
+| #53 | `c55a554c` | bank_reconciliations.branch_id + recurring_journal_lines.branch_id schema + posting wiring |
+| #54 | `aa2bbaa3` | Per-line branch pickers UI (journal + recurring line dialogs, bank-rec header) + lines.*.branch_id validation |
+
+**Invariants locked by tests:** per-branch trial balance dr==cr; clearing nets to 0 company-wide; each branch BS A==L+E (with per-branch CYE + per-branch RE on close); `branchId=null` everywhere = byte-identical company-wide behavior. Engine fires ONLY on genuinely cross-branch journals (0 in current data).
+
+**Key gotcha (PR7b CI):** adding the per-line Branch combobox made the journal "Add Line" dialog have 2 `button[role=combobox]`; E2E helper `tests/e2e/journal-entries/helpers.ts:60` needed `.first()` to target Account (9 specs failed, fixed in same PR).
+
+**Deferred:** PR8 (audited retro-correction of historical economically-multi-branch journals) — only worth building if production detection of cross-branch journals becomes material; currently 0. Design staged in `.sisyphus/plans/per-branch-financial-statements-2b.md`.
 
 ## SESSION 2026-06-21 (cont.) — FULL 2b core (clearing engine + line-level statements), 5 PRs MERGED
 
@@ -264,34 +286,49 @@ gh pr view <num> --json statusCheckRollup
 ## Continuation Prompt for New Session
 
 ```text
-Read task.md first. Repo on `main` at HEAD `5d57b6cf` (or fresher), working
-tree clean. Per-branch financial reports are COMPLETE for ALL FIVE statements —
-Balance Sheet, Trial Balance, Cash Flow (#42-#44) plus Income Statement &
-Comparative (#45). Every financial report page has a branch selector + export
-support. A shared `FinancialReportExportButton` now backs all five pages.
-All prior branch work (dashboards #38-#41, financial PR1-PR4, manual journal
-attribution #37) also merged. No open PRs.
+Read task.md first. Repo on `main` at HEAD `aa2bbaa3` (or fresher), working
+tree clean. FULL 2b is COMPLETE — the entire inter-branch per-branch financial
+statements initiative shipped (PRs #46-#54 merged): clearing engine, line-level
+reports, per-branch balance sheet (Due-From/Due-To), per-asset-branch
+depreciation, per-branch period closing, bank-rec/recurring branch schema, and
+per-line branch pickers UI. Engine is dormant-but-correct on current
+single-branch data (0 cross-branch journals). All prior branch work + the
+reduced-2b reports (#42-#45) also merged. No open PRs.
 
 Quick verify:
-  git rev-parse HEAD          # expect 5d57b6cf or fresher
+  git rev-parse HEAD          # expect aa2bbaa3 or fresher
   git status --short          # expect empty (or only task.md)
   gh run list --branch main --limit 3   # verify latest is green
   gh pr list --base main --state open   # expect empty unless new work started
 
 If dev DB seems empty: `sail artisan db:seed`. Schema is intact.
 
-NEXT ACTION needs USER DIRECTION (do NOT auto-pick). Per-branch financial reports
-are fully done. Remaining options (all optional / future — none blocking):
+NEXT ACTION needs USER DIRECTION (do NOT auto-pick). Full 2b is done. Remaining
+options (all optional / future — none blocking):
 
-1. FULL 2b (inter-branch clearing engine + per-branch period closing) — ONLY if
-   production starts booking real cross-branch journals. Plan + Oracle design in
-   .sisyphus/plans/per-branch-financial-statements-2b.md (PR3/4/6). Detection on
-   current data = 0, so deferred.
+1. PR8 (DEFERRED): audited retro-correction of historical economically-
+   multi-branch journals. Only worth building if production detection of
+   cross-branch journals becomes material (currently 0). Design staged in
+   .sisyphus/plans/per-branch-financial-statements-2b.md.
 
 2. H3 Wave 2 multi-currency FX subsystem (weeks) — pull when first non-IDR
    customer signs.
 
 3. Product feature work (request specs from user).
+
+KNOWN GOTCHAS (full 2b):
+- InterBranchClearingService.inject is pure/integer-cents; it ONLY requires the
+  1999-IBC account (or rejects null branch) when a branch actually has a nonzero
+  net. Multi-branch entries where every branch self-balances => no-op (this is
+  why per-asset depreciation across branches needs no clearing account).
+- Reports + period closing read LINE branch_id (journal_entry_lines.branch_id),
+  NOT header. Test fixtures that seed journals must tag line branch_id to match.
+- Period closing (Option A) derives per-branch P&L directly from posted
+  NON-closing lines; ClosePeriodAction + ReopenPeriodAction both delete the prior
+  closing entry to prevent double-count on reclose.
+- Adding a 2nd combobox to a line dialog breaks E2E locators that assume one;
+  tests/e2e/journal-entries/helpers.ts uses `.first()` for the Account field.
+
 
 KNOWN GOTCHAS (this session):
 - BranchResolverRegistry throws on unregistered types — intentional (fail loud).
