@@ -1,6 +1,15 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-06-21 (FULL 2b COMPLETE + operational validation. PRs #46-#54 (initiative) + #55 (smoke test & cross-branch detection command) all MERGED. main HEAD `92e292e8`. Detection on dev = 0 multi-branch journals → engine dormant-but-correct confirmed; PR8 still NOT warranted. Clearing engine + line-level reports + per-branch balance sheet (Due-From/Due-To) + per-asset-branch depreciation + per-branch period closing + bank-rec/recurring branch schema + per-line branch pickers UI all live. Only optional PR8 (retro-correction of historical multi-branch journals) deferred — gated on cross-branch detection which is currently 0. Engine is dormant-but-correct on all current single-branch data.) UTC
+Last updated: 2026-06-22 (FULL 2b COMPLETE + operational validation + scheduled monitoring. PRs #46-#54 (initiative) + #55 (smoke test & cross-branch detection command) + #56 (weekly scheduled detection + structured logging) all MERGED. main HEAD `a9f5242c`. Detection on dev = 0 multi-branch journals → engine dormant-but-correct confirmed; PR8 still NOT warranted. Clearing engine + line-level reports + per-branch balance sheet (Due-From/Due-To) + per-asset-branch depreciation + per-branch period closing + bank-rec/recurring branch schema + per-line branch pickers UI all live. The `journals:detect-cross-branch --posted-only` command now runs weekly (Mondays 06:00) and logs a `Log::warning` tripwire the moment cross-branch activity appears. Only optional PR8 (retro-correction of historical multi-branch journals) deferred — gated on that detection which is currently 0.) UTC
+
+## SESSION 2026-06-22 — Scheduled cross-branch monitoring (PR #56 merged)
+
+Turns the PR8 gate from a manual check into an automated tripwire. main HEAD `a9f5242c`. CI 5/5 green, Sonar PASS.
+
+- **Scheduled run** (`routes/console.php`): `journals:detect-cross-branch --posted-only` weekly, Mondays 06:00.
+- **Self-logging** (`DetectCrossBranchJournals`): when `multi_branch_entries > 0`, emits `Log::warning('Cross-branch journals detected by scheduled monitor.', [scope, multi_branch_entries, clearing_entries, clearing_lines, null_branch_lines])`. Routes the signal to log/Sentry since scheduled console output is invisible. Silent when count is 0.
+- **Scope rationale**: `--posted-only` — scheduled monitor cares only about committed accounting reality; draft entries are noise for the retro-correction decision. Ad-hoc full scans still available by running the command without the flag.
+- Tests: grup `inter-branch-clearing` 24 passed / 260 assertions (2 new via `Log::spy`: emitted on detection / not emitted when zero). duster + phpstan clean.
 
 ## SESSION 2026-06-21 (cont.) — 2b operational validation (PR #55 merged)
 
@@ -297,19 +306,23 @@ gh pr view <num> --json statusCheckRollup
 ## Continuation Prompt for New Session
 
 ```text
-Read task.md first. Repo on `main` at HEAD `92e292e8` (or fresher), working
-tree clean. FULL 2b is COMPLETE and operationally validated. The inter-branch
-initiative (PRs #46-#54) plus a follow-up (#55: end-to-end smoke test +
-`journals:detect-cross-branch` monitoring command) are all merged. The clearing
+Read task.md first. Repo on `main` at HEAD `a9f5242c` (or fresher), working
+tree clean. FULL 2b is COMPLETE, operationally validated, and monitored. The
+inter-branch initiative (PRs #46-#54) plus follow-ups (#55: end-to-end smoke
+test + `journals:detect-cross-branch` monitoring command; #56: weekly scheduled
+detection + structured `Log::warning` tripwire) are all merged. The clearing
 engine is dormant-but-correct: `journals:detect-cross-branch` reports 0
-economically multi-branch journals on current data. No open PRs.
+economically multi-branch journals on current data, and a weekly scheduled run
+(Mondays 06:00, `--posted-only`) will log a warning the moment that changes. No
+open PRs.
 
 Quick verify:
-  git rev-parse HEAD          # expect 92e292e8 or fresher
+  git rev-parse HEAD          # expect a9f5242c or fresher
   git status --short          # expect empty (or only task.md)
   gh run list --branch main --limit 3   # verify latest is green
   gh pr list --base main --state open   # expect empty unless new work started
   sail artisan journals:detect-cross-branch   # gate for PR8: expect 0 multi-branch
+  sail artisan schedule:list  # confirm journals:detect-cross-branch runs weekly
 
 If dev DB seems empty: `sail artisan db:seed`. Schema is intact.
 
