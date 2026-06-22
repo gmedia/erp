@@ -48,6 +48,11 @@ Artisan::command('recurring-journals:execute', function () {
 
 Schedule::command('recurring-journals:execute')->daily();
 
+Schedule::command('journals:detect-cross-branch', ['--posted-only'])
+    ->weekly()
+    ->mondays()
+    ->at('06:00');
+
 Artisan::command('approvals:repair-missing-steps {--dry-run : Audit only without writing data}', function () {
     $report = app(RepairMissingApprovalStepsAction::class)->execute(
         (bool) $this->option('dry-run'),
