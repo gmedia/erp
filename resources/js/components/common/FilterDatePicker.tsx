@@ -46,32 +46,32 @@ export function FilterDatePicker({
         <div className="space-y-2">
             {label && <label className="text-sm font-medium">{label}</label>}
             <Popover>
-            <PopoverTrigger asChild>
-                <Button
-                    variant="outline"
-                    className={cn(
-                        'w-full justify-start text-left font-normal',
-                        !date && 'text-muted-foreground',
-                        className,
-                    )}
-                >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {date ? (
-                        formatDateByRegionalSettings(date)
-                    ) : (
-                        <span>{placeholder}</span>
-                    )}
-                </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={handleSelect}
-                    autoFocus
-                />
-            </PopoverContent>
-        </Popover>
+                <PopoverTrigger asChild>
+                    <Button
+                        variant="outline"
+                        className={cn(
+                            'w-full justify-start text-left font-normal',
+                            !date && 'text-muted-foreground',
+                            className,
+                        )}
+                    >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {date ? (
+                            formatDateByRegionalSettings(date)
+                        ) : (
+                            <span>{placeholder}</span>
+                        )}
+                    </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={handleSelect}
+                        autoFocus
+                    />
+                </PopoverContent>
+            </Popover>
         </div>
     );
 }
