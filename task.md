@@ -1,6 +1,14 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-06-22 (FULL 2b COMPLETE + operational validation + scheduled monitoring. PRs #46-#54 (initiative) + #55 (smoke test & cross-branch detection command) + #56 (weekly scheduled detection + structured logging) all MERGED. main HEAD `a9f5242c`. Detection on dev = 0 multi-branch journals → engine dormant-but-correct confirmed; PR8 still NOT warranted. Clearing engine + line-level reports + per-branch balance sheet (Due-From/Due-To) + per-asset-branch depreciation + per-branch period closing + bank-rec/recurring branch schema + per-line branch pickers UI all live. The `journals:detect-cross-branch --posted-only` command now runs weekly (Mondays 06:00) and logs a `Log::warning` tripwire the moment cross-branch activity appears. Only optional PR8 (retro-correction of historical multi-branch journals) deferred — gated on that detection which is currently 0.) UTC
+Last updated: 2026-06-22 (FULL 2b COMPLETE + operational validation + scheduled monitoring + user guide. PRs #46-#54 (initiative) + #55 (smoke test & cross-branch detection command) + #56 (weekly scheduled detection + structured logging) + #57 (inter-branch clearing finance user guide) all MERGED. main HEAD `aa461253`. Detection on dev = 0 multi-branch journals → engine dormant-but-correct confirmed; PR8 still NOT warranted. Clearing engine + line-level reports + per-branch balance sheet (Due-From/Due-To) + per-asset-branch depreciation + per-branch period closing + bank-rec/recurring branch schema + per-line branch pickers UI all live. The `journals:detect-cross-branch --posted-only` command now runs weekly (Mondays 06:00) and logs a `Log::warning` tripwire the moment cross-branch activity appears. Only optional PR8 (retro-correction of historical multi-branch journals) deferred — gated on that detection which is currently 0.) UTC
+
+## SESSION 2026-06-22 — Inter-branch clearing user guide (PR #57 merged)
+
+Documentation for the now-complete inter-branch capability. main HEAD `aa461253`. CI 5/5 green, Sonar PASS. Doc-only — zero production code paths touched.
+
+- **New guide**: `docs/user-guide-inter-branch-clearing.md` (Indonesian, AR/AP tone). Covers: clearing account `1999-IBC`, per-line `branch_id`, auto-inject rules (single-branch no-op / balanced multi no-op / unbalanced multi inject) with worked example, per-line Branch picker (Journal Entries / Recurring / Bank Rec), reading per-branch reports (TB/BS sign-reclass/IS/GL, company-wide nets to 0), validation guards, scheduled monitoring command, tips + FAQ.
+- **Auto-discovery**: `UserGuideController` globs `docs/user-guide-*.md` — no registration, appears in `/user-guide` sidebar automatically.
+- Tests: `sail test --group user-guide` → 4 passed / 33 assertions.
 
 ## SESSION 2026-06-22 — Scheduled cross-branch monitoring (PR #56 merged)
 
@@ -306,18 +314,20 @@ gh pr view <num> --json statusCheckRollup
 ## Continuation Prompt for New Session
 
 ```text
-Read task.md first. Repo on `main` at HEAD `a9f5242c` (or fresher), working
-tree clean. FULL 2b is COMPLETE, operationally validated, and monitored. The
-inter-branch initiative (PRs #46-#54) plus follow-ups (#55: end-to-end smoke
-test + `journals:detect-cross-branch` monitoring command; #56: weekly scheduled
-detection + structured `Log::warning` tripwire) are all merged. The clearing
+Read task.md first. Repo on `main` at HEAD `aa461253` (or fresher), working
+tree clean. FULL 2b is COMPLETE, operationally validated, monitored, and
+documented. The inter-branch initiative (PRs #46-#54) plus follow-ups (#55:
+end-to-end smoke test + `journals:detect-cross-branch` monitoring command; #56:
+weekly scheduled detection + structured `Log::warning` tripwire; #57:
+inter-branch clearing finance user guide at
+`docs/user-guide-inter-branch-clearing.md`) are all merged. The clearing
 engine is dormant-but-correct: `journals:detect-cross-branch` reports 0
 economically multi-branch journals on current data, and a weekly scheduled run
 (Mondays 06:00, `--posted-only`) will log a warning the moment that changes. No
 open PRs.
 
 Quick verify:
-  git rev-parse HEAD          # expect a9f5242c or fresher
+  git rev-parse HEAD          # expect aa461253 or fresher
   git status --short          # expect empty (or only task.md)
   gh run list --branch main --limit 3   # verify latest is green
   gh pr list --base main --state open   # expect empty unless new work started
