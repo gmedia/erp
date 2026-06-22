@@ -109,69 +109,6 @@ Spesifikasi:
 
 ---
 
-## B. Refactor Modul dari Branch Lain (Inertia → SPA)
-
-Gunakan prompt ini untuk modul yang masih menggunakan arsitektur **Inertia** dan perlu di-refactor ke **Laravel API + React Full SPA**.
-
-### 5. Refactor Single Module
-
-```
-/refactor-module
-
-Refactor modul `{ModulName}` dari arsitektur Inertia ke SPA + API.
-
-Modul ini adalah {simple crud / complex crud / non-crud}.
-
-Yang perlu dilakukan:
-1. Backend:
-   - Pindah routes dari `routes/{modul}.php` ke `routes/api/{modul-names}.php` (API-only)
-   - Hapus semua `Inertia::render()` → controller return JSON saja
-   - Hapus import `use Inertia\Inertia` dan `use Inertia\Response`
-2. Frontend:
-   - Ganti `import { Head } from '@inertiajs/react'` → `import { Helmet } from 'react-helmet-async'`
-   - Ganti `<Head title="..." />` → `<Helmet><title>...</title></Helmet>`
-   - Ganti `import { router } from '@inertiajs/react'` → gunakan `axios` / React Query mutation
-   - Ganti `import { Link } from '@inertiajs/react'` → `import { Link } from 'react-router-dom'`
-   - Ganti data fetching dari Inertia props → React Query hooks
-   - Register lazy-loaded route di `app-routes.tsx`
-3. Test:
-   - Feature test: ganti `actingAs($user)` → `Sanctum::actingAs($user)`
-   - Hapus `assertInertia()` → gunakan `assertJson()`, `assertJsonStructure()`
-   - E2E: pastikan auth pakai Bearer token
-
-Referensi modul yang sudah benar:
-- Simple CRUD → `positions`, `departments`
-- Complex CRUD → `employees`, `suppliers`, `customers`
-- Non-CRUD → `users`, `permissions`
-
-Verifikasi:
-- `./vendor/bin/sail test --filter={ModulName}`
-- `./vendor/bin/sail npx playwright test tests/e2e/{modul-names}/`
-```
-
-### 6. Refactor Batch (Multiple Modules)
-
-```
-/refactor-module
-
-Refactor modul-modul berikut dari arsitektur Inertia ke SPA + API:
-
-Simple CRUD: `{ModulA}`, `{ModulB}`
-Complex CRUD: `{ModulC}`
-Non-CRUD: `{ModulD}`
-
-Kerjakan SATU MODUL PER SATU, verifikasi sebelum lanjut ke modul berikutnya.
-
-Untuk setiap modul, lakukan:
-1. Backend: pindah routes ke `routes/api/`, controller return JSON only
-2. Frontend: ganti @inertiajs/react → react-helmet-async + react-router-dom + React Query
-3. Register route di `app-routes.tsx`
-4. Test: update auth ke `Sanctum::actingAs()` + `assertJson()`
-5. Verifikasi: `./vendor/bin/sail test --filter={Modul}`
-
-Referensi: positions (simple), employees (complex), users (non-crud).
-```
-
 ---
 
 ## C. Test & Refactor Existing Code
@@ -271,7 +208,6 @@ Output wajib:
 | Complex CRUD baru | `/create-feature` | `feature-crud-complex` | `employees` / `suppliers` / `customers` |
 | Non-CRUD baru | `/create-feature` | `feature-non-crud` | `users` / `permissions` |
 | Import Excel | `/create-import` | `feature-import` | `employees` / `suppliers` |
-| Refactor Inertia → SPA | `/refactor-module` | `refactor-backend` + `refactor-frontend` | sesuai tipe CRUD |
 | Refactor berbasis Sonar MCP | `/refactor-sonar` | workflow `refactor-sonar` + `refactor-backend` | `docs/refactor-sonar-progress.md` |
 | Buat test baru | `/create-tests` | `testing-strategy` | sesuai tipe CRUD |
 | Refactor E2E test | — | `refactor-e2e` | `shared-test-factories.ts` |

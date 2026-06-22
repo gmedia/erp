@@ -1,4 +1,4 @@
-<!-- implementation-status: designed-only -->
+<!-- implementation-status: implemented -->
 # Desain Database: Laporan Keuangan (Financial Reports)
 
 Dokumen ini menjelaskan struktur dan logika untuk modul Laporan Keuangan dalam sistem ERP. Fokus utama: Neraca (Balance Sheet), Laba Rugi (Income Statement), dan Arus Kas (Cash Flow Statement).

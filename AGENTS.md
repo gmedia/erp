@@ -14,7 +14,7 @@ ERP system (gmedia) — Laravel 12 JSON API backend + React 19 full SPA frontend
 erp/
 ├── app/                # Backend: Actions, Domain, DTOs, Exports, Http, Models, Services
 ├── resources/js/       # Frontend SPA: React + TypeScript + Shadcn UI + TanStack Query
-├── routes/api/         # 48 modular route files (auto-included by routes/api.php)
+├── routes/api/         # 63 modular route files (auto-included by routes/api.php)
 ├── database/           # Migrations (67), Factories (67), Seeders (24)
 ├── tests/              # Pest (Feature/Unit) + Playwright E2E
 ├── docs/               # Design docs, module registry, refactor progress
@@ -112,7 +112,7 @@ sail artisan ide-helper:models -RW    # Model PHPDoc
 ## NOTES
 
 - **11,983 files** total (1,594 PHP, 377 TSX, 194 TS) — large codebase.
-- **48 API route files** — one per module, auto-included.
+- **63 API route files** — one per module, auto-included.
 - **68 models**, **67 migrations**, **67 factories** — near 1:1 ratio.
 - **SonarCloud** integrated — quality gate, duplication, coverage tracked.
 - **Sentry** for error monitoring.

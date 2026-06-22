@@ -1,4 +1,5 @@
 <!-- implementation-status: implemented -->
+<!-- scope-note: The `branch_id` → `warehouse_id` migration on `product_stocks` (and related tables) is NOT yet applied. Current code still uses `branch_id`. See Section 8 for migration plan. Warehouse CRUD, stock transfers, inventory stocktakes, and stock adjustments are fully implemented front-to-back. -->
 # Desain Database: Inventory (Persediaan)
 
 Dokumen ini menjelaskan struktur database untuk modul Inventory (Persediaan) dalam sistem ERP. Fokus utama: master gudang, transfer antar gudang, stock opname (inventarisasi fisik), penyesuaian stok, dan audit trail pergerakan stok.
