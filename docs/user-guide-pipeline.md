@@ -1,25 +1,16 @@
-# Panduan Pengguna: Pipeline Management (Asset Module)
+# User Guide: Pipeline Management
 
-Panduan ini menjelaskan cara menyiapkan dan menggunakan fitur **Pipeline** pada sistem ERP, dengan fokus pada modul **Asset**. Pipeline mengatur **lifecycle (siklus hidup)** sebuah entitas — dari status awal saat dibuat, melewati berbagai tahapan, hingga status akhir.
+## Gambaran Umum
 
----
+Panduan ini menjelaskan cara menyiapkan dan menggunakan fitur **Pipeline** pada sistem ERP, dengan fokus pada modul **Asset**. Pipeline mengatur **lifecycle (siklus hidup)** sebuah entitas -- dari status awal saat dibuat, melewati berbagai tahapan, hingga status akhir.
 
-## Daftar Isi
+## Menu & Navigasi
 
-1. [Konsep Dasar](#1-konsep-dasar)
-2. [Akses Menu Pipeline](#2-akses-menu-pipeline)
-3. [Setup Pipeline (Admin)](#3-setup-pipeline-admin)
-   - [3.1 Membuat Pipeline Baru](#31-membuat-pipeline-baru)
-   - [3.2 Menambahkan States](#32-menambahkan-states)
-   - [3.3 Menambahkan Transitions](#33-menambahkan-transitions)
-   - [3.4 Menambahkan Actions pada Transition](#34-menambahkan-actions-pada-transition)
-4. [Mengelola Pipeline](#4-mengelola-pipeline)
-5. [Penggunaan Sehari-hari (User)](#5-penggunaan-sehari-hari-user)
-   - [5.1 Melihat Status Pipeline di Asset](#51-melihat-status-pipeline-di-asset)
-   - [5.2 Menjalankan Transisi (Aksi)](#52-menjalankan-transisi-aksi)
-   - [5.3 Melihat Timeline / Riwayat Status](#53-melihat-timeline--riwayat-status)
-6. [Contoh: Setup Asset Lifecycle](#6-contoh-setup-asset-lifecycle)
-7. [FAQ & Tips](#7-faq--tips)
+| Menu | URL | Permission / Fungsi |
+|:---|:---|:---|
+| Settings > Pipeline | `/pipelines` | `pipeline` -- Mengelola pipeline, states, transitions, dan actions |
+| Pipeline Dashboard | `/pipeline-dashboard` | `pipeline_dashboard` -- Monitoring pipeline secara visual |
+| Pipeline Audit Trail | `/pipeline-audit-trail` | `pipeline_audit_trail` -- Melihat log seluruh transisi state |
 
 ---
 
@@ -63,7 +54,7 @@ Untuk mengakses menu ini, user harus memiliki permission `pipeline`.
 ### 3.1 Membuat Pipeline Baru
 
 1. Buka **Settings → Pipeline**.
-2. Klik tombol **Add New** (atau tombol ➕) di bagian atas halaman.
+2. Klik tombol **Add New** di bagian atas halaman.
 3. Isi form berikut:
 
 | Field | Keterangan | Contoh |
@@ -98,14 +89,14 @@ Setelah pipeline disimpan, klik **Edit** pada pipeline tersebut. Form akan menam
 | **Color** | Warna HEX untuk badge | `#6B7280` |
 | **Icon** | Nama icon dari Lucide Icons | `FileEdit` |
 
-4. Klik ikon ✅ (centang hijau) untuk menyimpan state.
+4. Klik ikon centang (centang hijau) untuk menyimpan state.
 5. Ulangi untuk semua state yang diperlukan.
 
 > [!IMPORTANT]
 > - Setiap pipeline **wajib** memiliki tepat **satu state bertipe Initial**.
 > - Pipeline harus memiliki **minimal satu state bertipe Final**.
-> - Untuk mengedit state yang sudah ada, klik ikon ✏️ (edit) pada baris tersebut.
-> - Untuk menghapus state, klik ikon 🗑️ (hapus). **Hati-hati**: jangan hapus state yang sudah digunakan oleh entitas.
+> - Untuk mengedit state yang sudah ada, klik ikon edit pada baris tersebut.
+> - Untuk menghapus state, klik ikon hapus. **Hati-hati**: jangan hapus state yang sudah digunakan oleh entitas.
 
 #### Referensi Warna yang Disarankan
 
@@ -124,13 +115,13 @@ Icon menggunakan nama dari library [Lucide Icons](https://lucide.dev/icons/). Be
 
 | Icon | Nama |
 |:---|:---|
-| 📝 | `FileEdit` |
-| ✅ | `CircleCheck` |
-| 🔧 | `Wrench` |
-| 🗑️ | `Trash2` |
-| ❌ | `XCircle` |
-| 📦 | `Package` |
-| ⚠️ | `AlertTriangle` |
+| FileEdit | `FileEdit` |
+| CircleCheck | `CircleCheck` |
+| Wrench | `Wrench` |
+| Trash2 | `Trash2` |
+| XCircle | `XCircle` |
+| Package | `Package` |
+| AlertTriangle | `AlertTriangle` |
 
 ### 3.3 Menambahkan Transitions
 
@@ -218,9 +209,9 @@ Halaman **Settings → Pipeline** menampilkan tabel daftar semua pipeline yang s
 
 ### Aksi yang Tersedia
 
-- **View** 👁️ — Melihat detail pipeline (read-only).
-- **Edit** ✏️ — Mengedit pipeline beserta states dan transitions.
-- **Delete** 🗑️ — Menghapus pipeline. ⚠️ Hanya bisa dilakukan jika tidak ada entitas yang menggunakannya.
+- **View** — Melihat detail pipeline (read-only).
+- **Edit** — Mengedit pipeline beserta states dan transitions.
+- **Delete** — Menghapus pipeline. Hanya bisa dilakukan jika tidak ada entitas yang menggunakannya.
 - **Export** — Mengekspor daftar pipeline ke file Excel/CSV.
 - **Search** — Mencari pipeline berdasarkan nama atau kode.
 
@@ -373,42 +364,41 @@ stateDiagram-v2
 
 ---
 
-## 7. FAQ & Tips
+## FAQ & Tips
 
-### Apa yang terjadi jika pipeline belum di-setup untuk asset?
-
-Jika belum ada pipeline yang aktif untuk entity type `Asset`, maka:
+**Q: Apa yang terjadi jika pipeline belum di-setup untuk asset?**
+**J:** Jika belum ada pipeline yang aktif untuk entity type `Asset`, maka:
 - Komponen **EntityStateActions** tidak akan muncul di halaman asset (tombol aksi tidak ada).
 - Tab **Timeline** akan kosong.
 - Asset masih bisa digunakan secara normal, hanya lifecycle-nya yang tidak dikelola oleh pipeline.
 
-### Bisakah satu jenis entitas memiliki lebih dari satu pipeline?
-
-Ya. Gunakan kolom **Conditions (JSON)** untuk membedakan kapan pipeline mana yang berlaku. Contoh:
+**Q: Bisakah satu jenis entitas memiliki lebih dari satu pipeline?**
+**J:** Ya. Gunakan kolom **Conditions (JSON)** untuk membedakan kapan pipeline mana yang berlaku. Contoh:
 - Pipeline A: `{"category": "vehicle"}` — untuk aset kendaraan.
 - Pipeline B: tanpa conditions — untuk aset lainnya.
 
-### Apa bedanya Status di tabel Asset dengan Status di Pipeline?
-
+**Q: Apa bedanya Status di tabel Asset dengan Status di Pipeline?**
+**J:**
 - **Pipeline State**: Disimpan di tabel `pipeline_entity_states`, dikelola oleh pipeline engine.
 - **Asset Status**: Kolom `status` di tabel `assets`, disinkronkan melalui action `Update Field`.
 
 Keduanya harus selalu konsisten. Pastikan setiap transisi memiliki action Update Field yang menyesuaikan kolom `status`.
 
-### Apakah state yang sudah digunakan bisa dihapus?
+**Q: Apakah state yang sudah digunakan bisa dihapus?**
+**J:** **Tidak disarankan.** Menghapus state yang sudah direferensi oleh data historis (log, entity state) akan merusak audit trail. Jika state tidak lagi diperlukan, lebih baik hapus transisi dari/ke state tersebut sehingga tidak ada entitas baru yang bisa masuk ke state itu.
 
-**Tidak disarankan.** Menghapus state yang sudah direferensi oleh data historis (log, entity state) akan merusak audit trail. Jika state tidak lagi diperlukan, lebih baik hapus transisi dari/ke state tersebut sehingga tidak ada entitas baru yang bisa masuk ke state itu.
-
-### Bagaimana jika tombol aksi muncul tapi tidak bisa diklik (disabled)?
-
-Ini terjadi karena **guard conditions** pada transisi belum terpenuhi. Arahkan kursor ke tombol untuk melihat tooltip yang menjelaskan alasan spesifik. Contoh:
+**Q: Bagaimana jika tombol aksi muncul tapi tidak bisa diklik (disabled)?**
+**J:** Ini terjadi karena **guard conditions** pada transisi belum terpenuhi. Arahkan kursor ke tombol untuk melihat tooltip yang menjelaskan alasan spesifik. Contoh:
 - *"Purchase cost harus lebih dari 0"*
 - *"User tidak memiliki permission yang diperlukan"*
 
-### Bagaimana cara mengekspor data pipeline?
+**Q: Bagaimana cara mengekspor data pipeline?**
+**J:** Pada halaman **Settings → Pipeline**, gunakan fitur **Export** di toolbar. Data akan diekspor dalam format Excel/CSV.
 
-Pada halaman **Settings → Pipeline**, gunakan fitur **Export** di toolbar. Data akan diekspor dalam format Excel/CSV.
+**Q: Apakah pipeline bisa dinonaktifkan sementara?**
+**J:** Ya. Ubah **Status** pipeline menjadi `inactive` di form edit. Pipeline yang inactive tidak akan digunakan untuk entity baru, tetapi entity yang sudah berada dalam pipeline tersebut tetap dapat melanjutkan transisinya.
+
+**Q: Bagaimana cara melihat riwayat transisi suatu entity?**
+**J:** Buka halaman detail entity (misalnya asset), lalu buka tab **Timeline**. Tab ini menampilkan seluruh log transisi: dari state mana ke state mana, siapa yang melakukan, kapan, dan komentar yang disertakan.
 
 ---
-
-> **Butuh bantuan?** Hubungi administrator sistem jika Anda mengalami masalah dengan konfigurasi pipeline atau memerlukan permission tambahan untuk menjalankan transisi tertentu.

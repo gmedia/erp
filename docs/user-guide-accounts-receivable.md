@@ -293,3 +293,91 @@ Pipeline memungkinkan:
 5. **Jangan hapus receipt** yang sudah confirmed — gunakan Void untuk audit trail
 6. **Apply CN segera** setelah confirmed — CN yang belum applied tidak mengurangi piutang
 7. **Satu CN per invoice** — jika perlu multiple pengurangan, buat beberapa CN
+
+---
+
+## FAQ & Tips
+
+**Q:** Bagaimana cara mencatat penerimaan pembayaran dari pelanggan jika pelanggan membayar beberapa invoice sekaligus?
+
+**J:** Buka menu **AR Receipts**, klik **Add New**. Isi header: pilih Customer, Branch, Fiscal Year, Receipt Date, Payment Method, Bank Account, dan Total Amount sesuai jumlah yang diterima. Kemudian klik **Add Allocation** untuk setiap invoice yang dilunasi. Pilih Customer Invoice yang sesuai, masukkan Allocated Amount (tidak boleh melebihi sisa amount_due invoice tersebut), dan klik Save. Ulangi untuk setiap invoice yang termasuk dalam pembayaran tersebut. Pastikan total seluruh alokasi tidak melebihi Total Amount di header. Setelah semua alokasi ditambahkan, klik Save pada form utama. Sistem otomatis membuat nomor receipt (format RCV-YYYY-XXXXXX) dan memperbarui status invoice terkait.
+
+**Q:** Apa perbedaan status Receipt "Draft", "Confirmed", dan "Cancelled"? Kapan masing-masing digunakan?
+
+**J:** Status **Draft** adalah status awal saat receipt baru dibuat dan belum diposting ke jurnal. Receipt masih bisa diedit atau dihapus. Status **Confirmed** berarti receipt sudah diposting — jurnal sudah tercatat, alokasi ke invoice sudah diterapkan, dan amount_received di invoice sudah bertambah. Receipt Confirmed tidak bisa diedit, hanya bisa di-void. Status **Cancelled** berarti receipt dibatalkan sebelum diposting (dari status Draft). Saat dibatalkan, alokasi dikembalikan dan invoice kembali ke status sebelumnya. Gunakan Draft untuk simulasi atau pengecekan ulang, Confirm saat pembayaran sudah diterima dan siap dicatat secara akuntansi, dan Cancel jika ada kesalahan input sebelum posting.
+
+**Q:** Bagaimana cara mencari receipt tertentu dengan cepat?
+
+**J:** Gunakan fitur pencarian di halaman AR Receipts. Anda bisa mencari berdasarkan:
+- **Nomor Receipt** (mis. RCV-2026-000042) — ketik di kolom search
+- **Nama Customer** — ketik nama pelanggan
+- **Reference** — nomor referensi transfer atau dokumen eksternal
+
+Selain pencarian teks, gunakan filter untuk mempersempit hasil:
+- Filter **Status** untuk melihat receipt Draft, Confirmed, atau Cancelled
+- Filter **Customer** untuk melihat semua receipt dari pelanggan tertentu
+- Filter **Branch** untuk receipt per cabang
+- Filter **Receipt Date** untuk rentang tanggal tertentu
+
+Filter dan pencarian bisa dikombinasikan — misalnya mencari semua receipt Confirmed untuk Customer "PT Maju Jaya" di bulan Juni 2026.
+
+**Q:** Apa hubungan antara AR Receipt dengan Customer Invoice? Bagaimana jika invoice sudah lunas?
+
+**J:** AR Receipt adalah dokumen penerimaan pembayaran yang mengalokasikan dana ke satu atau beberapa Customer Invoice. Setiap alokasi di receipt mengurangi amount_due pada invoice terkait. Sistem otomatis memperbarui status invoice:
+- Saat receipt di-Confirm, amount_received invoice bertambah, amount_due berkurang
+- Jika amount_due menjadi 0, status invoice otomatis berubah menjadi **Paid**
+- Jika amount_due berkurang tapi belum 0, status invoice menjadi **Partially Paid**
+
+Invoice yang sudah **Paid** atau **Cancelled** atau **Void** tidak akan muncul lagi di daftar invoice yang bisa dialokasi saat membuat receipt baru. Hanya invoice dengan status **Sent**, **Partially Paid**, atau **Overdue** yang tersedia untuk alokasi.
+
+**Q:** Bagaimana cara mengekspor data AR Receipts ke Excel?
+
+**J:** Buka halaman **AR Receipts**. Terapkan filter sesuai kebutuhan (Status, Customer, Branch, atau Receipt Date) untuk menentukan data yang akan diekspor. Klik tombol **Export** di toolbar bagian atas. Sistem akan mengunduh file Excel (.xlsx) yang berisi semua receipt sesuai filter aktif. Kolom yang diekspor mencakup: Receipt Number, Customer, Branch, Receipt Date, Payment Method, Status, dan Total Amount. Jika tidak ada filter aktif, seluruh data receipt akan diekspor. Proses ekspor otomatis menerapkan limit dan sorting yang sama dengan tampilan DataTable.
+
+**Q:** Metode pembayaran apa saja yang didukung? Apakah ada pengaruhnya terhadap akun yang digunakan?
+
+**J:** Sistem mendukung enam metode pembayaran:
+- **Bank Transfer** — transfer antar bank, gunakan akun bank yang sesuai
+- **Cash** — pembayaran tunai, gunakan akun kas
+- **Check** — cek dari pelanggan
+- **Giro** — bilyet giro
+- **Credit Card** — pembayaran kartu kredit
+- **Other** — metode lain (mis. payment gateway, e-wallet)
+
+Metode pembayaran menentukan akun kas/bank yang akan didebit di jurnal penerimaan. Pastikan memilih **Bank Account** yang sesuai dengan metode pembayaran. Misalnya, untuk Bank Transfer pilih akun bank penerima, untuk Cash pilih akun kas kecil/kas besar. Akun yang tersedia di dropdown adalah akun COA dengan tipe aset lancar (kas dan setara kas).
+
+**Q:** Apa yang terjadi jika receipt yang sudah di-Confirm dihapus? Apakah invoice kembali ke status sebelumnya?
+
+**J:** Receipt yang sudah berstatus **Confirmed** tidak bisa dihapus langsung — harus melalui proses **Void**. Saat receipt di-void:
+- Jurnal penerimaan yang sudah tercatat akan direverse (jurnal reversal)
+- Semua alokasi ke invoice dikembalikan — amount_received di setiap invoice dikurangi
+- amount_due di invoice bertambah kembali sesuai jumlah yang sebelumnya dialokasi
+- Status invoice otomatis disesuaikan: jika sebelumnya Paid bisa kembali ke Sent atau Partially Paid, jika sebelumnya Partially Paid bisa kembali ke Sent
+
+Proses Void memastikan audit trail tetap tercatat — receipt yang di-void tetap ada di sistem dengan status Cancelled/Void, bukan hilang. Ini penting untuk kepatuhan audit dan rekonsiliasi.
+
+**Q:** Apa tips terbaik untuk mengelola piutang pelanggan secara efektif menggunakan modul ini?
+
+**J:** Beberapa tips praktis:
+1. **Pantau AR Aging Report setiap minggu** — identifikasi pelanggan yang overdue lebih dari 30 hari dan lakukan follow-up segera. Semakin lama piutang menunggak, semakin sulit ditagih.
+2. **Gunakan Reference field** — selalu isi nomor referensi transfer atau bukti pembayaran eksternal untuk memudahkan rekonsiliasi bank.
+3. **Jangan tunda posting receipt** — receipt yang masih Draft tidak tercatat di jurnal dan tidak mengurangi piutang. Konfirmasi segera setelah pembayaran diterima.
+4. **Manfaatkan Customer Statement** — kirimkan laporan transaksi ke pelanggan secara berkala (bulanan) untuk konfirmasi saldo. Ini mencegah dispute di kemudian hari.
+5. **Gunakan Credit Note untuk koreksi, bukan menghapus receipt** — jika ada kesalahan nominal pembayaran, jangan void receipt lalu buat baru. Gunakan Credit Note untuk mencatat selisih. Ini menjaga jejak audit tetap bersih.
+6. **Periksa Due Date saat membuat invoice** — pastikan tanggal jatuh tempo realistis. Invoice yang overdue menumpuk akan menyulitkan manajemen kas.
+7. **Alokasi receipt tepat ke invoice yang benar** — jangan mengalokasikan pembayaran ke invoice yang salah. Jika terjadi kesalahan, void receipt dan buat baru dengan alokasi yang benar.
+8. **Batasi akses Void dan Delete** — pastikan hanya pengguna dengan permission `ar_receipt.delete` yang bisa menghapus/membatalkan receipt untuk mencegah penyalahgunaan.
+
+**Q:** Bagaimana jika pelanggan memberikan diskon atau potongan saat membayar? Apakah bisa dicatat di AR Receipt?
+
+**J:** Ya, sistem mendukung pencatatan diskon pembayaran melalui field **Discount Given** di setiap alokasi. Saat menambahkan alokasi ke invoice, isi field Discount Given dengan nominal diskon yang diberikan. Sistem akan menghitung: allocated_amount + discount_given tidak boleh melebihi amount_due invoice. Diskon ini dicatat terpisah dari nilai pembayaran dan akan mempengaruhi jurnal (biasanya ke akun Diskon Penjualan). Alternatifnya, jika diskon berupa pengurangan harga setelah invoice terbit, gunakan **Credit Note** dengan reason "Discount" lalu apply ke invoice terkait.
+
+**Q:** Apa yang harus dilakukan jika terjadi selisih pembayaran — misalnya pelanggan membayar lebih atau kurang dari jumlah invoice?
+
+**J:** **Jika pelanggan membayar lebih** (overpayment): Catat receipt sebesar jumlah yang diterima. Alokasikan ke invoice sebesar amount_due invoice (sehingga invoice menjadi Paid). Sisa kelebihan akan muncul sebagai unallocated amount. Hubungi finance/admin untuk menentukan apakah kelebihan akan dikembalikan (refund) atau dicatat sebagai deposit/prepayment untuk invoice berikutnya.
+
+**Jika pelanggan membayar kurang** (underpayment): Catat receipt sebesar jumlah yang diterima. Alokasikan ke invoice sebesar jumlah yang diterima. Invoice akan berubah menjadi Partially Paid. Sisa amount_due tetap tercatat di invoice dan bisa ditagih kemudian. Jika underpayment disebabkan oleh potongan/diskon yang disepakati, gunakan Credit Note untuk menutup selisihnya.
+
+**Q:** Bisakah satu receipt digunakan untuk membayar invoice dari beberapa pelanggan berbeda?
+
+**J:** Tidak. Satu AR Receipt hanya bisa dialokasikan ke invoice dari **satu pelanggan** yang sama — customer dipilih di header receipt. Jika Anda menerima pembayaran dari beberapa pelanggan sekaligus (misalnya via batch transfer), Anda harus membuat receipt terpisah untuk masing-masing pelanggan. Ini memastikan setiap pelanggan memiliki catatan penerimaan yang jelas dan memudahkan rekonsiliasi piutang per pelanggan.

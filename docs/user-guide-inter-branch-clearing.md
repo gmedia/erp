@@ -144,17 +144,50 @@ sail artisan journals:detect-cross-branch --limit=50      # batasi contoh yang d
 
 ## FAQ
 
-**T: Apakah saya harus mengubah cara mencatat jurnal satu cabang?**
-J: Tidak. Untuk jurnal yang hanya menyentuh satu cabang, tidak ada baris kliring yang disisipkan dan perilaku sama persis seperti sebelumnya.
+**Q: Apakah saya harus mengubah cara mencatat jurnal satu cabang?**
+A: Tidak. Untuk jurnal yang hanya menyentuh satu cabang, tidak ada baris kliring yang disisipkan dan perilaku sama persis seperti sebelumnya.
 
-**T: Mengapa muncul baris `1999-IBC` yang tidak saya buat?**
-J: Itu baris penyeimbang otomatis karena jurnal Anda menyentuh lebih dari satu cabang. Baris ini menjaga setiap cabang tetap seimbang.
+**Q: Mengapa muncul baris `1999-IBC` yang tidak saya buat?**
+A: Itu baris penyeimbang otomatis karena jurnal Anda menyentuh lebih dari satu cabang. Baris ini menjaga setiap cabang tetap seimbang.
 
-**T: Apa beda Due From dan Due To?**
-J: Due From = cabang lain berutang ke cabang ini (aset). Due To = cabang ini berutang ke cabang lain (liabilitas). Keduanya adalah dua sisi dari saldo kliring yang sama dan saling meniadakan company-wide.
+**Q: Apa beda Due From dan Due To?**
+A: Due From = cabang lain berutang ke cabang ini (aset). Due To = cabang ini berutang ke cabang lain (liabilitas). Keduanya adalah dua sisi dari saldo kliring yang sama dan saling meniadakan company-wide.
 
-**T: Jurnal multi-cabang saya ditolak. Kenapa?**
-J: Kemungkinan: (1) ada baris tanpa cabang pada jurnal multi-cabang, atau (2) akun `1999-IBC` belum ada di COA Version tahun fiskal terkait. Periksa kedua hal tersebut.
+**Q: Jurnal multi-cabang saya ditolak. Kenapa?**
+A: Kemungkinan: (1) ada baris tanpa cabang pada jurnal multi-cabang, atau (2) akun `1999-IBC` belum ada di COA Version tahun fiskal terkait. Periksa kedua hal tersebut.
 
-**T: Bagaimana cara tahu apakah ada transaksi antar cabang di sistem?**
-J: Jalankan `sail artisan journals:detect-cross-branch`, atau cek log warning mingguan dari monitor terjadwal.
+**Q: Bagaimana cara tahu apakah ada transaksi antar cabang di sistem?**
+A: Jalankan `sail artisan journals:detect-cross-branch`, atau cek log warning mingguan dari monitor terjadwal.
+
+**Q: Apa itu Inter-Branch Clearing secara sederhana?**
+A: Mekanisme yang membuat satu jurnal bisa mencatat transaksi lintas cabang sambil menjaga setiap cabang tetap seimbang sendiri. Sistem otomatis menambah baris penyeimbang ke akun kliring `1999-IBC` saat sebuah jurnal menyentuh dua cabang atau lebih.
+
+**Q: Bagaimana cara membuat jurnal yang melibatkan dua cabang?**
+A: Buka Journal Entries → Add New, isi header, lalu klik Add Line. Pada dialog baris pilih Account dan Branch untuk masing-masing baris (boleh berbeda cabang). Setelah Save, baris `1999-IBC` muncul otomatis jika ada cabang yang belum seimbang.
+
+**Q: Apakah saya perlu menambahkan baris akun kliring `1999-IBC` secara manual?**
+A: Tidak. Sistem yang menyisipkannya otomatis. Bahkan jika Anda menambahkannya manual, sistem akan menghapus dan menghitung ulang versinya sendiri agar konsisten.
+
+**Q: Kapan tepatnya baris kliring otomatis muncul?**
+A: Hanya saat satu jurnal menyentuh dua cabang atau lebih DAN ada cabang yang net debit/kreditnya belum nol. Jurnal satu cabang dan jurnal multi-cabang yang sudah seimbang per cabang tidak mendapat baris kliring.
+
+**Q: Mengapa saya harus mengisi Branch di setiap baris jurnal?**
+A: Karena saldo dan laporan dihitung per branch baris, bukan cabang di header. Pada jurnal multi-cabang, baris tanpa cabang (`branch_id` kosong) akan ditolak agar saldo per cabang tetap akurat.
+
+**Q: Di mana saya bisa melihat posisi Due From dan Due To antar cabang?**
+A: Pada Balance Sheet yang difilter per cabang. Saldo `1999-IBC` diklasifikasi ulang otomatis: net positif tampil sebagai Due From (aset), net negatif sebagai Due To (liabilitas).
+
+**Q: Mengapa saldo `1999-IBC` company-wide selalu nol?**
+A: Karena Due From di satu cabang selalu diimbangi Due To di cabang lawan. Saat laporan dilihat tanpa filter cabang, kedua sisi saling meniadakan sehingga net-nya nol.
+
+**Q: Apakah Recurring Journals dan Bank Reconciliation juga mendukung antar cabang?**
+A: Ya. Dialog baris Recurring Journals punya pemilih Branch per baris, dan saat dieksekusi auto-inject kliring berjalan sama. Bank Reconciliation punya field Branch di header, dan jurnal hasilnya mengikuti aturan kliring yang sama.
+
+**Q: Jurnal multi-cabang saya ditolak dengan pesan akun kliring tidak ditemukan. Apa solusinya?**
+A: Akun `1999-IBC` belum ada di COA Version tahun fiskal terkait. Pastikan seeder akun kliring sudah dijalankan untuk COA Version aktif pada tahun fiskal tersebut, lalu coba simpan ulang.
+
+**Q: Apakah fitur ini memengaruhi transaksi satu cabang yang sudah saya catat selama ini?**
+A: Tidak sama sekali. Untuk jurnal satu cabang tidak ada baris kliring yang disisipkan dan perilakunya identik seperti sebelumnya. Fitur ini sepenuhnya transparan untuk transaksi non-lintas-cabang.
+
+**Q: Seberapa sering sistem memeriksa transaksi antar cabang secara otomatis?**
+A: Monitor terjadwal berjalan otomatis setiap Senin pukul 06:00 menjalankan `journals:detect-cross-branch --posted-only`. Jika ditemukan jurnal multi-cabang, sistem menulis `Log::warning` agar muncul di log/Sentry; jika tidak ada, monitor diam.

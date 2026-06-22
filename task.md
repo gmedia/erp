@@ -1,6 +1,32 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-06-22 (Report debugging COMPLETE + COMMITTED + PUSHED. 2 commits: `e3221448` backend fixes + `89ace1aa` frontend date picker refactor. Working tree clean. main HEAD `89ace1aa`. All 5 report endpoints return data after `migrate:fresh --seed`. SESSION 2026-06-22 — Report debugging below.) UTC
+Last updated: 2026-06-22 (Multi-Currency user guide CREATED. docs/user-guide-multi-currency.md — 184 lines, 11 FAQ, 7 numbered sections, Bahasa Indonesia. Covers single-currency constraint, Admin Settings, form currency handling, DataTable column, Excel export/import validation, permissions, roadmap. No emojis. main HEAD `86e0b6a6` — working tree has 3 untracked doc files: user-guide-stock-monitor.md + user-guide-recurring-journals.md + user-guide-multi-currency.md.)
+
+## SESSION 2026-06-22 — Purchase Request User Guide
+
+Created comprehensive user guide for Purchase Requests module at `docs/user-guide-purchase-requests.md`:
+- First line: `# User Guide: Purchase Requests` (as required)
+- All content in Bahasa Indonesia
+- Structure: `## Gambaran Umum`, `## Menu & Navigasi` (table with Menu/URL/Permission), numbered sections `## 1.` through `## 9.`, `## FAQ & Tips` (10 Q&A items)
+- Each workflow step includes `[Screenshot: description]` placeholder
+- Covers: creating PR (with items/lines), viewing details, editing (before approval), deleting/cancelling, approval workflow/status lifecycle, search/filter, sorting columns, export to Excel, permissions
+- Status lifecycle: draft → pending approval → approved → partially ordered → ordered → rejected → cancelled
+- 10 FAQ items covering: auto-generate PR number, estimated amount calculation, edit restrictions, adding items, resubmitting rejected PRs, viewing PRs with PO, delete restrictions, approval history, priority impact, branch-specific export
+- Screenshot placeholders throughout for future visual documentation
+- No emojis anywhere
+- Permission documented: `purchase_request`
+
+Key technical details captured from source code:
+- Priority options: Low, Normal, High, Urgent
+- Status options: Draft, Pending Approval, Approved, Rejected, Partially Ordered, Fully Ordered, Cancelled
+- Sortable columns: PR Number, Branch, Department, Requester, Request Date, Required Date, Priority, Status, Estimated Amount
+- Filter fields: search (PR number/notes/rejection reason), branch, department, requester, priority, status, request_date_from/to
+- Items table columns: Product, Unit, Quantity, Est. Unit Price, Notes, Action
+- Export columns: PR Number, Branch, Department, Requester, Request Date, Required Date, Priority, Status, Estimated Amount, Notes, Rejection Reason, Created At
+
+---
+
+## SESSION 2026-06-22 — Prod scheduler service (PR #59 merged)
 
 ## SESSION 2026-06-22 — Prod scheduler service (PR #59 merged)
 

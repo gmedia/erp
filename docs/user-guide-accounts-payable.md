@@ -189,3 +189,47 @@ Pipeline memungkinkan:
 3. **Cek AP Aging Report** secara berkala untuk identifikasi tagihan overdue
 4. **Jangan hapus payment** yang sudah confirmed — gunakan Void untuk audit trail
 5. **Supplier Invoice Number** membantu rekonsiliasi dengan faktur fisik dari vendor
+
+---
+
+## FAQ & Tips
+
+**Q:** Bagaimana cara membuat pembayaran ke supplier yang benar?
+
+**J:** Buka menu AP Payments, klik Add New. Isi header: pilih Supplier, Branch, Fiscal Year, Payment Date, Payment Method, dan Bank Account. Masukkan Total Amount sesuai nominal yang akan dibayarkan. Tambahkan alokasi dengan klik Add Allocation: pilih Supplier Bill yang ingin dibayar, isi Allocated Amount (tidak boleh melebihi sisa tagihan), dan opsional isi Discount Taken jika ada potongan pembayaran dini. Klik Save. Nomor payment (PAY-YYYY-NNNNNN) akan dibuat otomatis.
+
+**Q:** Apa saja status yang dimiliki AP Payment dan apa artinya?
+
+**J:** Status payment terdiri dari: **Draft** (baru dibuat, bisa diedit dan dihapus), **Pending Approval** (menunggu persetujuan dari approver), **Confirmed** (sudah dikonfirmasi dan jurnal otomatis terposting ke buku besar), **Reconciled** (sudah dicocokkan dengan rekening koran/bank statement), **Cancelled** (dibatalkan sebelum confirmed), dan **Void** (dibatalkan setelah confirmed dengan jurnal reversal).
+
+**Q:** Apa yang terjadi ketika payment dikonfirmasi (Confirmed)?
+
+**J:** Saat status diubah menjadi Confirmed, sistem otomatis mencatat siapa yang mengkonfirmasi dan kapan (confirmed_by, confirmed_at). Sistem juga otomatis memposting jurnal akuntansi (mendebit akun hutang supplier dan mengkredit akun bank/kas yang dipilih) melalui PostApPaymentJournalAction. Setelah confirmed, payment tidak bisa diedit bebas -- hanya bisa di-Void jika perlu dibatalkan.
+
+**Q:** Apa yang terjadi jika payment dibatalkan atau dihapus?
+
+**J:** Saat payment dihapus (status Draft/Cancelled), semua alokasi akan di-revert: amount_paid di setiap Supplier Bill yang terkait akan dikurangi, amount_due dihitung ulang, dan status bill otomatis disesuaikan (misalnya dari Paid kembali ke Partially Paid atau Confirmed). Jika payment sudah Confirmed dan ingin dibatalkan, gunakan status Void agar jurnal reversal tercatat dan audit trail tetap lengkap.
+
+**Q:** Bagaimana cara mencari dan memfilter data pembayaran?
+
+**J:** Gunakan kolom pencarian di halaman AP Payments untuk mencari berdasarkan payment number, reference, atau notes. Filter tersedia untuk Supplier (pilih supplier tertentu), Branch, Payment Method (Bank Transfer/Cash/Check/Giro/Other), Status (Draft/Pending Approval/Confirmed/Reconciled/Cancelled/Void), dan Date Range. Klik kolom header untuk mengurutkan data berdasarkan Payment Number, Supplier, Branch, Payment Date, Payment Method, Status, atau Total Amount.
+
+**Q:** Bagaimana hubungan antara AP Payment dengan Supplier Bill?
+
+**J:** Satu AP Payment bisa membayar satu atau beberapa Supplier Bill sekaligus (multi-bill payment). Sebaliknya, satu Supplier Bill bisa dibayar bertahap melalui beberapa AP Payment (partial payment). Saat payment dibuat, alokasi menghubungkan payment ke bill tertentu dengan nominal tertentu. Sistem otomatis memvalidasi bahwa allocated amount tidak melebihi sisa tagihan (amount_due) dan hanya bill dengan status Confirmed/Partially Paid/Overdue yang bisa dialokasikan.
+
+**Q:** Bagaimana cara mengekspor data pembayaran ke Excel?
+
+**J:** Buka halaman AP Payments. Gunakan filter yang tersedia untuk mempersempit data yang ingin diekspor (supplier, branch, payment method, status, date range). Klik tombol Export di toolbar. File Excel (.xlsx) akan diunduh dengan kolom: Payment Number, Supplier, Branch, Payment Date, Payment Method, Currency, Status, Total Amount, Total Allocated, Total Unallocated, Reference, Notes, Created By, dan Created At. Kolom yang diekspor akan sesuai dengan filter yang diterapkan.
+
+**Q:** Apakah sistem mendukung multi-currency dalam pembayaran?
+
+**J:** Ya, setiap AP Payment memiliki field Currency. Secara default menggunakan IDR, namun bisa diubah ke mata uang lain saat membuat payment. Total Amount dan alokasi akan mengikuti mata uang yang dipilih. Format tampilan nominal di tabel dan form akan menyesuaikan dengan regional settings (menggunakan format mata uang yang sesuai).
+
+**Q:** Apa yang dimaksud dengan Total Unallocated pada tabel AP Payments?
+
+**J:** Total Unallocated adalah selisih antara Total Amount pembayaran dengan total alokasi ke Supplier Bill (total_allocated). Jika Anda membuat payment sebesar Rp 10.000.000 tetapi baru mengalokasikan Rp 7.000.000 ke bill, maka Total Unallocated akan menampilkan Rp 3.000.000. Gunakan informasi ini untuk memastikan seluruh dana pembayaran sudah dialokasikan dengan benar ke tagihan yang sesuai.
+
+**Q:** Bagaimana workflow approval untuk AP Payment?
+
+**J:** Setelah payment dibuat dengan status Draft, ubah status ke Pending Approval untuk mengajukan persetujuan. Approver yang memiliki permission dapat menyetujui payment melalui menu My Approvals atau langsung di halaman edit payment. Setelah disetujui, status berubah menjadi Confirmed dan jurnal otomatis terposting. Jika payment ditolak, status bisa dikembalikan ke Draft untuk diperbaiki. Proses approval dicatat lengkap dengan approved_by dan approved_at untuk keperluan audit trail.
