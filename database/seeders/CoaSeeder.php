@@ -201,15 +201,17 @@ class CoaSeeder extends Seeder
             'memo' => 'Utang dagang kepada supplier',
         ]);
 
-        // Sample Journal 3: Pay Operating Expense (Draft)
+        // Sample Journal 3: Pay Operating Expense
         $journal3 = JournalEntry::create([
             'fiscal_year_id' => $fiscalYear->id,
             'entry_number' => 'JV-2026-00003',
             'entry_date' => '2026-01-25',
             'reference' => 'EXP-001',
             'description' => 'Pembayaran biaya listrik dan telepon',
-            'status' => 'draft',
+            'status' => 'posted',
             'created_by' => $user?->id,
+            'posted_by' => $user?->id,
+            'posted_at' => now(),
         ]);
 
         // Debit: General & Admin Expense (52000) - Expense bertambah
@@ -228,6 +230,180 @@ class CoaSeeder extends Seeder
             'debit' => 0,
             'credit' => 500000,
             'memo' => 'Pengeluaran dari kas kecil',
+        ]);
+
+        // Sample Journal 4: Service Revenue
+        $journal4 = JournalEntry::create([
+            'fiscal_year_id' => $fiscalYear->id,
+            'entry_number' => 'JV-2026-00004',
+            'entry_date' => '2026-02-05',
+            'reference' => 'INV-002',
+            'description' => 'Pendapatan jasa konsultasi',
+            'status' => 'posted',
+            'created_by' => $user?->id,
+            'posted_by' => $user?->id,
+            'posted_at' => now(),
+        ]);
+
+        JournalEntryLine::create([
+            'journal_entry_id' => $journal4->id,
+            'account_id' => $accountMap['11110'],
+            'debit' => 10000000,
+            'credit' => 0,
+            'memo' => 'Penerimaan kas dari jasa konsultasi',
+        ]);
+
+        JournalEntryLine::create([
+            'journal_entry_id' => $journal4->id,
+            'account_id' => $accountMap['41000'],
+            'debit' => 0,
+            'credit' => 10000000,
+            'memo' => 'Pendapatan jasa konsultasi',
+        ]);
+
+        // Sample Journal 5: Pay Operating Expense (additional)
+        $journal5 = JournalEntry::create([
+            'fiscal_year_id' => $fiscalYear->id,
+            'entry_number' => 'JV-2026-00005',
+            'entry_date' => '2026-02-10',
+            'reference' => 'EXP-002',
+            'description' => 'Pembayaran biaya sewa kantor',
+            'status' => 'posted',
+            'created_by' => $user?->id,
+            'posted_by' => $user?->id,
+            'posted_at' => now(),
+        ]);
+
+        JournalEntryLine::create([
+            'journal_entry_id' => $journal5->id,
+            'account_id' => $accountMap['52000'],
+            'debit' => 2500000,
+            'credit' => 0,
+            'memo' => 'Biaya sewa kantor bulan Februari',
+        ]);
+
+        JournalEntryLine::create([
+            'journal_entry_id' => $journal5->id,
+            'account_id' => $accountMap['11110'],
+            'debit' => 0,
+            'credit' => 2500000,
+            'memo' => 'Pembayaran sewa dari bank',
+        ]);
+
+        // Sample Journal 6: Asset Purchase
+        $journal6 = JournalEntry::create([
+            'fiscal_year_id' => $fiscalYear->id,
+            'entry_number' => 'JV-2026-00006',
+            'entry_date' => '2026-02-15',
+            'reference' => 'PO-002',
+            'description' => 'Pembelian peralatan kantor',
+            'status' => 'posted',
+            'created_by' => $user?->id,
+            'posted_by' => $user?->id,
+            'posted_at' => now(),
+        ]);
+
+        JournalEntryLine::create([
+            'journal_entry_id' => $journal6->id,
+            'account_id' => $accountMap['12100'],
+            'debit' => 7500000,
+            'credit' => 0,
+            'memo' => 'Penambahan peralatan kantor',
+        ]);
+
+        JournalEntryLine::create([
+            'journal_entry_id' => $journal6->id,
+            'account_id' => $accountMap['21100'],
+            'debit' => 0,
+            'credit' => 7500000,
+            'memo' => 'Utang pembelian peralatan',
+        ]);
+
+        // Sample Journal 7: Liability Payment
+        $journal7 = JournalEntry::create([
+            'fiscal_year_id' => $fiscalYear->id,
+            'entry_number' => 'JV-2026-00007',
+            'entry_date' => '2026-02-20',
+            'reference' => 'PAY-001',
+            'description' => 'Pembayaran utang dagang',
+            'status' => 'posted',
+            'created_by' => $user?->id,
+            'posted_by' => $user?->id,
+            'posted_at' => now(),
+        ]);
+
+        JournalEntryLine::create([
+            'journal_entry_id' => $journal7->id,
+            'account_id' => $accountMap['21100'],
+            'debit' => 3000000,
+            'credit' => 0,
+            'memo' => 'Pelunasan utang dagang',
+        ]);
+
+        JournalEntryLine::create([
+            'journal_entry_id' => $journal7->id,
+            'account_id' => $accountMap['11110'],
+            'debit' => 0,
+            'credit' => 3000000,
+            'memo' => 'Pembayaran dari bank',
+        ]);
+
+        // Sample Journal 8: Equity Contribution
+        $journal8 = JournalEntry::create([
+            'fiscal_year_id' => $fiscalYear->id,
+            'entry_number' => 'JV-2026-00008',
+            'entry_date' => '2026-03-01',
+            'reference' => 'EQ-001',
+            'description' => 'Setoran modal pemilik',
+            'status' => 'posted',
+            'created_by' => $user?->id,
+            'posted_by' => $user?->id,
+            'posted_at' => now(),
+        ]);
+
+        JournalEntryLine::create([
+            'journal_entry_id' => $journal8->id,
+            'account_id' => $accountMap['11110'],
+            'debit' => 50000000,
+            'credit' => 0,
+            'memo' => 'Penerimaan setoran modal',
+        ]);
+
+        JournalEntryLine::create([
+            'journal_entry_id' => $journal8->id,
+            'account_id' => $accountMap['31000'],
+            'debit' => 0,
+            'credit' => 50000000,
+            'memo' => 'Modal disetor pemilik',
+        ]);
+
+        // Sample Journal 9: Depreciation Expense
+        $journal9 = JournalEntry::create([
+            'fiscal_year_id' => $fiscalYear->id,
+            'entry_number' => 'JV-2026-00009',
+            'entry_date' => '2026-03-15',
+            'reference' => 'DEP-001',
+            'description' => 'Penyusutan peralatan kantor bulan Maret',
+            'status' => 'posted',
+            'created_by' => $user?->id,
+            'posted_by' => $user?->id,
+            'posted_at' => now(),
+        ]);
+
+        JournalEntryLine::create([
+            'journal_entry_id' => $journal9->id,
+            'account_id' => $accountMap['52000'],
+            'debit' => 625000,
+            'credit' => 0,
+            'memo' => 'Beban penyusutan peralatan kantor',
+        ]);
+
+        JournalEntryLine::create([
+            'journal_entry_id' => $journal9->id,
+            'account_id' => $accountMap['12100'],
+            'debit' => 0,
+            'credit' => 625000,
+            'memo' => 'Akumulasi penyusutan peralatan (contra asset)',
         ]);
     }
 

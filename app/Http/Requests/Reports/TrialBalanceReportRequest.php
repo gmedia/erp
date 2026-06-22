@@ -14,7 +14,7 @@ class TrialBalanceReportRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'fiscal_year_id' => ['required', 'integer', 'exists:fiscal_years,id'],
+            'fiscal_year_id' => ['nullable', 'integer', 'exists:fiscal_years,id'],
             'period_month' => ['nullable', 'integer', 'between:1,12'],
             'period_year' => ['nullable', 'integer', 'between:2000,2100'],
         ];

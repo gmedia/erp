@@ -34,7 +34,7 @@ class EmployeeFactory extends Factory
             'department_id' => Department::factory(),
             'position_id' => Position::factory(),
             'branch_id' => Branch::factory(),
-            'user_id' => $this->faker->boolean(20) ? User::factory() : null,
+            'user_id' => User::factory(),
             // nullable two-decimal salary
             'salary' => $this->faker->optional(0.8, null)->randomFloat(2, 30000, 150000),
             // Random hire date within the last 10 years

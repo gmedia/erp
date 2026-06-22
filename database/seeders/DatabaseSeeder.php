@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         // Seed default test user
-        User::updateOrCreate(
+        $testUser = User::updateOrCreate(
             ['email' => 'test@example.com'],
             [
                 'name' => 'Test User',
@@ -85,6 +85,22 @@ class DatabaseSeeder extends Seeder
         $departmentId = Department::query()->value('id');
         $positionId = Position::query()->value('id');
         $branchId = Branch::query()->value('id');
+
+        // Test User Employee (for test@example.com — ensures CheckPermission middleware finds employee)
+        Employee::updateOrCreate([
+            'email' => 'test@example.com',
+            'user_id' => $testUser->id,
+        ], [
+            'employee_id' => 'EMP-TEST01',
+            'name' => 'Test User',
+            'phone' => '1234567890',
+            'department_id' => $departmentId,
+            'position_id' => $positionId,
+            'branch_id' => $branchId,
+            'salary' => 50000,
+            'hire_date' => now(),
+            'employment_status' => 'regular',
+        ]);
 
         // Admin Employee
         Employee::updateOrCreate([
@@ -169,11 +185,13 @@ class DatabaseSeeder extends Seeder
             ArSampleDataSeeder::class,
             GlExtendedSampleDataSeeder::class,
             ReportConfigurationSeeder::class,
+            BudgetSampleDataSeeder::class,
         ]);
 
         // Assign all permissions to sample users for easy testing
         $allPermissions = Permission::all();
         foreach ([
+            'test@example.com',
             config('app.admin'),
             'manager.hr@dokfin.id',
             'director.finance@dokfin.id',

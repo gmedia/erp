@@ -18,7 +18,7 @@ class GlExtendedSampleDataSeeder extends Seeder
     public function run(): void
     {
         $user = User::query()->first() ?? User::factory()->create();
-        $fiscalYear = FiscalYear::query()->first() ?? FiscalYear::factory()->create([
+        $fiscalYear = FiscalYear::where('status', 'open')->first() ?? FiscalYear::factory()->create([
             'name' => 'FY 2026',
             'start_date' => '2026-01-01',
             'end_date' => '2026-12-31',

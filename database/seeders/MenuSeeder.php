@@ -610,6 +610,16 @@ class MenuSeeder extends Seeder
                         'child' => [],
                     ],
                     [
+                        'name' => 'budget_variance_report',
+                        'display_name' => 'Budget Variance Report',
+                        'permissions' => [
+                            'budget_variance_report',
+                        ],
+                        'icon' => 'Target',
+                        'url' => 'reports/budget-variance',
+                        'child' => [],
+                    ],
+                    [
                         'name' => 'trial_balance_report',
                         'display_name' => 'Trial Balance Report',
                         'permissions' => [
@@ -617,6 +627,16 @@ class MenuSeeder extends Seeder
                         ],
                         'icon' => 'Scale',
                         'url' => 'reports/trial-balance',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'trial_balance_detailed_report',
+                        'display_name' => 'Trial Balance Detailed Report',
+                        'permissions' => [
+                            'trial_balance_report',
+                        ],
+                        'icon' => 'ListChecks',
+                        'url' => 'reports/trial-balance-detailed',
                         'child' => [],
                     ],
                     [

@@ -2,6 +2,7 @@
 
 namespace App\Actions\Reports;
 
+use App\Actions\FiscalYears\GetPreferredFiscalYearAction;
 use App\Models\AccountBalance;
 use App\Models\FiscalYear;
 
@@ -9,7 +10,19 @@ class GetTrialBalanceReportAction
 {
     public function execute(array $filters): array
     {
-        $fiscalYearId = (int) $filters['fiscal_year_id'];
+        $fiscalYearId = $this->resolveFiscalYearId($filters);
+
+        if ($fiscalYearId === null) {
+            return [
+                'data' => [],
+                'summary' => [
+                    'total_debit' => 0,
+                    'total_credit' => 0,
+                    'is_balanced' => true,
+                ],
+            ];
+        }
+
         $periodMonth = $this->intOrNull($filters['period_month'] ?? null);
         $periodYear = $this->intOrNull($filters['period_year'] ?? null);
 
@@ -49,6 +62,19 @@ class GetTrialBalanceReportAction
                 ) === 0,
             ],
         ];
+    }
+
+    private function resolveFiscalYearId(array $filters): ?int
+    {
+        if (isset($filters['fiscal_year_id']) && $filters['fiscal_year_id'] !== null && $filters['fiscal_year_id'] !== '') {
+            return (int) $filters['fiscal_year_id'];
+        }
+
+        $fiscalYears = FiscalYear::query()->orderByDesc('start_date')->get();
+
+        $preferred = app(GetPreferredFiscalYearAction::class)->execute($fiscalYears);
+
+        return $preferred?->id;
     }
 
     private function intOrNull(mixed $value): ?int
