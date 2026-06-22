@@ -13,6 +13,7 @@ import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 
 interface FilterDatePickerProps {
+    label?: string;
     value?: string;
     onChange?: (e: { target: { value: string } }) => void;
     placeholder?: string;
@@ -20,6 +21,7 @@ interface FilterDatePickerProps {
 }
 
 export function FilterDatePicker({
+    label,
     value,
     onChange,
     placeholder = 'Pick a date',
@@ -41,7 +43,9 @@ export function FilterDatePicker({
     };
 
     return (
-        <Popover>
+        <div className="space-y-2">
+            {label && <label className="text-sm font-medium">{label}</label>}
+            <Popover>
             <PopoverTrigger asChild>
                 <Button
                     variant="outline"
@@ -68,5 +72,6 @@ export function FilterDatePicker({
                 />
             </PopoverContent>
         </Popover>
+        </div>
     );
 }

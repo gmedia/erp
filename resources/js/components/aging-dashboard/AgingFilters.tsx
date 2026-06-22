@@ -1,4 +1,4 @@
-import { Input } from '@/components/ui/input';
+import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 import {
     Select,
     SelectContent,
@@ -26,21 +26,11 @@ export const AgingFilters = memo<AgingFiltersProps>(function AgingFilters({
 }) {
     return (
         <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-            <div className="flex flex-col gap-1.5">
-                <label
-                    htmlFor="as-of-date-input"
-                    className="text-sm font-medium text-muted-foreground"
-                >
-                    As of Date
-                </label>
-                <Input
-                    id="as-of-date-input"
-                    type="date"
-                    value={asOfDate}
-                    onChange={(e) => onAsOfDateChange(e.target.value)}
-                    className="w-[200px]"
-                />
-            </div>
+            <FilterDatePicker
+                label="As of Date"
+                value={asOfDate}
+                onChange={(e) => onAsOfDateChange(e.target.value)}
+            />
 
             <div className="flex flex-col gap-1.5">
                 <label

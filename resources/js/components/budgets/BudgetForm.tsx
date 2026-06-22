@@ -12,6 +12,7 @@ import {
 import * as z from 'zod';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
+import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
 import SelectField from '@/components/common/SelectField';
@@ -237,19 +238,17 @@ export const BudgetForm = memo<BudgetFormProps>(function BudgetForm({
                                                             />
                                                         </TableCell>
                                                         <TableCell>
-                                                            <InputField
+                                                            <DatePickerField
                                                                 name={`lines.${index}.period_start`}
                                                                 label=""
-                                                                type="date"
-                                                                placeholder="YYYY-MM-DD"
+                                                                placeholder="Pick start date"
                                                             />
                                                         </TableCell>
                                                         <TableCell>
-                                                            <InputField
+                                                            <DatePickerField
                                                                 name={`lines.${index}.period_end`}
                                                                 label=""
-                                                                type="date"
-                                                                placeholder="YYYY-MM-DD"
+                                                                placeholder="Pick end date"
                                                             />
                                                         </TableCell>
                                                         <TableCell>
