@@ -122,8 +122,37 @@ User chose scope **2b** then **reduced** (after detection showed zero cross-bran
 
 User is switching to a new 0pencode session. Read this section first.
 
+> **CURRENT STATE (2026-06-22): Inter-branch monitoring initiative 100% COMPLETE.**
+> main HEAD `d1bbbb00` (handoff commit; code HEAD `7fceac91` = PR #59). Working
+> tree clean (only `.sisyphus/` untracked). **No open PRs.** All of FULL 2b +
+> follow-ups #55-#59 merged. The full session logs are at the TOP of this file
+> (most recent first); read those for detail. The numbered list below (items
+> 1-6) is HISTORICAL context from earlier initiatives — accurate but superseded.
+>
+> **RECOMMENDED NEXT STEP (pick one, ASK user if unsure):**
+> - **(A) Prod verification — RECOMMENDED, only unobserved piece.** PR #59 added
+>   a `scheduler` service to `docker-compose.dist.yml` but it has never actually
+>   run in prod. After the next `docker stack deploy`, verify: service is up with
+>   exactly 1 replica + healthy (`docker service ls`, no crash-loop), and
+>   `docker service logs <stack>_scheduler` shows `schedule:work` idle-waiting.
+>   Optionally trigger `journals:detect-cross-branch` in a prod container to
+>   confirm the Sentry alert path reaches the dashboard (needs live DSN).
+>   NOTE: `docker stack deploy` to prod is HIGH-RISK + needs user confirmation +
+>   prod env access not available from the dev box.
+> - **(B) Idle — wait for triggers.** PR8 (retro-correction of historical
+>   multi-branch journals) gated on prod detection > 0 (currently 0). H3 Wave 2
+>   multi-currency FX gated on first non-IDR customer. Neither is warranted now.
+> - **(C) New product feature** — needs spec/direction from user.
+>
+> Verify baseline first: `git rev-parse HEAD` (expect `d1bbbb00` or fresher),
+> `git status --short` (expect empty or only `task.md`),
+> `gh pr list --base main --state open` (expect empty),
+> `sail artisan journals:detect-cross-branch` (PR8 gate; expect 0 multi-branch).
+
+--- HISTORICAL (earlier initiatives, superseded by the sessions above) ---
+
 1. **Verify baseline**: `git status --short` → expect empty (or only `task.md`). `git log --oneline -1` on main → expect `cc5621b8` (or fresher). Latest main CI green. **No open PRs.**
-2. **THIS SESSION — Pipeline/Approval dashboard branch-scoping initiative COMPLETE (3 PRs, Oracle-designed, all MERGED):**
+2. **Pipeline/Approval dashboard branch-scoping initiative COMPLETE (3 PRs, Oracle-designed, all MERGED):**
    - **PR #38** (squash `888843a2`) — shared `BranchResolverRegistry` (app/Domain/Branch/). FQCN→strategy map (Direct | Warehouse | None), `resolve(Model): ?int`, `relationsFor()`, `branchBearingTypes()`, `isRegistered()`. Throws on unregistered types. Refactored `journals:backfill-branch` onto it (no behavior change). No-branch journal sources registered as None first-class.
    - **PR #39** (squash `d071e552`) — pipeline dashboard scoping. Denormalized `pipeline_entity_states.branch_id` (nullable FK + index). Populated on write in `AssignPipelineAction` (isRegistered guard → unregistered = null). Registered Asset (Direct). `pipeline-states:backfill-branch` command. Dashboard action+controller scoped via ResolvesBranchScope (EXCLUDE). Frontend branch selector.
    - **PR #40** (squash `cc5621b8`) — approval monitoring scoping. Denormalized `approval_requests.branch_id`. Populated on write in `TriggerApprovalAction`. Registered PurchaseRequest (Direct) + PurchaseOrder (Warehouse). `approval-requests:backfill-branch` command. Summary + overdue scoped (overdue via `whereHas('request')` since steps have no branch_id). Frontend branch selector.
