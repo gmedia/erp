@@ -1,6 +1,20 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-06-22 (FULL 2b COMPLETE + operational validation + scheduled monitoring + user guide. PRs #46-#54 (initiative) + #55 (smoke test & cross-branch detection command) + #56 (weekly scheduled detection + structured logging) + #57 (inter-branch clearing finance user guide) all MERGED. main HEAD `aa461253`. Detection on dev = 0 multi-branch journals → engine dormant-but-correct confirmed; PR8 still NOT warranted. Clearing engine + line-level reports + per-branch balance sheet (Due-From/Due-To) + per-asset-branch depreciation + per-branch period closing + bank-rec/recurring branch schema + per-line branch pickers UI all live. The `journals:detect-cross-branch --posted-only` command now runs weekly (Mondays 06:00) and logs a `Log::warning` tripwire the moment cross-branch activity appears. Only optional PR8 (retro-correction of historical multi-branch journals) deferred — gated on that detection which is currently 0.) UTC
+Last updated: 2026-06-22 (FULL 2b COMPLETE + operational validation + scheduled monitoring + user guide + Sentry alert. PRs #46-#54 (initiative) + #55 (smoke test & cross-branch detection command) + #56 (weekly scheduled detection + structured logging) + #57 (inter-branch clearing finance user guide) + #58 (cross-branch detection → Sentry alert) all MERGED. main HEAD `adecd97d`. Detection on dev = 0 multi-branch journals → engine dormant-but-correct confirmed; PR8 still NOT warranted. Clearing engine + line-level reports + per-branch balance sheet (Due-From/Due-To) + per-asset-branch depreciation + per-branch period closing + bank-rec/recurring branch schema + per-line branch pickers UI all live. The `journals:detect-cross-branch --posted-only` command now runs weekly (Mondays 06:00), logs a `Log::warning`, AND sends `\Sentry\captureMessage(Severity::warning())` with structured context the moment cross-branch activity appears. KNOWN INFRA GAP: prod has no scheduler service (see audit below) — manual invocation alerts correctly, but the weekly run will NOT fire until a `schedule:work`/cron service is added to the prod stack. Only optional PR8 (retro-correction of historical multi-branch journals) deferred — gated on detection which is currently 0.) UTC
+
+## SESSION 2026-06-22 — Production monitoring audit + Sentry alert (PR #58 merged)
+
+Audited whether the PR #56 tripwire actually reaches a human in production. Found it was effectively cosmetic; fixed the notification half. main HEAD `adecd97d`. CI 5/5 green, Sonar PASS.
+
+**Audit findings (read-only):**
+- **Scheduler NOT running in prod**: `docker-compose.dist.yml` = single `octane:swoole` service; no `schedule:work`/cron service. Alpine base image (`docker/dist/base/Dockerfile`) has no cron/supervisor. `docker/dist/scripts/start-container.sh` = `optimize` + Octane only. grep `schedule:run|schedule:work` across prod surface = 0 hits. (The `docker/8.4/` image is dev/CI Sail, not prod.) → the Monday 06:00 schedule never fires in prod today.
+- **`Log::warning` not surfaced**: `config/logging.php` default stack → `single` file channel (ephemeral container file, no `sentry` channel). `config/sentry.php` `enable_logs=false` → standalone warnings without an exception are NOT sent to Sentry.
+
+**Fix shipped (notification half — chosen remediation):**
+- `DetectCrossBranchJournals`: on positive detection, now calls `\Sentry\captureMessage(..., Severity::warning())` wrapped in `withScope` attaching structured metrics (scope, multi_branch_entries, clearing_entries/lines, null_branch_lines). Captures directly to the Sentry hub → independent of `enable_logs`/log-channel wiring; fires on manual OR scheduled invocation. `Log::warning` kept for file-trail parity. Sentry no-ops safely without a DSN (dev/CI/test unaffected).
+- Tests: `tests/Feature/Console/DetectCrossBranchJournalsTest.php` → 6 passed / 13 assertions. New test binds a mock `ClientInterface` to the Sentry hub, asserts `captureMessage` fires, restores original client in `finally`. duster + phpstan (app/) clean.
+
+**Remaining infra gap (NOT done — separate from app code):** prod stack still has no scheduler-execution service. To make the weekly auto-run live, add a `scheduler` service to `docker-compose.dist.yml` running `php artisan schedule:work` (or a cron entry). Deferred as an infra decision; manual invocation already alerts correctly.
 
 ## SESSION 2026-06-22 — Inter-branch clearing user guide (PR #57 merged)
 
@@ -314,25 +328,28 @@ gh pr view <num> --json statusCheckRollup
 ## Continuation Prompt for New Session
 
 ```text
-Read task.md first. Repo on `main` at HEAD `aa461253` (or fresher), working
+Read task.md first. Repo on `main` at HEAD `adecd97d` (or fresher), working
 tree clean. FULL 2b is COMPLETE, operationally validated, monitored, and
 documented. The inter-branch initiative (PRs #46-#54) plus follow-ups (#55:
 end-to-end smoke test + `journals:detect-cross-branch` monitoring command; #56:
 weekly scheduled detection + structured `Log::warning` tripwire; #57:
 inter-branch clearing finance user guide at
-`docs/user-guide-inter-branch-clearing.md`) are all merged. The clearing
-engine is dormant-but-correct: `journals:detect-cross-branch` reports 0
-economically multi-branch journals on current data, and a weekly scheduled run
-(Mondays 06:00, `--posted-only`) will log a warning the moment that changes. No
-open PRs.
+`docs/user-guide-inter-branch-clearing.md`; #58: cross-branch detection →
+`\Sentry\captureMessage` alert) are all merged. The clearing engine is
+dormant-but-correct: `journals:detect-cross-branch` reports 0 economically
+multi-branch journals on current data, and on positive detection now both logs
+a warning AND captures a Sentry message the moment that changes. KNOWN INFRA
+GAP: prod stack (`docker-compose.dist.yml`) has no scheduler-execution service,
+so the weekly auto-run will NOT fire in prod until a `schedule:work`/cron
+service is added — manual invocation alerts correctly. No open PRs.
 
 Quick verify:
-  git rev-parse HEAD          # expect aa461253 or fresher
+  git rev-parse HEAD          # expect adecd97d or fresher
   git status --short          # expect empty (or only task.md)
   gh run list --branch main --limit 3   # verify latest is green
   gh pr list --base main --state open   # expect empty unless new work started
   sail artisan journals:detect-cross-branch   # gate for PR8: expect 0 multi-branch
-  sail artisan schedule:list  # confirm journals:detect-cross-branch runs weekly
+  sail artisan schedule:list  # confirm journals:detect-cross-branch runs weekly (dev)
 
 If dev DB seems empty: `sail artisan db:seed`. Schema is intact.
 
@@ -348,6 +365,12 @@ options (all optional / future — none blocking):
    customer signs.
 
 3. Product feature work (request specs from user).
+
+4. (INFRA, optional) Activate the weekly scheduler in prod: add a `scheduler`
+   service to `docker-compose.dist.yml` running `php artisan schedule:work`
+   (or a host cron calling `schedule:run` every minute). Until then the Sentry
+   alert from PR #58 only fires on MANUAL `journals:detect-cross-branch` runs.
+   See "Production monitoring audit" session above for the full finding.
 
 KNOWN GOTCHAS (full 2b):
 - InterBranchClearingService.inject is pure/integer-cents; it ONLY requires the
