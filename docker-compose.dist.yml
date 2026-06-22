@@ -28,6 +28,20 @@ services:
     networks:
       - erp-network
 
+  scheduler:
+    image: ${APP_IMAGE:-ghcr.io/gmedia/erp/app:latest}
+    env_file:
+      - .env.production
+    environment:
+      RUN_MIGRATIONS: "false"
+    command: php artisan schedule:work
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+    networks:
+      - erp-network
+
   # mariadb:
   #   image: mariadb:10.11
   #   environment:
