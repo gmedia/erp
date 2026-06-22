@@ -10,6 +10,8 @@ use App\Models\FiscalYear;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
+use Sentry\ClientInterface;
+use Sentry\SentrySdk;
 
 use function Pest\Laravel\seed;
 
@@ -120,4 +122,39 @@ test('does not log a warning when no multi-branch journals exist', function () {
     $this->artisan('journals:detect-cross-branch')->assertSuccessful();
 
     Log::shouldNotHaveReceived('warning');
+});
+
+test('captures a Sentry message when multi-branch journals are detected', function () {
+    $hub = SentrySdk::getCurrentHub();
+    $originalClient = $hub->getClient();
+
+    $captured = [];
+    $mockClient = mock(ClientInterface::class)->makePartial();
+    $mockClient->shouldReceive('captureMessage')
+        ->andReturnUsing(function (string $message) use (&$captured) {
+            $captured[] = $message;
+
+            return null;
+        });
+
+    $hub->bindClient($mockClient);
+
+    try {
+        $this->action->execute([
+            'entry_date' => '2026-02-01',
+            'description' => 'Inter-branch cash transfer A -> B',
+            'status' => 'posted',
+            'lines' => [
+                ['account_id' => $this->accountMap['11110'], 'branch_id' => $this->branchA->id, 'debit' => 0, 'credit' => 500],
+                ['account_id' => $this->accountMap['11110'], 'branch_id' => $this->branchB->id, 'debit' => 500, 'credit' => 0],
+            ],
+        ]);
+
+        $this->artisan('journals:detect-cross-branch')->assertSuccessful();
+    } finally {
+        $hub->bindClient($originalClient);
+    }
+
+    expect($captured)->toHaveCount(1)
+        ->and($captured[0])->toContain('Cross-branch journals detected by scheduled monitor');
 });

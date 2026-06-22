@@ -7,6 +7,11 @@ use Illuminate\Console\Command;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Sentry\Severity;
+use Sentry\State\Scope;
+
+use function Sentry\captureMessage;
+use function Sentry\withScope;
 
 class DetectCrossBranchJournals extends Command
 {
@@ -92,6 +97,21 @@ class DetectCrossBranchJournals extends Command
                 'clearing_lines' => $clearingLineCount,
                 'null_branch_lines' => $nullBranchLineCount,
             ]);
+
+            withScope(function (Scope $scope) use ($postedOnly, $multiBranchCount, $clearingEntryCount, $clearingLineCount, $nullBranchLineCount): void {
+                $scope->setContext('cross_branch_monitor', [
+                    'scope' => $postedOnly ? 'posted' : 'all',
+                    'multi_branch_entries' => $multiBranchCount,
+                    'clearing_entries' => $clearingEntryCount,
+                    'clearing_lines' => $clearingLineCount,
+                    'null_branch_lines' => $nullBranchLineCount,
+                ]);
+
+                captureMessage(
+                    sprintf('Cross-branch journals detected by scheduled monitor: %d multi-branch entries.', $multiBranchCount),
+                    Severity::warning(),
+                );
+            });
         }
 
         return self::SUCCESS;
