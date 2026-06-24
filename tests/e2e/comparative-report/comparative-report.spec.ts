@@ -36,11 +36,12 @@ test.describe('Comparative Report', () => {
         const yearOption = options.nth(optionCount - 1);
 
         const refreshPromise = page.waitForResponse(
-            (r) =>
-                (r.url().includes('/api/reports/comparative') &&
+            (r) => {
+                return r.url().includes('/api/reports/comparative') &&
                     !r.url().includes('/export') &&
                     r.request().method() === 'GET' &&
-                    r.status() < 400,
+                    r.status() < 400;
+            },
             { timeout: 30000 },
         );
 
@@ -68,11 +69,12 @@ test.describe('Comparative Report', () => {
 
         await Promise.all([
             page.waitForResponse(
-                (r) =>
-                    (r.url().includes('/api/reports/comparative') &&
+                (r) => {
+                    return r.url().includes('/api/reports/comparative') &&
                     !r.url().includes('/export') &&
                     r.request().method() === 'GET' &&
-                    r.status() < 400,
+                    r.status() < 400;
+                },
                 { timeout: 30000 },
             ),
             options.first().click({ force: true }),
@@ -106,11 +108,12 @@ test.describe('Comparative Report', () => {
 
         await Promise.all([
             page.waitForResponse(
-                (r) =>
-                    (r.url().includes('/api/reports/comparative') &&
+                (r) => {
+                    return r.url().includes('/api/reports/comparative') &&
                     !r.url().includes('/export') &&
                     r.request().method() === 'GET' &&
-                    r.status() < 400,
+                    r.status() < 400;
+                },
                 { timeout: 30000 },
             ),
             options.first().click({ force: true }),
