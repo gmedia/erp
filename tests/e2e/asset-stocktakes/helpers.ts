@@ -43,7 +43,16 @@ export async function createAssetStocktake(page: Page) {
     // It's already draft by default in form.
 
     // Save
+    const createResponsePromise = page.waitForResponse(
+        (response) =>
+            response.url().includes('/api/asset-stocktakes') &&
+            response.request().method() === 'POST' &&
+            response.status() < 400,
+        { timeout: 15000 },
+    );
+
     await formDialog.locator('button[type="submit"]').click();
+    await createResponsePromise;
 
     // Wait for dialog to close
     await expect(formDialog).not.toBeVisible();

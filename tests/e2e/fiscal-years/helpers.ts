@@ -9,10 +9,18 @@ export async function pickDate(
   label: string,
   day: string
 ): Promise<void> {
-  const trigger = page.getByRole('button', { name: label, exact: true });
+  // The DatePickerField renders a <button> whose accessible name is the formatted
+  // date (or "Pick a date" placeholder), NOT the form label. We must locate the
+  // trigger relative to the label text.
+  const formDialog = page.getByRole('dialog').last();
+  const trigger = formDialog
+    .locator(`label:has-text("${label}")`)
+    .locator('..')
+    .getByRole('button')
+    .first();
   await trigger.waitFor({ state: 'visible' });
   await trigger.click();
-  
+
   const calendar = page.locator('[data-slot="calendar"]').last();
   await calendar.waitFor({ state: 'visible', timeout: 15000 });
   await page.waitForTimeout(500);
@@ -20,7 +28,7 @@ export async function pickDate(
   const dayButton = calendar.locator('button').filter({ hasText: new RegExp(`^${day}$`) }).first();
   await dayButton.waitFor({ state: 'visible' });
   await dayButton.click({ force: true });
-  
+
   await page.keyboard.press('Escape');
   await expect(calendar).not.toBeVisible();
 }
@@ -61,8 +69,17 @@ export async function createFiscalYear(
     await page.getByRole('option', { name: overrides.status, exact: true }).click();
   }
 
+  const createResponsePromise = page.waitForResponse(
+    (response) =>
+      response.url().includes('/api/fiscal-years') &&
+      response.request().method() === 'POST' &&
+      response.status() < 400,
+    { timeout: 15000 },
+  );
+
   const submitButton = dialog.getByRole('button', { name: /Add/i }).last();
   await submitButton.click();
+  await createResponsePromise;
 
   await expect(dialog).not.toBeVisible();
 
@@ -120,8 +137,17 @@ export async function editFiscalYear(
     await page.getByRole('option', { name: updates.status, exact: true }).click();
   }
 
+  const updateResponsePromise = page.waitForResponse(
+    (response) =>
+      response.url().includes('/api/fiscal-years') &&
+      ['PUT', 'PATCH'].includes(response.request().method()) &&
+      response.status() < 400,
+    { timeout: 15000 },
+  );
+
   const updateBtn = dialog.getByRole('button', { name: /Update/i });
   await updateBtn.click();
+  await updateResponsePromise;
 
   await expect(dialog).not.toBeVisible();
 }
