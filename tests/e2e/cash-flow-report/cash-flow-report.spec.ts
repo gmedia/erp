@@ -10,11 +10,12 @@ test.describe('Cash Flow Report', () => {
 
     test('can view cash flow report', async ({ page }) => {
         const responsePromise = page.waitForResponse(
-            (r) =>
-                (r.url().includes('/api/reports/cash-flow') &&
+            (r) => {
+                return r.url().includes('/api/reports/cash-flow') &&
                 !r.url().includes('/export') &&
                 r.request().method() === 'GET' &&
-                r.status() < 400,
+                r.status() < 400;
+            },
             { timeout: 30000 },
         );
 
@@ -29,11 +30,12 @@ test.describe('Cash Flow Report', () => {
 
     test('can change fiscal year selector', async ({ page }) => {
         const initialResponse = page.waitForResponse(
-            (r) =>
-                (r.url().includes('/api/reports/cash-flow') &&
+            (r) => {
+                return r.url().includes('/api/reports/cash-flow') &&
                 !r.url().includes('/export') &&
                 r.request().method() === 'GET' &&
-                r.status() < 400,
+                r.status() < 400;
+            },
             { timeout: 30000 },
         );
 
@@ -52,11 +54,12 @@ test.describe('Cash Flow Report', () => {
         const targetOption = options.nth(optionCount - 1);
 
         const refetchPromise = page.waitForResponse(
-            (r) =>
-                (r.url().includes('/api/reports/cash-flow') &&
+            (r) => {
+                return r.url().includes('/api/reports/cash-flow') &&
                 !r.url().includes('/export') &&
                 r.request().method() === 'GET' &&
-                r.status() < 400,
+                r.status() < 400;
+            },
             { timeout: 15000 },
         );
 
@@ -66,11 +69,12 @@ test.describe('Cash Flow Report', () => {
 
     test('can change branch selector', async ({ page }) => {
         const initialResponse = page.waitForResponse(
-            (r) =>
-                (r.url().includes('/api/reports/cash-flow') &&
+            (r) => {
+                return r.url().includes('/api/reports/cash-flow') &&
                 !r.url().includes('/export') &&
                 r.request().method() === 'GET' &&
-                r.status() < 400,
+                r.status() < 400;
+            },
             { timeout: 30000 },
         );
 
@@ -94,11 +98,12 @@ test.describe('Cash Flow Report', () => {
         await expect(options.first()).toBeVisible({ timeout: 5000 });
 
         const refetchPromise = page.waitForResponse(
-            (r) =>
-                (r.url().includes('/api/reports/cash-flow') &&
+            (r) => {
+                return r.url().includes('/api/reports/cash-flow') &&
                 !r.url().includes('/export') &&
                 r.request().method() === 'GET' &&
-                r.status() < 400,
+                r.status() < 400;
+            },
             { timeout: 15000 },
         );
 
@@ -108,11 +113,12 @@ test.describe('Cash Flow Report', () => {
 
     test('can export cash flow report', async ({ page }) => {
         const initialResponse = page.waitForResponse(
-            (r) =>
-                (r.url().includes('/api/reports/cash-flow') &&
+            (r) => {
+                return r.url().includes('/api/reports/cash-flow') &&
                 !r.url().includes('/export') &&
                 r.request().method() === 'GET' &&
-                r.status() < 400,
+                r.status() < 400;
+            },
             { timeout: 30000 },
         );
 
