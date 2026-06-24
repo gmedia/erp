@@ -39,7 +39,7 @@ test('index sorts guides by title ascending', function () {
 
     $titles = collect($response->json('data'))->pluck('title')->all();
     $sorted = $titles;
-    sort($sorted, SORT_NATURAL | SORT_FLAG_CASE);
+    asort($sorted, SORT_NATURAL | SORT_FLAG_CASE);
 
     expect($titles)->toBe($sorted);
 });

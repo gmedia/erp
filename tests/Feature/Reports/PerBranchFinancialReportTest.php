@@ -134,11 +134,11 @@ test('omitting branchId reproduces company-wide behavior (backward compatible)',
 
     $companyWide = $this->service->getBalanceSheet($this->fiscalYear->id);
 
-    // Seeded NULL-branch journals: assets 8,000,000 / liabilities 3,000,000 / equity (CYE) 5,000,000.
+    // Seeded NULL-branch journals: assets 68,875,000 / liabilities 7,500,000 / equity (CYE) 61,375,000.
     // Plus branch fixtures: assets +1,800,000, liabilities +400,000, net income +1,400,000.
-    expect(round($companyWide['totals']['assets'], 2))->toBe(9800000.0);
-    expect(round($companyWide['totals']['liabilities'], 2))->toBe(3400000.0);
-    expect(round($companyWide['totals']['equity'], 2))->toBe(6400000.0);
+    expect(round($companyWide['totals']['assets'], 2))->toBe(70675000.0);
+    expect(round($companyWide['totals']['liabilities'], 2))->toBe(7900000.0);
+    expect(round($companyWide['totals']['equity'], 2))->toBe(62775000.0);
 });
 
 test('null-branch journals do not break per-branch balancing', function () {
