@@ -13,7 +13,7 @@ description: Aturan agent untuk project ERP
 | Backend API | Laravel (JSON API only) |
 | Frontend SPA | React + TypeScript (standalone SPA, bukan Inertia) |
 | Routing Frontend | `react-router-dom` → `resources/js/app-routes.tsx` |
-| Routing Backend | `routes/api/*.php` (40+ modular files) |
+| Routing Backend | `routes/api/*.php` (63 modular files) |
 | Data Fetching | React Query (`useCrudQuery`, `useCrudMutations`, custom hooks) |
 | Meta Tags | `Helmet` via import `react-helmet-async` (alias lokal ke `resources/js/lib/react-helmet-async.tsx`) |
 | Autentikasi | Sanctum Bearer Token (stateless, bukan session/cookies) |

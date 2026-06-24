@@ -1,7 +1,7 @@
 # Budget Management Module — Pre-Implementation Design
 
 **Generated:** 2026-06-05
-**Status:** Research complete, awaiting implementation decision
+**Status:** Implemented (2026-06-22). E2E tests pending.
 **Branch:** main
 
 ## Executive Summary

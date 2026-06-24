@@ -1,4 +1,4 @@
-<!-- implementation-status: designed-only -->
+<!-- implementation-status: implemented -->
 # Desain Database: Accounts Receivable (Piutang Usaha)
 
 Dokumen ini menjelaskan struktur database untuk modul Accounts Receivable (AR) dalam sistem ERP. Fokus utama: pencatatan tagihan ke pelanggan (customer invoices), penerimaan pembayaran, dan integrasi dengan jurnal akuntansi.

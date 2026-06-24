@@ -1,4 +1,5 @@
 <!-- implementation-status: implemented -->
+<!-- scope-note: Backend models & migrations exist for all components. However, these frontend pages are NOT yet built: Sales Order CRUD, Manufacturing (BOM & Production Order) CRUD, Subscription CRUD. Backend API routes also not registered. Only Product CRUD (catalog) is fully wired front-to-back. -->
 # Desain Database: Produk, Layanan, dan Produksi
 
 Dokumen ini menjelaskan struktur database untuk modul Produk, Layanan, Produksi (Manufacturing), dan Langganan (Subscription) dalam sistem ERP. Fokus utama: katalog produk, manajemen stok & harga, produksi (BOM & Production Order), dan penagihan berulang (subscription).

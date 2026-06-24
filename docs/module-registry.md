@@ -1,3 +1,5 @@
+<!-- scope-note: E2E registry covers 87 slugs (5 simple + 82 complex). Non-CRUD modules (58 per header) do NOT have a separate E2E section — many are lumped under "Complex CRUD" with view_type: page. Pest registry has 90 entries (5+41+44) vs header claim of 102 (5+39+58). The header counts are aspirational; the table rows are what's actually documented. -->
+<!-- scope-note: "Registry E2E — Complex CRUD" section (82 slugs) includes non-CRUD modules (reports, dashboards, settings, workflows) using view_type: page/modal/embedded/component. These are NOT true CRUD but are documented here because they share DataTable-based UI patterns. -->
 # Module Registry
 
 > Referensi metadata per-modul untuk testing (Pest + E2E).
@@ -11,7 +13,7 @@
 
 ### CRUD Simple
 
-Modul dengan satu tabel utama, tanpa relasi FK kompleks. **5 modul**: departments, positions, branches, customer-categories, supplier-categories.
+Modul dengan satu tabel utama, tanpa relasi FK kompleks. **5 modul**: departments, positions, branches, customer-categories, supplier-categories. Tidak termasuk product-categories, units, asset-categories, asset-locations, asset-models — semuanya complex CRUD (lihat catatan di bawah).
 
 - Frontend: `createSimpleEntityConfig()` + `createEntityCrudPage()` (6-line page file)
 - Kolom: `createSimpleEntityColumns()` → Select, Name, Created At, Updated At, Actions
@@ -23,7 +25,7 @@ Modul dengan satu tabel utama, tanpa relasi FK kompleks. **5 modul**: department
 
 ### CRUD Complex
 
-Modul dengan relasi FK, filter multi-field, custom columns. **28 modul** termasuk master data, transaction/nested form, dan borderline-simple.
+Modul dengan relasi FK, filter multi-field, custom columns. **39 modul** termasuk master data, transaction/nested form, dan borderline-simple.
 
 - Frontend: `createComplexEntityConfig()` + `createEntityCrudPage()` + sibling files (`Columns.tsx`, `Filters.tsx`, `Form.tsx`, `ViewModal.tsx`)
 - Form: custom `{Module}Form.tsx` menggunakan `EntityForm`, `AsyncSelectField`, `zodResolver`
@@ -34,14 +36,16 @@ Modul dengan relasi FK, filter multi-field, custom columns. **28 modul** termasu
 
 ### Non-CRUD
 
-Modul tanpa operasi CRUD standar. **29 modul** termasuk reports, dashboards, settings, workflows, dan embedded components.
+Modul tanpa operasi CRUD standar. **58 modul** termasuk reports, dashboards, settings, workflows, embedded components, dan cross-cutting regression specs.
 
-- Reports: `ReportDataTablePage` (11 modules) atau `FinancialReportPageShell` (5 modules)
+- Reports: `ReportDataTablePage` (19 modules) atau `FinancialReportPageShell` (5 modules)
 - Audit trails: `AuditTrailPage` (2 modules)
-- Dashboards: `AppLayout` + custom charts/cards (3 modules)
+- Dashboards: `AppLayout` + custom charts/cards (6 modules)
 - Settings: `AdminSettingsLayout` (1 module)
-- Workflows: `AppLayout` + custom domain logic (3 modules)
+- Workflows: `AppLayout` + custom domain logic (4 modules)
 - Embedded: components tanpa page shell (3 modules)
+- Cross-cutting regression specs (2 modules)
+- Complex CRUD dengan E2E entry di section ini (16 modules)
 - Backend: Action pattern via method DI, `AbstractReportIndexExport` atau `AbstractActionCollectionExport`
 
 ---
@@ -415,7 +419,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   sortable_columns: [Code, Name, Approvable Type, Status, Created At]
   view_type: dialog
   checkbox_header: false
-  note: "Memiliki dynamic nested array untuk Approval Flow Steps (mengatur role/user, SLA auto-approve, dll) via formik/react-hook-form."
+  note: "Memiliki dynamic nested array untuk Approval Flow Steps (mengatur role/user, SLA auto-approve, dll) via react-hook-form."
 
 - slug: approval-delegations
   route: /approval-delegations
@@ -432,8 +436,10 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   export_api: /api/accounts/export
   search_placeholder: "Search accounts..."
   sortable_columns: [Code, Name, Type, Parent Account, Level, Status]
-  view_type: dialog
+  view_type: page
+  view_url_pattern: "/accounts/\\w+"
   checkbox_header: false
+  note: "Custom tree-based page (AccountTree + AccountForm), not standard CRUD dialog."
   tests:
     - tests/e2e/accounts/add-account.spec.ts
     - tests/e2e/accounts/delete-account.spec.ts
@@ -793,6 +799,70 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   tests:
     - tests/e2e/fiscal-year-auto-select/fiscal-year-auto-select.spec.ts
 
+- slug: ap-aging-report
+  route: /reports/ap-aging
+  api: /api/reports/ap-aging
+  view_type: page
+  note: "Non-CRUD laporan aging hutang (AP Aging). Menampilkan summary per supplier dengan bucket umur hutang (Current, 1-30, 31-60, 61-90, >90 hari)."
+  tests:
+    - tests/e2e/ap-aging-report/ap-aging-report.spec.ts
+
+- slug: ap-outstanding-report
+  route: /reports/ap-outstanding
+  api: /api/reports/ap-outstanding
+  view_type: page
+  note: "Non-CRUD laporan outstanding hutang (AP Outstanding). Menampilkan daftar bill yang belum lunas per supplier dengan jumlah outstanding."
+  tests:
+    - tests/e2e/ap-outstanding-report/ap-outstanding-report.spec.ts
+
+- slug: ap-payment-history-report
+  route: /reports/ap-payment-history
+  api: /api/reports/ap-payment-history
+  view_type: page
+  note: "Non-CRUD laporan riwayat pembayaran hutang (AP Payment History). Menampilkan daftar pembayaran yang telah dilakukan per supplier."
+  tests:
+    - tests/e2e/ap-payment-history-report/ap-payment-history-report.spec.ts
+
+- slug: ar-aging-report
+  route: /reports/ar-aging
+  api: /api/reports/ar-aging
+  view_type: page
+  note: "Non-CRUD laporan aging piutang (AR Aging). Menampilkan summary per customer dengan bucket umur piutang (Current, 1-30, 31-60, 61-90, >90 hari)."
+  tests:
+    - tests/e2e/ar-aging-report/ar-aging-report.spec.ts
+
+- slug: ar-outstanding-report
+  route: /reports/ar-outstanding
+  api: /api/reports/ar-outstanding
+  view_type: page
+  note: "Non-CRUD laporan outstanding piutang (AR Outstanding). Menampilkan daftar invoice yang belum lunas per customer dengan jumlah outstanding."
+  tests:
+    - tests/e2e/ar-outstanding-report/ar-outstanding-report.spec.ts
+
+- slug: customer-statement-report
+  route: /reports/customer-statement
+  api: /api/reports/customer-statement
+  view_type: page
+  note: "Non-CRUD laporan statement pelanggan (Customer Statement). Menampilkan ringkasan transaksi per customer dalam periode tertentu."
+  tests:
+    - tests/e2e/customer-statement-report/customer-statement-report.spec.ts
+
+- slug: per-branch-financial-reports
+  route: (cross-cutting — covers /reports/balance-sheet, /reports/trial-balance, /reports/cash-flow, /reports/income-statement, /reports/comparative)
+  api: /api/reports/ (balance-sheet, trial-balance, cash-flow, income-statement, comparative)
+  view_type: cross-cutting
+  note: "Non-CRUD regression spec untuk 5 financial report pages dengan filter branch. Memverifikasi setiap report dapat dimuat dengan branch filter yang berfungsi."
+  tests:
+    - tests/e2e/per-branch-financial-reports/per-branch-financial-reports.spec.ts
+
+- slug: posting-journals
+  route: /posting-journals
+  api: POST /api/posting-journals
+  view_type: page
+  note: "Non-CRUD fitur bulk posting journal entries. Halaman untuk memposting banyak journal entry sekaligus dengan filter periode."
+  tests:
+    - tests/e2e/posting-journals/post-journal.spec.ts
+
 ## Testing
 
 E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
@@ -821,9 +891,9 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 2 | Customers | `customers` | `CustomerControllerTest`, `CustomerExportTest` | `CustomerTest` | — |
 | 3 | Suppliers | `suppliers` | `SupplierControllerTest`, `SupplierExportTest` | `SupplierTest` | — |
 | 4 | Products | `products` | `ProductControllerTest`, `ProductExportTest` | `ProductTest` | — |
-| 5 | Accounts | `accounts` | `AccountControllerTest`, `AccountExportTest` | `AccountTest` | — |
+| 5 | Accounts | `accounts` | `AccountControllerTest`, `AccountExportTest` | `AccountTest` | Custom tree-based page (AccountTree + AccountForm), not standard CRUD |
 | 6 | Account Mappings | `account-mappings` | `AccountMappingControllerTest`, `AccountMappingExportTest` | `AccountMappingTest` | — |
-| 7 | Assets | `assets` | `AssetControllerTest`, `AssetExportTest`, `AssetFilteredExportTest`, `AssetProfileTest` | `AssetTest` | Paling kompleks |
+| 7 | Assets | `assets` | `AssetControllerTest`, `AssetProfileTest` | `AssetTest` | Paling kompleks |
 | 8 | Asset Movements | `asset-movements` | `AssetMovementControllerTest`, `AssetMovementExportTest` | `AssetMovementTest` | — |
 | 9 | Asset Maintenances | `asset-maintenances` | `AssetMaintenanceControllerTest`, `AssetMaintenanceExportTest` | `AssetMaintenanceTest` | — |
 | 10 | COA Versions | `coa-versions` | `CoaVersionControllerTest`, `CoaVersionExportTest` | `CoaVersionTest` | — |
@@ -831,8 +901,8 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 12 | Journal Entries | `journal-entries` | `JournalEntryControllerTest`, `JournalEntryExportTest` | `JournalEntryTest` | — |
 | 13 | Asset Stocktakes | `asset-stocktakes` | `AssetStocktakeControllerTest`, `AssetStocktakeExportTest` | `AssetStocktakeTest` | — |
 | 14 | Pipelines | `pipelines` | `PipelineControllerTest` | `PipelineTest` | — |
-| 15 | Approval Flows | `approval-flows` | `ApprovalFlowControllerTest` | `ApprovalFlowTest`, `ApprovalFlowStepTest` | Memiliki `ApprovalFlowFilterServiceTest` & `UpdateApprovalFlowDataTest` |
-| 16 | Approval Delegations | `approval-delegations` | `ApprovalDelegationControllerTest`, `ApprovalDelegationExportTest` | `ApprovalDelegationTest` | Memiliki `ApprovalDelegationFilterServiceTest` & `UpdateApprovalDelegationDataTest` |
+| 15 | Approval Flows | `approval-flows` | `ApprovalFlowControllerTest` | `ApprovalFlowTest`, `ApprovalFlowStepTest` | Memiliki `ApprovalFlowFilterServiceTest` |
+| 16 | Approval Delegations | `approval-delegations` | `ApprovalDelegationControllerTest`, `ApprovalDelegationExportTest` | `ApprovalDelegationTest` | Memiliki `ApprovalDelegationFilterServiceTest` |
 | 17 | Stock Transfers | `stock-transfers` | `StockTransferControllerTest`, `StockTransferExportTest` | `StockTransferTest` | — |
 | 18 | Inventory Stocktakes | `inventory-stocktakes` | `InventoryStocktakeControllerTest`, `InventoryStocktakeExportTest` | `InventoryStocktakeTest` | — |
 | 19 | Stock Adjustments | `stock-adjustments` | `StockAdjustmentControllerTest`, `StockAdjustmentExportTest` | `StockAdjustmentTest` | — |
@@ -840,6 +910,22 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 21 | Purchase Orders | `purchase-orders` | `PurchaseOrderControllerTest`, `PurchaseOrderExportTest` | `PurchaseOrderTest` | Memiliki FilterService, DTO, Resource, Request, Action tests |
 | 22 | Goods Receipts | `goods-receipts` | `GoodsReceiptControllerTest`, `GoodsReceiptExportTest` | `GoodsReceiptTest` | Memiliki FilterService, DTO, Resource, Request, Action tests |
 | 23 | Supplier Returns | `supplier-returns` | `SupplierReturnControllerTest`, `SupplierReturnExportTest` | `SupplierReturnTest` | Memiliki FilterService, DTO, Resource, Request, Action tests |
+| 24 | Product Categories | `product-categories` | `ProductCategoryControllerTest`, `ProductCategoryExportTest` | `ProductCategoryTest` | Menggunakan `createComplexEntityConfig` |
+| 25 | Units | `units` | `UnitControllerTest`, `UnitExportTest` | `UnitTest` | Menggunakan `createComplexEntityConfig` |
+| 26 | Asset Categories | `asset-categories` | `AssetCategoryControllerTest`, `AssetCategoryExportTest` | `AssetCategoryTest` | Menggunakan `createComplexEntityConfig` |
+| 27 | Asset Locations | `asset-locations` | `AssetLocationControllerTest`, `AssetLocationExportTest` | `AssetLocationTest` | Menggunakan `createComplexEntityConfig` |
+| 28 | Asset Models | `asset-models` | `AssetModelControllerTest`, `AssetModelExportTest` | `AssetModelTest` | Menggunakan `createComplexEntityConfig` |
+| 29 | Report Configurations | `report-configurations` | `ReportConfigurationControllerTest`, `ReportConfigurationExportTest` | `ReportConfigurationTest` | — |
+| 30 | Budgets | `budgets` | `BudgetControllerTest`, `BudgetExportTest` | `BudgetTest` | Memiliki `BudgetVarianceReportControllerTest` |
+| 31 | Supplier Bills | `supplier-bills` | `SupplierBillControllerTest`, `SupplierBillExportTest` | `SupplierBillTest` | Memiliki FilterService, DTO, Resource, Request, Action tests |
+| 32 | AP Payments | `ap-payments` | `ApPaymentControllerTest`, `ApPaymentExportTest` | `ApPaymentTest` | Memiliki FilterService, DTO, Resource, Request, Action tests |
+| 33 | Customer Invoices | `customer-invoices` | `CustomerInvoiceControllerTest`, `CustomerInvoiceExportTest` | `CustomerInvoiceTest` | Memiliki FilterService, DTO, Resource, Request, Action tests |
+| 34 | AR Receipts | `ar-receipts` | `ArReceiptControllerTest`, `ArReceiptExportTest` | `ArReceiptTest` | Memiliki FilterService, DTO, Resource, Request, Action tests |
+| 35 | Credit Notes | `credit-notes` | `CreditNoteControllerTest`, `CreditNoteExportTest` | `CreditNoteTest` | Memiliki FilterService, DTO, Resource, Request, Action tests |
+| 36 | Period Closings | `period-closings` | `PeriodClosingControllerTest` | `PeriodClosingTest` | — |
+| 37 | Bank Reconciliations | `bank-reconciliations` | `BankReconciliationControllerTest`, `BankReconciliationExportTest` | `BankReconciliationTest` | — |
+| 38 | Recurring Journals | `recurring-journals` | `RecurringJournalControllerTest`, `RecurringJournalExportTest` | `RecurringJournalTest` | — |
+| 39 | Warehouses | `warehouses` | `WarehouseControllerTest`, `WarehouseExportTest` | `WarehouseTest` | Memiliki FilterService, Resource, Collection tests |
 
 ---
 
@@ -847,15 +933,15 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 
 | # | Modul | Group | Files | Catatan |
 |---|-------|-------|-------|---------|
-| 1 | Auth | `auth` | `Feature/Auth/*.php` (7 files) | Sudah di subfolder |
-| 2 | Settings | `settings` | `Feature/Settings/*.php` (3 files) | Sudah di subfolder |
+| 1 | Auth | `auth` | `Feature/Auth/*.php` (3 files) | Sudah di subfolder |
+| 2 | Settings | `settings` | — | Direktori belum ada, test Settings tidak ditemukan |
 | 3 | Dashboard | `dashboard` | `Feature/Dashboard/DashboardTest.php` | — |
 | 4 | Permissions | `permissions` | `Feature/Permissions/PermissionControllerTest.php` | — |
 | 5 | Users | `users` | `Feature/Users/UserControllerTest.php` | — |
-| 6 | Reports | `reports` | `Feature/Reports/*.php` (8 files) | Ada legacy + new tests |
+| 6 | Reports | `reports` | `Feature/Reports/*.php` (25 files) | Ada legacy + new tests |
 | 7 | Posting Journals | `posting-journals` | `Feature/PostingJournals/PostingJournalTest.php` | — |
 | 8 | Asset Depreciation Runs | `asset-depreciation-runs` | `Feature/AssetDepreciationRuns/*.php` | — |
-| 9 | Asset Reports | `asset-reports` | `Feature/AssetRegisterTest.php` | Laporan Asset Register |
+| 9 | Asset Reports | `asset-reports` | `Feature/Assets/AssetRegisterTest.php` | Laporan Asset Register |
 | 10 | Book Value Reports | `book-value-depreciation-reports` | `Feature/Reports/BookValueDepreciationReportTest.php` | Laporan Book Value & Depreciation |
 | 11 | Stocktake Variance Reports | `asset-stocktakes` | `Feature/AssetStocktakes/AssetStocktakeVarianceControllerTest.php` | Laporan Stocktake Variance |
 | 12 | Entity State Actions | `entity-state-actions` | `Feature/EntityStates/EntityStateControllerTest.php` | Pipeline actions engine per entitas |
