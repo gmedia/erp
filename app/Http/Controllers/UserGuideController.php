@@ -23,7 +23,7 @@ class UserGuideController extends Controller
                     'filename' => $filename,
                 ];
             })
-            ->sortBy('title')
+            ->sortBy('title', SORT_NATURAL | SORT_FLAG_CASE)
             ->values()
             ->all();
 
