@@ -66,7 +66,7 @@ class GetTrialBalanceReportAction
 
     private function resolveFiscalYearId(array $filters): ?int
     {
-        if (isset($filters['fiscal_year_id']) && $filters['fiscal_year_id'] !== null && $filters['fiscal_year_id'] !== '') {
+        if (isset($filters['fiscal_year_id']) && $filters['fiscal_year_id'] !== '') {
             return (int) $filters['fiscal_year_id'];
         }
 
