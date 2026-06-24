@@ -100,6 +100,42 @@ test.describe('Balance Sheet Report', () => {
         );
     });
 
+    test('can change branch selector', async ({ page }) => {
+        test.setTimeout(60000);
+
+        await page.goto('/reports/balance-sheet');
+
+        await page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/reports/balance-sheet') &&
+                !r.url().includes('/export') &&
+                r.status() < 400,
+            { timeout: 30000 },
+        );
+
+        const branchSelector = page.getByRole('combobox').nth(2);
+        await expect(branchSelector).toBeVisible();
+        await branchSelector.click();
+
+        await page.waitForResponse(
+            (r) => r.url().includes('/api/branches') && r.status() < 400,
+            { timeout: 10000 },
+        );
+
+        const options = page.locator('ul.p-1 li button:visible');
+        await expect(options.first()).toBeVisible({ timeout: 5000 });
+        await options.first().click({ force: true });
+
+        await page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/reports/balance-sheet') &&
+                !r.url().includes('/export') &&
+                r.request().method() === 'GET' &&
+                r.status() < 400,
+            { timeout: 15000 },
+        );
+    });
+
     test('can export balance sheet report', async ({ page }) => {
         test.setTimeout(60000);
 

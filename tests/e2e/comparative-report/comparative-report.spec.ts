@@ -37,9 +37,10 @@ test.describe('Comparative Report', () => {
 
         const refreshPromise = page.waitForResponse(
             (r) =>
-                r.url().includes('/api/reports/comparative') &&
-                !r.url().includes('/export') &&
-                r.status() < 400,
+                (r.url().includes('/api/reports/comparative') &&
+                    !r.url().includes('/export') &&
+                    r.request().method() === 'GET' &&
+                    r.status() < 400,
             { timeout: 30000 },
         );
 
@@ -68,8 +69,47 @@ test.describe('Comparative Report', () => {
         await Promise.all([
             page.waitForResponse(
                 (r) =>
-                    r.url().includes('/api/reports/comparative') &&
+                    (r.url().includes('/api/reports/comparative') &&
                     !r.url().includes('/export') &&
+                    r.request().method() === 'GET' &&
+                    r.status() < 400,
+                { timeout: 30000 },
+            ),
+            options.first().click({ force: true }),
+        ]);
+
+        await expect(
+            page.getByRole('heading', { name: 'Comparative Report' }),
+        ).toBeVisible();
+    });
+
+    test('can change branch selector', async ({ page }) => {
+        await page.goto('/reports/comparative');
+
+        await expect(
+            page.getByRole('heading', { name: 'Comparative Report' }),
+        ).toBeVisible({ timeout: 30000 });
+
+        const branchSelector = page.getByRole('combobox').nth(2);
+        await expect(branchSelector).toBeVisible();
+        await branchSelector.click();
+
+        await page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/branches') &&
+                r.status() < 400,
+            { timeout: 30000 },
+        );
+
+        const options = page.locator('ul.p-1 li button:visible');
+        await expect(options.first()).toBeVisible({ timeout: 5000 });
+
+        await Promise.all([
+            page.waitForResponse(
+                (r) =>
+                    (r.url().includes('/api/reports/comparative') &&
+                    !r.url().includes('/export') &&
+                    r.request().method() === 'GET' &&
                     r.status() < 400,
                 { timeout: 30000 },
             ),

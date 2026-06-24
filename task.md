@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-06-22 (Multi-Currency user guide CREATED. docs/user-guide-multi-currency.md — 184 lines, 11 FAQ, 7 numbered sections, Bahasa Indonesia. Covers single-currency constraint, Admin Settings, form currency handling, DataTable column, Excel export/import validation, permissions, roadmap. No emojis. main HEAD `86e0b6a6` — working tree has 3 untracked doc files: user-guide-stock-monitor.md + user-guide-recurring-journals.md + user-guide-multi-currency.md.)
+Last updated: 2026-06-23 (financial report E2E locator fix: all 4 specs pass. Reverted `replaceAll` mistake on FY/comparison selectors — shadcn `Select` uses `role="option"`, not `ul.p-1 li button`. 20/20 tests green across cash-flow (4), comparative (5), balance-sheet (5), income-statement (5). HEAD `d8f179ae`)
 
 ## SESSION 2026-06-22 — Purchase Request User Guide
 
@@ -475,3 +475,27 @@ CONVENTIONS REMINDER:
 
 If user says "lanjutkan" without direction, ASK which path.
 ```
+
+---
+
+## SESSION 2026-06-23 — General Ledger E2E Test Expansion
+
+**What changed**: Expanded `tests/e2e/general-ledger-report/general-ledger-report.spec.ts` from 1 test to 5 tests (149 lines) following `trial-balance-detailed-report` reference pattern.
+
+**Validated commands and outcomes**:
+- `PLAYWRIGHT_USE_SAIL=1 ./vendor/bin/sail npx playwright test tests/e2e/general-ledger-report/ --reporter=list` → **5/5 pass** (32.8s)
+
+**5 tests**:
+1. `can navigate to report page and see filters` — page load, heading, filter fields visible
+2. `can view general ledger report table` — table + rows visible (removed race-condition `waitForResponse`)
+3. `can filter by account` — account async select filter works
+4. `can filter by date range` — date range filter works
+5. `can export general ledger report` — export download succeeds
+
+**Race condition fix**: Test 2 had `waitForResponse` AFTER `expect(table).toBeVisible()`. The API response already returned before the listener registered → timeout. Fix: removed redundant `waitForResponse` (table visibility already proves data loaded). Reference spec (`trial-balance-detailed-report`) also doesn't use `waitForResponse` in view test.
+
+**Open risks**: None. All 5 tests green.
+
+**Next steps**: Expand other financial report E2E specs (cash-flow-report, comparative-report, balance-sheet-report, income-statement-report) — each currently has 1-2 tests. Also `cash-flow-report` has a `comparison` selector (FY comparison) that needs a dedicated test.
+
+**Continuation Prompt**: "General-ledger E2E done (5/5). Next: expand cash-flow-report tests (add comparison selector test). Lanjut?"

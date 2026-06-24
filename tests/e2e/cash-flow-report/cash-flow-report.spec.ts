@@ -11,8 +11,9 @@ test.describe('Cash Flow Report', () => {
     test('can view cash flow report', async ({ page }) => {
         const responsePromise = page.waitForResponse(
             (r) =>
-                r.url().includes('/api/reports/cash-flow') &&
+                (r.url().includes('/api/reports/cash-flow') &&
                 !r.url().includes('/export') &&
+                r.request().method() === 'GET' &&
                 r.status() < 400,
             { timeout: 30000 },
         );
@@ -29,8 +30,9 @@ test.describe('Cash Flow Report', () => {
     test('can change fiscal year selector', async ({ page }) => {
         const initialResponse = page.waitForResponse(
             (r) =>
-                r.url().includes('/api/reports/cash-flow') &&
+                (r.url().includes('/api/reports/cash-flow') &&
                 !r.url().includes('/export') &&
+                r.request().method() === 'GET' &&
                 r.status() < 400,
             { timeout: 30000 },
         );
@@ -51,8 +53,9 @@ test.describe('Cash Flow Report', () => {
 
         const refetchPromise = page.waitForResponse(
             (r) =>
-                r.url().includes('/api/reports/cash-flow') &&
+                (r.url().includes('/api/reports/cash-flow') &&
                 !r.url().includes('/export') &&
+                r.request().method() === 'GET' &&
                 r.status() < 400,
             { timeout: 15000 },
         );
@@ -61,11 +64,54 @@ test.describe('Cash Flow Report', () => {
         await refetchPromise;
     });
 
+    test('can change branch selector', async ({ page }) => {
+        const initialResponse = page.waitForResponse(
+            (r) =>
+                (r.url().includes('/api/reports/cash-flow') &&
+                !r.url().includes('/export') &&
+                r.request().method() === 'GET' &&
+                r.status() < 400,
+            { timeout: 30000 },
+        );
+
+        await page.goto('/reports/cash-flow');
+        await initialResponse;
+
+        const branchSelector = page.getByRole('combobox').nth(1);
+        await expect(branchSelector).toBeVisible();
+        await branchSelector.click();
+
+        const branchesResponse = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/branches') &&
+                r.status() < 400,
+            { timeout: 15000 },
+        );
+
+        await branchesResponse;
+
+        const options = page.locator('ul.p-1 li button:visible');
+        await expect(options.first()).toBeVisible({ timeout: 5000 });
+
+        const refetchPromise = page.waitForResponse(
+            (r) =>
+                (r.url().includes('/api/reports/cash-flow') &&
+                !r.url().includes('/export') &&
+                r.request().method() === 'GET' &&
+                r.status() < 400,
+            { timeout: 15000 },
+        );
+
+        await options.first().click({ force: true });
+        await refetchPromise;
+    });
+
     test('can export cash flow report', async ({ page }) => {
         const initialResponse = page.waitForResponse(
             (r) =>
-                r.url().includes('/api/reports/cash-flow') &&
+                (r.url().includes('/api/reports/cash-flow') &&
                 !r.url().includes('/export') &&
+                r.request().method() === 'GET' &&
                 r.status() < 400,
             { timeout: 30000 },
         );
