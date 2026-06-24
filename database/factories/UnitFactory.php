@@ -20,8 +20,8 @@ class UnitFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->unique()->words(2, true),
-            'symbol' => fake()->unique()->lexify('???'),
+            'name' => uniqid('unit-') . '-' . random_int(0, 9999),
+            'symbol' => uniqid('sym-'),
         ];
     }
 }

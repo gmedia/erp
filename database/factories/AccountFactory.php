@@ -25,7 +25,7 @@ class AccountFactory extends Factory
     {
         return [
             'coa_version_id' => CoaVersion::factory(),
-            'code' => $this->faker->unique()->numerify('#####'),
+            'code' => 'AC-' . now()->getTimestampMs() . '-' . random_int(0, 9999),
             'name' => $this->faker->words(3, true),
             'type' => $this->faker->randomElement(['asset', 'liability', 'equity', 'revenue', 'expense']),
             'sub_type' => null,

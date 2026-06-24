@@ -15,7 +15,7 @@ class AssetLocationFactory extends Factory
         return [
             'branch_id' => Branch::factory(),
             'parent_id' => null,
-            'code' => $this->faker->unique()->bothify('LOC-###'),
+            'code' => 'LOC-' . now()->getTimestampMs() . '-' . random_int(0, 9999),
             'name' => $this->faker->words(2, true),
         ];
     }

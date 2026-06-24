@@ -20,7 +20,7 @@ class PipelineFactory extends Factory
     {
         return [
             'name' => 'Pipeline ' . $this->faker->words(2, true),
-            'code' => $this->faker->unique()->slug(),
+            'code' => 'PL-' . now()->getTimestampMs() . '-' . random_int(0, 9999),
             'entity_type' => $this->faker->randomElement([
                 'App\Models\Asset',
                 'App\Models\PurchaseOrder',

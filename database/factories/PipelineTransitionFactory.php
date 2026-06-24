@@ -18,7 +18,7 @@ class PipelineTransitionFactory extends Factory
             'from_state_id' => PipelineState::factory(),
             'to_state_id' => PipelineState::factory(),
             'name' => $this->faker->words(2, true),
-            'code' => $this->faker->unique()->slug(),
+            'code' => 'PT-' . now()->getTimestampMs() . '-' . random_int(0, 9999),
             'description' => $this->faker->sentence(),
             'required_permission' => null,
             'guard_conditions' => [],

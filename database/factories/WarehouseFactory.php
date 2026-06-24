@@ -25,7 +25,7 @@ class WarehouseFactory extends Factory
     {
         return [
             'branch_id' => Branch::factory(),
-            'code' => $this->faker->unique()->bothify('WH-###'),
+            'code' => 'WH-' . now()->getTimestampMs() . '-' . random_int(0, 9999),
             'name' => $this->faker->company() . ' Warehouse',
         ];
     }
