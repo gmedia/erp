@@ -24,7 +24,7 @@ class ProductFactory extends Factory
         $sellingPrice = $cost * (1 + (fake()->randomFloat(2, 20, 100) / 100));
 
         return [
-            'code' => 'PRD-' . now()->getTimestampMs() . '-' . random_int(0, 9999),
+            'code' => fn () => 'PRD-' . uniqid() . '-' . random_int(0, 9999),
             'name' => fake()->words(3, true),
             'description' => fake()->optional()->sentence(),
             'type' => fake()->randomElement(['raw_material', 'finished_good', 'purchased_good', 'service']),

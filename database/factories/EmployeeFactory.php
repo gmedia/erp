@@ -27,9 +27,9 @@ class EmployeeFactory extends Factory
     public function definition(): array
     {
         return [
-            'employee_id' => 'EMP-' . now()->getTimestampMs() . '-' . random_int(0, 9999),
+            'employee_id' => fn () => 'EMP-' . uniqid() . '-' . random_int(0, 9999),
             'name' => $this->faker->name(),
-            'email' => 'test-' . now()->getTimestampMs() . '-employee@example.com',
+            'email' => fn () => 'test-' . uniqid() . '-employee@example.com',
             'phone' => $this->faker->optional()->phoneNumber(),
             'department_id' => Department::factory(),
             'position_id' => Position::factory(),

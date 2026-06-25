@@ -15,7 +15,7 @@ class AssetStocktakeFactory extends Factory
     {
         return [
             'branch_id' => Branch::factory(),
-            'reference' => 'ST-' . now()->getTimestampMs() . '-' . random_int(0, 9999),
+            'reference' => fn () => 'ST-' . uniqid() . '-' . random_int(0, 9999),
             'planned_at' => $this->faker->dateTimeBetween('-6 months', '+1 month'),
             'performed_at' => $this->faker->boolean(40) ? $this->faker->dateTimeBetween('-6 months', 'now') : null,
             'status' => $this->faker->randomElement(['draft', 'in_progress', 'completed', 'cancelled']),

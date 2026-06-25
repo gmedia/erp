@@ -20,7 +20,7 @@ class ApprovalFlowFactory extends Factory
     {
         return [
             'name' => $this->faker->words(3, true) . ' Approval',
-            'code' => 'AF-' . now()->getTimestampMs() . '-' . random_int(0, 9999),
+            'code' => fn () => 'AF-' . uniqid() . '-' . random_int(0, 9999),
             'approvable_type' => 'App\\Models\\PurchaseRequest',
             'description' => $this->faker->sentence(),
             'is_active' => true,

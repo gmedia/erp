@@ -20,7 +20,7 @@ class PipelineStateFactory extends Factory
     {
         return [
             'pipeline_id' => Pipeline::factory(),
-            'code' => 'PS-' . now()->getTimestampMs() . '-' . random_int(0, 9999),
+            'code' => fn () => 'PS-' . uniqid() . '-' . random_int(0, 9999),
             'name' => $this->faker->word,
             'type' => $this->faker->randomElement(['initial', 'intermediate', 'final']),
             'color' => $this->faker->hexColor,

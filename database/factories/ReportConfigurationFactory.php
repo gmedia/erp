@@ -17,10 +17,9 @@ class ReportConfigurationFactory extends Factory
     public function definition(): array
     {
         $type = $this->faker->randomElement(ReportConfiguration::TYPES);
-        $slug = str_replace('_', '-', $type) . '-' . now()->getTimestampMs() . '-' . random_int(0, 9999);
 
         return [
-            'code' => $slug,
+            'code' => fn () => str_replace('_', '-', $type) . '-' . uniqid() . '-' . random_int(0, 9999),
             'name' => $this->faker->sentence(3),
             'description' => $this->faker->optional()->sentence(),
             'report_type' => $type,

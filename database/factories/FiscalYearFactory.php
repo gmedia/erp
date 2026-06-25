@@ -20,10 +20,9 @@ class FiscalYearFactory extends Factory
     public function definition(): array
     {
         $year = 2020 + random_int(0, 50);
-        $uid = now()->getTimestampMs() . '-' . random_int(0, 9999);
 
         return [
-            'name' => 'FY-' . $year . '-' . $uid,
+            'name' => fn () => 'FY-' . $year . '-' . uniqid() . '-' . random_int(0, 9999),
             'start_date' => $year . '-01-01',
             'end_date' => $year . '-12-31',
             'status' => 'open',

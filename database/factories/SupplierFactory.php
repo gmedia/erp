@@ -23,7 +23,7 @@ class SupplierFactory extends Factory
     {
         return [
             'name' => $this->faker->company(),
-            'email' => 'test-' . now()->getTimestampMs() . '-supplier@example.com',
+            'email' => fn () => 'test-' . uniqid() . '-supplier@example.com',
             'phone' => $this->faker->phoneNumber(),
             'address' => $this->faker->address(),
             'branch_id' => Branch::factory(),

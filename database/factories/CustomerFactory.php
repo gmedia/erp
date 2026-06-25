@@ -23,7 +23,7 @@ class CustomerFactory extends Factory
     {
         return [
             'name' => fake()->name(),
-            'email' => 'test-' . now()->getTimestampMs() . '-customer@example.com',
+            'email' => fn () => 'test-' . uniqid() . '-customer@example.com',
             'phone' => fake()->phoneNumber(),
             'address' => fake()->address(),
             'branch_id' => Branch::factory(),
