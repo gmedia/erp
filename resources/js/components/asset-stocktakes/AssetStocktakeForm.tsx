@@ -68,9 +68,7 @@ const getAssetStocktakeFormDefaults = (
             assetStocktake.branch?.id,
         ),
         reference: assetStocktake.reference || '',
-        planned_at: assetStocktake.planned_at
-            ? assetStocktake.planned_at
-            : '',
+        planned_at: assetStocktake.planned_at ? assetStocktake.planned_at : '',
         performed_at: assetStocktake.performed_at
             ? assetStocktake.performed_at
             : null,
