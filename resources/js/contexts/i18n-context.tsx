@@ -215,7 +215,7 @@ export function I18nProvider({
                 return Object.entries(params).reduce(
                     (str, [paramKey, paramValue]) => {
                         return str.replaceAll(
-                            String.raw`{${paramKey}}`,
+                            `{${paramKey}}`,
                             paramValue,
                         );
                     },

@@ -55,8 +55,24 @@ class GetAgingDashboardDataAction
      *     },
      *     ar_buckets: array<int, array{label: string, amount: float, percentage: float}>,
      *     ap_buckets: array<int, array{label: string, amount: float, percentage: float}>,
-     *     top_overdue_customers: array<int, array{customer_id: int, customer_name: string, outstanding_amount: float, overdue_amount: float, invoice_count: int, oldest_due_date: ?string, max_days_overdue: int}>,
-     *     top_overdue_suppliers: array<int, array{supplier_id: int, supplier_name: string, outstanding_amount: float, overdue_amount: float, bill_count: int, oldest_due_date: ?string, max_days_overdue: int}>
+     *     top_overdue_customers: array<int, array{
+     *         customer_id: int,
+     *         customer_name: string,
+     *         outstanding_amount: float,
+     *         overdue_amount: float,
+     *         invoice_count: int,
+     *         oldest_due_date: ?string,
+     *         max_days_overdue: int,
+     *     }>,
+     *     top_overdue_suppliers: array<int, array{
+     *         supplier_id: int,
+     *         supplier_name: string,
+     *         outstanding_amount: float,
+     *         overdue_amount: float,
+     *         bill_count: int,
+     *         oldest_due_date: ?string,
+     *         max_days_overdue: int,
+     *     }>
      * }
      */
     public function execute(string $asOfDate, ?int $branchId = null): array
@@ -71,8 +87,12 @@ class GetAgingDashboardDataAction
         $d61 = $asOf->copy()->subDays(61)->toDateString();
         $d90 = $asOf->copy()->subDays(90)->toDateString();
 
-        $this->guardHomogeneousCurrency('customer_invoices', self::AR_OUTSTANDING_STATUSES, $branchId, 'aging-dashboard:ar');
-        $this->guardHomogeneousCurrency('supplier_bills', self::AP_OUTSTANDING_STATUSES, $branchId, 'aging-dashboard:ap');
+        $this->guardHomogeneousCurrency(
+            'customer_invoices', self::AR_OUTSTANDING_STATUSES, $branchId, 'aging-dashboard:ar',
+        );
+        $this->guardHomogeneousCurrency(
+            'supplier_bills', self::AP_OUTSTANDING_STATUSES, $branchId, 'aging-dashboard:ap',
+        );
 
         $arRow = $this->aggregateBuckets(
             CustomerInvoice::query()->getQuery(),
@@ -235,7 +255,15 @@ class GetAgingDashboardDataAction
     }
 
     /**
-     * @return array<int, array{customer_id: int, customer_name: string, outstanding_amount: float, overdue_amount: float, invoice_count: int, oldest_due_date: ?string, max_days_overdue: int}>
+     * @return array<int, array{
+     *     customer_id: int,
+     *     customer_name: string,
+     *     outstanding_amount: float,
+     *     overdue_amount: float,
+     *     invoice_count: int,
+     *     oldest_due_date: ?string,
+     *     max_days_overdue: int,
+     * }>
      */
     private function topOverdueCustomers(?int $branchId, Carbon $asOf): array
     {
@@ -285,7 +313,15 @@ class GetAgingDashboardDataAction
     }
 
     /**
-     * @return array<int, array{supplier_id: int, supplier_name: string, outstanding_amount: float, overdue_amount: float, bill_count: int, oldest_due_date: ?string, max_days_overdue: int}>
+     * @return array<int, array{
+     *     supplier_id: int,
+     *     supplier_name: string,
+     *     outstanding_amount: float,
+     *     overdue_amount: float,
+     *     bill_count: int,
+     *     oldest_due_date: ?string,
+     *     max_days_overdue: int,
+     * }>
      */
     private function topOverdueSuppliers(?int $branchId, Carbon $asOf): array
     {

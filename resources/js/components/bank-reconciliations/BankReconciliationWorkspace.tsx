@@ -649,61 +649,68 @@ export const BankReconciliationWorkspace =
                                                                 '—'}
                                                         </TableCell>
                                                         <TableCell>
-                                                            {item.is_reconciled ? (
-                                                                <span className="text-xs text-muted-foreground">
-                                                                    —
-                                                                </span>
-                                                            ) : item.account ? (
-                                                                <TooltipProvider>
-                                                                    <Tooltip>
-                                                                        <TooltipTrigger
-                                                                            asChild
-                                                                        >
-                                                                            <button
-                                                                                className="max-w-[130px] truncate text-left text-xs font-medium text-blue-700 hover:underline"
-                                                                                onClick={() =>
-                                                                                    openAssignDialog(
-                                                                                        item.id!,
-                                                                                    )
-                                                                                }
-                                                                            >
-                                                                                {
-                                                                                    item
-                                                                                        .account
-                                                                                        .code
-                                                                                }
-                                                                            </button>
-                                                                        </TooltipTrigger>
-                                                                        <TooltipContent>
-                                                                            {
-                                                                                item
-                                                                                    .account
-                                                                                    .code
-                                                                            }{' '}
-                                                                            —{' '}
-                                                                            {
-                                                                                item
-                                                                                    .account
-                                                                                    .name
-                                                                            }
-                                                                        </TooltipContent>
-                                                                    </Tooltip>
-                                                                </TooltipProvider>
-                                                            ) : (
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="sm"
-                                                                    className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
-                                                                    onClick={() =>
-                                                                        openAssignDialog(
-                                                                            item.id!,
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <BookOpen className="mr-1 size-3" />
-                                                                    Assign
+                                                            {(() => {
+                                                                if (item.is_reconciled) {
+                                                                    return (
+                                                                        <span className="text-xs text-muted-foreground">
+                                                                            —
+                                                                        </span>
+                                                                    );
+                                                                }
+                                                                if (item.account) {
+                                                                    return (
+                                                                        <TooltipProvider>
+                                                                            <Tooltip>
+                                                                                <TooltipTrigger
+                                                                                    asChild
+                                                                                >
+                                                                                    <button
+                                                                                        className="max-w-[130px] truncate text-left text-xs font-medium text-blue-700 hover:underline"
+                                                                                        onClick={() =>
+                                                                                            openAssignDialog(
+                                                                                                item.id!,
+                                                                                            )
+                                                                                        }
+                                                                                    >
+                                                                                        {
+                                                                                            item
+                                                                                                .account
+                                                                                                .code
+                                                                                        }
+                                                                                    </button>
+                                                                                </TooltipTrigger>
+                                                                                <TooltipContent>
+                                                                                    {
+                                                                                        item
+                                                                                            .account
+                                                                                            .code
+                                                                                    }{' '}
+                                                                                    —{' '}
+                                                                                    {
+                                                                                        item
+                                                                                            .account
+                                                                                            .name
+                                                                                    }
+                                                                                </TooltipContent>
+                                                                            </Tooltip>
+                                                                        </TooltipProvider>
+                                                                    );
+                                                                }
+                                                                return (
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                        className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
+                                                                        onClick={() =>
+                                                                            openAssignDialog(
+                                                                                item.id!,
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <BookOpen className="mr-1 size-3" />
+                                                                        Assign
                                                                 </Button>
-                                                            )}
+                                                            )})()}
                                                         </TableCell>
                                                         <TableCell className="text-right">
                                                             {loadingItemId ===
@@ -943,26 +950,36 @@ export const BankReconciliationWorkspace =
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {accountLoading ? (
-                                                <TableRow>
-                                                    <TableCell
-                                                        colSpan={3}
-                                                        className="py-10 text-center"
-                                                    >
-                                                        <Loader2 className="mx-auto size-5 animate-spin text-muted-foreground" />
-                                                    </TableCell>
-                                                </TableRow>
-                                            ) : accountOptions.length === 0 ? (
-                                                <TableRow>
-                                                    <TableCell
-                                                        colSpan={3}
-                                                        className="py-10 text-center text-muted-foreground"
-                                                    >
-                                                        No accounts found.
-                                                    </TableCell>
-                                                </TableRow>
-                                            ) : (
-                                                accountOptions.map(
+                                            {(() => {
+                                                if (accountLoading) {
+                                                    return (
+                                                        <TableRow>
+                                                            <TableCell
+                                                                colSpan={3}
+                                                                className="py-10 text-center"
+                                                            >
+                                                                <Loader2 className="mx-auto size-5 animate-spin text-muted-foreground" />
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    );
+                                                }
+                                                if (
+                                                    accountOptions.length ===
+                                                    0
+                                                ) {
+                                                    return (
+                                                        <TableRow>
+                                                            <TableCell
+                                                                colSpan={3}
+                                                                className="py-10 text-center text-muted-foreground"
+                                                            >
+                                                                No accounts
+                                                                found.
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    );
+                                                }
+                                                return accountOptions.map(
                                                     (account) => (
                                                         <TableRow
                                                             key={account.id}
@@ -993,8 +1010,8 @@ export const BankReconciliationWorkspace =
                                                             </TableCell>
                                                         </TableRow>
                                                     ),
-                                                )
-                                            )}
+                                                );
+                                            })()}
                                         </TableBody>
                                     </Table>
                                 </div>

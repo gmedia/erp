@@ -78,7 +78,7 @@ class FinancialReportService
         }
 
         // PHP-side month bucketing keeps query cross-DB safe (avoids MariaDB-only MONTH()).
-        /** @var Collection<int, object{entry_date: string, account_type: string, debit: string, credit: string}> $rows */
+        /** @var Collection<int, object{entry_date: string, account_type: string, debit: string, credit: string}> */
         $rows = JournalEntryLine::query()
             ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
             ->join('accounts', 'accounts.id', '=', 'journal_entry_lines.account_id')
@@ -133,7 +133,11 @@ class FinancialReportService
     /**
      * Get Balance Sheet Report
      */
-    public function getBalanceSheet(int $fiscalYearId, ?int $comparisonFiscalYearId = null, ?int $branchId = null): array
+    public function getBalanceSheet(
+        int $fiscalYearId,
+        ?int $comparisonFiscalYearId = null,
+        ?int $branchId = null,
+    ): array
     {
         $coaVersion = $this->resolveRequiredCoaVersion($fiscalYearId);
 
@@ -165,7 +169,9 @@ class FinancialReportService
         // 3. Calculate Net Income for Comparison Year (if exists)
         $comparisonNetIncome = 0;
         if ($comparisonFiscalYearId && $comparisonCoaVersion) {
-            $comparisonNetIncome = $this->calculateNetIncome($comparisonFiscalYearId, $comparisonCoaVersion->id, $branchId);
+            $comparisonNetIncome = $this->calculateNetIncome(
+                $comparisonFiscalYearId, $comparisonCoaVersion->id, $branchId,
+            );
         }
 
         $clearingReclass = $this->extractClearingReclassification(
@@ -218,7 +224,11 @@ class FinancialReportService
         ];
     }
 
-    public function getIncomeStatement(int $fiscalYearId, ?int $comparisonFiscalYearId = null, ?int $branchId = null): array
+    public function getIncomeStatement(
+        int $fiscalYearId,
+        ?int $comparisonFiscalYearId = null,
+        ?int $branchId = null,
+    ): array
     {
         $coaVersion = $this->resolveRequiredCoaVersion($fiscalYearId);
 
@@ -257,7 +267,11 @@ class FinancialReportService
         ];
     }
 
-    public function getComparativeReport(int $fiscalYearId, ?int $comparisonFiscalYearId = null, ?int $branchId = null): array
+    public function getComparativeReport(
+        int $fiscalYearId,
+        ?int $comparisonFiscalYearId = null,
+        ?int $branchId = null,
+    ): array
     {
         $coaVersion = $this->resolveRequiredCoaVersion($fiscalYearId);
 
@@ -430,7 +444,11 @@ class FinancialReportService
      * @param  Collection<int, Account>  $accounts
      * @return array{comparisonCoaVersion: ?CoaVersion, comparisonBalanceByCurrentAccountId: array<int, float|int>}
      */
-    private function prepareComparisonContext(Collection $accounts, ?int $comparisonFiscalYearId, ?int $branchId = null): array
+    private function prepareComparisonContext(
+        Collection $accounts,
+        ?int $comparisonFiscalYearId,
+        ?int $branchId = null,
+    ): array
     {
         $comparisonCoaVersion = $this->resolveComparisonCoaVersion($comparisonFiscalYearId);
 
@@ -687,7 +705,8 @@ class FinancialReportService
         $codes = $currentAccounts->pluck('code')->unique()->values()->all();
 
         /** @var Collection<int, Account> $comparisonAccounts */
-        $comparisonAccounts = $this->accountsWithPostedSums($comparisonCoaVersion->id, $comparisonFiscalYearId, $branchId)
+        $comparisonAccounts = $this
+            ->accountsWithPostedSums($comparisonCoaVersion->id, $comparisonFiscalYearId, $branchId)
             ->whereIn('code', $codes)
             ->get();
 

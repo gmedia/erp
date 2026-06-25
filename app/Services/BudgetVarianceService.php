@@ -59,7 +59,12 @@ class BudgetVarianceService
     /**
      * Get summary totals for a budget variance.
      *
-     * @return array{total_allocated: float, total_actual: float, total_available: float, overall_variance_percent: float|null}
+     * @return array{
+     *     total_allocated: float,
+     *     total_actual: float,
+     *     total_available: float,
+     *     overall_variance_percent: float|null,
+     * }
      */
     public function calculateSummary(Collection $varianceData): array
     {
@@ -68,7 +73,12 @@ class BudgetVarianceService
             'total_actual' => $varianceData->sum('actual'),
             'total_available' => $varianceData->sum('available'),
             'overall_variance_percent' => $varianceData->sum('allocated') > 0
-                ? round((($varianceData->sum('allocated') - $varianceData->sum('actual')) / $varianceData->sum('allocated')) * 100, 2)
+                ? round(
+                    ($varianceData->sum('allocated') - $varianceData->sum('actual'))
+                    / $varianceData->sum('allocated')
+                    * 100,
+                    2,
+                )
                 : null,
         ];
     }

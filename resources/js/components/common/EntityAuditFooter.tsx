@@ -1,6 +1,6 @@
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 
-type AuditStampPerson = { name?: string | null } | null | undefined;
+type AuditStampPerson = { name?: string | null } | null;
 
 interface EntityAuditFooterProps {
     createdBy?: AuditStampPerson;

@@ -5,7 +5,7 @@ import { createSortingHeader } from '@/utils/columns';
 import type { CellContext, ColumnDef } from '@tanstack/react-table';
 import type { ComponentProps, ReactNode } from 'react';
 
-type DisplayValue = ReactNode | null | undefined;
+type DisplayValue = ReactNode | null;
 
 type WarehouseSummary =
     | {
@@ -13,8 +13,7 @@ type WarehouseSummary =
           code?: string | null;
           branch?: { name: string | null } | null;
       }
-    | null
-    | undefined;
+    | null;
 
 type SummaryColumnOptions<TData> = {
     id?: string;

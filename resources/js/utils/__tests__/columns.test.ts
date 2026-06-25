@@ -1,4 +1,5 @@
 // Type checking test for column utilities
+import { describe, expect, it } from 'vitest';
 import { Department } from '@/types/department';
 import { Employee } from '@/types/employee';
 import { Position } from '@/types/position';
@@ -12,78 +13,117 @@ import {
     createTextColumn,
 } from '../columns';
 
-// Test type safety with Department
-const departmentColumns = [
-    createSelectColumn<Department>(),
-    createTextColumn<Department>({ accessorKey: 'name', label: 'Name' }),
-    createDateColumn<Department>({
-        accessorKey: 'created_at',
-        label: 'Created At',
-    }),
-    createActionsColumn<Department>({
-        onEdit: (dept) => console.log('Edit', dept),
-        onDelete: (dept) => console.log('Delete', dept),
-    }),
-];
+describe('createSelectColumn', () => {
+    it('creates a select column with correct id', () => {
+        const col = createSelectColumn<Department>();
+        expect(col.id).toBe('select');
+    });
 
-// Test type safety with Employee
-const employeeColumns = [
-    createSelectColumn<Employee>(),
-    createTextColumn<Employee>({ accessorKey: 'name', label: 'Name' }),
-    createEmailColumn<Employee>({ accessorKey: 'email', label: 'Email' }),
-    createPhoneColumn<Employee>({ accessorKey: 'phone', label: 'Phone' }),
-    createCurrencyColumn<Employee>({ accessorKey: 'salary', label: 'Salary' }),
-    createDateColumn<Employee>({
-        accessorKey: 'hire_date',
-        label: 'Hire Date',
-    }),
-    createActionsColumn<Employee>({
-        onEdit: (emp) => console.log('Edit', emp),
-        onDelete: (emp) => console.log('Delete', emp),
-        onView: (emp) => console.log('View', emp),
-    }),
-];
+    it('creates a select column with meta', () => {
+        const col = createSelectColumn<Department>();
+        expect(col.meta).toEqual({ enableColumnFilter: false });
+    });
+});
 
-// Test type safety with Position
-const positionColumns = [
-    createSelectColumn<Position>(),
-    createTextColumn<Position>({ accessorKey: 'name', label: 'Name' }),
-    createDateColumn<Position>({
-        accessorKey: 'updated_at',
-        label: 'Updated At',
-        enableSorting: false,
-    }),
-    createActionsColumn<Position>({
-        onEdit: (pos) => console.log('Edit', pos),
-        onDelete: (pos) => console.log('Delete', pos),
-    }),
-];
+describe('createTextColumn', () => {
+    it('creates a text column with given accessor key and label', () => {
+        const col = createTextColumn<Department>({ accessorKey: 'name', label: 'Name' });
+        expect(col.accessorKey).toBe('name');
+        expect(col.header).toBe('Name');
+    });
+});
 
-// Test with various options
-const testColumns = [
-    createTextColumn<Employee>({
-        accessorKey: 'name',
-        label: 'Full Name',
-        className: 'font-bold',
-    }),
-    createCurrencyColumn<Employee>({
-        accessorKey: 'salary',
-        label: 'Annual Salary',
-        currency: 'IDR',
-        locale: 'id-ID',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-    }),
-    createDateColumn<Employee>({
-        accessorKey: 'hire_date',
-        label: 'Start Date',
-        dateFormat: 'dd MMM yyyy',
-    }),
-];
+describe('createDateColumn', () => {
+    it('creates a date column with default format', () => {
+        const col = createDateColumn<Department>({ accessorKey: 'created_at', label: 'Created At' });
+        expect(col.accessorKey).toBe('created_at');
+        expect(col.header).toBe('Created At');
+    });
 
-// This file is for type checking only - it should compile without errors
-// Use the columns to avoid unused variable warnings
-console.log('Department columns count:', departmentColumns.length);
-console.log('Employee columns count:', employeeColumns.length);
-console.log('Position columns count:', positionColumns.length);
-console.log('Test columns count:', testColumns.length);
+    it('creates a date column with sorting disabled', () => {
+        const col = createDateColumn<Position>({ accessorKey: 'updated_at', label: 'Updated At', enableSorting: false });
+        expect(col.enableSorting).toBe(false);
+    });
+});
+
+describe('createEmailColumn', () => {
+    it('creates an email column with correct accessor key', () => {
+        const col = createEmailColumn<Employee>({ accessorKey: 'email', label: 'Email' });
+        expect(col.accessorKey).toBe('email');
+        expect(col.header).toBe('Email');
+    });
+});
+
+describe('createPhoneColumn', () => {
+    it('creates a phone column with correct accessor key', () => {
+        const col = createPhoneColumn<Employee>({ accessorKey: 'phone', label: 'Phone' });
+        expect(col.accessorKey).toBe('phone');
+    });
+});
+
+describe('createCurrencyColumn', () => {
+    it('creates a currency column with correct accessor key', () => {
+        const col = createCurrencyColumn<Employee>({ accessorKey: 'salary', label: 'Salary' });
+        expect(col.accessorKey).toBe('salary');
+    });
+});
+
+describe('createActionsColumn', () => {
+    it('creates an actions column with id', () => {
+        const col = createActionsColumn<Department>();
+        expect(col.id).toBe('actions');
+    });
+
+    it('creates an actions column with callbacks', () => {
+        const col = createActionsColumn<Department>({
+            onEdit: () => {},
+            onDelete: () => {},
+        });
+        expect(col.id).toBe('actions');
+    });
+});
+
+describe('column type safety', () => {
+    it('builds Department columns array', () => {
+        const columns = [
+            createSelectColumn<Department>(),
+            createTextColumn<Department>({ accessorKey: 'name', label: 'Name' }),
+            createDateColumn<Department>({ accessorKey: 'created_at', label: 'Created At' }),
+            createActionsColumn<Department>({
+                onEdit: () => {},
+                onDelete: () => {},
+            }),
+        ];
+        expect(columns).toHaveLength(4);
+    });
+
+    it('builds Employee columns array', () => {
+        const columns = [
+            createSelectColumn<Employee>(),
+            createTextColumn<Employee>({ accessorKey: 'name', label: 'Name' }),
+            createEmailColumn<Employee>({ accessorKey: 'email', label: 'Email' }),
+            createPhoneColumn<Employee>({ accessorKey: 'phone', label: 'Phone' }),
+            createCurrencyColumn<Employee>({ accessorKey: 'salary', label: 'Salary' }),
+            createDateColumn<Employee>({ accessorKey: 'hire_date', label: 'Hire Date' }),
+            createActionsColumn<Employee>({
+                onEdit: () => {},
+                onDelete: () => {},
+                onView: () => {},
+            }),
+        ];
+        expect(columns).toHaveLength(7);
+    });
+
+    it('builds Position columns array', () => {
+        const columns = [
+            createSelectColumn<Position>(),
+            createTextColumn<Position>({ accessorKey: 'name', label: 'Name' }),
+            createDateColumn<Position>({ accessorKey: 'updated_at', label: 'Updated At', enableSorting: false }),
+            createActionsColumn<Position>({
+                onEdit: () => {},
+                onDelete: () => {},
+            }),
+        ];
+        expect(columns).toHaveLength(4);
+    });
+});

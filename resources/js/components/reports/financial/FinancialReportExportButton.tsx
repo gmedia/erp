@@ -1,13 +1,13 @@
 import { Button } from '@/components/ui/button';
 import { Download, Loader2 } from 'lucide-react';
 
-type FinancialReportExportButtonProps = {
-    exporting: boolean;
-    selectedYearId: number;
-    comparisonYearId?: number;
-    branchId?: string | null;
-    onExport: (payload: Record<string, string>) => void;
-};
+interface FinancialReportExportButtonProps {
+    readonly exporting: boolean;
+    readonly selectedYearId: number;
+    readonly comparisonYearId?: number;
+    readonly branchId?: string | null;
+    readonly onExport: (payload: Record<string, string>) => void;
+}
 
 export function FinancialReportExportButton({
     exporting,
