@@ -56,7 +56,7 @@ const getAssetStocktakeFormDefaults = (
         return {
             branch_id: '',
             reference: '',
-            planned_at: new Date(),
+            planned_at: '',
             performed_at: null,
             status: 'draft',
         };
@@ -69,10 +69,10 @@ const getAssetStocktakeFormDefaults = (
         ),
         reference: assetStocktake.reference || '',
         planned_at: assetStocktake.planned_at
-            ? new Date(assetStocktake.planned_at)
-            : new Date(),
+            ? assetStocktake.planned_at
+            : '',
         performed_at: assetStocktake.performed_at
-            ? new Date(assetStocktake.performed_at)
+            ? assetStocktake.performed_at
             : null,
         status: assetStocktake.status,
     };

@@ -210,8 +210,8 @@ export type ProductFormData = z.infer<typeof productFormSchema>;
  */
 export const fiscalYearFormSchema = z.object({
     name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
-    start_date: z.date({ message: 'Start date is required.' }),
-    end_date: z.date({ message: 'End date is required.' }),
+    start_date: z.string().min(1, { message: 'Start date is required.' }),
+    end_date: z.string().min(1, { message: 'End date is required.' }),
     status: z.enum(['open', 'closed', 'locked'], {
         message: 'Status is required.',
     }),
@@ -449,8 +449,8 @@ export type AssetMaintenanceFormData = z.infer<
 export const assetStocktakeFormSchema = z.object({
     branch_id: z.string().min(1, { message: 'Branch is required.' }),
     reference: z.string().min(1, { message: 'Reference is required.' }),
-    planned_at: z.date({ message: 'Planned date is required.' }),
-    performed_at: z.date().optional().nullable(),
+    planned_at: z.string().min(1, { message: 'Planned date is required.' }),
+    performed_at: z.string().optional().nullable(),
     status: z.enum(['draft', 'in_progress', 'completed', 'cancelled'], {
         message: 'Status is required.',
     }),

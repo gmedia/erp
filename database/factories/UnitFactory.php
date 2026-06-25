@@ -21,7 +21,7 @@ class UnitFactory extends Factory
     {
         return [
             'name' => uniqid('unit-') . '-' . random_int(0, 9999),
-            'symbol' => uniqid('sym-'),
+            'symbol' => mb_substr(uniqid('s'), 0, 10),
         ];
     }
 }

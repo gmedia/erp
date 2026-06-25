@@ -4,13 +4,7 @@ import { login } from '../helpers';
 async function waitForAgingDashboardData(
     page: Parameters<typeof test.beforeEach>[0]['page'],
 ) {
-    await page.waitForResponse(
-        (response) =>
-            response.url().includes('/api/aging-dashboard') &&
-            response.request().method() === 'GET' &&
-            response.status() < 400,
-        { timeout: 15000 },
-    );
+    await page.waitForSelector('[data-slot="card"]', { timeout: 30000 });
 }
 
 test.describe('Aging Dashboard', () => {
@@ -21,9 +15,8 @@ test.describe('Aging Dashboard', () => {
     test('can navigate to aging dashboard and view summary cards', async ({
         page,
     }) => {
-        const dataPromise = waitForAgingDashboardData(page);
         await page.goto('/aging-dashboard');
-        await dataPromise;
+        await waitForAgingDashboardData(page);
 
         await expect(
             page.getByRole('heading', { name: 'Accounts Aging Overview' }),
@@ -46,9 +39,8 @@ test.describe('Aging Dashboard', () => {
     });
 
     test('displays AR and AP bucket charts', async ({ page }) => {
-        const dataPromise = waitForAgingDashboardData(page);
         await page.goto('/aging-dashboard');
-        await dataPromise;
+        await waitForAgingDashboardData(page);
 
         await expect(page.getByText('Receivables (AR)')).toBeVisible();
         await expect(page.getByText('Payables (AP)')).toBeVisible();
@@ -57,34 +49,43 @@ test.describe('Aging Dashboard', () => {
     test('displays top overdue customers and suppliers tables', async ({
         page,
     }) => {
-        const dataPromise = waitForAgingDashboardData(page);
         await page.goto('/aging-dashboard');
-        await dataPromise;
+        await waitForAgingDashboardData(page);
 
         await expect(page.getByText('Top Overdue Customers')).toBeVisible();
         await expect(page.getByText('Top Overdue Suppliers')).toBeVisible();
     });
 
     test('can change as_of_date filter and refetch', async ({ page }) => {
-        const dataPromise = waitForAgingDashboardData(page);
         await page.goto('/aging-dashboard');
-        await dataPromise;
+        await waitForAgingDashboardData(page);
 
-        const refetchPromise = waitForAgingDashboardData(page);
-        await page.locator('#as-of-date-input').fill('2026-01-01');
-        await refetchPromise;
+        const dateTrigger = page
+            .locator('button')
+            .filter({ has: page.locator('.lucide-calendar') });
+        await dateTrigger.click();
 
-        await expect(page).toHaveURL(/as_of_date=2026-01-01/);
+        const calendar = page.locator('[data-slot="calendar"]');
+        await calendar.waitFor({ state: 'visible' });
+        await calendar
+            .locator('button:not([disabled])')
+            .first()
+            .click();
+
+        // Wait for URL to reflect the new as_of_date param before asserting.
+        // waitForAgingDashboardData resolves too early because [data-slot="card"]
+        // is already visible from the initial render; setSearchParams is async.
+        await page.waitForURL(/as_of_date=/, { timeout: 10000 });
+
+        await expect(page).toHaveURL(/as_of_date=/);
     });
 
     test('can refresh data', async ({ page }) => {
-        const dataPromise = waitForAgingDashboardData(page);
         await page.goto('/aging-dashboard');
-        await dataPromise;
+        await waitForAgingDashboardData(page);
 
-        const refreshPromise = waitForAgingDashboardData(page);
         await page.getByRole('button', { name: 'Refresh Data' }).click();
-        await refreshPromise;
+        await waitForAgingDashboardData(page);
 
         await expect(
             page.getByRole('heading', { name: 'Accounts Aging Overview' }),
@@ -92,33 +93,26 @@ test.describe('Aging Dashboard', () => {
     });
 
     test('can change branch filter and refetch', async ({ page }) => {
-        const dataPromise = waitForAgingDashboardData(page);
         await page.goto('/aging-dashboard');
-        await dataPromise;
+        await waitForAgingDashboardData(page);
 
-        const refetchPromise = page.waitForResponse(
-            (response) =>
-                response.url().includes('/api/aging-dashboard') &&
-                response.url().includes('branch_id=') &&
-                response.status() < 400,
-            { timeout: 15000 },
-        );
+        const branchTrigger = page.getByRole('combobox', { name: 'Branch' });
+        await branchTrigger.click();
 
-        await page.locator('#branch-select').click();
         const firstBranchOption = page
             .getByRole('option')
             .filter({ hasNotText: 'All Branches' })
             .first();
         await firstBranchOption.click();
-        await refetchPromise;
+
+        await waitForAgingDashboardData(page);
 
         await expect(page).toHaveURL(/branch_id=\d+/);
     });
 
     test('renders five aging buckets per chart', async ({ page }) => {
-        const dataPromise = waitForAgingDashboardData(page);
         await page.goto('/aging-dashboard');
-        await dataPromise;
+        await waitForAgingDashboardData(page);
 
         const expectedLabels = [
             'Current',

@@ -22,6 +22,7 @@ generateModuleTests({
     editUpdates: { reference: `UPDATED-ST-${Date.now()}` },
     sortableColumns: ['Reference', 'Branch', 'Planned Date', 'Performed Date', 'Status', 'Created By'],
     viewType: 'dialog',
+    viewDialogTitle: 'Asset Stocktake Details',
     exportApiPath: '/api/asset-stocktakes/export',
     expectedExportColumns: ['ID', 'Reference', 'Branch', 'Planned At', 'Performed At', 'Status', 'Created By', 'Created At'],
 });

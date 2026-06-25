@@ -18,7 +18,7 @@ export default defineConfig({
     ...(shouldPreloadAuthState ? { storageState: storageStatePath } : {}),
     actionTimeout: 15000,
   },
-  fullyParallel: false,
+  fullyParallel: true,
   workers,
   reporter: [
     ['html', { outputFolder: 'e2e/playwright-report', open: 'never' }],

@@ -9,7 +9,6 @@ import SelectField from '@/components/common/SelectField';
 import { useEntityForm } from '@/hooks/useEntityForm';
 import { type FiscalYear } from '@/types/entity';
 import { fiscalYearFormSchema, type FiscalYearFormData } from '@/utils/schemas';
-import { format } from 'date-fns';
 
 interface FiscalYearFormProps {
     open: boolean;
@@ -23,12 +22,8 @@ type FiscalYearFormInput = z.input<typeof fiscalYearFormSchema>;
 
 const getDefaults = (entity?: FiscalYear | null): FiscalYearFormInput => ({
     name: entity?.name || '',
-    start_date: entity?.start_date
-        ? new Date(entity.start_date)
-        : (undefined as unknown as Date),
-    end_date: entity?.end_date
-        ? new Date(entity.end_date)
-        : (undefined as unknown as Date),
+    start_date: entity?.start_date || '',
+    end_date: entity?.end_date || '',
     status: entity?.status || 'open',
 });
 
@@ -46,15 +41,7 @@ export function FiscalYearForm({
     });
 
     const handleFormSubmit = (data: FiscalYearFormInput) => {
-        const payload = {
-            ...data,
-            start_date: format(
-                data.start_date,
-                'yyyy-MM-dd',
-            ) as unknown as Date,
-            end_date: format(data.end_date, 'yyyy-MM-dd') as unknown as Date,
-        } as FiscalYearFormData;
-        onSubmit(payload);
+        onSubmit(data as FiscalYearFormData);
     };
 
     return (
