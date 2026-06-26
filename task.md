@@ -571,7 +571,7 @@ Completed security hardening across 3 batches (9 files modified, ~2,800 lines ad
 
 **Verified**: PHP syntax check on `AppServiceProvider.php` + `FortifyServiceProvider.php` — no errors. LSP diagnostics: intelephense not installed (non-blocking).
 
-**Commit**: `TBD` — all Batch 1-3 changes committed
+**Commit**: `04d11ea2` — all Batch 1-3 changes committed
 
 **Files modified** (9): `.env.example`, `InteractsWithStockSnapshotQuery.php`, `AppServiceProvider.php`, `FortifyServiceProvider.php`, `bootstrap/app.php`, `composer.lock`, `config/cors.php`, `package-lock.json`, `two-factor-setup-modal.tsx`
 
