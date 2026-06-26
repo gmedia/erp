@@ -140,6 +140,8 @@ trait HandlesReportQuery
         }
 
         if (in_array($sortBy, $aggregateSortable, true)) {
+            $sortDirection = strtolower($sortDirection) === 'asc' ? 'asc' : 'desc';
+
             $query->orderByRaw($sortBy . ' ' . $sortDirection);
 
             return;
@@ -205,7 +207,7 @@ trait HandlesReportQuery
     protected function applyMaintenanceCostReportSorting(Request $request, Builder $query): void
     {
         $sortBy = $request->string('sort_by', 'performed_at')->toString();
-        $sortDirection = $request->string('sort_direction', 'desc')->toString();
+        $sortDirection = strtolower($request->string('sort_direction', 'desc')->toString()) === 'asc' ? 'asc' : 'desc';
 
         if (in_array($sortBy, ['asset_code', 'asset_name'], true)) {
             $query->join('assets', 'asset_maintenances.asset_id', '=', 'assets.id')
@@ -223,6 +225,22 @@ trait HandlesReportQuery
             return;
         }
 
-        $query->orderBy('asset_maintenances.' . $sortBy, $sortDirection);
+        $allowedSortBy = [
+            'asset_code',
+            'asset_name',
+            'supplier_name',
+            'cost',
+            'maintenance_type',
+            'maintenance_date',
+            'next_maintenance_date',
+            'created_at',
+            'updated_at',
+        ];
+
+        if (in_array($sortBy, $allowedSortBy, true)) {
+            $query->orderBy('asset_maintenances.' . $sortBy, $sortDirection);
+        } else {
+            $query->orderBy('asset_maintenances.performed_at', 'desc');
+        }
     }
 }
