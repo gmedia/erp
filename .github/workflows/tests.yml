@@ -97,7 +97,9 @@ jobs:
           exit 1
 
       - name: Start Sail
-        run: ./vendor/bin/sail up -d --wait
+        run: |
+          docker volume rm erp_sail-mariadb 2>/dev/null || true
+          ./vendor/bin/sail up -d --wait
 
       - name: Cache npm dependencies
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
@@ -323,7 +325,9 @@ jobs:
           exit 1
 
       - name: Start Sail
-        run: ./vendor/bin/sail up -d --wait
+        run: |
+          docker volume rm erp_sail-mariadb 2>/dev/null || true
+          ./vendor/bin/sail up -d --wait
 
       - name: Cache npm dependencies
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
