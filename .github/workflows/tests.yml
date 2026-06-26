@@ -101,6 +101,16 @@ jobs:
           docker volume rm erp_sail-mariadb 2>/dev/null || true
           ./vendor/bin/sail up -d --wait
 
+      - name: Capture MariaDB logs on failure
+        if: failure()
+        run: |
+          echo "::group::MariaDB container logs"
+          docker logs erp-mariadb-1 2>&1 || true
+          echo "::endgroup::"
+          echo "::group::All container status"
+          docker ps -a 2>&1 || true
+          echo "::endgroup::"
+
       - name: Cache npm dependencies
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
         with:
@@ -328,6 +338,14 @@ jobs:
         run: |
           docker volume rm erp_sail-mariadb 2>/dev/null || true
           ./vendor/bin/sail up -d --wait
+
+      - name: Capture MariaDB logs on failure
+        if: failure()
+        run: |
+          echo "=== MariaDB Container Logs ==="
+          docker logs erp-mariadb-1 2>&1 || echo "Failed to capture MariaDB logs"
+          echo "=== All Container Statuses ==="
+          docker ps -a
 
       - name: Cache npm dependencies
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
