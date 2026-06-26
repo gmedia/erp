@@ -76,7 +76,7 @@ function TwoFactorSetupStep({
                                     <div
                                         // qrCodeSvg is a server-generated SVG from a trusted source (Laravel backend).
                                         // The SVG is sanitized by the backend before sending — no user input involved.
-                                         
+
                                         dangerouslySetInnerHTML={{
                                             __html: qrCodeSvg,
                                         }}
