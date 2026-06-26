@@ -137,8 +137,7 @@ class FinancialReportService
         int $fiscalYearId,
         ?int $comparisonFiscalYearId = null,
         ?int $branchId = null,
-    ): array
-    {
+    ): array {
         $coaVersion = $this->resolveRequiredCoaVersion($fiscalYearId);
 
         if (! $coaVersion) {
@@ -228,8 +227,7 @@ class FinancialReportService
         int $fiscalYearId,
         ?int $comparisonFiscalYearId = null,
         ?int $branchId = null,
-    ): array
-    {
+    ): array {
         $coaVersion = $this->resolveRequiredCoaVersion($fiscalYearId);
 
         if (! $coaVersion) {
@@ -271,8 +269,7 @@ class FinancialReportService
         int $fiscalYearId,
         ?int $comparisonFiscalYearId = null,
         ?int $branchId = null,
-    ): array
-    {
+    ): array {
         $coaVersion = $this->resolveRequiredCoaVersion($fiscalYearId);
 
         if (! $coaVersion) {
@@ -448,8 +445,7 @@ class FinancialReportService
         Collection $accounts,
         ?int $comparisonFiscalYearId,
         ?int $branchId = null,
-    ): array
-    {
+    ): array {
         $comparisonCoaVersion = $this->resolveComparisonCoaVersion($comparisonFiscalYearId);
 
         return [

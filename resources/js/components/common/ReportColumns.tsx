@@ -7,13 +7,11 @@ import type { ComponentProps, ReactNode } from 'react';
 
 type DisplayValue = ReactNode | null;
 
-type WarehouseSummary =
-    | {
-          name: string | null;
-          code?: string | null;
-          branch?: { name: string | null } | null;
-      }
-    | null;
+type WarehouseSummary = {
+    name: string | null;
+    code?: string | null;
+    branch?: { name: string | null } | null;
+} | null;
 
 type SummaryColumnOptions<TData> = {
     id?: string;

@@ -214,10 +214,7 @@ export function I18nProvider({
             if (params) {
                 return Object.entries(params).reduce(
                     (str, [paramKey, paramValue]) => {
-                        return str.replaceAll(
-                            `{${paramKey}}`,
-                            paramValue,
-                        );
+                        return str.replaceAll(`{${paramKey}}`, paramValue);
                     },
                     value,
                 );

@@ -650,14 +650,18 @@ export const BankReconciliationWorkspace =
                                                         </TableCell>
                                                         <TableCell>
                                                             {(() => {
-                                                                if (item.is_reconciled) {
+                                                                if (
+                                                                    item.is_reconciled
+                                                                ) {
                                                                     return (
                                                                         <span className="text-xs text-muted-foreground">
                                                                             —
                                                                         </span>
                                                                     );
                                                                 }
-                                                                if (item.account) {
+                                                                if (
+                                                                    item.account
+                                                                ) {
                                                                     return (
                                                                         <TooltipProvider>
                                                                             <Tooltip>
@@ -709,8 +713,9 @@ export const BankReconciliationWorkspace =
                                                                     >
                                                                         <BookOpen className="mr-1 size-3" />
                                                                         Assign
-                                                                </Button>
-                                                            )})()}
+                                                                    </Button>
+                                                                );
+                                                            })()}
                                                         </TableCell>
                                                         <TableCell className="text-right">
                                                             {loadingItemId ===
@@ -964,8 +969,7 @@ export const BankReconciliationWorkspace =
                                                     );
                                                 }
                                                 if (
-                                                    accountOptions.length ===
-                                                    0
+                                                    accountOptions.length === 0
                                                 ) {
                                                     return (
                                                         <TableRow>
