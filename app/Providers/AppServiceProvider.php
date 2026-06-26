@@ -3,6 +3,9 @@
 namespace App\Providers;
 
 use App\Models\Setting;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Throwable;
@@ -36,6 +39,8 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->bootMailSettings();
+        $this->bootRateLimiters();
+        $this->enforceProductionDebugMode();
     }
 
     /**
@@ -75,6 +80,34 @@ class AppServiceProvider extends ServiceProvider
             }
         } catch (Throwable $e) {
             report($e);
+        }
+    }
+
+    /**
+     * Register rate limiters for imports and exports.
+     */
+    protected function bootRateLimiters(): void
+    {
+        RateLimiter::for('imports', function (Request $request) {
+            return Limit::perMinute(10)->by(
+                optional($request->user())->id ?: $request->ip()
+            );
+        });
+
+        RateLimiter::for('exports', function (Request $request) {
+            return Limit::perMinute(10)->by(
+                optional($request->user())->id ?: $request->ip()
+            );
+        });
+    }
+
+    /**
+     * Enforce APP_DEBUG=false in production environment.
+     */
+    protected function enforceProductionDebugMode(): void
+    {
+        if (app()->environment('production')) {
+            config(['app.debug' => false]);
         }
     }
 

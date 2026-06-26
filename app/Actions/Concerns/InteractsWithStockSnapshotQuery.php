@@ -32,7 +32,7 @@ trait InteractsWithStockSnapshotQuery
                 'stock_movements.*',
                 DB::raw('stock_movements.balance_after as quantity_on_hand'),
                 DB::raw('COALESCE(stock_movements.average_cost_after, products.cost) as average_cost'),
-                DB::raw('(' . $stockValueExpr . ') as stock_value'),
+                DB::raw('(' . $this->stockSnapshotValueExpression() . ') as stock_value'),
                 DB::raw('products.name as product_name'),
                 DB::raw('warehouses.name as warehouse_name'),
                 DB::raw('branches.name as branch_name'),

@@ -22,6 +22,10 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        RateLimiter::for('login', function (Request $request) {
+            return Limit::perMinute(5)->by($request->input('email') . '|' . $request->ip());
+        });
+
         RateLimiter::for('two-factor', function (Request $request) {
             return Limit::perMinute(5)->by($request->session()->get('login.id'));
         });

@@ -1,0 +1,48 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+class ContentSecurityPolicy
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param  Closure(Request): (Response)  $next
+     */
+    public function handle(Request $request, Closure $next): Response
+    {
+        $response = $next($request);
+
+        $response->headers->set('Content-Security-Policy', $this->buildPolicy());
+
+        return $response;
+    }
+
+    /**
+     * Build the Content-Security-Policy header value.
+     */
+    protected function buildPolicy(): string
+    {
+        $connectSrc = "'self'";
+
+        if (app()->environment('local')) {
+            $connectSrc .= ' ws: http://localhost:*';
+        }
+
+        return implode('; ', [
+            "default-src 'self'",
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+            "style-src 'self' 'unsafe-inline'",
+            "img-src 'self' data: https:",
+            "font-src 'self' data:",
+            "connect-src {$connectSrc}",
+            "frame-ancestors 'none'",
+            "base-uri 'self'",
+            "form-action 'self'",
+        ]);
+    }
+}
