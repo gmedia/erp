@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-06-25 (E2E verification of uncommitted changes: 11 suites, 91/91 tests pass. All 7 files committed at HEAD `1b3a398c`)
+Last updated: 2026-06-26 (Batch E tracker finalization: mark Batch D done, remove duplicate Batch F row, correct Known gotcha. Committed at HEAD `76ff9e4f`)
 
 ## SESSION 2026-06-22 — Purchase Request User Guide
 
@@ -543,3 +543,26 @@ If user says "lanjutkan" without direction, ASK which path.
 **Next steps**: (none currently — task complete)
 
 **Continuation Prompt**: "E2E verification done. 11 suites, 91/91 pass. All 7 files committed at 1b3a398c. What's next?"
+
+---
+
+## SESSION 2026-06-26 — Batch E Tracker Finalization
+
+Finalized `docs/refactor-sonar-progress.md`:
+
+- **Batch D status**: Changed from `in-progress` to `done` (was incorrectly left in-progress after Batch E completion)
+- **Duplicate Batch F row**: Removed duplicate row at line 21 (2 Batch F entries existed — one from Batch E, one ghost from earlier wave)
+- **Known gotcha corrected**: "2 waves + 2 bug fixes" → "2 waves + 3 bug triages" (bug triage count was underreported)
+- **Batch table**: 6 batches (A–F), all `done`, no duplicates
+
+**Commit**: `76ff9e4f` — `docs: finalize Batch E tracker — mark Batch D done, remove duplicate Batch F row`
+
+**State**: Batch E refactor work complete (was already done in prior session; this session just fixed tracker documentation). All 6 Sonar batches complete. `refactor-sonar-progress.md` batch table clean.
+
+**Working tree**: Lock file drift (`composer.lock`, `package-lock.json`) + `.sisyphus/` untracked — benign, not committed.
+
+**Open risks**: None. Lock file drift is unrelated environment noise.
+
+**Next steps**: No active task. Ready for new work.
+
+**Continuation Prompt**: "Batch E tracker finalized at `76ff9e4f`. 6/6 Sonar batches done. What's next?"
