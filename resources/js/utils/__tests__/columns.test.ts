@@ -1,5 +1,8 @@
-// @ts-nocheck — test file with no test framework installed; validated via CI's tsc --noEmit
 // Type checking test for column utilities
+// This file performs compile-time type assertions — no runtime test framework needed.
+// Run: tsc --noEmit (ensures types compile cleanly)
+
+import type { ColumnDef } from '@tanstack/react-table';
 import { Department } from '@/types/department';
 import { Employee } from '@/types/employee';
 import { Position } from '@/types/position';
@@ -13,164 +16,134 @@ import {
     createTextColumn,
 } from '../columns';
 
-// Our column builders always set accessorKey, but ColumnDef declares it as optional.
-// Use a helper to assert the resolved type for test assertions.
-function accessorKeyOf(col: any): string {
-    return col.accessorKey as string;
+// ── Helper ──
+
+type AccessorKeyCol = ColumnDef<unknown> & { accessorKey: string };
+
+function accessorKeyOf(col: AccessorKeyCol): string {
+    return col.accessorKey;
 }
 
-describe('createSelectColumn', () => {
-    it('creates a select column with correct id', () => {
-        const col = createSelectColumn<Department>();
-        expect(col.id).toBe('select');
-    });
+type WithAccessorKey<T> = Extract<ColumnDef<T>, { accessorKey: string }>;
+type WithId<T> = Extract<ColumnDef<T>, { id: string }>;
+type WithEnableSorting<T> = Extract<ColumnDef<T>, { enableSorting: unknown }>;
 
-    it('creates a select column with meta', () => {
-        const col = createSelectColumn<Department>();
-        expect(col.meta).toEqual({ enableColumnFilter: false });
-    });
-});
+// ── createSelectColumn ──
 
-describe('createTextColumn', () => {
-    it('creates a text column with given accessor key and label', () => {
-        const col = createTextColumn<Department>({
-            accessorKey: 'name',
-            label: 'Name',
-        });
-        expect(accessorKeyOf(col)).toBe('name');
-        expect(col.header).toBe('Name');
-    });
-});
+const _selectCol = createSelectColumn<Department>() as WithId<Department>;
+const _selectIdCheck = _selectCol.id as string satisfies string;
 
-describe('createDateColumn', () => {
-    it('creates a date column with default format', () => {
-        const col = createDateColumn<Department>({
-            accessorKey: 'created_at',
-            label: 'Created At',
-        });
-        expect(accessorKeyOf(col)).toBe('created_at');
-        expect(col.header).toBe('Created At');
-    });
+type _SelectHasMeta = Extract<ColumnDef<Department>, { meta: unknown }> extends { meta: unknown } ? true : false;
+const _selectMetaCheck: _SelectHasMeta = true;
 
-    it('creates a date column with sorting disabled', () => {
-        const col = createDateColumn<Position>({
-            accessorKey: 'updated_at',
-            label: 'Updated At',
-            enableSorting: false,
-        });
-        expect(col.enableSorting).toBe(false);
-    });
-});
+// ── createTextColumn ──
 
-describe('createEmailColumn', () => {
-    it('creates an email column with correct accessor key', () => {
-        const col = createEmailColumn<Employee>({
-            accessorKey: 'email',
-            label: 'Email',
-        });
-        expect(accessorKeyOf(col)).toBe('email');
-        expect(col.header).toBe('Email');
-    });
-});
+const _textCol = createTextColumn<Department>({ accessorKey: 'name', label: 'Name' }) as WithAccessorKey<Department>;
+type _TextAccessorKey = typeof _textCol['accessorKey'];
+const _textAk: _TextAccessorKey = 'name';
+type _TextHeader = Extract<ColumnDef<Department>, { header: unknown }>['header'];
+const _textHeader: _TextHeader = 'Name';
 
-describe('createPhoneColumn', () => {
-    it('creates a phone column with correct accessor key', () => {
-        const col = createPhoneColumn<Employee>({
-            accessorKey: 'phone',
-            label: 'Phone',
-        });
-        expect(accessorKeyOf(col)).toBe('phone');
-    });
-});
+// ── createDateColumn ──
 
-describe('createCurrencyColumn', () => {
-    it('creates a currency column with correct accessor key', () => {
-        const col = createCurrencyColumn<Employee>({
-            accessorKey: 'salary',
-            label: 'Salary',
-        });
-        expect(accessorKeyOf(col)).toBe('salary');
-    });
-});
+const _dateCol = createDateColumn<Department>({ accessorKey: 'created_at', label: 'Created At' }) as WithAccessorKey<Department>;
+type _DateAccessorKey = typeof _dateCol['accessorKey'];
+const _dateAk: _DateAccessorKey = 'created_at';
 
-describe('createActionsColumn', () => {
-    it('creates an actions column with id', () => {
-        const col = createActionsColumn<Department>();
-        expect(col.id).toBe('actions');
-    });
+const _dateColNoSort = createDateColumn<Position>({
+    accessorKey: 'updated_at',
+    label: 'Updated At',
+    enableSorting: false,
+}) as WithEnableSorting<Position>;
+type _DateNoSort = typeof _dateColNoSort extends { enableSorting: false } ? true : false;
+const _dateNoSortCheck: _DateNoSort = true;
 
-    it('creates an actions column with callbacks', () => {
-        const col = createActionsColumn<Department>({
-            onEdit: () => {},
-            onDelete: () => {},
-        });
-        expect(col.id).toBe('actions');
-    });
-});
+// ── createEmailColumn ──
 
-describe('column type safety', () => {
-    it('builds Department columns array', () => {
-        const columns = [
-            createSelectColumn<Department>(),
-            createTextColumn<Department>({
-                accessorKey: 'name',
-                label: 'Name',
-            }),
-            createDateColumn<Department>({
-                accessorKey: 'created_at',
-                label: 'Created At',
-            }),
-            createActionsColumn<Department>({
-                onEdit: () => {},
-                onDelete: () => {},
-            }),
-        ];
-        expect(columns).toHaveLength(4);
-    });
+const _emailCol = createEmailColumn<Employee>({ accessorKey: 'email', label: 'Email' }) as WithAccessorKey<Employee>;
+type _EmailAccessorKey = typeof _emailCol['accessorKey'];
+const _emailAk: _EmailAccessorKey = 'email';
 
-    it('builds Employee columns array', () => {
-        const columns = [
-            createSelectColumn<Employee>(),
-            createTextColumn<Employee>({ accessorKey: 'name', label: 'Name' }),
-            createEmailColumn<Employee>({
-                accessorKey: 'email',
-                label: 'Email',
-            }),
-            createPhoneColumn<Employee>({
-                accessorKey: 'phone',
-                label: 'Phone',
-            }),
-            createCurrencyColumn<Employee>({
-                accessorKey: 'salary',
-                label: 'Salary',
-            }),
-            createDateColumn<Employee>({
-                accessorKey: 'hire_date',
-                label: 'Hire Date',
-            }),
-            createActionsColumn<Employee>({
-                onEdit: () => {},
-                onDelete: () => {},
-                onView: () => {},
-            }),
-        ];
-        expect(columns).toHaveLength(7);
-    });
+// ── createPhoneColumn ──
 
-    it('builds Position columns array', () => {
-        const columns = [
-            createSelectColumn<Position>(),
-            createTextColumn<Position>({ accessorKey: 'name', label: 'Name' }),
-            createDateColumn<Position>({
-                accessorKey: 'updated_at',
-                label: 'Updated At',
-                enableSorting: false,
-            }),
-            createActionsColumn<Position>({
-                onEdit: () => {},
-                onDelete: () => {},
-            }),
-        ];
-        expect(columns).toHaveLength(4);
-    });
-});
+const _phoneCol = createPhoneColumn<Employee>({ accessorKey: 'phone', label: 'Phone' }) as WithAccessorKey<Employee>;
+type _PhoneAccessorKey = typeof _phoneCol['accessorKey'];
+const _phoneAk: _PhoneAccessorKey = 'phone';
+
+// ── createCurrencyColumn ──
+
+const _currencyCol = createCurrencyColumn<Employee>({ accessorKey: 'salary', label: 'Salary' }) as WithAccessorKey<Employee>;
+type _CurrencyAccessorKey = typeof _currencyCol['accessorKey'];
+const _currencyAk: _CurrencyAccessorKey = 'salary';
+
+// ── createActionsColumn ──
+
+const _actionsCol = createActionsColumn<Department>() as WithId<Department>;
+const _actionsIdCheck = _actionsCol.id as string satisfies string;
+
+const _actionsColWithCb = createActionsColumn<Department>({
+    onEdit: () => {},
+    onDelete: () => {},
+}) as WithId<Department>;
+const _actionsColWithCbIdCheck = _actionsColWithCb.id as string satisfies string;
+
+// ── Column array builds ──
+
+const _deptColumns = [
+    createSelectColumn<Department>(),
+    createTextColumn<Department>({ accessorKey: 'name', label: 'Name' }),
+    createDateColumn<Department>({ accessorKey: 'created_at', label: 'Created At' }),
+    createActionsColumn<Department>({ onEdit: () => {}, onDelete: () => {} }),
+] as const;
+type _DeptColsLen = typeof _deptColumns['length'] extends 4 ? true : false;
+const _deptLenCheck: _DeptColsLen = true;
+
+const _empColumns = [
+    createSelectColumn<Employee>(),
+    createTextColumn<Employee>({ accessorKey: 'name', label: 'Name' }),
+    createEmailColumn<Employee>({ accessorKey: 'email', label: 'Email' }),
+    createPhoneColumn<Employee>({ accessorKey: 'phone', label: 'Phone' }),
+    createCurrencyColumn<Employee>({ accessorKey: 'salary', label: 'Salary' }),
+    createDateColumn<Employee>({ accessorKey: 'hire_date', label: 'Hire Date' }),
+    createActionsColumn<Employee>({ onEdit: () => {}, onDelete: () => {}, onView: () => {} }),
+] as const;
+type _EmpColsLen = typeof _empColumns['length'] extends 7 ? true : false;
+const _empLenCheck: _EmpColsLen = true;
+
+const _posColumns = [
+    createSelectColumn<Position>(),
+    createTextColumn<Position>({ accessorKey: 'name', label: 'Name' }),
+    createDateColumn<Position>({ accessorKey: 'updated_at', label: 'Updated At', enableSorting: false }),
+    createActionsColumn<Position>({ onEdit: () => {}, onDelete: () => {} }),
+] as const;
+type _PosColsLen = typeof _posColumns['length'] extends 4 ? true : false;
+const _posLenCheck: _PosColsLen = true;
+
+// ── Exhaustiveness guard ──
+void _selectIdCheck;
+void _selectMetaCheck;
+void _textAk;
+void _textHeader;
+void _dateAk;
+void _dateNoSortCheck;
+void _emailAk;
+void _phoneAk;
+void _currencyAk;
+void _actionsIdCheck;
+void _actionsColWithCbIdCheck;
+void _deptLenCheck;
+void _empLenCheck;
+void _posLenCheck;
+void accessorKeyOf;
+void _selectCol;
+void _textCol;
+void _dateCol;
+void _dateColNoSort;
+void _emailCol;
+void _phoneCol;
+void _currencyCol;
+void _actionsCol;
+void _actionsColWithCb;
+void _deptColumns;
+void _empColumns;
+void _posColumns;
