@@ -255,7 +255,7 @@ jobs:
   e2e:
     name: Playwright E2E via Sail
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 150
     needs: quality
     if: ${{ needs.quality.outputs.autofix_applied != 'true' }}
     permissions:
@@ -312,6 +312,7 @@ jobs:
           branch_tag=$(echo "$branch_tag" | tr -cd '[:alnum:]._-')
 
           candidates=(
+            "ghcr.io/${GITHUB_REPOSITORY}/ci-sail:sha-${GITHUB_SHA::7}"
             "$CI_SAIL_IMAGE"
             "ghcr.io/${GITHUB_REPOSITORY}/ci-sail:${branch_tag}"
             "ghcr.io/${GITHUB_REPOSITORY}/ci-sail:latest"

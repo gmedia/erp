@@ -88,6 +88,12 @@ class AppServiceProvider extends ServiceProvider
      */
     protected function bootRateLimiters(): void
     {
+        // Disable rate limiting for E2E testing environment to prevent 429 errors
+        // when Playwright runs parallel tests against the dev server.
+        if (app()->environment('testing') || env('DISABLE_RATE_LIMITING')) {
+            return;
+        }
+
         RateLimiter::for('imports', function (Request $request) {
             return Limit::perMinute(10)->by(
                 optional($request->user())->id ?: $request->ip()
