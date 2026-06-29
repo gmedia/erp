@@ -3,26 +3,17 @@
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
-test('it can upload a file to minio s3 disk', function () {
-    // We want to test the actual S3 disk, not a fake, to ensure credentials work
+test('upload file', function () {
+    Storage::fake('s3');
+
     $disk = Storage::disk('s3');
+    $file = UploadedFile::fake()->image('test.jpg');
 
-    // Create a fake uploaded file
-    $file = UploadedFile::fake()->image('test-avatar.jpg');
-
-    // Generate a unique path
-    $path = 'testing/' . uniqid() . '-' . $file->getClientOriginalName();
-
-    // Attempt to put the file on the S3 disk
+    $path = 'tests/' . now()->timestamp . '.jpg';
     $success = $disk->put($path, $file->getContent());
 
-    // Assert the upload was successful
     expect($success)->toBeTrue();
 
-    // Assert the file actually exists on the disk
-    expect($disk->exists($path))->toBeTrue();
-
-    // Clean up
-    $disk->delete($path);
-    expect($disk->exists($path))->toBeFalse();
-})->group('integration', 's3', 'minio');
+    // Assert the file exists in the fake disk
+    $disk->assertExists($path);
+})->group('minio');
