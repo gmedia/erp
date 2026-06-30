@@ -1,3 +1,70 @@
+# AGENT WORKFLOW
+
+> Rules the agent MUST follow without exception. Violation = invalid session.
+
+## Core Rules
+
+1. **NEVER wait for CI/CD.** Push and move on.
+2. **One task = one branch** (`feat/*` or `fix/*`) = **one MR/PR.**
+3. **Every MR must have a handoff** (what was done, files changed, next steps).
+4. **Session start: process open MRs first** — merge if green, fix if red.
+
+## Workflow
+
+```
+1. git checkout -b feat/<desc>   # from latest main
+2. Incremental commits            # feat:, fix:, refactor:, test:
+3. git push && gh pr create       # with handoff description
+4. Move to next task immediately  # DO NOT wait for CI
+```
+
+## Session Start Checklist
+
+```bash
+gh pr list --state open     # Find pending MRs
+# CI green → squash merge → delete branch → pull main
+# CI red   → checkout branch → fix → push
+```
+
+## Commit Prefixes
+
+| Prefix | When |
+|--------|------|
+| `feat:` | New feature or behavior |
+| `fix:` | Bug fix |
+| `refactor:` | Code restructure, no behavior change |
+| `test:` | Test additions or fixes |
+| `docs:` | Documentation only |
+| `chore:` | Build, CI, dependencies |
+
+## MR Handoff Template
+
+```
+## What was done
+- [brief bullet list of changes]
+
+## Files changed
+- `path/to/file` — [what and why]
+
+## Verification
+- [ ] sail test --group {slug}
+- [ ] sail bin duster fix
+- [ ] npm run types
+
+## Next steps
+- [optional follow-up]
+```
+
+## Anti-Patterns
+
+- ❌ Working directly on `main`
+- ❌ Polling CI or waiting for pipelines
+- ❌ Multiple unrelated changes in one MR
+- ❌ Empty MR descriptions
+- ❌ Force-push or rebase shared branches
+
+---
+
 # PROJECT KNOWLEDGE BASE
 
 **Generated:** 2025-05-02
