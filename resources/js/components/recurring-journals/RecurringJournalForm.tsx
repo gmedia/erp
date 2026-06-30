@@ -104,10 +104,20 @@ const LineActions = memo<{
 }>(function LineActions({ index, onEditLine, onRemoveLine }) {
     return (
         <>
-            <Button variant="ghost" size="icon" onClick={() => onEditLine(index)} title="Edit line">
+            <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onEditLine(index)}
+                title="Edit line"
+            >
                 <Pencil className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => onRemoveLine(index)} title="Remove line">
+            <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onRemoveLine(index)}
+                title="Remove line"
+            >
                 <Trash2 className="h-4 w-4" />
             </Button>
         </>
@@ -325,7 +335,13 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                                     totalDebit={totalDebit}
                                     totalCredit={totalCredit}
                                     emptyMessage='No lines added yet. Click "Add Line" to start.'
-                                    actions={(index) => <LineActions index={index} onEditLine={handleEditLine} onRemoveLine={handleRemoveLine} />}
+                                    actions={(index) => (
+                                        <LineActions
+                                            index={index}
+                                            onEditLine={handleEditLine}
+                                            onRemoveLine={handleRemoveLine}
+                                        />
+                                    )}
                                 />
                             </div>
                         </div>
