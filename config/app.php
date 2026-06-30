@@ -162,4 +162,17 @@ return [
 
     'supported_transaction_currencies' => ['IDR'],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Rate Limiting Override
+    |--------------------------------------------------------------------------
+    |
+    | Set to true (via DISABLE_RATE_LIMITING env var) to bypass all rate
+    | limiting. Primarily used during E2E testing to prevent 429 errors
+    | when Playwright runs parallel tests against the dev server.
+    |
+    */
+
+    'disable_rate_limiting' => env('DISABLE_RATE_LIMITING', false),
+
 ];

@@ -90,7 +90,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // Disable rate limiting for E2E testing environment to prevent 429 errors
         // when Playwright runs parallel tests against the dev server.
-        if (app()->environment('testing') || env('DISABLE_RATE_LIMITING')) {
+        if (app()->environment('testing') || config('app.disable_rate_limiting')) {
             return;
         }
 
