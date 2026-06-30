@@ -718,11 +718,10 @@ export const BankReconciliationWorkspace =
                                                             })()}
                                                         </TableCell>
                                                         <TableCell className="text-right">
-                                                    {loadingItemId === item.id
-                                                        ? (
-                                                            <Loader2 className="ml-auto size-4 animate-spin text-muted-foreground" />
-                                                        )
-                                                        : item.is_reconciled ? (
+                                                            {loadingItemId ===
+                                                            item.id ? (
+                                                                <Loader2 className="ml-auto size-4 animate-spin text-muted-foreground" />
+                                                            ) : item.is_reconciled ? (
                                                                 <Button
                                                                     variant="ghost"
                                                                     size="sm"

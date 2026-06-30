@@ -51,35 +51,35 @@ class BackfillApprovalRequestBranch extends Command
                 ->with(array_merge(['approvable'], $relation))
                 ->chunkById($chunkSize,
                     function ($requests) use ($registry, &$stats, &$totalUpdated, $approvableType, $dryRun): void {
-                    foreach ($requests as $request) {
-                        $stats[$approvableType]['matched']++;
+                        foreach ($requests as $request) {
+                            $stats[$approvableType]['matched']++;
 
-                        $approvable = $request->approvable;
+                            $approvable = $request->approvable;
 
-                        if (! $approvable instanceof Model) {
-                            $stats[$approvableType]['unresolved']++;
+                            if (! $approvable instanceof Model) {
+                                $stats[$approvableType]['unresolved']++;
 
-                            continue;
+                                continue;
+                            }
+
+                            $branchId = $registry->resolve($approvable);
+
+                            if ($branchId === null) {
+                                $stats[$approvableType]['unresolved']++;
+
+                                continue;
+                            }
+
+                            $stats[$approvableType]['resolved']++;
+
+                            if (! $dryRun) {
+                                $request->branch_id = $branchId;
+                                $request->save();
+                            }
+
+                            $totalUpdated++;
                         }
-
-                        $branchId = $registry->resolve($approvable);
-
-                        if ($branchId === null) {
-                            $stats[$approvableType]['unresolved']++;
-
-                            continue;
-                        }
-
-                        $stats[$approvableType]['resolved']++;
-
-                        if (! $dryRun) {
-                            $request->branch_id = $branchId;
-                            $request->save();
-                        }
-
-                        $totalUpdated++;
-                    }
-                });
+                    });
         }
 
         $this->renderSummary($stats, $dryRun);

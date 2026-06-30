@@ -15,10 +15,7 @@ import { type ColumnDef } from '@tanstack/react-table';
 type BudgetBadgeVariant = 'default' | 'secondary' | 'outline' | 'destructive';
 
 function getBudgetTypeBadgeVariant(type: string) {
-    const variants: Record<
-        string,
-        BudgetBadgeVariant
-    > = {
+    const variants: Record<string, BudgetBadgeVariant> = {
         operational: 'default',
         capital: 'secondary',
         project: 'outline',

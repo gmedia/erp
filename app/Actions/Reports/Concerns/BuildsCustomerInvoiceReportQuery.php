@@ -20,8 +20,7 @@ trait BuildsCustomerInvoiceReportQuery
     protected function buildBaseCustomerInvoiceQuery(
         array $additionalColumns = [],
         array $additionalBindings = [],
-    ): Builder
-    {
+    ): Builder {
         $baseColumns = [
             'ci.id as customer_invoice_id',
             'ci.invoice_number',
