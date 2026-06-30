@@ -12,18 +12,23 @@
 ## Workflow
 
 ```
-1. git checkout -b feat/<desc>   # from latest main
-2. Incremental commits            # feat:, fix:, refactor:, test:
-3. git push && gh pr create       # with handoff description
-4. Move to next task immediately  # DO NOT wait for CI
+1. rtk git checkout -b feat/<desc>   # from latest main
+2. Incremental commits                # feat:, fix:, refactor:, test:
+3. rtk git push && gh pr create       # with handoff description
+4. Move to next task immediately      # DO NOT wait for CI
 ```
+
+> Use `rtk` wrapper for all git operations. `rtk` ensures the correct environment and SSH keys are configured. Never use raw `git` directly — always `rtk git <command>`.
 
 ## Session Start Checklist
 
 ```bash
-gh pr list --state open     # Find pending MRs
+gh pr list --state open --assignee @me    # Find your pending MRs
+gh pr checks <id>                          # Check CI status
 # CI green → squash merge → delete branch → pull main
+gh pr merge <id> --squash --delete-branch && rtk git pull --ff-only
 # CI red   → checkout branch → fix → push
+gh pr view <id> --json headRefName         # Get branch name
 ```
 
 ## Commit Prefixes
@@ -50,6 +55,7 @@ gh pr list --state open     # Find pending MRs
 - [ ] sail test --group {slug}
 - [ ] sail bin duster fix
 - [ ] npm run types
+- [ ] CI passing (gh pr checks)
 
 ## Next steps
 - [optional follow-up]
@@ -62,6 +68,7 @@ gh pr list --state open     # Find pending MRs
 - ❌ Multiple unrelated changes in one MR
 - ❌ Empty MR descriptions
 - ❌ Force-push or rebase shared branches
+- ❌ Using raw `git` directly — always use `rtk git`
 
 ---
 
