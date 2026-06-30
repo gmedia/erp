@@ -718,10 +718,11 @@ export const BankReconciliationWorkspace =
                                                             })()}
                                                         </TableCell>
                                                         <TableCell className="text-right">
-                                                            {loadingItemId ===
-                                                            item.id ? (
-                                                                <Loader2 className="ml-auto size-4 animate-spin text-muted-foreground" />
-                                                            ) : item.is_reconciled ? (
+                                                    {loadingItemId === item.id
+                                                        ? (
+                                                            <Loader2 className="ml-auto size-4 animate-spin text-muted-foreground" />
+                                                        )
+                                                        : item.is_reconciled ? (
                                                                 <Button
                                                                     variant="ghost"
                                                                     size="sm"
@@ -815,25 +816,27 @@ export const BankReconciliationWorkspace =
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {jeLoading ? (
-                                                <TableRow>
-                                                    <TableCell
-                                                        colSpan={7}
-                                                        className="py-10 text-center"
-                                                    >
-                                                        <Loader2 className="mx-auto size-5 animate-spin text-muted-foreground" />
-                                                    </TableCell>
-                                                </TableRow>
-                                            ) : jeLines.length === 0 ? (
-                                                <TableRow>
-                                                    <TableCell
-                                                        colSpan={7}
-                                                        className="py-10 text-center text-muted-foreground"
-                                                    >
-                                                        No unmatched journal
-                                                        entry lines found.
-                                                    </TableCell>
-                                                </TableRow>
+                                            {jeLines.length === 0 ? (
+                                                jeLoading ? (
+                                                    <TableRow>
+                                                        <TableCell
+                                                            colSpan={7}
+                                                            className="py-10 text-center"
+                                                        >
+                                                            <Loader2 className="mx-auto size-5 animate-spin text-muted-foreground" />
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ) : (
+                                                    <TableRow>
+                                                        <TableCell
+                                                            colSpan={7}
+                                                            className="py-10 text-center text-muted-foreground"
+                                                        >
+                                                            No unmatched journal
+                                                            entry lines found.
+                                                        </TableCell>
+                                                    </TableRow>
+                                                )
                                             ) : (
                                                 jeLines.map((line) => (
                                                     <TableRow key={line.id}>

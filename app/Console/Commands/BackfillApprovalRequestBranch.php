@@ -12,12 +12,15 @@ class BackfillApprovalRequestBranch extends Command
     /**
      * @var string
      */
-    protected $signature = 'approval-requests:backfill-branch {--dry-run : Report what would change without writing} {--chunk=500 : Number of rows processed per batch}';
+    protected $signature = 'approval-requests:backfill-branch'
+        . ' {--dry-run : Report what would change without writing}'
+        . ' {--chunk=500 : Number of rows processed per batch}';
 
     /**
      * @var string
      */
-    protected $description = 'Backfill approval_requests.branch_id from each request polymorphic approvable. Idempotent: only touches rows where branch_id is null.';
+    protected $description = 'Backfill approval_requests.branch_id from each request'
+        . ' polymorphic approvable. Idempotent: only touches rows where branch_id is null.';
 
     public function handle(BranchResolverRegistry $registry): int
     {
@@ -46,7 +49,8 @@ class BackfillApprovalRequestBranch extends Command
                 ->whereNull('branch_id')
                 ->where('approvable_type', $approvableType)
                 ->with(array_merge(['approvable'], $relation))
-                ->chunkById($chunkSize, function ($requests) use ($registry, &$stats, &$totalUpdated, $approvableType, $dryRun): void {
+                ->chunkById($chunkSize,
+                    function ($requests) use ($registry, &$stats, &$totalUpdated, $approvableType, $dryRun): void {
                     foreach ($requests as $request) {
                         $stats[$approvableType]['matched']++;
 

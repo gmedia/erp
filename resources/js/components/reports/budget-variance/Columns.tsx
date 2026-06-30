@@ -92,7 +92,7 @@ export const budgetVarianceColumns: ColumnDef<BudgetVarianceItem>[] = [
         ...createSortingHeader('Variance %'),
         cell: ({ row }) => {
             const val = row.getValue('variance_percent') as number | null;
-            return val !== null ? `${val.toFixed(2)}%` : '-';
+            return val === null ? '-' : `${val.toFixed(2)}%`;
         },
     },
     {

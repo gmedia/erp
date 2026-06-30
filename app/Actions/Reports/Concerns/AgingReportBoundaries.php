@@ -59,15 +59,21 @@ trait AgingReportBoundaries
      */
     protected function agingBucketSelectSqlWithAliases(string $tableAlias, array $aliases): string
     {
-        return "CASE WHEN {$tableAlias}.due_date >= ? THEN {$tableAlias}.amount_due ELSE 0 END as {$aliases['current']},
-        CASE WHEN {$tableAlias}.due_date BETWEEN ? AND ? THEN {$tableAlias}.amount_due ELSE 0 END as {$aliases['1_30']},
-        CASE WHEN {$tableAlias}.due_date BETWEEN ? AND ? THEN {$tableAlias}.amount_due ELSE 0 END as {$aliases['31_60']},
-        CASE WHEN {$tableAlias}.due_date BETWEEN ? AND ? THEN {$tableAlias}.amount_due ELSE 0 END as {$aliases['61_90']},
-        CASE WHEN {$tableAlias}.due_date < ? THEN {$tableAlias}.amount_due ELSE 0 END as {$aliases['over_90']}";
+        $aCurrent = $aliases['current'];
+        $a1_30 = $aliases['1_30'];
+        $a31_60 = $aliases['31_60'];
+        $a61_90 = $aliases['61_90'];
+        $aOver90 = $aliases['over_90'];
+
+        return "CASE WHEN {$tableAlias}.due_date >= ? THEN {$tableAlias}.amount_due ELSE 0 END as {$aCurrent},
+        CASE WHEN {$tableAlias}.due_date BETWEEN ? AND ? THEN {$tableAlias}.amount_due ELSE 0 END as {$a1_30},
+        CASE WHEN {$tableAlias}.due_date BETWEEN ? AND ? THEN {$tableAlias}.amount_due ELSE 0 END as {$a31_60},
+        CASE WHEN {$tableAlias}.due_date BETWEEN ? AND ? THEN {$tableAlias}.amount_due ELSE 0 END as {$a61_90},
+        CASE WHEN {$tableAlias}.due_date < ? THEN {$tableAlias}.amount_due ELSE 0 END as {$aOver90}";
     }
 
     /**
-     * @param  array{today: string, d1: string, d30: string, d31: string, d60: string, d61: string, d90: string}  $boundaries
+     * @param  array{today: string, d1: string, d30: string, d31: string, d60: string, d61: string, d90: string} $boundaries
      * @return list<string>
      */
     protected function agingBucketBindings(array $boundaries): array

@@ -50,12 +50,22 @@ class PostDepreciationToJournalAction
                 $accumulatedKey = $accumulatedAccount . '-' . $branchId;
 
                 if (! isset($summary[$expenseKey])) {
-                    $summary[$expenseKey] = ['account_id' => $expenseAccount, 'branch_id' => $branchId, 'debit' => 0, 'credit' => 0];
+                    $summary[$expenseKey] = [
+                        'account_id' => $expenseAccount,
+                        'branch_id' => $branchId,
+                        'debit' => 0,
+                        'credit' => 0,
+                    ];
                 }
                 $summary[$expenseKey]['debit'] += $line->amount;
 
                 if (! isset($summary[$accumulatedKey])) {
-                    $summary[$accumulatedKey] = ['account_id' => $accumulatedAccount, 'branch_id' => $branchId, 'debit' => 0, 'credit' => 0];
+                    $summary[$accumulatedKey] = [
+                        'account_id' => $accumulatedAccount,
+                        'branch_id' => $branchId,
+                        'debit' => 0,
+                        'credit' => 0,
+                    ];
                 }
                 $summary[$accumulatedKey]['credit'] += $line->amount;
 

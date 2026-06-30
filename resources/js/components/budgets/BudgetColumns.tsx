@@ -12,10 +12,12 @@ import {
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { type ColumnDef } from '@tanstack/react-table';
 
+type BudgetBadgeVariant = 'default' | 'secondary' | 'outline' | 'destructive';
+
 function getBudgetTypeBadgeVariant(type: string) {
     const variants: Record<
         string,
-        'default' | 'secondary' | 'outline' | 'destructive'
+        BudgetBadgeVariant
     > = {
         operational: 'default',
         capital: 'secondary',

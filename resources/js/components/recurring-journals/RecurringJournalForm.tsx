@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Pencil, Plus, Trash } from 'lucide-react';
-import { memo, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import {
     useFieldArray,
     useForm,
@@ -158,6 +158,32 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
 
         const handleRemoveLine = (index: number) => remove(index);
 
+        const renderLineActions = useCallback(
+            (index: number) => (
+                <div className="flex items-center gap-1">
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEditLine(index)}
+                        aria-label="Edit line"
+                    >
+                        <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleRemoveLine(index)}
+                        aria-label="Delete line"
+                    >
+                        <Trash className="h-4 w-4" />
+                    </Button>
+                </div>
+            ),
+            [handleEditLine],
+        );
+
         const totalDebit = useMemo(
             () =>
                 lines?.reduce(
@@ -308,30 +334,7 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                                     totalDebit={totalDebit}
                                     totalCredit={totalCredit}
                                     emptyMessage='No lines added yet. Click "Add Line" to start.'
-                                    actions={(index) => (
-                                        <div className="flex items-center gap-2">
-                                            <Button
-                                                type="button"
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() =>
-                                                    handleEditLine(index)
-                                                }
-                                            >
-                                                <Pencil className="h-4 w-4" />
-                                            </Button>
-                                            <Button
-                                                type="button"
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() =>
-                                                    handleRemoveLine(index)
-                                                }
-                                            >
-                                                <Trash className="h-4 w-4 text-red-500" />
-                                            </Button>
-                                        </div>
-                                    )}
+                                    actions={renderLineActions}
                                 />
                             </div>
                         </div>

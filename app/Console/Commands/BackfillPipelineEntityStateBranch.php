@@ -12,12 +12,15 @@ class BackfillPipelineEntityStateBranch extends Command
     /**
      * @var string
      */
-    protected $signature = 'pipeline-states:backfill-branch {--dry-run : Report what would change without writing} {--chunk=500 : Number of rows processed per batch}';
+    protected $signature = 'pipeline-states:backfill-branch'
+        . ' {--dry-run : Report what would change without writing}'
+        . ' {--chunk=500 : Number of rows processed per batch}';
 
     /**
      * @var string
      */
-    protected $description = 'Backfill pipeline_entity_states.branch_id from each row polymorphic entity. Idempotent: only touches rows where branch_id is null.';
+    protected $description = 'Backfill pipeline_entity_states.branch_id from each row'
+        . ' polymorphic entity. Idempotent: only touches rows where branch_id is null.';
 
     public function handle(BranchResolverRegistry $registry): int
     {
@@ -46,7 +49,8 @@ class BackfillPipelineEntityStateBranch extends Command
                 ->whereNull('branch_id')
                 ->where('entity_type', $entityType)
                 ->with(array_merge(['entity'], $relation))
-                ->chunkById($chunkSize, function ($states) use ($registry, &$stats, &$totalUpdated, $entityType, $dryRun): void {
+                ->chunkById($chunkSize,
+                    function ($states) use ($registry, &$stats, &$totalUpdated, $entityType, $dryRun): void {
                     foreach ($states as $state) {
                         $stats[$entityType]['matched']++;
 

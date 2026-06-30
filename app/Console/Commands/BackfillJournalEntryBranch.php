@@ -12,12 +12,15 @@ class BackfillJournalEntryBranch extends Command
     /**
      * @var string
      */
-    protected $signature = 'journals:backfill-branch {--dry-run : Report what would change without writing} {--chunk=500 : Number of rows processed per batch}';
+    protected $signature = 'journals:backfill-branch'
+        . ' {--dry-run : Report what would change without writing}'
+        . ' {--chunk=500 : Number of rows processed per batch}';
 
     /**
      * @var string
      */
-    protected $description = 'Backfill journal_entries.branch_id from each entry polymorphic source. Idempotent: only touches rows where branch_id is null.';
+    protected $description = 'Backfill journal_entries.branch_id from each entry'
+        . ' polymorphic source. Idempotent: only touches rows where branch_id is null.';
 
     public function handle(BranchResolverRegistry $registry): int
     {
@@ -47,7 +50,8 @@ class BackfillJournalEntryBranch extends Command
                 ->where('source_type', $sourceType)
                 ->whereNotNull('source_id')
                 ->with(array_merge(['source'], $relation))
-                ->chunkById($chunkSize, function ($entries) use ($registry, &$stats, &$totalUpdated, $sourceType, $dryRun): void {
+                ->chunkById($chunkSize,
+                    function ($entries) use ($registry, &$stats, &$totalUpdated, $sourceType, $dryRun): void {
                     foreach ($entries as $entry) {
                         $stats[$sourceType]['matched']++;
 

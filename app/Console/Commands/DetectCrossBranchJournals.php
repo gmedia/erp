@@ -18,12 +18,16 @@ class DetectCrossBranchJournals extends Command
     /**
      * @var string
      */
-    protected $signature = 'journals:detect-cross-branch {--posted-only : Count only posted journal entries} {--limit=20 : Max number of sample entry numbers to list}';
+    protected $signature = 'journals:detect-cross-branch'
+        . ' {--posted-only : Count only posted journal entries}'
+        . ' {--limit=20 : Max number of sample entry numbers to list}';
 
     /**
      * @var string
      */
-    protected $description = 'Report how many journal entries are economically multi-branch and how many inter-branch clearing lines exist. Read-only gate for the deferred retro-correction work (full 2b PR8).';
+    protected $description = 'Report how many journal entries are economically multi-branch'
+        . ' and how many inter-branch clearing lines exist.'
+        . ' Read-only gate for the deferred retro-correction work (full 2b PR8).';
 
     public function handle(): int
     {
@@ -98,7 +102,15 @@ class DetectCrossBranchJournals extends Command
                 'null_branch_lines' => $nullBranchLineCount,
             ]);
 
-            withScope(function (Scope $scope) use ($postedOnly, $multiBranchCount, $clearingEntryCount, $clearingLineCount, $nullBranchLineCount): void {
+            withScope(function (
+                Scope $scope,
+            ) use (
+                $postedOnly,
+                $multiBranchCount,
+                $clearingEntryCount,
+                $clearingLineCount,
+                $nullBranchLineCount,
+            ): void {
                 $scope->setContext('cross_branch_monitor', [
                     'scope' => $postedOnly ? 'posted' : 'all',
                     'multi_branch_entries' => $multiBranchCount,
@@ -138,13 +150,16 @@ class DetectCrossBranchJournals extends Command
         int $clearingLineCount,
         int $nullBranchLineCount,
     ): void {
-        $this->info($postedOnly ? 'Scope: posted journal entries only.' : 'Scope: all journal entries (draft + posted).');
+        $this->info($postedOnly
+            ? 'Scope: posted journal entries only.'
+            : 'Scope: all journal entries (draft + posted).');
 
         $this->table(
             ['Metric', 'Count'],
             [
                 ['Economically multi-branch entries', $multiBranchCount],
-                ['Entries with clearing lines (' . InterBranchClearingService::CLEARING_CODE . ')', $clearingEntryCount],
+                ['Entries with clearing lines ('
+                    . InterBranchClearingService::CLEARING_CODE . ')', $clearingEntryCount],
                 ['Total clearing lines', $clearingLineCount],
                 ['Null-branch lines (company-wide)', $nullBranchLineCount],
             ],

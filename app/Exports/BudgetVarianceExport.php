@@ -26,7 +26,10 @@ class BudgetVarianceExport implements FromCollection, ShouldAutoSize, WithHeadin
      */
     public function headings(): array
     {
-        return ['Account Code', 'Account Name', 'Type', 'Period Start', 'Period End', 'Allocated', 'Actual', 'Available', 'Variance %', 'Status'];
+        return [
+            'Account Code', 'Account Name', 'Type', 'Period Start', 'Period End',
+            'Allocated', 'Actual', 'Available', 'Variance %', 'Status',
+        ];
     }
 
     /**

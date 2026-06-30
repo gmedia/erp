@@ -63,6 +63,10 @@ function CalendarWeekNumber({
   )
 }
 
+type CalendarProps = React.ComponentProps<typeof DayPicker> & {
+    buttonVariant?: React.ComponentProps<typeof Button>["variant"]
+};
+
 function Calendar({
   className,
   classNames,
@@ -72,11 +76,7 @@ function Calendar({
   formatters,
   components,
   ...props
-}: Readonly<
-  React.ComponentProps<typeof DayPicker> & {
-    buttonVariant?: React.ComponentProps<typeof Button>["variant"]
-  }
->) {
+}: Readonly<CalendarProps>) {
   const defaultClassNames = getDefaultClassNames()
 
   return (
