@@ -25,6 +25,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->bootRateLimiters();
+
         View::composer('app', function ($view) {
             try {
                 $companyName = cache()->remember('app.company_name', 3600, function () {
@@ -39,7 +41,6 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->bootMailSettings();
-        $this->bootRateLimiters();
         $this->enforceProductionDebugMode();
     }
 
@@ -88,25 +89,33 @@ class AppServiceProvider extends ServiceProvider
      */
     protected function bootRateLimiters(): void
     {
-        // Disable rate limiting for E2E testing environment to prevent 429 errors
-        // when Playwright runs parallel tests against the dev server.
-        if (app()->environment('testing') || config('app.disable_rate_limiting')) {
-            return;
-        }
+        $isTesting = app()->environment('testing') || config('app.disable_rate_limiting');
 
-        RateLimiter::for('imports', function (Request $request) {
+        RateLimiter::for('imports', function (Request $request) use ($isTesting) {
+            if ($isTesting) {
+                return Limit::none();
+            }
+
             return Limit::perMinute(10)->by(
                 optional($request->user())->id ?: $request->ip()
             );
         });
 
-        RateLimiter::for('exports', function (Request $request) {
+        RateLimiter::for('exports', function (Request $request) use ($isTesting) {
+            if ($isTesting) {
+                return Limit::none();
+            }
+
             return Limit::perMinute(10)->by(
                 optional($request->user())->id ?: $request->ip()
             );
         });
 
-        RateLimiter::for('api', function (Request $request) {
+        RateLimiter::for('api', function (Request $request) use ($isTesting) {
+            if ($isTesting) {
+                return Limit::none();
+            }
+
             return Limit::perMinute(60)->by(
                 optional($request->user())->id ?: $request->ip()
             );
