@@ -14,8 +14,10 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 
 // Extend the base DataTable props with additional required props for CRUD operations
-export interface DataTableProps<T, FilterType extends FilterState = FilterState>
-    extends Omit<BaseDataTableProps<T>, 'onFilterChange' | 'filters'> {
+export interface DataTableProps<
+    T,
+    FilterType extends FilterState = FilterState,
+> extends Omit<BaseDataTableProps<T>, 'onFilterChange' | 'filters'> {
     filters: FilterType;
     onFilterChange: (filters: Partial<FilterType>) => void;
 }

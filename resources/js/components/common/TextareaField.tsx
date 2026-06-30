@@ -10,8 +10,10 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { type ReactNode } from 'react';
 
-interface TextareaFieldProps
-    extends Omit<React.ComponentProps<'textarea'>, 'name'> {
+interface TextareaFieldProps extends Omit<
+    React.ComponentProps<'textarea'>,
+    'name'
+> {
     name: string;
     label: string;
     placeholder?: string;

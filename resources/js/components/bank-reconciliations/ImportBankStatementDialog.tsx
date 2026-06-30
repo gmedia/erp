@@ -155,10 +155,10 @@ export const ImportBankStatementDialog = memo<ImportBankStatementDialogProps>(
         const isMappingValid = () =>
             Boolean(
                 mapping.date &&
-                    mapping.description &&
-                    (amountMode === 'single'
-                        ? mapping.amount
-                        : mapping.debit && mapping.credit),
+                mapping.description &&
+                (amountMode === 'single'
+                    ? mapping.amount
+                    : mapping.debit && mapping.credit),
             );
 
         const buildImportFormData = (selectedFile: File) => {

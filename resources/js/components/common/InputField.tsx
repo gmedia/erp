@@ -11,8 +11,10 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { type ReactNode } from 'react';
 
-interface InputFieldProps
-    extends Omit<React.ComponentProps<'input'>, 'name' | 'prefix'> {
+interface InputFieldProps extends Omit<
+    React.ComponentProps<'input'>,
+    'name' | 'prefix'
+> {
     name: string;
     label: string;
     placeholder?: string;

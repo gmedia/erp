@@ -206,8 +206,7 @@ export function formatDateByRegionalSettings(
     return formatDatePattern(date, resolvedFormat, locale);
 }
 
-export interface RegionalDateTimeFormatOptions
-    extends RegionalDateFormatOptions {
+export interface RegionalDateTimeFormatOptions extends RegionalDateFormatOptions {
     hour12?: boolean;
     withSeconds?: boolean;
 }

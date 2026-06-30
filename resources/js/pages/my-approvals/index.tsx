@@ -208,7 +208,8 @@ export default function MyApprovalsPage() {
                                                 {step.request.submitted_at
                                                     ? formatDistanceToNow(
                                                           new Date(
-                                                              step.request.submitted_at,
+                                                              step.request
+                                                                  .submitted_at,
                                                           ),
                                                           { addSuffix: true },
                                                       )

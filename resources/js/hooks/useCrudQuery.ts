@@ -35,8 +35,10 @@ export interface UseCrudQueryOptions {
     enabled?: boolean;
 }
 
-export interface UseCrudQueryReturn<Entity>
-    extends Omit<UseQueryResult<ApiResponse<Entity>, Error>, 'data'> {
+export interface UseCrudQueryReturn<Entity> extends Omit<
+    UseQueryResult<ApiResponse<Entity>, Error>,
+    'data'
+> {
     data: Entity[];
     meta: ApiResponse<Entity>['meta'];
 }

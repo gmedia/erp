@@ -220,8 +220,7 @@ export interface RegionalNumberFormatOptions {
     useGrouping?: boolean;
 }
 
-export interface RegionalCurrencyFormatOptions
-    extends RegionalNumberFormatOptions {
+export interface RegionalCurrencyFormatOptions extends RegionalNumberFormatOptions {
     currency?: string;
     currencyDisplay?: Intl.NumberFormatOptions['currencyDisplay'];
 }
