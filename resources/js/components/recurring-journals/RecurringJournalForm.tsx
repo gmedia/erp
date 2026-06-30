@@ -1,8 +1,8 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Pencil, Plus, Trash } from 'lucide-react';
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import {
     useFieldArray,
     useForm,
@@ -97,6 +97,23 @@ const getRecurringJournalFormDefaults = (
     };
 };
 
+const LineActions = memo<{
+    index: number;
+    onEditLine: (index: number) => void;
+    onRemoveLine: (index: number) => void;
+}>(function LineActions({ index, onEditLine, onRemoveLine }) {
+    return (
+        <>
+            <Button variant="ghost" size="icon" onClick={() => onEditLine(index)} title="Edit line">
+                <Pencil className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={() => onRemoveLine(index)} title="Remove line">
+                <Trash2 className="h-4 w-4" />
+            </Button>
+        </>
+    );
+});
+
 export const RecurringJournalForm = memo<RecurringJournalFormProps>(
     function RecurringJournalForm({
         open,
@@ -157,32 +174,6 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
         };
 
         const handleRemoveLine = (index: number) => remove(index);
-
-        const renderLineActions = useCallback(
-            (index: number) => (
-                <div className="flex items-center gap-1">
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleEditLine(index)}
-                        aria-label="Edit line"
-                    >
-                        <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleRemoveLine(index)}
-                        aria-label="Delete line"
-                    >
-                        <Trash className="h-4 w-4" />
-                    </Button>
-                </div>
-            ),
-            [handleEditLine],
-        );
 
         const totalDebit = useMemo(
             () =>
@@ -334,7 +325,7 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                                     totalDebit={totalDebit}
                                     totalCredit={totalCredit}
                                     emptyMessage='No lines added yet. Click "Add Line" to start.'
-                                    actions={renderLineActions}
+                                    actions={(index) => <LineActions index={index} onEditLine={handleEditLine} onRemoveLine={handleRemoveLine} />}
                                 />
                             </div>
                         </div>
