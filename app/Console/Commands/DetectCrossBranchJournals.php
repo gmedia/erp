@@ -20,7 +20,8 @@ class DetectCrossBranchJournals extends Command
      */
     protected $signature = 'journals:detect-cross-branch'
         . ' {--posted-only : Count only posted journal entries}'
-        . ' {--limit=20 : Max number of sample entry numbers to list}';
+        . ' {--limit=20 : Max number of sample entry numbers to list}'
+        . ' {--source-type= : Filter by a specific source_type (FQCN)}';
 
     /**
      * @var string
@@ -119,10 +120,10 @@ class DetectCrossBranchJournals extends Command
                     'null_branch_lines' => $nullBranchLineCount,
                 ]);
 
-                captureMessage(
-                    sprintf('Cross-branch journals detected by scheduled monitor: %d multi-branch entries.', $multiBranchCount),
-                    Severity::warning(),
-                );
+                captureMessage(sprintf(
+                    'Cross-branch journals detected by scheduled monitor: %d multi-branch entries.',
+                    $multiBranchCount,
+                ), Severity::warning());
             });
         }
 

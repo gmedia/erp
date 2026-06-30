@@ -169,7 +169,7 @@ class FinancialReportService
         $comparisonNetIncome = 0;
         if ($comparisonFiscalYearId && $comparisonCoaVersion) {
             $comparisonNetIncome = $this->calculateNetIncome(
-                $comparisonFiscalYearId, $comparisonCoaVersion->id, $branchId,
+                $comparisonFiscalYearId, $comparisonCoaVersion->id, $branchId
             );
         }
 

@@ -14,7 +14,8 @@ class BackfillApprovalRequestBranch extends Command
      */
     protected $signature = 'approval-requests:backfill-branch'
         . ' {--dry-run : Report what would change without writing}'
-        . ' {--chunk=500 : Number of rows processed per batch}';
+        . ' {--chunk=500 : Number of rows processed per batch}'
+        . ' {--source-type= : Filter by a specific source_type (FQCN)}';
 
     /**
      * @var string
