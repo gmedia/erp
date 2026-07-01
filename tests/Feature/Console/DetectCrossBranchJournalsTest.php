@@ -46,7 +46,7 @@ test('detects zero multi-branch journals on single-branch data', function () {
     ]);
 
     $this->artisan('journals:detect-cross-branch')
-        ->expectsOutputToContain('No economically multi-branch journals detected')
+        ->expectsOutputToContain('No multi-branch journals. Retro-correction (PR8) NOT warranted.')
         ->assertSuccessful();
 });
 
@@ -78,7 +78,7 @@ test('posted-only scope ignores draft cross-branch journals', function () {
     ]);
 
     $this->artisan('journals:detect-cross-branch --posted-only')
-        ->expectsOutputToContain('No economically multi-branch journals detected')
+        ->expectsOutputToContain('No multi-branch journals. Retro-correction (PR8) NOT warranted.')
         ->assertSuccessful();
 });
 
