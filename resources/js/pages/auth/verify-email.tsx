@@ -21,7 +21,7 @@ export default function VerifyEmail({
     const [status, setStatus] = useState(initialStatus);
     const [processing, setProcessing] = useState(false);
 
-    const handleResend = async (e: React.FormEvent) => {
+    const handleResend = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setProcessing(true);
 

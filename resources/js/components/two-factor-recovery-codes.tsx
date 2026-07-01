@@ -57,7 +57,7 @@ export default function TwoFactorRecoveryCodes({
         }
     }, [recoveryCodesList.length, fetchRecoveryCodes]);
 
-    const handleRegenerate = async (e: React.FormEvent) => {
+    const handleRegenerate = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setProcessing(true);
         try {
