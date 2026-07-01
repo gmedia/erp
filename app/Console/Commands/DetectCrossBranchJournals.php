@@ -19,16 +19,16 @@ class DetectCrossBranchJournals extends Command
      * @var string
      */
     protected $signature = 'journals:detect-cross-branch'
-        . ' {--posted-only : Count only posted journal entries}'
-        . ' {--limit=20 : Max number of sample entry numbers to list}'
-        . ' {--source-type= : Filter by a specific source_type (FQCN)}';
+        . ' {--posted-only : Only posted entries}'
+        . ' {--limit=20 : Max sample entries to list}'
+        . ' {--source-type= : Filter by source_type (FQCN)}';
 
     /**
      * @var string
      */
-    protected $description = 'Report how many journal entries are economically multi-branch'
-        . ' and how many inter-branch clearing lines exist.'
-        . ' Read-only gate for the deferred retro-correction work (full 2b PR8).';
+    protected $description = 'Report economically multi-branch journal entries'
+        . ' and inter-branch clearing lines.'
+        . ' Read-only gate for deferred retro-correction (PR8).';
 
     public function handle(): int
     {
@@ -88,10 +88,10 @@ class DetectCrossBranchJournals extends Command
 
         $this->line('');
         if ($multiBranchCount === 0) {
-            $this->info('No economically multi-branch journals detected. Retro-correction (PR8) is NOT warranted.');
+            $this->info('No multi-branch journals. Retro-correction (PR8) NOT warranted.');
         } else {
             $this->warn(sprintf(
-                '%d multi-branch journal entries detected. Evaluate whether retro-correction (PR8) is now warranted.',
+                '%d multi-branch entries. Evaluate whether retro-correction (PR8) is warranted.',
                 $multiBranchCount,
             ));
 

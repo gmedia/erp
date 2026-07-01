@@ -65,11 +65,16 @@ trait AgingReportBoundaries
         $a61_90 = $aliases['61_90'];
         $aOver90 = $aliases['over_90'];
 
-        return "CASE WHEN {$tableAlias}.due_date >= ? THEN {$tableAlias}.amount_due ELSE 0 END as {$aCurrent},
-        CASE WHEN {$tableAlias}.due_date BETWEEN ? AND ? THEN {$tableAlias}.amount_due ELSE 0 END as {$a1_30},
-        CASE WHEN {$tableAlias}.due_date BETWEEN ? AND ? THEN {$tableAlias}.amount_due ELSE 0 END as {$a31_60},
-        CASE WHEN {$tableAlias}.due_date BETWEEN ? AND ? THEN {$tableAlias}.amount_due ELSE 0 END as {$a61_90},
-        CASE WHEN {$tableAlias}.due_date < ? THEN {$tableAlias}.amount_due ELSE 0 END as {$aOver90}";
+        return "CASE WHEN {$tableAlias}.due_date >= ?"
+            . " THEN {$tableAlias}.amount_due ELSE 0 END as {$aCurrent},"
+            . " CASE WHEN {$tableAlias}.due_date BETWEEN ? AND ?"
+            . " THEN {$tableAlias}.amount_due ELSE 0 END as {$a1_30},"
+            . " CASE WHEN {$tableAlias}.due_date BETWEEN ? AND ?"
+            . " THEN {$tableAlias}.amount_due ELSE 0 END as {$a31_60},"
+            . " CASE WHEN {$tableAlias}.due_date BETWEEN ? AND ?"
+            . " THEN {$tableAlias}.amount_due ELSE 0 END as {$a61_90},"
+            . " CASE WHEN {$tableAlias}.due_date < ?"
+            . " THEN {$tableAlias}.amount_due ELSE 0 END as {$aOver90}";
     }
 
     /**

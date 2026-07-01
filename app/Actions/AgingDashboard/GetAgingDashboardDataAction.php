@@ -88,10 +88,10 @@ class GetAgingDashboardDataAction
         $d90 = $asOf->copy()->subDays(90)->toDateString();
 
         $this->guardHomogeneousCurrency(
-            'customer_invoices', self::AR_OUTSTANDING_STATUSES, $branchId, 'aging-dashboard:ar'
+            'customer_invoices', self::AR_OUTSTANDING_STATUSES, $branchId, 'aging-dashboard:ar',
         );
         $this->guardHomogeneousCurrency(
-            'supplier_bills', self::AP_OUTSTANDING_STATUSES, $branchId, 'aging-dashboard:ap'
+            'supplier_bills', self::AP_OUTSTANDING_STATUSES, $branchId, 'aging-dashboard:ap',
         );
 
         $arRow = $this->aggregateBuckets(
