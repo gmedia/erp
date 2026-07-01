@@ -17,11 +17,9 @@ class BackfillApprovalRequestBranch extends Command
         . ' {--chunk=500 : Batch size}'
         . ' {--source-type= : FQCN filter}';
 
-    /**
-     * @var string
-     */
     protected $description = 'Backfill branch_id on approval_requests'
-        . ' from polymorphic approvable. Idempotent — only null branch_ids.';
+        . ' from polymorphic approvable.'
+        . ' Idempotent — only null branch_ids.';
 
     public function handle(BranchResolverRegistry $registry): int
     {

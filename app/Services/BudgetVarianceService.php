@@ -101,8 +101,8 @@ class BudgetVarianceService
             ->where('journal_entries.status', 'posted')
             ->whereBetween('journal_entries.entry_date', [$periodStart->format('Y-m-d'), $periodEnd->format('Y-m-d')])
             ->selectRaw(
-                'COALESCE(SUM(journal_entry_lines.debit), 0) as total_debit, ' .
-                'COALESCE(SUM(journal_entry_lines.credit), 0) as total_credit',
+                'COALESCE(SUM(journal_entry_lines.debit), 0) as total_debit, '
+                . 'COALESCE(SUM(journal_entry_lines.credit), 0) as total_credit',
             )
             ->first();
 
