@@ -47,37 +47,34 @@ class BackfillPipelineEntityStateBranch extends Command
                 ->whereNull('branch_id')
                 ->where('entity_type', $entityType)
                 ->with(array_merge(['entity'], $relation))
-                ->chunkById($chunkSize,
-                    function ($states) use ($registry, &$stats, &$totalUpdated, $entityType, $dryRun): void {
-                        foreach ($states as $state) {
-                            $stats[$entityType]['matched']++;
+                ->chunkById($chunkSize, function ($states) use ($registry, &$stats, &$totalUpdated, $entityType, $dryRun): void {
+                    foreach ($states as $state) {
+                        $stats[$entityType]['matched']++;
 
-                            $entity = $state->entity;
+                        $entity = $state->entity;
 
-                            if (! $entity instanceof Model) {
-                                $stats[$entityType]['unresolved']++;
-
-                                continue;
-                            }
-
-                            $branchId = $registry->resolve($entity);
-
-                            if ($branchId === null) {
-                                $stats[$entityType]['unresolved']++;
-
-                                continue;
-                            }
-
-                            $stats[$entityType]['resolved']++;
-
-                            if (! $dryRun) {
-                                $state->branch_id = $branchId;
-                                $state->save();
-                            }
-
-                            $totalUpdated++;
+                        if (! $entity instanceof Model) {
+                            $stats[$entityType]['unresolved']++;
+                            continue;
                         }
-                    });
+
+                        $branchId = $registry->resolve($entity);
+
+                        if ($branchId === null) {
+                            $stats[$entityType]['unresolved']++;
+                            continue;
+                        }
+
+                        $stats[$entityType]['resolved']++;
+
+                        if (! $dryRun) {
+                            $state->branch_id = $branchId;
+                            $state->save();
+                        }
+
+                        $totalUpdated++;
+                    }
+                });
         }
 
         $this->renderSummary($stats, $dryRun);

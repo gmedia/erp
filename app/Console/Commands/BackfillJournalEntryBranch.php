@@ -48,37 +48,34 @@ class BackfillJournalEntryBranch extends Command
                 ->where('source_type', $sourceType)
                 ->whereNotNull('source_id')
                 ->with(array_merge(['source'], $relation))
-                ->chunkById($chunkSize,
-                    function ($entries) use ($registry, &$stats, &$totalUpdated, $sourceType, $dryRun): void {
-                        foreach ($entries as $entry) {
-                            $stats[$sourceType]['matched']++;
+                ->chunkById($chunkSize, function ($entries) use ($registry, &$stats, &$totalUpdated, $sourceType, $dryRun): void {
+                    foreach ($entries as $entry) {
+                        $stats[$sourceType]['matched']++;
 
-                            $source = $entry->source;
+                        $source = $entry->source;
 
-                            if (! $source instanceof Model) {
-                                $stats[$sourceType]['unresolved']++;
-
-                                continue;
-                            }
-
-                            $branchId = $registry->resolve($source);
-
-                            if ($branchId === null) {
-                                $stats[$sourceType]['unresolved']++;
-
-                                continue;
-                            }
-
-                            $stats[$sourceType]['resolved']++;
-
-                            if (! $dryRun) {
-                                $entry->branch_id = $branchId;
-                                $entry->save();
-                            }
-
-                            $totalUpdated++;
+                        if (! $source instanceof Model) {
+                            $stats[$sourceType]['unresolved']++;
+                            continue;
                         }
-                    });
+
+                        $branchId = $registry->resolve($source);
+
+                        if ($branchId === null) {
+                            $stats[$sourceType]['unresolved']++;
+                            continue;
+                        }
+
+                        $stats[$sourceType]['resolved']++;
+
+                        if (! $dryRun) {
+                            $entry->branch_id = $branchId;
+                            $entry->save();
+                        }
+
+                        $totalUpdated++;
+                    }
+                });
         }
 
         $this->renderSummary($stats, $dryRun);
