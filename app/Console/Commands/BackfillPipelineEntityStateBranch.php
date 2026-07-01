@@ -55,6 +55,7 @@ class BackfillPipelineEntityStateBranch extends Command
 
                         if (! $entity instanceof Model) {
                             $stats[$entityType]['unresolved']++;
+
                             continue;
                         }
 
@@ -62,6 +63,7 @@ class BackfillPipelineEntityStateBranch extends Command
 
                         if ($branchId === null) {
                             $stats[$entityType]['unresolved']++;
+
                             continue;
                         }
 

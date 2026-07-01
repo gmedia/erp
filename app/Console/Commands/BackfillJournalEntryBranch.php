@@ -56,6 +56,7 @@ class BackfillJournalEntryBranch extends Command
 
                         if (! $source instanceof Model) {
                             $stats[$sourceType]['unresolved']++;
+
                             continue;
                         }
 
@@ -63,6 +64,7 @@ class BackfillJournalEntryBranch extends Command
 
                         if ($branchId === null) {
                             $stats[$sourceType]['unresolved']++;
+
                             continue;
                         }
 
