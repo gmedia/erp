@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-06-26 (Batch 3 security hardening: H-01 to L-04 complete. Committed at HEAD `TBD`)
+Last updated: 2026-07-01 — Sonar refactor batch A-F done. HEAD `ab962b57`.
 
 ## SESSION 2026-06-22 — Purchase Request User Guide
 
