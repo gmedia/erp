@@ -73,7 +73,9 @@ trait AgingReportBoundaries
     }
 
     /**
-     * @param  array{today: string, d1: string, d30: string, d31: string, d60: string, d61: string, d90: string}  $boundaries
+     * @param  array{
+     *     today: string, d1: string, d30: string, d31: string, d60: string, d61: string, d90: string
+     * }  $boundaries
      * @return list<string>
      */
     protected function agingBucketBindings(array $boundaries): array
