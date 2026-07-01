@@ -16,11 +16,9 @@ class BackfillJournalEntryBranch extends Command
         . ' {--dry-run : Report what would change without writing}'
         . ' {--chunk=500 : Number of rows processed per batch}';
 
-    /**
-     * @var string
-     */
-    protected $description = 'Backfill journal_entries.branch_id from each entry'
-        . ' polymorphic source. Idempotent: only touches rows where branch_id is null.';
+    protected $description = 'Backfill journal_entries.branch_id'
+        . ' from each entry polymorphic source.'
+        . ' Idempotent: only touches rows where branch_id is null.';
 
     public function handle(BranchResolverRegistry $registry): int
     {

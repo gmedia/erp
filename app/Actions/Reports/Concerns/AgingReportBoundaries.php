@@ -74,7 +74,8 @@ trait AgingReportBoundaries
             . " CASE WHEN {$tableAlias}.due_date BETWEEN ? AND ?"
             . " THEN {$tableAlias}.amount_due ELSE 0 END as {$a61_90},"
             . " CASE WHEN {$tableAlias}.due_date < ?"
-            . " THEN {$tableAlias}.amount_due ELSE 0 END as {$aOver90}";
+            . " THEN {$tableAlias}.amount_due ELSE 0 END as {$aOver90}"
+            . ';';
     }
 
     /**

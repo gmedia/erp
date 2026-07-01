@@ -100,9 +100,9 @@ class BranchResolverRegistry
     {
         if (! array_key_exists($type, self::STRATEGIES)) {
             throw new InvalidArgumentException(
-                "No branch resolution strategy registered for [{$type}]. " .
-                'Register it in ' . self::class . '::STRATEGIES ' .
-                '(use BranchResolutionStrategy::None for intentionally unscopable types).',
+                "No branch resolution strategy registered for [{$type}]. "
+                . 'Register it in ' . self::class . '::STRATEGIES '
+                . '(use BranchResolutionStrategy::None for intentionally unscopable types).',
             );
         }
 

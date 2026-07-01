@@ -46,8 +46,10 @@ class PostDepreciationToJournalAction
                 }
 
                 $branchId = $asset->branch_id;
-                $expenseKey = $expenseAccount . '-' . $branchId;
-                $accumulatedKey = $accumulatedAccount . '-' . $branchId;
+                $expenseKey = $expenseAccount . '-'
+                    . $branchId;
+                $accumulatedKey = $accumulatedAccount . '-'
+                    . $branchId;
 
                 if (! isset($summary[$expenseKey])) {
                     $summary[$expenseKey] = [
