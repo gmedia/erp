@@ -205,6 +205,14 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
 
         const isBalanced = totalDebit === totalCredit;
 
+        const renderLineActions = (index: number) => (
+            <LineActions
+                index={index}
+                onEditLine={handleEditLine}
+                onRemoveLine={handleRemoveLine}
+            />
+        );
+
         return (
             <>
                 <EntityForm
@@ -335,13 +343,7 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                                     totalDebit={totalDebit}
                                     totalCredit={totalCredit}
                                     emptyMessage='No lines added yet. Click "Add Line" to start.'
-                                    actions={(index) => (
-                                        <LineActions
-                                            index={index}
-                                            onEditLine={handleEditLine}
-                                            onRemoveLine={handleRemoveLine}
-                                        />
-                                    )}
+                                    actions={renderLineActions}
                                 />
                             </div>
                         </div>

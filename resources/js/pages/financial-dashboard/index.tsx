@@ -88,8 +88,8 @@ export default function FinancialDashboard() {
                         </p>
                     </div>
                     <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-sm font-medium text-muted-foreground">
+                        <div className="flex flex-col gap-1.5" id="branch-filter">
+                            <label className="text-sm font-medium text-muted-foreground" htmlFor="branch-filter">
                                 Branch
                             </label>
                             <AsyncSelect
