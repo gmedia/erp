@@ -226,8 +226,8 @@ export interface RegionalCurrencyFormatOptions extends RegionalNumberFormatOptio
 }
 
 function resolveCurrencyCode(
-    currency: string | undefined,
     settings: RegionalNumberFormatSettings,
+    currency?: string,
 ): string {
     const normalized = currency?.trim().toUpperCase();
 
@@ -289,7 +289,7 @@ export function formatCurrencyByRegionalSettings(
     }
 
     const settings = getRegionalNumberFormatSettings();
-    const resolvedCurrency = resolveCurrencyCode(currency, settings);
+    const resolvedCurrency = resolveCurrencyCode(settings, currency);
     const fractionDigits = resolveFractionDigits(
         settings.number_format_hide_decimal,
         minimumFractionDigits,

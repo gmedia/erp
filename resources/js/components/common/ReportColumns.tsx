@@ -124,8 +124,8 @@ export function StatusBadgeCell({
     value,
     variant = 'outline',
 }: Readonly<{
-    value: string | null | undefined;
-    variant?: ComponentProps<typeof Badge>['variant'];
+    value: string | null;
+    variant: ComponentProps<typeof Badge>['variant'];
 }>) {
     return (
         <Badge variant={variant} className="capitalize">
@@ -259,7 +259,7 @@ export function createReportStatusBadgeColumn<TData>(
         ...createSortingHeader(options.header),
         cell: ({ row }: CellContext<TData, unknown>) => (
             <StatusBadgeCell
-                value={options.getValue(row.original)}
+                value={options.getValue(row.original) ?? null}
                 variant={options.getVariant?.(row.original)}
             />
         ),
