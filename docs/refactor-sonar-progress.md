@@ -59,17 +59,16 @@ After Batch E regression fixes (2 waves + 2 bugs) on top of `7ca7e387`:
 - duplicated_lines_density: **0.7%** (828 duplicated_lines, 28 duplicated_blocks across 28 files; sub-threshold, gate OK)
 - new_coverage: **98.0%**
 - new_duplicated_lines_density: **1.2%**
-- code_smells: **4** (deferred typescript:S3358 ternaries in BankReconciliationWorkspace)
+- code_smells: **0** (all S3358 resolved — nested ternary in BankReconciliationWorkspace.tsx refactored to 3 conditional blocks)
 - bugs: 0
 - vulnerabilities: 0
 - security_hotspots TO_REVIEW: 0
 
-### OPEN issues breakdown (post-batch-E-regression)
+### OPEN issues breakdown (post-wave-26)
 
 | Rule | Count | Severity | Effort | Notes |
 |---|---|---|---|---|
-| `typescript:S3358` | 4 | MAJOR | n/a | Nested ternaries in `BankReconciliationWorkspace.tsx` — deeply nested JSX cells, refactor risk exceeds value, deferred |
-| **Total** | **4** | | **n/a** | |
+| **Total** | **0** | | **n/a** | All Sonar issues resolved. |
 
 ### Batch E regression retrospective (2026-06-25)
 

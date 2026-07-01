@@ -603,3 +603,37 @@ Finalized `docs/refactor-sonar-progress.md`:
 **Next steps**: No active task. Ready for new work.
 
 **Continuation Prompt**: "Batch E tracker finalized at `76ff9e4f`. 6/6 Sonar batches done. What's next?"
+
+---
+
+## SESSION 2026-07-01 — Task C S3358 Refactor
+
+### What was done
+- Task A: Verified SonarCloud project `gmedia_erp` — quality gate OK, coverage 95.4%, 0 bugs, 0 vulns, 29 code smells, ncloc 97,290
+- Task B: Verified all 4 financial report E2E specs (balance-sheet, cash-flow, comparative, income-statement) already comprehensive — no expansion needed
+- Task C: Refactored `typescript:S3358` nested ternary in `BankReconciliationWorkspace.tsx` lines 819-838
+  - Actual count: only 1 S3358 issue (not 4 as recorded in progress doc)
+  - Nested ternary replaced with 3 separate conditional rendering blocks
+  - Verified: `npm run types` passed clean
+- Updated `docs/refactor-sonar-progress.md`: corrected S3358 count (4→0), batch C marked done, OPEN issues table updated to 0
+- Updated `task.md`: session summary recorded
+
+### Files changed
+- `resources/js/components/bank-reconciliations/BankReconciliationWorkspace.tsx` — refactored nested ternary to 3 conditional blocks
+- `docs/refactor-sonar-progress.md` — corrected S3358 count, batch C done, OPEN issues 0
+- `task.md` — session summary added
+
+### Verification
+- `./vendor/bin/sail npm run types` — passed clean
+- LSP diagnostics clean on changed file
+
+### Commit
+- `TODO` — pending
+
+### Open risks
+- None. All 6 Sonar batches (A-F) complete. Sonar gate OK at 95.4% coverage, 0 duplications.
+
+### Next steps
+- Commit & push. Ready for new work.
+
+**Continuation Prompt**: "Task C S3358 refactor ready to commit & push. What's next?"
