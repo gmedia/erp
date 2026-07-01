@@ -168,9 +168,7 @@ class FinancialReportService
         // 3. Calculate Net Income for Comparison Year (if exists)
         $comparisonNetIncome = 0;
         if ($comparisonFiscalYearId && $comparisonCoaVersion) {
-            $comparisonNetIncome = $this->calculateNetIncome(
-                $comparisonFiscalYearId, $comparisonCoaVersion->id, $branchId,
-            );
+            $comparisonNetIncome = $this->calculateNetIncome($comparisonFiscalYearId, $comparisonCoaVersion->id, $branchId);
         }
 
         $clearingReclass = $this->extractClearingReclassification(
