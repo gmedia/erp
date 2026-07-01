@@ -42,8 +42,8 @@ class InterBranchClearingService
             return $lines;
         }
 
-        $branchIds = array_map('intval', array_keys($netByBranch));
-        sort($branchIds);
+        $branchIds = array_keys($netByBranch);
+        sort($branchIds, SORT_NUMERIC);
 
         $needsInjection = false;
         foreach ($netByBranch as $net) {
@@ -73,7 +73,7 @@ class InterBranchClearingService
 
         $injected = [];
         foreach ($branchIds as $branchId) {
-            $net = $netByBranch[(string) $branchId];
+            $net = $netByBranch[$branchId];
             if ($net === 0) {
                 continue;
             }
