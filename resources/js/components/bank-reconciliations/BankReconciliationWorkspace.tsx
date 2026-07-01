@@ -815,28 +815,30 @@ export const BankReconciliationWorkspace =
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {jeLines.length === 0 && jeLoading && (
-                                                <TableRow>
-                                                    <TableCell
-                                                        colSpan={7}
-                                                        className="py-10 text-center"
-                                                    >
-                                                        <Loader2 className="mx-auto size-5 animate-spin text-muted-foreground" />
-                                                    </TableCell>
-                                                </TableRow>
-                                            )}
-                                            {jeLines.length === 0 && !jeLoading && (
-                                                <TableRow>
-                                                    <TableCell
-                                                        colSpan={7}
-                                                        className="py-10 text-center text-muted-foreground"
-                                                    >
-                                                        No unmatched journal
-                                                        entry lines found.
-                                                    </TableCell>
-                                                </TableRow>
-                                            )}
-                                            {jeLines.length > 0 && (
+                                            {jeLines.length === 0 &&
+                                                jeLoading && (
+                                                    <TableRow>
+                                                        <TableCell
+                                                            colSpan={7}
+                                                            className="py-10 text-center"
+                                                        >
+                                                            <Loader2 className="mx-auto size-5 animate-spin text-muted-foreground" />
+                                                        </TableCell>
+                                                    </TableRow>
+                                                )}
+                                            {jeLines.length === 0 &&
+                                                !jeLoading && (
+                                                    <TableRow>
+                                                        <TableCell
+                                                            colSpan={7}
+                                                            className="py-10 text-center text-muted-foreground"
+                                                        >
+                                                            No unmatched journal
+                                                            entry lines found.
+                                                        </TableCell>
+                                                    </TableRow>
+                                                )}
+                                            {jeLines.length > 0 &&
                                                 jeLines.map((line) => (
                                                     <TableRow key={line.id}>
                                                         <TableCell className="font-mono text-xs">
@@ -899,8 +901,7 @@ export const BankReconciliationWorkspace =
                                                             </Button>
                                                         </TableCell>
                                                     </TableRow>
-                                                ))
-                                            )}
+                                                ))}
                                         </TableBody>
                                     </Table>
                                 </div>
