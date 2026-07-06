@@ -2,23 +2,12 @@
 
 namespace App\Exports;
 
-use App\Exports\Concerns\InteractsWithExportFilters;
+use App\Exports\Concerns\BaseExport;
 use App\Models\Budget;
 use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
 
-class BudgetExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class BudgetExport extends BaseExport
 {
-    use InteractsWithExportFilters;
-
-    public function __construct(
-        protected array $filters = [],
-    ) {}
-
     public function query(): Builder
     {
         $query = Budget::query()->with(['fiscalYear', 'creator']);
@@ -31,16 +20,6 @@ class BudgetExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMappi
         );
 
         return $query->orderBy('created_at', 'desc');
-    }
-
-    public function headings(): array
-    {
-        return $this->exportHeadings($this->columns());
-    }
-
-    public function map($budget): array
-    {
-        return $this->mapExportRow($budget, $this->columns());
     }
 
     protected function columns(): array

@@ -2,23 +2,12 @@
 
 namespace App\Exports;
 
-use App\Exports\Concerns\InteractsWithExportFilters;
+use App\Exports\Concerns\BaseExport;
 use App\Models\RecurringJournal;
 use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
 
-class RecurringJournalExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class RecurringJournalExport extends BaseExport
 {
-    use InteractsWithExportFilters;
-
-    public function __construct(
-        protected array $filters = [],
-    ) {}
-
     public function query(): Builder
     {
         $query = RecurringJournal::query()->with(['fiscalYear', 'creator', 'lines']);
@@ -32,16 +21,6 @@ class RecurringJournalExport implements FromQuery, ShouldAutoSize, WithHeadings,
         );
 
         return $query->orderBy('next_run_date');
-    }
-
-    public function headings(): array
-    {
-        return $this->exportHeadings($this->columns());
-    }
-
-    public function map($recurringJournal): array
-    {
-        return $this->mapExportRow($recurringJournal, $this->columns());
     }
 
     protected function columns(): array

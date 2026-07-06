@@ -2,23 +2,12 @@
 
 namespace App\Exports;
 
-use App\Exports\Concerns\InteractsWithExportFilters;
+use App\Exports\Concerns\BaseExport;
 use App\Models\CustomerInvoice;
 use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
 
-class CustomerInvoiceExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class CustomerInvoiceExport extends BaseExport
 {
-    use InteractsWithExportFilters;
-
-    public function __construct(
-        private readonly array $filters = []
-    ) {}
-
     public function query(): Builder
     {
         $query = CustomerInvoice::query()->with(['customer', 'branch', 'fiscalYear']);
@@ -44,16 +33,6 @@ class CustomerInvoiceExport implements FromQuery, ShouldAutoSize, WithHeadings, 
         ]);
 
         return $query;
-    }
-
-    public function headings(): array
-    {
-        return $this->exportHeadings($this->columns());
-    }
-
-    public function map($customerInvoice): array
-    {
-        return $this->mapExportRow($customerInvoice, $this->columns());
     }
 
     protected function columns(): array

@@ -2,25 +2,13 @@
 
 namespace App\Exports;
 
-use App\Exports\Concerns\InteractsWithExportFilters;
+use App\Exports\Concerns\BaseExport;
 use App\Models\Supplier;
 use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
 
-class SupplierExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class SupplierExport extends BaseExport
 {
-    use InteractsWithExportFilters;
-
-    protected array $filters;
-
-    public function __construct(array $filters = [])
-    {
-        $this->filters = $filters;
-    }
+    public function __construct(protected readonly array $filters = []) {}
 
     public function query(): Builder
     {
@@ -33,16 +21,6 @@ class SupplierExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
         ], [], ['name', 'email', 'phone', 'branch_id', 'category_id', 'status', 'created_at']);
 
         return $query;
-    }
-
-    public function headings(): array
-    {
-        return $this->exportHeadings($this->columns());
-    }
-
-    public function map($supplier): array
-    {
-        return $this->mapExportRow($supplier, $this->columns());
     }
 
     /**

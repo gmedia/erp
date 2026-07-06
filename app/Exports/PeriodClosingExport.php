@@ -2,23 +2,12 @@
 
 namespace App\Exports;
 
-use App\Exports\Concerns\InteractsWithExportFilters;
+use App\Exports\Concerns\BaseExport;
 use App\Models\PeriodClosing;
 use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
 
-class PeriodClosingExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class PeriodClosingExport extends BaseExport
 {
-    use InteractsWithExportFilters;
-
-    public function __construct(
-        protected array $filters = [],
-    ) {}
-
     public function query(): Builder
     {
         $query = PeriodClosing::query()->with(['fiscalYear', 'closedBy', 'reopenedBy']);
@@ -37,16 +26,6 @@ class PeriodClosingExport implements FromQuery, ShouldAutoSize, WithHeadings, Wi
         );
 
         return $query->orderByDesc('period_year')->orderByDesc('period_month');
-    }
-
-    public function headings(): array
-    {
-        return $this->exportHeadings($this->columns());
-    }
-
-    public function map($periodClosing): array
-    {
-        return $this->mapExportRow($periodClosing, $this->columns());
     }
 
     protected function columns(): array

@@ -2,23 +2,12 @@
 
 namespace App\Exports;
 
-use App\Exports\Concerns\InteractsWithExportFilters;
+use App\Exports\Concerns\BaseExport;
 use App\Models\CreditNote;
 use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
 
-class CreditNoteExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class CreditNoteExport extends BaseExport
 {
-    use InteractsWithExportFilters;
-
-    public function __construct(
-        private readonly array $filters = []
-    ) {}
-
     public function query(): Builder
     {
         $query = CreditNote::query()->with(['customer', 'customerInvoice', 'branch', 'fiscalYear']);
@@ -42,16 +31,6 @@ class CreditNoteExport implements FromQuery, ShouldAutoSize, WithHeadings, WithM
         ]);
 
         return $query;
-    }
-
-    public function headings(): array
-    {
-        return $this->exportHeadings($this->columns());
-    }
-
-    public function map($creditNote): array
-    {
-        return $this->mapExportRow($creditNote, $this->columns());
     }
 
     protected function columns(): array

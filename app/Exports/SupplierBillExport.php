@@ -2,23 +2,12 @@
 
 namespace App\Exports;
 
-use App\Exports\Concerns\InteractsWithExportFilters;
+use App\Exports\Concerns\BaseExport;
 use App\Models\SupplierBill;
 use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
 
-class SupplierBillExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class SupplierBillExport extends BaseExport
 {
-    use InteractsWithExportFilters;
-
-    public function __construct(
-        private readonly array $filters = []
-    ) {}
-
     public function query(): Builder
     {
         $query = SupplierBill::query()->with(['supplier', 'branch']);
@@ -53,19 +42,6 @@ class SupplierBillExport implements FromQuery, ShouldAutoSize, WithHeadings, Wit
         return $query;
     }
 
-    public function headings(): array
-    {
-        return $this->exportHeadings($this->columns());
-    }
-
-    public function map($supplierBill): array
-    {
-        return $this->mapExportRow($supplierBill, $this->columns());
-    }
-
-    /**
-     * @return array<string, callable(mixed): mixed>
-     */
     protected function columns(): array
     {
         return [
