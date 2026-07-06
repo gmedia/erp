@@ -2,26 +2,12 @@
 
 namespace App\Exports;
 
-use App\Exports\Concerns\InteractsWithExportFilters;
+use App\Exports\Concerns\BaseExport;
 use App\Models\AssetStocktake;
 use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
 
-class AssetStocktakeExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class AssetStocktakeExport extends BaseExport
 {
-    use InteractsWithExportFilters;
-
-    protected array $filters;
-
-    public function __construct(array $filters = [])
-    {
-        $this->filters = $filters;
-    }
-
     public function query(): Builder
     {
         $query = AssetStocktake::query()->with(['branch', 'createdBy']);
@@ -41,16 +27,6 @@ class AssetStocktakeExport implements FromQuery, ShouldAutoSize, WithHeadings, W
         ]);
 
         return $query;
-    }
-
-    public function headings(): array
-    {
-        return $this->exportHeadings($this->columns());
-    }
-
-    public function map($row): array
-    {
-        return $this->mapExportRow($row, $this->columns());
     }
 
     /**

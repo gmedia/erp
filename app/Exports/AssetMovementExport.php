@@ -3,26 +3,12 @@
 namespace App\Exports;
 
 use App\Domain\AssetMovements\AssetMovementFilterService;
-use App\Exports\Concerns\InteractsWithExportFilters;
+use App\Exports\Concerns\BaseExport;
 use App\Models\AssetMovement;
 use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
 
-class AssetMovementExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class AssetMovementExport extends BaseExport
 {
-    use InteractsWithExportFilters;
-
-    protected array $filters;
-
-    public function __construct(array $filters = [])
-    {
-        $this->filters = $filters;
-    }
-
     public function query(): Builder
     {
         $query = AssetMovement::query()->with([
@@ -47,16 +33,6 @@ class AssetMovementExport implements FromQuery, ShouldAutoSize, WithHeadings, Wi
         );
 
         return $query;
-    }
-
-    public function headings(): array
-    {
-        return $this->exportHeadings($this->columns());
-    }
-
-    public function map($movement): array
-    {
-        return $this->mapExportRow($movement, $this->columns());
     }
 
     /**

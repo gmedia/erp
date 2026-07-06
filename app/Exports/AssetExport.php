@@ -9,8 +9,6 @@ use Illuminate\Database\Eloquent\Builder;
 
 class AssetExport extends BaseExport
 {
-    public function __construct(protected readonly array $filters = []) {}
-
     public function query(): Builder
     {
         $query = Asset::query()->with([

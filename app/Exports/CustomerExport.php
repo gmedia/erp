@@ -2,26 +2,12 @@
 
 namespace App\Exports;
 
-use App\Exports\Concerns\InteractsWithExportFilters;
+use App\Exports\Concerns\BaseExport;
 use App\Models\Customer;
 use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
 
-class CustomerExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class CustomerExport extends BaseExport
 {
-    use InteractsWithExportFilters;
-
-    protected array $filters;
-
-    public function __construct(array $filters = [])
-    {
-        $this->filters = $filters;
-    }
-
     public function query(): Builder
     {
         $query = Customer::query()->with(['branch', 'category']);
@@ -33,16 +19,6 @@ class CustomerExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
         ], [], ['name', 'email', 'phone', 'branch_id', 'category_id', 'status', 'created_at']);
 
         return $query;
-    }
-
-    public function headings(): array
-    {
-        return $this->exportHeadings($this->columns());
-    }
-
-    public function map($customer): array
-    {
-        return $this->mapExportRow($customer, $this->columns());
     }
 
     /**

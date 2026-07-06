@@ -2,26 +2,12 @@
 
 namespace App\Exports;
 
-use App\Exports\Concerns\InteractsWithExportFilters;
+use App\Exports\Concerns\BaseExport;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
 
-class ProductExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class ProductExport extends BaseExport
 {
-    use InteractsWithExportFilters;
-
-    protected array $filters;
-
-    public function __construct(array $filters = [])
-    {
-        $this->filters = $filters;
-    }
-
     public function query(): Builder
     {
         $query = Product::query()->with(['category', 'unit', 'branch']);
@@ -36,16 +22,6 @@ class ProductExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapp
         ], [], ['code', 'name', 'type', 'cost', 'selling_price', 'status', 'created_at']);
 
         return $query;
-    }
-
-    public function headings(): array
-    {
-        return $this->exportHeadings($this->columns());
-    }
-
-    public function map($product): array
-    {
-        return $this->mapExportRow($product, $this->columns());
     }
 
     /**
