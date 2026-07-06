@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { KpiCard } from '@/components/common/KpiCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatCurrency } from '@/lib/utils';
 import { TrendingDown, TrendingUp } from 'lucide-react';
@@ -40,7 +40,14 @@ export const AgingSummaryCards = memo<AgingSummaryCardsProps>(
                 borderColor: 'border-l-emerald-500',
                 iconColor: 'text-emerald-500',
                 value: arSummary.total_outstanding,
-                subtitle: `${arSummary.invoice_count} open invoices`,
+                formattedValue: formatCurrency(arSummary.total_outstanding),
+                footer: (
+                    <div className="mt-2 flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">
+                            {arSummary.invoice_count} open invoices
+                        </span>
+                    </div>
+                ),
             },
             {
                 title: 'AR Overdue',
@@ -48,11 +55,22 @@ export const AgingSummaryCards = memo<AgingSummaryCardsProps>(
                 borderColor: 'border-l-amber-500',
                 iconColor: 'text-amber-500',
                 value: arSummary.overdue_amount,
-                badge: `${arSummary.overdue_percentage.toFixed(1)}%`,
-                badgeVariant: getOverdueBadgeVariant(
-                    arSummary.overdue_percentage,
+                formattedValue: formatCurrency(arSummary.overdue_amount),
+                footer: (
+                    <div className="mt-2 flex items-center gap-2">
+                        <Badge
+                            variant={getOverdueBadgeVariant(
+                                arSummary.overdue_percentage,
+                            )}
+                            className="text-xs font-medium"
+                        >
+                            {arSummary.overdue_percentage.toFixed(1)}%
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">
+                            {arSummary.overdue_count} overdue
+                        </span>
+                    </div>
                 ),
-                subtitle: `${arSummary.overdue_count} overdue`,
             },
             {
                 title: 'Total Payables',
@@ -60,7 +78,14 @@ export const AgingSummaryCards = memo<AgingSummaryCardsProps>(
                 borderColor: 'border-l-rose-500',
                 iconColor: 'text-rose-500',
                 value: apSummary.total_outstanding,
-                subtitle: `${apSummary.invoice_count} open bills`,
+                formattedValue: formatCurrency(apSummary.total_outstanding),
+                footer: (
+                    <div className="mt-2 flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">
+                            {apSummary.invoice_count} open bills
+                        </span>
+                    </div>
+                ),
             },
             {
                 title: 'AP Overdue',
@@ -68,51 +93,40 @@ export const AgingSummaryCards = memo<AgingSummaryCardsProps>(
                 borderColor: 'border-l-orange-500',
                 iconColor: 'text-orange-500',
                 value: apSummary.overdue_amount,
-                badge: `${apSummary.overdue_percentage.toFixed(1)}%`,
-                badgeVariant: getOverdueBadgeVariant(
-                    apSummary.overdue_percentage,
+                formattedValue: formatCurrency(apSummary.overdue_amount),
+                footer: (
+                    <div className="mt-2 flex items-center gap-2">
+                        <Badge
+                            variant={getOverdueBadgeVariant(
+                                apSummary.overdue_percentage,
+                            )}
+                            className="text-xs font-medium"
+                        >
+                            {apSummary.overdue_percentage.toFixed(1)}%
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">
+                            {apSummary.overdue_count} overdue
+                        </span>
+                    </div>
                 ),
-                subtitle: `${apSummary.overdue_count} overdue`,
             },
         ];
 
         return (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-                {cards.map((card) => {
-                    const Icon = card.icon;
-
-                    return (
-                        <Card
-                            key={card.title}
-                            className={`overflow-hidden border-l-4 ${card.borderColor} transition-all hover:shadow-md`}
-                        >
-                            <CardHeader className="flex flex-row items-center justify-between pt-4 pb-2">
-                                <CardTitle className="text-sm font-medium text-muted-foreground">
-                                    {card.title}
-                                </CardTitle>
-                                <Icon className={`h-4 w-4 ${card.iconColor}`} />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold">
-                                    {formatCurrency(card.value)}
-                                </div>
-                                <div className="mt-2 flex items-center gap-2">
-                                    {card.badge && (
-                                        <Badge
-                                            variant={card.badgeVariant}
-                                            className="text-xs font-medium"
-                                        >
-                                            {card.badge}
-                                        </Badge>
-                                    )}
-                                    <span className="text-xs text-muted-foreground">
-                                        {card.subtitle}
-                                    </span>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    );
-                })}
+                {cards.map((card) => (
+                    <KpiCard
+                        key={card.title}
+                        title={card.title}
+                        icon={card.icon}
+                        value={card.value}
+                        formattedValue={card.formattedValue}
+                        borderColor={card.borderColor}
+                        iconColor={card.iconColor}
+                    >
+                        {card.footer}
+                    </KpiCard>
+                ))}
             </div>
         );
     },
