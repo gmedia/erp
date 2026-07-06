@@ -3,23 +3,12 @@
 namespace App\Exports;
 
 use App\Domain\AssetMaintenances\AssetMaintenanceFilterService;
-use App\Exports\Concerns\InteractsWithExportFilters;
+use App\Exports\Concerns\BaseExport;
 use App\Models\AssetMaintenance;
 use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
 
-class AssetMaintenanceExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class AssetMaintenanceExport extends BaseExport
 {
-    use InteractsWithExportFilters;
-
-    public function __construct(
-        protected array $filters = []
-    ) {}
-
     public function query(): Builder
     {
         $query = AssetMaintenance::query()->with(['asset', 'supplier', 'createdBy']);
@@ -60,16 +49,6 @@ class AssetMaintenanceExport implements FromQuery, ShouldAutoSize, WithHeadings,
         );
 
         return $query;
-    }
-
-    public function headings(): array
-    {
-        return $this->exportHeadings($this->columns());
-    }
-
-    public function map($maintenance): array
-    {
-        return $this->mapExportRow($maintenance, $this->columns());
     }
 
     /**

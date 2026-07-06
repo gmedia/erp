@@ -2,25 +2,13 @@
 
 namespace App\Exports;
 
-use App\Exports\Concerns\InteractsWithExportFilters;
+use App\Exports\Concerns\BaseExport;
 use App\Models\ApprovalFlow;
 use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
 
-class ApprovalFlowExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class ApprovalFlowExport extends BaseExport
 {
-    use InteractsWithExportFilters;
-
-    protected array $filters;
-
-    public function __construct(array $filters = [])
-    {
-        $this->filters = $filters;
-    }
+    public function __construct(protected readonly array $filters = []) {}
 
     public function query(): Builder
     {
@@ -34,16 +22,6 @@ class ApprovalFlowExport implements FromQuery, ShouldAutoSize, WithHeadings, Wit
         $this->applySorting($query, $this->filters, ['name', 'code', 'approvable_type', 'is_active', 'created_at']);
 
         return $query;
-    }
-
-    public function headings(): array
-    {
-        return $this->exportHeadings($this->columns());
-    }
-
-    public function map($flow): array
-    {
-        return $this->mapExportRow($flow, $this->columns());
     }
 
     /**

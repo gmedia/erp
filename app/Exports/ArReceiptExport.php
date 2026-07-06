@@ -2,23 +2,12 @@
 
 namespace App\Exports;
 
-use App\Exports\Concerns\InteractsWithExportFilters;
+use App\Exports\Concerns\BaseExport;
 use App\Models\ArReceipt;
 use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
 
-class ArReceiptExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class ArReceiptExport extends BaseExport
 {
-    use InteractsWithExportFilters;
-
-    public function __construct(
-        private readonly array $filters = []
-    ) {}
-
     public function query(): Builder
     {
         $query = ArReceipt::query()->with(['customer', 'branch', 'fiscalYear', 'bankAccount']);
@@ -44,16 +33,6 @@ class ArReceiptExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMa
         ]);
 
         return $query;
-    }
-
-    public function headings(): array
-    {
-        return $this->exportHeadings($this->columns());
-    }
-
-    public function map($arReceipt): array
-    {
-        return $this->mapExportRow($arReceipt, $this->columns());
     }
 
     protected function columns(): array

@@ -2,25 +2,13 @@
 
 namespace App\Exports;
 
-use App\Exports\Concerns\InteractsWithExportFilters;
+use App\Exports\Concerns\BaseExport;
 use App\Models\StockAdjustment;
 use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
 
-class StockAdjustmentExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class StockAdjustmentExport extends BaseExport
 {
-    use InteractsWithExportFilters;
-
-    protected array $filters;
-
-    public function __construct(array $filters = [])
-    {
-        $this->filters = $filters;
-    }
+    public function __construct(protected readonly array $filters = []) {}
 
     public function query(): Builder
     {
@@ -43,16 +31,6 @@ class StockAdjustmentExport implements FromQuery, ShouldAutoSize, WithHeadings, 
         ]);
 
         return $query;
-    }
-
-    public function headings(): array
-    {
-        return $this->exportHeadings($this->columns());
-    }
-
-    public function map($item): array
-    {
-        return $this->mapExportRow($item, $this->columns());
     }
 
     /**

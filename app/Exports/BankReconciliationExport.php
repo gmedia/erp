@@ -2,23 +2,12 @@
 
 namespace App\Exports;
 
-use App\Exports\Concerns\InteractsWithExportFilters;
+use App\Exports\Concerns\BaseExport;
 use App\Models\BankReconciliation;
 use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
 
-class BankReconciliationExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class BankReconciliationExport extends BaseExport
 {
-    use InteractsWithExportFilters;
-
-    public function __construct(
-        protected array $filters = [],
-    ) {}
-
     public function query(): Builder
     {
         $query = BankReconciliation::query()->with(['account', 'fiscalYear', 'completedBy']);
@@ -32,16 +21,6 @@ class BankReconciliationExport implements FromQuery, ShouldAutoSize, WithHeading
         );
 
         return $query->orderBy('reconciliation_date', 'desc');
-    }
-
-    public function headings(): array
-    {
-        return $this->exportHeadings($this->columns());
-    }
-
-    public function map($bankReconciliation): array
-    {
-        return $this->mapExportRow($bankReconciliation, $this->columns());
     }
 
     protected function columns(): array

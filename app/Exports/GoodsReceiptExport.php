@@ -2,23 +2,12 @@
 
 namespace App\Exports;
 
-use App\Exports\Concerns\InteractsWithExportFilters;
+use App\Exports\Concerns\BaseExport;
 use App\Models\GoodsReceipt;
 use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
 
-class GoodsReceiptExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class GoodsReceiptExport extends BaseExport
 {
-    use InteractsWithExportFilters;
-
-    public function __construct(
-        private readonly array $filters = []
-    ) {}
-
     public function query(): Builder
     {
         $query = GoodsReceipt::query()->with(['purchaseOrder.supplier', 'warehouse', 'receiver']);
@@ -42,19 +31,6 @@ class GoodsReceiptExport implements FromQuery, ShouldAutoSize, WithHeadings, Wit
         return $query;
     }
 
-    public function headings(): array
-    {
-        return $this->exportHeadings($this->columns());
-    }
-
-    public function map($goodsReceipt): array
-    {
-        return $this->mapExportRow($goodsReceipt, $this->columns());
-    }
-
-    /**
-     * @return array<string, callable(mixed): mixed>
-     */
     protected function columns(): array
     {
         return [

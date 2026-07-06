@@ -2,26 +2,12 @@
 
 namespace App\Exports;
 
-use App\Exports\Concerns\InteractsWithExportFilters;
+use App\Exports\Concerns\BaseExport;
 use App\Models\ReportConfiguration;
 use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
 
-class ReportConfigurationExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class ReportConfigurationExport extends BaseExport
 {
-    use InteractsWithExportFilters;
-
-    /**
-     * @param  array<string, mixed>  $filters
-     */
-    public function __construct(
-        protected array $filters = [],
-    ) {}
-
     public function query(): Builder
     {
         $query = ReportConfiguration::query()->with(['creator', 'sections']);
@@ -37,16 +23,6 @@ class ReportConfigurationExport implements FromQuery, ShouldAutoSize, WithHeadin
         );
 
         return $query->orderBy('name');
-    }
-
-    public function headings(): array
-    {
-        return $this->exportHeadings($this->columns());
-    }
-
-    public function map($item): array
-    {
-        return $this->mapExportRow($item, $this->columns());
     }
 
     /**

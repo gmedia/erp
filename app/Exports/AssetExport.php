@@ -3,26 +3,12 @@
 namespace App\Exports;
 
 use App\Domain\Assets\AssetFilterService;
-use App\Exports\Concerns\InteractsWithExportFilters;
+use App\Exports\Concerns\BaseExport;
 use App\Models\Asset;
 use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
 
-class AssetExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class AssetExport extends BaseExport
 {
-    use InteractsWithExportFilters;
-
-    protected array $filters;
-
-    public function __construct(array $filters = [])
-    {
-        $this->filters = $filters;
-    }
-
     public function query(): Builder
     {
         $query = Asset::query()->with([
@@ -74,16 +60,6 @@ class AssetExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMappin
         );
 
         return $query;
-    }
-
-    public function headings(): array
-    {
-        return $this->exportHeadings($this->columns());
-    }
-
-    public function map($asset): array
-    {
-        return $this->mapExportRow($asset, $this->columns());
     }
 
     /**

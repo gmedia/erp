@@ -2,26 +2,12 @@
 
 namespace App\Exports;
 
-use App\Exports\Concerns\InteractsWithExportFilters;
+use App\Exports\Concerns\BaseExport;
 use App\Models\Pipeline;
 use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
 
-class PipelineExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class PipelineExport extends BaseExport
 {
-    use InteractsWithExportFilters;
-
-    protected array $filters;
-
-    public function __construct(array $filters = [])
-    {
-        $this->filters = $filters;
-    }
-
     public function query(): Builder
     {
         $query = Pipeline::query()->with(['creator']);
@@ -48,16 +34,6 @@ class PipelineExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMap
         }
 
         return $query;
-    }
-
-    public function headings(): array
-    {
-        return $this->exportHeadings($this->columns());
-    }
-
-    public function map($pipeline): array
-    {
-        return $this->mapExportRow($pipeline, $this->columns());
     }
 
     /**

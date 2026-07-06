@@ -2,23 +2,12 @@
 
 namespace App\Exports;
 
-use App\Exports\Concerns\InteractsWithExportFilters;
+use App\Exports\Concerns\BaseExport;
 use App\Models\SupplierReturn;
 use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
 
-class SupplierReturnExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class SupplierReturnExport extends BaseExport
 {
-    use InteractsWithExportFilters;
-
-    public function __construct(
-        private readonly array $filters = []
-    ) {}
-
     public function query(): Builder
     {
         $query = SupplierReturn::query()->with(['purchaseOrder', 'goodsReceipt', 'supplier', 'warehouse']);
@@ -44,19 +33,6 @@ class SupplierReturnExport implements FromQuery, ShouldAutoSize, WithHeadings, W
         return $query;
     }
 
-    public function headings(): array
-    {
-        return $this->exportHeadings($this->columns());
-    }
-
-    public function map($supplierReturn): array
-    {
-        return $this->mapExportRow($supplierReturn, $this->columns());
-    }
-
-    /**
-     * @return array<string, callable(mixed): mixed>
-     */
     protected function columns(): array
     {
         return [
