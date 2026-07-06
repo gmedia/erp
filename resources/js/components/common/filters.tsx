@@ -932,6 +932,26 @@ export function createInventoryReportScopeFilterFields(
     return fields;
 }
 
+export function createCustomerFinancialFilterFields(
+    searchPlaceholder: string,
+): FieldDescriptor[] {
+    return [
+        createTextFilterField('search', 'Search', searchPlaceholder),
+        createAsyncSelectFilterField(
+            'customer_id',
+            'Customer',
+            '/api/customers',
+            'Select Customer',
+        ),
+        createAsyncSelectFilterField(
+            'branch_id',
+            'Branch',
+            '/api/branches',
+            'Select Branch',
+        ),
+    ];
+}
+
 export function createInventoryStocktakeReportFilterField(
     placeholder = 'All stocktakes',
 ): FieldDescriptor {
