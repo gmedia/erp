@@ -273,49 +273,7 @@ class GetAgingDashboardDataAction
      */
     private function topOverdueCustomers(?int $branchId, Carbon $asOf): array
     {
-        $asOfStr = $asOf->toDateString();
-
-        $query = DB::table('customer_invoices as ci')
-            ->join('customers as c', 'c.id', '=', 'ci.customer_id')
-            ->whereIn('ci.status', self::AR_OUTSTANDING_STATUSES);
-
-        if ($branchId !== null) {
-            $query->where('ci.branch_id', $branchId);
-        }
-
-        $rows = $query
-            ->groupBy('ci.customer_id', 'c.name')
-            ->selectRaw(
-                'ci.customer_id AS customer_id,
-                 c.name AS customer_name,
-                 COALESCE(SUM(ci.amount_due), 0) AS outstanding_amount,
-                 COALESCE(SUM(CASE WHEN ci.due_date < ? THEN ci.amount_due ELSE 0 END), 0) AS overdue_amount,
-                 COUNT(*) AS invoice_count,
-                 MIN(ci.due_date) AS oldest_due_date',
-                [$asOfStr]
-            )
-            ->havingRaw('SUM(CASE WHEN ci.due_date < ? THEN ci.amount_due ELSE 0 END) > 0', [$asOfStr])
-            ->orderByDesc('overdue_amount')
-            ->orderByDesc('outstanding_amount')
-            ->limit(10)
-            ->get();
-
-        return $rows->map(function ($row) use ($asOf): array {
-            $oldest = $row->oldest_due_date ? Carbon::parse($row->oldest_due_date) : null;
-            $maxDaysOverdue = $oldest && $oldest->lt($asOf)
-                ? (int) $oldest->diffInDays($asOf)
-                : 0;
-
-            return [
-                'customer_id' => (int) $row->customer_id,
-                'customer_name' => (string) $row->customer_name,
-                'outstanding_amount' => round((float) $row->outstanding_amount, 2),
-                'overdue_amount' => round((float) $row->overdue_amount, 2),
-                'invoice_count' => (int) $row->invoice_count,
-                'oldest_due_date' => $oldest?->toDateString(),
-                'max_days_overdue' => $maxDaysOverdue,
-            ];
-        })->all();
+        return $this->topOverduePartners('customer', $branchId, $asOf);
     }
 
     /**
@@ -331,45 +289,74 @@ class GetAgingDashboardDataAction
      */
     private function topOverdueSuppliers(?int $branchId, Carbon $asOf): array
     {
+        return $this->topOverduePartners('supplier', $branchId, $asOf);
+    }
+
+    /**
+     * @param  'customer'|'supplier'  $type
+     * @return array<int, array<string, mixed>>
+     */
+    private function topOverduePartners(string $type, ?int $branchId, Carbon $asOf): array
+    {
         $asOfStr = $asOf->toDateString();
 
-        $query = DB::table('supplier_bills as sb')
-            ->join('suppliers as s', 's.id', '=', 'sb.supplier_id')
-            ->whereIn('sb.status', self::AP_OUTSTANDING_STATUSES);
+        if ($type === 'customer') {
+            $statuses = self::AR_OUTSTANDING_STATUSES;
+            $table = 'customer_invoices';
+            $tableAlias = 'ci';
+            $partnerTable = 'customers';
+            $partnerAlias = 'c';
+            $partnerFk = 'customer_id';
+            $partnerNameCol = 'customer_name';
+            $countCol = 'invoice_count';
+        } else {
+            $statuses = self::AP_OUTSTANDING_STATUSES;
+            $table = 'supplier_bills';
+            $tableAlias = 'sb';
+            $partnerTable = 'suppliers';
+            $partnerAlias = 's';
+            $partnerFk = 'supplier_id';
+            $partnerNameCol = 'supplier_name';
+            $countCol = 'bill_count';
+        }
+
+        $query = DB::table("{$table} as {$tableAlias}")
+            ->join("{$partnerTable} as {$partnerAlias}", "{$partnerAlias}.id", '=', "{$tableAlias}.{$partnerFk}")
+            ->whereIn("{$tableAlias}.status", $statuses);
 
         if ($branchId !== null) {
-            $query->where('sb.branch_id', $branchId);
+            $query->where("{$tableAlias}.branch_id", $branchId);
         }
 
         $rows = $query
-            ->groupBy('sb.supplier_id', 's.name')
+            ->groupBy("{$tableAlias}.{$partnerFk}", "{$partnerAlias}.name")
             ->selectRaw(
-                'sb.supplier_id AS supplier_id,
-                 s.name AS supplier_name,
-                 COALESCE(SUM(sb.amount_due), 0) AS outstanding_amount,
-                 COALESCE(SUM(CASE WHEN sb.due_date < ? THEN sb.amount_due ELSE 0 END), 0) AS overdue_amount,
-                 COUNT(*) AS bill_count,
-                 MIN(sb.due_date) AS oldest_due_date',
+                "{$tableAlias}.{$partnerFk} AS {$partnerFk},
+                 {$partnerAlias}.name AS {$partnerNameCol},
+                 COALESCE(SUM({$tableAlias}.amount_due), 0) AS outstanding_amount,
+                 COALESCE(SUM(CASE WHEN {$tableAlias}.due_date < ? THEN {$tableAlias}.amount_due ELSE 0 END), 0) AS overdue_amount,
+                 COUNT(*) AS {$countCol},
+                 MIN({$tableAlias}.due_date) AS oldest_due_date",
                 [$asOfStr]
             )
-            ->havingRaw('SUM(CASE WHEN sb.due_date < ? THEN sb.amount_due ELSE 0 END) > 0', [$asOfStr])
+            ->havingRaw("SUM(CASE WHEN {$tableAlias}.due_date < ? THEN {$tableAlias}.amount_due ELSE 0 END) > 0", [$asOfStr])
             ->orderByDesc('overdue_amount')
             ->orderByDesc('outstanding_amount')
             ->limit(10)
             ->get();
 
-        return $rows->map(function ($row) use ($asOf): array {
+        return $rows->map(function ($row) use ($asOf, $partnerFk, $partnerNameCol, $countCol): array {
             $oldest = $row->oldest_due_date ? Carbon::parse($row->oldest_due_date) : null;
             $maxDaysOverdue = $oldest && $oldest->lt($asOf)
                 ? (int) $oldest->diffInDays($asOf)
                 : 0;
 
             return [
-                'supplier_id' => (int) $row->supplier_id,
-                'supplier_name' => (string) $row->supplier_name,
+                $partnerFk => (int) $row->{$partnerFk},
+                $partnerNameCol => (string) $row->{$partnerNameCol},
                 'outstanding_amount' => round((float) $row->outstanding_amount, 2),
                 'overdue_amount' => round((float) $row->overdue_amount, 2),
-                'bill_count' => (int) $row->bill_count,
+                $countCol => (int) $row->{$countCol},
                 'oldest_due_date' => $oldest?->toDateString(),
                 'max_days_overdue' => $maxDaysOverdue,
             ];
