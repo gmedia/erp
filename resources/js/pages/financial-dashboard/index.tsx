@@ -77,10 +77,7 @@ export default function FinancialDashboard() {
             breadcrumbs={breadcrumbs}
             toolbar={
                 <>
-                    <div
-                        className="flex flex-col gap-1.5"
-                        id="branch-filter"
-                    >
+                    <div className="flex flex-col gap-1.5" id="branch-filter">
                         <label
                             className="text-sm font-medium text-muted-foreground"
                             htmlFor="branch-filter"
@@ -101,9 +98,7 @@ export default function FinancialDashboard() {
                             selectedYearId={fiscalYearId}
                             comparisonYearId={comparisonYearId}
                             onYearChange={handleYearChange}
-                            onComparisonYearChange={
-                                handleComparisonYearChange
-                            }
+                            onComparisonYearChange={handleComparisonYearChange}
                         />
                     )}
                 </>

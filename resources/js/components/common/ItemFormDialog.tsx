@@ -84,7 +84,9 @@ export function ItemFormDialogShell<TFormValues extends FieldValues>({
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-2xl">
                 <DialogHeader>
-                    <DialogTitle>{item ? `Edit ${titleLabel}` : `Add ${titleLabel}`}</DialogTitle>
+                    <DialogTitle>
+                        {item ? `Edit ${titleLabel}` : `Add ${titleLabel}`}
+                    </DialogTitle>
                     <DialogDescription className="sr-only">
                         {item
                             ? `Edit ${itemDescription}.`
@@ -111,7 +113,9 @@ export function ItemFormDialogShell<TFormValues extends FieldValues>({
                                 Cancel
                             </Button>
                             <Button type="submit">
-                                {item ? `Update ${actionLabel}` : `Save ${actionLabel}`}
+                                {item
+                                    ? `Update ${actionLabel}`
+                                    : `Save ${actionLabel}`}
                             </Button>
                         </DialogFooter>
                     </form>

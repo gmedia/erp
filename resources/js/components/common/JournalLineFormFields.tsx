@@ -63,7 +63,8 @@ export function JournalLineFormFields<TFormValues extends FieldValues>({
                     url={branchUrl}
                     placeholder="Select branch"
                     initialLabel={
-                        ((defaultValues as Record<string, unknown>).branch_name as string) || ''
+                        ((defaultValues as Record<string, unknown>)
+                            .branch_name as string) || ''
                     }
                     onItemSelect={(branch) => {
                         form.setValue(

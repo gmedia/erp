@@ -1,5 +1,5 @@
-import { Badge } from '@/components/ui/badge';
 import { KpiCard } from '@/components/common/KpiCard';
+import { Badge } from '@/components/ui/badge';
 import { formatCurrency } from '@/lib/utils';
 import {
     Banknote,
@@ -83,7 +83,10 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
                     'summary-6',
                     'summary-7',
                 ].map((key) => (
-                    <div key={key} className="animate-pulse rounded-lg border bg-card p-6 shadow-sm">
+                    <div
+                        key={key}
+                        className="animate-pulse rounded-lg border bg-card p-6 shadow-sm"
+                    >
                         <div className="flex items-center justify-between pb-2">
                             <div className="h-4 w-24 rounded bg-muted"></div>
                         </div>
@@ -105,10 +108,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             footer: (
                 <>
                     <div className="mt-2 flex items-center gap-2">
-                        {getChangeBadge(
-                            data.revenue.change,
-                            false,
-                        )}
+                        {getChangeBadge(data.revenue.change, false)}
                         <span className="text-xs text-muted-foreground">
                             vs comparison period
                         </span>
@@ -129,10 +129,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             footer: (
                 <>
                     <div className="mt-2 flex items-center gap-2">
-                        {getChangeBadge(
-                            data.expenses.change,
-                            true,
-                        )}
+                        {getChangeBadge(data.expenses.change, true)}
                         <span className="text-xs text-muted-foreground">
                             vs comparison period
                         </span>
@@ -153,10 +150,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             footer: (
                 <>
                     <div className="mt-2 flex items-center gap-2">
-                        {getChangeBadge(
-                            data.net_income.change,
-                            false,
-                        )}
+                        {getChangeBadge(data.net_income.change, false)}
                         <span className="text-xs text-muted-foreground">
                             vs comparison period
                         </span>
@@ -177,10 +171,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             footer: (
                 <>
                     <div className="mt-2 flex items-center gap-2">
-                        {getChangeBadge(
-                            data.total_assets.change,
-                            false,
-                        )}
+                        {getChangeBadge(data.total_assets.change, false)}
                         <span className="text-xs text-muted-foreground">
                             vs comparison period
                         </span>
@@ -201,10 +192,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             footer: (
                 <>
                     <div className="mt-2 flex items-center gap-2">
-                        {getChangeBadge(
-                            data.total_liabilities.change,
-                            true,
-                        )}
+                        {getChangeBadge(data.total_liabilities.change, true)}
                         <span className="text-xs text-muted-foreground">
                             vs comparison period
                         </span>
@@ -225,10 +213,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             footer: (
                 <>
                     <div className="mt-2 flex items-center gap-2">
-                        {getChangeBadge(
-                            data.equity.change,
-                            false,
-                        )}
+                        {getChangeBadge(data.equity.change, false)}
                         <span className="text-xs text-muted-foreground">
                             vs comparison period
                         </span>
@@ -249,10 +234,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             footer: (
                 <>
                     <div className="mt-2 flex items-center gap-2">
-                        {getChangeBadge(
-                            data.cash_balance.change,
-                            false,
-                        )}
+                        {getChangeBadge(data.cash_balance.change, false)}
                         <span className="text-xs text-muted-foreground">
                             vs comparison period
                         </span>

@@ -1,5 +1,5 @@
-import { Badge } from '@/components/ui/badge';
 import { KpiCard } from '@/components/common/KpiCard';
+import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatCurrency } from '@/lib/utils';
 import { TrendingDown, TrendingUp } from 'lucide-react';
