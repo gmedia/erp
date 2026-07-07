@@ -1,6 +1,6 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-07-01 — Sonar refactor batch A-F done. HEAD `ab962b57`.
+Last updated: 2026-07-07 — All SonarQube refactor work complete (A-G + regression waves). HEAD `2f66a978`. 0 issues, Quality Gate OK, 95.4% coverage, 0.7% dup density.
 
 ## SESSION 2026-06-22 — Purchase Request User Guide
 
@@ -628,12 +628,12 @@ Finalized `docs/refactor-sonar-progress.md`:
 - LSP diagnostics clean on changed file
 
 ### Commit
-- `TODO` — pending
+- Committed & pushed via PR #65 merge. HEAD `2f66a978`.
 
 ### Open risks
-- None. All 6 Sonar batches (A-F) complete. Sonar gate OK at 95.4% coverage, 0 duplications.
+- None. All Sonar waves (A-G) complete, including batch C regression wave. Sonar gate OK at 95.4% coverage, 0 issues.
 
 ### Next steps
-- Commit & push. Ready for new work.
+- All SonarQube refactor work complete. Ready for new feature/module work.
 
-**Continuation Prompt**: "Task C S3358 refactor ready to commit & push. What's next?"
+**Continuation Prompt**: "All Sonar refactor work complete (A-G). 0 issues, Quality Gate OK. What's next?"
