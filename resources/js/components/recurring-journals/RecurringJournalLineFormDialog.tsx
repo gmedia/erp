@@ -5,9 +5,8 @@ import { useEffect, useMemo } from 'react';
 import { type Resolver, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import AsyncSelectField from '@/components/common/AsyncSelectField';
-import { InputField } from '@/components/common/InputField';
 import { ItemFormDialogShell } from '@/components/common/ItemFormDialog';
+import { JournalLineFormFields } from '@/components/common/JournalLineFormFields';
 
 const recurringJournalLineSchema = z.object({
     account_id: z.coerce.number().min(1, { message: 'Account is required.' }),
@@ -89,69 +88,11 @@ export function RecurringJournalLineFormDialog({
             onSave={onSave}
             itemDescription="recurring journal line"
         >
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
-                <AsyncSelectField<{
-                    code: string;
-                    name: string;
-                    normal_balance: string;
-                }>
-                    key={`account-${defaultValues.account_id || 'new'}-${open ? 'open' : 'closed'}`}
-                    name="account_id"
-                    label="Account"
-                    url="/api/accounts?is_active=1&has_children=0"
-                    placeholder="Select Account"
-                    labelFn={(acc) =>
-                        `${acc.code} - ${acc.name} (${acc.normal_balance})`
-                    }
-                    initialLabel={
-                        defaultValues.account_code
-                            ? `${defaultValues.account_code} - ${defaultValues.account_name}`
-                            : ''
-                    }
-                    onItemSelect={(account) => {
-                        form.setValue('account_name', account?.name || '', {
-                            shouldDirty: true,
-                        });
-                        form.setValue('account_code', account?.code || '', {
-                            shouldDirty: true,
-                        });
-                    }}
-                />
-                <AsyncSelectField<{ name: string }>
-                    key={`branch-${defaultValues.branch_id || 'new'}-${open ? 'open' : 'closed'}`}
-                    name="branch_id"
-                    label="Branch"
-                    url="/api/branches"
-                    placeholder="Select branch"
-                    initialLabel={defaultValues.branch_name || ''}
-                    onItemSelect={(branch) => {
-                        form.setValue('branch_name', branch?.name || '', {
-                            shouldDirty: true,
-                        });
-                    }}
-                />
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <InputField
-                    name="debit"
-                    label="Debit"
-                    type="number"
-                    min={0}
-                    step="0.01"
-                    placeholder="0"
-                />
-                <InputField
-                    name="credit"
-                    label="Credit"
-                    type="number"
-                    min={0}
-                    step="0.01"
-                    placeholder="0"
-                />
-            </div>
-
-            <InputField name="memo" label="Memo" placeholder="Line Memo" />
+            <JournalLineFormFields
+                form={form}
+                open={open}
+                defaultValues={defaultValues}
+            />
         </ItemFormDialogShell>
     );
 }

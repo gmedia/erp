@@ -1,10 +1,9 @@
 'use client';
 
-import { createCustomerBranchFilterFields } from '@/components/common/customer-branch-filters';
 import {
+    createCustomerFinancialFilterFields,
     createDateFilterFields,
     createSelectFilterFields,
-    createTextFilterField,
     currencyOptions,
     type FieldDescriptor,
 } from '@/components/common/filters';
@@ -28,12 +27,9 @@ export function createArReceiptFilterFields(): FieldDescriptor[] {
     ];
 
     return [
-        createTextFilterField(
-            'search',
-            'Search',
+        ...createCustomerFinancialFilterFields(
             'Search receipt number, customer, or reference...',
         ),
-        ...createCustomerBranchFilterFields(),
         ...createSelectFilterFields([
             {
                 name: 'status',

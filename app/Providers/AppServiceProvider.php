@@ -91,32 +91,22 @@ class AppServiceProvider extends ServiceProvider
     {
         $isTesting = app()->environment('testing') || config('app.disable_rate_limiting');
 
-        RateLimiter::for('imports', function (Request $request) use ($isTesting) {
+        $this->registerRateLimiter('imports', 10, $isTesting);
+        $this->registerRateLimiter('exports', 10, $isTesting);
+        $this->registerRateLimiter('api', 60, $isTesting);
+    }
+
+    /**
+     * Register a single rate limiter by name.
+     */
+    protected function registerRateLimiter(string $name, int $maxPerMinute, bool $isTesting): void
+    {
+        RateLimiter::for($name, function (Request $request) use ($isTesting, $maxPerMinute) {
             if ($isTesting) {
                 return Limit::none();
             }
 
-            return Limit::perMinute(10)->by(
-                optional($request->user())->id ?: $request->ip()
-            );
-        });
-
-        RateLimiter::for('exports', function (Request $request) use ($isTesting) {
-            if ($isTesting) {
-                return Limit::none();
-            }
-
-            return Limit::perMinute(10)->by(
-                optional($request->user())->id ?: $request->ip()
-            );
-        });
-
-        RateLimiter::for('api', function (Request $request) use ($isTesting) {
-            if ($isTesting) {
-                return Limit::none();
-            }
-
-            return Limit::perMinute(60)->by(
+            return Limit::perMinute($maxPerMinute)->by(
                 optional($request->user())->id ?: $request->ip()
             );
         });

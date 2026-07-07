@@ -1,10 +1,9 @@
 'use client';
 
-import { createCustomerBranchFilterFields } from '@/components/common/customer-branch-filters';
 import {
+    createCustomerFinancialFilterFields,
     createDateFilterFields,
     createSelectFilterFields,
-    createTextFilterField,
     type FieldDescriptor,
 } from '@/components/common/filters';
 
@@ -26,12 +25,9 @@ export function createCreditNoteFilterFields(): FieldDescriptor[] {
     ];
 
     return [
-        createTextFilterField(
-            'search',
-            'Search',
+        ...createCustomerFinancialFilterFields(
             'Search credit note number, customer, or notes...',
         ),
-        ...createCustomerBranchFilterFields(),
         ...createSelectFilterFields([
             {
                 name: 'reason',

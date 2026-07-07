@@ -1,9 +1,7 @@
+import DashboardPageShell from '@/components/common/DashboardPageShell';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
-import { AlertCircle, Info, RefreshCw } from 'lucide-react';
-import { Helmet } from 'react-helmet-async';
+import { Info } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { AsyncSelect } from '../../components/common/AsyncSelect';
 import { CashFlowSummary } from '../../components/financial-dashboard/CashFlowSummary';
@@ -72,113 +70,85 @@ export default function FinancialDashboard() {
     const showSegmentBanner = data?.branch_scope?.excludes_unallocated === true;
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Helmet>
-                <title>Financial Dashboard</title>
-            </Helmet>
-            <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-4 pb-12 md:p-6">
-                <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
-                    <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-foreground">
-                            Financial Overview
-                        </h1>
-                        <p className="mt-1 text-muted-foreground">
-                            Monitor key financial metrics, cash flow, and
-                            expense trends.
-                        </p>
-                    </div>
-                    <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-                        <div
-                            className="flex flex-col gap-1.5"
-                            id="branch-filter"
+        <DashboardPageShell
+            title="Financial Dashboard"
+            heading="Financial Overview"
+            description="Monitor key financial metrics, cash flow, and expense trends."
+            breadcrumbs={breadcrumbs}
+            toolbar={
+                <>
+                    <div
+                        className="flex flex-col gap-1.5"
+                        id="branch-filter"
+                    >
+                        <label
+                            className="text-sm font-medium text-muted-foreground"
+                            htmlFor="branch-filter"
                         >
-                            <label
-                                className="text-sm font-medium text-muted-foreground"
-                                htmlFor="branch-filter"
-                            >
-                                Branch
-                            </label>
-                            <AsyncSelect
-                                url="/api/branches"
-                                placeholder="All Branches"
-                                value={branchId?.toString() ?? ''}
-                                onValueChange={handleBranchChange}
-                                className="w-[180px]"
-                            />
-                        </div>
-                        {data?.fiscal_years && data.fiscal_years.length > 0 && (
-                            <FiscalYearSelector
-                                fiscalYears={data.fiscal_years}
-                                selectedYearId={fiscalYearId}
-                                comparisonYearId={comparisonYearId}
-                                onYearChange={handleYearChange}
-                                onComparisonYearChange={
-                                    handleComparisonYearChange
-                                }
-                            />
-                        )}
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => refetch()}
-                            disabled={isLoading}
-                            className="flex items-center gap-2"
-                        >
-                            <RefreshCw
-                                className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`}
-                            />
-                            Refresh Data
-                        </Button>
+                            Branch
+                        </label>
+                        <AsyncSelect
+                            url="/api/branches"
+                            placeholder="All Branches"
+                            value={branchId?.toString() ?? ''}
+                            onValueChange={handleBranchChange}
+                            className="w-[180px]"
+                        />
                     </div>
-                </div>
+                    {data?.fiscal_years && data.fiscal_years.length > 0 && (
+                        <FiscalYearSelector
+                            fiscalYears={data.fiscal_years}
+                            selectedYearId={fiscalYearId}
+                            comparisonYearId={comparisonYearId}
+                            onYearChange={handleYearChange}
+                            onComparisonYearChange={
+                                handleComparisonYearChange
+                            }
+                        />
+                    )}
+                </>
+            }
+            isLoading={isLoading}
+            isError={isError}
+            error={error}
+            errorMessage="Failed to fetch financial dashboard data from the server. Please try refreshing."
+            refetch={refetch}
+        >
+            {showSegmentBanner && (
+                <Alert className="border-blue-200 bg-blue-50 text-blue-900 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-100">
+                    <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                    <AlertTitle className="font-semibold">
+                        Segment view — Branch P&L
+                    </AlertTitle>
+                    <AlertDescription className="mt-1 text-sm">
+                        Revenue, Expenses, and Net Income reflect this
+                        branch&apos;s segment only and exclude company-wide /
+                        unallocated entries (period-closing, depreciation).
+                        Total Assets, Liabilities, Equity, and Cash Balance
+                        remain company-wide.
+                    </AlertDescription>
+                </Alert>
+            )}
 
-                {isError && (
-                    <Alert variant="destructive" className="mb-4">
-                        <AlertCircle className="h-4 w-4" />
-                        <AlertTitle>Error Loading Dashboard</AlertTitle>
-                        <AlertDescription className="mt-2 max-w-lg text-sm">
-                            {error?.message ||
-                                'Failed to fetch financial dashboard data from the server. Please try refreshing.'}
-                        </AlertDescription>
-                    </Alert>
-                )}
+            <div className="space-y-6">
+                <SummaryCards data={data?.kpis} isLoading={isLoading} />
 
-                {showSegmentBanner && (
-                    <Alert className="border-blue-200 bg-blue-50 text-blue-900 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-100">
-                        <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                        <AlertTitle className="font-semibold">
-                            Segment view — Branch P&L
-                        </AlertTitle>
-                        <AlertDescription className="mt-1 text-sm">
-                            Revenue, Expenses, and Net Income reflect this
-                            branch&apos;s segment only and exclude company-wide
-                            / unallocated entries (period-closing,
-                            depreciation). Total Assets, Liabilities, Equity,
-                            and Cash Balance remain company-wide.
-                        </AlertDescription>
-                    </Alert>
-                )}
+                <MonthlyTrendChart
+                    data={data?.monthly_trends}
+                    isLoading={isLoading}
+                />
 
-                <div className="space-y-6">
-                    <SummaryCards data={data?.kpis} isLoading={isLoading} />
-
-                    <MonthlyTrendChart
-                        data={data?.monthly_trends}
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                    <CashFlowSummary
+                        data={data?.cash_flow_summary}
                         isLoading={isLoading}
                     />
-
-                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                        <CashFlowSummary
-                            data={data?.cash_flow_summary}
-                            isLoading={isLoading}
-                        />
-                        <ExpenseBreakdown
-                            data={data?.expense_breakdown}
-                            isLoading={isLoading}
-                        />
-                    </div>
+                    <ExpenseBreakdown
+                        data={data?.expense_breakdown}
+                        isLoading={isLoading}
+                    />
                 </div>
             </div>
-        </AppLayout>
+        </DashboardPageShell>
     );
 }
