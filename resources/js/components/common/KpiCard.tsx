@@ -15,7 +15,6 @@ export interface KpiCardProps {
 export function KpiCard({
     title,
     icon: Icon,
-    value: _value,
     formattedValue,
     borderColor,
     iconColor,
