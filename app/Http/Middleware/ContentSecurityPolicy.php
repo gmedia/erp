@@ -30,7 +30,7 @@ class ContentSecurityPolicy
         $connectSrc = "'self'";
         $scriptSrc = "'self' 'unsafe-inline'";
 
-        if (app()->environment('local')) {
+        if (app()->environment('local', 'testing')) {
             $connectSrc .= ' ws: http://localhost:*';
             $scriptSrc .= ' http://localhost:*';
         }
