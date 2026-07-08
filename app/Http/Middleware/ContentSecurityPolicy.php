@@ -28,14 +28,16 @@ class ContentSecurityPolicy
     protected function buildPolicy(): string
     {
         $connectSrc = "'self'";
+        $scriptSrc = "'self' 'unsafe-inline'";
 
         if (app()->environment('local')) {
             $connectSrc .= ' ws: http://localhost:*';
+            $scriptSrc .= ' http://localhost:*';
         }
 
         return implode('; ', [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline'",
+            "script-src {$scriptSrc}",
             "style-src 'self' 'unsafe-inline'",
             "img-src 'self' data:",
             "font-src 'self' data:",
