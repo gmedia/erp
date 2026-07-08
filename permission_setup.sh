@@ -159,3 +159,7 @@ done
 cp .env.example .env
 safe_chmod ugo+rw .env
 safe_chown 1000:1000 .env
+
+# Generate application encryption key
+echo "Generating application encryption key..."
+php artisan key:generate
