@@ -90,6 +90,8 @@ test('store creates ap payment with allocations', function () {
     $bankAccount = Account::factory()->create(['type' => 'asset']);
     $supplierBill = SupplierBill::factory()->confirmed()->create();
 
+    $allocationAmount = (int) $supplierBill->grand_total;
+
     $payload = [
         'supplier_id' => $supplier->id,
         'branch_id' => $branch->id,
@@ -98,14 +100,14 @@ test('store creates ap payment with allocations', function () {
         'payment_method' => 'bank_transfer',
         'bank_account_id' => $bankAccount->id,
         'currency' => 'IDR',
-        'total_amount' => 1000000,
+        'total_amount' => $allocationAmount,
         'reference' => 'TRF-001',
         'status' => 'draft',
         'notes' => 'Initial payment',
         'allocations' => [
             [
                 'supplier_bill_id' => $supplierBill->id,
-                'allocated_amount' => 1000000,
+                'allocated_amount' => $allocationAmount,
                 'discount_taken' => 0,
                 'notes' => 'Full payment',
             ],
