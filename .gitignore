@@ -33,6 +33,7 @@ yarn-error.log
 /.kilo*
 /.trae*
 /.claude*
+.sisyphus
 
 # IDE helper
 _ide_helper.php
@@ -52,7 +53,10 @@ coverage-new.xml
 # SonarQube artifacts
 sonar-project.properties
 opencode.json
+.opencode
 .playwright-mcp/
 
 # Depwire cache
 .depwire/
+.depwireignore
+depwire-output.json
