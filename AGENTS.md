@@ -70,6 +70,19 @@ gh pr view <id> --json headRefName         # Get branch name
 - ❌ Force-push or rebase shared branches
 - ❌ Using raw `git` directly — always use `rtk git`
 
+## Quality Gate
+
+- **WAJIB** gunakan SonarQube MCP tools (`sonarqube_*`) untuk SEMUA masalah terkait quality gate.
+- Tools yang tersedia: `sonarqube_get_project_quality_gate_status`, `sonarqube_search_sonar_issues_in_projects`, `sonarqube_get_component_measures`, `sonarqube_search_duplicated_files`, `sonarqube_search_files_by_coverage`, `sonarqube_get_duplications`, `sonarqube_get_file_coverage_details`, dll.
+- **Alur standar**:
+  1. Cek status quality gate: `sonarqube_get_project_quality_gate_status(projectKey="gmedia_erp")`
+  2. Jika failed → ambil metrik inti: `sonarqube_get_component_measures(projectKey="gmedia_erp", metricKeys=["duplicated_lines", "duplicated_blocks", "duplicated_lines_density", "ncloc", "coverage", "bugs", "vulnerabilities", "code_smells"])`
+  3. Tentukan prioritas berdasarkan metrik yang paling kritis.
+  4. Untuk duplikasi: `sonarqube_search_duplicated_files(projectKey="gmedia_erp")` → ambil file prioritas tertinggi.
+  5. Untuk coverage: `sonarqube_search_files_by_coverage(projectKey="gmedia_erp", maxCoverage=50)` → tambah test.
+  6. Untuk issues: `sonarqube_search_sonar_issues_in_projects(projects=["gmedia_erp"], severities=["HIGH","BLOCKER"])` → fix critical issues.
+- **JANGAN** berspekulasi tentang status quality gate tanpa data dari SonarQube MCP.
+
 ---
 
 # PROJECT KNOWLEDGE BASE
