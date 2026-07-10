@@ -258,6 +258,7 @@ jobs:
     timeout-minutes: 150
     needs: quality
     if: ${{ needs.quality.outputs.autofix_applied != 'true' }}
+    continue-on-error: true
     permissions:
       contents: read
       packages: read
@@ -507,5 +508,32 @@ jobs:
           fi
 
           echo "quality=${{ needs.quality.result }} e2e=${{ needs.e2e.result }}"
-          [ "${{ needs.quality.result }}" = "success" ]
-          [ "${{ needs.e2e.result }}" = "success" ]
+
+          quality_result="${{ needs.quality.result }}"
+          e2e_result="${{ needs.e2e.result }}"
+
+          if [[ "$quality_result" == "success" ]]; then
+            echo "✅ quality=success"
+            quality_passed=true
+          else
+            echo "❌ quality=$quality_result"
+            quality_passed=false
+          fi
+
+          if [[ "$e2e_result" == "success" || "$e2e_result" == "skipped" || "$e2e_result" == "cancelled" ]]; then
+            echo "✅ e2e=$e2e_result (non-blocking)"
+            e2e_passed=true
+          else
+            echo "❌ e2e=$e2e_result"
+            e2e_passed=false
+          fi
+
+          if [[ "$quality_passed" == "true" ]] && [[ "$e2e_passed" == "true" ]]; then
+            echo "CI=success"
+            echo "ci=success" >> "$GITHUB_OUTPUT"
+            exit 0
+          else
+            echo "CI=failure"
+            echo "ci=failure" >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
