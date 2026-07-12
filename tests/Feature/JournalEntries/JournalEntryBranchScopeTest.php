@@ -3,6 +3,7 @@
 use App\Models\Account;
 use App\Models\Branch;
 use App\Models\Employee;
+use App\Models\Employment;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
 use App\Models\Permission;
@@ -22,6 +23,9 @@ function makeJournalUserInBranch(?int $branchId, array $permissions): User
     $user = User::factory()->create();
     $employee = Employee::factory()->create([
         'user_id' => $user->id,
+    ]);
+    Employment::factory()->create([
+        'employee_id' => $employee->id,
         'branch_id' => $branchId,
         'department_id' => null,
         'position_id' => null,

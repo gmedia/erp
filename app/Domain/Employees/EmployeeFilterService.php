@@ -3,41 +3,87 @@
 namespace App\Domain\Employees;
 
 use App\Domain\Concerns\BaseFilterService;
-use App\Models\Employee;
 use Illuminate\Database\Eloquent\Builder;
 
-/**
- * Filter service for employee queries.
- *
- * Provides search, advanced filtering, and sorting functionality for employee listings.
- */
 class EmployeeFilterService
 {
     use BaseFilterService;
 
+    private bool $employmentJoined = false;
+
     /**
-     * Apply advanced filters for employees (department, position, salary, hire date).
+     * Apply search across employee fields, qualifying bare column names
+     * with "employees." prefix to avoid ambiguous-column errors after
+     * the employment join is added by applyAdvancedFilters.
      *
-     * @param  Builder<Employee>  $query
-     * @param  array<string, mixed>  $filters
+     * Fully overrides the trait method instead of delegating, because
+     * trait methods cannot be called statically.
+     *
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  Builder<TModel>  $query
+     * @param  array<int, string>  $searchFields
+     * @param  array<string, array<int, string>>  $relationSearchFields
      */
+    public function applySearch(
+        Builder $query,
+        string $search,
+        array $searchFields,
+        array $relationSearchFields = []
+    ): void {
+        $qualifiedFields = $this->qualifySearchFields('employees', $searchFields);
+
+        $query->where(function ($q) use ($search, $qualifiedFields, $relationSearchFields) {
+            foreach ($qualifiedFields as $field) {
+                $q->orWhere($field, 'like', "%{$search}%");
+            }
+
+            foreach ($relationSearchFields as $relation => $fields) {
+                $q->orWhereHas($relation, function ($relationQuery) use ($search, $fields) {
+                    $relationQuery->where(function ($rq) use ($search, $fields) {
+                        foreach ($fields as $field) {
+                            $rq->orWhere($field, 'like', "%{$search}%");
+                        }
+                    });
+                });
+            }
+        });
+    }
+
     public function applyAdvancedFilters(Builder $query, array $filters): void
     {
+        $this->ensureEmploymentJoin($query);
+
         $this->applyConfiguredFilters(
             $query,
             $filters,
             [
-                'department_id' => 'department_id',
-                'position_id' => 'position_id',
-                'branch_id' => 'branch_id',
-                'employment_status' => 'employment_status',
+                'department_id' => 'employments.department_id',
+                'position_id' => 'employments.position_id',
+                'branch_id' => 'employments.branch_id',
+                'employment_status' => 'employments.employment_status',
             ],
             [
-                'hire_date' => ['from' => 'hire_date_from', 'to' => 'hire_date_to'],
+                'employments.hire_date' => ['from' => 'hire_date_from', 'to' => 'hire_date_to'],
             ],
             [
-                'salary' => ['min' => 'salary_min', 'max' => 'salary_max'],
+                'employments.salary' => ['min' => 'salary_min', 'max' => 'salary_max'],
             ],
         );
+    }
+
+    private function ensureEmploymentJoin(Builder $query): void
+    {
+        if ($this->employmentJoined) {
+            return;
+        }
+
+        $query->select('employees.*')
+            ->leftJoin('employments', function ($join) {
+                $join->on('employees.id', '=', 'employments.employee_id')
+                    ->where('employments.is_current', true);
+            });
+
+        $this->employmentJoined = true;
     }
 }

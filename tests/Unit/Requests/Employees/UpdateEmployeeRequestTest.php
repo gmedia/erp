@@ -42,13 +42,13 @@ describe('UpdateEmployeeRequest', function () {
             'name',
             'email',
             'phone',
-            'department_id',
-            'position_id',
-            'branch_id',
-            'salary',
-            'hire_date',
-            'employment_status',
-            'termination_date',
+            'current_employment.department_id',
+            'current_employment.position_id',
+            'current_employment.branch_id',
+            'current_employment.salary',
+            'current_employment.hire_date',
+            'current_employment.employment_status',
+            'current_employment.termination_date',
         ]);
     });
 
@@ -194,7 +194,7 @@ describe('UpdateEmployeeRequest', function () {
 
     test('rules validation fails with invalid department', function () {
         $employee = Employee::factory()->create();
-        $data = ['department_id' => 999999]; // non-existent department id
+        $data = ['current_employment' => ['department_id' => 999999]]; // non-existent department id
 
         $request = new UpdateEmployeeRequest;
         $request->setRouteResolver(function () use ($employee) {
@@ -217,12 +217,12 @@ describe('UpdateEmployeeRequest', function () {
         $validator = validator($data, $request->rules());
 
         expect($validator->fails())->toBeTrue()
-            ->and($validator->errors()->has('department_id'))->toBeTrue();
+            ->and($validator->errors()->has('current_employment.department_id'))->toBeTrue();
     });
 
     test('rules validation fails with negative salary', function () {
         $employee = Employee::factory()->create();
-        $data = ['salary' => '-1000'];
+        $data = ['current_employment' => ['salary' => '-1000']];
 
         $request = new UpdateEmployeeRequest;
         $request->setRouteResolver(function () use ($employee) {
@@ -245,12 +245,12 @@ describe('UpdateEmployeeRequest', function () {
         $validator = validator($data, $request->rules());
 
         expect($validator->fails())->toBeTrue()
-            ->and($validator->errors()->has('salary'))->toBeTrue();
+            ->and($validator->errors()->has('current_employment.salary'))->toBeTrue();
     });
 
     test('rules validation fails with invalid hire_date', function () {
         $employee = Employee::factory()->create();
-        $data = ['hire_date' => 'invalid-date'];
+        $data = ['current_employment' => ['hire_date' => 'invalid-date']];
 
         $request = new UpdateEmployeeRequest;
         $request->setRouteResolver(function () use ($employee) {
@@ -273,14 +273,14 @@ describe('UpdateEmployeeRequest', function () {
         $validator = validator($data, $request->rules());
 
         expect($validator->fails())->toBeTrue()
-            ->and($validator->errors()->has('hire_date'))->toBeTrue();
+            ->and($validator->errors()->has('current_employment.hire_date'))->toBeTrue();
     });
 
     test('rules validation passes with valid department id', function () {
         $employee = Employee::factory()->create();
         $department = Department::factory()->create();
 
-        $data = ['department_id' => $department->id];
+        $data = ['current_employment' => ['department_id' => $department->id]];
 
         $request = new UpdateEmployeeRequest;
         $request->setRouteResolver(function () use ($employee) {

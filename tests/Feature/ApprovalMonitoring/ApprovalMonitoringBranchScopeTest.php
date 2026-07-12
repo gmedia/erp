@@ -7,6 +7,7 @@ use App\Models\ApprovalRequestStep;
 use App\Models\Asset;
 use App\Models\Branch;
 use App\Models\Employee;
+use App\Models\Employment;
 use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -24,6 +25,9 @@ function makeApprovalUser(?int $branchId, array $permissions): User
     $user = User::factory()->create();
     $employee = Employee::factory()->create([
         'user_id' => $user->id,
+    ]);
+    Employment::factory()->create([
+        'employee_id' => $employee->id,
         'branch_id' => $branchId,
         'department_id' => null,
         'position_id' => null,

@@ -27,13 +27,13 @@ describe('StoreEmployeeRequest', function () {
             'name',
             'email',
             'phone',
-            'department_id',
-            'position_id',
-            'branch_id',
-            'salary',
-            'hire_date',
-            'employment_status',
-            'termination_date',
+            'current_employment.department_id',
+            'current_employment.position_id',
+            'current_employment.branch_id',
+            'current_employment.salary',
+            'current_employment.hire_date',
+            'current_employment.employment_status',
+            'current_employment.termination_date',
         ]);
     });
 
@@ -45,13 +45,14 @@ describe('StoreEmployeeRequest', function () {
             'employee_id' => 'EMP-123',
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
-            'phone' => '555-1234',
-            'department_id' => $department->id,
-            'position_id' => $position->id,
-            'branch_id' => Branch::factory()->create()->id,
-            'salary' => '75000.00',
-            'hire_date' => '2023-01-15',
-            'employment_status' => 'regular',
+            'current_employment' => [
+                'department_id' => $department->id,
+                'position_id' => $position->id,
+                'branch_id' => Branch::factory()->create()->id,
+                'salary' => '75000.00',
+                'hire_date' => '2023-01-15',
+                'employment_status' => 'regular',
+            ],
         ];
 
         $validator = validator($data, (new StoreEmployeeRequest)->rules());
@@ -68,11 +69,11 @@ describe('StoreEmployeeRequest', function () {
             ->and($validator->errors()->has('employee_id'))->toBeTrue()
             ->and($validator->errors()->has('name'))->toBeTrue()
             ->and($validator->errors()->has('email'))->toBeTrue()
-            ->and($validator->errors()->has('department_id'))->toBeTrue()
-            ->and($validator->errors()->has('position_id'))->toBeTrue()
-            ->and($validator->errors()->has('branch_id'))->toBeTrue()
-            ->and($validator->errors()->has('hire_date'))->toBeTrue()
-            ->and($validator->errors()->has('employment_status'))->toBeTrue();
+            ->and($validator->errors()->has('current_employment.department_id'))->toBeTrue()
+            ->and($validator->errors()->has('current_employment.position_id'))->toBeTrue()
+            ->and($validator->errors()->has('current_employment.branch_id'))->toBeTrue()
+            ->and($validator->errors()->has('current_employment.hire_date'))->toBeTrue()
+            ->and($validator->errors()->has('current_employment.employment_status'))->toBeTrue();
     });
 
     test('rules validation fails with invalid email', function () {
@@ -83,12 +84,14 @@ describe('StoreEmployeeRequest', function () {
             'employee_id' => 'EMP-123',
             'name' => 'John Doe',
             'email' => 'invalid-email',
-            'department_id' => $department->id,
-            'position_id' => $position->id,
-            'branch_id' => Branch::factory()->create()->id,
-            'salary' => '75000.00',
-            'hire_date' => '2023-01-15',
-            'employment_status' => 'regular',
+            'current_employment' => [
+                'department_id' => $department->id,
+                'position_id' => $position->id,
+                'branch_id' => Branch::factory()->create()->id,
+                'salary' => '75000.00',
+                'hire_date' => '2023-01-15',
+                'employment_status' => 'regular',
+            ],
         ];
 
         $validator = validator($data, (new StoreEmployeeRequest)->rules());
@@ -106,12 +109,14 @@ describe('StoreEmployeeRequest', function () {
             'employee_id' => 'EMP-123',
             'name' => 'John Doe',
             'email' => 'existing@example.com',
-            'department_id' => $department->id,
-            'position_id' => $position->id,
-            'branch_id' => Branch::factory()->create()->id,
-            'salary' => '75000.00',
-            'hire_date' => '2023-01-15',
-            'employment_status' => 'regular',
+            'current_employment' => [
+                'department_id' => $department->id,
+                'position_id' => $position->id,
+                'branch_id' => Branch::factory()->create()->id,
+                'salary' => '75000.00',
+                'hire_date' => '2023-01-15',
+                'employment_status' => 'regular',
+            ],
         ];
 
         $validator = validator($data, (new StoreEmployeeRequest)->rules());
@@ -127,18 +132,20 @@ describe('StoreEmployeeRequest', function () {
             'employee_id' => 'EMP-123',
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
-            'department_id' => 999999, // non-existent department id
-            'position_id' => $position->id,
-            'branch_id' => Branch::factory()->create()->id,
-            'salary' => '75000.00',
-            'hire_date' => '2023-01-15',
-            'employment_status' => 'regular',
+            'current_employment' => [
+                'department_id' => 999999,
+                'position_id' => $position->id,
+                'branch_id' => Branch::factory()->create()->id,
+                'salary' => '75000.00',
+                'hire_date' => '2023-01-15',
+                'employment_status' => 'regular',
+            ],
         ];
 
         $validator = validator($data, (new StoreEmployeeRequest)->rules());
 
         expect($validator->fails())->toBeTrue()
-            ->and($validator->errors()->has('department_id'))->toBeTrue();
+            ->and($validator->errors()->has('current_employment.department_id'))->toBeTrue();
     });
 
     test('rules validation fails with negative salary', function () {
@@ -149,18 +156,20 @@ describe('StoreEmployeeRequest', function () {
             'employee_id' => 'EMP-123',
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
-            'department_id' => $department->id,
-            'position_id' => $position->id,
-            'branch_id' => Branch::factory()->create()->id,
-            'salary' => '-1000',
-            'hire_date' => '2023-01-15',
-            'employment_status' => 'regular',
+            'current_employment' => [
+                'department_id' => $department->id,
+                'position_id' => $position->id,
+                'branch_id' => Branch::factory()->create()->id,
+                'salary' => '-1000',
+                'hire_date' => '2023-01-15',
+                'employment_status' => 'regular',
+            ],
         ];
 
         $validator = validator($data, (new StoreEmployeeRequest)->rules());
 
         expect($validator->fails())->toBeTrue()
-            ->and($validator->errors()->has('salary'))->toBeTrue();
+            ->and($validator->errors()->has('current_employment.salary'))->toBeTrue();
     });
 
     test('rules validation fails with invalid hire_date', function () {
@@ -171,18 +180,20 @@ describe('StoreEmployeeRequest', function () {
             'employee_id' => 'EMP-123',
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
-            'department_id' => $department->id,
-            'position_id' => $position->id,
-            'branch_id' => Branch::factory()->create()->id,
-            'salary' => '75000.00',
-            'hire_date' => 'invalid-date',
-            'employment_status' => 'regular',
+            'current_employment' => [
+                'department_id' => $department->id,
+                'position_id' => $position->id,
+                'branch_id' => Branch::factory()->create()->id,
+                'salary' => '75000.00',
+                'hire_date' => 'invalid-date',
+                'employment_status' => 'regular',
+            ],
         ];
 
         $validator = validator($data, (new StoreEmployeeRequest)->rules());
 
         expect($validator->fails())->toBeTrue()
-            ->and($validator->errors()->has('hire_date'))->toBeTrue();
+            ->and($validator->errors()->has('current_employment.hire_date'))->toBeTrue();
     });
 
     test('rules validation passes with valid branch id', function () {
@@ -194,12 +205,14 @@ describe('StoreEmployeeRequest', function () {
             'employee_id' => 'EMP-123',
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
-            'department_id' => $department->id,
-            'position_id' => $position->id,
-            'branch_id' => $branch->id,
-            'salary' => '75000.00',
-            'hire_date' => '2023-01-15',
-            'employment_status' => 'regular',
+            'current_employment' => [
+                'department_id' => $department->id,
+                'position_id' => $position->id,
+                'branch_id' => $branch->id,
+                'salary' => '75000.00',
+                'hire_date' => '2023-01-15',
+                'employment_status' => 'regular',
+            ],
         ];
 
         $validator = validator($data, (new StoreEmployeeRequest)->rules());

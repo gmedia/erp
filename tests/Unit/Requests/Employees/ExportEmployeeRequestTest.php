@@ -30,8 +30,8 @@ test('rules returns validation rules', function () {
     expect($rules['sort_by'])->toBe([
         'nullable',
         'string',
-        'in:id,employee_id,name,email,department_id,position_id,salary,employment_status,'
-            . 'hire_date,created_at,updated_at',
+        'in:id,employee_id,name,email,employments.department_id,employments.position_id,'
+            . 'employments.salary,employments.employment_status,employments.hire_date,created_at,updated_at',
     ]);
     expect($rules['sort_direction'])->toBe(['nullable', 'string', 'in:asc,desc']);
 });

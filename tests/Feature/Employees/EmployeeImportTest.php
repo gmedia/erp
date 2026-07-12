@@ -42,6 +42,9 @@ test('can import employees from csv file', function () {
 
     $this->assertDatabaseHas('employees', [
         'email' => 'john@example.com',
+    ]);
+
+    $this->assertDatabaseHas('employments', [
         'department_id' => $this->department->id,
         'position_id' => $this->position->id,
         'branch_id' => $this->branch->id,
@@ -108,7 +111,6 @@ test('skips/upserts existing email', function () {
     Employee::factory()->create([
         'email' => 'exist@example.com',
         'name' => 'Old Name',
-        'salary' => 5000000,
     ]);
 
     $csvContent = implode("\n", [
@@ -132,7 +134,6 @@ test('skips/upserts existing email', function () {
     $this->assertDatabaseHas('employees', [
         'email' => 'exist@example.com',
         'name' => 'New Name',
-        'salary' => 9000000,
     ]);
 })->group('employees');
 

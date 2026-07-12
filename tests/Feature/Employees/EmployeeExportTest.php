@@ -1,8 +1,10 @@
 <?php
 
 use App\Exports\EmployeeExport;
+use App\Models\Company;
 use App\Models\Department;
 use App\Models\Employee;
+use App\Models\Employment;
 use App\Models\Position;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -32,16 +34,43 @@ describe('EmployeeExport', function () {
         $marketing = Department::factory()->create(['name' => 'Marketing']);
         $sales = Department::factory()->create(['name' => 'Sales']);
 
-        Employee::factory()->create(['department_id' => $engineering->id]);
-        Employee::factory()->create(['department_id' => $marketing->id]);
-        Employee::factory()->create(['department_id' => $sales->id]);
+        Employee::factory()
+            ->afterCreating(function ($e) use ($engineering) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => $engineering->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => now()->subYear(),
+                    'is_current' => true, ]);
+            })
+            ->create();
+        Employee::factory()
+            ->afterCreating(function ($e) use ($marketing) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => $marketing->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => now()->subYear(),
+                    'is_current' => true, ]);
+            })
+            ->create();
+        Employee::factory()
+            ->afterCreating(function ($e) use ($sales) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => $sales->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => now()->subYear(),
+                    'is_current' => true, ]);
+            })
+            ->create();
 
         $export = new EmployeeExport(['department_id' => $engineering->id]);
 
         $results = $export->query()->get();
 
         expect($results)->toHaveCount(1)
-            ->and($results->first()->department->name)->toBe('Engineering');
+            ->and($results->first()->currentEmployment->department->name)->toBe('Engineering');
     });
 
     test('query applies exact position filter', function () {
@@ -49,99 +78,362 @@ describe('EmployeeExport', function () {
         $productManager = Position::factory()->create(['name' => 'Product Manager']);
         $designer = Position::factory()->create(['name' => 'Designer']);
 
-        Employee::factory()->create(['position_id' => $seniorDev->id]);
-        Employee::factory()->create(['position_id' => $productManager->id]);
-        Employee::factory()->create(['position_id' => $designer->id]);
+        Employee::factory()
+            ->afterCreating(function ($e) use ($seniorDev) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => $seniorDev->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => now()->subYear(),
+                    'is_current' => true, ]);
+            })
+            ->create();
+        Employee::factory()
+            ->afterCreating(function ($e) use ($productManager) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => $productManager->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => now()->subYear(),
+                    'is_current' => true, ]);
+            })
+            ->create();
+        Employee::factory()
+            ->afterCreating(function ($e) use ($designer) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => $designer->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => now()->subYear(),
+                    'is_current' => true, ]);
+            })
+            ->create();
 
         $export = new EmployeeExport(['position_id' => $seniorDev->id]);
 
         $results = $export->query()->get();
 
         expect($results)->toHaveCount(1)
-            ->and($results->first()->position->name)->toBe('Senior Developer');
+            ->and($results->first()->currentEmployment->position->name)->toBe('Senior Developer');
     });
 
     test('query applies minimum salary filter', function () {
-        Employee::factory()->create(['salary' => 45000.00]);
-        Employee::factory()->create(['salary' => 65000.00]);
-        Employee::factory()->create(['salary' => 85000.00]);
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => '2023-01-01',
+                    'salary' => 45000.00,
+                    'is_current' => true, ]);
+            })
+            ->create();
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => '2023-01-01',
+                    'salary' => 65000.00,
+                    'is_current' => true, ]);
+            })
+            ->create();
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => '2023-01-01',
+                    'salary' => 85000.00,
+                    'is_current' => true, ]);
+            })
+            ->create();
 
-        $export = new EmployeeExport(['min_salary' => 60000]);
+        $export = new EmployeeExport(['salary_min' => 60000]);
 
         $results = $export->query()->get();
 
         expect($results)->toHaveCount(2);
-        $salaries = $results->pluck('salary')->map(fn ($s) => (float) $s)->sort()->values();
+        $salaries = $results->map(fn ($e) => (float) $e->currentEmployment->salary)->sort()->values();
         expect($salaries[0])->toBeGreaterThanOrEqual(65000.00)
             ->and($salaries[1])->toBeGreaterThanOrEqual(65000.00);
     });
 
     test('query applies maximum salary filter', function () {
-        Employee::factory()->create(['salary' => 45000.00]);
-        Employee::factory()->create(['salary' => 65000.00]);
-        Employee::factory()->create(['salary' => 85000.00]);
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => '2023-01-01',
+                    'salary' => 45000.00,
+                    'is_current' => true, ]);
+            })
+            ->create();
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => '2023-01-01',
+                    'salary' => 65000.00,
+                    'is_current' => true, ]);
+            })
+            ->create();
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => '2023-01-01',
+                    'salary' => 85000.00,
+                    'is_current' => true, ]);
+            })
+            ->create();
 
-        $export = new EmployeeExport(['max_salary' => 70000]);
+        $export = new EmployeeExport(['salary_max' => 60000]);
 
         $results = $export->query()->get();
 
-        expect($results)->toHaveCount(2);
-        $salaries = $results->pluck('salary')->map(fn ($s) => (float) $s)->sort()->values();
-        expect($salaries[0])->toBeLessThanOrEqual(65000.00)
-            ->and($salaries[1])->toBeLessThanOrEqual(65000.00);
+        expect($results)->toHaveCount(1);
+        expect((float) $results->first()->currentEmployment->salary)->toBe(45000.00);
     });
 
     test('query applies both min and max salary range filters', function () {
-        Employee::factory()->create(['salary' => 40000.00]);
-        Employee::factory()->create(['salary' => 60000.00]);
-        Employee::factory()->create(['salary' => 80000.00]);
-        Employee::factory()->create(['salary' => 100000.00]);
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => '2023-01-01',
+                    'salary' => 50000.00,
+                    'is_current' => true, ]);
+            })
+            ->create();
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => '2023-01-01',
+                    'salary' => 75000.00,
+                    'is_current' => true, ]);
+            })
+            ->create();
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => '2023-01-01',
+                    'salary' => 100000.00,
+                    'is_current' => true, ]);
+            })
+            ->create();
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => '2023-01-01',
+                    'salary' => 60000.00,
+                    'is_current' => true, ]);
+            })
+            ->create();
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => '2023-01-01',
+                    'salary' => 80000.00,
+                    'is_current' => true, ]);
+            })
+            ->create();
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => '2023-01-01',
+                    'salary' => 100000.00,
+                    'is_current' => true, ]);
+            })
+            ->create();
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => '2023-01-01',
+                    'salary' => 60000.00,
+                    'is_current' => true, ]);
+            })
+            ->create();
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => '2023-01-01',
+                    'salary' => 80000.00,
+                    'is_current' => true, ]);
+            })
+            ->create();
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => '2023-01-01',
+                    'salary' => 100000.00,
+                    'is_current' => true, ]);
+            })
+            ->create();
 
         $export = new EmployeeExport([
-            'min_salary' => 55000,
-            'max_salary' => 90000,
+            'salary_min' => 55000,
+            'salary_max' => 90000,
         ]);
 
         $results = $export->query()->get();
 
         expect($results)->toHaveCount(2);
-        $salaries = $results->pluck('salary')->map(fn ($s) => (float) $s)->sort()->values();
+        $salaries = $results->map(fn ($e) => (float) $e->currentEmployment->salary)->sort()->values();
         expect($salaries[0])->toBe(60000.00)
             ->and($salaries[1])->toBe(80000.00);
     });
 
     test('query applies hire date from filter', function () {
-        Employee::factory()->create(['hire_date' => '2023-01-01']);
-        Employee::factory()->create(['hire_date' => '2023-06-01']);
-        Employee::factory()->create(['hire_date' => '2023-12-01']);
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => '2023-01-15',
+                    'is_current' => true, ]);
+            })
+            ->create();
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => '2023-06-01',
+                    'is_current' => true, ]);
+            })
+            ->create();
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => '2023-12-20',
+                    'is_current' => true, ]);
+            })
+            ->create();
 
         $export = new EmployeeExport(['hire_date_from' => '2023-03-01']);
 
         $results = $export->query()->get();
 
         expect($results)->toHaveCount(2);
-        $hireDates = $results->pluck('hire_date')->map(fn ($d) => $d->format('Y-m-d'))->sort()->values();
-        expect($hireDates)->toContain('2023-06-01', '2023-12-01');
+        $dates = $results->map(fn ($e) => $e->currentEmployment->hire_date)->sort()->values();
+        expect($dates[0]->format('Y-m-d'))->toBe('2023-06-01')
+            ->and($dates[1]->format('Y-m-d'))->toBe('2023-12-20');
     });
 
     test('query applies hire date to filter', function () {
-        Employee::factory()->create(['hire_date' => '2023-01-01']);
-        Employee::factory()->create(['hire_date' => '2023-06-01']);
-        Employee::factory()->create(['hire_date' => '2023-12-01']);
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => '2023-01-15',
+                    'is_current' => true, ]);
+            })
+            ->create();
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => '2023-06-01',
+                    'is_current' => true, ]);
+            })
+            ->create();
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => '2023-12-20',
+                    'is_current' => true, ]);
+            })
+            ->create();
 
         $export = new EmployeeExport(['hire_date_to' => '2023-09-01']);
 
         $results = $export->query()->get();
 
         expect($results)->toHaveCount(2);
-        $hireDates = $results->pluck('hire_date')->map(fn ($d) => $d->format('Y-m-d'))->sort()->values();
-        expect($hireDates)->toContain('2023-01-01', '2023-06-01');
+        $dates = $results->map(fn ($e) => $e->currentEmployment->hire_date)->sort()->values();
+        expect($dates[0]->format('Y-m-d'))->toBe('2023-01-15')
+            ->and($dates[1]->format('Y-m-d'))->toBe('2023-06-01');
     });
 
     test('query applies hire date range filters', function () {
-        Employee::factory()->create(['hire_date' => '2023-01-01']);
-        Employee::factory()->create(['hire_date' => '2023-06-01']);
-        Employee::factory()->create(['hire_date' => '2023-12-01']);
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => '2023-01-01',
+                    'is_current' => true, ]);
+            })
+            ->create();
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => '2023-06-01',
+                    'is_current' => true, ]);
+            })
+            ->create();
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => '2023-12-01',
+                    'is_current' => true, ]);
+            })
+            ->create();
 
         $export = new EmployeeExport([
             'hire_date_from' => '2023-03-01',
@@ -151,7 +443,7 @@ describe('EmployeeExport', function () {
         $results = $export->query()->get();
 
         expect($results)->toHaveCount(1)
-            ->and($results->first()->hire_date->format('Y-m-d'))->toBe('2023-06-01');
+            ->and($results->first()->currentEmployment->hire_date->format('Y-m-d'))->toBe('2023-06-01');
     });
 
     test('query applies ascending sort by name', function () {
@@ -169,9 +461,39 @@ describe('EmployeeExport', function () {
     });
 
     test('query applies descending sort by salary', function () {
-        Employee::factory()->create(['name' => 'Low Salary', 'salary' => 40000.00]);
-        Employee::factory()->create(['name' => 'High Salary', 'salary' => 80000.00]);
-        Employee::factory()->create(['name' => 'Medium Salary', 'salary' => 60000.00]);
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => '2023-01-01',
+                    'salary' => 40000.00,
+                    'is_current' => true, ]);
+            })
+            ->create(['name' => 'Low Salary']);
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => '2023-01-01',
+                    'salary' => 80000.00,
+                    'is_current' => true, ]);
+            })
+            ->create(['name' => 'High Salary']);
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => '2023-01-01',
+                    'salary' => 60000.00,
+                    'is_current' => true, ]);
+            })
+            ->create(['name' => 'Medium Salary']);
 
         $export = new EmployeeExport(['sort_by' => 'salary', 'sort_direction' => 'desc']);
 
@@ -201,28 +523,37 @@ describe('EmployeeExport', function () {
         $marketingManager = Position::factory()->create(['name' => 'Marketing Manager']);
         $developer = Position::factory()->create(['name' => 'Developer']);
 
-        Employee::factory()->create([
-            'name' => 'John Developer',
-            'department_id' => $engineering->id,
-            'position_id' => $seniorDev->id,
-            'salary' => 75000.00,
-        ]);
-        Employee::factory()->create([
-            'name' => 'Jane Manager',
-            'department_id' => $marketing->id,
-            'position_id' => $marketingManager->id,
-            'salary' => 65000.00,
-        ]);
-        Employee::factory()->create([
-            'name' => 'Bob Developer',
-            'department_id' => $engineering->id,
-            'position_id' => $developer->id,
-            'salary' => 55000.00,
-        ]);
+        Employee::factory()
+            ->afterCreating(function ($e) use ($engineering, $seniorDev) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => $engineering->id,
+                    'position_id' => $seniorDev->id,
+                    'salary' => 75000.00,
+                    'is_current' => true, ]);
+            })
+            ->create(['name' => 'John Developer']);
+        Employee::factory()
+            ->afterCreating(function ($e) use ($marketing, $marketingManager) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => $marketing->id,
+                    'position_id' => $marketingManager->id,
+                    'salary' => 65000.00,
+                    'is_current' => true, ]);
+            })
+            ->create(['name' => 'Jane Manager']);
+        Employee::factory()
+            ->afterCreating(function ($e) use ($engineering, $developer) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => $engineering->id,
+                    'position_id' => $developer->id,
+                    'salary' => 55000.00,
+                    'is_current' => true, ]);
+            })
+            ->create(['name' => 'Bob Developer']);
 
         $export = new EmployeeExport([
             'department_id' => $engineering->id,
-            'min_salary' => 60000,
+            'salary_min' => 60000,
             'sort_by' => 'name',
             'sort_direction' => 'asc',
         ]);
@@ -258,16 +589,24 @@ describe('EmployeeExport', function () {
         $department = Department::factory()->create(['name' => 'Engineering']);
         $position = Position::factory()->create(['name' => 'Senior Developer']);
 
-        $employee = Employee::factory()->create([
-            'name' => 'John Doe',
-            'email' => 'john@example.com',
-            'phone' => '555-1234',
-            'department_id' => $department->id,
-            'position_id' => $position->id,
-            'salary' => 85000.50,
-            'hire_date' => '2023-03-15',
-            'created_at' => '2023-01-10 14:30:00',
-        ]);
+        $employee = Employee::factory()
+            ->afterCreating(function ($e) use ($department, $position) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => $department->id,
+                    'position_id' => $position->id,
+                    'salary' => 85000.50,
+                    'hire_date' => '2023-03-15',
+                    'is_current' => true, ]);
+            })
+            ->create([
+                'name' => 'John Doe',
+                'email' => 'john@example.com',
+                'phone' => '555-1234',
+                'created_at' => '2023-01-10 14:30:00',
+            ]);
+
+        // Refresh to load relationships
+        $employee->refresh()->load('currentEmployment.department', 'currentEmployment.position', 'currentEmployment.branch');
 
         $export = new EmployeeExport([]);
         $mapped = $export->map($employee);
@@ -280,9 +619,9 @@ describe('EmployeeExport', function () {
             '555-1234',
             'Engineering',
             'Senior Developer',
-            $employee->branch->name,
+            $employee->currentEmployment->branch->name ?? null,
             '85000.50',
-            $employee->employment_status,
+            $employee->currentEmployment->employment_status,
             '2023-03-15',
             '2023-01-10T14:30:00+00:00',
         ]);
@@ -292,15 +631,23 @@ describe('EmployeeExport', function () {
         $department = Department::factory()->create(['name' => 'Marketing']);
         $position = Position::factory()->create(['name' => 'Manager']);
 
-        $employee = Employee::factory()->create([
-            'name' => 'Jane Doe',
-            'email' => 'jane@example.com',
-            'phone' => null,
-            'department_id' => $department->id,
-            'position_id' => $position->id,
-            'salary' => 70000.00,
-            'hire_date' => '2023-02-01',
-        ]);
+        $employee = Employee::factory()
+            ->afterCreating(function ($e) use ($department, $position) {
+                $e->employments()->delete();
+                Employment::factory()->create(['employee_id' => $e->id, 'department_id' => $department->id,
+                    'position_id' => $position->id,
+                    'salary' => 70000.00,
+                    'hire_date' => '2023-02-01',
+                    'is_current' => true, ]);
+            })
+            ->create([
+                'name' => 'Jane Doe',
+                'email' => 'jane@example.com',
+                'phone' => null,
+            ]);
+
+        // Refresh to load relationships
+        $employee->refresh()->load('currentEmployment');
 
         $export = new EmployeeExport([]);
         $mapped = $export->map($employee);

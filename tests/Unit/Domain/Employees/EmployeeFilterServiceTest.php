@@ -3,6 +3,7 @@
 use App\Domain\Employees\EmployeeFilterService;
 use App\Models\Department;
 use App\Models\Employee;
+use App\Models\Employment;
 use App\Models\Position;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -35,9 +36,13 @@ test('applyAdvancedFilters applies department filter', function () {
     $marketing = Department::factory()->create(['name' => 'Marketing']);
     $sales = Department::factory()->create(['name' => 'Sales']);
 
-    Employee::factory()->create(['department_id' => $engineering->id]);
-    Employee::factory()->create(['department_id' => $marketing->id]);
-    Employee::factory()->create(['department_id' => $sales->id]);
+    $emp1 = Employee::factory()->create();
+    $emp2 = Employee::factory()->create();
+    $emp3 = Employee::factory()->create();
+
+    Employment::factory()->create(['employee_id' => $emp1->id, 'department_id' => $engineering->id, 'is_current' => true]);
+    Employment::factory()->create(['employee_id' => $emp2->id, 'department_id' => $marketing->id, 'is_current' => true]);
+    Employment::factory()->create(['employee_id' => $emp3->id, 'department_id' => $sales->id, 'is_current' => true]);
 
     $query = Employee::query();
     $service->applyAdvancedFilters($query, ['department_id' => $engineering->id]);
@@ -45,7 +50,7 @@ test('applyAdvancedFilters applies department filter', function () {
     $results = $query->get();
 
     expect($results)->toHaveCount(1)
-        ->and($results->first()->department_id)->toBe($engineering->id);
+        ->and($results->first()->id)->toBe($emp1->id);
 });
 
 test('applyAdvancedFilters applies position filter', function () {
@@ -54,8 +59,11 @@ test('applyAdvancedFilters applies position filter', function () {
     $developer = Position::factory()->create(['name' => 'Developer']);
     $manager = Position::factory()->create(['name' => 'Manager']);
 
-    Employee::factory()->create(['position_id' => $developer->id]);
-    Employee::factory()->create(['position_id' => $manager->id]);
+    $emp1 = Employee::factory()->create();
+    $emp2 = Employee::factory()->create();
+
+    Employment::factory()->create(['employee_id' => $emp1->id, 'position_id' => $developer->id, 'is_current' => true]);
+    Employment::factory()->create(['employee_id' => $emp2->id, 'position_id' => $manager->id, 'is_current' => true]);
 
     $query = Employee::query();
     $service->applyAdvancedFilters($query, ['position_id' => $developer->id]);
@@ -63,15 +71,19 @@ test('applyAdvancedFilters applies position filter', function () {
     $results = $query->get();
 
     expect($results)->toHaveCount(1)
-        ->and($results->first()->position_id)->toBe($developer->id);
+        ->and($results->first()->id)->toBe($emp1->id);
 });
 
 test('applyAdvancedFilters applies salary range filters', function () {
     $service = new EmployeeFilterService;
 
-    Employee::factory()->create(['salary' => 50000.00]);
-    Employee::factory()->create(['salary' => 75000.00]);
-    Employee::factory()->create(['salary' => 100000.00]);
+    $emp1 = Employee::factory()->create();
+    $emp2 = Employee::factory()->create();
+    $emp3 = Employee::factory()->create();
+
+    Employment::factory()->create(['employee_id' => $emp1->id, 'salary' => 50000.00, 'is_current' => true]);
+    Employment::factory()->create(['employee_id' => $emp2->id, 'salary' => 75000.00, 'is_current' => true]);
+    Employment::factory()->create(['employee_id' => $emp3->id, 'salary' => 100000.00, 'is_current' => true]);
 
     $query = Employee::query();
     $service->applyAdvancedFilters($query, [
@@ -82,15 +94,19 @@ test('applyAdvancedFilters applies salary range filters', function () {
     $results = $query->get();
 
     expect($results)->toHaveCount(1)
-        ->and($results->first()->salary)->toBe('75000.00');
+        ->and($results->first()->id)->toBe($emp2->id);
 });
 
 test('applyAdvancedFilters applies hire date range filters', function () {
     $service = new EmployeeFilterService;
 
-    Employee::factory()->create(['hire_date' => '2023-01-01']);
-    Employee::factory()->create(['hire_date' => '2023-06-01']);
-    Employee::factory()->create(['hire_date' => '2023-12-01']);
+    $emp1 = Employee::factory()->create();
+    $emp2 = Employee::factory()->create();
+    $emp3 = Employee::factory()->create();
+
+    Employment::factory()->create(['employee_id' => $emp1->id, 'hire_date' => '2023-01-01', 'is_current' => true]);
+    Employment::factory()->create(['employee_id' => $emp2->id, 'hire_date' => '2023-06-01', 'is_current' => true]);
+    Employment::factory()->create(['employee_id' => $emp3->id, 'hire_date' => '2023-12-01', 'is_current' => true]);
 
     $query = Employee::query();
     $service->applyAdvancedFilters($query, [
@@ -101,13 +117,19 @@ test('applyAdvancedFilters applies hire date range filters', function () {
     $results = $query->get();
 
     expect($results)->toHaveCount(1)
-        ->and($results->first()->hire_date->format('Y-m-d'))->toBe('2023-06-01');
+        ->and($results->first()->id)->toBe($emp2->id);
 });
 
 test('applyAdvancedFilters handles empty filters', function () {
     $service = new EmployeeFilterService;
 
-    Employee::factory()->count(3)->create();
+    $emp1 = Employee::factory()->create();
+    $emp2 = Employee::factory()->create();
+    $emp3 = Employee::factory()->create();
+
+    Employment::factory()->create(['employee_id' => $emp1->id, 'is_current' => true]);
+    Employment::factory()->create(['employee_id' => $emp2->id, 'is_current' => true]);
+    Employment::factory()->create(['employee_id' => $emp3->id, 'is_current' => true]);
 
     $query = Employee::query();
     $originalCount = $query->count();
@@ -128,7 +150,7 @@ test('applySorting applies ascending sort when allowed', function () {
         $query,
         'name',
         'asc',
-        ['id', 'name', 'email', 'department_id', 'position_id', 'salary', 'hire_date', 'created_at', 'updated_at']
+        ['id', 'name', 'email', 'created_at', 'updated_at']
     );
 
     $results = $query->get();
@@ -148,7 +170,7 @@ test('applySorting applies descending sort when allowed', function () {
         $query,
         'name',
         'desc',
-        ['id', 'name', 'email', 'department_id', 'position_id', 'salary', 'hire_date', 'created_at', 'updated_at']
+        ['id', 'name', 'email', 'created_at', 'updated_at']
     );
 
     $results = $query->get();
@@ -169,7 +191,7 @@ test('applySorting does not apply sort when field not allowed', function () {
         $query,
         'invalid_field',
         'asc',
-        ['id', 'name', 'email', 'department_id', 'position_id', 'salary', 'hire_date', 'created_at', 'updated_at']
+        ['id', 'name', 'email', 'created_at', 'updated_at']
     );
 
     // SQL should remain unchanged since invalid field

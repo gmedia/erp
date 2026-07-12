@@ -21,7 +21,7 @@ class IndexEmployeesAction
      */
     public function execute(IndexEmployeeRequest $request): LengthAwarePaginator
     {
-        $query = Employee::query()->with(['department', 'position', 'branch']);
+        $query = Employee::query()->with(['currentEmployment.department', 'currentEmployment.position', 'currentEmployment.branch']);
 
         return $this->handleSearchOrPrimaryIndexRequest(
             $request,
@@ -35,20 +35,20 @@ class IndexEmployeesAction
             ],
             ['department_id', 'position_id', 'branch_id', 'employment_status'],
             ['salary_min', 'salary_max', 'hire_date_from', 'hire_date_to'],
-            'created_at',
+            'employees.created_at',
             [
                 'id',
                 'employee_id',
                 'name',
                 'email',
                 'phone',
-                'department_id',
-                'position_id',
-                'branch_id',
-                'salary',
-                'employment_status',
-                'hire_date',
-                'created_at',
+                'employments.department_id',
+                'employments.position_id',
+                'employments.branch_id',
+                'employments.salary',
+                'employments.employment_status',
+                'employments.hire_date',
+                'employees.created_at',
                 'updated_at',
             ],
         );

@@ -21,13 +21,14 @@ abstract class AbstractEmployeeRequest extends AuthorizedFormRequest
             'name' => $this->withSometimes(['required', 'string', 'max:255']),
             'email' => $this->withSometimes(['required', 'email', $this->emailUniqueRule()]),
             'phone' => 'nullable|string|max:20',
-            'department_id' => $this->withSometimes(['required', 'exists:departments,id']),
-            'position_id' => $this->withSometimes(['required', 'exists:positions,id']),
-            'branch_id' => $this->withSometimes(['required', 'exists:branches,id']),
-            'salary' => 'nullable|numeric|min:0',
-            'hire_date' => $this->withSometimes(['required', 'date']),
-            'employment_status' => $this->withSometimes(['required', 'string', 'in:regular,intern']),
-            'termination_date' => 'nullable|date',
+            'current_employment.department_id' => $this->withSometimes(['required', 'exists:departments,id']),
+            'current_employment.position_id' => $this->withSometimes(['required', 'exists:positions,id']),
+            'current_employment.branch_id' => $this->withSometimes(['required', 'exists:branches,id']),
+            'current_employment.company_id' => $this->withSometimes(['required', 'exists:companies,id']),
+            'current_employment.salary' => 'nullable|numeric|min:0',
+            'current_employment.hire_date' => $this->withSometimes(['required', 'date']),
+            'current_employment.employment_status' => $this->withSometimes(['required', 'string', 'in:regular,intern']),
+            'current_employment.termination_date' => 'nullable|date',
         ];
     }
 
