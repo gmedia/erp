@@ -17,9 +17,36 @@ describe('EmployeeExport', function () {
     });
 
     test('query applies search filter across name and email fields', function () {
-        Employee::factory()->create(['name' => 'John Doe', 'email' => 'john@example.com']);
-        Employee::factory()->create(['name' => 'Jane Smith', 'email' => 'jane@example.com']);
-        Employee::factory()->create(['name' => 'Bob Johnson', 'email' => 'bob@example.com']);
+        $company = Company::factory()->create();
+        $department = Department::factory()->create();
+        $position = Position::factory()->create();
+        Employee::factory()
+            ->afterCreating(function ($e) use ($company, $department, $position) {
+                Employment::factory()->create([
+                    'employee_id' => $e->id, 'department_id' => $department->id,
+                    'position_id' => $position->id, 'company_id' => $company->id,
+                    'hire_date' => now()->subYear(), 'is_current' => true,
+                ]);
+            })
+            ->create(['name' => 'John Doe', 'email' => 'john@example.com']);
+        Employee::factory()
+            ->afterCreating(function ($e) use ($company, $department, $position) {
+                Employment::factory()->create([
+                    'employee_id' => $e->id, 'department_id' => $department->id,
+                    'position_id' => $position->id, 'company_id' => $company->id,
+                    'hire_date' => now()->subYear(), 'is_current' => true,
+                ]);
+            })
+            ->create(['name' => 'Jane Smith', 'email' => 'jane@example.com']);
+        Employee::factory()
+            ->afterCreating(function ($e) use ($company, $department, $position) {
+                Employment::factory()->create([
+                    'employee_id' => $e->id, 'department_id' => $department->id,
+                    'position_id' => $position->id, 'company_id' => $company->id,
+                    'hire_date' => now()->subYear(), 'is_current' => true,
+                ]);
+            })
+            ->create(['name' => 'Bob Johnson', 'email' => 'bob@example.com']);
 
         $export = new EmployeeExport(['search' => 'doe']);
 
@@ -447,11 +474,38 @@ describe('EmployeeExport', function () {
     });
 
     test('query applies ascending sort by name', function () {
-        Employee::factory()->create(['name' => 'Zoe Employee']);
-        Employee::factory()->create(['name' => 'Alice Employee']);
-        Employee::factory()->create(['name' => 'Bob Employee']);
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                Employment::factory()->create([
+                    'employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => now()->subYear(), 'is_current' => true,
+                ]);
+            })
+            ->create(['name' => 'Zoe Employee']);
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                Employment::factory()->create([
+                    'employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => now()->subYear(), 'is_current' => true,
+                ]);
+            })
+            ->create(['name' => 'Alice Employee']);
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                Employment::factory()->create([
+                    'employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => now()->subYear(), 'is_current' => true,
+                ]);
+            })
+            ->create(['name' => 'Bob Employee']);
 
-        $export = new EmployeeExport(['sort_by' => 'name', 'sort_direction' => 'asc']);
+        $export = new EmployeeExport(['sort_column' => 'name', 'sort_direction' => 'asc']);
 
         $results = $export->query()->get();
 
@@ -495,7 +549,7 @@ describe('EmployeeExport', function () {
             })
             ->create(['name' => 'Medium Salary']);
 
-        $export = new EmployeeExport(['sort_by' => 'salary', 'sort_direction' => 'desc']);
+        $export = new EmployeeExport(['sort_column' => 'salary', 'sort_direction' => 'desc']);
 
         $results = $export->query()->get();
 
@@ -505,9 +559,18 @@ describe('EmployeeExport', function () {
     });
 
     test('query does not allow invalid sort columns', function () {
-        Employee::factory()->create(['name' => 'Test Employee']);
+        Employee::factory()
+            ->afterCreating(function ($e) {
+                Employment::factory()->create([
+                    'employee_id' => $e->id, 'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => now()->subYear(), 'is_current' => true,
+                ]);
+            })
+            ->create(['name' => 'Test Employee']);
 
-        $export = new EmployeeExport(['sort_by' => 'invalid_column']);
+        $export = new EmployeeExport(['sort_column' => 'invalid_column']);
 
         $query = $export->query();
 
@@ -554,7 +617,7 @@ describe('EmployeeExport', function () {
         $export = new EmployeeExport([
             'department_id' => $engineering->id,
             'salary_min' => 60000,
-            'sort_by' => 'name',
+            'sort_column' => 'name',
             'sort_direction' => 'asc',
         ]);
 
@@ -656,7 +719,19 @@ describe('EmployeeExport', function () {
     });
 
     test('handles empty filters gracefully', function () {
-        Employee::factory()->count(5)->create();
+        Employee::factory()
+            ->count(5)
+            ->afterCreating(function ($e) {
+                Employment::factory()->create([
+                    'employee_id' => $e->id,
+                    'department_id' => Department::factory()->create()->id,
+                    'position_id' => Position::factory()->create()->id,
+                    'company_id' => Company::factory()->create()->id,
+                    'hire_date' => now()->subYear(),
+                    'is_current' => true,
+                ]);
+            })
+            ->create();
 
         $export = new EmployeeExport([]);
 
