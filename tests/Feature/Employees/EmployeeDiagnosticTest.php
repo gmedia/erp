@@ -53,6 +53,5 @@ test('diagnostic: fresh model instance count', function () {
     $app = app();
     $freshModel = $app->make(Employee::class);
     $count = $freshModel->newQuery()->count();
-    dump("Fresh query count: {$count}");
     expect($count)->toBeGreaterThan(0);
 });
