@@ -15,6 +15,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Collection<int, Branch> $branches
+ * @property-read Collection<int, Employment> $employments
  *
  * @method static \Database\Factories\CompanyFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Company newModelQuery()
@@ -41,17 +42,11 @@ class Company extends Model
         'name',
     ];
 
-    /**
-     * @return HasMany<Branch>
-     */
     public function branches(): HasMany
     {
         return $this->hasMany(Branch::class);
     }
 
-    /**
-     * @return HasMany<Employment>
-     */
     public function employments(): HasMany
     {
         return $this->hasMany(Employment::class);

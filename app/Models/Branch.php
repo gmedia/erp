@@ -46,17 +46,11 @@ class Branch extends Model
         'company_id',
     ];
 
-    /**
-     * @return BelongsTo<Company, Branch>
-     */
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
     }
 
-    /**
-     * @return HasMany<Employment>
-     */
     public function employments(): HasMany
     {
         return $this->hasMany(Employment::class);

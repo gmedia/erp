@@ -109,8 +109,6 @@ class Employee extends Model
 
     /**
      * All employment records for this employee.
-     *
-     * @return HasMany<Employment>
      */
     public function employments(): HasMany
     {
@@ -119,8 +117,6 @@ class Employee extends Model
 
     /**
      * The employee's current (active) employment record.
-     *
-     * @return HasOne<Employment>
      */
     public function currentEmployment(): HasOne
     {
@@ -145,8 +141,6 @@ class Employee extends Model
 
     /**
      * The system user account associated with this employee.
-     *
-     * @return BelongsTo<User, Employee>
      */
     public function user(): BelongsTo
     {
