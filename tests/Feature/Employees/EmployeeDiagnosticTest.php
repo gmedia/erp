@@ -12,7 +12,6 @@ test('diagnostic: just count employees after beforeEach', function () {
     Sanctum::actingAs($user, ['*']);
 
     $count = Employee::count();
-    dump("Initial count: {$count}");
     expect($count)->toBeGreaterThan(0);
 });
 
@@ -21,13 +20,10 @@ test('diagnostic: factory create then count', function () {
     Sanctum::actingAs($user, ['*']);
 
     $countBefore = Employee::count();
-    dump("Count before factory create: {$countBefore}");
 
     $e = Employee::factory()->create();
-    dump('Created employee ID: ' . $e->id);
 
     $countAfter = Employee::count();
-    dump("Count after factory create: {$countAfter}");
 
     expect($countAfter)->toBeGreaterThan(0);
 });
@@ -43,10 +39,8 @@ test('diagnostic: raw DB insert then count', function () {
     ]);
 
     $dbCount = DB::table('employees')->count();
-    dump("DB raw count: {$dbCount}");
 
     $eloquentCount = Employee::count();
-    dump("Eloquent count: {$eloquentCount}");
 
     expect($dbCount)->toBeGreaterThan(0);
     expect($eloquentCount)->toEqual($dbCount);
