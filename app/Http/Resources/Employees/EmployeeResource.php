@@ -10,6 +10,7 @@ use Illuminate\Support\Carbon;
 
 /**
  * @mixin Employee
+ *
  * @property-read Carbon|null $tenure
  */
 class EmployeeResource extends JsonResource
