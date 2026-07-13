@@ -142,10 +142,10 @@ describe('Employee API Endpoints', function () {
                 'employment_status' => 'regular',
             ]);
         })->create();
-        Employee::factory()->afterCreating(function (Employee $e) use ($sales) {
+        Employee::factory()->afterCreating(function (Employee $e) use ($sales, $company) {
             $e->employments()->delete();
             $e->currentEmployment()->create([
-                'company_id' => Company::factory()->create()->id,
+                'company_id' => $company->id,
                 'department_id' => $sales->id,
                 'position_id' => Position::factory()->create()->id,
                 'hire_date' => now()->subYear(),

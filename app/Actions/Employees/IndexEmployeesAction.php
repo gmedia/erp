@@ -33,7 +33,7 @@ class IndexEmployeesAction
                 'phone',
                 'employee_id',
             ],
-            ['department_id', 'position_id', 'branch_id', 'employment_status'],
+            ['department_id', 'position_id', 'branch_id', 'company_id', 'employment_status'],
             ['salary_min', 'salary_max', 'hire_date_from', 'hire_date_to'],
             'employees.created_at',
             [

@@ -61,6 +61,7 @@ class EmployeeFilterService
                 'department_id' => 'employments.department_id',
                 'position_id' => 'employments.position_id',
                 'branch_id' => 'employments.branch_id',
+                'company_id' => 'employments.company_id',
                 'employment_status' => 'employments.employment_status',
             ],
             [

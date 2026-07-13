@@ -23,6 +23,7 @@ test('execute returns paginated employees without filters', function () {
     $request->shouldReceive('get')->with('position_id')->andReturn(null);
     $request->shouldReceive('get')->with('branch_id')->andReturn(null);
     $request->shouldReceive('get')->with('employment_status')->andReturn(null);
+    $request->shouldReceive('get')->with('company_id')->andReturn(null);
     $request->shouldReceive('get')->with('salary_min')->andReturn(null);
     $request->shouldReceive('get')->with('salary_max')->andReturn(null);
     $request->shouldReceive('get')->with('hire_date_from')->andReturn(null);
@@ -146,6 +147,7 @@ test('execute applies advanced filters when no search provided', function () {
     $request->shouldReceive('get')->with('position_id')->andReturn(2);
     $request->shouldReceive('get')->with('branch_id')->andReturn(3);
     $request->shouldReceive('get')->with('employment_status')->andReturn('regular');
+    $request->shouldReceive('get')->with('company_id')->andReturn(null);
     $request->shouldReceive('get')->with('salary_min')->andReturn(50000);
     $request->shouldReceive('get')->with('salary_max')->andReturn(80000);
     $request->shouldReceive('get')->with('hire_date_from')->andReturn('2023-01-01');
@@ -163,6 +165,7 @@ test('execute applies advanced filters when no search provided', function () {
             'position_id' => 2,
             'branch_id' => 3,
             'employment_status' => 'regular',
+            'company_id' => null,
         ]);
 
     $filterService->shouldReceive('applyAdvancedFilters')
