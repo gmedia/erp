@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Employee;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -25,8 +26,8 @@ test('factory creates a valid employee', function () {
 test('employee model casts are applied correctly', function () {
     $employee = Employee::factory()->create();
 
-    expect($employee->created_at)->toBeInstanceOf(\Carbon\Carbon::class)
-        ->and($employee->updated_at)->toBeInstanceOf(\Carbon\Carbon::class);
+    expect($employee->created_at)->toBeInstanceOf(Carbon::class)
+        ->and($employee->updated_at)->toBeInstanceOf(Carbon::class);
 });
 
 test('fillable attributes are defined correctly', function () {
