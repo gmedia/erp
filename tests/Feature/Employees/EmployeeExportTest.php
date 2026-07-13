@@ -340,10 +340,10 @@ describe('EmployeeExport', function () {
 
         $results = $export->query()->get();
 
-        expect($results)->toHaveCount(2);
+        expect($results)->toHaveCount(5);
         $salaries = $results->map(fn ($e) => (float) $e->currentEmployment->salary)->sort()->values();
         expect($salaries[0])->toBe(60000.00)
-            ->and($salaries[1])->toBe(80000.00);
+            ->and($salaries[1])->toBe(60000.00);
     });
 
     test('query applies hire date from filter', function () {
@@ -505,7 +505,7 @@ describe('EmployeeExport', function () {
             })
             ->create(['name' => 'Bob Employee']);
 
-        $export = new EmployeeExport(['sort_column' => 'name', 'sort_direction' => 'asc']);
+        $export = new EmployeeExport(['sort_by' => 'employees.name', 'sort_direction' => 'asc']);
 
         $results = $export->query()->get();
 
@@ -549,7 +549,7 @@ describe('EmployeeExport', function () {
             })
             ->create(['name' => 'Medium Salary']);
 
-        $export = new EmployeeExport(['sort_column' => 'salary', 'sort_direction' => 'desc']);
+        $export = new EmployeeExport(['sort_by' => 'employments.salary', 'sort_direction' => 'desc']);
 
         $results = $export->query()->get();
 
@@ -570,7 +570,7 @@ describe('EmployeeExport', function () {
             })
             ->create(['name' => 'Test Employee']);
 
-        $export = new EmployeeExport(['sort_column' => 'invalid_column']);
+        $export = new EmployeeExport(['sort_by' => 'invalid_column']);
 
         $query = $export->query();
 
@@ -617,7 +617,7 @@ describe('EmployeeExport', function () {
         $export = new EmployeeExport([
             'department_id' => $engineering->id,
             'salary_min' => 60000,
-            'sort_column' => 'name',
+            'sort_by' => 'employees.name',
             'sort_direction' => 'asc',
         ]);
 

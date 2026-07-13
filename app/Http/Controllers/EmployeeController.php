@@ -48,6 +48,7 @@ class EmployeeController extends Controller
 
         $employee = Employee::create($validated);
         $employee->employments()->create(array_merge($employmentData, ['is_current' => true]));
+        $employee->load('currentEmployment');
 
         return (new EmployeeResource($employee))
             ->response()
@@ -83,6 +84,7 @@ class EmployeeController extends Controller
                 $employee->employments()->create(array_merge($employmentData, ['is_current' => true]));
             }
         }
+        $employee->load('currentEmployment');
 
         return (new EmployeeResource($employee))->response();
     }
