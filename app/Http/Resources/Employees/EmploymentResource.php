@@ -5,9 +5,13 @@ namespace App\Http\Resources\Employees;
 use App\Http\Resources\Branches\BranchResource;
 use App\Http\Resources\Departments\DepartmentResource;
 use App\Http\Resources\Positions\PositionResource;
+use App\Models\Employment;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin Employment
+ */
 class EmploymentResource extends JsonResource
 {
     /**
@@ -25,7 +29,7 @@ class EmploymentResource extends JsonResource
             'position_id' => $this->position_id,
             'branch_id' => $this->branch_id,
             'salary' => $this->salary,
-            'hire_date' => $this->hire_date?->toDateString(),
+            'hire_date' => $this->hire_date->toDateString(),
             'termination_date' => $this->termination_date?->toDateString(),
             'employment_status' => $this->employment_status,
             'is_current' => $this->is_current,

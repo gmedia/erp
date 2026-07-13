@@ -3,11 +3,13 @@
 namespace App\Http\Resources\Employees;
 
 use App\Http\Resources\Users\UserResource;
+use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Carbon;
 
 /**
+ * @mixin Employee
  * @property-read Carbon|null $tenure
  */
 class EmployeeResource extends JsonResource

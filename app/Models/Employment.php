@@ -16,8 +16,8 @@ use Illuminate\Support\Carbon;
  * @property int|null $position_id
  * @property int|null $branch_id
  * @property string|null $salary
- * @property string $hire_date
- * @property string|null $termination_date
+ * @property Carbon $hire_date
+ * @property Carbon|null $termination_date
  * @property string|null $employment_status
  * @property bool $is_current
  * @property Carbon|null $created_at
