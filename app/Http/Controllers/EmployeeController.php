@@ -42,7 +42,13 @@ class EmployeeController extends Controller
      */
     public function store(StoreEmployeeRequest $request): JsonResponse
     {
-        $employee = Employee::create($request->validated());
+        $validated = $request->validated();
+        $employmentData = $validated['current_employment'] ?? [];
+        unset($validated['current_employment']);
+
+        $employee = Employee::create($validated);
+        $employee->employments()->create(array_merge($employmentData, ['is_current' => true]));
+        $employee->load('currentEmployment');
 
         return (new EmployeeResource($employee))
             ->response()
@@ -54,7 +60,7 @@ class EmployeeController extends Controller
      */
     public function show(Employee $employee): JsonResponse
     {
-        $employee->load(['department', 'position', 'branch']);
+        $employee->load(['currentEmployment.department', 'currentEmployment.position', 'currentEmployment.branch']);
 
         return (new EmployeeResource($employee))->response();
     }
@@ -64,7 +70,21 @@ class EmployeeController extends Controller
      */
     public function update(UpdateEmployeeRequest $request, Employee $employee): JsonResponse
     {
-        $employee->update($request->validated());
+        $validated = $request->validated();
+        $employmentData = $validated['current_employment'] ?? [];
+        unset($validated['current_employment']);
+
+        $employee->update($validated);
+
+        if (! empty($employmentData)) {
+            $employment = $employee->currentEmployment;
+            if ($employment) {
+                $employment->update($employmentData);
+            } else {
+                $employee->employments()->create(array_merge($employmentData, ['is_current' => true]));
+            }
+        }
+        $employee->load('currentEmployment');
 
         return (new EmployeeResource($employee))->response();
     }

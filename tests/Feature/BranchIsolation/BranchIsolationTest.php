@@ -5,6 +5,7 @@ use App\Models\Branch;
 use App\Models\Customer;
 use App\Models\CustomerInvoice;
 use App\Models\Employee;
+use App\Models\Employment;
 use App\Models\Permission;
 use App\Models\Supplier;
 use App\Models\User;
@@ -21,6 +22,9 @@ function createUserInBranch(Branch $branch, array $permissions = []): User
     $user = User::factory()->create();
     $employee = Employee::factory()->create([
         'user_id' => $user->id,
+    ]);
+    Employment::factory()->create([
+        'employee_id' => $employee->id,
         'branch_id' => $branch->id,
         'department_id' => null,
         'position_id' => null,
@@ -45,6 +49,9 @@ function createAdminUser(array $permissions = []): User
     $user = User::factory()->create();
     $employee = Employee::factory()->create([
         'user_id' => $user->id,
+    ]);
+    Employment::factory()->create([
+        'employee_id' => $employee->id,
         'branch_id' => null,
         'department_id' => null,
         'position_id' => null,

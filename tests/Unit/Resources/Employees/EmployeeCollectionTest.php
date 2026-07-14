@@ -3,6 +3,7 @@
 use App\Http\Resources\Employees\EmployeeCollection;
 use App\Http\Resources\Employees\EmployeeResource;
 use App\Models\Employee;
+use App\Models\Employment;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 
@@ -17,6 +18,15 @@ test('collects property is set correctly', function () {
 test('collection transforms multiple employees correctly', function () {
     $employees = Employee::factory()->count(3)->create();
 
+    // Ensure each employee has a current employment for salary assertion
+    foreach ($employees as $employee) {
+        Employment::factory()->create([
+            'employee_id' => $employee->id,
+            'salary' => 50000.00,
+            'is_current' => true,
+        ]);
+    }
+
     $collection = new EmployeeCollection($employees);
     $request = new Request;
 
@@ -27,13 +37,14 @@ test('collection transforms multiple employees correctly', function () {
 
     foreach ($result as $index => $item) {
         expect($item)->toHaveKeys([
-            'id', 'name', 'email', 'phone', 'department',
-            'position', 'salary', 'hire_date', 'created_at', 'updated_at',
+            'id', 'employee_id', 'name', 'email', 'phone', 'user_id',
+            'tenure', 'current_employment', 'employments',
+            'created_at', 'updated_at',
         ])
             ->and($item['id'])->toBe($employees[$index]->id)
             ->and($item['name'])->toBe($employees[$index]->name)
             ->and($item['email'])->toBe($employees[$index]->email)
-            ->and($item['salary'])->toBeString();
+            ->and($item['current_employment']['salary'])->toBeString();
     }
 });
 

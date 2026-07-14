@@ -11,8 +11,8 @@ class IndexEmployeeRequest extends AbstractEmployeeListingRequest
     {
         return array_merge(
             $this->employeeListingRules(
-                'id,employee_id,name,email,phone,department_id,position_id,' .
-                    'branch_id,salary,employment_status,hire_date,created_at,updated_at',
+                'id,employee_id,name,email,phone,employments.department_id,employments.position_id,' .
+                    'employments.branch_id,employments.salary,employments.employment_status,employments.hire_date,created_at,updated_at',
                 [
                     'salary_min' => ['nullable', 'numeric', 'min:0'],
                     'salary_max' => ['nullable', 'numeric', 'min:0'],

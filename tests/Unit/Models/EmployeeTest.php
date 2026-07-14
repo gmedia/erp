@@ -1,8 +1,8 @@
 <?php
 
 use App\Models\Employee;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Carbon;
 
 use function Pest\Laravel\assertDatabaseHas;
 
@@ -17,26 +17,17 @@ test('factory creates a valid employee', function () {
         'name' => $employee->name,
         'email' => $employee->email,
         'phone' => $employee->phone,
-        'department_id' => $employee->department_id,
-        'position_id' => $employee->position_id,
-        'branch_id' => $employee->branch_id,
-        'salary' => $employee->getRawOriginal('salary'),
-        'hire_date' => $employee->getRawOriginal('hire_date'),
+        'employee_id' => $employee->employee_id,
+        'user_id' => $employee->user_id,
     ]);
+
 });
 
-test('casts are applied correctly', function () {
-    $employee = Employee::factory()->create([
-        'salary' => 12345.67,
-        'hire_date' => '2023-04-01',
-    ]);
+test('employee model casts are applied correctly', function () {
+    $employee = Employee::factory()->create();
 
-    // salary should be a stringified decimal with two places
-    expect($employee->salary)->toBeString()
-        ->and($employee->salary)->toBe('12345.67');
-
-    // hire_date should be a Carbon instance
-    expect($employee->hire_date)->toBeInstanceOf(Carbon::class);
+    expect($employee->created_at)->toBeInstanceOf(Carbon::class)
+        ->and($employee->updated_at)->toBeInstanceOf(Carbon::class);
 });
 
 test('fillable attributes are defined correctly', function () {
@@ -47,13 +38,6 @@ test('fillable attributes are defined correctly', function () {
         'name',
         'email',
         'phone',
-        'department_id',
-        'position_id',
-        'branch_id',
         'user_id',
-        'salary',
-        'hire_date',
-        'employment_status',
-        'termination_date',
     ]);
 });

@@ -2,15 +2,16 @@
 
 namespace App\Http\Resources\Employees;
 
+use App\Http\Resources\Users\UserResource;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Carbon;
 
 /**
- * @property Employee $resource
- */
-/**
  * @mixin Employee
+ *
+ * @property-read Carbon|null $tenure
  */
 class EmployeeResource extends JsonResource
 {
@@ -18,34 +19,30 @@ class EmployeeResource extends JsonResource
      * Transform the resource into an array.
      *
      * @param  Request  $request
-     * @return array<string, mixed>
      */
     public function toArray($request): array
     {
+        $currentEmployment = $this->whenLoaded('currentEmployment');
+        $employments = $this->whenLoaded('employments');
+
         return [
-            'id' => $this->resource->id,
-            'employee_id' => $this->resource->employee_id,
-            'name' => $this->resource->name,
-            'email' => $this->resource->email,
-            'phone' => $this->resource->phone,
-            'department' => [
-                'id' => $this->resource->department_id,
-                'name' => $this->resource->department?->name,
-            ],
-            'position' => [
-                'id' => $this->resource->position_id,
-                'name' => $this->resource->position?->name,
-            ],
-            'branch' => [
-                'id' => $this->resource->branch_id,
-                'name' => $this->resource->branch?->name,
-            ],
-            'employment_status' => $this->resource->employment_status,
-            'salary' => $this->resource->salary ? (string) $this->resource->salary : null,
-            'hire_date' => $this->resource->hire_date?->toIso8601String(),
-            'termination_date' => $this->resource->termination_date?->toIso8601String(),
-            'created_at' => $this->resource->created_at?->toIso8601String(),
-            'updated_at' => $this->resource->updated_at?->toIso8601String(),
+            'id' => $this->id,
+            'employee_id' => $this->employee_id,
+            'name' => $this->name,
+            'email' => $this->email,
+            'phone' => $this->phone,
+            'user_id' => $this->user_id,
+            'tenure' => $this->tenure?->toDateString(),
+            'current_employment' => $currentEmployment
+                ? new EmploymentResource($this->currentEmployment)
+                : null,
+            'employments' => $employments
+                ? EmploymentResource::collection($this->employments)
+                : [],
+            'user' => $this->whenLoaded('user', fn () => new UserResource($this->user)),
+            'permissions' => $this->whenLoaded('permissions'),
+            'created_at' => $this->created_at?->toDateTimeString(),
+            'updated_at' => $this->updated_at?->toDateTimeString(),
         ];
     }
 }

@@ -1,8 +1,10 @@
 <?php
 
 use App\Models\Branch;
+use App\Models\Company;
 use App\Models\Department;
 use App\Models\Employee;
+use App\Models\Employment;
 use App\Models\Position;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -26,7 +28,34 @@ describe('Employee API Endpoints', function () {
 
     test('index returns paginated employees with proper meta structure', function () {
         $baseline = Employee::count();
-        Employee::factory()->count(25)->create();
+        $department = Department::factory()->create();
+        $position = Position::factory()->create();
+        $branch = Branch::factory()->create();
+        $company = Company::factory()->create();
+
+        // Give the beforeEach user's employee a currentEmployment so it doesn't break structure assertions
+        Employment::factory()->create([
+            'employee_id' => auth()->user()->employee->id,
+            'company_id' => $company->id,
+            'department_id' => $department->id,
+            'position_id' => $position->id,
+            'branch_id' => $branch->id,
+            'is_current' => true,
+        ]);
+
+        $employees = Employee::factory()->count(25)->create();
+
+        // Create Employment records for all employees so current_employment is not null
+        foreach ($employees as $employee) {
+            Employment::factory()->create([
+                'employee_id' => $employee->id,
+                'company_id' => $company->id,
+                'department_id' => $department->id,
+                'position_id' => $position->id,
+                'branch_id' => $branch->id,
+                'is_current' => true,
+            ]);
+        }
 
         $response = getJson('/api/employees?per_page=10');
 
@@ -38,11 +67,14 @@ describe('Employee API Endpoints', function () {
                         'name',
                         'email',
                         'phone',
-                        'department' => ['id', 'name'],
-                        'position' => ['id', 'name'],
-                        'branch' => ['id', 'name'],
-                        'salary',
-                        'hire_date',
+                        'current_employment' => [
+                            'id',
+                            'department_id',
+                            'position_id',
+                            'branch_id',
+                            'salary',
+                            'hire_date',
+                        ],
                         'created_at',
                         'updated_at',
                     ],
@@ -88,17 +120,46 @@ describe('Employee API Endpoints', function () {
         $marketing = Department::factory()->create(['name' => 'Marketing']);
         $sales = Department::factory()->create(['name' => 'Sales']);
 
-        Employee::factory()->create(['department_id' => $engineering->id]);
-        Employee::factory()->create(['department_id' => $marketing->id]);
-        Employee::factory()->create(['department_id' => $sales->id]);
+        $company = Company::factory()->create();
 
-        $response = getJson('/api/employees?department_id=' . $engineering->id);
+        Employee::factory()->afterCreating(function (Employee $e) use ($engineering, $company) {
+            $e->employments()->delete();
+            $e->currentEmployment()->create([
+                'company_id' => $company->id,
+                'department_id' => $engineering->id,
+                'position_id' => Position::factory()->create()->id,
+                'hire_date' => now()->subYear(),
+                'employment_status' => 'regular',
+            ]);
+        })->create();
+        Employee::factory()->afterCreating(function (Employee $e) use ($marketing) {
+            $e->employments()->delete();
+            $e->currentEmployment()->create([
+                'company_id' => Company::factory()->create()->id,
+                'department_id' => $marketing->id,
+                'position_id' => Position::factory()->create()->id,
+                'hire_date' => now()->subYear(),
+                'employment_status' => 'regular',
+            ]);
+        })->create();
+        Employee::factory()->afterCreating(function (Employee $e) use ($sales, $company) {
+            $e->employments()->delete();
+            $e->currentEmployment()->create([
+                'company_id' => $company->id,
+                'department_id' => $sales->id,
+                'position_id' => Position::factory()->create()->id,
+                'hire_date' => now()->subYear(),
+                'employment_status' => 'regular',
+            ]);
+        })->create();
+
+        $response = getJson('/api/employees?department_id=' . $engineering->id . '&company_id=' . $company->id);
 
         $response->assertOk();
 
         $data = $response->json('data');
         expect($data)->toHaveCount(1)
-            ->and($data[0]['department']['id'])->toBe($engineering->id);
+            ->and($data[0]['current_employment']['department']['id'])->toBe($engineering->id);
     });
 
     test('index supports sorting by different fields', function () {
@@ -118,6 +179,7 @@ describe('Employee API Endpoints', function () {
     });
 
     test('store creates employee with valid data and returns 201 status', function () {
+        $company = Company::factory()->create();
         $department = Department::factory()->create();
         $position = Position::factory()->create();
         $branch = Branch::factory()->create();
@@ -127,12 +189,15 @@ describe('Employee API Endpoints', function () {
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
             'phone' => '555-1234',
-            'department_id' => $department->id,
-            'position_id' => $position->id,
-            'branch_id' => $branch->id,
-            'salary' => '75000.00',
-            'hire_date' => '2023-01-15',
-            'employment_status' => 'regular',
+            'current_employment' => [
+                'company_id' => $company->id,
+                'department_id' => $department->id,
+                'position_id' => $position->id,
+                'branch_id' => $branch->id,
+                'salary' => '75000.00',
+                'hire_date' => '2023-01-15',
+                'employment_status' => 'regular',
+            ],
         ];
 
         $response = postJson('/api/employees', $employeeData);
@@ -144,11 +209,14 @@ describe('Employee API Endpoints', function () {
                     'name',
                     'email',
                     'phone',
-                    'department',
-                    'position',
-                    'branch',
-                    'salary',
-                    'hire_date',
+                    'current_employment' => [
+                        'id',
+                        'department_id',
+                        'position_id',
+                        'branch_id',
+                        'salary',
+                        'hire_date',
+                    ],
                     'created_at',
                     'updated_at',
                 ],
@@ -156,18 +224,20 @@ describe('Employee API Endpoints', function () {
             ->assertJsonFragment([
                 'name' => 'John Doe',
                 'email' => 'john.doe@example.com',
-                'department' => [
-                    'id' => $department->id,
-                    'name' => $department->name,
-                ],
             ])
             ->assertJsonPath('data.name', 'John Doe')
-            ->assertJsonPath('data.branch.id', $branch->id);
+            ->assertJsonPath('data.current_employment.branch_id', $branch->id);
 
         assertDatabaseHas('employees', [
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
+        ]);
+
+        assertDatabaseHas('employments', [
+            'employee_id' => $response->json('data.id'),
+            'department_id' => $department->id,
             'branch_id' => $branch->id,
+            'is_current' => true,
         ]);
     });
 
@@ -179,16 +249,17 @@ describe('Employee API Endpoints', function () {
                 'employee_id',
                 'name',
                 'email',
-                'department_id',
-                'position_id',
-                'branch_id',
-                'hire_date',
-                'employment_status',
+                'current_employment.department_id',
+                'current_employment.position_id',
+                'current_employment.branch_id',
+                'current_employment.hire_date',
+                'current_employment.employment_status',
             ]);
     });
 
     test('store validates unique email constraint', function () {
         Employee::factory()->create(['email' => 'existing@example.com']);
+        $company = Company::factory()->create();
         $department = Department::factory()->create();
         $position = Position::factory()->create();
         $branch = Branch::factory()->create();
@@ -197,12 +268,15 @@ describe('Employee API Endpoints', function () {
             'employee_id' => 'EMP-002',
             'name' => 'New Employee',
             'email' => 'existing@example.com',
-            'department_id' => $department->id,
-            'position_id' => $position->id,
-            'branch_id' => $branch->id,
-            'salary' => '50000.00',
-            'hire_date' => '2023-01-01',
-            'employment_status' => 'regular',
+            'current_employment' => [
+                'company_id' => $company->id,
+                'department_id' => $department->id,
+                'position_id' => $position->id,
+                'branch_id' => $branch->id,
+                'salary' => '50000.00',
+                'hire_date' => '2023-01-01',
+                'employment_status' => 'regular',
+            ],
         ]);
 
         $response->assertUnprocessable()
@@ -210,7 +284,22 @@ describe('Employee API Endpoints', function () {
     });
 
     test('show returns single employee with full resource structure', function () {
+        $department = Department::factory()->create();
+        $position = Position::factory()->create();
+        $branch = Branch::factory()->create();
+        $company = Company::factory()->create();
         $employee = Employee::factory()->create();
+
+        Employment::factory()->create([
+            'employee_id' => $employee->id,
+            'company_id' => $company->id,
+            'department_id' => $department->id,
+            'position_id' => $position->id,
+            'branch_id' => $branch->id,
+            'is_current' => true,
+        ]);
+
+        $employee->load('currentEmployment.department', 'currentEmployment.position', 'currentEmployment.branch');
 
         $response = getJson("/api/employees/{$employee->id}");
 
@@ -221,11 +310,14 @@ describe('Employee API Endpoints', function () {
                     'name',
                     'email',
                     'phone',
-                    'department',
-                    'position',
-                    'branch',
-                    'salary',
-                    'hire_date',
+                    'current_employment' => [
+                        'id',
+                        'department',
+                        'position',
+                        'branch',
+                        'salary',
+                        'hire_date',
+                    ],
                     'created_at',
                     'updated_at',
                 ],
@@ -249,18 +341,20 @@ describe('Employee API Endpoints', function () {
         $branch = Branch::factory()->create();
         $employee = Employee::factory()->create([
             'name' => 'Old Name',
-            'department_id' => $department->id,
-            'position_id' => $position->id,
-            'branch_id' => $branch->id,
         ]);
+        $employee->load('currentEmployment.department', 'currentEmployment.position', 'currentEmployment.branch');
 
         $newPosition = Position::factory()->create(['name' => 'Senior Developer']);
         $newBranch = Branch::factory()->create(['name' => 'New Branch']);
 
         $updateData = [
             'name' => 'Updated Name',
-            'position_id' => $newPosition->id,
-            'branch_id' => $newBranch->id,
+            'current_employment' => [
+                'position_id' => $newPosition->id,
+                'branch_id' => $newBranch->id,
+                'company_id' => Company::factory()->create()->id,
+                'hire_date' => '2023-01-01',
+            ],
         ];
 
         $response = putJson("/api/employees/{$employee->id}", $updateData);
@@ -272,31 +366,32 @@ describe('Employee API Endpoints', function () {
                     'name',
                     'email',
                     'phone',
-                    'department',
-                    'position',
-                    'branch',
-                    'salary',
-                    'hire_date',
+                    'current_employment' => [
+                        'id',
+                        'department_id',
+                        'position_id',
+                        'branch_id',
+                        'salary',
+                        'hire_date',
+                    ],
                     'created_at',
                     'updated_at',
                 ],
             ])
             ->assertJsonFragment([
-                'name' => 'Updated Name',
-                'position' => [
-                    'id' => $newPosition->id,
-                    'name' => $newPosition->name,
-                ],
-                'branch' => [
-                    'id' => $newBranch->id,
-                    'name' => $newBranch->name,
-                ],
+                'position_id' => $newPosition->id,
+                'branch_id' => $newBranch->id,
             ]);
 
         $employee->refresh();
-        expect($employee->name)->toBe('Updated Name')
-            ->and($employee->position_id)->toBe($newPosition->id)
-            ->and($employee->branch_id)->toBe($newBranch->id);
+        expect($employee->name)->toBe('Updated Name');
+
+        assertDatabaseHas('employments', [
+            'employee_id' => $employee->id,
+            'position_id' => $newPosition->id,
+            'branch_id' => $newBranch->id,
+            'is_current' => true,
+        ]);
     });
 
     test('update validates fields when provided with invalid data', function () {
@@ -306,12 +401,14 @@ describe('Employee API Endpoints', function () {
             'employee_id' => '', // Empty ID
             'name' => '', // Empty name
             'email' => 'invalid-email', // Invalid email format
-            'department_id' => 'invalid-dept', // Invalid department
-            'branch_id' => 'invalid-branch', // Invalid branch
-            'salary' => '-100', // Negative salary
-            'hire_date' => 'invalid-date', // Invalid date
-            'employment_status' => 'invalid-status', // Invalid enum
-            'termination_date' => 'invalid-date', // Invalid date
+            'current_employment' => [
+                'department_id' => 'invalid-dept', // Invalid department
+                'branch_id' => 'invalid-branch', // Invalid branch
+                'salary' => '-100', // Negative salary
+                'hire_date' => 'invalid-date', // Invalid date
+                'employment_status' => 'invalid-status', // Invalid enum
+                'termination_date' => 'invalid-date', // Invalid date
+            ],
         ]);
 
         $response->assertUnprocessable()
@@ -319,12 +416,12 @@ describe('Employee API Endpoints', function () {
                 'employee_id',
                 'name',
                 'email',
-                'department_id',
-                'branch_id',
-                'salary',
-                'hire_date',
-                'employment_status',
-                'termination_date',
+                'current_employment.department_id',
+                'current_employment.branch_id',
+                'current_employment.salary',
+                'current_employment.hire_date',
+                'current_employment.employment_status',
+                'current_employment.termination_date',
             ]);
     });
 
@@ -333,15 +430,19 @@ describe('Employee API Endpoints', function () {
         $department = Department::factory()->create();
         $position = Position::factory()->create();
         $branch = Branch::factory()->create();
+        $company = Company::factory()->create();
 
         $response = putJson("/api/employees/{$employee->id}", [
             'name' => 'Updated Name',
             'email' => 'john@example.com', // Same email should be allowed
-            'department_id' => $department->id,
-            'position_id' => $position->id,
-            'branch_id' => $branch->id,
-            'hire_date' => '2023-01-01',
-            'employment_status' => 'regular',
+            'current_employment' => [
+                'department_id' => $department->id,
+                'position_id' => $position->id,
+                'branch_id' => $branch->id,
+                'company_id' => $company->id,
+                'hire_date' => '2023-01-01',
+                'employment_status' => 'regular',
+            ],
         ]);
 
         $response->assertOk();
@@ -355,11 +456,13 @@ describe('Employee API Endpoints', function () {
         $response = putJson('/api/employees/99999', [
             'name' => 'Test Employee',
             'email' => 'test@example.com',
-            'department_id' => $department->id,
-            'position_id' => $position->id,
-            'branch_id' => $branch->id,
-            'hire_date' => '2023-01-01',
-            'employment_status' => 'regular',
+            'current_employment' => [
+                'department_id' => $department->id,
+                'position_id' => $position->id,
+                'branch_id' => $branch->id,
+                'hire_date' => '2023-01-01',
+                'employment_status' => 'regular',
+            ],
         ]);
 
         $response->assertNotFound();
@@ -406,18 +509,43 @@ describe('Employee API Endpoints', function () {
         $manager = Position::factory()->create(['name' => 'Manager']);
         $branchA = Branch::factory()->create(['name' => 'Branch A']);
         $branchB = Branch::factory()->create(['name' => 'Branch B']);
+        $company = Company::factory()->create();
 
-        Employee::factory()->create([
-            'department_id' => $engineering->id,
-            'position_id' => $developer->id,
-            'branch_id' => $branchA->id,
-        ]);
-        Employee::factory()->create([
-            'department_id' => $marketing->id,
-            'position_id' => $manager->id,
-            'branch_id' => $branchB->id,
-        ]);
-        Employee::factory()->create(['position_id' => $manager->id, 'branch_id' => $branchA->id]);
+        Employee::factory()
+            ->afterCreating(function ($employee) use ($engineering, $developer, $branchA, $company) {
+                $employee->employments()->delete();
+                $employee->employments()->create([
+                    'company_id' => $company->id,
+                    'department_id' => $engineering->id,
+                    'position_id' => $developer->id,
+                    'branch_id' => $branchA->id,
+                    'is_current' => true,
+                ]);
+            })
+            ->create();
+        Employee::factory()
+            ->afterCreating(function ($employee) use ($marketing, $manager, $branchB, $company) {
+                $employee->employments()->delete();
+                $employee->employments()->create([
+                    'company_id' => $company->id,
+                    'department_id' => $marketing->id,
+                    'position_id' => $manager->id,
+                    'branch_id' => $branchB->id,
+                    'is_current' => true,
+                ]);
+            })
+            ->create();
+        Employee::factory()
+            ->afterCreating(function ($employee) use ($manager, $branchA, $company) {
+                $employee->employments()->delete();
+                $employee->employments()->create([
+                    'company_id' => $company->id,
+                    'position_id' => $manager->id,
+                    'branch_id' => $branchA->id,
+                    'is_current' => true,
+                ]);
+            })
+            ->create();
 
         $response = postJson('/api/employees/export', [
             'department_id' => $engineering->id,

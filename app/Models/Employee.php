@@ -8,81 +8,44 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 /**
- * @property int $id
- * @property string $name
- * @property string $email
- * @property string|null $phone
- * @property string $department
- * @property string $position
- * @property string $salary
- * @property Carbon $hire_date
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+ * Represents an employee identity in the system.
  *
- * @method static \Database\Factories\EmployeeFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereDepartment($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereEmail($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereHireDate($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee wherePhone($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee wherePosition($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereSalary($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereUpdatedAt($value)
- *
- * @mixin \Eloquent
- */
-/**
- * Class Employee
- *
- * Represents an employee in the system.
+ * Employment history (department, position, branch, salary, dates, status)
+ * is stored in the Employment model, allowing multiple employment records
+ * across companies over time.
  *
  * @property int $id
  * @property string $employee_id
  * @property string $name
  * @property string $email
  * @property string|null $phone
- * @property int|null $department_id
- * @property int|null $position_id
- * @property int|null $branch_id
  * @property int|null $user_id
- * @property string $salary
- * @property Carbon $hire_date
- * @property string $employment_status
- * @property Carbon|null $termination_date
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read Branch|null $branch
- * @property-read Department|null $department
+ * @property-read Collection<int, Employment> $employments
+ * @property-read int|null $employments_count
+ * @property-read Employment|null $currentEmployment
  * @property-read Collection<int, Permission> $permissions
  * @property-read int|null $permissions_count
- * @property-read Position|null $position
  * @property-read User|null $user
+ * @property-read Carbon|null $tenure
  *
  * @method static \Database\Factories\EmployeeFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereBranchId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereDepartmentId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereEmail($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereEmployeeId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereEmploymentStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereHireDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee wherePhone($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee wherePositionId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereSalary($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereTerminationDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereUserId($value)
  *
@@ -103,14 +66,7 @@ class Employee extends Model
         'name',
         'email',
         'phone',
-        'department_id',
-        'position_id',
-        'branch_id',
         'user_id',
-        'salary',
-        'hire_date',
-        'employment_status',
-        'termination_date',
     ];
 
     /**
@@ -118,11 +74,7 @@ class Employee extends Model
      *
      * @var array<string, string>
      */
-    protected $casts = [
-        'hire_date' => 'date',
-        'termination_date' => 'date',
-        'salary' => 'decimal:2',
-    ];
+    protected $casts = [];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -131,6 +83,15 @@ class Employee extends Model
      */
     protected $hidden = [
         'salary',
+    ];
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var list<string>
+     */
+    protected $appends = [
+        'tenure',
     ];
 
     public function permissions(): BelongsToMany
@@ -147,31 +108,40 @@ class Employee extends Model
     }
 
     /**
-     * Get the formatted salary attribute.
-     *
-     * @param  mixed  $value
-     * @return string
+     * All employment records for this employee.
      */
-    public function getSalaryAttribute($value)
+    public function employments(): HasMany
     {
-        return number_format($value, 2, '.', '');
+        return $this->hasMany(Employment::class);
     }
 
-    public function department(): BelongsTo
+    /**
+     * The employee's current (active) employment record.
+     */
+    public function currentEmployment(): HasOne
     {
-        return $this->belongsTo(Department::class);
+        return $this->hasOne(Employment::class)->where('is_current', true);
     }
 
-    public function position(): BelongsTo
+    /**
+     * Get the employee's tenure based on the earliest hire date across all employments.
+     *
+     * Falls back to the employee's created_at date if no employment records exist.
+     */
+    public function getTenureAttribute(): ?Carbon
     {
-        return $this->belongsTo(Position::class);
+        $earliestHireDate = DB::table('employments')
+            ->where('employee_id', $this->id)
+            ->min('hire_date');
+
+        $date = $earliestHireDate ?? $this->created_at;
+
+        return $date ? Carbon::parse($date) : null;
     }
 
-    public function branch(): BelongsTo
-    {
-        return $this->belongsTo(Branch::class);
-    }
-
+    /**
+     * The system user account associated with this employee.
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

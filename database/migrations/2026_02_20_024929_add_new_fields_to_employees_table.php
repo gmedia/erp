@@ -9,25 +9,31 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('employees', function (Blueprint $table) {
-            $table->string('employee_id')->nullable()->after('id');
+        $hasEmployeeId = Schema::hasColumn('employees', 'employee_id');
+
+        Schema::table('employees', function (Blueprint $table) use ($hasEmployeeId) {
+            if (! $hasEmployeeId) {
+                $table->string('employee_id')->nullable();
+            }
             $table->decimal('salary', 10, 2)->nullable()->change();
             $table->string('employment_status')->default('regular')->after('hire_date');
             $table->date('termination_date')->nullable()->after('employment_status');
         });
 
-        // Set default employee_id for existing records
-        $employees = DB::table('employees')->get();
-        foreach ($employees as $emp) {
-            DB::table('employees')
-                ->where('id', $emp->id)
-                ->update(['employee_id' => 'EMP-' . str_pad($emp->id, 5, '0', STR_PAD_LEFT)]);
-        }
+        if (! $hasEmployeeId) {
+            // Set default employee_id for existing records
+            $employees = DB::table('employees')->get();
+            foreach ($employees as $emp) {
+                DB::table('employees')
+                    ->where('id', $emp->id)
+                    ->update(['employee_id' => 'EMP-' . str_pad($emp->id, 5, '0', STR_PAD_LEFT)]);
+            }
 
-        Schema::table('employees', function (Blueprint $table) {
-            $table->string('employee_id')->nullable(false)->change();
-            $table->unique('employee_id');
-        });
+            Schema::table('employees', function (Blueprint $table) {
+                $table->string('employee_id')->nullable(false)->change();
+                $table->unique('employee_id');
+            });
+        }
     }
 
     public function down(): void
