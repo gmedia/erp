@@ -21,21 +21,12 @@ class DashboardController extends Controller
         return response()->json([
             'data' => [
                 'totals' => [
-                    'customers' => $this->scoped(Customer::query(), $branchId)->count(),
-                    'employees' => $this->scoped(Employee::query(), $branchId)->count(),
-                    'suppliers' => $this->scoped(Supplier::query(), $branchId)->count(),
-                    'assets' => $this->scoped(Asset::query(), $branchId)->count(),
+                    'customers' => $this->scoped(Customer::query(), $branchId, Customer::class)->count(),
+                    'employees' => $this->scoped(Employee::query(), $branchId, Employee::class)->count(),
+                    'suppliers' => $this->scoped(Supplier::query(), $branchId, Supplier::class)->count(),
+                    'assets' => $this->scoped(Asset::query(), $branchId, Asset::class)->count(),
                 ],
             ],
         ]);
-    }
-
-    private function scoped(Builder $query, ?int $branchId): Builder
-    {
-        if ($branchId !== null) {
-            $query->where('branch_id', $branchId);
-        }
-
-        return $query;
     }
 }

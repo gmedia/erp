@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Concerns;
 
+use App\Models\Employee;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -79,6 +81,30 @@ trait ResolvesBranchScope
 
     protected function resolveUserBranchId(?User $user): ?int
     {
-        return $user?->employee?->branch_id;
+        return $user?->employee?->currentEmployment?->branch_id;
+    }
+
+    /**
+     * Apply branch scope to a query, accounting for models where the
+     * branch_id column has been moved to a related table (e.g. Employee).
+     *
+     * @param  Builder  $query      The Eloquent query to scope.
+     * @param  int|null $branchId   The resolved branch ID; null = unscoped.
+     * @param  string   $modelClass The fully-qualified model class name.
+     * @return Builder
+     */
+    protected function scoped(Builder $query, ?int $branchId, string $modelClass): Builder
+    {
+        if ($branchId === null) {
+            return $query;
+        }
+
+        if ($modelClass === Employee::class) {
+            return $query->whereHas('currentEmployment', fn (Builder $q) =>
+                $q->where('branch_id', $branchId)
+            );
+        }
+
+        return $query->where('branch_id', $branchId);
     }
 }
