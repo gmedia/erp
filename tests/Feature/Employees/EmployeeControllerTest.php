@@ -130,6 +130,7 @@ describe('Employee API Endpoints', function () {
                 'position_id' => Position::factory()->create()->id,
                 'hire_date' => now()->subYear(),
                 'employment_status' => 'regular',
+                'is_current' => true,
             ]);
         })->create();
         Employee::factory()->afterCreating(function (Employee $e) use ($marketing) {
@@ -140,6 +141,7 @@ describe('Employee API Endpoints', function () {
                 'position_id' => Position::factory()->create()->id,
                 'hire_date' => now()->subYear(),
                 'employment_status' => 'regular',
+                'is_current' => true,
             ]);
         })->create();
         Employee::factory()->afterCreating(function (Employee $e) use ($sales, $company) {
@@ -150,6 +152,7 @@ describe('Employee API Endpoints', function () {
                 'position_id' => Position::factory()->create()->id,
                 'hire_date' => now()->subYear(),
                 'employment_status' => 'regular',
+                'is_current' => true,
             ]);
         })->create();
 
