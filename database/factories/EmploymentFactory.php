@@ -33,4 +33,34 @@ class EmploymentFactory extends Factory
             'is_current' => true,
         ];
     }
+
+    /**
+     * Set the department for the employment.
+     */
+    public function withDepartment(int $departmentId): static
+    {
+        return $this->state(fn () => [
+            'department_id' => $departmentId,
+        ]);
+    }
+
+    /**
+     * Set the position for the employment.
+     */
+    public function withPosition(int $positionId): static
+    {
+        return $this->state(fn () => [
+            'position_id' => $positionId,
+        ]);
+    }
+
+    /**
+     * Set the branch for the employment.
+     */
+    public function withBranch(int $branchId): static
+    {
+        return $this->state(fn () => [
+            'branch_id' => $branchId,
+        ]);
+    }
 }
