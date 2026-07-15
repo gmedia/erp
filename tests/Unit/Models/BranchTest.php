@@ -22,5 +22,6 @@ test('fillable attributes are defined correctly', function () {
 
     expect($fillable)->toBe([
         'name',
+        'company_id',
     ]);
 });

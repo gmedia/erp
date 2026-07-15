@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Branch;
 use App\Models\Department;
 use App\Models\Employee;
+use App\Models\Employment;
 use App\Models\Permission;
 use App\Models\Position;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -87,32 +88,34 @@ class DatabaseSeeder extends Seeder
         $branchId = Branch::query()->value('id');
 
         // Test User Employee (for test@example.com — ensures CheckPermission middleware finds employee)
-        Employee::updateOrCreate([
+        $testEmployee = Employee::updateOrCreate([
             'email' => 'test@example.com',
             'user_id' => $testUser->id,
         ], [
             'employee_id' => 'EMP-TEST01',
             'name' => 'Test User',
             'phone' => '1234567890',
-            'department_id' => $departmentId,
-            'position_id' => $positionId,
-            'branch_id' => $branchId,
+        ]);
+
+        Employment::factory()->withDepartment($departmentId)->withPosition($positionId)->withBranch($branchId)->for($testEmployee)->create([
+            'company_id' => 1,
             'salary' => 50000,
             'hire_date' => now(),
             'employment_status' => 'regular',
         ]);
 
         // Admin Employee
-        Employee::updateOrCreate([
+        $adminEmployee = Employee::updateOrCreate([
             'email' => config('app.admin'),
             'user_id' => $admin->id,
         ], [
             'employee_id' => 'EMP-00000',
             'name' => 'Admin User',
             'phone' => '1234567890',
-            'department_id' => $departmentId,
-            'position_id' => $positionId,
-            'branch_id' => $branchId,
+        ]);
+
+        Employment::factory()->withDepartment($departmentId)->withPosition($positionId)->withBranch($branchId)->for($adminEmployee)->create([
+            'company_id' => 1,
             'salary' => 100000,
             'hire_date' => now(),
             'employment_status' => 'regular',
@@ -120,48 +123,51 @@ class DatabaseSeeder extends Seeder
 
         // Sample Employees for Approvals
         $hrManagerUser = User::where('email', 'manager.hr@dokfin.id')->first();
-        Employee::updateOrCreate([
+        $hrManagerEmployee = Employee::updateOrCreate([
             'email' => 'manager.hr@dokfin.id',
             'user_id' => $hrManagerUser->id,
         ], [
             'employee_id' => 'EMP-HR001',
             'name' => 'HR Manager',
             'phone' => '081234567891',
-            'department_id' => Department::where('name', 'HR')->value('id'),
-            'position_id' => Position::where('name', 'Manager')->value('id'),
-            'branch_id' => $branchId,
+        ]);
+
+        Employment::factory()->withDepartment(Department::where('name', 'HR')->value('id'))->withPosition(Position::where('name', 'Manager')->value('id'))->withBranch($branchId)->for($hrManagerEmployee)->create([
+            'company_id' => 1,
             'salary' => 15000000,
             'hire_date' => now()->subYears(2),
             'employment_status' => 'regular',
         ]);
 
         $financeDirectorUser = User::where('email', 'director.finance@dokfin.id')->first();
-        Employee::updateOrCreate([
+        $financeDirectorEmployee = Employee::updateOrCreate([
             'email' => 'director.finance@dokfin.id',
             'user_id' => $financeDirectorUser->id,
         ], [
             'employee_id' => 'EMP-FIN001',
             'name' => 'Finance Director',
             'phone' => '081234567892',
-            'department_id' => Department::where('name', 'Finance')->value('id'),
-            'position_id' => Position::where('name', 'Director')->value('id'),
-            'branch_id' => $branchId,
+        ]);
+
+        Employment::factory()->withDepartment(Department::where('name', 'Finance')->value('id'))->withPosition(Position::where('name', 'Director')->value('id'))->withBranch($branchId)->for($financeDirectorEmployee)->create([
+            'company_id' => 1,
             'salary' => 25000000,
             'hire_date' => now()->subYears(5),
             'employment_status' => 'regular',
         ]);
 
         $itStaffUser = User::where('email', 'staff.it@dokfin.id')->first();
-        Employee::updateOrCreate([
+        $itStaffEmployee = Employee::updateOrCreate([
             'email' => 'staff.it@dokfin.id',
             'user_id' => $itStaffUser->id,
         ], [
             'employee_id' => 'EMP-IT001',
             'name' => 'IT Staff',
             'phone' => '081234567893',
-            'department_id' => Department::where('name', 'Engineering')->value('id'),
-            'position_id' => Position::where('name', 'Senior')->value('id'),
-            'branch_id' => $branchId,
+        ]);
+
+        Employment::factory()->withDepartment(Department::where('name', 'Engineering')->value('id'))->withPosition(Position::where('name', 'Senior')->value('id'))->withBranch($branchId)->for($itStaffEmployee)->create([
+            'company_id' => 1,
             'salary' => 12000000,
             'hire_date' => now()->subYears(1),
             'employment_status' => 'regular',
