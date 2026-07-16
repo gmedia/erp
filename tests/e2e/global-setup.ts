@@ -241,7 +241,7 @@ async function createAdminAuthState(baseUrl: string, authStatePath: string): Pro
                 let body = '';
                 try {
                     body = await response.text();
-                } catch (_e) {
+                } catch {
                     body = '[could not read body]';
                 }
                 throw new Error(`Failed to login during global setup: ${response.status} ${response.statusText}. Body: ${body}`);
