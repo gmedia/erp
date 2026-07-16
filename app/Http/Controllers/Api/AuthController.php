@@ -37,7 +37,7 @@ class AuthController extends Controller
             'email' => $credentials['email'],
             'user_found' => ! is_null($user),
             'user_id' => $user?->id,
-            'user_password_hash' => $user ? substr($user->password, 0, 12).'...' : 'N/A',
+            'user_password_hash' => $user ? substr($user->password, 0, 12) . '...' : 'N/A',
             'hash_check' => $user ? Hash::check($credentials['password'], $user->password) : 'N/A',
             'auth_attempt' => $authAttempt,
             'default_guard' => config('auth.defaults.guard'),
