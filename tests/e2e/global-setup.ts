@@ -238,7 +238,13 @@ async function createAdminAuthState(baseUrl: string, authStatePath: string): Pro
             });
 
             if (! response.ok) {
-                throw new Error(`Failed to login during global setup: ${response.status} ${response.statusText}`);
+                let body = '';
+                try {
+                    body = await response.text();
+                } catch (_) {
+                    body = '[could not read body]';
+                }
+                throw new Error(`Failed to login during global setup: ${response.status} ${response.statusText}. Body: ${body}`);
             }
 
             const payload = (await response.json()) as LoginResponse;
