@@ -365,6 +365,9 @@ jobs:
       - name: Generate application key
         run: ./vendor/bin/sail artisan key:generate
 
+      - name: Run database migrations and seed
+        run: ./vendor/bin/sail artisan migrate:fresh --seed
+
       - name: Configure MinIO bucket
         run: |
           ./vendor/bin/sail exec -T minio mc alias set myminio http://localhost:9000 sail password
