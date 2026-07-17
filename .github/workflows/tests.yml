@@ -59,13 +59,6 @@ jobs:
       - name: Bootstrap Sail dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Pull CI Sail image
         shell: bash
         timeout-minutes: 5
@@ -297,13 +290,6 @@ jobs:
 
       - name: Bootstrap Sail dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Pull CI Sail image
         shell: bash
