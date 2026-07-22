@@ -222,11 +222,11 @@ jobs:
           SONAR_HOST_URL: https://sonarcloud.io
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
+          # Keep JRE provisioning on: bundled scanner JRE is Java 17 (rejected by SonarCloud).
           args: >
             -Dproject.settings=.sonarcloud.properties
             -Dsonar.organization=gmedia
             -Dsonar.projectKey=gmedia_erp
-            -Dsonar.scanner.skipJreProvisioning=true
 
       - name: Upload failure logs
         if: failure() && steps.autofix.outputs.changed != 'true'
