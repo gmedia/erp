@@ -1,17 +1,17 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-07-22 — Quality failed on Sonar Java 17; fix staged. PR #69 OPEN.
+Last updated: 2026-07-22 — Sonar JRE fix pushed. CI run #29902687313 IN_PROGRESS. PR #69 OPEN.
 
 ## SESSION 2026-07-22 — Unstick E2E CI (PR #69)
 
 **Goal**: Get PR #69 fully green (Quality + Test suite; verify E2E migrate).
 
-**Current milestone**: Fix Sonar scanner Java (blocker for Quality → blocks E2E).
+**Current milestone**: Wait for one-shot CI result on Sonar JRE provisioning fix (do not poll).
 
 ### Root causes (confirmed)
 
 1. **E2E migrate (fixed earlier)**: `--database=testing` invalid (no Laravel connection). Now `migrate:fresh --seed --force` on default `mariadb`/`laravel`.
-2. **Quality Sonar (new blocker, run 29901127532)**: `sonar.scanner.skipJreProvisioning=true` made scanner use bundled JRE **Java 17**. SonarCloud rejects Java 17. Log: `Using the java executable '.../sonar-scanner-cli/.../jre/bin/java' from JAVA_HOME` then `Java 17.0.15` then ERROR upgrade to Java 21+.
+2. **Quality Sonar (fixed, awaiting CI)**: `sonar.scanner.skipJreProvisioning=true` made scanner use bundled JRE **Java 17**. SonarCloud rejects Java 17. Fix: remove the flag so scanner provisions supported JRE (Java 21+).
 
 | Context | Connection name | Database name |
 |---------|-----------------|---------------|
@@ -26,7 +26,8 @@ Last updated: 2026-07-22 — Quality failed on Sonar Java 17; fix staged. PR #69
 | `44ba57c2` | fix: remove temporary AuthController login debug logging |
 | `ae1f66d6` | docs: update task.md handoff for E2E CI fix |
 | `71f595b0` | docs: note CI run after E2E migrate fix push |
-| (pending) | fix: stop skipping Sonar scanner JRE provisioning (Java 21+) |
+| `03468670` | fix: keep Sonar scanner JRE provisioning for Java 21+ |
+| `2e7e039c` | docs: update task.md for Sonar Quality blocker |
 
 1. E2E migrate without `--database=testing`
 2. AuthController login debug removed
@@ -38,11 +39,13 @@ Last updated: 2026-07-22 — Quality failed on Sonar Java 17; fix staged. PR #69
 - CI run 29901127532: Duster/PHPStan/TS/tests with coverage **passed**; Sonar scan **failed** exit 3 (Java 17)
 - E2E **skipped** because Quality failed (`needs: quality`)
 - Project quality gate on main: OK (not the PR analysis failure)
+- Push: HEAD `2e7e039c` on `fix/e2e-login-debug` matches origin
+- CI run https://github.com/gmedia/erp/actions/runs/29902687313 started; Quality checks **pending** at push time
 
 ### Next steps
 
-1. Commit + push Sonar JRE provisioning fix.
-2. One-shot check next CI run: Quality Sonar step green.
+1. One-shot check `gh pr checks 69` / run #29902687313 (no polling).
+2. Confirm Quality Sonar step green (Java 21+).
 3. Confirm E2E "Run database migrations and seed" passes.
 4. If Quality + Test suite green: squash-merge PR #69. E2E has `continue-on-error: true`.
 
@@ -50,7 +53,9 @@ Last updated: 2026-07-22 — Quality failed on Sonar Java 17; fix staged. PR #69
 
 - Branch: `fix/e2e-login-debug`
 - PR: https://github.com/gmedia/erp/pull/69
-- Failed Quality job: https://github.com/gmedia/erp/actions/runs/29901127532/job/88861954670
+- HEAD: `2e7e039c`
+- New CI run: https://github.com/gmedia/erp/actions/runs/29902687313
+- Prior failed Quality: https://github.com/gmedia/erp/actions/runs/29901127532/job/88861954670
 - Do **not** re-add `skipJreProvisioning=true`
 - Do **not** invent a `testing` connection for E2E
 - Do **not** poll CI
@@ -64,8 +69,8 @@ Last updated: 2026-07-22 — Quality failed on Sonar Java 17; fix staged. PR #69
 ## Continuation Prompt
 
 ```
-Continue PR #69 on fix/e2e-login-debug. Read task.md.
-Quality failed: Sonar used bundled Java 17 due to skipJreProvisioning.
-Fix: remove that flag. Push, then one-shot check gh pr checks 69.
+Continue PR #69 on fix/e2e-login-debug. Read task.md. HEAD should be 2e7e039c (or later).
+One-shot check gh pr checks 69 / run 29902687313.
+If Quality Sonar green, verify E2E migrate/login. If Sonar still fails, read Quality job logs for next root cause.
 Do not invent testing connection. Do not poll CI. Do not re-add skipJreProvisioning.
 ```
