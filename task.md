@@ -1,69 +1,71 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-07-22 — Pushed E2E migrate fix. HEAD `ae1f66d6`. CI run #29900923800 IN_PROGRESS. PR #69 OPEN.
+Last updated: 2026-07-22 — Quality failed on Sonar Java 17; fix staged. PR #69 OPEN.
 
 ## SESSION 2026-07-22 — Unstick E2E CI (PR #69)
 
-**Goal**: Get PR #69 E2E job past "Run database migrations and seed" and fully green.
+**Goal**: Get PR #69 fully green (Quality + Test suite; verify E2E migrate).
 
-**Current milestone**: Fix pushed; waiting for CI result (do not poll — check once next session).
+**Current milestone**: Fix Sonar scanner Java (blocker for Quality → blocks E2E).
 
-### Root cause (confirmed)
+### Root causes (confirmed)
 
-Previous commit `73a12c9b` used invalid `--database=testing` (no such Laravel connection).
+1. **E2E migrate (fixed earlier)**: `--database=testing` invalid (no Laravel connection). Now `migrate:fresh --seed --force` on default `mariadb`/`laravel`.
+2. **Quality Sonar (new blocker, run 29901127532)**: `sonar.scanner.skipJreProvisioning=true` made scanner use bundled JRE **Java 17**. SonarCloud rejects Java 17. Log: `Using the java executable '.../sonar-scanner-cli/.../jre/bin/java' from JAVA_HOME` then `Java 17.0.15` then ERROR upgrade to Java 21+.
 
 | Context | Connection name | Database name |
 |---------|-----------------|---------------|
 | Pest (`phpunit.xml`) | `mariadb` | `testing` (via `DB_DATABASE`) |
-| Sail app / E2E (`.env` from `.env.example`) | `mariadb` | `laravel` |
-| `config/database.php` | no `testing` key | — |
+| Sail app / E2E | `mariadb` | `laravel` |
 
-Local repro: `Database connection [testing] not configured.`
-
-### What changed this session (pushed)
+### What changed this session
 
 | Commit | Message |
 |--------|---------|
 | `3285c2cd` | fix: use default DB for E2E migrate:fresh --seed |
 | `44ba57c2` | fix: remove temporary AuthController login debug logging |
 | `ae1f66d6` | docs: update task.md handoff for E2E CI fix |
+| `71f595b0` | docs: note CI run after E2E migrate fix push |
+| (pending) | fix: stop skipping Sonar scanner JRE provisioning (Java 21+) |
 
-1. `.github/workflows/tests.yml` — `migrate:fresh --seed --force` (no `--database=testing`)
-2. `AuthController::login()` — restored plain `Auth::attempt`; removed debug `Log::info`
+1. E2E migrate without `--database=testing`
+2. AuthController login debug removed
+3. Remove `-Dsonar.scanner.skipJreProvisioning=true` so scanner provisions supported JRE
 
 ### Validated
 
-- Local: bad flag fails with connection not configured
-- Push: branch `fix/e2e-login-debug` @ `ae1f66d6` matches origin
-- CI: run https://github.com/gmedia/erp/actions/runs/29900923800 started; Quality checks IN_PROGRESS at push time
+- Local: bad migrate flag → `Database connection [testing] not configured.`
+- CI run 29901127532: Duster/PHPStan/TS/tests with coverage **passed**; Sonar scan **failed** exit 3 (Java 17)
+- E2E **skipped** because Quality failed (`needs: quality`)
+- Project quality gate on main: OK (not the PR analysis failure)
 
 ### Next steps
 
-1. Check `gh pr checks 69` / run #29900923800 once (no polling).
-2. Confirm E2E step "Run database migrations and seed" passes.
-3. If migrate OK but login fails: seed admin `admin@dokfin.id` / `password` + Sail logs.
-4. If Quality + Test suite green: squash-merge PR #69. E2E has `continue-on-error: true` — still verify manually.
+1. Commit + push Sonar JRE provisioning fix.
+2. One-shot check next CI run: Quality Sonar step green.
+3. Confirm E2E "Run database migrations and seed" passes.
+4. If Quality + Test suite green: squash-merge PR #69. E2E has `continue-on-error: true`.
 
 ### Critical context
 
 - Branch: `fix/e2e-login-debug`
 - PR: https://github.com/gmedia/erp/pull/69
-- HEAD: `ae1f66d6`
-- Prior failed E2E job (pre-fix): #87815025920
-- `CI_SAIL_IMAGE`: `ghcr.io/gmedia/erp/ci-sail:8.4`
+- Failed Quality job: https://github.com/gmedia/erp/actions/runs/29901127532/job/88861954670
+- Do **not** re-add `skipJreProvisioning=true`
 - Do **not** invent a `testing` connection for E2E
+- Do **not** poll CI
 
 ### Key files
 
-- `.github/workflows/tests.yml` — E2E migrate step (~line 361)
+- `.github/workflows/tests.yml` — Sonar args + E2E migrate (~line 217–229, ~361)
 - `app/Http/Controllers/Api/AuthController.php`
 - `phpunit.xml` / `.env.example` / `tests/e2e/global-setup.ts` / `DatabaseSeeder.php`
 
 ## Continuation Prompt
 
 ```
-Continue PR #69 E2E CI fix on fix/e2e-login-debug.
-Read task.md. HEAD should be ae1f66d6 (or later). Check gh pr checks 69 / run 29900923800.
-If E2E migrate passed, verify login; if failed, read job logs for next root cause.
-Do not invent a testing connection. Do not poll CI.
+Continue PR #69 on fix/e2e-login-debug. Read task.md.
+Quality failed: Sonar used bundled Java 17 due to skipJreProvisioning.
+Fix: remove that flag. Push, then one-shot check gh pr checks 69.
+Do not invent testing connection. Do not poll CI. Do not re-add skipJreProvisioning.
 ```
