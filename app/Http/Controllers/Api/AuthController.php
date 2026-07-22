@@ -13,7 +13,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -30,23 +29,7 @@ class AuthController extends Controller
     {
         $credentials = $request->only('email', 'password');
 
-        // Debug: trace credential validation failure
-        $user = User::where('email', $credentials['email'])->first();
-        $authAttempt = Auth::attempt($credentials);
-        Log::info('AuthController::login debug', [
-            'email' => $credentials['email'],
-            'user_found' => ! is_null($user),
-            'user_id' => $user?->id,
-            'user_password_hash' => $user ? substr($user->password, 0, 12) . '...' : 'N/A',
-            'hash_check' => $user ? Hash::check($credentials['password'], $user->password) : 'N/A',
-            'auth_attempt' => $authAttempt,
-            'default_guard' => config('auth.defaults.guard'),
-            'auth_guard_provider' => config('auth.guards.web.provider'),
-            'session_driver' => config('session.driver'),
-            'session_domain' => config('session.domain'),
-        ]);
-
-        if (! $authAttempt) {
+        if (! Auth::attempt($credentials)) {
             throw ValidationException::withMessages([
                 'email' => __('auth.failed'),
             ]);
@@ -54,7 +37,6 @@ class AuthController extends Controller
 
         $user = Auth::user();
 
-        // Use device name if provided, otherwise default to 'mobile_app'
         $deviceName = $request->post('device_name', 'mobile_app');
         $token = $user->createToken($deviceName);
 
