@@ -359,7 +359,7 @@ jobs:
         run: ./vendor/bin/sail artisan key:generate
 
       - name: Run database migrations and seed
-        run: ./vendor/bin/sail artisan migrate:fresh --seed --database=testing
+        run: ./vendor/bin/sail artisan migrate:fresh --seed --force
 
       - name: Configure MinIO bucket
         run: |
