@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 /**
  * Represents an employee identity in the system.
@@ -130,13 +131,17 @@ class Employee extends Model
      */
     public function getTenureAttribute(): ?Carbon
     {
-        $earliestHireDate = DB::table('employments')
-            ->where('employee_id', $this->id)
-            ->min('hire_date');
+        try {
+            $earliestHireDate = DB::table('employments')
+                ->where('employee_id', $this->id)
+                ->min('hire_date');
 
-        $date = $earliestHireDate ?? $this->created_at;
+            $date = $earliestHireDate ?? $this->created_at;
 
-        return $date ? Carbon::parse($date) : null;
+            return $date ? Carbon::parse($date) : null;
+        } catch (Throwable) {
+            return null;
+        }
     }
 
     /**

@@ -37,8 +37,8 @@ export default [
             'react-hooks/exhaustive-deps': 'warn',
         },
     },
-    {
-        ignores: ['vendor', 'node_modules', 'public', 'bootstrap/ssr', 'tailwind.config.js', 'coverage-html'],
-    },
     prettier, // Turn off all rules that might conflict with Prettier
+    {
+        ignores: ['vendor', 'node_modules', 'public', 'bootstrap/ssr', 'tailwind.config.js', 'coverage-html', '.0pencode/'],
+    },
 ];
