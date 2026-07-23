@@ -1,76 +1,81 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-07-22 — Sonar JRE fix pushed. CI run #29902687313 IN_PROGRESS. PR #69 OPEN.
+Last updated: 2026-07-23 — APP_ENV fix applied. PR #69 OPEN on fix/e2e-login-debug.
 
-## SESSION 2026-07-22 — Unstick E2E CI (PR #69)
+## SESSION 2026-07-23 — Fix E2E login DB mismatch (PR #69)
 
-**Goal**: Get PR #69 fully green (Quality + Test suite; verify E2E migrate).
+**Goal**: Get PR #69 fully green (Quality + Test suite; Playwright past global-setup login).
 
-**Current milestone**: Wait for one-shot CI result on Sonar JRE provisioning fix (do not poll).
+**Current milestone**: Pushed `APP_ENV=local` fix; one-shot CI check pending.
 
 ### Root causes (confirmed)
 
-1. **E2E migrate (fixed earlier)**: `--database=testing` invalid (no Laravel connection). Now `migrate:fresh --seed --force` on default `mariadb`/`laravel`.
-2. **Quality Sonar (fixed, awaiting CI)**: `sonar.scanner.skipJreProvisioning=true` made scanner use bundled JRE **Java 17**. SonarCloud rejects Java 17. Fix: remove the flag so scanner provisions supported JRE (Java 21+).
+1. **E2E migrate (fixed)**: `--database=testing` invalid. Now `migrate:fresh --seed --force` on default `mariadb`/`laravel`.
+2. **Quality Sonar (fixed)**: removed `sonar.scanner.skipJreProvisioning=true` so scanner provisions Java 21+.
+3. **E2E login 500 (fix applied)**: CI `cp .env.example .env` with `APP_ENV=testing` → Laravel `LoadEnvironmentVariables` loads tracked `.env.testing` → `DB_DATABASE=testing`. Migrate/seed fill `laravel`; HTTP app queries `testing.users` → 500.
 
-| Context | Connection name | Database name |
-|---------|-----------------|---------------|
-| Pest (`phpunit.xml`) | `mariadb` | `testing` (via `DB_DATABASE`) |
-| Sail app / E2E | `mariadb` | `laravel` |
+| Context | Connection | Database |
+|---------|------------|----------|
+| Pest (`phpunit.xml`) | `mariadb` | `testing` |
+| Sail app / E2E (intended) | `mariadb` | `laravel` |
+| Broken HTTP path (before fix) | `mariadb` | `testing` via `.env.testing` |
 
 ### What changed this session
 
 | Commit | Message |
 |--------|---------|
+| (pending) | fix: use APP_ENV=local in .env.example so E2E uses laravel DB |
+| (pending) | docs: update task.md for env/DB mismatch fix |
+
+Prior commits on branch:
+
+| Commit | Message |
+|--------|---------|
+| `6a71c163` | docs: note CI run after Sonar JRE fix push |
+| `03468670` | fix: keep Sonar scanner JRE provisioning for Java 21+ |
 | `3285c2cd` | fix: use default DB for E2E migrate:fresh --seed |
 | `44ba57c2` | fix: remove temporary AuthController login debug logging |
-| `ae1f66d6` | docs: update task.md handoff for E2E CI fix |
-| `71f595b0` | docs: note CI run after E2E migrate fix push |
-| `03468670` | fix: keep Sonar scanner JRE provisioning for Java 21+ |
-| `2e7e039c` | docs: update task.md for Sonar Quality blocker |
-
-1. E2E migrate without `--database=testing`
-2. AuthController login debug removed
-3. Remove `-Dsonar.scanner.skipJreProvisioning=true` so scanner provisions supported JRE
 
 ### Validated
 
-- Local: bad migrate flag → `Database connection [testing] not configured.`
-- CI run 29901127532: Duster/PHPStan/TS/tests with coverage **passed**; Sonar scan **failed** exit 3 (Java 17)
-- E2E **skipped** because Quality failed (`needs: quality`)
-- Project quality gate on main: OK (not the PR analysis failure)
-- Push: HEAD `2e7e039c` on `fix/e2e-login-debug` matches origin
-- CI run https://github.com/gmedia/erp/actions/runs/29902687313 started; Quality checks **pending** at push time
+- CI run 29902892175 (`headSha` `6a71c163`): Quality green (incl. Sonar); E2E migrate/seed green; Playwright failed at `createAdminAuthState` with login **500**
+- Exact error: `Table 'testing.users' doesn't exist ... Database: testing ... email = admin@dokfin.id`
+- Framework: `Env::get('APP_ENV')` → load `.env.{APP_ENV}` when file exists
+- `artisan serve` passthrough includes `APP_ENV` to child PHP server process
+- Pest isolation unchanged: `phpunit.xml` still sets `APP_ENV=testing` + `DB_DATABASE=testing`
 
 ### Next steps
 
-1. One-shot check `gh pr checks 69` / run #29902687313 (no polling).
-2. Confirm Quality Sonar step green (Java 21+).
-3. Confirm E2E "Run database migrations and seed" passes.
-4. If Quality + Test suite green: squash-merge PR #69. E2E has `continue-on-error: true`.
+1. One-shot check next CI run after push (no polling).
+2. Confirm Quality still green.
+3. Confirm Playwright global-setup login past 500 (no `testing.users` error).
+4. If Quality + Test suite green and E2E verified: squash-merge PR #69. E2E has `continue-on-error: true`.
 
 ### Critical context
 
 - Branch: `fix/e2e-login-debug`
 - PR: https://github.com/gmedia/erp/pull/69
-- HEAD: `2e7e039c`
-- New CI run: https://github.com/gmedia/erp/actions/runs/29902687313
-- Prior failed Quality: https://github.com/gmedia/erp/actions/runs/29901127532/job/88861954670
-- Do **not** re-add `skipJreProvisioning=true`
+- Prior CI: https://github.com/gmedia/erp/actions/runs/29902892175
 - Do **not** invent a `testing` connection for E2E
+- Do **not** re-add `skipJreProvisioning=true`
 - Do **not** poll CI
+- Keep `.env.testing` for Pest-only overrides; do not point Sail/E2E at it
 
 ### Key files
 
-- `.github/workflows/tests.yml` — Sonar args + E2E migrate (~line 217–229, ~361)
+- `.env.example` — `APP_ENV=local` (was `testing`)
+- `.env.testing` — Pest DB `testing` (unchanged)
+- `phpunit.xml` — Pest env overrides (unchanged)
+- `.github/workflows/tests.yml` — `cp .env.example .env`; E2E migrate/seed
+- `tests/e2e/global-setup.ts` — login bootstrap
 - `app/Http/Controllers/Api/AuthController.php`
-- `phpunit.xml` / `.env.example` / `tests/e2e/global-setup.ts` / `DatabaseSeeder.php`
 
 ## Continuation Prompt
 
 ```
-Continue PR #69 on fix/e2e-login-debug. Read task.md. HEAD should be 2e7e039c (or later).
-One-shot check gh pr checks 69 / run 29902687313.
-If Quality Sonar green, verify E2E migrate/login. If Sonar still fails, read Quality job logs for next root cause.
+Continue PR #69 on fix/e2e-login-debug. Read task.md.
+One-shot check gh pr checks 69 / latest CI run after APP_ENV=local fix.
+Expect: Quality green; Playwright login no longer hits testing.users.
+If still 500, re-read E2E logs for active DB name.
 Do not invent testing connection. Do not poll CI. Do not re-add skipJreProvisioning.
 ```
