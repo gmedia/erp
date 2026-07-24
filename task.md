@@ -1,12 +1,12 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-07-24 — branch `fix/e2e-disable-rate-limiting` (E2E 429 fix).
+Last updated: 2026-07-24 — PR #70 open (`764fd737`) for E2E 429 fix.
 
 ## SESSION 2026-07-24 — Playwright E2E 429 rate-limit fix
 
 **Goal**: Stop residual Playwright CI failures caused by HTTP 429 under parallel suite load (post PR #69 merge).
 
-**Current milestone**: Fix implemented on branch; PR open/pending.
+**Current milestone**: PR #70 open — https://github.com/gmedia/erp/pull/70
 
 ### Root cause
 
