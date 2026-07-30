@@ -77,7 +77,9 @@ export const employeeColumns: ColumnDef<Employee>[] = [
         accessorFn: (row) => row.current_employment?.department?.name,
         ...createSortingHeader('Department'),
         cell: ({ row }) => (
-            <div>{row.original.current_employment?.department?.name ?? '-'}</div>
+            <div>
+                {row.original.current_employment?.department?.name ?? '-'}
+            </div>
         ),
     },
     {

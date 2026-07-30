@@ -24,7 +24,7 @@ class BranchFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->city().' Branch',
+            'name' => $this->faker->city() . ' Branch',
             'company_id' => Company::factory(),
         ];
     }

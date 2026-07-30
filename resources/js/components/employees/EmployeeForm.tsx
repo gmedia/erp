@@ -61,9 +61,7 @@ const getEmployeeFormDefaults = (
         name: employee.name,
         email: employee.email,
         phone: employee.phone || '',
-        company_id: employment?.company_id
-            ? String(employment.company_id)
-            : '',
+        company_id: employment?.company_id ? String(employment.company_id) : '',
         department_id: employment?.department_id
             ? String(employment.department_id)
             : '',
