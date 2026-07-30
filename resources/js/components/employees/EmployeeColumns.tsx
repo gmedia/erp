@@ -5,8 +5,6 @@ import { ColumnDef } from '@tanstack/react-table';
 
 import {
     createActionsColumn,
-    createCurrencyColumn,
-    createDateColumn,
     createEmailColumn,
     createPhoneColumn,
     createSelectColumn,
@@ -16,28 +14,34 @@ import {
 
 import { Employee } from '@/types/entity';
 
-/**
- * Cell renderer for department column - handles both object and string values
- */
-const renderDepartmentCell = ({ row }: { row: { original: Employee } }) => {
-    const val = row.original.department;
-    return <div>{typeof val === 'object' ? val.name : val}</div>;
+const formatCurrency = (value: string | null | undefined): string => {
+    if (!value) {
+        return '-';
+    }
+
+    const amount = Number(value);
+    if (Number.isNaN(amount)) {
+        return value;
+    }
+
+    return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        maximumFractionDigits: 0,
+    }).format(amount);
 };
 
-/**
- * Cell renderer for position column - handles both object and string values
- */
-const renderPositionCell = ({ row }: { row: { original: Employee } }) => {
-    const val = row.original.position;
-    return <div>{typeof val === 'object' ? val.name : val}</div>;
-};
+const formatDate = (value: string | null | undefined): string => {
+    if (!value) {
+        return '-';
+    }
 
-/**
- * Cell renderer for branch column - handles both object and string values
- */
-const renderBranchCell = ({ row }: { row: { original: Employee } }) => {
-    const val = row.original.branch;
-    return <div>{typeof val === 'object' ? val.name : val}</div>;
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+        return value;
+    }
+
+    return date.toLocaleDateString('id-ID');
 };
 
 export const employeeColumns: ColumnDef<Employee>[] = [
@@ -51,10 +55,14 @@ export const employeeColumns: ColumnDef<Employee>[] = [
     createTextColumn<Employee>({ accessorKey: 'name', label: 'Name' }),
     {
         id: 'employment_status',
-        accessorKey: 'employment_status',
+        accessorFn: (row) => row.current_employment?.employment_status,
         ...createSortingHeader('Status'),
         cell: ({ row }) => {
-            const status = row.original.employment_status;
+            const status = row.original.current_employment?.employment_status;
+            if (!status) {
+                return <div>-</div>;
+            }
+
             return (
                 <Badge variant={status === 'intern' ? 'secondary' : 'default'}>
                     {status === 'intern' ? 'Intern' : 'Regular'}
@@ -66,31 +74,43 @@ export const employeeColumns: ColumnDef<Employee>[] = [
     createPhoneColumn<Employee>({ accessorKey: 'phone', label: 'Phone' }),
     {
         id: 'department_id',
-        accessorKey: 'department',
+        accessorFn: (row) => row.current_employment?.department?.name,
         ...createSortingHeader('Department'),
-        cell: renderDepartmentCell,
+        cell: ({ row }) => (
+            <div>{row.original.current_employment?.department?.name ?? '-'}</div>
+        ),
     },
     {
         id: 'position_id',
-        accessorKey: 'position',
+        accessorFn: (row) => row.current_employment?.position?.name,
         ...createSortingHeader('Position'),
-        cell: renderPositionCell,
+        cell: ({ row }) => (
+            <div>{row.original.current_employment?.position?.name ?? '-'}</div>
+        ),
     },
     {
         id: 'branch_id',
-        accessorKey: 'branch',
+        accessorFn: (row) => row.current_employment?.branch?.name,
         ...createSortingHeader('Branch'),
-        cell: renderBranchCell,
+        cell: ({ row }) => (
+            <div>{row.original.current_employment?.branch?.name ?? '-'}</div>
+        ),
     },
-    createCurrencyColumn<Employee>({
-        accessorKey: 'salary',
-        label: 'Salary',
-        currency: 'IDR',
-        locale: 'id-ID',
-    }),
-    createDateColumn<Employee>({
-        accessorKey: 'hire_date',
-        label: 'Hire Date',
-    }),
+    {
+        id: 'salary',
+        accessorFn: (row) => row.current_employment?.salary,
+        ...createSortingHeader('Salary'),
+        cell: ({ row }) => (
+            <div>{formatCurrency(row.original.current_employment?.salary)}</div>
+        ),
+    },
+    {
+        id: 'hire_date',
+        accessorFn: (row) => row.current_employment?.hire_date,
+        ...createSortingHeader('Hire Date'),
+        cell: ({ row }) => (
+            <div>{formatDate(row.original.current_employment?.hire_date)}</div>
+        ),
+    },
     createActionsColumn<Employee>(),
 ];

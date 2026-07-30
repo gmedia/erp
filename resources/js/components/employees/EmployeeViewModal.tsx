@@ -16,27 +16,19 @@ interface EmployeeViewModalProps {
     item: Employee | null;
 }
 
-/**
- * EmployeeViewModal - A read-only modal to display employee details.
- * Similar layout to Edit modal but with static text instead of form inputs.
- */
 export const EmployeeViewModal = memo<EmployeeViewModalProps>(
     function EmployeeViewModal({ open, onClose, item }) {
         const { t } = useTranslation();
         if (!item) return null;
 
-        const departmentName =
-            typeof item.department === 'object'
-                ? item.department.name
-                : item.department;
-
-        const positionName =
-            typeof item.position === 'object'
-                ? item.position.name
-                : item.position;
-
-        const branchName =
-            typeof item.branch === 'object' ? item.branch.name : item.branch;
+        const employment = item.current_employment;
+        const status = employment?.employment_status;
+        const statusLabel =
+            status === 'intern'
+                ? 'Intern'
+                : status === 'regular'
+                  ? 'Regular'
+                  : '-';
 
         return (
             <ViewModalShell
@@ -50,29 +42,35 @@ export const EmployeeViewModal = memo<EmployeeViewModalProps>(
                     <ViewField label="Name" value={item.name} />
                     <ViewField label="Email" value={item.email} />
                     <ViewField label="Phone" value={item.phone} />
+                    <ViewField label="Status" value={statusLabel} />
                     <ViewField
-                        label="Status"
-                        value={
-                            item.employment_status === 'intern'
-                                ? 'Intern'
-                                : 'Regular'
-                        }
+                        label="Department"
+                        value={employment?.department?.name ?? '-'}
                     />
-                    <ViewField label="Department" value={departmentName} />
-                    <ViewField label="Position" value={positionName} />
-                    <ViewField label="Branch" value={branchName} />
+                    <ViewField
+                        label="Position"
+                        value={employment?.position?.name ?? '-'}
+                    />
+                    <ViewField
+                        label="Branch"
+                        value={employment?.branch?.name ?? '-'}
+                    />
                     <ViewField
                         label="Salary"
-                        value={formatRupiah(item.salary || 0)}
+                        value={formatRupiah(employment?.salary || 0)}
                     />
                     <ViewField
                         label="Hire Date"
-                        value={formatDate(item.hire_date)}
+                        value={
+                            employment?.hire_date
+                                ? formatDate(employment.hire_date)
+                                : '-'
+                        }
                     />
-                    {item.termination_date && (
+                    {employment?.termination_date && (
                         <ViewField
                             label="Termination Date"
-                            value={formatDate(item.termination_date)}
+                            value={formatDate(employment.termination_date)}
                         />
                     )}
                 </div>
