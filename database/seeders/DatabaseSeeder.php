@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Branch;
+use App\Models\Company;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Employment;
@@ -86,6 +87,8 @@ class DatabaseSeeder extends Seeder
         $departmentId = Department::query()->value('id');
         $positionId = Position::query()->value('id');
         $branchId = Branch::query()->value('id');
+        $companyId = Company::query()->value('id')
+            ?? Company::query()->firstOrCreate(['name' => 'PT. Default Company'])->id;
 
         // Test User Employee (for test@example.com — ensures CheckPermission middleware finds employee)
         $testEmployee = Employee::updateOrCreate([
@@ -98,7 +101,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Employment::factory()->withDepartment($departmentId)->withPosition($positionId)->withBranch($branchId)->for($testEmployee)->create([
-            'company_id' => 1,
+            'company_id' => $companyId,
             'salary' => 50000,
             'hire_date' => now(),
             'employment_status' => 'regular',
@@ -115,7 +118,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Employment::factory()->withDepartment($departmentId)->withPosition($positionId)->withBranch($branchId)->for($adminEmployee)->create([
-            'company_id' => 1,
+            'company_id' => $companyId,
             'salary' => 100000,
             'hire_date' => now(),
             'employment_status' => 'regular',
@@ -133,7 +136,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Employment::factory()->withDepartment(Department::where('name', 'HR')->value('id'))->withPosition(Position::where('name', 'Manager')->value('id'))->withBranch($branchId)->for($hrManagerEmployee)->create([
-            'company_id' => 1,
+            'company_id' => $companyId,
             'salary' => 15000000,
             'hire_date' => now()->subYears(2),
             'employment_status' => 'regular',
@@ -150,7 +153,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Employment::factory()->withDepartment(Department::where('name', 'Finance')->value('id'))->withPosition(Position::where('name', 'Director')->value('id'))->withBranch($branchId)->for($financeDirectorEmployee)->create([
-            'company_id' => 1,
+            'company_id' => $companyId,
             'salary' => 25000000,
             'hire_date' => now()->subYears(5),
             'employment_status' => 'regular',
@@ -167,7 +170,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Employment::factory()->withDepartment(Department::where('name', 'Engineering')->value('id'))->withPosition(Position::where('name', 'Senior')->value('id'))->withBranch($branchId)->for($itStaffEmployee)->create([
-            'company_id' => 1,
+            'company_id' => $companyId,
             'salary' => 12000000,
             'hire_date' => now()->subYears(1),
             'employment_status' => 'regular',
