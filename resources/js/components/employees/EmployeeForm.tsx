@@ -13,14 +13,17 @@ import { InputField } from '@/components/common/InputField';
 import NameField from '@/components/common/NameField';
 import SelectField from '@/components/common/SelectField';
 
-import { Employee, EmployeeFormData } from '@/types/entity';
-import { employeeFormSchema } from '@/utils/schemas';
+import { Employee } from '@/types/entity';
+import {
+    employeeFormSchema,
+    type EmployeeFormData,
+} from '@/utils/schemas';
 
 interface EmployeeFormProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     entity?: Employee | null;
-    onSubmit: (data: EmployeeFormData | Record<string, unknown>) => void;
+    onSubmit: (data: Record<string, unknown>) => void;
     isLoading?: boolean;
 }
 
@@ -30,9 +33,9 @@ interface BranchOption {
     company_id?: number | null;
 }
 
-type EmployeeFormValues = z.input<typeof employeeFormSchema>;
+type EmployeeFormInput = z.input<typeof employeeFormSchema>;
 
-const emptyDefaults = (): EmployeeFormValues => ({
+const emptyDefaults = (): EmployeeFormInput => ({
     employee_id: '',
     name: '',
     email: '',
@@ -49,7 +52,7 @@ const emptyDefaults = (): EmployeeFormValues => ({
 
 const getEmployeeFormDefaults = (
     employee?: Employee | null,
-): EmployeeFormValues => {
+): EmployeeFormInput => {
     if (!employee) {
         return emptyDefaults();
     }
@@ -80,16 +83,11 @@ const getEmployeeFormDefaults = (
     };
 };
 
-const toApiPayload = (data: EmployeeFormValues): Record<string, unknown> => {
-    const hireDate =
-        data.hire_date instanceof Date
-            ? format(data.hire_date, 'yyyy-MM-dd')
-            : String(data.hire_date);
+const toApiPayload = (data: EmployeeFormData): Record<string, unknown> => {
+    const hireDate = format(data.hire_date, 'yyyy-MM-dd');
 
     const terminationDate = data.termination_date
-        ? data.termination_date instanceof Date
-            ? format(data.termination_date, 'yyyy-MM-dd')
-            : String(data.termination_date)
+        ? format(data.termination_date, 'yyyy-MM-dd')
         : null;
 
     return {
@@ -167,7 +165,7 @@ export const EmployeeForm = memo<EmployeeFormProps>(function EmployeeForm({
         [entity],
     );
 
-    const form = useForm<EmployeeFormValues>({
+    const form = useForm<EmployeeFormInput, unknown, EmployeeFormData>({
         resolver: zodResolver(employeeFormSchema),
         defaultValues,
     });
@@ -188,12 +186,12 @@ export const EmployeeForm = memo<EmployeeFormProps>(function EmployeeForm({
         [form],
     );
 
-    const handleFormSubmit = (data: EmployeeFormValues) => {
+    const handleFormSubmit = (data: EmployeeFormData) => {
         onSubmit(toApiPayload(data));
     };
 
     return (
-        <EntityForm<EmployeeFormData>
+        <EntityForm<EmployeeFormInput, EmployeeFormData>
             form={form}
             open={open}
             onOpenChange={onOpenChange}
