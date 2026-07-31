@@ -14,10 +14,7 @@ import NameField from '@/components/common/NameField';
 import SelectField from '@/components/common/SelectField';
 
 import { Employee } from '@/types/entity';
-import {
-    employeeFormSchema,
-    type EmployeeFormData,
-} from '@/utils/schemas';
+import { employeeFormSchema, type EmployeeFormData } from '@/utils/schemas';
 
 interface EmployeeFormProps {
     open: boolean;
