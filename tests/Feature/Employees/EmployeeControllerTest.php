@@ -181,6 +181,37 @@ describe('Employee API Endpoints', function () {
         expect($aIndex)->toBeLessThan($zIndex);
     });
 
+    test('index accepts nested employment sort_by values and rejects bare employment fields', function () {
+        $accepted = [
+            'employments.department_id',
+            'employments.position_id',
+            'employments.branch_id',
+            'employments.salary',
+            'employments.employment_status',
+            'employments.hire_date',
+        ];
+
+        foreach ($accepted as $sortBy) {
+            getJson('/api/employees?sort_by=' . $sortBy . '&sort_direction=asc')
+                ->assertOk();
+        }
+
+        $rejected = [
+            'department_id',
+            'position_id',
+            'branch_id',
+            'salary',
+            'employment_status',
+            'hire_date',
+        ];
+
+        foreach ($rejected as $sortBy) {
+            getJson('/api/employees?sort_by=' . $sortBy . '&sort_direction=asc')
+                ->assertUnprocessable()
+                ->assertJsonValidationErrors(['sort_by']);
+        }
+    });
+
     test('store creates employee with valid data and returns 201 status', function () {
         $company = Company::factory()->create();
         $department = Department::factory()->create();

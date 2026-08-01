@@ -54,7 +54,7 @@ export const employeeColumns: ColumnDef<Employee>[] = [
     },
     createTextColumn<Employee>({ accessorKey: 'name', label: 'Name' }),
     {
-        id: 'employment_status',
+        id: 'employments.employment_status',
         accessorFn: (row) => row.current_employment?.employment_status,
         ...createSortingHeader('Status'),
         cell: ({ row }) => {
@@ -73,7 +73,7 @@ export const employeeColumns: ColumnDef<Employee>[] = [
     createEmailColumn<Employee>({ accessorKey: 'email', label: 'Email' }),
     createPhoneColumn<Employee>({ accessorKey: 'phone', label: 'Phone' }),
     {
-        id: 'department_id',
+        id: 'employments.department_id',
         accessorFn: (row) => row.current_employment?.department?.name,
         ...createSortingHeader('Department'),
         cell: ({ row }) => (
@@ -83,7 +83,7 @@ export const employeeColumns: ColumnDef<Employee>[] = [
         ),
     },
     {
-        id: 'position_id',
+        id: 'employments.position_id',
         accessorFn: (row) => row.current_employment?.position?.name,
         ...createSortingHeader('Position'),
         cell: ({ row }) => (
@@ -91,7 +91,7 @@ export const employeeColumns: ColumnDef<Employee>[] = [
         ),
     },
     {
-        id: 'branch_id',
+        id: 'employments.branch_id',
         accessorFn: (row) => row.current_employment?.branch?.name,
         ...createSortingHeader('Branch'),
         cell: ({ row }) => (
@@ -99,7 +99,7 @@ export const employeeColumns: ColumnDef<Employee>[] = [
         ),
     },
     {
-        id: 'salary',
+        id: 'employments.salary',
         accessorFn: (row) => row.current_employment?.salary,
         ...createSortingHeader('Salary'),
         cell: ({ row }) => (
@@ -107,7 +107,7 @@ export const employeeColumns: ColumnDef<Employee>[] = [
         ),
     },
     {
-        id: 'hire_date',
+        id: 'employments.hire_date',
         accessorFn: (row) => row.current_employment?.hire_date,
         ...createSortingHeader('Hire Date'),
         cell: ({ row }) => (
