@@ -34,7 +34,7 @@ describe('Branch API Endpoints', function () {
         $response->assertOk()
             ->assertJsonStructure([
                 'data' => [
-                    '*' => ['id', 'name', 'created_at', 'updated_at'],
+                    '*' => ['id', 'name', 'company_id', 'created_at', 'updated_at'],
                 ],
                 'meta' => ['total', 'per_page', 'current_page'],
             ]);

@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Branch;
+use App\Models\Company;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -24,6 +25,7 @@ class BranchFactory extends Factory
     {
         return [
             'name' => $this->faker->city() . ' Branch',
+            'company_id' => Company::factory(),
         ];
     }
 }

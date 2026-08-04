@@ -17,4 +17,6 @@ test('to array transforms collection', function () {
 
     expect($result)->toHaveCount(3);
     expect($result[0]['name'])->toBe($branches[0]->name);
+    expect($result[0])->toHaveKey('company_id')
+        ->and($result[0]['company_id'])->toBe($branches[0]->company_id);
 });

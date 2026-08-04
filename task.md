@@ -1,81 +1,86 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-07-23 — APP_ENV fix applied. PR #69 OPEN on fix/e2e-login-debug.
+Last updated: 2026-07-30 — PR #70 residual nested-employment fix pushed (`48940ce6`).
 
-## SESSION 2026-07-23 — Fix E2E login DB mismatch (PR #69)
+## SESSION 2026-07-30 — Residual Employee E2E after 429 fix
 
-**Goal**: Get PR #69 fully green (Quality + Test suite; Playwright past global-setup login).
+**Goal**: Clear residual Playwright Employee/User E2E failures on PR #70 after rate-limit 429 was fixed.
 
-**Current milestone**: Pushed `APP_ENV=local` fix; one-shot CI check pending.
+**Current milestone**: PR #70 open — https://github.com/gmedia/erp/pull/70  
+**Branch**: `fix/e2e-disable-rate-limiting`  
+**HEAD**: `48940ce6`
 
-### Root causes (confirmed)
+### Prior: 429 rate-limit (done)
 
-1. **E2E migrate (fixed)**: `--database=testing` invalid. Now `migrate:fresh --seed --force` on default `mariadb`/`laravel`.
-2. **Quality Sonar (fixed)**: removed `sonar.scanner.skipJreProvisioning=true` so scanner provisions Java 21+.
-3. **E2E login 500 (fix applied)**: CI `cp .env.example .env` with `APP_ENV=testing` → Laravel `LoadEnvironmentVariables` loads tracked `.env.testing` → `DB_DATABASE=testing`. Migrate/seed fill `laravel`; HTTP app queries `testing.users` → 500.
+- Root cause: 60/min API throttle + shared admin + parallel Playwright + `APP_ENV=local`
+- Fix: E2E Prepare environment appends `DISABLE_RATE_LIMITING=true` to `.env`
+- Verified on run `30056540816`: **0× 429**, Quality + Test suite green
+- Residual: **13 failed / 499 passed** — Employee/User dialog-not-close
 
-| Context | Connection | Database |
-|---------|------------|----------|
-| Pest (`phpunit.xml`) | `mariadb` | `testing` |
-| Sail app / E2E (intended) | `mariadb` | `laravel` |
-| Broken HTTP path (before fix) | `mariadb` | `testing` via `.env.testing` |
+### Residual root cause (done product fix)
 
-### What changed this session
+Frontend + E2E still used flat Employee fields after Employment refactor (#68). Backend requires nested:
 
-| Commit | Message |
-|--------|---------|
-| (pending) | fix: use APP_ENV=local in .env.example so E2E uses laravel DB |
-| (pending) | docs: update task.md for env/DB mismatch fix |
+```json
+{
+  "employee_id", "name", "email", "phone",
+  "current_employment": {
+    "company_id", "department_id", "position_id", "branch_id",
+    "salary", "hire_date", "employment_status"
+  }
+}
+```
 
-Prior commits on branch:
+No companies API — company is derived from selected Branch (`company_id`).
 
-| Commit | Message |
-|--------|---------|
-| `6a71c163` | docs: note CI run after Sonar JRE fix push |
-| `03468670` | fix: keep Sonar scanner JRE provisioning for Java 21+ |
-| `3285c2cd` | fix: use default DB for E2E migrate:fresh --seed |
-| `44ba57c2` | fix: remove temporary AuthController login debug logging |
+### What landed this session (5 commits)
+
+| Commit | Change |
+|--------|--------|
+| `35f8b60c` | BranchResource exposes `company_id` + unit test |
+| `2b8693e0` | BranchFactory / BranchSeeder / DatabaseSeeder assign company |
+| `623b76dd` | Nested Employee/Employment types + `company_id` in form schema |
+| `9933861e` | EmployeeForm submits nested `current_employment`; branch `onItemSelect` sets company |
+| `48940ce6` | EmployeeColumns + EmployeeViewModal read `current_employment.*` |
+
+E2E helpers left UI-flat intentionally: form combobox labels still match Engineering / Senior Developer / Head Office / Regular; form nests payload + derives company on submit.
+
+### Constraints that remain valid
+
+- Do **not** invent a `testing` connection for E2E
+- Do **not** re-add `skipJreProvisioning=true`
+- Do **not** poll CI (one-shot only)
+- Keep `.env.testing` for Pest-only; Sail/E2E use `APP_ENV=local`
+- Production must never set `DISABLE_RATE_LIMITING=true`
+- Prefer light sequential work (OpenCode killed by heavy parallel agents)
 
 ### Validated
 
-- CI run 29902892175 (`headSha` `6a71c163`): Quality green (incl. Sonar); E2E migrate/seed green; Playwright failed at `createAdminAuthState` with login **500**
-- Exact error: `Table 'testing.users' doesn't exist ... Database: testing ... email = admin@dokfin.id`
-- Framework: `Env::get('APP_ENV')` → load `.env.{APP_ENV}` when file exists
-- `artisan serve` passthrough includes `APP_ENV` to child PHP server process
-- Pest isolation unchanged: `phpunit.xml` still sets `APP_ENV=testing` + `DB_DATABASE=testing`
+- Working tree clean; branch in sync with origin
+- 429 fix still present (`764fd737`)
+- Product residual fix pushed to PR #70
 
-### Next steps
+### Open risks / next
 
-1. One-shot check next CI run after push (no polling).
-2. Confirm Quality still green.
-3. Confirm Playwright global-setup login past 500 (no `testing.users` error).
-4. If Quality + Test suite green and E2E verified: squash-merge PR #69. E2E has `continue-on-error: true`.
+1. One-shot CI recheck after push — confirm Employee/User E2E no longer fail on dialog-not-close
+2. If still red: minimal E2E helper polish (hire_date defaults, salary edit, export expectations)
+3. Optional later: CSP MinIO logo `img-src` if still noisy after suite green
 
-### Critical context
+### Recommended next step
 
-- Branch: `fix/e2e-login-debug`
-- PR: https://github.com/gmedia/erp/pull/69
-- Prior CI: https://github.com/gmedia/erp/actions/runs/29902892175
-- Do **not** invent a `testing` connection for E2E
-- Do **not** re-add `skipJreProvisioning=true`
-- Do **not** poll CI
-- Keep `.env.testing` for Pest-only overrides; do not point Sail/E2E at it
-
-### Key files
-
-- `.env.example` — `APP_ENV=local` (was `testing`)
-- `.env.testing` — Pest DB `testing` (unchanged)
-- `phpunit.xml` — Pest env overrides (unchanged)
-- `.github/workflows/tests.yml` — `cp .env.example .env`; E2E migrate/seed
-- `tests/e2e/global-setup.ts` — login bootstrap
-- `app/Http/Controllers/Api/AuthController.php`
+```
+One-shot: gh pr checks 70  (or latest run on PR #70 after headSha 48940ce6)
+If Employee/User E2E green → squash-merge PR #70
+If still red → inspect residual assertion (not 429) and patch helpers minimally
+Do not poll CI. Do not re-add skipJreProvisioning.
+```
 
 ## Continuation Prompt
 
 ```
-Continue PR #69 on fix/e2e-login-debug. Read task.md.
-One-shot check gh pr checks 69 / latest CI run after APP_ENV=local fix.
-Expect: Quality green; Playwright login no longer hits testing.users.
-If still 500, re-read E2E logs for active DB name.
-Do not invent testing connection. Do not poll CI. Do not re-add skipJreProvisioning.
+Branch fix/e2e-disable-rate-limiting HEAD 48940ce6 on PR #70.
+429 fixed; nested-employment product fix pushed (Branch company_id + EmployeeForm nested payload + columns/view).
+Read task.md. One-shot CI check for PR #70. Do not poll.
+If Employee/User E2E still fail, minimal helper polish only.
+Do not re-add skipJreProvisioning. Prefer sequential work over heavy parallel agents.
 ```

@@ -16,6 +16,11 @@ import {
     createTextColumn,
 } from '../columns';
 
+interface PayrollFixture {
+    salary: string | null;
+    hire_date: string;
+}
+
 // ── Helper ──
 
 type AccessorKeyCol = ColumnDef<unknown> & { accessorKey: string };
@@ -92,10 +97,10 @@ const _phoneAk: _PhoneAccessorKey = 'phone';
 
 // ── createCurrencyColumn ──
 
-const _currencyCol = createCurrencyColumn<Employee>({
+const _currencyCol = createCurrencyColumn<PayrollFixture>({
     accessorKey: 'salary',
     label: 'Salary',
-}) as WithAccessorKey<Employee>;
+}) as WithAccessorKey<PayrollFixture>;
 type _CurrencyAccessorKey = (typeof _currencyCol)['accessorKey'];
 const _currencyAk: _CurrencyAccessorKey = 'salary';
 
@@ -130,8 +135,11 @@ const _empColumns = [
     createTextColumn<Employee>({ accessorKey: 'name', label: 'Name' }),
     createEmailColumn<Employee>({ accessorKey: 'email', label: 'Email' }),
     createPhoneColumn<Employee>({ accessorKey: 'phone', label: 'Phone' }),
-    createCurrencyColumn<Employee>({ accessorKey: 'salary', label: 'Salary' }),
-    createDateColumn<Employee>({
+    createCurrencyColumn<PayrollFixture>({
+        accessorKey: 'salary',
+        label: 'Salary',
+    }),
+    createDateColumn<PayrollFixture>({
         accessorKey: 'hire_date',
         label: 'Hire Date',
     }),
