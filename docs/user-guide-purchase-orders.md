@@ -2,333 +2,120 @@
 
 ## Gambaran Umum
 
-P O (PO)     y   . PO    y  , , ,   y. PO       P R y  .
+Modul Purchase Orders (PO) digunakan untuk membuat pesanan pembelian resmi ke supplier. PO dapat dibuat secara manual atau dikonversi dari Purchase Request (PR) yang sudah disetujui. PO mencatat detail item yang dipesan, harga, jadwal pengiriman, dan menjadi dasar untuk penerimaan barang (Goods Receipt).
 
-S PO     (: PO-XXXXX),  y   ,      ( )    . PO y        G R   .
+Fitur utama:
+- Pembuatan PO manual atau konversi dari PR
+- Detail item dengan kuantitas, harga, dan diskon
+- Tracking status dari draft hingga received
+- Integrasi dengan Goods Receipt dan Supplier Return
+- Export data ke Excel
 
-## M & N
+[Screenshot: Daftar Purchase Orders]
 
-| M | P |  |
-|------|------|-----------|
-| P O | `/-` | H     PO |
-| P R | `/-` | S    PO  PR y  |
-| G R | `/-` | P   PO y   |
-| S  | `/-` | T   PO y   y |
+## Menu & Navigasi
 
-## . M  P O
+| Menu | Route | Fungsi |
+|------|-------|--------|
+| Purchase Orders | `/purchase-orders` | Daftar PO dengan filter, search, CRUD, export |
+| Purchase Requests | `/purchase-requests` | Sumber PR untuk konversi ke PO |
+| Goods Receipts | `/goods-receipts` | Penerimaan barang dari PO |
+| Supplier Returns | `/supplier-returns` | Retur barang ke supplier |
 
-  **P O**       URL `/-`. H      PO y   .
+## 1. Daftar Purchase Orders
 
-[S: H  P O    ]
+Halaman `/purchase-orders` menampilkan tabel PO:
 
-### K y T
+**Kolom tabel:**
+- PO Number: Nomor PO (auto-generated, format: PO-XXXXX)
+- Supplier: Nama supplier
+- Warehouse: Gudang tujuan
+- Order Date: Tanggal pemesanan
+- Expected Delivery: Tanggal perkiraan tiba
+- Status: draft, submitted, approved, ordered, partially_received, received, cancelled
+- Grand Total: Total nilai PO
 
-| K | K |   |
-|-------|------------|-----------------|
-| PO N | N  PO () | Y |
-| S | N   PO | Y |
-| W | G   | Y |
-| O  | T  PO | Y |
-|  y | T   | Y |
-| y | M   | Y |
-| S | S PO   | Y |
-| G T | T  PO | Y |
+**Filter tersedia:**
+- Search: berdasarkan PO number, payment terms, notes, atau shipping address
+- Supplier: dropdown async select
+- Warehouse: dropdown async select
+- Status: dropdown status
 
-## . M  M P O
+**Sorting:** Semua kolom sortable.
 
-G     PO   PO, y y, ,   . K       .
+[Screenshot: Tabel PO dengan filter]
 
-[S: K    ]
+## 2. Membuat Purchase Order Baru
 
-###  y T
+Klik tombol **Add** untuk membuka form PO.
 
-|  |  |
-|--------|--------|
-| S |     |
-| W |     |
-| S |    PO |
-| y |     |
-| O  |      |
+**Field form header:**
+- Supplier: pilih supplier (wajib)
+- Warehouse: pilih gudang tujuan (wajib)
+- Order Date: tanggal pemesanan (wajib)
+- Expected Delivery: tanggal perkiraan tiba (wajib)
+- Payment Terms: syarat pembayaran (opsional)
+- Shipping Address: alamat pengiriman (opsional)
+- Notes: catatan tambahan (opsional)
 
-K  ****    ,  ,   **y**. U  ,  **R**.
+[Screenshot: Form header PO]
 
-[S: P    , , , y,   ]
+### Menambahkan Item PO
 
-## . M P O 
+Klik **Add Item** untuk menambahkan produk yang dipesan:
 
-K  ** N**     .   PO      y  .
+- Product: pilih produk (wajib)
+- Unit: satuan produk (auto-terisi)
+- Quantity: jumlah dipesan (wajib)
+- Unit Price: harga satuan (wajib)
+- Discount (%): diskon dalam persen (opsional)
+- Tax (%): pajak dalam persen (opsional)
+- Notes: catatan per item (opsional)
 
-[S:   P O ]
+Grand Total dihitung dari subtotal semua item setelah diskon dan pajak.
 
-###  y H 
+[Screenshot: Form item PO]
 
-|  | K | W |
-|-------|------------|-------|
-| S | P    | Y |
-| W | P   | Y |
-| O  | T  PO | Y |
-|  y |    | T |
-| Py T | Sy y (: N ) | T |
-| y | M   | Y |
-| S  |    | T |
-| N |     | T |
+Klik **Save**. PO dibuat dengan status **draft**.
 
-### M I 
+## 3. Konversi dari Purchase Request
 
-S   ,      PO:
+PO dapat dibuat otomatis dari PR yang sudah disetujui:
 
-. K  ** I**   I
-. P    y 
-. I  y  
-. P  
-. I  
-. T  ( )
-. T  ( )
-. K **S**   
+1. Buka PR yang berstatus **Approved**
+2. Klik tombol **Convert to PO**
+3. Form PO akan terisi otomatis dengan data dari PR
+4. Sesuaikan jika diperlukan, lalu klik **Save**
 
-U     y. S        G T PO.
+## 4. Workflow Status PO
 
-[S:    PO   , y, , , ,  ]
-
-### My PO
-
-S   ,  **S**  y PO. PO     ****   PO    (: PO-XXXXX).
-
-[S: PO     ]
-
-## . M P O  P R
-
-PO    P R y      :
-
-.   **P R**
-.  PR   ****
-. K  ** PO**  PR y 
-.  PO       PR 
-. S  , ,    
-. K **S**  y PO
-
-[S: T  PO   P R]
-
-I  PR      PO  ,       .
-
-## . M  P O
-
-K   (V)      PO. M      PO    y .
-
-[S: M  P O   ]
-
-### I y 
-
-- N PO   
-- I  (, )
-- W 
-- T  
-- Sy y   
--  
-- 
-- S    (  )
--     , , ,  
-- G T
-
-## . M P O
-
-K   ()       . PO   ****   y. PO       .
-
-[S:   P O]
-
-### K P  S
-
-| S |   | K |
-|--------|--------------|------------|
-|  | S  |     |
-| P  | T   | M  |
-|  | T | H  |
-| Py R | T | S    |
-| R | T   | S  |
-|  | T   | S  |
-|  | T   | S  |
-
-## . M  P O
-
-PO   ****    :
-
-.  PO y  
-. P    
-. U   **P **    **S  **
-. PO      y 
-
-[S: T S    PO]
-
-P       y   PO   **My **.
-
-## . My  M P O
-
-U    :
-
-.   **My **
-.  PO y  
-. K PO   
-. P ****  y  **R**  
-. T  ()   
-
-[S: H My    PO y  ]
-
-PO y      ****       G R. PO y      ****  .
-
-## . M P  (G R)
-
-S PO      :
-
-.   **G R**
-. K ** N**
-. P PO y   
-. I  PO   
-. S  y - 
-. S G R
-
-[S:  G R    PO]
-
-S PO     **Py R** ( )  **R** (y )   y .
-
-## . M P O
-
-PO     :
-
-- PO     
-- S    
-- T   
-
- PO,    ****. PO     ****      .
-
-[S: T   PO]
-
-## . M P O
-
-PO   ****  :
-
-.  PO y  
-. K  ****
-. K 
-
-PO y      ****      .
-
-[S:    PO]
-
-## . M P O
-
-PO   ****    :
-
-. K    ()   
-. K 
-
-P: P      . U PO y  ,     .
-
-[S:    PO]
-
-## . M  P O
-
-U   PO   :
-
-. T    (    y )
-. K  ****     
-.     
-
-[S: T    ]
-
-### K   
-
-    : PO N, S, W, O ,  y, y, S, G T,     .
-
-## . M  P O
-
-K         . K y      .
-
-[S: H    ]
-
-### K y  
-
-- PO N
-- S
-- W
-- O 
--  y
-- y
-- S
-- G T
-
-## Q & T
-
-**Q:        PO?**
-
-**J:**    PO y            .    PO y   , y   . Ky -   PO,      PO y   .
-
-**Q:    PO   PR ?**
-
-**J:** S  PO    PR. U   PR    PO,  PO        PR y    . P       .
-
-**Q:  PO N  ?**
-
-**J:** T, PO N        (PO-XXXXX). H        .
-
-**Q: M PO       ?**
-
-**J:** PO y         y     . J  ,      PO      .
-
-**Q:    PO y   y?**
-
-**J:** L  PO   S. S **Py R**     ,  **R**     . U  ,  G R y   PO .
-
-**Q:  y    y    y ?**
-
-**J:** S  G R,   y  y - . J   y   ,     y. PO     y   .
-
-**Q:    y  PO?**
-
-**J:**   **  T**    y    PO.    Ty: P O   .
-
-**Q:  PO    G R ?**
-
-**J:** PO   **Py R**   . I y        y. K       .
-
-**Q:      y   PO?**
-
-**J:**  y    PO. P   y    . S    PO       G T    y .
-
-**Q:    PO  ?**
-
-**J:** T,      PO. S PO      . J    ,  PO   - .
-
-## H 
-
-   P O   `_`. H  :
-
-- M  PO
-- M PO 
-- M PO (  )
-- M PO ( )
-- M  PO
-- M 
-- My/ PO (   )
-
-H      .
-
-## S PO
-
-| S | K |
+| Status | Keterangan |
 |--------|------------|
-|  | PO  ,   |
-| P  | PO   |
-|  | PO  ,   |
-| Py R | S    |
-| R | S    |
-|  | PO    |
-|  | PO  |
+| Draft | PO baru dibuat |
+| Submitted | PO diajukan untuk approval |
+| Approved | PO disetujui, siap dikirim ke supplier |
+| Ordered | PO sudah dikirim ke supplier |
+| Partially Received | Sebagian barang sudah diterima |
+| Received | Semua barang sudah diterima |
+| Cancelled | PO dibatalkan |
 
-## I  M L
+## 5. Penerimaan Barang (Goods Receipt)
 
-- **P R**: S    PO
-- **G R**: P   PO
-- **S **: T y  PO
-- **P Py**: Py  
-- ** **:   PO
-- **P**: T  PO  
+Barang yang diterima dari PO dicatat di modul Goods Receipts. GR akan otomatis mengupdate status PO:
+- Jika sebagian diterima → Partially Received
+- Jika semua diterima → Received
+
+## 6. Export Data
+
+Klik tombol **Export** untuk mengunduh data PO ke Excel.
+
+## FAQ
+
+**Q: Apakah PO yang sudah received masih bisa diedit?**
+A: Tidak. PO dengan status received atau partially_received tidak dapat diedit.
+
+**Q: Bagaimana jika barang yang diterima tidak sesuai?**
+A: Gunakan modul Supplier Returns untuk mencatat pengembalian barang ke supplier.
+
+**Q: Apakah bisa membuat PO tanpa PR?**
+A: Ya, PO bisa dibuat langsung tanpa melalui PR.

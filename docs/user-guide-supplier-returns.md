@@ -2,281 +2,93 @@
 
 ## Gambaran Umum
 
-S R        . M       y       ,  ,  ,   . S     , , ,    y .
+Modul Supplier Returns mencatat pengembalian barang ke supplier. Retur dapat dilakukan berdasarkan Purchase Order (PO) atau Goods Receipt (GR) yang sudah dikonfirmasi. Setiap retur mencatat alasan pengembalian, kuantitas, dan dampaknya terhadap stok gudang.
 
- :
-- P    
-- P   (, , )
-- I  P O  G R
-- P   y 
--    
+Fitur utama:
+- Pencatatan retur berdasarkan PO atau GR
+- Berbagai alasan retur (rusak, tidak sesuai, kadaluarsa, dll)
+- Otomatis mengurangi stok gudang
+- Tracking status retur
+- Export data ke Excel
 
-## M & N
+[Screenshot: Daftar Supplier Returns]
 
-| M | URL | P |
-|------|-----|------------|
-| S R | /- | _ |
+## Menu & Navigasi
 
-## . M  S R
+| Menu | Route | Fungsi |
+|------|-------|--------|
+| Supplier Returns | `/supplier-returns` | Daftar retur dengan filter, search, CRUD, export |
+| Purchase Orders | `/purchase-orders` | PO sumber retur |
+| Goods Receipts | `/goods-receipts` | GR sumber retur |
 
-U    :
+## 1. Daftar Supplier Returns
 
-.   **S R**   
-. H       
+Halaman `/supplier-returns` menampilkan tabel retur:
 
-[S: H      ]
+**Kolom tabel:**
+- Return Number: Nomor retur (auto-generated)
+- PO Number: Nomor PO terkait
+- GR Number: Nomor GR terkait
+- Supplier: Nama supplier
+- Warehouse: Gudang asal retur
+- Return Date: Tanggal retur
+- Reason: Alasan retur
+- Status: draft, confirmed, cancelled
 
-K y :
-- R N: N  
-- PO N: N P O 
-- GR N: N G R 
-- S: N   
-- W: G   
-- R : T 
-- R:  
-- S: S  (, , )
+**Filter tersedia:**
+- Search: berdasarkan return number atau notes
+- Supplier: dropdown async select
+- Warehouse: dropdown async select
+- Status: dropdown status
 
-## . M S R 
+**Sorting:** Semua kolom sortable.
 
-U    :
+[Screenshot: Tabel Supplier Returns dengan filter]
 
-. K  ** N**     
-.      - :
+## 2. Membuat Supplier Return Baru
 
-** U:**
-- **R N**: N  ( -  )
-- **S**: S  (: )
-- **P O**: P PO  ()
-- **G R**: P GR  ()
-- **S**: P    ()
-- **W**: P    ()
-- **R **: T  ()
-- **R**:   ()
-- **N**:   ()
+Klik tombol **Add** untuk membuka form retur.
 
-[S:       ]
+**Field form header:**
+- Purchase Order: pilih PO (wajib)
+- Goods Receipt: pilih GR (opsional, filter berdasarkan PO)
+- Supplier: auto-terisi dari PO
+- Warehouse: gudang asal (auto-terisi)
+- Return Date: tanggal retur (wajib)
+- Reason: alasan retur (wajib)
+- Notes: catatan tambahan (opsional)
 
-**P  (R):**
-- ****:  /
-- **W I**:      
-- ** Qy**: J   y 
-- ****:    
-- **O**:  y
+[Screenshot: Form header Supplier Return]
 
-## . M I P
+### Item Retur
 
-S   ,    y  :
+Setelah PO dipilih, item yang sudah diterima akan muncul. Untuk setiap item:
 
-. K  ** I**   I 
-.     
-. I  :
-   - **GR I I**: I   G R
-   - **P**: P y 
-   - **U**: S 
-   - **Qy R**: J y 
-   - **U P**: H 
-   - **N**:   ()
-. K **S**   
+- Product: nama produk (read-only)
+- Received Qty: jumlah yang sudah diterima (read-only)
+- Return Qty: jumlah yang diretur (isi manual)
+- Unit Price: harga satuan (read-only)
+- Reason: alasan retur per item (opsional)
 
-[S:    ]
+[Screenshot: Form item Supplier Return]
 
-. U       y
-. I     
+Klik **Save**. Retur dibuat dengan status **draft**.
 
-[S: T     y  ]
+## 3. Konfirmasi Retur
 
-## . My S R
+Klik tombol **Confirm** untuk mengkonfirmasi retur. Sistem akan mengurangi stok gudang sesuai return qty.
 
-S   :
+## 4. Export Data
 
-. P    
-. P     
-. K  **S**    
-. S      ****
-. R N   -  y 
+Klik tombol **Export** untuk mengunduh data retur ke Excel.
 
-## . M  S R
+## FAQ
 
-U    :
+**Q: Apakah retur yang sudah confirmed bisa diedit?**
+A: Tidak. Retur yang sudah confirmed bersifat final.
 
-. K  **V** ()     y 
-.        
+**Q: Apakah retur bisa dilakukan tanpa GR?**
+A: Ya, retur bisa langsung dari PO tanpa melalui GR.
 
-[S:    ]
-
-I y :
--   
--   y 
-- I    
-- S  (  )
-
-## . M S R
-
-U   :
-
-. K  **** ()     y 
-.       y  
-. U   
-. K **S**  y 
-
-:
-- S    ****  ****   
-- Hy     **** y  
-
-[S:    ]
-
-## . M S S R
-
-### M S R
-
-U   :
-
-.    y  
-. U   ****  ****
-. S 
-. S :
-   - M  
-   - M  y 
-   - M    ( O  )
-
-### M S R
-
-U   :
-
-.    y  
-. U   ****
-. S 
-
-: S  y  ****   
-
-## . M S R
-
-U   :
-
-. K  **** ( )    
-. K    y 
-. S    
-
-:
-- Hy     **** y  
-- S  y  ****  ****   
-
-[S:   ]
-
-## . M  M 
-
-### P 
-
-G      :
-- M   (   )
-- T       
-
-[S:     "S    ..."]
-
-###  L
-
-K  ****      :
-- **P O**:   PO
-- **G R**:   GR
-- **S**:   
-- **W**:   
-- **R**:    
-- **S**:   
-- **R  **:   
-- **R  T**:   
-
-[S: P   ]
-
-S  :
-. K **y**   
-. K **R**    
-
-## . M 
-
-U  :
-
-. K   y  
-. K     (-Z, -)
-. K     (Z-, -)
-
-K y  :
-- R N
-- PO N
-- GR N
-- S
-- W
-- R 
-- R
-- S
-
-I       .
-
-[S: H    ]
-
-## .    
-
-U    :
-
-. T   
-. K  ****    
-.     
-
-[S: T   ]
-
-K   :
-- I
-- R N
-- PO N
-- GR N
-- S
-- W
-- R 
-- R
-- S
-- N
--  
-
-## . P  
-
-M S R   :
-
-| P |  |
-|------------|-----------|
-| _ |      |
-| _. | M    |
-| _. | M   |
-| _. | M   |
-
-P    y     y .
-
-## Q & T
-
-**Q:**  R N   ?
-**J:** T, R N   -   SR-XXXXX    y.
-
-**Q:** M y      ?
-**J:** S  y    y  . S         .
-
-**Q:**  y     ?
-**J:** S    ,       y ,        O  .
-
-**Q:**        ?
-**J:** S      . J      O    .
-
-**Q:**    y    ?
-**J:** T,   y      y  . P      .
-
-**Q:**    G R    ?
-**J:** T, G R  . N    GR     y    .
-
-**Q:**       ?
-**J:** G  R    R  T          .
-
-**Q:** M  y      ?
-**J:** P        S. I        .
-
-**Q:**       y     ?
-**J:** T,    y    . J      ,    .
-
-**Q:**     ?
-**J:** G             y      .
+**Q: Apa yang terjadi pada stok setelah retur dikonfirmasi?**
+A: Stok di gudang akan berkurang sesuai return qty yang dikonfirmasi.
