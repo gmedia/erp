@@ -1,9 +1,15 @@
-<!-- scope-note: E2E registry covers 87 slugs (5 simple + 82 complex). Non-CRUD modules (58 per header) do NOT have a separate E2E section — many are lumped under "Complex CRUD" with view_type: page. Pest registry has 90 entries (5+41+44) vs header claim of 102 (5+39+58). The header counts are aspirational; the table rows are what's actually documented. -->
-<!-- scope-note: "Registry E2E — Complex CRUD" section (82 slugs) includes non-CRUD modules (reports, dashboards, settings, workflows) using view_type: page/modal/embedded/component. These are NOT true CRUD but are documented here because they share DataTable-based UI patterns. -->
+<!-- scope-note: E2E: ~87 slug entries under Simple (5) + Complex YAML (includes many non-CRUD pages). Plus 1 legacy `- modul: Asset Dashboard` entry. Pest table rows (actual): Simple 5 + Complex 39 + Non-CRUD 30 = 74. Classification taxonomy "58 non-CRUD concepts" is conceptual, not Pest row count. Prefer table/YAML rows over header taxonomy when counting. -->
+<!-- scope-note: "Registry E2E — Complex CRUD" section includes non-CRUD modules (reports, dashboards, settings, workflows) using view_type: page/modal/embedded/component. These are NOT true CRUD but share DataTable/UI patterns. -->
 # Module Registry
+
+**Last updated:** 2026-08-04
 
 > Referensi metadata per-modul untuk testing (Pest + E2E).
 > Data ini digunakan oleh agent saat membuat atau refactoring test.
+>
+> **Counts = table/YAML rows**, not taxonomy bullets.
+> - Pest rows: **74** (5 simple + 39 complex + 30 non-CRUD)
+> - Non-CRUD "58" below = conceptual taxonomy (reports/dashboards/workflows/…), not Pest rows
 >
 > Lihat juga: `docs/archive/refactor-style-consistency-plan.md` untuk matriks klasifikasi implementasi aktual dan hasil audit per tahap.
 
@@ -36,7 +42,7 @@ Modul dengan relasi FK, filter multi-field, custom columns. **39 modul** termasu
 
 ### Non-CRUD
 
-Modul tanpa operasi CRUD standar. **58 modul** termasuk reports, dashboards, settings, workflows, embedded components, dan cross-cutting regression specs.
+Modul tanpa operasi CRUD standar. **~58 konsep** (taxonomy di bawah) termasuk reports, dashboards, settings, workflows, embedded components, dan cross-cutting regression specs. **Pest Non-CRUD table: 30 rows** (bukan 58).
 
 - Reports: `ReportDataTablePage` (19 modules) atau `FinancialReportPageShell` (5 modules)
 - Audit trails: `AuditTrailPage` (2 modules)
@@ -684,10 +690,10 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
     - tests/e2e/approval-monitoring/approval-monitoring.spec.ts
 
 - slug: dashboards
-  route: /
+  route: /dashboard
   api: /api/dashboard
   view_type: page
-  note: "Main application dashboard with summary cards and charts."
+  note: "Main home dashboard: 4 entity total cards (customers, employees, suppliers, assets) via GET /api/dashboard. NOT the financial KPI dashboard — that is slug financial-dashboard at /financial-dashboard."
   tests:
     - tests/e2e/dashboards/dashboard.spec.ts
 
