@@ -32,7 +32,7 @@
 | 16 | Accounts Receivable | `16_accounts_receivable_design.md` | ✅ Implemented | PR #11 |
 | 17 | General Ledger (Extended) | `17_general_ledger_design.md` | ✅ Implemented | PR #12 |
 | 18 | Financial Reports | `18_financial_reports_design.md` | ✅ Implemented | PR #13 |
-| 19 | Budget Management | `docs/budget-management-design.md` | ✅ Implemented | Pest OK; E2E pending |
+| 19 | Budget Management | `docs/budget-management-design.md` | ✅ Implemented | Pest OK; E2E PR #72 (`tests/e2e/budgets/`) |
 | 20 | Financial Dashboard | — | ✅ Implemented | KPI / YoY; permission `financial_dashboard` |
 | 21 | Aging Dashboard | — | ✅ Implemented | AR/AP aging; permission `aging_dashboard` |
 | 22 | Asset Dashboard | — | ✅ Implemented | Asset distribution / alerts |
@@ -380,9 +380,10 @@ Task-task ini bisa dikerjakan kapan saja, tidak harus menunggu Fase 1-3.
 
 | Date | Milestone |
 |------|-----------|
+| 2026-08-05 | Budget design + status: E2E suite on PR #72 (`tests/e2e/budgets/`) |
 | 2026-08-04 | Docs cleanup: budget design truth, status table +19–23, Sonar progress frozen |
 | 2026-06-25 | Sonar batch E regression closed; gate OK, coverage 95.5% |
-| 2026-06-22 | Budget Management module implemented (Pest; E2E pending) |
+| 2026-06-22 | Budget Management module implemented (Pest; E2E later on PR #72) |
 | 2026-05-15 | Financial Reports module complete (PR #13) |
 | 2026-05-13 | General Ledger Extended module complete (PR #12) |
 | 2026-05-11 | Accounts Receivable module complete (PR #11) |
