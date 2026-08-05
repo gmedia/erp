@@ -1,86 +1,59 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-07-30 — PR #70 residual nested-employment fix pushed (`48940ce6`).
+Last updated: 2026-08-04 — docs cleanup on `docs/cleanup-user-guides-and-stale-docs`.
 
-## SESSION 2026-07-30 — Residual Employee E2E after 429 fix
+## Current milestone
 
-**Goal**: Clear residual Playwright Employee/User E2E failures on PR #70 after rate-limit 429 was fixed.
+**Branch:** `docs/cleanup-user-guides-and-stale-docs`  
+**Base:** `main` @ `bd573fb3` (post PR #70)  
+**Goal:** Restore corrupted user guides + fix stale design/status/registry/dashboard docs.
 
-**Current milestone**: PR #70 open — https://github.com/gmedia/erp/pull/70  
-**Branch**: `fix/e2e-disable-rate-limiting`  
-**HEAD**: `48940ce6`
+## What changed in this session
 
-### Prior: 429 rate-limit (done)
+### P0 — User guides (7 files rewritten)
+Corrupted guides deleted and rewritten (Indonesian, menus/routes, workflows, FAQ):
+- `docs/user-guide-purchase-requests.md`
+- `docs/user-guide-purchase-orders.md`
+- `docs/user-guide-goods-receipts.md`
+- `docs/user-guide-supplier-returns.md`
+- `docs/user-guide-stock-transfers.md`
+- `docs/user-guide-asset-maintenances.md`
+- `docs/user-guide-asset-stocktakes.md`
 
-- Root cause: 60/min API throttle + shared admin + parallel Playwright + `APP_ENV=local`
-- Fix: E2E Prepare environment appends `DISABLE_RATE_LIMITING=true` to `.env`
-- Verified on run `30056540816`: **0× 429**, Quality + Test suite green
-- Residual: **13 failed / 499 passed** — Employee/User dialog-not-close
+### P1 — Status / design truth
+- `docs/budget-management-design.md` — removed GREENFIELD; marked Implemented + E2E gap
+- `docs/database/IMPLEMENTATION_STATUS.md` — date 2026-08-04; rows 19–23 (Budget + dashboards); test baseline note
+- `docs/refactor-sonar-progress.md` — **FROZEN**; superseded OPEN-83 section; closed Next Steps
 
-### Residual root cause (done product fix)
+### P2 — Registry / index / dashboards
+- `docs/module-registry.md` — Last updated + correct count notes (Pest 74); dashboards note fixed
+- `docs/README.md` — **new** docs index + dashboard matrix
+- `docs/user-guide-dashboard.md` — rewrite for real home dashboard (4 entity totals)
+- `docs/user-guide-financial-dashboard.md` — disambiguation callout vs `/dashboard`
 
-Frontend + E2E still used flat Employee fields after Employment refactor (#68). Backend requires nested:
+## Validated
 
-```json
-{
-  "employee_id", "name", "email", "phone",
-  "current_employment": {
-    "company_id", "department_id", "position_id", "branch_id",
-    "salary", "hire_date", "employment_status"
-  }
-}
-```
+- Docs-only branch; no app code changes
+- Guides served by `UserGuideController` glob `docs/user-guide-*.md`
+- Main dashboard ground truth: `resources/js/pages/dashboard.tsx` → `GET /api/dashboard` totals
 
-No companies API — company is derived from selected Branch (`company_id`).
+## Open risks / blockers
 
-### What landed this session (5 commits)
+- Budget E2E still missing (`tests/e2e/budgets/`) — product gap, out of scope for this docs PR
+- Lean rewrites of 7 guides are shorter than peer guides; expand later if product needs more depth
+- Prefer light sequential tool use (heavy parallel agents killed OpenCode session)
 
-| Commit | Change |
-|--------|--------|
-| `35f8b60c` | BranchResource exposes `company_id` + unit test |
-| `2b8693e0` | BranchFactory / BranchSeeder / DatabaseSeeder assign company |
-| `623b76dd` | Nested Employee/Employment types + `company_id` in form schema |
-| `9933861e` | EmployeeForm submits nested `current_employment`; branch `onItemSelect` sets company |
-| `48940ce6` | EmployeeColumns + EmployeeViewModal read `current_employment.*` |
+## Recommended next step
 
-E2E helpers left UI-flat intentionally: form combobox labels still match Engineering / Senior Developer / Head Office / Regular; form nests payload + derives company on submit.
-
-### Constraints that remain valid
-
-- Do **not** invent a `testing` connection for E2E
-- Do **not** re-add `skipJreProvisioning=true`
-- Do **not** poll CI (one-shot only)
-- Keep `.env.testing` for Pest-only; Sail/E2E use `APP_ENV=local`
-- Production must never set `DISABLE_RATE_LIMITING=true`
-- Prefer light sequential work (OpenCode killed by heavy parallel agents)
-
-### Validated
-
-- Working tree clean; branch in sync with origin
-- 429 fix still present (`764fd737`)
-- Product residual fix pushed to PR #70
-
-### Open risks / next
-
-1. One-shot CI recheck after push — confirm Employee/User E2E no longer fail on dialog-not-close
-2. If still red: minimal E2E helper polish (hire_date defaults, salary edit, export expectations)
-3. Optional later: CSP MinIO logo `img-src` if still noisy after suite green
-
-### Recommended next step
-
-```
-One-shot: gh pr checks 70  (or latest run on PR #70 after headSha 48940ce6)
-If Employee/User E2E green → squash-merge PR #70
-If still red → inspect residual assertion (not 429) and patch helpers minimally
-Do not poll CI. Do not re-add skipJreProvisioning.
-```
+1. Commit all docs changes on this branch
+2. Push + open PR with handoff template
+3. Do **not** wait for CI; move on
 
 ## Continuation Prompt
 
 ```
-Branch fix/e2e-disable-rate-limiting HEAD 48940ce6 on PR #70.
-429 fixed; nested-employment product fix pushed (Branch company_id + EmployeeForm nested payload + columns/view).
-Read task.md. One-shot CI check for PR #70. Do not poll.
-If Employee/User E2E still fail, minimal helper polish only.
-Do not re-add skipJreProvisioning. Prefer sequential work over heavy parallel agents.
+Continue docs cleanup on docs/cleanup-user-guides-and-stale-docs.
+If uncommitted: commit, push, gh pr create.
+If PR open: process open MRs per AGENTS.md (merge if green).
+Do not re-do P0–P2 unless verification fails.
 ```

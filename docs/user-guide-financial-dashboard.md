@@ -1,5 +1,7 @@
 # User Guide: Financial Dashboard
 
+> **Disambiguasi:** Ini **bukan** beranda `/dashboard`. Beranda hanya menampilkan total customer/employee/supplier/asset — lihat `user-guide-dashboard.md`. Financial Dashboard = KPI keuangan di `/financial-dashboard`.
+
 ## Gambaran Umum
 
 Financial Dashboard adalah halaman khusus yang menampilkan Key Performance Indicator (KPI) keuangan perusahaan secara komprehensif. Halaman ini dirancang untuk memberikan gambaran mendalam mengenai kesehatan finansial bisnis melalui 7 KPI cards dengan perbandingan Year-over-Year (YoY), grafik pendapatan vs pengeluaran bulanan, ringkasan arus kas, dan breakdown pengeluaran teratas. Financial Dashboard bersifat read-only dan tidak memiliki operasi CRUD.

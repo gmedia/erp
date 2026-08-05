@@ -1,14 +1,16 @@
-# Budget Management Module — Pre-Implementation Design
+# Budget Management Module — Design
 
 **Generated:** 2026-06-05
-**Status:** Implemented (2026-06-22). E2E tests pending.
-**Branch:** main
+**Status:** Implemented (2026-06-22). Pest tests present. **E2E tests pending** (`tests/e2e/budgets/` does not exist yet).
+**Last updated:** 2026-08-04
 
 ## Executive Summary
 
-Budget Management is **GREENFIELD** — zero existing code. The module will let finance teams set per-account spending targets per fiscal year period, then track actual-vs-budget variance in real time. Implementation reuses the existing `FinancialReportService`, `Account`, `FiscalYear`, and `JournalEntry` infrastructure.
+Budget Management is **implemented**. Finance teams set per-account spending targets per fiscal year period and track actual-vs-budget variance in real time. The module reuses `FinancialReportService`, `Account`, `FiscalYear`, and `JournalEntry` infrastructure.
 
-**Estimated effort:** 3–4 days (schema + backend + frontend + tests)
+**What shipped:** Models (`Budget`, `BudgetLine`), `BudgetController`, `BudgetVarianceReportController`, `BudgetVarianceService`, export, SPA pages under `/budgets` and budget-variance report, Pest feature/unit tests.
+**Remaining gap:** Playwright E2E suite for budgets (not started).
+**Original estimate (historical):** 3–4 days (schema + backend + frontend + tests).
 **Value:** High — enables proactive financial control instead of reactive GL review.
 
 ---
@@ -203,16 +205,16 @@ Standard `ReportDataTablePage` with:
 
 ---
 
-## 6. Implementation Phases
+## 6. What Shipped (Implementation Checklist)
 
-### Phase 1: Schema + Models (0.5 day)
+### Phase 1: Schema + Models — ✅ Done
 - Migration: `budgets` + `budget_lines`
 - Models: `Budget`, `BudgetLine` with relationships
 - Factory: `BudgetFactory`, `BudgetLineFactory`
 - Permission seeder entries: `budget`, `budget.create`, `budget.edit`, `budget.delete`, `budget.approve`, `budget_variance_report`
 - Menu seeder entry under Accounting group
 
-### Phase 2: Backend CRUD + Variance Service (1.5 days)
+### Phase 2: Backend CRUD + Variance Service — ✅ Done
 - Controller: `BudgetController` (CRUD + approve + lock)
 - Action: `StoreBudgetAction`, `UpdateBudgetAction`
 - Service: `BudgetVarianceService` (getActualsForPeriod, calculateVariance)
@@ -221,16 +223,16 @@ Standard `ReportDataTablePage` with:
 - Export: `BudgetExport`, `BudgetVarianceExport`
 - Route file: `routes/api/budgets.php` with `permission:budget,true`
 
-### Phase 3: Frontend (1 day)
+### Phase 3: Frontend — ✅ Done
 - Entity config in `entityConfigs.ts`
 - Page: `pages/budgets/index.tsx`
 - Siblings: `BudgetColumns.tsx`, `BudgetFilters.tsx`, `BudgetForm.tsx`, `BudgetViewModal.tsx`
 - Report page: `pages/reports/budget-variance/index.tsx`
 - Route registration in `app-routes.tsx`
 
-### Phase 4: Tests + Integration (0.5 day)
-- Pest: `BudgetControllerTest`, `BudgetExportTest`, `BudgetVarianceReportTest` + model unit tests
-- E2E: `tests/e2e/budgets/` (9 standard cases)
+### Phase 4: Tests + Integration — 🔨 Partial
+- ✅ Pest: `BudgetControllerTest`, `BudgetExportTest`, `BudgetVarianceReportTest` + model unit tests
+- ❌ E2E: `tests/e2e/budgets/` (9 standard cases) — **still pending**
 - Optional: approval flow integration (if `ApprovalFlow` already configured for Budget entity)
 
 ---
@@ -265,14 +267,14 @@ Standard `ReportDataTablePage` with:
 
 ---
 
-## 9. Decision Points for User
+## 9. Historical Decisions / Deferred Enhancements
 
-Before implementation starts, confirm:
+Decisions made for the shipped MVP (kept for context):
 
-1. **Period granularity** — Monthly (12 lines per account per FY) or quarterly (4 lines)? Or allow both?
-2. **Approval flow** — Should budget approval use existing `ApprovalFlow` engine, or simple manager-approve pattern?
-3. **Commitment tracking** — Track PO-level pre-allocations (complex) or only posted JE actuals (simpler, Phase 1)?
-4. **Budget types** — Start with all 4 (operational, capital, project, revenue) or just operational?
-5. **Report scope** — Variance by account only, or also by department/branch dimension?
+1. **Period granularity** — Monthly lines per account per FY (shipped).
+2. **Approval flow** — Simple manager-approve pattern (not full `ApprovalFlow` engine).
+3. **Commitment tracking** — Posted JE actuals only; PO-level pre-allocations deferred.
+4. **Budget types** — All four types supported in schema (operational, capital, project, revenue).
+5. **Report scope** — Variance by account; department/branch dimension deferred.
 
-**Recommendation:** Start with monthly periods, simple approve (no flow engine), posted actuals only, operational type only. Expand incrementally.
+**Open follow-ups:** E2E suite; optional ApprovalFlow integration; commitment tracking; multi-currency (tracked separately).

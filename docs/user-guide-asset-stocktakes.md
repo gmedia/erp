@@ -2,353 +2,115 @@
 
 ## Gambaran Umum
 
-M  S  **   **            . S   ,  (),    ,  (/_//),  -  y . M        y , , ,  .
+Modul Asset Stocktakes mengelola proses stock opname (penghitungan fisik) aset perusahaan. Setiap stocktake mencatat referensi, cabang, tanggal rencana dan pelaksanaan, serta hasil pengecekan per aset. Stocktake yang sudah dilakukan menghasilkan laporan variance untuk aset yang tidak ditemukan atau berada di lokasi yang salah.
 
- :
-- P    :   I P  /
--   "P"       
-- R  : , M, , M
--     
--     
-- S     
-- S   R, , P , P , S,  y
-- L     
+Fitur utama:
+- Perencanaan stocktake per cabang
+- Proses "Perform" untuk mencatat hasil pengecekan per aset
+- Tracking status (draft, in_progress, completed)
+- Laporan variance stocktake
+- Export data ke Excel
 
----
+[Screenshot: Daftar Asset Stocktakes]
 
-## M & N
+## Menu & Navigasi
 
-| M | URL |  |
-|------|-----|--------|
-|  S | `/-` | K     |
-|  S P | `/-//` | L     |
-|  S V | `/--` | L    |
+| Menu | Route | Fungsi |
+|------|-------|--------|
+| Asset Stocktakes | `/asset-stocktakes` | Daftar stocktake dengan filter, search, CRUD |
+| Asset Stocktake Perform | `/asset-stocktakes/{ulid}/perform` | Halaman khusus untuk mencatat hasil pengecekan |
+| Asset Stocktake Variance Report | `/asset-stocktake-variances` | Laporan variance hasil stocktake |
 
-M      ****.
+## 1. Daftar Asset Stocktakes
 
----
+Halaman `/asset-stocktakes` menampilkan tabel stocktake:
 
-## . M  S 
+**Kolom tabel:**
+- Reference: Nomor referensi stocktake (auto-generated)
+- Branch: Cabang yang di-stocktake
+- Planned Date: Tanggal rencana pelaksanaan
+- Performed Date: Tanggal pelaksanaan aktual
+- Status: draft, in_progress, completed
+- Created By: User yang membuat
 
-### L-
+**Filter tersedia:**
+- Search: berdasarkan reference atau notes
+- Branch: dropdown async select
+- Status: dropdown (draft/in_progress/completed)
 
-.   ** S**   ** N**
-. I    :
+**Sorting:** Semua kolom sortable.
 
-   **I S:**
-   - **R**  N   (-  )
-   - ****  P     (yS,    )
-   - **P **  T  
-   - **P **  T 实际 (,   )
-   - **S**  S :
-     - ``  S  ,  
-     - `I P`  S  
-     - ``  S ,    
-     - ``  S 
+[Screenshot: Tabel Asset Stocktakes dengan filter]
 
-. K **S**       
+## 2. Membuat Stocktake Baru
 
-[S:    S   R, , P , P , S]
+Klik tombol **Add** untuk membuka form stocktake.
 
-### V 
+**Field form:**
+- Branch: pilih cabang yang akan di-stocktake (wajib)
+- Planned Date: tanggal rencana pelaksanaan (wajib)
+- Notes: catatan atau instruksi (opsional)
 
-|  | V |
-|-------|----------|
-| R | W ,  |
-|  | W  |
-| P  | W ,    |
-| P  | O,    |
-| S | W  (/I P//) |
+[Screenshot: Form Asset Stocktake]
 
----
+Klik **Save**. Stocktake dibuat dengan status **draft**.
 
-## . M S (P )
+## 3. Melakukan Stocktake (Perform)
 
-  **P**        .
+Setelah stocktake dibuat, proses pengecekan dilakukan di halaman khusus:
 
-### L-
+1. Buka daftar stocktake
+2. Klik tombol **Perform** pada stocktake yang ingin dijalankan
+3. Anda akan diarahkan ke halaman `/asset-stocktakes/{ulid}/perform`
+4. Halaman ini menampilkan daftar aset di cabang tersebut dengan kolom:
+   - **Asset Code** dan **Asset Name**: Identitas aset
+   - **Expected Location**: Lokasi seharusnya menurut sistem
+   - **Found Location**: Lokasi aktual ditemukan (isi manual)
+   - **Result**: found, not_found, damaged, relocated
+   - **Notes**: Catatan pengecekan
+   - **Checked By**: Nama petugas pengecekan
+   - **Checked At**: Waktu pengecekan
 
-.   ** S**
-.     ****  **I P**
-. K        **P**
-. H P S      
+5. Untuk setiap aset, isi **Found Location** dan **Result**
+6. Klik **Save** untuk menyimpan progress
 
-[S:      P]
+[Screenshot: Halaman Perform Asset Stocktake]
 
-### H P S
+## 4. Menyelesaikan Stocktake
 
-H P      :
+Setelah semua aset selesai dicek:
 
-| K | P |
-|-------|------------|
-| ** ** | K  y     |
-| ** N** | N  |
-| **R** | H : /M//M |
-| **L (I M)** | L     (yS) |
-| **N** |     () |
+1. Klik tombol **Complete**
+2. Status berubah menjadi **completed**
+3. Performed Date terisi otomatis
+4. Laporan variance tersedia di Asset Stocktake Variance Report
 
-[S: H P  S      ]
+## 5. Workflow Status
 
-### M R
-
-P     :
-
-- ****      y    
-- **M**       y 
-- ****       
-- **M**          (   )
-
-### M L  (M)
-
-J  = **M**,  **L (I M)**  :
-- P     (yS)
-- L    
-- L     `__`
-
-### My H S
-
-. I      
-. K **S S I**    
-. S     ****    
-
----
-
-## . M   S
-
-.   ** S**
-.   y      
-. K  **V** (y)   
-.       
-
-[S:  V  S   ]
-
-### I y 
-
-- R 
--    
-- P   P 
-- S 
-- U y   ( y)
-- T     
--     (  )
-
----
-
-## . M  S
-
-.   ** S**
-.   y  
-. K  **** ()   
-.        y  
-. U  y 
-. K **S**  y 
-
-[S:    S   ]
-
-> ****:   y   (, ,  ). H      P.
-
----
-
-## . M  S
-
-.   ** S**
-.   y  
-. K  **** ()   
-. K    y 
-. S    
-
-> ****: H  y       . S  y ,  .
-
----
-
-## . S  
-
-### S
-
- K     **S y ...**   :
-- N  
-
-[S: S    ]
-
-###  T
-
-|  | P |
+| Status | Keterangan |
 |--------|------------|
-| **** |    (yS,    ) |
-| **S** |   : , I P, , |
-| **P ** |       |
-| **P T** |       |
+| Draft | Stocktake direncanakan, belum dimulai |
+| In Progress | Stocktake sedang berjalan, pengecekan dapat dilakukan bertahap |
+| Completed | Stocktake selesai, variance report tersedia |
 
-[S: P   S   , S,   ]
+## 6. Laporan Variance
 
-### M 
+Hasil stocktake yang sudah completed dapat dilihat di **Asset Stocktake Variance Report** (`/asset-stocktake-variances`). Laporan ini menampilkan aset yang:
+- **Not Found**: Aset tidak ditemukan di lokasi manapun
+- **Relocated**: Aset ditemukan di lokasi yang berbeda dari expected
+- **Damaged**: Aset ditemukan dalam kondisi rusak
 
-. K   y  
-. P    (: S = "I P")
-. T     y 
-. K        (:  =    S =   P   )
+## 7. Export Data
 
----
+Klik tombol **Export** untuk mengunduh data stocktake ke Excel.
 
-## . S K
+## FAQ
 
-K     . K y  -:
+**Q: Apakah stocktake yang sudah completed bisa diedit?**
+A: Tidak. Stocktake yang sudah completed bersifat final.
 
-| K | P |
-|-------|------------|
-| **R** | U    |
-| **** | U    |
-| **P ** | U    |
-| **P ** | U    |
-| **S** | U   (/I P//) |
-| ** y** | U    y  |
+**Q: Apakah bisa melakukan stocktake sebagian?**
+A: Ya. Anda bisa menyimpan progress di halaman Perform dan melanjutkan nanti. Status tetap In Progress sampai semua aset dicek.
 
-K     (-Z, -, -),     (Z-, -, -).
-
----
-
-## .   
-
-.   ** S**
-. T      
-. K  ****  
-.   (.)      
-
-[S: T     S]
-
-### K   
-
-| K | P |
-|-------|------------|
-| I | I   (ULI) |
-| R | N   |
-|  | N  |
-| P  | T   |
-| P  | T   |
-| S | S  |
-|  y | U y   |
-|   | T   |
-| U  | T    |
-
----
-
-## . P
-
-| P |  |
-|-----------|-------|
-| `_` | V &    |
-| `_.` | M    |
-| `_.` | M      |
-| `_.` | M   |
-
-> ****: P    y     y . P `_`      .
-
----
-
-## Q & T
-
-###    , I P, ,  ?
-
-- ****: S  ,    . I      .
-- **I P**: S  ,        .
-- ****: S ,      y . L   -.
-- ****: S ,  . y      .
-
-###      ?
-
-S   ****,   ** S V** (`/--`). L        ,   y , ,  .
-
-###    , M, ,  M?
-
-- ****:          .
-- **M**:      y    .
-- ****:          .
-- **M**:         ,    .
-
-###  y      ?
-
-Y.   P    y y  .     ,   .
-
-###         ?
-
-I  -    (    ). J      ,         .
-
-###  y      ?
-
-Y.          . S     .
-
-###      I P?
-
-Y.       ****. S    - .
-
-###        M?
-
-P  = **M**,   **L (I M)**  .       . P  ,  .
-
-###       ?
-
-L   -y  . U           .
-
-### K  y   -?
-
-S   (R, , P , P , S,  y)  .
-
-###  y      ?
-
-Y. T  P   P T  ,   .   y      y .
-
----
-
-> ** ?** H             S.
-
----
-
-## FAQ & Tips
-
-**Q: Bagaimana cara membuat stocktake baru untuk aset di branch tertentu?**
-
-Pertama, navigasi ke halaman Asset Stocktakes dan klik tombol "Add New". Isi Reference Number (unik), Branch (pilih cabang tempat aset berada), Planned Date (tanggal jadwal stocktake), dan status awal (Draft atau Scheduled). Klik Save untuk menyimpan. Stocktake akan muncul di daftar dengan status yang ditentukan.
-
-**Q: Apa perbedaan status Draft, Scheduled, In Progress, Completed, dan Cancelled?**
-
-Draft adalah status awal saat stocktake baru dibuat, belum siap dieksekusi. Scheduled berarti stocktake sudah dijadwalkan dengan tanggal pasti dan siap dilakukan. In Progress menandakan proses stocktake sedang berlangsung, tim sudah melakukan pencatatan fisik. Completed adalah status final setelah semua aset sudah diverifikasi dan data sudah dikunci. Cancelled digunakan jika stocktake dibatalkan karena alasan tertentu.
-
-**Q: Bagaimana cara memulai proses stocktake dari status Scheduled?**
-
-Buka stocktake yang sudah berstatus Scheduled, klik tombol "Perform" untuk masuk ke halaman Perform Stocktake. Halaman ini menampilkan daftar aset yang harus diverifikasi. Untuk setiap aset, catat lokasi aktual (apakah sesuai dengan lokasi sistem), kondisi fisik (Good, Minor Damage, Major Damage, Missing), dan catatan jika ada. Klik Submit untuk menyelesaikan pencatatan.
-
-**Q: Apa yang harus dilakukan jika aset tidak ditemukan saat stocktake?**
-
-Jika aset tidak ditemukan, tandai kondisi sebagai "Missing" di kolom kondisi. Isi lokasi aktual dengan nilai kosong atau "Not Found". Tambahkan catatan jika ada informasi tambahan seperti kapan terakhir dilihat atau kemungkinan penyebab. Setelah stocktake completed, tim dapat menginvestigasi lebih lanjut dan jika aset benar-benar hilang, dapat dilakukan proses disposal atau adjustment.
-
-**Q: Bagaimana cara menangani variance antara lokasi sistem dan lokasi aktual?**
-
-Variance otomatis tercatat saat lokasi aktual berbeda dari lokasi sistem. Setelah stocktake completed, variance dapat dilihat di halaman Asset Stocktake Variances. Untuk menyesuaikan, buat Asset Movement dengan type "Transfer" dari lokasi sistem ke lokasi aktual. Jika variance tersebut valid dan disetujui, update lokasi aset di sistem agar sesuai dengan kondisi fisik.
-
-**Q: Bisakah stocktake dibatalkan setelah sudah In Progress?**
-
-Ya, stocktake dapat dibatalkan dengan mengubah status ke Cancelled. Namun perlu diingat bahwa data pencatatan yang sudah diinput akan tetap tersimpan di sistem sebagai history. Jika ingin melakukan stocktake ulang, buat stocktake baru dengan reference number berbeda. Stocktake yang cancelled tidak dapat diubah kembali ke status lain.
-
-**Q: Bagaimana cara filter dan mencari stocktake tertentu?**
-
-Gunakan field filter di atas tabel: Branch (filter berdasarkan cabang), Status (filter berdasarkan status stocktake), Planned Date (filter berdasarkan tanggal jadwal), Performed Date (filter berdasarkan tanggal eksekusi), dan Created By (filter berdasarkan pembuat). Gunakan search box untuk mencari berdasarkan Reference Number atau catatan. Filter kombinasi dapat digunakan untuk hasil lebih spesifik.
-
-**Q: Bagaimana cara export data stocktake ke file Excel?**
-
-Di halaman Asset Stocktakes, klik tombol Export di toolbar. File Excel akan terunduh dengan kolom: Reference Number, Branch, Planned Date, Performed Date, Status, Created By, Created At, Updated At. Untuk export detail stocktake items (aset individual), buka stocktake tersebut dan gunakan export dari halaman detail atau Perform page.
-
-**Q: Apa best practice untuk manajemen stocktake aset?**
-
-Jadwalkan stocktake secara berkala, minimal sekali per tahun untuk semua aset. Gunakan status Scheduled untuk memberikan waktu tim prepare. Assign PIC yang familiar dengan aset di branch tersebut. Dokumentasi catatan lengkap untuk setiap variance. Review variance report segera setelah completed. Update sistem untuk aset yang berubah lokasi atau kondisi. Simpan dokumentasi fisik (foto, checklist) sebagai backup.
-
-**Q: Bagaimana alur lengkap dari schedule sampai completed?**
-
-Alur standar: (1) Buat stocktake baru dengan status Draft, isi reference dan branch. (2) Set Planned Date dan ubah status ke Scheduled. (3) Assign tim dan prepare checklist. (4) Pada Planned Date, klik Perform untuk mulai In Progress. (5) Tim verifikasi setiap aset, input lokasi aktual dan kondisi. (6) Submit hasil pencatatan. (7) Review variance dan approve hasil. (8) Ubah status ke Completed. (9) Proses adjustment untuk variance yang valid. (10) Archive dokumentasi.
-
-**Q: Bisakah satu stocktake mencakup aset dari multiple locations?**
-
-Ya, stocktake dapat mencakup aset dari multiple locations dalam satu branch. Saat melakukan Perform, setiap aset memiliki field Expected Location (lokasi di sistem) dan Found Location (lokasi aktual saat verifikasi). Aset dari lokasi berbeda dapat diverifikasi dalam satu stocktake session. Variance akan tercatat per aset dengan detail lokasi.
-
-**Q: Bagaimana cara melihat history stocktake untuk aset tertentu?**
-
-Buka halaman Asset Profile untuk aset tersebut. Di section Asset Movements atau history, cari entri dengan type "Stocktake". History akan menampilkan tanggal stocktake, kondisi saat itu, lokasi saat itu, dan variance jika ada. Untuk history lengkap, gunakan halaman Asset Stocktake Variances dan filter berdasarkan Asset Code atau Asset Name.
+**Q: Apa perbedaan Asset Stocktake dengan Inventory Stocktake?**
+A: Asset Stocktake untuk aset tetap (fixed assets), sedangkan Inventory Stocktake untuk stok persediaan (inventory).

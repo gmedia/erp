@@ -2,347 +2,113 @@
 
 ## Gambaran Umum
 
-P R (PR)     y     y         . PR     y    y , ,  ,    y . S PR    ,        P O (PO)  .
+Modul Purchase Requests (PR) digunakan untuk mengajukan permintaan pembelian barang atau jasa dari departemen internal. Setiap PR dapat berisi beberapa item dengan spesifikasi kuantitas, estimasi harga, dan prioritas. PR yang disetujui dapat dikonversi menjadi Purchase Order (PO).
 
- PR    y :  (),   ( ),  (), y  (  PO ),  (  PO ),  (),   (). S PR    / y  , , y,    .
+Fitur utama:
+- Pengajuan permintaan pembelian dengan detail item
+- Prioritas permintaan (low, medium, high, urgent)
+- Workflow approval sebelum konversi ke PO
+- Tracking status dari draft hingga approved/rejected/converted
+- Export data ke Excel
 
-## M & N
+[Screenshot: Daftar Purchase Requests dengan tabel dan filter]
 
-| M | URL | P |
-|------|-----|------------|
-| P R | `/-` | `_` |
+## Menu & Navigasi
 
-## . M  P R
+| Menu | Route | Fungsi |
+|------|-------|--------|
+| Purchase Requests | `/purchase-requests` | Daftar PR dengan filter, search, CRUD, export |
+| Purchase Orders | `/purchase-orders` | Daftar PO yang dapat dibuat dari PR yang disetujui |
 
-U   P R:
+## 1. Daftar Purchase Requests
 
-. L   RP   y   `_`.
-. N   **P R**     .
-. H      PR y  .
+Halaman `/purchase-requests` menampilkan tabel PR dengan fitur:
 
-[S: H  P R    ]
+**Kolom tabel:**
+- PR Number: Nomor PR (auto-generated)
+- Branch: Cabang pemohon
+- Department: Departemen pemohon
+- Requester: Nama pemohon
+- Request Date: Tanggal pengajuan
+- Required Date: Tanggal dibutuhkan
+- Priority: low, medium, high, urgent
+- Status: draft, submitted, approved, rejected, converted
+- Estimated Amount: Estimasi total nilai
 
-T  - :
-- **PR N**  N  PR (: PR--)
-- ****   y  PR
-- ****   
-- **R**  Ky y  
-- **R **  T  PR
-- **R **  T  y 
-- **Py**  T  (L, N, H, U)
-- **S**  S  PR
-- ** **  T   PR
-- ****  T  (V, , )
+**Filter tersedia:**
+- Search: berdasarkan PR number, notes, atau rejection reason
+- Branch: dropdown async select
+- Department: dropdown async select
+- Status: dropdown (draft/submitted/approved/rejected/converted)
+- Priority: dropdown (low/medium/high/urgent)
 
-## . M  M P R
+**Sorting:** Semua kolom sortable. Klik header kolom untuk sort ascending/descending.
 
-### P T
+[Screenshot: Tabel PR dengan kolom dan filter]
 
-G  **S**     :
+## 2. Membuat Purchase Request Baru
 
-. K       : "S PR , ,   ..."
-. S     PR N, N,  R R.
-. H    -  .
+Klik tombol **Add** di toolbar untuk membuka form PR baru.
 
-[S:     ]
+**Field form header:**
+- Branch: pilih cabang (wajib)
+- Department: pilih departemen (wajib)
+- Requester: pilih karyawan pemohon (wajib)
+- Request Date: tanggal pengajuan (default hari ini)
+- Required Date: tanggal dibutuhkan (wajib)
+- Priority: pilih prioritas (wajib, default: medium)
+- Notes: catatan tambahan (opsional)
 
-###  L
+[Screenshot: Form header PR]
 
-          :
+### Menambahkan Item PR
 
-- ****    
-- ****    
-- **R**    y 
-- **Py**  P: L, N, H, U
-- **S**  P: , P , , Py O, O, R, 
-- **R  **   PR   
-- **R  T**   PR   
+Klik **Add Item** untuk menambahkan barang/jasa yang diminta:
 
-L  :
+- Product: pilih produk (wajib)
+- Unit: satuan produk (auto-terisi)
+- Quantity: jumlah yang diminta (wajib)
+- Estimated Unit Price: estimasi harga satuan (opsional)
+- Notes: catatan per item (opsional)
 
-. K     y .
-. P   (: S = "P ").
-. T     y  .
-. K       .
+Estimated Amount total dihitung dari jumlah item.
 
-[S: P     ]
+[Screenshot: Form item PR]
 
-### M 
+Klik **Save** untuk menyimpan. PR dibuat dengan status **draft**.
 
-S    :
+## 3. Melihat dan Mengedit PR
 
-- **PR N**
-- ****
-- ****
-- **R**
-- **R **
-- **R **
-- **Py**
-- **S**
-- ** **
+Klik ikon **View** (mata) pada kolom Actions untuk melihat detail PR.
+Klik ikon **Edit** (pensil) untuk mengubah PR yang masih berstatus draft.
 
-L :
+[Screenshot: Detail PR dengan daftar item]
 
-. K   y  .
-. K     (-Z,    ).
-. K     (Z-,    ).
-. I     .
+## 4. Workflow Status PR
 
-[S: H     ]
+| Status | Keterangan | Action Berikutnya |
+|--------|------------|-------------------|
+| Draft | PR baru dibuat, belum diajukan | Edit, Submit, Delete |
+| Submitted | PR diajukan untuk approval | Approve, Reject |
+| Approved | PR disetujui, siap konversi ke PO | Konversi ke PO |
+| Rejected | PR ditolak | Lihat alasan penolakan |
+| Converted | PR sudah dikonversi menjadi PO | Lihat PO terkait |
 
-## . M P R 
+## 5. Menghapus PR
 
-### L P
+Klik ikon **Delete** (trash) pada PR berstatus **draft**. PR dengan status selain draft tidak dapat dihapus.
 
-. K  ** N P R**    .
-.   " N P R"  .
+## 6. Export Data
 
-[S:    N P R]
+Klik tombol **Export** untuk mengunduh data PR ke Excel. Filter yang aktif akan diterapkan ke hasil export.
 
-### M  H
+## FAQ
 
- y  :
+**Q: Bagaimana cara mengkonversi PR ke PO?**
+A: Setelah PR berstatus Approved, buka detail PR dan klik tombol "Convert to PO". Sistem akan membuka form PO baru dengan data dari PR.
 
-- **PR N**  N PR (  -,   )
-- ****  P    (   )
-- ****  P    (   )
-- **R y**  P y    (   y)
-- **R **  T  PR (:  )
-- **R **  T  y 
-- **Py**  P: L, N, H, U
-- **S**  P:  (  PR )
-- ** **  T  (   ,  )
-- **N**       PR
+**Q: Apakah PR yang sudah dikonversi masih bisa diedit?**
+A: Tidak. PR yang sudah dikonversi (status: converted) bersifat read-only.
 
-### M I/L
-
-S PR     y   :
-
-.   **I**  ,   ** I**.
-.  "P R I"  .
-
-[S:    P R]
-
-. I  :
-   - **P**  P    P
-   - **U**  P /   U
-   - **Qy**  J y 
-   - ** U P**    
-   - **N**      
-
-. K **S**      .
-. I       : P, U, Qy, . U P, N, .
-. T         (y  __).
-
-### M I
-
-U   y  :
-
-. K  **** ( )    y  .
-.        y  .
-. U  y .
-. K **S**  .
-
-### M I
-
-U  :
-
-. K  **R** ( )    y  .
-. I         .
-
-### My P R
-
-. S     ,   **S**   .
-. S  y PR    .
-.     PR      .
-
-[S: N   PR ]
-
-## . M  P R
-
-U   PR:
-
-. K  **V** ( y)      PR y  .
-.  "P R "  .
-
-[S:    P R]
-
-   :
-
-- H: PR N, , , R
-- : R , R 
-- Py  S   
--     y IR
-- N  R R (  )
-- T   : P, U, Qy, . U P, . T, N
-
-## . M P R
-
-PR      ****    .
-
-### L 
-
-. K  **** ( )   .
-.  " P R"     .
-
-[S:   P R]
-
-. U      :
-   -  : , , R, R , R , Py, N
-   - T, ,   
-.        .
-. K **S**  y .
-. N       .
-
-###  
-
-- PR   ****, **Py O**, **O**, **R**,  ****   .
-- S       PR y  .
-
-## . M  M P R
-
-### M PR (S )
-
-PR   ****   :
-
-. K  **** ( )   .
-. K   : " y  y     P R?"
-. K ****  .
-. PR      .
-
-[S:    P R]
-
-### M PR (S P )
-
-PR   **P **  ****   (-):
-
-.    PR.
-. U  **S**  ****.
-. I **R R**   .
-. K **S**  y  .
-
-PR y              PO.
-
-## . W  P R
-
-### M PR  
-
-S PR    ****:
-
-.    PR.
-. U  **S**  **P **.
-. K **S**   PR   .
-
-[S:       P ]
-
-. S   PR    y   (   ).
-. PR      y  y.
-
-### P 
-
-      PR   **My **:
-
-.   PR   .
-.     PR .
-.   :
-   - ****  My PR,    ****
-   - **R**  M PR,    **R**,   R R
-
-[S: H My   PR ]
-
-. S /,     .
-
-### S Ly
-
-S  PR  :
-
-. ****  PR  ,  
-. **P **  PR  ,   
-. ****  PR ,   PO
-. **Py O**  S  PO  (   PO)
-. **O** (y O)  S    PO 
-. **R**  PR   ,    PO
-. ****  PR  (   ),    PO
-
-T y :
-
--   P  (  )
-- P    ( )
-- P   R ( )
-- P    ( )
--   Py O (PO  )
-- Py O  O (PO  )
--    ( /)
-
-[S:   y P R]
-
-## .  P R  
-
-### L 
-
-.    ,   ****.
-. S       PR y   .
-
-[S: T   ]
-
-.    -    .
-.   : PR N, , , R, R , R , Py, S,  , N, R R,  .
-
-###   
-
-    y :
-
-- J   = " ",  y PR   
-- J  S = "P ",  y PR 
-- U   PR,   
-
-## . P  
-
-P y    P R:
-
-| P |  |
-|------------|-----------|
-| `_` |     P R: , , , ,  |
-
-T  ,   :
-- M  P R
-- M  PR
-- M PR 
-- M   PR
--  PR  
-
-  :
--     y    
-- P     `_`
-
-## Q & T
-
-**Q:**    PR   PR N ?
-**J:** K  PR N   PR . S  -    PR-YYYY-NNNNNN (: PR--).
-
-**Q:**      ?
-**J:**   y       (y  __). N          .
-
-**Q:** K PR      ?
-**J:** PR y         PO y  . J  ,  PR   PR ,         PO.
-
-**Q:**       PR y  ?
-**J:**    PR (  ),    I   I,    ,  S. I      .
-
-**Q:**  PR y    ?
-**J:** PR y      .  PR     PR y ,      -  .
-
-**Q:**    PR y   PO?
-**J:**  S = "Py O"  "O".  PR    PO y           P O.
-
-**Q:** K      PR ?
-**J:** T  y   PR   . PR       , y   ().
-
-**Q:**    y  PR?
-**J:**   PR,     Hy. T   y         .
-
-**Q:**  Py H  U   ?
-**J:** Py      ,         .      y .
-
-**Q:**    y PR   ?
-**J:** S   =  y ,   .     y PR   .
+**Q: Siapa yang bisa menyetujui PR?**
+A: Approval mengikuti workflow approval yang dikonfigurasi di modul Approval Flows untuk tipe PurchaseRequest.

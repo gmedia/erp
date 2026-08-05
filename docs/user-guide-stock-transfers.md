@@ -2,260 +2,107 @@
 
 ## Gambaran Umum
 
-M S T          RP.            ,   ,    . M           .
+Modul Stock Transfers mencatat pemindahan stok barang antar gudang. Setiap transfer mencatat gudang asal, gudang tujuan, item yang dipindahkan, dan tanggal estimasi tiba. Transfer yang sudah dikonfirmasi akan mengurangi stok di gudang asal dan menambah stok di gudang tujuan.
 
-S      y  ,  ,   ,    y      -. S       ,      .
+Fitur utama:
+- Pemindahan stok antar gudang
+- Tracking status dari draft hingga received
+- Tanggal transfer dan estimasi tiba
+- Soft-cancel (status cancelled, bukan delete)
+- Export data ke Excel
 
-## M & N
+[Screenshot: Daftar Stock Transfers]
 
-| M | P |  |
-|------|------|-----------|
-| S T | `/-` | H     |
-| T T | `/-` ( ) |     |
-|  T | `/-` ( V) |     |
-|  T | `/-` ( ) |    |
-|   | `/-` ( ) | U     |
+## Menu & Navigasi
 
-## . M H S T
+| Menu | Route | Fungsi |
+|------|-------|--------|
+| Stock Transfers | `/stock-transfers` | Daftar transfer dengan filter, search, CRUD, export |
+| Stock Movements | `/stock-movements` | Kartu stok yang mencatat semua pergerakan |
+| Stock Monitor | `/stock-monitor` | Dashboard monitoring stok per gudang |
 
-U   S T:
+## 1. Daftar Stock Transfers
 
-. L   RP   y  z `_`.
-.     .
-. K  **S T**.
-. H           .
+Halaman `/stock-transfers` menampilkan tabel transfer:
 
-[S: H           ]
+**Kolom tabel:**
+- Transfer Number: Nomor transfer (auto-generated)
+- From Warehouse: Gudang asal
+- To Warehouse: Gudang tujuan
+- Transfer Date: Tanggal transfer
+- Expected Arrival: Estimasi tanggal tiba
+- Status: draft, in_transit, received, cancelled
 
-P      :
-- **S **: K    "S  ..."        y.
-- ****:    ,  ,  .
-- **T**: M     T N,  W, T W, T ,  ,  S.
-- **T **: U   .
-- **T **: U     .
+**Filter tersedia:**
+- Search: berdasarkan transfer number atau notes
+- From Warehouse: dropdown async select
+- To Warehouse: dropdown async select
+- Status: dropdown status
 
-## . M T S 
+**Sorting:** Semua kolom sortable.
 
-U    :
+[Screenshot: Tabel Stock Transfers dengan filter]
 
-. K  ** N S T**     .
-.      .
+## 2. Membuat Stock Transfer Baru
 
-[S:      ]
+Klik tombol **Add** untuk membuka form transfer.
 
-. I - :
-   - **T N**: N   (,        `ST-XXXX`).
-   - **S**: P    (, P , , I T, R, ).
-   - ** W**: P     .
-   - **T W**: P    .
-   - **T **: P   .
-   - **  **: P        ().
-   - **R y**: P y y   ().
+**Field form header:**
+- From Warehouse: pilih gudang asal (wajib)
+- To Warehouse: pilih gudang tujuan (wajib, harus berbeda)
+- Transfer Date: tanggal transfer (wajib)
+- Expected Arrival: estimasi tanggal tiba (wajib)
+- Notes: catatan tambahan (opsional)
 
-[S:     - ]
+[Screenshot: Form header Stock Transfer]
 
-. T    **N**  .
-. K  ** I**    y  .
+### Menambahkan Item Transfer
 
-[S:       I]
+Klik **Add Item** untuk menambahkan produk yang dipindahkan:
 
-. P  , :
-   - **P**: P  y  .
-   - **U**: P  .
-   - **Qy**: M  y  .
-   - **Qy R**: J y  ( ,   ).
-   - **U **: y   ().
-   - **N**:      ().
+- Product: pilih produk (wajib, hanya produk yang ada di gudang asal)
+- Unit: satuan produk (auto-terisi)
+- Available Qty: stok tersedia di gudang asal (read-only)
+- Transfer Qty: jumlah yang dipindahkan (wajib, maksimal available qty)
+- Notes: catatan per item (opsional)
 
-[S:    ]
+[Screenshot: Form item Stock Transfer]
 
-. K **S**     .
-. U  -      .
-. K **S**     y .
+Klik **Save**. Transfer dibuat dengan status **draft**.
 
-T        . J T N ,        `ST-XXXX`.
+## 3. Workflow Transfer
 
-## . M  T S
+| Status | Keterangan |
+|--------|------------|
+| Draft | Transfer baru dibuat, belum diproses |
+| In Transit | Barang sedang dalam perjalanan |
+| Received | Barang sudah diterima di gudang tujuan |
+| Cancelled | Transfer dibatalkan (soft-cancel) |
 
-U    :
+[Screenshot: Transfer dengan status In Transit]
 
-. P   ,   y  .
-. K  **V** ( )       .
-.     .
+## 4. Menerima Barang di Gudang Tujuan
 
-[S:       ]
+Setelah transfer berstatus **In Transit**, barang dapat diterima di gudang tujuan:
+1. Buka detail transfer
+2. Klik tombol **Receive**
+3. Stok di gudang asal berkurang, stok di gudang tujuan bertambah
 
-  :
-- I : T N, S,  W, T W, T ,   .
-- I : R y, N.
-- T :   y   , ,  .
-- I :  y,  y, S y, R y   -.
+## 5. Membatalkan Transfer
 
-## . M T S
+Klik ikon **Delete** pada transfer berstatus **draft**. Sistem akan mengubah status menjadi **cancelled** (soft-cancel).
 
-T        (y    P ). U :
+## 6. Export Data
 
-. P   ,   y  .
-. K  **** ( )   .
-.         y  .
-
-[S:     ]
-
-. U - y   .
-. U  ,          .
-. T     ** I**  .
-. K **S**  y .
-
-P         .
-
-## . M T S
-
-T      -. U :
-
-. P   ,   y  .
-. K  **** (  )   .
-.      : "T    . T     [T N]."
-
-[S:    ]
-
-. K ****   .
-
-T   y  ****.         ,      .
-
-## .  S T
-
-T     y     y:
-
-| S |  |
-|--------|-----------|
-|  | T  ,   . |
-| P  | T   . |
-|  | T  ,   . |
-| I T |        . |
-| R |      . |
-|  | T ,     . |
-
-[S:        ]
-
-  y :
-. ****  T   .
-. **P **  T    ( ).
-. ****  T    .
-. **I T**      .
-. **R**        .
-
-T     , y     .
-
-## . M  M T
-
-### P
-
-G         :
-
-. K        "S  ...".
-. S     -      y.
-
-[S: S     y ]
-
-### 
-
-U     :
-
-. G     .
-.  y :
-   - ** W**:    .
-   - **T W**:    .
-   - **S**:    .
-
-[S:       ]
-
-. P   y .
-. T    y    y .
-. U  ,   X      "".
-
-## . M 
-
-K-       :
-
-| K | K |
-|-------|------------|
-| T N | U    (-Z  Z-). |
-|  W | U    . |
-| T W | U    . |
-| T  | U    (  ). |
-|   | U    . |
-| S | U   . |
-
-[S: H  T N    ]
-
-K     (-Z, -),     (Z-, -).
-
-## . M   
-
-U      :
-
-. K  ****    .
-. S          y .
-.        .
-
-[S: T    ]
-
-   - :
-- T N
--  W
-- T W
-- T 
--   
-- S
-- N
-- I  (P, U, Qy, Qy R, U )
-
-## . Iz 
-
-M S T  z  .   z y :
-
-| Iz |  |
-|------|-----------|
-| `_` |      . |
-| `_.` | M   . |
-| `_.` | M   . |
-| `_.` | M  . |
-
-[S: H    z _]
-
-H       -    .
+Klik tombol **Export** untuk mengunduh data transfer ke Excel.
 
 ## FAQ
 
-**Q: Bagaimana cara membuat stock transfer baru?**
-A: Buka halaman Stock Transfers, klik tombol Add, lalu isi gudang asal (from warehouse), gudang tujuan (to warehouse), tanggal transfer, dan daftar produk beserta kuantitasnya. Setelah lengkap, simpan untuk membuat transfer dengan status awal.
+**Q: Apakah transfer bisa antar gudang yang sama?**
+A: Tidak. From Warehouse dan To Warehouse harus berbeda.
 
-**Q: Apa perbedaan setiap status pada stock transfer?**
-A: Status menggambarkan tahap proses transfer, mulai dari draft/pending saat baru dibuat, in transit ketika barang sedang dikirim, completed saat barang diterima penuh di gudang tujuan, hingga cancelled bila transfer dibatalkan.
+**Q: Apakah bisa transfer melebihi stok yang tersedia?**
+A: Tidak. Transfer Qty maksimal sesuai Available Qty di gudang asal.
 
-**Q: Apa itu qty received dan qty rejected?**
-A: Qty received adalah jumlah barang yang benar-benar diterima di gudang tujuan, sedangkan qty rejected adalah jumlah barang yang ditolak karena rusak atau tidak sesuai. Selisih keduanya menentukan stok yang benar-benar masuk.
-
-**Q: Bagaimana cara membatalkan stock transfer?**
-A: Pilih transfer yang ingin dibatalkan lalu gunakan aksi cancel. Pembatalan akan mengubah status menjadi cancelled dan tidak memengaruhi stok jika transfer belum completed.
-
-**Q: Apa format penomoran transfer number?**
-A: Transfer number dibuat otomatis oleh sistem dengan format `ST-XXXX` (prefix ST diikuti nomor urut), sehingga setiap transfer memiliki nomor unik dan mudah dilacak.
-
-**Q: Apa perbedaan from warehouse dan to warehouse?**
-A: From warehouse adalah gudang asal tempat barang dikeluarkan, sedangkan to warehouse adalah gudang tujuan tempat barang akan diterima. Keduanya harus berbeda dalam satu transfer.
-
-**Q: Bagaimana cara filter dan search stock transfer?**
-A: Gunakan kolom pencarian untuk mencari berdasarkan transfer number, lalu gunakan filter untuk menyaring berdasarkan gudang asal, gudang tujuan, tanggal, atau status sesuai kebutuhan.
-
-**Q: Bagaimana cara export data stock transfer?**
-A: Klik tombol Export pada toolbar untuk mengunduh data transfer ke file Excel. Kolom hasil export mencakup seluruh kolom yang tampil pada tabel, termasuk informasi gudang dan status.
-
-**Q: Apa hubungan stock transfer dengan stock movements?**
-A: Setiap stock transfer yang diproses akan mencatat pergerakan stok pada kartu stok (stock movements), baik pengurangan di gudang asal maupun penambahan di gudang tujuan, sehingga riwayat stok tetap akurat.
-
-**Q: Apa yang terjadi pada stok saat transfer completed?**
-A: Saat transfer berstatus completed, stok akan berkurang di gudang asal sesuai qty yang dikirim dan bertambah di gudang tujuan sesuai qty received, menjaga keseimbangan stok antar gudang.
-
-**Q: Apa tips penting saat melakukan transfer antar gudang?**
-A: Pastikan stok di gudang asal mencukupi sebelum membuat transfer, verifikasi qty received saat barang tiba, dan segera proses pembatalan bila terjadi kesalahan agar data stok tetap konsisten.
+**Q: Apakah transfer yang sudah received bisa dibatalkan?**
+A: Tidak. Transfer dengan status received tidak dapat dibatalkan. Gunakan transfer baru untuk mengembalikan stok.
