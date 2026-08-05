@@ -493,6 +493,20 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   view_type: dialog
   checkbox_header: false
 
+- slug: budgets
+  route: /budgets
+  api: /api/budgets
+  export_api: /api/budgets/export
+  search_placeholder: "Search budgets..."
+  sortable_columns: [Name, Budget Type, Status, Total Amount, Created At]
+  non_sortable_columns: [Fiscal Year]
+  view_type: dialog
+  view_dialog_title: "Budget Details"
+  checkbox_header: false
+  note: "Complex CRUD dengan nested Budget Lines (min 1 line: account_id, period_start/end, allocated_amount). Create via inline Add Line row (bukan nested dialog)."
+  tests:
+    - tests/e2e/budgets/budget.spec.ts
+
 - slug: recurring-journals
   route: /recurring-journals
   api: /api/recurring-journals
