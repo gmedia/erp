@@ -1,6 +1,7 @@
-// Type checking test for column utilities
-// This file performs compile-time type assertions — no runtime test framework needed.
-// Run: tsc --noEmit (ensures types compile cleanly)
+// Compile-time type assertions for column utilities (not a runtime test suite).
+// Intentionally NOT named *.test.ts — Sonar S2187 flags empty test files, and this
+// project has no Vitest/Jest unit runner for frontend (Playwright E2E + `tsc --noEmit` only).
+// Run: npm run types  (tsc --noEmit)
 
 import { Department } from '@/types/department';
 import { Employee } from '@/types/employee';
