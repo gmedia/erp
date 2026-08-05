@@ -1,59 +1,43 @@
 # AI Handoff: ERP Active State
 
-Last updated: 2026-08-04 — docs cleanup on `docs/cleanup-user-guides-and-stale-docs`.
+Last updated: 2026-08-05 — Budget E2E PR #72 open.
 
 ## Current milestone
 
-**Branch:** `docs/cleanup-user-guides-and-stale-docs`  
-**Base:** `main` @ `bd573fb3` (post PR #70)  
-**Goal:** Restore corrupted user guides + fix stale design/status/registry/dashboard docs.
+**Branch:** `feat/budgets-e2e` (from `main` @ `f8f4be01`)  
+**PR:** https://github.com/gmedia/erp/pull/72  
+**HEAD:** `40ca2fba`  
+**Goal:** Close Budget product gap — Playwright E2E + module registry.  
+**Status:** Done — 3 commits pushed; PR open. Do not wait for CI.
 
-## What changed in this session
+## What changed this session
 
-### P0 — User guides (7 files rewritten)
-Corrupted guides deleted and rewritten (Indonesian, menus/routes, workflows, FAQ):
-- `docs/user-guide-purchase-requests.md`
-- `docs/user-guide-purchase-orders.md`
-- `docs/user-guide-goods-receipts.md`
-- `docs/user-guide-supplier-returns.md`
-- `docs/user-guide-stock-transfers.md`
-- `docs/user-guide-asset-maintenances.md`
-- `docs/user-guide-asset-stocktakes.md`
+- `tests/e2e/budgets/helpers.ts` — create (≥1 line), search, edit
+- `tests/e2e/budgets/budget.spec.ts` — `generateModuleTests` + Status/Budget Type filters
+- `docs/module-registry.md` — budgets Complex CRUD YAML
+- Commits: `b8a44ef8` test | `62c29ff8` docs | `40ca2fba` chore handoff
 
-### P1 — Status / design truth
-- `docs/budget-management-design.md` — removed GREENFIELD; marked Implemented + E2E gap
-- `docs/database/IMPLEMENTATION_STATUS.md` — date 2026-08-04; rows 19–23 (Budget + dashboards); test baseline note
-- `docs/refactor-sonar-progress.md` — **FROZEN**; superseded OPEN-83 section; closed Next Steps
+## Validated commands and outcomes
 
-### P2 — Registry / index / dashboards
-- `docs/module-registry.md` — Last updated + correct count notes (Pest 74); dashboards note fixed
-- `docs/README.md` — **new** docs index + dashboard matrix
-- `docs/user-guide-dashboard.md` — rewrite for real home dashboard (4 entity totals)
-- `docs/user-guide-financial-dashboard.md` — disambiguation callout vs `/dashboard`
-
-## Validated
-
-- Docs-only branch; no app code changes
-- Guides served by `UserGuideController` glob `docs/user-guide-*.md`
-- Main dashboard ground truth: `resources/js/pages/dashboard.tsx` → `GET /api/dashboard` totals
+- `git push -u origin feat/budgets-e2e` — OK
+- `gh pr create` → #72 — OK
+- Working tree clean; branch tracking `origin/feat/budgets-e2e`
 
 ## Open risks / blockers
 
-- Budget E2E still missing (`tests/e2e/budgets/`) — product gap, out of scope for this docs PR
-- Lean rewrites of 7 guides are shorter than peer guides; expand later if product needs more depth
-- Prefer light sequential tool use (heavy parallel agents killed OpenCode session)
+- Create helper needs seed: ≥1 fiscal year + ≥1 account (first AsyncSelect option)
+- Inline line editor date pickers use `Pick start/end date` placeholders
+- Playwright budgets suite not run locally this session (CI will cover)
 
 ## Recommended next step
 
-1. Commit all docs changes on this branch
-2. Push + open PR with handoff template
-3. Do **not** wait for CI; move on
+- Session start: process open MRs — if #72 green → squash merge; if red → fix
+- Optional local: `PLAYWRIGHT_USE_SAIL=1 ./vendor/bin/sail npx playwright test tests/e2e/budgets/`
 
 ## Continuation Prompt
 
 ```
-Continue docs cleanup on docs/cleanup-user-guides-and-stale-docs.
-If uncommitted: commit, push, gh pr create.
-If PR open: process open MRs per AGENTS.md (merge if green).
-Do not re-do P0–P2 unless verification fails.
+PR #72 (feat/budgets-e2e) is open. Check gh pr checks 72.
+Green → squash merge + delete branch + pull main.
+Red → checkout feat/budgets-e2e, fix, push. Do not wait on CI otherwise.
 ```
