@@ -18,7 +18,12 @@ class EmployeeExport extends BaseExport
             ->with(['currentEmployment.department', 'currentEmployment.position', 'currentEmployment.branch'])
             ->select('employees.*');
 
-        $this->applySearchFilter($query, $this->filters, ['employees.employee_id', 'employees.name', 'employees.email', 'employees.phone']);
+        $this->applySearchFilter($query, $this->filters, [
+            'employees.employee_id',
+            'employees.name',
+            'employees.email',
+            'employees.phone',
+        ]);
         $this->applyExactFilters($query, $this->filters, [
             'department_id' => 'employments.department_id',
             'position_id' => 'employments.position_id',
@@ -65,12 +70,27 @@ class EmployeeExport extends BaseExport
             'Name' => fn (Employee $e): mixed => $e->name,
             'Email' => fn (Employee $e): mixed => $e->email,
             'Phone' => fn (Employee $e): mixed => $e->phone,
-            'Department' => fn (Employee $e): mixed => $this->relatedAttribute($e->currentEmployment, 'department', 'name'),
-            'Position' => fn (Employee $e): mixed => $this->relatedAttribute($e->currentEmployment, 'position', 'name'),
-            'Branch' => fn (Employee $e): mixed => $this->relatedAttribute($e->currentEmployment, 'branch', 'name'),
+            'Department' => fn (Employee $e): mixed => $this->relatedAttribute(
+                $e->currentEmployment,
+                'department',
+                'name',
+            ),
+            'Position' => fn (Employee $e): mixed => $this->relatedAttribute(
+                $e->currentEmployment,
+                'position',
+                'name',
+            ),
+            'Branch' => fn (Employee $e): mixed => $this->relatedAttribute(
+                $e->currentEmployment,
+                'branch',
+                'name',
+            ),
             'Salary' => fn (Employee $e): mixed => $e->currentEmployment?->salary,
             'Status' => fn (Employee $e): mixed => $e->currentEmployment?->employment_status,
-            'Hire Date' => fn (Employee $e): mixed => $this->formatDateValue($e->currentEmployment?->hire_date, 'Y-m-d'),
+            'Hire Date' => fn (Employee $e): mixed => $this->formatDateValue(
+                $e->currentEmployment?->hire_date,
+                'Y-m-d',
+            ),
             'Created At' => fn (Employee $e): mixed => $this->formatIso8601($e->created_at),
         ];
     }

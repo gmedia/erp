@@ -669,6 +669,7 @@ export const BankReconciliationWorkspace =
                                                                                     asChild
                                                                                 >
                                                                                     <button
+                                                                                        type="button"
                                                                                         className="max-w-[130px] truncate text-left text-xs font-medium text-blue-700 hover:underline"
                                                                                         onClick={() =>
                                                                                             openAssignDialog(
@@ -718,38 +719,50 @@ export const BankReconciliationWorkspace =
                                                             })()}
                                                         </TableCell>
                                                         <TableCell className="text-right">
-                                                            {loadingItemId ===
-                                                            item.id ? (
-                                                                <Loader2 className="ml-auto size-4 animate-spin text-muted-foreground" />
-                                                            ) : item.is_reconciled ? (
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="sm"
-                                                                    className="h-7 px-2 text-xs text-red-600 hover:bg-red-50 hover:text-red-700"
-                                                                    onClick={() =>
-                                                                        handleUnmatch(
-                                                                            item.id!,
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <Link2Off className="mr-1 size-3" />
-                                                                    Unmatch
-                                                                </Button>
-                                                            ) : (
-                                                                <Button
-                                                                    variant="outline"
-                                                                    size="sm"
-                                                                    className="h-7 px-2 text-xs"
-                                                                    onClick={() =>
-                                                                        openMatchDialog(
-                                                                            item.id!,
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <Link2 className="mr-1 size-3" />
-                                                                    Match
-                                                                </Button>
-                                                            )}
+                                                            {(() => {
+                                                                if (
+                                                                    loadingItemId ===
+                                                                    item.id
+                                                                ) {
+                                                                    return (
+                                                                        <Loader2 className="ml-auto size-4 animate-spin text-muted-foreground" />
+                                                                    );
+                                                                }
+                                                                if (
+                                                                    item.is_reconciled
+                                                                ) {
+                                                                    return (
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            size="sm"
+                                                                            className="h-7 px-2 text-xs text-red-600 hover:bg-red-50 hover:text-red-700"
+                                                                            onClick={() =>
+                                                                                handleUnmatch(
+                                                                                    item.id!,
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            <Link2Off className="mr-1 size-3" />
+                                                                            Unmatch
+                                                                        </Button>
+                                                                    );
+                                                                }
+                                                                return (
+                                                                    <Button
+                                                                        variant="outline"
+                                                                        size="sm"
+                                                                        className="h-7 px-2 text-xs"
+                                                                        onClick={() =>
+                                                                            openMatchDialog(
+                                                                                item.id!,
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <Link2 className="mr-1 size-3" />
+                                                                        Match
+                                                                    </Button>
+                                                                );
+                                                            })()}
                                                         </TableCell>
                                                     </TableRow>
                                                 ))
