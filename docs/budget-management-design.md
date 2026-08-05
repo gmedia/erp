@@ -230,11 +230,11 @@ Standard `ReportDataTablePage` with:
 - Report page: `pages/reports/budget-variance/index.tsx`
 - Route registration in `app-routes.tsx`
 
-### Phase 4: Tests + Integration — ✅ Done (CRUD E2E)
+### Phase 4: Tests + Integration — ✅ Done (CRUD + report E2E)
 - ✅ Pest: `BudgetControllerTest`, `BudgetExportTest`, `BudgetVarianceReportTest` + model unit tests
 - ✅ E2E: `tests/e2e/budgets/` (helpers + standard CRUD cases via `generateModuleTests`) — **PR #72**
+- ✅ E2E: `tests/e2e/budget-variance-report/` (required `budget_id` filter, status/account_type, export)
 - Optional: approval flow integration (if `ApprovalFlow` already configured for Budget entity)
-- Optional: Playwright coverage for budget-variance **report** page (`/reports/budget-variance`)
 
 ---
 
