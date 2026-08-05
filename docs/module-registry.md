@@ -503,7 +503,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   view_type: dialog
   view_dialog_title: "Budget Details"
   checkbox_header: false
-  note: "Complex CRUD dengan nested Budget Lines (min 1 line: account_id, period_start/end, allocated_amount). Create via inline Add Line row (bukan nested dialog)."
+  note: "Complex CRUD dengan nested Budget Lines (min 1 line: account_id, period_start/end, allocated_amount). Create via inline Add Line row (bukan nested dialog). Report page: slug budget-variance-report."
   tests:
     - tests/e2e/budgets/budget.spec.ts
 
@@ -883,6 +883,18 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   tests:
     - tests/e2e/posting-journals/post-journal.spec.ts
 
+- slug: budget-variance-report
+  route: /reports/budget-variance
+  api: /api/reports/budget-variance
+  export_api: /api/reports/budget-variance/export
+  search_placeholder: ""
+  sortable_columns: [Account Code, Account Name, Account Type, Period Start, Period End, Allocated, Actual, Available, Variance %, Status]
+  view_type: page
+  checkbox_header: false
+  note: "Non-CRUD laporan variance budget vs actual (posted JE). budget_id WAJIB di index/export. Filter status (within_budget|warning|over_budget) dan account_type. Permission budget_variance_report. Export filename budget_variance_*.xlsx."
+  tests:
+    - tests/e2e/budget-variance-report/budget-variance-report.spec.ts
+
 ## Testing
 
 E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
@@ -983,6 +995,7 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 28 | Purchase History Report | `purchase-history-report` | `Feature/Reports/PurchaseHistoryReportTest.php` | Laporan riwayat pembelian per supplier/produk/periode + export |
 | 29 | Goods Receipt Report | `goods-receipt-report` | `Feature/Reports/GoodsReceiptReportTest.php` | Laporan penerimaan barang per periode/supplier/gudang + export |
 | 30 | Aging Dashboard | `aging-dashboard` | `Feature/AgingDashboard/AgingDashboardControllerTest.php` | AR/AP aging dashboard with 5 buckets + top 10 overdue customers/suppliers + branch filter |
+| 31 | Budget Variance Report | `budget-variance-report` | `Feature/Budgets/BudgetVarianceReportControllerTest.php` | Non-CRUD laporan variance budget; E2E di `tests/e2e/budget-variance-report/` (budget_id required) |
 
 ---
 
