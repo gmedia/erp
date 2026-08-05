@@ -27,8 +27,7 @@ export const EmployeeViewModal = memo<EmployeeViewModalProps>(
             intern: 'Intern',
             regular: 'Regular',
         };
-        const statusLabel =
-            (status ? statusLabels[status] : undefined) ?? '-';
+        const statusLabel = (status ? statusLabels[status] : undefined) ?? '-';
 
         return (
             <ViewModalShell
