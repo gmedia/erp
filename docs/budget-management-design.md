@@ -1,15 +1,15 @@
 # Budget Management Module — Design
 
 **Generated:** 2026-06-05
-**Status:** Implemented (2026-06-22). Pest tests present. **E2E tests pending** (`tests/e2e/budgets/` does not exist yet).
-**Last updated:** 2026-08-04
+**Status:** Implemented (2026-06-22). Pest OK. Playwright E2E suite on **PR #72** (`tests/e2e/budgets/`, registry entry).
+**Last updated:** 2026-08-05
 
 ## Executive Summary
 
 Budget Management is **implemented**. Finance teams set per-account spending targets per fiscal year period and track actual-vs-budget variance in real time. The module reuses `FinancialReportService`, `Account`, `FiscalYear`, and `JournalEntry` infrastructure.
 
-**What shipped:** Models (`Budget`, `BudgetLine`), `BudgetController`, `BudgetVarianceReportController`, `BudgetVarianceService`, export, SPA pages under `/budgets` and budget-variance report, Pest feature/unit tests.
-**Remaining gap:** Playwright E2E suite for budgets (not started).
+**What shipped:** Models (`Budget`, `BudgetLine`), `BudgetController`, `BudgetVarianceReportController`, `BudgetVarianceService`, export, SPA pages under `/budgets` and budget-variance report, Pest feature/unit tests, Playwright E2E (`tests/e2e/budgets/` via PR #72).
+**Remaining gaps (product, not E2E):** optional ApprovalFlow integration; commitment tracking (PO-level); multi-currency (tracked separately). Budget-variance **report** E2E is still optional follow-up.
 **Original estimate (historical):** 3–4 days (schema + backend + frontend + tests).
 **Value:** High — enables proactive financial control instead of reactive GL review.
 
@@ -230,10 +230,11 @@ Standard `ReportDataTablePage` with:
 - Report page: `pages/reports/budget-variance/index.tsx`
 - Route registration in `app-routes.tsx`
 
-### Phase 4: Tests + Integration — 🔨 Partial
+### Phase 4: Tests + Integration — ✅ Done (CRUD E2E)
 - ✅ Pest: `BudgetControllerTest`, `BudgetExportTest`, `BudgetVarianceReportTest` + model unit tests
-- ❌ E2E: `tests/e2e/budgets/` (9 standard cases) — **still pending**
+- ✅ E2E: `tests/e2e/budgets/` (helpers + standard CRUD cases via `generateModuleTests`) — **PR #72**
 - Optional: approval flow integration (if `ApprovalFlow` already configured for Budget entity)
+- Optional: Playwright coverage for budget-variance **report** page (`/reports/budget-variance`)
 
 ---
 
@@ -277,4 +278,4 @@ Decisions made for the shipped MVP (kept for context):
 4. **Budget types** — All four types supported in schema (operational, capital, project, revenue).
 5. **Report scope** — Variance by account; department/branch dimension deferred.
 
-**Open follow-ups:** E2E suite; optional ApprovalFlow integration; commitment tracking; multi-currency (tracked separately).
+**Open follow-ups:** optional ApprovalFlow integration; commitment tracking; multi-currency (tracked separately); optional budget-variance report E2E.
