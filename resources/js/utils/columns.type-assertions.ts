@@ -15,7 +15,7 @@ import {
     createPhoneColumn,
     createSelectColumn,
     createTextColumn,
-} from '../columns';
+} from './columns';
 
 interface PayrollFixture {
     salary: string | null;
