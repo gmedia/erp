@@ -167,30 +167,32 @@ type _PosColsLen = (typeof _posColumns)['length'] extends 4 ? true : false;
 const _posLenCheck: _PosColsLen = true;
 
 // ── Exhaustiveness guard ──
-void _selectIdCheck;
-void _selectMetaCheck;
-void _textAk;
-void _textHeader;
-void _dateAk;
-void _dateNoSortCheck;
-void _emailAk;
-void _phoneAk;
-void _currencyAk;
-void _actionsIdCheck;
-void _actionsColWithCbIdCheck;
-void _deptLenCheck;
-void _empLenCheck;
-void _posLenCheck;
-void accessorKeyOf;
-void _selectCol;
-void _textCol;
-void _dateCol;
-void _dateColNoSort;
-void _emailCol;
-void _phoneCol;
-void _currencyCol;
-void _actionsCol;
-void _actionsColWithCb;
-void _deptColumns;
-void _empColumns;
-void _posColumns;
+export const __columnsTypeAssertionGuards = {
+    accessorKeyOf,
+    selectCol: _selectCol,
+    selectId: _selectIdCheck,
+    selectMeta: _selectMetaCheck,
+    textCol: _textCol,
+    textAk: _textAk,
+    textHeader: _textHeader,
+    dateCol: _dateCol,
+    dateAk: _dateAk,
+    dateColNoSort: _dateColNoSort,
+    dateNoSort: _dateNoSortCheck,
+    emailCol: _emailCol,
+    emailAk: _emailAk,
+    phoneCol: _phoneCol,
+    phoneAk: _phoneAk,
+    currencyCol: _currencyCol,
+    currencyAk: _currencyAk,
+    actionsCol: _actionsCol,
+    actionsId: _actionsIdCheck,
+    actionsColWithCb: _actionsColWithCb,
+    actionsColWithCbId: _actionsColWithCbIdCheck,
+    deptColumns: _deptColumns,
+    deptLen: _deptLenCheck,
+    empColumns: _empColumns,
+    empLen: _empLenCheck,
+    posColumns: _posColumns,
+    posLen: _posLenCheck,
+} as const;
