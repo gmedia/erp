@@ -8,6 +8,44 @@
 2. **One task = one branch** (`feat/*` or `fix/*`) = **one MR/PR.**
 3. **Every MR must have a handoff** (what was done, files changed, next steps).
 4. **Session start: process open MRs first** — merge if green, fix if red.
+5. **Process budget (OpenCode stability) — HARD LIMIT.** Parallel tool/agent fan-out kills the host session. Follow **Tool & Process Concurrency** below with zero exceptions.
+
+## Tool & Process Concurrency (HARD — prevents OpenCode kill)
+
+> OpenCode has repeatedly been killed when the agent fired many tools/subagents in one turn. Prefer **serial** work. Throughput is secondary to session survival.
+
+### Hard limits (per assistant turn)
+
+| Kind | Max per turn | Notes |
+|------|--------------|-------|
+| Total tool calls | **3** | Prefer **1–2**. Never “spray” reads/greps. |
+| Background `task` / explore / librarian | **0 default** | Use only if user explicitly asks for parallel research. Max **1** if used. |
+| `run_in_background=true` | **Avoid** | Prefer sync, single agent. |
+| Simultaneous file reads | **1–2** | Do not batch 5–10 `Read` calls. |
+| Simultaneous bash / git / gh | **1** | Chain with `&&` in one shell if sequential steps needed. |
+| Sonar / MCP / Depwire / Context7 | **1** | One MCP call, then reason; next call only if needed. |
+
+### Required workflow
+
+1. **One file at a time** for edits: read → edit → next file. Never parallel multi-file edit batches.
+2. **One search at a time**: one `grep`/`glob`/`bash`, use results, then next search.
+3. **No parallel subagent swarms** for “explore everything”. Main agent greps/reads directly for small scopes.
+4. **After any kill / interrupt**: resume with **strict serial** mode (1 tool per step) until the task finishes.
+5. **When in doubt**: fewer tools. Incomplete progress + alive session > full plan + dead OpenCode.
+
+### Explicitly forbidden
+
+- ❌ 5+ tool calls in a single assistant message
+- ❌ Multiple `task(subagent_type="explore"|"librarian")` in parallel
+- ❌ Parallel `Read` of many files “to save time”
+- ❌ Parallel Sonar + git + file reads + explore agents together
+- ❌ Spawning agents for work the main agent can do with one `grep`/`Read`
+
+### Allowed exceptions (still keep total ≤ 3 tools)
+
+- Two independent **tiny** reads of known paths (e.g. two line ranges already identified)
+- One `git status`/`log` combined in a **single** bash script
+- User explicitly orders parallel research (“fire explore agents”)
 
 ## Workflow
 
@@ -69,6 +107,7 @@ gh pr view <id> --json headRefName         # Get branch name
 - ❌ Empty MR descriptions
 - ❌ Force-push or rebase shared branches
 - ❌ Using raw `git` directly — always use `rtk git`
+- ❌ **Multi-process fan-out** (many tools/agents in one turn) — kills OpenCode; see **Tool & Process Concurrency**
 
 ## Quality Gate
 

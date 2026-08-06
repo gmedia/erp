@@ -328,18 +328,20 @@ class GetAgingDashboardDataAction
             $query->where("{$tableAlias}.branch_id", $branchId);
         }
 
+        $overdueCase = "CASE WHEN {$tableAlias}.due_date < ? THEN {$tableAlias}.amount_due ELSE 0 END";
+
         $rows = $query
             ->groupBy("{$tableAlias}.{$partnerFk}", "{$partnerAlias}.name")
             ->selectRaw(
                 "{$tableAlias}.{$partnerFk} AS {$partnerFk},
                  {$partnerAlias}.name AS {$partnerNameCol},
                  COALESCE(SUM({$tableAlias}.amount_due), 0) AS outstanding_amount,
-                 COALESCE(SUM(CASE WHEN {$tableAlias}.due_date < ? THEN {$tableAlias}.amount_due ELSE 0 END), 0) AS overdue_amount,
+                 COALESCE(SUM({$overdueCase}), 0) AS overdue_amount,
                  COUNT(*) AS {$countCol},
                  MIN({$tableAlias}.due_date) AS oldest_due_date",
                 [$asOfStr]
             )
-            ->havingRaw("SUM(CASE WHEN {$tableAlias}.due_date < ? THEN {$tableAlias}.amount_due ELSE 0 END) > 0", [$asOfStr])
+            ->havingRaw("SUM({$overdueCase}) > 0", [$asOfStr])
             ->orderByDesc('overdue_amount')
             ->orderByDesc('outstanding_amount')
             ->limit(10)

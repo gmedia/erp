@@ -48,6 +48,7 @@ export function UserMenuContent({ user }: Readonly<UserMenuContentProps>) {
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
                 <button
+                    type="button"
                     className="block w-full text-left"
                     onClick={handleLogout}
                     data-test="logout-button"

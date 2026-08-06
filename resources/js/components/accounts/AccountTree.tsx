@@ -57,6 +57,7 @@ function AccountTreeNode({
             >
                 <div className="flex min-w-0 flex-1 items-center">
                     <button
+                        type="button"
                         onClick={() => setIsOpen(!isOpen)}
                         className={cn(
                             'mr-1 rounded-sm p-1 transition-transform hover:bg-accent',
@@ -98,6 +99,7 @@ function AccountTreeNode({
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button
+                                    type="button"
                                     size="icon"
                                     variant="ghost"
                                     className="h-8 w-8 text-primary"
@@ -112,6 +114,7 @@ function AccountTreeNode({
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button
+                                    type="button"
                                     size="icon"
                                     variant="ghost"
                                     className="h-8 w-8 text-blue-500"
@@ -126,6 +129,7 @@ function AccountTreeNode({
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button
+                                    type="button"
                                     size="icon"
                                     variant="ghost"
                                     className="h-8 w-8 text-destructive"
@@ -189,7 +193,12 @@ export function AccountTree({
                 <h3 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
                     Hierarchy
                 </h3>
-                <Button size="sm" variant="outline" onClick={onAddRoot}>
+                <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={onAddRoot}
+                >
                     <Plus className="mr-2 h-4 w-4" />
                     New Root Account
                 </Button>
@@ -201,7 +210,7 @@ export function AccountTree({
                         <p className="mb-4 text-muted-foreground">
                             No accounts found in this version.
                         </p>
-                        <Button onClick={onAddRoot}>
+                        <Button type="button" onClick={onAddRoot}>
                             <Plus className="mr-2 h-4 w-4" />
                             Create Your First Account
                         </Button>

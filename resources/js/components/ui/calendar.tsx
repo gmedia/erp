@@ -64,7 +64,7 @@ function CalendarWeekNumber({
 }
 
 type CalendarProps = React.ComponentProps<typeof DayPicker> & {
-    buttonVariant?: React.ComponentProps<typeof Button>["variant"]
+    buttonVariant?: NonNullable<React.ComponentProps<typeof Button>["variant"]>
 };
 
 function Calendar({

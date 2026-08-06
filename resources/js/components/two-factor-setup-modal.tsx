@@ -89,7 +89,11 @@ function TwoFactorSetupStep({
                     </div>
 
                     <div className="flex w-full space-x-5">
-                        <Button className="w-full" onClick={onNextStep}>
+                        <Button
+                            type="button"
+                            className="w-full"
+                            onClick={onNextStep}
+                        >
                             {buttonText}
                         </Button>
                     </div>
@@ -112,6 +116,7 @@ function TwoFactorSetupStep({
                                         className="h-full w-full bg-background p-3 text-foreground outline-none"
                                     />
                                     <button
+                                        type="button"
                                         onClick={() => copy(manualSetupKey)}
                                         className="border-l border-border px-3 hover:bg-muted"
                                     >
