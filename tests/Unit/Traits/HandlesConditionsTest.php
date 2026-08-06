@@ -2,31 +2,10 @@
 
 use App\Models\Asset;
 use App\Models\AssetCategory;
-use App\Traits\HandlesConditions;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Unit\Traits\HandlesConditionsHarness;
 
 uses(RefreshDatabase::class)->group('handles-conditions');
-
-class HandlesConditionsHarness
-{
-    use HandlesConditions;
-
-    public function runEvaluateConditions(array $conditions, Model $entity): bool
-    {
-        return $this->evaluateConditions($conditions, $entity);
-    }
-
-    public function runEvaluateFieldCheck(array $check, Model $entity): bool
-    {
-        return $this->evaluateFieldCheck($check, $entity);
-    }
-
-    public function runEvaluateRelationCheck(array $check, Model $entity): bool
-    {
-        return $this->evaluateRelationCheck($check, $entity);
-    }
-}
 
 beforeEach(function () {
     $this->harness = new HandlesConditionsHarness;
