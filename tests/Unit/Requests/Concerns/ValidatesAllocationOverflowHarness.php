@@ -3,6 +3,7 @@
 namespace Tests\Unit\Requests\Concerns;
 
 use App\Http\Requests\Concerns\ValidatesAllocationOverflow;
+use Closure;
 use Illuminate\Contracts\Validation\Validator;
 
 /**
@@ -13,7 +14,7 @@ class ValidatesAllocationOverflowHarness
     use ValidatesAllocationOverflow;
 
     /**
-     * @param array<string, mixed> $input
+     * @param  array<string, mixed>  $input
      */
     public function __construct(private array $input)
     {
@@ -30,7 +31,7 @@ class ValidatesAllocationOverflowHarness
         string $inputKey,
         string $referenceIdKey,
         string $errorMessagePrefix,
-        \Closure $getMaxAllocationFor,
+        Closure $getMaxAllocationFor,
     ): void {
         $this->validateAllocationOverflow(
             $validator,
