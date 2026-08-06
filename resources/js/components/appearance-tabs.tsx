@@ -25,6 +25,7 @@ export default function AppearanceToggleTab({
         >
             {tabs.map(({ value, icon: Icon, label }) => (
                 <button
+                    type="button"
                     key={value}
                     onClick={() => updateAppearance(value)}
                     className={cn(
