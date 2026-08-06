@@ -193,7 +193,12 @@ export function AccountTree({
                 <h3 className="text-sm font-semibold tracking-wider text-muted-foreground uppercase">
                     Hierarchy
                 </h3>
-                <Button type="button" size="sm" variant="outline" onClick={onAddRoot}>
+                <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={onAddRoot}
+                >
                     <Plus className="mr-2 h-4 w-4" />
                     New Root Account
                 </Button>
