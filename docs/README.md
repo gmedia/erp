@@ -26,7 +26,7 @@ Index for agents and developers. Prefer these paths over inventing new status do
 
 | Doc | Status |
 |-----|--------|
-| [budget-management-design.md](./budget-management-design.md) | **Implemented** (2026-06-22); Pest OK; E2E PR #72 |
+| [budget-management-design.md](./budget-management-design.md) | **Implemented** (2026-06-22); Pest OK; E2E #72 (CRUD) + #75 (variance report) |
 | [profit-loss-by-department-design.md](./profit-loss-by-department-design.md) | Research only |
 | [database/\*_design.md](./database/) | Module design specs (see IMPLEMENTATION_STATUS) |
 
