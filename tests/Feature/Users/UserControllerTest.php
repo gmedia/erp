@@ -170,6 +170,84 @@ describe('Update User API', function () {
     });
 });
 
+describe('Users Dropdown API', function () {
+    beforeEach(function () {
+        $user = createTestUserWithPermissions(['user']);
+        Sanctum::actingAs($user, ['*']);
+    });
+
+    test('apiIndex returns users limited to id and name', function () {
+        $alice = User::factory()->create(['name' => 'Alice Dropdown', 'email' => 'alice-dropdown@example.com']);
+        $bob = User::factory()->create(['name' => 'Bob Dropdown', 'email' => 'bob-dropdown@example.com']);
+
+        $response = getJson('/api/users');
+
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => ['id', 'name'],
+                ],
+            ]);
+
+        $ids = collect($response->json('data'))->pluck('id');
+        expect($ids)->toContain($alice->id, $bob->id);
+
+        $first = $response->json('data.0');
+        expect($first)->toHaveKeys(['id', 'name'])
+            ->and($first)->not->toHaveKey('email');
+    });
+
+    test('apiIndex filters users by search on name or email', function () {
+        $matchByName = User::factory()->create([
+            'name' => 'UniqueSearchNameXYZ',
+            'email' => 'uniquesearch-name@example.com',
+        ]);
+        $matchByEmail = User::factory()->create([
+            'name' => 'Other Person',
+            'email' => 'uniquesearchemail@example.com',
+        ]);
+        User::factory()->create([
+            'name' => 'No Match User',
+            'email' => 'nomatch@example.com',
+        ]);
+
+        $response = getJson('/api/users?search=UniqueSearch');
+
+        $response->assertOk();
+
+        $ids = collect($response->json('data'))->pluck('id');
+        expect($ids)->toContain($matchByName->id, $matchByEmail->id)
+            ->and($ids)->not->toContain(
+                User::query()->where('email', 'nomatch@example.com')->value('id')
+            );
+    });
+
+    test('apiShow returns a single user id and name', function () {
+        $target = User::factory()->create([
+            'name' => 'Show Target',
+            'email' => 'show-target@example.com',
+        ]);
+
+        $response = getJson("/api/users/{$target->id}");
+
+        $response->assertOk()
+            ->assertJson([
+                'data' => [
+                    'id' => $target->id,
+                    'name' => 'Show Target',
+                ],
+            ]);
+
+        expect($response->json('data'))->not->toHaveKey('email');
+    });
+
+    test('apiShow returns 404 for non-existent user', function () {
+        $response = getJson('/api/users/999999');
+
+        $response->assertNotFound();
+    });
+});
+
 describe('User API Permission Tests', function () {
     test('getUserByEmployee returns 403 when user lacks user permission', function () {
         $user = createTestUserWithPermissions([]);
@@ -193,6 +271,26 @@ describe('User API Permission Tests', function () {
             'email' => 'test@example.com',
             'password' => 'password123',
         ]);
+
+        $response->assertForbidden();
+    });
+
+    test('apiIndex returns 403 when user lacks user permission', function () {
+        $user = createTestUserWithPermissions([]);
+        Sanctum::actingAs($user, ['*']);
+
+        $response = getJson('/api/users');
+
+        $response->assertForbidden();
+    });
+
+    test('apiShow returns 403 when user lacks user permission', function () {
+        $user = createTestUserWithPermissions([]);
+        Sanctum::actingAs($user, ['*']);
+
+        $target = User::factory()->create();
+
+        $response = getJson("/api/users/{$target->id}");
 
         $response->assertForbidden();
     });
