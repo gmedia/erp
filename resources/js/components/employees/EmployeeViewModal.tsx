@@ -23,12 +23,11 @@ export const EmployeeViewModal = memo<EmployeeViewModalProps>(
 
         const employment = item.current_employment;
         const status = employment?.employment_status;
-        const statusLabel =
-            status === 'intern'
-                ? 'Intern'
-                : status === 'regular'
-                  ? 'Regular'
-                  : '-';
+        const statusLabels: Record<string, string> = {
+            intern: 'Intern',
+            regular: 'Regular',
+        };
+        const statusLabel = (status ? statusLabels[status] : undefined) ?? '-';
 
         return (
             <ViewModalShell

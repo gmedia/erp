@@ -222,7 +222,7 @@ export interface RegionalNumberFormatOptions {
 
 export interface RegionalCurrencyFormatOptions extends RegionalNumberFormatOptions {
     currency?: string;
-    currencyDisplay?: Intl.NumberFormatOptions['currencyDisplay'];
+    currencyDisplay?: NonNullable<Intl.NumberFormatOptions['currencyDisplay']>;
 }
 
 function resolveCurrencyCode(
