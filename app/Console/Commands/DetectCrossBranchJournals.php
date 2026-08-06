@@ -120,7 +120,13 @@ class DetectCrossBranchJournals extends Command
                     'null_branch_lines' => $nullBranchLineCount,
                 ]);
 
-                captureMessage(sprintf('Cross-branch journals detected by scheduled monitor: %d multi-branch entries.', $multiBranchCount), Severity::warning());
+                captureMessage(
+                    sprintf(
+                        'Cross-branch journals detected by scheduled monitor: %d multi-branch entries.',
+                        $multiBranchCount
+                    ),
+                    Severity::warning()
+                );
             });
         }
 
