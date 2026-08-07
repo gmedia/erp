@@ -781,7 +781,6 @@ class MenuSeeder extends Seeder
                     'asset_category',
                     'asset_model',
                     'asset_location',
-                    'accounts',
                     'pipeline',
                 ],
                 'icon' => 'Database',
