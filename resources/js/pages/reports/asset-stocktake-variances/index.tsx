@@ -16,7 +16,7 @@ export default function StocktakeVarianceReport() {
             title="Stocktake Variance Report"
             breadcrumbs={createReportBreadcrumbs(
                 'Stocktake Variance',
-                '/asset-stocktake-variances',
+                '/reports/asset-stocktake-variances',
             )}
             columns={varianceColumns}
             filterFields={createVarianceFilterFields()}

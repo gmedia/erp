@@ -31,7 +31,7 @@ Fitur utama:
 | Asset Maintenances | /asset-maintenances | Jadwal dan histori perawatan |
 | Asset Stocktakes | /asset-stocktakes | Stocktake header dengan perform page |
 | Asset Depreciation Runs | /asset-depreciation-runs | Run depresiasi dengan calculate/post/void |
-| Asset Stocktake Variance Report | /asset-stocktake-variances | Laporan variance stocktake |
+| Asset Stocktake Variance Report | /reports/asset-stocktake-variances | Laporan variance stocktake |
 
 ## 1. Manajemen Data Aset
 
@@ -421,7 +421,7 @@ Field form:
 
 ### 7.5 Variance Report
 
-Setelah stocktake completed, variance report tersedia di `/asset-stocktake-variances` menampilkan:
+Setelah stocktake completed, variance report tersedia di `/reports/asset-stocktake-variances` menampilkan:
 - Aset yang tidak ditemukan di lokasi expected
 - Aset yang ditemukan di lokasi berbeda
 - Perbedaan kondisi
@@ -590,7 +590,7 @@ A: Ya, gunakan fitur Import di toolbar halaman Assets. Download template, isi da
 
 ### Q: Bagaimana cara melihat variance stocktake?
 
-A: Setelah stocktake completed, buka halaman `/asset-stocktake-variances` untuk melihat laporan variance semua stocktake.
+A: Setelah stocktake completed, buka halaman `/reports/asset-stocktake-variances` untuk melihat laporan variance semua stocktake.
 
 ### Q: Bisakah depreciation run di-edit setelah posted?
 
