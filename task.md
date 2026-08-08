@@ -1,61 +1,62 @@
 # task.md — Active Session Handoff
 
-**Last updated:** 2026-08-06  
-**Current milestone:** Sonar MAJOR wave 2 + budget E2E status docs shipped as PR #79  
-**Branch:** `fix/sonar-major-wave2` @ `5bc1c0d7`  
-**Open PRs:** #77 (CI running, exclusive Employee*/BR/number-format), #79 (wave2 — do not poll CI)
+**Last updated:** 2026-08-08  
+**Current milestone:** Visual audit — **Wave 0–1 complete** (capture + vision); **Wave 2 mass capture FROZEN**  
+**Branch:** `chore/visual-audit-wave-0-1`  
+**Open PR:** https://github.com/gmedia/erp/pull/86  
+**Vision session:** multimodal-looker `ses_02021a5c2ffeaD0HIIg6ymhnEW`
 
-## What changed in this session
+## Read order
 
-- Combined #1+#2 on `fix/sonar-major-wave2` from main tip `a46fef52` (#78)
-- php:S103: aging dashboard action + DetectCrossBranchJournals + 3 Backfill* commands
-- S9011: explicit `type="button"` on shared UI, AccountTree chevron, verify-email
-- S4782: `calendar.tsx` `buttonVariant` → `NonNullable<...>`
-- `AGENTS.md`: Tool & Process Concurrency hard limits (max 3 tools/turn, no parallel explore swarms)
-- `IMPLEMENTATION_STATUS.md`: Budget #72 CRUD + #75 variance report E2E wording
-- 6 atomic commits; pushed; **PR #79** opened
+1. `task.md` (this)  
+2. `docs/visual-audit/BACKLOG.md` (T1–T5 + hotfixes)  
+3. `docs/visual-audit/FINDINGS.md`  
+4. `docs/visual-audit-plan.md` (program; stop-rule applied)
 
-## Commits on branch
+## Done
 
+- Wave 0 setup + smoke `/dashboard`
+- Wave 1 capture 7/7 PASS
+- Multimodal vision on 8 PNGs → FINDINGS + BACKLOG
+- **Stop-rule YES** (≥3 shared-shell; ~11 material)
+
+## P0 callouts
+
+1. **FD-01** Negative cash balance styled green  
+2. **EMP-01 / SHELL-07** Wide tables clip Actions  
+3. **ACC-02 / SHELL-08** Wrong sidebar active on Chart of Accounts  
+
+## Themes (do not implement until user picks)
+
+T1 DataTable shell · T2 Sidebar · T3 Page header · T4 KPI semantics · T5 Sparse density  
+
+Hotfixes HF-1..3 in BACKLOG for smaller MRs.
+
+## Do not
+
+- Mass-capture Wave 2 / remaining 78 routes  
+- Use default `playwright.config.ts` for visual (migrate:fresh)  
+- Redesign all 85 modules in one MR  
+
+## Capture (exceptions only)
+
+```bash
+VISUAL_AUDIT=1 VISUAL_AUDIT_WAVE=wave-X VISUAL_AUDIT_ROUTES='...' \
+  PLAYWRIGHT_BASE_URL=http://127.0.0.1:82 \
+  npx playwright test -c playwright.visual-audit.config.ts --workers=1
 ```
-5bc1c0d7 docs: mark budget variance report E2E as landed (#75)
-a3e0a79e docs: add OpenCode process budget concurrency rules
-4d13cb7b fix: tighten calendar buttonVariant type (S4782)
-49553691 fix: add explicit button types on AccountTree and verify-email
-ea1ab741 fix: add explicit button types on shared UI (S9011)
-1fee38a2 fix: break long PHP lines (Sonar S103)
-```
 
-## Validated commands and outcomes
+## Recommended next
 
-- Multi-commit via git-master (`GIT_MASTER=1`) — clean tree after 6 commits
-- `git push -u origin HEAD` OK
-- `gh pr create` → https://github.com/gmedia/erp/pull/79
-- **Did not** poll CI (AGENTS rule)
-
-## Open risks/blockers
-
-- #77 exclusive files — do not edit until #77 merged
-- OpenCode process budget — stay serial (≤3 tools/turn)
-- Stash `task-md-pre-wave2` may still exist; drop after handoff confirmed
-
-## Recommended next step
-
-1. **User-driven:** when #77 green → squash-merge + delete branch + `rtk git pull --ff-only` on main
-2. **User-driven:** when #79 green → same
-3. **Parallel-safe while CI runs (if needed):** next Sonar MAJOR batch that does **not** touch #77 or #79 file sets — only after checking exclusive lists; prefer wait for merge to reduce conflict risk
-4. Do **not** poll `gh pr checks` in a loop
+1. User: **commit** chore docs/harness **or** implement **HF-1** (cash color) / **HF-2** (sticky actions) / **T1** plan  
+2. After shared chrome ships: optional re-smoke 3–5 routes only  
 
 ## Continuation Prompt
 
 ```
-Read task.md. PR #79 is Sonar wave 2 + docs (branch fix/sonar-major-wave2).
-PR #77 still exclusive until merged. Session start: process open MRs first
-(merge green, fix red). Never wait/poll CI. Stay within AGENTS.md process budget
-(max 3 tools/turn, serial). Do not re-touch #77 files.
+Read task.md + docs/visual-audit/BACKLOG.md + FINDINGS.md.
+Wave 0–1 capture+vision done; Wave 2 mass capture FROZEN (stop-rule).
+P0: FD-01 negative cash green; EMP sticky Actions; ACC sidebar active.
+Next only if user asks: commit chore OR implement HF/T theme (one MR).
+Vision session: ses_02021a5c2ffeaD0HIIg6ymhnEW. Base :82 workers=1.
 ```
-
-## Exclusive file sets (do not touch while open)
-
-**#77:** EmployeeViewModal, IndexEmployeesAction, EmployeeExport, IndexEmployeeRequest, BankReconciliationWorkspace, number-format.ts  
-**#79 (this PR):** wave2 PHP S103 targets, S9011 TSX list, calendar.tsx, AGENTS.md, IMPLEMENTATION_STATUS.md
