@@ -9,6 +9,7 @@ export interface KpiCardProps {
     formattedValue: string;
     borderColor: string;
     iconColor: string;
+    valueClassName?: string;
     children?: ReactNode;
 }
 
@@ -18,6 +19,7 @@ export function KpiCard({
     formattedValue,
     borderColor,
     iconColor,
+    valueClassName,
     children,
 }: KpiCardProps) {
     return (
@@ -31,7 +33,11 @@ export function KpiCard({
                 <Icon className={`h-4 w-4 ${iconColor}`} />
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold">{formattedValue}</div>
+                <div
+                    className={`text-2xl font-bold tabular-nums ${valueClassName ?? ''}`}
+                >
+                    {formattedValue}
+                </div>
                 {children}
             </CardContent>
         </Card>

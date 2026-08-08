@@ -67,6 +67,25 @@ function getChangeBadge(change: number, isExpenseOrLiability: boolean = false) {
     );
 }
 
+function signedBalanceChrome(
+    value: number,
+    positive: { borderColor: string; iconColor: string },
+): {
+    borderColor: string;
+    iconColor: string;
+    valueClassName?: string;
+} {
+    if (value < 0) {
+        return {
+            borderColor: 'border-l-rose-500',
+            iconColor: 'text-rose-500',
+            valueClassName: 'text-rose-600 dark:text-rose-400',
+        };
+    }
+
+    return positive;
+}
+
 export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
     data,
     isLoading,
@@ -143,8 +162,10 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
         {
             title: 'Net Income',
             icon: DollarSign,
-            borderColor: 'border-l-blue-500',
-            iconColor: 'text-blue-500',
+            ...signedBalanceChrome(data.net_income.value, {
+                borderColor: 'border-l-blue-500',
+                iconColor: 'text-blue-500',
+            }),
             value: data.net_income.value,
             formattedValue: formatCurrency(data.net_income.value),
             footer: (
@@ -206,8 +227,10 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
         {
             title: 'Equity',
             icon: PiggyBank,
-            borderColor: 'border-l-purple-500',
-            iconColor: 'text-purple-500',
+            ...signedBalanceChrome(data.equity.value, {
+                borderColor: 'border-l-purple-500',
+                iconColor: 'text-purple-500',
+            }),
             value: data.equity.value,
             formattedValue: formatCurrency(data.equity.value),
             footer: (
@@ -227,8 +250,10 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
         {
             title: 'Cash Balance',
             icon: Banknote,
-            borderColor: 'border-l-teal-500',
-            iconColor: 'text-teal-500',
+            ...signedBalanceChrome(data.cash_balance.value, {
+                borderColor: 'border-l-teal-500',
+                iconColor: 'text-teal-500',
+            }),
             value: data.cash_balance.value,
             formattedValue: formatCurrency(data.cash_balance.value),
             footer: (
@@ -258,6 +283,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
                     formattedValue={card.formattedValue}
                     borderColor={card.borderColor}
                     iconColor={card.iconColor}
+                    valueClassName={card.valueClassName}
                 >
                     {card.footer}
                 </KpiCard>
