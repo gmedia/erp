@@ -25,8 +25,14 @@ import {
 } from '@tanstack/react-table';
 
 import { useExport } from '@/hooks/useExport';
+import { cn } from '@/lib/utils';
 import * as React from 'react';
 import type { FieldDescriptor } from './filters';
+
+const STICKY_ACTIONS_CELL =
+    'sticky right-0 z-10 bg-background shadow-[-6px_0_8px_-6px_rgba(0,0,0,0.15)] dark:shadow-[-6px_0_8px_-6px_rgba(0,0,0,0.45)]';
+const STICKY_ACTIONS_HEAD =
+    'sticky right-0 z-20 bg-muted shadow-[-6px_0_8px_-6px_rgba(0,0,0,0.15)] dark:shadow-[-6px_0_8px_-6px_rgba(0,0,0,0.45)]';
 
 // Helper function to safely extract placeholder from filter fields
 function getPlaceholderFromFilterFields(
@@ -299,7 +305,7 @@ export function DataTable<T>({
     if (isLoading) {
         tableContent = loadingRows.map((rowKey) => (
             <TableRow key={rowKey}>
-                {columns.map((column) => {
+                {columnsWithActions.map((column) => {
                     let columnKey = 'loading-column';
                     if ('id' in column && column.id) {
                         columnKey = String(column.id);
@@ -308,11 +314,15 @@ export function DataTable<T>({
                     } else if (typeof column.header === 'string') {
                         columnKey = column.header;
                     }
+                    const isActions = columnKey === 'actions';
 
                     return (
                         <TableCell
                             key={`${rowKey}-${columnKey}`}
-                            className="border-border"
+                            className={cn(
+                                'border-border',
+                                isActions && STICKY_ACTIONS_CELL,
+                            )}
                         >
                             <Skeleton className="h-4 w-full bg-muted" />
                         </TableCell>
@@ -327,21 +337,30 @@ export function DataTable<T>({
                 data-state={row.getIsSelected() && 'selected'}
                 className="hover:bg-muted/50"
             >
-                {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="border-border">
-                        {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                        )}
-                    </TableCell>
-                ))}
+                {row.getVisibleCells().map((cell) => {
+                    const isActions = cell.column.id === 'actions';
+                    return (
+                        <TableCell
+                            key={cell.id}
+                            className={cn(
+                                'border-border',
+                                isActions && STICKY_ACTIONS_CELL,
+                            )}
+                        >
+                            {flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext(),
+                            )}
+                        </TableCell>
+                    );
+                })}
             </TableRow>
         ));
     } else {
         tableContent = (
             <TableRow>
                 <TableCell
-                    colSpan={columns.length}
+                    colSpan={columnsWithActions.length}
                     className="h-24 text-center text-muted-foreground"
                 >
                     No results.
@@ -387,26 +406,33 @@ export function DataTable<T>({
                 table={table}
             />
 
-            {/* Table */}
-            <div className="overflow-hidden rounded-md border border-border">
-                <Table>
+            <div className="rounded-md border border-border">
+                <Table className="min-w-max">
                     <TableHeader className="bg-muted">
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => (
-                                    <TableHead
-                                        key={header.id}
-                                        className="border-border select-none"
-                                    >
-                                        {header.isPlaceholder
-                                            ? null
-                                            : flexRender(
-                                                  header.column.columnDef
-                                                      .header,
-                                                  header.getContext(),
-                                              )}
-                                    </TableHead>
-                                ))}
+                                {headerGroup.headers.map((header) => {
+                                    const isActions =
+                                        header.column.id === 'actions';
+                                    return (
+                                        <TableHead
+                                            key={header.id}
+                                            className={cn(
+                                                'border-border select-none',
+                                                isActions &&
+                                                    STICKY_ACTIONS_HEAD,
+                                            )}
+                                        >
+                                            {header.isPlaceholder
+                                                ? null
+                                                : flexRender(
+                                                      header.column.columnDef
+                                                          .header,
+                                                      header.getContext(),
+                                                  )}
+                                        </TableHead>
+                                    );
+                                })}
                             </TableRow>
                         ))}
                     </TableHeader>
