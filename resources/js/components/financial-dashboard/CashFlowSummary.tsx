@@ -75,7 +75,7 @@ export const CashFlowSummary = memo<CashFlowSummaryProps>(
             {
                 label: 'Net Cash Flow',
                 value: data.net,
-                color: data.net >= 0 ? 'bg-blue-500' : 'bg-amber-500',
+                color: data.net >= 0 ? 'bg-blue-500' : 'bg-rose-500',
             },
         ];
 
