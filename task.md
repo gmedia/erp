@@ -2,7 +2,8 @@
 
 **Last updated:** 2026-08-08  
 **Current milestone:** Visual audit — **Wave 0–1 complete** (capture + vision); **Wave 2 mass capture FROZEN**  
-**Branch:** `main` (+ uncommitted audit artifacts)  
+**Branch:** `chore/visual-audit-wave-0-1`  
+**Open PR:** https://github.com/gmedia/erp/pull/86  
 **Vision session:** multimodal-looker `ses_02021a5c2ffeaD0HIIg6ymhnEW`
 
 ## Read order
