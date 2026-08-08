@@ -20,7 +20,7 @@
 |----|-----|------|--------|
 | HF-1 | P0 | Financial dashboard: negative Cash Balance must not use success green | done (fix/hf1) |
 | HF-2 | P0 | Employees (and wide tables): sticky Actions + horizontal scroll | done (fix/hf2) |
-| HF-3 | P1 | Accounts: fix sidebar active state for Chart of Accounts | open |
+| HF-3 | P1 | Accounts: fix sidebar active state for Chart of Accounts | done (fix/hf3) |
 
 ## Done
 
