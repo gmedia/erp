@@ -39,6 +39,6 @@
 
 ## Next agent action
 
-1. User picks: **HF-1/2/3** quick fixes **or** **T1** shell redesign plan  
-2. Do **not** mass Wave 2 capture  
-3. Optional: commit docs+harness on `chore/visual-audit-wave-0-1`
+1. Merge **PR #89** (HF-3) if still open  
+2. User picks **T1** DataTable shell v2 (preferred) **or** **T2** sidebar density  
+3. Do **not** mass Wave 2 capture
