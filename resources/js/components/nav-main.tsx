@@ -15,10 +15,7 @@ import {
 } from '@/components/ui/sidebar';
 import { useAuth } from '@/contexts/auth-context';
 import { useTranslation } from '@/contexts/i18n-context';
-import {
-    isNavHrefActive,
-    pathMatchesNavHref,
-} from '@/lib/nav-active';
+import { isNavHrefActive, pathMatchesNavHref } from '@/lib/nav-active';
 import { type NavItem } from '@/types';
 import { ChevronRight } from 'lucide-react';
 import { useMemo } from 'react';
