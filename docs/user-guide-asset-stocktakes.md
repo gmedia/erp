@@ -19,7 +19,7 @@ Fitur utama:
 |------|-------|--------|
 | Asset Stocktakes | `/asset-stocktakes` | Daftar stocktake dengan filter, search, CRUD |
 | Asset Stocktake Perform | `/asset-stocktakes/{ulid}/perform` | Halaman khusus untuk mencatat hasil pengecekan |
-| Asset Stocktake Variance Report | `/asset-stocktake-variances` | Laporan variance hasil stocktake |
+| Asset Stocktake Variance Report | `/reports/asset-stocktake-variances` | Laporan variance hasil stocktake |
 
 ## 1. Daftar Asset Stocktakes
 
@@ -95,7 +95,7 @@ Setelah semua aset selesai dicek:
 
 ## 6. Laporan Variance
 
-Hasil stocktake yang sudah completed dapat dilihat di **Asset Stocktake Variance Report** (`/asset-stocktake-variances`). Laporan ini menampilkan aset yang:
+Hasil stocktake yang sudah completed dapat dilihat di **Asset Stocktake Variance Report** (`/reports/asset-stocktake-variances`). Laporan ini menampilkan aset yang:
 - **Not Found**: Aset tidak ditemukan di lokasi manapun
 - **Relocated**: Aset ditemukan di lokasi yang berbeda dari expected
 - **Damaged**: Aset ditemukan dalam kondisi rusak

@@ -398,14 +398,16 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
     - tests/e2e/inventory-valuation-report/inventory-valuation-report.spec.ts
 
 - slug: asset-stocktake-variances
-  route: /asset-stocktake-variances
+  route: /reports/asset-stocktake-variances
   api: /api/asset-stocktake-variances
   export_api: /api/asset-stocktake-variances/export
   search_placeholder: "Search code, name, notes..."
   sortable_columns: [Asset Code, Asset Name, Expected Location, Found Location, Result, Notes, Checked By, Checked At]
-  view_type: dialog
+  view_type: page
   checkbox_header: false
-  note: "Laporan Stocktake Variance (Non-CRUD), menggunakan read-only data table dengan filter."
+  note: "Laporan Stocktake Variance (Non-CRUD). SPA path under /reports/…; API remains /api/asset-stocktake-variances. Sidebar MenuSeeder url: reports/asset-stocktake-variances."
+  tests:
+    - tests/e2e/asset-stocktake-variances/index.spec.ts
 
 - slug: pipelines
   route: /pipelines
@@ -666,11 +668,13 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   checkbox_header: false
   note: "Non-CRUD feature for viewing and exporting approval audit trail logs. Read-only Data Table with Detail modal."
 
-- modul: Asset Dashboard
-  group: asset-dashboard
+- slug: asset-dashboard
+  route: /asset-dashboard
+  api: /api/asset-dashboard/data
+  view_type: page
+  note: "Non-CRUD dashboard visualisasi aset (distribution, condition, maintenance, warranty alerts). Requires asset_dashboard permission. Sidebar MenuSeeder: asset_dashboard → asset-dashboard."
   tests:
     - tests/e2e/asset-dashboard/asset-dashboard.spec.ts
-  note: "Non-CRUD feature for visualizing asset distribution, condition, maintenance, and warranty alerts."
 
 - slug: admin-settings
   route: /admin-settings
