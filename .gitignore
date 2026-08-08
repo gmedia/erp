@@ -44,6 +44,9 @@ test-results/
 output_e2e_test.log
 e2e/.auth/
 
+# Visual audit screenshots (keep markdown + url-list.json)
+docs/visual-audit/waves/**/*.png
+
 # Pest artifacts
 coverage-html/
 coverage-html-new/
