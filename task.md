@@ -1,9 +1,9 @@
 # task.md — Active Session Handoff
 
 **Last updated:** 2026-08-08  
-**Current milestone:** Visual audit — HF-1 (negative cash semantics) in progress on branch  
-**Branch:** `fix/hf1-financial-cash-negative-color`  
-**Main tip:** `aee84afe` (chore visual audit Wave 0–1 #86 merged)  
+**Current milestone:** Visual audit — HF-2 sticky DataTable Actions (PR pending)  
+**Branch:** `fix/hf2-datatable-sticky-actions`  
+**Main tip:** `5245260d` (HF-1 #87 merged)  
 **Vision session:** multimodal-looker `ses_02021a5c2ffeaD0HIIg6ymhnEW`
 
 ## Read order
@@ -16,13 +16,14 @@
 ## Done
 
 - Wave 0–1 harness + plan + FINDINGS/BACKLOG (PR #86 merged)
-- **HF-1:** signed-balance KPI chrome — Cash / Net Income / Equity use rose when value &lt; 0; `KpiCard.valueClassName`; net cash flow bar rose when negative
+- **HF-1:** signed-balance KPI chrome — Cash / Net Income / Equity rose when &lt; 0 (PR #87)
+- **HF-2:** sticky `actions` column + allow horizontal scroll on shared `DataTable` (`DataTableCore`); `createActionsColumn` size 56
 
 ## P0 remaining
 
-1. ~~**FD-01** Negative cash balance styled green~~ → HF-1 (this branch)  
-2. **EMP-01 / SHELL-07** Wide tables clip Actions → HF-2  
-3. **ACC-02 / SHELL-08** Wrong sidebar active on Chart of Accounts → HF-3  
+1. ~~FD-01 / HF-1~~  
+2. ~~EMP-01 / SHELL-07 / HF-2~~ (this branch)  
+3. **ACC-02 / SHELL-08** Wrong sidebar active on Chart of Accounts → **HF-3**
 
 ## Themes (user picks next)
 
@@ -34,19 +35,17 @@ T1 DataTable shell · T2 Sidebar · T3 Page header · T4 KPI semantics · T5 Spa
 - Use default `playwright.config.ts` for visual (migrate:fresh)  
 - Redesign all 85 modules in one MR  
 
-## Recommended next (after HF-1 PR)
+## Recommended next (after HF-2 PR merge)
 
-1. HF-2 sticky Actions  
-2. HF-3 Accounts sidebar active  
-3. Then T1 shell if capacity  
+1. HF-3 Accounts sidebar active  
+2. Then T1 shell if capacity  
 
-## Files (HF-1)
+## Files (HF-2)
 
-- `resources/js/components/common/KpiCard.tsx`  
-- `resources/js/components/financial-dashboard/SummaryCards.tsx`  
-- `resources/js/components/financial-dashboard/CashFlowSummary.tsx`  
+- `resources/js/components/common/DataTableCore.tsx`  
+- `resources/js/utils/columns.tsx`  
 - `docs/visual-audit/BACKLOG.md`  
 
 ## Continuation Prompt
 
-Continue HF-1 PR if open; else implement HF-2 sticky DataTable Actions on a new `fix/hf2-*` branch from main. Do not Wave 2 mass capture.
+After HF-2 merge: implement HF-3 CoA sidebar active on `fix/hf3-*` from main. Do not Wave 2 mass capture.

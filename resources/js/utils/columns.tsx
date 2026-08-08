@@ -362,6 +362,7 @@ export function createActionsColumn<T = Record<string, unknown>>(
     return {
         id: 'actions',
         enableHiding,
+        size: 56,
         meta: {
             viewPath,
         },
