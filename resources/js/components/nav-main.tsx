@@ -15,17 +15,40 @@ import {
 } from '@/components/ui/sidebar';
 import { useAuth } from '@/contexts/auth-context';
 import { useTranslation } from '@/contexts/i18n-context';
+import { isNavHrefActive, pathMatchesNavHref } from '@/lib/nav-active';
 import { type NavItem } from '@/types';
 import { ChevronRight } from 'lucide-react';
+import { useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 import { Badge } from '@/components/ui/badge';
+
+function collectNavHrefs(items: NavItem[]): string[] {
+    const hrefs: string[] = [];
+
+    for (const item of items) {
+        if (item.href && item.href !== '#') {
+            hrefs.push(item.href);
+        }
+        if (item.children?.length) {
+            for (const child of item.children) {
+                if (child.href && child.href !== '#') {
+                    hrefs.push(child.href);
+                }
+            }
+        }
+    }
+
+    return hrefs;
+}
 
 export function NavMain({ items = [] }: Readonly<{ items: NavItem[] }>) {
     const { pendingApprovalsCount } = useAuth();
     const location = useLocation();
     const pendingCount = pendingApprovalsCount || 0;
     const { t } = useTranslation();
+
+    const allHrefs = useMemo(() => collectNavHrefs(items), [items]);
 
     return (
         <SidebarGroup className="px-2 py-0">
@@ -37,7 +60,10 @@ export function NavMain({ items = [] }: Readonly<{ items: NavItem[] }>) {
                             key={item.title}
                             asChild
                             defaultOpen={item.children.some((child) =>
-                                location.pathname.startsWith(child.href),
+                                pathMatchesNavHref(
+                                    location.pathname,
+                                    child.href,
+                                ),
                             )}
                             className="group/collapsible"
                         >
@@ -59,8 +85,10 @@ export function NavMain({ items = [] }: Readonly<{ items: NavItem[] }>) {
                                             >
                                                 <SidebarMenuSubButton
                                                     asChild
-                                                    isActive={location.pathname.startsWith(
+                                                    isActive={isNavHrefActive(
+                                                        location.pathname,
                                                         subItem.href,
+                                                        allHrefs,
                                                     )}
                                                 >
                                                     <Link to={subItem.href}>
@@ -95,8 +123,10 @@ export function NavMain({ items = [] }: Readonly<{ items: NavItem[] }>) {
                         <SidebarMenuItem key={item.title}>
                             <SidebarMenuButton
                                 asChild
-                                isActive={location.pathname.startsWith(
+                                isActive={isNavHrefActive(
+                                    location.pathname,
                                     item.href,
+                                    allHrefs,
                                 )}
                                 tooltip={{ children: item.title }}
                             >
