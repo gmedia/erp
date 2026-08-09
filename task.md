@@ -1,7 +1,7 @@
 # task.md — Active Session Handoff
 
 **Last updated:** 2026-08-08  
-**Current milestone:** Visual audit — HF-3 shipped as **PR #89** (await user merge)  
+**Current milestone:** Visual audit — HF-3 **PR #89** (CI: Quality/Pest/Sonar green; E2E 1 flaky Asset export create — unrelated to nav; failed job re-runned)  
 **Branch:** `fix/hf3-accounts-sidebar-active`  
 **Commits:** `d4b85789` (fix nav-active) · `32ed7582` (docs)  
 **PR:** https://github.com/gmedia/erp/pull/89  
