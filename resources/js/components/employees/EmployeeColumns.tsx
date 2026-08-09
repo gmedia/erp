@@ -63,9 +63,7 @@ export const employeeColumns: ColumnDef<Employee>[] = [
             }
 
             const label = status === 'intern' ? 'Intern' : 'Regular';
-            return (
-                <Badge variant={statusBadgeVariant(status)}>{label}</Badge>
-            );
+            return <Badge variant={statusBadgeVariant(status)}>{label}</Badge>;
         },
     },
     createEmailColumn<Employee>({ accessorKey: 'email', label: 'Email' }),

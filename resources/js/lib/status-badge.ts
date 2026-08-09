@@ -5,7 +5,9 @@ const POSITIVE: BadgeVariant = 'default';
 const MUTED: BadgeVariant = 'secondary';
 const DANGER: BadgeVariant = 'destructive';
 
-export function statusBadgeVariant(status: string | null | undefined): BadgeVariant {
+export function statusBadgeVariant(
+    status: string | null | undefined,
+): BadgeVariant {
     if (!status) {
         return NEUTRAL;
     }
