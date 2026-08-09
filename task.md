@@ -1,8 +1,9 @@
 # task.md — Active Session Handoff
 
 **Last updated:** 2026-08-09  
-**Current milestone:** Visual audit — **T1 DataTable shell v2** (in progress)  
-**Branch:** `feat/t1-datatable-shell-v2` (from main `bf5758d8`)  
+**Current milestone:** Visual audit — **T1 DataTable shell v2** → **PR #90**  
+**Branch:** `feat/t1-datatable-shell-v2` @ `2b63e4d0` (from main `bf5758d8`)  
+**PR:** https://github.com/gmedia/erp/pull/90  
 **Vision session:** multimodal-looker `ses_02021a5c2ffeaD0HIIg6ymhnEW`
 
 ## Read order
@@ -21,18 +22,23 @@
 | HF-2 | #88 | sticky DataTable Actions + scroll |
 | HF-3 | #89 | nav segment match + longest-href (CoA) |
 
-## What changed this session (T1 WIP)
+## What changed this session (T1 → PR #90)
 
-Shared chrome (not committed yet unless agent commits next):
+Commits on branch (4 atomic):
 
-- `DataTableToolbar.tsx` — single flex-wrap row; search + `ml-auto` actions (SHELL-02/03)
-- `DataTableCore.tsx` — bulk selection bar + clear; `enableRowSelection`; table border wrap; pagination footer chrome; Button import (SHELL-10/11)
-- `PaginationControls.tsx` — responsive footer layout, stronger “Showing…” text (SHELL-11)
-- `lib/status-badge.ts` — shared `statusBadgeVariant` / `formatStatusLabel`
-- `EmployeeColumns.tsx` + `PurchaseOrderColumns.tsx` — semantic Badge variants (SHELL-06 / EMP-03 / PO-01)
-- `BACKLOG.md` — T1 in progress; T2 active-route partial (HF-3)
+1. `a2ad8777` feat: semantic status badges for employees and POs  
+2. `0c71b883` feat: single-row DataTable toolbar layout  
+3. `aec6123e` feat: DataTable bulk bar and pagination chrome  
+4. `2b63e4d0` docs: mark T1 DataTable shell in progress  
 
-Sticky Actions (HF-2) **unchanged**.
+- `DataTableToolbar.tsx` — single flex-wrap row (SHELL-02/03)  
+- `DataTableCore.tsx` — bulk bar + shell (SHELL-10/11)  
+- `PaginationControls.tsx` — footer chrome  
+- `lib/status-badge.ts` + EMP/PO columns — SHELL-06  
+- Sticky Actions (HF-2) **unchanged**  
+- `e2e/` left untracked  
+
+Validated: `tsc --noEmit` clean.
 
 ## Themes remaining
 
@@ -53,11 +59,11 @@ Sticky Actions (HF-2) **unchanged**.
 
 ## Recommended next
 
-1. `npm run types` (or sail) on touched TS  
-2. Optional light smoke: `/employees`, `/purchase-orders`, `/departments`  
-3. Commit + push + **one PR** for T1 only  
-4. Mark BACKLOG T1 done after merge  
+1. Review/merge **PR #90** when ready (do not block on local CI wait)  
+2. After merge: mark BACKLOG T1 done; pull main  
+3. Optional: T2 sidebar density **or** light visual re-smoke  
+4. **No** Wave 2 mass capture  
 
 ## Continuation Prompt
 
-Finish T1: verify types/lint, commit on `feat/t1-datatable-shell-v2`, open MR with handoff. No Wave 2. Do not include `e2e/`.
+PR #90 open for T1. Merge when green, update BACKLOG T1 → done, then T2 residual or re-smoke. No Wave 2.
