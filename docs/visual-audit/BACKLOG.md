@@ -8,8 +8,8 @@
 
 | ID | Pri | Theme | Scope | Status | Notes |
 |----|-----|-------|-------|--------|-------|
-| T1 | P0–P1 | DataTable shell v2 | EntityCrudPage / shared table | open | Single toolbar row; sticky Actions; semantic Status; scroll discipline; bulk bar optional. Fixes SHELL-02,03,06,07,10,11; EMP-*; PO-* |
-| T2 | P1 | Sidebar IA & active | AppLayout / nav | open | Truncation strategy; **correct active route**; density. SHELL-01,08,09; ACC-02 |
+| T1 | P0–P1 | DataTable shell v2 | EntityCrudPage / shared table | in progress (`feat/t1-datatable-shell-v2`) | Single toolbar row; sticky Actions (HF-2); semantic Status; bulk bar; pagination chrome. SHELL-02,03,06,10,11; EMP-*; PO-* |
+| T2 | P1 | Sidebar IA & active | AppLayout / nav | partial | **Active route done (HF-3)**; truncation/density still open. SHELL-01,09 |
 | T3 | P1 | Page header contract | Layout primitive | open | breadcrumb + title + desc + actions; no double title / bare breadcrumb drift. SHELL-04; ACC-01; RSM-02; FD-06 |
 | T4 | P0–P1 | Dashboard & KPI semantics | Home + financial dash + amounts | open | Home content strategy; **danger for negatives**; hide comparison until Compare set; FY visible. FD-01..03; DASH-*; BS-02 |
 | T5 | P1–P2 | Sparse & report density | ReportDataTable + list | open | Summary strip / empty panels; report H1 parity. SHELL-05; RSM-01 |
