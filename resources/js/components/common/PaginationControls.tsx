@@ -35,14 +35,14 @@ export function PaginationControls({
     renderPageNumbers: () => React.ReactNode;
 }>) {
     return (
-        <div className="flex flex-col gap-3 py-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+        <div className="flex flex-col gap-2 py-2 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:text-sm">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
                 <p className="whitespace-nowrap">Rows per page</p>
                 <Select
                     value={String(pagination.per_page)}
                     onValueChange={onPageSizeChange}
                 >
-                    <SelectTrigger className="w-[70px] border-border bg-background">
+                    <SelectTrigger className="h-8 w-[70px] border-border bg-background">
                         <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="border-border bg-background text-foreground">

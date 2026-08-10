@@ -72,9 +72,9 @@ export function DataTablePage<
                 <title>{title}</title>
             </Helmet>
             <AppLayout breadcrumbs={breadcrumbs}>
-                <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                <div className="flex w-full flex-col gap-3 overflow-x-auto p-4">
                     {children}
-                    <div className="rounded-lg bg-white">
+                    <div className="rounded-lg border border-border/60 bg-card shadow-sm">
                         <DataTable
                             columns={columns}
                             data={data}

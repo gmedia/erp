@@ -295,7 +295,7 @@ export function FinancialReportPageShell({
         );
     } else {
         content = (
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
+            <div className="flex w-full flex-col gap-3 p-4">
                 <PageHeader
                     title={title}
                     meta={headerMeta}
