@@ -1,3 +1,4 @@
+import { PageHeader } from '@/components/common/PageHeader';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
@@ -40,31 +41,27 @@ export default function DashboardPageShell({
                 <title>{title}</title>
             </Helmet>
             <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-4 pb-12 md:p-6">
-                <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
-                    <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-foreground">
-                            {heading}
-                        </h1>
-                        <p className="mt-1 text-muted-foreground">
-                            {description}
-                        </p>
-                    </div>
-                    <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-                        {toolbar}
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => refetch()}
-                            disabled={isLoading}
-                            className="flex items-center gap-2"
-                        >
-                            <RefreshCw
-                                className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`}
-                            />
-                            Refresh Data
-                        </Button>
-                    </div>
-                </div>
+                <PageHeader
+                    title={heading}
+                    description={description}
+                    actions={
+                        <>
+                            {toolbar}
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => refetch()}
+                                disabled={isLoading}
+                                className="flex items-center gap-2"
+                            >
+                                <RefreshCw
+                                    className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`}
+                                />
+                                Refresh Data
+                            </Button>
+                        </>
+                    }
+                />
 
                 {isError && (
                     <Alert variant="destructive" className="mb-4">
