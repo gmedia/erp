@@ -42,13 +42,17 @@
 - Wait on CI (AGENTS: never wait for CI)  
 - Parallel tool fan-out (AGENTS: ≤3 tools/turn; post-kill = 1)
 
+## Re-smoke (2026-08-10)
+
+- Command: `VISUAL_AUDIT=1 PLAYWRIGHT_BASE_URL=http://127.0.0.1:82 npx playwright test -c playwright.visual-audit.config.ts`
+- Result: **84 pass / 1 fail** (`/asset-models` → login bounce)
+- PNGs: `docs/visual-audit/waves/**` (gitignored). Harness uses full MenuSeeder url-list (85), not Wave 0–1 subset
+
 ## Recommended next (pick one)
 
-### A — Selective visual re-smoke (recommended default)
-- **Only** `playwright.visual-audit.config.ts`
-- 1 worker; base `http://127.0.0.1:82`; admin login
-- Re-capture Wave 0–1 shell routes; PNGs gitignored
-- Optional multimodal-looker / human: confirm SHELL-05 void reduced; no T1–T4 regressions
+### A — Human / multimodal spot-check (recommended)
+- Review Wave 0–1 shell PNGs post-T5 (SHELL-05 density, no T1–T4 regressions)
+- Optionally fix `/asset-models` auth/permission for visual capture
 
 ### B — Exception surface (one MR)
 - My Approvals **or** asset profile **or** dense modal — not full leaf inventory
@@ -56,6 +60,9 @@
 ### C — Residual FINDINGS (optional product)
 - PO-05 Grand Total column; BS-01 Compare label; SHELL-12 home vs FD product call
 
+### D — Harness improvement (optional chore)
+- Env allowlist so re-smoke can be truly selective (7–8 routes)
+
 ## Continuation Prompt
 
-Main at `03c22267` (T5 #94 merged). T1–T5 closed. Run selective Wave 0–1 re-smoke with visual-audit config only, then optionally one exception-surface MR. No mass Wave 2. Keep `e2e/` untracked.
+Closeout PR #95 open. Main tip pre-closeout: `03c22267` (T5 #94). Re-smoke 84/85 done (asset-models fail). Next: spot-check PNGs or one exception-surface MR. Keep `e2e/` untracked.

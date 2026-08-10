@@ -49,7 +49,7 @@
 
 ## Next agent action
 
-1. **Selective re-smoke** Wave 0–1 routes with `playwright.visual-audit.config.ts` only (1 worker; never default Playwright config)  
-2. Optional multimodal / human pass on re-captured PNGs (shared-shell re-review)  
-3. If clean: one **exception surface** MR (My Approvals **or** asset profile **or** modal) — not mass Wave 2  
-4. Do **not** mass-capture remaining ~78 routes  
+1. ~~Selective re-smoke~~ **Done 2026-08-10:** `VISUAL_AUDIT=1` + `playwright.visual-audit.config.ts` — **84/85 PASS**; **FAIL** `/asset-models` (bounced to `/login`). Note: harness walks full `url-list.json` (85), not Wave 0–1 only — treat as opportunistic full leaf pass; PNGs gitignored under `docs/visual-audit/waves/`  
+2. Optional multimodal / human pass on key Wave 0–1 PNGs (employees, departments, PO, stock-movement report, dashboard, FD, accounts, balance-sheet)  
+3. If clean: one **exception surface** MR (My Approvals **or** asset profile **or** modal) — not a second mass capture  
+4. Optional: add route filter to visual-audit harness so “selective” ≠ all 85  
