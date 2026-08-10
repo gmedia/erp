@@ -1,6 +1,7 @@
 'use client';
 
 import { DataTable } from '@/components/common/DataTableCore';
+import { PageHeader } from '@/components/common/PageHeader';
 import type { FieldDescriptor } from '@/components/common/filters';
 import type { FilterState } from '@/hooks/useCrudFilters';
 import { useCrudFilters } from '@/hooks/useCrudFilters';
@@ -38,6 +39,7 @@ type ReportDataTablePageProps<
     TFilters extends FilterState = FilterState,
 > = {
     title: string;
+    description?: string;
     breadcrumbs: BreadcrumbItem[];
     columns: ColumnDef<TData>[];
     filterFields: FieldDescriptor[];
@@ -55,6 +57,7 @@ export function ReportDataTablePage<
     TFilters extends FilterState = FilterState,
 >({
     title,
+    description,
     breadcrumbs,
     columns,
     filterFields,
@@ -93,6 +96,7 @@ export function ReportDataTablePage<
             </Helmet>
             <AppLayout breadcrumbs={breadcrumbs}>
                 <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
+                    <PageHeader title={title} description={description} />
                     <div className="rounded-lg bg-white">
                         <DataTable
                             columns={columns}

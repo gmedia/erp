@@ -1,10 +1,10 @@
 # task.md — Active Session Handoff
 
 **Last updated:** 2026-08-10  
-**Current milestone:** Visual audit — resolve **PR #91** (T2) conflicts after **#90** merged; **T3** is PR #92  
-**Branch:** `feat/t2-sidebar-density` (merging `origin/main`)  
+**Current milestone:** Visual audit — **T3** PR #92 after **#90** + **#91** on main  
+**Branch:** `feat/t3-page-header`  
 **T1:** PR #90 **merged**  
-**T2 PR:** https://github.com/gmedia/erp/pull/91  
+**T2:** PR #91 **merged**  
 **T3 PR:** https://github.com/gmedia/erp/pull/92  
 **Vision session:** multimodal-looker `ses_02021a5c2ffeaD0HIIg6ymhnEW`
 
@@ -17,39 +17,50 @@
 
 ## Done
 
-- Wave 0–1 + HF-1–3 on main  
+- Wave 0–1 harness + plan + FINDINGS/BACKLOG (PR #86)  
+- **HF-1–3** on main  
 - **T1** DataTable shell v2 — **PR #90 merged**  
-- **T2** sidebar density/truncation — PR #91 (conflict fix in progress after #90)  
-- **T3** page header — PR #92 open (`feat/t3-page-header`)
+- **T2** Sidebar density — **PR #91 merged**  
+- **T3** (this branch / PR #92):
+  - `PageHeader` primitive (`title` / `description` / `actions` / `meta`)
+  - Wired: `DashboardPageShell`, `ReportDataTablePage` (+ optional `description`), `FinancialReportPageShell`
+  - Pages: stock-movements (RSM-02), financial-dashboard (FD-06 “Financial Overview”), accounts (ACC-01)
 
-## Themes
+## Themes status
 
-| ID | Status |
-|----|--------|
-| T1 | **merged** (#90) |
-| **T2** | PR #91 — conflict resolve → re-push |
-| T3 | PR #92 open |
-| T4–T5 | open |
+| ID | Theme | Status |
+|----|-------|--------|
+| T1 | DataTable shell v2 | **merged** (#90) |
+| T2 | Sidebar IA residual | **merged** (#91) |
+| **T3** | Page header contract | **PR #92** |
+| T4 | Dashboard & KPI | open after T3 |
+| T5 | Sparse & report density | open |
 
 ## Do not
 
-- Mass Wave 2 capture  
-- Default playwright visual (`migrate:fresh`)  
-- Commit untracked `e2e/`  
-- Wait on CI; one theme = one branch = one MR  
-
-## Files (T2)
-
-- `resources/js/components/ui/sidebar.tsx`  
-- `resources/js/components/nav-main.tsx`  
-- `docs/visual-audit/BACKLOG.md` · `task.md` (conflict resolution)
+- Mass-capture Wave 2 / remaining 78 routes  
+- Use default `playwright.config.ts` for visual (migrate:fresh)  
+- Redesign all 85 modules in one MR  
+- Commit local untracked `e2e/` junk  
+- Wait on CI (AGENTS: never wait for CI)
 
 ## Recommended next
 
-1. Finish merge of `origin/main` into `feat/t2-sidebar-density` → push → human merge #91  
-2. Refresh #92 on main after #91 if needed  
-3. After T2/T3: **T4** dashboard/KPI  
+1. Human: merge **#92** when ready  
+2. After merge: pull main; mark T3 done; pick **T4**  
+3. Optional light re-smoke with **visual-audit config only**
+
+## Files (T3)
+
+- `resources/js/components/common/PageHeader.tsx`  
+- `resources/js/components/common/DashboardPageShell.tsx`  
+- `resources/js/components/common/ReportDataTablePage.tsx`  
+- `resources/js/components/reports/financial/FinancialReportPageShell.tsx`  
+- `resources/js/pages/accounts/index.tsx`  
+- `resources/js/pages/stock-movements/index.tsx`  
+- `resources/js/pages/financial-dashboard/index.tsx`  
+- `docs/visual-audit/BACKLOG.md` · `task.md`
 
 ## Continuation Prompt
 
-T1 (#90) merged. Fix #91 conflicts (docs only expected), push T2, merge #91 then #92. No Wave 2 mass capture.
+T1 (#90) and T2 (#91) merged. Resolve #92 docs conflicts if needed, push, human merge #92. Then **T4**. No Wave 2 mass capture. Keep `e2e/` untracked.

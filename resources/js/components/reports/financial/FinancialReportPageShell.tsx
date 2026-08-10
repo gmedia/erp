@@ -1,4 +1,5 @@
 import { AsyncSelect } from '@/components/common/AsyncSelect';
+import { PageHeader } from '@/components/common/PageHeader';
 import { Badge } from '@/components/ui/badge';
 import {
     Select,
@@ -295,55 +296,21 @@ export function FinancialReportPageShell({
     } else {
         content = (
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex flex-col gap-1">
-                        <h1 className="text-2xl font-bold tracking-tight">
-                            {title}
-                        </h1>
-                        {headerMeta}
-                    </div>
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-                        <div className="w-full sm:w-[220px]">
-                            <Select
-                                value={String(selectedYearId)}
-                                onValueChange={onYearChange}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Fiscal Year" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {fiscalYears.map((fiscalYear) => (
-                                        <SelectItem
-                                            key={fiscalYear.id}
-                                            value={String(fiscalYear.id)}
-                                        >
-                                            {fiscalYear.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="w-full sm:w-[220px]">
-                            <Select
-                                value={
-                                    comparisonYearId
-                                        ? String(comparisonYearId)
-                                        : 'none'
-                                }
-                                onValueChange={onComparisonChange}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Compare With..." />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="none">None</SelectItem>
-                                    {fiscalYears
-                                        .filter(
-                                            (fiscalYear) =>
-                                                fiscalYear.id !==
-                                                selectedYearId,
-                                        )
-                                        .map((fiscalYear) => (
+                <PageHeader
+                    title={title}
+                    meta={headerMeta}
+                    actions={
+                        <>
+                            <div className="w-full sm:w-[220px]">
+                                <Select
+                                    value={String(selectedYearId)}
+                                    onValueChange={onYearChange}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Fiscal Year" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {fiscalYears.map((fiscalYear) => (
                                             <SelectItem
                                                 key={fiscalYear.id}
                                                 value={String(fiscalYear.id)}
@@ -351,23 +318,59 @@ export function FinancialReportPageShell({
                                                 {fiscalYear.name}
                                             </SelectItem>
                                         ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        {onBranchChange && (
-                            <div className="w-full sm:w-[200px]">
-                                <AsyncSelect
-                                    url="/api/branches"
-                                    placeholder="All Branches"
-                                    value={branchId ?? ''}
-                                    onValueChange={onBranchChange}
-                                    label="Branch"
-                                />
+                                    </SelectContent>
+                                </Select>
                             </div>
-                        )}
-                        {headerActions}
-                    </div>
-                </div>
+                            <div className="w-full sm:w-[220px]">
+                                <Select
+                                    value={
+                                        comparisonYearId
+                                            ? String(comparisonYearId)
+                                            : 'none'
+                                    }
+                                    onValueChange={onComparisonChange}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Compare With..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="none">
+                                            None
+                                        </SelectItem>
+                                        {fiscalYears
+                                            .filter(
+                                                (fiscalYear) =>
+                                                    fiscalYear.id !==
+                                                    selectedYearId,
+                                            )
+                                            .map((fiscalYear) => (
+                                                <SelectItem
+                                                    key={fiscalYear.id}
+                                                    value={String(
+                                                        fiscalYear.id,
+                                                    )}
+                                                >
+                                                    {fiscalYear.name}
+                                                </SelectItem>
+                                            ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            {onBranchChange && (
+                                <div className="w-full sm:w-[200px]">
+                                    <AsyncSelect
+                                        url="/api/branches"
+                                        placeholder="All Branches"
+                                        value={branchId ?? ''}
+                                        onValueChange={onBranchChange}
+                                        label="Branch"
+                                    />
+                                </div>
+                            )}
+                            {headerActions}
+                        </>
+                    }
+                />
 
                 {children}
             </div>

@@ -14,6 +14,7 @@ export default function StockMovementsPage() {
     return (
         <ReportDataTablePage<StockMovementItem>
             title="Stock Movements"
+            description="Digital stock card — product movements by warehouse, type, and period."
             breadcrumbs={[
                 { title: 'Inventory', href: '#' },
                 { title: 'Stock Movements', href: '/stock-movements' },
