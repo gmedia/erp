@@ -10,6 +10,7 @@ import {
     type AccountFormData,
 } from '@/components/accounts/AccountForm';
 import { AccountTree } from '@/components/accounts/AccountTree';
+import { PageHeader } from '@/components/common/PageHeader';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -38,10 +39,8 @@ import axios from 'axios';
 import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Chart of Accounts',
-        href: '/accounts',
-    },
+    { title: 'Master Data', href: '#' },
+    { title: 'Chart of Accounts', href: '/accounts' },
 ];
 
 export default function AccountIndex() {
@@ -206,50 +205,45 @@ export default function AccountIndex() {
             </Helmet>
 
             <div className="flex h-full flex-col space-y-6 p-4">
-                <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
-                    <div>
-                        <h1 className="text-2xl font-bold tracking-tight">
-                            Chart of Accounts
-                        </h1>
-                        <p className="text-muted-foreground">
-                            Manage your hierarchical accounts and COA versions.
-                        </p>
-                    </div>
+                <PageHeader
+                    title="Chart of Accounts"
+                    description="Manage hierarchical accounts and COA versions."
+                    actions={
+                        <div className="flex flex-wrap items-center gap-2">
+                            <Select
+                                value={selectedVersionId || ''}
+                                onValueChange={setSelectedVersionId}
+                            >
+                                <SelectTrigger className="w-[320px]">
+                                    <SelectValue placeholder="Select COA Version" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {coaVersions.map((v) => (
+                                        <SelectItem
+                                            key={v.id}
+                                            value={v.id.toString()}
+                                        >
+                                            {v.name} ({v.status})
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
 
-                    <div className="flex items-center gap-2">
-                        <Select
-                            value={selectedVersionId || ''}
-                            onValueChange={setSelectedVersionId}
-                        >
-                            <SelectTrigger className="w-[320px]">
-                                <SelectValue placeholder="Select COA Version" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {coaVersions.map((v) => (
-                                    <SelectItem
-                                        key={v.id}
-                                        value={v.id.toString()}
-                                    >
-                                        {v.name} ({v.status})
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={handleExport}
-                            disabled={!selectedVersionId || exporting}
-                        >
-                            {exporting ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                                <Download className="h-4 w-4" />
-                            )}
-                        </Button>
-                    </div>
-                </div>
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={handleExport}
+                                disabled={!selectedVersionId || exporting}
+                            >
+                                {exporting ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                    <Download className="h-4 w-4" />
+                                )}
+                            </Button>
+                        </div>
+                    }
+                />
 
                 <div className="flex max-w-md items-center gap-2">
                     <div className="relative flex-1">
