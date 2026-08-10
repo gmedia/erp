@@ -9,7 +9,7 @@
 | ID | Pri | Theme | Scope | Status | Notes |
 |----|-----|-------|-------|--------|-------|
 | T1 | P0–P1 | DataTable shell v2 | EntityCrudPage / shared table | in progress | PR #90 — shell v2; sticky Actions already HF-2 |
-| T2 | P1 | Sidebar IA & active | AppLayout / nav | in progress | Density + truncation tooltips; active route = HF-3. SHELL-01,09 residual; SHELL-08/ACC-02 done HF-3 |
+| T2 | P1 | Sidebar IA & active | AppLayout / nav | in progress | **PR #91** — density + truncation tooltips; active route = HF-3. SHELL-01,09 residual; SHELL-08/ACC-02 done HF-3 |
 | T3 | P1 | Page header contract | Layout primitive | open | breadcrumb + title + desc + actions; no double title / bare breadcrumb drift. SHELL-04; ACC-01; RSM-02; FD-06 |
 | T4 | P0–P1 | Dashboard & KPI semantics | Home + financial dash + amounts | open | Home content strategy; **danger for negatives**; hide comparison until Compare set; FY visible. FD-01..03; DASH-*; BS-02 |
 | T5 | P1–P2 | Sparse & report density | ReportDataTable + list | open | Summary strip / empty panels; report H1 parity. SHELL-05; RSM-01 |
@@ -39,6 +39,6 @@
 
 ## Next agent action
 
-1. Merge **PR #90** (T1) and **T2** sidebar density PR when ready  
+1. Merge **PR #90** (T1) and **PR #91** (T2) when ready  
 2. Then **T3** page header contract (or T4/T5)  
 3. Do **not** mass Wave 2 capture
