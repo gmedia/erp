@@ -13,6 +13,11 @@ import {
     SidebarMenuSubButton,
     SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { useAuth } from '@/contexts/auth-context';
 import { useTranslation } from '@/contexts/i18n-context';
 import { isNavHrefActive, pathMatchesNavHref } from '@/lib/nav-active';
@@ -70,11 +75,14 @@ export function NavMain({ items = [] }: Readonly<{ items: NavItem[] }>) {
                             <SidebarMenuItem>
                                 <CollapsibleTrigger asChild>
                                     <SidebarMenuButton
+                                        size="sm"
                                         tooltip={{ children: item.title }}
                                     >
                                         {item.icon && <item.icon />}
-                                        <span>{item.title}</span>
-                                        <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                                        <span className="min-w-0 flex-1 truncate">
+                                            {item.title}
+                                        </span>
+                                        <ChevronRight className="ml-auto size-4 shrink-0 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                                     </SidebarMenuButton>
                                 </CollapsibleTrigger>
                                 <CollapsibleContent>
@@ -83,36 +91,53 @@ export function NavMain({ items = [] }: Readonly<{ items: NavItem[] }>) {
                                             <SidebarMenuSubItem
                                                 key={subItem.title}
                                             >
-                                                <SidebarMenuSubButton
-                                                    asChild
-                                                    isActive={isNavHrefActive(
-                                                        location.pathname,
-                                                        subItem.href,
-                                                        allHrefs,
-                                                    )}
-                                                >
-                                                    <Link to={subItem.href}>
-                                                        {subItem.icon && (
-                                                            <subItem.icon />
-                                                        )}
-                                                        <span>
-                                                            {subItem.title}
-                                                        </span>
-                                                        {subItem.href ===
-                                                            '/my-approvals' &&
-                                                            pendingCount >
-                                                                0 && (
-                                                                <Badge
-                                                                    variant="destructive"
-                                                                    className="ml-auto flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1 text-[10px]"
-                                                                >
-                                                                    {
-                                                                        pendingCount
-                                                                    }
-                                                                </Badge>
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <SidebarMenuSubButton
+                                                            asChild
+                                                            size="sm"
+                                                            isActive={isNavHrefActive(
+                                                                location.pathname,
+                                                                subItem.href,
+                                                                allHrefs,
                                                             )}
-                                                    </Link>
-                                                </SidebarMenuSubButton>
+                                                        >
+                                                            <Link
+                                                                to={
+                                                                    subItem.href
+                                                                }
+                                                            >
+                                                                {subItem.icon && (
+                                                                    <subItem.icon />
+                                                                )}
+                                                                <span className="min-w-0 flex-1 truncate">
+                                                                    {
+                                                                        subItem.title
+                                                                    }
+                                                                </span>
+                                                                {subItem.href ===
+                                                                    '/my-approvals' &&
+                                                                    pendingCount >
+                                                                        0 && (
+                                                                        <Badge
+                                                                            variant="destructive"
+                                                                            className="ml-auto flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1 text-[10px]"
+                                                                        >
+                                                                            {
+                                                                                pendingCount
+                                                                            }
+                                                                        </Badge>
+                                                                    )}
+                                                            </Link>
+                                                        </SidebarMenuSubButton>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent
+                                                        side="right"
+                                                        align="center"
+                                                    >
+                                                        {subItem.title}
+                                                    </TooltipContent>
+                                                </Tooltip>
                                             </SidebarMenuSubItem>
                                         ))}
                                     </SidebarMenuSub>
@@ -123,6 +148,7 @@ export function NavMain({ items = [] }: Readonly<{ items: NavItem[] }>) {
                         <SidebarMenuItem key={item.title}>
                             <SidebarMenuButton
                                 asChild
+                                size="sm"
                                 isActive={isNavHrefActive(
                                     location.pathname,
                                     item.href,
@@ -132,7 +158,9 @@ export function NavMain({ items = [] }: Readonly<{ items: NavItem[] }>) {
                             >
                                 <Link to={item.href}>
                                     {item.icon && <item.icon />}
-                                    <span>{item.title}</span>
+                                    <span className="min-w-0 flex-1 truncate">
+                                        {item.title}
+                                    </span>
                                     {item.href === '/my-approvals' &&
                                         pendingCount > 0 && (
                                             <Badge
