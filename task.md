@@ -2,7 +2,8 @@
 
 **Last updated:** 2026-08-10  
 **Current milestone:** Visual audit — **T4** dashboard & KPI semantics  
-**Branch:** `feat/t4-dashboard-kpi-semantics` @ `6630f30e` + local T4 edits  
+**Branch:** `feat/t4-dashboard-kpi-semantics`  
+**T4 PR:** https://github.com/gmedia/erp/pull/93  
 **T1–T3:** PRs #90–#92 **merged** on main  
 **Vision session:** multimodal-looker `ses_02021a5c2ffeaD0HIIg6ymhnEW`
 
@@ -33,7 +34,7 @@
 | T1 | DataTable shell v2 | **merged** (#90) |
 | T2 | Sidebar IA residual | **merged** (#91) |
 | T3 | Page header contract | **merged** (#92) |
-| **T4** | Dashboard & KPI | **code on branch** — commit/PR next |
+| **T4** | Dashboard & KPI | **PR #93** |
 | T5 | Sparse & report density | open |
 
 ## Do not
@@ -50,9 +51,8 @@
 
 ## Recommended next
 
-1. Commit T4 (multi-commit OK) + push + `gh pr create`  
-2. Human merge T4  
-3. Then **T5** or light re-smoke (visual-audit config only)
+1. Human merge **#93**  
+2. Then **T5** or light re-smoke (visual-audit config only)
 
 ## Files (T4)
 
@@ -64,4 +64,4 @@
 
 ## Continuation Prompt
 
-T1–T3 merged. On `feat/t4-dashboard-kpi-semantics`: FD-02/03, BS-02, DASH-01 implemented; `tsc` clean. Commit (keep `e2e/` untracked), push, open T4 PR. No Wave 2. After merge → T5.
+T1–T3 merged. T4 **PR #93** open (FD-02/03, BS-02, DASH-01). Human merge → T5. No Wave 2. Keep `e2e/` untracked.
