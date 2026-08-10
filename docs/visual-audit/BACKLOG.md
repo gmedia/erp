@@ -1,6 +1,6 @@
 # Visual Audit — Backlog
 
-**Last updated:** 2026-08-08  
+**Last updated:** 2026-08-10  
 **Source:** multimodal-looker Wave 0–1  
 **Policy:** No Wave 2 mass capture until T1–T3 land or shared-shell re-reviewed
 
@@ -8,11 +8,11 @@
 
 | ID | Pri | Theme | Scope | Status | Notes |
 |----|-----|-------|-------|--------|-------|
-| T1 | P0–P1 | DataTable shell v2 | EntityCrudPage / shared table | open | Single toolbar row; sticky Actions; semantic Status; scroll discipline; bulk bar optional. Fixes SHELL-02,03,06,07,10,11; EMP-*; PO-* |
-| T2 | P1 | Sidebar IA & active | AppLayout / nav | open | Truncation strategy; **correct active route**; density. SHELL-01,08,09; ACC-02 |
-| T3 | P1 | Page header contract | Layout primitive | open | breadcrumb + title + desc + actions; no double title / bare breadcrumb drift. SHELL-04; ACC-01; RSM-02; FD-06 |
-| T4 | P0–P1 | Dashboard & KPI semantics | Home + financial dash + amounts | open | Home content strategy; **danger for negatives**; hide comparison until Compare set; FY visible. FD-01..03; DASH-*; BS-02 |
-| T5 | P1–P2 | Sparse & report density | ReportDataTable + list | open | Summary strip / empty panels; report H1 parity. SHELL-05; RSM-01 |
+| T1 | P0–P1 | DataTable shell v2 | EntityCrudPage / shared table | open (PR #90) | Single toolbar row; sticky Actions; semantic Status; scroll discipline; bulk bar optional. Fixes SHELL-02,03,06,07,10,11; EMP-*; PO-* |
+| T2 | P1 | Sidebar IA & active | AppLayout / nav | open (PR #91) | Truncation strategy; density residual after HF-3. SHELL-01,08,09 |
+| T3 | P1 | Page header contract | Layout primitive | in PR (`feat/t3-page-header`) | Shared `PageHeader`; Dashboard/Report/Financial shells; accounts ACC-01; stock-movements RSM-02; FD-06 title. SHELL-04 |
+| T4 | P0–P1 | Dashboard & KPI semantics | Home + financial dash + amounts | open | Home content strategy; **danger for negatives**; hide comparison until Compare set; FY visible. FD-01..03 residual; DASH-*; BS-02 |
+| T5 | P1–P2 | Sparse & report density | ReportDataTable + list | open | Summary strip / empty panels; report density. SHELL-05; RSM-01 |
 
 ## Hotfixes (can ship before full T1)
 
@@ -39,6 +39,6 @@
 
 ## Next agent action
 
-1. Merge **PR #89** (HF-3) if still open  
-2. User picks **T1** DataTable shell v2 (preferred) **or** **T2** sidebar density  
-3. Do **not** mass Wave 2 capture
+1. Human: merge **PR #90** (T1), **#91** (T2), and T3 PR when green — order flexible  
+2. After merges: pull main; mark T1–T3 done in this table  
+3. Do **not** mass Wave 2 capture; next theme **T4** or residual polish

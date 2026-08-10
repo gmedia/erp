@@ -1,11 +1,10 @@
 # task.md — Active Session Handoff
 
-**Last updated:** 2026-08-08  
-**Current milestone:** Visual audit — HF-3 **PR #89** (CI: Quality/Pest/Sonar green; E2E 1 flaky Asset export create — unrelated to nav; failed job re-runned)  
-**Branch:** `fix/hf3-accounts-sidebar-active`  
-**Commits:** `d4b85789` (fix nav-active) · `32ed7582` (docs)  
-**PR:** https://github.com/gmedia/erp/pull/89  
-**Main tip (pre-merge):** `5e9abaa4` (HF-2 #88)  
+**Last updated:** 2026-08-10  
+**Current milestone:** Visual audit — **T3 page header** on `feat/t3-page-header` (ship PR; parallel with #90/#91)  
+**Branch:** `feat/t3-page-header`  
+**Base main tip:** `bf5758d8` (HF-1–3 landed)  
+**Open PRs:** T1 [#90](https://github.com/gmedia/erp/pull/90) · T2 [#91](https://github.com/gmedia/erp/pull/91) · T3 (this branch)  
 **Vision session:** multimodal-looker `ses_02021a5c2ffeaD0HIIg6ymhnEW`
 
 ## Read order
@@ -17,26 +16,24 @@
 
 ## Done
 
-- Wave 0–1 harness + plan + FINDINGS/BACKLOG (PR #86 merged)
-- **HF-1:** signed-balance KPI chrome (PR #87)
-- **HF-2:** sticky `actions` + horizontal scroll (PR #88)
-- **HF-3:** nav active via segment match + longest-href wins — **PR #89 open** (ACC-02 / SHELL-08)
+- Wave 0–1 harness + plan + FINDINGS/BACKLOG (PR #86)
+- **HF-1–3** on main (`bf5758d8`)
+- **T1** DataTable shell v2 — PR #90 open  
+- **T2** Sidebar density — PR #91 open  
+- **T3** (this branch):
+  - `PageHeader` primitive (`title` / `description` / `actions` / `meta`)
+  - Wired: `DashboardPageShell`, `ReportDataTablePage` (+ optional `description`), `FinancialReportPageShell`
+  - Pages: stock-movements (RSM-02 description), financial-dashboard (FD-06 “Financial Overview” crumb/title), accounts (ACC-01: crumb Master Data → CoA; single `PageHeader` H1)
 
-## P0 remaining
+## Themes status
 
-1. ~~FD-01 / HF-1~~  
-2. ~~EMP-01 / SHELL-07 / HF-2~~  
-3. ~~ACC-02 / SHELL-08 / HF-3~~ (merge PR #89)
-
-## Themes (user picks next after #89 merge)
-
-| ID | Theme | Why next |
-|----|-------|----------|
-| **T1** | DataTable shell v2 | Highest blast radius: SHELL-02,03,06,07,10,11; EMP-*; PO-* (sticky Actions already in HF-2 — rest of shell) |
-| **T2** | Sidebar IA residual | Truncation + density only (active route done in HF-3) |
-| T3 | Page header contract | breadcrumb/title drift |
-| T4 | Dashboard & KPI | residual after HF-1 |
-| T5 | Sparse & report density | lower pri |
+| ID | Theme | Status |
+|----|-------|--------|
+| T1 | DataTable shell v2 | PR #90 |
+| T2 | Sidebar IA residual | PR #91 |
+| **T3** | Page header contract | **this branch → PR** |
+| T4 | Dashboard & KPI | open after T1–T3 |
+| T5 | Sparse & report density | open |
 
 ## Do not
 
@@ -44,21 +41,26 @@
 - Use default `playwright.config.ts` for visual (migrate:fresh)  
 - Redesign all 85 modules in one MR  
 - Commit local untracked `e2e/` junk  
-- Start T1/T2 on top of unmerged HF-3 branch (new branch from **main after merge**)
+- Wait on CI for #90/#91 (AGENTS: never wait for CI)
 
 ## Recommended next
 
-1. **You:** review/merge **PR #89** (manual smoke: `/accounts` → CoA active, not Department)  
-2. **Agent after merge:** `rtk git checkout main && rtk git pull --ff-only` → branch `feat/t1-datatable-shell-v2` **or** `feat/t2-sidebar-density`  
-3. Prefer **T1** if capacity (shared table chrome); **T2** if small residual sidebar polish only  
-4. Optional light re-smoke 3–5 routes with visual-audit config only  
+1. Finish T3: `npx tsc --noEmit` (or project types script) → commit → push → `gh pr create`  
+2. Human: merge #90 / #91 / T3 when ready  
+3. After merges: pull main; mark T1–T3 done; pick **T4**  
+4. Optional light re-smoke 3–5 routes with **visual-audit config only**
 
-## Files (HF-3 / PR #89)
+## Files (T3)
 
-- `resources/js/lib/nav-active.ts`  
-- `resources/js/components/nav-main.tsx`  
-- `docs/visual-audit/BACKLOG.md`  
+- `resources/js/components/common/PageHeader.tsx`  
+- `resources/js/components/common/DashboardPageShell.tsx`  
+- `resources/js/components/common/ReportDataTablePage.tsx`  
+- `resources/js/components/reports/financial/FinancialReportPageShell.tsx`  
+- `resources/js/pages/accounts/index.tsx`  
+- `resources/js/pages/stock-movements/index.tsx`  
+- `resources/js/pages/financial-dashboard/index.tsx`  
+- `docs/visual-audit/BACKLOG.md` · `task.md`
 
 ## Continuation Prompt
 
-After PR #89 merge: pull main, start **T1 DataTable shell v2** (or T2 sidebar density if user prefers small). One theme = one branch = one MR. Do not Wave 2 mass capture.
+Ship **T3 PR** if not open; do not block on #90/#91 CI. After human merges T1–T3, pull main and start **T4** or residual. One theme = one branch = one MR. No Wave 2 mass capture. Keep `e2e/` untracked.
