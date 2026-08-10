@@ -1,10 +1,11 @@
 # task.md — Active Session Handoff
 
 **Last updated:** 2026-08-10  
-**Current milestone:** Visual audit — **T3 page header** on `feat/t3-page-header` (ship PR; parallel with #90/#91)  
+**Current milestone:** Visual audit — **T3 shipped PR #92** (parallel with #90/#91)  
 **Branch:** `feat/t3-page-header`  
+**Commits:** `102a26dd` · `0000580f` · `ad2e4112`  
 **Base main tip:** `bf5758d8` (HF-1–3 landed)  
-**Open PRs:** T1 [#90](https://github.com/gmedia/erp/pull/90) · T2 [#91](https://github.com/gmedia/erp/pull/91) · T3 (this branch)  
+**Open PRs:** T1 [#90](https://github.com/gmedia/erp/pull/90) · T2 [#91](https://github.com/gmedia/erp/pull/91) · T3 [#92](https://github.com/gmedia/erp/pull/92)  
 **Vision session:** multimodal-looker `ses_02021a5c2ffeaD0HIIg6ymhnEW`
 
 ## Read order
