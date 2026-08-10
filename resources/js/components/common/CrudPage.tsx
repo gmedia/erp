@@ -202,8 +202,8 @@ export function CrudPage<
             </Helmet>
 
             <AppLayout breadcrumbs={config.breadcrumbs}>
-                <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                    <div className="rounded-lg bg-white">
+                <div className="flex w-full flex-col gap-3 overflow-x-auto p-4">
+                    <div className="rounded-lg border border-border/60 bg-card shadow-sm">
                         <config.DataTableComponent {...dataTableProps} />
                     </div>
                 </div>

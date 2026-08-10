@@ -47,6 +47,17 @@
 - One `git status`/`log` combined in a **single** bash script
 - User explicitly orders parallel research (“fire explore agents”)
 
+### Post-kill recovery (MANDATORY)
+
+1. After OpenCode kill / interrupt: **strict serial** — **1 tool call per assistant turn** until the interrupted task is finished or stable.
+2. Do **not** re-fire explore/librarian/oracle swarms to “catch up”.
+3. Resume from `task.md` + `git status` only; re-apply unfinished edits **one file at a time**.
+4. Prefer completing a small shippable slice (commit/PR) over re-planning the whole theme.
+
+### Why this exists
+
+Host RAM/CPU is limited. Parallel `Read`/`Edit`/`task` batches have **killed OpenCode mid-T5** (and earlier sessions). Session survival > agent throughput.
+
 ## Workflow
 
 ```

@@ -345,7 +345,7 @@ export function DataTable<T>({
                         <TableCell
                             key={cell.id}
                             className={cn(
-                                'border-border',
+                                'border-border px-2 py-1.5',
                                 isActions && STICKY_ACTIONS_CELL,
                             )}
                         >
@@ -363,7 +363,7 @@ export function DataTable<T>({
             <TableRow>
                 <TableCell
                     colSpan={columnsWithActions.length}
-                    className="h-24 text-center text-muted-foreground"
+                    className="h-16 py-6 text-center text-sm text-muted-foreground"
                 >
                     No results.
                 </TableCell>
@@ -372,7 +372,7 @@ export function DataTable<T>({
     }
 
     return (
-        <div className="w-full bg-background text-foreground">
+        <div className="w-full space-y-2 bg-card p-3 text-foreground sm:p-4">
             <DataTableToolbar
                 searchValue={searchValue}
                 onSearchChange={setSearchValue}
@@ -431,7 +431,7 @@ export function DataTable<T>({
 
             <div className="overflow-hidden rounded-md border border-border">
                 <Table className="min-w-max">
-                    <TableHeader className="bg-muted">
+                    <TableHeader className="bg-muted/80">
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {
@@ -441,7 +441,7 @@ export function DataTable<T>({
                                         <TableHead
                                             key={header.id}
                                             className={cn(
-                                                'border-border select-none',
+                                                'h-9 border-border px-2 py-1.5 text-xs select-none',
                                                 isActions &&
                                                     STICKY_ACTIONS_HEAD,
                                             )}
@@ -463,7 +463,7 @@ export function DataTable<T>({
                 </Table>
             </div>
 
-            <div className="mt-1 border-t border-border/60">
+            <div className="border-t border-border/50 pt-1">
                 <DataTablePagination
                     pagination={pagination}
                     onPageChange={handlePageChange}
