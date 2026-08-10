@@ -2,17 +2,13 @@
 
 **Last updated:** 2026-08-10  
 **Source:** multimodal-looker Wave 0–1  
-**Policy:** No Wave 2 mass capture until T1–T5 land or shared-shell re-reviewed
+**Policy:** T1–T5 landed on main. No **mass** Wave 2 (85 leaves). Prefer selective re-smoke of Wave 0–1 shells, then exception surfaces only.
 
 ## Open (prioritized)
 
 | ID | Pri | Theme | Scope | Status | Notes |
 |----|-----|-------|-------|--------|-------|
-| T1 | P0–P1 | DataTable shell v2 | EntityCrudPage / shared table | **done (PR #90 merged)** | Single toolbar row; sticky Actions (HF-2); semantic Status; bulk bar; pagination chrome. SHELL-02,03,06,10,11; EMP-*; PO-* |
-| T2 | P1 | Sidebar IA & active | AppLayout / nav | **done (PR #91 merged)** | Density + truncation tooltips; active route = HF-3. SHELL-01,09 residual closed with T2 |
-| T3 | P1 | Page header contract | Layout primitive | **done (PR #92 merged)** | Shared `PageHeader`; Dashboard/Report/Financial shells; accounts ACC-01; stock-movements RSM-02; FD-06 title. SHELL-04 |
-| T4 | P0–P1 | Dashboard & KPI semantics | Home + financial dash + amounts | **done (PR #93 merged)** | FD-02 FY URL sync; FD-03 hide YoY when Compare=None; BS-02 signed amount rose chrome; DASH-01 home via DashboardPageShell + KpiCard |
-| T5 | P1–P2 | Sparse & report density | ReportDataTable + list | **in progress (this PR)** | Content-height shells (drop h-full flex-1 void); denser DataTable + pagination. SHELL-05; RSM-01 |
+| — | — | — | — | **none** | All planned shared-shell themes T1–T5 closed. Next work is re-smoke / exceptions (below). |
 
 ## Hotfixes (can ship before full T1)
 
@@ -29,10 +25,19 @@
 | VA-W0-SETUP | harness, url-list, visual-audit config, smoke |
 | VA-W1-CAPTURE | 7 routes PNG |
 | VA-W1-VISION | multimodal-looker full audit; stop-rule YES |
-| T1 | PR #90 merged into main |
-| T2 | PR #91 merged into main |
-| T3 | PR #92 merged into main |
-| T4 | PR #93 merged into main |
+| T1 | PR #90 — DataTable shell v2 |
+| T2 | PR #91 — Sidebar density + active |
+| T3 | PR #92 — Page header contract |
+| T4 | PR #93 — Dashboard & KPI semantics |
+| T5 | PR #94 — Sparse & report density (SHELL-05; RSM-01) |
+
+## Residual / optional (not shared-shell themes)
+
+| ID | Pri | Item | Notes |
+|----|-----|------|-------|
+| PO-05 | P2 | Grand Total column visibility | Product/column config, not shell |
+| BS-01 | P2 | Compare “None” label opacity | Filter UX |
+| SHELL-12 | P3 | Home stub vs financial dashboard | Product decision |
 
 ## Implementation rules
 
@@ -40,10 +45,11 @@
 - Prefer shared chrome over per-module hacks
 - Re-capture only **exception** surfaces later (modals, mobile, dark, My Approvals, asset profile) — not 85 leaves
 - PNGs stay gitignored; cite paths in MR description
+- Agents: **AGENTS.md Tool & Process Concurrency** (≤3 tools/turn; post-kill = 1 tool/turn)
 
 ## Next agent action
 
-1. Finish **T5** PR: types → commit → push → `gh pr create`  
-2. After T5 merge (or shared-shell re-review): consider unfreezing selective Wave 2 capture  
-3. Do **not** mass Wave 2 capture yet  
-4. Agents: respect **AGENTS.md Tool & Process Concurrency** (max 3 tools/turn; post-kill = 1 tool/turn)
+1. **Selective re-smoke** Wave 0–1 routes with `playwright.visual-audit.config.ts` only (1 worker; never default Playwright config)  
+2. Optional multimodal / human pass on re-captured PNGs (shared-shell re-review)  
+3. If clean: one **exception surface** MR (My Approvals **or** asset profile **or** modal) — not mass Wave 2  
+4. Do **not** mass-capture remaining ~78 routes  
