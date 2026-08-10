@@ -1,9 +1,11 @@
 # task.md — Active Session Handoff
 
-**Last updated:** 2026-08-09  
-**Current milestone:** Visual audit — **T1 DataTable shell v2** → **PR #90**  
-**Branch:** `feat/t1-datatable-shell-v2` @ `2b63e4d0` (from main `bf5758d8`)  
-**PR:** https://github.com/gmedia/erp/pull/90  
+**Last updated:** 2026-08-10  
+**Current milestone:** Visual audit — resolve **PR #91** (T2) conflicts after **#90** merged; **T3** is PR #92  
+**Branch:** `feat/t2-sidebar-density` (merging `origin/main`)  
+**T1:** PR #90 **merged**  
+**T2 PR:** https://github.com/gmedia/erp/pull/91  
+**T3 PR:** https://github.com/gmedia/erp/pull/92  
 **Vision session:** multimodal-looker `ses_02021a5c2ffeaD0HIIg6ymhnEW`
 
 ## Read order
@@ -15,55 +17,39 @@
 
 ## Done
 
-| ID | PR | Notes |
-|----|-----|--------|
-| Wave 0–1 | #86 | harness, plan, FINDINGS freeze |
-| HF-1 | #87 | signed KPI danger chrome |
-| HF-2 | #88 | sticky DataTable Actions + scroll |
-| HF-3 | #89 | nav segment match + longest-href (CoA) |
+- Wave 0–1 + HF-1–3 on main  
+- **T1** DataTable shell v2 — **PR #90 merged**  
+- **T2** sidebar density/truncation — PR #91 (conflict fix in progress after #90)  
+- **T3** page header — PR #92 open (`feat/t3-page-header`)
 
-## What changed this session (T1 → PR #90)
+## Themes
 
-Commits on branch (4 atomic):
-
-1. `a2ad8777` feat: semantic status badges for employees and POs  
-2. `0c71b883` feat: single-row DataTable toolbar layout  
-3. `aec6123e` feat: DataTable bulk bar and pagination chrome  
-4. `2b63e4d0` docs: mark T1 DataTable shell in progress  
-
-- `DataTableToolbar.tsx` — single flex-wrap row (SHELL-02/03)  
-- `DataTableCore.tsx` — bulk bar + shell (SHELL-10/11)  
-- `PaginationControls.tsx` — footer chrome  
-- `lib/status-badge.ts` + EMP/PO columns — SHELL-06  
-- Sticky Actions (HF-2) **unchanged**  
-- `e2e/` left untracked  
-
-Validated: `tsc --noEmit` clean.
-
-## Themes remaining
-
-| ID | Pri | Theme | Status |
-|----|-----|-------|--------|
-| **T1** | P0–P1 | DataTable shell v2 | **WIP on branch** — finish verify + PR |
-| **T2** | P1 | Sidebar residual | Truncation + density only |
-| T3 | P1 | Page header contract | open |
-| T4 | P0–P1 | Dashboard & KPI residual | open |
-| T5 | P1–P2 | Sparse & report density | open |
+| ID | Status |
+|----|--------|
+| T1 | **merged** (#90) |
+| **T2** | PR #91 — conflict resolve → re-push |
+| T3 | PR #92 open |
+| T4–T5 | open |
 
 ## Do not
 
-- Wave 2 mass capture (~78 routes)  
-- Default `playwright.config.ts` for visual (`migrate:fresh`)  
-- Multi-theme one MR  
-- Commit untracked `e2e/`
+- Mass Wave 2 capture  
+- Default playwright visual (`migrate:fresh`)  
+- Commit untracked `e2e/`  
+- Wait on CI; one theme = one branch = one MR  
+
+## Files (T2)
+
+- `resources/js/components/ui/sidebar.tsx`  
+- `resources/js/components/nav-main.tsx`  
+- `docs/visual-audit/BACKLOG.md` · `task.md` (conflict resolution)
 
 ## Recommended next
 
-1. Review/merge **PR #90** when ready (do not block on local CI wait)  
-2. After merge: mark BACKLOG T1 done; pull main  
-3. Optional: T2 sidebar density **or** light visual re-smoke  
-4. **No** Wave 2 mass capture  
+1. Finish merge of `origin/main` into `feat/t2-sidebar-density` → push → human merge #91  
+2. Refresh #92 on main after #91 if needed  
+3. After T2/T3: **T4** dashboard/KPI  
 
 ## Continuation Prompt
 
-PR #90 open for T1. Merge when green, update BACKLOG T1 → done, then T2 residual or re-smoke. No Wave 2.
+T1 (#90) merged. Fix #91 conflicts (docs only expected), push T2, merge #91 then #92. No Wave 2 mass capture.
