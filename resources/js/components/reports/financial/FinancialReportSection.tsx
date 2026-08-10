@@ -51,14 +51,22 @@ export const financialPositionSectionConfigs: readonly FinancialReportSectionCon
 
 export const getChangeTextClass = (value: number): string => {
     if (value < 0) {
-        return 'text-red-500';
+        return 'text-rose-600 dark:text-rose-400';
     }
 
     if (value > 0) {
-        return 'text-green-600';
+        return 'text-emerald-600 dark:text-emerald-400';
     }
 
     return 'text-muted-foreground';
+};
+
+export const getSignedAmountTextClass = (value: number): string => {
+    if (value < 0) {
+        return 'text-rose-600 dark:text-rose-400';
+    }
+
+    return '';
 };
 
 function AccountRow({
@@ -101,10 +109,24 @@ function AccountRow({
                     <span className="truncate">{node.name}</span>
                 </button>
                 <div className="flex gap-4 text-right tabular-nums">
-                    <div className="w-32">{formatCurrency(node.balance)}</div>
+                    <div
+                        className={cn(
+                            'w-32',
+                            getSignedAmountTextClass(node.balance),
+                        )}
+                    >
+                        {formatCurrency(node.balance)}
+                    </div>
                     {showComparison && (
                         <>
-                            <div className="w-32 text-muted-foreground">
+                            <div
+                                className={cn(
+                                    'w-32 text-muted-foreground',
+                                    getSignedAmountTextClass(
+                                        node.comparison_balance || 0,
+                                    ),
+                                )}
+                            >
                                 {formatCurrency(node.comparison_balance || 0)}
                             </div>
                             <div className={cn('w-28', changeTextClass)}>
@@ -185,12 +207,24 @@ export function FinancialReportSection({
                         </div>
                     </div>
                     <div className="flex gap-4 text-right tabular-nums">
-                        <span className="w-32 text-lg font-bold">
+                        <span
+                            className={cn(
+                                'w-32 text-lg font-bold',
+                                getSignedAmountTextClass(total),
+                            )}
+                        >
                             {formatCurrency(total)}
                         </span>
                         {showComparison && (
                             <>
-                                <span className="w-32 text-lg font-bold text-muted-foreground">
+                                <span
+                                    className={cn(
+                                        'w-32 text-lg font-bold text-muted-foreground',
+                                        getSignedAmountTextClass(
+                                            comparisonTotal || 0,
+                                        ),
+                                    )}
+                                >
                                     {formatCurrency(comparisonTotal || 0)}
                                 </span>
                                 <span

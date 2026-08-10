@@ -2,6 +2,7 @@ import DashboardPageShell from '@/components/common/DashboardPageShell';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { BreadcrumbItem } from '@/types';
 import { Info } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AsyncSelect } from '../../components/common/AsyncSelect';
 import { CashFlowSummary } from '../../components/financial-dashboard/CashFlowSummary';
@@ -20,6 +21,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function FinancialDashboard() {
     const [searchParams, setSearchParams] = useSearchParams();
+    const preferredYearSynced = useRef(false);
 
     const fiscalYearId = searchParams.get('fiscal_year_id')
         ? Number(searchParams.get('fiscal_year_id'))
@@ -36,6 +38,28 @@ export default function FinancialDashboard() {
         comparisonYearId,
         branchId,
     });
+
+    useEffect(() => {
+        if (preferredYearSynced.current) {
+            return;
+        }
+        if (fiscalYearId !== null) {
+            preferredYearSynced.current = true;
+            return;
+        }
+        const preferredId = data?.selected_year_id;
+        if (!preferredId) {
+            return;
+        }
+        preferredYearSynced.current = true;
+        const next = new URLSearchParams(searchParams);
+        next.set('fiscal_year_id', preferredId.toString());
+        setSearchParams(next, { replace: true });
+    }, [data?.selected_year_id, fiscalYearId, searchParams, setSearchParams]);
+
+    const resolvedYearId = fiscalYearId ?? data?.selected_year_id ?? null;
+    const hasComparison =
+        comparisonYearId !== null && comparisonYearId !== undefined;
 
     const handleYearChange = (yearId: number | null) => {
         const newParams = new URLSearchParams(searchParams);
@@ -95,7 +119,7 @@ export default function FinancialDashboard() {
                     {data?.fiscal_years && data.fiscal_years.length > 0 && (
                         <FiscalYearSelector
                             fiscalYears={data.fiscal_years}
-                            selectedYearId={fiscalYearId}
+                            selectedYearId={resolvedYearId}
                             comparisonYearId={comparisonYearId}
                             onYearChange={handleYearChange}
                             onComparisonYearChange={handleComparisonYearChange}
@@ -126,7 +150,11 @@ export default function FinancialDashboard() {
             )}
 
             <div className="space-y-6">
-                <SummaryCards data={data?.kpis} isLoading={isLoading} />
+                <SummaryCards
+                    data={data?.kpis}
+                    isLoading={isLoading}
+                    showComparison={hasComparison}
+                />
 
                 <MonthlyTrendChart
                     data={data?.monthly_trends}

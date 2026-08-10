@@ -19,6 +19,7 @@ import type {
 interface SummaryCardsProps {
     readonly data?: FinancialDashboardData['kpis'];
     readonly isLoading: boolean;
+    readonly showComparison?: boolean;
 }
 
 function getScopePill(scope?: KpiItem['scope']) {
@@ -67,6 +68,29 @@ function getChangeBadge(change: number, isExpenseOrLiability: boolean = false) {
     );
 }
 
+function comparisonFooter(
+    change: number,
+    isExpenseOrLiability: boolean,
+    scope: KpiItem['scope'] | undefined,
+    showComparison: boolean,
+) {
+    return (
+        <>
+            {showComparison && (
+                <div className="mt-2 flex items-center gap-2">
+                    {getChangeBadge(change, isExpenseOrLiability)}
+                    <span className="text-xs text-muted-foreground">
+                        vs comparison period
+                    </span>
+                </div>
+            )}
+            <div className={showComparison ? 'mt-1.5' : 'mt-2'}>
+                {getScopePill(scope)}
+            </div>
+        </>
+    );
+}
+
 function signedBalanceChrome(
     value: number,
     positive: { borderColor: string; iconColor: string },
@@ -89,6 +113,7 @@ function signedBalanceChrome(
 export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
     data,
     isLoading,
+    showComparison = false,
 }) {
     if (isLoading || !data) {
         return (
@@ -124,18 +149,11 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             iconColor: 'text-emerald-500',
             value: data.revenue.value,
             formattedValue: formatCurrency(data.revenue.value),
-            footer: (
-                <>
-                    <div className="mt-2 flex items-center gap-2">
-                        {getChangeBadge(data.revenue.change, false)}
-                        <span className="text-xs text-muted-foreground">
-                            vs comparison period
-                        </span>
-                    </div>
-                    <div className="mt-1.5">
-                        {getScopePill(data.revenue.scope)}
-                    </div>
-                </>
+            footer: comparisonFooter(
+                data.revenue.change,
+                false,
+                data.revenue.scope,
+                showComparison,
             ),
         },
         {
@@ -145,18 +163,11 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             iconColor: 'text-rose-500',
             value: data.expenses.value,
             formattedValue: formatCurrency(data.expenses.value),
-            footer: (
-                <>
-                    <div className="mt-2 flex items-center gap-2">
-                        {getChangeBadge(data.expenses.change, true)}
-                        <span className="text-xs text-muted-foreground">
-                            vs comparison period
-                        </span>
-                    </div>
-                    <div className="mt-1.5">
-                        {getScopePill(data.expenses.scope)}
-                    </div>
-                </>
+            footer: comparisonFooter(
+                data.expenses.change,
+                true,
+                data.expenses.scope,
+                showComparison,
             ),
         },
         {
@@ -168,18 +179,11 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             }),
             value: data.net_income.value,
             formattedValue: formatCurrency(data.net_income.value),
-            footer: (
-                <>
-                    <div className="mt-2 flex items-center gap-2">
-                        {getChangeBadge(data.net_income.change, false)}
-                        <span className="text-xs text-muted-foreground">
-                            vs comparison period
-                        </span>
-                    </div>
-                    <div className="mt-1.5">
-                        {getScopePill(data.net_income.scope)}
-                    </div>
-                </>
+            footer: comparisonFooter(
+                data.net_income.change,
+                false,
+                data.net_income.scope,
+                showComparison,
             ),
         },
         {
@@ -189,18 +193,11 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             iconColor: 'text-indigo-500',
             value: data.total_assets.value,
             formattedValue: formatCurrency(data.total_assets.value),
-            footer: (
-                <>
-                    <div className="mt-2 flex items-center gap-2">
-                        {getChangeBadge(data.total_assets.change, false)}
-                        <span className="text-xs text-muted-foreground">
-                            vs comparison period
-                        </span>
-                    </div>
-                    <div className="mt-1.5">
-                        {getScopePill(data.total_assets.scope)}
-                    </div>
-                </>
+            footer: comparisonFooter(
+                data.total_assets.change,
+                false,
+                data.total_assets.scope,
+                showComparison,
             ),
         },
         {
@@ -210,18 +207,11 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             iconColor: 'text-amber-500',
             value: data.total_liabilities.value,
             formattedValue: formatCurrency(data.total_liabilities.value),
-            footer: (
-                <>
-                    <div className="mt-2 flex items-center gap-2">
-                        {getChangeBadge(data.total_liabilities.change, true)}
-                        <span className="text-xs text-muted-foreground">
-                            vs comparison period
-                        </span>
-                    </div>
-                    <div className="mt-1.5">
-                        {getScopePill(data.total_liabilities.scope)}
-                    </div>
-                </>
+            footer: comparisonFooter(
+                data.total_liabilities.change,
+                true,
+                data.total_liabilities.scope,
+                showComparison,
             ),
         },
         {
@@ -233,18 +223,11 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             }),
             value: data.equity.value,
             formattedValue: formatCurrency(data.equity.value),
-            footer: (
-                <>
-                    <div className="mt-2 flex items-center gap-2">
-                        {getChangeBadge(data.equity.change, false)}
-                        <span className="text-xs text-muted-foreground">
-                            vs comparison period
-                        </span>
-                    </div>
-                    <div className="mt-1.5">
-                        {getScopePill(data.equity.scope)}
-                    </div>
-                </>
+            footer: comparisonFooter(
+                data.equity.change,
+                false,
+                data.equity.scope,
+                showComparison,
             ),
         },
         {
@@ -256,18 +239,11 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             }),
             value: data.cash_balance.value,
             formattedValue: formatCurrency(data.cash_balance.value),
-            footer: (
-                <>
-                    <div className="mt-2 flex items-center gap-2">
-                        {getChangeBadge(data.cash_balance.change, false)}
-                        <span className="text-xs text-muted-foreground">
-                            vs comparison period
-                        </span>
-                    </div>
-                    <div className="mt-1.5">
-                        {getScopePill(data.cash_balance.scope)}
-                    </div>
-                </>
+            footer: comparisonFooter(
+                data.cash_balance.change,
+                false,
+                data.cash_balance.scope,
+                showComparison,
             ),
         },
     ];
