@@ -1,8 +1,8 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
-import { ColumnDef } from '@tanstack/react-table';
-
+import { statusBadgeVariant } from '@/lib/status-badge';
+import { Employee } from '@/types/entity';
 import {
     createActionsColumn,
     createEmailColumn,
@@ -11,8 +11,7 @@ import {
     createSortingHeader,
     createTextColumn,
 } from '@/utils/columns';
-
-import { Employee } from '@/types/entity';
+import { ColumnDef } from '@tanstack/react-table';
 
 const formatCurrency = (value: string | null | undefined): string => {
     if (!value) {
@@ -63,11 +62,8 @@ export const employeeColumns: ColumnDef<Employee>[] = [
                 return <div>-</div>;
             }
 
-            return (
-                <Badge variant={status === 'intern' ? 'secondary' : 'default'}>
-                    {status === 'intern' ? 'Intern' : 'Regular'}
-                </Badge>
-            );
+            const label = status === 'intern' ? 'Intern' : 'Regular';
+            return <Badge variant={statusBadgeVariant(status)}>{label}</Badge>;
         },
     },
     createEmailColumn<Employee>({ accessorKey: 'email', label: 'Email' }),

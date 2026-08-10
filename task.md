@@ -1,39 +1,39 @@
 # task.md — Active Session Handoff
 
 **Last updated:** 2026-08-10  
-**Current milestone:** Visual audit — **T3 shipped PR #92** (parallel with #90/#91)  
+**Current milestone:** Visual audit — **T3** PR #92 (docs merge with main after **#90**); **T2** PR #91 MERGEABLE  
 **Branch:** `feat/t3-page-header`  
-**Commits:** `102a26dd` · `0000580f` · `ad2e4112`  
-**Base main tip:** `bf5758d8` (HF-1–3 landed)  
-**Open PRs:** T1 [#90](https://github.com/gmedia/erp/pull/90) · T2 [#91](https://github.com/gmedia/erp/pull/91) · T3 [#92](https://github.com/gmedia/erp/pull/92)  
+**T1:** PR #90 **merged**  
+**T2 PR:** https://github.com/gmedia/erp/pull/91  
+**T3 PR:** https://github.com/gmedia/erp/pull/92  
 **Vision session:** multimodal-looker `ses_02021a5c2ffeaD0HIIg6ymhnEW`
 
 ## Read order
 
 1. `task.md` (this)  
-2. `docs/visual-audit/BACKLOG.md` (T1–T5 + hotfixes)  
+2. `docs/visual-audit/BACKLOG.md`  
 3. `docs/visual-audit/FINDINGS.md`  
-4. `docs/visual-audit-plan.md` (program; stop-rule applied)
+4. `docs/visual-audit-plan.md`
 
 ## Done
 
-- Wave 0–1 harness + plan + FINDINGS/BACKLOG (PR #86)
-- **HF-1–3** on main (`bf5758d8`)
-- **T1** DataTable shell v2 — PR #90 open  
-- **T2** Sidebar density — PR #91 open  
-- **T3** (this branch):
+- Wave 0–1 harness + plan + FINDINGS/BACKLOG (PR #86)  
+- **HF-1–3** on main  
+- **T1** DataTable shell v2 — **PR #90 merged**  
+- **T2** Sidebar density — PR #91 (main merged; MERGEABLE)  
+- **T3** (this branch / PR #92):
   - `PageHeader` primitive (`title` / `description` / `actions` / `meta`)
   - Wired: `DashboardPageShell`, `ReportDataTablePage` (+ optional `description`), `FinancialReportPageShell`
-  - Pages: stock-movements (RSM-02 description), financial-dashboard (FD-06 “Financial Overview” crumb/title), accounts (ACC-01: crumb Master Data → CoA; single `PageHeader` H1)
+  - Pages: stock-movements (RSM-02), financial-dashboard (FD-06 “Financial Overview”), accounts (ACC-01)
 
 ## Themes status
 
 | ID | Theme | Status |
 |----|-------|--------|
-| T1 | DataTable shell v2 | PR #90 |
+| T1 | DataTable shell v2 | **merged** (#90) |
 | T2 | Sidebar IA residual | PR #91 |
-| **T3** | Page header contract | **this branch → PR** |
-| T4 | Dashboard & KPI | open after T1–T3 |
+| **T3** | Page header contract | **PR #92** |
+| T4 | Dashboard & KPI | open after T2–T3 |
 | T5 | Sparse & report density | open |
 
 ## Do not
@@ -42,14 +42,13 @@
 - Use default `playwright.config.ts` for visual (migrate:fresh)  
 - Redesign all 85 modules in one MR  
 - Commit local untracked `e2e/` junk  
-- Wait on CI for #90/#91 (AGENTS: never wait for CI)
+- Wait on CI (AGENTS: never wait for CI)
 
 ## Recommended next
 
-1. Finish T3: `npx tsc --noEmit` (or project types script) → commit → push → `gh pr create`  
-2. Human: merge #90 / #91 / T3 when ready  
-3. After merges: pull main; mark T1–T3 done; pick **T4**  
-4. Optional light re-smoke 3–5 routes with **visual-audit config only**
+1. Human: merge #91 then #92 when ready  
+2. After merges: pull main; mark T2–T3 done; pick **T4**  
+3. Optional light re-smoke with **visual-audit config only**
 
 ## Files (T3)
 
@@ -64,4 +63,4 @@
 
 ## Continuation Prompt
 
-Ship **T3 PR** if not open; do not block on #90/#91 CI. After human merges T1–T3, pull main and start **T4** or residual. One theme = one branch = one MR. No Wave 2 mass capture. Keep `e2e/` untracked.
+T1 (#90) merged. T2 #91 and T3 #92 open (docs conflicts resolved). Human merge order #91 → #92. Then **T4**. No Wave 2 mass capture. Keep `e2e/` untracked.
