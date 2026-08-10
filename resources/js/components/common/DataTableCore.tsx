@@ -441,7 +441,7 @@ export function DataTable<T>({
                                         <TableHead
                                             key={header.id}
                                             className={cn(
-                                                'h-9 border-border select-none px-2 py-1.5 text-xs',
+                                                'h-9 border-border px-2 py-1.5 text-xs select-none',
                                                 isActions &&
                                                     STICKY_ACTIONS_HEAD,
                                             )}
