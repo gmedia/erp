@@ -1,9 +1,9 @@
 # task.md — Active Session Handoff
 
 **Last updated:** 2026-08-10  
-**Current milestone:** Visual audit — **T1–T4 merged**; next **T5** or light re-smoke  
-**Branch:** `main` @ `ab4cb0d8` (T4 #93 squash)  
-**T1–T4:** PRs #90–#93 **merged**  
+**Current milestone:** Visual audit — **T1–T5 merged**; next = selective re-smoke / exception surfaces  
+**Branch:** `main` @ `03c22267` (T5 #94 squash)  
+**T1–T5:** PRs #90–#94 **merged**  
 **Vision session:** multimodal-looker `ses_02021a5c2ffeaD0HIIg6ymhnEW`
 
 ## Read order
@@ -20,7 +20,8 @@
 - **T1** DataTable shell v2 — **#90**  
 - **T2** Sidebar density — **#91**  
 - **T3** Page header — **#92**  
-- **T4** Dashboard & KPI — **#93** (FD-02/03, BS-02, DASH-01)
+- **T4** Dashboard & KPI — **#93** (FD-02/03, BS-02, DASH-01)  
+- **T5** Sparse & report density — **#94** (SHELL-05; denser list/report shells)
 
 ## Themes status
 
@@ -30,31 +31,38 @@
 | T2 | Sidebar IA residual | **merged** (#91) |
 | T3 | Page header contract | **merged** (#92) |
 | T4 | Dashboard & KPI | **merged** (#93) |
-| **T5** | Sparse & report density | **open** — next implementation theme |
+| T5 | Sparse & report density | **merged** (#94) |
 
 ## Do not
 
-- Mass-capture Wave 2 / remaining 78 routes until T5 lands **or** shared-shell re-reviewed  
+- Mass-capture Wave 2 / remaining ~78 routes (exception surfaces only after re-smoke)  
 - Use default `playwright.config.ts` for visual (migrate:fresh)  
 - Redesign all 85 modules in one MR  
 - Commit local untracked `e2e/` junk  
-- Wait on CI (AGENTS: never wait for CI)
+- Wait on CI (AGENTS: never wait for CI)  
+- Parallel tool fan-out (AGENTS: ≤3 tools/turn; post-kill = 1)
+
+## Re-smoke (2026-08-10)
+
+- Command: `VISUAL_AUDIT=1 PLAYWRIGHT_BASE_URL=http://127.0.0.1:82 npx playwright test -c playwright.visual-audit.config.ts`
+- Result: **84 pass / 1 fail** (`/asset-models` → login bounce)
+- PNGs: `docs/visual-audit/waves/**` (gitignored). Harness uses full MenuSeeder url-list (85), not Wave 0–1 subset
 
 ## Recommended next (pick one)
 
-### A — **T5** (recommended default)
-- Branch from main: `feat/t5-sparse-report-density`
-- Scope (BACKLOG): SHELL-05, RSM-01 — summary strip / empty panels; report density on `ReportDataTablePage` + sparse list surfaces
-- One theme = one PR
+### A — Human / multimodal spot-check (recommended)
+- Review Wave 0–1 shell PNGs post-T5 (SHELL-05 density, no T1–T4 regressions)
+- Optionally fix `/asset-models` auth/permission for visual capture
 
-### B — Light visual re-smoke (optional before/after T5)
-- **Only** `playwright.visual-audit.config.ts` (never default config)
-- 1 worker; base `http://127.0.0.1:82`; admin login
-- Re-capture Wave 0–1 exception routes only if needed; PNGs gitignored
+### B — Exception surface (one MR)
+- My Approvals **or** asset profile **or** dense modal — not full leaf inventory
 
-### C — Shared-shell re-review
-- multimodal-looker on post-T1–T4 chrome before unfreezing Wave 2 mass capture
+### C — Residual FINDINGS (optional product)
+- PO-05 Grand Total column; BS-01 Compare label; SHELL-12 home vs FD product call
+
+### D — Harness improvement (optional chore)
+- Env allowlist so re-smoke can be truly selective (7–8 routes)
 
 ## Continuation Prompt
 
-Main at `ab4cb0d8` (T4 #93 merged). Start **T5** from main or optional visual-audit re-smoke. No Wave 2 mass capture yet. Keep `e2e/` untracked.
+Closeout PR #95 open. Main tip pre-closeout: `03c22267` (T5 #94). Re-smoke 84/85 done (asset-models fail). Next: spot-check PNGs or one exception-surface MR. Keep `e2e/` untracked.
