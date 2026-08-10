@@ -8,11 +8,11 @@
 
 | ID | Pri | Theme | Scope | Status | Notes |
 |----|-----|-------|-------|--------|-------|
-| T1 | P0–P1 | DataTable shell v2 | EntityCrudPage / shared table | in progress | PR #90 — shell v2; sticky Actions already HF-2 |
-| T2 | P1 | Sidebar IA & active | AppLayout / nav | in progress | **PR #91** — density + truncation tooltips; active route = HF-3. SHELL-01,09 residual; SHELL-08/ACC-02 done HF-3 |
-| T3 | P1 | Page header contract | Layout primitive | open | breadcrumb + title + desc + actions; no double title / bare breadcrumb drift. SHELL-04; ACC-01; RSM-02; FD-06 |
-| T4 | P0–P1 | Dashboard & KPI semantics | Home + financial dash + amounts | open | Home content strategy; **danger for negatives**; hide comparison until Compare set; FY visible. FD-01..03; DASH-*; BS-02 |
-| T5 | P1–P2 | Sparse & report density | ReportDataTable + list | open | Summary strip / empty panels; report H1 parity. SHELL-05; RSM-01 |
+| T1 | P0–P1 | DataTable shell v2 | EntityCrudPage / shared table | **done (PR #90 merged)** | Single toolbar row; sticky Actions (HF-2); semantic Status; bulk bar; pagination chrome. SHELL-02,03,06,10,11; EMP-*; PO-* |
+| T2 | P1 | Sidebar IA & active | AppLayout / nav | open (PR #91) | Density + truncation tooltips; active route = HF-3. SHELL-01,09 residual |
+| T3 | P1 | Page header contract | Layout primitive | open (PR #92) | Shared `PageHeader`; shells + ACC-01 / RSM-02 / FD-06. SHELL-04 |
+| T4 | P0–P1 | Dashboard & KPI semantics | Home + financial dash + amounts | open | Home content strategy; **danger for negatives**; hide comparison until Compare set; FY visible. FD residual; DASH-*; BS-02 |
+| T5 | P1–P2 | Sparse & report density | ReportDataTable + list | open | Summary strip / empty panels; report density. SHELL-05; RSM-01 |
 
 ## Hotfixes (can ship before full T1)
 
@@ -29,6 +29,7 @@
 | VA-W0-SETUP | harness, url-list, visual-audit config, smoke |
 | VA-W1-CAPTURE | 7 routes PNG |
 | VA-W1-VISION | multimodal-looker full audit; stop-rule YES |
+| T1 | PR #90 merged into main |
 
 ## Implementation rules
 
@@ -39,6 +40,6 @@
 
 ## Next agent action
 
-1. Merge **PR #90** (T1) and **PR #91** (T2) when ready  
-2. Then **T3** page header contract (or T4/T5)  
-3. Do **not** mass Wave 2 capture
+1. Resolve **PR #91** (T2) merge conflicts → merge when green  
+2. Merge **PR #92** (T3) when ready (may need main refresh after #91)  
+3. Do **not** mass Wave 2 capture; next theme **T4** after T2/T3 land

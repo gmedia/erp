@@ -3,6 +3,7 @@
 import { GenericActions } from '@/components/common/ActionsDropdown';
 import { DataTablePagination } from '@/components/common/DataTablePagination';
 import { DataTableToolbar } from '@/components/common/DataTableToolbar';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -265,6 +266,7 @@ export function DataTable<T>({
         },
         onColumnVisibilityChange: setColumnVisibility,
         onRowSelectionChange: setRowSelection,
+        enableRowSelection: true,
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         manualPagination: true,
@@ -406,7 +408,28 @@ export function DataTable<T>({
                 table={table}
             />
 
-            <div className="rounded-md border border-border">
+            {Object.keys(rowSelection).length > 0 && (
+                <div
+                    className="mb-2 flex items-center gap-3 rounded-md border border-border bg-muted/40 px-3 py-2 text-sm"
+                    data-testid="bulk-selection-bar"
+                    role="status"
+                >
+                    <span className="font-medium text-foreground">
+                        {Object.keys(rowSelection).length} selected
+                    </span>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 px-2"
+                        onClick={() => setRowSelection({})}
+                    >
+                        Clear selection
+                    </Button>
+                </div>
+            )}
+
+            <div className="overflow-hidden rounded-md border border-border">
                 <Table className="min-w-max">
                     <TableHeader className="bg-muted">
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -440,14 +463,15 @@ export function DataTable<T>({
                 </Table>
             </div>
 
-            {/* Pagination */}
-            <DataTablePagination
-                pagination={pagination}
-                onPageChange={handlePageChange}
-                onPageSizeChange={(per_page: number) =>
-                    handlePageSizeChange(per_page.toString())
-                }
-            />
+            <div className="mt-1 border-t border-border/60">
+                <DataTablePagination
+                    pagination={pagination}
+                    onPageChange={handlePageChange}
+                    onPageSizeChange={(per_page: number) =>
+                        handlePageSizeChange(per_page.toString())
+                    }
+                />
+            </div>
         </div>
     );
 }

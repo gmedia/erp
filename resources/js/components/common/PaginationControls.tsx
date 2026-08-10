@@ -35,9 +35,9 @@ export function PaginationControls({
     renderPageNumbers: () => React.ReactNode;
 }>) {
     return (
-        <div className="flex items-center justify-between py-4 text-sm text-muted-foreground">
-            <div className="flex items-center space-x-2">
-                <p>Rows per page</p>
+        <div className="flex flex-col gap-3 py-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                <p className="whitespace-nowrap">Rows per page</p>
                 <Select
                     value={String(pagination.per_page)}
                     onValueChange={onPageSizeChange}
@@ -53,13 +53,13 @@ export function PaginationControls({
                         <SelectItem value="100">100</SelectItem>
                     </SelectContent>
                 </Select>
-                <p>
+                <p className="text-foreground/80">
                     Showing {pagination.from} to {pagination.to} of{' '}
                     {pagination.total} entries
                 </p>
             </div>
 
-            <Pagination>
+            <Pagination className="mx-0 w-auto justify-end">
                 <PaginationContent>
                     <PaginationItem>
                         <PaginationPrevious
