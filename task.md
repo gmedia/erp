@@ -1,64 +1,69 @@
 # task.md — Active Session Handoff
 
-**Last updated:** 2026-08-08  
-**Current milestone:** Visual audit — HF-3 **PR #89** (CI: Quality/Pest/Sonar green; E2E 1 flaky Asset export create — unrelated to nav; failed job re-runned)  
-**Branch:** `fix/hf3-accounts-sidebar-active`  
-**Commits:** `d4b85789` (fix nav-active) · `32ed7582` (docs)  
-**PR:** https://github.com/gmedia/erp/pull/89  
-**Main tip (pre-merge):** `5e9abaa4` (HF-2 #88)  
+**Last updated:** 2026-08-09  
+**Current milestone:** Visual audit — **T1 DataTable shell v2** → **PR #90**  
+**Branch:** `feat/t1-datatable-shell-v2` @ `2b63e4d0` (from main `bf5758d8`)  
+**PR:** https://github.com/gmedia/erp/pull/90  
 **Vision session:** multimodal-looker `ses_02021a5c2ffeaD0HIIg6ymhnEW`
 
 ## Read order
 
 1. `task.md` (this)  
-2. `docs/visual-audit/BACKLOG.md` (T1–T5 + hotfixes)  
+2. `docs/visual-audit/BACKLOG.md`  
 3. `docs/visual-audit/FINDINGS.md`  
-4. `docs/visual-audit-plan.md` (program; stop-rule applied)
+4. `docs/visual-audit-plan.md`
 
 ## Done
 
-- Wave 0–1 harness + plan + FINDINGS/BACKLOG (PR #86 merged)
-- **HF-1:** signed-balance KPI chrome (PR #87)
-- **HF-2:** sticky `actions` + horizontal scroll (PR #88)
-- **HF-3:** nav active via segment match + longest-href wins — **PR #89 open** (ACC-02 / SHELL-08)
+| ID | PR | Notes |
+|----|-----|--------|
+| Wave 0–1 | #86 | harness, plan, FINDINGS freeze |
+| HF-1 | #87 | signed KPI danger chrome |
+| HF-2 | #88 | sticky DataTable Actions + scroll |
+| HF-3 | #89 | nav segment match + longest-href (CoA) |
 
-## P0 remaining
+## What changed this session (T1 → PR #90)
 
-1. ~~FD-01 / HF-1~~  
-2. ~~EMP-01 / SHELL-07 / HF-2~~  
-3. ~~ACC-02 / SHELL-08 / HF-3~~ (merge PR #89)
+Commits on branch (4 atomic):
 
-## Themes (user picks next after #89 merge)
+1. `a2ad8777` feat: semantic status badges for employees and POs  
+2. `0c71b883` feat: single-row DataTable toolbar layout  
+3. `aec6123e` feat: DataTable bulk bar and pagination chrome  
+4. `2b63e4d0` docs: mark T1 DataTable shell in progress  
 
-| ID | Theme | Why next |
-|----|-------|----------|
-| **T1** | DataTable shell v2 | Highest blast radius: SHELL-02,03,06,07,10,11; EMP-*; PO-* (sticky Actions already in HF-2 — rest of shell) |
-| **T2** | Sidebar IA residual | Truncation + density only (active route done in HF-3) |
-| T3 | Page header contract | breadcrumb/title drift |
-| T4 | Dashboard & KPI | residual after HF-1 |
-| T5 | Sparse & report density | lower pri |
+- `DataTableToolbar.tsx` — single flex-wrap row (SHELL-02/03)  
+- `DataTableCore.tsx` — bulk bar + shell (SHELL-10/11)  
+- `PaginationControls.tsx` — footer chrome  
+- `lib/status-badge.ts` + EMP/PO columns — SHELL-06  
+- Sticky Actions (HF-2) **unchanged**  
+- `e2e/` left untracked  
+
+Validated: `tsc --noEmit` clean.
+
+## Themes remaining
+
+| ID | Pri | Theme | Status |
+|----|-----|-------|--------|
+| **T1** | P0–P1 | DataTable shell v2 | **WIP on branch** — finish verify + PR |
+| **T2** | P1 | Sidebar residual | Truncation + density only |
+| T3 | P1 | Page header contract | open |
+| T4 | P0–P1 | Dashboard & KPI residual | open |
+| T5 | P1–P2 | Sparse & report density | open |
 
 ## Do not
 
-- Mass-capture Wave 2 / remaining 78 routes  
-- Use default `playwright.config.ts` for visual (migrate:fresh)  
-- Redesign all 85 modules in one MR  
-- Commit local untracked `e2e/` junk  
-- Start T1/T2 on top of unmerged HF-3 branch (new branch from **main after merge**)
+- Wave 2 mass capture (~78 routes)  
+- Default `playwright.config.ts` for visual (`migrate:fresh`)  
+- Multi-theme one MR  
+- Commit untracked `e2e/`
 
 ## Recommended next
 
-1. **You:** review/merge **PR #89** (manual smoke: `/accounts` → CoA active, not Department)  
-2. **Agent after merge:** `rtk git checkout main && rtk git pull --ff-only` → branch `feat/t1-datatable-shell-v2` **or** `feat/t2-sidebar-density`  
-3. Prefer **T1** if capacity (shared table chrome); **T2** if small residual sidebar polish only  
-4. Optional light re-smoke 3–5 routes with visual-audit config only  
-
-## Files (HF-3 / PR #89)
-
-- `resources/js/lib/nav-active.ts`  
-- `resources/js/components/nav-main.tsx`  
-- `docs/visual-audit/BACKLOG.md`  
+1. Review/merge **PR #90** when ready (do not block on local CI wait)  
+2. After merge: mark BACKLOG T1 done; pull main  
+3. Optional: T2 sidebar density **or** light visual re-smoke  
+4. **No** Wave 2 mass capture  
 
 ## Continuation Prompt
 
-After PR #89 merge: pull main, start **T1 DataTable shell v2** (or T2 sidebar density if user prefers small). One theme = one branch = one MR. Do not Wave 2 mass capture.
+PR #90 open for T1. Merge when green, update BACKLOG T1 → done, then T2 residual or re-smoke. No Wave 2.

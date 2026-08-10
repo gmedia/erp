@@ -1,6 +1,7 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
+import { formatStatusLabel, statusBadgeVariant } from '@/lib/status-badge';
 import { PurchaseOrder } from '@/types/purchase-order';
 import {
     createActionsColumn,
@@ -21,7 +22,9 @@ const renderWarehouseCell = ({ row }: { row: { original: PurchaseOrder } }) => (
 );
 
 const renderStatusCell = ({ row }: { row: { original: PurchaseOrder } }) => (
-    <Badge variant="outline">{row.original.status.replace('_', ' ')}</Badge>
+    <Badge variant={statusBadgeVariant(row.original.status)}>
+        {formatStatusLabel(row.original.status)}
+    </Badge>
 );
 
 export const purchaseOrderColumns: ColumnDef<PurchaseOrder>[] = [
