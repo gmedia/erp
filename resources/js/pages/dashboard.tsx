@@ -6,12 +6,7 @@ import axios from '@/lib/axios';
 import { type BreadcrumbItem } from '@/types';
 import { formatNumberByRegionalSettings } from '@/utils/number-format';
 import { useQuery } from '@tanstack/react-query';
-import {
-    Boxes,
-    Building2,
-    Users,
-    Warehouse,
-} from 'lucide-react';
+import { Boxes, Building2, Users, Warehouse } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
