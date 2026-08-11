@@ -288,7 +288,8 @@ export default function MyApprovalsPage() {
                                                     {typeLabel}
                                                 </Badge>
                                                 <span className="font-mono text-[11px] text-muted-foreground tabular-nums">
-                                                    #{step.request.approvable_id}
+                                                    #
+                                                    {step.request.approvable_id}
                                                 </span>
                                                 <StatusBadge
                                                     status={step.status}
@@ -438,7 +439,10 @@ export default function MyApprovalsPage() {
 
                 <Tabs defaultValue="pending" className="w-full gap-3">
                     <TabsList className="grid h-9 w-full grid-cols-4 lg:w-[28rem]">
-                        <TabsTrigger value="pending" className="group text-xs sm:text-sm">
+                        <TabsTrigger
+                            value="pending"
+                            className="group text-xs sm:text-sm"
+                        >
                             Pending
                             <TabCount count={pending.length} />
                         </TabsTrigger>
@@ -456,7 +460,10 @@ export default function MyApprovalsPage() {
                             Rejected
                             <TabCount count={rejected.length} />
                         </TabsTrigger>
-                        <TabsTrigger value="all" className="group text-xs sm:text-sm">
+                        <TabsTrigger
+                            value="all"
+                            className="group text-xs sm:text-sm"
+                        >
                             All
                             <TabCount count={all.length} />
                         </TabsTrigger>
