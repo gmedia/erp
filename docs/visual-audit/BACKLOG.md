@@ -1,8 +1,8 @@
 # Visual Audit — Backlog
 
-**Last updated:** 2026-08-10  
+**Last updated:** 2026-08-11  
 **Source:** multimodal-looker Wave 0–1  
-**Policy:** T1–T5 landed on main. No **mass** Wave 2 (85 leaves). Prefer selective re-smoke of Wave 0–1 shells, then exception surfaces only.
+**Policy:** T1–T5 landed on main. No **mass** Wave 2 (85 leaves). Prefer selective re-smoke via `VISUAL_AUDIT_PRESET` / `VISUAL_AUDIT_ROUTES`, then exception surfaces only.
 
 ## Open (prioritized)
 
@@ -47,9 +47,23 @@
 - PNGs stay gitignored; cite paths in MR description
 - Agents: **AGENTS.md Tool & Process Concurrency** (≤3 tools/turn; post-kill = 1 tool/turn)
 
+## Harness route selection
+
+| Priority | Env | Effect |
+|----------|-----|--------|
+| 1 | `VISUAL_AUDIT_ROUTES=/a,/b` | Comma list only |
+| 2 | `VISUAL_AUDIT_PRESET=shells` | Named set in `presets.json` (`shells`, `wave-0`, `exceptions`, `dashboards`, `smoke`) |
+| 3 | (none) | Full `url-list.json` (85) — avoid on low-RAM hosts |
+
+```bash
+VISUAL_AUDIT=1 VISUAL_AUDIT_PRESET=shells PLAYWRIGHT_BASE_URL=http://127.0.0.1:82 \
+  npx playwright test -c playwright.visual-audit.config.ts
+```
+
 ## Next agent action
 
-1. ~~Selective re-smoke~~ **Done 2026-08-10:** `VISUAL_AUDIT=1` + `playwright.visual-audit.config.ts` — **84/85 PASS**; **FAIL** `/asset-models` (bounced to `/login`). Note: harness walks full `url-list.json` (85), not Wave 0–1 only — treat as opportunistic full leaf pass; PNGs gitignored under `docs/visual-audit/waves/`  
-2. Optional multimodal / human pass on key Wave 0–1 PNGs (employees, departments, PO, stock-movement report, dashboard, FD, accounts, balance-sheet)  
-3. If clean: one **exception surface** MR (My Approvals **or** asset profile **or** modal) — not a second mass capture  
-4. Optional: add route filter to visual-audit harness so “selective” ≠ all 85  
+1. ~~Selective re-smoke~~ **Done 2026-08-10:** full catalog **84/85 PASS**; **FAIL** `/asset-models` → `/login`
+2. ~~Harness allowlist~~ **Done 2026-08-11:** `VISUAL_AUDIT_PRESET` + `docs/visual-audit/presets.json`
+3. Optional multimodal / human pass on Wave 0–1 PNGs
+4. Exception surface MRs (My Approvals #96, then asset profile / modal) — not mass capture
+5. Optional: fix `/asset-models` capture auth bounce
