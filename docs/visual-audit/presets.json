@@ -1,0 +1,55 @@
+{
+  "description": "Named route sets for VISUAL_AUDIT_PRESET. Used by tests/e2e/visual-audit/capture.spec.ts. Prefer presets over full url-list.json (85 routes) on constrained hosts.",
+  "presets": {
+    "wave-0": {
+      "note": "Original Wave 0 shell sample (shared chrome review)",
+      "routes": [
+        "/dashboard",
+        "/financial-dashboard",
+        "/employees",
+        "/departments",
+        "/purchase-orders",
+        "/accounts",
+        "/reports/balance-sheet",
+        "/reports/stock-movement"
+      ]
+    },
+    "shells": {
+      "note": "Alias of wave-0 — selective re-smoke after T1–T5",
+      "routes": [
+        "/dashboard",
+        "/financial-dashboard",
+        "/employees",
+        "/departments",
+        "/purchase-orders",
+        "/accounts",
+        "/reports/balance-sheet",
+        "/reports/stock-movement"
+      ]
+    },
+    "exceptions": {
+      "note": "Non-DataTable / exception surfaces (post shared-shell)",
+      "routes": [
+        "/my-approvals",
+        "/assets",
+        "/accounts",
+        "/dashboard",
+        "/financial-dashboard"
+      ]
+    },
+    "dashboards": {
+      "note": "KPI / home dashboards only",
+      "routes": [
+        "/dashboard",
+        "/financial-dashboard",
+        "/aging-dashboard",
+        "/asset-dashboard",
+        "/pipeline-dashboard"
+      ]
+    },
+    "smoke": {
+      "note": "Minimal 3-route harness check",
+      "routes": ["/dashboard", "/departments", "/employees"]
+    }
+  }
+}
