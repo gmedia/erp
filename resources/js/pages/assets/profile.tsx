@@ -1,6 +1,7 @@
 'use client';
 
 import { ApprovalHistoryTimeline } from '@/components/approvals/ApprovalHistoryTimeline';
+import { PageHeader } from '@/components/common/PageHeader';
 import { EntityStateActions } from '@/components/pipeline/EntityStateActions';
 import { EntityStateTimeline } from '@/components/pipeline/EntityStateTimeline';
 import { Badge } from '@/components/ui/badge';
@@ -42,7 +43,6 @@ import {
     Hash,
     History,
     Info,
-    Layers,
     Loader2,
     MapPin,
     Package,
@@ -215,158 +215,138 @@ export default function AssetProfile() {
                 <title>{`Asset Profile - ${item.asset_code}`}</title>
             </Helmet>
 
-            <div className="flex flex-col gap-6 p-6">
-                {/* Header Section - Enhanced */}
-                <div className="relative overflow-hidden rounded-xl border bg-gradient-to-r from-primary/5 via-primary/10 to-transparent p-6">
-                    <div className="absolute top-0 right-0 -z-10 h-64 w-64 opacity-20">
-                        <Package className="h-full w-full text-primary/30" />
-                    </div>
-                    <div className="flex flex-col justify-between gap-6 md:flex-row md:items-start">
-                        <div className="flex items-start gap-4">
-                            {/* Icon Box */}
-                            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary shadow-sm">
-                                <Layers className="h-8 w-8" />
-                            </div>
-                            <div className="space-y-2">
-                                <div className="flex flex-wrap items-center gap-2">
-                                    <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
-                                        {item.name}
-                                    </h1>
-                                    <Badge
-                                        variant="outline"
-                                        className="px-3 py-1 font-mono text-sm"
-                                    >
-                                        {item.asset_code}
-                                    </Badge>
-                                </div>
-                                <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                                    <span className="flex items-center gap-1">
-                                        <Package className="h-4 w-4" />
-                                        {item.category?.name || 'Uncategorized'}
+            <div className="flex flex-col gap-4 p-4 md:p-6">
+                <PageHeader
+                    title={item.name}
+                    meta={
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                            <Badge
+                                variant="outline"
+                                className="font-mono text-xs"
+                            >
+                                {item.asset_code}
+                            </Badge>
+                            <span className="inline-flex items-center gap-1">
+                                <Package className="h-3.5 w-3.5" />
+                                {item.category?.name || 'Uncategorized'}
+                            </span>
+                            <span className="hidden text-muted-foreground sm:inline">
+                                ·
+                            </span>
+                            <span className="inline-flex items-center gap-1">
+                                <Settings className="h-3.5 w-3.5" />
+                                {item.model?.model_name || 'Generic Model'}
+                            </span>
+                            {item.model?.manufacturer ? (
+                                <>
+                                    <span className="hidden text-muted-foreground sm:inline">
+                                        ·
                                     </span>
-                                    <span className="hidden sm:inline">•</span>
-                                    <span className="flex items-center gap-1">
-                                        <Settings className="h-4 w-4" />
-                                        {item.model?.model_name ||
-                                            'Generic Model'}
-                                    </span>
-                                    {item.model?.manufacturer && (
-                                        <>
-                                            <span className="hidden sm:inline">
-                                                •
-                                            </span>
-                                            <span>
-                                                {item.model.manufacturer}
-                                            </span>
-                                        </>
-                                    )}
-                                </div>
-                            </div>
+                                    <span>{item.model.manufacturer}</span>
+                                </>
+                            ) : null}
                         </div>
-
-                        <div className="flex flex-wrap items-center gap-4">
-                            {item.qrcode_url && (
-                                <div className="flex flex-col items-center gap-2">
-                                    <div className="rounded-lg border border-primary/10 bg-white p-2 shadow-sm">
+                    }
+                    actions={
+                        <>
+                            {item.qrcode_url ? (
+                                <div className="flex items-center gap-2">
+                                    <div className="rounded-md border bg-background p-1">
                                         <QRCodeSVG
                                             value={item.qrcode_url || ''}
-                                            size={80}
+                                            size={56}
                                             level="H"
-                                            className="qr-code-svg h-20 w-20"
+                                            className="qr-code-svg h-14 w-14"
                                         />
                                     </div>
                                     <Button
-                                        variant="ghost"
+                                        variant="outline"
                                         size="sm"
-                                        className="h-8 gap-2 text-xs text-primary hover:bg-primary/5 hover:text-primary"
+                                        className="h-8 gap-1.5 text-xs"
                                         onClick={handlePrint}
                                     >
                                         <Printer className="h-3.5 w-3.5" />
                                         Print QR
                                     </Button>
                                 </div>
-                            )}
-                            <div className="flex flex-col gap-2">
-                                <EntityStateActions
-                                    entityType="asset"
-                                    entityId={item.ulid}
-                                    onStateChange={handleStateChange}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                            ) : null}
+                            <EntityStateActions
+                                entityType="asset"
+                                entityId={item.ulid}
+                                onStateChange={handleStateChange}
+                            />
+                        </>
+                    }
+                />
 
                 <Tabs defaultValue="summary" className="w-full">
-                    <TabsList className="mb-4 grid !h-auto w-full grid-cols-2 gap-2 bg-muted/50 p-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
+                    <TabsList className="mb-2 grid !h-auto w-full grid-cols-2 gap-1 bg-muted/50 p-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
                         <TabsTrigger
                             value="summary"
-                            className="data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                            className="gap-1.5 text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm sm:text-sm"
                         >
-                            <Info className="mr-2 h-4 w-4" />
+                            <Info className="hidden h-3.5 w-3.5 sm:block" />
                             Summary
                         </TabsTrigger>
                         <TabsTrigger
                             value="movements"
-                            className="data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                            className="gap-1.5 text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm sm:text-sm"
                         >
-                            <History className="mr-2 h-4 w-4" />
+                            <History className="hidden h-3.5 w-3.5 sm:block" />
                             Movements
                         </TabsTrigger>
                         <TabsTrigger
                             value="maintenance"
-                            className="data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                            className="gap-1.5 text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm sm:text-sm"
                         >
-                            <Wrench className="mr-2 h-4 w-4" />
+                            <Wrench className="hidden h-3.5 w-3.5 sm:block" />
                             Maintenance
                         </TabsTrigger>
                         <TabsTrigger
                             value="stocktake"
-                            className="data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                            className="gap-1.5 text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm sm:text-sm"
                         >
-                            <ClipboardCheck className="mr-2 h-4 w-4" />
+                            <ClipboardCheck className="hidden h-3.5 w-3.5 sm:block" />
                             Stocktake
                         </TabsTrigger>
                         <TabsTrigger
                             value="depreciation"
-                            className="data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                            className="gap-1.5 text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm sm:text-sm"
                         >
-                            <TrendingDown className="mr-2 h-4 w-4" />
+                            <TrendingDown className="hidden h-3.5 w-3.5 sm:block" />
                             Depreciation
                         </TabsTrigger>
                         <TabsTrigger
                             value="timeline"
-                            className="data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                            className="gap-1.5 text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm sm:text-sm"
                         >
-                            <History className="mr-2 h-4 w-4" />
+                            <History className="hidden h-3.5 w-3.5 sm:block" />
                             Timeline
                         </TabsTrigger>
                         <TabsTrigger
                             value="approvals"
-                            className="data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                            className="gap-1.5 text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm sm:text-sm"
                         >
-                            <History className="mr-2 h-4 w-4" />
+                            <History className="hidden h-3.5 w-3.5 sm:block" />
                             Approvals
                         </TabsTrigger>
                     </TabsList>
 
                     {/* Summary Tab */}
-                    <TabsContent value="summary" className="mt-6 space-y-6">
-                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <TabsContent value="summary" className="mt-3 space-y-4">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                             {/* General Information */}
                             <Card
                                 className="group transition-all duration-200 hover:border-primary/30 hover:shadow-md"
                                 data-testid="summary-general-info"
                             >
-                                <CardHeader className="pb-3">
+                                <CardHeader className="px-4 py-3">
                                     <CardTitle className="flex items-center gap-2 text-sm font-medium">
-                                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
-                                            <Info className="h-4 w-4" />
-                                        </div>
+                                        <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                                         <span>General Information</span>
                                     </CardTitle>
                                 </CardHeader>
-                                <CardContent className="space-y-4">
+                                <CardContent className="space-y-3 px-4 pb-4">
                                     <div className="flex items-center justify-between text-sm">
                                         <span className="flex items-center gap-2 text-muted-foreground">
                                             <Hash className="h-3.5 w-3.5" />
@@ -414,15 +394,13 @@ export default function AssetProfile() {
                                 className="group transition-all duration-200 hover:border-primary/30 hover:shadow-md"
                                 data-testid="summary-location-info"
                             >
-                                <CardHeader className="pb-3">
+                                <CardHeader className="px-4 py-3">
                                     <CardTitle className="flex items-center gap-2 text-sm font-medium">
-                                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400">
-                                            <MapPin className="h-4 w-4" />
-                                        </div>
+                                        <MapPin className="h-4 w-4 text-green-600 dark:text-green-400" />
                                         <span>Current Location & PIC</span>
                                     </CardTitle>
                                 </CardHeader>
-                                <CardContent className="space-y-4">
+                                <CardContent className="space-y-3 px-4 pb-4">
                                     <div className="flex items-center justify-between text-sm">
                                         <span className="flex items-center gap-2 text-muted-foreground">
                                             <Building2 className="h-3.5 w-3.5" />
@@ -484,15 +462,13 @@ export default function AssetProfile() {
                                 className="group transition-all duration-200 hover:border-primary/30 hover:shadow-md"
                                 data-testid="summary-financial-info"
                             >
-                                <CardHeader className="pb-3">
+                                <CardHeader className="px-4 py-3">
                                     <CardTitle className="flex items-center gap-2 text-sm font-medium">
-                                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400">
-                                            <CircleDollarSign className="h-4 w-4" />
-                                        </div>
+                                        <CircleDollarSign className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                                         <span>Financial Summary</span>
                                     </CardTitle>
                                 </CardHeader>
-                                <CardContent className="space-y-4">
+                                <CardContent className="space-y-3 px-4 pb-4">
                                     <div className="flex items-center justify-between text-sm">
                                         <span className="text-muted-foreground">
                                             Purchase Cost
@@ -556,15 +532,13 @@ export default function AssetProfile() {
 
                         {item.notes && (
                             <Card className="transition-all duration-200 hover:shadow-md">
-                                <CardHeader className="pb-3">
+                                <CardHeader className="px-4 py-3">
                                     <CardTitle className="flex items-center gap-2 text-sm font-medium">
-                                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
-                                            <Info className="h-4 w-4" />
-                                        </div>
+                                        <Info className="h-4 w-4 text-muted-foreground" />
                                         <span>Notes</span>
                                     </CardTitle>
                                 </CardHeader>
-                                <CardContent>
+                                <CardContent className="px-4 pb-4">
                                     <p className="text-sm leading-relaxed whitespace-pre-wrap text-muted-foreground">
                                         {item.notes}
                                     </p>
@@ -574,7 +548,7 @@ export default function AssetProfile() {
                     </TabsContent>
 
                     {/* Movements Tab */}
-                    <TabsContent value="movements" className="mt-6">
+                    <TabsContent value="movements" className="mt-3">
                         <Card className="overflow-hidden">
                             <CardContent className="p-0">
                                 {item.movements?.length ? (
@@ -713,7 +687,7 @@ export default function AssetProfile() {
                     </TabsContent>
 
                     {/* Maintenance Tab */}
-                    <TabsContent value="maintenance" className="mt-6">
+                    <TabsContent value="maintenance" className="mt-3">
                         <Card className="overflow-hidden">
                             <CardContent className="p-0">
                                 {item.maintenances?.length ? (
@@ -811,7 +785,7 @@ export default function AssetProfile() {
                     </TabsContent>
 
                     {/* Stocktake Tab */}
-                    <TabsContent value="stocktake" className="mt-6">
+                    <TabsContent value="stocktake" className="mt-3">
                         <Card className="overflow-hidden">
                             <CardContent className="p-0">
                                 {item.stocktake_items?.length ? (
@@ -900,7 +874,7 @@ export default function AssetProfile() {
                     </TabsContent>
 
                     {/* Depreciation Tab */}
-                    <TabsContent value="depreciation" className="mt-6">
+                    <TabsContent value="depreciation" className="mt-3">
                         <Card className="overflow-hidden">
                             <CardContent className="p-0">
                                 {item.depreciation_lines?.length ? (
@@ -988,7 +962,7 @@ export default function AssetProfile() {
                     </TabsContent>
 
                     {/* Timeline Tab */}
-                    <TabsContent value="timeline" className="mt-6">
+                    <TabsContent value="timeline" className="mt-3">
                         <EntityStateTimeline
                             key={timelineKey}
                             entityType="asset"
@@ -997,7 +971,7 @@ export default function AssetProfile() {
                     </TabsContent>
 
                     {/* Approvals Tab */}
-                    <TabsContent value="approvals" className="mt-6">
+                    <TabsContent value="approvals" className="mt-3">
                         <ApprovalHistoryTimeline
                             entityType="asset"
                             entityId={item.ulid}
