@@ -11,6 +11,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { cn } from '@/lib/utils';
 
 interface ViewModalShellProps {
     open: boolean;
@@ -31,7 +32,7 @@ export function ViewModalShell({
     title,
     description,
     children,
-    contentClassName = 'sm:max-w-[425px]',
+    contentClassName,
     headerClassName,
     footerClassName,
     footer,
@@ -39,16 +40,25 @@ export function ViewModalShell({
 }: Readonly<ViewModalShellProps>) {
     return (
         <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-            <DialogContent className={contentClassName}>
-                <DialogHeader className={headerClassName}>
-                    <DialogTitle>{title}</DialogTitle>
-                    <DialogDescription>{description}</DialogDescription>
+            <DialogContent
+                className={cn(
+                    'gap-3 p-4 sm:max-w-lg',
+                    contentClassName,
+                )}
+            >
+                <DialogHeader className={cn('gap-1 pr-8', headerClassName)}>
+                    <DialogTitle className="text-base leading-tight">
+                        {title}
+                    </DialogTitle>
+                    <DialogDescription className="text-xs">
+                        {description}
+                    </DialogDescription>
                 </DialogHeader>
 
                 {children}
 
                 {!hideFooter && (
-                    <DialogFooter className={footerClassName}>
+                    <DialogFooter className={cn('pt-1', footerClassName)}>
                         {footer ?? (
                             <Button type="button" onClick={onClose}>
                                 Close

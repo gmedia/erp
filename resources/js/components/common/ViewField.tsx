@@ -1,6 +1,7 @@
 'use client';
 
 import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 import * as React from 'react';
 
 interface ViewFieldProps {
@@ -19,9 +20,11 @@ export function ViewField({
     className,
 }: Readonly<ViewFieldProps>) {
     return (
-        <div className="grid gap-1">
-            <Label className="text-muted-foreground">{label}</Label>
-            <div className={`text-sm font-medium ${className || ''}`}>
+        <div className="grid gap-0.5">
+            <Label className="text-muted-foreground text-xs font-normal">
+                {label}
+            </Label>
+            <div className={cn('text-sm font-medium leading-snug', className)}>
                 {value || '-'}
             </div>
         </div>
