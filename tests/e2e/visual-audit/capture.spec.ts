@@ -108,12 +108,21 @@ test.describe('visual audit capture', () => {
     test(`capture ${route}`, async ({ page }) => {
       test.setTimeout(90_000);
 
-      await login(page, undefined, undefined, { requireDashboard: false });
+      await login(page, undefined, undefined, { requireDashboard: true });
       await page.setViewportSize({ width: 1440, height: 900 });
-      await page.goto(route, { waitUntil: 'domcontentloaded', timeout: 60_000 });
 
-      await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => undefined);
-      await page.waitForTimeout(500);
+      const gotoTarget = async (): Promise<void> => {
+        await page.goto(route, { waitUntil: 'domcontentloaded', timeout: 60_000 });
+        await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => undefined);
+        await page.waitForTimeout(500);
+      };
+
+      await gotoTarget();
+
+      if (route !== '/login' && page.url().includes('/login')) {
+        await login(page, undefined, undefined, { requireDashboard: true });
+        await gotoTarget();
+      }
 
       const url = page.url();
       expect(url.includes('/login') && route !== '/login').toBeFalsy();
