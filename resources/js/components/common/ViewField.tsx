@@ -21,10 +21,10 @@ export function ViewField({
 }: Readonly<ViewFieldProps>) {
     return (
         <div className="grid gap-0.5">
-            <Label className="text-muted-foreground text-xs font-normal">
+            <Label className="text-xs font-normal text-muted-foreground">
                 {label}
             </Label>
-            <div className={cn('text-sm font-medium leading-snug', className)}>
+            <div className={cn('text-sm leading-snug font-medium', className)}>
                 {value || '-'}
             </div>
         </div>

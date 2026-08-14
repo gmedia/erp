@@ -41,10 +41,7 @@ export function ViewModalShell({
     return (
         <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
             <DialogContent
-                className={cn(
-                    'gap-3 p-4 sm:max-w-lg',
-                    contentClassName,
-                )}
+                className={cn('gap-3 p-4 sm:max-w-lg', contentClassName)}
             >
                 <DialogHeader className={cn('gap-1 pr-8', headerClassName)}>
                     <DialogTitle className="text-base leading-tight">
