@@ -1,10 +1,10 @@
 # task.md — Active Session Handoff
 
 **Last updated:** 2026-08-11  
-**Current milestone:** Visual audit — resolve #98 / #99 conflicts after #96 merge  
-**Branch tip (this work):** `fix/va-asset-models-capture-auth` (rebasing onto main)  
-**main tip:** includes **#96** My Approvals + **#97** harness (`361f28cb`)  
-**Open PRs:** [#98](https://github.com/gmedia/erp/pull/98) capture auth · [#99](https://github.com/gmedia/erp/pull/99) asset profile  
+**Current milestone:** Visual audit — #98 merged; #99 rebased onto main  
+**Branch tip (this work):** `feat/va-asset-profile-chrome`  
+**main tip:** **#96** + **#97** + **#98**  
+**Open PRs:** [#99](https://github.com/gmedia/erp/pull/99) asset profile  
 **Vision session:** multimodal-looker `ses_02021a5c2ffeaD0HIIg6ymhnEW`
 
 ## Read order
@@ -16,50 +16,31 @@
 
 ## Done
 
-- Wave 0–1 harness + plan + FINDINGS/BACKLOG (PR #86)  
-- **HF-1–3** · **T1–T5** #90–#94 · **Closeout** #95 · **Harness** #97 · **My Approvals** #96 — **on main**  
-- Full re-smoke **84/85** historically (`/asset-models` → login)  
-- **Capture auth settle** — this branch / **PR #98**  
-  - `requireDashboard: true` + re-login retry on top of #97 presets  
-  - Local 3-route PASS pre-rebase  
+- T1–T5 · Closeout #95 · Harness #97 · My Approvals **#96** · Capture auth **#98** — **on main**  
+- **Asset profile chrome** — this branch / **PR #99**  
+  - Gradient hero → `PageHeader`; compact tabs/cards; QR + EntityState* kept  
+  - `npm run types` clean  
 
 ## Themes status
 
 | ID | Theme | Status |
 |----|-------|--------|
-| T1–T5 | Shared shell | **merged** |
-| Harness | Named presets | **merged** (#97) |
-| EX-1 | My Approvals inbox | **merged** (#96) |
-| EX-auth | Capture auth settle | **PR #98** (rebasing) |
-| EX-asset-profile | Asset profile densify | **PR #99** |
+| T1–T5 / Harness / EX-1 / EX-auth | shell + presets + My Approvals + capture | **merged** |
+| EX-asset-profile | Asset profile densify | **PR #99** (rebasing) |
 
 ## Do not
 
-- Mass-capture Wave 2 / remaining ~78 routes  
-- Use default `playwright.config.ts` for visual (`migrate:fresh`)  
-- Commit untracked `e2e/`  
-- Wait on CI  
-- Parallel tool fan-out (≤3 tools/turn; post-kill = 1)  
-
-## Validated (pre-rebase)
-
-```bash
-VISUAL_AUDIT=1 VISUAL_AUDIT_ROUTES=/asset-models,/asset-categories,/dashboard \
-  PLAYWRIGHT_BASE_URL=http://127.0.0.1:82 PLAYWRIGHT_WORKERS=1 \
-  npx playwright test -c playwright.visual-audit.config.ts
-# → 3 passed (re-run after rebase if needed)
-```
+- Mass Wave 2 · commit `e2e/` · wait/poll CI · stack more work on this PR  
 
 ## Recommended next
 
-1. Finish rebase #98 → force-with-lease push (MERGEABLE).  
-2. Rebase #99 onto main → resolve `task.md`/`BACKLOG` → push.  
-3. Merge #98 / #99 when ready (no CI wait).  
+1. Finish rebase → force-with-lease → MERGEABLE.  
+2. User merges **#99** when ready.  
+3. No mass Wave 2.
 
 ## Continuation Prompt
 
 ```
-Read task.md. Resolve #98 and #99 conflicts vs main (post-#96).
-Prefer rebase; keep capture auth + asset profile chrome.
-Do not poll CI. Keep e2e/ untracked. AGENTS ≤3 tools/turn.
+Read task.md. #98 merged. Finish #99 rebase/push if needed.
+Do not poll CI. Keep e2e/ untracked.
 ```
