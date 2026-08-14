@@ -13,7 +13,8 @@
 | Harness | Named presets | **merged** (#97) |
 | EX-1 | My Approvals inbox | **merged** (#96) |
 | EX-auth | Capture auth settle | **merged** (#98) |
-| EX-asset-profile | Asset profile chrome | **PR #99** (rebasing) |
+| EX-asset-profile | Asset profile chrome | **merged** (#99) |
+| EX-modal | View/form modal chrome | **this branch** |
 
 ## Exception rows
 
@@ -21,7 +22,8 @@
 |----|-----|-------|-------|--------|-------|
 | EX-1 | P1 | My Approvals chrome | `/my-approvals` | **merged #96** | Densify inbox |
 | EX-auth | P1 | Capture auth settle | visual harness | **merged #98** | `requireDashboard` + re-login |
-| EX-asset-profile | P1 | Asset profile chrome | `/assets/:ulid` | **PR #99** | PageHeader + compact tabs/cards |
+| EX-asset-profile | P1 | Asset profile chrome | `/assets/:ulid` | **merged #99** | PageHeader + compact tabs/cards |
+| EX-modal | P1 | View/form modal chrome | ViewModalShell + EntityForm | **this branch** | Tighter padding, title, ViewField |
 
 ## Hotfixes (can ship before full T1)
 
