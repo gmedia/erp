@@ -99,10 +99,12 @@ export default function EntityForm<
                     className,
                 )}
             >
-                <div className="shrink-0 p-6 pb-2">
-                    <DialogHeader>
-                        <DialogTitle>{title}</DialogTitle>
-                        <DialogDescription>
+                <div className="shrink-0 px-4 pt-4 pb-1">
+                    <DialogHeader className="gap-1">
+                        <DialogTitle className="text-base leading-tight">
+                            {title}
+                        </DialogTitle>
+                        <DialogDescription className="text-xs">
                             {t('common.fill_details')}
                         </DialogDescription>
                     </DialogHeader>
@@ -112,13 +114,13 @@ export default function EntityForm<
                         onSubmit={form.handleSubmit(handleSubmit)}
                         className="flex min-h-0 flex-1 flex-col"
                     >
-                        <div className="min-h-0 flex-1 overflow-y-auto px-6">
-                            <div className="space-y-4 py-1 pb-6">
+                        <div className="min-h-0 flex-1 overflow-y-auto px-4">
+                            <div className="space-y-3 py-1 pb-4">
                                 {children}
                             </div>
                         </div>
-                        <div className="shrink-0 p-6 pt-2">
-                            <DialogFooter className="border-t pt-4">
+                        <div className="shrink-0 px-4 pt-1 pb-4">
+                            <DialogFooter className="border-t pt-3">
                                 <Button
                                     type="button"
                                     variant="outline"
