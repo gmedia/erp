@@ -36,7 +36,7 @@
 | SHELL-09 | P2 | Deep nav | Long nested lists; active child hard to see |
 | SHELL-10 | P2 | CRUD | Checkbox without bulk action UX |
 | SHELL-11 | P2 | DataTable | Pagination weak in empty footer zone |
-| SHELL-12 | P3 | DASH vs FD | Home stub vs rich financial dashboard |
+| SHELL-12 | P3 | DASH vs FD | **product:** enrich `/dashboard` widgets; do not merge with financial dashboard |
 
 **Material shared-shell count:** 11 (≥3 threshold).
 
@@ -49,7 +49,7 @@
 | EMP-03 | P1 | `/employees` | All status “Regular” solid black |
 | PO-01 | P1 | `/purchase-orders` | 8 statuses look identical; critical states don’t pop |
 | PO-04 | P2 | `/purchase-orders` | No Actions column visible |
-| PO-05 | P2 | `/purchase-orders` | Grand Total not in visible columns |
+| PO-05 | P2 | `/purchase-orders` | **product:** pin Grand Total sticky (left of Actions) |
 | ACC-01 | P1 | `/accounts` | Double title (breadcrumb + H1 same) |
 | ACC-02 | P1 | `/accounts` | Wrong sidebar active state |
 | RSM-01 | P1 | stock-movement | 2 rows + ~70% white void |
