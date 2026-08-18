@@ -23,6 +23,10 @@ test.describe('Financial Dashboard', () => {
 
     await expect(page.getByRole('heading', { name: 'Financial Overview' })).toBeVisible();
 
+    const fiscalYearTrigger = page.locator('#fiscal-year-select');
+    await expect(fiscalYearTrigger).toBeVisible({ timeout: 10000 });
+    await expect(fiscalYearTrigger).not.toHaveText(/Select fiscal year/i);
+
     const cards = ['Revenue', 'Expenses', 'Net Income', 'Total Assets', 'Total Liabilities', 'Equity', 'Cash Balance'];
 
     for (const cardLabel of cards) {

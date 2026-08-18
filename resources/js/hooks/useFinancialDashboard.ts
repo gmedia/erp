@@ -1,5 +1,5 @@
 import axios from '@/lib/axios';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 export interface KpiItem {
     value: number;
@@ -103,6 +103,7 @@ export function useFinancialDashboard(params?: UseFinancialDashboardParams) {
             params?.branchId,
         ],
         queryFn: fetchDashboardData,
+        placeholderData: keepPreviousData,
         staleTime: 60000,
     });
 
