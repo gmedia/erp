@@ -51,7 +51,7 @@
 | ID | Pri | Item | Notes |
 |----|-----|------|-------|
 | PO-05 | P2 | Grand Total column visibility | Product/column config, not shell |
-| BS-01 | P2 | Compare “None” label opacity | Filter UX |
+| BS-01 | P2 | Compare “None” label opacity | **this branch** — labeled Fiscal Year / Compare; None muted |
 | SHELL-12 | P3 | Home stub vs financial dashboard | Product decision |
 
 ## Implementation rules
