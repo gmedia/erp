@@ -49,7 +49,7 @@
 | EMP-03 | P1 | `/employees` | All status “Regular” solid black |
 | PO-01 | P1 | `/purchase-orders` | 8 statuses look identical; critical states don’t pop |
 | PO-04 | P2 | `/purchase-orders` | No Actions column visible |
-| PO-05 | P2 | `/purchase-orders` | **product:** pin Grand Total sticky (left of Actions) |
+| PO-05 | P2 | `/purchase-orders` | **in this MR** — sticky Grand Total immediately left of Actions |
 | ACC-01 | P1 | `/accounts` | Double title (breadcrumb + H1 same) |
 | ACC-02 | P1 | `/accounts` | Wrong sidebar active state |
 | RSM-01 | P1 | stock-movement | 2 rows + ~70% white void |
