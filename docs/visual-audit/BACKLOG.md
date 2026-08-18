@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-08-18  
 **Source:** multimodal-looker Wave 0–1  
-**Policy:** T1–T5 + harness presets on main. No **mass** Wave 2 (85 leaves). Prefer selective re-smoke via `VISUAL_AUDIT_PRESET` / `VISUAL_AUDIT_ROUTES`, then exception surfaces only.
+**Policy:** T1–T5 + EX themes on main. No **mass** Wave 2 (85 leaves). Prefer selective re-smoke via `VISUAL_AUDIT_PRESET` / `VISUAL_AUDIT_ROUTES`.
 
 ## Themes
 
@@ -45,20 +45,25 @@
 | T3 | PR #92 — Page header contract |
 | T4 | PR #93 — Dashboard & KPI semantics |
 | T5 | PR #94 — Sparse & report density (SHELL-05; RSM-01) |
+| BS-02 | Signed amounts rose for negatives (`FinancialReportSection`) |
+| FD-03 | KPI vs-comparison hidden when Compare is None |
+| FD-06 | Breadcrumb + H1 both “Financial Overview” |
+| RSM-02 | Stock Movements page has title + description |
 
 ## Residual / optional (not shared-shell themes)
 
 | ID | Pri | Item | Notes |
 |----|-----|------|-------|
 | PO-05 | P2 | Grand Total column visibility | Product/column config, not shell |
-| BS-01 | P2 | Compare “None” label opacity | **this branch** — labeled Fiscal Year / Compare; None muted |
+| BS-01 | P2 | Compare “None” label opacity | **merged #102** — labeled Fiscal Year / Compare; None muted |
 | SHELL-12 | P3 | Home stub vs financial dashboard | Product decision |
+| FD-02 | P1 | FY “Select…” while KPIs full | Recheck after preferred-FY wiring |
 
 ## Implementation rules
 
 - One theme ≈ one `feat/*` or `fix/*` MR (AGENTS.md)
 - Prefer shared chrome over per-module hacks
-- Re-capture only **exception** surfaces later (modals, mobile, dark, My Approvals, asset profile) — not 85 leaves
+- Re-capture only **exception** surfaces later — not 85 leaves
 - PNGs stay gitignored; cite paths in MR description
 - Agents: **AGENTS.md Tool & Process Concurrency** (≤3 tools/turn; post-kill = 1 tool/turn)
 
@@ -77,8 +82,7 @@ VISUAL_AUDIT=1 VISUAL_AUDIT_PRESET=shells PLAYWRIGHT_BASE_URL=http://127.0.0.1:8
 
 ## Next agent action
 
-1. ~~Selective re-smoke~~ **Done 2026-08-10:** full catalog **84/85 PASS**; **FAIL** `/asset-models` → `/login` (fixed **#98 merged**).
-2. ~~Harness allowlist~~ **Done 2026-08-11:** `VISUAL_AUDIT_PRESET` + `docs/visual-audit/presets.json` (**#97 merged**).
-3. ~~#96–#100~~ **merged** on main (My Approvals, capture auth, asset profile, view/form modal).
-4. Optional: `VISUAL_AUDIT_PRESET=exceptions` re-smoke — not full catalog.
-5. Optional residual FINDINGS (PO-05 / BS-01 / SHELL-12) only with product call — not mass Wave 2.
+1. ~~#96–#102~~ **merged** on main (EX themes + BS-01). Docs closeout #101 merged; this PR #103 FINDINGS landed.
+2. Keep `e2e/` untracked.
+3. Optional: `VISUAL_AUDIT_PRESET=exceptions` re-smoke — do not commit PNGs.
+4. PO-05 / SHELL-12 / FD-02 only with product call — not mass Wave 2.
