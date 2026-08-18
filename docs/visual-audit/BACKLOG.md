@@ -55,7 +55,7 @@
 | ID | Pri | Item | Notes |
 |----|-----|------|-------|
 | PO-05 | P2 | Grand Total column visibility | Product/column config, not shell |
-| BS-01 | P2 | Compare “None” label opacity | **#102** (open) — labeled Fiscal Year / Compare |
+| BS-01 | P2 | Compare “None” label opacity | **merged #102** — labeled Fiscal Year / Compare; None muted |
 | SHELL-12 | P3 | Home stub vs financial dashboard | Product decision |
 | FD-02 | P1 | FY “Select…” while KPIs full | Recheck after preferred-FY wiring |
 
@@ -82,7 +82,7 @@ VISUAL_AUDIT=1 VISUAL_AUDIT_PRESET=shells PLAYWRIGHT_BASE_URL=http://127.0.0.1:8
 
 ## Next agent action
 
-1. Merge **#101** (docs EX-modal closeout) and **#102** (BS-01) when CI green — do not poll.
+1. ~~#96–#102~~ **merged** on main (EX themes + BS-01). Docs closeout #101 merged; this PR #103 FINDINGS landed.
 2. Keep `e2e/` untracked.
 3. Optional: `VISUAL_AUDIT_PRESET=exceptions` re-smoke — do not commit PNGs.
 4. PO-05 / SHELL-12 / FD-02 only with product call — not mass Wave 2.
