@@ -1,6 +1,6 @@
 # Visual Audit — Backlog
 
-**Last updated:** 2026-08-11  
+**Last updated:** 2026-08-18  
 **Source:** multimodal-looker Wave 0–1  
 **Policy:** T1–T5 + harness presets on main. No **mass** Wave 2 (85 leaves). Prefer selective re-smoke via `VISUAL_AUDIT_PRESET` / `VISUAL_AUDIT_ROUTES`, then exception surfaces only.
 
@@ -14,7 +14,7 @@
 | EX-1 | My Approvals inbox | **merged** (#96) |
 | EX-auth | Capture auth settle | **merged** (#98) |
 | EX-asset-profile | Asset profile chrome | **merged** (#99) |
-| EX-modal | View/form modal chrome | **this branch** |
+| EX-modal | View/form modal chrome | **merged** (#100) |
 
 ## Exception rows
 
@@ -23,7 +23,7 @@
 | EX-1 | P1 | My Approvals chrome | `/my-approvals` | **merged #96** | Densify inbox |
 | EX-auth | P1 | Capture auth settle | visual harness | **merged #98** | `requireDashboard` + re-login |
 | EX-asset-profile | P1 | Asset profile chrome | `/assets/:ulid` | **merged #99** | PageHeader + compact tabs/cards |
-| EX-modal | P1 | View/form modal chrome | ViewModalShell + EntityForm | **this branch** | Tighter padding, title, ViewField |
+| EX-modal | P1 | View/form modal chrome | ViewModalShell + EntityForm | **merged #100** | Tighter padding, title, ViewField |
 
 ## Hotfixes (can ship before full T1)
 
@@ -79,7 +79,6 @@ VISUAL_AUDIT=1 VISUAL_AUDIT_PRESET=shells PLAYWRIGHT_BASE_URL=http://127.0.0.1:8
 
 1. ~~Selective re-smoke~~ **Done 2026-08-10:** full catalog **84/85 PASS**; **FAIL** `/asset-models` → `/login` (fixed **#98 merged**).
 2. ~~Harness allowlist~~ **Done 2026-08-11:** `VISUAL_AUDIT_PRESET` + `docs/visual-audit/presets.json` (**#97 merged**).
-3. ~~#96 / #98~~ **merged** on main.
-4. Finish **#99** rebase → MERGEABLE → merge when ready (no CI wait).
-5. Optional: selective capture of asset profile URL only; multimodal on Wave 0–1 PNGs.
-6. Optional residual FINDINGS (PO-05 / BS-01 / SHELL-12) only with product call — not mass Wave 2.
+3. ~~#96–#100~~ **merged** on main (My Approvals, capture auth, asset profile, view/form modal).
+4. Optional: `VISUAL_AUDIT_PRESET=exceptions` re-smoke — not full catalog.
+5. Optional residual FINDINGS (PO-05 / BS-01 / SHELL-12) only with product call — not mass Wave 2.
