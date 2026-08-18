@@ -301,12 +301,15 @@ export function FinancialReportPageShell({
                     meta={headerMeta}
                     actions={
                         <>
-                            <div className="w-full sm:w-[220px]">
+                            <div className="flex w-full flex-col gap-1 sm:w-[220px]">
+                                <span className="text-muted-foreground text-xs font-medium">
+                                    Fiscal Year
+                                </span>
                                 <Select
                                     value={String(selectedYearId)}
                                     onValueChange={onYearChange}
                                 >
-                                    <SelectTrigger>
+                                    <SelectTrigger aria-label="Fiscal Year">
                                         <SelectValue placeholder="Fiscal Year" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -321,7 +324,10 @@ export function FinancialReportPageShell({
                                     </SelectContent>
                                 </Select>
                             </div>
-                            <div className="w-full sm:w-[220px]">
+                            <div className="flex w-full flex-col gap-1 sm:w-[220px]">
+                                <span className="text-muted-foreground text-xs font-medium">
+                                    Compare
+                                </span>
                                 <Select
                                     value={
                                         comparisonYearId
@@ -330,11 +336,21 @@ export function FinancialReportPageShell({
                                     }
                                     onValueChange={onComparisonChange}
                                 >
-                                    <SelectTrigger>
+                                    <SelectTrigger
+                                        aria-label="Compare fiscal year"
+                                        className={
+                                            comparisonYearId
+                                                ? undefined
+                                                : 'text-muted-foreground'
+                                        }
+                                    >
                                         <SelectValue placeholder="Compare With..." />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="none">
+                                        <SelectItem
+                                            value="none"
+                                            className="text-muted-foreground"
+                                        >
                                             None
                                         </SelectItem>
                                         {fiscalYears
