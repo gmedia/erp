@@ -54,10 +54,10 @@
 
 | ID | Pri | Item | Notes |
 |----|-----|------|-------|
-| PO-05 | P2 | Grand Total column visibility | Product/column config, not shell |
+| PO-05 | P2 | Grand Total column visibility | **product: pin sticky left of Actions** — PO columns (+ invoice/bill siblings if same pattern) |
 | BS-01 | P2 | Compare “None” label opacity | **merged #102** — labeled Fiscal Year / Compare; None muted |
-| SHELL-12 | P3 | Home stub vs financial dashboard | Product decision |
-| FD-02 | P1 | FY “Select…” while KPIs full | **this PR** — bind Select to matching FY id; keepPreviousData |
+| SHELL-12 | P3 | Home stub vs financial dashboard | **product: enrich `/dashboard`** — charts/widgets in placeholder; keep separate FD route/permission |
+| FD-02 | P1 | FY “Select…” while KPIs full | **merged #104** |
 
 ## Implementation rules
 

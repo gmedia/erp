@@ -1,9 +1,9 @@
 # task.md — Active Session Handoff
 
 **Last updated:** 2026-08-18  
-**Current milestone:** Visual audit — **parked** (shared shell + EX + FD-02 on main)  
+**Current milestone:** Visual residuals after product call — **PO-05 next**  
 **Branch:** `main`  
-**Open PRs:** none for visual-audit  
+**Open PRs:** none  
 **Vision session:** multimodal-looker `ses_02021a5c2ffeaD0HIIg6ymhnEW`
 
 ## Read order
@@ -12,17 +12,15 @@
 2. `docs/visual-audit/BACKLOG.md`  
 3. `docs/visual-audit/FINDINGS.md`
 
+## Product call (2026-08-18)
+
+- **PO-05:** pin **Grand Total** sticky, immediately left of Actions. Scope: purchase orders; siblings (invoices/bills) if they share the column pattern.  
+- **SHELL-12 / DASH-01:** **enrich `/dashboard`** (charts/widgets in the placeholder). Keep `/financial-dashboard` and separate permissions. Do **not** redirect `/` to FD.
+
 ## Done on main
 
-- T1–T5 · #95 closeout · #97 harness presets  
-- #96–#100 EX · **#101** docs · **#102** BS-01 · **#103** FINDINGS  
-- **#104** FD-02 FY selector bind + `keepPreviousData`  
+- T1–T5 · EX · #101–#105 (incl. FD-02, parked handoff)  
 - Keep `e2e/` untracked
-
-## This session
-
-- #104 squash-merged; local `main` pulled  
-- Visual-audit themes closed except product residuals
 
 ## Do not
 
@@ -30,17 +28,17 @@
 - Commit `e2e/`  
 - Wait on CI  
 - >3 tools/turn  
-- Implement PO-05 or SHELL-12 without a product call
+- Merge home into financial dashboard
 
 ## Recommended next step
 
-1. Product call: **PO-05** (Grand Total column), **SHELL-12** (home stub vs financial dashboard). If both no → visual-audit closed.  
-2. Optional AI work on `main`: one small Sonar wave (HIGH/BLOCKER or worst coverage) — separate MR, no FY selector.  
+1. **PO-05 first** — one `feat/*` or `fix/*` MR: sticky money column left of Actions on PO table (then siblings).  
+2. **SHELL-12 second** — separate MR: home widgets (needs a short widget list: e.g. counts stay + 1–2 charts or deep-links). Do not start until PO-05 PR exists.  
 3. Optional: `VISUAL_AUDIT_PRESET=exceptions` locally — do not commit PNGs.
 
 ## Continuation Prompt
 
 ```
-Read task.md. Visual audit is parked on main after #104. Do not start mass Wave 2. Keep e2e/ untracked.
-Residuals PO-05 / SHELL-12 only with product call. Next AI theme: Sonar on main if requested, else stop.
+Read task.md. Product call done: PO-05 sticky Grand Total next; SHELL-12 enrich /dashboard after that.
+Do not mass Wave 2. Keep e2e/ untracked. One theme = one MR.
 ```
