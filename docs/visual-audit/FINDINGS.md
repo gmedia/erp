@@ -1,7 +1,7 @@
 # Visual Audit — Findings
 
 **Wave:** 0 + 1 (capture + multimodal vision)  
-**Last updated:** 2026-08-08  
+**Last updated:** 2026-08-18  
 **Reviewer:** multimodal-looker (`ses_02021a5c2ffeaD0HIIg6ymhnEW`)  
 **Viewport:** 1440×900  
 **Stop-rule (≥3 shared-shell):** **YES — freeze Wave 2 mass capture**
@@ -53,12 +53,12 @@
 | ACC-01 | P1 | `/accounts` | Double title (breadcrumb + H1 same) |
 | ACC-02 | P1 | `/accounts` | Wrong sidebar active state |
 | RSM-01 | P1 | stock-movement | 2 rows + ~70% white void |
-| RSM-02 | P2 | stock-movement | No H1 (unlike Balance Sheet) |
+| RSM-02 | P2 | stock-movement | **landed** — `title` + description on ReportDataTablePage |
 | BS-01 | P2 | balance-sheet | Bare selects; “None” opaque without Compare label |
-| BS-02 | P2 | balance-sheet | Negative amounts same black as positive |
+| BS-02 | P2 | balance-sheet | **landed** — `getSignedAmountTextClass` rose for negatives |
 | FD-02 | P1 | financial-dashboard | FY shows “Select…” while KPIs full |
-| FD-03 | P1 | financial-dashboard | “0.00% vs comparison” with Compare = None |
-| FD-06 | P2 | financial-dashboard | Breadcrumb “Financial Dashboard” vs H1 “Financial Overview” |
+| FD-03 | P1 | financial-dashboard | **landed** — KPI “vs comparison” gated on `showComparison` |
+| FD-06 | P2 | financial-dashboard | **landed** — breadcrumb + H1 both “Financial Overview” |
 
 Full multimodal narrative: session `ses_02021a5c2ffeaD0HIIg6ymhnEW`.
 
