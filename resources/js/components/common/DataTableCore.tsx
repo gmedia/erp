@@ -282,9 +282,7 @@ export function DataTable<T>({
         const actionsIndex = keys.lastIndexOf('actions');
         const grandTotalIndex = keys.indexOf('grand_total');
 
-        return (
-            actionsIndex > 0 && grandTotalIndex === actionsIndex - 1
-        );
+        return actionsIndex > 0 && grandTotalIndex === actionsIndex - 1;
     }, [columnsWithActions]);
 
     const table = useReactTable({
@@ -370,10 +368,7 @@ export function DataTable<T>({
                             key={`${rowKey}-${columnKey}`}
                             className={cn(
                                 'border-border',
-                                stickyCellClass(
-                                    columnKey,
-                                    hasStickyGrandTotal,
-                                ),
+                                stickyCellClass(columnKey, hasStickyGrandTotal),
                             )}
                         >
                             <Skeleton className="h-4 w-full bg-muted" />
