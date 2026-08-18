@@ -3,7 +3,7 @@
 **Last updated:** 2026-08-18  
 **Current milestone:** Visual audit — FD-02 fiscal year selector  
 **Branch:** `fix/fd-02-fiscal-year-selector`  
-**Open PRs:** (create after commit)  
+**Open PRs:** [#104](https://github.com/gmedia/erp/pull/104)  
 **Vision session:** multimodal-looker `ses_02021a5c2ffeaD0HIIg6ymhnEW`
 
 ## Read order
@@ -20,8 +20,10 @@
 
 ## This session
 
-- FD-02: FY Select binds only when id exists in list; `keepPreviousData` on dashboard query  
+- FD-02 shipped as **PR #104** (do not wait on CI)
+- FY Select binds only when id exists in list; `keepPreviousData` on dashboard query
 - E2E: `#fiscal-year-select` must not show “Select fiscal year” after data load
+- FINDINGS/BACKLOG mark FD-02 as this PR
 
 ## Do not
 
@@ -32,14 +34,13 @@
 
 ## Recommended next step
 
-1. Commit + `gh pr create` for FD-02.  
+1. After #104 is green: squash-merge, delete branch, `rtk git pull --ff-only` on main. Do not poll.  
 2. Residual only with product call: PO-05, SHELL-12.  
 3. Optional: `VISUAL_AUDIT_PRESET=exceptions` — do not commit PNGs.
 
 ## Continuation Prompt
 
 ```
-Read task.md. On branch fix/fd-02-fiscal-year-selector.
-Finish commit/PR for FD-02 if not opened. Do not start mass Wave 2. Keep e2e/ untracked.
-Residuals: PO-05, SHELL-12 only with product call.
+Read task.md. FD-02 is PR #104. Do not poll CI. Do not start mass Wave 2. Keep e2e/ untracked.
+If #104 is already merged, pull main. Residuals: PO-05, SHELL-12 only with product call.
 ```
