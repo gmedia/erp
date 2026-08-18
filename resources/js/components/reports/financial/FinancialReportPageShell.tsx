@@ -302,7 +302,7 @@ export function FinancialReportPageShell({
                     actions={
                         <>
                             <div className="flex w-full flex-col gap-1 sm:w-[220px]">
-                                <span className="text-muted-foreground text-xs font-medium">
+                                <span className="text-xs font-medium text-muted-foreground">
                                     Fiscal Year
                                 </span>
                                 <Select
@@ -325,7 +325,7 @@ export function FinancialReportPageShell({
                                 </Select>
                             </div>
                             <div className="flex w-full flex-col gap-1 sm:w-[220px]">
-                                <span className="text-muted-foreground text-xs font-medium">
+                                <span className="text-xs font-medium text-muted-foreground">
                                     Compare
                                 </span>
                                 <Select
