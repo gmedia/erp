@@ -56,7 +56,7 @@
 | RSM-02 | P2 | stock-movement | **landed** — `title` + description on ReportDataTablePage |
 | BS-01 | P2 | balance-sheet | Bare selects; “None” opaque without Compare label |
 | BS-02 | P2 | balance-sheet | **landed** — `getSignedAmountTextClass` rose for negatives |
-| FD-02 | P1 | financial-dashboard | FY shows “Select…” while KPIs full |
+| FD-02 | P1 | financial-dashboard | **landed** — FY select binds to preferred year; keepPreviousData on refetch |
 | FD-03 | P1 | financial-dashboard | **landed** — KPI “vs comparison” gated on `showComparison` |
 | FD-06 | P2 | financial-dashboard | **landed** — breadcrumb + H1 both “Financial Overview” |
 

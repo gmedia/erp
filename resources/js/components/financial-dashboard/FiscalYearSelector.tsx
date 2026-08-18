@@ -24,6 +24,10 @@ export const FiscalYearSelector = memo<FiscalYearSelectorProps>(
         onYearChange,
         onComparisonYearChange,
     }) {
+        const selectedValue = fiscalYears
+            .find((year) => Number(year.id) === Number(selectedYearId))
+            ?.id.toString();
+
         return (
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <div className="flex flex-col gap-1.5">
@@ -34,7 +38,7 @@ export const FiscalYearSelector = memo<FiscalYearSelectorProps>(
                         Fiscal Year
                     </label>
                     <Select
-                        value={selectedYearId?.toString() || ''}
+                        value={selectedValue}
                         onValueChange={(value) =>
                             onYearChange(value ? Number(value) : null)
                         }
