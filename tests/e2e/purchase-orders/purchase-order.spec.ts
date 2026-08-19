@@ -165,4 +165,23 @@ test.describe('Purchase Orders Module', () => {
         await expect(itemDialog.getByRole('combobox', { name: 'Product' })).toContainText(product.name);
         await expect(itemDialog.getByRole('combobox', { name: 'Unit' })).toContainText(unit.name);
     });
+
+    test('Grand Total header is sticky left of Actions', async ({ page }) => {
+        await page.goto('/purchase-orders');
+        await page.waitForResponse(
+            (response) =>
+                response.url().includes('/api/purchase-orders') &&
+                response.request().method() === 'GET',
+        );
+
+        const grandTotalHead = page.locator(
+            'thead [data-sticky-column="grand_total"]',
+        );
+        const actionsHead = page.locator('thead [data-sticky-column="actions"]');
+
+        await expect(grandTotalHead).toBeVisible();
+        await expect(actionsHead).toBeVisible();
+        await expect(grandTotalHead).toHaveCSS('position', 'sticky');
+        await expect(actionsHead).toHaveCSS('position', 'sticky');
+    });
 });

@@ -30,10 +30,40 @@ import { cn } from '@/lib/utils';
 import * as React from 'react';
 import type { FieldDescriptor } from './filters';
 
-const STICKY_ACTIONS_CELL =
-    'sticky right-0 z-10 bg-background shadow-[-6px_0_8px_-6px_rgba(0,0,0,0.15)] dark:shadow-[-6px_0_8px_-6px_rgba(0,0,0,0.45)]';
-const STICKY_ACTIONS_HEAD =
-    'sticky right-0 z-20 bg-muted shadow-[-6px_0_8px_-6px_rgba(0,0,0,0.15)] dark:shadow-[-6px_0_8px_-6px_rgba(0,0,0,0.45)]';
+const STICKY_EDGE_SHADOW =
+    'shadow-[-6px_0_8px_-6px_rgba(0,0,0,0.15)] dark:shadow-[-6px_0_8px_-6px_rgba(0,0,0,0.45)]';
+const STICKY_ACTIONS_CELL = `sticky right-0 z-20 bg-background`;
+const STICKY_ACTIONS_HEAD = `sticky right-0 z-30 bg-muted`;
+const STICKY_GRAND_TOTAL_CELL = `sticky right-14 z-10 min-w-28 bg-background whitespace-nowrap ${STICKY_EDGE_SHADOW}`;
+const STICKY_GRAND_TOTAL_HEAD = `sticky right-14 z-20 min-w-28 bg-muted whitespace-nowrap ${STICKY_EDGE_SHADOW}`;
+
+function stickyCellClass(
+    columnId: string,
+    hasGrandTotal: boolean,
+): string | false {
+    if (columnId === 'actions') {
+        return cn(STICKY_ACTIONS_CELL, !hasGrandTotal && STICKY_EDGE_SHADOW);
+    }
+    if (columnId === 'grand_total' && hasGrandTotal) {
+        return STICKY_GRAND_TOTAL_CELL;
+    }
+
+    return false;
+}
+
+function stickyHeadClass(
+    columnId: string,
+    hasGrandTotal: boolean,
+): string | false {
+    if (columnId === 'actions') {
+        return cn(STICKY_ACTIONS_HEAD, !hasGrandTotal && STICKY_EDGE_SHADOW);
+    }
+    if (columnId === 'grand_total' && hasGrandTotal) {
+        return STICKY_GRAND_TOTAL_HEAD;
+    }
+
+    return false;
+}
 
 // Helper function to safely extract placeholder from filter fields
 function getPlaceholderFromFilterFields(
@@ -238,6 +268,23 @@ export function DataTable<T>({
         });
     }, [columns, onEdit, onDelete, onView, extraActionItems]);
 
+    const hasStickyGrandTotal = React.useMemo(() => {
+        const columnKey = (column: (typeof columnsWithActions)[number]) => {
+            if ('id' in column && column.id) {
+                return String(column.id);
+            }
+            if ('accessorKey' in column && column.accessorKey) {
+                return String(column.accessorKey);
+            }
+            return '';
+        };
+        const keys = columnsWithActions.map(columnKey);
+        const actionsIndex = keys.lastIndexOf('actions');
+        const grandTotalIndex = keys.indexOf('grand_total');
+
+        return actionsIndex > 0 && grandTotalIndex === actionsIndex - 1;
+    }, [columnsWithActions]);
+
     const table = useReactTable({
         data,
         columns: columnsWithActions,
@@ -316,14 +363,12 @@ export function DataTable<T>({
                     } else if (typeof column.header === 'string') {
                         columnKey = column.header;
                     }
-                    const isActions = columnKey === 'actions';
-
                     return (
                         <TableCell
                             key={`${rowKey}-${columnKey}`}
                             className={cn(
                                 'border-border',
-                                isActions && STICKY_ACTIONS_CELL,
+                                stickyCellClass(columnKey, hasStickyGrandTotal),
                             )}
                         >
                             <Skeleton className="h-4 w-full bg-muted" />
@@ -340,13 +385,15 @@ export function DataTable<T>({
                 className="hover:bg-muted/50"
             >
                 {row.getVisibleCells().map((cell) => {
-                    const isActions = cell.column.id === 'actions';
                     return (
                         <TableCell
                             key={cell.id}
                             className={cn(
                                 'border-border px-2 py-1.5',
-                                isActions && STICKY_ACTIONS_CELL,
+                                stickyCellClass(
+                                    cell.column.id,
+                                    hasStickyGrandTotal,
+                                ),
                             )}
                         >
                             {flexRender(
@@ -435,15 +482,25 @@ export function DataTable<T>({
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {
-                                    const isActions =
-                                        header.column.id === 'actions';
                                     return (
                                         <TableHead
                                             key={header.id}
+                                            data-sticky-column={
+                                                header.column.id ===
+                                                    'grand_total' &&
+                                                hasStickyGrandTotal
+                                                    ? 'grand_total'
+                                                    : header.column.id ===
+                                                        'actions'
+                                                      ? 'actions'
+                                                      : undefined
+                                            }
                                             className={cn(
                                                 'h-9 border-border px-2 py-1.5 text-xs select-none',
-                                                isActions &&
-                                                    STICKY_ACTIONS_HEAD,
+                                                stickyHeadClass(
+                                                    header.column.id,
+                                                    hasStickyGrandTotal,
+                                                ),
                                             )}
                                         >
                                             {header.isPlaceholder

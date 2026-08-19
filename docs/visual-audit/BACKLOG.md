@@ -54,7 +54,7 @@
 
 | ID | Pri | Item | Notes |
 |----|-----|------|-------|
-| PO-05 | P2 | Grand Total column visibility | **product: pin sticky left of Actions** — PO columns (+ invoice/bill siblings if same pattern) |
+| PO-05 | P2 | Grand Total column visibility | **in this MR** — sticky when `grand_total` is immediately left of Actions (PO, credit notes; not invoice/bill Amount Due) |
 | BS-01 | P2 | Compare “None” label opacity | **merged #102** — labeled Fiscal Year / Compare; None muted |
 | SHELL-12 | P3 | Home stub vs financial dashboard | **product: enrich `/dashboard`** — charts/widgets in placeholder; keep separate FD route/permission |
 | FD-02 | P1 | FY “Select…” while KPIs full | **merged #104** |
