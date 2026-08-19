@@ -17,7 +17,7 @@ Permission: `dashboard`.
 
 | Menu | URL | Fungsi |
 |------|-----|--------|
-| Dashboard | `/dashboard` (root `/` mengarah ke sini) | Empat kartu total + area placeholder |
+| Dashboard | `/dashboard` (root `/` mengarah ke sini) | Empat kartu total + shortcut operasional + mix master data |
 
 ## 1. Mengakses Dashboard
 
@@ -38,9 +38,16 @@ Permission: `dashboard`.
 
 Angka diformat sesuai pengaturan regional aplikasi.
 
-## 3. Area Placeholder
+## 3. Widget Operasional
 
-Di bawah kartu, ada area konten placeholder (pola dekoratif). Ini **bukan** grafik keuangan. Untuk KPI keuangan, gunakan **Financial Dashboard**.
+Di bawah kartu ada dua panel:
+
+| Panel | Isi |
+|-------|-----|
+| Shortcuts | Deep-link ke My Approvals, Purchase Orders, dan Stock Monitor |
+| Master data mix | Bar relatif dari empat total yang sama (bukan KPI keuangan) |
+
+Untuk KPI keuangan, gunakan **Financial Dashboard**.
 
 ## 4. Sumber Data & Error
 

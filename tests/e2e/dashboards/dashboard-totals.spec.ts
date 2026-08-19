@@ -83,4 +83,34 @@ test.describe('Dashboard', () => {
 
     await expect(page).toHaveTitle(/Dashboard/, { timeout: 10000 });
   });
+
+  test('dashboard shows operational shortcuts and mix widget', async ({
+    page,
+  }) => {
+    await login(page, undefined, undefined, { requireDashboard: false });
+
+    await page.goto('/dashboard');
+    await page.waitForResponse(
+      (r) => r.url().includes('/api/dashboard') && r.status() < 400,
+    );
+
+    const shortcuts = page.getByTestId('dashboard-shortcuts');
+    await expect(
+      shortcuts.getByRole('link', { name: 'My Approvals' }),
+    ).toBeVisible();
+    await expect(
+      shortcuts.getByRole('link', { name: 'Purchase Orders' }),
+    ).toBeVisible();
+    await expect(
+      shortcuts.getByRole('link', { name: 'Stock Monitor' }),
+    ).toBeVisible();
+    const mix = page.getByTestId('dashboard-mix');
+    await expect(mix.getByText('Master data mix')).toBeVisible();
+    await expect(
+      mix.getByText(
+        'Operational counts only. Financial KPIs stay on Financial Overview.',
+        { exact: true },
+      ),
+    ).toBeVisible();
+  });
 });

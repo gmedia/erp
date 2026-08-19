@@ -1,12 +1,20 @@
 import DashboardPageShell from '@/components/common/DashboardPageShell';
 import { KpiCard } from '@/components/common/KpiCard';
-import { Card, CardContent } from '@/components/ui/card';
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import axios from '@/lib/axios';
 import { type BreadcrumbItem } from '@/types';
 import { formatNumberByRegionalSettings } from '@/utils/number-format';
 import { useQuery } from '@tanstack/react-query';
-import { Boxes, Building2, Users, Warehouse } from 'lucide-react';
+import {
+    Boxes,
+    Building2,
+    ClipboardCheck,
+    PackageSearch,
+    ShoppingCart,
+    Users,
+    Warehouse,
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -72,11 +80,61 @@ export default function Dashboard() {
         },
     ] as const;
 
+    const shortcuts = [
+        {
+            title: 'My Approvals',
+            href: '/my-approvals',
+            description: 'Review pending requests',
+            icon: ClipboardCheck,
+        },
+        {
+            title: 'Purchase Orders',
+            href: '/purchase-orders',
+            description: 'Open the PO list',
+            icon: ShoppingCart,
+        },
+        {
+            title: 'Stock Monitor',
+            href: '/stock-monitor',
+            description: 'On-hand quantity by warehouse',
+            icon: PackageSearch,
+        },
+    ] as const;
+
+    const composition = [
+        {
+            key: 'customers',
+            label: 'Customers',
+            value: totals.customers,
+            barClass: 'bg-blue-500',
+        },
+        {
+            key: 'employees',
+            label: 'Employees',
+            value: totals.employees,
+            barClass: 'bg-emerald-500',
+        },
+        {
+            key: 'suppliers',
+            label: 'Suppliers',
+            value: totals.suppliers,
+            barClass: 'bg-amber-500',
+        },
+        {
+            key: 'assets',
+            label: 'Assets',
+            value: totals.assets,
+            barClass: 'bg-indigo-500',
+        },
+    ] as const;
+
+    const maxComposition = Math.max(...composition.map((row) => row.value), 1);
+
     return (
         <DashboardPageShell
             title="Dashboard"
             heading="Dashboard"
-            description="At-a-glance entity counts across customers, people, suppliers, and assets."
+            description="At-a-glance entity counts, operational shortcuts, and master-data mix. Financial KPIs stay on Financial Overview."
             breadcrumbs={breadcrumbs}
             isLoading={isLoading}
             isError={isError}
@@ -112,15 +170,64 @@ export default function Dashboard() {
                       ))}
             </div>
 
-            <Card className="relative min-h-[40vh] overflow-hidden border-dashed">
-                <CardContent className="relative flex min-h-[40vh] items-center justify-center p-0">
-                    <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/15 dark:stroke-neutral-100/15" />
-                    <p className="relative z-10 max-w-sm px-6 text-center text-sm text-muted-foreground">
-                        More operational widgets will appear here. Use Financial
-                        Overview and module dashboards for detailed KPIs.
-                    </p>
-                </CardContent>
-            </Card>
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <Card data-testid="dashboard-shortcuts">
+                    <CardHeader>
+                        <CardTitle>Shortcuts</CardTitle>
+                    </CardHeader>
+                    <CardContent className="grid gap-2">
+                        {shortcuts.map((item) => (
+                            <Link
+                                key={item.href}
+                                to={item.href}
+                                className="flex items-start gap-3 rounded-lg border p-3 text-left transition-colors hover:bg-accent"
+                            >
+                                <item.icon className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+                                <span className="min-w-0">
+                                    <span className="block text-sm font-medium">
+                                        {item.title}
+                                    </span>
+                                    <span className="block text-xs text-muted-foreground">
+                                        {item.description}
+                                    </span>
+                                </span>
+                            </Link>
+                        ))}
+                    </CardContent>
+                </Card>
+
+                <Card data-testid="dashboard-mix">
+                    <CardHeader>
+                        <CardTitle>Master data mix</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                        {composition.map((row) => (
+                            <div key={row.key} className="space-y-1">
+                                <div className="flex items-center justify-between text-sm">
+                                    <span>{row.label}</span>
+                                    <span className="text-muted-foreground tabular-nums">
+                                        {formatNumberByRegionalSettings(
+                                            row.value,
+                                        )}
+                                    </span>
+                                </div>
+                                <div className="h-2 overflow-hidden rounded-full bg-muted">
+                                    <div
+                                        className={`h-full rounded-full ${row.barClass}`}
+                                        style={{
+                                            width: `${(row.value / maxComposition) * 100}%`,
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        ))}
+                        <p className="text-xs text-muted-foreground">
+                            Operational counts only. Financial KPIs stay on
+                            Financial Overview.
+                        </p>
+                    </CardContent>
+                </Card>
+            </div>
         </DashboardPageShell>
     );
 }
