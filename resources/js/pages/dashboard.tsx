@@ -171,7 +171,7 @@ export default function Dashboard() {
             </div>
 
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                <Card>
+                <Card data-testid="dashboard-shortcuts">
                     <CardHeader>
                         <CardTitle>Shortcuts</CardTitle>
                     </CardHeader>

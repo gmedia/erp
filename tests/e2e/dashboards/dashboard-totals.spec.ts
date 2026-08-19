@@ -94,14 +94,15 @@ test.describe('Dashboard', () => {
       (r) => r.url().includes('/api/dashboard') && r.status() < 400,
     );
 
+    const shortcuts = page.getByTestId('dashboard-shortcuts');
     await expect(
-      page.getByRole('link', { name: /My Approvals/ }),
+      shortcuts.getByRole('link', { name: 'My Approvals' }),
     ).toBeVisible();
     await expect(
-      page.getByRole('link', { name: /Purchase Orders/ }),
+      shortcuts.getByRole('link', { name: 'Purchase Orders' }),
     ).toBeVisible();
     await expect(
-      page.getByRole('link', { name: /Stock Monitor/ }),
+      shortcuts.getByRole('link', { name: 'Stock Monitor' }),
     ).toBeVisible();
     await expect(page.getByText('Master data mix')).toBeVisible();
     await expect(
