@@ -104,9 +104,13 @@ test.describe('Dashboard', () => {
     await expect(
       shortcuts.getByRole('link', { name: 'Stock Monitor' }),
     ).toBeVisible();
-    await expect(page.getByText('Master data mix')).toBeVisible();
+    const mix = page.getByTestId('dashboard-mix');
+    await expect(mix.getByText('Master data mix')).toBeVisible();
     await expect(
-      page.getByText(/Financial KPIs stay on Financial Overview/),
+      mix.getByText(
+        'Operational counts only. Financial KPIs stay on Financial Overview.',
+        { exact: true },
+      ),
     ).toBeVisible();
   });
 });

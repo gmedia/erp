@@ -196,7 +196,7 @@ export default function Dashboard() {
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card data-testid="dashboard-mix">
                     <CardHeader>
                         <CardTitle>Master data mix</CardTitle>
                     </CardHeader>
