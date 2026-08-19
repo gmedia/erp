@@ -36,7 +36,7 @@
 | SHELL-09 | P2 | Deep nav | Long nested lists; active child hard to see |
 | SHELL-10 | P2 | CRUD | Checkbox without bulk action UX |
 | SHELL-11 | P2 | DataTable | Pagination weak in empty footer zone |
-| SHELL-12 | P3 | DASH vs FD | **product:** enrich `/dashboard` widgets; do not merge with financial dashboard |
+| SHELL-12 | P3 | DASH vs FD | **in this MR:** shortcuts + master-data mix; do not merge with financial dashboard |
 
 **Material shared-shell count:** 11 (≥3 threshold).
 
