@@ -205,7 +205,7 @@ export default function Dashboard() {
                             <div key={row.key} className="space-y-1">
                                 <div className="flex items-center justify-between text-sm">
                                     <span>{row.label}</span>
-                                    <span className="tabular-nums text-muted-foreground">
+                                    <span className="text-muted-foreground tabular-nums">
                                         {formatNumberByRegionalSettings(
                                             row.value,
                                         )}
