@@ -83,4 +83,29 @@ test.describe('Dashboard', () => {
 
     await expect(page).toHaveTitle(/Dashboard/, { timeout: 10000 });
   });
+
+  test('dashboard shows operational shortcuts and mix widget', async ({
+    page,
+  }) => {
+    await login(page, undefined, undefined, { requireDashboard: false });
+
+    await page.goto('/dashboard');
+    await page.waitForResponse(
+      (r) => r.url().includes('/api/dashboard') && r.status() < 400,
+    );
+
+    await expect(
+      page.getByRole('link', { name: /My Approvals/ }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: /Purchase Orders/ }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: /Stock Monitor/ }),
+    ).toBeVisible();
+    await expect(page.getByText('Master data mix')).toBeVisible();
+    await expect(
+      page.getByText(/Financial KPIs stay on Financial Overview/),
+    ).toBeVisible();
+  });
 });
