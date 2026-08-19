@@ -1,6 +1,6 @@
 # Visual Audit — Backlog
 
-**Last updated:** 2026-08-19  
+**Last updated:** 2026-08-19 (#108 merged)  
 **Source:** multimodal-looker Wave 0–1  
 **Policy:** T1–T5 + EX themes on main. No **mass** Wave 2 (85 leaves). Prefer selective re-smoke via `VISUAL_AUDIT_PRESET` / `VISUAL_AUDIT_ROUTES`.
 
@@ -56,7 +56,7 @@
 |----|-----|------|-------|
 | PO-05 | P2 | Grand Total column visibility | **merged #107** — sticky when `grand_total` is immediately left of Actions (PO, credit notes; not invoice/bill Amount Due) |
 | BS-01 | P2 | Compare “None” label opacity | **merged #102** — labeled Fiscal Year / Compare; None muted |
-| SHELL-12 | P3 | Home stub vs financial dashboard | **in this MR** — shortcuts + master-data mix; keep separate FD route/permission |
+| SHELL-12 | P3 | Home stub vs financial dashboard | **merged #108** — shortcuts + master-data mix; keep separate FD route/permission |
 | FD-02 | P1 | FY “Select…” while KPIs full | **merged #104** |
 
 ## Implementation rules
