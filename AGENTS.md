@@ -137,8 +137,8 @@ gh pr view <id> --json headRefName         # Get branch name
 
 # PROJECT KNOWLEDGE BASE
 
-**Generated:** 2025-05-02
-**Commit:** ddc886a7
+**Generated:** 2026-11-09
+**Commit:** 446c9498
 **Branch:** main
 
 ## OVERVIEW
@@ -152,13 +152,14 @@ erp/
 ├── app/                # Backend: Actions, Domain, DTOs, Exports, Http, Models, Services
 ├── resources/js/       # Frontend SPA: React + TypeScript + Shadcn UI + TanStack Query
 ├── routes/api/         # 63 modular route files (auto-included by routes/api.php)
-├── database/           # Migrations (67), Factories (67), Seeders (24)
-├── tests/              # Pest (Feature/Unit) + Playwright E2E
-├── docs/               # Design docs, module registry, refactor progress
+├── database/           # Migrations (106), Factories (88), Seeders (29)
+├── tests/              # Pest (Feature/Unit) + Playwright E2E (106 specs)
+├── docs/               # Design docs, module registry, 35 user guides
 ├── .github/            # Skills, prompts, workflows, agent configs
+├── .gitlab/            # GitLab CI deploy include (.gitlab-ci.yml)
 ├── scripts/            # Sync scripts, E2E lock helper
 ├── docker/             # Docker configs
-└── .kilo/              # Kilo sync configs
+└── task.md             # Active session handoff
 ```
 
 ## WHERE TO LOOK
@@ -175,14 +176,36 @@ erp/
 | Shared backend traits | `app/Actions/Concerns/`, `app/Http/Controllers/Concerns/` | `InteractsWithExportFilters`, `LoadsResourceRelations` |
 | Entity configs | `resources/js/utils/entityConfigs.ts` | Simple vs Complex config |
 | Form schemas | `resources/js/utils/schemas.ts` (or per-module) | Zod validation |
-| Type definitions | `resources/js/types/` | 36 type files |
-| Hooks | `resources/js/hooks/` | `useEntityForm`, `useCrudQuery`, `useCrudMutations` |
-| User guide content | `docs/user-guide-*.md` | Markdown files served via `/api/user-guide` |
+| Type definitions | `resources/js/types/` | 46 type files |
+| Hooks | `resources/js/hooks/` | 30 hooks; `useEntityForm`, `useCrudQuery`, `useCrudMutations` |
+| User guide content | `docs/user-guide-*.md` | 35 guides served via `/api/user-guide` |
 | User guide page | `resources/js/pages/user-guide/index.tsx` | Renders markdown from API |
 | Module metadata | `docs/module-registry.md` | Full E2E + Pest registry |
 | Dev patterns | `docs/development-patterns.md` | Canonical implementation guide |
+| Migrations/factories/seeders | `database/` | 106 / 88 / 29 — see `database/AGENTS.md` |
+| Backend route files | `routes/api/` | 63 files, 406 defs — see `routes/AGENTS.md` |
+| CI pipelines | `.github/workflows/`, `.gitlab/ci/` | Pest + Playwright + deploy |
 | Session handoff | `task.md` | Active status + next action |
 | Skills/templates | `.github/skills/` | Scaffolding for new features |
+
+## CODE MAP
+
+Reference counts = files referencing the symbol (rg; no LSP server installed). High counts = central abstractions — change these carefully.
+
+| Symbol | Type | Location | Refs | Role |
+|--------|------|----------|------|------|
+| `createEntityCrudPage` | factory fn | `resources/js/components/common/EntityCrudPage.tsx` | 45 | Builds 43 CRUD pages |
+| `destroyModel` | controller helper | `app/Http/Controllers/Controller.php` | 33 | Shared `destroy()` response |
+| `ApprovalFlow` | model | `app/Models/ApprovalFlow.php` | 32 | Approval definitions |
+| `ReportDataTablePage` | React component | `resources/js/components/common/ReportDataTablePage.tsx` | 24 | Report page shell |
+| `PipelineState` | model | `app/Models/PipelineState.php` | 22 | Pipeline state catalog |
+| `StoresItemsInTransaction` | trait | `app/Http/Controllers/Concerns/StoresItemsInTransaction.php` | 17 | Nested item transactions |
+| `PipelineEntityState` | model | `app/Models/PipelineEntityState.php` | 15 | Per-entity pipeline state |
+| `ApprovalFlowStep` | model | `app/Models/ApprovalFlowStep.php` | 15 | Approval step definitions |
+| `LoadsResourceRelations` | trait | `app/Http/Controllers/Concerns/LoadsResourceRelations.php` | 14 | `show()` eager loads |
+| `AbstractReportIndexExport` | base export | `app/Exports/Concerns/AbstractReportIndexExport.php` | 13 | Report export base |
+| `useEntityForm` | hook | `resources/js/hooks/useEntityForm.ts` | 12 | Form + Zod wiring |
+| `SimpleCrudStoreRequest` | request base | `app/Http/Requests/SimpleCrudStoreRequest.php` | 11 | Name-only CRUD validation |
 
 ## CONVENTIONS
 
@@ -218,8 +241,8 @@ erp/
 | Reports | `AbstractReportIndexExport` + Action | `ReportDataTablePage` |
 | Transactions | `StoresItemsInTransaction` trait | `ItemFormDialog` + nested form |
 | Exports | `columns()` declarative + `InteractsWithExportFilters` | Export button in toolbar |
-| Pipelines | `EntityState` engine | `EntityStateActions` component |
-| Approvals | `ApprovalFlow` + `ApprovalFlowStep` | `MyApprovals` inbox |
+| Pipelines | `Pipeline` + `PipelineState` + `PipelineTransition` + `PipelineEntityState` | `components/pipeline/EntityStateActions` |
+| Approvals | `ApprovalFlow` + `ApprovalFlowStep` + `ApprovalRequest` | `pages/my-approvals/` + `components/approvals/` |
 
 ## COMMANDS
 
@@ -238,7 +261,9 @@ npx playwright test tests/e2e/{slug}/ # E2E by module
 sail bin phpstan analyze              # Static analysis
 sail bin duster fix                   # Code style (TLint + Pint + CS Fixer)
 sail npm run lint                     # ESLint
+sail npm run lint:check               # ESLint, no writes
 sail npm run format                   # Prettier
+sail npm run format:check             # Prettier, no writes
 npm run types                         # TypeScript check
 
 # Utilities
@@ -248,9 +273,12 @@ sail artisan ide-helper:models -RW    # Model PHPDoc
 
 ## NOTES
 
-- **11,983 files** total (1,594 PHP, 377 TSX, 194 TS) — large codebase.
-- **63 API route files** — one per module, auto-included.
-- **68 models**, **67 migrations**, **67 factories** — near 1:1 ratio.
+- **2,931 files** in tracked source (1,998 PHP, 479 TSX, 255 TS) — large codebase.
+- **63 API route files** / **406 route definitions** — auto-included by `routes/api.php`.
+- **89 models**, **106 migrations**, **88 factories**, **29 seeders** — near 1:1 model/factory ratio.
+- **61 backend action modules**, **48 domain filter modules**, **24 DTO modules**.
+- **63 frontend page dirs** (98 files), **57 component dirs**, **106 Playwright specs**.
+- **104 Pest test groups** (`->group('...')`); 67 Feature dirs, 10 Unit dirs.
 - **SonarCloud** integrated — quality gate, duplication, coverage tracked.
 - **Sentry** for error monitoring.
 - **Octane** for performance (production).

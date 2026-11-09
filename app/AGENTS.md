@@ -8,25 +8,26 @@ Laravel 12 backend organized by responsibility: Actions (business logic), Domain
 
 ```
 app/
-├── Actions/{Module}/        # Business logic per module (index, store, update, delete, export)
-│   └── Concerns/            # Shared action traits (InteractsWithExportFilters, etc.)
-├── Domain/{Module}/         # Filter services, query builders
-├── DTOs/{Module}/           # Data transfer objects (validated input → typed object)
+├── Actions/{Module}/        # 61 modules — business logic (index, store, update, delete, export)
+│   └── Concerns/            # 19 shared action files (10 traits) — SimpleCrud actions, export filters
+├── Console/Commands/        # Artisan commands (backfills, maintenance)
+├── Domain/{Module}/         # 48 modules — filter services, query builders
+├── DTOs/{Module}/           # 24 modules — validated input → typed object
 │   └── Concerns/            # Shared DTO traits
-├── Exports/                 # Laravel Excel exports (declarative columns() pattern)
-│   └── Concerns/            # InteractsWithExportFilters trait
+├── Exports/                 # 71 Laravel Excel exports (declarative columns() pattern)
+│   └── Concerns/            # SimpleCrudExport, AbstractReportIndexExport, InteractsWithExportFilters
 ├── Http/
-│   ├── Controllers/         # 69 controllers (Admin/, Api/, Auth/, Concerns/, Settings/)
+│   ├── Controllers/         # 90 controllers (Admin/, Api/, Concerns/)
 │   ├── Middleware/           # Custom middleware
-│   ├── Requests/{Module}/   # Form requests per module
-│   └── Resources/{Module}/  # API resources per module
+│   ├── Requests/{Module}/   # 54 FormRequest dirs
+│   └── Resources/{Module}/  # 55 API resource dirs
 ├── Imports/                 # Import classes (Excel)
 ├── Mail/                    # Mailable classes
-├── Models/                  # 68 Eloquent models
+├── Models/                  # 89 Eloquent models
 │   └── Concerns/            # Model traits
 ├── Providers/               # Service providers
-├── Services/                # Application services
-└── Traits/                  # Global traits
+├── Services/                # 5 application services (financial, currency, budgets)
+└── Traits/                  # 2 global traits
 ```
 
 ## WHERE TO LOOK
@@ -41,13 +42,17 @@ app/
 | Add model | `Models/` — with `HasFactory`, typed `$fillable`, `$casts` |
 | Shared controller logic | `Http/Controllers/Concerns/` — `LoadsResourceRelations`, `StoresItemsInTransaction` |
 | Shared export logic | `Exports/Concerns/InteractsWithExportFilters` |
-| Shared action logic | `Actions/Concerns/` — 16 shared traits |
+| Shared action logic | `Actions/Concerns/` — 19 files (10 traits) |
+| Artisan command | `Console/Commands/` — backfills, maintenance |
+| Financial service | `Services/FinancialReportService.php`, `BudgetVarianceService.php` |
+| Pipeline engine | `Models/Pipeline.php`, `PipelineState.php`, `PipelineTransition.php`, `PipelineEntityState.php` |
+| Report export base | `Exports/Concerns/AbstractReportIndexExport.php` |
 
 ## CONVENTIONS
 
 - **Actions pattern** — business logic lives in Action classes, NOT controllers. Controllers are thin (delegate to Actions).
 - **Export `columns()` pattern** — all exports use declarative `columns()` returning `['Header' => fn($item) => $item->field]`. Headings/mapping auto-derived.
-- **SimpleCrud base classes** — `SimpleCrudStoreRequest`, `SimpleCrudUpdateRequest`, `SimpleCrudIndexRequest`, `SimpleCrudExportRequest`, `SimpleCrudResource`, `SimpleCrudCollection`, `SimpleCrudExport` for name-only modules.
+- **SimpleCrud base classes** — `SimpleCrudStoreRequest`, `SimpleCrudUpdateRequest`, `SimpleCrudIndexRequest`, `SimpleCrudExportRequest`, `SimpleCrudListingRequest`, `SimpleCrudNameRequest`, `SimpleCrudResource`, `SimpleCrudCollection`, `SimpleCrudExport`; actions via `SimpleCrudIndexAction` / `SimpleCrudExportAction` for name-only modules.
 - **Controller `destroy()`** — use `$this->destroyModel($model)` helper. Exception: soft-cancel pattern for transactions.
 - **Controller `show()`** — use `$this->loadResourceRelations($model)` via `LoadsResourceRelations` trait.
 - **DTOs** — typed value objects for complex store/update operations. Created from validated request data.
