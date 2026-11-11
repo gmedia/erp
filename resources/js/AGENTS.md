@@ -38,9 +38,9 @@ resources/js/
 | Shared hooks      | `hooks/useEntityForm.ts`, `hooks/useCrudQuery.ts`, `hooks/useCrudMutations.ts`       |
 | UI primitives     | `components/ui/` — Shadcn (button, dialog, table, etc.)                              |
 | Common components | `components/common/` — EntityForm, ViewField, ViewModalShell, DataTable              |
-| Item dialog       | `components/common/ItemFormDialog.tsx` — nested transaction line items                |
+| Item dialog       | `components/common/ItemFormDialog.tsx` — nested transaction line items               |
 | Pipeline runtime  | `components/pipeline/EntityStateActions.tsx` + `EntityStateTimeline.tsx`             |
-| Pipeline CRUD     | `components/pipelines/` — Columns, Filters, Form, StateManager, TransitionManager     |
+| Pipeline CRUD     | `components/pipelines/` — Columns, Filters, Form, StateManager, TransitionManager    |
 | Type defs         | `types/{module}.ts`                                                                  |
 
 ## CONVENTIONS
