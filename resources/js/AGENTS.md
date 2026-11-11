@@ -9,21 +9,20 @@ React 19 + TypeScript full SPA with Shadcn UI, TanStack Query, react-router-dom,
 ```
 resources/js/
 ├── app-routes.tsx           # All routes (lazy-loaded), THE routing source of truth
-├── pages/{module-slug}/     # Page components (1 file for simple, index.tsx for complex)
+├── pages/{module-slug}/     # 63 dirs / 98 files (index.tsx per module)
 ├── components/
-│   ├── common/              # 39 shared components (EntityCrudPage, ReportDataTablePage, etc.)
+│   ├── common/              # 42 shared components (EntityCrudPage, ReportDataTablePage, ItemFormDialog)
 │   ├── ui/                  # 34 Shadcn UI primitives
-│   └── {module-slug}/       # Module-specific (Columns, Filters, Form, ViewModal)
-├── hooks/                   # 26 custom hooks (useEntityForm, useCrudQuery, useCrudMutations)
-├── types/                   # 36 TypeScript type definition files
+│   ├── pipeline/            # Runtime state: EntityStateActions, EntityStateTimeline
+│   ├── pipelines/           # Pipeline CRUD: Columns, Filters, Form, StateManager, TransitionManager
+│   └── {module-slug}/       # 57 component dirs total — module-specific sibling files
+├── hooks/                   # 30 hooks (useEntityForm, useCrudQuery, useCrudMutations, usePipelineState)
+├── types/                   # 46 TypeScript type definition files
 ├── utils/                   # entityConfigs.ts, schemas, helpers
 ├── contexts/                # React contexts (auth, i18n)
 ├── layouts/                 # App/Auth/Settings/Admin layouts
 ├── lib/                     # Utility wrappers (react-helmet-async shim, utils.ts)
-├── constants/               # App constants
-├── actions/                 # Server action helpers
-├── routes/                  # Route helpers
-└── wayfinder/               # Laravel Wayfinder generated routes
+└── constants/               # App constants
 ```
 
 ## WHERE TO LOOK
@@ -39,12 +38,16 @@ resources/js/
 | Shared hooks      | `hooks/useEntityForm.ts`, `hooks/useCrudQuery.ts`, `hooks/useCrudMutations.ts`       |
 | UI primitives     | `components/ui/` — Shadcn (button, dialog, table, etc.)                              |
 | Common components | `components/common/` — EntityForm, ViewField, ViewModalShell, DataTable              |
+| Item dialog       | `components/common/ItemFormDialog.tsx` — nested transaction line items               |
+| Pipeline runtime  | `components/pipeline/EntityStateActions.tsx` + `EntityStateTimeline.tsx`             |
+| Pipeline CRUD     | `components/pipelines/` — Columns, Filters, Form, StateManager, TransitionManager    |
 | Type defs         | `types/{module}.ts`                                                                  |
 
 ## CONVENTIONS
 
-- **Page factory** — simple CRUD = `createEntityCrudPage(config)` (6 lines). Complex = same factory + sibling files.
+- **Page factory** — simple CRUD = `createEntityCrudPage(config)` (6 lines). Complex = same factory + sibling files. 43 page files use it; auth/reports/dashboards are custom.
 - **Sibling file pattern** — `{Module}Columns.tsx`, `{Module}Filters.tsx`, `{Module}Form.tsx`, `{Module}ViewModal.tsx`.
+- **`pipeline/` vs `pipelines/`** — `pipeline/` = runtime state actions/timeline; `pipelines/` = pipeline CRUD UI.
 - **Form prop naming** — always `entity` (never `product`, `customer`, etc.).
 - **`useEntityForm` hook** — eliminates form setup boilerplate. Takes `schema`, `getDefaults`, `entity`.
 - **ViewModal** — always `memo()` wrapped, uses `ViewModalShell` + `ViewField`.

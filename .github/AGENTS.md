@@ -11,6 +11,7 @@ CI/CD workflows, reusable agent prompts, scaffolding skills with templates, and 
 ├── agents/                  # Agent role definitions (context7-research, refactor-safe)
 ├── prompts/                 # Reusable prompt templates for common tasks
 │   ├── checkpoint-progress.prompt.md
+│   ├── context7-docs.prompt.md
 │   ├── continue-progress.prompt.md
 │   ├── create-feature.prompt.md
 │   ├── create-import.prompt.md

@@ -34,6 +34,7 @@ yarn-error.log
 /.trae*
 /.claude*
 .sisyphus
+.omo/
 
 # IDE helper
 _ide_helper.php

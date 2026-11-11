@@ -15,7 +15,7 @@ tests/
 │   ├── Domain/              # FilterService tests
 │   ├── Requests/            # FormRequest validation tests
 │   └── Resources/           # Resource transformation tests
-├── e2e/{module-slug}/       # Playwright specs + helpers
+├── e2e/{module-slug}/       # 92 dirs / 106 Playwright specs + helpers
 ├── Traits/                  # 10 shared test traits
 └── Pest.php                 # Pest config (base TestCase, RefreshDatabase)
 ```
@@ -28,7 +28,8 @@ tests/
 - **E2E auth** — Bearer token injected to localStorage
 - **E2E structure** — `helpers.ts` (factories/utils) + `{module}.spec.ts`
 - **E2E standard** — 9-10 test cases per module (Search, Filters, Add, View, Edit, Export, Checkbox, Sorting, Delete, Import)
-- **Factories** — 67 factories, 1:1 with models
+- **Factories** — 88 factories, 1:1 with models
+- **Coverage map** — 104 unique Pest groups; 67 Feature dirs, 10 Unit dirs
 - **Run by module** — `sail test --group {slug}` or `npx playwright test tests/e2e/{slug}/`
 
 ## WHERE TO LOOK
