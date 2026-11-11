@@ -73,7 +73,9 @@ services:
             retries: 3
             timeout: 5s
     minio:
-        image: 'minio/minio:latest'
+        # Upstream minio/minio is gone from Docker Hub and quay.io denies anonymous
+        # pulls; pgsty/minio is a drop-in fork bundling minio + mc + curl.
+        image: 'pgsty/minio:RELEASE.2026-08-04T00-00-00Z'
         ports:
             - '${HOST_IP}:${FORWARD_MINIO_PORT:-9000}:9000'
             - '${HOST_IP}:${FORWARD_MINIO_CONSOLE_PORT:-8900}:8900'
