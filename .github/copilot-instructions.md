@@ -123,38 +123,44 @@ Untuk task refactor berbasis SonarQube dengan target menurunkan duplikasi dan me
 5. **Penanganan Anomali Metrik**
 	- Jika `coverage`/metrik lain anomali (mis. `0.0`) namun test lokal lulus, catat sebagai anomali pipeline di progress doc dan lanjutkan verifikasi pada snapshot berikutnya.
 
-## 9. Session Handoff & Continuity (Lintas Laptop/Shift)
+## 9. Session Handoff & Continuity (Lintas Server)
 
-- Karena user sering pindah laptop dengan Remote SSH server yang sama, agent **WAJIB** menjaga continuity via checkpoint repository.
-- `task.md` adalah sumber status aktif utama dan harus selalu bisa dipakai agent berikutnya tanpa konteks chat sebelumnya.
+- Karena user menjalankan banyak server berisi tmux + opencode pada workspace yang sama, agent **WAJIB** menjaga continuity via **GitHub Issues** (`gmedia/erp`), bukan file `task.md` (deprecated sejak 2026-11-17).
+- **Sumber kebenaran aktif = https://github.com/gmedia/erp/issues** (label `status:*`, komentar `<!-- claim -->` / `<!-- checkpoint -->`).
 
 ### Aturan Wajib
 
-1. Saat memulai sesi baru untuk task berlanjut:
-	- Baca `task.md` terlebih dahulu.
+1. Saat memulai sesi baru:
+	- `gh pr list --state open --assignee @me --repo gmedia/erp` — selesaikan PR merah lebih dulu.
+	- `gh issue list --assignee @me --repo gmedia/erp` — pilih yang berlabel `status:claimed`.
+	- Jika belum ada klaim, jalankan `/claim-issue` sebelum mengerjakan apa pun.
+	- Baca `gh issue view N --comments` → cari komentar `<!-- checkpoint -->` terakhir sebagai pengganti "Continuation Prompt".
 	- Verifikasi baseline cepat: `git rev-parse HEAD`, `git status --short`.
 
-2. Sebelum menutup sesi (atau setelah wave perubahan signifikan), update `task.md` minimal:
+2. Sebelum menutup sesi (atau setelah wave perubahan signifikan), jalankan `/checkpoint-progress` dan tulis komentar issue berisi:
 	- `Last updated`
 	- `Current milestone`
 	- `What changed in this session`
 	- `Validated commands and outcomes`
 	- `Open risks/blockers`
 	- `Recommended next step`
-	- `Continuation Prompt`
 
 3. Gunakan prompt reusable untuk handoff:
+	- `.github/prompts/claim-issue.prompt.md`
 	- `.github/prompts/continue-progress.prompt.md`
 	- `.github/prompts/checkpoint-progress.prompt.md`
 
-4. Jika ada commit, tulis hash commit terbaru pada checkpoint.
+4. Jika ada commit, tulis hash commit terbaru pada checkpoint issue.
 
-5. Jangan simpan log mentah panjang di `task.md`; simpan ringkasan terstruktur agar tetap terbaca.
-6. Pertahankan peran dokumen handoff berikut secara konsisten:
-	- `task.md` = status handoff aktif dan next action
-	- `task.changelog.md` = changelog produk/fitur
-	- `task.handoff-archive.md` = arsip checkpoint handoff E2E yang sudah tidak aktif
-7. Hindari duplikasi checkpoint historis di `task.md` atau `task.changelog.md` setelah dipindahkan ke `task.handoff-archive.md`.
-8. Jaga konsistensi bahasa per dokumen:
-	- `task.changelog.md` default menggunakan Bahasa Indonesia untuk isi changelog produk
-	- `task.md` dan `task.handoff-archive.md` boleh memakai English ringkas untuk handoff teknis jika lebih jelas
+5. Jangan simpan log mentah panjang di komentar issue; simpan ringkasan terstruktur agar tetap terbaca.
+
+6. Peran dokumen (semua `task.*` adalah arsip, bukan sumber aktif):
+	- GitHub Issues = status handoff aktif, klaim, dan next action
+	- `task.md` = deprecated (arsip status lama)
+	- `task.changelog.md` = arsip changelog produk/fitur (deprecated)
+	- `task.handoff-archive.md` = arsip checkpoint handoff E2E lama
+
+7. Hindari duplikasi checkpoint historis; riwayat tersimpan otomatis sebagai komentar issue.
+
+8. Jaga konsistensi bahasa:
+	- Komentar checkpoint issue boleh English ringkas atau Bahasa Indonesia sesuai konteks tim.

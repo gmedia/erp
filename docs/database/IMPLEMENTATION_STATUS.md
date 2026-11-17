@@ -398,8 +398,8 @@ Task-task ini bisa dikerjakan kapan saja, tidak harus menunggu Fase 1-3.
 
 ### Cara Melanjutkan
 
-1. Baca `task.md` untuk status handoff aktif.
+1. Baca issue yang diklaim di https://github.com/gmedia/erp/issues (`gh issue view N --comments`, marker `<!-- checkpoint -->`) untuk status handoff aktif. `task.md` deprecated.
 2. Baca `.github/prompts/continue-progress.prompt.md` untuk workflow standar.
 3. Pilih task dari Roadmap di atas berdasarkan prioritas bisnis.
 4. Gunakan skill yang sesuai dari `.github/skills/` (lihat kolom Skill di roadmap).
-5. Setelah selesai, update dokumen ini dan `task.md`.
+5. Setelah selesai, update dokumen ini dan tulis checkpoint ke issue tersebut (`/checkpoint-progress`).

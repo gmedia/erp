@@ -133,6 +133,6 @@ Catatan penamaan: heading modul memakai pola `Nama Modul di Kode (Label Bisnis)`
 
 ## Dokumen Terkait
 
-- Status handoff aktif: `task.md`
+- Status handoff aktif: GitHub Issues https://github.com/gmedia/erp/issues (`task.md` deprecated)
 - Arsip historis handoff E2E: `task.handoff-archive.md`
 - Pre-implementation research: `docs/profit-loss-by-department-design.md`
