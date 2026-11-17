@@ -31,7 +31,7 @@ class BudgetController extends Controller
 
     public function index(IndexBudgetRequest $request): JsonResponse
     {
-        $query = Budget::query()->with(['fiscalYear', 'creator']);
+        $query = Budget::query()->with(['fiscalYear', 'creator', 'lines.account']);
 
         if ($request->filled('search')) {
             $this->filterService->applySearch(
@@ -82,7 +82,7 @@ class BudgetController extends Controller
     {
         $budget = $action->execute($budget, $request->validated());
 
-        return (new BudgetResource($budget->load(['fiscalYear', 'creator', 'approver'])))->response();
+        return (new BudgetResource($this->loadResourceRelations($budget)))->response();
     }
 
     public function destroy(Budget $budget): JsonResponse
@@ -99,8 +99,8 @@ class BudgetController extends Controller
     public function export(Request $request): JsonResponse
     {
         $filters = $request->only(['search', 'fiscal_year_id', 'budget_type', 'status']);
-        $filename = 'budgets_export_' . now()->format('Y-m-d_H-i-s') . '_' . Str::ulid() . '.xlsx';
-        $filePath = 'exports/' . $filename;
+        $filename = 'budgets_export_'.now()->format('Y-m-d_H-i-s').'_'.Str::ulid().'.xlsx';
+        $filePath = 'exports/'.$filename;
 
         Excel::store(new BudgetExport($filters), $filePath, 'public');
 

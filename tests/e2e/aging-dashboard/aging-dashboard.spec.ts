@@ -67,10 +67,11 @@ test.describe('Aging Dashboard', () => {
 
         const calendar = page.locator('[data-slot="calendar"]');
         await calendar.waitFor({ state: 'visible' });
-        await calendar
-            .locator('button:not([disabled])')
-            .first()
-            .click();
+        const dayButton = calendar
+            .locator('button:not([disabled]):not([aria-selected="true"])')
+            .filter({ hasNot: page.locator('[data-selected="true"]') })
+            .last();
+        await dayButton.click();
 
         // Wait for URL to reflect the new as_of_date param before asserting.
         // waitForAgingDashboardData resolves too early because [data-slot="card"]
