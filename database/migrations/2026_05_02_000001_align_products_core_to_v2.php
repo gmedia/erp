@@ -74,7 +74,7 @@ return new class extends Migration
         Schema::table('production_orders', function (Blueprint $table) {
             $table->date('actual_start_date')->nullable()->after('planned_end_date');
             $table->date('actual_end_date')->nullable()->after('actual_start_date');
-            $table->foreignId('unit_id')->after('quantity')
+            $table->foreignId('unit_id')->nullable()->after('quantity')
                 ->constrained('units')
                 ->onDelete('cascade');
             $table->foreignId('created_by')->nullable()->after('notes')
@@ -104,7 +104,7 @@ return new class extends Migration
 
             $table->decimal('quantity_planned', 15, 2)->default(0)
                 ->after('product_id');
-            $table->foreignId('unit_id')->after('quantity_planned')
+            $table->foreignId('unit_id')->nullable()->after('quantity_planned')
                 ->constrained('units')
                 ->onDelete('cascade');
             $table->text('notes')->nullable()->after('cost');
