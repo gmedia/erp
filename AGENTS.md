@@ -180,7 +180,7 @@ erp/
 | Task | Location | Notes |
 |------|----------|-------|
 | Add new module (backend) | `app/Actions/{Module}/`, `app/Http/Controllers/`, `routes/api/` | Follow `docs/development-patterns.md` |
-| Add new module (frontend) | `resources/js/pages/{slug}/`, `resources/js/components/{slug}/` | Use `createEntityCrudPage` pattern |
+| Add new module (frontend) | `resources/js/pages/{slug}/`, `resources/js/components/{slug}/` | Use `createEntityCrudPage` pattern; ikuti `docs/ui-design-rules.md` |
 | Register route (frontend) | `resources/js/app-routes.tsx` | Lazy-loaded `<Route>` |
 | Register route (backend) | `routes/api/{module-slug}.php` | Auto-included |
 | Add export | `app/Exports/` | Declarative `columns()` pattern |
@@ -195,6 +195,7 @@ erp/
 | User guide page | `resources/js/pages/user-guide/index.tsx` | Renders markdown from API |
 | Module metadata | `docs/module-registry.md` | Full E2E + Pest registry |
 | Dev patterns | `docs/development-patterns.md` | Canonical implementation guide |
+| UI design rules | `docs/ui-design-rules.md` | Aturan pembuatan + review/koreksi UI konsisten antar modul |
 | Migrations/factories/seeders | `database/` | 106 / 88 / 29 — see `database/AGENTS.md` |
 | Backend route files | `routes/api/` | 63 files, 406 defs — see `routes/AGENTS.md` |
 | CI pipelines | `.github/workflows/`, `.gitlab/ci/` | Pest + Playwright + deploy |

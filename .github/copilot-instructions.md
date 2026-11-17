@@ -20,6 +20,8 @@ description: Aturan agent untuk project ERP
 | State Management | React Context (`auth-context.tsx`) + React Query cache |
 | Lazy Loading | Route-level code splitting di `app-routes.tsx` |
 
+> **UI konsisten antar modul:** Sebelum membuat atau mengoreksi UI, baca **`docs/ui-design-rules.md`**. Dokumen itu adalah sumber kebenaran untuk page shell, toolbar, tabel, status/warna, form, modal, dan checklist review UI existing.
+
 ### Routing Convention
 
 - **Backend**: Buat file route baru di `routes/api/{module-slug}.php`. File di-include otomatis oleh `routes/api.php`.
