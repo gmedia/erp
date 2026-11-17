@@ -27,7 +27,7 @@ yarn-error.log
 /.vscode
 /.zed
 /.agent*
-# task.* — tracked for AI agent handoff continuity
+# task.* — legacy tracked handoff files (deprecated 2026-11-17; active status in GitHub Issues)
 /.cline*
 /.roo*
 /.kilo*

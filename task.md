@@ -1,6 +1,9 @@
-# task.md — Active Session Handoff
+# task.md — Archived Session Handoff (deprecated)
 
-**Last updated:** 2026-08-26  
+> [!WARNING]
+> **DEPRECATED for cross-server coordination (2026-11-17).** File ini dipertahankan hanya sebagai arsip status lama. Koordinasi kerja aktif, klaim, handoff, dan next action sekarang berada di **https://github.com/gmedia/erp/issues** (label `status:*`, komentar `<!-- claim -->`). Gunakan prompt `/claim-issue` untuk mulai dan `/continue-progress` untuk melanjutkan. Jangan menulis status kerja baru di sini — gunakan komentar issue.
+
+**Last updated:** 2026-08-26  (superseded by GitHub Issues)  
 **Current milestone:** Visual shared-shell themes **closed**; waiting for new product brief  
 **Branch:** `main` (pull before work)  
 **Open PRs:** none  

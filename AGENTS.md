@@ -51,7 +51,7 @@
 
 1. After OpenCode kill / interrupt: **strict serial** — **1 tool call per assistant turn** until the interrupted task is finished or stable.
 2. Do **not** re-fire explore/librarian/oracle swarms to “catch up”.
-3. Resume from `task.md` + `git status` only; re-apply unfinished edits **one file at a time**.
+3. Resume from claimed GitHub Issue (`gh issue view N --comments`, marker `<!-- checkpoint -->`) + `git status` only; re-apply unfinished edits **one file at a time**. `task.md` is deprecated.
 4. Prefer completing a small shippable slice (commit/PR) over re-planning the whole theme.
 
 ### Why this exists
@@ -73,6 +73,7 @@ Host RAM/CPU is limited. Parallel `Read`/`Edit`/`task` batches have **killed Ope
 
 ```bash
 gh pr list --state open --assignee @me    # Find your pending MRs
+gh issue list --assignee @me --repo gmedia/erp  # Active claimed work (task.md deprecated); cari label status:claimed
 gh pr checks <id>                          # Check CI status
 # CI green → squash merge → delete branch → pull main
 gh pr merge <id> --squash --delete-branch && rtk git pull --ff-only
@@ -159,7 +160,7 @@ erp/
 ├── .gitlab/            # GitLab CI deploy include (.gitlab-ci.yml)
 ├── scripts/            # Sync scripts, E2E lock helper
 ├── docker/             # Docker configs
-└── task.md             # Active session handoff
+└── task.md             # Deprecated handoff (active status: gmedia/erp/issues)
 ```
 
 ## WHERE TO LOOK
@@ -185,7 +186,7 @@ erp/
 | Migrations/factories/seeders | `database/` | 106 / 88 / 29 — see `database/AGENTS.md` |
 | Backend route files | `routes/api/` | 63 files, 406 defs — see `routes/AGENTS.md` |
 | CI pipelines | `.github/workflows/`, `.gitlab/ci/` | Pest + Playwright + deploy |
-| Session handoff | `task.md` | Active status + next action |
+| Session handoff | `gmedia/erp/issues` | Active claim + checkpoint (`task.md` deprecated) |
 | Skills/templates | `.github/skills/` | Scaffolding for new features |
 
 ## CODE MAP
@@ -284,5 +285,5 @@ sail artisan ide-helper:models -RW    # Model PHPDoc
 - **Octane** for performance (production).
 - **Scramble** for auto-generated API docs.
 - **Zustand** used alongside React Query for client state.
-- **`task.md`** is the handoff document — read it first when continuing work.
+- **`task.md`** is a deprecated handoff document — active status lives in `gmedia/erp/issues` (labels `status:*`, comments `<!-- claim -->` / `<!-- checkpoint -->`). Read it only for historical context.
 - **`.github/skills/`** has scaffolding templates for new modules.

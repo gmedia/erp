@@ -34,8 +34,10 @@ Index for agents and developers. Prefer these paths over inventing new status do
 
 - [archive/](./archive/) — historical refactor, SPA migration, Sonar progress archive
 
-## Handoff (repo root)
+## Handoff (repo root) — deprecated
 
-- `task.md` — active session handoff
+Active coordination since 2026-11-17 lives in **https://github.com/gmedia/erp/issues** (`status:*` labels, `<!-- claim -->` / `<!-- checkpoint -->` comments). The files below are historical archives only.
+
+- `task.md` — deprecated session handoff
 - `task.changelog.md` — product changelog
 - `task.handoff-archive.md` — archived E2E handoffs

@@ -1,9 +1,11 @@
 # Changelog Tugas
 
+> **DEPRECATED (2026-11-17).** Changelog produk sebaiknya diikuti dari PR yang di-merge di https://github.com/gmedia/erp/pulls. File ini arsip historis; jangan menulis entri baru di sini. Koordinasi kerja aktif ada di https://github.com/gmedia/erp/issues.
+
 Terakhir diperbarui: 2026-06-15 (post-quick-wins)
 
 File ini menyimpan catatan perubahan produk dan fitur.
-Baca `task.md` untuk status handoff aktif dan `task.handoff-archive.md` untuk riwayat checkpoint E2E lama.
+Untuk status handoff aktif, gunakan komentar `<!-- checkpoint -->` pada issue yang diklaim; `task.md` dan `task.handoff-archive.md` juga sudah deprecated.
 
 Catatan penamaan: heading modul memakai pola `Nama Modul di Kode (Label Bisnis)` agar tetap mudah dipahami manusia tanpa kehilangan anchor teknis di repo.
 

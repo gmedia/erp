@@ -1,5 +1,7 @@
 # Rencana Refactoring Konsistensi Style Antar Modul
 
+> **ARCHIVED (2026-11-17).** Referensi historis untuk wave refactor style yang sudah selesai. Instruksi "update `task.md`" di dalam dokumen ini bersifat historis — `task.md` sudah deprecated; status kerja aktif ada di https://github.com/gmedia/erp/issues. Jangan jalankan ulang wave dari dokumen ini tanpa product call baru.
+
 ## Tujuan
 
 - Menyamakan style implementasi antar modul sejenis tanpa mengubah kontrak API, route, query param, payload, permission, atau `data-testid` yang sudah dipakai test.

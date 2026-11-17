@@ -3,6 +3,8 @@
 > **Last updated:** 2026-08-04
 >
 > **Purpose:** Referensi cepat untuk AI agent dan developer tentang status implementasi setiap modul database. Dokumen ini adalah satu-satunya sumber kebenaran untuk status implementasi — jangan duplikasi informasi ini di file desain individual.
+>
+> **Handoff:** Untuk status *pekerjaan* (siapa mengerjakan apa), gunakan https://github.com/gmedia/erp/issues — `task.md` sudah deprecated sejak 2026-11-17.
 
 ---
 

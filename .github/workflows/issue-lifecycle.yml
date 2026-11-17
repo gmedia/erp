@@ -1,0 +1,131 @@
+name: Issue lifecycle (multi-server claim board)
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+  schedule:
+    # Hourly stale-claim check
+    - cron: '17 * * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: issue-lifecycle
+  cancel-in-progress: false
+
+jobs:
+  pr-opened:
+    if: >-
+      github.event_name == 'pull_request' &&
+      (github.event.action == 'opened' || github.event.action == 'reopened' || github.event.action == 'synchronize')
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: read
+    steps:
+      - name: Move referenced issues to in-review
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        with:
+          script: |
+            const body = context.payload.pull_request.body || '';
+            const numbers = [...new Set(
+              [...body.matchAll(/(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)/gi)]
+                .map(m => Number(m[1]))
+            )];
+            if (!numbers.length) {
+              core.info('PR body has no Closes #N reference; nothing to do.');
+              return;
+            }
+            for (const issue_number of numbers) {
+              try {
+                const current = await github.rest.issues.listLabelsOnIssue({
+                  owner: context.repo.owner, repo: context.repo.repo, issue_number,
+                });
+                const labels = current.data.map(l => l.name);
+                if (labels.includes('status:claimed') || labels.includes('status:available')) {
+                  for (const name of ['status:claimed', 'status:available']) {
+                    await github.rest.issues.removeLabel({
+                      owner: context.repo.owner, repo: context.repo.repo, issue_number, name,
+                    }).catch(() => {});
+                  }
+                  await github.rest.issues.addLabels({
+                    owner: context.repo.owner, repo: context.repo.repo, issue_number,
+                    labels: ['status:in-review'],
+                  });
+                  core.info(`Issue #${issue_number} -> status:in-review`);
+                }
+              } catch (error) {
+                core.warning(`Could not update #${issue_number}: ${error.message}`);
+              }
+            }
+
+  pr-merged:
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.action == 'closed' &&
+      github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: read
+    steps:
+      - name: Mark referenced issues done
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        with:
+          script: |
+            const body = context.payload.pull_request.body || '';
+            const numbers = [...new Set(
+              [...body.matchAll(/(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)/gi)]
+                .map(m => Number(m[1]))
+            )];
+            for (const issue_number of numbers) {
+              try {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner, repo: context.repo.repo, issue_number,
+                  labels: ['status:done'],
+                });
+                for (const name of ['status:claimed', 'status:in-review', 'status:available']) {
+                  await github.rest.issues.removeLabel({
+                    owner: context.repo.owner, repo: context.repo.repo, issue_number, name,
+                  }).catch(() => {});
+                }
+                core.info(`Issue #${issue_number} -> status:done`);
+              } catch (error) {
+                core.warning(`Could not update #${issue_number}: ${error.message}`);
+              }
+            }
+
+  stale-claims:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Warn claims older than 24h with no update
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        with:
+          script: |
+            const cutoff = Date.now() - 24 * 60 * 60 * 1000;
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: 'status:claimed', per_page: 100,
+            });
+            for (const issue of issues) {
+              if (issue.pull_request) continue;
+              const comments = await github.paginate(github.rest.issues.listComments, {
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, per_page: 100,
+              });
+              const claim = [...comments].reverse().find(c => c.body?.includes('<!-- claim -->'));
+              const stamp = claim ? Date.parse(claim.updated_at || claim.created_at) : Date.parse(issue.updated_at);
+              if (!stamp || stamp > cutoff) continue;
+              const marker = '<!-- stale-claim-bot -->';
+              if (comments.some(c => c.body?.includes(marker) && Date.parse(c.created_at) > stamp)) continue;
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `${marker}\nThis claim has had no update for 24h. If the server is still working, comment an ETA. Otherwise another opencode server may unclaim it (remove \`status:claimed\`, restore \`status:available\`).`,
+              });
+              core.info(`Stale claim warned on #${issue.number}`);
+            }
