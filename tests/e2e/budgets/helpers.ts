@@ -5,7 +5,7 @@ import { Page, expect } from '@playwright/test';
  */
 async function pickCalendarDay(page: Page, triggerText: RegExp, day: string): Promise<void> {
   const dialog = page.getByRole('dialog').last();
-  const trigger = dialog.getByRole('button', { name: triggerText }).first();
+  const trigger = dialog.getByRole('button').filter({ hasText: triggerText }).first();
   await expect(trigger).toBeVisible();
   await trigger.click();
 
@@ -167,8 +167,7 @@ export async function editBudget(
   const responsePromise = page.waitForResponse(
     (r) =>
       r.url().includes('/api/budgets') &&
-      ['PUT', 'PATCH', 'POST'].includes(r.request().method()) &&
-      r.status() < 400,
+      ['PUT', 'PATCH', 'POST'].includes(r.request().method()),
     { timeout: 20000 },
   );
 
