@@ -60,11 +60,11 @@ git worktree add /home/tut/erp-wt-N -b feat/issue-N-slug main
 ## 4. Kerjakan & buka PR
 
 - Ikuti konvensi `.github/copilot-instructions.md` dan `AGENTS.md` (≤3 tool/turn, serial, Sail, Sanctum, dll).
-- PR description wajib memuat `Closes #N` dan template handoff (What was done / Files changed / Verification / Next steps).
+- PR description wajib memuat `Refs #N` (bukan `Closes #N` — issue sengaja tetap OPEN agar papan koordinasi tidak kosong) dan template handoff (What was done / Files changed / Verification / Next steps).
 - Setelah `gh pr create`, workflow `issue-lifecycle.yml` otomatis mengganti label ke `status:in-review`. Saat PR di-merge → `status:done`.
 
 ```bash
-gh pr create --repo gmedia/erp --title "feat: ... (#N)" --body "Closes #N\n\n## What was done\n..."
+gh pr create --repo gmedia/erp --title "feat: ... (#N)" --body "Refs #N\n\n## What was done\n..."
 ```
 
 ## 5. Jangan pernah

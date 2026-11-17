@@ -68,7 +68,7 @@ Marker `<!-- checkpoint -->` wajib — dipakai `/continue-progress` untuk mencar
 
 ## 5. Tutup sesi
 
-- Kalau PR sudah dibuka: pastikan deskripsi PR memuat `Closes #N` (workflow `issue-lifecycle.yml` akan mengubah label ke `status:in-review`).
+- Kalau PR sudah dibuka: pastikan deskripsi PR memuat `Refs #N` (bukan `Closes #N` — agar issue tidak auto-close; workflow `issue-lifecycle.yml` akan mengubah label ke `status:in-review`, lalu `status:done` saat merge).
 - Kalau belum: biarkan label `status:claimed` tetap ada.
 
 ## 6. Output Final ke User
