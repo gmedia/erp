@@ -65,3 +65,20 @@ Full multimodal narrative: session `ses_02021a5c2ffeaD0HIIg6ymhnEW`.
 ## Themes → BACKLOG
 
 T1 DataTable shell v2 · T2 Sidebar IA/active · T3 Page header contract · T4 KPI/dashboard semantics · T5 Sparse/report density
+
+---
+
+## Re-smoke 2026-11-17 (issue #116) — code-backed checklist
+
+Harness: `VISUAL_AUDIT=1 VISUAL_AUDIT_PRESET=smoke` (3 passed) + `exceptions` (5 passed), 1 worker, dijalankan **di dalam container** dengan `PLAYWRIGHT_BASE_URL=http://127.0.0.1:80` (bukan `:82` published host — dari container `:82` mengarah ke dirinya sendiri dan ERR_CONNECTION_REFUSED). PNG otomatis ter-ignore via `.gitignore`.
+
+Checklist `docs/ui-design-rules.md` Bagian 3 dipakai dalam mode **code-backed review** (PNG tidak dapat dibaca oleh agent tanpa vision di sesi ini, sehingga verifikasi dilakukan terhadap komponen/shared shell, bukan piksel):
+
+| Aturan | Bukti di kode | Verdict |
+|--------|---------------|---------|
+| D. Actions sticky kanan | `DataTableCore.tsx` `STICKY_ACTIONS_CELL/HEAD` = `sticky right-0` | PASS |
+| E. Angka negatif bukan hijau | `FinancialReportSection.getSignedAmountTextClass` → rose untuk `value < 0`; `SummaryCards.signedBalanceChrome` → `border-l-rose-500`, `text-rose-600` | PASS (HF-1/FD-01 fixed) |
+| B. Page shell konsisten | route CRUD/report memakai factory / `ReportDataTablePage` | PASS |
+| A–C, F–G (chrome, toolbar, form/modal, teknis) | Tidak diverifikasi visual pada sesi ini | UNCLEAR |
+
+Catatan: untuk verdict visual penuh (SHELL-01/02/03/06/08, double title), diperlukan agent dengan kemampuan vision atau OCR terstruktur. Tidak ada finding baru yang ditambahkan; ini hanya konfirmasi bahwa perbaikan lama masih hadir di kode setelah re-smoke.
