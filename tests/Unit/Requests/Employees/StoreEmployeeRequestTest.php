@@ -204,6 +204,7 @@ describe('StoreEmployeeRequest', function () {
     });
 
     test('rules validation passes with valid branch id', function () {
+        $company = Company::factory()->create();
         $department = Department::factory()->create();
         $position = Position::factory()->create();
         $branch = Branch::factory()->create();
@@ -213,7 +214,7 @@ describe('StoreEmployeeRequest', function () {
             'name' => 'John Doe',
             'email' => 'john.doe@example.com',
             'current_employment' => [
-                'company_id' => '1',
+                'company_id' => $company->id,
                 'department_id' => $department->id,
                 'position_id' => $position->id,
                 'branch_id' => $branch->id,
