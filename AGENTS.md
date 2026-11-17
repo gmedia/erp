@@ -82,6 +82,17 @@ gh pr merge <id> --squash --delete-branch && rtk git pull --ff-only
 gh pr view <id> --json headRefName         # Get branch name
 ```
 
+### Saat diminta "setup local development"
+
+Agent wajib melakukan langkah ini **sebelum/menyertakan** `bash project_setup.sh`:
+
+1. `git config core.hooksPath .githooks` — pasang pre-push guard. `project_setup.sh` juga melakukan ini secara non-fatal, tapi agent tetap harus memverifikasi hasilnya: `git config --get core.hooksPath` harus mengembalikan `.githooks`.
+2. `gh auth status` — pastikan akun tim (mis. `oppytut`), bukan akun sesaat.
+3. `git config user.name` / `git config user.email` — harus terisi; kalau kosong, set dari identitas commit terakhir repo (`git log -1 --format='%an <%ae>'`).
+4. Buka `http://localhost:82` via SSH tunnel dari laptop; jangan pernah bind ke `0.0.0.0` di host ber-IP-publik.
+
+Guard menolak push dari branch tanpa pola `<type>/issue-N-slug`, issue belum `status:claimed`, atau bukan di-assign ke akun `gh`. Ini pelengkap koordinasi di https://github.com/gmedia/erp/issues.
+
 ## Commit Prefixes
 
 | Prefix | When |

@@ -22,6 +22,21 @@ This Enterprise Resource Planning (ERP) system is a comprehensive business manag
     bash ./permission_setup.sh
     ```
     > Run from Git Bash, or from PowerShell if Git Bash is installed.
+- Pasang pre-push guard untuk koordinasi multi-server (sekali per clone)
+    ```
+    git config core.hooksPath .githooks
+    ```
+    > Guard menolak push dari branch tanpa pola `issue-N-slug`, issue yang belum
+    > `status:claimed`, atau yang tidak di-assign ke akun `gh` Anda. Fail-open
+    > saat offline. `project_setup.sh` juga memasangnya otomatis (non-fatal).
+- Siapkan identitas kerja sebelum klaim issue
+    ```
+    gh auth status                       # harus akun tim, mis. oppytut
+    git config user.name
+    git config user.email
+    ```
+    > `gh issue list --assignee @me` dan pre-push guard memakai identitas ini.
+    > Lihat https://github.com/gmedia/erp/issues dan prompt `/claim-issue`.
 - Apply project setup
     ```
     bash project_setup.sh
