@@ -2,10 +2,10 @@
 
 **Status:** Planned (not executed)  
 **Created:** 2026-08-08  
-**Owner handoff:** See root `task.md` (active session) + this doc (full plan)  
+**Owner handoff:** See https://github.com/gmedia/erp/issues (active claim/checkpoint) + this doc (full plan); root `task.md` is deprecated  
 **Related:** `docs/module-registry.md`, `database/seeders/MenuSeeder.php`, `resources/js/app-routes.tsx`
 
-> **Agent rule:** On session start / handoff, read **`task.md` first**, then this plan if milestone is visual audit. Do **not** start 85-page capture or parallel visual agents without Wave 0 setup and host memory check.
+> **Agent rule:** On session start / handoff, read your claimed issue's `<!-- checkpoint -->` comments first (`gh issue view N --comments`), then this plan if milestone is visual audit. Do **not** start 85-page capture or parallel visual agents without Wave 0 setup and host memory check.
 
 ---
 
@@ -280,11 +280,11 @@ Aggregate **top shared** vs **page-specific**. Prefer one epic doc over 85 GitHu
 ## 12. Continuation (for agents)
 
 ```
-Read task.md (active handoff), then docs/visual-audit-plan.md (this file).
+Read your claimed issue at gmedia/erp/issues (gh issue view N --comments, marker <!-- checkpoint -->), then docs/visual-audit-plan.md (this file). task.md is deprecated.
 Do NOT capture all 85 pages in one session.
 Respect AGENTS.md process budget (≤3 tools/turn, serial).
 Host RAM limited: 1 browser worker, batch 3–5 screenshots per review agent.
-Next executable step unless task.md says otherwise: Wave 0 setup, then Wave 1 only.
+Next executable step unless the issue says otherwise: Wave 0 setup, then Wave 1 only.
 Base URL: http://127.0.0.1:82/ — check /up before browser work.
 After #84/#85: variance path /reports/asset-stocktake-variances; no menu perm key "accounts".
 Implement fixes only when user asks; default is plan + findings docs.
@@ -296,11 +296,11 @@ Implement fixes only when user asks; default is plan + findings docs.
 
 | File | Role |
 |------|------|
-| **`task.md`** | **Active** handoff: current wave, branch, blockers, next command |
+| **GitHub Issues (`gmedia/erp`)** | **Active** claim + checkpoint: current wave, branch, blockers, next command |
 | **`docs/visual-audit-plan.md`** | Full durable plan (this file) |
 | **`docs/visual-audit/FINDINGS.md`** | Session/wave findings (create in Wave 0) |
-| **`docs/visual-audit/BACKLOG.md`** | Triaged work items (create in Wave 0) |
+| **`docs/visual-audit/BACKLOG.md`** | Triaged work items (create in Wave 0) — mirror into Issues for claim tracking |
 | **`docs/module-registry.md`** | Module metadata / test registry |
-| **`task.handoff-archive.md`** | Archive old handoffs — do not duplicate long history in `task.md` |
+| **`task.handoff-archive.md`** | Archive old handoffs — do not duplicate long history; `task.md` deprecated |
 
-When a visual-audit wave finishes, **update `task.md`** (milestone, what changed, next step, continuation prompt) and append a short delta to FINDINGS/BACKLOG — do not only leave context in chat.
+When a visual-audit wave finishes, **write a `<!-- checkpoint -->` comment on your claimed issue** (milestone, what changed, next step) and append a short delta to FINDINGS/BACKLOG — do not only leave context in chat.

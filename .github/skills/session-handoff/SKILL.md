@@ -1,28 +1,33 @@
 ---
 name: Session Handoff
-description: Standarisasi checkpoint progress lintas laptop/shift agar sesi berikutnya langsung lanjut.
+description: Standarisasi checkpoint lintas server/shift ke GitHub Issues agar sesi berikutnya langsung lanjut tanpa konflik antar opencode.
 ---
 
 # Session Handoff Skill
 
-Gunakan skill ini saat user sering berpindah laptop/shift, tetapi tetap memakai Remote SSH workspace yang sama.
+Gunakan skill ini saat beberapa server menjalankan opencode pada workspace yang sama, atau user sering berpindah server/laptop.
+
+> **Sejak 2026-11-17:** sumber kebenaran aktif = **https://github.com/gmedia/erp/issues**, bukan `task.md` (deprecated). Lihat `/claim-issue`, `/continue-progress`, `/checkpoint-progress`.
 
 ## Kapan Dipakai
 
-- User bilang sering pindah laptop/shift.
+- User memakai banyak server dengan tmux + opencode.
 - Task panjang (refactor, stabilisasi test, rollout bertahap).
-- Ada risiko kehilangan konteks antar sesi.
+- Ada risiko dua server mengerjakan hal yang sama atau kehilangan konteks.
 
 ## Tujuan
 
-1. Progress tersimpan konsisten di repo.
-2. Agent berikutnya bisa lanjut tanpa re-triage besar.
-3. User cukup jalankan prompt lanjutan.
+1. Satu issue = satu klaim = satu branch = satu PR.
+2. Agent berikutnya bisa lanjut dari komentar `<!-- checkpoint -->` tanpa re-triage.
+3. Tidak ada server yang menimpa status server lain lewat file bersama.
 
 ## Sumber Kebenaran
 
-- `task.md` adalah single source of truth untuk status aktif.
+- **Aktif:** issue di `gmedia/erp` — label `status:*`, komentar `<!-- claim -->` dan `<!-- checkpoint -->`.
+- **Arsip (baca hanya jika perlu):** `task.md`, `task.changelog.md`, `task.handoff-archive.md` — deprecated, jangan ditulis.
+- Referensi teknis tetap di repo: `.github/copilot-instructions.md`, `AGENTS.md`, `docs/development-patterns.md`, `docs/module-registry.md`.
 - Prompt reusable:
+  - `.github/prompts/claim-issue.prompt.md`
   - `.github/prompts/continue-progress.prompt.md`
   - `.github/prompts/checkpoint-progress.prompt.md`
 
@@ -30,10 +35,11 @@ Gunakan skill ini saat user sering berpindah laptop/shift, tetapi tetap memakai 
 
 ### A. Saat Memulai Sesi Baru
 
-1. Baca `task.md` dulu.
-2. Jalankan baseline cepat:
-
-Catatan: command git pada baseline dijalankan di host, command runtime project tetap via Sail.
+1. `gh pr list --state open --assignee @me --repo gmedia/erp` — selesaikan PR merah dulu.
+2. `gh issue list --repo gmedia/erp --assignee @me --state open` — pilih yang berlabel `status:claimed`. Fallback bila kombinasi filter kosong: `gh search issues --repo gmedia/erp --assignee @me --label 'status:claimed' --state open`.
+3. Kalau kosong → jalankan `/claim-issue` sebelum mengerjakan apa pun.
+4. Baca `gh issue view N --repo gmedia/erp --comments` → cari `<!-- checkpoint -->` terakhir.
+5. Baseline cepat:
 
 ```bash
 git rev-parse HEAD
@@ -41,17 +47,17 @@ git status --short
 ./vendor/bin/sail php -v
 ```
 
-3. Ambil 1 objective aktif + 1 next action dari `task.md`.
+6. Ambil 1 objective + 1 next action dari checkpoint.
 
 ### B. Saat Bekerja
 
 1. Eksekusi dalam wave kecil.
 2. Simpan command validasi yang benar-benar dijalankan.
-3. Hindari full-suite bila ada constraint user untuk targeted validation only.
+3. Hindari full-suite bila ada constraint targeted validation only.
 
 ### C. Sebelum Menutup Sesi
 
-Update `task.md` minimal bagian berikut:
+Jalankan `/checkpoint-progress`. Tulis komentar issue berisi:
 
 1. `Last updated`
 2. `Current milestone`
@@ -59,17 +65,15 @@ Update `task.md` minimal bagian berikut:
 4. `Validated commands and outcomes`
 5. `Open risks/blockers`
 6. `Recommended next step`
-7. `Continuation Prompt`
+
+**Jangan** menulis ke `task.md` — deprecated dan bersama antar server.
 
 ## Template
 
-Gunakan template ini saat perlu merapikan struktur handoff:
-
-- `.github/skills/session-handoff/resources/handoff.template.md`
+- `.github/skills/session-handoff/resources/handoff.template.md` — format komentar issue.
 
 ## Definition of Done
 
-- Sesi berikutnya dapat dimulai cukup dengan:
-  - membaca `task.md`
-  - memakai prompt `/continue-progress`
-- Tidak ada ambiguity tentang objective aktif, hasil validasi terakhir, dan next action.
+- Sesi berikutnya dapat dimulai dengan: `/continue-progress` + `gh issue view N --comments`.
+- Tidak ada ambiguity tentang issue aktif, objective, hasil validasi terakhir, dan next action.
+- Tidak ada server yang menimpa handoff server lain.

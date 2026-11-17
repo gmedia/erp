@@ -1,27 +1,52 @@
 ---
-description: "Use when: melanjutkan sesi lintas laptop atau shift dari task.md, checkpoint aktif, dan next action terbaru"
+description: "Use when: melanjutkan sesi lintas server dari issue yang sedang diklaim di gmedia/erp, bukan dari task.md"
 ---
 
-# Workflow: Continue Progress
+# Workflow: Continue Progress (Issues)
 
-Gunakan prompt ini untuk melanjutkan sesi lintas laptop atau shift pada Remote SSH server/workspace yang sama.
+Pakai prompt ini untuk melanjutkan kerja di server mana pun. **Sumber kebenaran aktif = GitHub Issues**, bukan `task.md` (deprecated sejak 2026-11-17).
 
-## 1. Mulai dari Sumber Kebenaran Aktif
+## 1. Cek MR/PR terbuka lebih dulu (aturan AGENTS.md)
 
-1. Baca `task.md` terlebih dahulu sebagai source of truth untuk objective aktif, state terakhir, dan next action.
-2. Gunakan pembagian dokumen berikut secara konsisten:
-	- `task.md` = status handoff aktif
-	- `task.changelog.md` = changelog produk/fitur
-	- `task.handoff-archive.md` = arsip checkpoint E2E lama
-3. Baca `task.handoff-archive.md` hanya jika context aktif di `task.md` belum cukup untuk melanjutkan.
-4. Baca `task.changelog.md` hanya jika butuh riwayat perubahan produk/fitur yang relevan.
-5. `.github/copilot-instructions.md`
-6. Jika ada local workspace override, baca `.kilo/rules/erp-agent-rules.md`
-7. Jika objective aktif menyentuh package/framework docs atau refactor struktural, prioritaskan Context7 atau Depwire sesuai routing terbaru di `.github/copilot-instructions.md`
+```bash
+gh pr list --state open --assignee @me --repo gmedia/erp
+```
 
-## 2. Verifikasi Baseline Sesi
+Kalau ada yang CI merah → kerjakan dulu. Hijau → squash merge + delete branch, lalu lanjut.
 
-Catatan: command git pada tahap baseline dijalankan langsung di host, sedangkan command runtime project tetap via Sail.
+## 2. Ambil objective aktif dari issue yang diklaim
+
+```bash
+gh issue list --repo gmedia/erp --assignee @me --state open --limit 20
+
+# Pilih yang berlabel status:claimed dari hasil di atas.
+# Catatan: kombinasi --assignee + --label kadang kosong saat propagasi GitHub;
+# filter label manual lebih reliabel. Fallback: gh search issues --repo gmedia/erp --assignee @me --label 'status:claimed' --state open
+```
+
+- Kalau **tidak ada** yang diklaim: jangan mulai kerja. Jalankan `/claim-issue` dulu untuk mengambil issue `status:available`.
+- Kalau ada **lebih dari satu**: pilih yang paling lama diklaim, atau tanya user.
+- Baca detail + riwayat handoff terakhir:
+
+```bash
+gh issue view N --repo gmedia/erp --comments
+```
+
+Cari komentar terakhir berisi `<!-- checkpoint -->` atau `<!-- claim -->`. Itu pengganti "Continuation Prompt" dari `task.md` lama.
+
+## 3. Referensi pendukung (tetap di repo)
+
+File berikut **masih** dibaca dari repo — bukan dipindah ke Issues:
+
+- `.github/copilot-instructions.md` — aturan arsitektur & anti-pattern
+- `AGENTS.md` — workflow, batas ≤3 tool/turn, Sail
+- `docs/development-patterns.md` — pola CRUD/report/export/FY
+- `docs/module-registry.md` — metadata test per modul
+- `task.md` — **arsip status lama saja**, jangan dijadikan sumber aktif
+
+Jika ada local override, baca `.kilo/rules/erp-agent-rules.md`.
+
+## 4. Verifikasi Baseline Sesi
 
 ```bash
 git rev-parse HEAD
@@ -29,36 +54,35 @@ git status --short
 ./vendor/bin/sail php -v
 ```
 
-## 3. Sinkronkan Tujuan Sesi
+## 5. Sinkronkan Tujuan Sesi
 
-- Ringkas status aktif dalam 5-10 poin dari `task.md`.
-- Abaikan checkpoint historis dari `task.handoff-archive.md` kecuali benar-benar masih relevan dengan objective aktif.
-- Tentukan 1 objective aktif, 1 blocker utama, dan 1 next action terukur.
-- Tentukan juga MCP utama yang relevan untuk objective aktif: `laravel-boost`, `context7`, atau `depwire`.
+- Ringkas status dari issue + komentar checkpoint (5–10 poin).
+- Tentukan 1 objective aktif, 1 blocker, 1 next action terukur.
+- Tentukan MCP utama: `laravel-boost`, `context7`, atau `depwire`.
 
-## 4. Kerjakan Wave Kecil
+## 6. Kerjakan Wave Kecil
 
-- Kerjakan perubahan bertahap (minimal-risk).
-- Jalankan validasi terfokus via Sail (hindari full test jika tidak diminta user).
-- Catat command dan hasil validasi yang benar-benar dijalankan.
+- Perubahan bertahap, minimal-risk.
+- Validasi terfokus via Sail (hindari full suite bila tidak diminta).
+- Catat command + hasilnya untuk ditulis ke checkpoint issue.
 
-## 5. Perbarui Handoff Aktif
+## 7. Simpan Handoff ke Issue (bukan task.md)
 
-Perbarui `task.md` dengan format ringkas berikut:
+Sebelum menutup sesi, jalankan `/checkpoint-progress`. Ringkasan ditulis sebagai komentar issue dengan marker `<!-- checkpoint -->`, berisi:
 
-1. `Last updated` (tanggal terbaru)
+1. `Last updated`
 2. `Current milestone`
 3. `What changed in this session`
 4. `Validated commands and outcomes`
 5. `Open risks/blockers`
 6. `Recommended next step`
-7. `Continuation Prompt` yang siap copy-paste
 
-Jika ringkasan historis lama sudah tidak cocok berada di `task.md`, pindahkan ke `task.handoff-archive.md` daripada menumpuknya di status aktif.
+Jangan tulis ke `task.md` — file itu deprecated dan bersama antar server.
 
-## 6. Output Final ke User
+## 8. Output Final ke User
 
-- Sebutkan root cause / tujuan yang dikerjakan.
+- Sebutkan issue `#N` yang dikerjakan.
+- Sebutkan root cause / tujuan.
 - Sebutkan file yang diubah.
-- Sebutkan command validasi yang dijalankan via Sail + hasil.
-- Tutup dengan langkah user berikutnya (1-3 item).
+- Sebutkan command validasi via Sail + hasil.
+- Tutup dengan 1–3 langkah berikutnya.

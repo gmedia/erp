@@ -1,9 +1,11 @@
 # AI Handoff Archive: E2E Stabilization
 
-Last updated: 2026-04-29
+Last updated: 2026-11-17 (status: archived; no longer active)
 
-Read `task.md` first for the active handoff state.
-This file stores condensed historical checkpoints that were moved out of `task.md` so the active handoff document stays short and current.
+> **DEPRECATED.** Handoff aktif sejak 2026-11-17 berada di https://github.com/gmedia/erp/issues. File ini hanya arsip historis E2E; jangan menulis status baru di sini.
+
+`task.md` juga deprecated — baca komentar `<!-- checkpoint -->` terakhir pada issue yang diklaim sebagai gantinya.
+This file stores condensed historical checkpoints that were moved out of `task.md`.
 
 ## 2026-04-29
 
@@ -23,7 +25,7 @@ This file stores condensed historical checkpoints that were moved out of `task.m
   - `./vendor/bin/sail run sh ./scripts/e2e-with-lock.sh npx playwright test tests/e2e/entity-state-actions/entity-state-actions.spec.ts --workers=1 --retries=0 --reporter=line` -> `1 passed (16.2s)`
   - `./vendor/bin/sail run sh ./scripts/e2e-with-lock.sh npx playwright test tests/e2e/entity-state-timeline/entity-state-timeline.spec.ts --workers=1 --retries=0 --reporter=line` -> `1 passed (19.8s)`
 - Persistent notes:
-  - `task.*` handoff continuity remains local to this workspace because `.gitignore` excludes it.
+  - `task.*` handoff continuity was originally treated as workspace-local, but these files are in fact tracked in git; since 2026-11-17 active status lives in GitHub Issues instead.
   - Keep exactly one Playwright process active at a time because `global-setup.ts` still runs `migrate:fresh` and `db:seed`.
   - The remaining plain `login(page)` callers are intentionally limited to dashboard or debug-only surfaces.
 

@@ -1,24 +1,23 @@
 ---
-description: "Use when: menyimpan checkpoint sesi lintas laptop atau shift ke task.md sebelum pause, pindah perangkat, atau selesai kerja"
+description: "Use when: menyimpan checkpoint sesi ke komentar issue gmedia/erp sebelum pause, pindah server, atau selesai kerja"
 ---
 
-# Workflow: Checkpoint Progress
+# Workflow: Checkpoint Progress (Issues)
 
-Gunakan prompt ini untuk menutup sesi lintas laptop atau shift sebelum pause, pindah perangkat, atau selesai kerja.
+Pakai prompt ini untuk menutup sesi sebelum pause / pindah server. **Checkpoint ditulis sebagai komentar issue**, bukan ke `task.md` (deprecated).
 
-## 1. Mulai dari Sumber Kebenaran Aktif
+## 1. Tentukan issue aktif
 
-1. Baca `task.md` terlebih dahulu sebagai source of truth untuk objective aktif, state terakhir, dan next action.
-2. Gunakan pembagian dokumen berikut secara konsisten:
-	- `task.md` = status handoff aktif
-	- `task.changelog.md` = changelog produk/fitur
-	- `task.handoff-archive.md` = arsip checkpoint E2E lama
-3. Jangan pindahkan checkpoint teknis E2E ke `task.changelog.md`.
-4. Jika sesi aktif memakai MCP penting seperti `laravel-boost`, `context7`, atau `depwire`, catat penggunaannya secara ringkas di checkpoint.
+```bash
+gh issue list --repo gmedia/erp --assignee @me --state open
+# Pilih yang berlabel status:claimed (fallback: gh search issues --repo gmedia/erp --assignee @me --label 'status:claimed' --state open)
+```
+
+Catat nomor issue `N`. Kalau lebih dari satu, checkpoint masing-masing secara terpisah. Jangan tulis ke `task.md`.
 
 ## 2. Verifikasi Baseline Sesi
 
-Catatan: command git pada tahap ini dijalankan langsung di host.
+Command git dijalankan langsung di host; command runtime tetap via Sail.
 
 ```bash
 git rev-parse HEAD
@@ -26,41 +25,55 @@ git status --short
 ./vendor/bin/sail php -v
 ```
 
-## 3. Perbarui Handoff Aktif
+## 3. Susun Checkpoint
 
-Ringkas checkpoint aktif di `task.md` dengan item berikut:
+Ringkas poin berikut:
 
 1. Perubahan utama yang sudah selesai
 2. File yang terdampak
 3. Commit hash (jika ada)
-4. Hal yang belum selesai
-5. MCP atau workflow agent penting yang dipakai pada sesi ini
+4. Hal yang belum selesai / blocker
+5. MCP atau workflow agent penting yang dipakai sesi ini
+6. Validasi: command yang benar-benar dijalankan + hasil (passed/failed, durasi singkat)
+7. Next action tunggal paling prioritas
 
-Jika ringkasan historis lama masih penting tetapi tidak lagi aktif, ringkas dan pindahkan ke `task.handoff-archive.md`.
+## 4. Tulis ke Issue sebagai komentar
 
-## 4. Simpan Bukti Validasi
+```bash
+gh issue comment N --repo gmedia/erp --body "$(cat <<'EOF'
+<!-- checkpoint -->
+**Last updated:** <YYYY-MM-DD HH:MM UTC>
+**Server:** <hostname> (tmux: <session>)
 
-- Catat command validasi yang benar-benar dijalankan
-- Catat hasilnya: passed/failed + angka durasi singkat
-- Bedakan jelas antara hasil chat-run vs user-run
+### What changed
+- ...
 
-## 5. Tetapkan Next Action Tunggal
+### Files changed
+- `path` — ...
 
-Tentukan 1 next action paling prioritas untuk sesi berikutnya.
+### Validated commands and outcomes
+- `sail test --group x` — passed (12s)
+- `npm run types` — passed
 
-## 6. Perbarui Continuation Prompt
+### Open risks / blockers
+- ...
 
-Perbarui prompt siap pakai di bagian akhir `task.md` agar berisi:
+### Recommended next step
+1. ...
+EOF
+)"
+```
 
-- objective aktif
-- constraint user
-- baseline command
-- command validasi berikutnya
-- MCP utama yang kemungkinan dipakai berikutnya bila sudah jelas
+Marker `<!-- checkpoint -->` wajib — dipakai `/continue-progress` untuk mencari handoff terakhir. Komentar terakhir menang; tidak perlu menghapus yang lama (riwayat terjaga).
 
-## 7. Output Final ke User
+## 5. Tutup sesi
 
-- Sebutkan bahwa checkpoint aktif sudah diperbarui.
+- Kalau PR sudah dibuka: pastikan deskripsi PR memuat `Closes #N` (workflow `issue-lifecycle.yml` akan mengubah label ke `status:in-review`).
+- Kalau belum: biarkan label `status:claimed` tetap ada.
+
+## 6. Output Final ke User
+
+- Sebutkan issue `#N` tempat checkpoint disimpan.
 - Sebutkan file yang diubah.
-- Sebutkan command validasi yang benar-benar dijalankan + hasil ringkasnya.
-- Tutup dengan 1 next action paling prioritas untuk sesi berikutnya.
+- Sebutkan command validasi + hasil ringkas.
+- Tutup dengan 1 next action paling prioritas.
