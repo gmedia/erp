@@ -43,6 +43,11 @@ jobs:
                   owner: context.repo.owner, repo: context.repo.repo, issue_number,
                 });
                 const labels = current.data.map(l => l.name);
+                // Guard race: jika merge event sudah menandai done, jangan mundurkan ke in-review.
+                if (labels.includes('status:done')) {
+                  core.info(`Issue #${issue_number} already status:done — skip in-review.`);
+                  continue;
+                }
                 if (labels.includes('status:claimed') || labels.includes('status:available')) {
                   for (const name of ['status:claimed', 'status:available']) {
                     await github.rest.issues.removeLabel({
