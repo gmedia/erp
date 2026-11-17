@@ -10,11 +10,13 @@ use App\Models\PurchaseRequest;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Laravel\Sanctum\Sanctum;
 
 uses(RefreshDatabase::class)->group('approvals');
 
 beforeEach(function () {
+    Mail::fake();
     $this->action = app(TriggerApprovalAction::class);
     $this->actor = User::factory()->create();
     Sanctum::actingAs($this->actor, ['*']);
