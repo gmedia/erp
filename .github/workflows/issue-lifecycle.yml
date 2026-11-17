@@ -2,7 +2,7 @@ name: Issue lifecycle (multi-server claim board)
 
 on:
   pull_request:
-    types: [opened, reopened, closed]
+    types: [opened, reopened, synchronize, closed]
   schedule:
     # Hourly stale-claim check
     - cron: '17 * * * *'
