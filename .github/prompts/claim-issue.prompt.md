@@ -57,6 +57,16 @@ Kalau lebih dari satu opencode di host yang sama, pakai worktree agar tidak tabr
 git worktree add /home/tut/erp-wt-N -b feat/issue-N-slug main
 ```
 
+## 3b. Pasang pre-push guard (sekali per server)
+
+Repo menyediakan `.githooks/pre-push` yang menolak push dari branch tanpa pola `issue-N`, issue yang belum `status:claimed`, atau yang tidak di-assign ke akun `gh` Anda. Pasang sekali setelah clone:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+Guard **fail-open** saat `gh` tidak tersedia/offline, jadi pekerjaan tanpa jaringan tetap bisa dipush. Untuk verifikasi: push dari branch `main` selalu lolos; push dari branch `test-hook-bad-format` akan ditolak.
+
 ## 4. Kerjakan & buka PR
 
 - Ikuti konvensi `.github/copilot-instructions.md` dan `AGENTS.md` (≤3 tool/turn, serial, Sail, Sanctum, dll).

@@ -74,6 +74,7 @@ Host RAM/CPU is limited. Parallel `Read`/`Edit`/`task` batches have **killed Ope
 ```bash
 gh pr list --state open --assignee @me    # Find your pending MRs
 gh issue list --assignee @me --repo gmedia/erp  # Active claimed work (task.md deprecated); cari label status:claimed
+git config core.hooksPath .githooks             # Pasang pre-push guard (sekali per server/clone)
 gh pr checks <id>                          # Check CI status
 # CI green → squash merge → delete branch → pull main
 gh pr merge <id> --squash --delete-branch && rtk git pull --ff-only
