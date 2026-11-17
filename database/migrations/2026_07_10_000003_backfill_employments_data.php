@@ -1,9 +1,9 @@
 <?php
 
-use App\Models\Company;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use RuntimeException;
 
 return new class extends Migration
 {
@@ -17,7 +17,7 @@ return new class extends Migration
         }
 
         if ($employmentCount > 0) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 'employments is partially populated — refusing to backfill again, manual review required'
             );
         }
