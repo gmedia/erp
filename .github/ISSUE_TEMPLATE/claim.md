@@ -17,7 +17,7 @@ assignees: ''
 
 ## Definition of Done
 - [ ] Branch `feat/issue-N-slug` atau `fix/issue-N-slug` dari `main`
-- [ ] `Closes #N` di deskripsi PR
+- [ ] `Refs #N` di deskripsi PR (bukan `Closes #N` — issue sengaja tetap OPEN dengan label `status:done`)
 - [ ] Verifikasi sesuai modul: `sail test --group {slug}`, `npm run types`, `sail bin duster fix`
 - [ ] PR punya handoff (What was done / Files changed / Verification / Next steps)
 - [ ] Label di-update ke `status:in-review`
