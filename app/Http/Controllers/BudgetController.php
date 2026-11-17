@@ -99,8 +99,8 @@ class BudgetController extends Controller
     public function export(Request $request): JsonResponse
     {
         $filters = $request->only(['search', 'fiscal_year_id', 'budget_type', 'status']);
-        $filename = 'budgets_export_'.now()->format('Y-m-d_H-i-s').'_'.Str::ulid().'.xlsx';
-        $filePath = 'exports/'.$filename;
+        $filename = 'budgets_export_' . now()->format('Y-m-d_H-i-s') . '_' . Str::ulid() . '.xlsx';
+        $filePath = 'exports/' . $filename;
 
         Excel::store(new BudgetExport($filters), $filePath, 'public');
 
