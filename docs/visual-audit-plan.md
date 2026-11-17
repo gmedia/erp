@@ -5,7 +5,7 @@
 **Owner handoff:** See https://github.com/gmedia/erp/issues (active claim/checkpoint) + this doc (full plan); root `task.md` is deprecated  
 **Related:** `docs/module-registry.md`, `database/seeders/MenuSeeder.php`, `resources/js/app-routes.tsx`
 
-> **Agent rule:** On session start / handoff, read your claimed issue's `<!-- checkpoint -->` comments first (`gh issue view N --comments`), then this plan if milestone is visual audit. Do **not** start 85-page capture or parallel visual agents without Wave 0 setup and host memory check.
+> **Agent rule:** On session start / handoff, read your claimed issue's `<!-- checkpoint -->` comments first (`gh issue view N --comments`; fallback: `gh api repos/gmedia/erp/issues/N/comments --jq '.[] | .body'`), then this plan if milestone is visual audit. Do **not** start 85-page capture or parallel visual agents without Wave 0 setup and host memory check.
 
 ---
 
@@ -280,7 +280,7 @@ Aggregate **top shared** vs **page-specific**. Prefer one epic doc over 85 GitHu
 ## 12. Continuation (for agents)
 
 ```
-Read your claimed issue at gmedia/erp/issues (gh issue view N --comments, marker <!-- checkpoint -->), then docs/visual-audit-plan.md (this file). task.md is deprecated.
+Read your claimed issue at gmedia/erp/issues (gh issue view N --comments; fallback: gh api repos/gmedia/erp/issues/N/comments --jq '.[] | .body', marker <!-- checkpoint -->), then docs/visual-audit-plan.md (this file). task.md is deprecated.
 Do NOT capture all 85 pages in one session.
 Respect AGENTS.md process budget (≤3 tools/turn, serial).
 Host RAM limited: 1 browser worker, batch 3–5 screenshots per review agent.

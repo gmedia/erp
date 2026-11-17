@@ -30,6 +30,8 @@ gh issue list --repo gmedia/erp --assignee @me --state open --limit 20
 
 ```bash
 gh issue view N --repo gmedia/erp --comments
+# Fallback bila gh issue view gagal (deprecation GraphQL Projects classic):
+gh api repos/gmedia/erp/issues/N/comments --jq '.[] | .body'
 ```
 
 Cari komentar terakhir berisi `<!-- checkpoint -->` atau `<!-- claim -->`. Itu pengganti "Continuation Prompt" dari `task.md` lama.

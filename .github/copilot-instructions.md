@@ -136,7 +136,7 @@ Untuk task refactor berbasis SonarQube dengan target menurunkan duplikasi dan me
 	- `gh pr list --state open --assignee @me --repo gmedia/erp` — selesaikan PR merah lebih dulu.
 	- `gh issue list --assignee @me --repo gmedia/erp` — pilih yang berlabel `status:claimed`.
 	- Jika belum ada klaim, jalankan `/claim-issue` sebelum mengerjakan apa pun.
-	- Baca `gh issue view N --comments` → cari komentar `<!-- checkpoint -->` terakhir sebagai pengganti "Continuation Prompt".
+	- Baca `gh issue view N --comments` → cari komentar `<!-- checkpoint -->` terakhir sebagai pengganti "Continuation Prompt". Fallback bila gagal (deprecation GraphQL Projects classic): `gh api repos/gmedia/erp/issues/N/comments --jq '.[] | .body'`.
 	- Verifikasi baseline cepat: `git rev-parse HEAD`, `git status --short`.
 
 1b. Saat diminta "setup local development", sebelum `bash project_setup.sh`:

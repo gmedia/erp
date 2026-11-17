@@ -38,7 +38,7 @@ Gunakan skill ini saat beberapa server menjalankan opencode pada workspace yang 
 1. `gh pr list --state open --assignee @me --repo gmedia/erp` — selesaikan PR merah dulu.
 2. `gh issue list --repo gmedia/erp --assignee @me --state open` — pilih yang berlabel `status:claimed`. Fallback bila kombinasi filter kosong: `gh search issues --repo gmedia/erp --assignee @me --label 'status:claimed' --state open`.
 3. Kalau kosong → jalankan `/claim-issue` sebelum mengerjakan apa pun.
-4. Baca `gh issue view N --repo gmedia/erp --comments` → cari `<!-- checkpoint -->` terakhir.
+4. Baca `gh issue view N --repo gmedia/erp --comments` → cari `<!-- checkpoint -->` terakhir. Fallback: `gh api repos/gmedia/erp/issues/N/comments --jq '.[] | .body'`.
 5. Baseline cepat:
 
 ```bash
@@ -74,6 +74,6 @@ Jalankan `/checkpoint-progress`. Tulis komentar issue berisi:
 
 ## Definition of Done
 
-- Sesi berikutnya dapat dimulai dengan: `/continue-progress` + `gh issue view N --comments`.
+- Sesi berikutnya dapat dimulai dengan: `/continue-progress` + `gh issue view N --comments` (fallback: `gh api repos/gmedia/erp/issues/N/comments --jq '.[] | .body'`).
 - Tidak ada ambiguity tentang issue aktif, objective, hasil validasi terakhir, dan next action.
 - Tidak ada server yang menimpa handoff server lain.
