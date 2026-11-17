@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Pasang pre-push guard untuk koordinasi multi-server (non-fatal:
+# jangan gagalkan setup bila dijalankan di luar clone git).
+git config core.hooksPath .githooks 2>/dev/null || true
+
 # Installing composer packages
 composer install
 

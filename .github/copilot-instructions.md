@@ -137,6 +137,11 @@ Untuk task refactor berbasis SonarQube dengan target menurunkan duplikasi dan me
 	- Baca `gh issue view N --comments` → cari komentar `<!-- checkpoint -->` terakhir sebagai pengganti "Continuation Prompt".
 	- Verifikasi baseline cepat: `git rev-parse HEAD`, `git status --short`.
 
+1b. Saat diminta "setup local development", sebelum `bash project_setup.sh`:
+	- `git config core.hooksPath .githooks` lalu verifikasi `git config --get core.hooksPath` = `.githooks`.
+	- `gh auth status` harus akun tim (`oppytut`); `git config user.name` / `user.email` harus terisi.
+	- Jangan bind aplikasi ke `0.0.0.0` di host ber-IP-publik; akses via SSH tunnel (`localhost:82`).
+
 2. Sebelum menutup sesi (atau setelah wave perubahan signifikan), jalankan `/checkpoint-progress` dan tulis komentar issue berisi:
 	- `Last updated`
 	- `Current milestone`
