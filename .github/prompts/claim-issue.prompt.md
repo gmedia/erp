@@ -22,7 +22,7 @@ gh issue list --repo gmedia/erp --label 'status:available' --limit 20
 
 Sebelum klaim, pastikan:
 - label masih `status:available`
-- tidak ada komentar `<!-- claim -->` aktif (baca: `gh issue view N --repo gmedia/erp --comments`)
+- tidak ada komentar `<!-- claim -->` aktif (baca: `gh issue view N --repo gmedia/erp --comments`; fallback: `gh api repos/gmedia/erp/issues/N/comments --jq '.[] | .body'`)
 
 Lalu klaim (atomic-ish: label dulu, komentar setelahnya):
 

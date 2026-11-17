@@ -398,7 +398,7 @@ Task-task ini bisa dikerjakan kapan saja, tidak harus menunggu Fase 1-3.
 
 ### Cara Melanjutkan
 
-1. Baca issue yang diklaim di https://github.com/gmedia/erp/issues (`gh issue view N --comments`, marker `<!-- checkpoint -->`) untuk status handoff aktif. `task.md` deprecated.
+1. Baca issue yang diklaim di https://github.com/gmedia/erp/issues (`gh issue view N --comments`, marker `<!-- checkpoint -->`; fallback: `gh api repos/gmedia/erp/issues/N/comments --jq '.[] | .body'`) untuk status handoff aktif. `task.md` deprecated.
 2. Baca `.github/prompts/continue-progress.prompt.md` untuk workflow standar.
 3. Pilih task dari Roadmap di atas berdasarkan prioritas bisnis.
 4. Gunakan skill yang sesuai dari `.github/skills/` (lihat kolom Skill di roadmap).

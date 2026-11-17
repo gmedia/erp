@@ -51,7 +51,7 @@
 
 1. After OpenCode kill / interrupt: **strict serial** — **1 tool call per assistant turn** until the interrupted task is finished or stable.
 2. Do **not** re-fire explore/librarian/oracle swarms to “catch up”.
-3. Resume from claimed GitHub Issue (`gh issue view N --comments`, marker `<!-- checkpoint -->`) + `git status` only; re-apply unfinished edits **one file at a time**. `task.md` is deprecated.
+3. Resume from claimed GitHub Issue (`gh issue view N --comments`, marker `<!-- checkpoint -->`; fallback bila gagal: `gh api repos/gmedia/erp/issues/N/comments --jq '.[] | .body'`) + `git status` only; re-apply unfinished edits **one file at a time**. `task.md` is deprecated.
 4. Prefer completing a small shippable slice (commit/PR) over re-planning the whole theme.
 
 ### Why this exists
