@@ -12,7 +12,11 @@ describe('vehicle loan foundation', function () {
     });
 
     it('resolves the branch directly from the vehicle loan', function () {
-        $loan = VehicleLoan::factory()->make(['branch_id' => 42]);
+        $loan = VehicleLoan::factory()->make([
+            'branch_id' => 42,
+            'driver_id' => null,
+            'vehicle_unit_id' => null,
+        ]);
 
         expect(app(BranchResolverRegistry::class)->resolve($loan))->toBe(42);
     });
