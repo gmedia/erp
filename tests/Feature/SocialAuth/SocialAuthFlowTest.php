@@ -10,7 +10,7 @@ use App\Services\SocialAuth\StatelessSocialiteFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Laravel\Socialite\Two\User as SocialiteUser;
-use Mockery;
+use Mockery as M;
 
 uses(RefreshDatabase::class)->group('social-auth');
 
@@ -35,7 +35,7 @@ beforeEach(function () {
 });
 
 afterEach(function () {
-    Mockery::close();
+    M::close();
 });
 
 function fakeDriver(string $email, array $raw, string $id = 'ext-1'): StatelessSocialiteDriver
@@ -48,7 +48,7 @@ function fakeDriver(string $email, array $raw, string $id = 'ext-1'): StatelessS
         'avatar' => null,
     ])->setRaw($raw);
 
-    $provider = Mockery::mock(StatelessSocialiteDriver::class);
+    $provider = M::mock(StatelessSocialiteDriver::class);
     $provider->shouldReceive('user')->andReturn($socialUser);
 
     return $provider;
@@ -60,7 +60,7 @@ test('callback redirects to spa with ticket on successful login', function () {
     $state = $manager->create('google', 'login');
     $manager->rememberVerifierForExchange($state['state'], (string) $manager->verifierForNonce($state['nonce']));
 
-    app()->instance(StatelessSocialiteFactory::class, Mockery::mock(StatelessSocialiteFactory::class)
+    app()->instance(StatelessSocialiteFactory::class, M::mock(StatelessSocialiteFactory::class)
         ->shouldReceive('make')->andReturn(fakeDriver('existing@example.com', [
             'hd' => 'example.com', 'email_verified' => true,
         ]))->getMock());

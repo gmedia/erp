@@ -79,6 +79,10 @@ class SocialAuthController extends Controller
         $this->assertProvider($provider);
         $state = (string) $request->input('state');
 
+        if (! SocialLoginPolicy::enabled()) {
+            return redirect()->away($this->spaUrl('/auth/social/callback#error=social_login_disabled'));
+        }
+
         try {
             $data = $this->stateManager->verify($state, $provider);
 
