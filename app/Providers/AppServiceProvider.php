@@ -95,7 +95,7 @@ class AppServiceProvider extends ServiceProvider
                 return array_filter($settings, fn ($value) => ! is_null($value) && $value !== '');
             });
 
-            if (! empty($mailSettings)) {
+            if (! empty($mailSettings) && ! $this->usesLoopbackMailHost($mailSettings)) {
                 // Force default mailer to smtp to ensure database settings are used
                 config(['mail.default' => 'smtp']);
 
@@ -104,6 +104,22 @@ class AppServiceProvider extends ServiceProvider
         } catch (Throwable $e) {
             report($e);
         }
+    }
+
+    /**
+     * A loopback mail host is the seed placeholder, never a real mail server.
+     *
+     * The smtp settings row is created by migration with 127.0.0.1:2525 defaults and
+     * is meant to be replaced by an admin. Until then, forcing the smtp mailer makes
+     * every outgoing mail fail with a transport error, so the env mailer is kept.
+     *
+     * @param  array<string, mixed>  $mailSettings
+     */
+    protected function usesLoopbackMailHost(array $mailSettings): bool
+    {
+        $host = strtolower(trim((string) ($mailSettings['mail_host'] ?? '')));
+
+        return in_array($host, ['127.0.0.1', 'localhost', '::1'], true);
     }
 
     /**
