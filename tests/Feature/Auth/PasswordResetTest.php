@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -22,6 +23,21 @@ test('reset password link can be requested via api', function () {
     $response->assertStatus(200);
 
     Notification::assertSentTo($user, ResetPassword::class);
+});
+
+test('reset password does not fail when smtp settings are still placeholders', function () {
+    Notification::fake();
+
+    Setting::set('mail_host', '127.0.0.1');
+    Setting::set('mail_port', '2525');
+    cache()->forget('app.mail_settings');
+
+    $user = User::factory()->create();
+
+    $response = $this->postJson('/api/forgot-password', ['email' => $user->email]);
+
+    $response->assertStatus(200);
+    expect(config('mail.default'))->not->toBe('smtp');
 });
 
 test('reset password notification links to the spa reset page', function () {
