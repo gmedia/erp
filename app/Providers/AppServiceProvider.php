@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Models\Setting;
+use App\Models\User;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -42,6 +44,26 @@ class AppServiceProvider extends ServiceProvider
 
         $this->bootMailSettings();
         $this->enforceProductionDebugMode();
+        $this->bootPasswordResetUrl();
+    }
+
+    /**
+     * Point password reset emails at the SPA reset page.
+     *
+     * The framework default builds the link with route('password.reset'), which
+     * no longer exists now that the frontend is a React SPA. Leaving it unset
+     * makes /api/forgot-password fail with RouteNotFoundException.
+     */
+    protected function bootPasswordResetUrl(): void
+    {
+        ResetPassword::createUrlUsing(function (User $notifiable, string $token): string {
+            $base = rtrim((string) config('app.frontend_url', config('app.url')), '/');
+
+            return $base . '/reset-password?' . http_build_query([
+                'token' => $token,
+                'email' => $notifiable->getEmailForPasswordReset(),
+            ]);
+        });
     }
 
     /**
