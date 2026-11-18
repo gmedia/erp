@@ -1,8 +1,11 @@
 <?php
 
+use App\Events\ApprovalRequestApproved;
+use App\Events\ApprovalRequestRejected;
 use App\Models\ApprovalFlow;
 use App\Models\ApprovalFlowStep;
 use App\Models\ApprovalRequest;
+use App\Models\ApprovalRequestStep;
 use App\Models\Permission;
 use App\Models\VehicleLoan;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -98,4 +101,95 @@ it('dispatches approval notifications and deduplicates them', function () {
     $approval = ApprovalRequest::firstOrFail();
 
     expect($approval->status)->toBe('pending');
+});
+
+it('mirrors final approval status back to the vehicle loan', function () {
+    $approver = $this->createTestUserWithPermissions(['my_approvals']);
+
+    $flow = ApprovalFlow::create([
+        'code' => 'vehicle-loan.mirror-test',
+        'name' => 'Vehicle Loan Mirror Test',
+        'approvable_type' => VehicleLoan::class,
+        'is_active' => true,
+        'created_by' => $this->user->id,
+    ]);
+
+    $flowStep = ApprovalFlowStep::create([
+        'approval_flow_id' => $flow->id,
+        'step_order' => 1,
+        'name' => 'Approve',
+        'approver_type' => 'user',
+        'approver_user_id' => $approver->id,
+        'required_action' => 'approve',
+        'can_reject' => true,
+    ]);
+
+    $loan = VehicleLoan::factory()->create([
+        'requester_id' => $this->user->id,
+        'status' => 'pending',
+    ]);
+
+    $approval = ApprovalRequest::create([
+        'approval_flow_id' => $flow->id,
+        'approvable_type' => VehicleLoan::class,
+        'approvable_id' => $loan->id,
+        'current_step_order' => 1,
+        'status' => 'approved',
+        'submitted_by' => $this->user->id,
+        'submitted_at' => now()->subHour(),
+        'completed_at' => now(),
+    ]);
+
+    ApprovalRequestStep::create([
+        'approval_request_id' => $approval->id,
+        'approval_flow_step_id' => $flowStep->id,
+        'step_order' => 1,
+        'status' => 'approved',
+        'acted_by' => $approver->id,
+        'action' => 'approve',
+        'acted_at' => now(),
+    ]);
+
+    ApprovalRequestApproved::dispatch($approval, $approver->id, true);
+
+    $loan->refresh();
+
+    expect($loan->status)->toBe('approved')
+        ->and($loan->approved_at)->not->toBeNull()
+        ->and($loan->approved_by)->toBe($approver->id);
+});
+
+it('mirrors rejection reason back to the vehicle loan', function () {
+    $approver = $this->createTestUserWithPermissions(['my_approvals']);
+
+    $flow = ApprovalFlow::create([
+        'code' => 'vehicle-loan.reject-mirror-test',
+        'name' => 'Vehicle Loan Reject Mirror Test',
+        'approvable_type' => VehicleLoan::class,
+        'is_active' => true,
+        'created_by' => $this->user->id,
+    ]);
+
+    $loan = VehicleLoan::factory()->create([
+        'requester_id' => $this->user->id,
+        'status' => 'in_progress',
+    ]);
+
+    $approval = ApprovalRequest::create([
+        'approval_flow_id' => $flow->id,
+        'approvable_type' => VehicleLoan::class,
+        'approvable_id' => $loan->id,
+        'current_step_order' => 1,
+        'status' => 'rejected',
+        'submitted_by' => $this->user->id,
+        'submitted_at' => now()->subHour(),
+        'completed_at' => now(),
+    ]);
+
+    ApprovalRequestRejected::dispatch($approval, $approver->id, 'Unit tidak tersedia');
+
+    $loan->refresh();
+
+    expect($loan->status)->toBe('rejected')
+        ->and($loan->rejection_reason)->toBe('Unit tidak tersedia');
 });

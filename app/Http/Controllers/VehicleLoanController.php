@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\VehicleLoans\ExportVehicleLoansAction;
 use App\Actions\VehicleLoans\GenerateVehicleLoanCodeAction;
 use App\Actions\VehicleLoans\HandoverVehicleLoanKeyAction;
 use App\Actions\VehicleLoans\ReviewVehicleLoanAssignmentAction;
@@ -9,6 +10,7 @@ use App\Actions\VehicleLoans\StoreVehicleLoanPhotoAction;
 use App\Actions\VehicleLoans\StoreVehicleLoanPickupAction;
 use App\Actions\VehicleLoans\StoreVehicleLoanReturnAction;
 use App\Actions\VehicleLoans\SubmitVehicleLoanAction;
+use App\Http\Requests\VehicleLoans\ExportVehicleLoansRequest;
 use App\Http\Requests\VehicleLoans\HandoverVehicleLoanKeyRequest;
 use App\Http\Requests\VehicleLoans\IndexVehicleLoanRequest;
 use App\Http\Requests\VehicleLoans\ReviewVehicleLoanAssignmentRequest;
@@ -84,6 +86,13 @@ class VehicleLoanController extends Controller
         $vehicleLoan->update(['status' => 'cancelled']);
 
         return response()->json(['message' => 'Loan request cancelled.']);
+    }
+
+    public function export(
+        ExportVehicleLoansRequest $request,
+        ExportVehicleLoansAction $action,
+    ): JsonResponse {
+        return $action->execute($request);
     }
 
     public function submit(

@@ -399,5 +399,7 @@ Audit: `ApprovalAuditLog` (event enum — tambah migrasi bila perlu `assignment_
 
 - [x] Rancangan awal dibuat
 - [x] Review agent deep selesai → temuan diintegrasikan
-- [x] Implementasi slice 1–8 (fondasi, notifikasi, master, alur penuh, FE, report, guide)
+- [x] Implementasi slice 1–8 (fondasi, notifikasi, master, alur penuh, FE, report/export, guide)
+- [x] Mirror status approval → `vehicle_loans` (`MirrorVehicleLoanApprovalStatus`) + test
+- [x] Export report XLSX/CSV (`ExportVehicleLoansAction`, `VehicleLoanExport`)
 - [ ] Final disetujui untuk implementasi / merge MR

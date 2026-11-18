@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $license_type
  * @property Carbon|null $license_expiry
  * @property bool $is_active
+ * @property-read Employee $employee
  *
  * @method static \Database\Factories\VehicleDriverFactory factory($count = null, $state = [])
  *

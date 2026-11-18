@@ -34,7 +34,17 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
+ * @property-read User $requester
+ * @property-read Department|null $department
+ * @property-read Branch|null $branch
+ * @property-read Company|null $company
+ * @property-read VehicleDriver|null $driver
+ * @property-read VehicleUnit|null $vehicleUnit
+ * @property-read User|null $approver
+ * @property-read VehicleLoanPickup|null $pickup
+ * @property-read VehicleLoanReturn|null $returns
  * @property-read Collection<int, ApprovalRequest> $approvalRequests
+ * @property-read Collection<int, VehicleLoanActivityLog> $activityLogs
  *
  * @method static \Database\Factories\VehicleLoanFactory factory($count = null, $state = [])
  *
