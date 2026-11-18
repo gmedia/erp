@@ -11,9 +11,12 @@ use Laravel\Socialite\Contracts\User;
  * Runtime wrapper that narrows Socialite's provider contract to the
  * stateless API provider we register in AppServiceProvider.
  */
-final class StatelessSocialiteDriver
+class StatelessSocialiteDriver
 {
-    public function __construct(public readonly GoogleProvider|MicrosoftProvider $provider) {}
+    public function __construct(public readonly GoogleProvider|MicrosoftProvider $provider)
+    {
+        //
+    }
 
     public function setStateForRedirect(string $state): self
     {

@@ -24,12 +24,18 @@ class SocialLoginPolicy
         return Cache::remember(self::CACHE_KEY, now()->addMinutes(10), function (): array {
             $defaults = config('social_login.defaults', []);
 
+            $defaults = config('social_login.defaults', []);
+            $flag = fn (string $key, bool $fallback): bool => $defaults[$key] ?? $fallback;
+
             return [
-                'enabled' => self::bool('social_login_enabled', $defaults['enabled'] ?? true),
-                'jit_provisioning' => self::bool('social_login_jit_provisioning', $defaults['jit_provisioning'] ?? false),
-                'auto_link_by_email' => self::bool('social_login_auto_link_by_email', $defaults['auto_link_by_email'] ?? false),
-                'allow_personal' => self::bool('social_login_allow_personal', $defaults['allow_personal'] ?? false),
-                'password_login_enabled' => self::bool('password_login_enabled', $defaults['password_login_enabled'] ?? true),
+                'enabled' => self::bool('social_login_enabled', $flag('enabled', true)),
+                'jit_provisioning' => self::bool('social_login_jit_provisioning', $flag('jit_provisioning', false)),
+                'auto_link_by_email' => self::bool(
+                    'social_login_auto_link_by_email',
+                    $flag('auto_link_by_email', false)
+                ),
+                'allow_personal' => self::bool('social_login_allow_personal', $flag('allow_personal', false)),
+                'password_login_enabled' => self::bool('password_login_enabled', $flag('password_login_enabled', true)),
                 'allowed_domains' => self::list('social_login_allowed_domains', $defaults['allowed_domains'] ?? []),
                 'allowed_tenants' => self::list('social_login_allowed_tenants', $defaults['allowed_tenants'] ?? []),
             ];

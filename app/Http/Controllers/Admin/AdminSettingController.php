@@ -51,7 +51,10 @@ class AdminSettingController extends Controller
             }
 
             $raw = is_string($validated[$listKey]) ? $validated[$listKey] : '';
-            $items = array_values(array_filter(array_map('trim', explode(',', $raw)), fn (string $v): bool => $v !== ''));
+            $items = array_values(array_filter(
+                array_map('trim', explode(',', $raw)),
+                fn (string $v): bool => $v !== '',
+            ));
             $validated[$listKey] = json_encode($items) ?: '[]';
         }
 

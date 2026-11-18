@@ -60,7 +60,11 @@ class OAuthStateManager
         }
 
         [$provider, $intent, $nonce, $signature] = $parts;
-        $expectedSignature = hash_hmac('sha256', implode('|', [$provider, $intent, $nonce]), (string) config('app.key'));
+        $expectedSignature = hash_hmac(
+            'sha256',
+            implode('|', [$provider, $intent, $nonce]),
+            (string) config('app.key')
+        );
 
         if (! hash_equals($expectedSignature, $signature) || $provider !== $expectedProvider) {
             throw SocialAuthException::invalidState();

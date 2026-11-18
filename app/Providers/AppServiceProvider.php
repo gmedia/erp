@@ -76,12 +76,14 @@ class AppServiceProvider extends ServiceProvider
      */
     protected function bootSocialite(): void
     {
-        Socialite::extend('google', fn () => new GoogleProvider(
-            request(),
-            (string) config('services.google.client_id'),
-            (string) config('services.google.client_secret'),
-            (string) config('services.google.redirect')
-        ));
+        Socialite::extend('google', function () {
+            return new GoogleProvider(
+                request(),
+                (string) config('services.google.client_id'),
+                (string) config('services.google.client_secret'),
+                (string) config('services.google.redirect')
+            );
+        });
 
         Socialite::extend('microsoft', function () {
             $provider = new MicrosoftProvider(
