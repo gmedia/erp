@@ -399,4 +399,5 @@ Audit: `ApprovalAuditLog` (event enum — tambah migrasi bila perlu `assignment_
 
 - [x] Rancangan awal dibuat
 - [x] Review agent deep selesai → temuan diintegrasikan
-- [ ] Final disetujui untuk implementasi
+- [x] Implementasi slice 1–8 (fondasi, notifikasi, master, alur penuh, FE, report, guide)
+- [ ] Final disetujui untuk implementasi / merge MR
