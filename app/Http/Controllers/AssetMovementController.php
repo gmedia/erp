@@ -108,7 +108,7 @@ class AssetMovementController extends Controller
 
         if ($request->hasFile('document')) {
             if ($asset_movement->document_path) {
-                Storage::disk(config('filesystems.default'))->delete($asset_movement->document_path);
+                Storage::disk('public')->delete($asset_movement->document_path);
             }
 
             $document = $this->storeDocument($request->file('document'));
@@ -190,7 +190,7 @@ class AssetMovementController extends Controller
         }
 
         return [
-            'path' => $file->store('asset-movements/documents', config('filesystems.default')),
+            'path' => $file->store('asset-movements/documents', 'public'),
             'name' => $file->getClientOriginalName(),
         ];
     }

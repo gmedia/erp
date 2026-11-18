@@ -53,7 +53,7 @@ class AssetMovementResource extends JsonResource
             'document_path' => $this->document_path,
             'document_name' => $this->document_name,
             'document_url' => $this->document_path
-                ? Storage::disk(config('filesystems.default'))->url($this->document_path)
+                ? Storage::disk('public')->url($this->document_path)
                 : null,
             'created_by' => $this->createdBy?->name,
             'created_at' => $this->created_at?->toIso8601String(),

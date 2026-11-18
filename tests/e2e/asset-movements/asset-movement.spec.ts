@@ -83,5 +83,5 @@ test('uploads a supporting document with an asset movement', async ({ page }) =>
   const response = await responsePromise;
   const payload = await response.json();
   expect(payload.data.document_name).toBe('movement-proof.pdf');
-  expect(payload.data.document_url).toContain('/asset-movements/documents/');
+  expect(payload.data.document_url).toContain('/storage/asset-movements/documents/');
 });
