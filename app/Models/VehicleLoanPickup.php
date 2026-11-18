@@ -21,6 +21,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property Carbon $picked_at
  * @property Carbon|null $key_handover_at
  * @property int|null $security_user_id
+ * @property-read VehicleLoan $loan
+ * @property-read VehicleLoanReturn|null $returnRecord
  *
  * @method static \Database\Factories\VehicleLoanPickupFactory factory($count = null, $state = [])
  *

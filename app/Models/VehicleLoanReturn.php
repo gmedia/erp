@@ -21,6 +21,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int|null $odometer_end
  * @property Carbon $returned_at
  * @property int|null $received_by_security_id
+ * @property-read VehicleLoanPickup $pickup
+ * @property-read VehicleLoan $loan
  *
  * @method static \Database\Factories\VehicleLoanReturnFactory factory($count = null, $state = [])
  *

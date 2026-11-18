@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Database\Factories\VehicleDriverFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $employee_id
  * @property string|null $license_number
  * @property string|null $license_type
- * @property string|null $license_expiry
+ * @property Carbon|null $license_expiry
  * @property bool $is_active
  *
  * @method static \Database\Factories\VehicleDriverFactory factory($count = null, $state = [])
