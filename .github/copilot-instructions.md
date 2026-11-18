@@ -125,6 +125,25 @@ Untuk task refactor berbasis SonarQube dengan target menurunkan duplikasi dan me
 5. **Penanganan Anomali Metrik**
 	- Jika `coverage`/metrik lain anomali (mis. `0.0`) namun test lokal lulus, catat sebagai anomali pipeline di progress doc dan lanjutkan verifikasi pada snapshot berikutnya.
 
+## 10. Produk On-Premise / Multi-Perusahaan — DILARANG hardcode brand
+
+> ERP ini dipasang di banyak perusahaan berbeda (on premise). Kode, UI, dan dokumentasi produk harus netral terhadap organisasi mana pun.
+
+**WAJIB:**
+
+1. **Jangan pernah hardcode nama brand, nama perusahaan, domain, tenant, logo, atau warna korporat** di kode, view/UI, migrasi, seeder, factory, config, test, atau dokumen generik.
+   - ❌ `'gmedia'`, `'gmedia.co.id'`, `'Gmedia ERP'`, alamat email `@gmedia.*`, tenant ID tertentu, aset logo bermerek.
+   - ✅ Ambil dari data: `Setting::get('company_name')`, `Setting::get('company_logo_path')` (pola已有 di `AuthController::resolveSharedSettings()`), `config('app.name')`, atau `.env`.
+   - ✅ Contoh di dokumen/test pakai placeholder netral: `example.com`, `perusahaan.contoh`, `tenant-contoh`.
+2. **Nilai default di `.env.example`, seeder, dan config harus generik** (`APP_NAME=ERP`, placeholder domain), bukan nama perusahaan tertentu.
+3. **Sebelum commit**, periksa file yang diubah untuk string brand yang tidak disengaja. Jika ada, ganti dengan `Setting`/config/env.
+4. **Perilaku produk tidak boleh bergantung pada identitas organisasi tertentu.** Gunakan flag/konfigurasi (mis. allowlist domain dari `settings`) agar setiap instalasi menentukan sendiri aturannya.
+
+**Pengecualian (bukan branding produk — jangan diubah tanpa instruksi eksplisit):**
+
+- Identifier infrastruktur repositori: org GitHub `gmedia/erp`, project key SonarCloud `gmedia_erp`, remote git, URL issue tracker, nama CI image, dan path filesistem bersejarah.
+- Referensi ke file arsip/jurnal lama yang memang mencatat sejarah repositori.
+
 ## 9. Session Handoff & Continuity (Lintas Server)
 
 - Karena user menjalankan banyak server berisi tmux + opencode pada workspace yang sama, agent **WAJIB** menjaga continuity via **GitHub Issues** (`gmedia/erp`), bukan file `task.md` (deprecated sejak 2026-11-17).

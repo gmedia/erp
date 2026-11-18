@@ -4,6 +4,7 @@
 
 ## Core Rules
 
+0. **PRODUK ON-PREMISE / MULTI-PERUSAHAAN — JANGAN hardcode brand.** ERP ini dipasang di banyak perusahaan. Jangan menulis `'gmedia'`, domain, tenant, logo, atau nama korporat lain di kode/UI/migrasi/seeder/test/docs generik. Pakai `Setting::get('company_name')`, `Setting::get('company_logo_path')`, `config('app.name')`, atau `.env`. Contoh pakai placeholder netral (`example.com`, `perusahaan.contoh`). Detail lengkap: `.github/copilot-instructions.md` §10. Pengecualian: identifier infra repo (`gmedia/erp`, `gmedia_erp`, remote git, URL issue) — itu bukan branding produk.
 1. **NEVER wait for CI/CD.** Push and move on.
 2. **One task = one branch** (`feat/*` or `fix/*`) = **one MR/PR.**
 3. **Every MR must have a handoff** (what was done, files changed, next steps).
