@@ -5,6 +5,10 @@ LABEL maintainer="Taylor Otwell"
 ARG WWWGROUP=1000
 ARG WWWUSER=1337
 ARG NODE_VERSION=22
+# Pin to the version in package-lock.json: browsers are baked into the image,
+# while node_modules is mounted from the host at runtime. A mismatch makes
+# Playwright look for a different chromium revision and fail every E2E test.
+ARG PLAYWRIGHT_VERSION=1.61.1
 ARG MYSQL_CLIENT="mysql-client"
 ARG POSTGRES_VERSION=17
 
@@ -77,8 +81,8 @@ RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg -
 # Layer 6: Playwright browsers
 # ---------------------------------------------------------------------------
 RUN mkdir -p $PLAYWRIGHT_BROWSERS_PATH \
-    && npx playwright install-deps \
-    && npx playwright install chromium chromium-headless-shell \
+    && npx playwright@$PLAYWRIGHT_VERSION install-deps \
+    && npx playwright@$PLAYWRIGHT_VERSION install chromium chromium-headless-shell \
     && chmod -R u+rwX,g+rwX,o-rwx $PLAYWRIGHT_BROWSERS_PATH \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
