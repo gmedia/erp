@@ -13,6 +13,7 @@ class NotificationController extends Controller
     {
         $query = DatabaseNotification::where('notifiable_type', Auth::user()->getMorphClass())
             ->where('notifiable_id', Auth::id())
+            ->whereNull('data->channel')
             ->orderByDesc('created_at');
 
         if ($request->boolean('unread_only')) {
@@ -36,6 +37,7 @@ class NotificationController extends Controller
     {
         $count = DatabaseNotification::where('notifiable_type', Auth::user()->getMorphClass())
             ->where('notifiable_id', Auth::id())
+            ->whereNull('data->channel')
             ->whereNull('read_at')
             ->count();
 
@@ -59,6 +61,7 @@ class NotificationController extends Controller
     {
         DatabaseNotification::where('notifiable_type', Auth::user()->getMorphClass())
             ->where('notifiable_id', Auth::id())
+            ->whereNull('data->channel')
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
 

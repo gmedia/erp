@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { VehicleLoanQrPanel } from '@/components/vehicle-loans/VehicleLoanQrPanel';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
 import { useState } from 'react';
@@ -163,6 +164,12 @@ export default function VehicleLoanPickupPage() {
                         >
                             Kirim Form Pengambilan
                         </Button>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardContent className="pt-4">
+                        <VehicleLoanQrPanel form="pickup" />
                     </CardContent>
                 </Card>
             </div>

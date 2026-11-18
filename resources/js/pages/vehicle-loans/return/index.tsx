@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { VehicleLoanQrPanel } from '@/components/vehicle-loans/VehicleLoanQrPanel';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
 import { useState } from 'react';
@@ -188,6 +189,12 @@ export default function VehicleLoanReturnPage() {
                         >
                             Kirim Pengembalian
                         </Button>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardContent className="pt-4">
+                        <VehicleLoanQrPanel form="return" />
                     </CardContent>
                 </Card>
             </div>

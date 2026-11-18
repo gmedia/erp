@@ -20,9 +20,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int|null $department_id
  * @property int|null $branch_id
  * @property int|null $company_id
- * @property Carbon $start_at
- * @property Carbon $end_at
- * @property string $purpose
+ * @property Carbon|null $start_at
+ * @property Carbon|null $end_at
+ * @property string|null $purpose
  * @property int|null $driver_id
  * @property int|null $vehicle_unit_id
  * @property string $status

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\VehicleLoanActivityLog;
 use App\Models\VehicleLoanPickup;
 use App\Models\VehicleLoanReturn;
 use Illuminate\Http\Response;
@@ -18,6 +19,8 @@ class VehicleLoanPhotoController extends Controller
             abort(403);
         }
 
+        $this->logView($vehicleLoanPickup->vehicle_loan_id, 'pickup_photo_viewed');
+
         return $this->response($vehicleLoanPickup->selfie_photo_path, $vehicleLoanPickup->selfie_photo_name);
     }
 
@@ -29,6 +32,8 @@ class VehicleLoanPhotoController extends Controller
         if (! $this->canView($loan->requester_id, $loan->approved_by, $pickup->security_user_id)) {
             abort(403);
         }
+
+        $this->logView($vehicleLoanReturn->vehicle_loan_id, 'handover_photo_viewed');
 
         return $this->response($vehicleLoanReturn->handover_photo_path, $vehicleLoanReturn->handover_photo_name);
     }
@@ -42,7 +47,18 @@ class VehicleLoanPhotoController extends Controller
             abort(403);
         }
 
+        $this->logView($vehicleLoanReturn->vehicle_loan_id, 'condition_photo_viewed');
+
         return $this->response($vehicleLoanReturn->condition_photo_path, $vehicleLoanReturn->condition_photo_name);
+    }
+
+    private function logView(int $loanId, string $event): void
+    {
+        VehicleLoanActivityLog::create([
+            'vehicle_loan_id' => $loanId,
+            'event' => $event,
+            'actor_user_id' => Auth::id(),
+        ]);
     }
 
     private function canView(int $requesterId, ?int $approverId, ?int $securityId): bool

@@ -46,7 +46,8 @@ class ValidateVehicleLoanAction
         $query = VehicleLoan::query()
             ->whereIn('status', $activeStatuses)
             ->where('start_at', '<', $end)
-            ->where('end_at', '>', $start);
+            ->where('end_at', '>', $start)
+            ->lockForUpdate();
 
         if ($ignoreLoanId !== null) {
             $query->where('id', '!=', $ignoreLoanId);

@@ -12,6 +12,9 @@ class HandoverVehicleLoanKeyAction
 {
     public function execute(VehicleLoanPickup $pickup): void
     {
+        /** @var VehicleLoanPickup $pickup */
+        $pickup = VehicleLoanPickup::whereKey($pickup->id)->lockForUpdate()->firstOrFail();
+
         if ($pickup->key_handover_at !== null) {
             throw new InvalidArgumentException('Key has already been handed over.');
         }

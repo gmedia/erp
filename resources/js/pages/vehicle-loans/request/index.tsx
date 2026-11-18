@@ -3,10 +3,18 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { VehicleLoanQrPanel } from '@/components/vehicle-loans/VehicleLoanQrPanel';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
-import { QRCodeSVG } from 'qrcode.react';
+import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { toast } from 'sonner';
@@ -17,6 +25,11 @@ interface LoanForm {
     purpose: string;
     driver_id: string;
     vehicle_unit_id: string;
+}
+
+interface AssignmentOptions {
+    drivers: Array<{ id: number; name: string; license_expiry: string | null }>;
+    units: Array<{ id: number; plate_number: string; vehicle_type: string }>;
 }
 
 const emptyForm: LoanForm = {
@@ -31,36 +44,40 @@ export default function VehicleLoanRequestPage() {
     const [form, setForm] = useState<LoanForm>(emptyForm);
     const [draftId, setDraftId] = useState<number | null>(null);
     const [loading, setLoading] = useState(false);
-    const [qrUrl] = useState(
-        () => `${window.location.origin}/vehicle-loans/request`,
-    );
+
+    const { data: options } = useQuery({
+        queryKey: ['vehicle-loans', 'assignment-options'],
+        queryFn: async () => {
+            const response = await axios.get<AssignmentOptions>(
+                '/api/vehicle-loans/assignment-options',
+            );
+            return response.data;
+        },
+        staleTime: 5 * 60 * 1000,
+    });
 
     function update(key: keyof LoanForm, value: string) {
         setForm((current) => ({ ...current, [key]: value }));
     }
 
-    async function saveDraft() {
+    async function saveDraft(): Promise<number | null> {
         setLoading(true);
         try {
             const response = await axios.post('/api/vehicle-loans', form);
-            setDraftId(response.data.id);
+            const id = Number(response.data.id ?? response.data.data?.id);
+            setDraftId(id);
             toast.success('Draft disimpan.');
+            return id;
         } catch {
             toast.error('Gagal menyimpan draft.');
+            return null;
         } finally {
             setLoading(false);
         }
     }
 
     async function submit() {
-        if (!draftId) {
-            await saveDraft();
-        }
-
-        const id =
-            draftId ??
-            (await axios.get('/api/vehicle-loans/my?per_page=1')).data.data[0]
-                ?.id;
+        const id = draftId ?? (await saveDraft());
 
         if (!id) {
             toast.error('Draft tidak ditemukan. Simpan draft terlebih dahulu.');
@@ -135,44 +152,77 @@ export default function VehicleLoanRequestPage() {
                             />
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="driver_id">
-                                Driver (opsional — diisi approver bila kosong)
-                            </Label>
-                            <Input
-                                id="driver_id"
-                                inputMode="numeric"
-                                placeholder="ID driver"
-                                value={form.driver_id}
-                                onChange={(e) =>
-                                    update('driver_id', e.target.value)
+                            <Label htmlFor="driver_id">Driver (opsional)</Label>
+                            <Select
+                                value={form.driver_id || 'none'}
+                                onValueChange={(value) =>
+                                    update(
+                                        'driver_id',
+                                        value === 'none' ? '' : value,
+                                    )
                                 }
-                            />
+                            >
+                                <SelectTrigger id="driver_id">
+                                    <SelectValue placeholder="Kosong — diisi approver" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="none">
+                                        Kosong — diisi approver
+                                    </SelectItem>
+                                    {options?.drivers.map((driver) => (
+                                        <SelectItem
+                                            key={driver.id}
+                                            value={String(driver.id)}
+                                        >
+                                            {driver.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="vehicle_unit_id">
                                 Unit kendaraan (opsional)
                             </Label>
-                            <Input
-                                id="vehicle_unit_id"
-                                inputMode="numeric"
-                                placeholder="ID unit"
-                                value={form.vehicle_unit_id}
-                                onChange={(e) =>
-                                    update('vehicle_unit_id', e.target.value)
+                            <Select
+                                value={form.vehicle_unit_id || 'none'}
+                                onValueChange={(value) =>
+                                    update(
+                                        'vehicle_unit_id',
+                                        value === 'none' ? '' : value,
+                                    )
                                 }
-                            />
+                            >
+                                <SelectTrigger id="vehicle_unit_id">
+                                    <SelectValue placeholder="Kosong — diisi approver" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="none">
+                                        Kosong — diisi approver
+                                    </SelectItem>
+                                    {options?.units.map((unit) => (
+                                        <SelectItem
+                                            key={unit.id}
+                                            value={String(unit.id)}
+                                        >
+                                            {unit.plate_number} (
+                                            {unit.vehicle_type})
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
                         <div className="sticky bottom-0 flex gap-2 bg-background pt-2">
                             <Button
                                 variant="outline"
-                                onClick={saveDraft}
+                                onClick={() => void saveDraft()}
                                 disabled={loading}
                                 className="flex-1"
                             >
                                 Simpan Draft
                             </Button>
                             <Button
-                                onClick={submit}
+                                onClick={() => void submit()}
                                 disabled={loading}
                                 className="flex-1"
                             >
@@ -183,12 +233,8 @@ export default function VehicleLoanRequestPage() {
                 </Card>
 
                 <Card>
-                    <CardContent className="flex items-center gap-4 pt-4">
-                        <QRCodeSVG value={qrUrl} size={96} />
-                        <p className="text-xs text-muted-foreground">
-                            QR halaman ini — ditempel di loket. Scan + login
-                            untuk mengisi permintaan.
-                        </p>
+                    <CardContent className="pt-4">
+                        <VehicleLoanQrPanel form="request" />
                     </CardContent>
                 </Card>
             </div>

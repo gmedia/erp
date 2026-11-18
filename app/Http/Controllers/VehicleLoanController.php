@@ -10,6 +10,7 @@ use App\Actions\VehicleLoans\StoreVehicleLoanPhotoAction;
 use App\Actions\VehicleLoans\StoreVehicleLoanPickupAction;
 use App\Actions\VehicleLoans\StoreVehicleLoanReturnAction;
 use App\Actions\VehicleLoans\SubmitVehicleLoanAction;
+use App\Http\Controllers\Concerns\ResolvesBranchScope;
 use App\Http\Requests\VehicleLoans\ExportVehicleLoansRequest;
 use App\Http\Requests\VehicleLoans\HandoverVehicleLoanKeyRequest;
 use App\Http\Requests\VehicleLoans\IndexVehicleLoanRequest;
@@ -20,9 +21,12 @@ use App\Http\Requests\VehicleLoans\StoreVehicleLoanReturnRequest;
 use App\Http\Requests\VehicleLoans\UpdateVehicleLoanRequest;
 use App\Http\Resources\VehicleLoans\VehicleLoanResource;
 use App\Models\ApprovalRequest;
+use App\Models\VehicleDriver;
 use App\Models\VehicleLoan;
 use App\Models\VehicleLoanPickup;
+use App\Models\VehicleUnit;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -30,6 +34,8 @@ use InvalidArgumentException;
 
 class VehicleLoanController extends Controller
 {
+    use ResolvesBranchScope;
+
     public function index(IndexVehicleLoanRequest $request): JsonResponse
     {
         $query = VehicleLoan::query()
@@ -38,6 +44,10 @@ class VehicleLoanController extends Controller
             ->when($request->filled('date_from'), fn ($q) => $q->whereDate('start_at', '>=', $request->date('date_from')))
             ->when($request->filled('date_to'), fn ($q) => $q->whereDate('end_at', '<=', $request->date('date_to')))
             ->when($request->boolean('mine'), fn ($q) => $q->where('requester_id', Auth::id()))
+            ->when($this->resolveBranchFromRequest($request) !== null, fn ($q) => $q->where(
+                'branch_id',
+                $this->resolveBranchFromRequest($request),
+            ))
             ->orderByDesc('id');
 
         return response()->json($query->paginate($request->integer('per_page', 15)));
@@ -88,6 +98,40 @@ class VehicleLoanController extends Controller
         return response()->json(['message' => 'Loan request cancelled.']);
     }
 
+    public function assignmentOptions(): JsonResponse
+    {
+        return response()->json([
+            'drivers' => VehicleDriver::query()
+                ->where('is_active', true)
+                ->with('employee')
+                ->orderBy('id')
+                ->get()
+                ->map(fn (VehicleDriver $driver): array => [
+                    'id' => $driver->id,
+                    'name' => $driver->employee->name,
+                    'license_expiry' => $driver->license_expiry?->toDateString(),
+                ]),
+            'units' => VehicleUnit::query()
+                ->where('is_active', true)
+                ->with('asset')
+                ->orderBy('id')
+                ->get()
+                ->map(fn (VehicleUnit $unit): array => [
+                    'id' => $unit->id,
+                    'plate_number' => $unit->plate_number,
+                    'vehicle_type' => $unit->vehicle_type,
+                ]),
+        ]);
+    }
+
+    public function mobileConfig(): JsonResponse
+    {
+        return response()->json([
+            'public_base_url' => config('vehicle_loan.public_base_url'),
+            'qr_paths' => config('vehicle_loan.qr_paths'),
+        ]);
+    }
+
     public function export(
         ExportVehicleLoansRequest $request,
         ExportVehicleLoansAction $action,
@@ -133,12 +177,18 @@ class VehicleLoanController extends Controller
         return response()->json($loans);
     }
 
-    public function securityQueue(): JsonResponse
+    public function securityQueue(Request $request): JsonResponse
     {
-        $loans = VehicleLoan::whereIn('status', ['approved', 'pickup_done'])
-            ->with(['requester', 'department', 'driver.employee', 'vehicleUnit.asset', 'pickup'])
-            ->orderBy('start_at')
-            ->paginate(20);
+        $branchId = $this->resolveBranchFromRequest($request);
+
+        $query = VehicleLoan::whereIn('status', ['approved', 'pickup_done'])
+            ->with(['requester', 'department', 'driver.employee', 'vehicleUnit.asset', 'pickup']);
+
+        if ($branchId !== null) {
+            $query->where('branch_id', $branchId);
+        }
+
+        $loans = $query->orderBy('start_at')->paginate(20);
 
         return response()->json($loans);
     }

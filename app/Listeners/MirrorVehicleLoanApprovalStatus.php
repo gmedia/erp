@@ -6,10 +6,16 @@ use App\Events\ApprovalRequestApproved;
 use App\Events\ApprovalRequestRejected;
 use App\Models\VehicleLoan;
 use App\Models\VehicleLoanActivityLog;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\DB;
 
-class MirrorVehicleLoanApprovalStatus
+class MirrorVehicleLoanApprovalStatus implements ShouldQueue
 {
+    use InteractsWithQueue;
+
+    public $tries = 3;
+
     public function handle(ApprovalRequestApproved|ApprovalRequestRejected $event): void
     {
         $approval = $event->approvalRequest;

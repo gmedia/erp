@@ -4,6 +4,18 @@ use App\Http\Controllers\VehicleLoanController;
 use App\Http\Controllers\VehicleLoanPhotoController;
 use Illuminate\Support\Facades\Route;
 
+// Public inside auth:sanctum: approvers may not hold vehicle_loan module permission.
+Route::get('vehicle-loans/assignment-options', [
+    VehicleLoanController::class, 'assignmentOptions',
+]);
+Route::get('vehicle-loans/mobile-config', [
+    VehicleLoanController::class, 'mobileConfig',
+]);
+
+Route::post('vehicle-loans/{vehicle_loan}/review-assignment', [
+    VehicleLoanController::class, 'reviewAssignment',
+]);
+
 Route::middleware('permission:vehicle_loan,true')->group(function () {
     Route::get('vehicle-loans', [VehicleLoanController::class, 'index']);
     Route::get('vehicle-loans/my', [VehicleLoanController::class, 'my']);
@@ -43,10 +55,3 @@ Route::middleware('permission:vehicle_loan,true')->group(function () {
         VehicleLoanController::class, 'storeReturn',
     ])->middleware('permission:vehicle_loan.return,true');
 });
-
-// Authorization is enforced by ReviewVehicleLoanAssignmentAction against the
-// current approver step. Do not gate this behind the vehicle_loan permission:
-// an approver may legitimately hold approval rights without loan module rights.
-Route::post('vehicle-loans/{vehicle_loan}/review-assignment', [
-    VehicleLoanController::class, 'reviewAssignment',
-]);
