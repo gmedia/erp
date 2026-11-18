@@ -281,3 +281,7 @@ Kolom Origin dan Destination tidak mendukung sorting. Gunakan search atau filter
 
 **J:** Gunakan sorting pada kolom Date untuk mengurutkan dari yang terbaru (klik header Date dua kali untuk descending) atau dari yang terlama (sekali klik untuk ascending). Anda juga bisa menggunakan filter date range untuk menampilkan movement dalam periode tertentu, misalnya bulan ini atau tahun ini saja.
 
+
+**Q:** Bisakah saya melampirkan dokumen pendukung pada movement?
+
+**J:** Ya. Saat membuat atau mengedit movement, gunakan field **Supporting Document** di bagian Reference & Notes untuk mengunggah file PDF, JPG, atau PNG (maksimal 5 MB). Dokumen yang telah diunggah dapat dibuka dari modal detail movement melalui tautan nama file. Satu movement hanya menyimpan satu dokumen pendukung; unggah file baru akan menggantikan file sebelumnya.

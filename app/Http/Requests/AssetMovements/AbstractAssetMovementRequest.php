@@ -15,6 +15,7 @@ abstract class AbstractAssetMovementRequest extends AuthorizedFormRequest
             'moved_at' => ['required', 'date'],
             'reference' => ['nullable', 'string', 'max:255'],
             'notes' => ['nullable', 'string'],
+            'document' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
         ];
     }
 }

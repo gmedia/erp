@@ -29,6 +29,9 @@ export interface AssetMovement extends EntityWithId {
     to_employee?: { id: number; name: string } | null;
     reference: string | null;
     notes: string | null;
+    document_path?: string | null;
+    document_name?: string | null;
+    document_url?: string | null;
     pic: string | null;
     created_by?: string | number | null;
 }

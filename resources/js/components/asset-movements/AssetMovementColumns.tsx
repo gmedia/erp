@@ -27,6 +27,9 @@ export interface AssetMovement {
     to_employee?: string;
     reference?: string;
     notes?: string;
+    document_path?: string | null;
+    document_name?: string | null;
+    document_url?: string | null;
     created_by: string;
 }
 

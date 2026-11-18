@@ -41,7 +41,7 @@ Catatan penamaan: heading modul memakai pola `Nama Modul di Kode (Label Bisnis)`
 
 ### Modul Asset Movement (Mutasi Aset)
 
-- [ ] Dokumen: tambah upload dokumen movement
+- [x] Dokumen: tambah upload dokumen movement
 
 ### Modul Financial Reports (Laporan Keuangan)
 

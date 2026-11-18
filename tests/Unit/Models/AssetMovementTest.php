@@ -29,6 +29,8 @@ test('it has fillable attributes', function () {
         'to_employee_id',
         'reference',
         'notes',
+        'document_path',
+        'document_name',
         'created_by',
     ]);
 });

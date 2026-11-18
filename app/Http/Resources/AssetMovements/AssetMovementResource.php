@@ -6,6 +6,7 @@ use App\Models\AssetMovement;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\MissingValue;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * @mixin AssetMovement
@@ -49,6 +50,11 @@ class AssetMovementResource extends JsonResource
             'to_employee' => $this->toEmployee?->name,
             'reference' => $this->reference,
             'notes' => $this->notes,
+            'document_path' => $this->document_path,
+            'document_name' => $this->document_name,
+            'document_url' => $this->document_path
+                ? Storage::disk('public')->url($this->document_path)
+                : null,
             'created_by' => $this->createdBy?->name,
             'created_at' => $this->created_at?->toIso8601String(),
         ];
