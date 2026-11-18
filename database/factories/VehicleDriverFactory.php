@@ -20,7 +20,8 @@ class VehicleDriverFactory extends Factory
             'employee_id' => Employee::factory(),
             'license_number' => $this->faker->optional()->numerify('SIM-#######'),
             'license_type' => $this->faker->optional()->randomElement(['A', 'B', 'C']),
-            'license_expiry' => $this->faker->optional()->date('Y-m-d', '+5 years'),
+            // Always valid: validate via a deterministic future date.
+            'license_expiry' => now()->addYears(5)->toDateString(),
             'is_active' => true,
         ];
     }
