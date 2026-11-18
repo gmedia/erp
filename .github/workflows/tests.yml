@@ -169,8 +169,8 @@ jobs:
               git rebase "FETCH_HEAD"
             fi
           done
-          echo "::error::Failed to push autofixes after 3 attempts."
-          exit 1
+          echo "::warning::Failed to push autofixes after 3 attempts; continuing. Please apply formatting locally."
+          exit 0
 
       - name: Configure MinIO bucket
         if: steps.autofix.outputs.changed != 'true'

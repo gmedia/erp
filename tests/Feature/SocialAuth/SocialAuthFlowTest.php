@@ -71,6 +71,44 @@ test('callback redirects to spa with ticket on successful login', function () {
     expect($response->headers->get('Location'))->toContain('/auth/social/callback#ticket=');
 });
 
+test('callback redirects to settings after link intent', function () {
+    $user = User::factory()->create(['email' => 'existing@example.com']);
+    $manager = app(OAuthStateManager::class);
+    $state = $manager->create('google', 'link');
+    $manager->rememberVerifierForExchange($state['state'], (string) $manager->verifierForNonce($state['nonce']));
+
+    app()->instance(StatelessSocialiteFactory::class, M::mock(StatelessSocialiteFactory::class)
+        ->shouldReceive('make')->andReturn(fakeDriver('existing@example.com', [
+            'hd' => 'example.com', 'email_verified' => true,
+        ]))->getMock());
+
+    $response = $this->get('/api/social/google/callback?state=' . urlencode($state['state']) . '&code=fake');
+
+    $response->assertRedirect();
+    expect($response->headers->get('Location'))->toContain('/settings/social-accounts#linked=1');
+});
+
+test('callback sends two factor users to challenge page', function () {
+    $user = User::factory()->create([
+        'email' => 'existing@example.com',
+        'two_factor_secret' => encrypt('JBSWY3DPEHPK3PXP'),
+        'two_factor_confirmed_at' => now(),
+    ]);
+    $manager = app(OAuthStateManager::class);
+    $state = $manager->create('google', 'login');
+    $manager->rememberVerifierForExchange($state['state'], (string) $manager->verifierForNonce($state['nonce']));
+
+    app()->instance(StatelessSocialiteFactory::class, M::mock(StatelessSocialiteFactory::class)
+        ->shouldReceive('make')->andReturn(fakeDriver('existing@example.com', [
+            'hd' => 'example.com', 'email_verified' => true,
+        ]))->getMock());
+
+    $response = $this->get('/api/social/google/callback?state=' . urlencode($state['state']) . '&code=fake');
+
+    $response->assertRedirect();
+    expect($response->headers->get('Location'))->toContain('/two-factor-challenge?social_ticket=');
+});
+
 test('callback redirects with error when state is invalid', function () {
     $response = $this->get('/api/social/google/callback?state=tampered&code=fake');
 
