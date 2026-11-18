@@ -219,7 +219,7 @@ function disableViteHotFile(): void {
 
 async function createAdminAuthState(baseUrl: string, authStatePath: string): Promise<void> {
     const loginPayload = {
-        email: 'admin@dokfin.id',
+        email: process.env.APP_ADMIN ?? 'admin@example.com',
         password: 'password',
         device_name: 'playwright-global-setup',
     };

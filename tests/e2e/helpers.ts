@@ -3,7 +3,7 @@ import { Page, expect } from '@playwright/test';
 type ApiResponseMatcher = string | RegExp | ((url: string) => boolean);
 
 const pageDebugListenersAttached = new WeakSet<Page>();
-const DEFAULT_E2E_EMAIL = 'admin@dokfin.id';
+const DEFAULT_E2E_EMAIL = process.env.APP_ADMIN ?? 'admin@example.com';
 const DEFAULT_E2E_PASSWORD = 'password';
 
 interface LoginOptions {
