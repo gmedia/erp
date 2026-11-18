@@ -24,6 +24,17 @@ test('reset password link can be requested via api', function () {
     Notification::assertSentTo($user, ResetPassword::class);
 });
 
+test('reset password notification links to the spa reset page', function () {
+    $user = User::factory()->create();
+
+    $mail = (new ResetPassword('test-token'))->toMail($user);
+
+    expect($mail->actionUrl)
+        ->toContain('/reset-password')
+        ->toContain('token=test-token')
+        ->toContain('email=' . urlencode($user->email));
+});
+
 // Note: Password reset screen rendering is handled by the SPA frontend in the new architecture.
 // We only need to test the API endpoints for requesting and submitting the reset.
 
