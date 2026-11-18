@@ -127,21 +127,6 @@ class AssetMovementController extends Controller
         ]);
     }
 
-    /**
-     * @return array{path: string, name: string}|null
-     */
-    private function storeDocument(?UploadedFile $file): ?array
-    {
-        if (! $file) {
-            return null;
-        }
-
-        return [
-            'path' => $file->store('asset-movements/documents', config('filesystems.default')),
-            'name' => $file->getClientOriginalName(),
-        ];
-    }
-
     public function destroy(AssetMovement $asset_movement): JsonResponse
     {
         return DB::transaction(function () use ($asset_movement) {
@@ -193,5 +178,20 @@ class AssetMovementController extends Controller
     public function export(ExportAssetMovementRequest $request, ExportAssetMovementsAction $action): JsonResponse
     {
         return $action->execute($request);
+    }
+
+    /**
+     * @return array{path: string, name: string}|null
+     */
+    private function storeDocument(?UploadedFile $file): ?array
+    {
+        if (! $file) {
+            return null;
+        }
+
+        return [
+            'path' => $file->store('asset-movements/documents', config('filesystems.default')),
+            'name' => $file->getClientOriginalName(),
+        ];
     }
 }
