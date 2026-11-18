@@ -13,6 +13,10 @@ beforeEach(function () {
         'group' => 'authentication', 'key' => 'password_login_enabled',
         'value' => '1', 'type' => 'boolean',
     ]);
+    Setting::updateOrCreate(['key' => 'social_login_enabled'], [
+        'group' => 'authentication', 'key' => 'social_login_enabled',
+        'value' => '1', 'type' => 'boolean',
+    ]);
     SocialLoginPolicy::forgetCache();
 });
 
@@ -55,30 +59,29 @@ test('linked accounts endpoint requires authentication', function () {
 
 test('linked accounts endpoint returns empty list for authenticated user', function () {
     $user = User::factory()->create();
+    Sanctum::actingAs($user);
 
-    Sanctum::actingAs($user)
-        ->getJson('/api/social/accounts')
+    $this->getJson('/api/social/accounts')
         ->assertOk()
         ->assertJson(['accounts' => []]);
 });
 
 test('set password endpoint validates confirmation', function () {
     $user = User::factory()->create();
+    Sanctum::actingAs($user);
 
-    Sanctum::actingAs($user)
-        ->postJson('/api/social/set-password', ['password' => 'newpassword'])
+    $this->postJson('/api/social/set-password', ['password' => 'newpassword'])
         ->assertStatus(422);
 });
 
 test('set password endpoint updates oauth-only user password', function () {
     $user = User::factory()->create(['password' => null]);
+    Sanctum::actingAs($user);
 
-    Sanctum::actingAs($user)
-        ->postJson('/api/social/set-password', [
-            'password' => 'newpassword',
-            'password_confirmation' => 'newpassword',
-        ])
-        ->assertOk();
+    $this->postJson('/api/social/set-password', [
+        'password' => 'newpassword',
+        'password_confirmation' => 'newpassword',
+    ])->assertOk();
 
     expect($user->fresh()->password)->not->toBeNull();
 });
