@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Http\JsonResponse;
 use RuntimeException;
 
 class SocialAuthException extends RuntimeException
@@ -52,5 +53,16 @@ class SocialAuthException extends RuntimeException
     public static function twoFactorRequired(): self
     {
         return new self('two_factor_required', 403);
+    }
+
+    /**
+     * Render as a stable JSON error for the SPA.
+     */
+    public function render(): JsonResponse
+    {
+        return response()->json([
+            'message' => $this->getMessage(),
+            'error_code' => $this->errorCode,
+        ], $this->status);
     }
 }
