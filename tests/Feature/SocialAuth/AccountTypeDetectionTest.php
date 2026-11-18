@@ -91,6 +91,7 @@ test('empty allowlist fails closed', function () {
 });
 
 test('microsoft 365 tenant is detected from tenant object', function () {
+    authSettings();
     Setting::set('social_login_allowed_tenants', ['tenant-contoh']);
 
     $detected = app(DetectAccountTypeAction::class)->execute(
@@ -115,6 +116,7 @@ test('microsoft consumer tenant is personal', function () {
 });
 
 test('microsoft tenant outside allowlist is rejected', function () {
+    authSettings();
     Setting::set('social_login_allowed_tenants', ['allowed-tenant']);
 
     $detected = app(DetectAccountTypeAction::class)->execute(
