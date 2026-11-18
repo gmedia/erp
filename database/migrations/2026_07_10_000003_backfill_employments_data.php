@@ -8,29 +8,37 @@ return new class extends Migration
 {
     public function up(): void
     {
-        $employeeCount = DB::table('employees')->count();
-        $employmentCount = DB::table('employments')->count();
-
-        if ($employmentCount >= $employeeCount) {
-            return;
-        }
-
-        if ($employmentCount > 0) {
-            throw new RuntimeException(
-                'employments is partially populated — refusing to backfill again, manual review required'
-            );
-        }
-
         DB::transaction(function (): void {
-            $companyId = DB::table('companies')->insertGetId([
-                'name' => 'PT. Default Company',
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ]);
+            // 1. Ensure the default company exists. This must happen even when there is
+            //    nothing to backfill, because a fresh database still expects company id 1.
+            $companyId = DB::table('companies')->orderBy('id')->value('id');
 
+            if ($companyId === null) {
+                $companyId = DB::table('companies')->insertGetId([
+                    'name' => 'PT. Default Company',
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ]);
+            }
+
+            // 2. Map branches that have no company yet (idempotent).
             DB::table('branches')
                 ->whereNull('company_id')
                 ->update(['company_id' => $companyId]);
+
+            // 3. Backfill employments, but never twice.
+            $employeeCount = DB::table('employees')->count();
+            $employmentCount = DB::table('employments')->count();
+
+            if ($employmentCount >= $employeeCount) {
+                return;
+            }
+
+            if ($employmentCount > 0) {
+                throw new RuntimeException(
+                    'employments is partially populated — refusing to backfill again, manual review required'
+                );
+            }
 
             $branchCompanyMap = DB::table('branches')
                 ->pluck('company_id', 'id')
