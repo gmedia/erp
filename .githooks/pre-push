@@ -49,6 +49,13 @@ if [ -z "$repo" ] || [ -z "$me" ]; then
     exit 0
 fi
 
+# CI autofix bot pushes back style fixes to the same claimed branch.
+# Allow it explicitly; human pushes still follow the claim rules below.
+if [ "$me" = "github-actions[bot]" ]; then
+    echo "[pre-push] OK: CI autofix bot -> $current_branch." >&2
+    exit 0
+fi
+
 json="$(gh issue view "$issue_number" --repo "$repo" \
     --json state,labels,assignees \
     --jq '{state:.state,labels:[.labels[].name],assignees:[.assignees[].login]}' 2>/dev/null || true)"

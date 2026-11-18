@@ -9,6 +9,7 @@ use App\Services\SocialAuth\StatelessSocialiteDriver;
 use App\Services\SocialAuth\StatelessSocialiteFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
+use Laravel\Socialite\Two\User as SocialiteUser;
 use Mockery;
 
 uses(RefreshDatabase::class)->group('social-auth');
@@ -39,7 +40,7 @@ afterEach(function () {
 
 function fakeDriver(string $email, array $raw, string $id = 'ext-1'): StatelessSocialiteDriver
 {
-    $socialUser = (new Laravel\Socialite\Two\User)->map([
+    $socialUser = (new SocialiteUser)->map([
         'id' => $id,
         'nickname' => 'Example',
         'name' => 'Example User',
