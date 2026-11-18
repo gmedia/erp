@@ -4,12 +4,16 @@ namespace App\Providers;
 
 use App\Models\Setting;
 use App\Models\User;
+use App\Services\SocialAuth\Providers\GoogleProvider;
+use App\Services\SocialAuth\Providers\MicrosoftProvider;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Socialite\Facades\Socialite;
+use SocialiteProviders\Manager\Config;
 use Throwable;
 
 class AppServiceProvider extends ServiceProvider
@@ -28,6 +32,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->bootRateLimiters();
+        $this->bootSocialite();
 
         View::composer('app', function ($view) {
             try {
@@ -64,6 +69,44 @@ class AppServiceProvider extends ServiceProvider
                 'email' => $notifiable->getEmailForPasswordReset(),
             ]);
         });
+    }
+
+    /**
+     * Register Socialite providers and rate limiters for social login.
+     */
+    protected function bootSocialite(): void
+    {
+        Socialite::extend('google', fn () => new GoogleProvider(
+            request(),
+            (string) config('services.google.client_id'),
+            (string) config('services.google.client_secret'),
+            (string) config('services.google.redirect')
+        ));
+
+        Socialite::extend('microsoft', function () {
+            $provider = new MicrosoftProvider(
+                request(),
+                (string) config('services.microsoft.client_id'),
+                (string) config('services.microsoft.client_secret'),
+                (string) config('services.microsoft.redirect')
+            );
+            $config = new Config(
+                (string) config('services.microsoft.client_id'),
+                (string) config('services.microsoft.client_secret'),
+                (string) config('services.microsoft.redirect'),
+                [
+                    'tenant' => (string) config('services.microsoft.tenant', 'common'),
+                    'include_tenant_info' => true,
+                ]
+            );
+
+            return $provider->setConfig($config);
+        });
+
+        $isTesting = app()->environment('testing') || config('app.disable_rate_limiting');
+        foreach (['social-redirect' => 10, 'social-callback' => 30, 'social-exchange' => 20] as $name => $max) {
+            $this->registerRateLimiter($name, $max, $isTesting);
+        }
     }
 
     /**

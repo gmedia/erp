@@ -72,6 +72,7 @@ class DatabaseSeeder extends Seeder
         );
 
         $this->call([
+            AuthenticationSettingSeeder::class,
             BranchSeeder::class,
             WarehouseSeeder::class,
             DepartmentSeeder::class,

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\SocialAuth\SocialLoginPolicy;
 use Database\Factories\SettingFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -80,6 +81,7 @@ class Setting extends Model
         // Clear application caches
         cache()->forget('app.company_name');
         cache()->forget('app.mail_settings');
+        cache()->forget(SocialLoginPolicy::CACHE_KEY);
 
         return $setting->fresh();
     }

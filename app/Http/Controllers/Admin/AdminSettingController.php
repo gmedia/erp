@@ -45,6 +45,16 @@ class AdminSettingController extends Controller
         unset($validated['company_logo']);
         unset($validated['company_logo_svg']);
 
+        foreach (['social_login_allowed_domains', 'social_login_allowed_tenants'] as $listKey) {
+            if (! array_key_exists($listKey, $validated)) {
+                continue;
+            }
+
+            $raw = is_string($validated[$listKey]) ? $validated[$listKey] : '';
+            $items = array_values(array_filter(array_map('trim', explode(',', $raw)), fn (string $v): bool => $v !== ''));
+            $validated[$listKey] = json_encode($items) ?: '[]';
+        }
+
         foreach ($validated as $key => $value) {
             Setting::set($key, $value ?? '');
         }
