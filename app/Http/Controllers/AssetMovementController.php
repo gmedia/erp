@@ -13,8 +13,10 @@ use App\Models\AssetMovement;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class AssetMovementController extends Controller
 {
@@ -56,13 +58,19 @@ class AssetMovementController extends Controller
         return DB::transaction(function () use ($request) {
             $asset = Asset::findOrFail($request->asset_id);
 
+            $validated = $request->validated();
+            unset($validated['document']);
+            $document = $this->storeDocument($request->file('document'));
+
             $movement = AssetMovement::create([
-                ...$request->validated(),
+                ...$validated,
                 'from_branch_id' => $asset->branch_id,
                 'from_location_id' => $asset->asset_location_id,
                 'from_department_id' => $asset->department_id,
                 'from_employee_id' => $asset->employee_id,
                 'created_by' => Auth::id(),
+                'document_path' => $document['path'] ?? null,
+                'document_name' => $document['name'] ?? null,
             ]);
 
             // Update asset current state
@@ -95,7 +103,20 @@ class AssetMovementController extends Controller
 
     public function update(UpdateAssetMovementRequest $request, AssetMovement $asset_movement): JsonResponse
     {
-        $asset_movement->update($request->validated());
+        $validated = $request->validated();
+        unset($validated['document']);
+
+        if ($request->hasFile('document')) {
+            if ($asset_movement->document_path) {
+                Storage::disk(config('filesystems.default'))->delete($asset_movement->document_path);
+            }
+
+            $document = $this->storeDocument($request->file('document'));
+            $validated['document_path'] = $document['path'];
+            $validated['document_name'] = $document['name'];
+        }
+
+        $asset_movement->update($validated);
 
         return response()->json([
             'message' => 'Movement updated successfully',
@@ -104,6 +125,21 @@ class AssetMovementController extends Controller
                 'fromDepartment', 'toDepartment', 'fromEmployee', 'toEmployee', 'createdBy',
             ])),
         ]);
+    }
+
+    /**
+     * @return array{path: string, name: string}|null
+     */
+    private function storeDocument(?UploadedFile $file): ?array
+    {
+        if (! $file) {
+            return null;
+        }
+
+        return [
+            'path' => $file->store('asset-movements/documents', config('filesystems.default')),
+            'name' => $file->getClientOriginalName(),
+        ];
     }
 
     public function destroy(AssetMovement $asset_movement): JsonResponse

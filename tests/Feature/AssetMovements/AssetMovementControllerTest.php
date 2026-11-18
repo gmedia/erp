@@ -7,11 +7,14 @@ use App\Models\AssetLocation;
 use App\Models\AssetMovement;
 use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\deleteJson;
 use function Pest\Laravel\getJson;
+use function Pest\Laravel\post;
 use function Pest\Laravel\postJson;
 use function Pest\Laravel\putJson;
 
@@ -88,4 +91,39 @@ test('it deletes asset movement', function () {
 
     $response->assertStatus(200);
     $this->assertDatabaseMissing('asset_movements', ['id' => $movement->id]);
+});
+
+test('it stores a supporting document with the movement', function () {
+    Storage::fake('local');
+
+    $asset = Asset::factory()->create();
+    $file = UploadedFile::fake()->create('movement-proof.pdf', 128, 'application/pdf');
+
+    $response = post('/api/asset-movements', [
+        'asset_id' => $asset->id,
+        'movement_type' => 'adjustment',
+        'moved_at' => now()->format('Y-m-d H:i:s'),
+        'document' => $file,
+    ]);
+
+    $response->assertStatus(201)
+        ->assertJsonPath('data.document_name', 'movement-proof.pdf');
+
+    $path = AssetMovement::latest('id')->value('document_path');
+    expect($path)->not->toBeNull();
+    Storage::disk('local')->assertExists($path);
+});
+
+test('it rejects unsupported document types', function () {
+    Storage::fake('local');
+
+    $asset = Asset::factory()->create();
+
+    post('/api/asset-movements', [
+        'asset_id' => $asset->id,
+        'movement_type' => 'adjustment',
+        'moved_at' => now()->format('Y-m-d H:i:s'),
+        'document' => UploadedFile::fake()->create('malware.exe', 128),
+    ], ['Accept' => 'application/json'])->assertStatus(422)
+        ->assertJsonValidationErrors('document');
 });

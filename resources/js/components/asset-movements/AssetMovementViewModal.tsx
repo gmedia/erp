@@ -105,6 +105,26 @@ export const AssetMovementViewModal = memo<AssetMovementViewModalProps>(
                         />
                     )}
 
+                    {item.document_name && (
+                        <ViewField
+                            label="Supporting Document"
+                            value={
+                                item.document_url ? (
+                                    <a
+                                        href={item.document_url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-primary underline"
+                                    >
+                                        {item.document_name}
+                                    </a>
+                                ) : (
+                                    item.document_name
+                                )
+                            }
+                        />
+                    )}
+
                     <ViewField
                         label="Recorded By"
                         value={item.created_by || '-'}

@@ -1,6 +1,6 @@
 import { Page, expect } from '@playwright/test';
 
-async function pickFirstAsyncOption(page: Page, searchText?: string): Promise<void> {
+export async function pickFirstAsyncOption(page: Page, searchText?: string): Promise<void> {
   const list = page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').last();
   await expect(list).toBeVisible({ timeout: 10000 });
 
@@ -169,7 +169,7 @@ export async function editAssetMovement(
   const updateResponsePromise = page.waitForResponse(
     (response) =>
       response.url().includes('/api/asset-movements') &&
-      ['PUT', 'PATCH'].includes(response.request().method()) &&
+      ['PUT', 'PATCH', 'POST'].includes(response.request().method()) &&
       response.status() < 400,
     { timeout: 15000 },
   );

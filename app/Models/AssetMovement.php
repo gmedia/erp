@@ -24,6 +24,8 @@ use Illuminate\Support\Carbon;
  * @property int|null $to_employee_id
  * @property string|null $reference
  * @property string|null $notes
+ * @property string|null $document_path
+ * @property string|null $document_name
  * @property int|null $created_by
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -86,6 +88,8 @@ class AssetMovement extends Model
         'to_employee_id',
         'reference',
         'notes',
+        'document_path',
+        'document_name',
         'created_by',
     ];
 

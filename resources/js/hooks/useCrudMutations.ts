@@ -62,6 +62,13 @@ export function useCrudMutations<Entity, FormData>({
         { id: string | number; data: FormData }
     >({
         mutationFn: async ({ id, data }) => {
+            if (data instanceof FormData) {
+                // Multipart PUT is not parsed by PHP; Laravel needs method spoofing.
+                data.append('_method', 'PUT');
+                const response = await axios.post(`${endpoint}/${id}`, data);
+                return response.data;
+            }
+
             const response = await axios.put(`${endpoint}/${id}`, data);
             return response.data;
         },

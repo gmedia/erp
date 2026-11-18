@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
-import { memo, useEffect, useMemo } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
@@ -24,7 +24,7 @@ interface AssetMovementFormProps {
     onOpenChange: (open: boolean) => void;
     entity?: AssetMovement | null; // For editing (passed by EntityCrudPage)
     asset?: Asset | null; // For creating from asset profile page
-    onSubmit: (data: AssetMovementFormData) => void;
+    onSubmit: (data: AssetMovementFormData | FormData) => void;
     isLoading?: boolean;
 }
 
@@ -104,23 +104,48 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
             defaultValues,
         });
 
+        const [documentFile, setDocumentFile] = useState<File | null>(null);
+
         const movementType = form.watch('movement_type');
         const toBranchId = form.watch('to_branch_id');
 
         useEffect(() => {
             if (open) {
                 form.reset(defaultValues);
+                setDocumentFile(null);
             }
         }, [open, form, defaultValues]);
 
         const handleFormSubmit = (data: AssetMovementFormData) => {
-            onSubmit({
-                ...data,
-                moved_at: format(
-                    data.moved_at,
-                    'yyyy-MM-dd HH:mm:ss',
-                ) as unknown as Date,
+            const formData = new FormData();
+
+            formData.append('asset_id', data.asset_id);
+            formData.append('movement_type', data.movement_type);
+            formData.append(
+                'moved_at',
+                format(data.moved_at, 'yyyy-MM-dd HH:mm:ss'),
+            );
+
+            const optionalFields: Array<[string, string | undefined]> = [
+                ['to_branch_id', data.to_branch_id],
+                ['to_location_id', data.to_location_id],
+                ['to_department_id', data.to_department_id],
+                ['to_employee_id', data.to_employee_id],
+                ['reference', data.reference],
+                ['notes', data.notes],
+            ];
+
+            optionalFields.forEach(([key, value]) => {
+                if (value) {
+                    formData.append(key, value);
+                }
             });
+
+            if (documentFile) {
+                formData.append('document', documentFile);
+            }
+
+            onSubmit(formData);
         };
 
         const isEdit = !!entity;
@@ -253,6 +278,30 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
                                 label="Notes"
                                 placeholder="Reason for movement..."
                             />
+                            <div className="space-y-2">
+                                <label
+                                    htmlFor="movement-document"
+                                    className="text-sm font-medium"
+                                >
+                                    Supporting Document
+                                </label>
+                                <input
+                                    id="movement-document"
+                                    type="file"
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    className="block w-full text-sm text-muted-foreground file:mr-4 file:rounded-md file:border file:px-3 file:py-1 file:text-sm"
+                                    onChange={(event) =>
+                                        setDocumentFile(
+                                            event.target.files?.[0] ?? null,
+                                        )
+                                    }
+                                />
+                                {entity?.document_name && (
+                                    <p className="text-xs text-muted-foreground">
+                                        Current: {entity.document_name}
+                                    </p>
+                                )}
+                            </div>
                         </div>
                     </div>
                 )}
