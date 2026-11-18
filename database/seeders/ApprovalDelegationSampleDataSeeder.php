@@ -13,9 +13,9 @@ class ApprovalDelegationSampleDataSeeder extends Seeder
      */
     public function run(): void
     {
-        $financeDirector = User::where('email', 'director.finance@dokfin.id')->first();
-        $hrManager = User::where('email', 'manager.hr@dokfin.id')->first();
-        $itStaff = User::where('email', 'staff.it@dokfin.id')->first();
+        $financeDirector = User::where('email', 'director.finance@example.com')->first();
+        $hrManager = User::where('email', 'manager.hr@example.com')->first();
+        $itStaff = User::where('email', 'staff.it@example.com')->first();
 
         // 1. Finance Director delegates to HR Manager (Active now)
         ApprovalDelegation::create([
