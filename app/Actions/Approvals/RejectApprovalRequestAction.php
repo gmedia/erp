@@ -2,6 +2,7 @@
 
 namespace App\Actions\Approvals;
 
+use App\Events\ApprovalRequestRejected;
 use App\Models\ApprovalAuditLog;
 use App\Models\ApprovalRequest;
 use App\Models\ApprovalRequestStep;
@@ -38,6 +39,8 @@ class RejectApprovalRequestAction
                 'step_order' => $currentStep->step_order,
                 'metadata' => json_encode(['comments' => $comments]),
             ]);
+
+            DB::afterCommit(fn () => ApprovalRequestRejected::dispatch($approvalRequest, $userId, $comments));
         });
     }
 }

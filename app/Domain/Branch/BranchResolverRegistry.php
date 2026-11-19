@@ -16,6 +16,7 @@ use App\Models\RecurringJournal;
 use App\Models\StockAdjustment;
 use App\Models\SupplierBill;
 use App\Models\SupplierReturn;
+use App\Models\VehicleLoan;
 use Illuminate\Database\Eloquent\Model;
 use InvalidArgumentException;
 
@@ -34,6 +35,7 @@ class BranchResolverRegistry
         CustomerInvoice::class => BranchResolutionStrategy::Direct,
         PurchaseRequest::class => BranchResolutionStrategy::Direct,
         SupplierBill::class => BranchResolutionStrategy::Direct,
+        VehicleLoan::class => BranchResolutionStrategy::Direct,
         GoodsReceipt::class => BranchResolutionStrategy::Warehouse,
         StockAdjustment::class => BranchResolutionStrategy::Warehouse,
         SupplierReturn::class => BranchResolutionStrategy::Warehouse,

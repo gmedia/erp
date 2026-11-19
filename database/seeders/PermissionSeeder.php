@@ -1072,6 +1072,42 @@ class PermissionSeeder extends Seeder
                 'display_name' => 'View All Branches (Cross-Branch Admin)',
                 'child' => [],
             ],
+            [
+                'name' => 'vehicle_loan',
+                'display_name' => 'Vehicle Loan',
+                'child' => [
+                    [
+                        'name' => 'vehicle_loan.request',
+                        'display_name' => 'Request Vehicle Loan',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'vehicle_loan.pickup',
+                        'display_name' => 'Vehicle Loan Pickup',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'vehicle_loan.return',
+                        'display_name' => 'Vehicle Loan Return',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'vehicle_loan.security',
+                        'display_name' => 'Vehicle Loan Security Queue',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'vehicle_loan.report',
+                        'display_name' => 'Vehicle Loan Report',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'vehicle_loan.master',
+                        'display_name' => 'Vehicle Loan Master Data',
+                        'child' => [],
+                    ],
+                ],
+            ],
         ];
 
         $this->createPermissions($permissions);

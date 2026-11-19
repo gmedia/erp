@@ -183,6 +183,7 @@ class DatabaseSeeder extends Seeder
             SettingSampleDataSeeder::class,
             PipelineSampleDataSeeder::class,
             ApprovalFlowSampleDataSeeder::class,
+            VehicleLoanApprovalFlowSeeder::class,
             ApprovalDelegationSampleDataSeeder::class,
             ProductSampleDataSeeder::class,
             PurchasingSampleDataSeeder::class,

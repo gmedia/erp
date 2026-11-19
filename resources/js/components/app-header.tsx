@@ -1,5 +1,6 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { Icon } from '@/components/icon';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -161,6 +162,7 @@ export function AppHeader({ breadcrumbs = [] }: Readonly<AppHeaderProps>) {
                     </div>
 
                     <div className="ml-auto flex items-center space-x-2">
+                        <NotificationBell />
                         <div className="relative flex items-center space-x-1">
                             <Button
                                 variant="ghost"

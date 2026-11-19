@@ -11,6 +11,13 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
@@ -162,16 +169,32 @@ function TabCount({ count }: Readonly<{ count: number }>) {
     );
 }
 
+interface AssignmentOption {
+    id: number;
+    label: string;
+}
+
+interface AssignmentOptions {
+    drivers: AssignmentOption[];
+    units: AssignmentOption[];
+}
+
 export default function MyApprovalsPage() {
     const queryClient = useQueryClient();
     const [actionDialog, setActionDialog] = useState<{
         open: boolean;
         type: 'approve' | 'reject' | null;
         requestStep: ApprovalRequestStep | null;
+        driverId: string;
+        unitId: string;
+        reviewNotes: string;
     }>({
         open: false,
         type: null,
         requestStep: null,
+        driverId: '',
+        unitId: '',
+        reviewNotes: '',
     });
     const [comments, setComments] = useState('');
     const [processing, setProcessing] = useState(false);
@@ -184,16 +207,57 @@ export default function MyApprovalsPage() {
         },
     });
 
+    const { data: assignmentOptions } = useQuery<AssignmentOptions>({
+        queryKey: ['vehicle-loans', 'assignment-options'],
+        queryFn: async () => {
+            const response = await axios.get<{
+                drivers: Array<{ id: number; name: string }>;
+                units: Array<{
+                    id: number;
+                    plate_number: string;
+                    vehicle_type: string;
+                }>;
+            }>('/api/vehicle-loans/assignment-options');
+            return {
+                drivers: response.data.drivers.map((d) => ({
+                    id: d.id,
+                    label: d.name,
+                })),
+                units: response.data.units.map((u) => ({
+                    id: u.id,
+                    label: `${u.plate_number} (${u.vehicle_type})`,
+                })),
+            };
+        },
+        staleTime: 5 * 60 * 1000,
+    });
+
     const pending = data?.pending ?? [];
     const approved = data?.approved ?? [];
     const rejected = data?.rejected ?? [];
     const all = data?.all ?? [];
 
+    const isVehicleLoan = (step: ApprovalRequestStep | null): boolean =>
+        shortApprovableType(step?.request.approvable_type ?? '') ===
+        'VehicleLoan';
+
     const openActionDialog = (
         type: 'approve' | 'reject',
         step: ApprovalRequestStep,
     ) => {
-        setActionDialog({ open: true, type, requestStep: step });
+        const approvable = step.request.approvable as
+            | { driver_id?: number; vehicle_unit_id?: number }
+            | undefined;
+        setActionDialog({
+            open: true,
+            type,
+            requestStep: step,
+            driverId: approvable?.driver_id ? String(approvable.driver_id) : '',
+            unitId: approvable?.vehicle_unit_id
+                ? String(approvable.vehicle_unit_id)
+                : '',
+            reviewNotes: '',
+        });
         setComments('');
     };
 
@@ -201,12 +265,38 @@ export default function MyApprovalsPage() {
         if (!actionDialog.requestStep || !actionDialog.type) return;
 
         setProcessing(true);
-        const url = `/api/my-approvals/${actionDialog.requestStep.request.id}/${actionDialog.type}`;
+        const approvalId = actionDialog.requestStep.request.id;
+        const loanId = actionDialog.requestStep.request.approvable_id;
 
-        axios
-            .post(url, { comments })
+        const submitReview = async (): Promise<void> => {
+            if (!isVehicleLoan(actionDialog.requestStep)) return;
+            await axios.post(`/api/vehicle-loans/${loanId}/review-assignment`, {
+                driver_id: actionDialog.driverId
+                    ? Number(actionDialog.driverId)
+                    : null,
+                vehicle_unit_id: actionDialog.unitId
+                    ? Number(actionDialog.unitId)
+                    : null,
+                review_notes: actionDialog.reviewNotes || null,
+            });
+        };
+
+        void submitReview()
+            .then(() =>
+                axios.post(
+                    `/api/my-approvals/${approvalId}/${actionDialog.type}`,
+                    { comments },
+                ),
+            )
             .then(() => {
-                setActionDialog({ open: false, type: null, requestStep: null });
+                setActionDialog({
+                    open: false,
+                    type: null,
+                    requestStep: null,
+                    driverId: '',
+                    unitId: '',
+                    reviewNotes: '',
+                });
                 queryClient.invalidateQueries({ queryKey: ['my-approvals'] });
                 toast.success(`Request ${actionDialog.type}d successfully`);
             })
@@ -226,6 +316,9 @@ export default function MyApprovalsPage() {
 
         if (type === 'Asset') {
             return `/assets/${ulid || id}`;
+        }
+        if (type === 'VehicleLoan') {
+            return `/vehicle-loans/${id}`;
         }
 
         return '#';
@@ -505,6 +598,103 @@ export default function MyApprovalsPage() {
                     </DialogHeader>
 
                     <div className="grid gap-4 py-4">
+                        {isVehicleLoan(actionDialog.requestStep) && (
+                            <div className="space-y-3 rounded-md border border-border/70 bg-muted/20 p-3">
+                                <p className="text-xs font-medium text-muted-foreground">
+                                    Review penugasan kendaraan
+                                </p>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="review_driver">
+                                        Driver
+                                    </Label>
+                                    <Select
+                                        value={actionDialog.driverId || 'none'}
+                                        onValueChange={(value) =>
+                                            setActionDialog((current) => ({
+                                                ...current,
+                                                driverId:
+                                                    value === 'none'
+                                                        ? ''
+                                                        : value,
+                                            }))
+                                        }
+                                    >
+                                        <SelectTrigger id="review_driver">
+                                            <SelectValue placeholder="Kosong — tidak diubah" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="none">
+                                                Kosong — tidak diubah
+                                            </SelectItem>
+                                            {assignmentOptions?.drivers.map(
+                                                (driver) => (
+                                                    <SelectItem
+                                                        key={driver.id}
+                                                        value={String(
+                                                            driver.id,
+                                                        )}
+                                                    >
+                                                        {driver.label}
+                                                    </SelectItem>
+                                                ),
+                                            )}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="review_unit">
+                                        Unit kendaraan
+                                    </Label>
+                                    <Select
+                                        value={actionDialog.unitId || 'none'}
+                                        onValueChange={(value) =>
+                                            setActionDialog((current) => ({
+                                                ...current,
+                                                unitId:
+                                                    value === 'none'
+                                                        ? ''
+                                                        : value,
+                                            }))
+                                        }
+                                    >
+                                        <SelectTrigger id="review_unit">
+                                            <SelectValue placeholder="Kosong — tidak diubah" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="none">
+                                                Kosong — tidak diubah
+                                            </SelectItem>
+                                            {assignmentOptions?.units.map(
+                                                (unit) => (
+                                                    <SelectItem
+                                                        key={unit.id}
+                                                        value={String(unit.id)}
+                                                    >
+                                                        {unit.label}
+                                                    </SelectItem>
+                                                ),
+                                            )}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="review_notes">
+                                        Catatan review (opsional)
+                                    </Label>
+                                    <Textarea
+                                        id="review_notes"
+                                        value={actionDialog.reviewNotes}
+                                        onChange={(e) =>
+                                            setActionDialog((current) => ({
+                                                ...current,
+                                                reviewNotes: e.target.value,
+                                            }))
+                                        }
+                                        rows={2}
+                                    />
+                                </div>
+                            </div>
+                        )}
                         <div className="grid gap-2">
                             <Label htmlFor="comments">
                                 Comments{' '}

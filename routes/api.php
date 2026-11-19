@@ -90,5 +90,9 @@ Route::middleware('auth:sanctum')->group(function () {
     require __DIR__ . '/api/suppliers.php';
     require __DIR__ . '/api/units.php';
     require __DIR__ . '/api/users.php';
+    require __DIR__ . '/api/notifications.php';
+    require __DIR__ . '/api/vehicle-drivers.php';
+    require __DIR__ . '/api/vehicle-units.php';
+    require __DIR__ . '/api/vehicle-loans.php';
     require __DIR__ . '/api/warehouses.php';
 });

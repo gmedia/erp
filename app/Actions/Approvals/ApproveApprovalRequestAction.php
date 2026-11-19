@@ -2,6 +2,7 @@
 
 namespace App\Actions\Approvals;
 
+use App\Events\ApprovalRequestApproved;
 use App\Models\ApprovalAuditLog;
 use App\Models\ApprovalRequest;
 use App\Models\ApprovalRequestStep;
@@ -46,6 +47,8 @@ class ApproveApprovalRequestAction
                     'status' => 'in_progress',
                 ]);
 
+                DB::afterCommit(fn () => ApprovalRequestApproved::dispatch($approvalRequest, $userId, false));
+
                 return;
             }
 
@@ -62,6 +65,8 @@ class ApproveApprovalRequestAction
                 'actor_user_id' => $userId,
                 'metadata' => json_encode([]),
             ]);
+
+            DB::afterCommit(fn () => ApprovalRequestApproved::dispatch($approvalRequest, $userId, true));
         });
     }
 }

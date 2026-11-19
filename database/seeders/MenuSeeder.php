@@ -277,6 +277,47 @@ class MenuSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'vehicle_loan',
+                'display_name' => 'Vehicle Loans',
+                'permissions' => [
+                    'vehicle_loan',
+                    'vehicle_loan.request',
+                    'vehicle_loan.pickup',
+                    'vehicle_loan.return',
+                    'vehicle_loan.security',
+                    'vehicle_loan.report',
+                    'vehicle_loan.master',
+                ],
+                'icon' => 'CarFront',
+                'url' => null,
+                'child' => [
+                    [
+                        'name' => 'vehicle_loan_request',
+                        'display_name' => 'New Request',
+                        'permissions' => ['vehicle_loan', 'vehicle_loan.request'],
+                        'icon' => 'ClipboardPlus',
+                        'url' => 'vehicle-loans/request',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'vehicle_loan_dashboard',
+                        'display_name' => 'Loan Dashboard',
+                        'permissions' => ['vehicle_loan', 'vehicle_loan.report'],
+                        'icon' => 'ChartNoAxesCombined',
+                        'url' => 'vehicle-loans/dashboard',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'vehicle_loan_security',
+                        'display_name' => 'Security Queue',
+                        'permissions' => ['vehicle_loan', 'vehicle_loan.security'],
+                        'icon' => 'ShieldCheck',
+                        'url' => 'vehicle-loans/security',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'inventory',
                 'display_name' => 'Inventory',
                 'permissions' => [

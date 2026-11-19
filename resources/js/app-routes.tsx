@@ -124,6 +124,16 @@ const ApprovalAuditTrail = lazy(
     () => import('./pages/approval-audit-trail/index'),
 );
 const MyApprovals = lazy(() => import('./pages/my-approvals/index'));
+const VehicleLoanRequest = lazy(() => import('./pages/vehicle-loans/request'));
+const VehicleLoanPickup = lazy(() => import('./pages/vehicle-loans/pickup'));
+const VehicleLoanReturn = lazy(() => import('./pages/vehicle-loans/return'));
+const VehicleLoanSecurity = lazy(
+    () => import('./pages/vehicle-loans/security'),
+);
+const VehicleLoanDashboard = lazy(
+    () => import('./pages/vehicle-loans/dashboard'),
+);
+const VehicleLoanDetail = lazy(() => import('./pages/vehicle-loans/detail'));
 
 // Users & Permissions
 const Users = lazy(() => import('./pages/users/index'));
@@ -741,6 +751,56 @@ export default function AppRoutes() {
                     element={
                         <P>
                             <MyApprovals />
+                        </P>
+                    }
+                />
+
+                {/* Vehicle Loans */}
+                <Route
+                    path="/vehicle-loans/request"
+                    element={
+                        <P>
+                            <VehicleLoanRequest />
+                        </P>
+                    }
+                />
+                <Route
+                    path="/vehicle-loans/pickup"
+                    element={
+                        <P>
+                            <VehicleLoanPickup />
+                        </P>
+                    }
+                />
+                <Route
+                    path="/vehicle-loans/return"
+                    element={
+                        <P>
+                            <VehicleLoanReturn />
+                        </P>
+                    }
+                />
+                <Route
+                    path="/vehicle-loans/security"
+                    element={
+                        <P>
+                            <VehicleLoanSecurity />
+                        </P>
+                    }
+                />
+                <Route
+                    path="/vehicle-loans/dashboard"
+                    element={
+                        <P>
+                            <VehicleLoanDashboard />
+                        </P>
+                    }
+                />
+                <Route
+                    path="/vehicle-loans/:id"
+                    element={
+                        <P>
+                            <VehicleLoanDetail />
                         </P>
                     }
                 />

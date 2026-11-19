@@ -2,8 +2,11 @@
 
 namespace App\Providers;
 
+use App\Events\ApprovalRequestApproved;
 use App\Events\ApprovalRequestCreated;
-use App\Listeners\SendApprovalRequestNotifications;
+use App\Events\ApprovalRequestRejected;
+use App\Listeners\DispatchGenericNotification;
+use App\Listeners\MirrorVehicleLoanApprovalStatus;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -20,7 +23,15 @@ class EventServiceProvider extends ServiceProvider
             SendEmailVerificationNotification::class,
         ],
         ApprovalRequestCreated::class => [
-            SendApprovalRequestNotifications::class,
+            DispatchGenericNotification::class,
+        ],
+        ApprovalRequestApproved::class => [
+            DispatchGenericNotification::class,
+            MirrorVehicleLoanApprovalStatus::class,
+        ],
+        ApprovalRequestRejected::class => [
+            DispatchGenericNotification::class,
+            MirrorVehicleLoanApprovalStatus::class,
         ],
     ];
 
