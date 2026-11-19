@@ -34,6 +34,27 @@ class VehicleLoanResource extends SimpleCrudResource
             'review_notes' => $this->resource->review_notes,
             'pickup' => $this->resource->pickup,
             'returns' => $this->resource->returns,
+            'approval_requests' => $this->whenLoaded('approvalRequests', fn () => $this->resource->approvalRequests->map(fn ($approval): array => [
+                'id' => $approval->id,
+                'status' => $approval->status,
+                'current_step_order' => $approval->current_step_order,
+                'submitted_at' => $approval->submitted_at?->toIso8601String(),
+                'completed_at' => $approval->completed_at?->toIso8601String(),
+                'steps' => $approval->steps->map(fn ($step): array => [
+                    'step_order' => $step->step_order,
+                    'status' => $step->status,
+                    'action' => $step->action,
+                    'comments' => $step->comments,
+                    'acted_at' => $step->acted_at?->toIso8601String(),
+                    'approver_name' => $step->flowStep?->user?->name,
+                ])->values(),
+            ])->values()),
+            'activity_logs' => $this->whenLoaded('activityLogs', fn () => $this->resource->activityLogs->map(fn ($log): array => [
+                'id' => $log->id,
+                'event' => $log->event,
+                'actor_name' => $log->actor?->name,
+                'created_at' => $log->created_at?->toIso8601String(),
+            ])->values()),
             'created_at' => $this->resource->created_at?->toIso8601String(),
         ];
     }

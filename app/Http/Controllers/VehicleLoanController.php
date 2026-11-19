@@ -73,7 +73,7 @@ class VehicleLoanController extends Controller
     {
         return (new VehicleLoanResource($vehicleLoan->load([
             'requester', 'department', 'branch', 'company', 'driver.employee', 'vehicleUnit.asset',
-            'pickup', 'returns', 'approvalRequests', 'activityLogs',
+            'pickup', 'returns', 'approvalRequests.steps.flowStep.user', 'activityLogs.actor',
         ])))->response();
     }
 

@@ -1,6 +1,6 @@
 import { PageHeader } from '@/components/common/PageHeader';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -60,6 +60,20 @@ export default function VehicleLoanRequestPage() {
         setForm((current) => ({ ...current, [key]: value }));
     }
 
+    function validate(): boolean {
+        if (!form.start_at || !form.end_at || form.purpose.trim().length < 5) {
+            toast.error('Lengkapi jadwal dan tujuan perjalanan.');
+            return false;
+        }
+
+        if (new Date(form.end_at) <= new Date(form.start_at)) {
+            toast.error('Waktu selesai harus setelah waktu mulai.');
+            return false;
+        }
+
+        return true;
+    }
+
     async function saveDraft(): Promise<number | null> {
         setLoading(true);
         try {
@@ -77,6 +91,10 @@ export default function VehicleLoanRequestPage() {
     }
 
     async function submit() {
+        if (!validate()) {
+            return;
+        }
+
         const id = draftId ?? (await saveDraft());
 
         if (!id) {
@@ -91,7 +109,9 @@ export default function VehicleLoanRequestPage() {
             setForm(emptyForm);
             setDraftId(null);
         } catch {
-            toast.error('Gagal mengirim permintaan. Lengkapi semua field.');
+            toast.error(
+                'Gagal mengirim permintaan. Periksa kembali data Anda.',
+            );
         } finally {
             setLoading(false);
         }
@@ -100,23 +120,35 @@ export default function VehicleLoanRequestPage() {
     return (
         <AppLayout
             breadcrumbs={[
-                { title: 'Vehicle Loans', href: '/vehicle-loans/request' },
+                {
+                    title: 'Peminjaman Kendaraan',
+                    href: '/vehicle-loans/request',
+                },
             ]}
         >
             <Helmet>
-                <title>Permintaan Peminjaman Kendaraan </title>
+                <title>Permintaan Peminjaman Kendaraan</title>
             </Helmet>
-            <div className="mx-auto max-w-2xl space-y-4 p-4 md:p-6">
+            <div className="mx-auto max-w-2xl space-y-4 p-4 pb-24 md:p-6">
                 <PageHeader
                     title="Permintaan Peminjaman Kendaraan"
-                    description="Isi form berikut, simpan draft, lalu kirim untuk approval."
+                    description="Isi jadwal dan tujuan perjalanan, simpan draft, lalu kirim untuk approval."
                 />
 
                 <Card>
-                    <CardContent className="space-y-4 pt-4">
+                    <CardHeader className="pb-3">
+                        <CardTitle className="text-base">Jadwal</CardTitle>
+                    </CardHeader>
+                    <CardContent className="grid gap-4 sm:grid-cols-2">
                         <div className="grid gap-2">
                             <Label htmlFor="start_at">
-                                Mulai (tanggal & jam)
+                                Mulai
+                                <span
+                                    className="ml-1 text-destructive"
+                                    aria-hidden="true"
+                                >
+                                    *
+                                </span>
                             </Label>
                             <Input
                                 id="start_at"
@@ -129,7 +161,13 @@ export default function VehicleLoanRequestPage() {
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="end_at">
-                                Selesai (tanggal & jam)
+                                Selesai
+                                <span
+                                    className="ml-1 text-destructive"
+                                    aria-hidden="true"
+                                >
+                                    *
+                                </span>
                             </Label>
                             <Input
                                 id="end_at"
@@ -140,19 +178,46 @@ export default function VehicleLoanRequestPage() {
                                 }
                             />
                         </div>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader className="pb-3">
+                        <CardTitle className="text-base">Perjalanan</CardTitle>
+                    </CardHeader>
+                    <CardContent className="grid gap-2">
+                        <Label htmlFor="purpose">
+                            Tujuan perjalanan
+                            <span
+                                className="ml-1 text-destructive"
+                                aria-hidden="true"
+                            >
+                                *
+                            </span>
+                        </Label>
+                        <Textarea
+                            id="purpose"
+                            value={form.purpose}
+                            placeholder="Contoh: kunjungan klien ke Kantor Cabang Bandung"
+                            onChange={(e) => update('purpose', e.target.value)}
+                            rows={3}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                            Jelaskan tujuan singkat agar approver mudah menilai
+                            permintaan.
+                        </p>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader className="pb-3">
+                        <CardTitle className="text-base">
+                            Penugasan (opsional)
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="grid gap-4 sm:grid-cols-2">
                         <div className="grid gap-2">
-                            <Label htmlFor="purpose">Tujuan perjalanan</Label>
-                            <Textarea
-                                id="purpose"
-                                value={form.purpose}
-                                onChange={(e) =>
-                                    update('purpose', e.target.value)
-                                }
-                                rows={3}
-                            />
-                        </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="driver_id">Driver (opsional)</Label>
+                            <Label htmlFor="driver_id">Driver</Label>
                             <Select
                                 value={form.driver_id || 'none'}
                                 onValueChange={(value) =>
@@ -163,11 +228,11 @@ export default function VehicleLoanRequestPage() {
                                 }
                             >
                                 <SelectTrigger id="driver_id">
-                                    <SelectValue placeholder="Kosong — diisi approver" />
+                                    <SelectValue placeholder="Pilih driver" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="none">
-                                        Kosong — diisi approver
+                                        Belum ditentukan (approver melengkapi)
                                     </SelectItem>
                                     {options?.drivers.map((driver) => (
                                         <SelectItem
@@ -182,7 +247,7 @@ export default function VehicleLoanRequestPage() {
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="vehicle_unit_id">
-                                Unit kendaraan (opsional)
+                                Unit kendaraan
                             </Label>
                             <Select
                                 value={form.vehicle_unit_id || 'none'}
@@ -194,11 +259,11 @@ export default function VehicleLoanRequestPage() {
                                 }
                             >
                                 <SelectTrigger id="vehicle_unit_id">
-                                    <SelectValue placeholder="Kosong — diisi approver" />
+                                    <SelectValue placeholder="Pilih unit kendaraan" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="none">
-                                        Kosong — diisi approver
+                                        Belum ditentukan (approver melengkapi)
                                     </SelectItem>
                                     {options?.units.map((unit) => (
                                         <SelectItem
@@ -212,31 +277,36 @@ export default function VehicleLoanRequestPage() {
                                 </SelectContent>
                             </Select>
                         </div>
-                        <div className="sticky bottom-0 flex gap-2 bg-background pt-2">
-                            <Button
-                                variant="outline"
-                                onClick={() => void saveDraft()}
-                                disabled={loading}
-                                className="flex-1"
-                            >
-                                Simpan Draft
-                            </Button>
-                            <Button
-                                onClick={() => void submit()}
-                                disabled={loading}
-                                className="flex-1"
-                            >
-                                Kirim Permintaan
-                            </Button>
-                        </div>
+                        <p className="text-xs text-muted-foreground sm:col-span-2">
+                            Boleh dikosongkan. Approver dapat menetapkan driver
+                            dan unit saat review.
+                        </p>
                     </CardContent>
                 </Card>
 
                 <Card>
-                    <CardContent className="pt-4">
+                    <CardContent className="pt-6">
                         <VehicleLoanQrPanel form="request" />
                     </CardContent>
                 </Card>
+
+                <div className="sticky bottom-0 -mx-4 flex gap-2 border-t bg-background/95 p-4 backdrop-blur md:-mx-6 md:px-6">
+                    <Button
+                        variant="outline"
+                        onClick={() => void saveDraft()}
+                        disabled={loading}
+                        className="min-h-11 flex-1"
+                    >
+                        Simpan Draft
+                    </Button>
+                    <Button
+                        onClick={() => void submit()}
+                        disabled={loading}
+                        className="min-h-11 flex-1"
+                    >
+                        Kirim Permintaan
+                    </Button>
+                </div>
             </div>
         </AppLayout>
     );

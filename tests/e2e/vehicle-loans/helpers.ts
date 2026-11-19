@@ -149,7 +149,7 @@ export async function submitVehicleLoanPickup(page: Page): Promise<void> {
     await page.goto(VEHICLE_LOAN_PICKUP_PATH);
 
     await page
-        .getByRole('button', { name: 'Muat permintaan disetujui' })
+        .getByRole('button', { name: /Muat Permintaan Disetujui/i })
         .click();
     await page.waitForResponse(
         (response) =>
@@ -157,14 +157,13 @@ export async function submitVehicleLoanPickup(page: Page): Promise<void> {
             response.status() < 400,
     );
 
-    const loanInput = page.locator('#loan');
-    await expect(loanInput).toBeVisible();
-    const options = page.locator('#approved-loans option');
-    await expect(options.first()).toBeVisible();
-    const value = await options.first().getAttribute('value');
-    if (!value) throw new Error('No approved loan available for pickup');
-
-    await loanInput.fill(value);
+    const loanSelect = page.locator('#loan');
+    await expect(loanSelect).toBeVisible();
+    await loanSelect.click();
+    const firstOption = page.getByRole('option').first();
+    await expect(firstOption).toBeVisible();
+    await firstOption.click();
+    await expect(loanSelect).toContainText(/VL-/);
     await expect(page.getByText('Tujuan:')).toBeVisible();
 
     await page.locator('#selfie').setInputFiles({
@@ -182,7 +181,7 @@ export async function submitVehicleLoanPickup(page: Page): Promise<void> {
             response.url().includes('/pickups') &&
             response.status() < 400,
     );
-    await page.getByRole('button', { name: 'Kirim Form Pengambilan' }).click();
+    await page.getByRole('button', { name: 'Kirim Pengambilan' }).click();
     await responsePromise;
 }
 
@@ -240,7 +239,7 @@ export async function submitVehicleLoanReturn(page: Page): Promise<void> {
     await page.goto(VEHICLE_LOAN_RETURN_PATH);
 
     await page
-        .getByRole('button', { name: 'Muat data pengambilan saya' })
+        .getByRole('button', { name: /Muat Data Pengambilan Saya/i })
         .click();
     await page.waitForResponse(
         (response) =>
@@ -248,14 +247,13 @@ export async function submitVehicleLoanReturn(page: Page): Promise<void> {
             response.status() < 400,
     );
 
-    const pickupInput = page.locator('#pickup');
-    await expect(pickupInput).toBeVisible();
-    const options = page.locator('#my-pickups option');
-    await expect(options.first()).toBeVisible();
-    const value = await options.first().getAttribute('value');
-    if (!value) throw new Error('No handed-over pickup available for return');
-
-    await pickupInput.fill(value);
+    const pickupSelect = page.locator('#pickup');
+    await expect(pickupSelect).toBeVisible();
+    await pickupSelect.click();
+    const firstOption = page.getByRole('option').first();
+    await expect(firstOption).toBeVisible();
+    await firstOption.click();
+    await expect(pickupSelect).toContainText(/VL-/);
 
     const png = {
         name: 'bukti.png',

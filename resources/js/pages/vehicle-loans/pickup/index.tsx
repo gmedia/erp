@@ -1,12 +1,19 @@
 import { PageHeader } from '@/components/common/PageHeader';
 import { PhotoInput } from '@/components/common/PhotoInput';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { VehicleLoanQrPanel } from '@/components/vehicle-loans/VehicleLoanQrPanel';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
+import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { toast } from 'sonner';
@@ -28,15 +35,20 @@ export default function VehicleLoanPickupPage() {
     const [photoMode, setPhotoMode] = useState('with_driver');
     const [photo, setPhoto] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
+    const [loaded, setLoaded] = useState(false);
 
     async function loadApproved() {
+        setLoading(true);
         try {
             const response = await axios.get(
                 '/api/vehicle-loans?status=approved&per_page=50',
             );
             setLoans(response.data.data);
+            setLoaded(true);
         } catch {
             toast.error('Gagal memuat daftar permintaan.');
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -74,99 +86,155 @@ export default function VehicleLoanPickupPage() {
             ]}
         >
             <Helmet>
-                <title>Pengambilan Kendaraan </title>
+                <title>Pengambilan Kendaraan</title>
             </Helmet>
             <div className="mx-auto max-w-2xl space-y-4 p-4 md:p-6">
                 <PageHeader
-                    title="Form Pengambilan Kendaraan"
-                    description="Pilih permintaan yang sudah disetujui, unggah foto, lalu ambil kunci di security."
+                    title="Pengambilan Kendaraan"
+                    description="Pilih permintaan yang sudah disetujui, unggah bukti, lalu ambil kunci di pos security."
                 />
 
                 <Card>
-                    <CardContent className="space-y-4 pt-4">
+                    <CardHeader className="pb-3">
+                        <CardTitle className="text-base">
+                            Data Pengambilan
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
                         <Button
                             variant="outline"
-                            onClick={loadApproved}
-                            className="w-full"
+                            onClick={() => void loadApproved()}
+                            disabled={loading}
+                            className="min-h-11 w-full"
                         >
-                            Muat permintaan disetujui
+                            {loading
+                                ? 'Memuat...'
+                                : 'Muat Permintaan Disetujui'}
                         </Button>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="loan">Permintaan</Label>
-                            <Input
-                                id="loan"
-                                list="approved-loans"
-                                value={loanId}
-                                onChange={(e) => setLoanId(e.target.value)}
-                                placeholder="Pilih nomor permintaan"
-                            />
-                            <datalist id="approved-loans">
-                                {loans.map((loan) => (
-                                    <option key={loan.id} value={loan.id}>
-                                        {loan.code} —{' '}
-                                        {loan.plate_number ??
-                                            'unit belum ditentukan'}
-                                    </option>
-                                ))}
-                            </datalist>
+                            <Label htmlFor="loan">
+                                Permintaan
+                                <span
+                                    className="ml-1 text-destructive"
+                                    aria-hidden="true"
+                                >
+                                    *
+                                </span>
+                            </Label>
+                            <Select
+                                value={loanId || undefined}
+                                onValueChange={setLoanId}
+                                disabled={!loans.length}
+                            >
+                                <SelectTrigger id="loan">
+                                    <SelectValue
+                                        placeholder={
+                                            loaded && !loans.length
+                                                ? 'Tidak ada permintaan disetujui'
+                                                : 'Pilih permintaan'
+                                        }
+                                    />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {loans.map((loan) => (
+                                        <SelectItem
+                                            key={loan.id}
+                                            value={String(loan.id)}
+                                        >
+                                            {loan.code} —{' '}
+                                            {loan.plate_number ??
+                                                'unit belum ditentukan'}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            {loaded && !loans.length && (
+                                <p className="text-sm text-muted-foreground">
+                                    Belum ada permintaan yang disetujui. Ajukan
+                                    permintaan terlebih dahulu.
+                                </p>
+                            )}
                         </div>
 
                         {selected && (
-                            <div className="rounded-md bg-muted p-3 text-sm">
-                                <p>
-                                    <strong>{selected.code}</strong>
-                                </p>
+                            <div className="space-y-1 rounded-lg border bg-muted/30 p-3 text-sm">
+                                <p className="font-medium">{selected.code}</p>
                                 <p>Driver: {selected.driver_name ?? '-'}</p>
                                 <p>Unit: {selected.plate_number ?? '-'}</p>
                                 <p>Tujuan: {selected.purpose}</p>
                                 <p>
                                     Mulai:{' '}
-                                    {new Date(
+                                    {formatDateTimeByRegionalSettings(
                                         selected.start_at,
-                                    ).toLocaleString()}
+                                    )}
+                                </p>
+                                <p>
+                                    Selesai:{' '}
+                                    {formatDateTimeByRegionalSettings(
+                                        selected.end_at,
+                                    )}
                                 </p>
                             </div>
                         )}
+                    </CardContent>
+                </Card>
 
+                <Card>
+                    <CardHeader className="pb-3">
+                        <CardTitle className="text-base">Foto Bukti</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
                         <div className="grid gap-2">
                             <Label htmlFor="photo_mode">Jenis foto</Label>
-                            <select
-                                id="photo_mode"
-                                className="flex h-10 w-full rounded-md border bg-background px-3 text-sm"
+                            <Select
                                 value={photoMode}
-                                onChange={(e) => setPhotoMode(e.target.value)}
+                                onValueChange={setPhotoMode}
                             >
-                                <option value="with_driver">
-                                    Selfie bersama driver
-                                </option>
-                                <option value="without_driver">
-                                    Selfie dengan SIM (tanpa driver)
-                                </option>
-                            </select>
+                                <SelectTrigger id="photo_mode">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="with_driver">
+                                        Selfie bersama driver
+                                    </SelectItem>
+                                    <SelectItem value="without_driver">
+                                        Selfie dengan SIM (tanpa driver)
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
-
                         <div className="grid gap-2">
-                            <Label htmlFor="selfie">Foto</Label>
+                            <Label htmlFor="selfie">
+                                Foto selfie
+                                <span
+                                    className="ml-1 text-destructive"
+                                    aria-hidden="true"
+                                >
+                                    *
+                                </span>
+                            </Label>
                             <PhotoInput
                                 id="selfie"
                                 value={photo}
                                 onChange={setPhoto}
+                                buttonLabel="Ambil Selfie"
+                                hint="Format JPG/PNG, maksimal 5 MB. Pastikan wajah dan SIM terlihat jelas."
+                                capture
                             />
                         </div>
-
                         <Button
-                            onClick={submit}
-                            disabled={loading}
-                            className="w-full"
+                            onClick={() => void submit()}
+                            disabled={loading || !loanId || !photo}
+                            className="min-h-11 w-full"
                         >
-                            Kirim Form Pengambilan
+                            Kirim Pengambilan
                         </Button>
                     </CardContent>
                 </Card>
 
                 <Card>
-                    <CardContent className="pt-4">
+                    <CardContent className="pt-6">
                         <VehicleLoanQrPanel form="pickup" />
                     </CardContent>
                 </Card>
