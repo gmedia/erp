@@ -6,6 +6,7 @@ import {
     VEHICLE_LOAN_REQUEST_PATH,
     VEHICLE_LOAN_RETURN_PATH,
     VEHICLE_LOAN_SECURITY_PATH,
+    apiRequest,
     seedApprovedLoan,
     seedHandedOverPickup,
     submitVehicleLoanPickup,
@@ -84,7 +85,9 @@ test.describe('Vehicle Loans', () => {
     test('notification inbox is available for approval activity', async ({
         page,
     }) => {
-        const response = await page.request.get(
+        const response = await apiRequest(
+            page,
+            'get',
             '/api/notifications/unread-count',
         );
         expect(response.ok()).toBeTruthy();

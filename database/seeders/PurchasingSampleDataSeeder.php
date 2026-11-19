@@ -45,6 +45,16 @@ class PurchasingSampleDataSeeder extends Seeder
             return;
         }
 
+        $legacySupplier = Supplier::where('email', 'purchasing.sample@vendor.local')->first();
+
+        if ($legacySupplier && ! Supplier::where('email', 'procurement@vendor.example')->exists()) {
+            $legacySupplier->update([
+                'email' => 'procurement@vendor.example',
+                'name' => 'PT Sumber Makmur Sejahtera',
+                'address' => 'Jl. Industri Raya No. 12, Tangerang',
+            ]);
+        }
+
         $supplier = Supplier::query()->first();
         if (! $supplier) {
             $categoryId = SupplierCategory::query()->value('id');
@@ -53,11 +63,11 @@ class PurchasingSampleDataSeeder extends Seeder
             }
 
             $supplier = Supplier::updateOrCreate(
-                ['email' => 'purchasing.sample@vendor.local'],
+                ['email' => 'procurement@vendor.example'],
                 [
-                    'name' => 'Purchasing Sample Vendor',
+                    'name' => 'PT Sumber Makmur Sejahtera',
                     'phone' => '0215551234',
-                    'address' => 'Jl. Sample Vendor No. 1',
+                    'address' => 'Jl. Industri Raya No. 12, Tangerang',
                     'branch_id' => $branchId,
                     'category_id' => $categoryId,
                     'status' => 'active',
@@ -815,7 +825,7 @@ class PurchasingSampleDataSeeder extends Seeder
                     'priority' => $definition['priority'],
                     'status' => $status,
                     'estimated_amount' => $estimatedAmount,
-                    'notes' => 'Sample purchasing request data',
+                    'notes' => 'Permintaan pembelian kebutuhan operasional',
                     'approved_by' => $approved ? $adminUserId : null,
                     'approved_at' => $approved ? now()->subDays(30 - $index) : null,
                     'rejection_reason' => $rejected ? 'Budget tidak disetujui pada putaran approval.' : null,
@@ -834,7 +844,7 @@ class PurchasingSampleDataSeeder extends Seeder
                     'quantity_ordered' => $firstOrdered,
                     'estimated_unit_price' => $firstUnitPrice,
                     'estimated_total' => $firstQuantity * $firstUnitPrice,
-                    'notes' => 'Sample PR item A',
+                    'notes' => 'Kebutuhan operasional gudang',
                 ]
             );
 
@@ -849,7 +859,7 @@ class PurchasingSampleDataSeeder extends Seeder
                     'quantity_ordered' => $secondOrdered,
                     'estimated_unit_price' => $secondUnitPrice,
                     'estimated_total' => $secondQuantity * $secondUnitPrice,
-                    'notes' => 'Sample PR item B',
+                    'notes' => 'Kebutuhan perawatan fasilitas',
                 ]
             );
 
@@ -985,7 +995,7 @@ class PurchasingSampleDataSeeder extends Seeder
                     'discount_amount' => 0,
                     'grand_total' => $grandTotal,
                     'status' => $status,
-                    'notes' => 'Sample purchasing order data',
+                    'notes' => 'Pesanan pembelian sesuai permintaan',
                     'shipping_address' => 'Gudang Utama',
                     'approved_by' => $approved ? $adminUserId : null,
                     'approved_at' => $approved ? now()->subDays(20 - $index) : null,
@@ -1010,7 +1020,7 @@ class PurchasingSampleDataSeeder extends Seeder
                     'discount_percent' => 0,
                     'tax_percent' => 11,
                     'line_total' => $firstLineTotal,
-                    'notes' => 'Sample PO item A',
+                    'notes' => 'Kebutuhan operasional gudang',
                 ]
             );
 
@@ -1028,7 +1038,7 @@ class PurchasingSampleDataSeeder extends Seeder
                     'discount_percent' => 0,
                     'tax_percent' => 11,
                     'line_total' => $secondLineTotal,
-                    'notes' => 'Sample PO item B',
+                    'notes' => 'Kebutuhan perawatan fasilitas',
                 ]
             );
 
@@ -1302,7 +1312,7 @@ class PurchasingSampleDataSeeder extends Seeder
                     'receipt_date' => now()->subDays(12 - $index)->toDateString(),
                     'supplier_delivery_note' => 'SJ-' . now()->format('Ymd') . '-99' . ($index + 1),
                     'status' => $definition['status'],
-                    'notes' => 'Sample goods receipt data',
+                    'notes' => 'Penerimaan barang sesuai pesanan pembelian',
                     'received_by' => $requesterId,
                     'confirmed_by' => $confirmed ? $adminUserId : null,
                     'confirmed_at' => $confirmed ? now()->subDays(10 - $index) : null,
@@ -1322,7 +1332,7 @@ class PurchasingSampleDataSeeder extends Seeder
                     'quantity_accepted' => $definition['quantity_accepted'],
                     'quantity_rejected' => $definition['quantity_rejected'],
                     'unit_price' => $poItem->unit_price,
-                    'notes' => 'Sample GR item',
+                    'notes' => 'Item penerimaan barang',
                 ]
             );
 
@@ -1369,7 +1379,7 @@ class PurchasingSampleDataSeeder extends Seeder
                     'return_date' => now()->subDays(7 - $index)->toDateString(),
                     'reason' => $definition['reason'],
                     'status' => $definition['status'],
-                    'notes' => 'Sample supplier return data',
+                    'notes' => 'Retur barang ke supplier karena tidak sesuai spesifikasi',
                     'created_by' => $adminUserId,
                 ]
             );
@@ -1384,7 +1394,7 @@ class PurchasingSampleDataSeeder extends Seeder
                     'unit_id' => $baseReceiptItem->unit_id ?? $fallbackUnitId,
                     'quantity_returned' => $definition['quantity'],
                     'unit_price' => $baseReceiptItem->unit_price,
-                    'notes' => 'Sample supplier return item',
+                    'notes' => 'Item retur ke supplier',
                 ]
             );
         }

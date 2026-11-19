@@ -17,7 +17,7 @@ class SettingSampleDataSeeder extends Seeder
             [
                 'group' => 'general',
                 'key' => 'company_name',
-                'value' => 'Perusahaan Contoh',
+                'value' => 'PT Nusantara Sejahtera',
                 'type' => 'string',
             ],
             [

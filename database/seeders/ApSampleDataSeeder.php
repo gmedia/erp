@@ -189,7 +189,7 @@ class ApSampleDataSeeder extends Seeder
                     'amount_paid' => 0,
                     'amount_due' => $grandTotal,
                     'status' => $definition['status'],
-                    'notes' => 'Sample supplier bill for testing Accounts Payable module.',
+                    'notes' => 'Tagihan supplier atas pembelian barang',
                     'created_by' => $adminUserId,
                     'confirmed_by' => $definition['confirmed'] ? $adminUserId : null,
                     'confirmed_at' => $definition['confirmed'] ? $billDate->copy()->addHours(2) : null,
@@ -244,7 +244,7 @@ class ApSampleDataSeeder extends Seeder
                     'discount_percent' => $discountPercent,
                     'tax_percent' => $taxPercent,
                     'line_total' => $lineTotal,
-                    'notes' => 'Sample bill item for testing.',
+                    'notes' => 'Item tagihan sesuai faktur supplier',
                 ]
             );
         }
@@ -319,7 +319,7 @@ class ApSampleDataSeeder extends Seeder
                     'total_unallocated' => 0,
                     'reference' => 'REF-' . now()->format('Ymd') . '-' . ($index + 100),
                     'status' => $definition['status'],
-                    'notes' => 'Sample AP payment for testing.',
+                    'notes' => 'Pembayaran tagihan supplier melalui transfer bank',
                     'created_by' => $adminUserId,
                     'confirmed_by' => $definition['status'] === 'confirmed' ? $adminUserId : null,
                     'confirmed_at' => $definition['status'] === 'confirmed' ? $paymentDate->copy()->addHours(1) : null,
@@ -341,7 +341,7 @@ class ApSampleDataSeeder extends Seeder
                     [
                         'allocated_amount' => $allocation['amount'],
                         'discount_taken' => 0,
-                        'notes' => 'Payment allocation for testing.',
+                        'notes' => 'Alokasi pembayaran ke tagihan supplier',
                     ]
                 );
 

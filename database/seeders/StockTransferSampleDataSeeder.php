@@ -138,7 +138,7 @@ class StockTransferSampleDataSeeder extends Seeder
                 array_merge([
                     'from_warehouse_id' => $fromWarehouse->id,
                     'to_warehouse_id' => $toWarehouse->id,
-                    'notes' => 'Sample data',
+                    'notes' => 'Pemindahan stok antar gudang',
                 ], $sample['actors'], [
                     'transfer_date' => $sample['transfer_date'],
                     'expected_arrival_date' => $sample['expected_arrival_date'],
@@ -169,8 +169,26 @@ class StockTransferSampleDataSeeder extends Seeder
         }
     }
 
+    private function renameLegacyProducts(): void
+    {
+        $map = [
+            'INV-SMP-001' => 'INV-2026-001',
+            'INV-SMP-002' => 'INV-2026-002',
+            'INV-SMP-003' => 'INV-2026-003',
+        ];
+
+        foreach ($map as $legacy => $current) {
+            if (Product::where('code', $current)->exists()) {
+                continue;
+            }
+
+            Product::where('code', $legacy)->update(['code' => $current]);
+        }
+    }
+
     private function ensureProducts(int $branchId): Collection
     {
+        $this->renameLegacyProducts();
         $products = Product::query()->orderBy('id')->take(3)->get();
 
         if ($products->count() >= 3) {
@@ -182,20 +200,20 @@ class StockTransferSampleDataSeeder extends Seeder
 
         $samples = [
             [
-                'code' => 'INV-SMP-001',
-                'name' => 'Inventory Sample Product A',
+                'code' => 'INV-2026-001',
+                'name' => 'Kabel HDMI 2 Meter',
                 'type' => 'raw_material',
                 'cost' => 10000,
             ],
             [
-                'code' => 'INV-SMP-002',
-                'name' => 'Inventory Sample Product B',
+                'code' => 'INV-2026-002',
+                'name' => 'Mouse Wireless M170',
                 'type' => 'raw_material',
                 'cost' => 15000,
             ],
             [
-                'code' => 'INV-SMP-003',
-                'name' => 'Inventory Sample Product C',
+                'code' => 'INV-2026-003',
+                'name' => 'Keyboard Mekanik K2',
                 'type' => 'finished_good',
                 'cost' => 25000,
             ],
@@ -247,7 +265,7 @@ class StockTransferSampleDataSeeder extends Seeder
                 'quantity' => $quantity,
                 'quantity_received' => $quantityReceived,
                 'unit_cost' => (float) $product->cost,
-                'notes' => 'Sample item',
+                'notes' => 'Transfer stok sesuai permintaan',
             ];
         }
 

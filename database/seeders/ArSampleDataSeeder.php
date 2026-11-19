@@ -22,6 +22,14 @@ class ArSampleDataSeeder extends Seeder
 {
     public function run(): void
     {
+        Customer::where('address', 'like', 'Jl. Sample No.%')
+            ->get()
+            ->each(function (Customer $customer): void {
+                $customer->update([
+                    'address' => str_replace('Jl. Sample No.', 'Jl. Sudirman No.', (string) $customer->address),
+                ]);
+            });
+
         $adminUserId = User::query()
             ->where('email', config('app.admin'))
             ->value('id') ?? User::query()->value('id');
@@ -50,7 +58,7 @@ class ArSampleDataSeeder extends Seeder
                     'name' => $name,
                     'email' => strtolower(str_replace([' ', '.'], ['', ''], $name)) . '@example.com',
                     'phone' => '08' . rand(1000000000, 9999999999),
-                    'address' => 'Jl. Sample No. ' . rand(1, 100) . ', Jakarta',
+                    'address' => 'Jl. Sudirman No. ' . rand(1, 100) . ', Jakarta',
                     'branch_id' => $branch->id,
                     'category_id' => $categoryId,
                     'status' => 'active',
@@ -212,7 +220,7 @@ class ArSampleDataSeeder extends Seeder
                     'credit_note_amount' => $definition['credit_note_amount'],
                     'amount_due' => $definition['grand_total'] - $definition['amount_received'] - $definition['credit_note_amount'],
                     'status' => $definition['status'],
-                    'notes' => 'Sample customer invoice data',
+                    'notes' => 'Invoice penjualan sesuai pesanan pelanggan',
                     'journal_entry_id' => null,
                     'created_by' => $adminUserId,
                     'sent_by' => $definition['sent_by'],
@@ -239,8 +247,8 @@ class ArSampleDataSeeder extends Seeder
                         'tax_percent' => 10,
                         'line_total' => $quantity * $unitPrice,
                         'account_id' => $revenueAccount->id,
-                        'description' => 'Sample item',
-                        'notes' => 'Sample invoice item',
+                        'description' => 'Penjualan barang sesuai pesanan',
+                        'notes' => 'Item invoice sesuai pesanan pelanggan',
                     ]
                 );
             }
@@ -317,7 +325,7 @@ class ArSampleDataSeeder extends Seeder
                     'total_unallocated' => $definition['total_amount'] - $definition['total_allocated'],
                     'reference' => 'TRF-' . now()->format('Ymd') . '-' . ($index + 1),
                     'status' => $definition['status'],
-                    'notes' => 'Sample AR receipt data',
+                    'notes' => 'Penerimaan pembayaran melalui transfer bank',
                     'journal_entry_id' => null,
                     'created_by' => $adminUserId,
                     'confirmed_by' => $definition['status'] === 'confirmed' ? $adminUserId : null,
@@ -339,7 +347,7 @@ class ArSampleDataSeeder extends Seeder
                     [
                         'allocated_amount' => $allocationData['amount'],
                         'discount_given' => 0,
-                        'notes' => 'Sample receipt allocation',
+                        'notes' => 'Alokasi pembayaran ke invoice terkait',
                     ]
                 );
 
@@ -418,7 +426,7 @@ class ArSampleDataSeeder extends Seeder
                     'tax_amount' => $taxAmount,
                     'grand_total' => $definition['grand_total'],
                     'status' => $definition['status'],
-                    'notes' => 'Sample credit note data',
+                    'notes' => 'Nota kredit atas retur penjualan',
                     'journal_entry_id' => null,
                     'created_by' => $adminUserId,
                     'confirmed_by' => in_array($definition['status'], ['confirmed', 'applied'], true) ? $adminUserId : null,
@@ -445,7 +453,7 @@ class ArSampleDataSeeder extends Seeder
                         'line_total' => $quantity * $unitPrice,
                         'account_id' => $revenueAccount->id,
                         'description' => 'Credit note item',
-                        'notes' => 'Sample credit note item',
+                        'notes' => 'Item nota kredit atas retur penjualan',
                     ]
                 );
             }

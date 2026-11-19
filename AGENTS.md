@@ -10,6 +10,7 @@
 3. **Every MR must have a handoff** (what was done, files changed, next steps).
 4. **Session start: process open MRs first** — merge if green, fix if red.
 5. **Process budget (OpenCode stability) — HARD LIMIT.** Parallel tool/agent fan-out kills the host session. Follow **Tool & Process Concurrency** below with zero exceptions.
+6. **Seeder data harus realistis (WAJIB).** Data demo tidak boleh menampilkan penanda seperti `sample`, `dummy`, `test`, `contoh`, atau `lorem` di field yang dilihat pengguna (kode, nama, tujuan, catatan, plat, SIM). Pakai format produksi (mis. `VL-2026-0001`, `B 1234 XYZ`, `Budi Santoso`). Seeder wajib idempoten, mencakup semua stage workflow, konsisten dengan source of truth (approval/pipeline), dan membersihkan data demo lama bila format kode berubah. Detail: `database/AGENTS.md` → **Seeder Data Rules (MANDATORY)**.
 
 ## Tool & Process Concurrency (HARD — prevents OpenCode kill)
 
