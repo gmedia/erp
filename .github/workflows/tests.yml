@@ -565,6 +565,57 @@ jobs:
           path: android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 7
 
+  mobile_emulator:
+    name: Android emulator smoke test
+    needs: mobile_android
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    continue-on-error: true
+    permissions:
+      contents: read
+
+    steps:
+      - name: Download debug APK
+        uses: actions/download-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: app-debug-apk
+          path: apk
+
+      - name: Launch emulator and smoke test
+        uses: ReactiveCircus/android-emulator-runner@e93c997dcab69054e999e3924af3d21c4a736e13 # v2.9.0
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_5
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
+          script: |
+            set -e
+            adb install -r apk/app-debug.apk
+            adb shell am start -W -n com.contoh.erp/.MainActivity
+            sleep 15
+            pid="$(adb shell pidof com.contoh.erp | tr -d '\r')"
+            if [ -z "$pid" ]; then
+              echo "App process is not running after launch"
+              exit 1
+            fi
+            echo "App process pid=$pid"
+            adb exec-out screencap -p > android-smoke.png
+            if adb logcat -d -s AndroidRuntime:E | grep -q "FATAL EXCEPTION"; then
+              echo "FATAL EXCEPTION detected in logcat"
+              exit 1
+            fi
+
+      - name: Upload emulator screenshot
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: android-smoke
+          path: android-smoke.png
+          if-no-files-found: ignore
+          retention-days: 7
+
   ci:
     name: Test suite via Sail
     needs: [quality, e2e, mobile_android]
