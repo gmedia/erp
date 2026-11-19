@@ -573,6 +573,9 @@ jobs:
     continue-on-error: true
     permissions:
       contents: read
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
 
     steps:
       - name: Download debug APK
@@ -580,6 +583,9 @@ jobs:
         with:
           name: app-debug-apk
           path: apk
+
+      - name: Add Android platform tools to PATH
+        run: echo "$ANDROID_HOME/platform-tools" >> "$GITHUB_PATH"
 
       - name: Launch emulator and smoke test
         uses: ReactiveCircus/android-emulator-runner@e93c997dcab69054e999e3924af3d21c4a736e13 # v2.9.0
