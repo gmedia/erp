@@ -51,6 +51,15 @@ interface SettingsData {
         mail_from_address?: string;
         mail_from_name?: string;
     };
+    authentication?: {
+        social_login_enabled?: boolean;
+        password_login_enabled?: boolean;
+        social_login_allow_personal?: boolean;
+        social_login_auto_link_by_email?: boolean;
+        social_login_jit_provisioning?: boolean;
+        social_login_allowed_domains?: string[];
+        social_login_allowed_tenants?: string[];
+    };
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -759,6 +768,228 @@ interface AdminSettingsResponse {
     settings: SettingsData;
 }
 
+function AuthenticationSettings({
+    settings,
+    onSaved,
+}: Readonly<{
+    settings: SettingsData['authentication'];
+    onSaved?: () => Promise<void> | void;
+}>) {
+    const [processing, setProcessing] = useState(false);
+    const [recentlySuccessful, setRecentlySuccessful] = useState(false);
+    const [errors, setErrors] = useState<Record<string, string>>({});
+    const [socialEnabled, setSocialEnabled] = useState(
+        settings?.social_login_enabled ?? true,
+    );
+    const [passwordEnabled, setPasswordEnabled] = useState(
+        settings?.password_login_enabled ?? true,
+    );
+    const [personalEnabled, setPersonalEnabled] = useState(
+        settings?.social_login_allow_personal ?? false,
+    );
+    const [autoLink, setAutoLink] = useState(
+        settings?.social_login_auto_link_by_email ?? false,
+    );
+    const [jit, setJit] = useState(
+        settings?.social_login_jit_provisioning ?? false,
+    );
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setProcessing(true);
+        setErrors({});
+        setRecentlySuccessful(false);
+
+        try {
+            const formData = new FormData(e.currentTarget);
+            await axiosInstance.put(
+                '/api/admin-settings',
+                Object.fromEntries(formData.entries()),
+            );
+            await onSaved?.();
+            setRecentlySuccessful(true);
+            setTimeout(() => setRecentlySuccessful(false), 3000);
+        } catch (error: unknown) {
+            const newErrors = mapFirstValidationErrors(error);
+            if (Object.keys(newErrors).length > 0) {
+                setErrors(newErrors);
+            }
+        } finally {
+            setProcessing(false);
+        }
+    };
+
+    const toggles = [
+        {
+            key: 'social_login_enabled',
+            label: 'Enable social login',
+            description:
+                'Allow sign in with Google Workspace or Microsoft 365.',
+            checked: socialEnabled,
+            set: setSocialEnabled,
+            testId: 'social-login-enabled',
+        },
+        {
+            key: 'password_login_enabled',
+            label: 'Enable password login',
+            description: 'Allow the email and password form on the login page.',
+            checked: passwordEnabled,
+            set: setPasswordEnabled,
+            testId: 'password-login-enabled',
+        },
+        {
+            key: 'social_login_allow_personal',
+            label: 'Allow personal accounts',
+            description:
+                'Allow personal Google or Microsoft accounts (off by default).',
+            checked: personalEnabled,
+            set: setPersonalEnabled,
+            testId: 'social-login-personal',
+        },
+        {
+            key: 'social_login_auto_link_by_email',
+            label: 'Auto-link by email',
+            description:
+                'Link a social profile automatically when the email matches.',
+            checked: autoLink,
+            set: setAutoLink,
+            testId: 'social-login-auto-link',
+        },
+        {
+            key: 'social_login_jit_provisioning',
+            label: 'Auto-create users',
+            description:
+                'Create a user on first social sign in. HR provisioning is still required.',
+            checked: jit,
+            set: setJit,
+            testId: 'social-login-jit',
+        },
+    ];
+
+    return (
+        <div className="space-y-6">
+            <HeadingSmall
+                title="Authentication"
+                description="Manage sign-in methods and allowed organizations"
+            />
+
+            <form
+                onSubmit={handleSubmit}
+                data-testid="authentication-settings-form"
+                className="space-y-6"
+            >
+                {toggles.map((toggle) => (
+                    <div
+                        key={toggle.key}
+                        className="flex items-start gap-3 rounded-md border px-3 py-2"
+                    >
+                        <Checkbox
+                            id={toggle.key}
+                            checked={toggle.checked}
+                            onCheckedChange={(checked) =>
+                                toggle.set(checked === true)
+                            }
+                            data-testid={toggle.testId}
+                            className="mt-0.5"
+                        />
+                        <div className="space-y-1">
+                            <Label
+                                htmlFor={toggle.key}
+                                className="cursor-pointer"
+                            >
+                                {toggle.label}
+                            </Label>
+                            <p className="text-sm text-muted-foreground">
+                                {toggle.description}
+                            </p>
+                        </div>
+                        <input
+                            type="hidden"
+                            name={toggle.key}
+                            value={toggle.checked ? '1' : '0'}
+                        />
+                    </div>
+                ))}
+
+                <div className="grid gap-2">
+                    <Label htmlFor="social_login_allowed_domains">
+                        Allowed email domains
+                    </Label>
+                    <textarea
+                        id="social_login_allowed_domains"
+                        name="social_login_allowed_domains"
+                        defaultValue={(
+                            settings?.social_login_allowed_domains ?? []
+                        ).join(', ')}
+                        placeholder="example.com, subsidiary.example"
+                        rows={3}
+                        className="flex min-h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        data-testid="social-allowed-domains"
+                    />
+                    <p className="text-sm text-muted-foreground">
+                        Comma-separated. Leave empty to deny all Workspace
+                        sign-ins.
+                    </p>
+                    {errors.social_login_allowed_domains && (
+                        <p className="text-sm text-destructive">
+                            {errors.social_login_allowed_domains}
+                        </p>
+                    )}
+                </div>
+
+                <div className="grid gap-2">
+                    <Label htmlFor="social_login_allowed_tenants">
+                        Allowed Microsoft tenants
+                    </Label>
+                    <textarea
+                        id="social_login_allowed_tenants"
+                        name="social_login_allowed_tenants"
+                        defaultValue={(
+                            settings?.social_login_allowed_tenants ?? []
+                        ).join(', ')}
+                        placeholder="tenant-id"
+                        rows={3}
+                        className="flex min-h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        data-testid="social-allowed-tenants"
+                    />
+                    <p className="text-sm text-muted-foreground">
+                        Comma-separated. Leave empty to deny all Microsoft 365
+                        sign-ins.
+                    </p>
+                    {errors.social_login_allowed_tenants && (
+                        <p className="text-sm text-destructive">
+                            {errors.social_login_allowed_tenants}
+                        </p>
+                    )}
+                </div>
+
+                <div className="flex items-center gap-4">
+                    <Button
+                        disabled={processing}
+                        className="min-w-24"
+                        data-testid="save-authentication-settings"
+                    >
+                        {processing ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : null}
+                        Save
+                    </Button>
+
+                    <Transition
+                        show={recentlySuccessful}
+                        enter="transition ease-in-out duration-300"
+                        enterFrom="opacity-0"
+                        leave="transition ease-in-out duration-300"
+                        leaveTo="opacity-0"
+                    >
+                        <p className="text-sm text-green-600">Saved</p>
+                    </Transition>
+                </div>
+            </form>
+        </div>
+    );
+}
+
 export default function AdminSettings() {
     const [searchParams] = useSearchParams();
     const currentGroup = searchParams.get('group') || 'general';
@@ -827,6 +1058,12 @@ export default function AdminSettings() {
                 )}
                 {currentGroup === 'smtp' && (
                     <SmtpSettings settings={data?.settings?.smtp} />
+                )}
+                {currentGroup === 'authentication' && (
+                    <AuthenticationSettings
+                        settings={data?.settings?.authentication}
+                        onSaved={handleGeneralSettingsSaved}
+                    />
                 )}
             </AdminSettingsLayout>
         </AppLayout>

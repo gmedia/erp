@@ -4,7 +4,7 @@ import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { LoaderCircle } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import InputError from '@/components/input-error';
@@ -20,6 +20,8 @@ import AuthLayout from '@/layouts/auth-layout';
 
 export default function TwoFactorChallenge() {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const socialTicket = searchParams.get('social_ticket') ?? '';
     const [showRecoveryInput, setShowRecoveryInput] = useState<boolean>(false);
     const [code, setCode] = useState<string>('');
     const [processing, setProcessing] = useState(false);
@@ -68,6 +70,19 @@ export default function TwoFactorChallenge() {
         }
 
         try {
+            if (socialTicket) {
+                const response = await axiosInstance.post(
+                    '/api/social/two-factor/verify',
+                    { social_ticket: socialTicket, code },
+                );
+                window.location.assign(
+                    `/auth/social/callback#ticket=${encodeURIComponent(
+                        response.data.ticket,
+                    )}`,
+                );
+                return;
+            }
+
             await axiosInstance.post('/two-factor-challenge', data);
 
             // Re-fetch user to get the latest employee/permissions loaded and redirect
@@ -156,16 +171,18 @@ export default function TwoFactorChallenge() {
                         Continue
                     </Button>
 
-                    <div className="text-center text-sm text-muted-foreground">
-                        <span>or you can </span>
-                        <button
-                            type="button"
-                            className="cursor-pointer text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
-                            onClick={toggleRecoveryMode}
-                        >
-                            {authConfigContent.toggleText}
-                        </button>
-                    </div>
+                    {!socialTicket && (
+                        <div className="text-center text-sm text-muted-foreground">
+                            <span>or you can </span>
+                            <button
+                                type="button"
+                                className="cursor-pointer text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
+                                onClick={toggleRecoveryMode}
+                            >
+                                {authConfigContent.toggleText}
+                            </button>
+                        </div>
+                    )}
                 </form>
             </div>
         </AuthLayout>

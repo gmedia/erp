@@ -26,6 +26,11 @@ const sidebarNavItems: NavItem[] = [
         href: '/admin-settings?group=smtp',
         icon: null,
     },
+    {
+        title: 'Authentication',
+        href: '/admin-settings?group=authentication',
+        icon: null,
+    },
 ];
 
 export default function AdminSettingsLayout({

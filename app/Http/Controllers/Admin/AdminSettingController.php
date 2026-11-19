@@ -55,7 +55,7 @@ class AdminSettingController extends Controller
                 array_map('trim', explode(',', $raw)),
                 fn (string $v): bool => $v !== '',
             ));
-            $validated[$listKey] = json_encode($items) ?: '[]';
+            $validated[$listKey] = $items;
         }
 
         foreach ($validated as $key => $value) {
