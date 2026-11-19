@@ -384,7 +384,18 @@ jobs:
           restore-keys: ${{ runner.os }}-playwright-
 
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+        shell: bash
+        run: |
+          for attempt in 1 2 3; do
+            if npx playwright install --with-deps chromium; then
+              exit 0
+            fi
+            echo "Playwright browser install failed (attempt ${attempt}/3). Retrying in 15s..."
+            sudo apt-get clean || true
+            sleep 15
+          done
+          echo "::error::Playwright browser install failed after 3 attempts."
+          exit 1
 
       - name: Run Playwright E2E
         run: >
