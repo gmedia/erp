@@ -4,10 +4,12 @@ use App\Http\Middleware\CheckPermission;
 use App\Http\Middleware\ContentSecurityPolicy;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\SetLocaleMiddleware;
+use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use Sentry\Laravel\Integration;
 
@@ -19,6 +21,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // This is a JSON API + SPA with no named login route. Returning null
+        // lets unauthenticated API requests raise AuthenticationException
+        // instead of redirecting to a route that does not exist.
+        Authenticate::redirectUsing(fn () => null);
+
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state', 'locale']);
 
         $middleware->web(append: [
@@ -37,5 +44,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        $exceptions->shouldRenderJsonWhen(fn (Request $request) => $request->is('api/*'));
+
         Integration::handles($exceptions);
     })->create();
