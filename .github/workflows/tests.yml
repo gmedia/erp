@@ -199,6 +199,10 @@ jobs:
         if: steps.autofix.outputs.changed != 'true'
         run: ./vendor/bin/sail npm run build
 
+      - name: Build mobile bundle
+        if: steps.autofix.outputs.changed != 'true'
+        run: ./vendor/bin/sail npm run build:mobile
+
       - name: Run tests with coverage
         if: ${{ steps.autofix.outputs.changed != 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
         run: ./vendor/bin/sail test --colors=always --coverage-clover=coverage.xml
@@ -513,9 +517,57 @@ jobs:
             ./vendor/bin/sail down -v
           fi
 
+  mobile_android:
+    name: Android debug build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+
+    steps:
+      - name: Checkout source branch
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          repository: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit --fund=false
+
+      - name: Setup Java
+        uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4.8.0
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      - name: Build mobile bundle and sync Android
+        run: npm run mobile:sync
+
+      - name: Build debug APK
+        run: cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: app-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 7
+
   ci:
     name: Test suite via Sail
-    needs: [quality, e2e]
+    needs: [quality, e2e, mobile_android]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -527,10 +579,11 @@ jobs:
             exit 1
           fi
 
-          echo "quality=${{ needs.quality.result }} e2e=${{ needs.e2e.result }}"
+          echo "quality=${{ needs.quality.result }} e2e=${{ needs.e2e.result }} mobile=${{ needs.mobile_android.result }}"
 
           quality_result="${{ needs.quality.result }}"
           e2e_result="${{ needs.e2e.result }}"
+          mobile_result="${{ needs.mobile_android.result }}"
 
           if [[ "$quality_result" == "success" ]]; then
             echo "✅ quality=success"
@@ -548,7 +601,15 @@ jobs:
             e2e_passed=false
           fi
 
-          if [[ "$quality_passed" == "true" ]] && [[ "$e2e_passed" == "true" ]]; then
+          if [[ "$mobile_result" == "success" ]]; then
+            echo "mobile=$mobile_result"
+            mobile_passed=true
+          else
+            echo "mobile=$mobile_result"
+            mobile_passed=false
+          fi
+
+          if [[ "$quality_passed" == "true" ]] && [[ "$e2e_passed" == "true" ]] && [[ "$mobile_passed" == "true" ]]; then
             echo "CI=success"
             echo "ci=success" >> "$GITHUB_OUTPUT"
             exit 0

@@ -1,6 +1,9 @@
 import baseAxios from 'axios';
 
+const baseURL = import.meta.env.VITE_API_BASE_URL ?? '';
+
 const axios = baseAxios.create({
+    baseURL,
     headers: {
         'X-Requested-With': 'XMLHttpRequest',
         Accept: 'application/json',
