@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\SocialAuthController;
 use Illuminate\Support\Facades\Route;
 
 // All routes here are automatically prefixed with /api/ by Laravel
@@ -8,11 +9,24 @@ use Illuminate\Support\Facades\Route;
 Route::post('login', [AuthController::class, 'login']);
 Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('reset-password', [AuthController::class, 'resetPassword']);
+Route::get('social/policy', [SocialAuthController::class, 'policy']);
+Route::get('social/{provider}/redirect', [SocialAuthController::class, 'redirect'])
+    ->middleware('throttle:social-redirect');
+Route::get('social/{provider}/callback', [SocialAuthController::class, 'callback'])
+    ->middleware('throttle:social-callback');
+Route::post('social/exchange', [SocialAuthController::class, 'exchange'])
+    ->middleware('throttle:social-exchange');
+Route::post('social/two-factor/verify', [SocialAuthController::class, 'verifyTwoFactor'])
+    ->middleware('throttle:social-exchange');
 
 // === PROTECTED ===
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::get('me', [AuthController::class, 'me']);
+
+    Route::get('social/accounts', [SocialAuthController::class, 'accounts']);
+    Route::delete('social/accounts/{socialAccount}', [SocialAuthController::class, 'unlink']);
+    Route::post('social/set-password', [SocialAuthController::class, 'setPassword']);
 
     require __DIR__ . '/api/ap-payments.php';
     require __DIR__ . '/api/account-mappings.php';

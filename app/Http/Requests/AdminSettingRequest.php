@@ -36,6 +36,15 @@ class AdminSettingRequest extends AuthorizedFormRequest
             'mail_from_address' => ['nullable', 'string', 'email', 'max:255'],
             'mail_from_name' => ['nullable', 'string', 'max:255'],
             'test_email' => ['nullable', 'string', 'email', 'max:255'],
+
+            // Authentication policy (managed by admins, stored in `settings`).
+            'social_login_enabled' => ['nullable', 'boolean'],
+            'social_login_jit_provisioning' => ['nullable', 'boolean'],
+            'social_login_auto_link_by_email' => ['nullable', 'boolean'],
+            'social_login_allow_personal' => ['nullable', 'boolean'],
+            'password_login_enabled' => ['nullable', 'boolean'],
+            'social_login_allowed_domains' => ['nullable', 'string', 'max:4000'],
+            'social_login_allowed_tenants' => ['nullable', 'string', 'max:4000'],
         ];
     }
 }

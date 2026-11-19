@@ -3,7 +3,7 @@ import { Page, expect } from '@playwright/test';
 type ApiResponseMatcher = string | RegExp | ((url: string) => boolean);
 
 const pageDebugListenersAttached = new WeakSet<Page>();
-const DEFAULT_E2E_EMAIL = 'admin@dokfin.id';
+export const DEFAULT_E2E_EMAIL = process.env.APP_ADMIN ?? 'admin@example.com';
 const DEFAULT_E2E_PASSWORD = 'password';
 
 interface LoginOptions {
@@ -216,7 +216,7 @@ export async function createEntity(
  * Logs in a user using the provided credentials.
  *
  * @param page - Playwright Page object.
- * @param email - User email address. Defaults to 'admin@dokfin.id'.
+ * @param email - User email address. Defaults to APP_ADMIN.
  * @param password - User password. Defaults to 'password'.
  *
  * @returns A promise that resolves when navigation to the dashboard is complete.

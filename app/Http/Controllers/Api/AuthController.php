@@ -9,6 +9,7 @@ use App\Models\Employee;
 use App\Models\Menu;
 use App\Models\Setting;
 use App\Models\User;
+use App\Services\SocialAuth\SocialLoginPolicy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
@@ -27,6 +28,10 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
+        if (! SocialLoginPolicy::passwordLoginEnabled()) {
+            return response()->json(['message' => __('Password login is disabled.')], 403);
+        }
+
         $credentials = $request->only('email', 'password');
 
         if (! Auth::attempt($credentials)) {

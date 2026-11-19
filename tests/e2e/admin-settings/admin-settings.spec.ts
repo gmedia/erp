@@ -1,5 +1,5 @@
 import { test, expect, type Page, type Response } from '@playwright/test';
-import { login } from '../helpers';
+import { DEFAULT_E2E_EMAIL, login } from '../helpers';
 
 async function saveAdminSettings(
     page: Page,
@@ -274,7 +274,7 @@ test.describe('Admin Settings', () => {
         await expect(testEmailInput).toBeVisible();
 
         // Fill in a test email
-        await testEmailInput.fill('admin@dokfin.id');
+        await testEmailInput.fill(DEFAULT_E2E_EMAIL);
 
         // Click the send button
         const sendTestButton = page.getByTestId('send-test-email');

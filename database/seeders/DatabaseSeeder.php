@@ -45,7 +45,7 @@ class DatabaseSeeder extends Seeder
 
         // Seed sample users for approvals
         User::updateOrCreate(
-            ['email' => 'manager.hr@dokfin.id'],
+            ['email' => 'manager.hr@example.com'],
             [
                 'name' => 'HR Manager',
                 'password' => Hash::make('password'),
@@ -54,7 +54,7 @@ class DatabaseSeeder extends Seeder
         );
 
         User::updateOrCreate(
-            ['email' => 'director.finance@dokfin.id'],
+            ['email' => 'director.finance@example.com'],
             [
                 'name' => 'Finance Director',
                 'password' => Hash::make('password'),
@@ -63,7 +63,7 @@ class DatabaseSeeder extends Seeder
         );
 
         User::updateOrCreate(
-            ['email' => 'staff.it@dokfin.id'],
+            ['email' => 'staff.it@example.com'],
             [
                 'name' => 'IT Staff',
                 'password' => Hash::make('password'),
@@ -72,6 +72,7 @@ class DatabaseSeeder extends Seeder
         );
 
         $this->call([
+            AuthenticationSettingSeeder::class,
             BranchSeeder::class,
             WarehouseSeeder::class,
             DepartmentSeeder::class,
@@ -125,9 +126,9 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Sample Employees for Approvals
-        $hrManagerUser = User::where('email', 'manager.hr@dokfin.id')->first();
+        $hrManagerUser = User::where('email', 'manager.hr@example.com')->first();
         $hrManagerEmployee = Employee::updateOrCreate([
-            'email' => 'manager.hr@dokfin.id',
+            'email' => 'manager.hr@example.com',
             'user_id' => $hrManagerUser->id,
         ], [
             'employee_id' => 'EMP-HR001',
@@ -142,9 +143,9 @@ class DatabaseSeeder extends Seeder
             'employment_status' => 'regular',
         ]);
 
-        $financeDirectorUser = User::where('email', 'director.finance@dokfin.id')->first();
+        $financeDirectorUser = User::where('email', 'director.finance@example.com')->first();
         $financeDirectorEmployee = Employee::updateOrCreate([
-            'email' => 'director.finance@dokfin.id',
+            'email' => 'director.finance@example.com',
             'user_id' => $financeDirectorUser->id,
         ], [
             'employee_id' => 'EMP-FIN001',
@@ -159,9 +160,9 @@ class DatabaseSeeder extends Seeder
             'employment_status' => 'regular',
         ]);
 
-        $itStaffUser = User::where('email', 'staff.it@dokfin.id')->first();
+        $itStaffUser = User::where('email', 'staff.it@example.com')->first();
         $itStaffEmployee = Employee::updateOrCreate([
-            'email' => 'staff.it@dokfin.id',
+            'email' => 'staff.it@example.com',
             'user_id' => $itStaffUser->id,
         ], [
             'employee_id' => 'EMP-IT001',
@@ -202,9 +203,9 @@ class DatabaseSeeder extends Seeder
         foreach ([
             'test@example.com',
             config('app.admin'),
-            'manager.hr@dokfin.id',
-            'director.finance@dokfin.id',
-            'staff.it@dokfin.id',
+            'manager.hr@example.com',
+            'director.finance@example.com',
+            'staff.it@example.com',
         ] as $email) {
             $employee = Employee::where('email', $email)->first();
             if ($employee) {

@@ -3,6 +3,7 @@
 use App\Actions\Approvals\RepairMissingApprovalStepsAction;
 use App\Actions\RecurringJournals\ExecuteRecurringJournalAction;
 use App\Models\RecurringJournal;
+use App\Models\SocialLoginTicket;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
@@ -47,6 +48,12 @@ Artisan::command('recurring-journals:execute', function () {
 })->purpose('Execute all due recurring journals');
 
 Schedule::command('recurring-journals:execute')->daily();
+
+Schedule::call(function () {
+    SocialLoginTicket::query()
+        ->where('expires_at', '<', now()->subDay())
+        ->delete();
+})->everyFiveMinutes()->name('cleanup-social-login-tickets');
 
 Schedule::command('journals:detect-cross-branch', ['--posted-only'])
     ->weekly()

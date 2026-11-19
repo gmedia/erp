@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test';
-import { login } from '../helpers';
+import { DEFAULT_E2E_EMAIL, login } from '../helpers';
 
 test.describe('My Approvals', () => {
     test.beforeEach(async ({ page }) => {
         // Authenticate using login helper
-        await login(page, 'admin@dokfin.id', undefined, { requireDashboard: false });
+        await login(page, DEFAULT_E2E_EMAIL, undefined, { requireDashboard: false });
     });
 
     test('can view and approve pending request', async ({ page }) => {

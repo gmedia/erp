@@ -18,8 +18,8 @@ class ApprovalFlowSampleDataSeeder extends Seeder
     public function run(): void
     {
         $admin = User::where('email', config('app.admin'))->first();
-        $hrManager = User::where('email', 'manager.hr@dokfin.id')->first();
-        $financeDirector = User::where('email', 'director.finance@dokfin.id')->first();
+        $hrManager = User::where('email', 'manager.hr@example.com')->first();
+        $financeDirector = User::where('email', 'director.finance@example.com')->first();
 
         if (! $admin || ! $hrManager || ! $financeDirector) {
             return;
