@@ -70,6 +70,8 @@ class GlExtendedSampleDataSeeder extends Seeder
             $journal = RecurringJournal::updateOrCreate(
                 ['name' => $name, 'fiscal_year_id' => $fiscalYear->id],
                 [
+                    'description' => $name . ' - {MM}/{YYYY}',
+                    'reference_template' => 'RJ-{YYYY}-{MM}-{DD}-' . str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT),
                     'frequency' => $index === 0 ? 'weekly' : 'monthly',
                     'next_run_date' => now()->startOfMonth()->addMonths($index),
                     'total_amount' => $amount,

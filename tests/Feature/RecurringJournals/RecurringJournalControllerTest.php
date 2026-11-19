@@ -31,7 +31,8 @@ function recurringJournalPayload(?FiscalYear $fiscalYear = null): array
 
     return [
         'name' => 'Monthly Accrual',
-        'description' => 'Monthly accrual template',
+        'description_template' => 'Monthly accrual {MM}/{YYYY}',
+        'reference_template' => 'RJ-{YYYY}-{MM}-{DD}',
         'fiscal_year_id' => $fiscalYear->id,
         'frequency' => 'monthly',
         'next_run_date' => '2026-01-15',
@@ -55,9 +56,41 @@ test('it can list recurring journals', function () {
 test('it can create a recurring journal with lines', function () {
     $response = postJson('/api/recurring-journals', recurringJournalPayload());
 
-    $response->assertCreated()->assertJsonStructure(['data' => ['id', 'name', 'lines']]);
-    assertDatabaseHas('recurring_journals', ['name' => 'Monthly Accrual', 'total_amount' => 1000]);
+    $response
+        ->assertCreated()
+        ->assertJsonStructure(['data' => ['id', 'name', 'lines']])
+        ->assertJsonPath('data.description_template', 'Monthly accrual {MM}/{YYYY}')
+        ->assertJsonPath('data.reference_template', 'RJ-{YYYY}-{MM}-{DD}');
+
+    assertDatabaseHas('recurring_journals', [
+        'name' => 'Monthly Accrual',
+        'total_amount' => 1000,
+        'description' => 'Monthly accrual {MM}/{YYYY}',
+        'reference_template' => 'RJ-{YYYY}-{MM}-{DD}',
+    ]);
     expect(RecurringJournal::first()->lines)->toHaveCount(2);
+});
+
+test('it accepts the legacy description field', function () {
+    $payload = recurringJournalPayload();
+    unset($payload['description_template']);
+    $payload['description'] = 'Legacy description template';
+
+    postJson('/api/recurring-journals', $payload)->assertCreated();
+
+    assertDatabaseHas('recurring_journals', [
+        'name' => 'Monthly Accrual',
+        'description' => 'Legacy description template',
+    ]);
+});
+
+test('it requires a description template', function () {
+    $payload = recurringJournalPayload();
+    unset($payload['description_template']);
+
+    postJson('/api/recurring-journals', $payload)
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('description_template');
 });
 
 test('it can show a recurring journal', function () {
@@ -96,8 +129,16 @@ test('it can export recurring journals', function () {
     postJson('/api/recurring-journals/export', [])->assertOk()->assertJsonStructure(['url', 'filename']);
 });
 
-test('it can execute a recurring journal', function () {
-    $journal = RecurringJournal::factory()->create(['auto_post' => true, 'is_active' => true, 'next_run_date' => '2026-01-15']);
+test('it can execute a recurring journal and render templates', function () {
+    $this->travelTo('2026-01-15 10:00:00');
+
+    $journal = RecurringJournal::factory()->create([
+        'auto_post' => true,
+        'is_active' => true,
+        'next_run_date' => '2026-01-15',
+        'description' => 'Monthly accrual {MM}/{YYYY}',
+        'reference_template' => 'RJ-{YYYY}-{MM}-{DD}',
+    ]);
     $accounts = Account::factory()->count(2)->create();
     RecurringJournalLine::factory()->create(['recurring_journal_id' => $journal->id, 'account_id' => $accounts[0]->id, 'debit' => 1000, 'credit' => 0]);
     RecurringJournalLine::factory()->create(['recurring_journal_id' => $journal->id, 'account_id' => $accounts[1]->id, 'debit' => 0, 'credit' => 1000]);
@@ -106,7 +147,11 @@ test('it can execute a recurring journal', function () {
         ->assertCreated()
         ->assertJsonStructure(['data' => ['id', 'entry_number', 'lines']]);
 
-    expect(JournalEntry::where('source_id', $journal->id)->where('journal_type', 'recurring')->exists())->toBeTrue();
+    $entry = JournalEntry::where('source_id', $journal->id)->where('journal_type', 'recurring')->first();
+
+    expect($entry)->not->toBeNull()
+        ->and($entry->reference)->toBe('RJ-2026-01-15')
+        ->and($entry->description)->toBe('Monthly accrual 01/2026');
 });
 
 test('it validates lines must be balanced', function () {

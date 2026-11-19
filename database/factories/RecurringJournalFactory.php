@@ -19,9 +19,10 @@ class RecurringJournalFactory extends Factory
     {
         return [
             'name' => $this->faker->sentence(3),
-            'description' => $this->faker->optional()->sentence(),
+            'description' => 'Recurring journal {MM}/{YYYY}',
+            'reference_template' => 'RJ-{YYYY}-{MM}-{DD}',
             'fiscal_year_id' => FiscalYear::factory(),
-            'frequency' => $this->faker->randomElement(['monthly', 'quarterly', 'semi_annual', 'annual']),
+            'frequency' => $this->faker->randomElement(['monthly', 'quarterly', 'annual']),
             'next_run_date' => $this->faker->dateTimeBetween('now', '+3 months'),
             'last_run_date' => $this->faker->optional()->dateTimeBetween('-3 months', 'now'),
             'end_date' => $this->faker->optional()->dateTimeBetween('+6 months', '+2 years'),

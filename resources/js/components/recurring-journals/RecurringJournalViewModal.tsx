@@ -19,7 +19,7 @@ const frequencyLabels: Record<string, string> = {
     weekly: 'Weekly',
     monthly: 'Monthly',
     quarterly: 'Quarterly',
-    yearly: 'Yearly',
+    annual: 'Yearly',
 };
 
 const currencyOpts = { locale: 'id-ID', currency: 'IDR' } as const;

@@ -86,10 +86,6 @@ test.describe('Recurring Journal date field', () => {
         });
         await expect(dialog).toBeVisible();
 
-        await dialog
-            .locator('input[name="description_template"]')
-            .fill('E2E recurring journal');
-
         const expectedDate = await changeDateFieldValue(
             page,
             dialog,

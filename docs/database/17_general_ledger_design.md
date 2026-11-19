@@ -117,9 +117,10 @@ Template jurnal yang dijadwalkan berulang otomatis.
 | :--- | :--- | :--- |
 | `id` | BigInt | Primary Key |
 | `name` | String | Nama template (mis. "Beban Sewa Gedung Bulanan") |
-| `description` | Text | Deskripsi template (nullable) |
+| `description` | Text | Deskripsi template (nullable; mendukung placeholder `{YYYY}`, `{MM}`, `{DD}`) |
+| `reference_template` | String | Template nomor referensi (nullable; placeholder yang sama) |
 | `fiscal_year_id` | BigInt | FK -> `fiscal_years` (nullable, berlaku di tahun fiskal tertentu) |
-| `frequency` | Enum | `monthly`, `quarterly`, `semi_annual`, `annual` |
+| `frequency` | Enum | `daily`, `weekly`, `monthly`, `quarterly`, `annual` |
 | `next_run_date` | Date | Tanggal eksekusi berikutnya |
 | `last_run_date` | Date | Tanggal eksekusi terakhir (nullable) |
 | `end_date` | Date | Tanggal berakhir penjadwalan (nullable, NULL = berlaku selamanya) |
@@ -336,7 +337,7 @@ stateDiagram-v2
 *   Query: `WHERE is_active = true AND next_run_date <= TODAY AND (end_date IS NULL OR end_date >= TODAY)`.
 *   Untuk setiap template yang eligible:
     1.  Buat `journal_entry` dari `recurring_journal_lines`.
-    2.  Set `journal_entry.reference = 'Recurring: {name}'`.
+    2.  Render `reference_template` dan `description` dengan placeholder `{YYYY}`, `{MM}`, `{DD}`; jika kosong gunakan fallback (reference null, description = name).
     3.  Jika `auto_post = true`, langsung posting. Jika tidak, biarkan `draft`.
     4.  Update `last_run_date = TODAY`.
     5.  Update `next_run_date` ke periode berikutnya berdasarkan `frequency`.

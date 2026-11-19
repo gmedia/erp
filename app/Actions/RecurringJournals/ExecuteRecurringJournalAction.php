@@ -28,12 +28,20 @@ class ExecuteRecurringJournalAction
                 throw ValidationException::withMessages(['lines' => 'Recurring journal lines are not balanced.']);
             }
 
+            $executedAt = now();
+            $reference = $this->renderTemplate($recurringJournal->reference_template, $executedAt);
+            $description = $this->renderTemplate($recurringJournal->description, $executedAt);
+
+            if ($description === null || $description === '') {
+                $description = $recurringJournal->name;
+            }
+
             $entry = JournalEntry::create([
                 'fiscal_year_id' => $recurringJournal->fiscal_year_id,
                 'entry_number' => $this->nextEntryNumber(),
-                'entry_date' => now()->toDateString(),
-                'reference' => 'Recurring Journal #' . $recurringJournal->id,
-                'description' => $recurringJournal->name,
+                'entry_date' => $executedAt->toDateString(),
+                'reference' => $reference,
+                'description' => $description,
                 'status' => $recurringJournal->auto_post ? 'posted' : 'draft',
                 'journal_type' => 'recurring',
                 'source_type' => RecurringJournal::class,
@@ -66,12 +74,25 @@ class ExecuteRecurringJournalAction
             }
 
             $recurringJournal->update([
-                'last_run_date' => now()->toDateString(),
+                'last_run_date' => $executedAt->toDateString(),
                 'next_run_date' => $this->nextRunDate($recurringJournal),
             ]);
 
             return $entry->load(['lines.account', 'fiscalYear', 'createdBy', 'postedBy']);
         });
+    }
+
+    private function renderTemplate(?string $template, CarbonInterface $date): ?string
+    {
+        if ($template === null || $template === '') {
+            return null;
+        }
+
+        return str_replace(
+            ['{YYYY}', '{MM}', '{DD}'],
+            [$date->format('Y'), $date->format('m'), $date->format('d')],
+            $template,
+        );
     }
 
     private function nextEntryNumber(): string

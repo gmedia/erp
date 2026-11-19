@@ -17,7 +17,9 @@ class StoreRecurringJournalRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
+            'description' => ['nullable', 'string', 'required_without:description_template'],
+            'description_template' => ['nullable', 'string', 'required_without:description'],
+            'reference_template' => ['nullable', 'string', 'max:255'],
             'fiscal_year_id' => ['nullable', 'integer', 'exists:fiscal_years,id'],
             'frequency' => ['required', Rule::in(['daily', 'weekly', 'monthly', 'quarterly', 'annual'])],
             'next_run_date' => ['required', 'date'],

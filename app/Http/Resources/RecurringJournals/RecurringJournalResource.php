@@ -15,6 +15,8 @@ class RecurringJournalResource extends JsonResource
             'id' => $this->resource->id,
             'name' => $this->resource->name,
             'description' => $this->resource->description,
+            'description_template' => $this->resource->description,
+            'reference_template' => $this->resource->reference_template,
             'frequency' => $this->resource->frequency,
             'next_run_date' => $this->resource->next_run_date->format('Y-m-d'),
             'last_run_date' => $this->resource->last_run_date?->format('Y-m-d'),
