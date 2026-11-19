@@ -9,82 +9,97 @@ remote_name="$1"
 remote_url="$2"
 shift 2
 
-current_branch="$(git symbolic-ref --quiet --short HEAD 2>/dev/null || true)"
-if [ -z "$current_branch" ]; then
-    echo "[pre-push] Detached HEAD — izinkan push." >&2
+branches=()
+while read -r local_ref local_sha remote_ref remote_sha; do
+    case "$local_ref" in
+        refs/heads/*)
+            branches+=("${local_ref#refs/heads/}")
+            ;;
+    esac
+done
+
+if [ ${#branches[@]} -eq 0 ]; then
+    current_branch="$(git symbolic-ref --quiet --short HEAD 2>/dev/null || true)"
+    if [ -n "$current_branch" ]; then
+        branches+=("$current_branch")
+    fi
+fi
+
+if [ ${#branches[@]} -eq 0 ]; then
+    echo "[pre-push] Detached HEAD / no branch ref - izinkan push." >&2
     exit 0
 fi
 
-case "$current_branch" in
-    main|develop|master)
-        exit 0
-        ;;
-esac
-
-# Ambil issue number dari pola feat|fix/issue-N-slug
-issue_number=""
-for pattern in '^(feat|fix)/issue-([0-9]+)-' '^(docs|chore|test|refactor)/issue-([0-9]+)-'; do
-    if [[ "$current_branch" =~ $pattern ]]; then
-        issue_number="${BASH_REMATCH[2]}"
-        break
-    fi
-done
-
-if [ -z "$issue_number" ]; then
-    echo "[pre-push] DITOLAK: branch '$current_branch' tidak mengikuti pola" >&2
-    echo "  <feat|fix|docs|chore|test|refactor>/issue-N-slug" >&2
-    echo "  Klaim issue dulu dengan /claim-issue, lalu buat branch feat/issue-N-slug." >&2
-    exit 1
-fi
-
 if ! command -v gh >/dev/null 2>&1; then
-    echo "[pre-push] WARNING: gh tidak tersedia — izinkan push (fail-open)." >&2
+    echo "[pre-push] WARNING: gh tidak tersedia - izinkan push (fail-open)." >&2
     exit 0
 fi
 
 repo="$(gh repo view --json nameWithOwner --jq .nameWithOwner 2>/dev/null || true)"
 me="$(gh api user --jq .login 2>/dev/null || true)"
 if [ -z "$repo" ] || [ -z "$me" ]; then
-    echo "[pre-push] WARNING: tidak bisa cek issue (offline?) — izinkan push (fail-open)." >&2
+    echo "[pre-push] WARNING: tidak bisa cek issue (offline?) - izinkan push (fail-open)." >&2
     exit 0
 fi
 
-# CI autofix bot pushes back style fixes to the same claimed branch.
-# Allow it explicitly; human pushes still follow the claim rules below.
-if [ "$me" = "github-actions[bot]" ]; then
-    echo "[pre-push] OK: CI autofix bot -> $current_branch." >&2
-    exit 0
-fi
+for current_branch in "${branches[@]}"; do
+    case "$current_branch" in
+        main|develop|master)
+            continue
+            ;;
+    esac
 
-json="$(gh issue view "$issue_number" --repo "$repo" \
-    --json state,labels,assignees \
-    --jq '{state:.state,labels:[.labels[].name],assignees:[.assignees[].login]}' 2>/dev/null || true)"
+    issue_number=""
+    for pattern in '^(feat|fix)/issue-([0-9]+)-' '^(docs|chore|test|refactor)/issue-([0-9]+)-'; do
+        if [[ "$current_branch" =~ $pattern ]]; then
+            issue_number="${BASH_REMATCH[2]}"
+            break
+        fi
+    done
 
-if [ -z "$json" ]; then
-    echo "[pre-push] WARNING: issue #$issue_number tidak bisa dibaca — izinkan push (fail-open)." >&2
-    exit 0
-fi
+    if [ -z "$issue_number" ]; then
+        echo "[pre-push] DITOLAK: branch '$current_branch' tidak mengikuti pola" >&2
+        echo "  <feat|fix|docs|chore|test|refactor>/issue-N-slug" >&2
+        echo "  Klaim issue dulu dengan /claim-issue, lalu buat branch feat/issue-N-slug." >&2
+        exit 1
+    fi
 
-state="$(printf '%s' "$json" | python3 -c 'import json,sys; print(json.load(sys.stdin)["state"])')"
-labels="$(printf '%s' "$json" | python3 -c 'import json,sys; print(" ".join(json.load(sys.stdin)["labels"]))')"
-assignees="$(printf '%s' "$json" | python3 -c 'import json,sys; print(" ".join(json.load(sys.stdin)["assignees"]))')"
+    if [ "$me" = "github-actions[bot]" ]; then
+        echo "[pre-push] OK: CI autofix bot -> $current_branch." >&2
+        continue
+    fi
 
-if [ "$state" != "OPEN" ]; then
-    echo "[pre-push] DITOLAK: issue #$issue_number sudah $state." >&2
-    exit 1
-fi
+    json="$(gh issue view "$issue_number" --repo "$repo" \
+        --json state,labels,assignees \
+        --jq '{state:.state,labels:[.labels[].name],assignees:[.assignees[].login]}' 2>/dev/null || true)"
 
-if ! printf '%s\n' "$labels" | grep -q 'status:claimed'; then
-    echo "[pre-push] DITOLAK: issue #$issue_number belum berlabel status:claimed." >&2
-    echo "  Klaim dulu: /claim-issue" >&2
-    exit 1
-fi
+    if [ -z "$json" ]; then
+        echo "[pre-push] WARNING: issue #$issue_number tidak bisa dibaca - izinkan push (fail-open)." >&2
+        continue
+    fi
 
-if ! printf '%s\n' "$assignees" | grep -qw "$me"; then
-    echo "[pre-push] DITOLAK: issue #$issue_number tidak di-assign ke '$me'." >&2
-    echo "  Assignee saat ini: ${assignees:-none}" >&2
-    exit 1
-fi
+    state="$(printf '%s' "$json" | python3 -c 'import json,sys; print(json.load(sys.stdin)["state"])')"
+    labels="$(printf '%s' "$json" | python3 -c 'import json,sys; print(" ".join(json.load(sys.stdin)["labels"]))')"
+    assignees="$(printf '%s' "$json" | python3 -c 'import json,sys; print(" ".join(json.load(sys.stdin)["assignees"]))')"
 
-echo "[pre-push] OK: $current_branch -> issue #$issue_number (claimed by $me)" >&2
+    if [ "$state" != "OPEN" ]; then
+        echo "[pre-push] DITOLAK: issue #$issue_number sudah $state." >&2
+        exit 1
+    fi
+
+    if ! printf '%s\n' "$labels" | grep -Eq '(^| )status:(claimed|in-review)( |$)'; then
+        echo "[pre-push] DITOLAK: issue #$issue_number belum berlabel status:claimed atau status:in-review." >&2
+        echo "  Klaim dulu: /claim-issue" >&2
+        exit 1
+    fi
+
+    if ! printf '%s\n' "$assignees" | grep -qw "$me"; then
+        echo "[pre-push] DITOLAK: issue #$issue_number tidak di-assign ke '$me'." >&2
+        echo "  Assignee saat ini: ${assignees:-none}" >&2
+        exit 1
+    fi
+
+    echo "[pre-push] OK: $current_branch -> issue #$issue_number" >&2
+done
+
 exit 0

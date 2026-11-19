@@ -19,7 +19,11 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => [env('APP_URL', 'http://localhost')],
+    'allowed_origins' => array_values(array_unique(array_filter([
+        env('APP_URL', 'http://localhost'),
+        'http://localhost',
+        'capacitor://localhost',
+    ]))),
 
     'allowed_origins_patterns' => [],
 

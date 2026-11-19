@@ -2,9 +2,12 @@
 
 namespace App\Providers;
 
+use App\Contracts\FcmAccessTokenProvider;
 use App\Contracts\PushSender;
 use App\Models\Setting;
 use App\Models\User;
+use App\Services\Push\FcmPushSender;
+use App\Services\Push\GoogleServiceAccountTokenProvider;
 use App\Services\Push\LogPushSender;
 use App\Services\SocialAuth\Providers\GoogleProvider;
 use App\Services\SocialAuth\Providers\MicrosoftProvider;
@@ -25,7 +28,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(PushSender::class, LogPushSender::class);
+        $this->app->bind(FcmAccessTokenProvider::class, GoogleServiceAccountTokenProvider::class);
+
+        $this->app->bind(PushSender::class, function ($app): PushSender {
+            return match (config('notifications.push.driver', 'log')) {
+                'fcm' => $app->make(FcmPushSender::class),
+                default => $app->make(LogPushSender::class),
+            };
+        });
     }
 
     /**
