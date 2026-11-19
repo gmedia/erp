@@ -1,4 +1,10 @@
 import axiosInstance from '@/lib/axios';
+import {
+    clearToken,
+    getToken,
+    initTokenStorage,
+    setToken,
+} from '@/lib/token-storage';
 import { type Translations } from '@/types/i18n';
 import { type Permission } from '@/types/permission';
 import { type User } from '@/types/user';
@@ -116,7 +122,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const refreshAuth = useCallback(async () => {
-        const token = localStorage.getItem('api_token');
+        await initTokenStorage();
+        const token = getToken();
         if (!token) {
             setIsLoading(false);
             return;
@@ -152,7 +159,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             ).__APP_COMPANY_NAME__ = data.companyName;
         } catch (error) {
             console.error('Failed to fetch auth state', error);
-            localStorage.removeItem('api_token');
+            clearToken();
             setUser(null);
         } finally {
             setIsLoading(false);
@@ -165,7 +172,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const login = useCallback(
         (token: string, data: { user: User; employee: Employee }) => {
-            localStorage.setItem('api_token', token);
+            setToken(token);
             if (data.user) setUser(data.user);
             refreshAuth();
         },
@@ -178,7 +185,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         } catch (e) {
             console.error(e);
         }
-        localStorage.removeItem('api_token');
+        clearToken();
         setUser(null);
         globalThis.location.href = '/login';
     }, []);
