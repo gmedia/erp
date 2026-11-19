@@ -83,7 +83,7 @@ export default function SocialCallback() {
                     { headers: { 'X-Social-Ticket-Token': ticket } },
                 );
                 login(response.data.token, response.data);
-                navigate(intended, { replace: true });
+                void navigate(intended, { replace: true });
             } catch {
                 let text = ERROR_MESSAGES.ticket_invalid;
                 try {
