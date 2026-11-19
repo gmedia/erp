@@ -205,7 +205,7 @@ jobs:
 
       - name: Run tests
         if: ${{ steps.autofix.outputs.changed != 'true' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
-        run: ./vendor/bin/sail test --parallel --recreate-databases --colors=always
+        run: ./vendor/bin/sail test --colors=always
 
       - name: Setup Java for Sonar scanner
         if: ${{ success() && steps.autofix.outputs.changed != 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
