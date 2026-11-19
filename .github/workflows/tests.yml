@@ -9,6 +9,7 @@ on:
     branches:
       - develop
       - main
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -566,8 +567,9 @@ jobs:
           retention-days: 7
 
   mobile_emulator:
-    name: Android emulator smoke test
+    name: Android emulator smoke test (manual, needs KVM)
     needs: mobile_android
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     continue-on-error: true
