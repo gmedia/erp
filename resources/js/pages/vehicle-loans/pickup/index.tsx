@@ -1,4 +1,5 @@
 import { PageHeader } from '@/components/common/PageHeader';
+import { PhotoInput } from '@/components/common/PhotoInput';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -147,13 +148,10 @@ export default function VehicleLoanPickupPage() {
 
                         <div className="grid gap-2">
                             <Label htmlFor="selfie">Foto</Label>
-                            <Input
+                            <PhotoInput
                                 id="selfie"
-                                type="file"
-                                accept="image/jpeg,image/png"
-                                onChange={(e) =>
-                                    setPhoto(e.target.files?.[0] ?? null)
-                                }
+                                value={photo}
+                                onChange={setPhoto}
                             />
                         </div>
 
