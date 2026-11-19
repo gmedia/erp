@@ -100,8 +100,12 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        // Revoke the token that was used to authenticate the current request...
-        $token = $request->user()?->currentAccessToken();
+        $user = $request->user();
+        $token = $user?->currentAccessToken();
+
+        if ($user) {
+            $user->deviceTokens()->delete();
+        }
 
         if ($token instanceof PersonalAccessToken) {
             $token->delete();

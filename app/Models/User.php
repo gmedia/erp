@@ -95,6 +95,12 @@ class User extends Authenticatable
         return $this->hasMany(SocialAccount::class);
     }
 
+    /** @return HasMany<DeviceToken, $this> */
+    public function deviceTokens(): HasMany
+    {
+        return $this->hasMany(DeviceToken::class);
+    }
+
     /**
      * Get the attributes that should be cast.
      *

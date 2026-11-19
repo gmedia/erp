@@ -3,17 +3,22 @@
 namespace App\Services;
 
 use App\Contracts\NotifiableEvent;
+use App\Contracts\PushSender;
 use App\Models\NotificationPreference;
 use App\Models\Setting;
 use App\Models\User;
 use App\Notifications\GenericAppNotification;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Throwable;
 
 class NotificationService
 {
+    public function __construct(private readonly PushSender $pushSender) {}
+
     /**
      * Dispatch a notifiable event through the configured channels.
      * Safe to call multiple times: a (dedupe_key, recipient) pair is unique.
@@ -21,7 +26,9 @@ class NotificationService
     public function send(NotifiableEvent $event): void
     {
         $eventKey = $event->eventKey();
-        $configured = config("notifications.events.{$eventKey}.channels", ['database']);
+        $events = (array) config('notifications.events', []);
+        $eventConfig = $events[$eventKey] ?? [];
+        $configured = is_array($eventConfig) ? ($eventConfig['channels'] ?? ['database']) : ['database'];
 
         if (! is_array($configured)) {
             $configured = ['database'];
@@ -92,7 +99,39 @@ class NotificationService
                         (string) (Setting::get('company_name') ?? config('app.name', 'ERP')),
                     ));
                 }
+
+                if ($channel === 'push') {
+                    $this->sendPush($recipient, $event, $eventKey, $payload, $dedupeKey);
+                }
             }
+        }
+    }
+
+    private function sendPush(User $recipient, NotifiableEvent $event, string $eventKey, array $payload, string $dedupeKey): void
+    {
+        $tokens = $recipient->deviceTokens()->get();
+
+        if ($tokens->isEmpty()) {
+            return;
+        }
+
+        try {
+            if (! Cache::add('push:' . $dedupeKey, true, now()->addDay())) {
+                return;
+            }
+
+            $pushPayload = [
+                'event_key' => $eventKey,
+                'title' => $payload['title'] ?? $eventKey,
+                'body' => $payload['body'] ?? '',
+                'target_url' => $event->targetUrl(),
+            ];
+
+            foreach ($tokens as $token) {
+                $this->pushSender->send($token, $pushPayload);
+            }
+        } catch (Throwable $e) {
+            report($e);
         }
     }
 

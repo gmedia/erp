@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Contracts\PushSender;
 use App\Models\Setting;
 use App\Models\User;
+use App\Services\Push\LogPushSender;
 use App\Services\SocialAuth\Providers\GoogleProvider;
 use App\Services\SocialAuth\Providers\MicrosoftProvider;
 use Illuminate\Auth\Notifications\ResetPassword;
@@ -23,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(PushSender::class, LogPushSender::class);
     }
 
     /**
