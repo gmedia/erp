@@ -249,8 +249,8 @@ jobs:
     name: Playwright E2E via Sail
     runs-on: ubuntu-latest
     timeout-minutes: 150
-    needs: quality
-    if: ${{ needs.quality.outputs.autofix_applied != 'true' }}
+    # Parallel with Quality (option b, issue #162): autofixes are formatting-only;
+    # `ci` still fails when autofix_applied=true and the follow-up run re-tests.
     continue-on-error: true
     permissions:
       contents: read

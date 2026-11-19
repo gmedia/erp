@@ -59,6 +59,21 @@
 
 Host RAM/CPU is limited. Parallel `Read`/`Edit`/`task` batches have **killed OpenCode mid-T5** (and earlier sessions). Session survival > agent throughput.
 
+### E2E: Playwright di host, Laravel tetap di Docker
+
+> Aturan ini mengoreksi asumsi lama "semua command E2E wajib `sail ...`". **Benar hanya untuk PHP/Artisan. Playwright cukup dijalankan di host.**
+
+- `playwright.config.ts` dan `tests/e2e/global-setup.ts` sudah mendukung runner terpisah. `PLAYWRIGHT_USE_SAIL=1` memaksa **npm dan artisan** lewat Sail — jangan diset kalau ingin Playwright di host.
+- **Laravel/MariaDB/MinIO/Valkey tetap wajib di Sail**: `./vendor/bin/sail up -d --wait` + `migrate:fresh --seed` + MinIO bucket.
+- **Playwright di host**: `npx playwright test ...` (atau `PLAYWRIGHT_WORKERS=N npx playwright test ...`). Host butuh Node 20 + npm; `node_modules/` sudah ada di repo.
+- Supaya `global-setup` tetap menjalankan Artisan **di dalam container**, set `PLAYWRIGHT_PHP_BINARY` ke wrapper:
+  `#!/usr/bin/env bash; exec ./vendor/bin/sail php "$@"` (simpan di `scripts/sail-php`, chmod +x). Tanpa ini, `tryLocalPhpBinary()` akan memakai `php` host dan gagal terkoneksi ke DB.
+- `PLAYWRIGHT_BASE_URL` tetap `http://localhost:82` (port publish Sail), bukan `localhost:80` di dalam container.
+- **Jangan** menjalankan `./vendor/bin/sail npx playwright test ...` untuk mengukur performa E2E: itu menambah overlay container dan bukan konfigurasi yang dipakai CI (CI menjalankan `npx playwright test` langsung di runner).
+- `DISABLE_RATE_LIMITING=true` **harus aktif di proses web server di dalam container**, bukan hanya di Artisan CLI. Tanpa ini, E2E gagal dengan `429 Too Many Requests` (limiter `throttle:api` 60/menit). Cara aman tanpa mengubah `.env`: compose override yang menambah environment variable ke service `laravel.test`, lalu `config:cache` sekali supaya request HTTP ikut membaca nilai tersebut.
+- `APP_ADMIN` yang dipakai `global-setup.ts` harus sama dengan admin hasil seed di container (CI pakai `admin@example.com`; host bisa berbeda). Jangan mengubah `.env` — set `APP_ADMIN` di environment proses Playwright.
+- Pre-flight wajib sebelum push: jumlah test **515** dengan argumen direktori yang sama seperti job CI. `npx playwright test --list` tanpa argumen menghitung semua spec (677) — bukan angka yang dipakai CI. Pakai daftar 78 direktori `tests/e2e/...` dari step `Run Playwright E2E` di `tests.yml`.
+
 ## Workflow
 
 ```
