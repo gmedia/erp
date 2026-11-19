@@ -27,6 +27,7 @@ use App\Models\VehicleLoanPickup;
 use App\Models\VehicleUnit;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -36,7 +37,7 @@ class VehicleLoanController extends Controller
 {
     use ResolvesBranchScope;
 
-    public function index(IndexVehicleLoanRequest $request): JsonResponse
+    public function index(IndexVehicleLoanRequest $request): AnonymousResourceCollection
     {
         $query = VehicleLoan::query()
             ->with(['requester', 'department', 'driver.employee', 'vehicleUnit.asset', 'pickup', 'returns'])
@@ -50,7 +51,7 @@ class VehicleLoanController extends Controller
             ))
             ->orderByDesc('id');
 
-        return response()->json($query->paginate($request->integer('per_page', 15)));
+        return VehicleLoanResource::collection($query->paginate($request->integer('per_page', 15)));
     }
 
     public function store(StoreVehicleLoanRequest $request, GenerateVehicleLoanCodeAction $generateCode): JsonResponse
@@ -167,17 +168,17 @@ class VehicleLoanController extends Controller
         return (new VehicleLoanResource($vehicleLoan->fresh()))->response();
     }
 
-    public function my(): JsonResponse
+    public function my(): AnonymousResourceCollection
     {
         $loans = VehicleLoan::where('requester_id', Auth::id())
-            ->with(['driver.employee', 'vehicleUnit.asset', 'pickup', 'returns'])
+            ->with(['requester', 'driver.employee', 'vehicleUnit.asset', 'pickup', 'returns'])
             ->orderByDesc('id')
             ->paginate(15);
 
-        return response()->json($loans);
+        return VehicleLoanResource::collection($loans);
     }
 
-    public function securityQueue(Request $request): JsonResponse
+    public function securityQueue(Request $request): AnonymousResourceCollection
     {
         $branchId = $this->resolveBranchFromRequest($request);
 
@@ -190,7 +191,7 @@ class VehicleLoanController extends Controller
 
         $loans = $query->orderBy('start_at')->paginate(20);
 
-        return response()->json($loans);
+        return VehicleLoanResource::collection($loans);
     }
 
     public function storePickup(

@@ -140,12 +140,16 @@ it('lists filters shows updates and cancels loans', function () {
     ]);
 });
 
-it('shows the security queue for approved loans', function () {
+it('shows the security queue with derived requester unit and driver names', function () {
     $loan = VehicleLoan::factory()->create(['status' => 'approved']);
 
     getJson('/api/vehicle-loans/security-queue')
         ->assertOk()
-        ->assertJsonPath('data.0.id', $loan->id);
+        ->assertJsonPath('data.0.id', $loan->id)
+        ->assertJsonPath('data.0.requester_name', $loan->requester->name)
+        ->assertJsonPath('data.0.driver_name', $loan->driver?->employee?->name)
+        ->assertJsonPath('data.0.plate_number', $loan->vehicleUnit?->plate_number)
+        ->assertJsonStructure(['data' => [['id', 'status', 'requester_name', 'driver_name', 'plate_number']]]);
 });
 
 it('completes pickup, key handover and return', function () {
