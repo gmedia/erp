@@ -9,9 +9,14 @@ import AuthLayout from '@/layouts/auth-layout';
 import axiosInstance from '@/lib/axios';
 import axios from 'axios';
 import { LoaderCircle } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useLocation, useNavigate } from 'react-router-dom';
+
+import {
+    type SocialPolicyResponse,
+    type SocialProvider,
+} from '@/types/social-auth';
 
 interface LoginProps {
     readonly status?: string;
@@ -30,6 +35,45 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
 
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [policy, setPolicy] = useState<SocialPolicyResponse | null>(null);
+    const [socialProvider, setSocialProvider] =
+        useState<SocialProvider | null>(null);
+
+    useEffect(() => {
+        let active = true;
+        axiosInstance
+            .get<SocialPolicyResponse>('/api/social/policy')
+            .then((response) => {
+                if (active) {
+                    setPolicy(response.data);
+                }
+            })
+            .catch(() => {
+                setPolicy(null);
+            });
+        return () => {
+            active = false;
+        };
+    }, []);
+
+    const handleSocialLogin = async (provider: SocialProvider) => {
+        setSocialProvider(provider);
+        setErrors({});
+        try {
+            const intended = location.state?.from?.pathname || '/dashboard';
+            sessionStorage.setItem('social_intended', intended);
+            const response = await axiosInstance.get<{
+                url: string;
+                state: string;
+            }>(`/api/social/${provider}/redirect`);
+            window.location.assign(response.data.url);
+        } catch {
+            setSocialProvider(null);
+            setErrors({
+                email: 'Social login is temporarily unavailable. Please try again.',
+            });
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -87,6 +131,37 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
                 <title>Log in - {import.meta.env.VITE_APP_NAME || 'ERP'}</title>
             </Helmet>
 
+            {policy?.socialLoginEnabled && (
+                <div className="flex flex-col gap-3">
+                    {(policy.providers ?? []).map((provider) => (
+                        <Button
+                                key={provider}
+                                type="button"
+                                variant="outline"
+                                className="w-full"
+                                disabled={socialProvider !== null}
+                                onClick={() => void handleSocialLogin(provider)}
+                                data-test={`social-login-${provider}`}
+                            >
+                                {socialProvider === provider ? (
+                                    <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                                ) : null}
+                                {provider === 'google'
+                                    ? 'Continue with Google'
+                                    : 'Continue with Microsoft'}
+                            </Button>
+                    ))}
+                </div>
+            )}
+
+            {policy?.socialLoginEnabled && (
+                <div className="relative text-center text-sm text-muted-foreground">
+                    <span className="absolute inset-x-0 top-1/2 border-t" />
+                    <span className="relative bg-background px-2">or</span>
+                </div>
+            )}
+
+            {policy?.passwordLoginEnabled !== false && (
             <form onSubmit={handleSubmit} className="flex flex-col gap-6">
                 <div className="grid gap-6">
                     <div className="grid gap-2">
@@ -144,6 +219,13 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
                     </Button>
                 </div>
             </form>
+            )}
+
+            {policy?.passwordLoginEnabled === false && (
+                <p className="text-center text-sm text-muted-foreground">
+                    Password login is disabled. Use social sign in above.
+                </p>
+            )}
 
             {status && (
                 <div className="mb-4 text-center text-sm font-medium text-green-600">

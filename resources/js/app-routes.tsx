@@ -20,6 +20,7 @@ const ConfirmPassword = lazy(() => import('./pages/auth/confirm-password'));
 const TwoFactorChallenge = lazy(
     () => import('./pages/auth/two-factor-challenge'),
 );
+const SocialCallback = lazy(() => import('./pages/auth/social-callback'));
 
 // --- Main pages ---
 const Dashboard = lazy(() => import('./pages/dashboard'));
@@ -258,6 +259,11 @@ export default function AppRoutes() {
                         </P>
                     }
                 />
+                <Route
+                    path="/auth/social/callback"
+                    element={<SocialCallback />}
+                />
+
                 <Route
                     path="/two-factor-challenge"
                     element={
