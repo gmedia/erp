@@ -4,6 +4,7 @@ import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
+import { getToken } from '@/lib/token-storage';
 import { cn } from '@/lib/utils';
 import { type BreadcrumbItem } from '@/types';
 import { BookOpen, Loader2 } from 'lucide-react';
@@ -29,7 +30,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 async function fetchWithAuth(url: string) {
-    const apiToken = localStorage.getItem('api_token') || '';
+    const apiToken = getToken() || '';
     return fetch(url, {
         headers: {
             Authorization: `Bearer ${apiToken}`,

@@ -47,6 +47,7 @@
         "typescript-eslint": "^8.23.0"
     },
     "dependencies": {
+        "@aparajita/capacitor-secure-storage": "8.0.1",
         "@capacitor/android": "8.6.2",
         "@capacitor/cli": "8.6.2",
         "@capacitor/core": "8.6.2",
