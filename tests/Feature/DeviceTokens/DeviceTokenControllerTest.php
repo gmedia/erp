@@ -44,15 +44,15 @@ test('registering an existing token reassigns it to the current user', function 
 test('user only lists their own device tokens', function () {
     $user = User::factory()->create();
     $other = User::factory()->create();
-    DeviceToken::factory()->create(['user_id' => $user->id, 'token' => 'mine']);
-    DeviceToken::factory()->create(['user_id' => $other->id, 'token' => 'theirs']);
+    DeviceToken::factory()->create(['user_id' => $user->id, 'device_name' => 'mine']);
+    DeviceToken::factory()->create(['user_id' => $other->id, 'device_name' => 'theirs']);
 
     Sanctum::actingAs($user, ['*']);
 
     $this->getJson('/api/device-tokens')
         ->assertOk()
         ->assertJsonCount(1, 'data')
-        ->assertJsonPath('data.0.token', 'mine');
+        ->assertJsonPath('data.0.device_name', 'mine');
 });
 
 test('user can delete their own device token', function () {
