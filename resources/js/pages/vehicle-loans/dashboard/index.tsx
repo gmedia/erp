@@ -13,6 +13,7 @@ export default function VehicleLoanDashboardPage() {
             return response.data.data as Array<{
                 id: number;
                 status: string;
+                is_overdue?: boolean;
                 plate_number: string | null;
             }>;
         },
@@ -33,6 +34,10 @@ export default function VehicleLoanDashboardPage() {
         { label: 'Ditolak', value: count('rejected') },
         { label: 'Dipakai', value: count('pickup_done') },
         { label: 'Selesai', value: count('returned') },
+        {
+            label: 'Terlambat',
+            value: loans.filter((loan) => loan.is_overdue).length,
+        },
     ];
 
     return (
