@@ -29,6 +29,7 @@ import {
     type SupplierBill,
     type SupplierBillFormData,
 } from '@/types/supplier-bill';
+import { toDateInputValue } from '@/utils/date-format';
 import {
     formatItemReference,
     omitItemDisplayLabels,
@@ -76,8 +77,10 @@ const getSupplierBillFormDefaults = (
             goods_receipt_id: '',
             supplier_invoice_number: '',
             supplier_invoice_date: null,
-            bill_date: new Date(),
-            due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+            bill_date: toDateInputValue(new Date()),
+            due_date: toDateInputValue(
+                new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+            ),
             payment_terms: '',
             currency: 'IDR',
             status: 'draft',
@@ -105,14 +108,14 @@ const getSupplierBillFormDefaults = (
             : '',
         supplier_invoice_number: supplierBill.supplier_invoice_number || '',
         supplier_invoice_date: supplierBill.supplier_invoice_date
-            ? new Date(supplierBill.supplier_invoice_date)
+            ? toDateInputValue(supplierBill.supplier_invoice_date)
             : null,
         bill_date: supplierBill.bill_date
-            ? new Date(supplierBill.bill_date)
-            : new Date(),
+            ? toDateInputValue(supplierBill.bill_date)
+            : toDateInputValue(new Date()),
         due_date: supplierBill.due_date
-            ? new Date(supplierBill.due_date)
-            : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+            ? toDateInputValue(supplierBill.due_date)
+            : toDateInputValue(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)),
         payment_terms: supplierBill.payment_terms || '',
         currency: supplierBill.currency || 'IDR',
         status: supplierBill.status,

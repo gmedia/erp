@@ -48,8 +48,8 @@ export interface PurchaseOrderFormData {
     po_number?: string;
     supplier_id: string;
     warehouse_id: string;
-    order_date: Date;
-    expected_delivery_date?: Date | null;
+    order_date: string;
+    expected_delivery_date?: string | null;
     payment_terms?: string;
     currency: string;
     status: PurchaseOrderStatus;

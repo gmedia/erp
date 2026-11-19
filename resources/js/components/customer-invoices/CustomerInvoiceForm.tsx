@@ -18,6 +18,7 @@ import {
     type CustomerInvoice,
     type CustomerInvoiceFormData,
 } from '@/types/customer-invoice';
+import { toDateInputValue } from '@/utils/date-format';
 import { omitItemDisplayLabels } from '@/utils/entity-form-item';
 import { customerInvoiceFormSchema } from '@/utils/schemas';
 import { CustomerInvoiceItemFormDialog } from './CustomerInvoiceItemFormDialog';
@@ -40,8 +41,8 @@ const getCustomerInvoiceFormDefaults = (
             customer_id: '',
             branch_id: '',
             fiscal_year_id: '',
-            invoice_date: new Date(),
-            due_date: new Date(),
+            invoice_date: toDateInputValue(new Date()),
+            due_date: toDateInputValue(new Date()),
             payment_terms: '',
             currency: 'IDR',
             status: 'draft',
@@ -61,11 +62,11 @@ const getCustomerInvoiceFormDefaults = (
             ? String(customerInvoice.fiscal_year.id)
             : '',
         invoice_date: customerInvoice.invoice_date
-            ? new Date(customerInvoice.invoice_date)
-            : new Date(),
+            ? toDateInputValue(customerInvoice.invoice_date)
+            : toDateInputValue(new Date()),
         due_date: customerInvoice.due_date
-            ? new Date(customerInvoice.due_date)
-            : new Date(),
+            ? toDateInputValue(customerInvoice.due_date)
+            : toDateInputValue(new Date()),
         payment_terms: customerInvoice.payment_terms || '',
         currency: customerInvoice.currency || 'IDR',
         status: customerInvoice.status,

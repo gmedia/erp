@@ -14,6 +14,7 @@ import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
 
 import { Asset } from '@/types/asset';
+import { toDateInputValue } from '@/utils/date-format';
 import { AssetFormData, assetFormSchema } from '@/utils/schemas';
 
 interface AssetFormProps {
@@ -77,7 +78,7 @@ const getAssetFormDefaults = (asset?: Asset | null): AssetFormData => {
             department_id: '',
             employee_id: '',
             supplier_id: '',
-            purchase_date: new Date(),
+            purchase_date: toDateInputValue(new Date()),
             purchase_cost: '',
             currency: 'IDR',
             warranty_end_date: null,
@@ -123,18 +124,18 @@ const getAssetFormDefaults = (asset?: Asset | null): AssetFormData => {
             asset.supplier?.id,
             asset.supplier_id,
         ),
-        purchase_date: new Date(asset.purchase_date),
+        purchase_date: toDateInputValue(asset.purchase_date),
         purchase_cost: asset.purchase_cost || '',
         currency: asset.currency || 'IDR',
         warranty_end_date: asset.warranty_end_date
-            ? new Date(asset.warranty_end_date)
+            ? toDateInputValue(asset.warranty_end_date)
             : null,
         status: asset.status,
         condition: asset.condition,
         notes: asset.notes || '',
         depreciation_method: asset.depreciation_method || 'straight_line',
         depreciation_start_date: asset.depreciation_start_date
-            ? new Date(asset.depreciation_start_date)
+            ? toDateInputValue(asset.depreciation_start_date)
             : null,
         useful_life_months: asset.useful_life_months
             ? String(asset.useful_life_months)
@@ -215,21 +216,12 @@ export const AssetForm = memo<AssetFormProps>(function AssetForm({
     const handleFormSubmit = (data: AssetFormData) => {
         onSubmit({
             ...data,
-            purchase_date: format(
-                data.purchase_date,
-                'yyyy-MM-dd',
-            ) as unknown as Date,
+            purchase_date: format(data.purchase_date, 'yyyy-MM-dd'),
             warranty_end_date: data.warranty_end_date
-                ? (format(
-                      data.warranty_end_date,
-                      'yyyy-MM-dd',
-                  ) as unknown as Date)
+                ? format(data.warranty_end_date, 'yyyy-MM-dd')
                 : null,
             depreciation_start_date: data.depreciation_start_date
-                ? (format(
-                      data.depreciation_start_date,
-                      'yyyy-MM-dd',
-                  ) as unknown as Date)
+                ? format(data.depreciation_start_date, 'yyyy-MM-dd')
                 : null,
         });
     };

@@ -61,9 +61,9 @@ export interface SupplierBillFormData {
     purchase_order_id?: string;
     goods_receipt_id?: string;
     supplier_invoice_number?: string;
-    supplier_invoice_date?: Date | null;
-    bill_date: Date;
-    due_date: Date;
+    supplier_invoice_date?: string | null;
+    bill_date: string;
+    due_date: string;
     payment_terms?: string;
     currency: string;
     status: SupplierBillStatus;

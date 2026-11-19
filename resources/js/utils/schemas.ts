@@ -40,8 +40,8 @@ export const approvalDelegationFormSchema = z
             .string()
             .min(1, { message: 'Delegate is required.' }),
         approvable_type: z.string().optional(),
-        start_date: z.date({ message: 'Start date is required.' }),
-        end_date: z.date({ message: 'End date is required.' }),
+        start_date: z.string().min(1, { message: 'Start date is required.' }),
+        end_date: z.string().min(1, { message: 'End date is required.' }),
         reason: z.string().optional(),
         is_active: z
             .union([z.boolean(), z.string()])
@@ -118,11 +118,11 @@ export const employeeFormSchema = z.object({
                 }),
             ]),
         ),
-    hire_date: z.date({ message: 'Hire date is required.' }),
+    hire_date: z.string().min(1, { message: 'Hire date is required.' }),
     employment_status: z.enum(['regular', 'intern'], {
         message: 'Employment status is required.',
     }),
-    termination_date: z.date().optional().nullable(),
+    termination_date: z.string().optional().nullable(),
 });
 
 export type EmployeeFormData = z.infer<typeof employeeFormSchema>;
@@ -232,7 +232,7 @@ export type CoaVersionFormData = z.infer<typeof coaVersionFormSchema>;
 
 // Schema for Journal Entry
 export const journalEntryFormSchema = z.object({
-    entry_date: z.date({ message: 'Date is required.' }),
+    entry_date: z.string().min(1, { message: 'Date is required.' }),
     reference: z.string().optional(),
     description: z.string().min(1, { message: 'Description is required.' }),
     lines: z
@@ -379,10 +379,10 @@ export const assetFormSchema = z.object({
     department_id: z.string().default(''),
     employee_id: z.string().default(''),
     supplier_id: z.string().default(''),
-    purchase_date: z.date({ message: 'Purchase date is required.' }),
+    purchase_date: z.string().min(1, { message: 'Purchase date is required.' }),
     purchase_cost: z.string().min(1, { message: 'Purchase cost is required.' }),
     currency: z.string().min(3).max(3).default('IDR'),
-    warranty_end_date: z.date().optional().nullable(),
+    warranty_end_date: z.string().optional().nullable(),
     status: z.enum(['draft', 'active', 'maintenance', 'disposed', 'lost'], {
         message: 'Status is required.',
     }),
@@ -394,7 +394,7 @@ export const assetFormSchema = z.object({
     depreciation_method: z
         .enum(['straight_line', 'declining_balance'])
         .default('straight_line'),
-    depreciation_start_date: z.date().optional().nullable(),
+    depreciation_start_date: z.string().optional().nullable(),
     useful_life_months: z.string().default(''),
     salvage_value: z.string().default(''),
     depreciation_expense_account_id: z.string().default(''),
@@ -414,7 +414,7 @@ export const assetMovementFormSchema = z.object({
             message: 'Movement type is required.',
         },
     ),
-    moved_at: z.date({ message: 'Movement date is required.' }),
+    moved_at: z.string().min(1, { message: 'Movement date is required.' }),
     to_branch_id: z.string().optional(),
     to_location_id: z.string().optional(),
     to_department_id: z.string().optional(),
@@ -436,8 +436,8 @@ export const assetMaintenanceFormSchema = z.object({
     status: z.enum(['scheduled', 'in_progress', 'completed', 'cancelled'], {
         message: 'Status is required.',
     }),
-    scheduled_at: z.date({ message: 'Scheduled date is required.' }),
-    performed_at: z.date().optional().nullable(),
+    scheduled_at: z.string().min(1, { message: 'Scheduled date is required.' }),
+    performed_at: z.string().optional().nullable(),
     supplier_id: z.string().default(''),
     cost: z.string().default('0'),
     notes: z.string().default(''),
@@ -653,8 +653,8 @@ export const stockTransferFormSchema = z.object({
     to_warehouse_id: z
         .string()
         .min(1, { message: 'To warehouse is required.' }),
-    transfer_date: z.date({ message: 'Transfer date is required.' }),
-    expected_arrival_date: z.date().optional().nullable(),
+    transfer_date: z.string().min(1, { message: 'Transfer date is required.' }),
+    expected_arrival_date: z.string().optional().nullable(),
     status: z.enum(
         [
             'draft',
@@ -715,7 +715,9 @@ export const inventoryStocktakeItemSchema = z.object({
 export const inventoryStocktakeFormSchema = z.object({
     stocktake_number: z.string().optional(),
     warehouse_id: z.string().min(1, { message: 'Warehouse is required.' }),
-    stocktake_date: z.date({ message: 'Stocktake date is required.' }),
+    stocktake_date: z
+        .string()
+        .min(1, { message: 'Stocktake date is required.' }),
     status: z.enum(['draft', 'in_progress', 'completed', 'cancelled'], {
         message: 'Status is required.',
     }),
@@ -754,7 +756,9 @@ export const stockAdjustmentItemSchema = z.object({
 export const stockAdjustmentFormSchema = z.object({
     adjustment_number: z.string().optional(),
     warehouse_id: z.string().min(1, { message: 'Warehouse is required.' }),
-    adjustment_date: z.date({ message: 'Adjustment date is required.' }),
+    adjustment_date: z
+        .string()
+        .min(1, { message: 'Adjustment date is required.' }),
     adjustment_type: z.enum(
         [
             'damage',
@@ -786,8 +790,8 @@ export const purchaseRequestFormSchema = z.object({
     branch_id: z.string().min(1, { message: 'Branch is required.' }),
     department_id: z.string().optional(),
     requested_by: z.string().optional(),
-    request_date: z.date({ message: 'Request date is required.' }),
-    required_date: z.date().optional().nullable(),
+    request_date: z.string().min(1, { message: 'Request date is required.' }),
+    required_date: z.string().optional().nullable(),
     priority: z.enum(['low', 'normal', 'high', 'urgent'], {
         message: 'Priority is required.',
     }),
@@ -835,8 +839,8 @@ export const purchaseOrderFormSchema = z.object({
     po_number: z.string().optional(),
     supplier_id: z.string().min(1, { message: 'Supplier is required.' }),
     warehouse_id: z.string().min(1, { message: 'Warehouse is required.' }),
-    order_date: z.date({ message: 'Order date is required.' }),
-    expected_delivery_date: z.date().optional().nullable(),
+    order_date: z.string().min(1, { message: 'Order date is required.' }),
+    expected_delivery_date: z.string().optional().nullable(),
     payment_terms: z.string().optional(),
     currency: z.string().min(3, { message: 'Currency is required.' }).max(3),
     status: z.enum(
@@ -896,7 +900,7 @@ export const goodsReceiptFormSchema = z.object({
         .string()
         .min(1, { message: 'Purchase order is required.' }),
     warehouse_id: z.string().min(1, { message: 'Warehouse is required.' }),
-    receipt_date: z.date({ message: 'Receipt date is required.' }),
+    receipt_date: z.string().min(1, { message: 'Receipt date is required.' }),
     supplier_delivery_note: z.string().optional(),
     status: z.enum(['draft', 'confirmed', 'cancelled'], {
         message: 'Status is required.',
@@ -943,7 +947,7 @@ export const supplierReturnFormSchema = z.object({
     goods_receipt_id: z.string().optional(),
     supplier_id: z.string().min(1, { message: 'Supplier is required.' }),
     warehouse_id: z.string().min(1, { message: 'Warehouse is required.' }),
-    return_date: z.date({ message: 'Return date is required.' }),
+    return_date: z.string().min(1, { message: 'Return date is required.' }),
     reason: z.enum(
         ['defective', 'wrong_item', 'excess_quantity', 'damaged', 'other'],
         {
@@ -986,9 +990,9 @@ export const supplierBillFormSchema = z.object({
     purchase_order_id: z.string().optional(),
     goods_receipt_id: z.string().optional(),
     supplier_invoice_number: z.string().optional(),
-    supplier_invoice_date: z.date().nullable().optional(),
-    bill_date: z.date({ message: 'Bill date is required.' }),
-    due_date: z.date({ message: 'Due date is required.' }),
+    supplier_invoice_date: z.string().nullable().optional(),
+    bill_date: z.string().min(1, { message: 'Bill date is required.' }),
+    due_date: z.string().min(1, { message: 'Due date is required.' }),
     payment_terms: z.string().optional(),
     currency: z.string().min(1, { message: 'Currency is required.' }),
     status: z.string().min(1, { message: 'Status is required.' }),
@@ -1035,7 +1039,7 @@ export const apPaymentFormSchema = z.object({
     supplier_id: z.string().min(1, { message: 'Supplier is required.' }),
     branch_id: z.string().min(1, { message: 'Branch is required.' }),
     fiscal_year_id: z.string().min(1, { message: 'Fiscal year is required.' }),
-    payment_date: z.date({ message: 'Payment date is required.' }),
+    payment_date: z.string().min(1, { message: 'Payment date is required.' }),
     payment_method: z
         .string()
         .min(1, { message: 'Payment method is required.' }),
@@ -1072,8 +1076,8 @@ export const customerInvoiceFormSchema = z.object({
     customer_id: z.string().min(1, { message: 'Customer is required.' }),
     branch_id: z.string().min(1, { message: 'Branch is required.' }),
     fiscal_year_id: z.string().min(1, { message: 'Fiscal year is required.' }),
-    invoice_date: z.date({ message: 'Invoice date is required.' }),
-    due_date: z.date({ message: 'Due date is required.' }),
+    invoice_date: z.string().min(1, { message: 'Invoice date is required.' }),
+    due_date: z.string().min(1, { message: 'Due date is required.' }),
     payment_terms: z.string().optional(),
     currency: z.string().min(1, { message: 'Currency is required.' }),
     status: z.enum(
@@ -1133,7 +1137,7 @@ export const arReceiptFormSchema = z.object({
     customer_id: z.string().min(1, { message: 'Customer is required.' }),
     branch_id: z.string().min(1, { message: 'Branch is required.' }),
     fiscal_year_id: z.string().min(1, { message: 'Fiscal year is required.' }),
-    receipt_date: z.date({ message: 'Receipt date is required.' }),
+    receipt_date: z.string().min(1, { message: 'Receipt date is required.' }),
     payment_method: z.enum(
         ['bank_transfer', 'cash', 'check', 'giro', 'credit_card', 'other'],
         { message: 'Payment method is required.' },
@@ -1172,7 +1176,9 @@ export const creditNoteFormSchema = z.object({
     customer_invoice_id: z.string().optional(),
     branch_id: z.string().min(1, { message: 'Branch is required.' }),
     fiscal_year_id: z.string().min(1, { message: 'Fiscal year is required.' }),
-    credit_note_date: z.date({ message: 'Credit note date is required.' }),
+    credit_note_date: z
+        .string()
+        .min(1, { message: 'Credit note date is required.' }),
     reason: z.enum(['return', 'discount', 'correction', 'bad_debt', 'other'], {
         message: 'Reason is required.',
     }),

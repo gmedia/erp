@@ -23,6 +23,7 @@ import {
     type RecurringJournal,
     type RecurringJournalLine,
 } from '@/types/recurring-journal';
+import { toDateInputValue } from '@/utils/date-format';
 import { RecurringJournalLineFormDialog } from './RecurringJournalLineFormDialog';
 import { RecurringJournalLinesTable } from './RecurringJournalLinesTable';
 
@@ -40,7 +41,7 @@ const recurringJournalFormSchema = z.object({
     frequency: z.enum(['daily', 'weekly', 'monthly', 'quarterly', 'yearly'], {
         message: 'Frequency is required.',
     }),
-    next_run_date: z.date({ message: 'Next run date is required.' }),
+    next_run_date: z.string().min(1, { message: 'Next run date is required.' }),
     auto_post: z.boolean().default(false),
     is_active: z.boolean().default(true),
     reference_template: z.string().optional(),
@@ -69,7 +70,7 @@ const getRecurringJournalFormDefaults = (
         return {
             name: '',
             frequency: 'monthly',
-            next_run_date: new Date(),
+            next_run_date: toDateInputValue(new Date()),
             auto_post: false,
             is_active: true,
             reference_template: '',
@@ -81,7 +82,7 @@ const getRecurringJournalFormDefaults = (
     return {
         name: entity.name || '',
         frequency: entity.frequency || 'monthly',
-        next_run_date: new Date(entity.next_run_date),
+        next_run_date: toDateInputValue(entity.next_run_date),
         auto_post: entity.auto_post || false,
         is_active: entity.is_active ?? true,
         reference_template: entity.reference_template || '',

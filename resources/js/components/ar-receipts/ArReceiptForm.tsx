@@ -21,6 +21,7 @@ import {
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type ArReceipt, type ArReceiptFormData } from '@/types/ar-receipt';
+import { toDateInputValue } from '@/utils/date-format';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { arReceiptFormSchema } from '@/utils/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -44,7 +45,7 @@ const getArReceiptFormDefaults = (
             customer_id: '',
             branch_id: '',
             fiscal_year_id: '',
-            receipt_date: new Date(),
+            receipt_date: toDateInputValue(new Date()),
             payment_method: 'bank_transfer',
             bank_account_id: '',
             currency: 'IDR',
@@ -64,8 +65,8 @@ const getArReceiptFormDefaults = (
             ? String(arReceipt.fiscal_year.id)
             : '',
         receipt_date: arReceipt.receipt_date
-            ? new Date(arReceipt.receipt_date)
-            : new Date(),
+            ? toDateInputValue(arReceipt.receipt_date)
+            : toDateInputValue(new Date()),
         payment_method: arReceipt.payment_method,
         bank_account_id: arReceipt.bank_account?.id
             ? String(arReceipt.bank_account.id)

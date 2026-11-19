@@ -13,6 +13,7 @@ import { InputField } from '@/components/common/InputField';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
 import { type AssetMaintenance } from '@/types/asset-maintenance';
+import { toDateInputValue } from '@/utils/date-format';
 import {
     AssetMaintenanceFormData,
     assetMaintenanceFormSchema,
@@ -34,7 +35,7 @@ const getAssetMaintenanceFormDefaults = (
             asset_id: '',
             maintenance_type: 'other',
             status: 'scheduled',
-            scheduled_at: new Date(),
+            scheduled_at: toDateInputValue(new Date()),
             performed_at: null,
             supplier_id: '',
             cost: '0',
@@ -47,9 +48,11 @@ const getAssetMaintenanceFormDefaults = (
         maintenance_type: item.maintenance_type || 'other',
         status: item.status || 'scheduled',
         scheduled_at: item.scheduled_at
-            ? new Date(item.scheduled_at)
-            : new Date(),
-        performed_at: item.performed_at ? new Date(item.performed_at) : null,
+            ? toDateInputValue(item.scheduled_at)
+            : toDateInputValue(new Date()),
+        performed_at: item.performed_at
+            ? toDateInputValue(item.performed_at)
+            : null,
         supplier_id: item.supplier_id ? String(item.supplier_id) : '',
         cost: item.cost ?? '0',
         notes: item.notes || '',
@@ -94,16 +97,10 @@ export const AssetMaintenanceForm = memo<AssetMaintenanceFormProps>(
             onSubmit({
                 ...data,
                 scheduled_at: data.scheduled_at
-                    ? (format(
-                          data.scheduled_at,
-                          'yyyy-MM-dd HH:mm:ss',
-                      ) as unknown as Date)
-                    : (null as unknown as Date),
+                    ? format(data.scheduled_at, 'yyyy-MM-dd HH:mm:ss')
+                    : '',
                 performed_at: data.performed_at
-                    ? (format(
-                          data.performed_at,
-                          'yyyy-MM-dd HH:mm:ss',
-                      ) as unknown as Date)
+                    ? format(data.performed_at, 'yyyy-MM-dd HH:mm:ss')
                     : null,
             });
         };

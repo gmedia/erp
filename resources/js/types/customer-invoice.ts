@@ -55,8 +55,8 @@ export interface CustomerInvoiceFormData {
     customer_id: string;
     branch_id: string;
     fiscal_year_id: string;
-    invoice_date: Date;
-    due_date: Date;
+    invoice_date: string;
+    due_date: string;
     payment_terms?: string;
     currency: string;
     status: CustomerInvoiceStatus;
