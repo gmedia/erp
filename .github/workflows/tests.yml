@@ -200,11 +200,11 @@ jobs:
         run: ./vendor/bin/sail npm run build
 
       - name: Run tests with coverage
-        if: ${{ steps.autofix.outputs.changed != 'true' && github.event_name != 'pull_request' }}
+        if: ${{ steps.autofix.outputs.changed != 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
         run: ./vendor/bin/sail test --colors=always --coverage-clover=coverage.xml
 
-      - name: Run tests in parallel
-        if: ${{ steps.autofix.outputs.changed != 'true' && github.event_name == 'pull_request' }}
+      - name: Run tests
+        if: ${{ steps.autofix.outputs.changed != 'true' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
         run: ./vendor/bin/sail test --parallel --recreate-databases --colors=always
 
       - name: Setup Java for Sonar scanner
@@ -227,7 +227,6 @@ jobs:
             -Dproject.settings=.sonarcloud.properties
             -Dsonar.organization=gmedia
             -Dsonar.projectKey=gmedia_erp
-            ${{ github.event_name == 'pull_request' && '-Dsonar.php.coverage.reportPaths=' || '' }}
 
       - name: Upload failure logs
         if: failure() && steps.autofix.outputs.changed != 'true'
@@ -259,6 +258,7 @@ jobs:
     env:
       PLAYWRIGHT_USE_SAIL: '1'
       PLAYWRIGHT_BASE_URL: http://localhost:82
+      PLAYWRIGHT_WORKERS: '2'
 
     steps:
       - name: Checkout source branch
