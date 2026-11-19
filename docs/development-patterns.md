@@ -119,6 +119,29 @@ export const XxxForm = memo<XxxFormProps>(function XxxForm({
 });
 ```
 
+### Field Tanggal (`DatePickerField`)
+
+Semua field tanggal di form memakai `DatePickerField` dan schema `z.string()`, **bukan** `z.date()`.
+
+- Required: `z.string().min(1, { message: '... is required.' })`
+- Optional: `z.string().optional().nullable()`
+- Default wajib string `yyyy-MM-dd` lewat `toDateInputValue()`:
+  - required: `toDateInputValue(entity?.field ?? new Date())`
+  - optional: `entity?.field ? toDateInputValue(entity.field) : null`
+- `DatePickerField` menyimpan/mengirim string `yyyy-MM-dd`, dan mengirim `''` saat dikosongkan (Laravel mengubahnya menjadi `null`).
+- Jangan mengirim objek `Date` ke API dan jangan menambahkan `z.date()`.
+
+```tsx
+import { toDateInputValue } from '@/utils/date-format';
+
+const getDefaults = (entity?: Xxx | null): XxxFormData => ({
+    purchase_date: toDateInputValue(entity?.purchase_date ?? new Date()),
+    warranty_end_date: entity?.warranty_end_date
+        ? toDateInputValue(entity.warranty_end_date)
+        : null,
+});
+```
+
 ### ViewModal Component
 
 ```tsx
@@ -426,6 +449,7 @@ class XxxExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping,
 
 - [ ] Pest group: `->group('{module-slug}')` (kebab-case)
 - [ ] E2E: `tests/e2e/{module-slug}/{module}.spec.ts`
+- [ ] E2E field tanggal: ganti nilai lewat `changeDateFieldValue(page, dialog, label)` dan assert payload `yyyy-MM-dd`
 
 ---
 
@@ -445,3 +469,5 @@ class XxxExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping,
 | `LoadsResourceRelations`     | `Controllers/Concerns/LoadsResourceRelations.php`   | Relation loading trait                   |
 | `StoresItemsInTransaction`   | `Controllers/Concerns/StoresItemsInTransaction.php` | Transaction form pattern                 |
 | `destroyModel()`             | `Controller.php` (base)                             | Standard delete response                 |
+| `toDateInputValue`           | `utils/date-format.ts`                              | Normalisasi nilai tanggal ke `yyyy-MM-dd` |
+| `changeDateFieldValue`       | `tests/e2e/helpers.ts`                              | Ganti nilai `DatePickerField` di E2E     |

@@ -17,6 +17,9 @@ const bankReconciliationFormSchema = z
         fiscal_year_id: z
             .string()
             .min(1, { message: 'Fiscal year is required.' }),
+        reconciliation_date: z
+            .string()
+            .min(1, { message: 'Reconciliation date is required.' }),
         period_start: z
             .string()
             .min(1, { message: 'Period start is required.' }),
@@ -24,6 +27,7 @@ const bankReconciliationFormSchema = z
         statement_balance: z.coerce.number({
             message: 'Statement balance is required.',
         }),
+        book_balance: z.coerce.number(),
         branch_id: z.string().optional(),
     })
     .refine((data) => data.period_end >= data.period_start, {
@@ -48,19 +52,29 @@ const getBankReconciliationFormDefaults = (
         return {
             account_id: '',
             fiscal_year_id: '',
+            reconciliation_date: toDateInputValue(new Date()),
             period_start: toDateInputValue(new Date()),
             period_end: toDateInputValue(new Date()),
             statement_balance: 0,
+            book_balance: 0,
             branch_id: '',
         };
     }
     return {
-        account_id: String(entity.account_id),
-        fiscal_year_id: String(entity.fiscal_year_id),
+        account_id: String(entity.account_id ?? entity.account?.id ?? ''),
+        fiscal_year_id: String(
+            entity.fiscal_year_id ?? entity.fiscal_year?.id ?? '',
+        ),
+        reconciliation_date: toDateInputValue(entity.reconciliation_date),
         period_start: toDateInputValue(entity.period_start),
         period_end: toDateInputValue(entity.period_end),
         statement_balance: Number(entity.statement_balance),
-        branch_id: entity.branch_id ? String(entity.branch_id) : '',
+        book_balance: Number(entity.book_balance),
+        branch_id: entity.branch_id
+            ? String(entity.branch_id)
+            : entity.branch?.id
+              ? String(entity.branch.id)
+              : '',
     };
 };
 
