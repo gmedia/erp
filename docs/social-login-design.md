@@ -1,6 +1,6 @@
 # Social Login Design — Google & Microsoft (Personal + Workspace/365)
 
-**Status:** Rancangan (belum diimplementasikan)
+**Status:** Implemented (backend #148, frontend #154, Wave 5 #159). Deployment guide: `docs/social-login-deployment.md`.
 **Dibuat:** 2026-11-18
 **Scope:** Login OAuth untuk 4 varian akun — Google pribadi, Google Workspace, Microsoft pribadi, Microsoft 365.
 **Arsitektur target:** Laravel 12 JSON API + React 19 SPA, Sanctum Bearer Token (tanpa Inertia, tanpa session login).
@@ -484,7 +484,7 @@ Review read-only oleh agent `deep-low` menghasilkan verdict **REJECTED** dengan 
 
 Temuan HIGH yang juga diadopsi: 2FA bypass (§3.4), `email_verified` Microsoft/Google dari klaim yang salah (§3.1/§3.2), evaluasi ulang kebijakan tiap login, tiket atomic + binding + cleanup scheduler, `GuestRoute` pada callback link, migrasi employee nullable, rate limit yang hanya deklaratif, factory OAuth-only, duplikasi set-password, CSRF exchange, FQCN/duster, dan 9 test gap baru di §8.1.
 
-Status saat ini: **siap untuk diimplementasikan** setelah keputusan yang tersisa di §10 (akun personal, tenant Microsoft, 2FA) dikonfirmasi tim. Keputusan domain/tenant & toggle password SUDAH final (§10.1).
+Status saat ini: **diimplementasikan lengkap** (Wave 1–5). Semua keputusan di §10 final. Untuk langkah operasional lihat `docs/social-login-deployment.md`.
 
 ### 12.1 Keputusan User Tambahan (2026-11-18)
 
