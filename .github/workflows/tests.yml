@@ -383,6 +383,9 @@ jobs:
           key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-playwright-
 
+      - name: Configure apt retries
+        run: echo 'Acquire::Retries "10";' | sudo tee /etc/apt/apt.conf.d/80-retries
+
       - name: Install Playwright browsers
         shell: bash
         run: |
