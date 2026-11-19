@@ -205,7 +205,7 @@ jobs:
 
       - name: Run tests
         if: ${{ steps.autofix.outputs.changed != 'true' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
-        run: ./vendor/bin/sail test --parallel --recreate-databases --colors=always
+        run: ./vendor/bin/sail test --colors=always
 
       - name: Setup Java for Sonar scanner
         if: ${{ success() && steps.autofix.outputs.changed != 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
@@ -246,12 +246,17 @@ jobs:
           fi
 
   e2e:
-    name: Playwright E2E via Sail
+    name: Playwright E2E via Sail (shard ${{ matrix.shard }}/4)
     runs-on: ubuntu-latest
     timeout-minutes: 150
     # Parallel with Quality (option b, issue #162): autofixes are formatting-only;
     # `ci` still fails when autofix_applied=true and the follow-up run re-tests.
+    # Sharded across runners (issue #183): 4 shards, 129/129/129/128 = 515 tests.
     continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
     permissions:
       contents: read
       packages: read
@@ -378,8 +383,22 @@ jobs:
           key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-playwright-
 
+      - name: Configure apt retries
+        run: echo 'Acquire::Retries "10";' | sudo tee /etc/apt/apt.conf.d/80-retries
+
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+        shell: bash
+        run: |
+          for attempt in 1 2 3; do
+            if npx playwright install --with-deps chromium; then
+              exit 0
+            fi
+            echo "Playwright browser install failed (attempt ${attempt}/3). Retrying in 15s..."
+            sudo apt-get clean || true
+            sleep 15
+          done
+          echo "::error::Playwright browser install failed after 3 attempts."
+          exit 1
 
       - name: Run Playwright E2E
         run: >
@@ -462,6 +481,7 @@ jobs:
           tests/e2e/units/
           tests/e2e/users/
           tests/e2e/warehouses/
+          --shard=${{ matrix.shard }}/4
           --reporter=line
 
       - name: Upload Playwright report
@@ -469,7 +489,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         continue-on-error: true
         with:
-          name: playwright-report-${{ github.run_id }}
+          name: playwright-report-${{ github.run_id }}-shard-${{ matrix.shard }}
           path: |
             e2e/playwright-report
             e2e/test-results
@@ -481,7 +501,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         continue-on-error: true
         with:
-          name: e2e-laravel-logs-${{ github.run_id }}
+          name: e2e-laravel-logs-${{ github.run_id }}-shard-${{ matrix.shard }}
           path: storage/logs
           if-no-files-found: ignore
           retention-days: 7
