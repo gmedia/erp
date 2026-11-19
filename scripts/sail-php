@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Route Artisan calls from Playwright global-setup into the Sail app container.
+# Playwright itself runs on the host; only PHP/Artisan needs the container.
+exec ./vendor/bin/sail php "$@"
