@@ -270,6 +270,8 @@ jobs:
     env:
       PLAYWRIGHT_USE_SAIL: '1'
       PLAYWRIGHT_BASE_URL: http://localhost:82
+      COMPOSE_FILE: 'docker-compose.yml:.github/ci/docker-compose.e2e.yml'
+      PLAYWRIGHT_WORKERS: '2'
 
     steps:
       - name: Checkout source branch

@@ -1,0 +1,8 @@
+# CI-only Compose override for the Playwright E2E job (see issue #219).
+# Raises the PHP built-in server worker count so 2 parallel Playwright workers do
+# not saturate the app. Applied via COMPOSE_FILE; local/dev is unaffected.
+services:
+  laravel.test:
+    environment:
+      PHP_CLI_SERVER_WORKERS: '8'
+      SUPERVISOR_PHP_COMMAND: '/usr/bin/php -d variables_order=EGPCS /var/www/html/artisan serve --host=0.0.0.0 --port=80 --no-reload'
