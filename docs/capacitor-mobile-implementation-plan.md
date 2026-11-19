@@ -1,6 +1,6 @@
 # Rancangan Implementasi Mobile — Capacitor JS (Android-first)
 
-> **Status:** FINAL v3.5 — Android-first (Fase 0/1/3/5 + FCM sender)  
+> **Status:** FINAL v3.6 — Android-first (Fase 0/1/3/4/5, hardening, PWA)  
 > **Tanggal:** 2026-11-19  
 > **Lingkup:** ERP on-premise multi-cabang — Laravel 12 JSON API + React 19/TypeScript/Vite 7 SPA  
 > **Keputusan induk:** Android-first dengan Capacitor v8. iOS **ditunda** sebagai backlog aditif (tanpa rewrite). PWA dipakai sebagai jembatan interim untuk pengguna iPhone dan desktop.
@@ -405,6 +405,7 @@ Dikerjakan setelah Android stabil. **Tidak perlu** mengubah React SPA, backend `
 | v3.2 → v3.3 | Menyelaraskan rencana dengan fakta Fase 0: build mobile statis (`index.html` + `vite.mobile.config.ts`, `publicDir:false`, alias `@`), `VITE_API_BASE_URL` + axios baseURL, CORS origin native, `APP_NAME` precedence (dotenv tanpa expand), script `build:mobile`/`mobile:sync`, `.gitignore` `dist`, dan catatan blocker toolchain. |
 | v3.3 → v3.4 | Fase 1 dieksekusi: device_tokens table/model/factory, kontrak `PushSender` + `LogPushSender` (+ binding), channel `push` di `NotificationService` (dedupe Cache), events/config `push`, API device-tokens + Policy + logout revocation, 11 test baru (6 device-tokens + 5 notifications), regresi approvals/vehicle-loans hijau, PHPStan/Duster clean. **Fix:** lookup config event bertitik (mis. `approval.request.created`) memakai akses array literal, bukan dot traversal. |
 | v3.4 → v3.5 | Fase 3/5 dieksekusi: `token-storage.ts` (cache + secure storage, 8 call site), `lib/camera.ts` + `PhotoInput` untuk pickup/return, `@capacitor/camera`/`@aparajita` sync. FCM HTTP v1 sender + Google service account token provider + tests (PR #207). Emulator CI: Android debug APK blocking; emulator smoke dibuat manual/opt-in karena runner hosted tanpa KVM; host punya `/dev/kvm`. |
+| v3.5 → v3.6 | Fase 4 client push (`@capacitor/push-notifications` 8.1.3, `lib/push-notifications.ts`, Settings native section), hardening device token (throttle 10/menit, token hidden, `device-tokens:prune` harian, CORS tests), dan PWA manifest + ikon netral + service worker pass-through. CI: branch harus rebase ke `main` agar `scripts/check-date-schemas.sh` tersedia. |
 
 ---
 
@@ -445,3 +446,13 @@ Dikerjakan setelah Android stabil. **Tidak perlu** mengubah React SPA, backend `
 - **CI mobile:** `mobile_android` membangun debug APK dan bersifat blocking. `mobile_emulator` dibuat **manual/opt-in** (`workflow_dispatch`) karena runner GitHub hosted tidak punya KVM; host ini punya `/dev/kvm` tetapi belum punya JDK/SDK/libs.
 - **Status runtime:** login/logout native dan capture kamera belum diverifikasi di device/emulator. Verifikasi hanya sampai type-check, web build, dan kompilasi APK.
 - **appId:** masih placeholder `com.contoh.erp`; wajib diganti sebelum build internal pertama.
+
+---
+
+## 17. Catatan implementasi Fase 4 + hardening + PWA (fakta lapangan, 2026-11-19)
+
+- **Fase 4 client push:** `@capacitor/push-notifications` 8.1.3. `resources/js/lib/push-notifications.ts` meminta izin di user gesture, `register()`, mengirim token ke `/api/device-tokens`, menampilkan toast foreground, dan membuka `target_url`. Section "Notifications" hanya tampil di native (Settings profile). Bila `google-services.json` belum ada, Android build tetap jalan (plugin google-services tidak diterapkan) dan registrasi gagal dengan pesan yang jelas.
+- **Hardening device token:** `POST /api/device-tokens` di-throttle 10/menit; `token` disembunyikan dari JSON; command `device-tokens:prune` dijadwalkan harian; CORS native diuji; kredensial Firebase di-`.gitignore`.
+- **PWA:** `public/manifest.webmanifest` + ikon netral 192/512 (GD), service worker pass-through tanpa cache, link manifest/theme/apple + registrasi SW di `app.blade.php`.
+- **CI note:** workflow dari `main` memanggil `scripts/check-date-schemas.sh`; branch PR harus up-to-date/rebase ke `main`, jika tidak Quality gagal `127`.
+- **Status runtime:** push belum diuji end-to-end (butuh `google-services.json`, FCM credentials, `PUSH_DRIVER=fcm`, dan device). Login/kamera juga belum diverifikasi runtime.
