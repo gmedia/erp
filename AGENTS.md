@@ -73,6 +73,8 @@ Host RAM/CPU is limited. Parallel `Read`/`Edit`/`task` batches have **killed Ope
 - `DISABLE_RATE_LIMITING=true` **harus aktif di proses web server di dalam container**, bukan hanya di Artisan CLI. Tanpa ini, E2E gagal dengan `429 Too Many Requests` (limiter `throttle:api` 60/menit). Cara aman tanpa mengubah `.env`: compose override yang menambah environment variable ke service `laravel.test`, lalu `config:cache` sekali supaya request HTTP ikut membaca nilai tersebut.
 - `APP_ADMIN` yang dipakai `global-setup.ts` harus sama dengan admin hasil seed di container (CI pakai `admin@example.com`; host bisa berbeda). Jangan mengubah `.env` — set `APP_ADMIN` di environment proses Playwright.
 - Pre-flight wajib sebelum push: jumlah test **515** dengan argumen direktori yang sama seperti job CI. `npx playwright test --list` tanpa argumen menghitung semua spec (677) — bukan angka yang dipakai CI. Pakai daftar 78 direktori `tests/e2e/...` dari step `Run Playwright E2E` di `tests.yml`.
+- CI memecah E2E menjadi **4 shard** (`--shard=n/4`, matrix job). Saat menambah/menghapus direktori E2E, pastikan `npx playwright test --list <dirs>` tetap 515 dan tiap shard tetap terisi.
+- **`sail test --parallel` belum bisa dipakai** di repo ini: base `tests/TestCase.php` tidak memakai `RefreshDatabase`, sehingga semua worker paralel memakai database `testing` yang sama dan gagal `Table 'testing.*' doesn't exist`. Gunakan serial sampai DB per-worker disiapkan (lihat issue #162/#183).
 
 ## Workflow
 
