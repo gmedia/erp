@@ -70,6 +70,24 @@ Host RAM/CPU is limited. Parallel `Read`/`Edit`/`task` batches have **killed Ope
 
 > Use `rtk` wrapper for all git operations. `rtk` ensures the correct environment and SSH keys are configured. Never use raw `git` directly — always `rtk git <command>`.
 
+### `rtk` tidak tersedia? Pasang otomatis
+
+Agent **wajib** memastikan `rtk` tersedia sebelum menjalankan operasi git apa pun. Deteksi dengan `command -v rtk`. Jika tidak ditemukan:
+
+1. Pasang dari installer resmi (binary terverifikasi SHA-256):
+   ```bash
+   curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh
+   ```
+2. Installer menaruh binary di `~/.local/bin/rtk`. Pastikan PATH termuat:
+   ```bash
+   export PATH="$HOME/.local/bin:$PATH"
+   ```
+   Tambahkan `export PATH="$HOME/.local/bin:$PATH"` ke `~/.bashrc` jika belum ada, agar sesi berikutnya otomatis punya `rtk`.
+3. Verifikasi: `rtk --version` (bukan `command not found`) dan `rtk git status` harus menampilkan branch.
+4. Jangan pernah fallback ke raw `git` hanya karena `rtk` belum ada — pasang dulu. Gunakan raw `git` hanya jika installer gagal, dan laporkan ke user sebagai blocker.
+
+> Catatan: ini adalah `rtk-ai/rtk` (Rust token killer), bukan paket `rtk` dari crates.io.
+
 ## Session Start Checklist
 
 ```bash
