@@ -1,4 +1,5 @@
 import { PageHeader } from '@/components/common/PageHeader';
+import { PhotoInput } from '@/components/common/PhotoInput';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -121,30 +122,20 @@ export default function VehicleLoanReturnPage() {
                             <Label htmlFor="handover">
                                 Foto bukti serah terima dengan security
                             </Label>
-                            <Input
+                            <PhotoInput
                                 id="handover"
-                                type="file"
-                                accept="image/jpeg,image/png"
-                                onChange={(e) =>
-                                    setHandoverPhoto(
-                                        e.target.files?.[0] ?? null,
-                                    )
-                                }
+                                value={handoverPhoto}
+                                onChange={setHandoverPhoto}
                             />
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="condition">
                                 Foto kondisi kendaraan
                             </Label>
-                            <Input
+                            <PhotoInput
                                 id="condition"
-                                type="file"
-                                accept="image/jpeg,image/png"
-                                onChange={(e) =>
-                                    setConditionPhoto(
-                                        e.target.files?.[0] ?? null,
-                                    )
-                                }
+                                value={conditionPhoto}
+                                onChange={setConditionPhoto}
                             />
                         </div>
                         <div className="grid gap-2">
