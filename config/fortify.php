@@ -149,11 +149,7 @@ return [
         // Features::emailVerification(),
         // Features::updateProfileInformation(),
         // Features::updatePasswords(),
-        Features::twoFactorAuthentication([
-            'confirm' => true,
-            'confirmPassword' => true,
-            // 'window' => 0
-        ]),
+        // Features::twoFactorAuthentication() disabled: /api/login never checks users.two_factor_secret.
     ],
 
 ];
