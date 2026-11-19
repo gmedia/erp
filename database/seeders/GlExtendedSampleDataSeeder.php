@@ -51,7 +51,21 @@ class GlExtendedSampleDataSeeder extends Seeder
     private function seedRecurringJournals(FiscalYear $fiscalYear, Collection $accounts, User $user): void
     {
         foreach ([750000, 1250000, 2500000, 3750000] as $index => $amount) {
-            $name = 'Recurring Journal Sample ' . ($index + 1);
+            $name = 'Jurnal Berulang Beban Operasional ' . ($index + 1);
+            $legacyName = 'Recurring Journal Sample ' . ($index + 1);
+
+            $legacyJournals = RecurringJournal::where('name', $legacyName)
+                ->where('fiscal_year_id', $fiscalYear->id)
+                ->get();
+
+            if (RecurringJournal::where('name', $name)->where('fiscal_year_id', $fiscalYear->id)->exists()) {
+                foreach ($legacyJournals as $legacyJournal) {
+                    $legacyJournal->lines()->delete();
+                    $legacyJournal->delete();
+                }
+            } elseif ($legacyJournals->isNotEmpty()) {
+                $legacyJournals->first()->update(['name' => $name]);
+            }
 
             $journal = RecurringJournal::updateOrCreate(
                 ['name' => $name, 'fiscal_year_id' => $fiscalYear->id],
@@ -65,8 +79,8 @@ class GlExtendedSampleDataSeeder extends Seeder
 
             $journal->lines()->delete();
             $journal->lines()->createMany([
-                ['account_id' => $accounts[0]->id, 'debit' => $amount, 'credit' => 0, 'memo' => 'Debit sample line'],
-                ['account_id' => $accounts[1]->id, 'debit' => 0, 'credit' => $amount, 'memo' => 'Credit sample line'],
+                ['account_id' => $accounts[0]->id, 'debit' => $amount, 'credit' => 0, 'memo' => 'Beban operasional bulanan'],
+                ['account_id' => $accounts[1]->id, 'debit' => 0, 'credit' => $amount, 'memo' => 'Kas keluar untuk beban operasional'],
             ]);
         }
     }

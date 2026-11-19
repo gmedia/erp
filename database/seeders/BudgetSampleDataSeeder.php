@@ -14,6 +14,14 @@ class BudgetSampleDataSeeder extends Seeder
 {
     public function run(): void
     {
+        foreach ([
+            'Sample draft operational budget for testing Budget module.' => 'Anggaran operasional tahunan versi draft',
+            'Sample approved operational budget for testing Budget module.' => 'Anggaran operasional tahunan yang telah disetujui',
+            'Sample locked capital budget for testing Budget module.' => 'Anggaran modal yang telah dikunci',
+        ] as $legacy => $current) {
+            Budget::where('description', $legacy)->update(['description' => $current]);
+        }
+
         $adminUserId = User::query()->where('email', config('app.admin'))->value('id') ?? User::query()->value('id');
         $fiscalYear = FiscalYear::query()->where('status', 'open')->first();
 
@@ -49,7 +57,7 @@ class BudgetSampleDataSeeder extends Seeder
         $budgetDefinitions = [
             [
                 'name' => "Operational Budget {$fyName} (Draft)",
-                'description' => 'Sample draft operational budget for testing Budget module.',
+                'description' => 'Anggaran operasional tahunan versi draft',
                 'budget_type' => 'operational',
                 'status' => 'draft',
                 'approved' => false,
@@ -64,7 +72,7 @@ class BudgetSampleDataSeeder extends Seeder
             ],
             [
                 'name' => "Operational Budget {$fyName} (Approved)",
-                'description' => 'Sample approved operational budget for testing Budget module.',
+                'description' => 'Anggaran operasional tahunan yang telah disetujui',
                 'budget_type' => 'operational',
                 'status' => 'approved',
                 'approved' => true,
@@ -80,7 +88,7 @@ class BudgetSampleDataSeeder extends Seeder
             ],
             [
                 'name' => "Capital Budget {$fyName} (Locked)",
-                'description' => 'Sample locked capital budget for testing Budget module.',
+                'description' => 'Anggaran modal yang telah dikunci',
                 'budget_type' => 'capital',
                 'status' => 'locked',
                 'approved' => true,
@@ -125,7 +133,7 @@ class BudgetSampleDataSeeder extends Seeder
                     'period_start' => $line['period_start'],
                     'period_end' => $line['period_end'],
                     'allocated_amount' => $line['amount'],
-                    'notes' => 'Sample budget line for testing.',
+                    'notes' => 'Alokasi anggaran per periode',
                 ]);
             }
         }

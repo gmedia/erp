@@ -23,11 +23,20 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        // Seed default test user
+        // Seed default demo user
+        $legacyDemoUser = User::where('email', 'test@example.com')->first();
+
+        if ($legacyDemoUser && ! User::where('email', 'rina.kartika@example.com')->exists()) {
+            $legacyDemoUser->update([
+                'email' => 'rina.kartika@example.com',
+                'name' => 'Rina Kartika',
+            ]);
+        }
+
         $testUser = User::updateOrCreate(
-            ['email' => 'test@example.com'],
+            ['email' => 'rina.kartika@example.com'],
             [
-                'name' => 'Test User',
+                'name' => 'Rina Kartika',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
             ]
@@ -91,13 +100,23 @@ class DatabaseSeeder extends Seeder
         $companyId = Company::query()->value('id')
             ?? Company::query()->firstOrCreate(['name' => 'PT. Default Company'])->id;
 
-        // Test User Employee (for test@example.com — ensures CheckPermission middleware finds employee)
+        $legacyDemoEmployee = Employee::where('email', 'test@example.com')->first();
+
+        if ($legacyDemoEmployee && ! Employee::where('email', 'rina.kartika@example.com')->exists()) {
+            $legacyDemoEmployee->update([
+                'email' => 'rina.kartika@example.com',
+                'name' => 'Rina Kartika',
+                'employee_id' => 'EMP-2022-0031',
+            ]);
+        }
+
+        // Demo user employee (ensures CheckPermission middleware finds employee)
         $testEmployee = Employee::updateOrCreate([
-            'email' => 'test@example.com',
+            'email' => 'rina.kartika@example.com',
             'user_id' => $testUser->id,
         ], [
-            'employee_id' => 'EMP-TEST01',
-            'name' => 'Test User',
+            'employee_id' => 'EMP-2022-0031',
+            'name' => 'Rina Kartika',
             'phone' => '1234567890',
         ]);
 
@@ -203,7 +222,7 @@ class DatabaseSeeder extends Seeder
         // Assign all permissions to sample users for easy testing
         $allPermissions = Permission::all();
         foreach ([
-            'test@example.com',
+            'rina.kartika@example.com',
             config('app.admin'),
             'manager.hr@example.com',
             'director.finance@example.com',

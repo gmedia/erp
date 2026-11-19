@@ -94,7 +94,7 @@ class StockAdjustmentSampleDataSeeder extends Seeder
                 ['adjustment_number' => $sample['adjustment_number']],
                 array_merge([
                     'warehouse_id' => $warehouse->id,
-                    'notes' => 'Sample data',
+                    'notes' => 'Penyesuaian stok hasil stocktake',
                     'created_by' => $adminUserId,
                 ], $approved ?? [], [
                     'adjustment_date' => $sample['adjustment_date'],
@@ -129,10 +129,28 @@ class StockAdjustmentSampleDataSeeder extends Seeder
         }
     }
 
+    private function renameLegacyProducts(): void
+    {
+        $map = [
+            'INV-SMP-001' => 'INV-2026-001',
+            'INV-SMP-002' => 'INV-2026-002',
+            'INV-SMP-003' => 'INV-2026-003',
+        ];
+
+        foreach ($map as $legacy => $current) {
+            if (Product::where('code', $current)->exists()) {
+                continue;
+            }
+
+            Product::where('code', $legacy)->update(['code' => $current]);
+        }
+    }
+
     private function ensureProductsWithStock(int $branchId): Collection
     {
+        $this->renameLegacyProducts();
         $products = Product::query()
-            ->whereIn('code', ['INV-SMP-001', 'INV-SMP-002', 'INV-SMP-003'])
+            ->whereIn('code', ['INV-2026-001', 'INV-2026-002', 'INV-2026-003'])
             ->orderBy('id')
             ->get();
 
@@ -150,20 +168,20 @@ class StockAdjustmentSampleDataSeeder extends Seeder
 
         $samples = [
             [
-                'code' => 'INV-SMP-001',
-                'name' => 'Inventory Sample Product A',
+                'code' => 'INV-2026-001',
+                'name' => 'Kabel HDMI 2 Meter',
                 'type' => 'raw_material',
                 'cost' => 10000,
             ],
             [
-                'code' => 'INV-SMP-002',
-                'name' => 'Inventory Sample Product B',
+                'code' => 'INV-2026-002',
+                'name' => 'Mouse Wireless M170',
                 'type' => 'raw_material',
                 'cost' => 15000,
             ],
             [
-                'code' => 'INV-SMP-003',
-                'name' => 'Inventory Sample Product C',
+                'code' => 'INV-2026-003',
+                'name' => 'Keyboard Mekanik K2',
                 'type' => 'finished_good',
                 'cost' => 25000,
             ],
@@ -193,7 +211,7 @@ class StockAdjustmentSampleDataSeeder extends Seeder
         }
 
         return Product::query()
-            ->whereIn('code', ['INV-SMP-001', 'INV-SMP-002', 'INV-SMP-003'])
+            ->whereIn('code', ['INV-2026-001', 'INV-2026-002', 'INV-2026-003'])
             ->orderBy('id')
             ->get()
             ->take(3);
@@ -225,7 +243,7 @@ class StockAdjustmentSampleDataSeeder extends Seeder
                 'quantity_after' => $quantityAfter,
                 'unit_cost' => $unitCost,
                 'total_cost' => $totalCost,
-                'reason' => 'Sample item',
+                'reason' => 'Penyesuaian stok hasil opname fisik',
             ];
         }
 
@@ -262,7 +280,7 @@ class StockAdjustmentSampleDataSeeder extends Seeder
                 'quantity_after' => $quantityAfter,
                 'unit_cost' => $unitCost,
                 'total_cost' => $totalCost,
-                'reason' => 'Generated from stocktake sample',
+                'reason' => 'Penyesuaian dari hasil stocktake',
             ];
         }
 
