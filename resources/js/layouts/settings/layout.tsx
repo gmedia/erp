@@ -17,11 +17,7 @@ const sidebarNavItems: NavItem[] = [
         href: '/settings/password',
         icon: null,
     },
-    {
-        title: 'Two-Factor Auth',
-        href: '/settings/two-factor-auth',
-        icon: null,
-    },
+    // Hidden until /api/login verifies users.two_factor_secret; otherwise 2FA is bypassable.
     {
         title: 'Appearance',
         href: '/settings/appearance',
