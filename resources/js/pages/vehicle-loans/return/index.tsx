@@ -1,21 +1,35 @@
 import { PageHeader } from '@/components/common/PageHeader';
 import { PhotoInput } from '@/components/common/PhotoInput';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { VehicleLoanQrPanel } from '@/components/vehicle-loans/VehicleLoanQrPanel';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
+import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { toast } from 'sonner';
 
+interface PickupOption {
+    id: number;
+    vehicle_loan_id: number;
+    code: string;
+    plate_number: string | null;
+    start_at: string | null;
+}
+
 export default function VehicleLoanReturnPage() {
-    const [pickups, setPickups] = useState<
-        Array<{ id: number; vehicle_loan_id: number }>
-    >([]);
+    const [pickups, setPickups] = useState<PickupOption[]>([]);
     const [pickupId, setPickupId] = useState('');
     const [handoverPhoto, setHandoverPhoto] = useState<File | null>(null);
     const [conditionPhoto, setConditionPhoto] = useState<File | null>(null);
@@ -23,14 +37,19 @@ export default function VehicleLoanReturnPage() {
     const [incidentNote, setIncidentNote] = useState('');
     const [odometerEnd, setOdometerEnd] = useState('');
     const [loading, setLoading] = useState(false);
+    const [loaded, setLoaded] = useState(false);
 
     async function loadPickups() {
+        setLoading(true);
         try {
             const response = await axios.get(
                 '/api/vehicle-loans/my?per_page=50',
             );
             const items = (
                 response.data.data as Array<{
+                    code: string;
+                    plate_number: string | null;
+                    start_at: string | null;
                     pickup?: {
                         id: number;
                         vehicle_loan_id: number;
@@ -38,14 +57,24 @@ export default function VehicleLoanReturnPage() {
                     };
                 }>
             )
-                .filter((loan) => loan.pickup)
-                .map((loan) => loan.pickup!)
-                .filter((pickup) => Boolean(pickup.key_handover_at));
+                .filter((loan) => loan.pickup?.key_handover_at)
+                .map((loan) => ({
+                    id: loan.pickup!.id,
+                    vehicle_loan_id: loan.pickup!.vehicle_loan_id,
+                    code: loan.code,
+                    plate_number: loan.plate_number,
+                    start_at: loan.start_at,
+                }));
             setPickups(items);
+            setLoaded(true);
         } catch {
             toast.error('Gagal memuat data pengambilan.');
+        } finally {
+            setLoading(false);
         }
     }
+
+    const selected = pickups.find((pickup) => String(pickup.id) === pickupId);
 
     async function submit() {
         if (!pickupId || !handoverPhoto || !conditionPhoto) {
@@ -53,10 +82,15 @@ export default function VehicleLoanReturnPage() {
             return;
         }
 
+        if (incident && incidentNote.trim().length < 5) {
+            toast.error('Isi keterangan insiden minimal 5 karakter.');
+            return;
+        }
+
         const body = new FormData();
         body.append('handover_photo', handoverPhoto);
         body.append('condition_photo', conditionPhoto);
-        body.append('incident', String(incident));
+        body.append('incident', incident ? '1' : '0');
         if (incident) body.append('incident_note', incidentNote);
         if (odometerEnd) body.append('odometer_end', odometerEnd);
 
@@ -68,6 +102,11 @@ export default function VehicleLoanReturnPage() {
             );
             toast.success('Pengembalian berhasil dicatat.');
             setPickupId('');
+            setHandoverPhoto(null);
+            setConditionPhoto(null);
+            setIncident(false);
+            setIncidentNote('');
+            setOdometerEnd('');
         } catch {
             toast.error('Gagal mencatat pengembalian.');
         } finally {
@@ -82,85 +121,176 @@ export default function VehicleLoanReturnPage() {
             ]}
         >
             <Helmet>
-                <title>Pengembalian Kendaraan </title>
+                <title>Pengembalian Kendaraan</title>
             </Helmet>
             <div className="mx-auto max-w-2xl space-y-4 p-4 md:p-6">
                 <PageHeader
-                    title="Form Pengembalian Kendaraan"
-                    description="Unggah bukti serah terima, foto kondisi, dancatat insiden bila ada."
+                    title="Pengembalian Kendaraan"
+                    description="Pilih pengambilan, unggah bukti serah terima dan kondisi kendaraan, lalu catat insiden bila ada."
                 />
 
                 <Card>
-                    <CardContent className="space-y-4 pt-4">
+                    <CardHeader className="pb-3">
+                        <CardTitle className="text-base">
+                            Data Pengembalian
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
                         <Button
                             variant="outline"
-                            onClick={loadPickups}
-                            className="w-full"
+                            onClick={() => void loadPickups()}
+                            disabled={loading}
+                            className="min-h-11 w-full"
                         >
-                            Muat data pengambilan saya
+                            {loading
+                                ? 'Memuat...'
+                                : 'Muat Data Pengambilan Saya'}
                         </Button>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="pickup">Pengambilan</Label>
-                            <Input
-                                id="pickup"
-                                list="my-pickups"
-                                value={pickupId}
-                                onChange={(e) => setPickupId(e.target.value)}
-                            />
-                            <datalist id="my-pickups">
-                                {pickups.map((pickup) => (
-                                    <option key={pickup.id} value={pickup.id}>
-                                        Pengambilan #{pickup.id} — Loan #
-                                        {pickup.vehicle_loan_id}
-                                    </option>
-                                ))}
-                            </datalist>
+                            <Label htmlFor="pickup">
+                                Pengambilan
+                                <span
+                                    className="ml-1 text-destructive"
+                                    aria-hidden="true"
+                                >
+                                    *
+                                </span>
+                            </Label>
+                            <Select
+                                value={pickupId || undefined}
+                                onValueChange={setPickupId}
+                                disabled={!pickups.length}
+                            >
+                                <SelectTrigger id="pickup">
+                                    <SelectValue
+                                        placeholder={
+                                            loaded && !pickups.length
+                                                ? 'Tidak ada pengambilan aktif'
+                                                : 'Pilih pengambilan'
+                                        }
+                                    />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {pickups.map((pickup) => (
+                                        <SelectItem
+                                            key={pickup.id}
+                                            value={String(pickup.id)}
+                                        >
+                                            {pickup.code} —{' '}
+                                            {pickup.plate_number ??
+                                                'unit belum ditentukan'}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            {loaded && !pickups.length && (
+                                <p className="text-sm text-muted-foreground">
+                                    Belum ada kendaraan yang sedang dipinjam.
+                                    Pengembalian tersedia setelah kunci
+                                    diserahkan security.
+                                </p>
+                            )}
                         </div>
 
+                        {selected && (
+                            <div className="space-y-1 rounded-lg border bg-muted/30 p-3 text-sm">
+                                <p className="font-medium">{selected.code}</p>
+                                <p>Unit: {selected.plate_number ?? '-'}</p>
+                                <p>
+                                    Mulai:{' '}
+                                    {formatDateTimeByRegionalSettings(
+                                        selected.start_at,
+                                    )}
+                                </p>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader className="pb-3">
+                        <CardTitle className="text-base">
+                            Bukti & Kondisi
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
                         <div className="grid gap-2">
                             <Label htmlFor="handover">
                                 Foto bukti serah terima dengan security
+                                <span
+                                    className="ml-1 text-destructive"
+                                    aria-hidden="true"
+                                >
+                                    *
+                                </span>
                             </Label>
                             <PhotoInput
                                 id="handover"
                                 value={handoverPhoto}
                                 onChange={setHandoverPhoto}
+                                buttonLabel="Ambil Foto Serah Terima"
+                                hint="Foto bersama petugas security saat mengembalikan kunci. JPG/PNG, maks. 5 MB."
+                                capture
                             />
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="condition">
                                 Foto kondisi kendaraan
+                                <span
+                                    className="ml-1 text-destructive"
+                                    aria-hidden="true"
+                                >
+                                    *
+                                </span>
                             </Label>
                             <PhotoInput
                                 id="condition"
                                 value={conditionPhoto}
                                 onChange={setConditionPhoto}
+                                buttonLabel="Ambil Foto Kondisi"
+                                hint="Ambil dari beberapa sisi bila ada lecet atau kerusakan."
+                                capture
                             />
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="odometer">
                                 Odometer akhir (opsional)
                             </Label>
-                            <Input
-                                id="odometer"
-                                inputMode="numeric"
-                                value={odometerEnd}
-                                onChange={(e) => setOdometerEnd(e.target.value)}
-                            />
+                            <div className="relative">
+                                <Input
+                                    id="odometer"
+                                    inputMode="numeric"
+                                    value={odometerEnd}
+                                    onChange={(e) =>
+                                        setOdometerEnd(e.target.value)
+                                    }
+                                    className="pr-10"
+                                />
+                                <span className="absolute inset-y-0 right-3 flex items-center text-xs text-muted-foreground">
+                                    km
+                                </span>
+                            </div>
                         </div>
-                        <label className="flex items-center gap-2 text-sm">
+                        <label className="flex min-h-11 items-center gap-2 text-sm">
                             <input
                                 type="checkbox"
+                                className="size-4"
                                 checked={incident}
                                 onChange={(e) => setIncident(e.target.checked)}
                             />
-                            Ada insiden
+                            Ada insiden selama peminjaman
                         </label>
                         {incident && (
                             <div className="grid gap-2">
                                 <Label htmlFor="incident_note">
                                     Keterangan insiden
+                                    <span
+                                        className="ml-1 text-destructive"
+                                        aria-hidden="true"
+                                    >
+                                        *
+                                    </span>
                                 </Label>
                                 <Textarea
                                     id="incident_note"
@@ -169,14 +299,19 @@ export default function VehicleLoanReturnPage() {
                                         setIncidentNote(e.target.value)
                                     }
                                     rows={3}
+                                    placeholder="Jelaskan kejadian, lokasi, dan kondisi kendaraan."
                                 />
                             </div>
                         )}
-
                         <Button
-                            onClick={submit}
-                            disabled={loading}
-                            className="w-full"
+                            onClick={() => void submit()}
+                            disabled={
+                                loading ||
+                                !pickupId ||
+                                !handoverPhoto ||
+                                !conditionPhoto
+                            }
+                            className="min-h-11 w-full"
                         >
                             Kirim Pengembalian
                         </Button>
@@ -184,7 +319,7 @@ export default function VehicleLoanReturnPage() {
                 </Card>
 
                 <Card>
-                    <CardContent className="pt-4">
+                    <CardContent className="pt-6">
                         <VehicleLoanQrPanel form="return" />
                     </CardContent>
                 </Card>

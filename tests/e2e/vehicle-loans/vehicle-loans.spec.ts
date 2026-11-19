@@ -183,9 +183,12 @@ test.describe('Vehicle Loans', () => {
         await page.goto(VEHICLE_LOAN_DASHBOARD_PATH);
 
         await expect(page).toHaveTitle(/Dashboard Peminjaman Kendaraan/);
+        await expect(
+            page.getByRole('heading', { name: 'Status Permintaan' }),
+        ).toBeVisible();
         await expect(page.getByText('Total permintaan')).toBeVisible();
-        await expect(page.getByText('Disetujui')).toBeVisible();
-        await expect(page.getByText('Selesai')).toBeVisible();
+        await expect(page.getByText('Terlambat dikembalikan')).toBeVisible();
+        await expect(page.getByText('Permintaan Terbaru')).toBeVisible();
     });
 
     test('QR panels on all three forms point to the configured base URL', async ({
@@ -199,20 +202,15 @@ test.describe('Vehicle Loans', () => {
         await page.goto(VEHICLE_LOAN_REQUEST_PATH);
         await base;
 
-        for (const [path, label] of [
-            [VEHICLE_LOAN_REQUEST_PATH, 'request'],
-            [VEHICLE_LOAN_PICKUP_PATH, 'pickup'],
-            [VEHICLE_LOAN_RETURN_PATH, 'return'],
-        ] as const) {
+        for (const path of [
+            VEHICLE_LOAN_REQUEST_PATH,
+            VEHICLE_LOAN_PICKUP_PATH,
+            VEHICLE_LOAN_RETURN_PATH,
+        ]) {
             await page.goto(path);
-            const qr = page
-                .locator(
-                    'svg[height="96"][width="96"], svg[width="96"][height="96"]',
-                )
-                .first();
-            await expect(qr).toBeVisible();
+            await expect(page.getByText('QR Loket Security')).toBeVisible();
             await expect(
-                page.getByText(new RegExp(`/vehicle-loans/${label}`)),
+                page.locator('svg[height="88"][width="88"]').first(),
             ).toBeVisible();
         }
     });

@@ -9,6 +9,7 @@ use App\Models\Employee;
 use App\Models\NotificationPreference;
 use App\Models\VehicleDriver;
 use App\Models\VehicleLoan;
+use App\Models\VehicleLoanActivityLog;
 use App\Models\VehicleUnit;
 use App\Notifications\GenericAppNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -291,6 +292,60 @@ it('lets the current approver change driver and unit', function () {
     expect($loan->driver_id)->toBe($driver->id)
         ->and($loan->vehicle_unit_id)->toBe($unit->id)
         ->and($loan->review_notes)->toBe('Assigned by approver');
+});
+
+it('exposes approval timeline and activity logs on detail', function () {
+    $flow = ApprovalFlow::create([
+        'code' => 'vehicle-loan.detail-test',
+        'name' => 'Detail Test',
+        'approvable_type' => VehicleLoan::class,
+        'is_active' => true,
+        'created_by' => $this->user->id,
+    ]);
+
+    $flowStep = ApprovalFlowStep::create([
+        'approval_flow_id' => $flow->id,
+        'step_order' => 1,
+        'name' => 'Approve',
+        'approver_type' => 'user',
+        'approver_user_id' => $this->user->id,
+        'required_action' => 'approve',
+        'can_reject' => true,
+    ]);
+
+    $loan = VehicleLoan::factory()->create([
+        'requester_id' => $this->user->id,
+        'status' => 'pending',
+    ]);
+
+    $approval = ApprovalRequest::create([
+        'approval_flow_id' => $flow->id,
+        'approvable_type' => VehicleLoan::class,
+        'approvable_id' => $loan->id,
+        'current_step_order' => 1,
+        'status' => 'pending',
+        'submitted_by' => $this->user->id,
+        'submitted_at' => now(),
+    ]);
+
+    ApprovalRequestStep::create([
+        'approval_request_id' => $approval->id,
+        'approval_flow_step_id' => $flowStep->id,
+        'step_order' => 1,
+        'status' => 'pending',
+    ]);
+
+    VehicleLoanActivityLog::create([
+        'vehicle_loan_id' => $loan->id,
+        'event' => 'submitted',
+        'actor_user_id' => $this->user->id,
+    ]);
+
+    getJson("/api/vehicle-loans/{$loan->id}")
+        ->assertOk()
+        ->assertJsonPath('data.approval_requests.0.steps.0.step_order', 1)
+        ->assertJsonPath('data.approval_requests.0.steps.0.approver_name', $this->user->name)
+        ->assertJsonPath('data.activity_logs.0.event', 'submitted');
 });
 
 it('exposes the notification inbox and marks notifications read', function () {
