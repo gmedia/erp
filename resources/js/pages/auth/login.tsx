@@ -36,8 +36,9 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [policy, setPolicy] = useState<SocialPolicyResponse | null>(null);
-    const [socialProvider, setSocialProvider] =
-        useState<SocialProvider | null>(null);
+    const [socialProvider, setSocialProvider] = useState<SocialProvider | null>(
+        null,
+    );
 
     useEffect(() => {
         let active = true;
@@ -135,21 +136,21 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
                 <div className="flex flex-col gap-3">
                     {(policy.providers ?? []).map((provider) => (
                         <Button
-                                key={provider}
-                                type="button"
-                                variant="outline"
-                                className="w-full"
-                                disabled={socialProvider !== null}
-                                onClick={() => void handleSocialLogin(provider)}
-                                data-test={`social-login-${provider}`}
-                            >
-                                {socialProvider === provider ? (
-                                    <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                                ) : null}
-                                {provider === 'google'
-                                    ? 'Continue with Google'
-                                    : 'Continue with Microsoft'}
-                            </Button>
+                            key={provider}
+                            type="button"
+                            variant="outline"
+                            className="w-full"
+                            disabled={socialProvider !== null}
+                            onClick={() => void handleSocialLogin(provider)}
+                            data-test={`social-login-${provider}`}
+                        >
+                            {socialProvider === provider ? (
+                                <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                            ) : null}
+                            {provider === 'google'
+                                ? 'Continue with Google'
+                                : 'Continue with Microsoft'}
+                        </Button>
                     ))}
                 </div>
             )}
@@ -162,63 +163,63 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
             )}
 
             {policy?.passwordLoginEnabled !== false && (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-                <div className="grid gap-6">
-                    <div className="grid gap-2">
-                        <Label htmlFor="email">Email address</Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            name="email"
-                            required
-                            autoFocus
-                            autoComplete="email"
-                            placeholder="email@example.com"
-                        />
-                        <InputError message={errors.email} />
-                    </div>
-
-                    <div className="grid gap-2">
-                        <div className="flex items-center">
-                            <Label htmlFor="password">Password</Label>
-                            {canResetPassword && (
-                                <TextLink
-                                    to="/forgot-password"
-                                    className="ml-auto text-sm"
-                                >
-                                    Forgot password?
-                                </TextLink>
-                            )}
+                <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+                    <div className="grid gap-6">
+                        <div className="grid gap-2">
+                            <Label htmlFor="email">Email address</Label>
+                            <Input
+                                id="email"
+                                type="email"
+                                name="email"
+                                required
+                                autoFocus
+                                autoComplete="email"
+                                placeholder="email@example.com"
+                            />
+                            <InputError message={errors.email} />
                         </div>
-                        <Input
-                            id="password"
-                            type="password"
-                            name="password"
-                            required
-                            autoComplete="current-password"
-                            placeholder="Password"
-                        />
-                        <InputError message={errors.password} />
-                    </div>
 
-                    <div className="flex items-center space-x-3">
-                        <Checkbox id="remember" name="remember" />
-                        <Label htmlFor="remember">Remember me</Label>
-                    </div>
+                        <div className="grid gap-2">
+                            <div className="flex items-center">
+                                <Label htmlFor="password">Password</Label>
+                                {canResetPassword && (
+                                    <TextLink
+                                        to="/forgot-password"
+                                        className="ml-auto text-sm"
+                                    >
+                                        Forgot password?
+                                    </TextLink>
+                                )}
+                            </div>
+                            <Input
+                                id="password"
+                                type="password"
+                                name="password"
+                                required
+                                autoComplete="current-password"
+                                placeholder="Password"
+                            />
+                            <InputError message={errors.password} />
+                        </div>
 
-                    <Button
-                        type="submit"
-                        className="mt-4 w-full"
-                        disabled={processing}
-                        data-test="login-button"
-                    >
-                        {processing && (
-                            <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                        )}
-                        Log in
-                    </Button>
-                </div>
-            </form>
+                        <div className="flex items-center space-x-3">
+                            <Checkbox id="remember" name="remember" />
+                            <Label htmlFor="remember">Remember me</Label>
+                        </div>
+
+                        <Button
+                            type="submit"
+                            className="mt-4 w-full"
+                            disabled={processing}
+                            data-test="login-button"
+                        >
+                            {processing && (
+                                <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                            )}
+                            Log in
+                        </Button>
+                    </div>
+                </form>
             )}
 
             {policy?.passwordLoginEnabled === false && (

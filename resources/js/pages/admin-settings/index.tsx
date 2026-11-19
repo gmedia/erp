@@ -918,16 +918,17 @@ function AuthenticationSettings({
                     <textarea
                         id="social_login_allowed_domains"
                         name="social_login_allowed_domains"
-                        defaultValue={(settings?.social_login_allowed_domains ?? []).join(
-                            ', ',
-                        )}
+                        defaultValue={(
+                            settings?.social_login_allowed_domains ?? []
+                        ).join(', ')}
                         placeholder="example.com, subsidiary.example"
                         rows={3}
                         className="flex min-h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                         data-testid="social-allowed-domains"
                     />
                     <p className="text-sm text-muted-foreground">
-                        Comma-separated. Leave empty to deny all Workspace sign-ins.
+                        Comma-separated. Leave empty to deny all Workspace
+                        sign-ins.
                     </p>
                     {errors.social_login_allowed_domains && (
                         <p className="text-sm text-destructive">
@@ -943,16 +944,17 @@ function AuthenticationSettings({
                     <textarea
                         id="social_login_allowed_tenants"
                         name="social_login_allowed_tenants"
-                        defaultValue={(settings?.social_login_allowed_tenants ?? []).join(
-                            ', ',
-                        )}
+                        defaultValue={(
+                            settings?.social_login_allowed_tenants ?? []
+                        ).join(', ')}
                         placeholder="tenant-id"
                         rows={3}
                         className="flex min-h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                         data-testid="social-allowed-tenants"
                     />
                     <p className="text-sm text-muted-foreground">
-                        Comma-separated. Leave empty to deny all Microsoft 365 sign-ins.
+                        Comma-separated. Leave empty to deny all Microsoft 365
+                        sign-ins.
                     </p>
                     {errors.social_login_allowed_tenants && (
                         <p className="text-sm text-destructive">

@@ -18,7 +18,8 @@ const ERROR_MESSAGES: Record<SocialAuthErrorCode, string> = {
     personal_accounts_disabled: 'Personal accounts are not allowed.',
     domain_not_allowed: 'Your email domain is not allowed.',
     tenant_not_allowed: 'Your organization is not allowed.',
-    account_not_registered: 'Your account is not registered. Ask an administrator.',
+    account_not_registered:
+        'Your account is not registered. Ask an administrator.',
     social_login_disabled: 'Social login is disabled.',
     ticket_invalid: 'The login session is invalid or has expired.',
     ticket_consumed: 'This login link has already been used.',
@@ -29,9 +30,7 @@ const ERROR_MESSAGES: Record<SocialAuthErrorCode, string> = {
 };
 
 function fragmentValue(key: string): string {
-    const params = new URLSearchParams(
-        window.location.hash.replace(/^#/, ''),
-    );
+    const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
 
     return params.get(key) ?? '';
 }
@@ -88,9 +87,10 @@ export default function SocialCallback() {
             } catch {
                 let text = ERROR_MESSAGES.ticket_invalid;
                 try {
-                    const policy = await axiosInstance.get<SocialPolicyResponse>(
-                        '/api/social/policy',
-                    );
+                    const policy =
+                        await axiosInstance.get<SocialPolicyResponse>(
+                            '/api/social/policy',
+                        );
                     if (!policy.data.socialLoginEnabled) {
                         text = ERROR_MESSAGES.social_login_disabled;
                     }
