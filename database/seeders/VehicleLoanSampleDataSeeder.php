@@ -112,7 +112,7 @@ class VehicleLoanSampleDataSeeder extends Seeder
 
         $start = $overdue
             ? now()->subDays(3)->setTime(8, 0)
-            : now()->addDay()->setTime(8, 0);
+            : now()->addDays($index + 1)->setTime(8, 0);
         $end = $overdue
             ? now()->subDay()->setTime(17, 0)
             : (clone $start)->setTime(17, 0);

@@ -39,14 +39,21 @@ class ReviewVehicleLoanAssignmentAction
                 'vehicle_unit_id' => $loan->vehicle_unit_id,
             ];
 
-            app(ValidateVehicleLoanAction::class)->execute([
-                'start_at' => $loan->start_at,
-                'end_at' => $loan->end_at,
-                'purpose' => $loan->purpose,
-                'driver_id' => $data['driver_id'] ?? $loan->driver_id,
-                'vehicle_unit_id' => $data['vehicle_unit_id'] ?? $loan->vehicle_unit_id,
-                'skip_future' => true,
-            ], $loan->id);
+            $newDriverId = $data['driver_id'] ?? $loan->driver_id;
+            $newUnitId = $data['vehicle_unit_id'] ?? $loan->vehicle_unit_id;
+            $assignmentChanged = (int) ($newDriverId ?? 0) !== (int) ($loan->driver_id ?? 0)
+                || (int) ($newUnitId ?? 0) !== (int) ($loan->vehicle_unit_id ?? 0);
+
+            if ($assignmentChanged) {
+                app(ValidateVehicleLoanAction::class)->execute([
+                    'start_at' => $loan->start_at,
+                    'end_at' => $loan->end_at,
+                    'purpose' => $loan->purpose,
+                    'driver_id' => $newDriverId,
+                    'vehicle_unit_id' => $newUnitId,
+                    'skip_future' => true,
+                ], $loan->id);
+            }
 
             $loan->update([
                 'driver_id' => $data['driver_id'] ?? $loan->driver_id,

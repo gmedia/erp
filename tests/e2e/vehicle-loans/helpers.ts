@@ -64,8 +64,12 @@ export async function apiRequest(
 export async function seedApprovedLoan(page: Page): Promise<number> {
     const response = await apiRequest(page, 'post', '/api/vehicle-loans', {
         data: {
-            start_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-            end_at: new Date(Date.now() + 27 * 60 * 60 * 1000).toISOString(),
+            start_at: new Date(
+                Date.now() + 30 * 24 * 60 * 60 * 1000,
+            ).toISOString(),
+            end_at: new Date(
+                Date.now() + 30 * 24 * 60 * 60 * 1000 + 3 * 60 * 60 * 1000,
+            ).toISOString(),
             purpose: 'E2ESeed pinjaman disetujui',
         },
     });
