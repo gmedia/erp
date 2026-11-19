@@ -189,6 +189,7 @@ class DatabaseSeeder extends Seeder
             PurchasingSampleDataSeeder::class,
             ApSampleDataSeeder::class,
             AssetSampleDataSeeder::class,
+            VehicleLoanSampleDataSeeder::class,
             StockTransferSampleDataSeeder::class,
             InventoryStocktakeSampleDataSeeder::class,
             StockAdjustmentSampleDataSeeder::class,
