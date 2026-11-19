@@ -95,3 +95,14 @@ test('fcm sender keeps tokens on server errors', function () {
 
     expect(DeviceToken::find($token->id))->not->toBeNull();
 });
+
+test('fcm sender requires a project id', function () {
+    Cache::flush();
+    config(['services.fcm.project_id' => '']);
+    fakeFcmAccessTokenProvider();
+
+    $token = DeviceToken::factory()->create();
+
+    expect(fn () => app(FcmPushSender::class)->send($token, []))
+        ->toThrow(RuntimeException::class, 'FCM project id is not configured.');
+});
