@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/table';
 
 import { JournalEntry } from '@/types/journal-entry';
+import { toDateInputValue } from '@/utils/date-format';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { JournalEntryFormData, journalEntryFormSchema } from '@/utils/schemas';
 import { JournalEntryLineFormDialog } from './JournalEntryLineFormDialog';
@@ -47,7 +48,7 @@ const getJournalEntryFormDefaults = (
 ): JournalEntryFormData => {
     if (!journalEntry) {
         return {
-            entry_date: new Date(),
+            entry_date: toDateInputValue(new Date()),
             reference: '',
             description: '',
             lines: [],
@@ -55,7 +56,7 @@ const getJournalEntryFormDefaults = (
     }
 
     return {
-        entry_date: new Date(journalEntry.entry_date),
+        entry_date: toDateInputValue(journalEntry.entry_date),
         reference: journalEntry.reference || '',
         description: journalEntry.description || '',
         lines: journalEntry.lines.map((line) => ({
@@ -136,10 +137,7 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
         ) => {
             const payload = {
                 ...data,
-                entry_date: format(
-                    data.entry_date,
-                    'yyyy-MM-dd',
-                ) as unknown as Date, // Format for API, cast to satisfy schema if needed
+                entry_date: format(data.entry_date, 'yyyy-MM-dd'),
             } as JournalEntryFormData;
             onSubmit(payload);
         };

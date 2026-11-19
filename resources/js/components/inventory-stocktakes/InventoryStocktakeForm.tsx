@@ -28,6 +28,7 @@ import {
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type InventoryStocktake } from '@/types/inventory-stocktake';
+import { toDateInputValue } from '@/utils/date-format';
 import {
     formatItemReference,
     omitItemDisplayLabels,
@@ -85,7 +86,7 @@ const getInventoryStocktakeFormDefaults = (
         return {
             stocktake_number: '',
             warehouse_id: '',
-            stocktake_date: new Date(),
+            stocktake_date: toDateInputValue(new Date()),
             status: 'draft',
             product_category_id: '',
             notes: '',
@@ -99,8 +100,8 @@ const getInventoryStocktakeFormDefaults = (
             ? String(inventoryStocktake.warehouse.id)
             : '',
         stocktake_date: inventoryStocktake.stocktake_date
-            ? new Date(inventoryStocktake.stocktake_date)
-            : new Date(),
+            ? toDateInputValue(inventoryStocktake.stocktake_date)
+            : toDateInputValue(new Date()),
         status: inventoryStocktake.status,
         product_category_id: inventoryStocktake.product_category?.id
             ? String(inventoryStocktake.product_category.id)

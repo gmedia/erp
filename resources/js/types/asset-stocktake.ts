@@ -20,8 +20,8 @@ export interface AssetStocktake extends BaseEntity {
 export interface AssetStocktakeFormData {
     reference: string;
     branch_id: string;
-    planned_at: Date;
-    performed_at?: Date | null;
+    planned_at: string;
+    performed_at?: string | null;
     status: 'draft' | 'in_progress' | 'completed' | 'cancelled';
 }
 

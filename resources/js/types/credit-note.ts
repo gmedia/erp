@@ -53,7 +53,7 @@ export interface CreditNoteFormData {
     customer_invoice_id?: string;
     branch_id: string;
     fiscal_year_id: string;
-    credit_note_date: Date;
+    credit_note_date: string;
     reason: CreditNoteReason;
     status: CreditNoteStatus;
     notes?: string;

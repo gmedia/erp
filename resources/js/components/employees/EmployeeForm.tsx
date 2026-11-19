@@ -14,6 +14,7 @@ import NameField from '@/components/common/NameField';
 import SelectField from '@/components/common/SelectField';
 
 import { Employee } from '@/types/entity';
+import { toDateInputValue } from '@/utils/date-format';
 import { employeeFormSchema, type EmployeeFormData } from '@/utils/schemas';
 
 interface EmployeeFormProps {
@@ -42,7 +43,7 @@ const emptyDefaults = (): EmployeeFormInput => ({
     position_id: '',
     branch_id: '',
     salary: '',
-    hire_date: new Date(),
+    hire_date: toDateInputValue(new Date()),
     employment_status: 'regular',
     termination_date: null,
 });
@@ -71,11 +72,11 @@ const getEmployeeFormDefaults = (
         branch_id: employment?.branch_id ? String(employment.branch_id) : '',
         salary: employment?.salary || '',
         hire_date: employment?.hire_date
-            ? new Date(employment.hire_date)
-            : new Date(),
+            ? toDateInputValue(employment.hire_date)
+            : toDateInputValue(new Date()),
         employment_status: employment?.employment_status || 'regular',
         termination_date: employment?.termination_date
-            ? new Date(employment.termination_date)
+            ? toDateInputValue(employment.termination_date)
             : null,
     };
 };

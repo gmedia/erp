@@ -29,6 +29,7 @@ import {
     type PurchaseOrder,
     type PurchaseOrderFormData,
 } from '@/types/purchase-order';
+import { toDateInputValue } from '@/utils/date-format';
 import {
     formatItemReference,
     omitItemDisplayLabels,
@@ -72,7 +73,7 @@ const getPurchaseOrderFormDefaults = (
             po_number: '',
             supplier_id: '',
             warehouse_id: '',
-            order_date: new Date(),
+            order_date: toDateInputValue(new Date()),
             expected_delivery_date: null,
             payment_terms: '',
             currency: 'IDR',
@@ -92,10 +93,10 @@ const getPurchaseOrderFormDefaults = (
             ? String(purchaseOrder.warehouse.id)
             : '',
         order_date: purchaseOrder.order_date
-            ? new Date(purchaseOrder.order_date)
-            : new Date(),
+            ? toDateInputValue(purchaseOrder.order_date)
+            : toDateInputValue(new Date()),
         expected_delivery_date: purchaseOrder.expected_delivery_date
-            ? new Date(purchaseOrder.expected_delivery_date)
+            ? toDateInputValue(purchaseOrder.expected_delivery_date)
             : null,
         payment_terms: purchaseOrder.payment_terms || '',
         currency: purchaseOrder.currency || 'IDR',

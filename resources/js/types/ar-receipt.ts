@@ -50,7 +50,7 @@ export interface ArReceiptFormData {
     customer_id: string;
     branch_id: string;
     fiscal_year_id: string;
-    receipt_date: Date;
+    receipt_date: string;
     payment_method: ArReceiptPaymentMethod;
     bank_account_id?: string;
     currency: string;

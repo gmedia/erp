@@ -43,8 +43,8 @@ export interface PurchaseRequestFormData {
     branch_id: string;
     department_id?: string;
     requested_by?: string;
-    request_date: Date;
-    required_date?: Date | null;
+    request_date: string;
+    required_date?: string | null;
     priority: PurchaseRequestPriority;
     status: PurchaseRequestStatus;
     estimated_amount?: number;

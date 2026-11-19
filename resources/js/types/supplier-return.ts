@@ -45,7 +45,7 @@ export interface SupplierReturnFormData {
     goods_receipt_id?: string;
     supplier_id: string;
     warehouse_id: string;
-    return_date: Date;
+    return_date: string;
     reason: SupplierReturnReason;
     status: SupplierReturnStatus;
     notes?: string;

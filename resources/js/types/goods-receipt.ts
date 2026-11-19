@@ -36,7 +36,7 @@ export interface GoodsReceiptFormData {
     gr_number?: string;
     purchase_order_id: string;
     warehouse_id: string;
-    receipt_date: Date;
+    receipt_date: string;
     supplier_delivery_note?: string;
     status: GoodsReceiptStatus;
     received_by?: string;

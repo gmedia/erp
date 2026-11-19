@@ -29,6 +29,7 @@ import {
     type PurchaseRequest,
     type PurchaseRequestFormData,
 } from '@/types/purchase-request';
+import { toDateInputValue } from '@/utils/date-format';
 import {
     formatItemReference,
     omitItemDisplayLabels,
@@ -70,7 +71,7 @@ const getPurchaseRequestFormDefaults = (
             branch_id: '',
             department_id: '',
             requested_by: '',
-            request_date: new Date(),
+            request_date: toDateInputValue(new Date()),
             required_date: null,
             priority: 'normal',
             status: 'draft',
@@ -93,10 +94,10 @@ const getPurchaseRequestFormDefaults = (
             ? String(purchaseRequest.requester.id)
             : '',
         request_date: purchaseRequest.request_date
-            ? new Date(purchaseRequest.request_date)
-            : new Date(),
+            ? toDateInputValue(purchaseRequest.request_date)
+            : toDateInputValue(new Date()),
         required_date: purchaseRequest.required_date
-            ? new Date(purchaseRequest.required_date)
+            ? toDateInputValue(purchaseRequest.required_date)
             : null,
         priority: purchaseRequest.priority,
         status: purchaseRequest.status,

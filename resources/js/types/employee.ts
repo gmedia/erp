@@ -39,7 +39,7 @@ export interface EmployeeFormData {
     branch_id: string;
     company_id: string;
     salary?: string;
-    hire_date: Date | string;
+    hire_date: string;
     employment_status: 'regular' | 'intern';
-    termination_date?: Date | string | null;
+    termination_date?: string | null;
 }

@@ -28,6 +28,7 @@ import {
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { StockTransfer } from '@/types/stock-transfer';
+import { toDateInputValue } from '@/utils/date-format';
 import {
     formatItemReference,
     omitItemDisplayLabels,
@@ -89,7 +90,7 @@ const getStockTransferFormDefaults = (
             transfer_number: '',
             from_warehouse_id: '',
             to_warehouse_id: '',
-            transfer_date: new Date(),
+            transfer_date: toDateInputValue(new Date()),
             expected_arrival_date: null,
             status: 'draft',
             notes: '',
@@ -109,10 +110,10 @@ const getStockTransferFormDefaults = (
             ? String(stockTransfer.to_warehouse.id)
             : '',
         transfer_date: stockTransfer.transfer_date
-            ? new Date(stockTransfer.transfer_date)
-            : new Date(),
+            ? toDateInputValue(stockTransfer.transfer_date)
+            : toDateInputValue(new Date()),
         expected_arrival_date: stockTransfer.expected_arrival_date
-            ? new Date(stockTransfer.expected_arrival_date)
+            ? toDateInputValue(stockTransfer.expected_arrival_date)
             : null,
         status: stockTransfer.status,
         notes: stockTransfer.notes || '',
