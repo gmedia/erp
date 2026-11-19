@@ -15,23 +15,27 @@ return [
     'events' => [
         'approval.request.created' => [
             'label' => 'New approval request waiting for you',
-            'channels' => ['database', 'mail'],
+            'channels' => ['database', 'mail', 'push'],
         ],
         'approval.request.approved' => [
             'label' => 'Approval request approved',
-            'channels' => ['database', 'mail'],
+            'channels' => ['database', 'mail', 'push'],
         ],
         'approval.request.rejected' => [
             'label' => 'Approval request rejected',
-            'channels' => ['database', 'mail'],
+            'channels' => ['database', 'mail', 'push'],
         ],
         'vehicle_loan.pickup.due' => [
             'label' => 'Vehicle pickup scheduled',
-            'channels' => ['database'],
+            'channels' => ['database', 'push'],
         ],
         'vehicle_loan.return.due' => [
             'label' => 'Vehicle return due',
-            'channels' => ['database'],
+            'channels' => ['database', 'push'],
         ],
+    ],
+
+    'push' => [
+        'driver' => env('PUSH_DRIVER', 'log'),
     ],
 ];

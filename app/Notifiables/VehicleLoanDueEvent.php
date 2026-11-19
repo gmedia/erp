@@ -31,7 +31,7 @@ class VehicleLoanDueEvent implements NotifiableEvent
 
     public function channels(): array
     {
-        return ['database'];
+        return ['database', 'push'];
     }
 
     public function payload(): array

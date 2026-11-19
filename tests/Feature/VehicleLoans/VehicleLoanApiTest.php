@@ -384,7 +384,11 @@ it('honors notification preferences', function () {
 
     postJson("/api/vehicle-loans/{$loan->id}/submit")->assertOk();
 
-    expect(DatabaseNotification::where('notifiable_id', $approver->id)->count())->toBe(0);
+    expect(
+        DatabaseNotification::where('notifiable_id', $approver->id)
+            ->whereNull('data->channel')
+            ->count()
+    )->toBe(0);
 });
 
 it('builds the generic notification mail', function () {

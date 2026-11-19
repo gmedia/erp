@@ -33,7 +33,7 @@ class ApprovalEvent implements NotifiableEvent
 
     public function channels(): array
     {
-        return ['database', 'mail'];
+        return ['database', 'mail', 'push'];
     }
 
     public function payload(): array
