@@ -1,3 +1,4 @@
+import { clearToken, getToken } from '@/lib/token-storage';
 import baseAxios from 'axios';
 
 const baseURL = import.meta.env.VITE_API_BASE_URL ?? '';
@@ -11,7 +12,7 @@ const axios = baseAxios.create({
 });
 
 axios.interceptors.request.use((config) => {
-    const token = localStorage.getItem('api_token');
+    const token = getToken();
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
@@ -23,7 +24,7 @@ axios.interceptors.response.use(
     (error) => {
         if (error.response?.status === 401) {
             // Clear stale token; ProtectedRoute will handle the redirect
-            localStorage.removeItem('api_token');
+            clearToken();
         }
         return Promise.reject(error);
     },

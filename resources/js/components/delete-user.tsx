@@ -13,6 +13,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import axios from '@/lib/axios';
+import { clearToken } from '@/lib/token-storage';
 import rawAxios from 'axios';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
@@ -32,7 +33,7 @@ export default function DeleteUser() {
 
         try {
             await axios.delete('/api/profile', { data });
-            localStorage.removeItem('api_token');
+            clearToken();
             globalThis.location.href = '/login';
         } catch (error: unknown) {
             if (
