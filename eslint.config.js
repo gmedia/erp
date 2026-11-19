@@ -39,6 +39,6 @@ export default [
     },
     prettier, // Turn off all rules that might conflict with Prettier
     {
-        ignores: ['vendor', 'node_modules', 'public', 'bootstrap/ssr', 'tailwind.config.js', 'coverage-html', '.0pencode/'],
+        ignores: ['vendor', 'node_modules', 'public', 'dist', 'android', 'bootstrap/ssr', 'tailwind.config.js', 'coverage-html', '.0pencode/'],
     },
 ];
