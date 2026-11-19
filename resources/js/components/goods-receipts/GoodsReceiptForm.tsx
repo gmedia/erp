@@ -29,6 +29,7 @@ import {
     type GoodsReceipt,
     type GoodsReceiptFormData,
 } from '@/types/goods-receipt';
+import { toDateInputValue } from '@/utils/date-format';
 import {
     formatItemReference,
     omitItemDisplayLabels,
@@ -68,7 +69,7 @@ const getGoodsReceiptFormDefaults = (
             gr_number: '',
             purchase_order_id: '',
             warehouse_id: '',
-            receipt_date: new Date(),
+            receipt_date: toDateInputValue(new Date()),
             supplier_delivery_note: '',
             status: 'draft',
             received_by: '',
@@ -86,8 +87,8 @@ const getGoodsReceiptFormDefaults = (
             ? String(goodsReceipt.warehouse.id)
             : '',
         receipt_date: goodsReceipt.receipt_date
-            ? new Date(goodsReceipt.receipt_date)
-            : new Date(),
+            ? toDateInputValue(goodsReceipt.receipt_date)
+            : toDateInputValue(new Date()),
         supplier_delivery_note: goodsReceipt.supplier_delivery_note || '',
         status: goodsReceipt.status,
         received_by: goodsReceipt.received_by?.id

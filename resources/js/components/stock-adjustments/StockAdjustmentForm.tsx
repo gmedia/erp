@@ -28,6 +28,7 @@ import {
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type StockAdjustment } from '@/types/stock-adjustment';
+import { toDateInputValue } from '@/utils/date-format';
 import {
     formatItemReference,
     omitItemDisplayLabels,
@@ -108,7 +109,7 @@ const getStockAdjustmentFormDefaults = (
         return {
             adjustment_number: '',
             warehouse_id: '',
-            adjustment_date: new Date(),
+            adjustment_date: toDateInputValue(new Date()),
             adjustment_type: 'correction',
             status: 'draft',
             inventory_stocktake_id: '',
@@ -123,8 +124,8 @@ const getStockAdjustmentFormDefaults = (
             ? String(stockAdjustment.warehouse.id)
             : '',
         adjustment_date: stockAdjustment.adjustment_date
-            ? new Date(stockAdjustment.adjustment_date)
-            : new Date(),
+            ? toDateInputValue(stockAdjustment.adjustment_date)
+            : toDateInputValue(new Date()),
         adjustment_type: stockAdjustment.adjustment_type,
         status: stockAdjustment.status,
         inventory_stocktake_id: stockAdjustment.inventory_stocktake?.id

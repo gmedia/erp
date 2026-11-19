@@ -53,7 +53,7 @@ export interface ApPaymentFormData {
     supplier_id: string;
     branch_id: string;
     fiscal_year_id: string;
-    payment_date: Date;
+    payment_date: string;
     payment_method: ApPaymentMethod;
     bank_account_id: string;
     currency: string;

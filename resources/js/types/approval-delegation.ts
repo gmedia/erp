@@ -17,8 +17,8 @@ export interface ApprovalDelegationFormData {
     delegator_user_id: string;
     delegate_user_id: string;
     approvable_type?: string;
-    start_date: Date;
-    end_date: Date;
+    start_date: string;
+    end_date: string;
     reason?: string;
     is_active: string | boolean;
 }
@@ -28,6 +28,6 @@ export interface ApprovalDelegationFilters {
     delegator_user_id?: string;
     delegate_user_id?: string;
     is_active?: string;
-    start_date_from?: Date | null;
-    start_date_to?: Date | null;
+    start_date_from?: string | null;
+    start_date_to?: string | null;
 }

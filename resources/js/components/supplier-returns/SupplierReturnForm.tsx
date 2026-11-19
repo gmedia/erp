@@ -29,6 +29,7 @@ import {
     type SupplierReturn,
     type SupplierReturnFormData,
 } from '@/types/supplier-return';
+import { toDateInputValue } from '@/utils/date-format';
 import {
     formatItemReference,
     omitItemDisplayLabels,
@@ -68,7 +69,7 @@ const getSupplierReturnFormDefaults = (
             goods_receipt_id: '',
             supplier_id: '',
             warehouse_id: '',
-            return_date: new Date(),
+            return_date: toDateInputValue(new Date()),
             reason: 'defective',
             status: 'draft',
             notes: '',
@@ -91,8 +92,8 @@ const getSupplierReturnFormDefaults = (
             ? String(supplierReturn.warehouse.id)
             : '',
         return_date: supplierReturn.return_date
-            ? new Date(supplierReturn.return_date)
-            : new Date(),
+            ? toDateInputValue(supplierReturn.return_date)
+            : toDateInputValue(new Date()),
         reason: supplierReturn.reason,
         status: supplierReturn.status,
         notes: supplierReturn.notes || '',

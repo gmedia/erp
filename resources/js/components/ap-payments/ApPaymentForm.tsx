@@ -26,6 +26,7 @@ import {
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type ApPayment, type ApPaymentFormData } from '@/types/ap-payment';
+import { toDateInputValue } from '@/utils/date-format';
 import { formatItemReference } from '@/utils/entity-form-item';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { apPaymentFormSchema } from '@/utils/schemas';
@@ -57,7 +58,7 @@ const getApPaymentFormDefaults = (
             supplier_id: '',
             branch_id: '',
             fiscal_year_id: '',
-            payment_date: new Date(),
+            payment_date: toDateInputValue(new Date()),
             payment_method: 'bank_transfer',
             bank_account_id: '',
             currency: 'IDR',
@@ -79,8 +80,8 @@ const getApPaymentFormDefaults = (
             ? String(apPayment.fiscal_year.id)
             : '',
         payment_date: apPayment.payment_date
-            ? new Date(apPayment.payment_date)
-            : new Date(),
+            ? toDateInputValue(apPayment.payment_date)
+            : toDateInputValue(new Date()),
         payment_method: apPayment.payment_method,
         bank_account_id: apPayment.bank_account?.id
             ? String(apPayment.bank_account.id)

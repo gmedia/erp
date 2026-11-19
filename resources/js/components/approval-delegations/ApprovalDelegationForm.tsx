@@ -15,6 +15,7 @@ import {
     ApprovalDelegation,
     ApprovalDelegationFormData,
 } from '@/types/approval-delegation';
+import { toDateInputValue } from '@/utils/date-format';
 import { approvalDelegationFormSchema } from '@/utils/schemas';
 
 interface ApprovalDelegationFormProps {
@@ -32,8 +33,8 @@ const getApprovalDelegationFormDefaults = (
         return {
             delegator_user_id: '',
             delegate_user_id: '',
-            start_date: new Date(),
-            end_date: new Date(),
+            start_date: toDateInputValue(new Date()),
+            end_date: toDateInputValue(new Date()),
             reason: '',
             is_active: '1',
             approvable_type: '',
@@ -49,8 +50,8 @@ const getApprovalDelegationFormDefaults = (
             entity.delegate_user_id ||
                 (entity.delegate ? entity.delegate.id : ''),
         ),
-        start_date: new Date(entity.start_date),
-        end_date: new Date(entity.end_date),
+        start_date: toDateInputValue(entity.start_date),
+        end_date: toDateInputValue(entity.end_date),
         reason: entity.reason || '',
         is_active: entity.is_active ? '1' : '0',
         approvable_type: entity.approvable_type || '',

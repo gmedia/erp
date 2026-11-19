@@ -8,6 +8,7 @@ import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
 import { useEntityForm } from '@/hooks/useEntityForm';
 import { type BankReconciliation } from '@/types/bank-reconciliation';
+import { toDateInputValue } from '@/utils/date-format';
 import * as z from 'zod';
 
 const bankReconciliationFormSchema = z
@@ -16,8 +17,10 @@ const bankReconciliationFormSchema = z
         fiscal_year_id: z
             .string()
             .min(1, { message: 'Fiscal year is required.' }),
-        period_start: z.date({ message: 'Period start is required.' }),
-        period_end: z.date({ message: 'Period end is required.' }),
+        period_start: z
+            .string()
+            .min(1, { message: 'Period start is required.' }),
+        period_end: z.string().min(1, { message: 'Period end is required.' }),
         statement_balance: z.coerce.number({
             message: 'Statement balance is required.',
         }),
@@ -45,8 +48,8 @@ const getBankReconciliationFormDefaults = (
         return {
             account_id: '',
             fiscal_year_id: '',
-            period_start: new Date(),
-            period_end: new Date(),
+            period_start: toDateInputValue(new Date()),
+            period_end: toDateInputValue(new Date()),
             statement_balance: 0,
             branch_id: '',
         };
@@ -54,8 +57,8 @@ const getBankReconciliationFormDefaults = (
     return {
         account_id: String(entity.account_id),
         fiscal_year_id: String(entity.fiscal_year_id),
-        period_start: new Date(entity.period_start),
-        period_end: new Date(entity.period_end),
+        period_start: toDateInputValue(entity.period_start),
+        period_end: toDateInputValue(entity.period_end),
         statement_balance: Number(entity.statement_balance),
         branch_id: entity.branch_id ? String(entity.branch_id) : '',
     };

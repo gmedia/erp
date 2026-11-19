@@ -14,6 +14,7 @@ import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
 import { Asset, AssetMovement } from '@/types/asset';
 
+import { toDateInputValue } from '@/utils/date-format';
 import {
     AssetMovementFormData,
     assetMovementFormSchema,
@@ -62,7 +63,7 @@ const getAssetMovementFormDefaults = (
             movement_type: isAssetMovementType(item.movement_type)
                 ? item.movement_type
                 : 'transfer',
-            moved_at: item.moved_at ? new Date(item.moved_at) : new Date(),
+            moved_at: toDateInputValue(item.moved_at ?? new Date()),
             to_branch_id: toOptionalSelectValue(item.to_branch_id),
             to_location_id: toOptionalSelectValue(item.to_location_id),
             to_department_id: toOptionalSelectValue(item.to_department_id),
@@ -75,7 +76,7 @@ const getAssetMovementFormDefaults = (
     return {
         asset_id: toOptionalSelectValue(asset?.id),
         movement_type: 'transfer',
-        moved_at: new Date(),
+        moved_at: toDateInputValue(new Date()),
         to_branch_id: toOptionalSelectValue(asset?.branch_id),
         to_location_id: toOptionalSelectValue(asset?.asset_location_id),
         to_department_id: toOptionalSelectValue(asset?.department_id),

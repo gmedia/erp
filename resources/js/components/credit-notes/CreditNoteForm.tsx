@@ -9,6 +9,7 @@ import { TransactionLineItemsTable } from '@/components/common/TransactionLineIt
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type CreditNote, type CreditNoteFormData } from '@/types/credit-note';
+import { toDateInputValue } from '@/utils/date-format';
 import { omitItemDisplayLabels } from '@/utils/entity-form-item';
 import { creditNoteFormSchema } from '@/utils/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -33,7 +34,7 @@ const getCreditNoteFormDefaults = (
             customer_invoice_id: '',
             branch_id: '',
             fiscal_year_id: '',
-            credit_note_date: new Date(),
+            credit_note_date: toDateInputValue(new Date()),
             reason: 'return',
             status: 'draft',
             notes: '',
@@ -52,8 +53,8 @@ const getCreditNoteFormDefaults = (
             ? String(creditNote.fiscal_year.id)
             : '',
         credit_note_date: creditNote.credit_note_date
-            ? new Date(creditNote.credit_note_date)
-            : new Date(),
+            ? toDateInputValue(creditNote.credit_note_date)
+            : toDateInputValue(new Date()),
         reason: creditNote.reason,
         status: creditNote.status,
         notes: creditNote.notes || '',

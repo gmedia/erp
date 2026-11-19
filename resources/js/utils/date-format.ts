@@ -1,3 +1,5 @@
+import { format } from 'date-fns';
+
 export interface RegionalDateFormatSettings {
     date_format: string;
 }
@@ -108,6 +110,16 @@ function toDate(value: string | Date | number): Date | null {
     const date = value instanceof Date ? value : new Date(value);
 
     return Number.isNaN(date.getTime()) ? null : date;
+}
+
+export function toDateInputValue(value?: string | Date | null): string {
+    if (value === null || value === undefined || value === '') {
+        return '';
+    }
+
+    const date = value instanceof Date ? value : new Date(value);
+
+    return Number.isNaN(date.getTime()) ? '' : format(date, 'yyyy-MM-dd');
 }
 
 function to12Hour(hours: number): number {
