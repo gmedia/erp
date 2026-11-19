@@ -1,5 +1,9 @@
 import { useAuth } from '@/contexts/auth-context';
 import axios from '@/lib/axios';
+import {
+    enablePushNotifications,
+    isPushSupported,
+} from '@/lib/push-notifications';
 import { isAxiosError } from 'axios';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -36,6 +40,7 @@ export default function Profile({
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [pushBusy, setPushBusy] = useState(false);
     const verificationStatus =
         status ?? searchParams.get('status') ?? undefined;
 
@@ -182,6 +187,44 @@ export default function Profile({
                         </div>
                     </form>
                 </div>
+
+                {isPushSupported() && (
+                    <div className="space-y-6">
+                        <HeadingSmall
+                            title="Notifications"
+                            description="Enable push notifications on this device."
+                        />
+                        <Button
+                            type="button"
+                            variant="outline"
+                            disabled={pushBusy}
+                            onClick={async () => {
+                                setPushBusy(true);
+
+                                try {
+                                    const result =
+                                        await enablePushNotifications();
+
+                                    if (result === 'denied') {
+                                        toast.error(
+                                            'Notification permission denied.',
+                                        );
+                                    }
+                                } catch {
+                                    toast.error(
+                                        'Failed to enable notifications.',
+                                    );
+                                } finally {
+                                    setPushBusy(false);
+                                }
+                            }}
+                        >
+                            {pushBusy
+                                ? 'Enabling notifications...'
+                                : 'Enable notifications'}
+                        </Button>
+                    </div>
+                )}
 
                 <DeleteUser />
             </SettingsLayout>
