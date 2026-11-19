@@ -140,7 +140,7 @@ return [
      |
      */
 
-    'admin' => env('APP_ADMIN', 'admin@dokfin.id'),
+    'admin' => env('APP_ADMIN', 'admin@example.com'),
 
     /*
     |--------------------------------------------------------------------------

@@ -17,7 +17,7 @@ class SettingSampleDataSeeder extends Seeder
             [
                 'group' => 'general',
                 'key' => 'company_name',
-                'value' => 'Dokfin',
+                'value' => 'Perusahaan Contoh',
                 'type' => 'string',
             ],
             [
@@ -30,13 +30,13 @@ class SettingSampleDataSeeder extends Seeder
             [
                 'group' => 'general',
                 'key' => 'company_phone',
-                'value' => '+62 274 380 345',
+                'value' => '+62 21 0000 0000',
                 'type' => 'string',
             ],
             [
                 'group' => 'general',
                 'key' => 'company_email',
-                'value' => 'mail@dokfin.com',
+                'value' => 'contact@example.com',
                 'type' => 'string',
             ],
             [
