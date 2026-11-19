@@ -1,6 +1,6 @@
 # Rancangan Implementasi Mobile — Capacitor JS (Android-first)
 
-> **Status:** FINAL v3.4 — Android-first (Fase 0 + Fase 1 dieksekusi di host)  
+> **Status:** FINAL v3.5 — Android-first (Fase 0/1/3/5 + FCM sender)  
 > **Tanggal:** 2026-11-19  
 > **Lingkup:** ERP on-premise multi-cabang — Laravel 12 JSON API + React 19/TypeScript/Vite 7 SPA  
 > **Keputusan induk:** Android-first dengan Capacitor v8. iOS **ditunda** sebagai backlog aditif (tanpa rewrite). PWA dipakai sebagai jembatan interim untuk pengguna iPhone dan desktop.
@@ -404,6 +404,7 @@ Dikerjakan setelah Android stabil. **Tidak perlu** mengubah React SPA, backend `
 | v3.1 → v3.2 | Menutup sisa minor verifikasi v3.1: typo "economic" → "ekonomis"; instruksi eksplisit menghapus/mengganti entri SHA-256 **debug** di `assetlinks.json` sebelum rilis (Fase 2 dan Fase 7). |
 | v3.2 → v3.3 | Menyelaraskan rencana dengan fakta Fase 0: build mobile statis (`index.html` + `vite.mobile.config.ts`, `publicDir:false`, alias `@`), `VITE_API_BASE_URL` + axios baseURL, CORS origin native, `APP_NAME` precedence (dotenv tanpa expand), script `build:mobile`/`mobile:sync`, `.gitignore` `dist`, dan catatan blocker toolchain. |
 | v3.3 → v3.4 | Fase 1 dieksekusi: device_tokens table/model/factory, kontrak `PushSender` + `LogPushSender` (+ binding), channel `push` di `NotificationService` (dedupe Cache), events/config `push`, API device-tokens + Policy + logout revocation, 11 test baru (6 device-tokens + 5 notifications), regresi approvals/vehicle-loans hijau, PHPStan/Duster clean. **Fix:** lookup config event bertitik (mis. `approval.request.created`) memakai akses array literal, bukan dot traversal. |
+| v3.4 → v3.5 | Fase 3/5 dieksekusi: `token-storage.ts` (cache + secure storage, 8 call site), `lib/camera.ts` + `PhotoInput` untuk pickup/return, `@capacitor/camera`/`@aparajita` sync. FCM HTTP v1 sender + Google service account token provider + tests (PR #207). Emulator CI: Android debug APK blocking; emulator smoke dibuat manual/opt-in karena runner hosted tanpa KVM; host punya `/dev/kvm`. |
 
 ---
 
@@ -433,3 +434,14 @@ Dikerjakan setelah Android stabil. **Tidak perlu** mengubah React SPA, backend `
 - Logout `AuthController` mencabut semua device token user.
 - Test: `DeviceTokenControllerTest` (6) + `PushChannelTest` (5). Regresi `approvals` (12) + `vehicle-loans` (25) hijau. PHPStan & Duster clean.
 - Penyesuaian test vehicle-loans: assertion notifikasi in-app memakai `whereNull('data->channel')`, konsisten dengan filter `NotificationController` (baris reservasi mail bukan notifikasi in-app).
+
+---
+
+## 16. Catatan implementasi Fase 3/5 + FCM (fakta lapangan, 2026-11-19)
+
+- **Fase 5 (token storage):** `resources/js/lib/token-storage.ts` memakai cache in-memory sinkron + `initTokenStorage()` async. Native memakai `@aparajita/capacitor-secure-storage`; web tetap `localStorage`. `AuthProvider` menunggu init sebelum membaca token; 8 call site dimigrasi; axios 401 memakai `clearToken()`.
+- **Fase 3 (kamera):** `resources/js/lib/camera.ts` memanggil `Camera.takePhoto({ quality: 80, editable: 'no' })` lalu mengonversi `webPath`/`uri` menjadi `File`. `PhotoInput` menampilkan tombol kamera di native dan input file lama di web. Pickup/return sudah memakainya. `appRestoredResult` belum diimplementasikan (follow-up).
+- **FCM:** `FcmPushSender` memanggil FCM v1 `messages:send`; `GoogleServiceAccountTokenProvider` memakai `google/auth` dan cache 50 menit. `PUSH_DRIVER=log` default, `fcm` opt-in. Token unregistered dihapus; kegagalan HTTP dicatat. 3 test baru (sukses, unregistered, server error).
+- **CI mobile:** `mobile_android` membangun debug APK dan bersifat blocking. `mobile_emulator` dibuat **manual/opt-in** (`workflow_dispatch`) karena runner GitHub hosted tidak punya KVM; host ini punya `/dev/kvm` tetapi belum punya JDK/SDK/libs.
+- **Status runtime:** login/logout native dan capture kamera belum diverifikasi di device/emulator. Verifikasi hanya sampai type-check, web build, dan kompilasi APK.
+- **appId:** masih placeholder `com.contoh.erp`; wajib diganti sebelum build internal pertama.
