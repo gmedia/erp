@@ -20,6 +20,10 @@ class DeviceToken extends Model
         'last_seen_at',
     ];
 
+    protected $hidden = [
+        'token',
+    ];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

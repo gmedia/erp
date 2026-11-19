@@ -5,6 +5,7 @@ use App\Actions\RecurringJournals\ExecuteRecurringJournalAction;
 use App\Actions\VehicleLoans\CleanupVehicleLoansAction;
 use App\Actions\VehicleLoans\NotifyOverdueVehicleLoansAction;
 use App\Console\Commands\CleanupSocialLoginTickets;
+use App\Console\Commands\PruneStaleDeviceTokens;
 use App\Models\RecurringJournal;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -54,6 +55,10 @@ Schedule::command('recurring-journals:execute')->daily();
 Schedule::command(CleanupSocialLoginTickets::class)
     ->everyFiveMinutes()
     ->name('cleanup-social-login-tickets');
+
+Schedule::command(PruneStaleDeviceTokens::class)
+    ->daily()
+    ->name('prune-stale-device-tokens');
 
 Schedule::command('journals:detect-cross-branch', ['--posted-only'])
     ->weekly()
