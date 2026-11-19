@@ -23,18 +23,17 @@ use App\Models\VehicleUnit;
 use Illuminate\Database\Seeder;
 
 /**
- * Sample data untuk seluruh tahapan modul Vehicle Loans.
+ * Data contoh realistis untuk seluruh tahapan modul Vehicle Loans.
  *
- * Setiap status didemokan oleh satu record: draft, pending, in_progress,
- * approved, rejected, pickup_done, returned, cancelled, ditambah satu
- * record pickup_done yang overdue. ApprovalRequest dibuat sebagai source of
- * truth, lengkap dengan step-nya, agar badge/approval queue konsisten dengan
- * status mirror di vehicle_loans.
+ * Setiap status diwakili satu record: draft, pending, in_progress, approved,
+ * rejected, pickup_done, returned, cancelled, ditambah satu pickup_done yang
+ * overdue. ApprovalRequest dibuat sebagai source of truth, lengkap dengan
+ * step-nya, agar badge/approval queue konsisten dengan status mirror di
+ * vehicle_loans. Nilai yang tampil di UI memakai data wajar (bukan kata
+ * "sample"/"dummy") agar demo terasa seperti data operasional nyata.
  */
 class VehicleLoanSampleDataSeeder extends Seeder
 {
-    private const PREFIX = 'VL-SAMPLE-';
-
     public function run(): void
     {
         $flow = ApprovalFlow::where('code', config('vehicle_loan.approval_flow_code'))->first();
@@ -48,7 +47,17 @@ class VehicleLoanSampleDataSeeder extends Seeder
             return;
         }
 
-        $requesters = User::query()->orderBy('id')->limit(5)->pluck('id')->all();
+        $this->purgeLegacySampleData();
+
+        $requesters = User::query()
+            ->where('name', 'not like', '%sample%')
+            ->where('name', 'not like', '%dummy%')
+            ->where('name', 'not like', '%test%')
+            ->orderBy('id')
+            ->limit(5)
+            ->pluck('id')
+            ->all();
+
         if ($requesters === []) {
             $requesters = [$admin->id];
         }
@@ -67,15 +76,15 @@ class VehicleLoanSampleDataSeeder extends Seeder
         $departmentId = Department::query()->orderBy('id')->value('id');
 
         $scenarios = [
-            ['code' => self::PREFIX . 'DRAFT', 'status' => 'draft', 'purpose' => 'Sample: permintaan masih draft'],
-            ['code' => self::PREFIX . 'PENDING', 'status' => 'pending', 'purpose' => 'Sample: menunggu approval'],
-            ['code' => self::PREFIX . 'IN-PROGRESS', 'status' => 'in_progress', 'purpose' => 'Sample: approval bertahap berjalan'],
-            ['code' => self::PREFIX . 'APPROVED', 'status' => 'approved', 'purpose' => 'Sample: disetujui, siap ambil kunci'],
-            ['code' => self::PREFIX . 'REJECTED', 'status' => 'rejected', 'purpose' => 'Sample: ditolak approver'],
-            ['code' => self::PREFIX . 'PICKUP-DONE', 'status' => 'pickup_done', 'purpose' => 'Sample: kunci diambil, kendaraan dipakai'],
-            ['code' => self::PREFIX . 'RETURNED', 'status' => 'returned', 'purpose' => 'Sample: sudah dikembalikan'],
-            ['code' => self::PREFIX . 'CANCELLED', 'status' => 'cancelled', 'purpose' => 'Sample: dibatalkan peminjam'],
-            ['code' => self::PREFIX . 'OVERDUE', 'status' => 'pickup_done', 'purpose' => 'Sample: terlewat jadwal pengembalian', 'overdue' => true],
+            ['code' => 'VL-2026-0001', 'status' => 'draft', 'purpose' => 'Perjalanan dinas ke Kantor Cabang Bandung'],
+            ['code' => 'VL-2026-0002', 'status' => 'pending', 'purpose' => 'Antar dokumen kontrak ke kantor notaris'],
+            ['code' => 'VL-2026-0003', 'status' => 'in_progress', 'purpose' => 'Kunjungan koordinasi proyek di Gedung Menara Kuningan'],
+            ['code' => 'VL-2026-0004', 'status' => 'approved', 'purpose' => 'Penjemputan tamu dari Bandara Soekarno-Hatta'],
+            ['code' => 'VL-2026-0005', 'status' => 'rejected', 'purpose' => 'Survey lokasi gudang di Cikarang'],
+            ['code' => 'VL-2026-0006', 'status' => 'pickup_done', 'purpose' => 'Pengiriman sparepart ke vendor di Tangerang'],
+            ['code' => 'VL-2026-0007', 'status' => 'returned', 'purpose' => 'Rapat koordinasi bulanan di kantor pusat'],
+            ['code' => 'VL-2026-0008', 'status' => 'cancelled', 'purpose' => 'Kunjungan supplier ke pabrik Karawang'],
+            ['code' => 'VL-2026-0009', 'status' => 'pickup_done', 'purpose' => 'Perjalanan dinas ke Surabaya', 'overdue' => true],
         ];
 
         foreach ($scenarios as $index => $scenario) {
@@ -114,11 +123,11 @@ class VehicleLoanSampleDataSeeder extends Seeder
             : null;
 
         $rejectionReason = $status === 'rejected'
-            ? 'Sample: jadwal bentrok dengan kebutuhan unit lain.'
+            ? 'Jadwal bentrok dengan kebutuhan unit lain pada jam yang sama.'
             : null;
 
         $reviewNotes = in_array($status, ['in_progress', 'approved'], true)
-            ? 'Sample: driver dan unit disetujui setelah review.'
+            ? 'Driver dan unit disesuaikan setelah pengecekan jadwal operasional.'
             : null;
 
         return VehicleLoan::updateOrCreate(
@@ -199,15 +208,15 @@ class VehicleLoanSampleDataSeeder extends Seeder
                 'acted_by' => $stepStatus === 'pending' ? null : $this->approverId(),
                 'action' => $stepStatus === 'pending' ? null : ($stepStatus === 'rejected' ? 'reject' : 'approve'),
                 'comments' => $status === 'rejected'
-                    ? 'Sample: jadwal bentrok dengan kebutuhan unit lain.'
-                    : ($status === 'in_progress' ? 'Sample: driver dan unit diperbarui.' : null),
+                    ? 'Jadwal bentrok dengan kebutuhan unit lain pada jam yang sama.'
+                    : ($status === 'in_progress' ? 'Driver dan unit diperbarui oleh atasan.' : null),
                 'acted_at' => $stepStatus === 'pending' ? null : ($loan->approved_at ?? now()),
             ],
         );
 
         if ($status === 'in_progress') {
             $loan->update([
-                'review_notes' => 'Sample: driver dan unit diperbarui oleh approver.',
+                'review_notes' => 'Penugasan driver dan unit diperbarui oleh atasan.',
             ]);
 
             VehicleLoanActivityLog::firstOrCreate(
@@ -248,7 +257,7 @@ class VehicleLoanSampleDataSeeder extends Seeder
             [
                 'requester_id' => $requesters[0] ?? $admin->id,
                 'photo_mode' => 'with_driver',
-                'selfie_photo_path' => self::PREFIX . 'pickups/' . $loan->code . '.jpg',
+                'selfie_photo_path' => 'vehicle-loans/pickups/' . $loan->code . '.jpg',
                 'selfie_photo_name' => 'selfie.jpg',
                 'driver_snapshot_id' => $driver->id,
                 'unit_snapshot_id' => $unit->id,
@@ -269,9 +278,9 @@ class VehicleLoanSampleDataSeeder extends Seeder
             [
                 'vehicle_loan_id' => $loan->id,
                 'returner_id' => $requesters[0] ?? $admin->id,
-                'handover_photo_path' => self::PREFIX . 'returns/' . $loan->code . '-handover.jpg',
+                'handover_photo_path' => 'vehicle-loans/returns/' . $loan->code . '-handover.jpg',
                 'handover_photo_name' => 'handover.jpg',
-                'condition_photo_path' => self::PREFIX . 'returns/' . $loan->code . '-condition.jpg',
+                'condition_photo_path' => 'vehicle-loans/returns/' . $loan->code . '-condition.jpg',
                 'condition_photo_name' => 'condition.jpg',
                 'incident' => false,
                 'odometer_start' => 12500,
@@ -307,6 +316,49 @@ class VehicleLoanSampleDataSeeder extends Seeder
         }
     }
 
+    private function purgeLegacySampleData(): void
+    {
+        $loanIds = VehicleLoan::where('code', 'like', 'VL-SAMPLE-%')->pluck('id');
+
+        if ($loanIds->isNotEmpty()) {
+            VehicleLoanReturn::whereIn('vehicle_loan_id', $loanIds)->delete();
+            VehicleLoanPickup::whereIn('vehicle_loan_id', $loanIds)->delete();
+
+            $approvalIds = ApprovalRequest::where('approvable_type', VehicleLoan::class)
+                ->whereIn('approvable_id', $loanIds)
+                ->pluck('id');
+
+            ApprovalRequestStep::whereIn('approval_request_id', $approvalIds)->delete();
+            ApprovalRequest::whereIn('id', $approvalIds)->delete();
+            VehicleLoanActivityLog::whereIn('vehicle_loan_id', $loanIds)->delete();
+
+            VehicleLoan::whereIn('id', $loanIds)->forceDelete();
+        }
+
+        $legacyDriver = VehicleDriver::where('license_number', 'SIM-SAMPLE-001')->first();
+        if ($legacyDriver && ! VehicleLoan::where('driver_id', $legacyDriver->id)->exists()) {
+            $legacyDriver->delete();
+        }
+
+        $legacyUnit = VehicleUnit::where('plate_number', 'B-SAMPLE-1')->first();
+        if ($legacyUnit) {
+            $legacyAsset = Asset::find($legacyUnit->asset_id);
+
+            if (! VehicleLoan::where('vehicle_unit_id', $legacyUnit->id)->exists()) {
+                $legacyUnit->delete();
+            }
+
+            if ($legacyAsset && ! VehicleUnit::where('asset_id', $legacyAsset->id)->exists()) {
+                $legacyAsset->delete();
+            }
+        }
+
+        $legacyEmployee = Employee::where('employee_id', 'EMP-SAMPLE-VL')->first();
+        if ($legacyEmployee && ! VehicleDriver::where('employee_id', $legacyEmployee->id)->exists()) {
+            $legacyEmployee->delete();
+        }
+    }
+
     private function approverId(): int
     {
         $email = Setting::get('vehicle_loan_approver_email');
@@ -324,32 +376,29 @@ class VehicleLoanSampleDataSeeder extends Seeder
 
     private function firstDriver(User $admin): VehicleDriver
     {
-        $driver = VehicleDriver::query()->orderBy('id')->first();
+        $driver = VehicleDriver::where('license_number', 'SIM-B-2024-00123')->first();
         if ($driver) {
             return $driver;
         }
 
-        $employee = Employee::query()->orderBy('id')->first();
-        if (! $employee) {
-            $employee = Employee::create([
-                'employee_id' => 'EMP-SAMPLE-VL',
-                'name' => 'Sample Driver',
-                'user_id' => $admin->id,
-            ]);
-        }
+        $employee = Employee::firstOrCreate(
+            ['employee_id' => 'EMP-2021-0145'],
+            ['name' => 'Budi Santoso', 'email' => 'budi.santoso@example.com', 'user_id' => $admin->id],
+        );
 
-        return VehicleDriver::create([
-            'employee_id' => $employee->id,
-            'license_number' => 'SIM-SAMPLE-001',
-            'license_type' => 'B',
-            'license_expiry' => now()->addYears(5)->toDateString(),
-            'is_active' => true,
-        ]);
+        return VehicleDriver::updateOrCreate(
+            ['license_number' => 'SIM-B-2024-00123'],
+            [
+                'employee_id' => $employee->id,
+                'license_type' => 'B',
+                'license_expiry' => now()->addYears(5)->toDateString(),
+                'is_active' => true,
+            ]);
     }
 
     private function firstUnit(): ?VehicleUnit
     {
-        $unit = VehicleUnit::query()->orderBy('id')->first();
+        $unit = VehicleUnit::where('plate_number', 'B 1234 XYZ')->first();
         if ($unit) {
             return $unit;
         }
@@ -363,9 +412,9 @@ class VehicleLoanSampleDataSeeder extends Seeder
         }
 
         $asset = Asset::updateOrCreate(
-            ['asset_code' => 'FA-SAMPLE-VL-001'],
+            ['asset_code' => 'FA-2021-0145'],
             [
-                'name' => 'Sample Vehicle',
+                'name' => 'Toyota Avanza 1.5 G',
                 'asset_category_id' => $category->id,
                 'branch_id' => $branchId,
                 'purchase_date' => now()->subYear()->toDateString(),
@@ -379,7 +428,7 @@ class VehicleLoanSampleDataSeeder extends Seeder
         return VehicleUnit::updateOrCreate(
             ['asset_id' => $asset->id],
             [
-                'plate_number' => 'B-SAMPLE-1',
+                'plate_number' => 'B 1234 XYZ',
                 'vehicle_type' => 'car',
                 'capacity' => 5,
                 'is_active' => true,

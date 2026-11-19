@@ -33,10 +33,22 @@ database/
 - **Idempotent seeders** — use `firstOrCreate` / `updateOrCreate`; re-running `db:seed` must not duplicate rows.
 - **Naming** — sample/demo data seeders end in `SampleDataSeeder`.
 
+### Seeder Data Rules (MANDATORY)
+
+- **Realistic data** — every user-visible value must look like real operational data. Never put the words `sample`, `dummy`, `test`, `contoh`, or `lorem` in loan/asset/person names, codes, purposes, notes, plate numbers, or license numbers.
+- **No visible marker prefixes** — do not encode a demo marker in `code` (e.g. `VL-SAMPLE-...`) or in master records (`Sample Driver`, `B-SAMPLE-1`). Use production-like formats (e.g. `VL-2026-0001`, `B 1234 XYZ`, `Budi Santoso`).
+- **Cover every stage** — sample seeders for workflow modules must create at least one row per status/state, including edge states (rejected, cancelled, overdue) when the module supports them.
+- **Consistent source of truth** — when a module mirrors a workflow table, seed both sides consistently (e.g. `approval_requests` + `approval_request_steps` must match the mirrored `status`).
+- **Idempotent + legacy cleanup** — use `firstOrCreate`/`updateOrCreate`; when renaming demo codes, purge the old demo rows inside the seeder so re-running does not leave duplicates.
+- **No brand or tenant hardcode** — never hardcode company name, domain, logo, or email; resolve from `Setting`/`config`.
+- **Verify** — run `migrate:fresh --seed` and the seeder a second time; counts must be identical, and spot-check each stage in the UI.
+
 ## ANTI-PATTERNS
 
 - ❌ Editing a migration that already ran on a shared environment — add a new migration.
 - ❌ Non-idempotent seeders (`create()` in loops).
+- ❌ Seeder values that expose demo markers (`Sample: ...`, `Sample Driver`, `VL-SAMPLE-*`, `Dummy`) in any user-visible field.
+- ❌ Seeder that only covers the happy path and leaves rejected/cancelled/overdue stages empty.
 - ❌ Migrations without `down()` or with untyped closures.
 - ❌ Missing indexes on foreign keys or frequently filtered columns.
 - ❌ Factory states that hard-code IDs instead of `factory()` relations.
