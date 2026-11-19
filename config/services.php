@@ -28,6 +28,11 @@ return [
         'include_tenant_info' => true,
     ],
 
+    'fcm' => [
+        'project_id' => env('FCM_PROJECT_ID'),
+        'credentials' => env('FCM_CREDENTIALS'),
+    ],
+
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],
