@@ -49,6 +49,7 @@ resources/js/
 - **Sibling file pattern** — `{Module}Columns.tsx`, `{Module}Filters.tsx`, `{Module}Form.tsx`, `{Module}ViewModal.tsx`.
 - **`pipeline/` vs `pipelines/`** — `pipeline/` = runtime state actions/timeline; `pipelines/` = pipeline CRUD UI.
 - **Form prop naming** — always `entity` (never `product`, `customer`, etc.).
+- **Date fields** — form schemas use `z.string()` with `yyyy-MM-dd`; default values go through `toDateInputValue()` in `utils/date-format.ts`. Never use `z.date()` or send raw `Date` objects to the API.
 - **`useEntityForm` hook** — eliminates form setup boilerplate. Takes `schema`, `getDefaults`, `entity`.
 - **ViewModal** — always `memo()` wrapped, uses `ViewModalShell` + `ViewField`.
 - **Data fetching** — TanStack Query via `useCrudQuery`/`useCrudMutations`. No raw axios in components.

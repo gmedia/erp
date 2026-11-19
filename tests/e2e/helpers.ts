@@ -1,4 +1,4 @@
-import { Page, expect } from '@playwright/test';
+import { Locator, Page, expect } from '@playwright/test';
 
 type ApiResponseMatcher = string | RegExp | ((url: string) => boolean);
 
@@ -7,109 +7,144 @@ export const DEFAULT_E2E_EMAIL = process.env.APP_ADMIN ?? 'admin@example.com';
 const DEFAULT_E2E_PASSWORD = 'password';
 
 interface LoginOptions {
-  requireDashboard?: boolean;
+    requireDashboard?: boolean;
 }
 
 function matchesApiUrl(url: string, matcher: ApiResponseMatcher): boolean {
-  if (typeof matcher === 'string') {
-    return url.includes(matcher);
-  }
+    if (typeof matcher === 'string') {
+        return url.includes(matcher);
+    }
 
-  if (matcher instanceof RegExp) {
-    return matcher.test(url);
-  }
+    if (matcher instanceof RegExp) {
+        return matcher.test(url);
+    }
 
-  return matcher(url);
+    return matcher(url);
 }
 
 export async function waitForApiAfterAction(
-  page: Page,
-  matcher: ApiResponseMatcher,
-  action: () => Promise<unknown>,
-  timeout = 10000,
+    page: Page,
+    matcher: ApiResponseMatcher,
+    action: () => Promise<unknown>,
+    timeout = 10000,
 ): Promise<void> {
-  const responsePromise = page.waitForResponse(
-    (response) =>
-      matchesApiUrl(response.url(), matcher) && response.status() < 400,
-    { timeout },
-  );
+    const responsePromise = page.waitForResponse(
+        (response) =>
+            matchesApiUrl(response.url(), matcher) && response.status() < 400,
+        { timeout },
+    );
 
-  await action();
-  await responsePromise;
+    await action();
+    await responsePromise;
 }
 
 export async function reloadAndWaitForApi(
-  page: Page,
-  matcher: ApiResponseMatcher,
-  timeout = 10000,
+    page: Page,
+    matcher: ApiResponseMatcher,
+    timeout = 10000,
 ): Promise<void> {
-  await waitForApiAfterAction(page, matcher, () => page.reload(), timeout);
+    await waitForApiAfterAction(page, matcher, () => page.reload(), timeout);
 }
 
 export async function searchAndWaitForApi(
-  page: Page,
-  searchInput: ReturnType<Page['getByPlaceholder']>,
-  value: string,
-  matcher: ApiResponseMatcher,
-  timeout = 10000,
+    page: Page,
+    searchInput: ReturnType<Page['getByPlaceholder']>,
+    value: string,
+    matcher: ApiResponseMatcher,
+    timeout = 10000,
 ): Promise<void> {
-  await waitForApiAfterAction(
-    page,
-    matcher,
-    async () => {
-      await searchInput.clear();
-      await searchInput.fill(value);
-      await searchInput.press('Enter');
-    },
-    timeout,
-  );
+    await waitForApiAfterAction(
+        page,
+        matcher,
+        async () => {
+            await searchInput.clear();
+            await searchInput.fill(value);
+            await searchInput.press('Enter');
+        },
+        timeout,
+    );
+}
+
+export async function changeDateFieldValue(
+    page: Page,
+    dialog: Locator,
+    label: string,
+): Promise<string> {
+    const trigger = dialog
+        .getByText(label, { exact: true })
+        .locator('xpath=..')
+        .locator('button');
+    await expect(trigger).toBeVisible();
+    await trigger.click();
+
+    await page
+        .getByRole('button', { name: 'Go to the Previous Month' })
+        .last()
+        .click();
+
+    const dayButton = page
+        .locator('button[data-date]')
+        .filter({ hasText: /^15$/ })
+        .first();
+    await expect(dayButton).toBeVisible();
+
+    const expectedDate = await dayButton.getAttribute('data-date');
+    await dayButton.click();
+
+    expect(expectedDate).not.toBeNull();
+
+    return expectedDate ?? '';
 }
 
 export async function ensureAppOrigin(page: Page): Promise<void> {
-  const currentUrl = page.url();
+    const currentUrl = page.url();
 
-  if (currentUrl.startsWith('http://') || currentUrl.startsWith('https://')) {
-    return;
-  }
-
-  let lastError: unknown;
-
-  for (let attempt = 0; attempt < 3; attempt++) {
-    try {
-      await page.goto('/login', { waitUntil: 'domcontentloaded', timeout: 60000 });
-      return;
-    } catch (error) {
-      lastError = error;
-      const message = error instanceof Error ? error.message : String(error);
-      const retriable =
-        message.includes('net::ERR_ABORTED') ||
-        message.toLowerCase().includes('frame was detached') ||
-        message.toLowerCase().includes('navigation');
-
-      if (!retriable) {
-        throw error;
-      }
-
-      await page.waitForTimeout(750);
+    if (currentUrl.startsWith('http://') || currentUrl.startsWith('https://')) {
+        return;
     }
-  }
 
-  throw lastError instanceof Error ? lastError : new Error(String(lastError));
+    let lastError: unknown;
+
+    for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+            await page.goto('/login', {
+                waitUntil: 'domcontentloaded',
+                timeout: 60000,
+            });
+            return;
+        } catch (error) {
+            lastError = error;
+            const message =
+                error instanceof Error ? error.message : String(error);
+            const retriable =
+                message.includes('net::ERR_ABORTED') ||
+                message.toLowerCase().includes('frame was detached') ||
+                message.toLowerCase().includes('navigation');
+
+            if (!retriable) {
+                throw error;
+            }
+
+            await page.waitForTimeout(750);
+        }
+    }
+
+    throw lastError instanceof Error ? lastError : new Error(String(lastError));
 }
 
 // Generic entity creation helper
 export interface EntityField {
-  name: string;
-  type: 'text' | 'email' | 'select' | 'textarea';
-  selector?: string;
-  defaultValue: string;
-  optionSelector?: string;
+    name: string;
+    type: 'text' | 'email' | 'select' | 'textarea';
+    selector?: string;
+    defaultValue: string;
+    optionSelector?: string;
 }
 
 export interface EntityConfig {
-  route: string;
-  fields: EntityField[];
-  returnField: string; // field name to return as identifier
+    route: string;
+    fields: EntityField[];
+    returnField: string; // field name to return as identifier
 }
 
 /**
@@ -120,96 +155,133 @@ export interface EntityConfig {
  * @param overrides - Optional field overrides.
  * @returns The unique identifier field value used for the created entity.
  */
+export async function openModule(
+    page: Page,
+    route: string,
+    apiPath: string,
+): Promise<void> {
+    await login(page, undefined, undefined, { requireDashboard: false });
+    await page.goto(route);
+    await page.waitForResponse(
+        (response) =>
+            response.url().includes(apiPath) && response.status() < 400,
+        { timeout: 15000 },
+    );
+}
+
 export async function createEntity(
-  page: Page,
-  config: EntityConfig,
-  overrides: Record<string, string> = {}
+    page: Page,
+    config: EntityConfig,
+    overrides: Record<string, string> = {},
 ): Promise<string> {
-  // 1️⃣ Login
-  await login(page, undefined, undefined, { requireDashboard: false });
+    // 1️⃣ Login
+    await login(page, undefined, undefined, { requireDashboard: false });
 
-  // 2️⃣ Navigate to entity list page
-  await page.goto(config.route);
+    // 2️⃣ Navigate to entity list page
+    await page.goto(config.route);
 
-  // 3️⃣ Open the "Add Entity" dialog
-  const addButton = page.getByRole('button', { name: /Add/i });
-  try {
-    await expect(addButton).toBeVisible({ timeout: 5000 });
-  } catch (error) {
-    console.error("Add button hidden. Page content:");
-    console.error(await page.textContent('body'));
-    await page.screenshot({ path: 'tests/e2e/test-results/debug-add-button.png' });
-    throw error;
-  }
-  await addButton.click();
+    // 3️⃣ Open the "Add Entity" dialog
+    const addButton = page.getByRole('button', { name: /Add/i });
+    try {
+        await expect(addButton).toBeVisible({ timeout: 5000 });
+    } catch (error) {
+        console.error('Add button hidden. Page content:');
+        console.error(await page.textContent('body'));
+        await page.screenshot({
+            path: 'tests/e2e/test-results/debug-add-button.png',
+        });
+        throw error;
+    }
+    await addButton.click();
 
-  // 4️⃣ Fill the form fields
-  let returnValue = '';
+    // 4️⃣ Fill the form fields
+    let returnValue = '';
 
-  for (const field of config.fields) {
-    const value = overrides[field.name] ?? field.defaultValue;
+    for (const field of config.fields) {
+        const value = overrides[field.name] ?? field.defaultValue;
 
-    if (field.name === config.returnField) {
-      returnValue = value;
+        if (field.name === config.returnField) {
+            returnValue = value;
+        }
+
+        if (field.type === 'select') {
+            // Find the combobox by role and name (using partial match for robustness)
+            const combobox = page
+                .getByRole('combobox', {
+                    name: new RegExp(field.selector || value, 'i'),
+                })
+                .first();
+            await expect(combobox).toBeVisible();
+            await combobox.click();
+
+            // Support both legacy listbox/option and current AsyncSelect popover list.
+            const listbox = page
+                .locator('[role="listbox"]:visible, ul[aria-busy]:visible')
+                .last();
+            await expect(listbox).toBeVisible();
+
+            // Search if input is available
+            const searchInput = page
+                .locator('input[placeholder="Search..."]:visible')
+                .last();
+            if (await searchInput.isVisible().catch(() => false)) {
+                await searchInput.fill(value);
+                // Wait for debounce and fetch
+                await page.waitForTimeout(500);
+            }
+
+            // Click the option
+            const option = page
+                .locator(
+                    '[role="option"]:visible, ul[aria-busy]:visible button:visible',
+                )
+                .filter({ hasText: new RegExp(value, 'i') })
+                .first();
+            await expect(option).toBeVisible();
+            await option.click({ force: true });
+
+            // Wait for listbox to disappear
+            await expect(
+                page.locator('[role="listbox"]:visible, ul[aria-busy]:visible'),
+            )
+                .toHaveCount(0, { timeout: 10000 })
+                .catch(() => null);
+        } else if (field.type === 'textarea') {
+            await page.fill(`textarea[name="${field.name}"]`, value);
+        } else {
+            await page.fill(`input[name="${field.name}"]`, value);
+        }
     }
 
-    if (field.type === 'select') {
-      // Find the combobox by role and name (using partial match for robustness)
-      const combobox = page.getByRole('combobox', { name: new RegExp(field.selector || value, 'i') }).first();
-      await expect(combobox).toBeVisible();
-      await combobox.click();
+    // Ensure the dialog is visible before interacting
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    const submitButton = dialog.getByRole('button', {
+        name: /Add|Tambah|Create|Buat|Update|Perbarui|Submit|Kirim/i,
+    });
+    await expect(submitButton).toBeVisible();
+    await submitButton.click();
 
-      // Support both legacy listbox/option and current AsyncSelect popover list.
-      const listbox = page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').last();
-      await expect(listbox).toBeVisible();
-
-      // Search if input is available
-      const searchInput = page.locator('input[placeholder="Search..."]:visible').last();
-      if (await searchInput.isVisible().catch(() => false)) {
-        await searchInput.fill(value);
-        // Wait for debounce and fetch
-        await page.waitForTimeout(500);
-      }
-
-      // Click the option
-      const option = page
-        .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
-        .filter({ hasText: new RegExp(value, 'i') })
-        .first();
-      await expect(option).toBeVisible();
-      await option.click({ force: true });
-
-      // Wait for listbox to disappear
-      await expect(page.locator('[role="listbox"]:visible, ul[aria-busy]:visible')).toHaveCount(0, { timeout: 10000 }).catch(() => null);
+    // Wait for dialog to disappear with a descriptive error
+    try {
+        await expect(dialog).not.toBeVisible({ timeout: 15000 });
+    } catch (error) {
+        console.error(
+            `Dialog did not close after 15s. Likely validation error or backend failure.`,
+        );
+        // Check for visible error messages in the dialog
+        const errorMessages = await dialog
+            .locator('.text-destructive, .text-red-500, [role="alert"]')
+            .allTextContents();
+        if (errorMessages.length > 0) {
+            console.error(
+                `Found error messages in dialog: ${errorMessages.join(', ')}`,
+            );
+        }
+        throw error;
     }
- else if (field.type === 'textarea') {
-      await page.fill(`textarea[name="${field.name}"]`, value);
-    } else {
-      await page.fill(`input[name="${field.name}"]`, value);
-    }
-  }
 
-  // Ensure the dialog is visible before interacting
-  const dialog = page.getByRole('dialog');
-  await expect(dialog).toBeVisible();
-  const submitButton = dialog.getByRole('button', { name: /Add|Tambah|Create|Buat|Update|Perbarui|Submit|Kirim/i });
-  await expect(submitButton).toBeVisible();
-  await submitButton.click();
-
-  // Wait for dialog to disappear with a descriptive error
-  try {
-      await expect(dialog).not.toBeVisible({ timeout: 15000 });
-  } catch (error) {
-      console.error(`Dialog did not close after 15s. Likely validation error or backend failure.`);
-      // Check for visible error messages in the dialog
-      const errorMessages = await dialog.locator('.text-destructive, .text-red-500, [role="alert"]').allTextContents();
-      if (errorMessages.length > 0) {
-          console.error(`Found error messages in dialog: ${errorMessages.join(', ')}`);
-      }
-      throw error;
-  }
-
-  return returnValue;
+    return returnValue;
 }
 
 /**
@@ -222,333 +294,372 @@ export async function createEntity(
  * @returns A promise that resolves when navigation to the dashboard is complete.
  */
 export async function login(
-  page: Page,
-  email = DEFAULT_E2E_EMAIL,
-  password = DEFAULT_E2E_PASSWORD,
-  options: LoginOptions = {},
+    page: Page,
+    email = DEFAULT_E2E_EMAIL,
+    password = DEFAULT_E2E_PASSWORD,
+    options: LoginOptions = {},
 ): Promise<void> {
-  const requireDashboard = options.requireDashboard ?? true;
+    const requireDashboard = options.requireDashboard ?? true;
 
-  if (!pageDebugListenersAttached.has(page)) {
-    pageDebugListenersAttached.add(page);
+    if (!pageDebugListenersAttached.has(page)) {
+        pageDebugListenersAttached.add(page);
 
-    // Listen for uncaught JS errors
-    page.on('pageerror', exception => {
-      console.error(`Uncaught exception: "${exception}"`);
-    });
+        // Listen for uncaught JS errors
+        page.on('pageerror', (exception) => {
+            console.error(`Uncaught exception: "${exception}"`);
+        });
 
-    // Listen for console errors
-    page.on('console', msg => {
-      if (msg.type() === 'error') {
-        const text = msg.text();
-        // Ignore known expected errors to keep test output clean
-        if (text.includes('Failed to send logs: TypeError: Failed to fetch')) return; // Laravel Boost logger
-        if (text.includes('the server responded with a status of 422')) return; // Expected validation error
-        if (text.includes('AxiosError')) return; // Expected validation error
-        if (text.includes('Download the React DevTools')) return;
+        // Listen for console errors
+        page.on('console', (msg) => {
+            if (msg.type() === 'error') {
+                const text = msg.text();
+                // Ignore known expected errors to keep test output clean
+                if (
+                    text.includes(
+                        'Failed to send logs: TypeError: Failed to fetch',
+                    )
+                )
+                    return; // Laravel Boost logger
+                if (text.includes('the server responded with a status of 422'))
+                    return; // Expected validation error
+                if (text.includes('AxiosError')) return; // Expected validation error
+                if (text.includes('Download the React DevTools')) return;
 
-        console.error(`Console Error text: "${text}"`);
-      }
-    });
-  }
-
-  const gotoWithRetry = async (url: string): Promise<void> => {
-    let lastError: unknown;
-    for (let attempt = 0; attempt < 3; attempt++) {
-      try {
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
-        return;
-      } catch (err) {
-        lastError = err;
-        const message = err instanceof Error ? err.message : String(err);
-        const retriable =
-          message.includes('net::ERR_ABORTED') ||
-          message.toLowerCase().includes('frame was detached') ||
-          message.toLowerCase().includes('navigation');
-        if (!retriable) throw err;
-        await page.waitForTimeout(750);
-      }
+                console.error(`Console Error text: "${text}"`);
+            }
+        });
     }
-    throw lastError instanceof Error ? lastError : new Error(String(lastError));
-  };
 
-  const clearStoredAuth = async (): Promise<void> => {
-    await page.context().clearCookies();
+    const gotoWithRetry = async (url: string): Promise<void> => {
+        let lastError: unknown;
+        for (let attempt = 0; attempt < 3; attempt++) {
+            try {
+                await page.goto(url, {
+                    waitUntil: 'domcontentloaded',
+                    timeout: 60000,
+                });
+                return;
+            } catch (err) {
+                lastError = err;
+                const message =
+                    err instanceof Error ? err.message : String(err);
+                const retriable =
+                    message.includes('net::ERR_ABORTED') ||
+                    message.toLowerCase().includes('frame was detached') ||
+                    message.toLowerCase().includes('navigation');
+                if (!retriable) throw err;
+                await page.waitForTimeout(750);
+            }
+        }
+        throw lastError instanceof Error
+            ? lastError
+            : new Error(String(lastError));
+    };
+
+    const clearStoredAuth = async (): Promise<void> => {
+        await page.context().clearCookies();
+        await page.evaluate(() => {
+            localStorage.removeItem('api_token');
+            sessionStorage.clear();
+        });
+    };
+
+    const hasReusableSession = async (
+        expectedEmail: string,
+    ): Promise<boolean> => {
+        return page
+            .evaluate(async (targetEmail) => {
+                const token = localStorage.getItem('api_token');
+                if (!token) {
+                    return false;
+                }
+
+                try {
+                    const response = await fetch('/api/me', {
+                        method: 'GET',
+                        headers: {
+                            Accept: 'application/json',
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
+
+                    if (!response.ok) {
+                        return false;
+                    }
+
+                    const payload = (await response.json()) as {
+                        user?: { email?: string };
+                    };
+
+                    return payload.user?.email === targetEmail;
+                } catch {
+                    return false;
+                }
+            }, expectedEmail)
+            .catch(() => false);
+    };
+
+    const shouldAttemptSessionReuse =
+        email === DEFAULT_E2E_EMAIL && password === DEFAULT_E2E_PASSWORD;
+
+    if (shouldAttemptSessionReuse) {
+        if (page.url() === 'about:blank') {
+            await gotoWithRetry('/login');
+        }
+
+        if (await hasReusableSession(email)) {
+            if (requireDashboard) {
+                await gotoWithRetry('/dashboard');
+                await expect(page).toHaveURL(/\/dashboard/);
+            }
+
+            return;
+        }
+    }
+
+    // Auth in this SPA is driven by a bearer token in localStorage, not cookies.
+    // Reset the client auth state before every login so stale tokens do not redirect
+    // us away from the login page or keep us logged in as the wrong user.
+    await gotoWithRetry('/login');
+    await clearStoredAuth();
+    await gotoWithRetry('/login');
+
+    const emailInput = page.locator('input[name="email"]');
     await page.evaluate(() => {
-      localStorage.removeItem('api_token');
-      sessionStorage.clear();
+        document.querySelector('vite-error-overlay')?.remove();
     });
-  };
+    await expect(emailInput).toBeVisible({ timeout: 15000 });
+    await emailInput.fill(email);
+    await page.fill('input[name="password"]', password);
 
-  const hasReusableSession = async (expectedEmail: string): Promise<boolean> => {
-    return page
-      .evaluate(async (targetEmail) => {
-        const token = localStorage.getItem('api_token');
-        if (!token) {
-          return false;
-        }
+    const loginResponse = page.waitForResponse(
+        (response) =>
+            response.url().includes('/api/login') &&
+            response.request().method() === 'POST',
+        { timeout: 60000 },
+    );
+    const authStateResponse = page.waitForResponse(
+        (response) =>
+            response.url().includes('/api/me') &&
+            response.request().method() === 'GET' &&
+            response.status() < 400,
+        { timeout: 60000 },
+    );
 
-        try {
-          const response = await fetch('/api/me', {
-            method: 'GET',
-            headers: {
-              Accept: 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-          });
+    await page
+        .locator(
+            'button[type="submit"], button[data-test="login-button"], button[data-testid="login-button"]',
+        )
+        .first()
+        .click({ force: true });
 
-          if (!response.ok) {
-            return false;
-          }
-
-          const payload = (await response.json()) as { user?: { email?: string } };
-
-          return payload.user?.email === targetEmail;
-        } catch {
-          return false;
-        }
-      }, expectedEmail)
-      .catch(() => false);
-  };
-
-  const shouldAttemptSessionReuse =
-    email === DEFAULT_E2E_EMAIL && password === DEFAULT_E2E_PASSWORD;
-
-  if (shouldAttemptSessionReuse) {
-    if (page.url() === 'about:blank') {
-      await gotoWithRetry('/login');
+    await loginResponse;
+    if (requireDashboard) {
+        await page.waitForURL('**/dashboard', { timeout: 60000 });
     }
-
-    if (await hasReusableSession(email)) {
-      if (requireDashboard) {
-        await gotoWithRetry('/dashboard');
-        await expect(page).toHaveURL(/\/dashboard/);
-      }
-
-      return;
-    }
-  }
-
-  // Auth in this SPA is driven by a bearer token in localStorage, not cookies.
-  // Reset the client auth state before every login so stale tokens do not redirect
-  // us away from the login page or keep us logged in as the wrong user.
-  await gotoWithRetry('/login');
-  await clearStoredAuth();
-  await gotoWithRetry('/login');
-
-  const emailInput = page.locator('input[name="email"]');
-  await page.evaluate(() => {
-    document.querySelector('vite-error-overlay')?.remove();
-  });
-  await expect(emailInput).toBeVisible({ timeout: 15000 });
-  await emailInput.fill(email);
-  await page.fill('input[name="password"]', password);
-
-  const loginResponse = page.waitForResponse(
-    response =>
-      response.url().includes('/api/login') && response.request().method() === 'POST',
-    { timeout: 60000 },
-  );
-  const authStateResponse = page.waitForResponse(
-    response =>
-      response.url().includes('/api/me') &&
-      response.request().method() === 'GET' &&
-      response.status() < 400,
-    { timeout: 60000 },
-  );
-
-  await page
-    .locator(
-      'button[type="submit"], button[data-test="login-button"], button[data-testid="login-button"]',
-    )
-    .first()
-    .click({ force: true });
-
-  await loginResponse;
-  if (requireDashboard) {
-    await page.waitForURL('**/dashboard', { timeout: 60000 });
-  }
-  await authStateResponse;
-  await expect
-    .poll(async () =>
-      page.evaluate(() => Boolean(localStorage.getItem('api_token'))).catch(() => false),
-    )
-    .toBe(true);
+    await authStateResponse;
+    await expect
+        .poll(async () =>
+            page
+                .evaluate(() => Boolean(localStorage.getItem('api_token')))
+                .catch(() => false),
+        )
+        .toBe(true);
 }
-
-
 
 /**
  * Generic function to create an account via the UI.
  */
 export async function createAccount(
-  page: Page,
-  overrides: Partial<{
-    coa_version: string;
-    code: string;
-    name: string;
-    type: string;
-    normal_balance: string;
-    is_active: boolean;
-    is_cash_flow: boolean;
-    description: string;
-  }> = {}
+    page: Page,
+    overrides: Partial<{
+        coa_version: string;
+        code: string;
+        name: string;
+        type: string;
+        normal_balance: string;
+        is_active: boolean;
+        is_cash_flow: boolean;
+        description: string;
+    }> = {},
 ): Promise<string> {
-  const timestamp = Date.now();
-  const defaultName = `Account ${timestamp}`;
-  const defaultCode = `CODE${timestamp.toString().slice(-5)}`;
+    const timestamp = Date.now();
+    const defaultName = `Account ${timestamp}`;
+    const defaultCode = `CODE${timestamp.toString().slice(-5)}`;
 
-  // 1️⃣ Login
-  await login(page, undefined, undefined, { requireDashboard: false });
+    // 1️⃣ Login
+    await login(page, undefined, undefined, { requireDashboard: false });
 
-  // 2️⃣ Navigate to Accounts page
-  await page.goto('/accounts');
-  await page.waitForLoadState('networkidle');
-
-  // 3️⃣ Select COA Version if provided
-  if (overrides.coa_version) {
-    // Try to find the selector trigger by role or text
-    const versionTrigger = page.getByRole('combobox').or(page.locator('button')).filter({ hasText: /Select COA Version|COA \d{4}/i }).first();
-    await expect(versionTrigger).toBeVisible({ timeout: 30000 });
-    await versionTrigger.click();
-    
-    const option = page.getByRole('option', { name: overrides.coa_version });
-    await expect(option).toBeVisible({ timeout: 15000 });
-    await option.first().click();
+    // 2️⃣ Navigate to Accounts page
+    await page.goto('/accounts');
     await page.waitForLoadState('networkidle');
-  }
 
-  // 4️⃣ Open the "Add Account" dialog
-  const addButton = page.getByRole('button', { name: /New Root Account/i });
-  await expect(addButton).toBeVisible({ timeout: 15000 });
-  await addButton.click();
+    // 3️⃣ Select COA Version if provided
+    if (overrides.coa_version) {
+        // Try to find the selector trigger by role or text
+        const versionTrigger = page
+            .getByRole('combobox')
+            .or(page.locator('button'))
+            .filter({ hasText: /Select COA Version|COA \d{4}/i })
+            .first();
+        await expect(versionTrigger).toBeVisible({ timeout: 30000 });
+        await versionTrigger.click();
 
-  // Wait for dialog to be visible
-  const dialog = page.getByRole('dialog');
-  await expect(dialog).toBeVisible();
+        const option = page.getByRole('option', {
+            name: overrides.coa_version,
+        });
+        await expect(option).toBeVisible({ timeout: 15000 });
+        await option.first().click();
+        await page.waitForLoadState('networkidle');
+    }
 
-  // 5️⃣ Fill the form fields
-  const name = overrides.name ?? defaultName;
-  const code = overrides.code ?? defaultCode;
-  
-  await dialog.locator('input[name="code"]').fill(code);
-  await dialog.locator('input[name="name"]').fill(name);
+    // 4️⃣ Open the "Add Account" dialog
+    const addButton = page.getByRole('button', { name: /New Root Account/i });
+    await expect(addButton).toBeVisible({ timeout: 15000 });
+    await addButton.click();
 
-  // Select type
-  if (overrides.type) {
-    const typeTrigger = dialog.locator('button').filter({ hasText: /Asset|Liability|Equity|Revenue|Expense/i });
-    await typeTrigger.click();
-    await page.getByRole('option', { name: overrides.type, exact: true }).click();
-  }
+    // Wait for dialog to be visible
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
 
-  // Select normal balance
-  if (overrides.normal_balance) {
-    const balanceTrigger = dialog.locator('button').filter({ hasText: /Debit|Credit/i }).last();
-    await balanceTrigger.click();
-    await page.getByRole('option', { name: overrides.normal_balance, exact: true }).click();
-  }
+    // 5️⃣ Fill the form fields
+    const name = overrides.name ?? defaultName;
+    const code = overrides.code ?? defaultCode;
 
-  // Checkboxes
-  if (overrides.is_active === false) {
-    await dialog.locator('button[id="is_active"]').click();
-  }
-  if (overrides.is_cash_flow === true) {
-    await dialog.locator('button[id="is_cash_flow"]').click();
-  }
+    await dialog.locator('input[name="code"]').fill(code);
+    await dialog.locator('input[name="name"]').fill(name);
 
-  if (overrides.description) {
-    await dialog.locator('textarea[id="description"]').fill(overrides.description);
-  }
+    // Select type
+    if (overrides.type) {
+        const typeTrigger = dialog
+            .locator('button')
+            .filter({ hasText: /Asset|Liability|Equity|Revenue|Expense/i });
+        await typeTrigger.click();
+        await page
+            .getByRole('option', { name: overrides.type, exact: true })
+            .click();
+    }
 
-  // 6️⃣ Submit the form
-  const submitButton = dialog.getByRole('button', { name: /Create/i }).first();
-  await submitButton.click();
+    // Select normal balance
+    if (overrides.normal_balance) {
+        const balanceTrigger = dialog
+            .locator('button')
+            .filter({ hasText: /Debit|Credit/i })
+            .last();
+        await balanceTrigger.click();
+        await page
+            .getByRole('option', {
+                name: overrides.normal_balance,
+                exact: true,
+            })
+            .click();
+    }
 
-  // Wait for dialog to be hidden
-  await expect(dialog).not.toBeVisible({ timeout: 15000 });
+    // Checkboxes
+    if (overrides.is_active === false) {
+        await dialog.locator('button[id="is_active"]').click();
+    }
+    if (overrides.is_cash_flow === true) {
+        await dialog.locator('button[id="is_cash_flow"]').click();
+    }
 
-  return code;
+    if (overrides.description) {
+        await dialog
+            .locator('textarea[id="description"]')
+            .fill(overrides.description);
+    }
+
+    // 6️⃣ Submit the form
+    const submitButton = dialog
+        .getByRole('button', { name: /Create/i })
+        .first();
+    await submitButton.click();
+
+    // Wait for dialog to be hidden
+    await expect(dialog).not.toBeVisible({ timeout: 15000 });
+
+    return code;
 }
 
 /**
  * Search for an account by code or name.
  */
 export async function searchAccount(page: Page, query: string): Promise<void> {
-  const searchInput = page.getByPlaceholder(/Search code or name/i);
-  await searchInput.waitFor({ state: 'visible' });
-  await searchInput.fill(query);
-  await searchInput.press('Enter');
-  await page.waitForLoadState('networkidle');
+    const searchInput = page.getByPlaceholder(/Search code or name/i);
+    await searchInput.waitFor({ state: 'visible' });
+    await searchInput.fill(query);
+    await searchInput.press('Enter');
+    await page.waitForLoadState('networkidle');
 }
 
 /**
  * Edit an existing account.
  */
 export async function editAccount(
-  page: Page,
-  code: string,
-  updates: { name?: string; type?: string }
+    page: Page,
+    code: string,
+    updates: { name?: string; type?: string },
 ): Promise<void> {
-  await searchAccount(page, code);
+    await searchAccount(page, code);
 
-  const item = page.locator('div', { hasText: code }).first();
-  await expect(item).toBeVisible();
-  
-  // Hover to reveal buttons
-  await item.hover();
+    const item = page.locator('div', { hasText: code }).first();
+    await expect(item).toBeVisible();
 
-  // The Edit button has .text-blue-500 class
-  const editBtn = item.locator('button.text-blue-500');
-  await editBtn.click();
+    // Hover to reveal buttons
+    await item.hover();
 
-  const dialog = page.getByRole('dialog');
-  await expect(dialog).toBeVisible();
+    // The Edit button has .text-blue-500 class
+    const editBtn = item.locator('button.text-blue-500');
+    await editBtn.click();
 
-  if (updates.name) {
-    await dialog.locator('input[name="name"]').fill(updates.name);
-  }
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
 
-  if (updates.type) {
-    const typeTrigger = dialog.locator('button').filter({ hasText: /Asset|Liability|Equity|Revenue|Expense/i });
-    await typeTrigger.click();
-    await page.getByRole('option', { name: updates.type, exact: true }).click();
-  }
+    if (updates.name) {
+        await dialog.locator('input[name="name"]').fill(updates.name);
+    }
 
-  const updateBtn = dialog.getByRole('button', { name: /Update|Save|Submit/i }).first();
-  await updateBtn.click();
+    if (updates.type) {
+        const typeTrigger = dialog
+            .locator('button')
+            .filter({ hasText: /Asset|Liability|Equity|Revenue|Expense/i });
+        await typeTrigger.click();
+        await page
+            .getByRole('option', { name: updates.type, exact: true })
+            .click();
+    }
 
-  await expect(dialog).not.toBeVisible({ timeout: 15000 });
+    const updateBtn = dialog
+        .getByRole('button', { name: /Update|Save|Submit/i })
+        .first();
+    await updateBtn.click();
+
+    await expect(dialog).not.toBeVisible({ timeout: 15000 });
 }
 
 /**
  * Delete an account.
  */
 export async function deleteAccount(page: Page, code: string): Promise<void> {
-  await searchAccount(page, code);
+    await searchAccount(page, code);
 
-  // Find the row or tree item containing the code
-  const item = page.locator('div', { hasText: code }).first();
-  await expect(item).toBeVisible();
-  
-  // Hover to reveal buttons
-  await item.hover();
+    // Find the row or tree item containing the code
+    const item = page.locator('div', { hasText: code }).first();
+    await expect(item).toBeVisible();
 
-  // The Delete button has .text-destructive class
-  const deleteBtn = item.locator('button.text-destructive');
-  await deleteBtn.click();
+    // Hover to reveal buttons
+    await item.hover();
 
-  // Confirm deletion in AlertDialog
-  const confirmBtn = page.getByRole('button', { name: /Delete/i }).last();
-  await confirmBtn.click();
+    // The Delete button has .text-destructive class
+    const deleteBtn = item.locator('button.text-destructive');
+    await deleteBtn.click();
 
-  await page.waitForLoadState('networkidle');
+    // Confirm deletion in AlertDialog
+    const confirmBtn = page.getByRole('button', { name: /Delete/i }).last();
+    await confirmBtn.click();
+
+    await page.waitForLoadState('networkidle');
 }
-
 
 // Asset Model helpers
 // ---------------------------------------------------
-
-
-
-
-

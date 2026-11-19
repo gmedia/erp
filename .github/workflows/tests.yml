@@ -38,6 +38,9 @@ jobs:
           repository: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name || github.repository }}
           ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
 
+      - name: Guard date field schemas
+        run: bash scripts/check-date-schemas.sh
+
       - name: Setup PHP
         uses: shivammathur/setup-php@d59004228537ca90c8dca680592a08a675bf52b6 # v2
         with:

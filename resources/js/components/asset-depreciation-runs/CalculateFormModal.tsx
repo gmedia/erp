@@ -12,14 +12,13 @@ import {
 import { Form } from '@/components/ui/form';
 import { type FiscalYear } from '@/types/fiscal-year';
 import { type AssetDepreciationCalculationFormData } from '@/utils/schemas';
-import { format } from 'date-fns';
 import { Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
 interface CalculateFormValues {
     fiscal_year_id: string;
-    period_start?: Date;
-    period_end?: Date;
+    period_start?: string;
+    period_end?: string;
 }
 
 interface CalculateFormModalProps {
@@ -68,8 +67,8 @@ export function CalculateFormModal({
 
         const payload: AssetDepreciationCalculationFormData = {
             fiscal_year_id: data.fiscal_year_id,
-            period_start: format(data.period_start, 'yyyy-MM-dd'),
-            period_end: format(data.period_end, 'yyyy-MM-dd'),
+            period_start: data.period_start,
+            period_end: data.period_end,
         };
 
         const result = await onSubmit(payload);

@@ -34,6 +34,7 @@ export interface UnmatchedJournalLine {
 
 export interface BankReconciliation {
     id: number;
+    reconciliation_date: string;
     account_id: number;
     account?: {
         id: number;
