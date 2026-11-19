@@ -11,7 +11,7 @@ use Illuminate\Support\Carbon;
 uses(RefreshDatabase::class)->group('recurring-journals');
 
 test('it has correct fillable attributes', function () {
-    expect((new RecurringJournal)->getFillable())->toBe(['name', 'description', 'fiscal_year_id', 'frequency', 'next_run_date', 'last_run_date', 'end_date', 'total_amount', 'auto_post', 'is_active', 'created_by']);
+    expect((new RecurringJournal)->getFillable())->toBe(['name', 'description', 'reference_template', 'fiscal_year_id', 'frequency', 'next_run_date', 'last_run_date', 'end_date', 'total_amount', 'auto_post', 'is_active', 'created_by']);
 });
 
 test('it belongs to fiscal year', function () {

@@ -27,7 +27,7 @@ class RecurringJournalController extends Controller
 
     public function store(StoreRecurringJournalRequest $request): JsonResponse
     {
-        $data = $request->validated();
+        $data = $this->normalizeTemplateFields($request->validated());
         $lines = $data['lines'];
         unset($data['lines']);
         $data['created_by'] = auth()->id();
@@ -55,7 +55,7 @@ class RecurringJournalController extends Controller
 
     public function update(UpdateRecurringJournalRequest $request, RecurringJournal $recurringJournal): JsonResponse
     {
-        $data = $request->validated();
+        $data = $this->normalizeTemplateFields($request->validated());
         $lines = $data['lines'];
         unset($data['lines']);
         $data['total_amount'] = collect($lines)->sum(fn (array $line): float => (float) $line['debit']);
@@ -89,6 +89,23 @@ class RecurringJournalController extends Controller
     public function execute(RecurringJournal $recurringJournal, ExecuteRecurringJournalAction $action): JsonResponse
     {
         return (new JournalEntryResource($action->execute($recurringJournal)))->response()->setStatusCode(201);
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function normalizeTemplateFields(array $data): array
+    {
+        $descriptionTemplate = $data['description_template'] ?? null;
+
+        if (is_string($descriptionTemplate) && $descriptionTemplate !== '') {
+            $data['description'] = $descriptionTemplate;
+        }
+
+        unset($data['description_template']);
+
+        return $data;
     }
 
     private function syncLines(RecurringJournal $journal, array $items): null

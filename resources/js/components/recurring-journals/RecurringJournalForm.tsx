@@ -38,7 +38,7 @@ const recurringJournalLineSchema = z.object({
 
 const recurringJournalFormSchema = z.object({
     name: z.string().min(1, { message: 'Name is required.' }),
-    frequency: z.enum(['daily', 'weekly', 'monthly', 'quarterly', 'yearly'], {
+    frequency: z.enum(['daily', 'weekly', 'monthly', 'quarterly', 'annual'], {
         message: 'Frequency is required.',
     }),
     next_run_date: z.string().min(1, { message: 'Next run date is required.' }),
@@ -247,7 +247,7 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                                             value: 'quarterly',
                                             label: 'Quarterly',
                                         },
-                                        { value: 'yearly', label: 'Yearly' },
+                                        { value: 'annual', label: 'Yearly' },
                                     ]}
                                 />
                             </div>

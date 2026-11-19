@@ -14,6 +14,7 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property string $name
  * @property string|null $description
+ * @property string|null $reference_template
  * @property int|null $fiscal_year_id
  * @property string $frequency
  * @property Carbon $next_run_date
@@ -68,6 +69,7 @@ class RecurringJournal extends Model
     protected $fillable = [
         'name',
         'description',
+        'reference_template',
         'fiscal_year_id',
         'frequency',
         'next_run_date',

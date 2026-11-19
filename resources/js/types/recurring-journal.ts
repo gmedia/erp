@@ -13,7 +13,7 @@ export interface RecurringJournalLine {
 export interface RecurringJournal {
     id: number;
     name: string;
-    frequency: 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly';
+    frequency: 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'annual';
     next_run_date: string;
     last_run_date?: string;
     auto_post: boolean;

@@ -18,7 +18,7 @@ function getFrequencyLabel(frequency: RecurringJournal['frequency']) {
         weekly: 'Weekly',
         monthly: 'Monthly',
         quarterly: 'Quarterly',
-        yearly: 'Yearly',
+        annual: 'Yearly',
     };
     return labels[frequency] || frequency;
 }
