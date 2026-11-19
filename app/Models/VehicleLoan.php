@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int|null $driver_id
  * @property int|null $vehicle_unit_id
  * @property string $status
+ * @property bool $is_overdue
  * @property Carbon|null $submitted_at
  * @property Carbon|null $approved_at
  * @property int|null $approved_by
@@ -73,6 +74,7 @@ class VehicleLoan extends Model
         'driver_id',
         'vehicle_unit_id',
         'status',
+        'is_overdue',
         'submitted_at',
         'approved_at',
         'approved_by',
@@ -88,6 +90,7 @@ class VehicleLoan extends Model
         'end_at' => 'datetime',
         'submitted_at' => 'datetime',
         'approved_at' => 'datetime',
+        'is_overdue' => 'boolean',
     ];
 
     public function requester(): BelongsTo

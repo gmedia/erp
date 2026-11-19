@@ -2,6 +2,8 @@
 
 use App\Actions\Approvals\RepairMissingApprovalStepsAction;
 use App\Actions\RecurringJournals\ExecuteRecurringJournalAction;
+use App\Actions\VehicleLoans\CleanupVehicleLoansAction;
+use App\Actions\VehicleLoans\NotifyOverdueVehicleLoansAction;
 use App\Console\Commands\CleanupSocialLoginTickets;
 use App\Models\RecurringJournal;
 use Illuminate\Foundation\Inspiring;
@@ -58,6 +60,34 @@ Schedule::command('journals:detect-cross-branch', ['--posted-only'])
     ->mondays()
     ->at('06:00');
 
+Artisan::command('vehicle-loans:cleanup {--dry-run : Audit only without deleting data}', function () {
+    $stats = app(CleanupVehicleLoansAction::class)->execute((bool) $this->option('dry-run'));
+
+    $this->info(sprintf(
+        'Photos deleted: %d. Drafts expired: %d%s',
+        $stats['photos_deleted'],
+        $stats['drafts_expired'],
+        $this->option('dry-run') ? ' (dry run)' : '',
+    ));
+
+    return Command::SUCCESS;
+})->purpose('Delete expired vehicle-loan photos and cancel stale drafts');
+
+Artisan::command('vehicle-loans:notify-overdue {--dry-run : Audit only without writing data}', function () {
+    $stats = app(NotifyOverdueVehicleLoansAction::class)->execute((bool) $this->option('dry-run'));
+
+    $this->info(sprintf(
+        'Overdue loans notified: %d%s',
+        $stats['notified'],
+        $this->option('dry-run') ? ' (dry run)' : '',
+    ));
+
+    return Command::SUCCESS;
+})->purpose('Notify requesters about overdue vehicle loans');
+
+Schedule::command('vehicle-loans:cleanup')->dailyAt('02:00');
+Schedule::command('vehicle-loans:notify-overdue')->everyThirtyMinutes();
+
 Artisan::command('approvals:repair-missing-steps {--dry-run : Audit only without writing data}', function () {
     $report = app(RepairMissingApprovalStepsAction::class)->execute(
         (bool) $this->option('dry-run'),
@@ -111,3 +141,7 @@ Artisan::command('approvals:repair-missing-steps {--dry-run : Audit only without
 
     return Command::SUCCESS;
 })->purpose('Audit or repair approval requests that are missing request steps');
+
+Schedule::call(fn () => Artisan::call('approvals:repair-missing-steps'))
+    ->daily()
+    ->name('repair-missing-approval-steps');
