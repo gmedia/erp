@@ -133,12 +133,31 @@ function scanGroups(string $root): array
     return array_keys($groups);
 }
 
+function e2eExcluded(string $root): array
+{
+    static $cache = [];
+    if (isset($cache[$root])) {
+        return $cache[$root];
+    }
+
+    $file = $root . '/.github/ci/e2e-excluded.txt';
+    if (is_file($file)) {
+        $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
+        $cache[$root] = array_values(array_filter(array_map('trim', $lines)));
+
+        return $cache[$root];
+    }
+
+    return $cache[$root] = E2E_EXCLUDED;
+}
+
 function scanE2EDirs(string $root): array
 {
+    $excluded = e2eExcluded($root);
     $dirs = [];
     foreach (glob($root . '/tests/e2e/*', GLOB_ONLYDIR) ?: [] as $dir) {
         $name = basename($dir);
-        if (! in_array($name, E2E_EXCLUDED, true)) {
+        if (! in_array($name, $excluded, true)) {
             $dirs[$name] = true;
         }
     }
@@ -197,7 +216,7 @@ function mapFiles(string $root, array $files, array $groups, array $e2eDirs): ar
         }
 
         // Excluded E2E dirs are intentionally not run in CI.
-        if (preg_match('#^tests/e2e/([^/]+)/#', $path, $ex) && in_array($ex[1], E2E_EXCLUDED, true)) {
+        if (preg_match('#^tests/e2e/([^/]+)/#', $path, $ex) && in_array($ex[1], e2eExcluded($root), true)) {
             $ignored[] = $path;
             $reasons[] = "excluded_e2e: {$path}";
 
