@@ -38,7 +38,7 @@ export const AgingSummaryCards = memo<AgingSummaryCardsProps>(
                 title: 'Total Receivables',
                 icon: TrendingUp,
                 borderColor: 'border-l-emerald-500',
-                iconColor: 'text-emerald-500',
+                iconColor: 'text-success',
                 value: arSummary.total_outstanding,
                 formattedValue: formatCurrency(arSummary.total_outstanding),
                 footer: (
@@ -53,7 +53,7 @@ export const AgingSummaryCards = memo<AgingSummaryCardsProps>(
                 title: 'AR Overdue',
                 icon: TrendingDown,
                 borderColor: 'border-l-amber-500',
-                iconColor: 'text-amber-500',
+                iconColor: 'text-warning',
                 value: arSummary.overdue_amount,
                 formattedValue: formatCurrency(arSummary.overdue_amount),
                 footer: (
@@ -76,7 +76,7 @@ export const AgingSummaryCards = memo<AgingSummaryCardsProps>(
                 title: 'Total Payables',
                 icon: TrendingDown,
                 borderColor: 'border-l-rose-500',
-                iconColor: 'text-rose-500',
+                iconColor: 'text-destructive-foreground',
                 value: apSummary.total_outstanding,
                 formattedValue: formatCurrency(apSummary.total_outstanding),
                 footer: (
@@ -91,7 +91,7 @@ export const AgingSummaryCards = memo<AgingSummaryCardsProps>(
                 title: 'AP Overdue',
                 icon: TrendingUp,
                 borderColor: 'border-l-orange-500',
-                iconColor: 'text-orange-500',
+                iconColor: 'text-warning',
                 value: apSummary.overdue_amount,
                 formattedValue: formatCurrency(apSummary.overdue_amount),
                 footer: (

@@ -55,13 +55,13 @@ export function WarrantyAlerts({
             <Card className="flex h-full min-h-[300px] flex-col">
                 <CardHeader className="pb-2">
                     <CardTitle className="flex items-center space-x-2 text-muted-foreground">
-                        <ShieldCheck className="h-5 w-5 text-emerald-500" />
+                        <ShieldCheck className="h-5 w-5 text-success" />
                         <span>Expiring Warranties</span>
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="flex flex-1 flex-col items-center justify-center p-6 text-center text-muted-foreground">
-                    <div className="mb-3 rounded-full bg-emerald-500/10 p-3">
-                        <ShieldCheck className="h-6 w-6 text-emerald-500" />
+                    <div className="mb-3 rounded-full bg-success/10 p-3">
+                        <ShieldCheck className="h-6 w-6 text-success" />
                     </div>
                     <p className="text-sm">
                         All clear! No asset warranties are expiring within the
@@ -73,9 +73,9 @@ export function WarrantyAlerts({
     }
 
     return (
-        <Card className="flex h-full min-h-[300px] flex-col border-amber-200/50 shadow-sm">
-            <CardHeader className="flex flex-row items-center justify-between border-b bg-amber-50/50 pb-2 dark:bg-amber-500/5">
-                <CardTitle className="flex items-center space-x-2 text-amber-700 dark:text-amber-500">
+        <Card className="flex h-full min-h-[300px] flex-col border-warning/30 shadow-sm">
+            <CardHeader className="flex flex-row items-center justify-between border-b bg-warning-soft pb-2">
+                <CardTitle className="flex items-center space-x-2 text-warning">
                     <AlertTriangle className="h-5 w-5" />
                     <span>Expiring Warranties</span>
                 </CardTitle>
@@ -87,7 +87,7 @@ export function WarrantyAlerts({
                             const isCritical = asset.days_remaining <= 7;
                             const warningBadgeClassName = isCritical
                                 ? ''
-                                : 'bg-amber-100 text-amber-800 hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400';
+                                : 'bg-warning-soft text-warning hover:bg-warning-soft';
 
                             return (
                                 <div

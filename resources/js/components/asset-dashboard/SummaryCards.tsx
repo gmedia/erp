@@ -36,7 +36,7 @@ export function SummaryCards({ data, isLoading }: Readonly<SummaryCardsProps>) {
                     <CardTitle className="text-sm font-medium text-muted-foreground">
                         Total Assets
                     </CardTitle>
-                    <Package className="h-4 w-4 text-blue-500" />
+                    <Package className="h-4 w-4 text-info" />
                 </CardHeader>
                 <CardContent>
                     <div className="text-3xl font-bold">
@@ -53,7 +53,7 @@ export function SummaryCards({ data, isLoading }: Readonly<SummaryCardsProps>) {
                     <CardTitle className="text-sm font-medium text-muted-foreground">
                         Purchase Cost
                     </CardTitle>
-                    <Calculator className="h-4 w-4 text-emerald-500" />
+                    <Calculator className="h-4 w-4 text-success" />
                 </CardHeader>
                 <CardContent>
                     <div className="text-3xl font-bold">
@@ -70,7 +70,7 @@ export function SummaryCards({ data, isLoading }: Readonly<SummaryCardsProps>) {
                     <CardTitle className="text-sm font-medium text-muted-foreground">
                         Book Value
                     </CardTitle>
-                    <BarChart className="h-4 w-4 text-indigo-500" />
+                    <BarChart className="h-4 w-4 text-chart-3" />
                 </CardHeader>
                 <CardContent>
                     <div className="text-3xl font-bold">
@@ -87,7 +87,7 @@ export function SummaryCards({ data, isLoading }: Readonly<SummaryCardsProps>) {
                     <CardTitle className="text-sm font-medium text-muted-foreground">
                         Accum. Depreciation
                     </CardTitle>
-                    <History className="h-4 w-4 text-rose-500" />
+                    <History className="h-4 w-4 text-destructive-foreground" />
                 </CardHeader>
                 <CardContent>
                     <div className="text-3xl font-bold">
