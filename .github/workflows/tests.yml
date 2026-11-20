@@ -199,6 +199,10 @@ jobs:
         if: steps.autofix.outputs.changed != 'true'
         run: ./vendor/bin/sail npm run types
 
+      - name: Check sidebar menu icons
+        if: steps.autofix.outputs.changed != 'true'
+        run: ./vendor/bin/sail npm run check:menu-icons
+
       - name: Build assets
         if: steps.autofix.outputs.changed != 'true'
         run: ./vendor/bin/sail npm run build

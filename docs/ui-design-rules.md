@@ -75,6 +75,7 @@ Jangan menebak struktur. Baca file di atas sebelum menulis UI baru atau mengorek
 
 ### 2.8 Layout & density
 - Sidebar: label tidak terpotong (SHELL-01), item aktif sesuai rute (SHELL-08, HF-3).
+- Sidebar: setiap menu dan child menu wajib punya ikon yang terdaftar di `resources/js/lib/icon-map.ts` (import + entry). Jalankan `npm run check:menu-icons` setelah mengubah menu.
 - Nested navigation panjang: child aktif mudah terlihat (SHELL-09).
 - Gunakan Tailwind 4 utility + `tailwind-merge`; jangan inline style warna/spacing yang bisa memakai token.
 - Responsif: uji viewport 1440×900 (baseline audit) dan viewport sempit untuk overflow horizontal.
@@ -100,6 +101,7 @@ Gunakan checklist ini saat diminta "review UI", "cek konsistensi modul X", atau 
 - [ ] H1 + deskripsi tunggal, tidak double title dengan breadcrumb.
 - [ ] Breadcrumb sesuai lokasi, bukan judul.
 - [ ] Sidebar active state benar.
+- [ ] Semua menu + child menu punya ikon; `npm run check:menu-icons` lulus tanpa missing.
 
 ### C. Toolbar
 - [ ] Search kiri, aksi kanan, satu baris.

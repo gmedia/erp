@@ -55,6 +55,7 @@ resources/js/
 - **Data fetching** — TanStack Query via `useCrudQuery`/`useCrudMutations`. No raw axios in components.
 - **Auth** — `auth-context.tsx` + Sanctum Bearer Token in localStorage.
 - **Meta tags** — import from `react-helmet-async` (aliased to local shim, NOT upstream package).
+- **Sidebar icons** — every `MenuSeeder` icon (parent + children) must be imported and registered in `lib/icon-map.ts`; run `npm run check:menu-icons` after menu changes.
 - **Lazy loading** — all page routes use `React.lazy()` in `app-routes.tsx`.
 - **Tailwind 4** — utility-first, `tailwind-merge` for class composition.
 
@@ -65,4 +66,5 @@ resources/js/
 - ❌ Direct axios calls in components (use hooks)
 - ❌ Module-specific form prop names (always `entity`)
 - ❌ Adding `react-helmet-async` to package.json dependencies
+- ❌ Adding a menu icon name without importing and registering it in `lib/icon-map.ts`
 - ❌ Non-lazy route imports in app-routes.tsx
