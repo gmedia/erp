@@ -55,7 +55,7 @@ Install iOS, push APNs, kamera iOS, Keychain, dan distribusi Apple **belum** ter
 | Test | Pest per-module `->group('{slug}')`; Playwright `workers` dari `PLAYWRIGHT_WORKERS` (default 1), `fullyParallel: true`; satu instance dipaksa `scripts/e2e-with-lock.sh`. Tidak ada angka "515 test" di repo (±106 spec sesuai `AGENTS.md`; hitung ulang saat eksekusi) | `playwright.config.ts:3-6,21-22`; `scripts/e2e-with-lock.sh:15-32,39`; `package.json:13` |
 | Alur kerja | Sail via `sudo -n docker compose`, port ter-bind `127.0.0.1` (host ber-IP publik), **host tanpa php/composer/npm lokal** | sesi setup lokal 2026-11-19 |
 
-> Sumber status aktif adalah GitHub issue `gmedia/erp`, bukan `task.md` / `task.handoff-archive.md` (deprecated — `AGENTS.md:55,77`, `.github/copilot-instructions.md:149-150`).
+> Sumber status aktif adalah GitHub issue `gmedia/erp`, bukan `task.md` / `task.handoff-archive.md` (deprecated — `AGENTS.md` → Session Handoff & Continuity).
 
 ---
 
@@ -292,7 +292,7 @@ Fase ini adalah **jembatan** agar pengguna iPhone tetap bisa melakukan approval 
 
 ---
 
-## 6. Konvensi wajib (AGENTS.md / copilot-instructions.md)
+## 6. Konvensi wajib (AGENTS.md)
 
 - Satu task = satu branch `feat/issue-N-slug` = satu PR dengan `Refs #N`.
 - `rtk git` untuk git; **verifikasi** `git config --get core.hooksPath` → `.githooks`.
@@ -301,7 +301,7 @@ Fase ini adalah **jembatan** agar pengguna iPhone tetap bisa melakukan approval 
 - Maksimal 3 tool call per turn; serial setelah interrupt. Tidak ada parallel agent swarm.
 - Rule 0: tanpa `'gmedia'`, domain, tenant, logo, atau nama korporat di kode/UI/migrasi/seeder/test/docs generik. Kecuali identifier infra repo (`gmedia/erp`, `gmedia_erp`).
 - Test group kebab-case, satu group per test. `Sanctum::actingAs()`, `assertJson()` — bukan `actingAs()`/`assertInertia()`.
-- `sail bin duster fix` setelah perubahan PHP; `npm run types` sebelum merge; SonarQube MCP untuk quality gate.
+- `sail bin duster fix` setelah perubahan PHP; `npm run types` sebelum merge; SonarCloud Web API (`curl`) untuk quality gate.
 - UI: satu pola per kebutuhan; prop form `entity`; `ViewModal` = `memo()` + `ViewModalShell` + `ViewField`; jangan ubah `data-testid`.
 
 ---
@@ -315,7 +315,7 @@ Fase ini adalah **jembatan** agar pengguna iPhone tetap bisa melakukan approval 
 | E2E existing | `npm run test:e2e` (= prepare + `sh ./scripts/e2e-with-lock.sh npx playwright test …`) | Satu instance, `workers` default 1; jangan jalankan di chat |
 | Device Android | Emulator + device fisik | Push background/killed tidak bisa diverifikasi di browser |
 | Manual | Internal test track / APK UAT | Checklist: install, login, kamera, push, deep link, logout (token device terhapus) |
-| Quality gate | SonarQube MCP (`projectKey=gmedia_erp`) | Wajib sebelum merge (`AGENTS.md`) |
+| Quality gate | SonarCloud Web API (`projectKey=gmedia_erp`) | Wajib sebelum merge (`AGENTS.md`) |
 
 ---
 
@@ -366,7 +366,7 @@ Fase ini adalah **jembatan** agar pengguna iPhone tetap bisa melakukan approval 
 - [ ] `sail test --group {slug}` hijau.
 - [ ] `sail npm run types`, `lint:check`, `format:check` hijau.
 - [ ] `sail bin duster fix` dijalankan bila ada perubahan PHP.
-- [ ] SonarQube quality gate dicek via MCP.
+- [ ] SonarCloud quality gate dicek via API / `gh pr checks`.
 - [ ] PR description memuat `Refs #N`, handoff (what/files/verification/next steps), bukti device Android bila relevan.
 - [ ] Tidak ada brand hardcoded (Rule 0).
 - [ ] `git config --get core.hooksPath` mengembalikan `.githooks`.

@@ -362,11 +362,11 @@ Task-task ini bisa dikerjakan kapan saja, tidak harus menunggu Fase 1-3.
 
 ### Arsitektur & Konvensi
 
-- **Stack**: Laravel API + React Full SPA (BUKAN Inertia). Lihat `.github/copilot-instructions.md`.
+- **Stack**: Laravel API + React Full SPA (BUKAN Inertia). Lihat `AGENTS.md`.
 - **Auth**: Sanctum Bearer Token (stateless). Feature tests wajib `Sanctum::actingAs()`.
 - **Pattern**: Controller tipis → Action classes → FilterService. Export pakai `columns()` pattern.
-- **Skill docs**: `.github/skills/` berisi template dan instruksi per tipe task.
-- **Prompt docs**: `.github/prompts/` berisi workflow reusable (continue, checkpoint, create-feature, dll).
+- **Skill docs**: `.claude/skills/` berisi template dan instruksi per tipe task.
+- **Prompt docs**: `.claude/commands/` berisi workflow reusable (continue, checkpoint, create-feature, dll).
 
 ### Baseline Test
 
@@ -399,7 +399,7 @@ Task-task ini bisa dikerjakan kapan saja, tidak harus menunggu Fase 1-3.
 ### Cara Melanjutkan
 
 1. Baca issue yang diklaim di https://github.com/gmedia/erp/issues (`gh issue view N --comments`, marker `<!-- checkpoint -->`; fallback: `gh api repos/gmedia/erp/issues/N/comments --jq '.[] | .body'`) untuk status handoff aktif. `task.md` deprecated.
-2. Baca `.github/prompts/continue-progress.prompt.md` untuk workflow standar.
+2. Jalankan `/continue-progress` (`.claude/commands/continue-progress.md`) untuk workflow standar.
 3. Pilih task dari Roadmap di atas berdasarkan prioritas bisnis.
-4. Gunakan skill yang sesuai dari `.github/skills/` (lihat kolom Skill di roadmap).
+4. Gunakan skill yang sesuai dari `.claude/skills/` (lihat kolom Skill di roadmap).
 5. Setelah selesai, update dokumen ini dan tulis checkpoint ke issue tersebut (`/checkpoint-progress`).

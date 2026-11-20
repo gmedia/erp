@@ -1,57 +1,33 @@
-# .github/ — DevOps & Agent Skills Knowledge Base
+# .github/ — CI & GitHub Knowledge Base
 
 ## OVERVIEW
 
-CI/CD workflows, reusable agent prompts, scaffolding skills with templates, and agent configuration.
+GitHub-only configuration: CI/CD workflows and issue templates. Agent rules, skills, commands, and subagents live elsewhere — see root `AGENTS.md` (rules) and `.claude/` (skills/commands/agents shared by OpenCode and Claude CLI).
 
 ## STRUCTURE
 
 ```
 .github/
-├── agents/                  # Agent role definitions (context7-research, refactor-safe)
-├── prompts/                 # Reusable prompt templates for common tasks
-│   ├── checkpoint-progress.prompt.md
-│   ├── context7-docs.prompt.md
-│   ├── continue-progress.prompt.md
-│   ├── create-feature.prompt.md
-│   ├── create-import.prompt.md
-│   ├── create-tests.prompt.md
-│   ├── refactor-module.prompt.md
-│   ├── refactor-safe-depwire.prompt.md
-│   └── refactor-sonar.prompt.md
-├── skills/                  # Scaffolding skills with templates + scripts
-│   ├── database-migration/  # Migration, factory, seeder templates
-│   ├── feature-crud-complex/ # Complex CRUD scaffolding
-│   ├── feature-crud-simple/  # Simple CRUD scaffolding
-│   ├── feature-import/       # Import feature skill
-│   ├── feature-non-crud/     # Non-CRUD feature templates
-│   ├── refactor-backend/     # Backend refactor templates
-│   ├── refactor-e2e/         # E2E test refactor templates
-│   ├── refactor-frontend/    # Frontend refactor templates
-│   ├── session-handoff/      # Handoff template
-│   └── testing-strategy/     # Test templates (Feature, Unit, E2E)
+├── ISSUE_TEMPLATE/
+│   └── claim.md             # Template issue kerja (claim → branch → PR)
 ├── workflows/
 │   ├── ci-image.yml         # Docker CI image build
+│   ├── issue-lifecycle.yml  # Label status:* otomatis saat PR dibuka/merge
 │   ├── release.yml          # Release workflow
-│   └── tests.yml            # Test pipeline (Pest + Playwright)
-└── copilot-instructions.md  # Master agent rules (THE source of truth)
+│   └── tests.yml            # Test pipeline (Pest + Playwright E2E, 4 shard)
+└── AGENTS.md
 ```
 
 ## WHERE TO LOOK
 
 | Task | Location |
 |------|----------|
-| Agent rules | `copilot-instructions.md` — canonical rules |
-| New feature scaffold | `skills/feature-crud-complex/` or `skills/feature-crud-simple/` |
-| Session handoff | `prompts/continue-progress.prompt.md` |
-| Checkpoint | `prompts/checkpoint-progress.prompt.md` |
-| Test creation | `skills/testing-strategy/` + `prompts/create-tests.prompt.md` |
-| Safe refactor | `skills/refactor-backend/` + `prompts/refactor-safe-depwire.prompt.md` |
-| CI pipeline | `workflows/tests.yml` |
+| CI pipeline / E2E shard list | `workflows/tests.yml` |
+| Issue status automation | `workflows/issue-lifecycle.yml` |
+| Agent rules | root `AGENTS.md` |
+| Skills / commands / subagents | `.claude/skills/`, `.claude/commands/`, `.claude/agents/` |
 
 ## CONVENTIONS
 
-- **Skills** have `SKILL.md` (instructions) + `resources/` (templates) + `scripts/` (generators)
-- **Prompts** are reusable markdown files invoked by agents
-- **`copilot-instructions.md`** is the single source of truth for all agent behavior
-- **`DECISION.md`** documents skill selection logic
+- Jangan menaruh konfigurasi agent (instructions, prompts, skills) di `.github/` lagi.
+- Saat menambah/menghapus direktori E2E, update daftar di step `Run Playwright E2E` (`tests.yml`) dan angka di root `AGENTS.md`.

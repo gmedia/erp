@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(rtk git status:*)",
+      "Bash(rtk git diff:*)",
+      "Bash(rtk git log:*)",
+      "Bash(rtk git show:*)",
+      "Bash(rtk git branch:*)",
+      "Bash(rtk git fetch:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr checks:*)",
+      "Bash(gh issue list:*)",
+      "Bash(gh issue view:*)",
+      "Bash(./vendor/bin/sail test:*)",
+      "Bash(./vendor/bin/sail bin phpstan:*)",
+      "Bash(./vendor/bin/sail bin duster:*)",
+      "Bash(./vendor/bin/sail artisan route:list:*)",
+      "Bash(./vendor/bin/sail artisan db:show:*)",
+      "Bash(./vendor/bin/sail artisan db:table:*)",
+      "Bash(npm run types:*)",
+      "Bash(npm run lint:check:*)",
+      "Bash(npm run format:check:*)",
+      "Bash(npm run check:menu-icons:*)",
+      "Bash(npx playwright test:*)",
+      "Bash(bash scripts/sync-opencode.sh)",
+      "Bash(rg:*)",
+      "Bash(curl -s https://sonarcloud.io/api/:*)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.local)",
+      "Read(./.env.production)",
+      "Read(./.env.testing)"
+    ]
+  }
+}

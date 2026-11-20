@@ -137,28 +137,28 @@ Helper functions harus di `tests/e2e/{modul-names}/helpers.ts`.
 
 ---
 
-## D. Refactor Berbasis SonarQube MCP (Duplikasi)
+## D. Refactor Berbasis SonarCloud (Duplikasi)
 
 ### 9. Refactor Sonar (Baseline + Wave Semi-Besar Terkontrol)
 
 ```
 /refactor-sonar
 
-Ambil dan analisa data dari SonarQube MCP untuk menurunkan duplikasi dan menjaga konsistensi style kode antar modul.
+Ambil dan analisa data dari SonarCloud Web API (lihat `AGENTS.md` → Quality Gate) untuk menurunkan duplikasi dan menjaga konsistensi style kode antar modul.
 
 Project key: `gmedia_erp`
 Target: turunkan `duplicated_lines`, `duplicated_blocks`, dan `new_duplicated_lines_density` tanpa mengubah API contract.
 
 Instruksi:
-1. Ambil baseline Sonar MCP (WAJIB):
+1. Ambil baseline SonarCloud API (WAJIB):
    - quality gate
    - duplicated_lines
    - duplicated_blocks
    - duplicated_lines_density
    - ncloc
    - coverage
-2. Sebelum refactor struktural, gunakan Depwire untuk file context, impact analysis, dan simulate change bila wave mencakup rename/move/split/merge.
-3. Jika pola duplikasi dipicu behavior package/framework, gunakan Context7 untuk memastikan abstraction mengikuti docs versi terbaru.
+2. Sebelum refactor struktural, petakan blast radius via `rg` (`/refactor-safe`) bila wave mencakup rename/move/split/merge.
+3. Jika pola duplikasi dipicu behavior package/framework, cek source versi terpasang di `vendor/`/`node_modules/` agar abstraction sesuai.
 4. Ambil shortlist cluster duplikasi prioritas, lalu pilih 1 wave semi-besar terkontrol (4-8 file) dengan pola refactor yang sama.
 5. Refactor hanya internal (shared concern/trait/helper), tanpa ubah route, payload, response keys, query param.
 6. Terapkan pola style/struktur yang sama ke sibling module setara pada wave yang sama.
@@ -166,7 +166,7 @@ Instruksi:
 8. Update `docs/refactor-sonar-progress.md`:
    - baseline/delta metrik
    - ringkasan perubahan wave
-   - evidence Depwire/Context7 bila dipakai
+   - evidence blast radius (`rg`) bila dipakai
    - evidence test
    - snapshot Sonar terbaru
 9. Jika `coverage` Sonar anomali (contoh `0.0`) tapi test lokal lulus, catat sebagai anomali pipeline dan verifikasi ulang pada snapshot berikutnya.
@@ -184,12 +184,12 @@ Konteks:
 - Wave sebelumnya: `{commit-hash}`
 
 Langkah:
-1. Tarik ulang quality gate + metrik inti Sonar MCP.
-2. Gunakan Depwire lagi jika wave berikutnya mengubah symbol atau struktur file yang berbeda dari wave sebelumnya.
+1. Tarik ulang quality gate + metrik inti via SonarCloud API.
+2. Petakan ulang blast radius via `rg` jika wave berikutnya mengubah symbol atau struktur file yang berbeda dari wave sebelumnya.
 3. Jika snapshot belum berubah, lanjut 1 wave refactor 4-8 file dengan pola yang sama dan risiko rendah.
 4. Jalankan test terfokus hanya untuk modul terdampak.
 5. Commit + push.
-6. Tarik ulang Sonar MCP dan update delta + log di `docs/refactor-sonar-progress.md`.
+6. Tarik ulang SonarCloud API dan update delta + log di `docs/refactor-sonar-progress.md`.
 
 Output wajib:
 - Daftar file yang direfactor
@@ -208,6 +208,6 @@ Output wajib:
 | Complex CRUD baru | `/create-feature` | `feature-crud-complex` | `employees` / `suppliers` / `customers` |
 | Non-CRUD baru | `/create-feature` | `feature-non-crud` | `users` / `permissions` |
 | Import Excel | `/create-import` | `feature-import` | `employees` / `suppliers` |
-| Refactor berbasis Sonar MCP | `/refactor-sonar` | workflow `refactor-sonar` + `refactor-backend` | `docs/refactor-sonar-progress.md` |
+| Refactor berbasis SonarCloud | `/refactor-sonar` | `refactor-backend` | `docs/refactor-sonar-progress.md` |
 | Buat test baru | `/create-tests` | `testing-strategy` | sesuai tipe CRUD |
 | Refactor E2E test | — | `refactor-e2e` | `shared-test-factories.ts` |

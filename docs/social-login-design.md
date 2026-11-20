@@ -76,7 +76,7 @@ Implikasi penting: karena tidak ada employee, `AuthController::me()` mengembalik
 | Microsoft pribadi (MSA) | `tenant === null` ATAU `tid = 9188040d-6c67-4c5b-b112-36a304b66dad` (consumers tenant) | `account_type = personal` |
 | Microsoft 365 (work/school) | `tid` / `tenant.id` terisi dan bukan consumers tenant | `account_type = microsoft_365`, simpan `tenant_id` |
 
-**Domain/tenant bukan hardcode.** Daftar domain/tenant yang diizinkan berasal dari `settings` (diedit admin lewat UI Settings), `.env` hanya memberi nilai awal saat seeding. Semua contoh memakai placeholder netral (`example.com`, `tenant-contoh`) — lihat aturan anti-branding di `.github/copilot-instructions.md` §10.
+**Domain/tenant bukan hardcode.** Daftar domain/tenant yang diizinkan berasal dari `settings` (diedit admin lewat UI Settings), `.env` hanya memberi nilai awal saat seeding. Semua contoh memakai placeholder netral (`example.com`, `tenant-contoh`) — lihat aturan anti-branding di `AGENTS.md` → On-Premise / Multi-Perusahaan.
 
 - Pakai `socialiteproviders/microsoft` dengan:
   ```php
@@ -490,7 +490,7 @@ Status saat ini: **diimplementasikan lengkap** (Wave 1–5). Semua keputusan di 
 
 1. Admin bisa mengatur **domain yang boleh login** → tersimpan di `settings` (`social_login_allowed_domains`), diubah dari UI Settings, fail-closed bila kosong. Tidak ada hardcode domain/brand.
 2. Admin bisa mengatur **aktif/nonaktif login email-password** → `settings.password_login_enabled`, dicek di `AuthController::login()` dan flag UI dari `/api/social/policy`.
-3. **Aturan agent baru:** ERP ini untuk perusahaan lain (on premise) → dilarang hardcode brand/domain/tenant/logo di kode, UI, migrasi, seeder, test, docs generik. Aturan tertanam di `.github/copilot-instructions.md` §10 dan `AGENTS.md` Core Rule 0. Pengecualian hanya identifier infra repo (`gmedia/erp`, `gmedia_erp`). Contoh di dokumen ini sudah diganti ke placeholder netral (`example.com`).
+3. **Aturan agent baru:** ERP ini untuk perusahaan lain (on premise) → dilarang hardcode brand/domain/tenant/logo di kode, UI, migrasi, seeder, test, docs generik. Aturan tertanam di `AGENTS.md` (Core Rule 0 dan section On-Premise / Multi-Perusahaan). Pengecualian hanya identifier infra repo (`gmedia/erp`, `gmedia_erp`). Contoh di dokumen ini sudah diganti ke placeholder netral (`example.com`).
 
 ---
 
