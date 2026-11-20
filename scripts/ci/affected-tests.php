@@ -15,7 +15,6 @@ declare(strict_types=1);
  *   php scripts/ci/affected-tests.php --self-test
  *   (CI) git diff --name-only base...head | php scripts/ci/affected-tests.php
  */
-
 $opts = getopt('', ['files:', 'self-test', 'repo:']);
 
 $root = rtrim($opts['repo'] ?? getcwd(), '/');
@@ -114,8 +113,8 @@ function slugAlias(string $slug): string
 function scanGroups(string $root): array
 {
     $groups = [];
-    $dir = $root.'/tests';
-    if (!is_dir($dir)) {
+    $dir = $root . '/tests';
+    if (! is_dir($dir)) {
         return [];
     }
     $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS));
@@ -137,9 +136,9 @@ function scanGroups(string $root): array
 function scanE2EDirs(string $root): array
 {
     $dirs = [];
-    foreach (glob($root.'/tests/e2e/*', GLOB_ONLYDIR) ?: [] as $dir) {
+    foreach (glob($root . '/tests/e2e/*', GLOB_ONLYDIR) ?: [] as $dir) {
         $name = basename($dir);
-        if (!in_array($name, E2E_EXCLUDED, true)) {
+        if (! in_array($name, E2E_EXCLUDED, true)) {
             $dirs[$name] = true;
         }
     }
@@ -149,12 +148,12 @@ function scanE2EDirs(string $root): array
 
 function fileGroups(string $root, string $path): array
 {
-    $full = $root.'/'.$path;
-    if (!is_file($full)) {
+    $full = $root . '/' . $path;
+    if (! is_file($full)) {
         return [];
     }
     $content = file_get_contents($full);
-    if (!$content || !preg_match_all("/->group\('([^']+)'\)/", $content, $m)) {
+    if (! $content || ! preg_match_all("/->group\('([^']+)'\)/", $content, $m)) {
         return [];
     }
 
@@ -165,10 +164,10 @@ function candidates(string $slug): array
 {
     $variants = [$slug, slugAlias($slug)];
     if (str_ends_with($slug, 'y')) {
-        $variants[] = substr($slug, 0, -1).'ies';
+        $variants[] = substr($slug, 0, -1) . 'ies';
     }
-    $variants[] = $slug.'s';
-    $variants[] = $slug.'es';
+    $variants[] = $slug . 's';
+    $variants[] = $slug . 'es';
 
     return array_values(array_unique(array_filter($variants)));
 }
@@ -193,20 +192,23 @@ function mapFiles(string $root, array $files, array $groups, array $e2eDirs): ar
 
         if (matchesAny($path, IGNORE_PATTERNS)) {
             $ignored[] = $path;
+
             continue;
         }
 
         // Excluded E2E dirs are intentionally not run in CI.
         if (preg_match('#^tests/e2e/([^/]+)/#', $path, $ex) && in_array($ex[1], E2E_EXCLUDED, true)) {
             $ignored[] = $path;
-            $reasons[] = "excluded_e2e: $path";
+            $reasons[] = "excluded_e2e: {$path}";
+
             continue;
         }
 
         // Deleted test file: cannot derive its group safely.
-        if (preg_match('#^tests/(Feature|Unit)/#', $path) && !is_file($root.'/'.$path)) {
+        if (preg_match('#^tests/(Feature|Unit)/#', $path) && ! is_file($root . '/' . $path)) {
             $fullPest = true;
-            $reasons[] = "deleted_test: $path";
+            $reasons[] = "deleted_test: {$path}";
+
             continue;
         }
 
@@ -215,11 +217,11 @@ function mapFiles(string $root, array $files, array $groups, array $e2eDirs): ar
         $isFullE2e = $both || matchesAny($path, FULL_E2E);
         if ($isFullPest) {
             $fullPest = true;
-            $reasons[] = "full_pest: $path";
+            $reasons[] = "full_pest: {$path}";
         }
         if ($isFullE2e) {
             $fullE2e = true;
-            $reasons[] = "full_e2e: $path";
+            $reasons[] = "full_e2e: {$path}";
         }
 
         $resolved = $isFullPest || $isFullE2e;
@@ -231,13 +233,13 @@ function mapFiles(string $root, array $files, array $groups, array $e2eDirs): ar
                     $pest[$group] = true;
                 } else {
                     $fullPest = true;
-                    $reasons[] = "unknown_group: $path -> $group";
+                    $reasons[] = "unknown_group: {$path} -> {$group}";
                 }
                 $resolved = true;
             }
         } else {
             foreach (MODULE_PATTERNS as $re) {
-                if (!preg_match($re, $path, $m)) {
+                if (! preg_match($re, $path, $m)) {
                     continue;
                 }
                 foreach (candidates(kebab($m[1])) as $slug) {
@@ -255,10 +257,10 @@ function mapFiles(string $root, array $files, array $groups, array $e2eDirs): ar
         }
 
         $isCodeRoot = (bool) preg_match('#^(app/|routes/|resources/js/|database/|tests/)#', $path);
-        if (!$resolved && $isCodeRoot) {
+        if (! $resolved && $isCodeRoot) {
             $fullPest = true;
             $fullE2e = true;
-            $reasons[] = "unmapped: $path";
+            $reasons[] = "unmapped: {$path}";
         }
     }
 
@@ -309,20 +311,20 @@ function runSelfTest(string $root): int
                 $key === 'e2e_has' => in_array($value, $result['e2e_dirs'], true),
                 default => $result[$key] === $value,
             };
-            if (!$ok) {
+            if (! $ok) {
                 $failures++;
-                fwrite(STDERR, "FAIL $file [$key expected ".json_encode($value).'] got '.json_encode($result)."\n");
+                fwrite(STDERR, "FAIL {$file} [{$key} expected " . json_encode($value) . '] got ' . json_encode($result) . "\n");
             }
         }
     }
 
     $total = count($cases);
     if ($failures === 0) {
-        echo "self-test: OK ($total cases)\n";
+        echo "self-test: OK ({$total} cases)\n";
 
         return 0;
     }
-    echo "self-test: $failures failure(s) in $total cases\n";
+    echo "self-test: {$failures} failure(s) in {$total} cases\n";
 
     return 1;
 }
@@ -343,10 +345,10 @@ if (isset($opts['files'])) {
 $files = array_values(array_filter(array_map('trim', preg_split('/\R/', (string) $raw) ?: [])));
 if ($files === []) {
     // Empty diff: run nothing (docs/no-op), not FULL.
-    echo json_encode(['full_pest' => false, 'full_e2e' => false, 'pest_groups' => [], 'e2e_dirs' => [], 'ignored' => [], 'reasons' => ['no_changes']], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n";
+    echo json_encode(['full_pest' => false, 'full_e2e' => false, 'pest_groups' => [], 'e2e_dirs' => [], 'ignored' => [], 'reasons' => ['no_changes']], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
     exit(0);
 }
 
 $result = mapFiles($root, $files, $groups, $e2eDirs);
-echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n";
+echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
 exit(0);
