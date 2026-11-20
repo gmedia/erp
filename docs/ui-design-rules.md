@@ -120,6 +120,7 @@ Jangan menebak struktur. Baca file di atas sebelum menulis UI baru atau mengorek
     - warning/pending = amber,
     - netral/draft = gray.
 - Pakai varian/token, bukan class warna mentah: `Badge variant="success" | "warning" | "destructive-soft" | "outline"`, teks `text-success` / `text-warning` / `text-destructive-foreground` / `text-info` (lihat §0.1).
+- Ditegakkan CI: `npm run check:raw-colors` gagal bila ada kelas palet Tailwind mentah (`text-red-500`, `bg-emerald-100`, `decoration-neutral-300`, …) di `resources/js`. Pengecualian hanya lewat allowlist di `scripts/check-raw-colors.mjs` beserta alasannya.
 - **Angka negatif tidak boleh memakai warna sukses** (HF-1, FD-01). Pakai helper `getSignedAmountTextClass`.
 - Pisahkan warna status dokumen dari warna amount.
 
@@ -205,6 +206,7 @@ Gunakan checklist ini saat diminta "review UI", "cek konsistensi modul X", atau 
 ### H. Bahasa visual (§0)
 
 - [ ] Tidak ada hex/rgb/`oklch` atau `dark:bg-…` manual di komponen; semua lewat token.
+- [ ] `npm run check:raw-colors` lolos (0 kelas palet mentah).
 - [ ] Card tanpa border/bayangan; kontrol (Button, Badge, Tabs, chip) berbentuk pill.
 - [ ] Satu tombol utama per area; aksi berbahaya `destructive-soft`.
 - [ ] Angka KPI/tabel `tabular-nums`; tabel tanpa garis vertikal/zebra; aksi baris lewat menu `⋯`.

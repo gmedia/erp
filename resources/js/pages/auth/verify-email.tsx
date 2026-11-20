@@ -77,7 +77,7 @@ export default function VerifyEmail({
                 <button
                     type="button"
                     onClick={handleLogout}
-                    className="mx-auto block text-sm underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
+                    className="mx-auto block text-sm underline decoration-muted-foreground/40 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current!"
                 >
                     Log out
                 </button>

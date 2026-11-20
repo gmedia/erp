@@ -346,6 +346,7 @@ Reference counts = files referencing the symbol (rg; no LSP server installed). H
 - **Routing** — backend: new file `routes/api/{module-slug}.php` (auto-included); frontend: lazy `<Route path="/{module}" element={<P><Component /></P>} />` in `resources/js/app-routes.tsx`.
 - **UI consistency** — read `docs/ui-design-rules.md` before creating/reviewing UI (page shell, toolbar, table, status colors, form, modal).
 - **Sidebar icons** — every menu in `database/seeders/MenuSeeder.php` uses a Lucide icon registered in `resources/js/lib/icon-map.ts`; `npm run check:menu-icons` must report `0 missing` (fallback `CircleHelp` is not a substitute).
+- **Theme colors** — no raw Tailwind palette classes (`text-red-500`, `bg-emerald-100`) in `resources/js`; use tokens (`text-success`, `bg-warning-soft`, `text-destructive-foreground`). `npm run check:raw-colors` runs in CI; exceptions only via its allowlist.
 - **Empty wrapper body** — multiline with comment, e.g. `class ExportBranchRequest extends SimpleCrudExportRequest { // Intentionally empty. Behavior is inherited from the base class. }` (duster would otherwise collapse it to one line).
 
 ## ANTI-PATTERNS (THIS PROJECT)
