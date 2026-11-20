@@ -129,13 +129,9 @@ export default function VehicleLoanDashboardPage() {
                         </h2>
                         <p className="text-xs text-muted-foreground">
                             Diperbarui{' '}
-                            {new Date(dataUpdatedAt).toLocaleString('id-ID', {
-                                day: '2-digit',
-                                month: '2-digit',
-                                year: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                            })}
+                            {formatDateTimeByRegionalSettings(
+                                new Date(dataUpdatedAt).toISOString(),
+                            )}
                         </p>
                     </div>
                     <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -183,13 +179,14 @@ export default function VehicleLoanDashboardPage() {
                         <CardHeader className="pb-2">
                             <CardTitle className="flex items-center gap-2 text-sm">
                                 <CarFront className="size-4 text-sky-600" />
-                                Sedang dipakai
+                                Aktif (belum terlambat)
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
                             <p className="text-3xl font-bold">{active}</p>
                             <p className="text-xs text-muted-foreground">
-                                Kunci sudah diserahkan dan belum dikembalikan.
+                                Kunci diserahkan, belum dikembalikan, dan belum
+                                melewati tenggat.
                             </p>
                         </CardContent>
                     </Card>
@@ -236,10 +233,16 @@ export default function VehicleLoanDashboardPage() {
                                                 loan.start_at,
                                             )}
                                         </p>
-                                        <VehicleLoanStatusBadge
-                                            status={loan.status}
-                                            className="self-start sm:self-auto"
-                                        />
+                                        <div className="flex items-center gap-2 self-start sm:self-auto">
+                                            {loan.is_overdue && (
+                                                <span className="rounded-full bg-rose-100 px-2 py-1 text-xs font-medium text-rose-900">
+                                                    Terlambat
+                                                </span>
+                                            )}
+                                            <VehicleLoanStatusBadge
+                                                status={loan.status}
+                                            />
+                                        </div>
                                     </div>
                                 ))
                             )}

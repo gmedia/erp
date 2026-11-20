@@ -200,7 +200,7 @@ export default function VehicleLoanPickupPage() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="with_driver">
-                                        Selfie bersama driver
+                                        Selfie bersama pengemudi
                                     </SelectItem>
                                     <SelectItem value="without_driver">
                                         Selfie dengan SIM (tanpa driver)
@@ -234,9 +234,14 @@ export default function VehicleLoanPickupPage() {
                         >
                             Kirim Pengambilan
                         </Button>
-                        {(!loanId || !photo) && (
+                        {!loanId && (
                             <p className="text-center text-xs text-muted-foreground">
-                                Pilih permintaan dan unggah foto untuk mengirim.
+                                Pilih permintaan terlebih dahulu.
+                            </p>
+                        )}
+                        {loanId && !photo && (
+                            <p className="text-center text-xs text-muted-foreground">
+                                Unggah foto untuk mengirim.
                             </p>
                         )}
                     </CardContent>

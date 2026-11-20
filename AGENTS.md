@@ -11,6 +11,7 @@
 4. **Session start: process open MRs first** — merge if green, fix if red.
 5. **Process budget (OpenCode stability) — HARD LIMIT.** Parallel tool/agent fan-out kills the host session. Follow **Tool & Process Concurrency** below with zero exceptions.
 6. **Seeder data harus realistis (WAJIB).** Data demo tidak boleh menampilkan penanda seperti `sample`, `dummy`, `test`, `contoh`, atau `lorem` di field yang dilihat pengguna (kode, nama, tujuan, catatan, plat, SIM). Pakai format produksi (mis. `VL-2026-0001`, `B 1234 XYZ`, `Budi Santoso`). Seeder wajib idempoten, mencakup semua stage workflow, konsisten dengan source of truth (approval/pipeline), dan membersihkan data demo lama bila format kode berubah. Detail: `database/AGENTS.md` → **Seeder Data Rules (MANDATORY)**.
+7. **Semua komponen UI wajib memakai shadcn-ui (WAJIB).** Gunakan primitives yang sudah ada di `resources/js/components/ui/*` (Button, Input, Select, Dialog, Tabs, DropdownMenu, Calendar, dll.) sebelum membuat elemen HTML mentah. Untuk kebutuhan khusus, buat wrapper di `components/common`/`components/vehicle-loans` yang tetap memakai primitives shadcn; jangan menambah UI library baru tanpa persetujuan. Contoh: date-time picker memakai `Input`, upload memakai `Button` + `Input`, bukan `<input type=file>` polos.
 
 ## Tool & Process Concurrency (HARD — prevents OpenCode kill)
 

@@ -140,3 +140,12 @@ Gunakan checklist ini saat diminta "review UI", "cek konsistensi modul X", atau 
 > Satu pola UI per kebutuhan. Kalau Anda menulis JSX layout/table/form yang tidak ada di shared component, kemungkinan besar Anda harus **memakai atau memperbaiki shared component**, bukan membuat yang baru.
 
 Pengecualian harus dicatat di `docs/visual-audit/FINDINGS.md` dengan alasan, supaya agent berikutnya tidak mengira itu pola baku.
+
+## Mandatory: shadcn-ui components
+
+Semua kontrol UI wajib memakai komponen shadcn-ui yang sudah ada di `resources/js/components/ui/*`:
+
+- `Button`, `Input`, `Textarea`, `Select`, `Checkbox`, `Dialog`, `Tabs`, `DropdownMenu`, `Calendar`, `Popover`, dll.
+- Jangan memakai elemen HTML mentah (`<button>`, `<input type="file">`, `<select>`) untuk kontrol interaktif jika ada padanan shadcn.
+- Komponen khusus (date-time picker, upload foto, QR panel) harus berupa wrapper yang tetap memakai primitives shadcn.
+- Jangan menambah UI library baru tanpa persetujuan.

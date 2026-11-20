@@ -29,6 +29,7 @@ interface SecurityLoan {
     driver_name: string | null;
     start_at: string;
     end_at: string;
+    is_overdue?: boolean;
     approval_requests?: Array<{ status: string }>;
     pickup?: { id: number; key_handover_at: string | null } | null;
 }
@@ -206,9 +207,16 @@ export default function VehicleLoanSecurityPage() {
                                                     {loan.requester_name}
                                                 </p>
                                             </div>
-                                            <VehicleLoanStatusBadge
-                                                status={loan.status}
-                                            />
+                                            <div className="flex flex-wrap items-center justify-end gap-1">
+                                                {loan.is_overdue && (
+                                                    <span className="rounded-full bg-rose-100 px-2 py-1 text-xs font-medium text-rose-900">
+                                                        Terlambat
+                                                    </span>
+                                                )}
+                                                <VehicleLoanStatusBadge
+                                                    status={loan.status}
+                                                />
+                                            </div>
                                         </div>
                                         <dl className="grid grid-cols-2 gap-x-3 gap-y-1 text-sm">
                                             <dt className="text-muted-foreground">
