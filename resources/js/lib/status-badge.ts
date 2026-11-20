@@ -1,9 +1,18 @@
-type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline';
+export type BadgeVariant =
+    | 'default'
+    | 'secondary'
+    | 'destructive'
+    | 'destructive-soft'
+    | 'outline'
+    | 'success'
+    | 'warning';
 
+// Semantik warna status: docs/ui-design-rules.md §0.1 & §2.5.
 const NEUTRAL: BadgeVariant = 'outline';
-const POSITIVE: BadgeVariant = 'default';
+const POSITIVE: BadgeVariant = 'success';
+const PENDING: BadgeVariant = 'warning';
 const MUTED: BadgeVariant = 'secondary';
-const DANGER: BadgeVariant = 'destructive';
+const DANGER: BadgeVariant = 'destructive-soft';
 
 export function statusBadgeVariant(
     status: string | null | undefined,
@@ -25,12 +34,14 @@ export function statusBadgeVariant(
         case 'completed':
             return POSITIVE;
 
-        case 'intern':
-        case 'draft':
         case 'pending':
         case 'pending_approval':
         case 'partially_received':
         case 'open':
+            return PENDING;
+
+        case 'intern':
+        case 'draft':
         case 'inactive':
             return MUTED;
 

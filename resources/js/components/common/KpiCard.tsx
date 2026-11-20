@@ -7,7 +7,8 @@ export interface KpiCardProps {
     icon: LucideIcon;
     value: number;
     formattedValue: string;
-    borderColor: string;
+    /** @deprecated Aksen garis kiri tidak dipakai lagi (docs/ui-design-rules.md §0.4). */
+    borderColor?: string;
     iconColor: string;
     valueClassName?: string;
     children?: ReactNode;
@@ -17,15 +18,12 @@ export function KpiCard({
     title,
     icon: Icon,
     formattedValue,
-    borderColor,
     iconColor,
     valueClassName,
     children,
 }: KpiCardProps) {
     return (
-        <Card
-            className={`overflow-hidden border-l-4 ${borderColor} transition-all hover:shadow-md`}
-        >
+        <Card className="gap-2 overflow-hidden">
             <CardHeader className="flex flex-row items-center justify-between pt-4 pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                     {title}
@@ -34,7 +32,7 @@ export function KpiCard({
             </CardHeader>
             <CardContent>
                 <div
-                    className={`text-2xl font-bold tabular-nums ${valueClassName ?? ''}`}
+                    className={`text-3xl font-semibold tabular-nums ${valueClassName ?? ''}`}
                 >
                     {formattedValue}
                 </div>

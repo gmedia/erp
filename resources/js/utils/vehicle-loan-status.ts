@@ -1,6 +1,4 @@
-import { statusBadgeVariant } from '@/lib/status-badge';
-
-type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline';
+import { type BadgeVariant, statusBadgeVariant } from '@/lib/status-badge';
 
 const LABELS: Record<string, string> = {
     draft: 'Draf',
@@ -15,8 +13,8 @@ const LABELS: Record<string, string> = {
 
 const VARIANT_OVERRIDES: Record<string, BadgeVariant> = {
     in_progress: 'secondary',
-    pickup_done: 'default',
-    returned: 'default',
+    pickup_done: 'success',
+    returned: 'success',
 };
 
 export function vehicleLoanStatusLabel(
