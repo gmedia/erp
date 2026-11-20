@@ -51,7 +51,7 @@ export function DeleteConfirmationDialog<T>({
                     <AlertDialogAction
                         onClick={onConfirm}
                         disabled={isLoading}
-                        className="bg-destructive text-white hover:bg-destructive/80"
+                        className="bg-destructive-foreground text-white hover:bg-destructive-foreground/80"
                     >
                         {isLoading ? t('common.deleting') : t('common.delete')}
                     </AlertDialogAction>
