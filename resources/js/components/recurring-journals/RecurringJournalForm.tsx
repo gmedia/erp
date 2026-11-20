@@ -313,7 +313,7 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                                 </div>
 
                                 {!isBalanced && lines && lines.length > 0 && (
-                                    <div className="rounded-md bg-yellow-50 p-3 text-sm text-yellow-800">
+                                    <div className="rounded-md bg-warning-soft p-3 text-sm text-warning">
                                         Warning: Total Debit and Total Credit
                                         must be equal.
                                     </div>

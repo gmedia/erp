@@ -125,7 +125,7 @@ export function createStockMovementsColumns(): ColumnDef<StockMovementItem>[] {
                 if (!url) return <div>{ref}</div>;
 
                 return (
-                    <a href={url} className="text-blue-600 hover:underline">
+                    <a href={url} className="text-info hover:underline">
                         {ref}
                     </a>
                 );

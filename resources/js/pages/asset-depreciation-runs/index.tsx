@@ -158,7 +158,7 @@ export default function Index() {
                                 {isPosting === item.id ? (
                                     <Loader2 className="mr-1 h-4 w-4 animate-spin" />
                                 ) : (
-                                    <CheckCircle2 className="mr-1 h-4 w-4 text-green-600" />
+                                    <CheckCircle2 className="mr-1 h-4 w-4 text-success" />
                                 )}
                                 Post
                             </Button>

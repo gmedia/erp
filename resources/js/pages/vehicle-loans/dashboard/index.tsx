@@ -56,49 +56,49 @@ export default function VehicleLoanDashboardPage() {
             label: 'Total permintaan',
             value: loans.length,
             icon: FileText,
-            tone: 'text-slate-600 bg-slate-100',
+            tone: 'text-muted-foreground bg-muted',
         },
         {
             label: 'Draf',
             value: count('draft'),
             icon: FileText,
-            tone: 'text-slate-600 bg-slate-100',
+            tone: 'text-muted-foreground bg-muted',
         },
         {
             label: 'Menunggu Persetujuan',
             value: count('pending') + count('in_progress'),
             icon: Clock3,
-            tone: 'text-amber-700 bg-amber-50',
+            tone: 'text-warning bg-warning-soft',
         },
         {
             label: 'Disetujui',
             value: count('approved'),
             icon: CheckCircle2,
-            tone: 'text-emerald-700 bg-emerald-50',
+            tone: 'text-success bg-success-soft',
         },
         {
             label: 'Ditolak',
             value: count('rejected'),
             icon: XCircle,
-            tone: 'text-rose-700 bg-rose-50',
+            tone: 'text-destructive-foreground bg-destructive-soft',
         },
         {
             label: 'Kendaraan Dipakai',
             value: count('pickup_done'),
             icon: KeyRound,
-            tone: 'text-sky-700 bg-sky-50',
+            tone: 'text-info bg-info/10',
         },
         {
             label: 'Selesai',
             value: count('returned'),
             icon: CarFront,
-            tone: 'text-emerald-700 bg-emerald-50',
+            tone: 'text-success bg-success-soft',
         },
         {
             label: 'Dibatalkan',
             value: count('cancelled'),
             icon: Ban,
-            tone: 'text-slate-600 bg-slate-100',
+            tone: 'text-muted-foreground bg-muted',
         },
     ];
 
@@ -164,7 +164,7 @@ export default function VehicleLoanDashboardPage() {
                     <Card>
                         <CardHeader className="pb-2">
                             <CardTitle className="flex items-center gap-2 text-sm">
-                                <AlertTriangle className="size-4 text-amber-600" />
+                                <AlertTriangle className="size-4 text-warning" />
                                 Terlambat dikembalikan
                             </CardTitle>
                         </CardHeader>
@@ -178,7 +178,7 @@ export default function VehicleLoanDashboardPage() {
                     <Card>
                         <CardHeader className="pb-2">
                             <CardTitle className="flex items-center gap-2 text-sm">
-                                <CarFront className="size-4 text-sky-600" />
+                                <CarFront className="size-4 text-info" />
                                 Aktif (belum terlambat)
                             </CardTitle>
                         </CardHeader>
@@ -235,7 +235,7 @@ export default function VehicleLoanDashboardPage() {
                                         </p>
                                         <div className="flex items-center gap-2 self-start sm:self-auto">
                                             {loan.is_overdue && (
-                                                <span className="rounded-full bg-rose-100 px-2 py-1 text-xs font-medium text-rose-900">
+                                                <span className="rounded-full bg-destructive-soft px-2 py-1 text-xs font-medium text-destructive-foreground">
                                                     Terlambat
                                                 </span>
                                             )}

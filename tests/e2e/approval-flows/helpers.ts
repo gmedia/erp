@@ -111,7 +111,7 @@ export async function createApprovalFlow(
   } catch (error) {
       console.error(`Dialog did not close after 15s. Likely validation error or backend failure.`);
       const errorMessages = await dialog
-        .locator('.text-destructive, .text-red-500, [role="alert"]')
+        .locator('.text-destructive, .text-destructive-foreground, .text-red-500, [role="alert"]')
         .allTextContents()
         .catch(() => []);
       if (errorMessages.length > 0) {

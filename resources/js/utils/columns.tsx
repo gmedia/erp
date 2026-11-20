@@ -267,7 +267,7 @@ export function createLinkColumn<T = Record<string, unknown>>(
         label,
         enableSorting = true,
         linkType,
-        linkClassName = 'text-blue-600 hover:text-blue-800 hover:underline',
+        linkClassName = 'text-info hover:text-info hover:underline',
     } = options;
 
     const getHref = (value: string) => {
@@ -424,7 +424,7 @@ export function createBadgeColumn<T = Record<string, unknown>>(
         label,
         enableSorting = true,
         colorMap = {},
-        defaultColor = 'bg-gray-100 text-gray-800',
+        defaultColor = 'bg-muted text-foreground',
     } = options;
 
     const baseColumn: ColumnDef<T> = {

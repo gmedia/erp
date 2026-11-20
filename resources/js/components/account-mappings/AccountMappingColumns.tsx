@@ -44,9 +44,9 @@ export const accountMappingColumns: ColumnDef<AccountMapping>[] = [
         accessorKey: 'type',
         label: 'Type',
         colorMap: {
-            rename: 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-100',
-            merge: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-            split: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+            rename: 'bg-muted text-foreground',
+            merge: 'bg-info/10 text-info',
+            split: 'bg-chart-3/10 text-chart-3',
         },
     }),
     createTextColumn<AccountMapping>({ accessorKey: 'notes', label: 'Notes' }),
