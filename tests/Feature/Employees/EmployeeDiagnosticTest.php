@@ -5,7 +5,7 @@ use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 
-uses(LazilyRefreshDatabase::class);
+uses(LazilyRefreshDatabase::class)->group('employees');
 
 test('diagnostic: just count employees after beforeEach', function () {
     $user = createTestUserWithPermissions(['employee']);
