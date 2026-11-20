@@ -30,7 +30,9 @@
     ],
     "deny": [
       "Read(./.env)",
-      "Read(./.env.*)"
+      "Read(./.env.local)",
+      "Read(./.env.production)",
+      "Read(./.env.testing)"
     ]
   }
 }
