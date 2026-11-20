@@ -14,17 +14,17 @@ interface AgingBucketChartProps {
 
 const COLOR_SCALES = {
     emerald: [
-        'bg-success/25',
-        'bg-success/45',
-        'bg-success/65',
-        'bg-success/85',
+        'bg-success/40',
+        'bg-success/60',
+        'bg-success/75',
+        'bg-success/90',
         'bg-success',
     ],
     rose: [
-        'bg-destructive-foreground/25',
-        'bg-destructive-foreground/45',
-        'bg-destructive-foreground/65',
-        'bg-destructive-foreground/85',
+        'bg-destructive-foreground/40',
+        'bg-destructive-foreground/60',
+        'bg-destructive-foreground/75',
+        'bg-destructive-foreground/90',
         'bg-destructive-foreground',
     ],
 };
