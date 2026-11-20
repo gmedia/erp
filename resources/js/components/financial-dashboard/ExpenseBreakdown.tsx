@@ -83,7 +83,7 @@ export const ExpenseBreakdown = memo<ExpenseBreakdownProps>(
                                     </div>
                                     <div className="h-3 w-full overflow-hidden rounded bg-secondary">
                                         <div
-                                            className="h-full rounded-r bg-destructive transition-all duration-500"
+                                            className="h-full rounded-r bg-destructive-foreground transition-all duration-500"
                                             style={{ width: widthStr }}
                                         />
                                     </div>

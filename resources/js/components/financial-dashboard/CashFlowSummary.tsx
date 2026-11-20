@@ -70,12 +70,12 @@ export const CashFlowSummary = memo<CashFlowSummaryProps>(
             {
                 label: 'Cash Outflow',
                 value: data.outflow,
-                color: 'bg-destructive',
+                color: 'bg-destructive-foreground',
             },
             {
                 label: 'Net Cash Flow',
                 value: data.net,
-                color: data.net >= 0 ? 'bg-info' : 'bg-destructive',
+                color: data.net >= 0 ? 'bg-info' : 'bg-destructive-foreground',
             },
         ];
 

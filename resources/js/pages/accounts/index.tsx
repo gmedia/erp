@@ -312,7 +312,7 @@ export default function AccountIndex() {
                                 e.preventDefault();
                                 void confirmDelete();
                             }}
-                            className="bg-destructive text-white hover:bg-destructive/80"
+                            className="bg-destructive-foreground text-white hover:bg-destructive-foreground/80"
                             disabled={isActionLoading}
                         >
                             {isActionLoading && (

@@ -21,11 +21,11 @@ const COLOR_SCALES = {
         'bg-success',
     ],
     rose: [
-        'bg-destructive/25',
-        'bg-destructive/45',
-        'bg-destructive/65',
-        'bg-destructive/85',
-        'bg-destructive',
+        'bg-destructive-foreground/25',
+        'bg-destructive-foreground/45',
+        'bg-destructive-foreground/65',
+        'bg-destructive-foreground/85',
+        'bg-destructive-foreground',
     ],
 };
 

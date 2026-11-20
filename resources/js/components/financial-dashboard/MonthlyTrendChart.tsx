@@ -116,7 +116,7 @@ export const MonthlyTrendChart = memo<MonthlyTrendChartProps>(
                                 </span>
                             </div>
                             <div className="flex items-center space-x-2">
-                                <div className="h-3 w-3 rounded-full bg-destructive"></div>
+                                <div className="h-3 w-3 rounded-full bg-destructive-foreground"></div>
                                 <span className="text-muted-foreground">
                                     Expenses
                                 </span>
@@ -161,7 +161,7 @@ export const MonthlyTrendChart = memo<MonthlyTrendChartProps>(
                                                 </div>
                                             </div>
                                             <div
-                                                className="group relative w-6 rounded-t bg-destructive transition-all hover:opacity-80"
+                                                className="group relative w-6 rounded-t bg-destructive-foreground transition-all hover:opacity-80"
                                                 style={{
                                                     height: `${expensesHeight}px`,
                                                 }}
