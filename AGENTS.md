@@ -130,6 +130,7 @@ Agent wajib melakukan langkah ini **sebelum/menyertakan** `bash project_setup.sh
 2. `gh auth status` — pastikan akun tim (mis. `oppytut`), bukan akun sesaat.
 3. `git config user.name` / `git config user.email` — harus terisi; kalau kosong, set dari identitas commit terakhir repo (`git log -1 --format='%an <%ae>'`).
 4. Buka `http://localhost:82` via SSH tunnel dari laptop; jangan pernah bind ke `0.0.0.0` di host ber-IP-publik.
+5. **Image app tidak perlu di-build lokal.** `project_setup.sh` mem-pull `ghcr.io/gmedia/erp/ci-sail:8.4` (public, Dockerfile sama `docker/8.4`, dibangun CI) lalu men-tag-nya `sail-8.4/app`; UID container menyesuaikan saat runtime (`start-container` → `usermod`). Build lokal (>25 menit) hanya bila `SAIL_BUILD=1` atau pull gagal. Script juga menjalankan `sail up -d --wait` (bukan `sleep`) dan `key:generate` bila `APP_KEY` kosong.
 
 Guard menolak push dari branch tanpa pola `<type>/issue-N-slug`, issue belum `status:claimed`, atau bukan di-assign ke akun `gh`. Ini pelengkap koordinasi di https://github.com/gmedia/erp/issues.
 
