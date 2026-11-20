@@ -37,6 +37,20 @@ export default [
             'react-hooks/exhaustive-deps': 'warn',
         },
     },
+    {
+        // Typed lint khusus aturan promise (Sonar typescript:S9383): promise yang
+        // sengaja tidak ditunggu wajib diberi `void`, selain itu await/.catch.
+        files: ['resources/js/**/*.{ts,tsx}'],
+        languageOptions: {
+            parserOptions: {
+                projectService: true,
+                tsconfigRootDir: import.meta.dirname,
+            },
+        },
+        rules: {
+            '@typescript-eslint/no-floating-promises': 'error',
+        },
+    },
     prettier, // Turn off all rules that might conflict with Prettier
     {
         ignores: ['vendor', 'node_modules', 'public', 'dist', 'android', 'bootstrap/ssr', 'tailwind.config.js', 'coverage-html', '.0pencode/'],
