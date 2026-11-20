@@ -1,4 +1,4 @@
-package com.dokfin.app_gmedia;
+package com.dokfin.erp;
 
 import com.getcapacitor.BridgeActivity;
 

@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace = "com.dokfin.app_gmedia"
+    namespace = "com.dokfin.erp"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.dokfin.app_gmedia"
+        applicationId "com.dokfin.erp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

@@ -3,6 +3,7 @@
 /node_modules
 /public/build
 /dist
+/dist-mobile
 /firebase-service-account*.json
 /fcm-credentials*.json
 /storage/app/firebase/*.json
