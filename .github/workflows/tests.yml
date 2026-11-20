@@ -19,6 +19,57 @@ env:
   CI_SAIL_IMAGE: ghcr.io/${{ github.repository }}/ci-sail:8.4
 
 jobs:
+  changes:
+    name: Affected tests (shadow)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    continue-on-error: true
+    permissions:
+      contents: read
+    outputs:
+      full_pest: ${{ steps.affected.outputs.full_pest }}
+      full_e2e: ${{ steps.affected.outputs.full_e2e }}
+      pest_groups: ${{ steps.affected.outputs.pest_groups }}
+      e2e_dirs: ${{ steps.affected.outputs.e2e_dirs }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@d59004228537ca90c8dca680592a08a675bf52b6 # v2
+        with:
+          php-version: 8.4
+          coverage: none
+
+      - name: Mapper self-test
+        run: php scripts/ci/affected-tests.php --self-test
+
+      - name: Compute affected tests (shadow)
+        id: affected
+        continue-on-error: true
+        env:
+          SAME_REPO: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          FORCE_FULL: ${{ vars.CI_FORCE_FULL }}
+        run: |
+          set -uo pipefail
+          out() { echo "$1=$2" >> "$GITHUB_OUTPUT"; }
+          out full_pest false; out full_e2e false; out pest_groups '[]'; out e2e_dirs '[]'
+          full() { out full_pest true; out full_e2e true; echo "Affected-tests: FULL ($1)" >> "$GITHUB_STEP_SUMMARY"; }
+          if [ "${FORCE_FULL:-}" = "1" ]; then full "CI_FORCE_FULL=1"; exit 0; fi
+          if [ "${SAME_REPO:-}" != "true" ]; then full "fork PR or non-PR event"; exit 0; fi
+          if [ -z "${BASE_SHA:-}" ] || [ -z "${HEAD_SHA:-}" ]; then full "missing base/head sha"; exit 0; fi
+          git fetch --no-tags --quiet origin "$BASE_SHA" "$HEAD_SHA" || true
+          git show "$BASE_SHA:scripts/ci/affected-tests.php" > /tmp/affected-tests.php 2>/dev/null || cp scripts/ci/affected-tests.php /tmp/affected-tests.php
+          git diff --name-only -M "$BASE_SHA...$HEAD_SHA" > /tmp/changed.txt || true
+          php /tmp/affected-tests.php --files /tmp/changed.txt > /tmp/affected.json
+          php -r '$d=json_decode(file_get_contents("/tmp/affected.json"),true); foreach(["full_pest","full_e2e"] as $k){echo $k."=".($d[$k]?"true":"false")."\n";} echo "pest_groups=".json_encode($d["pest_groups"])."\n"; echo "e2e_dirs=".json_encode($d["e2e_dirs"])."\n";' >> "$GITHUB_OUTPUT"
+          { echo "### Affected tests (shadow, non-blocking)"; echo '```json'; cat /tmp/affected.json; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
   quality:
     name: Quality checks via Sail
     runs-on: ubuntu-latest
