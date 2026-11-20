@@ -185,6 +185,19 @@ describe('Stock Transfer API Endpoints', function () {
         ]);
     });
 
+    test('update accepts an unchanged transfer number', function () {
+        $transfer = StockTransfer::factory()->create(['status' => 'draft']);
+
+        putJson("/api/stock-transfers/{$transfer->id}", [
+            'transfer_number' => $transfer->transfer_number,
+        ])->assertOk();
+
+        assertDatabaseHas('stock_transfers', [
+            'id' => $transfer->id,
+            'transfer_number' => $transfer->transfer_number,
+        ]);
+    });
+
     test('show returns transfer with all relations and items loaded', function () {
         $fromWarehouse = Warehouse::factory()->create();
         $toWarehouse = Warehouse::factory()->create();
