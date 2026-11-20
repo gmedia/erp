@@ -63,10 +63,22 @@ export async function enablePushNotifications(): Promise<PushRegistrationResult>
                 const target = action.notification.data?.target_url;
 
                 if (typeof target === 'string' && target !== '') {
-                    globalThis.location.assign(target);
+                    globalThis.history.pushState({}, '', target);
+                    globalThis.dispatchEvent(new PopStateEvent('popstate'));
                 }
             },
         );
+    }
+
+    if (Capacitor.getPlatform() === 'android') {
+        await PushNotifications.createChannel({
+            id: 'default',
+            name: 'General',
+            description: 'General notifications',
+            importance: 5,
+            visibility: 1,
+            vibration: true,
+        });
     }
 
     await PushNotifications.register();
