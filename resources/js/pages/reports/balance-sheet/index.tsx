@@ -180,7 +180,7 @@ export default function BalanceSheet() {
                     {!isBalanced && (
                         <Alert
                             variant="destructive"
-                            className="border-destructive/40 bg-destructive-foreground/10 text-destructive"
+                            className="border-destructive/40 bg-destructive/10 text-destructive"
                         >
                             <AlertTriangle className="h-4 w-4" />
                             <AlertTitle>Unbalanced</AlertTitle>
