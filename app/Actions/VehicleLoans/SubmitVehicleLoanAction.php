@@ -20,9 +20,10 @@ class SubmitVehicleLoanAction
                 throw new InvalidArgumentException('Only draft or rejected loans can be submitted.');
             }
 
-            app(ValidateVehicleLoanAction::class)->execute($loan->only([
-                'start_at', 'end_at', 'purpose', 'driver_id', 'vehicle_unit_id',
-            ]), $loan->id);
+            app(ValidateVehicleLoanAction::class)->execute(
+                $loan->only(['start_at', 'end_at', 'purpose', 'driver_id', 'vehicle_unit_id']),
+                $loan->id,
+            );
 
             $approval = $this->triggerApproval->execute($loan, [
                 'flow_code' => config('vehicle_loan.approval_flow_code'),

@@ -24,9 +24,12 @@ class ReviewVehicleLoanAssignmentAction
             $step = $approval->steps()
                 ->where('status', 'pending')
                 ->where('step_order', $approval->current_step_order)
-                ->whereHas('flowStep', fn ($q) => $q
-                    ->where('approver_type', 'user')
-                    ->where('approver_user_id', $userId))
+                ->whereHas(
+                    'flowStep',
+                    fn ($q) => $q
+                        ->where('approver_type', 'user')
+                        ->where('approver_user_id', $userId),
+                )
                 ->lockForUpdate()
                 ->first();
 

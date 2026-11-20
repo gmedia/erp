@@ -55,7 +55,7 @@ export default function TwoFactorChallenge() {
         setCode('');
     };
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         setProcessing(true);
         setErrors({});

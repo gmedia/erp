@@ -11,7 +11,10 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class WarehouseExport extends BaseExport
 {
-    public function __construct(protected readonly array $filters = []) {}
+    public function __construct(protected readonly array $filters = [])
+    {
+        // Intentionally empty. Dependencies are assigned via promoted properties.
+    }
 
     public function query(): Builder
     {

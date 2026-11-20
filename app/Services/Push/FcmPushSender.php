@@ -11,7 +11,10 @@ use RuntimeException;
 
 class FcmPushSender implements PushSender
 {
-    public function __construct(private readonly FcmAccessTokenProvider $tokens) {}
+    public function __construct(private readonly FcmAccessTokenProvider $tokens)
+    {
+        // Intentionally empty. Dependencies are assigned via promoted properties.
+    }
 
     public function send(DeviceToken $token, array $payload): void
     {

@@ -36,10 +36,13 @@ class EmploymentResource extends JsonResource
             'department' => new DepartmentResource($this->whenLoaded('department')),
             'position' => new PositionResource($this->whenLoaded('position')),
             'branch' => new BranchResource($this->whenLoaded('branch')),
-            'company' => $this->when($this->relationLoaded('company'), fn () => [
-                'id' => $this->company->id,
-                'name' => $this->company->name,
-            ]),
+            'company' => $this->when(
+                $this->relationLoaded('company'),
+                fn () => [
+                    'id' => $this->company->id,
+                    'name' => $this->company->name,
+                ],
+            ),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
