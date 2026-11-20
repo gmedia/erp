@@ -181,7 +181,7 @@ export default function IncomeStatement() {
                                 className={cn(
                                     'text-sm font-semibold tabular-nums',
                                     isProfit
-                                        ? 'text-emerald-700 dark:text-emerald-300'
+                                        ? 'text-success'
                                         : 'text-destructive',
                                 )}
                             >

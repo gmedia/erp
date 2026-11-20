@@ -117,7 +117,7 @@ function AccountTreeNode({
                                     type="button"
                                     size="icon"
                                     variant="ghost"
-                                    className="h-8 w-8 text-blue-500"
+                                    className="h-8 w-8 text-info"
                                     onClick={() => onEdit(account)}
                                 >
                                     <Edit className="h-4 w-4" />

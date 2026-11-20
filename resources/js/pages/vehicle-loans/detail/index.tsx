@@ -266,7 +266,7 @@ export default function VehicleLoanDetailPage() {
                                             </p>
                                         )}
                                         {data.rejection_reason && (
-                                            <p className="mt-4 rounded-md bg-rose-100 p-3 text-sm text-rose-900">
+                                            <p className="mt-4 rounded-md bg-destructive-soft p-3 text-sm text-destructive-foreground">
                                                 Alasan ditolak:{' '}
                                                 {data.rejection_reason}
                                             </p>
@@ -287,7 +287,7 @@ export default function VehicleLoanDetailPage() {
                                             status={data.status}
                                         />
                                         {data.is_overdue && (
-                                            <p className="rounded-md bg-amber-100 p-2 text-xs font-medium text-amber-900">
+                                            <p className="rounded-md bg-warning-soft p-2 text-xs font-medium text-warning">
                                                 Kendaraan melewati jadwal
                                                 pengembalian.
                                             </p>
@@ -346,11 +346,11 @@ export default function VehicleLoanDetailPage() {
                                                             className={`mt-1 flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
                                                                 step.status ===
                                                                 'approved'
-                                                                    ? 'bg-emerald-100 text-emerald-800'
+                                                                    ? 'bg-success-soft text-success'
                                                                     : step.status ===
                                                                         'rejected'
-                                                                      ? 'bg-rose-100 text-rose-800'
-                                                                      : 'bg-amber-100 text-amber-900'
+                                                                      ? 'bg-destructive-soft text-destructive-foreground'
+                                                                      : 'bg-warning-soft text-warning'
                                                             }`}
                                                         >
                                                             {step.step_order}
@@ -410,7 +410,7 @@ export default function VehicleLoanDetailPage() {
                                                 key={log.id}
                                                 className="flex gap-3"
                                             >
-                                                <span className="mt-1.5 size-2 shrink-0 rounded-full bg-slate-400" />
+                                                <span className="mt-1.5 size-2 shrink-0 rounded-full bg-muted-foreground" />
                                                 <div>
                                                     <p className="text-sm font-medium">
                                                         {ACTIVITY_LABELS[

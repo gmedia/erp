@@ -87,7 +87,7 @@ export function NotificationBell() {
                 >
                     <Bell className="!size-5 opacity-80" />
                     {count > 0 && (
-                        <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-semibold text-white">
+                        <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold text-white">
                             {count > 9 ? '9+' : count}
                         </span>
                     )}
@@ -129,7 +129,7 @@ export function NotificationBell() {
                                 {item.data.target_url && (
                                     <Link
                                         to={item.data.target_url}
-                                        className="text-xs text-blue-600 underline"
+                                        className="text-xs text-info underline"
                                         onClick={() => markRead.mutate(item.id)}
                                     >
                                         Open

@@ -170,8 +170,8 @@ export function EntityStateActions({
                                     </div>
                                 </TooltipTrigger>
                                 {!transition.is_allowed && (
-                                    <TooltipContent className="max-w-xs border-red-200 bg-red-50 text-xs text-red-500">
-                                        <div className="mb-1 font-semibold text-red-700">
+                                    <TooltipContent className="max-w-xs border-destructive/30 bg-destructive-soft text-xs text-destructive-foreground">
+                                        <div className="mb-1 font-semibold text-destructive-foreground">
                                             Cannot execute:
                                         </div>
                                         <ul className="list-disc pl-3">

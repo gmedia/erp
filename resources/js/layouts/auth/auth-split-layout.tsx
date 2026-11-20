@@ -18,6 +18,7 @@ export default function AuthSplitLayout({
     return (
         <div className="relative grid h-dvh flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
             <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r">
+                {/* Panel brand sengaja selalu gelap di kedua mode — pengecualian token (docs/ui-design-rules.md §0.5). */}
                 <div className="absolute inset-0 bg-zinc-900" />
                 <Link
                     to="/"

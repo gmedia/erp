@@ -136,7 +136,7 @@ function StatusBadge({ status }: Readonly<{ status: string }>) {
             return (
                 <Badge
                     variant="default"
-                    className="gap-1 bg-emerald-600 font-normal hover:bg-emerald-700"
+                    className="gap-1 bg-success font-normal hover:bg-success"
                 >
                     <Check className="h-3 w-3" /> Approved
                 </Badge>
@@ -456,7 +456,7 @@ export default function MyApprovalsPage() {
                                         <div className="flex w-full flex-wrap items-center gap-1.5 border-t border-border/60 pt-2">
                                             <Button
                                                 size="sm"
-                                                className="h-8 w-full border-0 bg-emerald-600 text-white hover:bg-emerald-700 focus-visible:ring-emerald-300 sm:w-auto dark:bg-emerald-600 dark:hover:bg-emerald-500"
+                                                className="h-8 w-full border-0 bg-success text-white hover:bg-success focus-visible:ring-success/30 sm:w-auto"
                                                 onClick={() =>
                                                     openActionDialog(
                                                         'approve',

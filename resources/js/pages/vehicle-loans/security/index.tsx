@@ -209,7 +209,7 @@ export default function VehicleLoanSecurityPage() {
                                             </div>
                                             <div className="flex flex-wrap items-center justify-end gap-1">
                                                 {loan.is_overdue && (
-                                                    <span className="rounded-full bg-rose-100 px-2 py-1 text-xs font-medium text-rose-900">
+                                                    <span className="rounded-full bg-destructive-soft px-2 py-1 text-xs font-medium text-destructive-foreground">
                                                         Terlambat
                                                     </span>
                                                 )}
@@ -259,7 +259,7 @@ export default function VehicleLoanSecurityPage() {
                                         <div className="mt-auto flex items-center justify-between gap-2 border-t pt-3">
                                             <div className="min-w-0">
                                                 {handed ? (
-                                                    <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-800">
+                                                    <span className="inline-flex items-center rounded-full bg-success-soft px-2 py-1 text-xs font-medium text-success">
                                                         Kunci sudah diserahkan
                                                     </span>
                                                 ) : ready ? (

@@ -71,7 +71,7 @@ export const RecurringJournalLinesTable = memo<RecurringJournalLinesTableProps>(
                                 <TableRow key={line.id ?? index}>
                                     <TableCell>
                                         <div>{line.account_code}</div>
-                                        <div className="text-sm text-gray-500">
+                                        <div className="text-sm text-muted-foreground">
                                             {line.account_name}
                                         </div>
                                     </TableCell>
