@@ -70,6 +70,107 @@ jobs:
           php -r '$d=json_decode(file_get_contents("/tmp/affected.json"),true); foreach(["full_pest","full_e2e"] as $k){echo $k."=".($d[$k]?"true":"false")."\n";} echo "pest_groups=".json_encode($d["pest_groups"])."\n"; echo "e2e_dirs=".json_encode($d["e2e_dirs"])."\n";' >> "$GITHUB_OUTPUT"
           { echo "### Affected tests (shadow, non-blocking)"; echo '```json'; cat /tmp/affected.json; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 
+  affected-pest-preview:
+    name: Affected Pest (shadow, non-blocking)
+    needs: changes
+    if: ${{ needs.changes.result == 'success' && needs.changes.outputs.full_pest != 'true' && needs.changes.outputs.pest_groups != '[]' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    continue-on-error: true
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - name: Checkout source branch
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          repository: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@d59004228537ca90c8dca680592a08a675bf52b6 # v2
+        with:
+          php-version: 8.4
+          tools: composer:v2
+          coverage: none
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          sed -i "s/^WWWUSER=.*/WWWUSER=$(id -u)/" .env
+          sed -i "s/^WWWGROUP=.*/WWWGROUP=$(id -g)/" .env
+          mkdir -p storage/tmp
+          chmod -R u+rwX,g+rwX,o-rwx storage/tmp
+
+      - name: Bootstrap Sail dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Pull CI Sail image
+        shell: bash
+        timeout-minutes: 5
+        run: |
+          branch_tag="${GITHUB_BASE_REF:-${GITHUB_REF_NAME}}"
+          branch_tag=$(echo "$branch_tag" | tr -cd '[:alnum:]._-')
+          candidates=(
+            "ghcr.io/${GITHUB_REPOSITORY}/ci-sail:sha-${GITHUB_SHA::7}"
+            "$CI_SAIL_IMAGE"
+            "ghcr.io/${GITHUB_REPOSITORY}/ci-sail:${branch_tag}"
+            "ghcr.io/${GITHUB_REPOSITORY}/ci-sail:latest"
+          )
+          for image in "${candidates[@]}"; do
+            for attempt in 1 2 3; do
+              if timeout 60s docker pull "$image"; then
+                docker tag "$image" sail-8.4/app
+                exit 0
+              fi
+              if [ "$attempt" -lt 3 ]; then
+                echo "CI Sail image $image not available. Retry ${attempt}/3 in 10s..."
+                sleep 10
+              fi
+            done
+          done
+          echo "::error::Unable to pull any CI Sail image candidate after retries."
+          exit 1
+
+      - name: Start Sail
+        run: |
+          docker volume rm erp_sail-mariadb 2>/dev/null || true
+          ./vendor/bin/sail up -d --wait
+
+      - name: Generate application key
+        run: ./vendor/bin/sail artisan key:generate
+
+      - name: Run affected Pest groups (non-blocking)
+        continue-on-error: true
+        env:
+          GROUPS_JSON: ${{ needs.changes.outputs.pest_groups }}
+        run: |
+          set -uo pipefail
+          mapfile -t GROUPS < <(php -r '$d=json_decode((string) getenv("GROUPS_JSON"), true) ?: []; foreach ($d as $g) { echo $g, PHP_EOL; }')
+          { echo "### Affected Pest (shadow, non-blocking)"; echo "**Groups (${#GROUPS[@]}):** ${GROUPS[*]}"; } >> "$GITHUB_STEP_SUMMARY"
+          if [ "${#GROUPS[@]}" -eq 0 ]; then exit 0; fi
+          ARGS=(); for g in "${GROUPS[@]}"; do ARGS+=(--group "$g"); done
+          START=$(date +%s)
+          ./vendor/bin/sail test "${ARGS[@]}" --colors=never 2>&1 | tee /tmp/affected-pest.log
+          RC=${PIPESTATUS[0]}
+          END=$(date +%s)
+          { echo "**Duration:** $((END-START))s"; echo "**Exit:** $RC"; echo '```'; tail -n 8 /tmp/affected-pest.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          exit $RC
+
+      - name: Stop Sail
+        if: always()
+        run: ./vendor/bin/sail down 2>&1 | tail -3 || true
+
+
   quality:
     name: Quality checks via Sail
     runs-on: ubuntu-latest
