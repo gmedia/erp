@@ -25,7 +25,10 @@ interface PickupOption {
     vehicle_loan_id: number;
     code: string;
     plate_number: string | null;
+    driver_name: string | null;
+    purpose: string | null;
     start_at: string | null;
+    end_at: string | null;
 }
 
 export default function VehicleLoanReturnPage() {
@@ -49,7 +52,10 @@ export default function VehicleLoanReturnPage() {
                 response.data.data as Array<{
                     code: string;
                     plate_number: string | null;
+                    driver_name: string | null;
+                    purpose: string | null;
                     start_at: string | null;
+                    end_at: string | null;
                     pickup?: {
                         id: number;
                         vehicle_loan_id: number;
@@ -63,7 +69,10 @@ export default function VehicleLoanReturnPage() {
                     vehicle_loan_id: loan.pickup!.vehicle_loan_id,
                     code: loan.code,
                     plate_number: loan.plate_number,
+                    driver_name: loan.driver_name,
+                    purpose: loan.purpose,
                     start_at: loan.start_at,
+                    end_at: loan.end_at,
                 }));
             setPickups(items);
             setLoaded(true);
@@ -196,11 +205,19 @@ export default function VehicleLoanReturnPage() {
                         {selected && (
                             <div className="space-y-1 rounded-lg border bg-muted/30 p-3 text-sm">
                                 <p className="font-medium">{selected.code}</p>
-                                <p>Unit: {selected.plate_number ?? '-'}</p>
+                                <p>Pengemudi: {selected.driver_name ?? '-'}</p>
+                                <p>Kendaraan: {selected.plate_number ?? '-'}</p>
+                                <p>Tujuan: {selected.purpose ?? '-'}</p>
                                 <p>
                                     Mulai:{' '}
                                     {formatDateTimeByRegionalSettings(
                                         selected.start_at,
+                                    )}
+                                </p>
+                                <p>
+                                    Selesai:{' '}
+                                    {formatDateTimeByRegionalSettings(
+                                        selected.end_at,
                                     )}
                                 </p>
                             </div>
@@ -217,7 +234,7 @@ export default function VehicleLoanReturnPage() {
                     <CardContent className="space-y-4">
                         <div className="grid gap-2">
                             <Label htmlFor="handover">
-                                Foto bukti serah terima dengan security
+                                Foto bukti serah terima dengan petugas keamanan
                                 <span
                                     className="ml-1 text-destructive"
                                     aria-hidden="true"
@@ -230,7 +247,7 @@ export default function VehicleLoanReturnPage() {
                                 value={handoverPhoto}
                                 onChange={setHandoverPhoto}
                                 buttonLabel="Ambil Foto Serah Terima"
-                                hint="Foto bersama petugas security saat mengembalikan kunci. JPG/PNG, maks. 5 MB."
+                                hint="Foto bersama petugas keamanan saat mengembalikan kunci. JPG/PNG, maks. 5 MB."
                                 capture
                             />
                         </div>
@@ -249,7 +266,7 @@ export default function VehicleLoanReturnPage() {
                                 value={conditionPhoto}
                                 onChange={setConditionPhoto}
                                 buttonLabel="Ambil Foto Kondisi"
-                                hint="Ambil dari beberapa sisi bila ada lecet atau kerusakan."
+                                hint="Ambil satu foto yang menunjukkan kondisi keseluruhan kendaraan."
                                 capture
                             />
                         </div>
@@ -315,10 +332,16 @@ export default function VehicleLoanReturnPage() {
                         >
                             Kirim Pengembalian
                         </Button>
+                        {(!pickupId || !handoverPhoto || !conditionPhoto) && (
+                            <p className="text-center text-xs text-muted-foreground">
+                                Pilih pengambilan dan unggah kedua foto untuk
+                                mengirim.
+                            </p>
+                        )}
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="hidden sm:block">
                     <CardContent className="pt-6">
                         <VehicleLoanQrPanel form="return" />
                     </CardContent>

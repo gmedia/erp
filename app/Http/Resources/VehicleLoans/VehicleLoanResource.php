@@ -28,6 +28,7 @@ class VehicleLoanResource extends SimpleCrudResource
             'vehicle_unit_id' => $this->resource->vehicle_unit_id,
             'plate_number' => $this->resource->vehicleUnit?->plate_number,
             'status' => $this->resource->status,
+            'is_overdue' => (bool) $this->resource->is_overdue,
             'submitted_at' => $this->resource->submitted_at?->toIso8601String(),
             'approved_at' => $this->resource->approved_at?->toIso8601String(),
             'rejection_reason' => $this->resource->rejection_reason,

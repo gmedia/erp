@@ -2,6 +2,7 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
     Select,
     SelectContent,
@@ -28,6 +29,7 @@ interface SecurityLoan {
     driver_name: string | null;
     start_at: string;
     end_at: string;
+    approval_requests?: Array<{ status: string }>;
     pickup?: { id: number; key_handover_at: string | null } | null;
 }
 
@@ -36,7 +38,7 @@ type QueueFilter = 'all' | 'ready' | 'handed';
 export default function VehicleLoanSecurityPage() {
     const queryClient = useQueryClient();
     const [search, setSearch] = useState('');
-    const [filter, setFilter] = useState<QueueFilter>('ready');
+    const [filter, setFilter] = useState<QueueFilter>('all');
 
     const { data, isLoading } = useQuery({
         queryKey: ['vehicle-loans', 'security-queue'],
@@ -80,9 +82,12 @@ export default function VehicleLoanSecurityPage() {
             void queryClient.invalidateQueries({
                 queryKey: ['vehicle-loans', 'security-queue'],
             });
+            void queryClient.invalidateQueries({
+                queryKey: ['vehicle-loans', 'dashboard'],
+            });
         } catch {
             toast.error(
-                'Gagal menyerahkan kunci. Pastikan approval sudah final.',
+                'Gagal menyerahkan kunci. Pastikan persetujuan sudah final.',
             );
         }
     }
@@ -90,47 +95,60 @@ export default function VehicleLoanSecurityPage() {
     return (
         <AppLayout
             breadcrumbs={[
-                { title: 'Antrean Security', href: '/vehicle-loans/security' },
+                { title: 'Antrean Keamanan', href: '/vehicle-loans/security' },
             ]}
         >
             <Helmet>
-                <title>Daftar Peminjaman — Security</title>
+                <title>Antrean Keamanan — Peminjaman Kendaraan</title>
             </Helmet>
             <div className="mx-auto max-w-7xl space-y-4 p-4 md:p-6">
                 <PageHeader
-                    title="Daftar Peminjaman Kendaraan"
-                    description="Verifikasi status approval sebelum menyerahkan kunci kendaraan."
+                    title="Antrean Keamanan"
+                    description="Verifikasi status persetujuan sebelum menyerahkan kunci kendaraan."
                 />
 
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                    <Input
-                        value={search}
-                        onChange={(event) => setSearch(event.target.value)}
-                        placeholder="Cari kode, peminjam, plat, atau driver"
-                        className="sm:max-w-sm"
-                    />
-                    <Select
-                        value={filter}
-                        onValueChange={(value) =>
-                            setFilter(value as QueueFilter)
-                        }
+                <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_220px_auto] sm:items-end">
+                    <div className="grid gap-1">
+                        <Label htmlFor="security-search" className="text-xs">
+                            Cari
+                        </Label>
+                        <Input
+                            id="security-search"
+                            value={search}
+                            onChange={(event) => setSearch(event.target.value)}
+                            placeholder="Kode, peminjam, plat, atau pengemudi"
+                        />
+                    </div>
+                    <div className="grid gap-1">
+                        <Label htmlFor="security-filter" className="text-xs">
+                            Status antrean
+                        </Label>
+                        <Select
+                            value={filter}
+                            onValueChange={(value) =>
+                                setFilter(value as QueueFilter)
+                            }
+                        >
+                            <SelectTrigger id="security-filter">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    Semua permintaan
+                                </SelectItem>
+                                <SelectItem value="ready">
+                                    Siap diserahkan
+                                </SelectItem>
+                                <SelectItem value="handed">
+                                    Sudah diserahkan
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <p
+                        className="text-sm text-muted-foreground"
+                        aria-live="polite"
                     >
-                        <SelectTrigger className="sm:w-52">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="ready">
-                                Siap diserahkan
-                            </SelectItem>
-                            <SelectItem value="handed">
-                                Sudah diserahkan
-                            </SelectItem>
-                            <SelectItem value="all">
-                                Semua permintaan
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <p className="text-sm text-muted-foreground sm:ml-auto">
                         {filtered.length} permintaan
                     </p>
                 </div>
@@ -138,18 +156,31 @@ export default function VehicleLoanSecurityPage() {
                 {isLoading ? (
                     <Card>
                         <CardContent className="py-10 text-center text-sm text-muted-foreground">
-                            Memuat antrean security...
+                            Memuat antrean keamanan...
                         </CardContent>
                     </Card>
                 ) : filtered.length === 0 ? (
                     <Card>
-                        <CardContent className="space-y-1 py-10 text-center">
-                            <p className="font-medium">
-                                Tidak ada permintaan pada filter ini
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                                Coba ubah filter atau kata pencarian.
-                            </p>
+                        <CardContent className="space-y-3 py-10 text-center">
+                            <div>
+                                <p className="font-medium">
+                                    Tidak ada permintaan pada filter ini
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                    Ubah filter atau kata pencarian untuk
+                                    melihat antrean lain.
+                                </p>
+                            </div>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                    setFilter('all');
+                                    setSearch('');
+                                }}
+                            >
+                                Tampilkan Semua
+                            </Button>
                         </CardContent>
                     </Card>
                 ) : (
@@ -159,6 +190,8 @@ export default function VehicleLoanSecurityPage() {
                                 loan.pickup?.key_handover_at,
                             );
                             const ready = Boolean(loan.pickup) && !handed;
+                            const approvalStatus =
+                                loan.approval_requests?.[0]?.status;
 
                             return (
                                 <Card key={loan.id} className="flex flex-col">
@@ -169,6 +202,7 @@ export default function VehicleLoanSecurityPage() {
                                                     {loan.code}
                                                 </p>
                                                 <p className="text-xs text-muted-foreground">
+                                                    Peminjam:{' '}
                                                     {loan.requester_name}
                                                 </p>
                                             </div>
@@ -178,11 +212,11 @@ export default function VehicleLoanSecurityPage() {
                                         </div>
                                         <dl className="grid grid-cols-2 gap-x-3 gap-y-1 text-sm">
                                             <dt className="text-muted-foreground">
-                                                Unit
+                                                Kendaraan
                                             </dt>
                                             <dd>{loan.plate_number ?? '-'}</dd>
                                             <dt className="text-muted-foreground">
-                                                Driver
+                                                Pengemudi
                                             </dt>
                                             <dd>{loan.driver_name ?? '-'}</dd>
                                             <dt className="text-muted-foreground">
@@ -201,38 +235,53 @@ export default function VehicleLoanSecurityPage() {
                                                     loan.end_at,
                                                 )}
                                             </dd>
+                                            <dt className="text-muted-foreground">
+                                                Persetujuan
+                                            </dt>
+                                            <dd>
+                                                {approvalStatus ? (
+                                                    <VehicleLoanStatusBadge
+                                                        status={approvalStatus}
+                                                    />
+                                                ) : (
+                                                    '-'
+                                                )}
+                                            </dd>
                                         </dl>
-                                        <div className="mt-auto flex flex-wrap items-center gap-2 border-t pt-3">
-                                            {handed ? (
-                                                <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700">
-                                                    Kunci sudah diserahkan
-                                                </span>
-                                            ) : ready ? (
-                                                <Button
-                                                    size="sm"
-                                                    onClick={() =>
-                                                        void handover(
-                                                            loan.pickup!.id,
-                                                        )
-                                                    }
-                                                >
-                                                    Serahkan Kunci
-                                                </Button>
-                                            ) : (
-                                                <span className="text-xs text-muted-foreground">
-                                                    Menunggu form pengambilan
-                                                    dari peminjam
-                                                </span>
-                                            )}
+                                        <div className="mt-auto flex items-center justify-between gap-2 border-t pt-3">
+                                            <div className="min-w-0">
+                                                {handed ? (
+                                                    <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-800">
+                                                        Kunci sudah diserahkan
+                                                    </span>
+                                                ) : ready ? (
+                                                    <Button
+                                                        size="sm"
+                                                        className="min-h-10"
+                                                        onClick={() =>
+                                                            void handover(
+                                                                loan.pickup!.id,
+                                                            )
+                                                        }
+                                                    >
+                                                        Serahkan Kunci
+                                                    </Button>
+                                                ) : (
+                                                    <span className="text-xs text-muted-foreground">
+                                                        Menunggu pengambilan
+                                                    </span>
+                                                )}
+                                            </div>
                                             <Button
                                                 size="sm"
                                                 variant="outline"
+                                                className="min-h-10"
                                                 asChild
                                             >
                                                 <Link
                                                     to={`/vehicle-loans/${loan.id}`}
                                                 >
-                                                    Lihat Detail
+                                                    Detail
                                                 </Link>
                                             </Button>
                                         </div>

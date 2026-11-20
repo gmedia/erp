@@ -45,13 +45,13 @@ export function VehicleLoanQrPanel({
                 )}
             </div>
             <div className="space-y-1">
-                <p className="text-sm font-medium">QR Loket Security</p>
+                <p className="text-sm font-medium">QR Pos Keamanan</p>
                 <p className="text-xs text-muted-foreground">
                     Cetak dan tempel QR ini di pos security. Peminjam scan,
                     login, lalu form terbuka otomatis.
                 </p>
                 <span className="inline-flex rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-                    Hanya untuk kiosk / cetak
+                    Hanya untuk kios / cetak
                 </span>
             </div>
         </div>

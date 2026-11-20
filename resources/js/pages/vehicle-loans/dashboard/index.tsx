@@ -27,6 +27,7 @@ interface DashboardLoan {
     requester_name: string | null;
     plate_number: string | null;
     start_at: string | null;
+    end_at: string | null;
 }
 
 export default function VehicleLoanDashboardPage() {
@@ -42,6 +43,13 @@ export default function VehicleLoanDashboardPage() {
     const count = (status: string) =>
         loans.filter((loan) => loan.status === status).length;
     const overdue = loans.filter((loan) => loan.is_overdue).length;
+    const active = loans.filter(
+        (loan) =>
+            loan.status === 'pickup_done' &&
+            !loan.is_overdue &&
+            loan.end_at !== null &&
+            new Date(loan.end_at) >= new Date(),
+    ).length;
 
     const statusCards = [
         {
@@ -51,13 +59,13 @@ export default function VehicleLoanDashboardPage() {
             tone: 'text-slate-600 bg-slate-100',
         },
         {
-            label: 'Draft',
+            label: 'Draf',
             value: count('draft'),
             icon: FileText,
             tone: 'text-slate-600 bg-slate-100',
         },
         {
-            label: 'Menunggu approval',
+            label: 'Menunggu Persetujuan',
             value: count('pending') + count('in_progress'),
             icon: Clock3,
             tone: 'text-amber-700 bg-amber-50',
@@ -75,7 +83,7 @@ export default function VehicleLoanDashboardPage() {
             tone: 'text-rose-700 bg-rose-50',
         },
         {
-            label: 'Kendaraan dipakai',
+            label: 'Kendaraan Dipakai',
             value: count('pickup_done'),
             icon: KeyRound,
             tone: 'text-sky-700 bg-sky-50',
@@ -115,16 +123,19 @@ export default function VehicleLoanDashboardPage() {
                 />
 
                 <section className="space-y-3">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                         <h2 className="text-sm font-semibold">
                             Status Permintaan
                         </h2>
                         <p className="text-xs text-muted-foreground">
                             Diperbarui{' '}
-                            {new Date(dataUpdatedAt).toLocaleTimeString(
-                                'id-ID',
-                                { hour: '2-digit', minute: '2-digit' },
-                            )}
+                            {new Date(dataUpdatedAt).toLocaleString('id-ID', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                            })}
                         </p>
                     </div>
                     <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -139,7 +150,7 @@ export default function VehicleLoanDashboardPage() {
                                             <Icon className="size-5" />
                                         </span>
                                         <div className="min-w-0">
-                                            <p className="truncate text-xs text-muted-foreground">
+                                            <p className="text-xs leading-tight text-muted-foreground">
                                                 {card.label}
                                             </p>
                                             <p className="text-2xl font-bold">
@@ -176,9 +187,7 @@ export default function VehicleLoanDashboardPage() {
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-3xl font-bold">
-                                {count('pickup_done')}
-                            </p>
+                            <p className="text-3xl font-bold">{active}</p>
                             <p className="text-xs text-muted-foreground">
                                 Kunci sudah diserahkan dan belum dikembalikan.
                             </p>
@@ -193,7 +202,7 @@ export default function VehicleLoanDashboardPage() {
                         </h2>
                         <Button variant="outline" size="sm" asChild>
                             <Link to="/vehicle-loans/security">
-                                Lihat Antrean Security
+                                Lihat Antrean
                             </Link>
                         </Button>
                     </div>
@@ -207,7 +216,7 @@ export default function VehicleLoanDashboardPage() {
                                 recentLoans.map((loan) => (
                                     <div
                                         key={loan.id}
-                                        className="flex items-center gap-3 py-3"
+                                        className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:gap-3"
                                     >
                                         <div className="min-w-0 flex-1">
                                             <Link
@@ -222,13 +231,14 @@ export default function VehicleLoanDashboardPage() {
                                                     'unit belum ditentukan'}
                                             </p>
                                         </div>
-                                        <p className="hidden text-xs text-muted-foreground sm:block">
+                                        <p className="text-xs text-muted-foreground sm:whitespace-nowrap">
                                             {formatDateTimeByRegionalSettings(
                                                 loan.start_at,
                                             )}
                                         </p>
                                         <VehicleLoanStatusBadge
                                             status={loan.status}
+                                            className="self-start sm:self-auto"
                                         />
                                     </div>
                                 ))
