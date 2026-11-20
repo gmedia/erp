@@ -180,7 +180,7 @@ Tool agent yang didukung: **OpenCode** dan **Claude CLI**. Keduanya membaca file
 | Apa | Lokasi | Dipakai oleh |
 |-----|--------|--------------|
 | Aturan | `AGENTS.md` (root + `app/`, `database/`, `routes/`, `tests/`, `resources/js/`, `.github/`) | OpenCode & Claude (native) |
-| Skills | `.claude/skills/<name>/SKILL.md` (+ `resources/`, `scripts/`) | Claude (native), OpenCode (path kompatibel Claude) |
+| Skills | `.claude/skills/<name>/SKILL.md` (+ `resources/`, `scripts/`) | Claude (native), OpenCode via `opencode.json` (`skills.paths`) |
 | Commands | `.claude/commands/<name>.md` → `/<name>` | Claude (native), OpenCode via `opencode.json` |
 | Subagent | `.claude/agents/<name>.md` | Claude (native), OpenCode via `opencode.json` |
 | Config OpenCode | `opencode.json` (gitignored) — generate: `bash scripts/sync-opencode.sh` | OpenCode |

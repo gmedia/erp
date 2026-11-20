@@ -1,124 +1,69 @@
 #!/usr/bin/env bash
-# sync-opencode.sh — Generate opencode.json from .github/ source
-# Run this after changing .github/copilot-instructions.md, prompts, or skills.
-# Output: opencode.json (gitignored)
+# sync-opencode.sh — Generate opencode.json from the shared agent config.
+#
+# Source of truth (shared by OpenCode and Claude CLI):
+#   AGENTS.md                 rules (OpenCode loads it natively)
+#   .claude/commands/*.md     slash commands
+#   .claude/agents/*.md       subagents
+#   .claude/skills/*/SKILL.md skills (registered via skills.paths)
+#
+# Run after adding/removing a command or agent. Output: opencode.json (gitignored).
+# MCP servers are intentionally not configured.
 
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
-echo "Generating opencode.json from .github/ source..."
+command -v jq >/dev/null 2>&1 || { echo "jq is required" >&2; exit 1; }
 
-# Collect instruction files
-INSTRUCTIONS_JSON=$(cat <<'EOF'
-[
-  "AGENTS.md",
-  ".github/copilot-instructions.md",
-  "docs/development-patterns.md",
-  "docs/module-registry.md"
-]
-EOF
-)
+echo "Generating opencode.json from AGENTS.md + .claude/ ..."
 
-# Build commands from prompts
-COMMANDS_JSON="{"
-first_cmd=true
-for source in .github/prompts/*.prompt.md; do
-  cmd_name="$(basename "$source" .prompt.md)"
-  # Extract description from frontmatter, strip surrounding quotes
-  desc=$(sed -n 's/^description:[[:space:]]*//p' "$source" | head -1 | sed 's/^"//;s/"$//')
-  [ -z "$desc" ] && desc="$cmd_name workflow"
-  # Escape any remaining double quotes in description
-  desc=$(echo "$desc" | sed 's/"/\\"/g')
-
-  if [ "$first_cmd" = true ]; then
-    first_cmd=false
-  else
-    COMMANDS_JSON+=","
-  fi
-
-  COMMANDS_JSON+=$(cat <<EOF
-
-    "$cmd_name": {
-      "template": "{file:./.github/prompts/${cmd_name}.prompt.md}",
-      "description": "$desc"
-    }
-EOF
-  )
-done
-COMMANDS_JSON+="
-  }"
-
-# Write opencode.json
-cat > opencode.json <<EOF
-{
-  "\$schema": "https://opencode.ai/config.json",
-  "instructions": $INSTRUCTIONS_JSON,
-  "agent": {
-    "code": {
-      "mode": "primary",
-      "prompt": "You are an expert AI coding assistant for this ERP repository. Follow .github/copilot-instructions.md as the primary rule source. Keep architecture as Laravel API + React SPA (no Inertia). Use ./vendor/bin/sail for all runtime commands. Use MCP tools when available.",
-      "tools": {
-        "write": true,
-        "edit": true,
-        "bash": true
-      }
-    },
-    "plan": {
-      "mode": "primary",
-      "prompt": "You are a planning agent for this ERP repository. Analyze requirements, propose architecture, and create implementation plans. Do NOT edit files directly.",
-      "tools": {
-        "write": false,
-        "edit": false,
-        "bash": false
-      }
-    },
-    "safe-refactor": {
-      "description": "Refactor aman dengan blast radius analysis via Depwire MCP",
-      "mode": "subagent",
-      "prompt": "{file:./.github/agents/refactor-safe.agent.md}",
-      "tools": {
-        "write": true,
-        "edit": true,
-        "bash": true
-      }
-    },
-    "context7-research": {
-      "description": "Lookup docs package/framework/SDK/API/CLI terbaru via Context7 MCP",
-      "mode": "subagent",
-      "prompt": "{file:./.github/agents/context7-research.agent.md}",
-      "tools": {
-        "write": false,
-        "edit": false,
-        "bash": false
-      }
-    }
-  },
-  "command": $COMMANDS_JSON,
-  "mcp": {
-    "context7": {
-      "type": "local",
-      "command": ["npx", "-y", "@upstash/context7-mcp@latest"],
-      "environment": {
-        "DEFAULT_MINIMUM_TOKENS": "10000"
-      }
-    },
-    "laravel-boost": {
-      "type": "local",
-      "command": ["./vendor/bin/sail", "php", "/var/www/html/artisan", "boost:mcp"],
-      "timeout": 15000
-    },
-    "depwire": {
-      "type": "local",
-      "command": ["npx", "-y", "depwire-cli", "mcp"]
-    }
-  }
+# Description from YAML frontmatter (first `description:` line, quotes stripped).
+frontmatter_description() {
+  sed -n '1,/^---$/{/^description:/{s/^description:[[:space:]]*//;s/^"//;s/"$//;p;q}}' "$1"
 }
-EOF
 
-echo "✅ opencode.json generated successfully"
-echo "   Instructions: $(echo "$INSTRUCTIONS_JSON" | grep -c '"' || true) references"
-echo "   Commands: $(echo "$COMMANDS_JSON" | grep -c 'template' || true) prompts"
-echo "   MCP servers: context7, laravel-boost, depwire"
-echo "   Agents: code (primary), plan (primary), safe-refactor (sub), context7-research (sub)"
+commands='{}'
+for source in .claude/commands/*.md; do
+  name="$(basename "$source" .md)"
+  desc="$(frontmatter_description "$source")"
+  [ -z "$desc" ] && desc="$name workflow"
+  commands="$(jq --arg n "$name" --arg d "$desc" --arg t "{file:./$source}" \
+    '. + {($n): {template: $t, description: $d}}' <<<"$commands")"
+done
+
+agents="$(jq -n '{
+  code: {
+    mode: "primary",
+    prompt: "You are an expert AI coding assistant for this ERP repository. Follow AGENTS.md as the primary rule source. Keep architecture as Laravel API + React SPA (no Inertia). Use ./vendor/bin/sail for all runtime commands. MCP servers are not used; use the CLI tooling listed in AGENTS.md.",
+    tools: {write: true, edit: true, bash: true}
+  },
+  plan: {
+    mode: "primary",
+    prompt: "You are a planning agent for this ERP repository. Follow AGENTS.md. Analyze requirements, propose architecture, and create implementation plans. Do NOT edit files directly.",
+    tools: {write: false, edit: false, bash: false}
+  }
+}')"
+for source in .claude/agents/*.md; do
+  name="$(basename "$source" .md)"
+  desc="$(frontmatter_description "$source")"
+  agents="$(jq --arg n "$name" --arg d "$desc" --arg p "{file:./$source}" \
+    '. + {($n): {description: $d, mode: "subagent", prompt: $p, tools: {write: true, edit: true, bash: true}}}' <<<"$agents")"
+done
+
+jq -n \
+  --argjson commands "$commands" \
+  --argjson agents "$agents" \
+  '{
+    "$schema": "https://opencode.ai/config.json",
+    instructions: ["docs/development-patterns.md", "docs/module-registry.md"],
+    skills: {paths: [".claude/skills"]},
+    agent: $agents,
+    command: $commands
+  }' > opencode.json
+
+echo "✅ opencode.json generated"
+echo "   Commands: $(jq '.command | length' opencode.json)"
+echo "   Agents:   $(jq -r '.agent | keys | join(", ")' opencode.json)"
+echo "   Skills:   $(find .claude/skills -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l) (from .claude/skills)"

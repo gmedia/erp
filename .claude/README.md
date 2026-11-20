@@ -18,7 +18,7 @@ Folder ini adalah sumber kebenaran untuk skill, command, dan subagent. Aturan ut
 ```
 
 - **Claude CLI** membaca `.claude/` secara native.
-- **OpenCode** membaca skill dari `.claude/skills/` (path kompatibel Claude); command dan agent didaftarkan ke `opencode.json` oleh `bash scripts/sync-opencode.sh`. Jalankan ulang script itu setelah menambah/menghapus command atau agent.
+- **OpenCode** mendapat skill (`skills.paths`), command, dan agent dari `opencode.json` yang dibuat oleh `bash scripts/sync-opencode.sh`. Jalankan ulang script itu setelah menambah/menghapus command atau agent.
 - Frontmatter skill: `name` = nama folder (kebab-case), `description` = kapan dipakai.
 
 ## Skills
