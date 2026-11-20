@@ -35,6 +35,9 @@ class FcmPushSender implements PushSender
                     ],
                     'android' => [
                         'priority' => 'high',
+                        'notification' => [
+                            'channel_id' => 'default',
+                        ],
                     ],
                 ],
             ]);

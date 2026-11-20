@@ -43,7 +43,8 @@ test('fcm sender posts to the v1 endpoint with the access token', function () {
             && $request->hasHeader('Authorization', 'Bearer test-token')
             && $request['message']['token'] === 'fcm-token'
             && $request['message']['data']['event_key'] === 'approval.request.created'
-            && $request['message']['data']['target_url'] === '/approvals/1';
+            && $request['message']['data']['target_url'] === '/approvals/1'
+            && $request['message']['android']['notification']['channel_id'] === 'default';
     });
 });
 
