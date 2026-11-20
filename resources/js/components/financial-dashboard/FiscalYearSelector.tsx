@@ -29,12 +29,9 @@ export const FiscalYearSelector = memo<FiscalYearSelectorProps>(
             ?.id.toString();
 
         return (
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <div className="flex flex-col gap-1.5">
-                    <label
-                        htmlFor="fiscal-year-select"
-                        className="text-sm font-medium text-muted-foreground"
-                    >
+            <div className="flex flex-wrap items-center gap-2">
+                <div>
+                    <label htmlFor="fiscal-year-select" className="sr-only">
                         Fiscal Year
                     </label>
                     <Select
@@ -62,11 +59,8 @@ export const FiscalYearSelector = memo<FiscalYearSelectorProps>(
                     </Select>
                 </div>
 
-                <div className="flex flex-col gap-1.5">
-                    <label
-                        htmlFor="comparison-year-select"
-                        className="text-sm font-medium text-muted-foreground"
-                    >
+                <div>
+                    <label htmlFor="comparison-year-select" className="sr-only">
                         Compare With
                     </label>
                     <Select
@@ -81,6 +75,7 @@ export const FiscalYearSelector = memo<FiscalYearSelectorProps>(
                             id="comparison-year-select"
                             className="w-[200px]"
                         >
+                            <span className="text-muted-foreground">vs</span>
                             <SelectValue placeholder="None" />
                         </SelectTrigger>
                         <SelectContent>
