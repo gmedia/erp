@@ -129,6 +129,9 @@ Agent wajib melakukan langkah ini **sebelum/menyertakan** `bash project_setup.sh
 1. `git config core.hooksPath .githooks` — pasang pre-push guard. `project_setup.sh` juga melakukan ini secara non-fatal, tapi agent tetap harus memverifikasi hasilnya: `git config --get core.hooksPath` harus mengembalikan `.githooks`.
 2. `gh auth status` — pastikan akun tim (mis. `oppytut`), bukan akun sesaat.
 3. `git config user.name` / `git config user.email` — harus terisi; kalau kosong, set dari identitas commit terakhir repo (`git log -1 --format='%an <%ae>'`).
+3b. **`.env` hanya lewat `bash scripts/setup-env.sh`.** Agent **dilarang** membaca, meng-`cat`/`grep`, atau mengedit `.env` langsung (diblokir `deny` di `.claude/settings.json`). Script membuat `.env` dari `.env.example` tanpa menimpa yang sudah ada, memaksa `HOST_IP=127.0.0.1`, memindah port forward yang bentrok (mis. Valkey 6379 → 6380), `chmod 600`, dan hanya mencetak key non-rahasia. `APP_KEY` diisi via `./vendor/bin/sail artisan key:generate`. Butuh nilai lain di `.env`? Minta user mengubahnya sendiri.
+3c. **Host ber-IP publik:** `HOST_IP` wajib `127.0.0.1` — port yang dipublish Docker **melewati UFW**, jadi `HOST_IP` kosong = MariaDB/Valkey/MinIO/app terbuka ke internet. Setelah `sail up`, verifikasi: `docker ps --format '{{.Ports}}'` hanya berisi `127.0.0.1:`.
+3d. `project_setup.sh` menjalankan `sail down -v` + `migrate:fresh --seed` (menghapus volume/data) dan `sail npm run dev` di foreground — di host yang sudah punya data, jalankan langkahnya satu per satu dan Vite di background.
 4. Buka `http://localhost:82` via SSH tunnel dari laptop; jangan pernah bind ke `0.0.0.0` di host ber-IP-publik.
 
 Guard menolak push dari branch tanpa pola `<type>/issue-N-slug`, issue belum `status:claimed`, atau bukan di-assign ke akun `gh`. Ini pelengkap koordinasi di https://github.com/gmedia/erp/issues.
