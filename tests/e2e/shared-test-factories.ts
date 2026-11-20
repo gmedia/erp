@@ -5,10 +5,10 @@
  * All modules MUST comply with the ModuleTestConfig interface.
  */
 
-import { test, expect, Page, Locator } from '@playwright/test';
-import { login } from './helpers';
-import * as fs from 'node:fs';
+import { expect, Locator, Page, test } from '@playwright/test';
 import ExcelJS from 'exceljs';
+import * as fs from 'node:fs';
+import { login } from './helpers';
 
 // ==================== INTERFACES ====================
 
@@ -21,37 +21,41 @@ export interface FilterTestConfig {
 
 export interface ModuleTestConfig {
     // Identitas modul
-    entityName: string;           // PascalCase singular: 'Department'
-    entityNamePlural: string;     // PascalCase plural: 'Departments'
-    route: string;                // Frontend route: '/departments'
-    apiPath: string;              // API base path: '/api/departments'
+    entityName: string; // PascalCase singular: 'Department'
+    entityNamePlural: string; // PascalCase plural: 'Departments'
+    route: string; // Frontend route: '/departments'
+    apiPath: string; // API base path: '/api/departments'
 
     // Callbacks (WAJIB)
-    createEntity: (page: Page) => Promise<string>;  // Return identifier (name/code/email)
+    createEntity: (page: Page) => Promise<string>; // Return identifier (name/code/email)
     searchEntity: (page: Page, identifier: string) => Promise<void>;
 
     // Callbacks (OPSIONAL)
-    editEntity?: (page: Page, identifier: string, updates: Record<string, string>) => Promise<void>;
+    editEntity?: (
+        page: Page,
+        identifier: string,
+        updates: Record<string, string>,
+    ) => Promise<void>;
     editUpdates?: Record<string, string>;
 
     // DataTable config
-    sortableColumns: string[];    // Label text kolom sortable PERSIS seperti di UI
+    sortableColumns: string[]; // Label text kolom sortable PERSIS seperti di UI
     skipCreateBeforeSort?: boolean;
 
     // View config
     viewType: 'dialog' | 'page';
-    viewDialogTitle?: string;     // Required jika viewType = 'dialog'
-    viewUrlPattern?: RegExp;      // Required jika viewType = 'page'
+    viewDialogTitle?: string; // Required jika viewType = 'dialog'
+    viewUrlPattern?: RegExp; // Required jika viewType = 'page'
 
     // Export config
-    exportApiPath: string;        // '/api/departments/export'
+    exportApiPath: string; // '/api/departments/export'
     expectedExportColumns: string[];
 
     // Filter config (opsional)
     filterTests?: FilterTestConfig[];
 
     // Overrides (opsional — untuk modul dengan pattern non-standar)
-    actionsPattern?: 'dropdown' | 'icon-buttons';  // default: 'dropdown'
+    actionsPattern?: 'dropdown' | 'icon-buttons'; // default: 'dropdown'
     customBeforeEach?: (page: Page) => Promise<void>;
 
     // Custom action callbacks (WAJIB jika actionsPattern = 'icon-buttons')
@@ -63,12 +67,19 @@ export interface ModuleTestConfig {
 // ==================== HELPER FUNCTIONS ====================
 
 async function waitForApiResponse(page: Page, apiPath: string): Promise<void> {
-    await page.waitForResponse(r => r.url().includes(apiPath) && r.status() < 400, {
-        timeout: 30000,
-    });
+    await page.waitForResponse(
+        (r) => r.url().includes(apiPath) && r.status() < 400,
+        {
+            timeout: 30000,
+        },
+    );
 }
 
-async function navigateToModule(page: Page, route: string, apiPath: string): Promise<void> {
+async function navigateToModule(
+    page: Page,
+    route: string,
+    apiPath: string,
+): Promise<void> {
     const responsePromise = waitForApiResponse(page, apiPath);
     await page.goto(route);
     await responsePromise;
@@ -78,7 +89,10 @@ function findTableRow(page: Page, identifier: string): Locator {
     return page.locator('tbody tr').filter({ hasText: identifier }).first();
 }
 
-async function openActionsMenu(target: Locator, config: ModuleTestConfig): Promise<void> {
+async function openActionsMenu(
+    target: Locator,
+    config: ModuleTestConfig,
+): Promise<void> {
     if (config.actionsPattern === 'icon-buttons') {
         return;
     }
@@ -93,7 +107,9 @@ export function generateModuleTests(config: ModuleTestConfig) {
         let createdIdentifier: string;
 
         test.beforeEach(async ({ page }) => {
-            await login(page, undefined, undefined, { requireDashboard: false });
+            await login(page, undefined, undefined, {
+                requireDashboard: false,
+            });
             await navigateToModule(page, config.route, config.apiPath);
             if (config.customBeforeEach) {
                 await config.customBeforeEach(page);
@@ -147,7 +163,10 @@ export function generateModuleTests(config: ModuleTestConfig) {
             const row = findTableRow(page, identifier);
             await expect(row).toBeVisible();
 
-            if (config.actionsPattern === 'icon-buttons' && config.customViewAction) {
+            if (
+                config.actionsPattern === 'icon-buttons' &&
+                config.customViewAction
+            ) {
                 await config.customViewAction(page);
             } else {
                 await openActionsMenu(row, config);
@@ -162,7 +181,9 @@ export function generateModuleTests(config: ModuleTestConfig) {
                 if (config.viewUrlPattern) {
                     await expect(page).toHaveURL(config.viewUrlPattern);
                 }
-                await expect(page.getByText(identifier, { exact: true }).first()).toBeVisible();
+                await expect(
+                    page.getByText(identifier, { exact: true }).first(),
+                ).toBeVisible();
             }
         });
 
@@ -173,7 +194,10 @@ export function generateModuleTests(config: ModuleTestConfig) {
             const row = findTableRow(page, identifier);
             await expect(row).toBeVisible();
 
-            if (config.actionsPattern === 'icon-buttons' && config.customDeleteAction) {
+            if (
+                config.actionsPattern === 'icon-buttons' &&
+                config.customDeleteAction
+            ) {
                 await config.customDeleteAction(page);
             } else {
                 await openActionsMenu(row, config);
@@ -181,7 +205,9 @@ export function generateModuleTests(config: ModuleTestConfig) {
             }
 
             // Confirm delete dialog
-            const confirmButton = page.getByRole('button', { name: /continue|confirm|delete|yes|hapus/i });
+            const confirmButton = page.getByRole('button', {
+                name: /continue|confirm|delete|yes|hapus/i,
+            });
             const responsePromise = waitForApiResponse(page, config.apiPath);
             await confirmButton.first().click();
             await responsePromise;
@@ -224,26 +250,34 @@ export function generateModuleTests(config: ModuleTestConfig) {
         });
 
         // ==================== 7. CHECKBOX ====================
-        test(`${config.entityNamePlural} datatable has correct checkbox behavior`, async ({ page }) => {
+        test(`${config.entityNamePlural} datatable has correct checkbox behavior`, async ({
+            page,
+        }) => {
             // Create entity to ensure table has rows
             const identifier = await config.createEntity(page);
             await navigateToModule(page, config.route, config.apiPath);
             await config.searchEntity(page, identifier);
 
             // Header: current table implementation exposes the select-all checkbox
-            const headerCheckboxes = page.locator('thead [data-testid="select-all"]');
+            const headerCheckboxes = page.locator(
+                'thead [data-testid="select-all"]',
+            );
             await expect(headerCheckboxes).toHaveCount(1);
             await expect(headerCheckboxes.first()).toBeVisible();
 
             // Body: HARUS ada checkbox on the created row, not just the first rendered row.
             const row = findTableRow(page, identifier);
             await expect(row).toBeVisible();
-            const bodyCheckbox = row.locator('[data-testid="select-row"]').first();
+            const bodyCheckbox = row
+                .locator('[data-testid="select-row"]')
+                .first();
             await expect(bodyCheckbox).toBeVisible();
         });
 
         // ==================== 8. SORTING ====================
-        test(`can sort ${config.entityNamePlural} by all columns`, async ({ page }) => {
+        test(`can sort ${config.entityNamePlural} by all columns`, async ({
+            page,
+        }) => {
             test.setTimeout(120000); // 2 minutes for sorting all columns
             // Create entity to ensure table has data
             if (!config.skipCreateBeforeSort) {
@@ -252,16 +286,24 @@ export function generateModuleTests(config: ModuleTestConfig) {
             await navigateToModule(page, config.route, config.apiPath);
 
             for (const column of config.sortableColumns) {
-                const sortButton = page.locator('thead').getByRole('button', { name: column, exact: true });
+                const sortButton = page
+                    .locator('thead')
+                    .getByRole('button', { name: column, exact: true });
                 await expect(sortButton).toBeVisible();
 
                 // Sort ASC
-                const ascResponsePromise = waitForApiResponse(page, config.apiPath);
+                const ascResponsePromise = waitForApiResponse(
+                    page,
+                    config.apiPath,
+                );
                 await sortButton.click();
                 await ascResponsePromise;
 
                 // Sort DESC
-                const descResponsePromise = waitForApiResponse(page, config.apiPath);
+                const descResponsePromise = waitForApiResponse(
+                    page,
+                    config.apiPath,
+                );
                 await sortButton.click();
                 await descResponsePromise;
             }
@@ -271,7 +313,9 @@ export function generateModuleTests(config: ModuleTestConfig) {
         test(`can filter ${config.entityNamePlural}`, async ({ page }) => {
             if (!config.filterTests || config.filterTests.length === 0) {
                 // Minimal: verify filter button exists
-                const filterButton = page.getByRole('button', { name: /filter/i });
+                const filterButton = page.getByRole('button', {
+                    name: /filter/i,
+                });
                 if (await filterButton.isVisible()) {
                     await filterButton.click();
                     const dialog = page.getByRole('dialog');
@@ -284,40 +328,61 @@ export function generateModuleTests(config: ModuleTestConfig) {
             const filterButton = page.getByRole('button', { name: /filter/i });
             await filterButton.click();
 
+            const filterDialog = page.getByRole('dialog');
+            await expect(filterDialog).toBeVisible();
+
             for (const filterTest of config.filterTests) {
-                const container = page
+                const container = filterDialog
                     .locator('label', { hasText: filterTest.filterName })
                     .locator('..');
 
                 if (filterTest.filterType === 'text') {
-                    await container.locator('input').first().fill(filterTest.filterValue);
+                    await container
+                        .locator('input')
+                        .first()
+                        .fill(filterTest.filterValue);
                     continue;
                 }
 
                 if (filterTest.filterType === 'date') {
-                    await container.locator('input').first().fill(filterTest.filterValue);
+                    await container
+                        .locator('input')
+                        .first()
+                        .fill(filterTest.filterValue);
                     continue;
                 }
 
-                if (filterTest.filterType === 'combobox' || filterTest.filterType === 'select') {
+                if (
+                    filterTest.filterType === 'combobox' ||
+                    filterTest.filterType === 'select'
+                ) {
                     const combobox = container.getByRole('combobox').first();
                     await combobox.click();
                     const option = page
-                        .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
-                        .filter({ hasText: new RegExp(filterTest.filterValue, 'i') })
+                        .locator(
+                            '[role="option"]:visible, ul[aria-busy]:visible button:visible',
+                        )
+                        .filter({
+                            hasText: new RegExp(filterTest.filterValue, 'i'),
+                        })
                         .first();
                     await expect(option).toBeVisible();
                     await option.click({ force: true });
+                    await expect(combobox).toContainText(
+                        new RegExp(filterTest.filterValue, 'i'),
+                    );
                 }
             }
 
             // Apply filter
-            const applyButton = page.getByRole('button', { name: /apply|terapkan/i });
-            if (await applyButton.isVisible()) {
-                const responsePromise = waitForApiResponse(page, config.apiPath);
-                await applyButton.click();
-                await responsePromise;
-            }
+            const applyButton = filterDialog.getByRole('button', {
+                name: /apply|terapkan/i,
+            });
+            await expect(applyButton).toBeVisible();
+
+            const responsePromise = waitForApiResponse(page, config.apiPath);
+            await applyButton.click();
+            await responsePromise;
         });
     });
 }
