@@ -6,7 +6,7 @@ use App\Models\AssetCategory;
 use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('book-value-depreciation-reports');
 
 test('book value depreciation export collects all rows via action export flow', function () {
     $category = AssetCategory::factory()->create();

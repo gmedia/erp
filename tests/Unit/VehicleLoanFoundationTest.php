@@ -3,6 +3,8 @@
 use App\Domain\Branch\BranchResolverRegistry;
 use App\Models\VehicleLoan;
 
+uses()->group('vehicle-loans');
+
 describe('vehicle loan foundation', function () {
     it('registers vehicle loans as a direct branch-bearing type', function () {
         $registry = app(BranchResolverRegistry::class);
