@@ -10,12 +10,34 @@ composer install
 # Installing npm packages
 npm install
 
-# Starting Laravel Sail
-./vendor/bin/sail down -v
-./vendor/bin/sail up -d --build
+# .env (aman untuk host ber-IP publik: HOST_IP=127.0.0.1, port bentrok dipindah).
+# Tidak menimpa .env yang sudah ada.
+if [ -f scripts/setup-env.sh ]; then
+    bash scripts/setup-env.sh
+fi
 
-# Waiting for the database to be ready
-sleep 60
+# Image app: pakai image CI yang sudah dipublish (Dockerfile sama: docker/8.4)
+# agar tidak build lokal >25 menit. Build lokal hanya bila SAIL_BUILD=1 atau pull gagal.
+SAIL_IMAGE="sail-8.4/app"
+CI_IMAGE="ghcr.io/gmedia/erp/ci-sail:8.4"
+UP_ARGS=(-d --wait)
+if [ "${SAIL_BUILD:-0}" = "1" ]; then
+    UP_ARGS+=(--build)
+elif docker pull "$CI_IMAGE"; then
+    docker tag "$CI_IMAGE" "$SAIL_IMAGE"
+else
+    echo "Pull $CI_IMAGE gagal — build image lokal."
+    UP_ARGS+=(--build)
+fi
+
+# Starting Laravel Sail (down -v menghapus volume/data lama — lihat AGENTS.md 3d)
+./vendor/bin/sail down -v
+./vendor/bin/sail up "${UP_ARGS[@]}"
+
+# APP_KEY kosong di .env.example → generate sekali
+if ! grep -qE '^APP_KEY=.+' .env; then
+    ./vendor/bin/sail artisan key:generate
+fi
 
 # Running migrations
 ./vendor/bin/sail artisan migrate:fresh --seed

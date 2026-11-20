@@ -133,6 +133,7 @@ Agent wajib melakukan langkah ini **sebelum/menyertakan** `bash project_setup.sh
 3c. **Host ber-IP publik:** `HOST_IP` wajib `127.0.0.1` — port yang dipublish Docker **melewati UFW**, jadi `HOST_IP` kosong = MariaDB/Valkey/MinIO/app terbuka ke internet. Setelah `sail up`, verifikasi: `docker ps --format '{{.Ports}}'` hanya berisi `127.0.0.1:`.
 3d. `project_setup.sh` menjalankan `sail down -v` + `migrate:fresh --seed` (menghapus volume/data) dan `sail npm run dev` di foreground — di host yang sudah punya data, jalankan langkahnya satu per satu dan Vite di background.
 4. Buka `http://localhost:82` via SSH tunnel dari laptop; jangan pernah bind ke `0.0.0.0` di host ber-IP-publik.
+5. **Image app tidak perlu di-build lokal.** `project_setup.sh` mem-pull `ghcr.io/gmedia/erp/ci-sail:8.4` (public, Dockerfile sama `docker/8.4`, dibangun CI) lalu men-tag-nya `sail-8.4/app`; UID container menyesuaikan saat runtime (`start-container` → `usermod`). Build lokal (>25 menit) hanya bila `SAIL_BUILD=1` atau pull gagal. Script juga menjalankan `sail up -d --wait` (bukan `sleep`) dan `key:generate` bila `APP_KEY` kosong.
 
 Guard menolak push dari branch tanpa pola `<type>/issue-N-slug`, issue belum `status:claimed`, atau bukan di-assign ke akun `gh`. Ini pelengkap koordinasi di https://github.com/gmedia/erp/issues.
 
