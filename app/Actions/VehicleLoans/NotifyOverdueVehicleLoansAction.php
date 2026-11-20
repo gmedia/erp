@@ -10,7 +10,10 @@ use Illuminate\Support\Collection;
 
 class NotifyOverdueVehicleLoansAction
 {
-    public function __construct(private readonly NotificationService $notifications) {}
+    public function __construct(private readonly NotificationService $notifications)
+    {
+        // Intentionally empty. Dependencies are assigned via promoted properties.
+    }
 
     /**
      * @return array<string, int>

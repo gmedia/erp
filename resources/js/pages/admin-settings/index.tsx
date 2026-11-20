@@ -78,7 +78,7 @@ const CURRENCY_OPTIONS = [
 ] as const;
 
 async function submitJsonAdminSettings(
-    e: React.FormEvent<HTMLFormElement>,
+    e: React.SubmitEvent<HTMLFormElement>,
     setProcessing: (value: boolean) => void,
     setErrors: (value: Record<string, string>) => void,
     setRecentlySuccessful: (value: boolean) => void,
@@ -117,7 +117,7 @@ function GeneralSettings({
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         setProcessing(true);
         setErrors({});
@@ -308,7 +308,7 @@ function RegionalSettings({
         setHideDecimal(Boolean(settings?.number_format_hide_decimal));
     }, [settings?.number_format_hide_decimal]);
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         setProcessing(true);
         setErrors({});
@@ -514,7 +514,7 @@ function SmtpSettings({
     const [testRecentlySuccessful, setTestRecentlySuccessful] = useState(false);
     const [testErrors, setTestErrors] = useState<Record<string, string>>({});
 
-    const handleTestSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleTestSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         setTestProcessing(true);
         setTestErrors({});
@@ -794,7 +794,7 @@ function AuthenticationSettings({
         settings?.social_login_jit_provisioning ?? false,
     );
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         setProcessing(true);
         setErrors({});
