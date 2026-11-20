@@ -145,6 +145,6 @@ class VehicleLoan extends Model
 
     public function activityLogs(): HasMany
     {
-        return $this->hasMany(VehicleLoanActivityLog::class);
+        return $this->hasMany(VehicleLoanActivityLog::class)->orderBy('created_at')->orderBy('id');
     }
 }

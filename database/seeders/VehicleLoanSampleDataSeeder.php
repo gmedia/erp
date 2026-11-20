@@ -66,20 +66,20 @@ class VehicleLoanSampleDataSeeder extends Seeder
         $departmentId = Department::query()->orderBy('id')->value('id');
 
         $scenarios = [
-            ['code' => 'VL-2026-0001', 'status' => 'draft', 'purpose' => 'Perjalanan dinas ke Kantor Cabang Bandung'],
-            ['code' => 'VL-2026-0002', 'status' => 'pending', 'purpose' => 'Antar dokumen kontrak ke kantor notaris'],
-            ['code' => 'VL-2026-0003', 'status' => 'in_progress', 'purpose' => 'Kunjungan koordinasi proyek di Gedung Menara Kuningan'],
-            ['code' => 'VL-2026-0004', 'status' => 'approved', 'purpose' => 'Penjemputan tamu dari Bandara Soekarno-Hatta'],
-            ['code' => 'VL-2026-0005', 'status' => 'rejected', 'purpose' => 'Survey lokasi gudang di Cikarang'],
-            ['code' => 'VL-2026-0006', 'status' => 'pickup_done', 'purpose' => 'Pengiriman sparepart ke vendor di Tangerang', 'ready' => true],
-            ['code' => 'VL-2026-0007', 'status' => 'returned', 'purpose' => 'Rapat koordinasi bulanan di kantor pusat'],
-            ['code' => 'VL-2026-0008', 'status' => 'cancelled', 'purpose' => 'Kunjungan supplier ke pabrik Karawang'],
-            ['code' => 'VL-2026-0009', 'status' => 'pickup_done', 'purpose' => 'Perjalanan dinas ke Surabaya', 'overdue' => true],
+            ['code' => 'VL-2026-0001', 'status' => 'draft', 'unit' => 0, 'purpose' => 'Perjalanan dinas ke Kantor Cabang Bandung'],
+            ['code' => 'VL-2026-0002', 'status' => 'pending', 'unit' => 1, 'purpose' => 'Antar dokumen kontrak ke kantor notaris'],
+            ['code' => 'VL-2026-0003', 'status' => 'in_progress', 'unit' => 2, 'purpose' => 'Kunjungan koordinasi proyek di Gedung Menara Kuningan'],
+            ['code' => 'VL-2026-0004', 'status' => 'approved', 'unit' => 0, 'purpose' => 'Penjemputan tamu dari Bandara Soekarno-Hatta'],
+            ['code' => 'VL-2026-0005', 'status' => 'rejected', 'unit' => 1, 'purpose' => 'Survey lokasi gudang di Cikarang'],
+            ['code' => 'VL-2026-0006', 'status' => 'pickup_done', 'unit' => 0, 'purpose' => 'Pengiriman sparepart ke vendor di Tangerang', 'ready' => true],
+            ['code' => 'VL-2026-0007', 'status' => 'returned', 'unit' => 1, 'purpose' => 'Rapat koordinasi bulanan di kantor pusat'],
+            ['code' => 'VL-2026-0008', 'status' => 'cancelled', 'unit' => 2, 'purpose' => 'Kunjungan supplier ke pabrik Karawang'],
+            ['code' => 'VL-2026-0009', 'status' => 'pickup_done', 'unit' => 2, 'purpose' => 'Perjalanan dinas ke Surabaya', 'overdue' => true],
         ];
 
         foreach ($scenarios as $index => $scenario) {
             $driver = $drivers[$index % count($drivers)];
-            $unit = $units[$index % count($units)];
+            $unit = $units[(int) ($scenario['unit'] ?? $index % count($units)) % count($units)];
 
             $loan = $this->seedLoan($scenario, $index, $requesters, $driver, $unit, [
                 'branch_id' => $branchId,
@@ -110,8 +110,8 @@ class VehicleLoanSampleDataSeeder extends Seeder
             $start = now()->subDays(6)->setTime(8, 0);
             $end = now()->subDays(5)->setTime(17, 0);
         } elseif ($status === 'pickup_done') {
-            $start = now()->subHours(2);
-            $end = now()->addHours(5);
+            $start = now()->subDay()->setTime(8, 0);
+            $end = now()->setTime(17, 0);
         } else {
             $start = now()->addDays($index + 1)->setTime(8, 0);
             $end = (clone $start)->setTime(17, 0);

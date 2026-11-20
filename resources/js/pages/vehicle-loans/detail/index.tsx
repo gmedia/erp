@@ -200,7 +200,7 @@ export default function VehicleLoanDetailPage() {
                                                 )}
                                             />
                                             <Field
-                                                label="Selesai"
+                                                label="Batas Pengembalian"
                                                 value={formatDateTimeByRegionalSettings(
                                                     data.end_at,
                                                 )}
@@ -234,12 +234,6 @@ export default function VehicleLoanDetailPage() {
                                             <Field
                                                 label="Kendaraan"
                                                 value={data.plate_number}
-                                            />
-                                            <Field
-                                                label="Disetujui"
-                                                value={formatDateTimeByRegionalSettings(
-                                                    data.approved_at,
-                                                )}
                                             />
                                             <Field
                                                 label="Kunci diserahkan"

@@ -17,16 +17,20 @@ export async function submitVehicleLoanRequest(
 ): Promise<void> {
     await page.goto(VEHICLE_LOAN_REQUEST_PATH);
 
-    const start = page.locator('#start_at');
-    const end = page.locator('#end_at');
-    await expect(start).toBeVisible();
-    await expect(end).toBeVisible();
+    const startDate = page.locator('#start_at_date');
+    const startTime = page.locator('#start_at_time');
+    const endDate = page.locator('#end_at_date');
+    const endTime = page.locator('#end_at_time');
+    await expect(startDate).toBeVisible();
+    await expect(endDate).toBeVisible();
 
     const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
     const dayAfter = new Date(tomorrow.getTime() + 3 * 60 * 60 * 1000);
 
-    await start.fill(toDatetimeLocal(tomorrow));
-    await end.fill(toDatetimeLocal(dayAfter));
+    await startDate.fill(toDisplayDate(tomorrow));
+    await startTime.fill('08:00');
+    await endDate.fill(toDisplayDate(dayAfter));
+    await endTime.fill('11:00');
     await page.locator('#purpose').fill(purpose);
 
     const responsePromise = page.waitForResponse(
@@ -139,9 +143,9 @@ export async function seedApprovedLoan(page: Page): Promise<number> {
     throw new Error(`Seeded loan ${id} did not reach approved status`);
 }
 
-function toDatetimeLocal(date: Date): string {
+function toDisplayDate(date: Date): string {
     const pad = (value: number) => String(value).padStart(2, '0');
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()}`;
 }
 
 /** Upload a tiny valid PNG via the file input, then submit the form. */

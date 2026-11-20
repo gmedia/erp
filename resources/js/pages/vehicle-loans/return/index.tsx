@@ -2,6 +2,7 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { PhotoInput } from '@/components/common/PhotoInput';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -25,6 +26,7 @@ interface PickupOption {
     vehicle_loan_id: number;
     code: string;
     plate_number: string | null;
+    requester_name: string | null;
     driver_name: string | null;
     purpose: string | null;
     start_at: string | null;
@@ -52,6 +54,7 @@ export default function VehicleLoanReturnPage() {
                 response.data.data as Array<{
                     code: string;
                     plate_number: string | null;
+                    requester_name: string | null;
                     driver_name: string | null;
                     purpose: string | null;
                     start_at: string | null;
@@ -69,6 +72,7 @@ export default function VehicleLoanReturnPage() {
                     vehicle_loan_id: loan.pickup!.vehicle_loan_id,
                     code: loan.code,
                     plate_number: loan.plate_number,
+                    requester_name: loan.requester_name,
                     driver_name: loan.driver_name,
                     purpose: loan.purpose,
                     start_at: loan.start_at,
@@ -205,6 +209,9 @@ export default function VehicleLoanReturnPage() {
                         {selected && (
                             <div className="space-y-1 rounded-lg border bg-muted/30 p-3 text-sm">
                                 <p className="font-medium">{selected.code}</p>
+                                <p>
+                                    Peminjam: {selected.requester_name ?? '-'}
+                                </p>
                                 <p>Pengemudi: {selected.driver_name ?? '-'}</p>
                                 <p>Kendaraan: {selected.plate_number ?? '-'}</p>
                                 <p>Tujuan: {selected.purpose ?? '-'}</p>
@@ -289,15 +296,18 @@ export default function VehicleLoanReturnPage() {
                                 </span>
                             </div>
                         </div>
-                        <label className="flex min-h-11 items-center gap-2 text-sm">
-                            <input
-                                type="checkbox"
-                                className="size-4"
+                        <div className="flex min-h-11 items-center gap-2 text-sm">
+                            <Checkbox
+                                id="incident"
                                 checked={incident}
-                                onChange={(e) => setIncident(e.target.checked)}
+                                onCheckedChange={(checked) =>
+                                    setIncident(checked === true)
+                                }
                             />
-                            Ada insiden selama peminjaman
-                        </label>
+                            <Label htmlFor="incident" className="font-normal">
+                                Ada insiden selama peminjaman
+                            </Label>
+                        </div>
                         {incident && (
                             <div className="grid gap-2">
                                 <Label htmlFor="incident_note">
@@ -332,10 +342,14 @@ export default function VehicleLoanReturnPage() {
                         >
                             Kirim Pengembalian
                         </Button>
-                        {(!pickupId || !handoverPhoto || !conditionPhoto) && (
+                        {!pickupId && (
                             <p className="text-center text-xs text-muted-foreground">
-                                Pilih pengambilan dan unggah kedua foto untuk
-                                mengirim.
+                                Pilih data pengembalian terlebih dahulu.
+                            </p>
+                        )}
+                        {pickupId && (!handoverPhoto || !conditionPhoto) && (
+                            <p className="text-center text-xs text-muted-foreground">
+                                Unggah kedua foto untuk mengirim.
                             </p>
                         )}
                     </CardContent>

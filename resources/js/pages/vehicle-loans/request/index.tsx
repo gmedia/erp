@@ -1,7 +1,6 @@
 import { PageHeader } from '@/components/common/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
     Select,
@@ -11,6 +10,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { VehicleLoanDateTimeFields } from '@/components/vehicle-loans/VehicleLoanDateTimeFields';
 import { VehicleLoanQrPanel } from '@/components/vehicle-loans/VehicleLoanQrPanel';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
@@ -140,46 +140,20 @@ export default function VehicleLoanRequestPage() {
                         <CardTitle className="text-base">Jadwal</CardTitle>
                     </CardHeader>
                     <CardContent className="grid gap-4 sm:grid-cols-2">
-                        <div className="grid gap-2">
-                            <Label htmlFor="start_at">
-                                Mulai
-                                <span
-                                    className="ml-1 text-destructive"
-                                    aria-hidden="true"
-                                >
-                                    *
-                                </span>
-                            </Label>
-                            <Input
-                                id="start_at"
-                                type="datetime-local"
-                                lang="id-ID"
-                                value={form.start_at}
-                                onChange={(e) =>
-                                    update('start_at', e.target.value)
-                                }
-                            />
-                        </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="end_at">
-                                Selesai
-                                <span
-                                    className="ml-1 text-destructive"
-                                    aria-hidden="true"
-                                >
-                                    *
-                                </span>
-                            </Label>
-                            <Input
-                                id="end_at"
-                                type="datetime-local"
-                                lang="id-ID"
-                                value={form.end_at}
-                                onChange={(e) =>
-                                    update('end_at', e.target.value)
-                                }
-                            />
-                        </div>
+                        <VehicleLoanDateTimeFields
+                            id="start_at"
+                            label="Mulai"
+                            value={form.start_at}
+                            onChange={(value) => update('start_at', value)}
+                            required
+                        />
+                        <VehicleLoanDateTimeFields
+                            id="end_at"
+                            label="Selesai"
+                            value={form.end_at}
+                            onChange={(value) => update('end_at', value)}
+                            required
+                        />
                         <p className="text-xs text-muted-foreground sm:col-span-2">
                             Format: tanggal/bulan/tahun, gunakan waktu 24 jam.
                         </p>

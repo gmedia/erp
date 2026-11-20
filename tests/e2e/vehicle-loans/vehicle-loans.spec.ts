@@ -27,8 +27,8 @@ test.describe('Vehicle Loans', () => {
         await page.goto(VEHICLE_LOAN_REQUEST_PATH);
 
         await expect(page).toHaveTitle(/Permintaan Peminjaman Kendaraan/);
-        await expect(page.locator('#start_at')).toBeVisible();
-        await expect(page.locator('#end_at')).toBeVisible();
+        await expect(page.locator('#start_at_date')).toBeVisible();
+        await expect(page.locator('#end_at_date')).toBeVisible();
         await expect(page.locator('#purpose')).toBeVisible();
         await expect(page.locator('#driver_id')).toBeVisible();
         await expect(page.locator('#vehicle_unit_id')).toBeVisible();
@@ -43,8 +43,10 @@ test.describe('Vehicle Loans', () => {
     test('can save a draft then submit it for approval', async ({ page }) => {
         await page.goto(VEHICLE_LOAN_REQUEST_PATH);
 
-        await page.locator('#start_at').fill('2030-01-01T08:00');
-        await page.locator('#end_at').fill('2030-01-01T10:00');
+        await page.locator('#start_at_date').fill('01/01/2030');
+        await page.locator('#start_at_time').fill('08:00');
+        await page.locator('#end_at_date').fill('01/01/2030');
+        await page.locator('#end_at_time').fill('10:00');
         await page.locator('#purpose').fill('Draft E2E');
 
         const draftResponse = page.waitForResponse(
