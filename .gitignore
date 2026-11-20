@@ -32,13 +32,16 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+# Legacy agent tools (tidak dipakai lagi; tetap di-ignore agar sisa folder lama tidak ter-commit)
 /.agent*
 # task.* — legacy tracked handoff files (deprecated 2026-11-17; active status in GitHub Issues)
 /.cline*
 /.roo*
 /.kilo*
 /.trae*
-/.claude*
+# Claude CLI: .claude/ di-commit (skills/commands/agents/settings.json); yang lokal saja di-ignore
+/.claude/settings.local.json
+/CLAUDE.local.md
 .sisyphus
 .omo/
 
@@ -64,9 +67,6 @@ coverage-new.xml
 sonar-project.properties
 opencode.json
 .opencode
-.playwright-mcp/
 
-# Depwire cache
-.depwire/
 .depwireignore
 depwire-output.json
