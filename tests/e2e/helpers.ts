@@ -271,7 +271,9 @@ export async function createEntity(
         );
         // Check for visible error messages in the dialog
         const errorMessages = await dialog
-            .locator('.text-destructive, .text-red-500, [role="alert"]')
+            .locator(
+                '.text-destructive, .text-destructive-foreground, .text-red-500, [role="alert"]',
+            )
             .allTextContents();
         if (errorMessages.length > 0) {
             console.error(
@@ -608,8 +610,8 @@ export async function editAccount(
     // Hover to reveal buttons
     await item.hover();
 
-    // The Edit button has .text-blue-500 class
-    const editBtn = item.locator('button.text-blue-500');
+    // Selector berbasis aria-label, bukan class warna (token bisa berubah).
+    const editBtn = item.getByRole('button', { name: 'Edit account' });
     await editBtn.click();
 
     const dialog = page.getByRole('dialog');
@@ -650,8 +652,8 @@ export async function deleteAccount(page: Page, code: string): Promise<void> {
     // Hover to reveal buttons
     await item.hover();
 
-    // The Delete button has .text-destructive class
-    const deleteBtn = item.locator('button.text-destructive');
+    // Selector berbasis aria-label, bukan class warna (token bisa berubah).
+    const deleteBtn = item.getByRole('button', { name: 'Delete account' });
     await deleteBtn.click();
 
     // Confirm deletion in AlertDialog

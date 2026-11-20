@@ -118,6 +118,7 @@ function AccountTreeNode({
                                     size="icon"
                                     variant="ghost"
                                     className="h-8 w-8 text-info"
+                                    aria-label="Edit account"
                                     onClick={() => onEdit(account)}
                                 >
                                     <Edit className="h-4 w-4" />
@@ -133,6 +134,7 @@ function AccountTreeNode({
                                     size="icon"
                                     variant="ghost"
                                     className="h-8 w-8 text-destructive"
+                                    aria-label="Delete account"
                                     onClick={() => onDelete(account)}
                                 >
                                     <Trash2 className="h-4 w-4" />
