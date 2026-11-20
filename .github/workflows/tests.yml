@@ -44,6 +44,9 @@ jobs:
           php-version: 8.4
           coverage: none
 
+      - name: Mapper self-test
+        run: php scripts/ci/affected-tests.php --self-test
+
       - name: Compute affected tests (shadow)
         id: affected
         continue-on-error: true
