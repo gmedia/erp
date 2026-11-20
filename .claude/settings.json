@@ -25,6 +25,7 @@
       "Bash(npm run check:menu-icons:*)",
       "Bash(npx playwright test:*)",
       "Bash(bash scripts/sync-opencode.sh)",
+      "Bash(bash scripts/setup-env.sh)",
       "Bash(rg:*)",
       "Bash(curl -s https://sonarcloud.io/api/:*)"
     ],
