@@ -342,7 +342,7 @@ export default function AssetProfile() {
                             >
                                 <CardHeader className="px-4 py-3">
                                     <CardTitle className="flex items-center gap-2 text-sm font-medium">
-                                        <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                        <Info className="h-4 w-4 text-info" />
                                         <span>General Information</span>
                                     </CardTitle>
                                 </CardHeader>
@@ -396,7 +396,7 @@ export default function AssetProfile() {
                             >
                                 <CardHeader className="px-4 py-3">
                                     <CardTitle className="flex items-center gap-2 text-sm font-medium">
-                                        <MapPin className="h-4 w-4 text-green-600 dark:text-green-400" />
+                                        <MapPin className="h-4 w-4 text-success" />
                                         <span>Current Location & PIC</span>
                                     </CardTitle>
                                 </CardHeader>
@@ -464,7 +464,7 @@ export default function AssetProfile() {
                             >
                                 <CardHeader className="px-4 py-3">
                                     <CardTitle className="flex items-center gap-2 text-sm font-medium">
-                                        <CircleDollarSign className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                                        <CircleDollarSign className="h-4 w-4 text-warning" />
                                         <span>Financial Summary</span>
                                     </CardTitle>
                                 </CardHeader>

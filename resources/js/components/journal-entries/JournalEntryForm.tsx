@@ -296,7 +296,7 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                                                                         0
                                                                 }
                                                             >
-                                                                <Trash className="h-4 w-4 text-red-500" />
+                                                                <Trash className="h-4 w-4 text-destructive-foreground" />
                                                             </Button>
                                                         </div>
                                                     </TableCell>
@@ -335,8 +335,8 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                                             <span
                                                 className={
                                                     Math.abs(difference) > 0.01
-                                                        ? 'font-bold text-red-500'
-                                                        : 'font-bold text-green-500'
+                                                        ? 'font-bold text-destructive-foreground'
+                                                        : 'font-bold text-success'
                                                 }
                                             >
                                                 Diff:{' '}
@@ -353,12 +353,12 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                                 </TableFooter>
                             </Table>
                             {form.formState.errors.root && (
-                                <p className="p-4 text-sm text-red-500">
+                                <p className="p-4 text-sm text-destructive-foreground">
                                     {form.formState.errors.root.message}
                                 </p>
                             )}
                             {form.formState.errors.lines && (
-                                <p className="p-4 text-sm text-red-500">
+                                <p className="p-4 text-sm text-destructive-foreground">
                                     {JSON.stringify(
                                         form.formState.errors.lines,
                                     )}

@@ -561,40 +561,40 @@ export const ImportBankStatementDialog = memo<ImportBankStatementDialogProps>(
                     <div className="space-y-4 py-4">
                         <div className="flex items-center justify-center gap-4 rounded-md border p-6">
                             <div className="flex flex-col items-center gap-2 text-center">
-                                <CheckCircle2 className="size-12 text-green-600" />
+                                <CheckCircle2 className="size-12 text-success" />
                                 <p className="font-medium">Import Completed</p>
                             </div>
                         </div>
 
                         <div className="space-y-3 rounded-md border p-4 text-sm">
                             <div className="flex items-center gap-4 font-medium">
-                                <div className="flex items-center text-green-600">
+                                <div className="flex items-center text-success">
                                     <CheckCircle2 className="mr-1.5 size-4" />
                                     Imported: {result.imported}
                                 </div>
-                                <div className="flex items-center text-yellow-600">
+                                <div className="flex items-center text-warning">
                                     <AlertCircle className="mr-1.5 size-4" />
                                     Skipped: {result.skipped}
                                 </div>
-                                <div className="flex items-center text-red-600">
+                                <div className="flex items-center text-destructive-foreground">
                                     <X className="mr-1.5 size-4" />
                                     Errors: {result.errors.length}
                                 </div>
                             </div>
 
                             {result.errors.length > 0 && (
-                                <ScrollArea className="max-h-40 rounded bg-slate-50">
+                                <ScrollArea className="max-h-40 rounded bg-muted">
                                     <div className="p-2 pr-4 text-xs">
                                         <table className="w-full text-left">
                                             <thead>
                                                 <tr>
-                                                    <th className="pb-1 text-slate-500">
+                                                    <th className="pb-1 text-muted-foreground">
                                                         Row
                                                     </th>
-                                                    <th className="pb-1 text-slate-500">
+                                                    <th className="pb-1 text-muted-foreground">
                                                         Field
                                                     </th>
-                                                    <th className="pb-1 text-slate-500">
+                                                    <th className="pb-1 text-muted-foreground">
                                                         Message
                                                     </th>
                                                 </tr>
@@ -603,15 +603,15 @@ export const ImportBankStatementDialog = memo<ImportBankStatementDialogProps>(
                                                 {result.errors.map((err) => (
                                                     <tr
                                                         key={`${err.row}-${err.field}-${err.message}`}
-                                                        className="border-t border-slate-100"
+                                                        className="border-t border-border"
                                                     >
-                                                        <td className="py-1 align-top font-mono text-slate-500">
+                                                        <td className="py-1 align-top font-mono text-muted-foreground">
                                                             {err.row}
                                                         </td>
-                                                        <td className="py-1 align-top font-medium text-slate-700">
+                                                        <td className="py-1 align-top font-medium text-foreground">
                                                             {err.field}
                                                         </td>
-                                                        <td className="py-1 align-top text-red-600">
+                                                        <td className="py-1 align-top text-destructive-foreground">
                                                             {err.message}
                                                         </td>
                                                     </tr>

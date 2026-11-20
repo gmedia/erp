@@ -37,31 +37,23 @@ export const stockAdjustmentColumns: ColumnDef<StockAdjustment>[] = [
         accessorKey: 'adjustment_type',
         label: 'Adjustment Type',
         colorMap: {
-            damage: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-            expired:
-                'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
-            shrinkage:
-                'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
-            correction:
-                'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-100',
-            stocktake_result:
-                'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400',
-            initial_stock:
-                'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-            other: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300',
+            damage: 'bg-destructive-soft text-destructive-foreground',
+            expired: 'bg-warning-soft text-warning',
+            shrinkage: 'bg-warning-soft text-warning',
+            correction: 'bg-muted text-foreground',
+            stocktake_result: 'bg-chart-3/10 text-chart-3',
+            initial_stock: 'bg-success-soft text-success',
+            other: 'bg-muted text-foreground',
         },
     }),
     createBadgeColumn<StockAdjustment>({
         accessorKey: 'status',
         label: 'Status',
         colorMap: {
-            draft: 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-100',
-            pending_approval:
-                'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-            approved:
-                'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-            cancelled:
-                'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+            draft: 'bg-muted text-foreground',
+            pending_approval: 'bg-warning-soft text-warning',
+            approved: 'bg-success-soft text-success',
+            cancelled: 'bg-destructive-soft text-destructive-foreground',
         },
     }),
     {

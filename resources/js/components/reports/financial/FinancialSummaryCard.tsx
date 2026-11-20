@@ -35,8 +35,7 @@ export function FinancialStatusBadge({
         <Badge
             variant={isPositive ? 'secondary' : 'destructive'}
             className={cn(
-                isPositive &&
-                    'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
+                isPositive && 'border-success/30 bg-success/10 text-success',
                 className,
             )}
         >
@@ -57,7 +56,7 @@ export function FinancialSummaryCard({
         <Card
             className={cn(
                 'overflow-hidden border-t-4',
-                isPositive ? 'border-emerald-500' : 'border-destructive',
+                isPositive ? 'border-success' : 'border-destructive',
                 className,
             )}
         >

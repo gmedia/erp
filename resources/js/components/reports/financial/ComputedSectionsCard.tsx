@@ -44,7 +44,7 @@ function ComputedSectionRow({
                         className={cn(
                             'text-sm font-bold tabular-nums',
                             section.value >= 0
-                                ? 'text-emerald-700 dark:text-emerald-300'
+                                ? 'text-success'
                                 : 'text-destructive',
                         )}
                     >

@@ -25,7 +25,9 @@ export const bankReconciliationColumns: ColumnDef<BankReconciliation>[] = [
             return (
                 <div>
                     <div>{account?.code}</div>
-                    <div className="text-sm text-gray-500">{account?.name}</div>
+                    <div className="text-sm text-muted-foreground">
+                        {account?.name}
+                    </div>
                 </div>
             );
         },

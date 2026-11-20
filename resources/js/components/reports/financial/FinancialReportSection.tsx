@@ -51,11 +51,11 @@ export const financialPositionSectionConfigs: readonly FinancialReportSectionCon
 
 export const getChangeTextClass = (value: number): string => {
     if (value < 0) {
-        return 'text-rose-600 dark:text-rose-400';
+        return 'text-destructive-foreground';
     }
 
     if (value > 0) {
-        return 'text-emerald-600 dark:text-emerald-400';
+        return 'text-success';
     }
 
     return 'text-muted-foreground';
@@ -63,7 +63,7 @@ export const getChangeTextClass = (value: number): string => {
 
 export const getSignedAmountTextClass = (value: number): string => {
     if (value < 0) {
-        return 'text-rose-600 dark:text-rose-400';
+        return 'text-destructive-foreground';
     }
 
     return '';

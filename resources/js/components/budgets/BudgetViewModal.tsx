@@ -67,25 +67,25 @@ export const BudgetViewModal = memo<BudgetViewModalProps>(
                     <div className="space-y-6 py-2">
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div className="min-w-0">
-                                <p className="text-sm font-medium text-gray-500">
+                                <p className="text-sm font-medium text-muted-foreground">
                                     Name
                                 </p>
                                 <p>{item.name}</p>
                             </div>
                             <div className="min-w-0">
-                                <p className="text-sm font-medium text-gray-500">
+                                <p className="text-sm font-medium text-muted-foreground">
                                     Fiscal Year
                                 </p>
                                 <p>{item.fiscal_year?.name ?? '-'}</p>
                             </div>
                             <div className="min-w-0">
-                                <p className="text-sm font-medium text-gray-500">
+                                <p className="text-sm font-medium text-muted-foreground">
                                     Budget Type
                                 </p>
                                 <p>{getBudgetTypeLabel(item.budget_type)}</p>
                             </div>
                             <div className="min-w-0">
-                                <p className="text-sm font-medium text-gray-500">
+                                <p className="text-sm font-medium text-muted-foreground">
                                     Status
                                 </p>
                                 <Badge
@@ -98,7 +98,7 @@ export const BudgetViewModal = memo<BudgetViewModalProps>(
                                 </Badge>
                             </div>
                             <div className="min-w-0">
-                                <p className="text-sm font-medium text-gray-500">
+                                <p className="text-sm font-medium text-muted-foreground">
                                     Total Amount
                                 </p>
                                 <p>
@@ -112,7 +112,7 @@ export const BudgetViewModal = memo<BudgetViewModalProps>(
                                 </p>
                             </div>
                             <div className="min-w-0">
-                                <p className="text-sm font-medium text-gray-500">
+                                <p className="text-sm font-medium text-muted-foreground">
                                     Created By
                                 </p>
                                 <p>{item.creator?.name ?? '-'}</p>
@@ -120,13 +120,13 @@ export const BudgetViewModal = memo<BudgetViewModalProps>(
                             {item.approver && (
                                 <>
                                     <div className="min-w-0">
-                                        <p className="text-sm font-medium text-gray-500">
+                                        <p className="text-sm font-medium text-muted-foreground">
                                             Approved By
                                         </p>
                                         <p>{item.approver.name}</p>
                                     </div>
                                     <div className="min-w-0">
-                                        <p className="text-sm font-medium text-gray-500">
+                                        <p className="text-sm font-medium text-muted-foreground">
                                             Approved At
                                         </p>
                                         <p>
@@ -141,7 +141,7 @@ export const BudgetViewModal = memo<BudgetViewModalProps>(
                             )}
                             {item.description && (
                                 <div className="min-w-0 sm:col-span-2">
-                                    <p className="text-sm font-medium text-gray-500">
+                                    <p className="text-sm font-medium text-muted-foreground">
                                         Description
                                     </p>
                                     <p>{item.description}</p>

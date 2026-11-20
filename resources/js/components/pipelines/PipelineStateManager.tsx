@@ -124,13 +124,15 @@ export function PipelineStateManager({
                     <div className="flex gap-2">
                         {state.color && (
                             <div
-                                className="h-6 w-6 rounded border border-gray-200"
+                                className="h-6 w-6 rounded border border-border"
                                 style={{ backgroundColor: state.color }}
                                 title={state.color}
                             />
                         )}
                         {state.icon && (
-                            <span className="text-gray-500">{state.icon}</span>
+                            <span className="text-muted-foreground">
+                                {state.icon}
+                            </span>
                         )}
                     </div>
                 </TableCell>
@@ -160,7 +162,7 @@ export function PipelineStateManager({
 
     const renderEditRow = () => {
         return (
-            <TableRow key="edit-row" className="bg-gray-50 dark:bg-gray-900">
+            <TableRow key="edit-row" className="bg-muted">
                 <TableCell>
                     <Input
                         value={formData.code}
@@ -248,7 +250,7 @@ export function PipelineStateManager({
                         onClick={handleSave}
                         title="Save state"
                     >
-                        <Check className="h-4 w-4 text-green-600" />
+                        <Check className="h-4 w-4 text-success" />
                     </Button>
                     <Button
                         type="button"
@@ -257,7 +259,7 @@ export function PipelineStateManager({
                         onClick={handleCancel}
                         title="Cancel edit"
                     >
-                        <X className="h-4 w-4 text-red-600" />
+                        <X className="h-4 w-4 text-destructive-foreground" />
                     </Button>
                 </TableCell>
             </TableRow>

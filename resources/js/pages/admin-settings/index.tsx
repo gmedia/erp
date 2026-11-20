@@ -277,7 +277,7 @@ function GeneralSettings({
                         leave="transition ease-in-out duration-300"
                         leaveTo="opacity-0"
                     >
-                        <p className="text-sm text-green-600">Saved</p>
+                        <p className="text-sm text-success">Saved</p>
                     </Transition>
                 </div>
             </form>
@@ -495,7 +495,7 @@ function RegionalSettings({
                         leave="transition ease-in-out duration-300"
                         leaveTo="opacity-0"
                     >
-                        <p className="text-sm text-green-600">Saved</p>
+                        <p className="text-sm text-success">Saved</p>
                     </Transition>
                 </div>
             </form>
@@ -694,7 +694,7 @@ function SmtpSettings({
                         leave="transition ease-in-out duration-300"
                         leaveTo="opacity-0"
                     >
-                        <p className="text-sm text-green-600">Saved</p>
+                        <p className="text-sm text-success">Saved</p>
                     </Transition>
                 </div>
             </form>
@@ -753,7 +753,7 @@ function SmtpSettings({
                             leave="transition ease-in-out duration-300"
                             leaveTo="opacity-0"
                         >
-                            <p className="text-sm text-green-600">
+                            <p className="text-sm text-success">
                                 Test email sent successfully! Check your inbox.
                             </p>
                         </Transition>
@@ -982,7 +982,7 @@ function AuthenticationSettings({
                         leave="transition ease-in-out duration-300"
                         leaveTo="opacity-0"
                     >
-                        <p className="text-sm text-green-600">Saved</p>
+                        <p className="text-sm text-success">Saved</p>
                     </Transition>
                 </div>
             </form>

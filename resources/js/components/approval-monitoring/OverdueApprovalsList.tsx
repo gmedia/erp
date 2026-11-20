@@ -46,10 +46,10 @@ export function OverdueApprovalsList({
                 </CardHeader>
                 <CardContent>
                     <div className="flex flex-col items-center justify-center space-y-2 rounded-md border border-dashed p-8 text-center">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900">
-                            <AlertCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-success-soft">
+                            <AlertCircle className="h-5 w-5 text-success" />
                         </div>
-                        <h3 className="font-semibold text-emerald-700 dark:text-emerald-400">
+                        <h3 className="font-semibold text-success">
                             All caught up!
                         </h3>
                         <p className="text-sm text-muted-foreground">
@@ -62,9 +62,9 @@ export function OverdueApprovalsList({
     }
 
     return (
-        <Card className="col-span-1 border-rose-200 dark:border-rose-900/50">
+        <Card className="col-span-1 border-destructive/30">
             <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-rose-600 dark:text-rose-400">
+                <CardTitle className="flex items-center gap-2 text-destructive-foreground">
                     <AlertCircle className="h-5 w-5" />
                     Overdue Approvals
                 </CardTitle>
@@ -107,7 +107,7 @@ export function OverdueApprovalsList({
                                             </span>
                                         </div>
                                     </TableCell>
-                                    <TableCell className="text-right font-medium text-rose-600">
+                                    <TableCell className="text-right font-medium text-destructive-foreground">
                                         {Math.floor(item.hours_overdue)}h
                                     </TableCell>
                                 </TableRow>

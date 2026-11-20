@@ -35,10 +35,10 @@ export function SummaryCards({
                     <CardTitle className="text-sm font-medium">
                         Approved Today
                     </CardTitle>
-                    <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                    <CheckCircle2 className="h-4 w-4 text-success" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold text-emerald-600">
+                    <div className="text-2xl font-bold text-success">
                         {isLoading ? '...' : summary?.approved_today || 0}
                     </div>
                     <p className="text-xs text-muted-foreground">
@@ -52,10 +52,10 @@ export function SummaryCards({
                     <CardTitle className="text-sm font-medium">
                         Rejected Today
                     </CardTitle>
-                    <X className="h-4 w-4 text-rose-500" />
+                    <X className="h-4 w-4 text-destructive-foreground" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold text-rose-600">
+                    <div className="text-2xl font-bold text-destructive-foreground">
                         {isLoading ? '...' : summary?.rejected_today || 0}
                     </div>
                     <p className="text-xs text-muted-foreground">
@@ -69,10 +69,10 @@ export function SummaryCards({
                     <CardTitle className="text-sm font-medium">
                         Avg Processing Time
                     </CardTitle>
-                    <Activity className="h-4 w-4 text-blue-500" />
+                    <Activity className="h-4 w-4 text-info" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold text-blue-600">
+                    <div className="text-2xl font-bold text-info">
                         {isLoading
                             ? '...'
                             : `${summary?.avg_processing_time_hours || 0}h`}
