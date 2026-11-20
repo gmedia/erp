@@ -20,7 +20,13 @@ export function JournalLineFormFields<TFormValues extends FieldValues>({
     accountUrl = '/api/accounts?is_active=1&has_children=0',
     branchUrl = '/api/branches',
 }: Readonly<JournalLineFormFieldsProps<TFormValues>>) {
-    const keyBase = `${(defaultValues as Record<string, unknown>).account_id || 'new'}-${open ? 'open' : 'closed'}`;
+    const accountId = (defaultValues as Record<string, unknown>).account_id;
+    const accountKey =
+        (typeof accountId === 'string' || typeof accountId === 'number') &&
+        accountId
+            ? String(accountId)
+            : 'new';
+    const keyBase = `${accountKey}-${open ? 'open' : 'closed'}`;
 
     return (
         <>

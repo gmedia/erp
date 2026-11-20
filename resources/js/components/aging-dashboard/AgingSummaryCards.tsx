@@ -115,7 +115,6 @@ export const AgingSummaryCards = memo<AgingSummaryCardsProps>(
                         key={card.title}
                         title={card.title}
                         icon={card.icon}
-                        value={card.value}
                         formattedValue={card.formattedValue}
                         iconColor={card.iconColor}
                     >

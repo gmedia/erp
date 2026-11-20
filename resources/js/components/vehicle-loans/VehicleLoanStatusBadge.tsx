@@ -20,10 +20,10 @@ const STATUS_STYLES: Record<string, string> = {
 export function VehicleLoanStatusBadge({
     status,
     className,
-}: {
+}: Readonly<{
     status: string | null | undefined;
     className?: string;
-}) {
+}>) {
     const key = (status ?? '').toLowerCase().replace(/\s+/g, '_');
 
     return (

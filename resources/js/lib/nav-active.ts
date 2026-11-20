@@ -3,7 +3,11 @@ export function normalizeNavPath(path: string): string {
         return '';
     }
 
-    const trimmed = path.replace(/\/+$/, '');
+    let end = path.length;
+    while (end > 0 && path[end - 1] === '/') {
+        end--;
+    }
+    const trimmed = path.slice(0, end);
     if (trimmed === '') {
         return '/';
     }

@@ -75,6 +75,20 @@ const ACTIVITY_LABELS: Record<string, string> = {
     return_overdue: 'Pengembalian terlambat',
 };
 
+const STEP_STATUS_CLASS: Record<string, string> = {
+    approved: 'bg-success-soft text-success',
+    rejected: 'bg-destructive-soft text-destructive-foreground',
+};
+
+function incidentLabel(
+    returns: { incident?: boolean | null } | null | undefined,
+): string | null {
+    if (!returns) {
+        return null;
+    }
+    return returns.incident ? 'Ada insiden' : 'Tidak ada';
+}
+
 function Field({
     label,
     value,
@@ -250,13 +264,9 @@ export default function VehicleLoanDetailPage() {
                                             />
                                             <Field
                                                 label="Insiden"
-                                                value={
-                                                    data.returns
-                                                        ? data.returns.incident
-                                                            ? 'Ada insiden'
-                                                            : 'Tidak ada'
-                                                        : null
-                                                }
+                                                value={incidentLabel(
+                                                    data.returns,
+                                                )}
                                             />
                                         </dl>
                                         {data.review_notes && (
@@ -343,15 +353,7 @@ export default function VehicleLoanDetailPage() {
                                                         className="flex gap-3"
                                                     >
                                                         <span
-                                                            className={`mt-1 flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
-                                                                step.status ===
-                                                                'approved'
-                                                                    ? 'bg-success-soft text-success'
-                                                                    : step.status ===
-                                                                        'rejected'
-                                                                      ? 'bg-destructive-soft text-destructive-foreground'
-                                                                      : 'bg-warning-soft text-warning'
-                                                            }`}
+                                                            className={`mt-1 flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${STEP_STATUS_CLASS[step.status] ?? 'bg-warning-soft text-warning'}`}
                                                         >
                                                             {step.step_order}
                                                         </span>

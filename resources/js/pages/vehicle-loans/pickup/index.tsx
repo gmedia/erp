@@ -10,6 +10,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { RequiredLabel } from '@/components/vehicle-loans/RequiredLabel';
 import { VehicleLoanQrPanel } from '@/components/vehicle-loans/VehicleLoanQrPanel';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
@@ -114,15 +115,9 @@ export default function VehicleLoanPickupPage() {
                         </Button>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="loan">
+                            <RequiredLabel htmlFor="loan">
                                 Permintaan
-                                <span
-                                    className="ml-1 text-destructive"
-                                    aria-hidden="true"
-                                >
-                                    *
-                                </span>
-                            </Label>
+                            </RequiredLabel>
                             <Select
                                 value={loanId || undefined}
                                 onValueChange={setLoanId}
@@ -209,15 +204,9 @@ export default function VehicleLoanPickupPage() {
                             </Select>
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="selfie">
+                            <RequiredLabel htmlFor="selfie">
                                 Foto selfie
-                                <span
-                                    className="ml-1 text-destructive"
-                                    aria-hidden="true"
-                                >
-                                    *
-                                </span>
-                            </Label>
+                            </RequiredLabel>
                             <PhotoInput
                                 id="selfie"
                                 value={photo}

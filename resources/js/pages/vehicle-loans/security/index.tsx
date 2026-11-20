@@ -154,13 +154,14 @@ export default function VehicleLoanSecurityPage() {
                     </p>
                 </div>
 
-                {isLoading ? (
+                {isLoading && (
                     <Card>
                         <CardContent className="py-10 text-center text-sm text-muted-foreground">
                             Memuat antrean keamanan...
                         </CardContent>
                     </Card>
-                ) : filtered.length === 0 ? (
+                )}
+                {!isLoading && filtered.length === 0 && (
                     <Card>
                         <CardContent className="space-y-3 py-10 text-center">
                             <div>
@@ -184,7 +185,8 @@ export default function VehicleLoanSecurityPage() {
                             </Button>
                         </CardContent>
                     </Card>
-                ) : (
+                )}
+                {!isLoading && filtered.length > 0 && (
                     <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                         {filtered.map((loan) => {
                             const handed = Boolean(
@@ -258,11 +260,12 @@ export default function VehicleLoanSecurityPage() {
                                         </dl>
                                         <div className="mt-auto flex items-center justify-between gap-2 border-t pt-3">
                                             <div className="min-w-0">
-                                                {handed ? (
+                                                {handed && (
                                                     <span className="inline-flex items-center rounded-full bg-success-soft px-2 py-1 text-xs font-medium text-success">
                                                         Kunci sudah diserahkan
                                                     </span>
-                                                ) : ready ? (
+                                                )}
+                                                {ready && (
                                                     <Button
                                                         size="sm"
                                                         className="min-h-10"
@@ -274,7 +277,8 @@ export default function VehicleLoanSecurityPage() {
                                                     >
                                                         Serahkan Kunci
                                                     </Button>
-                                                ) : (
+                                                )}
+                                                {!handed && !ready && (
                                                     <span className="text-xs text-muted-foreground">
                                                         Menunggu pengambilan
                                                     </span>

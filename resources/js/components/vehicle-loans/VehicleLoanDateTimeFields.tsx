@@ -1,6 +1,6 @@
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useEffect, useState } from 'react';
+import { RequiredLabel } from './RequiredLabel';
 
 interface VehicleLoanDateTimeFieldsProps {
     id: string;
@@ -25,8 +25,8 @@ function toDisplay(value: string): { date: string; time: string } {
 }
 
 function toValue(date: string, time: string): string | null {
-    const dateMatch = date.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-    const timeMatch = time.match(/^(\d{2}):(\d{2})$/);
+    const dateMatch = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(date);
+    const timeMatch = /^(\d{2}):(\d{2})$/.exec(time);
 
     if (!dateMatch || !timeMatch) {
         return null;
@@ -65,14 +65,9 @@ export function VehicleLoanDateTimeFields({
 
     return (
         <div className="grid gap-2">
-            <Label htmlFor={`${id}_date`}>
+            <RequiredLabel htmlFor={`${id}_date`} required={required}>
                 {label}
-                {required && (
-                    <span className="ml-1 text-destructive" aria-hidden="true">
-                        *
-                    </span>
-                )}
-            </Label>
+            </RequiredLabel>
             <div className="grid grid-cols-[1fr_110px] gap-2">
                 <Input
                     id={`${id}_date`}

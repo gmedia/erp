@@ -13,6 +13,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { RequiredLabel } from '@/components/vehicle-loans/RequiredLabel';
 import { VehicleLoanQrPanel } from '@/components/vehicle-loans/VehicleLoanQrPanel';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
@@ -161,15 +162,9 @@ export default function VehicleLoanReturnPage() {
                         </Button>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="pickup">
+                            <RequiredLabel htmlFor="pickup">
                                 Pengambilan
-                                <span
-                                    className="ml-1 text-destructive"
-                                    aria-hidden="true"
-                                >
-                                    *
-                                </span>
-                            </Label>
+                            </RequiredLabel>
                             <Select
                                 value={pickupId || undefined}
                                 onValueChange={setPickupId}
@@ -240,15 +235,9 @@ export default function VehicleLoanReturnPage() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="handover">
+                            <RequiredLabel htmlFor="handover">
                                 Foto bukti serah terima dengan petugas keamanan
-                                <span
-                                    className="ml-1 text-destructive"
-                                    aria-hidden="true"
-                                >
-                                    *
-                                </span>
-                            </Label>
+                            </RequiredLabel>
                             <PhotoInput
                                 id="handover"
                                 value={handoverPhoto}
@@ -259,15 +248,9 @@ export default function VehicleLoanReturnPage() {
                             />
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="condition">
+                            <RequiredLabel htmlFor="condition">
                                 Foto kondisi kendaraan
-                                <span
-                                    className="ml-1 text-destructive"
-                                    aria-hidden="true"
-                                >
-                                    *
-                                </span>
-                            </Label>
+                            </RequiredLabel>
                             <PhotoInput
                                 id="condition"
                                 value={conditionPhoto}
@@ -310,15 +293,9 @@ export default function VehicleLoanReturnPage() {
                         </div>
                         {incident && (
                             <div className="grid gap-2">
-                                <Label htmlFor="incident_note">
+                                <RequiredLabel htmlFor="incident_note">
                                     Keterangan insiden
-                                    <span
-                                        className="ml-1 text-destructive"
-                                        aria-hidden="true"
-                                    >
-                                        *
-                                    </span>
-                                </Label>
+                                </RequiredLabel>
                                 <Textarea
                                     id="incident_note"
                                     value={incidentNote}

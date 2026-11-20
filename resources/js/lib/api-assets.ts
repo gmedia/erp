@@ -11,5 +11,7 @@ export function resolveApiAssetUrl(
         return path;
     }
 
-    return `${API_BASE_URL}${path.startsWith('/') ? path : `/${path}`}`;
+    const normalizedPath = path.startsWith('/') ? path : '/' + path;
+
+    return `${API_BASE_URL}${normalizedPath}`;
 }

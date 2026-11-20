@@ -85,99 +85,97 @@ export function DataTableToolbar<T>({
     };
 
     return (
-        <>
-            <div className="flex flex-wrap items-center gap-2 py-4">
-                <Input
-                    placeholder={searchPlaceholder}
-                    value={searchValue}
-                    onChange={handleSearchChange}
-                    onKeyDown={handleSearchKeyDown}
-                    className="h-9 max-w-sm min-w-[12rem] flex-1 border-border bg-background placeholder:text-muted-foreground sm:flex-none"
-                    data-testid="search-input"
+        <div className="flex flex-wrap items-center gap-2 py-4">
+            <Input
+                placeholder={searchPlaceholder}
+                value={searchValue}
+                onChange={handleSearchChange}
+                onKeyDown={handleSearchKeyDown}
+                className="h-9 max-w-sm min-w-[12rem] flex-1 border-border bg-background placeholder:text-muted-foreground sm:flex-none"
+                data-testid="search-input"
+            />
+
+            <div className="ml-auto flex flex-wrap items-center gap-2">
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsFilterModalOpen(true)}
+                    aria-label="Filters"
+                    data-testid="filter-button"
+                >
+                    <Filter className="mr-2 h-4 w-4" />
+                    Filters
+                </Button>
+
+                <FilterModal
+                    open={isFilterModalOpen}
+                    onOpenChange={setIsFilterModalOpen}
+                    filterFields={filterFields}
+                    tempFilters={tempFilters}
+                    onTempFiltersChange={onTempFiltersChange}
+                    onApply={onApplyFilters}
+                    onReset={onResetFilters}
+                    onClearAll={onClearAllFilters}
                 />
 
-                <div className="ml-auto flex flex-wrap items-center gap-2">
+                {onAdd && (
                     <Button
-                        variant="outline"
                         size="sm"
-                        onClick={() => setIsFilterModalOpen(true)}
-                        aria-label="Filters"
-                        data-testid="filter-button"
+                        onClick={onAdd}
+                        aria-label="Add"
+                        data-testid="add-button"
                     >
-                        <Filter className="mr-2 h-4 w-4" />
-                        Filters
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Add
                     </Button>
+                )}
 
-                    <FilterModal
-                        open={isFilterModalOpen}
-                        onOpenChange={setIsFilterModalOpen}
-                        filterFields={filterFields}
-                        tempFilters={tempFilters}
-                        onTempFiltersChange={onTempFiltersChange}
-                        onApply={onApplyFilters}
-                        onReset={onResetFilters}
-                        onClearAll={onClearAllFilters}
-                    />
+                {extraActions}
 
-                    {onAdd && (
-                        <Button
-                            size="sm"
-                            onClick={onAdd}
-                            aria-label="Add"
-                            data-testid="add-button"
-                        >
-                            <PlusCircle className="mr-2 h-4 w-4" />
-                            Add
-                        </Button>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={onExport}
+                    disabled={exporting}
+                    aria-label="Export"
+                    data-testid="export-button"
+                >
+                    {exporting ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                        <Download className="mr-2 h-4 w-4" />
                     )}
+                    Export
+                </Button>
 
-                    {extraActions}
-
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={onExport}
-                        disabled={exporting}
-                        aria-label="Export"
-                        data-testid="export-button"
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm">
+                            Columns <ChevronDown className="ml-2 h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                        align="end"
+                        className="border-border bg-background text-foreground"
                     >
-                        {exporting ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : (
-                            <Download className="mr-2 h-4 w-4" />
-                        )}
-                        Export
-                    </Button>
-
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm">
-                                Columns <ChevronDown className="ml-2 h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                            align="end"
-                            className="border-border bg-background text-foreground"
-                        >
-                            {table
-                                .getAllColumns()
-                                .filter((col) => col.getCanHide())
-                                .map((col) => (
-                                    <DropdownMenuCheckboxItem
-                                        key={col.id}
-                                        className="capitalize"
-                                        checked={col.getIsVisible()}
-                                        onCheckedChange={(value: boolean) =>
-                                            col.toggleVisibility(!!value)
-                                        }
-                                    >
-                                        {col.id}
-                                    </DropdownMenuCheckboxItem>
-                                ))}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </div>
+                        {table
+                            .getAllColumns()
+                            .filter((col) => col.getCanHide())
+                            .map((col) => (
+                                <DropdownMenuCheckboxItem
+                                    key={col.id}
+                                    className="capitalize"
+                                    checked={col.getIsVisible()}
+                                    onCheckedChange={(value: boolean) =>
+                                        col.toggleVisibility(!!value)
+                                    }
+                                >
+                                    {col.id}
+                                </DropdownMenuCheckboxItem>
+                            ))}
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
-        </>
+        </div>
     );
 }
