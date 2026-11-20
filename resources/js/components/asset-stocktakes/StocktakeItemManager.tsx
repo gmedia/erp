@@ -75,7 +75,7 @@ export function StocktakeItemManager({
                 };
             }),
         };
-        onSave(submitData);
+        void onSave(submitData);
     };
 
     return (

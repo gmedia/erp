@@ -47,7 +47,7 @@ export default function UserGuidePage() {
     const [contentLoading, setContentLoading] = useState(false);
 
     useEffect(() => {
-        fetchWithAuth('/api/user-guide')
+        void fetchWithAuth('/api/user-guide')
             .then((r) => r.json())
             .then((json) => {
                 const data: GuideItem[] = json.data || [];
@@ -62,7 +62,7 @@ export default function UserGuidePage() {
     useEffect(() => {
         if (!activeSlug) return;
         setContentLoading(true);
-        fetchWithAuth(`/api/user-guide/${activeSlug}`)
+        void fetchWithAuth(`/api/user-guide/${activeSlug}`)
             .then((r) => r.json())
             .then((json) => {
                 setContent(json.data || null);

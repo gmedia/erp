@@ -125,7 +125,7 @@ export function useEntityPipeline(
             });
             setStateData(response.data.data);
             toast.success(response.data.message || 'Transition successful');
-            fetchTimeline(1); // Refresh timeline after transition
+            void fetchTimeline(1); // Refresh timeline after transition
             return true;
         } catch (err: unknown) {
             if (axios.isAxiosError(err)) {

@@ -51,10 +51,10 @@ export function useAssetDepreciationRuns() {
                 formData,
             );
             toast.success(response.data.message);
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ['asset-depreciation-runs'],
             });
-            refetch();
+            void refetch();
             return true;
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
@@ -82,10 +82,10 @@ export function useAssetDepreciationRuns() {
                 `/api/asset-depreciation-runs/${id}/post`,
             );
             toast.success(response.data.message);
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ['asset-depreciation-runs'],
             });
-            refetch();
+            void refetch();
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
                 const message =

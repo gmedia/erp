@@ -71,7 +71,7 @@ export default function EntityForm<
 
     const handleSubmit = React.useCallback(
         (values: TTransformedValues) => {
-            onSubmit(values);
+            void onSubmit(values);
         },
         [onSubmit],
     );

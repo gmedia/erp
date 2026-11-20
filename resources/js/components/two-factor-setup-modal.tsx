@@ -329,7 +329,7 @@ export default function TwoFactorSetupModal({
         }
 
         if (!qrCodeSvg) {
-            fetchSetupData();
+            void fetchSetupData();
         }
     }, [isOpen, qrCodeSvg, fetchSetupData, resetModalState]);
 

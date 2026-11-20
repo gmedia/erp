@@ -170,7 +170,7 @@ export function PipelineTransitionFormDialog({
                     <form
                         onSubmit={(e) => {
                             e.stopPropagation();
-                            form.handleSubmit(onSubmit)(e);
+                            void form.handleSubmit(onSubmit)(e);
                         }}
                         className="flex min-h-0 flex-1 flex-col"
                     >

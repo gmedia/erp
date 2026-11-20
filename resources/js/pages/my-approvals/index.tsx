@@ -297,7 +297,9 @@ export default function MyApprovalsPage() {
                     unitId: '',
                     reviewNotes: '',
                 });
-                queryClient.invalidateQueries({ queryKey: ['my-approvals'] });
+                void queryClient.invalidateQueries({
+                    queryKey: ['my-approvals'],
+                });
                 toast.success(`Request ${actionDialog.type}d successfully`);
             })
             .catch((err) => {

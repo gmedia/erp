@@ -91,8 +91,10 @@ export function usePostingJournal() {
 
             toast.success(response.data.message);
             setSelectedIds([]);
-            queryClient.invalidateQueries({ queryKey: ['posting-journals'] });
-            refetch();
+            void queryClient.invalidateQueries({
+                queryKey: ['posting-journals'],
+            });
+            void refetch();
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
                 const message =

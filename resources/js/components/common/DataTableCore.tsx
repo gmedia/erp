@@ -221,7 +221,7 @@ export function DataTable<T>({
 
     // Memoize export handler
     const handleExport = React.useCallback(() => {
-        exportData(
+        void exportData(
             Object.fromEntries(
                 Object.entries(filters).map(([key, value]) => [
                     key,

@@ -202,7 +202,7 @@ export const InventoryStocktakeForm = memo<InventoryStocktakeFormProps>(
                 }
             };
 
-            loadDetail();
+            void loadDetail();
         }, [open, activeStocktake?.id, activeStocktake?.items, form]);
 
         return (

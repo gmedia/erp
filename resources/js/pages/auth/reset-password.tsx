@@ -49,7 +49,7 @@ export default function ResetPassword({
             toast.success(
                 response.data.status || 'Password has been successfully reset.',
             );
-            navigate('/login', { replace: true });
+            void navigate('/login', { replace: true });
         } catch (error: unknown) {
             const formattedErrors = mapFirstValidationErrors(error);
 

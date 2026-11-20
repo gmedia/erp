@@ -40,8 +40,8 @@ export default function VerifyEmail({
         e.preventDefault();
         try {
             await axios.post('/api/logout');
-            logout();
-            navigate('/login');
+            void logout();
+            void navigate('/login');
         } catch {
             toast.error('Failed to log out.');
         }

@@ -167,14 +167,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }, []);
 
     useEffect(() => {
-        refreshAuth();
+        void refreshAuth();
     }, [refreshAuth]);
 
     const login = useCallback(
         (token: string, data: { user: User; employee: Employee }) => {
             setToken(token);
             if (data.user) setUser(data.user);
-            refreshAuth();
+            void refreshAuth();
         },
         [refreshAuth],
     );

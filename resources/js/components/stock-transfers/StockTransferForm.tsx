@@ -215,7 +215,7 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                 }
             };
 
-            loadDetail();
+            void loadDetail();
         }, [open, activeStockTransfer?.id, activeStockTransfer?.items, form]);
 
         return (

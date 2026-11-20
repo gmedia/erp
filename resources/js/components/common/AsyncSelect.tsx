@@ -72,7 +72,7 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
             }
         };
 
-        resolvePreferred();
+        void resolvePreferred();
     }, [preferredMetaKey, preferredResolved, value, url, onValueChange]);
 
     const debouncedSearch = useDebounce(search, 300);
@@ -143,13 +143,13 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
             }
         };
 
-        fetchInitialLabel();
+        void fetchInitialLabel();
     }, [value, url, selectedLabel, initialLoadDone, labelFn, initialLabel]);
 
     // Fetch items on open or search
     React.useEffect(() => {
         if (open) {
-            fetchItems(debouncedSearch);
+            void fetchItems(debouncedSearch);
         }
     }, [open, debouncedSearch, fetchItems]);
 

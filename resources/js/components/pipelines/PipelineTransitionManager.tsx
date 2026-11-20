@@ -32,8 +32,8 @@ export function PipelineTransitionManager({
         useState<PipelineTransition | null>(null);
 
     useEffect(() => {
-        fetchTransitions();
-        fetchStates();
+        void fetchTransitions();
+        void fetchStates();
     }, [fetchTransitions, fetchStates]);
 
     const handleCreateNew = () => {
@@ -154,7 +154,7 @@ export function PipelineTransitionManager({
                     transition={editingTransition}
                     states={states}
                     onSuccess={() => {
-                        fetchTransitions();
+                        void fetchTransitions();
                         setIsDialogOpen(false);
                     }}
                 />

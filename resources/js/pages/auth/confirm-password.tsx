@@ -31,7 +31,7 @@ export default function ConfirmPassword() {
 
             // Redirect to intended location after confirming password
             const from = location.state?.from?.pathname || '/dashboard';
-            navigate(from, { replace: true });
+            void navigate(from, { replace: true });
         } catch (error: unknown) {
             if (axios.isAxiosError(error) && error.response?.status === 422) {
                 setErrors(error.response.data.errors || {});

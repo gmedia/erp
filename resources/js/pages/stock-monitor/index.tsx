@@ -96,7 +96,7 @@ export default function StockMonitorPage() {
                 console.error('Failed to load filter options', e);
             }
         };
-        fetchOptions();
+        void fetchOptions();
     }, []);
 
     const columns = createStockMonitorColumns();
