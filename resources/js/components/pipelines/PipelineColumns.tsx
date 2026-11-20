@@ -19,7 +19,11 @@ const renderStatusCell = ({ row }: { row: { original: Pipeline } }) => {
 
 export const pipelineColumns: ColumnDef<Pipeline>[] = [
     createSelectColumn<Pipeline>(),
-    createTextColumn<Pipeline>({ accessorKey: 'name', label: 'Name' }),
+    createTextColumn<Pipeline>({
+        accessorKey: 'name',
+        label: 'Name',
+        primary: true,
+    }),
     createTextColumn<Pipeline>({ accessorKey: 'code', label: 'Code' }),
     {
         accessorKey: 'entity_type',

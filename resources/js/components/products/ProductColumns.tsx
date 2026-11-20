@@ -60,7 +60,11 @@ const renderStatusCell = ({ row }: { row: { original: Product } }) => {
 export const productColumns: ColumnDef<Product>[] = [
     createSelectColumn(),
     createTextColumn<Product>({ accessorKey: 'code', label: 'Code' }),
-    createTextColumn<Product>({ accessorKey: 'name', label: 'Name' }),
+    createTextColumn<Product>({
+        accessorKey: 'name',
+        label: 'Name',
+        primary: true,
+    }),
     {
         accessorKey: 'type',
         ...createSortingHeader('Type'),

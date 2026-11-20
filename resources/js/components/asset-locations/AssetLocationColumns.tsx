@@ -35,7 +35,11 @@ const renderParentCell = ({ row }: { row: { original: AssetLocation } }) => {
 export const assetLocationColumns: ColumnDef<AssetLocation>[] = [
     createSelectColumn<AssetLocation>(),
     createTextColumn<AssetLocation>({ accessorKey: 'code', label: 'Code' }),
-    createTextColumn<AssetLocation>({ accessorKey: 'name', label: 'Name' }),
+    createTextColumn<AssetLocation>({
+        accessorKey: 'name',
+        label: 'Name',
+        primary: true,
+    }),
     {
         accessorKey: 'branch',
         ...createSortingHeader('Branch'),

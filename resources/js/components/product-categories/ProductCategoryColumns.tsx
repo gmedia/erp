@@ -18,7 +18,11 @@ export interface ProductCategory {
 
 export const productCategoryColumns: ColumnDef<ProductCategory>[] = [
     createSelectColumn<ProductCategory>(),
-    createTextColumn<ProductCategory>({ accessorKey: 'name', label: 'Name' }),
+    createTextColumn<ProductCategory>({
+        accessorKey: 'name',
+        label: 'Name',
+        primary: true,
+    }),
     createTextColumn<ProductCategory>({
         accessorKey: 'description',
         label: 'Description',

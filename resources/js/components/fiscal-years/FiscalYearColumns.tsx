@@ -12,7 +12,11 @@ import { ColumnDef } from '@tanstack/react-table';
 
 export const fiscalYearColumns: ColumnDef<FiscalYear>[] = [
     createSelectColumn<FiscalYear>(),
-    createTextColumn<FiscalYear>({ accessorKey: 'name', label: 'Name' }),
+    createTextColumn<FiscalYear>({
+        accessorKey: 'name',
+        label: 'Name',
+        primary: true,
+    }),
     createDateColumn<FiscalYear>({
         accessorKey: 'start_date',
         label: 'Start Date',

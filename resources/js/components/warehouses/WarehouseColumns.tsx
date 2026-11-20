@@ -20,7 +20,11 @@ const renderBranchCell = ({ row }: { row: { original: Warehouse } }) => {
 export const warehouseColumns: ColumnDef<Warehouse>[] = [
     createSelectColumn<Warehouse>(),
     createTextColumn<Warehouse>({ accessorKey: 'code', label: 'Code' }),
-    createTextColumn<Warehouse>({ accessorKey: 'name', label: 'Name' }),
+    createTextColumn<Warehouse>({
+        accessorKey: 'name',
+        label: 'Name',
+        primary: true,
+    }),
     {
         accessorKey: 'branch',
         ...createSortingHeader('Branch'),

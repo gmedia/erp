@@ -13,7 +13,11 @@ import { ColumnDef } from '@tanstack/react-table';
 export const assetCategoryColumns: ColumnDef<AssetCategory>[] = [
     createSelectColumn<AssetCategory>(),
     createTextColumn<AssetCategory>({ accessorKey: 'code', label: 'Code' }),
-    createTextColumn<AssetCategory>({ accessorKey: 'name', label: 'Name' }),
+    createTextColumn<AssetCategory>({
+        accessorKey: 'name',
+        label: 'Name',
+        primary: true,
+    }),
     createNumberColumn<AssetCategory>({
         accessorKey: 'useful_life_months_default',
         label: 'Default Useful Life (Months)',

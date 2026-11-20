@@ -3,13 +3,14 @@
 import { GenericActions } from '@/components/common/ActionsDropdown';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { formatDate } from '@/lib/utils';
+import { cn, formatDate } from '@/lib/utils';
 import {
     formatCurrencyByRegionalSettings,
     formatNumberByRegionalSettings,
 } from '@/utils/number-format';
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown } from 'lucide-react';
+import type { ReactNode } from 'react';
 
 // Type definitions for better type safety
 export type ColumnBuilderOptions<T = Record<string, unknown>> = {
@@ -89,20 +90,49 @@ export function createSortingHeader(label: string) {
 
 // Basic text column with optional sorting
 export function createTextColumn<T = Record<string, unknown>>(
-    options: ColumnBuilderOptions<T>,
+    options: ColumnBuilderOptions<T> & {
+        /** Sel utama baris (nama/kode dokumen): teks tebal (§0.4). */
+        primary?: boolean;
+        /** Baris meta kecil di bawah teks utama (sel dua baris, §0.4). */
+        description?: (row: T) => ReactNode;
+    },
 ): ColumnDef<T> {
-    const { accessorKey, label, enableSorting = true } = options;
+    const {
+        accessorKey,
+        label,
+        enableSorting = true,
+        primary = false,
+        description,
+    } = options;
 
     const baseColumn: ColumnDef<T> = {
         accessorKey: accessorKey as string,
         cell: ({ row }) => {
             const value = row.getValue(accessorKey as string);
+            const text =
+                typeof value === 'string' || typeof value === 'number'
+                    ? String(value)
+                    : '-';
+            const meta = description?.(row.original);
 
-            if (typeof value === 'string' || typeof value === 'number') {
-                return <div>{String(value)}</div>;
+            if (!primary && !meta) {
+                return <div>{text}</div>;
             }
 
-            return <div>-</div>;
+            return (
+                <div className="min-w-0">
+                    <div
+                        className={cn(primary && 'font-medium text-foreground')}
+                    >
+                        {text}
+                    </div>
+                    {meta ? (
+                        <div className="truncate text-xs text-muted-foreground">
+                            {meta}
+                        </div>
+                    ) : null}
+                </div>
+            );
         },
     };
 
@@ -498,7 +528,11 @@ export function createSimpleEntityColumns<
 >(): ColumnDef<T>[] {
     return [
         createSelectColumn<T>(),
-        createTextColumn<T>({ accessorKey: 'name', label: 'Name' }),
+        createTextColumn<T>({
+            accessorKey: 'name',
+            label: 'Name',
+            primary: true,
+        }),
         createDateColumn<T>({ accessorKey: 'created_at', label: 'Created At' }),
         createDateColumn<T>({ accessorKey: 'updated_at', label: 'Updated At' }),
         createActionsColumn<T>(),
