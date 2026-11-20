@@ -4,6 +4,7 @@ namespace App\Http\Requests\StockAdjustments;
 
 use App\Http\Requests\AuthorizedFormRequest;
 use App\Http\Requests\Concerns\HasSometimesArrayRules;
+use App\Models\StockAdjustment;
 
 abstract class AbstractStockAdjustmentRequest extends AuthorizedFormRequest
 {
@@ -50,7 +51,8 @@ abstract class AbstractStockAdjustmentRequest extends AuthorizedFormRequest
             return 'unique:stock_adjustments,adjustment_number';
         }
 
-        $adjustmentId = $this->route('stockAdjustment')->id ?? $this->route('id');
+        $adjustment = $this->route('stock_adjustment') ?? $this->route('stockAdjustment');
+        $adjustmentId = $adjustment instanceof StockAdjustment ? $adjustment->getKey() : $adjustment;
 
         return 'unique:stock_adjustments,adjustment_number,' . $adjustmentId;
     }
