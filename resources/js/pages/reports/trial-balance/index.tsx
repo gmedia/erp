@@ -115,7 +115,7 @@ export default function TrialBalance() {
                 footerClassName={isBalanced ? undefined : 'text-destructive'}
             >
                 {!isBalanced && report.length > 0 && (
-                    <div className="mt-3 rounded-md border border-destructive/30 bg-destructive-foreground/5 px-3 py-2 text-sm text-destructive">
+                    <div className="mt-3 rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
                         Trial Balance tidak seimbang. Selisih:{' '}
                         {formatCurrency(difference)}
                     </div>

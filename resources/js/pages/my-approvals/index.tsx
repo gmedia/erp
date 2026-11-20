@@ -527,7 +527,7 @@ export default function MyApprovalsPage() {
                 )}
 
                 {error && (
-                    <div className="rounded-md border border-destructive/30 bg-destructive-foreground/5 px-3 py-2.5 text-sm text-destructive">
+                    <div className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-sm text-destructive">
                         Failed to load approvals. Please refresh and try again.
                     </div>
                 )}
