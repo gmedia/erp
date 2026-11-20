@@ -68,5 +68,3 @@ sonar-project.properties
 opencode.json
 .opencode
 
-.depwireignore
-depwire-output.json

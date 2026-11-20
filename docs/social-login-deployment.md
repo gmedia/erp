@@ -122,6 +122,6 @@ Untuk investigasi, lihat channel log `security` (provider, account_type, kode er
 ## 7. Referensi
 
 - Spesifikasi & keputusan desain: `docs/social-login-design.md`
-- Aturan anti-hardcode brand: `.github/copilot-instructions.md` §10
+- Aturan anti-hardcode brand: `AGENTS.md` → On-Premise / Multi-Perusahaan
 - Laravel Socialite: <https://laravel.com/docs/12.x/socialite>
 - Microsoft identity platform (tenant types): dokumentasi resmi Microsoft Entra
