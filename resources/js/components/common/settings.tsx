@@ -145,11 +145,16 @@ export function SettingsSaveButton({
     processing,
     recentlySuccessful,
     testId,
+    dataTest,
+    label = 'Save',
 }: Readonly<{
     formId: string;
     processing: boolean;
     recentlySuccessful: boolean;
     testId?: string;
+    /** Atribut `data-test` lama yang masih dipakai E2E. */
+    dataTest?: string;
+    label?: string;
 }>) {
     return (
         <>
@@ -168,11 +173,12 @@ export function SettingsSaveButton({
                 disabled={processing}
                 className="min-w-24"
                 data-testid={testId}
+                data-test={dataTest}
             >
                 {processing ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : null}
-                Save
+                {label}
             </Button>
         </>
     );

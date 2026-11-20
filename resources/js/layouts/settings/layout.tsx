@@ -42,7 +42,7 @@ export default function SettingsLayout({
                 active: currentPath === item.href,
             }))}
         >
-            <div className="max-w-xl space-y-12">{children}</div>
+            {children}
         </SettingsShell>
     );
 }

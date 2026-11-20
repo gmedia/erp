@@ -9,16 +9,18 @@ import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { toast } from 'sonner';
 
+import {
+    SettingsRow,
+    SettingsSaveButton,
+    SettingsSection,
+} from '@/components/common/settings';
 import DeleteUser from '@/components/delete-user';
 import HeadingSmall from '@/components/heading-small';
-import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { type BreadcrumbItem } from '@/types';
-import { Transition } from '@headlessui/react';
 import { useSearchParams } from 'react-router-dom';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -84,56 +86,56 @@ export default function Profile({
             </Helmet>
 
             <SettingsLayout>
-                <div className="space-y-6">
-                    <HeadingSmall
-                        title="Profile information"
-                        description="Update your name and email address"
-                    />
-
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="grid gap-2">
-                            <Label htmlFor="name">Name</Label>
-
+                <SettingsSection
+                    title="Profile information"
+                    description="Update your name and email address"
+                    actions={
+                        <SettingsSaveButton
+                            formId="profile-form"
+                            processing={processing}
+                            recentlySuccessful={recentlySuccessful}
+                            dataTest="update-profile-button"
+                        />
+                    }
+                >
+                    <form id="profile-form" onSubmit={handleSubmit}>
+                        <SettingsRow
+                            label="Name"
+                            htmlFor="name"
+                            description="Shown across the app and in approvals."
+                            error={errors.name}
+                        >
                             <Input
                                 id="name"
-                                className="mt-1 block w-full"
                                 defaultValue={user?.name ?? ''}
                                 name="name"
                                 required
                                 autoComplete="name"
                                 placeholder="Full name"
                             />
+                        </SettingsRow>
 
-                            <InputError
-                                className="mt-2"
-                                message={errors.name}
-                            />
-                        </div>
-
-                        <div className="grid gap-2">
-                            <Label htmlFor="email">Email address</Label>
-
+                        <SettingsRow
+                            label="Email address"
+                            htmlFor="email"
+                            description="Used to sign in and receive notifications."
+                            error={errors.email}
+                        >
                             <Input
                                 id="email"
                                 type="email"
-                                className="mt-1 block w-full"
                                 defaultValue={user?.email ?? ''}
                                 name="email"
                                 required
                                 autoComplete="username"
                                 placeholder="Email address"
                             />
-
-                            <InputError
-                                className="mt-2"
-                                message={errors.email}
-                            />
-                        </div>
+                        </SettingsRow>
 
                         {mustVerifyEmail &&
                             user?.email_verified_at === null && (
                                 <div>
-                                    <p className="-mt-4 text-sm text-muted-foreground">
+                                    <p className="text-sm text-muted-foreground">
                                         Your email address is unverified.{' '}
                                         <button
                                             type="button"
@@ -164,29 +166,8 @@ export default function Profile({
                                     )}
                                 </div>
                             )}
-
-                        <div className="flex items-center gap-4">
-                            <Button
-                                disabled={processing}
-                                data-test="update-profile-button"
-                            >
-                                Save
-                            </Button>
-
-                            <Transition
-                                show={recentlySuccessful}
-                                enter="transition ease-in-out"
-                                enterFrom="opacity-0"
-                                leave="transition ease-in-out"
-                                leaveTo="opacity-0"
-                            >
-                                <p className="text-sm text-muted-foreground">
-                                    Saved
-                                </p>
-                            </Transition>
-                        </div>
                     </form>
-                </div>
+                </SettingsSection>
 
                 {isPushSupported() && (
                     <div className="space-y-6">
