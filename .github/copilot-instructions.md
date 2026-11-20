@@ -22,6 +22,8 @@ description: Aturan agent untuk project ERP
 
 > **UI konsisten antar modul:** Sebelum membuat atau mengoreksi UI, baca **`docs/ui-design-rules.md`**. Dokumen itu adalah sumber kebenaran untuk page shell, toolbar, tabel, status/warna, form, modal, dan checklist review UI existing.
 
+> **Ikon sidebar:** Setiap menu dan child menu di `database/seeders/MenuSeeder.php` wajib memakai ikon Lucide yang diimpor dan didaftarkan di `resources/js/lib/icon-map.ts`. Jalankan `npm run check:menu-icons` setelah mengubah menu; hasil wajib `0 missing`. Fallback `CircleHelp` bukan pengganti registrasi.
+
 ### Routing Convention
 
 - **Backend**: Buat file route baru di `routes/api/{module-slug}.php`. File di-include otomatis oleh `routes/api.php`.

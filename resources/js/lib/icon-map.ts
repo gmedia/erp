@@ -13,11 +13,15 @@ import {
     Building2,
     Calculator,
     Calendar,
+    CarFront,
+    ChartNoAxesCombined,
     CheckCircle,
     CheckSquare,
+    CircleHelp,
     ClipboardCheck,
     ClipboardList,
     ClipboardPenLine,
+    ClipboardPlus,
     Copy,
     Database,
     Edit3,
@@ -53,6 +57,7 @@ import {
     Settings,
     Settings2,
     Shield,
+    ShieldCheck,
     ShoppingCart,
     Swords,
     Tags,
@@ -71,6 +76,9 @@ import {
 const iconMap: Record<string, LucideIcon> = {
     Banknote,
     BookOpen,
+    CarFront,
+    ChartNoAxesCombined,
+    CircleHelp,
     Folder,
     IdCard,
     LayoutGrid,
@@ -109,6 +117,7 @@ const iconMap: Record<string, LucideIcon> = {
     Layers,
     Map,
     Shield,
+    ShieldCheck,
     Swords,
     Lock,
     User,
@@ -130,6 +139,7 @@ const iconMap: Record<string, LucideIcon> = {
     History,
     Hourglass,
     ClipboardList,
+    ClipboardPlus,
     FilePlus2,
     PackageCheck,
     PiggyBank,
@@ -139,5 +149,6 @@ const iconMap: Record<string, LucideIcon> = {
 
 export function getIcon(name: string | null): LucideIcon | undefined {
     if (!name) return undefined;
-    return iconMap[name];
+
+    return iconMap[name] ?? CircleHelp;
 }
