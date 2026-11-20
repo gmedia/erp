@@ -1,4 +1,4 @@
-package com.contoh.erp;
+package com.dokfin.app_gmedia;
 
 import com.getcapacitor.BridgeActivity;
 
