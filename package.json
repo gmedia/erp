@@ -5,6 +5,7 @@
         "build": "vite build",
         "build:mobile": "vite build --config vite.mobile.config.ts --mode mobile && node scripts/copy-mobile-public.mjs",
         "dev": "vite",
+        "dev:tunnel": "vite --config vite.tunnel.config.ts",
         "format": "prettier --write resources/",
         "format:check": "prettier --check resources/",
         "check:menu-icons": "node scripts/check-menu-icons.mjs",

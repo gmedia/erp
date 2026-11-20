@@ -132,8 +132,26 @@ Agent wajib melakukan langkah ini **sebelum/menyertakan** `bash project_setup.sh
 3b. **`.env` hanya lewat `bash scripts/setup-env.sh`.** Agent **dilarang** membaca, meng-`cat`/`grep`, atau mengedit `.env` langsung (diblokir `deny` di `.claude/settings.json`). Script membuat `.env` dari `.env.example` tanpa menimpa yang sudah ada, memaksa `HOST_IP=127.0.0.1`, memindah port forward yang bentrok (mis. Valkey 6379 → 6380), `chmod 600`, dan hanya mencetak key non-rahasia. `APP_KEY` diisi via `./vendor/bin/sail artisan key:generate`. Butuh nilai lain di `.env`? Minta user mengubahnya sendiri.
 3c. **Host ber-IP publik:** `HOST_IP` wajib `127.0.0.1` — port yang dipublish Docker **melewati UFW**, jadi `HOST_IP` kosong = MariaDB/Valkey/MinIO/app terbuka ke internet. Setelah `sail up`, verifikasi: `docker ps --format '{{.Ports}}'` hanya berisi `127.0.0.1:`.
 3d. `project_setup.sh` menjalankan `sail down -v` + `migrate:fresh --seed` (menghapus volume/data) dan `sail npm run dev` di foreground — di host yang sudah punya data, jalankan langkahnya satu per satu dan Vite di background.
-4. Buka `http://localhost:82` via SSH tunnel dari laptop; jangan pernah bind ke `0.0.0.0` di host ber-IP-publik.
+4. **Akses dari laptop = SSH tunnel** (lihat **Akses dari laptop (SSH tunnel)** di bawah); jangan pernah bind ke `0.0.0.0` di host ber-IP-publik.
 5. **Image app tidak perlu di-build lokal.** `project_setup.sh` mem-pull `ghcr.io/gmedia/erp/ci-sail:8.4` (public, Dockerfile sama `docker/8.4`, dibangun CI) lalu men-tag-nya `sail-8.4/app`; UID container menyesuaikan saat runtime (`start-container` → `usermod`). Build lokal (>25 menit) hanya bila `SAIL_BUILD=1` atau pull gagal. Script juga menjalankan `sail up -d --wait` (bukan `sleep`) dan `key:generate` bila `APP_KEY` kosong.
+
+### Akses dari laptop (SSH tunnel)
+
+Saat user minta akses ERP di host remote/server dari laptop, agent **wajib** memeriksa kondisi aktual host sebelum memberi perintah, dan tidak boleh menebak dari default:
+
+1. **Port yang dipublish:** `docker ps --format '{{.Names}} {{.Ports}}'`. Ambil port app (`APP_PORT`, default `82`) dan port Vite (`VITE_PORT`, default `5173`; `scripts/setup-env.sh` bisa memindahkannya kalau bentrok, mis. `5175`). Semua harus `127.0.0.1:`.
+2. **Mode aset:** `test -f public/hot && cat public/hot`.
+   - **Tidak ada `public/hot`** berarti mode build (`public/build`). Cukup tunnel port app.
+   - **Ada `public/hot`** berarti Vite dev aktif dan browser memuat aset dari URL di file itu. Port Vite **wajib** ikut di-tunnel dengan **nomor port lokal yang sama**. Kalau tidak, halaman blank.
+   - Isi `public/hot` harus `http://localhost:<VITE_PORT>`. Kalau `http://0.0.0.0:...` (hasil `npm run dev -- --host`), browser menolak. Hentikan, lalu jalankan `./vendor/bin/sail npm run dev:tunnel` (`vite.tunnel.config.ts`: listen di container, origin/HMR `localhost:<VITE_PORT>`).
+3. **Perintah untuk laptop** (port app lokal boleh diganti, port Vite tidak; MinIO `9000` opsional untuk foto/dokumen):
+   ```bash
+   ssh -N -L 8082:127.0.0.1:<APP_PORT> -L <VITE_PORT>:127.0.0.1:<VITE_PORT> -L 9000:127.0.0.1:9000 <user>@<host>
+   # buka http://localhost:8082 ; tanpa Vite dev: hapus -L <VITE_PORT>...
+   ```
+4. **Verifikasi sebelum menjawab:** `curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:<VITE_PORT>/@vite/client` → `200` (bila Vite dev aktif), dan HTML app (`curl -s http://127.0.0.1:<APP_PORT>/`) merujuk `http://localhost:<VITE_PORT>/…` atau `/build/…`.
+5. **Hentikan Vite dev sebelum E2E/screenshot** (`./vendor/bin/sail exec laravel.test pkill -f vite`, `public/hot` ikut terhapus) supaya aset sama dengan CI (build).
+6. Jangan menulis alamat/IP server sewaan atau privat ke repo, PR, atau issue. Pakai placeholder `<user>@<host>`.
 
 Guard menolak push dari branch tanpa pola `<type>/issue-N-slug`, issue belum `status:claimed`, atau bukan di-assign ke akun `gh`. Ini pelengkap koordinasi di https://github.com/gmedia/erp/issues.
 
