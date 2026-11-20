@@ -8,6 +8,7 @@
         "format": "prettier --write resources/",
         "format:check": "prettier --check resources/",
         "check:menu-icons": "node scripts/check-menu-icons.mjs",
+        "check:raw-colors": "node scripts/check-raw-colors.mjs",
         "lint": "eslint . --fix",
         "lint:check": "eslint . --max-warnings=0",
         "types": "tsc --noEmit",

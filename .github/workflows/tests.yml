@@ -355,6 +355,10 @@ jobs:
         if: steps.autofix.outputs.changed != 'true'
         run: ./vendor/bin/sail npm run check:menu-icons
 
+      - name: Check raw Tailwind colors
+        if: steps.autofix.outputs.changed != 'true'
+        run: ./vendor/bin/sail npm run check:raw-colors
+
       - name: Build assets
         if: steps.autofix.outputs.changed != 'true'
         run: ./vendor/bin/sail npm run build
