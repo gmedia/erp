@@ -31,7 +31,7 @@ export function SummaryCards({ data, isLoading }: Readonly<SummaryCardsProps>) {
 
     return (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Card className="overflow-hidden border-l-4 border-l-blue-500 transition-all hover:shadow-md">
+            <Card className="overflow-hidden">
                 <CardHeader className="flex flex-row items-center justify-between pt-4 pb-2">
                     <CardTitle className="text-sm font-medium text-muted-foreground">
                         Total Assets
@@ -48,7 +48,7 @@ export function SummaryCards({ data, isLoading }: Readonly<SummaryCardsProps>) {
                 </CardContent>
             </Card>
 
-            <Card className="overflow-hidden border-l-4 border-l-emerald-500 transition-all hover:shadow-md">
+            <Card className="overflow-hidden">
                 <CardHeader className="flex flex-row items-center justify-between pt-4 pb-2">
                     <CardTitle className="text-sm font-medium text-muted-foreground">
                         Purchase Cost
@@ -65,7 +65,7 @@ export function SummaryCards({ data, isLoading }: Readonly<SummaryCardsProps>) {
                 </CardContent>
             </Card>
 
-            <Card className="overflow-hidden border-l-4 border-l-indigo-500 transition-all hover:shadow-md">
+            <Card className="overflow-hidden">
                 <CardHeader className="flex flex-row items-center justify-between pt-4 pb-2">
                     <CardTitle className="text-sm font-medium text-muted-foreground">
                         Book Value
@@ -82,7 +82,7 @@ export function SummaryCards({ data, isLoading }: Readonly<SummaryCardsProps>) {
                 </CardContent>
             </Card>
 
-            <Card className="overflow-hidden border-l-4 border-l-rose-500 transition-all hover:shadow-md">
+            <Card className="overflow-hidden">
                 <CardHeader className="flex flex-row items-center justify-between pt-4 pb-2">
                     <CardTitle className="text-sm font-medium text-muted-foreground">
                         Accum. Depreciation

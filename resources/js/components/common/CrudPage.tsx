@@ -203,7 +203,7 @@ export function CrudPage<
 
             <AppLayout breadcrumbs={config.breadcrumbs}>
                 <div className="flex w-full flex-col gap-3 overflow-x-auto p-4">
-                    <div className="rounded-lg border border-border/60 bg-card shadow-sm">
+                    <div>
                         <config.DataTableComponent {...dataTableProps} />
                     </div>
                 </div>

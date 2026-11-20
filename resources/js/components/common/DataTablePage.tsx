@@ -74,7 +74,7 @@ export function DataTablePage<
             <AppLayout breadcrumbs={breadcrumbs}>
                 <div className="flex w-full flex-col gap-3 overflow-x-auto p-4">
                     {children}
-                    <div className="rounded-lg border border-border/60 bg-card shadow-sm">
+                    <div>
                         <DataTable
                             columns={columns}
                             data={data}
