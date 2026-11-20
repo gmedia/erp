@@ -30,8 +30,10 @@ import { cn } from '@/lib/utils';
 import * as React from 'react';
 import type { FieldDescriptor } from './filters';
 
+// Tepi kiri kolom sticky: fade ke latar halaman agar kolom yang tertutup
+// (scroll horizontal) memudar, bukan terpotong tajam di atas latar datar.
 const STICKY_EDGE_SHADOW =
-    'shadow-[-6px_0_8px_-6px_rgba(0,0,0,0.15)] dark:shadow-[-6px_0_8px_-6px_rgba(0,0,0,0.45)]';
+    'before:pointer-events-none before:absolute before:inset-y-0 before:-left-6 before:w-6 before:bg-linear-to-r before:from-transparent before:to-background';
 const STICKY_ACTIONS_CELL = `sticky right-0 z-20 bg-background`;
 const STICKY_ACTIONS_HEAD = `sticky right-0 z-30 bg-background`;
 const STICKY_GRAND_TOTAL_CELL = `sticky right-14 z-10 min-w-28 bg-background whitespace-nowrap ${STICKY_EDGE_SHADOW}`;
