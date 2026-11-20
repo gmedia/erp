@@ -10,13 +10,13 @@ Sumber checklist: komentar dengan marker `<!-- multi-server-checklist -->` di ht
 
 ## Prompt utama (disarankan)
 
-Salin seluruh blok berikut ke opencode di server kedua, dari direktori clone repo:
+Salin seluruh blok berikut ke sesi agent (OpenCode/Claude CLI) di server kedua, dari direktori clone repo:
 
 ```text
 Saya ingin menguji koordinasi multi-server untuk repo gmedia/erp dari HOST KEDUA ini.
 
 Baca dulu:
-- AGENTS.md dan .github/copilot-instructions.md
+- AGENTS.md
 - https://github.com/gmedia/erp/issues/119 (khususnya komentar dengan marker <!-- multi-server-checklist -->)
 - docs/ui-design-rules.md
 

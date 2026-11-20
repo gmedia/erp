@@ -40,19 +40,16 @@ Cari komentar terakhir berisi `<!-- checkpoint -->` atau `<!-- claim -->`. Itu p
 
 File berikut **masih** dibaca dari repo — bukan dipindah ke Issues:
 
-- `.github/copilot-instructions.md` — aturan arsitektur & anti-pattern
-- `AGENTS.md` — workflow, batas ≤3 tool/turn, Sail
+- `AGENTS.md` — aturan arsitektur, anti-pattern, workflow, batas ≤3 tool/turn, Sail
 - `docs/development-patterns.md` — pola CRUD/report/export/FY
 - `docs/module-registry.md` — metadata test per modul
 - `task.md` — **arsip status lama saja**, jangan dijadikan sumber aktif
 
-Jika ada local override, baca `.kilo/rules/erp-agent-rules.md`.
-
 ## 4. Verifikasi Baseline Sesi
 
 ```bash
-git rev-parse HEAD
-git status --short
+rtk git rev-parse HEAD
+rtk git status --short
 ./vendor/bin/sail php -v
 ```
 
@@ -60,7 +57,7 @@ git status --short
 
 - Ringkas status dari issue + komentar checkpoint (5–10 poin).
 - Tentukan 1 objective aktif, 1 blocker, 1 next action terukur.
-- Tentukan MCP utama: `laravel-boost`, `context7`, atau `depwire`.
+- Tentukan skill/command utama yang relevan (lihat `.claude/README.md`).
 
 ## 6. Kerjakan Wave Kecil
 

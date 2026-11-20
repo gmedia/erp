@@ -1,5 +1,5 @@
 ---
-name: Database Migration
+name: database-migration
 description: Panduan membuat migration, seeder, dan factory sesuai standar Laravel.
 ---
 
@@ -7,28 +7,28 @@ description: Panduan membuat migration, seeder, dan factory sesuai standar Larav
 
 Gunakan skill ini untuk membuat atau memodifikasi struktur database dengan aman.
 
-## 🔌 MCP Tools yang Digunakan
+## 🔧 Tools yang Digunakan
 
-> **PENTING**: Selalu gunakan MCP tools ini sebelum membuat perubahan!
+> **PENTING**: Selalu cek schema existing sebelum membuat perubahan!
 
 | Tool | Fungsi |
 |------|--------|
-| `mcp_laravel-boost_database-schema` | Lihat schema existing (tabel, kolom, FK, index) |
-| `mcp_laravel-boost_search-docs` | Cari dokumentasi Laravel migrations |
-| `mcp_laravel-boost_tinker` | Verifikasi sample data atau test code snippet |
-| `read_file` | Baca file referensi existing |
+| `./vendor/bin/sail artisan db:table {table}` (ringkas: `db:show`) | Lihat schema existing (tabel, kolom, FK, index) |
+| Source `vendor/` versi terpasang + docs resmi | Cari dokumentasi Laravel migrations |
+| `./vendor/bin/sail artisan tinker --execute='...'` | Verifikasi sample data atau test code snippet |
+| Baca file | Baca file referensi existing |
 
 ### Contoh Penggunaan
 
 ```
 # Sebelum buat migration, lihat schema existing:
-mcp_laravel-boost_database-schema()
+./vendor/bin/sail artisan db:show
 
-# Cari dokumentasi jika ragu:
-mcp_laravel-boost_search-docs(queries: ["migration foreign key"])
+# Cari dokumentasi jika ragu (source versi terpasang):
+rg -n "function foreignId" vendor/laravel/framework/src/Illuminate/Database/Schema
 
 # Verifikasi struktur tabel setelah migrate:
-mcp_laravel-boost_database-schema(summary: true, filter: "products")
+./vendor/bin/sail artisan db:table products
 ```
 
 ---
@@ -78,7 +78,7 @@ Apa yang perlu dilakukan?
 | Factory | `database/factories/` | Ikuti pola `EmployeeFactory.php` |
 | Seeder | `database/seeders/` | Ikuti pola `EmployeeSeeder.php` |
 
-> **TIP**: Gunakan `read_file` untuk baca file referensi, bukan template.
+> **TIP**: Baca file referensi existing, bukan template.
 
 ---
 
@@ -131,7 +131,7 @@ Schema::table('products', function (Blueprint $table) {
 - ❌ Drop column tanpa backup
 
 ### Best Practices:
-- ✅ Gunakan `mcp_laravel-boost_database-schema` sebelum buat migration
+- ✅ Cek schema via `./vendor/bin/sail artisan db:table {table}` sebelum buat migration
 - ✅ Test migration di local dulu
 - ✅ Gunakan `nullable()` untuk kolom baru
 - ✅ Test rollback: `migrate:rollback` lalu `migrate` lagi
@@ -154,4 +154,4 @@ Schema::table('products', function (Blueprint $table) {
 ./vendor/bin/sail artisan migrate
 ```
 
-Setelah migrate, gunakan `mcp_laravel-boost_database-schema(summary: true, filter: "{table}")` untuk verifikasi struktur tabel.
+Setelah migrate, gunakan `./vendor/bin/sail artisan db:table {table}` untuk verifikasi struktur tabel.

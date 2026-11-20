@@ -15,31 +15,30 @@ Analisa request user:
 
 Backend:
 ```text
-read_file(filePath: "/absolute/path/to/project/.github/skills/refactor-backend/SKILL.md", startLine: 1, endLine: 250)
+baca .claude/skills/refactor-backend/SKILL.md (baris 1–250)
 ```
 
 Frontend:
 ```text
-read_file(filePath: "/absolute/path/to/project/.github/skills/refactor-frontend/SKILL.md", startLine: 1, endLine: 250)
+baca .claude/skills/refactor-frontend/SKILL.md (baris 1–250)
 ```
 
 ## 3. Map Blast Radius dan Dependency
 
 Sebelum edit:
-- Untuk file target, ambil konteks dengan `mcp_depwire_get_file_context(filePath: "app/Services/ExampleService.php")`
-- Untuk symbol yang mungkin diubah, jalankan `mcp_depwire_impact_analysis(symbol: "ExampleService", file: "app/Services/ExampleService.php")`
-- Jika akan rename/move/delete/split/merge file, jalankan `mcp_depwire_simulate_change(...)` lebih dulu
-- Jika refactor dipicu perubahan package/framework/API, resolve docs via Context7 sebelum edit
+- Petakan pemakai file/symbol target: `rg -n 'ExampleService' app routes resources/js tests database config`
+- Jika akan rename/move/delete/split/merge file, ikuti `/refactor-safe` (daftar file terdampak dulu)
+- Jika refactor dipicu perubahan package/framework/API, cek source versi terpasang di `vendor/`/`node_modules/` sebelum edit
 
 ## 4. Check Architecture (Backend)
 
 ```bash
-bash .github/skills/refactor-backend/scripts/check-architecture.sh {ModuleName}
+bash .claude/skills/refactor-backend/scripts/check-architecture.sh {ModuleName}
 ```
 
 ## 5. Identifikasi Issues
 
-Dari output Depwire, check-architecture, atau review manual:
+Dari hasil `rg`, check-architecture, atau review manual:
 - [ ] Controller terlalu gemuk?
 - [ ] Validasi tidak di FormRequest?
 - [ ] Response tidak pakai Resource?
@@ -71,7 +70,7 @@ Backend:
 ```
 
 ```bash
-bash .github/skills/refactor-backend/scripts/check-architecture.sh {ModuleName}
+bash .claude/skills/refactor-backend/scripts/check-architecture.sh {ModuleName}
 ```
 
 E2E:

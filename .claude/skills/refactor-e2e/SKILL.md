@@ -1,5 +1,5 @@
 ---
-name: Refactor E2E Tests
+name: refactor-e2e
 description: Panduan refactor E2E test per modul menggunakan shared test factories, termasuk pertimbangan refactoring frontend/backend agar testing konsisten.
 ---
 
@@ -8,14 +8,14 @@ description: Panduan refactor E2E test per modul menggunakan shared test factori
 Gunakan skill ini untuk refactoring E2E test satu modul pada satu waktu.
 Baca modul existing yang sejenis sebagai referensi pattern sebelum refactoring.
 
-## 🔌 MCP Tools yang Digunakan
+## 🔧 Tools yang Digunakan
 
 | Tool | Kapan Digunakan |
 |------|-----------------|
-| `activate_laravel_logging_and_debugging_tools()` | Aktifkan tool browser log dan backend error saat test gagal |
-| `mcp_laravel-boost_database-schema` | Verify kolom export match database |
-| `mcp_laravel-boost_list-routes` | Verify API routes per modul |
-| `read_file` | Baca file referensi existing |
+| `tail -n 50 storage/logs/laravel.log` | Aktifkan tool browser log dan backend error saat test gagal |
+| `./vendor/bin/sail artisan db:table {table}` (ringkas: `db:show`) | Verify kolom export match database |
+| `./vendor/bin/sail artisan route:list --path=api/{slug}` | Verify API routes per modul |
+| Baca file | Baca file referensi existing |
 
 ---
 
@@ -34,15 +34,15 @@ Cari modul yang akan direfactor. Catat informasi berikut dari kode existing:
 
 Referensi modul yang sudah direfactor:
 ```
-read_file(filePath: "/absolute/path/to/project/tests/e2e/departments/helpers.ts", startLine: 1, endLine: 220)
-read_file(filePath: "/absolute/path/to/project/tests/e2e/departments/department.spec.ts", startLine: 1, endLine: 260)
+baca tests/e2e/departments/helpers.ts (baris 1–220)
+baca tests/e2e/departments/department.spec.ts (baris 1–260)
 ```
 
 ### Langkah 2: Periksa Frontend (SEBELUM Menulis Test)
 
 Baca file Columns modul:
 ```
-read_file(filePath: "/absolute/path/to/project/resources/js/components/{module}/{Module}Columns.tsx", startLine: 1, endLine: 260)
+baca resources/js/components/{module}/{Module}Columns.tsx (baris 1–260)
 ```
 
 **Periksa dan perbaiki jika perlu:**
@@ -65,7 +65,7 @@ read_file(filePath: "/absolute/path/to/project/resources/js/components/{module}/
 ### Langkah 3: Periksa Backend (SEBELUM Menulis Test)
 
 ```
-read_file(filePath: "/absolute/path/to/project/app/Http/Requests/{Module}/Index{Entity}Request.php", startLine: 1, endLine: 220)
+baca app/Http/Requests/{Module}/Index{Entity}Request.php (baris 1–220)
 ```
 
 **Periksa:**
@@ -76,7 +76,7 @@ read_file(filePath: "/absolute/path/to/project/app/Http/Requests/{Module}/Index{
 
 2. **Export columns** — Baca Export Action:
    ```
-  read_file(filePath: "/absolute/path/to/project/app/Actions/{Module}/Export{Module}Action.php", startLine: 1, endLine: 220)
+  baca app/Actions/{Module}/Export{Module}Action.php (baris 1–220)
    ```
    - Pastikan semua kolom DataTable diexport
    - Jika missing: tambahkan ke Export Action dan Export class
@@ -84,12 +84,12 @@ read_file(filePath: "/absolute/path/to/project/app/Http/Requests/{Module}/Index{
 ### Langkah 4: Cek Shared Test Factories
 
 ```
-read_file(filePath: "/absolute/path/to/project/tests/e2e/shared-test-factories.ts", startLine: 1, endLine: 260)
+baca tests/e2e/shared-test-factories.ts (baris 1–260)
 ```
 
 Jika file **belum ada**, buat dulu menggunakan template:
 ```
-read_file(filePath: "/absolute/path/to/project/.github/skills/refactor-e2e/resources/shared-test-factories.ts.template", startLine: 1, endLine: 260)
+baca .claude/skills/refactor-e2e/resources/shared-test-factories.ts.template (baris 1–260)
 ```
 
 ### Langkah 5: Buat/Update Module Helpers
@@ -107,13 +107,13 @@ Buat file `tests/e2e/{module}/helpers.ts` jika belum ada.
 Referensi pattern helpers:
 ```
 # Simple CRUD:
-read_file(filePath: "/absolute/path/to/project/tests/e2e/departments/helpers.ts", startLine: 1, endLine: 220)
+baca tests/e2e/departments/helpers.ts (baris 1–220)
 
 # Complex CRUD:
-read_file(filePath: "/absolute/path/to/project/tests/e2e/employees/helpers.ts", startLine: 1, endLine: 260)
+baca tests/e2e/employees/helpers.ts (baris 1–260)
 
 # Complex dengan async select:
-read_file(filePath: "/absolute/path/to/project/tests/e2e/account-mappings/helpers.ts", startLine: 1, endLine: 260)
+baca tests/e2e/account-mappings/helpers.ts (baris 1–260)
 ```
 
 ### Langkah 6: Buat Spec File
@@ -122,7 +122,7 @@ Buat file `tests/e2e/{module}/{entity}.spec.ts` menggunakan `generateModuleTests
 
 Gunakan template:
 ```
-read_file(filePath: "/absolute/path/to/project/.github/skills/refactor-e2e/resources/module.spec.ts.template", startLine: 1, endLine: 260)
+baca .claude/skills/refactor-e2e/resources/module.spec.ts.template (baris 1–260)
 ```
 
 ### Langkah 7: Verifikasi
@@ -134,8 +134,8 @@ npx playwright test tests/e2e/{module}/ --reporter=line
 
 Jika gagal:
 ```
-activate_laravel_logging_and_debugging_tools()
-# lalu gunakan browser log dan last backend exception tool yang tersedia
+npx playwright show-trace test-results/<test>/trace.zip   # browser/network log
+tail -n 50 storage/logs/laravel.log                        # exception backend terbaru
 ```
 
 ---

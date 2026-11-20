@@ -25,9 +25,9 @@ Spesifikasi:
 - Validasi per-row: [referensi ke aturan unik/format, misal: ikuti validasi StoreRequest]
 
 Instruksi:
-1. Gunakan skill `feature-import` → baca dengan `read_file(filePath: "/absolute/path/to/project/.github/skills/feature-import/SKILL.md", startLine: 1, endLine: 250)` lalu lanjutkan range berikutnya jika perlu
+1. Gunakan skill `feature-import` → baca dengan `baca .claude/skills/feature-import/SKILL.md (baris 1–250)` lalu lanjutkan range berikutnya jika perlu
 2. Pelajari pattern import dari modul `Employees` sebagai referensi struktur.
-3. Jika format file, parser, atau dependency package import perlu referensi eksternal terbaru, gunakan Context7 sebelum implementasi.
+3. Jika format file, parser, atau dependency package import perlu referensi eksternal terbaru, cek source versi terpasang (mis. `vendor/maatwebsite/excel`) sebelum implementasi.
 4. Output yang diharapkan:
    - Backend: Importer class (`app/Imports/{Module}Import.php`), Action class, Form Request, Controller methods, Route.
    - Frontend: Komponen Dialog Upload file & Summary tampilan, tombol navigasi di index.
@@ -42,4 +42,4 @@ Instruksi:
 
 ## Referensi
 
-Untuk melihat aturan arsitektur secara detail, agent akan membaca panduannya di `.github/skills/feature-import/SKILL.md`.
+Untuk melihat aturan arsitektur secara detail, agent akan membaca panduannya di `.claude/skills/feature-import/SKILL.md`.

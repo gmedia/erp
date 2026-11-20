@@ -1,5 +1,5 @@
 ---
-name: Feature CRUD Complex
+name: feature-crud-complex
 description: Workflow untuk membuat fitur CRUD kompleks dengan relasi foreign key, filter multi-field, dan komponen frontend terpisah.
 ---
 
@@ -121,17 +121,16 @@ tests/
 
 ---
 
-## 🔌 MCP Tools yang Digunakan
+## 🔧 Tools yang Digunakan
 
 | Tool | Kapan Digunakan |
 |------|-----------------|
-| `mcp_laravel-boost_database-schema` | Lihat relasi antar tabel existing |
-| `mcp_laravel-boost_tinker` | Test query relationships |
-| `mcp_laravel-boost_list-routes` | Verifikasi routes |
-| `mcp_laravel-boost_search-docs` | Cari dokumentasi Eloquent relationships |
-| `activate_shadcn_ui_code_retrieval` | Aktifkan retrieval source komponen UI (select, date-picker) |
-| `mcp_shadcn-ui_get_component` | Ambil source komponen UI yang relevan |
-| `read_file` | Baca referensi dari Employee/Supplier/Customer; paralelkan bila perlu |
+| `./vendor/bin/sail artisan db:table {table}` (ringkas: `db:show`) | Lihat relasi antar tabel existing |
+| `./vendor/bin/sail artisan tinker --execute='...'` | Test query relationships |
+| `./vendor/bin/sail artisan route:list --path=api/{slug}` | Verifikasi routes |
+| Source `vendor/` versi terpasang + docs resmi | Cari dokumentasi Eloquent relationships |
+| Komponen lokal `resources/js/components/ui/` (tambah: `npx shadcn@latest add {name}`) | Ambil source komponen UI yang relevan |
+| Baca file | Baca referensi dari Employee/Supplier/Customer; baca satu per satu |
 
 ---
 
@@ -141,21 +140,21 @@ tests/
 
 ```
 # Backend References
-read_file(filePath: "/absolute/path/to/project/app/Models/Employee.php", startLine: 1, endLine: 200)
-read_file(filePath: "/absolute/path/to/project/app/Http/Controllers/EmployeeController.php", startLine: 1, endLine: 200)
-read_file(filePath: "/absolute/path/to/project/app/Actions/Employees/IndexEmployeesAction.php", startLine: 1, endLine: 200)
-read_file(filePath: "/absolute/path/to/project/app/Domain/Employees/EmployeeFilterService.php", startLine: 1, endLine: 200)
-read_file(filePath: "/absolute/path/to/project/app/DTOs/Employees/UpdateEmployeeData.php", startLine: 1, endLine: 200)
-read_file(filePath: "/absolute/path/to/project/app/Exports/EmployeeExport.php", startLine: 1, endLine: 200)
+baca app/Models/Employee.php (baris 1–200)
+baca app/Http/Controllers/EmployeeController.php (baris 1–200)
+baca app/Actions/Employees/IndexEmployeesAction.php (baris 1–200)
+baca app/Domain/Employees/EmployeeFilterService.php (baris 1–200)
+baca app/DTOs/Employees/UpdateEmployeeData.php (baris 1–200)
+baca app/Exports/EmployeeExport.php (baris 1–200)
 
 # Frontend References
-read_file(filePath: "/absolute/path/to/project/resources/js/components/employees/EmployeeForm.tsx", startLine: 1, endLine: 220)
-read_file(filePath: "/absolute/path/to/project/resources/js/components/employees/EmployeeFilters.tsx", startLine: 1, endLine: 220)
-read_file(filePath: "/absolute/path/to/project/resources/js/components/employees/EmployeeColumns.tsx", startLine: 1, endLine: 220)
-read_file(filePath: "/absolute/path/to/project/resources/js/utils/entityConfigs.ts", startLine: 1, endLine: 260)  # Lihat employeeConfig
+baca resources/js/components/employees/EmployeeForm.tsx (baris 1–220)
+baca resources/js/components/employees/EmployeeFilters.tsx (baris 1–220)
+baca resources/js/components/employees/EmployeeColumns.tsx (baris 1–220)
+baca resources/js/utils/entityConfigs.ts (baris 1–260)  # Lihat employeeConfig
 
 # Test Examples
-read_file(filePath: "/absolute/path/to/project/tests/Feature/EmployeeControllerTest.php", startLine: 1, endLine: 240)
+baca tests/Feature/EmployeeControllerTest.php (baris 1–240)
 ```
 
 ---

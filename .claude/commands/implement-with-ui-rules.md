@@ -14,7 +14,7 @@ Contoh objek: issue #115 (upload dokumen pendukung Asset Movement).
 Kerjakan issue #115 (upload dokumen pada Asset Movement) dari host ini sampai PR. Fokus: fitur + pembuktian bahwa aturan UI dipakai.
 
 Baca dulu, SEBELUM menulis kode:
-1. .github/copilot-instructions.md + AGENTS.md
+1. AGENTS.md
 2. docs/ui-design-rules.md — khususnya Bagian 2 (pembuatan UI) dan Bagian 3 (checklist review)
 3. resources/js/AGENTS.md
 4. File terkait:

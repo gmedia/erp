@@ -33,7 +33,7 @@ Ringkas poin berikut:
 2. File yang terdampak
 3. Commit hash (jika ada)
 4. Hal yang belum selesai / blocker
-5. MCP atau workflow agent penting yang dipakai sesi ini
+5. Skill/command agent penting yang dipakai sesi ini
 6. Validasi: command yang benar-benar dijalankan + hasil (passed/failed, durasi singkat)
 7. Next action tunggal paling prioritas
 

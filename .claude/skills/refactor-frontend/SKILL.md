@@ -1,5 +1,5 @@
 ---
-name: Refactor Frontend
+name: refactor-frontend
 description: Panduan refactor khusus Frontend (React SPA)
 ---
 
@@ -7,15 +7,13 @@ description: Panduan refactor khusus Frontend (React SPA)
 
 Lakukan refactor kode frontend secara **TERKONTROL** tanpa merusak frontend behavior, E2E test, atau API compatibility.
 
-## 🔌 MCP Tools yang Digunakan
+## 🔧 Tools yang Digunakan
 
 | Tool | Kapan Digunakan |
 |------|-----------------|
-| `activate_shadcn_ui_code_retrieval` | Aktifkan referensi source komponen UI untuk pattern |
-| `mcp_shadcn-ui_get_component` | Ambil source komponen UI untuk pattern |
-| `mcp_shadcn-ui_get_component_demo` | Lihat contoh usage bila perlu |
-| `activate_laravel_logging_and_debugging_tools()` | Aktifkan browser log jika frontend error |
-| `read_file` | Baca file referensi |
+| Komponen lokal `resources/js/components/ui/` (tambah: `npx shadcn@latest add {name}`) | Ambil source komponen UI untuk pattern |
+| Playwright trace/screenshot (`npx playwright show-trace test-results/.../trace.zip`) | Aktifkan browser log jika frontend error |
+| Baca file | Baca file referensi |
 
 ---
 
@@ -66,17 +64,14 @@ Lakukan refactor kode frontend secara **TERKONTROL** tanpa merusak frontend beha
 
 ```
 # Baca file referensi, bukan template:
-read_file(filePath: "/absolute/path/to/project/resources/js/pages/positions/index.tsx", startLine: 1, endLine: 220)
-read_file(filePath: "/absolute/path/to/project/resources/js/components/employees/EmployeeForm.tsx", startLine: 1, endLine: 220)
+baca resources/js/pages/positions/index.tsx (baris 1–220)
+baca resources/js/components/employees/EmployeeForm.tsx (baris 1–220)
 
-# Aktifkan tool retrieval komponen shadcn bila perlu source/pattern:
-activate_shadcn_ui_code_retrieval()
+# Source komponen shadcn ada di repo:
+ls resources/js/components/ui/
 
-# Ambil source komponen:
-mcp_shadcn-ui_get_component(componentName: "table")
-
-# Ambil demo penggunaan komponen bila perlu:
-mcp_shadcn-ui_get_component_demo(componentName: "table")
+# Contoh pemakaian komponen di modul lain:
+rg -l "@/components/ui/table" resources/js/components | head
 ```
 
 | Pattern | File Referensi |
@@ -148,8 +143,8 @@ JANGAN:
 
 Jika frontend error:
 ```
-activate_laravel_logging_and_debugging_tools()
-# lalu gunakan tool browser log Laravel yang tersedia
+# Cek console browser (DevTools) atau trace Playwright, dan error API di backend:
+tail -n 50 storage/logs/laravel.log
 ```
 
 ---

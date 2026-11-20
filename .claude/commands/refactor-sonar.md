@@ -10,22 +10,17 @@ Workflow ini khusus untuk menurunkan duplikasi kode secara terukur tanpa merusak
 
 ## 1. Ambil Baseline SonarQube (WAJIB)
 
-Selalu cek MCP server yang tersedia lebih dulu.
+Sumber data: **SonarCloud Web API** via `curl` (publik, tanpa token). Endpoint lengkap ada di `AGENTS.md` → **Quality Gate**.
 
-Urutan eksekusi:
+Urutan eksekusi (`S=https://sonarcloud.io/api`, `K=gmedia_erp`):
 
-1. Jika Sonar MCP tersedia, gunakan urutan tool berikut:
-	- `mcp_io_github_son_get_project_quality_gate_status`
-	- `mcp_io_github_son_get_component_measures` untuk metrik inti
-	- `mcp_io_github_son_search_duplicated_files` untuk shortlist file cluster prioritas
-	- `mcp_io_github_son_get_duplications` hanya untuk file prioritas (drill-down)
-2. Jika Sonar MCP tidak tersedia, jelaskan alasan singkat lalu gunakan fallback berikut:
-	- Config Sonar: `.sonarcloud.properties`
-	- Laporan coverage: `coverage.xml`
-	- Perubahan file dari Git untuk mendeteksi cluster duplikasi lintas modul
-3. Untuk data aplikasi Laravel, prioritaskan Laravel Boost MCP (schema/routes/log/docs) sesuai kebutuhan.
+1. Quality gate: `curl -s "$S/qualitygates/project_status?projectKey=$K" | jq '.projectStatus.status'`
+2. Metrik inti: `curl -s "$S/measures/component?component=$K&metricKeys=duplicated_lines,duplicated_blocks,duplicated_lines_density,ncloc,coverage" | jq -c '.component.measures'`
+3. Shortlist file cluster prioritas: `curl -s "$S/measures/component_tree?component=$K&metricKeys=duplicated_lines&qualifiers=FIL&s=metric&metricSort=duplicated_lines&asc=false&ps=20" | jq -r '.components[] | "\(.measures[0].value)\t\(.path)"'`
+4. Drill-down hanya untuk file prioritas: `curl -s "$S/duplications/show?key=$K:<path>"`
+5. Jika API tidak bisa diakses, jelaskan alasan singkat lalu pakai fallback: `.sonarcloud.properties`, `coverage.xml`, dan perubahan file Git untuk mendeteksi cluster duplikasi lintas modul.
 
-Metrik minimum yang wajib dikumpulkan (dari Sonar MCP atau laporan setara):
+Metrik minimum yang wajib dikumpulkan (dari SonarCloud API atau laporan setara):
 
 - `duplicated_lines`
 - `duplicated_blocks`
@@ -42,10 +37,9 @@ Catatan hemat token:
 
 Sebelum rename, move, split, merge, atau extraction lintas file:
 
-- Gunakan `mcp_depwire_get_file_context(filePath: "...")` untuk melihat import/export dan file pemakai.
-- Gunakan `mcp_depwire_impact_analysis(symbol: "...", file: "...")` untuk symbol utama yang akan diubah.
-- Jika wave mengubah struktur file, jalankan `mcp_depwire_simulate_change(...)` sebelum edit.
-- Jika pola duplikasi dipicu API package/framework eksternal, ambil docs terbaru via Context7 sebelum menentukan abstraction target.
+- Petakan import/export dan file pemakai dengan `rg -n '{Symbol}' app routes resources/js tests database config` (lihat `/refactor-safe`).
+- Jika wave mengubah struktur file, tulis daftar file yang akan disentuh sebelum edit.
+- Jika pola duplikasi dipicu API package/framework eksternal, cek source versi terpasang di `vendor/`/`node_modules/` sebelum menentukan abstraction target.
 
 ## 3. Mapping ke Modul Registry
 
@@ -87,13 +81,13 @@ Checklist wajib:
 - Empty wrapper class tetap multiline + komentar intent
 - Hindari FQCN di body executable PHP
 - Untuk pattern yang sama (FilterService / FormRequest), gunakan shared abstraction yang seragam antar modul
-- Untuk refactor style agent guidance, update di folder `.github` (source of truth)
+- Untuk refactor style agent guidance, update `AGENTS.md` atau `.claude/` (source of truth)
 
-Checklist MCP-aware wave:
+Checklist wave:
 
-- Jika extraction menyentuh banyak file, Depwire digunakan sebelum patch pertama.
-- Jika wave dipicu aturan package/framework, Context7 dipakai untuk syntax/behavior yang version-specific.
-- Jika wave hanya butuh data project Laravel, prioritaskan Laravel Boost daripada docs eksternal.
+- Jika extraction menyentuh banyak file, blast radius via `rg` dipetakan sebelum patch pertama.
+- Jika wave dipicu aturan package/framework, behavior version-specific dicek di source `vendor/`/`node_modules/`.
+- Untuk data project Laravel, pakai `sail artisan db:table` / `route:list` / `tinker`.
 
 ## 6. Eksekusi Refactor per Batch
 
@@ -104,7 +98,7 @@ Untuk tiap batch:
 3. Refactor internal tanpa ubah API contract
 4. Tambah/rapikan Feature + Unit test modul tersebut
 5. Jalankan formatter/lint sesuai standar project
-6. Update evidence Depwire/Context7 di progress note jika dipakai untuk keputusan wave
+6. Catat evidence blast radius (`rg`) di progress note bila dipakai untuk keputusan wave
 
 Checklist anti-regresi wave:
 
@@ -151,8 +145,8 @@ Contoh:
 - Metrik `duplicated_lines_density` project tidak naik setelah merge
 - Tidak ada perubahan route/payload API publik
 - Semua test batch (Pest + E2E) pass
-- Jika Sonar MCP tidak tersedia, keputusan refactor tetap menyertakan baseline + evidence fallback yang bisa diaudit
-- Jika refactor struktural dilakukan, evidence Depwire tercatat di progress note atau ringkasan wave
+- Jika SonarCloud API tidak bisa diakses, keputusan refactor tetap menyertakan baseline + evidence fallback yang bisa diaudit
+- Jika refactor struktural dilakukan, evidence blast radius tercatat di progress note atau ringkasan wave
 
 ## 9. Catatan Anomali Sonar
 

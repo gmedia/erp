@@ -1,5 +1,5 @@
 ---
-name: Feature Custom / Non-CRUD
+name: feature-non-crud
 description: Workflow untuk fitur non-standar seperti Dashboard, Settings, User Management, atau Halaman Khusus.
 ---
 
@@ -29,21 +29,17 @@ Fitur ini NON-CRUD jika:
 
 ---
 
-## 🔌 MCP Tools yang Digunakan
+## 🔧 Tools yang Digunakan
 
 | Tool | Kapan Digunakan |
 |------|-----------------|
-| `mcp_laravel-boost_database-schema` | Lihat model/tabel existing untuk relasi |
-| `mcp_laravel-boost_list-routes` | Lihat routes existing, plan custom routes |
-| `mcp_laravel-boost_search-docs` | Cari dokumentasi Laravel ecosystem yang relevan dengan backend project |
-| `mcp_context7_resolve-library-id(...)` + `mcp_context7_query-docs(...)` | Cari dokumentasi React Query, react-router-dom, atau package non-Laravel lain |
-| `mcp_laravel-boost_tinker` | Test relationships dan business logic |
-| `activate_shadcn_ui_component_and_block_listing` | Cari dashboard/UI blocks dan komponen tersedia |
-| `activate_shadcn_ui_code_retrieval` | Aktifkan pengambilan source block/komponen UI |
-| `mcp_shadcn-ui_get_block` | Ambil source complex UI blocks |
-| `mcp_shadcn-ui_get_component` | Ambil source komponen UI (combobox, tree-view) |
-| `mcp_shadcn-ui_get_component_demo` | Lihat demo penggunaan komponen UI bila perlu |
-| `read_file` | Baca file referensi User/Permission; paralelkan bila perlu |
+| `./vendor/bin/sail artisan db:table {table}` (ringkas: `db:show`) | Lihat model/tabel existing untuk relasi |
+| `./vendor/bin/sail artisan route:list --path=api/{slug}` | Lihat routes existing, plan custom routes |
+| Source `vendor/` versi terpasang + docs resmi | Cari dokumentasi Laravel ecosystem yang relevan dengan backend project |
+| Source `node_modules/{pkg}` versi terpasang + docs resmi | Cari dokumentasi React Query, react-router-dom, atau package non-Laravel lain |
+| `./vendor/bin/sail artisan tinker --execute='...'` | Test relationships dan business logic |
+| Komponen lokal `resources/js/components/ui/` (tambah: `npx shadcn@latest add {name}`) | Ambil source komponen UI (combobox, tree-view) |
+| Baca file | Baca file referensi User/Permission; baca satu per satu |
 
 ---
 
@@ -1091,9 +1087,9 @@ describe('Permission API Access', function () {
 3. **Baca Referensi**
     ```
    # WAJIB baca file referensi sebelum coding
-    read_file(filePath: "/absolute/path/to/project/app/Http/Controllers/UserController.php", startLine: 1, endLine: 220)
-    read_file(filePath: "/absolute/path/to/project/app/Http/Controllers/PermissionController.php", startLine: 1, endLine: 220)
-    read_file(filePath: "/absolute/path/to/project/tests/Feature/UserControllerTest.php", startLine: 1, endLine: 260)
+    baca app/Http/Controllers/UserController.php (baris 1–220)
+    baca app/Http/Controllers/PermissionController.php (baris 1–220)
+    baca tests/Feature/UserControllerTest.php (baris 1–260)
    ```
 
 ### Phase 2: Backend Implementation
@@ -1219,7 +1215,7 @@ describe('Permission API Access', function () {
 ./vendor/bin/sail test --filter={Feature}
 ```
 
-Gunakan `mcp_laravel-boost_list-routes` untuk verify routes terdaftar.
+Gunakan `./vendor/bin/sail artisan route:list --path=api/{slug}` untuk verify routes terdaftar.
 
 ---
 
@@ -1359,24 +1355,21 @@ Pattern B (Matrix/Bulk):
 
 ## 📚 Additional Resources
 
-### MCP Tool Examples
+### Tool Examples
 
 ```
 # Check database relationships
-mcp_laravel-boost_database-schema()
+./vendor/bin/sail artisan db:table employees
 
 # Test relationships in tinker
-mcp_laravel-boost_tinker(code: "
-  \$employee = App\\Models\\Employee::first();
-  \$employee->user;
-  \$employee->permissions;
-")
+./vendor/bin/sail artisan tinker --execute='
+  $employee = App\Models\Employee::first();
+  dump($employee->user, $employee->permissions);
+'
 
 # Find UI components
-activate_shadcn_ui_component_and_block_listing()
-activate_shadcn_ui_code_retrieval()
-mcp_shadcn-ui_get_component(componentName: "combobox")
-mcp_shadcn-ui_get_component_demo(componentName: "combobox")
+ls resources/js/components/ui/
+npx shadcn@latest add {name}   # hanya jika komponen belum ada
 ```
 
 ### Reference Files

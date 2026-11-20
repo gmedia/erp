@@ -14,32 +14,32 @@ Analisa requirement user:
 
 Untuk Simple:
 ```text
-read_file(filePath: "/absolute/path/to/project/.github/skills/feature-crud-simple/SKILL.md", startLine: 1, endLine: 250)
+baca .claude/skills/feature-crud-simple/SKILL.md (baris 1–250)
 ```
 
 Untuk Complex:
 ```text
-read_file(filePath: "/absolute/path/to/project/.github/skills/feature-crud-complex/SKILL.md", startLine: 1, endLine: 250)
+baca .claude/skills/feature-crud-complex/SKILL.md (baris 1–250)
 ```
 
-Jika implementasi dipicu library/framework tertentu di luar Laravel ecosystem, resolve docs dulu via Context7 sebelum coding.
+Jika implementasi dipicu library/framework tertentu di luar Laravel ecosystem, cek source versi terpasang di `node_modules/`/`vendor/` dan docs resmi versi tersebut sebelum coding.
 
 ## 3. Jalankan Scaffold Script
 
 Simple:
 ```bash
-bash .github/skills/feature-crud-simple/scripts/scaffold.sh {FeatureName} --dry-run
+bash .claude/skills/feature-crud-simple/scripts/scaffold.sh {FeatureName} --dry-run
 ```
 
 Complex:
 ```bash
-bash .github/skills/feature-crud-complex/scripts/scaffold.sh {FeatureName} --dry-run
+bash .claude/skills/feature-crud-complex/scripts/scaffold.sh {FeatureName} --dry-run
 ```
 
 ## 4. Create Scaffold (setelah konfirmasi)
 
 ```bash
-bash .github/skills/feature-crud-simple/scripts/scaffold.sh {FeatureName}
+bash .claude/skills/feature-crud-simple/scripts/scaffold.sh {FeatureName}
 ```
 
 ## 5. Implementasi Mengikuti Skill

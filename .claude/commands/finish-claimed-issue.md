@@ -6,19 +6,19 @@ description: "Use when: melanjutkan work item yang sudah diklaim di host ini dar
 
 Prompt ini dipakai di host **tempat issue diklaim** (mis. `dest-1` untuk #117). Ia melanjutkan pekerjaan dari branch lokal yang sudah ada sampai PR dan verifikasi label. File ini ikut ter-`pull` lewat `git pull` di `main`.
 
-Prasyarat: langkah 1–6 checklist multi-server sudah PASS (lihat `.github/prompts/verify-second-server.prompt.md` dan komentar `<!-- multi-server-checklist -->` di issue #119).
+Prasyarat: langkah 1–6 checklist multi-server sudah PASS (lihat `.claude/commands/verify-second-server.md` dan komentar `<!-- multi-server-checklist -->` di issue #119).
 
 ## Prompt utama
 
-Salin blok berikut ke opencode di host yang sudah mengklaim issue:
+Salin blok berikut ke sesi agent (OpenCode/Claude CLI) di host yang sudah mengklaim issue:
 
 ```text
 Lanjutkan issue #117 (notifikasi email approval) dari host ini sampai selesai. Issue ini sudah diklaim di host ini pada langkah sebelumnya (label status:claimed, assignee oppytut).
 
 Baca dulu:
-- AGENTS.md, .github/copilot-instructions.md
+- AGENTS.md
 - docs/ui-design-rules.md (cek apakah aturan UI relevan; untuk #117 kemungkinan tidak ada UI baru — sebutkan jika demikian)
-- .github/prompts/continue-progress.prompt.md dan checkpoint-progress.prompt.md
+- .claude/commands/continue-progress.md dan checkpoint-progress.prompt.md
 - Komentar issue #117 via: gh api repos/gmedia/erp/issues/117/comments --jq '.[] | .body'
   (gh issue view --comments mungkin gagal di host ini karena deprecation GraphQL Projects classic — sudah ada fallback REST)
 
@@ -48,7 +48,7 @@ Kalau ada FAIL di transisi label, jangan hapus apa pun — laporkan error persis
 ## Versi ringkas (kalau sudah yakin mekanismenya)
 
 ```text
-Lanjutkan #117 di host ini: kerjakan notifikasi email approval, commit feat:, push, buka PR dengan Refs #117 (bukan Closes), lalu verifikasi label issue berubah claimed → in-review → done dan issue tetap OPEN. Update tabel klaim di #119. Baca fallback REST untuk komentar di .github/prompts/continue-progress.prompt.md bila gh issue view --comments gagal.
+Lanjutkan #117 di host ini: kerjakan notifikasi email approval, commit feat:, push, buka PR dengan Refs #117 (bukan Closes), lalu verifikasi label issue berubah claimed → in-review → done dan issue tetap OPEN. Update tabel klaim di #119. Baca fallback REST untuk komentar di .claude/commands/continue-progress.md bila gh issue view --comments gagal.
 ```
 
 ## Catatan

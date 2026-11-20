@@ -1,5 +1,5 @@
 ---
-name: Feature CRUD Simple
+name: feature-crud-simple
 description: Workflow untuk membuat fitur CRUD sederhana (Departments, Positions, Branches, CustomerCategories, SupplierCategories) dengan satu tabel utama tanpa relasi kompleks.
 ---
 
@@ -7,16 +7,15 @@ description: Workflow untuk membuat fitur CRUD sederhana (Departments, Positions
 
 Gunakan skill ini untuk membuat fitur CRUD sederhana yang hanya melibatkan satu tabel utama tanpa relasi foreign key.
 
-## 🔌 MCP Tools yang Digunakan
+## 🔧 Tools yang Digunakan
 
 | Tool | Kapan Digunakan |
 |------|-----------------|
-| `mcp_laravel-boost_database-schema` | Sebelum buat migration, lihat existing tables |
-| `mcp_laravel-boost_list-routes` | Verifikasi routes setelah create |
-| `mcp_laravel-boost_search-docs` | Cari dokumentasi Laravel jika ragu |
-| `activate_shadcn_ui_code_retrieval` | Aktifkan retrieval source komponen UI (table, form, button) |
-| `mcp_shadcn-ui_get_component` | Ambil source komponen UI yang relevan |
-| `read_file` | Baca file referensi existing |
+| `./vendor/bin/sail artisan db:table {table}` (ringkas: `db:show`) | Sebelum buat migration, lihat existing tables |
+| `./vendor/bin/sail artisan route:list --path=api/{slug}` | Verifikasi routes setelah create |
+| Source `vendor/` versi terpasang + docs resmi | Cari dokumentasi Laravel jika ragu |
+| Komponen lokal `resources/js/components/ui/` (tambah: `npx shadcn@latest add {name}`) | Ambil source komponen UI yang relevan |
+| Baca file | Baca file referensi existing |
 
 ---
 

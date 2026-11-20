@@ -1,5 +1,5 @@
 ---
-name: Feature Import Excel
+name: feature-import
 description: Workflow untuk menambahkan fitur import data melalui file Excel pada modul CRUD existing.
 ---
 

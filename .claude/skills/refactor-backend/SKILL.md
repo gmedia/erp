@@ -1,5 +1,5 @@
 ---
-name: Refactor Backend
+name: refactor-backend
 description: Panduan refactor khusus Backend (Laravel)
 ---
 
@@ -7,16 +7,16 @@ description: Panduan refactor khusus Backend (Laravel)
 
 Lakukan refactor kode backend secara **TERKONTROL** tanpa merusak API contract, response structure, atau test existing.
 
-## 🔌 MCP Tools yang Digunakan
+## 🔧 Tools yang Digunakan
 
 | Tool | Kapan Digunakan |
 |------|-----------------|
-| `mcp_laravel-boost_database-schema` | **WAJIB** cek schema sebelum refactor Model |
-| `mcp_laravel-boost_list-routes` | Verifikasi routes tidak berubah |
-| `mcp_laravel-boost_search-docs` | Cari best practices Laravel |
-| `mcp_laravel-boost_tinker` | Test query Eloquent sebelum commit |
-| `activate_laravel_logging_and_debugging_tools()` | Aktifkan tool error/log jika test gagal |
-| `read_file` | Baca file referensi |
+| `./vendor/bin/sail artisan db:table {table}` (ringkas: `db:show`) | **WAJIB** cek schema sebelum refactor Model |
+| `./vendor/bin/sail artisan route:list --path=api/{slug}` | Verifikasi routes tidak berubah |
+| Source `vendor/` versi terpasang + docs resmi | Cari best practices Laravel |
+| `./vendor/bin/sail artisan tinker --execute='...'` | Test query Eloquent sebelum commit |
+| `tail -n 50 storage/logs/laravel.log` | Aktifkan tool error/log jika test gagal |
+| Baca file | Baca file referensi |
 
 ---
 
@@ -67,11 +67,11 @@ Gunakan jika:
 
 ```
 # WAJIB cek schema sebelum refactor:
-mcp_laravel-boost_database-schema()
+./vendor/bin/sail artisan db:table {table}
 
 # Baca file existing untuk pattern:
-read_file(filePath: "/absolute/path/to/project/app/Http/Controllers/PositionController.php", startLine: 1, endLine: 220)
-read_file(filePath: "/absolute/path/to/project/app/Http/Requests/Positions/StorePositionRequest.php", startLine: 1, endLine: 220)
+baca app/Http/Controllers/PositionController.php (baris 1–220)
+baca app/Http/Requests/Positions/StorePositionRequest.php (baris 1–220)
 ```
 
 | Pattern | File Referensi |
@@ -148,11 +148,11 @@ JANGAN buat DTO/Action/Domain Service jika:
 
 Jika test gagal:
 ```
-activate_laravel_logging_and_debugging_tools()
-# lalu gunakan tool error/log Laravel yang tersedia untuk cek exception terbaru
+tail -n 50 storage/logs/laravel.log
+# exception terbaru ada di bagian akhir log
 ```
 
-**Gunakan `mcp_laravel-boost_list-routes` untuk verify routes tidak berubah.**
+**Gunakan `./vendor/bin/sail artisan route:list --path=api/{slug}` (bandingkan sebelum/sesudah) untuk verify routes tidak berubah.**
 
 ---
 

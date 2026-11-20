@@ -1,17 +1,17 @@
 ---
-name: Session Handoff
-description: Standarisasi checkpoint lintas server/shift ke GitHub Issues agar sesi berikutnya langsung lanjut tanpa konflik antar opencode.
+name: session-handoff
+description: Standarisasi checkpoint lintas server/shift ke GitHub Issues agar sesi berikutnya langsung lanjut tanpa konflik antar sesi agent (OpenCode/Claude CLI).
 ---
 
 # Session Handoff Skill
 
-Gunakan skill ini saat beberapa server menjalankan opencode pada workspace yang sama, atau user sering berpindah server/laptop.
+Gunakan skill ini saat beberapa server menjalankan agent (OpenCode/Claude CLI) pada workspace yang sama, atau user sering berpindah server/laptop.
 
 > **Sejak 2026-11-17:** sumber kebenaran aktif = **https://github.com/gmedia/erp/issues**, bukan `task.md` (deprecated). Lihat `/claim-issue`, `/continue-progress`, `/checkpoint-progress`.
 
 ## Kapan Dipakai
 
-- User memakai banyak server dengan tmux + opencode.
+- User memakai banyak server dengan tmux + OpenCode/Claude CLI.
 - Task panjang (refactor, stabilisasi test, rollout bertahap).
 - Ada risiko dua server mengerjakan hal yang sama atau kehilangan konteks.
 
@@ -25,11 +25,11 @@ Gunakan skill ini saat beberapa server menjalankan opencode pada workspace yang 
 
 - **Aktif:** issue di `gmedia/erp` — label `status:*`, komentar `<!-- claim -->` dan `<!-- checkpoint -->`.
 - **Arsip (baca hanya jika perlu):** `task.md`, `task.changelog.md`, `task.handoff-archive.md` — deprecated, jangan ditulis.
-- Referensi teknis tetap di repo: `.github/copilot-instructions.md`, `AGENTS.md`, `docs/development-patterns.md`, `docs/module-registry.md`.
+- Referensi teknis tetap di repo: `AGENTS.md`, `docs/development-patterns.md`, `docs/module-registry.md`.
 - Prompt reusable:
-  - `.github/prompts/claim-issue.prompt.md`
-  - `.github/prompts/continue-progress.prompt.md`
-  - `.github/prompts/checkpoint-progress.prompt.md`
+  - `.claude/commands/claim-issue.md`
+  - `.claude/commands/continue-progress.md`
+  - `.claude/commands/checkpoint-progress.md`
 
 ## Workflow Wajib
 
@@ -70,7 +70,7 @@ Jalankan `/checkpoint-progress`. Tulis komentar issue berisi:
 
 ## Template
 
-- `.github/skills/session-handoff/resources/handoff.template.md` — format komentar issue.
+- `.claude/skills/session-handoff/resources/handoff.template.md` — format komentar issue.
 
 ## Definition of Done
 

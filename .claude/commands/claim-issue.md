@@ -1,10 +1,10 @@
 ---
-description: "Use when: sesi opencode baru di server mana pun — klaim issue GitHub sebelum membuat branch, dan update status saat PR dibuka"
+description: "Use when: sesi agent baru (OpenCode/Claude CLI) di server mana pun — klaim issue GitHub sebelum membuat branch, dan update status saat PR dibuka"
 ---
 
 # Workflow: Claim Issue (multi-server)
 
-Pakai prompt ini di **setiap server opencode** sebelum mengerjakan task. Issue = satu klaim = satu branch = satu PR. `task.md` adalah handoff **lokal per server**, jangan dipakai sebagai koordinasi lintas server.
+Pakai prompt ini di **setiap sesi agent (OpenCode/Claude CLI)** sebelum mengerjakan task. Issue = satu klaim = satu branch = satu PR. `task.md` adalah handoff **lokal per server**, jangan dipakai sebagai koordinasi lintas server.
 
 ## 1. Cek MR/PR terbuka lebih dulu (aturan AGENTS.md)
 
@@ -40,7 +40,7 @@ EOF
 )"
 ```
 
-Kalau server mati >24 jam tanpa update, opencode lain boleh `unclaim`: komentar alasan → hapus `status:claimed` → kembalikan `status:available`.
+Kalau server mati >24 jam tanpa update, sesi agent lain boleh `unclaim`: komentar alasan → hapus `status:claimed` → kembalikan `status:available`.
 
 ## 3. Buat branch / worktree
 
@@ -51,7 +51,7 @@ git checkout main && git pull --ff-only
 git checkout -b feat/issue-N-slug
 ```
 
-Kalau lebih dari satu opencode di host yang sama, pakai worktree agar tidak tabrak checkout:
+Kalau lebih dari satu sesi agent di host yang sama, pakai worktree agar tidak tabrak checkout:
 
 ```bash
 git worktree add /home/tut/erp-wt-N -b feat/issue-N-slug main
@@ -69,7 +69,7 @@ Guard **fail-open** saat `gh` tidak tersedia/offline, jadi pekerjaan tanpa jarin
 
 ## 4. Kerjakan & buka PR
 
-- Ikuti konvensi `.github/copilot-instructions.md` dan `AGENTS.md` (≤3 tool/turn, serial, Sail, Sanctum, dll).
+- Ikuti konvensi `AGENTS.md` (≤3 tool/turn, serial, Sail, Sanctum, dll).
 - PR description wajib memuat `Refs #N` (bukan `Closes #N` — issue sengaja tetap OPEN agar papan koordinasi tidak kosong) dan template handoff (What was done / Files changed / Verification / Next steps).
 - Setelah `gh pr create`, workflow `issue-lifecycle.yml` otomatis mengganti label ke `status:in-review`. Saat PR di-merge → `status:done`.
 

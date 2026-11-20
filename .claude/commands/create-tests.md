@@ -13,7 +13,7 @@ description: Membuat test untuk fitur existing
 ## 2. Baca Testing Strategy Skill
 
 ```text
-read_file(filePath: "/absolute/path/to/project/.github/skills/testing-strategy/SKILL.md", startLine: 1, endLine: 250)
+baca .claude/skills/testing-strategy/SKILL.md (baris 1–250)
 ```
 
 ## 3. Identifikasi Test Gaps
@@ -25,13 +25,13 @@ ls tests/Unit/Actions/{Module}/
 ls tests/e2e/{module}/
 ```
 
-Jika test dipicu oleh behavior package/framework eksternal, gunakan Context7 untuk docs terbaru sebelum menulis assertion atau setup.
+Jika test dipicu oleh behavior package/framework eksternal, cek source versi terpasang di `vendor/`/`node_modules/` sebelum menulis assertion atau setup.
 
 ## 4. Buat Feature Test (jika belum ada)
 
 Gunakan template:
 ```text
-read_file(filePath: "/absolute/path/to/project/.github/skills/testing-strategy/resources/FeatureTest.php.template", startLine: 1, endLine: 250)
+baca .claude/skills/testing-strategy/resources/FeatureTest.php.template (baris 1–250)
 ```
 
 Lokasi: `tests/Feature/{Module}ControllerTest.php`
@@ -44,7 +44,7 @@ Catatan penting:
 
 Gunakan template:
 ```text
-read_file(filePath: "/absolute/path/to/project/.github/skills/testing-strategy/resources/UnitTest.php.template", startLine: 1, endLine: 250)
+baca .claude/skills/testing-strategy/resources/UnitTest.php.template (baris 1–250)
 ```
 
 Lokasi: `tests/Unit/Actions/{Module}/`
@@ -53,7 +53,7 @@ Lokasi: `tests/Unit/Actions/{Module}/`
 
 Gunakan template:
 ```text
-read_file(filePath: "/absolute/path/to/project/.github/skills/testing-strategy/resources/e2e.spec.ts.template", startLine: 1, endLine: 250)
+baca .claude/skills/testing-strategy/resources/e2e.spec.ts.template (baris 1–250)
 ```
 
 Lokasi: `tests/e2e/{module}/`

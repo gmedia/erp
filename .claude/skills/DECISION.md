@@ -2,27 +2,21 @@
 
 Gunakan tabel ini untuk memilih skill yang tepat berdasarkan kebutuhan task.
 
-## 🔌 MCP Tools - Selalu Gunakan Ini!
+## 🔧 Tooling (tanpa MCP)
 
-> **PENTING**: Selalu gunakan MCP tools, bukan command manual. Ini lebih efisien dan menghemat token.
+> MCP server tidak dipakai. Gunakan command CLI berikut; semua runtime via Sail.
 
-| Kebutuhan | MCP Tool |
-|-----------|----------|
-| Lihat DB schema | `mcp_laravel-boost_database-schema()` |
-| Lihat routes | `mcp_laravel-boost_list-routes()` |
-| Cari docs Laravel ecosystem | `mcp_laravel-boost_search-docs(queries: [...])` |
-| Cari docs package/framework/SDK/CLI terbaru | `mcp_context7_resolve-library-id(...)` lalu `mcp_context7_query-docs(...)` |
-| Lihat blast radius sebelum refactor | `mcp_depwire_get_file_context(filePath: "...")` + `mcp_depwire_impact_analysis(symbol: "...", file: "...")` |
-| Simulasikan rename/move/delete/split/merge | `mcp_depwire_simulate_change(operation: "...", ...)` |
-| Cek health arsitektur | `mcp_depwire_get_health_score()` atau `mcp_depwire_get_architecture_summary()` |
-| Cari dead code | `mcp_depwire_find_dead_code(confidence: "high")` |
-| Test code | `mcp_laravel-boost_tinker(code: "...")` |
-| Debug error | `activate_laravel_logging_and_debugging_tools()` lalu gunakan tool error/log yang tersedia |
-| Quality gate Sonar | `mcp_io_github_son_get_project_quality_gate_status(projectKey: "...")` |
-| Metrik duplikasi Sonar | `mcp_io_github_son_get_component_measures(projectKey: "...", metricKeys: [...])` |
-| Cluster duplikasi Sonar | `mcp_io_github_son_search_duplicated_files(projectKey: "...")` |
-| Ambil komponen UI | `activate_shadcn_ui_code_retrieval()` lalu `mcp_shadcn-ui_get_component(componentName: "...")`; gunakan `mcp_shadcn-ui_get_block(blockName: "...")` untuk block besar |
-| Baca file referensi | `read_file(filePath: "/absolute/path/to/project/...", startLine: 1, endLine: 250)` |
+| Kebutuhan | Command |
+|-----------|---------|
+| Lihat DB schema | `./vendor/bin/sail artisan db:show` lalu `./vendor/bin/sail artisan db:table {table}` |
+| Lihat routes | `./vendor/bin/sail artisan route:list --path=api/{slug}` |
+| Cari docs Laravel/package | Source versi terpasang di `vendor/` / `node_modules/`, lalu docs resmi versi terkait |
+| Lihat blast radius sebelum refactor | `rg -n '{Symbol}' app routes resources/js tests database config` |
+| Rename/move/delete/split/merge | `/refactor-safe`: daftar file dari `rg` dulu, edit, lalu ulangi `rg` + phpstan/types/test |
+| Test code | `./vendor/bin/sail artisan tinker --execute='...'` |
+| Debug error | `tail -n 50 storage/logs/laravel.log`; E2E: `npx playwright show-trace` |
+| Quality gate / metrik / duplikasi Sonar | SonarCloud Web API via `curl` — lihat `AGENTS.md` → Quality Gate |
+| Ambil komponen UI | `resources/js/components/ui/`; tambah baru: `npx shadcn@latest add {name}` |
 
 ---
 
@@ -31,10 +25,10 @@ Gunakan tabel ini untuk memilih skill yang tepat berdasarkan kebutuhan task.
 ```
 Apa yang ingin dilakukan?
 │
-├── Butuh docs library/framework/API/CLI terbaru ─→ Context7
+├── Butuh docs library/framework/API/CLI ─→ source vendor/ + docs resmi versi terpasang
 │
 ├── Analisis dependensi / blast radius
-│   └── Rename, move, split, merge, atau health score ─→ Depwire
+│   └── Rename, move, split, merge ─→ /refactor-safe (rg)
 │
 ├── Buat fitur baru
 │   ├── CRUD 1 tabel, tanpa FK? ────→ feature-crud-simple
@@ -44,7 +38,7 @@ Apa yang ingin dilakukan?
 ├── Refactor kode existing
 │   ├── Backend (Laravel)? ─────────→ refactor-backend
 │   ├── Frontend (React)? ──────────→ refactor-frontend
-│   └── Berbasis temuan Sonar? ─────→ workflow refactor-sonar
+│   └── Berbasis temuan Sonar? ─────→ `/refactor-sonar`
 │
 ├── Database
 │   └── Migration, seeder? ─────────→ database-migration
@@ -58,16 +52,16 @@ Apa yang ingin dilakukan?
 
 ## 📊 Decision Matrix
 
-| Kondisi | Skill / MCP |
+| Kondisi | Skill / Workflow |
 |---------|-------------|
-| Butuh syntax, konfigurasi, atau upgrade notes package | `Context7 MCP` |
-| Perlu blast radius atau refactor aman lintas file | `Depwire MCP` |
+| Butuh syntax, konfigurasi, atau upgrade notes package | source `vendor/`/`node_modules/` + docs resmi |
+| Perlu blast radius atau refactor aman lintas file | `/refactor-safe` / subagent `refactor-safe` |
 | CRUD 1 tabel | `feature-crud-simple` |
 | CRUD dengan FK, filter range | `feature-crud-complex` |
 | Dashboard, Settings | `feature-non-crud` |
 | Perbaiki arsitektur backend | `refactor-backend` |
 | Perbaiki struktur komponen | `refactor-frontend` |
-| Prioritas refactor dari SonarQube | `workflow refactor-sonar` |
+| Prioritas refactor dari SonarQube | ``/refactor-sonar`` |
 | Migration, seeder | `database-migration` |
 | Buat tests | `testing-strategy` |
 | Pindah laptop/shift, perlu checkpoint rapi | `session-handoff` |
@@ -76,15 +70,9 @@ Apa yang ingin dilakukan?
 
 ## 🔍 Kriteria Detail
 
-### Context7
-- ✅ Pertanyaan package/framework/SDK/CLI
-- ✅ Butuh syntax, konfigurasi, atau docs versi terbaru
-- ✅ Upgrade, migration, atau behavior yang version-specific
-
-### Depwire
+### refactor-safe
 - ✅ Rename/move/delete/split/merge file atau symbol
-- ✅ Ingin tahu dependents, blast radius, atau dependency graph
-- ✅ Cek health score, dead code, atau security scan berbasis graph
+- ✅ Ingin tahu dependents atau blast radius (via `rg`)
 
 ### feature-crud-simple
 - ✅ Hanya 1 tabel utama
@@ -103,7 +91,7 @@ Apa yang ingin dilakukan?
 - ✅ Merapikan Controller/Action
 - ✅ TIDAK mengubah API
 
-### workflow refactor-sonar
+### `/refactor-sonar`
 - ✅ Berbasis baseline + delta metrik Sonar
 - ✅ Wave semi-besar terkontrol (4-8 file per pola)
 - ✅ Wajib update `docs/refactor-sonar-progress.md` setiap wave
@@ -116,8 +104,8 @@ Apa yang ingin dilakukan?
 
 ## 🚀 Cara Menggunakan
 
-1. **Cek dulu MCP inti**: gunakan `Context7` untuk docs package/framework dan `Depwire` untuk impact analysis atau refactor safety
+1. **Untuk refactor struktural**, petakan pemakai via `rg` (`/refactor-safe`) sebelum edit
 2. **Pilih skill** dari decision tree jika task butuh workflow repo
-3. **Baca SKILL.md**: mulai dengan `read_file(filePath: "/absolute/path/to/project/.github/skills/{skill}/SKILL.md", startLine: 1, endLine: 250)`, lalu lanjutkan range berikutnya sampai instruksi relevan selesai terbaca
-4. **Gunakan MCP tools** sesuai instruksi di SKILL.md; untuk refactor struktural, jalankan Depwire sebelum edit
+3. **Baca SKILL.md**: mulai dengan `baca .claude/skills/{skill}/SKILL.md (baris 1–250)`, lalu lanjutkan range berikutnya sampai instruksi relevan selesai terbaca
+4. **Gunakan tooling CLI** sesuai instruksi di SKILL.md
 5. **Referensi files existing**, bukan template

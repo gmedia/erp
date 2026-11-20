@@ -1,5 +1,5 @@
 ---
-name: Testing Strategy
+name: testing-strategy
 description: Panduan membuat unit test, feature test, dan e2e test sesuai pola codebase.
 ---
 
@@ -7,14 +7,14 @@ description: Panduan membuat unit test, feature test, dan e2e test sesuai pola c
 
 Gunakan skill ini untuk membuat test yang konsisten dengan pola testing di codebase.
 
-## 🔌 MCP Tools yang Digunakan
+## 🔧 Tools yang Digunakan
 
 | Tool | Kapan Digunakan |
 |------|-----------------|
-| `activate_laravel_logging_and_debugging_tools()` | Aktifkan tool error/log saat test gagal |
-| `mcp_laravel-boost_tinker` | Inspect test data atau debug code snippets |
-| `activate_laravel_logging_and_debugging_tools()` | Aktifkan tool browser log untuk debug E2E frontend errors |
-| `read_file` | Baca file test referensi |
+| `tail -n 50 storage/logs/laravel.log` | Aktifkan tool error/log saat test gagal |
+| `./vendor/bin/sail artisan tinker --execute='...'` | Inspect test data atau debug code snippets |
+| Playwright trace/screenshot (`npx playwright show-trace test-results/.../trace.zip`) | Aktifkan tool browser log untuk debug E2E frontend errors |
+| Baca file | Baca file test referensi |
 
 ---
 
@@ -43,12 +43,12 @@ Gunakan skill ini untuk membuat test yang konsisten dengan pola testing di codeb
 
 ```
 # Baca file test existing untuk pattern:
-read_file(filePath: "/absolute/path/to/project/tests/Feature/EmployeeControllerTest.php", startLine: 1, endLine: 260)
-read_file(filePath: "/absolute/path/to/project/tests/e2e/employees/add-employee.spec.ts", startLine: 1, endLine: 260)
+baca tests/Feature/EmployeeControllerTest.php (baris 1–260)
+baca tests/e2e/employees/add-employee.spec.ts (baris 1–260)
 
 # Debug test failure:
-activate_laravel_logging_and_debugging_tools()
-# lalu gunakan tool error/log atau browser log Laravel yang tersedia
+tail -n 50 storage/logs/laravel.log                        # exception backend
+npx playwright show-trace test-results/<test>/trace.zip   # E2E: browser/network log
 ```
 
 | Pattern | File Referensi |
@@ -136,6 +136,6 @@ $this->assertTrue($validator->fails());
 
 Jika test gagal:
 ```
-activate_laravel_logging_and_debugging_tools()
-# lalu gunakan tool error/log atau browser log Laravel yang tersedia
+tail -n 50 storage/logs/laravel.log                        # exception backend
+npx playwright show-trace test-results/<test>/trace.zip   # E2E: browser/network log
 ```

@@ -1,8 +1,10 @@
 ---
-description: Gunakan saat butuh Depwire untuk blast radius, impact analysis, rename/move safety, atau refactor aman lintas modul
+description: Gunakan saat butuh blast radius, impact analysis, rename/move safety, atau refactor aman lintas modul (berbasis rg + validasi sempit)
 ---
 
-# Workflow: Refactor Aman dengan Depwire
+# Workflow: Refactor Aman
+
+Target: $ARGUMENTS
 
 ## 1. Tentukan Anchor
 
@@ -13,57 +15,53 @@ Mulai dari titik perubahan paling dekat:
 
 ## 2. Ambil Konteks Lokal
 
-```text
-mcp_depwire_get_file_context(filePath: "app/Services/ExampleService.php")
-```
-
-Gunakan hasil ini untuk melihat:
+Baca file target, lalu catat:
 - symbol yang didefinisikan file
-- import dan export
-- file lain yang mengimpor file tersebut
+- `use`/`import` dan export
+- file lain yang mengimpor file tersebut:
+
+```bash
+rg -n 'ExampleService' app routes database tests
+rg -n "from '@/components/example/ExampleForm'" resources/js tests/e2e
+```
 
 ## 3. Ukur Blast Radius
 
-```text
-mcp_depwire_impact_analysis(symbol: "ExampleService", file: "app/Services/ExampleService.php")
+Cari semua bentuk referensi, bukan hanya nama class:
+
+```bash
+rg -n 'ExampleService|example_service|example-service' app routes resources/js tests database config
 ```
 
-Gunakan ini sebelum:
+Perhatikan juga referensi tidak langsung:
+- string route/endpoint (`/api/examples`), nama permission, query key React Query
+- container binding di `app/Providers/`, config, dan factory/seeder
+- nama file di test E2E (`tests/e2e/{slug}/`) dan `docs/module-registry.md`
+
+Lakukan ini sebelum:
 - mengganti nama class atau function
 - mengubah signature public
 - memindahkan responsibility ke file lain
 
-## 4. Simulasikan Perubahan Struktural
+## 4. Rencanakan Perubahan Struktural
 
-```text
-mcp_depwire_simulate_change(operation: "rename", target: "app/Services/ExampleService.php", destination: "app/Services/NewExampleService.php")
-```
+Untuk `rename`, `move`, `delete`, `split`, atau `merge`, tulis daftar file yang akan disentuh dari hasil langkah 3 sebelum mengedit. Jangan lakukan refactor struktural lintas file sebelum daftar ini lengkap.
 
-Pilih operasi yang sesuai:
-- `rename`
-- `move`
-- `delete`
-- `split`
-- `merge`
+## 5. Cek Behavior Package Bila Perlu
 
-Jangan lakukan refactor struktural lintas file sebelum hasil simulasi dipahami.
-
-## 5. Ambil Docs Eksternal Bila Perlu
-
-Jika perubahan dipicu oleh API package/framework/CLI, pakai Context7 sebelum edit:
-
-```text
-mcp_context7_resolve-library-id(libraryName: "React Router", query: "route object API migration")
-mcp_context7_query-docs(libraryId: "/remix-run/react-router", query: "route object API migration")
-```
+Jika perubahan dipicu oleh API package/framework/CLI, baca source versi terpasang di `vendor/` atau `node_modules/` (lihat `composer.lock` / `package-lock.json`), lalu docs resmi untuk versi tersebut.
 
 ## 6. Edit Minimum, Lalu Validasi Sempit
 
 - Lakukan perubahan kecil yang langsung menjawab hasil impact analysis
-- Validasi dulu pada test atau compile slice yang paling dekat
+- Validasi dulu pada slice terdekat:
+  - `./vendor/bin/sail bin phpstan analyze {path}`
+  - `npm run types`
+  - `./vendor/bin/sail test --group {slug}`
+- Ulangi `rg` dari langkah 3 untuk memastikan tidak ada referensi lama tersisa
 - Jika validasi gagal, perbaiki slice yang sama sebelum memperluas scope
 
-## 7. Kapan Prompt Ini Dipakai
+## 7. Kapan Workflow Ini Dipakai
 
 - rename atau move file
 - split atau merge file besar
