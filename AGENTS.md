@@ -75,7 +75,7 @@ Host RAM/CPU is limited. Parallel `Read`/`Edit`/`task` batches have **killed Ope
 - `APP_ADMIN` yang dipakai `global-setup.ts` harus sama dengan admin hasil seed di container (CI pakai `admin@example.com`; host bisa berbeda). Jangan mengubah `.env` — set `APP_ADMIN` di environment proses Playwright.
 - Pre-flight wajib sebelum push: jalankan `npx playwright test --list` dengan daftar 78 direktori `tests/e2e/...` dari step `Run Playwright E2E` di `tests.yml`. Saat ini **522 tests di 65 files**; `--list` tanpa argumen menghitung semua spec (684 tests di 81 files) — bukan angka yang dipakai CI.
 - CI memecah E2E menjadi **4 shard** (`--shard=n/4`, matrix job). Saat menambah/menghapus test/direktori E2E, update angka di atas dan pastikan tiap shard tetap terisi.
-- CI memakai **1 worker Playwright per shard**. `PLAYWRIGHT_WORKERS>1` terbukti flaky di bawah beban (timeout `waitForResponse` pada login/report) meski sudah di-shard — jangan dinaikkan tanpa menambah kapasitas server PHP (lihat #183).
+- CI memakai **1 worker Playwright per shard**. `PLAYWRIGHT_WORKERS>1` adalah **jalan buntu**: flaky di bawah beban, dan menaikkan `PHP_CLI_SERVER_WORKERS` ke 8 **tetap gagal** (E2E hang >50m, `waitForResponse` timeout massal — lihat #219). Jangan ulangi eksperimen ini; konfigurasi stabil 4 shard × 1 worker.
 - **`sail test --parallel` belum bisa dipakai** di repo ini: base `tests/TestCase.php` tidak memakai `RefreshDatabase`, sehingga semua worker paralel memakai database `testing` yang sama dan gagal `Table 'testing.*' doesn't exist`. Gunakan serial sampai DB per-worker disiapkan (lihat issue #162/#183).
 
 ## Workflow
