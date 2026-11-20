@@ -6,14 +6,14 @@ import {
 } from '@/utils/vehicle-loan-status';
 
 const STATUS_STYLES: Record<string, string> = {
-    draft: 'border-slate-200 bg-slate-100 text-slate-700',
-    pending: 'border-amber-200 bg-amber-50 text-amber-800',
-    in_progress: 'border-amber-200 bg-amber-50 text-amber-800',
-    approved: 'border-emerald-200 bg-emerald-50 text-emerald-800',
-    rejected: 'border-rose-200 bg-rose-50 text-rose-800',
-    pickup_done: 'border-sky-200 bg-sky-50 text-sky-800',
-    returned: 'border-emerald-200 bg-emerald-50 text-emerald-800',
-    cancelled: 'border-slate-200 bg-slate-50 text-slate-600',
+    draft: 'border-slate-300 bg-slate-100 text-slate-800',
+    pending: 'border-amber-300 bg-amber-100 text-amber-900',
+    in_progress: 'border-amber-300 bg-amber-100 text-amber-900',
+    approved: 'border-emerald-300 bg-emerald-100 text-emerald-900',
+    rejected: 'border-rose-300 bg-rose-100 text-rose-900',
+    pickup_done: 'border-sky-300 bg-sky-100 text-sky-900',
+    returned: 'border-emerald-300 bg-emerald-100 text-emerald-900',
+    cancelled: 'border-slate-300 bg-slate-100 text-slate-700',
 };
 
 export function VehicleLoanStatusBadge({

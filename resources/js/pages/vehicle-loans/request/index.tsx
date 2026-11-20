@@ -105,7 +105,7 @@ export default function VehicleLoanRequestPage() {
         setLoading(true);
         try {
             await axios.post(`/api/vehicle-loans/${id}/submit`);
-            toast.success('Permintaan dikirim untuk approval.');
+            toast.success('Permintaan dikirim untuk persetujuan.');
             setForm(emptyForm);
             setDraftId(null);
         } catch {
@@ -132,7 +132,7 @@ export default function VehicleLoanRequestPage() {
             <div className="mx-auto max-w-2xl space-y-4 p-4 pb-24 md:p-6">
                 <PageHeader
                     title="Permintaan Peminjaman Kendaraan"
-                    description="Isi jadwal dan tujuan perjalanan, simpan draft, lalu kirim untuk approval."
+                    description="Isi jadwal dan tujuan perjalanan, simpan draf, lalu kirim untuk persetujuan."
                 />
 
                 <Card>
@@ -153,6 +153,7 @@ export default function VehicleLoanRequestPage() {
                             <Input
                                 id="start_at"
                                 type="datetime-local"
+                                lang="id-ID"
                                 value={form.start_at}
                                 onChange={(e) =>
                                     update('start_at', e.target.value)
@@ -172,12 +173,16 @@ export default function VehicleLoanRequestPage() {
                             <Input
                                 id="end_at"
                                 type="datetime-local"
+                                lang="id-ID"
                                 value={form.end_at}
                                 onChange={(e) =>
                                     update('end_at', e.target.value)
                                 }
                             />
                         </div>
+                        <p className="text-xs text-muted-foreground sm:col-span-2">
+                            Format: tanggal/bulan/tahun, gunakan waktu 24 jam.
+                        </p>
                     </CardContent>
                 </Card>
 
@@ -203,7 +208,7 @@ export default function VehicleLoanRequestPage() {
                             rows={3}
                         />
                         <p className="text-xs text-muted-foreground">
-                            Jelaskan tujuan singkat agar approver mudah menilai
+                            Jelaskan tujuan singkat agar penyetuju mudah menilai
                             permintaan.
                         </p>
                     </CardContent>
@@ -217,7 +222,7 @@ export default function VehicleLoanRequestPage() {
                     </CardHeader>
                     <CardContent className="grid gap-4 sm:grid-cols-2">
                         <div className="grid gap-2">
-                            <Label htmlFor="driver_id">Driver</Label>
+                            <Label htmlFor="driver_id">Pengemudi</Label>
                             <Select
                                 value={form.driver_id || 'none'}
                                 onValueChange={(value) =>
@@ -232,7 +237,7 @@ export default function VehicleLoanRequestPage() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="none">
-                                        Belum ditentukan (approver melengkapi)
+                                        Belum ditentukan (penyetuju melengkapi)
                                     </SelectItem>
                                     {options?.drivers.map((driver) => (
                                         <SelectItem
@@ -263,7 +268,7 @@ export default function VehicleLoanRequestPage() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="none">
-                                        Belum ditentukan (approver melengkapi)
+                                        Belum ditentukan (penyetuju melengkapi)
                                     </SelectItem>
                                     {options?.units.map((unit) => (
                                         <SelectItem
@@ -284,7 +289,7 @@ export default function VehicleLoanRequestPage() {
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="hidden sm:block">
                     <CardContent className="pt-6">
                         <VehicleLoanQrPanel form="request" />
                     </CardContent>
@@ -297,7 +302,7 @@ export default function VehicleLoanRequestPage() {
                         disabled={loading}
                         className="min-h-11 flex-1"
                     >
-                        Simpan Draft
+                        Simpan Draf
                     </Button>
                     <Button
                         onClick={() => void submit()}

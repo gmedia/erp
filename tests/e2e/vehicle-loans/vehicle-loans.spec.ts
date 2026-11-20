@@ -33,7 +33,7 @@ test.describe('Vehicle Loans', () => {
         await expect(page.locator('#driver_id')).toBeVisible();
         await expect(page.locator('#vehicle_unit_id')).toBeVisible();
         await expect(
-            page.getByRole('button', { name: 'Simpan Draft' }),
+            page.getByRole('button', { name: 'Simpan Draf' }),
         ).toBeVisible();
         await expect(
             page.getByRole('button', { name: 'Kirim Permintaan' }),
@@ -53,7 +53,7 @@ test.describe('Vehicle Loans', () => {
                 response.request().method() === 'POST' &&
                 response.status() === 201,
         );
-        await page.getByRole('button', { name: 'Simpan Draft' }).click();
+        await page.getByRole('button', { name: 'Simpan Draf' }).click();
         await draftResponse;
 
         const submitResponse = page.waitForResponse(
@@ -141,9 +141,11 @@ test.describe('Vehicle Loans', () => {
 
         await page.goto(VEHICLE_LOAN_SECURITY_PATH);
 
-        await expect(page).toHaveTitle(/Daftar Peminjaman — Security/);
+        await expect(page).toHaveTitle(
+            /Antrean Keamanan — Peminjaman Kendaraan/,
+        );
         await expect(
-            page.getByText('Daftar Peminjaman Kendaraan'),
+            page.getByRole('heading', { name: 'Antrean Keamanan' }),
         ).toBeVisible();
 
         const response = page.waitForResponse(
@@ -208,7 +210,7 @@ test.describe('Vehicle Loans', () => {
             VEHICLE_LOAN_RETURN_PATH,
         ]) {
             await page.goto(path);
-            await expect(page.getByText('QR Loket Security')).toBeVisible();
+            await expect(page.getByText('QR Pos Keamanan')).toBeVisible();
             await expect(
                 page.locator('svg[height="88"][width="88"]').first(),
             ).toBeVisible();

@@ -183,7 +183,7 @@ class VehicleLoanController extends Controller
         $branchId = $this->resolveBranchFromRequest($request);
 
         $query = VehicleLoan::whereIn('status', ['approved', 'pickup_done'])
-            ->with(['requester', 'department', 'driver.employee', 'vehicleUnit.asset', 'pickup']);
+            ->with(['requester', 'department', 'driver.employee', 'vehicleUnit.asset', 'pickup', 'approvalRequests.steps.flowStep.user']);
 
         if ($branchId !== null) {
             $query->where('branch_id', $branchId);

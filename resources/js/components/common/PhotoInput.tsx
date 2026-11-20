@@ -1,8 +1,7 @@
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { takePhoto } from '@/lib/camera';
 import { Capacitor } from '@capacitor/core';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface PhotoInputProps {
     id: string;
@@ -70,18 +69,28 @@ export function PhotoInput({
 }: Readonly<PhotoInputProps>) {
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     if (!Capacitor.isNativePlatform()) {
         return (
             <div className="grid gap-2">
-                <Input
+                <input
+                    ref={fileInputRef}
                     id={id}
                     type="file"
                     accept={accept}
                     capture={capture ? 'environment' : undefined}
-                    className="min-h-11 cursor-pointer"
+                    className="sr-only"
                     onChange={(e) => onChange(e.target.files?.[0] ?? null)}
                 />
+                <Button
+                    type="button"
+                    variant="outline"
+                    className="min-h-11 w-full justify-start"
+                    onClick={() => fileInputRef.current?.click()}
+                >
+                    {value ? 'Ganti Foto' : 'Pilih Foto'}
+                </Button>
                 {hint && !value && (
                     <p className="text-xs text-muted-foreground">{hint}</p>
                 )}

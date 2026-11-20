@@ -21,6 +21,8 @@ use App\Models\VehicleLoanPickup;
 use App\Models\VehicleLoanReturn;
 use App\Models\VehicleUnit;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 /**
  * Data contoh realistis untuk seluruh tahapan modul Vehicle Loans.
@@ -49,23 +51,11 @@ class VehicleLoanSampleDataSeeder extends Seeder
 
         $this->purgeLegacySampleData();
 
-        $requesters = User::query()
-            ->where('name', 'not like', '%sample%')
-            ->where('name', 'not like', '%dummy%')
-            ->where('name', 'not like', '%test%')
-            ->orderBy('id')
-            ->limit(5)
-            ->pluck('id')
-            ->all();
+        $requesters = $this->ensureRequesters();
+        $drivers = $this->ensureDrivers($admin);
+        $units = $this->ensureUnits();
 
-        if ($requesters === []) {
-            $requesters = [$admin->id];
-        }
-
-        $driver = $this->firstDriver($admin);
-        $unit = $this->firstUnit();
-
-        if (! $unit) {
+        if ($units === [] || $drivers === []) {
             // Master data tidak bisa dibuat aman tanpa Employee/Asset kategori
             // kendaraan. Seeder lain wajib berjalan lebih dulu.
             return;
@@ -81,13 +71,16 @@ class VehicleLoanSampleDataSeeder extends Seeder
             ['code' => 'VL-2026-0003', 'status' => 'in_progress', 'purpose' => 'Kunjungan koordinasi proyek di Gedung Menara Kuningan'],
             ['code' => 'VL-2026-0004', 'status' => 'approved', 'purpose' => 'Penjemputan tamu dari Bandara Soekarno-Hatta'],
             ['code' => 'VL-2026-0005', 'status' => 'rejected', 'purpose' => 'Survey lokasi gudang di Cikarang'],
-            ['code' => 'VL-2026-0006', 'status' => 'pickup_done', 'purpose' => 'Pengiriman sparepart ke vendor di Tangerang'],
+            ['code' => 'VL-2026-0006', 'status' => 'pickup_done', 'purpose' => 'Pengiriman sparepart ke vendor di Tangerang', 'ready' => true],
             ['code' => 'VL-2026-0007', 'status' => 'returned', 'purpose' => 'Rapat koordinasi bulanan di kantor pusat'],
             ['code' => 'VL-2026-0008', 'status' => 'cancelled', 'purpose' => 'Kunjungan supplier ke pabrik Karawang'],
             ['code' => 'VL-2026-0009', 'status' => 'pickup_done', 'purpose' => 'Perjalanan dinas ke Surabaya', 'overdue' => true],
         ];
 
         foreach ($scenarios as $index => $scenario) {
+            $driver = $drivers[$index % count($drivers)];
+            $unit = $units[$index % count($units)];
+
             $loan = $this->seedLoan($scenario, $index, $requesters, $driver, $unit, [
                 'branch_id' => $branchId,
                 'company_id' => $companyId,
@@ -95,7 +88,7 @@ class VehicleLoanSampleDataSeeder extends Seeder
             ]);
 
             $this->seedApproval($loan, $scenario['status'], $flow, $flowStep, $admin, $requesters, $driver, $unit);
-            $this->seedPickupAndReturn($loan, $scenario['status'], $requesters, $admin, $driver, $unit, (bool) ($scenario['overdue'] ?? false));
+            $this->seedPickupAndReturn($loan, $scenario['status'], $requesters, $admin, $driver, $unit, (bool) ($scenario['overdue'] ?? false), (bool) ($scenario['ready'] ?? false));
             $this->seedActivityLog($loan, $scenario['status'], $admin);
         }
     }
@@ -110,17 +103,36 @@ class VehicleLoanSampleDataSeeder extends Seeder
         $status = $scenario['status'];
         $overdue = (bool) ($scenario['overdue'] ?? false);
 
-        $start = $overdue
-            ? now()->subDays(3)->setTime(8, 0)
-            : now()->addDays($index + 1)->setTime(8, 0);
-        $end = $overdue
-            ? now()->subDay()->setTime(17, 0)
-            : (clone $start)->setTime(17, 0);
+        if ($overdue) {
+            $start = now()->subDays(3)->setTime(8, 0);
+            $end = now()->subDay()->setTime(17, 0);
+        } elseif ($status === 'returned') {
+            $start = now()->subDays(6)->setTime(8, 0);
+            $end = now()->subDays(5)->setTime(17, 0);
+        } elseif ($status === 'pickup_done') {
+            $start = now()->subHours(2);
+            $end = now()->addHours(5);
+        } else {
+            $start = now()->addDays($index + 1)->setTime(8, 0);
+            $end = (clone $start)->setTime(17, 0);
+        }
 
-        $submittedAt = in_array($status, ['draft'], true) ? null : (clone $start)->subDay()->setTime(9, 0);
-        $approvedAt = in_array($status, ['approved', 'pickup_done', 'returned'], true)
-            ? (clone $submittedAt)->addHours(2)
-            : null;
+        if (in_array($status, ['draft'], true)) {
+            $submittedAt = null;
+        } else {
+            $candidateSubmitted = (clone $start)->subDay()->setTime(9, 0);
+            $submittedAt = $candidateSubmitted->greaterThan(now())
+                ? now()->subHours(2)
+                : $candidateSubmitted;
+        }
+
+        $approvedAt = null;
+        if ($submittedAt && in_array($status, ['approved', 'pickup_done', 'returned'], true)) {
+            $candidateApproved = (clone $submittedAt)->addHours(2);
+            $approvedAt = $candidateApproved->greaterThan(now())
+                ? now()->subMinutes(30)
+                : $candidateApproved;
+        }
 
         $rejectionReason = $status === 'rejected'
             ? 'Jadwal bentrok dengan kebutuhan unit lain pada jam yang sama.'
@@ -218,19 +230,6 @@ class VehicleLoanSampleDataSeeder extends Seeder
             $loan->update([
                 'review_notes' => 'Penugasan driver dan unit diperbarui oleh atasan.',
             ]);
-
-            VehicleLoanActivityLog::firstOrCreate(
-                [
-                    'vehicle_loan_id' => $loan->id,
-                    'event' => 'assignment_changed',
-                ],
-                [
-                    'actor_user_id' => $this->approverId(),
-                    'metadata' => [
-                        'after' => ['driver_id' => $driver->id, 'vehicle_unit_id' => $unit->id],
-                    ],
-                ],
-            );
         }
     }
 
@@ -243,6 +242,7 @@ class VehicleLoanSampleDataSeeder extends Seeder
         VehicleDriver $driver,
         VehicleUnit $unit,
         bool $overdue,
+        bool $ready,
     ): void {
         if (! in_array($status, ['pickup_done', 'returned'], true)) {
             return;
@@ -250,7 +250,7 @@ class VehicleLoanSampleDataSeeder extends Seeder
 
         $pickedAt = $overdue
             ? now()->subDays(3)->setTime(8, 0)
-            : (clone $loan->start_at)->setTime(7, 45);
+            : (clone $loan->start_at);
 
         $pickup = VehicleLoanPickup::updateOrCreate(
             ['vehicle_loan_id' => $loan->id],
@@ -262,8 +262,8 @@ class VehicleLoanSampleDataSeeder extends Seeder
                 'driver_snapshot_id' => $driver->id,
                 'unit_snapshot_id' => $unit->id,
                 'picked_at' => $pickedAt,
-                'key_handover_at' => (clone $pickedAt)->addMinutes(15),
-                'security_user_id' => $admin->id,
+                'key_handover_at' => $ready ? null : (clone $pickedAt)->addMinutes(15),
+                'security_user_id' => $ready ? null : $admin->id,
             ],
         );
 
@@ -296,22 +296,42 @@ class VehicleLoanSampleDataSeeder extends Seeder
         $events = match ($status) {
             'draft' => ['draft_created'],
             'pending' => ['submitted'],
-            'in_progress' => ['approval_step_advanced'],
-            'approved' => ['approval_completed'],
-            'rejected' => ['approval_rejected'],
-            'pickup_done' => ['pickup_submitted', 'key_handed_over'],
-            'returned' => ['pickup_submitted', 'key_handed_over', 'return_submitted'],
-            'cancelled' => ['cancelled'],
+            'in_progress' => ['submitted', 'assignment_changed', 'approval_step_advanced'],
+            'approved' => ['submitted', 'approval_completed'],
+            'rejected' => ['submitted', 'approval_rejected'],
+            'pickup_done' => ['submitted', 'approval_completed', 'pickup_submitted', 'key_handed_over'],
+            'returned' => ['submitted', 'approval_completed', 'pickup_submitted', 'key_handed_over', 'return_submitted'],
+            'cancelled' => ['draft_created', 'cancelled'],
             default => [],
         };
 
+        $times = [
+            'draft_created' => $loan->created_at,
+            'submitted' => $loan->submitted_at,
+            'approval_step_advanced' => $loan->updated_at,
+            'approval_completed' => $loan->approved_at,
+            'approval_rejected' => $loan->updated_at,
+            'assignment_changed' => $loan->approved_at,
+            'cancelled' => $loan->created_at,
+            'pickup_submitted' => $loan->pickup?->picked_at,
+            'key_handed_over' => $loan->pickup?->key_handover_at,
+            'return_submitted' => $loan->returns?->returned_at,
+        ];
+
         foreach ($events as $event) {
+            if ($event === 'key_handed_over' && $loan->pickup?->key_handover_at === null) {
+                continue;
+            }
+
             VehicleLoanActivityLog::firstOrCreate(
                 [
                     'vehicle_loan_id' => $loan->id,
                     'event' => $event,
                 ],
-                ['actor_user_id' => $admin->id],
+                [
+                    'actor_user_id' => $admin->id,
+                    'created_at' => $times[$event] ?? $loan->created_at,
+                ],
             );
         }
     }
@@ -374,65 +394,119 @@ class VehicleLoanSampleDataSeeder extends Seeder
         return (int) ($admin ?? User::query()->orderBy('id')->value('id'));
     }
 
-    private function firstDriver(User $admin): VehicleDriver
+    /**
+     * @return list<int>
+     */
+    private function ensureRequesters(): array
     {
-        $driver = VehicleDriver::where('license_number', 'SIM-B-2024-00123')->first();
-        if ($driver) {
-            return $driver;
+        $people = [
+            ['email' => 'dewi.lestari@example.com', 'name' => 'Dewi Lestari'],
+            ['email' => 'andi.pratama@example.com', 'name' => 'Andi Pratama'],
+            ['email' => 'siti.rahmawati@example.com', 'name' => 'Siti Rahmawati'],
+        ];
+
+        $ids = [];
+
+        foreach ($people as $person) {
+            $user = User::firstOrCreate(
+                ['email' => $person['email']],
+                [
+                    'name' => $person['name'],
+                    'password' => Hash::make(Str::random(32)),
+                    'email_verified_at' => now(),
+                ],
+            );
+
+            if ($user->name !== $person['name']) {
+                $user->update(['name' => $person['name']]);
+            }
+
+            $ids[] = $user->id;
         }
 
-        $employee = Employee::firstOrCreate(
-            ['employee_id' => 'EMP-2021-0145'],
-            ['name' => 'Budi Santoso', 'email' => 'budi.santoso@example.com', 'user_id' => $admin->id],
-        );
-
-        return VehicleDriver::updateOrCreate(
-            ['license_number' => 'SIM-B-2024-00123'],
-            [
-                'employee_id' => $employee->id,
-                'license_type' => 'B',
-                'license_expiry' => now()->addYears(5)->toDateString(),
-                'is_active' => true,
-            ]);
+        return $ids;
     }
 
-    private function firstUnit(): ?VehicleUnit
+    /**
+     * @return list<VehicleDriver>
+     */
+    private function ensureDrivers(User $admin): array
     {
-        $unit = VehicleUnit::where('plate_number', 'B 1234 XYZ')->first();
-        if ($unit) {
-            return $unit;
+        $people = [
+            ['employee_id' => 'EMP-2021-0145', 'name' => 'Budi Santoso', 'email' => 'budi.santoso@example.com', 'license' => 'SIM-B-2024-00123', 'type' => 'B'],
+            ['employee_id' => 'EMP-2022-0117', 'name' => 'Agus Setiawan', 'email' => 'agus.setiawan@example.com', 'license' => 'SIM-B-2022-01170', 'type' => 'B'],
+            ['employee_id' => 'EMP-2020-0088', 'name' => 'Joko Susilo', 'email' => 'joko.susilo@example.com', 'license' => 'SIM-A-2020-00881', 'type' => 'A'],
+        ];
+
+        $drivers = [];
+
+        foreach ($people as $person) {
+            $employee = Employee::firstOrCreate(
+                ['employee_id' => $person['employee_id']],
+                ['name' => $person['name'], 'email' => $person['email'], 'user_id' => $admin->id],
+            );
+
+            $drivers[] = VehicleDriver::updateOrCreate(
+                ['license_number' => $person['license']],
+                [
+                    'employee_id' => $employee->id,
+                    'license_type' => $person['type'],
+                    'license_expiry' => now()->addYears(5)->toDateString(),
+                    'is_active' => true,
+                ],
+            );
         }
 
+        return $drivers;
+    }
+
+    /**
+     * @return list<VehicleUnit>
+     */
+    private function ensureUnits(): array
+    {
         $category = AssetCategory::where('code', 'KND')->first()
             ?? AssetCategory::query()->orderBy('id')->first();
         $branchId = Branch::query()->orderBy('id')->value('id');
 
         if (! $category || ! $branchId) {
-            return null;
+            return [];
         }
 
-        $asset = Asset::updateOrCreate(
-            ['asset_code' => 'FA-2021-0145'],
-            [
-                'name' => 'Toyota Avanza 1.5 G',
-                'asset_category_id' => $category->id,
-                'branch_id' => $branchId,
-                'purchase_date' => now()->subYear()->toDateString(),
-                'purchase_cost' => 150000000,
-                'currency' => 'IDR',
-                'status' => 'active',
-                'condition' => 'good',
-            ],
-        );
+        $vehicles = [
+            ['asset_code' => 'FA-2021-0145', 'name' => 'Toyota Avanza 1.5 G', 'plate' => 'B 1234 XYZ', 'type' => 'car', 'capacity' => 5],
+            ['asset_code' => 'FA-2022-0117', 'name' => 'Honda Vario 160 CBS', 'plate' => 'B 5678 ABC', 'type' => 'motorcycle', 'capacity' => 2],
+            ['asset_code' => 'FA-2020-0088', 'name' => 'Mitsubishi L300 Pickup', 'plate' => 'B 9012 DEF', 'type' => 'car', 'capacity' => 3],
+        ];
 
-        return VehicleUnit::updateOrCreate(
-            ['asset_id' => $asset->id],
-            [
-                'plate_number' => 'B 1234 XYZ',
-                'vehicle_type' => 'car',
-                'capacity' => 5,
-                'is_active' => true,
-            ],
-        );
+        $units = [];
+
+        foreach ($vehicles as $vehicle) {
+            $asset = Asset::updateOrCreate(
+                ['asset_code' => $vehicle['asset_code']],
+                [
+                    'name' => $vehicle['name'],
+                    'asset_category_id' => $category->id,
+                    'branch_id' => $branchId,
+                    'purchase_date' => now()->subYears(3)->toDateString(),
+                    'purchase_cost' => 150000000,
+                    'currency' => 'IDR',
+                    'status' => 'active',
+                    'condition' => 'good',
+                ],
+            );
+
+            $units[] = VehicleUnit::updateOrCreate(
+                ['asset_id' => $asset->id],
+                [
+                    'plate_number' => $vehicle['plate'],
+                    'vehicle_type' => $vehicle['type'],
+                    'capacity' => $vehicle['capacity'],
+                    'is_active' => true,
+                ],
+            );
+        }
+
+        return $units;
     }
 }

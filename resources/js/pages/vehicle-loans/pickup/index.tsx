@@ -24,6 +24,7 @@ interface Loan {
     start_at: string;
     end_at: string;
     purpose: string;
+    requester_name: string | null;
     plate_number: string | null;
     driver_name: string | null;
     status: string;
@@ -68,7 +69,7 @@ export default function VehicleLoanPickupPage() {
         try {
             await axios.post(`/api/vehicle-loans/${loanId}/pickups`, body);
             toast.success(
-                'Form pengambilan dikirim. Ambil kunci di pos security.',
+                'Form pengambilan dikirim. Ambil kunci di pos keamanan.',
             );
             setLoanId('');
             setPhoto(null);
@@ -160,8 +161,11 @@ export default function VehicleLoanPickupPage() {
                         {selected && (
                             <div className="space-y-1 rounded-lg border bg-muted/30 p-3 text-sm">
                                 <p className="font-medium">{selected.code}</p>
-                                <p>Driver: {selected.driver_name ?? '-'}</p>
-                                <p>Unit: {selected.plate_number ?? '-'}</p>
+                                <p>
+                                    Peminjam: {selected.requester_name ?? '-'}
+                                </p>
+                                <p>Pengemudi: {selected.driver_name ?? '-'}</p>
+                                <p>Kendaraan: {selected.plate_number ?? '-'}</p>
                                 <p>Tujuan: {selected.purpose}</p>
                                 <p>
                                     Mulai:{' '}
@@ -230,10 +234,15 @@ export default function VehicleLoanPickupPage() {
                         >
                             Kirim Pengambilan
                         </Button>
+                        {(!loanId || !photo) && (
+                            <p className="text-center text-xs text-muted-foreground">
+                                Pilih permintaan dan unggah foto untuk mengirim.
+                            </p>
+                        )}
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="hidden sm:block">
                     <CardContent className="pt-6">
                         <VehicleLoanQrPanel form="pickup" />
                     </CardContent>

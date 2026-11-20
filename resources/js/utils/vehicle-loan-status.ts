@@ -3,7 +3,7 @@ import { statusBadgeVariant } from '@/lib/status-badge';
 type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline';
 
 const LABELS: Record<string, string> = {
-    draft: 'Draft',
+    draft: 'Draf',
     pending: 'Menunggu',
     in_progress: 'Diproses',
     approved: 'Disetujui',
