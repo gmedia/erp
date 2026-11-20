@@ -7,8 +7,6 @@ export interface KpiCardProps {
     icon: LucideIcon;
     value: number;
     formattedValue: string;
-    /** @deprecated Aksen garis kiri tidak dipakai lagi (docs/ui-design-rules.md §0.4). */
-    borderColor?: string;
     iconColor: string;
     valueClassName?: string;
     children?: ReactNode;
