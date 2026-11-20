@@ -82,7 +82,7 @@ export function CategoryDistributionChart({
                                 </div>
                                 <div className="h-4 w-full overflow-hidden rounded bg-secondary">
                                     <div
-                                        className="h-full rounded-r bg-blue-500 transition-all duration-500"
+                                        className="h-full rounded-r bg-info transition-all duration-500"
                                         style={{ width: widthStr }}
                                     />
                                 </div>

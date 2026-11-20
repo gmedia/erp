@@ -134,8 +134,8 @@ export default function FinancialDashboard() {
             refetch={refetch}
         >
             {showSegmentBanner && (
-                <Alert className="border-blue-200 bg-blue-50 text-blue-900 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-100">
-                    <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <Alert className="border-info/30 bg-info/10 text-info">
+                    <Info className="h-4 w-4 text-info" />
                     <AlertTitle className="font-semibold">
                         Segment view — Branch P&L
                     </AlertTitle>

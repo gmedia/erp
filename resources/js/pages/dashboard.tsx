@@ -53,25 +53,25 @@ export default function Dashboard() {
         {
             title: 'Total Customers',
             icon: Users,
-            iconColor: 'text-blue-500',
+            iconColor: 'text-info',
             value: totals.customers,
         },
         {
             title: 'Total Employees',
             icon: Building2,
-            iconColor: 'text-emerald-500',
+            iconColor: 'text-success',
             value: totals.employees,
         },
         {
             title: 'Total Suppliers',
             icon: Warehouse,
-            iconColor: 'text-amber-500',
+            iconColor: 'text-warning',
             value: totals.suppliers,
         },
         {
             title: 'Total Assets',
             icon: Boxes,
-            iconColor: 'text-indigo-500',
+            iconColor: 'text-chart-3',
             value: totals.assets,
         },
     ] as const;
@@ -102,25 +102,25 @@ export default function Dashboard() {
             key: 'customers',
             label: 'Customers',
             value: totals.customers,
-            barClass: 'bg-blue-500',
+            barClass: 'bg-info',
         },
         {
             key: 'employees',
             label: 'Employees',
             value: totals.employees,
-            barClass: 'bg-emerald-500',
+            barClass: 'bg-success',
         },
         {
             key: 'suppliers',
             label: 'Suppliers',
             value: totals.suppliers,
-            barClass: 'bg-amber-500',
+            barClass: 'bg-warning',
         },
         {
             key: 'assets',
             label: 'Assets',
             value: totals.assets,
-            barClass: 'bg-indigo-500',
+            barClass: 'bg-chart-3',
         },
     ] as const;
 

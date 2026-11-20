@@ -58,7 +58,7 @@ export function StaleEntitiesTable({
             <CardHeader>
                 <div className="flex items-center justify-between">
                     <div>
-                        <CardTitle className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
+                        <CardTitle className="flex items-center gap-2 text-warning">
                             <AlertCircle className="h-5 w-5" />
                             Stale Entities
                         </CardTitle>
@@ -70,7 +70,7 @@ export function StaleEntitiesTable({
                     <div>
                         <Badge
                             variant="outline"
-                            className="border-amber-300 bg-amber-50 font-mono text-xs text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-400"
+                            className="border-warning/30 bg-warning-soft font-mono text-xs text-warning"
                         >
                             {data.length} {data.length === 50 ? '+' : ''}{' '}
                             detected
@@ -147,7 +147,7 @@ export function StaleEntitiesTable({
                                                 </span>
                                             </div>
                                         </TableCell>
-                                        <TableCell className="text-right font-bold text-amber-600 dark:text-amber-400">
+                                        <TableCell className="text-right font-bold text-warning">
                                             {entity.days_in_state}
                                         </TableCell>
                                     </TableRow>
