@@ -2,11 +2,14 @@
 
 namespace App\Http\Requests\InventoryStocktakes;
 
+use App\Models\InventoryStocktake;
+
 class UpdateInventoryStocktakeRequest extends AbstractInventoryStocktakeRequest
 {
     public function rules(): array
     {
-        $stocktakeId = $this->route('inventoryStocktake')->id ?? $this->route('id');
+        $stocktake = $this->route('inventory_stocktake') ?? $this->route('inventoryStocktake');
+        $stocktakeId = $stocktake instanceof InventoryStocktake ? $stocktake->getKey() : $stocktake;
 
         return array_merge(
             [

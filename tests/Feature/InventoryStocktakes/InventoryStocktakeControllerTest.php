@@ -151,6 +151,19 @@ describe('Inventory Stocktake API Endpoints', function () {
         ]);
     });
 
+    test('update accepts an unchanged stocktake number', function () {
+        $stocktake = InventoryStocktake::factory()->create(['status' => 'draft']);
+
+        putJson("/api/inventory-stocktakes/{$stocktake->id}", [
+            'stocktake_number' => $stocktake->stocktake_number,
+        ])->assertOk();
+
+        assertDatabaseHas('inventory_stocktakes', [
+            'id' => $stocktake->id,
+            'stocktake_number' => $stocktake->stocktake_number,
+        ]);
+    });
+
     test('destroy cancels a stocktake (no hard delete)', function () {
         $stocktake = InventoryStocktake::factory()->create(['status' => 'draft']);
 

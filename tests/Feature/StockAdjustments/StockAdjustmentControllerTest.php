@@ -183,6 +183,19 @@ describe('Stock Adjustment API Endpoints', function () {
         ]);
     });
 
+    test('update accepts an unchanged adjustment number', function () {
+        $adjustment = StockAdjustment::factory()->create(['status' => 'draft']);
+
+        putJson("/api/stock-adjustments/{$adjustment->id}", [
+            'adjustment_number' => $adjustment->adjustment_number,
+        ])->assertOk();
+
+        assertDatabaseHas('stock_adjustments', [
+            'id' => $adjustment->id,
+            'adjustment_number' => $adjustment->adjustment_number,
+        ]);
+    });
+
     test('show returns adjustment with all relations loaded', function () {
         $warehouse = Warehouse::factory()->create();
         $product = Product::factory()->create();

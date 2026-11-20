@@ -1,0 +1,63 @@
+import { expect, test } from '@playwright/test';
+
+import { changeDateFieldValue, openModule } from '../helpers';
+import { createApprovalDelegation, searchApprovalDelegation } from './helpers';
+
+test.describe('Approval Delegation date fields', () => {
+    test.beforeEach(async ({ page }) => {
+        await openModule(
+            page,
+            '/approval-delegations',
+            '/api/approval-delegations',
+        );
+    });
+
+    test('can change the start date', async ({ page }) => {
+        const reason = await createApprovalDelegation(page);
+        await searchApprovalDelegation(page, reason);
+
+        const row = page
+            .locator('tbody tr')
+            .filter({ hasText: reason })
+            .first();
+        await expect(row).toBeVisible();
+
+        await row.getByRole('button', { name: /Actions/i }).click();
+        await page.getByRole('menuitem', { name: /Edit/i }).click();
+
+        const dialog = page.getByRole('dialog', {
+            name: /Edit Approval Delegation/i,
+        });
+        await expect(dialog).toBeVisible();
+
+        const startDate = await changeDateFieldValue(
+            page,
+            dialog,
+            'Start Date',
+        );
+
+        const updateRequestPromise = page.waitForRequest(
+            (request) =>
+                request.url().includes('/api/approval-delegations/') &&
+                ['PUT', 'PATCH'].includes(request.method()),
+        );
+        const updateResponsePromise = page.waitForResponse(
+            (response) =>
+                response.url().includes('/api/approval-delegations/') &&
+                ['PUT', 'PATCH'].includes(response.request().method()) &&
+                response.status() < 400,
+        );
+
+        await dialog.getByRole('button', { name: /Update/i }).click();
+
+        const updateRequest = await updateRequestPromise;
+        const payload = updateRequest.postDataJSON() as {
+            start_date?: string;
+        };
+
+        expect(payload.start_date).toBe(startDate);
+
+        await updateResponsePromise;
+        await expect(dialog).not.toBeVisible();
+    });
+});
