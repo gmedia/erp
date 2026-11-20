@@ -154,7 +154,7 @@ function TwoFactorVerificationStep({
         }, 0);
     }, []);
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         setProcessing(true);
         setError('');

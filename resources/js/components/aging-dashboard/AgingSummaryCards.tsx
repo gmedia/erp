@@ -37,7 +37,6 @@ export const AgingSummaryCards = memo<AgingSummaryCardsProps>(
             {
                 title: 'Total Receivables',
                 icon: TrendingUp,
-                borderColor: 'border-l-emerald-500',
                 iconColor: 'text-success',
                 value: arSummary.total_outstanding,
                 formattedValue: formatCurrency(arSummary.total_outstanding),
@@ -52,7 +51,6 @@ export const AgingSummaryCards = memo<AgingSummaryCardsProps>(
             {
                 title: 'AR Overdue',
                 icon: TrendingDown,
-                borderColor: 'border-l-amber-500',
                 iconColor: 'text-warning',
                 value: arSummary.overdue_amount,
                 formattedValue: formatCurrency(arSummary.overdue_amount),
@@ -75,7 +73,6 @@ export const AgingSummaryCards = memo<AgingSummaryCardsProps>(
             {
                 title: 'Total Payables',
                 icon: TrendingDown,
-                borderColor: 'border-l-rose-500',
                 iconColor: 'text-destructive-foreground',
                 value: apSummary.total_outstanding,
                 formattedValue: formatCurrency(apSummary.total_outstanding),
@@ -90,7 +87,6 @@ export const AgingSummaryCards = memo<AgingSummaryCardsProps>(
             {
                 title: 'AP Overdue',
                 icon: TrendingUp,
-                borderColor: 'border-l-orange-500',
                 iconColor: 'text-warning',
                 value: apSummary.overdue_amount,
                 formattedValue: formatCurrency(apSummary.overdue_amount),
@@ -121,7 +117,6 @@ export const AgingSummaryCards = memo<AgingSummaryCardsProps>(
                         icon={card.icon}
                         value={card.value}
                         formattedValue={card.formattedValue}
-                        borderColor={card.borderColor}
                         iconColor={card.iconColor}
                     >
                         {card.footer}

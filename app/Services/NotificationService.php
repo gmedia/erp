@@ -17,7 +17,10 @@ use Throwable;
 
 class NotificationService
 {
-    public function __construct(private readonly PushSender $pushSender) {}
+    public function __construct(private readonly PushSender $pushSender)
+    {
+        // Intentionally empty. Dependencies are assigned via promoted properties.
+    }
 
     /**
      * Dispatch a notifiable event through the configured channels.

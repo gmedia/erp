@@ -93,15 +93,13 @@ function comparisonFooter(
 
 function signedBalanceChrome(
     value: number,
-    positive: { borderColor: string; iconColor: string },
+    positive: { iconColor: string },
 ): {
-    borderColor: string;
     iconColor: string;
     valueClassName?: string;
 } {
     if (value < 0) {
         return {
-            borderColor: 'border-l-rose-500',
             iconColor: 'text-destructive-foreground',
             valueClassName: 'text-destructive-foreground',
         };
@@ -145,7 +143,6 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
         {
             title: 'Revenue',
             icon: TrendingUp,
-            borderColor: 'border-l-emerald-500',
             iconColor: 'text-success',
             value: data.revenue.value,
             formattedValue: formatCurrency(data.revenue.value),
@@ -159,7 +156,6 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
         {
             title: 'Expenses',
             icon: TrendingDown,
-            borderColor: 'border-l-rose-500',
             iconColor: 'text-destructive-foreground',
             value: data.expenses.value,
             formattedValue: formatCurrency(data.expenses.value),
@@ -174,7 +170,6 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             title: 'Net Income',
             icon: DollarSign,
             ...signedBalanceChrome(data.net_income.value, {
-                borderColor: 'border-l-blue-500',
                 iconColor: 'text-info',
             }),
             value: data.net_income.value,
@@ -189,7 +184,6 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
         {
             title: 'Total Assets',
             icon: Building2,
-            borderColor: 'border-l-indigo-500',
             iconColor: 'text-chart-3',
             value: data.total_assets.value,
             formattedValue: formatCurrency(data.total_assets.value),
@@ -203,7 +197,6 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
         {
             title: 'Total Liabilities',
             icon: CreditCard,
-            borderColor: 'border-l-amber-500',
             iconColor: 'text-warning',
             value: data.total_liabilities.value,
             formattedValue: formatCurrency(data.total_liabilities.value),
@@ -218,7 +211,6 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             title: 'Equity',
             icon: PiggyBank,
             ...signedBalanceChrome(data.equity.value, {
-                borderColor: 'border-l-purple-500',
                 iconColor: 'text-chart-3',
             }),
             value: data.equity.value,
@@ -234,7 +226,6 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             title: 'Cash Balance',
             icon: Banknote,
             ...signedBalanceChrome(data.cash_balance.value, {
-                borderColor: 'border-l-teal-500',
                 iconColor: 'text-success',
             }),
             value: data.cash_balance.value,
@@ -257,7 +248,6 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
                     icon={card.icon}
                     value={card.value}
                     formattedValue={card.formattedValue}
-                    borderColor={card.borderColor}
                     iconColor={card.iconColor}
                     valueClassName={card.valueClassName}
                 >

@@ -53,28 +53,24 @@ export default function Dashboard() {
         {
             title: 'Total Customers',
             icon: Users,
-            borderColor: 'border-l-blue-500',
             iconColor: 'text-info',
             value: totals.customers,
         },
         {
             title: 'Total Employees',
             icon: Building2,
-            borderColor: 'border-l-emerald-500',
             iconColor: 'text-success',
             value: totals.employees,
         },
         {
             title: 'Total Suppliers',
             icon: Warehouse,
-            borderColor: 'border-l-amber-500',
             iconColor: 'text-warning',
             value: totals.suppliers,
         },
         {
             title: 'Total Assets',
             icon: Boxes,
-            borderColor: 'border-l-indigo-500',
             iconColor: 'text-chart-3',
             value: totals.assets,
         },
@@ -164,7 +160,6 @@ export default function Dashboard() {
                               formattedValue={formatNumberByRegionalSettings(
                                   card.value,
                               )}
-                              borderColor={card.borderColor}
                               iconColor={card.iconColor}
                           />
                       ))}

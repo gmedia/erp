@@ -45,7 +45,7 @@ export default function Profile({
         status ?? searchParams.get('status') ?? undefined;
 
     const handleSubmit = async (
-        e: Readonly<React.FormEvent<HTMLFormElement>>,
+        e: Readonly<React.SubmitEvent<HTMLFormElement>>,
     ) => {
         e.preventDefault();
         setProcessing(true);

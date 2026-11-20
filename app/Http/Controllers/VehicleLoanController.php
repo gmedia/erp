@@ -45,10 +45,10 @@ class VehicleLoanController extends Controller
             ->when($request->filled('date_from'), fn ($q) => $q->whereDate('start_at', '>=', $request->date('date_from')))
             ->when($request->filled('date_to'), fn ($q) => $q->whereDate('end_at', '<=', $request->date('date_to')))
             ->when($request->boolean('mine'), fn ($q) => $q->where('requester_id', Auth::id()))
-            ->when($this->resolveBranchFromRequest($request) !== null, fn ($q) => $q->where(
-                'branch_id',
-                $this->resolveBranchFromRequest($request),
-            ))
+            ->when(
+                $this->resolveBranchFromRequest($request) !== null,
+                fn ($q) => $q->where('branch_id', $this->resolveBranchFromRequest($request)),
+            )
             ->orderByDesc('id');
 
         return VehicleLoanResource::collection($query->paginate($request->integer('per_page', 15)));

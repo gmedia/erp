@@ -29,7 +29,7 @@ export default function ResetPassword({
     const resolvedEmail = email ?? searchParams.get('email') ?? '';
 
     const handleSubmit = async (
-        e: Readonly<React.FormEvent<HTMLFormElement>>,
+        e: Readonly<React.SubmitEvent<HTMLFormElement>>,
     ) => {
         e.preventDefault();
         setProcessing(true);
