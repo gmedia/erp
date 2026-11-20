@@ -271,9 +271,7 @@ export async function createEntity(
         );
         // Check for visible error messages in the dialog
         const errorMessages = await dialog
-            .locator(
-                '.text-destructive, .text-destructive-foreground, .text-red-500, [role="alert"]',
-            )
+            .locator('.text-destructive, .text-destructive-foreground, .text-red-500, [role="alert"]')
             .allTextContents();
         if (errorMessages.length > 0) {
             console.error(
