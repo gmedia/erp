@@ -22,7 +22,7 @@ export function UserMenuContent({ user }: Readonly<UserMenuContentProps>) {
     const handleLogout = (e: Readonly<React.MouseEvent>) => {
         e.preventDefault();
         cleanup();
-        logout();
+        void logout();
     };
 
     return (

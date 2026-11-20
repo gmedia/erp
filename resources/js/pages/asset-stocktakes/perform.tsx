@@ -29,7 +29,7 @@ export default function PerformAssetStocktakePage() {
 
     useEffect(() => {
         if (stocktake?.ulid) {
-            fetchItems(stocktake.ulid);
+            void fetchItems(stocktake.ulid);
         }
     }, [stocktake?.ulid, fetchItems]);
 

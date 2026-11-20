@@ -86,7 +86,7 @@ export default function TwoFactorChallenge() {
             await axiosInstance.post('/two-factor-challenge', data);
 
             // Re-fetch user to get the latest employee/permissions loaded and redirect
-            navigate('/dashboard', { replace: true });
+            void navigate('/dashboard', { replace: true });
         } catch (error: unknown) {
             if (axios.isAxiosError(error) && error.response?.status === 422) {
                 setErrors(error.response.data.errors || {});

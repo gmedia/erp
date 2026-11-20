@@ -98,7 +98,7 @@ export function ItemFormDialogShell<TFormValues extends FieldValues>({
                     <form
                         onSubmit={(event) => {
                             event.stopPropagation();
-                            form.handleSubmit(onSave)(event);
+                            void form.handleSubmit(onSave)(event);
                         }}
                         className="space-y-4"
                     >

@@ -51,7 +51,7 @@ export function PipelineStateManager({
     });
 
     useEffect(() => {
-        fetchStates();
+        void fetchStates();
     }, [fetchStates]);
 
     const handleCreateNew = () => {

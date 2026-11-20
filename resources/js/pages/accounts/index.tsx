@@ -110,12 +110,12 @@ export default function AccountIndex() {
     );
 
     useEffect(() => {
-        fetchCoaVersions();
+        void fetchCoaVersions();
     }, [fetchCoaVersions]);
 
     useEffect(() => {
         if (selectedVersionId) {
-            fetchAccounts();
+            void fetchAccounts();
         }
     }, [selectedVersionId, fetchAccounts]);
 
@@ -156,7 +156,7 @@ export default function AccountIndex() {
                 toast.success('Account created successfully');
             }
             setIsFormOpen(false);
-            fetchAccounts();
+            void fetchAccounts();
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
                 toast.error(
@@ -177,7 +177,7 @@ export default function AccountIndex() {
             await axiosInstance.delete(`/api/accounts/${accountToDelete.id}`);
             toast.success('Account deleted successfully');
             setIsDeleteDialogOpen(false);
-            fetchAccounts();
+            void fetchAccounts();
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
                 toast.error(
@@ -192,7 +192,7 @@ export default function AccountIndex() {
     };
 
     const handleExport = () => {
-        exportData({
+        void exportData({
             coa_version_id: selectedVersionId || undefined,
             search: search,
         });
@@ -310,7 +310,7 @@ export default function AccountIndex() {
                         <AlertDialogAction
                             onClick={(e) => {
                                 e.preventDefault();
-                                confirmDelete();
+                                void confirmDelete();
                             }}
                             className="bg-destructive text-white hover:bg-destructive/80"
                             disabled={isActionLoading}

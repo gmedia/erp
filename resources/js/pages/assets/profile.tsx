@@ -80,7 +80,7 @@ export default function AssetProfile() {
 
     const handleStateChange = useCallback(() => {
         setTimelineKey(Date.now());
-        queryClient.invalidateQueries({ queryKey: ['asset-profile', id] });
+        void queryClient.invalidateQueries({ queryKey: ['asset-profile', id] });
     }, [queryClient, id]);
 
     const formatDate = (dateString: string | null) => {

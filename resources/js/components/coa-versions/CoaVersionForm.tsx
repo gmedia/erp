@@ -62,7 +62,7 @@ export function CoaVersionForm({
         };
 
         if (open) {
-            fetchFiscalYears();
+            void fetchFiscalYears();
             form.reset({
                 name: activeEntity?.name || '',
                 fiscal_year_id: activeEntity?.fiscal_year_id || undefined,

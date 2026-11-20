@@ -227,7 +227,7 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
                 }
             };
 
-            loadDetail();
+            void loadDetail();
         }, [
             open,
             activeStockAdjustment?.id,

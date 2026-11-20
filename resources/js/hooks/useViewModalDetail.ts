@@ -41,7 +41,7 @@ export function useViewModalDetail<TItem extends ViewModalDetailItem>({
             }
         };
 
-        load();
+        void load();
     }, [endpoint, open, item]);
 
     return detail ?? item;

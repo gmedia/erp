@@ -56,7 +56,7 @@ export function EntityStateActions({
     const [processing, setProcessing] = useState(false);
 
     useEffect(() => {
-        fetchState();
+        void fetchState();
     }, [fetchState]);
 
     const handleActionClick = (transition: PipelineTransition) => {
@@ -68,7 +68,7 @@ export function EntityStateActions({
         } else if (transition.requires_confirmation) {
             setShowConfirm(true);
         } else {
-            handleExecute(transition);
+            void handleExecute(transition);
         }
     };
 
@@ -210,7 +210,7 @@ export function EntityStateActions({
                             onClick={(e) => {
                                 e.preventDefault();
                                 if (selectedTransition)
-                                    handleExecute(selectedTransition);
+                                    void handleExecute(selectedTransition);
                             }}
                             disabled={processing}
                             style={

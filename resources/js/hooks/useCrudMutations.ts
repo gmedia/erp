@@ -43,7 +43,7 @@ export function useCrudMutations<Entity, FormData>({
             return response.data;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey });
+            void queryClient.invalidateQueries({ queryKey });
             toast.success(`${entityName} created successfully`);
             onSuccess?.();
         },
@@ -73,7 +73,7 @@ export function useCrudMutations<Entity, FormData>({
             return response.data;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey });
+            void queryClient.invalidateQueries({ queryKey });
             toast.success(`${entityName} updated successfully`);
             onSuccess?.();
         },
@@ -91,7 +91,7 @@ export function useCrudMutations<Entity, FormData>({
             await axios.delete(`${endpoint}/${id}`);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey });
+            void queryClient.invalidateQueries({ queryKey });
             toast.success(`${entityName} deleted successfully`);
             onSuccess?.();
         },

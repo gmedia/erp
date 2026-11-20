@@ -36,7 +36,7 @@ export function ApprovalHistoryTimeline({
     });
 
     useEffect(() => {
-        fetchHistory();
+        void fetchHistory();
     }, [fetchHistory]);
 
     if (loading && history.length === 0) {

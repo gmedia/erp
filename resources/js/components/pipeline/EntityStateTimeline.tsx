@@ -30,7 +30,7 @@ export function EntityStateTimeline({ entityType, entityId }: Readonly<Props>) {
     const CommentIcon = iconRegistry.MessageCircle ?? Activity;
 
     useEffect(() => {
-        fetchTimeline();
+        void fetchTimeline();
     }, [fetchTimeline]);
 
     if (timelineLoading && timeline.length === 0) {

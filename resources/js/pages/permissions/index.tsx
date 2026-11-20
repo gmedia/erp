@@ -54,14 +54,14 @@ export default function PermissionsIndex() {
 
     useEffect(() => {
         if (selectedEmployeeId) {
-            fetchPermissions(selectedEmployeeId);
+            void fetchPermissions(selectedEmployeeId);
         } else {
             setSelectedPermissions([]);
         }
     }, [selectedEmployeeId, fetchPermissions, setSelectedPermissions]);
 
     const handleSave = () => {
-        updatePermissions(selectedEmployeeId, selectedPermissions);
+        void updatePermissions(selectedEmployeeId, selectedPermissions);
     };
 
     return (

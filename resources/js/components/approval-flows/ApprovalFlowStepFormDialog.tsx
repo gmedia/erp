@@ -96,7 +96,7 @@ export function ApprovalFlowStepFormDialog({
                     <form
                         onSubmit={(e) => {
                             e.stopPropagation();
-                            form.handleSubmit(onSave)(e);
+                            void form.handleSubmit(onSave)(e);
                         }}
                         className="flex min-h-0 flex-1 flex-col"
                     >

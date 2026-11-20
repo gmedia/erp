@@ -99,7 +99,7 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
 
             // Redirect to intended location or dashboard
             const from = location.state?.from?.pathname || '/dashboard';
-            navigate(from, { replace: true });
+            void navigate(from, { replace: true });
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
                 if (error.response?.status === 422) {

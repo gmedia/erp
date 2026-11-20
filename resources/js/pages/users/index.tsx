@@ -47,11 +47,11 @@ export default function UsersIndex() {
     const selectedEmployeeId = form.watch('employee_id');
 
     useEffect(() => {
-        fetchUser(selectedEmployeeId);
+        void fetchUser(selectedEmployeeId);
     }, [selectedEmployeeId, fetchUser]);
 
     const handleSave = () => {
-        saveUser(selectedEmployeeId, form.getValues());
+        void saveUser(selectedEmployeeId, form.getValues());
     };
 
     return (
