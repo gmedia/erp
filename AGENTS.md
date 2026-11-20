@@ -4,7 +4,7 @@
 
 ## Core Rules
 
-0. **PRODUK ON-PREMISE / MULTI-PERUSAHAAN — JANGAN hardcode brand.** ERP ini dipasang di banyak perusahaan. Jangan menulis `'gmedia'`, domain, tenant, logo, atau nama korporat lain di kode/UI/migrasi/seeder/test/docs generik. Pakai `Setting::get('company_name')`, `Setting::get('company_logo_path')`, `config('app.name')`, atau `.env`. Contoh pakai placeholder netral (`example.com`, `perusahaan.contoh`). Detail lengkap: `.github/copilot-instructions.md` §10. Pengecualian: identifier infra repo (`gmedia/erp`, `gmedia_erp`, remote git, URL issue) — itu bukan branding produk.
+0. **PRODUK ON-PREMISE / MULTI-PERUSAHAAN — JANGAN hardcode brand.** ERP ini dipasang di banyak perusahaan. Jangan menulis `'gmedia'`, domain, tenant, logo, atau nama korporat lain di kode/UI/migrasi/seeder/test/docs generik. Pakai `Setting::get('company_name')`, `Setting::get('company_logo_path')`, `config('app.name')`, atau `.env`. Contoh pakai placeholder netral (`example.com`, `perusahaan.contoh`). Detail lengkap: section **On-Premise / Multi-Perusahaan** di bawah. Pengecualian: identifier infra repo (`gmedia/erp`, `gmedia_erp`, remote git, URL issue) — itu bukan branding produk.
 1. **NEVER wait for CI/CD.** Push and move on.
 2. **One task = one branch** (`feat/*` or `fix/*`) = **one MR/PR.**
 3. **Every MR must have a handoff** (what was done, files changed, next steps).
@@ -27,7 +27,7 @@
 | `run_in_background=true` | **Avoid** | Prefer sync, single agent. |
 | Simultaneous file reads | **1–2** | Do not batch 5–10 `Read` calls. |
 | Simultaneous bash / git / gh | **1** | Chain with `&&` in one shell if sequential steps needed. |
-| Sonar / MCP / Depwire / Context7 | **1** | One MCP call, then reason; next call only if needed. |
+| SonarCloud API (`curl`) | **1** | One call, then reason; next call only if needed. MCP servers are not used. |
 
 ### Required workflow
 
@@ -173,18 +173,80 @@ Guard menolak push dari branch tanpa pola `<type>/issue-N-slug`, issue belum `st
 - ❌ Using raw `git` directly — always use `rtk git`
 - ❌ **Multi-process fan-out** (many tools/agents in one turn) — kills OpenCode; see **Tool & Process Concurrency**
 
+## Agent Tooling (OpenCode & Claude CLI — tanpa MCP)
+
+Tool agent yang didukung: **OpenCode** dan **Claude CLI**. Keduanya membaca file yang sama:
+
+| Apa | Lokasi | Dipakai oleh |
+|-----|--------|--------------|
+| Aturan | `AGENTS.md` (root + `app/`, `database/`, `routes/`, `tests/`, `resources/js/`, `.github/`) | OpenCode & Claude (native) |
+| Skills | `.claude/skills/<name>/SKILL.md` (+ `resources/`, `scripts/`) | Claude (native), OpenCode (path kompatibel Claude) |
+| Commands | `.claude/commands/<name>.md` → `/<name>` | Claude (native), OpenCode via `opencode.json` |
+| Subagent | `.claude/agents/<name>.md` | Claude (native), OpenCode via `opencode.json` |
+| Config OpenCode | `opencode.json` (gitignored) — generate: `bash scripts/sync-opencode.sh` | OpenCode |
+
+- Ubah aturan/skill/command **hanya** di lokasi di atas, lalu jalankan `bash scripts/sync-opencode.sh` bila menambah/menghapus command atau agent.
+- **MCP server tidak dipakai.** Gunakan padanan CLI:
+
+| Kebutuhan | Command |
+|-----------|---------|
+| Schema DB | `./vendor/bin/sail artisan db:show` (ringkas) → `./vendor/bin/sail artisan db:table {table}` |
+| Daftar route | `./vendor/bin/sail artisan route:list --path=api/{slug}` |
+| Uji query/logic | `./vendor/bin/sail artisan tinker --execute='...'` |
+| Log aplikasi | `tail -n 50 storage/logs/laravel.log` |
+| Docs Laravel/package | Source versi terpasang di `vendor/` / `node_modules/`, lalu docs resmi versi terkait |
+| Blast radius / pemakai symbol | `rg -n '{Symbol}' app routes resources/js tests database config` (cek juga string route, query key, nama file) |
+| Validasi refactor | `./vendor/bin/sail bin phpstan analyze`, `npm run types`, `./vendor/bin/sail test --group {slug}` |
+| Komponen UI Shadcn | `resources/js/components/ui/`; tambah baru: `npx shadcn@latest add {name}` |
+| Quality gate | SonarCloud Web API via `curl` (lihat **Quality Gate**) |
+
+- **Token efficiency:** mulai dari data ringkas (`db:show`, `rg -l`, `head`), baru baca detail yang relevan; potong output panjang dengan `head`/`tail -n`/`jq`.
+- **Security:** jangan hardcode API key/token/secret di file repo; pakai `.env` / environment variable.
+
 ## Quality Gate
 
-- **WAJIB** gunakan SonarQube MCP tools (`sonarqube_*`) untuk SEMUA masalah terkait quality gate.
-- Tools yang tersedia: `sonarqube_get_project_quality_gate_status`, `sonarqube_search_sonar_issues_in_projects`, `sonarqube_get_component_measures`, `sonarqube_search_duplicated_files`, `sonarqube_search_files_by_coverage`, `sonarqube_get_duplications`, `sonarqube_get_file_coverage_details`, dll.
-- **Alur standar**:
-  1. Cek status quality gate: `sonarqube_get_project_quality_gate_status(projectKey="gmedia_erp")`
-  2. Jika failed → ambil metrik inti: `sonarqube_get_component_measures(projectKey="gmedia_erp", metricKeys=["duplicated_lines", "duplicated_blocks", "duplicated_lines_density", "ncloc", "coverage", "bugs", "vulnerabilities", "code_smells"])`
+- Data quality gate diambil dari **SonarCloud Web API** (publik, tanpa token) via `curl`, atau dari check SonarCloud di PR (`gh pr checks <id>`).
+- **Alur standar** (`S=https://sonarcloud.io/api`, `K=gmedia_erp`; tambahkan `&pullRequest=<id>` untuk analisis PR):
+  1. Status quality gate: `curl -s "$S/qualitygates/project_status?projectKey=$K" | jq '.projectStatus.status'`
+  2. Jika failed → metrik inti: `curl -s "$S/measures/component?component=$K&metricKeys=duplicated_lines,duplicated_blocks,duplicated_lines_density,ncloc,coverage,bugs,vulnerabilities,code_smells" | jq -c '.component.measures'`
   3. Tentukan prioritas berdasarkan metrik yang paling kritis.
-  4. Untuk duplikasi: `sonarqube_search_duplicated_files(projectKey="gmedia_erp")` → ambil file prioritas tertinggi.
-  5. Untuk coverage: `sonarqube_search_files_by_coverage(projectKey="gmedia_erp", maxCoverage=50)` → tambah test.
-  6. Untuk issues: `sonarqube_search_sonar_issues_in_projects(projects=["gmedia_erp"], severities=["HIGH","BLOCKER"])` → fix critical issues.
-- **JANGAN** berspekulasi tentang status quality gate tanpa data dari SonarQube MCP.
+  4. Duplikasi: `curl -s "$S/measures/component_tree?component=$K&metricKeys=duplicated_lines&qualifiers=FIL&s=metric&metricSort=duplicated_lines&asc=false&ps=20"` → detail per file: `curl -s "$S/duplications/show?key=$K:<path>"`.
+  5. Coverage: `curl -s "$S/measures/component_tree?component=$K&metricKeys=coverage&qualifiers=FIL&s=metric&metricSort=coverage&asc=true&ps=20"` → tambah test.
+  6. Issues: `curl -s "$S/issues/search?componentKeys=$K&impactSeverities=HIGH,BLOCKER&resolved=false&ps=50"` → fix critical issues.
+- **JANGAN** berspekulasi tentang status quality gate tanpa data dari SonarCloud API / check PR.
+
+### Sonar Refactor Protocol (Duplication)
+
+Untuk refactor berbasis SonarCloud dengan target menurunkan duplikasi dan menjaga konsistensi style antar modul (command `/refactor-sonar`):
+
+1. **Baseline WAJIB** — quality gate + `duplicated_lines`, `duplicated_blocks`, `duplicated_lines_density`, `ncloc`, `coverage`. Mulai dari ringkasan; detail file/cluster hanya untuk prioritas tertinggi.
+2. **Eksekusi semi-besar terkontrol** — 4–8 file per wave dengan pola yang sama; utamakan extraction shared concern/trait/helper untuk pola berulang lintas modul setara.
+3. **Guard konsistensi antar modul** — terapkan pola yang sama ke sibling module setara pada wave yang sama; pertahankan API contract (route, payload, response keys, query params). Untuk rename/move/split/merge atau extraction lintas file, petakan semua pemakai via `rg` sebelum patch pertama. Jika dipicu API package/framework, cek source versi terpasang di `vendor/`/`node_modules/`.
+4. **Verifikasi & tracking** — test terfokus modul terdampak via Sail; update `docs/refactor-sonar-progress.md` tiap wave (baseline/delta, ringkasan, evidence test, snapshot Sonar).
+5. **Anomali metrik** — jika `coverage`/metrik lain anomali (mis. `0.0`) namun test lokal lulus, catat sebagai anomali pipeline di progress doc dan verifikasi ulang pada snapshot berikutnya.
+
+## Session Handoff & Continuity (Lintas Server)
+
+- User menjalankan banyak server (tmux + OpenCode/Claude CLI) pada workspace yang sama. Continuity dijaga via **GitHub Issues** `gmedia/erp` (label `status:*`, komentar `<!-- claim -->` / `<!-- checkpoint -->`), bukan `task.md`.
+- Mulai sesi: ikuti **Session Start Checklist**; jika belum ada klaim, jalankan `/claim-issue`; baca `<!-- checkpoint -->` terakhir di `gh issue view N --comments`; verifikasi baseline `rtk git rev-parse HEAD` + `rtk git status --short`.
+- Sebelum menutup sesi (atau setelah wave signifikan), jalankan `/checkpoint-progress` dan tulis komentar issue berisi: `Last updated`, `Current milestone`, `What changed in this session`, `Validated commands and outcomes`, `Open risks/blockers`, `Recommended next step`, plus hash commit terbaru.
+- Command handoff: `/claim-issue`, `/continue-progress`, `/checkpoint-progress`, `/finish-claimed-issue`.
+- Simpan ringkasan terstruktur, bukan log mentah panjang. Bahasa checkpoint: English ringkas atau Bahasa Indonesia.
+- Peran dokumen: GitHub Issues = status aktif; `task.md`, `task.changelog.md`, `task.handoff-archive.md` = arsip (deprecated).
+
+## On-Premise / Multi-Perusahaan — DILARANG hardcode brand
+
+ERP ini dipasang di banyak perusahaan berbeda (on premise). Kode, UI, dan dokumentasi produk harus netral terhadap organisasi mana pun.
+
+1. **Jangan hardcode nama brand, nama perusahaan, domain, tenant, logo, atau warna korporat** di kode, view/UI, migrasi, seeder, factory, config, test, atau dokumen generik.
+   - ❌ `'gmedia'`, `'gmedia.co.id'`, `'Gmedia ERP'`, email `@gmedia.*`, tenant ID tertentu, aset logo bermerek.
+   - ✅ Ambil dari data: `Setting::get('company_name')`, `Setting::get('company_logo_path')` (pola di `AuthController::resolveSharedSettings()`), `config('app.name')`, atau `.env`.
+   - ✅ Contoh di dokumen/test pakai placeholder netral: `example.com`, `perusahaan.contoh`, `tenant-contoh`.
+2. **Default di `.env.example`, seeder, dan config harus generik** (`APP_NAME=ERP`, placeholder domain).
+3. **Sebelum commit**, periksa file yang diubah untuk string brand yang tidak disengaja; ganti dengan `Setting`/config/env.
+4. **Perilaku produk tidak boleh bergantung pada identitas organisasi tertentu** — pakai flag/konfigurasi (mis. allowlist domain dari `settings`).
+
+**Pengecualian** (bukan branding produk): identifier infrastruktur repo — org GitHub `gmedia/erp`, project key SonarCloud `gmedia_erp`, remote git, URL issue tracker, nama CI image, path filesistem bersejarah — dan file arsip/jurnal lama.
 
 ---
 
@@ -208,7 +270,8 @@ erp/
 ├── database/           # Migrations (106), Factories (88), Seeders (29)
 ├── tests/              # Pest (Feature/Unit) + Playwright E2E (106 specs)
 ├── docs/               # Design docs, module registry, 35 user guides
-├── .github/            # Skills, prompts, workflows, agent configs
+├── .claude/            # Agent skills, commands, subagents (OpenCode + Claude CLI)
+├── .github/            # CI workflows, issue templates
 ├── .gitlab/            # GitLab CI deploy include (.gitlab-ci.yml)
 ├── scripts/            # Sync scripts, E2E lock helper
 ├── docker/             # Docker configs
@@ -240,7 +303,9 @@ erp/
 | Backend route files | `routes/api/` | 63 files, 406 defs — see `routes/AGENTS.md` |
 | CI pipelines | `.github/workflows/`, `.gitlab/ci/` | Pest + Playwright + deploy |
 | Session handoff | `gmedia/erp/issues` | Active claim + checkpoint (`task.md` deprecated) |
-| Skills/templates | `.github/skills/` | Scaffolding for new features |
+| Skills/templates | `.claude/skills/` | Scaffolding for new features |
+| Agent commands | `.claude/commands/` | `/claim-issue`, `/create-feature`, `/refactor-sonar`, … |
+| Subagents | `.claude/agents/` | `refactor-safe` |
 
 ## CODE MAP
 
@@ -274,6 +339,10 @@ Reference counts = files referencing the symbol (rg; no LSP server installed). H
 - **Form prop** — always `entity` (never module-specific name).
 - **Test groups** — `->group('{module-slug}')` kebab-case, single group only.
 - **react-helmet-async** — aliased to local shim (`resources/js/lib/`), never re-add upstream dep.
+- **Routing** — backend: new file `routes/api/{module-slug}.php` (auto-included); frontend: lazy `<Route path="/{module}" element={<P><Component /></P>} />` in `resources/js/app-routes.tsx`.
+- **UI consistency** — read `docs/ui-design-rules.md` before creating/reviewing UI (page shell, toolbar, table, status colors, form, modal).
+- **Sidebar icons** — every menu in `database/seeders/MenuSeeder.php` uses a Lucide icon registered in `resources/js/lib/icon-map.ts`; `npm run check:menu-icons` must report `0 missing` (fallback `CircleHelp` is not a substitute).
+- **Empty wrapper body** — multiline with comment, e.g. `class ExportBranchRequest extends SimpleCrudExportRequest { // Intentionally empty. Behavior is inherited from the base class. }` (duster would otherwise collapse it to one line).
 
 ## ANTI-PATTERNS (THIS PROJECT)
 
@@ -339,4 +408,4 @@ sail artisan ide-helper:models -RW    # Model PHPDoc
 - **Scramble** for auto-generated API docs.
 - **Zustand** used alongside React Query for client state.
 - **`task.md`** is a deprecated handoff document — active status lives in `gmedia/erp/issues` (labels `status:*`, comments `<!-- claim -->` / `<!-- checkpoint -->`). Read it only for historical context.
-- **`.github/skills/`** has scaffolding templates for new modules.
+- **`.claude/`** holds agent skills (scaffolding templates), commands, and subagents shared by OpenCode and Claude CLI.
