@@ -1,3 +1,4 @@
+import { ImportResultSummary } from '@/components/common/ImportResultSummary';
 import { memo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -32,14 +33,12 @@ import axios from '@/lib/axios';
 import { useQueryClient } from '@tanstack/react-query';
 import rawAxios from 'axios';
 import {
-    AlertCircle,
     ArrowLeft,
     ArrowRight,
     CheckCircle2,
     FileSpreadsheet,
     Loader2,
     Upload,
-    X,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -561,67 +560,12 @@ export const ImportBankStatementDialog = memo<ImportBankStatementDialogProps>(
                     <div className="space-y-4 py-4">
                         <div className="flex items-center justify-center gap-4 rounded-md border p-6">
                             <div className="flex flex-col items-center gap-2 text-center">
-                                <CheckCircle2 className="size-12 text-green-600" />
+                                <CheckCircle2 className="size-12 text-success" />
                                 <p className="font-medium">Import Completed</p>
                             </div>
                         </div>
 
-                        <div className="space-y-3 rounded-md border p-4 text-sm">
-                            <div className="flex items-center gap-4 font-medium">
-                                <div className="flex items-center text-green-600">
-                                    <CheckCircle2 className="mr-1.5 size-4" />
-                                    Imported: {result.imported}
-                                </div>
-                                <div className="flex items-center text-yellow-600">
-                                    <AlertCircle className="mr-1.5 size-4" />
-                                    Skipped: {result.skipped}
-                                </div>
-                                <div className="flex items-center text-red-600">
-                                    <X className="mr-1.5 size-4" />
-                                    Errors: {result.errors.length}
-                                </div>
-                            </div>
-
-                            {result.errors.length > 0 && (
-                                <ScrollArea className="max-h-40 rounded bg-slate-50">
-                                    <div className="p-2 pr-4 text-xs">
-                                        <table className="w-full text-left">
-                                            <thead>
-                                                <tr>
-                                                    <th className="pb-1 text-slate-500">
-                                                        Row
-                                                    </th>
-                                                    <th className="pb-1 text-slate-500">
-                                                        Field
-                                                    </th>
-                                                    <th className="pb-1 text-slate-500">
-                                                        Message
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {result.errors.map((err) => (
-                                                    <tr
-                                                        key={`${err.row}-${err.field}-${err.message}`}
-                                                        className="border-t border-slate-100"
-                                                    >
-                                                        <td className="py-1 align-top font-mono text-slate-500">
-                                                            {err.row}
-                                                        </td>
-                                                        <td className="py-1 align-top font-medium text-slate-700">
-                                                            {err.field}
-                                                        </td>
-                                                        <td className="py-1 align-top text-red-600">
-                                                            {err.message}
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </ScrollArea>
-                            )}
-                        </div>
+                        <ImportResultSummary result={result} className="p-4" />
                     </div>
                 );
             }

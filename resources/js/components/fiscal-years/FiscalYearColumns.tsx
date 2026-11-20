@@ -25,9 +25,9 @@ export const fiscalYearColumns: ColumnDef<FiscalYear>[] = [
         accessorKey: 'status',
         label: 'Status',
         colorMap: {
-            open: 'bg-green-100 text-green-800',
-            closed: 'bg-yellow-100 text-yellow-800',
-            locked: 'bg-red-100 text-red-800',
+            open: 'bg-success-soft text-success',
+            closed: 'bg-warning-soft text-warning',
+            locked: 'bg-destructive-soft text-destructive-foreground',
         },
     }),
     createDateColumn<FiscalYear>({

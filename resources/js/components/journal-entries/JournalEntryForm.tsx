@@ -1,9 +1,11 @@
 'use client';
 
+import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
+import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { Pencil, Plus, Trash } from 'lucide-react';
-import { memo, useEffect, useMemo, useState } from 'react';
+import { memo, useMemo } from 'react';
 import {
     useFieldArray,
     useForm,
@@ -31,6 +33,8 @@ import { toDateInputValue } from '@/utils/date-format';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { JournalEntryFormData, journalEntryFormSchema } from '@/utils/schemas';
 import { JournalEntryLineFormDialog } from './JournalEntryLineFormDialog';
+
+type JournalEntryLineItem = NonNullable<JournalEntryFormData['lines']>[number];
 
 interface JournalEntryFormProps {
     open: boolean;
@@ -99,30 +103,18 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
             name: 'lines',
         });
 
-        const [isItemDialogOpen, setIsItemDialogOpen] = useState(false);
-        const [editingIndex, setEditingIndex] = useState<number | null>(null);
-
         const lines = useWatch({
             control: form.control,
             name: 'lines',
         });
 
-        // Reset form when dialog opens/closes or data changes
-        useEffect(() => {
-            if (open) {
-                form.reset(defaultValues);
-            }
-        }, [open, defaultValues, form]);
+        const lineDialog = useEntityFormItemDialog({
+            items: lines as JournalEntryLineItem[] | undefined,
+            appendItem: append,
+            updateItem: update,
+        });
 
-        const handleCreateNewLine = () => {
-            setEditingIndex(null);
-            setIsItemDialogOpen(true);
-        };
-
-        const handleEditLine = (index: number) => {
-            setEditingIndex(index);
-            setIsItemDialogOpen(true);
-        };
+        useResetFormOnDefaultValues(form, defaultValues, { enabled: open });
 
         const totalDebit =
             lines?.reduce((acc, line) => acc + (Number(line.debit) || 0), 0) ||
@@ -191,7 +183,7 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                                 type="button"
                                 variant="outline"
                                 size="sm"
-                                onClick={handleCreateNewLine}
+                                onClick={lineDialog.handleCreateNewItem}
                                 className="w-full sm:w-auto"
                             >
                                 <Plus className="mr-2 h-4 w-4" />
@@ -273,7 +265,7 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                                                                 variant="ghost"
                                                                 size="icon"
                                                                 onClick={() =>
-                                                                    handleEditLine(
+                                                                    lineDialog.handleEditItem(
                                                                         index,
                                                                     )
                                                                 }
@@ -296,7 +288,7 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                                                                         0
                                                                 }
                                                             >
-                                                                <Trash className="h-4 w-4 text-red-500" />
+                                                                <Trash className="h-4 w-4 text-destructive-foreground" />
                                                             </Button>
                                                         </div>
                                                     </TableCell>
@@ -335,8 +327,8 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                                             <span
                                                 className={
                                                     Math.abs(difference) > 0.01
-                                                        ? 'font-bold text-red-500'
-                                                        : 'font-bold text-green-500'
+                                                        ? 'font-bold text-destructive-foreground'
+                                                        : 'font-bold text-success'
                                                 }
                                             >
                                                 Diff:{' '}
@@ -353,12 +345,12 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                                 </TableFooter>
                             </Table>
                             {form.formState.errors.root && (
-                                <p className="p-4 text-sm text-red-500">
+                                <p className="p-4 text-sm text-destructive-foreground">
                                     {form.formState.errors.root.message}
                                 </p>
                             )}
                             {form.formState.errors.lines && (
-                                <p className="p-4 text-sm text-red-500">
+                                <p className="p-4 text-sm text-destructive-foreground">
                                     {JSON.stringify(
                                         form.formState.errors.lines,
                                     )}
@@ -369,28 +361,10 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                 </div>
 
                 <JournalEntryLineFormDialog
-                    open={isItemDialogOpen}
-                    onOpenChange={(nextOpen) => {
-                        setIsItemDialogOpen(nextOpen);
-                        if (!nextOpen) {
-                            setEditingIndex(null);
-                        }
-                    }}
-                    item={
-                        editingIndex === null
-                            ? null
-                            : ((lines?.[editingIndex] as NonNullable<
-                                  JournalEntryFormData['lines']
-                              >[number]) ?? null)
-                    }
-                    onSave={(data) => {
-                        if (editingIndex === null) {
-                            append(data);
-                        } else {
-                            update(editingIndex, data);
-                        }
-                        setIsItemDialogOpen(false);
-                    }}
+                    open={lineDialog.isItemDialogOpen}
+                    onOpenChange={lineDialog.handleItemDialogOpenChange}
+                    item={lineDialog.item}
+                    onSave={lineDialog.handleSaveItem}
                 />
             </EntityForm>
         );

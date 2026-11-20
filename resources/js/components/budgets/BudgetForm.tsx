@@ -277,7 +277,7 @@ export const BudgetForm = memo<BudgetFormProps>(function BudgetForm({
                                                                     )
                                                                 }
                                                             >
-                                                                <Pencil className="h-4 w-4 text-green-500" />
+                                                                <Pencil className="h-4 w-4 text-success" />
                                                             </Button>
                                                         </TableCell>
                                                     </TableRow>
@@ -339,7 +339,7 @@ export const BudgetForm = memo<BudgetFormProps>(function BudgetForm({
                                                                     )
                                                                 }
                                                             >
-                                                                <Trash className="h-4 w-4 text-red-500" />
+                                                                <Trash className="h-4 w-4 text-destructive-foreground" />
                                                             </Button>
                                                         </div>
                                                     </TableCell>
@@ -370,7 +370,7 @@ export const BudgetForm = memo<BudgetFormProps>(function BudgetForm({
                                 </TableFooter>
                             </Table>
                             {form.formState.errors.lines && (
-                                <p className="p-4 text-sm text-red-500">
+                                <p className="p-4 text-sm text-destructive-foreground">
                                     {typeof form.formState.errors.lines ===
                                         'object' &&
                                     'message' in form.formState.errors.lines

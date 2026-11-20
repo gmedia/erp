@@ -484,11 +484,11 @@ export const BankReconciliationWorkspace =
                                         className="h-4"
                                     />
                                     <div className="flex items-center gap-1.5">
-                                        <CheckCircle2 className="size-3.5 text-green-600" />
+                                        <CheckCircle2 className="size-3.5 text-success" />
                                         <span className="text-muted-foreground">
                                             Matched:
                                         </span>
-                                        <span className="font-medium text-green-700">
+                                        <span className="font-medium text-success">
                                             {matchedCount}
                                         </span>
                                     </div>
@@ -500,7 +500,7 @@ export const BankReconciliationWorkspace =
                                         <span className="text-muted-foreground">
                                             Unmatched:
                                         </span>
-                                        <span className="font-medium text-amber-700">
+                                        <span className="font-medium text-warning">
                                             {unmatchedCount}
                                         </span>
                                     </div>
@@ -509,11 +509,11 @@ export const BankReconciliationWorkspace =
                                         className="h-4"
                                     />
                                     <div className="flex items-center gap-1.5">
-                                        <BookOpen className="size-3.5 text-blue-600" />
+                                        <BookOpen className="size-3.5 text-info" />
                                         <span className="text-muted-foreground">
                                             Accounts Assigned:
                                         </span>
-                                        <span className="font-medium text-blue-700">
+                                        <span className="font-medium text-info">
                                             {accountsAssignedCount}/
                                             {unmatchedItems.length}
                                         </span>
@@ -530,8 +530,8 @@ export const BankReconciliationWorkspace =
                                             className={
                                                 Math.abs(currentDifference) <=
                                                 0.01
-                                                    ? 'font-medium text-green-700'
-                                                    : 'font-medium text-red-700'
+                                                    ? 'font-medium text-success'
+                                                    : 'font-medium text-destructive-foreground'
                                             }
                                         >
                                             {formatCurrencyByRegionalSettings(
@@ -595,7 +595,7 @@ export const BankReconciliationWorkspace =
                                                         key={item.id}
                                                         className={
                                                             item.is_reconciled
-                                                                ? 'bg-green-50/50'
+                                                                ? 'bg-success-soft'
                                                                 : undefined
                                                         }
                                                     >
@@ -635,7 +635,7 @@ export const BankReconciliationWorkspace =
                                                                 }
                                                                 className={
                                                                     item.is_reconciled
-                                                                        ? 'bg-green-100 text-green-800 hover:bg-green-100'
+                                                                        ? 'bg-success-soft text-success hover:bg-success-soft'
                                                                         : undefined
                                                                 }
                                                             >
@@ -670,7 +670,7 @@ export const BankReconciliationWorkspace =
                                                                                 >
                                                                                     <button
                                                                                         type="button"
-                                                                                        className="max-w-[130px] truncate text-left text-xs font-medium text-blue-700 hover:underline"
+                                                                                        className="max-w-[130px] truncate text-left text-xs font-medium text-info hover:underline"
                                                                                         onClick={() =>
                                                                                             openAssignDialog(
                                                                                                 item.id!,
@@ -735,7 +735,7 @@ export const BankReconciliationWorkspace =
                                                                         <Button
                                                                             variant="ghost"
                                                                             size="sm"
-                                                                            className="h-7 px-2 text-xs text-red-600 hover:bg-red-50 hover:text-red-700"
+                                                                            className="h-7 px-2 text-xs text-destructive-foreground hover:bg-destructive-soft hover:text-destructive-foreground"
                                                                             onClick={() =>
                                                                                 handleUnmatch(
                                                                                     item.id!,

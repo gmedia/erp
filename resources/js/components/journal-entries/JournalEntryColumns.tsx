@@ -100,7 +100,7 @@ export const journalEntryColumns: ColumnDef<JournalEntry>[] = [
                                 size="icon"
                                 onClick={() => meta?.onDelete?.(row.original)}
                             >
-                                <Trash className="h-4 w-4 text-red-500" />
+                                <Trash className="h-4 w-4 text-destructive-foreground" />
                             </Button>
                         </>
                     )}

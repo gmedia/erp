@@ -49,13 +49,13 @@ export function JournalEntryViewModal({
                 <div className="space-y-6 py-2">
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div className="min-w-0">
-                            <p className="text-sm font-medium text-gray-500">
+                            <p className="text-sm font-medium text-muted-foreground">
                                 Entry Number
                             </p>
                             <p>{item.entry_number}</p>
                         </div>
                         <div className="min-w-0">
-                            <p className="text-sm font-medium text-gray-500">
+                            <p className="text-sm font-medium text-muted-foreground">
                                 Date
                             </p>
                             <p>
@@ -63,13 +63,13 @@ export function JournalEntryViewModal({
                             </p>
                         </div>
                         <div className="min-w-0">
-                            <p className="text-sm font-medium text-gray-500">
+                            <p className="text-sm font-medium text-muted-foreground">
                                 Reference
                             </p>
                             <p>{item.reference || '-'}</p>
                         </div>
                         <div className="min-w-0">
-                            <p className="text-sm font-medium text-gray-500">
+                            <p className="text-sm font-medium text-muted-foreground">
                                 Status
                             </p>
                             <Badge
@@ -79,7 +79,7 @@ export function JournalEntryViewModal({
                             </Badge>
                         </div>
                         <div className="min-w-0 sm:col-span-2">
-                            <p className="text-sm font-medium text-gray-500">
+                            <p className="text-sm font-medium text-muted-foreground">
                                 Description
                             </p>
                             <p>{item.description}</p>
@@ -105,7 +105,7 @@ export function JournalEntryViewModal({
                                     <TableRow key={line.id}>
                                         <TableCell>
                                             <div>{line.account_code}</div>
-                                            <div className="text-sm text-gray-500">
+                                            <div className="text-sm text-muted-foreground">
                                                 {line.account_name}
                                             </div>
                                         </TableCell>

@@ -345,7 +345,7 @@ export function PipelineTransitionFormDialog({
                                                                     type="button"
                                                                     variant="ghost"
                                                                     size="icon"
-                                                                    className="absolute top-2 right-2 text-red-500"
+                                                                    className="absolute top-2 right-2 text-destructive-foreground"
                                                                     onClick={() =>
                                                                         removeAction(
                                                                             index,

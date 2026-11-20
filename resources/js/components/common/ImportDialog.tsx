@@ -1,3 +1,4 @@
+import { ImportResultSummary } from '@/components/common/ImportResultSummary';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -10,17 +11,9 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import axios from '@/lib/axios';
 import rawAxios from 'axios';
-import {
-    AlertCircle,
-    CheckCircle2,
-    Download,
-    Loader2,
-    PlusCircle,
-    X,
-} from 'lucide-react';
+import { Download, Loader2, PlusCircle } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -194,62 +187,7 @@ export default function ImportDialog({
                     </div>
 
                     {result && (
-                        <div className="mt-4 space-y-3 rounded-md border p-3 text-sm">
-                            <div className="flex items-center gap-4 font-medium">
-                                <div className="flex items-center text-green-600">
-                                    <CheckCircle2 className="mr-1.5 h-4 w-4" />
-                                    Imported: {result.imported}
-                                </div>
-                                <div className="flex items-center text-yellow-600">
-                                    <AlertCircle className="mr-1.5 h-4 w-4" />
-                                    Skipped: {result.skipped}
-                                </div>
-                                <div className="flex items-center text-red-600">
-                                    <X className="mr-1.5 h-4 w-4" />
-                                    Errors: {result.errors.length}
-                                </div>
-                            </div>
-
-                            {result.errors.length > 0 && (
-                                <ScrollArea className="max-h-40 rounded bg-slate-50">
-                                    <div className="p-2 pr-4 text-xs">
-                                        <table className="w-full text-left">
-                                            <thead>
-                                                <tr>
-                                                    <th className="pb-1 text-slate-500">
-                                                        Row
-                                                    </th>
-                                                    <th className="pb-1 text-slate-500">
-                                                        Field
-                                                    </th>
-                                                    <th className="pb-1 text-slate-500">
-                                                        Message
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {result.errors.map((err) => (
-                                                    <tr
-                                                        key={`${err.row}-${err.field}-${err.message}`}
-                                                        className="border-t border-slate-100"
-                                                    >
-                                                        <td className="py-1 align-top font-mono text-slate-500">
-                                                            {err.row}
-                                                        </td>
-                                                        <td className="py-1 align-top font-medium text-slate-700">
-                                                            {err.field}
-                                                        </td>
-                                                        <td className="py-1 align-top text-red-600">
-                                                            {err.message}
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </ScrollArea>
-                            )}
-                        </div>
+                        <ImportResultSummary result={result} className="mt-4" />
                     )}
                 </div>
 

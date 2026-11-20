@@ -77,15 +77,21 @@ export function ApprovalHistoryTimeline({
     const getStatusIcon = (status: string) => {
         switch (status) {
             case 'approved':
-                return <CheckCircle2 className="h-4 w-4 text-emerald-500" />;
+                return <CheckCircle2 className="h-4 w-4 text-success" />;
             case 'rejected':
-                return <XCircle className="h-4 w-4 text-rose-500" />;
+                return (
+                    <XCircle className="h-4 w-4 text-destructive-foreground" />
+                );
             case 'pending':
-                return <Clock className="h-4 w-4 text-amber-500" />;
+                return <Clock className="h-4 w-4 text-warning" />;
             case 'skipped':
-                return <SkipForward className="h-4 w-4 text-slate-500" />;
+                return (
+                    <SkipForward className="h-4 w-4 text-muted-foreground" />
+                );
             case 'cancelled':
-                return <AlertCircle className="h-4 w-4 text-slate-500" />;
+                return (
+                    <AlertCircle className="h-4 w-4 text-muted-foreground" />
+                );
             default:
                 return <Clock className="h-4 w-4" />;
         }
@@ -97,7 +103,7 @@ export function ApprovalHistoryTimeline({
                 return (
                     <Badge
                         variant="outline"
-                        className="border-emerald-500/20 bg-emerald-500/10 text-emerald-500"
+                        className="border-success/20 bg-success/10 text-success"
                     >
                         Approved
                     </Badge>
@@ -106,7 +112,7 @@ export function ApprovalHistoryTimeline({
                 return (
                     <Badge
                         variant="outline"
-                        className="border-rose-500/20 bg-rose-500/10 text-rose-500"
+                        className="border-destructive/20 bg-destructive/10 text-destructive-foreground"
                     >
                         Rejected
                     </Badge>
@@ -115,7 +121,7 @@ export function ApprovalHistoryTimeline({
                 return (
                     <Badge
                         variant="outline"
-                        className="border-amber-500/20 bg-amber-500/10 text-amber-500"
+                        className="border-warning/20 bg-warning/10 text-warning"
                     >
                         Pending
                     </Badge>
@@ -124,7 +130,7 @@ export function ApprovalHistoryTimeline({
                 return (
                     <Badge
                         variant="outline"
-                        className="border-slate-500/20 bg-slate-500/10 text-slate-500"
+                        className="border-border bg-muted text-muted-foreground"
                     >
                         Skipped
                     </Badge>
@@ -133,7 +139,7 @@ export function ApprovalHistoryTimeline({
                 return (
                     <Badge
                         variant="outline"
-                        className="border-slate-500/20 bg-slate-500/10 text-slate-500"
+                        className="border-border bg-muted text-muted-foreground"
                     >
                         Cancelled
                     </Badge>
@@ -142,7 +148,7 @@ export function ApprovalHistoryTimeline({
                 return (
                     <Badge
                         variant="outline"
-                        className="border-blue-500/20 bg-blue-500/10 text-blue-500"
+                        className="border-info/20 bg-info/10 text-info"
                     >
                         In Progress
                     </Badge>

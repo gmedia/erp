@@ -24,10 +24,9 @@ export const coaVersionColumns: ColumnDef<CoaVersion>[] = [
         accessorKey: 'status',
         label: 'Status',
         colorMap: {
-            draft: 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-100',
-            active: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-            archived:
-                'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+            draft: 'bg-muted text-foreground',
+            active: 'bg-success-soft text-success',
+            archived: 'bg-warning-soft text-warning',
         },
     }),
     createDateColumn<CoaVersion>({

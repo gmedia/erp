@@ -38,13 +38,10 @@ export const inventoryStocktakeColumns: ColumnDef<InventoryStocktake>[] = [
         accessorKey: 'status',
         label: 'Status',
         colorMap: {
-            draft: 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-100',
-            in_progress:
-                'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-            completed:
-                'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-            cancelled:
-                'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+            draft: 'bg-muted text-foreground',
+            in_progress: 'bg-warning-soft text-warning',
+            completed: 'bg-success-soft text-success',
+            cancelled: 'bg-destructive-soft text-destructive-foreground',
         },
     }),
     {
