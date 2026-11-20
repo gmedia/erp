@@ -70,11 +70,7 @@ const getBankReconciliationFormDefaults = (
         period_end: toDateInputValue(entity.period_end),
         statement_balance: Number(entity.statement_balance),
         book_balance: Number(entity.book_balance),
-        branch_id: entity.branch_id
-            ? String(entity.branch_id)
-            : entity.branch?.id
-              ? String(entity.branch.id)
-              : '',
+        branch_id: String(entity.branch_id || entity.branch?.id || ''),
     };
 };
 

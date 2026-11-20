@@ -34,7 +34,7 @@ export default function DashboardPageShell({
     errorMessage = 'Failed to fetch dashboard data from the server. Please try refreshing.',
     refetch,
     children,
-}: DashboardPageShellProps) {
+}: Readonly<DashboardPageShellProps>) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Helmet>

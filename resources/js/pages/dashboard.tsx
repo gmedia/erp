@@ -156,7 +156,6 @@ export default function Dashboard() {
                               key={card.title}
                               title={card.title}
                               icon={card.icon}
-                              value={card.value}
                               formattedValue={formatNumberByRegionalSettings(
                                   card.value,
                               )}

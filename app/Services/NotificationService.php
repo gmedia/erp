@@ -110,8 +110,13 @@ class NotificationService
         }
     }
 
-    private function sendPush(User $recipient, NotifiableEvent $event, string $eventKey, array $payload, string $dedupeKey): void
-    {
+    private function sendPush(
+        User $recipient,
+        NotifiableEvent $event,
+        string $eventKey,
+        array $payload,
+        string $dedupeKey,
+    ): void {
         $tokens = $recipient->deviceTokens()->get();
 
         if ($tokens->isEmpty()) {

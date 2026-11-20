@@ -53,6 +53,19 @@ function stickyCellClass(
     return false;
 }
 
+function stickyColumnAttr(
+    columnId: string,
+    hasGrandTotal: boolean,
+): 'grand_total' | 'actions' | undefined {
+    if (columnId === 'grand_total' && hasGrandTotal) {
+        return 'grand_total';
+    }
+    if (columnId === 'actions') {
+        return 'actions';
+    }
+    return undefined;
+}
+
 function stickyHeadClass(
     columnId: string,
     hasGrandTotal: boolean,
@@ -461,7 +474,7 @@ export function DataTable<T>({
                 <div
                     className="mb-2 flex items-center gap-3 rounded-md border border-border bg-muted/40 px-3 py-2 text-sm"
                     data-testid="bulk-selection-bar"
-                    role="status"
+                    aria-live="polite"
                 >
                     <span className="font-medium text-foreground">
                         {Object.keys(rowSelection).length} selected
@@ -487,16 +500,10 @@ export function DataTable<T>({
                                     return (
                                         <TableHead
                                             key={header.id}
-                                            data-sticky-column={
-                                                header.column.id ===
-                                                    'grand_total' &&
-                                                hasStickyGrandTotal
-                                                    ? 'grand_total'
-                                                    : header.column.id ===
-                                                        'actions'
-                                                      ? 'actions'
-                                                      : undefined
-                                            }
+                                            data-sticky-column={stickyColumnAttr(
+                                                header.column.id,
+                                                hasStickyGrandTotal,
+                                            )}
                                             className={cn(
                                                 'h-9 border-border px-2 py-1.5 text-xs select-none',
                                                 stickyHeadClass(

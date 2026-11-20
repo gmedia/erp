@@ -10,6 +10,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { RequiredLabel } from '@/components/vehicle-loans/RequiredLabel';
 import { VehicleLoanDateTimeFields } from '@/components/vehicle-loans/VehicleLoanDateTimeFields';
 import { VehicleLoanQrPanel } from '@/components/vehicle-loans/VehicleLoanQrPanel';
 import AppLayout from '@/layouts/app-layout';
@@ -165,15 +166,9 @@ export default function VehicleLoanRequestPage() {
                         <CardTitle className="text-base">Perjalanan</CardTitle>
                     </CardHeader>
                     <CardContent className="grid gap-2">
-                        <Label htmlFor="purpose">
+                        <RequiredLabel htmlFor="purpose">
                             Tujuan perjalanan
-                            <span
-                                className="ml-1 text-destructive"
-                                aria-hidden="true"
-                            >
-                                *
-                            </span>
-                        </Label>
+                        </RequiredLabel>
                         <Textarea
                             id="purpose"
                             value={form.purpose}

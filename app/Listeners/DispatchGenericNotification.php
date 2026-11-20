@@ -46,7 +46,7 @@ class DispatchGenericNotification
             $approvers,
             [
                 'title' => 'New approval request waiting for you',
-                'body' => class_basename($request->approvable_type) . ' #' . $request->approvable_id . ' needs your review.',
+                'body' => $this->approvableLabel($request) . ' needs your review.',
             ],
             '/my-approvals',
         ));
@@ -67,7 +67,7 @@ class DispatchGenericNotification
             collect([$submitter->id => $submitter]),
             [
                 'title' => 'Your request was approved',
-                'body' => class_basename($request->approvable_type) . ' #' . $request->approvable_id . ' has been approved.',
+                'body' => $this->approvableLabel($request) . ' has been approved.',
             ],
             $this->targetUrlFor($request),
         ));
@@ -84,7 +84,7 @@ class DispatchGenericNotification
             collect([$submitter->id => $submitter]),
             [
                 'title' => 'Your request was rejected',
-                'body' => class_basename($request->approvable_type) . ' #' . $request->approvable_id
+                'body' => $this->approvableLabel($request)
                     . ' was rejected. Reason: ' . $event->reason,
             ],
             $this->targetUrlFor($request),
@@ -98,6 +98,11 @@ class DispatchGenericNotification
             $event instanceof ApprovalRequestApproved => $this->handleApproved($event),
             $event instanceof ApprovalRequestRejected => $this->handleRejected($event),
         };
+    }
+
+    private function approvableLabel(ApprovalRequest $request): string
+    {
+        return class_basename($request->approvable_type) . ' #' . $request->approvable_id;
     }
 
     private function targetUrlFor(ApprovalRequest $request): string

@@ -246,7 +246,6 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
                     key={card.title}
                     title={card.title}
                     icon={card.icon}
-                    value={card.value}
                     formattedValue={card.formattedValue}
                     iconColor={card.iconColor}
                     valueClassName={card.valueClassName}

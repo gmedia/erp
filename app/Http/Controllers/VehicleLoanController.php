@@ -42,8 +42,14 @@ class VehicleLoanController extends Controller
         $query = VehicleLoan::query()
             ->with(['requester', 'department', 'driver.employee', 'vehicleUnit.asset', 'pickup', 'returns'])
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->string('status')))
-            ->when($request->filled('date_from'), fn ($q) => $q->whereDate('start_at', '>=', $request->date('date_from')))
-            ->when($request->filled('date_to'), fn ($q) => $q->whereDate('end_at', '<=', $request->date('date_to')))
+            ->when(
+                $request->filled('date_from'),
+                fn ($q) => $q->whereDate('start_at', '>=', $request->date('date_from')),
+            )
+            ->when(
+                $request->filled('date_to'),
+                fn ($q) => $q->whereDate('end_at', '<=', $request->date('date_to')),
+            )
             ->when($request->boolean('mine'), fn ($q) => $q->where('requester_id', Auth::id()))
             ->when(
                 $this->resolveBranchFromRequest($request) !== null,
@@ -183,7 +189,14 @@ class VehicleLoanController extends Controller
         $branchId = $this->resolveBranchFromRequest($request);
 
         $query = VehicleLoan::whereIn('status', ['approved', 'pickup_done'])
-            ->with(['requester', 'department', 'driver.employee', 'vehicleUnit.asset', 'pickup', 'approvalRequests.steps.flowStep.user']);
+            ->with([
+                'requester',
+                'department',
+                'driver.employee',
+                'vehicleUnit.asset',
+                'pickup',
+                'approvalRequests.steps.flowStep.user',
+            ]);
 
         if ($branchId !== null) {
             $query->where('branch_id', $branchId);

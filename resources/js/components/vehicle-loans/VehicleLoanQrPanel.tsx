@@ -11,9 +11,9 @@ interface MobileConfig {
  * never from window.location.origin, so printed codes survive domain changes. */
 export function VehicleLoanQrPanel({
     form,
-}: {
+}: Readonly<{
     form: 'request' | 'pickup' | 'return';
-}) {
+}>) {
     const { data } = useQuery({
         queryKey: ['vehicle-loans', 'mobile-config'],
         queryFn: async () => {

@@ -5,7 +5,6 @@ import type { ReactNode } from 'react';
 export interface KpiCardProps {
     title: string;
     icon: LucideIcon;
-    value: number;
     formattedValue: string;
     iconColor: string;
     valueClassName?: string;
@@ -19,7 +18,7 @@ export function KpiCard({
     iconColor,
     valueClassName,
     children,
-}: KpiCardProps) {
+}: Readonly<KpiCardProps>) {
     return (
         <Card className="gap-2 overflow-hidden">
             <CardHeader className="flex flex-row items-center justify-between pt-4 pb-2">

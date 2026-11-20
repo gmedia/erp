@@ -5,6 +5,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import { ChartPie } from 'lucide-react';
 import { StatusDistributionItem } from '../../hooks/useAssetDashboard';
 
 interface StatusDistributionChartProps {
@@ -35,25 +36,7 @@ export function StatusDistributionChart({
         return (
             <Card className="flex h-[400px] w-full flex-col items-center justify-center p-6 text-center text-muted-foreground">
                 <div className="mb-4 rounded-full bg-muted p-4">
-                    <svg
-                        className="h-8 w-8 opacity-50"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"
-                        />
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"
-                        />
-                    </svg>
+                    <ChartPie className="h-8 w-8 opacity-50" />
                 </div>
                 No status distribution data available.
             </Card>

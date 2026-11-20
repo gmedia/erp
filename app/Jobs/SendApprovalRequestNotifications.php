@@ -33,7 +33,8 @@ class SendApprovalRequestNotifications implements ShouldQueue
                 $approver = $flowStep->user;
 
                 if ($approver?->email) {
-                    Mail::to($approver->email)->send(new ApprovalRequestNotification($this->approvalRequest, $approver));
+                    $mail = new ApprovalRequestNotification($this->approvalRequest, $approver);
+                    Mail::to($approver->email)->send($mail);
                 }
             });
     }
