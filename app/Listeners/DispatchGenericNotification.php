@@ -12,7 +12,10 @@ use App\Services\NotificationService;
 
 class DispatchGenericNotification
 {
-    public function __construct(private readonly NotificationService $service) {}
+    public function __construct(private readonly NotificationService $service)
+    {
+        // Intentionally empty. Dependencies are assigned via promoted properties.
+    }
 
     public function handleCreated(ApprovalRequestCreated $event): void
     {

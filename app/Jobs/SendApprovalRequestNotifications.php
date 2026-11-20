@@ -16,7 +16,10 @@ class SendApprovalRequestNotifications implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(public readonly ApprovalRequest $approvalRequest) {}
+    public function __construct(public readonly ApprovalRequest $approvalRequest)
+    {
+        // Intentionally empty. Dependencies are assigned via promoted properties.
+    }
 
     public function handle(): void
     {
