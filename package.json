@@ -3,7 +3,7 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "build:mobile": "vite build --config vite.mobile.config.ts",
+        "build:mobile": "vite build --config vite.mobile.config.ts --mode mobile",
         "dev": "vite",
         "format": "prettier --write resources/",
         "format:check": "prettier --check resources/",
