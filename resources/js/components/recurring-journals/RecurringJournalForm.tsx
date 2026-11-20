@@ -1,8 +1,10 @@
 'use client';
 
+import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
+import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
-import { memo, useEffect, useMemo, useState } from 'react';
+import { memo, useMemo } from 'react';
 import {
     useFieldArray,
     useForm,
@@ -150,39 +152,30 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
             name: 'lines',
         });
 
-        const [isItemDialogOpen, setIsItemDialogOpen] = useState(false);
-        const [editingIndex, setEditingIndex] = useState<number | null>(null);
-
         const lines = useWatch({
             control: form.control,
             name: 'lines',
         });
 
-        useEffect(() => {
-            if (open) {
-                form.reset(defaultValues);
-            }
-        }, [open, defaultValues, form]);
+        const lineDialog = useEntityFormItemDialog({
+            items: lines as unknown as RecurringJournalLine[] | undefined,
+            appendItem: (data: RecurringJournalLine) => append(data),
+            updateItem: (index: number, data: RecurringJournalLine) =>
+                update(index, data),
+            mapEditingItem: (line) =>
+                line
+                    ? {
+                          account_id: Number(line.account_id),
+                          account_name: line.account_name,
+                          account_code: line.account_code,
+                          debit: Number(line.debit),
+                          credit: Number(line.credit),
+                          memo: line.memo,
+                      }
+                    : null,
+        });
 
-        const handleCreateNewLine = () => {
-            setEditingIndex(null);
-            setIsItemDialogOpen(true);
-        };
-
-        const handleEditLine = (index: number) => {
-            setEditingIndex(index);
-            setIsItemDialogOpen(true);
-        };
-
-        const handleSaveLine = (data: RecurringJournalLine) => {
-            if (editingIndex === null) {
-                append(data);
-            } else {
-                update(editingIndex, data);
-            }
-            setIsItemDialogOpen(false);
-            setEditingIndex(null);
-        };
+        useResetFormOnDefaultValues(form, defaultValues, { enabled: open });
 
         const handleRemoveLine = (index: number) => remove(index);
 
@@ -209,7 +202,7 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
         const renderLineActions = (index: number) => (
             <LineActions
                 index={index}
-                onEditLine={handleEditLine}
+                onEditLine={lineDialog.handleEditItem}
                 onRemoveLine={handleRemoveLine}
             />
         );
@@ -312,7 +305,7 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                                         type="button"
                                         variant="outline"
                                         size="sm"
-                                        onClick={handleCreateNewLine}
+                                        onClick={lineDialog.handleCreateNewItem}
                                     >
                                         <Plus className="mr-2 h-4 w-4" />
                                         Add Line
@@ -352,25 +345,10 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                 </EntityForm>
 
                 <RecurringJournalLineFormDialog
-                    open={isItemDialogOpen}
-                    onOpenChange={setIsItemDialogOpen}
-                    item={
-                        editingIndex !== null && lines?.[editingIndex]
-                            ? {
-                                  account_id: Number(
-                                      lines[editingIndex].account_id,
-                                  ),
-                                  account_name:
-                                      lines[editingIndex].account_name,
-                                  account_code:
-                                      lines[editingIndex].account_code,
-                                  debit: Number(lines[editingIndex].debit),
-                                  credit: Number(lines[editingIndex].credit),
-                                  memo: lines[editingIndex].memo,
-                              }
-                            : null
-                    }
-                    onSave={handleSaveLine}
+                    open={lineDialog.isItemDialogOpen}
+                    onOpenChange={lineDialog.handleItemDialogOpenChange}
+                    item={lineDialog.item}
+                    onSave={lineDialog.handleSaveItem}
                 />
             </>
         );
