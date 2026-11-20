@@ -107,10 +107,15 @@ test('store creates ar receipt with allocations', function () {
 
     $response->assertCreated()
         ->assertJsonPath('data.customer.id', $customer->id)
-        ->assertJsonPath('data.allocations.0.customer_invoice_id', $invoice->id);
+        ->assertJsonPath('data.allocations.0.customer_invoice_id', $invoice->id)
+        ->assertJsonPath('data.total_amount', '50000.00');
 
     $id = $response->json('data.id');
-    assertDatabaseHas('ar_receipts', ['id' => $id, 'customer_id' => $customer->id]);
+    assertDatabaseHas('ar_receipts', [
+        'id' => $id,
+        'customer_id' => $customer->id,
+        'total_amount' => 50000,
+    ]);
     assertDatabaseHas('ar_receipt_allocations', [
         'ar_receipt_id' => $id,
         'customer_invoice_id' => $invoice->id,

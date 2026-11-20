@@ -66,7 +66,9 @@ abstract class AbstractArReceiptRequest extends AuthorizedFormRequest
 
     protected function totalAmountRules(): array
     {
-        return [];
+        return [
+            'total_amount' => $this->withSometimes(['required', 'numeric', 'gt:0']),
+        ];
     }
 
     private function maxInvoiceAllocation(

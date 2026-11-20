@@ -4,6 +4,7 @@ namespace App\Http\Requests\StockTransfers;
 
 use App\Http\Requests\AuthorizedFormRequest;
 use App\Http\Requests\Concerns\HasSometimesArrayRules;
+use App\Models\StockTransfer;
 
 abstract class AbstractStockTransferRequest extends AuthorizedFormRequest
 {
@@ -61,7 +62,8 @@ abstract class AbstractStockTransferRequest extends AuthorizedFormRequest
             return 'unique:stock_transfers,transfer_number';
         }
 
-        $transferId = $this->route('stockTransfer')->id ?? $this->route('id');
+        $transfer = $this->route('stock_transfer') ?? $this->route('stockTransfer');
+        $transferId = $transfer instanceof StockTransfer ? $transfer->getKey() : $transfer;
 
         return 'unique:stock_transfers,transfer_number,' . $transferId;
     }
