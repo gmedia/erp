@@ -1,9 +1,12 @@
-import { test, expect, type Page, type Response } from '@playwright/test';
+import { expect, test, type Page, type Response } from '@playwright/test';
 import { DEFAULT_E2E_EMAIL, login } from '../helpers';
 
 async function saveAdminSettings(
     page: Page,
-    saveButtonTestId: 'save-general-settings' | 'save-regional-settings' | 'save-smtp-settings',
+    saveButtonTestId:
+        | 'save-general-settings'
+        | 'save-regional-settings'
+        | 'save-smtp-settings',
 ) {
     const responsePromise = page.waitForResponse(
         (response: Response) =>
@@ -17,17 +20,13 @@ async function saveAdminSettings(
     await responsePromise;
 }
 
-async function waitForAdminSettingsRefresh(
-    page: Page,
-) {
-    await page
-        .waitForResponse(
-            (response: Response) =>
-                response.url().includes('/api/admin-settings') &&
-                response.request().method() === 'GET' &&
-                response.status() < 400,
-        )
-        ;
+async function waitForAdminSettingsRefresh(page: Page) {
+    await page.waitForResponse(
+        (response: Response) =>
+            response.url().includes('/api/admin-settings') &&
+            response.request().method() === 'GET' &&
+            response.status() < 400,
+    );
 }
 
 test.describe('Admin Settings', () => {
@@ -35,21 +34,31 @@ test.describe('Admin Settings', () => {
         await login(page, undefined, undefined, { requireDashboard: false });
     });
 
-    test('page loads and shows General settings by default', async ({ page }) => {
+    test('page loads and shows General settings by default', async ({
+        page,
+    }) => {
         await page.goto('/admin-settings');
         await expect(page).toHaveTitle(/Admin Settings/);
 
         // Sidebar navigation should be visible
-        await expect(page.getByRole('link', { name: 'General', exact: true })).toBeVisible();
-        await expect(page.getByRole('link', { name: 'Regional', exact: true })).toBeVisible();
-        await expect(page.getByRole('link', { name: 'SMTP', exact: true })).toBeVisible();
+        await expect(
+            page.getByRole('link', { name: 'General', exact: true }),
+        ).toBeVisible();
+        await expect(
+            page.getByRole('link', { name: 'Regional', exact: true }),
+        ).toBeVisible();
+        await expect(
+            page.getByRole('link', { name: 'SMTP', exact: true }),
+        ).toBeVisible();
 
         // General settings heading should show
         await expect(page.getByText('General Settings')).toBeVisible();
 
         // General form fields should be visible
         await expect(page.locator('input[name="company_name"]')).toBeVisible();
-        await expect(page.locator('input[name="company_address"]')).toBeVisible();
+        await expect(
+            page.locator('input[name="company_address"]'),
+        ).toBeVisible();
         await expect(page.locator('input[name="company_phone"]')).toBeVisible();
         await expect(page.locator('input[name="company_email"]')).toBeVisible();
     });
@@ -67,8 +76,12 @@ test.describe('Admin Settings', () => {
         // Regional form fields should be visible
         await expect(page.getByTestId('currency-select-trigger')).toBeVisible();
         await expect(page.locator('input[name="date_format"]')).toBeVisible();
-        await expect(page.locator('input[name="number_format_decimal"]')).toBeVisible();
-        await expect(page.locator('input[name="number_format_thousand"]')).toBeVisible();
+        await expect(
+            page.locator('input[name="number_format_decimal"]'),
+        ).toBeVisible();
+        await expect(
+            page.locator('input[name="number_format_thousand"]'),
+        ).toBeVisible();
         await expect(page.getByTestId('hide-decimal-checkbox')).toBeVisible();
     });
 
@@ -88,7 +101,9 @@ test.describe('Admin Settings', () => {
 
         // Verify the value persisted
         await page.reload();
-        await expect(page.locator('input[name="company_name"]')).toHaveValue(companyName);
+        await expect(page.locator('input[name="company_name"]')).toHaveValue(
+            companyName,
+        );
     });
 
     test('can update regional settings', async ({ page }) => {
@@ -122,20 +137,29 @@ test.describe('Admin Settings', () => {
         await saveAdminSettings(page, 'save-regional-settings');
     });
 
-    test('settings page is accessible from Admin menu in sidebar', async ({ page }) => {
+    test('settings page is accessible from Admin menu in sidebar', async ({
+        page,
+    }) => {
         await page.goto('/dashboard');
 
         // Look for Admin group in sidebar - click to expand if not already
-        const adminMenu = page.getByRole('button', { name: 'Admin', exact: true });
-        const isExpanded = (await adminMenu.getAttribute('data-state')) === 'open';
-        
+        const adminMenu = page.getByRole('button', {
+            name: 'Admin',
+            exact: true,
+        });
+        const isExpanded =
+            (await adminMenu.getAttribute('data-state')) === 'open';
+
         if (!isExpanded) {
             await adminMenu.click();
         }
 
         // Look for Setting link, it should become visible after expansion
-        const settingLink = page.getByRole('link', { name: 'Setting', exact: true });
-        
+        const settingLink = page.getByRole('link', {
+            name: 'Setting',
+            exact: true,
+        });
+
         // Ensure it's rendered and visible
         await expect(settingLink).toBeVisible();
         await settingLink.click();
@@ -144,12 +168,17 @@ test.describe('Admin Settings', () => {
         await expect(page).toHaveTitle(/Admin Settings/);
     });
 
-    test('logo upload field is visible on General settings', async ({ page }) => {
+    test('logo upload field is visible on General settings', async ({
+        page,
+    }) => {
         await page.goto('/admin-settings');
 
-        // Logo upload field should be visible
+        // Upload memakai pola shadcn: tombol + input file tersembunyi (W4-14)
+        await expect(
+            page.getByRole('button', { name: /Pilih Logo SVG/i }),
+        ).toBeVisible();
+
         const logoInput = page.locator('input[name="company_logo"]');
-        await expect(logoInput).toBeVisible();
         await expect(logoInput).toHaveAttribute('type', 'file');
         await expect(logoInput).toHaveAttribute('accept', '.svg,image/svg+xml');
 
@@ -201,7 +230,7 @@ test.describe('Admin Settings', () => {
         // Verify it's using the uploaded logo from storage
         const logoSrc = await appLogo.getAttribute('src');
         expect(logoSrc).toBeTruthy();
-        
+
         // If we uploaded successfully, it should point to branding/logos, not the default
         if (logoSrc && !logoSrc.includes('logo_orange.svg')) {
             expect(logoSrc).toContain('branding/logos');
@@ -212,13 +241,15 @@ test.describe('Admin Settings', () => {
         await page.goto('/admin-settings');
 
         const logoInput = page.locator('input[name="company_logo"]');
-        
+
         // Verify accept attribute restricts file types
         const acceptAttr = await logoInput.getAttribute('accept');
         expect(acceptAttr).toBe('.svg,image/svg+xml');
     });
 
-    test('can navigate to SMTP settings and update values', async ({ page }) => {
+    test('can navigate to SMTP settings and update values', async ({
+        page,
+    }) => {
         await page.goto('/admin-settings');
 
         // Click SMTP tab
@@ -233,9 +264,15 @@ test.describe('Admin Settings', () => {
         await expect(page.locator('input[name="mail_port"]')).toBeVisible();
         await expect(page.locator('input[name="mail_username"]')).toBeVisible();
         await expect(page.locator('input[name="mail_password"]')).toBeVisible();
-        await expect(page.locator('input[name="mail_encryption"]')).toBeVisible();
-        await expect(page.locator('input[name="mail_from_address"]')).toBeVisible();
-        await expect(page.locator('input[name="mail_from_name"]')).toBeVisible();
+        await expect(
+            page.locator('input[name="mail_encryption"]'),
+        ).toBeVisible();
+        await expect(
+            page.locator('input[name="mail_from_address"]'),
+        ).toBeVisible();
+        await expect(
+            page.locator('input[name="mail_from_name"]'),
+        ).toBeVisible();
 
         // Save original host
         const hostInput = page.locator('input[name="mail_host"]');
@@ -254,7 +291,9 @@ test.describe('Admin Settings', () => {
 
         // Verify persistence
         await page.reload();
-        await expect(page.locator('input[name="mail_host"]')).toHaveValue('smtp.mailtrap.io');
+        await expect(page.locator('input[name="mail_host"]')).toHaveValue(
+            'smtp.mailtrap.io',
+        );
 
         // Restore original host so we don't break the next test
         await hostInput.clear();
@@ -281,10 +320,13 @@ test.describe('Admin Settings', () => {
         await sendTestButton.click();
 
         // The form should either succeed or fail gracefully by showing a red error string returning from backend
-        const successMessage = page.getByText('Test email sent successfully! Check your inbox.');
+        const successMessage = page.getByText(
+            'Test email sent successfully! Check your inbox.',
+        );
         const errorMessage = page.locator('text=Failed to send email:');
 
-        await expect(successMessage.or(errorMessage)).toBeVisible({ timeout: 5000 });
+        await expect(successMessage.or(errorMessage)).toBeVisible({
+            timeout: 5000,
+        });
     });
 });
-

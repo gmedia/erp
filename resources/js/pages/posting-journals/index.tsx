@@ -1,5 +1,6 @@
 'use client';
 
+import { GenericActions } from '@/components/common/ActionsDropdown';
 import { DataTablePagination } from '@/components/common/DataTablePagination';
 import {
     buildStandalonePaginationView,
@@ -29,14 +30,7 @@ import {
     formatCurrencyByRegionalSettings,
     formatNumberByRegionalSettings,
 } from '@/utils/number-format';
-import {
-    AlertCircle,
-    CheckCircle2,
-    Eye,
-    Loader2,
-    Search,
-    X,
-} from 'lucide-react';
+import { AlertCircle, CheckCircle2, Loader2, Search, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -200,17 +194,15 @@ export default function Index() {
                     </TableCell>
 
                     <TableCell className="pt-3 text-right align-top">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => {
-                                setViewItem(item);
-                                setViewOpen(true);
-                            }}
-                            aria-label={`View ${item.entry_number}`}
-                        >
-                            <Eye className="h-4 w-4" />
-                        </Button>
+                        <div className="flex justify-end">
+                            <GenericActions
+                                item={item}
+                                onView={() => {
+                                    setViewItem(item);
+                                    setViewOpen(true);
+                                }}
+                            />
+                        </div>
                     </TableCell>
                 </TableRow>
             );

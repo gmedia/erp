@@ -1,13 +1,13 @@
+import { GenericActions } from '@/components/common/ActionsDropdown';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
     approvalEventBadgeVariant,
+    formatClassName,
     formatStatusLabel,
 } from '@/lib/status-badge';
 import { createSortingHeader } from '@/utils/columns';
 import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import { ColumnDef } from '@tanstack/react-table';
-import { Eye } from 'lucide-react';
 
 export interface ApprovalAuditTrailItem {
     id: number;
@@ -43,7 +43,9 @@ export const createApprovalAuditTrailColumns = ({
     {
         accessorKey: 'approvable_type',
         ...createSortingHeader('Document Type'),
-        cell: ({ row }) => <div>{row.original.approvable_type_short}</div>,
+        cell: ({ row }) => (
+            <div>{formatClassName(row.original.approvable_type)}</div>
+        ),
     },
     {
         accessorKey: 'approvable_id',
@@ -78,16 +80,7 @@ export const createApprovalAuditTrailColumns = ({
         id: 'actions',
         cell: ({ row }) => {
             const item = row.original;
-            return (
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onViewDetail(item)}
-                    title="View Details"
-                >
-                    <Eye className="h-4 w-4" />
-                </Button>
-            );
+            return <GenericActions item={item} onView={onViewDetail} />;
         },
     },
 ];
