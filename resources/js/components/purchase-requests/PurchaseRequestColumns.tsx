@@ -1,13 +1,14 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
 import { PurchaseRequest } from '@/types/purchase-request';
 import {
     createActionsColumn,
     createCurrencyColumn,
     createDateColumn,
+    createPriorityBadgeColumn,
     createSelectColumn,
     createSortingHeader,
+    createStatusBadgeColumn,
     createTextColumn,
 } from '@/utils/columns';
 import { ColumnDef } from '@tanstack/react-table';
@@ -27,26 +28,6 @@ const renderRequesterCell = ({
 }: {
     row: { original: PurchaseRequest };
 }) => <div>{row.original.requester?.name ?? '-'}</div>;
-
-const renderPriorityCell = ({
-    row,
-}: {
-    row: { original: PurchaseRequest };
-}) => {
-    const priority = row.original.priority;
-    let variant: 'default' | 'secondary' | 'destructive' = 'secondary';
-    if (priority === 'urgent') {
-        variant = 'destructive';
-    } else if (priority === 'high') {
-        variant = 'default';
-    }
-
-    return <Badge variant={variant}>{priority.replace('_', ' ')}</Badge>;
-};
-
-const renderStatusCell = ({ row }: { row: { original: PurchaseRequest } }) => (
-    <Badge variant="outline">{row.original.status.replace('_', ' ')}</Badge>
-);
 
 export const purchaseRequestColumns: ColumnDef<PurchaseRequest>[] = [
     createSelectColumn<PurchaseRequest>(),
@@ -77,16 +58,14 @@ export const purchaseRequestColumns: ColumnDef<PurchaseRequest>[] = [
         accessorKey: 'required_date',
         label: 'Required Date',
     }),
-    {
+    createPriorityBadgeColumn<PurchaseRequest>({
         accessorKey: 'priority',
-        ...createSortingHeader('Priority'),
-        cell: renderPriorityCell,
-    },
-    {
+        label: 'Priority',
+    }),
+    createStatusBadgeColumn<PurchaseRequest>({
         accessorKey: 'status',
-        ...createSortingHeader('Status'),
-        cell: renderStatusCell,
-    },
+        label: 'Status',
+    }),
     createCurrencyColumn<PurchaseRequest>({
         accessorKey: 'estimated_amount',
         label: 'Estimated Amount',

@@ -1,12 +1,14 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
+import { formatStatusLabel } from '@/lib/status-badge';
 import { CreditNote } from '@/types/credit-note';
 import {
     createActionsColumn,
     createDateColumn,
     createSelectColumn,
     createSortingHeader,
+    createStatusBadgeColumn,
     createTextColumn,
 } from '@/utils/columns';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
@@ -21,11 +23,7 @@ const renderBranchCell = ({ row }: { row: { original: CreditNote } }) => (
 );
 
 const renderReasonCell = ({ row }: { row: { original: CreditNote } }) => (
-    <Badge variant="outline">{row.original.reason}</Badge>
-);
-
-const renderStatusCell = ({ row }: { row: { original: CreditNote } }) => (
-    <Badge variant="outline">{row.original.status.replace('_', ' ')}</Badge>
+    <Badge variant="outline">{formatStatusLabel(row.original.reason)}</Badge>
 );
 
 export const creditNoteColumns: ColumnDef<CreditNote>[] = [
@@ -53,11 +51,10 @@ export const creditNoteColumns: ColumnDef<CreditNote>[] = [
         ...createSortingHeader('Reason'),
         cell: renderReasonCell,
     },
-    {
+    createStatusBadgeColumn<CreditNote>({
         accessorKey: 'status',
-        ...createSortingHeader('Status'),
-        cell: renderStatusCell,
-    },
+        label: 'Status',
+    }),
     {
         accessorKey: 'grand_total',
         ...createSortingHeader('Grand Total'),

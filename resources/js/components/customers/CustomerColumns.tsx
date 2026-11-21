@@ -12,6 +12,7 @@ import {
 } from '@/utils/columns';
 
 import { Badge } from '@/components/ui/badge';
+import { formatStatusLabel, statusBadgeVariant } from '@/lib/status-badge';
 import { Customer } from '@/types/entity';
 
 /**
@@ -36,8 +37,8 @@ const renderCategoryCell = ({ row }: { row: { original: Customer } }) => {
 const renderStatusCell = ({ row }: { row: { original: Customer } }) => {
     const status = row.original.status;
     return (
-        <Badge variant={status === 'active' ? 'default' : 'destructive'}>
-            {status === 'active' ? 'Active' : 'Inactive'}
+        <Badge variant={statusBadgeVariant(status)}>
+            {formatStatusLabel(status)}
         </Badge>
     );
 };

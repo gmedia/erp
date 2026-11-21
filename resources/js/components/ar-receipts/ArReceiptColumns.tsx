@@ -1,6 +1,7 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
+import { formatStatusLabel } from '@/lib/status-badge';
 import { ArReceipt } from '@/types/ar-receipt';
 import {
     createActionsColumn,
@@ -8,6 +9,7 @@ import {
     createRowCurrencyAmountColumn,
     createSelectColumn,
     createSortingHeader,
+    createStatusBadgeColumn,
     createTextColumn,
 } from '@/utils/columns';
 import { ColumnDef } from '@tanstack/react-table';
@@ -22,12 +24,8 @@ const renderBranchCell = ({ row }: { row: { original: ArReceipt } }) => (
 
 const renderPaymentMethodCell = ({ row }: { row: { original: ArReceipt } }) => (
     <Badge variant="outline">
-        {row.original.payment_method.replace('_', ' ')}
+        {formatStatusLabel(row.original.payment_method)}
     </Badge>
-);
-
-const renderStatusCell = ({ row }: { row: { original: ArReceipt } }) => (
-    <Badge variant="outline">{row.original.status.replace('_', ' ')}</Badge>
 );
 
 export const arReceiptColumns: ColumnDef<ArReceipt>[] = [
@@ -59,11 +57,10 @@ export const arReceiptColumns: ColumnDef<ArReceipt>[] = [
         accessorKey: 'currency',
         label: 'Currency',
     }),
-    {
+    createStatusBadgeColumn<ArReceipt>({
         accessorKey: 'status',
-        ...createSortingHeader('Status'),
-        cell: renderStatusCell,
-    },
+        label: 'Status',
+    }),
     createRowCurrencyAmountColumn<ArReceipt>({
         accessorKey: 'total_amount',
         label: 'Total Amount',

@@ -1,12 +1,12 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
 import { GoodsReceipt } from '@/types/goods-receipt';
 import {
     createActionsColumn,
     createDateColumn,
     createSelectColumn,
     createSortingHeader,
+    createStatusBadgeColumn,
     createTextColumn,
 } from '@/utils/columns';
 import { ColumnDef } from '@tanstack/react-table';
@@ -17,10 +17,6 @@ const renderPoNumberCell = ({ row }: { row: { original: GoodsReceipt } }) => (
 
 const renderWarehouseCell = ({ row }: { row: { original: GoodsReceipt } }) => (
     <div>{row.original.warehouse?.name ?? '-'}</div>
-);
-
-const renderStatusCell = ({ row }: { row: { original: GoodsReceipt } }) => (
-    <Badge variant="outline">{row.original.status}</Badge>
 );
 
 export const goodsReceiptColumns: ColumnDef<GoodsReceipt>[] = [
@@ -47,10 +43,9 @@ export const goodsReceiptColumns: ColumnDef<GoodsReceipt>[] = [
         accessorKey: 'supplier_delivery_note',
         label: 'Supplier Delivery Note',
     }),
-    {
+    createStatusBadgeColumn<GoodsReceipt>({
         accessorKey: 'status',
-        ...createSortingHeader('Status'),
-        cell: renderStatusCell,
-    },
+        label: 'Status',
+    }),
     createActionsColumn<GoodsReceipt>(),
 ];

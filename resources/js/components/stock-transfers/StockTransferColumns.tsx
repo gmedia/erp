@@ -3,10 +3,10 @@
 import { GenericActions } from '@/components/common/ActionsDropdown';
 import { type StockTransfer } from '@/types/stock-transfer';
 import {
-    createBadgeColumn,
     createDateColumn,
     createSelectColumn,
     createSortingHeader,
+    createStatusBadgeColumn,
     createTextColumn,
 } from '@/utils/columns';
 import { type ColumnDef, type TableMeta } from '@tanstack/react-table';
@@ -43,17 +43,9 @@ export const stockTransferColumns: ColumnDef<StockTransfer>[] = [
         accessorKey: 'expected_arrival_date',
         label: 'Expected Arrival',
     }),
-    createBadgeColumn<StockTransfer>({
+    createStatusBadgeColumn<StockTransfer>({
         accessorKey: 'status',
         label: 'Status',
-        colorMap: {
-            draft: 'bg-muted text-foreground',
-            pending_approval: 'bg-warning-soft text-warning',
-            approved: 'bg-info/10 text-info',
-            in_transit: 'bg-chart-3/10 text-chart-3',
-            received: 'bg-success-soft text-success',
-            cancelled: 'bg-destructive-soft text-destructive-foreground',
-        },
     }),
     {
         id: 'actions',

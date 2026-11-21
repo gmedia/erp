@@ -12,6 +12,7 @@ import {
 } from '@/utils/columns';
 
 import { Badge } from '@/components/ui/badge';
+import { formatStatusLabel, statusBadgeVariant } from '@/lib/status-badge';
 import { Supplier } from '@/types/entity';
 
 /**
@@ -36,8 +37,8 @@ const renderCategoryCell = ({ row }: { row: { original: Supplier } }) => {
 const renderStatusCell = ({ row }: { row: { original: Supplier } }) => {
     const status = row.original.status;
     return (
-        <Badge variant={status === 'active' ? 'default' : 'secondary'}>
-            {status.charAt(0).toUpperCase() + status.slice(1)}
+        <Badge variant={statusBadgeVariant(status)}>
+            {formatStatusLabel(status)}
         </Badge>
     );
 };

@@ -1,5 +1,9 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+    approvalEventBadgeVariant,
+    formatStatusLabel,
+} from '@/lib/status-badge';
 import { createSortingHeader } from '@/utils/columns';
 import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import { ColumnDef } from '@tanstack/react-table';
@@ -51,22 +55,12 @@ export const createApprovalAuditTrailColumns = ({
         ...createSortingHeader('Event'),
         cell: ({ row }) => {
             const eventStr = row.getValue('event') as string;
-            const formatted = eventStr
-                ? eventStr
-                      .replaceAll('_', ' ')
-                      .replaceAll(/\b\w/g, (letter) => letter.toUpperCase())
-                : '-';
-            let variant: 'default' | 'secondary' | 'destructive' | 'outline' =
-                'outline';
-
-            if (eventStr.includes('approved')) variant = 'default';
-            if (eventStr === 'step_rejected') variant = 'destructive';
-            if (eventStr === 'submitted') variant = 'secondary';
-            if (eventStr === 'auto_approved') variant = 'default';
-            if (eventStr === 'delegated' || eventStr === 'escalated')
-                variant = 'secondary';
-
-            return <Badge variant={variant}>{formatted}</Badge>;
+            const formatted = eventStr ? formatStatusLabel(eventStr) : '-';
+            return (
+                <Badge variant={approvalEventBadgeVariant(eventStr)}>
+                    {formatted}
+                </Badge>
+            );
         },
     },
     {

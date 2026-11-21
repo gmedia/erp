@@ -1,8 +1,15 @@
 'use client';
 
 import { GenericActions } from '@/components/common/ActionsDropdown';
+import { Badge, type BadgeVariant } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import {
+    adjustmentTypeBadgeVariant,
+    formatStatusLabel,
+    priorityBadgeVariant,
+    statusBadgeVariant,
+} from '@/lib/status-badge';
 import { cn, formatDate } from '@/lib/utils';
 import {
     formatCurrencyByRegionalSettings,
@@ -442,11 +449,21 @@ export function createSelectColumn<
     };
 }
 
-// Badge column for status-like values
+// Badge column for status-like values.
+// Default render memakai satu peta status→tone terpusat (lib/status-badge.ts,
+// W4-01/W4-02) + shadcn Badge. `colorMap`/`defaultColor` (klas, string) masih
+// didukung agar pemakai lama tidak pecah, tetapi pemakai baru sebaiknya
+// memakai `variantMap` atau helper `createStatusBadgeColumn`.
 export function createBadgeColumn<T = Record<string, unknown>>(
     options: ColumnBuilderOptions<T> & {
         colorMap?: Record<string, string>;
         defaultColor?: string;
+        /** Peta nilai → variant Badge (menggantikan colorMap class string). */
+        variantMap?: Record<string, BadgeVariant>;
+        /** Override tone default (bila status tidak dikenal). */
+        defaultVariant?: BadgeVariant;
+        /** Humanize label (snake_case → Title Case). Default: true. */
+        humanize?: boolean;
     },
 ): ColumnDef<T> {
     const {
@@ -454,7 +471,10 @@ export function createBadgeColumn<T = Record<string, unknown>>(
         label,
         enableSorting = true,
         colorMap = {},
-        defaultColor = 'bg-muted text-foreground',
+        defaultColor,
+        variantMap,
+        defaultVariant = 'outline',
+        humanize = true,
     } = options;
 
     const baseColumn: ColumnDef<T> = {
@@ -463,14 +483,116 @@ export function createBadgeColumn<T = Record<string, unknown>>(
             const value = row.getValue(accessorKey as string) as string;
             if (!value) return <div>-</div>;
 
-            const colorClass = colorMap[value] || defaultColor;
+            const text = humanize ? formatStatusLabel(value) : value;
 
+            const variant = variantMap?.[value] ?? statusBadgeVariant(value);
+
+            // Fallback legacy: pemakai lama yang masih melewati colorMap.
+            if (colorMap[value]) {
+                return (
+                    <span
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${colorMap[value]}`}
+                    >
+                        {text}
+                    </span>
+                );
+            }
+            if (defaultColor && !variantMap) {
+                return (
+                    <span
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${defaultColor}`}
+                    >
+                        {text}
+                    </span>
+                );
+            }
+
+            return <Badge variant={variant ?? defaultVariant}>{text}</Badge>;
+        },
+    };
+
+    if (enableSorting) {
+        return {
+            ...baseColumn,
+            ...createSortingHeader(label),
+        };
+    }
+
+    return {
+        ...baseColumn,
+        enableSorting: false,
+        header: label,
+    };
+}
+
+// Status badge column (satu peta status→tone terpusat, W4-01/W4-02).
+export function createStatusBadgeColumn<T = Record<string, unknown>>(
+    options: ColumnBuilderOptions<T> & {
+        variantMap?: Record<string, BadgeVariant>;
+        defaultVariant?: BadgeVariant;
+        humanize?: boolean;
+    },
+): ColumnDef<T> {
+    const { accessorKey, label, variantMap, defaultVariant, humanize } =
+        options;
+    return createBadgeColumn<T>({
+        accessorKey,
+        label,
+        enableSorting: options.enableSorting,
+        variantMap,
+        defaultVariant,
+        humanize,
+    });
+}
+
+// Adjustment type badge column (damage/expired/..., W4-01).
+export function createAdjustmentTypeBadgeColumn<T = Record<string, unknown>>(
+    options: ColumnBuilderOptions<T>,
+): ColumnDef<T> {
+    const { accessorKey, label, enableSorting = true } = options;
+
+    const baseColumn: ColumnDef<T> = {
+        accessorKey: accessorKey as string,
+        cell: ({ row }) => {
+            const value = row.getValue(accessorKey as string) as string;
+            if (!value) return <div>-</div>;
             return (
-                <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${colorClass}`}
-                >
-                    {value}
-                </span>
+                <Badge variant={adjustmentTypeBadgeVariant(value)}>
+                    {formatStatusLabel(value)}
+                </Badge>
+            );
+        },
+    };
+
+    if (enableSorting) {
+        return {
+            ...baseColumn,
+            ...createSortingHeader(label),
+        };
+    }
+
+    return {
+        ...baseColumn,
+        enableSorting: false,
+        header: label,
+    };
+}
+
+// Priority badge column (urgent/high/normal/low, W4-02).
+export function createPriorityBadgeColumn<T = Record<string, unknown>>(
+    options: ColumnBuilderOptions<T>,
+): ColumnDef<T> {
+    const { accessorKey, label, enableSorting = true } = options;
+
+    const baseColumn: ColumnDef<T> = {
+        accessorKey: accessorKey as string,
+        cell: ({ row }) => {
+            const value = row.getValue(accessorKey as string) as string;
+            if (!value) return <div>-</div>;
+            return (
+                <Badge variant={priorityBadgeVariant(value)}>
+                    {formatStatusLabel(value)}
+                </Badge>
             );
         },
     };

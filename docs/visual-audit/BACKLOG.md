@@ -20,7 +20,7 @@
 
 | Grup  | Pri | Temuan                            | Scope                                                                     | Status    |
 | ----- | --- | --------------------------------- | ------------------------------------------------------------------------- | --------- |
-| W4-G1 | P1  | W4-01, W4-02                      | Badge status: label humanize + tone semantik terpusat                     | open #302 |
+| W4-G1 | P1  | W4-01, W4-02                      | Badge status: label humanize + tone semantik terpusat                     | **merged #310** |
 | W4-G2 | P1  | W4-03, W4-10                      | Tabel: tepi scroll kanan, kolom sticky, header non-sortable               | open #303 |
 | W4-G3 | P1  | W4-04, W4-05, W4-06               | Page shell: PageHeader CRUD, shell custom, breadcrumb                     | open #304 |
 | W4-G4 | P1  | W4-07, W4-08, W4-18               | Dashboard: KPI terpotong, filter satu baris, pipeline dashboard           | open #305 |

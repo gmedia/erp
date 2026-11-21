@@ -1,6 +1,7 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
+import { formatStatusLabel, statusBadgeVariant } from '@/lib/status-badge';
 import { Asset } from '@/types/asset';
 import {
     createActionsColumn,
@@ -43,20 +44,9 @@ const createAssetRelationColumn = (
 
 const renderStatusCell = ({ row }: { row: { original: Asset } }) => {
     const status = row.original.status;
-    const variants: Record<
-        string,
-        'default' | 'secondary' | 'destructive' | 'outline'
-    > = {
-        draft: 'outline',
-        active: 'default',
-        maintenance: 'secondary',
-        disposed: 'destructive',
-        lost: 'destructive',
-    };
-    const capitalizedStatus = status.charAt(0).toUpperCase() + status.slice(1);
     return (
-        <Badge variant={variants[status] || 'default'}>
-            {capitalizedStatus}
+        <Badge variant={statusBadgeVariant(status)}>
+            {formatStatusLabel(status)}
         </Badge>
     );
 };

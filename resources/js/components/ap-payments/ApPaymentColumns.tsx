@@ -1,6 +1,7 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
+import { formatStatusLabel } from '@/lib/status-badge';
 import { ApPayment } from '@/types/ap-payment';
 import {
     createActionsColumn,
@@ -8,6 +9,7 @@ import {
     createRowCurrencyAmountColumn,
     createSelectColumn,
     createSortingHeader,
+    createStatusBadgeColumn,
     createTextColumn,
 } from '@/utils/columns';
 import { ColumnDef } from '@tanstack/react-table';
@@ -22,12 +24,8 @@ const renderBranchCell = ({ row }: { row: { original: ApPayment } }) => (
 
 const renderPaymentMethodCell = ({ row }: { row: { original: ApPayment } }) => (
     <Badge variant="outline">
-        {row.original.payment_method.replace('_', ' ')}
+        {formatStatusLabel(row.original.payment_method)}
     </Badge>
-);
-
-const renderStatusCell = ({ row }: { row: { original: ApPayment } }) => (
-    <Badge variant="outline">{row.original.status.replace('_', ' ')}</Badge>
 );
 
 export const apPaymentColumns: ColumnDef<ApPayment>[] = [
@@ -59,11 +57,10 @@ export const apPaymentColumns: ColumnDef<ApPayment>[] = [
         accessorKey: 'currency',
         label: 'Currency',
     }),
-    {
+    createStatusBadgeColumn<ApPayment>({
         accessorKey: 'status',
-        ...createSortingHeader('Status'),
-        cell: renderStatusCell,
-    },
+        label: 'Status',
+    }),
     createRowCurrencyAmountColumn<ApPayment>({
         accessorKey: 'total_amount',
         label: 'Total Amount',

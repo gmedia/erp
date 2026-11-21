@@ -1,6 +1,7 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
+import { formatStatusLabel, statusBadgeVariant } from '@/lib/status-badge';
 import {
     createActionsColumn,
     createCurrencyColumn,
@@ -41,18 +42,9 @@ const renderTypeCell = ({ row }: { row: { original: Product } }) => {
  */
 const renderStatusCell = ({ row }: { row: { original: Product } }) => {
     const status = row.original.status;
-    const variants: Record<
-        string,
-        'default' | 'secondary' | 'outline' | 'destructive'
-    > = {
-        active: 'default',
-        inactive: 'secondary',
-        discontinued: 'destructive',
-    };
-
     return (
-        <Badge variant={variants[status] || 'outline'}>
-            {status.charAt(0).toUpperCase() + status.slice(1)}
+        <Badge variant={statusBadgeVariant(status)}>
+            {formatStatusLabel(status)}
         </Badge>
     );
 };

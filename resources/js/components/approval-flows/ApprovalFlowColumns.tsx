@@ -1,4 +1,5 @@
 import { Badge } from '@/components/ui/badge';
+import { statusBadgeVariant } from '@/lib/status-badge';
 import {
     createActionsColumn,
     createSelectColumn,
@@ -35,7 +36,11 @@ export const approvalFlowColumns: ColumnDef<ApprovalFlow>[] = [
         cell: ({ row }) => {
             const isActive = row.getValue('is_active') as boolean;
             return (
-                <Badge variant={isActive ? 'default' : 'secondary'}>
+                <Badge
+                    variant={statusBadgeVariant(
+                        isActive ? 'active' : 'inactive',
+                    )}
+                >
                     {isActive ? 'Active' : 'Inactive'}
                 </Badge>
             );

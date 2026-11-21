@@ -1,5 +1,9 @@
 import { createReportTextColumn } from '@/components/common/ReportColumns';
 import { Badge } from '@/components/ui/badge';
+import {
+    formatStatusLabel,
+    stocktakeVarianceBadgeVariant,
+} from '@/lib/status-badge';
 import { createSortingHeader } from '@/utils/columns';
 import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import { ColumnDef } from '@tanstack/react-table';
@@ -78,14 +82,13 @@ export const varianceColumns: ColumnDef<AssetStocktakeVarianceItem>[] = [
         accessorKey: 'result',
         ...createSortingHeader('Result'),
         cell: ({ row }) => {
-            const val = (row.getValue('result') as string)?.toLowerCase();
-            let variant: 'default' | 'secondary' | 'destructive' | 'outline' =
-                'default';
-            if (val === 'damaged') variant = 'destructive';
-            if (val === 'missing') variant = 'destructive';
-            if (val === 'moved') variant = 'secondary';
-
-            return <Badge variant={variant}>{val?.toUpperCase() || '-'}</Badge>;
+            const val = row.getValue('result') as string;
+            if (!val) return '-';
+            return (
+                <Badge variant={stocktakeVarianceBadgeVariant(val)}>
+                    {formatStatusLabel(val)}
+                </Badge>
+            );
         },
     },
     createReportTextColumn<AssetStocktakeVarianceItem>({

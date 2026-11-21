@@ -4,10 +4,10 @@ import { GenericActions } from '@/components/common/ActionsDropdown';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { AssetStocktake } from '@/types/asset-stocktake';
 import {
-    createBadgeColumn,
     createDateColumn,
     createSelectColumn,
     createSortingHeader,
+    createStatusBadgeColumn,
     createTextColumn,
     type CustomTableMeta,
 } from '@/utils/columns';
@@ -34,15 +34,9 @@ export const assetStocktakeColumns: ColumnDef<AssetStocktake>[] = [
         accessorKey: 'performed_at',
         label: 'Performed Date',
     }),
-    createBadgeColumn<AssetStocktake>({
+    createStatusBadgeColumn<AssetStocktake>({
         accessorKey: 'status',
         label: 'Status',
-        colorMap: {
-            draft: 'bg-muted text-foreground',
-            in_progress: 'bg-info/10 text-info',
-            completed: 'bg-success-soft text-success',
-            cancelled: 'bg-destructive-soft text-destructive-foreground',
-        },
     }),
     {
         id: 'created_by',

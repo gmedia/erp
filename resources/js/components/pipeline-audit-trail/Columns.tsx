@@ -70,21 +70,18 @@ export const createPipelineAuditTrailColumns = ({
         header: 'From State',
         cell: ({ row }) => {
             const name = row.getValue('from_state_name') as string | null;
-            const color = row.original.from_state_color;
             if (!name) return <Badge variant="outline">Initial</Badge>;
             return (
-                <Badge
-                    style={
-                        color
-                            ? {
-                                  backgroundColor: color,
-                                  color: '#fff',
-                                  borderColor: color,
-                              }
-                            : undefined
-                    }
-                    variant="outline"
-                >
+                <Badge variant="outline">
+                    {row.original.from_state_color ? (
+                        <span
+                            aria-hidden
+                            className="size-2 shrink-0 rounded-full"
+                            style={{
+                                backgroundColor: row.original.from_state_color,
+                            }}
+                        />
+                    ) : null}
                     {name}
                 </Badge>
             );
@@ -96,21 +93,18 @@ export const createPipelineAuditTrailColumns = ({
         header: 'To State',
         cell: ({ row }) => {
             const name = row.getValue('to_state_name') as string | null;
-            const color = row.original.to_state_color;
             if (!name) return '-';
             return (
-                <Badge
-                    style={
-                        color
-                            ? {
-                                  backgroundColor: color,
-                                  color: '#fff',
-                                  borderColor: color,
-                              }
-                            : undefined
-                    }
-                    variant="outline"
-                >
+                <Badge variant="outline">
+                    {row.original.to_state_color ? (
+                        <span
+                            aria-hidden
+                            className="size-2 shrink-0 rounded-full"
+                            style={{
+                                backgroundColor: row.original.to_state_color,
+                            }}
+                        />
+                    ) : null}
                     {name}
                 </Badge>
             );
