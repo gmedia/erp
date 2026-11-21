@@ -1,20 +1,19 @@
 import axios from '@/lib/axios';
 import { isAxiosError } from 'axios';
-import { LoaderCircle } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { toast } from 'sonner';
 
-import InputError from '@/components/input-error';
+import {
+    SettingsRow,
+    SettingsSaveButton,
+    SettingsSection,
+} from '@/components/common/settings';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { type BreadcrumbItem } from '@/types';
-import { Transition } from '@headlessui/react';
 
-import HeadingSmall from '@/components/heading-small';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -88,95 +87,71 @@ export default function Password() {
             </Helmet>
 
             <SettingsLayout>
-                <div className="space-y-6">
-                    <HeadingSmall
-                        title="Update password"
-                        description="Ensure your account is using a long, random password to stay secure"
-                    />
-
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="grid gap-2">
-                            <Label htmlFor="current_password">
-                                Current password
-                            </Label>
-
+                <SettingsSection
+                    title="Update password"
+                    description="Ensure your account is using a long, random password to stay secure"
+                    actions={
+                        <SettingsSaveButton
+                            formId="password-form"
+                            processing={processing}
+                            recentlySuccessful={recentlySuccessful}
+                            dataTest="update-password-button"
+                            label="Save password"
+                        />
+                    }
+                >
+                    <form id="password-form" onSubmit={handleSubmit}>
+                        <SettingsRow
+                            label="Current password"
+                            htmlFor="current_password"
+                            description="Confirm it is you before changing the password."
+                            error={errors.current_password}
+                        >
                             <Input
                                 id="current_password"
                                 ref={currentPasswordInput}
                                 name="current_password"
                                 type="password"
-                                className="mt-1 block w-full"
                                 autoComplete="current-password"
                                 placeholder="Current password"
                                 required
                             />
+                        </SettingsRow>
 
-                            <InputError message={errors.current_password} />
-                        </div>
-
-                        <div className="grid gap-2">
-                            <Label htmlFor="password">New password</Label>
-
+                        <SettingsRow
+                            label="New password"
+                            htmlFor="password"
+                            description="Use a long, unique password."
+                            error={errors.password}
+                        >
                             <Input
                                 id="password"
                                 ref={passwordInput}
                                 name="password"
                                 type="password"
-                                className="mt-1 block w-full"
                                 autoComplete="new-password"
                                 placeholder="New password"
                                 required
                             />
+                        </SettingsRow>
 
-                            <InputError message={errors.password} />
-                        </div>
-
-                        <div className="grid gap-2">
-                            <Label htmlFor="password_confirmation">
-                                Confirm password
-                            </Label>
-
+                        <SettingsRow
+                            label="Confirm password"
+                            htmlFor="password_confirmation"
+                            description="Type the new password again."
+                            error={errors.password_confirmation}
+                        >
                             <Input
                                 id="password_confirmation"
                                 name="password_confirmation"
                                 type="password"
-                                className="mt-1 block w-full"
                                 autoComplete="new-password"
                                 placeholder="Confirm password"
                                 required
                             />
-
-                            <InputError
-                                message={errors.password_confirmation}
-                            />
-                        </div>
-
-                        <div className="flex items-center gap-4">
-                            <Button
-                                type="submit"
-                                disabled={processing}
-                                data-test="update-password-button"
-                            >
-                                {processing && (
-                                    <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                                )}
-                                Save password
-                            </Button>
-
-                            <Transition
-                                show={recentlySuccessful}
-                                enter="transition ease-in-out duration-300"
-                                enterFrom="opacity-0"
-                                leave="transition ease-in-out duration-300"
-                                leaveTo="opacity-0"
-                            >
-                                <p className="text-sm text-muted-foreground">
-                                    Saved
-                                </p>
-                            </Transition>
-                        </div>
+                        </SettingsRow>
                     </form>
-                </div>
+                </SettingsSection>
             </SettingsLayout>
         </AppLayout>
     );
