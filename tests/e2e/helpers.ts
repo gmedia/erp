@@ -77,19 +77,49 @@ export async function changeDateFieldValue(
     await expect(trigger).toBeVisible();
     await trigger.click();
 
-    await page
-        .getByRole('button', { name: 'Go to the Previous Month' })
-        .last()
-        .click();
+    // Calendar popovers are portaled to <body> and Radix keeps a closing
+    // popover mounted (data-state="closed") until its exit animation ends, so
+    // a global `.last()` can resolve to that detaching sibling. Scope to the
+    // single open calendar popover, then wait until it is fully rendered.
+    const calendar = page
+        .locator('[data-slot="popover-content"][data-state="open"]')
+        .filter({ has: page.locator('[data-slot="calendar"]') });
+    await expect(calendar).toBeVisible();
 
-    const dayButton = page
+    // Read the 15th of the currently shown month (single view, so unambiguous)
+    // to derive the previous month's 15th as the target date.
+    const shownDay15 = calendar
         .locator('button[data-date]')
         .filter({ hasText: /^15$/ })
         .first();
+    await expect(shownDay15).toBeVisible();
+    const [year, month] = ((await shownDay15.getAttribute('data-date')) ?? '')
+        .split('-')
+        .map(Number);
+    const targetDate =
+        month === 1
+            ? `${year - 1}-12-15`
+            : `${year}-${String(month - 1).padStart(2, '0')}-15`;
+
+    // Click via the auto-waiting action (waits on actionTimeout) rather than a
+    // short expect, so a slow month-nav button render does not trip a 5s gate.
+    await calendar
+        .getByRole('button', { name: 'Go to the Previous Month' })
+        .click();
+
+    // The month transition keeps the old month mounted briefly, so a text
+    // "15" match is ambiguous. Target the exact data-date of the previous
+    // month's 15th, which is unique.
+    const dayButton = calendar.locator(`button[data-date="${targetDate}"]`);
     await expect(dayButton).toBeVisible();
 
     const expectedDate = await dayButton.getAttribute('data-date');
-    await dayButton.click();
+    // Clicking an already-selected day deselects it (react-day-picker single
+    // mode), which a prior --repeat-each run can cause. Only click when needed.
+    if ((await dayButton.getAttribute('data-selected-single')) !== 'true') {
+        await dayButton.click();
+    }
+    await expect(dayButton).toHaveAttribute('data-selected-single', 'true');
 
     expect(expectedDate).not.toBeNull();
 
