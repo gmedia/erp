@@ -57,6 +57,7 @@ e2e/e2e-full/
 
 # Visual audit screenshots (keep markdown + url-list.json)
 docs/visual-audit/waves/**/*.png
+docs/visual-audit/waves/**/report.jsonl
 
 # Pest artifacts
 coverage-html/
