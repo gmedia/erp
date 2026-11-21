@@ -23,6 +23,7 @@
       "Bash(npm run lint:check:*)",
       "Bash(npm run format:check:*)",
       "Bash(npm run check:menu-icons:*)",
+      "Bash(npm run check:raw-colors:*)",
       "Bash(npx playwright test:*)",
       "Bash(bash scripts/sync-opencode.sh)",
       "Bash(bash scripts/setup-env.sh)",

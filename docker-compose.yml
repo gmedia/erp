@@ -23,6 +23,10 @@ services:
             XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
             XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
             IGNITION_LOCAL_SITES_PATH: '${PWD}'
+            # .env.testing (tracked) tidak memuat password DB; env proses menang atas
+            # dotenv sehingga Pest (DB "testing") memakai password yang sama dengan
+            # service mariadb di host yang DB-nya ber-password.
+            DB_PASSWORD: '${DB_PASSWORD}'
         volumes:
             - '.:/var/www/html'
         networks:
