@@ -1,8 +1,11 @@
-import HeadingSmall from '@/components/heading-small';
+import {
+    SettingsRow,
+    SettingsSaveButton,
+    SettingsSection,
+} from '@/components/common/settings';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
     Select,
     SelectContent,
@@ -10,7 +13,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/contexts/auth-context';
 import AdminSettingsLayout from '@/layouts/admin-settings/layout';
 import AppLayout from '@/layouts/app-layout';
@@ -154,90 +157,92 @@ function GeneralSettings({
     };
 
     return (
-        <div className="space-y-6">
-            <HeadingSmall
-                title="General Settings"
-                description="Configure your company information"
-            />
-
+        <SettingsSection
+            title="General Settings"
+            description="Configure your company information"
+            actions={
+                <SettingsSaveButton
+                    formId="general-settings-form"
+                    processing={processing}
+                    recentlySuccessful={recentlySuccessful}
+                    testId="save-general-settings"
+                />
+            }
+        >
             <form
+                id="general-settings-form"
                 onSubmit={handleSubmit}
                 data-testid="general-settings-form"
-                className="space-y-6"
                 encType="multipart/form-data"
             >
-                <div className="grid gap-2">
-                    <Label htmlFor="company_name">Company Name</Label>
+                <SettingsRow
+                    label="Company Name"
+                    htmlFor="company_name"
+                    description="Shown in the app header, documents, and emails."
+                    error={errors.company_name}
+                >
                     <Input
                         id="company_name"
                         name="company_name"
                         defaultValue={settings?.company_name ?? ''}
                         placeholder="Enter company name"
-                        className="mt-1 block w-full"
                     />
-                    {errors.company_name && (
-                        <p className="text-sm text-destructive">
-                            {errors.company_name}
-                        </p>
-                    )}
-                </div>
+                </SettingsRow>
 
-                <div className="grid gap-2">
-                    <Label htmlFor="company_address">Company Address</Label>
+                <SettingsRow
+                    label="Company Address"
+                    htmlFor="company_address"
+                    description="Printed on documents such as invoices and purchase orders."
+                    error={errors.company_address}
+                >
                     <Input
                         id="company_address"
                         name="company_address"
                         defaultValue={settings?.company_address ?? ''}
                         placeholder="Enter company address"
-                        className="mt-1 block w-full"
                     />
-                    {errors.company_address && (
-                        <p className="text-sm text-destructive">
-                            {errors.company_address}
-                        </p>
-                    )}
-                </div>
+                </SettingsRow>
 
-                <div className="grid gap-2">
-                    <Label htmlFor="company_phone">Company Phone</Label>
+                <SettingsRow
+                    label="Company Phone"
+                    htmlFor="company_phone"
+                    description="Main contact number for the company."
+                    error={errors.company_phone}
+                >
                     <Input
                         id="company_phone"
                         name="company_phone"
                         defaultValue={settings?.company_phone ?? ''}
                         placeholder="Enter company phone"
-                        className="mt-1 block w-full"
                     />
-                    {errors.company_phone && (
-                        <p className="text-sm text-destructive">
-                            {errors.company_phone}
-                        </p>
-                    )}
-                </div>
+                </SettingsRow>
 
-                <div className="grid gap-2">
-                    <Label htmlFor="company_email">Company Email</Label>
+                <SettingsRow
+                    label="Company Email"
+                    htmlFor="company_email"
+                    description="Main contact email for the company."
+                    error={errors.company_email}
+                >
                     <Input
                         id="company_email"
                         name="company_email"
                         type="email"
                         defaultValue={settings?.company_email ?? ''}
                         placeholder="Enter company email"
-                        className="mt-1 block w-full"
                     />
-                    {errors.company_email && (
-                        <p className="text-sm text-destructive">
-                            {errors.company_email}
-                        </p>
-                    )}
-                </div>
+                </SettingsRow>
 
-                <div className="grid gap-2">
-                    <Label htmlFor="company_logo">Company Logo (SVG)</Label>
+                <SettingsRow
+                    label="Company Logo (SVG)"
+                    htmlFor="company_logo"
+                    description="Upload file SVG. Jika kosong, aplikasi tetap menggunakan logo default."
+                    error={errors.company_logo}
+                >
                     {settings?.company_logo_url && (
                         <img
                             src={settings.company_logo_url}
                             alt="Current company logo"
-                            className="h-14 w-auto rounded border object-contain p-2"
+                            className="h-14 w-auto rounded-md bg-card object-contain p-2"
                         />
                     )}
                     <Input
@@ -245,43 +250,10 @@ function GeneralSettings({
                         name="company_logo"
                         type="file"
                         accept=".svg,image/svg+xml"
-                        className="mt-1 block w-full"
                     />
-                    <p className="text-sm text-muted-foreground">
-                        Upload file SVG. Jika kosong, aplikasi tetap menggunakan
-                        logo default.
-                    </p>
-                    {errors.company_logo && (
-                        <p className="text-sm text-destructive">
-                            {errors.company_logo}
-                        </p>
-                    )}
-                </div>
-
-                <div className="flex items-center gap-4">
-                    <Button
-                        disabled={processing}
-                        className="min-w-24"
-                        data-testid="save-general-settings"
-                    >
-                        {processing ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : null}
-                        Save
-                    </Button>
-
-                    <Transition
-                        show={recentlySuccessful}
-                        enter="transition ease-in-out duration-300"
-                        enterFrom="opacity-0"
-                        leave="transition ease-in-out duration-300"
-                        leaveTo="opacity-0"
-                    >
-                        <p className="text-sm text-success">Saved</p>
-                    </Transition>
-                </div>
+                </SettingsRow>
             </form>
-        </div>
+        </SettingsSection>
     );
 }
 
@@ -348,23 +320,33 @@ function RegionalSettings({
     };
 
     return (
-        <div className="space-y-6">
-            <HeadingSmall
-                title="Regional Settings"
-                description="Configure currency and format preferences"
-            />
-
+        <SettingsSection
+            title="Regional Settings"
+            description="Configure currency and format preferences"
+            actions={
+                <SettingsSaveButton
+                    formId="regional-settings-form"
+                    processing={processing}
+                    recentlySuccessful={recentlySuccessful}
+                    testId="save-regional-settings"
+                />
+            }
+        >
             <form
+                id="regional-settings-form"
                 onSubmit={handleSubmit}
                 data-testid="regional-settings-form"
-                className="space-y-6"
             >
-                <div className="grid gap-2">
-                    <Label htmlFor="currency">Currency</Label>
+                <SettingsRow
+                    label="Currency"
+                    htmlFor="currency"
+                    description="Default currency for amounts across all modules."
+                    error={errors.currency}
+                >
                     <Select value={currency} onValueChange={setCurrency}>
                         <SelectTrigger
                             id="currency"
-                            className="mt-1 w-full"
+                            className="w-full"
                             data-testid="currency-select-trigger"
                         >
                             <SelectValue placeholder="Select currency" />
@@ -381,125 +363,72 @@ function RegionalSettings({
                         </SelectContent>
                     </Select>
                     <input type="hidden" name="currency" value={currency} />
-                    {errors.currency && (
-                        <p className="text-sm text-destructive">
-                            {errors.currency}
-                        </p>
-                    )}
-                </div>
+                </SettingsRow>
 
-                <div className="grid gap-2">
-                    <Label htmlFor="date_format">Date Format</Label>
+                <SettingsRow
+                    label="Date Format"
+                    htmlFor="date_format"
+                    description="PHP-style pattern, e.g. d/m/Y."
+                    error={errors.date_format}
+                >
                     <Input
                         id="date_format"
                         name="date_format"
                         defaultValue={settings?.date_format ?? 'd/m/Y'}
                         placeholder="e.g. d/m/Y"
-                        className="mt-1 block w-full"
                     />
-                    {errors.date_format && (
-                        <p className="text-sm text-destructive">
-                            {errors.date_format}
-                        </p>
-                    )}
-                </div>
+                </SettingsRow>
 
-                <div className="grid gap-2">
-                    <Label htmlFor="number_format_decimal">
-                        Decimal Separator
-                    </Label>
+                <SettingsRow
+                    label="Decimal Separator"
+                    htmlFor="number_format_decimal"
+                    description="Character between whole and fractional digits."
+                    error={errors.number_format_decimal}
+                >
                     <Input
                         id="number_format_decimal"
                         name="number_format_decimal"
                         defaultValue={settings?.number_format_decimal ?? ','}
                         placeholder="e.g. ,"
-                        className="mt-1 block w-full"
                     />
-                    {errors.number_format_decimal && (
-                        <p className="text-sm text-destructive">
-                            {errors.number_format_decimal}
-                        </p>
-                    )}
-                </div>
+                </SettingsRow>
 
-                <div className="grid gap-2">
-                    <Label htmlFor="number_format_thousand">
-                        Thousand Separator
-                    </Label>
+                <SettingsRow
+                    label="Thousand Separator"
+                    htmlFor="number_format_thousand"
+                    description="Character between groups of thousands."
+                    error={errors.number_format_thousand}
+                >
                     <Input
                         id="number_format_thousand"
                         name="number_format_thousand"
                         defaultValue={settings?.number_format_thousand ?? '.'}
                         placeholder="e.g. ."
-                        className="mt-1 block w-full"
                     />
-                    {errors.number_format_thousand && (
-                        <p className="text-sm text-destructive">
-                            {errors.number_format_thousand}
-                        </p>
-                    )}
-                </div>
+                </SettingsRow>
 
-                <div className="grid gap-2">
-                    <div className="flex items-start gap-3 rounded-md border px-3 py-2">
-                        <Checkbox
-                            id="number_format_hide_decimal"
-                            checked={hideDecimal}
-                            onCheckedChange={(checked) =>
-                                setHideDecimal(checked === true)
-                            }
-                            data-testid="hide-decimal-checkbox"
-                            className="mt-0.5"
-                        />
-                        <div className="space-y-1">
-                            <Label
-                                htmlFor="number_format_hide_decimal"
-                                className="cursor-pointer"
-                            >
-                                Hide Decimal Separator
-                            </Label>
-                            <p className="text-sm text-muted-foreground">
-                                Jika aktif, semua modul menampilkan angka tanpa
-                                desimal.
-                            </p>
-                        </div>
-                    </div>
+                <SettingsRow
+                    label="Hide Decimal Separator"
+                    htmlFor="number_format_hide_decimal"
+                    description="Jika aktif, semua modul menampilkan angka tanpa desimal."
+                    error={errors.number_format_hide_decimal}
+                >
+                    <Checkbox
+                        id="number_format_hide_decimal"
+                        checked={hideDecimal}
+                        onCheckedChange={(checked) =>
+                            setHideDecimal(checked === true)
+                        }
+                        data-testid="hide-decimal-checkbox"
+                    />
                     <input
                         type="hidden"
                         name="number_format_hide_decimal"
                         value={hideDecimal ? '1' : '0'}
                     />
-                    {errors.number_format_hide_decimal && (
-                        <p className="text-sm text-destructive">
-                            {errors.number_format_hide_decimal}
-                        </p>
-                    )}
-                </div>
-
-                <div className="flex items-center gap-4">
-                    <Button
-                        disabled={processing}
-                        className="min-w-24"
-                        data-testid="save-regional-settings"
-                    >
-                        {processing ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : null}
-                        Save
-                    </Button>
-
-                    <Transition
-                        show={recentlySuccessful}
-                        enter="transition ease-in-out duration-300"
-                        enterFrom="opacity-0"
-                        leave="transition ease-in-out duration-300"
-                        leaveTo="opacity-0"
-                    >
-                        <p className="text-sm text-success">Saved</p>
-                    </Transition>
-                </div>
+                </SettingsRow>
             </form>
-        </div>
+        </SettingsSection>
     );
 }
 
@@ -543,192 +472,149 @@ function SmtpSettings({
     };
 
     return (
-        <div className="space-y-6">
-            <HeadingSmall
+        <div className="space-y-12">
+            <SettingsSection
                 title="SMTP Settings"
                 description="Configure outgoing email server (SMTP) details"
-            />
-
-            <form
-                onSubmit={(e) =>
-                    submitJsonAdminSettings(
-                        e,
-                        setProcessing,
-                        setErrors,
-                        setRecentlySuccessful,
-                    )
+                actions={
+                    <SettingsSaveButton
+                        formId="smtp-settings-form"
+                        processing={processing}
+                        recentlySuccessful={recentlySuccessful}
+                        testId="save-smtp-settings"
+                    />
                 }
-                data-testid="smtp-settings-form"
-                className="space-y-6"
             >
-                <div className="grid gap-2">
-                    <Label htmlFor="mail_host">Mail Host</Label>
-                    <Input
-                        id="mail_host"
-                        name="mail_host"
-                        defaultValue={settings?.mail_host ?? ''}
-                        placeholder="e.g. smtp.mailgun.org"
-                        className="mt-1 block w-full"
-                    />
-                    {errors.mail_host && (
-                        <p className="text-sm text-destructive">
-                            {errors.mail_host}
-                        </p>
-                    )}
-                </div>
-
-                <div className="grid gap-2">
-                    <Label htmlFor="mail_port">Mail Port</Label>
-                    <Input
-                        id="mail_port"
-                        name="mail_port"
-                        defaultValue={settings?.mail_port ?? ''}
-                        placeholder="e.g. 587"
-                        className="mt-1 block w-full"
-                    />
-                    {errors.mail_port && (
-                        <p className="text-sm text-destructive">
-                            {errors.mail_port}
-                        </p>
-                    )}
-                </div>
-
-                <div className="grid gap-2">
-                    <Label htmlFor="mail_username">Mail Username</Label>
-                    <Input
-                        id="mail_username"
-                        name="mail_username"
-                        defaultValue={settings?.mail_username ?? ''}
-                        placeholder="e.g. postmaster@yourdomain.com"
-                        className="mt-1 block w-full"
-                    />
-                    {errors.mail_username && (
-                        <p className="text-sm text-destructive">
-                            {errors.mail_username}
-                        </p>
-                    )}
-                </div>
-
-                <div className="grid gap-2">
-                    <Label htmlFor="mail_password">Mail Password</Label>
-                    <Input
-                        id="mail_password"
-                        name="mail_password"
-                        type="password"
-                        defaultValue={settings?.mail_password ?? ''}
-                        placeholder="e.g. secret123"
-                        className="mt-1 block w-full"
-                    />
-                    {errors.mail_password && (
-                        <p className="text-sm text-destructive">
-                            {errors.mail_password}
-                        </p>
-                    )}
-                </div>
-
-                <div className="grid gap-2">
-                    <Label htmlFor="mail_encryption">Mail Encryption</Label>
-                    <Input
-                        id="mail_encryption"
-                        name="mail_encryption"
-                        defaultValue={settings?.mail_encryption ?? ''}
-                        placeholder="e.g. tls, ssl, or leave empty"
-                        className="mt-1 block w-full"
-                    />
-                    {errors.mail_encryption && (
-                        <p className="text-sm text-destructive">
-                            {errors.mail_encryption}
-                        </p>
-                    )}
-                </div>
-
-                <div className="grid gap-2">
-                    <Label htmlFor="mail_from_address">From Address</Label>
-                    <Input
-                        id="mail_from_address"
-                        name="mail_from_address"
-                        type="email"
-                        defaultValue={settings?.mail_from_address ?? ''}
-                        placeholder="e.g. noreply@yourdomain.com"
-                        className="mt-1 block w-full"
-                    />
-                    {errors.mail_from_address && (
-                        <p className="text-sm text-destructive">
-                            {errors.mail_from_address}
-                        </p>
-                    )}
-                </div>
-
-                <div className="grid gap-2">
-                    <Label htmlFor="mail_from_name">From Name</Label>
-                    <Input
-                        id="mail_from_name"
-                        name="mail_from_name"
-                        defaultValue={settings?.mail_from_name ?? ''}
-                        placeholder="e.g. My Company"
-                        className="mt-1 block w-full"
-                    />
-                    {errors.mail_from_name && (
-                        <p className="text-sm text-destructive">
-                            {errors.mail_from_name}
-                        </p>
-                    )}
-                </div>
-
-                <div className="flex items-center gap-4">
-                    <Button
-                        disabled={processing}
-                        className="min-w-24"
-                        data-testid="save-smtp-settings"
-                    >
-                        {processing ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : null}
-                        Save
-                    </Button>
-
-                    <Transition
-                        show={recentlySuccessful}
-                        enter="transition ease-in-out duration-300"
-                        enterFrom="opacity-0"
-                        leave="transition ease-in-out duration-300"
-                        leaveTo="opacity-0"
-                    >
-                        <p className="text-sm text-success">Saved</p>
-                    </Transition>
-                </div>
-            </form>
-
-            <Separator className="my-8" />
-
-            <div className="space-y-4">
-                <HeadingSmall
-                    title="Test SMTP Configuration"
-                    description="Send a test email to verify your settings are correct"
-                />
-
                 <form
-                    onSubmit={handleTestSubmit}
-                    data-testid="test-smtp-form"
-                    className="flex w-full items-start gap-4"
+                    id="smtp-settings-form"
+                    onSubmit={(e) =>
+                        submitJsonAdminSettings(
+                            e,
+                            setProcessing,
+                            setErrors,
+                            setRecentlySuccessful,
+                        )
+                    }
+                    data-testid="smtp-settings-form"
                 >
-                    <div className="flex-1 space-y-2">
-                        <div className="flex w-full items-center gap-4">
-                            <div className="flex-1">
-                                <Label htmlFor="test_email" className="sr-only">
-                                    Test Email
-                                </Label>
-                                <Input
-                                    id="test_email"
-                                    name="test_email"
-                                    type="email"
-                                    placeholder="Enter email to test..."
-                                    className="w-full"
-                                />
-                            </div>
+                    <SettingsRow
+                        label="Mail Host"
+                        htmlFor="mail_host"
+                        description="Hostname of the outgoing mail server."
+                        error={errors.mail_host}
+                    >
+                        <Input
+                            id="mail_host"
+                            name="mail_host"
+                            defaultValue={settings?.mail_host ?? ''}
+                            placeholder="e.g. smtp.mailgun.org"
+                        />
+                    </SettingsRow>
+                    <SettingsRow
+                        label="Mail Port"
+                        htmlFor="mail_port"
+                        description="Usually 587 (TLS) or 465 (SSL)."
+                        error={errors.mail_port}
+                    >
+                        <Input
+                            id="mail_port"
+                            name="mail_port"
+                            defaultValue={settings?.mail_port ?? ''}
+                            placeholder="e.g. 587"
+                        />
+                    </SettingsRow>
+                    <SettingsRow
+                        label="Mail Username"
+                        htmlFor="mail_username"
+                        description="Account used to authenticate with the server."
+                        error={errors.mail_username}
+                    >
+                        <Input
+                            id="mail_username"
+                            name="mail_username"
+                            defaultValue={settings?.mail_username ?? ''}
+                            placeholder="e.g. postmaster@yourdomain.com"
+                        />
+                    </SettingsRow>
+                    <SettingsRow
+                        label="Mail Password"
+                        htmlFor="mail_password"
+                        description="Password or app token for the account above."
+                        error={errors.mail_password}
+                    >
+                        <Input
+                            id="mail_password"
+                            name="mail_password"
+                            type="password"
+                            defaultValue={settings?.mail_password ?? ''}
+                            placeholder="e.g. secret123"
+                        />
+                    </SettingsRow>
+                    <SettingsRow
+                        label="Mail Encryption"
+                        htmlFor="mail_encryption"
+                        description="tls, ssl, or leave empty for none."
+                        error={errors.mail_encryption}
+                    >
+                        <Input
+                            id="mail_encryption"
+                            name="mail_encryption"
+                            defaultValue={settings?.mail_encryption ?? ''}
+                            placeholder="e.g. tls, ssl, or leave empty"
+                        />
+                    </SettingsRow>
+                    <SettingsRow
+                        label="From Address"
+                        htmlFor="mail_from_address"
+                        description="Sender address shown to recipients."
+                        error={errors.mail_from_address}
+                    >
+                        <Input
+                            id="mail_from_address"
+                            name="mail_from_address"
+                            type="email"
+                            defaultValue={settings?.mail_from_address ?? ''}
+                            placeholder="e.g. noreply@yourdomain.com"
+                        />
+                    </SettingsRow>
+                    <SettingsRow
+                        label="From Name"
+                        htmlFor="mail_from_name"
+                        description="Sender name shown to recipients."
+                        error={errors.mail_from_name}
+                    >
+                        <Input
+                            id="mail_from_name"
+                            name="mail_from_name"
+                            defaultValue={settings?.mail_from_name ?? ''}
+                            placeholder="e.g. My Company"
+                        />
+                    </SettingsRow>
+                </form>
+            </SettingsSection>
+
+            <SettingsSection
+                title="Test SMTP Configuration"
+                description="Send a test email to verify your settings are correct"
+            >
+                <form onSubmit={handleTestSubmit} data-testid="test-smtp-form">
+                    <SettingsRow
+                        label="Test Email"
+                        htmlFor="test_email"
+                        description="Recipient for the test message. Save your settings first."
+                        error={testErrors.test_email}
+                    >
+                        <div className="flex gap-2">
+                            <Input
+                                id="test_email"
+                                name="test_email"
+                                type="email"
+                                placeholder="Enter email to test..."
+                                className="flex-1"
+                            />
                             <Button
+                                variant="secondary"
                                 disabled={testProcessing}
-                                className="min-w-32"
                                 data-testid="send-test-email"
                             >
                                 {testProcessing ? (
@@ -739,13 +625,6 @@ function SmtpSettings({
                                     : 'Send Test Email'}
                             </Button>
                         </div>
-
-                        {testErrors.test_email && (
-                            <p className="text-sm text-destructive">
-                                {testErrors.test_email}
-                            </p>
-                        )}
-
                         <Transition
                             show={testRecentlySuccessful}
                             enter="transition ease-in-out duration-300"
@@ -757,9 +636,9 @@ function SmtpSettings({
                                 Test email sent successfully! Check your inbox.
                             </p>
                         </Transition>
-                    </div>
+                    </SettingsRow>
                 </form>
-            </div>
+            </SettingsSection>
         </div>
     );
 }
@@ -867,21 +746,30 @@ function AuthenticationSettings({
     ];
 
     return (
-        <div className="space-y-6">
-            <HeadingSmall
-                title="Authentication"
-                description="Manage sign-in methods and allowed organizations"
-            />
-
+        <SettingsSection
+            title="Authentication"
+            description="Manage sign-in methods and allowed organizations"
+            actions={
+                <SettingsSaveButton
+                    formId="authentication-settings-form"
+                    processing={processing}
+                    recentlySuccessful={recentlySuccessful}
+                    testId="save-authentication-settings"
+                />
+            }
+        >
             <form
+                id="authentication-settings-form"
                 onSubmit={handleSubmit}
                 data-testid="authentication-settings-form"
-                className="space-y-6"
             >
                 {toggles.map((toggle) => (
-                    <div
+                    <SettingsRow
                         key={toggle.key}
-                        className="flex items-start gap-3 rounded-md border px-3 py-2"
+                        label={toggle.label}
+                        htmlFor={toggle.key}
+                        description={toggle.description}
+                        error={errors[toggle.key]}
                     >
                         <Checkbox
                             id={toggle.key}
@@ -890,32 +778,22 @@ function AuthenticationSettings({
                                 toggle.set(checked === true)
                             }
                             data-testid={toggle.testId}
-                            className="mt-0.5"
                         />
-                        <div className="space-y-1">
-                            <Label
-                                htmlFor={toggle.key}
-                                className="cursor-pointer"
-                            >
-                                {toggle.label}
-                            </Label>
-                            <p className="text-sm text-muted-foreground">
-                                {toggle.description}
-                            </p>
-                        </div>
                         <input
                             type="hidden"
                             name={toggle.key}
                             value={toggle.checked ? '1' : '0'}
                         />
-                    </div>
+                    </SettingsRow>
                 ))}
 
-                <div className="grid gap-2">
-                    <Label htmlFor="social_login_allowed_domains">
-                        Allowed email domains
-                    </Label>
-                    <textarea
+                <SettingsRow
+                    label="Allowed email domains"
+                    htmlFor="social_login_allowed_domains"
+                    description="Comma-separated. Leave empty to deny all Workspace sign-ins."
+                    error={errors.social_login_allowed_domains}
+                >
+                    <Textarea
                         id="social_login_allowed_domains"
                         name="social_login_allowed_domains"
                         defaultValue={(
@@ -923,25 +801,17 @@ function AuthenticationSettings({
                         ).join(', ')}
                         placeholder="example.com, subsidiary.example"
                         rows={3}
-                        className="flex min-h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                         data-testid="social-allowed-domains"
                     />
-                    <p className="text-sm text-muted-foreground">
-                        Comma-separated. Leave empty to deny all Workspace
-                        sign-ins.
-                    </p>
-                    {errors.social_login_allowed_domains && (
-                        <p className="text-sm text-destructive">
-                            {errors.social_login_allowed_domains}
-                        </p>
-                    )}
-                </div>
+                </SettingsRow>
 
-                <div className="grid gap-2">
-                    <Label htmlFor="social_login_allowed_tenants">
-                        Allowed Microsoft tenants
-                    </Label>
-                    <textarea
+                <SettingsRow
+                    label="Allowed Microsoft tenants"
+                    htmlFor="social_login_allowed_tenants"
+                    description="Comma-separated. Leave empty to deny all Microsoft 365 sign-ins."
+                    error={errors.social_login_allowed_tenants}
+                >
+                    <Textarea
                         id="social_login_allowed_tenants"
                         name="social_login_allowed_tenants"
                         defaultValue={(
@@ -949,44 +819,11 @@ function AuthenticationSettings({
                         ).join(', ')}
                         placeholder="tenant-id"
                         rows={3}
-                        className="flex min-h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                         data-testid="social-allowed-tenants"
                     />
-                    <p className="text-sm text-muted-foreground">
-                        Comma-separated. Leave empty to deny all Microsoft 365
-                        sign-ins.
-                    </p>
-                    {errors.social_login_allowed_tenants && (
-                        <p className="text-sm text-destructive">
-                            {errors.social_login_allowed_tenants}
-                        </p>
-                    )}
-                </div>
-
-                <div className="flex items-center gap-4">
-                    <Button
-                        disabled={processing}
-                        className="min-w-24"
-                        data-testid="save-authentication-settings"
-                    >
-                        {processing ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : null}
-                        Save
-                    </Button>
-
-                    <Transition
-                        show={recentlySuccessful}
-                        enter="transition ease-in-out duration-300"
-                        enterFrom="opacity-0"
-                        leave="transition ease-in-out duration-300"
-                        leaveTo="opacity-0"
-                    >
-                        <p className="text-sm text-success">Saved</p>
-                    </Transition>
-                </div>
+                </SettingsRow>
             </form>
-        </div>
+        </SettingsSection>
     );
 }
 
