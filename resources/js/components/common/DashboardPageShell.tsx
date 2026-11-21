@@ -1,9 +1,9 @@
+import { PageBanner } from '@/components/common/PageBanner';
 import { PageHeader } from '@/components/common/PageHeader';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
-import { AlertCircle, RefreshCw } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 
 interface DashboardPageShellProps {
@@ -48,11 +48,11 @@ export default function DashboardPageShell({
                         <>
                             {toolbar}
                             <Button
-                                variant="outline"
+                                variant="secondary"
                                 size="sm"
                                 onClick={() => refetch()}
                                 disabled={isLoading}
-                                className="flex items-center gap-2"
+                                className="gap-2"
                             >
                                 <RefreshCw
                                     className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`}
@@ -64,15 +64,9 @@ export default function DashboardPageShell({
                 />
 
                 {isError && (
-                    <Alert variant="destructive" className="mb-4">
-                        <AlertCircle className="h-4 w-4" />
-                        <AlertTitle>{errorTitle}</AlertTitle>
-                        <AlertDescription className="mt-2 max-w-lg text-sm">
-                            {error instanceof Error
-                                ? error.message
-                                : errorMessage}
-                        </AlertDescription>
-                    </Alert>
+                    <PageBanner tone="destructive" title={errorTitle}>
+                        {error instanceof Error ? error.message : errorMessage}
+                    </PageBanner>
                 )}
 
                 {children}

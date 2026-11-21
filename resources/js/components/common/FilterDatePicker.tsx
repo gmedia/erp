@@ -14,6 +14,8 @@ import { CalendarIcon } from 'lucide-react';
 
 interface FilterDatePickerProps {
     label?: string;
+    /** Tampilkan label sebagai prefix di dalam tombol (toolbar satu baris). */
+    inlineLabel?: boolean;
     value?: string;
     onChange?: (e: { target: { value: string } }) => void;
     placeholder?: string;
@@ -22,6 +24,7 @@ interface FilterDatePickerProps {
 
 export function FilterDatePicker({
     label,
+    inlineLabel = false,
     value,
     onChange,
     placeholder = 'Pick a date',
@@ -44,7 +47,9 @@ export function FilterDatePicker({
 
     return (
         <div className="space-y-2">
-            {label && <label className="text-sm font-medium">{label}</label>}
+            {label && !inlineLabel && (
+                <label className="text-sm font-medium">{label}</label>
+            )}
             <Popover>
                 <PopoverTrigger asChild>
                     <Button
@@ -56,6 +61,11 @@ export function FilterDatePicker({
                         )}
                     >
                         <CalendarIcon className="mr-2 h-4 w-4" />
+                        {label && inlineLabel && (
+                            <span className="mr-1.5 text-muted-foreground">
+                                {label}
+                            </span>
+                        )}
                         {date ? (
                             formatDateByRegionalSettings(date)
                         ) : (

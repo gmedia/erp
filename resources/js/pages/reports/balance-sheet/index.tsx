@@ -1,3 +1,4 @@
+import { PageBanner } from '@/components/common/PageBanner';
 import { ComputedSectionsCard } from '@/components/reports/financial/ComputedSectionsCard';
 import { FinancialReportExportButton } from '@/components/reports/financial/FinancialReportExportButton';
 import {
@@ -16,11 +17,9 @@ import {
     FinancialStatusBadge,
     FinancialSummaryCard,
 } from '@/components/reports/financial/FinancialSummaryCard';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { useExport } from '@/hooks/useExport';
 import { formatCurrency } from '@/lib/utils';
-import { AlertTriangle } from 'lucide-react';
 
 interface BalanceSheetResponse {
     fiscalYears: FinancialReportFiscalYear[];
@@ -178,19 +177,12 @@ export default function BalanceSheet() {
                     </div>
 
                     {!isBalanced && (
-                        <Alert
-                            variant="destructive"
-                            className="border-destructive/40 bg-destructive/10 text-destructive"
-                        >
-                            <AlertTriangle className="h-4 w-4" />
-                            <AlertTitle>Unbalanced</AlertTitle>
-                            <AlertDescription>
-                                Difference:{' '}
-                                <span className="font-medium tabular-nums">
-                                    {formatCurrency(difference)}
-                                </span>
-                            </AlertDescription>
-                        </Alert>
+                        <PageBanner tone="destructive" title="Unbalanced">
+                            Difference:{' '}
+                            <span className="font-medium tabular-nums">
+                                {formatCurrency(difference)}
+                            </span>
+                        </PageBanner>
                     )}
                 </FinancialSummaryCard>
 

@@ -25,18 +25,17 @@ export const AgingFilters = memo<AgingFiltersProps>(function AgingFilters({
     onBranchChange,
 }) {
     return (
-        <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+        <div className="flex flex-wrap items-center gap-2">
             <FilterDatePicker
-                label="As of Date"
+                label="As of"
+                inlineLabel
+                className="w-auto"
                 value={asOfDate}
                 onChange={(e) => onAsOfDateChange(e.target.value)}
             />
 
-            <div className="flex flex-col gap-1.5">
-                <label
-                    htmlFor="branch-select"
-                    className="text-sm font-medium text-muted-foreground"
-                >
+            <div>
+                <label htmlFor="branch-select" className="sr-only">
                     Branch
                 </label>
                 <Select

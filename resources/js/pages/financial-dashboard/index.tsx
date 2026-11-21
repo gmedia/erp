@@ -1,7 +1,6 @@
 import DashboardPageShell from '@/components/common/DashboardPageShell';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { PageBanner } from '@/components/common/PageBanner';
 import { BreadcrumbItem } from '@/types';
-import { Info } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AsyncSelect } from '../../components/common/AsyncSelect';
@@ -101,11 +100,8 @@ export default function FinancialDashboard() {
             breadcrumbs={breadcrumbs}
             toolbar={
                 <>
-                    <div className="flex flex-col gap-1.5" id="branch-filter">
-                        <label
-                            className="text-sm font-medium text-muted-foreground"
-                            htmlFor="branch-filter"
-                        >
+                    <div id="branch-filter">
+                        <label className="sr-only" htmlFor="branch-filter">
                             Branch
                         </label>
                         <AsyncSelect
@@ -134,19 +130,12 @@ export default function FinancialDashboard() {
             refetch={refetch}
         >
             {showSegmentBanner && (
-                <Alert className="border-info/30 bg-info/10 text-info">
-                    <Info className="h-4 w-4 text-info" />
-                    <AlertTitle className="font-semibold">
-                        Segment view — Branch P&L
-                    </AlertTitle>
-                    <AlertDescription className="mt-1 text-sm">
-                        Revenue, Expenses, and Net Income reflect this
-                        branch&apos;s segment only and exclude company-wide /
-                        unallocated entries (period-closing, depreciation).
-                        Total Assets, Liabilities, Equity, and Cash Balance
-                        remain company-wide.
-                    </AlertDescription>
-                </Alert>
+                <PageBanner tone="info" title="Segment view — Branch P&L">
+                    Revenue, Expenses, and Net Income reflect this branch&apos;s
+                    segment only and exclude company-wide / unallocated entries
+                    (period-closing, depreciation). Total Assets, Liabilities,
+                    Equity, and Cash Balance remain company-wide.
+                </PageBanner>
             )}
 
             <div className="space-y-6">
