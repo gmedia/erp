@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
 # Route Artisan calls from Playwright global-setup into the Sail app container.
 # Playwright itself runs on the host; only PHP/Artisan needs the container.
+# Fallback: bila shell ini tidak bisa akses socket Docker tetapi user terdaftar
+# di group 'docker' di /etc/group (shell belum memuat group-nya), lompat via
+# 'sg docker' yang membaca ulang membership dari /etc/group.
+if ! docker ps >/dev/null 2>&1 \
+    && command -v sg >/dev/null 2>&1 \
+    && sg docker -c 'docker ps' >/dev/null 2>&1; then
+    exec sg docker -c "./vendor/bin/sail php $*"
+fi
 exec ./vendor/bin/sail php "$@"
