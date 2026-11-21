@@ -26,7 +26,7 @@
 | W4-G4 | P1  | W4-07, W4-08, W4-18               | Dashboard: KPI terpotong, filter satu baris, pipeline dashboard           | **merged #313** |
 | W4-G5 | P2  | W4-09, W4-11, W4-12, W4-14        | Aksi baris, formatter nilai mentah, link email/telepon, upload logo       | open #306 |
 | W4-G6 | P2  | W4-13, W4-15, W4-16, W4-17        | Font, toolbar mobile, sidebar footer, My Approvals                        | open #307 |
-| W4-G7 | P1  | W4-19, W4-20, W4-21, W4-22, W4-24 | Report: query sebelum pilihan, pagination, comparative, empty state, i18n | open #308 |
+| W4-G7 | P1  | W4-19, W4-20, W4-21, W4-22, W4-24 | Report: query sebelum pilihan, pagination, comparative, empty state, i18n | **merged #314** |
 | W4-G8 | P2  | W4-23                             | Seeder & logic report yang membuat data tampil tidak konsisten            | open #309 |
 
 ## Exception rows
