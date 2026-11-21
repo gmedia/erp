@@ -5,6 +5,7 @@ import {
     createReportWarehouseColumn,
 } from '@/components/common/ReportColumns';
 import { createNumberColumn } from '@/utils/columns';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
 import type { ColumnDef } from '@tanstack/react-table';
 
 export type StockAdjustmentReportItem = {
@@ -27,7 +28,10 @@ export const stockAdjustmentReportColumns: ColumnDef<StockAdjustmentReportItem>[
         createReportTextColumn<StockAdjustmentReportItem>({
             accessorKey: 'adjustment_date',
             header: 'Adjustment Date',
-            getValue: (item) => item.adjustment_date,
+            getValue: (item) =>
+                item.adjustment_date
+                    ? formatDateByRegionalSettings(item.adjustment_date)
+                    : '-',
             sortable: true,
         }),
         createReportTextColumn<StockAdjustmentReportItem>({

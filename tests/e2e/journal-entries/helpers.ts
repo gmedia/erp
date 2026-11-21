@@ -126,11 +126,13 @@ export async function editJournalEntry(
     const row = page.locator('tr', { hasText: query }).first();
     await expect(row).toBeVisible();
 
-    const editBtn = row.locator('button:has(svg.lucide-pencil)'); 
-    if (!await editBtn.isVisible()) {
-        throw new Error(`Edit button not found for ${query}. Status might not be 'draft'.`);                                                                        
+    // Aksi baris kini menu "..." standar (W4-09); Edit hanya untuk draft.
+    await row.getByRole('button', { name: 'Actions' }).first().click();
+    const editItem = page.getByRole('menuitem', { name: 'Edit' });
+    if (!(await editItem.isVisible().catch(() => false))) {
+        throw new Error(`Edit action not available for ${query}. Status might not be 'draft'.`);
     }
-    await editBtn.click();
+    await editItem.click();
 
     const dialog = page.getByRole('dialog', { name: /Edit/i }).first();
     await expect(dialog).toBeVisible();
@@ -149,20 +151,20 @@ export async function viewJournalEntry(page: Page, query: string): Promise<void>
     await searchJournalEntry(page, query);
     const row = page.locator('tr', { hasText: query }).first();
     await expect(row).toBeVisible();
-    const viewBtn = row.locator('button:has(svg.lucide-eye)'); 
-    await expect(viewBtn).toBeVisible();
-    await viewBtn.click();
+    await row.getByRole('button', { name: 'Actions' }).first().click();
+    await page.getByRole('menuitem', { name: 'View' }).click();
 }
 
 export async function deleteJournalEntry(page: Page, query: string): Promise<void> {                                                                                
     await searchJournalEntry(page, query);
 
-  const deleteBtn = page
+  await page
     .locator('tr', { hasText: query })
     .first()
-    .locator('button:has(svg.lucide-trash)');
-  await expect(deleteBtn).toBeVisible();
-  await deleteBtn.click();
+    .getByRole('button', { name: 'Actions' })
+    .first()
+    .click();
+  await page.getByRole('menuitem', { name: 'Delete' }).click();
 
   const confirmDialog = page.getByRole('alertdialog').first();
   if (await confirmDialog.isVisible().catch(() => false)) {

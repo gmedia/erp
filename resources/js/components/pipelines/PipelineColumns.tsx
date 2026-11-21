@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge';
-import { statusBadgeVariant } from '@/lib/status-badge';
+import { formatClassName, statusBadgeVariant } from '@/lib/status-badge';
 import { type Pipeline } from '@/types/entity';
 import {
     createActionsColumn,
@@ -29,10 +29,9 @@ export const pipelineColumns: ColumnDef<Pipeline>[] = [
     {
         accessorKey: 'entity_type',
         ...createSortingHeader('Entity'),
-        cell: ({ row }: { row: { original: Pipeline } }) => {
-            const parts = row.original.entity_type.split('\\');
-            return parts.at(-1) ?? '';
-        },
+        cell: ({ row }: { row: { original: Pipeline } }) => (
+            <span>{formatClassName(row.original.entity_type)}</span>
+        ),
     },
     {
         accessorKey: 'version',

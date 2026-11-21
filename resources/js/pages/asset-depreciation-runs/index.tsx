@@ -2,6 +2,7 @@
 
 import { CalculateFormModal } from '@/components/asset-depreciation-runs/CalculateFormModal';
 import { RunLinesModal } from '@/components/asset-depreciation-runs/RunLinesModal';
+import { GenericActions } from '@/components/common/ActionsDropdown';
 import { DataTablePagination } from '@/components/common/DataTablePagination';
 import {
     buildStandalonePaginationView,
@@ -11,6 +12,7 @@ import {
 } from '@/components/common/StandaloneTablePage';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import {
     Table,
     TableBody,
@@ -24,7 +26,7 @@ import { BreadcrumbItem } from '@/types';
 import { AssetDepreciationRun } from '@/types/asset-depreciation-run';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { type AssetDepreciationCalculationFormData } from '@/utils/schemas';
-import { Calculator, CheckCircle2, Eye, Loader2, Plus } from 'lucide-react';
+import { Calculator, CheckCircle2, Loader2, Plus } from 'lucide-react';
 import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -137,32 +139,31 @@ export default function Index() {
                     </span>
                 </TableCell>
                 <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            title="View Lines"
-                            onClick={() => setViewRunId(item.id)}
-                        >
-                            <Eye className="h-4 w-4" />
-                        </Button>
-
-                        {item.status === 'calculated' && (
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-8 px-2"
-                                disabled={isPosting === item.id}
-                                onClick={() => postToJournal(item.id)}
-                            >
-                                {isPosting === item.id ? (
-                                    <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-                                ) : (
-                                    <CheckCircle2 className="mr-1 h-4 w-4 text-success" />
-                                )}
-                                Post
-                            </Button>
-                        )}
+                    <div className="flex justify-end">
+                        <GenericActions
+                            item={item}
+                            onView={() => setViewRunId(item.id)}
+                            extraItems={
+                                item.status === 'calculated'
+                                    ? [
+                                          <DropdownMenuItem
+                                              key="post"
+                                              disabled={isPosting === item.id}
+                                              onClick={() =>
+                                                  postToJournal(item.id)
+                                              }
+                                          >
+                                              {isPosting === item.id ? (
+                                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                              ) : (
+                                                  <CheckCircle2 className="mr-2 h-4 w-4 text-success" />
+                                              )}
+                                              Post
+                                          </DropdownMenuItem>,
+                                      ]
+                                    : undefined
+                            }
+                        />
                     </div>
                 </TableCell>
             </TableRow>

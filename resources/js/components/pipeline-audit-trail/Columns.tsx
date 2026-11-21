@@ -1,9 +1,9 @@
+import { GenericActions } from '@/components/common/ActionsDropdown';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { formatClassName } from '@/lib/status-badge';
 import { createSortingHeader } from '@/utils/columns';
 import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import { ColumnDef } from '@tanstack/react-table';
-import { Eye } from 'lucide-react';
 
 export interface PipelineAuditTrailItem {
     id: number;
@@ -57,7 +57,9 @@ export const createPipelineAuditTrailColumns = ({
     {
         accessorKey: 'entity_type',
         ...createSortingHeader('Entity Type'),
-        cell: ({ row }) => <div>{row.original.entity_type_short}</div>,
+        cell: ({ row }) => (
+            <div>{formatClassName(row.original.entity_type)}</div>
+        ),
     },
     {
         accessorKey: 'entity_id',
@@ -140,16 +142,7 @@ export const createPipelineAuditTrailColumns = ({
         id: 'actions',
         cell: ({ row }) => {
             const item = row.original;
-            return (
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onViewDetail(item)}
-                    title="View Details"
-                >
-                    <Eye className="h-4 w-4" />
-                </Button>
-            );
+            return <GenericActions item={item} onView={onViewDetail} />;
         },
     },
 ];

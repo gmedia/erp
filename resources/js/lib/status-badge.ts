@@ -191,6 +191,23 @@ export function stocktakeVarianceBadgeVariant(
     }
 }
 
+// Nama class PHP/FQCN → label manusiawi (mis. App\Models\PurchaseRequest →
+// "Purchase Request", SupplierBill → "Supplier Bill") untuk kolom Entity/
+// Approvable/Document Type (W4-11).
+export function formatClassName(value: string | null | undefined): string {
+    if (!value) {
+        return '-';
+    }
+
+    const short = value.split('\\').pop() ?? value;
+
+    return short
+        .replaceAll('_', ' ')
+        .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
 // Humanize label status: snake_case/huruf kecil → Title Case.
 // Nilai yang sudah berupa Title Case ("Bank Transfer", "Raw Material")
 // tidak berubah.

@@ -18,7 +18,8 @@ test.describe('Journal Entry date field', () => {
             .first();
         await expect(row).toBeVisible();
 
-        await row.locator('button:has(svg.lucide-pencil)').click();
+        await row.getByRole('button', { name: 'Actions' }).first().click();
+        await page.getByRole('menuitem', { name: 'Edit' }).click();
 
         const dialog = page.getByRole('dialog', { name: /Edit/i }).first();
         await expect(dialog).toBeVisible();

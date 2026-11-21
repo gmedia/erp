@@ -1,5 +1,6 @@
 'use client';
 
+import { GenericActions } from '@/components/common/ActionsDropdown';
 import { Button } from '@/components/ui/button';
 import {
     Tooltip,
@@ -12,11 +13,9 @@ import { type Account } from '@/types/account';
 import {
     ChevronDown,
     ChevronRight,
-    Edit,
     FileText,
     Folder,
     Plus,
-    Trash2,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -111,37 +110,11 @@ function AccountTreeNode({
                             <TooltipContent>Add Child Account</TooltipContent>
                         </Tooltip>
 
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    type="button"
-                                    size="icon"
-                                    variant="ghost"
-                                    className="h-8 w-8 text-info"
-                                    aria-label="Edit account"
-                                    onClick={() => onEdit(account)}
-                                >
-                                    <Edit className="h-4 w-4" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>Edit Account</TooltipContent>
-                        </Tooltip>
-
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    type="button"
-                                    size="icon"
-                                    variant="ghost"
-                                    className="h-8 w-8 text-destructive"
-                                    aria-label="Delete account"
-                                    onClick={() => onDelete(account)}
-                                >
-                                    <Trash2 className="h-4 w-4" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>Delete Account</TooltipContent>
-                        </Tooltip>
+                        <GenericActions
+                            item={account}
+                            onEdit={onEdit}
+                            onDelete={onDelete}
+                        />
                     </TooltipProvider>
                 </div>
             </div>
