@@ -5,6 +5,7 @@ namespace App\Actions\Reports;
 use App\Actions\FiscalYears\GetPreferredFiscalYearAction;
 use App\Models\AccountBalance;
 use App\Models\FiscalYear;
+use Illuminate\Support\Collection;
 
 class GetTrialBalanceReportAction
 {
@@ -25,26 +26,35 @@ class GetTrialBalanceReportAction
 
         $periodMonth = $this->intOrNull($filters['period_month'] ?? null);
         $periodYear = $this->intOrNull($filters['period_year'] ?? null);
-
-        if ($periodYear === null) {
-            $periodYear = FiscalYear::query()
-                ->whereKey($fiscalYearId)
-                ->value('start_date')?->year;
-        }
+        $periodSelected = $periodMonth !== null || $periodYear !== null;
 
         $query = AccountBalance::query()
             ->with('account')
             ->where('fiscal_year_id', $fiscalYearId);
 
-        if ($periodMonth !== null) {
-            $query->where('period_month', $periodMonth);
+        if ($periodSelected) {
+            if ($periodYear === null) {
+                $periodYear = FiscalYear::query()
+                    ->whereKey($fiscalYearId)
+                    ->value('start_date')?->year;
+            }
+
+            if ($periodMonth !== null) {
+                $query->where('period_month', $periodMonth);
+            }
+
+            if ($periodYear !== null) {
+                $query->where('period_year', $periodYear);
+            }
         }
 
-        if ($periodYear !== null) {
-            $query->where('period_year', $periodYear);
-        }
+        $balances = $query->get();
 
-        $rows = $query->get()
+        $rows = ($periodSelected
+            ? $balances
+            : $balances->groupBy('account_id')->map(
+                fn ($group) => $this->mergeBalances($group),
+            )->values())
             ->map(fn (AccountBalance $balance): array => $this->row($balance));
 
         $totalDebit = $rows->sum('debit_balance');
@@ -86,6 +96,23 @@ class GetTrialBalanceReportAction
         return (int) $value;
     }
 
+    /**
+     * Gabungkan saldo beberapa periode menjadi satu baris per akun (dipakai
+     * saat periode tidak dipilih, agar akun tidak tampil berulang — W4-20).
+     *
+     * @param  Collection<int, AccountBalance>  $group
+     */
+    private function mergeBalances($group): AccountBalance
+    {
+        $first = $group->first();
+        $first->opening_balance = $group->sum('opening_balance');
+        $first->debit_total = $group->sum('debit_total');
+        $first->credit_total = $group->sum('credit_total');
+        $first->closing_balance = $group->sum('closing_balance');
+
+        return $first;
+    }
+
     private function row(AccountBalance $balance): array
     {
         $closing = (float) $balance->closing_balance;
@@ -95,6 +122,8 @@ class GetTrialBalanceReportAction
             'account_code' => $balance->account->code,
             'account_name' => $balance->account->name,
             'account_type' => $balance->account->type,
+            'period_month' => $balance->period_month,
+            'period_year' => $balance->period_year,
             'opening_balance' => (float) $balance->opening_balance,
             'debit_total' => (float) $balance->debit_total,
             'credit_total' => (float) $balance->credit_total,

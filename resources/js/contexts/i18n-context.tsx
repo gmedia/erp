@@ -150,6 +150,23 @@ const defaultTranslations: Translations = {
         en: 'English',
         id: 'Indonesian',
     },
+    reports: {
+        sections: {
+            operating_header: 'Cash Flows from Operating Activities',
+            net_income_source: 'Net Income',
+            depreciation_addback: 'Depreciation',
+            working_capital_changes: 'Changes in Working Capital',
+            operating_cash_flow: 'Net Cash from Operating Activities',
+            investing_header: 'Cash Flows from Investing Activities',
+            fixed_asset_activity: 'Fixed Asset Activity',
+            investing_cash_flow: 'Net Cash from Investing Activities',
+            financing_header: 'Cash Flows from Financing Activities',
+            long_term_debt_activity: 'Long-term Borrowings',
+            equity_activity: 'Paid-in Capital',
+            financing_cash_flow: 'Net Cash from Financing Activities',
+            net_change: 'Net Increase/Decrease in Cash',
+        },
+    },
 };
 
 // Provider props - accepts translations as props for flexibility

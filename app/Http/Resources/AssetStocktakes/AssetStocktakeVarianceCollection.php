@@ -22,6 +22,8 @@ class AssetStocktakeVarianceCollection extends ResourceCollection
                 'last_page' => $this->resource->lastPage(),
                 'per_page' => $this->resource->perPage(),
                 'total' => $this->resource->total(),
+                'from' => $this->resource->firstItem(),
+                'to' => $this->resource->lastItem(),
             ],
         ];
     }

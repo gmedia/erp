@@ -27,6 +27,11 @@ test.describe('Asset Stocktake Variance Report E2E', () => {
         // Apply filters to close dialog
         await dialog.getByRole('button', { name: 'Apply Filters' }).click();
 
+        // Pagination info must reflect visible rows, not "0 to 0" (W4-20)
+        const pagination = page.getByText(/Showing \d+ to \d+ of \d+/);
+        await expect(pagination).toBeVisible();
+        await expect(pagination).not.toHaveText(/Showing 0 to 0 of 1/);
+
         // Should be able to export
         const exportBtn = page.getByRole('button', { name: 'Export', exact: true });
         await expect(exportBtn).toBeVisible();

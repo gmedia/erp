@@ -159,6 +159,8 @@ export interface DataTableProps<T> {
     extraToolbarActions?: React.ReactNode;
     /** Optional entity name for default search placeholder */
     entityName?: string;
+    /** Ganti pesan kosong default (mis. prompt instruktif filter wajib). */
+    emptyState?: React.ReactNode;
 }
 
 /**
@@ -193,6 +195,7 @@ export function DataTable<T>({
     extraActionItems,
     extraToolbarActions,
     entityName,
+    emptyState,
 }: Readonly<DataTableProps<T>>) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnVisibility, setColumnVisibility] =
@@ -427,7 +430,7 @@ export function DataTable<T>({
                     colSpan={columnsWithActions.length}
                     className="h-16 py-6 text-center text-sm text-muted-foreground"
                 >
-                    No results.
+                    {emptyState ?? 'No results.'}
                 </TableCell>
             </TableRow>
         );

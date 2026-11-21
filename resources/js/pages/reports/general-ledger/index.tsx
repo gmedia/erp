@@ -32,6 +32,8 @@ export default function GeneralLedgerReportPage() {
             queryKey={['general-ledger-report']}
             entityName="General Ledger"
             exportEndpoint="/api/reports/general-ledger/export"
+            requiredFilters={['account_id']}
+            requiredFilterHint="Pilih akun (dan periode) pada filter untuk melihat buku besar."
         />
     );
 }

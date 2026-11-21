@@ -8,6 +8,16 @@ test.describe('Trial Balance Detailed Report', () => {
         await login(page, undefined, undefined, { requireDashboard: false });
     });
 
+    test('shows instructive prompt before fiscal year is selected', async ({
+        page,
+    }) => {
+        await page.goto('/reports/trial-balance-detailed');
+
+        await expect(
+            page.getByTestId('report-filter-prompt'),
+        ).toBeVisible({ timeout: 15000 });
+    });
+
     test('can view trial balance detailed report', async ({ page }) => {
         await page.goto('/reports/trial-balance-detailed');
 

@@ -8,6 +8,7 @@ import { useCrudFilters } from '@/hooks/useCrudFilters';
 import { useCrudQuery } from '@/hooks/useCrudQuery';
 import AppLayout from '@/layouts/app-layout';
 import type { ColumnDef } from '@tanstack/react-table';
+import { Filter } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Helmet } from 'react-helmet-async';
 
@@ -50,7 +51,44 @@ type ReportDataTablePageProps<
     exportEndpoint: string;
     onView?: (item: TData) => void;
     children?: ReactNode;
+    /**
+     * Filter yang wajib dipilih sebelum query dijalankan (mis. `budget_id`,
+     * `account_id`). Selama kosong, halaman menampilkan empty state
+     * instruktif dan tidak memanggil API (W4-19/W4-22).
+     */
+    requiredFilters?: readonly (keyof TFilters & string)[];
+    /** Pesan empty state saat `requiredFilters` belum lengkap. */
+    requiredFilterHint?: string;
 };
+
+function hasAllRequiredFilters(
+    filters: Record<string, unknown>,
+    required: readonly string[] | undefined,
+): boolean {
+    if (!required || required.length === 0) {
+        return true;
+    }
+
+    return required.every((key) => {
+        const value = filters[key];
+        return value !== undefined && value !== null && String(value) !== '';
+    });
+}
+
+function ReportSelectFilterPrompt({ hint }: Readonly<{ hint: string }>) {
+    return (
+        <div
+            data-testid="report-filter-prompt"
+            className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed px-6 py-16 text-center"
+        >
+            <Filter className="size-8 text-muted-foreground" aria-hidden />
+            <p className="text-sm font-medium text-foreground">
+                Pilih filter untuk menampilkan laporan
+            </p>
+            <p className="max-w-md text-sm text-muted-foreground">{hint}</p>
+        </div>
+    );
+}
 
 export function ReportDataTablePage<
     TData,
@@ -68,6 +106,8 @@ export function ReportDataTablePage<
     exportEndpoint,
     onView,
     children,
+    requiredFilters,
+    requiredFilterHint,
 }: Readonly<ReportDataTablePageProps<TData, TFilters>>) {
     const {
         filters,
@@ -81,12 +121,18 @@ export function ReportDataTablePage<
         initialFilters,
     });
 
+    const ready = hasAllRequiredFilters(
+        filters as Record<string, unknown>,
+        requiredFilters,
+    );
+
     const { data, isLoading, meta } = useCrudQuery<TData>({
         endpoint,
         queryKey,
         entityName,
         pagination,
         filters,
+        enabled: ready,
     });
 
     return (
@@ -100,14 +146,14 @@ export function ReportDataTablePage<
                     <div>
                         <DataTable
                             columns={columns}
-                            data={data}
+                            data={ready ? data : []}
                             pagination={{
                                 page: meta.current_page,
                                 per_page: meta.per_page,
-                                total: meta.total,
+                                total: ready ? meta.total : 0,
                                 last_page: meta.last_page,
-                                from: meta.from ?? 0,
-                                to: meta.to ?? 0,
+                                from: ready ? (meta.from ?? 0) : 0,
+                                to: ready ? (meta.to ?? 0) : 0,
                             }}
                             onPageChange={handlePageChange}
                             onPageSizeChange={handlePageSizeChange}
@@ -125,6 +171,16 @@ export function ReportDataTablePage<
                             exportEndpoint={exportEndpoint}
                             entityName={entityName}
                             onView={onView}
+                            emptyState={
+                                ready ? undefined : (
+                                    <ReportSelectFilterPrompt
+                                        hint={
+                                            requiredFilterHint ??
+                                            `Pilih filter yang diperlukan untuk menampilkan ${entityName}.`
+                                        }
+                                    />
+                                )
+                            }
                         />
                     </div>
                 </div>
