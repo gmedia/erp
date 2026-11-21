@@ -36,8 +36,8 @@ generateModuleTests({
     {
       filterName: 'Branch',
       filterType: 'combobox',
-      filterValue: 'Branch 1', 
-      expectedText: 'Branch 1',
+      filterValue: 'Jakarta Selatan', 
+      expectedText: 'Jakarta Selatan',
     }
   ]
 });

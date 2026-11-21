@@ -54,10 +54,25 @@ class StockMovementSampleDataSeeder extends Seeder
 
         $transferItem = StockTransferItem::query()
             ->with(['stockTransfer'])
-            ->first();
+            ->whereHas('stockTransfer', fn ($query) => $query->where('status', 'received'))
+            ->first()
+            ?? StockTransferItem::query()->with(['stockTransfer'])->first();
 
         if ($transferItem?->stockTransfer) {
             $transfer = $transferItem->stockTransfer;
+
+            $sourceBalance = $this->currentBalance(
+                (int) $transferItem->product_id,
+                (int) $transfer->from_warehouse_id,
+                (int) $transfer->id,
+            );
+            $outQuantity = (float) $transferItem->quantity;
+            $receivedQuantity = (float) $transferItem->quantity_received;
+            $targetBalance = $this->currentBalance(
+                (int) $transferItem->product_id,
+                (int) $transfer->to_warehouse_id,
+                (int) $transfer->id,
+            );
 
             StockMovement::updateOrCreate(
                 [
@@ -69,8 +84,8 @@ class StockMovementSampleDataSeeder extends Seeder
                 ],
                 [
                     'quantity_in' => 0,
-                    'quantity_out' => (float) $transferItem->quantity,
-                    'balance_after' => 0,
+                    'quantity_out' => $outQuantity,
+                    'balance_after' => max(0, $sourceBalance - $outQuantity),
                     'unit_cost' => $transferItem->unit_cost,
                     'average_cost_after' => null,
                     'reference_number' => $transfer->transfer_number,
@@ -89,9 +104,9 @@ class StockMovementSampleDataSeeder extends Seeder
                     'product_id' => $transferItem->product_id,
                 ],
                 [
-                    'quantity_in' => (float) $transferItem->quantity_received,
+                    'quantity_in' => $receivedQuantity,
                     'quantity_out' => 0,
-                    'balance_after' => 0,
+                    'balance_after' => $targetBalance + $receivedQuantity,
                     'unit_cost' => $transferItem->unit_cost,
                     'average_cost_after' => null,
                     'reference_number' => $transfer->transfer_number,
@@ -101,5 +116,23 @@ class StockMovementSampleDataSeeder extends Seeder
                 ],
             );
         }
+    }
+
+    /**
+     * Saldo berjalan terakhir untuk produk+gudang, mengabaikan gerakan dari
+     * transfer yang sedang diproses agar seeder tetap idempoten.
+     */
+    private function currentBalance(int $productId, int $warehouseId, ?int $excludeTransferId = null): float
+    {
+        return (float) (StockMovement::query()
+            ->where('product_id', $productId)
+            ->where('warehouse_id', $warehouseId)
+            ->when($excludeTransferId !== null, fn ($query) => $query
+                ->whereNot(fn ($inner) => $inner
+                    ->where('reference_type', StockTransfer::class)
+                    ->where('reference_id', $excludeTransferId)))
+            ->orderByDesc('moved_at')
+            ->orderByDesc('id')
+            ->value('balance_after') ?? 0);
     }
 }

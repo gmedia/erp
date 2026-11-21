@@ -25,10 +25,10 @@ export default function BookValueDepreciationReport() {
                 asset_category_id: '',
                 branch_id: '',
             }}
-            endpoint="/reports/book-value-depreciation"
+            endpoint="/api/reports/book-value-depreciation"
             queryKey={['book-value-report']}
             entityName="Asset (Book Value)"
-            exportEndpoint="/reports/book-value-depreciation/export"
+            exportEndpoint="/api/reports/book-value-depreciation/export"
         />
     );
 }

@@ -30,10 +30,10 @@ export default function MaintenanceCostReport() {
                 start_date: '',
                 end_date: '',
             }}
-            endpoint="/reports/maintenance-cost"
+            endpoint="/api/reports/maintenance-cost"
             queryKey={['maintenance-cost-report']}
             entityName="Maintenance Cost"
-            exportEndpoint="/reports/maintenance-cost/export"
+            exportEndpoint="/api/reports/maintenance-cost/export"
         />
     );
 }

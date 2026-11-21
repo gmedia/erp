@@ -117,15 +117,21 @@ class DatabaseSeeder extends Seeder
         ], [
             'employee_id' => 'EMP-2022-0031',
             'name' => 'Rina Kartika',
-            'phone' => '1234567890',
+            'phone' => '081234567800',
         ]);
 
-        Employment::factory()->withDepartment($departmentId)->withPosition($positionId)->withBranch($branchId)->for($testEmployee)->create([
-            'company_id' => $companyId,
-            'salary' => 50000,
-            'hire_date' => now(),
-            'employment_status' => 'regular',
-        ]);
+        Employment::updateOrCreate(
+            ['employee_id' => $testEmployee->id, 'is_current' => true],
+            [
+                'company_id' => $companyId,
+                'department_id' => $departmentId,
+                'position_id' => $positionId,
+                'branch_id' => $branchId,
+                'salary' => 50000,
+                'hire_date' => now(),
+                'employment_status' => 'regular',
+            ],
+        );
 
         // Admin Employee
         $adminEmployee = Employee::updateOrCreate([
@@ -134,15 +140,21 @@ class DatabaseSeeder extends Seeder
         ], [
             'employee_id' => 'EMP-00000',
             'name' => 'Admin User',
-            'phone' => '1234567890',
+            'phone' => '081234567801',
         ]);
 
-        Employment::factory()->withDepartment($departmentId)->withPosition($positionId)->withBranch($branchId)->for($adminEmployee)->create([
-            'company_id' => $companyId,
-            'salary' => 100000,
-            'hire_date' => now(),
-            'employment_status' => 'regular',
-        ]);
+        Employment::updateOrCreate(
+            ['employee_id' => $adminEmployee->id, 'is_current' => true],
+            [
+                'company_id' => $companyId,
+                'department_id' => $departmentId,
+                'position_id' => $positionId,
+                'branch_id' => $branchId,
+                'salary' => 100000,
+                'hire_date' => now(),
+                'employment_status' => 'regular',
+            ],
+        );
 
         // Sample Employees for Approvals
         $hrManagerUser = User::where('email', 'manager.hr@example.com')->first();
@@ -155,12 +167,18 @@ class DatabaseSeeder extends Seeder
             'phone' => '081234567891',
         ]);
 
-        Employment::factory()->withDepartment(Department::where('name', 'HR')->value('id'))->withPosition(Position::where('name', 'Manager')->value('id'))->withBranch($branchId)->for($hrManagerEmployee)->create([
-            'company_id' => $companyId,
-            'salary' => 15000000,
-            'hire_date' => now()->subYears(2),
-            'employment_status' => 'regular',
-        ]);
+        Employment::updateOrCreate(
+            ['employee_id' => $hrManagerEmployee->id, 'is_current' => true],
+            [
+                'company_id' => $companyId,
+                'department_id' => Department::where('name', 'HR')->value('id'),
+                'position_id' => Position::where('name', 'Manager')->value('id'),
+                'branch_id' => $branchId,
+                'salary' => 15000000,
+                'hire_date' => now()->subYears(2),
+                'employment_status' => 'regular',
+            ],
+        );
 
         $financeDirectorUser = User::where('email', 'director.finance@example.com')->first();
         $financeDirectorEmployee = Employee::updateOrCreate([
@@ -172,12 +190,18 @@ class DatabaseSeeder extends Seeder
             'phone' => '081234567892',
         ]);
 
-        Employment::factory()->withDepartment(Department::where('name', 'Finance')->value('id'))->withPosition(Position::where('name', 'Director')->value('id'))->withBranch($branchId)->for($financeDirectorEmployee)->create([
-            'company_id' => $companyId,
-            'salary' => 25000000,
-            'hire_date' => now()->subYears(5),
-            'employment_status' => 'regular',
-        ]);
+        Employment::updateOrCreate(
+            ['employee_id' => $financeDirectorEmployee->id, 'is_current' => true],
+            [
+                'company_id' => $companyId,
+                'department_id' => Department::where('name', 'Finance')->value('id'),
+                'position_id' => Position::where('name', 'Director')->value('id'),
+                'branch_id' => $branchId,
+                'salary' => 25000000,
+                'hire_date' => now()->subYears(5),
+                'employment_status' => 'regular',
+            ],
+        );
 
         $itStaffUser = User::where('email', 'staff.it@example.com')->first();
         $itStaffEmployee = Employee::updateOrCreate([
@@ -189,12 +213,18 @@ class DatabaseSeeder extends Seeder
             'phone' => '081234567893',
         ]);
 
-        Employment::factory()->withDepartment(Department::where('name', 'Engineering')->value('id'))->withPosition(Position::where('name', 'Senior')->value('id'))->withBranch($branchId)->for($itStaffEmployee)->create([
-            'company_id' => $companyId,
-            'salary' => 12000000,
-            'hire_date' => now()->subYears(1),
-            'employment_status' => 'regular',
-        ]);
+        Employment::updateOrCreate(
+            ['employee_id' => $itStaffEmployee->id, 'is_current' => true],
+            [
+                'company_id' => $companyId,
+                'department_id' => Department::where('name', 'Engineering')->value('id'),
+                'position_id' => Position::where('name', 'Senior')->value('id'),
+                'branch_id' => $branchId,
+                'salary' => 12000000,
+                'hire_date' => now()->subYears(1),
+                'employment_status' => 'regular',
+            ],
+        );
 
         $this->call([
             PermissionSeeder::class,

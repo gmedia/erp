@@ -1,6 +1,11 @@
 <?php
 
+use App\Models\Account;
+use App\Models\CoaVersion;
 use App\Models\FiscalYear;
+use App\Models\JournalEntry;
+use App\Models\JournalEntryLine;
+use Database\Seeders\ReportConfigurationSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
@@ -39,6 +44,48 @@ test('it can fetch cash flow data via json', function () {
             'computed_sections',
         ])
         ->assertJsonPath('selectedYearId', $this->fiscalYear->id);
+});
+
+test('it reports cash debit as inflow and credit as outflow', function () {
+    $this->seed(ReportConfigurationSeeder::class);
+    Sanctum::actingAs($this->user, ['*']);
+
+    $coaVersion = CoaVersion::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'status' => 'active',
+    ]);
+    $cashAccount = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '11110',
+        'name' => 'Cash in Banks',
+        'type' => 'asset',
+        'sub_type' => 'current_asset',
+        'normal_balance' => 'debit',
+        'is_cash_flow' => true,
+    ]);
+
+    $journal = JournalEntry::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'status' => 'posted',
+    ]);
+
+    JournalEntryLine::factory()->create([
+        'journal_entry_id' => $journal->id,
+        'account_id' => $cashAccount->id,
+        'debit' => 500000,
+        'credit' => 0,
+    ]);
+
+    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
+        ->assertOk();
+
+    $row = collect($response->json('report'))->firstWhere('code', '11110');
+    expect((float) $row['inflow'])->toBe(500000.0)
+        ->and((float) $row['outflow'])->toBe(0.0);
+
+    $sections = collect($response->json('computed_sections'))->keyBy('code');
+    expect((float) $sections['cash_inflow']['value'])->toBe(500000.0)
+        ->and((float) $sections['net_change']['value'])->toBe(500000.0);
 });
 
 test('it can export cash flow report', function () {

@@ -137,7 +137,8 @@ class ReportController extends Controller
             $report = $this->reportService->getCashFlow($selectedYearId, $branchId);
             $config = $this->configurationResolver->execute(ReportConfiguration::TYPE_CASH_FLOW);
             if ($config) {
-                $computedSections = $this->evaluateSections->execute($config['sections'], $report['totals'] ?? []);
+                $totals = $this->reportService->getCashFlowTotals($selectedYearId, $branchId);
+                $computedSections = $this->evaluateSections->execute($config['sections'], $totals);
             }
         }
 

@@ -58,6 +58,35 @@ test('it can fetch ar outstanding report data', function () {
         );
 });
 
+test('it excludes paid cancelled and void invoices', function () {
+    $customer = Customer::factory()->create();
+    $fiscalYear = FiscalYear::factory()->create();
+
+    foreach (['sent', 'paid', 'cancelled', 'void'] as $index => $status) {
+        CustomerInvoice::factory()->create([
+            'customer_id' => $customer->id,
+            'fiscal_year_id' => $fiscalYear->id,
+            'invoice_number' => 'INV-STATUS-' . strtoupper($status),
+            'status' => $status,
+            'grand_total' => 100000,
+            'amount_received' => $status === 'paid' ? 100000 : 0,
+            'amount_due' => $status === 'paid' ? 0 : 100000,
+        ]);
+    }
+
+    Sanctum::actingAs($this->user, ['*']);
+    $response = getJson('/api/reports/ar-outstanding')->assertOk();
+
+    $numbers = collect($response->json('data'))
+        ->pluck('customer_invoice.invoice_number')
+        ->all();
+
+    expect($numbers)->toContain('INV-STATUS-SENT')
+        ->not->toContain('INV-STATUS-PAID')
+        ->not->toContain('INV-STATUS-CANCELLED')
+        ->not->toContain('INV-STATUS-VOID');
+});
+
 test('it can filter by customer', function () {
     $customerA = Customer::factory()->create(['name' => 'Customer A']);
     $customerB = Customer::factory()->create(['name' => 'Customer B']);
@@ -143,8 +172,8 @@ test('it computes days_overdue in PHP without MariaDB-only DATEDIFF', function (
 
     expect($byNumber['INV-OVERDUE']['days_overdue'])->toBe(10);
     expect($byNumber['INV-FUTURE']['days_overdue'])->toBe(0);
-    // Draft invoices appear in result set but days_overdue is zero (status-gated in PHP).
-    expect($byNumber['INV-DRAFT-OVERDUE']['days_overdue'])->toBe(0);
+    // Outstanding hanya memuat invoice berjalan: draft tidak termasuk (W4-23).
+    expect($byNumber->has('INV-DRAFT-OVERDUE'))->toBeFalse();
 
     Carbon::setTestNow();
 });

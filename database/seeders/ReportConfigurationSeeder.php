@@ -96,29 +96,17 @@ class ReportConfigurationSeeder extends Seeder
             ['code' => 'cash_flow'],
             [
                 'name' => 'Cash Flow Statement',
-                'description' => 'Cash inflows and outflows for the period (indirect method).',
+                'description' => 'Cash receipts and payments for the period (direct method).',
                 'report_type' => ReportConfiguration::TYPE_CASH_FLOW,
                 'is_active' => true,
             ]
         );
 
         $sections = [
-            ['operating_header', 'CASH FLOWS FROM OPERATING ACTIVITIES', ReportSection::TYPE_HEADER, null, null, null, null],
-            ['net_income_source', 'Net Income', ReportSection::TYPE_DETAIL, null, null, null, '{net_income}'],
-            ['depreciation_addback', 'Depreciation', ReportSection::TYPE_DETAIL, 'expense', 'depreciation_expense', ReportSection::SIGN_REVERSED, null],
-            ['working_capital_changes', 'Changes in Working Capital', ReportSection::TYPE_DETAIL, null, null, null, null],
-            ['operating_cash_flow', 'Net Cash from Operating Activities', ReportSection::TYPE_SUBTOTAL, null, null, null, '{net_income_source} + {depreciation_addback} + {working_capital_changes}'],
-
-            ['investing_header', 'CASH FLOWS FROM INVESTING ACTIVITIES', ReportSection::TYPE_HEADER, null, null, null, null],
-            ['fixed_asset_activity', 'Fixed Asset Activity', ReportSection::TYPE_DETAIL, 'asset', 'fixed_asset', ReportSection::SIGN_REVERSED, null],
-            ['investing_cash_flow', 'Net Cash from Investing Activities', ReportSection::TYPE_SUBTOTAL, null, null, null, '{fixed_asset_activity}'],
-
-            ['financing_header', 'CASH FLOWS FROM FINANCING ACTIVITIES', ReportSection::TYPE_HEADER, null, null, null, null],
-            ['long_term_debt_activity', 'Long-term Borrowings', ReportSection::TYPE_DETAIL, 'liability', 'long_term_liability', null, null],
-            ['equity_activity', 'Paid-in Capital', ReportSection::TYPE_DETAIL, 'equity', 'paid_in_capital', null, null],
-            ['financing_cash_flow', 'Net Cash from Financing Activities', ReportSection::TYPE_SUBTOTAL, null, null, null, '{long_term_debt_activity} + {equity_activity}'],
-
-            ['net_change', 'NET INCREASE/DECREASE IN CASH', ReportSection::TYPE_TOTAL, null, null, null, '{operating_cash_flow} + {investing_cash_flow} + {financing_cash_flow}'],
+            ['operating_header', 'CASH RECEIPTS AND PAYMENTS', ReportSection::TYPE_HEADER, null, null, null, null],
+            ['cash_inflow', 'Total Cash Inflow', ReportSection::TYPE_SUBTOTAL, null, null, null, null],
+            ['cash_outflow', 'Total Cash Outflow', ReportSection::TYPE_SUBTOTAL, null, null, null, null],
+            ['net_change', 'NET INCREASE/DECREASE IN CASH', ReportSection::TYPE_TOTAL, null, null, null, '{cash_inflow} - {cash_outflow}'],
         ];
 
         $this->seedSections($config, $sections);
@@ -149,6 +137,13 @@ class ReportConfigurationSeeder extends Seeder
      */
     private function seedSections(ReportConfiguration $config, array $sections): void
     {
+        $codes = array_column($sections, 0);
+
+        ReportSection::query()
+            ->where('report_configuration_id', $config->id)
+            ->whereNotIn('code', $codes)
+            ->delete();
+
         foreach ($sections as $order => [$code, $name, $type, $accountType, $subType, $sign, $formula]) {
             ReportSection::updateOrCreate(
                 [
