@@ -32,8 +32,13 @@ export function GenericActions<T>({
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm">
-                    Actions <MoreHorizontal className="ml-2 h-4 w-4" />
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-8 text-muted-foreground hover:text-foreground"
+                >
+                    <MoreHorizontal className="size-4" />
+                    <span className="sr-only">Actions</span>
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -58,7 +63,7 @@ export function GenericActions<T>({
                 )}
                 {onDelete && (
                     <DropdownMenuItem
-                        className="text-destructive"
+                        className="text-destructive-foreground focus:text-destructive-foreground"
                         onClick={() => onDelete(item)}
                     >
                         Delete

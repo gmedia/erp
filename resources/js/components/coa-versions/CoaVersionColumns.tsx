@@ -13,7 +13,11 @@ import { ColumnDef } from '@tanstack/react-table';
 
 export const coaVersionColumns: ColumnDef<CoaVersion>[] = [
     createSelectColumn<CoaVersion>(),
-    createTextColumn<CoaVersion>({ accessorKey: 'name', label: 'Name' }),
+    createTextColumn<CoaVersion>({
+        accessorKey: 'name',
+        label: 'Name',
+        primary: true,
+    }),
     {
         id: 'fiscal_year.name',
         accessorKey: 'fiscal_year.name',

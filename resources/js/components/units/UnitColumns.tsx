@@ -18,7 +18,11 @@ export interface Unit {
 
 export const unitColumns: ColumnDef<Unit>[] = [
     createSelectColumn<Unit>(),
-    createTextColumn<Unit>({ accessorKey: 'name', label: 'Name' }),
+    createTextColumn<Unit>({
+        accessorKey: 'name',
+        label: 'Name',
+        primary: true,
+    }),
     createTextColumn<Unit>({
         accessorKey: 'symbol',
         label: 'Symbol',

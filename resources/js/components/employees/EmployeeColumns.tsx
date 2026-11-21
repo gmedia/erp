@@ -51,7 +51,11 @@ export const employeeColumns: ColumnDef<Employee>[] = [
         ...createSortingHeader('NIK'),
         cell: ({ row }) => <div>{row.original.employee_id}</div>,
     },
-    createTextColumn<Employee>({ accessorKey: 'name', label: 'Name' }),
+    createTextColumn<Employee>({
+        accessorKey: 'name',
+        label: 'Name',
+        primary: true,
+    }),
     {
         id: 'employments.employment_status',
         accessorFn: (row) => row.current_employment?.employment_status,

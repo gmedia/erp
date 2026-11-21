@@ -44,7 +44,11 @@ const renderStatusCell = ({ row }: { row: { original: Supplier } }) => {
 
 export const supplierColumns: ColumnDef<Supplier>[] = [
     createSelectColumn<Supplier>(),
-    createTextColumn<Supplier>({ accessorKey: 'name', label: 'Name' }),
+    createTextColumn<Supplier>({
+        accessorKey: 'name',
+        label: 'Name',
+        primary: true,
+    }),
     createEmailColumn<Supplier>({ accessorKey: 'email', label: 'Email' }),
     createPhoneColumn<Supplier>({ accessorKey: 'phone', label: 'Phone' }),
     {
