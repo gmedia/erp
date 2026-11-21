@@ -495,7 +495,7 @@ export default function MyApprovalsPage() {
     return (
         <AppLayout
             breadcrumbs={[
-                { title: 'Home', href: '/' },
+                { title: 'Dashboard', href: '/dashboard' },
                 { title: 'My Approvals', href: '/my-approvals' },
             ]}
         >

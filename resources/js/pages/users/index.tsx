@@ -1,11 +1,6 @@
+import { PageHeader } from '@/components/common/PageHeader';
 import { EmployeeSelector } from '@/components/permissions/EmployeeSelector'; // Reuse EmployeeSelector
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { UserForm } from '@/components/users/UserForm';
 import { useEmployeeUser } from '@/hooks/users/useEmployeeUser';
 import AppLayout from '@/layouts/app-layout';
@@ -60,15 +55,13 @@ export default function UsersIndex() {
                 <title>Users</title>
             </Helmet>
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
+                <PageHeader
+                    title="Users"
+                    description="Manage user accounts linked to employees."
+                />
                 <div className="grid auto-rows-min gap-4 md:grid-cols-1">
                     <Card>
-                        <CardHeader>
-                            <CardTitle>User Management</CardTitle>
-                            <CardDescription>
-                                Manage user accounts linked to employees.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
+                        <CardContent className="space-y-6 pt-6">
                             <div className="max-w-md space-y-4">
                                 <FormProvider {...form}>
                                     <form className="space-y-4">

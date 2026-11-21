@@ -19,7 +19,7 @@ export default function ApprovalMonitoringDashboard() {
     return (
         <AppLayout
             breadcrumbs={[
-                { title: 'Home', href: '/' },
+                { title: 'Dashboard', href: '/dashboard' },
                 { title: 'Approval Monitoring', href: '#' },
             ]}
         >

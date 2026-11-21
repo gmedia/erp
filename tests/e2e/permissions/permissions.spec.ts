@@ -47,7 +47,13 @@ test.describe('Employee Permissions', () => {
 
         // 4. Wait for permissions to load/appear
         // We expect the tree to be visible.
-        await expect(page.getByText('Permissions Hierarchy')).toBeVisible();
+        await expect(
+            page.getByRole('heading', {
+                name: 'Permissions',
+                exact: true,
+                level: 1,
+            }),
+        ).toBeVisible();
         
         // 5. Select "Create Department" permission
         // The tree node name is "Create Department".

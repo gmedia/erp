@@ -5,6 +5,7 @@ import { Helmet } from 'react-helmet-async';
 
 import { DataTableProps as BaseDataTableProps } from '@/components/common/DataTableCore';
 import { DeleteConfirmationDialog } from '@/components/common/DeleteConfirmationDialog';
+import { PageHeader } from '@/components/common/PageHeader';
 import { type FilterState } from '@/hooks/useCrudFilters';
 import {
     useCrudPage,
@@ -37,6 +38,8 @@ export interface CrudPageConfig<
 > extends BaseCrudPageConfig<T, FilterType> {
     // UI configuration
     entityNamePlural: string;
+    /** Judul halaman memakai entityNamePlural; deskripsi opsional di bawahnya. */
+    description?: string;
     breadcrumbs: BreadcrumbItem[];
     identifierKey?: string;
 
@@ -203,6 +206,10 @@ export function CrudPage<
 
             <AppLayout breadcrumbs={config.breadcrumbs}>
                 <div className="flex w-full flex-col gap-3 overflow-x-auto p-4">
+                    <PageHeader
+                        title={config.entityNamePlural}
+                        description={config.description}
+                    />
                     <div>
                         <config.DataTableComponent {...dataTableProps} />
                     </div>
