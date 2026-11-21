@@ -120,4 +120,7 @@ export interface Translations {
         en: string;
         id: string;
     };
+    reports: {
+        sections: Record<string, string>;
+    };
 }

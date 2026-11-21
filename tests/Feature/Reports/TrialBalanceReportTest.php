@@ -30,6 +30,20 @@ test('it can get trial balance report', function () {
         ->assertJsonPath('summary.total_debit', 1000);
 });
 
+test('it aggregates account balances per account when no period is selected', function () {
+    $fiscalYear = FiscalYear::factory()->create(['status' => 'open']);
+    $account = Account::factory()->create(['code' => '1010', 'name' => 'Cash', 'type' => 'asset']);
+
+    AccountBalance::factory()->create(['account_id' => $account->id, 'fiscal_year_id' => $fiscalYear->id, 'period_month' => 1, 'period_year' => 2026, 'opening_balance' => 100, 'debit_total' => 400, 'credit_total' => 0, 'closing_balance' => 500]);
+    AccountBalance::factory()->create(['account_id' => $account->id, 'fiscal_year_id' => $fiscalYear->id, 'period_month' => 2, 'period_year' => 2026, 'opening_balance' => 500, 'debit_total' => 0, 'credit_total' => 200, 'closing_balance' => 300]);
+
+    getJson("/api/reports/trial-balance-detailed?fiscal_year_id={$fiscalYear->id}")
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.account_code', '1010')
+        ->assertJsonPath('data.0.closing_balance', 800);
+});
+
 test('it filters by fiscal year and period', function () {
     $fiscalYear = FiscalYear::factory()->create();
     $otherFiscalYear = FiscalYear::factory()->create();

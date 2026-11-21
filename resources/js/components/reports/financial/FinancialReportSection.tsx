@@ -69,6 +69,25 @@ export const getSignedAmountTextClass = (value: number): string => {
     return '';
 };
 
+/**
+ * Format persentase perubahan; pembanding 0 menghasilkan `—` (n/a) alih-alih
+ * `0.0%` yang menyesatkan (W4-21).
+ */
+export const formatChangePercentage = (
+    percentage: number | null | undefined,
+    comparisonBase: number | null | undefined,
+): string => {
+    if (
+        comparisonBase === null ||
+        comparisonBase === undefined ||
+        comparisonBase === 0
+    ) {
+        return '—';
+    }
+
+    return `${(percentage ?? 0).toFixed(1)}%`;
+};
+
 function AccountRow({
     node,
     isExpanded = true,
@@ -133,7 +152,10 @@ function AccountRow({
                                 {formatCurrency(changeValue)}
                             </div>
                             <div className={cn('w-16', changeTextClass)}>
-                                {(node.change_percentage || 0).toFixed(1)}%
+                                {formatChangePercentage(
+                                    node.change_percentage,
+                                    node.comparison_balance,
+                                )}
                             </div>
                         </>
                     )}
@@ -206,10 +228,10 @@ export function FinancialReportSection({
                             </Button>
                         </div>
                     </div>
-                    <div className="flex gap-4 text-right tabular-nums">
+                    <div className="flex gap-4 text-right whitespace-nowrap tabular-nums">
                         <span
                             className={cn(
-                                'w-32 text-lg font-bold',
+                                'w-40 text-lg font-bold',
                                 getSignedAmountTextClass(total),
                             )}
                         >
@@ -219,7 +241,7 @@ export function FinancialReportSection({
                             <>
                                 <span
                                     className={cn(
-                                        'w-32 text-lg font-bold text-muted-foreground',
+                                        'w-40 text-lg font-bold text-muted-foreground',
                                         getSignedAmountTextClass(
                                             comparisonTotal || 0,
                                         ),
@@ -229,7 +251,7 @@ export function FinancialReportSection({
                                 </span>
                                 <span
                                     className={cn(
-                                        'w-28 text-lg font-bold',
+                                        'w-36 text-lg font-bold',
                                         changeTextClass,
                                     )}
                                 >
@@ -237,11 +259,14 @@ export function FinancialReportSection({
                                 </span>
                                 <span
                                     className={cn(
-                                        'w-16 text-lg font-bold',
+                                        'w-20 text-lg font-bold',
                                         changeTextClass,
                                     )}
                                 >
-                                    {(changePercentage || 0).toFixed(1)}%
+                                    {formatChangePercentage(
+                                        changePercentage,
+                                        comparisonTotal,
+                                    )}
                                 </span>
                             </>
                         )}

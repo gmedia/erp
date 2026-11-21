@@ -26,6 +26,18 @@ test.describe('General Ledger Report', () => {
         await expect(applyBtn).toBeVisible();
     });
 
+    test('shows instructive prompt before account is selected', async ({
+        page,
+    }) => {
+        await page.goto('/reports/general-ledger');
+
+        await expect(
+            page.getByTestId('report-filter-prompt'),
+        ).toBeVisible({ timeout: 15000 });
+
+        await expect(page.getByText('No results.')).toHaveCount(0);
+    });
+
     test('can view general ledger report table', async ({ page }) => {
         await page.goto('/reports/general-ledger');
 
@@ -71,6 +83,15 @@ test.describe('General Ledger Report', () => {
         await page.getByRole('button', { name: /filters/i }).click();
         const filtersDialog = page.getByRole('dialog');
         await expect(filtersDialog).toBeVisible();
+
+        // Account is a required filter (W4-22): pick one before applying dates.
+        await filtersDialog
+            .locator('button[role="combobox"]')
+            .first()
+            .click({ force: true });
+        const accountOption = page.locator('ul.p-1 li button:visible').first();
+        await expect(accountOption).toBeVisible({ timeout: 10000 });
+        await accountOption.click({ force: true });
 
         const dateInputs = filtersDialog.locator('input[type="text"]');
         const count = await dateInputs.count();

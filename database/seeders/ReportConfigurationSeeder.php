@@ -41,7 +41,7 @@ class ReportConfigurationSeeder extends Seeder
             ['total_liabilities', 'TOTAL KEWAJIBAN', ReportSection::TYPE_TOTAL, 'liability', null, null, null],
 
             ['equity_header', 'EKUITAS', ReportSection::TYPE_HEADER, null, null, null, null],
-            ['paid_in_capital', 'Modal Disetor', ReportSection::TYPE_DETAIL, 'equity', 'paid_in_capital', null, null],
+            ['paid_in_capital', 'Paid-in Capital', ReportSection::TYPE_DETAIL, 'equity', 'paid_in_capital', null, null],
             ['retained_earnings', 'Laba Ditahan', ReportSection::TYPE_DETAIL, 'equity', 'retained_earnings', null, null],
             ['current_year_earnings', 'Laba Bersih Tahun Berjalan', ReportSection::TYPE_DETAIL, null, null, null, '{revenue} - {expense}'],
             ['total_equity', 'TOTAL EKUITAS', ReportSection::TYPE_TOTAL, 'equity', null, null, null],
@@ -96,29 +96,29 @@ class ReportConfigurationSeeder extends Seeder
             ['code' => 'cash_flow'],
             [
                 'name' => 'Cash Flow Statement',
-                'description' => 'Pergerakan kas masuk dan keluar (metode tidak langsung) selama periode tertentu.',
+                'description' => 'Cash inflows and outflows for the period (indirect method).',
                 'report_type' => ReportConfiguration::TYPE_CASH_FLOW,
                 'is_active' => true,
             ]
         );
 
         $sections = [
-            ['operating_header', 'ARUS KAS DARI AKTIVITAS OPERASIONAL', ReportSection::TYPE_HEADER, null, null, null, null],
-            ['net_income_source', 'Laba Bersih', ReportSection::TYPE_DETAIL, null, null, null, '{net_income}'],
-            ['depreciation_addback', 'Penyusutan', ReportSection::TYPE_DETAIL, 'expense', 'depreciation_expense', ReportSection::SIGN_REVERSED, null],
-            ['working_capital_changes', 'Perubahan Modal Kerja', ReportSection::TYPE_DETAIL, null, null, null, null],
-            ['operating_cash_flow', 'Arus Kas Bersih dari Operasional', ReportSection::TYPE_SUBTOTAL, null, null, null, '{net_income_source} + {depreciation_addback} + {working_capital_changes}'],
+            ['operating_header', 'CASH FLOWS FROM OPERATING ACTIVITIES', ReportSection::TYPE_HEADER, null, null, null, null],
+            ['net_income_source', 'Net Income', ReportSection::TYPE_DETAIL, null, null, null, '{net_income}'],
+            ['depreciation_addback', 'Depreciation', ReportSection::TYPE_DETAIL, 'expense', 'depreciation_expense', ReportSection::SIGN_REVERSED, null],
+            ['working_capital_changes', 'Changes in Working Capital', ReportSection::TYPE_DETAIL, null, null, null, null],
+            ['operating_cash_flow', 'Net Cash from Operating Activities', ReportSection::TYPE_SUBTOTAL, null, null, null, '{net_income_source} + {depreciation_addback} + {working_capital_changes}'],
 
-            ['investing_header', 'ARUS KAS DARI AKTIVITAS INVESTASI', ReportSection::TYPE_HEADER, null, null, null, null],
-            ['fixed_asset_activity', 'Aktivitas Aset Tetap', ReportSection::TYPE_DETAIL, 'asset', 'fixed_asset', ReportSection::SIGN_REVERSED, null],
-            ['investing_cash_flow', 'Arus Kas Bersih dari Investasi', ReportSection::TYPE_SUBTOTAL, null, null, null, '{fixed_asset_activity}'],
+            ['investing_header', 'CASH FLOWS FROM INVESTING ACTIVITIES', ReportSection::TYPE_HEADER, null, null, null, null],
+            ['fixed_asset_activity', 'Fixed Asset Activity', ReportSection::TYPE_DETAIL, 'asset', 'fixed_asset', ReportSection::SIGN_REVERSED, null],
+            ['investing_cash_flow', 'Net Cash from Investing Activities', ReportSection::TYPE_SUBTOTAL, null, null, null, '{fixed_asset_activity}'],
 
-            ['financing_header', 'ARUS KAS DARI AKTIVITAS PENDANAAN', ReportSection::TYPE_HEADER, null, null, null, null],
-            ['long_term_debt_activity', 'Pinjaman Jangka Panjang', ReportSection::TYPE_DETAIL, 'liability', 'long_term_liability', null, null],
-            ['equity_activity', 'Modal Disetor', ReportSection::TYPE_DETAIL, 'equity', 'paid_in_capital', null, null],
-            ['financing_cash_flow', 'Arus Kas Bersih dari Pendanaan', ReportSection::TYPE_SUBTOTAL, null, null, null, '{long_term_debt_activity} + {equity_activity}'],
+            ['financing_header', 'CASH FLOWS FROM FINANCING ACTIVITIES', ReportSection::TYPE_HEADER, null, null, null, null],
+            ['long_term_debt_activity', 'Long-term Borrowings', ReportSection::TYPE_DETAIL, 'liability', 'long_term_liability', null, null],
+            ['equity_activity', 'Paid-in Capital', ReportSection::TYPE_DETAIL, 'equity', 'paid_in_capital', null, null],
+            ['financing_cash_flow', 'Net Cash from Financing Activities', ReportSection::TYPE_SUBTOTAL, null, null, null, '{long_term_debt_activity} + {equity_activity}'],
 
-            ['net_change', 'KENAIKAN/PENURUNAN KAS BERSIH', ReportSection::TYPE_TOTAL, null, null, null, '{operating_cash_flow} + {investing_cash_flow} + {financing_cash_flow}'],
+            ['net_change', 'NET INCREASE/DECREASE IN CASH', ReportSection::TYPE_TOTAL, null, null, null, '{operating_cash_flow} + {investing_cash_flow} + {financing_cash_flow}'],
         ];
 
         $this->seedSections($config, $sections);

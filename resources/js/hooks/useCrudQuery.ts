@@ -24,6 +24,38 @@ export interface ApiResponse<T> {
         from?: number;
         to?: number;
     };
+    summary?: Record<string, unknown>;
+}
+
+/**
+ * Normalisasi meta pagination agar `from`/`to` selalu konsisten dengan jumlah
+ * baris yang tampil. Beberapa endpoint report mengembalikan data tanpa `meta`
+ * (atau `meta` tanpa `from`/`to`), yang membuat UI menampilkan
+ * "Showing 0 to 0 of 0" padahal ada baris (W4-20).
+ */
+function normalizeMeta<T>(
+    response: Partial<ApiResponse<T>> | undefined,
+    perPage: number,
+    page: number,
+): ApiResponse<T>['meta'] {
+    const rows = Array.isArray(response?.data) ? response.data : [];
+    const meta = response?.meta;
+    const total = meta?.total ?? rows.length;
+    const from =
+        meta?.from ??
+        (rows.length === 0
+            ? 0
+            : (meta?.current_page ?? page - 1) * perPage + 1);
+    const to = meta?.to ?? (rows.length === 0 ? 0 : from + rows.length - 1);
+
+    return {
+        current_page: meta?.current_page ?? page,
+        per_page: meta?.per_page ?? perPage,
+        total,
+        last_page: meta?.last_page ?? Math.max(1, Math.ceil(total / perPage)),
+        from,
+        to,
+    };
 }
 
 export interface UseCrudQueryOptions {
@@ -63,27 +95,32 @@ export function useCrudQuery<Entity>({
                     },
                 });
 
-                return (
-                    response.data || {
-                        data: [],
-                        meta: {
-                            current_page: 1,
-                            per_page: pagination.per_page,
-                            total: 0,
-                            last_page: 1,
-                        },
-                    }
-                );
+                return response.data
+                    ? {
+                          ...response.data,
+                          meta: normalizeMeta(
+                              response.data,
+                              pagination.per_page,
+                              pagination.page,
+                          ),
+                      }
+                    : {
+                          data: [],
+                          meta: normalizeMeta(
+                              undefined,
+                              pagination.per_page,
+                              pagination.page,
+                          ),
+                      };
             } catch (error) {
                 handleApiError(error, `Failed to load ${entityName}`);
                 return {
                     data: [],
-                    meta: {
-                        current_page: 1,
-                        per_page: pagination.per_page,
-                        total: 0,
-                        last_page: 1,
-                    },
+                    meta: normalizeMeta(
+                        undefined,
+                        pagination.per_page,
+                        pagination.page,
+                    ),
                 };
             }
         },
@@ -93,11 +130,8 @@ export function useCrudQuery<Entity>({
     return {
         ...query,
         data: query.data?.data || [],
-        meta: query.data?.meta || {
-            current_page: 1,
-            per_page: pagination.per_page,
-            total: 0,
-            last_page: 1,
-        },
+        meta:
+            query.data?.meta ||
+            normalizeMeta(undefined, pagination.per_page, pagination.page),
     };
 }
