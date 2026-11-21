@@ -346,7 +346,10 @@ function SidebarHeader({
     <div
       data-slot="sidebar-header"
       data-sidebar="header"
-      className={cn("flex flex-col gap-2 p-2", className)}
+      className={cn(
+        "bg-sidebar border-sidebar-border flex flex-col gap-2 border-t p-2",
+        className
+      )}
       {...props}
     />
   )
@@ -360,7 +363,10 @@ function SidebarFooter({
     <div
       data-slot="sidebar-footer"
       data-sidebar="footer"
-      className={cn("flex flex-col gap-2 p-2", className)}
+      className={cn(
+        "bg-sidebar border-sidebar-border flex flex-col gap-2 border-t p-2",
+        className
+      )}
       {...props}
     />
   )
@@ -389,7 +395,9 @@ function SidebarContent({
       data-slot="sidebar-content"
       data-sidebar="content"
       className={cn(
-        "flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden",
+        // pb-8 memberi ruang agar item terakhir grup tidak tertutup footer;
+        // mask fade bawah menandakan konten masih bisa di-scroll (W4-16).
+        "flex min-h-0 flex-1 flex-col gap-2 overflow-auto pb-8 group-data-[collapsible=icon]:overflow-hidden group-data-[collapsible=icon]:pb-2 [mask-image:linear-gradient(to_bottom,black_calc(100%-1.5rem),transparent)]",
         className
       )}
       {...props}

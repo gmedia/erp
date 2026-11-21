@@ -1,5 +1,11 @@
 @import 'tailwindcss';
 
+/* Self-host Instrument Sans (offline-safe untuk on-premise) — W4-13. */
+@import '@fontsource/instrument-sans/400.css';
+@import '@fontsource/instrument-sans/500.css';
+@import '@fontsource/instrument-sans/600.css';
+@import '@fontsource/instrument-sans/700.css';
+
 @plugin 'tailwindcss-animate';
 @plugin '@tailwindcss/typography';
 
