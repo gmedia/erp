@@ -23,7 +23,7 @@
 | W4-G1 | P1  | W4-01, W4-02                      | Badge status: label humanize + tone semantik terpusat                     | **merged #310** |
 | W4-G2 | P1  | W4-03, W4-10                      | Tabel: tepi scroll kanan, kolom sticky, header non-sortable               | **merged #311** |
 | W4-G3 | P1  | W4-04, W4-05, W4-06               | Page shell: PageHeader CRUD, shell custom, breadcrumb                     | **merged #312** |
-| W4-G4 | P1  | W4-07, W4-08, W4-18               | Dashboard: KPI terpotong, filter satu baris, pipeline dashboard           | open #305 |
+| W4-G4 | P1  | W4-07, W4-08, W4-18               | Dashboard: KPI terpotong, filter satu baris, pipeline dashboard           | **merged #313** |
 | W4-G5 | P2  | W4-09, W4-11, W4-12, W4-14        | Aksi baris, formatter nilai mentah, link email/telepon, upload logo       | open #306 |
 | W4-G6 | P2  | W4-13, W4-15, W4-16, W4-17        | Font, toolbar mobile, sidebar footer, My Approvals                        | open #307 |
 | W4-G7 | P1  | W4-19, W4-20, W4-21, W4-22, W4-24 | Report: query sebelum pilihan, pagination, comparative, empty state, i18n | open #308 |
