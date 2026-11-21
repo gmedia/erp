@@ -15,8 +15,33 @@ class BranchSeeder extends Seeder
         );
 
         $branches = [
-            'Head Office', 'Branch 1', 'Branch 2', 'Branch 3',
+            'Head Office',
+            'Jakarta Selatan',
+            'Bandung',
+            'Surabaya',
         ];
+
+        $legacyNames = [
+            'Branch 1' => 'Jakarta Selatan',
+            'Branch 2' => 'Bandung',
+            'Branch 3' => 'Surabaya',
+        ];
+
+        foreach ($legacyNames as $legacy => $replacement) {
+            $branch = Branch::query()->where('name', $legacy)->first();
+
+            if ($branch === null) {
+                continue;
+            }
+
+            if (Branch::query()->where('name', $replacement)->exists()) {
+                $branch->delete();
+
+                continue;
+            }
+
+            $branch->update(['name' => $replacement]);
+        }
 
         foreach ($branches as $name) {
             Branch::updateOrCreate(

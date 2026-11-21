@@ -12,6 +12,8 @@ use App\Models\Branch;
 use App\Models\Company;
 use App\Models\Department;
 use App\Models\Employee;
+use App\Models\Employment;
+use App\Models\Position;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\VehicleDriver;
@@ -433,18 +435,43 @@ class VehicleLoanSampleDataSeeder extends Seeder
     private function ensureDrivers(User $admin): array
     {
         $people = [
-            ['employee_id' => 'EMP-2021-0145', 'name' => 'Budi Santoso', 'email' => 'budi.santoso@example.com', 'license' => 'SIM-B-2024-00123', 'type' => 'B'],
-            ['employee_id' => 'EMP-2022-0117', 'name' => 'Agus Setiawan', 'email' => 'agus.setiawan@example.com', 'license' => 'SIM-B-2022-01170', 'type' => 'B'],
-            ['employee_id' => 'EMP-2020-0088', 'name' => 'Joko Susilo', 'email' => 'joko.susilo@example.com', 'license' => 'SIM-A-2020-00881', 'type' => 'A'],
+            ['employee_id' => 'EMP-2021-0145', 'name' => 'Budi Santoso', 'email' => 'budi.santoso@example.com', 'phone' => '081234567811', 'license' => 'SIM-B-2024-00123', 'type' => 'B'],
+            ['employee_id' => 'EMP-2022-0117', 'name' => 'Agus Setiawan', 'email' => 'agus.setiawan@example.com', 'phone' => '081234567812', 'license' => 'SIM-B-2022-01170', 'type' => 'B'],
+            ['employee_id' => 'EMP-2020-0088', 'name' => 'Joko Susilo', 'email' => 'joko.susilo@example.com', 'phone' => '081234567813', 'license' => 'SIM-A-2020-00881', 'type' => 'A'],
         ];
+
+        $companyId = Company::query()->value('id');
+        $branchId = Branch::query()->orderBy('id')->value('id');
+        $departmentId = Department::query()->value('id');
+        $positionId = Position::query()->value('id');
 
         $drivers = [];
 
         foreach ($people as $person) {
-            $employee = Employee::firstOrCreate(
+            $employee = Employee::updateOrCreate(
                 ['employee_id' => $person['employee_id']],
-                ['name' => $person['name'], 'email' => $person['email'], 'user_id' => $admin->id],
+                [
+                    'name' => $person['name'],
+                    'email' => $person['email'],
+                    'phone' => $person['phone'],
+                    'user_id' => $admin->id,
+                ],
             );
+
+            if ($companyId !== null) {
+                Employment::updateOrCreate(
+                    ['employee_id' => $employee->id, 'is_current' => true],
+                    [
+                        'company_id' => $companyId,
+                        'department_id' => $departmentId,
+                        'position_id' => $positionId,
+                        'branch_id' => $branchId,
+                        'salary' => 8500000,
+                        'hire_date' => now()->subYears(3),
+                        'employment_status' => 'regular',
+                    ],
+                );
+            }
 
             $drivers[] = VehicleDriver::updateOrCreate(
                 ['license_number' => $person['license']],

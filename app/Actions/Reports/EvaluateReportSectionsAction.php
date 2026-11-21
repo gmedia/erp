@@ -67,7 +67,9 @@ class EvaluateReportSectionsAction
         $subType = $section['account_sub_type_filter'] ?? null;
 
         if ($accountType === null) {
-            return 0.0;
+            // Section ringkasan tanpa akun (mis. cash_inflow) mengambil nilai
+            // dari total laporan yang dipasok pemanggil (W4-23).
+            return (float) ($reportTotals[$section['code']] ?? 0);
         }
 
         if ($subType !== null) {

@@ -2,7 +2,6 @@
 
 use App\Models\FiscalYear;
 use App\Models\ReportConfiguration;
-use App\Models\ReportSection;
 use Database\Seeders\ReportConfigurationSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
@@ -42,12 +41,15 @@ test('income statement response includes configuration with ordered sections', f
         ->and(collect($sections)->pluck('code'))->toContain('total_revenue', 'net_income');
 });
 
-test('cash flow response includes configuration with reversed sign section for depreciation', function () {
+test('cash flow response includes direct-method summary configuration', function () {
     $response = $this->getJson('/api/reports/cash-flow')->assertStatus(200);
 
     $sections = collect($response->json('configuration.sections'));
-    expect($sections->firstWhere('code', 'depreciation_addback')['sign_convention'])
-        ->toBe(ReportSection::SIGN_REVERSED);
+
+    expect($sections->pluck('code')->all())
+        ->toBe(['operating_header', 'cash_inflow', 'cash_outflow', 'net_change'])
+        ->and($sections->firstWhere('code', 'net_change')['formula'])
+        ->toBe('{cash_inflow} - {cash_outflow}');
 });
 
 test('trial balance response includes minimal configuration', function () {

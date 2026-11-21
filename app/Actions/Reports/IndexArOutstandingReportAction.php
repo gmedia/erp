@@ -28,8 +28,11 @@ class IndexArOutstandingReportAction
 
     protected function buildQuery(): Builder
     {
-        // days_overdue computed in PHP via Carbon (cross-DB). See ArOutstandingReportResource.
+        // Outstanding = invoice yang masih punya saldo tagihan; invoice paid/
+        // cancelled/void bukan piutang berjalan (W4-23, sejajar AP Outstanding).
         return $this->buildBaseCustomerInvoiceQuery()
+            ->whereIn('ci.status', ['sent', 'partially_paid', 'overdue'])
+            ->where('ci.amount_due', '>', 0)
             ->withCasts($this->getBaseCasts());
     }
 

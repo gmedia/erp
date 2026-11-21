@@ -57,10 +57,31 @@ class FinancialReportService
             $accounts,
             fn (Account $account, float $debit, float $credit, float $netDebit, float $netCredit) => [
                 ...$this->baseAccountPayload($account),
-                'inflow' => $netCredit,
-                'outflow' => $netDebit,
+                // Akun kas bersaldo normal debit: penambahan kas (debit) adalah
+                // arus masuk, pengurangan (kredit) arus keluar (W4-23).
+                'inflow' => $netDebit,
+                'outflow' => $netCredit,
             ]
         );
+    }
+
+    /**
+     * Total arus kas untuk ringkasan laporan (dipakai config cash_flow).
+     *
+     * @return array{cash_inflow: float, cash_outflow: float, net_change: float}
+     */
+    public function getCashFlowTotals(int $fiscalYearId, ?int $branchId = null): array
+    {
+        $rows = $this->getCashFlow($fiscalYearId, $branchId);
+
+        $inflow = array_sum(array_column($rows, 'inflow'));
+        $outflow = array_sum(array_column($rows, 'outflow'));
+
+        return [
+            'cash_inflow' => round($inflow, 2),
+            'cash_outflow' => round($outflow, 2),
+            'net_change' => round($inflow - $outflow, 2),
+        ];
     }
 
     /**

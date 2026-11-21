@@ -120,7 +120,7 @@ test('cash flow calculations are correct', function () {
         'normal_balance' => 'debit',
         'level' => 1,
         'is_active' => true,
-        'is_cash_flow' => false,
+        'is_cash_flow' => true,
     ]);
 
     $revenueCash = Account::create([
@@ -131,7 +131,7 @@ test('cash flow calculations are correct', function () {
         'normal_balance' => 'credit',
         'level' => 1,
         'is_active' => true,
-        'is_cash_flow' => true,
+        'is_cash_flow' => false,
     ]);
 
     $expenseCash = Account::create([
@@ -142,7 +142,7 @@ test('cash flow calculations are correct', function () {
         'normal_balance' => 'debit',
         'level' => 1,
         'is_active' => true,
-        'is_cash_flow' => true,
+        'is_cash_flow' => false,
     ]);
 
     $journal1 = JournalEntry::create([
@@ -194,11 +194,10 @@ test('cash flow calculations are correct', function () {
     Sanctum::actingAs($this->user, ['*']);
     $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
         ->assertStatus(200)
-        ->assertJsonCount(2, 'report')
-        ->assertJsonPath('report.0.code', '4100')
-        ->assertJsonPath('report.0.inflow', 1000)
-        ->assertJsonPath('report.1.code', '5200')
-        ->assertJsonPath('report.1.outflow', 200);
+        ->assertJsonCount(1, 'report')
+        ->assertJsonPath('report.0.code', '1100')
+        ->assertJsonPath('report.0.inflow', 800)
+        ->assertJsonPath('report.0.outflow', 0);
 });
 
 test('balance sheet accounts include net income in equity', function () {
