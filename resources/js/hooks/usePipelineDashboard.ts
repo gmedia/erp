@@ -15,6 +15,8 @@ export interface StateSummary {
     code: string;
     color: string;
     count: number;
+    pipeline_id?: number;
+    pipeline_name?: string;
 }
 
 export interface StaleEntity {

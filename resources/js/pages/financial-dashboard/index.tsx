@@ -109,7 +109,7 @@ export default function FinancialDashboard() {
                             placeholder="All Branches"
                             value={branchId?.toString() ?? ''}
                             onValueChange={handleBranchChange}
-                            className="w-[180px]"
+                            className="w-[160px] shrink-0"
                         />
                     </div>
                     {data?.fiscal_years && data.fiscal_years.length > 0 && (

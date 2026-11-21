@@ -83,7 +83,15 @@ it('returns correct summary data via API', function () {
     $response->assertOk()
         ->assertJsonStructure([
             'summary' => [
-                '*' => ['state_id', 'name', 'code', 'color', 'count'],
+                '*' => [
+                    'state_id',
+                    'name',
+                    'code',
+                    'color',
+                    'count',
+                    'pipeline_id',
+                    'pipeline_name',
+                ],
             ],
             'stale_entities',
         ]);

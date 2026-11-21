@@ -25,16 +25,16 @@ export const AgingFilters = memo<AgingFiltersProps>(function AgingFilters({
     onBranchChange,
 }) {
     return (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-nowrap items-center gap-2">
             <FilterDatePicker
                 label="As of"
                 inlineLabel
-                className="w-auto"
+                className="w-auto shrink-0"
                 value={asOfDate}
                 onChange={(e) => onAsOfDateChange(e.target.value)}
             />
 
-            <div>
+            <div className="shrink-0">
                 <label htmlFor="branch-select" className="sr-only">
                     Branch
                 </label>
@@ -44,7 +44,7 @@ export const AgingFilters = memo<AgingFiltersProps>(function AgingFilters({
                         onBranchChange(value === 'all' ? null : Number(value))
                     }
                 >
-                    <SelectTrigger id="branch-select" className="w-[200px]">
+                    <SelectTrigger id="branch-select" className="w-[180px]">
                         <SelectValue placeholder="All Branches" />
                     </SelectTrigger>
                     <SelectContent>
