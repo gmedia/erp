@@ -69,6 +69,11 @@ Host RAM/CPU is limited. Parallel `Read`/`Edit`/`task` batches have **killed Ope
 - `playwright.config.ts` dan `tests/e2e/global-setup.ts` sudah mendukung runner terpisah. `PLAYWRIGHT_USE_SAIL=1` memaksa **npm dan artisan** lewat Sail — jangan diset kalau ingin Playwright di host.
 - **Laravel/MariaDB/MinIO/Valkey tetap wajib di Sail**: `./vendor/bin/sail up -d --wait` + `migrate:fresh --seed` + MinIO bucket.
 - **Playwright di host**: `npx playwright test ...` (atau `PLAYWRIGHT_WORKERS=N npx playwright test ...`). Host butuh Node 20 + npm; `node_modules/` sudah ada di repo.
+- **Full suite lokal/server**: pakai **`bash scripts/e2e-full.sh`** (di luar CI). Script mengotomasi alur yang benar sekaligus — stop Vite dev + hapus `public/hot` + `npm run build`, `config:cache` (biar web server baca `DISABLE_RATE_LIMITING`; tanpa ini **429 massal**), watchdog yang cache-ulang `config.php` bila hilang, daftar direktori **sama dengan CI**, `--retries=1` 1 worker, lalu `config:clear` via `trap` (sukses/gagal/Ctrl-C) supaya Pest tetap memakai `.env.testing`. Argumen diteruskan ke Playwright:
+  - `bash scripts/e2e-full.sh` → seluruh direktori E2E (CI list)
+  - `bash scripts/e2e-full.sh tests/e2e/branches` → hanya modul tertentu
+  - `bash scripts/e2e-full.sh --shard=1/4 --reporter=line` → shard seperti CI
+  - Exit code = exit Playwright; `bootstrap/cache/config.php` dijamin tidak tersisa.
 - Supaya `global-setup` tetap menjalankan Artisan **di dalam container**, set `PLAYWRIGHT_PHP_BINARY` ke wrapper:
   `#!/usr/bin/env bash; exec ./vendor/bin/sail php "$@"` (simpan di `scripts/sail-php`, chmod +x). Tanpa ini, `tryLocalPhpBinary()` akan memakai `php` host dan gagal terkoneksi ke DB.
 - `PLAYWRIGHT_BASE_URL` tetap `http://localhost:82` (port publish Sail), bukan `localhost:80` di dalam container.
