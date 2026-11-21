@@ -160,7 +160,7 @@ function TabCount({ count }: Readonly<{ count: number }>) {
     return (
         <span
             className={cn(
-                'ml-1.5 inline-flex min-w-5 items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-semibold tabular-nums',
+                'ml-2 inline-flex min-w-6 items-center justify-center rounded-full px-2 py-0.5 text-[10px] font-semibold tabular-nums',
                 'bg-muted text-muted-foreground group-data-[state=active]:bg-primary/15 group-data-[state=active]:text-primary',
             )}
         >
@@ -456,7 +456,7 @@ export default function MyApprovalsPage() {
                                         <div className="flex w-full flex-wrap items-center gap-1.5 border-t border-border/60 pt-2">
                                             <Button
                                                 size="sm"
-                                                className="h-8 w-full border-0 bg-success text-white hover:bg-success focus-visible:ring-success/30 sm:w-auto"
+                                                className="h-8 w-full rounded-full sm:w-auto"
                                                 onClick={() =>
                                                     openActionDialog(
                                                         'approve',
@@ -469,8 +469,8 @@ export default function MyApprovalsPage() {
                                             </Button>
                                             <Button
                                                 size="sm"
-                                                variant="destructive"
-                                                className="h-8 w-full sm:w-auto"
+                                                variant="destructive-soft"
+                                                className="h-8 w-full rounded-full sm:w-auto"
                                                 onClick={() =>
                                                     openActionDialog(
                                                         'reject',
@@ -505,7 +505,7 @@ export default function MyApprovalsPage() {
                 </title>
             </Helmet>
 
-            <div className="mx-auto max-w-5xl space-y-4 p-4 sm:p-5">
+            <div className="flex w-full flex-col gap-4 p-4 sm:p-5">
                 <PageHeader
                     title="My Approvals"
                     description="Review and act on documents waiting for your decision."

@@ -91,11 +91,12 @@ export function DataTableToolbar<T>({
                 value={searchValue}
                 onChange={handleSearchChange}
                 onKeyDown={handleSearchKeyDown}
-                className="h-9 max-w-sm min-w-[12rem] flex-1 border-border bg-background placeholder:text-muted-foreground sm:flex-none"
+                className="h-9 w-full min-w-0 border-border bg-background placeholder:text-muted-foreground sm:max-w-sm sm:flex-1"
                 data-testid="search-input"
             />
 
-            <div className="ml-auto flex flex-wrap items-center gap-2">
+            {/* Mobile: kontrol dalam satu baris bisa di-scroll, bukan 2-3 baris (W4-15). */}
+            <div className="ml-auto flex w-full flex-nowrap items-center gap-2 overflow-x-auto pb-1 sm:w-auto sm:overflow-visible sm:pb-0">
                 <Button
                     variant="outline"
                     size="sm"
@@ -103,8 +104,8 @@ export function DataTableToolbar<T>({
                     aria-label="Filters"
                     data-testid="filter-button"
                 >
-                    <Filter className="mr-2 h-4 w-4" />
-                    Filters
+                    <Filter className="h-4 w-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Filters</span>
                 </Button>
 
                 <FilterModal
@@ -125,8 +126,8 @@ export function DataTableToolbar<T>({
                         aria-label="Add"
                         data-testid="add-button"
                     >
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                        Add
+                        <PlusCircle className="h-4 w-4 sm:mr-2" />
+                        <span className="hidden sm:inline">Add</span>
                     </Button>
                 )}
 
@@ -141,17 +142,22 @@ export function DataTableToolbar<T>({
                     data-testid="export-button"
                 >
                     {exporting ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <Loader2 className="h-4 w-4 animate-spin sm:mr-2" />
                     ) : (
-                        <Download className="mr-2 h-4 w-4" />
+                        <Download className="h-4 w-4 sm:mr-2" />
                     )}
-                    Export
+                    <span className="hidden sm:inline">Export</span>
                 </Button>
 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm">
-                            Columns <ChevronDown className="ml-2 h-4 w-4" />
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            aria-label="Columns"
+                        >
+                            <span className="hidden sm:inline">Columns</span>
+                            <ChevronDown className="h-4 w-4 sm:ml-2" />
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
