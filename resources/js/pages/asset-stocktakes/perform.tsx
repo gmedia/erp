@@ -34,7 +34,7 @@ export default function PerformAssetStocktakePage() {
     }, [stocktake?.ulid, fetchItems]);
 
     const breadcrumbs = [
-        { title: 'Home', href: '/' },
+        { title: 'Dashboard', href: '/dashboard' },
         { title: 'Asset Stocktakes', href: '/asset-stocktakes' },
         {
             title: stocktake

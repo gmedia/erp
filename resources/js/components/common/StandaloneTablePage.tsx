@@ -1,12 +1,7 @@
 'use client';
 
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
+import { PageHeader } from '@/components/common/PageHeader';
+import { Card, CardContent } from '@/components/ui/card';
 import { TableCell, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
@@ -92,24 +87,12 @@ export function StandaloneTablePage({
             </Helmet>
 
             <div className="flex flex-col gap-6 p-6">
+                <PageHeader
+                    title={heading}
+                    description={description}
+                    actions={actions}
+                />
                 <Card>
-                    <CardHeader className="gap-4 sm:flex-row sm:items-start sm:justify-between sm:space-y-0">
-                        <div>
-                            <CardTitle className="text-2xl font-semibold tracking-tight">
-                                {heading}
-                            </CardTitle>
-                            <CardDescription className="mt-1">
-                                {description}
-                            </CardDescription>
-                        </div>
-
-                        {actions && (
-                            <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
-                                {actions}
-                            </div>
-                        )}
-                    </CardHeader>
-
                     <CardContent className="flex flex-col gap-4">
                         {children}
                     </CardContent>

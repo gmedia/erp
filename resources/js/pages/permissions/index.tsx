@@ -1,12 +1,7 @@
+import { PageHeader } from '@/components/common/PageHeader';
 import { EmployeeSelector } from '@/components/permissions/EmployeeSelector';
 import { PermissionManager } from '@/components/permissions/PermissionManager';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { useEmployeePermissions } from '@/hooks/permissions/useEmployeePermissions';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
@@ -70,15 +65,13 @@ export default function PermissionsIndex() {
                 <title>Permissions</title>
             </Helmet>
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
+                <PageHeader
+                    title="Permissions"
+                    description="Manage system permissions for employees."
+                />
                 <div className="grid auto-rows-min gap-4 md:grid-cols-1">
                     <Card>
-                        <CardHeader>
-                            <CardTitle>Permissions Hierarchy</CardTitle>
-                            <CardDescription>
-                                Manage system permissions for employees.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
+                        <CardContent className="space-y-6 pt-6">
                             <div className="max-w-md space-y-4">
                                 <FormProvider {...form}>
                                     <form className="space-y-4">
