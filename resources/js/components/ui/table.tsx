@@ -2,20 +2,53 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+// Indikator tepi kanan (W4-03): strip gradient non-scrolling di tepi viewport
+// muncul hanya saat masih ada konten di luar viewport kanan.
+const TABLE_EDGE_RIGHT =
+  "after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-6 after:bg-linear-to-r after:from-background after:to-transparent"
+
 function Table({
   className,
   ...props
 }: Readonly<React.ComponentProps<"table">>) {
+  const scrollRef = React.useRef<HTMLDivElement>(null)
+  const [canScrollRight, setCanScrollRight] = React.useState(false)
+
+  React.useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    const update = () =>
+      setCanScrollRight(
+        el.scrollLeft + el.clientWidth < el.scrollWidth - 1
+      )
+    update()
+    el.addEventListener("scroll", update, { passive: true })
+    window.addEventListener("resize", update)
+    return () => {
+      el.removeEventListener("scroll", update)
+      window.removeEventListener("resize", update)
+    }
+  }, [])
+
   return (
     <div
       data-slot="table-container"
-      className="relative w-full overflow-x-auto"
+      data-overflow-right={canScrollRight || undefined}
+      className={cn(
+        "relative w-full min-w-0",
+        canScrollRight && TABLE_EDGE_RIGHT
+      )}
     >
-      <table
-        data-slot="table"
-        className={cn("w-full caption-bottom text-sm", className)}
-        {...props}
-      />
+      <div
+        ref={scrollRef}
+        className="w-full min-w-0 overflow-x-auto"
+      >
+        <table
+          data-slot="table"
+          className={cn("w-full caption-bottom text-sm", className)}
+          {...props}
+        />
+      </div>
     </div>
   )
 }
