@@ -34,7 +34,8 @@ class GetPipelineDashboardDataAction
         }
 
         $summaryData = [];
-        // Map all valid states for selected pipeline(s)
+        // Map all valid states for selected pipeline(s), scoped per pipeline so
+        // state cards of different pipelines are distinguishable (W4-18).
         foreach ($pipelines as $pipeline) {
             foreach ($pipeline->states as $state) {
                 $summaryData[$state->id] = [
@@ -43,6 +44,8 @@ class GetPipelineDashboardDataAction
                     'code' => $state->code,
                     'color' => $state->color ?? '#6B7280',
                     'count' => 0,
+                    'pipeline_id' => $pipeline->id,
+                    'pipeline_name' => $pipeline->name,
                 ];
             }
         }

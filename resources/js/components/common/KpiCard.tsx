@@ -27,9 +27,10 @@ export function KpiCard({
                 </CardTitle>
                 <Icon className={`h-4 w-4 ${iconColor}`} />
             </CardHeader>
-            <CardContent>
+            <CardContent className="min-w-0">
                 <div
-                    className={`text-3xl font-semibold tabular-nums ${valueClassName ?? ''}`}
+                    title={formattedValue}
+                    className={`text-xl font-semibold break-keep tabular-nums min-[1400px]:text-2xl ${valueClassName ?? ''}`}
                 >
                     {formattedValue}
                 </div>

@@ -42,7 +42,7 @@ export const FiscalYearSelector = memo<FiscalYearSelectorProps>(
                     >
                         <SelectTrigger
                             id="fiscal-year-select"
-                            className="w-[200px]"
+                            className="w-[170px] shrink-0"
                         >
                             <SelectValue placeholder="Select fiscal year" />
                         </SelectTrigger>
@@ -73,7 +73,7 @@ export const FiscalYearSelector = memo<FiscalYearSelectorProps>(
                     >
                         <SelectTrigger
                             id="comparison-year-select"
-                            className="w-[200px]"
+                            className="w-[170px] shrink-0"
                         >
                             <span className="text-muted-foreground">vs</span>
                             <SelectValue placeholder="None" />

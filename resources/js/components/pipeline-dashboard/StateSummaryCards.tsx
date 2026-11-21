@@ -39,29 +39,72 @@ export function StateSummaryCards({
         );
     }
 
+    const totalEntities = data.reduce((sum, state) => sum + state.count, 0);
+    if (totalEntities === 0) {
+        return (
+            <div className="w-full rounded-lg border border-dashed p-8 text-center text-muted-foreground">
+                <p className="font-medium text-foreground">
+                    No entities in any state yet
+                </p>
+                <p className="mt-1 text-sm">
+                    State distribution appears once records enter these
+                    pipelines.
+                </p>
+            </div>
+        );
+    }
+
+    const groups = new Map<
+        string,
+        { pipelineName: string | null; states: StateSummary[] }
+    >();
+    for (const state of data) {
+        const key = state.pipeline_id ? String(state.pipeline_id) : 'all';
+        const group = groups.get(key) ?? {
+            pipelineName: state.pipeline_name ?? null,
+            states: [],
+        };
+        group.states.push(state);
+        groups.set(key, group);
+    }
+    const showGroupHeading = groups.size > 1;
+
     return (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {data.map((state) => (
-                <Card
-                    key={state.state_id}
-                    className="overflow-hidden transition-all hover:shadow-md"
-                >
-                    <div
-                        className="h-2 w-full"
-                        style={{ backgroundColor: state.color }}
-                    />
-                    <CardHeader className="flex flex-row items-center justify-between pt-4 pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">
-                            {state.name}
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-3xl font-bold">{state.count}</div>
-                        <p className="mt-1 text-xs text-muted-foreground">
-                            entities currently in state
-                        </p>
-                    </CardContent>
-                </Card>
+        <div className="flex flex-col gap-4">
+            {Array.from(groups.entries()).map(([key, group]) => (
+                <div key={key} className="flex flex-col gap-2">
+                    {showGroupHeading && group.pipelineName ? (
+                        <h2 className="text-sm font-semibold text-foreground">
+                            {group.pipelineName}
+                        </h2>
+                    ) : null}
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                        {group.states.map((state) => (
+                            <Card
+                                key={state.state_id}
+                                className="overflow-hidden transition-all hover:shadow-md"
+                            >
+                                <div
+                                    className="h-2 w-full"
+                                    style={{ backgroundColor: state.color }}
+                                />
+                                <CardHeader className="flex flex-row items-center justify-between pt-4 pb-2">
+                                    <CardTitle className="text-sm font-medium text-muted-foreground">
+                                        {state.name}
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-3xl font-bold">
+                                        {state.count}
+                                    </div>
+                                    <p className="mt-1 text-xs text-muted-foreground">
+                                        entities currently in state
+                                    </p>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                </div>
             ))}
         </div>
     );
