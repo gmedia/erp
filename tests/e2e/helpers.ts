@@ -638,9 +638,9 @@ export async function editAccount(
     // Hover to reveal buttons
     await item.hover();
 
-    // Selector berbasis aria-label, bukan class warna (token bisa berubah).
-    const editBtn = item.getByRole('button', { name: 'Edit account' });
-    await editBtn.click();
+    // Aksi baris kini menu "..." standar (W4-09).
+    await item.getByRole('button', { name: 'Actions' }).first().click();
+    await page.getByRole('menuitem', { name: 'Edit' }).click();
 
     const dialog = page.getByRole('dialog');
     await expect(dialog).toBeVisible();
@@ -680,9 +680,9 @@ export async function deleteAccount(page: Page, code: string): Promise<void> {
     // Hover to reveal buttons
     await item.hover();
 
-    // Selector berbasis aria-label, bukan class warna (token bisa berubah).
-    const deleteBtn = item.getByRole('button', { name: 'Delete account' });
-    await deleteBtn.click();
+    // Aksi baris kini menu "..." standar (W4-09).
+    await item.getByRole('button', { name: 'Actions' }).first().click();
+    await page.getByRole('menuitem', { name: 'Delete' }).click();
 
     // Confirm deletion in AlertDialog
     const confirmBtn = page.getByRole('button', { name: /Delete/i }).last();

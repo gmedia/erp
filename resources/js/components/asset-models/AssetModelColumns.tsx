@@ -1,6 +1,7 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
+import { formatStatusLabel } from '@/lib/status-badge';
 import { ColumnDef } from '@tanstack/react-table';
 
 import {
@@ -25,10 +26,23 @@ const renderCategoryCell = ({ row }: { row: { original: AssetModel } }) => {
  */
 const renderSpecsCell = ({ row }: { row: { original: AssetModel } }) => {
     const specs = row.original.specs;
-    if (!specs) return <span className="text-muted-foreground">-</span>;
+    if (!specs || typeof specs !== 'object') {
+        return <span className="text-muted-foreground">-</span>;
+    }
+
+    const entries = Object.entries(specs as Record<string, unknown>);
+    if (entries.length === 0) {
+        return <span className="text-muted-foreground">-</span>;
+    }
+
     return (
         <span className="text-xs text-muted-foreground">
-            {JSON.stringify(specs).slice(0, 50)}...
+            {entries
+                .map(
+                    ([key, value]) =>
+                        `${formatStatusLabel(key)}: ${String(value)}`,
+                )
+                .join(' · ')}
         </span>
     );
 };

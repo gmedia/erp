@@ -1,6 +1,7 @@
 'use client';
 
 import { createReportTextColumn } from '@/components/common/ReportColumns';
+import { formatStatusLabel } from '@/lib/status-badge';
 import { createCurrencyColumn } from '@/utils/columns';
 import type { ColumnDef } from '@tanstack/react-table';
 
@@ -48,7 +49,7 @@ export const trialBalanceDetailedColumns: ColumnDef<TrialBalanceDetailedItem>[] 
         createReportTextColumn<TrialBalanceDetailedItem>({
             id: 'account_type',
             header: 'Type',
-            getValue: (item) => item.account_type,
+            getValue: (item) => formatStatusLabel(item.account_type),
             sortable: true,
         }),
         currencyCol('opening_balance', 'Opening Balance'),

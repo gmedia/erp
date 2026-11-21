@@ -1,7 +1,7 @@
 'use client';
 
+import { GenericActions } from '@/components/common/ActionsDropdown';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { formatStatusLabel, statusBadgeVariant } from '@/lib/status-badge';
 import { type JournalEntry } from '@/types/journal-entry';
 import {
@@ -13,7 +13,6 @@ import {
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { type ColumnDef } from '@tanstack/react-table';
-import { Eye, Pencil, Trash } from 'lucide-react';
 
 export const journalEntryColumns: ColumnDef<JournalEntry>[] = [
     createSelectColumn<JournalEntry>(),
@@ -64,37 +63,19 @@ export const journalEntryColumns: ColumnDef<JournalEntry>[] = [
         },
     },
     {
-        id: 'row-actions',
+        id: 'actions',
+        size: 56,
         cell: ({ row, table }) => {
             const meta = table.options.meta as CustomTableMeta<JournalEntry>;
+            const item = row.original;
+            const isDraft = item.status === 'draft';
             return (
-                <div className="flex items-center gap-2">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => meta?.onView?.(row.original)}
-                    >
-                        <Eye className="h-4 w-4" />
-                    </Button>
-                    {row.original.status === 'draft' && (
-                        <>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => meta?.onEdit?.(row.original)}
-                            >
-                                <Pencil className="h-4 w-4" />
-                            </Button>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => meta?.onDelete?.(row.original)}
-                            >
-                                <Trash className="h-4 w-4 text-destructive-foreground" />
-                            </Button>
-                        </>
-                    )}
-                </div>
+                <GenericActions
+                    item={item}
+                    onView={meta?.onView}
+                    onEdit={isDraft ? meta?.onEdit : undefined}
+                    onDelete={isDraft ? meta?.onDelete : undefined}
+                />
             );
         },
     },

@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge';
-import { statusBadgeVariant } from '@/lib/status-badge';
+import { formatClassName, statusBadgeVariant } from '@/lib/status-badge';
 import {
     createActionsColumn,
     createSelectColumn,
@@ -23,12 +23,11 @@ export const approvalFlowColumns: ColumnDef<ApprovalFlow>[] = [
     {
         accessorKey: 'approvable_type',
         ...createSortingHeader('Approvable Type'),
-        cell: ({ row }) => {
-            const type = row.getValue('approvable_type') as string;
-            if (!type) return '';
-            const parts = type.split('\\');
-            return parts.at(-1) ?? '';
-        },
+        cell: ({ row }) => (
+            <span>
+                {formatClassName(row.getValue('approvable_type') as string)}
+            </span>
+        ),
     },
     {
         accessorKey: 'is_active',

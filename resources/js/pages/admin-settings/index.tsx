@@ -26,7 +26,7 @@ import { Transition } from '@headlessui/react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
 interface SettingsData {
@@ -119,6 +119,8 @@ function GeneralSettings({
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [logoFileName, setLogoFileName] = useState<string>('');
+    const logoInputRef = useRef<HTMLInputElement>(null);
 
     const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -245,12 +247,32 @@ function GeneralSettings({
                             className="h-14 w-auto rounded-md bg-card object-contain p-2"
                         />
                     )}
-                    <Input
-                        id="company_logo"
-                        name="company_logo"
-                        type="file"
-                        accept=".svg,image/svg+xml"
-                    />
+                    <div className="flex flex-wrap items-center gap-2">
+                        <input
+                            ref={logoInputRef}
+                            id="company_logo"
+                            name="company_logo"
+                            type="file"
+                            accept=".svg,image/svg+xml"
+                            className="hidden"
+                            onChange={(event) =>
+                                setLogoFileName(
+                                    event.target.files?.[0]?.name ?? '',
+                                )
+                            }
+                        />
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => logoInputRef.current?.click()}
+                        >
+                            Pilih Logo SVG
+                        </Button>
+                        <span className="text-sm text-muted-foreground">
+                            {logoFileName || 'Belum ada file dipilih'}
+                        </span>
+                    </div>
                 </SettingsRow>
             </form>
         </SettingsSection>

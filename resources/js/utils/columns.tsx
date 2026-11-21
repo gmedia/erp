@@ -68,6 +68,10 @@ export type ActionsColumnOptions<T = Record<string, unknown>> = {
     onView?: (row: T) => void;
     viewPath?: (row: T) => string;
     enableHiding?: boolean;
+    /** Sembunyikan Edit bila predikat false (mis. hanya status draft). */
+    canEdit?: (row: T) => boolean;
+    /** Sembunyikan Delete bila predikat false. */
+    canDelete?: (row: T) => boolean;
 };
 
 // Helper function to create sorting header
@@ -304,7 +308,9 @@ export function createLinkColumn<T = Record<string, unknown>>(
         label,
         enableSorting = true,
         linkType,
-        linkClassName = 'text-info hover:text-info hover:underline',
+        // Email/telepon sebagai teks biasa agar tabel tidak ramai tautan biru;
+        // tetap dapat diklik (W4-12).
+        linkClassName = 'text-foreground underline-offset-4 hover:underline',
     } = options;
 
     const getHref = (value: string) => {
@@ -394,6 +400,8 @@ export function createActionsColumn<T = Record<string, unknown>>(
         onView,
         viewPath,
         enableHiding = false,
+        canEdit,
+        canDelete,
     } = options;
 
     return {
@@ -410,8 +418,16 @@ export function createActionsColumn<T = Record<string, unknown>>(
                     item={item}
                     viewUrl={viewPath ? viewPath(item) : undefined}
                     onView={onView}
-                    onEdit={onEdit ? () => onEdit(item) : undefined}
-                    onDelete={onDelete ? () => onDelete(item) : undefined}
+                    onEdit={
+                        onEdit && (canEdit?.(item) ?? true)
+                            ? () => onEdit(item)
+                            : undefined
+                    }
+                    onDelete={
+                        onDelete && (canDelete?.(item) ?? true)
+                            ? () => onDelete(item)
+                            : undefined
+                    }
                 />
             );
         },
