@@ -1,84 +1,151 @@
 # Visual Audit — Findings
 
+## Audit pasca gelombang 1–4 (2026-11-21, #296)
+
+**Cakupan:** 85 route `url-list.json` × **light/dark** × **desktop 1440×900 / mobile 390×844** = 340 capture (server dev, `npm run build`, seed segar, admin).
+**Harness:** `VISUAL_AUDIT=1 VISUAL_AUDIT_WAVE=wave-4 VISUAL_AUDIT_THEMES=light,dark VISUAL_AUDIT_VIEWPORTS=desktop,mobile npx playwright test -c playwright.visual-audit.config.ts` → PNG + `report.jsonl` di `docs/visual-audit/waves/wave-4/` (gitignored, tidak di-commit). 85/85 passed, 6,4 menit.
+**Pembanding:** referensi desain light/dark (bahasa visual #259–#292) + `docs/ui-design-rules.md` §0.
+
+### Metrik otomatis (`report.jsonl`)
+
+| Cek                                                            | Hasil                                                           |
+| -------------------------------------------------------------- | --------------------------------------------------------------- |
+| Kelas `.dark` aktif di capture dark                            | 170/170                                                         |
+| Overflow horizontal level halaman (`scrollWidth > innerWidth`) | 0 (desktop & mobile) — tabel lebar di-scroll di dalam container |
+| Error console saat load                                        | 1 — `/reports/budget-variance` 422 (W4-19)                      |
+
+### Temuan
+
+Prioritas: **P1** = terlihat jelas / salah informasi / melanggar aturan inti; **P2** = inkonsistensi antar modul; **P3** = polish.
+Nama file screenshot: `<slug>.png` (light desktop) atau `<slug>--<theme>--<viewport>.png`.
+
+#### A. Pola bersama (shared shell / komponen)
+
+| ID    | Pri | Masalah                                                                                                                                                                                                                                                                                                                                                                         | Route contoh                                                                                                                                                                                                                                                                                                                                                                                                                              | Arah perbaikan                                                                                                                                |
+| ----- | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| W4-01 | P1  | Label status mentah: `pending_approval`, `in_transit`, `in_progress`, `stocktake_result`, `bank_transfer`, huruf kecil `draft`/`confirmed`/`partially paid`/`closed`/`open`/`archived`. Report memakai Title Case untuk status yang sama.                                                                                                                                       | stock-transfers, inventory-stocktakes, stock-adjustments, goods-receipts, purchase-requests (priority), supplier-bills, customer-invoices, ar-receipts, credit-notes, ap-payments, fiscal-years, coa-versions, asset-maintenances (`In_progress`), asset-stocktakes, reports/ap-payment-history                                                                                                                                           | Satu formatter label (humanize + i18n) + satu komponen badge status dipakai semua kolom status/priority/method.                               |
+| W4-02 | P1  | Warna badge status tidak semantik (aturan §0.4: `success`/`warning`/`destructive-soft`/`outline`): `Active`, `Closed`, `Completed`, `POSTED`, `Step Approved`, `high` = solid primary (light hitam, dark putih menyala); `urgent`, `Step Rejected` = solid merah; pipeline-audit-trail pill solid saturasi (oranye/hijau/biru, teks putih — kontras rendah, terutama di amber). | customers, suppliers, products, recurring-journals, period-closings, report-configurations, bank-reconciliations, budgets, journal-entries, pipelines, approval-flows, approval-delegations, purchase-requests, reports/purchase-order-status (Status Category), pipeline-audit-trail, approval-audit-trail                                                                                                                               | Peta status→tone terpusat; badge soft (`bg-success-soft` dst.) + `outline` untuk netral. Gelombang 2 (#269) belum menjangkau modul-modul ini. |
+| W4-03 | P1  | Kolom paling kanan terpotong di 1440px di balik kolom aksi sticky, tanpa indikator bisa di-scroll (teks terpotong `He…`, `Rp`, `A`, `98,`).                                                                                                                                                                                                                                     | employees (Branch), assets (Status), purchase-orders, supplier-returns, supplier-bills, customer-invoices (Grand Total), recurring-journals, asset-maintenances (Notes), stock-movements (Balance), reports/ap-aging, ap-outstanding, ap-payment-history, ar-aging, ar-outstanding, customer-statement, assets/register, inventory-valuation, purchase-order-status, purchase-history, stock-adjustment, pipeline-audit-trail (Performer) | Bayangan/gradient tepi kanan saat container scrollable; tinjau default column visibility & min-width kolom; kolom sticky tidak menutupi isi.  |
+| W4-04 | P1  | Halaman CRUD tanpa judul H1 + deskripsi (hanya breadcrumb/label di topbar), sementara dashboard, report, stock-movements, accounts punya. Tidak sesuai referensi (judul halaman jelas di atas konten).                                                                                                                                                                          | semua halaman `createEntityCrudPage` (employees, customers, suppliers, journal-entries, assets, purchase-orders, master data, …)                                                                                                                                                                                                                                                                                                          | `createEntityCrudPage` merender `PageHeader` (title + description opsional dari config).                                                      |
+| W4-05 | P2  | Shell halaman custom berbeda-beda: H1 di dalam card pembungkus (posting-journals, asset-depreciation-runs), card "Hierarchy" (permissions, users), card-in-card (reports/trial-balance).                                                                                                                                                                                        | posting-journals, asset-depreciation-runs, permissions, users, reports/trial-balance                                                                                                                                                                                                                                                                                                                                                      | `PageHeader` di luar card; konten tanpa pembungkus ganda.                                                                                     |
+| W4-06 | P2  | Akar breadcrumb tidak konsisten: `Home` (my-approvals, approval-monitoring), `Dashboard` (admin-settings, permissions, users, asset-depreciation-runs), `Admin`/`Inventory`/`Reports`/`Master Data`/`Pipelines`; banyak CRUD tanpa breadcrumb.                                                                                                                                  | lihat kolom kiri                                                                                                                                                                                                                                                                                                                                                                                                                          | Satu aturan breadcrumb (grup menu → halaman) dari menu tree.                                                                                  |
+| W4-07 | P1  | Nilai KPI terpotong di card desktop: `Rp 11.375.000`, `Rp 48.000.000`, `Rp 1.422.800.0…`, `Rp 842.591.66…`; Cash Balance negatif: tanda `-` terbungkus ke baris sendiri.                                                                                                                                                                                                        | financial-dashboard, aging-dashboard, asset-dashboard                                                                                                                                                                                                                                                                                                                                                                                     | Ukuran angka responsif / format ringkas (mis. `Rp 1,42 M`) + nilai penuh di tooltip; tanda minus menempel (`whitespace-nowrap`).              |
+| W4-08 | P2  | Filter header dashboard pecah 2 baris di 1440px (Branch + FY + `vs` bertumpuk; As of + Branch bertumpuk) — target #291 satu baris.                                                                                                                                                                                                                                              | financial-dashboard, aging-dashboard                                                                                                                                                                                                                                                                                                                                                                                                      | Lebar kontrol tetap/ringkas atau pindahkan deskripsi agar toolbar muat satu baris di ≥1280px.                                                 |
+| W4-09 | P2  | Aksi baris tidak seragam dengan menu `⋯` (#292): ikon mata + pensil (journal-entries), ikon mata (posting-journals, asset-depreciation-runs, pipeline-audit-trail, approval-audit-trail), ikon biru/merah (accounts tree). Report asset-register justru punya `⋯`.                                                                                                              | lihat kolom kiri                                                                                                                                                                                                                                                                                                                                                                                                                          | `GenericActions`/`createActionsColumn` untuk list; report read-only tanpa kolom aksi atau satu ikon view konsisten.                           |
+| W4-10 | P2  | Ukuran/gaya header kolom campur: kolom non-sortable lebih kecil (Grand Total, Amount Due, Description, Specs, Symbol, Category).                                                                                                                                                                                                                                                | reports/ap-_, ar-_, product-categories, units, asset-models, inventory-valuation                                                                                                                                                                                                                                                                                                                                                          | Header non-sortable memakai gaya yang sama dengan `createSortingHeader` (tanpa ikon).                                                         |
+| W4-11 | P2  | Nilai mentah di sel: JSON `{"cpu":"i5",…}` (asset-models Specs); nama class `PurchaseRequest`/`SupplierBill` (pipelines Entity, approval-flows Approvable Type, audit trail Document Type); `asset` huruf kecil (trial-balance-detailed Type); bulan `1/2/3` (period-closings); tanggal ISO `2026-11-19` (reports/stock-adjustment) sementara lainnya `dd/mm/yyyy`.             | lihat kolom kiri                                                                                                                                                                                                                                                                                                                                                                                                                          | Formatter tampilan (spec key-value ringkas, label entity, nama bulan, format tanggal tunggal).                                                |
+| W4-12 | P2  | Email/telepon di tabel tampil sebagai link biru → tabel ramai; referensi memakai teks biasa.                                                                                                                                                                                                                                                                                    | employees, customers, suppliers                                                                                                                                                                                                                                                                                                                                                                                                           | Teks `text-foreground`/muted, link hanya saat hover/ikon.                                                                                     |
+| W4-13 | P2  | Font `--font-sans: 'Instrument Sans'` dideklarasikan tetapi tidak pernah dimuat (tanpa `@font-face`/link) → fallback font sistem; bobot `font-medium` sel utama (#292) tidak terlihat bila font fallback tak punya 500 (capture server: DejaVu Sans).                                                                                                                           | semua tabel (contoh departments, employees)                                                                                                                                                                                                                                                                                                                                                                                               | Self-host font (mis. `@fontsource`, aman untuk on-premise offline) dan/atau `font-semibold` untuk sel utama.                                  |
+| W4-14 | P2  | Upload logo di Admin Settings memakai input file native ("Choose File No file chosen") — melanggar Core Rule 7 (shadcn).                                                                                                                                                                                                                                                        | admin-settings                                                                                                                                                                                                                                                                                                                                                                                                                            | Wrapper `Button` + `Input` tersembunyi seperti pola upload lain.                                                                              |
+| W4-15 | P2  | Mobile 390px: toolbar tabel pecah 2–3 baris (Filters/Add/Import/Export/Columns); toolbar report rata tengah vs CRUD rata kiri; kolom aksi journal-entries tidak sticky sehingga hilang di luar layar.                                                                                                                                                                           | employees, suppliers, journal-entries, semua reports (`--light--mobile`)                                                                                                                                                                                                                                                                                                                                                                  | Di mobile: Import/Export/Columns masuk menu overflow; alignment kiri seragam; aksi sticky di semua list.                                      |
+| W4-16 | P3  | Sidebar: item terakhir grup yang terbuka terpotong di balik footer (English/User Guide) tanpa fade/scroll hint.                                                                                                                                                                                                                                                                 | departments (Master Data → Product), reports/\* (Report → Income Statement)                                                                                                                                                                                                                                                                                                                                                               | Area menu scroll dengan fade bawah atau footer tidak menimpa.                                                                                 |
+| W4-17 | P3  | My Approvals desktop: kolom konten sempit terpusat dengan ruang kosong kiri besar; Approve/Reject solid saturasi (mobile: dua tombol penuh merah/hijau besar). Tab count rapat.                                                                                                                                                                                                 | my-approvals                                                                                                                                                                                                                                                                                                                                                                                                                              | Lebar konten mengikuti shell; Approve = primary pill, Reject = `destructive-soft`.                                                            |
+| W4-18 | P3  | Pipeline dashboard: kartu state diulang per pipeline tanpa label pipeline (mis. `Draft` muncul dua kali), semua 0 tanpa empty state.                                                                                                                                                                                                                                            | pipeline-dashboard                                                                                                                                                                                                                                                                                                                                                                                                                        | Kelompokkan per pipeline (judul grup) + empty state.                                                                                          |
+
+#### B. Fungsional / data yang terlihat di UI
+
+| ID    | Pri | Masalah                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Route                                                                                                                                                  | Arah perbaikan                                                                                                                                                                                     |
+| ----- | --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| W4-19 | P1  | Halaman memanggil API sebelum budget dipilih → 422 + toast "The budget id field is required."                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | reports/budget-variance                                                                                                                                | Query `enabled` hanya bila budget terpilih; empty state "Pilih budget".                                                                                                                            |
+| W4-20 | P1  | Info pagination salah: 12 baris tampil tetapi "Showing 0 to 0 of 0 entries" (trial-balance-detailed); 1 baris tetapi "Showing 0 to 0 of 1" (asset-stocktake-variances). Trial-balance-detailed juga menampilkan akun yang sama 3× tanpa fiscal year dipilih.                                                                                                                                                                                                                                                                                                                      | reports/trial-balance-detailed, reports/asset-stocktake-variances                                                                                      | Periksa mapping `meta` response ↔ `DataTablePagination`; sumber baris trial-balance-detailed sebelum filter.                                                                                       |
+| W4-21 | P2  | Comparative: % change `0.0%` saat pembanding Rp 0 (seharusnya `—`/n/a); angka total header bertabrakan (`Rp 68.875.0000.0%`).                                                                                                                                                                                                                                                                                                                                                                                                                                                     | reports/comparative                                                                                                                                    | Guard pembagi nol + jarak/kolom tetap untuk total.                                                                                                                                                 |
+| W4-22 | P2  | Report yang butuh pilihan (account/budget/fiscal year) hanya menampilkan "No results."                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | reports/general-ledger, budget-variance, trial-balance-detailed                                                                                        | Empty state instruktif ("Pilih akun untuk melihat buku besar").                                                                                                                                    |
+| W4-23 | P2  | Data demo tidak konsisten/realistis (Core Rule 6): branch `Branch 1/2/3` (+ asset-locations `Office (Branch 1)`); 3 employee tanpa status/phone/department/position; stock-monitor & inventory-valuation qty 0 sedangkan stock-movements balance 98; INV-2026-000004 received Rp 36 jt atas Rp 18 jt (amount due −Rp 18 jt) dan ar-outstanding memuat invoice Paid/Cancelled/Void; book-value-depreciation & maintenance-cost kosong padahal ada depreciation run posted & maintenance completed; cash-flow menampilkan Cash in Banks Rp 59,5 jt sebagai outflow (net −Rp 59 jt). | branches, asset-locations, employees, stock-monitor, reports/inventory-valuation, ar-outstanding, book-value-depreciation, maintenance-cost, cash-flow | Audit seeder (idempoten, nama realistis, saldo konsisten) **dan** cek logic report (filter outstanding, sumber nilai buku/biaya maintenance, arah inflow/outflow) — bedakan bug seed vs bug query. |
+| W4-24 | P3  | Cash-flow summary berlabel Indonesia (`ARUS KAS DARI AKTIVITAS OPERASIONAL`) di UI berbahasa Inggris.                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | reports/cash-flow                                                                                                                                      | Lewat i18n.                                                                                                                                                                                        |
+
+### Dark mode
+
+Tidak ada halaman yang gagal beralih tema; token permukaan/teks konsisten. Masalah dark yang tersisa tercakup di **W4-02** (badge solid putih/merah/oranye terlalu kontras atau teks putih di amber) dan **W4-12** (link biru).
+
+### Ringkasan untuk perbaikan
+
+- **Komponen bersama dulu** (dampak terbesar, sedikit file): W4-01 + W4-02 (badge status), W4-03 (tepi scroll tabel), W4-04 (PageHeader CRUD), W4-13 (font), W4-07 (KPI).
+- **Per-modul**: W4-05, W4-06, W4-09, W4-10, W4-11, W4-12, W4-14, W4-15.
+- **Bug/data**: W4-19, W4-20, W4-21, W4-22, W4-23 (perlu Pest/E2E, bukan hanya visual).
+
+---
+
+## Arsip — Wave 0–1 (2026-08)
+
 **Wave:** 0 + 1 (capture + multimodal vision)  
 **Last updated:** 2026-08-18  
 **Reviewer:** multimodal-looker (`ses_02021a5c2ffeaD0HIIg6ymhnEW`)  
 **Viewport:** 1440×900  
 **Stop-rule (≥3 shared-shell):** **YES — freeze Wave 2 mass capture**
 
-## Wave capture status
+### Wave capture status
 
-| Wave | Routes | Status |
-|------|--------|--------|
-| 0 | `/dashboard` | Capture OK |
-| 1 | 7 shells (CRUD/report/financial) | Capture OK + vision |
+| Wave | Routes                           | Status              |
+| ---- | -------------------------------- | ------------------- |
+| 0    | `/dashboard`                     | Capture OK          |
+| 1    | 7 shells (CRUD/report/financial) | Capture OK + vision |
 
-## P0 (must fix first)
+### P0 (must fix first)
 
-| ID | Route | Summary | Screenshot |
-|----|-------|---------|------------|
-| EMP-01 | `/employees` | Table clips right: salary truncated; **Actions column not visible**; no sticky actions | `wave-1/employees.png` |
-| FD-01 | `/financial-dashboard` | **Cash Balance negative** with **green/teal** (positive) semantic | `wave-1/financial-dashboard.png` |
-| SHELL-07 | EMP, PO | Horizontal overflow / missing sticky Actions (systemic) | wave-1 |
+| ID       | Route                  | Summary                                                                                | Screenshot                       |
+| -------- | ---------------------- | -------------------------------------------------------------------------------------- | -------------------------------- |
+| EMP-01   | `/employees`           | Table clips right: salary truncated; **Actions column not visible**; no sticky actions | `wave-1/employees.png`           |
+| FD-01    | `/financial-dashboard` | **Cash Balance negative** with **green/teal** (positive) semantic                      | `wave-1/financial-dashboard.png` |
+| SHELL-07 | EMP, PO                | Horizontal overflow / missing sticky Actions (systemic)                                | wave-1                           |
 
-## Shared-shell (P1+) — stop mass capture
+### Shared-shell (P1+) — stop mass capture
 
-| ID | Sev | Screens | Issue |
-|----|-----|---------|-------|
-| SHELL-01 | P1 | All 8 | Sidebar nested labels truncated (ellipsis) |
-| SHELL-02 | P1 | DEPT EMP PO RSM | Toolbar 1 vs 2 rows; Columns orphaned |
-| SHELL-03 | P1 | DEPT EMP PO RSM | Search left / actions far right; dead gap |
-| SHELL-04 | P1 | DASH vs ACC/BS/FD | Page chrome split: breadcrumb-only vs H1+desc |
-| SHELL-05 | P1 | Sparse tables | Huge empty canvas under few rows |
-| SHELL-06 | P1 | EMP PO | Status badges non-semantic (mono black/outline) |
-| SHELL-07 | P0–P1 | EMP PO | Table overflow / no sticky Actions |
-| SHELL-08 | P1 | ACC | Sidebar **active item wrong** (Department while on CoA) |
-| SHELL-09 | P2 | Deep nav | Long nested lists; active child hard to see |
-| SHELL-10 | P2 | CRUD | Checkbox without bulk action UX |
-| SHELL-11 | P2 | DataTable | Pagination weak in empty footer zone |
-| SHELL-12 | P3 | DASH vs FD | **in this MR:** shortcuts + master-data mix; do not merge with financial dashboard |
+| ID       | Sev   | Screens           | Issue                                                                              |
+| -------- | ----- | ----------------- | ---------------------------------------------------------------------------------- |
+| SHELL-01 | P1    | All 8             | Sidebar nested labels truncated (ellipsis)                                         |
+| SHELL-02 | P1    | DEPT EMP PO RSM   | Toolbar 1 vs 2 rows; Columns orphaned                                              |
+| SHELL-03 | P1    | DEPT EMP PO RSM   | Search left / actions far right; dead gap                                          |
+| SHELL-04 | P1    | DASH vs ACC/BS/FD | Page chrome split: breadcrumb-only vs H1+desc                                      |
+| SHELL-05 | P1    | Sparse tables     | Huge empty canvas under few rows                                                   |
+| SHELL-06 | P1    | EMP PO            | Status badges non-semantic (mono black/outline)                                    |
+| SHELL-07 | P0–P1 | EMP PO            | Table overflow / no sticky Actions                                                 |
+| SHELL-08 | P1    | ACC               | Sidebar **active item wrong** (Department while on CoA)                            |
+| SHELL-09 | P2    | Deep nav          | Long nested lists; active child hard to see                                        |
+| SHELL-10 | P2    | CRUD              | Checkbox without bulk action UX                                                    |
+| SHELL-11 | P2    | DataTable         | Pagination weak in empty footer zone                                               |
+| SHELL-12 | P3    | DASH vs FD        | **in this MR:** shortcuts + master-data mix; do not merge with financial dashboard |
 
 **Material shared-shell count:** 11 (≥3 threshold).
 
-## High-signal per-route (non-exhaustive)
+### High-signal per-route (non-exhaustive)
 
-| ID | Sev | Route | Summary |
-|----|-----|-------|---------|
-| DASH-01 | P1 | `/dashboard` | 4 count cards + ~60% empty; unfinished home |
-| EMP-02 | P1 | `/employees` | Toolbar 2-row mess |
-| EMP-03 | P1 | `/employees` | All status “Regular” solid black |
-| PO-01 | P1 | `/purchase-orders` | 8 statuses look identical; critical states don’t pop |
-| PO-04 | P2 | `/purchase-orders` | No Actions column visible |
-| PO-05 | P2 | `/purchase-orders` | **in this MR** — sticky Grand Total immediately left of Actions |
-| ACC-01 | P1 | `/accounts` | Double title (breadcrumb + H1 same) |
-| ACC-02 | P1 | `/accounts` | Wrong sidebar active state |
-| RSM-01 | P1 | stock-movement | 2 rows + ~70% white void |
-| RSM-02 | P2 | stock-movement | **landed** — `title` + description on ReportDataTablePage |
-| BS-01 | P2 | balance-sheet | Bare selects; “None” opaque without Compare label |
-| BS-02 | P2 | balance-sheet | **landed** — `getSignedAmountTextClass` rose for negatives |
-| FD-02 | P1 | financial-dashboard | **landed** — FY select binds to preferred year; keepPreviousData on refetch |
-| FD-03 | P1 | financial-dashboard | **landed** — KPI “vs comparison” gated on `showComparison` |
-| FD-06 | P2 | financial-dashboard | **landed** — breadcrumb + H1 both “Financial Overview” |
+| ID      | Sev | Route               | Summary                                                                     |
+| ------- | --- | ------------------- | --------------------------------------------------------------------------- |
+| DASH-01 | P1  | `/dashboard`        | 4 count cards + ~60% empty; unfinished home                                 |
+| EMP-02  | P1  | `/employees`        | Toolbar 2-row mess                                                          |
+| EMP-03  | P1  | `/employees`        | All status “Regular” solid black                                            |
+| PO-01   | P1  | `/purchase-orders`  | 8 statuses look identical; critical states don’t pop                        |
+| PO-04   | P2  | `/purchase-orders`  | No Actions column visible                                                   |
+| PO-05   | P2  | `/purchase-orders`  | **in this MR** — sticky Grand Total immediately left of Actions             |
+| ACC-01  | P1  | `/accounts`         | Double title (breadcrumb + H1 same)                                         |
+| ACC-02  | P1  | `/accounts`         | Wrong sidebar active state                                                  |
+| RSM-01  | P1  | stock-movement      | 2 rows + ~70% white void                                                    |
+| RSM-02  | P2  | stock-movement      | **landed** — `title` + description on ReportDataTablePage                   |
+| BS-01   | P2  | balance-sheet       | Bare selects; “None” opaque without Compare label                           |
+| BS-02   | P2  | balance-sheet       | **landed** — `getSignedAmountTextClass` rose for negatives                  |
+| FD-02   | P1  | financial-dashboard | **landed** — FY select binds to preferred year; keepPreviousData on refetch |
+| FD-03   | P1  | financial-dashboard | **landed** — KPI “vs comparison” gated on `showComparison`                  |
+| FD-06   | P2  | financial-dashboard | **landed** — breadcrumb + H1 both “Financial Overview”                      |
 
 Full multimodal narrative: session `ses_02021a5c2ffeaD0HIIg6ymhnEW`.
 
-## Themes → BACKLOG
+### Themes → BACKLOG
 
 T1 DataTable shell v2 · T2 Sidebar IA/active · T3 Page header contract · T4 KPI/dashboard semantics · T5 Sparse/report density
 
 ---
 
-## Re-smoke 2026-11-17 (issue #116) — code-backed checklist
+### Re-smoke 2026-11-17 (issue #116) — code-backed checklist
 
 Harness: `VISUAL_AUDIT=1 VISUAL_AUDIT_PRESET=smoke` (3 passed) + `exceptions` (5 passed), 1 worker, dijalankan **di dalam container** dengan `PLAYWRIGHT_BASE_URL=http://127.0.0.1:80` (bukan `:82` published host — dari container `:82` mengarah ke dirinya sendiri dan ERR_CONNECTION_REFUSED). PNG otomatis ter-ignore via `.gitignore`.
 
 Checklist `docs/ui-design-rules.md` Bagian 3 dipakai dalam mode **code-backed review** (PNG tidak dapat dibaca oleh agent tanpa vision di sesi ini, sehingga verifikasi dilakukan terhadap komponen/shared shell, bukan piksel):
 
-| Aturan | Bukti di kode | Verdict |
-|--------|---------------|---------|
-| D. Actions sticky kanan | `DataTableCore.tsx` `STICKY_ACTIONS_CELL/HEAD` = `sticky right-0` | PASS |
-| E. Angka negatif bukan hijau | `FinancialReportSection.getSignedAmountTextClass` → rose untuk `value < 0`; `SummaryCards.signedBalanceChrome` → `border-l-rose-500`, `text-rose-600` | PASS (HF-1/FD-01 fixed) |
-| B. Page shell konsisten | route CRUD/report memakai factory / `ReportDataTablePage` | PASS |
-| A–C, F–G (chrome, toolbar, form/modal, teknis) | Tidak diverifikasi visual pada sesi ini | UNCLEAR |
+| Aturan                                         | Bukti di kode                                                                                                                                         | Verdict                 |
+| ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| D. Actions sticky kanan                        | `DataTableCore.tsx` `STICKY_ACTIONS_CELL/HEAD` = `sticky right-0`                                                                                     | PASS                    |
+| E. Angka negatif bukan hijau                   | `FinancialReportSection.getSignedAmountTextClass` → rose untuk `value < 0`; `SummaryCards.signedBalanceChrome` → `border-l-rose-500`, `text-rose-600` | PASS (HF-1/FD-01 fixed) |
+| B. Page shell konsisten                        | route CRUD/report memakai factory / `ReportDataTablePage`                                                                                             | PASS                    |
+| A–C, F–G (chrome, toolbar, form/modal, teknis) | Tidak diverifikasi visual pada sesi ini                                                                                                               | UNCLEAR                 |
 
 Catatan: untuk verdict visual penuh (SHELL-01/02/03/06/08, double title), diperlukan agent dengan kemampuan vision atau OCR terstruktur. Tidak ada finding baru yang ditambahkan; ini hanya konfirmasi bahwa perbaikan lama masih hadir di kode setelah re-smoke.
