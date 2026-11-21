@@ -1,12 +1,12 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
 import { SupplierBill } from '@/types/supplier-bill';
 import {
     createActionsColumn,
     createDateColumn,
     createSelectColumn,
     createSortingHeader,
+    createStatusBadgeColumn,
     createTextColumn,
 } from '@/utils/columns';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
@@ -18,10 +18,6 @@ const renderSupplierCell = ({ row }: { row: { original: SupplierBill } }) => (
 
 const renderBranchCell = ({ row }: { row: { original: SupplierBill } }) => (
     <div>{row.original.branch?.name ?? '-'}</div>
-);
-
-const renderStatusCell = ({ row }: { row: { original: SupplierBill } }) => (
-    <Badge variant="outline">{row.original.status.replace('_', ' ')}</Badge>
 );
 
 export const supplierBillColumns: ColumnDef<SupplierBill>[] = [
@@ -52,11 +48,10 @@ export const supplierBillColumns: ColumnDef<SupplierBill>[] = [
         accessorKey: 'currency',
         label: 'Currency',
     }),
-    {
+    createStatusBadgeColumn<SupplierBill>({
         accessorKey: 'status',
-        ...createSortingHeader('Status'),
-        cell: renderStatusCell,
-    },
+        label: 'Status',
+    }),
     {
         accessorKey: 'grand_total',
         ...createSortingHeader('Grand Total'),

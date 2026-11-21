@@ -1,6 +1,7 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
+import { statusBadgeVariant } from '@/lib/status-badge';
 import { type RecurringJournal } from '@/types/recurring-journal';
 import {
     createActionsColumn,
@@ -65,7 +66,9 @@ export const recurringJournalColumns: ColumnDef<RecurringJournal>[] = [
         ...createSortingHeader('Is Active'),
         cell: ({ row }) => (
             <Badge
-                variant={row.getValue('is_active') ? 'default' : 'secondary'}
+                variant={statusBadgeVariant(
+                    row.getValue('is_active') ? 'active' : 'inactive',
+                )}
             >
                 {row.getValue('is_active') ? 'Active' : 'Inactive'}
             </Badge>

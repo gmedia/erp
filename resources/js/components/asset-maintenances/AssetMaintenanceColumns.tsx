@@ -1,26 +1,17 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
+import { formatStatusLabel } from '@/lib/status-badge';
 import { type AssetMaintenance } from '@/types/asset-maintenance';
 import {
     createActionsColumn,
     createSelectColumn,
     createSortingHeader,
+    createStatusBadgeColumn,
 } from '@/utils/columns';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { type ColumnDef } from '@tanstack/react-table';
-
-function getMaintenanceStatusVariant(status: string) {
-    if (status === 'completed') {
-        return 'default';
-    }
-    if (status === 'cancelled') {
-        return 'destructive';
-    }
-
-    return 'secondary';
-}
 
 export const assetMaintenanceColumns: ColumnDef<AssetMaintenance>[] = [
     createSelectColumn<AssetMaintenance>(),
@@ -44,25 +35,15 @@ export const assetMaintenanceColumns: ColumnDef<AssetMaintenance>[] = [
         accessorKey: 'maintenance_type',
         ...createSortingHeader('Type'),
         cell: ({ row }) => (
-            <Badge variant="outline" className="capitalize">
-                {row.getValue('maintenance_type') as string}
+            <Badge variant="outline">
+                {formatStatusLabel(row.getValue('maintenance_type') as string)}
             </Badge>
         ),
     },
-    {
+    createStatusBadgeColumn<AssetMaintenance>({
         accessorKey: 'status',
-        ...createSortingHeader('Status'),
-        cell: ({ row }) => {
-            const status = row.getValue('status') as string;
-            const variant = getMaintenanceStatusVariant(status);
-
-            return (
-                <Badge variant={variant} className="capitalize">
-                    {status}
-                </Badge>
-            );
-        },
-    },
+        label: 'Status',
+    }),
     {
         accessorKey: 'scheduled_at',
         ...createSortingHeader('Scheduled'),

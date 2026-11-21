@@ -70,10 +70,6 @@ export const purchaseOrderStatusReportColumns: ColumnDef<PurchaseOrderStatusRepo
             accessorKey: 'purchase_order.status_category',
             header: 'Status Category',
             getValue: (item) => item.purchase_order?.status_category,
-            getVariant: (item) =>
-                item.purchase_order?.status_category === 'closed'
-                    ? 'default'
-                    : 'outline',
         }),
         createNumberColumn<PurchaseOrderStatusReportItem>({
             accessorKey: 'ordered_quantity',

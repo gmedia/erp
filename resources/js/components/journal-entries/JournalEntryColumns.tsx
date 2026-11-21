@@ -2,6 +2,7 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { formatStatusLabel, statusBadgeVariant } from '@/lib/status-badge';
 import { type JournalEntry } from '@/types/journal-entry';
 import {
     createSelectColumn,
@@ -13,17 +14,6 @@ import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { type ColumnDef } from '@tanstack/react-table';
 import { Eye, Pencil, Trash } from 'lucide-react';
-
-function getJournalStatusVariant(status: string) {
-    if (status === 'posted') {
-        return 'default';
-    }
-    if (status === 'draft') {
-        return 'secondary';
-    }
-
-    return 'destructive';
-}
 
 export const journalEntryColumns: ColumnDef<JournalEntry>[] = [
     createSelectColumn<JournalEntry>(),
@@ -67,8 +57,8 @@ export const journalEntryColumns: ColumnDef<JournalEntry>[] = [
         cell: ({ row }) => {
             const status = row.getValue('status') as string;
             return (
-                <Badge variant={getJournalStatusVariant(status)}>
-                    {status.toUpperCase()}
+                <Badge variant={statusBadgeVariant(status)}>
+                    {formatStatusLabel(status)}
                 </Badge>
             );
         },

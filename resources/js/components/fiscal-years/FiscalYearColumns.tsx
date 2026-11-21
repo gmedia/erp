@@ -25,14 +25,13 @@ export const fiscalYearColumns: ColumnDef<FiscalYear>[] = [
         accessorKey: 'end_date',
         label: 'End Date',
     }),
+    // Konteks tahun fiskal: open = berjalan (sukses), closed = finalisasi
+    // (netral), locked = terkunci (danger, dari peta umum). 'open'/'closed'
+    // di sini beda makna dari status dokumen — jadi override via variantMap.
     createBadgeColumn<FiscalYear>({
         accessorKey: 'status',
         label: 'Status',
-        colorMap: {
-            open: 'bg-success-soft text-success',
-            closed: 'bg-warning-soft text-warning',
-            locked: 'bg-destructive-soft text-destructive-foreground',
-        },
+        variantMap: { open: 'success', closed: 'secondary' },
     }),
     createDateColumn<FiscalYear>({
         accessorKey: 'created_at',

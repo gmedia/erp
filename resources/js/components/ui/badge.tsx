@@ -21,6 +21,7 @@ const badgeVariants = cva(
           "border-success/30 bg-success-soft text-success",
         warning:
           "border-warning/30 bg-warning-soft text-warning",
+        info: "border-info/30 bg-info/10 text-info",
         "destructive-soft":
           "border-destructive/30 bg-destructive-soft text-destructive-foreground",
       },
@@ -30,6 +31,9 @@ const badgeVariants = cva(
     },
   }
 )
+
+export type BadgeVariant =
+  NonNullable<VariantProps<typeof badgeVariants>["variant"]>
 
 function Badge({
   className,

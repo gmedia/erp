@@ -1,6 +1,7 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
+import { formatStatusLabel, statusBadgeVariant } from '@/lib/status-badge';
 import { type BankReconciliation } from '@/types/bank-reconciliation';
 import {
     createActionsColumn,
@@ -10,10 +11,6 @@ import {
 } from '@/utils/columns';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { type ColumnDef } from '@tanstack/react-table';
-
-function getStatusVariant(status: BankReconciliation['status']) {
-    return status === 'completed' ? 'default' : 'secondary';
-}
 
 export const bankReconciliationColumns: ColumnDef<BankReconciliation>[] = [
     createSelectColumn<BankReconciliation>(),
@@ -70,12 +67,8 @@ export const bankReconciliationColumns: ColumnDef<BankReconciliation>[] = [
         cell: ({ row }) => {
             const status = row.getValue('status') as string;
             return (
-                <Badge
-                    variant={getStatusVariant(
-                        status as BankReconciliation['status'],
-                    )}
-                >
-                    {status === 'in_progress' ? 'In Progress' : 'Completed'}
+                <Badge variant={statusBadgeVariant(status)}>
+                    {formatStatusLabel(status)}
                 </Badge>
             );
         },

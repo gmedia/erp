@@ -1,6 +1,7 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
+import { formatStatusLabel, statusBadgeVariant } from '@/lib/status-badge';
 import { type PeriodClosing } from '@/types/period-closing';
 import {
     createActionsColumn,
@@ -10,10 +11,6 @@ import {
 } from '@/utils/columns';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { type ColumnDef } from '@tanstack/react-table';
-
-function getStatusVariant(status: PeriodClosing['status']) {
-    return status === 'closed' ? 'default' : 'secondary';
-}
 
 function getClosingTypeLabel(type: PeriodClosing['closing_type']) {
     return type === 'monthly' ? 'Monthly' : 'Yearly';
@@ -45,12 +42,8 @@ export const periodClosingColumns: ColumnDef<PeriodClosing>[] = [
         cell: ({ row }) => {
             const status = row.getValue('status') as string;
             return (
-                <Badge
-                    variant={getStatusVariant(
-                        status as PeriodClosing['status'],
-                    )}
-                >
-                    {status === 'draft' ? 'Draft' : 'Closed'}
+                <Badge variant={statusBadgeVariant(status)}>
+                    {formatStatusLabel(status)}
                 </Badge>
             );
         },

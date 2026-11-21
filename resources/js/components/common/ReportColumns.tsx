@@ -1,6 +1,7 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
+import { formatStatusLabel, statusBadgeVariant } from '@/lib/status-badge';
 import { createSortingHeader } from '@/utils/columns';
 import type { CellContext, ColumnDef } from '@tanstack/react-table';
 import type { ComponentProps, ReactNode } from 'react';
@@ -122,16 +123,15 @@ export function WarehouseSummaryCell({
 
 export function StatusBadgeCell({
     value,
-    variant = 'outline',
+    variant,
 }: Readonly<{
     value: string | null;
-    variant: ComponentProps<typeof Badge>['variant'];
+    variant?: ComponentProps<typeof Badge>['variant'];
 }>) {
-    return (
-        <Badge variant={variant} className="capitalize">
-            {formatReportLabel(value)}
-        </Badge>
-    );
+    // Tone default dari peta status→tone terpusat (W4-01/W4-02);
+    // pemakai lama tetap bisa override lewat `getVariant`.
+    const resolvedVariant = variant ?? statusBadgeVariant(value);
+    return <Badge variant={resolvedVariant}>{formatStatusLabel(value)}</Badge>;
 }
 
 function resolveReportColumnId({

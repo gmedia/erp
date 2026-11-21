@@ -1,4 +1,5 @@
 import { Badge } from '@/components/ui/badge';
+import { statusBadgeVariant } from '@/lib/status-badge';
 import { ApprovalDelegation } from '@/types/approval-delegation';
 import {
     createActionsColumn,
@@ -73,7 +74,11 @@ export const approvalDelegationColumns: ColumnDef<ApprovalDelegation>[] = [
         cell: ({ row }) => {
             const isActive = row.original.is_active;
             return (
-                <Badge variant={isActive ? 'default' : 'secondary'}>
+                <Badge
+                    variant={statusBadgeVariant(
+                        isActive ? 'active' : 'inactive',
+                    )}
+                >
                     {isActive ? 'Active' : 'Inactive'}
                 </Badge>
             );

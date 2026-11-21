@@ -3,10 +3,11 @@
 import { GenericActions } from '@/components/common/ActionsDropdown';
 import { type StockAdjustment } from '@/types/stock-adjustment';
 import {
-    createBadgeColumn,
+    createAdjustmentTypeBadgeColumn,
     createDateColumn,
     createSelectColumn,
     createSortingHeader,
+    createStatusBadgeColumn,
     createTextColumn,
 } from '@/utils/columns';
 import { type ColumnDef, type TableMeta } from '@tanstack/react-table';
@@ -33,28 +34,13 @@ export const stockAdjustmentColumns: ColumnDef<StockAdjustment>[] = [
         accessorKey: 'adjustment_date',
         label: 'Adjustment Date',
     }),
-    createBadgeColumn<StockAdjustment>({
+    createAdjustmentTypeBadgeColumn<StockAdjustment>({
         accessorKey: 'adjustment_type',
         label: 'Adjustment Type',
-        colorMap: {
-            damage: 'bg-destructive-soft text-destructive-foreground',
-            expired: 'bg-warning-soft text-warning',
-            shrinkage: 'bg-warning-soft text-warning',
-            correction: 'bg-muted text-foreground',
-            stocktake_result: 'bg-chart-3/10 text-chart-3',
-            initial_stock: 'bg-success-soft text-success',
-            other: 'bg-muted text-foreground',
-        },
     }),
-    createBadgeColumn<StockAdjustment>({
+    createStatusBadgeColumn<StockAdjustment>({
         accessorKey: 'status',
         label: 'Status',
-        colorMap: {
-            draft: 'bg-muted text-foreground',
-            pending_approval: 'bg-warning-soft text-warning',
-            approved: 'bg-success-soft text-success',
-            cancelled: 'bg-destructive-soft text-destructive-foreground',
-        },
     }),
     {
         id: 'actions',

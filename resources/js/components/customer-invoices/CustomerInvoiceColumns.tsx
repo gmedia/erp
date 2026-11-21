@@ -1,6 +1,5 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
 import { CustomerInvoice } from '@/types/customer-invoice';
 import {
     createActionsColumn,
@@ -8,6 +7,7 @@ import {
     createRowCurrencyAmountColumn,
     createSelectColumn,
     createSortingHeader,
+    createStatusBadgeColumn,
     createTextColumn,
 } from '@/utils/columns';
 import { ColumnDef } from '@tanstack/react-table';
@@ -20,10 +20,6 @@ const renderCustomerCell = ({
 
 const renderBranchCell = ({ row }: { row: { original: CustomerInvoice } }) => (
     <div>{row.original.branch?.name ?? '-'}</div>
-);
-
-const renderStatusCell = ({ row }: { row: { original: CustomerInvoice } }) => (
-    <Badge variant="outline">{row.original.status.replace('_', ' ')}</Badge>
 );
 
 export const customerInvoiceColumns: ColumnDef<CustomerInvoice>[] = [
@@ -54,11 +50,10 @@ export const customerInvoiceColumns: ColumnDef<CustomerInvoice>[] = [
         accessorKey: 'currency',
         label: 'Currency',
     }),
-    {
+    createStatusBadgeColumn<CustomerInvoice>({
         accessorKey: 'status',
-        ...createSortingHeader('Status'),
-        cell: renderStatusCell,
-    },
+        label: 'Status',
+    }),
     createRowCurrencyAmountColumn<CustomerInvoice>({
         accessorKey: 'grand_total',
         label: 'Grand Total',

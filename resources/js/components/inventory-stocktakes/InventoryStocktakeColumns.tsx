@@ -3,10 +3,10 @@
 import { GenericActions } from '@/components/common/ActionsDropdown';
 import { type InventoryStocktake } from '@/types/inventory-stocktake';
 import {
-    createBadgeColumn,
     createDateColumn,
     createSelectColumn,
     createSortingHeader,
+    createStatusBadgeColumn,
     createTextColumn,
     type CustomTableMeta,
 } from '@/utils/columns';
@@ -34,15 +34,9 @@ export const inventoryStocktakeColumns: ColumnDef<InventoryStocktake>[] = [
         accessorKey: 'stocktake_date',
         label: 'Stocktake Date',
     }),
-    createBadgeColumn<InventoryStocktake>({
+    createStatusBadgeColumn<InventoryStocktake>({
         accessorKey: 'status',
         label: 'Status',
-        colorMap: {
-            draft: 'bg-muted text-foreground',
-            in_progress: 'bg-warning-soft text-warning',
-            completed: 'bg-success-soft text-success',
-            cancelled: 'bg-destructive-soft text-destructive-foreground',
-        },
     }),
     {
         id: 'actions',

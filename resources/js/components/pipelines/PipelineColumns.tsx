@@ -1,4 +1,5 @@
 import { Badge } from '@/components/ui/badge';
+import { statusBadgeVariant } from '@/lib/status-badge';
 import { type Pipeline } from '@/types/entity';
 import {
     createActionsColumn,
@@ -11,7 +12,7 @@ import { ColumnDef } from '@tanstack/react-table';
 const renderStatusCell = ({ row }: { row: { original: Pipeline } }) => {
     const is_active = row.original.is_active;
     return (
-        <Badge variant={is_active ? 'default' : 'secondary'}>
+        <Badge variant={statusBadgeVariant(is_active ? 'active' : 'inactive')}>
             {is_active ? 'Active' : 'Inactive'}
         </Badge>
     );
