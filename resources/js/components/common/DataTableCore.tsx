@@ -505,7 +505,7 @@ export function DataTable<T>({
                                                 hasStickyGrandTotal,
                                             )}
                                             className={cn(
-                                                'h-9 border-border px-2 py-1.5 text-xs select-none',
+                                                'h-9 border-border px-2 py-1.5 text-sm font-medium select-none',
                                                 stickyHeadClass(
                                                     header.column.id,
                                                     hasStickyGrandTotal,
