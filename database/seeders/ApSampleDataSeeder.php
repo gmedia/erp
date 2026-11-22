@@ -90,6 +90,7 @@ class ApSampleDataSeeder extends Seeder
         $billDefinitions = [
             [
                 'number' => "BILL-{$year}-000001",
+                'bill_date_days_ago' => 56,
                 'status' => 'draft',
                 'supplier_index' => 0,
                 'total_amount' => 15000000,
@@ -99,6 +100,7 @@ class ApSampleDataSeeder extends Seeder
             ],
             [
                 'number' => "BILL-{$year}-000002",
+                'bill_date_days_ago' => 55,
                 'status' => 'confirmed',
                 'supplier_index' => 1,
                 'total_amount' => 25000000,
@@ -108,6 +110,7 @@ class ApSampleDataSeeder extends Seeder
             ],
             [
                 'number' => "BILL-{$year}-000003",
+                'bill_date_days_ago' => 54,
                 'status' => 'confirmed',
                 'supplier_index' => 0,
                 'total_amount' => 30000000,
@@ -117,6 +120,7 @@ class ApSampleDataSeeder extends Seeder
             ],
             [
                 'number' => "BILL-{$year}-000004",
+                'bill_date_days_ago' => 53,
                 'status' => 'confirmed',
                 'supplier_index' => 2,
                 'total_amount' => 20000000,
@@ -126,15 +130,17 @@ class ApSampleDataSeeder extends Seeder
             ],
             [
                 'number' => "BILL-{$year}-000005",
+                'bill_date_days_ago' => 75,
                 'status' => 'overdue',
                 'supplier_index' => 1,
                 'total_amount' => 18000000,
                 'item_count' => 2,
-                'due_date_offset' => -15,
+                'due_date_offset' => 30,
                 'confirmed' => true,
             ],
             [
                 'number' => "BILL-{$year}-000006",
+                'bill_date_days_ago' => 52,
                 'status' => 'cancelled',
                 'supplier_index' => 0,
                 'total_amount' => 12000000,
@@ -144,6 +150,7 @@ class ApSampleDataSeeder extends Seeder
             ],
             [
                 'number' => "BILL-{$year}-000007",
+                'bill_date_days_ago' => 51,
                 'status' => 'void',
                 'supplier_index' => 2,
                 'total_amount' => 22000000,
@@ -160,7 +167,11 @@ class ApSampleDataSeeder extends Seeder
             $purchaseOrder = $purchaseOrders[$index % $purchaseOrders->count()] ?? null;
             $goodsReceipt = $goodsReceipts[$index % $goodsReceipts->count()] ?? null;
 
-            $billDate = now()->subDays(60 - $index);
+            // Tanggal dokumen lebih tua untuk bill overdue agar jatuh tempo
+            // tetap setelah tanggal dokumen (W5-20).
+            $billDate = now()->subDays(
+                $definition['bill_date_days_ago'] ?? (60 - $index),
+            );
             $dueDate = $billDate->copy()->addDays($definition['due_date_offset']);
 
             $subtotal = $definition['total_amount'] * 0.85;
@@ -293,10 +304,16 @@ class ApSampleDataSeeder extends Seeder
             ],
         ];
 
+        // Transfer bank harus memakai akun bank (11110), bukan akun Cash (11100).
         $bankAccount = Account::query()
             ->where('type', 'asset')
-            ->where('code', 'like', '111%')
-            ->first();
+            ->where('code', '11110')
+            ->first()
+            ?? Account::query()
+                ->where('type', 'asset')
+                ->where('code', 'like', '111%')
+                ->orderByDesc('code')
+                ->first();
 
         $billAllocations = [];
 

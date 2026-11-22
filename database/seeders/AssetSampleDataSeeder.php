@@ -255,7 +255,7 @@ class AssetSampleDataSeeder extends Seeder
             // ─── DRAFT ──────────────────────────────────────────────
             [
                 'asset_code' => 'FA-000004',
-                'name' => 'Meja Kerja Baru (Belum Aktif)',
+                'name' => 'Meja Kerja Staff',
                 'asset_model_id' => $deskModel?->id,
                 'asset_category_id' => $offCategory?->id,
                 'serial_number' => 'SN-IKEA-001',
@@ -280,7 +280,7 @@ class AssetSampleDataSeeder extends Seeder
             ],
             [
                 'asset_code' => 'FA-000005',
-                'name' => 'Proyektor Ruang Meeting (Belum Aktif)',
+                'name' => 'Proyektor Ruang Meeting',
                 'asset_model_id' => $projectorModel?->id,
                 'asset_category_id' => $itCategory?->id,
                 'serial_number' => 'SN-EPS-001',
@@ -334,7 +334,7 @@ class AssetSampleDataSeeder extends Seeder
             // ─── DISPOSED ───────────────────────────────────────────
             [
                 'asset_code' => 'FA-000007',
-                'name' => 'Laptop Lama (Sudah Dihapusbukukan)',
+                'name' => 'Laptop Lama',
                 'asset_model_id' => $thinkpadModel?->id,
                 'asset_category_id' => $itCategory?->id,
                 'serial_number' => 'SN-LNV-001',
@@ -361,7 +361,7 @@ class AssetSampleDataSeeder extends Seeder
             // ─── LOST ───────────────────────────────────────────────
             [
                 'asset_code' => 'FA-000008',
-                'name' => 'Filing Cabinet (Hilang Saat Pindah Kantor)',
+                'name' => 'Filing Cabinet',
                 'asset_model_id' => $cabinetModel?->id,
                 'asset_category_id' => $offCategory?->id,
                 'serial_number' => 'SN-KRS-001',
@@ -388,7 +388,7 @@ class AssetSampleDataSeeder extends Seeder
             // ─── CANCELLED ──────────────────────────────────────────
             [
                 'asset_code' => 'FA-000009',
-                'name' => 'Meja Kerja (Dibatalkan - Salah Order)',
+                'name' => 'Meja Kerja Cadangan',
                 'asset_model_id' => $deskModel?->id,
                 'asset_category_id' => $offCategory?->id,
                 'serial_number' => 'SN-IKEA-002',
@@ -442,7 +442,7 @@ class AssetSampleDataSeeder extends Seeder
             ],
             [
                 'asset_code' => 'FA-000011',
-                'name' => 'Manager Car (Toyota Camry)',
+                'name' => 'Toyota Camry',
                 'asset_model_id' => null,
                 'asset_category_id' => $vehCategory?->id,
                 'serial_number' => 'SN-TYT-002',
@@ -467,7 +467,7 @@ class AssetSampleDataSeeder extends Seeder
             ],
             [
                 'asset_code' => 'FA-000012',
-                'name' => 'Old Inkjet Printer',
+                'name' => 'Printer Inkjet',
                 'asset_model_id' => null,
                 'asset_category_id' => $itCategory?->id,
                 'serial_number' => 'SN-EPS-002',
@@ -517,7 +517,7 @@ class AssetSampleDataSeeder extends Seeder
                     'to_department_id' => $asset->department_id,
                     'from_employee_id' => null,
                     'to_employee_id' => $asset->employee_id,
-                    'reference' => 'INIT',
+                    'reference' => 'Akuisisi awal',
                     'notes' => null,
                     'created_by' => $adminUser?->id,
                 ]
@@ -947,6 +947,13 @@ class AssetSampleDataSeeder extends Seeder
 
                     $postAction = app(PostDepreciationToJournalAction::class);
                     $postAction->execute($run);
+
+                    // Lengkapi jejak audit run (W5-21).
+                    $run->forceFill([
+                        'created_by' => $adminUser?->id ?? $run->created_by,
+                        'posted_by' => $adminUser?->id ?? $run->posted_by,
+                        'posted_at' => $run->posted_at ?? now(),
+                    ])->save();
                 }
             }
         }

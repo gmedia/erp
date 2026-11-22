@@ -56,7 +56,7 @@ class DatabaseSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'manager.hr@example.com'],
             [
-                'name' => 'HR Manager',
+                'name' => 'Hendra Wijaya',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
             ]
@@ -65,7 +65,7 @@ class DatabaseSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'director.finance@example.com'],
             [
-                'name' => 'Finance Director',
+                'name' => 'Dewi Anggraini',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
             ]
@@ -74,7 +74,7 @@ class DatabaseSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'staff.it@example.com'],
             [
-                'name' => 'IT Staff',
+                'name' => 'Agus Prasetyo',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
             ]
@@ -106,7 +106,7 @@ class DatabaseSeeder extends Seeder
             $legacyDemoEmployee->update([
                 'email' => 'rina.kartika@example.com',
                 'name' => 'Rina Kartika',
-                'employee_id' => 'EMP-2022-0031',
+                'employee_id' => 'EMP-000001',
             ]);
         }
 
@@ -115,7 +115,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'rina.kartika@example.com',
             'user_id' => $testUser->id,
         ], [
-            'employee_id' => 'EMP-2022-0031',
+            'employee_id' => 'EMP-000001',
             'name' => 'Rina Kartika',
             'phone' => '081234567800',
         ]);
@@ -138,7 +138,7 @@ class DatabaseSeeder extends Seeder
             'email' => config('app.admin'),
             'user_id' => $admin->id,
         ], [
-            'employee_id' => 'EMP-00000',
+            'employee_id' => 'EMP-000002',
             'name' => 'Admin User',
             'phone' => '081234567801',
         ]);
@@ -162,8 +162,8 @@ class DatabaseSeeder extends Seeder
             'email' => 'manager.hr@example.com',
             'user_id' => $hrManagerUser->id,
         ], [
-            'employee_id' => 'EMP-HR001',
-            'name' => 'HR Manager',
+            'employee_id' => 'EMP-000003',
+            'name' => 'Hendra Wijaya',
             'phone' => '081234567891',
         ]);
 
@@ -185,8 +185,8 @@ class DatabaseSeeder extends Seeder
             'email' => 'director.finance@example.com',
             'user_id' => $financeDirectorUser->id,
         ], [
-            'employee_id' => 'EMP-FIN001',
-            'name' => 'Finance Director',
+            'employee_id' => 'EMP-000004',
+            'name' => 'Dewi Anggraini',
             'phone' => '081234567892',
         ]);
 
@@ -208,8 +208,8 @@ class DatabaseSeeder extends Seeder
             'email' => 'staff.it@example.com',
             'user_id' => $itStaffUser->id,
         ], [
-            'employee_id' => 'EMP-IT001',
-            'name' => 'IT Staff',
+            'employee_id' => 'EMP-000005',
+            'name' => 'Agus Prasetyo',
             'phone' => '081234567893',
         ]);
 
@@ -248,6 +248,12 @@ class DatabaseSeeder extends Seeder
             ReportConfigurationSeeder::class,
             BudgetSampleDataSeeder::class,
         ]);
+
+        // Rekonsiliasi GL↔subledger hanya untuk dataset demo (bukan test),
+        // karena test isolasi cabang menguji saldo clearing dari nol.
+        if (! app()->environment('testing')) {
+            $this->call(SubledgerGlReconciliationSeeder::class);
+        }
 
         // Assign all permissions to sample users for easy testing
         $allPermissions = Permission::all();

@@ -139,12 +139,32 @@ class CoaSeeder extends Seeder
     {
         $user = User::first();
 
+        // Idempoten: hapus jurnal demo lama beserta barisnya sebelum dibuat
+        // ulang, sehingga seed berulang tidak melanggar unique(entry_number).
+        // Hanya nomor jurnal milik seeder ini (jangan hapus jurnal seeder lain).
+        $demoEntryNumbers = [
+            'JV-2026-00001', 'JV-2026-00002', 'JV-2026-00003',
+            'JV-2026-00004', 'JV-2026-00005', 'JV-2026-00006',
+            'JV-2026-00007', 'JV-2026-00008', 'JV-2026-00009',
+        ];
+
+        $demoEntryIds = JournalEntry::query()
+            ->whereIn('entry_number', $demoEntryNumbers)
+            ->pluck('id');
+
+        if ($demoEntryIds->isNotEmpty()) {
+            JournalEntryLine::query()
+                ->whereIn('journal_entry_id', $demoEntryIds)
+                ->delete();
+            JournalEntry::query()->whereIn('id', $demoEntryIds)->delete();
+        }
+
         // Sample Journal 1: Cash Sales
         $journal1 = JournalEntry::create([
             'fiscal_year_id' => $fiscalYear->id,
             'entry_number' => 'JV-2026-00001',
             'entry_date' => '2026-01-15',
-            'reference' => 'INV-001',
+            'reference' => 'INV-2026-000101',
             'description' => 'Penjualan tunai produk',
             'status' => 'posted',
             'created_by' => $user?->id,
@@ -175,7 +195,7 @@ class CoaSeeder extends Seeder
             'fiscal_year_id' => $fiscalYear->id,
             'entry_number' => 'JV-2026-00002',
             'entry_date' => '2026-01-20',
-            'reference' => 'PO-001',
+            'reference' => 'PO-2026-000101',
             'description' => 'Pembelian barang dagangan secara kredit',
             'status' => 'posted',
             'created_by' => $user?->id,
@@ -206,7 +226,7 @@ class CoaSeeder extends Seeder
             'fiscal_year_id' => $fiscalYear->id,
             'entry_number' => 'JV-2026-00003',
             'entry_date' => '2026-01-25',
-            'reference' => 'EXP-001',
+            'reference' => 'EXP-2026-000101',
             'description' => 'Pembayaran biaya listrik dan telepon',
             'status' => 'posted',
             'created_by' => $user?->id,
@@ -237,7 +257,7 @@ class CoaSeeder extends Seeder
             'fiscal_year_id' => $fiscalYear->id,
             'entry_number' => 'JV-2026-00004',
             'entry_date' => '2026-02-05',
-            'reference' => 'INV-002',
+            'reference' => 'INV-2026-000102',
             'description' => 'Pendapatan jasa konsultasi',
             'status' => 'posted',
             'created_by' => $user?->id,
@@ -266,7 +286,7 @@ class CoaSeeder extends Seeder
             'fiscal_year_id' => $fiscalYear->id,
             'entry_number' => 'JV-2026-00005',
             'entry_date' => '2026-02-10',
-            'reference' => 'EXP-002',
+            'reference' => 'EXP-2026-000102',
             'description' => 'Pembayaran biaya sewa kantor',
             'status' => 'posted',
             'created_by' => $user?->id,
@@ -295,7 +315,7 @@ class CoaSeeder extends Seeder
             'fiscal_year_id' => $fiscalYear->id,
             'entry_number' => 'JV-2026-00006',
             'entry_date' => '2026-02-15',
-            'reference' => 'PO-002',
+            'reference' => 'PO-2026-000102',
             'description' => 'Pembelian peralatan kantor',
             'status' => 'posted',
             'created_by' => $user?->id,
@@ -324,7 +344,7 @@ class CoaSeeder extends Seeder
             'fiscal_year_id' => $fiscalYear->id,
             'entry_number' => 'JV-2026-00007',
             'entry_date' => '2026-02-20',
-            'reference' => 'PAY-001',
+            'reference' => 'PAY-2026-000101',
             'description' => 'Pembayaran utang dagang',
             'status' => 'posted',
             'created_by' => $user?->id,
@@ -353,7 +373,7 @@ class CoaSeeder extends Seeder
             'fiscal_year_id' => $fiscalYear->id,
             'entry_number' => 'JV-2026-00008',
             'entry_date' => '2026-03-01',
-            'reference' => 'EQ-001',
+            'reference' => 'EQ-2026-000101',
             'description' => 'Setoran modal pemilik',
             'status' => 'posted',
             'created_by' => $user?->id,
@@ -382,7 +402,7 @@ class CoaSeeder extends Seeder
             'fiscal_year_id' => $fiscalYear->id,
             'entry_number' => 'JV-2026-00009',
             'entry_date' => '2026-03-15',
-            'reference' => 'DEP-001',
+            'reference' => 'DEP-2026-000101',
             'description' => 'Penyusutan peralatan kantor bulan Maret',
             'status' => 'posted',
             'created_by' => $user?->id,

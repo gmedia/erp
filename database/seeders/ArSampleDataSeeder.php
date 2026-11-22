@@ -117,6 +117,7 @@ class ArSampleDataSeeder extends Seeder
         $invoiceDefinitions = [
             [
                 'number' => "INV-{$year}-000001",
+                'invoice_date_days_ago' => 40,
                 'status' => 'draft',
                 'grand_total' => 12000000,
                 'amount_received' => 0,
@@ -128,6 +129,7 @@ class ArSampleDataSeeder extends Seeder
             ],
             [
                 'number' => "INV-{$year}-000002",
+                'invoice_date_days_ago' => 39,
                 'status' => 'sent',
                 'grand_total' => 28000000,
                 'amount_received' => 0,
@@ -139,6 +141,7 @@ class ArSampleDataSeeder extends Seeder
             ],
             [
                 'number' => "INV-{$year}-000003",
+                'invoice_date_days_ago' => 38,
                 'status' => 'partially_paid',
                 'grand_total' => 35000000,
                 'amount_received' => 0,
@@ -150,6 +153,7 @@ class ArSampleDataSeeder extends Seeder
             ],
             [
                 'number' => "INV-{$year}-000004",
+                'invoice_date_days_ago' => 37,
                 'status' => 'paid',
                 'grand_total' => 18000000,
                 'amount_received' => 0,
@@ -161,6 +165,7 @@ class ArSampleDataSeeder extends Seeder
             ],
             [
                 'number' => "INV-{$year}-000005",
+                'invoice_date_days_ago' => 60,
                 'status' => 'overdue',
                 'grand_total' => 22000000,
                 'amount_received' => 0,
@@ -168,10 +173,11 @@ class ArSampleDataSeeder extends Seeder
                 'item_count' => 2,
                 'sent_by' => $adminUserId,
                 'sent_at' => now()->subDays(40),
-                'due_date_offset' => -5,
+                'due_date_offset' => 30,
             ],
             [
                 'number' => "INV-{$year}-000006",
+                'invoice_date_days_ago' => 35,
                 'status' => 'cancelled',
                 'grand_total' => 10000000,
                 'amount_received' => 0,
@@ -183,6 +189,7 @@ class ArSampleDataSeeder extends Seeder
             ],
             [
                 'number' => "INV-{$year}-000007",
+                'invoice_date_days_ago' => 34,
                 'status' => 'void',
                 'grand_total' => 16000000,
                 'amount_received' => 0,
@@ -196,7 +203,11 @@ class ArSampleDataSeeder extends Seeder
 
         foreach ($invoiceDefinitions as $index => $definition) {
             $customer = $customers[$index % $customers->count()];
-            $invoiceDate = now()->subDays(60 - $index * 5);
+            // Tanggal dokumen lebih tua untuk invoice overdue agar jatuh
+            // tempo tetap setelah tanggal dokumen (W5-20).
+            $invoiceDate = now()->subDays(
+                $definition['invoice_date_days_ago'] ?? (60 - $index * 5),
+            );
             $dueDate = $invoiceDate->copy()->addDays($definition['due_date_offset']);
 
             $subtotal = $definition['grand_total'] * 0.9;

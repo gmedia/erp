@@ -33,96 +33,115 @@ class ProductSampleDataSeeder extends Seeder
         $boxUnit = Unit::where('name', 'Box')->first();
         $serviceUnit = Unit::where('name', 'Service')->first();
 
-        $woodPanel = Product::create([
-            'code' => 'RM-WOOD-001',
-            'name' => 'MDF Wood Panel 120x240cm',
-            'description' => 'Medium Density Fiberboard for furniture manufacturing',
-            'type' => 'raw_material',
-            'product_category_id' => $rawMaterialWood->id,
-            'unit_id' => $sheetUnit->id,
-            'cost' => 250000,
-            'selling_price' => 0,
-            'status' => 'active',
-        ]);
+        $woodPanel = Product::updateOrCreate(
+            ['code' => 'RM-WOOD-001'],
+            [
+                'name' => 'MDF Wood Panel 120x240cm',
+                'description' => 'Medium Density Fiberboard for furniture manufacturing',
+                'type' => 'raw_material',
+                'product_category_id' => $rawMaterialWood->id,
+                'unit_id' => $sheetUnit->id,
+                'cost' => 250000,
+                'selling_price' => 0,
+                'status' => 'active',
+            ]);
 
-        $tableLegs = Product::create([
-            'code' => 'RM-WOOD-002',
-            'name' => 'Wooden Table Legs (Set of 4)',
-            'description' => 'Premium wooden table legs',
-            'type' => 'raw_material',
-            'product_category_id' => $rawMaterialWood->id,
-            'unit_id' => $setUnit->id,
-            'cost' => 180000,
-            'selling_price' => 0,
-            'status' => 'active',
-        ]);
+        $tableLegs = Product::updateOrCreate(
+            ['code' => 'RM-WOOD-002'],
+            [
+                'name' => 'Wooden Table Legs (Set of 4)',
+                'description' => 'Premium wooden table legs',
+                'type' => 'raw_material',
+                'product_category_id' => $rawMaterialWood->id,
+                'unit_id' => $setUnit->id,
+                'cost' => 180000,
+                'selling_price' => 0,
+                'status' => 'active',
+            ]);
 
-        $screws = Product::create([
-            'code' => 'RM-HW-001',
-            'name' => 'Wood Screws 4x40mm (Box of 100)',
-            'description' => 'Quality wood screws for furniture assembly',
-            'type' => 'raw_material',
-            'product_category_id' => $rawMaterialHardware->id,
-            'unit_id' => $boxUnit->id,
-            'cost' => 25000,
-            'selling_price' => 0,
-            'status' => 'active',
-        ]);
+        $screws = Product::updateOrCreate(
+            ['code' => 'RM-HW-001'],
+            [
+                'name' => 'Wood Screws 4x40mm (Box of 100)',
+                'description' => 'Quality wood screws for furniture assembly',
+                'type' => 'raw_material',
+                'product_category_id' => $rawMaterialHardware->id,
+                'unit_id' => $boxUnit->id,
+                'cost' => 25000,
+                'selling_price' => 0,
+                'status' => 'active',
+            ]);
 
-        $officeDesk = Product::create([
-            'code' => 'FG-FURN-001',
-            'name' => 'Executive Office Desk',
-            'description' => 'Premium executive office desk with storage',
-            'type' => 'finished_good',
-            'product_category_id' => $furnitureCategory->id,
-            'unit_id' => $pieceUnit->id,
-            'cost' => 850000,
-            'selling_price' => 1500000,
-            'status' => 'active',
-        ]);
+        $officeDesk = Product::updateOrCreate(
+            ['code' => 'FG-FURN-001'],
+            [
+                'name' => 'Executive Office Desk',
+                'description' => 'Premium executive office desk with storage',
+                'type' => 'finished_good',
+                'product_category_id' => $furnitureCategory->id,
+                'unit_id' => $pieceUnit->id,
+                'cost' => 850000,
+                'selling_price' => 1500000,
+                'status' => 'active',
+            ]);
 
-        BillOfMaterial::create([
-            'finished_product_id' => $officeDesk->id,
-            'raw_material_id' => $woodPanel->id,
-            'quantity' => 2,
-            'waste_percentage' => 5,
-            'unit_id' => $sheetUnit->id,
-            'notes' => 'Top panel and bottom shelf',
-        ]);
+        BillOfMaterial::updateOrCreate(
+            [
+                'finished_product_id' => $officeDesk->id,
+                'raw_material_id' => $woodPanel->id,
+            ],
+            [
+                'quantity' => 2,
+                'waste_percentage' => 5,
+                'unit_id' => $sheetUnit->id,
+                'notes' => 'Top panel and bottom shelf',
+            ]);
 
-        BillOfMaterial::create([
-            'finished_product_id' => $officeDesk->id,
-            'raw_material_id' => $tableLegs->id,
-            'quantity' => 1,
-            'waste_percentage' => 0,
-            'unit_id' => $setUnit->id,
-            'notes' => 'Table legs support',
-        ]);
+        BillOfMaterial::updateOrCreate(
+            [
+                'finished_product_id' => $officeDesk->id,
+                'raw_material_id' => $tableLegs->id,
+            ],
+            [
+                'quantity' => 1,
+                'waste_percentage' => 0,
+                'unit_id' => $setUnit->id,
+                'notes' => 'Table legs support',
+            ]);
 
-        BillOfMaterial::create([
-            'finished_product_id' => $officeDesk->id,
-            'raw_material_id' => $screws->id,
-            'quantity' => 2,
-            'waste_percentage' => 10,
-            'unit_id' => $boxUnit->id,
-            'notes' => 'Assembly screws',
-        ]);
+        BillOfMaterial::updateOrCreate(
+            [
+                'finished_product_id' => $officeDesk->id,
+                'raw_material_id' => $screws->id,
+            ],
+            [
+                'quantity' => 2,
+                'waste_percentage' => 10,
+                'unit_id' => $boxUnit->id,
+                'notes' => 'Assembly screws',
+            ]);
 
         $branchId = Branch::query()->value('id') ?? Branch::create(['name' => 'Head Office'])->id;
 
-        $productionOrder = ProductionOrder::create([
-            'order_number' => 'MO-2026-000001',
-            'product_id' => $officeDesk->id,
-            'branch_id' => $branchId,
-            'quantity' => 10,
-            'unit_id' => $pieceUnit->id,
-            'planned_start_date' => now()->subDays(7),
-            'planned_end_date' => now()->subDays(1),
-            'actual_start_date' => now()->subDays(6),
-            'actual_end_date' => now()->subDays(1),
-            'status' => 'completed',
-            'total_cost' => 8500000,
-        ]);
+        $productionOrder = ProductionOrder::updateOrCreate(
+            ['order_number' => 'MO-2026-000001'],
+            [
+                'product_id' => $officeDesk->id,
+                'branch_id' => $branchId,
+                'quantity' => 10,
+                'unit_id' => $pieceUnit->id,
+                'planned_start_date' => now()->subDays(7),
+                'planned_end_date' => now()->subDays(1),
+                'actual_start_date' => now()->subDays(6),
+                'actual_end_date' => now()->subDays(1),
+                'status' => 'completed',
+                'total_cost' => 8500000,
+            ]);
+
+        // Idempoten: bersihkan item demo lama untuk order ini.
+        ProductionOrderItem::query()
+            ->where('production_order_id', $productionOrder->id)
+            ->delete();
 
         ProductionOrderItem::create([
             'production_order_id' => $productionOrder->id,
@@ -154,50 +173,64 @@ class ProductSampleDataSeeder extends Seeder
             'cost' => 500000,
         ]);
 
-        $cloudStorage = Product::create([
-            'code' => 'SaaS-CLOUD-001',
-            'name' => 'Cloud Storage Pro',
-            'description' => 'Premium cloud storage solution with advanced features',
-            'type' => 'service',
-            'product_category_id' => $softwareCategory->id,
-            'unit_id' => $serviceUnit->id,
-            'cost' => 30000,
-            'selling_price' => 99000,
-            'billing_model' => 'subscription',
-            'status' => 'active',
-        ]);
+        $cloudStorage = Product::updateOrCreate(
+            ['code' => 'SaaS-CLOUD-001'],
+            [
+                'name' => 'Cloud Storage Pro',
+                'description' => 'Premium cloud storage solution with advanced features',
+                'type' => 'service',
+                'product_category_id' => $softwareCategory->id,
+                'unit_id' => $serviceUnit->id,
+                'cost' => 30000,
+                'selling_price' => 99000,
+                'billing_model' => 'subscription',
+                'status' => 'active',
+            ]);
 
-        $monthlyPlan = SubscriptionPlan::create([
-            'product_id' => $cloudStorage->id,
-            'name' => 'Cloud Storage Pro - Monthly',
-            'billing_interval' => 'monthly',
-            'price' => 99000,
-            'setup_fee' => 0,
-            'trial_period_days' => 14,
-            'is_active' => true,
-        ]);
+        $monthlyPlan = SubscriptionPlan::updateOrCreate(
+            [
+                'product_id' => $cloudStorage->id,
+                'name' => 'Cloud Storage Pro - Monthly',
+            ],
+            [
+                'billing_interval' => 'monthly',
+                'price' => 99000,
+                'setup_fee' => 0,
+                'trial_period_days' => 14,
+                'is_active' => true,
+            ]);
 
-        SubscriptionPlan::create([
-            'product_id' => $cloudStorage->id,
-            'name' => 'Cloud Storage Pro - Annual',
-            'billing_interval' => 'annual',
-            'price' => 990000,
-            'setup_fee' => 0,
-            'trial_period_days' => 14,
-            'is_active' => true,
-        ]);
+        SubscriptionPlan::updateOrCreate(
+            [
+                'product_id' => $cloudStorage->id,
+                'name' => 'Cloud Storage Pro - Annual',
+            ],
+            [
+                'billing_interval' => 'annual',
+                'price' => 990000,
+                'setup_fee' => 0,
+                'trial_period_days' => 14,
+                'is_active' => true,
+            ]);
 
         if (Customer::count() > 0) {
             $customer = Customer::first();
 
-            $subscription = CustomerSubscription::create([
-                'customer_id' => $customer->id,
-                'subscription_plan_id' => $monthlyPlan->id,
-                'start_date' => now()->subMonths(3),
-                'end_date' => null,
-                'next_billing_date' => now()->addDays(15),
-                'status' => 'active',
-            ]);
+            $subscription = CustomerSubscription::updateOrCreate(
+                [
+                    'customer_id' => $customer->id,
+                    'subscription_plan_id' => $monthlyPlan->id,
+                ],
+                [
+                    'start_date' => now()->subMonths(3),
+                    'end_date' => null,
+                    'next_billing_date' => now()->addDays(15),
+                    'status' => 'active',
+                ]);
+
+            SubscriptionBillingRecord::query()
+                ->where('customer_subscription_id', $subscription->id)
+                ->delete();
 
             SubscriptionBillingRecord::create([
                 'customer_subscription_id' => $subscription->id,
@@ -212,24 +245,28 @@ class ProductSampleDataSeeder extends Seeder
             ]);
         }
 
-        $deskChair = Product::create([
-            'code' => 'FG-FURN-002',
-            'name' => 'Ergonomic Office Chair',
-            'description' => 'Comfortable ergonomic chair for office use',
-            'type' => 'finished_good',
-            'product_category_id' => $furnitureCategory->id,
-            'unit_id' => $pieceUnit->id,
-            'cost' => 450000,
-            'selling_price' => 750000,
-            'status' => 'active',
-        ]);
+        $deskChair = Product::updateOrCreate(
+            ['code' => 'FG-FURN-002'],
+            [
+                'name' => 'Ergonomic Office Chair',
+                'description' => 'Comfortable ergonomic chair for office use',
+                'type' => 'finished_good',
+                'product_category_id' => $furnitureCategory->id,
+                'unit_id' => $pieceUnit->id,
+                'cost' => 450000,
+                'selling_price' => 750000,
+                'status' => 'active',
+            ]);
 
-        ProductDependency::create([
-            'product_id' => $officeDesk->id,
-            'related_product_id' => $deskChair->id,
-            'type' => 'recommended',
-            'notes' => 'Complete your office setup with a matching chair',
-        ]);
+        ProductDependency::updateOrCreate(
+            [
+                'product_id' => $officeDesk->id,
+                'related_product_id' => $deskChair->id,
+                'type' => 'recommended',
+            ],
+            [
+                'notes' => 'Complete your office setup with a matching chair',
+            ]);
 
         $this->command->info('Sample product data created successfully!');
     }
