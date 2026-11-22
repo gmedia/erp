@@ -1,6 +1,7 @@
 'use client';
 
 import { DataTable } from '@/components/common/DataTableCore';
+import { PageHeader } from '@/components/common/PageHeader';
 import type { FieldDescriptor } from '@/components/common/filters';
 import type { FilterState } from '@/hooks/useCrudFilters';
 import AppLayout from '@/layouts/app-layout';
@@ -24,6 +25,7 @@ type PaginationMeta = {
 
 type DataTablePageProps<TData, TFilters extends FilterState = FilterState> = {
     title: string;
+    description?: string;
     breadcrumbs: BreadcrumbItem[];
     columns: ColumnDef<TData>[];
     data: TData[];
@@ -63,6 +65,7 @@ export function DataTablePage<
     onFilterChange,
     onResetFilters,
     children,
+    description,
 }: Readonly<DataTablePageProps<TData, TFilters>>) {
     const tableFilters = filters as Record<string, string | number | undefined>;
 
@@ -73,6 +76,7 @@ export function DataTablePage<
             </Helmet>
             <AppLayout breadcrumbs={breadcrumbs}>
                 <div className="flex w-full flex-col gap-3 overflow-x-auto p-4">
+                    <PageHeader title={title} description={description} />
                     {children}
                     <div>
                         <DataTable

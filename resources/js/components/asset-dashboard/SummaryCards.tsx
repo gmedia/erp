@@ -1,3 +1,4 @@
+import { KpiCard } from '@/components/common/KpiCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatCurrency } from '@/lib/utils';
 import { formatNumberByRegionalSettings } from '@/utils/number-format';
@@ -31,73 +32,53 @@ export function SummaryCards({ data, isLoading }: Readonly<SummaryCardsProps>) {
 
     return (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Card className="overflow-hidden">
-                <CardHeader className="flex flex-row items-center justify-between pt-4 pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">
-                        Total Assets
-                    </CardTitle>
-                    <Package className="h-4 w-4 text-info" />
-                </CardHeader>
-                <CardContent>
-                    <div className="text-3xl font-bold">
-                        {formatNumberByRegionalSettings(data.total_assets)}
-                    </div>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                        registered assets
-                    </p>
-                </CardContent>
-            </Card>
+            <KpiCard
+                title="Total Assets"
+                icon={Package}
+                iconColor="text-info"
+                formattedValue={formatNumberByRegionalSettings(
+                    data.total_assets,
+                )}
+            >
+                <p className="mt-1 text-xs text-muted-foreground">
+                    registered assets
+                </p>
+            </KpiCard>
 
-            <Card className="overflow-hidden">
-                <CardHeader className="flex flex-row items-center justify-between pt-4 pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">
-                        Purchase Cost
-                    </CardTitle>
-                    <Calculator className="h-4 w-4 text-success" />
-                </CardHeader>
-                <CardContent>
-                    <div className="text-3xl font-bold">
-                        {formatCurrency(data.total_purchase_cost)}
-                    </div>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                        total acquisition value
-                    </p>
-                </CardContent>
-            </Card>
+            <KpiCard
+                title="Purchase Cost"
+                icon={Calculator}
+                iconColor="text-success"
+                formattedValue={formatCurrency(data.total_purchase_cost)}
+            >
+                <p className="mt-1 text-xs text-muted-foreground">
+                    total acquisition value
+                </p>
+            </KpiCard>
 
-            <Card className="overflow-hidden">
-                <CardHeader className="flex flex-row items-center justify-between pt-4 pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">
-                        Book Value
-                    </CardTitle>
-                    <BarChart className="h-4 w-4 text-chart-3" />
-                </CardHeader>
-                <CardContent>
-                    <div className="text-3xl font-bold">
-                        {formatCurrency(data.total_book_value)}
-                    </div>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                        current estimated value
-                    </p>
-                </CardContent>
-            </Card>
+            <KpiCard
+                title="Book Value"
+                icon={BarChart}
+                iconColor="text-chart-3"
+                formattedValue={formatCurrency(data.total_book_value)}
+            >
+                <p className="mt-1 text-xs text-muted-foreground">
+                    current estimated value
+                </p>
+            </KpiCard>
 
-            <Card className="overflow-hidden">
-                <CardHeader className="flex flex-row items-center justify-between pt-4 pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">
-                        Accum. Depreciation
-                    </CardTitle>
-                    <History className="h-4 w-4 text-destructive-foreground" />
-                </CardHeader>
-                <CardContent>
-                    <div className="text-3xl font-bold">
-                        {formatCurrency(data.total_accumulated_depreciation)}
-                    </div>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                        total value deprecated
-                    </p>
-                </CardContent>
-            </Card>
+            <KpiCard
+                title="Accum. Depreciation"
+                icon={History}
+                iconColor="text-destructive-foreground"
+                formattedValue={formatCurrency(
+                    data.total_accumulated_depreciation,
+                )}
+            >
+                <p className="mt-1 text-xs text-muted-foreground">
+                    total value deprecated
+                </p>
+            </KpiCard>
         </div>
     );
 }

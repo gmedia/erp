@@ -12,8 +12,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Pipelines', href: '/pipelines' },
-    { title: 'Dashboard', href: '/pipeline-dashboard' },
+    { title: 'Pipeline Dashboard', href: '/pipeline-dashboard' },
 ];
 
 export default function PipelineDashboard() {

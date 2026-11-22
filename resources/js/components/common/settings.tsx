@@ -33,7 +33,7 @@ export function SettingsShell({
     return (
         <div className="mx-auto w-full max-w-6xl px-4 py-6">
             <div className="mb-8 space-y-1">
-                <h1 className="text-xl font-semibold tracking-tight">
+                <h1 className="text-2xl font-semibold tracking-tight text-foreground">
                     {title}
                 </h1>
                 {description && (

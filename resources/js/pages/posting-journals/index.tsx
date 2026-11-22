@@ -340,9 +340,9 @@ export default function Index() {
                 </Alert>
             )}
 
-            <div className="overflow-hidden rounded-md border">
+            <div className="overflow-hidden rounded-lg bg-card">
                 <Table>
-                    <TableHeader className="bg-muted">
+                    <TableHeader className="[&_th]:text-muted-foreground">
                         <TableRow>
                             <TableHead className="w-[52px]">
                                 <Checkbox
@@ -358,7 +358,7 @@ export default function Index() {
                             <TableHead className="text-center">
                                 Status
                             </TableHead>
-                            <TableHead className="sticky right-0 z-20 w-[60px] bg-muted"></TableHead>
+                            <TableHead className="sticky right-0 z-20 w-[60px] bg-card"></TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>{tableBodyContent}</TableBody>
