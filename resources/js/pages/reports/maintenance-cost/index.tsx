@@ -34,6 +34,11 @@ export default function MaintenanceCostReport() {
             queryKey={['maintenance-cost-report']}
             entityName="Maintenance Cost"
             exportEndpoint="/api/reports/maintenance-cost/export"
+            defaultColumnVisibility={{
+                branch_name: false,
+                scheduled_at: false,
+                performed_at: false,
+            }}
         />
     );
 }

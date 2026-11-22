@@ -138,7 +138,7 @@ export default function Index() {
                         {item.created_by_user?.name || '-'}
                     </span>
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="sticky right-0 z-20 bg-background text-right">
                     <div className="flex justify-end">
                         <GenericActions
                             item={item}
@@ -218,7 +218,7 @@ export default function Index() {
                             <TableHead>Status</TableHead>
                             <TableHead>Journal</TableHead>
                             <TableHead>Created By</TableHead>
-                            <TableHead className="text-right">
+                            <TableHead className="sticky right-0 z-20 bg-muted text-right">
                                 Actions
                             </TableHead>
                         </TableRow>

@@ -59,6 +59,8 @@ type ReportDataTablePageProps<
     requiredFilters?: readonly (keyof TFilters & string)[];
     /** Pesan empty state saat `requiredFilters` belum lengkap. */
     requiredFilterHint?: string;
+    /** Kolom sekunder yang disembunyikan default (aktif via menu Columns). */
+    defaultColumnVisibility?: Record<string, boolean>;
 };
 
 function hasAllRequiredFilters(
@@ -108,6 +110,7 @@ export function ReportDataTablePage<
     children,
     requiredFilters,
     requiredFilterHint,
+    defaultColumnVisibility,
 }: Readonly<ReportDataTablePageProps<TData, TFilters>>) {
     const {
         filters,
@@ -171,6 +174,7 @@ export function ReportDataTablePage<
                             exportEndpoint={exportEndpoint}
                             entityName={entityName}
                             onView={onView}
+                            defaultColumnVisibility={defaultColumnVisibility}
                             emptyState={
                                 ready ? undefined : (
                                     <ReportSelectFilterPrompt

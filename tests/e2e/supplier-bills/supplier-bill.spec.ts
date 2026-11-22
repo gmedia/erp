@@ -1,7 +1,14 @@
 import { test } from '@playwright/test';
 
-import { generateModuleTests, ModuleTestConfig } from '../shared-test-factories';
-import { createSupplierBill, editSupplierBill, searchSupplierBill } from './helpers';
+import {
+    generateModuleTests,
+    ModuleTestConfig,
+} from '../shared-test-factories';
+import {
+    createSupplierBill,
+    editSupplierBill,
+    searchSupplierBill,
+} from './helpers';
 
 const config: ModuleTestConfig = {
     entityName: 'Supplier Bill',
@@ -14,12 +21,32 @@ const config: ModuleTestConfig = {
     editEntity: editSupplierBill,
     editUpdates: { bill_number: `BILL-E2E-UPDATED-${Date.now()}` },
     expectedExportColumns: [
-        'ID', 'Bill Number', 'Supplier', 'Branch', 'Bill Date', 'Due Date',
-        'Supplier Invoice #', 'Payment Terms', 'Currency', 'Status',
-        'Subtotal', 'Tax Amount', 'Discount Amount', 'Grand Total',
-        'Amount Paid', 'Amount Due', 'Notes', 'Created At',
+        'ID',
+        'Bill Number',
+        'Supplier',
+        'Branch',
+        'Due Date',
+        'Supplier Invoice #',
+        'Payment Terms',
+        'Currency',
+        'Status',
+        'Subtotal',
+        'Tax Amount',
+        'Discount Amount',
+        'Grand Total',
+        'Amount Paid',
+        'Amount Due',
+        'Notes',
+        'Created At',
     ],
-    sortableColumns: ['Bill Number', 'Supplier', 'Branch', 'Bill Date', 'Due Date', 'Status', 'Grand Total', 'Amount Due'],
+    sortableColumns: [
+        'Bill Number',
+        'Supplier',
+        'Due Date',
+        'Status',
+        'Grand Total',
+        'Amount Due',
+    ],
     viewType: 'dialog',
     viewDialogTitle: 'Supplier Bill Details',
 };

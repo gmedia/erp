@@ -12,6 +12,8 @@ export type FormComponentType = 'simple' | 'complex';
 export type EntityCrudConfig<T extends object = object> =
     CustomEntityConfig<T> & {
         toolbarActions?: React.ReactNode;
+        /** Kolom yang disembunyikan default agar kolom kunci muat di 1440px. */
+        defaultColumnVisibility?: Record<string, boolean>;
     };
 
 type CrudFormProps<T extends object> = {
@@ -117,6 +119,8 @@ export function createEntityCrudPage<T extends object>(
                             entityName: config.entityNameForSearch,
                             onView: props.onView,
                             extraToolbarActions: config.toolbarActions,
+                            defaultColumnVisibility:
+                                config.defaultColumnVisibility,
                         }),
 
                         mapFormProps: createFormPropsMapper(config),

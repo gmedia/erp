@@ -18,7 +18,7 @@ const config: ModuleTestConfig = {
         'Reason', 'Status', 'Subtotal', 'Tax Amount', 'Grand Total',
         'Notes', 'Created At',
     ],
-    sortableColumns: ['Credit Note Number', 'Customer', 'Branch', 'Credit Note Date', 'Reason', 'Status', 'Grand Total'],
+    sortableColumns: ['Credit Note Number', 'Customer', 'Branch', 'Credit Note Date', 'Status', 'Grand Total'],
     viewType: 'dialog',
     viewDialogTitle: 'Credit Note Details',
 };

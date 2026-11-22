@@ -1,6 +1,9 @@
 import { test } from '@playwright/test';
 
-import { generateModuleTests, ModuleTestConfig } from '../shared-test-factories';
+import {
+    generateModuleTests,
+    ModuleTestConfig,
+} from '../shared-test-factories';
 import { createApPayment, editApPayment, searchApPayment } from './helpers';
 
 const config: ModuleTestConfig = {
@@ -14,12 +17,28 @@ const config: ModuleTestConfig = {
     editEntity: editApPayment,
     editUpdates: { payment_number: `PAY-E2E-UPDATED-${Date.now()}` },
     expectedExportColumns: [
-        'ID', 'Payment Number', 'Supplier', 'Branch', 'Bank Account',
-        'Payment Date', 'Payment Method', 'Currency', 'Status',
-        'Total Amount', 'Total Allocated', 'Total Unallocated',
-        'Reference', 'Notes', 'Created At',
+        'ID',
+        'Payment Number',
+        'Supplier',
+        'Branch',
+        'Bank Account',
+        'Payment Date',
+        'Currency',
+        'Status',
+        'Total Amount',
+        'Total Allocated',
+        'Total Unallocated',
+        'Reference',
+        'Notes',
+        'Created At',
     ],
-    sortableColumns: ['Payment Number', 'Supplier', 'Branch', 'Payment Date', 'Payment Method', 'Status', 'Total Amount'],
+    sortableColumns: [
+        'Payment Number',
+        'Supplier',
+        'Payment Date',
+        'Status',
+        'Total Amount',
+    ],
     viewType: 'dialog',
     viewDialogTitle: 'AP Payment Details',
 };

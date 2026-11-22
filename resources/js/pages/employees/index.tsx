@@ -6,6 +6,12 @@ import { employeeConfig } from '@/utils/entityConfigs';
 
 const config = {
     ...employeeConfig,
+    defaultColumnVisibility: {
+        'employments.branch_id': false,
+        'employments.position_id': false,
+        'employments.hire_date': false,
+        phone: false,
+    },
     toolbarActions: (
         <ImportDialog
             title="Import Employees"

@@ -34,6 +34,13 @@ export default function PurchaseOrderStatusReportPage() {
             queryKey={['purchase-order-status-report']}
             entityName="Purchase Order Status Report"
             exportEndpoint="/api/reports/purchase-order-status/export"
+            defaultColumnVisibility={{
+                warehouse_name: false,
+                purchase_order_expected_delivery_date: false,
+                receipt_progress_percent: false,
+                grand_total: false,
+                purchase_order_status: false,
+            }}
         />
     );
 }

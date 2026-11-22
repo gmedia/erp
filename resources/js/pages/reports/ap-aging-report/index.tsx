@@ -31,6 +31,11 @@ export default function ApAgingReportPage() {
             queryKey={['ap-aging-report']}
             entityName="AP Aging Report"
             exportEndpoint="/api/reports/ap-aging/export"
+            defaultColumnVisibility={{
+                branch_name: false,
+                grand_total: false,
+                bill_status: false,
+            }}
         />
     );
 }

@@ -28,6 +28,10 @@ export default function BudgetVarianceReportPage() {
             queryKey={['budget-variance-report']}
             entityName="Budget Variance"
             exportEndpoint="/api/reports/budget-variance/export"
+            defaultColumnVisibility={{
+                period_start: false,
+                period_end: false,
+            }}
             requiredFilters={['budget_id']}
             requiredFilterHint="Pilih budget pada filter untuk melihat varians anggaran per akun."
         />
