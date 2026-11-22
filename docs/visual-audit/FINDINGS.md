@@ -205,6 +205,44 @@ Tidak ada halaman yang gagal beralih tema; token permukaan/teks konsisten. Masal
 
 Full multimodal narrative: session `ses_02021a5c2ffeaD0HIIg6ymhnEW`.
 
+## Audit wave-6 (2026-11-22, #335)
+
+**Cakupan:** 85 route `url-list.json` × light/dark × desktop 1440×900 / mobile 390×844 = 340 capture setelah W5-G1…G7 (#328–#334) merged, ditambah audit DOM terukur per route (170 kombinasi) untuk indikator scroll, lebar kolom, label mentah, badge solid, dan KPI terpotong.
+**Harness:** `VISUAL_AUDIT_WAVE=wave-6` → 85/85 passed; `VISUAL_AUDIT_WAVE=w6-fixes` (21 route terdampak) → 84/84 capture, 0 overflow.
+
+### Metrik otomatis
+
+| Cek | Hasil |
+| --- | --- |
+| `.dark` aktif di capture dark | 170/170 |
+| Overflow horizontal level halaman | **0** |
+| Error console saat load | 0 (hanya logo MinIO 404 saat capture environment) |
+| Label snake_case pada badge | 0 |
+| Badge solid/saturasi | 0 |
+| Label filter ALL CAPS | 0 |
+
+### Temuan & status
+
+| ID | Pri | Temuan | Status |
+| --- | --- | --- | --- |
+| W6-01 | P2 | Indikator tepi kanan tabel tidak muncul sampai user menggulir (7 route) | **fixed (#336)** — `ResizeObserver` pada `ui/table.tsx` |
+| W6-02 | P2 | Kolom terakhir di luar viewport tanpa indikator (turunan W6-01) | **fixed (#336)** |
+| W6-03 | P3 | Kolom kunci/uanga tersembunyi di 1440 pada 7 route | **fixed (#336)** — `defaultColumnVisibility` diperluas, 13 route `cut=0` |
+| W6-04 | P3 | Total Balance Sheet terpotong 2px di 1440 | **fixed (#336)** — lebar kolom total dinaikkan |
+| W6-05 | P3 | COGS `51000` = 0 (tidak ada penjualan di subledger demo) | **fixed (#336)** — jurnal penjualan + HPP (COGS 18 jt) |
+| W6-06 | P3 | AP payment tidak diposting ke GL / tidak tampak di cash-flow | **fixed (#336)** — jurnal kas AP + arus kas bruto |
+| W6-07 | P3 | Nomor stocktake `SO-…-92xxxx` (bentrok Sales Order) | **fixed (#336)** — `STO-2026-0000xx` + pembersihan legacy |
+| W6-08 | P3 | Nomor PO/GR rentang `99xxxx` | **fixed (#336)** — `0001xx` + generator berbasis nomor terakhir |
+| W6-09 | P3 | Kode approval flow campur (`vehicle-loan.default`) | **fixed (#336)** — `vehicle_loan_default` |
+| W6-10 | P3 | Manufacturer `Generic` | **fixed (#336)** — `Krisbow` |
+| W6-11 | P3 | Surat jalan `SJ-<tanggal seed>-99x` | **fixed (#336)** — `SJ-2026-0001xx` |
+| W6-12 | P3 | 3 supplier return ke PO yang sama | **fixed (#336)** — tersebar ke 3 PO/GR |
+| W6-13 | P3 | Recurring journal di masa lalu + nama demo | **fixed (#336)** — jadwal masa depan + nama realistis |
+| W6-14 | P3 | Audit trail timestamp identik (36/68) | **fixed (#336)** — 68/68 & 16/16 unik |
+| W6-15 | P3 | Rantai asset movement tidak konsisten | **fixed (#336)** — printer IT Room → Office |
+| W6-16 | P3 | Department kendaraan/server di HR | **fixed (#336)** — Operations/Engineering |
+| W6-17 | P3 | Deskripsi singkat halaman CRUD kosong (85/86) | **fixed (#336)** — 37 config (43 halaman) berdeskripsi |
+
 ### Themes → BACKLOG
 
 T1 DataTable shell v2 · T2 Sidebar IA/active · T3 Page header contract · T4 KPI/dashboard semantics · T5 Sparse/report density
