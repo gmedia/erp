@@ -140,7 +140,8 @@
         "selectFilterBudget": "Choose a budget in the filters to see the budget variance.",
         "selectFilterAccount": "Choose an account (and period) in the filters to see the ledger.",
         "selectFilterFiscalYear": "Choose a fiscal year (and period) to see the detailed trial balance.",
-        "selectFilterDefault": "Choose the required filters to show {entity}."
+        "selectFilterDefault": "Choose the required filters to show {entity}.",
+        "selectFilterCustomer": "Choose a customer in the filters to see the statement."
     },
     "admin": {
         "selectLogo": "Select SVG Logo",
