@@ -22,7 +22,7 @@ Kerjakan berurutan G1 → G7.
 
 | Grup  | Pri | Temuan                                          | Scope                                                             | Status                     |
 | ----- | --- | ----------------------------------------------- | ----------------------------------------------------------------- | -------------------------- |
-| W5-G1 | P1  | W5-09, W5-10, W5-11                             | Formatter & badge: nilai mentah, tone status, format uang/tanggal | **merged #PR_PLACEHOLDER** |
+| W5-G1 | P1  | W5-09, W5-10, W5-11                             | Formatter & badge: nilai mentah, tone status, format uang/tanggal | **merged #328** |
 | W5-G2 | P1  | W5-01, W5-02, W5-03                             | Tabel: kolom kunci tertutup, fade report, aksi sticky mobile      | open #321                  |
 | W5-G3 | P1  | W5-05, W5-06, W5-07                             | Page shell: breadcrumb, shell custom, KPI/toolbar dashboard       | open #322                  |
 | W5-G4 | P1  | W5-04, W5-08                                    | Report: laporan keuangan mobile, empty state i18n + mobile        | open #323                  |
