@@ -122,5 +122,14 @@ export interface Translations {
     };
     reports: {
         sections: Record<string, string>;
+        selectFilterTitle: string;
+        selectFilterBudget: string;
+        selectFilterAccount: string;
+        selectFilterFiscalYear: string;
+        selectFilterDefault: string;
+    };
+    admin: {
+        selectLogo: string;
+        noFileSelected: string;
     };
 }

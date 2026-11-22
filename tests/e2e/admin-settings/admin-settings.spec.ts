@@ -175,7 +175,7 @@ test.describe('Admin Settings', () => {
 
         // Upload memakai pola shadcn: tombol + input file tersembunyi (W4-14)
         await expect(
-            page.getByRole('button', { name: /Pilih Logo SVG/i }),
+            page.getByRole('button', { name: /Select SVG Logo/i }),
         ).toBeVisible();
 
         const logoInput = page.locator('input[name="company_logo"]');

@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn, formatCurrency } from '@/lib/utils';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
@@ -126,7 +125,7 @@ function AccountRow({
         <div className="flex flex-col">
             <div
                 className={cn(
-                    'flex items-center gap-2 border-b border-border/40 px-2 py-2 text-sm hover:bg-muted/40',
+                    'flex min-w-max items-center gap-2 border-b border-border/40 px-2 py-2 text-sm hover:bg-muted/40',
                     hasChildren && 'bg-muted/20 font-semibold',
                 )}
             >
@@ -137,7 +136,7 @@ function AccountRow({
                     style={{ paddingLeft: `${(node.level - 1) * 1.5}rem` }}
                 >
                     {hasChildren ? expandIcon : <div className="w-4" />}
-                    <span className="font-mono text-xs text-muted-foreground">
+                    <span className="font-mono text-xs whitespace-nowrap text-muted-foreground">
                         {node.code}
                     </span>
                     <span className="truncate">{node.name}</span>
@@ -227,7 +226,7 @@ export function FinancialReportSection({
     };
 
     return (
-        <Card className="mb-6">
+        <Card className="mb-6 min-w-0">
             <CardHeader className="pb-2">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex flex-wrap items-center gap-2">
@@ -251,10 +250,10 @@ export function FinancialReportSection({
                             </Button>
                         </div>
                     </div>
-                    <div className="flex gap-4 text-right whitespace-nowrap tabular-nums">
+                    <div className="flex w-full flex-wrap justify-between gap-2 text-right whitespace-nowrap tabular-nums sm:w-auto sm:flex-nowrap sm:justify-end sm:gap-4">
                         <span
                             className={cn(
-                                'w-40 text-lg font-bold',
+                                'text-lg font-bold sm:w-40',
                                 getSignedAmountTextClass(total),
                             )}
                         >
@@ -264,7 +263,7 @@ export function FinancialReportSection({
                             <>
                                 <span
                                     className={cn(
-                                        'w-40 text-lg font-bold text-muted-foreground',
+                                        'text-lg font-bold text-muted-foreground sm:w-40',
                                         getSignedAmountTextClass(
                                             comparisonTotal || 0,
                                         ),
@@ -274,7 +273,7 @@ export function FinancialReportSection({
                                 </span>
                                 <span
                                     className={cn(
-                                        'w-36 text-lg font-bold',
+                                        'text-lg font-bold sm:w-36',
                                         changeTextClass,
                                     )}
                                 >
@@ -282,7 +281,7 @@ export function FinancialReportSection({
                                 </span>
                                 <span
                                     className={cn(
-                                        'w-20 text-lg font-bold',
+                                        'text-lg font-bold sm:w-20',
                                         getChangePercentageTextClass(
                                             changePercentage,
                                             comparisonTotal,
@@ -306,9 +305,9 @@ export function FinancialReportSection({
                     </div>
                 ) : (
                     <div className="overflow-hidden rounded-md border">
-                        <ScrollArea className="max-h-[60vh]">
-                            <div className="sticky top-0 z-10 flex items-center border-b bg-background px-2 py-2 text-xs font-medium text-muted-foreground uppercase">
-                                <div className="flex-1">Account</div>
+                        <div className="max-h-[60vh] w-full min-w-0 overflow-auto">
+                            <div className="sticky top-0 z-10 flex min-w-max items-center border-b bg-background px-2 py-2 text-xs font-medium text-muted-foreground uppercase">
+                                <div className="min-w-40 flex-1">Account</div>
                                 <div className="flex gap-4 text-right tabular-nums">
                                     <div className="w-32">Current</div>
                                     {showComparison && (
@@ -330,8 +329,7 @@ export function FinancialReportSection({
                                     showComparison={showComparison}
                                 />
                             ))}
-                            <ScrollBar orientation="horizontal" />
-                        </ScrollArea>
+                        </div>
                     </div>
                 )}
             </CardContent>
@@ -393,5 +391,5 @@ export function ComparisonFinancialReportSectionGroup({
         return <>{content}</>;
     }
 
-    return <div className={className}>{content}</div>;
+    return <div className={cn('min-w-0', className)}>{content}</div>;
 }

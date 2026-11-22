@@ -3,6 +3,7 @@
 import { DataTable } from '@/components/common/DataTableCore';
 import { PageHeader } from '@/components/common/PageHeader';
 import type { FieldDescriptor } from '@/components/common/filters';
+import { useTranslation } from '@/contexts/i18n-context';
 import type { FilterState } from '@/hooks/useCrudFilters';
 import { useCrudFilters } from '@/hooks/useCrudFilters';
 import { useCrudQuery } from '@/hooks/useCrudQuery';
@@ -57,8 +58,8 @@ type ReportDataTablePageProps<
      * instruktif dan tidak memanggil API (W4-19/W4-22).
      */
     requiredFilters?: readonly (keyof TFilters & string)[];
-    /** Pesan empty state saat `requiredFilters` belum lengkap. */
-    requiredFilterHint?: string;
+    /** Kunci i18n untuk pesan empty state saat `requiredFilters` belum lengkap. */
+    requiredFilterHintKey?: string;
     /** Kolom sekunder yang disembunyikan default (aktif via menu Columns). */
     defaultColumnVisibility?: Record<string, boolean>;
 };
@@ -77,15 +78,23 @@ function hasAllRequiredFilters(
     });
 }
 
-function ReportSelectFilterPrompt({ hint }: Readonly<{ hint: string }>) {
+function ReportSelectFilterPrompt({
+    hintKey,
+    entityName,
+}: Readonly<{ hintKey?: string; entityName: string }>) {
+    const { t } = useTranslation();
+    const hint = hintKey
+        ? t(hintKey)
+        : t('reports.selectFilterDefault').replace('{entity}', entityName);
+
     return (
         <div
             data-testid="report-filter-prompt"
-            className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed px-6 py-16 text-center"
+            className="sticky left-0 flex w-[calc(100cqw-2rem)] flex-col items-center justify-center gap-2 rounded-lg border border-dashed px-6 py-16 text-center"
         >
             <Filter className="size-8 text-muted-foreground" aria-hidden />
             <p className="text-sm font-medium text-foreground">
-                Pilih filter untuk menampilkan laporan
+                {t('reports.selectFilterTitle')}
             </p>
             <p className="max-w-md text-sm text-muted-foreground">{hint}</p>
         </div>
@@ -109,7 +118,7 @@ export function ReportDataTablePage<
     onView,
     children,
     requiredFilters,
-    requiredFilterHint,
+    requiredFilterHintKey,
     defaultColumnVisibility,
 }: Readonly<ReportDataTablePageProps<TData, TFilters>>) {
     const {
@@ -178,10 +187,8 @@ export function ReportDataTablePage<
                             emptyState={
                                 ready ? undefined : (
                                     <ReportSelectFilterPrompt
-                                        hint={
-                                            requiredFilterHint ??
-                                            `Pilih filter yang diperlukan untuk menampilkan ${entityName}.`
-                                        }
+                                        hintKey={requiredFilterHintKey}
+                                        entityName={entityName}
                                     />
                                 )
                             }

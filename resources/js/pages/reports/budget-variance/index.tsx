@@ -33,7 +33,7 @@ export default function BudgetVarianceReportPage() {
                 period_end: false,
             }}
             requiredFilters={['budget_id']}
-            requiredFilterHint="Pilih budget pada filter untuk melihat varians anggaran per akun."
+            requiredFilterHintKey="reports.selectFilterBudget"
         />
     );
 }

@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/contexts/auth-context';
+import { useTranslation } from '@/contexts/i18n-context';
 import AdminSettingsLayout from '@/layouts/admin-settings/layout';
 import AppLayout from '@/layouts/app-layout';
 import axiosInstance from '@/lib/axios';
@@ -116,6 +117,7 @@ function GeneralSettings({
     settings: SettingsData['general'];
     onSaved?: () => Promise<void> | void;
 }>) {
+    const { t } = useTranslation();
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -267,10 +269,10 @@ function GeneralSettings({
                             size="sm"
                             onClick={() => logoInputRef.current?.click()}
                         >
-                            Pilih Logo SVG
+                            {t('admin.selectLogo')}
                         </Button>
                         <span className="text-sm text-muted-foreground">
-                            {logoFileName || 'Belum ada file dipilih'}
+                            {logoFileName || t('admin.noFileSelected')}
                         </span>
                     </div>
                 </SettingsRow>

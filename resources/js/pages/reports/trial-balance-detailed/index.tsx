@@ -31,7 +31,7 @@ export default function TrialBalanceDetailedReportPage() {
             entityName="Trial Balance Detailed"
             exportEndpoint="/api/reports/trial-balance-detailed/export"
             requiredFilters={['fiscal_year_id']}
-            requiredFilterHint="Pilih tahun fiskal (dan periode) untuk melihat neraca saldo detail."
+            requiredFilterHintKey="reports.selectFilterFiscalYear"
         />
     );
 }

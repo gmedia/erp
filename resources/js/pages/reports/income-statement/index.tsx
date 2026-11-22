@@ -122,7 +122,7 @@ export default function IncomeStatement() {
                 />
             }
         >
-            <div className="grid gap-6">
+            <div className="grid min-w-0 gap-6">
                 <FinancialReportSection
                     title="Revenue"
                     nodes={report.revenues || []}

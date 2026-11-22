@@ -124,7 +124,7 @@ export default function ComparativeReport() {
                 />
             }
         >
-            <div className="grid gap-6">
+            <div className="grid min-w-0 gap-6">
                 <ComparisonFinancialReportSectionGroup
                     sections={financialPositionSectionConfigs}
                     report={report}

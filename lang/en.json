@@ -119,5 +119,31 @@
         "switch": "Language",
         "en": "English",
         "id": "Indonesian"
+    },
+    "reports": {
+        "sections": {
+            "operating_header": "Cash Flows from Operating Activities",
+            "net_income_source": "Net Income",
+            "depreciation_addback": "Depreciation",
+            "working_capital_changes": "Changes in Working Capital",
+            "operating_cash_flow": "Net Cash from Operating Activities",
+            "investing_header": "Cash Flows from Investing Activities",
+            "fixed_asset_activity": "Fixed Asset Activity",
+            "investing_cash_flow": "Net Cash from Investing Activities",
+            "financing_header": "Cash Flows from Financing Activities",
+            "long_term_debt_activity": "Long-term Borrowings",
+            "equity_activity": "Paid-in Capital",
+            "financing_cash_flow": "Net Cash from Financing Activities",
+            "net_change": "Net Increase/Decrease in Cash"
+        },
+        "selectFilterTitle": "Select a filter to show the report",
+        "selectFilterBudget": "Choose a budget in the filters to see the budget variance.",
+        "selectFilterAccount": "Choose an account (and period) in the filters to see the ledger.",
+        "selectFilterFiscalYear": "Choose a fiscal year (and period) to see the detailed trial balance.",
+        "selectFilterDefault": "Choose the required filters to show {entity}."
+    },
+    "admin": {
+        "selectLogo": "Select SVG Logo",
+        "noFileSelected": "No file selected"
     }
 }
