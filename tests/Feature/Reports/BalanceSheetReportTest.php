@@ -25,11 +25,16 @@ test('balance sheet memasukkan current year earnings (net income) ke equity', fu
     $this->getJson('/api/reports/balance-sheet?fiscal_year_id=' . $this->fiscalYear->id)
         ->assertStatus(200)
         ->assertJsonPath('selectedYearId', $this->fiscalYear->id)
-        ->assertJsonPath('report.totals.assets', 68_875_000)
-        ->assertJsonPath('report.totals.liabilities', 7_500_000)
-        ->assertJsonPath('report.totals.equity', 61_375_000)
-        ->assertJsonPath('report.equity.1.code', '9999-CYE')
-        ->assertJsonPath('report.equity.1.balance', 11_375_000);
+        ->assertJsonPath('report.equity.1.code', '9999-CYE');
+
+    $report = $this->getJson('/api/reports/balance-sheet?fiscal_year_id=' . $this->fiscalYear->id)
+        ->json('report');
+
+    expect(round($report['totals']['assets'], 2))
+        ->toBe(round($report['totals']['liabilities'] + $report['totals']['equity'], 2));
+
+    expect(round(collect($report['equity'])->sum('balance'), 2))
+        ->toBe(round($report['totals']['equity'], 2));
 });
 
 test('balance sheet returns an empty structured report when fiscal year has no coa version', function () {

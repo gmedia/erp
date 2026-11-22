@@ -21,6 +21,7 @@ type AuditTrailPageProps<TItem, TFilters extends FilterState = FilterState> = {
     queryKey: string[];
     entityName: string;
     exportEndpoint: string;
+    defaultColumnVisibility?: Record<string, boolean>;
     buildColumns: (options: {
         onViewDetail: (item: TItem) => void;
     }) => ColumnDef<TItem>[];
@@ -43,6 +44,7 @@ export function AuditTrailPage<
     queryKey,
     entityName,
     exportEndpoint,
+    defaultColumnVisibility,
     buildColumns,
     renderDetailModal,
 }: Readonly<AuditTrailPageProps<TItem, TFilters>>) {
@@ -67,6 +69,7 @@ export function AuditTrailPage<
             queryKey={queryKey}
             entityName={entityName}
             exportEndpoint={exportEndpoint}
+            defaultColumnVisibility={defaultColumnVisibility}
         >
             {renderDetailModal({
                 item: selectedItem,

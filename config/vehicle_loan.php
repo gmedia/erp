@@ -38,7 +38,7 @@ return [
     |
     */
 
-    'approval_flow_code' => env('VEHICLE_LOAN_APPROVAL_FLOW_CODE', 'vehicle-loan.default'),
+    'approval_flow_code' => env('VEHICLE_LOAN_APPROVAL_FLOW_CODE', 'vehicle_loan_default'),
     'approvable_type' => VehicleLoan::class,
 
     /*

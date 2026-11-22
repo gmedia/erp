@@ -39,6 +39,7 @@ export default function InventoryStocktakeVarianceReportPage() {
                 warehouse_name: false,
                 counted_at: false,
                 stocktake_date: false,
+                stocktake_number: false,
             }}
         />
     );

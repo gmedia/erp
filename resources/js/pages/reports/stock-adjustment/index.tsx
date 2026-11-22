@@ -33,6 +33,11 @@ export default function StockAdjustmentReportPage() {
             queryKey={['stock-adjustment-report']}
             entityName="Stock Adjustment Report"
             exportEndpoint="/api/reports/stock-adjustment/export"
+            defaultColumnVisibility={{
+                'warehouse.name': false,
+                adjustment_count: false,
+                total_quantity_adjusted: false,
+            }}
         />
     );
 }

@@ -35,12 +35,12 @@ it('keeps purchasing sample approval config and seeded approval data consistent'
 
     $year = now()->format('Y');
 
-    $pendingPurchaseRequest = PurchaseRequest::query()->where('pr_number', "PR-{$year}-990002")->firstOrFail();
-    $approvedPurchaseRequest = PurchaseRequest::query()->where('pr_number', "PR-{$year}-990003")->firstOrFail();
-    $rejectedPurchaseRequest = PurchaseRequest::query()->where('pr_number', "PR-{$year}-990004")->firstOrFail();
+    $pendingPurchaseRequest = PurchaseRequest::query()->where('pr_number', "PR-{$year}-000102")->firstOrFail();
+    $approvedPurchaseRequest = PurchaseRequest::query()->where('pr_number', "PR-{$year}-000103")->firstOrFail();
+    $rejectedPurchaseRequest = PurchaseRequest::query()->where('pr_number', "PR-{$year}-000104")->firstOrFail();
 
-    $pendingPurchaseOrder = PurchaseOrder::query()->where('po_number', "PO-{$year}-990002")->firstOrFail();
-    $rejectedPurchaseOrder = PurchaseOrder::query()->where('po_number', "PO-{$year}-990004")->firstOrFail();
+    $pendingPurchaseOrder = PurchaseOrder::query()->where('po_number', "PO-{$year}-000102")->firstOrFail();
+    $rejectedPurchaseOrder = PurchaseOrder::query()->where('po_number', "PO-{$year}-000104")->firstOrFail();
 
     $assertApprovalRequest = function (string $approvableType, int $approvableId, string $expectedStatus) {
         $approvalRequest = ApprovalRequest::query()

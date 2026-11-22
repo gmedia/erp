@@ -6,8 +6,11 @@ use App\Models\Account;
 use App\Models\ApPayment;
 use App\Models\ApPaymentAllocation;
 use App\Models\Branch;
+use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use App\Models\GoodsReceipt;
+use App\Models\JournalEntry;
+use App\Models\JournalEntryLine;
 use App\Models\Product;
 use App\Models\PurchaseOrder;
 use App\Models\Supplier;
@@ -304,16 +307,17 @@ class ApSampleDataSeeder extends Seeder
             ],
         ];
 
-        // Transfer bank harus memakai akun bank (11110), bukan akun Cash (11100).
+        // Akun harus dari COA versi tahun fiskal ini agar posting sejalan dengan
+        // laporan (W6-06). Transfer bank memakai akun bank (11110), bukan Cash.
+        $coaVersionId = CoaVersion::query()
+            ->where('fiscal_year_id', $fiscalYearId)
+            ->orderByRaw("CASE status WHEN 'active' THEN 0 ELSE 1 END")
+            ->value('id');
+
         $bankAccount = Account::query()
-            ->where('type', 'asset')
+            ->when($coaVersionId, fn ($query) => $query->where('coa_version_id', $coaVersionId))
             ->where('code', '11110')
-            ->first()
-            ?? Account::query()
-                ->where('type', 'asset')
-                ->where('code', 'like', '111%')
-                ->orderByDesc('code')
-                ->first();
+            ->first();
 
         $billAllocations = [];
 
@@ -385,6 +389,84 @@ class ApSampleDataSeeder extends Seeder
                 $bill->updatePaymentStatus();
                 $bill->save();
             }
+        }
+
+        $this->seedPaymentJournals($fiscalYearId, $bankAccount, $adminUserId);
+    }
+
+    /**
+     * Posting kas untuk pembayaran AP yang confirmed agar arus kas dan GL
+     * sejalan dengan subledger (W6-06). Idempoten via prefix APP-.
+     */
+    private function seedPaymentJournals(
+        int $fiscalYearId,
+        ?Account $bankAccount,
+        int $adminUserId,
+    ): void {
+        $coaVersionId = CoaVersion::query()
+            ->where('fiscal_year_id', $fiscalYearId)
+            ->orderByRaw("CASE status WHEN 'active' THEN 0 ELSE 1 END")
+            ->value('id');
+
+        $payableAccount = Account::query()
+            ->when($coaVersionId, fn ($query) => $query->where('coa_version_id', $coaVersionId))
+            ->where('code', '21100')
+            ->first();
+
+        if (! $payableAccount || ! $bankAccount) {
+            return;
+        }
+
+        $existing = JournalEntry::query()
+            ->where('entry_number', 'like', 'APP-%')
+            ->pluck('id');
+
+        if ($existing->isNotEmpty()) {
+            JournalEntryLine::query()
+                ->whereIn('journal_entry_id', $existing)
+                ->delete();
+            JournalEntry::query()->whereIn('id', $existing)->delete();
+        }
+
+        $payments = ApPayment::query()
+            ->where('status', 'confirmed')
+            ->orderBy('payment_number')
+            ->get();
+
+        foreach ($payments as $payment) {
+            $amount = (float) $payment->total_amount;
+
+            if ($amount <= 0) {
+                continue;
+            }
+
+            $entry = JournalEntry::create([
+                'fiscal_year_id' => $fiscalYearId,
+                'entry_number' => 'APP-' . $payment->payment_number,
+                'entry_date' => $payment->payment_date->toDateString(),
+                'reference' => $payment->payment_number,
+                'description' => 'Pembayaran tagihan supplier ' . $payment->payment_number,
+                'status' => 'posted',
+                'journal_type' => 'payment',
+                'created_by' => $adminUserId,
+                'posted_by' => $adminUserId,
+                'posted_at' => $payment->confirmed_at ?? now(),
+            ]);
+
+            $entry->lines()->createMany([
+                [
+                    'account_id' => $payableAccount->id,
+                    'debit' => $amount,
+                    'credit' => 0,
+                    'memo' => 'Pelunasan utang usaha',
+                ],
+                [
+                    'account_id' => $bankAccount->id,
+                    'debit' => 0,
+                    'credit' => $amount,
+                    'memo' => 'Kas keluar untuk pembayaran supplier',
+                ],
+            ]);
         }
     }
 }

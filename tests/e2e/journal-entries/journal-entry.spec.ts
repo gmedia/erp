@@ -20,14 +20,7 @@ generateModuleTests({
         description: 'Updated Journal Entry Description',
     },
 
-    sortableColumns: [
-        'Entry Number',
-        'Date',
-        'Description',
-        'Reference',
-        'Total Amount',
-        'Status',
-    ],
+    sortableColumns: ['Entry Number', 'Date', 'Description', 'Status'],
 
     viewType: 'dialog',
     viewDialogTitle: 'Journal Entry Details',

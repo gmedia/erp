@@ -46,12 +46,20 @@ trait StoresItemsInTransaction
             return;
         }
 
+        $yearPrefix = $prefix . '-' . now()->format('Y') . '-';
+
+        // Urutan berdasarkan nomor terakhir (bukan id) agar data demo bernomor
+        // realistis dan pembuatan dokumen baru tidak bertabrakan dengan nomor
+        // yang sudah dipakai (W6-08).
+        $lastSequence = $model->newQuery()
+            ->where($attribute, 'like', $yearPrefix . '%')
+            ->pluck($attribute)
+            ->map(fn ($value): int => (int) substr((string) $value, strlen($yearPrefix)))
+            ->max() ?? 0;
+
         $model->update([
-            $attribute => $prefix
-                . '-'
-                . now()->format('Y')
-                . '-'
-                . str_pad((string) $model->getKey(), 6, '0', STR_PAD_LEFT),
+            $attribute => $yearPrefix
+                . str_pad((string) ($lastSequence + 1), 6, '0', STR_PAD_LEFT),
         ]);
     }
 

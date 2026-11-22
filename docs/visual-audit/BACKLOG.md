@@ -117,7 +117,7 @@ Matriks tema/viewport (opsional): `VISUAL_AUDIT_THEMES=light,dark VISUAL_AUDIT_V
 
 ## Next agent action
 
-0. **2026-11-22:** kerjakan grup `W5-G1`…`W5-G7` (#320–#326) berurutan — detail tiap temuan di `FINDINGS.md` → **Audit ulang wave-5**. (`W4-G1`…`W4-G8` selesai, #310–#318.)
+0. **2026-11-22:** `W5-G1`…`W5-G7` selesai (#328–#334). Temuan sisa audit wave-6 (W6-01…W6-17) dikerjakan di #335 → PR #336; lihat `FINDINGS.md` → **Audit wave-6**. Tidak ada temuan terbuka. (`W4-G1`…`W4-G8` selesai, #310–#318.)
 
 1. ~~#96–#102~~ **merged** on main (EX themes + BS-01). Docs closeout #101 merged; this PR #103 FINDINGS landed.
 2. Keep `e2e/` untracked.

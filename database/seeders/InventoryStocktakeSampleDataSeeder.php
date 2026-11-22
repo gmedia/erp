@@ -37,30 +37,36 @@ class InventoryStocktakeSampleDataSeeder extends Seeder
 
         $year = now()->format('Y');
 
+        // Format kode berubah (SO-… → STO-…): bersihkan baris demo lama agar
+        // seed ulang tidak menyisakan prefix yang bentrok dengan Sales Order.
+        InventoryStocktake::query()
+            ->where('stocktake_number', 'like', 'SO-%-92%')
+            ->delete();
+
         $samples = [
             [
-                'stocktake_number' => "SO-{$year}-920001",
+                'stocktake_number' => "STO-{$year}-000001",
                 'status' => 'draft',
                 'stocktake_date' => now()->subDays(8)->toDateString(),
                 'completed' => null,
                 'items' => $this->makeStocktakeItems($products, $branchIdForStock, $adminUserId, 'draft'),
             ],
             [
-                'stocktake_number' => "SO-{$year}-920002",
+                'stocktake_number' => "STO-{$year}-000002",
                 'status' => 'in_progress',
                 'stocktake_date' => now()->subDays(6)->toDateString(),
                 'completed' => null,
                 'items' => $this->makeStocktakeItems($products, $branchIdForStock, $adminUserId, 'in_progress'),
             ],
             [
-                'stocktake_number' => "SO-{$year}-920003",
+                'stocktake_number' => "STO-{$year}-000003",
                 'status' => 'completed',
                 'stocktake_date' => now()->subDays(4)->toDateString(),
                 'completed' => ['completed_by' => $adminUserId, 'completed_at' => now()->subDays(2)],
                 'items' => $this->makeStocktakeItems($products, $branchIdForStock, $adminUserId, 'completed'),
             ],
             [
-                'stocktake_number' => "SO-{$year}-920004",
+                'stocktake_number' => "STO-{$year}-000004",
                 'status' => 'cancelled',
                 'stocktake_date' => now()->subDays(3)->toDateString(),
                 'completed' => null,

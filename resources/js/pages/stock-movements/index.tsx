@@ -32,6 +32,11 @@ export default function StockMovementsPage() {
             queryKey={['stock-movements']}
             entityName="Stock Movement"
             exportEndpoint="/api/stock-movements/export"
+            defaultColumnVisibility={{
+                created_by: false,
+                warehouse_name: false,
+                average_cost_after: false,
+            }}
         />
     );
 }

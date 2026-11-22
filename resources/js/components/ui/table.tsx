@@ -18,16 +18,30 @@ function Table({
   React.useEffect(() => {
     const el = scrollRef.current
     if (!el) return
-    const update = () =>
-      setCanScrollRight(
-        el.scrollLeft + el.clientWidth < el.scrollWidth - 1
-      )
+
+    const update = () => {
+      const next = el.scrollLeft + el.clientWidth < el.scrollWidth - 1
+      setCanScrollRight((prev) => (prev === next ? prev : next))
+    }
+
     update()
     el.addEventListener("scroll", update, { passive: true })
     window.addEventListener("resize", update)
+
+    // Lebar tabel bertambah setelah data async masuk; observer menjaga
+    // indikator tetap akurat tanpa menunggu scroll (W6-01).
+    const observer =
+      typeof ResizeObserver === "undefined"
+        ? null
+        : new ResizeObserver(update)
+    observer?.observe(el)
+    const table = el.querySelector("table")
+    if (table) observer?.observe(table)
+
     return () => {
       el.removeEventListener("scroll", update)
       window.removeEventListener("resize", update)
+      observer?.disconnect()
     }
   }, [])
 
