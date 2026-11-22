@@ -1,6 +1,7 @@
 import { OverdueApprovalsList } from '@/components/approval-monitoring/OverdueApprovalsList';
 import { SummaryCards } from '@/components/approval-monitoring/SummaryCards';
 import { AsyncSelect } from '@/components/common/AsyncSelect';
+import { PageHeader } from '@/components/common/PageHeader';
 import {
     Select,
     SelectContent,
@@ -19,24 +20,17 @@ export default function ApprovalMonitoringDashboard() {
     return (
         <AppLayout
             breadcrumbs={[
-                { title: 'Dashboard', href: '/dashboard' },
-                { title: 'Approval Monitoring', href: '#' },
+                { title: 'Approval Monitoring', href: '/approval-monitoring' },
             ]}
         >
             <Helmet>
                 <title>Approval Monitoring</title>
             </Helmet>
             <div className="flex h-full flex-1 flex-col gap-6 p-4">
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                        <h2 className="text-2xl font-bold tracking-tight">
-                            Approval Monitoring
-                        </h2>
-                        <p className="text-muted-foreground">
-                            Monitor approval workflows and overdue tasks
-                        </p>
-                    </div>
-                </div>
+                <PageHeader
+                    title="Approval Monitoring"
+                    description="Monitor approval workflows and overdue tasks."
+                />
 
                 <SummaryCards summary={data?.summary} isLoading={isLoading} />
 

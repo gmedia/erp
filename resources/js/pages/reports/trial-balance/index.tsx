@@ -96,7 +96,7 @@ export default function TrialBalance() {
             }
         >
             <FinancialTableCard
-                title="Trial Balance Report"
+                title="Accounts"
                 items={report}
                 amountColumns={[
                     {
@@ -116,7 +116,7 @@ export default function TrialBalance() {
             >
                 {!isBalanced && report.length > 0 && (
                     <div className="mt-3 rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
-                        Trial Balance tidak seimbang. Selisih:{' '}
+                        Trial balance is not balanced. Difference:{' '}
                         {formatCurrency(difference)}
                     </div>
                 )}

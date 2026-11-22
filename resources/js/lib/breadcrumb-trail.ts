@@ -50,7 +50,9 @@ function findMenuTrail(
                 ? findMenuTrail(item.children, pathname, here)
                 : null;
 
-            return deeper ?? here;
+            // Halaman detail (mis. /asset-stocktakes/:id/perform) bukan lokasi
+            // menu; kembalikan null agar breadcrumb eksplisit halaman dipakai.
+            return deeper ?? (href === pathname ? here : null);
         }
 
         if (item.children?.length) {
@@ -104,13 +106,27 @@ export function resolveBreadcrumbs(
 ): BreadcrumbItem[] {
     const menuTrail = resolveMenuBreadcrumbTrail(menus, pathname);
 
-    if (explicit && explicit.length >= 2) {
-        return [...explicit];
+    if (!menuTrail || menuTrail.length === 0) {
+        return explicit ? [...explicit] : [];
     }
 
-    if (menuTrail && menuTrail.length > 0) {
+    // Rangka (grup) dari menu tree; label daun = label halaman (H1) yang
+    // diberikan halaman lewat breadcrumb eksplisitnya.
+    const leaf =
+        explicit && explicit.length > 0
+            ? explicit[explicit.length - 1]
+            : undefined;
+
+    if (!leaf) {
         return menuTrail;
     }
 
-    return explicit ? [...explicit] : [];
+    const merged = [...menuTrail];
+    merged[merged.length - 1] = {
+        title: leaf.title,
+        href:
+            leaf.href && leaf.href !== '#' ? leaf.href : menuTrail.at(-1)!.href,
+    };
+
+    return merged;
 }

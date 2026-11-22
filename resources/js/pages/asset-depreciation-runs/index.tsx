@@ -208,9 +208,9 @@ export default function Index() {
                 </Button>
             }
         >
-            <div className="overflow-hidden rounded-md border">
+            <div className="overflow-hidden rounded-lg bg-card">
                 <Table>
-                    <TableHeader className="bg-muted">
+                    <TableHeader className="[&_th]:text-muted-foreground">
                         <TableRow>
                             <TableHead>Fiscal Year</TableHead>
                             <TableHead>Period</TableHead>
@@ -218,7 +218,7 @@ export default function Index() {
                             <TableHead>Status</TableHead>
                             <TableHead>Journal</TableHead>
                             <TableHead>Created By</TableHead>
-                            <TableHead className="sticky right-0 z-20 bg-muted text-right">
+                            <TableHead className="sticky right-0 z-20 bg-card text-right">
                                 Actions
                             </TableHead>
                         </TableRow>

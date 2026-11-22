@@ -149,6 +149,7 @@ export default function StockMonitorPage() {
     return (
         <DataTablePage<StockMonitorItem, Record<string, string>>
             title="Stock Monitor"
+            description="Stock on hand, value, and low-stock items per product and warehouse."
             breadcrumbs={[
                 { title: 'Inventory', href: '#' },
                 { title: 'Stock Monitor', href: '/stock-monitor' },

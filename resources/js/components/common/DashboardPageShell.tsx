@@ -42,39 +42,29 @@ export default function DashboardPageShell({
             </Helmet>
             <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-4 pb-12 md:p-6">
                 <div className="flex flex-col gap-3">
-                    <PageHeader title={heading} description={description} />
-                    {toolbar ? (
-                        <div className="flex w-full flex-nowrap items-center gap-2 overflow-x-auto pb-1">
-                            {toolbar}
-                            <Button
-                                variant="secondary"
-                                size="sm"
-                                onClick={() => refetch()}
-                                disabled={isLoading}
-                                className="ml-auto shrink-0 gap-2"
-                            >
-                                <RefreshCw
-                                    className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`}
-                                />
-                                Refresh Data
-                            </Button>
-                        </div>
-                    ) : (
-                        <div className="flex w-full justify-end">
-                            <Button
-                                variant="secondary"
-                                size="sm"
-                                onClick={() => refetch()}
-                                disabled={isLoading}
-                                className="shrink-0 gap-2"
-                            >
-                                <RefreshCw
-                                    className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`}
-                                />
-                                Refresh Data
-                            </Button>
-                        </div>
-                    )}
+                    <PageHeader
+                        title={heading}
+                        description={description}
+                        actions={
+                            <>
+                                <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+                                    {toolbar}
+                                </div>
+                                <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    onClick={() => refetch()}
+                                    disabled={isLoading}
+                                    className="w-full shrink-0 gap-2 sm:ml-auto sm:w-auto"
+                                >
+                                    <RefreshCw
+                                        className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`}
+                                    />
+                                    Refresh Data
+                                </Button>
+                            </>
+                        }
+                    />
                 </div>
 
                 {isError && (
