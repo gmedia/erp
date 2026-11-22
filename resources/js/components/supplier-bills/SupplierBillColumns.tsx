@@ -25,6 +25,7 @@ export const supplierBillColumns: ColumnDef<SupplierBill>[] = [
     createTextColumn<SupplierBill>({
         accessorKey: 'bill_number',
         label: 'Bill Number',
+        primary: true,
     }),
     {
         accessorKey: 'supplier',

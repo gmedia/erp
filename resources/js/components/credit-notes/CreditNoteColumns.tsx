@@ -31,6 +31,7 @@ export const creditNoteColumns: ColumnDef<CreditNote>[] = [
     createTextColumn<CreditNote>({
         accessorKey: 'credit_note_number',
         label: 'Credit Note Number',
+        primary: true,
     }),
     {
         accessorKey: 'customer',

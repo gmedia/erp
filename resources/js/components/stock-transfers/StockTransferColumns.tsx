@@ -22,6 +22,7 @@ export const stockTransferColumns: ColumnDef<StockTransfer>[] = [
     createTextColumn<StockTransfer>({
         accessorKey: 'transfer_number',
         label: 'Transfer Number',
+        primary: true,
     }),
     {
         id: 'from_warehouse_id',

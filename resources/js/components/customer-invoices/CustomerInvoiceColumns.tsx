@@ -27,6 +27,7 @@ export const customerInvoiceColumns: ColumnDef<CustomerInvoice>[] = [
     createTextColumn<CustomerInvoice>({
         accessorKey: 'invoice_number',
         label: 'Invoice Number',
+        primary: true,
     }),
     {
         accessorKey: 'customer',

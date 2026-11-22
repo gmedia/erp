@@ -13,19 +13,21 @@ interface AgingBucketChartProps {
     readonly accentColor: 'emerald' | 'rose';
 }
 
+// "Current" bukan tunggakan: netral. Intensitas warna baru meningkat pada
+// bucket yang benar-benar jatuh tempo (W5-12).
 const COLOR_SCALES = {
     emerald: [
-        'bg-success/40',
-        'bg-success/60',
-        'bg-success/75',
-        'bg-success/90',
+        'bg-muted-foreground/30',
+        'bg-success/50',
+        'bg-success/70',
+        'bg-success/85',
         'bg-success',
     ],
     rose: [
-        'bg-destructive-foreground/40',
-        'bg-destructive-foreground/60',
-        'bg-destructive-foreground/75',
-        'bg-destructive-foreground/90',
+        'bg-muted-foreground/30',
+        'bg-destructive-foreground/50',
+        'bg-destructive-foreground/70',
+        'bg-destructive-foreground/85',
         'bg-destructive-foreground',
     ],
 };

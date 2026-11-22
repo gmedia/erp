@@ -303,7 +303,7 @@ export default function VehicleLoanReturnPage() {
                                         setIncidentNote(e.target.value)
                                     }
                                     rows={3}
-                                    placeholder="Jelaskan kejadian, lokasi, dan kondisi kendaraan."
+                                    placeholder="Jelaskan kejadian dan kondisi kendaraan"
                                 />
                             </div>
                         )}

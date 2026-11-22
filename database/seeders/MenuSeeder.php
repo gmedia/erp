@@ -488,7 +488,7 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => 'ap_aging_report',
-                        'display_name' => 'AP Aging Report',
+                        'display_name' => 'AP Aging',
                         'permissions' => ['ap_aging_report'],
                         'icon' => 'Calendar',
                         'url' => 'reports/ap-aging',
@@ -567,7 +567,7 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => 'ar_aging_report',
-                        'display_name' => 'AR Aging Report',
+                        'display_name' => 'AR Aging',
                         'permissions' => ['ar_aging_report'],
                         'icon' => 'Calendar',
                         'url' => 'reports/ar-aging',
@@ -652,7 +652,7 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => 'budget_variance_report',
-                        'display_name' => 'Budget Variance Report',
+                        'display_name' => 'Budget Variance',
                         'permissions' => [
                             'budget_variance_report',
                         ],
@@ -662,7 +662,7 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => 'trial_balance_report',
-                        'display_name' => 'Trial Balance Report',
+                        'display_name' => 'Trial Balance',
                         'permissions' => [
                             'trial_balance_report',
                         ],
@@ -672,7 +672,7 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => 'trial_balance_detailed_report',
-                        'display_name' => 'Trial Balance Detailed Report',
+                        'display_name' => 'Trial Balance Detailed',
                         'permissions' => [
                             'trial_balance_report',
                         ],
@@ -682,7 +682,7 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => 'general_ledger_report',
-                        'display_name' => 'General Ledger Report',
+                        'display_name' => 'General Ledger',
                         'permissions' => [
                             'general_ledger_report',
                         ],
@@ -692,7 +692,7 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => 'balance_sheet_report',
-                        'display_name' => 'Balance Sheet Report',
+                        'display_name' => 'Balance Sheet',
                         'permissions' => [
                             'balance_sheet_report',
                         ],
@@ -702,7 +702,7 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => 'income_statement_report',
-                        'display_name' => 'Income Statement Report',
+                        'display_name' => 'Income Statement',
                         'permissions' => [
                             'income_statement_report',
                         ],
@@ -712,7 +712,7 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => 'cash_flow_report',
-                        'display_name' => 'Cash Flow Report',
+                        'display_name' => 'Cash Flow',
                         'permissions' => [
                             'cash_flow_report',
                         ],
@@ -722,7 +722,7 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => 'comparative_report',
-                        'display_name' => 'Comparative Report',
+                        'display_name' => 'Comparative',
                         'permissions' => [
                             'comparative_report',
                         ],
@@ -732,7 +732,7 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => 'inventory_valuation_report',
-                        'display_name' => 'Inventory Valuation Report',
+                        'display_name' => 'Inventory Valuation',
                         'permissions' => [
                             'inventory_valuation_report',
                         ],
@@ -742,7 +742,7 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => 'stock_movement_report',
-                        'display_name' => 'Stock Movement Report',
+                        'display_name' => 'Stock Movement',
                         'permissions' => [
                             'stock_movement_report',
                         ],
@@ -752,7 +752,7 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => 'inventory_stocktake_variance_report',
-                        'display_name' => 'Inventory Stocktake Variance Report',
+                        'display_name' => 'Inventory Stocktake Variance',
                         'permissions' => [
                             'inventory_stocktake_variance_report',
                         ],
@@ -762,7 +762,7 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => 'stock_adjustment_report',
-                        'display_name' => 'Stock Adjustment Report',
+                        'display_name' => 'Stock Adjustment',
                         'permissions' => [
                             'stock_adjustment_report',
                         ],
@@ -772,7 +772,7 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => 'purchase_order_status_report',
-                        'display_name' => 'Purchase Order Status Report',
+                        'display_name' => 'Purchase Order Status',
                         'permissions' => [
                             'purchase_order_status_report',
                         ],
@@ -782,7 +782,7 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => 'purchase_history_report',
-                        'display_name' => 'Purchase History Report',
+                        'display_name' => 'Purchase History',
                         'permissions' => [
                             'purchase_history_report',
                         ],
@@ -792,7 +792,7 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => 'goods_receipt_report',
-                        'display_name' => 'Goods Receipt Report',
+                        'display_name' => 'Goods Receipt',
                         'permissions' => [
                             'goods_receipt_report',
                         ],

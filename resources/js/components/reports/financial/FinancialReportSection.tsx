@@ -307,7 +307,12 @@ export function FinancialReportSection({
                     <div className="overflow-hidden rounded-md border">
                         <div className="max-h-[60vh] w-full min-w-0 overflow-auto">
                             <div className="sticky top-0 z-10 flex min-w-max items-center border-b bg-background px-2 py-2 text-xs font-medium text-muted-foreground uppercase">
-                                <div className="min-w-40 flex-1">Account</div>
+                                {/* Spacer selebar ikon expand agar label
+                                    sejajar dengan teks baris (W5-12). */}
+                                <div className="flex min-w-40 flex-1 items-center gap-2">
+                                    <div className="w-4" aria-hidden />
+                                    <span>Account</span>
+                                </div>
                                 <div className="flex gap-4 text-right tabular-nums">
                                     <div className="w-32">Current</div>
                                     {showComparison && (

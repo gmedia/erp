@@ -792,7 +792,7 @@ export const BankReconciliationWorkspace =
                             <div className="relative shrink-0">
                                 <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
                                 <Input
-                                    placeholder="Search by entry number, description, reference..."
+                                    placeholder="Search entry, description, reference"
                                     value={jeSearch}
                                     onChange={(e) =>
                                         setJeSearch(e.target.value)

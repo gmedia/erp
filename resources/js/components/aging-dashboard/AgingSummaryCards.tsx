@@ -2,7 +2,7 @@ import { KpiCard } from '@/components/common/KpiCard';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatCurrency } from '@/lib/utils';
-import { TrendingDown, TrendingUp } from 'lucide-react';
+import { Clock, CreditCard, Wallet } from 'lucide-react';
 import { memo } from 'react';
 import type { AgingSummary } from '../../hooks/useAgingDashboard';
 
@@ -36,7 +36,7 @@ export const AgingSummaryCards = memo<AgingSummaryCardsProps>(
         const cards = [
             {
                 title: 'Total Receivables',
-                icon: TrendingUp,
+                icon: Wallet,
                 iconColor: 'text-success',
                 value: arSummary.total_outstanding,
                 formattedValue: formatCurrency(arSummary.total_outstanding),
@@ -50,7 +50,7 @@ export const AgingSummaryCards = memo<AgingSummaryCardsProps>(
             },
             {
                 title: 'AR Overdue',
-                icon: TrendingDown,
+                icon: Clock,
                 iconColor: 'text-warning',
                 value: arSummary.overdue_amount,
                 formattedValue: formatCurrency(arSummary.overdue_amount),
@@ -72,7 +72,7 @@ export const AgingSummaryCards = memo<AgingSummaryCardsProps>(
             },
             {
                 title: 'Total Payables',
-                icon: TrendingDown,
+                icon: CreditCard,
                 iconColor: 'text-destructive-foreground',
                 value: apSummary.total_outstanding,
                 formattedValue: formatCurrency(apSummary.total_outstanding),
@@ -86,7 +86,7 @@ export const AgingSummaryCards = memo<AgingSummaryCardsProps>(
             },
             {
                 title: 'AP Overdue',
-                icon: TrendingUp,
+                icon: Clock,
                 iconColor: 'text-warning',
                 value: apSummary.overdue_amount,
                 formattedValue: formatCurrency(apSummary.overdue_amount),

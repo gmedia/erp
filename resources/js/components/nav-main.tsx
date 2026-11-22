@@ -23,7 +23,7 @@ import { useTranslation } from '@/contexts/i18n-context';
 import { isNavHrefActive, pathMatchesNavHref } from '@/lib/nav-active';
 import { type NavItem } from '@/types';
 import { ChevronRight } from 'lucide-react';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 import { Badge } from '@/components/ui/badge';
@@ -54,6 +54,15 @@ export function NavMain({ items = [] }: Readonly<{ items: NavItem[] }>) {
     const { t } = useTranslation();
 
     const allHrefs = useMemo(() => collectNavHrefs(items), [items]);
+
+    // Item aktif di bawah area fade harus ikut terlihat (W5-12).
+    useEffect(() => {
+        const active = document.querySelector<HTMLElement>(
+            '[data-slot="sidebar-content"] [data-active="true"]',
+        );
+
+        active?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    }, [location.pathname]);
 
     return (
         <SidebarGroup className="px-2 py-0">

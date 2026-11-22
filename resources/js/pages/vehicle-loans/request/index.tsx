@@ -172,7 +172,7 @@ export default function VehicleLoanRequestPage() {
                         <Textarea
                             id="purpose"
                             value={form.purpose}
-                            placeholder="Contoh: kunjungan klien ke Kantor Cabang Bandung"
+                            placeholder="Contoh: kunjungan klien"
                             onChange={(e) => update('purpose', e.target.value)}
                             rows={3}
                         />
