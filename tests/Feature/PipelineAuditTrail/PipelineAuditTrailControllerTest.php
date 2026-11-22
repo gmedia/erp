@@ -85,6 +85,31 @@ test('it can fetch audit trail data via json', function () {
         );
 });
 
+test('it resolves the document number for known entity types', function () {
+    $purchaseRequest = \App\Models\PurchaseRequest::factory()->create([
+        'pr_number' => 'PR-2026-0777',
+    ]);
+
+    PipelineStateLog::create([
+        'pipeline_entity_state_id' => $this->entityState->id,
+        'entity_type' => \App\Models\PurchaseRequest::class,
+        'entity_id' => (string) $purchaseRequest->id,
+        'from_state_id' => $this->stateA->id,
+        'to_state_id' => $this->stateB->id,
+        'transition_id' => $this->transition->id,
+        'performed_by' => $this->user->id,
+    ]);
+
+    Sanctum::actingAs($this->user, ['*']);
+    $response = $this->getJson('/api/pipeline-audit-trail')->assertOk();
+
+    $row = collect($response->json('data'))
+        ->firstWhere('entity_type', \App\Models\PurchaseRequest::class);
+
+    expect($row)->not->toBeNull()
+        ->and($row['entity_number'])->toBe('PR-2026-0777');
+});
+
 test('it can filter the report by various parameters', function () {
     // Modify log to be older
     $this->log->forceFill(['created_at' => '2025-01-01 00:00:00'])->saveQuietly();

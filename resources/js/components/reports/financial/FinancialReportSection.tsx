@@ -73,6 +73,21 @@ export const getSignedAmountTextClass = (value: number): string => {
  * Format persentase perubahan; pembanding 0 menghasilkan `—` (n/a) alih-alih
  * `0.0%` yang menyesatkan (W4-21).
  */
+export const getChangePercentageTextClass = (
+    percentage: number | null | undefined,
+    comparisonBase: number | null | undefined,
+): string => {
+    if (
+        comparisonBase === null ||
+        comparisonBase === undefined ||
+        comparisonBase === 0
+    ) {
+        return 'text-muted-foreground';
+    }
+
+    return getChangeTextClass(percentage ?? 0);
+};
+
 export const formatChangePercentage = (
     percentage: number | null | undefined,
     comparisonBase: number | null | undefined,
@@ -151,7 +166,15 @@ function AccountRow({
                             <div className={cn('w-28', changeTextClass)}>
                                 {formatCurrency(changeValue)}
                             </div>
-                            <div className={cn('w-16', changeTextClass)}>
+                            <div
+                                className={cn(
+                                    'w-16',
+                                    getChangePercentageTextClass(
+                                        node.change_percentage,
+                                        node.comparison_balance,
+                                    ),
+                                )}
+                            >
                                 {formatChangePercentage(
                                     node.change_percentage,
                                     node.comparison_balance,
@@ -260,7 +283,10 @@ export function FinancialReportSection({
                                 <span
                                     className={cn(
                                         'w-20 text-lg font-bold',
-                                        changeTextClass,
+                                        getChangePercentageTextClass(
+                                            changePercentage,
+                                            comparisonTotal,
+                                        ),
                                     )}
                                 >
                                     {formatChangePercentage(

@@ -49,7 +49,7 @@ function formatCurrency(value: string | null | undefined): string {
     return formatCurrencyByRegionalSettings(value, {
         currency: 'IDR',
         locale: 'id-ID',
-        minimumFractionDigits: 2,
+        minimumFractionDigits: 0,
         maximumFractionDigits: 2,
     });
 }

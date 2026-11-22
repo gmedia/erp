@@ -71,7 +71,7 @@ export const purchaseRequestColumns: ColumnDef<PurchaseRequest>[] = [
         label: 'Estimated Amount',
         currency: 'IDR',
         locale: 'id-ID',
-        minimumFractionDigits: 2,
+        minimumFractionDigits: 0,
         maximumFractionDigits: 2,
     }),
     createActionsColumn<PurchaseRequest>(),

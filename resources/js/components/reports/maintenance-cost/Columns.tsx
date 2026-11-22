@@ -51,12 +51,10 @@ export const maintenanceCostColumns: ColumnDef<MaintenanceCostReportItem>[] = [
         header: 'Type',
         getValue: (item) => item.maintenance_type,
     }),
-    createReportTextColumn<MaintenanceCostReportItem>({
+    createReportStatusBadgeColumn<MaintenanceCostReportItem>({
         accessorKey: 'status',
         header: 'Status',
-        getValue: (item) => item.status?.replace('_', ' '),
-        className: 'capitalize',
-        sortable: true,
+        getValue: (item) => item.status,
     }),
     createReportTextColumn<MaintenanceCostReportItem>({
         accessorKey: 'scheduled_at',

@@ -274,7 +274,7 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
                                                     currency:
                                                         selectedCurrency ||
                                                         'IDR',
-                                                    minimumFractionDigits: 2,
+                                                    minimumFractionDigits: 0,
                                                     maximumFractionDigits: 2,
                                                 },
                                             )}
@@ -287,7 +287,7 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
                                                     currency:
                                                         selectedCurrency ||
                                                         'IDR',
-                                                    minimumFractionDigits: 2,
+                                                    minimumFractionDigits: 0,
                                                     maximumFractionDigits: 2,
                                                 },
                                             )}

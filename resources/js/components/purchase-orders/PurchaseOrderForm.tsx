@@ -343,7 +343,7 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(
                                                         currency:
                                                             selectedCurrency ||
                                                             undefined,
-                                                        minimumFractionDigits: 2,
+                                                        minimumFractionDigits: 0,
                                                         maximumFractionDigits: 2,
                                                     },
                                                 )}

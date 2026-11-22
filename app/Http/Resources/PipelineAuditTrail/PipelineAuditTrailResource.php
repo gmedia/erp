@@ -3,6 +3,7 @@
 namespace App\Http\Resources\PipelineAuditTrail;
 
 use App\Models\PipelineStateLog;
+use App\Support\DocumentNumberResolver;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Str;
@@ -20,6 +21,10 @@ class PipelineAuditTrailResource extends JsonResource
             'entity_type' => $this->entity_type,
             'entity_type_short' => Str::afterLast($this->entity_type, '\\'),
             'entity_id' => $this->entity_id,
+            'entity_number' => app(DocumentNumberResolver::class)->resolve(
+                $this->entity_type,
+                $this->entity_id,
+            ),
             'pipeline_name' => $this->pipelineEntityState->pipeline->name,
             'from_state_id' => $this->from_state_id,
             'from_state_name' => $this->fromState?->name,

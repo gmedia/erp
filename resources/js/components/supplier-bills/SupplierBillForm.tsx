@@ -368,7 +368,7 @@ export const SupplierBillForm = memo<SupplierBillFormProps>(
                                                         currency:
                                                             selectedCurrency ||
                                                             undefined,
-                                                        minimumFractionDigits: 2,
+                                                        minimumFractionDigits: 0,
                                                         maximumFractionDigits: 2,
                                                     },
                                                 )}

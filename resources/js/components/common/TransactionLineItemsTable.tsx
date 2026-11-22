@@ -57,7 +57,7 @@ function computeLineTotal(item: TransactionLineItem, includeDiscount: boolean) {
 function formatQty(value: number) {
     return formatNumberByRegionalSettings(value, {
         locale: 'id-ID',
-        minimumFractionDigits: 2,
+        minimumFractionDigits: 0,
         maximumFractionDigits: 2,
     });
 }
@@ -66,7 +66,7 @@ function formatCurrency(value: number, currency?: string) {
     return formatCurrencyByRegionalSettings(value, {
         locale: 'id-ID',
         currency: currency || 'IDR',
-        minimumFractionDigits: 2,
+        minimumFractionDigits: 0,
         maximumFractionDigits: 2,
     });
 }

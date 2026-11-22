@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge';
-import { statusBadgeVariant } from '@/lib/status-badge';
+import { formatClassName, statusBadgeVariant } from '@/lib/status-badge';
 import { ApprovalDelegation } from '@/types/approval-delegation';
 import {
     createActionsColumn,
@@ -34,14 +34,9 @@ export const approvalDelegationColumns: ColumnDef<ApprovalDelegation>[] = [
     {
         accessorKey: 'approvable_type',
         ...createSortingHeader('Approvable Type'),
-        cell: ({ row }) => {
-            const type = row.original.approvable_type;
-            if (!type) return <span className="text-muted-foreground">-</span>;
-
-            // Format App\Models\PurchaseOrder -> PurchaseOrder
-            const parts = type.split('\\');
-            return <span>{parts.at(-1)}</span>;
-        },
+        cell: ({ row }) => (
+            <span>{formatClassName(row.original.approvable_type)}</span>
+        ),
     },
     {
         accessorKey: 'start_date',

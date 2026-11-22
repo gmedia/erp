@@ -68,8 +68,6 @@ export const purchaseOrderColumns: ColumnDef<PurchaseOrder>[] = [
                 {formatCurrencyByRegionalSettings(row.original.grand_total, {
                     locale: 'id-ID',
                     currency: row.original.currency || undefined,
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
                 })}
             </div>
         ),

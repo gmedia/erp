@@ -20,15 +20,15 @@
 
 Kerjakan berurutan G1 → G7.
 
-| Grup  | Pri | Temuan                                          | Scope                                                             | Status    |
-| ----- | --- | ----------------------------------------------- | ----------------------------------------------------------------- | --------- |
-| W5-G1 | P1  | W5-09, W5-10, W5-11                             | Formatter & badge: nilai mentah, tone status, format uang/tanggal | open #320 |
-| W5-G2 | P1  | W5-01, W5-02, W5-03                             | Tabel: kolom kunci tertutup, fade report, aksi sticky mobile      | open #321 |
-| W5-G3 | P1  | W5-05, W5-06, W5-07                             | Page shell: breadcrumb, shell custom, KPI/toolbar dashboard       | open #322 |
-| W5-G4 | P1  | W5-04, W5-08                                    | Report: laporan keuangan mobile, empty state i18n + mobile        | open #323 |
-| W5-G5 | P1  | W5-13, W5-14, W5-15, W5-16, W5-17, W5-18, W5-19 | Logic report/modul yang salah informasi                           | open #324 |
-| W5-G6 | P2  | W5-20, W5-21, W5-22, W5-23                      | Seeder: tanggal, GL vs subledger, kode/nama, variasi data         | open #325 |
-| W5-G7 | P3  | W5-12                                           | Polish UI kecil                                                   | open #326 |
+| Grup  | Pri | Temuan                                          | Scope                                                             | Status                     |
+| ----- | --- | ----------------------------------------------- | ----------------------------------------------------------------- | -------------------------- |
+| W5-G1 | P1  | W5-09, W5-10, W5-11                             | Formatter & badge: nilai mentah, tone status, format uang/tanggal | **merged #PR_PLACEHOLDER** |
+| W5-G2 | P1  | W5-01, W5-02, W5-03                             | Tabel: kolom kunci tertutup, fade report, aksi sticky mobile      | open #321                  |
+| W5-G3 | P1  | W5-05, W5-06, W5-07                             | Page shell: breadcrumb, shell custom, KPI/toolbar dashboard       | open #322                  |
+| W5-G4 | P1  | W5-04, W5-08                                    | Report: laporan keuangan mobile, empty state i18n + mobile        | open #323                  |
+| W5-G5 | P1  | W5-13, W5-14, W5-15, W5-16, W5-17, W5-18, W5-19 | Logic report/modul yang salah informasi                           | open #324                  |
+| W5-G6 | P2  | W5-20, W5-21, W5-22, W5-23                      | Seeder: tanggal, GL vs subledger, kode/nama, variasi data         | open #325                  |
+| W5-G7 | P3  | W5-12                                           | Polish UI kecil                                                   | open #326                  |
 
 ## Wave 4 fix groups (dari `FINDINGS.md` W4-xx)
 

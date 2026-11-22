@@ -26,7 +26,7 @@ interface PurchaseRequestViewModalProps {
 const formatAmount = (value: string | number | null | undefined): string =>
     formatCurrencyByRegionalSettings(value ?? 0, {
         locale: 'id-ID',
-        minimumFractionDigits: 2,
+        minimumFractionDigits: 0,
         maximumFractionDigits: 2,
     });
 

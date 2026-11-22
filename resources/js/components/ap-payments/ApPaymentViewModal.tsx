@@ -56,7 +56,7 @@ export const ApPaymentViewModal = React.memo(
             formatCurrencyByRegionalSettings(value ?? 0, {
                 locale: 'id-ID',
                 currency: item.currency || undefined,
-                minimumFractionDigits: 2,
+                minimumFractionDigits: 0,
                 maximumFractionDigits: 2,
             });
 

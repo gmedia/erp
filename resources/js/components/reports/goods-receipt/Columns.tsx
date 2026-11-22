@@ -81,19 +81,19 @@ export const goodsReceiptReportColumns: ColumnDef<GoodsReceiptReportItem>[] = [
     createNumberColumn<GoodsReceiptReportItem>({
         accessorKey: 'total_received_quantity',
         label: 'Received Qty',
-        minimumFractionDigits: 2,
+        minimumFractionDigits: 0,
         maximumFractionDigits: 2,
     }),
     createNumberColumn<GoodsReceiptReportItem>({
         accessorKey: 'total_accepted_quantity',
         label: 'Accepted Qty',
-        minimumFractionDigits: 2,
+        minimumFractionDigits: 0,
         maximumFractionDigits: 2,
     }),
     createNumberColumn<GoodsReceiptReportItem>({
         accessorKey: 'total_rejected_quantity',
         label: 'Rejected Qty',
-        minimumFractionDigits: 2,
+        minimumFractionDigits: 0,
         maximumFractionDigits: 2,
     }),
     createCurrencyColumn<GoodsReceiptReportItem>({
@@ -101,7 +101,7 @@ export const goodsReceiptReportColumns: ColumnDef<GoodsReceiptReportItem>[] = [
         label: 'Total Value',
         currency: 'IDR',
         locale: 'id-ID',
-        minimumFractionDigits: 2,
+        minimumFractionDigits: 0,
         maximumFractionDigits: 2,
     }),
 ];

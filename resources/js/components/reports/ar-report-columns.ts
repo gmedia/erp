@@ -5,8 +5,8 @@ import {
     createReportSummaryColumn,
     createReportTextColumn,
 } from '@/components/common/ReportColumns';
+import { formatCurrency } from '@/lib/utils';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
-import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import type { ColumnDef } from '@tanstack/react-table';
 
 export interface ArInvoiceReportBase {
@@ -34,13 +34,7 @@ export function formatArReportDate(value: string | null | undefined): string {
 export function formatArReportCurrency(
     value: string | null | undefined,
 ): string {
-    if (!value) return '-';
-    return formatCurrencyByRegionalSettings(value, {
-        currency: 'IDR',
-        locale: 'id-ID',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    });
+    return formatCurrency(value);
 }
 
 export function createArInvoiceBaseColumns<

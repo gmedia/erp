@@ -1,6 +1,7 @@
 'use client';
 
 import {
+    createReportStatusBadgeColumn,
     createReportTextColumn,
     createReportWarehouseColumn,
 } from '@/components/common/ReportColumns';
@@ -34,20 +35,16 @@ export const stockAdjustmentReportColumns: ColumnDef<StockAdjustmentReportItem>[
                     : '-',
             sortable: true,
         }),
-        createReportTextColumn<StockAdjustmentReportItem>({
+        createReportStatusBadgeColumn<StockAdjustmentReportItem>({
             accessorKey: 'adjustment_type',
             header: 'Adjustment Type',
-            getValue: (item) =>
-                (item.adjustment_type ?? '-').replaceAll('_', ' '),
-            className: 'capitalize',
-            sortable: true,
+            getValue: (item) => item.adjustment_type,
+            getVariant: () => 'outline',
         }),
-        createReportTextColumn<StockAdjustmentReportItem>({
+        createReportStatusBadgeColumn<StockAdjustmentReportItem>({
             accessorKey: 'status',
             header: 'Status',
-            getValue: (item) => (item.status ?? '-').replaceAll('_', ' '),
-            className: 'capitalize',
-            sortable: true,
+            getValue: (item) => item.status,
         }),
         createReportWarehouseColumn<StockAdjustmentReportItem>({
             accessorKey: 'warehouse.name',
@@ -64,13 +61,13 @@ export const stockAdjustmentReportColumns: ColumnDef<StockAdjustmentReportItem>[
         createNumberColumn<StockAdjustmentReportItem>({
             accessorKey: 'total_quantity_adjusted',
             label: 'Total Qty Adjusted',
-            minimumFractionDigits: 2,
+            minimumFractionDigits: 0,
             maximumFractionDigits: 2,
         }),
         createNumberColumn<StockAdjustmentReportItem>({
             accessorKey: 'total_adjustment_value',
             label: 'Total Adjustment Value',
-            minimumFractionDigits: 2,
+            minimumFractionDigits: 0,
             maximumFractionDigits: 2,
         }),
     ];

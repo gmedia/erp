@@ -59,7 +59,7 @@ export const inventoryValuationColumns: ColumnDef<InventoryValuationItem>[] = [
     createNumberColumn<InventoryValuationItem>({
         accessorKey: 'quantity_on_hand',
         label: 'Qty On Hand',
-        minimumFractionDigits: 2,
+        minimumFractionDigits: 0,
         maximumFractionDigits: 2,
     }),
     createCurrencyColumn<InventoryValuationItem>({
@@ -67,18 +67,12 @@ export const inventoryValuationColumns: ColumnDef<InventoryValuationItem>[] = [
         label: 'Avg Cost',
         currency: 'IDR',
         locale: 'id-ID',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-        className: 'text-right',
     }),
     createCurrencyColumn<InventoryValuationItem>({
         accessorKey: 'stock_value',
         label: 'Stock Value',
         currency: 'IDR',
         locale: 'id-ID',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-        className: 'text-right',
     }),
     createReportTextColumn<InventoryValuationItem>({
         accessorKey: 'moved_at',

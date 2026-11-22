@@ -5,8 +5,9 @@ import {
     createReportSummaryColumn,
     createReportTextColumn,
 } from '@/components/common/ReportColumns';
+import { formatStatusLabel } from '@/lib/status-badge';
+import { formatCurrency } from '@/lib/utils';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
-import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import type { ColumnDef } from '@tanstack/react-table';
 
 export type ApPaymentHistoryReportItem = {
@@ -30,12 +31,7 @@ function formatDate(value: string | null | undefined): string {
 }
 
 function formatAmount(value: string | number | null | undefined): string {
-    return formatCurrencyByRegionalSettings(value ?? 0, {
-        locale: 'id-ID',
-        currency: 'IDR',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    });
+    return formatCurrency(value);
 }
 
 export const apPaymentHistoryReportColumns: ColumnDef<ApPaymentHistoryReportItem>[] =
@@ -68,7 +64,7 @@ export const apPaymentHistoryReportColumns: ColumnDef<ApPaymentHistoryReportItem
         createReportTextColumn<ApPaymentHistoryReportItem>({
             accessorKey: 'payment.method',
             header: 'Payment Method',
-            getValue: (item) => item.payment?.method,
+            getValue: (item) => formatStatusLabel(item.payment?.method),
             sortable: true,
         }),
         createReportTextColumn<ApPaymentHistoryReportItem>({

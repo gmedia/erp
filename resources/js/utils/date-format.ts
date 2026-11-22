@@ -132,6 +132,23 @@ function pad2(value: number): string {
     return String(value).padStart(2, '0');
 }
 
+function formatClockTime(
+    date: Date,
+    hour12: boolean,
+    withSeconds: boolean,
+): string {
+    const hours = date.getHours();
+    const hourPart = pad2(hour12 ? to12Hour(hours) : hours);
+    const minutePart = pad2(date.getMinutes());
+    const secondPart = withSeconds ? `:${pad2(date.getSeconds())}` : '';
+
+    if (!hour12) {
+        return `${hourPart}:${minutePart}${secondPart}`;
+    }
+
+    return `${hourPart}:${minutePart}${secondPart} ${hours >= 12 ? 'PM' : 'AM'}`;
+}
+
 function formatDatePattern(date: Date, format: string, locale: string): string {
     const monthShort = new Intl.DateTimeFormat(locale, {
         month: 'short',
@@ -233,7 +250,6 @@ export interface RegionalTimeFormatOptions {
 export function formatTimeByRegionalSettings(
     value: DateTimeInput,
     {
-        locale = 'id-ID',
         fallback = '-',
         hour12 = false,
         withSeconds = false,
@@ -248,12 +264,33 @@ export function formatTimeByRegionalSettings(
         return fallback;
     }
 
-    return new Intl.DateTimeFormat(locale, {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: withSeconds ? '2-digit' : undefined,
-        hour12,
-    }).format(date);
+    return formatClockTime(date, hour12, withSeconds);
+}
+
+/** Tanggal+waktu, tetapi nilai tengah malam (date-only) tampil tanpa jam. */
+export function formatDateTimeOrDateByRegionalSettings(
+    value: DateTimeInput,
+    options: RegionalDateTimeFormatOptions = {},
+): string {
+    if (value === null || value === undefined || value === '') {
+        return options.fallback ?? '-';
+    }
+
+    const date = toDate(value);
+    if (!date) {
+        return options.fallback ?? '-';
+    }
+
+    const isDateOnly =
+        date.getHours() === 0 &&
+        date.getMinutes() === 0 &&
+        date.getSeconds() === 0;
+
+    if (isDateOnly) {
+        return formatDateByRegionalSettings(date, options);
+    }
+
+    return formatDateTimeByRegionalSettings(date, options);
 }
 
 export function formatDateTimeByRegionalSettings(
@@ -281,12 +318,7 @@ export function formatDateTimeByRegionalSettings(
         fallback,
     });
 
-    const timePart = new Intl.DateTimeFormat(locale, {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: withSeconds ? '2-digit' : undefined,
-        hour12,
-    }).format(date);
+    const timePart = formatClockTime(date, hour12, withSeconds);
 
     return `${datePart} ${timePart}`;
 }

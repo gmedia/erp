@@ -15,6 +15,7 @@ export interface ApprovalAuditTrailItem {
     approvable_type: string;
     approvable_type_short: string;
     approvable_id: number;
+    approvable_number: string | null;
     event: string;
     actor_user_id: number | null;
     actor_user_name: string;
@@ -50,7 +51,12 @@ export const createApprovalAuditTrailColumns = ({
     {
         accessorKey: 'approvable_id',
         ...createSortingHeader('Document ID'),
-        cell: ({ row }) => <div>{row.getValue('approvable_id')}</div>,
+        cell: ({ row }) => (
+            <div title={`#${row.original.approvable_id}`}>
+                {row.original.approvable_number ??
+                    `#${row.original.approvable_id}`}
+            </div>
+        ),
     },
     {
         accessorKey: 'event',
