@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\AccountingPosting\PostGoodsReceiptJournalAction;
 use App\Actions\GoodsReceipts\ExportGoodsReceiptsAction;
 use App\Actions\GoodsReceipts\IndexGoodsReceiptsAction;
+use App\Actions\GoodsReceipts\PostGoodsReceiptMovementsAction;
 use App\Actions\GoodsReceipts\SyncGoodsReceiptItemsAction;
 use App\DTOs\GoodsReceipts\UpdateGoodsReceiptData;
 use App\Http\Controllers\Concerns\LoadsResourceRelations;
@@ -71,6 +72,7 @@ class GoodsReceiptController extends Controller
         GoodsReceipt $goodsReceipt,
         SyncGoodsReceiptItemsAction $syncItems,
         PostGoodsReceiptJournalAction $postJournal,
+        PostGoodsReceiptMovementsAction $postMovements,
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
@@ -94,7 +96,9 @@ class GoodsReceiptController extends Controller
                 $syncItems->execute($goodsReceipt, $items);
             },
             afterCommit: $isNewlyConfirmed
-                ? function (GoodsReceipt $goodsReceipt) use ($postJournal): void {
+                ? function (GoodsReceipt $goodsReceipt) use ($postJournal, $postMovements): void {
+                    $postMovements->execute($goodsReceipt->refresh());
+
                     try {
                         $postJournal->execute($goodsReceipt->refresh());
                     } catch (ValidationException $e) {

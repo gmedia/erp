@@ -21,6 +21,40 @@ beforeEach(function () {
     Sanctum::actingAs($this->testUser, ['*']);
 });
 
+test('it does not classify draft pending cancelled or rejected as outstanding', function () {
+    $supplier = Supplier::factory()->create();
+    $warehouse = Warehouse::factory()->create();
+    $product = Product::factory()->create();
+    $unit = Unit::factory()->create();
+
+    foreach (['draft' => 'not_started', 'pending_approval' => 'not_started', 'cancelled' => 'closed', 'rejected' => 'closed'] as $status => $expected) {
+        $po = PurchaseOrder::factory()->create([
+            'po_number' => 'PO-' . strtoupper($status) . '-001',
+            'supplier_id' => $supplier->id,
+            'warehouse_id' => $warehouse->id,
+            'order_date' => '2026-04-01',
+            'status' => $status,
+            'grand_total' => 500000,
+        ]);
+
+        PurchaseOrderItem::factory()->create([
+            'purchase_order_id' => $po->id,
+            'product_id' => $product->id,
+            'unit_id' => $unit->id,
+            'quantity' => 5,
+            'quantity_received' => 0,
+        ]);
+    }
+
+    Sanctum::actingAs($this->testUser, ['*']);
+    $rows = collect($this->getJson('/api/reports/purchase-order-status')->assertOk()->json('data'));
+
+    expect($rows->firstWhere('purchase_order.po_number', 'PO-DRAFT-001')['purchase_order']['status_category'])->toBe('not_started')
+        ->and($rows->firstWhere('purchase_order.po_number', 'PO-PENDING_APPROVAL-001')['purchase_order']['status_category'])->toBe('not_started')
+        ->and($rows->firstWhere('purchase_order.po_number', 'PO-CANCELLED-001')['purchase_order']['status_category'])->toBe('closed')
+        ->and($rows->firstWhere('purchase_order.po_number', 'PO-REJECTED-001')['purchase_order']['status_category'])->toBe('closed');
+});
+
 test('it requires permission to access purchase order status report', function () {
     Sanctum::actingAs($this->otherUserAccount, ['*']);
     $this->getJson('/api/reports/purchase-order-status')

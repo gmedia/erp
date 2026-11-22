@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\AccountingPosting\PostSupplierReturnJournalAction;
 use App\Actions\SupplierReturns\ExportSupplierReturnsAction;
 use App\Actions\SupplierReturns\IndexSupplierReturnsAction;
+use App\Actions\SupplierReturns\PostSupplierReturnMovementsAction;
 use App\Actions\SupplierReturns\SyncSupplierReturnItemsAction;
 use App\DTOs\SupplierReturns\UpdateSupplierReturnData;
 use App\Http\Controllers\Concerns\StoresItemsInTransaction;
@@ -84,6 +85,7 @@ class SupplierReturnController extends Controller
         SupplierReturn $supplierReturn,
         SyncSupplierReturnItemsAction $syncItems,
         PostSupplierReturnJournalAction $postJournal,
+        PostSupplierReturnMovementsAction $postMovements,
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
@@ -107,7 +109,9 @@ class SupplierReturnController extends Controller
                 $syncItems->execute($supplierReturn, $items);
             },
             afterCommit: $isNewlyConfirmed
-                ? function (SupplierReturn $supplierReturn) use ($postJournal): void {
+                ? function (SupplierReturn $supplierReturn) use ($postJournal, $postMovements): void {
+                    $postMovements->execute($supplierReturn->refresh());
+
                     try {
                         $postJournal->execute($supplierReturn->refresh());
                     } catch (ValidationException $e) {

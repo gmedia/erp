@@ -18,13 +18,19 @@ class StockMovementSampleDataSeeder extends Seeder
             ->where('email', config('app.admin'))
             ->value('id') ?? User::query()->value('id');
 
-        $adjustmentItem = StockAdjustmentItem::query()
+        // Hanya adjustment approved yang menghasilkan movement, dan semua item
+        // non-nol ikut tercatat (W5-19).
+        $adjustmentItems = StockAdjustmentItem::query()
             ->with(['stockAdjustment'])
-            ->first();
+            ->whereHas('stockAdjustment', fn ($query) => $query->where('status', 'approved'))
+            ->where('quantity_adjusted', '<>', 0)
+            ->get();
 
-        if ($adjustmentItem?->stockAdjustment) {
+        foreach ($adjustmentItems as $adjustmentItem) {
             $adjustment = $adjustmentItem->stockAdjustment;
-            $movementType = (float) $adjustmentItem->quantity_adjusted >= 0 ? 'adjustment_in' : 'adjustment_out';
+            $movementType = (float) $adjustmentItem->quantity_adjusted > 0
+                ? 'adjustment_in'
+                : 'adjustment_out';
 
             StockMovement::updateOrCreate(
                 [
@@ -46,7 +52,7 @@ class StockMovementSampleDataSeeder extends Seeder
                     'average_cost_after' => null,
                     'reference_number' => $adjustment->adjustment_number,
                     'notes' => $adjustment->notes,
-                    'moved_at' => $adjustment->adjustment_date ? $adjustment->adjustment_date->startOfDay() : now(),
+                    'moved_at' => $adjustment->adjustment_date->startOfDay(),
                     'created_by' => $adminUserId,
                 ],
             );

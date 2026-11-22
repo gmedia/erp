@@ -17,7 +17,11 @@ export type PurchaseOrderStatusReportItem = {
         order_date: string | null;
         expected_delivery_date: string | null;
         status: string;
-        status_category: 'outstanding' | 'partially_received' | 'closed';
+        status_category:
+            | 'not_started'
+            | 'outstanding'
+            | 'partially_received'
+            | 'closed';
     };
     supplier: {
         id: number;

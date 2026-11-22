@@ -29,7 +29,12 @@ abstract class AbstractPurchaseOrderStatusReportRequest extends AbstractReportRe
                 'status_category' => [
                     'nullable',
                     'string',
-                    Rule::in(['outstanding', 'partially_received', 'closed']),
+                    Rule::in([
+                        'not_started',
+                        'outstanding',
+                        'partially_received',
+                        'closed',
+                    ]),
                 ],
             ],
             $this->dateRangeRules(),

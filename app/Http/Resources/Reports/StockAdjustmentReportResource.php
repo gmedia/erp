@@ -14,6 +14,8 @@ class StockAdjustmentReportResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'stock_adjustment_id' => $this->stock_adjustment_id,
+            'adjustment_number' => $this->adjustment_number,
             'adjustment_date' => $this->adjustment_date?->toDateString(),
             'adjustment_type' => $this->adjustment_type,
             'status' => $this->status,

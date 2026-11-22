@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\AccountingPosting\PostStockAdjustmentJournalAction;
 use App\Actions\StockAdjustments\ExportStockAdjustmentsAction;
 use App\Actions\StockAdjustments\IndexStockAdjustmentsAction;
+use App\Actions\StockAdjustments\PostStockAdjustmentMovementsAction;
 use App\Actions\StockAdjustments\SyncStockAdjustmentItemsAction;
 use App\DTOs\StockAdjustments\UpdateStockAdjustmentData;
 use App\Http\Controllers\Concerns\StoresItemsInTransaction;
@@ -78,6 +79,7 @@ class StockAdjustmentController extends Controller
         StockAdjustment $stockAdjustment,
         SyncStockAdjustmentItemsAction $syncItems,
         PostStockAdjustmentJournalAction $postJournal,
+        PostStockAdjustmentMovementsAction $postMovements,
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
@@ -101,7 +103,9 @@ class StockAdjustmentController extends Controller
                 $syncItems->execute($stockAdjustment, $items);
             },
             afterCommit: $isNewlyApproved
-                ? function (StockAdjustment $stockAdjustment) use ($postJournal): void {
+                ? function (StockAdjustment $stockAdjustment) use ($postJournal, $postMovements): void {
+                    $postMovements->execute($stockAdjustment->refresh());
+
                     try {
                         $postJournal->execute($stockAdjustment->refresh());
                     } catch (ValidationException $e) {

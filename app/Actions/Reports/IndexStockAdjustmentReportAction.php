@@ -20,6 +20,8 @@ class IndexStockAdjustmentReportAction
             ->join('warehouses as w', 'sa.warehouse_id', '=', 'w.id')
             ->leftJoin('branches as b', 'w.branch_id', '=', 'b.id')
             ->selectRaw('
+                sa.id as stock_adjustment_id,
+                sa.adjustment_number,
                 sa.adjustment_date,
                 sa.adjustment_type,
                 sa.status,
@@ -33,6 +35,8 @@ class IndexStockAdjustmentReportAction
                 SUM(sai.total_cost) as total_adjustment_value
             ')
             ->groupBy([
+                'sa.id',
+                'sa.adjustment_number',
                 'sa.adjustment_date',
                 'sa.adjustment_type',
                 'sa.status',
@@ -71,7 +75,7 @@ class IndexStockAdjustmentReportAction
             $query,
             'adjustment_date',
             [],
-            ['adjustment_date', 'adjustment_type', 'status', 'warehouse_name', 'branch_name'],
+            ['adjustment_number', 'adjustment_date', 'adjustment_type', 'status', 'warehouse_name', 'branch_name'],
             ['total_quantity_adjusted', 'total_adjustment_value', 'adjustment_count'],
             'adjustment_date',
         );
