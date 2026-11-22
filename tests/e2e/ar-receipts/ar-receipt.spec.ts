@@ -1,6 +1,9 @@
 import { test } from '@playwright/test';
 
-import { generateModuleTests, ModuleTestConfig } from '../shared-test-factories';
+import {
+    generateModuleTests,
+    ModuleTestConfig,
+} from '../shared-test-factories';
 import { createArReceipt, editArReceipt, searchArReceipt } from './helpers';
 
 const config: ModuleTestConfig = {
@@ -14,12 +17,28 @@ const config: ModuleTestConfig = {
     editEntity: editArReceipt,
     editUpdates: { receipt_number: `RCV-E2E-UPDATED-${Date.now()}` },
     expectedExportColumns: [
-        'ID', 'Receipt Number', 'Customer', 'Branch', 'Bank Account',
-        'Receipt Date', 'Payment Method', 'Currency', 'Status',
-        'Total Amount', 'Total Allocated', 'Total Unallocated',
-        'Reference', 'Notes', 'Created At',
+        'ID',
+        'Receipt Number',
+        'Customer',
+        'Branch',
+        'Bank Account',
+        'Receipt Date',
+        'Currency',
+        'Status',
+        'Total Amount',
+        'Total Allocated',
+        'Total Unallocated',
+        'Reference',
+        'Notes',
+        'Created At',
     ],
-    sortableColumns: ['Receipt Number', 'Customer', 'Branch', 'Receipt Date', 'Payment Method', 'Status', 'Total Amount'],
+    sortableColumns: [
+        'Receipt Number',
+        'Customer',
+        'Receipt Date',
+        'Status',
+        'Total Amount',
+    ],
     viewType: 'dialog',
     viewDialogTitle: 'AR Receipt Details',
 };

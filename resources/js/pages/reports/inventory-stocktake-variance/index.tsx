@@ -35,6 +35,11 @@ export default function InventoryStocktakeVarianceReportPage() {
             queryKey={['inventory-stocktake-variance-report']}
             entityName="Inventory Stocktake Variance"
             exportEndpoint="/api/reports/inventory-stocktake-variance/export"
+            defaultColumnVisibility={{
+                warehouse_name: false,
+                counted_at: false,
+                stocktake_date: false,
+            }}
         />
     );
 }

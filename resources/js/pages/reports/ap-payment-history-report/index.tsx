@@ -33,6 +33,11 @@ export default function ApPaymentHistoryReportPage() {
             queryKey={['ap-payment-history-report']}
             entityName="AP Payment History"
             exportEndpoint="/api/reports/ap-payment-history/export"
+            defaultColumnVisibility={{
+                branch_name: false,
+                bank_account: false,
+                payment_method: false,
+            }}
         />
     );
 }

@@ -36,14 +36,18 @@ const STICKY_EDGE_SHADOW =
     'before:pointer-events-none before:absolute before:inset-y-0 before:-left-6 before:w-6 before:bg-linear-to-r before:from-transparent before:to-background';
 const STICKY_ACTIONS_CELL = `sticky right-0 z-20 bg-background`;
 const STICKY_ACTIONS_HEAD = `sticky right-0 z-30 bg-background`;
-const STICKY_GRAND_TOTAL_CELL = `sticky right-14 z-10 min-w-28 bg-background whitespace-nowrap ${STICKY_EDGE_SHADOW}`;
-const STICKY_GRAND_TOTAL_HEAD = `sticky right-14 z-20 min-w-28 bg-background whitespace-nowrap ${STICKY_EDGE_SHADOW}`;
+const STICKY_GRAND_TOTAL_CELL = `lg:sticky lg:right-14 lg:z-10 min-w-28 bg-background whitespace-nowrap ${STICKY_EDGE_SHADOW}`;
+const STICKY_GRAND_TOTAL_HEAD = `lg:sticky lg:right-14 lg:z-20 min-w-28 bg-background whitespace-nowrap ${STICKY_EDGE_SHADOW}`;
+
+function isActionsColumn(columnId: string): boolean {
+    return columnId === 'actions' || columnId === 'actions_custom';
+}
 
 function stickyCellClass(
     columnId: string,
     hasGrandTotal: boolean,
 ): string | false {
-    if (columnId === 'actions') {
+    if (isActionsColumn(columnId)) {
         return cn(STICKY_ACTIONS_CELL, !hasGrandTotal && STICKY_EDGE_SHADOW);
     }
     if (columnId === 'grand_total' && hasGrandTotal) {
@@ -60,7 +64,7 @@ function stickyColumnAttr(
     if (columnId === 'grand_total' && hasGrandTotal) {
         return 'grand_total';
     }
-    if (columnId === 'actions') {
+    if (isActionsColumn(columnId)) {
         return 'actions';
     }
     return undefined;
@@ -70,7 +74,7 @@ function stickyHeadClass(
     columnId: string,
     hasGrandTotal: boolean,
 ): string | false {
-    if (columnId === 'actions') {
+    if (isActionsColumn(columnId)) {
         return cn(STICKY_ACTIONS_HEAD, !hasGrandTotal && STICKY_EDGE_SHADOW);
     }
     if (columnId === 'grand_total' && hasGrandTotal) {
@@ -161,6 +165,8 @@ export interface DataTableProps<T> {
     entityName?: string;
     /** Ganti pesan kosong default (mis. prompt instruktif filter wajib). */
     emptyState?: React.ReactNode;
+    /** Kolom yang disembunyikan secara default (dapat diaktifkan via Columns). */
+    defaultColumnVisibility?: Record<string, boolean>;
 }
 
 /**
@@ -196,10 +202,11 @@ export function DataTable<T>({
     extraToolbarActions,
     entityName,
     emptyState,
+    defaultColumnVisibility,
 }: Readonly<DataTableProps<T>>) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnVisibility, setColumnVisibility] =
-        React.useState<VisibilityState>({});
+        React.useState<VisibilityState>(defaultColumnVisibility ?? {});
     const [rowSelection, setRowSelection] = React.useState({});
     const [searchValue, setSearchValue] = React.useState(filterValue);
     const [isFilterModalOpen, setIsFilterModalOpen] = React.useState(false);
@@ -297,7 +304,10 @@ export function DataTable<T>({
             return '';
         };
         const keys = columnsWithActions.map(columnKey);
-        const actionsIndex = keys.lastIndexOf('actions');
+        const actionsIndex = Math.max(
+            keys.lastIndexOf('actions'),
+            keys.lastIndexOf('actions_custom'),
+        );
         const grandTotalIndex = keys.indexOf('grand_total');
 
         return actionsIndex > 0 && grandTotalIndex === actionsIndex - 1;

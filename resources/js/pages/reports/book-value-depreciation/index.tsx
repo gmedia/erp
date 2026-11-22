@@ -29,6 +29,12 @@ export default function BookValueDepreciationReport() {
             queryKey={['book-value-report']}
             entityName="Asset (Book Value)"
             exportEndpoint="/api/reports/book-value-depreciation/export"
+            defaultColumnVisibility={{
+                branch_name: false,
+                salvage_value: false,
+                useful_life_months: false,
+                category_name: false,
+            }}
         />
     );
 }

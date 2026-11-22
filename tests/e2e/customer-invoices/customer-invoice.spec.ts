@@ -1,7 +1,14 @@
 import { test } from '@playwright/test';
 
-import { generateModuleTests, ModuleTestConfig } from '../shared-test-factories';
-import { createCustomerInvoice, editCustomerInvoice, searchCustomerInvoice } from './helpers';
+import {
+    generateModuleTests,
+    ModuleTestConfig,
+} from '../shared-test-factories';
+import {
+    createCustomerInvoice,
+    editCustomerInvoice,
+    searchCustomerInvoice,
+} from './helpers';
 
 const config: ModuleTestConfig = {
     entityName: 'Customer Invoice',
@@ -14,12 +21,31 @@ const config: ModuleTestConfig = {
     editEntity: editCustomerInvoice,
     editUpdates: { invoice_number: `INV-E2E-UPDATED-${Date.now()}` },
     expectedExportColumns: [
-        'ID', 'Invoice Number', 'Customer', 'Branch', 'Invoice Date', 'Due Date',
-        'Currency', 'Status', 'Subtotal', 'Tax Amount', 'Discount Amount',
-        'Grand Total', 'Amount Received', 'Credit Note Amount', 'Amount Due',
-        'Notes', 'Created At',
+        'ID',
+        'Invoice Number',
+        'Customer',
+        'Branch',
+        'Due Date',
+        'Currency',
+        'Status',
+        'Subtotal',
+        'Tax Amount',
+        'Discount Amount',
+        'Grand Total',
+        'Amount Received',
+        'Credit Note Amount',
+        'Amount Due',
+        'Notes',
+        'Created At',
     ],
-    sortableColumns: ['Invoice Number', 'Customer', 'Branch', 'Invoice Date', 'Due Date', 'Status', 'Grand Total', 'Amount Due'],
+    sortableColumns: [
+        'Invoice Number',
+        'Customer',
+        'Due Date',
+        'Status',
+        'Grand Total',
+        'Amount Due',
+    ],
     viewType: 'dialog',
     viewDialogTitle: 'Customer Invoice Details',
 };

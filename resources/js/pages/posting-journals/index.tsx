@@ -193,7 +193,7 @@ export default function Index() {
                         </Badge>
                     </TableCell>
 
-                    <TableCell className="pt-3 text-right align-top">
+                    <TableCell className="sticky right-0 z-20 bg-background pt-3 text-right align-top">
                         <div className="flex justify-end">
                             <GenericActions
                                 item={item}
@@ -358,7 +358,7 @@ export default function Index() {
                             <TableHead className="text-center">
                                 Status
                             </TableHead>
-                            <TableHead className="w-[60px]"></TableHead>
+                            <TableHead className="sticky right-0 z-20 w-[60px] bg-muted"></TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>{tableBodyContent}</TableBody>

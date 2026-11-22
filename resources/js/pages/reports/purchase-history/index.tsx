@@ -33,6 +33,14 @@ export default function PurchaseHistoryReportPage() {
             queryKey={['purchase-history-report']}
             entityName="Purchase History Report"
             exportEndpoint="/api/reports/purchase-history/export"
+            defaultColumnVisibility={{
+                warehouse_name: false,
+                purchase_order_expected_delivery_date: false,
+                receipt_count: false,
+                purchase_order_status: false,
+                goods_receipt_last_receipt_date: false,
+                total_purchase_value: false,
+            }}
         />
     );
 }

@@ -30,6 +30,10 @@ export default function CustomerStatementReportPage() {
             queryKey={['customer-statement-report']}
             entityName="Customer Statement Report"
             exportEndpoint="/api/reports/customer-statement/export"
+            defaultColumnVisibility={{
+                branch_name: false,
+                amount_received: false,
+            }}
         />
     );
 }

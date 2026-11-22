@@ -6,6 +6,13 @@ import { assetConfig } from '@/utils/entityConfigs';
 
 const config = {
     ...assetConfig,
+    defaultColumnVisibility: {
+        branch: false,
+        department: false,
+        supplier: false,
+        location: false,
+        purchase_date: false,
+    },
     toolbarActions: (
         <ImportDialog
             title="Import Assets"

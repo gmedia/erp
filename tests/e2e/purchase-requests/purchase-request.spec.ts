@@ -1,7 +1,10 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
 import { login } from '../helpers';
-import { generateModuleTests, ModuleTestConfig } from '../shared-test-factories';
+import {
+    generateModuleTests,
+    ModuleTestConfig,
+} from '../shared-test-factories';
 import {
     createPurchaseRequest,
     editPurchaseRequest,
@@ -15,7 +18,7 @@ async function getFirstAsyncOption(page: Page, url: string) {
         const response = await fetch(`${endpoint}${separator}per_page=1`, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
-                'Authorization': `Bearer ${apiToken}`,
+                Authorization: `Bearer ${apiToken}`,
             },
         });
         const payload = await response.json();
@@ -29,9 +32,17 @@ async function getFirstAsyncOption(page: Page, url: string) {
     }, url);
 }
 
-async function selectAsyncOption(page: Page, container: Page | Locator, label: string, optionName: string) {
+async function selectAsyncOption(
+    page: Page,
+    container: Page | Locator,
+    label: string,
+    optionName: string,
+) {
     await container.getByRole('combobox', { name: label }).click();
-    const escapedOptionName = optionName.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
+    const escapedOptionName = optionName.replaceAll(
+        /[.*+?^${}()|[\]\\]/g,
+        String.raw`\$&`,
+    );
     const optionPattern = new RegExp(escapedOptionName, 'i');
 
     const option = page
@@ -69,11 +80,7 @@ const config: ModuleTestConfig = {
     ],
     sortableColumns: [
         'PR Number',
-        'Branch',
-        'Department',
-        'Requester',
         'Request Date',
-        'Required Date',
         'Priority',
         'Status',
         'Estimated Amount',
@@ -88,15 +95,21 @@ test.describe('Purchase Requests Module', () => {
     test.beforeEach(async ({ page }) => {
         await login(page, undefined, undefined, { requireDashboard: false });
         await page.goto('/purchase-requests');
-        await page
-            .waitForResponse((response) => response.url().includes('/api/purchase-requests') && response.status() < 400)
-            ;
+        await page.waitForResponse(
+            (response) =>
+                response.url().includes('/api/purchase-requests') &&
+                response.status() < 400,
+        );
     });
 
-    test('add dialog starts with empty items and add item button shows icon', async ({ page }) => {
+    test('add dialog starts with empty items and add item button shows icon', async ({
+        page,
+    }) => {
         await page.getByRole('button', { name: /^Add$/i }).first().click();
 
-        const dialog = page.getByRole('dialog', { name: /Add New Purchase Request/i });
+        const dialog = page.getByRole('dialog', {
+            name: /Add New Purchase Request/i,
+        });
 
         await expect(dialog.getByText('No items added yet.')).toBeVisible();
 
@@ -106,16 +119,25 @@ test.describe('Purchase Requests Module', () => {
         await expect(addItemButton.locator('svg')).toBeVisible();
     });
 
-    test('add dialog item table shows product and unit names with icon actions', async ({ page }) => {
+    test('add dialog item table shows product and unit names with icon actions', async ({
+        page,
+    }) => {
         const [product, unit] = await Promise.all([
-            getFirstAsyncOption(page, '/api/products?search=Executive%20Office%20Desk'),
+            getFirstAsyncOption(
+                page,
+                '/api/products?search=Executive%20Office%20Desk',
+            ),
             getFirstAsyncOption(page, '/api/units?search=Piece'),
         ]);
 
         await page.getByRole('button', { name: /^Add$/i }).first().click();
 
-        const purchaseRequestDialog = page.getByRole('dialog', { name: /Add New Purchase Request/i });
-        await purchaseRequestDialog.getByRole('button', { name: /Add Item/i }).click();
+        const purchaseRequestDialog = page.getByRole('dialog', {
+            name: /Add New Purchase Request/i,
+        });
+        await purchaseRequestDialog
+            .getByRole('button', { name: /Add Item/i })
+            .click();
 
         const itemDialog = page.getByRole('dialog', { name: /^Add Item$/i });
 
@@ -128,15 +150,22 @@ test.describe('Purchase Requests Module', () => {
 
         await expect(firstRow).toContainText(product.name);
         await expect(firstRow).toContainText(unit.name);
-        await expect(firstRow.getByRole('button', { name: /Edit item 1/i })).toBeVisible();
-        await expect(firstRow.getByRole('button', { name: /Remove item 1/i })).toBeVisible();
+        await expect(
+            firstRow.getByRole('button', { name: /Edit item 1/i }),
+        ).toBeVisible();
+        await expect(
+            firstRow.getByRole('button', { name: /Remove item 1/i }),
+        ).toBeVisible();
         await expect(firstRow.getByText(/^Edit$/)).toHaveCount(0);
         await expect(firstRow.getByText(/^Remove$/)).toHaveCount(0);
     });
 
     test('edit dialog keeps item names and icon actions', async ({ page }) => {
         const [product, unit] = await Promise.all([
-            getFirstAsyncOption(page, '/api/products?search=Executive%20Office%20Desk'),
+            getFirstAsyncOption(
+                page,
+                '/api/products?search=Executive%20Office%20Desk',
+            ),
             getFirstAsyncOption(page, '/api/units?search=Piece'),
         ]);
 
@@ -149,15 +178,21 @@ test.describe('Purchase Requests Module', () => {
         await firstRow.getByRole('button').last().click();
         await page.getByRole('menuitem', { name: 'Edit' }).click();
 
-        const dialog = page.getByRole('dialog', { name: /Edit Purchase Request/i });
+        const dialog = page.getByRole('dialog', {
+            name: /Edit Purchase Request/i,
+        });
         const itemRow = dialog.locator('tbody tr').first();
         const addItemButton = dialog.getByRole('button', { name: /Add Item/i });
 
         await expect(addItemButton.locator('svg')).toBeVisible();
         await expect(itemRow).toContainText(product.name);
         await expect(itemRow).toContainText(unit.name);
-        await expect(itemRow.getByRole('button', { name: /Edit item 1/i })).toBeVisible();
-        await expect(itemRow.getByRole('button', { name: /Remove item 1/i })).toBeVisible();
+        await expect(
+            itemRow.getByRole('button', { name: /Edit item 1/i }),
+        ).toBeVisible();
+        await expect(
+            itemRow.getByRole('button', { name: /Remove item 1/i }),
+        ).toBeVisible();
         await expect(itemRow.getByText(/^Edit$/)).toHaveCount(0);
         await expect(itemRow.getByText(/^Remove$/)).toHaveCount(0);
     });

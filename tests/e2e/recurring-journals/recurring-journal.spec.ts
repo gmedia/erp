@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { login } from '../helpers';
 
 test.describe('Recurring Journal E2E Tests', () => {
@@ -6,7 +6,8 @@ test.describe('Recurring Journal E2E Tests', () => {
         await login(page, undefined, undefined, { requireDashboard: false });
         await page.goto('/recurring-journals');
         await page.waitForResponse(
-            (r) => r.url().includes('/api/recurring-journals') && r.status() < 400,
+            (r) =>
+                r.url().includes('/api/recurring-journals') && r.status() < 400,
             { timeout: 15000 },
         );
     });
@@ -22,7 +23,8 @@ test.describe('Recurring Journal E2E Tests', () => {
         await searchInput.fill('Sample');
         await searchInput.press('Enter');
         await page.waitForResponse(
-            (r) => r.url().includes('/api/recurring-journals') && r.status() < 400,
+            (r) =>
+                r.url().includes('/api/recurring-journals') && r.status() < 400,
             { timeout: 15000 },
         );
         await expect(page.locator('tbody tr').first()).toBeVisible();
@@ -48,8 +50,12 @@ test.describe('Recurring Journal E2E Tests', () => {
         expect(download.suggestedFilename()).toBeTruthy();
     });
 
-    test('Recurring Journals datatable has correct checkbox behavior', async ({ page }) => {
-        const headerCheckboxes = page.locator('thead [data-testid="select-all"]');
+    test('Recurring Journals datatable has correct checkbox behavior', async ({
+        page,
+    }) => {
+        const headerCheckboxes = page.locator(
+            'thead [data-testid="select-all"]',
+        );
         await expect(headerCheckboxes).toHaveCount(1);
         await expect(headerCheckboxes.first()).toBeVisible();
 
@@ -68,11 +74,12 @@ test.describe('Recurring Journal E2E Tests', () => {
             'Total Amount',
             'Auto Post',
             'Is Active',
-            'Created At',
         ];
 
         for (const column of sortableColumns) {
-            const sortButton = page.locator('thead').getByRole('button', { name: column, exact: true });
+            const sortButton = page
+                .locator('thead')
+                .getByRole('button', { name: column, exact: true });
             await expect(sortButton).toBeVisible();
             await sortButton.click();
             await page.waitForTimeout(500);

@@ -1,5 +1,5 @@
 import { generateModuleTests } from '../shared-test-factories';
-import { createEmployee, searchEmployee, editEmployee } from './helpers';
+import { createEmployee, editEmployee, searchEmployee } from './helpers';
 
 generateModuleTests({
     entityName: 'Employee',
@@ -17,16 +17,7 @@ generateModuleTests({
     },
 
     // DataTable config
-    sortableColumns: [
-        'Name',
-        'Email',
-        'Phone',
-        'Department',
-        'Position',
-        'Branch',
-        'Salary',
-        'Hire Date',
-    ],
+    sortableColumns: ['Name', 'Email', 'Department', 'Salary'],
 
     // View config
     viewType: 'dialog',

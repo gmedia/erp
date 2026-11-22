@@ -49,6 +49,8 @@ export interface CustomEntityConfig<
     // Optional view modal component for displaying item details
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     readonly viewModalComponent?: React.ComponentType<any>;
+    // Kolom yang disembunyikan default (dapat diaktifkan lewat menu Columns)
+    readonly defaultColumnVisibility?: Record<string, boolean>;
 }
 
 // Union type for all entity configurations with improved typing
@@ -181,6 +183,7 @@ export interface ComplexEntityConfigOptions<T = Record<string, unknown>> {
     getDeleteMessage: (item: T) => string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     viewModalComponent?: React.ComponentType<any>;
+    defaultColumnVisibility?: Record<string, boolean>;
 }
 
 // Factory to create a bound SimpleEntityViewModal for a specific entity
@@ -247,6 +250,7 @@ function createComplexEntityConfig<T = Record<string, unknown>>(
         entityNameForSearch: options.entityNameForSearch,
         getDeleteMessage: options.getDeleteMessage,
         viewModalComponent: options.viewModalComponent,
+        defaultColumnVisibility: options.defaultColumnVisibility,
     };
 }
 
@@ -459,6 +463,12 @@ export const purchaseRequestConfig = createComplexEntityConfig<PurchaseRequest>(
             request_date_to: '',
         },
         columns: purchaseRequestColumns,
+        defaultColumnVisibility: {
+            branch: false,
+            department: false,
+            requester: false,
+            required_date: false,
+        },
         filterFields: createPurchaseRequestFilterFields(),
         formComponent: PurchaseRequestForm,
         formType: 'complex',
@@ -486,6 +496,11 @@ export const purchaseOrderConfig = createComplexEntityConfig<PurchaseOrder>({
         order_date_to: '',
     },
     columns: purchaseOrderColumns,
+    defaultColumnVisibility: {
+        warehouse: false,
+        currency: false,
+        expected_delivery_date: false,
+    },
     filterFields: createPurchaseOrderFilterFields(),
     formComponent: PurchaseOrderForm,
     formType: 'complex',
@@ -990,6 +1005,11 @@ export const supplierBillConfig = createComplexEntityConfig<SupplierBill>({
         due_date_to: '',
     },
     columns: supplierBillColumns,
+    defaultColumnVisibility: {
+        branch: false,
+        currency: false,
+        bill_date: false,
+    },
     filterFields: createSupplierBillFilterFields(),
     formComponent: SupplierBillForm,
     formType: 'complex',
@@ -1017,6 +1037,12 @@ export const apPaymentConfig = createComplexEntityConfig<ApPayment>({
         payment_date_to: '',
     },
     columns: apPaymentColumns,
+    defaultColumnVisibility: {
+        branch: false,
+        currency: false,
+        payment_method: false,
+        total_unallocated: false,
+    },
     filterFields: createApPaymentFilterFields(),
     formComponent: ApPaymentForm,
     formType: 'complex',
@@ -1095,6 +1121,11 @@ export const customerInvoiceConfig = createComplexEntityConfig<CustomerInvoice>(
             due_date_to: '',
         },
         columns: customerInvoiceColumns,
+        defaultColumnVisibility: {
+            branch: false,
+            currency: false,
+            invoice_date: false,
+        },
         filterFields: createCustomerInvoiceFilterFields(),
         formComponent: CustomerInvoiceForm,
         formType: 'complex',
@@ -1123,6 +1154,12 @@ export const arReceiptConfig = createComplexEntityConfig<ArReceipt>({
         receipt_date_to: '',
     },
     columns: arReceiptColumns,
+    defaultColumnVisibility: {
+        branch: false,
+        currency: false,
+        payment_method: false,
+        total_unallocated: false,
+    },
     filterFields: createArReceiptFilterFields(),
     formComponent: ArReceiptForm,
     formType: 'complex',
@@ -1149,6 +1186,9 @@ export const creditNoteConfig = createComplexEntityConfig<CreditNote>({
         credit_note_date_to: '',
     },
     columns: creditNoteColumns,
+    defaultColumnVisibility: {
+        reason: false,
+    },
     filterFields: createCreditNoteFilterFields(),
     formComponent: CreditNoteForm,
     formType: 'complex',
@@ -1181,6 +1221,9 @@ export const recurringJournalConfig =
         ],
         initialFilters: { search: '', frequency: '', is_active: '' },
         columns: recurringJournalColumns,
+        defaultColumnVisibility: {
+            created_at: false,
+        },
         filterFields: createRecurringJournalFilterFields(),
         formComponent: RecurringJournalForm,
         formType: 'complex',

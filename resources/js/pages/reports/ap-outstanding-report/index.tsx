@@ -32,6 +32,10 @@ export default function ApOutstandingReportPage() {
             queryKey={['ap-outstanding-report']}
             entityName="AP Outstanding Report"
             exportEndpoint="/api/reports/ap-outstanding/export"
+            defaultColumnVisibility={{
+                branch_name: false,
+                amount_paid: false,
+            }}
         />
     );
 }

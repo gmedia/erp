@@ -3,9 +3,10 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 
 // Indikator tepi kanan (W4-03): strip gradient non-scrolling di tepi viewport
-// muncul hanya saat masih ada konten di luar viewport kanan.
+// muncul hanya saat masih ada konten di luar viewport kanan. Sel terakhir diberi
+// ruang (W5-02) agar fade tidak menutupi angka/header.
 const TABLE_EDGE_RIGHT =
-  "after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-6 after:bg-linear-to-r after:from-background after:to-transparent"
+  "after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-4 after:bg-linear-to-r after:from-background after:to-transparent"
 
 function Table({
   className,
@@ -36,7 +37,9 @@ function Table({
       data-overflow-right={canScrollRight || undefined}
       className={cn(
         "relative w-full min-w-0",
-        canScrollRight && TABLE_EDGE_RIGHT
+        canScrollRight && TABLE_EDGE_RIGHT,
+        canScrollRight &&
+          "[&_td:last-child]:pr-5 [&_th:last-child]:pr-5"
       )}
     >
       <div
