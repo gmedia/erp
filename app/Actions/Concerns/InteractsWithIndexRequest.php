@@ -312,6 +312,12 @@ trait InteractsWithIndexRequest
             $this->normalizeIndexSortDirection($request->string('sort_direction', 'desc')->toString()),
             $allowedSorts,
         );
+
+        // Tie-break deterministik: banyak baris demo punya created_at identik,
+        // sehingga tanpa ini urutan tampak acak antar request (W5-12).
+        if ($sortBy !== 'id') {
+            $query->orderBy('id', 'desc');
+        }
     }
 
     /**

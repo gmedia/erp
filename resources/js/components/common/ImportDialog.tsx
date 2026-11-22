@@ -148,9 +148,9 @@ export default function ImportDialog({
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 {trigger || (
-                    <Button variant="outline">
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                        Import
+                    <Button variant="outline" aria-label="Import">
+                        <PlusCircle className="h-4 w-4 sm:mr-2" />
+                        <span className="hidden sm:inline">Import</span>
                     </Button>
                 )}
             </DialogTrigger>

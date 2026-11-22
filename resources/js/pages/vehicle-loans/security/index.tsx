@@ -117,7 +117,7 @@ export default function VehicleLoanSecurityPage() {
                             id="security-search"
                             value={search}
                             onChange={(event) => setSearch(event.target.value)}
-                            placeholder="Kode, peminjam, plat, atau pengemudi"
+                            placeholder="Cari kode atau plat"
                         />
                     </div>
                     <div className="grid gap-1">

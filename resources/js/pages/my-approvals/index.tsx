@@ -160,7 +160,7 @@ function TabCount({ count }: Readonly<{ count: number }>) {
     return (
         <span
             className={cn(
-                'ml-2 inline-flex min-w-6 items-center justify-center rounded-full px-2 py-0.5 text-[10px] font-semibold tabular-nums',
+                'inline-flex min-w-5 shrink-0 items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-semibold tabular-nums',
                 'bg-muted text-muted-foreground group-data-[state=active]:bg-primary/15 group-data-[state=active]:text-primary',
             )}
         >
@@ -536,28 +536,28 @@ export default function MyApprovalsPage() {
                     <TabsList className="grid h-9 w-full grid-cols-4 lg:w-[28rem]">
                         <TabsTrigger
                             value="pending"
-                            className="group text-xs sm:text-sm"
+                            className="group gap-1.5 text-xs sm:text-sm"
                         >
                             Pending
                             <TabCount count={pending.length} />
                         </TabsTrigger>
                         <TabsTrigger
                             value="approved"
-                            className="group text-xs sm:text-sm"
+                            className="group gap-1.5 text-xs sm:text-sm"
                         >
                             Approved
                             <TabCount count={approved.length} />
                         </TabsTrigger>
                         <TabsTrigger
                             value="rejected"
-                            className="group text-xs sm:text-sm"
+                            className="group gap-1.5 text-xs sm:text-sm"
                         >
                             Rejected
                             <TabCount count={rejected.length} />
                         </TabsTrigger>
                         <TabsTrigger
                             value="all"
-                            className="group text-xs sm:text-sm"
+                            className="group gap-1.5 text-xs sm:text-sm"
                         >
                             All
                             <TabCount count={all.length} />

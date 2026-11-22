@@ -2,6 +2,7 @@ import { OverdueApprovalsList } from '@/components/approval-monitoring/OverdueAp
 import { SummaryCards } from '@/components/approval-monitoring/SummaryCards';
 import { AsyncSelect } from '@/components/common/AsyncSelect';
 import { PageHeader } from '@/components/common/PageHeader';
+import { Label } from '@/components/ui/label';
 import {
     Select,
     SelectContent,
@@ -35,8 +36,14 @@ export default function ApprovalMonitoringDashboard() {
                 <SummaryCards summary={data?.summary} isLoading={isLoading} />
 
                 <div className="flex flex-col gap-4">
-                    <div className="flex flex-wrap items-center gap-4">
-                        <div className="w-full sm:w-64">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end">
+                        <div className="w-full space-y-2 sm:w-64">
+                            <Label
+                                htmlFor="status-filter"
+                                className="text-sm font-medium text-muted-foreground"
+                            >
+                                Status
+                            </Label>
                             <Select
                                 value={filters.status || 'all'}
                                 onValueChange={(val) =>
@@ -46,7 +53,7 @@ export default function ApprovalMonitoringDashboard() {
                                     )
                                 }
                             >
-                                <SelectTrigger>
+                                <SelectTrigger id="status-filter">
                                     <SelectValue placeholder="All Statuses" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -68,7 +75,10 @@ export default function ApprovalMonitoringDashboard() {
                                 </SelectContent>
                             </Select>
                         </div>
-                        <div className="w-full sm:w-64">
+                        <div className="w-full space-y-2 sm:w-64">
+                            <Label className="text-sm font-medium text-muted-foreground">
+                                Branch
+                            </Label>
                             <AsyncSelect
                                 url="/api/branches"
                                 placeholder="All Branches"

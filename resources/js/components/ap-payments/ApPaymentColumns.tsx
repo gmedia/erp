@@ -33,6 +33,7 @@ export const apPaymentColumns: ColumnDef<ApPayment>[] = [
     createTextColumn<ApPayment>({
         accessorKey: 'payment_number',
         label: 'Payment Number',
+        primary: true,
     }),
     {
         accessorKey: 'supplier',

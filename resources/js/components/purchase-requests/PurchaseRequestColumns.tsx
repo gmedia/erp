@@ -34,6 +34,7 @@ export const purchaseRequestColumns: ColumnDef<PurchaseRequest>[] = [
     createTextColumn<PurchaseRequest>({
         accessorKey: 'pr_number',
         label: 'PR Number',
+        primary: true,
     }),
     {
         accessorKey: 'branch',

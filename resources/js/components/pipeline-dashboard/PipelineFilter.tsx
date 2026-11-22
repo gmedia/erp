@@ -34,7 +34,7 @@ export function PipelineFilter({
                 <div className="w-full space-y-2 sm:w-64">
                     <Label
                         htmlFor="branch-filter"
-                        className="text-xs font-semibold text-muted-foreground uppercase"
+                        className="text-sm font-medium text-muted-foreground"
                     >
                         Branch
                     </Label>
@@ -53,7 +53,7 @@ export function PipelineFilter({
                 <div className="w-full space-y-2 sm:w-64">
                     <Label
                         htmlFor="pipeline-filter"
-                        className="text-xs font-semibold text-muted-foreground uppercase"
+                        className="text-sm font-medium text-muted-foreground"
                     >
                         Select Pipeline
                     </Label>
@@ -83,7 +83,7 @@ export function PipelineFilter({
                 <div className="w-full space-y-2 sm:w-48">
                     <Label
                         htmlFor="stale-days"
-                        className="text-xs font-semibold text-muted-foreground uppercase"
+                        className="text-sm font-medium text-muted-foreground"
                     >
                         Stale Threshold
                     </Label>

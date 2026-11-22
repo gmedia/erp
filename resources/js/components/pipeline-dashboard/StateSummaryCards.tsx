@@ -69,9 +69,29 @@ export function StateSummaryCards({
     }
     const showGroupHeading = groups.size > 1;
 
+    // Grup yang seluruh kartunya 0 tidak ditampilkan (W5-12); bila semua grup
+    // kosong, tampilkan empty state di bawah.
+    const visibleGroups = Array.from(groups.entries()).filter(([, group]) =>
+        group.states.some((state) => state.count > 0),
+    );
+
+    if (visibleGroups.length === 0) {
+        return (
+            <div className="w-full rounded-lg border border-dashed p-8 text-center text-muted-foreground">
+                <p className="font-medium text-foreground">
+                    No entities in any state yet
+                </p>
+                <p className="mt-1 text-sm">
+                    State distribution appears once records enter these
+                    pipelines.
+                </p>
+            </div>
+        );
+    }
+
     return (
         <div className="flex flex-col gap-4">
-            {Array.from(groups.entries()).map(([key, group]) => (
+            {visibleGroups.map(([key, group]) => (
                 <div key={key} className="flex flex-col gap-2">
                     {showGroupHeading && group.pipelineName ? (
                         <h2 className="text-sm font-semibold text-foreground">

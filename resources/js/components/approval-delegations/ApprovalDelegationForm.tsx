@@ -140,7 +140,7 @@ export const ApprovalDelegationForm = memo<ApprovalDelegationFormProps>(
                         <InputField
                             name="approvable_type"
                             label="Approvable Type (e.g. App\Models\PurchaseOrder)"
-                            placeholder="Leave optional to delegate all types"
+                            placeholder="All types (optional)"
                         />
 
                         <SelectField

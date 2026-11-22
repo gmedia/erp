@@ -32,6 +32,7 @@ export const purchaseOrderColumns: ColumnDef<PurchaseOrder>[] = [
     createTextColumn<PurchaseOrder>({
         accessorKey: 'po_number',
         label: 'PO Number',
+        primary: true,
     }),
     {
         accessorKey: 'supplier',

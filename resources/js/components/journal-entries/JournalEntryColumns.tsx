@@ -19,6 +19,7 @@ export const journalEntryColumns: ColumnDef<JournalEntry>[] = [
     createTextColumn<JournalEntry>({
         accessorKey: 'entry_number',
         label: 'Entry Number',
+        primary: true,
         enableSorting: true,
     }),
     {

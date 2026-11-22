@@ -12,7 +12,7 @@ import {
     formatDateByRegionalSettings,
     formatTimeByRegionalSettings,
 } from '@/utils/date-format';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle2 } from 'lucide-react';
 
 interface OverdueApprovalsListProps {
     data?: OverdueApproval[];
@@ -47,7 +47,7 @@ export function OverdueApprovalsList({
                 <CardContent>
                     <div className="flex flex-col items-center justify-center space-y-2 rounded-md border border-dashed p-8 text-center">
                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-success-soft">
-                            <AlertCircle className="h-5 w-5 text-success" />
+                            <CheckCircle2 className="h-5 w-5 text-success" />
                         </div>
                         <h3 className="font-semibold text-success">
                             All caught up!

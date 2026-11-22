@@ -24,6 +24,7 @@ export const goodsReceiptColumns: ColumnDef<GoodsReceipt>[] = [
     createTextColumn<GoodsReceipt>({
         accessorKey: 'gr_number',
         label: 'GR Number',
+        primary: true,
     }),
     {
         accessorKey: 'purchase_order',

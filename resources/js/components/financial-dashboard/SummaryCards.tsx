@@ -7,8 +7,8 @@ import {
     CreditCard,
     DollarSign,
     PiggyBank,
-    TrendingDown,
-    TrendingUp,
+    Receipt,
+    Wallet,
 } from 'lucide-react';
 import { memo } from 'react';
 import type {
@@ -142,7 +142,8 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
     const cards = [
         {
             title: 'Revenue',
-            icon: TrendingUp,
+            // Ikon deskriptif: panah tren tanpa delta menyesatkan (W5-12).
+            icon: Wallet,
             iconColor: 'text-success',
             value: data.revenue.value,
             formattedValue: formatCurrency(data.revenue.value),
@@ -155,7 +156,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
         },
         {
             title: 'Expenses',
-            icon: TrendingDown,
+            icon: Receipt,
             iconColor: 'text-destructive-foreground',
             value: data.expenses.value,
             formattedValue: formatCurrency(data.expenses.value),

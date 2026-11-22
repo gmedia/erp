@@ -33,6 +33,7 @@ export const arReceiptColumns: ColumnDef<ArReceipt>[] = [
     createTextColumn<ArReceipt>({
         accessorKey: 'receipt_number',
         label: 'Receipt Number',
+        primary: true,
     }),
     {
         accessorKey: 'customer',

@@ -23,6 +23,7 @@ export const stockAdjustmentColumns: ColumnDef<StockAdjustment>[] = [
     createTextColumn<StockAdjustment>({
         accessorKey: 'adjustment_number',
         label: 'Adjustment Number',
+        primary: true,
     }),
     {
         id: 'warehouse_id',
