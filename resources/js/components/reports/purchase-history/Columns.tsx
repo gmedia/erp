@@ -81,19 +81,19 @@ export const purchaseHistoryReportColumns: ColumnDef<PurchaseHistoryReportItem>[
         createNumberColumn<PurchaseHistoryReportItem>({
             accessorKey: 'ordered_quantity',
             label: 'Ordered Qty',
-            minimumFractionDigits: 2,
+            minimumFractionDigits: 0,
             maximumFractionDigits: 2,
         }),
         createNumberColumn<PurchaseHistoryReportItem>({
             accessorKey: 'received_quantity',
             label: 'Received Qty',
-            minimumFractionDigits: 2,
+            minimumFractionDigits: 0,
             maximumFractionDigits: 2,
         }),
         createNumberColumn<PurchaseHistoryReportItem>({
             accessorKey: 'outstanding_quantity',
             label: 'Outstanding Qty',
-            minimumFractionDigits: 2,
+            minimumFractionDigits: 0,
             maximumFractionDigits: 2,
         }),
         createNumberColumn<PurchaseHistoryReportItem>({
@@ -113,7 +113,7 @@ export const purchaseHistoryReportColumns: ColumnDef<PurchaseHistoryReportItem>[
             label: 'Total Value',
             currency: 'IDR',
             locale: 'id-ID',
-            minimumFractionDigits: 2,
+            minimumFractionDigits: 0,
             maximumFractionDigits: 2,
         }),
         createReportTextColumn<PurchaseHistoryReportItem>({

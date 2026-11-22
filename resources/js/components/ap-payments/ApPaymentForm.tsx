@@ -308,7 +308,7 @@ export const ApPaymentForm = memo<ApPaymentFormProps>(function ApPaymentForm({
                                                     currency:
                                                         selectedCurrency ||
                                                         undefined,
-                                                    minimumFractionDigits: 2,
+                                                    minimumFractionDigits: 0,
                                                     maximumFractionDigits: 2,
                                                 },
                                             )}
@@ -321,7 +321,7 @@ export const ApPaymentForm = memo<ApPaymentFormProps>(function ApPaymentForm({
                                                     currency:
                                                         selectedCurrency ||
                                                         undefined,
-                                                    minimumFractionDigits: 2,
+                                                    minimumFractionDigits: 0,
                                                     maximumFractionDigits: 2,
                                                 },
                                             )}

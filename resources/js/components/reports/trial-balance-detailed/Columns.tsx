@@ -27,8 +27,6 @@ const currencyCol = (
         label,
         currency: 'IDR',
         locale: 'id-ID',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
         className: 'text-right',
     });
 

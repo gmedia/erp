@@ -5,6 +5,7 @@ use App\Models\PipelineEntityState;
 use App\Models\PipelineState;
 use App\Models\PipelineStateLog;
 use App\Models\PipelineTransition;
+use App\Models\PurchaseRequest;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
@@ -83,6 +84,31 @@ test('it can fetch audit trail data via json', function () {
                 ->has('meta')
                 ->has('links')
         );
+});
+
+test('it resolves the document number for known entity types', function () {
+    $purchaseRequest = PurchaseRequest::factory()->create([
+        'pr_number' => 'PR-2026-0777',
+    ]);
+
+    PipelineStateLog::create([
+        'pipeline_entity_state_id' => $this->entityState->id,
+        'entity_type' => PurchaseRequest::class,
+        'entity_id' => (string) $purchaseRequest->id,
+        'from_state_id' => $this->stateA->id,
+        'to_state_id' => $this->stateB->id,
+        'transition_id' => $this->transition->id,
+        'performed_by' => $this->user->id,
+    ]);
+
+    Sanctum::actingAs($this->user, ['*']);
+    $response = $this->getJson('/api/pipeline-audit-trail')->assertOk();
+
+    $row = collect($response->json('data'))
+        ->firstWhere('entity_type', PurchaseRequest::class);
+
+    expect($row)->not->toBeNull()
+        ->and($row['entity_number'])->toBe('PR-2026-0777');
 });
 
 test('it can filter the report by various parameters', function () {

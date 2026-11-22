@@ -60,7 +60,7 @@ export const supplierBillColumns: ColumnDef<SupplierBill>[] = [
                 {formatCurrencyByRegionalSettings(row.original.grand_total, {
                     locale: 'id-ID',
                     currency: row.original.currency || undefined,
-                    minimumFractionDigits: 2,
+                    minimumFractionDigits: 0,
                     maximumFractionDigits: 2,
                 })}
             </div>
@@ -74,7 +74,7 @@ export const supplierBillColumns: ColumnDef<SupplierBill>[] = [
                 {formatCurrencyByRegionalSettings(row.original.amount_due, {
                     locale: 'id-ID',
                     currency: row.original.currency || undefined,
-                    minimumFractionDigits: 2,
+                    minimumFractionDigits: 0,
                     maximumFractionDigits: 2,
                 })}
             </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
+import { formatStatusLabel } from '@/lib/status-badge';
 import { SupplierReturn } from '@/types/supplier-return';
 import {
     createActionsColumn,
@@ -66,6 +67,9 @@ export const supplierReturnColumns: ColumnDef<SupplierReturn>[] = [
     {
         accessorKey: 'reason',
         ...createSortingHeader('Reason'),
+        cell: ({ row }) => (
+            <span>{formatStatusLabel(row.original.reason)}</span>
+        ),
     },
     {
         accessorKey: 'status',

@@ -63,7 +63,7 @@ export const creditNoteColumns: ColumnDef<CreditNote>[] = [
                 {formatCurrencyByRegionalSettings(row.original.grand_total, {
                     locale: 'id-ID',
                     currency: 'IDR',
-                    minimumFractionDigits: 2,
+                    minimumFractionDigits: 0,
                     maximumFractionDigits: 2,
                 })}
             </div>

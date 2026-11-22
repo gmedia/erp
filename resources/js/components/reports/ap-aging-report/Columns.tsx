@@ -5,8 +5,8 @@ import {
     createReportSummaryColumn,
     createReportTextColumn,
 } from '@/components/common/ReportColumns';
+import { formatCurrency } from '@/lib/utils';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
-import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import type { ColumnDef } from '@tanstack/react-table';
 
 export type ApAgingReportItem = {
@@ -42,12 +42,7 @@ function formatDate(value: string | null | undefined): string {
 }
 
 function formatAmount(value: string | number | null | undefined): string {
-    return formatCurrencyByRegionalSettings(value ?? 0, {
-        locale: 'id-ID',
-        currency: 'IDR',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    });
+    return formatCurrency(value);
 }
 
 export const apAgingReportColumns: ColumnDef<ApAgingReportItem>[] = [

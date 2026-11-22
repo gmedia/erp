@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\ApprovalAuditTrail;
 
+use App\Support\DocumentNumberResolver;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -20,6 +21,10 @@ class ApprovalAuditTrailResource extends JsonResource
             'approvable_type' => $this->approvable_type,
             'approvable_type_short' => Str::afterLast($this->approvable_type, '\\'),
             'approvable_id' => $this->approvable_id,
+            'approvable_number' => app(DocumentNumberResolver::class)->resolve(
+                $this->approvable_type,
+                $this->approvable_id,
+            ),
             'event' => $this->event,
             'actor_user_id' => $this->actor_user_id,
             'actor_user_name' => $this->actor->name ?? 'System',

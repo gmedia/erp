@@ -1,6 +1,5 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
 import { ColumnDef } from '@tanstack/react-table';
 
 import {
@@ -14,7 +13,7 @@ import { type Warehouse } from '@/types/entity';
 
 const renderBranchCell = ({ row }: { row: { original: Warehouse } }) => {
     const branch = row.original.branch;
-    return <Badge variant="outline">{branch?.name || '-'}</Badge>;
+    return <span>{branch?.name || '-'}</span>;
 };
 
 export const warehouseColumns: ColumnDef<Warehouse>[] = [

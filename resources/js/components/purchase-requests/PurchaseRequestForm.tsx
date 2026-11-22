@@ -345,7 +345,7 @@ export const PurchaseRequestForm = memo<PurchaseRequestFormProps>(
                                                         0,
                                                     {
                                                         locale: 'id-ID',
-                                                        minimumFractionDigits: 2,
+                                                        minimumFractionDigits: 0,
                                                         maximumFractionDigits: 2,
                                                     },
                                                 )}

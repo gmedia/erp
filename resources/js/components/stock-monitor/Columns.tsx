@@ -5,7 +5,7 @@ import {
     createReportTextColumn,
     createReportWarehouseColumn,
 } from '@/components/common/ReportColumns';
-import { createNumberColumn } from '@/utils/columns';
+import { createCurrencyColumn, createNumberColumn } from '@/utils/columns';
 import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import type { ColumnDef } from '@tanstack/react-table';
 
@@ -54,20 +54,16 @@ export function createStockMonitorColumns(): ColumnDef<StockMonitorItem>[] {
         createNumberColumn<StockMonitorItem>({
             accessorKey: 'quantity_on_hand',
             label: 'Qty On Hand',
-            minimumFractionDigits: 2,
+            minimumFractionDigits: 0,
             maximumFractionDigits: 2,
         }),
-        createNumberColumn<StockMonitorItem>({
+        createCurrencyColumn<StockMonitorItem>({
             accessorKey: 'average_cost',
             label: 'Avg Cost',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
         }),
-        createNumberColumn<StockMonitorItem>({
+        createCurrencyColumn<StockMonitorItem>({
             accessorKey: 'stock_value',
             label: 'Stock Value',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
         }),
         createReportTextColumn<StockMonitorItem>({
             accessorKey: 'moved_at',

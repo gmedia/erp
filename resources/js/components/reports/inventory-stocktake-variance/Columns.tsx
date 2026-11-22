@@ -85,19 +85,19 @@ export const inventoryStocktakeVarianceColumns: ColumnDef<InventoryStocktakeVari
         createNumberColumn<InventoryStocktakeVarianceReportItem>({
             accessorKey: 'system_quantity',
             label: 'System Qty',
-            minimumFractionDigits: 2,
+            minimumFractionDigits: 0,
             maximumFractionDigits: 2,
         }),
         createNumberColumn<InventoryStocktakeVarianceReportItem>({
             accessorKey: 'counted_quantity',
             label: 'Counted Qty',
-            minimumFractionDigits: 2,
+            minimumFractionDigits: 0,
             maximumFractionDigits: 2,
         }),
         createNumberColumn<InventoryStocktakeVarianceReportItem>({
             accessorKey: 'variance',
             label: 'Variance',
-            minimumFractionDigits: 2,
+            minimumFractionDigits: 0,
             maximumFractionDigits: 2,
         }),
         createReportTextColumn<InventoryStocktakeVarianceReportItem>({

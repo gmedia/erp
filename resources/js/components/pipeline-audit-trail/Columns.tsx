@@ -11,6 +11,7 @@ export interface PipelineAuditTrailItem {
     entity_type: string;
     entity_type_short: string;
     entity_id: string;
+    entity_number: string | null;
     pipeline_name: string | null;
     from_state_id: number | null;
     from_state_name: string | null;
@@ -64,7 +65,11 @@ export const createPipelineAuditTrailColumns = ({
     {
         accessorKey: 'entity_id',
         header: 'Entity ID',
-        cell: ({ row }) => <div>{row.getValue('entity_id')}</div>,
+        cell: ({ row }) => (
+            <div title={`#${row.original.entity_id}`}>
+                {row.original.entity_number ?? `#${row.original.entity_id}`}
+            </div>
+        ),
         enableSorting: false,
     },
     {

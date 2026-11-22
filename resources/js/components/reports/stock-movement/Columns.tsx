@@ -6,7 +6,7 @@ import {
     createReportWarehouseColumn,
 } from '@/components/common/ReportColumns';
 import { createNumberColumn } from '@/utils/columns';
-import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
+import { formatDateTimeOrDateByRegionalSettings } from '@/utils/date-format';
 import type { ColumnDef } from '@tanstack/react-table';
 
 export type StockMovementReportItem = {
@@ -29,7 +29,7 @@ export type StockMovementReportItem = {
 };
 
 function formatDate(value: string | null | undefined): string {
-    return formatDateTimeByRegionalSettings(value);
+    return formatDateTimeOrDateByRegionalSettings(value);
 }
 
 export const stockMovementReportColumns: ColumnDef<StockMovementReportItem>[] =
@@ -59,19 +59,19 @@ export const stockMovementReportColumns: ColumnDef<StockMovementReportItem>[] =
         createNumberColumn<StockMovementReportItem>({
             accessorKey: 'total_in',
             label: 'Total In',
-            minimumFractionDigits: 2,
+            minimumFractionDigits: 0,
             maximumFractionDigits: 2,
         }),
         createNumberColumn<StockMovementReportItem>({
             accessorKey: 'total_out',
             label: 'Total Out',
-            minimumFractionDigits: 2,
+            minimumFractionDigits: 0,
             maximumFractionDigits: 2,
         }),
         createNumberColumn<StockMovementReportItem>({
             accessorKey: 'ending_balance',
             label: 'Ending Balance',
-            minimumFractionDigits: 2,
+            minimumFractionDigits: 0,
             maximumFractionDigits: 2,
         }),
         createReportTextColumn<StockMovementReportItem>({

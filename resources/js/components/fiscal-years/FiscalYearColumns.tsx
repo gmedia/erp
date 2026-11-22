@@ -3,9 +3,9 @@
 import { type FiscalYear } from '@/types/entity';
 import {
     createActionsColumn,
-    createBadgeColumn,
     createDateColumn,
     createSelectColumn,
+    createStatusBadgeColumn,
     createTextColumn,
 } from '@/utils/columns';
 import { ColumnDef } from '@tanstack/react-table';
@@ -28,10 +28,9 @@ export const fiscalYearColumns: ColumnDef<FiscalYear>[] = [
     // Konteks tahun fiskal: open = berjalan (sukses), closed = finalisasi
     // (netral), locked = terkunci (danger, dari peta umum). 'open'/'closed'
     // di sini beda makna dari status dokumen — jadi override via variantMap.
-    createBadgeColumn<FiscalYear>({
+    createStatusBadgeColumn<FiscalYear>({
         accessorKey: 'status',
         label: 'Status',
-        variantMap: { open: 'success', closed: 'secondary' },
     }),
     createDateColumn<FiscalYear>({
         accessorKey: 'created_at',

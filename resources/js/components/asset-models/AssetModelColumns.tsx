@@ -24,6 +24,38 @@ const renderCategoryCell = ({ row }: { row: { original: AssetModel } }) => {
 /**
  * Cell renderer for specs column
  */
+const SPEC_ACRONYMS = new Set([
+    'ram',
+    'gb',
+    'tb',
+    'cpu',
+    'gpu',
+    'os',
+    'ssd',
+    'hdd',
+    'usb',
+    'hdmi',
+    'lan',
+    'wifi',
+]);
+
+function formatSpecLabel(key: string): string {
+    return key
+        .split(/[\s_]+/)
+        .filter(Boolean)
+        .map((word) =>
+            SPEC_ACRONYMS.has(word.toLowerCase())
+                ? word.toUpperCase()
+                : formatStatusLabel(word),
+        )
+        .join(' ');
+}
+
+function formatSpecValue(value: unknown): string {
+    const text = String(value);
+    return /^[a-z][a-z_]*$/.test(text) ? formatStatusLabel(text) : text;
+}
+
 const renderSpecsCell = ({ row }: { row: { original: AssetModel } }) => {
     const specs = row.original.specs;
     if (!specs || typeof specs !== 'object') {
@@ -40,7 +72,7 @@ const renderSpecsCell = ({ row }: { row: { original: AssetModel } }) => {
             {entries
                 .map(
                     ([key, value]) =>
-                        `${formatStatusLabel(key)}: ${String(value)}`,
+                        `${formatSpecLabel(key)}: ${formatSpecValue(value)}`,
                 )
                 .join(' · ')}
         </span>

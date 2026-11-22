@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
+import { formatStatusLabel } from '@/lib/status-badge';
 import { useQuery } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -247,7 +248,7 @@ export function FinancialReportHeaderMeta({
         <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
             {fiscalYear && (
                 <span>
-                    {fiscalYear.name} • {fiscalYear.status}
+                    {fiscalYear.name} · {formatStatusLabel(fiscalYear.status)}
                 </span>
             )}
             {showComparisonBadge && (

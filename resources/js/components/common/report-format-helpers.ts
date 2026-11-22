@@ -56,7 +56,7 @@ export function createAmountFormatter(currency?: string) {
         formatCurrencyByRegionalSettings(value ?? 0, {
             locale: 'id-ID',
             currency: currency || undefined,
-            minimumFractionDigits: 2,
+            minimumFractionDigits: 0,
             maximumFractionDigits: 2,
         });
 }

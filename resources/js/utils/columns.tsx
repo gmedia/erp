@@ -5,7 +5,6 @@ import { Badge, type BadgeVariant } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
-    adjustmentTypeBadgeVariant,
     formatStatusLabel,
     priorityBadgeVariant,
     statusBadgeVariant,
@@ -209,9 +208,9 @@ export function createCurrencyColumn<T = Record<string, unknown>>(
         enableSorting = true,
         currency,
         locale = 'id-ID',
-        minimumFractionDigits = 2,
+        minimumFractionDigits = 0,
         maximumFractionDigits = 2,
-        className = 'font-medium',
+        className = 'text-right font-medium tabular-nums',
     } = options;
 
     const baseColumn: ColumnDef<T> = {
@@ -572,11 +571,7 @@ export function createAdjustmentTypeBadgeColumn<T = Record<string, unknown>>(
         cell: ({ row }) => {
             const value = row.getValue(accessorKey as string) as string;
             if (!value) return <div>-</div>;
-            return (
-                <Badge variant={adjustmentTypeBadgeVariant(value)}>
-                    {formatStatusLabel(value)}
-                </Badge>
-            );
+            return <Badge variant="outline">{formatStatusLabel(value)}</Badge>;
         },
     };
 
@@ -651,7 +646,7 @@ export function createRowCurrencyAmountColumn<
                     {
                         locale: 'id-ID',
                         currency: row.original.currency || undefined,
-                        minimumFractionDigits: 2,
+                        minimumFractionDigits: 0,
                         maximumFractionDigits: 2,
                     },
                 )}

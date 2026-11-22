@@ -37,6 +37,9 @@ export function statusBadgeVariant(
         case 'paid':
         case 'returned':
         case 'reconciled':
+        case 'approved':
+        case 'auto_approved':
+        case 'applied':
             return POSITIVE;
 
         // Menunggu/terbuka: pending, draft terbuka, partially paid/received.
@@ -55,8 +58,7 @@ export function statusBadgeVariant(
         case 'in_progress':
         case 'work_in_progress':
         case 'maintenance':
-        case 'approved':
-        case 'auto_approved':
+        case 'open':
         case 'stocktake_result':
         case 'on_hold':
         case 'sent':
@@ -68,6 +70,7 @@ export function statusBadgeVariant(
         case 'inactive':
         case 'archived':
         case 'idle':
+        case 'locked':
             return MUTED;
 
         // Negatif/danger: ditolak, dibatalkan, gagal, telat.
@@ -81,7 +84,6 @@ export function statusBadgeVariant(
         case 'overdue':
         case 'discontinued':
         case 'expired':
-        case 'locked':
         case 'disposed':
         case 'lost':
             return DANGER;
@@ -138,36 +140,7 @@ export function approvalEventBadgeVariant(
         return MUTED;
     }
 
-    return NEUTRAL;
-}
-
-// Adjustment type (stok): rusak/hilang = danger, expired/susut = warning,
-// hasil stocktake = info, stok awal = sukses, koreksi/lainnya = netral.
-export function adjustmentTypeBadgeVariant(
-    type: string | null | undefined,
-): BadgeVariant {
-    if (!type) {
-        return NEUTRAL;
-    }
-
-    const key = type.toLowerCase().replace(/\s+/g, '_');
-
-    switch (key) {
-        case 'damage':
-        case 'lost':
-            return DANGER;
-        case 'expired':
-        case 'shrinkage':
-            return PENDING;
-        case 'stocktake_result':
-            return INFO;
-        case 'initial_stock':
-            return POSITIVE;
-        case 'correction':
-        case 'other':
-        default:
-            return NEUTRAL;
-    }
+    return statusBadgeVariant(key);
 }
 
 // Hasil selisih stocktake aset: hilang/rusak = danger, dipindah = info.
@@ -194,6 +167,21 @@ export function stocktakeVarianceBadgeVariant(
 // Nama class PHP/FQCN → label manusiawi (mis. App\Models\PurchaseRequest →
 // "Purchase Request", SupplierBill → "Supplier Bill") untuk kolom Entity/
 // Approvable/Document Type (W4-11).
+const CLASS_NAME_ACRONYMS = new Set([
+    'ap',
+    'ar',
+    'po',
+    'pr',
+    'gr',
+    'coa',
+    'gl',
+    'fy',
+    'hr',
+    'vat',
+    'sku',
+    'uom',
+]);
+
 export function formatClassName(value: string | null | undefined): string {
     if (!value) {
         return '-';
@@ -205,7 +193,14 @@ export function formatClassName(value: string | null | undefined): string {
         .replaceAll('_', ' ')
         .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
         .replace(/\s+/g, ' ')
-        .trim();
+        .trim()
+        .split(' ')
+        .map((word) =>
+            CLASS_NAME_ACRONYMS.has(word.toLowerCase())
+                ? word.toUpperCase()
+                : word,
+        )
+        .join(' ');
 }
 
 // Humanize label status: snake_case/huruf kecil → Title Case.

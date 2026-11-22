@@ -11,6 +11,7 @@ use App\Services\Push\GoogleServiceAccountTokenProvider;
 use App\Services\Push\LogPushSender;
 use App\Services\SocialAuth\Providers\GoogleProvider;
 use App\Services\SocialAuth\Providers\MicrosoftProvider;
+use App\Support\DocumentNumberResolver;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -29,6 +30,8 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(FcmAccessTokenProvider::class, GoogleServiceAccountTokenProvider::class);
+
+        $this->app->scoped(DocumentNumberResolver::class);
 
         $this->app->bind(PushSender::class, function ($app): PushSender {
             return match (config('notifications.push.driver', 'log')) {
