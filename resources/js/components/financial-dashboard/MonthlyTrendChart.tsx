@@ -167,8 +167,26 @@ export const MonthlyTrendChart = memo<MonthlyTrendChartProps>(
                                             <span className="text-xs font-medium text-muted-foreground">
                                                 {item.label}
                                             </span>
+                                            {/* Label per seri (W5-18): nilai
+                                                revenue & expense tidak lagi
+                                                digabung jadi satu angka. */}
+                                            {item.revenue > 0 && (
+                                                <span className="text-xs font-semibold text-success">
+                                                    {formatCompact(
+                                                        item.revenue,
+                                                    )}
+                                                </span>
+                                            )}
+                                            {item.expenses > 0 && (
+                                                <span className="text-xs font-semibold text-destructive-foreground">
+                                                    {formatCompact(
+                                                        item.expenses,
+                                                    )}
+                                                </span>
+                                            )}
                                             <span
-                                                className={`text-xs font-semibold ${netIncomeColor}`}
+                                                className={`text-xs ${netIncomeColor}`}
+                                                title={`Net income: ${formatCurrency(item.net_income)}`}
                                             >
                                                 {formatCompact(item.net_income)}
                                             </span>

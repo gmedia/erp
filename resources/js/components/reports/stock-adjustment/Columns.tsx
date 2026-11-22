@@ -10,6 +10,8 @@ import { formatDateByRegionalSettings } from '@/utils/date-format';
 import type { ColumnDef } from '@tanstack/react-table';
 
 export type StockAdjustmentReportItem = {
+    stock_adjustment_id: number;
+    adjustment_number: string;
     adjustment_date: string | null;
     adjustment_type: string;
     status: string;
@@ -26,6 +28,12 @@ export type StockAdjustmentReportItem = {
 
 export const stockAdjustmentReportColumns: ColumnDef<StockAdjustmentReportItem>[] =
     [
+        createReportTextColumn<StockAdjustmentReportItem>({
+            accessorKey: 'adjustment_number',
+            header: 'Adjustment No.',
+            getValue: (item) => item.adjustment_number,
+            sortable: true,
+        }),
         createReportTextColumn<StockAdjustmentReportItem>({
             accessorKey: 'adjustment_date',
             header: 'Adjustment Date',

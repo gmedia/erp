@@ -9,6 +9,7 @@ export interface ApprovalDelegation {
     end_date: string;
     reason: string | null;
     is_active: boolean;
+    status?: 'active' | 'scheduled' | 'expired' | 'inactive';
     created_at: string;
     updated_at: string;
 }

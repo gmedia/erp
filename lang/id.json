@@ -140,7 +140,8 @@
         "selectFilterBudget": "Pilih budget pada filter untuk melihat varians anggaran.",
         "selectFilterAccount": "Pilih akun (dan periode) pada filter untuk melihat buku besar.",
         "selectFilterFiscalYear": "Pilih tahun fiskal (dan periode) untuk melihat neraca saldo detail.",
-        "selectFilterDefault": "Pilih filter yang diperlukan untuk menampilkan {entity}."
+        "selectFilterDefault": "Pilih filter yang diperlukan untuk menampilkan {entity}.",
+        "selectFilterCustomer": "Pilih customer pada filter untuk melihat statement."
     },
     "admin": {
         "selectLogo": "Pilih Logo SVG",

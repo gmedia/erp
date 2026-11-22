@@ -219,6 +219,48 @@ test('update modifies supplier return and items', function () {
         ->assertJsonCount(1, 'data.items');
 });
 
+test('confirming a supplier return creates supplier return stock movements', function () {
+    [
+        $purchaseOrder,
+        $goodsReceipt,
+        $goodsReceiptItem,
+        $supplier,
+        $warehouse,
+        $product,
+        $unit,
+    ] = createGoodsReceiptItemForSupplierReturn();
+    $supplierReturn = SupplierReturn::factory()->create([
+        'purchase_order_id' => $purchaseOrder->id,
+        'goods_receipt_id' => $goodsReceipt->id,
+        'supplier_id' => $supplier->id,
+        'warehouse_id' => $warehouse->id,
+        'status' => 'draft',
+        'confirmed_at' => null,
+        'confirmed_by' => null,
+    ]);
+
+    putJson('/api/supplier-returns/' . $supplierReturn->id, [
+        'status' => 'confirmed',
+        'items' => [
+            [
+                'goods_receipt_item_id' => $goodsReceiptItem->id,
+                'product_id' => $product->id,
+                'unit_id' => $unit->id,
+                'quantity_returned' => 3,
+                'unit_price' => 10000,
+            ],
+        ],
+    ])->assertOk();
+
+    assertDatabaseHas('stock_movements', [
+        'movement_type' => 'supplier_return',
+        'reference_type' => SupplierReturn::class,
+        'reference_id' => $supplierReturn->id,
+        'product_id' => $product->id,
+        'quantity_out' => 3,
+    ]);
+});
+
 test('confirming supplier return rolls back state when journal posting fails with non-validation error', function () {
     $supplierReturn = SupplierReturn::factory()->create([
         'status' => 'draft',

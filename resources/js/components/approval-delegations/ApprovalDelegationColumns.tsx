@@ -1,5 +1,9 @@
 import { Badge } from '@/components/ui/badge';
-import { formatClassName, statusBadgeVariant } from '@/lib/status-badge';
+import {
+    formatClassName,
+    formatStatusLabel,
+    statusBadgeVariant,
+} from '@/lib/status-badge';
 import { ApprovalDelegation } from '@/types/approval-delegation';
 import {
     createActionsColumn,
@@ -67,14 +71,13 @@ export const approvalDelegationColumns: ColumnDef<ApprovalDelegation>[] = [
         accessorKey: 'is_active',
         ...createSortingHeader('Status'),
         cell: ({ row }) => {
-            const isActive = row.original.is_active;
+            // Status turunan tanggal dari API (W5-17).
+            const status =
+                row.original.status ??
+                (row.original.is_active ? 'active' : 'inactive');
             return (
-                <Badge
-                    variant={statusBadgeVariant(
-                        isActive ? 'active' : 'inactive',
-                    )}
-                >
-                    {isActive ? 'Active' : 'Inactive'}
+                <Badge variant={statusBadgeVariant(status)}>
+                    {formatStatusLabel(status)}
                 </Badge>
             );
         },

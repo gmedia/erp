@@ -3,6 +3,7 @@
 use App\Models\Employee;
 use App\Models\Permission;
 use App\Models\User;
+use Tests\TestCase;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,7 +16,7 @@ use App\Models\User;
 |
 */
 
-pest()->extend(Tests\TestCase::class)->in('Feature', 'Unit');
+pest()->extend(TestCase::class)->in('Feature', 'Unit');
 
 /*
 |--------------------------------------------------------------------------
@@ -46,8 +47,7 @@ expect()->extend('toBeOne', function () {
 /**
  * Create a test user with specific permissions.
  *
- * @param array<string> $permissionNames
- * @return User
+ * @param  array<string>  $permissionNames
  */
 function createTestUserWithPermissions(array $permissionNames = []): User
 {
@@ -56,7 +56,7 @@ function createTestUserWithPermissions(array $permissionNames = []): User
         'user_id' => $user->id,
     ]);
 
-    if (!empty($permissionNames)) {
+    if (! empty($permissionNames)) {
         $permissions = [];
         foreach ($permissionNames as $name) {
             $permissions[] = Permission::firstOrCreate(

@@ -96,7 +96,11 @@ class IndexPurchaseOrderStatusReportAction extends ConfiguredPurchaseOrderReport
 
     private function statusCategorySelectSql(): string
     {
+        // Draft/pending belum menjadi komitmen pesanan; cancelled/rejected
+        // terminal. Keduanya tidak boleh dihitung sebagai outstanding (W5-13).
         return "CASE
+            WHEN po.status IN ('draft', 'pending_approval') THEN 'not_started'
+            WHEN po.status IN ('cancelled', 'rejected') THEN 'closed'
             WHEN (COALESCE(SUM(poi.quantity), 0) - COALESCE(SUM(poi.quantity_received), 0)) <= 0
                 OR po.status IN ('fully_received', 'closed')
                 THEN 'closed'

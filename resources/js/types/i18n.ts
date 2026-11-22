@@ -126,6 +126,7 @@ export interface Translations {
         selectFilterBudget: string;
         selectFilterAccount: string;
         selectFilterFiscalYear: string;
+        selectFilterCustomer: string;
         selectFilterDefault: string;
     };
     admin: {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\AccountingPosting\PostGoodsReceiptJournalAction;
 use App\Actions\GoodsReceipts\ExportGoodsReceiptsAction;
 use App\Actions\GoodsReceipts\IndexGoodsReceiptsAction;
+use App\Actions\GoodsReceipts\PostGoodsReceiptMovementsAction;
 use App\Actions\GoodsReceipts\SyncGoodsReceiptItemsAction;
 use App\DTOs\GoodsReceipts\UpdateGoodsReceiptData;
 use App\Http\Controllers\Concerns\LoadsResourceRelations;
@@ -71,6 +72,7 @@ class GoodsReceiptController extends Controller
         GoodsReceipt $goodsReceipt,
         SyncGoodsReceiptItemsAction $syncItems,
         PostGoodsReceiptJournalAction $postJournal,
+        PostGoodsReceiptMovementsAction $postMovements,
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
@@ -110,6 +112,11 @@ class GoodsReceiptController extends Controller
                 }
             : null,
         );
+
+        if ($isNewlyConfirmed) {
+            // Setelah commit: movement tetap ada walau posting jurnal gagal.
+            $postMovements->execute($goodsReceipt->refresh());
+        }
 
         return (new GoodsReceiptResource($this->loadResourceRelations($goodsReceipt)))->response();
     }

@@ -219,6 +219,40 @@ test('update modifies goods receipt and items', function () {
         ->assertJsonCount(1, 'data.items');
 });
 
+test('confirming a goods receipt creates goods receipt stock movements', function () {
+    [$purchaseOrder, $purchaseOrderItem, $product, $unit] = createPurchaseOrderWithItemForGoodsReceipt();
+    $goodsReceipt = GoodsReceipt::factory()->create([
+        'purchase_order_id' => $purchaseOrder->id,
+        'warehouse_id' => $purchaseOrder->warehouse_id,
+        'status' => 'draft',
+        'confirmed_at' => null,
+        'confirmed_by' => null,
+    ]);
+
+    putJson('/api/goods-receipts/' . $goodsReceipt->id, [
+        'status' => 'confirmed',
+        'items' => [
+            [
+                'purchase_order_item_id' => $purchaseOrderItem->id,
+                'product_id' => $product->id,
+                'unit_id' => $unit->id,
+                'quantity_received' => 7,
+                'quantity_accepted' => 6,
+                'quantity_rejected' => 1,
+                'unit_price' => 10000,
+            ],
+        ],
+    ])->assertOk();
+
+    assertDatabaseHas('stock_movements', [
+        'movement_type' => 'goods_receipt',
+        'reference_type' => GoodsReceipt::class,
+        'reference_id' => $goodsReceipt->id,
+        'product_id' => $product->id,
+        'quantity_in' => 6,
+    ]);
+});
+
 test('update keeps current goods receipt number unique', function () {
     $goodsReceipt = GoodsReceipt::factory()->create(['gr_number' => 'GR-KEEP-001']);
 

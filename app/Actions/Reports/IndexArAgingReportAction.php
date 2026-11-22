@@ -43,13 +43,18 @@ class IndexArAgingReportAction
         return $this->buildBaseCustomerInvoiceQuery(
             [$this->agingBucketSelectSql('ci')],
             $this->agingBucketBindings($boundaries),
-        )->withCasts(array_merge($this->getBaseCasts(), [
-            'aging_current' => 'decimal:2',
-            'aging_1_30' => 'decimal:2',
-            'aging_31_60' => 'decimal:2',
-            'aging_61_90' => 'decimal:2',
-            'aging_over_90' => 'decimal:2',
-        ]));
+        )
+            // Aging hanya piutang berjalan; paid/cancelled/void/draft bukan
+            // saldo tagihan (W5-14, sejajar AR Outstanding).
+            ->whereIn('ci.status', ['sent', 'partially_paid', 'overdue'])
+            ->where('ci.amount_due', '>', 0)
+            ->withCasts(array_merge($this->getBaseCasts(), [
+                'aging_current' => 'decimal:2',
+                'aging_1_30' => 'decimal:2',
+                'aging_31_60' => 'decimal:2',
+                'aging_61_90' => 'decimal:2',
+                'aging_over_90' => 'decimal:2',
+            ]));
     }
 
     protected function defaultSortBy(): string

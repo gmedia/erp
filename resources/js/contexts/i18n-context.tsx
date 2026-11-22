@@ -173,6 +173,8 @@ const defaultTranslations: Translations = {
             'Choose an account (and period) in the filters to see the ledger.',
         selectFilterFiscalYear:
             'Choose a fiscal year (and period) to see the detailed trial balance.',
+        selectFilterCustomer:
+            'Choose a customer in the filters to see the statement.',
         selectFilterDefault: 'Choose the required filters to show {entity}.',
     },
     admin: {

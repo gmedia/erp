@@ -58,6 +58,36 @@ test('it can fetch ar aging report data with aging buckets', function () {
         );
 });
 
+test('it excludes paid cancelled void and draft invoices', function () {
+    $customer = Customer::factory()->create();
+    $fiscalYear = FiscalYear::factory()->create();
+
+    foreach (['sent', 'paid', 'cancelled', 'void', 'draft'] as $status) {
+        CustomerInvoice::factory()->create([
+            'customer_id' => $customer->id,
+            'fiscal_year_id' => $fiscalYear->id,
+            'invoice_number' => 'INV-AGING-' . strtoupper($status),
+            'invoice_date' => '2026-01-10',
+            'due_date' => '2026-02-10',
+            'status' => $status,
+            'grand_total' => 100000,
+            'amount_received' => $status === 'paid' ? 100000 : 0,
+            'amount_due' => $status === 'paid' ? 0 : 100000,
+        ]);
+    }
+
+    Sanctum::actingAs($this->user, ['*']);
+    $numbers = collect(getJson('/api/reports/ar-aging')->assertOk()->json('data'))
+        ->pluck('customer_invoice.invoice_number')
+        ->all();
+
+    expect($numbers)->toContain('INV-AGING-SENT')
+        ->not->toContain('INV-AGING-PAID')
+        ->not->toContain('INV-AGING-CANCELLED')
+        ->not->toContain('INV-AGING-VOID')
+        ->not->toContain('INV-AGING-DRAFT');
+});
+
 test('it can filter by customer', function () {
     $customerA = Customer::factory()->create(['name' => 'Customer A']);
     $customerB = Customer::factory()->create(['name' => 'Customer B']);

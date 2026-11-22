@@ -35,6 +35,9 @@ class IndexCustomerStatementReportAction
     protected function buildQuery(): Builder
     {
         return $this->buildBaseCustomerInvoiceQuery([$this->runningBalanceSelectSql()])
+            // Running balance hanya transaksi piutang berjalan (W5-14).
+            ->whereIn('ci.status', ['sent', 'partially_paid', 'overdue'])
+            ->where('ci.amount_due', '>', 0)
             ->withCasts(array_merge($this->getBaseCasts(), [
                 'running_balance' => 'decimal:2',
             ]));

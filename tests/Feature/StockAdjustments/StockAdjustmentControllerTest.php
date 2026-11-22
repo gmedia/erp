@@ -183,6 +183,54 @@ describe('Stock Adjustment API Endpoints', function () {
         ]);
     });
 
+    test('approving an adjustment creates stock movements per item', function () {
+        $warehouse = Warehouse::factory()->create();
+        $productIn = Product::factory()->create();
+        $productOut = Product::factory()->create();
+        $unit = Unit::factory()->create();
+
+        $adjustment = StockAdjustment::factory()->create([
+            'warehouse_id' => $warehouse->id,
+            'status' => 'draft',
+            'approved_at' => null,
+        ]);
+
+        // Item sudah tersimpan sebelum approval (alur nyata: draft → approve).
+        $adjustment->items()->create([
+            'product_id' => $productIn->id,
+            'unit_id' => $unit->id,
+            'quantity_before' => 10,
+            'quantity_adjusted' => 5,
+            'quantity_after' => 15,
+        ]);
+        $adjustment->items()->create([
+            'product_id' => $productOut->id,
+            'unit_id' => $unit->id,
+            'quantity_before' => 10,
+            'quantity_adjusted' => -3,
+            'quantity_after' => 7,
+        ]);
+
+        putJson("/api/stock-adjustments/{$adjustment->id}", [
+            'status' => 'approved',
+        ])->assertOk();
+
+        assertDatabaseHas('stock_movements', [
+            'movement_type' => 'adjustment_in',
+            'reference_type' => StockAdjustment::class,
+            'reference_id' => $adjustment->id,
+            'product_id' => $productIn->id,
+            'quantity_in' => 5,
+        ]);
+        assertDatabaseHas('stock_movements', [
+            'movement_type' => 'adjustment_out',
+            'reference_type' => StockAdjustment::class,
+            'reference_id' => $adjustment->id,
+            'product_id' => $productOut->id,
+            'quantity_out' => 3,
+        ]);
+    });
+
     test('update accepts an unchanged adjustment number', function () {
         $adjustment = StockAdjustment::factory()->create(['status' => 'draft']);
 

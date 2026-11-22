@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\AccountingPosting\PostSupplierReturnJournalAction;
 use App\Actions\SupplierReturns\ExportSupplierReturnsAction;
 use App\Actions\SupplierReturns\IndexSupplierReturnsAction;
+use App\Actions\SupplierReturns\PostSupplierReturnMovementsAction;
 use App\Actions\SupplierReturns\SyncSupplierReturnItemsAction;
 use App\DTOs\SupplierReturns\UpdateSupplierReturnData;
 use App\Http\Controllers\Concerns\StoresItemsInTransaction;
@@ -84,6 +85,7 @@ class SupplierReturnController extends Controller
         SupplierReturn $supplierReturn,
         SyncSupplierReturnItemsAction $syncItems,
         PostSupplierReturnJournalAction $postJournal,
+        PostSupplierReturnMovementsAction $postMovements,
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
@@ -133,6 +135,11 @@ class SupplierReturnController extends Controller
             'items.product',
             'items.unit',
         ]);
+
+        if ($isNewlyConfirmed) {
+            // Setelah commit: movement tetap ada walau posting jurnal gagal.
+            $postMovements->execute($supplierReturn->refresh());
+        }
 
         return (new SupplierReturnResource($supplierReturn))->response();
     }

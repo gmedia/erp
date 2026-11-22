@@ -25,6 +25,31 @@ describe('Approval Delegation API Endpoints', function () {
         Sanctum::actingAs($user, ['*']);
     });
 
+    test('index derives status from dates', function () {
+        ApprovalDelegation::factory()->create([
+            'start_date' => now()->addMonth()->toDateString(),
+            'end_date' => now()->addMonth()->addDays(7)->toDateString(),
+            'is_active' => true,
+        ]);
+        ApprovalDelegation::factory()->create([
+            'start_date' => now()->subDays(2)->toDateString(),
+            'end_date' => now()->addDays(5)->toDateString(),
+            'is_active' => true,
+        ]);
+        ApprovalDelegation::factory()->create([
+            'start_date' => now()->subMonth()->toDateString(),
+            'end_date' => now()->subDays(5)->toDateString(),
+            'is_active' => true,
+        ]);
+
+        $statuses = collect(getJson('/api/approval-delegations?per_page=50')->assertOk()->json('data'))
+            ->pluck('status');
+
+        expect($statuses)->toContain('scheduled')
+            ->toContain('active')
+            ->toContain('expired');
+    });
+
     test('index returns paginated delegations', function () {
         $baseline = ApprovalDelegation::count();
         ApprovalDelegation::factory()->count(15)->create();

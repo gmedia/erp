@@ -53,6 +53,38 @@ test('it can fetch customer statement report data', function () {
         );
 });
 
+test('it excludes paid cancelled void and draft invoices from running balance', function () {
+    $customer = Customer::factory()->create();
+    $fiscalYear = FiscalYear::factory()->create();
+
+    foreach (['sent', 'paid', 'cancelled', 'void', 'draft'] as $status) {
+        CustomerInvoice::factory()->create([
+            'customer_id' => $customer->id,
+            'fiscal_year_id' => $fiscalYear->id,
+            'invoice_number' => 'INV-STMT-' . strtoupper($status),
+            'invoice_date' => '2026-01-10',
+            'due_date' => '2026-02-10',
+            'status' => $status,
+            'grand_total' => 100000,
+            'amount_received' => $status === 'paid' ? 100000 : 0,
+            'amount_due' => $status === 'paid' ? 0 : 100000,
+        ]);
+    }
+
+    Sanctum::actingAs($this->user, ['*']);
+    $numbers = collect(
+        getJson('/api/reports/customer-statement?customer_id=' . $customer->id)
+            ->assertOk()
+            ->json('data'),
+    )->pluck('customer_invoice.invoice_number')->all();
+
+    expect($numbers)->toContain('INV-STMT-SENT')
+        ->not->toContain('INV-STMT-PAID')
+        ->not->toContain('INV-STMT-CANCELLED')
+        ->not->toContain('INV-STMT-VOID')
+        ->not->toContain('INV-STMT-DRAFT');
+});
+
 test('it can filter by customer', function () {
     $customerA = Customer::factory()->create(['name' => 'Customer A']);
     $customerB = Customer::factory()->create(['name' => 'Customer B']);

@@ -135,6 +135,11 @@ class GlExtendedSampleDataSeeder extends Seeder
                 ],
                 [
                     'status' => 'closed',
+                    'net_income' => $this->monthlyNetIncome(
+                        $fiscalYear,
+                        $month,
+                        $periodYear,
+                    ),
                     'retained_earnings_account_id' => $accounts[2]->id,
                     'closed_by' => $user->id,
                     'closed_at' => now(),
@@ -156,6 +161,34 @@ class GlExtendedSampleDataSeeder extends Seeder
                 'created_by' => $user->id,
             ],
         );
+    }
+
+    /**
+     * Laba bersih bulanan dari jurnal posted (revenue - expense), agar
+     * period closing hasil seed tidak menampilkan Rp 0 (W5-16).
+     */
+    private function monthlyNetIncome(
+        FiscalYear $fiscalYear,
+        int $month,
+        int $year,
+    ): float {
+        $row = DB::table('journal_entry_lines')
+            ->join('journal_entries', 'journal_entry_lines.journal_entry_id', '=', 'journal_entries.id')
+            ->join('accounts', 'accounts.id', '=', 'journal_entry_lines.account_id')
+            ->where('journal_entries.fiscal_year_id', $fiscalYear->id)
+            ->where('journal_entries.status', 'posted')
+            ->where('journal_entries.journal_type', '<>', 'closing')
+            ->whereIn('accounts.type', ['revenue', 'expense'])
+            ->whereYear('journal_entries.entry_date', $year)
+            ->whereMonth('journal_entries.entry_date', $month)
+            // revenue normal kredit, expense normal debit → credit - debit
+            // sudah merupakan laba bersih.
+            ->selectRaw(
+                'COALESCE(SUM(journal_entry_lines.credit - journal_entry_lines.debit), 0) as net',
+            )
+            ->first();
+
+        return round((float) ($row->net ?? 0), 2);
     }
 
     private function seedAccountBalances(FiscalYear $fiscalYear, Collection $accounts): void
