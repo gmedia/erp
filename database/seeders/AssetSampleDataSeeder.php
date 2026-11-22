@@ -92,7 +92,7 @@ class AssetSampleDataSeeder extends Seeder
             ],
             [
                 'asset_category_id' => $mchCategory?->id,
-                'manufacturer' => 'Generic',
+                'manufacturer' => 'Krisbow',
                 'model_name' => 'Packing Machine',
                 'specs' => ['power' => '220V'],
             ],
@@ -208,7 +208,7 @@ class AssetSampleDataSeeder extends Seeder
                 'asset_category_id' => $itCategory?->id,
                 'serial_number' => 'SN-HP-001',
                 'branch_id' => $headOffice->id,
-                'asset_location_id' => $office?->id,
+                'asset_location_id' => $itRoom?->id,
                 'department_id' => $defaultDepartment?->id,
                 'employee_id' => null,
                 'supplier_id' => $supplier->id,
@@ -770,7 +770,7 @@ class AssetSampleDataSeeder extends Seeder
                     'transition_id' => null,
                     'performed_by' => $adminUser?->id,
                     'comment' => 'Initial pipeline assignment',
-                    'created_at' => now()->subDays($daysAgoInitial),
+                    'created_at' => now()->subDays($daysAgoInitial)->subMinutes($daysAgoInitial * 7),
                 ]
             );
 
@@ -795,12 +795,34 @@ class AssetSampleDataSeeder extends Seeder
                     'transition_id' => $transition?->id,
                     'performed_by' => $adminUser?->id,
                     'comment' => $comment,
-                    'created_at' => now()->subDays($daysAgo),
+                    'created_at' => now()->subDays($daysAgo)->subMinutes($daysAgo * 7),
                 ]);
             }
         }
 
         // ── Additional Sample Data (Movements, Maintenance, etc.) ───
+        // Department mengikuti jenis aset, bukan default HR (W6-16).
+        $departmentByAssetCode = [
+            'FA-000003' => 'Operations',
+            'FA-000010' => 'Engineering',
+            'FA-000011' => 'Operations',
+        ];
+
+        foreach ($departmentByAssetCode as $assetCode => $departmentName) {
+            $department = Department::query()->where('name', $departmentName)->first();
+            $departmentAsset = Asset::query()->where('asset_code', $assetCode)->first();
+
+            if (! $department || ! $departmentAsset) {
+                continue;
+            }
+
+            $departmentAsset->update(['department_id' => $department->id]);
+            AssetMovement::query()
+                ->where('asset_id', $departmentAsset->id)
+                ->where('movement_type', 'acquired')
+                ->update(['to_department_id' => $department->id]);
+        }
+
         $laptopAsset = Asset::where('asset_code', 'FA-000001')->first();
         $printerAsset = Asset::where('asset_code', 'FA-000002')->first();
         $carAsset = Asset::where('asset_code', 'FA-000003')->first();
@@ -819,7 +841,7 @@ class AssetSampleDataSeeder extends Seeder
                     'to_location_id' => $office->id,
                     'from_department_id' => $defaultDepartment->id,
                     'to_department_id' => $defaultDepartment->id,
-                    'reference' => 'TRF-001',
+                    'reference' => 'TRF-' . now()->format('Y') . '-000101',
                     'notes' => 'Dipindahkan ke lantai 2 untuk penggunaan bersama.',
                     'created_by' => $adminUser?->id,
                 ]);
@@ -872,7 +894,7 @@ class AssetSampleDataSeeder extends Seeder
         if (! AssetStocktake::where('branch_id', $headOffice->id)->exists()) {
             $stocktake = AssetStocktake::create([
                 'branch_id' => $headOffice->id,
-                'reference' => 'STK-' . date('Ym'),
+                'reference' => 'STO-' . date('Y') . '-000101',
                 'planned_at' => now()->subDays(1),
                 'performed_at' => now(),
                 'status' => 'completed',

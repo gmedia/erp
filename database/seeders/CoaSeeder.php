@@ -146,6 +146,7 @@ class CoaSeeder extends Seeder
             'JV-2026-00001', 'JV-2026-00002', 'JV-2026-00003',
             'JV-2026-00004', 'JV-2026-00005', 'JV-2026-00006',
             'JV-2026-00007', 'JV-2026-00008', 'JV-2026-00009',
+            'JV-2026-00010', 'JV-2026-00011',
         ];
 
         $demoEntryIds = JournalEntry::query()
@@ -424,6 +425,64 @@ class CoaSeeder extends Seeder
             'debit' => 0,
             'credit' => 625000,
             'memo' => 'Akumulasi penyusutan peralatan (contra asset)',
+        ]);
+
+        // Sample Journal 10: Penjualan kredit
+        $journal10 = JournalEntry::create([
+            'fiscal_year_id' => $fiscalYear->id,
+            'entry_number' => 'JV-2026-00010',
+            'entry_date' => '2026-03-20',
+            'reference' => 'INV-2026-000201',
+            'description' => 'Penjualan kredit produk jadi',
+            'status' => 'posted',
+            'created_by' => $user?->id,
+            'posted_by' => $user?->id,
+            'posted_at' => now(),
+        ]);
+
+        JournalEntryLine::create([
+            'journal_entry_id' => $journal10->id,
+            'account_id' => $accountMap['11200'],
+            'debit' => 30000000,
+            'credit' => 0,
+            'memo' => 'Piutang usaha dari penjualan kredit',
+        ]);
+
+        JournalEntryLine::create([
+            'journal_entry_id' => $journal10->id,
+            'account_id' => $accountMap['41000'],
+            'debit' => 0,
+            'credit' => 30000000,
+            'memo' => 'Pendapatan penjualan',
+        ]);
+
+        // Sample Journal 11: Harga pokok penjualan
+        $journal11 = JournalEntry::create([
+            'fiscal_year_id' => $fiscalYear->id,
+            'entry_number' => 'JV-2026-00011',
+            'entry_date' => '2026-03-20',
+            'reference' => 'INV-2026-000201',
+            'description' => 'Harga pokok penjualan atas penjualan kredit',
+            'status' => 'posted',
+            'created_by' => $user?->id,
+            'posted_by' => $user?->id,
+            'posted_at' => now(),
+        ]);
+
+        JournalEntryLine::create([
+            'journal_entry_id' => $journal11->id,
+            'account_id' => $accountMap['51000'],
+            'debit' => 18000000,
+            'credit' => 0,
+            'memo' => 'Beban pokok penjualan',
+        ]);
+
+        JournalEntryLine::create([
+            'journal_entry_id' => $journal11->id,
+            'account_id' => $accountMap['11300'],
+            'debit' => 0,
+            'credit' => 18000000,
+            'memo' => 'Pengurangan persediaan atas penjualan',
         ]);
     }
 

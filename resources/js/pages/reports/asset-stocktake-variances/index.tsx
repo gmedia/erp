@@ -30,6 +30,16 @@ export default function StocktakeVarianceReport() {
             queryKey={['asset-stocktake-variances']}
             entityName="Variance"
             exportEndpoint="/api/asset-stocktake-variances/export"
+            defaultColumnVisibility={{
+                expected_branch_name: false,
+                expected_location_name: false,
+                found_branch_name: false,
+                found_location_name: false,
+                notes: false,
+                asset_name: false,
+                checked_at: false,
+                stocktake_reference: false,
+            }}
         />
     );
 }

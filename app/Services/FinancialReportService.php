@@ -57,10 +57,10 @@ class FinancialReportService
             $accounts,
             fn (Account $account, float $debit, float $credit, float $netDebit, float $netCredit) => [
                 ...$this->baseAccountPayload($account),
-                // Akun kas bersaldo normal debit: penambahan kas (debit) adalah
-                // arus masuk, pengurangan (kredit) arus keluar (W4-23).
-                'inflow' => $netDebit,
-                'outflow' => $netCredit,
+                // Arus kas bruto: debit = kas masuk, kredit = kas keluar, agar
+                // pembayaran AP tetap terlihat walau ada penerimaan (W6-06).
+                'inflow' => $debit,
+                'outflow' => $credit,
             ]
         );
     }

@@ -787,14 +787,26 @@ class PurchasingSampleDataSeeder extends Seeder
     ): array {
         $year = now()->format('Y');
 
+        // Rentang lama 99xxxx → 0001xx (W6-08): rename bila target kosong,
+        // hapus duplikat lama bila sudah ada.
+        foreach (PurchaseRequest::query()->where('pr_number', 'like', "PR-{$year}-99%")->get() as $legacy) {
+            $target = "PR-{$year}-0001" . substr($legacy->pr_number, -2);
+
+            if (PurchaseRequest::query()->where('pr_number', $target)->exists()) {
+                $legacy->delete();
+            } else {
+                $legacy->update(['pr_number' => $target]);
+            }
+        }
+
         $definitions = [
-            ['number' => "PR-{$year}-990001", 'status' => 'draft', 'priority' => 'normal'],
-            ['number' => "PR-{$year}-990002", 'status' => 'pending_approval', 'priority' => 'high'],
-            ['number' => "PR-{$year}-990003", 'status' => 'approved', 'priority' => 'normal'],
-            ['number' => "PR-{$year}-990004", 'status' => 'rejected', 'priority' => 'urgent'],
-            ['number' => "PR-{$year}-990005", 'status' => 'partially_ordered', 'priority' => 'high'],
-            ['number' => "PR-{$year}-990006", 'status' => 'fully_ordered', 'priority' => 'normal'],
-            ['number' => "PR-{$year}-990007", 'status' => 'cancelled', 'priority' => 'low'],
+            ['number' => "PR-{$year}-000101", 'status' => 'draft', 'priority' => 'normal'],
+            ['number' => "PR-{$year}-000102", 'status' => 'pending_approval', 'priority' => 'high'],
+            ['number' => "PR-{$year}-000103", 'status' => 'approved', 'priority' => 'normal'],
+            ['number' => "PR-{$year}-000104", 'status' => 'rejected', 'priority' => 'urgent'],
+            ['number' => "PR-{$year}-000105", 'status' => 'partially_ordered', 'priority' => 'high'],
+            ['number' => "PR-{$year}-000106", 'status' => 'fully_ordered', 'priority' => 'normal'],
+            ['number' => "PR-{$year}-000107", 'status' => 'cancelled', 'priority' => 'low'],
         ];
 
         $histories = [
@@ -947,15 +959,25 @@ class PurchasingSampleDataSeeder extends Seeder
     ): array {
         $year = now()->format('Y');
 
+        foreach (PurchaseOrder::query()->where('po_number', 'like', "PO-{$year}-99%")->get() as $legacy) {
+            $target = "PO-{$year}-0001" . substr($legacy->po_number, -2);
+
+            if (PurchaseOrder::query()->where('po_number', $target)->exists()) {
+                $legacy->delete();
+            } else {
+                $legacy->update(['po_number' => $target]);
+            }
+        }
+
         $definitions = [
-            ['number' => "PO-{$year}-990001", 'status' => 'draft', 'source_status' => 'approved'],
-            ['number' => "PO-{$year}-990002", 'status' => 'pending_approval', 'source_status' => 'approved'],
-            ['number' => "PO-{$year}-990003", 'status' => 'confirmed', 'source_status' => 'approved'],
-            ['number' => "PO-{$year}-990004", 'status' => 'rejected', 'source_status' => 'approved'],
-            ['number' => "PO-{$year}-990005", 'status' => 'partially_received', 'source_status' => 'partially_ordered'],
-            ['number' => "PO-{$year}-990006", 'status' => 'fully_received', 'source_status' => 'fully_ordered'],
-            ['number' => "PO-{$year}-990007", 'status' => 'cancelled', 'source_status' => 'approved'],
-            ['number' => "PO-{$year}-990008", 'status' => 'closed', 'source_status' => 'fully_ordered'],
+            ['number' => "PO-{$year}-000101", 'status' => 'draft', 'source_status' => 'approved'],
+            ['number' => "PO-{$year}-000102", 'status' => 'pending_approval', 'source_status' => 'approved'],
+            ['number' => "PO-{$year}-000103", 'status' => 'confirmed', 'source_status' => 'approved'],
+            ['number' => "PO-{$year}-000104", 'status' => 'rejected', 'source_status' => 'approved'],
+            ['number' => "PO-{$year}-000105", 'status' => 'partially_received', 'source_status' => 'partially_ordered'],
+            ['number' => "PO-{$year}-000106", 'status' => 'fully_received', 'source_status' => 'fully_ordered'],
+            ['number' => "PO-{$year}-000107", 'status' => 'cancelled', 'source_status' => 'approved'],
+            ['number' => "PO-{$year}-000108", 'status' => 'closed', 'source_status' => 'fully_ordered'],
         ];
 
         $histories = [
@@ -1170,6 +1192,7 @@ class PurchasingSampleDataSeeder extends Seeder
                 'step_order' => null,
                 'ip_address' => '127.0.0.1',
                 'user_agent' => 'Seeder',
+                'created_at' => $submittedAt,
                 'metadata' => [
                     'source' => 'PurchasingSampleDataSeeder',
                     'approval_flow_code' => $approvalFlowCode,
@@ -1229,6 +1252,7 @@ class PurchasingSampleDataSeeder extends Seeder
                         'actor_user_id' => $step->approver_user_id,
                         'ip_address' => '127.0.0.1',
                         'user_agent' => 'Seeder',
+                        'created_at' => $actedAt ?? $submittedAt,
                         'metadata' => [
                             'source' => 'PurchasingSampleDataSeeder',
                             'comments' => 'Approved via seeder',
@@ -1253,6 +1277,7 @@ class PurchasingSampleDataSeeder extends Seeder
                     'actor_user_id' => $rejectedStep?->approver_user_id,
                     'ip_address' => '127.0.0.1',
                     'user_agent' => 'Seeder',
+                    'created_at' => $actedAt ?? $submittedAt,
                     'metadata' => [
                         'source' => 'PurchasingSampleDataSeeder',
                         'comments' => 'Rejected via seeder',
@@ -1276,6 +1301,7 @@ class PurchasingSampleDataSeeder extends Seeder
                     'step_order' => $lastStepOrder,
                     'ip_address' => '127.0.0.1',
                     'user_agent' => 'Seeder',
+                    'created_at' => $completedAt ?? $submittedAt,
                     'metadata' => [
                         'source' => 'PurchasingSampleDataSeeder',
                         'approval_flow_code' => $approvalFlowCode,
@@ -1295,9 +1321,19 @@ class PurchasingSampleDataSeeder extends Seeder
     ): array {
         $year = now()->format('Y');
 
+        foreach (GoodsReceipt::query()->where('gr_number', 'like', "GR-{$year}-99%")->get() as $legacy) {
+            $target = "GR-{$year}-0001" . substr($legacy->gr_number, -2);
+
+            if (GoodsReceipt::query()->where('gr_number', $target)->exists()) {
+                $legacy->delete();
+            } else {
+                $legacy->update(['gr_number' => $target]);
+            }
+        }
+
         $definitions = [
             [
-                'number' => "GR-{$year}-990001",
+                'number' => "GR-{$year}-000101",
                 'status' => 'draft',
                 'po_status' => 'confirmed',
                 'quantity_received' => 2.00,
@@ -1305,7 +1341,7 @@ class PurchasingSampleDataSeeder extends Seeder
                 'quantity_rejected' => 0.00,
             ],
             [
-                'number' => "GR-{$year}-990002",
+                'number' => "GR-{$year}-000102",
                 'status' => 'confirmed',
                 'po_status' => 'partially_received',
                 'quantity_received' => 4.00,
@@ -1313,7 +1349,7 @@ class PurchasingSampleDataSeeder extends Seeder
                 'quantity_rejected' => 1.00,
             ],
             [
-                'number' => "GR-{$year}-990003",
+                'number' => "GR-{$year}-000103",
                 'status' => 'confirmed',
                 'po_status' => 'fully_received',
                 'quantity_received' => 10.00,
@@ -1321,7 +1357,7 @@ class PurchasingSampleDataSeeder extends Seeder
                 'quantity_rejected' => 0.00,
             ],
             [
-                'number' => "GR-{$year}-990004",
+                'number' => "GR-{$year}-000104",
                 'status' => 'cancelled',
                 'po_status' => 'cancelled',
                 'quantity_received' => 1.00,
@@ -1350,7 +1386,7 @@ class PurchasingSampleDataSeeder extends Seeder
                     'purchase_order_id' => $purchaseOrder->id,
                     'warehouse_id' => $warehouse->id,
                     'receipt_date' => now()->subDays(12 - $index)->toDateString(),
-                    'supplier_delivery_note' => 'SJ-' . now()->format('Ymd') . '-99' . ($index + 1),
+                    'supplier_delivery_note' => 'SJ-' . $year . '-0001' . str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT),
                     'status' => $definition['status'],
                     'notes' => 'Penerimaan barang sesuai pesanan pembelian',
                     'received_by' => $requesterId,
@@ -1394,21 +1430,42 @@ class PurchasingSampleDataSeeder extends Seeder
     ): void {
         $year = now()->format('Y');
 
-        $baseReceipt = $goodsReceipts['confirmed_2'] ?? $goodsReceipts['confirmed_3'] ?? null;
-        $baseReceiptItem = $goodsReceiptItems['confirmed_2'] ?? $goodsReceiptItems['confirmed_3'] ?? null;
-        $baseOrder = $purchaseOrders['fully_received'] ?? $purchaseOrders['partially_received'] ?? null;
+        foreach (SupplierReturn::query()->where('return_number', 'like', "SR-{$year}-99%")->get() as $legacy) {
+            $target = "SR-{$year}-0001" . substr($legacy->return_number, -2);
 
-        if (! $baseReceipt || ! $baseReceiptItem || ! $baseOrder) {
+            if (SupplierReturn::query()->where('return_number', $target)->exists()) {
+                $legacy->delete();
+            } else {
+                $legacy->update(['return_number' => $target]);
+            }
+        }
+
+        // Retur tersebar ke beberapa PO/GR, bukan menumpuk di satu dokumen
+        // (W6-12).
+        $candidates = [];
+
+        foreach ($goodsReceipts as $key => $receipt) {
+            $item = $goodsReceiptItems[$key] ?? null;
+            $order = $receipt ? PurchaseOrder::query()->find($receipt->purchase_order_id) : null;
+
+            if ($receipt && $item && $order) {
+                $candidates[] = [$order, $receipt, $item];
+            }
+        }
+
+        if ($candidates === []) {
             return;
         }
 
         $definitions = [
-            ['number' => "SR-{$year}-990001", 'status' => 'draft', 'reason' => 'damaged', 'quantity' => 1.00],
-            ['number' => "SR-{$year}-990002", 'status' => 'confirmed', 'reason' => 'defective', 'quantity' => 2.00],
-            ['number' => "SR-{$year}-990003", 'status' => 'cancelled', 'reason' => 'other', 'quantity' => 1.00],
+            ['number' => "SR-{$year}-000101", 'status' => 'draft', 'reason' => 'damaged', 'quantity' => 1.00],
+            ['number' => "SR-{$year}-000102", 'status' => 'confirmed', 'reason' => 'defective', 'quantity' => 2.00],
+            ['number' => "SR-{$year}-000103", 'status' => 'cancelled', 'reason' => 'other', 'quantity' => 1.00],
         ];
 
         foreach ($definitions as $index => $definition) {
+            [$baseOrder, $baseReceipt, $baseReceiptItem] = $candidates[$index % count($candidates)];
+
             $supplierReturn = SupplierReturn::updateOrCreate(
                 ['return_number' => $definition['number']],
                 [
@@ -1488,7 +1545,7 @@ class PurchasingSampleDataSeeder extends Seeder
             'transition_id' => null,
             'performed_by' => $adminUserId,
             'comment' => 'Initial pipeline assignment',
-            'created_at' => now()->subDays($baseDays),
+            'created_at' => now()->subDays($baseDays)->subMinutes($baseDays * 11),
         ]);
 
         $step = $baseDays - 1;
@@ -1512,7 +1569,7 @@ class PurchasingSampleDataSeeder extends Seeder
                 'transition_id' => $transition?->id,
                 'performed_by' => $adminUserId,
                 'comment' => null,
-                'created_at' => now()->subDays(max(1, $step)),
+                'created_at' => now()->subDays(max(1, $step))->subMinutes($step * 11),
             ]);
 
             $step--;

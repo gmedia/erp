@@ -31,6 +31,7 @@ export default function InventoryValuationReportPage() {
             queryKey={['inventory-valuation-report']}
             entityName="Inventory Valuation"
             exportEndpoint="/api/reports/inventory-valuation/export"
+            defaultColumnVisibility={{ unit_name: false, moved_at: false }}
         />
     );
 }

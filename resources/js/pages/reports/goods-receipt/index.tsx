@@ -33,6 +33,12 @@ export default function GoodsReceiptReportPage() {
             queryKey={['goods-receipt-report']}
             entityName="Goods Receipt Report"
             exportEndpoint="/api/reports/goods-receipt/export"
+            defaultColumnVisibility={{
+                'warehouse.name': false,
+                item_count: false,
+                total_received_quantity: false,
+                total_rejected_quantity: false,
+            }}
         />
     );
 }

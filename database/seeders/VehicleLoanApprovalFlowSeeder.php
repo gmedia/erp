@@ -32,8 +32,20 @@ class VehicleLoanApprovalFlowSeeder extends Seeder
             return;
         }
 
+        // Kode lama memakai titik; seragamkan ke snake_case (W6-09).
+        $targetCode = config('vehicle_loan.approval_flow_code');
+        $legacy = ApprovalFlow::query()->where('code', 'vehicle-loan.default')->first();
+
+        if ($legacy) {
+            if (ApprovalFlow::query()->where('code', $targetCode)->exists()) {
+                $legacy->delete();
+            } else {
+                $legacy->update(['code' => $targetCode]);
+            }
+        }
+
         $flow = ApprovalFlow::updateOrCreate(
-            ['code' => config('vehicle_loan.approval_flow_code')],
+            ['code' => $targetCode],
             [
                 'name' => 'Vehicle Loan Default Approval',
                 'approvable_type' => config('vehicle_loan.approvable_type'),

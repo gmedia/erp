@@ -196,8 +196,8 @@ test('cash flow calculations are correct', function () {
         ->assertStatus(200)
         ->assertJsonCount(1, 'report')
         ->assertJsonPath('report.0.code', '1100')
-        ->assertJsonPath('report.0.inflow', 800)
-        ->assertJsonPath('report.0.outflow', 0);
+        ->assertJsonPath('report.0.inflow', 1000)
+        ->assertJsonPath('report.0.outflow', 200);
 });
 
 test('balance sheet accounts include net income in equity', function () {

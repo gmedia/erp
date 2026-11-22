@@ -32,6 +32,7 @@ export default function PipelineAuditTrail() {
             queryKey={['pipeline-audit-trail']}
             entityName="Audit Trail"
             exportEndpoint="/api/pipeline-audit-trail/export"
+            defaultColumnVisibility={{ comment: false, transition_name: false }}
             buildColumns={createPipelineAuditTrailColumns}
             renderDetailModal={({ item, open, onOpenChange }) => (
                 <DetailModal

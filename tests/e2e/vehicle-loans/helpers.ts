@@ -91,9 +91,9 @@ export async function seedApprovedLoan(page: Page): Promise<number> {
         data?: Array<{ id: number; code: string }>;
     };
     const flow = flows.data?.find(
-        (item) => item.code === 'vehicle-loan.default',
+        (item) => item.code === 'vehicle_loan_default',
     );
-    if (!flow) throw new Error('vehicle-loan.default flow not found');
+    if (!flow) throw new Error('vehicle_loan_default flow not found');
 
     // Submit the draft first so the real approval engine creates the request;
     // then approve it via My Approvals API.

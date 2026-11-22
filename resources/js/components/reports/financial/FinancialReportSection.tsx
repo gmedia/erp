@@ -253,7 +253,7 @@ export function FinancialReportSection({
                     <div className="flex w-full flex-wrap justify-between gap-2 text-right whitespace-nowrap tabular-nums sm:w-auto sm:flex-nowrap sm:justify-end sm:gap-4">
                         <span
                             className={cn(
-                                'text-lg font-bold sm:w-40',
+                                'text-lg font-bold sm:w-44',
                                 getSignedAmountTextClass(total),
                             )}
                         >
@@ -263,7 +263,7 @@ export function FinancialReportSection({
                             <>
                                 <span
                                     className={cn(
-                                        'text-lg font-bold text-muted-foreground sm:w-40',
+                                        'text-lg font-bold text-muted-foreground sm:w-44',
                                         getSignedAmountTextClass(
                                             comparisonTotal || 0,
                                         ),
@@ -273,7 +273,7 @@ export function FinancialReportSection({
                                 </span>
                                 <span
                                     className={cn(
-                                        'text-lg font-bold sm:w-36',
+                                        'text-lg font-bold sm:w-40',
                                         changeTextClass,
                                     )}
                                 >
@@ -281,7 +281,7 @@ export function FinancialReportSection({
                                 </span>
                                 <span
                                     className={cn(
-                                        'text-lg font-bold sm:w-20',
+                                        'text-lg font-bold sm:w-24',
                                         getChangePercentageTextClass(
                                             changePercentage,
                                             comparisonTotal,

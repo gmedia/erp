@@ -12,6 +12,8 @@ use App\Models\Position;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
@@ -255,6 +257,8 @@ class DatabaseSeeder extends Seeder
             $this->call(SubledgerGlReconciliationSeeder::class);
         }
 
+        $this->spreadIdenticalAuditTimestamps();
+
         // Assign all permissions to sample users for easy testing
         $allPermissions = Permission::all();
         foreach ([
@@ -267,6 +271,31 @@ class DatabaseSeeder extends Seeder
             $employee = Employee::where('email', $email)->first();
             if ($employee) {
                 $employee->permissions()->sync($allPermissions);
+            }
+        }
+    }
+
+    /**
+     * Seeder membuat banyak log pada detik yang sama; geser tiap duplikat
+     * beberapa detik agar audit trail tidak tampak identik (W6-14).
+     */
+    private function spreadIdenticalAuditTimestamps(): void
+    {
+        foreach (['pipeline_state_logs', 'approval_audit_logs'] as $table) {
+            $rows = DB::table($table)->orderBy('id')->get(['id', 'created_at']);
+            $seen = [];
+
+            foreach ($rows as $row) {
+                $key = (string) $row->created_at;
+                $seen[$key] = ($seen[$key] ?? 0) + 1;
+
+                if ($seen[$key] === 1 || $row->created_at === null) {
+                    continue;
+                }
+
+                DB::table($table)->where('id', $row->id)->update([
+                    'created_at' => Carbon::parse($row->created_at)->addSeconds($seen[$key] - 1),
+                ]);
             }
         }
     }

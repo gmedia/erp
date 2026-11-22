@@ -67,10 +67,10 @@ export const TopOverdueSuppliers = memo<TopOverdueSuppliersProps>(
                                 <TableHead className="text-right">
                                     Outstanding
                                 </TableHead>
-                                <TableHead className="text-right">
+                                <TableHead className="hidden text-right 2xl:table-cell">
                                     Bills
                                 </TableHead>
-                                <TableHead className="text-right">
+                                <TableHead className="hidden text-right 2xl:table-cell">
                                     Oldest Due
                                 </TableHead>
                                 <TableHead className="text-right">
@@ -94,10 +94,10 @@ export const TopOverdueSuppliers = memo<TopOverdueSuppliersProps>(
                                             supplier.outstanding_amount,
                                         )}
                                     </TableCell>
-                                    <TableCell className="text-right tabular-nums">
+                                    <TableCell className="hidden text-right tabular-nums 2xl:table-cell">
                                         {supplier.bill_count}
                                     </TableCell>
-                                    <TableCell className="text-right tabular-nums">
+                                    <TableCell className="hidden text-right tabular-nums 2xl:table-cell">
                                         {formatDateByRegionalSettings(
                                             supplier.oldest_due_date,
                                         )}

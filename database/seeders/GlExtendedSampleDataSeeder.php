@@ -50,21 +50,37 @@ class GlExtendedSampleDataSeeder extends Seeder
 
     private function seedRecurringJournals(FiscalYear $fiscalYear, Collection $accounts, User $user): void
     {
-        foreach ([750000, 1250000, 2500000, 3750000] as $index => $amount) {
-            $name = 'Jurnal Berulang Beban Operasional ' . ($index + 1);
-            $legacyName = 'Recurring Journal Sample ' . ($index + 1);
+        $definitions = [
+            ['name' => 'Sewa Kantor Bulanan', 'amount' => 750000, 'frequency' => 'monthly'],
+            ['name' => 'Listrik dan Air', 'amount' => 1250000, 'frequency' => 'monthly'],
+            ['name' => 'Internet dan Telepon', 'amount' => 2500000, 'frequency' => 'monthly'],
+            ['name' => 'Jasa Kebersihan', 'amount' => 3750000, 'frequency' => 'monthly'],
+        ];
 
-            $legacyJournals = RecurringJournal::where('name', $legacyName)
-                ->where('fiscal_year_id', $fiscalYear->id)
-                ->get();
+        foreach ($definitions as $index => $definition) {
+            $name = $definition['name'];
 
-            if (RecurringJournal::where('name', $name)->where('fiscal_year_id', $fiscalYear->id)->exists()) {
+            // Bersihkan nama demo lama (W5-22/W6-13).
+            $legacyNames = [
+                'Recurring Journal Sample ' . ($index + 1),
+                'Jurnal Berulang Beban Operasional ' . ($index + 1),
+            ];
+
+            foreach ($legacyNames as $legacyName) {
+                $legacyJournals = RecurringJournal::where('name', $legacyName)
+                    ->where('fiscal_year_id', $fiscalYear->id)
+                    ->get();
+
                 foreach ($legacyJournals as $legacyJournal) {
-                    $legacyJournal->lines()->delete();
-                    $legacyJournal->delete();
+                    if (RecurringJournal::where('name', $name)->where('fiscal_year_id', $fiscalYear->id)->exists()) {
+                        $legacyJournal->lines()->delete();
+                        $legacyJournal->delete();
+                    } else {
+                        $legacyJournal->update(['name' => $name]);
+
+                        break;
+                    }
                 }
-            } elseif ($legacyJournals->isNotEmpty()) {
-                $legacyJournals->first()->update(['name' => $name]);
             }
 
             $journal = RecurringJournal::updateOrCreate(
@@ -72,17 +88,18 @@ class GlExtendedSampleDataSeeder extends Seeder
                 [
                     'description' => $name . ' - {MM}/{YYYY}',
                     'reference_template' => 'RJ-{YYYY}-{MM}-{DD}-' . str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT),
-                    'frequency' => $index === 0 ? 'weekly' : 'monthly',
-                    'next_run_date' => now()->startOfMonth()->addMonths($index),
-                    'total_amount' => $amount,
+                    'frequency' => $definition['frequency'],
+                    // Selalu jadwal berikutnya, tidak pernah di masa lalu (W6-13).
+                    'next_run_date' => now()->startOfMonth()->addMonths($index + 1),
+                    'total_amount' => $definition['amount'],
                     'created_by' => $user->id,
                 ],
             );
 
             $journal->lines()->delete();
             $journal->lines()->createMany([
-                ['account_id' => $accounts[0]->id, 'debit' => $amount, 'credit' => 0, 'memo' => 'Beban operasional bulanan'],
-                ['account_id' => $accounts[1]->id, 'debit' => 0, 'credit' => $amount, 'memo' => 'Kas keluar untuk beban operasional'],
+                ['account_id' => $accounts[0]->id, 'debit' => $definition['amount'], 'credit' => 0, 'memo' => 'Beban operasional bulanan'],
+                ['account_id' => $accounts[1]->id, 'debit' => 0, 'credit' => $definition['amount'], 'memo' => 'Kas keluar untuk beban operasional'],
             ]);
         }
     }

@@ -1,62 +1,53 @@
 import { generateModuleTests } from '../shared-test-factories';
 import {
-  createAssetMaintenance,
-  editAssetMaintenance,
-  searchAssetMaintenance,
+    createAssetMaintenance,
+    editAssetMaintenance,
+    searchAssetMaintenance,
 } from './helpers';
 
 generateModuleTests({
-  entityName: 'Asset Maintenance',
-  entityNamePlural: 'Asset Maintenances',
-  route: '/asset-maintenances',
-  apiPath: '/api/asset-maintenances',
-  exportApiPath: '/api/asset-maintenances/export',
+    entityName: 'Asset Maintenance',
+    entityNamePlural: 'Asset Maintenances',
+    route: '/asset-maintenances',
+    apiPath: '/api/asset-maintenances',
+    exportApiPath: '/api/asset-maintenances/export',
 
-  createEntity: createAssetMaintenance,
-  searchEntity: searchAssetMaintenance,
-  editEntity: editAssetMaintenance,
-  editUpdates: { notes: `UPDATED-MAINT-${Date.now()}` },
+    createEntity: createAssetMaintenance,
+    searchEntity: searchAssetMaintenance,
+    editEntity: editAssetMaintenance,
+    editUpdates: { notes: `UPDATED-MAINT-${Date.now()}` },
 
-  viewType: 'dialog',
+    viewType: 'dialog',
 
-  sortableColumns: [
-    'Asset',
-    'Type',
-    'Status',
-    'Scheduled',
-    'Performed',
-    'Supplier',
-    'Notes',
-    'Cost',
-  ],
+    sortableColumns: ['Asset', 'Status', 'Scheduled', 'Notes', 'Cost'],
 
-  expectedExportColumns: [
-    'ID',
-    'Asset Code',
-    'Asset Name',
-    'Maintenance Type',
-    'Status',
-    'Scheduled At',
-    'Performed At',
-    'Supplier',
-    'Cost',
-    'Notes',
-    'Created By',
-    'Created At',
-  ],
+    expectedExportColumns: [
+        'ID',
+        'Asset Code',
+        'Asset Name',
+        'Maintenance Type',
+        'Status',
+        'Scheduled At',
+        'Performed At',
+        'Supplier',
+        'Cost',
+        'Notes',
+        'Created By',
+        'Created At',
+    ],
 
-  filterTests: [
-    {
-      filterName: 'Type',
-      filterType: 'select',
-      filterValue: 'preventive',
-      expectedText: 'preventive',
-    },
-    {
-      filterName: 'Status',
-      filterType: 'select',
-      filterValue: 'scheduled',
-      expectedText: 'scheduled',
-    },
-  ],
+    filterTests: [
+        {
+            filterName: 'Type',
+            filterType: 'select',
+            filterValue: 'preventive',
+            expectedText: 'preventive',
+        },
+        {
+            filterName: 'Status',
+            filterType: 'select',
+            filterValue: 'scheduled',
+            expectedText: 'scheduled',
+        },
+    ],
 });

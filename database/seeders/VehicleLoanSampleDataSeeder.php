@@ -506,6 +506,9 @@ class VehicleLoanSampleDataSeeder extends Seeder
             ['asset_code' => 'FA-000013', 'name' => 'Mitsubishi L300 Pickup', 'plate' => 'B 9012 DEF', 'type' => 'car', 'capacity' => 3],
         ];
 
+        // Kendaraan operasional berada di department Operations (W6-16).
+        $operationsDepartment = Department::query()->where('name', 'Operations')->first();
+
         $units = [];
 
         foreach ($vehicles as $vehicle) {
@@ -515,6 +518,7 @@ class VehicleLoanSampleDataSeeder extends Seeder
                     'name' => $vehicle['name'],
                     'asset_category_id' => $category->id,
                     'branch_id' => $branchId,
+                    'department_id' => $operationsDepartment?->id,
                     'purchase_date' => now()->subYears(3)->toDateString(),
                     'purchase_cost' => 150000000,
                     'currency' => 'IDR',

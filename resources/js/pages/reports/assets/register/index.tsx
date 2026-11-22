@@ -33,6 +33,13 @@ export default function AssetRegisterReport() {
             queryKey={['assets-report']}
             entityName="Asset"
             exportEndpoint="/reports/assets/register/export"
+            defaultColumnVisibility={{
+                branch: false,
+                department: false,
+                supplier: false,
+                location: false,
+                purchase_date: false,
+            }}
         />
     );
 }
