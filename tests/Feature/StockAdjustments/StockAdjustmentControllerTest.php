@@ -192,24 +192,28 @@ describe('Stock Adjustment API Endpoints', function () {
         $adjustment = StockAdjustment::factory()->create([
             'warehouse_id' => $warehouse->id,
             'status' => 'draft',
+            'approved_at' => null,
         ]);
 
-        $dbg = putJson("/api/stock-adjustments/{$adjustment->id}", [
-            'status' => 'approved',
-            'items' => [
-                [
-                    'product_id' => $productIn->id,
-                    'unit_id' => $unit->id,
-                    'quantity_adjusted' => 5,
-                ],
-                [
-                    'product_id' => $productOut->id,
-                    'unit_id' => $unit->id,
-                    'quantity_adjusted' => -3,
-                ],
-            ],
+        // Item sudah tersimpan sebelum approval (alur nyata: draft → approve).
+        $adjustment->items()->create([
+            'product_id' => $productIn->id,
+            'unit_id' => $unit->id,
+            'quantity_before' => 10,
+            'quantity_adjusted' => 5,
+            'quantity_after' => 15,
         ]);
-        $dbg->assertOk();
+        $adjustment->items()->create([
+            'product_id' => $productOut->id,
+            'unit_id' => $unit->id,
+            'quantity_before' => 10,
+            'quantity_adjusted' => -3,
+            'quantity_after' => 7,
+        ]);
+
+        putJson("/api/stock-adjustments/{$adjustment->id}", [
+            'status' => 'approved',
+        ])->assertOk();
 
         assertDatabaseHas('stock_movements', [
             'movement_type' => 'adjustment_in',

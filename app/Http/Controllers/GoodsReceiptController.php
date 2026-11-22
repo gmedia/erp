@@ -96,9 +96,7 @@ class GoodsReceiptController extends Controller
                 $syncItems->execute($goodsReceipt, $items);
             },
             afterCommit: $isNewlyConfirmed
-                ? function (GoodsReceipt $goodsReceipt) use ($postJournal, $postMovements): void {
-                    $postMovements->execute($goodsReceipt->refresh());
-
+                ? function (GoodsReceipt $goodsReceipt) use ($postJournal): void {
                     try {
                         $postJournal->execute($goodsReceipt->refresh());
                     } catch (ValidationException $e) {
@@ -114,6 +112,11 @@ class GoodsReceiptController extends Controller
                 }
             : null,
         );
+
+        if ($isNewlyConfirmed) {
+            // Setelah commit: movement tetap ada walau posting jurnal gagal.
+            $postMovements->execute($goodsReceipt->refresh());
+        }
 
         return (new GoodsReceiptResource($this->loadResourceRelations($goodsReceipt)))->response();
     }

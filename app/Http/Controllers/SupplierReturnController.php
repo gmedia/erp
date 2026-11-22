@@ -109,9 +109,7 @@ class SupplierReturnController extends Controller
                 $syncItems->execute($supplierReturn, $items);
             },
             afterCommit: $isNewlyConfirmed
-                ? function (SupplierReturn $supplierReturn) use ($postJournal, $postMovements): void {
-                    $postMovements->execute($supplierReturn->refresh());
-
+                ? function (SupplierReturn $supplierReturn) use ($postJournal): void {
                     try {
                         $postJournal->execute($supplierReturn->refresh());
                     } catch (ValidationException $e) {
@@ -137,6 +135,11 @@ class SupplierReturnController extends Controller
             'items.product',
             'items.unit',
         ]);
+
+        if ($isNewlyConfirmed) {
+            // Setelah commit: movement tetap ada walau posting jurnal gagal.
+            $postMovements->execute($supplierReturn->refresh());
+        }
 
         return (new SupplierReturnResource($supplierReturn))->response();
     }

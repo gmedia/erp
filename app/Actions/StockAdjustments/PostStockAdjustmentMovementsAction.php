@@ -22,7 +22,8 @@ class PostStockAdjustmentMovementsAction
             return;
         }
 
-        $stockAdjustment->loadMissing('items');
+        // load() (bukan loadMissing) agar relasi tidak memakai cache pra-sync.
+        $stockAdjustment->load('items');
 
         foreach ($stockAdjustment->items as $item) {
             $quantity = (float) $item->quantity_adjusted;

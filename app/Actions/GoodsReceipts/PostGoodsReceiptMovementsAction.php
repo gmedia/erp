@@ -21,7 +21,8 @@ class PostGoodsReceiptMovementsAction
             return;
         }
 
-        $goodsReceipt->loadMissing('items');
+        // load() (bukan loadMissing) agar relasi tidak memakai cache pra-sync.
+        $goodsReceipt->load('items');
 
         foreach ($goodsReceipt->items as $item) {
             $quantity = (float) $item->quantity_accepted;

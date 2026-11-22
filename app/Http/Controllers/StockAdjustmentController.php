@@ -103,9 +103,7 @@ class StockAdjustmentController extends Controller
                 $syncItems->execute($stockAdjustment, $items);
             },
             afterCommit: $isNewlyApproved
-                ? function (StockAdjustment $stockAdjustment) use ($postJournal, $postMovements): void {
-                    $postMovements->execute($stockAdjustment->refresh());
-
+                ? function (StockAdjustment $stockAdjustment) use ($postJournal): void {
                     try {
                         $postJournal->execute($stockAdjustment->refresh());
                     } catch (ValidationException $e) {
@@ -121,6 +119,12 @@ class StockAdjustmentController extends Controller
                 }
             : null,
         );
+
+        if ($isNewlyApproved) {
+            // Setelah transaksi commit: movement tidak boleh ikut rollback bila
+            // posting jurnal gagal (W5-19).
+            $postMovements->execute($stockAdjustment->refresh());
+        }
 
         $stockAdjustment->load(['warehouse', 'inventoryStocktake', 'journalEntry', 'items.product', 'items.unit']);
 
