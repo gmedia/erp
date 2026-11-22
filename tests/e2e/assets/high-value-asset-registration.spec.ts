@@ -281,7 +281,7 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
     // This test uses a fully approved asset from seed data (FA-000011, 450M, already active)
     // to verify that high-value assets can reach Active state
     await login(page, DEFAULT_E2E_EMAIL, undefined, { requireDashboard: false });
-    await goToAssetProfile(page, 'Manager Car (Toyota Camry)');
+    await goToAssetProfile(page, 'Toyota Camry');
 
     // Badge should show "Active" — this asset (450M) is already active in seeder
     await expect(page.getByText('Active', { exact: true }).first()).toBeVisible();

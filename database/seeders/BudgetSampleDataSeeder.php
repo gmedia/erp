@@ -15,9 +15,9 @@ class BudgetSampleDataSeeder extends Seeder
     public function run(): void
     {
         foreach ([
-            'Sample draft operational budget for testing Budget module.' => 'Anggaran operasional tahunan versi draft',
-            'Sample approved operational budget for testing Budget module.' => 'Anggaran operasional tahunan yang telah disetujui',
-            'Sample locked capital budget for testing Budget module.' => 'Anggaran modal yang telah dikunci',
+            'Sample draft operational budget for testing Budget module.' => 'Anggaran operasional tahunan (rencana awal)',
+            'Sample approved operational budget for testing Budget module.' => 'Anggaran operasional triwulan I yang telah disetujui',
+            'Sample locked capital budget for testing Budget module.' => 'Anggaran belanja modal tahunan',
         ] as $legacy => $current) {
             Budget::where('description', $legacy)->update(['description' => $current]);
         }
@@ -56,8 +56,8 @@ class BudgetSampleDataSeeder extends Seeder
 
         $budgetDefinitions = [
             [
-                'name' => "Operational Budget {$fyName} (Draft)",
-                'description' => 'Anggaran operasional tahunan versi draft',
+                'name' => "Anggaran Operasional {$fyName}",
+                'description' => 'Anggaran operasional tahunan (rencana awal)',
                 'budget_type' => 'operational',
                 'status' => 'draft',
                 'approved' => false,
@@ -71,8 +71,8 @@ class BudgetSampleDataSeeder extends Seeder
                 ],
             ],
             [
-                'name' => "Operational Budget {$fyName} (Approved)",
-                'description' => 'Anggaran operasional tahunan yang telah disetujui',
+                'name' => "Anggaran Operasional Triwulan I {$fyName}",
+                'description' => 'Anggaran operasional triwulan I yang telah disetujui',
                 'budget_type' => 'operational',
                 'status' => 'approved',
                 'approved' => true,
@@ -87,8 +87,8 @@ class BudgetSampleDataSeeder extends Seeder
                 ],
             ],
             [
-                'name' => "Capital Budget {$fyName} (Locked)",
-                'description' => 'Anggaran modal yang telah dikunci',
+                'name' => "Anggaran Modal {$fyName}",
+                'description' => 'Anggaran belanja modal tahunan',
                 'budget_type' => 'capital',
                 'status' => 'locked',
                 'approved' => true,
@@ -108,18 +108,25 @@ class BudgetSampleDataSeeder extends Seeder
                 $totalAmount += $line['amount'];
             }
 
-            $budget = Budget::create([
-                'ulid' => Str::ulid()->toBase32(),
-                'fiscal_year_id' => $fiscalYear->id,
-                'name' => $definition['name'],
-                'description' => $definition['description'],
-                'budget_type' => $definition['budget_type'],
-                'status' => $definition['status'],
-                'total_amount' => $totalAmount,
-                'created_by' => $adminUserId,
-                'approved_by' => $definition['approved'] ? $adminUserId : null,
-                'approved_at' => $definition['approved'] ? now() : null,
-            ]);
+            // Idempoten: satu budget per (fiscal_year, nama).
+            $budget = Budget::updateOrCreate(
+                [
+                    'fiscal_year_id' => $fiscalYear->id,
+                    'name' => $definition['name'],
+                ],
+                [
+                    'ulid' => Str::ulid()->toBase32(),
+                    'description' => $definition['description'],
+                    'budget_type' => $definition['budget_type'],
+                    'status' => $definition['status'],
+                    'total_amount' => $totalAmount,
+                    'created_by' => $adminUserId,
+                    'approved_by' => $definition['approved'] ? $adminUserId : null,
+                    'approved_at' => $definition['approved'] ? now() : null,
+                ]);
+
+            // Idempoten: baris budget demo dibuat ulang tiap seed.
+            BudgetLine::query()->where('budget_id', $budget->id)->delete();
 
             foreach ($definition['lines'] as $line) {
                 $account = $definition['accounts'][$line['account_offset']] ?? null;

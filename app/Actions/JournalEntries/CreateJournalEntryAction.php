@@ -73,7 +73,12 @@ class CreateJournalEntryAction
                     // Generate Entry Number
                     // We use max() instead of count() to handle deletions correctly (gaps in sequence)
                     // Format: JV-{Year}-XXXXX
+                    // Batasi ke prefix JV-<tahun> agar entri non-JV (mis. saldo
+                    // awal REC-) tidak merusak urutan nomor.
+                    $entryPrefix = 'JV-' . $fiscalYear->name . '-';
+
                     $lastEntry = JournalEntry::where('fiscal_year_id', $fiscalYear->id)
+                        ->where('entry_number', 'like', $entryPrefix . '%')
                         ->lockForUpdate()
                         ->orderBy('entry_number', 'desc')
                         ->first();

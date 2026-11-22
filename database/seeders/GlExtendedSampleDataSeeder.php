@@ -89,13 +89,19 @@ class GlExtendedSampleDataSeeder extends Seeder
 
     private function seedBankReconciliations(FiscalYear $fiscalYear, Collection $accounts, User $user): void
     {
+        // Akun rekonsiliasi harus akun bank leaf, bukan akun induk (W5-21).
+        $bankAccount = Account::query()
+            ->where('code', '11110')
+            ->first() ?? $accounts[0];
+
+        // Tidak ada periode masa depan (W5-21): bulan berjalan + bulan lalu.
         foreach ([['in_progress', null], ['completed', now()]] as $index => [$status, $completedAt]) {
-            $periodStart = now()->startOfMonth()->addMonths($index);
-            $periodEnd = now()->startOfMonth()->addMonths($index)->endOfMonth();
+            $periodStart = now()->startOfMonth()->subMonths(1 - $index);
+            $periodEnd = now()->startOfMonth()->subMonths(1 - $index)->endOfMonth();
 
             $reconciliation = BankReconciliation::updateOrCreate(
                 [
-                    'account_id' => $accounts[0]->id,
+                    'account_id' => $bankAccount->id,
                     'period_start' => $periodStart->toDateString(),
                     'period_end' => $periodEnd->toDateString(),
                 ],

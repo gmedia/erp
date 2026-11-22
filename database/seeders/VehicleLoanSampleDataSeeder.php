@@ -435,9 +435,9 @@ class VehicleLoanSampleDataSeeder extends Seeder
     private function ensureDrivers(User $admin): array
     {
         $people = [
-            ['employee_id' => 'EMP-2021-0145', 'name' => 'Budi Santoso', 'email' => 'budi.santoso@example.com', 'phone' => '081234567811', 'license' => 'SIM-B-2024-00123', 'type' => 'B'],
-            ['employee_id' => 'EMP-2022-0117', 'name' => 'Agus Setiawan', 'email' => 'agus.setiawan@example.com', 'phone' => '081234567812', 'license' => 'SIM-B-2022-01170', 'type' => 'B'],
-            ['employee_id' => 'EMP-2020-0088', 'name' => 'Joko Susilo', 'email' => 'joko.susilo@example.com', 'phone' => '081234567813', 'license' => 'SIM-A-2020-00881', 'type' => 'A'],
+            ['employee_id' => 'EMP-000006', 'name' => 'Budi Santoso', 'email' => 'budi.santoso@example.com', 'phone' => '081234567811', 'license' => 'SIM-B-2024-00123', 'type' => 'B'],
+            ['employee_id' => 'EMP-000007', 'name' => 'Agus Setiawan', 'email' => 'agus.setiawan@example.com', 'phone' => '081234567812', 'license' => 'SIM-B-2022-01170', 'type' => 'B'],
+            ['employee_id' => 'EMP-000008', 'name' => 'Joko Susilo', 'email' => 'joko.susilo@example.com', 'phone' => '081234567813', 'license' => 'SIM-A-2020-00881', 'type' => 'A'],
         ];
 
         $companyId = Company::query()->value('id');
@@ -501,9 +501,9 @@ class VehicleLoanSampleDataSeeder extends Seeder
         }
 
         $vehicles = [
-            ['asset_code' => 'FA-2021-0145', 'name' => 'Toyota Avanza 1.5 G', 'plate' => 'B 1234 XYZ', 'type' => 'car', 'capacity' => 5],
-            ['asset_code' => 'FA-2022-0117', 'name' => 'Honda Vario 160 CBS', 'plate' => 'B 5678 ABC', 'type' => 'motorcycle', 'capacity' => 2],
-            ['asset_code' => 'FA-2020-0088', 'name' => 'Mitsubishi L300 Pickup', 'plate' => 'B 9012 DEF', 'type' => 'car', 'capacity' => 3],
+            ['asset_code' => 'FA-000014', 'name' => 'Toyota Avanza 1.5 G', 'plate' => 'B 1234 XYZ', 'type' => 'car', 'capacity' => 5],
+            ['asset_code' => 'FA-000015', 'name' => 'Honda Vario 160 CBS', 'plate' => 'B 5678 ABC', 'type' => 'motorcycle', 'capacity' => 2],
+            ['asset_code' => 'FA-000013', 'name' => 'Mitsubishi L300 Pickup', 'plate' => 'B 9012 DEF', 'type' => 'car', 'capacity' => 3],
         ];
 
         $units = [];

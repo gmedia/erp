@@ -26,12 +26,14 @@ class ProductCategorySeeder extends Seeder
         ];
 
         foreach ($categories as $category) {
-            DB::table('product_categories')->insert([
-                'name' => $category['name'],
-                'description' => $category['description'],
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            // Idempoten: seed ulang tidak boleh melanggar unique(name).
+            DB::table('product_categories')->updateOrInsert(
+                ['name' => $category['name']],
+                [
+                    'description' => $category['description'],
+                    'updated_at' => now(),
+                ],
+            );
         }
     }
 }

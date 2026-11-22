@@ -36,12 +36,14 @@ class UnitSeeder extends Seeder
         ];
 
         foreach ($units as $unit) {
-            DB::table('units')->insert([
-                'name' => $unit['name'],
-                'symbol' => $unit['symbol'],
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            // Idempoten: seed ulang tidak boleh melanggar unique(name).
+            DB::table('units')->updateOrInsert(
+                ['name' => $unit['name']],
+                [
+                    'symbol' => $unit['symbol'],
+                    'updated_at' => now(),
+                ],
+            );
         }
     }
 }

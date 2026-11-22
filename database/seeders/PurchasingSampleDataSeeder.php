@@ -55,7 +55,40 @@ class PurchasingSampleDataSeeder extends Seeder
             ]);
         }
 
-        $supplier = Supplier::query()->first();
+        // Beberapa supplier dengan kategori yang cocok (W5-23).
+        $supplierSeeds = [
+            ['email' => 'procurement@vendor.example', 'name' => 'PT Sumber Makmur Sejahtera', 'category' => 'Office Supplies', 'phone' => '0215551234'],
+            ['email' => 'sales@nusantara-elektronik.example', 'name' => 'PT Nusantara Elektronik', 'category' => 'Electronics', 'phone' => '0215552345'],
+            ['email' => 'order@mebel-jaya.example', 'name' => 'CV Mebel Jaya Abadi', 'category' => 'Furniture', 'phone' => '0225553456'],
+            ['email' => 'kontak@logistik-cepat.example', 'name' => 'PT Logistik Cepat Nusantara', 'category' => 'Logistics', 'phone' => '0315554567'],
+            ['email' => 'it@solusi-digital.example', 'name' => 'PT Solusi Digital Teknologi', 'category' => 'IT Services', 'phone' => '0215555678'],
+        ];
+
+        foreach ($supplierSeeds as $seed) {
+            $categoryId = SupplierCategory::query()
+                ->where('name', $seed['category'])
+                ->value('id')
+                ?? SupplierCategory::query()->value('id');
+
+            Supplier::updateOrCreate(
+                ['email' => $seed['email']],
+                [
+                    'name' => $seed['name'],
+                    'phone' => $seed['phone'],
+                    'address' => 'Jl. Industri Raya No. 12, Tangerang',
+                    'branch_id' => $branchId,
+                    'category_id' => $categoryId,
+                    'status' => 'active',
+                ],
+            );
+        }
+
+        $suppliers = Supplier::query()
+            ->whereIn('email', array_column($supplierSeeds, 'email'))
+            ->orderBy('id')
+            ->get();
+
+        $supplier = $suppliers->first();
         if (! $supplier) {
             $categoryId = SupplierCategory::query()->value('id');
             if (! $categoryId) {
@@ -955,8 +988,9 @@ class PurchasingSampleDataSeeder extends Seeder
             $firstProduct = $products[($index + 2) % $products->count()];
             $secondProduct = $products[($index + 3) % $products->count()];
 
-            $firstQuantity = 10.00;
-            $secondQuantity = 6.00;
+            // Kuantitas bervariasi agar data demo tidak seragam (W5-23).
+            $firstQuantity = (float) (6 + (($index * 5) % 17));
+            $secondQuantity = (float) (3 + (($index * 3) % 11));
 
             $firstUnitPrice = (float) ($firstProduct->cost ?? 12000);
             $secondUnitPrice = (float) ($secondProduct->cost ?? 14000);
@@ -981,10 +1015,16 @@ class PurchasingSampleDataSeeder extends Seeder
 
             $approved = in_array($status, ['confirmed', 'partially_received', 'fully_received', 'closed'], true);
 
+            // Rotasi supplier aktif agar tidak semua PO ke vendor yang sama.
+            $poSuppliers = Supplier::query()->orderBy('id')->get();
+            $poSupplierId = $poSuppliers->isEmpty()
+                ? $supplier->id
+                : $poSuppliers[$index % $poSuppliers->count()]->id;
+
             $purchaseOrder = PurchaseOrder::updateOrCreate(
                 ['po_number' => $definition['number']],
                 [
-                    'supplier_id' => $supplier->id,
+                    'supplier_id' => $poSupplierId,
                     'warehouse_id' => $warehouse->id,
                     'order_date' => now()->subDays(24 - $index)->toDateString(),
                     'expected_delivery_date' => now()->subDays(18 - $index)->toDateString(),
