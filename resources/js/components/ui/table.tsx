@@ -36,7 +36,7 @@ function Table({
       data-slot="table-container"
       data-overflow-right={canScrollRight || undefined}
       className={cn(
-        "relative w-full min-w-0",
+        "relative @container w-full min-w-0",
         canScrollRight && TABLE_EDGE_RIGHT,
         canScrollRight &&
           "[&_td:last-child]:pr-5 [&_th:last-child]:pr-5"

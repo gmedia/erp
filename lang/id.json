@@ -119,5 +119,31 @@
         "switch": "Bahasa",
         "en": "Inggris",
         "id": "Indonesia"
+    },
+    "reports": {
+        "sections": {
+            "operating_header": "Arus Kas dari Aktivitas Operasi",
+            "net_income_source": "Laba Bersih",
+            "depreciation_addback": "Penyusutan",
+            "working_capital_changes": "Perubahan Modal Kerja",
+            "operating_cash_flow": "Arus Kas Bersih dari Aktivitas Operasi",
+            "investing_header": "Arus Kas dari Aktivitas Investasi",
+            "fixed_asset_activity": "Aktivitas Aset Tetap",
+            "investing_cash_flow": "Arus Kas Bersih dari Aktivitas Investasi",
+            "financing_header": "Arus Kas dari Aktivitas Pendanaan",
+            "long_term_debt_activity": "Pinjaman Jangka Panjang",
+            "equity_activity": "Modal Disetor",
+            "financing_cash_flow": "Arus Kas Bersih dari Aktivitas Pendanaan",
+            "net_change": "Kenaikan/Penurunan Kas Bersih"
+        },
+        "selectFilterTitle": "Pilih filter untuk menampilkan laporan",
+        "selectFilterBudget": "Pilih budget pada filter untuk melihat varians anggaran.",
+        "selectFilterAccount": "Pilih akun (dan periode) pada filter untuk melihat buku besar.",
+        "selectFilterFiscalYear": "Pilih tahun fiskal (dan periode) untuk melihat neraca saldo detail.",
+        "selectFilterDefault": "Pilih filter yang diperlukan untuk menampilkan {entity}."
+    },
+    "admin": {
+        "selectLogo": "Pilih Logo SVG",
+        "noFileSelected": "Belum ada file dipilih"
     }
 }

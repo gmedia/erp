@@ -166,6 +166,18 @@ const defaultTranslations: Translations = {
             financing_cash_flow: 'Net Cash from Financing Activities',
             net_change: 'Net Increase/Decrease in Cash',
         },
+        selectFilterTitle: 'Select a filter to show the report',
+        selectFilterBudget:
+            'Choose a budget in the filters to see the budget variance.',
+        selectFilterAccount:
+            'Choose an account (and period) in the filters to see the ledger.',
+        selectFilterFiscalYear:
+            'Choose a fiscal year (and period) to see the detailed trial balance.',
+        selectFilterDefault: 'Choose the required filters to show {entity}.',
+    },
+    admin: {
+        selectLogo: 'Select SVG Logo',
+        noFileSelected: 'No file selected',
     },
 };
 
