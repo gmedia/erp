@@ -4,12 +4,16 @@ import {
     type ViewModalItemsTableColumn,
 } from '@/components/common/ViewModalItemsTable';
 import { ViewModalShell } from '@/components/common/ViewModalShell';
+import { EntityDetailTabs } from '@/components/pipeline/EntityDetailTabs';
+import { EntityStateActions } from '@/components/pipeline/EntityStateActions';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import {
     formatCurrencyByRegionalSettings,
     formatNumberByRegionalSettings,
 } from '@/utils/number-format';
+import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 
 import {
@@ -71,7 +75,17 @@ const purchaseRequestItemColumns: ViewModalItemsTableColumn<PurchaseRequestItem>
 
 export const PurchaseRequestViewModal = React.memo(
     ({ item, open, onClose }: PurchaseRequestViewModalProps) => {
+        const [timelineKey, setTimelineKey] = React.useState(() => Date.now());
+        const queryClient = useQueryClient();
+
         if (!item) return null;
+
+        const handleStateChange = () => {
+            setTimelineKey(Date.now());
+            void queryClient.invalidateQueries({
+                queryKey: ['purchase-requests'],
+            });
+        };
 
         return (
             <ViewModalShell
@@ -80,68 +94,86 @@ export const PurchaseRequestViewModal = React.memo(
                 title="Purchase Request Details"
                 description="View details and requested items"
                 contentClassName="flex max-h-[90vh] max-w-[95vw] flex-col overflow-hidden sm:max-w-7xl"
+                footer={
+                    <div className="flex w-full flex-wrap items-center justify-end gap-2">
+                        <EntityStateActions
+                            entityType="purchase_request"
+                            entityId={item.id}
+                            onStateChange={handleStateChange}
+                        />
+                        <Button type="button" onClick={onClose}>
+                            Close
+                        </Button>
+                    </div>
+                }
             >
-                <div className="min-h-0 flex-1 overflow-y-auto sm:pr-4">
-                    <div className="space-y-6 py-2">
-                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                            <ViewField
-                                label="PR Number"
-                                value={item.pr_number}
-                            />
-                            <ViewField
-                                label="Branch"
-                                value={item.branch?.name}
-                            />
-                            <ViewField
-                                label="Department"
-                                value={item.department?.name}
-                            />
-                            <ViewField
-                                label="Requested By"
-                                value={item.requester?.name}
-                            />
-                            <ViewField
-                                label="Request Date"
-                                value={formatDateByRegionalSettings(
-                                    item.request_date,
-                                )}
-                            />
-                            <ViewField
-                                label="Required Date"
-                                value={formatDateByRegionalSettings(
-                                    item.required_date,
-                                )}
-                            />
-                            <ViewField
-                                label="Priority"
-                                value={<Badge>{item.priority}</Badge>}
-                            />
-                            <ViewField
-                                label="Status"
-                                value={
-                                    <Badge variant="outline">
-                                        {item.status}
-                                    </Badge>
-                                }
-                            />
-                            <ViewField
-                                label="Estimated Amount"
-                                value={formatAmount(item.estimated_amount)}
-                            />
-                            <ViewField
-                                label="Notes"
-                                value={item.notes || '-'}
+                <EntityDetailTabs
+                    entityType="purchase_request"
+                    entityId={item.id}
+                    timelineKey={timelineKey}
+                >
+                    <div className="min-h-0 flex-1 overflow-y-auto sm:pr-4">
+                        <div className="space-y-6 py-2">
+                            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                                <ViewField
+                                    label="PR Number"
+                                    value={item.pr_number}
+                                />
+                                <ViewField
+                                    label="Branch"
+                                    value={item.branch?.name}
+                                />
+                                <ViewField
+                                    label="Department"
+                                    value={item.department?.name}
+                                />
+                                <ViewField
+                                    label="Requested By"
+                                    value={item.requester?.name}
+                                />
+                                <ViewField
+                                    label="Request Date"
+                                    value={formatDateByRegionalSettings(
+                                        item.request_date,
+                                    )}
+                                />
+                                <ViewField
+                                    label="Required Date"
+                                    value={formatDateByRegionalSettings(
+                                        item.required_date,
+                                    )}
+                                />
+                                <ViewField
+                                    label="Priority"
+                                    value={<Badge>{item.priority}</Badge>}
+                                />
+                                <ViewField
+                                    label="Status"
+                                    value={
+                                        <Badge variant="outline">
+                                            {item.status}
+                                        </Badge>
+                                    }
+                                />
+                                <ViewField
+                                    label="Estimated Amount"
+                                    value={formatAmount(item.estimated_amount)}
+                                />
+                                <ViewField
+                                    label="Notes"
+                                    value={item.notes || '-'}
+                                />
+                            </div>
+
+                            <ViewModalItemsTable
+                                items={item.items}
+                                columns={purchaseRequestItemColumns}
+                                minWidthClassName="min-w-[720px]"
+                                getRowKey={(row) => row.id}
                             />
                         </div>
-
-                        <ViewModalItemsTable
-                            items={item.items}
-                            columns={purchaseRequestItemColumns}
-                            minWidthClassName="min-w-[720px]"
-                            getRowKey={(row) => row.id}
-                        />
                     </div>
-                </div>
+                </EntityDetailTabs>
             </ViewModalShell>
         );
     },

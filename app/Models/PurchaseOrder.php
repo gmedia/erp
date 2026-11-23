@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Actions\EntityStates\AssignPipelineAction;
 use App\Models\Concerns\BuildsAttributeCasts;
 use App\Models\Concerns\HasSupplierRelation;
+use App\Traits\HasPipeline;
 use Database\Factories\PurchaseOrderFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -70,7 +72,22 @@ use Illuminate\Support\Carbon;
 class PurchaseOrder extends Model
 {
     /** @use HasFactory<PurchaseOrderFactory> */
-    use BuildsAttributeCasts, HasFactory, HasSupplierRelation;
+    use BuildsAttributeCasts, HasFactory, HasPipeline, HasSupplierRelation;
+
+    /**
+     * Statuses that are only produced by the approval flow, the pipeline submit, or
+     * goods receipt (PurchaseOrderReceiptService). Never reached by a manual transition.
+     *
+     * @var list<string>
+     */
+    public const APPROVAL_OUTCOME_STATUSES = [
+        'confirmed',
+        'rejected',
+        'partially_received',
+        'fully_received',
+    ];
+
+    public const STATUS_DRAFT = 'draft';
 
     /**
      * The attributes that are mass assignable.
@@ -96,6 +113,17 @@ class PurchaseOrder extends Model
         'approved_at',
         'created_by',
     ];
+
+    /**
+     * Auto-assign the po_lifecycle pipeline (initial state: draft) on creation,
+     * so every creation path (API, import, seeder) gets a pipeline state.
+     */
+    protected static function booted(): void
+    {
+        static::created(function (PurchaseOrder $purchaseOrder): void {
+            app(AssignPipelineAction::class)->execute($purchaseOrder);
+        });
+    }
 
     public function warehouse(): BelongsTo
     {

@@ -259,7 +259,7 @@ class PurchasingSampleDataSeeder extends Seeder
                         'action_type' => 'trigger_approval',
                         'execution_order' => 5,
                         'config' => [
-                            'approval_flow_code' => 'purchase_request_default',
+                            'flow_code' => 'purchase_request_default',
                         ],
                     ],
                     [
@@ -497,7 +497,7 @@ class PurchasingSampleDataSeeder extends Seeder
                         'action_type' => 'trigger_approval',
                         'execution_order' => 5,
                         'config' => [
-                            'approval_flow_code' => 'purchase_order_default',
+                            'flow_code' => 'purchase_order_default',
                         ],
                     ],
                     [
@@ -1192,7 +1192,7 @@ class PurchasingSampleDataSeeder extends Seeder
                 'created_at' => $submittedAt,
                 'metadata' => [
                     'source' => 'PurchasingSampleDataSeeder',
-                    'approval_flow_code' => $approvalFlowCode,
+                    'flow_code' => $approvalFlowCode,
                     'status' => $requestStatus,
                 ],
             ]
@@ -1301,7 +1301,7 @@ class PurchasingSampleDataSeeder extends Seeder
                     'created_at' => $completedAt ?? $submittedAt,
                     'metadata' => [
                         'source' => 'PurchasingSampleDataSeeder',
-                        'approval_flow_code' => $approvalFlowCode,
+                        'flow_code' => $approvalFlowCode,
                     ],
                 ]
             );

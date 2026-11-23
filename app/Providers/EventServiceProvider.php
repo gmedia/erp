@@ -6,6 +6,8 @@ use App\Events\ApprovalRequestApproved;
 use App\Events\ApprovalRequestCreated;
 use App\Events\ApprovalRequestRejected;
 use App\Listeners\DispatchGenericNotification;
+use App\Listeners\MirrorPurchaseOrderApprovalStatus;
+use App\Listeners\MirrorPurchaseRequestApprovalStatus;
 use App\Listeners\MirrorVehicleLoanApprovalStatus;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -28,10 +30,14 @@ class EventServiceProvider extends ServiceProvider
         ApprovalRequestApproved::class => [
             DispatchGenericNotification::class,
             MirrorVehicleLoanApprovalStatus::class,
+            MirrorPurchaseRequestApprovalStatus::class,
+            MirrorPurchaseOrderApprovalStatus::class,
         ],
         ApprovalRequestRejected::class => [
             DispatchGenericNotification::class,
             MirrorVehicleLoanApprovalStatus::class,
+            MirrorPurchaseRequestApprovalStatus::class,
+            MirrorPurchaseOrderApprovalStatus::class,
         ],
     ];
 
