@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import axios from '@/lib/axios';
 import rawAxios from 'axios';
-import { Download, Loader2, PlusCircle } from 'lucide-react';
+import { Download, Loader2, Upload } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -149,7 +149,7 @@ export default function ImportDialog({
             <DialogTrigger asChild>
                 {trigger || (
                     <Button variant="outline" aria-label="Import">
-                        <PlusCircle className="h-4 w-4 sm:mr-2" />
+                        <Upload className="h-4 w-4 sm:mr-2" />
                         <span className="hidden sm:inline">Import</span>
                     </Button>
                 )}

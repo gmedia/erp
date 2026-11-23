@@ -15,22 +15,13 @@ interface AgingBucketChartProps {
 
 // "Current" bukan tunggakan: netral. Intensitas warna baru meningkat pada
 // bucket yang benar-benar jatuh tempo (W5-12).
-const COLOR_SCALES = {
-    emerald: [
-        'bg-muted-foreground/30',
-        'bg-success/50',
-        'bg-success/70',
-        'bg-success/85',
-        'bg-success',
-    ],
-    rose: [
-        'bg-muted-foreground/30',
-        'bg-destructive-foreground/50',
-        'bg-destructive-foreground/70',
-        'bg-destructive-foreground/85',
-        'bg-destructive-foreground',
-    ],
-};
+const AGING_BAR_COLORS = [
+    'bg-muted-foreground/30',
+    'bg-warning/50',
+    'bg-warning/70',
+    'bg-destructive-foreground/70',
+    'bg-destructive-foreground',
+];
 
 export const AgingBucketChart = memo<AgingBucketChartProps>(
     function AgingBucketChart({
@@ -68,8 +59,6 @@ export const AgingBucketChart = memo<AgingBucketChartProps>(
             );
         }
 
-        const colorScale = COLOR_SCALES[accentColor];
-
         return (
             <Card className="flex h-[320px] w-full flex-col">
                 <CardHeader className="pb-2">
@@ -84,7 +73,8 @@ export const AgingBucketChart = memo<AgingBucketChartProps>(
                             bucket.amount > 0 ? 1 : 0,
                             Math.min(bucket.percentage, 100),
                         );
-                        const barColor = colorScale[index] || colorScale[4];
+                        const barColor =
+                            AGING_BAR_COLORS[index] ?? AGING_BAR_COLORS[4];
 
                         return (
                             <div

@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { formatCurrency } from '@/lib/utils';
 import { formatNumberByRegionalSettings } from '@/utils/number-format';
 
 type SummaryBucket = {
@@ -84,7 +85,7 @@ export function StockMonitorSummaryCards({
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">
-                        {formatNumber(summary?.total_stock_value ?? 0)}
+                        {formatCurrency(summary?.total_stock_value ?? 0)}
                     </div>
                 </CardContent>
             </Card>

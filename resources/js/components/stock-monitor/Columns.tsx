@@ -6,7 +6,7 @@ import {
     createReportWarehouseColumn,
 } from '@/components/common/ReportColumns';
 import { createCurrencyColumn, createNumberColumn } from '@/utils/columns';
-import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
+import { formatDateTimeOrDateByRegionalSettings } from '@/utils/date-format';
 import type { ColumnDef } from '@tanstack/react-table';
 
 export type StockMonitorItem = {
@@ -30,7 +30,7 @@ export type StockMonitorItem = {
 };
 
 function formatDate(value: string | null | undefined): string {
-    return formatDateTimeByRegionalSettings(value);
+    return formatDateTimeOrDateByRegionalSettings(value);
 }
 
 export function createStockMonitorColumns(): ColumnDef<StockMonitorItem>[] {

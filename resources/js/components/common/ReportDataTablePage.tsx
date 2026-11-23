@@ -90,13 +90,15 @@ function ReportSelectFilterPrompt({
     return (
         <div
             data-testid="report-filter-prompt"
-            className="sticky left-0 flex w-[calc(100cqw-2rem)] flex-col items-center justify-center gap-2 rounded-lg border border-dashed px-6 py-16 text-center"
+            className="sticky left-0 flex w-[min(100%,calc(100vw_-_3rem))] flex-col items-center justify-center gap-2 rounded-lg border border-dashed px-4 py-16 text-center"
         >
             <Filter className="size-8 text-muted-foreground" aria-hidden />
             <p className="text-sm font-medium text-foreground">
                 {t('reports.selectFilterTitle')}
             </p>
-            <p className="max-w-md text-sm text-muted-foreground">{hint}</p>
+            <p className="max-w-md text-sm break-words text-muted-foreground">
+                {hint}
+            </p>
         </div>
     );
 }
@@ -155,6 +157,12 @@ export function ReportDataTablePage<
             <AppLayout breadcrumbs={breadcrumbs}>
                 <div className="flex w-full flex-col gap-3 overflow-x-auto p-4">
                     <PageHeader title={title} description={description} />
+                    {ready ? null : (
+                        <ReportSelectFilterPrompt
+                            hintKey={requiredFilterHintKey}
+                            entityName={entityName}
+                        />
+                    )}
                     <div>
                         <DataTable
                             columns={columns}
@@ -184,14 +192,7 @@ export function ReportDataTablePage<
                             entityName={entityName}
                             onView={onView}
                             defaultColumnVisibility={defaultColumnVisibility}
-                            emptyState={
-                                ready ? undefined : (
-                                    <ReportSelectFilterPrompt
-                                        hintKey={requiredFilterHintKey}
-                                        entityName={entityName}
-                                    />
-                                )
-                            }
+                            emptyState={ready ? undefined : ''}
                         />
                     </div>
                 </div>

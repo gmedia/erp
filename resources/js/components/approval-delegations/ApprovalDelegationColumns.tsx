@@ -39,7 +39,11 @@ export const approvalDelegationColumns: ColumnDef<ApprovalDelegation>[] = [
         accessorKey: 'approvable_type',
         ...createSortingHeader('Approvable Type'),
         cell: ({ row }) => (
-            <span>{formatClassName(row.original.approvable_type)}</span>
+            <span>
+                {row.original.approvable_type
+                    ? formatClassName(row.original.approvable_type)
+                    : 'All types'}
+            </span>
         ),
     },
     {
