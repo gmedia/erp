@@ -355,7 +355,7 @@ export default function Index() {
                         <TableHead className="text-right">Debit</TableHead>
                         <TableHead className="text-right">Credit</TableHead>
                         <TableHead className="text-center">Status</TableHead>
-                        <TableHead className="sticky right-0 z-20 w-[60px] bg-card text-right">
+                        <TableHead className="sticky right-0 z-20 w-[60px] bg-background text-right">
                             <span className="sr-only">Actions</span>
                         </TableHead>
                     </TableRow>

@@ -108,6 +108,8 @@ const defaultTranslations: Translations = {
         empty_description:
             'Create a user account for an employee to get started.',
         no_employee: 'No linked employee',
+        edit_requires_employee:
+            'Link an employee to this user before editing it.',
         status_linked: 'Linked',
         status_unlinked: 'Unlinked',
         columns: {

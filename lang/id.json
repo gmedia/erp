@@ -82,6 +82,7 @@
         "empty_title": "Pengguna tidak ditemukan",
         "empty_description": "Buat akun pengguna untuk karyawan untuk memulai.",
         "no_employee": "Belum ada karyawan terhubung",
+        "edit_requires_employee": "Hubungkan pengguna ini ke karyawan sebelum diubah.",
         "status_linked": "Terhubung",
         "status_unlinked": "Belum terhubung",
         "columns": {

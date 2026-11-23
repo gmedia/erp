@@ -78,6 +78,7 @@ export interface Translations {
         empty_title: string;
         empty_description: string;
         no_employee: string;
+        edit_requires_employee: string;
         status_linked: string;
         status_unlinked: string;
         columns: {

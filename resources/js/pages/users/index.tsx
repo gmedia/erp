@@ -26,6 +26,12 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { UserForm } from '@/components/users/UserForm';
 import { useTranslation } from '@/contexts/i18n-context';
 import { useEmployeeUser } from '@/hooks/users/useEmployeeUser';
@@ -257,7 +263,9 @@ function UsersBody({ manager }: Readonly<{ manager: UsersManager }>) {
         tableBody = rows.map((row) => (
             <TableRow key={row.id} data-testid="user-row">
                 <TableCell className="font-medium">{row.name}</TableCell>
-                <TableCell>{row.email}</TableCell>
+                <TableCell className="max-w-[220px] truncate" title={row.email}>
+                    {row.email}
+                </TableCell>
                 <TableCell>
                     {row.employee ? (
                         row.employee.name
@@ -274,16 +282,30 @@ function UsersBody({ manager }: Readonly<{ manager: UsersManager }>) {
                             : t('users.status_unlinked')}
                     </Badge>
                 </TableCell>
-                <TableCell className="sticky right-0 bg-background text-right">
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        disabled={!row.employee}
-                        onClick={() => openEdit(row)}
-                        aria-label={t('users.edit_user')}
-                    >
-                        <Pencil className="h-4 w-4" />
-                    </Button>
+                <TableCell className="sticky right-0 z-20 bg-background text-right">
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                {/* Wrapper span: tombol disabled tidak memicu hover tooltip. */}
+                                <span className="inline-flex">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        disabled={!row.employee}
+                                        onClick={() => openEdit(row)}
+                                        aria-label={t('users.edit_user')}
+                                    >
+                                        <Pencil className="h-4 w-4" />
+                                    </Button>
+                                </span>
+                            </TooltipTrigger>
+                            {!row.employee && (
+                                <TooltipContent>
+                                    {t('users.edit_requires_employee')}
+                                </TooltipContent>
+                            )}
+                        </Tooltip>
+                    </TooltipProvider>
                 </TableCell>
             </TableRow>
         ));
@@ -303,22 +325,22 @@ function UsersBody({ manager }: Readonly<{ manager: UsersManager }>) {
                 />
             </div>
 
-            <div className="overflow-hidden rounded-md border">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>{t('users.columns.name')}</TableHead>
-                            <TableHead>{t('users.columns.email')}</TableHead>
-                            <TableHead>{t('users.columns.employee')}</TableHead>
-                            <TableHead>{t('users.columns.status')}</TableHead>
-                            <TableHead className="sticky right-0 bg-background text-right">
+            <Table>
+                <TableHeader className="[&_th]:text-muted-foreground">
+                    <TableRow>
+                        <TableHead>{t('users.columns.name')}</TableHead>
+                        <TableHead>{t('users.columns.email')}</TableHead>
+                        <TableHead>{t('users.columns.employee')}</TableHead>
+                        <TableHead>{t('users.columns.status')}</TableHead>
+                        <TableHead className="sticky right-0 z-20 w-[60px] bg-background text-right">
+                            <span className="sr-only">
                                 {t('common.actions')}
-                            </TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>{tableBody}</TableBody>
-                </Table>
-            </div>
+                            </span>
+                        </TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>{tableBody}</TableBody>
+            </Table>
 
             <DataTablePagination
                 pagination={paginationView}
