@@ -52,7 +52,7 @@ class PostAssetAcquisitionJournalAction
             return true;
         }
 
-        if ($asset->status !== 'disposed' || $asset->purchase_date === null) {
+        if ($asset->status !== 'disposed') {
             return false;
         }
 
@@ -75,7 +75,7 @@ class PostAssetAcquisitionJournalAction
             ]);
         }
 
-        $reference = 'ACQ-'.$asset->asset_code;
+        $reference = 'ACQ-' . $asset->asset_code;
 
         $existing = JournalEntry::query()
             ->where('reference', $reference)
