@@ -251,6 +251,10 @@ class DatabaseSeeder extends Seeder
             BudgetSampleDataSeeder::class,
         ]);
 
+        // Normalisasi depresiasi aset (semua aset, termasuk kendaraan, sudah
+        // ada) sebelum rekonsiliasi GL (W7-05).
+        $this->call(AssetDepreciationNormalizationSeeder::class);
+
         // Rekonsiliasi GL↔subledger hanya untuk dataset demo (bukan test),
         // karena test isolasi cabang menguji saldo clearing dari nol.
         if (! app()->environment('testing')) {

@@ -19,7 +19,7 @@ class IndexAssetDepreciationRunsAction
     public function execute(IndexAssetDepreciationRunRequest $request): LengthAwarePaginator
     {
         $query = AssetDepreciationRun::query()
-            ->with(['fiscalYear', 'createdBy', 'postedBy'])
+            ->with(['fiscalYear', 'createdBy', 'postedBy', 'journalEntry'])
             ->withCount('lines');
 
         return $this->handleFilteredIndexRequest(

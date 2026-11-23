@@ -158,9 +158,11 @@ test('user can post depreciation run to journal', function () {
     $run->refresh();
     $this->assertNotNull($run->journal_entry_id);
 
+    // A posted depreciation run must leave a posted journal so the expense
+    // and accumulated depreciation reach the GL (W7-05).
     $this->assertDatabaseHas('journal_entries', [
         'id' => $run->journal_entry_id,
-        'status' => 'draft',
+        'status' => 'posted',
     ]);
 });
 

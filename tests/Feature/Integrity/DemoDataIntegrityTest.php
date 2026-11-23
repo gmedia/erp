@@ -319,3 +319,85 @@ test('W7-04 inventory valuation equals GL inventory account', function () {
     expect(round(postedBalance((int) $inventoryAccountId, true), 2))
         ->toBe(round($valuation, 2), 'GL 11300 must equal the sum of stock movement valuation');
 });
+
+// W7-05 — book value is always cost minus accumulated depreciation.
+test('W7-05 asset book value equals cost minus accumulated depreciation', function () {
+    $assets = DB::table('assets')->get(['asset_code', 'purchase_cost', 'accumulated_depreciation', 'book_value', 'status']);
+
+    expect($assets)->not->toBeEmpty('Demo data must include assets');
+
+    foreach ($assets as $asset) {
+        $expected = round((float) $asset->purchase_cost - (float) $asset->accumulated_depreciation, 2);
+
+        expect(round((float) $asset->book_value, 2))
+            ->toBe($expected, "Asset {$asset->asset_code} book value must equal cost minus accumulated depreciation");
+        expect((float) $asset->accumulated_depreciation)
+            ->toBeGreaterThanOrEqual(0.0, "Asset {$asset->asset_code} accumulated depreciation must be non-negative");
+        expect((float) $asset->book_value)
+            ->toBeGreaterThanOrEqual(0.0, "Asset {$asset->asset_code} book value must be non-negative");
+    }
+
+    foreach ($assets->whereIn('status', ['active', 'maintenance']) as $asset) {
+        expect((float) $asset->accumulated_depreciation)
+            ->toBeGreaterThan(0.0, "In-service asset {$asset->asset_code} must accrue depreciation");
+    }
+});
+
+// W7-05 — GL equipment net of accumulated depreciation equals the in-service register.
+test('W7-05 GL equipment minus accumulated depreciation equals in-service book value', function () {
+    $equipmentId = activeCoaAccountId('12100');
+    $accumulatedId = activeCoaAccountId('12200');
+
+    expect($equipmentId)->not->toBeNull('Active COA must expose account 12100');
+    expect($accumulatedId)->not->toBeNull('Active COA must expose account 12200');
+
+    $glEquipment = postedBalance((int) $equipmentId, true);
+    $glAccumulated = postedBalance((int) $accumulatedId, false);
+
+    $registerBookValue = (float) DB::table('assets')
+        ->whereIn('status', ['active', 'maintenance'])
+        ->sum('book_value');
+
+    expect(round($glEquipment - $glAccumulated, 2))
+        ->toBe(round($registerBookValue, 2), 'GL equipment net of accumulated depreciation must equal in-service book value');
+});
+
+// W7-05 — every posted depreciation run has a posted journal.
+test('W7-05 posted depreciation runs have posted journals', function () {
+    $runs = DB::table('asset_depreciation_runs')->where('status', 'posted')->get();
+
+    expect($runs)->not->toBeEmpty('Demo data must include a posted depreciation run');
+
+    foreach ($runs as $run) {
+        expect($run->journal_entry_id)->not->toBeNull("Depreciation run {$run->id} must reference a journal");
+
+        $journalStatus = DB::table('journal_entries')->where('id', $run->journal_entry_id)->value('status');
+        expect($journalStatus)->toBe('posted', "Depreciation run {$run->id} journal must be posted");
+    }
+});
+
+// W7-05 — depreciation expense in the GL equals the posted run depreciation.
+test('W7-05 depreciation expense equals posted depreciation run totals', function () {
+    $expenseId = activeCoaAccountId('53000');
+    expect($expenseId)->not->toBeNull('Active COA must expose account 53000');
+
+    $runTotal = (float) DB::table('asset_depreciation_lines')
+        ->join('asset_depreciation_runs', 'asset_depreciation_runs.id', '=', 'asset_depreciation_lines.asset_depreciation_run_id')
+        ->where('asset_depreciation_runs.status', 'posted')
+        ->sum('asset_depreciation_lines.amount');
+
+    expect(round(postedBalance((int) $expenseId, true), 2))
+        ->toBe(round($runTotal, 2), 'GL depreciation expense must equal the sum of posted depreciation run lines');
+});
+
+// W7-05 — trial balance (all posted journal lines) stays balanced.
+test('W7-05 posted journals are balanced', function () {
+    $totals = DB::table('journal_entry_lines')
+        ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+        ->where('journal_entries.status', 'posted')
+        ->selectRaw('COALESCE(SUM(journal_entry_lines.debit), 0) as debit, COALESCE(SUM(journal_entry_lines.credit), 0) as credit')
+        ->first();
+
+    expect(round((float) $totals->debit, 2))
+        ->toBe(round((float) $totals->credit, 2), 'Total debits must equal total credits across posted journals');
+});

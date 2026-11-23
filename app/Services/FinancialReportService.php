@@ -613,7 +613,10 @@ class FinancialReportService
 
             $debit = $account->posted_debit_sum ?? 0;
             $credit = $account->posted_credit_sum ?? 0;
-            $balance = $this->computeAccountBalance($account->normal_balance, $debit, $credit);
+            // Present balances by account type so contra accounts (e.g. an
+            // accumulated-depreciation asset with a credit normal balance) net
+            // against their bucket instead of inflating it (W7-05).
+            $balance = $this->computeAccountBalance($this->effectiveNormalBalance($account), $debit, $credit);
             $comparisonBalance = $comparisonFiscalYearId
                 ? (float) ($comparisonBalanceByCurrentAccountId[$account->id] ?? 0)
                 : 0.0;
@@ -648,6 +651,15 @@ class FinancialReportService
                 ? ($changeValue / abs($comparisonValue)) * 100
                 : 0;
         }
+    }
+
+    private function effectiveNormalBalance(Account $account): string
+    {
+        return match ($account->type) {
+            'asset', 'expense' => 'debit',
+            'liability', 'equity', 'revenue' => 'credit',
+            default => $account->normal_balance,
+        };
     }
 
     private function computeAccountBalance(string $normalBalance, float|int $debit, float|int $credit): float
