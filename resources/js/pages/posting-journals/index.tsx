@@ -340,30 +340,28 @@ export default function Index() {
                 </Alert>
             )}
 
-            <div className="overflow-hidden rounded-lg bg-card">
-                <Table>
-                    <TableHeader className="[&_th]:text-muted-foreground">
-                        <TableRow>
-                            <TableHead className="w-[52px]">
-                                <Checkbox
-                                    checked={allSelected}
-                                    onCheckedChange={selectAll}
-                                    aria-label="Select all"
-                                />
-                            </TableHead>
-                            <TableHead>Journal</TableHead>
-                            <TableHead className="w-[220px]">Lines</TableHead>
-                            <TableHead className="text-right">Debit</TableHead>
-                            <TableHead className="text-right">Credit</TableHead>
-                            <TableHead className="text-center">
-                                Status
-                            </TableHead>
-                            <TableHead className="sticky right-0 z-20 w-[60px] bg-card"></TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>{tableBodyContent}</TableBody>
-                </Table>
-            </div>
+            <Table>
+                <TableHeader className="[&_th]:text-muted-foreground">
+                    <TableRow>
+                        <TableHead className="w-[52px]">
+                            <Checkbox
+                                checked={allSelected}
+                                onCheckedChange={selectAll}
+                                aria-label="Select all"
+                            />
+                        </TableHead>
+                        <TableHead>Journal</TableHead>
+                        <TableHead className="w-[220px]">Lines</TableHead>
+                        <TableHead className="text-right">Debit</TableHead>
+                        <TableHead className="text-right">Credit</TableHead>
+                        <TableHead className="text-center">Status</TableHead>
+                        <TableHead className="sticky right-0 z-20 w-[60px] bg-card text-right">
+                            <span className="sr-only">Actions</span>
+                        </TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>{tableBodyContent}</TableBody>
+            </Table>
 
             <DataTablePagination
                 pagination={paginationView}

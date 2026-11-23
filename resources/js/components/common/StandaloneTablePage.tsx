@@ -1,7 +1,6 @@
 'use client';
 
 import { PageHeader } from '@/components/common/PageHeader';
-import { Card, CardContent } from '@/components/ui/card';
 import { TableCell, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
@@ -92,11 +91,7 @@ export function StandaloneTablePage({
                     description={description}
                     actions={actions}
                 />
-                <Card>
-                    <CardContent className="flex flex-col gap-4">
-                        {children}
-                    </CardContent>
-                </Card>
+                <div className="flex flex-col gap-4">{children}</div>
             </div>
         </AppLayout>
     );

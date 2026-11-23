@@ -208,25 +208,23 @@ export default function Index() {
                 </Button>
             }
         >
-            <div className="overflow-hidden rounded-lg bg-card">
-                <Table>
-                    <TableHeader className="[&_th]:text-muted-foreground">
-                        <TableRow>
-                            <TableHead>Fiscal Year</TableHead>
-                            <TableHead>Period</TableHead>
-                            <TableHead>Lines</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Journal</TableHead>
-                            <TableHead>Created By</TableHead>
-                            <TableHead className="sticky right-0 z-20 bg-card text-right">
-                                Actions
-                            </TableHead>
-                        </TableRow>
-                    </TableHeader>
+            <Table>
+                <TableHeader className="[&_th]:text-muted-foreground">
+                    <TableRow>
+                        <TableHead>Fiscal Year</TableHead>
+                        <TableHead>Period</TableHead>
+                        <TableHead>Lines</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Journal</TableHead>
+                        <TableHead>Created By</TableHead>
+                        <TableHead className="sticky right-0 z-20 w-[60px] bg-card text-right">
+                            <span className="sr-only">Actions</span>
+                        </TableHead>
+                    </TableRow>
+                </TableHeader>
 
-                    <TableBody>{tableBodyContent}</TableBody>
-                </Table>
-            </div>
+                <TableBody>{tableBodyContent}</TableBody>
+            </Table>
 
             <DataTablePagination
                 pagination={paginationView}
