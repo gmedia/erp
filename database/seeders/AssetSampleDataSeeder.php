@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Actions\AccountingPosting\PostAssetAcquisitionJournalAction;
 use App\Models\Account;
 use App\Models\ApprovalAuditLog;
 use App\Models\ApprovalFlow;
@@ -501,6 +502,12 @@ class AssetSampleDataSeeder extends Seeder
             unset($data['is_disposal']);
 
             $asset = Asset::updateOrCreate(['asset_code' => $data['asset_code']], $data);
+
+            // Perolehan dijurnal dari nilai register (#357). Draft dan aset
+            // yang dibatalkan belum dikapitalisasi, jadi tidak diposting.
+            if (in_array($asset->status, ['active', 'maintenance', 'disposed', 'lost'], true)) {
+                app(PostAssetAcquisitionJournalAction::class)->execute($asset);
+            }
 
             AssetMovement::updateOrCreate(
                 ['asset_id' => $asset->id, 'movement_type' => 'acquired', 'moved_at' => $asset->purchase_date],
