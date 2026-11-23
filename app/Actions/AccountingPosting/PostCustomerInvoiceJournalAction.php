@@ -12,6 +12,9 @@ class PostCustomerInvoiceJournalAction
 {
     public const AR_CONTROL_ACCOUNT_CODE = '11200';
 
+    /** @var list<string> */
+    public const POSTABLE_STATUSES = ['sent', 'partially_paid', 'paid', 'overdue'];
+
     public function __construct(
         private CreateJournalEntryAction $createJournalEntry,
         private ResolveControlAccountAction $resolveControlAccount,
@@ -26,7 +29,9 @@ class PostCustomerInvoiceJournalAction
             return $existing;
         }
 
-        if ($invoice->status !== 'sent') {
+        // Dokumen yang sudah dikirim lalu berubah menjadi partially_paid/paid/overdue
+        // tetap harus punya jurnal AR; draft/cancelled/void tidak diposting.
+        if (! in_array($invoice->status, self::POSTABLE_STATUSES, true)) {
             return null;
         }
 

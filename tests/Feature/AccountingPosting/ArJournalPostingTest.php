@@ -147,6 +147,52 @@ test('PostCustomerInvoiceJournalAction is idempotent and returns existing entry'
     expect(JournalEntry::count())->toBe(1);
 });
 
+test('PostCustomerInvoiceJournalAction posts invoices that moved past sent (partially_paid, paid, overdue)', function (string $status) {
+    makeArPostingFiscalYear();
+    $accounts = makeArPostingChartOfAccounts();
+
+    $invoice = CustomerInvoice::factory()->create([
+        'status' => $status,
+        'invoice_date' => '2026-03-15',
+        'grand_total' => 500000,
+        'amount_due' => 500000,
+    ]);
+    $invoice->items()->create([
+        'account_id' => $accounts['revenue']->id,
+        'description' => 'Item',
+        'quantity' => 1,
+        'unit_price' => 500000,
+        'discount_percent' => 0,
+        'tax_percent' => 0,
+        'line_total' => 500000,
+    ]);
+
+    $journalEntry = app(PostCustomerInvoiceJournalAction::class)->execute($invoice->fresh());
+
+    expect($journalEntry)->not->toBeNull()
+        ->and($journalEntry->status)->toBe('posted');
+    expect((float) $journalEntry->total_debit)->toBe(500000.0);
+})->with(['partially_paid', 'paid', 'overdue']);
+
+test('PostCustomerInvoiceJournalAction does not post cancelled or void invoices', function (string $status) {
+    makeArPostingFiscalYear();
+    $accounts = makeArPostingChartOfAccounts();
+
+    $invoice = CustomerInvoice::factory()->create(['status' => $status, 'invoice_date' => '2026-03-15']);
+    $invoice->items()->create([
+        'account_id' => $accounts['revenue']->id,
+        'description' => 'Item',
+        'quantity' => 1,
+        'unit_price' => 500000,
+        'discount_percent' => 0,
+        'tax_percent' => 0,
+        'line_total' => 500000,
+    ]);
+
+    expect(app(PostCustomerInvoiceJournalAction::class)->execute($invoice->fresh()))->toBeNull();
+    expect(JournalEntry::count())->toBe(0);
+})->with(['cancelled', 'void']);
+
 test('PostCustomerInvoiceJournalAction returns null when invoice is not sent', function () {
     makeArPostingFiscalYear();
     makeArPostingChartOfAccounts();
