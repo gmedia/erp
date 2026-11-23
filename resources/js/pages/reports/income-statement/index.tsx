@@ -85,6 +85,7 @@ export default function IncomeStatement() {
     return (
         <FinancialReportPageShell
             title="Income Statement"
+            descriptionKey="reports.pageDescriptions.income-statement"
             path="/reports/income-statement"
             fiscalYears={fiscalYears}
             selectedYearId={selectedYearId}
@@ -145,6 +146,7 @@ export default function IncomeStatement() {
 
                 <FinancialSummaryCard
                     description="Net Income = Total Revenue - Total Expense."
+                    hideStatusBorder
                     isPositive={isProfit}
                     status={
                         <FinancialStatusBadge

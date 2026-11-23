@@ -52,6 +52,10 @@ const defaultTranslations: Translations = {
         fill_details: 'Please fill in the details below.',
         view_details: 'Here are the details for this item.',
     },
+    stockTransfer: {
+        qty_received_label: 'Qty Received',
+        qty_received_placeholder: 'Empty = received in full',
+    },
     nav: {
         platform: 'Platform',
         dashboard: 'Dashboard',
@@ -89,6 +93,33 @@ const defaultTranslations: Translations = {
             hire_date: 'Hire Date',
             created_at: 'Created At',
             updated_at: 'Updated At',
+        },
+    },
+    my_approvals: {
+        request_number: 'No. {id}',
+    },
+    users: {
+        title: 'Users',
+        description: 'Manage user accounts linked to employees.',
+        add: 'Add User',
+        edit_user: 'Edit User',
+        dialog_description:
+            'Select an employee, then set the account name, email, and password.',
+        search_placeholder: 'Search users...',
+        loading: 'Loading users...',
+        empty_title: 'No users found',
+        empty_description:
+            'Create a user account for an employee to get started.',
+        no_employee: 'No linked employee',
+        edit_requires_employee:
+            'Link an employee to this user before editing it.',
+        status_linked: 'Linked',
+        status_unlinked: 'Unlinked',
+        columns: {
+            name: 'Name',
+            email: 'Email',
+            employee: 'Employee',
+            status: 'Status',
         },
     },
     departments: {
@@ -176,6 +207,8 @@ const defaultTranslations: Translations = {
         selectFilterCustomer:
             'Choose a customer in the filters to see the statement.',
         selectFilterDefault: 'Choose the required filters to show {entity}.',
+        totalRow: 'Total (all filtered results)',
+        asOfDate: 'As of {date}',
     },
     admin: {
         selectLogo: 'Select SVG Logo',

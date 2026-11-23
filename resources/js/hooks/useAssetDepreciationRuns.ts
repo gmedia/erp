@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 export function useAssetDepreciationRuns() {
     const queryClient = useQueryClient();
 
-    const [pagination, setPagination] = useState({ page: 1, per_page: 25 });
+    const [pagination, setPagination] = useState({ page: 1, per_page: 15 });
     const [filters, setFilters] = useState<Record<string, string | undefined>>(
         {},
     );

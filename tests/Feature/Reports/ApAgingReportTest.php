@@ -114,6 +114,39 @@ test('it can export ap aging report', function () {
     Excel::assertStored('exports/' . $filename, 'public');
 });
 
+test('it returns totals across all filtered rows not only the current page', function () {
+    $supplier = Supplier::factory()->create();
+    $branch = Branch::factory()->create();
+    $fiscalYear = FiscalYear::factory()->create();
+
+    SupplierBill::factory()->confirmed()->create([
+        'supplier_id' => $supplier->id,
+        'branch_id' => $branch->id,
+        'fiscal_year_id' => $fiscalYear->id,
+        'due_date' => Carbon::now()->addDays(10)->format('Y-m-d'),
+        'grand_total' => 1000000,
+        'amount_due' => 1000000,
+    ]);
+
+    SupplierBill::factory()->confirmed()->create([
+        'supplier_id' => $supplier->id,
+        'branch_id' => $branch->id,
+        'fiscal_year_id' => $fiscalYear->id,
+        'due_date' => Carbon::now()->subDays(35)->format('Y-m-d'),
+        'grand_total' => 2000000,
+        'amount_due' => 2000000,
+    ]);
+
+    getJson('/api/reports/ap-aging?per_page=1')
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('meta.total', 2)
+        ->assertJsonPath('summary.totals.amount_due', '3000000.00')
+        ->assertJsonPath('summary.totals.current_amount', '1000000.00')
+        ->assertJsonPath('summary.totals.days_31_60', '2000000.00')
+        ->assertJsonPath('summary.as_of_date', Carbon::today()->toDateString());
+});
+
 test('it rejects mixed currencies in the aggregated scope', function () {
     SupplierBill::factory()->confirmed()->create([
         'currency' => 'IDR',

@@ -108,7 +108,7 @@ test.describe('Dashboard', () => {
     await expect(mix.getByText('Master data mix')).toBeVisible();
     await expect(
       mix.getByText(
-        'Operational counts only. Financial KPIs stay on Financial Overview.',
+        'Operational counts only. Financial KPIs stay on Financial Dashboard.',
         { exact: true },
       ),
     ).toBeVisible();

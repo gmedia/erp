@@ -4,7 +4,9 @@ namespace App\Actions\Reports;
 
 use App\Actions\Reports\Concerns\AgingReportBoundaries;
 use App\Actions\Reports\Concerns\BuildsSupplierBillReportQuery;
+use App\Actions\Reports\Concerns\SumsReportTotals;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,11 +14,40 @@ class IndexApAgingReportAction
 {
     use AgingReportBoundaries;
     use BuildsSupplierBillReportQuery;
+    use SumsReportTotals;
 
     public function execute(FormRequest $request): LengthAwarePaginator|Collection
     {
         $this->guardSupplierBillCurrency($request, 'AP Aging Report');
 
+        $query = $this->buildFilteredQuery($request);
+
+        $this->applySupplierBillSorting($request, $query);
+
+        return $this->exportOrPaginate($request, $query);
+    }
+
+    /**
+     * Total + as-of untuk seluruh hasil filter (bukan satu halaman).
+     *
+     * @return array{as_of_date: string, totals: array<string, string>}
+     */
+    public function summarize(FormRequest $request): array
+    {
+        return $this->buildReportSummary($this->buildFilteredQuery($request), [
+            'grand_total',
+            'amount_paid',
+            'amount_due',
+            'current_amount',
+            'days_1_30',
+            'days_31_60',
+            'days_61_90',
+            'days_over_90',
+        ]);
+    }
+
+    private function buildFilteredQuery(FormRequest $request): Builder
+    {
         $boundaries = $this->agingBoundaries();
 
         $query = $this->buildBaseSupplierBillQuery(
@@ -41,8 +72,7 @@ class IndexApAgingReportAction
 
         $this->applySupplierBillFilters($request, $query);
         $this->applyDateRangeFilter($request, $query, 'sb.bill_date', 'start_date', 'end_date');
-        $this->applySupplierBillSorting($request, $query);
 
-        return $this->exportOrPaginate($request, $query);
+        return $query;
     }
 }

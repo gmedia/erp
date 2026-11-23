@@ -53,6 +53,10 @@ export interface CustomEntityConfig<
     readonly viewModalComponent?: React.ComponentType<any>;
     // Kolom yang disembunyikan default (dapat diaktifkan lewat menu Columns)
     readonly defaultColumnVisibility?: Record<string, boolean>;
+    // Opt-in: saat Edit, muat detail (GET /:id) sebelum form dibuka. Default off;
+    // hanya entity yang item-nya tidak ada di respons list (mis. stock transfer).
+    readonly loadDetailOnEdit?: boolean;
+    readonly detailLoadErrorMessage?: string;
 }
 
 // Union type for all entity configurations with improved typing
@@ -188,6 +192,8 @@ export interface ComplexEntityConfigOptions<T = Record<string, unknown>> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     viewModalComponent?: React.ComponentType<any>;
     defaultColumnVisibility?: Record<string, boolean>;
+    loadDetailOnEdit?: boolean;
+    detailLoadErrorMessage?: string;
 }
 
 // Factory to create a bound SimpleEntityViewModal for a specific entity
@@ -262,6 +268,8 @@ function createComplexEntityConfig<T = Record<string, unknown>>(
         getDeleteMessage: options.getDeleteMessage,
         viewModalComponent: options.viewModalComponent,
         defaultColumnVisibility: options.defaultColumnVisibility,
+        loadDetailOnEdit: options.loadDetailOnEdit,
+        detailLoadErrorMessage: options.detailLoadErrorMessage,
     };
 }
 
@@ -404,6 +412,10 @@ export const stockTransferConfig = createComplexEntityConfig<StockTransfer>({
     filterFields: createStockTransferFilterFields(),
     formComponent: StockTransferForm,
     formType: 'complex',
+    // Issue #360 keputusan 1: item tidak ada di respons list; Edit memuat detail dulu.
+    loadDetailOnEdit: true,
+    detailLoadErrorMessage:
+        'Failed to load stock transfer details. Please try again.',
     entityNameForSearch: 'stock transfer',
     viewModalComponent: StockTransferViewModal,
     getDeleteMessage: (transfer: { transfer_number?: string | null }) =>
@@ -1125,6 +1137,8 @@ export const approvalDelegationConfig =
     createComplexEntityConfig<ApprovalDelegation>({
         entityName: 'Approval Delegation',
         entityNamePlural: 'Approval Delegations',
+        description:
+            'Delegations that let another user approve on your behalf for a period.',
         apiEndpoint: '/api/approval-delegations',
         exportEndpoint: '/api/approval-delegations/export',
         queryKey: ['approval-delegations'],
@@ -1316,6 +1330,8 @@ export const bankReconciliationConfig =
     createComplexEntityConfig<BankReconciliation>({
         entityName: 'Bank Reconciliation',
         entityNamePlural: 'Bank Reconciliations',
+        description:
+            'Match bank statement balances with the books for each account.',
         apiEndpoint: '/api/bank-reconciliations',
         exportEndpoint: '/api/bank-reconciliations/export',
         queryKey: ['bank-reconciliations'],
@@ -1373,6 +1389,8 @@ export const reportConfigurationConfig =
     createComplexEntityConfig<ReportConfiguration>({
         entityName: 'Report Configuration',
         entityNamePlural: 'Report Configurations',
+        description:
+            'Settings that define how each report is generated and displayed.',
         apiEndpoint: '/api/report-configurations',
         exportEndpoint: '/api/report-configurations/export',
         queryKey: ['report-configurations'],

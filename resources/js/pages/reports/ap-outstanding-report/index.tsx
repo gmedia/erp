@@ -15,6 +15,7 @@ export default function ApOutstandingReportPage() {
     return (
         <ReportDataTablePage<ApOutstandingReportItem>
             title="AP Outstanding Report"
+            descriptionKey="reports.pageDescriptions.ap-outstanding"
             breadcrumbs={createReportBreadcrumbs(
                 'AP Outstanding',
                 '/reports/ap-outstanding',
@@ -36,6 +37,10 @@ export default function ApOutstandingReportPage() {
                 branch_name: false,
                 amount_paid: false,
             }}
+            summaryColumns={[
+                { key: 'grand_total', label: 'Grand Total' },
+                { key: 'amount_due', label: 'Amount Due' },
+            ]}
         />
     );
 }

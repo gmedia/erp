@@ -22,6 +22,9 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
+            'employee' => $this->whenLoaded('employee', fn () => $this->employee
+                ? ['id' => $this->employee->id, 'name' => $this->employee->name]
+                : null),
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];

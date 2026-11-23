@@ -15,6 +15,7 @@ export default function InventoryValuationReportPage() {
     return (
         <ReportDataTablePage<InventoryValuationItem>
             title="Inventory Valuation Report"
+            descriptionKey="reports.pageDescriptions.inventory-valuation"
             breadcrumbs={createReportBreadcrumbs(
                 'Inventory Valuation',
                 '/reports/inventory-valuation',

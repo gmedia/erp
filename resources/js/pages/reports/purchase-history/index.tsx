@@ -15,6 +15,7 @@ export default function PurchaseHistoryReportPage() {
     return (
         <ReportDataTablePage<PurchaseHistoryReportItem>
             title="Purchase History Report"
+            descriptionKey="reports.pageDescriptions.purchase-history"
             breadcrumbs={createReportBreadcrumbs(
                 'Purchase History',
                 '/reports/purchase-history',

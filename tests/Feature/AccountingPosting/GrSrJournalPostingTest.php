@@ -8,6 +8,7 @@ use App\Models\FiscalYear;
 use App\Models\GoodsReceipt;
 use App\Models\GoodsReceiptItem;
 use App\Models\JournalEntry;
+use App\Models\StockMovement;
 use App\Models\SupplierReturn;
 use App\Models\SupplierReturnItem;
 use App\Models\User;
@@ -310,10 +311,24 @@ test('SupplierReturnController update triggers journal posting on confirm transi
         'confirmed_at' => null,
     ]);
 
-    SupplierReturnItem::factory()->create([
+    $returnItem = SupplierReturnItem::factory()->create([
         'supplier_return_id' => $sr->id,
         'quantity_returned' => 5,
         'unit_price' => 60000,
+    ]);
+
+    // Stok masuk sah (penerimaan 5 unit) agar retur confirmed tidak ditolak 422 (cek stok konfirmasi #356).
+    $sourceGoodsReceipt = GoodsReceipt::factory()->create();
+    StockMovement::factory()->create([
+        'movement_type' => 'goods_receipt',
+        'reference_type' => GoodsReceipt::class,
+        'reference_id' => $sourceGoodsReceipt->id,
+        'product_id' => $returnItem->product_id,
+        'warehouse_id' => $sr->warehouse_id,
+        'quantity_in' => 5,
+        'quantity_out' => 0,
+        'balance_after' => 5,
+        'moved_at' => now()->subDay(),
     ]);
 
     putJson("/api/supplier-returns/{$sr->id}", [

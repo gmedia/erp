@@ -1,5 +1,6 @@
 import { AsyncSelect } from '@/components/common/AsyncSelect';
 import { PageHeader } from '@/components/common/PageHeader';
+import { ReportPageDescription } from '@/components/common/ReportDataTablePage';
 import { Badge } from '@/components/ui/badge';
 import {
     Select,
@@ -47,6 +48,8 @@ type ComparisonFinancialReportPageOptions<TReport> = {
 
 type FinancialReportPageShellProps = {
     title: string;
+    description?: string;
+    descriptionKey?: string;
     path: string;
     fiscalYears: FinancialReportFiscalYear[];
     selectedYearId: number;
@@ -265,6 +268,8 @@ export function FinancialReportHeaderMeta({
 
 export function FinancialReportPageShell({
     title,
+    description,
+    descriptionKey,
     path,
     fiscalYears,
     selectedYearId,
@@ -299,6 +304,15 @@ export function FinancialReportPageShell({
             <div className="flex w-full flex-col gap-3 p-4">
                 <PageHeader
                     title={title}
+                    description={
+                        descriptionKey ? (
+                            <ReportPageDescription
+                                descriptionKey={descriptionKey}
+                            />
+                        ) : (
+                            description
+                        )
+                    }
                     meta={headerMeta}
                     actions={
                         <>
@@ -374,7 +388,10 @@ export function FinancialReportPageShell({
                                 </Select>
                             </div>
                             {onBranchChange && (
-                                <div className="w-full sm:w-[200px]">
+                                <div className="flex w-full flex-col gap-1 sm:w-[200px]">
+                                    <span className="text-xs font-medium text-muted-foreground">
+                                        Branch
+                                    </span>
                                     <AsyncSelect
                                         url="/api/branches"
                                         placeholder="All Branches"

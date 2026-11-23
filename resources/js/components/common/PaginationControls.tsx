@@ -21,6 +21,7 @@ export function PaginationControls({
     onPageChange,
     onPageSizeChange,
     renderPageNumbers,
+    disabled = false,
 }: Readonly<{
     pagination: {
         page: number;
@@ -33,6 +34,7 @@ export function PaginationControls({
     onPageChange: (page: Readonly<number>) => void;
     onPageSizeChange: (per_page: string) => void;
     renderPageNumbers: () => React.ReactNode;
+    disabled?: boolean;
 }>) {
     return (
         <div className="flex flex-col gap-2 py-2 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:text-sm">
@@ -41,6 +43,7 @@ export function PaginationControls({
                 <Select
                     value={String(pagination.per_page)}
                     onValueChange={onPageSizeChange}
+                    disabled={disabled}
                 >
                     <SelectTrigger className="h-8 w-[70px] border-border bg-background">
                         <SelectValue />
@@ -70,9 +73,9 @@ export function PaginationControls({
                                     onPageChange(pagination.page - 1);
                                 }
                             }}
-                            aria-disabled={pagination.page <= 1}
+                            aria-disabled={disabled || pagination.page <= 1}
                             className={
-                                pagination.page <= 1
+                                disabled || pagination.page <= 1
                                     ? 'pointer-events-none opacity-50'
                                     : ''
                             }
@@ -91,9 +94,11 @@ export function PaginationControls({
                                 }
                             }}
                             aria-disabled={
+                                disabled ||
                                 pagination.page >= pagination.last_page
                             }
                             className={
+                                disabled ||
                                 pagination.page >= pagination.last_page
                                     ? 'pointer-events-none opacity-50'
                                     : ''

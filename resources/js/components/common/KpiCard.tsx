@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 
@@ -30,7 +31,10 @@ export function KpiCard({
             <CardContent className="min-w-0">
                 <div
                     title={formattedValue}
-                    className={`text-xl font-semibold break-keep tabular-nums min-[1400px]:text-2xl ${valueClassName ?? ''}`}
+                    className={cn(
+                        'text-xl font-semibold break-keep tabular-nums min-[1400px]:text-2xl',
+                        valueClassName,
+                    )}
                 >
                     {formattedValue}
                 </div>

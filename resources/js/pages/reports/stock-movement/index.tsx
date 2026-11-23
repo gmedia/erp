@@ -15,6 +15,7 @@ export default function StockMovementReportPage() {
     return (
         <ReportDataTablePage<StockMovementReportItem>
             title="Stock Movement Report"
+            descriptionKey="reports.pageDescriptions.stock-movement"
             breadcrumbs={createReportBreadcrumbs(
                 'Stock Movement',
                 '/reports/stock-movement',

@@ -21,7 +21,7 @@ test.describe('Financial Dashboard', () => {
     await page.goto('/financial-dashboard');
     await dataPromise;
 
-    await expect(page.getByRole('heading', { name: 'Financial Overview' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Financial Dashboard' })).toBeVisible();
 
     const fiscalYearTrigger = page.locator('#fiscal-year-select');
     await expect(fiscalYearTrigger).toBeVisible({ timeout: 10000 });
@@ -60,9 +60,9 @@ test.describe('Financial Dashboard', () => {
     await dataPromise;
 
     const refreshPromise = waitForFinancialDashboardData(page);
-    await page.getByRole('button', { name: 'Refresh Data' }).click();
+    await page.getByRole('button', { name: 'Refresh', exact: true }).click();
     await refreshPromise;
 
-    await expect(page.getByRole('heading', { name: 'Financial Overview' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Financial Dashboard' })).toBeVisible();
   });
 });

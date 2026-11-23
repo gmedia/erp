@@ -12,6 +12,15 @@ test.describe('AR Aging Report', () => {
         await expect(page.locator('table')).toBeVisible();
     });
 
+    test('shows total row with as-of date below the table', async ({ page }) => {
+        await openArAgingReport(page);
+        const summary = page.getByTestId('report-summary');
+        await expect(summary).toBeVisible();
+        await expect(page.getByTestId('report-as-of')).toContainText('As of ');
+        await expect(page.getByTestId('report-total-amount_due')).toBeVisible();
+        await expect(page.getByTestId('report-total-aging_over_90')).toBeVisible();
+    });
+
     test('can sort by column', async ({ page }) => {
         await openArAgingReport(page);
         const sortResponsePromise = page.waitForResponse(

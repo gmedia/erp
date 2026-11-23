@@ -102,10 +102,10 @@ export function StateSummaryCards({
                         {group.states.map((state) => (
                             <Card
                                 key={state.state_id}
-                                className="overflow-hidden transition-all hover:shadow-md"
+                                className="gap-0 overflow-hidden py-0"
                             >
                                 <div
-                                    className="h-2 w-full"
+                                    className="h-1.5 w-full"
                                     style={{ backgroundColor: state.color }}
                                 />
                                 <CardHeader className="flex flex-row items-center justify-between pt-4 pb-2">
