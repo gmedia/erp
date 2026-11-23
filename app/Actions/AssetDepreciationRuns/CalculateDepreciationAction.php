@@ -35,7 +35,7 @@ class CalculateDepreciationAction
                 'created_by' => Auth::id(),
             ]);
 
-            // Find eligible assets
+            // Find eligible assets (optionally limited to $data['asset_codes'], used by seeders)
             $assets = Asset::whereIn('status', ['active', 'maintenance'])
                 ->whereNotNull('depreciation_method')
                 ->where('depreciation_start_date', '<=', $data['period_end'])
@@ -45,6 +45,10 @@ class CalculateDepreciationAction
                     $q->whereNull('book_value')
                         ->orWhereRaw('book_value > COALESCE(salvage_value, 0)');
                 })
+                ->when(
+                    isset($data['asset_codes']),
+                    fn ($q) => $q->whereIn('asset_code', $data['asset_codes'])
+                )
                 ->get();
 
             $lines = [];

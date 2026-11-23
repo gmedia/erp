@@ -1,6 +1,9 @@
 <?php
 
 use App\Actions\AccountingPosting\PostSupplierBillJournalAction;
+use App\Models\Asset;
+use App\Models\AssetDepreciationLine;
+use App\Models\AssetDepreciationRun;
 use App\Models\Branch;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
@@ -96,4 +99,45 @@ test('re-running demo seeders does not delete journals of user-created documents
 
     expect(JournalEntry::query()->whereKey($journal->id)->exists())->toBeTrue()
         ->and(SupplierBill::query()->whereKey($bill->id)->value('journal_entry_id'))->toBe($journal->id);
+});
+
+test('re-running demo seeders does not touch user-created assets or their depreciation runs', function () {
+    test()->seed();
+
+    $fiscalYear = FiscalYear::query()->where('status', 'open')->firstOrFail();
+    $branch = Branch::query()->firstOrFail();
+
+    // Aset buatan pengguna: kode tidak mengikuti pola demo FA-000001..FA-000012.
+    $userAsset = Asset::factory()->create([
+        'asset_code' => 'FA-USER-0001',
+        'branch_id' => $branch->id,
+        'status' => 'active',
+        'depreciation_method' => 'straight_line',
+        'depreciation_start_date' => $fiscalYear->start_date,
+        'useful_life_months' => 60,
+        'salvage_value' => 0,
+        'purchase_cost' => 1000000,
+        'accumulated_depreciation' => 123456,
+        'book_value' => 876544,
+    ]);
+
+    // Run depresiasi buatan pengguna beserta baris dan jurnalnya.
+    $userRun = AssetDepreciationRun::factory()->create([
+        'fiscal_year_id' => $fiscalYear->id,
+        'period_start' => $fiscalYear->start_date,
+        'period_end' => $fiscalYear->start_date,
+        'status' => 'calculated',
+    ]);
+    $userLine = AssetDepreciationLine::factory()->create([
+        'asset_depreciation_run_id' => $userRun->id,
+        'asset_id' => $userAsset->id,
+    ]);
+
+    test()->seed();
+
+    expect(Asset::query()->whereKey($userAsset->id)->value('accumulated_depreciation'))->toEqual(123456.0)
+        ->and(Asset::query()->whereKey($userAsset->id)->value('book_value'))->toEqual(876544.0)
+        ->and(AssetDepreciationRun::query()->whereKey($userRun->id)->exists())->toBeTrue()
+        ->and(AssetDepreciationRun::query()->whereKey($userRun->id)->value('status'))->toBe('calculated')
+        ->and(AssetDepreciationLine::query()->whereKey($userLine->id)->exists())->toBeTrue();
 });

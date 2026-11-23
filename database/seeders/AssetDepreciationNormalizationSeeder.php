@@ -61,13 +61,24 @@ class AssetDepreciationNormalizationSeeder extends Seeder
     }
 
     /**
+     * Hanya aset demo (AssetSampleDataSeeder::DEMO_ASSET_CODES). Aset buatan
+     * pengguna, beserta run dan jurnal depresiasinya, tidak disentuh (#357).
+     */
+    private function demoAssets()
+    {
+        return Asset::query()
+            ->whereIn('asset_code', AssetSampleDataSeeder::DEMO_ASSET_CODES)
+            ->orderBy('id');
+    }
+
+    /**
      * Register (accumulated_depreciation, book_value) = saldo awal opening
      * (jurnal ACQ-* dari PostAssetAcquisitionJournalAction) + total run terposting.
      * Nilai hardcode di sample aset digantikan agar register sama dengan GL.
      */
     private function syncRegisterFromPostedSources(): void
     {
-        Asset::query()->orderBy('id')->get()->each(function (Asset $asset): void {
+        $this->demoAssets()->get()->each(function (Asset $asset): void {
             if (in_array($asset->status, ['draft', 'cancelled'], true)) {
                 return;
             }
@@ -113,7 +124,7 @@ class AssetDepreciationNormalizationSeeder extends Seeder
      */
     private function stampAssetMetadata(int $expenseAccountId, int $accumulatedAccountId): void
     {
-        Asset::query()->orderBy('id')->get()->each(function (Asset $asset) use ($expenseAccountId, $accumulatedAccountId): void {
+        $this->demoAssets()->get()->each(function (Asset $asset) use ($expenseAccountId, $accumulatedAccountId): void {
             if (in_array($asset->status, ['draft', 'cancelled'], true)) {
                 return;
             }
@@ -147,6 +158,7 @@ class AssetDepreciationNormalizationSeeder extends Seeder
             'fiscal_year_id' => $fiscalYear->id,
             'period_start' => $periodStart->toDateString(),
             'period_end' => $periodEnd->toDateString(),
+            'asset_codes' => AssetSampleDataSeeder::DEMO_ASSET_CODES,
         ]);
 
         if ($run->lines_count === 0) {
