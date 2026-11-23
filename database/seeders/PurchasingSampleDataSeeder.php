@@ -1192,7 +1192,7 @@ class PurchasingSampleDataSeeder extends Seeder
                 'created_at' => $submittedAt,
                 'metadata' => [
                     'source' => 'PurchasingSampleDataSeeder',
-                    'approval_flow_code' => $approvalFlowCode,
+                    'flow_code' => $approvalFlowCode,
                     'status' => $requestStatus,
                 ],
             ]
@@ -1301,7 +1301,7 @@ class PurchasingSampleDataSeeder extends Seeder
                     'created_at' => $completedAt ?? $submittedAt,
                     'metadata' => [
                         'source' => 'PurchasingSampleDataSeeder',
-                        'approval_flow_code' => $approvalFlowCode,
+                        'flow_code' => $approvalFlowCode,
                     ],
                 ]
             );

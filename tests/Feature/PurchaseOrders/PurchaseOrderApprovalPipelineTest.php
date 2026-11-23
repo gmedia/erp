@@ -165,3 +165,53 @@ test('submitting a purchase order creates a pending approval and sets status to 
             ->where('status', 'pending')
             ->exists())->toBeTrue();
 });
+
+test('approving the purchase order sets status to confirmed and records approved_by', function () {
+    $setup = setUpPurchaseOrderApprovalPipeline();
+    Sanctum::actingAs($this->submitter, ['*']);
+
+    $purchaseOrder = PurchaseOrder::factory()->create(['status' => 'draft']);
+
+    postJson("/api/entity-states/purchase_order/{$purchaseOrder->id}/transition", [
+        'transition_id' => $setup['submit']->id,
+    ])->assertOk();
+
+    $approval = ApprovalRequest::query()
+        ->where('approvable_type', PurchaseOrder::class)
+        ->where('approvable_id', $purchaseOrder->id)
+        ->firstOrFail();
+
+    Sanctum::actingAs($setup['approver'], ['*']);
+
+    postJson("/api/my-approvals/{$approval->id}/approve")->assertOk();
+
+    $purchaseOrder->refresh();
+
+    expect($purchaseOrder->status)->toBe('confirmed')
+        ->and($purchaseOrder->approved_by)->toBe($setup['approver']->id)
+        ->and($purchaseOrder->approved_at)->not->toBeNull();
+});
+
+test('rejecting the purchase order sets status to rejected', function () {
+    $setup = setUpPurchaseOrderApprovalPipeline();
+    Sanctum::actingAs($this->submitter, ['*']);
+
+    $purchaseOrder = PurchaseOrder::factory()->create(['status' => 'draft']);
+
+    postJson("/api/entity-states/purchase_order/{$purchaseOrder->id}/transition", [
+        'transition_id' => $setup['submit']->id,
+    ])->assertOk();
+
+    $approval = ApprovalRequest::query()
+        ->where('approvable_type', PurchaseOrder::class)
+        ->where('approvable_id', $purchaseOrder->id)
+        ->firstOrFail();
+
+    Sanctum::actingAs($setup['approver'], ['*']);
+
+    postJson("/api/my-approvals/{$approval->id}/reject", [
+        'comments' => 'Harga tidak sesuai',
+    ])->assertOk();
+
+    expect($purchaseOrder->fresh()->status)->toBe('rejected');
+});
