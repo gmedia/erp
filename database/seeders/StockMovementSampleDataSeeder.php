@@ -2,7 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Actions\AccountingPosting\PostGoodsReceiptJournalAction;
+use App\Actions\AccountingPosting\PostStockAdjustmentJournalAction;
+use App\Actions\AccountingPosting\PostSupplierReturnJournalAction;
 use App\Models\GoodsReceipt;
+use App\Models\JournalEntry;
+use App\Models\JournalEntryLine;
 use App\Models\StockAdjustment;
 use App\Models\StockAdjustmentItem;
 use App\Models\StockMovement;
@@ -65,6 +70,8 @@ class StockMovementSampleDataSeeder extends Seeder
 
         $stockPosting->rebuildBalances();
 
+        $this->postInventoryJournals();
+
         // Keep the approved adjustment's recorded `quantity_after` in sync with
         // the recomputed ledger balance so the detail view matches the card.
         $approvedAdjustments = StockAdjustment::query()
@@ -87,5 +94,51 @@ class StockMovementSampleDataSeeder extends Seeder
                 }
             }
         }
+    }
+
+    /**
+     * Jurnal persediaan demo (GR, retur, adjustment) lewat action aplikasi,
+     * setelah movement dibuat. Jurnal lama dilepas dulu karena action
+     * mengembalikan jurnal yang sudah ada bila `journal_entry_id` terisi.
+     */
+    private function postInventoryJournals(): void
+    {
+        $staleEntryIds = JournalEntry::query()
+            ->whereIn('source_type', [
+                GoodsReceipt::class,
+                SupplierReturn::class,
+                StockAdjustment::class,
+            ])
+            ->pluck('id');
+
+        if ($staleEntryIds->isNotEmpty()) {
+            GoodsReceipt::query()->whereIn('journal_entry_id', $staleEntryIds)->update(['journal_entry_id' => null]);
+            SupplierReturn::query()->whereIn('journal_entry_id', $staleEntryIds)->update(['journal_entry_id' => null]);
+            StockAdjustment::query()->whereIn('journal_entry_id', $staleEntryIds)->update(['journal_entry_id' => null]);
+            JournalEntryLine::query()->whereIn('journal_entry_id', $staleEntryIds)->delete();
+            JournalEntry::query()->whereIn('id', $staleEntryIds)->delete();
+        }
+
+        $postGoodsReceipt = app(PostGoodsReceiptJournalAction::class);
+        $postSupplierReturn = app(PostSupplierReturnJournalAction::class);
+        $postStockAdjustment = app(PostStockAdjustmentJournalAction::class);
+
+        GoodsReceipt::query()
+            ->where('status', 'confirmed')
+            ->orderBy('id')
+            ->get()
+            ->each(fn (GoodsReceipt $receipt) => $postGoodsReceipt->execute($receipt->refresh()));
+
+        SupplierReturn::query()
+            ->where('status', 'confirmed')
+            ->orderBy('id')
+            ->get()
+            ->each(fn (SupplierReturn $return) => $postSupplierReturn->execute($return->refresh()));
+
+        StockAdjustment::query()
+            ->where('status', 'approved')
+            ->orderBy('id')
+            ->get()
+            ->each(fn (StockAdjustment $adjustment) => $postStockAdjustment->execute($adjustment->refresh()));
     }
 }

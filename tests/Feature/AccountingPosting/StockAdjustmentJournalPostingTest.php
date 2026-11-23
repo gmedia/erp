@@ -141,6 +141,49 @@ test('PostStockAdjustmentJournalAction creates a balanced posted journal entry f
         ->and((float) $expenseLine->debit)->toBe(0.0);
 });
 
+test('PostStockAdjustmentJournalAction posts opening stock against owner capital, not COGS', function () {
+    makeStockAdjPostingFiscalYear();
+    $accounts = makeStockAdjPostingAccounts();
+    $equity = Account::factory()->create([
+        'coa_version_id' => $accounts['coa_version']->id,
+        'code' => '31000',
+        'name' => 'Owner Capital',
+        'type' => 'equity',
+        'normal_balance' => 'credit',
+        'is_active' => true,
+    ]);
+    $approver = User::factory()->create();
+
+    $adjustment = StockAdjustment::factory()->create([
+        'status' => 'approved',
+        'adjustment_number' => 'SA-2026-000010',
+        'adjustment_date' => '2026-01-02',
+        'adjustment_type' => 'initial_stock',
+        'journal_entry_id' => null,
+        'approved_by' => $approver->id,
+        'approved_at' => now(),
+    ]);
+
+    StockAdjustmentItem::factory()->create([
+        'stock_adjustment_id' => $adjustment->id,
+        'quantity_adjusted' => 50,
+        'unit_cost' => 10000,
+        'total_cost' => 500000,
+    ]);
+
+    $journalEntry = app(PostStockAdjustmentJournalAction::class)->execute($adjustment->fresh());
+
+    expect((float) $journalEntry->total_debit)->toBe(500000.0)
+        ->and((float) $journalEntry->total_credit)->toBe(500000.0);
+
+    $inventoryLine = $journalEntry->lines()->where('account_id', $accounts['inventory']->id)->first();
+    expect((float) $inventoryLine->debit)->toBe(500000.0);
+
+    $equityLine = $journalEntry->lines()->where('account_id', $equity->id)->first();
+    expect((float) $equityLine->credit)->toBe(500000.0)
+        ->and($journalEntry->lines()->where('account_id', $accounts['expense']->id)->exists())->toBeFalse();
+});
+
 test('PostStockAdjustmentJournalAction is idempotent', function () {
     makeStockAdjPostingFiscalYear();
     makeStockAdjPostingAccounts();

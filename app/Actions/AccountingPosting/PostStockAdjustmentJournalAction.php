@@ -14,6 +14,11 @@ class PostStockAdjustmentJournalAction
 
     public const STOCK_ADJUSTMENT_EXPENSE_CODE = '51000';
 
+    /**
+     * Saldo awal stok dilawankan ke modal (ekuitas), bukan ke beban HPP.
+     */
+    public const OPENING_STOCK_EQUITY_CODE = '31000';
+
     public function __construct(
         private CreateJournalEntryAction $createJournalEntry,
         private ResolveControlAccountAction $resolveControlAccount,
@@ -42,7 +47,11 @@ class PostStockAdjustmentJournalAction
             }
 
             $inventoryAccount = $this->resolveControlAccount->execute(self::INVENTORY_ACCOUNT_CODE);
-            $expenseAccount = $this->resolveControlAccount->execute(self::STOCK_ADJUSTMENT_EXPENSE_CODE);
+            $expenseAccount = $this->resolveControlAccount->execute(
+                $stockAdjustment->adjustment_type === 'initial_stock'
+                    ? self::OPENING_STOCK_EQUITY_CODE
+                    : self::STOCK_ADJUSTMENT_EXPENSE_CODE
+            );
 
             $totalPositive = 0.0;
             $totalNegative = 0.0;
