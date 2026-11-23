@@ -11,6 +11,10 @@ import {
     ItemNotesField,
     ItemProductUnitFields,
 } from '@/components/common/ItemFormDialog';
+import {
+    formatSourceLineLabel,
+    ItemSourceLineSelectField,
+} from '@/components/common/ItemSourceLineSelectField';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type SupplierReturnFormData } from '@/types/supplier-return';
 
@@ -18,6 +22,7 @@ const supplierReturnItemSchema = z.object({
     goods_receipt_item_id: z
         .string()
         .min(1, { message: 'GR item is required.' }),
+    goods_receipt_item_label: z.string().optional(),
     product_id: z.string().min(1, { message: 'Product is required.' }),
     product_label: z.string().optional(),
     unit_id: z.string().optional(),
@@ -38,6 +43,7 @@ interface SupplierReturnItemFormDialogProps {
     readonly onOpenChange: (open: boolean) => void;
     readonly item: SupplierReturnItemFormData | null;
     readonly onSave: (data: SupplierReturnItemFormData) => void;
+    readonly goodsReceiptId?: string;
 }
 
 export function SupplierReturnItemFormDialog({
@@ -45,11 +51,13 @@ export function SupplierReturnItemFormDialog({
     onOpenChange,
     item,
     onSave,
+    goodsReceiptId,
 }: SupplierReturnItemFormDialogProps) {
     const defaultValues = useMemo<SupplierReturnItemFormData>(() => {
         if (!item) {
             return {
                 goods_receipt_item_id: '',
+                goods_receipt_item_label: '',
                 product_id: '',
                 product_label: '',
                 unit_id: '',
@@ -62,6 +70,7 @@ export function SupplierReturnItemFormDialog({
 
         return {
             goods_receipt_item_id: item.goods_receipt_item_id || '',
+            goods_receipt_item_label: item.goods_receipt_item_label || '',
             product_id: item.product_id || '',
             product_label: item.product_label || '',
             unit_id: item.unit_id || '',
@@ -97,13 +106,53 @@ export function SupplierReturnItemFormDialog({
             itemDescription="supplier return item"
         >
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <InputField
+                <ItemSourceLineSelectField
+                    open={open}
                     name="goods_receipt_item_id"
-                    label="GR Item ID"
-                    type="number"
-                    min={1}
-                    step="1"
-                    placeholder="1"
+                    url={
+                        goodsReceiptId
+                            ? `/api/goods-receipts/${goodsReceiptId}/item-options`
+                            : null
+                    }
+                    label="GR Item"
+                    placeholder="Select GR item"
+                    emptyHint="Select a goods receipt first."
+                    initialId={defaultValues.goods_receipt_item_id}
+                    initialLabel={defaultValues.goods_receipt_item_label}
+                    onLineSelect={(line) => {
+                        form.setValue(
+                            'goods_receipt_item_label',
+                            formatSourceLineLabel(line),
+                            { shouldDirty: true },
+                        );
+                        form.setValue(
+                            'product_id',
+                            String(line.product_id ?? ''),
+                            {
+                                shouldDirty: true,
+                            },
+                        );
+                        form.setValue(
+                            'product_label',
+                            line.product_name ?? '',
+                            {
+                                shouldDirty: true,
+                            },
+                        );
+                        form.setValue('unit_id', String(line.unit_id ?? ''), {
+                            shouldDirty: true,
+                        });
+                        form.setValue('unit_label', line.unit_name ?? '', {
+                            shouldDirty: true,
+                        });
+                        form.setValue(
+                            'unit_price',
+                            Number(line.unit_price ?? 0),
+                            {
+                                shouldDirty: true,
+                            },
+                        );
+                    }}
                 />
                 <ItemProductUnitFields
                     form={form}

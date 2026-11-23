@@ -50,6 +50,7 @@ interface SupplierReturnFormProps {
 const createEmptySupplierReturnItem =
     (): SupplierReturnFormData['items'][number] => ({
         goods_receipt_item_id: '',
+        goods_receipt_item_label: '',
         product_id: '',
         product_label: '',
         unit_id: '',
@@ -100,6 +101,7 @@ const getSupplierReturnFormDefaults = (
         items: (supplierReturn.items || []).length
             ? (supplierReturn.items || []).map((it) => ({
                   goods_receipt_item_id: String(it.goods_receipt_item_id),
+                  goods_receipt_item_label: it.product?.name || '',
                   product_id: it.product?.id ? String(it.product.id) : '',
                   product_label: it.product?.name || '',
                   unit_id: it.unit?.id ? String(it.unit.id) : '',
@@ -146,6 +148,7 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
             name: 'items',
         });
         const watchedItems = form.watch('items');
+        const watchedGoodsReceiptId = form.watch('goods_receipt_id');
         const {
             isItemDialogOpen,
             item: selectedItem,
@@ -345,6 +348,7 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
                     onOpenChange={handleItemDialogOpenChange}
                     item={selectedItem}
                     onSave={handleSaveItem}
+                    goodsReceiptId={watchedGoodsReceiptId}
                 />
             </EntityForm>
         );

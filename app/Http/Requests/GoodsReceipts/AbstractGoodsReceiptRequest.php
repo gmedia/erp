@@ -5,12 +5,54 @@ namespace App\Http\Requests\GoodsReceipts;
 use App\Http\Requests\AuthorizedFormRequest;
 use App\Http\Requests\Concerns\HasRouteIgnoredUniqueRule;
 use App\Http\Requests\Concerns\HasSometimesArrayRules;
+use App\Models\PurchaseOrderItem;
 use Illuminate\Validation\Rules\Unique;
+use Illuminate\Validation\Validator;
 
 abstract class AbstractGoodsReceiptRequest extends AuthorizedFormRequest
 {
     use HasRouteIgnoredUniqueRule;
     use HasSometimesArrayRules;
+
+    public function after(): array
+    {
+        return [
+            function (Validator $validator): void {
+                $items = $this->input('items');
+
+                if (! is_array($items)) {
+                    return;
+                }
+
+                $existing = $this->route('goodsReceipt');
+                $purchaseOrderId = $this->input('purchase_order_id', $existing?->purchase_order_id);
+
+                if (! $purchaseOrderId) {
+                    return;
+                }
+
+                foreach ($items as $index => $item) {
+                    $lineId = $item['purchase_order_item_id'] ?? null;
+
+                    if ($lineId === null || $lineId === '') {
+                        continue;
+                    }
+
+                    $belongs = PurchaseOrderItem::query()
+                        ->whereKey($lineId)
+                        ->where('purchase_order_id', $purchaseOrderId)
+                        ->exists();
+
+                    if (! $belongs) {
+                        $validator->errors()->add(
+                            "items.{$index}.purchase_order_item_id",
+                            'The PO item must belong to the selected purchase order.',
+                        );
+                    }
+                }
+            },
+        ];
+    }
 
     public function rules(): array
     {

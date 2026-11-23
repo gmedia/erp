@@ -7,6 +7,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::middleware('permission:purchase_order,true')->group(function () {
         Route::get('purchase-orders', [PurchaseOrderController::class, 'index']);
         Route::get('purchase-orders/{purchaseOrder}', [PurchaseOrderController::class, 'show']);
+        Route::get('purchase-orders/{purchaseOrder}/item-options', [PurchaseOrderController::class, 'itemOptions']);
         Route::post('purchase-orders', [PurchaseOrderController::class, 'store']);
         Route::put('purchase-orders/{purchaseOrder}', [PurchaseOrderController::class, 'update']);
         Route::delete('purchase-orders/{purchaseOrder}', [PurchaseOrderController::class, 'destroy']);

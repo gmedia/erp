@@ -5,6 +5,7 @@ namespace App\Http\Requests\SupplierReturns;
 use App\Http\Requests\AuthorizedFormRequest;
 use App\Http\Requests\Concerns\HasSometimesArrayRules;
 use App\Models\GoodsReceipt;
+use App\Models\GoodsReceiptItem;
 use App\Models\PurchaseOrder;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
@@ -17,6 +18,8 @@ abstract class AbstractSupplierReturnMutationRequest extends AuthorizedFormReque
     {
         return [
             function (Validator $validator): void {
+                $this->validateItemsBelongToGoodsReceipt($validator);
+
                 $touched = collect(['purchase_order_id', 'supplier_id', 'goods_receipt_id'])
                     ->contains(fn (string $key): bool => $this->has($key));
 
@@ -85,6 +88,42 @@ abstract class AbstractSupplierReturnMutationRequest extends AuthorizedFormReque
             'items.*.unit_price' => $this->requiredNumericItemRule('min:0'),
             'items.*.notes' => $this->nullableStringItemRule(),
         ];
+    }
+
+    protected function validateItemsBelongToGoodsReceipt(Validator $validator): void
+    {
+        $items = $this->input('items');
+
+        if (! is_array($items)) {
+            return;
+        }
+
+        $existing = $this->route('supplierReturn');
+        $goodsReceiptId = $this->input('goods_receipt_id', $existing?->goods_receipt_id);
+
+        if (! $goodsReceiptId) {
+            return;
+        }
+
+        foreach ($items as $index => $item) {
+            $lineId = $item['goods_receipt_item_id'] ?? null;
+
+            if ($lineId === null || $lineId === '') {
+                continue;
+            }
+
+            $belongs = GoodsReceiptItem::query()
+                ->whereKey($lineId)
+                ->where('goods_receipt_id', $goodsReceiptId)
+                ->exists();
+
+            if (! $belongs) {
+                $validator->errors()->add(
+                    "items.{$index}.goods_receipt_item_id",
+                    'The GR item must belong to the selected goods receipt.',
+                );
+            }
+        }
     }
 
     protected function returnNumberUniqueRule(): Rule|string

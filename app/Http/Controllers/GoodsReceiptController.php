@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\AccountingPosting\PostGoodsReceiptJournalAction;
 use App\Actions\GoodsReceipts\ExportGoodsReceiptsAction;
 use App\Actions\GoodsReceipts\IndexGoodsReceiptsAction;
+use App\Actions\GoodsReceipts\ListGoodsReceiptItemOptionsAction;
 use App\Actions\GoodsReceipts\PostGoodsReceiptMovementsAction;
 use App\Actions\GoodsReceipts\SyncGoodsReceiptItemsAction;
 use App\DTOs\GoodsReceipts\UpdateGoodsReceiptData;
@@ -150,6 +151,11 @@ class GoodsReceiptController extends Controller
     public function destroy(GoodsReceipt $goodsReceipt): JsonResponse
     {
         return $this->destroyModel($goodsReceipt);
+    }
+
+    public function itemOptions(GoodsReceipt $goodsReceipt, ListGoodsReceiptItemOptionsAction $action): JsonResponse
+    {
+        return response()->json(['data' => $action->execute($goodsReceipt)]);
     }
 
     public function export(ExportGoodsReceiptRequest $request, ExportGoodsReceiptsAction $action): JsonResponse

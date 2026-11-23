@@ -50,6 +50,7 @@ interface GoodsReceiptFormProps {
 const createEmptyGoodsReceiptItem =
     (): GoodsReceiptFormData['items'][number] => ({
         purchase_order_item_id: '',
+        purchase_order_item_label: '',
         product_id: '',
         product_label: '',
         unit_id: '',
@@ -98,6 +99,7 @@ const getGoodsReceiptFormDefaults = (
         items: (goodsReceipt.items || []).length
             ? (goodsReceipt.items || []).map((it) => ({
                   purchase_order_item_id: String(it.purchase_order_item_id),
+                  purchase_order_item_label: it.product?.name || '',
                   product_id: it.product?.id ? String(it.product.id) : '',
                   product_label: it.product?.name || '',
                   unit_id: it.unit?.id ? String(it.unit.id) : '',
@@ -146,6 +148,7 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
             name: 'items',
         });
         const watchedItems = form.watch('items');
+        const watchedPurchaseOrderId = form.watch('purchase_order_id');
         const {
             isItemDialogOpen,
             item: selectedItem,
@@ -341,6 +344,7 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
                     onOpenChange={handleItemDialogOpenChange}
                     item={selectedItem}
                     onSave={handleSaveItem}
+                    purchaseOrderId={watchedPurchaseOrderId}
                 />
             </EntityForm>
         );

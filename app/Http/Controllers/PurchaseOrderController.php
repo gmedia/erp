@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\PurchaseOrders\ExportPurchaseOrdersAction;
 use App\Actions\PurchaseOrders\IndexPurchaseOrdersAction;
+use App\Actions\PurchaseOrders\ListPurchaseOrderItemOptionsAction;
 use App\Actions\PurchaseOrders\SyncPurchaseOrderItemsAction;
 use App\DTOs\PurchaseOrders\UpdatePurchaseOrderData;
 use App\Http\Controllers\Concerns\LoadsResourceRelations;
@@ -92,6 +93,11 @@ class PurchaseOrderController extends Controller
     public function destroy(PurchaseOrder $purchaseOrder): JsonResponse
     {
         return $this->destroyModel($purchaseOrder);
+    }
+
+    public function itemOptions(PurchaseOrder $purchaseOrder, ListPurchaseOrderItemOptionsAction $action): JsonResponse
+    {
+        return response()->json(['data' => $action->execute($purchaseOrder)]);
     }
 
     public function export(ExportPurchaseOrderRequest $request, ExportPurchaseOrdersAction $action): JsonResponse

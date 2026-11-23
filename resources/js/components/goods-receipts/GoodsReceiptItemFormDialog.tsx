@@ -11,6 +11,10 @@ import {
     ItemNotesField,
     ItemProductUnitFields,
 } from '@/components/common/ItemFormDialog';
+import {
+    formatSourceLineLabel,
+    ItemSourceLineSelectField,
+} from '@/components/common/ItemSourceLineSelectField';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type GoodsReceiptFormData } from '@/types/goods-receipt';
 
@@ -18,6 +22,7 @@ const goodsReceiptItemSchema = z.object({
     purchase_order_item_id: z
         .string()
         .min(1, { message: 'PO Item is required.' }),
+    purchase_order_item_label: z.string().optional(),
     product_id: z.string().min(1, { message: 'Product is required.' }),
     product_label: z.string().optional(),
     unit_id: z.string().min(1, { message: 'Unit is required.' }),
@@ -42,6 +47,7 @@ interface GoodsReceiptItemFormDialogProps {
     readonly onOpenChange: (open: boolean) => void;
     readonly item: GoodsReceiptItemFormData | null;
     readonly onSave: (data: GoodsReceiptItemFormData) => void;
+    readonly purchaseOrderId?: string;
 }
 
 export function GoodsReceiptItemFormDialog({
@@ -49,11 +55,13 @@ export function GoodsReceiptItemFormDialog({
     onOpenChange,
     item,
     onSave,
+    purchaseOrderId,
 }: GoodsReceiptItemFormDialogProps) {
     const defaultValues = useMemo<GoodsReceiptItemFormData>(() => {
         if (!item) {
             return {
                 purchase_order_item_id: '',
+                purchase_order_item_label: '',
                 product_id: '',
                 product_label: '',
                 unit_id: '',
@@ -68,6 +76,7 @@ export function GoodsReceiptItemFormDialog({
 
         return {
             purchase_order_item_id: item.purchase_order_item_id || '',
+            purchase_order_item_label: item.purchase_order_item_label || '',
             product_id: item.product_id || '',
             product_label: item.product_label || '',
             unit_id: item.unit_id || '',
@@ -105,13 +114,53 @@ export function GoodsReceiptItemFormDialog({
             itemDescription="goods receipt item"
         >
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <InputField
+                <ItemSourceLineSelectField
+                    open={open}
                     name="purchase_order_item_id"
-                    label="PO Item ID"
-                    type="number"
-                    min={1}
-                    step="1"
-                    placeholder="1"
+                    url={
+                        purchaseOrderId
+                            ? `/api/purchase-orders/${purchaseOrderId}/item-options`
+                            : null
+                    }
+                    label="PO Item"
+                    placeholder="Select PO item"
+                    emptyHint="Select a purchase order first."
+                    initialId={defaultValues.purchase_order_item_id}
+                    initialLabel={defaultValues.purchase_order_item_label}
+                    onLineSelect={(line) => {
+                        form.setValue(
+                            'purchase_order_item_label',
+                            formatSourceLineLabel(line),
+                            { shouldDirty: true },
+                        );
+                        form.setValue(
+                            'product_id',
+                            String(line.product_id ?? ''),
+                            {
+                                shouldDirty: true,
+                            },
+                        );
+                        form.setValue(
+                            'product_label',
+                            line.product_name ?? '',
+                            {
+                                shouldDirty: true,
+                            },
+                        );
+                        form.setValue('unit_id', String(line.unit_id ?? ''), {
+                            shouldDirty: true,
+                        });
+                        form.setValue('unit_label', line.unit_name ?? '', {
+                            shouldDirty: true,
+                        });
+                        form.setValue(
+                            'unit_price',
+                            Number(line.unit_price ?? 0),
+                            {
+                                shouldDirty: true,
+                            },
+                        );
+                    }}
                 />
                 <ItemProductUnitFields
                     form={form}
