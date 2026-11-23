@@ -25,8 +25,9 @@ import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
 import { cn } from '@/lib/utils';
 import { ApprovalRequest, ApprovalRequestStep } from '@/types/approval';
+import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { format, formatDistanceToNow, isValid, parseISO } from 'date-fns';
+import { formatDistanceToNow, isValid, parseISO } from 'date-fns';
 import { Check, Clock, Eye, Loader2, X } from 'lucide-react';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -121,7 +122,7 @@ function formatSubmittedAt(submittedAt: string | null | undefined): {
     }
     return {
         relative: formatDistanceToNow(date, { addSuffix: true }),
-        absolute: format(date, 'dd MMM yyyy HH:mm'),
+        absolute: formatDateTimeByRegionalSettings(date),
     };
 }
 

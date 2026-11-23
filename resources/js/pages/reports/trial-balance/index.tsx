@@ -90,7 +90,7 @@ export default function TrialBalance() {
                         <FinancialStatusBadge
                             isPositive={isBalanced}
                             positiveLabel="Balanced"
-                            negativeLabel={`Unbalanced • ${formatCurrency(difference)}`}
+                            negativeLabel={`Unbalanced • ${formatCurrency(difference, 0)}`}
                         />
                     )}
                 </FinancialReportHeaderMeta>
@@ -162,6 +162,7 @@ export default function TrialBalance() {
                                                     ? '-'
                                                     : formatCurrency(
                                                           item.debit,
+                                                          0,
                                                       )}
                                             </TableCell>
                                             <TableCell className="text-right text-xs whitespace-nowrap tabular-nums md:text-sm">
@@ -169,6 +170,7 @@ export default function TrialBalance() {
                                                     ? '-'
                                                     : formatCurrency(
                                                           item.credit,
+                                                          0,
                                                       )}
                                             </TableCell>
                                         </TableRow>
@@ -187,12 +189,12 @@ export default function TrialBalance() {
                                         <TableCell
                                             className={`text-right font-semibold tabular-nums ${isBalanced ? '' : 'text-destructive'}`}
                                         >
-                                            {formatCurrency(totalDebit)}
+                                            {formatCurrency(totalDebit, 0)}
                                         </TableCell>
                                         <TableCell
                                             className={`text-right font-semibold tabular-nums ${isBalanced ? '' : 'text-destructive'}`}
                                         >
-                                            {formatCurrency(totalCredit)}
+                                            {formatCurrency(totalCredit, 0)}
                                         </TableCell>
                                     </TableRow>
                                 </TableFooter>
@@ -203,7 +205,7 @@ export default function TrialBalance() {
                 {!isBalanced && report.length > 0 && (
                     <div className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
                         Trial balance is not balanced. Difference:{' '}
-                        {formatCurrency(difference)}
+                        {formatCurrency(difference, 0)}
                     </div>
                 )}
             </div>

@@ -156,6 +156,7 @@ export interface DataTableProps<T> {
     onResetFilters: () => void;
     /** Optional endpoint for export requests */
     exportEndpoint?: string;
+    edgeFade?: boolean;
     /** Optional fields to render inside the filter modal */
     filterFields?: FieldDescriptor[];
     /** Optional callbacks for row actions */
@@ -214,6 +215,7 @@ export function DataTable<T>({
     defaultColumnVisibility,
     controlsDisabled = false,
     footer,
+    edgeFade = true,
 }: Readonly<DataTableProps<T>>) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnVisibility, setColumnVisibility] =
@@ -520,7 +522,7 @@ export function DataTable<T>({
             )}
 
             <div className="overflow-x-auto">
-                <Table className="min-w-max">
+                <Table className="min-w-max" edgeFade={edgeFade}>
                     <TableHeader className="[&_th]:text-muted-foreground">
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>

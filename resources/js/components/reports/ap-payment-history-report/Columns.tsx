@@ -76,18 +76,21 @@ export const apPaymentHistoryReportColumns: ColumnDef<ApPaymentHistoryReportItem
         createReportTextColumn<ApPaymentHistoryReportItem>({
             id: 'total_amount',
             header: 'Total Amount',
+            align: 'right',
             getValue: (item) => formatAmount(item.amounts?.total),
             sortable: true,
         }),
         createReportTextColumn<ApPaymentHistoryReportItem>({
             id: 'allocated',
             header: 'Allocated',
+            align: 'right',
             getValue: (item) => formatAmount(item.amounts?.allocated),
             sortable: true,
         }),
         createReportTextColumn<ApPaymentHistoryReportItem>({
             id: 'unallocated',
             header: 'Unallocated',
+            align: 'right',
             getValue: (item) => formatAmount(item.amounts?.unallocated),
         }),
         createReportStatusBadgeColumn<ApPaymentHistoryReportItem>({
