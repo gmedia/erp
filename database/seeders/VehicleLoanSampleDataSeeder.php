@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Actions\AccountingPosting\PostAssetAcquisitionJournalAction;
 use App\Models\ApprovalFlow;
 use App\Models\ApprovalFlowStep;
 use App\Models\ApprovalRequest;
@@ -539,8 +540,16 @@ class VehicleLoanSampleDataSeeder extends Seeder
                     'currency' => 'IDR',
                     'status' => 'active',
                     'condition' => 'good',
+                    'depreciation_method' => 'straight_line',
+                    'depreciation_start_date' => now()->subYears(3)->toDateString(),
+                    'useful_life_months' => 60,
+                    'salvage_value' => 0,
                 ],
             );
+
+            // Kendaraan dibuat setelah AssetSampleDataSeeder, jadi perolehannya
+            // harus dijurnal di sini lewat action (#357).
+            app(PostAssetAcquisitionJournalAction::class)->execute($asset);
 
             // `asset_id` dan `plate_number` sama-sama unik; cocokkan keduanya
             // agar unit lama dengan plat yang sama tidak memicu duplikat.
