@@ -2,12 +2,17 @@
 
 namespace App\Actions\CreditNotes;
 
+use App\Actions\AccountingPosting\PostCreditNoteJournalAction;
 use App\Models\CreditNote;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
 class ApplyCreditNoteAction
 {
+    public function __construct(
+        private PostCreditNoteJournalAction $postJournal,
+    ) {}
+
     public function execute(CreditNote $creditNote): CreditNote
     {
         if ($creditNote->status !== 'confirmed') {
@@ -25,6 +30,8 @@ class ApplyCreditNoteAction
 
         return DB::transaction(function () use ($creditNote, $invoice) {
             $creditNote->update(['status' => 'applied']);
+
+            $this->postJournal->execute($creditNote);
 
             $newCreditNoteAmount = (float) $invoice->credit_note_amount + (float) $creditNote->grand_total;
             $amountDue = (float) $invoice->grand_total

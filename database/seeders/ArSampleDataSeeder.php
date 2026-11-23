@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Actions\AccountingPosting\PostArReceiptJournalAction;
+use App\Actions\AccountingPosting\PostCreditNoteJournalAction;
 use App\Actions\AccountingPosting\PostCustomerInvoiceJournalAction;
 use App\Models\Account;
 use App\Models\ArReceipt;
@@ -471,7 +472,6 @@ class ArSampleDataSeeder extends Seeder
                     'grand_total' => $definition['grand_total'],
                     'status' => $definition['status'],
                     'notes' => 'Nota kredit atas retur penjualan',
-                    'journal_entry_id' => null,
                     'created_by' => $adminUserId,
                     'confirmed_by' => in_array($definition['status'], ['confirmed', 'applied'], true) ? $adminUserId : null,
                     'confirmed_at' => in_array($definition['status'], ['confirmed', 'applied'], true) ? now()->subDays(1) : null,
@@ -502,14 +502,10 @@ class ArSampleDataSeeder extends Seeder
                 );
             }
 
-            // Update invoice credit_note_amount if applied
+            // Credit note applied: jurnal diposting lewat PostCreditNoteJournalAction (idempoten).
+            // Invoice credit_note_amount/amount_due dihitung ulang dari credit note terposting.
             if ($definition['applied'] && $invoice) {
-                $newCreditNoteAmount = (float) $invoice->credit_note_amount + $definition['grand_total'];
-                $invoice->update([
-                    'credit_note_amount' => $newCreditNoteAmount,
-                    'amount_due' => $invoice->grand_total - $invoice->amount_received - $newCreditNoteAmount,
-                ]);
-                $invoice->updatePaymentStatus();
+                app(PostCreditNoteJournalAction::class)->execute($creditNote->fresh());
             }
         }
     }
