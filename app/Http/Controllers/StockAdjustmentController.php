@@ -16,8 +16,10 @@ use App\Http\Requests\StockAdjustments\UpdateStockAdjustmentRequest;
 use App\Http\Resources\StockAdjustments\StockAdjustmentCollection;
 use App\Http\Resources\StockAdjustments\StockAdjustmentResource;
 use App\Models\StockAdjustment;
+use App\Services\StockPostingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
@@ -133,7 +135,17 @@ class StockAdjustmentController extends Controller
 
     public function destroy(StockAdjustment $stockAdjustment): JsonResponse
     {
-        $stockAdjustment->update(['status' => 'cancelled']);
+        // Issue #356 sibling: adjustment yang sudah approved dibatalkan lewat movement
+        // pembalik (histori tidak dihapus), dalam transaksi yang sama.
+        DB::transaction(function () use ($stockAdjustment): void {
+            $wasApproved = $stockAdjustment->status === 'approved';
+
+            $stockAdjustment->update(['status' => 'cancelled']);
+
+            if ($wasApproved) {
+                app(StockPostingService::class)->reverseDocument(StockAdjustment::class, $stockAdjustment->id, 'adjustment');
+            }
+        });
 
         return response()->json(null, 204);
     }

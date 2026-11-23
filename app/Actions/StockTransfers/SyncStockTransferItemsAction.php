@@ -23,7 +23,11 @@ class SyncStockTransferItemsAction
                 static fn (array $item): array => [
                     'unit_id' => $item['unit_id'],
                     'quantity' => $item['quantity'],
-                    'quantity_received' => $item['quantity_received'] ?? 0,
+                    // Issue #356 baris 5: tanpa quantity_received, transfer diterima penuh.
+                    // Nilai eksplisit (termasuk 0) tetap dihormati.
+                    'quantity_received' => array_key_exists('quantity_received', $item)
+                        ? $item['quantity_received']
+                        : $item['quantity'],
                     'unit_cost' => $item['unit_cost'] ?? 0,
                     'notes' => $item['notes'] ?? null,
                 ],

@@ -17,6 +17,7 @@ use App\Models\StockTransfer;
 use App\Services\StockPostingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class StockTransferController extends Controller
 {
@@ -82,32 +83,53 @@ class StockTransferController extends Controller
         $items = $validated['items'] ?? null;
         unset($validated['items']);
 
-        $this->updateWithSyncedItems(
-            model: $stockTransfer,
-            attributes: $validated,
-            items: $items,
-            payloadResolver: static function (array $attributes): array {
-                return UpdateStockTransferData::fromArray($attributes)->toArray();
-            },
-            syncItems: function (StockTransfer $stockTransfer, array $items) use ($syncItems): void {
+        $stockPosting = app(StockPostingService::class);
+
+        // Issue #356 baris 5-6: update, cek stok, dan posting dalam satu transaksi.
+        // Jika stok tidak cukup, seluruh perubahan dibatalkan (422).
+        DB::transaction(function () use ($stockTransfer, $validated, $items, $syncItems, $stockPosting): void {
+            $stockTransfer->update(UpdateStockTransferData::fromArray($validated)->toArray());
+
+            if (is_array($items)) {
                 $syncItems->execute($stockTransfer, $items);
-            },
-        );
+            }
+
+            $stockTransfer->refresh()->load('items');
+
+            if (in_array($stockTransfer->status, ['in_transit', 'received'], true)) {
+                $stockPosting->assertNoNegativeStock(
+                    $stockTransfer->items
+                        ->map(fn ($item): array => [
+                            (int) $item->product_id,
+                            (int) $stockTransfer->from_warehouse_id,
+                            (float) $item->quantity,
+                        ])
+                        ->all(),
+                );
+            }
+
+            $stockPosting->postStockTransferDispatch($stockTransfer);
+            $stockPosting->postStockTransferReceive($stockTransfer);
+        });
 
         $stockTransfer->load(['fromWarehouse', 'toWarehouse', 'items.product', 'items.unit']);
-
-        // Dispatch/receive change stock levels, so post the movement ledger
-        // through the shared stock posting service (W7-04).
-        $stockPosting = app(StockPostingService::class);
-        $stockPosting->postStockTransferDispatch($stockTransfer);
-        $stockPosting->postStockTransferReceive($stockTransfer);
 
         return (new StockTransferResource($stockTransfer))->response();
     }
 
     public function destroy(StockTransfer $stockTransfer): JsonResponse
     {
-        $stockTransfer->update(['status' => 'cancelled']);
+        // Issue #356 baris 4: transfer yang sudah dikirim dibatalkan lewat movement
+        // pembalik (histori tidak dihapus), dalam transaksi yang sama.
+        DB::transaction(function () use ($stockTransfer): void {
+            $wasPosted = in_array($stockTransfer->status, ['in_transit', 'received'], true);
+
+            $stockTransfer->update(['status' => 'cancelled']);
+
+            if ($wasPosted) {
+                app(StockPostingService::class)->reverseTransfer($stockTransfer->refresh());
+            }
+        });
 
         return response()->json(null, 204);
     }

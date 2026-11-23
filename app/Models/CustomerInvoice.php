@@ -118,6 +118,19 @@ class CustomerInvoice extends Model
         'sent_at',
     ];
 
+    /**
+     * Issue #356 baris 7: kolom DB ikut 0 untuk status tidak tertagih, bukan hanya
+     * accessor. Dengan begitu filter, sort, export, dan agregasi cocok dengan nilai tampil.
+     */
+    protected static function booted(): void
+    {
+        static::saving(function (CustomerInvoice $invoice): void {
+            if (in_array($invoice->status, ['draft', 'cancelled', 'void'], true)) {
+                $invoice->amount_due = '0.00';
+            }
+        });
+    }
+
     public function branch(): BelongsTo
     {
         return $this->belongsTo(Branch::class);

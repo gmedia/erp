@@ -75,6 +75,7 @@ class StockMovement extends Model
         'average_cost_after',
         'reference_type',
         'reference_id',
+        'source_line_id',
         'reference_number',
         'notes',
         'moved_at',
