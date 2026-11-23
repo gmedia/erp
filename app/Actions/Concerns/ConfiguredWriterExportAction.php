@@ -6,6 +6,7 @@ use App\Support\ExportStorage;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Excel as ExcelFormat;
 
 abstract class ConfiguredWriterExportAction
 {
