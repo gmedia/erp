@@ -72,15 +72,16 @@ beforeEach(function () {
 });
 
 // W7-01 — void/cancelled/draft documents must not carry an outstanding balance.
+// Read the raw column, not the model accessor, so a corrupted DB value cannot hide behind it.
 test('W7-01 void, cancelled and draft documents carry no amount due', function () {
     $inactiveStatuses = ['draft', 'cancelled', 'void'];
 
-    foreach (CustomerInvoice::query()->whereIn('status', $inactiveStatuses)->get() as $invoice) {
+    foreach (DB::table('customer_invoices')->whereIn('status', $inactiveStatuses)->get(['invoice_number', 'status', 'amount_due']) as $invoice) {
         expect((float) $invoice->amount_due)
             ->toBe(0.0, "Customer invoice {$invoice->invoice_number} ({$invoice->status}) must have amount due 0");
     }
 
-    foreach (SupplierBill::query()->whereIn('status', $inactiveStatuses)->get() as $bill) {
+    foreach (DB::table('supplier_bills')->whereIn('status', $inactiveStatuses)->get(['bill_number', 'status', 'amount_due']) as $bill) {
         expect((float) $bill->amount_due)
             ->toBe(0.0, "Supplier bill {$bill->bill_number} ({$bill->status}) must have amount due 0");
     }
@@ -227,6 +228,102 @@ test('W7-04 stock movement balances form a correct chain per product and warehou
     expect(min($balance))->toBeGreaterThanOrEqual(0.0, 'Running stock balance must never go negative');
 });
 
+// W7-04 — the reverse direction: every eligible document line must have a movement with the same quantity.
+test('W7-04 every eligible document line has a matching stock movement', function () {
+    $movementSums = DB::table('stock_movements')
+        ->whereNotNull('reference_type')
+        ->groupBy('reference_type', 'reference_id', 'product_id')
+        ->selectRaw('reference_type, reference_id, product_id, SUM(quantity_in) as qty_in, SUM(quantity_out) as qty_out')
+        ->get()
+        ->keyBy(fn ($row) => $row->reference_type . '#' . $row->reference_id . '#' . $row->product_id);
+
+    $checks = [
+        [
+            'type' => GoodsReceipt::class,
+            'header' => 'goods_receipts',
+            'lines' => 'goods_receipt_items',
+            'fk' => 'goods_receipt_id',
+            'status' => 'confirmed',
+            'qty' => 'quantity_received',
+            'direction' => 'in',
+        ],
+        [
+            'type' => SupplierReturn::class,
+            'header' => 'supplier_returns',
+            'lines' => 'supplier_return_items',
+            'fk' => 'supplier_return_id',
+            'status' => 'confirmed',
+            'qty' => 'quantity_returned',
+            'direction' => 'out',
+        ],
+        [
+            'type' => StockAdjustment::class,
+            'header' => 'stock_adjustments',
+            'lines' => 'stock_adjustment_items',
+            'fk' => 'stock_adjustment_id',
+            'status' => 'approved',
+            'qty' => 'quantity_adjusted',
+            'direction' => null,
+        ],
+        [
+            'type' => StockTransfer::class,
+            'header' => 'stock_transfers',
+            'lines' => 'stock_transfer_items',
+            'fk' => 'stock_transfer_id',
+            'status' => 'received',
+            'qty' => 'quantity',
+            'direction' => null,
+        ],
+    ];
+
+    $checked = 0;
+
+    foreach ($checks as $check) {
+        $eligibleIds = DB::table($check['header'])->where('status', $check['status'])->pluck('id');
+
+        foreach (DB::table($check['lines'])->whereIn($check['fk'], $eligibleIds)->get() as $line) {
+            $key = $check['type'] . '#' . $line->{$check['fk']} . '#' . $line->product_id;
+            $movement = $movementSums->get($key);
+
+            expect($movement)->not->toBeNull("Eligible {$check['header']}#{$line->{$check['fk']}} product {$line->product_id} must have a stock movement");
+
+            $expected = (float) $line->{$check['qty']};
+            $actual = match ($check['direction']) {
+                'in' => (float) $movement->qty_in,
+                'out' => (float) $movement->qty_out,
+                default => (float) $movement->qty_in + (float) $movement->qty_out,
+            };
+
+            expect(round($actual, 2))
+                ->toBe(round($expected, 2), "Movement quantity for {$key} must equal document line quantity");
+
+            $checked++;
+        }
+    }
+
+    expect($checked)->toBeGreaterThan(0, 'Demo data must include eligible stock document lines');
+});
+
+// W7-04 — running balance never goes negative at any movement, not only at the end.
+test('W7-04 running stock balance is non-negative at every movement', function () {
+    $movements = DB::table('stock_movements')
+        ->orderBy('product_id')
+        ->orderBy('warehouse_id')
+        ->orderBy('moved_at')
+        ->orderBy('id')
+        ->get(['id', 'product_id', 'warehouse_id', 'quantity_in', 'quantity_out']);
+
+    $balance = [];
+
+    foreach ($movements as $movement) {
+        $key = $movement->product_id . ':' . $movement->warehouse_id;
+        $balance[$key] = ($balance[$key] ?? 0.0) + (float) $movement->quantity_in - (float) $movement->quantity_out;
+
+        expect(round($balance[$key], 2))
+            ->toBeGreaterThanOrEqual(0.0, "Movement {$movement->id} drives {$key} below zero");
+    }
+});
+
 // W7-04 — snapshot quantity equals the latest movement balance (by moved_at, id).
 test('W7-04 stock snapshot uses the latest movement balance', function () {
     $movements = DB::table('stock_movements')
@@ -241,11 +338,17 @@ test('W7-04 stock snapshot uses the latest movement balance', function () {
         $latest[$movement->product_id . ':' . $movement->warehouse_id] = (float) $movement->balance_after;
     }
 
-    $request = IndexStockMonitorRequest::create('/api/stock-monitor', 'GET');
+    // Request a page size larger than the row count so every row is checked, not just page 1.
+    $totalRows = DB::table('stock_movements')
+        ->select('product_id', 'warehouse_id')
+        ->distinct()
+        ->count();
+    $request = IndexStockMonitorRequest::create('/api/stock-monitor', 'GET', ['per_page' => max(100, $totalRows)]);
     $result = app(IndexStockMonitorAction::class)->execute($request);
     $snapshot = collect($result['stocks']->items());
 
     expect($snapshot)->not->toBeEmpty('Stock monitor must show stock rows');
+    expect($snapshot)->toHaveCount($totalRows, 'Stock snapshot must cover every product and warehouse pair');
 
     foreach ($snapshot as $row) {
         $key = $row->product_id . ':' . $row->warehouse_id;
@@ -313,6 +416,47 @@ test('W7-04 inventory valuation equals GL inventory account', function () {
 
     expect(round(postedBalance((int) $inventoryAccountId, true), 2))
         ->toBe(round($valuation, 2), 'GL 11300 must equal the sum of stock movement valuation');
+});
+
+// Every posted document must reference a posted, balanced journal (issue #357 scope 4).
+test('W7-02 posted documents reference a posted and balanced journal', function () {
+    $documents = [
+        ['customer_invoices', 'invoice_number', ['sent', 'partially_paid', 'paid', 'overdue']],
+        ['supplier_bills', 'bill_number', ['confirmed', 'partially_paid', 'paid', 'overdue']],
+        ['goods_receipts', 'gr_number', ['confirmed']],
+        ['supplier_returns', 'return_number', ['confirmed']],
+        ['stock_adjustments', 'adjustment_number', ['approved']],
+    ];
+
+    $checked = 0;
+
+    foreach ($documents as [$table, $numberColumn, $postedStatuses]) {
+        $rows = DB::table($table)
+            ->whereIn('status', $postedStatuses)
+            ->get(['id', 'status', 'journal_entry_id', $numberColumn]);
+
+        foreach ($rows as $row) {
+            $label = "{$table} {$row->{$numberColumn}} ({$row->status})";
+
+            expect($row->journal_entry_id)->not->toBeNull("{$label} must reference a journal entry");
+
+            $journal = DB::table('journal_entries')->where('id', $row->journal_entry_id)->first(['status']);
+            expect($journal)->not->toBeNull("{$label} journal must exist");
+            expect($journal->status)->toBe('posted', "{$label} journal must be posted");
+
+            $totals = DB::table('journal_entry_lines')
+                ->where('journal_entry_id', $row->journal_entry_id)
+                ->selectRaw('COALESCE(SUM(debit), 0) as debit, COALESCE(SUM(credit), 0) as credit')
+                ->first();
+
+            expect(round((float) $totals->debit, 2))
+                ->toBe(round((float) $totals->credit, 2), "{$label} journal must balance");
+
+            $checked++;
+        }
+    }
+
+    expect($checked)->toBeGreaterThan(0, 'Demo data must include posted documents with journals');
 });
 
 // W7-05 — book value is always cost minus accumulated depreciation.
