@@ -448,15 +448,22 @@ class VehicleLoanSampleDataSeeder extends Seeder
         $drivers = [];
 
         foreach ($people as $person) {
-            $employee = Employee::updateOrCreate(
-                ['employee_id' => $person['employee_id']],
-                [
-                    'name' => $person['name'],
-                    'email' => $person['email'],
-                    'phone' => $person['phone'],
-                    'user_id' => $admin->id,
-                ],
-            );
+            // `employee_id` dan `email` sama-sama unik. Cocokkan keduanya agar
+            // baris lama (mis. dari format kode sebelumnya) tidak memicu
+            // unique violation saat seeder dijalankan ulang.
+            $employee = Employee::query()
+                ->where('employee_id', $person['employee_id'])
+                ->orWhere('email', $person['email'])
+                ->first()
+                ?? new Employee;
+
+            $employee->fill([
+                'employee_id' => $person['employee_id'],
+                'name' => $person['name'],
+                'email' => $person['email'],
+                'phone' => $person['phone'],
+                'user_id' => $admin->id,
+            ])->save();
 
             if ($companyId !== null) {
                 Employment::updateOrCreate(
@@ -473,15 +480,23 @@ class VehicleLoanSampleDataSeeder extends Seeder
                 );
             }
 
-            $drivers[] = VehicleDriver::updateOrCreate(
-                ['license_number' => $person['license']],
-                [
-                    'employee_id' => $employee->id,
-                    'license_type' => $person['type'],
-                    'license_expiry' => now()->addYears(5)->toDateString(),
-                    'is_active' => true,
-                ],
-            );
+            // `vehicle_drivers.employee_id` unik; cocokkan juga lewat
+            // license_number agar data lama tidak menghasilkan duplikat.
+            $driver = VehicleDriver::query()
+                ->where('employee_id', $employee->id)
+                ->orWhere('license_number', $person['license'])
+                ->first()
+                ?? new VehicleDriver;
+
+            $driver->fill([
+                'employee_id' => $employee->id,
+                'license_number' => $person['license'],
+                'license_type' => $person['type'],
+                'license_expiry' => now()->addYears(5)->toDateString(),
+                'is_active' => true,
+            ])->save();
+
+            $drivers[] = $driver;
         }
 
         return $drivers;
@@ -527,15 +542,23 @@ class VehicleLoanSampleDataSeeder extends Seeder
                 ],
             );
 
-            $units[] = VehicleUnit::updateOrCreate(
-                ['asset_id' => $asset->id],
-                [
-                    'plate_number' => $vehicle['plate'],
-                    'vehicle_type' => $vehicle['type'],
-                    'capacity' => $vehicle['capacity'],
-                    'is_active' => true,
-                ],
-            );
+            // `asset_id` dan `plate_number` sama-sama unik; cocokkan keduanya
+            // agar unit lama dengan plat yang sama tidak memicu duplikat.
+            $unit = VehicleUnit::query()
+                ->where('asset_id', $asset->id)
+                ->orWhere('plate_number', $vehicle['plate'])
+                ->first()
+                ?? new VehicleUnit;
+
+            $unit->fill([
+                'asset_id' => $asset->id,
+                'plate_number' => $vehicle['plate'],
+                'vehicle_type' => $vehicle['type'],
+                'capacity' => $vehicle['capacity'],
+                'is_active' => true,
+            ])->save();
+
+            $units[] = $unit;
         }
 
         return $units;
