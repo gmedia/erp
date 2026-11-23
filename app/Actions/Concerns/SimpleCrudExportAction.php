@@ -3,13 +3,12 @@
 namespace App\Actions\Concerns;
 
 use App\Domain\Concerns\BaseFilterService;
+use App\Support\ExportStorage;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Facades\Excel;
 
 /**
  * Base action for exporting simple CRUD entities to Excel.
@@ -46,15 +45,15 @@ abstract class SimpleCrudExportAction
         // Generate filename with timestamp
         $filename = $this->getFilenamePrefix() . '_export_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
 
-        // Store the file in storage/app/public/exports/
+        // Store the file on the configured export disk (exports/)
         $filePath = 'exports/' . $filename;
 
-        // Generate the Excel file using public disk
+        // Generate the Excel file on the export disk
         $export = $this->getExportInstance([], $query);
-        Excel::store($export, $filePath, 'public');
+        ExportStorage::store($export, $filePath);
 
-        // Generate the public URL for download
-        $url = Storage::disk('public')->url($filePath);
+        // Build the download URL (signed when the disk is private object storage)
+        $url = ExportStorage::url($filePath);
 
         return response()->json([
             'url' => $url,

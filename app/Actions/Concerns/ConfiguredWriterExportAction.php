@@ -2,12 +2,10 @@
 
 namespace App\Actions\Concerns;
 
+use App\Support\ExportStorage;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Maatwebsite\Excel\Excel as ExcelFormat;
-use Maatwebsite\Excel\Facades\Excel;
 
 abstract class ConfiguredWriterExportAction
 {
@@ -18,10 +16,10 @@ abstract class ConfiguredWriterExportAction
         $filename = $this->buildFilename($extension);
         $filePath = 'exports/' . $filename;
 
-        Excel::store($this->makeExport($filters), $filePath, 'public', $writerType);
+        ExportStorage::store($this->makeExport($filters), $filePath, $writerType);
 
         return response()->json([
-            'url' => Storage::disk('public')->url($filePath),
+            'url' => ExportStorage::url($filePath),
             'filename' => $filename,
         ]);
     }

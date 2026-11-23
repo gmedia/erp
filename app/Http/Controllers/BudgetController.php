@@ -14,11 +14,10 @@ use App\Http\Requests\Budgets\UpdateBudgetRequest;
 use App\Http\Resources\Budgets\BudgetCollection;
 use App\Http\Resources\Budgets\BudgetResource;
 use App\Models\Budget;
+use App\Support\ExportStorage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Maatwebsite\Excel\Facades\Excel;
 
 class BudgetController extends Controller
 {
@@ -102,10 +101,10 @@ class BudgetController extends Controller
         $filename = 'budgets_export_' . now()->format('Y-m-d_H-i-s') . '_' . Str::ulid() . '.xlsx';
         $filePath = 'exports/' . $filename;
 
-        Excel::store(new BudgetExport($filters), $filePath, 'public');
+        ExportStorage::store(new BudgetExport($filters), $filePath);
 
         return response()->json([
-            'url' => Storage::disk('public')->url($filePath),
+            'url' => ExportStorage::url($filePath),
             'filename' => $filename,
         ]);
     }

@@ -6,10 +6,9 @@ use App\Exports\BudgetVarianceExport;
 use App\Http\Requests\Budgets\BudgetVarianceReportRequest;
 use App\Models\Budget;
 use App\Services\BudgetVarianceService;
+use App\Support\ExportStorage;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Maatwebsite\Excel\Facades\Excel;
 
 class BudgetVarianceReportController extends Controller
 {
@@ -51,10 +50,10 @@ class BudgetVarianceReportController extends Controller
         $filename = 'budget_variance_' . now()->format('Y-m-d_H-i-s') . '_' . Str::ulid() . '.xlsx';
         $filePath = 'exports/' . $filename;
 
-        Excel::store(new BudgetVarianceExport($varianceData), $filePath, 'public');
+        ExportStorage::store(new BudgetVarianceExport($varianceData), $filePath);
 
         return response()->json([
-            'url' => Storage::disk('public')->url($filePath),
+            'url' => ExportStorage::url($filePath),
             'filename' => $filename,
         ]);
     }
