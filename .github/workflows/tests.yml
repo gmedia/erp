@@ -468,6 +468,7 @@ jobs:
           # AppServiceProvider honors config('app.disable_rate_limiting') via Limit::none().
           # Must live in .env (Sail app process), not only GHA job env.
           echo "DISABLE_RATE_LIMITING=true" >> .env
+          sed -i "s/^AWS_SECRET_ACCESS_KEY=.*/AWS_SECRET_ACCESS_KEY=password/" .env
           mkdir -p storage/tmp
           chmod -R u+rwX,g+rwX,o-rwx storage/tmp
 
