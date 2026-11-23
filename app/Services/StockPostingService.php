@@ -3,10 +3,12 @@
 namespace App\Services;
 
 use App\Models\GoodsReceipt;
+use App\Models\Product;
 use App\Models\StockAdjustment;
 use App\Models\StockMovement;
 use App\Models\StockTransfer;
 use App\Models\SupplierReturn;
+use App\Models\Warehouse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
@@ -354,8 +356,17 @@ class StockPostingService
                 ->value('balance_after');
 
             if ($available < $quantity) {
+                // Issue #360 baris 5: pesan memakai nama, bukan id mentah (i18n en/id).
+                $productName = Product::query()->whereKey($productId)->value('name');
+                $warehouseName = Warehouse::query()->whereKey($warehouseId)->value('name');
+
                 throw ValidationException::withMessages([
-                    'items' => ["Stok tidak cukup untuk produk {$productId} di gudang {$warehouseId} (tersedia {$available}, dibutuhkan {$quantity})."],
+                    'items' => [__('stock.insufficient', [
+                        'product' => $productName ?? '#' . $productId,
+                        'warehouse' => $warehouseName ?? '#' . $warehouseId,
+                        'available' => $available,
+                        'required' => $quantity,
+                    ])],
                 ])->status(422);
             }
         }

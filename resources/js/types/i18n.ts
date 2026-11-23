@@ -25,6 +25,10 @@ export interface Translations {
         fill_details: string;
         view_details: string;
     };
+    stockTransfer: {
+        qty_received_label: string;
+        qty_received_placeholder: string;
+    };
     nav: {
         platform: string;
         dashboard: string;
