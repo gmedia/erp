@@ -20,6 +20,16 @@ async function saveAdminSettings(
     await responsePromise;
 }
 
+function collectCspViolations(page: Page): string[] {
+    const violations: string[] = [];
+    page.on('console', (message) => {
+        if (/Content[- ]Security[- ]Policy|violates/i.test(message.text())) {
+            violations.push(message.text());
+        }
+    });
+    return violations;
+}
+
 async function waitForAdminSettingsRefresh(page: Page) {
     await page.waitForResponse(
         (response: Response) =>
@@ -187,6 +197,7 @@ test.describe('Admin Settings', () => {
     });
 
     test('can upload company logo', async ({ page }) => {
+        const cspViolations = collectCspViolations(page);
         await page.goto('/admin-settings');
 
         // Check if there's already a logo displayed
@@ -209,6 +220,43 @@ test.describe('Admin Settings', () => {
         const logoSrc = await logoPreview.getAttribute('src');
         expect(logoSrc).toBeTruthy();
         expect(logoSrc).toContain('branding/logos');
+
+        await expect
+            .poll(() =>
+                logoPreview.evaluate(
+                    (img: HTMLImageElement) => img.naturalWidth,
+                ),
+            )
+            .toBeGreaterThan(0);
+        expect(cspViolations).toEqual([]);
+    });
+
+    test('SVG with embedded script is not executed', async ({ page }) => {
+        const scriptMarker = 'csp-svg-script-executed';
+        const maliciousSvg = Buffer.from(
+            `<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10">` +
+                `<script>window.${scriptMarker} = true;</script>` +
+                `<rect width="10" height="10" fill="red"/></svg>`,
+        );
+
+        await page.goto('/admin-settings');
+        await page.locator('input[name="company_logo"]').setInputFiles({
+            name: 'malicious.svg',
+            mimeType: 'image/svg+xml',
+            buffer: maliciousSvg,
+        });
+        await saveAdminSettings(page, 'save-general-settings');
+        await waitForAdminSettingsRefresh(page);
+
+        const logoPreview = page.locator('img[alt="Current company logo"]');
+        await expect(logoPreview).toBeVisible({ timeout: 15000 });
+
+        const executed = await page.evaluate(
+            (marker: string) =>
+                Boolean((window as unknown as Record<string, unknown>)[marker]),
+            scriptMarker,
+        );
+        expect(executed).toBe(false);
     });
 
     test('uploaded logo appears in app logo component', async ({ page }) => {
