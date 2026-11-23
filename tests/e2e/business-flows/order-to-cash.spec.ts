@@ -355,24 +355,67 @@ async function createReceiptViaUi(
     return { id: receiptId, receipt_number: receiptNumber };
 }
 
-async function createCreditNoteViaUi(
+async function createCreditNoteViaApi(
     page: Page,
     ctx: {
         customerId: number;
         branchId: number;
         fiscalYearId: number;
         invoiceId: number;
-        invoiceNumber: string;
         accountId: number;
         description: string;
     },
 ): Promise<{ id: number; credit_note_number: string }> {
+    const today = new Date().toISOString().slice(0, 10);
+    const header = {
+        customer_id: ctx.customerId,
+        customer_invoice_id: ctx.invoiceId,
+        branch_id: ctx.branchId,
+        fiscal_year_id: ctx.fiscalYearId,
+        credit_note_date: today,
+        reason: 'return',
+        currency: 'IDR',
+    };
+    const items = [
+        {
+            account_id: ctx.accountId,
+            description: ctx.description,
+            quantity: 1,
+            unit_price: CREDIT_NOTE_AMOUNT,
+            tax_percent: 0,
+        },
+    ];
+
+    const draft = await sendJson(page, 'POST', '/api/credit-notes', {
+        ...header,
+        status: 'draft',
+        items,
+    });
+    expect(draft.status).toBeLessThan(400);
+    const creditNoteId = Number((draft.json.data as { id: number }).id);
+    const creditNoteNumber = String(
+        (draft.json.data as { credit_note_number: string }).credit_note_number,
+    );
+
+    const confirmed = await sendJson(
+        page,
+        'PUT',
+        `/api/credit-notes/${creditNoteId}`,
+        { ...header, status: 'confirmed', items },
+    );
+    expect(confirmed.status).toBeLessThan(400);
+
+    return { id: creditNoteId, credit_note_number: creditNoteNumber };
+}
+
+async function openCreditNoteInvoicePicker(
+    page: Page,
+    invoiceNumber: string,
+): Promise<void> {
     await page.goto('/credit-notes');
     await page.getByRole('button', { name: /add/i }).first().click();
-
     const dialog = page.getByRole('dialog', { name: /Add Credit Note/i });
     await expect(dialog).toBeVisible();
-
     await dialog
         .getByRole('combobox', { name: 'Customer', exact: true })
         .click();
@@ -387,64 +430,13 @@ async function createCreditNoteViaUi(
         .getByRole('combobox', { name: 'Customer Invoice (Optional)' })
         .click();
     const invoicePicker = page.getByRole('dialog').last();
-    await invoicePicker.getByPlaceholder('Search...').fill(ctx.invoiceNumber);
-    await invoicePicker
-        .getByRole('listitem')
-        .filter({ hasText: ctx.invoiceNumber })
-        .first()
-        .getByRole('button')
-        .click();
-    await dialog.getByRole('combobox', { name: 'Branch' }).click();
-    await page
-        .getByRole('dialog')
-        .last()
-        .getByRole('listitem')
-        .first()
-        .getByRole('button')
-        .click();
-    await dialog.getByRole('combobox', { name: 'Fiscal Year' }).click();
-    await page
-        .getByRole('dialog')
-        .last()
-        .getByRole('listitem')
-        .first()
-        .getByRole('button')
-        .click();
-    await dialog.getByRole('combobox', { name: 'Reason' }).click();
-    await page.getByRole('option', { name: 'Return', exact: true }).click();
-    await dialog.getByRole('button', { name: 'Add Item' }).click();
-    const itemDialog = page.getByRole('dialog', { name: /Add Item/i });
-    await expect(itemDialog).toBeVisible();
-    await itemDialog.getByLabel('Account').fill(String(ctx.accountId));
-    await itemDialog.getByLabel('Description').fill(ctx.description);
-    await itemDialog.getByLabel(/Quantity/i).fill('1');
-    await itemDialog.getByLabel(/Unit Price/i).fill(String(CREDIT_NOTE_AMOUNT));
-    await itemDialog.getByRole('button', { name: 'Save Item' }).click();
-    await expect(itemDialog).toBeHidden();
-
-    const createResponse = page.waitForResponse(
-        (response) =>
-            response.url().includes('/api/credit-notes') &&
-            response.request().method() === 'POST',
-    );
-    await dialog.getByRole('button', { name: 'Add', exact: true }).click();
-    const created = await (await createResponse).json();
-    await expect(dialog).toBeHidden();
-
-    const creditNoteId = Number((created.data as { id: number }).id);
-    const creditNoteNumber = String(
-        (created.data as { credit_note_number: string }).credit_note_number,
-    );
-    await confirmRowViaUi(
-        page,
-        '/credit-notes',
-        creditNoteId,
-        creditNoteNumber,
-        /Edit Credit Note/i,
-        '/api/credit-notes',
-    );
-
-    return { id: creditNoteId, credit_note_number: creditNoteNumber };
+    await invoicePicker.getByPlaceholder('Search...').fill(invoiceNumber);
+    await expect(
+        invoicePicker
+            .getByRole('listitem')
+            .filter({ hasText: invoiceNumber })
+            .first(),
+    ).toBeVisible();
 }
 
 interface O2cRun {
@@ -529,12 +521,11 @@ async function runOrderToCash(page: Page): Promise<O2cRun> {
         2,
     );
 
-    const creditNote = await createCreditNoteViaUi(page, {
+    const creditNote = await createCreditNoteViaApi(page, {
         customerId,
         branchId,
         fiscalYearId,
         invoiceId,
-        invoiceNumber: invoice.invoice_number,
         accountId: revenueAccountId,
         description: `CN ${description}`,
     });
@@ -624,8 +615,6 @@ test.describe('Order-to-cash: invoice sampai pelunasan', () => {
     test('invoice -> receipt sebagian -> credit note -> pelunasan mengosongkan piutang', async ({
         page,
     }) => {
-        test.fail(true, 'picker Customer Invoice credit note kosong (#373)');
-
         const run = await runOrderToCash(page);
 
         expect(run.settled.amount_received).toBeCloseTo(
@@ -643,8 +632,6 @@ test.describe('Order-to-cash: invoice sampai pelunasan', () => {
     test('jurnal invoice posted: Dr AR 11200 / Cr Pendapatan 41000 sebesar total', async ({
         page,
     }) => {
-        test.fail(true, 'picker Customer Invoice credit note kosong (#373)');
-
         const run = await runOrderToCash(page);
 
         expect(run.invoiceJournal.status).toBe('posted');
@@ -660,8 +647,6 @@ test.describe('Order-to-cash: invoice sampai pelunasan', () => {
     test('invoice dikirim menaikkan pendapatan 41000 sebesar total invoice', async ({
         page,
     }) => {
-        test.fail(true, 'picker Customer Invoice credit note kosong (#373)');
-
         const run = await runOrderToCash(page);
 
         expect(run.revenueAfterInvoice - run.revenueBefore).toBeCloseTo(
@@ -673,8 +658,6 @@ test.describe('Order-to-cash: invoice sampai pelunasan', () => {
     test('jurnal receipt posted: Dr kas / Cr AR 11200 sebesar pembayaran sebagian', async ({
         page,
     }) => {
-        test.fail(true, 'picker Customer Invoice credit note kosong (#373)');
-
         const run = await runOrderToCash(page);
 
         expect(run.receiptJournal.status).toBe('posted');
@@ -685,6 +668,17 @@ test.describe('Order-to-cash: invoice sampai pelunasan', () => {
             -RECEIPT_PART,
             2,
         );
+    });
+
+    test('picker Customer Invoice di form credit note menampilkan nomor invoice (#373)', async ({
+        page,
+    }) => {
+        test.fail(true, 'picker Customer Invoice credit note kosong (#373)');
+
+        const ctx = await createSentInvoice(page);
+        const invoice = await readInvoice(page, ctx.invoiceId);
+
+        await openCreditNoteInvoicePicker(page, invoice.invoice_number);
     });
 
     test('PUT confirmed dengan alokasi yang sama mengembalikan 200', async ({
