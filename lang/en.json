@@ -25,6 +25,10 @@
         "fill_details": "Please fill in the details below.",
         "view_details": "Here are the details for this item."
     },
+    "permissions": {
+        "empty_title": "No employee selected",
+        "empty_description": "Select an employee above to view and edit their system permissions."
+    },
     "nav": {
         "platform": "Platform",
         "dashboard": "Dashboard",

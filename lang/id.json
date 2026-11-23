@@ -25,6 +25,10 @@
         "fill_details": "Silakan isi detail di bawah ini.",
         "view_details": "Berikut adalah detail untuk item ini."
     },
+    "permissions": {
+        "empty_title": "Belum ada karyawan dipilih",
+        "empty_description": "Pilih karyawan di atas untuk melihat dan mengubah izin sistemnya."
+    },
     "nav": {
         "platform": "Platform",
         "dashboard": "Dasbor",
