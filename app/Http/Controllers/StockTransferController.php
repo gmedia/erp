@@ -18,6 +18,7 @@ use App\Services\StockPostingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class StockTransferController extends Controller
 {
@@ -87,8 +88,38 @@ class StockTransferController extends Controller
 
         // Issue #356 baris 5-6: update, cek stok, dan posting dalam satu transaksi.
         // Jika stok tidak cukup, seluruh perubahan dibatalkan (422).
-        DB::transaction(function () use ($stockTransfer, $validated, $items, $syncItems, $stockPosting): void {
+        $hasExplicitReceived = is_array($items) && collect($items)->contains(
+            fn (array $item): bool => array_key_exists('quantity_received', $item) && $item['quantity_received'] !== null,
+        );
+
+        DB::transaction(function () use ($stockTransfer, $validated, $items, $syncItems, $stockPosting, $hasExplicitReceived): void {
+            $wasDispatched = in_array($stockTransfer->status, ['in_transit', 'received'], true);
+            $wasReceived = $stockTransfer->status === 'received';
+            $nextStatus = $validated['status'] ?? $stockTransfer->status;
+
+            // Issue #360 baris 4c: transisi mundur ditolak. Received/in_transit tidak boleh
+            // kembali ke tahap sebelum dispatch, karena stok sudah bergerak.
+            if ($wasDispatched && in_array($nextStatus, ['draft', 'pending_approval', 'approved'], true)) {
+                throw ValidationException::withMessages([
+                    'status' => ['Transfer yang sudah dikirim tidak bisa kembali ke status ' . $nextStatus . '.'],
+                ])->status(422);
+            }
+
+            if ($wasReceived && $nextStatus === 'in_transit') {
+                throw ValidationException::withMessages([
+                    'status' => ['Transfer yang sudah diterima tidak bisa kembali ke in_transit.'],
+                ])->status(422);
+            }
+
             $stockTransfer->update(UpdateStockTransferData::fromArray($validated)->toArray());
+
+            // Issue #360 baris 4: pembatalan transfer yang sudah terposting membalik stok,
+            // lewat satu jalur yang sama dengan DELETE (reverseTransfer).
+            if ($wasDispatched && $nextStatus === 'cancelled') {
+                $stockPosting->reverseTransfer($stockTransfer->refresh());
+
+                return;
+            }
 
             if (is_array($items)) {
                 $syncItems->execute($stockTransfer, $items);
@@ -96,7 +127,18 @@ class StockTransferController extends Controller
 
             $stockTransfer->refresh()->load('items');
 
-            if (in_array($stockTransfer->status, ['in_transit', 'received'], true)) {
+            // Issue #360 baris 2: transisi ke received tanpa quantity_received per baris
+            // (tidak dikirim) = diterima penuh. Nilai eksplisit (termasuk 0) tetap dihormati.
+            if (! $wasReceived && $stockTransfer->status === 'received' && ! $hasExplicitReceived) {
+                foreach ($stockTransfer->items as $item) {
+                    $item->forceFill(['quantity_received' => $item->quantity])->saveQuietly();
+                }
+                $stockTransfer->refresh()->load('items');
+            }
+
+            // Issue #360 baris 1: stok hanya dicek saat qty BARU keluar (transisi ke
+            // dispatch). Setelah dispatch, stok sudah keluar; mengecek ulang = 422 palsu.
+            if (! $wasDispatched && in_array($stockTransfer->status, ['in_transit', 'received'], true)) {
                 $stockPosting->assertNoNegativeStock(
                     $stockTransfer->items
                         ->map(fn ($item): array => [

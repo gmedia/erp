@@ -146,5 +146,6 @@
     "admin": {
         "selectLogo": "Select SVG Logo",
         "noFileSelected": "No file selected"
-    }
+    },
+    "stock.insufficient": "Insufficient stock for :product in :warehouse (available :available, required :required)."
 }

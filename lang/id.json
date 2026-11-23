@@ -146,5 +146,6 @@
     "admin": {
         "selectLogo": "Pilih Logo SVG",
         "noFileSelected": "Belum ada file dipilih"
-    }
+    },
+    "stock.insufficient": "Stok tidak cukup untuk :product di :warehouse (tersedia :available, dibutuhkan :required)."
 }
