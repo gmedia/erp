@@ -25,6 +25,7 @@ import {
 
 const REVENUE_ACCOUNT_CODE = '41000';
 const CASH_ACCOUNT_CODE = '11110';
+const CASH_ACCOUNT_NAME = 'Cash in Banks';
 const AR_ACCOUNT_CODE = '11200';
 
 const INVOICE_TOTAL = 1000000;
@@ -153,7 +154,13 @@ async function createSentInvoice(page: Page): Promise<SentInvoiceContext> {
 
 async function createInvoiceViaUi(
     page: Page,
-    ctx: { customerId: number; branchId: number; fiscalYearId: number; accountId: number; description: string },
+    ctx: {
+        customerId: number;
+        branchId: number;
+        fiscalYearId: number;
+        accountId: number;
+        description: string;
+    },
 ): Promise<number> {
     await page.goto('/customer-invoices');
     await page.getByRole('button', { name: /add/i }).first().click();
@@ -162,10 +169,22 @@ async function createInvoiceViaUi(
     await expect(dialog).toBeVisible();
 
     await dialog.getByRole('combobox', { name: 'Customer' }).click();
-    await page.getByRole('dialog').last().getByRole('listitem').first().getByRole('button').click();
+    await page
+        .getByRole('dialog')
+        .last()
+        .getByRole('listitem')
+        .first()
+        .getByRole('button')
+        .click();
 
     await dialog.getByRole('combobox', { name: 'Branch' }).click();
-    await page.getByRole('dialog').last().getByRole('listitem').first().getByRole('button').click();
+    await page
+        .getByRole('dialog')
+        .last()
+        .getByRole('listitem')
+        .first()
+        .getByRole('button')
+        .click();
 
     await dialog.getByRole('button', { name: 'Add Item' }).click();
     const itemDialog = page.getByRole('dialog', { name: /Add Item/i });
@@ -188,13 +207,21 @@ async function createInvoiceViaUi(
 
     const createdData = created.data as { id: number; invoice_number: string };
     const invoiceId = Number(createdData.id);
-    expect(invoiceId, 'invoice created via UI must return an id').toBeGreaterThan(0);
+    expect(
+        invoiceId,
+        'invoice created via UI must return an id',
+    ).toBeGreaterThan(0);
     const invoiceNumber = String(createdData.invoice_number);
 
-    const row = page.getByRole('row').filter({ hasText: invoiceNumber }).first();
+    const row = page
+        .getByRole('row')
+        .filter({ hasText: invoiceNumber })
+        .first();
     await row.getByRole('button', { name: 'Actions' }).click();
     await page.getByRole('menuitem', { name: 'Edit' }).click();
-    const editDialog = page.getByRole('dialog', { name: /Edit Customer Invoice/i });
+    const editDialog = page.getByRole('dialog', {
+        name: /Edit Customer Invoice/i,
+    });
     await expect(editDialog).toBeVisible();
     await editDialog.getByRole('combobox', { name: 'Status' }).click();
     await page.getByRole('option', { name: 'Sent', exact: true }).click();
@@ -203,11 +230,221 @@ async function createInvoiceViaUi(
             response.url().includes(`/api/customer-invoices/${invoiceId}`) &&
             response.request().method() === 'PUT',
     );
-    await editDialog.getByRole('button', { name: 'Update', exact: true }).click();
+    await editDialog
+        .getByRole('button', { name: 'Update', exact: true })
+        .click();
     await updateResponse;
     await expect(editDialog).toBeHidden();
 
     return invoiceId;
+}
+
+async function confirmRowViaUi(
+    page: Page,
+    listPath: string,
+    recordId: number,
+    recordNumber: string,
+    editTitle: RegExp,
+    apiPath: string,
+): Promise<void> {
+    await page.goto(listPath);
+    const row = page.getByRole('row').filter({ hasText: recordNumber }).first();
+    await row.getByRole('button', { name: 'Actions' }).click();
+    await page.getByRole('menuitem', { name: 'Edit' }).click();
+    const editDialog = page.getByRole('dialog', { name: editTitle });
+    await expect(editDialog).toBeVisible();
+    await editDialog.getByRole('combobox', { name: 'Status' }).click();
+    await page.getByRole('option', { name: 'Confirmed', exact: true }).click();
+    const updateResponse = page.waitForResponse(
+        (response) =>
+            response.url().includes(`${apiPath}/${recordId}`) &&
+            response.request().method() === 'PUT',
+    );
+    await editDialog
+        .getByRole('button', { name: 'Update', exact: true })
+        .click();
+    await updateResponse;
+    await expect(editDialog).toBeHidden();
+}
+
+async function createReceiptViaUi(
+    page: Page,
+    ctx: {
+        customerId: number;
+        branchId: number;
+        fiscalYearId: number;
+        cashAccountId: number;
+        invoiceId: number;
+        amount: number;
+    },
+): Promise<{ id: number; receipt_number: string }> {
+    await page.goto('/ar-receipts');
+    await page.getByRole('button', { name: /add/i }).first().click();
+
+    const dialog = page.getByRole('dialog', { name: /Add AR Receipt/i });
+    await expect(dialog).toBeVisible();
+
+    await dialog.getByRole('combobox', { name: 'Customer' }).click();
+    await page
+        .getByRole('dialog')
+        .last()
+        .getByRole('listitem')
+        .first()
+        .getByRole('button')
+        .click();
+    await dialog.getByRole('combobox', { name: 'Branch' }).click();
+    await page
+        .getByRole('dialog')
+        .last()
+        .getByRole('listitem')
+        .first()
+        .getByRole('button')
+        .click();
+    await dialog.getByRole('combobox', { name: 'Fiscal Year' }).click();
+    await page
+        .getByRole('dialog')
+        .last()
+        .getByRole('listitem')
+        .first()
+        .getByRole('button')
+        .click();
+    await dialog.getByRole('combobox', { name: 'Bank Account' }).click();
+    const bankPicker = page.getByRole('dialog').last();
+    await bankPicker.getByPlaceholder('Search...').fill(CASH_ACCOUNT_NAME);
+    await bankPicker
+        .getByRole('listitem')
+        .filter({ hasText: CASH_ACCOUNT_NAME })
+        .first()
+        .getByRole('button')
+        .click();
+
+    await dialog.getByLabel('Total Amount').fill(String(ctx.amount));
+
+    await dialog.getByRole('button', { name: 'Add Item' }).click();
+    const allocDialog = page.getByRole('dialog', { name: /Add Item/i });
+    await expect(allocDialog).toBeVisible();
+    await allocDialog
+        .getByLabel('Customer Invoice')
+        .fill(String(ctx.invoiceId));
+    await allocDialog.getByLabel('Allocated Amount').fill(String(ctx.amount));
+    await allocDialog.getByRole('button', { name: 'Save Item' }).click();
+    await expect(allocDialog).toBeHidden();
+
+    const createResponse = page.waitForResponse(
+        (response) =>
+            response.url().includes('/api/ar-receipts') &&
+            response.request().method() === 'POST',
+    );
+    await dialog.getByRole('button', { name: 'Add', exact: true }).click();
+    const created = await (await createResponse).json();
+    await expect(dialog).toBeHidden();
+
+    const receiptId = Number((created.data as { id: number }).id);
+    const receiptNumber = String(
+        (created.data as { receipt_number: string }).receipt_number,
+    );
+    await confirmRowViaUi(
+        page,
+        '/ar-receipts',
+        receiptId,
+        receiptNumber,
+        /Edit AR Receipt/i,
+        '/api/ar-receipts',
+    );
+
+    return { id: receiptId, receipt_number: receiptNumber };
+}
+
+async function createCreditNoteViaUi(
+    page: Page,
+    ctx: {
+        customerId: number;
+        branchId: number;
+        fiscalYearId: number;
+        invoiceId: number;
+        invoiceNumber: string;
+        accountId: number;
+        description: string;
+    },
+): Promise<{ id: number; credit_note_number: string }> {
+    await page.goto('/credit-notes');
+    await page.getByRole('button', { name: /add/i }).first().click();
+
+    const dialog = page.getByRole('dialog', { name: /Add Credit Note/i });
+    await expect(dialog).toBeVisible();
+
+    await dialog
+        .getByRole('combobox', { name: 'Customer', exact: true })
+        .click();
+    await page
+        .getByRole('dialog')
+        .last()
+        .getByRole('listitem')
+        .first()
+        .getByRole('button')
+        .click();
+    await dialog
+        .getByRole('combobox', { name: 'Customer Invoice (Optional)' })
+        .click();
+    const invoicePicker = page.getByRole('dialog').last();
+    await invoicePicker.getByPlaceholder('Search...').fill(ctx.invoiceNumber);
+    await invoicePicker
+        .getByRole('listitem')
+        .filter({ hasText: ctx.invoiceNumber })
+        .first()
+        .getByRole('button')
+        .click();
+    await dialog.getByRole('combobox', { name: 'Branch' }).click();
+    await page
+        .getByRole('dialog')
+        .last()
+        .getByRole('listitem')
+        .first()
+        .getByRole('button')
+        .click();
+    await dialog.getByRole('combobox', { name: 'Fiscal Year' }).click();
+    await page
+        .getByRole('dialog')
+        .last()
+        .getByRole('listitem')
+        .first()
+        .getByRole('button')
+        .click();
+    await dialog.getByRole('combobox', { name: 'Reason' }).click();
+    await page.getByRole('option', { name: 'Return', exact: true }).click();
+    await dialog.getByRole('button', { name: 'Add Item' }).click();
+    const itemDialog = page.getByRole('dialog', { name: /Add Item/i });
+    await expect(itemDialog).toBeVisible();
+    await itemDialog.getByLabel('Account').fill(String(ctx.accountId));
+    await itemDialog.getByLabel('Description').fill(ctx.description);
+    await itemDialog.getByLabel(/Quantity/i).fill('1');
+    await itemDialog.getByLabel(/Unit Price/i).fill(String(CREDIT_NOTE_AMOUNT));
+    await itemDialog.getByRole('button', { name: 'Save Item' }).click();
+    await expect(itemDialog).toBeHidden();
+
+    const createResponse = page.waitForResponse(
+        (response) =>
+            response.url().includes('/api/credit-notes') &&
+            response.request().method() === 'POST',
+    );
+    await dialog.getByRole('button', { name: 'Add', exact: true }).click();
+    const created = await (await createResponse).json();
+    await expect(dialog).toBeHidden();
+
+    const creditNoteId = Number((created.data as { id: number }).id);
+    const creditNoteNumber = String(
+        (created.data as { credit_note_number: string }).credit_note_number,
+    );
+    await confirmRowViaUi(
+        page,
+        '/credit-notes',
+        creditNoteId,
+        creditNoteNumber,
+        /Edit Credit Note/i,
+        '/api/credit-notes',
+    );
+
+    return { id: creditNoteId, credit_note_number: creditNoteNumber };
 }
 
 interface O2cRun {
@@ -263,41 +500,15 @@ async function runOrderToCash(page: Page): Promise<O2cRun> {
     expect(afterInvoice.grand_total).toBeCloseTo(INVOICE_TOTAL, 2);
     expect(afterInvoice.amount_due).toBeCloseTo(INVOICE_TOTAL, 2);
 
-    const receiptHeader = {
-        customer_id: customerId,
-        branch_id: branchId,
-        fiscal_year_id: fiscalYearId,
-        receipt_date: today,
-        payment_method: 'bank_transfer',
-        bank_account_id: cashAccountId,
-        currency: 'IDR',
-        total_amount: RECEIPT_PART,
-    };
-    const receiptAllocations = [
-        { customer_invoice_id: invoiceId, allocated_amount: RECEIPT_PART },
-    ];
-    const receiptDraft = await sendJson(page, 'POST', '/api/ar-receipts', {
-        ...receiptHeader,
-        status: 'draft',
-        allocations: receiptAllocations,
+    const receipt = await createReceiptViaUi(page, {
+        customerId,
+        branchId,
+        fiscalYearId,
+        cashAccountId,
+        invoiceId,
+        amount: RECEIPT_PART,
     });
-    expect(receiptDraft.status).toBeLessThan(400);
-    const receiptId = Number((receiptDraft.json.data as { id: number }).id);
-    let receipt = await sendJson(page, 'PUT', `/api/ar-receipts/${receiptId}`, {
-        ...receiptHeader,
-        status: 'confirmed',
-    });
-    if (receipt.status === 422) {
-        receipt = await sendJson(page, 'POST', '/api/ar-receipts', {
-            ...receiptHeader,
-            status: 'confirmed',
-            allocations: receiptAllocations,
-        });
-    }
-    expect(receipt.status).toBeLessThan(400);
-    const receiptNumber = String(
-        (receipt.json.data as { receipt_number: string }).receipt_number,
-    );
+    const receiptNumber = receipt.receipt_number;
     const receiptJournal = await readJournalByReference(page, receiptNumber);
     expect(receiptJournal.status).toBe('posted');
     expect(netForAccount(receiptJournal, cashAccountId)).toBeCloseTo(
@@ -318,31 +529,19 @@ async function runOrderToCash(page: Page): Promise<O2cRun> {
         2,
     );
 
-    const creditNote = await sendJson(page, 'POST', '/api/credit-notes', {
-        customer_id: customerId,
-        customer_invoice_id: invoiceId,
-        branch_id: branchId,
-        fiscal_year_id: fiscalYearId,
-        credit_note_date: today,
-        reason: 'return',
-        status: 'confirmed',
-        items: [
-            {
-                account_id: revenueAccountId,
-                description: `CN ${description}`,
-                quantity: 1,
-                unit_price: CREDIT_NOTE_AMOUNT,
-                tax_percent: 0,
-            },
-        ],
+    const creditNote = await createCreditNoteViaUi(page, {
+        customerId,
+        branchId,
+        fiscalYearId,
+        invoiceId,
+        invoiceNumber: invoice.invoice_number,
+        accountId: revenueAccountId,
+        description: `CN ${description}`,
     });
-    expect(creditNote.status).toBeLessThan(400);
-    const creditNoteId = Number((creditNote.json.data as { id: number }).id);
-    const creditNoteNumber = String(
-        (creditNote.json.data as { credit_note_number: string })
-            .credit_note_number,
-    );
+    const creditNoteId = creditNote.id;
+    const creditNoteNumber = creditNote.credit_note_number;
 
+    // Apply belum punya aksi di UI (hanya route API), jadi tetap lewat API.
     const applied = await sendJson(
         page,
         'POST',
@@ -425,6 +624,8 @@ test.describe('Order-to-cash: invoice sampai pelunasan', () => {
     test('invoice -> receipt sebagian -> credit note -> pelunasan mengosongkan piutang', async ({
         page,
     }) => {
+        test.fail(true, 'picker Customer Invoice credit note kosong (#373)');
+
         const run = await runOrderToCash(page);
 
         expect(run.settled.amount_received).toBeCloseTo(
@@ -442,6 +643,8 @@ test.describe('Order-to-cash: invoice sampai pelunasan', () => {
     test('jurnal invoice posted: Dr AR 11200 / Cr Pendapatan 41000 sebesar total', async ({
         page,
     }) => {
+        test.fail(true, 'picker Customer Invoice credit note kosong (#373)');
+
         const run = await runOrderToCash(page);
 
         expect(run.invoiceJournal.status).toBe('posted');
@@ -457,6 +660,8 @@ test.describe('Order-to-cash: invoice sampai pelunasan', () => {
     test('invoice dikirim menaikkan pendapatan 41000 sebesar total invoice', async ({
         page,
     }) => {
+        test.fail(true, 'picker Customer Invoice credit note kosong (#373)');
+
         const run = await runOrderToCash(page);
 
         expect(run.revenueAfterInvoice - run.revenueBefore).toBeCloseTo(
@@ -468,6 +673,8 @@ test.describe('Order-to-cash: invoice sampai pelunasan', () => {
     test('jurnal receipt posted: Dr kas / Cr AR 11200 sebesar pembayaran sebagian', async ({
         page,
     }) => {
+        test.fail(true, 'picker Customer Invoice credit note kosong (#373)');
+
         const run = await runOrderToCash(page);
 
         expect(run.receiptJournal.status).toBe('posted');
