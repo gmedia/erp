@@ -80,15 +80,18 @@ export const createPipelineAuditTrailColumns = ({
             if (!name) return <Badge variant="outline">Initial</Badge>;
             return (
                 <Badge variant="outline">
-                    {row.original.from_state_color ? (
-                        <span
-                            aria-hidden
-                            className="size-2 shrink-0 rounded-full"
-                            style={{
-                                backgroundColor: row.original.from_state_color,
-                            }}
-                        />
-                    ) : null}
+                    <span
+                        aria-hidden
+                        className="size-2 shrink-0 rounded-full bg-muted-foreground"
+                        style={
+                            row.original.from_state_color
+                                ? {
+                                      backgroundColor:
+                                          row.original.from_state_color,
+                                  }
+                                : undefined
+                        }
+                    />
                     {name}
                 </Badge>
             );
@@ -103,15 +106,18 @@ export const createPipelineAuditTrailColumns = ({
             if (!name) return '-';
             return (
                 <Badge variant="outline">
-                    {row.original.to_state_color ? (
-                        <span
-                            aria-hidden
-                            className="size-2 shrink-0 rounded-full"
-                            style={{
-                                backgroundColor: row.original.to_state_color,
-                            }}
-                        />
-                    ) : null}
+                    <span
+                        aria-hidden
+                        className="size-2 shrink-0 rounded-full bg-muted-foreground"
+                        style={
+                            row.original.to_state_color
+                                ? {
+                                      backgroundColor:
+                                          row.original.to_state_color,
+                                  }
+                                : undefined
+                        }
+                    />
                     {name}
                 </Badge>
             );
