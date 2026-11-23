@@ -17,7 +17,12 @@ use Illuminate\Validation\ValidationException;
  */
 class ReverseSupplierReturnJournalAction
 {
-    public function __construct(private CreateJournalEntryAction $createJournalEntry) {}
+    private CreateJournalEntryAction $createJournalEntry;
+
+    public function __construct(CreateJournalEntryAction $createJournalEntry)
+    {
+        $this->createJournalEntry = $createJournalEntry;
+    }
 
     public function execute(SupplierReturn $supplierReturn): ?JournalEntry
     {
