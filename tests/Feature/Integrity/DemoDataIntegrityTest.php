@@ -277,6 +277,7 @@ test('W7-04 every eligible document line has a matching stock movement', functio
     ];
 
     $checked = 0;
+    $failures = [];
 
     foreach ($checks as $check) {
         $eligibleIds = DB::table($check['header'])->where('status', $check['status'])->pluck('id');
@@ -285,7 +286,14 @@ test('W7-04 every eligible document line has a matching stock movement', functio
             $key = $check['type'] . '#' . $line->{$check['fk']} . '#' . $line->product_id;
             $movement = $movementSums->get($key);
 
-            expect($movement)->not->toBeNull("Eligible {$check['header']}#{$line->{$check['fk']}} product {$line->product_id} must have a stock movement");
+            // Collect every violation instead of stopping at the first, so one broken
+            // document cannot hide a break in another document type.
+            if ($movement === null) {
+                $failures[] = "Eligible {$check['header']}#{$line->{$check['fk']}} product {$line->product_id} must have a stock movement";
+                $checked++;
+
+                continue;
+            }
 
             $expected = (float) $line->{$check['qty']};
             $actual = match ($check['direction']) {
@@ -294,14 +302,43 @@ test('W7-04 every eligible document line has a matching stock movement', functio
                 default => (float) $movement->qty_in + (float) $movement->qty_out,
             };
 
-            expect(round($actual, 2))
-                ->toBe(round($expected, 2), "Movement quantity for {$key} must equal document line quantity");
+            if (round($actual, 2) !== round($expected, 2)) {
+                $failures[] = "Movement quantity for {$key} must equal document line quantity";
+            }
 
             $checked++;
         }
     }
 
+    expect($failures)->toBeEmpty(implode(' | ', $failures));
     expect($checked)->toBeGreaterThan(0, 'Demo data must include eligible stock document lines');
+});
+
+// W7-04 — transfer receipt is a separate leg: every received transfer line needs its transfer_in movement.
+test('W7-04 every received stock transfer line has a matching transfer_in movement', function () {
+    $transferIn = DB::table('stock_movements')
+        ->where('reference_type', StockTransfer::class)
+        ->where('movement_type', 'transfer_in')
+        ->groupBy('reference_id', 'product_id')
+        ->selectRaw('reference_id, product_id, SUM(quantity_in) as qty_in')
+        ->get()
+        ->keyBy(fn ($row) => $row->reference_id . '#' . $row->product_id);
+
+    $receivedLines = DB::table('stock_transfer_items')
+        ->join('stock_transfers', 'stock_transfers.id', '=', 'stock_transfer_items.stock_transfer_id')
+        ->where('stock_transfers.status', 'received')
+        ->get(['stock_transfer_items.stock_transfer_id', 'stock_transfer_items.product_id', 'stock_transfer_items.quantity']);
+
+    expect($receivedLines)->not->toBeEmpty('Demo data must include received stock transfers');
+
+    foreach ($receivedLines as $line) {
+        $key = $line->stock_transfer_id . '#' . $line->product_id;
+        $in = $transferIn->get($key);
+
+        expect($in)->not->toBeNull("Received transfer {$key} must have a transfer_in movement");
+        expect(round((float) $in->qty_in, 2))
+            ->toBe(round((float) $line->quantity, 2), "transfer_in quantity for {$key} must equal transferred quantity");
+    }
 });
 
 // W7-04 — running balance never goes negative at any movement, not only at the end.
