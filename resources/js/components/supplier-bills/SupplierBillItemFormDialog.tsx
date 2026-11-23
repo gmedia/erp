@@ -6,7 +6,10 @@ import { type Resolver, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { InputField } from '@/components/common/InputField';
-import { ItemFormDialogShell } from '@/components/common/ItemFormDialog';
+import {
+    ItemAccountSelectField,
+    ItemFormDialogShell,
+} from '@/components/common/ItemFormDialog';
 import { ItemPricingFields } from '@/components/common/ItemPricingFields';
 import { TextareaField } from '@/components/common/TextareaField';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
@@ -101,11 +104,13 @@ export function SupplierBillItemFormDialog({
                     label="Description"
                     placeholder="Item description"
                 />
-                <InputField
+                <ItemAccountSelectField
+                    form={form}
+                    open={open}
                     name="account_id"
-                    label="Account ID"
-                    placeholder="Account ID"
-                    disabled
+                    labelName="account_label"
+                    initialId={defaultValues.account_id}
+                    initialLabel={defaultValues.account_label}
                 />
                 <ItemPricingFields />
             </div>

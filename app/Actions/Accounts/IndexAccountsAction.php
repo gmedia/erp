@@ -29,6 +29,10 @@ class IndexAccountsAction extends SimpleCrudIndexAction
 
         $this->applyCoaVersionFilter($request, $query);
 
+        if ($request->filled('has_children') && ! $request->boolean('has_children')) {
+            $query->whereDoesntHave('children');
+        }
+
         return $this->handleIndexRequestWithOptionalPagination(
             $request,
             $query,

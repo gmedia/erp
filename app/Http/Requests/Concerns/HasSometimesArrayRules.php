@@ -2,6 +2,9 @@
 
 namespace App\Http\Requests\Concerns;
 
+use App\Models\Account;
+use Closure;
+
 trait HasSometimesArrayRules
 {
     abstract protected function usesSometimes(): bool;
@@ -74,5 +77,20 @@ trait HasSometimesArrayRules
     protected function nullableStringItemRule(): array
     {
         return ['nullable', 'string'];
+    }
+
+    protected function postableAccountRule(): Closure
+    {
+        return function (string $attribute, mixed $value, Closure $fail): void {
+            $isPostable = Account::query()
+                ->whereKey($value)
+                ->where('is_active', true)
+                ->whereDoesntHave('children')
+                ->exists();
+
+            if (! $isPostable) {
+                $fail(__('account.not_postable'));
+            }
+        };
     }
 }
