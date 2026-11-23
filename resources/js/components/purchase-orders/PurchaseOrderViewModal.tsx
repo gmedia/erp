@@ -1,4 +1,3 @@
-import { ApprovalHistoryTimeline } from '@/components/approvals/ApprovalHistoryTimeline';
 import { ViewField } from '@/components/common/ViewField';
 import {
     ViewModalItemsTable,
@@ -9,12 +8,10 @@ import {
     createAmountFormatter,
     createPricingColumns,
 } from '@/components/common/report-format-helpers';
+import { EntityDetailTabs } from '@/components/pipeline/EntityDetailTabs';
 import { EntityStateActions } from '@/components/pipeline/EntityStateActions';
-import { EntityStateTimeline } from '@/components/pipeline/EntityStateTimeline';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useTranslation } from '@/contexts/i18n-context';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
@@ -49,7 +46,6 @@ export const PurchaseOrderViewModal = React.memo(
     ({ item, open, onClose }: PurchaseOrderViewModalProps) => {
         const [timelineKey, setTimelineKey] = React.useState(() => Date.now());
         const queryClient = useQueryClient();
-        const { t } = useTranslation();
 
         if (!item) return null;
 
@@ -84,119 +80,89 @@ export const PurchaseOrderViewModal = React.memo(
                     </div>
                 }
             >
-                <Tabs defaultValue="details" className="min-h-0 flex-1">
-                    <TabsList className="grid w-full grid-cols-3">
-                        <TabsTrigger value="details">
-                            {t('approval.tab_details')}
-                        </TabsTrigger>
-                        <TabsTrigger value="timeline">
-                            {t('approval.tab_timeline')}
-                        </TabsTrigger>
-                        <TabsTrigger value="approvals">
-                            {t('approval.tab_approvals')}
-                        </TabsTrigger>
-                    </TabsList>
-                    <TabsContent
-                        value="timeline"
-                        className="mt-3 max-h-[60vh] overflow-y-auto"
-                    >
-                        <EntityStateTimeline
-                            key={timelineKey}
-                            entityType="purchase_order"
-                            entityId={item.id}
-                        />
-                    </TabsContent>
-                    <TabsContent
-                        value="approvals"
-                        className="mt-3 max-h-[60vh] overflow-y-auto"
-                    >
-                        <ApprovalHistoryTimeline
-                            entityType="purchase_order"
-                            entityId={item.id}
-                        />
-                    </TabsContent>
-                    <TabsContent value="details" className="min-h-0 flex-1">
-                        <div className="min-h-0 flex-1 overflow-y-auto sm:pr-4">
-                            <div className="space-y-6 py-2">
-                                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                                    <ViewField
-                                        label="PO Number"
-                                        value={item.po_number}
-                                    />
-                                    <ViewField
-                                        label="Supplier"
-                                        value={item.supplier?.name}
-                                    />
-                                    <ViewField
-                                        label="Warehouse"
-                                        value={item.warehouse?.name}
-                                    />
-                                    <ViewField
-                                        label="Order Date"
-                                        value={formatDateByRegionalSettings(
-                                            item.order_date,
-                                        )}
-                                    />
-                                    <ViewField
-                                        label="Expected Delivery"
-                                        value={formatDateByRegionalSettings(
-                                            item.expected_delivery_date,
-                                        )}
-                                    />
-                                    <ViewField
-                                        label="Payment Terms"
-                                        value={item.payment_terms}
-                                    />
-                                    <ViewField
-                                        label="Currency"
-                                        value={item.currency}
-                                    />
-                                    <ViewField
-                                        label="Status"
-                                        value={
-                                            <Badge variant="outline">
-                                                {item.status}
-                                            </Badge>
-                                        }
-                                    />
-                                    <ViewField
-                                        label="Subtotal"
-                                        value={formatAmount(item.subtotal)}
-                                    />
-                                    <ViewField
-                                        label="Tax Amount"
-                                        value={formatAmount(item.tax_amount)}
-                                    />
-                                    <ViewField
-                                        label="Discount Amount"
-                                        value={formatAmount(
-                                            item.discount_amount,
-                                        )}
-                                    />
-                                    <ViewField
-                                        label="Grand Total"
-                                        value={formatAmount(item.grand_total)}
-                                    />
-                                    <ViewField
-                                        label="Shipping Address"
-                                        value={item.shipping_address || '-'}
-                                    />
-                                    <ViewField
-                                        label="Notes"
-                                        value={item.notes || '-'}
-                                    />
-                                </div>
-
-                                <ViewModalItemsTable
-                                    items={item.items}
-                                    columns={itemColumns}
-                                    minWidthClassName="min-w-[860px]"
-                                    getRowKey={(row) => row.id}
+                <EntityDetailTabs
+                    entityType="purchase_order"
+                    entityId={item.id}
+                    timelineKey={timelineKey}
+                >
+                    <div className="min-h-0 flex-1 overflow-y-auto sm:pr-4">
+                        <div className="space-y-6 py-2">
+                            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                                <ViewField
+                                    label="PO Number"
+                                    value={item.po_number}
+                                />
+                                <ViewField
+                                    label="Supplier"
+                                    value={item.supplier?.name}
+                                />
+                                <ViewField
+                                    label="Warehouse"
+                                    value={item.warehouse?.name}
+                                />
+                                <ViewField
+                                    label="Order Date"
+                                    value={formatDateByRegionalSettings(
+                                        item.order_date,
+                                    )}
+                                />
+                                <ViewField
+                                    label="Expected Delivery"
+                                    value={formatDateByRegionalSettings(
+                                        item.expected_delivery_date,
+                                    )}
+                                />
+                                <ViewField
+                                    label="Payment Terms"
+                                    value={item.payment_terms}
+                                />
+                                <ViewField
+                                    label="Currency"
+                                    value={item.currency}
+                                />
+                                <ViewField
+                                    label="Status"
+                                    value={
+                                        <Badge variant="outline">
+                                            {item.status}
+                                        </Badge>
+                                    }
+                                />
+                                <ViewField
+                                    label="Subtotal"
+                                    value={formatAmount(item.subtotal)}
+                                />
+                                <ViewField
+                                    label="Tax Amount"
+                                    value={formatAmount(item.tax_amount)}
+                                />
+                                <ViewField
+                                    label="Discount Amount"
+                                    value={formatAmount(item.discount_amount)}
+                                />
+                                <ViewField
+                                    label="Grand Total"
+                                    value={formatAmount(item.grand_total)}
+                                />
+                                <ViewField
+                                    label="Shipping Address"
+                                    value={item.shipping_address || '-'}
+                                />
+                                <ViewField
+                                    label="Notes"
+                                    value={item.notes || '-'}
                                 />
                             </div>
+
+                            <ViewModalItemsTable
+                                items={item.items}
+                                columns={itemColumns}
+                                minWidthClassName="min-w-[860px]"
+                                getRowKey={(row) => row.id}
+                            />
                         </div>
-                    </TabsContent>
-                </Tabs>
+                    </div>
+                </EntityDetailTabs>
             </ViewModalShell>
         );
     },

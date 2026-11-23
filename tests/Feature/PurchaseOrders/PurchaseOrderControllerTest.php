@@ -232,8 +232,30 @@ test('update rejects editing items of a purchase order awaiting approval or conf
                 'unit_price' => 1000,
             ],
         ],
-    ])->assertUnprocessable();
+    ])->assertUnprocessable()
+        ->assertJsonValidationErrors('items');
 })->with(['pending_approval', 'confirmed']);
+
+test('locked items message is translated for en and id', function (string $locale, string $expected) {
+    app()->setLocale($locale);
+    $purchaseOrder = PurchaseOrder::factory()->create(['status' => 'confirmed']);
+
+    $response = putJson('/api/purchase-orders/' . $purchaseOrder->id, [
+        'items' => [
+            [
+                'product_id' => Product::factory()->create()->id,
+                'unit_id' => Unit::factory()->create()->id,
+                'quantity' => 999,
+                'unit_price' => 1000,
+            ],
+        ],
+    ])->assertUnprocessable();
+
+    expect($response->json('errors.items.0'))->toBe($expected);
+})->with([
+    ['en', 'Items can only be changed while the document is still a draft.'],
+    ['id', 'Item hanya dapat diubah selama dokumen masih draft.'],
+]);
 
 test('update rejects changing supplier or warehouse of a purchase order awaiting approval', function () {
     $purchaseOrder = PurchaseOrder::factory()->create(['status' => 'pending_approval']);
