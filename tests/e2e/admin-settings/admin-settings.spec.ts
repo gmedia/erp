@@ -20,6 +20,16 @@ async function saveAdminSettings(
     await responsePromise;
 }
 
+function collectCspViolations(page: Page): string[] {
+    const violations: string[] = [];
+    page.on('console', (message) => {
+        if (/Content[- ]Security[- ]Policy|violates/i.test(message.text())) {
+            violations.push(message.text());
+        }
+    });
+    return violations;
+}
+
 async function waitForAdminSettingsRefresh(page: Page) {
     await page.waitForResponse(
         (response: Response) =>
@@ -186,6 +196,7 @@ test.describe('Admin Settings', () => {
     });
 
     test('can upload company logo', async ({ page }) => {
+        const cspViolations = collectCspViolations(page);
         await page.goto('/admin-settings');
 
         // Check if there's already a logo displayed
@@ -208,6 +219,15 @@ test.describe('Admin Settings', () => {
         const logoSrc = await logoPreview.getAttribute('src');
         expect(logoSrc).toBeTruthy();
         expect(logoSrc).toContain('branding/logos');
+
+        await expect
+            .poll(() =>
+                logoPreview.evaluate(
+                    (img: HTMLImageElement) => img.naturalWidth,
+                ),
+            )
+            .toBeGreaterThan(0);
+        expect(cspViolations).toEqual([]);
     });
 
     test('uploaded logo appears in app logo component', async ({ page }) => {

@@ -256,5 +256,6 @@
     "stock_transfer.already_received": "Transfer yang sudah diterima tidak bisa kembali ke in_transit.",
     "stock_transfer.cancelled_final": "Transfer yang sudah dibatalkan tidak bisa berubah status.",
     "stock_transfer.items_locked": "Item dan qty kirim tidak bisa diubah setelah transfer dikirim; hanya qty diterima yang bisa diubah.",
-    "stock_transfer.qty_received_exceeds": "Qty diterima tidak boleh melebihi qty yang dikirim."
+    "stock_transfer.qty_received_exceeds": "Qty diterima tidak boleh melebihi qty yang dikirim.",
+    "admin_settings.logo_upload_failed": "Logo tidak dapat disimpan. Tidak ada pengaturan yang diubah. Silakan coba lagi."
 }

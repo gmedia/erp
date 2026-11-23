@@ -3,6 +3,7 @@
 use App\Mail\TestSmtpMail;
 use App\Models\Setting;
 use Database\Seeders\SettingSampleDataSeeder;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
@@ -285,3 +286,69 @@ describe('AdminSettingController@testSmtp', function () {
         $response->assertJsonValidationErrors('test_email');
     });
 });
+
+describe('AdminSettingController@update logo write failures', function () {
+    beforeEach(function () {
+        Setting::set('company_name', 'Initial Company');
+        Setting::set('company_logo_path', 'branding/logos/previous.svg');
+    });
+
+    test('failed logo write returns localized 422 and saves no settings', function (
+        string $upload,
+        string $method,
+        bool $throws,
+    ) {
+        mockLogoDiskWriteFailure($method, $throws ? new RuntimeException('Connection refused') : null);
+
+        $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
+        Sanctum::actingAs($user, ['*']);
+
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">'
+            . '<rect width="10" height="10" fill="#f97316"/></svg>';
+        $logoPayload = $upload === 'file'
+            ? ['company_logo' => UploadedFile::fake()->create('logo.svg', 10, 'image/svg+xml')]
+            : ['company_logo_svg' => $svg];
+
+        $response = $this->post('/api/admin-settings', array_merge(
+            ['company_name' => 'Changed Company'],
+            $logoPayload,
+        ), ['Accept' => 'application/json']);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('message', __('admin_settings.logo_upload_failed'))
+            ->assertJsonPath('errors.company_logo.0', __('admin_settings.logo_upload_failed'));
+
+        expect(Setting::get('company_name'))->toBe('Initial Company');
+        expect(Setting::get('company_logo_path'))->toBe('branding/logos/previous.svg');
+    })->with([
+        'file write returns false' => ['file', 'putFileAs', false],
+        'file write throws' => ['file', 'putFileAs', true],
+        'svg write returns false' => ['svg', 'put', false],
+        'svg write throws' => ['svg', 'put', true],
+    ]);
+
+    test('logo failure message exists in both en and id translations', function () {
+        foreach (['en', 'id'] as $locale) {
+            $translations = json_decode((string) file_get_contents(lang_path("{$locale}.json")), true);
+
+            expect($translations)->toHaveKey('admin_settings.logo_upload_failed');
+        }
+    });
+});
+
+/**
+ * Make the default disk fail one write method, either by returning false or by throwing.
+ */
+function mockLogoDiskWriteFailure(string $method, ?Throwable $throws = null): void
+{
+    $disk = Mockery::mock(FilesystemAdapter::class);
+    $expectation = $disk->shouldReceive($method);
+
+    if ($throws instanceof Throwable) {
+        $expectation->andThrow($throws);
+    } else {
+        $expectation->andReturn(false);
+    }
+
+    Storage::shouldReceive('disk')->andReturn($disk);
+}
