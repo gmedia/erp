@@ -256,6 +256,7 @@ export function ReportDataTablePage<
                             onResetFilters={resetFilters}
                             filterFields={filterFields}
                             exportEndpoint={exportEndpoint}
+                            controlsDisabled={!ready}
                             entityName={entityName}
                             onView={onView}
                             defaultColumnVisibility={defaultColumnVisibility}

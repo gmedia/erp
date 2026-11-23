@@ -14,12 +14,14 @@ interface DataTablePaginationProps {
     };
     onPageChange: (page: number) => void;
     onPageSizeChange: (per_page: number) => void;
+    disabled?: boolean;
 }
 
 export function DataTablePagination({
     pagination,
     onPageChange,
     onPageSizeChange,
+    disabled = false,
 }: Readonly<DataTablePaginationProps>) {
     const renderPageNumbers = () => {
         const pages = [];
@@ -58,6 +60,7 @@ export function DataTablePagination({
             onPageChange={onPageChange}
             onPageSizeChange={(perPage) => onPageSizeChange(Number(perPage))}
             renderPageNumbers={renderPageNumbers}
+            disabled={disabled}
         />
     );
 }

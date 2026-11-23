@@ -145,6 +145,7 @@ export default function IncomeStatement() {
 
                 <FinancialSummaryCard
                     description="Net Income = Total Revenue - Total Expense."
+                    hideStatusBorder
                     isPositive={isProfit}
                     status={
                         <FinancialStatusBadge

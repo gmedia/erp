@@ -173,6 +173,7 @@ export interface DataTableProps<T> {
     emptyState?: React.ReactNode;
     /** Kolom yang disembunyikan secara default (dapat diaktifkan via Columns). */
     defaultColumnVisibility?: Record<string, boolean>;
+    controlsDisabled?: boolean;
 }
 
 /**
@@ -209,6 +210,7 @@ export function DataTable<T>({
     entityName,
     emptyState,
     defaultColumnVisibility,
+    controlsDisabled = false,
 }: Readonly<DataTableProps<T>>) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnVisibility, setColumnVisibility] =
@@ -489,6 +491,7 @@ export function DataTable<T>({
                 extraActions={extraToolbarActions}
                 onExport={handleExport}
                 exporting={exporting}
+                exportDisabled={controlsDisabled}
                 table={table}
             />
 
@@ -565,6 +568,7 @@ export function DataTable<T>({
                     onPageSizeChange={(per_page: number) =>
                         handlePageSizeChange(per_page.toString())
                     }
+                    disabled={controlsDisabled}
                 />
             </div>
         </div>
