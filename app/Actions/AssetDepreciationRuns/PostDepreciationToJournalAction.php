@@ -102,6 +102,9 @@ class PostDepreciationToJournalAction
                 'entry_date' => $run->period_end->format('Y-m-d'),
                 'reference' => 'DEPR-' . $run->period_start->format('Ym'),
                 'description' => 'Depreciation Run for ' . $run->period_start->format('M Y'),
+                // A posted depreciation run must leave a posted journal so the
+                // expense and accumulated depreciation reach the GL (W7-05).
+                'status' => 'posted',
                 'lines' => $journalLines,
             ];
 

@@ -74,11 +74,22 @@ it('reconciles GL balances with AR AP inventory and fixed asset subledgers', fun
         ->where('amount_due', '>', 0)
         ->sum('amount_due');
 
-    $equipmentBookValue = (float) DB::table('assets')->sum('book_value');
+    // Only in-service assets are capitalised; the GL shows equipment at cost
+    // (12100) with a contra accumulated-depreciation account (12200), and the
+    // net equals the register book value of in-service assets (W7-05).
+    $equipmentCost = (float) DB::table('assets')
+        ->whereIn('status', ['active', 'maintenance'])
+        ->sum('purchase_cost');
+    $accumulatedDepreciation = (float) DB::table('assets')
+        ->whereIn('status', ['active', 'maintenance'])
+        ->sum('accumulated_depreciation');
+    $equipmentBookValue = $equipmentCost - $accumulatedDepreciation;
 
     expect(glBalance('11200'))->toBe($outstandingAr)
         ->and(-glBalance('21100'))->toBe($outstandingAp)
-        ->and(glBalance('12100'))->toBe($equipmentBookValue)
+        ->and(glBalance('12100'))->toBe($equipmentCost)
+        ->and(-glBalance('12200'))->toBe($accumulatedDepreciation)
+        ->and(glBalance('12100') + glBalance('12200'))->toBe($equipmentBookValue)
         ->and(glBalance('11120'))->toBeGreaterThanOrEqual(0);
 });
 

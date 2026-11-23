@@ -2,8 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Actions\AssetDepreciationRuns\CalculateDepreciationAction;
-use App\Actions\AssetDepreciationRuns\PostDepreciationToJournalAction;
 use App\Models\Account;
 use App\Models\ApprovalAuditLog;
 use App\Models\ApprovalFlow;
@@ -11,7 +9,6 @@ use App\Models\ApprovalRequest;
 use App\Models\ApprovalRequestStep;
 use App\Models\Asset;
 use App\Models\AssetCategory;
-use App\Models\AssetDepreciationRun;
 use App\Models\AssetLocation;
 use App\Models\AssetMaintenance;
 use App\Models\AssetModel;
@@ -21,7 +18,6 @@ use App\Models\AssetStocktakeItem;
 use App\Models\Branch;
 use App\Models\Department;
 use App\Models\Employee;
-use App\Models\FiscalYear;
 use App\Models\Pipeline;
 use App\Models\PipelineEntityState;
 use App\Models\PipelineState;
@@ -942,42 +938,19 @@ class AssetSampleDataSeeder extends Seeder
             }
         }
 
-        // Depreciation Run
-        $fiscalYear = FiscalYear::where('status', 'open')->first();
-        if ($fiscalYear) {
-            $periodStart = now()->subMonth()->startOfMonth();
-            $periodEnd = now()->subMonth()->endOfMonth();
+        // Depreciation accounts: assign the dedicated contra-asset and expense
+        // accounts so depreciation runs post to the right GL accounts (W7-05).
+        // The actual depreciation run is created by
+        // AssetDepreciationNormalizationSeeder once every asset (including
+        // vehicles) exists.
+        $expenseAcc = Account::query()->where('code', '53000')->first();
+        $accumAcc = Account::query()->where('code', '12200')->first();
 
-            $expenseAcc = Account::where('type', 'expense')->first();
-            $accumAcc = Account::where('type', 'asset')->first();
-
-            if ($expenseAcc && $accumAcc) {
-                Asset::whereNull('depreciation_expense_account_id')->update([
-                    'depreciation_expense_account_id' => $expenseAcc->id,
-                    'accumulated_depr_account_id' => $accumAcc->id,
-                ]);
-
-                if (! AssetDepreciationRun::where('fiscal_year_id', $fiscalYear->id)
-                    ->where('period_start', $periodStart->toDateString())
-                    ->exists()) {
-                    $calculateAction = app(CalculateDepreciationAction::class);
-                    $run = $calculateAction->execute([
-                        'fiscal_year_id' => $fiscalYear->id,
-                        'period_start' => $periodStart->toDateString(),
-                        'period_end' => $periodEnd->toDateString(),
-                    ]);
-
-                    $postAction = app(PostDepreciationToJournalAction::class);
-                    $postAction->execute($run);
-
-                    // Lengkapi jejak audit run (W5-21).
-                    $run->forceFill([
-                        'created_by' => $adminUser?->id ?? $run->created_by,
-                        'posted_by' => $adminUser?->id ?? $run->posted_by,
-                        'posted_at' => $run->posted_at ?? now(),
-                    ])->save();
-                }
-            }
+        if ($expenseAcc && $accumAcc) {
+            Asset::query()->update([
+                'depreciation_expense_account_id' => $expenseAcc->id,
+                'accumulated_depr_account_id' => $accumAcc->id,
+            ]);
         }
     }
 }

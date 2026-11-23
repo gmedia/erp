@@ -42,10 +42,10 @@ class SubledgerGlReconciliationSeeder extends Seeder
 
         $accounts = Account::query()
             ->where('coa_version_id', $coaVersion->id)
-            ->whereIn('code', ['11200', '11300', '12100', '11120', '21100', '32000'])
+            ->whereIn('code', ['11200', '11300', '12100', '12200', '11120', '21100', '32000'])
             ->pluck('id', 'code');
 
-        if ($accounts->count() < 6) {
+        if ($accounts->count() < 7) {
             return;
         }
 
@@ -55,7 +55,8 @@ class SubledgerGlReconciliationSeeder extends Seeder
             // code => [target normal balance, is_debit_normal]
             '11200' => [$this->outstandingReceivable(), true],
             '11300' => [$this->inventoryValue(), true],
-            '12100' => [$this->equipmentBookValue(), true],
+            '12100' => [$this->equipmentCost(), true],
+            '12200' => [$this->accumulatedDepreciation(), false],
             '11120' => [2000000.0, true],
             '21100' => [$this->outstandingPayable(), false],
         ];
@@ -190,8 +191,17 @@ class SubledgerGlReconciliationSeeder extends Seeder
             ->value('value');
     }
 
-    private function equipmentBookValue(): float
+    private function equipmentCost(): float
     {
-        return (float) DB::table('assets')->sum('book_value');
+        return (float) DB::table('assets')
+            ->whereIn('status', ['active', 'maintenance'])
+            ->sum('purchase_cost');
+    }
+
+    private function accumulatedDepreciation(): float
+    {
+        return (float) DB::table('assets')
+            ->whereIn('status', ['active', 'maintenance'])
+            ->sum('accumulated_depreciation');
     }
 }

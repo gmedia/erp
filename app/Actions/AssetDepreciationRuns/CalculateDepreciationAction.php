@@ -54,7 +54,8 @@ class CalculateDepreciationAction
                 $salvage = (float) $asset->salvage_value;
                 $usefulLife = (int) $asset->useful_life_months;
 
-                $monthlyAmount = round(($cost - $salvage) / $usefulLife, 2);
+                // Whole-rupiah monthly depreciation (W7-05).
+                $monthlyAmount = round(($cost - $salvage) / $usefulLife);
 
                 $accumulatedBefore = (float) $asset->accumulated_depreciation;
                 $bookValueBefore = (float) ($asset->book_value ?? $cost);
@@ -66,7 +67,7 @@ class CalculateDepreciationAction
                     continue; // Already fully depreciated
                 }
 
-                $amount = min($monthlyAmount, $maxDepreciable);
+                $amount = round(min($monthlyAmount, $maxDepreciable));
 
                 $accumulatedAfter = $accumulatedBefore + $amount;
                 $bookValueAfter = $bookValueBefore - $amount;
