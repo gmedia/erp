@@ -127,6 +127,18 @@ class SupplierBill extends Model
         'confirmed_at',
     ];
 
+    /**
+     * Issue #356 baris 7: kolom DB ikut 0 untuk status tidak terbayar, bukan hanya accessor.
+     */
+    protected static function booted(): void
+    {
+        static::saving(function (SupplierBill $bill): void {
+            if (in_array($bill->status, ['draft', 'cancelled', 'void'], true)) {
+                $bill->amount_due = '0.00';
+            }
+        });
+    }
+
     public function branch(): BelongsTo
     {
         return $this->belongsTo(Branch::class);
