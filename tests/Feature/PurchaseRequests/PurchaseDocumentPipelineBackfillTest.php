@@ -10,6 +10,7 @@ use App\Models\PurchaseRequest;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Log;
 
 use function Pest\Laravel\seed;
 
@@ -158,4 +159,24 @@ test('demo seeder is idempotent for purchase document pipeline states', function
         ->count();
 
     expect($after)->toBe($before);
+});
+
+test('backfill skips and logs documents whose status has no pipeline state instead of defaulting to initial', function () {
+    $pr = PurchaseRequest::factory()->create(['status' => 'approved']);
+    PipelineEntityState::query()->delete();
+
+    // Status 'approved' tidak punya state di pipeline ini -> dokumen harus dilewati, bukan diberi state draft.
+    PipelineState::query()->where('code', 'approved')->delete();
+
+    Log::spy();
+
+    runPurchaseDocumentPipelineBackfill();
+
+    expect(PipelineEntityState::query()
+        ->where('entity_type', PurchaseRequest::class)
+        ->where('entity_id', $pr->id)
+        ->exists())->toBeFalse()
+        ->and($pr->fresh()->status)->toBe('approved');
+
+    Log::shouldHaveReceived('warning')->atLeast()->once();
 });
