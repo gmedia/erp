@@ -29,6 +29,10 @@
         "empty_title": "No employee selected",
         "empty_description": "Select an employee above to view and edit their system permissions."
     },
+    "stockTransfer": {
+        "qty_received_label": "Qty Received",
+        "qty_received_placeholder": "Empty = received in full"
+    },
     "nav": {
         "platform": "Platform",
         "dashboard": "Dashboard",
@@ -201,5 +205,11 @@
     "admin": {
         "selectLogo": "Select SVG Logo",
         "noFileSelected": "No file selected"
-    }
+    },
+    "stock.insufficient": "Insufficient stock for :product in :warehouse (available :available, required :required).",
+    "stock_transfer.already_dispatched": "A dispatched transfer cannot return to :status.",
+    "stock_transfer.already_received": "A received transfer cannot return to in_transit.",
+    "stock_transfer.cancelled_final": "A cancelled transfer cannot change status.",
+    "stock_transfer.items_locked": "Items and dispatched quantities cannot change after dispatch; only the received quantity can change.",
+    "stock_transfer.qty_received_exceeds": "Received quantity cannot exceed the transferred quantity."
 }

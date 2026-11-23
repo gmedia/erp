@@ -14,7 +14,7 @@ use Illuminate\Support\Carbon;
  * @property int $product_id
  * @property int $unit_id
  * @property numeric $quantity
- * @property numeric $quantity_received
+ * @property numeric|null $quantity_received
  * @property numeric $unit_cost
  * @property string|null $notes
  * @property Carbon|null $created_at

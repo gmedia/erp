@@ -52,6 +52,10 @@ const defaultTranslations: Translations = {
         fill_details: 'Please fill in the details below.',
         view_details: 'Here are the details for this item.',
     },
+    stockTransfer: {
+        qty_received_label: 'Qty Received',
+        qty_received_placeholder: 'Empty = received in full',
+    },
     nav: {
         platform: 'Platform',
         dashboard: 'Dashboard',

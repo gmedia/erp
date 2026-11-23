@@ -29,6 +29,10 @@
         "empty_title": "Belum ada karyawan dipilih",
         "empty_description": "Pilih karyawan di atas untuk melihat dan mengubah izin sistemnya."
     },
+    "stockTransfer": {
+        "qty_received_label": "Qty Diterima",
+        "qty_received_placeholder": "Kosong = diterima penuh"
+    },
     "nav": {
         "platform": "Platform",
         "dashboard": "Dasbor",
@@ -201,5 +205,11 @@
     "admin": {
         "selectLogo": "Pilih Logo SVG",
         "noFileSelected": "Belum ada file dipilih"
-    }
+    },
+    "stock.insufficient": "Stok tidak cukup untuk :product di :warehouse (tersedia :available, dibutuhkan :required).",
+    "stock_transfer.already_dispatched": "Transfer yang sudah dikirim tidak bisa kembali ke status :status.",
+    "stock_transfer.already_received": "Transfer yang sudah diterima tidak bisa kembali ke in_transit.",
+    "stock_transfer.cancelled_final": "Transfer yang sudah dibatalkan tidak bisa berubah status.",
+    "stock_transfer.items_locked": "Item dan qty kirim tidak bisa diubah setelah transfer dikirim; hanya qty diterima yang bisa diubah.",
+    "stock_transfer.qty_received_exceeds": "Qty diterima tidak boleh melebihi qty yang dikirim."
 }

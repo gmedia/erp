@@ -645,6 +645,12 @@ export const approvalFlowFormSchema = z.object({
 
 export type ApprovalFlowFormData = z.infer<typeof approvalFlowFormSchema>;
 
+export const stockTransferQuantityReceivedSchema = z.preprocess(
+    (val) =>
+        val === '' || val === null || val === undefined ? null : Number(val),
+    z.number().min(0).nullable(),
+);
+
 export const stockTransferFormSchema = z.object({
     transfer_number: z.string().optional(),
     from_warehouse_id: z
@@ -682,11 +688,7 @@ export const stockTransferFormSchema = z.object({
                 quantity: z.coerce
                     .number()
                     .gt(0, { message: 'Quantity must be greater than 0.' }),
-                quantity_received: z.coerce
-                    .number()
-                    .min(0)
-                    .optional()
-                    .default(0),
+                quantity_received: stockTransferQuantityReceivedSchema,
                 unit_cost: z.coerce.number().min(0).optional().default(0),
                 notes: z.string().optional(),
             }),
