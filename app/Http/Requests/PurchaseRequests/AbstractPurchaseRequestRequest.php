@@ -15,8 +15,10 @@ abstract class AbstractPurchaseRequestRequest extends AuthorizedFormRequest
     use HasSometimesArrayRules;
 
     /**
-     * Approval outcome (approved/rejected) comes only from the approval flow.
-     * Manual input is rejected unless the document already has that status.
+     * Whitelist: status yang boleh diisi manual lewat create/update.
+     * Status lain (pending_approval, approved, rejected, partially_ordered, fully_ordered)
+     * hanya dihasilkan oleh pipeline/approval atau sistem (konversi PO).
+     * Dokumen yang sudah berstatus tertentu tetap boleh dikirim ulang dengan status yang sama.
      */
     public function after(): array
     {
@@ -28,17 +30,15 @@ abstract class AbstractPurchaseRequestRequest extends AuthorizedFormRequest
 
                 $status = $this->input('status');
 
-                if (! in_array($status, PurchaseRequest::APPROVAL_OUTCOME_STATUSES, true)) {
-                    return;
+                if (! $this->isAllowedManualStatus($status)) {
+                    $validator->errors()->add('status', __('approval.status_manual_forbidden'));
                 }
-
-                $current = $this->route('purchaseRequest')?->status;
-
-                if ($current === $status) {
-                    return;
+            },
+            function (Validator $validator): void {
+                // Item terkunci sejak pending_approval; update item hanya saat masih draft.
+                if ($this->has('items') && $this->currentPurchaseRequestStatus() !== PurchaseRequest::STATUS_DRAFT) {
+                    $validator->errors()->add('items', __('approval.items_locked'));
                 }
-
-                $validator->errors()->add('status', __('approval.status_manual_forbidden'));
             },
         ];
     }
@@ -76,6 +76,19 @@ abstract class AbstractPurchaseRequestRequest extends AuthorizedFormRequest
             'items.*.estimated_unit_price' => ['nullable', 'numeric', 'min:0'],
             'items.*.notes' => ['nullable', 'string'],
         ];
+    }
+
+    protected function isAllowedManualStatus(mixed $status): bool
+    {
+        // Create: hanya draft. Update: status tidak berubah.
+        return $status === $this->currentPurchaseRequestStatus();
+    }
+
+    protected function currentPurchaseRequestStatus(): string
+    {
+        $purchaseRequest = $this->route('purchaseRequest');
+
+        return $purchaseRequest instanceof PurchaseRequest ? $purchaseRequest->status : PurchaseRequest::STATUS_DRAFT;
     }
 
     /**

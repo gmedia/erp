@@ -74,6 +74,8 @@ class PurchaseRequest extends Model
      */
     public const APPROVAL_OUTCOME_STATUSES = ['approved', 'rejected'];
 
+    public const STATUS_DRAFT = 'draft';
+
     /**
      * The attributes that are mass assignable.
      *

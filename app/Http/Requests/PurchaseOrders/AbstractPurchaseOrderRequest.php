@@ -16,8 +16,9 @@ abstract class AbstractPurchaseOrderRequest extends AuthorizedFormRequest
     use HasTransactionAmountRules;
 
     /**
-     * Approval outcome (confirmed via approval, rejected) comes only from the approval flow.
-     * Manual input is rejected unless the document already has that status.
+     * Whitelist: status yang boleh diisi manual lewat create/update hanya draft (create)
+     * atau status yang tidak berubah (update). Status pending_approval, confirmed, rejected,
+     * partially_received, fully_received, closed hanya dihasilkan pipeline/approval atau GR.
      */
     public function after(): array
     {
@@ -27,19 +28,15 @@ abstract class AbstractPurchaseOrderRequest extends AuthorizedFormRequest
                     return;
                 }
 
-                $status = $this->input('status');
-
-                if (! in_array($status, PurchaseOrder::APPROVAL_OUTCOME_STATUSES, true)) {
-                    return;
+                if (! $this->isAllowedManualStatus($this->input('status'))) {
+                    $validator->errors()->add('status', __('approval.status_manual_forbidden'));
                 }
-
-                $current = $this->route('purchaseOrder')?->status;
-
-                if ($current === $status) {
-                    return;
+            },
+            function (Validator $validator): void {
+                // Item terkunci sejak pending_approval/confirmed; update item hanya saat masih draft.
+                if ($this->has('items') && $this->currentPurchaseOrderStatus() !== PurchaseOrder::STATUS_DRAFT) {
+                    $validator->errors()->add('items', __('approval.items_locked'));
                 }
-
-                $validator->errors()->add('status', __('approval.status_manual_forbidden'));
             },
         ];
     }
@@ -80,6 +77,19 @@ abstract class AbstractPurchaseOrderRequest extends AuthorizedFormRequest
             'items.*.tax_percent' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'items.*.notes' => ['nullable', 'string'],
         ];
+    }
+
+    protected function isAllowedManualStatus(mixed $status): bool
+    {
+        // Create: hanya draft. Update: status tidak berubah.
+        return $status === $this->currentPurchaseOrderStatus();
+    }
+
+    protected function currentPurchaseOrderStatus(): string
+    {
+        $purchaseOrder = $this->route('purchaseOrder');
+
+        return $purchaseOrder instanceof PurchaseOrder ? $purchaseOrder->status : PurchaseOrder::STATUS_DRAFT;
     }
 
     abstract protected function poNumberUniqueRule(): string|object;

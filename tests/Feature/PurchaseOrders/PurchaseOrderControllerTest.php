@@ -188,6 +188,53 @@ test('update rejects manually setting purchase order status to confirmed or reje
     expect($purchaseOrder->fresh()->status)->toBe('draft');
 })->with(['confirmed', 'rejected']);
 
+test('store only accepts draft status for purchase order creation', function (string $status) {
+    $payload = [
+        'supplier_id' => Supplier::factory()->create()->id,
+        'warehouse_id' => Warehouse::factory()->create()->id,
+        'order_date' => '2026-03-05',
+        'currency' => 'IDR',
+        'status' => $status,
+        'items' => [
+            [
+                'product_id' => Product::factory()->create()->id,
+                'unit_id' => Unit::factory()->create()->id,
+                'quantity' => 1,
+                'unit_price' => 1000,
+            ],
+        ],
+    ];
+
+    postJson('/api/purchase-orders', $payload)
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('status');
+})->with(['confirmed', 'rejected', 'partially_received', 'fully_received', 'pending_approval', 'closed']);
+
+test('update rejects manual purchase order status jumps that bypass approval or receiving', function (string $status) {
+    $purchaseOrder = PurchaseOrder::factory()->create(['status' => 'draft']);
+
+    putJson('/api/purchase-orders/' . $purchaseOrder->id, ['status' => $status])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('status');
+
+    expect($purchaseOrder->fresh()->status)->toBe('draft');
+})->with(['pending_approval', 'partially_received', 'fully_received', 'closed']);
+
+test('update rejects editing items of a purchase order awaiting approval or confirmed', function (string $status) {
+    $purchaseOrder = PurchaseOrder::factory()->create(['status' => $status]);
+
+    putJson('/api/purchase-orders/' . $purchaseOrder->id, [
+        'items' => [
+            [
+                'product_id' => Product::factory()->create()->id,
+                'unit_id' => Unit::factory()->create()->id,
+                'quantity' => 999,
+                'unit_price' => 1000,
+            ],
+        ],
+    ])->assertUnprocessable();
+})->with(['pending_approval', 'confirmed']);
+
 test('update keeps already confirmed purchase order confirmed', function () {
     $purchaseOrder = PurchaseOrder::factory()->create(['status' => 'confirmed', 'approved_at' => now()]);
 

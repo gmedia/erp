@@ -81,6 +81,8 @@ class PurchaseOrder extends Model
      */
     public const APPROVAL_OUTCOME_STATUSES = ['confirmed', 'rejected'];
 
+    public const STATUS_DRAFT = 'draft';
+
     /**
      * The attributes that are mass assignable.
      *
