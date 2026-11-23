@@ -67,6 +67,9 @@ class StockTransferController extends Controller
             },
         );
 
+        // Create langsung berstatus received: jurnal selisih ikut diposting (Issue #357).
+        app(PostStockTransferJournalAction::class)->execute($transfer->refresh());
+
         $transfer->load(['fromWarehouse', 'toWarehouse', 'items.product', 'items.unit']);
 
         return (new StockTransferResource($transfer))

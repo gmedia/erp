@@ -453,8 +453,86 @@ test('W7-04 inventory valuation equals GL inventory account', function () {
         $valuation += (float) $movement->balance_after * $cost;
     }
 
+    // Barang dalam perjalanan tetap persediaan (keputusan #357). Nilainya dari
+    // dokumen transfer in_transit, bukan dari selisih GL.
+    $inTransit = (float) DB::table('stock_transfer_items')
+        ->join('stock_transfers', 'stock_transfers.id', '=', 'stock_transfer_items.stock_transfer_id')
+        ->where('stock_transfers.status', 'in_transit')
+        ->selectRaw('COALESCE(SUM(stock_transfer_items.quantity * stock_transfer_items.unit_cost), 0) as value')
+        ->value('value');
+
     expect(round(postedBalance((int) $inventoryAccountId, true), 2))
-        ->toBe(round($valuation, 2), 'GL 11300 must equal the sum of stock movement valuation');
+        ->toBe(round($valuation + $inTransit, 2), 'GL 11300 must equal stock movement valuation plus goods in transit');
+});
+
+// W7-04 — invarian 11300 harus menangkap kehilangan jurnal selisih transfer dan
+// barang in_transit yang tidak tercatat di GL (issue #357 review PR #384 butir 2).
+test('W7-04 11300 invariant fails when a transfer shortage journal is removed', function () {
+    $inventoryAccountId = activeCoaAccountId('11300');
+
+    $shortageJournalIds = DB::table('stock_transfers')
+        ->whereNotNull('journal_entry_id')
+        ->pluck('journal_entry_id');
+
+    expect($shortageJournalIds)->not->toBeEmpty('Demo data must post at least one transfer shortage journal');
+
+    // Hapus jurnal kekurangan: GL 11300 kehilangan kreditnya, invarian harus merah.
+    DB::table('journal_entry_lines')
+        ->whereIn('journal_entry_id', $shortageJournalIds)
+        ->where('account_id', $inventoryAccountId)
+        ->delete();
+
+    $valuation = 0.0;
+    $latest = [];
+    foreach (DB::table('stock_movements')->orderBy('moved_at')->orderBy('id')->get(['product_id', 'warehouse_id', 'balance_after', 'average_cost_after']) as $movement) {
+        $latest[$movement->product_id . ':' . $movement->warehouse_id] = $movement;
+    }
+    foreach ($latest as $movement) {
+        $cost = $movement->average_cost_after !== null
+            ? (float) $movement->average_cost_after
+            : (float) DB::table('products')->where('id', $movement->product_id)->value('cost');
+        $valuation += (float) $movement->balance_after * $cost;
+    }
+
+    $inTransit = (float) DB::table('stock_transfer_items')
+        ->join('stock_transfers', 'stock_transfers.id', '=', 'stock_transfer_items.stock_transfer_id')
+        ->where('stock_transfers.status', 'in_transit')
+        ->selectRaw('COALESCE(SUM(stock_transfer_items.quantity * stock_transfer_items.unit_cost), 0) as value')
+        ->value('value');
+
+    expect(round(postedBalance((int) $inventoryAccountId, true), 2))
+        ->not->toBe(round($valuation + $inTransit, 2), 'Invarian 11300 harus merah saat jurnal kekurangan hilang');
+});
+
+test('W7-04 11300 invariant depends on in_transit transfer value from the document', function () {
+    $inTransitItem = DB::table('stock_transfer_items')
+        ->join('stock_transfers', 'stock_transfers.id', '=', 'stock_transfer_items.stock_transfer_id')
+        ->where('stock_transfers.status', 'in_transit')
+        ->orderBy('stock_transfer_items.id')
+        ->first(['stock_transfer_items.id', 'stock_transfer_items.quantity', 'stock_transfer_items.unit_cost']);
+
+    expect($inTransitItem)->not->toBeNull('Demo data must include an in_transit transfer line');
+
+    $before = (float) DB::table('stock_transfer_items')
+        ->join('stock_transfers', 'stock_transfers.id', '=', 'stock_transfer_items.stock_transfer_id')
+        ->where('stock_transfers.status', 'in_transit')
+        ->selectRaw('COALESCE(SUM(stock_transfer_items.quantity * stock_transfer_items.unit_cost), 0) as value')
+        ->value('value');
+
+    // Ubah satu baris in_transit: nilai dokumen berubah, jadi invarian yang
+    // memasukkan barang dalam perjalanan juga berubah. Nilai GL tidak ikut berubah.
+    DB::table('stock_transfer_items')
+        ->where('id', $inTransitItem->id)
+        ->update(['quantity' => (float) $inTransitItem->quantity + 1]);
+
+    $after = (float) DB::table('stock_transfer_items')
+        ->join('stock_transfers', 'stock_transfers.id', '=', 'stock_transfer_items.stock_transfer_id')
+        ->where('stock_transfers.status', 'in_transit')
+        ->selectRaw('COALESCE(SUM(stock_transfer_items.quantity * stock_transfer_items.unit_cost), 0) as value')
+        ->value('value');
+
+    expect(round($after - $before, 2))
+        ->toBe(round((float) $inTransitItem->unit_cost, 2), 'Adding 1 unit to an in_transit line must add unit_cost to the in-transit value');
 });
 
 // Every posted document must reference a posted, balanced journal (issue #357 scope 4).
