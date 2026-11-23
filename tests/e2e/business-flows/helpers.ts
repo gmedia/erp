@@ -128,14 +128,21 @@ export async function sendJson(
         headers: await authHeaders(page),
         data: body,
     });
+    const status = response.status();
+    const text = await response.text();
+    let json: Record<string, unknown> = {};
+    try {
+        json = JSON.parse(text) as Record<string, unknown>;
+    } catch {
+        json = {};
+    }
+    if (status >= 400) {
+        console.log(
+            `[sendJson] ${method} ${path} -> ${status} body: ${text.slice(0, 2000)}`,
+        );
+    }
 
-    return {
-        status: response.status(),
-        json: (await response.json().catch(() => ({}))) as Record<
-            string,
-            unknown
-        >,
-    };
+    return { status, json };
 }
 
 export async function accountId(page: Page, code: string): Promise<number> {

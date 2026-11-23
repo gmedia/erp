@@ -26,7 +26,7 @@ import {
  * before/after deltas.
  *
  * Known defects are asserted with test.fail() and linked to their issue:
- * #356 (received qty / stock on POST confirmed) and #357 (journal coverage).
+ * #368 (PR approval entity state) and #367 (journal on POST confirmed).
  */
 
 const PO_QTY = 4;
