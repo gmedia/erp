@@ -1,6 +1,6 @@
 # Visual Audit — Backlog
 
-**Last updated:** 2026-11-22 (#319 — audit ulang wave-5)  
+**Last updated:** 2026-11-23 (#339 — audit independen wave-7)
 **Source:** multimodal-looker Wave 0–1; audit light/dark × desktop/mobile 85 route (#296, lihat `FINDINGS.md`)  
 **Policy:** T1–T5 + EX themes on main. No **mass** Wave 2 (85 leaves). Prefer selective re-smoke via `VISUAL_AUDIT_PRESET` / `VISUAL_AUDIT_ROUTES`.
 
@@ -16,19 +16,32 @@
 | EX-asset-profile | Asset profile chrome   | **merged** (#99)     |
 | EX-modal         | View/form modal chrome | **merged** (#100)    |
 
+## Wave 7 fix groups (dari `FINDINGS.md` W7-xx, #339)
+
+Kerjakan berurutan G1 → G6. Bukti fixed: invarian Pest `demo-integrity` (data/logic) + screenshot yang disebut per temuan (UI).
+
+| Grup  | Pri | Temuan                            | Scope                                                                                  | Status    |
+| ----- | --- | --------------------------------- | -------------------------------------------------------------------------------------- | --------- |
+| W7-G1 | P1  | W7-01, W7-02, W7-03               | AR/AP & purchasing: saldo void/cancelled, alokasi receipt/CN, received qty & status PO | open #340 |
+| W7-G2 | P1  | W7-04                             | Stok: posting movement konsisten untuk GR/retur/transfer/adjustment                    | open #341 |
+| W7-G3 | P1  | W7-05, W7-06                      | Aset tetap, depresiasi & angka lintas laporan                                          | open #342 |
+| W7-G4 | P1  | W7-07, W7-08, W7-09, W7-10, W7-11 | UI tabel & format: digit tertutup, nilai mentah, formatter, tone status, mobile        | open #343 |
+| W7-G5 | P2  | W7-12, W7-13, W7-14               | UI shell, pola report & dashboard                                                      | open #344 |
+| W7-G6 | P2  | W7-15, W7-16, W7-17               | Seeder: nilai realistis, audit trail/approval, kode & bahasa                           | open #345 |
+
 ## Wave 5 fix groups (dari `FINDINGS.md` W5-xx, #319)
 
 Kerjakan berurutan G1 → G7.
 
-| Grup  | Pri | Temuan                                          | Scope                                                             | Status                     |
-| ----- | --- | ----------------------------------------------- | ----------------------------------------------------------------- | -------------------------- |
+| Grup  | Pri | Temuan                                          | Scope                                                             | Status          |
+| ----- | --- | ----------------------------------------------- | ----------------------------------------------------------------- | --------------- |
 | W5-G1 | P1  | W5-09, W5-10, W5-11                             | Formatter & badge: nilai mentah, tone status, format uang/tanggal | **merged #328** |
-| W5-G2 | P1  | W5-01, W5-02, W5-03                             | Tabel: kolom kunci tertutup, fade report, aksi sticky mobile      | **merged #329**            |
-| W5-G3 | P1  | W5-05, W5-06, W5-07                             | Page shell: breadcrumb, shell custom, KPI/toolbar dashboard       | **merged #330**            |
-| W5-G4 | P1  | W5-04, W5-08                                    | Report: laporan keuangan mobile, empty state i18n + mobile        | **merged #331**            |
-| W5-G5 | P1  | W5-13, W5-14, W5-15, W5-16, W5-17, W5-18, W5-19 | Logic report/modul yang salah informasi                           | **merged #332**            |
-| W5-G6 | P2  | W5-20, W5-21, W5-22, W5-23                      | Seeder: tanggal, GL vs subledger, kode/nama, variasi data         | **merged #333**            |
-| W5-G7 | P3  | W5-12                                           | Polish UI kecil                                                   | **merged #334**            |
+| W5-G2 | P1  | W5-01, W5-02, W5-03                             | Tabel: kolom kunci tertutup, fade report, aksi sticky mobile      | **merged #329** |
+| W5-G3 | P1  | W5-05, W5-06, W5-07                             | Page shell: breadcrumb, shell custom, KPI/toolbar dashboard       | **merged #330** |
+| W5-G4 | P1  | W5-04, W5-08                                    | Report: laporan keuangan mobile, empty state i18n + mobile        | **merged #331** |
+| W5-G5 | P1  | W5-13, W5-14, W5-15, W5-16, W5-17, W5-18, W5-19 | Logic report/modul yang salah informasi                           | **merged #332** |
+| W5-G6 | P2  | W5-20, W5-21, W5-22, W5-23                      | Seeder: tanggal, GL vs subledger, kode/nama, variasi data         | **merged #333** |
+| W5-G7 | P3  | W5-12                                           | Polish UI kecil                                                   | **merged #334** |
 
 ## Wave 4 fix groups (dari `FINDINGS.md` W4-xx)
 
@@ -81,6 +94,7 @@ Kerjakan berurutan G1 → G7.
 | G3            | PR #278, #279, #280 — token warna komponen bersama, dashboard, vehicle loans + sisa modul               |
 | G4            | PR #288 (Settings dua kolom), #291 (header dashboard + `PageBanner`), #292 (aksi baris `⋯` + sel utama) |
 | VA-W4-AUDIT   | #296 — 340 capture light/dark × desktop/mobile, 24 temuan W4-xx                                         |
+| VA-W7-AUDIT   | #339 — audit independen (reviewer buta) 340 capture, 17 temuan W7-xx → 6 grup                           |
 | VA-W5-AUDIT   | #319 — audit ulang 340 capture pasca W4-G1…G8, 23 temuan W5-xx → 7 grup                                 |
 
 ## Residual / optional (not shared-shell themes)
@@ -117,7 +131,7 @@ Matriks tema/viewport (opsional): `VISUAL_AUDIT_THEMES=light,dark VISUAL_AUDIT_V
 
 ## Next agent action
 
-0. **2026-11-22:** `W5-G1`…`W5-G7` selesai (#328–#334). Temuan sisa audit wave-6 (W6-01…W6-17) dikerjakan di #335 → PR #336; lihat `FINDINGS.md` → **Audit wave-6**. Tidak ada temuan terbuka. (`W4-G1`…`W4-G8` selesai, #310–#318.)
+0. **2026-11-23:** kerjakan grup `W7-G1`…`W7-G6` (#340–#345) berurutan — detail di `FINDINGS.md` → **Audit independen wave-7**. W5/W6 ditutup; beberapa klaim fixed-nya reproduksi dan dipindah ke W7.
 
 1. ~~#96–#102~~ **merged** on main (EX themes + BS-01). Docs closeout #101 merged; this PR #103 FINDINGS landed.
 2. Keep `e2e/` untracked.
