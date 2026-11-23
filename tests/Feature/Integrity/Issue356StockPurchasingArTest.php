@@ -6,6 +6,8 @@ use App\Models\GoodsReceipt;
 use App\Models\Product;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
+use App\Models\StockAdjustment;
+use App\Models\StockAdjustmentItem;
 use App\Models\StockMovement;
 use App\Models\StockTransfer;
 use App\Models\StockTransferItem;
@@ -27,6 +29,7 @@ beforeEach(function () {
         'goods_receipt', 'goods_receipt.create', 'goods_receipt.edit', 'goods_receipt.delete',
         'stock_transfer', 'stock_transfer.create', 'stock_transfer.edit', 'stock_transfer.delete',
         'customer_invoice', 'customer_invoice.create', 'customer_invoice.edit', 'customer_invoice.delete',
+        'stock_adjustment', 'stock_adjustment.create', 'stock_adjustment.edit', 'stock_adjustment.delete',
     ]);
     actingAs($user);
 });
@@ -297,6 +300,36 @@ describe('Issue #356 — edit item GR confirmed setelah posting tidak menggandak
             ->value('net');
 
         expect($net)->toBe(6.0);
+    });
+});
+
+describe('Issue #356 — sibling: adjustment approved yang dibatalkan membalik stok', function () {
+    test('DELETE adjustment approved (+5) mengembalikan saldo ke 10 lewat movement pembalik', function () {
+        $warehouse = Warehouse::factory()->create();
+        $product = Product::factory()->create();
+        $unit = Unit::factory()->create();
+
+        $adjustment = StockAdjustment::factory()->create([
+            'warehouse_id' => $warehouse->id,
+            'status' => 'approved',
+        ]);
+        StockAdjustmentItem::factory()->create([
+            'stock_adjustment_id' => $adjustment->id,
+            'product_id' => $product->id,
+            'unit_id' => $unit->id,
+            'quantity_adjusted' => 5,
+        ]);
+        app(StockPostingService::class)->postStockAdjustment($adjustment->refresh());
+
+        deleteJson('/api/stock-adjustments/' . $adjustment->id)->assertNoContent();
+
+        $net = (float) StockMovement::query()
+            ->where('reference_type', StockAdjustment::class)
+            ->where('reference_id', $adjustment->id)
+            ->selectRaw('COALESCE(SUM(quantity_in) - SUM(quantity_out), 0) as net')
+            ->value('net');
+
+        expect($net)->toBe(0.0);
     });
 });
 
