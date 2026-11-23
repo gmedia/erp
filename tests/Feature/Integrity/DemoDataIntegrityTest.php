@@ -1,11 +1,17 @@
 <?php
 
+use App\Actions\StockMonitor\IndexStockMonitorAction;
+use App\Http\Requests\StockMonitor\IndexStockMonitorRequest;
 use App\Models\Account;
 use App\Models\CoaVersion;
 use App\Models\CustomerInvoice;
 use App\Models\FiscalYear;
+use App\Models\GoodsReceipt;
 use App\Models\PurchaseOrder;
+use App\Models\StockAdjustment;
+use App\Models\StockTransfer;
 use App\Models\SupplierBill;
+use App\Models\SupplierReturn;
 use Database\Seeders\SubledgerGlReconciliationSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -193,4 +199,123 @@ test('W7-03 supplier returns belong to the purchase order supplier and receipt',
         expect($row->gr_status)
             ->toBe('confirmed', "Supplier return {$row->return_number} must reference a confirmed goods receipt");
     }
+});
+
+// W7-04 — movement ledger chain is internally consistent per product+warehouse.
+test('W7-04 stock movement balances form a correct chain per product and warehouse', function () {
+    $movements = DB::table('stock_movements')
+        ->orderBy('product_id')
+        ->orderBy('warehouse_id')
+        ->orderBy('moved_at')
+        ->orderBy('id')
+        ->get(['id', 'product_id', 'warehouse_id', 'quantity_in', 'quantity_out', 'balance_after', 'moved_at']);
+
+    expect($movements)->not->toBeEmpty('Demo data must produce stock movements');
+
+    $balance = [];
+    $scope = null;
+
+    foreach ($movements as $movement) {
+        $key = $movement->product_id . ':' . $movement->warehouse_id;
+
+        if ($key !== $scope) {
+            $scope = $key;
+            $balance[$key] = 0.0;
+        }
+
+        $balance[$key] += (float) $movement->quantity_in - (float) $movement->quantity_out;
+
+        expect(round((float) $movement->balance_after, 2))
+            ->toBe(round($balance[$key], 2), "Movement {$movement->id} balance_after must equal the running balance for {$key}");
+    }
+
+    expect(min($balance))->toBeGreaterThanOrEqual(0.0, 'Running stock balance must never go negative');
+});
+
+// W7-04 — snapshot quantity equals the latest movement balance (by moved_at, id).
+test('W7-04 stock snapshot uses the latest movement balance', function () {
+    $movements = DB::table('stock_movements')
+        ->orderBy('product_id')
+        ->orderBy('warehouse_id')
+        ->orderBy('moved_at')
+        ->orderBy('id')
+        ->get(['product_id', 'warehouse_id', 'balance_after']);
+
+    $latest = [];
+    foreach ($movements as $movement) {
+        $latest[$movement->product_id . ':' . $movement->warehouse_id] = (float) $movement->balance_after;
+    }
+
+    $request = IndexStockMonitorRequest::create('/api/stock-monitor', 'GET');
+    $result = app(IndexStockMonitorAction::class)->execute($request);
+    $snapshot = collect($result['stocks']->items());
+
+    expect($snapshot)->not->toBeEmpty('Stock monitor must show stock rows');
+
+    foreach ($snapshot as $row) {
+        $key = $row->product_id . ':' . $row->warehouse_id;
+        expect(round((float) $row->quantity_on_hand, 2))
+            ->toBe(round($latest[$key] ?? 0.0, 2), "Stock snapshot for {$key} must equal the latest movement balance");
+    }
+});
+
+// W7-04 — only stock-affecting document states produce movements.
+test('W7-04 only eligible document states produce stock movements', function () {
+    $eligible = DB::table('stock_movements')
+        ->whereNotNull('reference_type')
+        ->get(['reference_type', 'reference_id'])
+        ->map(fn ($row) => $row->reference_type . '#' . $row->reference_id)
+        ->unique();
+
+    foreach ($eligible as $pair) {
+        [$type, $id] = explode('#', $pair);
+
+        $status = match ($type) {
+            GoodsReceipt::class => DB::table('goods_receipts')->where('id', $id)->value('status'),
+            SupplierReturn::class => DB::table('supplier_returns')->where('id', $id)->value('status'),
+            StockAdjustment::class => DB::table('stock_adjustments')->where('id', $id)->value('status'),
+            StockTransfer::class => DB::table('stock_transfers')->where('id', $id)->value('status'),
+            default => null,
+        };
+
+        $allowed = match ($type) {
+            GoodsReceipt::class, SupplierReturn::class => ['confirmed'],
+            StockAdjustment::class => ['approved'],
+            StockTransfer::class => ['in_transit', 'received'],
+            default => [],
+        };
+
+        expect(in_array($status, $allowed, true))
+            ->toBeTrue("Movement for {$type}#{$id} has ineligible status {$status}");
+    }
+});
+
+// W7-04 — inventory valuation equals GL 11300.
+test('W7-04 inventory valuation equals GL inventory account', function () {
+    $inventoryAccountId = activeCoaAccountId('11300');
+    expect($inventoryAccountId)->not->toBeNull('Active COA must expose account 11300');
+
+    $movements = DB::table('stock_movements')
+        ->orderBy('product_id')
+        ->orderBy('warehouse_id')
+        ->orderBy('moved_at')
+        ->orderBy('id')
+        ->get(['id', 'product_id', 'warehouse_id', 'balance_after', 'average_cost_after']);
+
+    $latest = [];
+    foreach ($movements as $movement) {
+        $latest[$movement->product_id . ':' . $movement->warehouse_id] = $movement;
+    }
+
+    $valuation = 0.0;
+    foreach ($latest as $movement) {
+        $cost = $movement->average_cost_after !== null
+            ? (float) $movement->average_cost_after
+            : (float) DB::table('products')->where('id', $movement->product_id)->value('cost');
+
+        $valuation += (float) $movement->balance_after * $cost;
+    }
+
+    expect(round(postedBalance((int) $inventoryAccountId, true), 2))
+        ->toBe(round($valuation, 2), 'GL 11300 must equal the sum of stock movement valuation');
 });

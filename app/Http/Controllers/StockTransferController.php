@@ -14,6 +14,7 @@ use App\Http\Requests\StockTransfers\UpdateStockTransferRequest;
 use App\Http\Resources\StockTransfers\StockTransferCollection;
 use App\Http\Resources\StockTransfers\StockTransferResource;
 use App\Models\StockTransfer;
+use App\Services\StockPostingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
@@ -94,6 +95,12 @@ class StockTransferController extends Controller
         );
 
         $stockTransfer->load(['fromWarehouse', 'toWarehouse', 'items.product', 'items.unit']);
+
+        // Dispatch/receive change stock levels, so post the movement ledger
+        // through the shared stock posting service (W7-04).
+        $stockPosting = app(StockPostingService::class);
+        $stockPosting->postStockTransferDispatch($stockTransfer);
+        $stockPosting->postStockTransferReceive($stockTransfer);
 
         return (new StockTransferResource($stockTransfer))->response();
     }

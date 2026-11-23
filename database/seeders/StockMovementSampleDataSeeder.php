@@ -2,143 +2,90 @@
 
 namespace Database\Seeders;
 
+use App\Models\GoodsReceipt;
 use App\Models\StockAdjustment;
 use App\Models\StockAdjustmentItem;
 use App\Models\StockMovement;
 use App\Models\StockTransfer;
-use App\Models\StockTransferItem;
-use App\Models\User;
+use App\Models\SupplierReturn;
+use App\Services\StockPostingService;
 use Illuminate\Database\Seeder;
 
+/**
+ * Post stock movements for every demo document that changes stock, using the
+ * same StockPostingService as the application (W7-04). Only documents in a
+ * stock-affecting state produce movements:
+ *   - goods receipt `confirmed`
+ *   - supplier return `confirmed`
+ *   - stock adjustment `approved`
+ *   - stock transfer `in_transit` (dispatch) and `received` (dispatch + receive)
+ *
+ * Movements are rebuilt from scratch each run (idempotent) and the
+ * `balance_after` chain is recomputed in (moved_at, id) order.
+ */
 class StockMovementSampleDataSeeder extends Seeder
 {
     public function run(): void
     {
-        $adminUserId = User::query()
-            ->where('email', config('app.admin'))
-            ->value('id') ?? User::query()->value('id');
+        $stockPosting = app(StockPostingService::class);
 
-        // Hanya adjustment approved yang menghasilkan movement, dan semua item
-        // non-nol ikut tercatat (W5-19).
-        $adjustmentItems = StockAdjustmentItem::query()
-            ->with(['stockAdjustment'])
-            ->whereHas('stockAdjustment', fn ($query) => $query->where('status', 'approved'))
-            ->where('quantity_adjusted', '<>', 0)
+        // Rebuild the ledger so re-seeding never leaves stale or duplicate rows.
+        StockMovement::query()->delete();
+
+        GoodsReceipt::query()
+            ->where('status', 'confirmed')
+            ->with('items')
+            ->orderBy('receipt_date')
+            ->orderBy('id')
+            ->each(fn (GoodsReceipt $receipt) => $stockPosting->postGoodsReceipt($receipt));
+
+        SupplierReturn::query()
+            ->where('status', 'confirmed')
+            ->with('items')
+            ->orderBy('return_date')
+            ->orderBy('id')
+            ->each(fn (SupplierReturn $return) => $stockPosting->postSupplierReturn($return));
+
+        StockAdjustment::query()
+            ->where('status', 'approved')
+            ->with('items')
+            ->orderBy('adjustment_date')
+            ->orderBy('id')
+            ->each(fn (StockAdjustment $adjustment) => $stockPosting->postStockAdjustment($adjustment));
+
+        StockTransfer::query()
+            ->whereIn('status', ['in_transit', 'received'])
+            ->with('items')
+            ->orderBy('transfer_date')
+            ->orderBy('id')
+            ->each(function (StockTransfer $transfer) use ($stockPosting): void {
+                $stockPosting->postStockTransferDispatch($transfer);
+                $stockPosting->postStockTransferReceive($transfer);
+            });
+
+        $stockPosting->rebuildBalances();
+
+        // Keep the approved adjustment's recorded `quantity_after` in sync with
+        // the recomputed ledger balance so the detail view matches the card.
+        $approvedAdjustments = StockAdjustment::query()
+            ->where('status', 'approved')
+            ->with('items')
             ->get();
 
-        foreach ($adjustmentItems as $adjustmentItem) {
-            $adjustment = $adjustmentItem->stockAdjustment;
-            $movementType = (float) $adjustmentItem->quantity_adjusted > 0
-                ? 'adjustment_in'
-                : 'adjustment_out';
+        foreach ($approvedAdjustments as $adjustment) {
+            foreach ($adjustment->items as $item) {
+                $balance = StockMovement::query()
+                    ->where('reference_type', StockAdjustment::class)
+                    ->where('reference_id', $adjustment->id)
+                    ->where('product_id', $item->product_id)
+                    ->value('balance_after');
 
-            StockMovement::updateOrCreate(
-                [
-                    'movement_type' => $movementType,
-                    'reference_type' => StockAdjustment::class,
-                    'reference_id' => $adjustment->id,
-                    'warehouse_id' => $adjustment->warehouse_id,
-                    'product_id' => $adjustmentItem->product_id,
-                ],
-                [
-                    'quantity_in' => $movementType === 'adjustment_in'
-                        ? abs((float) $adjustmentItem->quantity_adjusted)
-                        : 0,
-                    'quantity_out' => $movementType === 'adjustment_out'
-                        ? abs((float) $adjustmentItem->quantity_adjusted)
-                        : 0,
-                    'balance_after' => (float) $adjustmentItem->quantity_after,
-                    'unit_cost' => $adjustmentItem->unit_cost,
-                    'average_cost_after' => null,
-                    'reference_number' => $adjustment->adjustment_number,
-                    'notes' => $adjustment->notes,
-                    'moved_at' => $adjustment->adjustment_date->startOfDay(),
-                    'created_by' => $adminUserId,
-                ],
-            );
+                if ($balance !== null) {
+                    StockAdjustmentItem::query()
+                        ->whereKey($item->getKey())
+                        ->update(['quantity_after' => (float) $balance]);
+                }
+            }
         }
-
-        $transferItem = StockTransferItem::query()
-            ->with(['stockTransfer'])
-            ->whereHas('stockTransfer', fn ($query) => $query->where('status', 'received'))
-            ->first()
-            ?? StockTransferItem::query()->with(['stockTransfer'])->first();
-
-        if ($transferItem?->stockTransfer) {
-            $transfer = $transferItem->stockTransfer;
-
-            $sourceBalance = $this->currentBalance(
-                (int) $transferItem->product_id,
-                (int) $transfer->from_warehouse_id,
-                (int) $transfer->id,
-            );
-            $outQuantity = (float) $transferItem->quantity;
-            $receivedQuantity = (float) $transferItem->quantity_received;
-            $targetBalance = $this->currentBalance(
-                (int) $transferItem->product_id,
-                (int) $transfer->to_warehouse_id,
-                (int) $transfer->id,
-            );
-
-            StockMovement::updateOrCreate(
-                [
-                    'movement_type' => 'transfer_out',
-                    'reference_type' => StockTransfer::class,
-                    'reference_id' => $transfer->id,
-                    'warehouse_id' => $transfer->from_warehouse_id,
-                    'product_id' => $transferItem->product_id,
-                ],
-                [
-                    'quantity_in' => 0,
-                    'quantity_out' => $outQuantity,
-                    'balance_after' => max(0, $sourceBalance - $outQuantity),
-                    'unit_cost' => $transferItem->unit_cost,
-                    'average_cost_after' => null,
-                    'reference_number' => $transfer->transfer_number,
-                    'notes' => $transfer->notes,
-                    'moved_at' => $transfer->transfer_date ? $transfer->transfer_date->startOfDay() : now(),
-                    'created_by' => $adminUserId,
-                ],
-            );
-
-            StockMovement::updateOrCreate(
-                [
-                    'movement_type' => 'transfer_in',
-                    'reference_type' => StockTransfer::class,
-                    'reference_id' => $transfer->id,
-                    'warehouse_id' => $transfer->to_warehouse_id,
-                    'product_id' => $transferItem->product_id,
-                ],
-                [
-                    'quantity_in' => $receivedQuantity,
-                    'quantity_out' => 0,
-                    'balance_after' => $targetBalance + $receivedQuantity,
-                    'unit_cost' => $transferItem->unit_cost,
-                    'average_cost_after' => null,
-                    'reference_number' => $transfer->transfer_number,
-                    'notes' => $transfer->notes,
-                    'moved_at' => $transfer->transfer_date ? $transfer->transfer_date->startOfDay() : now(),
-                    'created_by' => $adminUserId,
-                ],
-            );
-        }
-    }
-
-    /**
-     * Saldo berjalan terakhir untuk produk+gudang, mengabaikan gerakan dari
-     * transfer yang sedang diproses agar seeder tetap idempoten.
-     */
-    private function currentBalance(int $productId, int $warehouseId, ?int $excludeTransferId = null): float
-    {
-        return (float) (StockMovement::query()
-            ->where('product_id', $productId)
-            ->where('warehouse_id', $warehouseId)
-            ->when($excludeTransferId !== null, fn ($query) => $query
-                ->whereNot(fn ($inner) => $inner
-                    ->where('reference_type', StockTransfer::class)
-                    ->where('reference_id', $excludeTransferId)))
-            ->orderByDesc('moved_at')
-            ->orderByDesc('id')
-            ->value('balance_after') ?? 0);
     }
 }

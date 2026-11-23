@@ -160,9 +160,23 @@ class SubledgerGlReconciliationSeeder extends Seeder
     private function inventoryValue(): float
     {
         // Nilai persediaan = saldo terakhir per produk/gudang × harga pokok.
-        $latest = DB::table('stock_movements')
-            ->selectRaw('MAX(id) as id')
-            ->groupBy('product_id', 'warehouse_id')
+        // Saldo terakhir = movement dengan (moved_at, id) terbesar, sama dengan
+        // urutan rantai `balance_after` dan snapshot stok (W7-04).
+        $latest = DB::table('stock_movements as sm_latest')
+            ->select('sm_latest.id')
+            ->whereNotExists(function ($query): void {
+                $query->selectRaw('1')
+                    ->from('stock_movements as sm_newer')
+                    ->whereColumn('sm_newer.product_id', 'sm_latest.product_id')
+                    ->whereColumn('sm_newer.warehouse_id', 'sm_latest.warehouse_id')
+                    ->where(function ($inner): void {
+                        $inner->whereColumn('sm_newer.moved_at', '>', 'sm_latest.moved_at')
+                            ->orWhere(function ($tie): void {
+                                $tie->whereColumn('sm_newer.moved_at', '=', 'sm_latest.moved_at')
+                                    ->whereColumn('sm_newer.id', '>', 'sm_latest.id');
+                            });
+                    });
+            })
             ->pluck('id');
 
         if ($latest->isEmpty()) {
