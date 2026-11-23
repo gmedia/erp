@@ -3,7 +3,9 @@
 namespace App\Actions\AccountingPosting;
 
 use App\Actions\JournalEntries\CreateJournalEntryAction;
+use App\Models\GoodsReceipt;
 use App\Models\JournalEntry;
+use App\Models\JournalEntryLine;
 use App\Models\SupplierBill;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -53,8 +55,14 @@ class PostSupplierBillJournalAction
             $debitLines = [];
             $expenseGrouped = [];
 
+            // Bill atas GR: akun debit = akun yang benar-benar dikredit jurnal GR terkait
+            // (GR/IR untuk GR baru, 21100 untuk GR lama), supaya utang tidak tercatat ganda.
+            $grCreditAccountId = $this->grCreditAccountIdFor($supplierBill);
+
             foreach ($supplierBill->items as $item) {
-                $accountId = (int) $item->account_id;
+                $accountId = $item->goods_receipt_item_id !== null && $grCreditAccountId !== null
+                    ? $grCreditAccountId
+                    : (int) $item->account_id;
                 $expenseGrouped[$accountId] = ($expenseGrouped[$accountId] ?? 0.0) + (float) $item->line_total;
             }
 
@@ -99,5 +107,30 @@ class PostSupplierBillJournalAction
 
             return $journalEntry;
         });
+    }
+
+    /**
+     * Akun kredit pada jurnal GR terkait yang bukan AP. Null bila bill tanpa GR
+     * atau GR belum punya jurnal; bill tanpa GR memakai akun item seperti biasa.
+     */
+    private function grCreditAccountIdFor(SupplierBill $supplierBill): ?int
+    {
+        if ($supplierBill->goods_receipt_id === null) {
+            return null;
+        }
+
+        $goodsReceipt = GoodsReceipt::query()->find($supplierBill->goods_receipt_id);
+
+        if ($goodsReceipt === null || $goodsReceipt->journal_entry_id === null) {
+            return null;
+        }
+
+        // Jurnal GR hanya punya satu sisi kredit (GR/IR atau AP lama); ambil akun itu apa adanya.
+        $creditLine = JournalEntryLine::query()
+            ->where('journal_entry_id', $goodsReceipt->journal_entry_id)
+            ->where('credit', '>', 0)
+            ->first();
+
+        return $creditLine?->account_id;
     }
 }

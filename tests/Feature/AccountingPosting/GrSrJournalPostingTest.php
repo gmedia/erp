@@ -51,9 +51,20 @@ function makeGrSrPostingAccounts(): array
         'is_active' => true,
     ]);
 
+    // GR/IR: akun perantara yang dikredit jurnal GR (issue #357).
+    $grirAccount = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '21150',
+        'name' => 'Goods Received Not Invoiced (GR/IR)',
+        'type' => 'liability',
+        'normal_balance' => 'credit',
+        'is_active' => true,
+    ]);
+
     return [
         'inventory' => $inventoryAccount,
         'ap' => $apAccount,
+        'grir' => $grirAccount,
     ];
 }
 
@@ -98,8 +109,10 @@ test('PostGoodsReceiptJournalAction creates a balanced posted journal entry', fu
     $inventoryLine = $journalEntry->lines()->where('account_id', $accounts['inventory']->id)->first();
     expect((float) $inventoryLine->debit)->toBe(500000.0);
 
-    $apLine = $journalEntry->lines()->where('account_id', $accounts['ap']->id)->first();
-    expect((float) $apLine->credit)->toBe(500000.0);
+    // GR mengkredit GR/IR (bukan AP); AP baru didebit/dikredit oleh bill atas GR.
+    $grirLine = $journalEntry->lines()->where('account_id', $accounts['grir']->id)->first();
+    expect((float) $grirLine->credit)->toBe(500000.0)
+        ->and($journalEntry->lines()->where('account_id', $accounts['ap']->id)->exists())->toBeFalse();
 });
 
 test('PostGoodsReceiptJournalAction is idempotent', function () {
