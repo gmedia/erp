@@ -33,6 +33,20 @@
         "qty_received_label": "Qty Diterima",
         "qty_received_placeholder": "Kosong = diterima penuh"
     },
+    "approval": {
+        "status_manual_forbidden": "Status ini hanya dapat diisi melalui proses approval atau oleh sistem.",
+        "items_locked": "Item hanya dapat diubah selama dokumen masih draft.",
+        "form_locked": "Menunggu atau sudah melewati approval: header dan item hanya-baca. Gunakan aksi status.",
+        "tab_details": "Detail",
+        "tab_timeline": "Riwayat",
+        "tab_approvals": "Persetujuan",
+        "flow_not_found": "Approval flow tidak ditemukan, tidak aktif, atau tidak memiliki langkah.",
+        "transition_forbidden": "Anda tidak memiliki izin untuk menjalankan transisi ini."
+    },
+    "approval.status_manual_forbidden": "Status ini hanya dapat diisi melalui proses approval atau oleh sistem.",
+    "approval.items_locked": "Item hanya dapat diubah selama dokumen masih draft.",
+    "approval.flow_not_found": "Approval flow tidak ditemukan, tidak aktif, atau tidak memiliki langkah.",
+    "approval.transition_forbidden": "Anda tidak memiliki izin untuk menjalankan transisi ini.",
     "nav": {
         "platform": "Platform",
         "dashboard": "Dasbor",

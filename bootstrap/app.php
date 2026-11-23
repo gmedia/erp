@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CheckEntityStatePermission;
 use App\Http\Middleware\CheckPermission;
 use App\Http\Middleware\ContentSecurityPolicy;
 use App\Http\Middleware\HandleAppearance;
@@ -41,6 +42,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'permission' => CheckPermission::class,
+            'entity-state-permission' => CheckEntityStatePermission::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -33,6 +33,20 @@
         "qty_received_label": "Qty Received",
         "qty_received_placeholder": "Empty = received in full"
     },
+    "approval": {
+        "status_manual_forbidden": "This status can only be set through the approval process or by the system.",
+        "items_locked": "Items can only be changed while the document is still a draft.",
+        "form_locked": "Awaiting or past approval: header and items are read-only. Use status actions instead.",
+        "tab_details": "Details",
+        "tab_timeline": "Timeline",
+        "tab_approvals": "Approvals",
+        "flow_not_found": "Approval flow not found, inactive, or has no steps.",
+        "transition_forbidden": "You do not have permission to execute this transition."
+    },
+    "approval.status_manual_forbidden": "This status can only be set through the approval process or by the system.",
+    "approval.items_locked": "Items can only be changed while the document is still a draft.",
+    "approval.flow_not_found": "Approval flow not found, inactive, or has no steps.",
+    "approval.transition_forbidden": "You do not have permission to execute this transition.",
     "nav": {
         "platform": "Platform",
         "dashboard": "Dashboard",
