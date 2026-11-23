@@ -359,6 +359,10 @@ jobs:
         if: steps.autofix.outputs.changed != 'true'
         run: ./vendor/bin/sail npm run check:raw-colors
 
+      - name: Check manual money/date formats in table columns
+        if: steps.autofix.outputs.changed != 'true'
+        run: ./vendor/bin/sail npm run check:formatters
+
       - name: Build assets
         if: steps.autofix.outputs.changed != 'true'
         run: ./vendor/bin/sail npm run build
