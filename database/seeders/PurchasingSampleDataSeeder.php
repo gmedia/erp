@@ -259,7 +259,7 @@ class PurchasingSampleDataSeeder extends Seeder
                         'action_type' => 'trigger_approval',
                         'execution_order' => 5,
                         'config' => [
-                            'approval_flow_code' => 'purchase_request_default',
+                            'flow_code' => 'purchase_request_default',
                         ],
                     ],
                     [
@@ -497,7 +497,7 @@ class PurchasingSampleDataSeeder extends Seeder
                         'action_type' => 'trigger_approval',
                         'execution_order' => 5,
                         'config' => [
-                            'approval_flow_code' => 'purchase_order_default',
+                            'flow_code' => 'purchase_order_default',
                         ],
                     ],
                     [
