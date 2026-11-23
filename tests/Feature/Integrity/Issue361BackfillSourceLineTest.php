@@ -300,6 +300,108 @@ describe('Issue #361 — dokumen lain (adjustment) juga dipasangkan', function (
     });
 });
 
+describe('Issue #361 — filter reference_type dan arah adjustment', function () {
+    test('movement dengan reference_type lain tidak dipasangkan meski reference_id dan tipe sama', function () {
+        $warehouse = Warehouse::factory()->create();
+        $product = Product::factory()->create();
+        $unit = Unit::factory()->create();
+
+        $adjustment = StockAdjustment::factory()->create([
+            'warehouse_id' => $warehouse->id,
+            'status' => 'approved',
+        ]);
+        $adjustment->items()->create([
+            'product_id' => $product->id,
+            'unit_id' => $unit->id,
+            'quantity_before' => 0,
+            'quantity_adjusted' => 5,
+            'quantity_after' => 5,
+            'unit_cost' => 1000,
+            'total_cost' => 5000,
+        ]);
+
+        // Movement bertipe adjustment_in tetapi berasal dari dokumen lain (ID kebetulan sama).
+        $foreignMovement = StockMovement::factory()->create([
+            'product_id' => $product->id,
+            'warehouse_id' => $warehouse->id,
+            'movement_type' => 'adjustment_in',
+            'quantity_in' => 5,
+            'quantity_out' => 0,
+            'reference_type' => GoodsReceipt::class,
+            'reference_id' => $adjustment->id,
+            'source_line_id' => null,
+        ]);
+
+        issue361RunBackfill();
+
+        expect($foreignMovement->refresh()->source_line_id)->toBeNull();
+    });
+
+    test('adjustment keluar -3 tidak dipasangkan ke baris +3 dan sebaliknya (arah dicocokkan)', function () {
+        $warehouse = Warehouse::factory()->create();
+        $product = Product::factory()->create();
+        $unit = Unit::factory()->create();
+
+        // Satu adjustment hanya boleh punya satu baris per produk (unique constraint),
+        // jadi arah diuji lewat dua adjustment berbeda dengan qty absolut sama.
+        $adjustmentPlus = StockAdjustment::factory()->create([
+            'warehouse_id' => $warehouse->id,
+            'status' => 'approved',
+        ]);
+        $itemPlus = $adjustmentPlus->items()->create([
+            'product_id' => $product->id,
+            'unit_id' => $unit->id,
+            'quantity_before' => 10,
+            'quantity_adjusted' => 3,
+            'quantity_after' => 13,
+            'unit_cost' => 1000,
+            'total_cost' => 3000,
+        ]);
+
+        $adjustmentMinus = StockAdjustment::factory()->create([
+            'warehouse_id' => $warehouse->id,
+            'status' => 'approved',
+        ]);
+        $itemMinus = $adjustmentMinus->items()->create([
+            'product_id' => $product->id,
+            'unit_id' => $unit->id,
+            'quantity_before' => 13,
+            'quantity_adjusted' => -3,
+            'quantity_after' => 10,
+            'unit_cost' => 1000,
+            'total_cost' => -3000,
+        ]);
+
+        // Movement adjustment_out milik dokumen +3 (salah arah): tidak boleh dipasangkan.
+        $wrongDirection = StockMovement::factory()->create([
+            'product_id' => $product->id,
+            'warehouse_id' => $warehouse->id,
+            'movement_type' => 'adjustment_out',
+            'quantity_in' => 0,
+            'quantity_out' => 3,
+            'reference_type' => StockAdjustment::class,
+            'reference_id' => $adjustmentPlus->id,
+            'source_line_id' => null,
+        ]);
+        $movementOut = StockMovement::factory()->create([
+            'product_id' => $product->id,
+            'warehouse_id' => $warehouse->id,
+            'movement_type' => 'adjustment_out',
+            'quantity_in' => 0,
+            'quantity_out' => 3,
+            'reference_type' => StockAdjustment::class,
+            'reference_id' => $adjustmentMinus->id,
+            'source_line_id' => null,
+        ]);
+
+        issue361RunBackfill();
+
+        expect($wrongDirection->refresh()->source_line_id)->toBeNull()
+            ->and($movementOut->refresh()->source_line_id)->toBe($itemMinus->id)
+            ->and($itemPlus->id)->not->toBe($movementOut->source_line_id);
+    });
+});
+
 describe('Issue #361 — keamanan migrasi', function () {
     test('down() tidak menghapus kolom source_line_id dan tidak mengubah data', function () {
         $product = Product::factory()->create();

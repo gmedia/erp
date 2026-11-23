@@ -26,12 +26,10 @@ return new class extends Migration
      * Pemetaan tipe movement ke dokumen sumber: tabel item, kolom FK dokumen,
      * kolom gudang header, kolom qty item, dan arah qty (in/out).
      *
-     * @phpstan-type Source array{
-     *     reference_type: string, items: string, document_key: string,
-     *     warehouse_key: string, quantity_column: string, quantity_sign: string
-     * }
+     * item_sign: tanda qty di baris dokumen yang sesuai dengan movement.
+     * Adjustment menyimpan qty bertanda (+ masuk, - keluar); dokumen lain positif.
      *
-     * @var array<string, Source>
+     * @var array<string, array{reference_type: string, items: string, document_key: string, warehouse_key: string, quantity_column: string, quantity_sign: string, item_sign: int}>
      */
     private const SOURCES = [
         'goods_receipt' => [
@@ -41,6 +39,7 @@ return new class extends Migration
             'warehouse_key' => 'warehouse_id',
             'quantity_column' => 'quantity_accepted',
             'quantity_sign' => 'in',
+            'item_sign' => 1,
         ],
         'supplier_return' => [
             'reference_type' => 'App\\Models\\SupplierReturn',
@@ -49,6 +48,7 @@ return new class extends Migration
             'warehouse_key' => 'warehouse_id',
             'quantity_column' => 'quantity_returned',
             'quantity_sign' => 'out',
+            'item_sign' => 1,
         ],
         'adjustment_in' => [
             'reference_type' => 'App\\Models\\StockAdjustment',
@@ -57,6 +57,7 @@ return new class extends Migration
             'warehouse_key' => 'warehouse_id',
             'quantity_column' => 'quantity_adjusted',
             'quantity_sign' => 'in',
+            'item_sign' => 1,
         ],
         'adjustment_out' => [
             'reference_type' => 'App\\Models\\StockAdjustment',
@@ -65,6 +66,7 @@ return new class extends Migration
             'warehouse_key' => 'warehouse_id',
             'quantity_column' => 'quantity_adjusted',
             'quantity_sign' => 'out',
+            'item_sign' => -1,
         ],
         'transfer_out' => [
             'reference_type' => 'App\\Models\\StockTransfer',
@@ -73,6 +75,7 @@ return new class extends Migration
             'warehouse_key' => 'from_warehouse_id',
             'quantity_column' => 'quantity',
             'quantity_sign' => 'out',
+            'item_sign' => 1,
         ],
         'transfer_in' => [
             'reference_type' => 'App\\Models\\StockTransfer',
@@ -81,6 +84,7 @@ return new class extends Migration
             'warehouse_key' => 'to_warehouse_id',
             'quantity_column' => 'quantity_received',
             'quantity_sign' => 'in',
+            'item_sign' => 1,
         ],
     ];
 
@@ -98,7 +102,7 @@ return new class extends Migration
     }
 
     /**
-     * @param  Source  $source
+     * @param  array{reference_type: string, items: string, document_key: string, warehouse_key: string, quantity_column: string, quantity_sign: string, item_sign: int}  $source
      */
     private function backfillType(string $movementType, array $source): void
     {
@@ -114,7 +118,7 @@ return new class extends Migration
     }
 
     /**
-     * @param  Source  $source
+     * @param  array{reference_type: string, items: string, document_key: string, warehouse_key: string, quantity_column: string, quantity_sign: string, item_sign: int}  $source
      */
     private function attachSourceLine(object $movement, array $source): void
     {
@@ -130,14 +134,21 @@ return new class extends Migration
             return;
         }
 
+        if ($movement->reference_type !== $source['reference_type']) {
+            $this->logAmbiguous($movement, 'reference_type_tidak_cocok', 0);
+
+            return;
+        }
+
         $quantity = $this->movementQuantity($movement, $source['quantity_sign']);
 
-        // Qty adjustment bisa negatif di item, movement menyimpan nilai absolut.
+        // Movement menyimpan nilai absolut. Baris dokumen dicocokkan dengan tanda
+        // (item_sign) agar +3 dan -3 pada produk sama tidak dianggap identik.
         // Baris yang sudah dipakai movement lain tidak dihitung, agar tidak ditebak.
         $candidates = DB::table($source['items'])
             ->where($source['document_key'], $movement->reference_id)
             ->where('product_id', $movement->product_id)
-            ->whereRaw('ABS(' . $source['quantity_column'] . ') = ?', [$quantity])
+            ->whereRaw($source['quantity_column'] . ' * ? = ?', [$source['item_sign'], $quantity])
             ->whereNotIn('id', $this->claimedLineIds($movement))
             ->pluck('id');
 
@@ -202,7 +213,7 @@ return new class extends Migration
     /**
      * Gudang movement harus sama dengan gudang header dokumen sumber.
      *
-     * @param  Source  $source
+     * @param  array{reference_type: string, items: string, document_key: string, warehouse_key: string, quantity_column: string, quantity_sign: string, item_sign: int}  $source
      */
     private function warehouseMatches(array $source, object $movement): bool
     {
