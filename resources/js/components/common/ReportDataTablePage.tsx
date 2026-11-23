@@ -8,6 +8,8 @@ import type { FilterState } from '@/hooks/useCrudFilters';
 import { useCrudFilters } from '@/hooks/useCrudFilters';
 import { useCrudQuery } from '@/hooks/useCrudQuery';
 import AppLayout from '@/layouts/app-layout';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
+import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import type { ColumnDef } from '@tanstack/react-table';
 import { Filter } from 'lucide-react';
 import type { ReactNode } from 'react';
@@ -71,14 +73,11 @@ export type ReportSummaryColumn = {
 };
 
 function formatSummaryAmount(value: string | undefined): string {
-    if (value === undefined || value === null || value === '') {
+    if (value === undefined || value === '') {
         return '-';
     }
 
-    return Number(value).toLocaleString('id-ID', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-    });
+    return formatCurrencyByRegionalSettings(value);
 }
 
 function ReportSummaryFooter({
@@ -93,7 +92,7 @@ function ReportSummaryFooter({
     return (
         <div
             data-testid="report-summary"
-            className="flex flex-wrap items-center justify-between gap-2 rounded-md border bg-muted/40 px-4 py-3 text-sm"
+            className="flex flex-wrap items-center justify-between gap-2 border-t bg-muted/40 px-4 py-2 text-sm"
         >
             <div className="flex flex-col">
                 <span className="font-medium text-foreground">
@@ -106,7 +105,7 @@ function ReportSummaryFooter({
                     >
                         {t('reports.asOfDate').replace(
                             '{date}',
-                            summary.as_of_date,
+                            formatDateByRegionalSettings(summary.as_of_date),
                         )}
                     </span>
                 ) : null}
@@ -261,15 +260,15 @@ export function ReportDataTablePage<
                             onView={onView}
                             defaultColumnVisibility={defaultColumnVisibility}
                             emptyState={ready ? undefined : ''}
+                            footer={
+                                ready && summaryColumns && summary ? (
+                                    <ReportSummaryFooter
+                                        summary={summary}
+                                        columns={summaryColumns}
+                                    />
+                                ) : undefined
+                            }
                         />
-                        {ready && summaryColumns && summary ? (
-                            <div className="mt-3">
-                                <ReportSummaryFooter
-                                    summary={summary}
-                                    columns={summaryColumns}
-                                />
-                            </div>
-                        ) : null}
                     </div>
                 </div>
                 {children}
