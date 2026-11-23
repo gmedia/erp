@@ -42,7 +42,7 @@ export async function createPurchaseHistoryReportData(
                 warehouse_id: warehouseId,
                 order_date: new Date().toISOString().slice(0, 10),
                 currency: 'IDR',
-                status: 'confirmed',
+                status: 'draft',
                 items: [
                     {
                         product_id: productId,

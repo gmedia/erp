@@ -3,6 +3,8 @@
 namespace App\Actions\EntityStates;
 
 use App\Models\PipelineTransition;
+use App\Models\PurchaseOrder;
+use App\Models\PurchaseRequest;
 use App\Traits\HandlesConditions;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
@@ -22,10 +24,15 @@ class EvaluateGuardAction
     public function execute(PipelineTransition $transition, Model $entity): array
     {
         $failures = [];
+
+        if ($this->targetsApprovalOutcome($transition, $entity)) {
+            $failures[] = __('approval.status_manual_forbidden');
+        }
+
         $guards = $transition->guard_conditions;
 
         if (empty($guards)) {
-            return []; // No guards, open transition
+            return $failures; // No guards, open transition
         }
 
         // 1. Evaluate field_checks: [ {"field": "status", "operator": "equals", "value": "active"} ]
@@ -90,5 +97,20 @@ class EvaluateGuardAction
         }
 
         return $failures;
+    }
+
+    /**
+     * Approval outcome states (approved/rejected/confirmed for PO) are only reached
+     * through the approval flow, never by a manual pipeline transition.
+     */
+    private function targetsApprovalOutcome(PipelineTransition $transition, Model $entity): bool
+    {
+        $outcomes = match ($entity::class) {
+            PurchaseRequest::class => PurchaseRequest::APPROVAL_OUTCOME_STATUSES,
+            PurchaseOrder::class => PurchaseOrder::APPROVAL_OUTCOME_STATUSES,
+            default => [],
+        };
+
+        return in_array($transition->toState->code, $outcomes, true);
     }
 }

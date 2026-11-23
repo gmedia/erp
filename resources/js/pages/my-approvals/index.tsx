@@ -86,9 +86,13 @@ function documentTitle(step: ApprovalRequestStep): string {
                 approvable.description.trim()) ||
             '';
         const code =
-            typeof approvable.asset_code === 'string'
-                ? approvable.asset_code.trim()
-                : '';
+            (typeof approvable.asset_code === 'string' &&
+                approvable.asset_code.trim()) ||
+            (typeof approvable.pr_number === 'string' &&
+                approvable.pr_number.trim()) ||
+            (typeof approvable.po_number === 'string' &&
+                approvable.po_number.trim()) ||
+            '';
         if (code && name) {
             return `${code} · ${name}`;
         }

@@ -8,6 +8,7 @@ use App\Models\PipelineTransitionAction;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
 
 class ExecuteTransitionActionsAction
@@ -107,7 +108,13 @@ class ExecuteTransitionActionsAction
 
     private function handleTriggerApproval(Model $entity, array $params): bool
     {
-        $this->triggerApprovalAction->execute($entity, $params);
+        $request = $this->triggerApprovalAction->execute($entity, $params);
+
+        if ($request === null) {
+            throw ValidationException::withMessages([
+                'transition_id' => __('approval.flow_not_found'),
+            ]);
+        }
 
         return true;
     }

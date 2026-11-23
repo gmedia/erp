@@ -29,6 +29,11 @@ Route::middleware('permission:pipeline,true')->group(function () {
     Route::apiResource('pipelines.transitions', PipelineTransitionController::class)
         ->scoped(['transition' => 'id'])
         ->except(['show']);
+});
+
+// Entity-state endpoints: `pipeline` permission, or the document module permission
+// for entity types listed in CheckEntityStatePermission (purchase_order, purchase_request).
+Route::middleware('entity-state-permission')->group(function () {
     Route::get('entity-states/{entityType}/{entityId}', [EntityStateController::class, 'getState']);
     Route::post(
         'entity-states/{entityType}/{entityId}/transition',
