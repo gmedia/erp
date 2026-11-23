@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Actions\EntityStates\SyncPipelineStateToStatusAction;
 use App\Models\GoodsReceipt;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
@@ -82,6 +83,7 @@ class PurchaseOrderReceiptService
 
         if ($purchaseOrder->status !== $status) {
             $purchaseOrder->forceFill(['status' => $status])->saveQuietly();
+            app(SyncPipelineStateToStatusAction::class)->execute($purchaseOrder, $status);
         }
     }
 }
