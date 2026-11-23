@@ -12,6 +12,14 @@ class PostSupplierBillJournalAction
 {
     public const AP_CONTROL_ACCOUNT_CODE = '21100';
 
+    /**
+     * Tagihan yang sudah dikonfirmasi lalu berubah menjadi overdue/partially_paid/paid
+     * tetap harus punya jurnal AP; draft/cancelled/void tidak diposting.
+     *
+     * @var list<string>
+     */
+    public const POSTABLE_STATUSES = ['confirmed', 'overdue', 'partially_paid', 'paid'];
+
     public function __construct(
         private CreateJournalEntryAction $createJournalEntry,
         private ResolveControlAccountAction $resolveControlAccount,
@@ -26,7 +34,7 @@ class PostSupplierBillJournalAction
             return $existing;
         }
 
-        if ($supplierBill->status !== 'confirmed') {
+        if (! in_array($supplierBill->status, self::POSTABLE_STATUSES, true)) {
             return null;
         }
 
