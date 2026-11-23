@@ -114,7 +114,9 @@ class AdminSettingController extends Controller
     {
         try {
             return Storage::disk(config('filesystems.default'))->putFile('branding/logos', $file);
-        } catch (Throwable) {
+        } catch (Throwable $exception) {
+            report($exception);
+
             return false;
         }
     }
@@ -125,7 +127,9 @@ class AdminSettingController extends Controller
 
         try {
             $stored = Storage::disk(config('filesystems.default'))->put($path, $svg);
-        } catch (Throwable) {
+        } catch (Throwable $exception) {
+            report($exception);
+
             return false;
         }
 
