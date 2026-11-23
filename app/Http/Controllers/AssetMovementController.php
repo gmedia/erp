@@ -10,13 +10,13 @@ use App\Http\Requests\AssetMovements\UpdateAssetMovementRequest;
 use App\Http\Resources\AssetMovements\AssetMovementResource;
 use App\Models\Asset;
 use App\Models\AssetMovement;
+use App\Support\ExportStorage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class AssetMovementController extends Controller
 {
@@ -108,7 +108,7 @@ class AssetMovementController extends Controller
 
         if ($request->hasFile('document')) {
             if ($asset_movement->document_path) {
-                Storage::disk('public')->delete($asset_movement->document_path);
+                ExportStorage::disk()->delete($asset_movement->document_path);
             }
 
             $document = $this->storeDocument($request->file('document'));
@@ -190,7 +190,7 @@ class AssetMovementController extends Controller
         }
 
         return [
-            'path' => $file->store('asset-movements/documents', 'public'),
+            'path' => $file->store('asset-movements/documents', ExportStorage::diskName()),
             'name' => $file->getClientOriginalName(),
         ];
     }

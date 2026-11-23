@@ -17,6 +17,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Generated File Disk
+    |--------------------------------------------------------------------------
+    |
+    | Excel exports and asset-movement documents are written here. Production
+    | runs several replicas with no shared volume, so a container-local disk
+    | loses the file on the next deploy and 404s when a request lands on a
+    | different replica. Set EXPORT_DISK=s3 there. The default stays "public"
+    | so local and test setups keep working unchanged.
+    |
+    */
+
+    'export_disk' => env('EXPORT_DISK', 'public'),
+
+    'export_url_ttl_minutes' => (int) env('EXPORT_URL_TTL_MINUTES', 30),
+
+    /*
+    |--------------------------------------------------------------------------
     | Filesystem Disks
     |--------------------------------------------------------------------------
     |
