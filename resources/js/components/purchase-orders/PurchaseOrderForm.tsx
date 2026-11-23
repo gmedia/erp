@@ -209,8 +209,12 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(
                                 value: 'pending_approval',
                                 label: 'Pending Approval',
                             },
-                            { value: 'confirmed', label: 'Confirmed' },
-                            { value: 'rejected', label: 'Rejected' },
+                            ...(purchaseOrder?.status === 'confirmed'
+                                ? [{ value: 'confirmed', label: 'Confirmed' }]
+                                : []),
+                            ...(purchaseOrder?.status === 'rejected'
+                                ? [{ value: 'rejected', label: 'Rejected' }]
+                                : []),
                             {
                                 value: 'partially_received',
                                 label: 'Partially Received',
