@@ -235,6 +235,29 @@ test('update rejects editing items of a purchase order awaiting approval or conf
     ])->assertUnprocessable();
 })->with(['pending_approval', 'confirmed']);
 
+test('update rejects changing supplier or warehouse of a purchase order awaiting approval', function () {
+    $purchaseOrder = PurchaseOrder::factory()->create(['status' => 'pending_approval']);
+
+    putJson('/api/purchase-orders/' . $purchaseOrder->id, [
+        'supplier_id' => Supplier::factory()->create()->id,
+    ])->assertUnprocessable()->assertJsonValidationErrors('supplier_id');
+
+    putJson('/api/purchase-orders/' . $purchaseOrder->id, [
+        'warehouse_id' => Warehouse::factory()->create()->id,
+    ])->assertUnprocessable()->assertJsonValidationErrors('warehouse_id');
+});
+
+test('update allows resending unchanged header values while purchase order awaits approval', function () {
+    $purchaseOrder = PurchaseOrder::factory()->create(['status' => 'pending_approval']);
+
+    putJson('/api/purchase-orders/' . $purchaseOrder->id, [
+        'supplier_id' => $purchaseOrder->supplier_id,
+        'warehouse_id' => $purchaseOrder->warehouse_id,
+        'currency' => $purchaseOrder->currency,
+        'notes' => 'catatan saja',
+    ])->assertOk();
+});
+
 test('update keeps already confirmed purchase order confirmed', function () {
     $purchaseOrder = PurchaseOrder::factory()->create(['status' => 'confirmed', 'approved_at' => now()]);
 

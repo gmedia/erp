@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Actions\EntityStates\SyncPipelineStateToStatusAction;
 use App\Events\ApprovalRequestApproved;
 use App\Events\ApprovalRequestRejected;
 use App\Models\PurchaseOrder;
@@ -24,7 +25,7 @@ class MirrorPurchaseOrderApprovalStatus
         }
 
         if ($event instanceof ApprovalRequestRejected) {
-            $purchaseOrder->update(['status' => 'rejected']);
+            $this->mirror($purchaseOrder, 'rejected');
 
             return;
         }
@@ -39,9 +40,17 @@ class MirrorPurchaseOrderApprovalStatus
             ->value('acted_by');
 
         $purchaseOrder->update([
-            'status' => 'confirmed',
             'approved_at' => $approval->completed_at ?? now(),
             'approved_by' => $finalApproverId ?? $event->actorUserId,
         ]);
+
+        $this->mirror($purchaseOrder, 'confirmed');
+    }
+
+    private function mirror(PurchaseOrder $purchaseOrder, string $status): void
+    {
+        $purchaseOrder->update(['status' => $status]);
+
+        app(SyncPipelineStateToStatusAction::class)->execute($purchaseOrder, $status);
     }
 }

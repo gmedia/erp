@@ -233,6 +233,7 @@
     "stock_transfer.cancelled_final": "Transfer yang sudah dibatalkan tidak bisa berubah status.",
     "approval.status_manual_forbidden": "Status ini hanya dapat diisi melalui proses approval atau oleh sistem.",
     "approval.items_locked": "Item hanya dapat diubah selama dokumen masih draft.",
+    "approval.form_locked": "Menunggu atau sudah melewati approval: header dan item hanya-baca. Gunakan aksi status.",
     "stock_transfer.items_locked": "Item dan qty kirim tidak bisa diubah setelah transfer dikirim; hanya qty diterima yang bisa diubah.",
     "stock_transfer.qty_received_exceeds": "Qty diterima tidak boleh melebihi qty yang dikirim."
 }

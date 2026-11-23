@@ -189,8 +189,21 @@ test('approving the purchase order sets status to confirmed and records approved
 
     expect($purchaseOrder->status)->toBe('confirmed')
         ->and($purchaseOrder->approved_by)->toBe($setup['approver']->id)
-        ->and($purchaseOrder->approved_at)->not->toBeNull();
+        ->and($purchaseOrder->approved_at)->not->toBeNull()
+        ->and(purchaseOrderPipelineStateCode($purchaseOrder))->toBe('confirmed');
 });
+
+/**
+ * Kode state pipeline po_lifecycle saat ini untuk satu PO.
+ */
+function purchaseOrderPipelineStateCode(PurchaseOrder $purchaseOrder): ?string
+{
+    return PipelineEntityState::query()
+        ->where('entity_type', PurchaseOrder::class)
+        ->where('entity_id', $purchaseOrder->id)
+        ->first()
+        ?->currentState?->code;
+}
 
 test('rejecting the purchase order sets status to rejected', function () {
     $setup = setUpPurchaseOrderApprovalPipeline();
@@ -213,5 +226,6 @@ test('rejecting the purchase order sets status to rejected', function () {
         'comments' => 'Harga tidak sesuai',
     ])->assertOk();
 
-    expect($purchaseOrder->fresh()->status)->toBe('rejected');
+    expect($purchaseOrder->fresh()->status)->toBe('rejected')
+        ->and(purchaseOrderPipelineStateCode($purchaseOrder))->toBe('rejected');
 });

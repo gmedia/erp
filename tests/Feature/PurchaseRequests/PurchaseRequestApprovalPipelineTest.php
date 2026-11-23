@@ -185,8 +185,21 @@ test('approving the final step marks the purchase request approved', function ()
     postJson("/api/my-approvals/{$approvalRequest->id}/approve")->assertOk();
 
     expect($purchaseRequest->fresh()->status)->toBe('approved')
-        ->and($purchaseRequest->fresh()->approved_by)->toBe($setup['approver']->id);
+        ->and($purchaseRequest->fresh()->approved_by)->toBe($setup['approver']->id)
+        ->and(purchaseRequestPipelineStateCode($purchaseRequest))->toBe('approved');
 });
+
+/**
+ * Kode state pipeline pr_lifecycle saat ini untuk satu PR.
+ */
+function purchaseRequestPipelineStateCode(PurchaseRequest $purchaseRequest): ?string
+{
+    return PipelineEntityState::query()
+        ->where('entity_type', PurchaseRequest::class)
+        ->where('entity_id', $purchaseRequest->id)
+        ->first()
+        ?->currentState?->code;
+}
 
 test('rejecting a purchase request marks it rejected', function () {
     $setup = setUpPurchaseRequestApprovalPipeline();
@@ -208,7 +221,8 @@ test('rejecting a purchase request marks it rejected', function () {
         'comments' => 'Anggaran tidak tersedia.',
     ])->assertOk();
 
-    expect($purchaseRequest->fresh()->status)->toBe('rejected');
+    expect($purchaseRequest->fresh()->status)->toBe('rejected')
+        ->and(purchaseRequestPipelineStateCode($purchaseRequest))->toBe('rejected');
 });
 
 test('manual pipeline Approve transition on a purchase request is rejected with 422', function () {

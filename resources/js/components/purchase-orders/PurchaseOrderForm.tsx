@@ -15,6 +15,7 @@ import {
 import { InputField } from '@/components/common/InputField';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
     Table,
     TableBody,
@@ -23,6 +24,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import {
@@ -133,6 +135,11 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(
         isLoading = false,
     }) {
         const activePurchaseOrder = purchaseOrder || item || entity;
+        // Header dan item terkunci sejak pending_approval/confirmed (sejalan dengan validasi backend).
+        const isLocked = Boolean(
+            activePurchaseOrder && activePurchaseOrder.status !== 'draft',
+        );
+        const { t } = useTranslation();
         const defaultValues = useMemo(
             () => getPurchaseOrderFormDefaults(activePurchaseOrder),
             [activePurchaseOrder],
@@ -191,207 +198,223 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(
                 }
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
+                submitDisabled={isLocked}
                 className="sm:max-w-[1100px]"
             >
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <InputField
-                        name="po_number"
-                        label="PO Number"
-                        placeholder="Auto-generated if empty"
-                    />
-
-                    <SelectField
-                        name="status"
-                        label="Status"
-                        options={[
-                            { value: 'draft', label: 'Draft' },
-                            {
-                                value: 'pending_approval',
-                                label: 'Pending Approval',
-                            },
-                            ...(purchaseOrder?.status === 'confirmed'
-                                ? [{ value: 'confirmed', label: 'Confirmed' }]
-                                : []),
-                            ...(purchaseOrder?.status === 'rejected'
-                                ? [{ value: 'rejected', label: 'Rejected' }]
-                                : []),
-                            {
-                                value: 'partially_received',
-                                label: 'Partially Received',
-                            },
-                            {
-                                value: 'fully_received',
-                                label: 'Fully Received',
-                            },
-                            { value: 'cancelled', label: 'Cancelled' },
-                            { value: 'closed', label: 'Closed' },
-                        ]}
-                        placeholder="Select status"
-                    />
-
-                    <AsyncSelectField
-                        name="supplier_id"
-                        label="Supplier"
-                        url="/api/suppliers"
-                        placeholder="Select supplier"
-                    />
-
-                    <AsyncSelectField
-                        name="warehouse_id"
-                        label="Warehouse"
-                        url="/api/warehouses"
-                        placeholder="Select warehouse"
-                    />
-
-                    <DatePickerField name="order_date" label="Order Date" />
-                    <DatePickerField
-                        name="expected_delivery_date"
-                        label="Expected Delivery Date"
-                    />
-
-                    <InputField
-                        name="payment_terms"
-                        label="Payment Terms"
-                        placeholder="Net 30"
-                    />
-
-                    <div className="md:col-span-2">
-                        <TextareaField
-                            name="shipping_address"
-                            label="Shipping Address"
-                            placeholder="Shipping address"
-                            rows={2}
+                {isLocked && (
+                    <Alert>
+                        <AlertDescription>
+                            {t('approval.form_locked')}
+                        </AlertDescription>
+                    </Alert>
+                )}
+                <fieldset disabled={isLocked} className="contents">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <InputField
+                            name="po_number"
+                            label="PO Number"
+                            placeholder="Auto-generated if empty"
                         />
-                    </div>
 
-                    <div className="md:col-span-2">
-                        <TextareaField
-                            name="notes"
-                            label="Notes"
-                            placeholder="Notes"
-                            rows={2}
+                        <SelectField
+                            name="status"
+                            label="Status"
+                            options={[
+                                { value: 'draft', label: 'Draft' },
+                                {
+                                    value: 'pending_approval',
+                                    label: 'Pending Approval',
+                                },
+                                ...(purchaseOrder?.status === 'confirmed'
+                                    ? [
+                                          {
+                                              value: 'confirmed',
+                                              label: 'Confirmed',
+                                          },
+                                      ]
+                                    : []),
+                                ...(purchaseOrder?.status === 'rejected'
+                                    ? [{ value: 'rejected', label: 'Rejected' }]
+                                    : []),
+                                {
+                                    value: 'partially_received',
+                                    label: 'Partially Received',
+                                },
+                                {
+                                    value: 'fully_received',
+                                    label: 'Fully Received',
+                                },
+                                { value: 'cancelled', label: 'Cancelled' },
+                                { value: 'closed', label: 'Closed' },
+                            ]}
+                            placeholder="Select status"
                         />
+
+                        <AsyncSelectField
+                            name="supplier_id"
+                            label="Supplier"
+                            url="/api/suppliers"
+                            placeholder="Select supplier"
+                        />
+
+                        <AsyncSelectField
+                            name="warehouse_id"
+                            label="Warehouse"
+                            url="/api/warehouses"
+                            placeholder="Select warehouse"
+                        />
+
+                        <DatePickerField name="order_date" label="Order Date" />
+                        <DatePickerField
+                            name="expected_delivery_date"
+                            label="Expected Delivery Date"
+                        />
+
+                        <InputField
+                            name="payment_terms"
+                            label="Payment Terms"
+                            placeholder="Net 30"
+                        />
+
+                        <div className="md:col-span-2">
+                            <TextareaField
+                                name="shipping_address"
+                                label="Shipping Address"
+                                placeholder="Shipping address"
+                                rows={2}
+                            />
+                        </div>
+
+                        <div className="md:col-span-2">
+                            <TextareaField
+                                name="notes"
+                                label="Notes"
+                                placeholder="Notes"
+                                rows={2}
+                            />
+                        </div>
                     </div>
-                </div>
 
-                <div className="mt-2 space-y-3 border-t pt-4">
-                    <EntityFormItemSectionHeader
-                        onAddItem={handleCreateNewItem}
-                    />
+                    <div className="mt-2 space-y-3 border-t pt-4">
+                        <EntityFormItemSectionHeader
+                            onAddItem={handleCreateNewItem}
+                        />
 
-                    <div className="rounded-md border">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[220px]">
-                                        Product
-                                    </TableHead>
-                                    <TableHead className="w-[140px]">
-                                        Unit
-                                    </TableHead>
-                                    <TableHead className="w-[120px]">
-                                        Qty
-                                    </TableHead>
-                                    <TableHead className="w-[140px]">
-                                        Unit Price
-                                    </TableHead>
-                                    <TableHead className="w-[130px]">
-                                        Disc %
-                                    </TableHead>
-                                    <TableHead className="w-[130px]">
-                                        Tax %
-                                    </TableHead>
-                                    <TableHead>Notes</TableHead>
-                                    <TableHead className="w-[120px] text-right">
-                                        Action
-                                    </TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {fields.map((field, index) => {
-                                    const purchaseOrderItem =
-                                        watchedItems?.[index] ??
-                                        createEmptyPurchaseOrderItem();
+                        <div className="rounded-md border">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="w-[220px]">
+                                            Product
+                                        </TableHead>
+                                        <TableHead className="w-[140px]">
+                                            Unit
+                                        </TableHead>
+                                        <TableHead className="w-[120px]">
+                                            Qty
+                                        </TableHead>
+                                        <TableHead className="w-[140px]">
+                                            Unit Price
+                                        </TableHead>
+                                        <TableHead className="w-[130px]">
+                                            Disc %
+                                        </TableHead>
+                                        <TableHead className="w-[130px]">
+                                            Tax %
+                                        </TableHead>
+                                        <TableHead>Notes</TableHead>
+                                        <TableHead className="w-[120px] text-right">
+                                            Action
+                                        </TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {fields.map((field, index) => {
+                                        const purchaseOrderItem =
+                                            watchedItems?.[index] ??
+                                            createEmptyPurchaseOrderItem();
 
-                                    return (
-                                        <TableRow key={field.id}>
-                                            <TableCell>
-                                                {formatItemReference(
-                                                    purchaseOrderItem.product_label,
-                                                    purchaseOrderItem.product_id,
-                                                )}
-                                            </TableCell>
-                                            <TableCell>
-                                                {formatItemReference(
-                                                    purchaseOrderItem.unit_label,
-                                                    purchaseOrderItem.unit_id,
-                                                )}
-                                            </TableCell>
-                                            <TableCell>
-                                                {formatNumberByRegionalSettings(
-                                                    purchaseOrderItem.quantity ??
-                                                        0,
-                                                    {
-                                                        locale: 'id-ID',
-                                                        minimumFractionDigits: 0,
-                                                        maximumFractionDigits: 2,
-                                                    },
-                                                )}
-                                            </TableCell>
-                                            <TableCell>
-                                                {formatCurrencyByRegionalSettings(
-                                                    purchaseOrderItem.unit_price ??
-                                                        0,
-                                                    {
-                                                        locale: 'id-ID',
-                                                        currency:
-                                                            selectedCurrency ||
-                                                            undefined,
-                                                        minimumFractionDigits: 0,
-                                                        maximumFractionDigits: 2,
-                                                    },
-                                                )}
-                                            </TableCell>
-                                            <TableCell>
-                                                {formatNumberByRegionalSettings(
-                                                    purchaseOrderItem.discount_percent ??
-                                                        0,
-                                                    {
-                                                        locale: 'id-ID',
-                                                        minimumFractionDigits: 0,
-                                                        maximumFractionDigits: 2,
-                                                    },
-                                                )}
-                                            </TableCell>
-                                            <TableCell>
-                                                {formatNumberByRegionalSettings(
-                                                    purchaseOrderItem.tax_percent ??
-                                                        0,
-                                                    {
-                                                        locale: 'id-ID',
-                                                        minimumFractionDigits: 0,
-                                                        maximumFractionDigits: 2,
-                                                    },
-                                                )}
-                                            </TableCell>
-                                            <TableCell>
-                                                {purchaseOrderItem.notes || '-'}
-                                            </TableCell>
-                                            <EntityFormItemActionsCell
-                                                index={index}
-                                                onEdit={handleEditItem}
-                                                onRemove={remove}
-                                            />
-                                        </TableRow>
-                                    );
-                                })}
-                                {fields.length === 0 && (
-                                    <EntityFormItemEmptyRow colSpan={8} />
-                                )}
-                            </TableBody>
-                        </Table>
+                                        return (
+                                            <TableRow key={field.id}>
+                                                <TableCell>
+                                                    {formatItemReference(
+                                                        purchaseOrderItem.product_label,
+                                                        purchaseOrderItem.product_id,
+                                                    )}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {formatItemReference(
+                                                        purchaseOrderItem.unit_label,
+                                                        purchaseOrderItem.unit_id,
+                                                    )}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {formatNumberByRegionalSettings(
+                                                        purchaseOrderItem.quantity ??
+                                                            0,
+                                                        {
+                                                            locale: 'id-ID',
+                                                            minimumFractionDigits: 0,
+                                                            maximumFractionDigits: 2,
+                                                        },
+                                                    )}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {formatCurrencyByRegionalSettings(
+                                                        purchaseOrderItem.unit_price ??
+                                                            0,
+                                                        {
+                                                            locale: 'id-ID',
+                                                            currency:
+                                                                selectedCurrency ||
+                                                                undefined,
+                                                            minimumFractionDigits: 0,
+                                                            maximumFractionDigits: 2,
+                                                        },
+                                                    )}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {formatNumberByRegionalSettings(
+                                                        purchaseOrderItem.discount_percent ??
+                                                            0,
+                                                        {
+                                                            locale: 'id-ID',
+                                                            minimumFractionDigits: 0,
+                                                            maximumFractionDigits: 2,
+                                                        },
+                                                    )}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {formatNumberByRegionalSettings(
+                                                        purchaseOrderItem.tax_percent ??
+                                                            0,
+                                                        {
+                                                            locale: 'id-ID',
+                                                            minimumFractionDigits: 0,
+                                                            maximumFractionDigits: 2,
+                                                        },
+                                                    )}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {purchaseOrderItem.notes ||
+                                                        '-'}
+                                                </TableCell>
+                                                <EntityFormItemActionsCell
+                                                    index={index}
+                                                    onEdit={handleEditItem}
+                                                    onRemove={remove}
+                                                />
+                                            </TableRow>
+                                        );
+                                    })}
+                                    {fields.length === 0 && (
+                                        <EntityFormItemEmptyRow colSpan={8} />
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </div>
                     </div>
-                </div>
+                </fieldset>
 
                 <PurchaseOrderItemFormDialog
                     open={isItemDialogOpen}
