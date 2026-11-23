@@ -5,7 +5,11 @@ import {
     TextCell,
     WarehouseSummaryCell,
 } from '@/components/common/ReportColumns';
-import { createNumberColumn, createSortingHeader } from '@/utils/columns';
+import {
+    createCurrencyColumn,
+    createNumberColumn,
+    createSortingHeader,
+} from '@/utils/columns';
 import { formatDateTimeOrDateByRegionalSettings } from '@/utils/date-format';
 import type { ColumnDef } from '@tanstack/react-table';
 
@@ -134,8 +138,16 @@ export function createStockMovementsColumns(): ColumnDef<StockMovementItem>[] {
         createStockMovementNumberColumn('quantity_in', 'Qty In'),
         createStockMovementNumberColumn('quantity_out', 'Qty Out'),
         createStockMovementNumberColumn('balance_after', 'Balance'),
-        createStockMovementNumberColumn('unit_cost', 'Unit Cost'),
-        createStockMovementNumberColumn('average_cost_after', 'Avg Cost'),
+        createCurrencyColumn<StockMovementItem>({
+            accessorKey: 'unit_cost',
+            label: 'Unit Cost',
+            maximumFractionDigits: 0,
+        }),
+        createCurrencyColumn<StockMovementItem>({
+            accessorKey: 'average_cost_after',
+            label: 'Avg Cost',
+            maximumFractionDigits: 0,
+        }),
         {
             id: 'created_by',
             header: 'Created By',

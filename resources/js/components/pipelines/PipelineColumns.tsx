@@ -25,7 +25,15 @@ export const pipelineColumns: ColumnDef<Pipeline>[] = [
         label: 'Name',
         primary: true,
     }),
-    createTextColumn<Pipeline>({ accessorKey: 'code', label: 'Code' }),
+    {
+        accessorKey: 'code',
+        ...createSortingHeader('Code'),
+        cell: ({ row }) => (
+            <span className="font-mono text-xs text-muted-foreground">
+                {row.original.code}
+            </span>
+        ),
+    },
     {
         accessorKey: 'entity_type',
         ...createSortingHeader('Entity'),

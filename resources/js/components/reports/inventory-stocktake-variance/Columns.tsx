@@ -1,9 +1,14 @@
 'use client';
 
 import {
+    createReportStatusBadgeColumn,
     createReportSummaryColumn,
     createReportTextColumn,
 } from '@/components/common/ReportColumns';
+import {
+    formatStatusLabel,
+    stocktakeVarianceBadgeVariant,
+} from '@/lib/status-badge';
 import { createNumberColumn } from '@/utils/columns';
 import {
     formatDateByRegionalSettings,
@@ -100,13 +105,12 @@ export const inventoryStocktakeVarianceColumns: ColumnDef<InventoryStocktakeVari
             minimumFractionDigits: 0,
             maximumFractionDigits: 2,
         }),
-        createReportTextColumn<InventoryStocktakeVarianceReportItem>({
+        createReportStatusBadgeColumn<InventoryStocktakeVarianceReportItem>({
             id: 'result',
             accessorKey: 'result',
             header: 'Result',
-            getValue: (item) => item.result,
-            className: 'capitalize',
-            sortable: true,
+            getValue: (item) => formatStatusLabel(item.result),
+            getVariant: (item) => stocktakeVarianceBadgeVariant(item.result),
         }),
         createReportTextColumn<InventoryStocktakeVarianceReportItem>({
             id: 'counted_at',

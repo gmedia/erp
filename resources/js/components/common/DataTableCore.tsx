@@ -34,7 +34,7 @@ import type { FieldDescriptor } from './filters';
 // (scroll horizontal) memudar, bukan terpotong tajam di atas latar datar.
 const STICKY_EDGE_SHADOW =
     'before:pointer-events-none before:absolute before:inset-y-0 before:-left-6 before:w-6 before:bg-linear-to-r before:from-transparent before:to-background';
-const STICKY_ACTIONS_CELL = `sticky right-0 z-20 bg-background`;
+const STICKY_ACTIONS_CELL = `sticky right-0 z-20 bg-inherit`;
 const STICKY_ACTIONS_HEAD = `sticky right-0 z-30 bg-background`;
 const STICKY_GRAND_TOTAL_CELL = `lg:sticky lg:right-14 lg:z-10 min-w-28 bg-background whitespace-nowrap ${STICKY_EDGE_SHADOW}`;
 const STICKY_GRAND_TOTAL_HEAD = `lg:sticky lg:right-14 lg:z-20 min-w-28 bg-background whitespace-nowrap ${STICKY_EDGE_SHADOW}`;
@@ -46,6 +46,7 @@ function isActionsColumn(columnId: string): boolean {
 function stickyCellClass(
     columnId: string,
     hasGrandTotal: boolean,
+    isBeforeActions = false,
 ): string | false {
     if (isActionsColumn(columnId)) {
         return cn(STICKY_ACTIONS_CELL, !hasGrandTotal && STICKY_EDGE_SHADOW);
@@ -53,9 +54,14 @@ function stickyCellClass(
     if (columnId === 'grand_total' && hasGrandTotal) {
         return STICKY_GRAND_TOTAL_CELL;
     }
+    if (isBeforeActions) {
+        return CELL_BEFORE_STICKY_ACTIONS;
+    }
 
     return false;
 }
+
+const CELL_BEFORE_STICKY_ACTIONS = 'pr-6';
 
 function stickyColumnAttr(
     columnId: string,
@@ -412,7 +418,7 @@ export function DataTable<T>({
                 data-state={row.getIsSelected() && 'selected'}
                 className="hover:bg-muted/50"
             >
-                {row.getVisibleCells().map((cell) => {
+                {row.getVisibleCells().map((cell, index, cells) => {
                     return (
                         <TableCell
                             key={cell.id}
@@ -421,6 +427,9 @@ export function DataTable<T>({
                                 stickyCellClass(
                                     cell.column.id,
                                     hasStickyGrandTotal,
+                                    isActionsColumn(
+                                        cells[index + 1]?.column.id ?? '',
+                                    ),
                                 ),
                             )}
                         >
@@ -509,32 +518,39 @@ export function DataTable<T>({
                     <TableHeader className="[&_th]:text-muted-foreground">
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => {
-                                    return (
-                                        <TableHead
-                                            key={header.id}
-                                            data-sticky-column={stickyColumnAttr(
-                                                header.column.id,
-                                                hasStickyGrandTotal,
-                                            )}
-                                            className={cn(
-                                                'h-9 border-border px-2 py-1.5 text-sm font-medium select-none',
-                                                stickyHeadClass(
+                                {headerGroup.headers.map(
+                                    (header, index, headers) => {
+                                        return (
+                                            <TableHead
+                                                key={header.id}
+                                                data-sticky-column={stickyColumnAttr(
                                                     header.column.id,
                                                     hasStickyGrandTotal,
-                                                ),
-                                            )}
-                                        >
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(
-                                                      header.column.columnDef
-                                                          .header,
-                                                      header.getContext(),
-                                                  )}
-                                        </TableHead>
-                                    );
-                                })}
+                                                )}
+                                                className={cn(
+                                                    'h-9 border-border px-2 py-1.5 text-sm font-medium select-none',
+                                                    stickyHeadClass(
+                                                        header.column.id,
+                                                        hasStickyGrandTotal,
+                                                    ),
+                                                    isActionsColumn(
+                                                        headers[index + 1]
+                                                            ?.column.id ?? '',
+                                                    ) &&
+                                                        CELL_BEFORE_STICKY_ACTIONS,
+                                                )}
+                                            >
+                                                {header.isPlaceholder
+                                                    ? null
+                                                    : flexRender(
+                                                          header.column
+                                                              .columnDef.header,
+                                                          header.getContext(),
+                                                      )}
+                                            </TableHead>
+                                        );
+                                    },
+                                )}
                             </TableRow>
                         ))}
                     </TableHeader>

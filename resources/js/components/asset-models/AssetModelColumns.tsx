@@ -39,8 +39,20 @@ const SPEC_ACRONYMS = new Set([
     'wifi',
 ]);
 
-function formatSpecLabel(key: string): string {
-    return key
+const SPEC_UNIT_SUFFIXES = new Set(['gb', 'tb', 'mb', 'mhz', 'ghz']);
+
+function splitSpecUnit(key: string): { base: string; unit: string | null } {
+    const parts = key.split(/[\s_]+/).filter(Boolean);
+    const last = parts[parts.length - 1]?.toLowerCase() ?? '';
+    if (parts.length > 1 && SPEC_UNIT_SUFFIXES.has(last)) {
+        return { base: parts.slice(0, -1).join('_'), unit: last.toUpperCase() };
+    }
+
+    return { base: key, unit: null };
+}
+
+function formatSpecLabel(base: string): string {
+    return base
         .split(/[\s_]+/)
         .filter(Boolean)
         .map((word) =>
@@ -51,8 +63,12 @@ function formatSpecLabel(key: string): string {
         .join(' ');
 }
 
-function formatSpecValue(value: unknown): string {
+function formatSpecValue(value: unknown, unit: string | null): string {
     const text = String(value);
+    if (unit) {
+        return `${text} ${unit}`;
+    }
+
     return /^[a-z][a-z_]*$/.test(text) ? formatStatusLabel(text) : text;
 }
 
@@ -70,10 +86,10 @@ const renderSpecsCell = ({ row }: { row: { original: AssetModel } }) => {
     return (
         <span className="text-xs text-muted-foreground">
             {entries
-                .map(
-                    ([key, value]) =>
-                        `${formatSpecLabel(key)}: ${formatSpecValue(value)}`,
-                )
+                .map(([key, value]) => {
+                    const { base, unit } = splitSpecUnit(key);
+                    return `${formatSpecLabel(base)}: ${formatSpecValue(value, unit)}`;
+                })
                 .join(' · ')}
         </span>
     );

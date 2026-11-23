@@ -389,23 +389,33 @@ export function FinancialTableCard<TItem extends FinancialTableRow>({
                                                 <TableCell className="hidden text-muted-foreground capitalize md:table-cell">
                                                     {item.type}
                                                 </TableCell>
-                                                {amountColumns.map((column) => {
-                                                    const value =
-                                                        column.value(item);
+                                                {amountColumns.map(
+                                                    (column, index) => {
+                                                        const value =
+                                                            column.value(item);
 
-                                                    return (
-                                                        <TableCell
-                                                            key={column.header}
-                                                            className="text-right tabular-nums"
-                                                        >
-                                                            {value === 0
-                                                                ? '-'
-                                                                : formatCurrency(
-                                                                      value,
-                                                                  )}
-                                                        </TableCell>
-                                                    );
-                                                })}
+                                                        return (
+                                                            <TableCell
+                                                                key={
+                                                                    column.header
+                                                                }
+                                                                className={cn(
+                                                                    'text-right tabular-nums',
+                                                                    index ===
+                                                                        amountColumns.length -
+                                                                            1 &&
+                                                                        'max-md:sticky max-md:right-0 max-md:bg-background',
+                                                                )}
+                                                            >
+                                                                {value === 0
+                                                                    ? '-'
+                                                                    : formatCurrency(
+                                                                          value,
+                                                                      )}
+                                                            </TableCell>
+                                                        );
+                                                    },
+                                                )}
                                             </TableRow>
                                         );
                                     })

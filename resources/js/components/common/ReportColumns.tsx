@@ -2,6 +2,7 @@
 
 import { Badge } from '@/components/ui/badge';
 import { formatStatusLabel, statusBadgeVariant } from '@/lib/status-badge';
+import { cn } from '@/lib/utils';
 import { createSortingHeader } from '@/utils/columns';
 import type { CellContext, ColumnDef } from '@tanstack/react-table';
 import type { ComponentProps, ReactNode } from 'react';
@@ -30,6 +31,7 @@ type TextColumnOptions<TData> = {
     getValue: (row: TData) => DisplayValue;
     className?: string;
     sortable?: boolean;
+    align?: 'left' | 'right';
 };
 
 type WarehouseColumnOptions<TData> = {
@@ -55,6 +57,7 @@ type ReportDisplayColumnOptions<TData> = {
     accessorKey?: string;
     header: string;
     sortable?: boolean;
+    align?: 'left' | 'right';
     renderCell: (row: TData) => ReactNode;
 };
 
@@ -159,6 +162,7 @@ function createReportDisplayColumn<TData>({
     accessorKey,
     header,
     sortable,
+    align = 'left',
     renderCell,
 }: ReportDisplayColumnOptions<TData>): ColumnDef<TData> {
     const cell = ({ row }: CellContext<TData, unknown>) =>
@@ -170,11 +174,22 @@ function createReportDisplayColumn<TData>({
     });
 
     if (sortable && accessorKey) {
+        const sortingHeader = createSortingHeader(header);
         return {
             id: columnId,
             accessorKey,
             cell,
-            ...createSortingHeader(header),
+            ...(align === 'right'
+                ? {
+                      header: (
+                          context: Parameters<typeof sortingHeader.header>[0],
+                      ) => (
+                          <div className="flex justify-end">
+                              {sortingHeader.header(context)}
+                          </div>
+                      ),
+                  }
+                : sortingHeader),
         };
     }
 
@@ -216,15 +231,20 @@ export function createReportSummaryColumn<TData>(
 export function createReportTextColumn<TData>(
     options: TextColumnOptions<TData>,
 ): ColumnDef<TData> {
+    const align = options.align ?? 'left';
     return createReportDisplayColumn({
         id: options.id,
         accessorKey: options.accessorKey,
         header: options.header,
         sortable: options.sortable,
+        align,
         renderCell: (row) => (
             <TextCell
                 value={options.getValue(row)}
-                className={options.className}
+                className={cn(
+                    options.className,
+                    align === 'right' && 'text-right tabular-nums',
+                )}
             />
         ),
     });

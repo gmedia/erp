@@ -28,7 +28,6 @@ export function statusBadgeVariant(
         case 'active':
         case 'regular':
         case 'completed':
-        case 'confirmed':
         case 'closed':
         case 'posted':
         case 'received':
@@ -48,6 +47,7 @@ export function statusBadgeVariant(
         case 'scheduled':
         case 'reopened':
         case 'outstanding':
+        case 'confirmed':
         case 'partially_received':
         case 'partially_paid':
         case 'partially_processed':
@@ -157,7 +157,10 @@ export function stocktakeVarianceBadgeVariant(
         case 'damaged':
         case 'missing':
             return DANGER;
+        case 'deficit':
+            return PENDING;
         case 'moved':
+        case 'surplus':
             return INFO;
         default:
             return NEUTRAL;

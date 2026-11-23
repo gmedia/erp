@@ -202,6 +202,80 @@ test.describe('visual audit capture', () => {
                     );
                     await page.screenshot({ path: file, fullPage: false });
 
+                    const clippedCells = await page.evaluate(() => {
+                        const edgeFadeWidthPx = 16;
+                        const out: string[] = [];
+                        document
+                            .querySelectorAll<HTMLElement>(
+                                '[data-slot="table-container"]',
+                            )
+                            .forEach((container) => {
+                                const row = container.querySelector(
+                                    'tbody tr[data-state], tbody tr',
+                                );
+                                if (!row) return;
+                                const containerRight =
+                                    container.getBoundingClientRect().right;
+                                const fadeLeft = container.hasAttribute(
+                                    'data-overflow-right',
+                                )
+                                    ? containerRight - edgeFadeWidthPx
+                                    : containerRight;
+                                const cells = Array.from(
+                                    row.querySelectorAll<HTMLElement>(
+                                        ':scope > td',
+                                    ),
+                                );
+                                let stickyLeft = Infinity;
+                                for (const cell of cells) {
+                                    if (
+                                        getComputedStyle(cell).position ===
+                                        'sticky'
+                                    ) {
+                                        const cellLeft =
+                                            cell.getBoundingClientRect().left;
+                                        const pseudo = getComputedStyle(
+                                            cell,
+                                            '::before',
+                                        );
+                                        const hasPseudo =
+                                            pseudo.content !== 'none' &&
+                                            pseudo.content !== '';
+                                        const pseudoLeft = hasPseudo
+                                            ? cellLeft +
+                                              (parseFloat(pseudo.left) || 0)
+                                            : cellLeft;
+                                        stickyLeft = Math.min(
+                                            stickyLeft,
+                                            pseudoLeft,
+                                        );
+                                    }
+                                }
+                                const limit = Math.min(fadeLeft, stickyLeft);
+                                for (const cell of cells) {
+                                    if (
+                                        getComputedStyle(cell).position ===
+                                        'sticky'
+                                    ) {
+                                        continue;
+                                    }
+                                    const range = document.createRange();
+                                    range.selectNodeContents(cell);
+                                    const textRight =
+                                        range.getBoundingClientRect().right;
+                                    const text = (cell.textContent ?? '')
+                                        .trim()
+                                        .slice(0, 40);
+                                    if (text && textRight > limit + 0.5) {
+                                        out.push(
+                                            `${text} (text right ${Math.round(textRight)} > limit ${Math.round(limit)})`,
+                                        );
+                                    }
+                                }
+                            });
+                        return out;
+                    });
+
                     appendFileSync(
                         reportPath,
                         JSON.stringify({
@@ -215,6 +289,7 @@ test.describe('visual audit capture', () => {
                                 metrics.scrollWidth - metrics.innerWidth,
                             ),
                             consoleErrors: [...consoleErrors],
+                            clippedCells,
                         }) + '\n',
                     );
                 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
-import { formatStatusLabel } from '@/lib/status-badge';
+import { formatStatusLabel, statusBadgeVariant } from '@/lib/status-badge';
 import { SupplierReturn } from '@/types/supplier-return';
 import {
     createActionsColumn,
@@ -31,7 +31,9 @@ const renderWarehouseCell = ({
 }) => <div>{row.original.warehouse?.name ?? '-'}</div>;
 
 const renderStatusCell = ({ row }: { row: { original: SupplierReturn } }) => (
-    <Badge variant="outline">{row.original.status}</Badge>
+    <Badge variant={statusBadgeVariant(row.original.status)}>
+        {formatStatusLabel(row.original.status)}
+    </Badge>
 );
 
 export const supplierReturnColumns: ColumnDef<SupplierReturn>[] = [

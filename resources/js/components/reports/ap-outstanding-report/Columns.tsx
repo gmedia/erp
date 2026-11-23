@@ -65,18 +65,21 @@ export const apOutstandingReportColumns: ColumnDef<ApOutstandingReportItem>[] =
             header: 'Grand Total',
             getValue: (item) => formatAmount(item.amounts?.grand_total),
             sortable: true,
+            align: 'right',
         }),
         createReportTextColumn<ApOutstandingReportItem>({
             id: 'amount_paid',
             header: 'Amount Paid',
             getValue: (item) => formatAmount(item.amounts?.amount_paid),
             sortable: true,
+            align: 'right',
         }),
         createReportTextColumn<ApOutstandingReportItem>({
             id: 'amount_due',
             header: 'Amount Due',
             getValue: (item) => formatAmount(item.amounts?.amount_due),
             sortable: true,
+            align: 'right',
         }),
         createNumberColumn<ApOutstandingReportItem>({
             accessorKey: 'days_overdue',
