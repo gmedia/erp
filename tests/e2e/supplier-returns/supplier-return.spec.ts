@@ -80,10 +80,8 @@ const config: ModuleTestConfig = {
     sortableColumns: [
         'Return Number',
         'PO Number',
-        'GR Number',
         'Supplier',
         'Return Date',
-        'Reason',
         'Status',
     ],
     viewType: 'dialog',

@@ -144,7 +144,7 @@ function AccountRow({
                 <div className="flex gap-4 text-right tabular-nums">
                     <div
                         className={cn(
-                            'w-32',
+                            'w-36',
                             getSignedAmountTextClass(node.balance),
                         )}
                     >
@@ -154,7 +154,7 @@ function AccountRow({
                         <>
                             <div
                                 className={cn(
-                                    'w-32 text-muted-foreground',
+                                    'w-36 text-muted-foreground',
                                     getSignedAmountTextClass(
                                         node.comparison_balance || 0,
                                     ),
@@ -253,7 +253,7 @@ export function FinancialReportSection({
                     <div className="flex w-full flex-wrap justify-between gap-2 text-right whitespace-nowrap tabular-nums sm:w-auto sm:flex-nowrap sm:justify-end sm:gap-4">
                         <span
                             className={cn(
-                                'text-lg font-bold sm:w-44',
+                                'text-lg font-bold sm:w-48',
                                 getSignedAmountTextClass(total),
                             )}
                         >
@@ -263,7 +263,7 @@ export function FinancialReportSection({
                             <>
                                 <span
                                     className={cn(
-                                        'text-lg font-bold text-muted-foreground sm:w-44',
+                                        'text-lg font-bold text-muted-foreground sm:w-48',
                                         getSignedAmountTextClass(
                                             comparisonTotal || 0,
                                         ),
@@ -314,10 +314,10 @@ export function FinancialReportSection({
                                     <span>Account</span>
                                 </div>
                                 <div className="flex gap-4 text-right tabular-nums">
-                                    <div className="w-32">Current</div>
+                                    <div className="w-36">Current</div>
                                     {showComparison && (
                                         <>
-                                            <div className="w-32">
+                                            <div className="w-36">
                                                 Comparison
                                             </div>
                                             <div className="w-28">Change</div>

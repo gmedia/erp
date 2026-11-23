@@ -38,6 +38,7 @@ export default function GoodsReceiptReportPage() {
                 item_count: false,
                 total_received_quantity: false,
                 total_rejected_quantity: false,
+                total_accepted_quantity: false,
             }}
         />
     );

@@ -89,7 +89,7 @@ export const TopOverdueSuppliers = memo<TopOverdueSuppliersProps>(
                                             supplier.overdue_amount,
                                         )}
                                     </TableCell>
-                                    <TableCell className="text-right tabular-nums">
+                                    <TableCell className="hidden text-right tabular-nums 2xl:table-cell">
                                         {formatCurrency(
                                             supplier.outstanding_amount,
                                         )}
