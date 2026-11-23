@@ -17,7 +17,7 @@ export default function ApAgingReportPage() {
             title="AP Aging Report"
             descriptionKey="reports.pageDescriptions.ap-aging"
             breadcrumbs={createReportBreadcrumbs(
-                'AP Aging',
+                'AP Aging Report',
                 '/reports/ap-aging',
             )}
             columns={apAgingReportColumns}
