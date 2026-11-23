@@ -484,7 +484,12 @@ test('W7-04 11300 invariant fails when a transfer shortage journal is removed', 
 
     $valuation = 0.0;
     $latest = [];
-    foreach (DB::table('stock_movements')->orderBy('moved_at')->orderBy('id')->get(['product_id', 'warehouse_id', 'balance_after', 'average_cost_after']) as $movement) {
+    $movements = DB::table('stock_movements')
+        ->orderBy('moved_at')
+        ->orderBy('id')
+        ->get(['product_id', 'warehouse_id', 'balance_after', 'average_cost_after']);
+
+    foreach ($movements as $movement) {
         $latest[$movement->product_id . ':' . $movement->warehouse_id] = $movement;
     }
     foreach ($latest as $movement) {
@@ -532,7 +537,10 @@ test('W7-04 11300 invariant depends on in_transit transfer value from the docume
         ->value('value');
 
     expect(round($after - $before, 2))
-        ->toBe(round((float) $inTransitItem->unit_cost, 2), 'Adding 1 unit to an in_transit line must add unit_cost to the in-transit value');
+        ->toBe(
+            round((float) $inTransitItem->unit_cost, 2),
+            'Adding 1 unit to an in_transit line must add unit_cost to the in-transit value'
+        );
 });
 
 // Every posted document must reference a posted, balanced journal (issue #357 scope 4).
