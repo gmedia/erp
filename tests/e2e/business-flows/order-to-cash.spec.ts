@@ -151,6 +151,65 @@ async function createSentInvoice(page: Page): Promise<SentInvoiceContext> {
     };
 }
 
+async function createInvoiceViaUi(
+    page: Page,
+    ctx: { customerId: number; branchId: number; fiscalYearId: number; accountId: number; description: string },
+): Promise<number> {
+    await page.goto('/customer-invoices');
+    await page.getByRole('button', { name: /add/i }).first().click();
+
+    const dialog = page.getByRole('dialog', { name: /Add Customer Invoice/i });
+    await expect(dialog).toBeVisible();
+
+    await dialog.getByRole('combobox', { name: 'Customer' }).click();
+    await page.getByRole('dialog').last().getByRole('listitem').first().getByRole('button').click();
+
+    await dialog.getByRole('combobox', { name: 'Branch' }).click();
+    await page.getByRole('dialog').last().getByRole('listitem').first().getByRole('button').click();
+
+    await dialog.getByRole('button', { name: 'Add Item' }).click();
+    const itemDialog = page.getByRole('dialog', { name: /Add Item/i });
+    await expect(itemDialog).toBeVisible();
+    await itemDialog.getByLabel('Account').fill(String(ctx.accountId));
+    await itemDialog.getByLabel('Description').fill(ctx.description);
+    await itemDialog.getByLabel(/Quantity/i).fill('1');
+    await itemDialog.getByLabel(/Unit Price/i).fill(String(INVOICE_TOTAL));
+    await itemDialog.getByRole('button', { name: 'Save Item' }).click();
+    await expect(itemDialog).toBeHidden();
+
+    const createResponse = page.waitForResponse(
+        (response) =>
+            response.url().includes('/api/customer-invoices') &&
+            response.request().method() === 'POST',
+    );
+    await dialog.getByRole('button', { name: 'Add', exact: true }).click();
+    const created = await (await createResponse).json();
+    await expect(dialog).toBeHidden();
+
+    const createdData = created.data as { id: number; invoice_number: string };
+    const invoiceId = Number(createdData.id);
+    expect(invoiceId, 'invoice created via UI must return an id').toBeGreaterThan(0);
+    const invoiceNumber = String(createdData.invoice_number);
+
+    const row = page.getByRole('row').filter({ hasText: invoiceNumber }).first();
+    await row.getByRole('button', { name: 'Actions' }).click();
+    await page.getByRole('menuitem', { name: 'Edit' }).click();
+    const editDialog = page.getByRole('dialog', { name: /Edit Customer Invoice/i });
+    await expect(editDialog).toBeVisible();
+    await editDialog.getByRole('combobox', { name: 'Status' }).click();
+    await page.getByRole('option', { name: 'Sent', exact: true }).click();
+    const updateResponse = page.waitForResponse(
+        (response) =>
+            response.url().includes(`/api/customer-invoices/${invoiceId}`) &&
+            response.request().method() === 'PUT',
+    );
+    await editDialog.getByRole('button', { name: 'Update', exact: true }).click();
+    await updateResponse;
+    await expect(editDialog).toBeHidden();
+
+    return invoiceId;
+}
+
 interface O2cRun {
     invoiceId: number;
     invoiceNumber: string;
@@ -180,43 +239,17 @@ async function runOrderToCash(page: Page): Promise<O2cRun> {
     const cashAccountId = await accountId(page, CASH_ACCOUNT_CODE);
     const arAccountId = await accountId(page, AR_ACCOUNT_CODE);
     const today = new Date().toISOString().slice(0, 10);
-    const due = new Date(Date.now() + 30 * 24 * 3600 * 1000)
-        .toISOString()
-        .slice(0, 10);
     const description = `E2E O2C ${Date.now()}`;
-    const lineItem = {
-        account_id: revenueAccountId,
-        description,
-        quantity: 1,
-        unit_price: INVOICE_TOTAL,
-        tax_percent: 0,
-    };
-    const header = {
-        customer_id: customerId,
-        branch_id: branchId,
-        fiscal_year_id: fiscalYearId,
-        invoice_date: today,
-        due_date: due,
-        currency: 'IDR',
-    };
 
     const revenueBefore = (await readReportTotals(page, fiscalYearId)).revenue;
 
-    const created = await sendJson(page, 'POST', '/api/customer-invoices', {
-        ...header,
-        status: 'draft',
-        items: [lineItem],
+    const invoiceId = await createInvoiceViaUi(page, {
+        customerId,
+        branchId,
+        fiscalYearId,
+        accountId: revenueAccountId,
+        description,
     });
-    expect(created.status).toBeLessThan(400);
-    const invoiceId = Number((created.json.data as { id: number }).id);
-
-    const sent = await sendJson(
-        page,
-        'PUT',
-        `/api/customer-invoices/${invoiceId}`,
-        { ...header, status: 'sent', items: [lineItem] },
-    );
-    expect(sent.status).toBeLessThan(400);
 
     const invoice = await readInvoice(page, invoiceId);
     const invoiceJournal = await readJournalByReference(
