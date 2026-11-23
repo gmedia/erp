@@ -19,6 +19,7 @@ use App\Models\AssetStocktakeItem;
 use App\Models\Branch;
 use App\Models\Department;
 use App\Models\Employee;
+use App\Models\FiscalYear;
 use App\Models\Pipeline;
 use App\Models\PipelineEntityState;
 use App\Models\PipelineState;
@@ -28,6 +29,7 @@ use App\Models\Supplier;
 use App\Models\SupplierCategory;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 
 class AssetSampleDataSeeder extends Seeder
 {
@@ -505,7 +507,9 @@ class AssetSampleDataSeeder extends Seeder
 
             // Perolehan dijurnal dari nilai register (#357). Draft dan aset
             // yang dibatalkan belum dikapitalisasi, jadi tidak diposting.
-            if (in_array($asset->status, ['active', 'maintenance', 'disposed', 'lost'], true)) {
+            // Aset disposed sebelum fiscal year terbuka tidak masuk saldo awal.
+            if (in_array($asset->status, ['active', 'maintenance', 'lost'], true)
+                || ($asset->status === 'disposed' && $this->acquiredWithinOpenFiscalYear($asset))) {
                 app(PostAssetAcquisitionJournalAction::class)->execute($asset);
             }
 
@@ -959,5 +963,20 @@ class AssetSampleDataSeeder extends Seeder
                 'accumulated_depr_account_id' => $accumAcc->id,
             ]);
         }
+    }
+
+    private function acquiredWithinOpenFiscalYear(Asset $asset): bool
+    {
+        if ($asset->purchase_date === null) {
+            return false;
+        }
+
+        $purchaseDate = Carbon::parse($asset->purchase_date)->toDateString();
+
+        return FiscalYear::query()
+            ->where('status', 'open')
+            ->where('start_date', '<=', $purchaseDate)
+            ->where('end_date', '>=', $purchaseDate)
+            ->exists();
     }
 }
