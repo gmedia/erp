@@ -10,9 +10,11 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Throwable;
 
 /**
  * Controller for application-level settings management.
@@ -58,18 +60,28 @@ class AdminSettingController extends Controller
             $validated[$listKey] = $items;
         }
 
-        foreach ($validated as $key => $value) {
-            Setting::set($key, $value ?? '');
+        $logoPath = null;
+
+        // Write the logo first: if the object storage rejects it, nothing is saved.
+        if ($uploadedLogo instanceof UploadedFile) {
+            $logoPath = $this->storeLogoFile($uploadedLogo);
+        } elseif (is_string($uploadedLogoSvg) && trim($uploadedLogoSvg) !== '') {
+            $logoPath = $this->storeLogoSvg($uploadedLogoSvg);
         }
 
-        if ($uploadedLogo instanceof UploadedFile) {
-            $path = $uploadedLogo->store('branding/logos', config('filesystems.default'));
-            Setting::set('company_logo_path', $path);
-        } elseif (is_string($uploadedLogoSvg) && trim($uploadedLogoSvg) !== '') {
-            $path = 'branding/logos/company-logo-' . Str::uuid() . '.svg';
-            Storage::disk(config('filesystems.default'))->put($path, $uploadedLogoSvg);
-            Setting::set('company_logo_path', $path);
+        if ($logoPath === false) {
+            return $this->logoUploadFailedResponse();
         }
+
+        DB::transaction(function () use ($validated, $logoPath): void {
+            foreach ($validated as $key => $value) {
+                Setting::set($key, $value ?? '');
+            }
+
+            if (is_string($logoPath)) {
+                Setting::set('company_logo_path', $logoPath);
+            }
+        });
 
         return response()->json([
             'message' => 'Settings updated successfully.',
@@ -96,6 +108,42 @@ class AdminSettingController extends Controller
                 'errors' => ['test_email' => ['Failed to send email: ' . $e->getMessage()]],
             ], 422);
         }
+    }
+
+    protected function storeLogoFile(UploadedFile $file): string|false
+    {
+        try {
+            return Storage::disk(config('filesystems.default'))->putFile('branding/logos', $file);
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return false;
+        }
+    }
+
+    protected function storeLogoSvg(string $svg): string|false
+    {
+        $path = 'branding/logos/company-logo-' . Str::uuid() . '.svg';
+
+        try {
+            $stored = Storage::disk(config('filesystems.default'))->put($path, $svg);
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return false;
+        }
+
+        return $stored === true ? $path : false;
+    }
+
+    protected function logoUploadFailedResponse(): JsonResponse
+    {
+        $message = __('admin_settings.logo_upload_failed');
+
+        return response()->json([
+            'message' => $message,
+            'errors' => ['company_logo' => [$message]],
+        ], 422);
     }
 
     protected function getCompanyLogoUrl(): ?string
