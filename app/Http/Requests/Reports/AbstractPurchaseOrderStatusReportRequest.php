@@ -34,6 +34,7 @@ abstract class AbstractPurchaseOrderStatusReportRequest extends AbstractReportRe
                         'outstanding',
                         'partially_received',
                         'closed',
+                        'cancelled',
                     ]),
                 ],
             ],

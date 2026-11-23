@@ -36,7 +36,7 @@ class IndexPurchaseOrderStatusReportAction extends ConfiguredPurchaseOrderReport
                     'COUNT(DISTINCT poi.id) as item_count',
                     'COALESCE(SUM(poi.quantity), 0) as ordered_quantity',
                     'COALESCE(SUM(poi.quantity_received), 0) as received_quantity',
-                    'COALESCE(SUM(poi.quantity), 0) - COALESCE(SUM(poi.quantity_received), 0) as outstanding_quantity',
+                    "CASE WHEN po.status IN ('cancelled', 'rejected') THEN 0 ELSE COALESCE(SUM(poi.quantity), 0) - COALESCE(SUM(poi.quantity_received), 0) END as outstanding_quantity",
                 ],
             ))
             ->selectRaw($this->statusCategorySelectSql() . ' as status_category')
@@ -97,12 +97,12 @@ class IndexPurchaseOrderStatusReportAction extends ConfiguredPurchaseOrderReport
     private function statusCategorySelectSql(): string
     {
         // Draft/pending belum menjadi komitmen pesanan; cancelled/rejected
-        // terminal. Keduanya tidak boleh dihitung sebagai outstanding (W5-13).
+        // terminal dengan outstanding 0 dan kategori tersendiri. Closed hanya
+        // bila seluruh kuantitas sudah diterima (W7-03).
         return "CASE
             WHEN po.status IN ('draft', 'pending_approval') THEN 'not_started'
-            WHEN po.status IN ('cancelled', 'rejected') THEN 'closed'
+            WHEN po.status IN ('cancelled', 'rejected') THEN 'cancelled'
             WHEN (COALESCE(SUM(poi.quantity), 0) - COALESCE(SUM(poi.quantity_received), 0)) <= 0
-                OR po.status IN ('fully_received', 'closed')
                 THEN 'closed'
             WHEN COALESCE(SUM(poi.quantity_received), 0) > 0
                 THEN 'partially_received'

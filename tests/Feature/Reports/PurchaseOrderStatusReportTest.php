@@ -27,7 +27,7 @@ test('it does not classify draft pending cancelled or rejected as outstanding', 
     $product = Product::factory()->create();
     $unit = Unit::factory()->create();
 
-    foreach (['draft' => 'not_started', 'pending_approval' => 'not_started', 'cancelled' => 'closed', 'rejected' => 'closed'] as $status => $expected) {
+    foreach (['draft' => 'not_started', 'pending_approval' => 'not_started', 'cancelled' => 'cancelled', 'rejected' => 'cancelled'] as $status => $expected) {
         $po = PurchaseOrder::factory()->create([
             'po_number' => 'PO-' . strtoupper($status) . '-001',
             'supplier_id' => $supplier->id,
@@ -51,8 +51,8 @@ test('it does not classify draft pending cancelled or rejected as outstanding', 
 
     expect($rows->firstWhere('purchase_order.po_number', 'PO-DRAFT-001')['purchase_order']['status_category'])->toBe('not_started')
         ->and($rows->firstWhere('purchase_order.po_number', 'PO-PENDING_APPROVAL-001')['purchase_order']['status_category'])->toBe('not_started')
-        ->and($rows->firstWhere('purchase_order.po_number', 'PO-CANCELLED-001')['purchase_order']['status_category'])->toBe('closed')
-        ->and($rows->firstWhere('purchase_order.po_number', 'PO-REJECTED-001')['purchase_order']['status_category'])->toBe('closed');
+        ->and($rows->firstWhere('purchase_order.po_number', 'PO-CANCELLED-001')['purchase_order']['status_category'])->toBe('cancelled')
+        ->and($rows->firstWhere('purchase_order.po_number', 'PO-REJECTED-001')['purchase_order']['status_category'])->toBe('cancelled');
 });
 
 test('it requires permission to access purchase order status report', function () {

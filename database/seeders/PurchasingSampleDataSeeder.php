@@ -31,6 +31,7 @@ use App\Models\User;
 use App\Models\Warehouse;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class PurchasingSampleDataSeeder extends Seeder
 {
@@ -153,6 +154,11 @@ class PurchasingSampleDataSeeder extends Seeder
             $purchaseOrderItems,
             $fallbackUnitId
         );
+
+        // Received quantity on purchase order lines must be derived from the
+        // confirmed goods receipt lines — the single source of truth used by
+        // every purchasing report (W7-03).
+        $this->syncPurchaseOrderReceivedQuantities();
 
         $this->seedSupplierReturns(
             $adminUserId,
@@ -1020,15 +1026,6 @@ class PurchasingSampleDataSeeder extends Seeder
             $firstReceived = 0.00;
             $secondReceived = 0.00;
 
-            if ($status === 'partially_received') {
-                $firstReceived = 4.00;
-            }
-
-            if (in_array($status, ['fully_received', 'closed'], true)) {
-                $firstReceived = $firstQuantity;
-                $secondReceived = $secondQuantity;
-            }
-
             $firstLineTotal = $firstQuantity * $firstUnitPrice;
             $secondLineTotal = $secondQuantity * $secondUnitPrice;
             $subtotal = $firstLineTotal + $secondLineTotal;
@@ -1331,38 +1328,50 @@ class PurchasingSampleDataSeeder extends Seeder
             }
         }
 
+        // Goods receipt lines are the single source of truth for received
+        // quantity. `received => null` means "receive the full ordered line".
         $definitions = [
             [
                 'number' => "GR-{$year}-000101",
                 'status' => 'draft',
                 'po_status' => 'confirmed',
-                'quantity_received' => 2.00,
-                'quantity_accepted' => 2.00,
-                'quantity_rejected' => 0.00,
+                'items' => [
+                    ['line' => 0, 'received' => 2.00, 'accepted' => 2.00],
+                ],
             ],
             [
                 'number' => "GR-{$year}-000102",
                 'status' => 'confirmed',
                 'po_status' => 'partially_received',
-                'quantity_received' => 4.00,
-                'quantity_accepted' => 3.00,
-                'quantity_rejected' => 1.00,
+                'items' => [
+                    ['line' => 0, 'received' => 4.00, 'accepted' => 3.00, 'rejected' => 1.00],
+                ],
             ],
             [
                 'number' => "GR-{$year}-000103",
                 'status' => 'confirmed',
                 'po_status' => 'fully_received',
-                'quantity_received' => 10.00,
-                'quantity_accepted' => 10.00,
-                'quantity_rejected' => 0.00,
+                'items' => [
+                    ['line' => 0, 'received' => null, 'accepted' => null],
+                    ['line' => 1, 'received' => null, 'accepted' => null],
+                ],
             ],
             [
                 'number' => "GR-{$year}-000104",
                 'status' => 'cancelled',
                 'po_status' => 'cancelled',
-                'quantity_received' => 1.00,
-                'quantity_accepted' => 0.00,
-                'quantity_rejected' => 1.00,
+                'items' => [
+                    ['line' => 0, 'received' => 0.00, 'accepted' => 0.00, 'rejected' => 0.00],
+                ],
+            ],
+            [
+                'number' => "GR-{$year}-000105",
+                'status' => 'confirmed',
+                'po_status' => 'closed',
+                'items' => [
+                    ['line' => 0, 'received' => null, 'accepted' => null],
+                    ['line' => 1, 'received' => null, 'accepted' => null],
+                ],
             ],
         ];
 
@@ -1372,9 +1381,8 @@ class PurchasingSampleDataSeeder extends Seeder
         foreach ($definitions as $index => $definition) {
             $purchaseOrder = $purchaseOrders[$definition['po_status']] ?? null;
             $poItems = $purchaseOrderItems[$definition['po_status']] ?? [];
-            $poItem = $poItems[0] ?? null;
 
-            if (! $purchaseOrder || ! $poItem) {
+            if (! $purchaseOrder) {
                 continue;
             }
 
@@ -1396,27 +1404,76 @@ class PurchasingSampleDataSeeder extends Seeder
                 ]
             );
 
-            $goodsReceiptItem = GoodsReceiptItem::updateOrCreate(
-                [
-                    'goods_receipt_id' => $goodsReceipt->id,
-                    'purchase_order_item_id' => $poItem->id,
-                ],
-                [
-                    'product_id' => $poItem->product_id,
-                    'unit_id' => $poItem->unit_id ?? $fallbackUnitId,
-                    'quantity_received' => $definition['quantity_received'],
-                    'quantity_accepted' => $definition['quantity_accepted'],
-                    'quantity_rejected' => $definition['quantity_rejected'],
-                    'unit_price' => $poItem->unit_price,
-                    'notes' => 'Item penerimaan barang',
-                ]
-            );
+            // Recreate lines so re-seeding never leaves stale receipt rows.
+            // Supplier return items reference receipt lines, so clear those
+            // dependents first to keep the seeder idempotent.
+            $existingItemIds = $goodsReceipt->items()->pluck('id');
+            if ($existingItemIds->isNotEmpty()) {
+                SupplierReturnItem::query()
+                    ->whereIn('goods_receipt_item_id', $existingItemIds)
+                    ->delete();
+            }
+            $goodsReceipt->items()->delete();
+
+            foreach ($definition['items'] as $itemDefinition) {
+                $poItem = $poItems[$itemDefinition['line']] ?? null;
+
+                if (! $poItem) {
+                    continue;
+                }
+
+                $orderedQuantity = (float) $poItem->quantity;
+                $received = $itemDefinition['received'] === null
+                    ? $orderedQuantity
+                    : min((float) $itemDefinition['received'], $orderedQuantity);
+                $accepted = $itemDefinition['accepted'] === null
+                    ? $received
+                    : min((float) $itemDefinition['accepted'], $received);
+                $rejected = $itemDefinition['rejected'] ?? max(0.0, $received - $accepted);
+
+                $goodsReceiptItem = GoodsReceiptItem::updateOrCreate(
+                    [
+                        'goods_receipt_id' => $goodsReceipt->id,
+                        'purchase_order_item_id' => $poItem->id,
+                    ],
+                    [
+                        'product_id' => $poItem->product_id,
+                        'unit_id' => $poItem->unit_id ?? $fallbackUnitId,
+                        'quantity_received' => $received,
+                        'quantity_accepted' => $accepted,
+                        'quantity_rejected' => $rejected,
+                        'unit_price' => $poItem->unit_price,
+                        'notes' => 'Item penerimaan barang',
+                    ]
+                );
+
+                $goodsReceiptItems[$definition['status'] . '_' . ($index + 1) . '_' . $itemDefinition['line']] = $goodsReceiptItem;
+            }
 
             $goodsReceipts[$definition['status'] . '_' . ($index + 1)] = $goodsReceipt;
-            $goodsReceiptItems[$definition['status'] . '_' . ($index + 1)] = $goodsReceiptItem;
         }
 
         return [$goodsReceipts, $goodsReceiptItems];
+    }
+
+    /**
+     * Derive each purchase order line's received quantity from the confirmed
+     * goods receipt lines, keeping the stored column and every report aligned.
+     */
+    private function syncPurchaseOrderReceivedQuantities(): void
+    {
+        $receivedByItem = DB::table('goods_receipt_items')
+            ->join('goods_receipts', 'goods_receipts.id', '=', 'goods_receipt_items.goods_receipt_id')
+            ->where('goods_receipts.status', 'confirmed')
+            ->groupBy('goods_receipt_items.purchase_order_item_id')
+            ->selectRaw('goods_receipt_items.purchase_order_item_id as purchase_order_item_id, SUM(goods_receipt_items.quantity_received) as received')
+            ->pluck('received', 'purchase_order_item_id');
+
+        foreach (PurchaseOrderItem::query()->get() as $item) {
+            $item->update([
+                'quantity_received' => (float) ($receivedByItem[$item->id] ?? 0),
+            ]);
+        }
     }
 
     private function seedSupplierReturns(
@@ -1441,14 +1498,18 @@ class PurchasingSampleDataSeeder extends Seeder
         }
 
         // Retur tersebar ke beberapa PO/GR, bukan menumpuk di satu dokumen
-        // (W6-12).
+        // (W6-12). Hanya GR terkonfirmasi yang boleh dirujuk retur (W7-03).
         $candidates = [];
 
-        foreach ($goodsReceipts as $key => $receipt) {
-            $item = $goodsReceiptItems[$key] ?? null;
-            $order = $receipt ? PurchaseOrder::query()->find($receipt->purchase_order_id) : null;
+        foreach ($goodsReceipts as $receipt) {
+            if ($receipt->status !== 'confirmed') {
+                continue;
+            }
 
-            if ($receipt && $item && $order) {
+            $item = $receipt->items()->orderBy('id')->first();
+            $order = PurchaseOrder::query()->find($receipt->purchase_order_id);
+
+            if ($item && $order) {
                 $candidates[] = [$order, $receipt, $item];
             }
         }
@@ -1471,7 +1532,7 @@ class PurchasingSampleDataSeeder extends Seeder
                 [
                     'purchase_order_id' => $baseOrder->id,
                     'goods_receipt_id' => $baseReceipt->id,
-                    'supplier_id' => $supplier->id,
+                    'supplier_id' => $baseOrder->supplier_id ?: $supplier->id,
                     'warehouse_id' => $warehouse->id,
                     'return_date' => now()->subDays(7 - $index)->toDateString(),
                     'reason' => $definition['reason'],
@@ -1480,6 +1541,8 @@ class PurchasingSampleDataSeeder extends Seeder
                     'created_by' => $adminUserId,
                 ]
             );
+
+            $supplierReturn->items()->delete();
 
             SupplierReturnItem::updateOrCreate(
                 [
