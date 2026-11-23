@@ -1,16 +1,35 @@
 import { expect, Page, test } from '@playwright/test';
 
 import { login } from '../helpers';
-import { apiGet, getFiscalYearId, readReportTotals, toNumber } from './helpers';
+import {
+    accountId,
+    apiGet,
+    firstId,
+    getFiscalYearId,
+    JournalEntryRecord,
+    netForAccount,
+    readJournalByReference,
+    readReportTotals,
+    sendJson,
+    toNumber,
+} from './helpers';
 
 /**
  * Order-to-cash (issue #355).
  *
  * Customer invoice -> partial receipt -> credit note -> settlement.
- * Write steps go through the API: the invoice, receipt, and credit-note UI
- * selectors are not verified for this flow, and #355 allows the API for
- * prerequisites and for reading numbers. Assertions are before/after deltas.
+ * Invoice is created as draft and moved to sent (the status that posts the
+ * AR journal). Receipt, credit note, and apply are API prerequisites; all
+ * amounts are read back from the API and the journals are checked.
  */
+
+const REVENUE_ACCOUNT_CODE = '41000';
+const CASH_ACCOUNT_CODE = '11110';
+const AR_ACCOUNT_CODE = '11200';
+
+const INVOICE_TOTAL = 1000000;
+const RECEIPT_PART = 400000;
+const CREDIT_NOTE_AMOUNT = 100000;
 
 interface InvoiceAmounts {
     grand_total: number;
@@ -20,46 +39,11 @@ interface InvoiceAmounts {
 }
 
 interface ArRow {
-    customer_invoice: { id: number };
+    customer_invoice: { id: number; invoice_number: string };
     amounts: Record<string, string>;
 }
 
-const INVOICE_TOTAL = 1000000;
-const RECEIPT_PART = 400000;
-const CREDIT_NOTE_AMOUNT = 100000;
-
-async function authHeaders(page: Page): Promise<Record<string, string>> {
-    const token = await page.evaluate(() => localStorage.getItem('api_token'));
-
-    return {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-    };
-}
-
-async function postJson<T = Record<string, unknown>>(
-    page: Page,
-    path: string,
-    body: unknown,
-): Promise<{ status: number; json: T }> {
-    const response = await page.request.post(path, {
-        headers: await authHeaders(page),
-        data: body,
-    });
-
-    return { status: response.status(), json: (await response.json()) as T };
-}
-
-async function firstId(page: Page, path: string): Promise<number> {
-    const body = await apiGet<{ data?: Array<{ id: number }> }>(page, path);
-    const row = body.data?.[0];
-    expect(row, `${path} must return at least one row`).toBeTruthy();
-
-    return Number(row?.id);
-}
-
-async function readOutstandingAmounts(
+async function readOutstanding(
     page: Page,
     invoiceId: number,
 ): Promise<InvoiceAmounts> {
@@ -84,10 +68,10 @@ async function readOutstandingAmounts(
     };
 }
 
-async function readInvoiceRecord(
+async function readInvoice(
     page: Page,
     invoiceId: number,
-): Promise<InvoiceAmounts & { status: string }> {
+): Promise<InvoiceAmounts & { status: string; invoice_number: string }> {
     const body = await apiGet<{ data: Record<string, unknown> }>(
         page,
         `/api/customer-invoices/${invoiceId}`,
@@ -96,6 +80,7 @@ async function readInvoiceRecord(
 
     return {
         status: String(record.status ?? ''),
+        invoice_number: String(record.invoice_number ?? ''),
         grand_total: toNumber(record.grand_total),
         amount_received: toNumber(record.amount_received),
         credit_note_amount: toNumber(record.credit_note_amount),
@@ -105,6 +90,11 @@ async function readInvoiceRecord(
 
 interface O2cRun {
     invoiceId: number;
+    invoiceNumber: string;
+    revenueAccountId: number;
+    arAccountId: number;
+    cashAccountId: number;
+    invoiceJournal: JournalEntryRecord;
     revenueBefore: number;
     revenueAfter: number;
     afterInvoice: InvoiceAmounts;
@@ -119,14 +109,16 @@ async function runOrderToCash(page: Page): Promise<O2cRun> {
     const fiscalYearId = await getFiscalYearId(page);
     const customerId = await firstId(page, '/api/customers?per_page=1');
     const branchId = await firstId(page, '/api/branches?per_page=1');
-    const bankAccountId = await firstId(page, '/api/accounts?per_page=1');
+    const revenueAccountId = await accountId(page, REVENUE_ACCOUNT_CODE);
+    const cashAccountId = await accountId(page, CASH_ACCOUNT_CODE);
+    const arAccountId = await accountId(page, AR_ACCOUNT_CODE);
     const today = new Date().toISOString().slice(0, 10);
     const due = new Date(Date.now() + 30 * 24 * 3600 * 1000)
         .toISOString()
         .slice(0, 10);
     const description = `E2E O2C ${Date.now()}`;
     const lineItem = {
-        account_id: bankAccountId,
+        account_id: revenueAccountId,
         description,
         quantity: 1,
         unit_price: INVOICE_TOTAL,
@@ -141,34 +133,41 @@ async function runOrderToCash(page: Page): Promise<O2cRun> {
         currency: 'IDR',
     };
 
-    const before = await readReportTotals(page, fiscalYearId);
+    const revenueBefore = (await readReportTotals(page, fiscalYearId)).revenue;
 
-    const invoice = await postJson<{ data: { id: number } }>(
-        page,
-        '/api/customer-invoices',
-        { ...header, status: 'draft', items: [lineItem] },
-    );
-    expect(invoice.status).toBeLessThan(400);
-    const invoiceId = invoice.json.data.id;
-
-    const sent = await page.request.put(`/api/customer-invoices/${invoiceId}`, {
-        headers: await authHeaders(page),
-        data: { ...header, status: 'sent', items: [lineItem] },
+    const created = await sendJson(page, 'POST', '/api/customer-invoices', {
+        ...header,
+        status: 'draft',
+        items: [lineItem],
     });
-    expect(sent.status()).toBeLessThan(400);
+    expect(created.status).toBeLessThan(400);
+    const invoiceId = Number((created.json.data as { id: number }).id);
 
-    const afterInvoice = await readOutstandingAmounts(page, invoiceId);
+    const sent = await sendJson(
+        page,
+        'PUT',
+        `/api/customer-invoices/${invoiceId}`,
+        { ...header, status: 'sent', items: [lineItem] },
+    );
+    expect(sent.status).toBeLessThan(400);
+
+    const invoice = await readInvoice(page, invoiceId);
+    const invoiceJournal = await readJournalByReference(
+        page,
+        invoice.invoice_number,
+    );
+
+    const afterInvoice = await readOutstanding(page, invoiceId);
     expect(afterInvoice.grand_total).toBeCloseTo(INVOICE_TOTAL, 2);
-    expect(afterInvoice.amount_received).toBeCloseTo(0, 2);
     expect(afterInvoice.amount_due).toBeCloseTo(INVOICE_TOTAL, 2);
 
-    const receipt = await postJson(page, '/api/ar-receipts', {
+    const receipt = await sendJson(page, 'POST', '/api/ar-receipts', {
         customer_id: customerId,
         branch_id: branchId,
         fiscal_year_id: fiscalYearId,
         receipt_date: today,
         payment_method: 'bank_transfer',
-        bank_account_id: bankAccountId,
+        bank_account_id: cashAccountId,
         currency: 'IDR',
         total_amount: RECEIPT_PART,
         status: 'confirmed',
@@ -178,7 +177,7 @@ async function runOrderToCash(page: Page): Promise<O2cRun> {
     });
     expect(receipt.status).toBeLessThan(400);
 
-    const afterReceipt = await readOutstandingAmounts(page, invoiceId);
+    const afterReceipt = await readOutstanding(page, invoiceId);
     expect(
         afterReceipt.amount_received - afterInvoice.amount_received,
     ).toBeCloseTo(RECEIPT_PART, 2);
@@ -187,38 +186,36 @@ async function runOrderToCash(page: Page): Promise<O2cRun> {
         2,
     );
 
-    const creditNote = await postJson<{ data: { id: number } }>(
-        page,
-        '/api/credit-notes',
-        {
-            customer_id: customerId,
-            customer_invoice_id: invoiceId,
-            branch_id: branchId,
-            fiscal_year_id: fiscalYearId,
-            credit_note_date: today,
-            reason: 'return',
-            status: 'confirmed',
-            items: [
-                {
-                    account_id: bankAccountId,
-                    description: `CN ${description}`,
-                    quantity: 1,
-                    unit_price: CREDIT_NOTE_AMOUNT,
-                    tax_percent: 0,
-                },
-            ],
-        },
-    );
+    const creditNote = await sendJson(page, 'POST', '/api/credit-notes', {
+        customer_id: customerId,
+        customer_invoice_id: invoiceId,
+        branch_id: branchId,
+        fiscal_year_id: fiscalYearId,
+        credit_note_date: today,
+        reason: 'return',
+        status: 'confirmed',
+        items: [
+            {
+                account_id: revenueAccountId,
+                description: `CN ${description}`,
+                quantity: 1,
+                unit_price: CREDIT_NOTE_AMOUNT,
+                tax_percent: 0,
+            },
+        ],
+    });
     expect(creditNote.status).toBeLessThan(400);
+    const creditNoteId = Number((creditNote.json.data as { id: number }).id);
 
-    const applied = await postJson(
+    const applied = await sendJson(
         page,
-        `/api/credit-notes/${creditNote.json.data.id}/apply`,
+        'POST',
+        `/api/credit-notes/${creditNoteId}/apply`,
         {},
     );
     expect(applied.status).toBeLessThan(400);
 
-    const afterCredit = await readOutstandingAmounts(page, invoiceId);
+    const afterCredit = await readOutstanding(page, invoiceId);
     expect(
         afterCredit.credit_note_amount - afterReceipt.credit_note_amount,
     ).toBeCloseTo(CREDIT_NOTE_AMOUNT, 2);
@@ -227,13 +224,13 @@ async function runOrderToCash(page: Page): Promise<O2cRun> {
         2,
     );
 
-    const settle = await postJson(page, '/api/ar-receipts', {
+    const settle = await sendJson(page, 'POST', '/api/ar-receipts', {
         customer_id: customerId,
         branch_id: branchId,
         fiscal_year_id: fiscalYearId,
         receipt_date: today,
         payment_method: 'bank_transfer',
-        bank_account_id: bankAccountId,
+        bank_account_id: cashAccountId,
         currency: 'IDR',
         total_amount: afterCredit.amount_due,
         status: 'confirmed',
@@ -246,13 +243,18 @@ async function runOrderToCash(page: Page): Promise<O2cRun> {
     });
     expect(settle.status).toBeLessThan(400);
 
-    const settled = await readInvoiceRecord(page, invoiceId);
-    const after = await readReportTotals(page, fiscalYearId);
+    const settled = await readInvoice(page, invoiceId);
+    const revenueAfter = (await readReportTotals(page, fiscalYearId)).revenue;
 
     return {
         invoiceId,
-        revenueBefore: before.revenue,
-        revenueAfter: after.revenue,
+        invoiceNumber: invoice.invoice_number,
+        revenueAccountId,
+        arAccountId,
+        cashAccountId,
+        invoiceJournal,
+        revenueBefore,
+        revenueAfter,
         afterInvoice,
         afterReceipt,
         afterCredit,
@@ -280,10 +282,28 @@ test.describe('Order-to-cash: invoice sampai pelunasan', () => {
         expect(run.settled.status).toBe('paid');
     });
 
+    test('jurnal invoice posted: Dr AR 11200 / Cr Pendapatan 41000 sebesar total', async ({
+        page,
+    }) => {
+        const run = await runOrderToCash(page);
+
+        expect(run.invoiceJournal.status).toBe('posted');
+        expect(netForAccount(run.invoiceJournal, run.arAccountId)).toBeCloseTo(
+            INVOICE_TOTAL,
+            2,
+        );
+        expect(
+            netForAccount(run.invoiceJournal, run.revenueAccountId),
+        ).toBeCloseTo(-INVOICE_TOTAL, 2);
+    });
+
     test('pelunasan invoice menaikkan pendapatan sebesar invoice dikurangi credit note', async ({
         page,
     }) => {
-        test.fail(true, 'invoice tidak memposting revenue (#340, W7-02)');
+        test.fail(
+            true,
+            'invoice tidak memposting revenue ke 41000 (#340, W7-02)',
+        );
 
         const run = await runOrderToCash(page);
 
