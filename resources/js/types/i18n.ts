@@ -67,6 +67,9 @@ export interface Translations {
             updated_at: string;
         };
     };
+    my_approvals: {
+        request_number: string;
+    };
     users: {
         title: string;
         description: string;

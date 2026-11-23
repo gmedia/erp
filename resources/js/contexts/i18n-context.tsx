@@ -95,6 +95,9 @@ const defaultTranslations: Translations = {
             updated_at: 'Updated At',
         },
     },
+    my_approvals: {
+        request_number: 'No. {id}',
+    },
     users: {
         title: 'Users',
         description: 'Manage user accounts linked to employees.',

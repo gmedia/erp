@@ -71,6 +71,9 @@
             "updated_at": "Diperbarui"
         }
     },
+    "my_approvals": {
+        "request_number": "No. {id}"
+    },
     "users": {
         "title": "Pengguna",
         "description": "Kelola akun pengguna yang terhubung dengan karyawan.",

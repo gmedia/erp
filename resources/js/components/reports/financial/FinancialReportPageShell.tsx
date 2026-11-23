@@ -388,7 +388,10 @@ export function FinancialReportPageShell({
                                 </Select>
                             </div>
                             {onBranchChange && (
-                                <div className="w-full sm:w-[200px]">
+                                <div className="flex w-full flex-col gap-1 sm:w-[200px]">
+                                    <span className="text-xs font-medium text-muted-foreground">
+                                        Branch
+                                    </span>
                                     <AsyncSelect
                                         url="/api/branches"
                                         placeholder="All Branches"
