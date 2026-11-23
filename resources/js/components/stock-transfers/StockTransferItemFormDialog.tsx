@@ -13,7 +13,10 @@ import {
 } from '@/components/common/ItemFormDialog';
 import { useTranslation } from '@/contexts/i18n-context';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
-import { type StockTransferFormData } from '@/utils/schemas';
+import {
+    type StockTransferFormData,
+    stockTransferQuantityReceivedSchema,
+} from '@/utils/schemas';
 
 const stockTransferItemSchema = z.object({
     product_id: z.string().min(1, { message: 'Product is required.' }),
@@ -23,13 +26,7 @@ const stockTransferItemSchema = z.object({
     quantity: z.coerce
         .number()
         .gt(0, { message: 'Quantity must be greater than 0.' }),
-    quantity_received: z.preprocess(
-        (val) =>
-            val === '' || val === null || val === undefined
-                ? null
-                : Number(val),
-        z.number().min(0).nullable(),
-    ),
+    quantity_received: stockTransferQuantityReceivedSchema,
     unit_cost: z.coerce.number().min(0).optional().default(0),
     notes: z.string().optional(),
 });

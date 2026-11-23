@@ -165,14 +165,17 @@ export function useCrudPage<
             const identifierKey = config.identifierKey || 'id';
             const id = (item as Record<string, unknown>)[identifierKey];
 
-            if (!config.loadDetailOnEdit || id === undefined || id === null) {
+            if (
+                !config.loadDetailOnEdit ||
+                (typeof id !== 'string' && typeof id !== 'number')
+            ) {
                 setSelectedItem(item);
                 setIsFormOpen(true);
                 return;
             }
 
             void axios
-                .get(`${config.apiEndpoint}/${String(id)}`)
+                .get(`${config.apiEndpoint}/${id}`)
                 .then((response) => {
                     setSelectedItem(
                         (response.data?.data ?? response.data) as T,

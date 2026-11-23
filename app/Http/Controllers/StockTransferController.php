@@ -104,10 +104,18 @@ class StockTransferController extends Controller
         // Issue #356 baris 5-6: update, cek stok, dan posting dalam satu transaksi.
         // Jika stok tidak cukup, seluruh perubahan dibatalkan (422).
         $hasExplicitReceived = is_array($items) && collect($items)->contains(
-            fn (array $item): bool => array_key_exists('quantity_received', $item) && $item['quantity_received'] !== null,
+            fn (array $item): bool => array_key_exists('quantity_received', $item)
+                && $item['quantity_received'] !== null,
         );
 
-        DB::transaction(function () use ($stockTransfer, $validated, $items, $syncItems, $stockPosting, $hasExplicitReceived): void {
+        DB::transaction(function () use (
+            $stockTransfer,
+            $validated,
+            $items,
+            $syncItems,
+            $stockPosting,
+            $hasExplicitReceived,
+        ): void {
             $wasDispatched = in_array($stockTransfer->status, ['in_transit', 'received'], true);
             $wasReceived = $stockTransfer->status === 'received';
             $wasCancelled = $stockTransfer->status === 'cancelled';
@@ -212,7 +220,10 @@ class StockTransferController extends Controller
         $message = match (true) {
             $from === 'cancelled' => __('stock_transfer.cancelled_final'),
             $from === 'received' && $to === 'in_transit' => __('stock_transfer.already_received'),
-            in_array($from, ['in_transit', 'received'], true) => __('stock_transfer.already_dispatched', ['status' => $to]),
+            in_array($from, ['in_transit', 'received'], true) => __(
+                'stock_transfer.already_dispatched',
+                ['status' => $to],
+            ),
             default => __('stock_transfer.cancelled_final'),
         };
 
