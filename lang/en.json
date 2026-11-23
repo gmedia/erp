@@ -153,6 +153,7 @@
     },
     "stock.insufficient": "Insufficient stock for :product in :warehouse (available :available, required :required).",
     "stock_transfer.already_dispatched": "A dispatched transfer cannot return to :status.",
+    "supplier_return.already_cancelled": "This supplier return is already cancelled.",
     "stock_transfer.already_received": "A received transfer cannot return to in_transit.",
     "stock_transfer.cancelled_final": "A cancelled transfer cannot change status.",
     "stock_transfer.items_locked": "Items and dispatched quantities cannot change after dispatch; only the received quantity can change.",

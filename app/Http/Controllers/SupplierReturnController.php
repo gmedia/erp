@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\AccountingPosting\PostSupplierReturnJournalAction;
+use App\Actions\AccountingPosting\ReverseSupplierReturnJournalAction;
 use App\Actions\SupplierReturns\ExportSupplierReturnsAction;
 use App\Actions\SupplierReturns\IndexSupplierReturnsAction;
 use App\Actions\SupplierReturns\PostSupplierReturnMovementsAction;
@@ -16,8 +17,10 @@ use App\Http\Requests\SupplierReturns\UpdateSupplierReturnRequest;
 use App\Http\Resources\SupplierReturns\SupplierReturnCollection;
 use App\Http\Resources\SupplierReturns\SupplierReturnResource;
 use App\Models\SupplierReturn;
+use App\Services\StockPostingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
@@ -86,10 +89,43 @@ class SupplierReturnController extends Controller
         SyncSupplierReturnItemsAction $syncItems,
         PostSupplierReturnJournalAction $postJournal,
         PostSupplierReturnMovementsAction $postMovements,
+        StockPostingService $stockPosting,
+        ReverseSupplierReturnJournalAction $reverseJournal,
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
         unset($validated['items']);
+
+        $requestedStatus = $validated['status'] ?? null;
+        $isCancellingConfirmed = $requestedStatus === 'cancelled' && $supplierReturn->status === 'confirmed';
+
+        if ($requestedStatus === 'cancelled' && $supplierReturn->status === 'cancelled') {
+            // Issue #362: batal dua kali ditolak, tidak membalik stok/jurnal lagi.
+            throw ValidationException::withMessages([
+                'status' => __('supplier_return.already_cancelled'),
+            ])->status(422);
+        }
+
+        if ($isCancellingConfirmed) {
+            // Issue #362: retur confirmed dibatalkan lewat pembalik (stok + jurnal), histori tetap.
+            DB::transaction(function () use ($supplierReturn, $validated, $stockPosting, $reverseJournal): void {
+                $supplierReturn->update(UpdateSupplierReturnData::fromArray($validated)->toArray());
+                $stockPosting->reverseDocument(SupplierReturn::class, $supplierReturn->id, 'supplier_return');
+                $reverseJournal->execute($supplierReturn->refresh());
+            });
+
+            $supplierReturn->load([
+                'purchaseOrder',
+                'goodsReceipt',
+                'supplier',
+                'warehouse',
+                'creator',
+                'items.product',
+                'items.unit',
+            ]);
+
+            return (new SupplierReturnResource($supplierReturn))->response();
+        }
 
         $isNewlyConfirmed = ($validated['status'] ?? null) === 'confirmed' && $supplierReturn->confirmed_at === null;
 
