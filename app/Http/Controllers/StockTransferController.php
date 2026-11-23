@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\AccountingPosting\PostStockTransferJournalAction;
 use App\Actions\StockTransfers\ExportStockTransfersAction;
 use App\Actions\StockTransfers\IndexStockTransfersAction;
 use App\Actions\StockTransfers\SyncStockTransferItemsAction;
@@ -110,6 +111,7 @@ class StockTransferController extends Controller
 
             $stockPosting->postStockTransferDispatch($stockTransfer);
             $stockPosting->postStockTransferReceive($stockTransfer);
+            app(PostStockTransferJournalAction::class)->execute($stockTransfer->refresh());
         });
 
         $stockTransfer->load(['fromWarehouse', 'toWarehouse', 'items.product', 'items.unit']);
