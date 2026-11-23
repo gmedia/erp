@@ -49,6 +49,10 @@ async function goToAssetProfile(page: Page, assetName: string) {
 }
 
 test.describe('High Value Asset Registration — Approval Flow', () => {
+  // Step 5/6 chain up to three logins + asset creation + activation + approvals
+  // in a single test; on CI runners that exceeds the global 60s timeout (#347).
+  test.describe.configure({ timeout: 120_000 });
+
   // Shared state across serial tests
   let assetName: string;
 
