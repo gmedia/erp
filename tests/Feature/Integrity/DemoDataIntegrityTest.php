@@ -239,12 +239,13 @@ test('W7-04 every eligible document line has a matching stock movement', functio
 
     $checks = [
         [
+            // Only accepted quantity is posted to stock (StockPostingService::postGoodsReceipt).
             'type' => GoodsReceipt::class,
             'header' => 'goods_receipts',
             'lines' => 'goods_receipt_items',
             'fk' => 'goods_receipt_id',
             'status' => 'confirmed',
-            'qty' => 'quantity_received',
+            'qty' => 'quantity_accepted',
             'direction' => 'in',
         ],
         [
@@ -263,15 +264,6 @@ test('W7-04 every eligible document line has a matching stock movement', functio
             'fk' => 'stock_adjustment_id',
             'status' => 'approved',
             'qty' => 'quantity_adjusted',
-            'direction' => null,
-        ],
-        [
-            'type' => StockTransfer::class,
-            'header' => 'stock_transfers',
-            'lines' => 'stock_transfer_items',
-            'fk' => 'stock_transfer_id',
-            'status' => 'received',
-            'qty' => 'quantity',
             'direction' => null,
         ],
     ];
@@ -314,30 +306,36 @@ test('W7-04 every eligible document line has a matching stock movement', functio
     expect($checked)->toBeGreaterThan(0, 'Demo data must include eligible stock document lines');
 });
 
-// W7-04 — transfer receipt is a separate leg: every received transfer line needs its transfer_in movement.
-test('W7-04 every received stock transfer line has a matching transfer_in movement', function () {
-    $transferIn = DB::table('stock_movements')
+// W7-04 — a received transfer is two legs: transfer_out = dispatched quantity,
+// transfer_in = quantity_received. Every received line must have both movements.
+test('W7-04 every received stock transfer line has matching transfer_out and transfer_in movements', function () {
+    $legs = DB::table('stock_movements')
         ->where('reference_type', StockTransfer::class)
-        ->where('movement_type', 'transfer_in')
-        ->groupBy('reference_id', 'product_id')
-        ->selectRaw('reference_id, product_id, SUM(quantity_in) as qty_in')
+        ->whereIn('movement_type', ['transfer_out', 'transfer_in'])
+        ->groupBy('reference_id', 'product_id', 'movement_type')
+        ->selectRaw('reference_id, product_id, movement_type, SUM(quantity_in) as qty_in, SUM(quantity_out) as qty_out')
         ->get()
-        ->keyBy(fn ($row) => $row->reference_id . '#' . $row->product_id);
+        ->keyBy(fn ($row) => $row->reference_id . '#' . $row->product_id . '#' . $row->movement_type);
 
     $receivedLines = DB::table('stock_transfer_items')
         ->join('stock_transfers', 'stock_transfers.id', '=', 'stock_transfer_items.stock_transfer_id')
         ->where('stock_transfers.status', 'received')
-        ->get(['stock_transfer_items.stock_transfer_id', 'stock_transfer_items.product_id', 'stock_transfer_items.quantity']);
+        ->get(['stock_transfer_items.stock_transfer_id', 'stock_transfer_items.product_id', 'stock_transfer_items.quantity', 'stock_transfer_items.quantity_received']);
 
     expect($receivedLines)->not->toBeEmpty('Demo data must include received stock transfers');
 
     foreach ($receivedLines as $line) {
         $key = $line->stock_transfer_id . '#' . $line->product_id;
-        $in = $transferIn->get($key);
 
+        $out = $legs->get($key . '#transfer_out');
+        expect($out)->not->toBeNull("Received transfer {$key} must have a transfer_out movement");
+        expect(round((float) $out->qty_out, 2))
+            ->toBe(round((float) $line->quantity, 2), "transfer_out quantity for {$key} must equal dispatched quantity");
+
+        $in = $legs->get($key . '#transfer_in');
         expect($in)->not->toBeNull("Received transfer {$key} must have a transfer_in movement");
         expect(round((float) $in->qty_in, 2))
-            ->toBe(round((float) $line->quantity, 2), "transfer_in quantity for {$key} must equal transferred quantity");
+            ->toBe(round((float) $line->quantity_received, 2), "transfer_in quantity for {$key} must equal quantity received");
     }
 });
 
@@ -375,22 +373,26 @@ test('W7-04 stock snapshot uses the latest movement balance', function () {
         $latest[$movement->product_id . ':' . $movement->warehouse_id] = (float) $movement->balance_after;
     }
 
-    // Request a page size larger than the row count so every row is checked, not just page 1.
-    $totalRows = DB::table('stock_movements')
-        ->select('product_id', 'warehouse_id')
-        ->distinct()
-        ->count();
-    $request = IndexStockMonitorRequest::create('/api/stock-monitor', 'GET', ['per_page' => max(100, $totalRows)]);
+    // Compare the set of product+warehouse pairs, not raw movement rows.
+    $pairs = array_keys($latest);
+    $pairCount = count($pairs);
+
+    // Request a page size larger than the pair count so every row is checked, not just page 1.
+    $request = IndexStockMonitorRequest::create('/api/stock-monitor', 'GET', ['per_page' => max(100, $pairCount)]);
     $result = app(IndexStockMonitorAction::class)->execute($request);
     $snapshot = collect($result['stocks']->items());
 
     expect($snapshot)->not->toBeEmpty('Stock monitor must show stock rows');
-    expect($snapshot)->toHaveCount($totalRows, 'Stock snapshot must cover every product and warehouse pair');
+
+    $snapshotPairs = $snapshot->map(fn ($row) => $row->product_id . ':' . $row->warehouse_id)->sort()->values()->all();
+    $expectedPairs = collect($pairs)->sort()->values()->all();
+
+    expect($snapshotPairs)->toBe($expectedPairs, 'Stock snapshot must cover exactly the product and warehouse pairs that have movements');
 
     foreach ($snapshot as $row) {
         $key = $row->product_id . ':' . $row->warehouse_id;
         expect(round((float) $row->quantity_on_hand, 2))
-            ->toBe(round($latest[$key] ?? 0.0, 2), "Stock snapshot for {$key} must equal the latest movement balance");
+            ->toBe(round($latest[$key], 2), "Stock snapshot for {$key} must equal the latest movement balance");
     }
 });
 
