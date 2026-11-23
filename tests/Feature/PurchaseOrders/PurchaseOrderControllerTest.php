@@ -74,6 +74,30 @@ test('index supports search and filters', function () {
         ->assertJsonCount(1, 'data');
 });
 
+test('store rejects manually creating purchase order with confirmed or rejected status', function (string $status) {
+    $payload = [
+        'supplier_id' => Supplier::factory()->create()->id,
+        'warehouse_id' => Warehouse::factory()->create()->id,
+        'order_date' => '2026-03-05',
+        'currency' => 'IDR',
+        'status' => $status,
+        'items' => [
+            [
+                'product_id' => Product::factory()->create()->id,
+                'unit_id' => Unit::factory()->create()->id,
+                'quantity' => 1,
+                'unit_price' => 5000,
+                'discount_percent' => 0,
+                'tax_percent' => 0,
+            ],
+        ],
+    ];
+
+    postJson('/api/purchase-orders', $payload)
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('status');
+})->with(['confirmed', 'rejected']);
+
 test('store creates purchase order with items', function () {
     $supplier = Supplier::factory()->create();
     $warehouse = Warehouse::factory()->create();
@@ -131,12 +155,11 @@ test('show returns purchase order detail', function () {
 });
 
 test('update modifies purchase order and items', function () {
-    $purchaseOrder = PurchaseOrder::factory()->create();
+    $purchaseOrder = PurchaseOrder::factory()->create(['status' => 'draft']);
     $product = Product::factory()->create();
     $unit = Unit::factory()->create();
 
     $payload = [
-        'status' => 'confirmed',
         'items' => [
             [
                 'product_id' => $product->id,
@@ -151,8 +174,26 @@ test('update modifies purchase order and items', function () {
 
     putJson('/api/purchase-orders/' . $purchaseOrder->id, $payload)
         ->assertOk()
-        ->assertJsonPath('data.status', 'confirmed')
+        ->assertJsonPath('data.status', 'draft')
         ->assertJsonCount(1, 'data.items');
+});
+
+test('update rejects manually setting purchase order status to confirmed or rejected', function (string $status) {
+    $purchaseOrder = PurchaseOrder::factory()->create(['status' => 'draft']);
+
+    putJson('/api/purchase-orders/' . $purchaseOrder->id, ['status' => $status])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('status');
+
+    expect($purchaseOrder->fresh()->status)->toBe('draft');
+})->with(['confirmed', 'rejected']);
+
+test('update keeps already confirmed purchase order confirmed', function () {
+    $purchaseOrder = PurchaseOrder::factory()->create(['status' => 'confirmed', 'approved_at' => now()]);
+
+    putJson('/api/purchase-orders/' . $purchaseOrder->id, ['status' => 'confirmed', 'notes' => 'edit'])
+        ->assertOk()
+        ->assertJsonPath('data.status', 'confirmed');
 });
 
 test('destroy removes purchase order', function () {

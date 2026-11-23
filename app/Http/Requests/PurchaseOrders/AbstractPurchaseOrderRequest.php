@@ -6,12 +6,43 @@ use App\Http\Requests\AuthorizedFormRequest;
 use App\Http\Requests\Concerns\HasSometimesArrayRules;
 use App\Http\Requests\Concerns\HasSupportedCurrencyRules;
 use App\Http\Requests\Concerns\HasTransactionAmountRules;
+use App\Models\PurchaseOrder;
+use Illuminate\Validation\Validator;
 
 abstract class AbstractPurchaseOrderRequest extends AuthorizedFormRequest
 {
     use HasSometimesArrayRules;
     use HasSupportedCurrencyRules;
     use HasTransactionAmountRules;
+
+    /**
+     * Approval outcome (confirmed via approval, rejected) comes only from the approval flow.
+     * Manual input is rejected unless the document already has that status.
+     */
+    public function after(): array
+    {
+        return [
+            function (Validator $validator): void {
+                if (! $this->has('status')) {
+                    return;
+                }
+
+                $status = $this->input('status');
+
+                if (! in_array($status, PurchaseOrder::APPROVAL_OUTCOME_STATUSES, true)) {
+                    return;
+                }
+
+                $current = $this->route('purchaseOrder')?->status;
+
+                if ($current === $status) {
+                    return;
+                }
+
+                $validator->errors()->add('status', __('approval.status_manual_forbidden'));
+            },
+        ];
+    }
 
     public function rules(): array
     {

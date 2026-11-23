@@ -68,6 +68,13 @@ class PurchaseRequest extends Model
     use HasFactory, HasPipeline;
 
     /**
+     * Statuses that are only produced by the approval flow / pipeline, never set manually.
+     *
+     * @var list<string>
+     */
+    public const APPROVAL_OUTCOME_STATUSES = ['approved', 'rejected'];
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>

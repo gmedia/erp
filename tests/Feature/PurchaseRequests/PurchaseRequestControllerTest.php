@@ -164,13 +164,12 @@ test('show returns purchase request detail', function () {
 });
 
 test('update modifies purchase request and items', function () {
-    $purchaseRequest = PurchaseRequest::factory()->create();
+    $purchaseRequest = PurchaseRequest::factory()->create(['status' => 'draft']);
     $product = Product::factory()->create();
     $unit = Unit::factory()->create();
 
     $payload = [
         'priority' => 'urgent',
-        'status' => 'approved',
         'items' => [
             [
                 'product_id' => $product->id,
@@ -184,8 +183,47 @@ test('update modifies purchase request and items', function () {
     putJson('/api/purchase-requests/' . $purchaseRequest->id, $payload)
         ->assertOk()
         ->assertJsonPath('data.priority', 'urgent')
-        ->assertJsonPath('data.status', 'approved')
+        ->assertJsonPath('data.status', 'draft')
         ->assertJsonCount(1, 'data.items');
+});
+
+test('update rejects manually setting purchase request status to approved', function () {
+    $purchaseRequest = PurchaseRequest::factory()->create(['status' => 'draft']);
+
+    putJson('/api/purchase-requests/' . $purchaseRequest->id, ['status' => 'approved'])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('status');
+
+    expect($purchaseRequest->fresh()->status)->toBe('draft');
+});
+
+test('store rejects manually creating purchase request with approved or rejected status', function (string $status) {
+    $payload = [
+        'branch_id' => Branch::factory()->create()->id,
+        'request_date' => now()->toDateString(),
+        'priority' => 'normal',
+        'status' => $status,
+        'items' => [
+            [
+                'product_id' => Product::factory()->create()->id,
+                'unit_id' => Unit::factory()->create()->id,
+                'quantity' => 1,
+                'estimated_unit_price' => 1000,
+            ],
+        ],
+    ];
+
+    postJson('/api/purchase-requests', $payload)
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('status');
+})->with(['approved', 'rejected']);
+
+test('update keeps already approved purchase request approved', function () {
+    $purchaseRequest = PurchaseRequest::factory()->create(['status' => 'approved', 'approved_at' => now()]);
+
+    putJson('/api/purchase-requests/' . $purchaseRequest->id, ['status' => 'approved', 'notes' => 'edit'])
+        ->assertOk()
+        ->assertJsonPath('data.status', 'approved');
 });
 
 test('update keeps current purchase request number unique', function () {

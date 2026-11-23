@@ -155,6 +155,7 @@
     "stock_transfer.already_dispatched": "Transfer yang sudah dikirim tidak bisa kembali ke status :status.",
     "stock_transfer.already_received": "Transfer yang sudah diterima tidak bisa kembali ke in_transit.",
     "stock_transfer.cancelled_final": "Transfer yang sudah dibatalkan tidak bisa berubah status.",
+    "approval.status_manual_forbidden": "Status disetujui atau ditolak hanya dapat diisi melalui proses approval.",
     "stock_transfer.items_locked": "Item dan qty kirim tidak bisa diubah setelah transfer dikirim; hanya qty diterima yang bisa diubah.",
     "stock_transfer.qty_received_exceeds": "Qty diterima tidak boleh melebihi qty yang dikirim."
 }

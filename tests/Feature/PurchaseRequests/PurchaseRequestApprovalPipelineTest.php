@@ -210,3 +210,38 @@ test('rejecting a purchase request marks it rejected', function () {
 
     expect($purchaseRequest->fresh()->status)->toBe('rejected');
 });
+
+test('manual pipeline Approve transition on a purchase request is rejected with 422', function () {
+    $setup = setUpPurchaseRequestApprovalPipeline();
+    Sanctum::actingAs($this->submitter, ['*']);
+
+    $purchaseRequest = PurchaseRequest::factory()->create(['status' => 'draft']);
+
+    postJson("/api/entity-states/purchase_request/{$purchaseRequest->id}/transition", [
+        'transition_id' => $setup['submit']->id,
+    ])->assertOk();
+
+    postJson("/api/entity-states/purchase_request/{$purchaseRequest->id}/transition", [
+        'transition_id' => $setup['approve']->id,
+    ])->assertUnprocessable();
+
+    expect($purchaseRequest->fresh()->status)->toBe('pending_approval');
+});
+
+test('manual pipeline Reject transition on a purchase request is rejected with 422', function () {
+    $setup = setUpPurchaseRequestApprovalPipeline();
+    Sanctum::actingAs($this->submitter, ['*']);
+
+    $purchaseRequest = PurchaseRequest::factory()->create(['status' => 'draft']);
+
+    postJson("/api/entity-states/purchase_request/{$purchaseRequest->id}/transition", [
+        'transition_id' => $setup['submit']->id,
+    ])->assertOk();
+
+    postJson("/api/entity-states/purchase_request/{$purchaseRequest->id}/transition", [
+        'transition_id' => $setup['reject']->id,
+        'comment' => 'manual',
+    ])->assertUnprocessable();
+
+    expect($purchaseRequest->fresh()->status)->toBe('pending_approval');
+});

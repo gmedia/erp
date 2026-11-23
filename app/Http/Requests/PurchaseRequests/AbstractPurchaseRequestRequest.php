@@ -5,12 +5,43 @@ namespace App\Http\Requests\PurchaseRequests;
 use App\Http\Requests\AuthorizedFormRequest;
 use App\Http\Requests\Concerns\HasRouteIgnoredUniqueRule;
 use App\Http\Requests\Concerns\HasSometimesArrayRules;
+use App\Models\PurchaseRequest;
 use Illuminate\Validation\Rules\Unique;
+use Illuminate\Validation\Validator;
 
 abstract class AbstractPurchaseRequestRequest extends AuthorizedFormRequest
 {
     use HasRouteIgnoredUniqueRule;
     use HasSometimesArrayRules;
+
+    /**
+     * Approval outcome (approved/rejected) comes only from the approval flow.
+     * Manual input is rejected unless the document already has that status.
+     */
+    public function after(): array
+    {
+        return [
+            function (Validator $validator): void {
+                if (! $this->has('status')) {
+                    return;
+                }
+
+                $status = $this->input('status');
+
+                if (! in_array($status, PurchaseRequest::APPROVAL_OUTCOME_STATUSES, true)) {
+                    return;
+                }
+
+                $current = $this->route('purchaseRequest')?->status;
+
+                if ($current === $status) {
+                    return;
+                }
+
+                $validator->errors()->add('status', __('approval.status_manual_forbidden'));
+            },
+        ];
+    }
 
     public function rules(): array
     {

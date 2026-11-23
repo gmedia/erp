@@ -155,6 +155,7 @@
     "stock_transfer.already_dispatched": "A dispatched transfer cannot return to :status.",
     "stock_transfer.already_received": "A received transfer cannot return to in_transit.",
     "stock_transfer.cancelled_final": "A cancelled transfer cannot change status.",
+    "approval.status_manual_forbidden": "Approved or rejected status can only be set through the approval process.",
     "stock_transfer.items_locked": "Items and dispatched quantities cannot change after dispatch; only the received quantity can change.",
     "stock_transfer.qty_received_exceeds": "Received quantity cannot exceed the transferred quantity."
 }
