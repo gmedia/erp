@@ -134,7 +134,7 @@ function StatusBadge({ status }: Readonly<{ status: string }>) {
     switch (status) {
         case 'pending':
             return (
-                <Badge variant="warning" className="gap-1 font-normal">
+                <Badge variant="secondary" className="gap-1 font-normal">
                     <Clock className="h-3 w-3" /> Pending
                 </Badge>
             );

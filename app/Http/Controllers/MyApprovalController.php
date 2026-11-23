@@ -48,16 +48,26 @@ class MyApprovalController extends Controller
             ->get();
 
         $resolver = app(DocumentNumberResolver::class);
+        $lists = [$pending, $approvedByMe, $rejectedByMe, $all];
 
-        $attachDocumentNumber = function (ApprovalRequestStep $step) use ($resolver): void {
-            $step->request->setAttribute('document_number', $resolver->resolve(
-                $step->request->approvable_type,
-                $step->request->approvable_id,
-            ));
-        };
+        // Resolve every document number up front: one query per approvable type,
+        // not one per step (avoids N+1 on the inbox lists).
+        $resolver->preload(
+            collect($lists)
+                ->flatten(1)
+                ->map(fn (ApprovalRequestStep $step) => [
+                    $step->request->approvable_type,
+                    $step->request->approvable_id,
+                ]),
+        );
 
-        foreach ([$pending, $approvedByMe, $rejectedByMe, $all] as $steps) {
-            $steps->each($attachDocumentNumber);
+        foreach ($lists as $steps) {
+            $steps->each(function (ApprovalRequestStep $step) use ($resolver): void {
+                $step->request->setAttribute('document_number', $resolver->resolve(
+                    $step->request->approvable_type,
+                    $step->request->approvable_id,
+                ));
+            });
         }
 
         return response()->json([

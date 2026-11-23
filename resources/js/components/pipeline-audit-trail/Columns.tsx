@@ -1,6 +1,6 @@
 import { GenericActions } from '@/components/common/ActionsDropdown';
 import { Badge } from '@/components/ui/badge';
-import { formatClassName } from '@/lib/status-badge';
+import { formatClassName, statusBadgeVariant } from '@/lib/status-badge';
 import { createSortingHeader } from '@/utils/columns';
 import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import { ColumnDef } from '@tanstack/react-table';
@@ -79,18 +79,10 @@ export const createPipelineAuditTrailColumns = ({
             const name = row.getValue('from_state_name') as string | null;
             if (!name) return <Badge variant="outline">Initial</Badge>;
             return (
-                <Badge variant="outline">
+                <Badge variant={statusBadgeVariant(name)}>
                     <span
                         aria-hidden
-                        className="size-2 shrink-0 rounded-full bg-muted-foreground"
-                        style={
-                            row.original.from_state_color
-                                ? {
-                                      backgroundColor:
-                                          row.original.from_state_color,
-                                  }
-                                : undefined
-                        }
+                        className="size-2 shrink-0 rounded-full bg-current"
                     />
                     {name}
                 </Badge>
@@ -105,18 +97,10 @@ export const createPipelineAuditTrailColumns = ({
             const name = row.getValue('to_state_name') as string | null;
             if (!name) return '-';
             return (
-                <Badge variant="outline">
+                <Badge variant={statusBadgeVariant(name)}>
                     <span
                         aria-hidden
-                        className="size-2 shrink-0 rounded-full bg-muted-foreground"
-                        style={
-                            row.original.to_state_color
-                                ? {
-                                      backgroundColor:
-                                          row.original.to_state_color,
-                                  }
-                                : undefined
-                        }
+                        className="size-2 shrink-0 rounded-full bg-current"
                     />
                     {name}
                 </Badge>
