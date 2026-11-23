@@ -33,6 +33,19 @@
         "qty_received_label": "Qty Received",
         "qty_received_placeholder": "Empty = received in full"
     },
+    "approval": {
+        "status_manual_forbidden": "This status can only be set through the approval process or by the system.",
+        "items_locked": "Items can only be changed while the document is still a draft.",
+        "form_locked": "Awaiting or past approval: header and items are read-only. Use status actions instead.",
+        "tab_details": "Details",
+        "tab_timeline": "Timeline",
+        "tab_approvals": "Approvals",
+        "flow_not_found": "Approval flow not found, inactive, or has no steps.",
+        "transition_forbidden": "You do not have permission to execute this transition."
+    },
+    "approval.status_manual_forbidden": "This status can only be set through the approval process or by the system.",
+    "approval.flow_not_found": "Approval flow not found, inactive, or has no steps.",
+    "approval.transition_forbidden": "You do not have permission to execute this transition.",
     "nav": {
         "platform": "Platform",
         "dashboard": "Dashboard",
@@ -231,12 +244,6 @@
     },
     "stock_transfer.already_received": "A received transfer cannot return to in_transit.",
     "stock_transfer.cancelled_final": "A cancelled transfer cannot change status.",
-    "approval.status_manual_forbidden": "This status can only be set through the approval process or by the system.",
-    "approval.items_locked": "Items can only be changed while the document is still a draft.",
-    "approval.form_locked": "Awaiting or past approval: header and items are read-only. Use status actions instead.",
-    "approval.tab_details": "Details",
-    "approval.tab_timeline": "Timeline",
-    "approval.tab_approvals": "Approvals",
     "stock_transfer.items_locked": "Items and dispatched quantities cannot change after dispatch; only the received quantity can change.",
     "stock_transfer.qty_received_exceeds": "Received quantity cannot exceed the transferred quantity."
 }

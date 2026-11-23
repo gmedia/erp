@@ -112,7 +112,7 @@ class ExecuteTransitionActionsAction
 
         if ($request === null) {
             throw ValidationException::withMessages([
-                'transition_id' => 'Approval flow tidak ditemukan, tidak aktif, atau tidak memiliki langkah.',
+                'transition_id' => __('approval.flow_not_found'),
             ]);
         }
 

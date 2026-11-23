@@ -139,6 +139,9 @@ test.describe('Purchase Order approval flow (UI)', () => {
 
         await expect(page.getByText(/Pending Approval/i).first()).toBeVisible();
 
+        await page.getByRole('tab', { name: 'Approvals', exact: true }).click();
+        await expect(page.getByText(/^Step 1\b/).first()).toBeVisible();
+
         await page.context().clearCookies();
         await login(page, DEFAULT_E2E_EMAIL, undefined, {
             requireDashboard: false,

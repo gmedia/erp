@@ -30,9 +30,22 @@
         "empty_description": "Pilih karyawan di atas untuk melihat dan mengubah izin sistemnya."
     },
     "stockTransfer": {
-        "qty_received_label": "Qty Diterima",
-        "qty_received_placeholder": "Kosong = diterima penuh"
+        "qty_received_label": "Qty Received",
+        "qty_received_placeholder": "Empty = received in full"
     },
+    "approval": {
+        "status_manual_forbidden": "Status ini hanya dapat diisi melalui proses approval atau oleh sistem.",
+        "items_locked": "Item hanya dapat diubah selama dokumen masih draft.",
+        "form_locked": "Menunggu atau sudah melewati approval: header dan item hanya-baca. Gunakan aksi status.",
+        "tab_details": "Detail",
+        "tab_timeline": "Riwayat",
+        "tab_approvals": "Persetujuan",
+        "flow_not_found": "Approval flow tidak ditemukan, tidak aktif, atau tidak memiliki langkah.",
+        "transition_forbidden": "Anda tidak memiliki izin untuk menjalankan transisi ini."
+    },
+    "approval.status_manual_forbidden": "Status ini hanya dapat diisi melalui proses approval atau oleh sistem.",
+    "approval.flow_not_found": "Approval flow tidak ditemukan, tidak aktif, atau tidak memiliki langkah.",
+    "approval.transition_forbidden": "Anda tidak memiliki izin untuk menjalankan transisi ini.",
     "nav": {
         "platform": "Platform",
         "dashboard": "Dasbor",
@@ -231,12 +244,6 @@
     },
     "stock_transfer.already_received": "Transfer yang sudah diterima tidak bisa kembali ke in_transit.",
     "stock_transfer.cancelled_final": "Transfer yang sudah dibatalkan tidak bisa berubah status.",
-    "approval.status_manual_forbidden": "Status ini hanya dapat diisi melalui proses approval atau oleh sistem.",
-    "approval.items_locked": "Item hanya dapat diubah selama dokumen masih draft.",
-    "approval.form_locked": "Menunggu atau sudah melewati approval: header dan item hanya-baca. Gunakan aksi status.",
-    "approval.tab_details": "Detail",
-    "approval.tab_timeline": "Riwayat",
-    "approval.tab_approvals": "Persetujuan",
     "stock_transfer.items_locked": "Item dan qty kirim tidak bisa diubah setelah transfer dikirim; hanya qty diterima yang bisa diubah.",
     "stock_transfer.qty_received_exceeds": "Qty diterima tidak boleh melebihi qty yang dikirim."
 }

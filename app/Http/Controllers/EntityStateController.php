@@ -111,7 +111,7 @@ class EntityStateController extends Controller
         // may only run transitions that declare an explicit required_permission.
         $hasPipelinePermission = auth()->user()?->employee?->hasPermission('pipeline') ?? false;
         if (! $hasPipelinePermission && ! $transition->required_permission) {
-            abort(403, 'You do not have permission to execute this transition.');
+            abort(403, __('approval.transition_forbidden'));
         }
 
         $updatedState = $this->executeTransitionAction->execute(
