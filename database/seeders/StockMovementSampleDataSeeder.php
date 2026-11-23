@@ -30,15 +30,26 @@ use Illuminate\Database\Seeder;
  */
 class StockMovementSampleDataSeeder extends Seeder
 {
+    /** Pola nomor dokumen demo yang dibuat seeder (lihat seeder masing-masing modul). */
+    private const GR_DEMO = 'GR-____-0001%';
+
+    private const SR_DEMO = 'SR-____-0001%';
+
+    private const SA_DEMO = 'SA-____-9100%';
+
+    private const ST_DEMO = 'ST-____-9000%';
+
     public function run(): void
     {
         $stockPosting = app(StockPostingService::class);
 
-        // Rebuild the ledger so re-seeding never leaves stale or duplicate rows.
-        StockMovement::query()->delete();
+        // Rebuild only the movements that belong to demo documents. Movements of
+        // user-created documents are never touched (issue #357).
+        $this->deleteDemoStockMovements();
 
         GoodsReceipt::query()
             ->where('status', 'confirmed')
+            ->where('gr_number', 'like', self::GR_DEMO)
             ->with('items')
             ->orderBy('receipt_date')
             ->orderBy('id')
@@ -46,6 +57,7 @@ class StockMovementSampleDataSeeder extends Seeder
 
         SupplierReturn::query()
             ->where('status', 'confirmed')
+            ->where('return_number', 'like', self::SR_DEMO)
             ->with('items')
             ->orderBy('return_date')
             ->orderBy('id')
@@ -53,6 +65,7 @@ class StockMovementSampleDataSeeder extends Seeder
 
         StockAdjustment::query()
             ->where('status', 'approved')
+            ->where('adjustment_number', 'like', self::SA_DEMO)
             ->with('items')
             ->orderBy('adjustment_date')
             ->orderBy('id')
@@ -60,6 +73,7 @@ class StockMovementSampleDataSeeder extends Seeder
 
         StockTransfer::query()
             ->whereIn('status', ['in_transit', 'received'])
+            ->where('transfer_number', 'like', self::ST_DEMO)
             ->with('items')
             ->orderBy('transfer_date')
             ->orderBy('id')
@@ -97,26 +111,67 @@ class StockMovementSampleDataSeeder extends Seeder
     }
 
     /**
+     * Hapus hanya movement milik dokumen demo (GR, retur, adjustment, transfer)
+     * yang nomor dokumennya dibuat oleh seeder demo. Movement buatan pengguna
+     * dibiarkan utuh; saat dokumen demo dibangun ulang, movement-nya ikut dibangun ulang.
+     */
+    private function deleteDemoStockMovements(): void
+    {
+        $demoIds = [
+            GoodsReceipt::class => $this->demoIds(GoodsReceipt::class, 'gr_number', self::GR_DEMO),
+            SupplierReturn::class => $this->demoIds(SupplierReturn::class, 'return_number', self::SR_DEMO),
+            StockAdjustment::class => $this->demoIds(StockAdjustment::class, 'adjustment_number', self::SA_DEMO),
+            StockTransfer::class => $this->demoIds(StockTransfer::class, 'transfer_number', self::ST_DEMO),
+        ];
+
+        StockMovement::query()
+            ->where(function ($query) use ($demoIds): void {
+                foreach ($demoIds as $referenceType => $ids) {
+                    if ($ids === []) {
+                        continue;
+                    }
+
+                    $query->orWhere(fn ($q) => $q
+                        ->where('reference_type', $referenceType)
+                        ->whereIn('reference_id', $ids));
+                }
+            })
+            ->delete();
+    }
+
+    /**
+     * @param  class-string  $modelClass
+     * @return list<int>
+     */
+    private function demoIds(string $modelClass, string $numberColumn, string $demoPattern): array
+    {
+        return $modelClass::query()
+            ->where($numberColumn, 'like', $demoPattern)
+            ->pluck('id')
+            ->all();
+    }
+
+    /**
      * Jurnal persediaan demo (GR, retur, adjustment) lewat action aplikasi,
      * setelah movement dibuat. Jurnal lama dilepas dulu karena action
      * mengembalikan jurnal yang sudah ada bila `journal_entry_id` terisi.
+     * Hanya jurnal milik dokumen demo yang dilepas; jurnal pengguna tetap.
      */
     private function postInventoryJournals(): void
     {
-        $staleEntryIds = JournalEntry::query()
-            ->whereIn('source_type', [
-                GoodsReceipt::class,
-                SupplierReturn::class,
-                StockAdjustment::class,
-            ])
+        $demoEntryIds = JournalEntry::query()
+            ->where(fn ($query) => $query
+                ->where(fn ($q) => $q->where('source_type', GoodsReceipt::class)->whereIn('source_id', $this->demoIds(GoodsReceipt::class, 'gr_number', self::GR_DEMO)))
+                ->orWhere(fn ($q) => $q->where('source_type', SupplierReturn::class)->whereIn('source_id', $this->demoIds(SupplierReturn::class, 'return_number', self::SR_DEMO)))
+                ->orWhere(fn ($q) => $q->where('source_type', StockAdjustment::class)->whereIn('source_id', $this->demoIds(StockAdjustment::class, 'adjustment_number', self::SA_DEMO))))
             ->pluck('id');
 
-        if ($staleEntryIds->isNotEmpty()) {
-            GoodsReceipt::query()->whereIn('journal_entry_id', $staleEntryIds)->update(['journal_entry_id' => null]);
-            SupplierReturn::query()->whereIn('journal_entry_id', $staleEntryIds)->update(['journal_entry_id' => null]);
-            StockAdjustment::query()->whereIn('journal_entry_id', $staleEntryIds)->update(['journal_entry_id' => null]);
-            JournalEntryLine::query()->whereIn('journal_entry_id', $staleEntryIds)->delete();
-            JournalEntry::query()->whereIn('id', $staleEntryIds)->delete();
+        if ($demoEntryIds->isNotEmpty()) {
+            GoodsReceipt::query()->whereIn('journal_entry_id', $demoEntryIds)->update(['journal_entry_id' => null]);
+            SupplierReturn::query()->whereIn('journal_entry_id', $demoEntryIds)->update(['journal_entry_id' => null]);
+            StockAdjustment::query()->whereIn('journal_entry_id', $demoEntryIds)->update(['journal_entry_id' => null]);
+            JournalEntryLine::query()->whereIn('journal_entry_id', $demoEntryIds)->delete();
+            JournalEntry::query()->whereIn('id', $demoEntryIds)->delete();
         }
 
         $postGoodsReceipt = app(PostGoodsReceiptJournalAction::class);
@@ -125,18 +180,21 @@ class StockMovementSampleDataSeeder extends Seeder
 
         GoodsReceipt::query()
             ->where('status', 'confirmed')
+            ->where('gr_number', 'like', self::GR_DEMO)
             ->orderBy('id')
             ->get()
             ->each(fn (GoodsReceipt $receipt) => $postGoodsReceipt->execute($receipt->refresh()));
 
         SupplierReturn::query()
             ->where('status', 'confirmed')
+            ->where('return_number', 'like', self::SR_DEMO)
             ->orderBy('id')
             ->get()
             ->each(fn (SupplierReturn $return) => $postSupplierReturn->execute($return->refresh()));
 
         StockAdjustment::query()
             ->where('status', 'approved')
+            ->where('adjustment_number', 'like', self::SA_DEMO)
             ->orderBy('id')
             ->get()
             ->each(fn (StockAdjustment $adjustment) => $postStockAdjustment->execute($adjustment->refresh()));

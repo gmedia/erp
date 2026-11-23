@@ -23,6 +23,11 @@ use Illuminate\Database\Seeder;
 
 class ApSampleDataSeeder extends Seeder
 {
+    /** Pola nomor dokumen AP demo yang dibuat seeder ini. */
+    private const BILL_DEMO = 'BILL-____-00000%';
+
+    private const PAYMENT_DEMO = 'PAY-____-00000%';
+
     public function run(): void
     {
         $adminUserId = User::query()->where('email', config('app.admin'))->value('id') ?? User::query()->value('id');
@@ -442,16 +447,24 @@ class ApSampleDataSeeder extends Seeder
         $postPayment = app(PostApPaymentJournalAction::class);
 
         // Jurnal demo AP dibuat ulang setiap run agar nilainya mengikuti dokumen terbaru.
+        // Hanya bill/payment demo (nomor dari seeder ini) yang jurnalnya dilepas dan
+        // diposting ulang; jurnal dokumen buatan pengguna tidak disentuh (issue #357).
         // Action mengembalikan jurnal lama bila journal_entry_id masih terisi, jadi harus dilepas dulu.
-        $billIds = SupplierBill::query()->where('fiscal_year_id', $fiscalYearId)->pluck('id');
-        $paymentIds = ApPayment::query()->where('fiscal_year_id', $fiscalYearId)->pluck('id');
+        $billIds = SupplierBill::query()
+            ->where('fiscal_year_id', $fiscalYearId)
+            ->where('bill_number', 'like', self::BILL_DEMO)
+            ->pluck('id');
+        $paymentIds = ApPayment::query()
+            ->where('fiscal_year_id', $fiscalYearId)
+            ->where('payment_number', 'like', self::PAYMENT_DEMO)
+            ->pluck('id');
 
         // Termasuk prefix APP- dari seeder lama yang memposting kas tulis-tangan (sudah dihapus).
         $staleEntryIds = JournalEntry::query()
             ->where(fn ($query) => $query
                 ->where(fn ($q) => $q->where('source_type', SupplierBill::class)->whereIn('source_id', $billIds))
                 ->orWhere(fn ($q) => $q->where('source_type', ApPayment::class)->whereIn('source_id', $paymentIds))
-                ->orWhere('entry_number', 'like', 'APP-%'))
+                ->orWhere(fn ($q) => $q->where('entry_number', 'like', 'APP-%')->where('source_type', ApPayment::class)))
             ->pluck('id');
 
         if ($staleEntryIds->isNotEmpty()) {
@@ -463,6 +476,7 @@ class ApSampleDataSeeder extends Seeder
 
         SupplierBill::query()
             ->where('fiscal_year_id', $fiscalYearId)
+            ->where('bill_number', 'like', self::BILL_DEMO)
             ->whereIn('status', PostSupplierBillJournalAction::POSTABLE_STATUSES)
             ->orderBy('bill_number')
             ->get()
@@ -470,6 +484,7 @@ class ApSampleDataSeeder extends Seeder
 
         ApPayment::query()
             ->where('fiscal_year_id', $fiscalYearId)
+            ->where('payment_number', 'like', self::PAYMENT_DEMO)
             ->where('status', 'confirmed')
             ->orderBy('payment_number')
             ->get()
