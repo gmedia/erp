@@ -181,13 +181,28 @@ interface AssignmentOptions {
     units: AssignmentOption[];
 }
 
-function RequestNumber({ id }: Readonly<{ id: number | string }>) {
+function RequestNumber({
+    id,
+    documentNumber,
+}: Readonly<{ id: number | string; documentNumber?: string | null }>) {
     const { t } = useTranslation();
 
     return (
         <span className="font-mono text-[11px] text-muted-foreground tabular-nums">
-            {t('my_approvals.request_number', { id: String(id) })}
+            {documentNumber
+                ? documentNumber
+                : t('my_approvals.request_number', { id: String(id) })}
         </span>
+    );
+}
+
+function LoadFailedAlert() {
+    const { t } = useTranslation();
+
+    return (
+        <div className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-sm text-destructive">
+            {t('my_approvals.load_failed')}
+        </div>
     );
 }
 
@@ -399,6 +414,10 @@ export default function MyApprovalsPage() {
                                                         step.request
                                                             .approvable_id
                                                     }
+                                                    documentNumber={
+                                                        step.request
+                                                            .document_number
+                                                    }
                                                 />
                                                 <StatusBadge
                                                     status={step.status}
@@ -540,11 +559,7 @@ export default function MyApprovalsPage() {
                     </div>
                 )}
 
-                {error && (
-                    <div className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-sm text-destructive">
-                        Failed to load approvals. Please refresh and try again.
-                    </div>
-                )}
+                {error && <LoadFailedAlert />}
 
                 <Tabs defaultValue="pending" className="w-full gap-3">
                     <TabsList className="grid h-9 w-full grid-cols-4 lg:w-[28rem]">

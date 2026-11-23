@@ -81,7 +81,8 @@
         "searchPlaceholder": "Cari kode atau nama..."
     },
     "my_approvals": {
-        "request_number": "No. {id}"
+        "request_number": "No. {id}",
+        "load_failed": "Gagal memuat persetujuan. Muat ulang halaman lalu coba lagi."
     },
     "users": {
         "title": "Pengguna",

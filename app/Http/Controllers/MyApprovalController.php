@@ -8,6 +8,7 @@ use App\Http\Requests\MyApprovals\ApproveMyApprovalRequest;
 use App\Http\Requests\MyApprovals\RejectMyApprovalRequest;
 use App\Models\ApprovalRequest;
 use App\Models\ApprovalRequestStep;
+use App\Support\DocumentNumberResolver;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
@@ -45,6 +46,19 @@ class MyApprovalController extends Controller
                     });
             })
             ->get();
+
+        $resolver = app(DocumentNumberResolver::class);
+
+        $attachDocumentNumber = function (ApprovalRequestStep $step) use ($resolver): void {
+            $step->request->setAttribute('document_number', $resolver->resolve(
+                $step->request->approvable_type,
+                $step->request->approvable_id,
+            ));
+        };
+
+        foreach ([$pending, $approvedByMe, $rejectedByMe, $all] as $steps) {
+            $steps->each($attachDocumentNumber);
+        }
 
         return response()->json([
             'pending' => $pending,

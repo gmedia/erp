@@ -154,9 +154,8 @@ test.describe('Admin Settings', () => {
             await adminMenu.click();
         }
 
-        // Look for Setting link, it should become visible after expansion
         const settingLink = page.getByRole('link', {
-            name: 'Setting',
+            name: 'Settings',
             exact: true,
         });
 
