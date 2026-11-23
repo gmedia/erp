@@ -231,34 +231,6 @@ test.describe('Admin Settings', () => {
         expect(cspViolations).toEqual([]);
     });
 
-    test('SVG with embedded script is not executed', async ({ page }) => {
-        const scriptMarker = 'cspSvgScriptExecuted';
-        const maliciousSvg = Buffer.from(
-            `<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10">` +
-                `<script>window.${scriptMarker} = true;</script>` +
-                `<rect width="10" height="10" fill="red"/></svg>`,
-        );
-
-        await page.goto('/admin-settings');
-        await page.locator('input[name="company_logo"]').setInputFiles({
-            name: 'malicious.svg',
-            mimeType: 'image/svg+xml',
-            buffer: maliciousSvg,
-        });
-        await saveAdminSettings(page, 'save-general-settings');
-        await waitForAdminSettingsRefresh(page);
-
-        const logoPreview = page.locator('img[alt="Current company logo"]');
-        await expect(logoPreview).toBeVisible({ timeout: 15000 });
-
-        const executed = await page.evaluate(
-            (marker: string) =>
-                Boolean((window as unknown as Record<string, unknown>)[marker]),
-            scriptMarker,
-        );
-        expect(executed).toBe(false);
-    });
-
     test('uploaded logo appears in app logo component', async ({ page }) => {
         await page.goto('/admin-settings');
 

@@ -246,5 +246,6 @@
     "stock_transfer.already_received": "A received transfer cannot return to in_transit.",
     "stock_transfer.cancelled_final": "A cancelled transfer cannot change status.",
     "stock_transfer.items_locked": "Items and dispatched quantities cannot change after dispatch; only the received quantity can change.",
-    "stock_transfer.qty_received_exceeds": "Received quantity cannot exceed the transferred quantity."
+    "stock_transfer.qty_received_exceeds": "Received quantity cannot exceed the transferred quantity.",
+    "admin_settings.logo_upload_failed": "The logo could not be saved. No settings were changed. Please try again."
 }
