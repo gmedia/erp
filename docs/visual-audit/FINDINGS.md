@@ -243,6 +243,18 @@ Full multimodal narrative: session `ses_02021a5c2ffeaD0HIIg6ymhnEW`.
 | W6-16 | P3 | Department kendaraan/server di HR | **fixed (#336)** — Operations/Engineering |
 | W6-17 | P3 | Deskripsi singkat halaman CRUD kosong (85/86) | **fixed (#336)** — 37 config (43 halaman) berdeskripsi |
 
+### Tindak lanjut audit (lanjutan #336)
+
+Setelah merge #336, audit penuh ulang (`wave-6-final`, 340 capture) menemukan sisa kolom kunci terpotong yang belum tercakup:
+
+| Route | Temuan | Status |
+| --- | --- | --- |
+| `/reports/ar-aging` | bucket `Over 90 Days` di luar viewport 1440 | **fixed (#337)** — sembunyikan Grand Total/Amount Received/Credit Note/Amount Due (redundan) |
+| `/reports/ar-outstanding` | `Days Overdue` di luar viewport | **fixed (#337)** |
+| `/supplier-returns` | `Status` di luar viewport | **fixed (#337)** — Warehouse disembunyikan |
+| `/account-mappings` | `Notes`, `Created At` di luar viewport | **fixed (#337)** — `Created At` disembunyikan |
+| `/recurring-journals`, `/inventory-stocktakes` | H1 tanpa deskripsi | **fixed (#337)** |
+
 ### Themes → BACKLOG
 
 T1 DataTable shell v2 · T2 Sidebar IA/active · T3 Page header contract · T4 KPI/dashboard semantics · T5 Sparse/report density

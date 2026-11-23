@@ -414,6 +414,8 @@ export const inventoryStocktakeConfig =
     createComplexEntityConfig<InventoryStocktake>({
         entityName: 'Inventory Stocktake',
         entityNamePlural: 'Inventory Stocktakes',
+        description:
+            'Physical counts of warehouse stock with variance results.',
         apiEndpoint: '/api/inventory-stocktakes',
         exportEndpoint: '/api/inventory-stocktakes/export',
         queryKey: ['inventory-stocktakes'],
@@ -583,6 +585,7 @@ export const supplierReturnConfig = createComplexEntityConfig<SupplierReturn>({
         return_date_to: '',
     },
     columns: supplierReturnColumns,
+    defaultColumnVisibility: { warehouse: false },
     filterFields: createSupplierReturnFilterFields(),
     formComponent: SupplierReturnForm,
     formType: 'complex',
@@ -764,6 +767,7 @@ export const accountMappingConfig = createComplexEntityConfig<AccountMapping>({
         target_coa_version_id: '',
     },
     columns: accountMappingColumns,
+    defaultColumnVisibility: { created_at: false },
     filterFields: createAccountMappingFilterFields(),
     formComponent: AccountMappingForm,
     formType: 'complex',
@@ -1273,6 +1277,7 @@ export const recurringJournalConfig =
     createComplexEntityConfig<RecurringJournal>({
         entityName: 'Recurring Journal',
         entityNamePlural: 'Recurring Journals',
+        description: 'Templates for journals that repeat on a schedule.',
         apiEndpoint: '/api/recurring-journals',
         exportEndpoint: '/api/recurring-journals/export',
         queryKey: ['recurring-journals'],

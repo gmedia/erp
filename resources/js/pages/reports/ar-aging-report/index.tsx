@@ -32,6 +32,12 @@ export default function ArAgingReportPage() {
             queryKey={['ar-aging-report']}
             entityName="AR Aging Report"
             exportEndpoint="/api/reports/ar-aging/export"
+            defaultColumnVisibility={{
+                grand_total: false,
+                amount_received: false,
+                credit_note_amount: false,
+                amount_due: false,
+            }}
         />
     );
 }

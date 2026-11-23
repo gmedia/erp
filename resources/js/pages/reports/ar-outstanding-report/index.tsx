@@ -32,6 +32,12 @@ export default function ArOutstandingReportPage() {
             queryKey={['ar-outstanding-report']}
             entityName="AR Outstanding Report"
             exportEndpoint="/api/reports/ar-outstanding/export"
+            defaultColumnVisibility={{
+                'branch.name': false,
+                grand_total: false,
+                amount_received: false,
+                credit_note_amount: false,
+            }}
         />
     );
 }

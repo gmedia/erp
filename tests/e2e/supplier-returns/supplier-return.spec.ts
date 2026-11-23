@@ -1,7 +1,10 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
 import { login } from '../helpers';
-import { generateModuleTests, ModuleTestConfig } from '../shared-test-factories';
+import {
+    generateModuleTests,
+    ModuleTestConfig,
+} from '../shared-test-factories';
 import {
     createSupplierReturn,
     editSupplierReturn,
@@ -29,9 +32,17 @@ async function getFirstAsyncOption(page: Page, url: string) {
     }, url);
 }
 
-async function selectAsyncOption(page: Page, container: Page | Locator, label: string, optionName: string) {
+async function selectAsyncOption(
+    page: Page,
+    container: Page | Locator,
+    label: string,
+    optionName: string,
+) {
     await container.getByRole('combobox', { name: label }).click();
-    const escapedOptionName = optionName.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
+    const escapedOptionName = optionName.replaceAll(
+        /[.*+?^${}()|[\]\\]/g,
+        String.raw`\$&`,
+    );
     const optionPattern = new RegExp(escapedOptionName, 'i');
 
     const option = page
@@ -71,7 +82,6 @@ const config: ModuleTestConfig = {
         'PO Number',
         'GR Number',
         'Supplier',
-        'Warehouse',
         'Return Date',
         'Reason',
         'Status',
@@ -86,15 +96,21 @@ test.describe('Supplier Returns Module', () => {
     test.beforeEach(async ({ page }) => {
         await login(page, undefined, undefined, { requireDashboard: false });
         await page.goto('/supplier-returns');
-        await page
-            .waitForResponse((response) => response.url().includes('/api/supplier-returns') && response.status() < 400)
-            ;
+        await page.waitForResponse(
+            (response) =>
+                response.url().includes('/api/supplier-returns') &&
+                response.status() < 400,
+        );
     });
 
-    test('add dialog starts with empty items and add item opens a dedicated dialog', async ({ page }) => {
+    test('add dialog starts with empty items and add item opens a dedicated dialog', async ({
+        page,
+    }) => {
         await page.getByRole('button', { name: /^Add$/i }).first().click();
 
-        const dialog = page.getByRole('dialog', { name: /Add New Supplier Return/i });
+        const dialog = page.getByRole('dialog', {
+            name: /Add New Supplier Return/i,
+        });
         const addItemButton = dialog.getByRole('button', { name: /Add Item/i });
 
         await expect(dialog.getByText('No items added yet.')).toBeVisible();
@@ -102,19 +118,30 @@ test.describe('Supplier Returns Module', () => {
 
         await addItemButton.click();
 
-        await expect(page.getByRole('dialog', { name: /^Add Item$/i })).toBeVisible();
+        await expect(
+            page.getByRole('dialog', { name: /^Add Item$/i }),
+        ).toBeVisible();
     });
 
-    test('add dialog item table shows product and unit names after saving item dialog', async ({ page }) => {
+    test('add dialog item table shows product and unit names after saving item dialog', async ({
+        page,
+    }) => {
         const [product, unit] = await Promise.all([
-            getFirstAsyncOption(page, '/api/products?search=Executive%20Office%20Desk'),
+            getFirstAsyncOption(
+                page,
+                '/api/products?search=Executive%20Office%20Desk',
+            ),
             getFirstAsyncOption(page, '/api/units?search=Piece'),
         ]);
 
         await page.getByRole('button', { name: /^Add$/i }).first().click();
 
-        const supplierReturnDialog = page.getByRole('dialog', { name: /Add New Supplier Return/i });
-        await supplierReturnDialog.getByRole('button', { name: /Add Item/i }).click();
+        const supplierReturnDialog = page.getByRole('dialog', {
+            name: /Add New Supplier Return/i,
+        });
+        await supplierReturnDialog
+            .getByRole('button', { name: /Add Item/i })
+            .click();
 
         const itemDialog = page.getByRole('dialog', { name: /^Add Item$/i });
 
@@ -129,14 +156,23 @@ test.describe('Supplier Returns Module', () => {
 
         await expect(firstRow).toContainText(product.name);
         await expect(firstRow).toContainText(unit.name);
-        await expect(firstRow.getByRole('button', { name: /Edit item 1/i })).toBeVisible();
-        await expect(firstRow.getByRole('button', { name: /Remove item 1/i })).toBeVisible();
+        await expect(
+            firstRow.getByRole('button', { name: /Edit item 1/i }),
+        ).toBeVisible();
+        await expect(
+            firstRow.getByRole('button', { name: /Remove item 1/i }),
+        ).toBeVisible();
         await expect(firstRow.getByText(/^Remove$/)).toHaveCount(0);
     });
 
-    test('edit dialog opens dedicated edit item dialog and keeps item labels', async ({ page }) => {
+    test('edit dialog opens dedicated edit item dialog and keeps item labels', async ({
+        page,
+    }) => {
         const [product, unit] = await Promise.all([
-            getFirstAsyncOption(page, '/api/products?search=Executive%20Office%20Desk'),
+            getFirstAsyncOption(
+                page,
+                '/api/products?search=Executive%20Office%20Desk',
+            ),
             getFirstAsyncOption(page, '/api/units?search=Piece'),
         ]);
 
@@ -147,10 +183,15 @@ test.describe('Supplier Returns Module', () => {
         const firstRow = page.locator('tbody tr').first();
 
         // Use force to prevent hanging on Radix UI Dropdown triggers flakily
-        await firstRow.getByRole('button', { name: /actions/i }).last().click({ force: true });
+        await firstRow
+            .getByRole('button', { name: /actions/i })
+            .last()
+            .click({ force: true });
         await page.getByRole('menuitem', { name: 'Edit' }).click();
 
-        const dialog = page.getByRole('dialog', { name: /Edit Supplier Return/i });
+        const dialog = page.getByRole('dialog', {
+            name: /Edit Supplier Return/i,
+        });
         const itemRow = dialog.locator('tbody tr').first();
 
         await expect(itemRow).toContainText(product.name);
@@ -161,8 +202,12 @@ test.describe('Supplier Returns Module', () => {
         const itemDialog = page.getByRole('dialog', { name: /^Edit Item$/i });
 
         await expect(itemDialog).toBeVisible();
-        await expect(itemDialog.getByRole('combobox', { name: 'Product' })).toContainText(product.name);
-        await expect(itemDialog.getByRole('combobox', { name: 'Unit' })).toContainText(unit.name);
+        await expect(
+            itemDialog.getByRole('combobox', { name: 'Product' }),
+        ).toContainText(product.name);
+        await expect(
+            itemDialog.getByRole('combobox', { name: 'Unit' }),
+        ).toContainText(unit.name);
         await expect(itemDialog.getByLabel('GR Item ID')).not.toHaveValue('');
     });
 });
