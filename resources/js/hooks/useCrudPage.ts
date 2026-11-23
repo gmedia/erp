@@ -3,6 +3,7 @@
 import { useCrudFilters, type FilterState } from '@/hooks/useCrudFilters';
 import { useCrudMutations } from '@/hooks/useCrudMutations';
 import { useCrudQuery } from '@/hooks/useCrudQuery';
+import axios from '@/lib/axios';
 import { type ApiError } from '@/utils/errorHandling';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -21,6 +22,8 @@ export interface CrudPageConfig<
     onUpdateSuccess?: () => void;
     onDeleteSuccess?: () => void;
     onError?: (error: ApiError) => void;
+
+    loadDetailOnEdit?: boolean;
 
     // Filter configuration
     initialFilters?: FilterType;
@@ -156,10 +159,37 @@ export function useCrudPage<
         setIsFormOpen(true);
     }, []);
 
-    const handleEdit = useCallback((item: T) => {
-        setSelectedItem(item);
-        setIsFormOpen(true);
-    }, []);
+    const handleEdit = useCallback(
+        (item: T) => {
+            setSelectedItem(item);
+            setIsFormOpen(true);
+
+            if (!config.loadDetailOnEdit) {
+                return;
+            }
+
+            const identifierKey = config.identifierKey || 'id';
+            const id = (item as Record<string, unknown>)[identifierKey];
+            if (id === undefined || id === null) {
+                return;
+            }
+
+            void axios
+                .get(`${config.apiEndpoint}/${String(id)}`)
+                .then((response) => {
+                    const detail = (response.data?.data ?? response.data) as T;
+                    setSelectedItem((current) =>
+                        current &&
+                        (current as Record<string, unknown>)[identifierKey] ===
+                            id
+                            ? detail
+                            : current,
+                    );
+                })
+                .catch(() => undefined);
+        },
+        [config.apiEndpoint, config.identifierKey, config.loadDetailOnEdit],
+    );
 
     const handleDelete = useCallback((item: T) => {
         setItemToDelete(item);

@@ -22,7 +22,7 @@ const stockTransferItemSchema = z.object({
     quantity: z.coerce
         .number()
         .gt(0, { message: 'Quantity must be greater than 0.' }),
-    quantity_received: z.coerce.number().min(0).optional().default(0),
+    quantity_received: z.coerce.number().min(0).optional().nullable(),
     unit_cost: z.coerce.number().min(0).optional().default(0),
     notes: z.string().optional(),
 });
@@ -34,6 +34,7 @@ interface StockTransferItemFormDialogProps {
     readonly onOpenChange: (open: boolean) => void;
     readonly item: StockTransferItemFormData | null;
     readonly onSave: (data: StockTransferItemFormData) => void;
+    readonly locked?: boolean;
 }
 
 export function StockTransferItemFormDialog({
@@ -41,6 +42,7 @@ export function StockTransferItemFormDialog({
     onOpenChange,
     item,
     onSave,
+    locked = false,
 }: Readonly<StockTransferItemFormDialogProps>) {
     const defaultValues = useMemo<StockTransferItemFormData>(() => {
         if (!item) {
@@ -50,7 +52,7 @@ export function StockTransferItemFormDialog({
                 unit_id: '',
                 unit_label: '',
                 quantity: 1,
-                quantity_received: 0,
+                quantity_received: null,
                 unit_cost: 0,
                 notes: '',
             };
@@ -62,11 +64,26 @@ export function StockTransferItemFormDialog({
             unit_id: item.unit_id || '',
             unit_label: item.unit_label || '',
             quantity: Number(item.quantity || 0),
-            quantity_received: Number(item.quantity_received || 0),
+            quantity_received:
+                item.quantity_received === null ||
+                item.quantity_received === undefined
+                    ? null
+                    : Number(item.quantity_received),
             unit_cost: Number(item.unit_cost || 0),
             notes: item.notes || '',
         };
     }, [item]);
+
+    const handleSave = (data: StockTransferItemFormData) => {
+        onSave(
+            locked
+                ? {
+                      ...defaultValues,
+                      quantity_received: data.quantity_received,
+                  }
+                : data,
+        );
+    };
 
     const form = useForm<
         StockTransferItemFormData,
@@ -89,45 +106,74 @@ export function StockTransferItemFormDialog({
             onOpenChange={onOpenChange}
             item={item}
             form={form}
-            onSave={onSave}
+            onSave={handleSave}
             itemDescription="stock transfer item"
         >
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <ItemProductUnitFields
-                    form={form}
-                    open={open}
-                    productInitialId={defaultValues.product_id}
-                    productInitialLabel={defaultValues.product_label}
-                    unitInitialId={defaultValues.unit_id}
-                    unitInitialLabel={defaultValues.unit_label}
-                />
-                <InputField
-                    name="quantity"
-                    label="Quantity"
-                    type="number"
-                    min={0}
-                    step="any"
-                    placeholder="1"
-                />
-                <InputField
-                    name="quantity_received"
-                    label="Quantity Received"
-                    type="number"
-                    min={0}
-                    step="any"
-                    placeholder="0"
-                />
-                <InputField
-                    name="unit_cost"
-                    label="Unit Cost"
-                    type="number"
-                    min={0}
-                    step="any"
-                    placeholder="0"
-                />
-            </div>
+            {locked ? (
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div className="space-y-1 text-sm">
+                        <div className="font-medium">Product</div>
+                        <div>
+                            {defaultValues.product_label ||
+                                defaultValues.product_id}
+                        </div>
+                    </div>
+                    <div className="space-y-1 text-sm">
+                        <div className="font-medium">Unit</div>
+                        <div>
+                            {defaultValues.unit_label || defaultValues.unit_id}
+                        </div>
+                    </div>
+                    <div className="space-y-1 text-sm">
+                        <div className="font-medium">Quantity</div>
+                        <div>{defaultValues.quantity}</div>
+                    </div>
+                    <InputField
+                        name="quantity_received"
+                        label="Quantity Received"
+                        type="number"
+                        min={0}
+                        step="any"
+                    />
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <ItemProductUnitFields
+                        form={form}
+                        open={open}
+                        productInitialId={defaultValues.product_id}
+                        productInitialLabel={defaultValues.product_label}
+                        unitInitialId={defaultValues.unit_id}
+                        unitInitialLabel={defaultValues.unit_label}
+                    />
+                    <InputField
+                        name="quantity"
+                        label="Quantity"
+                        type="number"
+                        min={0}
+                        step="any"
+                        placeholder="1"
+                    />
+                    <InputField
+                        name="quantity_received"
+                        label="Quantity Received"
+                        type="number"
+                        min={0}
+                        step="any"
+                        placeholder="Kosong = diterima penuh"
+                    />
+                    <InputField
+                        name="unit_cost"
+                        label="Unit Cost"
+                        type="number"
+                        min={0}
+                        step="any"
+                        placeholder="0"
+                    />
+                </div>
+            )}
 
-            <ItemNotesField />
+            {!locked && <ItemNotesField />}
         </ItemFormDialogShell>
     );
 }

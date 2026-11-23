@@ -14,6 +14,7 @@ use App\Http\Requests\StockTransfers\UpdateStockTransferRequest;
 use App\Http\Resources\StockTransfers\StockTransferCollection;
 use App\Http\Resources\StockTransfers\StockTransferResource;
 use App\Models\StockTransfer;
+use App\Models\StockTransferItem;
 use App\Services\StockPostingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -111,6 +112,12 @@ class StockTransferController extends Controller
                 ])->status(422);
             }
 
+            // Issue #360 keputusan 3: setelah dispatch, item dan qty kirim terkunci.
+            // Hanya quantity_received yang boleh berubah.
+            if ($wasDispatched && is_array($items) && $nextStatus !== 'cancelled') {
+                $this->assertDispatchedItemsUnchanged($stockTransfer, $items);
+            }
+
             $stockTransfer->update(UpdateStockTransferData::fromArray($validated)->toArray());
 
             // Issue #360 baris 4: pembatalan transfer yang sudah terposting membalik stok,
@@ -179,5 +186,34 @@ class StockTransferController extends Controller
     public function export(ExportStockTransferRequest $request, ExportStockTransfersAction $action): JsonResponse
     {
         return $action->execute($request);
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $items
+     */
+    private function assertDispatchedItemsUnchanged(StockTransfer $stockTransfer, array $items): void
+    {
+        $current = StockTransferItem::query()
+            ->where('stock_transfer_id', $stockTransfer->getKey())
+            ->get(['product_id', 'unit_id', 'quantity'])
+            ->mapWithKeys(fn (StockTransferItem $item): array => [
+                (int) $item->product_id => [(int) $item->unit_id, (float) $item->quantity],
+            ])
+            ->all();
+
+        $incoming = collect($items)
+            ->mapWithKeys(fn (array $item): array => [
+                (int) $item['product_id'] => [(int) $item['unit_id'], (float) $item['quantity']],
+            ])
+            ->all();
+
+        ksort($current);
+        ksort($incoming);
+
+        if ($current !== $incoming) {
+            throw ValidationException::withMessages([
+                'items' => ['Item dan qty kirim tidak bisa diubah setelah transfer dikirim; hanya qty diterima yang bisa diubah.'],
+            ])->status(422);
+        }
     }
 }

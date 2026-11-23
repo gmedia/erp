@@ -17,6 +17,7 @@ import {
 import { InputField } from '@/components/common/InputField';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
+import { Button } from '@/components/ui/button';
 import {
     Table,
     TableBody,
@@ -58,7 +59,7 @@ const createEmptyStockTransferItem =
         unit_id: '',
         unit_label: '',
         quantity: 1,
-        quantity_received: 0,
+        quantity_received: null,
         unit_cost: 0,
         notes: '',
     });
@@ -77,7 +78,7 @@ const normalizeStockTransferItem = (
     quantity_received:
         typeof item?.quantity_received === 'number'
             ? item.quantity_received
-            : 0,
+            : null,
     unit_cost: typeof item?.unit_cost === 'number' ? item.unit_cost : 0,
     notes: typeof item?.notes === 'string' ? item.notes : '',
 });
@@ -127,7 +128,11 @@ const getStockTransferFormDefaults = (
                   unit_id: item.unit?.id ? String(item.unit.id) : '',
                   unit_label: item.unit?.name || '',
                   quantity: Number(item.quantity || 0),
-                  quantity_received: Number(item.quantity_received || 0),
+                  quantity_received:
+                      item.quantity_received === null ||
+                      item.quantity_received === undefined
+                          ? null
+                          : Number(item.quantity_received),
                   unit_cost: Number(item.unit_cost || 0),
                   notes: item.notes || '',
               }))
@@ -147,6 +152,9 @@ export const StockTransferForm = memo<StockTransferFormProps>(
     }) {
         const activeStockTransfer = stockTransfer || item || entity;
         const loadedIdRef = useRef<number | null>(null);
+        const itemsLocked =
+            activeStockTransfer?.status === 'in_transit' ||
+            activeStockTransfer?.status === 'received';
 
         const defaultValues = useMemo(
             () => getStockTransferFormDefaults(activeStockTransfer),
@@ -340,9 +348,13 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                 </div>
 
                 <div className="mt-2 space-y-3 border-t pt-4">
-                    <EntityFormItemSectionHeader
-                        onAddItem={handleCreateNewItem}
-                    />
+                    {itemsLocked ? (
+                        <div className="text-sm font-semibold">Items</div>
+                    ) : (
+                        <EntityFormItemSectionHeader
+                            onAddItem={handleCreateNewItem}
+                        />
+                    )}
 
                     <div className="rounded-md border">
                         <Table>
@@ -402,6 +414,7 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                                                 </TableCell>
                                                 <TableCell>
                                                     {stockTransferItem.quantity_received ??
+                                                        stockTransferItem.quantity ??
                                                         0}
                                                 </TableCell>
                                                 <TableCell>
@@ -412,11 +425,29 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                                                     {stockTransferItem.notes ||
                                                         '-'}
                                                 </TableCell>
-                                                <EntityFormItemActionsCell
-                                                    index={index}
-                                                    onEdit={handleEditItem}
-                                                    onRemove={remove}
-                                                />
+                                                {itemsLocked ? (
+                                                    <TableCell className="text-right">
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() =>
+                                                                handleEditItem(
+                                                                    index,
+                                                                )
+                                                            }
+                                                            aria-label={`Edit received qty item ${index + 1}`}
+                                                        >
+                                                            Qty Received
+                                                        </Button>
+                                                    </TableCell>
+                                                ) : (
+                                                    <EntityFormItemActionsCell
+                                                        index={index}
+                                                        onEdit={handleEditItem}
+                                                        onRemove={remove}
+                                                    />
+                                                )}
                                             </TableRow>
                                         );
                                     })
@@ -431,6 +462,7 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                     onOpenChange={handleItemDialogOpenChange}
                     item={selectedItem}
                     onSave={handleSaveItem}
+                    locked={itemsLocked}
                 />
             </EntityForm>
         );

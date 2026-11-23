@@ -294,6 +294,61 @@ describe('Issue #360: update quantity setelah dispatch tidak menggandakan moveme
     });
 });
 
+describe('Issue #360 keputusan 3: item dan qty kirim terkunci setelah dispatch', function () {
+    test('mengubah quantity setelah in_transit ditolak 422 dan tidak ada movement tambahan', function () {
+        [$transfer, $from, $to, $product, $unit] = issue360Transfer(10, 5);
+
+        putJson("/api/stock-transfers/{$transfer->id}", issue360Payload('in_transit', $product->id, $unit->id))->assertOk();
+        $movements = StockMovement::query()->count();
+
+        putJson("/api/stock-transfers/{$transfer->id}", [
+            'items' => [['product_id' => $product->id, 'unit_id' => $unit->id, 'quantity' => 7]],
+        ])->assertStatus(422)->assertJsonValidationErrors(['items']);
+
+        expect(StockMovement::query()->count())->toBe($movements)
+            ->and(issue360Net($from->id, $product->id))->toBe(5.0);
+    });
+
+    test('mengganti produk setelah in_transit ditolak 422', function () {
+        [$transfer, , , $product, $unit] = issue360Transfer(10, 5);
+        $other = Product::factory()->create();
+
+        putJson("/api/stock-transfers/{$transfer->id}", issue360Payload('in_transit', $product->id, $unit->id))->assertOk();
+
+        putJson("/api/stock-transfers/{$transfer->id}", [
+            'items' => [['product_id' => $other->id, 'unit_id' => $unit->id, 'quantity' => 5]],
+        ])->assertStatus(422)->assertJsonValidationErrors(['items']);
+    });
+
+    test('quantity_received setelah in_transit tetap boleh diubah pada saat received', function () {
+        [$transfer, , $to, $product, $unit] = issue360Transfer(5, 5);
+
+        putJson("/api/stock-transfers/{$transfer->id}", issue360Payload('in_transit', $product->id, $unit->id))->assertOk();
+        putJson("/api/stock-transfers/{$transfer->id}", issue360Payload('received', $product->id, $unit->id, 4.0))->assertOk();
+
+        expect(issue360Net($to->id, $product->id))->toBe(4.0);
+    });
+
+    test('PUT received dengan quantity_received null (kosong di UI) = diterima penuh', function () {
+        [$transfer, , $to, $product, $unit] = issue360Transfer(5, 5);
+
+        putJson("/api/stock-transfers/{$transfer->id}", issue360Payload('in_transit', $product->id, $unit->id))->assertOk();
+        putJson("/api/stock-transfers/{$transfer->id}", [
+            'status' => 'received',
+            'items' => [['product_id' => $product->id, 'unit_id' => $unit->id, 'quantity' => 5, 'quantity_received' => null]],
+        ])->assertOk();
+
+        expect(issue360Net($to->id, $product->id))->toBe(5.0);
+    });
+
+    test('PUT tanpa items setelah in_transit tetap diizinkan (hanya status)', function () {
+        [$transfer, , , $product, $unit] = issue360Transfer(5, 5);
+
+        putJson("/api/stock-transfers/{$transfer->id}", issue360Payload('in_transit', $product->id, $unit->id))->assertOk();
+        putJson("/api/stock-transfers/{$transfer->id}", ['notes' => 'catatan'])->assertOk();
+    });
+});
+
 describe('Issue #360: DELETE dan PUT setara untuk pembatalan posted', function () {
     test('DELETE pada received membalik dua sisi', function () {
         [$transfer, $from, $to, $product, $unit] = issue360Transfer(5, 5);

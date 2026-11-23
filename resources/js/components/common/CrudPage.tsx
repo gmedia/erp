@@ -42,6 +42,7 @@ export interface CrudPageConfig<
     description?: string;
     breadcrumbs: BreadcrumbItem[];
     identifierKey?: string;
+    loadDetailOnEdit?: boolean;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     DataTableComponent: React.ComponentType<any>;
@@ -115,6 +116,7 @@ export function CrudPage<
         identifierKey: config.identifierKey,
         initialPagination: config.initialPagination,
         getDeleteMessage: config.getDeleteMessage,
+        loadDetailOnEdit: config.loadDetailOnEdit,
     });
 
     // Prepare data table props

@@ -108,6 +108,7 @@ export function createEntityCrudPage<T extends object>(
                         identifierKey: config.identifierKey,
                         breadcrumbs: [...config.breadcrumbs],
                         initialFilters: config.initialFilters,
+                        loadDetailOnEdit: config.loadDetailOnEdit,
 
                         DataTableComponent: DataTable,
                         FormComponent: config.formComponent,
