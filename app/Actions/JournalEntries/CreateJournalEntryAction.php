@@ -2,6 +2,7 @@
 
 namespace App\Actions\JournalEntries;
 
+use App\Models\Account;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
 use App\Services\InterBranchClearingService;
@@ -46,6 +47,8 @@ class CreateJournalEntryAction
                     'lines' => 'Journal entry is not balanced (debit must equal credit).',
                 ]);
             }
+
+            $this->assertLinesUseActiveAccounts($data['lines']);
         }
 
         while ($attempts < $maxAttempts) {
@@ -160,5 +163,31 @@ class CreateJournalEntryAction
         }
 
         throw new Exception("Failed to create journal entry after {$maxAttempts} attempts.");
+    }
+
+    /**
+     * Jurnal posted hanya boleh memakai akun aktif dari COA version aktif (#357).
+     * Akun COA archived/nonaktif ditolak dengan 422 agar tidak menggandakan saldo lama.
+     *
+     * @param  array<int, array<string, mixed>>  $lines
+     */
+    private function assertLinesUseActiveAccounts(array $lines): void
+    {
+        $accountIds = array_values(array_unique(array_map(
+            fn (array $line): int => (int) $line['account_id'],
+            $lines,
+        )));
+
+        $activeCount = Account::query()
+            ->whereIn('id', $accountIds)
+            ->where('is_active', true)
+            ->whereHas('coaVersion', fn ($query) => $query->where('status', 'active'))
+            ->count();
+
+        if ($activeCount !== count($accountIds)) {
+            throw ValidationException::withMessages([
+                'lines' => 'Journal entry uses an account that is inactive or outside the active COA version.',
+            ]);
+        }
     }
 }

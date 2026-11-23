@@ -48,13 +48,18 @@ class ApSampleDataSeeder extends Seeder
             return;
         }
 
+        // Hanya akun dari COA version aktif: akun COA archived tidak boleh dipakai posting.
+        $activeCoaVersionId = CoaVersion::query()->where('status', 'active')->value('id');
+
         $expenseAccounts = Account::query()
+            ->where('coa_version_id', $activeCoaVersionId)
             ->where('type', 'expense')
             ->where('is_active', true)
             ->take(3)
             ->get();
 
         $assetAccounts = Account::query()
+            ->where('coa_version_id', $activeCoaVersionId)
             ->where('type', 'asset')
             ->where('is_active', true)
             ->take(2)
@@ -342,16 +347,14 @@ class ApSampleDataSeeder extends Seeder
             ],
         ];
 
-        // Akun harus dari COA versi tahun fiskal ini agar posting sejalan dengan
-        // laporan (W6-06). Transfer bank memakai akun bank (11110), bukan Cash.
-        $coaVersionId = CoaVersion::query()
-            ->where('fiscal_year_id', $fiscalYearId)
-            ->orderByRaw("CASE status WHEN 'active' THEN 0 ELSE 1 END")
-            ->value('id');
+        // Akun bank harus dari COA version aktif agar posting sejalan dengan laporan
+        // (W6-06). Transfer bank memakai akun bank (11110), bukan Cash.
+        $activeCoaVersionId = CoaVersion::query()->where('status', 'active')->value('id');
 
         $bankAccount = Account::query()
-            ->when($coaVersionId, fn ($query) => $query->where('coa_version_id', $coaVersionId))
+            ->where('coa_version_id', $activeCoaVersionId)
             ->where('code', '11110')
+            ->where('is_active', true)
             ->first();
 
         $billAllocations = [];
