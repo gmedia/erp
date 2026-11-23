@@ -48,6 +48,7 @@ abstract class AbstractApPaymentRequest extends AuthorizedFormRequest
         $validator->after(function ($validator): void {
             $allocations = $this->input('allocations', []);
             $paymentId = $this->route('apPayment')?->id;
+            $supplierId = (int) $this->input('supplier_id');
 
             foreach ($allocations as $index => $allocation) {
                 if (empty($allocation['supplier_bill_id']) || empty($allocation['allocated_amount'])) {
@@ -56,6 +57,15 @@ abstract class AbstractApPaymentRequest extends AuthorizedFormRequest
 
                 $bill = SupplierBill::find($allocation['supplier_bill_id']);
                 if ($bill === null) {
+                    continue;
+                }
+
+                if ($supplierId !== 0 && (int) $bill->supplier_id !== $supplierId) {
+                    $validator->errors()->add(
+                        "allocations.{$index}.supplier_bill_id",
+                        'Supplier Bill does not belong to the selected supplier.',
+                    );
+
                     continue;
                 }
 

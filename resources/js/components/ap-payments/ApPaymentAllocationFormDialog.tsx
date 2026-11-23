@@ -5,11 +5,13 @@ import { useMemo } from 'react';
 import { type Resolver, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { InputField } from '@/components/common/InputField';
 import { ItemFormDialogShell } from '@/components/common/ItemFormDialog';
 import { TextareaField } from '@/components/common/TextareaField';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type ApPaymentFormData } from '@/types/ap-payment';
+import { type SupplierBill } from '@/types/supplier-bill';
 
 const apPaymentAllocationSchema = z.object({
     supplier_bill_id: z.string().min(1, { message: 'Bill is required.' }),
@@ -28,13 +30,18 @@ interface ApPaymentAllocationFormDialogProps {
     readonly onOpenChange: (open: boolean) => void;
     readonly item: ApPaymentAllocationFormData | null;
     readonly onSave: (data: ApPaymentAllocationFormData) => void;
+    readonly supplierId?: string;
 }
+
+const billLabel = (bill: SupplierBill): string =>
+    `${bill.bill_number ?? String(bill.id)} — ${bill.amount_due}`;
 
 export function ApPaymentAllocationFormDialog({
     open,
     onOpenChange,
     item,
     onSave,
+    supplierId,
 }: ApPaymentAllocationFormDialogProps) {
     const defaultValues = useMemo<ApPaymentAllocationFormData>(() => {
         if (!item) {
@@ -81,12 +88,27 @@ export function ApPaymentAllocationFormDialog({
             itemDescription="payment allocation"
         >
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <InputField
-                    name="supplier_bill_id"
-                    label="Supplier Bill ID"
-                    placeholder="Supplier Bill ID"
-                    disabled
-                />
+                {supplierId ? (
+                    <AsyncSelectField<SupplierBill>
+                        name="supplier_bill_id"
+                        label="Supplier Bill"
+                        placeholder="Select Supplier Bill"
+                        url={`/api/supplier-bills?supplier_id=${supplierId}`}
+                        labelFn={billLabel}
+                        valueFn={(bill) => String(bill.id)}
+                        onItemSelect={(bill) => {
+                            form.setValue('bill_label', bill.bill_number ?? '');
+                            form.setValue(
+                                'allocated_amount',
+                                Number(bill.amount_due),
+                            );
+                        }}
+                    />
+                ) : (
+                    <p className="text-sm text-muted-foreground md:col-span-2">
+                        Select a supplier first to choose a bill.
+                    </p>
+                )}
                 <InputField
                     name="allocated_amount"
                     label="Allocated Amount"

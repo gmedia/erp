@@ -117,6 +117,7 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
     });
     const watchedAllocations = form.watch('allocations');
     const selectedCurrency = form.watch('currency');
+    const selectedCustomerId = form.watch('customer_id');
     const {
         isItemDialogOpen,
         item: selectedItem,
@@ -309,6 +310,7 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
                 onOpenChange={handleItemDialogOpenChange}
                 item={selectedItem}
                 onSave={handleSaveItem}
+                customerId={selectedCustomerId}
             />
         </>
     );

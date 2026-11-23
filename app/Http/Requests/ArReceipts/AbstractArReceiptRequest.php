@@ -50,6 +50,8 @@ abstract class AbstractArReceiptRequest extends AuthorizedFormRequest
         $validator->after(function ($validator): void {
             $receiptId = $this->route('arReceipt')?->id;
 
+            $this->validateAllocationCustomerMatch($validator);
+
             $this->validateAllocationOverflow(
                 $validator,
                 'allocations',
@@ -69,6 +71,34 @@ abstract class AbstractArReceiptRequest extends AuthorizedFormRequest
         return [
             'total_amount' => $this->withSometimes(['required', 'numeric', 'gt:0']),
         ];
+    }
+
+    private function validateAllocationCustomerMatch(Validator $validator): void
+    {
+        $customerId = (int) $this->input('customer_id');
+
+        if ($customerId === 0) {
+            return;
+        }
+
+        foreach ($this->input('allocations', []) as $index => $allocation) {
+            $invoiceId = $allocation['customer_invoice_id'] ?? null;
+
+            if (empty($invoiceId)) {
+                continue;
+            }
+
+            $belongsToCustomer = CustomerInvoice::whereKey($invoiceId)
+                ->where('customer_id', $customerId)
+                ->exists();
+
+            if (! $belongsToCustomer) {
+                $validator->errors()->add(
+                    "allocations.{$index}.customer_invoice_id",
+                    'Customer Invoice does not belong to the selected customer.',
+                );
+            }
+        }
     }
 
     private function maxInvoiceAllocation(

@@ -7,6 +7,7 @@ import { useMemo } from 'react';
 import { type Resolver, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { InputField } from '@/components/common/InputField';
 import {
     ItemFormDialogShell,
@@ -14,6 +15,7 @@ import {
 } from '@/components/common/ItemFormDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type ArReceiptFormData } from '@/types/ar-receipt';
+import { type CustomerInvoice } from '@/types/customer-invoice';
 
 const arReceiptAllocationSchema = z.object({
     customer_invoice_id: z
@@ -34,13 +36,18 @@ interface ArReceiptAllocationFormDialogProps {
     readonly onOpenChange: (open: boolean) => void;
     readonly item: ArReceiptAllocationFormData | null;
     readonly onSave: (data: ArReceiptAllocationFormData) => void;
+    readonly customerId?: string;
 }
+
+const invoiceLabel = (invoice: CustomerInvoice): string =>
+    `${invoice.invoice_number ?? String(invoice.id)} — ${invoice.amount_due}`;
 
 export function ArReceiptAllocationFormDialog({
     open,
     onOpenChange,
     item,
     onSave,
+    customerId,
 }: ArReceiptAllocationFormDialogProps) {
     const defaultValues = useMemo<ArReceiptAllocationFormData>(() => {
         if (!item) {
@@ -87,11 +94,30 @@ export function ArReceiptAllocationFormDialog({
             itemDescription="allocation"
         >
             <div className="grid grid-cols-1 gap-4">
-                <InputField
-                    name="customer_invoice_id"
-                    label="Customer Invoice"
-                    placeholder="Select Customer Invoice"
-                />
+                {customerId ? (
+                    <AsyncSelectField<CustomerInvoice>
+                        name="customer_invoice_id"
+                        label="Customer Invoice"
+                        placeholder="Select Customer Invoice"
+                        url={`/api/customer-invoices?customer_id=${customerId}`}
+                        labelFn={invoiceLabel}
+                        valueFn={(invoice) => String(invoice.id)}
+                        onItemSelect={(invoice) => {
+                            form.setValue(
+                                'invoice_label',
+                                invoice.invoice_number ?? '',
+                            );
+                            form.setValue(
+                                'allocated_amount',
+                                Number(invoice.amount_due),
+                            );
+                        }}
+                    />
+                ) : (
+                    <p className="text-sm text-muted-foreground">
+                        Select a customer first to choose an invoice.
+                    </p>
+                )}
                 <InputField
                     name="allocated_amount"
                     label="Allocated Amount"

@@ -132,6 +132,7 @@ export const ApPaymentForm = memo<ApPaymentFormProps>(function ApPaymentForm({
     });
     const watchedAllocations = form.watch('allocations');
     const selectedCurrency = form.watch('currency');
+    const selectedSupplierId = form.watch('supplier_id');
     const {
         isItemDialogOpen,
         item: selectedItem,
@@ -350,6 +351,7 @@ export const ApPaymentForm = memo<ApPaymentFormProps>(function ApPaymentForm({
                 onOpenChange={handleItemDialogOpenChange}
                 item={selectedItem}
                 onSave={handleSaveItem}
+                supplierId={selectedSupplierId}
             />
         </EntityForm>
     );
