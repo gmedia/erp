@@ -232,7 +232,7 @@ test.describe('Admin Settings', () => {
     });
 
     test('SVG with embedded script is not executed', async ({ page }) => {
-        const scriptMarker = 'csp-svg-script-executed';
+        const scriptMarker = 'cspSvgScriptExecuted';
         const maliciousSvg = Buffer.from(
             `<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10">` +
                 `<script>window.${scriptMarker} = true;</script>` +

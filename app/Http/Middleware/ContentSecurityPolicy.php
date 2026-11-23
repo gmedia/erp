@@ -4,7 +4,9 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 class ContentSecurityPolicy
 {
@@ -56,16 +58,21 @@ class ContentSecurityPolicy
     }
 
     /**
-     * Origin (scheme://host[:port]) of the active storage disk, so images
-     * served from object storage (e.g. S3/MinIO) are allowed. Returns null
-     * when the disk has no usable http(s) URL, so no wildcard is ever added.
+     * Origin (scheme://host[:port]) of the URLs the active storage disk really
+     * generates, so images served from object storage (S3/MinIO) are allowed.
+     * Uses Storage::url() only (no network I/O). Returns null when the disk
+     * cannot be built or produces no http(s) URL, so no wildcard is added.
      */
     protected function storageImageOrigin(): ?string
     {
-        $diskName = (string) config('filesystems.default', 'local');
-        $url = config("filesystems.disks.{$diskName}.url");
+        try {
+            $url = Storage::disk((string) config('filesystems.default', 'local'))
+                ->url('csp-origin-probe');
+        } catch (Throwable) {
+            return null;
+        }
 
-        if (! is_string($url) || $url === '') {
+        if ($url === '') {
             return null;
         }
 

@@ -7,7 +7,13 @@ use Illuminate\Support\Facades\Storage;
 uses()->group('security-csp');
 
 beforeEach(function () {
-    Storage::forgetDisk(['local', 'public', 's3']);
+    // S3 client needs credentials to be built; url() never calls the network.
+    config()->set('filesystems.disks.s3.key', 'test-key');
+    config()->set('filesystems.disks.s3.secret', 'test-secret');
+    config()->set('filesystems.disks.s3.region', 'us-east-1');
+    config()->set('filesystems.disks.s3.bucket', 'erp-bucket');
+
+    Storage::forgetDisk(['local', 'public', 's3', 'broken']);
 });
 
 /**
@@ -71,6 +77,38 @@ test('non http disk url never adds a scheme wildcard', function () {
     config()->set('filesystems.default', 'public');
     config()->set('filesystems.disks.public.url', 'javascript://evil.example.com/storage');
     Storage::forgetDisk('public');
+
+    expect(cspImgSrc())->toBe("img-src 'self' data:");
+});
+
+test('s3 disk without configured url uses the endpoint origin', function () {
+    config()->set('filesystems.default', 's3');
+    config()->set('filesystems.disks.s3.url', null);
+    config()->set('filesystems.disks.s3.endpoint', 'https://minio.example.com:9000');
+    config()->set('filesystems.disks.s3.use_path_style_endpoint', true);
+    config()->set('filesystems.disks.s3.bucket', 'erp-bucket');
+    Storage::forgetDisk('s3');
+
+    expect(cspImgSrc())->toBe("img-src 'self' data: https://minio.example.com:9000");
+});
+
+test('s3 disk with virtual-host style endpoint uses the bucket host origin', function () {
+    config()->set('filesystems.default', 's3');
+    config()->set('filesystems.disks.s3.url', null);
+    config()->set('filesystems.disks.s3.endpoint', null);
+    config()->set('filesystems.disks.s3.use_path_style_endpoint', false);
+    Storage::forgetDisk('s3');
+
+    $imgSrc = cspImgSrc();
+
+    expect($imgSrc)->toStartWith("img-src 'self' data: https://erp-bucket.s3.")
+        ->and($imgSrc)->not->toContain('*');
+});
+
+test('disk that fails to build adds no origin and does not break the policy', function () {
+    config()->set('filesystems.default', 'broken');
+    config()->set('filesystems.disks.broken', ['driver' => 'unsupported-driver']);
+    Storage::forgetDisk('broken');
 
     expect(cspImgSrc())->toBe("img-src 'self' data:");
 });
