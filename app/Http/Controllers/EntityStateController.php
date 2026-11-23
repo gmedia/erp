@@ -107,6 +107,13 @@ class EntityStateController extends Controller
 
         $transition = PipelineTransition::findOrFail($request->validated('transition_id'));
 
+        // Users reaching this endpoint via a document module permission (not `pipeline`)
+        // may only run transitions that declare an explicit required_permission.
+        $hasPipelinePermission = auth()->user()?->employee?->hasPermission('pipeline') ?? false;
+        if (! $hasPipelinePermission && ! $transition->required_permission) {
+            abort(403, 'You do not have permission to execute this transition.');
+        }
+
         $updatedState = $this->executeTransitionAction->execute(
             $entityState,
             $transition,
