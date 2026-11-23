@@ -1125,6 +1125,8 @@ export const approvalDelegationConfig =
     createComplexEntityConfig<ApprovalDelegation>({
         entityName: 'Approval Delegation',
         entityNamePlural: 'Approval Delegations',
+        description:
+            'Delegations that let another user approve on your behalf for a period.',
         apiEndpoint: '/api/approval-delegations',
         exportEndpoint: '/api/approval-delegations/export',
         queryKey: ['approval-delegations'],
@@ -1316,6 +1318,8 @@ export const bankReconciliationConfig =
     createComplexEntityConfig<BankReconciliation>({
         entityName: 'Bank Reconciliation',
         entityNamePlural: 'Bank Reconciliations',
+        description:
+            'Match bank statement balances with the books for each account.',
         apiEndpoint: '/api/bank-reconciliations',
         exportEndpoint: '/api/bank-reconciliations/export',
         queryKey: ['bank-reconciliations'],
@@ -1373,6 +1377,8 @@ export const reportConfigurationConfig =
     createComplexEntityConfig<ReportConfiguration>({
         entityName: 'Report Configuration',
         entityNamePlural: 'Report Configurations',
+        description:
+            'Settings that define how each report is generated and displayed.',
         apiEndpoint: '/api/report-configurations',
         exportEndpoint: '/api/report-configurations/export',
         queryKey: ['report-configurations'],

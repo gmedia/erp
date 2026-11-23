@@ -1,4 +1,5 @@
 import { AsyncSelect } from '@/components/common/AsyncSelect';
+import { ReportPageDescription } from '@/components/common/ReportDataTablePage';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import {
@@ -64,6 +65,8 @@ type FinancialAmountColumn<TItem extends FinancialTableRow> = {
 
 type SingleYearFinancialReportPageShellProps = {
     title: string;
+    description?: string;
+    descriptionKey?: string;
     path: string;
     fiscalYears: FinancialReportFiscalYear[];
     selectedYearId: number;
@@ -210,6 +213,8 @@ export function useSingleYearFinancialReportPage<TReport>({
 
 export function SingleYearFinancialReportPageShell({
     title,
+    description,
+    descriptionKey,
     path,
     fiscalYears,
     selectedYearId,
@@ -244,6 +249,17 @@ export function SingleYearFinancialReportPageShell({
                         <h1 className="text-2xl font-bold tracking-tight">
                             {title}
                         </h1>
+                        {descriptionKey ? (
+                            <p className="text-sm text-muted-foreground md:text-base">
+                                <ReportPageDescription
+                                    descriptionKey={descriptionKey}
+                                />
+                            </p>
+                        ) : description ? (
+                            <p className="text-sm text-muted-foreground md:text-base">
+                                {description}
+                            </p>
+                        ) : null}
                         {headerMeta}
                     </div>
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">

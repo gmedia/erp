@@ -15,6 +15,7 @@ export default function ArOutstandingReportPage() {
     return (
         <ReportDataTablePage<ArOutstandingReportItem>
             title="AR Outstanding Report"
+            descriptionKey="reports.pageDescriptions.ar-outstanding"
             breadcrumbs={createReportBreadcrumbs(
                 'AR Outstanding',
                 '/reports/ar-outstanding',

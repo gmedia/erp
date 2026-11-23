@@ -44,6 +44,7 @@ type ReportDataTablePageProps<
 > = {
     title: string;
     description?: string;
+    descriptionKey?: string;
     breadcrumbs: BreadcrumbItem[];
     columns: ColumnDef<TData>[];
     filterFields: FieldDescriptor[];
@@ -78,6 +79,14 @@ function formatSummaryAmount(value: string | undefined): string {
     }
 
     return formatCurrencyByRegionalSettings(value);
+}
+
+export function ReportPageDescription({
+    descriptionKey,
+}: Readonly<{ descriptionKey: string }>) {
+    const { t } = useTranslation();
+
+    return <>{t(descriptionKey)}</>;
 }
 
 function ReportSummaryFooter({
@@ -174,6 +183,7 @@ export function ReportDataTablePage<
 >({
     title,
     description,
+    descriptionKey,
     breadcrumbs,
     columns,
     filterFields,
@@ -222,7 +232,18 @@ export function ReportDataTablePage<
             </Helmet>
             <AppLayout breadcrumbs={breadcrumbs}>
                 <div className="flex w-full flex-col gap-3 overflow-x-auto p-4">
-                    <PageHeader title={title} description={description} />
+                    <PageHeader
+                        title={title}
+                        description={
+                            descriptionKey ? (
+                                <ReportPageDescription
+                                    descriptionKey={descriptionKey}
+                                />
+                            ) : (
+                                description
+                            )
+                        }
+                    />
                     {ready ? null : (
                         <ReportSelectFilterPrompt
                             hintKey={requiredFilterHintKey}

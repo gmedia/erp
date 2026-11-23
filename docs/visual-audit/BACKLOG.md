@@ -26,7 +26,7 @@ Kerjakan berurutan G1 → G6. Bukti fixed: invarian Pest `demo-integrity` (data/
 | W7-G2 | P1  | W7-04                             | Stok: posting movement konsisten untuk GR/retur/transfer/adjustment                    | **in review #353** |
 | W7-G3 | P1  | W7-05, W7-06                      | Aset tetap, depresiasi & angka lintas laporan                                          | **in review #354** (W7-05 fixed, W7-06 partial) |
 | W7-G4 | P1  | W7-07, W7-08, W7-09, W7-10, W7-11 | UI tabel & format: digit tertutup, nilai mentah, formatter, tone status, mobile        | partial #343 (sisa di FINDINGS) |
-| W7-G5 | P2  | W7-12, W7-13, W7-14               | UI shell, pola report & dashboard                                                      | partial #344 (W7-12a, W7-12b, W7-12c; sisa W7-13, W7-14) |
+| W7-G5 | P2  | W7-12, W7-13, W7-14               | UI shell, pola report & dashboard                                                      | partial #344 (W7-12a, W7-12b, W7-12c, W7-13 poin 4/5; sisa W7-13 terjemahan CRUD id, W7-14) |
 | W7-G6 | P2  | W7-15, W7-16, W7-17               | Seeder: nilai realistis, audit trail/approval, kode & bahasa                           | open #345 |
 
 ## Wave 5 fix groups (dari `FINDINGS.md` W5-xx, #319)

@@ -75,6 +75,7 @@ export default function TrialBalance() {
     return (
         <SingleYearFinancialReportPageShell
             title="Trial Balance"
+            descriptionKey="reports.pageDescriptions.trial-balance"
             path="/reports/trial-balance"
             fiscalYears={fiscalYears}
             selectedYearId={selectedYearId}
