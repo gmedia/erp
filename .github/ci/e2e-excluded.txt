@@ -9,7 +9,6 @@ budgets
 customer-statement-report
 financial-dashboard
 fiscal-year-auto-select
-misc
 per-branch-financial-reports
 social-login
 vehicle-loans
