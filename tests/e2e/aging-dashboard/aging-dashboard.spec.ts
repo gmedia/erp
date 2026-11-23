@@ -19,7 +19,7 @@ test.describe('Aging Dashboard', () => {
         await waitForAgingDashboardData(page);
 
         await expect(
-            page.getByRole('heading', { name: 'Accounts Aging Overview' }),
+            page.getByRole('heading', { name: 'Aging Dashboard', exact: true }),
         ).toBeVisible();
 
         const cards = [
@@ -85,11 +85,13 @@ test.describe('Aging Dashboard', () => {
         await page.goto('/aging-dashboard');
         await waitForAgingDashboardData(page);
 
-        await page.getByRole('button', { name: 'Refresh Data' }).click();
+        await page
+            .getByRole('button', { name: 'Refresh', exact: true })
+            .click();
         await waitForAgingDashboardData(page);
 
         await expect(
-            page.getByRole('heading', { name: 'Accounts Aging Overview' }),
+            page.getByRole('heading', { name: 'Aging Dashboard', exact: true }),
         ).toBeVisible();
     });
 

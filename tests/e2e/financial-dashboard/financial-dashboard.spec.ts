@@ -60,7 +60,7 @@ test.describe('Financial Dashboard', () => {
     await dataPromise;
 
     const refreshPromise = waitForFinancialDashboardData(page);
-    await page.getByRole('button', { name: 'Refresh Data' }).click();
+    await page.getByRole('button', { name: 'Refresh', exact: true }).click();
     await refreshPromise;
 
     await expect(page.getByRole('heading', { name: 'Financial Overview' })).toBeVisible();

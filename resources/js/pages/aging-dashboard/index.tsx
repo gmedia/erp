@@ -72,7 +72,7 @@ export default function AgingDashboard() {
     return (
         <DashboardPageShell
             title="Aging Dashboard"
-            heading="Accounts Aging Overview"
+            heading="Aging Dashboard"
             description="Monitor outstanding receivables and payables bucketed by overdue age."
             breadcrumbs={breadcrumbs}
             toolbar={
