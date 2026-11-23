@@ -35,10 +35,10 @@ class IndexGoodsReceiptReportAction extends ConfiguredPurchaseOrderReportIndexAc
                 ],
                 [
                     'COUNT(DISTINCT gri.id) as item_count',
-                    'COALESCE(SUM(gri.quantity_received), 0) as total_received_quantity',
-                    'COALESCE(SUM(gri.quantity_accepted), 0) as total_accepted_quantity',
-                    'COALESCE(SUM(gri.quantity_rejected), 0) as total_rejected_quantity',
-                    'COALESCE(SUM(gri.quantity_received * gri.unit_price), 0) as total_receipt_value',
+                    "COALESCE(SUM(CASE WHEN gr.status = 'cancelled' THEN 0 ELSE gri.quantity_received END), 0) as total_received_quantity",
+                    "COALESCE(SUM(CASE WHEN gr.status = 'cancelled' THEN 0 ELSE gri.quantity_accepted END), 0) as total_accepted_quantity",
+                    "COALESCE(SUM(CASE WHEN gr.status = 'cancelled' THEN 0 ELSE gri.quantity_rejected END), 0) as total_rejected_quantity",
+                    "COALESCE(SUM(CASE WHEN gr.status = 'cancelled' THEN 0 ELSE gri.quantity_received * gri.unit_price END), 0) as total_receipt_value",
                 ],
             ))
             ->groupBy($this->purchaseOrderGroupedColumns([

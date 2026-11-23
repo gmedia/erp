@@ -229,7 +229,9 @@ class ArSampleDataSeeder extends Seeder
                     'grand_total' => $definition['grand_total'],
                     'amount_received' => $definition['amount_received'],
                     'credit_note_amount' => $definition['credit_note_amount'],
-                    'amount_due' => $definition['grand_total'] - $definition['amount_received'] - $definition['credit_note_amount'],
+                    'amount_due' => in_array($definition['status'], ['draft', 'cancelled', 'void'], true)
+                        ? 0
+                        : $definition['grand_total'] - $definition['amount_received'] - $definition['credit_note_amount'],
                     'status' => $definition['status'],
                     'notes' => 'Invoice penjualan sesuai pesanan pelanggan',
                     'journal_entry_id' => null,

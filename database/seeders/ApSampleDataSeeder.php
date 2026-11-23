@@ -201,7 +201,9 @@ class ApSampleDataSeeder extends Seeder
                     'discount_amount' => $discountAmount,
                     'grand_total' => $grandTotal,
                     'amount_paid' => 0,
-                    'amount_due' => $grandTotal,
+                    'amount_due' => in_array($definition['status'], ['draft', 'cancelled', 'void'], true)
+                        ? 0
+                        : $grandTotal,
                     'status' => $definition['status'],
                     'notes' => 'Tagihan supplier atas pembelian barang',
                     'created_by' => $adminUserId,

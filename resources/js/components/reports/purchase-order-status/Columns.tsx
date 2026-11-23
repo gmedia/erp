@@ -21,7 +21,8 @@ export type PurchaseOrderStatusReportItem = {
             | 'not_started'
             | 'outstanding'
             | 'partially_received'
-            | 'closed';
+            | 'closed'
+            | 'cancelled';
     };
     supplier: {
         id: number;

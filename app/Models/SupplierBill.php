@@ -202,6 +202,19 @@ class SupplierBill extends Model
         }
     }
 
+    /**
+     * Draft, cancelled and void bills are not payable, so they never expose
+     * an outstanding balance regardless of the stored column.
+     */
+    public function getAmountDueAttribute(mixed $value): mixed
+    {
+        if (in_array($this->status, ['draft', 'cancelled', 'void'], true)) {
+            return '0.00';
+        }
+
+        return $value;
+    }
+
     protected function casts(): array
     {
         return [
