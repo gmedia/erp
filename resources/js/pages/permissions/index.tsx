@@ -2,6 +2,7 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { EmployeeSelector } from '@/components/permissions/EmployeeSelector';
 import { PermissionManager } from '@/components/permissions/PermissionManager';
 import { Card, CardContent } from '@/components/ui/card';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useEmployeePermissions } from '@/hooks/permissions/useEmployeePermissions';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
@@ -10,6 +11,21 @@ import { Permission } from '@/types/permission';
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { FormProvider, useForm } from 'react-hook-form';
+
+function PermissionsEmptyState() {
+    const { t } = useTranslation();
+
+    return (
+        <div className="flex flex-col items-center justify-center gap-2 rounded-md border border-dashed p-8 text-center">
+            <p className="font-medium text-foreground">
+                {t('permissions.empty_title')}
+            </p>
+            <p className="text-sm text-muted-foreground">
+                {t('permissions.empty_description')}
+            </p>
+        </div>
+    );
+}
 
 export default function PermissionsIndex() {
     const [permissions, setPermissions] = useState<Permission[]>([]);
@@ -80,7 +96,7 @@ export default function PermissionsIndex() {
                                 </FormProvider>
                             </div>
 
-                            {selectedEmployeeId && (
+                            {selectedEmployeeId ? (
                                 <PermissionManager
                                     permissions={permissions}
                                     selectedPermissions={selectedPermissions}
@@ -88,6 +104,8 @@ export default function PermissionsIndex() {
                                     onSave={handleSave}
                                     loading={loading}
                                 />
+                            ) : (
+                                <PermissionsEmptyState />
                             )}
                         </CardContent>
                     </Card>

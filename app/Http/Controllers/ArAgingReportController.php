@@ -17,7 +17,7 @@ class ArAgingReportController extends Controller
     ): ArAgingReportCollection {
         $rows = $action->execute($request);
 
-        return new ArAgingReportCollection($rows);
+        return new ArAgingReportCollection($rows, $action->summarize($request));
     }
 
     public function export(

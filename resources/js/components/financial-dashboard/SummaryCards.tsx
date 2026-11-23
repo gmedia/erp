@@ -1,6 +1,6 @@
 import { KpiCard } from '@/components/common/KpiCard';
 import { Badge } from '@/components/ui/badge';
-import { formatCurrency } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 import {
     Banknote,
     Building2,
@@ -15,6 +15,8 @@ import type {
     FinancialDashboardData,
     KpiItem,
 } from '../../hooks/useFinancialDashboard';
+
+const MUTED_ICON = 'text-muted-foreground';
 
 interface SummaryCardsProps {
     readonly data?: FinancialDashboardData['kpis'];
@@ -91,21 +93,8 @@ function comparisonFooter(
     );
 }
 
-function signedBalanceChrome(
-    value: number,
-    positive: { iconColor: string },
-): {
-    iconColor: string;
-    valueClassName?: string;
-} {
-    if (value < 0) {
-        return {
-            iconColor: 'text-destructive-foreground',
-            valueClassName: 'text-destructive-foreground',
-        };
-    }
-
-    return positive;
+function signedBalanceChrome(value: number): { valueClassName?: string } {
+    return value < 0 ? { valueClassName: 'text-destructive-foreground' } : {};
 }
 
 export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
@@ -115,7 +104,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
 }) {
     if (isLoading || !data) {
         return (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
                 {[
                     'summary-1',
                     'summary-2',
@@ -144,7 +133,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             title: 'Revenue',
             // Ikon deskriptif: panah tren tanpa delta menyesatkan (W5-12).
             icon: Wallet,
-            iconColor: 'text-success',
+            iconColor: MUTED_ICON,
             value: data.revenue.value,
             formattedValue: formatCurrency(data.revenue.value),
             footer: comparisonFooter(
@@ -157,7 +146,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
         {
             title: 'Expenses',
             icon: Receipt,
-            iconColor: 'text-destructive-foreground',
+            iconColor: MUTED_ICON,
             value: data.expenses.value,
             formattedValue: formatCurrency(data.expenses.value),
             footer: comparisonFooter(
@@ -170,9 +159,8 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
         {
             title: 'Net Income',
             icon: DollarSign,
-            ...signedBalanceChrome(data.net_income.value, {
-                iconColor: 'text-info',
-            }),
+            iconColor: MUTED_ICON,
+            ...signedBalanceChrome(data.net_income.value),
             value: data.net_income.value,
             formattedValue: formatCurrency(data.net_income.value),
             footer: comparisonFooter(
@@ -185,7 +173,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
         {
             title: 'Total Assets',
             icon: Building2,
-            iconColor: 'text-chart-3',
+            iconColor: MUTED_ICON,
             value: data.total_assets.value,
             formattedValue: formatCurrency(data.total_assets.value),
             footer: comparisonFooter(
@@ -198,7 +186,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
         {
             title: 'Total Liabilities',
             icon: CreditCard,
-            iconColor: 'text-warning',
+            iconColor: MUTED_ICON,
             value: data.total_liabilities.value,
             formattedValue: formatCurrency(data.total_liabilities.value),
             footer: comparisonFooter(
@@ -211,9 +199,8 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
         {
             title: 'Equity',
             icon: PiggyBank,
-            ...signedBalanceChrome(data.equity.value, {
-                iconColor: 'text-chart-3',
-            }),
+            iconColor: MUTED_ICON,
+            ...signedBalanceChrome(data.equity.value),
             value: data.equity.value,
             formattedValue: formatCurrency(data.equity.value),
             footer: comparisonFooter(
@@ -226,9 +213,8 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
         {
             title: 'Cash Balance',
             icon: Banknote,
-            ...signedBalanceChrome(data.cash_balance.value, {
-                iconColor: 'text-success',
-            }),
+            iconColor: MUTED_ICON,
+            ...signedBalanceChrome(data.cash_balance.value),
             value: data.cash_balance.value,
             formattedValue: formatCurrency(data.cash_balance.value),
             footer: comparisonFooter(
@@ -241,18 +227,28 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
     ];
 
     return (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {cards.map((card) => (
-                <KpiCard
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-12">
+            {cards.map((card, index) => (
+                <div
                     key={card.title}
-                    title={card.title}
-                    icon={card.icon}
-                    formattedValue={card.formattedValue}
-                    iconColor={card.iconColor}
-                    valueClassName={card.valueClassName}
+                    className={cn(
+                        index === cards.length - 1 && 'col-span-2',
+                        index < 4 ? 'lg:col-span-3' : 'lg:col-span-4',
+                    )}
                 >
-                    {card.footer}
-                </KpiCard>
+                    <KpiCard
+                        title={card.title}
+                        icon={card.icon}
+                        formattedValue={card.formattedValue}
+                        iconColor={card.iconColor}
+                        valueClassName={cn(
+                            'text-lg sm:text-xl',
+                            card.valueClassName,
+                        )}
+                    >
+                        {card.footer}
+                    </KpiCard>
+                </div>
             ))}
         </div>
     );

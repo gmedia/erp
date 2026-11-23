@@ -29,7 +29,7 @@ export function PipelineFilter({
     onBranchChange,
 }: Readonly<PipelineFilterProps>) {
     return (
-        <Card className="shadow-sm">
+        <Card>
             <CardContent className="flex flex-col items-end gap-6 p-4 sm:flex-row">
                 <div className="w-full space-y-2 sm:w-64">
                     <Label

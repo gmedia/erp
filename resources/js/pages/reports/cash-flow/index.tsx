@@ -69,6 +69,7 @@ export default function CashFlow() {
     return (
         <SingleYearFinancialReportPageShell
             title="Cash Flow"
+            descriptionKey="reports.pageDescriptions.cash-flow"
             path="/reports/cash-flow"
             fiscalYears={fiscalYears}
             selectedYearId={selectedYearId}

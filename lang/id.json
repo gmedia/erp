@@ -25,6 +25,10 @@
         "fill_details": "Silakan isi detail di bawah ini.",
         "view_details": "Berikut adalah detail untuk item ini."
     },
+    "permissions": {
+        "empty_title": "Belum ada karyawan dipilih",
+        "empty_description": "Pilih karyawan di atas untuk melihat dan mengubah izin sistemnya."
+    },
     "stockTransfer": {
         "qty_received_label": "Qty Diterima",
         "qty_received_placeholder": "Kosong = diterima penuh"
@@ -65,6 +69,30 @@
             "hire_date": "Tanggal Masuk",
             "created_at": "Dibuat",
             "updated_at": "Diperbarui"
+        }
+    },
+    "my_approvals": {
+        "request_number": "No. {id}"
+    },
+    "users": {
+        "title": "Pengguna",
+        "description": "Kelola akun pengguna yang terhubung dengan karyawan.",
+        "add": "Tambah Pengguna",
+        "edit_user": "Ubah Pengguna",
+        "dialog_description": "Pilih karyawan, lalu atur nama akun, email, dan password.",
+        "search_placeholder": "Cari pengguna...",
+        "loading": "Memuat pengguna...",
+        "empty_title": "Pengguna tidak ditemukan",
+        "empty_description": "Buat akun pengguna untuk karyawan untuk memulai.",
+        "no_employee": "Belum ada karyawan terhubung",
+        "edit_requires_employee": "Hubungkan pengguna ini ke karyawan sebelum diubah.",
+        "status_linked": "Terhubung",
+        "status_unlinked": "Belum terhubung",
+        "columns": {
+            "name": "Nama",
+            "email": "Email",
+            "employee": "Karyawan",
+            "status": "Status"
         }
     },
     "departments": {
@@ -145,7 +173,38 @@
         "selectFilterAccount": "Pilih akun (dan periode) pada filter untuk melihat buku besar.",
         "selectFilterFiscalYear": "Pilih tahun fiskal (dan periode) untuk melihat neraca saldo detail.",
         "selectFilterDefault": "Pilih filter yang diperlukan untuk menampilkan {entity}.",
-        "selectFilterCustomer": "Pilih customer pada filter untuk melihat statement."
+        "selectFilterCustomer": "Pilih customer pada filter untuk melihat statement.",
+        "totalRow": "Total (seluruh hasil filter)",
+        "asOfDate": "Per {date}",
+        "pageDescriptions": {
+            "balance-sheet": "Posisi keuangan pada suatu tanggal: aset, liabilitas, dan ekuitas.",
+            "cash-flow": "Pergerakan kas dikelompokkan menjadi aktivitas operasi, investasi, dan pendanaan.",
+            "comparative": "Bandingkan pendapatan, beban, dan laba bersih antar tahun fiskal.",
+            "income-statement": "Pendapatan dan beban dalam satu periode untuk menunjukkan laba bersih.",
+            "trial-balance": "Total debit dan kredit setiap akun untuk memastikan pembukuan seimbang.",
+            "trial-balance-detailed": "Neraca uji dengan saldo awal, mutasi, dan saldo akhir per akun.",
+            "general-ledger": "Setiap baris jurnal yang diposting ke akun dalam satu periode, dengan saldo berjalan.",
+            "budget-variance": "Bandingkan realisasi belanja dengan anggaran yang disetujui per akun.",
+            "customer-statement": "Riwayat transaksi dan saldo terutang untuk satu pelanggan.",
+            "ar-aging": "Piutang dikelompokkan per umur untuk melihat saldo pelanggan yang jatuh tempo.",
+            "ar-outstanding": "Faktur pelanggan yang masih memiliki saldo belum dibayar.",
+            "ap-aging": "Utang dikelompokkan per umur untuk melihat saldo pemasok yang jatuh tempo.",
+            "ap-outstanding": "Tagihan pemasok yang masih memiliki saldo belum dibayar.",
+            "ap-payment-history": "Pembayaran ke pemasok dalam periode yang dipilih.",
+            "assets-register": "Daftar aset tetap dengan perolehan, lokasi, dan status terkini.",
+            "book-value-depreciation": "Harga perolehan, akumulasi penyusutan, dan nilai buku per aset.",
+            "maintenance-cost": "Biaya pemeliharaan per aset dalam periode yang dipilih.",
+            "asset-stocktake-variances": "Selisih antara aset tercatat dan hasil hitung fisik.",
+            "inventory-valuation": "Jumlah dan nilai stok per produk dan gudang.",
+            "inventory-stocktake-variance": "Selisih antara stok sistem dan hasil stock opname fisik.",
+            "purchase-history": "Transaksi pembelian beserta detail pemasok dan produk.",
+            "purchase-order-status": "Progres pesanan pembelian dari penerbitan hingga penerimaan dan penagihan.",
+            "stock-movement": "Stok masuk dan keluar per produk beserta dokumen sumbernya.",
+            "stock-adjustment": "Penyesuaian stok yang mengubah jumlah, beserta alasannya.",
+            "goods-receipt": "Barang yang diterima dari pemasok berdasarkan pesanan pembelian.",
+            "approval-audit-trail": "Riwayat tindakan persetujuan yang dilakukan pada permintaan.",
+            "pipeline-audit-trail": "Riwayat perpindahan status pada data pipeline."
+        }
     },
     "admin": {
         "selectLogo": "Pilih Logo SVG",

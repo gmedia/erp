@@ -15,6 +15,7 @@ export default function TrialBalanceDetailedReportPage() {
     return (
         <ReportDataTablePage<TrialBalanceDetailedItem>
             title="Trial Balance Detailed"
+            descriptionKey="reports.pageDescriptions.trial-balance-detailed"
             breadcrumbs={createReportBreadcrumbs(
                 'Trial Balance Detailed',
                 '/reports/trial-balance-detailed',

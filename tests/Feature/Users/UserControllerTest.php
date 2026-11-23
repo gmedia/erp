@@ -284,6 +284,51 @@ describe('User API Permission Tests', function () {
         $response->assertForbidden();
     });
 
+    test('apiTable returns paginated users with email and linked employee', function () {
+        Sanctum::actingAs(createTestUserWithPermissions(['user']), ['*']);
+
+        $linked = User::factory()->create(['name' => 'Table Linked', 'email' => 'table-linked@example.com']);
+        Employee::factory()->create(['name' => 'Table Employee', 'user_id' => $linked->id]);
+        $unlinked = User::factory()->create(['name' => 'Table Unlinked', 'email' => 'table-unlinked@example.com']);
+
+        $response = getJson('/api/users/table?search=Table');
+
+        $response->assertOk()
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => ['id', 'name', 'email', 'employee', 'created_at', 'updated_at'],
+                ],
+                'meta' => ['current_page', 'per_page', 'total', 'last_page'],
+            ]);
+
+        $rows = collect($response->json('data'))->keyBy('id');
+        expect($rows->get($linked->id)['email'])->toBe('table-linked@example.com')
+            ->and($rows->get($linked->id)['employee']['name'])->toBe('Table Employee')
+            ->and($rows->get($unlinked->id)['employee'])->toBeNull();
+    });
+
+    test('apiTable searches by name or email and paginates', function () {
+        Sanctum::actingAs(createTestUserWithPermissions(['user']), ['*']);
+
+        User::factory()->count(3)->create(['name' => 'Paged Person']);
+
+        $response = getJson('/api/users/table?search=Paged&per_page=2&page=1');
+
+        $response->assertOk();
+        expect($response->json('data'))->toHaveCount(2)
+            ->and($response->json('meta.total'))->toBe(3)
+            ->and($response->json('meta.per_page'))->toBe(2);
+    });
+
+    test('apiTable returns 403 when user lacks user permission', function () {
+        $user = createTestUserWithPermissions([]);
+        Sanctum::actingAs($user, ['*']);
+
+        $response = getJson('/api/users/table');
+
+        $response->assertForbidden();
+    });
+
     test('apiShow returns 403 when user lacks user permission', function () {
         $user = createTestUserWithPermissions([]);
         Sanctum::actingAs($user, ['*']);

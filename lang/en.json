@@ -25,6 +25,10 @@
         "fill_details": "Please fill in the details below.",
         "view_details": "Here are the details for this item."
     },
+    "permissions": {
+        "empty_title": "No employee selected",
+        "empty_description": "Select an employee above to view and edit their system permissions."
+    },
     "stockTransfer": {
         "qty_received_label": "Qty Received",
         "qty_received_placeholder": "Empty = received in full"
@@ -65,6 +69,30 @@
             "hire_date": "Hire Date",
             "created_at": "Created At",
             "updated_at": "Updated At"
+        }
+    },
+    "my_approvals": {
+        "request_number": "No. {id}"
+    },
+    "users": {
+        "title": "Users",
+        "description": "Manage user accounts linked to employees.",
+        "add": "Add User",
+        "edit_user": "Edit User",
+        "dialog_description": "Select an employee, then set the account name, email, and password.",
+        "search_placeholder": "Search users...",
+        "loading": "Loading users...",
+        "empty_title": "No users found",
+        "empty_description": "Create a user account for an employee to get started.",
+        "no_employee": "No linked employee",
+        "edit_requires_employee": "Link an employee to this user before editing it.",
+        "status_linked": "Linked",
+        "status_unlinked": "Unlinked",
+        "columns": {
+            "name": "Name",
+            "email": "Email",
+            "employee": "Employee",
+            "status": "Status"
         }
     },
     "departments": {
@@ -145,7 +173,38 @@
         "selectFilterAccount": "Choose an account (and period) in the filters to see the ledger.",
         "selectFilterFiscalYear": "Choose a fiscal year (and period) to see the detailed trial balance.",
         "selectFilterDefault": "Choose the required filters to show {entity}.",
-        "selectFilterCustomer": "Choose a customer in the filters to see the statement."
+        "selectFilterCustomer": "Choose a customer in the filters to see the statement.",
+        "totalRow": "Total (all filtered results)",
+        "asOfDate": "As of {date}",
+        "pageDescriptions": {
+            "balance-sheet": "Financial position at a point in time: assets, liabilities, and equity.",
+            "cash-flow": "Cash movements grouped into operating, investing, and financing activities.",
+            "comparative": "Compare revenue, expense, and net income across fiscal years.",
+            "income-statement": "Revenue and expenses over a period to show net income.",
+            "trial-balance": "Debit and credit totals of every account to check that the books balance.",
+            "trial-balance-detailed": "Trial balance with opening, movement, and closing balance per account.",
+            "general-ledger": "Every journal line posted to an account within a period, with running balance.",
+            "budget-variance": "Compare actual spending against the approved budget per account.",
+            "customer-statement": "Transaction history and outstanding balance for one customer.",
+            "ar-aging": "Receivables grouped by age bucket to show overdue customer balances.",
+            "ar-outstanding": "Open customer invoices that still have an unpaid balance.",
+            "ap-aging": "Payables grouped by age bucket to show overdue supplier balances.",
+            "ap-outstanding": "Open supplier bills that still have an unpaid balance.",
+            "ap-payment-history": "Payments made to suppliers within the selected period.",
+            "assets-register": "Fixed asset list with acquisition, location, and current status.",
+            "book-value-depreciation": "Acquisition cost, accumulated depreciation, and book value per asset.",
+            "maintenance-cost": "Maintenance spending per asset over the selected period.",
+            "asset-stocktake-variances": "Differences between recorded and physically counted assets.",
+            "inventory-valuation": "Stock quantity and value per product and warehouse.",
+            "inventory-stocktake-variance": "Differences between system stock and physical stocktake counts.",
+            "purchase-history": "Purchase transactions with supplier and product detail.",
+            "purchase-order-status": "Progress of purchase orders from issue to receipt and billing.",
+            "stock-movement": "Stock in and out per product, with source document.",
+            "stock-adjustment": "Stock adjustments that changed quantities, with reason.",
+            "goods-receipt": "Goods received from suppliers against purchase orders.",
+            "approval-audit-trail": "History of approval actions taken on requests.",
+            "pipeline-audit-trail": "History of state transitions on pipeline records."
+        }
     },
     "admin": {
         "selectLogo": "Select SVG Logo",

@@ -67,6 +67,30 @@ export interface Translations {
             updated_at: string;
         };
     };
+    my_approvals: {
+        request_number: string;
+    };
+    users: {
+        title: string;
+        description: string;
+        add: string;
+        edit_user: string;
+        dialog_description: string;
+        search_placeholder: string;
+        loading: string;
+        empty_title: string;
+        empty_description: string;
+        no_employee: string;
+        edit_requires_employee: string;
+        status_linked: string;
+        status_unlinked: string;
+        columns: {
+            name: string;
+            email: string;
+            employee: string;
+            status: string;
+        };
+    };
     departments: {
         title: string;
         add: string;
@@ -132,6 +156,8 @@ export interface Translations {
         selectFilterFiscalYear: string;
         selectFilterCustomer: string;
         selectFilterDefault: string;
+        totalRow: string;
+        asOfDate: string;
     };
     admin: {
         selectLogo: string;

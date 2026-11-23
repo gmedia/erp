@@ -173,6 +173,9 @@ export interface DataTableProps<T> {
     emptyState?: React.ReactNode;
     /** Kolom yang disembunyikan secara default (dapat diaktifkan via Columns). */
     defaultColumnVisibility?: Record<string, boolean>;
+    controlsDisabled?: boolean;
+    /** Baris ringkasan (mis. total) yang tampil tepat di bawah tabel, di atas pagination. */
+    footer?: React.ReactNode;
 }
 
 /**
@@ -209,6 +212,8 @@ export function DataTable<T>({
     entityName,
     emptyState,
     defaultColumnVisibility,
+    controlsDisabled = false,
+    footer,
 }: Readonly<DataTableProps<T>>) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnVisibility, setColumnVisibility] =
@@ -489,6 +494,7 @@ export function DataTable<T>({
                 extraActions={extraToolbarActions}
                 onExport={handleExport}
                 exporting={exporting}
+                exportDisabled={controlsDisabled}
                 table={table}
             />
 
@@ -513,7 +519,7 @@ export function DataTable<T>({
                 </div>
             )}
 
-            <div className="overflow-hidden">
+            <div className="overflow-x-auto">
                 <Table className="min-w-max">
                     <TableHeader className="[&_th]:text-muted-foreground">
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -558,6 +564,8 @@ export function DataTable<T>({
                 </Table>
             </div>
 
+            {footer ? <div className="mt-3">{footer}</div> : null}
+
             <div className="border-t border-border/50 pt-1">
                 <DataTablePagination
                     pagination={pagination}
@@ -565,6 +573,7 @@ export function DataTable<T>({
                     onPageSizeChange={(per_page: number) =>
                         handlePageSizeChange(per_page.toString())
                     }
+                    disabled={controlsDisabled}
                 />
             </div>
         </div>

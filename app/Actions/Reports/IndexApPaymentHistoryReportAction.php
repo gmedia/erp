@@ -3,16 +3,55 @@
 namespace App\Actions\Reports;
 
 use App\Actions\Reports\Concerns\HandlesReportQuery;
+use App\Actions\Reports\Concerns\SumsReportTotals;
 use App\Models\ApPayment;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Http\FormRequest;
 
 class IndexApPaymentHistoryReportAction
 {
     use HandlesReportQuery;
+    use SumsReportTotals;
 
     public function execute(FormRequest $request): LengthAwarePaginator|Collection
+    {
+        $query = $this->buildFilteredQuery($request);
+
+        $sortBy = $request->string('sort_by', 'payment_date')->toString();
+        $sortDirection = $request->string('sort_direction', 'desc')->toString();
+        $sortMap = [
+            'supplier_name' => 's.name',
+            'branch_name' => 'b.name',
+            'bank_account_name' => 'ba.name',
+            'payment_date' => 'ap.payment_date',
+            'payment_number' => 'ap.payment_number',
+            'payment_method' => 'ap.payment_method',
+            'total_amount' => 'ap.total_amount',
+            'total_allocated' => 'ap.total_allocated',
+        ];
+        $resolvedSort = $sortMap[$sortBy] ?? 'ap.' . $sortBy;
+        $query->orderBy($resolvedSort, $sortDirection);
+
+        return $this->exportOrPaginate($request, $query);
+    }
+
+    /**
+     * Total + as-of untuk seluruh hasil filter (bukan satu halaman).
+     *
+     * @return array{as_of_date: string, totals: array<string, string>}
+     */
+    public function summarize(FormRequest $request): array
+    {
+        return $this->buildReportSummary($this->buildFilteredQuery($request), [
+            'total_amount',
+            'total_allocated',
+            'total_unallocated',
+        ]);
+    }
+
+    private function buildFilteredQuery(FormRequest $request): Builder
     {
         $query = ApPayment::query()
             ->from('ap_payments as ap')
@@ -58,21 +97,6 @@ class IndexApPaymentHistoryReportAction
             'ap.reference',
         ]);
 
-        $sortBy = $request->string('sort_by', 'payment_date')->toString();
-        $sortDirection = $request->string('sort_direction', 'desc')->toString();
-        $sortMap = [
-            'supplier_name' => 's.name',
-            'branch_name' => 'b.name',
-            'bank_account_name' => 'ba.name',
-            'payment_date' => 'ap.payment_date',
-            'payment_number' => 'ap.payment_number',
-            'payment_method' => 'ap.payment_method',
-            'total_amount' => 'ap.total_amount',
-            'total_allocated' => 'ap.total_allocated',
-        ];
-        $resolvedSort = $sortMap[$sortBy] ?? 'ap.' . $sortBy;
-        $query->orderBy($resolvedSort, $sortDirection);
-
-        return $this->exportOrPaginate($request, $query);
+        return $query;
     }
 }

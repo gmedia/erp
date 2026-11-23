@@ -13,7 +13,7 @@ import { useFinancialDashboard } from '../../hooks/useFinancialDashboard';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Financial Overview',
+        title: 'Financial Dashboard',
         href: '/financial-dashboard',
     },
 ];
@@ -94,8 +94,8 @@ export default function FinancialDashboard() {
 
     return (
         <DashboardPageShell
-            title="Financial Overview"
-            heading="Financial Overview"
+            title="Financial Dashboard"
+            heading="Financial Dashboard"
             description="Monitor key financial metrics, cash flow, and expense trends."
             breadcrumbs={breadcrumbs}
             toolbar={

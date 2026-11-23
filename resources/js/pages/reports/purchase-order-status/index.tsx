@@ -15,6 +15,7 @@ export default function PurchaseOrderStatusReportPage() {
     return (
         <ReportDataTablePage<PurchaseOrderStatusReportItem>
             title="Purchase Order Status Report"
+            descriptionKey="reports.pageDescriptions.purchase-order-status"
             breadcrumbs={createReportBreadcrumbs(
                 'Purchase Order Status',
                 '/reports/purchase-order-status',

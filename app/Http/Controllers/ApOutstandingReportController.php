@@ -17,7 +17,7 @@ class ApOutstandingReportController extends Controller
     ): ApOutstandingReportCollection {
         $rows = $action->execute($request);
 
-        return new ApOutstandingReportCollection($rows);
+        return new ApOutstandingReportCollection($rows, $action->summarize($request));
     }
 
     public function export(

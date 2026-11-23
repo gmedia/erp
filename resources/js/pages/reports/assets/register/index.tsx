@@ -16,6 +16,7 @@ export default function AssetRegisterReport() {
     return (
         <ReportDataTablePage<Asset>
             title="Asset Register Report"
+            descriptionKey="reports.pageDescriptions.assets-register"
             breadcrumbs={createReportBreadcrumbs(
                 'Asset Register',
                 '/reports/assets/register',

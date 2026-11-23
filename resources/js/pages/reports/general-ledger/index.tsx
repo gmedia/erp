@@ -15,6 +15,7 @@ export default function GeneralLedgerReportPage() {
     return (
         <ReportDataTablePage<GeneralLedgerItem>
             title="General Ledger Report"
+            descriptionKey="reports.pageDescriptions.general-ledger"
             breadcrumbs={createReportBreadcrumbs(
                 'General Ledger',
                 '/reports/general-ledger',

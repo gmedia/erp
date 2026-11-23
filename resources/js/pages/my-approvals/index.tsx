@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
+import { useTranslation } from '@/contexts/i18n-context';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
 import { cn } from '@/lib/utils';
@@ -177,6 +178,16 @@ interface AssignmentOption {
 interface AssignmentOptions {
     drivers: AssignmentOption[];
     units: AssignmentOption[];
+}
+
+function RequestNumber({ id }: Readonly<{ id: number | string }>) {
+    const { t } = useTranslation();
+
+    return (
+        <span className="font-mono text-[11px] text-muted-foreground tabular-nums">
+            {t('my_approvals.request_number', { id: String(id) })}
+        </span>
+    );
 }
 
 export default function MyApprovalsPage() {
@@ -382,10 +393,12 @@ export default function MyApprovalsPage() {
                                                 >
                                                     {typeLabel}
                                                 </Badge>
-                                                <span className="font-mono text-[11px] text-muted-foreground tabular-nums">
-                                                    #
-                                                    {step.request.approvable_id}
-                                                </span>
+                                                <RequestNumber
+                                                    id={
+                                                        step.request
+                                                            .approvable_id
+                                                    }
+                                                />
                                                 <StatusBadge
                                                     status={step.status}
                                                 />

@@ -71,7 +71,9 @@ export const CashFlowSummary = memo<CashFlowSummaryProps>(
         return (
             <Card className="flex h-[300px] w-full flex-col">
                 <CardHeader className="pb-2">
-                    <CardTitle>Cash Flow Summary</CardTitle>
+                    <CardTitle className="text-base font-semibold">
+                        Cash Flow Summary
+                    </CardTitle>
                 </CardHeader>
                 <CardContent className="flex-1 overflow-hidden pb-4">
                     <div className="flex h-full w-full flex-col justify-center space-y-4 pr-4">

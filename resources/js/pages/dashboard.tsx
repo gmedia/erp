@@ -130,7 +130,7 @@ export default function Dashboard() {
         <DashboardPageShell
             title="Dashboard"
             heading="Dashboard"
-            description="At-a-glance entity counts, operational shortcuts, and master-data mix. Financial KPIs stay on Financial Overview."
+            description="At-a-glance entity counts, operational shortcuts, and master-data mix. Financial KPIs stay on Financial Dashboard."
             breadcrumbs={breadcrumbs}
             isLoading={isLoading}
             isError={isError}
@@ -217,7 +217,7 @@ export default function Dashboard() {
                         ))}
                         <p className="text-xs text-muted-foreground">
                             Operational counts only. Financial KPIs stay on
-                            Financial Overview.
+                            Financial Dashboard.
                         </p>
                     </CardContent>
                 </Card>
