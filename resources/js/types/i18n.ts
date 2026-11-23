@@ -63,6 +63,26 @@ export interface Translations {
             updated_at: string;
         };
     };
+    users: {
+        title: string;
+        description: string;
+        add: string;
+        edit_user: string;
+        dialog_description: string;
+        search_placeholder: string;
+        loading: string;
+        empty_title: string;
+        empty_description: string;
+        no_employee: string;
+        status_linked: string;
+        status_unlinked: string;
+        columns: {
+            name: string;
+            email: string;
+            employee: string;
+            status: string;
+        };
+    };
     departments: {
         title: string;
         add: string;

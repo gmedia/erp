@@ -91,6 +91,28 @@ const defaultTranslations: Translations = {
             updated_at: 'Updated At',
         },
     },
+    users: {
+        title: 'Users',
+        description: 'Manage user accounts linked to employees.',
+        add: 'Add User',
+        edit_user: 'Edit User',
+        dialog_description:
+            'Select an employee, then set the account name, email, and password.',
+        search_placeholder: 'Search users...',
+        loading: 'Loading users...',
+        empty_title: 'No users found',
+        empty_description:
+            'Create a user account for an employee to get started.',
+        no_employee: 'No linked employee',
+        status_linked: 'Linked',
+        status_unlinked: 'Unlinked',
+        columns: {
+            name: 'Name',
+            email: 'Email',
+            employee: 'Employee',
+            status: 'Status',
+        },
+    },
     departments: {
         title: 'Departments',
         add: 'Add Department',

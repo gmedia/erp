@@ -39,6 +39,30 @@ class UserController extends Controller
     }
 
     /**
+     * Paginated user list for the users management table.
+     *
+     * Each row includes the linked employee (if any) so the UI can show
+     * which employee a user account belongs to.
+     */
+    public function apiTable(Request $request): JsonResponse
+    {
+        $perPage = min(max((int) $request->integer('per_page', 15), 1), 100);
+
+        $query = User::query()->with('employee:id,name,user_id');
+
+        if ($search = trim((string) $request->input('search', ''))) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $users = $query->orderBy('name')->orderBy('id')->paginate($perPage);
+
+        return UserResource::collection($users)->response();
+    }
+
+    /**
      * Get a single user for API dropdowns
      */
     public function apiShow(User $user): JsonResponse

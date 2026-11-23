@@ -67,6 +67,26 @@
             "updated_at": "Diperbarui"
         }
     },
+    "users": {
+        "title": "Pengguna",
+        "description": "Kelola akun pengguna yang terhubung dengan karyawan.",
+        "add": "Tambah Pengguna",
+        "edit_user": "Ubah Pengguna",
+        "dialog_description": "Pilih karyawan, lalu atur nama akun, email, dan password.",
+        "search_placeholder": "Cari pengguna...",
+        "loading": "Memuat pengguna...",
+        "empty_title": "Pengguna tidak ditemukan",
+        "empty_description": "Buat akun pengguna untuk karyawan untuk memulai.",
+        "no_employee": "Belum ada karyawan terhubung",
+        "status_linked": "Terhubung",
+        "status_unlinked": "Belum terhubung",
+        "columns": {
+            "name": "Nama",
+            "email": "Email",
+            "employee": "Karyawan",
+            "status": "Status"
+        }
+    },
     "departments": {
         "title": "Departemen",
         "add": "Tambah Departemen",
