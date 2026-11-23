@@ -14,7 +14,6 @@ import {
     SettingsSaveButton,
     SettingsSection,
 } from '@/components/common/settings';
-import DeleteUser from '@/components/delete-user';
 import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -206,8 +205,6 @@ export default function Profile({
                         </Button>
                     </div>
                 )}
-
-                <DeleteUser />
             </SettingsLayout>
         </AppLayout>
     );
