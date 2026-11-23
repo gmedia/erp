@@ -1,7 +1,7 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
-import { statusBadgeVariant } from '@/lib/status-badge';
+import { formatClassName, statusBadgeVariant } from '@/lib/status-badge';
 import { type ReportConfiguration } from '@/types/report-configuration';
 import {
     createActionsColumn,
@@ -37,7 +37,7 @@ export const reportConfigurationColumns: ColumnDef<ReportConfiguration>[] = [
         ...createSortingHeader('Report Type'),
         cell: ({ row }) => {
             const value = row.getValue('report_type') as string;
-            return reportTypeLabels[value] ?? value;
+            return reportTypeLabels[value] ?? formatClassName(value);
         },
     },
     {
