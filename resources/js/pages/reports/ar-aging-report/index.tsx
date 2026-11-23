@@ -15,8 +15,9 @@ export default function ArAgingReportPage() {
     return (
         <ReportDataTablePage<ArAgingReportItem>
             title="AR Aging Report"
+            description="Receivables grouped by age bucket to show overdue customer balances."
             breadcrumbs={createReportBreadcrumbs(
-                'AR Aging',
+                'AR Aging Report',
                 '/reports/ar-aging',
             )}
             columns={arAgingReportColumns}
