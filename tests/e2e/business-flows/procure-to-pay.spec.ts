@@ -98,6 +98,174 @@ interface P2pRun {
     balanceSheetGap: number;
 }
 
+async function createPurchaseOrderViaUi(page: Page): Promise<number> {
+    await page.goto('/purchase-orders');
+    await page.getByRole('button', { name: /add/i }).first().click();
+
+    const dialog = page.getByRole('dialog', {
+        name: /Add New Purchase Order/i,
+    });
+    await expect(dialog).toBeVisible();
+
+    await dialog.getByRole('combobox', { name: 'Supplier' }).click();
+    await page
+        .getByRole('dialog')
+        .last()
+        .getByRole('listitem')
+        .first()
+        .getByRole('button')
+        .click();
+
+    await dialog.getByRole('combobox', { name: 'Warehouse' }).click();
+    await page
+        .getByRole('dialog')
+        .last()
+        .getByRole('listitem')
+        .first()
+        .getByRole('button')
+        .click();
+
+    await dialog.getByRole('button', { name: 'Add Item' }).click();
+    const itemDialog = page.getByRole('dialog', { name: /Add Item/i });
+    await expect(itemDialog).toBeVisible();
+    await itemDialog.getByRole('combobox', { name: 'Product' }).click();
+    await page
+        .getByRole('dialog')
+        .last()
+        .getByRole('listitem')
+        .first()
+        .getByRole('button')
+        .click();
+    await itemDialog.getByRole('combobox', { name: 'Unit' }).click();
+    await page
+        .getByRole('dialog')
+        .last()
+        .getByRole('listitem')
+        .first()
+        .getByRole('button')
+        .click();
+    await itemDialog.getByLabel(/Quantity/i).fill(String(PO_QTY));
+    await itemDialog.getByLabel(/Unit Price/i).fill(String(UNIT_PRICE));
+    await itemDialog.getByRole('button', { name: 'Save Item' }).click();
+    await expect(itemDialog).toBeHidden();
+
+    const createResponse = page.waitForResponse(
+        (response) =>
+            response.url().includes('/api/purchase-orders') &&
+            response.request().method() === 'POST',
+    );
+    await dialog.getByRole('button', { name: 'Add', exact: true }).click();
+    const created = await (await createResponse).json();
+    await expect(dialog).toBeHidden();
+
+    const poId = Number((created.data as { id: number }).id);
+    expect(poId, 'PO created via UI must return an id').toBeGreaterThan(0);
+
+    return poId;
+}
+
+async function createGoodsReceiptViaUi(
+    page: Page,
+    ctx: {
+        poId: number;
+        poItemId: number;
+        warehouseId: number;
+        productId: number;
+        unitId: number;
+    },
+): Promise<string> {
+    await page.goto('/goods-receipts');
+    await page.getByRole('button', { name: /add/i }).first().click();
+
+    const dialog = page.getByRole('dialog', {
+        name: /Add New Goods Receipt/i,
+    });
+    await expect(dialog).toBeVisible();
+
+    await dialog.getByRole('combobox', { name: 'Purchase Order' }).click();
+    await page
+        .getByRole('dialog')
+        .last()
+        .getByPlaceholder('Search...')
+        .fill(String(ctx.poId));
+    await page
+        .getByRole('dialog')
+        .last()
+        .getByRole('listitem')
+        .first()
+        .getByRole('button')
+        .click();
+
+    await dialog.getByRole('combobox', { name: 'Warehouse' }).click();
+    await page
+        .getByRole('dialog')
+        .last()
+        .getByRole('listitem')
+        .first()
+        .getByRole('button')
+        .click();
+
+    await dialog.getByRole('button', { name: 'Add Item' }).click();
+    const itemDialog = page.getByRole('dialog', { name: /Add Item/i });
+    await expect(itemDialog).toBeVisible();
+    await itemDialog.getByLabel('PO Item ID').fill(String(ctx.poItemId));
+    await itemDialog.getByRole('combobox', { name: 'Product' }).click();
+    await page
+        .getByRole('dialog')
+        .last()
+        .getByRole('listitem')
+        .first()
+        .getByRole('button')
+        .click();
+    await itemDialog.getByRole('combobox', { name: 'Unit' }).click();
+    await page
+        .getByRole('dialog')
+        .last()
+        .getByRole('listitem')
+        .first()
+        .getByRole('button')
+        .click();
+    await itemDialog.getByLabel('Quantity Received').fill(String(PO_QTY));
+    await itemDialog.getByLabel('Quantity Accepted').fill(String(PO_QTY));
+    await itemDialog.getByLabel('Unit Price').fill(String(UNIT_PRICE));
+    await itemDialog.getByRole('button', { name: 'Save Item' }).click();
+    await expect(itemDialog).toBeHidden();
+
+    const createResponse = page.waitForResponse(
+        (response) =>
+            response.url().includes('/api/goods-receipts') &&
+            response.request().method() === 'POST',
+    );
+    await dialog.getByRole('button', { name: 'Add', exact: true }).click();
+    const created = await (await createResponse).json();
+    await expect(dialog).toBeHidden();
+
+    const createdData = created.data as { id: number; gr_number: string };
+    const grNumber = String(createdData.gr_number);
+
+    const row = page.getByRole('row').filter({ hasText: grNumber }).first();
+    await row.getByRole('button', { name: 'Actions' }).click();
+    await page.getByRole('menuitem', { name: 'Edit' }).click();
+    const editDialog = page.getByRole('dialog', {
+        name: /Edit Goods Receipt/i,
+    });
+    await expect(editDialog).toBeVisible();
+    await editDialog.getByRole('combobox', { name: 'Status' }).click();
+    await page.getByRole('option', { name: 'Confirmed', exact: true }).click();
+    const updateResponse = page.waitForResponse(
+        (response) =>
+            response.url().includes(`/api/goods-receipts/${createdData.id}`) &&
+            response.request().method() === 'PUT',
+    );
+    await editDialog
+        .getByRole('button', { name: 'Update', exact: true })
+        .click();
+    await updateResponse;
+    await expect(editDialog).toBeHidden();
+
+    return grNumber;
+}
+
 async function runProcureToPay(page: Page): Promise<P2pRun> {
     await login(page, undefined, undefined, { requireDashboard: false });
 
@@ -117,67 +285,18 @@ async function runProcureToPay(page: Page): Promise<P2pRun> {
 
     const stockBefore = await readStockOnHandFor(page, productId, warehouseId);
 
-    const po = await sendJson(page, 'POST', '/api/purchase-orders', {
-        supplier_id: supplierId,
-        warehouse_id: warehouseId,
-        branch_id: branchId,
-        fiscal_year_id: fiscalYearId,
-        order_date: today,
-        currency: 'IDR',
-        status: 'draft',
-        items: [
-            {
-                product_id: productId,
-                unit_id: unitId,
-                quantity: PO_QTY,
-                unit_price: UNIT_PRICE,
-                discount_percent: 0,
-                tax_percent: 0,
-            },
-        ],
-    });
-    expect(po.status).toBeLessThan(400);
-    const poId = Number((po.json.data as { id: number }).id);
+    const poId = await createPurchaseOrderViaUi(page);
 
     const poLine = (await readPurchaseOrder(page, poId)).items[0];
     expect(poLine, `PO ${poId} must have one item`).toBeTruthy();
 
-    const grItems = [
-        {
-            purchase_order_item_id: poLine.id,
-            product_id: productId,
-            unit_id: unitId,
-            quantity_received: PO_QTY,
-            quantity_accepted: PO_QTY,
-            unit_price: UNIT_PRICE,
-        },
-    ];
-    const gr = await sendJson(page, 'POST', '/api/goods-receipts', {
-        purchase_order_id: poId,
-        warehouse_id: warehouseId,
-        branch_id: branchId,
-        receipt_date: today,
-        status: 'draft',
-        items: grItems,
+    const grNumber = await createGoodsReceiptViaUi(page, {
+        poId,
+        poItemId: poLine.id,
+        warehouseId,
+        productId,
+        unitId,
     });
-    expect(gr.status).toBeLessThan(400);
-    const grId = Number((gr.json.data as { id: number }).id);
-    const grNumber = String((gr.json.data as { gr_number: string }).gr_number);
-
-    const grConfirm = await sendJson(
-        page,
-        'PUT',
-        `/api/goods-receipts/${grId}`,
-        {
-            purchase_order_id: poId,
-            warehouse_id: warehouseId,
-            branch_id: branchId,
-            receipt_date: today,
-            status: 'confirmed',
-            items: grItems,
-        },
-    );
-    expect(grConfirm.status).toBeLessThan(400);
 
     const poReceived = await readPurchaseOrder(page, poId);
     const receivedLine = poReceived.items[0];
