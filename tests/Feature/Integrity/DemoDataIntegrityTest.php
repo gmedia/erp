@@ -12,7 +12,6 @@ use App\Models\StockAdjustment;
 use App\Models\StockTransfer;
 use App\Models\SupplierBill;
 use App\Models\SupplierReturn;
-use Database\Seeders\SubledgerGlReconciliationSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 
@@ -25,13 +24,9 @@ uses(RefreshDatabase::class)->group('demo-integrity');
  */
 function seedDemoData(): void
 {
+    // Seed exactly what ships. No seeder may write a journal computed from
+    // the difference between GL and subledger (issue #357).
     test()->seed();
-
-    // Production demo installs reconcile GL to the subledger, but
-    // DatabaseSeeder skips that step under the testing environment so that
-    // branch-isolation tests start from a zero clearing balance. Run it here
-    // so the invariants validate the dataset that actually ships.
-    test()->seed(SubledgerGlReconciliationSeeder::class);
 }
 
 function activeCoaAccountId(string $code): ?int

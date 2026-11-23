@@ -3,7 +3,6 @@
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
 use Database\Seeders\DatabaseSeeder;
-use Database\Seeders\SubledgerGlReconciliationSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 
@@ -61,8 +60,9 @@ it('never seeds a due date earlier than the document date', function () {
 });
 
 it('reconciles GL balances with AR AP inventory and fixed asset subledgers', function () {
+    // GL dibandingkan dengan subledger hanya melalui jurnal dokumen yang
+    // terposting. Seeder tidak boleh memposting jurnal selisih (issue #357).
     seed(DatabaseSeeder::class);
-    seed(SubledgerGlReconciliationSeeder::class);
 
     $outstandingAr = (float) DB::table('customer_invoices')
         ->whereIn('status', ['sent', 'partially_paid', 'overdue'])
@@ -91,6 +91,14 @@ it('reconciles GL balances with AR AP inventory and fixed asset subledgers', fun
         ->and(-glBalance('12200'))->toBe($accumulatedDepreciation)
         ->and(glBalance('12100') + glBalance('12200'))->toBe($equipmentBookValue)
         ->and(glBalance('11120'))->toBeGreaterThanOrEqual(0);
+});
+
+it('posts no reconciliation plug journals that force GL to equal subledgers', function () {
+    seed(DatabaseSeeder::class);
+
+    expect(
+        JournalEntry::query()->where('entry_number', 'like', 'REC-%')->count(),
+    )->toBe(0);
 });
 
 it('keeps the system inter-branch clearing account code available', function () {
