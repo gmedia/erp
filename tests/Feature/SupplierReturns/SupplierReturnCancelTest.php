@@ -39,7 +39,12 @@ function confirmedSupplierReturnForCancel(): array
     ]);
 
     $coaVersion = CoaVersion::factory()->create(['status' => 'active']);
-    foreach ([['21100', 'liability', 'credit'], ['11300', 'asset', 'debit']] as [$code, $type, $normal]) {
+    $accounts = [
+        ['21100', 'liability', 'credit'],
+        ['21150', 'liability', 'credit'],
+        ['11300', 'asset', 'debit'],
+    ];
+    foreach ($accounts as [$code, $type, $normal]) {
         Account::factory()->create([
             'coa_version_id' => $coaVersion->id,
             'code' => $code,
