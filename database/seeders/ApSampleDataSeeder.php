@@ -384,6 +384,18 @@ class ApSampleDataSeeder extends Seeder
                     continue;
                 }
 
+                // Hanya pembayaran confirmed yang punya jurnal dan boleh tercatat sebagai alokasi.
+                // Alokasi dari pembayaran draft tidak masuk ledger, sehingga subledger
+                // (ap_payment_allocations) sejalan dengan amount_paid dan GL 21100.
+                if ($definition['status'] !== 'confirmed') {
+                    ApPaymentAllocation::query()
+                        ->where('ap_payment_id', $apPayment->id)
+                        ->where('supplier_bill_id', $bill->id)
+                        ->delete();
+
+                    continue;
+                }
+
                 ApPaymentAllocation::updateOrCreate(
                     [
                         'ap_payment_id' => $apPayment->id,
@@ -397,12 +409,7 @@ class ApSampleDataSeeder extends Seeder
                 );
 
                 $totalAllocated += $allocation['amount'];
-
-                // Hanya pembayaran confirmed yang punya jurnal; alokasi draft tidak
-                // boleh menaikkan amount_paid bill (subledger harus sejalan dengan GL).
-                if ($definition['status'] === 'confirmed') {
-                    $billAllocations[$bill->id] = ($billAllocations[$bill->id] ?? 0) + $allocation['amount'];
-                }
+                $billAllocations[$bill->id] = ($billAllocations[$bill->id] ?? 0) + $allocation['amount'];
             }
 
             if ($totalAllocated > 0) {

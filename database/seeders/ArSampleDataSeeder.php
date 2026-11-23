@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use App\Actions\AccountingPosting\PostArReceiptJournalAction;
-use App\Actions\AccountingPosting\PostCreditNoteJournalAction;
 use App\Actions\AccountingPosting\PostCustomerInvoiceJournalAction;
+use App\Actions\CreditNotes\ApplyCreditNoteAction;
 use App\Models\Account;
 use App\Models\ArReceipt;
 use App\Models\ArReceiptAllocation;
@@ -458,6 +458,16 @@ class ArSampleDataSeeder extends Seeder
             $subtotal = $definition['grand_total'] * 0.9;
             $taxAmount = $definition['grand_total'] - $subtotal;
 
+            // CN "applied" dibuat confirmed dulu; status applied diset oleh ApplyCreditNoteAction.
+            // Seed ulang tidak boleh menurunkan CN yang sudah applied kembali ke confirmed.
+            $existingStatus = CreditNote::query()
+                ->where('credit_note_number', $definition['number'])
+                ->value('status');
+            $targetStatus = $definition['applied'] ? 'confirmed' : $definition['status'];
+            if ($existingStatus === 'applied') {
+                $targetStatus = 'applied';
+            }
+
             $creditNote = CreditNote::updateOrCreate(
                 ['credit_note_number' => $definition['number']],
                 [
@@ -470,7 +480,7 @@ class ArSampleDataSeeder extends Seeder
                     'subtotal' => $subtotal,
                     'tax_amount' => $taxAmount,
                     'grand_total' => $definition['grand_total'],
-                    'status' => $definition['status'],
+                    'status' => $targetStatus,
                     'notes' => 'Nota kredit atas retur penjualan',
                     'created_by' => $adminUserId,
                     'confirmed_by' => in_array($definition['status'], ['confirmed', 'applied'], true) ? $adminUserId : null,
@@ -502,10 +512,10 @@ class ArSampleDataSeeder extends Seeder
                 );
             }
 
-            // Credit note applied: jurnal diposting lewat PostCreditNoteJournalAction (idempoten).
-            // Invoice credit_note_amount/amount_due dihitung ulang dari credit note terposting.
-            if ($definition['applied'] && $invoice) {
-                app(PostCreditNoteJournalAction::class)->execute($creditNote->fresh());
+            // Credit note applied: lewat ApplyCreditNoteAction, yang memposting jurnal
+            // (PostCreditNoteJournalAction) dan memperbarui credit_note_amount/amount_due invoice.
+            if ($definition['applied'] && $invoice && $creditNote->fresh()->status === 'confirmed') {
+                app(ApplyCreditNoteAction::class)->execute($creditNote->fresh());
             }
         }
     }
