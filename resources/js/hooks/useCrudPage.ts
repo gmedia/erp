@@ -161,32 +161,28 @@ export function useCrudPage<
 
     const handleEdit = useCallback(
         (item: T) => {
-            setSelectedItem(item);
-            setIsFormOpen(true);
-
-            if (!config.loadDetailOnEdit) {
-                return;
-            }
-
             const identifierKey = config.identifierKey || 'id';
             const id = (item as Record<string, unknown>)[identifierKey];
-            if (id === undefined || id === null) {
+
+            if (!config.loadDetailOnEdit || id === undefined || id === null) {
+                setSelectedItem(item);
+                setIsFormOpen(true);
                 return;
             }
 
             void axios
                 .get(`${config.apiEndpoint}/${String(id)}`)
                 .then((response) => {
-                    const detail = (response.data?.data ?? response.data) as T;
-                    setSelectedItem((current) =>
-                        current &&
-                        (current as Record<string, unknown>)[identifierKey] ===
-                            id
-                            ? detail
-                            : current,
+                    setSelectedItem(
+                        (response.data?.data ?? response.data) as T,
                     );
                 })
-                .catch(() => undefined);
+                .catch(() => {
+                    setSelectedItem(item);
+                })
+                .finally(() => {
+                    setIsFormOpen(true);
+                });
         },
         [config.apiEndpoint, config.identifierKey, config.loadDetailOnEdit],
     );
