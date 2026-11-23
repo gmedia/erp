@@ -13,6 +13,7 @@ use App\Models\Unit;
 use App\Models\User;
 use App\Models\Warehouse;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 class StockAdjustmentSampleDataSeeder extends Seeder
@@ -43,6 +44,17 @@ class StockAdjustmentSampleDataSeeder extends Seeder
             ->value('id');
 
         $samples = [
+            // Saldo awal stok (approved) agar rantai `balance_after` dimulai
+            // dari nilai positif sebelum dokumen lain (W7-04).
+            [
+                'adjustment_number' => "SA-{$year}-910000",
+                'status' => 'approved',
+                'adjustment_date' => "{$year}-01-02",
+                'adjustment_type' => 'initial_stock',
+                'inventory_stocktake_id' => null,
+                'approved' => ['approved_by' => $adminUserId, 'approved_at' => Carbon::parse("{$year}-01-02 09:00")],
+                'items' => $this->makeOpeningStockItems(),
+            ],
             [
                 'adjustment_number' => "SA-{$year}-910001",
                 'status' => 'draft',
@@ -215,6 +227,34 @@ class StockAdjustmentSampleDataSeeder extends Seeder
             ->orderBy('id')
             ->get()
             ->take(3);
+    }
+
+    /**
+     * Saldo awal per produk (semua produk aktif) pada gudang utama.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function makeOpeningStockItems(): array
+    {
+        $items = [];
+        $baseQuantity = 50.0;
+
+        foreach (Product::query()->orderBy('id')->get() as $product) {
+            $unitCost = (float) $product->cost;
+
+            $items[] = [
+                'product_id' => (int) $product->id,
+                'unit_id' => (int) $product->unit_id,
+                'quantity_before' => 0.0,
+                'quantity_adjusted' => $baseQuantity,
+                'quantity_after' => $baseQuantity,
+                'unit_cost' => $unitCost,
+                'total_cost' => $baseQuantity * $unitCost,
+                'reason' => 'Saldo awal stok saat migrasi data',
+            ];
+        }
+
+        return $items;
     }
 
     private function makeManualAdjustmentItems(Collection $products, int $branchId, float $adjustment): array

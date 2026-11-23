@@ -48,11 +48,30 @@ trait InteractsWithStockSnapshotQuery
     /**
      * @return Builder<StockMovement>
      */
+    /**
+     * Latest movement per (product, warehouse) by (moved_at, id) — the same
+     * ordering the movement ledger and balance chain use. Using MAX(id) alone
+     * picks the wrong row when documents are posted out of chronological
+     * order (W7-04).
+     */
     protected function latestStockMovementIdsQuery(): Builder
     {
         return $this->stockMovementModelClass()::query()
-            ->selectRaw('MAX(id) as id')
-            ->groupBy('product_id', 'warehouse_id');
+            ->from('stock_movements as sm_latest')
+            ->select('sm_latest.id')
+            ->whereNotExists(function ($query): void {
+                $query->selectRaw('1')
+                    ->from('stock_movements as sm_newer')
+                    ->whereColumn('sm_newer.product_id', 'sm_latest.product_id')
+                    ->whereColumn('sm_newer.warehouse_id', 'sm_latest.warehouse_id')
+                    ->where(function ($inner): void {
+                        $inner->whereColumn('sm_newer.moved_at', '>', 'sm_latest.moved_at')
+                            ->orWhere(function ($tie): void {
+                                $tie->whereColumn('sm_newer.moved_at', '=', 'sm_latest.moved_at')
+                                    ->whereColumn('sm_newer.id', '>', 'sm_latest.id');
+                            });
+                    });
+            });
     }
 
     protected function applyStockSnapshotFilters(Request $request, Builder $query): void
