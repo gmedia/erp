@@ -17,7 +17,7 @@ class ArOutstandingReportController extends Controller
     ): ArOutstandingReportCollection {
         $rows = $action->execute($request);
 
-        return new ArOutstandingReportCollection($rows);
+        return new ArOutstandingReportCollection($rows, $action->summarize($request));
     }
 
     public function export(

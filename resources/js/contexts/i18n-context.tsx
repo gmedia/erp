@@ -198,6 +198,8 @@ const defaultTranslations: Translations = {
         selectFilterCustomer:
             'Choose a customer in the filters to see the statement.',
         selectFilterDefault: 'Choose the required filters to show {entity}.',
+        totalRow: 'Total (all filtered results)',
+        asOfDate: 'As of {date}',
     },
     admin: {
         selectLogo: 'Select SVG Logo',

@@ -4,6 +4,7 @@ namespace App\Actions\Reports;
 
 use App\Actions\Reports\Concerns\BuildsCustomerInvoiceReportQuery;
 use App\Actions\Reports\Concerns\HandlesReportQuery;
+use App\Actions\Reports\Concerns\SumsReportTotals;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -13,6 +14,7 @@ class IndexArOutstandingReportAction
 {
     use BuildsCustomerInvoiceReportQuery;
     use HandlesReportQuery;
+    use SumsReportTotals;
 
     public function execute(FormRequest $request): LengthAwarePaginator|Collection
     {
@@ -24,6 +26,20 @@ class IndexArOutstandingReportAction
         $this->applyOutstandingSorting($request, $query);
 
         return $this->exportOrPaginate($request, $query);
+    }
+
+    /**
+     * Total + as-of untuk seluruh hasil filter (bukan satu halaman).
+     *
+     * @return array{as_of_date: string, totals: array<string, string>}
+     */
+    public function summarize(FormRequest $request): array
+    {
+        $query = $this->buildQuery();
+
+        $this->applyBaseCustomerInvoiceFilters($request, $query);
+
+        return $this->buildReportSummary($query, ['grand_total', 'amount_received', 'credit_note_amount', 'amount_due']);
     }
 
     protected function buildQuery(): Builder

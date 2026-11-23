@@ -73,6 +73,7 @@ export interface UseCrudQueryReturn<Entity> extends Omit<
 > {
     data: Entity[];
     meta: ApiResponse<Entity>['meta'];
+    summary?: ApiResponse<Entity>['summary'];
 }
 
 export function useCrudQuery<Entity>({
@@ -133,5 +134,6 @@ export function useCrudQuery<Entity>({
         meta:
             query.data?.meta ||
             normalizeMeta(undefined, pagination.per_page, pagination.page),
+        summary: query.data?.summary,
     };
 }

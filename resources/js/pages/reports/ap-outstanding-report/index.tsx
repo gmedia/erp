@@ -36,6 +36,10 @@ export default function ApOutstandingReportPage() {
                 branch_name: false,
                 amount_paid: false,
             }}
+            summaryColumns={[
+                { key: 'grand_total', label: 'Grand Total' },
+                { key: 'amount_due', label: 'Amount Due' },
+            ]}
         />
     );
 }

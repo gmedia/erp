@@ -32,6 +32,12 @@ export default function ArOutstandingReportPage() {
             queryKey={['ar-outstanding-report']}
             entityName="AR Outstanding Report"
             exportEndpoint="/api/reports/ar-outstanding/export"
+            summaryColumns={[
+                { key: 'grand_total', label: 'Grand Total' },
+                { key: 'amount_received', label: 'Amount Received' },
+                { key: 'credit_note_amount', label: 'Credit Note Amount' },
+                { key: 'amount_due', label: 'Amount Due' },
+            ]}
             defaultColumnVisibility={{
                 'branch.name': false,
                 grand_total: false,

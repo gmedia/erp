@@ -148,6 +148,8 @@ export interface Translations {
         selectFilterFiscalYear: string;
         selectFilterCustomer: string;
         selectFilterDefault: string;
+        totalRow: string;
+        asOfDate: string;
     };
     admin: {
         selectLogo: string;

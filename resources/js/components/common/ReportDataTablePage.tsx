@@ -62,7 +62,73 @@ type ReportDataTablePageProps<
     requiredFilterHintKey?: string;
     /** Kolom sekunder yang disembunyikan default (aktif via menu Columns). */
     defaultColumnVisibility?: Record<string, boolean>;
+    summaryColumns?: readonly ReportSummaryColumn[];
 };
+
+export type ReportSummaryColumn = {
+    key: string;
+    label: string;
+};
+
+function formatSummaryAmount(value: string | undefined): string {
+    if (value === undefined || value === null || value === '') {
+        return '-';
+    }
+
+    return Number(value).toLocaleString('id-ID', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+    });
+}
+
+function ReportSummaryFooter({
+    summary,
+    columns,
+}: Readonly<{
+    summary: { as_of_date?: string; totals?: Record<string, string> };
+    columns: readonly ReportSummaryColumn[];
+}>) {
+    const { t } = useTranslation();
+
+    return (
+        <div
+            data-testid="report-summary"
+            className="flex flex-wrap items-center justify-between gap-2 rounded-md border bg-muted/40 px-4 py-3 text-sm"
+        >
+            <div className="flex flex-col">
+                <span className="font-medium text-foreground">
+                    {t('reports.totalRow')}
+                </span>
+                {summary.as_of_date ? (
+                    <span
+                        data-testid="report-as-of"
+                        className="text-xs text-muted-foreground"
+                    >
+                        {t('reports.asOfDate').replace(
+                            '{date}',
+                            summary.as_of_date,
+                        )}
+                    </span>
+                ) : null}
+            </div>
+            <dl className="flex flex-wrap gap-x-6 gap-y-2">
+                {columns.map((column) => (
+                    <div key={column.key} className="flex flex-col items-end">
+                        <dt className="text-xs text-muted-foreground">
+                            {column.label}
+                        </dt>
+                        <dd
+                            data-testid={`report-total-${column.key}`}
+                            className="font-medium text-foreground tabular-nums"
+                        >
+                            {formatSummaryAmount(summary.totals?.[column.key])}
+                        </dd>
+                    </div>
+                ))}
+            </dl>
+        </div>
+    );
+}
 
 function hasAllRequiredFilters(
     filters: Record<string, unknown>,
@@ -122,6 +188,7 @@ export function ReportDataTablePage<
     requiredFilters,
     requiredFilterHintKey,
     defaultColumnVisibility,
+    summaryColumns,
 }: Readonly<ReportDataTablePageProps<TData, TFilters>>) {
     const {
         filters,
@@ -140,7 +207,7 @@ export function ReportDataTablePage<
         requiredFilters,
     );
 
-    const { data, isLoading, meta } = useCrudQuery<TData>({
+    const { data, isLoading, meta, summary } = useCrudQuery<TData>({
         endpoint,
         queryKey,
         entityName,
@@ -194,6 +261,14 @@ export function ReportDataTablePage<
                             defaultColumnVisibility={defaultColumnVisibility}
                             emptyState={ready ? undefined : ''}
                         />
+                        {ready && summaryColumns && summary ? (
+                            <div className="mt-3">
+                                <ReportSummaryFooter
+                                    summary={summary}
+                                    columns={summaryColumns}
+                                />
+                            </div>
+                        ) : null}
                     </div>
                 </div>
                 {children}
