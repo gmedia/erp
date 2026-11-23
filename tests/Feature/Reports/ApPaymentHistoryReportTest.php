@@ -63,6 +63,31 @@ test('it returns confirmed payments with details', function () {
     expect($data[0]['amounts']['total'])->toBe('1000000.00');
 });
 
+test('it returns summary totals across all filtered rows not only current page', function () {
+    $supplier = Supplier::factory()->create();
+
+    ApPayment::factory()->confirmed()->count(3)->create([
+        'supplier_id' => $supplier->id,
+        'total_amount' => 1000000,
+        'total_allocated' => 600000,
+        'total_unallocated' => 400000,
+    ]);
+    ApPayment::factory()->confirmed()->create([
+        'total_amount' => 999999,
+        'total_allocated' => 0,
+        'total_unallocated' => 999999,
+    ]);
+
+    $response = getJson('/api/reports/ap-payment-history?supplier_id=' . $supplier->id . '&per_page=1')
+        ->assertOk();
+
+    expect($response->json('data'))->toHaveCount(1);
+    expect($response->json('summary.as_of_date'))->toBe(now()->toDateString());
+    expect($response->json('summary.totals.total_amount'))->toBe('3000000.00');
+    expect($response->json('summary.totals.total_allocated'))->toBe('1800000.00');
+    expect($response->json('summary.totals.total_unallocated'))->toBe('1200000.00');
+});
+
 test('it can filter by supplier and payment method', function () {
     $supplier1 = Supplier::factory()->create(['name' => 'Supplier A']);
     $supplier2 = Supplier::factory()->create(['name' => 'Supplier B']);
