@@ -8,6 +8,7 @@ use App\Models\PipelineTransitionAction;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseRequest;
 use Database\Seeders\DatabaseSeeder;
+use Illuminate\Database\Migrations\Migration;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use function Pest\Laravel\seed;
@@ -19,10 +20,20 @@ uses(RefreshDatabase::class)->group('purchase-requests');
  */
 function setUpPurchaseDocumentPipelines(): void
 {
-    foreach ([
-        ['code' => 'pr_lifecycle', 'entity_type' => PurchaseRequest::class, 'states' => ['draft', 'pending_approval', 'approved', 'rejected']],
-        ['code' => 'po_lifecycle', 'entity_type' => PurchaseOrder::class, 'states' => ['draft', 'pending_approval', 'confirmed', 'rejected']],
-    ] as $definition) {
+    $definitions = [
+        [
+            'code' => 'pr_lifecycle',
+            'entity_type' => PurchaseRequest::class,
+            'states' => ['draft', 'pending_approval', 'approved', 'rejected'],
+        ],
+        [
+            'code' => 'po_lifecycle',
+            'entity_type' => PurchaseOrder::class,
+            'states' => ['draft', 'pending_approval', 'confirmed', 'rejected'],
+        ],
+    ];
+
+    foreach ($definitions as $definition) {
         $pipeline = Pipeline::factory()->create([
             'code' => $definition['code'],
             'entity_type' => $definition['entity_type'],
@@ -45,7 +56,10 @@ function setUpPurchaseDocumentPipelines(): void
  */
 function runPurchaseDocumentPipelineBackfill(): void
 {
-    $migration = require database_path('migrations/2026_11_23_110000_backfill_pipeline_state_for_purchase_documents.php');
+    $path = database_path('migrations/2026_11_23_110000_backfill_pipeline_state_for_purchase_documents.php');
+
+    /** @var Migration $migration */
+    $migration = require $path;
     $migration->up();
 }
 
