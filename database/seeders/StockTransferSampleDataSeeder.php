@@ -253,7 +253,7 @@ class StockTransferSampleDataSeeder extends Seeder
         foreach ($products as $product) {
             $index++;
             $quantity = (float) (5 * $index);
-            $quantityReceived = 0.0;
+            $quantityReceived = null;
 
             if ($partialReceive) {
                 $quantityReceived = $index === 2 ? max(0.0, $quantity - 2.0) : $quantity;

@@ -25,7 +25,7 @@ class StockTransferItemFactory extends Factory
             'product_id' => Product::factory(),
             'unit_id' => Unit::factory(),
             'quantity' => $this->faker->randomFloat(2, 1, 100),
-            'quantity_received' => 0,
+            'quantity_received' => null,
             'unit_cost' => $this->faker->randomFloat(2, 0, 100000),
             'notes' => $this->faker->optional()->sentence(),
         ];

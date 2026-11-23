@@ -30,7 +30,7 @@ class StockTransferResource extends JsonResource
                 $stockTransferItems,
                 fn ($item) => [
                     'quantity' => (string) $item->quantity,
-                    'quantity_received' => (string) $item->quantity_received,
+                    'quantity_received' => $item->quantity_received === null ? null : (string) $item->quantity_received,
                     'unit_cost' => (string) $item->unit_cost,
                     'notes' => $item->notes,
                 ],

@@ -3,7 +3,8 @@
 import { useCrudFilters, type FilterState } from '@/hooks/useCrudFilters';
 import { useCrudMutations } from '@/hooks/useCrudMutations';
 import { useCrudQuery } from '@/hooks/useCrudQuery';
-import { type ApiError } from '@/utils/errorHandling';
+import axios from '@/lib/axios';
+import { handleApiError, type ApiError } from '@/utils/errorHandling';
 import { useCallback, useMemo, useState } from 'react';
 
 export interface CrudPageConfig<
@@ -21,6 +22,9 @@ export interface CrudPageConfig<
     onUpdateSuccess?: () => void;
     onDeleteSuccess?: () => void;
     onError?: (error: ApiError) => void;
+
+    loadDetailOnEdit?: boolean;
+    detailLoadErrorMessage?: string;
 
     // Filter configuration
     initialFilters?: FilterType;
@@ -156,10 +160,43 @@ export function useCrudPage<
         setIsFormOpen(true);
     }, []);
 
-    const handleEdit = useCallback((item: T) => {
-        setSelectedItem(item);
-        setIsFormOpen(true);
-    }, []);
+    const handleEdit = useCallback(
+        (item: T) => {
+            const identifierKey = config.identifierKey || 'id';
+            const id = (item as Record<string, unknown>)[identifierKey];
+
+            if (
+                !config.loadDetailOnEdit ||
+                (typeof id !== 'string' && typeof id !== 'number')
+            ) {
+                setSelectedItem(item);
+                setIsFormOpen(true);
+                return;
+            }
+
+            void axios
+                .get(`${config.apiEndpoint}/${id}`)
+                .then((response) => {
+                    setSelectedItem(
+                        (response.data?.data ?? response.data) as T,
+                    );
+                    setIsFormOpen(true);
+                })
+                .catch((error: unknown) => {
+                    handleApiError(
+                        error,
+                        config.detailLoadErrorMessage ?? config.entityName,
+                    );
+                });
+        },
+        [
+            config.apiEndpoint,
+            config.identifierKey,
+            config.loadDetailOnEdit,
+            config.detailLoadErrorMessage,
+            config.entityName,
+        ],
+    );
 
     const handleDelete = useCallback((item: T) => {
         setItemToDelete(item);
