@@ -1,6 +1,6 @@
 import { KpiCard } from '@/components/common/KpiCard';
 import { Badge } from '@/components/ui/badge';
-import { formatCurrency } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 import {
     Banknote,
     Building2,
@@ -227,22 +227,24 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
     ];
 
     return (
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-12">
             {cards.map((card, index) => (
                 <div
                     key={card.title}
-                    className={
-                        index === cards.length - 1
-                            ? 'col-span-2 lg:col-span-4'
-                            : undefined
-                    }
+                    className={cn(
+                        index === cards.length - 1 && 'col-span-2',
+                        index < 4 ? 'lg:col-span-3' : 'lg:col-span-4',
+                    )}
                 >
                     <KpiCard
                         title={card.title}
                         icon={card.icon}
                         formattedValue={card.formattedValue}
                         iconColor={card.iconColor}
-                        valueClassName={card.valueClassName}
+                        valueClassName={cn(
+                            'text-lg sm:text-xl',
+                            card.valueClassName,
+                        )}
                     >
                         {card.footer}
                     </KpiCard>
