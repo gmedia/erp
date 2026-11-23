@@ -19,7 +19,6 @@ use App\Models\AssetStocktakeItem;
 use App\Models\Branch;
 use App\Models\Department;
 use App\Models\Employee;
-use App\Models\FiscalYear;
 use App\Models\Pipeline;
 use App\Models\PipelineEntityState;
 use App\Models\PipelineState;
@@ -29,7 +28,6 @@ use App\Models\Supplier;
 use App\Models\SupplierCategory;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Carbon;
 
 class AssetSampleDataSeeder extends Seeder
 {
@@ -130,15 +128,15 @@ class AssetSampleDataSeeder extends Seeder
         foreach ($branches as $branch) {
             $office = AssetLocation::updateOrCreate(
                 ['branch_id' => $branch->id, 'code' => 'OFFICE'],
-                ['name' => 'Office (' . $branch->name . ')', 'parent_id' => null]
+                ['name' => 'Office ('.$branch->name.')', 'parent_id' => null]
             );
             AssetLocation::updateOrCreate(
                 ['branch_id' => $branch->id, 'code' => 'IT-ROOM'],
-                ['name' => 'IT Room (' . $branch->name . ')', 'parent_id' => $office->id]
+                ['name' => 'IT Room ('.$branch->name.')', 'parent_id' => $office->id]
             );
             AssetLocation::updateOrCreate(
                 ['branch_id' => $branch->id, 'code' => 'WAREHOUSE'],
-                ['name' => 'Warehouse (' . $branch->name . ')', 'parent_id' => null]
+                ['name' => 'Warehouse ('.$branch->name.')', 'parent_id' => null]
             );
         }
 
@@ -508,9 +506,10 @@ class AssetSampleDataSeeder extends Seeder
             // Perolehan dijurnal dari nilai register (#357). Draft dan aset
             // yang dibatalkan belum dikapitalisasi, jadi tidak diposting.
             // Aset disposed sebelum fiscal year terbuka tidak masuk saldo awal.
-            if (in_array($asset->status, ['active', 'maintenance', 'lost'], true)
-                || ($asset->status === 'disposed' && $this->acquiredWithinOpenFiscalYear($asset))) {
-                app(PostAssetAcquisitionJournalAction::class)->execute($asset);
+            $acquisitionJournal = app(PostAssetAcquisitionJournalAction::class);
+
+            if ($acquisitionJournal->isPostable($asset)) {
+                $acquisitionJournal->execute($asset);
             }
 
             AssetMovement::updateOrCreate(
@@ -544,7 +543,7 @@ class AssetSampleDataSeeder extends Seeder
                         'to_department_id' => null,
                         'from_employee_id' => $asset->employee_id,
                         'to_employee_id' => null,
-                        'reference' => 'DISP-' . $asset->asset_code,
+                        'reference' => 'DISP-'.$asset->asset_code,
                         'notes' => 'Disposal initiated via seeder',
                         'created_by' => $adminUser?->id,
                     ]
@@ -668,7 +667,7 @@ class AssetSampleDataSeeder extends Seeder
         // Map transition by "from_code -> to_code"
         $transitionMap = [];
         foreach ($transitions as $t) {
-            $key = $t->fromState->code . '->' . $t->toState->code;
+            $key = $t->fromState->code.'->'.$t->toState->code;
             $transitionMap[$key] = $t;
         }
 
@@ -703,7 +702,7 @@ class AssetSampleDataSeeder extends Seeder
                     'active',
                     'disposed',
                     'Laptop sudah melewati masa manfaat 3 tahun, layar retak dan keyboard tidak berfungsi. '
-                        . 'Disetujui untuk dihapusbukukan.',
+                        .'Disetujui untuk dihapusbukukan.',
                     60,
                 ],
             ],
@@ -714,7 +713,7 @@ class AssetSampleDataSeeder extends Seeder
                     'active',
                     'lost',
                     'Filing cabinet tidak ditemukan setelah proses pindah kantor dari Gedung A ke Gedung B. '
-                        . 'Sudah dicari selama 2 minggu.',
+                        .'Sudah dicari selama 2 minggu.',
                     30,
                 ],
             ],
@@ -848,7 +847,7 @@ class AssetSampleDataSeeder extends Seeder
                     'to_location_id' => $office->id,
                     'from_department_id' => $defaultDepartment->id,
                     'to_department_id' => $defaultDepartment->id,
-                    'reference' => 'TRF-' . now()->format('Y') . '-000101',
+                    'reference' => 'TRF-'.now()->format('Y').'-000101',
                     'notes' => 'Dipindahkan ke lantai 2 untuk penggunaan bersama.',
                     'created_by' => $adminUser?->id,
                 ]);
@@ -901,7 +900,7 @@ class AssetSampleDataSeeder extends Seeder
         if (! AssetStocktake::where('branch_id', $headOffice->id)->exists()) {
             $stocktake = AssetStocktake::create([
                 'branch_id' => $headOffice->id,
-                'reference' => 'STO-' . date('Y') . '-000101',
+                'reference' => 'STO-'.date('Y').'-000101',
                 'planned_at' => now()->subDays(1),
                 'performed_at' => now(),
                 'status' => 'completed',
@@ -963,20 +962,5 @@ class AssetSampleDataSeeder extends Seeder
                 'accumulated_depr_account_id' => $accumAcc->id,
             ]);
         }
-    }
-
-    private function acquiredWithinOpenFiscalYear(Asset $asset): bool
-    {
-        if ($asset->purchase_date === null) {
-            return false;
-        }
-
-        $purchaseDate = Carbon::parse($asset->purchase_date)->toDateString();
-
-        return FiscalYear::query()
-            ->where('status', 'open')
-            ->where('start_date', '<=', $purchaseDate)
-            ->where('end_date', '>=', $purchaseDate)
-            ->exists();
     }
 }

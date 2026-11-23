@@ -37,9 +37,12 @@ function makeOpeningCapitalAccounts(): array
         'is_active' => true,
     ]);
 
+    // Ambil dari COA aktif saja, sama dengan resolver di action.
+    $activeIds = CoaVersion::query()->where('status', 'active')->pluck('id');
+
     return [
-        'bank' => Account::query()->where('code', '11110')->firstOrFail(),
-        'capital' => Account::query()->where('code', '31000')->firstOrFail(),
+        'bank' => Account::query()->whereIn('coa_version_id', $activeIds)->where('code', '11110')->firstOrFail(),
+        'capital' => Account::query()->whereIn('coa_version_id', $activeIds)->where('code', '31000')->firstOrFail(),
     ];
 }
 
@@ -94,6 +97,68 @@ test('PostOpeningCapitalJournalAction is idempotent for the same reference', fun
     expect($second->id)->toBe($first->id)
         ->and(JournalEntry::query()->where('reference', 'OPEN-CAP-2026')->count())->toBe(1);
 });
+
+test('PostOpeningCapitalJournalAction memakai akun dari COA aktif, bukan COA nonaktif dengan kode sama', function () {
+    FiscalYear::factory()->create([
+        'name' => '2026',
+        'start_date' => '2026-01-01',
+        'end_date' => '2026-12-31',
+        'status' => 'open',
+    ]);
+
+    // COA lama (nonaktif) dengan kode yang sama dan id lebih kecil.
+    $oldVersion = CoaVersion::factory()->create(['status' => 'archived']);
+    Account::factory()->create([
+        'coa_version_id' => $oldVersion->id,
+        'code' => '11110',
+        'name' => 'Cash in Bank (lama)',
+        'type' => 'asset',
+        'normal_balance' => 'debit',
+        'is_active' => true,
+    ]);
+    Account::factory()->create([
+        'coa_version_id' => $oldVersion->id,
+        'code' => '31000',
+        'name' => 'Paid-in Capital (lama)',
+        'type' => 'equity',
+        'normal_balance' => 'credit',
+        'is_active' => true,
+    ]);
+
+    $accounts = makeOpeningCapitalAccounts();
+
+    $entry = app(PostOpeningCapitalJournalAction::class)->execute(
+        '2026-01-01',
+        500000000,
+        'OPEN-CAP-COA',
+        'Saldo awal modal',
+    );
+
+    $accountIds = $entry->lines()->pluck('account_id')->sort()->values()->all();
+    expect($accountIds)->toBe(collect([$accounts['bank']->id, $accounts['capital']->id])->sort()->values()->all());
+});
+
+test('PostOpeningCapitalJournalAction gagal bila akun kontrol tidak ada di COA aktif', function () {
+    FiscalYear::factory()->create([
+        'name' => '2026',
+        'start_date' => '2026-01-01',
+        'end_date' => '2026-12-31',
+        'status' => 'open',
+    ]);
+
+    // Hanya akun di COA nonaktif: resolver harus menolak, bukan memakai akun lama.
+    $oldVersion = CoaVersion::factory()->create(['status' => 'archived']);
+    Account::factory()->create([
+        'coa_version_id' => $oldVersion->id,
+        'code' => '11110',
+        'name' => 'Cash in Bank (lama)',
+        'type' => 'asset',
+        'normal_balance' => 'debit',
+        'is_active' => true,
+    ]);
+
+    app(PostOpeningCapitalJournalAction::class)->execute('2026-01-01', 500000000, 'OPEN-CAP-NOCOA', 'Saldo awal');
+})->throws(ValidationException::class);
 
 test('PostOpeningCapitalJournalAction rejects a non-positive amount', function () {
     FiscalYear::factory()->create([

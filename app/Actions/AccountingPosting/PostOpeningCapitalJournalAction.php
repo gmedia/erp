@@ -3,7 +3,6 @@
 namespace App\Actions\AccountingPosting;
 
 use App\Actions\JournalEntries\CreateJournalEntryAction;
-use App\Models\Account;
 use App\Models\JournalEntry;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -22,6 +21,7 @@ class PostOpeningCapitalJournalAction
 
     public function __construct(
         private CreateJournalEntryAction $createJournalEntry,
+        private ResolveControlAccountAction $resolveControlAccount,
     ) {}
 
     public function execute(string $entryDate, float $amount, string $reference, string $description): JournalEntry
@@ -44,8 +44,8 @@ class PostOpeningCapitalJournalAction
         }
 
         return DB::transaction(function () use ($entryDate, $amount, $reference, $description): JournalEntry {
-            $bankAccount = Account::query()->where('code', self::BANK_ACCOUNT_CODE)->firstOrFail();
-            $capitalAccount = Account::query()->where('code', self::PAID_IN_CAPITAL_CODE)->firstOrFail();
+            $bankAccount = $this->resolveControlAccount->execute(self::BANK_ACCOUNT_CODE);
+            $capitalAccount = $this->resolveControlAccount->execute(self::PAID_IN_CAPITAL_CODE);
 
             return $this->createJournalEntry->execute([
                 'entry_date' => $entryDate,

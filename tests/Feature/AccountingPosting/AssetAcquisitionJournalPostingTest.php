@@ -123,6 +123,42 @@ test('perolehan sebelum fiscal year terbuka dijurnal sebagai saldo awal di hari 
     expect($totalDebit)->toBe($totalCredit);
 });
 
+test('aset disposed sebelum fiscal year terbuka tidak masuk saldo awal (tidak ada jurnal ACQ)', function () {
+    makeAssetAcquisitionFixtures();
+
+    // Diperoleh 2024 (FY 2024 tidak ada / bukan open) lalu sudah dihapusbukukan.
+    $asset = Asset::factory()->create([
+        'asset_code' => 'FA-2024-0099',
+        'purchase_date' => '2024-06-01',
+        'purchase_cost' => 12000000,
+        'depreciation_start_date' => '2024-06-01',
+        'useful_life_months' => 24,
+        'salvage_value' => 0,
+        'status' => 'disposed',
+    ]);
+
+    $action = app(PostAssetAcquisitionJournalAction::class);
+
+    expect($action->isPostable($asset))->toBeFalse();
+    expect(JournalEntry::query()->where('reference', 'ACQ-FA-2024-0099')->exists())->toBeFalse();
+});
+
+test('aset disposed yang diperoleh dalam fiscal year terbuka tetap dijurnal', function () {
+    makeAssetAcquisitionFixtures();
+
+    $asset = Asset::factory()->create([
+        'asset_code' => 'FA-2026-0150',
+        'purchase_date' => '2026-02-01',
+        'purchase_cost' => 7000000,
+        'depreciation_start_date' => '2026-02-01',
+        'useful_life_months' => 24,
+        'salvage_value' => 0,
+        'status' => 'disposed',
+    ]);
+
+    expect(app(PostAssetAcquisitionJournalAction::class)->isPostable($asset))->toBeTrue();
+});
+
 test('perolehan yang dijurnal ulang dengan referensi sama dikembalikan tanpa jurnal ganda', function () {
     makeAssetAcquisitionFixtures();
 

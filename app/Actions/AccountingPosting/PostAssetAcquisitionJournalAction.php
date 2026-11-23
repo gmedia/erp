@@ -39,6 +39,32 @@ class PostAssetAcquisitionJournalAction
         private ResolveControlAccountAction $resolveControlAccount,
     ) {}
 
+    /**
+     * Aturan kapan aset masuk jurnal perolehan (#357):
+     * - active / maintenance / lost: selalu (perolehan sudah dikapitalisasi).
+     * - disposed: hanya bila diperoleh dalam fiscal year yang terbuka.
+     *   Disposed sebelum fiscal year terbuka tidak masuk saldo awal.
+     * - draft / cancelled: tidak dijurnal.
+     */
+    public function isPostable(Asset $asset): bool
+    {
+        if (in_array($asset->status, ['active', 'maintenance', 'lost'], true)) {
+            return true;
+        }
+
+        if ($asset->status !== 'disposed' || $asset->purchase_date === null) {
+            return false;
+        }
+
+        $purchaseDate = Carbon::parse($asset->purchase_date)->toDateString();
+
+        return FiscalYear::query()
+            ->where('status', 'open')
+            ->where('start_date', '<=', $purchaseDate)
+            ->where('end_date', '>=', $purchaseDate)
+            ->exists();
+    }
+
     public function execute(Asset $asset): JournalEntry
     {
         $amount = round((float) $asset->purchase_cost, 2);
@@ -49,7 +75,7 @@ class PostAssetAcquisitionJournalAction
             ]);
         }
 
-        $reference = 'ACQ-' . $asset->asset_code;
+        $reference = 'ACQ-'.$asset->asset_code;
 
         $existing = JournalEntry::query()
             ->where('reference', $reference)
