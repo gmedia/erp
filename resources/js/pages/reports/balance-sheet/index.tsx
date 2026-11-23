@@ -89,6 +89,7 @@ export default function BalanceSheet() {
     return (
         <FinancialReportPageShell
             title="Balance Sheet"
+            descriptionKey="reports.pageDescriptions.balance-sheet"
             path="/reports/balance-sheet"
             fiscalYears={fiscalYears}
             selectedYearId={selectedYearId}

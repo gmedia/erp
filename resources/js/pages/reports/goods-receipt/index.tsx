@@ -15,6 +15,7 @@ export default function GoodsReceiptReportPage() {
     return (
         <ReportDataTablePage<GoodsReceiptReportItem>
             title="Goods Receipt Report"
+            descriptionKey="reports.pageDescriptions.goods-receipt"
             breadcrumbs={createReportBreadcrumbs(
                 'Goods Receipt',
                 '/reports/goods-receipt',

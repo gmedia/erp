@@ -81,6 +81,7 @@ export default function ApprovalMonitoringDashboard() {
                             </Label>
                             <AsyncSelect
                                 url="/api/branches"
+                                label="Branch"
                                 placeholder="All Branches"
                                 value={filters.branch_id}
                                 onValueChange={(val) =>

@@ -15,6 +15,7 @@ export default function InventoryStocktakeVarianceReportPage() {
     return (
         <ReportDataTablePage<InventoryStocktakeVarianceReportItem>
             title="Inventory Stocktake Variance Report"
+            descriptionKey="reports.pageDescriptions.inventory-stocktake-variance"
             breadcrumbs={createReportBreadcrumbs(
                 'Inventory Stocktake Variance',
                 '/reports/inventory-stocktake-variance',

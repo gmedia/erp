@@ -13,6 +13,7 @@ export default function BudgetVarianceReportPage() {
     return (
         <ReportDataTablePage<BudgetVarianceItem>
             title="Budget Variance Report"
+            descriptionKey="reports.pageDescriptions.budget-variance"
             breadcrumbs={createReportBreadcrumbs(
                 'Budget Variance',
                 '/reports/budget-variance',

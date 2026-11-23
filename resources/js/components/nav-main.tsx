@@ -61,7 +61,7 @@ export function NavMain({ items = [] }: Readonly<{ items: NavItem[] }>) {
             '[data-slot="sidebar-content"] [data-active="true"]',
         );
 
-        active?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        active?.scrollIntoView({ block: 'center', inline: 'nearest' });
     }, [location.pathname]);
 
     return (

@@ -95,6 +95,33 @@ const defaultTranslations: Translations = {
             updated_at: 'Updated At',
         },
     },
+    my_approvals: {
+        request_number: 'No. {id}',
+    },
+    users: {
+        title: 'Users',
+        description: 'Manage user accounts linked to employees.',
+        add: 'Add User',
+        edit_user: 'Edit User',
+        dialog_description:
+            'Select an employee, then set the account name, email, and password.',
+        search_placeholder: 'Search users...',
+        loading: 'Loading users...',
+        empty_title: 'No users found',
+        empty_description:
+            'Create a user account for an employee to get started.',
+        no_employee: 'No linked employee',
+        edit_requires_employee:
+            'Link an employee to this user before editing it.',
+        status_linked: 'Linked',
+        status_unlinked: 'Unlinked',
+        columns: {
+            name: 'Name',
+            email: 'Email',
+            employee: 'Employee',
+            status: 'Status',
+        },
+    },
     departments: {
         title: 'Departments',
         add: 'Add Department',
@@ -180,6 +207,8 @@ const defaultTranslations: Translations = {
         selectFilterCustomer:
             'Choose a customer in the filters to see the statement.',
         selectFilterDefault: 'Choose the required filters to show {entity}.',
+        totalRow: 'Total (all filtered results)',
+        asOfDate: 'As of {date}',
     },
     admin: {
         selectLogo: 'Select SVG Logo',

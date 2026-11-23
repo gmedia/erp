@@ -15,6 +15,7 @@ export default function ApPaymentHistoryReportPage() {
     return (
         <ReportDataTablePage<ApPaymentHistoryReportItem>
             title="AP Payment History"
+            descriptionKey="reports.pageDescriptions.ap-payment-history"
             breadcrumbs={createReportBreadcrumbs(
                 'AP Payment History',
                 '/reports/ap-payment-history',
@@ -29,6 +30,11 @@ export default function ApPaymentHistoryReportPage() {
                 'payment_date_from',
                 'payment_date_to',
             ])}
+            summaryColumns={[
+                { key: 'total_amount', label: 'Total Amount' },
+                { key: 'total_allocated', label: 'Allocated' },
+                { key: 'total_unallocated', label: 'Unallocated' },
+            ]}
             endpoint="/api/reports/ap-payment-history"
             queryKey={['ap-payment-history-report']}
             entityName="AP Payment History"

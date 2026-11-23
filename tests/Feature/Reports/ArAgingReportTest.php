@@ -55,6 +55,7 @@ test('it can fetch ar aging report data with aging buckets', function () {
             ->has('data.0.aging_buckets')
             ->has('meta')
             ->has('links')
+            ->has('summary')
         );
 });
 
@@ -156,6 +157,34 @@ test('it can export ar aging report', function () {
 
     Excel::assertStored('exports/' . $filename, 'public');
     Carbon::setTestNow();
+});
+
+test('it returns totals across all filtered rows not only the current page', function () {
+    $customer = Customer::factory()->create();
+    $fiscalYear = FiscalYear::factory()->create();
+
+    foreach ([1, 2] as $i) {
+        CustomerInvoice::factory()->create([
+            'invoice_number' => 'INV-TOTAL-' . $i,
+            'customer_id' => $customer->id,
+            'fiscal_year_id' => $fiscalYear->id,
+            'invoice_date' => '2026-01-10',
+            'due_date' => '2026-02-10',
+            'status' => 'sent',
+            'grand_total' => 100000 * $i,
+            'amount_received' => 0,
+            'amount_due' => 100000 * $i,
+        ]);
+    }
+
+    Sanctum::actingAs($this->user, ['*']);
+    getJson('/api/reports/ar-aging?per_page=1')
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('meta.total', 2)
+        ->assertJsonPath('summary.totals.amount_due', '300000.00')
+        ->assertJsonPath('summary.totals.grand_total', '300000.00')
+        ->assertJsonPath('summary.as_of_date', Carbon::today()->toDateString());
 });
 
 test('it rejects mixed currencies in the aggregated scope', function () {

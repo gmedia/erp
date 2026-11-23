@@ -117,7 +117,7 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => 'posting_journal',
-                        'display_name' => 'Posting Journal',
+                        'display_name' => 'Posting Journals',
                         'permissions' => [
                             'posting_journal',
                         ],
@@ -265,7 +265,7 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => 'asset_depreciation_run',
-                        'display_name' => 'Depreciation Run',
+                        'display_name' => 'Depreciation Runs',
                         'permissions' => [
                             'asset_depreciation_run',
                         ],
@@ -488,7 +488,7 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => 'ap_aging_report',
-                        'display_name' => 'AP Aging',
+                        'display_name' => 'AP Aging Report',
                         'permissions' => ['ap_aging_report'],
                         'icon' => 'Calendar',
                         'url' => 'reports/ap-aging',
@@ -567,7 +567,7 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => 'ar_aging_report',
-                        'display_name' => 'AR Aging',
+                        'display_name' => 'AR Aging Report',
                         'permissions' => ['ar_aging_report'],
                         'icon' => 'Calendar',
                         'url' => 'reports/ar-aging',
@@ -1068,7 +1068,7 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => 'permission',
-                        'display_name' => 'Permission',
+                        'display_name' => 'Permissions',
                         'permissions' => [
                             'permission',
                         ],
@@ -1078,7 +1078,7 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => 'user',
-                        'display_name' => 'User',
+                        'display_name' => 'Users',
                         'permissions' => [
                             'user',
                         ],

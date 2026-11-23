@@ -15,8 +15,9 @@ export default function ArAgingReportPage() {
     return (
         <ReportDataTablePage<ArAgingReportItem>
             title="AR Aging Report"
+            descriptionKey="reports.pageDescriptions.ar-aging"
             breadcrumbs={createReportBreadcrumbs(
-                'AR Aging',
+                'AR Aging Report',
                 '/reports/ar-aging',
             )}
             columns={arAgingReportColumns}
@@ -38,6 +39,14 @@ export default function ArAgingReportPage() {
                 credit_note_amount: false,
                 amount_due: false,
             }}
+            summaryColumns={[
+                { key: 'amount_due', label: 'Amount Due' },
+                { key: 'aging_current', label: 'Current' },
+                { key: 'aging_1_30', label: '1-30 Days' },
+                { key: 'aging_31_60', label: '31-60 Days' },
+                { key: 'aging_61_90', label: '61-90 Days' },
+                { key: 'aging_over_90', label: 'Over 90 Days' },
+            ]}
         />
     );
 }

@@ -17,7 +17,7 @@ class ApAgingReportController extends Controller
     ): ApAgingReportCollection {
         $rows = $action->execute($request);
 
-        return new ApAgingReportCollection($rows);
+        return new ApAgingReportCollection($rows, $action->summarize($request));
     }
 
     public function export(

@@ -23,6 +23,7 @@ type FinancialSummaryCardProps = {
     children: ReactNode;
     className?: string;
     contentClassName?: string;
+    hideStatusBorder?: boolean;
 };
 
 export function FinancialStatusBadge({
@@ -51,12 +52,17 @@ export function FinancialSummaryCard({
     children,
     className,
     contentClassName,
+    hideStatusBorder = false,
 }: Readonly<FinancialSummaryCardProps>) {
     return (
         <Card
             className={cn(
-                'overflow-hidden border-t-4',
-                isPositive ? 'border-success' : 'border-destructive',
+                'overflow-hidden',
+                !hideStatusBorder &&
+                    cn(
+                        'border-t-4',
+                        isPositive ? 'border-success' : 'border-destructive',
+                    ),
                 className,
             )}
         >

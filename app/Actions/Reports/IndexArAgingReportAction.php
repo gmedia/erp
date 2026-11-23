@@ -5,6 +5,7 @@ namespace App\Actions\Reports;
 use App\Actions\Reports\Concerns\AgingReportBoundaries;
 use App\Actions\Reports\Concerns\BuildsCustomerInvoiceReportQuery;
 use App\Actions\Reports\Concerns\HandlesReportQuery;
+use App\Actions\Reports\Concerns\SumsReportTotals;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -15,6 +16,7 @@ class IndexArAgingReportAction
     use AgingReportBoundaries;
     use BuildsCustomerInvoiceReportQuery;
     use HandlesReportQuery;
+    use SumsReportTotals;
 
     public function execute(FormRequest $request): LengthAwarePaginator|Collection
     {
@@ -34,6 +36,30 @@ class IndexArAgingReportAction
         );
 
         return $this->exportOrPaginate($request, $query);
+    }
+
+    /**
+     * Total + as-of untuk seluruh hasil filter (bukan satu halaman).
+     *
+     * @return array{as_of_date: string, totals: array<string, string>}
+     */
+    public function summarize(FormRequest $request): array
+    {
+        $query = $this->buildQuery();
+
+        $this->applyBaseCustomerInvoiceFilters($request, $query);
+
+        return $this->buildReportSummary($query, [
+            'grand_total',
+            'amount_received',
+            'credit_note_amount',
+            'amount_due',
+            'aging_current',
+            'aging_1_30',
+            'aging_31_60',
+            'aging_61_90',
+            'aging_over_90',
+        ]);
     }
 
     protected function buildQuery(): Builder
