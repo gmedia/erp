@@ -93,7 +93,7 @@ test('user with purchase_request.edit (no pipeline permission) can submit a purc
     ])->assertOk();
 });
 
-test('user with purchase_order module permission but without purchase_order.edit cannot submit a purchase order', function () {
+test('user with purchase_order module permission but no purchase_order.edit cannot submit a PO', function () {
     $setup = setUpPurchaseOrderSubmitPipeline();
     $user = createTestUserWithPermissions(['purchase_order']);
     Sanctum::actingAs($user, ['*']);
@@ -152,7 +152,7 @@ test('user without any relevant permission cannot access purchase order entity s
     ])->assertStatus(403);
 });
 
-test('purchase order transition without required_permission is denied for user without pipeline permission', function () {
+test('PO transition without required_permission is denied for user without pipeline permission', function () {
     $setup = setUpPurchaseOrderSubmitPipeline(null);
     $user = createTestUserWithPermissions(['purchase_order', 'purchase_order.edit']);
     Sanctum::actingAs($user, ['*']);
