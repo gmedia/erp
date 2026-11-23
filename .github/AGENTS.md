@@ -14,7 +14,7 @@ GitHub-only configuration: CI/CD workflows and issue templates. Agent rules, ski
 │   ├── ci-image.yml         # Docker CI image build
 │   ├── issue-lifecycle.yml  # Label status:* otomatis saat PR dibuka/merge
 │   ├── release.yml          # Release workflow
-│   └── tests.yml            # Test pipeline (Pest + Playwright E2E, 4 shard)
+│   └── tests.yml            # Test pipeline (Pest + Playwright E2E, 6 shard)
 └── AGENTS.md
 ```
 
