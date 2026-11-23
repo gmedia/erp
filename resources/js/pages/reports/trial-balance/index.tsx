@@ -10,7 +10,6 @@ import {
     useSingleYearFinancialReportPage,
     type FinancialTableRow,
 } from '@/components/reports/financial/FinancialTableReportPage';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import {
     Table,
     TableBody,
@@ -105,94 +104,101 @@ export default function TrialBalance() {
             }
         >
             <div className="flex flex-col gap-3">
-                <ScrollArea className="max-h-[calc(100vh-18rem)]">
-                    <Table className="min-w-[760px]">
-                        <TableHeader className="sticky top-0 z-10 bg-background [&_th]:text-muted-foreground">
-                            <TableRow>
-                                <TableHead className="w-[120px]">
-                                    Code
-                                </TableHead>
-                                <TableHead>Account Name</TableHead>
-                                <TableHead className="hidden w-[120px] md:table-cell">
-                                    Type
-                                </TableHead>
-                                <TableHead className="text-right tabular-nums">
-                                    Debit
-                                </TableHead>
-                                <TableHead className="text-right tabular-nums">
-                                    Credit
-                                </TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {report.length === 0 ? (
+                <div className="overflow-hidden rounded-md border">
+                    <div className="overflow-x-auto">
+                        <Table className="md:min-w-[760px]">
+                            <TableHeader className="[&_th]:text-muted-foreground">
                                 <TableRow>
-                                    <TableCell
-                                        colSpan={5}
-                                        className="h-24 text-center text-muted-foreground"
-                                    >
-                                        No data available for the selected
-                                        fiscal year.
-                                    </TableCell>
+                                    <TableHead className="w-[64px] md:w-[120px]">
+                                        Code
+                                    </TableHead>
+                                    <TableHead className="max-w-[104px] md:max-w-none">
+                                        Account Name
+                                    </TableHead>
+                                    <TableHead className="hidden w-[120px] md:table-cell">
+                                        Type
+                                    </TableHead>
+                                    <TableHead className="text-right text-xs whitespace-nowrap tabular-nums md:text-sm">
+                                        Debit
+                                    </TableHead>
+                                    <TableHead className="text-right text-xs whitespace-nowrap tabular-nums md:text-sm">
+                                        Credit
+                                    </TableHead>
                                 </TableRow>
-                            ) : (
-                                report.map((item) => (
-                                    <TableRow key={item.id}>
-                                        <TableCell className="font-mono text-xs text-muted-foreground">
-                                            {item.code}
-                                        </TableCell>
-                                        <TableCell>
-                                            <div
-                                                className="truncate"
-                                                style={{
-                                                    paddingLeft: `${Math.max(0, item.level - 1) * 1.25}rem`,
-                                                }}
-                                            >
-                                                {item.name}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="hidden text-muted-foreground capitalize md:table-cell">
-                                            {item.type}
-                                        </TableCell>
-                                        <TableCell className="text-right tabular-nums">
-                                            {item.debit === 0
-                                                ? '-'
-                                                : formatCurrency(item.debit)}
-                                        </TableCell>
-                                        <TableCell className="text-right tabular-nums">
-                                            {item.credit === 0
-                                                ? '-'
-                                                : formatCurrency(item.credit)}
+                            </TableHeader>
+                            <TableBody>
+                                {report.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell
+                                            colSpan={5}
+                                            className="h-24 text-center text-muted-foreground"
+                                        >
+                                            No data available for the selected
+                                            fiscal year.
                                         </TableCell>
                                     </TableRow>
-                                ))
+                                ) : (
+                                    report.map((item) => (
+                                        <TableRow key={item.id}>
+                                            <TableCell className="font-mono text-xs text-muted-foreground">
+                                                {item.code}
+                                            </TableCell>
+                                            <TableCell className="max-w-[104px] md:max-w-none">
+                                                <div
+                                                    className="truncate"
+                                                    style={{
+                                                        paddingLeft: `${Math.max(0, item.level - 1) * 1.25}rem`,
+                                                    }}
+                                                >
+                                                    {item.name}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="hidden text-muted-foreground capitalize md:table-cell">
+                                                {item.type}
+                                            </TableCell>
+                                            <TableCell className="text-right text-xs whitespace-nowrap tabular-nums md:text-sm">
+                                                {item.debit === 0
+                                                    ? '-'
+                                                    : formatCurrency(
+                                                          item.debit,
+                                                      )}
+                                            </TableCell>
+                                            <TableCell className="text-right text-xs whitespace-nowrap tabular-nums md:text-sm">
+                                                {item.credit === 0
+                                                    ? '-'
+                                                    : formatCurrency(
+                                                          item.credit,
+                                                      )}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+                            {report.length > 0 && (
+                                <TableFooter>
+                                    <TableRow>
+                                        <TableCell
+                                            colSpan={3}
+                                            className="text-right font-semibold"
+                                        >
+                                            Total
+                                        </TableCell>
+                                        <TableCell
+                                            className={`text-right font-semibold tabular-nums ${isBalanced ? '' : 'text-destructive'}`}
+                                        >
+                                            {formatCurrency(totalDebit)}
+                                        </TableCell>
+                                        <TableCell
+                                            className={`text-right font-semibold tabular-nums ${isBalanced ? '' : 'text-destructive'}`}
+                                        >
+                                            {formatCurrency(totalCredit)}
+                                        </TableCell>
+                                    </TableRow>
+                                </TableFooter>
                             )}
-                        </TableBody>
-                        {report.length > 0 && (
-                            <TableFooter>
-                                <TableRow>
-                                    <TableCell
-                                        colSpan={3}
-                                        className="text-right font-semibold"
-                                    >
-                                        Total
-                                    </TableCell>
-                                    <TableCell
-                                        className={`text-right font-semibold tabular-nums ${isBalanced ? '' : 'text-destructive'}`}
-                                    >
-                                        {formatCurrency(totalDebit)}
-                                    </TableCell>
-                                    <TableCell
-                                        className={`text-right font-semibold tabular-nums ${isBalanced ? '' : 'text-destructive'}`}
-                                    >
-                                        {formatCurrency(totalCredit)}
-                                    </TableCell>
-                                </TableRow>
-                            </TableFooter>
-                        )}
-                    </Table>
-                    <ScrollBar orientation="horizontal" />
-                </ScrollArea>
+                        </Table>
+                    </div>
+                </div>
                 {!isBalanced && report.length > 0 && (
                     <div className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
                         Trial balance is not balanced. Difference:{' '}
