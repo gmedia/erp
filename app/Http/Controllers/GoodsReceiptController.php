@@ -17,8 +17,11 @@ use App\Http\Requests\GoodsReceipts\UpdateGoodsReceiptRequest;
 use App\Http\Resources\GoodsReceipts\GoodsReceiptCollection;
 use App\Http\Resources\GoodsReceipts\GoodsReceiptResource;
 use App\Models\GoodsReceipt;
+use App\Services\PurchaseOrderReceiptService;
+use App\Services\StockPostingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
@@ -73,16 +76,31 @@ class GoodsReceiptController extends Controller
         SyncGoodsReceiptItemsAction $syncItems,
         PostGoodsReceiptJournalAction $postJournal,
         PostGoodsReceiptMovementsAction $postMovements,
+        StockPostingService $stockPosting,
+        PurchaseOrderReceiptService $purchaseOrderReceipts,
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
         unset($validated['items']);
 
         $isNewlyConfirmed = ($validated['status'] ?? null) === 'confirmed' && $goodsReceipt->confirmed_at === null;
+        $isCancellingConfirmed = ($validated['status'] ?? null) === 'cancelled' && $goodsReceipt->status === 'confirmed';
 
         if ($isNewlyConfirmed) {
             $validated['confirmed_by'] = Auth::id();
             $validated['confirmed_at'] = now()->toIso8601String();
+        }
+
+        if ($isCancellingConfirmed) {
+            // Issue #356 baris 3: GR confirmed yang dibatalkan harus membalik stok
+            // dan received qty PO, dalam transaksi yang sama dengan perubahan status.
+            DB::transaction(function () use ($goodsReceipt, $validated, $stockPosting, $purchaseOrderReceipts): void {
+                $goodsReceipt->update(UpdateGoodsReceiptData::fromArray($validated)->toArray());
+                $stockPosting->reverseDocument(GoodsReceipt::class, $goodsReceipt->id, 'goods_receipt');
+                $purchaseOrderReceipts->syncFromGoodsReceipt($goodsReceipt->refresh());
+            });
+
+            return (new GoodsReceiptResource($this->loadResourceRelations($goodsReceipt)))->response();
         }
 
         $this->updateWithSyncedItems(
@@ -116,6 +134,14 @@ class GoodsReceiptController extends Controller
         if ($isNewlyConfirmed) {
             // Setelah commit: movement tetap ada walau posting jurnal gagal.
             $postMovements->execute($goodsReceipt->refresh());
+        } elseif ($goodsReceipt->status === 'confirmed' && is_array($items)) {
+            // Issue #356: item GR confirmed diedit setelah posting. Movement lama dibalik
+            // (histori tetap), lalu item baru diposting ulang. Tanpa ini stok tidak sesuai item.
+            DB::transaction(function () use ($goodsReceipt, $stockPosting, $purchaseOrderReceipts, $postMovements): void {
+                $stockPosting->reverseDocument(GoodsReceipt::class, $goodsReceipt->id, 'goods_receipt');
+                $postMovements->execute($goodsReceipt->refresh());
+                $purchaseOrderReceipts->syncFromGoodsReceipt($goodsReceipt);
+            });
         }
 
         return (new GoodsReceiptResource($this->loadResourceRelations($goodsReceipt)))->response();

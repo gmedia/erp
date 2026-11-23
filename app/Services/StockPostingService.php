@@ -8,6 +8,7 @@ use App\Models\StockMovement;
 use App\Models\StockTransfer;
 use App\Models\SupplierReturn;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Single source of truth for stock posting.
@@ -83,6 +84,7 @@ class StockPostingService
                 'reference_type' => GoodsReceipt::class,
                 'reference_id' => $goodsReceipt->id,
                 'reference_number' => $goodsReceipt->gr_number,
+                'source_line_id' => (int) $item->id,
                 'warehouse_id' => (int) $goodsReceipt->warehouse_id,
                 'product_id' => (int) $item->product_id,
                 'quantity_in' => $quantity,
@@ -120,6 +122,7 @@ class StockPostingService
                 'reference_type' => SupplierReturn::class,
                 'reference_id' => $supplierReturn->id,
                 'reference_number' => $supplierReturn->return_number,
+                'source_line_id' => (int) $item->id,
                 'warehouse_id' => (int) $supplierReturn->warehouse_id,
                 'product_id' => (int) $item->product_id,
                 'quantity_in' => 0,
@@ -157,6 +160,7 @@ class StockPostingService
                 'reference_type' => StockAdjustment::class,
                 'reference_id' => $stockAdjustment->id,
                 'reference_number' => $stockAdjustment->adjustment_number,
+                'source_line_id' => (int) $item->id,
                 'warehouse_id' => (int) $stockAdjustment->warehouse_id,
                 'product_id' => (int) $item->product_id,
                 'quantity_in' => $quantity > 0 ? abs($quantity) : 0,
@@ -198,6 +202,7 @@ class StockPostingService
                 'reference_type' => StockTransfer::class,
                 'reference_id' => $stockTransfer->id,
                 'reference_number' => $stockTransfer->transfer_number,
+                'source_line_id' => (int) $item->id,
                 'warehouse_id' => (int) $stockTransfer->from_warehouse_id,
                 'product_id' => (int) $item->product_id,
                 'quantity_in' => 0,
@@ -238,6 +243,7 @@ class StockPostingService
                 'reference_type' => StockTransfer::class,
                 'reference_id' => $stockTransfer->id,
                 'reference_number' => $stockTransfer->transfer_number,
+                'source_line_id' => (int) $item->id,
                 'warehouse_id' => (int) $stockTransfer->to_warehouse_id,
                 'product_id' => (int) $item->product_id,
                 'quantity_in' => $quantity,
@@ -255,6 +261,165 @@ class StockPostingService
     }
 
     /**
+     * Membalik semua movement dokumen yang sudah terposting dengan movement
+     * pembalik. Histori tidak dihapus (Issue #356, baris 3-4).
+     *
+     * Pembalik dibuat per movement asal dan bersifat idempoten: jika pembalik
+     * untuk movement asal sudah ada, tidak dibuat lagi.
+     */
+    public function reverseDocument(string $referenceType, int $referenceId, string $reversalType, ?int $createdBy = null): void
+    {
+        $originals = StockMovement::query()
+            ->where('reference_type', $referenceType)
+            ->where('reference_id', $referenceId)
+            ->whereNotIn('movement_type', [
+                'goods_receipt_reversal',
+                'supplier_return_reversal',
+                'adjustment_reversal',
+                'transfer_out_reversal',
+                'transfer_in_reversal',
+            ])
+            ->get();
+
+        $scopes = [];
+
+        foreach ($originals as $original) {
+            $alreadyReversed = StockMovement::query()
+                ->where('movement_type', $reversalType . '_reversal')
+                ->where('reference_type', $referenceType)
+                ->where('reference_id', $referenceId)
+                ->where('source_line_id', $original->source_line_id)
+                ->where('warehouse_id', $original->warehouse_id)
+                ->where('product_id', $original->product_id)
+                ->exists();
+
+            if ($alreadyReversed) {
+                continue;
+            }
+
+            $this->record([
+                'movement_type' => $reversalType . '_reversal',
+                'reference_type' => $referenceType,
+                'reference_id' => $referenceId,
+                'reference_number' => $original->reference_number,
+                'source_line_id' => $original->source_line_id,
+                'warehouse_id' => $original->warehouse_id,
+                'product_id' => $original->product_id,
+                'quantity_in' => (float) $original->quantity_out,
+                'quantity_out' => (float) $original->quantity_in,
+                'unit_cost' => $original->unit_cost,
+                'notes' => 'Pembalik dokumen dibatalkan',
+                'moved_at' => now(),
+                'created_by' => $createdBy ?? Auth::id(),
+            ]);
+
+            $scopes[] = [(int) $original->product_id, (int) $original->warehouse_id];
+        }
+
+        if ($scopes !== []) {
+            $this->rebuildBalances($scopes);
+        }
+    }
+
+    /**
+     * Menolak pengeluaran yang membuat stok negatif (Issue #356, baris 6).
+     *
+     * Dipanggil di dalam transaksi. Baris saldo diambil dengan lockForUpdate
+     * agar dua dokumen keluar bersamaan tidak sama-sama lolos.
+     *
+     * @param  array<int, array{0:int,1:int,2:float}>  $outflows  [product_id, warehouse_id, quantity]
+     */
+    public function assertNoNegativeStock(array $outflows): void
+    {
+        $required = [];
+
+        foreach ($outflows as [$productId, $warehouseId, $quantity]) {
+            if ($quantity <= 0) {
+                continue;
+            }
+
+            $key = $productId . ':' . $warehouseId;
+            $required[$key] = ($required[$key] ?? 0.0) + $quantity;
+        }
+
+        foreach ($required as $key => $quantity) {
+            [$productId, $warehouseId] = array_map('intval', explode(':', $key));
+
+            $available = (float) StockMovement::query()
+                ->where('product_id', $productId)
+                ->where('warehouse_id', $warehouseId)
+                ->lockForUpdate()
+                ->orderByDesc('moved_at')
+                ->orderByDesc('id')
+                ->value('balance_after');
+
+            if ($available < $quantity) {
+                throw ValidationException::withMessages([
+                    'items' => ["Stok tidak cukup untuk produk {$productId} di gudang {$warehouseId} (tersedia {$available}, dibutuhkan {$quantity})."],
+                ])->status(422);
+            }
+        }
+    }
+
+    /**
+     * Membalik movement transfer: dispatch (transfer_out) dan receive (transfer_in).
+     * Dipisah agar tipe pembalik mengikuti tipe asal.
+     */
+    public function reverseTransfer(StockTransfer $stockTransfer): void
+    {
+        $this->reverseMovementsOfType(StockTransfer::class, $stockTransfer->id, 'transfer_out', 'transfer_out_reversal');
+        $this->reverseMovementsOfType(StockTransfer::class, $stockTransfer->id, 'transfer_in', 'transfer_in_reversal');
+    }
+
+    private function reverseMovementsOfType(string $referenceType, int $referenceId, string $originalType, string $reversalType): void
+    {
+        $originals = StockMovement::query()
+            ->where('reference_type', $referenceType)
+            ->where('reference_id', $referenceId)
+            ->where('movement_type', $originalType)
+            ->get();
+
+        $scopes = [];
+
+        foreach ($originals as $original) {
+            $alreadyReversed = StockMovement::query()
+                ->where('movement_type', $reversalType)
+                ->where('reference_type', $referenceType)
+                ->where('reference_id', $referenceId)
+                ->where('source_line_id', $original->source_line_id)
+                ->where('warehouse_id', $original->warehouse_id)
+                ->where('product_id', $original->product_id)
+                ->exists();
+
+            if ($alreadyReversed) {
+                continue;
+            }
+
+            $this->record([
+                'movement_type' => $reversalType,
+                'reference_type' => $referenceType,
+                'reference_id' => $referenceId,
+                'reference_number' => $original->reference_number,
+                'source_line_id' => $original->source_line_id,
+                'warehouse_id' => $original->warehouse_id,
+                'product_id' => $original->product_id,
+                'quantity_in' => (float) $original->quantity_out,
+                'quantity_out' => (float) $original->quantity_in,
+                'unit_cost' => $original->unit_cost,
+                'notes' => 'Pembalik dokumen dibatalkan',
+                'moved_at' => now(),
+                'created_by' => Auth::id(),
+            ]);
+
+            $scopes[] = [(int) $original->product_id, (int) $original->warehouse_id];
+        }
+
+        if ($scopes !== []) {
+            $this->rebuildBalances($scopes);
+        }
+    }
+
+    /**
      * Idempotent upsert keyed by reference + type + warehouse + product.
      *
      * @param  array<string, mixed>  $attributes
@@ -266,6 +431,7 @@ class StockPostingService
                 'movement_type' => $attributes['movement_type'],
                 'reference_type' => $attributes['reference_type'],
                 'reference_id' => $attributes['reference_id'],
+                'source_line_id' => $attributes['source_line_id'],
                 'warehouse_id' => $attributes['warehouse_id'],
                 'product_id' => $attributes['product_id'],
             ],
