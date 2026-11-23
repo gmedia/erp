@@ -40,6 +40,8 @@ class AssetSampleDataSeeder extends Seeder
         'FA-000001', 'FA-000002', 'FA-000003', 'FA-000004',
         'FA-000005', 'FA-000006', 'FA-000007', 'FA-000008',
         'FA-000009', 'FA-000010', 'FA-000011', 'FA-000012',
+        // Kendaraan dibuat VehicleLoanSampleDataSeeder, tetap bagian dari demo.
+        'FA-000013', 'FA-000014', 'FA-000015',
     ];
 
     public function run(): void
