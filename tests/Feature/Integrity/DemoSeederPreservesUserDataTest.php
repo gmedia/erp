@@ -6,12 +6,14 @@ use App\Models\AssetDepreciationLine;
 use App\Models\AssetDepreciationRun;
 use App\Models\Branch;
 use App\Models\FiscalYear;
+use App\Models\InventoryStocktake;
 use App\Models\JournalEntry;
 use App\Models\Product;
 use App\Models\StockMovement;
 use App\Models\Supplier;
 use App\Models\SupplierBill;
 use App\Models\SupplierBillItem;
+use App\Models\User;
 use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -99,6 +101,27 @@ test('re-running demo seeders does not delete journals of user-created documents
 
     expect(JournalEntry::query()->whereKey($journal->id)->exists())->toBeTrue()
         ->and(SupplierBill::query()->whereKey($bill->id)->value('journal_entry_id'))->toBe($journal->id);
+});
+
+test('re-running demo seeders keeps user stocktakes whose number matches legacy demo pattern', function () {
+    test()->seed();
+
+    $warehouse = Warehouse::query()->firstOrFail();
+    $adminId = User::query()->orderBy('id')->value('id');
+
+    // Nomor pengguna yang kebetulan cocok pola lama SO-%-92% (tidak punya item demo).
+    $userStocktake = InventoryStocktake::query()->create([
+        'stocktake_number' => 'SO-2026-920777',
+        'warehouse_id' => $warehouse->id,
+        'stocktake_date' => now()->toDateString(),
+        'status' => 'draft',
+        'notes' => 'Stocktake buatan pengguna',
+        'created_by' => $adminId,
+    ]);
+
+    test()->seed();
+
+    expect(InventoryStocktake::query()->whereKey($userStocktake->id)->exists())->toBeTrue();
 });
 
 test('re-running demo seeders does not touch user-created assets or their depreciation runs', function () {
