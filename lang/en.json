@@ -234,6 +234,9 @@
     "approval.status_manual_forbidden": "This status can only be set through the approval process or by the system.",
     "approval.items_locked": "Items can only be changed while the document is still a draft.",
     "approval.form_locked": "Awaiting or past approval: header and items are read-only. Use status actions instead.",
+    "approval.tab_details": "Details",
+    "approval.tab_timeline": "Timeline",
+    "approval.tab_approvals": "Approvals",
     "stock_transfer.items_locked": "Items and dispatched quantities cannot change after dispatch; only the received quantity can change.",
     "stock_transfer.qty_received_exceeds": "Received quantity cannot exceed the transferred quantity."
 }

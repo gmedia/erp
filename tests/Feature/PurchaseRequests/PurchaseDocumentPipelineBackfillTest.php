@@ -113,19 +113,16 @@ test('backfill is idempotent and skips documents that already have a pipeline st
         ->and($pr->fresh()->status)->toBe('draft');
 });
 
-test('backfill falls back to the initial state when status is not part of the pipeline', function () {
+test('backfill does not default a document with a status outside the pipeline to the initial state', function () {
     $pr = PurchaseRequest::factory()->create(['status' => 'fully_ordered']);
     PipelineEntityState::query()->delete();
 
     runPurchaseDocumentPipelineBackfill();
 
-    $state = PipelineEntityState::query()
+    expect(PipelineEntityState::query()
         ->where('entity_type', PurchaseRequest::class)
         ->where('entity_id', $pr->id)
-        ->with('currentState')
-        ->first();
-
-    expect($state->currentState->code)->toBe('draft')
+        ->exists())->toBeFalse()
         ->and($pr->fresh()->status)->toBe('fully_ordered');
 });
 

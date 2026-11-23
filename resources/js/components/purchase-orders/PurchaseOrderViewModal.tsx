@@ -14,6 +14,7 @@ import { EntityStateTimeline } from '@/components/pipeline/EntityStateTimeline';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useTranslation } from '@/contexts/i18n-context';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { useQueryClient } from '@tanstack/react-query';
 import React from 'react';
@@ -48,6 +49,7 @@ export const PurchaseOrderViewModal = React.memo(
     ({ item, open, onClose }: PurchaseOrderViewModalProps) => {
         const [timelineKey, setTimelineKey] = React.useState(() => Date.now());
         const queryClient = useQueryClient();
+        const { t } = useTranslation();
 
         if (!item) return null;
 
@@ -84,9 +86,15 @@ export const PurchaseOrderViewModal = React.memo(
             >
                 <Tabs defaultValue="details" className="min-h-0 flex-1">
                     <TabsList className="grid w-full grid-cols-3">
-                        <TabsTrigger value="details">Details</TabsTrigger>
-                        <TabsTrigger value="timeline">Timeline</TabsTrigger>
-                        <TabsTrigger value="approvals">Approvals</TabsTrigger>
+                        <TabsTrigger value="details">
+                            {t('approval.tab_details')}
+                        </TabsTrigger>
+                        <TabsTrigger value="timeline">
+                            {t('approval.tab_timeline')}
+                        </TabsTrigger>
+                        <TabsTrigger value="approvals">
+                            {t('approval.tab_approvals')}
+                        </TabsTrigger>
                     </TabsList>
                     <TabsContent
                         value="timeline"

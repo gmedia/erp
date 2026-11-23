@@ -75,11 +75,17 @@ class PurchaseOrder extends Model
     use BuildsAttributeCasts, HasFactory, HasPipeline, HasSupplierRelation;
 
     /**
-     * Statuses that are only produced by the approval flow / pipeline, never set manually.
+     * Statuses that are only produced by the approval flow, the pipeline submit, or
+     * goods receipt (PurchaseOrderReceiptService). Never reached by a manual transition.
      *
      * @var list<string>
      */
-    public const APPROVAL_OUTCOME_STATUSES = ['confirmed', 'rejected'];
+    public const APPROVAL_OUTCOME_STATUSES = [
+        'confirmed',
+        'rejected',
+        'partially_received',
+        'fully_received',
+    ];
 
     public const STATUS_DRAFT = 'draft';
 

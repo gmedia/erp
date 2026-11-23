@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Backfill pipeline state untuk Purchase Request dan Purchase Order lama
@@ -52,11 +53,22 @@ return new class extends Migration
                         ->where('pipeline_id', $pipeline->id);
                 })
                 ->orderBy('id')
-                ->chunkById(500, function ($documents) use ($entityType, $pipeline, $initialState, $statesByCode) {
+                ->chunkById(500, function ($documents) use ($entityType, $pipeline, $statesByCode) {
                     $now = now();
 
                     foreach ($documents as $document) {
-                        $stateId = $statesByCode[$document->status] ?? $initialState->id;
+                        // Status tanpa state di pipeline ini (mis. approved yang tidak terdefinisi)
+                        // dilewati dan dicatat, supaya tidak tampil sebagai draft yang bisa diajukan ulang.
+                        if (! isset($statesByCode[$document->status])) {
+                            Log::warning(
+                                'Backfill pipeline state dilewati: status tanpa state di pipeline. '
+                                . "Entity: {$entityType} ID: {$document->id} Status: {$document->status}"
+                            );
+
+                            continue;
+                        }
+
+                        $stateId = $statesByCode[$document->status];
 
                         $entityStateId = DB::table('pipeline_entity_states')->insertGetId([
                             'pipeline_id' => $pipeline->id,
