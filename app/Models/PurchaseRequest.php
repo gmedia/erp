@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Actions\EntityStates\AssignPipelineAction;
+use App\Traits\HasPipeline;
 use Database\Factories\PurchaseRequestFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -63,7 +65,7 @@ use Illuminate\Support\Carbon;
 class PurchaseRequest extends Model
 {
     /** @use HasFactory<PurchaseRequestFactory> */
-    use HasFactory;
+    use HasFactory, HasPipeline;
 
     /**
      * The attributes that are mass assignable.
@@ -96,6 +98,17 @@ class PurchaseRequest extends Model
         'estimated_amount' => 'decimal:2',
         'approved_at' => 'datetime',
     ];
+
+    /**
+     * Auto-assign the pr_lifecycle pipeline (initial state: draft) on creation,
+     * so every creation path (API, import, seeder) gets a pipeline state.
+     */
+    protected static function booted(): void
+    {
+        static::created(function (PurchaseRequest $purchaseRequest): void {
+            app(AssignPipelineAction::class)->execute($purchaseRequest);
+        });
+    }
 
     public function branch(): BelongsTo
     {
