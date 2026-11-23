@@ -22,6 +22,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useTranslation } from '@/contexts/i18n-context';
 import { usePostingJournal } from '@/hooks/usePostingJournal';
 import { BreadcrumbItem } from '@/types';
 import { JournalEntry } from '@/types/journal-entry';
@@ -51,6 +52,7 @@ function getStatusBadgeVariant(status: JournalEntry['status']) {
 }
 
 export default function Index() {
+    const { t } = useTranslation();
     const {
         data,
         meta,
@@ -225,7 +227,7 @@ export default function Index() {
                         <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                         <Input
                             value={searchQuery}
-                            placeholder="Search journals..."
+                            placeholder={t('postingJournals.searchPlaceholder')}
                             className="pl-9"
                             onChange={(e) => handleSearch(e.target.value)}
                         />

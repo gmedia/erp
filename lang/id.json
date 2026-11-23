@@ -71,6 +71,15 @@
             "updated_at": "Diperbarui"
         }
     },
+    "pipelineDashboard": {
+        "entitiesInState": "entitas saat ini dalam status ini"
+    },
+    "postingJournals": {
+        "searchPlaceholder": "Cari jurnal..."
+    },
+    "accounts": {
+        "searchPlaceholder": "Cari kode atau nama..."
+    },
     "my_approvals": {
         "request_number": "No. {id}"
     },

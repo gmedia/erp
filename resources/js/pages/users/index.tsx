@@ -263,7 +263,10 @@ function UsersBody({ manager }: Readonly<{ manager: UsersManager }>) {
         tableBody = rows.map((row) => (
             <TableRow key={row.id} data-testid="user-row">
                 <TableCell className="font-medium">{row.name}</TableCell>
-                <TableCell className="max-w-[220px] truncate" title={row.email}>
+                <TableCell
+                    className="max-w-[160px] break-all md:max-w-[220px]"
+                    title={row.email}
+                >
                     {row.email}
                 </TableCell>
                 <TableCell>
@@ -306,6 +309,11 @@ function UsersBody({ manager }: Readonly<{ manager: UsersManager }>) {
                             )}
                         </Tooltip>
                     </TooltipProvider>
+                    {!row.employee && (
+                        <p className="mt-1 text-xs text-muted-foreground md:hidden">
+                            {t('users.edit_requires_employee')}
+                        </p>
+                    )}
                 </TableCell>
             </TableRow>
         ));

@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useTranslation } from '@/contexts/i18n-context';
 import { StateSummary } from '@/hooks/usePipelineDashboard';
 
 interface StateSummaryCardsProps {
@@ -10,6 +11,8 @@ export function StateSummaryCards({
     data,
     isLoading,
 }: Readonly<StateSummaryCardsProps>) {
+    const { t } = useTranslation();
+
     if (isLoading) {
         return (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -113,12 +116,12 @@ export function StateSummaryCards({
                                         {state.name}
                                     </CardTitle>
                                 </CardHeader>
-                                <CardContent>
+                                <CardContent className="pb-5">
                                     <div className="text-3xl font-bold">
                                         {state.count}
                                     </div>
                                     <p className="mt-1 text-xs text-muted-foreground">
-                                        entities currently in state
+                                        {t('pipelineDashboard.entitiesInState')}
                                     </p>
                                 </CardContent>
                             </Card>

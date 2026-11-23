@@ -42,6 +42,12 @@ interface TrialBalanceResponse {
 
 const emptyTrialBalanceReport: TrialBalanceResponse['report'] = [];
 
+const NAME_CELL_CLASS =
+    'min-w-[136px] break-words whitespace-normal md:min-w-0';
+
+const AMOUNT_HEAD_CLASS =
+    'min-w-[92px] text-right text-xs whitespace-nowrap tabular-nums md:min-w-0 md:text-sm';
+
 export default function TrialBalance() {
     const {
         fiscalYears,
@@ -113,16 +119,16 @@ export default function TrialBalance() {
                                     <TableHead className="w-[64px] md:w-[120px]">
                                         Code
                                     </TableHead>
-                                    <TableHead className="max-w-[104px] md:max-w-none">
+                                    <TableHead className="min-w-[136px] md:min-w-0">
                                         Account Name
                                     </TableHead>
                                     <TableHead className="hidden w-[120px] md:table-cell">
                                         Type
                                     </TableHead>
-                                    <TableHead className="text-right text-xs whitespace-nowrap tabular-nums md:text-sm">
+                                    <TableHead className={AMOUNT_HEAD_CLASS}>
                                         Debit
                                     </TableHead>
-                                    <TableHead className="text-right text-xs whitespace-nowrap tabular-nums md:text-sm">
+                                    <TableHead className={AMOUNT_HEAD_CLASS}>
                                         Credit
                                     </TableHead>
                                 </TableRow>
@@ -144,9 +150,11 @@ export default function TrialBalance() {
                                             <TableCell className="font-mono text-xs text-muted-foreground">
                                                 {item.code}
                                             </TableCell>
-                                            <TableCell className="max-w-[104px] md:max-w-none">
+                                            <TableCell
+                                                className={NAME_CELL_CLASS}
+                                            >
                                                 <div
-                                                    className="truncate"
+                                                    className="break-words"
                                                     style={{
                                                         paddingLeft: `${Math.max(0, item.level - 1) * 1.25}rem`,
                                                     }}

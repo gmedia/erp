@@ -30,6 +30,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useExport } from '@/hooks/useExport';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
@@ -44,6 +45,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function AccountIndex() {
+    const { t } = useTranslation();
     const [coaVersions, setCoaVersions] = useState<CoaVersion[]>([]);
     const [selectedVersionId, setSelectedVersionId] = useState<string | null>(
         null,
@@ -249,7 +251,7 @@ export default function AccountIndex() {
                     <div className="relative flex-1">
                         <Search className="absolute top-2.5 left-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
-                            placeholder="Search code or name..."
+                            placeholder={t('accounts.searchPlaceholder')}
                             className="pl-8"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
