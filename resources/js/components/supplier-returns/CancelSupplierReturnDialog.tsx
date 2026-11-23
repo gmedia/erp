@@ -40,14 +40,9 @@ export function CancelSupplierReturnDialog({
 
     const cancelMutation = useMutation({
         mutationFn: async (target: SupplierReturn) => {
-            const previous = target.notes?.trim();
-            const notes = previous
-                ? `${previous}\n[Cancelled] ${reason.trim()}`
-                : `[Cancelled] ${reason.trim()}`;
-
             const response = await axios.put(
                 `/api/supplier-returns/${target.id}`,
-                { status: 'cancelled', notes },
+                { status: 'cancelled', notes: reason.trim() },
             );
             return response.data;
         },

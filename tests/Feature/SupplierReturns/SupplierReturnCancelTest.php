@@ -17,6 +17,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\deleteJson;
 use function Pest\Laravel\putJson;
 
 uses(RefreshDatabase::class)->group('supplier-returns');
@@ -82,6 +83,19 @@ function confirmedSupplierReturnForCancel(): array
         'unit_price' => 5000,
     ]);
 
+    // Stok masuk sah dari penerimaan barang (5 unit) sebelum retur 3 unit dikonfirmasi.
+    StockMovement::factory()->create([
+        'movement_type' => 'goods_receipt',
+        'reference_type' => GoodsReceipt::class,
+        'reference_id' => $goodsReceipt->id,
+        'product_id' => $product->id,
+        'warehouse_id' => $warehouse->id,
+        'quantity_in' => 5,
+        'quantity_out' => 0,
+        'balance_after' => 5,
+        'moved_at' => now()->subDay(),
+    ]);
+
     $supplierReturn = SupplierReturn::factory()->create([
         'purchase_order_id' => $purchaseOrder->id,
         'goods_receipt_id' => $goodsReceipt->id,
@@ -132,15 +146,15 @@ beforeEach(function () {
 test('cancelling a confirmed supplier return reverses stock with a reversal movement and keeps history', function () {
     [$supplierReturn, $warehouse, $product] = confirmedSupplierReturnForCancel();
 
-    // Retur confirmed mengeluarkan 3 unit tanpa stok masuk sebelumnya: saldo -3.
-    expect(stockBalanceFor($product->id, $warehouse->id))->toBe(-3.0);
+    // Stok 5 - retur confirmed 3 = saldo 2.
+    expect(stockBalanceFor($product->id, $warehouse->id))->toBe(2.0);
 
     putJson('/api/supplier-returns/' . $supplierReturn->id, ['status' => 'cancelled'])
         ->assertOk()
         ->assertJsonPath('data.status', 'cancelled');
 
-    // Pembalik mengembalikan 3 unit: saldo kembali ke 0, histori movement tidak dihapus.
-    expect(stockBalanceFor($product->id, $warehouse->id))->toBe(0.0);
+    // Pembalik mengembalikan 3 unit: saldo kembali ke 5, histori movement tidak dihapus.
+    expect(stockBalanceFor($product->id, $warehouse->id))->toBe(5.0);
 
     assertDatabaseHas('stock_movements', [
         'movement_type' => 'supplier_return',
@@ -230,6 +244,138 @@ test('cancelling an already cancelled supplier return is rejected and does not r
         ->where('source_type', SupplierReturn::class)
         ->where('source_id', $supplierReturn->id)
         ->count())->toBe($reversalEntries);
+});
+
+test('cancelling a confirmed supplier return stores the reason and who cancelled it and when', function () {
+    [$supplierReturn] = confirmedSupplierReturnForCancel();
+
+    putJson('/api/supplier-returns/' . $supplierReturn->id, [
+        'status' => 'cancelled',
+        'notes' => 'Barang rusak saat diterima',
+    ])->assertOk();
+
+    $notes = $supplierReturn->refresh()->notes;
+    expect($notes)->toContain('Barang rusak saat diterima');
+    expect($notes)->toContain('[Cancelled by user #');
+});
+
+test('a cancelled supplier return cannot be re-opened to draft or confirmed', function () {
+    [$supplierReturn] = confirmedSupplierReturnForCancel();
+
+    putJson('/api/supplier-returns/' . $supplierReturn->id, ['status' => 'cancelled'])->assertOk();
+
+    putJson('/api/supplier-returns/' . $supplierReturn->id, ['status' => 'confirmed'])
+        ->assertStatus(422);
+    putJson('/api/supplier-returns/' . $supplierReturn->id, ['status' => 'draft'])
+        ->assertStatus(422);
+
+    expect($supplierReturn->refresh()->status)->toBe('cancelled');
+});
+
+test('a confirmed supplier return cannot be moved back to draft', function () {
+    [$supplierReturn, $warehouse, $product] = confirmedSupplierReturnForCancel();
+
+    putJson('/api/supplier-returns/' . $supplierReturn->id, ['status' => 'draft'])
+        ->assertStatus(422);
+
+    expect($supplierReturn->refresh()->status)->toBe('confirmed');
+    expect(stockBalanceFor($product->id, $warehouse->id))->toBe(2.0);
+});
+
+test('a confirmed supplier return cannot be deleted and keeps its stock and journal', function () {
+    [$supplierReturn, $warehouse, $product] = confirmedSupplierReturnForCancel();
+
+    $movementsBefore = StockMovement::query()->count();
+    $entriesBefore = JournalEntry::query()->count();
+
+    deleteJson('/api/supplier-returns/' . $supplierReturn->id)->assertStatus(422);
+
+    expect(SupplierReturn::query()->whereKey($supplierReturn->id)->exists())->toBeTrue();
+    expect(StockMovement::query()->count())->toBe($movementsBefore);
+    expect(JournalEntry::query()->count())->toBe($entriesBefore);
+});
+
+test('confirming a supplier return that exceeds stock is rejected with 422', function () {
+    $year = now()->format('Y');
+    FiscalYear::factory()->create([
+        'name' => $year,
+        'start_date' => $year . '-01-01',
+        'end_date' => $year . '-12-31',
+        'status' => 'open',
+    ]);
+
+    $supplier = Supplier::factory()->create();
+    $warehouse = Warehouse::factory()->create();
+    $purchaseOrder = PurchaseOrder::factory()->create([
+        'supplier_id' => $supplier->id,
+        'warehouse_id' => $warehouse->id,
+    ]);
+    $product = Product::factory()->create();
+    $unit = Unit::factory()->create();
+    $purchaseOrderItem = $purchaseOrder->items()->create([
+        'product_id' => $product->id,
+        'unit_id' => $unit->id,
+        'quantity' => 10,
+        'unit_price' => 5000,
+        'discount_percent' => 0,
+        'tax_percent' => 0,
+        'line_total' => 50000,
+    ]);
+    $goodsReceipt = GoodsReceipt::factory()->create([
+        'purchase_order_id' => $purchaseOrder->id,
+        'warehouse_id' => $warehouse->id,
+    ]);
+    $goodsReceiptItem = $goodsReceipt->items()->create([
+        'purchase_order_item_id' => $purchaseOrderItem->id,
+        'product_id' => $product->id,
+        'unit_id' => $unit->id,
+        'quantity_received' => 5,
+        'quantity_accepted' => 5,
+        'quantity_rejected' => 0,
+        'unit_price' => 5000,
+    ]);
+    $supplierReturn = SupplierReturn::factory()->create([
+        'purchase_order_id' => $purchaseOrder->id,
+        'goods_receipt_id' => $goodsReceipt->id,
+        'supplier_id' => $supplier->id,
+        'warehouse_id' => $warehouse->id,
+        'return_date' => now()->format('Y-m-d'),
+        'status' => 'draft',
+    ]);
+
+    // Tidak ada stok masuk di gudang ini: konfirmasi 3 unit harus ditolak (#356).
+    putJson('/api/supplier-returns/' . $supplierReturn->id, [
+        'status' => 'confirmed',
+        'items' => [[
+            'goods_receipt_item_id' => $goodsReceiptItem->id,
+            'product_id' => $product->id,
+            'unit_id' => $unit->id,
+            'quantity_returned' => 3,
+            'unit_price' => 5000,
+        ]],
+    ])->assertStatus(422);
+
+    expect($supplierReturn->refresh()->status)->toBe('draft');
+    expect(StockMovement::query()->where('product_id', $product->id)->count())->toBe(0);
+});
+
+test('editing items of a confirmed supplier return is rejected and keeps stock', function () {
+    [$supplierReturn, $warehouse, $product] = confirmedSupplierReturnForCancel();
+
+    $item = $supplierReturn->items()->firstOrFail();
+
+    putJson('/api/supplier-returns/' . $supplierReturn->id, [
+        'items' => [[
+            'goods_receipt_item_id' => $item->goods_receipt_item_id,
+            'product_id' => $product->id,
+            'unit_id' => $item->unit_id,
+            'quantity_returned' => 1,
+            'unit_price' => 5000,
+        ]],
+    ])->assertStatus(422);
+
+    expect($supplierReturn->items()->firstOrFail()->quantity_returned)->toEqual(3.0);
+    expect(stockBalanceFor($product->id, $warehouse->id))->toBe(2.0);
 });
 
 test('cancelling a confirmed supplier return requires the supplier_return.edit permission', function () {

@@ -7,6 +7,7 @@ use App\Models\GoodsReceipt;
 use App\Models\JournalEntry;
 use App\Models\Product;
 use App\Models\PurchaseOrder;
+use App\Models\StockMovement;
 use App\Models\Supplier;
 use App\Models\SupplierReturn;
 use App\Models\Unit;
@@ -68,6 +69,19 @@ function createGoodsReceiptItemForSupplierReturn(): array
         'quantity_accepted' => 5,
         'quantity_rejected' => 0,
         'unit_price' => 5000,
+    ]);
+
+    // Stok masuk sah dari penerimaan barang, supaya retur tidak membuat saldo negatif (#356).
+    StockMovement::factory()->create([
+        'movement_type' => 'goods_receipt',
+        'reference_type' => GoodsReceipt::class,
+        'reference_id' => $goodsReceipt->id,
+        'product_id' => $product->id,
+        'warehouse_id' => $warehouse->id,
+        'quantity_in' => 5,
+        'quantity_out' => 0,
+        'balance_after' => 5,
+        'moved_at' => now()->subDay(),
     ]);
 
     return [$purchaseOrder, $goodsReceipt, $goodsReceiptItem, $supplier, $warehouse, $product, $unit];
@@ -198,6 +212,9 @@ test('update modifies supplier return and items', function () {
         'goods_receipt_id' => $goodsReceipt->id,
         'supplier_id' => $supplier->id,
         'warehouse_id' => $warehouse->id,
+        'status' => 'draft',
+        'confirmed_at' => null,
+        'confirmed_by' => null,
     ]);
 
     $payload = [
@@ -269,7 +286,10 @@ test('confirming supplier return rolls back state when journal posting fails wit
     ]);
 
     $this->app->bind(PostSupplierReturnJournalAction::class, function ($app) {
-        return new class($app->make(CreateJournalEntryAction::class), $app->make(ResolveControlAccountAction::class)) extends PostSupplierReturnJournalAction
+        $journal = $app->make(CreateJournalEntryAction::class);
+        $control = $app->make(ResolveControlAccountAction::class);
+
+        return new class($journal, $control) extends PostSupplierReturnJournalAction
         {
             public function execute(SupplierReturn $supplierReturn): ?JournalEntry
             {
@@ -295,7 +315,10 @@ test('confirming supplier return swallows validation errors and keeps state conf
     ]);
 
     $this->app->bind(PostSupplierReturnJournalAction::class, function ($app) {
-        return new class($app->make(CreateJournalEntryAction::class), $app->make(ResolveControlAccountAction::class)) extends PostSupplierReturnJournalAction
+        $journal = $app->make(CreateJournalEntryAction::class);
+        $control = $app->make(ResolveControlAccountAction::class);
+
+        return new class($journal, $control) extends PostSupplierReturnJournalAction
         {
             public function execute(SupplierReturn $supplierReturn): ?JournalEntry
             {
@@ -315,11 +338,20 @@ test('confirming supplier return swallows validation errors and keeps state conf
     expect($supplierReturn->confirmed_at)->not->toBeNull();
 });
 
-test('destroy removes supplier return', function () {
-    $supplierReturn = SupplierReturn::factory()->create();
+test('destroy removes a draft supplier return', function () {
+    $supplierReturn = SupplierReturn::factory()->create(['status' => 'draft']);
 
     deleteJson('/api/supplier-returns/' . $supplierReturn->id)
         ->assertNoContent();
 
     assertDatabaseMissing('supplier_returns', ['id' => $supplierReturn->id]);
+});
+
+test('destroy rejects a confirmed supplier return', function () {
+    $supplierReturn = SupplierReturn::factory()->create(['status' => 'confirmed']);
+
+    deleteJson('/api/supplier-returns/' . $supplierReturn->id)
+        ->assertStatus(422);
+
+    assertDatabaseHas('supplier_returns', ['id' => $supplierReturn->id]);
 });

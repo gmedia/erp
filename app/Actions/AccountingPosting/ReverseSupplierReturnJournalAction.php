@@ -34,7 +34,7 @@ class ReverseSupplierReturnJournalAction
 
             if ($original->lines->isEmpty()) {
                 throw ValidationException::withMessages([
-                    'items' => 'Cannot reverse a supplier return journal with no lines.',
+                    'items' => [__('supplier_return.reversal_no_lines')],
                 ]);
             }
 
@@ -43,13 +43,17 @@ class ReverseSupplierReturnJournalAction
                 'branch_id' => $line->branch_id,
                 'debit' => (float) $line->credit,
                 'credit' => (float) $line->debit,
-                'memo' => 'Pembalik: ' . ($line->memo ?? $supplierReturn->return_number),
+                'memo' => __('supplier_return.reversal_memo', [
+                    'memo' => $line->memo ?? $supplierReturn->return_number,
+                ]),
             ])->all();
 
             return $this->createJournalEntry->execute([
                 'entry_date' => now()->format('Y-m-d'),
                 'reference' => $supplierReturn->return_number,
-                'description' => "Reversal Supplier Return {$supplierReturn->return_number}",
+                'description' => __('supplier_return.reversal_description', [
+                    'number' => $supplierReturn->return_number,
+                ]),
                 'status' => 'posted',
                 'journal_type' => 'system',
                 'source_type' => SupplierReturn::class,
