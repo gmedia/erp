@@ -4,7 +4,7 @@ import { useCrudFilters, type FilterState } from '@/hooks/useCrudFilters';
 import { useCrudMutations } from '@/hooks/useCrudMutations';
 import { useCrudQuery } from '@/hooks/useCrudQuery';
 import axios from '@/lib/axios';
-import { type ApiError } from '@/utils/errorHandling';
+import { handleApiError, type ApiError } from '@/utils/errorHandling';
 import { useCallback, useMemo, useState } from 'react';
 
 export interface CrudPageConfig<
@@ -24,6 +24,7 @@ export interface CrudPageConfig<
     onError?: (error: ApiError) => void;
 
     loadDetailOnEdit?: boolean;
+    detailLoadErrorMessage?: string;
 
     // Filter configuration
     initialFilters?: FilterType;
@@ -176,15 +177,22 @@ export function useCrudPage<
                     setSelectedItem(
                         (response.data?.data ?? response.data) as T,
                     );
-                })
-                .catch(() => {
-                    setSelectedItem(item);
-                })
-                .finally(() => {
                     setIsFormOpen(true);
+                })
+                .catch((error: unknown) => {
+                    handleApiError(
+                        error,
+                        config.detailLoadErrorMessage ?? config.entityName,
+                    );
                 });
         },
-        [config.apiEndpoint, config.identifierKey, config.loadDetailOnEdit],
+        [
+            config.apiEndpoint,
+            config.identifierKey,
+            config.loadDetailOnEdit,
+            config.detailLoadErrorMessage,
+            config.entityName,
+        ],
     );
 
     const handleDelete = useCallback((item: T) => {

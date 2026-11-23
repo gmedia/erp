@@ -15,7 +15,9 @@ class SyncStockTransferItemsAction
      */
     public function execute(StockTransfer $stockTransfer, array $items): void
     {
-        DB::transaction(function () use ($stockTransfer, $items) {
+        $isReceived = $stockTransfer->status === 'received';
+
+        DB::transaction(function () use ($stockTransfer, $items, $isReceived) {
             $this->upsertItemsWithCleanup(
                 $stockTransfer->items(),
                 $items,
@@ -23,9 +25,9 @@ class SyncStockTransferItemsAction
                 static fn (array $item): array => [
                     'unit_id' => $item['unit_id'],
                     'quantity' => $item['quantity'],
-                    // Issue #356 baris 5: tanpa quantity_received, transfer diterima penuh.
-                    // Nilai eksplisit (termasuk 0) tetap dihormati.
-                    'quantity_received' => $item['quantity_received'] ?? $item['quantity'],
+                    // Issue #360 review baris 2: qty diterima hanya bermakna saat received.
+                    // Sebelum itu selalu null ("belum diisi"), agar tidak mengunci angka palsu.
+                    'quantity_received' => $isReceived ? ($item['quantity_received'] ?? $item['quantity']) : null,
                     'unit_cost' => $item['unit_cost'] ?? 0,
                     'notes' => $item['notes'] ?? null,
                 ],

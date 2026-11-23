@@ -26,6 +26,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { StockTransfer } from '@/types/stock-transfer';
@@ -150,11 +151,13 @@ export const StockTransferForm = memo<StockTransferFormProps>(
         onSubmit,
         isLoading = false,
     }) {
+        const { t } = useTranslation();
         const activeStockTransfer = stockTransfer || item || entity;
         const loadedIdRef = useRef<number | null>(null);
         const itemsLocked =
             activeStockTransfer?.status === 'in_transit' ||
-            activeStockTransfer?.status === 'received';
+            activeStockTransfer?.status === 'received' ||
+            activeStockTransfer?.status === 'cancelled';
 
         const defaultValues = useMemo(
             () => getStockTransferFormDefaults(activeStockTransfer),
@@ -370,7 +373,7 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                                         Qty
                                     </TableHead>
                                     <TableHead className="w-[140px]">
-                                        Qty Received
+                                        {t('stockTransfer.qty_received_label')}
                                     </TableHead>
                                     <TableHead className="w-[140px]">
                                         Unit Cost
@@ -438,7 +441,9 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                                                             }
                                                             aria-label={`Edit received qty item ${index + 1}`}
                                                         >
-                                                            Qty Received
+                                                            {t(
+                                                                'stockTransfer.qty_received_label',
+                                                            )}
                                                         </Button>
                                                     </TableCell>
                                                 ) : (

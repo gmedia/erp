@@ -48,7 +48,7 @@ async function warehouseBalance(page: Page, warehouseId: number, productId: numb
         async ({ warehouseId, productId }) => {
             const apiToken = localStorage.getItem('api_token') || '';
             const response = await fetch(
-                `/api/stock-movements?warehouse_id=${warehouseId}&product_id=${productId}&per_page=500`,
+                `/api/stock-movements?warehouse_id=${warehouseId}&product_id=${productId}&per_page=100`,
                 { headers: { Accept: 'application/json', Authorization: `Bearer ${apiToken}` } },
             );
             const json = await response.json();
@@ -193,5 +193,30 @@ test.describe('Stock Transfer dispatch → receive (Issue #360)', () => {
         // Stok total tidak boleh berubah: yang keluar dari asal harus masuk ke tujuan.
         expect(totalAfter).toBeCloseTo(totalBefore, 2);
         expect(id).toBeGreaterThan(0);
+    });
+
+    test('receive lewat form tanpa mengisi Qty Received → diterima penuh, tujuan bertambah qty kirim', async ({ page }) => {
+        await ensureAppOrigin(page);
+
+        const transferNumber = await createStockTransfer(page);
+        const { toWarehouseId, fromWarehouseId, productId, quantity } = await readTransferDetail(page, transferNumber);
+        await seedStockAtSource(page, fromWarehouseId, productId, quantity);
+
+        const destinationBefore = await warehouseBalance(page, toWarehouseId, productId);
+
+        await changeStatusViaUi(page, transferNumber, 'In Transit');
+
+        const receivedRequest = page.waitForRequest(
+            (request) =>
+                request.url().includes('/api/stock-transfers/') &&
+                request.method() === 'PUT' &&
+                String(request.postData() ?? '').includes('"received"'),
+        );
+        await changeStatusViaUi(page, transferNumber, 'Received');
+        const payload = JSON.parse((await receivedRequest).postData() ?? '{}');
+        expect(payload.items?.[0]?.quantity_received ?? null).toBeNull();
+
+        const destinationAfter = await warehouseBalance(page, toWarehouseId, productId);
+        expect(destinationAfter - destinationBefore).toBeCloseTo(quantity, 2);
     });
 });

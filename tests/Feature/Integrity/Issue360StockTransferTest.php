@@ -11,6 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\deleteJson;
+use function Pest\Laravel\getJson;
 use function Pest\Laravel\putJson;
 
 uses(RefreshDatabase::class)->group('stock-transfers-issue-360');
@@ -57,7 +58,7 @@ function issue360Transfer(float $stock, float $qty): array
         'product_id' => $product->id,
         'unit_id' => $unit->id,
         'quantity' => $qty,
-        'quantity_received' => 0,
+        'quantity_received' => null,
     ]);
 
     return [$transfer, $from, $to, $product, $unit, $item];
@@ -161,7 +162,111 @@ describe('Issue #360 baris 3: payload UI dengan quantity_received 0 saat receive
     });
 });
 
-describe('Issue #360 baris 4: batal via PUT (cancelled) pada in_transit membalik stok asal', function () {
+describe('Issue #360 review baris 1: item in_transit dengan quantity_received tersimpan 0 tidak menghilangkan stok', function () {
+    test('in_transit dengan quantity_received null lalu received tanpa qty (form tidak mengirim) → diterima penuh 5, bukan 0', function () {
+        [$transfer, $from, $to, $product, $unit, $item] = issue360Transfer(5, 5);
+
+        putJson("/api/stock-transfers/{$transfer->id}", issue360Payload('in_transit', $product->id, $unit->id))->assertOk();
+
+        // Setara data lama yang sudah dinormalisasi migrasi: non-received bukan lagi 0.
+        expect(StockTransferItem::query()->whereKey($item->id)->value('quantity_received'))->toBeNull();
+
+        putJson("/api/stock-transfers/{$transfer->id}", ['status' => 'received'])->assertOk();
+
+        expect(issue360Net($to->id, $product->id))->toBe(5.0)
+            ->and(issue360Net($from->id, $product->id))->toBe(0.0);
+    });
+});
+
+describe('Issue #360 review baris 2: draft tidak menyimpan quantity_received sebelum dispatch', function () {
+    test('respons detail mengembalikan quantity_received null (bukan string kosong yang menjadi 0 di UI)', function () {
+        [$transfer, , , $product, $unit] = issue360Transfer(5, 5);
+
+        $response = getJson("/api/stock-transfers/{$transfer->id}")->assertOk();
+
+        expect($response->json('data.items.0.quantity_received'))->toBeNull();
+    });
+
+    test('draft qty 5 disimpan dengan quantity_received 5 dari form → nilai tersimpan null, bukan 5', function () {
+        [$transfer, , , $product, $unit, $item] = issue360Transfer(5, 5);
+
+        putJson("/api/stock-transfers/{$transfer->id}", [
+            'items' => [['product_id' => $product->id, 'unit_id' => $unit->id, 'quantity' => 5, 'quantity_received' => 5]],
+        ])->assertOk();
+
+        expect(StockTransferItem::query()->where('stock_transfer_id', $transfer->id)->value('quantity_received'))->toBeNull();
+    });
+
+    test('draft qty 5 disimpan dengan qty diterima 5, dikoreksi ke 8 sebelum dispatch, lalu receive dari form → masuk 8 (tidak hilang 3)', function () {
+        [$transfer, $from, $to, $product, $unit] = issue360Transfer(8, 5);
+
+        putJson("/api/stock-transfers/{$transfer->id}", [
+            'items' => [['product_id' => $product->id, 'unit_id' => $unit->id, 'quantity' => 5, 'quantity_received' => 5]],
+        ])->assertOk();
+
+        putJson("/api/stock-transfers/{$transfer->id}", [
+            'status' => 'in_transit',
+            'items' => [['product_id' => $product->id, 'unit_id' => $unit->id, 'quantity' => 8]],
+        ])->assertOk();
+
+        putJson("/api/stock-transfers/{$transfer->id}", [
+            'status' => 'received',
+            'items' => [['product_id' => $product->id, 'unit_id' => $unit->id, 'quantity' => 8, 'quantity_received' => 8]],
+        ])->assertOk();
+
+        expect(issue360Net($to->id, $product->id))->toBe(8.0);
+    });
+});
+
+describe('Issue #360 review baris 3: quantity_received tidak boleh melebihi quantity', function () {
+    test('received dengan quantity_received 50 dari qty 5 → 422 dan stok tujuan tidak bertambah', function () {
+        [$transfer, $from, $to, $product, $unit] = issue360Transfer(5, 5);
+
+        putJson("/api/stock-transfers/{$transfer->id}", issue360Payload('in_transit', $product->id, $unit->id))->assertOk();
+
+        putJson("/api/stock-transfers/{$transfer->id}", issue360Payload('received', $product->id, $unit->id, 50.0))
+            ->assertStatus(422);
+
+        expect(issue360Net($to->id, $product->id))->toBe(0.0);
+    });
+});
+
+describe('Issue #360 review baris 4: cancelled adalah status akhir', function () {
+    test('cancelled → in_transit ditolak 422 dan tidak ada movement baru', function () {
+        [$transfer, $from, $to, $product, $unit] = issue360Transfer(5, 5);
+
+        putJson("/api/stock-transfers/{$transfer->id}", issue360Payload('in_transit', $product->id, $unit->id))->assertOk();
+        putJson("/api/stock-transfers/{$transfer->id}", ['status' => 'cancelled'])->assertOk();
+
+        $movementsBefore = StockMovement::query()->count();
+
+        putJson("/api/stock-transfers/{$transfer->id}", issue360Payload('in_transit', $product->id, $unit->id))
+            ->assertStatus(422);
+
+        expect(StockMovement::query()->count())->toBe($movementsBefore)
+            ->and(issue360Net($from->id, $product->id))->toBe(5.0);
+    });
+
+    test('cancelled → draft dan cancelled → received ditolak 422', function () {
+        [$transfer, , , $product, $unit] = issue360Transfer(5, 5);
+
+        putJson("/api/stock-transfers/{$transfer->id}", ['status' => 'cancelled'])->assertOk();
+
+        putJson("/api/stock-transfers/{$transfer->id}", ['status' => 'draft'])->assertStatus(422);
+        putJson("/api/stock-transfers/{$transfer->id}", ['status' => 'received'])->assertStatus(422);
+    });
+
+    test('edit item pada transfer cancelled ditolak 422', function () {
+        [$transfer, , , $product, $unit] = issue360Transfer(5, 5);
+
+        putJson("/api/stock-transfers/{$transfer->id}", ['status' => 'cancelled'])->assertOk();
+
+        putJson("/api/stock-transfers/{$transfer->id}", issue360Payload('cancelled', $product->id, $unit->id))
+            ->assertStatus(422);
+    });
+});
+
+describe('Issue #360 batal via PUT (cancelled) pada in_transit membalik stok asal', function () {
     test('PUT cancelled pada in_transit mengembalikan saldo asal ke 5 (sama seperti DELETE)', function () {
         [$transfer, $from, $to, $product, $unit] = issue360Transfer(5, 5);
 

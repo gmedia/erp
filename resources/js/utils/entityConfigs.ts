@@ -56,6 +56,7 @@ export interface CustomEntityConfig<
     // Opt-in: saat Edit, muat detail (GET /:id) sebelum form dibuka. Default off;
     // hanya entity yang item-nya tidak ada di respons list (mis. stock transfer).
     readonly loadDetailOnEdit?: boolean;
+    readonly detailLoadErrorMessage?: string;
 }
 
 // Union type for all entity configurations with improved typing
@@ -192,6 +193,7 @@ export interface ComplexEntityConfigOptions<T = Record<string, unknown>> {
     viewModalComponent?: React.ComponentType<any>;
     defaultColumnVisibility?: Record<string, boolean>;
     loadDetailOnEdit?: boolean;
+    detailLoadErrorMessage?: string;
 }
 
 // Factory to create a bound SimpleEntityViewModal for a specific entity
@@ -267,6 +269,7 @@ function createComplexEntityConfig<T = Record<string, unknown>>(
         viewModalComponent: options.viewModalComponent,
         defaultColumnVisibility: options.defaultColumnVisibility,
         loadDetailOnEdit: options.loadDetailOnEdit,
+        detailLoadErrorMessage: options.detailLoadErrorMessage,
     };
 }
 
@@ -411,6 +414,8 @@ export const stockTransferConfig = createComplexEntityConfig<StockTransfer>({
     formType: 'complex',
     // Issue #360 keputusan 1: item tidak ada di respons list; Edit memuat detail dulu.
     loadDetailOnEdit: true,
+    detailLoadErrorMessage:
+        'Failed to load stock transfer details. Please try again.',
     entityNameForSearch: 'stock transfer',
     viewModalComponent: StockTransferViewModal,
     getDeleteMessage: (transfer: { transfer_number?: string | null }) =>

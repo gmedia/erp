@@ -682,11 +682,13 @@ export const stockTransferFormSchema = z.object({
                 quantity: z.coerce
                     .number()
                     .gt(0, { message: 'Quantity must be greater than 0.' }),
-                quantity_received: z.coerce
-                    .number()
-                    .min(0)
-                    .optional()
-                    .nullable(),
+                quantity_received: z.preprocess(
+                    (val) =>
+                        val === '' || val === null || val === undefined
+                            ? null
+                            : Number(val),
+                    z.number().min(0).nullable(),
+                ),
                 unit_cost: z.coerce.number().min(0).optional().default(0),
                 notes: z.string().optional(),
             }),

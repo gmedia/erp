@@ -11,6 +11,7 @@ import {
     ItemNotesField,
     ItemProductUnitFields,
 } from '@/components/common/ItemFormDialog';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type StockTransferFormData } from '@/utils/schemas';
 
@@ -22,7 +23,13 @@ const stockTransferItemSchema = z.object({
     quantity: z.coerce
         .number()
         .gt(0, { message: 'Quantity must be greater than 0.' }),
-    quantity_received: z.coerce.number().min(0).optional().nullable(),
+    quantity_received: z.preprocess(
+        (val) =>
+            val === '' || val === null || val === undefined
+                ? null
+                : Number(val),
+        z.number().min(0).nullable(),
+    ),
     unit_cost: z.coerce.number().min(0).optional().default(0),
     notes: z.string().optional(),
 });
@@ -44,6 +51,7 @@ export function StockTransferItemFormDialog({
     onSave,
     locked = false,
 }: Readonly<StockTransferItemFormDialogProps>) {
+    const { t } = useTranslation();
     const defaultValues = useMemo<StockTransferItemFormData>(() => {
         if (!item) {
             return {
@@ -130,7 +138,7 @@ export function StockTransferItemFormDialog({
                     </div>
                     <InputField
                         name="quantity_received"
-                        label="Quantity Received"
+                        label={t('stockTransfer.qty_received_label')}
                         type="number"
                         min={0}
                         step="any"
@@ -156,11 +164,13 @@ export function StockTransferItemFormDialog({
                     />
                     <InputField
                         name="quantity_received"
-                        label="Quantity Received"
+                        label={t('stockTransfer.qty_received_label')}
                         type="number"
                         min={0}
                         step="any"
-                        placeholder="Kosong = diterima penuh"
+                        placeholder={t(
+                            'stockTransfer.qty_received_placeholder',
+                        )}
                     />
                     <InputField
                         name="unit_cost"
