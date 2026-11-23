@@ -324,17 +324,19 @@ Full multimodal narrative: session `ses_02021a5c2ffeaD0HIIg6ymhnEW`.
 | W6-16 | P3  | Department kendaraan/server di HR                                       | **fixed (#336)** — Operations/Engineering                                |
 | W6-17 | P3  | Deskripsi singkat halaman CRUD kosong (85/86)                           | **fixed (#336)** — 37 config (43 halaman) berdeskripsi                   |
 
-### Tindak lanjut audit (lanjutan #336)
+### Tindak lanjut audit (lanjutan #336, commit `ce7fa13b` + `f932200c`)
 
 Setelah merge #336, audit penuh ulang (`wave-6-final`, 340 capture) menemukan sisa kolom kunci terpotong yang belum tercakup:
 
 | Route                                          | Temuan                                      | Status                                                                                       |
 | ---------------------------------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `/reports/ar-aging`                            | bucket `Over 90 Days` di luar viewport 1440 | **fixed (#337)** — sembunyikan Grand Total/Amount Received/Credit Note/Amount Due (redundan) |
-| `/reports/ar-outstanding`                      | `Days Overdue` di luar viewport             | **fixed (#337)**                                                                             |
-| `/supplier-returns`                            | `Status` di luar viewport                   | **fixed (#337)** — Warehouse disembunyikan                                                   |
-| `/account-mappings`                            | `Notes`, `Created At` di luar viewport      | **fixed (#337)** — `Created At` disembunyikan                                                |
-| `/recurring-journals`, `/inventory-stocktakes` | H1 tanpa deskripsi                          | **fixed (#337)**                                                                             |
+| `/reports/ar-aging`                            | bucket `Over 90 Days` di luar viewport 1440 | **fixed** — sembunyikan Grand Total/Amount Received/Credit Note/Amount Due (redundan) |
+| `/reports/ar-outstanding`                      | `Days Overdue` di luar viewport             | **fixed**                                                                                    |
+| `/supplier-returns`                            | `Status` di luar viewport                   | **fixed** — Warehouse + GR Number + Reason disembunyikan                                                   |
+| `/account-mappings`                            | `Notes`, `Created At` di luar viewport      | **fixed** — `Created At` + id akun redundan disembunyikan                                                |
+| `/recurring-journals`, `/inventory-stocktakes` | H1 tanpa deskripsi                          | **fixed**                                                                                    |
+
+Verifikasi akhir `wave-6-verify` (340 capture, 85 route × light/dark × desktop/mobile): **0 overflow halaman**, `.dark` aktif 170/170, 0 console error fungsional (hanya logo MinIO 404 — objek branding tidak ada di bucket host, bukan regresi kode). Audit DOM 170 kombinasi: **0 kolom tersembunyi tanpa indikator**, **0 KPI/nominal terpotong**, **0 halaman tanpa H1**, 0 error.
 
 ### Themes → BACKLOG
 
