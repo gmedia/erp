@@ -111,7 +111,7 @@ export function SupplierReturnItemFormDialog({
                     name="goods_receipt_item_id"
                     url={
                         goodsReceiptId
-                            ? `/api/goods-receipts/${goodsReceiptId}/item-options`
+                            ? `/api/goods-receipts/${goodsReceiptId}/item-options${item?.goods_receipt_item_id ? `?current_line_id=${item.goods_receipt_item_id}` : ''}`
                             : null
                     }
                     label="GR Item"

@@ -119,7 +119,7 @@ export function GoodsReceiptItemFormDialog({
                     name="purchase_order_item_id"
                     url={
                         purchaseOrderId
-                            ? `/api/purchase-orders/${purchaseOrderId}/item-options`
+                            ? `/api/purchase-orders/${purchaseOrderId}/item-options${item?.purchase_order_item_id ? `?current_line_id=${item.purchase_order_item_id}` : ''}`
                             : null
                     }
                     label="PO Item"

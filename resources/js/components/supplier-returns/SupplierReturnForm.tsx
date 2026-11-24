@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { memo, useMemo } from 'react';
+import { memo, useEffect, useMemo, useRef } from 'react';
 import { type Resolver, useFieldArray, useForm } from 'react-hook-form';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
@@ -149,6 +149,14 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
         });
         const watchedItems = form.watch('items');
         const watchedGoodsReceiptId = form.watch('goods_receipt_id');
+        const previousGoodsReceiptIdRef = useRef(watchedGoodsReceiptId);
+        useEffect(() => {
+            if (previousGoodsReceiptIdRef.current === watchedGoodsReceiptId) {
+                return;
+            }
+            previousGoodsReceiptIdRef.current = watchedGoodsReceiptId;
+            remove();
+        }, [watchedGoodsReceiptId, remove]);
         const {
             isItemDialogOpen,
             item: selectedItem,
