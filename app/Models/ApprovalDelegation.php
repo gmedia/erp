@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\ApprovalDelegationFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -67,6 +68,40 @@ class ApprovalDelegation extends Model
         'end_date' => 'date',
         'is_active' => 'boolean',
     ];
+
+    /**
+     * Delegations that are active today for the given delegate.
+     *
+     * @param  Builder<static>  $query
+     * @return Builder<static>
+     */
+    public function scopeActiveForDelegate(Builder $query, int $userId): Builder
+    {
+        $today = Carbon::today()->toDateString();
+
+        return $query->where('delegate_user_id', $userId)
+            ->where('is_active', true)
+            ->whereDate('start_date', '<=', $today)
+            ->whereDate('end_date', '>=', $today);
+    }
+
+    /**
+     * Keep delegations whose document-type scope covers $approvableType.
+     * A null scope means all document types.
+     *
+     * @param  Builder<static>  $query
+     * @return Builder<static>
+     */
+    public function scopeCoveringApprovable(Builder $query, ?string $approvableType): Builder
+    {
+        return $query->where(function (Builder $scope) use ($approvableType): void {
+            $scope->whereNull('approvable_type');
+
+            if ($approvableType !== null) {
+                $scope->orWhere('approvable_type', $approvableType);
+            }
+        });
+    }
 
     /**
      * Get the user who delegated their approval rights.

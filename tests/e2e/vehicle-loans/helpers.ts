@@ -1,4 +1,5 @@
 import { APIRequestContext, Page, expect } from '@playwright/test';
+import { approveApprovableAsDelegate } from '../helpers';
 
 export const VEHICLE_LOAN_REQUEST_PATH = '/vehicle-loans/request';
 export const VEHICLE_LOAN_PICKUP_PATH = '/vehicle-loans/pickup';
@@ -14,7 +15,7 @@ export const VEHICLE_LOAN_DASHBOARD_PATH = '/vehicle-loans/dashboard';
 export async function submitVehicleLoanRequest(
     page: Page,
     purpose = 'E2E perjalanan dinas',
-): Promise<void> {
+): Promise<number> {
     await page.goto(VEHICLE_LOAN_REQUEST_PATH);
 
     const startDate = page.locator('#start_at_date');
@@ -41,7 +42,11 @@ export async function submitVehicleLoanRequest(
     );
 
     await page.getByRole('button', { name: 'Kirim Permintaan' }).click();
-    await responsePromise;
+    const response = await responsePromise;
+    const body = (await response.json()) as { data?: { id?: number }; id?: number };
+    const id = body.data?.id ?? body.id;
+    if (!id) throw new Error('Vehicle loan POST returned no id');
+    return id;
 }
 
 export async function apiRequest(
@@ -104,27 +109,7 @@ export async function seedApprovedLoan(page: Page): Promise<number> {
     );
     expect(submit.ok()).toBeTruthy();
 
-    const approvals = await apiRequest(page, 'get', '/api/my-approvals');
-    expect(approvals.ok()).toBeTruthy();
-    const approvePayload = (await approvals.json()) as {
-        pending?: Array<{ request?: { id?: number; approvable_id?: number } }>;
-    };
-    const step = approvePayload.pending?.find(
-        (item) => item.request?.approvable_id === id,
-    );
-    const approvalId = step?.request?.id;
-    if (!approvalId)
-        throw new Error('Pending approval not found for seeded loan');
-
-    const approve = await apiRequest(
-        page,
-        'post',
-        `/api/my-approvals/${approvalId}/approve`,
-        {
-            data: { comments: 'E2ESeed approved' },
-        },
-    );
-    expect(approve.ok()).toBeTruthy();
+        await approveApprovableAsDelegate(page, id, 'E2ESeed approved', 'App\\Models\\VehicleLoan');
 
     for (let attempt = 0; attempt < 20; attempt++) {
         const check = await apiRequest(page, 'get', `/api/vehicle-loans/${id}`);

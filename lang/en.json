@@ -57,7 +57,9 @@
     "Supplier bill still has active payment allocations. Remove them before cancelling.": "Supplier bill still has active payment allocations. Remove them before cancelling.",
     "Goods receipt still has active supplier returns. Cancel them before cancelling.": "Goods receipt still has active supplier returns. Cancel them before cancelling.",
     "Goods receipt still has active supplier bills. Cancel them before cancelling.": "Goods receipt still has active supplier bills. Cancel them before cancelling.",
-    "approval.transition_forbidden": "You do not have permission to execute this transition.",
+     "approval.transition_forbidden": "You do not have permission to execute this transition.",
+     "approval.concurrent_step": "This approval step was already acted on by another request. Refresh and try again.",
+
     "nav": {
         "platform": "Platform",
         "dashboard": "Dashboard",
@@ -137,7 +139,10 @@
     },
     "my_approvals": {
         "request_number": "No. {id}",
-        "load_failed": "Failed to load approvals. Please refresh and try again."
+        "load_failed": "Failed to load approvals. Please refresh and try again.",
+  "delegated_badge": "Delegated",
+  "delegated_count": "{count} delegated",
+  "delegated_tooltip": "Pending steps you can act on as a delegate"
     },
     "posted_document": {
         "title": "Posted document",

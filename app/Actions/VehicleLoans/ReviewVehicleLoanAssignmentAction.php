@@ -2,6 +2,7 @@
 
 namespace App\Actions\VehicleLoans;
 
+use App\Actions\Approvals\ResolveApprovalStepActorAction;
 use App\Models\ApprovalRequest;
 use App\Models\ApprovalRequestStep;
 use App\Models\VehicleLoan;
@@ -21,17 +22,7 @@ class ReviewVehicleLoanAssignmentAction
             $userId = Auth::id();
 
             /** @var ApprovalRequestStep|null $step */
-            $step = $approval->steps()
-                ->where('status', 'pending')
-                ->where('step_order', $approval->current_step_order)
-                ->whereHas(
-                    'flowStep',
-                    fn ($q) => $q
-                        ->where('approver_type', 'user')
-                        ->where('approver_user_id', $userId),
-                )
-                ->lockForUpdate()
-                ->first();
+            $step = app(ResolveApprovalStepActorAction::class)->execute($approval, (int) $userId);
 
             if (! $step || ! in_array($approval->status, ['pending', 'in_progress'], true)) {
                 throw new InvalidArgumentException('You are not authorized to review this assignment.');

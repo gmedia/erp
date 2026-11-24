@@ -7,6 +7,7 @@ use App\Models\ApprovalRequestStep;
 use App\Models\Asset;
 use App\Models\Employee;
 use App\Models\NotificationPreference;
+use App\Models\User;
 use App\Models\VehicleDriver;
 use App\Models\VehicleLoan;
 use App\Models\VehicleLoanActivityLog;
@@ -267,7 +268,7 @@ it('lets the current approver change driver and unit', function () {
         'approvable_id' => $loan->id,
         'current_step_order' => 1,
         'status' => 'in_progress',
-        'submitted_by' => $this->user->id,
+        'submitted_by' => User::factory()->create()->id,
         'submitted_at' => now()->subHour(),
     ]);
 
