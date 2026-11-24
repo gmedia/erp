@@ -75,19 +75,7 @@ class SupplierReturnController extends Controller
             },
             afterCommit: $isConfirmedOnCreate
                 ? function (SupplierReturn $supplierReturn) use ($postJournal, $postMovements, $stockPosting): void {
-                    $stockPosting->assertNoNegativeStock($this->supplierReturnOutflows($supplierReturn));
-                    $postMovements->execute($supplierReturn->refresh());
-
-                    try {
-                        $postJournal->execute($supplierReturn->refresh());
-                    } catch (ValidationException $e) {
-                        // Sama dengan jalur update: kegagalan validasi (mis. COA belum lengkap)
-                        // tidak membatalkan retur; jurnal bisa diposting ulang nanti.
-                        Log::warning('Supplier return journal posting skipped', [
-                            'supplier_return_id' => $supplierReturn->id,
-                            'reason' => $e->getMessage(),
-                        ]);
-                    }
+                    $this->postConfirmedReturn($supplierReturn, $postJournal, $postMovements, $stockPosting);
                 }
             : null,
         );
@@ -196,21 +184,7 @@ class SupplierReturnController extends Controller
             },
             afterCommit: $isNewlyConfirmed
                 ? function (SupplierReturn $supplierReturn) use ($postJournal, $postMovements, $stockPosting): void {
-                    $stockPosting->assertNoNegativeStock($this->supplierReturnOutflows($supplierReturn));
-                    $postMovements->execute($supplierReturn->refresh());
-
-                    try {
-                        $postJournal->execute($supplierReturn->refresh());
-                    } catch (ValidationException $e) {
-                        // Validation failures (e.g. missing COA mapping) are intentionally
-                        // swallowed so the supplier return itself stays confirmed; user can
-                        // post the journal later. Non-validation errors propagate and
-                        // roll back the entire transaction (status flip included).
-                        Log::warning('Supplier return journal posting skipped', [
-                            'supplier_return_id' => $supplierReturn->id,
-                            'reason' => $e->getMessage(),
-                        ]);
-                    }
+                    $this->postConfirmedReturn($supplierReturn, $postJournal, $postMovements, $stockPosting);
                 }
             : null,
         );
@@ -281,5 +255,31 @@ class SupplierReturnController extends Controller
             : __('supplier_return.invalid_transition');
 
         throw ValidationException::withMessages(['status' => [$message]])->status(422);
+    }
+
+    /**
+     * Stok dan jurnal retur confirmed, dipakai create dan update dalam transaksi yang sama.
+     */
+    private function postConfirmedReturn(
+        SupplierReturn $supplierReturn,
+        PostSupplierReturnJournalAction $postJournal,
+        PostSupplierReturnMovementsAction $postMovements,
+        StockPostingService $stockPosting,
+    ): void {
+        $stockPosting->assertNoNegativeStock($this->supplierReturnOutflows($supplierReturn));
+        $postMovements->execute($supplierReturn->refresh());
+
+        try {
+            $postJournal->execute($supplierReturn->refresh());
+        } catch (ValidationException $e) {
+            // Validation failures (e.g. missing COA mapping) are intentionally
+            // swallowed so the supplier return itself stays confirmed; user can
+            // post the journal later. Non-validation errors propagate and
+            // roll back the entire transaction (status flip included).
+            Log::warning('Supplier return journal posting skipped', [
+                'supplier_return_id' => $supplierReturn->id,
+                'reason' => $e->getMessage(),
+            ]);
+        }
     }
 }
