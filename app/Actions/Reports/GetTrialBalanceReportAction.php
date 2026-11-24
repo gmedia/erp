@@ -7,6 +7,7 @@ use App\Models\FiscalYear;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use stdClass;
 
 /**
  * Trial balance detailed dihitung langsung dari journal_entry_lines posted
@@ -90,7 +91,7 @@ class GetTrialBalanceReportAction
     }
 
     /**
-     * @return Collection<int, \stdClass>
+     * @return Collection<int, stdClass>
      */
     private function balancesByAccount(int $fiscalYearId, string $start, string $end): Collection
     {
