@@ -96,7 +96,7 @@
         "close": "Tutup Periode",
         "reopen": "Buka Kembali Periode",
         "closeTitle": "Tutup periode ini?",
-        "closeDescription": "Periode {period} akan ditutup. Statusnya menjadi Ditutup, penutupan dicatat dengan nama dan waktu Anda, serta periode dikunci dari perubahan sampai dibuka kembali.",
+        "closeDescription": "Periode {period} akan ditutup. Statusnya menjadi Ditutup dan penutupan dicatat dengan nama dan waktu Anda. Catatan periode dapat dibuka kembali nanti.",
         "reopenTitle": "Buka kembali periode ini?",
         "reopenDescription": "Periode {period} akan dibuka kembali. Jurnal penutupannya dihapus dan periode dapat diubah lagi. Membuka kembali tidak membatalkan perubahan lain yang dibuat setelah penutupan.",
         "confirmClose": "Ya, tutup",

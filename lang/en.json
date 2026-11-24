@@ -96,7 +96,7 @@
         "close": "Close Period",
         "reopen": "Reopen Period",
         "closeTitle": "Close this period?",
-        "closeDescription": "Period {period} will be closed. Its status becomes Closed, the closing is recorded with your name and time, and the period is locked against further changes until it is reopened.",
+        "closeDescription": "Period {period} will be closed. Its status becomes Closed and the closing is recorded with your name and time. The period record can be reopened later.",
         "reopenTitle": "Reopen this period?",
         "reopenDescription": "Period {period} will be reopened. Its closing journal entry is deleted and the period becomes editable again. Reopening does not undo other changes made after closing.",
         "confirmClose": "Yes, close",
