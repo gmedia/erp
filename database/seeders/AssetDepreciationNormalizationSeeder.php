@@ -32,7 +32,7 @@ class AssetDepreciationNormalizationSeeder extends Seeder
 {
     use ReopensDemoPeriodClosings;
 
-    public function run(): void
+    protected function seedDemoData(): void
     {
         $fiscalYear = FiscalYear::query()->where('status', 'open')->orderBy('start_date')->first();
 
@@ -40,7 +40,7 @@ class AssetDepreciationNormalizationSeeder extends Seeder
             return;
         }
 
-        $this->withDemoPeriodsReopened($fiscalYear, fn () => $this->postDemoDepreciation($fiscalYear));
+        $this->postDemoDepreciation($fiscalYear);
     }
 
     private function postDemoDepreciation(FiscalYear $fiscalYear): void

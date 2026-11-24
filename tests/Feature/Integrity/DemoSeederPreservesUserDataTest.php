@@ -101,7 +101,7 @@ test('re-running demo seeders does not delete journals of user-created documents
     $bill = SupplierBill::factory()->confirmed()->create([
         'fiscal_year_id' => $fiscalYear->id,
         'bill_number' => 'BILL-USER-0002',
-        'bill_date' => $fiscalYear->start_date,
+        'bill_date' => $fiscalYear->start_date->copy()->addMonths(3),
     ]);
     userBillItem($bill);
 

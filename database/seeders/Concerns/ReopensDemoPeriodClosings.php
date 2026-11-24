@@ -16,6 +16,22 @@ use Illuminate\Support\Facades\DB;
  */
 trait ReopensDemoPeriodClosings
 {
+    /** Titik masuk seeder: isi seeder ada di seedDemoData(). */
+    public function run(): void
+    {
+        $fiscalYear = FiscalYear::query()->where('status', 'open')->orderBy('start_date')->first();
+
+        if ($fiscalYear === null) {
+            $this->seedDemoData();
+
+            return;
+        }
+
+        $this->withDemoPeriodsReopened($fiscalYear, fn () => $this->seedDemoData());
+    }
+
+    abstract protected function seedDemoData(): void;
+
     /**
      * @param  Closure(): void  $callback
      */

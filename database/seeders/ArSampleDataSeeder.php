@@ -20,17 +20,20 @@ use App\Models\FiscalYear;
 use App\Models\Product;
 use App\Models\Unit;
 use App\Models\User;
+use Database\Seeders\Concerns\ReopensDemoPeriodClosings;
 use Illuminate\Database\Seeder;
 
 class ArSampleDataSeeder extends Seeder
 {
+    use ReopensDemoPeriodClosings;
+
     /**
      * Status invoice yang pernah dikirim sehingga jurnal AR-nya sudah diposting
      * (sama seperti CustomerInvoiceController saat transisi ke "sent").
      */
     private const POSTED_INVOICE_STATUSES = ['sent', 'partially_paid', 'paid', 'overdue'];
 
-    public function run(): void
+    protected function seedDemoData(): void
     {
         Customer::where('address', 'like', 'Jl. Sample No.%')
             ->get()

@@ -25,7 +25,6 @@ use App\Models\VehicleLoanActivityLog;
 use App\Models\VehicleLoanPickup;
 use App\Models\VehicleLoanReturn;
 use App\Models\VehicleUnit;
-use App\Models\FiscalYear;
 use Database\Seeders\Concerns\ReopensDemoPeriodClosings;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -45,20 +44,7 @@ class VehicleLoanSampleDataSeeder extends Seeder
 {
     use ReopensDemoPeriodClosings;
 
-    public function run(): void
-    {
-        $fiscalYear = FiscalYear::query()->where('status', 'open')->orderBy('start_date')->first();
-
-        if (! $fiscalYear) {
-            $this->seedVehicleLoans();
-
-            return;
-        }
-
-        $this->withDemoPeriodsReopened($fiscalYear, fn () => $this->seedVehicleLoans());
-    }
-
-    private function seedVehicleLoans(): void
+    protected function seedDemoData(): void
     {
         $flow = ApprovalFlow::where('code', config('vehicle_loan.approval_flow_code'))->first();
         $flowStep = $flow

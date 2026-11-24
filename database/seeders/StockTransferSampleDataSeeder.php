@@ -12,12 +12,15 @@ use App\Models\StockTransferItem;
 use App\Models\Unit;
 use App\Models\User;
 use App\Models\Warehouse;
+use Database\Seeders\Concerns\ReopensDemoPeriodClosings;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
 
 class StockTransferSampleDataSeeder extends Seeder
 {
-    public function run(): void
+    use ReopensDemoPeriodClosings;
+
+    protected function seedDemoData(): void
     {
         $adminUserId = User::query()
             ->where('email', config('app.admin'))
