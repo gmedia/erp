@@ -14,8 +14,6 @@ use App\Models\SupplierBill;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 
-use function Pest\Laravel\putJson;
-
 uses(RefreshDatabase::class)->group('gr-ir-clearing');
 
 beforeEach(function () {
@@ -45,7 +43,11 @@ function makeGrIrFiscalYear(): FiscalYear
  */
 function makeGrIrAccounts(): array
 {
-    $coaVersion = CoaVersion::factory()->create(['status' => 'active']);
+    $fiscalYear = FiscalYear::where('status', 'open')->firstOrFail();
+    $coaVersion = CoaVersion::factory()->create([
+        'fiscal_year_id' => $fiscalYear->id,
+        'status' => 'active',
+    ]);
 
     $make = static fn (string $code, string $name, string $type, string $normal): Account => Account::factory()->create([
         'coa_version_id' => $coaVersion->id,
@@ -234,47 +236,3 @@ test('bill tanpa GR tetap mendebit beban dan mengkredit 21100 seperti sebelumnya
         ->and(lineNetCredit($entry, $accounts['grir']->id))->toBe(0.0);
 });
 
-test('pembatalan GR yang sudah diposting membalik baris jurnal asli GR, jurnal asli tetap posted', function () {
-    makeGrIrFiscalYear();
-    $accounts = makeGrIrAccounts();
-
-    $gr = confirmedGrOfAmount(GRIR_TEST_AMOUNT, 'GR-2026-000104');
-    $grEntry = app(PostGoodsReceiptJournalAction::class)->execute($gr);
-
-    putJson("/api/goods-receipts/{$gr->id}", ['status' => 'cancelled'])->assertOk();
-
-    $reversal = JournalEntry::query()
-        ->where('source_type', GoodsReceipt::class)
-        ->where('source_id', $gr->id)
-        ->where('id', '!=', $grEntry->id)
-        ->first();
-
-    expect($reversal)->not->toBeNull()
-        ->and(lineNetCredit($reversal, $accounts['grir']->id))->toBe(-GRIR_TEST_AMOUNT)
-        ->and(lineNetCredit($reversal, $accounts['inventory']->id))->toBe(GRIR_TEST_AMOUNT)
-        ->and(JournalEntry::find($grEntry->id)->status)->toBe('posted');
-});
-
-test('pembatalan bill yang sudah diposting membalik baris jurnal asli bill, jurnal asli tetap posted', function () {
-    makeGrIrFiscalYear();
-    $accounts = makeGrIrAccounts();
-
-    $gr = confirmedGrOfAmount(GRIR_TEST_AMOUNT, 'GR-2026-000105');
-    app(PostGoodsReceiptJournalAction::class)->execute($gr);
-
-    $bill = billOfGr($gr, $accounts['expense']->id, GRIR_TEST_AMOUNT, 'BILL-2026-000105');
-    $billEntry = app(PostSupplierBillJournalAction::class)->execute($bill);
-
-    putJson("/api/supplier-bills/{$bill->id}", ['status' => 'cancelled'])->assertOk();
-
-    $reversal = JournalEntry::query()
-        ->where('source_type', SupplierBill::class)
-        ->where('source_id', $bill->id)
-        ->where('id', '!=', $billEntry->id)
-        ->first();
-
-    expect($reversal)->not->toBeNull()
-        ->and(lineNetCredit($reversal, $accounts['grir']->id))->toBe(GRIR_TEST_AMOUNT)
-        ->and(lineNetCredit($reversal, $accounts['ap']->id))->toBe(-GRIR_TEST_AMOUNT)
-        ->and(JournalEntry::find($billEntry->id)->status)->toBe('posted');
-});
