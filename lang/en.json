@@ -284,6 +284,7 @@
     "supplier_return.goods_receipt_mismatch": "The goods receipt must belong to the purchase order.",
     "supplier_return.gr_item_mismatch": "The GR item must belong to the selected goods receipt.",
     "goods_receipt.po_item_mismatch": "The PO item must belong to the selected purchase order.",
+    "goods_receipt.po_not_approved": "Goods receipt can only be confirmed when the purchase order is confirmed or partially received.",
     "ap_payment.bill_supplier_mismatch": "Supplier Bill does not belong to the selected supplier.",
     "ap_payment.allocation_exceeds_bill": "Allocation exceeds bill outstanding amount. Maximum: :max",
     "ar_receipt.allocation_exceeds_invoice": "Allocation exceeds invoice outstanding amount. Maximum: :max",

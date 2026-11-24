@@ -1,4 +1,5 @@
 import { expect, Page } from '@playwright/test';
+import { execFileSync } from 'node:child_process';
 
 import { reloadAndWaitForApi, searchAndWaitForApi } from '../helpers';
 
@@ -183,4 +184,11 @@ export async function editPurchaseOrder(
     expect(updateResult, JSON.stringify(updateResult)).toMatchObject({ ok: true });
 
     await reloadAndWaitForApi(page, '/api/purchase-orders');
+}
+
+export function approvePurchaseOrderFixture(poNumber: string): void {
+    const php =
+        `\\App\\Models\\PurchaseOrder::where('po_number', '${poNumber}')` +
+        `->update(['status' => 'confirmed', 'approved_at' => now()]);`;
+    execFileSync('./vendor/bin/sail', ['artisan', 'tinker', `--execute=${php}`], { encoding: 'utf8' });
 }
