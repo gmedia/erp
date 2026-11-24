@@ -266,6 +266,26 @@ test('ekspor trial balance memuat saldo awal, mutasi, dan saldo akhir', function
         ->and((float) $cashRow[6])->toBe(180.0);
 });
 
+test('saldo nol akun kredit tidak mengeluarkan nol negatif (-0) di JSON', function () {
+    $previous = tbFiscalYear(2025, 'closed');
+    $fiscalYear = tbFiscalYear(2026);
+    $cash = tbAccount('1010', 'Kas', 'asset', 'debit');
+    $equity = tbAccount('3010', 'Modal', 'equity', 'credit');
+
+    // Modal kredit 100 lalu didebit 100 di 2025: saldo awal 2026 = 0 bersih (kredit-normal -> -0.0 tanpa normalisasi).
+    tbJournal($previous, '2025-03-01', [[$cash, 100, 0], [$equity, 0, 100]]);
+    tbJournal($previous, '2025-04-01', [[$equity, 100, 0], [$cash, 0, 100]]);
+    tbJournal($fiscalYear, '2026-02-05', [[$cash, 10, 0], [$cash, 0, 10]]);
+
+    // Periksa token JSON mentah: json_decode("-0") sudah kehilangan tanda minus.
+    $raw = getJson("/api/reports/trial-balance-detailed?fiscal_year_id={$fiscalYear->id}&period_month=2&period_year=2026")
+        ->assertOk()
+        ->getContent();
+
+    expect($raw)->not->toMatch('/:\s*-0(\.0+)?\s*[,}]/');
+    expect($raw)->not->toMatch('/"(opening_balance|debit_total|credit_total|closing_balance|debit_balance|credit_balance)":\s*-0/');
+});
+
 test('saldo awal + mutasi debit - kredit = saldo akhir per akun dan total seimbang', function () {
     $previous = tbFiscalYear(2025, 'closed');
     $fiscalYear = tbFiscalYear(2026);
