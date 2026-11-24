@@ -88,6 +88,251 @@ test('it reports cash debit as inflow and credit as outflow', function () {
         ->and((float) $sections['net_change']['value'])->toBe(500000.0);
 });
 
+/**
+ * Helper: buat akun kas, lalu posting satu jurnal dengan baris kas dan baris lawan.
+ *
+ * @param  array<int, array{account: Account, debit: float, credit: float}>  $counterLines
+ */
+function postCashFlowJournal(FiscalYear $fiscalYear, CoaVersion $coaVersion, Account $cashAccount, float $cashDebit, float $cashCredit, array $counterLines, string $status = 'posted'): JournalEntry
+{
+    $journal = JournalEntry::factory()->create([
+        'fiscal_year_id' => $fiscalYear->id,
+        'status' => $status,
+    ]);
+
+    JournalEntryLine::factory()->create([
+        'journal_entry_id' => $journal->id,
+        'account_id' => $cashAccount->id,
+        'debit' => $cashDebit,
+        'credit' => $cashCredit,
+    ]);
+
+    foreach ($counterLines as $line) {
+        JournalEntryLine::factory()->create([
+            'journal_entry_id' => $journal->id,
+            'account_id' => $line['account']->id,
+            'debit' => $line['debit'],
+            'credit' => $line['credit'],
+        ]);
+    }
+
+    return $journal;
+}
+
+test('it splits cash movements into operating, investing and financing activities', function () {
+    $this->seed(ReportConfigurationSeeder::class);
+    Sanctum::actingAs($this->user, ['*']);
+
+    $coaVersion = CoaVersion::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'status' => 'active',
+    ]);
+    $cash = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '11110',
+        'type' => 'asset',
+        'sub_type' => 'current_asset',
+        'normal_balance' => 'debit',
+        'is_cash_flow' => true,
+    ]);
+    $receivable = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '11200',
+        'type' => 'asset',
+        'sub_type' => 'current_asset',
+        'normal_balance' => 'debit',
+    ]);
+    $equipment = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '12100',
+        'type' => 'asset',
+        'sub_type' => 'non_current_asset',
+        'normal_balance' => 'debit',
+    ]);
+    $longTermLoan = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '22100',
+        'type' => 'liability',
+        'sub_type' => 'non_current_liability',
+        'normal_balance' => 'credit',
+    ]);
+
+    // Operasi: penerimaan dari piutang (kas masuk 300.000)
+    postCashFlowJournal($this->fiscalYear, $coaVersion, $cash, 300000, 0, [
+        ['account' => $receivable, 'debit' => 0, 'credit' => 300000],
+    ]);
+    // Investasi: beli peralatan tunai (kas keluar 200.000)
+    postCashFlowJournal($this->fiscalYear, $coaVersion, $cash, 0, 200000, [
+        ['account' => $equipment, 'debit' => 200000, 'credit' => 0],
+    ]);
+    // Pendanaan: terima pinjaman jangka panjang (kas masuk 150.000)
+    postCashFlowJournal($this->fiscalYear, $coaVersion, $cash, 150000, 0, [
+        ['account' => $longTermLoan, 'debit' => 0, 'credit' => 150000],
+    ]);
+
+    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
+        ->assertOk();
+
+    $sections = collect($response->json('computed_sections'))->keyBy('code');
+    expect((float) $sections['operating_cash_flow']['value'])->toBe(300000.0)
+        ->and((float) $sections['investing_cash_flow']['value'])->toBe(-200000.0)
+        ->and((float) $sections['financing_cash_flow']['value'])->toBe(150000.0);
+});
+
+test('it excludes transfers between cash accounts from cash flow activities', function () {
+    $this->seed(ReportConfigurationSeeder::class);
+    Sanctum::actingAs($this->user, ['*']);
+
+    $coaVersion = CoaVersion::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'status' => 'active',
+    ]);
+    $bank = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '11110',
+        'type' => 'asset',
+        'sub_type' => 'current_asset',
+        'normal_balance' => 'debit',
+        'is_cash_flow' => true,
+    ]);
+    $petty = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '11120',
+        'type' => 'asset',
+        'sub_type' => 'current_asset',
+        'normal_balance' => 'debit',
+        'is_cash_flow' => true,
+    ]);
+
+    // Transfer kas bank ke kas kecil: tidak mengubah kas gabungan.
+    postCashFlowJournal($this->fiscalYear, $coaVersion, $petty, 100000, 0, [
+        ['account' => $bank, 'debit' => 0, 'credit' => 100000],
+    ]);
+
+    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
+        ->assertOk();
+
+    $sections = collect($response->json('computed_sections'))->keyBy('code');
+    expect((float) $sections['operating_cash_flow']['value'])->toBe(0.0)
+        ->and((float) $sections['investing_cash_flow']['value'])->toBe(0.0)
+        ->and((float) $sections['financing_cash_flow']['value'])->toBe(0.0)
+        ->and((float) $sections['net_change']['value'])->toBe(0.0);
+});
+
+test('it splits a mixed journal proportionally across counter accounts and keeps totals equal to cash change', function () {
+    $this->seed(ReportConfigurationSeeder::class);
+    Sanctum::actingAs($this->user, ['*']);
+
+    $coaVersion = CoaVersion::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'status' => 'active',
+    ]);
+    $cash = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '11110',
+        'type' => 'asset',
+        'sub_type' => 'current_asset',
+        'normal_balance' => 'debit',
+        'is_cash_flow' => true,
+    ]);
+    $equipment = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '12100',
+        'type' => 'asset',
+        'sub_type' => 'non_current_asset',
+        'normal_balance' => 'debit',
+    ]);
+    $ownerCapital = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '31000',
+        'type' => 'equity',
+        'sub_type' => null,
+        'normal_balance' => 'credit',
+    ]);
+    $sales = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '41000',
+        'type' => 'revenue',
+        'sub_type' => null,
+        'normal_balance' => 'credit',
+    ]);
+
+    // Jurnal campuran: kas masuk 100.000 dengan lawan ekuitas 60.000 (pendanaan)
+    // dan pendapatan 40.000 (operasi). Kas keluar 30.000 untuk peralatan (investasi).
+    // Kas masuk 100.000 dibagi proporsional: pendanaan 60.000, operasi 40.000.
+    postCashFlowJournal($this->fiscalYear, $coaVersion, $cash, 100000, 30000, [
+        ['account' => $ownerCapital, 'debit' => 0, 'credit' => 60000],
+        ['account' => $sales, 'debit' => 0, 'credit' => 40000],
+        ['account' => $equipment, 'debit' => 30000, 'credit' => 0],
+    ]);
+
+    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
+        ->assertOk();
+
+    $sections = collect($response->json('computed_sections'))->keyBy('code');
+    $operating = (float) $sections['operating_cash_flow']['value'];
+    $investing = (float) $sections['investing_cash_flow']['value'];
+    $financing = (float) $sections['financing_cash_flow']['value'];
+    $netChange = (float) $sections['net_change']['value'];
+
+    expect($operating)->toBe(40000.0)
+        ->and($investing)->toBe(-30000.0)
+        ->and($financing)->toBe(60000.0)
+        ->and(round($operating + $investing + $financing, 2))->toBe($netChange)
+        ->and($netChange)->toBe(70000.0);
+});
+
+test('it reconciles activity totals to the opening to closing cash change', function () {
+    $this->seed(ReportConfigurationSeeder::class);
+    Sanctum::actingAs($this->user, ['*']);
+
+    $coaVersion = CoaVersion::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'status' => 'active',
+    ]);
+    $cash = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '11110',
+        'type' => 'asset',
+        'sub_type' => 'current_asset',
+        'normal_balance' => 'debit',
+        'is_cash_flow' => true,
+    ]);
+    $receivable = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '11200',
+        'type' => 'asset',
+        'sub_type' => 'current_asset',
+        'normal_balance' => 'debit',
+    ]);
+    $equipment = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '12100',
+        'type' => 'asset',
+        'sub_type' => 'non_current_asset',
+        'normal_balance' => 'debit',
+    ]);
+
+    // Saldo awal kas 0 -> akhir: +500.000 - 125.000 = 375.000.
+    postCashFlowJournal($this->fiscalYear, $coaVersion, $cash, 500000, 0, [
+        ['account' => $receivable, 'debit' => 0, 'credit' => 500000],
+    ]);
+    postCashFlowJournal($this->fiscalYear, $coaVersion, $cash, 0, 125000, [
+        ['account' => $equipment, 'debit' => 125000, 'credit' => 0],
+    ]);
+
+    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
+        ->assertOk();
+
+    $sections = collect($response->json('computed_sections'))->keyBy('code');
+    $total = (float) $sections['operating_cash_flow']['value']
+        + (float) $sections['investing_cash_flow']['value']
+        + (float) $sections['financing_cash_flow']['value'];
+
+    expect($total)->toBe(375000.0)
+        ->and((float) $sections['net_change']['value'])->toBe(375000.0);
+});
+
 test('it can export cash flow report', function () {
     Carbon::setTestNow(Carbon::parse('2026-03-04 10:00:00'));
     Excel::fake();
