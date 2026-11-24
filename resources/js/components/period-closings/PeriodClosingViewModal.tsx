@@ -40,14 +40,18 @@ export function PeriodClosingViewModal({
 
     const [pendingAction, setPendingAction] =
         useState<PeriodClosingAction | null>(null);
-    const [updated, setUpdated] = useState<PeriodClosing | null>(null);
+    // Hasil aksi hanya berlaku untuk item yang sedang dibuka; data baris baru mengalahkannya.
+    const [updated, setUpdated] = useState<{
+        source: PeriodClosing | null;
+        next: PeriodClosing;
+    } | null>(null);
     const { run, processing } = usePeriodClosingAction({
-        onSuccess: (next) => setUpdated(next),
+        onSuccess: (next) => setUpdated({ source: item, next }),
     });
 
     if (!item) return null;
 
-    const view = updated && updated.id === item.id ? updated : item;
+    const view = updated?.source === item ? updated.next : item;
     const isBusy = processing !== null;
     const canClose = canEdit && view.status !== 'closed';
     const canReopen = canEdit && view.status === 'closed';

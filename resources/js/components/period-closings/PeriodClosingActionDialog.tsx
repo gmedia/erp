@@ -22,26 +22,14 @@ interface PeriodClosingActionDialogProps {
     onOpenChange: (open: boolean) => void;
 }
 
-const MONTH_NAMES = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-];
+/** Label periode untuk pesan konfirmasi, mengikuti bahasa aktif. */
+function formatPeriodLabel(item: PeriodClosing, locale: string): string {
+    if (item.closing_type === 'yearly') return String(item.period_year);
 
-/** Label periode untuk pesan konfirmasi, mis. "March 2026" atau "Year 2026". */
-export function formatPeriodLabel(item: PeriodClosing): string {
-    if (item.closing_type === 'yearly') return `Year ${item.period_year}`;
-    const name = MONTH_NAMES[item.period_month - 1] ?? item.period_month;
-    return `${name} ${item.period_year}`;
+    return new Intl.DateTimeFormat(locale, {
+        month: 'long',
+        year: 'numeric',
+    }).format(new Date(item.period_year, item.period_month - 1, 1));
 }
 
 export function PeriodClosingActionDialog({
@@ -51,8 +39,8 @@ export function PeriodClosingActionDialog({
     onConfirm,
     onOpenChange,
 }: Readonly<PeriodClosingActionDialogProps>) {
-    const { t } = useTranslation();
-    const period = item ? formatPeriodLabel(item) : '';
+    const { t, locale } = useTranslation();
+    const period = item ? formatPeriodLabel(item, locale) : '';
     const isClose = action === 'close';
 
     return (
