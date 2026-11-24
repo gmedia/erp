@@ -16,7 +16,26 @@ uses(RefreshDatabase::class)->group('asset-acquisition-journal-posting');
  */
 function makeAssetAcquisitionFixtures(): void
 {
-    $coaVersion = CoaVersion::factory()->create(['status' => 'active']);
+    FiscalYear::factory()->create([
+        'name' => '2025',
+        'start_date' => '2025-01-01',
+        'end_date' => '2025-12-31',
+        'status' => 'closed',
+    ]);
+
+    $openYear = FiscalYear::factory()->create([
+        'name' => '2026',
+        'start_date' => '2026-01-01',
+        'end_date' => '2026-12-31',
+        'status' => 'open',
+    ]);
+
+    // Tanpa fiscal_year_id eksplisit, CoaVersionFactory membuat FY acak (2020-2070, open)
+    // yang ikut terpilih sebagai saldo awal dan membuat tes bergantung urutan.
+    $coaVersion = CoaVersion::factory()->create([
+        'status' => 'active',
+        'fiscal_year_id' => $openYear->id,
+    ]);
 
     $accounts = [
         ['11110', 'Cash in Bank', 'asset', 'debit'],
@@ -35,20 +54,6 @@ function makeAssetAcquisitionFixtures(): void
             'is_active' => true,
         ]);
     }
-
-    FiscalYear::factory()->create([
-        'name' => '2025',
-        'start_date' => '2025-01-01',
-        'end_date' => '2025-12-31',
-        'status' => 'closed',
-    ]);
-
-    FiscalYear::factory()->create([
-        'name' => '2026',
-        'start_date' => '2026-01-01',
-        'end_date' => '2026-12-31',
-        'status' => 'open',
-    ]);
 }
 
 function accountIdByCode(string $code): int
