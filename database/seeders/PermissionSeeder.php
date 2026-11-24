@@ -338,7 +338,13 @@ class PermissionSeeder extends Seeder
             [
                 'name' => 'posting_journal',
                 'display_name' => 'Posting Journal',
-                'child' => [],
+                'child' => [
+                    [
+                        'name' => 'posting_journal.edit',
+                        'display_name' => 'Edit Posting Journal',
+                        'child' => [],
+                    ],
+                ],
             ],
             [
                 'name' => 'recurring_journal',
@@ -953,6 +959,11 @@ class PermissionSeeder extends Seeder
                     [
                         'name' => 'asset_depreciation_run.create',
                         'display_name' => 'Create Asset Depreciation Run',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'asset_depreciation_run.edit',
+                        'display_name' => 'Edit Asset Depreciation Run',
                         'child' => [],
                     ],
                 ],
