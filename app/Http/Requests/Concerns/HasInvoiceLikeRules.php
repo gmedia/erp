@@ -33,7 +33,11 @@ trait HasInvoiceLikeRules
         return [
             'items' => $this->itemsRules(),
             'items.*.product_id' => ['nullable', 'integer', 'exists:products,id'],
-            'items.*.account_id' => [$this->itemRequiredRule(), 'integer', 'exists:accounts,id'],
+            'items.*.account_id' => [
+                $this->itemRequiredRule(),
+                'integer',
+                $this->postableAccountRule(),
+            ],
             'items.*.description' => [$this->itemRequiredRule(), 'string', 'max:255'],
             'items.*.quantity' => [$this->itemRequiredRule(), 'numeric', 'gt:0'],
             'items.*.unit_price' => [$this->itemRequiredRule(), 'numeric', 'min:0'],

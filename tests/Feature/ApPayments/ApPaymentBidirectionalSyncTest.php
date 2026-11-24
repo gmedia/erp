@@ -31,6 +31,7 @@ test('creating payment updates supplier bill amount_paid and amount_due', functi
     $fiscalYear = FiscalYear::factory()->create();
     $bankAccount = Account::factory()->create(['type' => 'asset']);
     $supplierBill = SupplierBill::factory()->confirmed()->create([
+        'supplier_id' => $supplier->id,
         'grand_total' => 1000000,
         'amount_paid' => 0,
         'amount_due' => 1000000,
@@ -70,6 +71,7 @@ test('updating payment allocation updates supplier bill amounts', function () {
     $fiscalYear = FiscalYear::factory()->create();
     $bankAccount = Account::factory()->create(['type' => 'asset']);
     $supplierBill = SupplierBill::factory()->confirmed()->create([
+        'supplier_id' => $supplier->id,
         'grand_total' => 1000000,
         'amount_paid' => 0,
         'amount_due' => 1000000,
@@ -158,6 +160,7 @@ test('over-allocation is prevented', function () {
     $fiscalYear = FiscalYear::factory()->create();
     $bankAccount = Account::factory()->create(['type' => 'asset']);
     $supplierBill = SupplierBill::factory()->confirmed()->create([
+        'supplier_id' => $supplier->id,
         'grand_total' => 1000000,
         'amount_paid' => 0,
         'amount_due' => 1000000,

@@ -7,6 +7,7 @@ import { z } from 'zod';
 
 import { InputField } from '@/components/common/InputField';
 import {
+    ItemAccountSelectField,
     ItemFormDialogShell,
     ItemNotesField,
     ItemProductUnitFields,
@@ -105,10 +106,13 @@ export function CreditNoteItemFormDialog({
                 productInitialLabel={defaultValues.product_label}
             />
             <div className="grid grid-cols-1 gap-4">
-                <InputField
+                <ItemAccountSelectField
+                    form={form}
+                    open={open}
                     name="account_id"
-                    label="Account"
-                    placeholder="Select Account"
+                    labelName="account_label"
+                    initialId={defaultValues.account_id}
+                    initialLabel={defaultValues.account_label}
                 />
                 <InputField
                     name="description"

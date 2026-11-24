@@ -9,6 +9,7 @@ import { TransactionLineItemsTable } from '@/components/common/TransactionLineIt
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type CreditNote, type CreditNoteFormData } from '@/types/credit-note';
+import { type CustomerInvoice } from '@/types/customer-invoice';
 import { toDateInputValue } from '@/utils/date-format';
 import { omitItemDisplayLabels } from '@/utils/entity-form-item';
 import { creditNoteFormSchema } from '@/utils/schemas';
@@ -157,11 +158,17 @@ export const CreditNoteForm = memo<CreditNoteFormProps>(
                             placeholder="Select Customer"
                             url="/api/customers"
                         />
-                        <AsyncSelectField
+                        <AsyncSelectField<
+                            Pick<CustomerInvoice, 'id' | 'invoice_number'>
+                        >
                             name="customer_invoice_id"
                             label="Customer Invoice (Optional)"
                             placeholder="Select Customer Invoice"
                             url="/api/customer-invoices"
+                            labelFn={(invoice) =>
+                                invoice.invoice_number ?? String(invoice.id)
+                            }
+                            valueFn={(invoice) => String(invoice.id)}
                         />
                         <AsyncSelectField
                             name="branch_id"

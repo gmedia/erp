@@ -51,6 +51,7 @@ export interface SupplierReturnFormData {
     notes?: string;
     items: Array<{
         goods_receipt_item_id: string;
+        goods_receipt_item_label?: string;
         product_id: string;
         product_label?: string;
         unit_id?: string;

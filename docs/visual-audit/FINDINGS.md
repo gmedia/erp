@@ -368,3 +368,7 @@ Temuan terbuka dari screenshot:
 - `my-approvals` chip `Pending` masih abu-abu.
 - `users` 390: email tidak terlihat di viewport; tombol edit nonaktif sudah ada keterangannya.
 - `pipeline-audit-trail`: badge PO/PR sudah pill; `Posted`/`Disposed`/`Lost` belum muncul di data screenshot.
+
+### Screenshot #370 langkah 7 (2026-11-24)
+
+Tujuh dialog item/alokasi dengan select terbuka (Customer Invoice item, Credit Note item, Supplier Bill item, AR Receipt alokasi, AP Payment alokasi, GR item, SR item) diambil light/dark x 1440/390: 28 berkas di `~/.erp-agent/shots370` (di luar repo, tidak di-commit). Tema dipaksa lewat `localStorage.appearance` dan kelas `dark` diverifikasi per berkas. Pada sampel visual, select terbuka dan pilihan berlabel terlihat (akun COA, nomor invoice/bill dengan sisa tagihan, baris PO/GR). Alokasi AR/AP hanya menampilkan pilihan setelah customer/supplier induk dipilih; daftar kosong bila pihak tidak punya dokumen terbuka.

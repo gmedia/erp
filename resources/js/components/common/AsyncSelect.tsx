@@ -27,6 +27,7 @@ export interface AsyncSelectProps<T extends object = Record<string, unknown>> {
     label?: string;
     /** Meta key to read from API response for auto-selecting a default value when no value is set. */
     preferredMetaKey?: string;
+    filterItems?: (item: T) => boolean;
 }
 
 export function AsyncSelect<T extends object = Record<string, unknown>>({
@@ -42,6 +43,7 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
     initialLabel,
     label,
     preferredMetaKey,
+    filterItems,
 }: Readonly<AsyncSelectProps<T>>) {
     const [open, setOpen] = React.useState(false);
     const [search, setSearch] = React.useState('');
@@ -101,7 +103,8 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
                 const data = response.data.data
                     ? response.data.data
                     : response.data;
-                setItems(Array.isArray(data) ? data : []);
+                const rows: T[] = Array.isArray(data) ? data : [];
+                setItems(filterItems ? rows.filter(filterItems) : rows);
             } catch (error) {
                 console.error('Failed to fetch items', error);
                 setItems([]);
@@ -109,7 +112,7 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
                 setLoading(false);
             }
         },
-        [url],
+        [url, filterItems],
     );
 
     // Initial fetch to get label if value is provided and initialLabel is not present

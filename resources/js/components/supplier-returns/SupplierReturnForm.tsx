@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { memo, useMemo } from 'react';
+import { memo, useEffect, useMemo, useRef } from 'react';
 import { type Resolver, useFieldArray, useForm } from 'react-hook-form';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
@@ -50,6 +50,7 @@ interface SupplierReturnFormProps {
 const createEmptySupplierReturnItem =
     (): SupplierReturnFormData['items'][number] => ({
         goods_receipt_item_id: '',
+        goods_receipt_item_label: '',
         product_id: '',
         product_label: '',
         unit_id: '',
@@ -100,6 +101,7 @@ const getSupplierReturnFormDefaults = (
         items: (supplierReturn.items || []).length
             ? (supplierReturn.items || []).map((it) => ({
                   goods_receipt_item_id: String(it.goods_receipt_item_id),
+                  goods_receipt_item_label: it.product?.name || '',
                   product_id: it.product?.id ? String(it.product.id) : '',
                   product_label: it.product?.name || '',
                   unit_id: it.unit?.id ? String(it.unit.id) : '',
@@ -146,6 +148,23 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
             name: 'items',
         });
         const watchedItems = form.watch('items');
+        const watchedPurchaseOrderId = form.watch('purchase_order_id');
+        const watchedGoodsReceiptId = form.watch('goods_receipt_id');
+        const headerSourceKey = `${watchedPurchaseOrderId}|${watchedGoodsReceiptId}`;
+        const defaultHeaderSourceKey = `${defaultValues.purchase_order_id}|${defaultValues.goods_receipt_id}`;
+        const previousHeaderSourceKeyRef = useRef(defaultHeaderSourceKey);
+        useEffect(() => {
+            if (previousHeaderSourceKeyRef.current === headerSourceKey) {
+                return;
+            }
+            const isResetToDefaults =
+                headerSourceKey === defaultHeaderSourceKey;
+            previousHeaderSourceKeyRef.current = headerSourceKey;
+            if (isResetToDefaults) {
+                return;
+            }
+            remove();
+        }, [headerSourceKey, defaultHeaderSourceKey, remove]);
         const {
             isItemDialogOpen,
             item: selectedItem,
@@ -200,18 +219,20 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
                         placeholder="Select status"
                     />
 
-                    <AsyncSelectField
+                    <AsyncSelectField<{ po_number: string }>
                         name="purchase_order_id"
                         label="Purchase Order"
                         url="/api/purchase-orders"
                         placeholder="Select purchase order"
+                        labelFn={(po) => po.po_number}
                     />
 
-                    <AsyncSelectField
+                    <AsyncSelectField<{ gr_number: string }>
                         name="goods_receipt_id"
                         label="Goods Receipt"
                         url="/api/goods-receipts"
                         placeholder="Select goods receipt"
+                        labelFn={(gr) => gr.gr_number}
                     />
 
                     <AsyncSelectField
@@ -265,9 +286,6 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="w-[140px]">
-                                        GR Item ID
-                                    </TableHead>
                                     <TableHead className="w-[220px]">
                                         Product
                                     </TableHead>
@@ -294,12 +312,6 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
 
                                     return (
                                         <TableRow key={field.id}>
-                                            <TableCell>
-                                                {formatItemReference(
-                                                    undefined,
-                                                    supplierReturnItem.goods_receipt_item_id,
-                                                )}
-                                            </TableCell>
                                             <TableCell>
                                                 {formatItemReference(
                                                     supplierReturnItem.product_label,
@@ -333,7 +345,7 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
                                     );
                                 })}
                                 {fields.length === 0 && (
-                                    <EntityFormItemEmptyRow colSpan={7} />
+                                    <EntityFormItemEmptyRow colSpan={6} />
                                 )}
                             </TableBody>
                         </Table>
@@ -345,6 +357,8 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
                     onOpenChange={handleItemDialogOpenChange}
                     item={selectedItem}
                     onSave={handleSaveItem}
+                    goodsReceiptId={watchedGoodsReceiptId}
+                    supplierReturnId={activeSupplierReturn?.id}
                 />
             </EntityForm>
         );
