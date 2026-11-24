@@ -235,4 +235,3 @@ test('bill tanpa GR tetap mendebit beban dan mengkredit 21100 seperti sebelumnya
         ->and(lineNetCredit($entry, $accounts['expense']->id))->toBe(-250000.0)
         ->and(lineNetCredit($entry, $accounts['grir']->id))->toBe(0.0);
 });
-
