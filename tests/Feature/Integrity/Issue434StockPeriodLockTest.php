@@ -119,8 +119,7 @@ test('movement GR baru bertanggal di bulan tertutup ditolak 422 tanpa tersimpan'
     $warehouse = Warehouse::factory()->create();
     $receipt = issue434Receipt($warehouse, $product, 5, '2026-03-15');
 
-    expect(fn () => app(StockPostingService::class)->postGoodsReceipt($receipt))
-        ->toThrow(ValidationException::class);
+    issue434ExpectPeriodLocked(fn () => app(StockPostingService::class)->postGoodsReceipt($receipt));
     expect(StockMovement::query()->where('reference_id', $receipt->id)->count())->toBe(0);
 });
 
@@ -131,8 +130,7 @@ test('penyesuaian stok bertanggal di bulan tertutup ditolak 422', function () {
     $warehouse = Warehouse::factory()->create();
     $adjustment = issue434Adjustment($warehouse, $product, 2, '2026-04-10');
 
-    expect(fn () => app(StockPostingService::class)->postStockAdjustment($adjustment))
-        ->toThrow(ValidationException::class);
+    issue434ExpectPeriodLocked(fn () => app(StockPostingService::class)->postStockAdjustment($adjustment));
     expect(StockMovement::query()->where('reference_id', $adjustment->id)->count())->toBe(0);
 });
 
@@ -147,6 +145,25 @@ test('bulan terbuka menerima movement stok', function () {
 
     expect(StockMovement::query()->where('reference_id', $receipt->id)->count())->toBe(1);
 });
+
+/**
+ * Memastikan penolakan berasal dari penguncian periode (bukan validasi lain).
+ *
+ * @param  callable(): void  $action
+ */
+function issue434ExpectPeriodLocked(callable $action): void
+{
+    try {
+        $action();
+    } catch (ValidationException $exception) {
+        $messages = collect($exception->errors())->flatten()->implode(' ');
+        expect($messages)->toMatch('/periode|period/i');
+
+        return;
+    }
+
+    test()->fail('Diharapkan ValidationException penguncian periode, tetapi tidak dilempar.');
+}
 
 /**
  * Snapshot keadaan yang tidak boleh berubah saat request ditolak 422.
@@ -244,8 +261,8 @@ test('retur pemasok bertanggal di bulan tertutup ditolak 422 tanpa movement', fu
     ]);
     $before = issue434Snapshot($product->id, $warehouse->id);
 
-    expect(fn () => app(StockPostingService::class)->postSupplierReturn($supplierReturn->refresh()))
-        ->toThrow(ValidationException::class);
+    $posting = app(StockPostingService::class);
+    issue434ExpectPeriodLocked(fn () => $posting->postSupplierReturn($supplierReturn->refresh()));
 
     expect(issue434Snapshot($product->id, $warehouse->id))->toBe($before);
 });
@@ -269,10 +286,37 @@ test('transfer dispatch bertanggal di bulan tertutup ditolak 422 tanpa movement'
     ]);
     $before = issue434Snapshot($product->id, $from->id);
 
-    expect(fn () => app(StockPostingService::class)->postStockTransferDispatch($transfer->refresh()))
-        ->toThrow(ValidationException::class);
+    $posting = app(StockPostingService::class);
+    issue434ExpectPeriodLocked(fn () => $posting->postStockTransferDispatch($transfer->refresh()));
 
     expect(issue434Snapshot($product->id, $from->id))->toBe($before);
+});
+
+test('transfer terima bertanggal di bulan tertutup ditolak 422 tanpa movement', function () {
+    $fiscalYear = issue434FiscalYear();
+    issue434CloseMonth($fiscalYear, 8);
+    $product = Product::factory()->create();
+    $from = Warehouse::factory()->create();
+    $to = Warehouse::factory()->create();
+    $transfer = StockTransfer::factory()->create([
+        'from_warehouse_id' => $from->id,
+        'to_warehouse_id' => $to->id,
+        'transfer_date' => '2026-08-05',
+        'received_at' => '2026-08-09 10:00:00',
+        'status' => 'received',
+    ]);
+    StockTransferItem::factory()->create([
+        'stock_transfer_id' => $transfer->id,
+        'product_id' => $product->id,
+        'quantity' => 2,
+        'quantity_received' => 2,
+    ]);
+    $before = issue434Snapshot($product->id, $to->id);
+
+    $posting = app(StockPostingService::class);
+    issue434ExpectPeriodLocked(fn () => $posting->postStockTransferReceive($transfer->refresh()));
+
+    expect(issue434Snapshot($product->id, $to->id))->toBe($before);
 });
 
 test('pembatalan hari ini ditolak 422 bila bulan ini tertutup dan tidak mengubah movement', function () {
@@ -285,11 +329,11 @@ test('pembatalan hari ini ditolak 422 bila bulan ini tertutup dan tidak mengubah
     app(StockPostingService::class)->postGoodsReceipt($receipt);
     $before = issue434Snapshot($product->id, $warehouse->id);
 
-    expect(fn () => app(StockPostingService::class)->reverseDocument(
+    issue434ExpectPeriodLocked(fn () => app(StockPostingService::class)->reverseDocument(
         GoodsReceipt::class,
         $receipt->id,
         'goods_receipt',
-    ))->toThrow(ValidationException::class);
+    ));
 
     expect(issue434Snapshot($product->id, $warehouse->id))->toBe($before);
 });
@@ -311,8 +355,26 @@ test('penutupan tahunan mengunci tanggal dalam tahun fiskal non-kalender', funct
     $receipt = issue434Receipt($warehouse, $product, 5, '2027-01-10');
     $before = issue434Snapshot($product->id, $warehouse->id);
 
-    expect(fn () => app(StockPostingService::class)->postGoodsReceipt($receipt))
-        ->toThrow(ValidationException::class);
+    issue434ExpectPeriodLocked(fn () => app(StockPostingService::class)->postGoodsReceipt($receipt));
+
+    expect(issue434Snapshot($product->id, $warehouse->id))->toBe($before);
+});
+
+test('pembatalan penyesuaian approved tanpa jurnal ditolak 422 bila bulan ini tertutup', function () {
+    $fiscalYear = issue434FiscalYear();
+    $product = Product::factory()->create();
+    $warehouse = Warehouse::factory()->create();
+    $adjustment = issue434Adjustment($warehouse, $product, 2, now()->subDays(40)->toDateString());
+    // Posting saat bulan ini masih terbuka, lalu bulan ini ditutup. Tanpa jurnal (journal_entry_id null).
+    app(StockPostingService::class)->postStockAdjustment($adjustment);
+    issue434CloseMonth($fiscalYear, (int) now()->month);
+    $before = issue434Snapshot($product->id, $warehouse->id);
+
+    issue434ExpectPeriodLocked(fn () => app(StockPostingService::class)->reverseDocument(
+        StockAdjustment::class,
+        (int) $adjustment->id,
+        'adjustment',
+    ));
 
     expect(issue434Snapshot($product->id, $warehouse->id))->toBe($before);
 });
@@ -348,8 +410,7 @@ test('pembatalan transfer hari ini ditolak 422 bila bulan ini tertutup tanpa pem
     issue434CloseMonth($fiscalYear, (int) now()->month);
     $before = issue434Snapshot($product->id, $from->id);
 
-    expect(fn () => app(StockPostingService::class)->reverseTransfer($transfer->refresh()))
-        ->toThrow(ValidationException::class);
+    issue434ExpectPeriodLocked(fn () => app(StockPostingService::class)->reverseTransfer($transfer->refresh()));
 
     expect(issue434Snapshot($product->id, $from->id))->toBe($before);
 });
