@@ -53,7 +53,7 @@ async function seedGoodsReceiptFixtures(page: Page): Promise<SeedResult> {
                     warehouse_id: warehouseId,
                     order_date: today,
                     currency: 'IDR',
-                    status: 'draft',
+                    status: 'confirmed',
                     items: poItems,
                 }),
             })).json();
@@ -148,12 +148,16 @@ test.describe('Goods Receipt header selects', () => {
         await expect(formDialog.locator('tbody tr').first()).toContainText(fixtures.productName);
 
         const purchaseOrderSelect = formDialog.getByRole('combobox', { name: 'Purchase Order' });
-        await purchaseOrderSelect.click();
         const listed = page.waitForResponse(
             (r) => r.url().includes('/api/purchase-orders') && r.ok(),
         );
-        await page.getByPlaceholder('Search...').fill(fixtures.otherPurchaseOrderNumber);
+        await purchaseOrderSelect.click();
         await listed;
+        const searched = page.waitForResponse(
+            (r) => r.url().includes('/api/purchase-orders') && r.ok(),
+        );
+        await page.getByPlaceholder('Search...').fill(fixtures.otherPurchaseOrderNumber);
+        await searched;
         await page
             .getByRole('button', { name: new RegExp(fixtures.otherPurchaseOrderNumber) })
             .first()

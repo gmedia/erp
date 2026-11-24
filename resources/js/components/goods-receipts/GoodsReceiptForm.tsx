@@ -194,6 +194,17 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
         });
 
         const handleSubmit = (data: GoodsReceiptFormData) => {
+            if (
+                data.status === 'confirmed' &&
+                selectedPoStatus &&
+                !CONFIRMABLE_PO_STATUSES.includes(selectedPoStatus)
+            ) {
+                form.setError('purchase_order_id', {
+                    type: 'validate',
+                    message: t('goods_receipt.po_not_approved'),
+                });
+                return;
+            }
             onSubmit({
                 ...data,
                 items: data.items.map(omitItemDisplayLabels),
@@ -241,6 +252,14 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
                             url="/api/purchase-orders"
                             placeholder="Select purchase order"
                             labelFn={(po) => po.po_number}
+                            filterItems={(po) =>
+                                CONFIRMABLE_PO_STATUSES.includes(
+                                    po.status ?? '',
+                                ) ||
+                                po.po_number ===
+                                    activeGoodsReceipt?.purchase_order
+                                        ?.po_number
+                            }
                             onItemSelect={(po) =>
                                 setSelectedPoStatus(po.status)
                             }
