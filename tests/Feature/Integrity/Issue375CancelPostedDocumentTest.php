@@ -3,6 +3,8 @@
 use App\Actions\AccountingPosting\PostCustomerInvoiceJournalAction;
 use App\Actions\AccountingPosting\PostSupplierBillJournalAction;
 use App\Models\Account;
+use App\Models\ApPayment;
+use App\Models\ApPaymentAllocation;
 use App\Models\CoaVersion;
 use App\Models\CreditNote;
 use App\Models\CustomerInvoice;
@@ -40,15 +42,19 @@ function cancelTestAccounts(): array
 {
     $coa = CoaVersion::factory()->create(['status' => 'active']);
 
-    $make = static fn (string $code, string $name, string $type, string $normal): Account
-        => Account::factory()->create([
-            'coa_version_id' => $coa->id,
-            'code' => $code,
-            'name' => $name,
-            'type' => $type,
-            'normal_balance' => $normal,
-            'is_active' => true,
-        ]);
+    $make = static fn (
+        string $code,
+        string $name,
+        string $type,
+        string $normal,
+    ): Account => Account::factory()->create([
+        'coa_version_id' => $coa->id,
+        'code' => $code,
+        'name' => $name,
+        'type' => $type,
+        'normal_balance' => $normal,
+        'is_active' => true,
+    ]);
 
     return [
         'ar' => $make('11200', 'Accounts Receivable', 'asset', 'debit'),
@@ -197,6 +203,29 @@ test('batal invoice ditolak 422 bila periode jurnal sudah tertutup', function ()
     putJson("/api/customer-invoices/{$invoice->id}", ['status' => 'cancelled'])->assertStatus(422);
 
     expect($invoice->refresh()->status)->toBe('sent');
+});
+
+test('batal bill ditolak 422 bila masih punya alokasi pembayaran confirmed', function () {
+    $accounts = cancelTestAccounts();
+    $bill = cancelTestBill($accounts);
+    app(PostSupplierBillJournalAction::class)->execute($bill->fresh());
+
+    $payment = ApPayment::factory()->create([
+        'status' => 'confirmed',
+        'supplier_id' => $bill->supplier_id,
+        'branch_id' => $bill->branch_id,
+        'fiscal_year_id' => $bill->fiscal_year_id,
+    ]);
+    ApPaymentAllocation::factory()->create([
+        'ap_payment_id' => $payment->id,
+        'supplier_bill_id' => $bill->id,
+    ]);
+
+    putJson("/api/supplier-bills/{$bill->id}", ['status' => 'cancelled'])
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('status');
+
+    expect($bill->refresh()->status)->toBe('confirmed');
 });
 
 test('batal bill terposting membalik baris jurnal asli, jurnal asli tetap posted', function () {
