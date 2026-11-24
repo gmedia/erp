@@ -6,7 +6,8 @@
 # → 429 massal (71 failed / 2.6h); dengan cache: 532 passed / 34 menit.
 #
 # Alur:
-#   1. Hentikan Vite dev di container + hapus `public/hot`; `npm run build`.
+#   1. Hentikan Vite dev di container + hapus `public/hot`; `npm run build`
+#      (dilewati bila sumber aset sama dengan build terakhir).
 #   2. `sail artisan config:cache`; `trap` → `config:clear` saat exit
 #      (sukses / gagal / Ctrl-C), supaya Pest tetap memakai `.env.testing`.
 #   3. Watchdog background: bila `bootstrap/cache/config.php` hilang selama
@@ -28,9 +29,11 @@
 #   bash scripts/e2e-full.sh                       # seluruh direktori E2E (CI list)
 #   bash scripts/e2e-full.sh tests/e2e/branches    # hanya modul tertentu
 #   bash scripts/e2e-full.sh --shard=1/4 --reporter=line
+#   bash scripts/e2e-full.sh tests/e2e/branches --last-failed   # ulang yang gagal saja
 #
 # Env opsional:
 #   E2E_FULL_PLAYWRIGHT_BASE_URL  default http://localhost:82 (port publish Sail)
+#   E2E_FULL_FORCE_BUILD=1        paksa npm run build
 #   APP_ADMIN                     default admin@example.com (harus = seed container)
 #
 # ATURAN: jangan menulis alamat/IP server atau kredensial di script ini;
@@ -48,6 +51,7 @@ HOT_FILE="public/hot"
 WATCHDOG_INTERVAL=5
 LOG_DIR="e2e/e2e-full"
 PW_LOG="$LOG_DIR/playwright.log"
+BUILD_STAMP="public/build/.e2e-fingerprint"
 
 # State (di-init sebelum trap agar aman di bawah set -u).
 VITE_ACTIVE=0
@@ -112,6 +116,16 @@ stop_vite() {
     rm -f "$HOT_FILE"
 }
 
+# Sidik jari isi berkas yang memengaruhi hasil build (kosong bila gagal dihitung).
+asset_fingerprint() {
+    find resources lang package.json package-lock.json vite.config.* tsconfig*.json components.json \
+        -type f -print0 2>/dev/null \
+        | LC_ALL=C sort -z \
+        | xargs -0 -r sha1sum 2>/dev/null \
+        | sha1sum \
+        | cut -d' ' -f1
+}
+
 # Stop Vite dev bila aktif + pastikan public/hot hilang + build aset.
 prepare_assets() {
     log "Memeriksa Vite dev di container..."
@@ -127,11 +141,23 @@ prepare_assets() {
         rm -f "$HOT_FILE"
     fi
 
+    local fingerprint
+    fingerprint="$(asset_fingerprint)"
+    if [ "${E2E_FULL_FORCE_BUILD:-0}" != "1" ] \
+        && [ -f public/build/manifest.json ] \
+        && [ -n "$fingerprint" ] \
+        && [ "$(cat "$BUILD_STAMP" 2>/dev/null)" = "$fingerprint" ]; then
+        log "Aset tidak berubah sejak build terakhir: build dilewati (E2E_FULL_FORCE_BUILD=1 untuk memaksa)."
+        return 0
+    fi
+
     log "Build aset Vite (npm run build)..."
     if ! npm run build; then
         log_err "npm run build gagal."
         return 1
     fi
+    # Vite mengosongkan public/build, jadi build manual otomatis membatalkan sidik jari ini.
+    printf '%s' "$fingerprint" > "$BUILD_STAMP"
     log "Build selesai."
     return 0
 }
