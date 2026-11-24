@@ -14,6 +14,7 @@ use App\Models\SupplierReturn;
 use App\Models\Unit;
 use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -256,7 +257,8 @@ test('cancelling a confirmed supplier return stores the reason and who cancelled
 
     $notes = $supplierReturn->refresh()->notes;
     expect($notes)->toContain('Barang rusak saat diterima');
-    expect($notes)->toContain('[Cancelled by user #');
+    expect($notes)->toContain('[Cancelled by user ' . Auth::user()->name . ' at ');
+    expect($notes)->not->toContain('[Cancelled by user #');
 });
 
 test('a cancelled supplier return cannot be re-opened to draft or confirmed', function () {

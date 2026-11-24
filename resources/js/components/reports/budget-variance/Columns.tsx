@@ -4,7 +4,10 @@ import { Badge } from '@/components/ui/badge';
 import { type BudgetVarianceItem } from '@/types/budget';
 import { createSortingHeader, createTextColumn } from '@/utils/columns';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
-import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
+import {
+    formatCurrencyByRegionalSettings,
+    formatNumberByRegionalSettings,
+} from '@/utils/number-format';
 import { type ColumnDef } from '@tanstack/react-table';
 
 function getVarianceStatusVariant(
@@ -92,7 +95,12 @@ export const budgetVarianceColumns: ColumnDef<BudgetVarianceItem>[] = [
         ...createSortingHeader('Variance %'),
         cell: ({ row }) => {
             const val = row.getValue('variance_percent') as number | null;
-            return val === null ? '-' : `${val.toFixed(2)}%`;
+            return val === null
+                ? '-'
+                : `${formatNumberByRegionalSettings(val, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                  })}%`;
         },
     },
     {

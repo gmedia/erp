@@ -504,7 +504,7 @@ class MenuSeeder extends Seeder
                     ],
                     [
                         'name' => 'ap_payment_history_report',
-                        'display_name' => 'Payment History',
+                        'display_name' => 'AP Payment History',
                         'permissions' => ['ap_payment_history_report'],
                         'icon' => 'History',
                         'url' => 'reports/ap-payment-history',
@@ -1057,7 +1057,7 @@ class MenuSeeder extends Seeder
                 'child' => [
                     [
                         'name' => 'admin_setting',
-                        'display_name' => 'Setting',
+                        'display_name' => 'Settings',
                         'permissions' => [
                             'admin_setting',
                             'admin_setting.edit',

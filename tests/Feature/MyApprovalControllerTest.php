@@ -3,8 +3,10 @@
 use App\Models\ApprovalFlowStep;
 use App\Models\ApprovalRequest;
 use App\Models\ApprovalRequestStep;
+use App\Models\PurchaseRequest;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -86,6 +88,68 @@ it('only lists the current actionable step in pending approvals', function () {
         ->assertOk()
         ->assertJsonCount(0, 'pending')
         ->assertJsonMissing(['id' => $futureStep->id]);
+});
+
+it('resolves document numbers for inbox steps with one query per document type', function () {
+    $user = User::factory()->create();
+    $flowStep = ApprovalFlowStep::factory()->create([
+        'approver_type' => 'user',
+        'approver_user_id' => $user->id,
+    ]);
+
+    $sequence = 0;
+    $createInbox = function (int $count) use ($flowStep, &$sequence): void {
+        for ($i = 0; $i < $count; $i++) {
+            $sequence++;
+            $purchaseRequest = PurchaseRequest::factory()->create([
+                'pr_number' => 'PR-2026-' . str_pad((string) (900000 + $sequence), 6, '0', STR_PAD_LEFT),
+            ]);
+            $request = ApprovalRequest::factory()->create([
+                'status' => 'in_progress',
+                'current_step_order' => 1,
+                'approvable_type' => PurchaseRequest::class,
+                'approvable_id' => $purchaseRequest->id,
+            ]);
+            ApprovalRequestStep::factory()->create([
+                'approval_request_id' => $request->id,
+                'approval_flow_step_id' => $flowStep->id,
+                'step_order' => 1,
+                'status' => 'pending',
+            ]);
+        }
+    };
+
+    $countPurchaseRequestQueries = function () use ($user): int {
+        $queries = [];
+        DB::enableQueryLog();
+        DB::flushQueryLog();
+
+        Sanctum::actingAs($user, ['*']);
+        getJson('/api/my-approvals')->assertOk();
+
+        foreach (DB::getQueryLog() as $logged) {
+            if (str_contains($logged['query'], 'from `purchase_requests`')) {
+                $queries[] = $logged['query'];
+            }
+        }
+        DB::disableQueryLog();
+
+        return count($queries);
+    };
+
+    $createInbox(1);
+    $single = $countPurchaseRequestQueries();
+
+    $createInbox(4);
+    $many = $countPurchaseRequestQueries();
+
+    // Query count must not grow with the number of inbox steps (no N+1).
+    expect($many)->toBe($single);
+
+    Sanctum::actingAs($user, ['*']);
+    getJson('/api/my-approvals')
+        ->assertOk()
+        ->assertJsonFragment(['document_number' => 'PR-2026-900001']);
 });
 
 it('can approve a pending request step', function () {

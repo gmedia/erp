@@ -33,6 +33,7 @@ export interface ApprovalRequest {
     approval_flow_id: number;
     approvable_type: string;
     approvable_id: number;
+    document_number?: string | null;
     current_step_order: number;
     status: 'pending' | 'in_progress' | 'approved' | 'rejected' | 'cancelled';
     submitted_by: number;

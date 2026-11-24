@@ -97,6 +97,7 @@ const defaultTranslations: Translations = {
     },
     my_approvals: {
         request_number: 'No. {id}',
+        load_failed: 'Failed to load approvals. Please refresh and try again.',
     },
     users: {
         title: 'Users',

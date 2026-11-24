@@ -18,9 +18,9 @@ function formatMonthName(value: unknown): string {
         return '-';
     }
 
-    return new Date(Date.UTC(2000, month - 1, 1)).toLocaleString('en-US', {
-        month: 'long',
-        timeZone: 'UTC',
+    return formatDateByRegionalSettings(new Date(2000, month - 1, 1), {
+        dateFormat: 'F',
+        locale: 'en-US',
     });
 }
 

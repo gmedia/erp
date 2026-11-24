@@ -277,6 +277,7 @@ export function ReportDataTablePage<
                             filterFields={filterFields}
                             exportEndpoint={exportEndpoint}
                             controlsDisabled={!ready}
+                            edgeFade={false}
                             entityName={entityName}
                             onView={onView}
                             defaultColumnVisibility={defaultColumnVisibility}

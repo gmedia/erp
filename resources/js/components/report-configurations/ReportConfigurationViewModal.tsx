@@ -11,6 +11,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { formatClassName } from '@/lib/status-badge';
 import { type ReportConfiguration } from '@/types/report-configuration';
 
 interface ReportConfigurationViewModalProps {
@@ -57,7 +58,7 @@ export const ReportConfigurationViewModal =
                                     label="Report Type"
                                     value={
                                         reportTypeLabels[item.report_type] ??
-                                        item.report_type
+                                        formatClassName(item.report_type)
                                     }
                                 />
                                 <ViewField
@@ -141,7 +142,9 @@ export const ReportConfigurationViewModal =
                                                                         section
                                                                             .section_type
                                                                     ] ??
-                                                                        section.section_type}
+                                                                        formatClassName(
+                                                                            section.section_type,
+                                                                        )}
                                                                 </Badge>
                                                             </TableCell>
                                                             <TableCell>
