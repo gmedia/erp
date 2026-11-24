@@ -16,6 +16,7 @@ export function useAssetDepreciationRuns() {
 
     const [isCalculating, setIsCalculating] = useState(false);
     const [isPosting, setIsPosting] = useState<number | null>(null);
+    const [isVoiding, setIsVoiding] = useState<number | null>(null);
 
     const { data, meta, isLoading, refetch } =
         useCrudQuery<AssetDepreciationRun>({
@@ -100,6 +101,34 @@ export function useAssetDepreciationRuns() {
         }
     };
 
+    const voidRun = async (id: number) => {
+        setIsVoiding(id);
+        try {
+            const response = await axiosInstance.post(
+                `/api/asset-depreciation-runs/${id}/void`,
+            );
+            toast.success(response.data.message);
+            void queryClient.invalidateQueries({
+                queryKey: ['asset-depreciation-runs'],
+            });
+            void refetch();
+            return true;
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error)) {
+                const message =
+                    error.response?.data?.errors?.status?.[0] ||
+                    error.response?.data?.message ||
+                    'Failed to void depreciation run';
+                toast.error(message);
+            } else {
+                toast.error('An unexpected error occurred');
+            }
+            return false;
+        } finally {
+            setIsVoiding(null);
+        }
+    };
+
     return {
         data,
         meta,
@@ -108,11 +137,13 @@ export function useAssetDepreciationRuns() {
         filters,
         isCalculating,
         isPosting,
+        isVoiding,
         setPage,
         setPerPage,
         handleFilterChange,
         calculateDepreciation,
         postToJournal,
+        voidRun,
         refetch,
     };
 }
