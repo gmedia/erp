@@ -2,18 +2,22 @@
 
 namespace App\Http\Requests\CreditNotes;
 
+use App\Http\Requests\Concerns\LocksPostedDocumentValues;
 use App\Http\Requests\Concerns\ValidatesStatusTransition;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\Rule;
 
 class UpdateCreditNoteRequest extends AbstractCreditNoteRequest
 {
+    use LocksPostedDocumentValues;
     use ValidatesStatusTransition;
 
     public function withValidator(Validator $validator): void
     {
         $validator->after(function ($validator): void {
-            $this->validateResultStatusTransition($validator, $this->route('creditNote')?->status);
+            $document = $this->route('creditNote');
+            $this->validateResultStatusTransition($validator, $document?->status);
+            $this->validatePostedDocumentLock($validator, $document);
         });
     }
 

@@ -2,12 +2,14 @@
 
 namespace App\Http\Requests\SupplierBills;
 
+use App\Http\Requests\Concerns\LocksPostedDocumentValues;
 use App\Http\Requests\Concerns\ValidatesStatusTransition;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\Rule;
 
 class UpdateSupplierBillRequest extends AbstractSupplierBillRequest
 {
+    use LocksPostedDocumentValues;
     use ValidatesStatusTransition;
 
     /** Stored statuses from which a PUT may set overdue. Drafts must be confirmed first. */
@@ -16,10 +18,9 @@ class UpdateSupplierBillRequest extends AbstractSupplierBillRequest
     public function withValidator(Validator $validator): void
     {
         $validator->after(function ($validator): void {
-            $this->validateResultStatusTransition(
-                $validator,
-                $this->route('supplierBill')?->status,
-            );
+            $document = $this->route('supplierBill');
+            $this->validateResultStatusTransition($validator, $document?->status);
+            $this->validatePostedDocumentLock($validator, $document);
         });
     }
 

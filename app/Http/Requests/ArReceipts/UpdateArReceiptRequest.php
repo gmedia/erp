@@ -2,12 +2,14 @@
 
 namespace App\Http\Requests\ArReceipts;
 
+use App\Http\Requests\Concerns\LocksPostedDocumentValues;
 use App\Http\Requests\Concerns\ValidatesStatusTransition;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\Rule;
 
 class UpdateArReceiptRequest extends AbstractArReceiptRequest
 {
+    use LocksPostedDocumentValues;
     use ValidatesStatusTransition;
 
     public function withValidator(Validator $validator): void
@@ -15,7 +17,9 @@ class UpdateArReceiptRequest extends AbstractArReceiptRequest
         parent::withValidator($validator);
 
         $validator->after(function ($validator): void {
-            $this->validateResultStatusTransition($validator, $this->route('ar_receipt')?->status);
+            $document = $this->route('ar_receipt');
+            $this->validateResultStatusTransition($validator, $document?->status);
+            $this->validatePostedDocumentLock($validator, $document);
         });
     }
 

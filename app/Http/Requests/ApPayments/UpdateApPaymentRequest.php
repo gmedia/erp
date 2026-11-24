@@ -2,12 +2,14 @@
 
 namespace App\Http\Requests\ApPayments;
 
+use App\Http\Requests\Concerns\LocksPostedDocumentValues;
 use App\Http\Requests\Concerns\ValidatesStatusTransition;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\Rule;
 
 class UpdateApPaymentRequest extends AbstractApPaymentRequest
 {
+    use LocksPostedDocumentValues;
     use ValidatesStatusTransition;
 
     public function withValidator(Validator $validator): void
@@ -15,7 +17,9 @@ class UpdateApPaymentRequest extends AbstractApPaymentRequest
         parent::withValidator($validator);
 
         $validator->after(function ($validator): void {
-            $this->validateResultStatusTransition($validator, $this->route('apPayment')?->status);
+            $document = $this->route('apPayment');
+            $this->validateResultStatusTransition($validator, $document?->status);
+            $this->validatePostedDocumentLock($validator, $document);
         });
     }
 

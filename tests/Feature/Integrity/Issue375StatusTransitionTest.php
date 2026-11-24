@@ -2,8 +2,11 @@
 
 use App\Models\ApPayment;
 use App\Models\ArReceipt;
+use App\Models\CoaVersion;
 use App\Models\CreditNote;
 use App\Models\CustomerInvoice;
+use App\Models\CustomerInvoiceItem;
+use App\Models\FiscalYear;
 use App\Models\GoodsReceipt;
 use App\Models\SupplierBill;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -23,6 +26,18 @@ beforeEach(function () {
         'credit_note', 'credit_note.edit',
     ]);
     Sanctum::actingAs($user, ['*']);
+
+    // Posting (draft -> sent/confirmed) butuh fiscal year dan COA version aktif.
+    $fiscalYear = FiscalYear::factory()->create([
+        'name' => '1998',
+        'start_date' => '1998-01-01',
+        'end_date' => '1998-12-31',
+        'status' => 'open',
+    ]);
+    CoaVersion::factory()->create([
+        'fiscal_year_id' => $fiscalYear->id,
+        'status' => 'active',
+    ]);
 });
 
 /**
@@ -92,6 +107,11 @@ test('status transition per dokumen follows the table', function (
     int $expected,
 ) {
     $record = $modelClass::factory()->create(['status' => $from]);
+
+    if ($modelClass === CustomerInvoice::class) {
+        // Posting invoice tanpa item ditolak 422 (aturan lama); beri satu item agar uji transisi saja.
+        CustomerInvoiceItem::factory()->create(['customer_invoice_id' => $record->id]);
+    }
 
     putJson("/api/{$endpoint}/{$record->id}", ['status' => $to])->assertStatus($expected);
 

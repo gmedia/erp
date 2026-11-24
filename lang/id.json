@@ -47,6 +47,7 @@
     "approval.items_locked": "Item hanya dapat diubah selama dokumen masih draft.",
     "approval.flow_not_found": "Approval flow tidak ditemukan, tidak aktif, atau tidak memiliki langkah.",
     "status_transition.invalid": "Tidak dapat mengubah status dari :from ke :to.",
+    "posted_document.values_locked": "Dokumen sudah diposting. Item dan nilainya terkunci; gunakan batal atau void.",
     "Only draft documents can be deleted. Cancel the document instead.": "Hanya dokumen draft yang dapat dihapus. Batalkan dokumen sebagai gantinya.",
     "Document is already cancelled.": "Dokumen sudah dibatalkan.",
     "Customer invoice still has active receipt allocations. Remove them before cancelling.": "Invoice pelanggan masih memiliki alokasi penerimaan aktif. Lepaskan alokasi tersebut sebelum membatalkan.",

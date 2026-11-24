@@ -47,6 +47,7 @@
     "approval.items_locked": "Items can only be changed while the document is still a draft.",
     "approval.flow_not_found": "Approval flow not found, inactive, or has no steps.",
     "status_transition.invalid": "Cannot change status from :from to :to.",
+    "posted_document.values_locked": "This document is already posted. Its items and amounts are locked; use cancel or void instead.",
     "Only draft documents can be deleted. Cancel the document instead.": "Only draft documents can be deleted. Cancel the document instead.",
     "Document is already cancelled.": "Document is already cancelled.",
     "Customer invoice still has active receipt allocations. Remove them before cancelling.": "Customer invoice still has active receipt allocations. Remove them before cancelling.",
