@@ -140,8 +140,6 @@ export async function editPurchaseRequest(
                 priority: detail.priority,
                 status: detail.status,
                 notes: detail.notes ?? '',
-                approved_by: detail.approved_by?.id ?? null,
-                approved_at: detail.approved_at ?? null,
                 rejection_reason: detail.rejection_reason ?? '',
                 items: (detail.items as PurchaseRequestDetailItem[] || []).map((item) => ({
                     product_id: item.product?.id,

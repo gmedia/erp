@@ -9,14 +9,8 @@ class UpdateStockTransferRequest extends AbstractStockTransferRequest
      */
     protected function extraRules(): array
     {
-        return [
-            'approved_by' => ['sometimes', 'nullable', 'exists:users,id'],
-            'approved_at' => ['sometimes', 'nullable', 'date'],
-            'shipped_by' => ['sometimes', 'nullable', 'exists:users,id'],
-            'shipped_at' => ['sometimes', 'nullable', 'date'],
-            'received_by' => ['sometimes', 'nullable', 'exists:users,id'],
-            'received_at' => ['sometimes', 'nullable', 'date'],
-        ];
+        // Issue #436: approved/shipped/received_* diisi server saat transisi status.
+        return [];
     }
 
     protected function usesSometimes(): bool

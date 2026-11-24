@@ -12,6 +12,7 @@ use App\Models\StockAdjustment;
 use App\Models\StockAdjustmentItem;
 use App\Models\Unit;
 use App\Models\Warehouse;
+use App\Services\StockPostingService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
 
@@ -189,6 +190,20 @@ describe('Stock Adjustment API Endpoints', function () {
         $product2 = Product::factory()->create();
         $unit = Unit::factory()->create();
 
+        // Stok awal untuk produk keluar, agar -3 tidak melebihi stok (Issue #436 butir 5).
+        $openingStock = StockAdjustment::factory()->create([
+            'warehouse_id' => $warehouse->id,
+            'status' => 'approved',
+            'adjustment_date' => '2026-06-01',
+        ]);
+        StockAdjustmentItem::factory()->create([
+            'stock_adjustment_id' => $openingStock->id,
+            'product_id' => $product2->id,
+            'unit_id' => $unit->id,
+            'quantity_adjusted' => 10,
+        ]);
+        app(StockPostingService::class)->postStockAdjustment($openingStock->refresh());
+
         $adjustment = StockAdjustment::factory()->create([
             'warehouse_id' => $warehouse->id,
             'status' => 'draft',
@@ -229,6 +244,20 @@ describe('Stock Adjustment API Endpoints', function () {
         $productIn = Product::factory()->create();
         $productOut = Product::factory()->create();
         $unit = Unit::factory()->create();
+
+        // Stok awal +10 untuk produk keluar, agar pengeluaran -3 tidak melebihi stok (Issue #436 butir 5).
+        $openingStock = StockAdjustment::factory()->create([
+            'warehouse_id' => $warehouse->id,
+            'status' => 'approved',
+            'adjustment_date' => '2026-06-01',
+        ]);
+        StockAdjustmentItem::factory()->create([
+            'stock_adjustment_id' => $openingStock->id,
+            'product_id' => $productOut->id,
+            'unit_id' => $unit->id,
+            'quantity_adjusted' => 10,
+        ]);
+        app(StockPostingService::class)->postStockAdjustment($openingStock->refresh());
 
         $adjustment = StockAdjustment::factory()->create([
             'warehouse_id' => $warehouse->id,

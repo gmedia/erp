@@ -382,6 +382,21 @@ class StockPostingService
     }
 
     /**
+     * Review #444 butir 2: pengeluaran bertanggal $from. Setiap scope (product+warehouse)
+     * pengeluaran diperiksa saldo berjalannya sejak $from, bukan hanya saldo akhir.
+     *
+     * @param  array<int, array{0:int,1:int,2:float}>  $outflows  [product_id, warehouse_id, quantity]
+     */
+    public function assertNoNegativeStockFrom(array $outflows, CarbonInterface $from): void
+    {
+        foreach ($outflows as [$productId, $warehouseId, $quantity]) {
+            if ($quantity > 0) {
+                $this->assertNoNegativeRunningBalanceFrom((int) $productId, (int) $warehouseId, $from);
+            }
+        }
+    }
+
+    /**
      * Membalik movement transfer: dispatch (transfer_out) dan receive (transfer_in).
      * Dipisah agar tipe pembalik mengikuti tipe asal.
      */
@@ -618,6 +633,30 @@ class StockPostingService
                     ->orderByDesc('id')
                     ->first(),
             );
+        }
+    }
+
+    /**
+     * Review #444 butir 2: tolak (422) bila saldo berjalan pada tanggal $from atau sesudahnya
+     * negatif. Pembanding dengan riwayat negatif lama mengikuti assertNoWorsenedNegativeBalance.
+     */
+    private function assertNoNegativeRunningBalanceFrom(int $productId, int $warehouseId, CarbonInterface $from): void
+    {
+        $fromKey = $from->format('Y-m-d H:i:s');
+
+        foreach ($this->closingBalances($productId, $warehouseId) as $movedAt => $balance) {
+            if ($movedAt >= $fromKey && $balance < 0) {
+                $this->throwInsufficientStock(
+                    $productId,
+                    $warehouseId,
+                    StockMovement::query()
+                        ->where('product_id', $productId)
+                        ->where('warehouse_id', $warehouseId)
+                        ->where('moved_at', $movedAt)
+                        ->orderByDesc('id')
+                        ->first(),
+                );
+            }
         }
     }
 

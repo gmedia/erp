@@ -90,9 +90,11 @@ function createGoodsReceiptItemForSupplierReturn(): array
         'line_total' => 55500,
     ]);
 
+    // Retur hanya untuk GR confirmed (Issue #436 butir 4); factory memilih status acak.
     $goodsReceipt = GoodsReceipt::factory()->create([
         'purchase_order_id' => $purchaseOrder->id,
         'warehouse_id' => $warehouse->id,
+        'status' => 'confirmed',
     ]);
 
     $goodsReceiptItem = $goodsReceipt->items()->create([
@@ -115,7 +117,9 @@ function createGoodsReceiptItemForSupplierReturn(): array
         'quantity_in' => 5,
         'quantity_out' => 0,
         'balance_after' => 5,
-        'moved_at' => now()->subDay(),
+        // Sebelum seluruh tanggal retur di tes (2026-03-06 s.d. 2026-04-01): saldo berjalan
+        // sejak tanggal retur harus tetap nonnegatif (review putaran 3 butir 2).
+        'moved_at' => '2026-01-01 00:00:00',
     ]);
 
     return [$purchaseOrder, $goodsReceipt, $goodsReceiptItem, $supplier, $warehouse, $product, $unit];

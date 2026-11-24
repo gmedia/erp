@@ -21,31 +21,45 @@ type GoodsReceiptItemFormData = GoodsReceiptFormData['items'][number];
 function buildGoodsReceiptItemSchema(
     t: (key: string, params?: Record<string, string>) => string,
 ) {
-    return z.object({
-        purchase_order_item_id: z.string().min(1, {
-            message: t('goodsReceipt.item.po_item_required'),
-        }),
-        purchase_order_item_label: z.string().optional(),
-        product_id: z.string().min(1, {
-            message: t('goodsReceipt.item.product_required'),
-        }),
-        product_label: z.string().optional(),
-        unit_id: z.string().min(1, {
-            message: t('goodsReceipt.item.unit_required'),
-        }),
-        unit_label: z.string().optional(),
-        quantity_received: z.coerce.number().gt(0, {
-            message: t('goodsReceipt.item.quantity_received_positive'),
-        }),
-        quantity_accepted: z.coerce.number().min(0, {
-            message: t('goodsReceipt.item.quantity_accepted_min'),
-        }),
-        quantity_rejected: z.coerce.number().min(0).optional().default(0),
-        unit_price: z.coerce.number().min(0, {
-            message: t('goodsReceipt.item.unit_price_min'),
-        }),
-        notes: z.string().optional(),
-    });
+    return z
+        .object({
+            purchase_order_item_id: z.string().min(1, {
+                message: t('goodsReceipt.item.po_item_required'),
+            }),
+            purchase_order_item_label: z.string().optional(),
+            product_id: z.string().min(1, {
+                message: t('goodsReceipt.item.product_required'),
+            }),
+            product_label: z.string().optional(),
+            unit_id: z.string().min(1, {
+                message: t('goodsReceipt.item.unit_required'),
+            }),
+            unit_label: z.string().optional(),
+            quantity_received: z.coerce.number().gt(0, {
+                message: t('goodsReceipt.item.quantity_received_positive'),
+            }),
+            quantity_accepted: z.coerce.number().min(0, {
+                message: t('goodsReceipt.item.quantity_accepted_min'),
+            }),
+            quantity_rejected: z.coerce.number().min(0).optional().default(0),
+            unit_price: z.coerce.number().min(0, {
+                message: t('goodsReceipt.item.unit_price_min'),
+            }),
+            notes: z.string().optional(),
+        })
+        .superRefine((value, ctx) => {
+            const rejected = value.quantity_rejected ?? 0;
+
+            if (value.quantity_accepted + rejected > value.quantity_received) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ['quantity_accepted'],
+                    message: t(
+                        'goodsReceipt.item.quantity_accepted_exceeds_received',
+                    ),
+                });
+            }
+        });
 }
 
 function buildPoItemOptionsUrl(

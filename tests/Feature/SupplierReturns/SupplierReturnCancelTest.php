@@ -74,9 +74,11 @@ function confirmedSupplierReturnForCancel(): array
         'line_total' => 50000,
     ]);
 
+    // Retur hanya untuk GR confirmed (Issue #436 butir 4); factory memilih status acak.
     $goodsReceipt = GoodsReceipt::factory()->create([
         'purchase_order_id' => $purchaseOrder->id,
         'warehouse_id' => $warehouse->id,
+        'status' => 'confirmed',
     ]);
 
     $goodsReceiptItem = $goodsReceipt->items()->create([
@@ -403,6 +405,7 @@ test('confirming a supplier return that exceeds stock is rejected with 422', fun
     $goodsReceipt = GoodsReceipt::factory()->create([
         'purchase_order_id' => $purchaseOrder->id,
         'warehouse_id' => $warehouse->id,
+        'status' => 'confirmed',
     ]);
     $goodsReceiptItem = $goodsReceipt->items()->create([
         'purchase_order_item_id' => $purchaseOrderItem->id,

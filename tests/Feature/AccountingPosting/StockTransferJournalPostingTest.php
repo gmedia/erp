@@ -170,6 +170,9 @@ test('alur controller: kirim (in_transit) tidak menjurnal, terima kurang menjurn
         'quantity_out' => 0,
         'balance_after' => 100,
         'unit_cost' => 50000,
+        // Stok sebelum tanggal transfer (2026-03-10): saldo berjalan tidak boleh negatif
+        // (review putaran 3 butir 2).
+        'moved_at' => '2026-01-01 00:00:00',
     ]);
 
     $transfer = StockTransfer::factory()->create([

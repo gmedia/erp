@@ -45,6 +45,7 @@ class StockAdjustmentController extends Controller
         SyncStockAdjustmentItemsAction $syncItems,
         PostStockAdjustmentJournalAction $postJournal,
         PostStockAdjustmentMovementsAction $postMovements,
+        StockPostingService $stockPosting,
     ): JsonResponse {
         $data = $request->validated();
         $items = $data['items'];
@@ -73,9 +74,14 @@ class StockAdjustmentController extends Controller
                 $syncItems->execute($adjustment, $items);
             },
             afterCommit: $isApprovedOnCreate
-                ? function (StockAdjustment $adjustment) use ($postJournal, $postMovements): void {
+                ? function (StockAdjustment $adjustment) use ($postJournal, $postMovements, $stockPosting): void {
+                    $stockPosting->assertNoNegativeStock($this->stockAdjustmentOutflows($adjustment->refresh()));
                     $postJournal->execute($adjustment->refresh());
                     $postMovements->execute($adjustment->refresh());
+                    $stockPosting->assertNoNegativeStockFrom(
+                        $this->stockAdjustmentOutflows($adjustment->refresh()),
+                        $adjustment->adjustment_date->copy()->startOfDay(),
+                    );
                 }
             : null,
         );
@@ -165,11 +171,17 @@ class StockAdjustmentController extends Controller
             syncItems: function (StockAdjustment $stockAdjustment, array $items) use ($syncItems): void {
                 $syncItems->execute($stockAdjustment, $items);
             },
+            // Issue #416: jurnal gagal (COA/periode) membatalkan seluruh transaksi.
+            // Issue #436 butir 5: approve lewat PUT juga menolak stok negatif.
             afterCommit: $isNewlyApproved
-                // Issue #416: jurnal gagal (COA/periode) membatalkan seluruh transaksi.
-                ? function (StockAdjustment $stockAdjustment) use ($postJournal, $postMovements): void {
+                ? function (StockAdjustment $stockAdjustment) use ($postJournal, $postMovements, $stockPosting): void {
+                    $stockPosting->assertNoNegativeStock($this->stockAdjustmentOutflows($stockAdjustment->refresh()));
                     $postJournal->execute($stockAdjustment->refresh());
                     $postMovements->execute($stockAdjustment->refresh());
+                    $stockPosting->assertNoNegativeStockFrom(
+                        $this->stockAdjustmentOutflows($stockAdjustment->refresh()),
+                        $stockAdjustment->adjustment_date->copy()->startOfDay(),
+                    );
                 }
             : null,
         );
@@ -195,6 +207,24 @@ class StockAdjustmentController extends Controller
     }
 
     /**
+     * Baris penyesuaian negatif sebagai pengeluaran (Issue #436 butir 3).
+     *
+     * @return array<int, array{0:int,1:int,2:float}>
+     */
+    private function stockAdjustmentOutflows(StockAdjustment $stockAdjustment): array
+    {
+        return $stockAdjustment->load('items')->items
+            ->filter(fn ($item): bool => (float) $item->quantity_adjusted < 0)
+            ->map(fn ($item): array => [
+                (int) $item->product_id,
+                (int) $stockAdjustment->warehouse_id,
+                abs((float) $item->quantity_adjusted),
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
      * @param  array<string, mixed>  $validated
      * @param  array<int, array<string, mixed>>  $items
      */
@@ -208,18 +238,20 @@ class StockAdjustmentController extends Controller
         DB::transaction(function () use ($stockAdjustment, $validated, $items, $syncItems, $stockPosting): void {
             $stockAdjustment->update(UpdateStockAdjustmentData::fromArray($validated)->toArray());
 
+            // Item diganti (bukan di-upsert) agar source_line_id movement asli tidak tertimpa
+            // repost; pembalik tetap utuh di riwayat (Issue #372).
+            // editDocument menghitung ulang saldo lalu menolak saldo negatif yang memburuk (422).
             $stockPosting->editDocument(
                 StockAdjustment::class,
                 $stockAdjustment->id,
                 'adjustment',
                 function () use ($stockAdjustment, $items, $syncItems, $stockPosting): void {
-                    // Item diganti (bukan di-upsert) agar source_line_id movement asli tidak tertimpa
-                    // repost; pembalik tetap utuh di riwayat (Issue #372).
                     $stockAdjustment->items()->delete();
                     $syncItems->execute($stockAdjustment, $items);
                     $stockPosting->postStockAdjustment($stockAdjustment->refresh());
                 },
             );
+
         });
     }
 }
