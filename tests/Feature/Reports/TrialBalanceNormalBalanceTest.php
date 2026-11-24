@@ -1,8 +1,9 @@
 <?php
 
 use App\Models\Account;
-use App\Models\AccountBalance;
 use App\Models\FiscalYear;
+use App\Models\JournalEntry;
+use App\Models\JournalEntryLine;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 
@@ -15,50 +16,71 @@ beforeEach(function () {
     Sanctum::actingAs($this->user, ['*']);
 });
 
-test('trial balance places a credit-normal account balance in the credit column', function () {
-    $fiscalYear = FiscalYear::factory()->create(['status' => 'open']);
-    $liability = Account::factory()->create(['code' => '2010', 'name' => 'Utang', 'type' => 'liability', 'normal_balance' => 'credit']);
+function tbnFiscalYear(): FiscalYear
+{
+    return FiscalYear::factory()->create([
+        'status' => 'open',
+        'start_date' => '2026-01-01',
+        'end_date' => '2026-12-31',
+    ]);
+}
 
-    // closing_balance disimpan dalam konvensi normal balance: saldo kredit 500 = +500.
-    AccountBalance::factory()->create([
-        'account_id' => $liability->id,
+function tbnAccount(string $code, string $name, string $type, string $normalBalance): Account
+{
+    return Account::factory()->create([
+        'code' => $code,
+        'name' => $name,
+        'type' => $type,
+        'normal_balance' => $normalBalance,
+    ]);
+}
+
+function tbnJournal(FiscalYear $fiscalYear, string $date, array $lines): void
+{
+    $entry = JournalEntry::factory()->create([
         'fiscal_year_id' => $fiscalYear->id,
-        'period_month' => 1,
-        'period_year' => 2026,
-        'opening_balance' => 0,
-        'debit_total' => 0,
-        'credit_total' => 500,
-        'movement' => 500,
-        'closing_balance' => 500,
+        'entry_date' => $date,
+        'status' => 'posted',
     ]);
 
-    $row = collect(getJson("/api/reports/trial-balance-detailed?fiscal_year_id={$fiscalYear->id}&period_month=1&period_year=2026")
-        ->assertOk()
-        ->json('data'))->firstWhere('account_code', '2010');
+    foreach ($lines as [$account, $debit, $credit]) {
+        JournalEntryLine::factory()->create([
+            'journal_entry_id' => $entry->id,
+            'account_id' => $account->id,
+            'debit' => $debit,
+            'credit' => $credit,
+        ]);
+    }
+}
+
+function tbnRow(FiscalYear $fiscalYear, string $code): ?array
+{
+    $url = "/api/reports/trial-balance-detailed?fiscal_year_id={$fiscalYear->id}&period_month=1&period_year=2026";
+
+    return collect(getJson($url)->assertOk()->json('data'))->firstWhere('account_code', $code);
+}
+
+test('trial balance places a credit-normal account balance in the credit column', function () {
+    $fiscalYear = tbnFiscalYear();
+    $liability = tbnAccount('2010', 'Utang', 'liability', 'credit');
+    $cash = tbnAccount('1010', 'Kas', 'asset', 'debit');
+
+    tbnJournal($fiscalYear, '2026-01-10', [[$cash, 500, 0], [$liability, 0, 500]]);
+
+    $row = tbnRow($fiscalYear, '2010');
 
     expect((float) $row['credit_balance'])->toBe(500.0);
     expect((float) $row['debit_balance'])->toBe(0.0);
 });
 
 test('trial balance keeps a debit-normal account balance in the debit column', function () {
-    $fiscalYear = FiscalYear::factory()->create(['status' => 'open']);
-    $cash = Account::factory()->create(['code' => '1010', 'name' => 'Kas', 'type' => 'asset', 'normal_balance' => 'debit']);
+    $fiscalYear = tbnFiscalYear();
+    $cash = tbnAccount('1010', 'Kas', 'asset', 'debit');
+    $equity = tbnAccount('3010', 'Modal', 'equity', 'credit');
 
-    AccountBalance::factory()->create([
-        'account_id' => $cash->id,
-        'fiscal_year_id' => $fiscalYear->id,
-        'period_month' => 1,
-        'period_year' => 2026,
-        'opening_balance' => 0,
-        'debit_total' => 800,
-        'credit_total' => 0,
-        'movement' => 800,
-        'closing_balance' => 800,
-    ]);
+    tbnJournal($fiscalYear, '2026-01-10', [[$cash, 800, 0], [$equity, 0, 800]]);
 
-    $row = collect(getJson("/api/reports/trial-balance-detailed?fiscal_year_id={$fiscalYear->id}&period_month=1&period_year=2026")
-        ->assertOk()
-        ->json('data'))->firstWhere('account_code', '1010');
+    $row = tbnRow($fiscalYear, '1010');
 
     expect((float) $row['debit_balance'])->toBe(800.0);
     expect((float) $row['credit_balance'])->toBe(0.0);
