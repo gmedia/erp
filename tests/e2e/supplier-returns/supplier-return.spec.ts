@@ -128,7 +128,7 @@ test.describe('Supplier Returns Module', () => {
         const [product, unit] = await Promise.all([
             getFirstAsyncOption(
                 page,
-                '/api/products?search=Executive%20Office%20Desk',
+                '/api/products?search=Meja%20Kerja%20Eksekutif',
             ),
             getFirstAsyncOption(page, '/api/units?search=Buah'),
         ]);
@@ -187,7 +187,7 @@ test.describe('Supplier Returns Module', () => {
         const [product, unit] = await Promise.all([
             getFirstAsyncOption(
                 page,
-                '/api/products?search=Executive%20Office%20Desk',
+                '/api/products?search=Meja%20Kerja%20Eksekutif',
             ),
             getFirstAsyncOption(page, '/api/units?search=Buah'),
         ]);

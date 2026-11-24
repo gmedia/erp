@@ -28,7 +28,7 @@ export async function createGoodsReceipt(page: Page): Promise<string> {
             getFirstId('/api/suppliers?per_page=1'),
             getFirstId('/api/warehouses?per_page=1'),
             getFirstId(
-                '/api/products?search=Executive%20Office%20Desk&per_page=1',
+                '/api/products?search=Meja%20Kerja%20Eksekutif&per_page=1',
             ),
             getFirstId('/api/units?search=Buah&per_page=1'),
         ]);

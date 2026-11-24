@@ -43,7 +43,15 @@ class PurchasingSampleDataSeeder extends Seeder
         $adminUserId = User::query()->where('email', config('app.admin'))->value('id') ?? User::query()->value('id');
         $branchId = Branch::query()->value('id');
         $departmentId = Department::query()->value('id');
-        $requesterId = Employee::query()->value('id');
+        // Pengaju PR: karyawan yang user-nya bukan admin dan bukan approver flow pembelian,
+        // agar pelaku transisi (admin/penyetuju) tidak pernah sama dengan pengaju (W7-16).
+        $requesterId = Employee::query()
+            ->whereNotNull('user_id')
+            ->where('user_id', '!=', $adminUserId)
+            ->whereNotIn('user_id', DB::table('approval_flow_steps')->pluck('approver_user_id')->unique()->all())
+            ->orderBy('id')
+            ->value('id')
+            ?? Employee::query()->value('id');
 
         if (! $adminUserId || ! $branchId || ! $departmentId || ! $requesterId) {
             return;
@@ -133,8 +141,14 @@ class PurchasingSampleDataSeeder extends Seeder
 
         $pipelines = $this->seedPurchasingPipelines($adminUserId);
 
-        // Pengaju dokumen harus user yang bukan approver flow pembelian (W7-16).
+        // Pengaju dokumen harus user yang bukan approver flow pembelian (W7-16). Pengaju PR
+        // adalah employee $requesterId; user-nya dipakai sebagai pengaju dokumen hanya bila
+        // bukan approver, agar approval dan pelaku transisi tidak pernah sama (PR #432).
         $documentRequesterId = $this->nonApproverUserId($adminUserId);
+        $requesterUserId = (int) (DB::table('employees')->where('id', $requesterId)->value('user_id') ?? 0);
+        if ($requesterUserId > 0 && $requesterUserId !== $adminUserId && $this->isNonApprover($requesterUserId)) {
+            $documentRequesterId = $requesterUserId;
+        }
 
         [$purchaseRequests, $purchaseRequestItems] = $this->seedPurchaseRequests(
             $adminUserId,
@@ -197,22 +211,35 @@ class PurchasingSampleDataSeeder extends Seeder
             ->value('id') ?? $adminUserId);
     }
 
+    private function isNonApprover(int $userId): bool
+    {
+        return ! DB::table('approval_flow_steps')->where('approver_user_id', $userId)->exists();
+    }
+
     /**
      * Daftar pelaku transisi demo: $performedBy plus user lain yang tersedia (deterministik).
      *
      * @return list<int>
      */
-    private function transitionActorIds(int $performedBy): array
+    private function transitionActorIds(int $performedBy, ?int $submittedBy = null): array
     {
+        $excluded = array_filter([$performedBy, $submittedBy]);
+
         $others = User::query()
-            ->where('id', '!=', $performedBy)
+            ->whereNotIn('id', $excluded)
             ->orderBy('id')
             ->limit(2)
             ->pluck('id')
             ->map(fn ($id) => (int) $id)
             ->all();
 
-        return array_values(array_unique(array_merge([$performedBy], $others)));
+        // Pengaju tidak boleh menjadi pelaku transisi lain pada dokumen yang sama (W7-16).
+        $actors = array_values(array_unique(array_merge([$performedBy], $others)));
+
+        return array_values(array_filter(
+            $actors,
+            fn (int $id) => $submittedBy === null || $id !== $submittedBy
+        )) ?: [$performedBy];
     }
 
     private function seedPurchasingPipelines(int $adminUserId): array
@@ -972,6 +999,7 @@ class PurchasingSampleDataSeeder extends Seeder
                 $histories[$status] ?? [],
                 $adminUserId,
                 $documentDate,
+                $adminUserId,
                 $documentRequesterId
             );
 
@@ -1744,12 +1772,22 @@ class PurchasingSampleDataSeeder extends Seeder
         // dengan pengaju pada dokumen yang melewati approval.
         // Pelaku transisi bervariasi (PR #432 butir 3): transisi selain pengajuan dilakukan
         // bergilir oleh pelaku berbeda (penyetuju, gudang, admin), bukan satu orang untuk semua.
-        $actors = $this->transitionActorIds($performedBy);
+        $actors = $this->transitionActorIds($performedBy, $submittedBy);
+        // Pelaku non-pengajuan tidak boleh sama dengan pengaju (W7-16).
+        $actors = array_values(array_filter(
+            $actors,
+            fn (int $id) => $submittedBy === null || $id !== $submittedBy,
+        ));
+        if ($actors === []) {
+            $actors = [$adminUserId];
+        }
         foreach ($logs as $index => $log) {
             $isSubmission = $log['from_state_id'] === $states['draft']->id
                 && $log['to_state_id'] === $states['pending_approval']?->id;
-            $actor = $isSubmission && $submittedBy !== null
-                ? $submittedBy
+            // Pembuatan dan pengajuan dokumen dicatat atas nama admin pembuat (created_by).
+            // Pengaju tidak pernah menjadi pelaku transisi mana pun (W7-16, PR #432).
+            $actor = ($isSubmission || $log['from_state_id'] === null)
+                ? $adminUserId
                 : $actors[($entityId + $index) % count($actors)];
 
             PipelineStateLog::create(array_merge($log, [

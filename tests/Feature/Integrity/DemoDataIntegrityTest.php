@@ -1326,7 +1326,10 @@ invariant('W7-16 approval actors differ from the requester', function () {
 
 // W7-16 — pelaku transisi pipeline pada dokumen pembelian berbeda dari pengajunya.
 invariant('W7-16 purchasing pipeline transitions are performed by someone other than the requester', function () {
-    $requestedBy = DB::table('purchase_requests')->pluck('requested_by', 'id');
+    // requested_by menyimpan employee id; pelaku transisi menyimpan user id. Petakan lewat user_id.
+    $requestedBy = DB::table('purchase_requests')
+        ->join('employees', 'employees.id', '=', 'purchase_requests.requested_by')
+        ->pluck('employees.user_id', 'purchase_requests.id');
 
     foreach (DB::table('pipeline_entity_states')->where('entity_type', 'App\\Models\\PurchaseRequest')->get(['id', 'entity_id']) as $entity) {
         $performers = DB::table('pipeline_state_logs')
@@ -1640,5 +1643,37 @@ invariant('W7-17 review visual butir 4: demo product, asset and stock names are 
     foreach ($legacy as $table => [$column, $names]) {
         expect(DB::table($table)->whereIn($column, $names)->count())
             ->toBe(0, "nama demo {$table}.{$column} masih berbahasa Inggris");
+    }
+});
+
+// PR432 — user demo (lewat email karyawan) harus tetap punya izin penuh, baik pada seed segar
+// maupun seed di atas data demo lama (email karyawan `main` masih `manager.hr@` dst.).
+test('PR432 demo users keep their permissions after seeding over legacy employee emails', function () {
+    seedDemoData();
+
+    $legacyEmails = [
+        'hendra.wijaya@example.com' => 'manager.hr@example.com',
+        'dewi.anggraini@example.com' => 'director.finance@example.com',
+        'agus.prasetyo@example.com' => 'staff.it@example.com',
+    ];
+
+    foreach ($legacyEmails as $newEmail => $userEmail) {
+        DB::table('employees')->where('email', $newEmail)->update(['email' => $userEmail]);
+    }
+
+    seedDemoData();
+
+    $permissionCount = DB::table('permissions')->count();
+    expect($permissionCount)->toBeGreaterThan(0);
+
+    foreach (array_merge(array_values($legacyEmails), ['rina.kartika@example.com', config('app.admin')]) as $email) {
+        $userId = DB::table('users')->where('email', $email)->value('id');
+        $employee = $userId
+            ? DB::table('employees')->where('user_id', $userId)->first()
+            : null;
+        expect($employee)->not->toBeNull("Karyawan demo untuk user {$email} harus ada");
+
+        $granted = DB::table('employee_permission')->where('employee_id', $employee->id)->count();
+        expect($granted)->toBe($permissionCount, "Karyawan demo {$email} harus punya seluruh izin");
     }
 });

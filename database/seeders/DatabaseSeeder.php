@@ -204,7 +204,8 @@ class DatabaseSeeder extends Seeder
 
         $this->spreadIdenticalAuditTimestamps();
 
-        // Assign all permissions to sample users for easy testing
+        // Assign all permissions to sample users for easy testing. Cari karyawan lewat
+        // user_id: email karyawan bisa berbeda dari email user di data demo lama (PR432).
         $allPermissions = Permission::all();
         foreach ([
             'rina.kartika@example.com',
@@ -213,7 +214,12 @@ class DatabaseSeeder extends Seeder
             'director.finance@example.com',
             'staff.it@example.com',
         ] as $email) {
-            $employee = Employee::where('email', $email)->first();
+            $user = User::where('email', $email)->first();
+            $employee = $user
+                ? Employee::where('user_id', $user->id)->first()
+                : null;
+            $employee ??= Employee::where('email', $email)->first();
+
             if ($employee) {
                 $employee->permissions()->sync($allPermissions);
             }

@@ -32,9 +32,7 @@ async function seedGoodsReceiptFixtures(page: Page): Promise<SeedResult> {
         const [supplierId, warehouseId, productId, unitId] = await Promise.all([
             firstId('/api/suppliers?per_page=1'),
             firstId('/api/warehouses?per_page=1'),
-            firstId(
-                '/api/products?search=Executive%20Office%20Desk&per_page=1',
-            ),
+            firstId('/api/products?search=Meja%20Kerja%20Eksekutif&per_page=1'),
             firstId('/api/units?search=Buah&per_page=1'),
         ]);
 
