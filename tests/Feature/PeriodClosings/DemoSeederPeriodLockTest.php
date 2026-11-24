@@ -3,7 +3,6 @@
 use App\Models\FiscalYear;
 use App\Models\PeriodClosing;
 use App\Models\User;
-use Database\Seeders\GlExtendedSampleDataSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('period-closings');
