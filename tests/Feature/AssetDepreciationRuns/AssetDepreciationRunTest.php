@@ -18,7 +18,7 @@ use function Pest\Laravel\postJson;
 uses(RefreshDatabase::class)->group('asset-depreciation-runs');
 
 beforeEach(function () {
-    $this->user = createTestUserWithPermissions(['asset_depreciation_run']);
+    $this->user = createTestUserWithPermissions(['asset_depreciation_run', 'asset_depreciation_run.edit']);
     Sanctum::actingAs($this->user);
 
     $this->fiscalYear = FiscalYear::factory()->create([

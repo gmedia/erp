@@ -21,5 +21,6 @@ Route::middleware('permission:stock_adjustment,true')->group(function () {
     Route::post('stock-adjustments/import', [StockAdjustmentController::class, 'import'])
         ->middleware('permission:stock_adjustment.create,true');
     Route::get('stock-adjustments/{stockAdjustment}/items', [StockAdjustmentItemController::class, 'getItems']);
-    Route::post('stock-adjustments/{stockAdjustment}/items', [StockAdjustmentItemController::class, 'syncItems']);
+    Route::post('stock-adjustments/{stockAdjustment}/items', [StockAdjustmentItemController::class, 'syncItems'])
+        ->middleware('permission:stock_adjustment.edit,true');
 });

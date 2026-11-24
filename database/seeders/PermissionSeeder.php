@@ -338,7 +338,13 @@ class PermissionSeeder extends Seeder
             [
                 'name' => 'posting_journal',
                 'display_name' => 'Posting Journal',
-                'child' => [],
+                'child' => [
+                    [
+                        'name' => 'posting_journal.edit',
+                        'display_name' => 'Edit Posting Journal',
+                        'child' => [],
+                    ],
+                ],
             ],
             [
                 'name' => 'recurring_journal',
@@ -420,6 +426,11 @@ class PermissionSeeder extends Seeder
                     [
                         'name' => 'period_closing.create',
                         'display_name' => 'Create Period Closing',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'period_closing.edit',
+                        'display_name' => 'Edit Period Closing',
                         'child' => [],
                     ],
                 ],
@@ -950,6 +961,11 @@ class PermissionSeeder extends Seeder
                         'display_name' => 'Create Asset Depreciation Run',
                         'child' => [],
                     ],
+                    [
+                        'name' => 'asset_depreciation_run.edit',
+                        'display_name' => 'Edit Asset Depreciation Run',
+                        'child' => [],
+                    ],
                 ],
             ],
             [
@@ -1054,7 +1070,13 @@ class PermissionSeeder extends Seeder
             [
                 'name' => 'user',
                 'display_name' => 'User',
-                'child' => [],
+                'child' => [
+                    [
+                        'name' => 'user.edit',
+                        'display_name' => 'Edit User',
+                        'child' => [],
+                    ],
+                ],
             ],
             [
                 'name' => 'admin_setting',

@@ -63,7 +63,7 @@ describe('Get User By Employee API', function () {
 
 describe('Update User API', function () {
     beforeEach(function () {
-        $user = createTestUserWithPermissions(['user']);
+        $user = createTestUserWithPermissions(['user', 'user.edit']);
         Sanctum::actingAs($user, ['*']);
     });
 
