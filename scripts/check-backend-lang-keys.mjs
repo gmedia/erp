@@ -33,12 +33,11 @@ function loadJson(locale) {
 
 const translations = Object.fromEntries(locales.map((locale) => [locale, loadJson(locale)]));
 
-// Kunci yang berbahaya: induknya (sebelum titik pertama) ada sebagai objek bersarang,
-// tetapi kunci datarnya tidak ada. Kunci tanpa objek induk (mis. "auth.failed",
-// yang berasal dari paket framework) tidak termasuk jebakan ini dan dilewati.
-function isNestedOnly(data, key) {
-    const parent = key.split('.')[0];
-    return typeof data[parent] === 'object' && data[parent] !== null && !(key in data);
+// Grup terjemahan bawaan framework boleh tidak ada di JSON aplikasi.
+const frameworkGroups = new Set(['auth', 'pagination', 'passwords', 'validation']);
+
+function isMissing(data, key) {
+    return !(key in data) && !(frameworkGroups.has(key.split('.')[0]) && typeof data[key.split('.')[0]] !== 'object');
 }
 
 const violations = [];
@@ -53,8 +52,8 @@ for (const file of walk(appDir)) {
         const line = source.slice(0, match.index).split('\n').length;
 
         for (const locale of locales) {
-            if (isNestedOnly(translations[locale], key)) {
-                violations.push(`${rel}:${line}  '${key}' hanya ada sebagai objek bersarang di lang/${locale}.json`);
+            if (isMissing(translations[locale], key)) {
+                violations.push(`${rel}:${line}  '${key}' tidak ada sebagai kunci datar di lang/${locale}.json`);
             }
         }
         seen.add(key);
