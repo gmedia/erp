@@ -9,8 +9,9 @@ export async function waitForApPaymentHistoryReportResponse(page: Page): Promise
 }
 
 export async function openApPaymentHistoryReport(page: Page): Promise<void> {
+    const responsePromise = waitForApPaymentHistoryReportResponse(page);
     await page.goto('/reports/ap-payment-history');
     await page.waitForURL('**/reports/ap-payment-history', { timeout: 15000 });
-    await waitForApPaymentHistoryReportResponse(page);
+    await responsePromise;
     await expect(page.locator('table')).toBeVisible();
 }

@@ -68,19 +68,22 @@ export async function createPurchaseOrderReportData(page: Page): Promise<string>
 }
 
 export async function waitForPurchaseOrderStatusReportResponse(page: Page): Promise<void> {
-    await page
-        .waitForResponse(
-            (response) =>
-                response.url().includes('/api/reports/purchase-order-status') &&
-                response.status() < 400,
-        )
-        ;
+    await page.waitForResponse(
+        (response) =>
+            response.url().includes('/api/reports/purchase-order-status') &&
+            response.status() < 400,
+    );
 }
 
 export async function openPurchaseOrderStatusReport(page: Page): Promise<void> {
+    const initialResponse = page.waitForResponse(
+        (response) =>
+            response.url().includes('/api/reports/purchase-order-status') &&
+            response.status() < 400,
+    );
     await page.goto('/reports/purchase-order-status');
     await page.waitForURL('**/reports/purchase-order-status', { timeout: 15000 });
-    await waitForPurchaseOrderStatusReportResponse(page);
+    await initialResponse;
 
     await expect(page.locator('table')).toBeVisible();
     await expect(page.locator('tbody tr').first()).toBeVisible();

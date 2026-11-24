@@ -5,11 +5,12 @@ import { createBankReconciliation, getReconcilableRow } from './helpers';
 test.describe('Bank Reconciliation E2E Tests', () => {
     test.beforeEach(async ({ page }) => {
         await login(page, undefined, undefined, { requireDashboard: false });
-        await page.goto('/bank-reconciliations');
-        await page.waitForResponse(
+        const listResponse = page.waitForResponse(
             (r) => r.url().includes('/api/bank-reconciliations') && r.status() < 400,
             { timeout: 15000 },
         );
+        await page.goto('/bank-reconciliations');
+        await listResponse;
     });
 
     test('can view Bank Reconciliations list', async ({ page }) => {
@@ -21,11 +22,12 @@ test.describe('Bank Reconciliation E2E Tests', () => {
         const searchInput = page.getByPlaceholder(/Search/i);
         await expect(searchInput).toBeVisible();
         await searchInput.fill('Cash');
-        await searchInput.press('Enter');
-        await page.waitForResponse(
+        const searchResponse = page.waitForResponse(
             (r) => r.url().includes('/api/bank-reconciliations') && r.status() < 400,
             { timeout: 15000 },
         );
+        await searchInput.press('Enter');
+        await searchResponse;
         await expect(page.locator('tbody tr').first()).toBeVisible();
     });
 
@@ -89,11 +91,12 @@ test.describe('Bank Reconciliation E2E Tests', () => {
 test.describe('Bank Reconciliation Workflow', () => {
     test.beforeEach(async ({ page }) => {
         await login(page, undefined, undefined, { requireDashboard: false });
-        await page.goto('/bank-reconciliations');
-        await page.waitForResponse(
+        const listResponse = page.waitForResponse(
             (r) => r.url().includes('/api/bank-reconciliations') && r.status() < 400,
             { timeout: 15000 },
         );
+        await page.goto('/bank-reconciliations');
+        await listResponse;
     });
 
     test('can open View modal and see Import Statement button', async ({ page }) => {
@@ -104,10 +107,7 @@ test.describe('Bank Reconciliation Workflow', () => {
         const hasRow = await row.isVisible().catch(() => false);
         if (!hasRow) {
             await createBankReconciliation(page);
-            await page.waitForResponse(
-                (r) => r.url().includes('/api/bank-reconciliations') && r.status() < 400,
-                { timeout: 15000 },
-            );
+            await expect(getReconcilableRow(page)).toBeVisible({ timeout: 15000 });
         }
 
         // Open actions menu → View
@@ -132,10 +132,7 @@ test.describe('Bank Reconciliation Workflow', () => {
         const hasRow = await row.isVisible().catch(() => false);
         if (!hasRow) {
             await createBankReconciliation(page);
-            await page.waitForResponse(
-                (r) => r.url().includes('/api/bank-reconciliations') && r.status() < 400,
-                { timeout: 15000 },
-            );
+            await expect(getReconcilableRow(page)).toBeVisible({ timeout: 15000 });
         }
 
         // Open View modal
@@ -174,10 +171,7 @@ test.describe('Bank Reconciliation Workflow', () => {
         const hasRow = await row.isVisible().catch(() => false);
         if (!hasRow) {
             await createBankReconciliation(page);
-            await page.waitForResponse(
-                (r) => r.url().includes('/api/bank-reconciliations') && r.status() < 400,
-                { timeout: 15000 },
-            );
+            await expect(getReconcilableRow(page)).toBeVisible({ timeout: 15000 });
         }
 
         // Open View modal
@@ -218,10 +212,7 @@ test.describe('Bank Reconciliation Workflow', () => {
         const hasRow = await row.isVisible().catch(() => false);
         if (!hasRow) {
             await createBankReconciliation(page);
-            await page.waitForResponse(
-                (r) => r.url().includes('/api/bank-reconciliations') && r.status() < 400,
-                { timeout: 15000 },
-            );
+            await expect(getReconcilableRow(page)).toBeVisible({ timeout: 15000 });
         }
 
         // Open View → Reconcile
@@ -256,10 +247,7 @@ test.describe('Bank Reconciliation Workflow', () => {
         const hasRow = await row.isVisible().catch(() => false);
         if (!hasRow) {
             await createBankReconciliation(page);
-            await page.waitForResponse(
-                (r) => r.url().includes('/api/bank-reconciliations') && r.status() < 400,
-                { timeout: 15000 },
-            );
+            await expect(getReconcilableRow(page)).toBeVisible({ timeout: 15000 });
         }
 
         // Open View → Reconcile

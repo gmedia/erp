@@ -7,19 +7,15 @@ test.describe('Stock Monitor Dashboard', () => {
     });
 
     test('can view stock monitor summary and filter data', async ({ page }) => {
+        const initialResponsePromise = page.waitForResponse(
+            (r) =>
+                r.url().includes('/stock-monitor') &&
+                r.request().headers()['accept']?.includes('application/json') &&
+                r.status() < 400,
+        );
         await page.goto('/stock-monitor');
         await page.waitForURL('**/stock-monitor', { timeout: 15000 });
-
-        await page
-            .waitForResponse(
-                (r) =>
-                    r.url().includes('/stock-monitor') &&
-                    r.request().headers()['accept']?.includes(
-                        'application/json',
-                    ) &&
-                    r.status() < 400,
-            )
-            ;
+        await initialResponsePromise;
 
         await expect(page.getByText('Total SKU-Warehouse')).toBeVisible();
         await expect(page.locator('table')).toBeVisible();
@@ -35,18 +31,14 @@ test.describe('Stock Monitor Dashboard', () => {
 
         const searchInput = page.getByRole('textbox').first();
         await searchInput.fill('P-');
+        const searchResponsePromise = page.waitForResponse(
+            (r) =>
+                r.url().includes('/stock-monitor') &&
+                r.request().headers()['accept']?.includes('application/json') &&
+                r.status() < 400,
+        );
         await searchInput.press('Enter');
-
-        await page
-            .waitForResponse(
-                (r) =>
-                    r.url().includes('/stock-monitor') &&
-                    r.request().headers()['accept']?.includes(
-                        'application/json',
-                    ) &&
-                    r.status() < 400,
-            )
-            ;
+        await searchResponsePromise;
 
         await expect(page.locator('tbody tr')).toHaveCount(1, {
             timeout: 15000,
@@ -54,18 +46,14 @@ test.describe('Stock Monitor Dashboard', () => {
 
         await page.getByRole('button', { name: /filters/i }).click();
         await page.getByRole('dialog').getByPlaceholder('Example: 10').fill('1000');
+        const filterResponsePromise = page.waitForResponse(
+            (r) =>
+                r.url().includes('/stock-monitor') &&
+                r.request().headers()['accept']?.includes('application/json') &&
+                r.status() < 400,
+        );
         await page.getByRole('button', { name: 'Apply Filters' }).click();
-
-        await page
-            .waitForResponse(
-                (r) =>
-                    r.url().includes('/stock-monitor') &&
-                    r.request().headers()['accept']?.includes(
-                        'application/json',
-                    ) &&
-                    r.status() < 400,
-            )
-            ;
+        await filterResponsePromise;
 
         await expect(page.getByText('Low Stock Items')).toBeVisible();
 

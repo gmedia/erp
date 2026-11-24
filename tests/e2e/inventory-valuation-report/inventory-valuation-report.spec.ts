@@ -7,46 +7,37 @@ test.describe('Inventory Valuation Report', () => {
     });
 
     test('can view report, search, filter, and export', async ({ page }) => {
+        const initialResponse = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/reports/inventory-valuation') &&
+                r.request().headers()['accept']?.includes('application/json') &&
+                r.status() < 400,
+        );
         await page.goto('/reports/inventory-valuation');
         await page.waitForURL('**/reports/inventory-valuation', { timeout: 15000 });
-
-        await page
-            .waitForResponse(
-                (r) =>
-                    r.url().includes('/api/reports/inventory-valuation') &&
-                    r.request().headers()['accept']?.includes('application/json') &&
-                    r.status() < 400,
-            )
-            ;
+        await initialResponse;
 
         await expect(page.locator('table')).toBeVisible();
         await expect(page.locator('tbody tr').first()).toBeVisible();
 
-        await Promise.all([
-            page.waitForResponse(
-                (r) =>
-                    r.url().includes('/api/reports/inventory-valuation/export') &&
-                    r.status() < 400,
-            ),
-            page.getByRole('button', { name: /export/i }).click(),
-        ]);
+        const exportResponse = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/reports/inventory-valuation/export') &&
+                r.status() < 400,
+        );
+        await page.getByRole('button', { name: /export/i }).click();
+        await exportResponse;
 
         const searchInput = page.getByRole('textbox').first();
-        await Promise.all([
-            page
-                .waitForResponse(
-                    (r) =>
-                        r.url().includes('/api/reports/inventory-valuation') &&
-                        r.request().headers()['accept']?.includes(
-                            'application/json',
-                        ) &&
-                        r.status() < 400,
-                )
-                ,
-            searchInput.fill('P-').then(async () => {
-                await searchInput.press('Enter');
-            }),
-        ]);
+        const searchResponse = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/reports/inventory-valuation') &&
+                r.request().headers()['accept']?.includes('application/json') &&
+                r.status() < 400,
+        );
+        await searchInput.fill('P-');
+        await searchInput.press('Enter');
+        await searchResponse;
 
         await page.getByRole('button', { name: /filters/i }).click();
         const filtersDialog = page.getByRole('dialog');
@@ -64,18 +55,13 @@ test.describe('Inventory Valuation Report', () => {
         await expect(branchOption).toBeVisible({ timeout: 10000 });
         await branchOption.click({ force: true });
 
-        await Promise.all([
-            page
-                .waitForResponse(
-                    (r) =>
-                        r.url().includes('/api/reports/inventory-valuation') &&
-                        r.request().headers()['accept']?.includes(
-                            'application/json',
-                        ) &&
-                        r.status() < 400,
-                )
-                ,
-            filtersDialog.getByRole('button', { name: 'Apply Filters' }).click(),
-        ]);
+        const applyResponse = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/reports/inventory-valuation') &&
+                r.request().headers()['accept']?.includes('application/json') &&
+                r.status() < 400,
+        );
+        await filtersDialog.getByRole('button', { name: 'Apply Filters' }).click();
+        await applyResponse;
     });
 });
