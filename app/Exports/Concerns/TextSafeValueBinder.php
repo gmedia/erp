@@ -16,14 +16,14 @@ use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
  */
 class TextSafeValueBinder extends DefaultValueBinder
 {
+    private static bool $neutralizePrefixes = false;
+
     /**
      * Awalan yang membuat pembaca spreadsheet menganggap teks sebagai formula atau
      * sel terformat. Dinetralkan dengan apostrof khusus CSV, karena CSV tidak punya
      * tipe sel.
      */
     private const DANGEROUS_PREFIXES = ['=', '+', '-', '@', "\t", "\r"];
-
-    private static bool $neutralizePrefixes = false;
 
     public static function neutralizeFormulaPrefixes(bool $enabled): void
     {
@@ -36,7 +36,7 @@ class TextSafeValueBinder extends DefaultValueBinder
             $text = $this->sanitizeText($value);
 
             if (self::$neutralizePrefixes && $this->startsWithDangerousPrefix($text)) {
-                $text = "'".$text;
+                $text = "'" . $text;
             }
 
             $cell->setValueExplicit($text, DataType::TYPE_STRING);

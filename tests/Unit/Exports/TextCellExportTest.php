@@ -1,12 +1,15 @@
 <?php
 
+use App\Exports\BranchExport;
 use App\Exports\Concerns\BaseExport;
 use App\Exports\Concerns\SimpleCrudExport;
 use App\Exports\Concerns\TextSafeValueBinder;
 use App\Exports\Concerns\WritesTextCells;
+use App\Exports\GeneralLedgerReportExport;
+use App\Exports\TrialBalanceReportExport;
+use App\Exports\UnitExport;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use Maatwebsite\Excel\DefaultValueBinder;
 use Maatwebsite\Excel\Excel as ExcelFormat;
@@ -34,7 +37,7 @@ function textCellRoundTrip(object $export, string $format): Spreadsheet
         TextSafeValueBinder::neutralizeFormulaPrefixes(false);
     }
 
-    $path = tempnam(sys_get_temp_dir(), 'textcell_').'.'.$format;
+    $path = tempnam(sys_get_temp_dir(), 'textcell_') . '.' . $format;
     file_put_contents($path, $binary);
 
     try {
@@ -71,6 +74,14 @@ function makeTextCellExport(array $rows): object
 }
 
 /**
+ * Kelas mengimplementasi WithCustomValueBinder (langsung atau lewat base).
+ */
+function implementsBinder(string $class): bool
+{
+    return in_array(WithCustomValueBinder::class, class_implements($class), true);
+}
+
+/**
  * Semua kelas konkret di app/Exports, termasuk yang mewarisi base class.
  *
  * @return list<string>
@@ -86,7 +97,7 @@ function textCellExportClasses(): array
         }
 
         $relative = substr($file->getPathname(), strlen(app_path()) + 1, -4);
-        $class = 'App\\'.str_replace('/', '\\', $relative);
+        $class = 'App\\' . str_replace('/', '\\', $relative);
 
         if (! class_exists($class)) {
             continue;
@@ -98,9 +109,12 @@ function textCellExportClasses(): array
             continue;
         }
 
-        if (is_subclass_of($class, FromCollection::class) || is_subclass_of($class, FromQuery::class)) {
-            $classes[] = $class;
+        // Value binder bukan kelas ekspor.
+        if (is_subclass_of($class, DefaultValueBinder::class)) {
+            continue;
         }
+
+        $classes[] = $class;
     }
 
     sort($classes);
@@ -181,7 +195,7 @@ describe('arsitektur ekspor', function () {
         expect($classes)->not->toBeEmpty();
 
         foreach ($classes as $class) {
-            expect(is_subclass_of($class, WithCustomValueBinder::class))
+            expect(implementsBinder($class))
                 ->toBeTrue("Kelas {$class} harus mengimplementasi WithCustomValueBinder");
         }
     });
@@ -194,7 +208,59 @@ describe('arsitektur ekspor', function () {
     });
 
     test('base export membawa binder bersama', function () {
-        expect(is_subclass_of(BaseExport::class, WithCustomValueBinder::class))->toBeTrue()
-            ->and(is_subclass_of(SimpleCrudExport::class, WithCustomValueBinder::class))->toBeTrue();
+        expect(implementsBinder(BaseExport::class))->toBeTrue()
+            ->and(implementsBinder(SimpleCrudExport::class))->toBeTrue();
+    });
+});
+
+describe('satu dataset lintas kelas ekspor', function () {
+
+    test('nilai teks berawalan karakter berbahaya tetap string di setiap pola ekspor', function () {
+        $dataset = [['=HYPERLINK("x")', '+62812', '-1', '@cmd', "\tTab", 'aman', 1500]];
+
+        // Pola 1: export langsung memakai WritesTextCells (seperti BaseExport / report).
+        $direct = makeTextCellExport($dataset);
+
+        // Pola 2: export yang mewarisi trait lewat kelas abstrak bersama.
+        $inherited = new class($dataset) implements FromCollection, WithCustomValueBinder
+        {
+            use WritesTextCells;
+
+            /**
+             * @param  list<list<mixed>>  $rows
+             */
+            public function __construct(private readonly array $rows) {}
+
+            public function collection(): Collection
+            {
+                return collect($this->rows);
+            }
+        };
+
+        foreach ([$direct, $inherited] as $export) {
+            $sheet = textCellRoundTrip($export, 'xlsx')->getActiveSheet();
+
+            foreach (['A1', 'B1', 'C1', 'D1', 'E1'] as $address) {
+                expect($sheet->getCell($address)->getDataType())->toBe(DataType::TYPE_STRING)
+                    ->and($sheet->getCell($address)->isFormula())->toBeFalse();
+            }
+
+            expect($sheet->getCell('A1')->getValue())->toBe('=HYPERLINK("x")')
+                ->and($sheet->getCell('B1')->getValue())->toBe('+62812')
+                ->and($sheet->getCell('F1')->getValue())->toBe('aman')
+                ->and($sheet->getCell('G1')->getDataType())->toBe(DataType::TYPE_NUMERIC);
+        }
+    });
+
+    test('kelas ekspor konkret dari modul laporan dan master data memakai binder bersama', function () {
+        foreach ([
+            TrialBalanceReportExport::class,
+            GeneralLedgerReportExport::class,
+            UnitExport::class,
+            BranchExport::class,
+        ] as $class) {
+            expect(in_array(WritesTextCells::class, class_uses_recursive($class), true))->toBeTrue($class);
+            expect(implementsBinder($class))->toBeTrue($class);
+        }
     });
 });

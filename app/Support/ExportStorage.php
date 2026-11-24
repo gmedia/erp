@@ -48,15 +48,6 @@ final class ExportStorage
     }
 
     /**
-     * Binder ekspor bersifat global (PhpSpreadsheet Cell). Pulihkan binder default
-     * agar pembacaan (impor) sesudahnya tidak ikut memakai binder teks.
-     */
-    private static function restoreDefaultValueBinder(): void
-    {
-        Cell::setValueBinder(app(config('excel.value_binder.default', DefaultValueBinder::class)));
-    }
-
-    /**
      * Build a download URL for a stored file.
      *
      * Object storage is private, so a plain url() would return a link that
@@ -77,8 +68,17 @@ final class ExportStorage
         return $disk->url($path);
     }
 
+    /**
+     * Binder ekspor bersifat global (PhpSpreadsheet Cell). Pulihkan binder default
+     * agar pembacaan (impor) sesudahnya tidak ikut memakai binder teks.
+     */
+    private static function restoreDefaultValueBinder(): void
+    {
+        Cell::setValueBinder(app(config('excel.value_binder.default', DefaultValueBinder::class)));
+    }
+
     private static function driver(): string
     {
-        return (string) config('filesystems.disks.'.self::diskName().'.driver', 'local');
+        return (string) config('filesystems.disks.' . self::diskName() . '.driver', 'local');
     }
 }

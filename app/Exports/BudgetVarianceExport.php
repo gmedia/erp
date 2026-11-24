@@ -59,7 +59,7 @@ class BudgetVarianceExport implements FromCollection, ShouldAutoSize, WithCustom
             $row['allocated'],
             $row['actual'],
             $row['available'],
-            $row['variance_percent'] !== null ? $row['variance_percent'].'%' : 'N/A',
+            $row['variance_percent'] !== null ? $row['variance_percent'] . '%' : 'N/A',
             ucwords(str_replace('_', ' ', $row['status'])),
         ];
     }

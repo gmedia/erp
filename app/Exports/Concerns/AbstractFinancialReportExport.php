@@ -35,7 +35,7 @@ abstract class AbstractFinancialReportExport implements FromCollection, ShouldAu
             $rows[] = [
                 $section,
                 $node['code'] ?? '',
-                str_repeat('    ', $depth).($node['name'] ?? ''),
+                str_repeat('    ', $depth) . ($node['name'] ?? ''),
                 $node['level'] ?? $depth,
                 $node['balance'] ?? 0,
                 $node['comparison_balance'] ?? 0,
