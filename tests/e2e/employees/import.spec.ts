@@ -1,7 +1,7 @@
-import { test, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { expect, test } from '@playwright/test';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { login } from '../helpers';
 
 test.describe('Employee Import E2E Tests', () => {
     test.beforeEach(async ({ page }) => {
@@ -21,13 +21,15 @@ test.describe('Employee Import E2E Tests', () => {
             '0812345678,Engineering,Senior Developer,Head Office,8000000,2024-01-01,regular',
         ].join(',');
         const csvContent = `${header}\n${row}`;
-        
+
         const fileName = `import_employee_${timestamp}.csv`;
         const filePath = path.join('/tmp', fileName);
         fs.writeFileSync(filePath, csvContent);
 
         // 2. Navigate to Employees page
-        const listResponse = page.waitForResponse(r => r.url().includes('/api/employees') && r.status() === 200);
+        const listResponse = page.waitForResponse(
+            (r) => r.url().includes('/api/employees') && r.status() === 200,
+        );
         await page.goto('/employees');
         await listResponse;
 
@@ -51,21 +53,29 @@ test.describe('Employee Import E2E Tests', () => {
         // 6. Verify Success
         // Wait for toast or error, increased timeout
         try {
-            await expect(page.getByText('Import Completed')).toBeVisible({ timeout: 10000 });
-            await expect(page.getByText('Successfully imported 1 rows.')).toBeVisible();
+            await expect(page.getByText('Import Completed')).toBeVisible({
+                timeout: 10000,
+            });
+            await expect(
+                page.getByText('Successfully imported 1 rows.'),
+            ).toBeVisible();
         } catch {
-            console.log("Success toast not found within timeout. Checking for data existence...");
-             // Check if error toast appeared instead
-            const errorToast = await page.getByText('Import Failed').isVisible();
+            console.log(
+                'Success toast not found within timeout. Checking for data existence...',
+            );
+            // Check if error toast appeared instead
+            const errorToast = await page
+                .getByText('Import Failed')
+                .isVisible();
             if (errorToast) {
-                console.log("Error toast detected!");
+                console.log('Error toast detected!');
             }
         }
 
         // Dialog should close (optional check depending on implementation, usually users close it or it auto closes)
         // In current implementation of ImportDialog.tsx, it does NOT auto close on success unless I update it.
         // But the toast appears.
-        
+
         // Close dialog manually if it's still open (it is based on code)
         if (await dialog.isVisible()) {
             // Use .first() to target the "Close" button in the footer, avoiding the X icon in header
@@ -76,12 +86,16 @@ test.describe('Employee Import E2E Tests', () => {
         // Search for the new employee
         const searchInput = page.getByPlaceholder('Search employees...');
         await searchInput.fill(uniqueEmail);
-        const searchResponse = page.waitForResponse(r => r.url().includes('/api/employees') && r.status() === 200);
+        const searchResponse = page.waitForResponse(
+            (r) => r.url().includes('/api/employees') && r.status() === 200,
+        );
         await searchInput.press('Enter');
         await searchResponse;
-        
+
         await expect(page.getByText(uniqueEmail)).toBeVisible();
-        await expect(page.getByText(`Imported User ${timestamp}`)).toBeVisible();
+        await expect(
+            page.getByText(`Imported User ${timestamp}`),
+        ).toBeVisible();
 
         // Cleanup
         if (fs.existsSync(filePath)) {
@@ -98,7 +112,7 @@ test.describe('Employee Import E2E Tests', () => {
             '0812345678,Engineering,Senior Developer,Head Office,8000000,2024-01-01,regular',
         ].join(',');
         const csvContent = `${header}\n${row}`;
-        
+
         const fileName = `invalid_import_${Date.now()}.csv`;
         const filePath = path.join('/tmp', fileName);
         fs.writeFileSync(filePath, csvContent);
@@ -118,14 +132,16 @@ test.describe('Employee Import E2E Tests', () => {
         await submitButton.click();
 
         // 5. Verify Error Summary
-        await expect(page.getByText('Import Finished with Errors')).toBeVisible();
+        await expect(
+            page.getByText('Import Finished with Errors'),
+        ).toBeVisible();
         await expect(page.getByText('Errors: 1')).toBeVisible(); // In the summary stats
-        
+
         // Check table content
         const errorTable = dialog.locator('table');
         await expect(errorTable).toBeVisible();
         await expect(errorTable).toContainText('Validation'); // Field name
-        
+
         // Cleanup
         if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);

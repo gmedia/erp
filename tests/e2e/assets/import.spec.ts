@@ -1,7 +1,7 @@
-import { test, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { expect, test } from '@playwright/test';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { login } from '../helpers';
 
 test.describe('Asset Import E2E Tests', () => {
     test.beforeEach(async ({ page }) => {
@@ -12,40 +12,42 @@ test.describe('Asset Import E2E Tests', () => {
         // 1. Prepare CSV file
         const timestamp = Date.now();
         const uniqueAssetCode = `AST-${timestamp.toString().slice(-7)}`;
-        
+
         const rowData = [
-            uniqueAssetCode,          // asset_code
+            uniqueAssetCode, // asset_code
             `E2E Asset ${timestamp}`, // name
-            'IT Equipment',           // asset_category
-            '',                       // asset_model
-            'Head Office',            // branch
-            '',                       // location
-            '',                       // department
-            '',                       // employee
-            '',                       // supplier
-            '',                       // serial_number
-            '',                       // barcode
-            '2024-01-01',             // purchase_date
-            '15000000',               // purchase_cost
-            'IDR',                    // currency
-            '',                       // warranty_end_date
-            'active',                 // status
-            'good',                   // condition
-            'E2E Import Verification' // notes
+            'IT Equipment', // asset_category
+            '', // asset_model
+            'Head Office', // branch
+            '', // location
+            '', // department
+            '', // employee
+            '', // supplier
+            '', // serial_number
+            '', // barcode
+            '2024-01-01', // purchase_date
+            '15000000', // purchase_cost
+            'IDR', // currency
+            '', // warranty_end_date
+            'active', // status
+            'good', // condition
+            'E2E Import Verification', // notes
         ];
-        
+
         const header = [
             'asset_code,name,asset_category,asset_model,branch,location,department,employee,supplier',
             'serial_number,barcode,purchase_date,purchase_cost,currency,warranty_end_date,status,condition,notes',
         ].join(',');
         const csvContent = `${header}\n${rowData.join(',')}`;
-        
+
         const fileName = `import_asset_${timestamp}.csv`;
         const filePath = path.join('/tmp', fileName);
         fs.writeFileSync(filePath, csvContent);
 
         // 2. Navigate to Assets page
-        const listResponse = page.waitForResponse(r => r.url().includes('/api/assets') && r.status() === 200);
+        const listResponse = page.waitForResponse(
+            (r) => r.url().includes('/api/assets') && r.status() === 200,
+        );
         await page.goto('/assets');
         await listResponse;
 
@@ -68,10 +70,14 @@ test.describe('Asset Import E2E Tests', () => {
 
         // 6. Verify Success
         try {
-            await expect(page.getByText('Import Completed')).toBeVisible({ timeout: 10000 });
-            await expect(page.getByText('Successfully imported 1 rows.')).toBeVisible();
+            await expect(page.getByText('Import Completed')).toBeVisible({
+                timeout: 10000,
+            });
+            await expect(
+                page.getByText('Successfully imported 1 rows.'),
+            ).toBeVisible();
         } catch {
-             // Check if error toast appeared instead
+            // Check if error toast appeared instead
             await page.getByText('Import Failed').isVisible();
         }
 
@@ -84,10 +90,12 @@ test.describe('Asset Import E2E Tests', () => {
         // Search for the new asset
         const searchInput = page.getByPlaceholder('Search assets...');
         await searchInput.fill(uniqueAssetCode);
-        const searchResponse = page.waitForResponse(r => r.url().includes('/api/assets') && r.status() === 200);
+        const searchResponse = page.waitForResponse(
+            (r) => r.url().includes('/api/assets') && r.status() === 200,
+        );
         await searchInput.press('Enter');
         await searchResponse;
-        
+
         await expect(page.getByText(uniqueAssetCode)).toBeVisible();
         await expect(page.getByText(`E2E Asset ${timestamp}`)).toBeVisible();
 
@@ -100,32 +108,32 @@ test.describe('Asset Import E2E Tests', () => {
     test('shows error summary for invalid import', async ({ page }) => {
         // 1. Prepare Invalid CSV (missing asset_code)
         const rowData = [
-            '',                       // asset_code
-            'Invalid Asset',          // name
-            'IT Equipment',           // asset_category
-            '',                       // asset_model
-            'Head Office',            // branch
-            '',                       // location
-            '',                       // department
-            '',                       // employee
-            '',                       // supplier
-            '',                       // serial_number
-            '',                       // barcode
-            '2024-01-01',             // purchase_date
-            '15000000',               // purchase_cost
-            'IDR',                    // currency
-            '',                       // warranty_end_date
-            'active',                 // status
-            'good',                   // condition
-            'E2E Import Error Check'  // notes
+            '', // asset_code
+            'Invalid Asset', // name
+            'IT Equipment', // asset_category
+            '', // asset_model
+            'Head Office', // branch
+            '', // location
+            '', // department
+            '', // employee
+            '', // supplier
+            '', // serial_number
+            '', // barcode
+            '2024-01-01', // purchase_date
+            '15000000', // purchase_cost
+            'IDR', // currency
+            '', // warranty_end_date
+            'active', // status
+            'good', // condition
+            'E2E Import Error Check', // notes
         ];
-        
+
         const header = [
             'asset_code,name,asset_category,asset_model,branch,location,department,employee,supplier',
             'serial_number,barcode,purchase_date,purchase_cost,currency,warranty_end_date,status,condition,notes',
         ].join(',');
         const csvContent = `${header}\n${rowData.join(',')}`;
-        
+
         const fileName = `invalid_import_${Date.now()}.csv`;
         const filePath = path.join('/tmp', fileName);
         fs.writeFileSync(filePath, csvContent);
@@ -145,14 +153,16 @@ test.describe('Asset Import E2E Tests', () => {
         await submitButton.click();
 
         // 5. Verify Error Summary
-        await expect(page.getByText('Import Finished with Errors')).toBeVisible();
+        await expect(
+            page.getByText('Import Finished with Errors'),
+        ).toBeVisible();
         await expect(page.getByText('Errors: 1')).toBeVisible();
-        
+
         // Check table content
         const errorTable = dialog.locator('table');
         await expect(errorTable).toBeVisible();
         await expect(errorTable).toContainText('Validation');
-        
+
         // Cleanup
         if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
