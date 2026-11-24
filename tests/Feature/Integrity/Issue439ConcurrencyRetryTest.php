@@ -89,7 +89,17 @@ it('tidak menghilangkan pembaruan saat instance model yang sama dipakai ulang se
     });
 
     expect($attempts)->toBe(2)
-        ->and($unit->fresh()->name)->toBe('unit-439-baru');
+        ->and($unit->fresh()->name)->toBe('unit-439-baru')
+        ->and($unit->name)->toBe('unit-439-baru');
+});
+
+it('memperbarui instance pemanggil di jalur tanpa retry', function (): void {
+    $unit = Unit::create(['name' => 'unit-439-' . uniqid(), 'symbol' => 'u439']);
+
+    concurrencyRetryHarness()->update($unit, ['name' => 'unit-439-langsung']);
+
+    expect($unit->name)->toBe('unit-439-langsung')
+        ->and($unit->fresh()->name)->toBe('unit-439-langsung');
 });
 
 it('mengulang duplicate entry hanya bila berasal dari indeks nomor dokumen', function (): void {
@@ -122,9 +132,11 @@ it('memetakan sisa galat konkurensi di jalur controller menjadi 409 dengan pesan
         ->and($thrown?->getMessage())->toBe(__('concurrency.conflict'));
 });
 
-it('menjawab 409 JSON concurrency.conflict bila galat konkurensi tetap terjadi di route API', function (): void {
+it('menjawab 409 JSON concurrency.conflict bila galat konkurensi lolos di route API', function (): void {
+    // DB::transaction biasa (tanpa TransactionRetrier): galat deadlock dilempar apa adanya
+    // dan harus dipetakan handler menjadi 409 untuk permintaan JSON.
     Route::post('/api/_issue439/conflict', function (): void {
-        TransactionRetrier::run(function (): void {
+        DB::transaction(function (): void {
             throw concurrencyRetryException(1213);
         });
     });
