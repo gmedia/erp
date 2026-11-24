@@ -2,9 +2,8 @@
 
 namespace App\Actions\JournalEntries;
 
-use App\Actions\AccountingPosting\ResolveControlAccountAction;
+use App\Actions\Concerns\AssertsJournalLineAccounts;
 use App\Actions\PeriodClosings\AssertPeriodOpenForPostingAction;
-use App\Models\Account;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
 use App\Services\InterBranchClearingService;
@@ -14,6 +13,8 @@ use Illuminate\Validation\ValidationException;
 
 class CreateJournalEntryAction
 {
+    use AssertsJournalLineAccounts;
+
     public function __construct(
         private InterBranchClearingService $clearing,
     ) {}
@@ -27,16 +28,26 @@ class CreateJournalEntryAction
      * - journal_type: e.g. 'general', 'adjusting', 'closing', 'recurring', 'system'.
      * - branch_id: owning branch resolved by the caller; null for company-wide entries.
      * - source_type, source_id: morph reference to the originating document.
+     * - entry_number_prefix: prefix nomor jurnal (default 'JV-'). Urutan dihitung per prefix dan tahun fiskal.
+     * - validate_accounts: true memeriksa akun aktif COA untuk semua status (default: hanya posted).
      */
     /**
      * @param  bool  $isPeriodClosingEntry  Hanya ClosePeriodAction/ReopenPeriodAction (lewat
      *                                      ReverseDocumentJournalAction) yang boleh mengirim true.
      *                                      Bukan dari $data, agar payload jurnal manual tidak bisa
      *                                      melewati penguncian periode (#423).
+     * @param  bool  $allowGroupAccounts  Hanya ReverseDocumentJournalAction yang boleh mengirim true,
+     *                                    agar pembalik baris asli ke akun kelompok selalu diterima (#437).
+     *                                    Bukan dari $data, agar payload API tidak bisa mengaktifkannya.
      */
-    public function execute(array $data, bool $isPeriodClosingEntry = false): JournalEntry
-    {
+    public function execute(
+        array $data,
+        bool $isPeriodClosingEntry = false,
+        bool $allowGroupAccounts = false,
+    ): JournalEntry {
         $status = $data['status'] ?? 'draft';
+        $entryNumberPrefix = $data['entry_number_prefix'] ?? 'JV-';
+        $validateAccounts = ($data['validate_accounts'] ?? false) || $status === 'posted';
 
         if ($status === 'posted') {
             $totalDebit = 0.0;
@@ -50,11 +61,19 @@ class CreateJournalEntryAction
                     'lines' => 'Journal entry is not balanced (debit must equal credit).',
                 ]);
             }
+        }
 
+        if ($validateAccounts) {
             $this->assertLinesUseActiveAccounts($data['lines'], $data['entry_date']);
         }
 
-        return TransactionRetrier::run(function () use ($data, $status, $isPeriodClosingEntry) {
+        return TransactionRetrier::run(function () use (
+            $data,
+            $status,
+            $isPeriodClosingEntry,
+            $allowGroupAccounts,
+            $entryNumberPrefix,
+        ) {
             $entryDate = $data['entry_date'];
 
             $fiscalYear = FiscalYear::where('start_date', '<=', $entryDate)
@@ -78,12 +97,18 @@ class CreateJournalEntryAction
                 app(AssertPeriodOpenForPostingAction::class)->execute($fiscalYear->id, $entryDate);
             }
 
+            // Sebelum baris jurnal ditulis, agar saldo posted yang dibaca belum memuat jurnal ini.
+            // Ada di dalam callback sehingga ikut terulang pada setiap percobaan TransactionRetrier.
+            if (! $allowGroupAccounts) {
+                $this->assertGroupAccountLinesReduceBalance($data['lines']);
+            }
+
             // Generate Entry Number
             // We use max() instead of count() to handle deletions correctly (gaps in sequence)
             // Format: JV-{Year}-XXXXX
             // Batasi ke prefix JV-<tahun> agar entri non-JV (mis. saldo
             // awal REC-) tidak merusak urutan nomor.
-            $entryPrefix = 'JV-' . $fiscalYear->name . '-';
+            $entryPrefix = $entryNumberPrefix . $fiscalYear->name . '-';
 
             $lastEntry = JournalEntry::where('fiscal_year_id', $fiscalYear->id)
                 ->where('entry_number', 'like', $entryPrefix . '%')
@@ -99,7 +124,7 @@ class CreateJournalEntryAction
                 $count = 1;
             }
 
-            $entryNumber = 'JV-' . $fiscalYear->name . '-' . str_pad((string) $count, 5, '0', STR_PAD_LEFT);
+            $entryNumber = $entryPrefix . str_pad((string) $count, 5, '0', STR_PAD_LEFT);
 
             $userId = Auth::id();
 
@@ -152,46 +177,5 @@ class CreateJournalEntryAction
 
             return $journalEntry;
         });
-    }
-
-    /**
-     * Jurnal posted hanya boleh memakai akun aktif dari COA version yang berlaku untuk
-     * tanggal jurnal (#357). Akun COA archived, nonaktif, atau dari COA lain ditolak 422
-     * agar tidak menggandakan saldo lama atau mencampur dua COA dalam satu jurnal.
-     *
-     * @param  array<int, array<string, mixed>>  $lines
-     */
-    private function assertLinesUseActiveAccounts(array $lines, string $entryDate): void
-    {
-        $coaVersionId = app(ResolveControlAccountAction::class)->resolveVersion($entryDate)->id;
-
-        $accountIds = array_values(array_unique(array_map(
-            fn (array $line): int => (int) $line['account_id'],
-            $lines,
-        )));
-
-        $accounts = Account::query()
-            ->whereIn('id', $accountIds)
-            ->get(['id', 'code', 'coa_version_id', 'is_active']);
-
-        if ($accounts->count() !== count($accountIds)) {
-            throw ValidationException::withMessages([
-                'lines' => __('accounting_posting.line_account_outside_coa', [
-                    'code' => '#' . implode(',#', $accountIds),
-                    'date' => $entryDate,
-                ]),
-            ]);
-        }
-
-        foreach ($accounts as $account) {
-            if (! $account->is_active || $account->coa_version_id !== $coaVersionId) {
-                throw ValidationException::withMessages([
-                    'lines' => __('accounting_posting.line_account_outside_coa', [
-                        'code' => $account->code,
-                        'date' => $entryDate,
-                    ]),
-                ]);
-            }
-        }
     }
 }

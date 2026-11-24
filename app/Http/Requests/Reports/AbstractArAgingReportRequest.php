@@ -18,6 +18,7 @@ abstract class AbstractArAgingReportRequest extends AbstractReportRequest
                 'customer_id' => ['nullable', 'integer', 'exists:customers,id'],
                 'branch_id' => ['nullable', 'integer', 'exists:branches,id'],
                 'status' => ['nullable', 'string', Rule::in(self::STATUS_VALUES)],
+                'as_of_date' => ['nullable', 'date'],
             ],
             $this->dateRangeRules(),
             $this->sortByEnumRules([

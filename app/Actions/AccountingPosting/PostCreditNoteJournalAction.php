@@ -2,6 +2,7 @@
 
 namespace App\Actions\AccountingPosting;
 
+use App\Actions\Concerns\RoundsLineAmounts;
 use App\Actions\JournalEntries\CreateJournalEntryAction;
 use App\Models\CreditNote;
 use App\Models\JournalEntry;
@@ -10,6 +11,8 @@ use Illuminate\Validation\ValidationException;
 
 class PostCreditNoteJournalAction
 {
+    use RoundsLineAmounts;
+
     public const AR_CONTROL_ACCOUNT_CODE = '11200';
 
     public function __construct(
@@ -46,11 +49,11 @@ class PostCreditNoteJournalAction
             $debitGrouped = [];
             foreach ($creditNote->items as $item) {
                 $accountId = (int) $item->account_id;
-                $debitGrouped[$accountId] = ($debitGrouped[$accountId] ?? 0.0) + (float) $item->line_total;
+                $debitGrouped[$accountId] = ($debitGrouped[$accountId] ?? 0.0)
+                    + $this->roundLineAmount($item->line_total);
             }
 
             $lines = [];
-            $total = 0.0;
             foreach ($debitGrouped as $accountId => $amount) {
                 if ($amount <= 0) {
                     continue;
@@ -58,14 +61,13 @@ class PostCreditNoteJournalAction
 
                 $lines[] = [
                     'account_id' => $accountId,
-                    'debit' => round($amount, 2),
+                    'debit' => $this->roundLineAmount($amount),
                     'credit' => 0,
                     'memo' => "Credit Note {$creditNote->credit_note_number}",
                 ];
-                $total += $amount;
             }
 
-            $total = round($total, 2);
+            $total = $this->sumRoundedLineAmounts(array_column($lines, 'debit'));
 
             $lines[] = [
                 'account_id' => $arAccount->id,

@@ -4,6 +4,8 @@ namespace App\Actions\Concerns;
 
 trait CalculatesTransactionLineTotals
 {
+    use RoundsLineAmounts;
+
     protected function calculateLineTotal(
         float $quantity,
         float $unitPrice,
@@ -12,74 +14,85 @@ trait CalculatesTransactionLineTotals
     ): float {
         $lineBeforeTax = $quantity * $unitPrice * (1 - ($discountPercent / 100));
 
-        return $lineBeforeTax * (1 + ($taxPercent / 100));
+        return $this->roundLineAmount($lineBeforeTax * (1 + ($taxPercent / 100)));
     }
 
     protected function calculateSubtotal(array $items): float
     {
-        return (float) collect($items)
-            ->sum(static fn (array $row) => (float) ($row['quantity'] * $row['unit_price']));
+        return $this->sumRoundedLineAmounts(array_map(
+            static fn (array $row): float => (float) ($row['quantity'] * $row['unit_price']),
+            $items,
+        ));
     }
 
     protected function calculateDiscountAmount(array $items): float
     {
-        return (float) collect($items)
-            ->sum(static function (array $row): float {
-                $lineSubtotal = (float) ($row['quantity'] * $row['unit_price']);
-                $discountPercent = (float) ($row['discount_percent'] ?? 0);
-
-                return (float) ($lineSubtotal * ($discountPercent / 100));
-            });
+        return $this->sumRoundedLineAmounts(array_map(
+            static fn (array $row): float => (float) (
+                $row['quantity'] * $row['unit_price'] * (((float) ($row['discount_percent'] ?? 0)) / 100)
+            ),
+            $items,
+        ));
     }
 
     protected function calculateTaxAmount(array $items): float
     {
-        return (float) collect($items)
-            ->sum(static function (array $row): float {
+        return $this->sumRoundedLineAmounts(array_map(
+            static function (array $row): float {
                 $lineSubtotal = (float) ($row['quantity'] * $row['unit_price']);
                 $discountPercent = (float) ($row['discount_percent'] ?? 0);
                 $discountedSubtotal = $lineSubtotal * (1 - ($discountPercent / 100));
                 $taxPercent = (float) ($row['tax_percent'] ?? 0);
 
                 return (float) ($discountedSubtotal * ($taxPercent / 100));
-            });
+            },
+            $items,
+        ));
     }
 
     protected function calculateGrandTotal(array $items): float
     {
-        return (float) collect($items)->sum(static fn (array $row) => (float) ($row['line_total']));
+        return $this->sumRoundedLineAmounts(array_map(
+            static fn (array $row): float => (float) $row['line_total'],
+            $items,
+        ));
     }
 
     /**
+     * Header harus seimbang: grand_total = subtotal - diskon + pajak.
+     * Selisih sen akibat pembulatan per komponen dibebankan sebagai penyeimbang:
+     * ke pajak bila dokumen berpajak; bila pajak mentah 0, ke diskon; bila keduanya 0,
+     * subtotal disamakan dengan grand total. Pajak dan diskon tidak boleh negatif.
+     *
      * @param  array<int, array<string, mixed>>  $normalizedItems
      * @return array<string, string>
      */
     protected function calculateHeaderTotals(array $normalizedItems): array
     {
-        $subtotal = collect($normalizedItems)
-            ->sum(static fn (array $row) => (float) ($row['quantity'] * $row['unit_price']));
+        $subtotal = $this->calculateSubtotal($normalizedItems);
+        $discount = $this->calculateDiscountAmount($normalizedItems);
+        $tax = $this->calculateTaxAmount($normalizedItems);
+        $grandTotal = $this->calculateGrandTotal($normalizedItems);
 
-        $discountAmount = collect($normalizedItems)
-            ->sum(static function (array $row): float {
-                $lineSubtotal = (float) ($row['quantity'] * $row['unit_price']);
+        $balance = $this->roundLineAmount($grandTotal - $subtotal + $discount - $tax);
 
-                return (float) ($lineSubtotal * (($row['discount_percent'] ?? 0) / 100));
-            });
+        if ($balance !== 0.0) {
+            $taxAfter = $this->roundLineAmount($tax + $balance);
+            $discountAfter = $this->roundLineAmount($discount - $balance);
 
-        $taxAmount = collect($normalizedItems)
-            ->sum(static function (array $row): float {
-                $lineSubtotal = (float) ($row['quantity'] * $row['unit_price']);
-                $discountedSubtotal = $lineSubtotal * (1 - (($row['discount_percent'] ?? 0) / 100));
-
-                return (float) ($discountedSubtotal * (($row['tax_percent'] ?? 0) / 100));
-            });
-
-        $grandTotal = collect($normalizedItems)->sum(static fn (array $row) => (float) ($row['line_total']));
+            if ($tax > 0.0 && $taxAfter >= 0.0) {
+                $tax = $taxAfter;
+            } elseif ($discount > 0.0 && $discountAfter >= 0.0) {
+                $discount = $discountAfter;
+            } else {
+                $subtotal = $this->roundLineAmount($grandTotal + $discount - $tax);
+            }
+        }
 
         return [
             'subtotal' => (string) $subtotal,
-            'discount_amount' => (string) $discountAmount,
-            'tax_amount' => (string) $taxAmount,
+            'discount_amount' => (string) $discount,
+            'tax_amount' => (string) $tax,
             'grand_total' => (string) $grandTotal,
         ];
     }

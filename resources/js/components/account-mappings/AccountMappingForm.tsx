@@ -106,13 +106,14 @@ export function AccountMappingForm({
         prevTargetCoaVersionId.current = targetCoaVersionId;
     }, [open, targetCoaVersionId, form]);
 
+    // Sumber boleh akun kelompok (saldo lama); target wajib akun daun.
     const sourceAccountsUrl = sourceCoaVersionId
         ? `/api/accounts?coa_version_id=${encodeURIComponent(sourceCoaVersionId)}`
         : '/api/accounts';
 
     const targetAccountsUrl = targetCoaVersionId
-        ? `/api/accounts?coa_version_id=${encodeURIComponent(targetCoaVersionId)}`
-        : '/api/accounts';
+        ? `/api/accounts?coa_version_id=${encodeURIComponent(targetCoaVersionId)}&has_children=0`
+        : '/api/accounts?has_children=0';
 
     return (
         <EntityForm<AccountMappingFormData>

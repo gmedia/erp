@@ -75,13 +75,14 @@ afterEach(function (): void {
 
 it('tidak menghilangkan pembaruan saat instance model yang sama dipakai ulang setelah rollback', function (): void {
     $unit = Unit::create(['name' => 'unit-439-' . uniqid(), 'symbol' => 'u439']);
+    $updatedName = 'unit-439-' . uniqid();
     $attempts = 0;
 
-    TransactionRetrier::run(function () use ($unit, &$attempts): void {
+    TransactionRetrier::run(function () use ($unit, $updatedName, &$attempts): void {
         $attempts++;
 
         // Mengulang pola StoresItemsInTransaction: model di luar callback dipakai ulang.
-        concurrencyRetryHarness()->update($unit, ['name' => 'unit-439-baru']);
+        concurrencyRetryHarness()->update($unit, ['name' => $updatedName]);
 
         if ($attempts < 2) {
             throw concurrencyRetryException(1213);
@@ -89,17 +90,18 @@ it('tidak menghilangkan pembaruan saat instance model yang sama dipakai ulang se
     });
 
     expect($attempts)->toBe(2)
-        ->and($unit->fresh()->name)->toBe('unit-439-baru')
-        ->and($unit->name)->toBe('unit-439-baru');
+        ->and($unit->fresh()->name)->toBe($updatedName)
+        ->and($unit->name)->toBe($updatedName);
 });
 
 it('memperbarui instance pemanggil di jalur tanpa retry', function (): void {
     $unit = Unit::create(['name' => 'unit-439-' . uniqid(), 'symbol' => 'u439']);
+    $updatedName = 'unit-439-' . uniqid();
 
-    concurrencyRetryHarness()->update($unit, ['name' => 'unit-439-langsung']);
+    concurrencyRetryHarness()->update($unit, ['name' => $updatedName]);
 
-    expect($unit->name)->toBe('unit-439-langsung')
-        ->and($unit->fresh()->name)->toBe('unit-439-langsung');
+    expect($unit->name)->toBe($updatedName)
+        ->and($unit->fresh()->name)->toBe($updatedName);
 });
 
 it('mengulang duplicate entry hanya bila berasal dari indeks nomor dokumen', function (): void {
@@ -149,17 +151,18 @@ it('menjawab 409 JSON concurrency.conflict bila galat konkurensi lolos di route 
 
 it('tidak menjalankan afterCommit dua kali saat percobaan diulang', function (): void {
     $unit = Unit::create(['name' => 'unit-439-' . uniqid(), 'symbol' => 'u439']);
+    $updatedName = 'unit-439-' . uniqid();
     $attempts = 0;
     $dispatched = 0;
 
-    TransactionRetrier::run(function () use ($unit, &$attempts, &$dispatched): void {
+    TransactionRetrier::run(function () use ($unit, $updatedName, &$attempts, &$dispatched): void {
         $attempts++;
 
         DB::afterCommit(function () use (&$dispatched): void {
             $dispatched++;
         });
 
-        $unit->update(['name' => 'unit-439-baru']);
+        $unit->update(['name' => $updatedName]);
 
         if ($attempts < 2) {
             throw concurrencyRetryException(1213);

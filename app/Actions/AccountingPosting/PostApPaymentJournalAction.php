@@ -12,6 +12,8 @@ class PostApPaymentJournalAction
 {
     public const AP_CONTROL_ACCOUNT_CODE = '21100';
 
+    public const AP_DISCOUNT_ACCOUNT_CODE = '51900';
+
     public function __construct(
         private CreateJournalEntryAction $createJournalEntry,
         private ResolveControlAccountAction $resolveControlAccount,
@@ -42,6 +44,33 @@ class PostApPaymentJournalAction
             $entryDate = $apPayment->payment_date->format('Y-m-d');
             $apAccount = $this->resolveControlAccount->execute(self::AP_CONTROL_ACCOUNT_CODE, $entryDate);
 
+            // Issue #437: diskon alokasi dijurnal ke akun diskon; AP didebit sebesar kas + diskon.
+            $discount = round((float) $apPayment->allocations()->sum('discount_taken'), 2);
+            $lines = [
+                [
+                    'account_id' => $apAccount->id,
+                    'debit' => round($amount + $discount, 2),
+                    'credit' => 0,
+                    'memo' => "Payment {$apPayment->payment_number}",
+                ],
+                [
+                    'account_id' => (int) $apPayment->bank_account_id,
+                    'debit' => 0,
+                    'credit' => $amount,
+                    'memo' => "Payment {$apPayment->payment_number}",
+                ],
+            ];
+
+            if ($discount > 0) {
+                $discountAccount = $this->resolveControlAccount->execute(self::AP_DISCOUNT_ACCOUNT_CODE, $entryDate);
+                $lines[] = [
+                    'account_id' => $discountAccount->id,
+                    'debit' => 0,
+                    'credit' => $discount,
+                    'memo' => "Discount {$apPayment->payment_number}",
+                ];
+            }
+
             $journalEntry = $this->createJournalEntry->execute([
                 'entry_date' => $entryDate,
                 'reference' => $apPayment->payment_number,
@@ -51,20 +80,7 @@ class PostApPaymentJournalAction
                 'source_type' => ApPayment::class,
                 'source_id' => $apPayment->id,
                 'branch_id' => $apPayment->branch_id,
-                'lines' => [
-                    [
-                        'account_id' => $apAccount->id,
-                        'debit' => $amount,
-                        'credit' => 0,
-                        'memo' => "Payment {$apPayment->payment_number}",
-                    ],
-                    [
-                        'account_id' => (int) $apPayment->bank_account_id,
-                        'debit' => 0,
-                        'credit' => $amount,
-                        'memo' => "Payment {$apPayment->payment_number}",
-                    ],
-                ],
+                'lines' => $lines,
             ]);
 
             $apPayment->forceFill([

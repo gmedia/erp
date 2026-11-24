@@ -124,6 +124,35 @@ test('PostSupplierBillJournalAction creates a balanced posted journal entry', fu
         ->and((float) $expenseLine->credit)->toBe(0.0);
 });
 
+test('PostSupplierBillJournalAction credit equals sum of rounded fractional lines', function () {
+    makePostingFiscalYear();
+    $accounts = makePostingChartOfAccounts();
+
+    $supplierBill = SupplierBill::factory()->confirmed()->create([
+        'bill_date' => '2026-03-15',
+        'grand_total' => 0.09,
+        'amount_due' => 0.09,
+    ]);
+
+    // Tiga baris line_total 0.03 (pecahan): jurnal harus = 0.09, bukan pembulatan total mentah.
+    foreach (range(1, 3) as $i) {
+        $supplierBill->items()->create([
+            'account_id' => $accounts['expense']->id,
+            'description' => "Item {$i}",
+            'quantity' => 1,
+            'unit_price' => 0.03,
+            'discount_percent' => 0,
+            'tax_percent' => 0,
+            'line_total' => 0.03,
+        ]);
+    }
+
+    $journalEntry = app(PostSupplierBillJournalAction::class)->execute($supplierBill->fresh());
+
+    expect((float) $journalEntry->total_debit)->toBe(0.09)
+        ->and((float) $journalEntry->total_credit)->toBe(0.09);
+});
+
 test('PostSupplierBillJournalAction is idempotent and returns existing entry', function () {
     makePostingFiscalYear();
     $accounts = makePostingChartOfAccounts();

@@ -2,6 +2,7 @@
 
 namespace App\Actions\JournalEntries;
 
+use App\Actions\Concerns\AssertsJournalLineAccounts;
 use App\Actions\PeriodClosings\AssertPeriodOpenForPostingAction;
 use App\Models\JournalEntry;
 use Exception;
@@ -10,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 
 class PostJournalAction
 {
+    use AssertsJournalLineAccounts;
+
     /**
      * @param  array<int>  $ids
      * @return array{success: int, failures: array<int, string>}
@@ -35,6 +38,15 @@ class PostJournalAction
                 DB::transaction(function () use ($entry) {
                     app(AssertPeriodOpenForPostingAction::class)
                         ->execute($entry->fiscal_year_id, $entry->entry_date->format('Y-m-d'));
+
+                    $lines = $entry->lines->map(fn ($line): array => [
+                        'account_id' => $line->account_id,
+                        'debit' => $line->debit,
+                        'credit' => $line->credit,
+                    ])->all();
+
+                    $this->assertLinesUseActiveAccounts($lines, $entry->entry_date->format('Y-m-d'));
+                    $this->assertGroupAccountLinesReduceBalance($lines);
 
                     $entry->update([
                         'status' => 'posted',
