@@ -46,6 +46,30 @@ test('header grand_total equals subtotal minus discount plus tax on fractional l
     expect((float) $header['grand_total'])->toBe($balanced);
 });
 
+test('header without tax puts the cent balancing difference on discount, not tax', function () {
+    $header = headerTotalsHelper()->header([
+        ['quantity' => 1, 'unit_price' => 0.284, 'discount_percent' => 2.5, 'tax_percent' => 0],
+        ['quantity' => 5, 'unit_price' => 0.988, 'discount_percent' => 7.5, 'tax_percent' => 0],
+    ]);
+
+    expect((float) $header['tax_amount'])->toBe(0.0);
+    expect((float) $header['discount_amount'])->toBeGreaterThanOrEqual(0.0);
+    expect(round(
+        (float) $header['subtotal'] - (float) $header['discount_amount'] + (float) $header['tax_amount'],
+        2,
+    ))->toBe((float) $header['grand_total']);
+});
+
+test('header without tax or discount keeps subtotal equal to grand total', function () {
+    $header = headerTotalsHelper()->header([
+        ['quantity' => 3, 'unit_price' => 0.333, 'discount_percent' => 0, 'tax_percent' => 0],
+    ]);
+
+    expect((float) $header['tax_amount'])->toBe(0.0);
+    expect((float) $header['discount_amount'])->toBe(0.0);
+    expect((float) $header['grand_total'])->toBe((float) $header['subtotal']);
+});
+
 test('header grand_total equals subtotal minus discount plus tax for a second fractional case', function () {
     $header = headerTotalsHelper()->header([
         ['quantity' => 8, 'unit_price' => 0.732, 'discount_percent' => 7.5, 'tax_percent' => 5.5],

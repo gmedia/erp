@@ -146,6 +146,76 @@ test('general ledger without start_date carries prior-year balance for balance s
         ->assertJsonPath('data.0.running_balance', -500);
 });
 
+test('general ledger with start_date keeps prior-year balance for balance sheet accounts', function () {
+    $prevYear = FiscalYear::factory()->create([
+        'status' => 'closed',
+        'start_date' => '2025-01-01',
+        'end_date' => '2025-12-31',
+    ]);
+    $fiscalYear = FiscalYear::factory()->create([
+        'status' => 'open',
+        'start_date' => '2026-01-01',
+        'end_date' => '2026-12-31',
+    ]);
+    $cash = Account::factory()->create(['code' => '1010', 'name' => 'Cash', 'type' => 'asset']);
+
+    $prevEntry = JournalEntry::factory()->create([
+        'fiscal_year_id' => $prevYear->id,
+        'entry_date' => '2025-06-01',
+        'status' => 'posted',
+    ]);
+    JournalEntryLine::factory()->create([
+        'journal_entry_id' => $prevEntry->id,
+        'account_id' => $cash->id,
+        'debit' => 1000,
+        'credit' => 0,
+    ]);
+
+    $janEntry = JournalEntry::factory()->create([
+        'fiscal_year_id' => $fiscalYear->id,
+        'entry_date' => '2026-01-10',
+        'status' => 'posted',
+    ]);
+    JournalEntryLine::factory()->create([
+        'journal_entry_id' => $janEntry->id,
+        'account_id' => $cash->id,
+        'debit' => 200,
+        'credit' => 0,
+    ]);
+
+    $febEntry = JournalEntry::factory()->create([
+        'fiscal_year_id' => $fiscalYear->id,
+        'entry_date' => '2026-02-15',
+        'status' => 'posted',
+    ]);
+    JournalEntryLine::factory()->create([
+        'journal_entry_id' => $febEntry->id,
+        'account_id' => $cash->id,
+        'debit' => 500,
+        'credit' => 0,
+    ]);
+
+    // Mulai 1 Februari: saldo awal = saldo tahun lalu (1000) + jurnal 10 Januari (200) = 1200.
+    getJson('/api/reports/general-ledger?' . http_build_query([
+        'fiscal_year_id' => $fiscalYear->id,
+        'account_id' => $cash->id,
+        'start_date' => '2026-02-01',
+        'end_date' => '2026-02-28',
+    ]))->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.running_balance', 1700);
+
+    // Mulai 1 Januari: saldo awal = saldo tahun lalu (1000), lalu jurnal Januari dan Februari.
+    getJson('/api/reports/general-ledger?' . http_build_query([
+        'fiscal_year_id' => $fiscalYear->id,
+        'account_id' => $cash->id,
+        'start_date' => '2026-01-01',
+        'end_date' => '2026-12-31',
+    ]))->assertOk()
+        ->assertJsonPath('data.0.running_balance', 1200)
+        ->assertJsonPath('data.1.running_balance', 1700);
+});
+
 test('general ledger export starts running balance from the opening balance', function () {
     ['fiscalYear' => $fiscalYear, 'account' => $account] = createGeneralLedgerOpeningFixture();
 

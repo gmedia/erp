@@ -107,12 +107,12 @@ export function AccountMappingForm({
     }, [open, targetCoaVersionId, form]);
 
     const sourceAccountsUrl = sourceCoaVersionId
-        ? `/api/accounts?coa_version_id=${encodeURIComponent(sourceCoaVersionId)}`
-        : '/api/accounts';
+        ? `/api/accounts?coa_version_id=${encodeURIComponent(sourceCoaVersionId)}&has_children=0`
+        : '/api/accounts?has_children=0';
 
     const targetAccountsUrl = targetCoaVersionId
-        ? `/api/accounts?coa_version_id=${encodeURIComponent(targetCoaVersionId)}`
-        : '/api/accounts';
+        ? `/api/accounts?coa_version_id=${encodeURIComponent(targetCoaVersionId)}&has_children=0`
+        : '/api/accounts?has_children=0';
 
     return (
         <EntityForm<AccountMappingFormData>

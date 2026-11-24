@@ -60,8 +60,9 @@ trait CalculatesTransactionLineTotals
 
     /**
      * Header harus seimbang: grand_total = subtotal - diskon + pajak.
-     * Selisih sen akibat pembulatan per komponen dibebankan ke pajak
-     * sebagai penyeimbang, supaya tampilan dan jurnal tidak berselisih.
+     * Selisih sen akibat pembulatan per komponen dibebankan sebagai penyeimbang:
+     * ke pajak bila dokumen berpajak; bila pajak mentah 0, ke diskon; bila keduanya 0,
+     * subtotal disamakan dengan grand total. Pajak dan diskon tidak boleh negatif.
      *
      * @param  array<int, array<string, mixed>>  $normalizedItems
      * @return array<string, string>
@@ -73,7 +74,17 @@ trait CalculatesTransactionLineTotals
         $tax = $this->calculateTaxAmount($normalizedItems);
         $grandTotal = $this->calculateGrandTotal($normalizedItems);
 
-        $tax = $this->roundLineAmount($grandTotal - $subtotal + $discount);
+        $balance = $this->roundLineAmount($grandTotal - $subtotal + $discount - $tax);
+
+        if ($balance !== 0.0) {
+            if ($tax > 0.0) {
+                $tax = $this->roundLineAmount($tax + $balance);
+            } elseif ($discount > 0.0 && $discount - $balance >= 0.0) {
+                $discount = $this->roundLineAmount($discount - $balance);
+            } else {
+                $subtotal = $grandTotal;
+            }
+        }
 
         return [
             'subtotal' => (string) $subtotal,

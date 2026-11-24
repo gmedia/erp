@@ -66,10 +66,10 @@ class GetGeneralLedgerReportAction
     }
 
     /**
-     * Saldo awal = akumulasi debit-kredit jurnal posted sebelum start_date
-     * (akun dan tahun fiskal yang sama). Tanpa start_date tetapi dengan tahun fiskal,
-     * akun neraca membawa saldo tahun sebelumnya (konsisten dengan trial balance);
-     * akun laba rugi mulai dari 0.
+     * Saldo awal = akumulasi debit-kredit jurnal posted sebelum start_date.
+     * Rumus sama dengan trial balance: jurnal tahun fiskal yang dipilih, plus
+     * untuk akun neraca (bukan revenue/expense) jurnal tahun sebelumnya.
+     * Akun laba rugi hanya menghitung tahun berjalan.
      */
     private function openingBalance(array $filters): float
     {
@@ -77,14 +77,20 @@ class GetGeneralLedgerReportAction
             return $this->carryForwardBalance($filters);
         }
 
+        $fiscalYearId = $filters['fiscal_year_id'] ?? null;
+        $accountType = Account::query()->whereKey($filters['account_id'])->value('type');
+        $isPnl = in_array($accountType, ['revenue', 'expense'], true);
+
         $sum = JournalEntryLine::query()
             ->where('account_id', $filters['account_id'])
-            ->whereHas('journalEntry', function (Builder $query) use ($filters): void {
+            ->whereHas('journalEntry', function (Builder $query) use ($filters, $fiscalYearId, $isPnl): void {
                 $query->where('status', 'posted')
                     ->where('entry_date', '<', $filters['start_date']);
 
-                if (! empty($filters['fiscal_year_id'])) {
-                    $query->where('fiscal_year_id', $filters['fiscal_year_id']);
+                // Neraca: semua jurnal sebelum start_date (termasuk tahun sebelumnya).
+                // Laba rugi: hanya jurnal tahun fiskal yang dipilih.
+                if (! empty($fiscalYearId) && $isPnl) {
+                    $query->where('fiscal_year_id', $fiscalYearId);
                 }
 
                 if (! empty($filters['journal_type'])) {
@@ -98,7 +104,7 @@ class GetGeneralLedgerReportAction
     }
 
     /**
-     * Saldo tahun sebelumnya untuk akun neraca (bukan revenue/expense) bila tanpa start_date.
+     * Tanpa start_date: akun neraca membawa saldo jurnal sebelum awal tahun fiskal.
      */
     private function carryForwardBalance(array $filters): float
     {

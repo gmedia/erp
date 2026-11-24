@@ -114,6 +114,29 @@ describe('Account Mapping API Endpoints', function () {
             ->assertJsonValidationErrors(['target_account_id']);
     });
 
+    test('store fails when target account is a group account with children', function () {
+        $group = Account::factory()->create([
+            'coa_version_id' => $this->targetVersion->id,
+            'code' => '11000',
+            'name' => 'Current Assets',
+        ]);
+        Account::factory()->create([
+            'coa_version_id' => $this->targetVersion->id,
+            'parent_id' => $group->id,
+            'code' => '11101',
+            'name' => 'Cash On Hand',
+        ]);
+
+        $response = postJson('/api/account-mappings', [
+            'source_account_id' => $this->sourceAccount->id,
+            'target_account_id' => $group->id,
+            'type' => 'rename',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['target_account_id']);
+    });
+
     test('update modifies mapping', function () {
         $mapping = AccountMapping::create([
             'source_account_id' => $this->sourceAccount->id,
