@@ -18,7 +18,7 @@ test.describe('Employee Import E2E Tests', () => {
             `EMP-${timestamp.toString().slice(-5)}`,
             `Imported User ${timestamp}`,
             uniqueEmail,
-            '0812345678,Engineering,Senior Developer,Kantor Pusat,8000000,2024-01-01,regular',
+            '0812345678,Teknik,Pengembang Senior,Kantor Pusat,8000000,2024-01-01,regular',
         ].join(',');
         const csvContent = `${header}\n${row}`;
 
@@ -109,7 +109,7 @@ test.describe('Employee Import E2E Tests', () => {
             'employee_id,name,email,phone,department,position,branch,salary,hire_date,employment_status';
         const row = [
             'EMP-INV,Invalid User,',
-            '0812345678,Engineering,Senior Developer,Kantor Pusat,8000000,2024-01-01,regular',
+            '0812345678,Teknik,Pengembang Senior,Kantor Pusat,8000000,2024-01-01,regular',
         ].join(',');
         const csvContent = `${header}\n${row}`;
 
