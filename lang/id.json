@@ -252,6 +252,7 @@
     "supplier_return.goods_receipt_mismatch": "Goods receipt harus milik purchase order tersebut.",
     "supplier_return.gr_item_mismatch": "Item GR harus milik goods receipt yang dipilih.",
     "goods_receipt.po_item_mismatch": "Item PO harus milik purchase order yang dipilih.",
+    "goods_receipt.po_not_approved": "GR hanya bisa dikonfirmasi bila purchase order sudah dikonfirmasi atau diterima sebagian.",
     "ap_payment.bill_supplier_mismatch": "Supplier Bill tidak milik supplier yang dipilih.",
     "ap_payment.allocation_exceeds_bill": "Alokasi melebihi sisa tagihan. Maksimum: :max",
     "ar_receipt.allocation_exceeds_invoice": "Alokasi melebihi sisa invoice. Maksimum: :max",

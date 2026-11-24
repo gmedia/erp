@@ -58,7 +58,7 @@ function makeGrPostOnCreateFixture(): array
         'is_active' => true,
     ]);
 
-    $purchaseOrder = PurchaseOrder::factory()->create();
+    $purchaseOrder = PurchaseOrder::factory()->create(['status' => 'confirmed']);
     /** @var PurchaseOrderItem $purchaseOrderItem */
     $purchaseOrderItem = $purchaseOrder->items()->create([
         'product_id' => Product::factory()->create()->id,

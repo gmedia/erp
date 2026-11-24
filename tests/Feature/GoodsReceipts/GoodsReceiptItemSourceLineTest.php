@@ -27,7 +27,7 @@ beforeEach(function () {
 
 function purchaseOrderWithLine(): array
 {
-    $purchaseOrder = PurchaseOrder::factory()->create();
+    $purchaseOrder = PurchaseOrder::factory()->create(['status' => 'confirmed']);
     $line = $purchaseOrder->items()->create([
         'product_id' => Product::factory()->create()->id,
         'unit_id' => Unit::factory()->create()->id,
