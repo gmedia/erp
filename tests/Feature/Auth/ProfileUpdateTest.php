@@ -13,7 +13,7 @@ test('profile update requires authentication', function () {
         ->assertUnauthorized();
 });
 
-test('authenticated user can update own name and email', function () {
+test('authenticated user can update own name', function () {
     $user = User::factory()->create([
         'name' => 'Nama Lama',
         'email' => 'lama@example.com',
@@ -21,21 +21,62 @@ test('authenticated user can update own name and email', function () {
     ]);
     Sanctum::actingAs($user, ['*']);
 
-    $this->patchJson('/api/profile', [
-        'name' => 'Budi Santoso',
-        'email' => 'Baru@Example.com',
-    ])
+    $this->patchJson('/api/profile', ['name' => 'Budi Santoso'])
         ->assertOk()
+        ->assertJsonPath('message', 'Profile updated successfully.')
         ->assertJsonPath('user.name', 'Budi Santoso')
-        ->assertJsonPath('user.email', 'baru@example.com');
+        ->assertJsonPath('user.email', 'lama@example.com');
 
     $user->refresh();
     expect($user->name)->toBe('Budi Santoso')
-        ->and($user->email)->toBe('baru@example.com')
-        ->and($user->email_verified_at)->toBeNull();
+        ->and($user->email)->toBe('lama@example.com');
 });
 
-test('keeping the same email does not reset verification', function () {
+test('profile update requires a name', function () {
+    $user = User::factory()->create();
+    Sanctum::actingAs($user, ['*']);
+
+    $this->patchJson('/api/profile', ['name' => ''])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['name'])
+        ->assertJsonPath('errors.name.0', 'The name field is required.');
+});
+
+test('profile update ignores email and keeps verification', function () {
+    $verifiedAt = now()->subDay()->startOfSecond();
+    $user = User::factory()->create([
+        'email' => 'milikku@example.com',
+        'email_verified_at' => $verifiedAt,
+    ]);
+    Sanctum::actingAs($user, ['*']);
+
+    $this->patchJson('/api/profile', [
+        'name' => 'Nama Baru',
+        'email' => 'orang-lain@example.com',
+    ])
+        ->assertOk()
+        ->assertJsonPath('user.email', 'milikku@example.com');
+
+    $user->refresh();
+    expect($user->name)->toBe('Nama Baru')
+        ->and($user->email)->toBe('milikku@example.com')
+        ->and($user->email_verified_at?->equalTo($verifiedAt))->toBeTrue();
+});
+
+test('profile update does not accept an email already used by another user', function () {
+    User::factory()->create(['email' => 'terpakai@example.com']);
+    $user = User::factory()->create(['email' => 'milikku@example.com']);
+    Sanctum::actingAs($user, ['*']);
+
+    $this->patchJson('/api/profile', [
+        'name' => $user->name,
+        'email' => 'terpakai@example.com',
+    ])->assertOk();
+
+    expect($user->refresh()->email)->toBe('milikku@example.com');
+});
+
+test('uppercase own email does not change email or verification', function () {
     $verifiedAt = now()->subDay()->startOfSecond();
     $user = User::factory()->create([
         'email' => 'sama@example.com',
@@ -45,23 +86,14 @@ test('keeping the same email does not reset verification', function () {
 
     $this->patchJson('/api/profile', [
         'name' => 'Nama Baru',
-        'email' => 'sama@example.com',
-    ])->assertOk();
-
-    expect($user->refresh()->email_verified_at?->equalTo($verifiedAt))->toBeTrue();
-});
-
-test('profile update rejects an email used by another user', function () {
-    User::factory()->create(['email' => 'terpakai@example.com']);
-    $user = User::factory()->create(['email' => 'milikku@example.com']);
-    Sanctum::actingAs($user, ['*']);
-
-    $this->patchJson('/api/profile', [
-        'name' => $user->name,
-        'email' => 'terpakai@example.com',
+        'email' => 'SAMA@Example.com',
     ])
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors(['email']);
+        ->assertOk()
+        ->assertJsonPath('user.email', 'sama@example.com');
+
+    $user->refresh();
+    expect($user->email)->toBe('sama@example.com')
+        ->and($user->email_verified_at?->equalTo($verifiedAt))->toBeTrue();
 });
 
 test('profile update ignores sensitive fields', function () {
@@ -104,5 +136,6 @@ test('profile update keeps social accounts linked', function () {
         'email' => 'sso-baru@example.com',
     ])->assertOk();
 
-    expect($user->socialAccounts()->where('provider_account_id', 'gid-123')->exists())->toBeTrue();
+    expect($user->refresh()->email)->toBe('sso@example.com')
+        ->and($user->socialAccounts()->where('provider_account_id', 'gid-123')->exists())->toBeTrue();
 });

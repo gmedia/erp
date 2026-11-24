@@ -1,4 +1,5 @@
 import { useAuth } from '@/contexts/auth-context';
+import { useTranslation } from '@/contexts/i18n-context';
 import axios from '@/lib/axios';
 import {
     enablePushNotifications,
@@ -20,7 +21,6 @@ import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { type BreadcrumbItem } from '@/types';
-import { useSearchParams } from 'react-router-dom';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -29,21 +29,23 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Profile({
-    mustVerifyEmail = true,
-    status,
-}: Readonly<{
-    mustVerifyEmail?: boolean;
-    status?: string;
-}>) {
+// useTranslation requires AppI18nProvider, which wraps AppLayout. Keep every
+// translated piece inside ProfileContent so it renders within that provider.
+export default function Profile() {
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <ProfileContent />
+        </AppLayout>
+    );
+}
+
+function ProfileContent() {
+    const { t } = useTranslation();
     const { user, refreshAuth } = useAuth();
-    const [searchParams] = useSearchParams();
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [pushBusy, setPushBusy] = useState(false);
-    const verificationStatus =
-        status ?? searchParams.get('status') ?? undefined;
 
     const handleSubmit = async (
         e: Readonly<React.SubmitEvent<HTMLFormElement>>,
@@ -54,22 +56,21 @@ export default function Profile({
         setRecentlySuccessful(false);
 
         const formData = new FormData(e.currentTarget);
-        const data = Object.fromEntries(formData.entries());
+        // Only the name is editable; email is read-only and managed by an admin.
+        const data = { name: String(formData.get('name') ?? '') };
 
         try {
             await axios.patch('/api/profile', data);
             setRecentlySuccessful(true);
-            toast.success('Profile updated successfully');
-            // Refresh user data by calling me endpoint
-            // Refresh user data
+            toast.success(t('profile.update_success'));
             await refreshAuth();
             setTimeout(() => setRecentlySuccessful(false), 3000);
         } catch (error: unknown) {
             if (isAxiosError(error) && error.response?.status === 422) {
                 setErrors(error.response.data.errors || {});
-                toast.error('Please check the form for errors');
+                toast.error(t('profile.update_validation_error'));
             } else {
-                toast.error('Failed to update profile');
+                toast.error(t('profile.update_failed'));
             }
         } finally {
             setProcessing(false);
@@ -77,7 +78,7 @@ export default function Profile({
     };
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <>
             <Helmet>
                 <title>
                     Profile settings - {import.meta.env.VITE_APP_NAME || 'ERP'}
@@ -86,22 +87,23 @@ export default function Profile({
 
             <SettingsLayout>
                 <SettingsSection
-                    title="Profile information"
-                    description="Update your name and email address"
+                    title={t('profile.title')}
+                    description={t('profile.description')}
                     actions={
                         <SettingsSaveButton
                             formId="profile-form"
                             processing={processing}
                             recentlySuccessful={recentlySuccessful}
                             dataTest="update-profile-button"
+                            label={t('common.save')}
                         />
                     }
                 >
                     <form id="profile-form" onSubmit={handleSubmit}>
                         <SettingsRow
-                            label="Name"
+                            label={t('profile.name_label')}
                             htmlFor="name"
-                            description="Shown across the app and in approvals."
+                            description={t('profile.name_description')}
                             error={errors.name}
                         >
                             <Input
@@ -110,69 +112,33 @@ export default function Profile({
                                 name="name"
                                 required
                                 autoComplete="name"
-                                placeholder="Full name"
+                                placeholder={t('profile.name_placeholder')}
                             />
                         </SettingsRow>
 
                         <SettingsRow
-                            label="Email address"
+                            label={t('profile.email_label')}
                             htmlFor="email"
-                            description="Used to sign in and receive notifications."
-                            error={errors.email}
+                            description={t('profile.email_description')}
                         >
                             <Input
                                 id="email"
                                 type="email"
-                                defaultValue={user?.email ?? ''}
+                                value={user?.email ?? ''}
                                 name="email"
-                                required
+                                readOnly
+                                disabled
                                 autoComplete="username"
-                                placeholder="Email address"
                             />
                         </SettingsRow>
-
-                        {mustVerifyEmail &&
-                            user?.email_verified_at === null && (
-                                <div>
-                                    <p className="text-sm text-muted-foreground">
-                                        Your email address is unverified.{' '}
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                axios
-                                                    .post(
-                                                        '/email/verification-notification',
-                                                    )
-                                                    .then(() =>
-                                                        toast.success(
-                                                            'Verification link sent',
-                                                        ),
-                                                    )
-                                            }
-                                            className="text-foreground underline decoration-muted-foreground/40 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current!"
-                                        >
-                                            Click here to resend the
-                                            verification email.
-                                        </button>
-                                    </p>
-
-                                    {verificationStatus ===
-                                        'verification-link-sent' && (
-                                        <div className="mt-2 text-sm font-medium text-success">
-                                            A new verification link has been
-                                            sent to your email address.
-                                        </div>
-                                    )}
-                                </div>
-                            )}
                     </form>
                 </SettingsSection>
 
                 {isPushSupported() && (
                     <div className="space-y-6">
                         <HeadingSmall
-                            title="Notifications"
-                            description="Enable push notifications on this device."
+                            title={t('profile.notifications_title')}
+                            description={t('profile.notifications_description')}
                         />
                         <Button
                             type="button"
@@ -187,12 +153,12 @@ export default function Profile({
 
                                     if (result === 'denied') {
                                         toast.error(
-                                            'Notification permission denied.',
+                                            t('profile.notifications_denied'),
                                         );
                                     }
                                 } catch {
                                     toast.error(
-                                        'Failed to enable notifications.',
+                                        t('profile.notifications_failed'),
                                     );
                                 } finally {
                                     setPushBusy(false);
@@ -200,12 +166,12 @@ export default function Profile({
                             }}
                         >
                             {pushBusy
-                                ? 'Enabling notifications...'
-                                : 'Enable notifications'}
+                                ? t('profile.notifications_enabling')
+                                : t('profile.notifications_enable')}
                         </Button>
                     </div>
                 )}
             </SettingsLayout>
-        </AppLayout>
+        </>
     );
 }

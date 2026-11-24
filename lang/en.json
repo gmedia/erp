@@ -247,5 +247,27 @@
     "stock_transfer.cancelled_final": "A cancelled transfer cannot change status.",
     "stock_transfer.items_locked": "Items and dispatched quantities cannot change after dispatch; only the received quantity can change.",
     "stock_transfer.qty_received_exceeds": "Received quantity cannot exceed the transferred quantity.",
-    "admin_settings.logo_upload_failed": "The logo could not be saved. No settings were changed. Please try again."
+    "admin_settings.logo_upload_failed": "The logo could not be saved. No settings were changed. Please try again.",
+    "profile.updated": "Profile updated successfully.",
+    "profile.name_required": "The name field is required.",
+    "profile.name_string": "The name must be text.",
+    "profile.name_max": "The name may not be greater than 255 characters.",
+    "profile": {
+        "title": "Profile information",
+        "description": "Update your name. Your email address is managed by an administrator.",
+        "name_label": "Name",
+        "name_description": "Shown across the app and in approvals.",
+        "name_placeholder": "Full name",
+        "email_label": "Email address",
+        "email_description": "Read-only. To change your email, ask an administrator to update it in the Users menu.",
+        "update_success": "Profile updated successfully",
+        "update_validation_error": "Please check the form for errors",
+        "update_failed": "Failed to update profile",
+        "notifications_title": "Notifications",
+        "notifications_description": "Enable push notifications on this device.",
+        "notifications_enable": "Enable notifications",
+        "notifications_enabling": "Enabling notifications...",
+        "notifications_denied": "Notification permission denied.",
+        "notifications_failed": "Failed to enable notifications."
+    }
 }

@@ -9,32 +9,21 @@ use Illuminate\Http\JsonResponse;
 class ProfileController extends Controller
 {
     /**
-     * Update the authenticated user's own name and email.
+     * Update the authenticated user's own name.
      *
-     * Only name and email are accepted. Password, roles, and other attributes
-     * are never mass-assigned here. Social accounts are keyed by provider id,
-     * so changing the email does not unlink them. A changed email must be
-     * verified again.
+     * Only the name is accepted. Email is read-only for self-service and is
+     * changed by an administrator, so any email sent here is ignored and
+     * email_verified_at is never touched. Password, roles, and other
+     * attributes are never mass-assigned here.
      */
     public function update(UpdateProfileRequest $request): JsonResponse
     {
         $user = $request->user();
-        $validated = $request->validated();
-        $email = strtolower((string) $validated['email']);
-
-        $emailChanged = $email !== $user->email;
-
-        $user->name = $validated['name'];
-        $user->email = $email;
-
-        if ($emailChanged) {
-            $user->email_verified_at = null;
-        }
-
+        $user->name = $request->validated('name');
         $user->save();
 
         return response()->json([
-            'message' => 'Profile updated successfully.',
+            'message' => __('profile.updated'),
             'user' => $user->fresh(),
         ]);
     }

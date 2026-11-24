@@ -4,10 +4,10 @@ namespace App\Http\Requests\Auth;
 
 use App\Http\Requests\AuthorizedFormRequest;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Validation\Rule;
 
 /**
- * Validates the self-service profile update (name and email only).
+ * Validates the self-service profile update. Only the name is editable;
+ * email is read-only here and changed by an administrator in the Users menu.
  */
 class UpdateProfileRequest extends AuthorizedFormRequest
 {
@@ -20,13 +20,6 @@ class UpdateProfileRequest extends AuthorizedFormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => [
-                'required',
-                'string',
-                'email',
-                'max:255',
-                Rule::unique('users', 'email')->ignore($this->user()?->id),
-            ],
         ];
     }
 
@@ -38,10 +31,9 @@ class UpdateProfileRequest extends AuthorizedFormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'The name field is required.',
-            'email.required' => 'The email field is required.',
-            'email.email' => 'The email field must be a valid email address.',
-            'email.unique' => 'The email has already been taken.',
+            'name.required' => __('profile.name_required'),
+            'name.string' => __('profile.name_string'),
+            'name.max' => __('profile.name_max'),
         ];
     }
 }
