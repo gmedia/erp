@@ -609,10 +609,27 @@ async function runOrderToCash(page: Page): Promise<O2cRun> {
 test.describe('Order-to-cash: invoice sampai pelunasan', () => {
     test.setTimeout(300000);
 
-    test('invoice -> receipt sebagian -> credit note -> pelunasan mengosongkan piutang', async ({
-        page,
-    }) => {
-        const run = await runOrderToCash(page);
+    let sharedRun: O2cRun | undefined;
+
+    test.beforeAll(async ({ browser }) => {
+        const context = await browser.newContext();
+        try {
+            sharedRun = await runOrderToCash(await context.newPage());
+        } finally {
+            await context.close();
+        }
+    });
+
+    const readSharedRun = (): O2cRun => {
+        if (!sharedRun) {
+            throw new Error('order-to-cash run was not prepared in beforeAll');
+        }
+
+        return sharedRun;
+    };
+
+    test('invoice -> receipt sebagian -> credit note -> pelunasan mengosongkan piutang', async () => {
+        const run = readSharedRun();
 
         expect(run.settled.amount_received).toBeCloseTo(
             INVOICE_TOTAL - CREDIT_NOTE_AMOUNT,
@@ -626,10 +643,8 @@ test.describe('Order-to-cash: invoice sampai pelunasan', () => {
         expect(run.settled.status).toBe('paid');
     });
 
-    test('jurnal invoice posted: Dr AR 11200 / Cr Pendapatan 41000 sebesar total', async ({
-        page,
-    }) => {
-        const run = await runOrderToCash(page);
+    test('jurnal invoice posted: Dr AR 11200 / Cr Pendapatan 41000 sebesar total', async () => {
+        const run = readSharedRun();
 
         expect(run.invoiceJournal.status).toBe('posted');
         expect(netForAccount(run.invoiceJournal, run.arAccountId)).toBeCloseTo(
@@ -641,10 +656,8 @@ test.describe('Order-to-cash: invoice sampai pelunasan', () => {
         ).toBeCloseTo(-INVOICE_TOTAL, 2);
     });
 
-    test('invoice dikirim menaikkan pendapatan 41000 sebesar total invoice', async ({
-        page,
-    }) => {
-        const run = await runOrderToCash(page);
+    test('invoice dikirim menaikkan pendapatan 41000 sebesar total invoice', async () => {
+        const run = readSharedRun();
 
         expect(run.revenueAfterInvoice - run.revenueBefore).toBeCloseTo(
             INVOICE_TOTAL,
@@ -652,10 +665,8 @@ test.describe('Order-to-cash: invoice sampai pelunasan', () => {
         );
     });
 
-    test('jurnal receipt posted: Dr kas / Cr AR 11200 sebesar pembayaran sebagian', async ({
-        page,
-    }) => {
-        const run = await runOrderToCash(page);
+    test('jurnal receipt posted: Dr kas / Cr AR 11200 sebesar pembayaran sebagian', async () => {
+        const run = readSharedRun();
 
         expect(run.receiptJournal.status).toBe('posted');
         expect(
@@ -749,7 +760,8 @@ test.describe('Order-to-cash: invoice sampai pelunasan', () => {
     test('jurnal credit note posted: Dr pendapatan 41000 / Cr AR 11200 sebesar CN', async ({
         page,
     }) => {
-        const run = await runOrderToCash(page);
+        const run = readSharedRun();
+        await login(page, undefined, undefined, { requireDashboard: false });
         const creditNoteJournal = await readJournalByReference(
             page,
             run.creditNoteNumber,
