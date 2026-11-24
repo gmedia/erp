@@ -441,7 +441,7 @@ describe('Issue #372 — langkah 2: jalur HTTP edit dan batal memakai tanggal ya
         ]);
         app(StockPostingService::class)->postStockTransferDispatch($transfer->refresh());
 
-        deleteJson('/api/stock-transfers/'.$transfer->id)->assertNoContent();
+        deleteJson('/api/stock-transfers/' . $transfer->id)->assertNoContent();
 
         $reversal = StockMovement::query()
             ->where('movement_type', 'transfer_out_reversal')
