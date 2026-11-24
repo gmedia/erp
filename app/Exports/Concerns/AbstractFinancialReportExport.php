@@ -5,10 +5,13 @@ namespace App\Exports\Concerns;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
-abstract class AbstractFinancialReportExport implements FromCollection, ShouldAutoSize, WithHeadings
+abstract class AbstractFinancialReportExport implements FromCollection, ShouldAutoSize, WithCustomValueBinder, WithHeadings
 {
+    use WritesTextCells;
+
     public function __construct(
         protected array $filters,
     ) {}
@@ -32,7 +35,7 @@ abstract class AbstractFinancialReportExport implements FromCollection, ShouldAu
             $rows[] = [
                 $section,
                 $node['code'] ?? '',
-                str_repeat('    ', $depth) . ($node['name'] ?? ''),
+                str_repeat('    ', $depth).($node['name'] ?? ''),
                 $node['level'] ?? $depth,
                 $node['balance'] ?? 0,
                 $node['comparison_balance'] ?? 0,

@@ -3,16 +3,19 @@
 namespace App\Exports;
 
 use App\Exports\Concerns\InteractsWithExportFilters;
+use App\Exports\Concerns\WritesTextCells;
 use App\Models\Account;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 
-class AccountExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+class AccountExport implements FromCollection, ShouldAutoSize, WithCustomValueBinder, WithHeadings, WithMapping, WithStyles
 {
     use InteractsWithExportFilters;
+    use WritesTextCells;
 
     protected array $filters;
 
