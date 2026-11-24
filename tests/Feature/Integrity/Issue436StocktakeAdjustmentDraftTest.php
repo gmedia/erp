@@ -10,6 +10,7 @@ use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 
+use function Pest\Laravel\getJson;
 use function Pest\Laravel\putJson;
 
 /**
@@ -107,6 +108,20 @@ test('penyelesaian stocktake yang diulang tidak membuat draft penyesuaian kedua'
     issue436CompleteStocktake($stocktake);
 
     expect(StockAdjustment::where('inventory_stocktake_id', $stocktake->id)->count())->toBe(1);
+});
+
+test('detail stocktake menampilkan nomor draft penyesuaian yang dibuatnya', function () {
+    $stocktake = issue436OpenStocktake();
+    issue436CompleteStocktake($stocktake);
+
+    $draft = StockAdjustment::where('inventory_stocktake_id', $stocktake->id)->firstOrFail();
+    $draft->update(['adjustment_number' => 'SA-2026-000001']);
+
+    getJson('/api/inventory-stocktakes/' . $stocktake->id)
+        ->assertOk()
+        ->assertJsonPath('data.stock_adjustment_draft.id', $draft->id)
+        ->assertJsonPath('data.stock_adjustment_draft.adjustment_number', 'SA-2026-000001')
+        ->assertJsonPath('data.stock_adjustment_draft.status', 'draft');
 });
 
 test('stocktake tanpa selisih tidak membuat draft penyesuaian', function () {

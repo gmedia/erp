@@ -23,7 +23,9 @@
         "error": "Kesalahan",
         "warning": "Peringatan",
         "fill_details": "Silakan isi detail di bawah ini.",
-        "view_details": "Berikut adalah detail untuk item ini."
+        "view_details": "Berikut adalah detail untuk item ini.",
+        "stocktake_adjustment_draft": "Draf Penyesuaian Stok",
+        "stocktake_adjustment_none": "-"
     },
     "permissions": {
         "empty_title": "Belum ada karyawan dipilih",

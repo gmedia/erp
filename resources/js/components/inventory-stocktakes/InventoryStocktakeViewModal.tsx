@@ -12,6 +12,7 @@ import {
 import { useViewModalDetail } from '@/hooks/useViewModalDetail';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 import { useTranslation } from '@/contexts/i18n-context';
 import { type InventoryStocktake } from '@/types/inventory-stocktake';
@@ -73,6 +74,24 @@ export const InventoryStocktakeViewModal = React.memo(
                             <ViewField
                                 label="Notes"
                                 value={current.notes || '-'}
+                            />
+                            <ViewField
+                                label={t('common.stocktake_adjustment_draft')}
+                                value={
+                                    current.stock_adjustment_draft ? (
+                                        <Link
+                                            to="/stock-adjustments"
+                                            className="text-primary underline-offset-4 hover:underline"
+                                        >
+                                            {current.stock_adjustment_draft
+                                                .adjustment_number ||
+                                                current.stock_adjustment_draft
+                                                    .id}
+                                        </Link>
+                                    ) : (
+                                        t('common.stocktake_adjustment_none')
+                                    )
+                                }
                             />
                         </div>
 

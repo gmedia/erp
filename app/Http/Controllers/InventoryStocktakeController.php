@@ -76,6 +76,7 @@ class InventoryStocktakeController extends Controller
             'items.product',
             'items.unit',
             'items.countedBy',
+            'stockAdjustments',
         ]);
 
         return (new InventoryStocktakeResource($inventoryStocktake))->response();
@@ -116,7 +117,14 @@ class InventoryStocktakeController extends Controller
             : null,
         );
 
-        $inventoryStocktake->load(['warehouse', 'productCategory', 'items.product', 'items.unit', 'items.countedBy']);
+        $inventoryStocktake->load([
+            'warehouse',
+            'productCategory',
+            'items.product',
+            'items.unit',
+            'items.countedBy',
+            'stockAdjustments',
+        ]);
 
         return (new InventoryStocktakeResource($inventoryStocktake))->response();
     }

@@ -38,6 +38,7 @@ class InventoryStocktakeResource extends JsonResource
                 'name' => $this->resource->completedBy->name,
             ] : null,
             'completed_at' => $this->resource->completed_at?->toIso8601String(),
+            'stock_adjustment_draft' => $this->stockAdjustmentDraft(),
             'items' => $this->resource->relationLoaded('items')
                 ? $this->resource->items->map(fn ($item) => [
                     'id' => $item->id,
@@ -65,6 +66,26 @@ class InventoryStocktakeResource extends JsonResource
                 : [],
             'created_at' => $this->resource->created_at?->toIso8601String(),
             'updated_at' => $this->resource->updated_at?->toIso8601String(),
+        ];
+    }
+
+    /**
+     * Draft penyesuaian hasil stocktake (Issue #436). Hanya dibaca bila relasi sudah dimuat.
+     *
+     * @return array{id: int, adjustment_number: string|null, status: string}|null
+     */
+    private function stockAdjustmentDraft(): ?array
+    {
+        if (! $this->resource->relationLoaded('stockAdjustments')) {
+            return null;
+        }
+
+        $draft = $this->resource->stockAdjustments->first();
+
+        return $draft === null ? null : [
+            'id' => $draft->id,
+            'adjustment_number' => $draft->adjustment_number,
+            'status' => $draft->status,
         ];
     }
 }
