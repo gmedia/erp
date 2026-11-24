@@ -93,8 +93,15 @@ test('it reports cash debit as inflow and credit as outflow', function () {
  *
  * @param  array<int, array{account: Account, debit: float, credit: float}>  $counterLines
  */
-function postCashFlowJournal(FiscalYear $fiscalYear, CoaVersion $coaVersion, Account $cashAccount, float $cashDebit, float $cashCredit, array $counterLines, string $status = 'posted'): JournalEntry
-{
+function postCashFlowJournal(
+    FiscalYear $fiscalYear,
+    CoaVersion $coaVersion,
+    Account $cashAccount,
+    float $cashDebit,
+    float $cashCredit,
+    array $counterLines,
+    string $status = 'posted',
+): JournalEntry {
     $journal = JournalEntry::factory()->create([
         'fiscal_year_id' => $fiscalYear->id,
         'status' => $status,
@@ -219,7 +226,7 @@ test('it excludes transfers between cash accounts from cash flow activities', fu
         ->and((float) $sections['net_change']['value'])->toBe(0.0);
 });
 
-test('it splits a mixed journal proportionally across counter accounts and keeps totals equal to cash change', function () {
+test('it attributes counter lines net of cash in a mixed journal and totals equal cash change', function () {
     $this->seed(ReportConfigurationSeeder::class);
     Sanctum::actingAs($this->user, ['*']);
 
@@ -259,7 +266,8 @@ test('it splits a mixed journal proportionally across counter accounts and keeps
 
     // Jurnal campuran: kas masuk 100.000 dengan lawan ekuitas 60.000 (pendanaan)
     // dan pendapatan 40.000 (operasi). Kas keluar 30.000 untuk peralatan (investasi).
-    // Kas masuk 100.000 dibagi proporsional: pendanaan 60.000, operasi 40.000.
+    // Kontribusi tiap baris lawan = kredit - debit: pendanaan 60.000, operasi 40.000,
+    // investasi -30.000 (tanpa pembagian proporsional).
     postCashFlowJournal($this->fiscalYear, $coaVersion, $cash, 100000, 30000, [
         ['account' => $ownerCapital, 'debit' => 0, 'credit' => 60000],
         ['account' => $sales, 'debit' => 0, 'credit' => 40000],
