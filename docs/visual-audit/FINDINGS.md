@@ -379,6 +379,10 @@ Seed segar (`migrate:fresh --seed`) lalu `db:seed` kedua berhasil. Pest `DemoDat
 | W7-16 | partial | Self-approval (`submitted_by` = `actor_user_id` pada `approved`): 0. `pipeline_state_logs` 68 baris, 26 hari berbeda; PO entity 8 punya 5 transisi. | Timestamp audit trail belum divalidasi visual; approval-flows vs approval Oktober belum dicek. |
 | W7-17 | partial | Test i18n dan Indonesian label (4 test W7-17) hijau. | Sequence `-000001`, kode akun `1999-IBC`, kode asset-location unik per cabang, mapping supplier–kategori produk, `Created At` kosong, dan email/telepon supplier belum dikerjakan. |
 
+### Langkah 10c #345 — Butir 4 Review visual PR #432 (nama Inggris jadi Indonesia)
+
+Diganti di seeder dan spec yang memakainya: `MDF Wood Panel 120x240cm` → `Papan MDF 120x240cm`, `Wooden Table Legs (Set of 4)` → `Kaki Meja Kayu (Isi 4)`, `Wood Screws 4x40mm (Box of 100)` → `Sekrup Kayu 4x40mm (Box isi 100)`, `High-End Server Rack` → `Rak Server High-End`, `Filing Cabinet` → `Lemari Arsip`, `Filing Cabinet 4 Drawer` → `Lemari Arsip 4 Laci`, `Printer Office Lt. 2` → `Printer Kantor Lt. 2`. Invarian `W7-17 review visual butir 4` ditulis merah lalu hijau di `DemoDataIntegrityTest.php`. Spec E2E yang diubah: `inventory-stocktakes`, `stock-transfers`, `stock-adjustments` helpers, `assets/high-value-asset-registration.spec.ts`. Butir 1–3, 5, 6 PR #432 tidak dikerjakan di langkah ini. W7-15/16/17 tetap **partial (#345)**.
+
 ### Screenshot #370 langkah 7 (2026-11-24)
 
 Tujuh dialog item/alokasi dengan select terbuka (Customer Invoice item, Credit Note item, Supplier Bill item, AR Receipt alokasi, AP Payment alokasi, GR item, SR item) diambil light/dark x 1440/390: 28 berkas di `~/.erp-agent/shots370` (di luar repo, tidak di-commit). Tema dipaksa lewat `localStorage.appearance` dan kelas `dark` diverifikasi per berkas. Pada sampel visual, select terbuka dan pilihan berlabel terlihat (akun COA, nomor invoice/bill dengan sisa tagihan, baris PO/GR). Alokasi AR/AP hanya menampilkan pilihan setelah customer/supplier induk dipilih; daftar kosong bila pihak tidak punya dokumen terbuka.

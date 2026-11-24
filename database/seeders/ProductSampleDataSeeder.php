@@ -36,7 +36,7 @@ class ProductSampleDataSeeder extends Seeder
         $woodPanel = Product::updateOrCreate(
             ['code' => 'RM-WOOD-001'],
             [
-                'name' => 'MDF Wood Panel 120x240cm',
+                'name' => 'Papan MDF 120x240cm',
                 'description' => 'Papan serat kerapatan sedang untuk produksi furnitur',
                 'type' => 'raw_material',
                 'product_category_id' => $rawMaterialWood->id,
@@ -49,7 +49,7 @@ class ProductSampleDataSeeder extends Seeder
         $tableLegs = Product::updateOrCreate(
             ['code' => 'RM-WOOD-002'],
             [
-                'name' => 'Wooden Table Legs (Set of 4)',
+                'name' => 'Kaki Meja Kayu (Isi 4)',
                 'description' => 'Premium wooden table legs',
                 'type' => 'raw_material',
                 'product_category_id' => $rawMaterialWood->id,
@@ -62,7 +62,7 @@ class ProductSampleDataSeeder extends Seeder
         $screws = Product::updateOrCreate(
             ['code' => 'RM-HW-001'],
             [
-                'name' => 'Wood Screws 4x40mm (Box of 100)',
+                'name' => 'Sekrup Kayu 4x40mm (Box isi 100)',
                 'description' => 'Sekrup kayu berkualitas untuk perakitan furnitur',
                 'type' => 'raw_material',
                 'product_category_id' => $rawMaterialHardware->id,

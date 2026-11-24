@@ -298,9 +298,9 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
 
   // ── Step 8: Verify Approval History shows trail ──────────────────
   test('Step 8: Approval History shows approval trail for high-value asset', async ({ page }) => {
-    // Use seeded asset FA-000010 (High-End Server Rack, 150M) which has pending approval
+    // Use seeded asset FA-000010 (Rak Server High-End, 150M) which has pending approval
     await login(page, DEFAULT_E2E_EMAIL, undefined, { requireDashboard: false });
-    await goToAssetProfile(page, 'High-End Server Rack');
+    await goToAssetProfile(page, 'Rak Server High-End');
 
     // Navigate to Approvals tab
     const approvalsTab = page.getByRole('tab', { name: /Approvals/i });
@@ -322,9 +322,9 @@ test.describe('High Value Asset Registration — Approval Flow', () => {
 
   // ── Step 9: Verify Timeline shows lifecycle history ──────────────
   test('Step 9: Timeline shows lifecycle history on high-value asset profile', async ({ page }) => {
-    // Use seeded asset FA-000010 (High-End Server Rack, 150M)
+    // Use seeded asset FA-000010 (Rak Server High-End, 150M)
     await login(page, DEFAULT_E2E_EMAIL, undefined, { requireDashboard: false });
-    await goToAssetProfile(page, 'High-End Server Rack');
+    await goToAssetProfile(page, 'Rak Server High-End');
 
     // Navigate to Timeline tab
     const timelineTab = page.getByRole('tab', { name: /Timeline/i });

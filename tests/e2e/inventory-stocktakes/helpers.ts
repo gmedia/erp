@@ -102,9 +102,9 @@ async function selectPersistedAsyncOption(
 export async function createInventoryStocktake(page: Page): Promise<string> {
     const stocktakeNumber = `SO-E2E-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
     const productCandidates: readonly AsyncOptionCandidate[] = [
-        { searchText: 'MDF Wood Panel', optionText: 'MDF Wood Panel' },
+        { searchText: 'Papan MDF', optionText: 'Papan MDF 120x240cm' },
         { searchText: 'Meja Kerja Eksekutif', optionText: 'Meja Kerja Eksekutif' },
-        { searchText: 'Wooden Table Legs', optionText: 'Wooden Table Legs' },
+        { searchText: 'Kaki Meja Kayu', optionText: 'Kaki Meja Kayu (Isi 4)' },
         { searchText: 'Inventory Sample Product', optionText: 'Inventory Sample Product' },
     ];
     const unitCandidates: readonly AsyncOptionCandidate[] = [

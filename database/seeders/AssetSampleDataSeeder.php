@@ -126,7 +126,7 @@ class AssetSampleDataSeeder extends Seeder
             [
                 'asset_category_id' => $offCategory?->id,
                 'manufacturer' => 'Krisbow',
-                'model_name' => 'Filing Cabinet 4 Drawer',
+                'model_name' => 'Lemari Arsip 4 Laci',
                 'specs' => ['material' => 'steel'],
             ],
         ];
@@ -191,7 +191,7 @@ class AssetSampleDataSeeder extends Seeder
         $machineModel = AssetModel::where('model_name', 'Packing Machine')->first();
         $thinkpadModel = AssetModel::where('model_name', 'ThinkPad X1 Carbon')->first();
         $projectorModel = AssetModel::where('model_name', 'Proyektor EB-X51')->first();
-        $cabinetModel = AssetModel::where('model_name', 'Filing Cabinet 4 Drawer')->first();
+        $cabinetModel = AssetModel::where('model_name', 'Lemari Arsip 4 Laci')->first();
 
         // ══════════════════════════════════════════════════════════════
         // SAMPLE ASSETS — One or more per pipeline state
@@ -234,7 +234,7 @@ class AssetSampleDataSeeder extends Seeder
             ],
             [
                 'asset_code' => 'FA-000002',
-                'name' => 'Printer Office Lt. 2',
+                'name' => 'Printer Kantor Lt. 2',
                 'asset_model_id' => $printerModel?->id,
                 'asset_category_id' => $itCategory?->id,
                 'serial_number' => 'SN-HP-001',
@@ -392,7 +392,7 @@ class AssetSampleDataSeeder extends Seeder
             // ─── LOST ───────────────────────────────────────────────
             [
                 'asset_code' => 'FA-000008',
-                'name' => 'Filing Cabinet',
+                'name' => 'Lemari Arsip',
                 'asset_model_id' => $cabinetModel?->id,
                 'asset_category_id' => $offCategory?->id,
                 'serial_number' => 'SN-KRS-001',
@@ -446,7 +446,7 @@ class AssetSampleDataSeeder extends Seeder
             // ─── ASSETS WITH APPROVAL INTEGRATION ───────────────────
             [
                 'asset_code' => 'FA-000010',
-                'name' => 'High-End Server Rack',
+                'name' => 'Rak Server High-End',
                 'asset_model_id' => null,
                 'asset_category_id' => $itCategory?->id,
                 'serial_number' => 'SN-SRV-001',

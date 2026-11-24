@@ -1516,3 +1516,19 @@ invariant('W7-17 demo master names are Indonesian, not mixed with English labels
 
     expect(DB::table('asset_categories')->whereIn('name', $englishLabels)->count())->toBe(0);
 });
+
+// W7-17 (Butir 4 Review visual PR #432) — nama produk, aset, dan stok demo berbahasa Indonesia.
+invariant('W7-17 review visual butir 4: demo product, asset and stock names are Indonesian', function () {
+    $legacy = [
+        'products' => ['name', [
+            'MDF Wood Panel 120x240cm', 'Wooden Table Legs (Set of 4)', 'Wood Screws 4x40mm (Box of 100)',
+        ]],
+        'assets' => ['name', ['High-End Server Rack', 'Filing Cabinet', 'Printer Office Lt. 2']],
+        'asset_models' => ['model_name', ['Filing Cabinet 4 Drawer']],
+    ];
+
+    foreach ($legacy as $table => [$column, $names]) {
+        expect(DB::table($table)->whereIn($column, $names)->count())
+            ->toBe(0, "nama demo {$table}.{$column} masih berbahasa Inggris");
+    }
+});
