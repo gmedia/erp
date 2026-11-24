@@ -112,7 +112,9 @@
         "processing": "Processing...",
         "closed": "Period closed.",
         "reopened": "Period reopened.",
-        "failed": "Failed to update the period. Please try again."
+        "failed": "Failed to update the period. Please try again.",
+        "typeMonthly": "Monthly",
+        "typeAnnual": "Annual"
     },
     "budgets": {
         "approve": "Approve Budget",
