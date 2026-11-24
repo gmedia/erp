@@ -246,7 +246,7 @@
         },
         "cashFlowActivities": {
             "title": "Arus Kas per Aktivitas",
-            "summary": "Ringkasan Arus Kas",
+            "summary": "Penerimaan dan Pengeluaran Kas",
             "detail": "Rincian Arus Kas per Akun"
         },
         "selectFilterTitle": "Pilih filter untuk menampilkan laporan",

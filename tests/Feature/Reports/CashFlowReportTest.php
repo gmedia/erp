@@ -1,5 +1,6 @@
 <?php
 
+use App\Exports\CashFlowReportExport;
 use App\Models\Account;
 use App\Models\Branch;
 use App\Models\CoaVersion;
@@ -610,6 +611,63 @@ test('it can export cash flow report', function () {
 
     Excel::assertStored('exports/' . $filename, 'public');
     Carbon::setTestNow();
+});
+
+test('cash flow export lists activities, opening cash, net change and closing cash', function () {
+    $this->seed(ReportConfigurationSeeder::class);
+    $coaVersion = CoaVersion::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'status' => 'active',
+    ]);
+    $cash = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '11110',
+        'name' => 'Cash in Banks',
+        'type' => 'asset',
+        'sub_type' => 'current_asset',
+        'normal_balance' => 'debit',
+        'is_cash_flow' => true,
+    ]);
+    $revenue = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '41100',
+        'name' => 'Sales',
+        'type' => 'revenue',
+        'sub_type' => 'operating_revenue',
+        'normal_balance' => 'credit',
+        'is_cash_flow' => false,
+    ]);
+
+    $journal = JournalEntry::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'status' => 'posted',
+        'entry_date' => '2025-06-01',
+    ]);
+    JournalEntryLine::factory()->create([
+        'journal_entry_id' => $journal->id,
+        'account_id' => $cash->id,
+        'debit' => 300000,
+        'credit' => 0,
+    ]);
+    JournalEntryLine::factory()->create([
+        'journal_entry_id' => $journal->id,
+        'account_id' => $revenue->id,
+        'debit' => 0,
+        'credit' => 300000,
+    ]);
+
+    $filters = ['fiscal_year_id' => $this->fiscalYear->id];
+    $export = new CashFlowReportExport($filters);
+    $rows = collect($export->collection()->all());
+    $labels = collect($export->footerRows())->pluck(0)->all();
+
+    expect($labels)->toContain('Operating activities')
+        ->and($labels)->toContain('Investing activities')
+        ->and($labels)->toContain('Financing activities')
+        ->and($labels)->toContain('Opening cash')
+        ->and($labels)->toContain('Net change')
+        ->and($labels)->toContain('Closing cash')
+        ->and($rows->firstWhere(0, '11110'))->not->toBeNull();
 });
 
 test('it requires permission to export cash flow report', function () {

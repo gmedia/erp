@@ -246,7 +246,7 @@
         },
         "cashFlowActivities": {
             "title": "Cash Flows by Activity",
-            "summary": "Cash Flow Summary",
+            "summary": "Cash Receipts and Payments",
             "detail": "Cash Flow Detail by Account"
         },
         "selectFilterTitle": "Select a filter to show the report",
