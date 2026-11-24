@@ -19,7 +19,16 @@ uses(RefreshDatabase::class)->group('asset-loss-journal-posting');
  */
 function makeAssetLossAccounts(): array
 {
-    $coaVersion = CoaVersion::factory()->create(['status' => 'active']);
+    $fiscalYear = FiscalYear::factory()->create([
+        'name' => '2026',
+        'start_date' => '2026-01-01',
+        'end_date' => '2026-12-31',
+        'status' => 'open',
+    ]);
+    $coaVersion = CoaVersion::factory()->create([
+        'fiscal_year_id' => $fiscalYear->id,
+        'status' => 'active',
+    ]);
 
     $make = fn (string $code, string $name, string $type, string $normal): Account => Account::factory()->create([
         'coa_version_id' => $coaVersion->id,
@@ -39,12 +48,8 @@ function makeAssetLossAccounts(): array
 
 function makeLostAsset(array $accounts, string $status = 'lost', ?string $fiscalStatus = 'open'): Asset
 {
-    FiscalYear::factory()->create([
-        'name' => '2026',
-        'start_date' => '2026-01-01',
-        'end_date' => '2026-12-31',
-        'status' => $fiscalStatus,
-    ]);
+    // Tahun fiskal 2026 sudah dibuat makeAssetLossAccounts(); atur statusnya di sini.
+    FiscalYear::where('name', '2026')->firstOrFail()->update(['status' => $fiscalStatus]);
 
     return Asset::factory()->create([
         'asset_category_id' => AssetCategory::factory()->create()->id,

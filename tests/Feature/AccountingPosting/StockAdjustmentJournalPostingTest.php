@@ -197,6 +197,7 @@ test('PostStockAdjustmentJournalAction is idempotent', function () {
         'status' => 'approved',
         'adjustment_number' => 'SA-2026-000003',
         'adjustment_date' => '2026-03-15',
+        'adjustment_type' => 'shrinkage',
         'journal_entry_id' => null,
         'approved_by' => $approver->id,
         'approved_at' => now(),
