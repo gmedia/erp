@@ -1,9 +1,21 @@
 import { expect, Page } from '@playwright/test';
 
 import { reloadAndWaitForApi, searchAndWaitForApi } from '../helpers';
+import { approvePurchaseOrderFixture } from '../purchase-orders/helpers';
+
+type SupplierReturnFixturePo = {
+    supplierId: number;
+    warehouseId: number;
+    productId: number;
+    unitId: number;
+    poId: number;
+    poNumber: string;
+    poItemId: number;
+    today: string;
+};
 
 export async function createSupplierReturn(page: Page): Promise<string> {
-    const createResult = await page.evaluate(async () => {
+    const draft = await page.evaluate(async () => {
         const apiToken = localStorage.getItem('api_token') || '';
 
         const getFirstId = async (url: string): Promise<number> => {
@@ -25,6 +37,8 @@ export async function createSupplierReturn(page: Page): Promise<string> {
             getFirstId('/api/units?search=Piece&per_page=1'),
         ]);
 
+        const today = new Date().toISOString().slice(0, 10);
+
         const poResponse = await fetch('/api/purchase-orders', {
             method: 'POST',
             headers: {
@@ -36,7 +50,7 @@ export async function createSupplierReturn(page: Page): Promise<string> {
             body: JSON.stringify({
                 supplier_id: supplierId,
                 warehouse_id: warehouseId,
-                order_date: new Date().toISOString().slice(0, 10),
+                order_date: today,
                 currency: 'IDR',
                 status: 'draft',
                 items: [
@@ -52,28 +66,47 @@ export async function createSupplierReturn(page: Page): Promise<string> {
             }),
         });
         const poPayload = await poResponse.json().catch(() => ({}));
-        const purchaseOrderId = poPayload?.data?.id;
-        const purchaseOrderItemId = poPayload?.data?.items?.[0]?.id;
+
+        return {
+            ok: poResponse.ok,
+            supplierId,
+            warehouseId,
+            productId,
+            unitId,
+            poId: Number(poPayload?.data?.id ?? 0),
+            poNumber: String(poPayload?.data?.po_number ?? ''),
+            poItemId: Number(poPayload?.data?.items?.[0]?.id ?? 0),
+            today,
+        } as SupplierReturnFixturePo & { ok: boolean };
+    });
+
+    expect(draft.ok, 'create purchase order fixture').toBeTruthy();
+
+    approvePurchaseOrderFixture(draft.poNumber);
+
+    const createResult = await page.evaluate(async (fixture) => {
+        const apiToken = localStorage.getItem('api_token') || '';
+        const jsonHeaders = {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            Authorization: `Bearer ${apiToken}`,
+            'X-Requested-With': 'XMLHttpRequest',
+        };
 
         const grResponse = await fetch('/api/goods-receipts', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json',
-                Authorization: `Bearer ${apiToken}`,
-                'X-Requested-With': 'XMLHttpRequest',
-            },
+            headers: jsonHeaders,
             body: JSON.stringify({
-                purchase_order_id: purchaseOrderId,
-                warehouse_id: warehouseId,
-                receipt_date: new Date().toISOString().slice(0, 10),
+                purchase_order_id: fixture.poId,
+                warehouse_id: fixture.warehouseId,
+                receipt_date: fixture.today,
                 supplier_delivery_note: 'SJ-E2E-001',
-                status: 'draft',
+                status: 'confirmed',
                 items: [
                     {
-                        purchase_order_item_id: purchaseOrderItemId,
-                        product_id: productId,
-                        unit_id: unitId,
+                        purchase_order_item_id: fixture.poItemId,
+                        product_id: fixture.productId,
+                        unit_id: fixture.unitId,
                         quantity_received: 5,
                         quantity_accepted: 5,
                         quantity_rejected: 0,
@@ -88,25 +121,20 @@ export async function createSupplierReturn(page: Page): Promise<string> {
 
         const srResponse = await fetch('/api/supplier-returns', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json',
-                Authorization: `Bearer ${apiToken}`,
-                'X-Requested-With': 'XMLHttpRequest',
-            },
+            headers: jsonHeaders,
             body: JSON.stringify({
-                purchase_order_id: purchaseOrderId,
+                purchase_order_id: fixture.poId,
                 goods_receipt_id: goodsReceiptId,
-                supplier_id: supplierId,
-                warehouse_id: warehouseId,
-                return_date: new Date().toISOString().slice(0, 10),
+                supplier_id: fixture.supplierId,
+                warehouse_id: fixture.warehouseId,
+                return_date: fixture.today,
                 reason: 'defective',
                 status: 'draft',
                 items: [
                     {
                         goods_receipt_item_id: goodsReceiptItemId,
-                        product_id: productId,
-                        unit_id: unitId,
+                        product_id: fixture.productId,
+                        unit_id: fixture.unitId,
                         quantity_returned: 2,
                         unit_price: 1000,
                     },
@@ -116,12 +144,16 @@ export async function createSupplierReturn(page: Page): Promise<string> {
 
         const payload = await srResponse.json().catch(() => ({}));
         return {
-            ok: srResponse.ok,
+            ok: grResponse.ok && srResponse.ok,
+            grStatus: grResponse.status,
+            grBody: grPayload,
+            status: srResponse.status,
+            body: payload,
             returnNumber: payload?.data?.return_number || '',
         };
-    });
+    }, draft);
 
-    expect(createResult.ok).toBeTruthy();
+    expect(createResult, JSON.stringify(createResult)).toMatchObject({ ok: true });
     expect(createResult.returnNumber).not.toBe('');
 
     await reloadAndWaitForApi(page, '/api/supplier-returns');
