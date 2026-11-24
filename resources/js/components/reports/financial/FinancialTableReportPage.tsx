@@ -49,6 +49,15 @@ type SingleYearFinancialReportResponse<TReport> = {
     selectedYearId: number;
     report: TReport;
     computed_sections: ComputedSection[];
+    // Hanya dikirim laporan arus kas (saldo kas awal/akhir dan aktivitas).
+    activities?: {
+        operating: number;
+        investing: number;
+        financing: number;
+    };
+    opening_cash_balance?: number;
+    net_change?: number;
+    closing_cash_balance?: number;
 };
 
 type SingleYearFinancialReportPageOptions<TReport> = {
@@ -203,6 +212,7 @@ export function useSingleYearFinancialReportPage<TReport>({
         branchId: urlBranchId,
         report,
         computedSections,
+        rawData: data,
         selectedFiscalYear,
         handleYearChange,
         handleBranchChange,
@@ -343,129 +353,136 @@ export function FinancialTableCard<TItem extends FinancialTableRow>({
             </CardHeader>
             <CardContent>
                 <div className="overflow-hidden rounded-md border">
-                    <ScrollArea className={scrollAreaClassName}>
-                        <Table className="min-w-[760px]">
-                            <TableHeader className="sticky top-0 z-10 bg-background">
-                                <TableRow>
-                                    <TableHead className="w-[120px]">
-                                        Code
-                                    </TableHead>
-                                    <TableHead>Account Name</TableHead>
-                                    <TableHead className="hidden w-[120px] md:table-cell">
-                                        Type
-                                    </TableHead>
-                                    {amountColumns.map((column) => (
-                                        <TableHead
-                                            key={column.header}
-                                            className="text-right tabular-nums"
-                                        >
-                                            {column.header}
+                    <div className="overflow-x-auto">
+                        <ScrollArea className={scrollAreaClassName}>
+                            <Table className="min-w-[640px] md:min-w-[760px]">
+                                <TableHeader className="sticky top-0 z-10 bg-background">
+                                    <TableRow>
+                                        <TableHead className="w-[120px]">
+                                            Code
                                         </TableHead>
-                                    ))}
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {items.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell
-                                            colSpan={3 + amountColumns.length}
-                                            className="h-24 text-center text-muted-foreground"
-                                        >
-                                            {emptyMessage}
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    items.map((item) => {
-                                        const hasChildren =
-                                            typeof item.id === 'number' &&
-                                            parentIds.has(item.id);
-
-                                        return (
-                                            <TableRow
-                                                key={item.id}
-                                                className={cn(
-                                                    'odd:bg-muted/10',
-                                                    hasChildren &&
-                                                        'bg-muted/20 font-medium',
-                                                )}
-                                            >
-                                                <TableCell className="font-mono text-xs text-muted-foreground">
-                                                    {item.code}
-                                                </TableCell>
-                                                <TableCell>
-                                                    <div
-                                                        className="truncate"
-                                                        style={{
-                                                            paddingLeft: `${Math.max(0, item.level - 1) * 1.25}rem`,
-                                                        }}
-                                                    >
-                                                        {item.name}
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell className="hidden text-muted-foreground capitalize md:table-cell">
-                                                    {item.type}
-                                                </TableCell>
-                                                {amountColumns.map(
-                                                    (column, index) => {
-                                                        const value =
-                                                            column.value(item);
-
-                                                        return (
-                                                            <TableCell
-                                                                key={
-                                                                    column.header
-                                                                }
-                                                                className={cn(
-                                                                    'text-right tabular-nums',
-                                                                    index ===
-                                                                        amountColumns.length -
-                                                                            1 &&
-                                                                        'max-md:sticky max-md:right-0 max-md:bg-background',
-                                                                )}
-                                                            >
-                                                                {value === 0
-                                                                    ? '-'
-                                                                    : formatCurrency(
-                                                                          value,
-                                                                      )}
-                                                            </TableCell>
-                                                        );
-                                                    },
-                                                )}
-                                            </TableRow>
-                                        );
-                                    })
-                                )}
-                            </TableBody>
-                            {items.length > 0 && (
-                                <TableFooter>
-                                    <TableRow>
-                                        <TableCell
-                                            colSpan={footerColSpan}
-                                            className="text-right font-semibold"
-                                        >
-                                            {footerLabel}
-                                        </TableCell>
-                                        {footerLeadingCell ?? (
-                                            <TableCell className="hidden md:table-cell" />
-                                        )}
+                                        <TableHead className="min-w-[140px] md:min-w-0">
+                                            Account Name
+                                        </TableHead>
+                                        <TableHead className="hidden w-[120px] md:table-cell">
+                                            Type
+                                        </TableHead>
                                         {amountColumns.map((column) => (
-                                            <TableCell
+                                            <TableHead
                                                 key={column.header}
-                                                className={cn(
-                                                    'text-right font-semibold tabular-nums',
-                                                    footerClassName,
-                                                )}
+                                                className="text-right tabular-nums"
                                             >
-                                                {formatCurrency(column.total)}
-                                            </TableCell>
+                                                {column.header}
+                                            </TableHead>
                                         ))}
                                     </TableRow>
-                                </TableFooter>
-                            )}
-                        </Table>
-                        <ScrollBar orientation="horizontal" />
-                    </ScrollArea>
+                                </TableHeader>
+                                <TableBody>
+                                    {items.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell
+                                                colSpan={
+                                                    3 + amountColumns.length
+                                                }
+                                                className="h-24 text-center text-muted-foreground"
+                                            >
+                                                {emptyMessage}
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : (
+                                        items.map((item) => {
+                                            const hasChildren =
+                                                typeof item.id === 'number' &&
+                                                parentIds.has(item.id);
+
+                                            return (
+                                                <TableRow
+                                                    key={item.id}
+                                                    className={cn(
+                                                        'odd:bg-muted/10',
+                                                        hasChildren &&
+                                                            'bg-muted/20 font-medium',
+                                                    )}
+                                                >
+                                                    <TableCell className="font-mono text-xs text-muted-foreground">
+                                                        {item.code}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <div
+                                                            className="break-words"
+                                                            style={{
+                                                                paddingLeft: `${Math.max(0, item.level - 1) * 1.25}rem`,
+                                                            }}
+                                                        >
+                                                            {item.name}
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell className="hidden text-muted-foreground capitalize md:table-cell">
+                                                        {item.type}
+                                                    </TableCell>
+                                                    {amountColumns.map(
+                                                        (column) => {
+                                                            const value =
+                                                                column.value(
+                                                                    item,
+                                                                );
+
+                                                            return (
+                                                                <TableCell
+                                                                    key={
+                                                                        column.header
+                                                                    }
+                                                                    className={cn(
+                                                                        'min-w-[96px] text-right',
+                                                                        'whitespace-nowrap tabular-nums md:min-w-0',
+                                                                    )}
+                                                                >
+                                                                    {value === 0
+                                                                        ? '-'
+                                                                        : formatCurrency(
+                                                                              value,
+                                                                          )}
+                                                                </TableCell>
+                                                            );
+                                                        },
+                                                    )}
+                                                </TableRow>
+                                            );
+                                        })
+                                    )}
+                                </TableBody>
+                                {items.length > 0 && (
+                                    <TableFooter>
+                                        <TableRow>
+                                            <TableCell
+                                                colSpan={footerColSpan}
+                                                className="text-right font-semibold"
+                                            >
+                                                {footerLabel}
+                                            </TableCell>
+                                            {footerLeadingCell ?? (
+                                                <TableCell className="hidden md:table-cell" />
+                                            )}
+                                            {amountColumns.map((column) => (
+                                                <TableCell
+                                                    key={column.header}
+                                                    className={cn(
+                                                        'text-right font-semibold tabular-nums',
+                                                        footerClassName,
+                                                    )}
+                                                >
+                                                    {formatCurrency(
+                                                        column.total,
+                                                    )}
+                                                </TableCell>
+                                            ))}
+                                        </TableRow>
+                                    </TableFooter>
+                                )}
+                            </Table>
+                            <ScrollBar orientation="horizontal" />
+                        </ScrollArea>
+                    </div>
                 </div>
                 {children}
             </CardContent>

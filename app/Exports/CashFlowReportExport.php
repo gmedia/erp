@@ -26,7 +26,7 @@ class CashFlowReportExport implements FromCollection, ShouldAutoSize, WithCustom
 
         $rows = app(FinancialReportService::class)->getCashFlow((int) $this->filters['fiscal_year_id'], $branchId);
 
-        return collect($rows)->map(fn (array $row): array => [
+        $accountRows = collect($rows)->map(fn (array $row): array => [
             $row['code'],
             $row['name'],
             $row['type'],
@@ -36,6 +36,35 @@ class CashFlowReportExport implements FromCollection, ShouldAutoSize, WithCustom
             $row['outflow'],
             $row['inflow'] - $row['outflow'],
         ]);
+
+        return $accountRows->concat($this->footerRows());
+    }
+
+    /**
+     * Ringkasan di bawah rincian akun: saldo awal, tiga aktivitas, kenaikan
+     * bersih, dan saldo akhir. Kolom label di kolom pertama.
+     *
+     * @return array<int, array<int, mixed>>
+     */
+    public function footerRows(): array
+    {
+        $branchId = isset($this->filters['branch_id']) && $this->filters['branch_id'] !== ''
+            ? (int) $this->filters['branch_id']
+            : null;
+        $fiscalYearId = (int) $this->filters['fiscal_year_id'];
+
+        $service = app(FinancialReportService::class);
+        $opening = $service->getOpeningCashBalance($fiscalYearId, $branchId);
+        $totals = $service->getCashFlowTotals($fiscalYearId, $branchId);
+
+        return [
+            ['Operating activities', '', '', '', '', '', '', $totals['operating_cash_flow']],
+            ['Investing activities', '', '', '', '', '', '', $totals['investing_cash_flow']],
+            ['Financing activities', '', '', '', '', '', '', $totals['financing_cash_flow']],
+            ['Opening cash', '', '', '', '', '', '', $opening],
+            ['Net change', '', '', '', '', '', '', $totals['net_change']],
+            ['Closing cash', '', '', '', '', '', '', round($opening + $totals['net_change'], 2)],
+        ];
     }
 
     public function headings(): array

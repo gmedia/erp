@@ -232,11 +232,34 @@ test('cash flow export matches json rows and totals', function () {
     array_shift($rows);
     $rows = collect($rows);
 
-    expect($rows->count())->toBe($report->count());
-    expect(round($rows->sum(fn (array $row): float => (float) $row[5]), 2))
+    // Baris akun di atas, footer ringkasan (6 baris) di bawah. Footer tidak ikut
+    // dihitung sebagai baris akun, dan kolom Inflow/Outflow footer kosong.
+    $accountRows = $rows->take($report->count());
+    $footerRows = $rows->slice($report->count())->values();
+
+    expect($rows->count())->toBe($report->count() + 6);
+    expect(round($accountRows->sum(fn (array $row): float => (float) $row[5]), 2))
         ->toEqual(round($report->sum(fn (array $row): float => (float) $row['inflow']), 2));
-    expect(round($rows->sum(fn (array $row): float => (float) $row[6]), 2))
+    expect(round($accountRows->sum(fn (array $row): float => (float) $row[6]), 2))
         ->toEqual(round($report->sum(fn (array $row): float => (float) $row['outflow']), 2));
+
+    $footer = $footerRows->mapWithKeys(fn (array $row): array => [$row[0] => round((float) $row[7], 2)]);
+    $activities = $json->json('activities');
+
+    expect($footer->keys()->all())->toEqual([
+        'Operating activities',
+        'Investing activities',
+        'Financing activities',
+        'Opening cash',
+        'Net change',
+        'Closing cash',
+    ]);
+    expect($footer['Operating activities'])->toEqual(round((float) $activities['operating'], 2));
+    expect($footer['Investing activities'])->toEqual(round((float) $activities['investing'], 2));
+    expect($footer['Financing activities'])->toEqual(round((float) $activities['financing'], 2));
+    expect($footer['Opening cash'])->toEqual(round((float) $json->json('opening_cash_balance'), 2));
+    expect($footer['Net change'])->toEqual(round((float) $json->json('net_change'), 2));
+    expect($footer['Closing cash'])->toEqual(round((float) $json->json('closing_cash_balance'), 2));
 });
 
 test('comparative export section totals match json totals', function () {

@@ -132,12 +132,22 @@ class ReportController extends Controller
 
         $report = [];
         $computedSections = [];
+        $activities = ['operating' => 0.0, 'investing' => 0.0, 'financing' => 0.0];
+        $openingCash = 0.0;
+        $netChange = 0.0;
         if ($selectedYearId) {
             $branchId = $this->resolveBranchId($request);
             $report = $this->reportService->getCashFlow($selectedYearId, $branchId);
+            $openingCash = $this->reportService->getOpeningCashBalance($selectedYearId, $branchId);
+            $totals = $this->reportService->getCashFlowTotals($selectedYearId, $branchId);
+            $netChange = $totals['net_change'];
+            $activities = [
+                'operating' => $totals['operating_cash_flow'],
+                'investing' => $totals['investing_cash_flow'],
+                'financing' => $totals['financing_cash_flow'],
+            ];
             $config = $this->configurationResolver->execute(ReportConfiguration::TYPE_CASH_FLOW);
             if ($config) {
-                $totals = $this->reportService->getCashFlowTotals($selectedYearId, $branchId);
                 $computedSections = $this->evaluateSections->execute($config['sections'], $totals);
             }
         }
@@ -148,6 +158,10 @@ class ReportController extends Controller
             'report' => $report,
             'configuration' => $this->configurationResolver->execute(ReportConfiguration::TYPE_CASH_FLOW),
             'computed_sections' => $computedSections,
+            'activities' => $activities,
+            'opening_cash_balance' => $openingCash,
+            'net_change' => $netChange,
+            'closing_cash_balance' => round($openingCash + $netChange, 2),
         ]);
     }
 
