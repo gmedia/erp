@@ -752,6 +752,7 @@ export const fiscalYearConfig = createComplexEntityConfig<FiscalYear>({
     description:
         'Accounting periods that scope journals and financial reports.',
     apiEndpoint: '/api/fiscal-years',
+    permissionPrefix: 'fiscal_year',
     exportEndpoint: '/api/fiscal-years/export',
     queryKey: ['fiscal-years'],
     breadcrumbs: [{ title: 'Fiscal Years', href: '/fiscal-years' }],
@@ -776,6 +777,7 @@ export const coaVersionConfig = createComplexEntityConfig<CoaVersion>({
     entityNamePlural: 'COA Versions',
     description: 'Chart of accounts versions per fiscal year.',
     apiEndpoint: '/api/coa-versions',
+    permissionPrefix: 'coa_version',
     exportEndpoint: '/api/coa-versions/export',
     queryKey: ['coa-versions'],
     breadcrumbs: [{ title: 'COA Versions', href: '/coa-versions' }],
@@ -800,6 +802,7 @@ export const accountMappingConfig = createComplexEntityConfig<AccountMapping>({
     entityNamePlural: 'Account Mappings',
     description: 'Maps control accounts to transaction types.',
     apiEndpoint: '/api/account-mappings',
+    permissionPrefix: 'account_mapping',
     exportEndpoint: '/api/account-mappings/export',
     queryKey: ['account-mappings'],
     breadcrumbs: [{ title: 'Account Mappings', href: '/account-mappings' }],
@@ -835,6 +838,7 @@ export const journalEntryConfig = createComplexEntityConfig<JournalEntry>({
     entityNamePlural: 'Journal Entries',
     description: 'Manual journal entries with debit and credit lines.',
     apiEndpoint: '/api/journal-entries',
+    permissionPrefix: 'journal_entry',
     exportEndpoint: '/api/journal-entries/export',
     queryKey: ['journal-entries'],
     breadcrumbs: [{ title: 'Journal Entries', href: '/journal-entries' }],
@@ -1041,6 +1045,7 @@ export const pipelineConfig = createComplexEntityConfig<Pipeline>({
     entityNamePlural: 'Pipelines',
     description: 'Workflow pipelines and the states entities move through.',
     apiEndpoint: '/api/pipelines',
+    permissionPrefix: 'pipeline',
     exportEndpoint: '/api/pipelines/export',
     queryKey: ['pipelines'],
     breadcrumbs: [{ title: 'Pipelines', href: '/pipelines' }],
@@ -1067,6 +1072,7 @@ export const approvalFlowConfig = createComplexEntityConfig<ApprovalFlow>({
     entityNamePlural: 'Approval Flows',
     description: 'Approval definitions with ordered steps and approvers.',
     apiEndpoint: '/api/approval-flows',
+    permissionPrefix: 'approval_flow',
     exportEndpoint: '/api/approval-flows/export',
     queryKey: ['approval-flows'],
     breadcrumbs: [{ title: 'Approval Flows', href: '/approval-flows' }],
@@ -1175,6 +1181,7 @@ export const approvalDelegationConfig =
         description:
             'Delegations that let another user approve on your behalf for a period.',
         apiEndpoint: '/api/approval-delegations',
+        permissionPrefix: 'approval_delegation',
         exportEndpoint: '/api/approval-delegations/export',
         queryKey: ['approval-delegations'],
         breadcrumbs: [
@@ -1296,6 +1303,7 @@ export const creditNoteConfig = createComplexEntityConfig<CreditNote>({
     entityNamePlural: 'Credit Notes',
     description: 'Credit notes that reduce customer invoice balances.',
     apiEndpoint: '/api/credit-notes',
+    permissionPrefix: 'credit_note',
     exportEndpoint: '/api/credit-notes/export',
     queryKey: ['credit-notes'],
     breadcrumbs: [{ title: 'Credit Notes', href: '/credit-notes' }],
@@ -1338,6 +1346,7 @@ export const recurringJournalConfig =
         entityNamePlural: 'Recurring Journals',
         description: 'Templates for journals that repeat on a schedule.',
         apiEndpoint: '/api/recurring-journals',
+        permissionPrefix: 'recurring_journal',
         exportEndpoint: '/api/recurring-journals/export',
         queryKey: ['recurring-journals'],
         breadcrumbs: [
@@ -1370,6 +1379,7 @@ export const bankReconciliationConfig =
         description:
             'Match bank statement balances with the books for each account.',
         apiEndpoint: '/api/bank-reconciliations',
+        permissionPrefix: 'bank_reconciliation',
         exportEndpoint: '/api/bank-reconciliations/export',
         queryKey: ['bank-reconciliations'],
         breadcrumbs: [
@@ -1397,6 +1407,7 @@ export const periodClosingConfig = createComplexEntityConfig<PeriodClosing>({
     entityNamePlural: 'Period Closings',
     description: 'Close accounting periods and carry balances forward.',
     apiEndpoint: '/api/period-closings',
+    permissionPrefix: 'period_closing',
     exportEndpoint: '/api/period-closings/export',
     queryKey: ['period-closings'],
     breadcrumbs: [{ title: 'Period Closings', href: '/period-closings' }],
@@ -1429,6 +1440,7 @@ export const reportConfigurationConfig =
         description:
             'Settings that define how each report is generated and displayed.',
         apiEndpoint: '/api/report-configurations',
+        permissionPrefix: 'report_configuration',
         exportEndpoint: '/api/report-configurations/export',
         queryKey: ['report-configurations'],
         breadcrumbs: [
@@ -1450,6 +1462,7 @@ export const budgetConfig = createComplexEntityConfig<Budget>({
     entityNamePlural: 'Budgets',
     description: 'Budget plans per account with period breakdown.',
     apiEndpoint: '/api/budgets',
+    permissionPrefix: 'budget',
     exportEndpoint: '/api/budgets/export',
     queryKey: ['budgets'],
     breadcrumbs: [{ title: 'Budgets', href: '/budgets' }],

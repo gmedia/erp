@@ -6,12 +6,89 @@ const VIEWER_EMAIL = 'module-action-viewer@example.com';
 const FIXTURE_PASSWORD = 'password';
 
 const VIEW_PAGES: Array<{ path: string; apiPath: string; perm: string }> = [
-    { path: '/purchase-orders', apiPath: '/api/purchase-orders', perm: 'purchase_order' },
-    { path: '/goods-receipts', apiPath: '/api/goods-receipts', perm: 'goods_receipt' },
-    { path: '/stock-transfers', apiPath: '/api/stock-transfers', perm: 'stock_transfer' },
-    { path: '/supplier-bills', apiPath: '/api/supplier-bills', perm: 'supplier_bill' },
-    { path: '/customer-invoices', apiPath: '/api/customer-invoices', perm: 'customer_invoice' },
+    {
+        path: '/purchase-orders',
+        apiPath: '/api/purchase-orders',
+        perm: 'purchase_order',
+    },
+    {
+        path: '/goods-receipts',
+        apiPath: '/api/goods-receipts',
+        perm: 'goods_receipt',
+    },
+    {
+        path: '/stock-transfers',
+        apiPath: '/api/stock-transfers',
+        perm: 'stock_transfer',
+    },
+    {
+        path: '/supplier-bills',
+        apiPath: '/api/supplier-bills',
+        perm: 'supplier_bill',
+    },
+    {
+        path: '/customer-invoices',
+        apiPath: '/api/customer-invoices',
+        perm: 'customer_invoice',
+    },
     { path: '/assets', apiPath: '/api/assets', perm: 'asset' },
+    {
+        path: '/fiscal-years',
+        apiPath: '/api/fiscal-years',
+        perm: 'fiscal_year',
+    },
+    {
+        path: '/coa-versions',
+        apiPath: '/api/coa-versions',
+        perm: 'coa_version',
+    },
+    {
+        path: '/account-mappings',
+        apiPath: '/api/account-mappings',
+        perm: 'account_mapping',
+    },
+    {
+        path: '/journal-entries',
+        apiPath: '/api/journal-entries',
+        perm: 'journal_entry',
+    },
+    { path: '/pipelines', apiPath: '/api/pipelines', perm: 'pipeline' },
+    {
+        path: '/approval-flows',
+        apiPath: '/api/approval-flows',
+        perm: 'approval_flow',
+    },
+    {
+        path: '/approval-delegations',
+        apiPath: '/api/approval-delegations',
+        perm: 'approval_delegation',
+    },
+    {
+        path: '/credit-notes',
+        apiPath: '/api/credit-notes',
+        perm: 'credit_note',
+    },
+    {
+        path: '/recurring-journals',
+        apiPath: '/api/recurring-journals',
+        perm: 'recurring_journal',
+    },
+    {
+        path: '/bank-reconciliations',
+        apiPath: '/api/bank-reconciliations',
+        perm: 'bank_reconciliation',
+    },
+    {
+        path: '/period-closings',
+        apiPath: '/api/period-closings',
+        perm: 'period_closing',
+    },
+    {
+        path: '/report-configurations',
+        apiPath: '/api/report-configurations',
+        perm: 'report_configuration',
+    },
+    { path: '/budgets', apiPath: '/api/budgets', perm: 'budget' },
 ];
 
 // Fixture hanya memegang izin lihat (modul.<nama> tanpa create/edit/delete).
