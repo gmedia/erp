@@ -49,8 +49,8 @@ trait AgingReportBoundaries
     protected function historicalArDueSql(string $invoiceAlias, string $asOfDate): string
     {
         return "({$invoiceAlias}.grand_total"
-            .' - '.$this->historicalCreditNoteSql($invoiceAlias, $asOfDate)
-            .' - '.$this->historicalReceivedSql($invoiceAlias, $asOfDate).')';
+            . ' - ' . $this->historicalCreditNoteSql($invoiceAlias, $asOfDate)
+            . ' - ' . $this->historicalReceivedSql($invoiceAlias, $asOfDate) . ')';
     }
 
     /**
@@ -58,22 +58,22 @@ trait AgingReportBoundaries
      */
     protected function historicalReceivedSql(string $invoiceAlias, string $asOfDate): string
     {
-        $posted = "'".implode("','", SyncArReceiptAllocationsAction::POSTED_STATUSES)."'";
-        $asOf = "'".Carbon::parse($asOfDate)->toDateString()."'";
-        $discountAccount = "'".PostArReceiptJournalAction::AR_DISCOUNT_ACCOUNT_CODE."'";
+        $posted = "'" . implode("','", SyncArReceiptAllocationsAction::POSTED_STATUSES) . "'";
+        $asOf = "'" . Carbon::parse($asOfDate)->toDateString() . "'";
+        $discountAccount = "'" . PostArReceiptJournalAction::AR_DISCOUNT_ACCOUNT_CODE . "'";
 
         // Diskon hanya ikut bila jurnal receipt memuat baris akun diskon (#437). Data lama
         // yang diskonnya tersimpan tetapi tidak terjurnal tidak mengurangi sisa.
         return 'COALESCE((SELECT SUM(ara.allocated_amount'
-            .' + CASE WHEN EXISTS (SELECT 1 FROM journal_entry_lines jel'
-            .' JOIN accounts acc ON acc.id = jel.account_id'
-            .' WHERE jel.journal_entry_id = arr.journal_entry_id'
-            ." AND acc.code = {$discountAccount}) THEN ara.discount_given ELSE 0 END)"
-            .' FROM ar_receipt_allocations ara'
-            .' JOIN ar_receipts arr ON arr.id = ara.ar_receipt_id'
-            ." WHERE ara.customer_invoice_id = {$invoiceAlias}.id"
-            ." AND arr.status IN ({$posted})"
-            ." AND arr.receipt_date <= {$asOf}), 0)";
+            . ' + CASE WHEN EXISTS (SELECT 1 FROM journal_entry_lines jel'
+            . ' JOIN accounts acc ON acc.id = jel.account_id'
+            . ' WHERE jel.journal_entry_id = arr.journal_entry_id'
+            . " AND acc.code = {$discountAccount}) THEN ara.discount_given ELSE 0 END)"
+            . ' FROM ar_receipt_allocations ara'
+            . ' JOIN ar_receipts arr ON arr.id = ara.ar_receipt_id'
+            . " WHERE ara.customer_invoice_id = {$invoiceAlias}.id"
+            . " AND arr.status IN ({$posted})"
+            . " AND arr.receipt_date <= {$asOf}), 0)";
     }
 
     /**
@@ -81,12 +81,12 @@ trait AgingReportBoundaries
      */
     protected function historicalCreditNoteSql(string $invoiceAlias, string $asOfDate): string
     {
-        $asOf = "'".Carbon::parse($asOfDate)->toDateString()."'";
+        $asOf = "'" . Carbon::parse($asOfDate)->toDateString() . "'";
 
         return 'COALESCE((SELECT SUM(cn.grand_total) FROM credit_notes cn'
-            ." WHERE cn.customer_invoice_id = {$invoiceAlias}.id"
-            ." AND cn.status IN ('confirmed', 'applied')"
-            ." AND cn.credit_note_date <= {$asOf}), 0)";
+            . " WHERE cn.customer_invoice_id = {$invoiceAlias}.id"
+            . " AND cn.status IN ('confirmed', 'applied')"
+            . " AND cn.credit_note_date <= {$asOf}), 0)";
     }
 
     /**
@@ -95,22 +95,22 @@ trait AgingReportBoundaries
      */
     protected function historicalApDueSql(string $billAlias, string $asOfDate): string
     {
-        $posted = "'".implode("','", SyncApPaymentAllocationsAction::POSTED_STATUSES)."'";
-        $asOf = "'".Carbon::parse($asOfDate)->toDateString()."'";
-        $discountAccount = "'".PostApPaymentJournalAction::AP_DISCOUNT_ACCOUNT_CODE."'";
+        $posted = "'" . implode("','", SyncApPaymentAllocationsAction::POSTED_STATUSES) . "'";
+        $asOf = "'" . Carbon::parse($asOfDate)->toDateString() . "'";
+        $discountAccount = "'" . PostApPaymentJournalAction::AP_DISCOUNT_ACCOUNT_CODE . "'";
 
         // Diskon hanya ikut bila jurnal payment memuat baris akun diskon (#437).
         return "({$billAlias}.grand_total"
-            .' - COALESCE((SELECT SUM(apa.allocated_amount'
-            .' + CASE WHEN EXISTS (SELECT 1 FROM journal_entry_lines jel'
-            .' JOIN accounts acc ON acc.id = jel.account_id'
-            .' WHERE jel.journal_entry_id = app.journal_entry_id'
-            ." AND acc.code = {$discountAccount}) THEN apa.discount_taken ELSE 0 END)"
-            .' FROM ap_payment_allocations apa'
-            .' JOIN ap_payments app ON app.id = apa.ap_payment_id'
-            ." WHERE apa.supplier_bill_id = {$billAlias}.id"
-            ." AND app.status IN ({$posted})"
-            ." AND app.payment_date <= {$asOf}), 0))";
+            . ' - COALESCE((SELECT SUM(apa.allocated_amount'
+            . ' + CASE WHEN EXISTS (SELECT 1 FROM journal_entry_lines jel'
+            . ' JOIN accounts acc ON acc.id = jel.account_id'
+            . ' WHERE jel.journal_entry_id = app.journal_entry_id'
+            . " AND acc.code = {$discountAccount}) THEN apa.discount_taken ELSE 0 END)"
+            . ' FROM ap_payment_allocations apa'
+            . ' JOIN ap_payments app ON app.id = apa.ap_payment_id'
+            . " WHERE apa.supplier_bill_id = {$billAlias}.id"
+            . " AND app.status IN ({$posted})"
+            . " AND app.payment_date <= {$asOf}), 0))";
     }
 
     /**
@@ -149,15 +149,15 @@ trait AgingReportBoundaries
         $due = $dueSql ?? "{$tableAlias}.amount_due";
 
         return "CASE WHEN {$tableAlias}.due_date >= ?"
-            ." THEN {$due} ELSE 0 END as {$aCurrent},"
-            ." CASE WHEN {$tableAlias}.due_date BETWEEN ? AND ?"
-            ." THEN {$due} ELSE 0 END as {$a1_30},"
-            ." CASE WHEN {$tableAlias}.due_date BETWEEN ? AND ?"
-            ." THEN {$due} ELSE 0 END as {$a31_60},"
-            ." CASE WHEN {$tableAlias}.due_date BETWEEN ? AND ?"
-            ." THEN {$due} ELSE 0 END as {$a61_90},"
-            ." CASE WHEN {$tableAlias}.due_date < ?"
-            ." THEN {$due} ELSE 0 END as {$aOver90}";
+            . " THEN {$due} ELSE 0 END as {$aCurrent},"
+            . " CASE WHEN {$tableAlias}.due_date BETWEEN ? AND ?"
+            . " THEN {$due} ELSE 0 END as {$a1_30},"
+            . " CASE WHEN {$tableAlias}.due_date BETWEEN ? AND ?"
+            . " THEN {$due} ELSE 0 END as {$a31_60},"
+            . " CASE WHEN {$tableAlias}.due_date BETWEEN ? AND ?"
+            . " THEN {$due} ELSE 0 END as {$a61_90},"
+            . " CASE WHEN {$tableAlias}.due_date < ?"
+            . " THEN {$due} ELSE 0 END as {$aOver90}";
     }
 
     /**

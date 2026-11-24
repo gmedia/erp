@@ -164,7 +164,7 @@ class GetAgingDashboardDataAction
         $query = DB::table("{$table} as {$alias}")
             ->whereIn("{$alias}.status", $statuses)
             ->whereDate("{$alias}.{$dateColumn}", '<=', $asOfStr)
-            ->whereRaw('('.$dueSql.') > 0');
+            ->whereRaw('(' . $dueSql . ') > 0');
 
         if ($branchId !== null) {
             $query->where("{$alias}.branch_id", $branchId);
@@ -337,7 +337,7 @@ class GetAgingDashboardDataAction
             ->join("{$partnerTable} as {$partnerAlias}", "{$partnerAlias}.id", '=', "{$tableAlias}.{$partnerFk}")
             ->whereIn("{$tableAlias}.status", $statuses)
             ->whereDate("{$tableAlias}.{$dateColumn}", '<=', $asOfStr)
-            ->whereRaw('('.$dueSql.') > 0');
+            ->whereRaw('(' . $dueSql . ') > 0');
 
         if ($branchId !== null) {
             $query->where("{$tableAlias}.branch_id", $branchId);
