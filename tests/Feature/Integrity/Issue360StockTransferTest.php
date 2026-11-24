@@ -52,6 +52,9 @@ function issue360Transfer(float $stock, float $qty): array
         'from_warehouse_id' => $from->id,
         'to_warehouse_id' => $to->id,
         'status' => 'draft',
+        // Stok dibuat kemarin: tanggal transfer harus sesudahnya (review putaran 3 butir 2 mengecek
+        // saldo berjalan sejak transfer_date; tanggal acak faker bisa mendahului stok).
+        'transfer_date' => now()->toDateString(),
     ]);
     $item = StockTransferItem::factory()->create([
         'stock_transfer_id' => $transfer->id,

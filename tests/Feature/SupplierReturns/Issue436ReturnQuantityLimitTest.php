@@ -78,7 +78,8 @@ function issue436ReturnableLine(float $received): array
         'quantity_in' => $received,
         'quantity_out' => 0,
         'balance_after' => $received,
-        'moved_at' => now()->subDay(),
+        // Sebelum tanggal retur (2026-03-06): saldo berjalan sejak tanggal retur tidak negatif.
+        'moved_at' => '2026-01-01 00:00:00',
     ]);
 
     return [$goodsReceipt, $line];
@@ -165,7 +166,12 @@ test('retur cancelled tidak mengurangi sisa qty yang boleh diretur', function ()
     putJson('/api/supplier-returns/' . $first->json('data.id'), ['status' => 'cancelled'])
         ->assertOk();
 
-    postJson('/api/supplier-returns', issue436ReturnPayload($goodsReceipt, $line, 10, 'confirmed'))
+    // Pembatalan membalik movement pada hari ini, jadi retur kedua diuji pada tanggal hari ini.
+    // Retur bertanggal mundur (sebelum pembalikan) tetap ditolak sesuai review putaran 3 butir 2.
+    $payload = issue436ReturnPayload($goodsReceipt, $line, 10, 'confirmed');
+    $payload['return_date'] = now()->toDateString();
+
+    postJson('/api/supplier-returns', $payload)
         ->assertCreated();
 });
 

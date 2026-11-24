@@ -311,8 +311,18 @@ class SupplierReturnController extends Controller
         PostSupplierReturnMovementsAction $postMovements,
         StockPostingService $stockPosting,
     ): void {
-        $stockPosting->assertNoNegativeStock($this->supplierReturnOutflows($supplierReturn));
+        $outflows = $this->supplierReturnOutflows($supplierReturn);
+        $stockPosting->assertNoNegativeStock($outflows);
         $postMovements->execute($supplierReturn->refresh());
+
+        // Review putaran 3 butir 2: retur bertanggal mundur memeriksa saldo berjalan sejak tanggal
+        // retur, bukan hanya saldo akhir. Dicek setelah movement terposting; 422 membatalkan transaksi.
+        // Retur hari ini tetap dijaga oleh assertNoNegativeStock di atas.
+        $returnDate = $supplierReturn->return_date->copy()->startOfDay();
+
+        if ($returnDate->lt(now()->startOfDay())) {
+            $stockPosting->assertNoNegativeStockFrom($outflows, $returnDate);
+        }
         // Jurnal gagal (COA/periode) melempar ValidationException: seluruh transaksi
         // dibatalkan, sehingga dokumen, stok, dan status tidak berubah (Issue #416).
         $postJournal->execute($supplierReturn->refresh());

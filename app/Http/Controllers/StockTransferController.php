@@ -191,6 +191,28 @@ class StockTransferController extends Controller
 
             $stockPosting->postStockTransferDispatch($stockTransfer);
             $stockPosting->postStockTransferReceive($stockTransfer);
+
+            // Review putaran 3 butir 2: kirim bertanggal mundur memeriksa saldo berjalan sejak
+            // transfer_date, setelah movement terposting; 422 membatalkan transaksi.
+            $transferDate = $stockTransfer->transfer_date->copy()->startOfDay();
+
+            if (
+                ! $wasDispatched
+                && $transferDate->lt(now()->startOfDay())
+                && in_array($stockTransfer->status, ['in_transit', 'received'], true)
+            ) {
+                $stockPosting->assertNoNegativeStockFrom(
+                    $stockTransfer->items
+                        ->map(fn ($item): array => [
+                            (int) $item->product_id,
+                            (int) $stockTransfer->from_warehouse_id,
+                            (float) $item->quantity,
+                        ])
+                        ->all(),
+                    $transferDate,
+                );
+            }
+
             app(PostStockTransferJournalAction::class)->execute($stockTransfer->refresh());
         });
 

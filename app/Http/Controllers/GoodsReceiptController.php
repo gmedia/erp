@@ -6,6 +6,7 @@ use App\Actions\AccountingPosting\PostGoodsReceiptJournalAction;
 use App\Actions\AccountingPosting\ReverseDocumentJournalAction;
 use App\Actions\GoodsReceipts\EnsurePurchaseOrderAllowsConfirmedReceiptAction;
 use App\Actions\GoodsReceipts\EnsurePurchaseOrderLineNotOverReceivedAction;
+use App\Actions\GoodsReceipts\EnsureStoredItemsAcceptedWithinReceivedAction;
 use App\Actions\GoodsReceipts\ExportGoodsReceiptsAction;
 use App\Actions\GoodsReceipts\IndexGoodsReceiptsAction;
 use App\Actions\GoodsReceipts\ListGoodsReceiptItemOptionsAction;
@@ -123,6 +124,7 @@ class GoodsReceiptController extends Controller
         ReverseDocumentJournalAction $reverseJournal,
         EnsurePurchaseOrderAllowsConfirmedReceiptAction $guardPurchaseOrder,
         EnsurePurchaseOrderLineNotOverReceivedAction $guardPurchaseOrderLines,
+        EnsureStoredItemsAcceptedWithinReceivedAction $guardStoredItems,
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
@@ -183,6 +185,7 @@ class GoodsReceiptController extends Controller
             $isNewlyConfirmed,
             $guardPurchaseOrder,
             $guardPurchaseOrderLines,
+            $guardStoredItems,
             $syncItems,
             $postJournal,
             $postMovements,
@@ -192,6 +195,10 @@ class GoodsReceiptController extends Controller
             // GR yang sudah confirmed tetap sah; aturan PO hanya berlaku saat GR baru dikonfirmasi.
             // Konfirmasi memakai item yang tersimpan bila payload tidak membawa items (butir 1 review).
             if ($isNewlyConfirmed) {
+                if ($items === null) {
+                    $guardStoredItems->execute($goodsReceipt->id);
+                }
+
                 $purchaseOrderId = $validated['purchase_order_id'] ?? $goodsReceipt->purchase_order_id;
                 $guardPurchaseOrder->execute((int) $purchaseOrderId);
                 $guardPurchaseOrderLines->execute(
