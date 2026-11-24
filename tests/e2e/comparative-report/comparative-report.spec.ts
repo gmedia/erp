@@ -94,14 +94,14 @@ test.describe('Comparative Report', () => {
 
         const branchSelector = page.getByRole('combobox').nth(2);
         await expect(branchSelector).toBeVisible();
-        await branchSelector.click();
-
-        await page.waitForResponse(
+        const branchesResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/branches') &&
                 r.status() < 400,
             { timeout: 30000 },
         );
+        await branchSelector.click();
+        await branchesResponse;
 
         const options = page.locator('ul.p-1 li button:visible');
         await expect(options.first()).toBeVisible({ timeout: 5000 });

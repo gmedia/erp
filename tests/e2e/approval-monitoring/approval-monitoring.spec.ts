@@ -41,8 +41,9 @@ test.describe('Approval Monitoring Dashboard', () => {
     });
 
     test('can filter by status', async ({ page }) => {
+        const dataResponse = page.waitForResponse(r => r.url().includes('/api/approval-monitoring/data') && r.status() < 400);
         await page.goto('/approval-monitoring');
-        await page.waitForResponse(r => r.url().includes('/api/approval-monitoring/data') && r.status() < 400);
+        await dataResponse;
 
         // Find and click the status combobox
         const combobox = page.getByRole('combobox').first();
@@ -61,8 +62,9 @@ test.describe('Approval Monitoring Dashboard', () => {
     });
 
     test('summary cards display values', async ({ page }) => {
+        const dataResponse = page.waitForResponse(r => r.url().includes('/api/approval-monitoring/data') && r.status() < 400);
         await page.goto('/approval-monitoring');
-        await page.waitForResponse(r => r.url().includes('/api/approval-monitoring/data') && r.status() < 400);
+        await dataResponse;
 
         // Verify "Pending Approvals" card has a numeric value
         const pendingCard = page.locator('[data-slot="card"]').filter({ hasText: 'Pending Approvals' });
@@ -86,8 +88,9 @@ test.describe('Approval Monitoring Dashboard', () => {
     });
 
     test('overdue approvals section renders', async ({ page }) => {
+        const dataResponse = page.waitForResponse(r => r.url().includes('/api/approval-monitoring/data') && r.status() < 400);
         await page.goto('/approval-monitoring');
-        await page.waitForResponse(r => r.url().includes('/api/approval-monitoring/data') && r.status() < 400);
+        await dataResponse;
 
         // Verify "Overdue Approvals" section is visible
         await expect(page.locator('text=Overdue Approvals').first()).toBeVisible();
@@ -107,8 +110,9 @@ test.describe('Approval Monitoring Dashboard', () => {
     });
 
     test('branch filter scopes the dashboard request', async ({ page }) => {
+        const dataResponse = page.waitForResponse(r => r.url().includes('/api/approval-monitoring/data') && r.status() < 400);
         await page.goto('/approval-monitoring');
-        await page.waitForResponse(r => r.url().includes('/api/approval-monitoring/data') && r.status() < 400);
+        await dataResponse;
 
         const branchSelect = page.getByRole('combobox').filter({ hasText: 'All Branches' });
         await expect(branchSelect).toBeVisible();
