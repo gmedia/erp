@@ -12,7 +12,15 @@ test.describe('Employee Import E2E Tests', () => {
         // 1. Prepare CSV file
         const timestamp = Date.now();
         const uniqueEmail = `import_${timestamp}@example.com`;
-        const csvContent = `employee_id,name,email,phone,department,position,branch,salary,hire_date,employment_status\nEMP-${timestamp.toString().slice(-5)},Imported User ${timestamp},${uniqueEmail},0812345678,Engineering,Senior Developer,Head Office,8000000,2024-01-01,regular`;
+        const header =
+            'employee_id,name,email,phone,department,position,branch,salary,hire_date,employment_status';
+        const row = [
+            `EMP-${timestamp.toString().slice(-5)}`,
+            `Imported User ${timestamp}`,
+            uniqueEmail,
+            '0812345678,Engineering,Senior Developer,Head Office,8000000,2024-01-01,regular',
+        ].join(',');
+        const csvContent = `${header}\n${row}`;
         
         const fileName = `import_employee_${timestamp}.csv`;
         const filePath = path.join('/tmp', fileName);
@@ -83,7 +91,13 @@ test.describe('Employee Import E2E Tests', () => {
 
     test('shows error summary for invalid import', async ({ page }) => {
         // 1. Prepare Invalid CSV (missing email)
-        const csvContent = `employee_id,name,email,phone,department,position,branch,salary,hire_date,employment_status\nEMP-INV,Invalid User,,0812345678,Engineering,Senior Developer,Head Office,8000000,2024-01-01,regular`;
+        const header =
+            'employee_id,name,email,phone,department,position,branch,salary,hire_date,employment_status';
+        const row = [
+            'EMP-INV,Invalid User,',
+            '0812345678,Engineering,Senior Developer,Head Office,8000000,2024-01-01,regular',
+        ].join(',');
+        const csvContent = `${header}\n${row}`;
         
         const fileName = `invalid_import_${Date.now()}.csv`;
         const filePath = path.join('/tmp', fileName);

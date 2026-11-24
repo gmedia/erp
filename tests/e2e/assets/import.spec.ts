@@ -34,7 +34,11 @@ test.describe('Asset Import E2E Tests', () => {
             'E2E Import Verification' // notes
         ];
         
-        const csvContent = `asset_code,name,asset_category,asset_model,branch,location,department,employee,supplier,serial_number,barcode,purchase_date,purchase_cost,currency,warranty_end_date,status,condition,notes\n${rowData.join(',')}`;
+        const header = [
+            'asset_code,name,asset_category,asset_model,branch,location,department,employee,supplier',
+            'serial_number,barcode,purchase_date,purchase_cost,currency,warranty_end_date,status,condition,notes',
+        ].join(',');
+        const csvContent = `${header}\n${rowData.join(',')}`;
         
         const fileName = `import_asset_${timestamp}.csv`;
         const filePath = path.join('/tmp', fileName);
@@ -116,7 +120,11 @@ test.describe('Asset Import E2E Tests', () => {
             'E2E Import Error Check'  // notes
         ];
         
-        const csvContent = `asset_code,name,asset_category,asset_model,branch,location,department,employee,supplier,serial_number,barcode,purchase_date,purchase_cost,currency,warranty_end_date,status,condition,notes\n${rowData.join(',')}`;
+        const header = [
+            'asset_code,name,asset_category,asset_model,branch,location,department,employee,supplier',
+            'serial_number,barcode,purchase_date,purchase_cost,currency,warranty_end_date,status,condition,notes',
+        ].join(',');
+        const csvContent = `${header}\n${rowData.join(',')}`;
         
         const fileName = `invalid_import_${Date.now()}.csv`;
         const filePath = path.join('/tmp', fileName);

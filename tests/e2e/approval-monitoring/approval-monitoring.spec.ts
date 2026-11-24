@@ -41,7 +41,9 @@ test.describe('Approval Monitoring Dashboard', () => {
     });
 
     test('can filter by status', async ({ page }) => {
-        const dataResponse = page.waitForResponse(r => r.url().includes('/api/approval-monitoring/data') && r.status() < 400);
+        const dataResponse = page.waitForResponse(
+            r => r.url().includes('/api/approval-monitoring/data') && r.status() < 400,
+        );
         await page.goto('/approval-monitoring');
         await dataResponse;
 
@@ -62,7 +64,9 @@ test.describe('Approval Monitoring Dashboard', () => {
     });
 
     test('summary cards display values', async ({ page }) => {
-        const dataResponse = page.waitForResponse(r => r.url().includes('/api/approval-monitoring/data') && r.status() < 400);
+        const dataResponse = page.waitForResponse(
+            r => r.url().includes('/api/approval-monitoring/data') && r.status() < 400,
+        );
         await page.goto('/approval-monitoring');
         await dataResponse;
 
@@ -88,7 +92,9 @@ test.describe('Approval Monitoring Dashboard', () => {
     });
 
     test('overdue approvals section renders', async ({ page }) => {
-        const dataResponse = page.waitForResponse(r => r.url().includes('/api/approval-monitoring/data') && r.status() < 400);
+        const dataResponse = page.waitForResponse(
+            r => r.url().includes('/api/approval-monitoring/data') && r.status() < 400,
+        );
         await page.goto('/approval-monitoring');
         await dataResponse;
 
@@ -110,7 +116,9 @@ test.describe('Approval Monitoring Dashboard', () => {
     });
 
     test('branch filter scopes the dashboard request', async ({ page }) => {
-        const dataResponse = page.waitForResponse(r => r.url().includes('/api/approval-monitoring/data') && r.status() < 400);
+        const dataResponse = page.waitForResponse(
+            r => r.url().includes('/api/approval-monitoring/data') && r.status() < 400,
+        );
         await page.goto('/approval-monitoring');
         await dataResponse;
 
