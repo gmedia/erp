@@ -5,6 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/auth-context';
+import { useTranslation } from '@/contexts/i18n-context';
 import AuthLayout from '@/layouts/auth-layout';
 import axiosInstance from '@/lib/axios';
 import axios from 'axios';
@@ -30,6 +31,7 @@ function getFormValue(formData: FormData, key: string): string {
 
 export default function Login({ status, canResetPassword = true }: LoginProps) {
     const { login } = useAuth();
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -125,8 +127,8 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
 
     return (
         <AuthLayout
-            title="Log in to your account"
-            description="Enter your email and password below to log in"
+            title={t('auth.login_title')}
+            description={t('auth.login_description')}
         >
             <Helmet>
                 <title>Log in - {import.meta.env.VITE_APP_NAME || 'ERP'}</title>
@@ -166,7 +168,7 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
                 <form onSubmit={handleSubmit} className="flex flex-col gap-6">
                     <div className="grid gap-6">
                         <div className="grid gap-2">
-                            <Label htmlFor="email">Email address</Label>
+                            <Label htmlFor="email">{t('auth.email')}</Label>
                             <Input
                                 id="email"
                                 type="email"
@@ -181,13 +183,15 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
 
                         <div className="grid gap-2">
                             <div className="flex items-center">
-                                <Label htmlFor="password">Password</Label>
+                                <Label htmlFor="password">
+                                    {t('auth.password')}
+                                </Label>
                                 {canResetPassword && (
                                     <TextLink
                                         to="/forgot-password"
                                         className="ml-auto text-sm"
                                     >
-                                        Forgot password?
+                                        {t('auth.forgot_password')}
                                     </TextLink>
                                 )}
                             </div>
@@ -204,7 +208,9 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
 
                         <div className="flex items-center space-x-3">
                             <Checkbox id="remember" name="remember" />
-                            <Label htmlFor="remember">Remember me</Label>
+                            <Label htmlFor="remember">
+                                {t('auth.remember_me')}
+                            </Label>
                         </div>
 
                         <Button
@@ -216,7 +222,7 @@ export default function Login({ status, canResetPassword = true }: LoginProps) {
                             {processing && (
                                 <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
                             )}
-                            Log in
+                            {t('auth.login')}
                         </Button>
                     </div>
                 </form>

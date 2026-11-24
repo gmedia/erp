@@ -69,19 +69,6 @@ class AuthController extends Controller
         $pendingApprovalsCount = $this->resolvePendingApprovalsCount($user->id);
         $menus = $this->resolveMenus($employee);
 
-        // Get Translations
-        $locale = app()->getLocale();
-        $path = lang_path("{$locale}.json");
-        $translations = [];
-        if (File::exists($path)) {
-            $translations = json_decode(File::get($path), true) ?? [];
-        } else {
-            $fallbackPath = lang_path('en.json');
-            if (File::exists($fallbackPath)) {
-                $translations = json_decode(File::get($fallbackPath), true) ?? [];
-            }
-        }
-
         return response()->json([
             'user' => $user,
             'employee' => $employee,
@@ -90,8 +77,19 @@ class AuthController extends Controller
             'regionalSettings' => $regionalSettings,
             'menus' => $menus,
             'pendingApprovalsCount' => $pendingApprovalsCount,
-            'translations' => $translations,
-            'locale' => $locale,
+            'translations' => $this->loadTranslations(),
+            'locale' => app()->getLocale(),
+        ]);
+    }
+
+    /**
+     * Public translations for the request locale (used before login).
+     */
+    public function translations()
+    {
+        return response()->json([
+            'locale' => app()->getLocale(),
+            'translations' => $this->loadTranslations(),
         ]);
     }
 
@@ -264,5 +262,19 @@ class AuthController extends Controller
             'number_format_thousand' => '.',
             'number_format_hide_decimal' => false,
         ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function loadTranslations(): array
+    {
+        $locale = app()->getLocale();
+        $path = lang_path("{$locale}.json");
+        if (! File::exists($path)) {
+            $path = lang_path('en.json');
+        }
+
+        return File::exists($path) ? (json_decode(File::get($path), true) ?? []) : [];
     }
 }

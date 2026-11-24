@@ -11,6 +11,7 @@ Route::post('login', [AuthController::class, 'login']);
 Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('reset-password', [AuthController::class, 'resetPassword']);
 Route::get('social/policy', [SocialAuthController::class, 'policy']);
+Route::get('locale/translations', [AuthController::class, 'translations']);
 Route::get('social/{provider}/redirect', [SocialAuthController::class, 'redirect'])
     ->middleware('throttle:social-redirect');
 Route::get('social/{provider}/callback', [SocialAuthController::class, 'callback'])
