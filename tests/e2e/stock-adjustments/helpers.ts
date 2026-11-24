@@ -12,11 +12,15 @@ async function selectAsyncOption(
         await expect(trigger).toBeVisible();
         await trigger.click();
 
-        const listbox = page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').last();
+        const listbox = page
+            .locator('[role="listbox"]:visible, ul[aria-busy]:visible')
+            .last();
         await expect(listbox).toBeVisible();
 
         if (searchText) {
-            const searchInput = page.locator('input[placeholder="Search..."]:visible').last();
+            const searchInput = page
+                .locator('input[placeholder="Search..."]:visible')
+                .last();
             if (await searchInput.isVisible().catch(() => false)) {
                 await searchInput.fill(searchText);
                 await page.waitForTimeout(250);
@@ -91,7 +95,9 @@ async function selectPersistedAsyncOption(
         await selectAsyncOption(page, trigger, searchText, optionText);
 
         try {
-            await expect(trigger).toContainText(optionPattern, { timeout: 2000 });
+            await expect(trigger).toContainText(optionPattern, {
+                timeout: 2000,
+            });
             return;
         } catch (error) {
             if (attempt === 3) {
@@ -105,9 +111,15 @@ export async function createStockAdjustment(page: Page): Promise<string> {
     const adjustmentNumber = `SA-E2E-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
     const productCandidates: readonly AsyncOptionCandidate[] = [
         { searchText: 'MDF Wood Panel', optionText: 'MDF Wood Panel' },
-        { searchText: 'Executive Office Desk', optionText: 'Executive Office Desk' },
+        {
+            searchText: 'Executive Office Desk',
+            optionText: 'Executive Office Desk',
+        },
         { searchText: 'Wooden Table Legs', optionText: 'Wooden Table Legs' },
-        { searchText: 'Inventory Sample Product', optionText: 'Inventory Sample Product' },
+        {
+            searchText: 'Inventory Sample Product',
+            optionText: 'Inventory Sample Product',
+        },
     ];
     const unitCandidates: readonly AsyncOptionCandidate[] = [
         { searchText: 'Sheet', optionText: 'Sheet' },
@@ -160,7 +172,9 @@ export async function createStockAdjustment(page: Page): Promise<string> {
     await itemDialog.locator('input[name="quantity_adjusted"]').fill('2');
 
     const parentRows = dialog.locator('tbody tr');
-    const saveItemButton = itemDialog.getByRole('button', { name: /Save Item/i });
+    const saveItemButton = itemDialog.getByRole('button', {
+        name: /Save Item/i,
+    });
     let itemCommitted = false;
 
     for (let attempt = 1; attempt <= 3; attempt++) {
@@ -190,16 +204,21 @@ export async function createStockAdjustment(page: Page): Promise<string> {
                 unitCandidates,
                 { searchText: '', optionText: '.+' },
             );
-            await itemDialog.locator('input[name="quantity_adjusted"]').fill('2');
+            await itemDialog
+                .locator('input[name="quantity_adjusted"]')
+                .fill('2');
             await page.waitForTimeout(250);
         }
     }
 
-    expect(itemCommitted, 'Stock adjustment item row should be committed before submit').toBeTruthy();
+    expect(
+        itemCommitted,
+        'Stock adjustment item row should be committed before submit',
+    ).toBeTruthy();
 
     // Wait until the item is committed to the parent form, then close item dialog deterministically.
     for (let closeAttempt = 1; closeAttempt <= 3; closeAttempt++) {
-        if (!await itemDialog.isVisible().catch(() => false)) {
+        if (!(await itemDialog.isVisible().catch(() => false))) {
             break;
         }
 
@@ -212,7 +231,10 @@ export async function createStockAdjustment(page: Page): Promise<string> {
             await page.keyboard.press('Escape').catch(() => null);
         }
     }
-    await expect(page.getByRole('dialog', { name: /Add Item/i })).toHaveCount(0, { timeout: 10000 });
+    await expect(page.getByRole('dialog', { name: /Add Item/i })).toHaveCount(
+        0,
+        { timeout: 10000 },
+    );
 
     // Ensure item append has been committed before submitting the main form.
     const emptyItemsCell = dialog.getByText('No items added yet.');
@@ -222,7 +244,11 @@ export async function createStockAdjustment(page: Page): Promise<string> {
     await expect(dialog.locator('tbody tr')).toHaveCount(1, { timeout: 10000 });
 
     // Close any lingering AsyncSelect popover that may intercept the submit click.
-    if (await page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').count()) {
+    if (
+        await page
+            .locator('[role="listbox"]:visible, ul[aria-busy]:visible')
+            .count()
+    ) {
         await page.keyboard.press('Escape').catch(() => null);
     }
 
@@ -232,7 +258,9 @@ export async function createStockAdjustment(page: Page): Promise<string> {
         }
 
         for (let confirmAttempt = 1; confirmAttempt <= 4; confirmAttempt++) {
-            await searchStockAdjustment(page, adjustmentNumber).catch(() => null);
+            await searchStockAdjustment(page, adjustmentNumber).catch(
+                () => null,
+            );
             if (await createdRow.isVisible().catch(() => false)) {
                 return true;
             }
@@ -246,28 +274,37 @@ export async function createStockAdjustment(page: Page): Promise<string> {
     let lastCreateError: unknown;
 
     for (let attempt = 1; attempt <= 3; attempt++) {
-        if (!await dialog.isVisible().catch(() => false)) {
+        if (!(await dialog.isVisible().catch(() => false))) {
             if (await confirmCreatedRow()) {
                 createResponseStatus = 200;
                 break;
             }
             if (attempt === 3) {
-                throw new Error('Stock adjustment dialog closed before creation could be confirmed.');
+                throw new Error(
+                    'Stock adjustment dialog closed before creation could be confirmed.',
+                );
             }
             await page.waitForTimeout(300 * attempt);
             continue;
         }
 
-        const submitButton = dialog.getByRole('button', { name: /^(Add|Create|Submit)$/i });
+        const submitButton = dialog.getByRole('button', {
+            name: /^(Add|Create|Submit)$/i,
+        });
         await expect(submitButton).toBeVisible({ timeout: 10000 });
         await expect(submitButton).toBeEnabled();
 
-        const createResponsePromise = page.waitForResponse(
-            (r) =>
-                r.url().includes('/api/stock-adjustments') &&
-                r.request().method() === 'POST',
-            { timeout: 10000 },
-        ).then((response) => ({ type: 'response' as const, status: response.status() }));
+        const createResponsePromise = page
+            .waitForResponse(
+                (r) =>
+                    r.url().includes('/api/stock-adjustments') &&
+                    r.request().method() === 'POST',
+                { timeout: 10000 },
+            )
+            .then((response) => ({
+                type: 'response' as const,
+                status: response.status(),
+            }));
         const createdRowPromise = createdRow
             .waitFor({ state: 'visible', timeout: 10000 })
             .then(() => ({ type: 'row' as const }));
@@ -308,12 +345,15 @@ export async function createStockAdjustment(page: Page): Promise<string> {
                 .then(() => true)
                 .catch(() => false);
 
-            if (dialogClosedAfterDelay && await confirmCreatedRow()) {
+            if (dialogClosedAfterDelay && (await confirmCreatedRow())) {
                 createResponseStatus = 200;
                 break;
             }
 
-            if (!await dialog.isVisible().catch(() => false) && await confirmCreatedRow()) {
+            if (
+                !(await dialog.isVisible().catch(() => false)) &&
+                (await confirmCreatedRow())
+            ) {
                 createResponseStatus = 200;
                 break;
             }
@@ -323,14 +363,22 @@ export async function createStockAdjustment(page: Page): Promise<string> {
             }
 
             // Retry when submit click did not produce a reliable creation signal.
-            if (await page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').count()) {
+            if (
+                await page
+                    .locator('[role="listbox"]:visible, ul[aria-busy]:visible')
+                    .count()
+            ) {
                 await page.keyboard.press('Escape').catch(() => null);
             }
 
-            const lingeringItemDialog = page.getByRole('dialog', { name: /Add Item/i });
+            const lingeringItemDialog = page.getByRole('dialog', {
+                name: /Add Item/i,
+            });
             if (await lingeringItemDialog.isVisible().catch(() => false)) {
                 await page.keyboard.press('Escape').catch(() => null);
-                await expect(lingeringItemDialog).toBeHidden({ timeout: 3000 }).catch(() => null);
+                await expect(lingeringItemDialog)
+                    .toBeHidden({ timeout: 3000 })
+                    .catch(() => null);
             }
         }
     }
@@ -341,7 +389,10 @@ export async function createStockAdjustment(page: Page): Promise<string> {
             : new Error('Stock adjustment create response was not captured.');
     }
 
-    expect(createResponseStatus, 'Stock adjustment create response should be successful').toBeLessThan(400);
+    expect(
+        createResponseStatus,
+        'Stock adjustment create response should be successful',
+    ).toBeLessThan(400);
 
     try {
         await expect(dialog).not.toBeVisible({ timeout: 5000 });
@@ -358,7 +409,7 @@ export async function createStockAdjustment(page: Page): Promise<string> {
     }
 
     await expect(dialog).not.toBeVisible({ timeout: 15000 });
-    if (!await createdRow.isVisible().catch(() => false)) {
+    if (!(await createdRow.isVisible().catch(() => false))) {
         await searchStockAdjustment(page, adjustmentNumber);
     }
     await expect(createdRow).toBeVisible({
@@ -392,7 +443,9 @@ export async function editStockAdjustment(
 
     // Wait for the GET detail request to complete before editing
     const detailResponse = page.waitForResponse(
-        (r) => !!r.url().match(/\/api\/stock-adjustments\/\d+$/) && r.request().method() === 'GET',
+        (r) =>
+            !!r.url().match(/\/api\/stock-adjustments\/\d+$/) &&
+            r.request().method() === 'GET',
         { timeout: 15000 },
     );
 
@@ -412,7 +465,10 @@ export async function editStockAdjustment(
     }
 
     // Click dialog title area to dismiss any floating popover/listbox
-    await dialog.locator('[data-slot="dialog-header"]').click().catch(() => null);
+    await dialog
+        .locator('[data-slot="dialog-header"]')
+        .click()
+        .catch(() => null);
     await page.waitForTimeout(300);
 
     const updateBtn = dialog.getByRole('button', { name: /Update/i });
