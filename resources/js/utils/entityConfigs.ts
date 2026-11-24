@@ -30,6 +30,8 @@ export interface BaseEntityConfig<
     readonly breadcrumbs: readonly BreadcrumbItem[];
     readonly getDeleteMessage: (item: T) => string;
     readonly initialFilters?: FilterType;
+    /** Prefix permission modul (`department` -> `.create/.edit/.delete`). Kosong = tanpa gating. */
+    readonly permissionPrefix?: string;
 }
 
 // Configuration for entities with custom components and stricter typing
@@ -167,6 +169,7 @@ export interface SimpleEntityConfigOptions<T = unknown> {
     description?: string;
     apiBase: string;
     filterPlaceholder: string;
+    permissionPrefix?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     viewModalComponent?: React.ComponentType<any>;
     getDeleteMessage?: (item: T) => string;
@@ -194,6 +197,7 @@ export interface ComplexEntityConfigOptions<T = Record<string, unknown>> {
     defaultColumnVisibility?: Record<string, boolean>;
     loadDetailOnEdit?: boolean;
     detailLoadErrorMessage?: string;
+    permissionPrefix?: string;
 }
 
 // Factory to create a bound SimpleEntityViewModal for a specific entity
@@ -225,12 +229,14 @@ function createSimpleEntityConfig<
         description,
         apiBase,
         filterPlaceholder,
+        permissionPrefix,
     } = options;
 
     return {
         entityName,
         entityNamePlural,
         description,
+        permissionPrefix,
         apiEndpoint: `/api/${apiBase}`,
         exportEndpoint: `/api/${apiBase}/export`,
         queryKey: [apiBase],
@@ -270,6 +276,7 @@ function createComplexEntityConfig<T = Record<string, unknown>>(
         defaultColumnVisibility: options.defaultColumnVisibility,
         loadDetailOnEdit: options.loadDetailOnEdit,
         detailLoadErrorMessage: options.detailLoadErrorMessage,
+        permissionPrefix: options.permissionPrefix,
     };
 }
 
@@ -280,6 +287,7 @@ export const departmentConfig = createSimpleEntityConfig({
     description: 'Organizational units used to group employees and assets.',
     apiBase: 'departments',
     filterPlaceholder: 'Search departments...',
+    permissionPrefix: 'department',
 });
 
 export const positionConfig = createSimpleEntityConfig({

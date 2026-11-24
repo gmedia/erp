@@ -2,8 +2,9 @@
 
 import { CrudPage } from '@/components/common/CrudPage';
 import { DataTable } from '@/components/common/DataTableCore';
+import { usePermissions } from '@/hooks/usePermissions';
 import { CustomEntityConfig } from '@/utils/entityConfigs';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 // Form component types
 export type FormComponentType = 'simple' | 'complex';
@@ -96,6 +97,16 @@ export function createEntityCrudPage<T extends object>(
 
     // Create the page component using the configuration
     const EntityCrudPage = (): React.JSX.Element => {
+        const { can } = usePermissions();
+        const prefix = config.permissionPrefix;
+        const canCreate = prefix ? can(`${prefix}.create`) : true;
+        const canEdit = prefix ? can(`${prefix}.edit`) : true;
+        const canDelete = prefix ? can(`${prefix}.delete`) : true;
+        const actionAccess = useMemo(
+            () => ({ canCreate, canEdit, canDelete }),
+            [canCreate, canEdit, canDelete],
+        );
+
         try {
             return (
                 <CrudPage
@@ -103,6 +114,7 @@ export function createEntityCrudPage<T extends object>(
                         entityName: config.entityName,
                         entityNamePlural: config.entityNamePlural,
                         description: config.description,
+                        actionAccess,
                         apiEndpoint: config.apiEndpoint,
                         queryKey: [...config.queryKey],
                         identifierKey: config.identifierKey,
