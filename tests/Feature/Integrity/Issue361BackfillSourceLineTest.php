@@ -50,7 +50,10 @@ function issue361ConfirmedGoodsReceipt(array $lines, ?Warehouse $warehouse = nul
 {
     $warehouse ??= Warehouse::factory()->create();
     $unit = Unit::factory()->create();
-    $purchaseOrder = PurchaseOrder::factory()->create(['warehouse_id' => $warehouse->id]);
+    $purchaseOrder = PurchaseOrder::factory()->create([
+        'warehouse_id' => $warehouse->id,
+        'status' => 'confirmed',
+    ]);
     $purchaseItems = [];
 
     foreach ($lines as $line) {
