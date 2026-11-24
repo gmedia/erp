@@ -10,6 +10,10 @@ import {
     TableEmptyStateRow,
     TableLoadingRow,
 } from '@/components/common/StandaloneTablePage';
+import {
+    type StatusActionConfig,
+    StatusActionDialog,
+} from '@/components/common/StatusActionDialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
@@ -27,7 +31,7 @@ import { BreadcrumbItem } from '@/types';
 import { AssetDepreciationRun } from '@/types/asset-depreciation-run';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { type AssetDepreciationCalculationFormData } from '@/utils/schemas';
-import { Calculator, CheckCircle2, Loader2, Plus } from 'lucide-react';
+import { Ban, Calculator, CheckCircle2, Loader2, Plus } from 'lucide-react';
 import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -56,14 +60,30 @@ export default function Index() {
         isLoading,
         isCalculating,
         isPosting,
+        isVoiding,
         setPage,
         setPerPage,
         calculateDepreciation,
         postToJournal,
+        voidRun,
     } = useAssetDepreciationRuns();
 
     const [isCalcOpen, setIsCalcOpen] = useState(false);
     const [viewRunId, setViewRunId] = useState<number | null>(null);
+    const [voidTarget, setVoidTarget] = useState<AssetDepreciationRun | null>(
+        null,
+    );
+
+    const voidConfig: StatusActionConfig<'void'> | undefined = voidTarget
+        ? {
+              action: 'void',
+              label: 'Void',
+              title: 'Void depreciation run?',
+              description:
+                  'The run is cancelled and does not count toward depreciation. You can calculate the same period again.',
+              confirmLabel: 'Void run',
+          }
+        : undefined;
 
     const { can } = usePermissions();
     const canEdit = can('asset_depreciation_run.edit');
@@ -166,6 +186,20 @@ export default function Index() {
                                               )}
                                               Post
                                           </DropdownMenuItem>,
+                                          <DropdownMenuItem
+                                              key="void"
+                                              disabled={isVoiding === item.id}
+                                              onClick={() =>
+                                                  setVoidTarget(item)
+                                              }
+                                          >
+                                              {isVoiding === item.id ? (
+                                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                              ) : (
+                                                  <Ban className="mr-2 h-4 w-4 text-destructive" />
+                                              )}
+                                              Void
+                                          </DropdownMenuItem>,
                                       ]
                                     : undefined
                             }
@@ -251,6 +285,18 @@ export default function Index() {
                 runId={viewRunId}
                 open={viewRunId !== null}
                 onClose={() => setViewRunId(null)}
+            />
+
+            <StatusActionDialog
+                config={voidConfig}
+                processing={isVoiding !== null}
+                processingLabel="Voiding..."
+                onConfirm={async () => {
+                    if (!voidTarget) return;
+                    const ok = await voidRun(voidTarget.id);
+                    if (ok) setVoidTarget(null);
+                }}
+                onCancel={() => setVoidTarget(null)}
             />
         </StandaloneTablePage>
     );

@@ -158,6 +158,20 @@ test('it does not change movement when only name changes during update', functio
     ]);
 });
 
+test('it excludes disposed assets from the picker but keeps lost assets', function () {
+    $active = Asset::factory()->create(['status' => 'active']);
+    $lost = Asset::factory()->create(['status' => 'lost']);
+    $disposed = Asset::factory()->create(['status' => 'disposed']);
+
+    $response = getJson('/api/assets?exclude_status=disposed&per_page=100');
+
+    $response->assertStatus(200);
+    $ids = collect($response->json('data'))->pluck('id')->all();
+
+    expect($ids)->toContain($active->id, $lost->id)
+        ->and($ids)->not->toContain($disposed->id);
+});
+
 test('it exports assets', function () {
     Asset::factory()->count(5)->create();
 
