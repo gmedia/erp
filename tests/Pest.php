@@ -69,3 +69,6 @@ function createTestUserWithPermissions(array $permissionNames = []): User
 
     return $user;
 }
+
+// Helper akuntansi bersama (COA + periode untuk jurnal GR, Issue #416).
+require_once __DIR__.'/Support/AccountingFixtures.php';
