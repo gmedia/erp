@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Actions\PeriodClosings\AssertPeriodOpenForPostingAction;
 use App\Models\FiscalYear;
 use App\Models\GoodsReceipt;
 use App\Models\Product;
@@ -638,6 +639,24 @@ class StockPostingService
         }
     }
 
+    /**
+     * Guard penguncian periode (#434): memakai AssertPeriodOpenForPostingAction yang sama
+     * dengan jurnal (#423). Tanggal di luar tahun fiskal mana pun tidak dikunci di sini.
+     */
+    private function assertPeriodOpenForMovement(CarbonInterface $date): void
+    {
+        $fiscalYear = FiscalYear::query()
+            ->where('start_date', '<=', $date->toDateString())
+            ->where('end_date', '>=', $date->toDateString())
+            ->first();
+
+        if ($fiscalYear === null) {
+            return;
+        }
+
+        app(AssertPeriodOpenForPostingAction::class)->execute($fiscalYear->id, $date->toDateString());
+    }
+
     private function throwInsufficientStock(int $productId, int $warehouseId, ?StockMovement $negative): void
     {
         $productName = Product::query()->whereKey($productId)->value('name');
@@ -660,8 +679,12 @@ class StockPostingService
         ])->status(422);
     }
 
-    private function reverseMovementsOfType(string $referenceType, int $referenceId, string $originalType, string $reversalType): void
-    {
+    private function reverseMovementsOfType(
+        string $referenceType,
+        int $referenceId,
+        string $originalType,
+        string $reversalType,
+    ): void {
         $originals = StockMovement::query()
             ->where('reference_type', $referenceType)
             ->where('reference_id', $referenceId)
@@ -715,6 +738,8 @@ class StockPostingService
      */
     private function record(array $attributes): StockMovement
     {
+        $this->assertPeriodOpenForMovement($attributes['moved_at']);
+
         $movement = StockMovement::query()->updateOrCreate(
             [
                 'movement_type' => $attributes['movement_type'],
