@@ -2,8 +2,8 @@
 
 import { GenericActions } from '@/components/common/ActionsDropdown';
 import { PeriodClosingActionDialog } from '@/components/period-closings/PeriodClosingActionDialog';
-import { useTranslation } from '@/contexts/i18n-context';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { useTranslation } from '@/contexts/i18n-context';
 import {
     type PeriodClosingAction,
     usePeriodClosingAction,
