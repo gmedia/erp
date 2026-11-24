@@ -38,6 +38,7 @@ class GoodsReceiptResource extends JsonResource
             'purchase_order' => $purchaseOrder ? [
                 'id' => $this->resource->purchase_order_id,
                 'po_number' => $purchaseOrder->po_number,
+                'status' => $purchaseOrder->status,
                 'supplier' => [
                     'id' => $purchaseOrder->supplier_id,
                     'name' => $purchaseOrderSupplier?->name,

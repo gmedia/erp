@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { memo, useEffect, useMemo, useRef } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { type Resolver, useFieldArray, useForm } from 'react-hook-form';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
@@ -15,6 +15,7 @@ import {
 import { InputField } from '@/components/common/InputField';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
     Table,
     TableBody,
@@ -23,6 +24,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import {
@@ -46,6 +48,10 @@ interface GoodsReceiptFormProps {
     onSubmit: (data: GoodsReceiptFormData) => void;
     isLoading?: boolean;
 }
+
+const CONFIRMABLE_PO_STATUSES = ['confirmed', 'partially_received'];
+
+type PurchaseOrderOption = { po_number: string; status?: string };
 
 const createEmptyGoodsReceiptItem =
     (): GoodsReceiptFormData['items'][number] => ({
@@ -124,6 +130,7 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
         onSubmit,
         isLoading = false,
     }) {
+        const { t } = useTranslation();
         const activeGoodsReceipt = goodsReceipt || item || entity;
         const defaultValues = useMemo(
             () => getGoodsReceiptFormDefaults(activeGoodsReceipt),
@@ -149,6 +156,15 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
         });
         const watchedItems = form.watch('items');
         const watchedPurchaseOrderId = form.watch('purchase_order_id');
+        const watchedStatus = form.watch('status');
+        const [selectedPoStatus, setSelectedPoStatus] = useState<
+            string | undefined
+        >(activeGoodsReceipt?.purchase_order?.status ?? undefined);
+        const isPoNotConfirmable =
+            watchedStatus === 'confirmed' &&
+            !!watchedPurchaseOrderId &&
+            !!selectedPoStatus &&
+            !CONFIRMABLE_PO_STATUSES.includes(selectedPoStatus);
         const previousPurchaseOrderIdRef = useRef(
             defaultValues.purchase_order_id,
         );
@@ -218,13 +234,25 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
                         placeholder="Select status"
                     />
 
-                    <AsyncSelectField<{ po_number: string }>
-                        name="purchase_order_id"
-                        label="Purchase Order"
-                        url="/api/purchase-orders"
-                        placeholder="Select purchase order"
-                        labelFn={(po) => po.po_number}
-                    />
+                    <div className="space-y-2">
+                        <AsyncSelectField<PurchaseOrderOption>
+                            name="purchase_order_id"
+                            label="Purchase Order"
+                            url="/api/purchase-orders"
+                            placeholder="Select purchase order"
+                            labelFn={(po) => po.po_number}
+                            onItemSelect={(po) =>
+                                setSelectedPoStatus(po.status)
+                            }
+                        />
+                        {isPoNotConfirmable && (
+                            <Alert variant="destructive">
+                                <AlertDescription>
+                                    {t('goods_receipt.po_not_approved')}
+                                </AlertDescription>
+                            </Alert>
+                        )}
+                    </div>
 
                     <AsyncSelectField
                         name="warehouse_id"

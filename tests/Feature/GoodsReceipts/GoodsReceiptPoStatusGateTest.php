@@ -175,6 +175,15 @@ test('blocked confirmed GR returns localized message in english', function () {
     expect($response->json('errors.status.0'))->toBe(__('goods_receipt.po_not_approved', [], 'en'));
 });
 
+test('GR response exposes purchase order status for the form warning', function () {
+    [$purchaseOrder, $item] = purchaseOrderWithStatusForGoodsReceiptGate('draft');
+
+    $response = postJson('/api/goods-receipts', goodsReceiptGatePayload($purchaseOrder, $item, 'draft'));
+
+    $response->assertStatus(201);
+    expect($response->json('data.purchase_order.status'))->toBe('draft');
+});
+
 test('blocked confirmed GR returns localized message in indonesian', function () {
     [$purchaseOrder, $item] = purchaseOrderWithStatusForGoodsReceiptGate('draft');
 
