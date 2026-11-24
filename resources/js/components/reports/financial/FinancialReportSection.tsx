@@ -132,13 +132,13 @@ function AccountRow({
         <div className="flex flex-col">
             <div
                 className={cn(
-                    'flex min-w-max items-center gap-2 border-b border-border/40 px-2 py-2 text-sm hover:bg-muted/40',
+                    'flex w-full items-center gap-2 border-b border-border/40 px-2 py-2 text-sm hover:bg-muted/40 md:w-auto md:min-w-max',
                     hasChildren && 'bg-muted/20 font-semibold',
                 )}
             >
                 <button
                     type="button"
-                    className="flex flex-1 cursor-pointer items-center gap-2 text-left"
+                    className="flex min-w-0 flex-1 cursor-pointer items-start gap-2 text-left md:items-center"
                     onClick={() => hasChildren && setExpanded(!expanded)}
                     style={{ paddingLeft: `${(node.level - 1) * 1.5}rem` }}
                 >
@@ -146,12 +146,14 @@ function AccountRow({
                     <span className="font-mono text-xs whitespace-nowrap text-muted-foreground">
                         {node.code}
                     </span>
-                    <span className="truncate">{node.name}</span>
+                    <span className="min-w-0 break-words md:truncate">
+                        {node.name}
+                    </span>
                 </button>
                 <div className="flex shrink-0 gap-2 text-right tabular-nums sm:gap-4">
                     <div
                         className={cn(
-                            'w-36 shrink-0',
+                            'w-28 shrink-0 md:w-36',
                             getSignedAmountTextClass(node.balance),
                         )}
                     >
@@ -161,7 +163,7 @@ function AccountRow({
                         <>
                             <div
                                 className={cn(
-                                    'w-36 shrink-0 text-muted-foreground',
+                                    'w-28 shrink-0 text-muted-foreground md:w-36',
                                     getSignedAmountTextClass(
                                         node.comparison_balance || 0,
                                     ),
@@ -170,13 +172,16 @@ function AccountRow({
                                 {formatCurrency(node.comparison_balance || 0)}
                             </div>
                             <div
-                                className={cn('w-28 shrink-0', changeTextClass)}
+                                className={cn(
+                                    'w-24 shrink-0 md:w-28',
+                                    changeTextClass,
+                                )}
                             >
                                 {formatCurrency(changeValue)}
                             </div>
                             <div
                                 className={cn(
-                                    'w-16 shrink-0',
+                                    'w-14 shrink-0 md:w-16',
                                     getChangePercentageTextClass(
                                         node.change_percentage,
                                         node.comparison_balance,
@@ -265,7 +270,7 @@ export function FinancialReportSection({
                     <div className="flex w-full flex-wrap justify-between gap-2 text-right whitespace-nowrap tabular-nums sm:w-auto sm:flex-nowrap sm:justify-end sm:gap-4">
                         <span
                             className={cn(
-                                'w-36 text-lg font-bold',
+                                'w-28 text-lg font-bold md:w-36',
                                 getSignedAmountTextClass(total),
                             )}
                         >
@@ -275,7 +280,7 @@ export function FinancialReportSection({
                             <>
                                 <span
                                     className={cn(
-                                        'w-36 text-lg font-bold text-muted-foreground',
+                                        'w-28 text-lg font-bold text-muted-foreground md:w-36',
                                         getSignedAmountTextClass(
                                             comparisonTotal || 0,
                                         ),
@@ -285,7 +290,7 @@ export function FinancialReportSection({
                                 </span>
                                 <span
                                     className={cn(
-                                        'w-28 text-lg font-bold',
+                                        'w-24 text-lg font-bold md:w-28',
                                         changeTextClass,
                                     )}
                                 >
@@ -293,7 +298,7 @@ export function FinancialReportSection({
                                 </span>
                                 <span
                                     className={cn(
-                                        'w-16 text-lg font-bold',
+                                        'w-14 text-lg font-bold md:w-16',
                                         getChangePercentageTextClass(
                                             changePercentage,
                                             comparisonTotal,
@@ -318,24 +323,26 @@ export function FinancialReportSection({
                 ) : (
                     <div className="overflow-hidden rounded-md border">
                         <div className="max-h-[60vh] w-full min-w-0 overflow-auto">
-                            <div className="sticky top-0 z-10 flex min-w-max items-center border-b bg-background px-2 py-2 text-xs font-medium text-muted-foreground">
+                            <div className="sticky top-0 z-10 flex w-full items-center border-b bg-background px-2 py-2 text-xs font-medium text-muted-foreground md:w-auto md:min-w-max">
                                 {/* Spacer selebar ikon expand agar label
                                     sejajar dengan teks baris (W5-12). */}
-                                <div className="flex min-w-40 flex-1 items-center gap-2">
+                                <div className="flex min-w-0 flex-1 items-center gap-2 md:min-w-40">
                                     <div className="w-4" aria-hidden />
                                     <span>Account</span>
                                 </div>
                                 <div className="flex shrink-0 gap-2 text-right tabular-nums sm:gap-4">
-                                    <div className="w-36 shrink-0">Current</div>
+                                    <div className="w-28 shrink-0 md:w-36">
+                                        Current
+                                    </div>
                                     {showComparison && (
                                         <>
-                                            <div className="w-36 shrink-0">
+                                            <div className="w-28 shrink-0 md:w-36">
                                                 Comparison
                                             </div>
-                                            <div className="w-28 shrink-0">
+                                            <div className="w-24 shrink-0 md:w-28">
                                                 Change
                                             </div>
-                                            <div className="w-16 shrink-0">
+                                            <div className="w-14 shrink-0 md:w-16">
                                                 %
                                             </div>
                                         </>

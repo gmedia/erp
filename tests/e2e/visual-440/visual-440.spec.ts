@@ -92,6 +92,73 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
         expect(scroller!.right).toBeLessThanOrEqual(390 + 1);
     });
 
+    const comparisonReports = [
+        { slug: 'balance-sheet', label: 'balance-sheet' },
+        { slug: 'income-statement', label: 'income-statement' },
+        { slug: 'comparative', label: 'comparative' },
+    ] as const;
+
+    for (const report of comparisonReports) {
+        test(`${report.label} 390: setiap nilai Current masuk kartu`, async ({
+            page,
+        }) => {
+            await page.setViewportSize({ width: 390, height: 844 });
+            const baseResponse = page.waitForResponse(
+                (r) =>
+                    r.url().includes(`/api/reports/${report.slug}`) &&
+                    r.status() < 400,
+            );
+            await page.goto(`/reports/${report.slug}`);
+            const base = await (await baseResponse).json();
+            const years: { id: number }[] = base.fiscalYears ?? [];
+            test.skip(
+                years.length < 2,
+                'Butuh minimal dua tahun fiskal di seed',
+            );
+
+            const comparisonId = years.find(
+                (y) => y.id !== base.selectedYearId,
+            )!.id;
+            const compareResponse = page.waitForResponse(
+                (r) =>
+                    r.url().includes(`/api/reports/${report.slug}`) &&
+                    r.url().includes('comparison_year_id') &&
+                    r.status() < 400,
+            );
+            await page.goto(
+                `/reports/${report.slug}?fiscal_year_id=${base.selectedYearId}` +
+                    `&comparison_year_id=${comparisonId}`,
+            );
+            await compareResponse;
+
+            const header = page.getByText('Current', { exact: true }).first();
+            await expect(header).toBeVisible();
+
+            const cells = await page
+                .locator('[data-slot="card"]')
+                .filter({ has: page.getByText('Current', { exact: true }) })
+                .evaluateAll((cards) =>
+                    cards.flatMap((card) => {
+                        const cardRight = card.getBoundingClientRect().right;
+                        return Array.from(
+                            card.querySelectorAll<HTMLElement>(
+                                '.tabular-nums > div:first-child',
+                            ),
+                        ).map((el) => ({
+                            text: el.textContent?.trim() ?? '',
+                            right: el.getBoundingClientRect().right,
+                            cardRight,
+                        }));
+                    }),
+                );
+            expect(cells.length).toBeGreaterThan(0);
+            const overflow = cells.filter(
+                (c) => c.text === '' || c.right > c.cardRight + 1,
+            );
+            expect(overflow).toEqual([]);
+        });
+    }
+
     test('financial-dashboard 390: nilai KPI tidak terpotong kartu', async ({
         page,
     }) => {
