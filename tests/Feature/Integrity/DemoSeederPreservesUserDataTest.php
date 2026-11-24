@@ -1,6 +1,7 @@
 <?php
 
 use App\Actions\AccountingPosting\PostSupplierBillJournalAction;
+use App\Models\Account;
 use App\Models\Asset;
 use App\Models\AssetDepreciationLine;
 use App\Models\AssetDepreciationRun;
@@ -25,8 +26,16 @@ uses(RefreshDatabase::class)->group('demo-integrity');
  */
 function userBillItem(SupplierBill $bill): void
 {
+    // Akun beban harus dari COA version aktif (#357): factory Account membuat akun di versi acak.
+    $expenseAccount = Account::query()
+        ->where('code', '51000')
+        ->where('is_active', true)
+        ->whereHas('coaVersion', fn ($query) => $query->where('status', 'active'))
+        ->firstOrFail();
+
     SupplierBillItem::factory()->create([
         'supplier_bill_id' => $bill->id,
+        'account_id' => $expenseAccount->id,
         'quantity' => 2,
         'unit_price' => 1000000,
         'discount_percent' => 0,
