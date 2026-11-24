@@ -410,6 +410,26 @@ test('batal credit note confirmed yang belum applied tidak mengurangi credit not
     expect($invoice->refresh()->only(['credit_note_amount', 'amount_due', 'status']))->toBe($before);
 });
 
+test('credit note draft boleh langsung applied dari form edit', function () {
+    $invoice = settledInvoice();
+    $creditNote = appliedCreditNote($invoice, 100000, 'CN-2026-000387');
+    $draft = $creditNote->replicate()->fill([
+        'credit_note_number' => 'CN-2026-000388',
+        'status' => 'draft',
+        'journal_entry_id' => null,
+    ]);
+    $draft->save();
+    $draft->items()->createMany(
+        $creditNote->items->map(fn ($item) => $item->replicate()->makeHidden(['id'])->toArray())->all(),
+    );
+
+    putJson("/api/credit-notes/{$draft->id}", ['status' => 'applied'])->assertOk();
+
+    expect($draft->refresh()->status)->toBe('applied')
+        ->and($draft->journal_entry_id)->not->toBeNull()
+        ->and((float) $invoice->refresh()->credit_note_amount)->toBe(200000.0);
+});
+
 test('batal credit note applied dua kali diterima 200 tanpa efek: tidak ada pembalik kedua', function () {
     $invoice = settledInvoice();
     $creditNote = appliedCreditNote($invoice, 200000, 'CN-2026-000376');
