@@ -112,7 +112,7 @@
         "approveTitle": "Approve this budget?",
         "approveDescription": "Budget {name} will be approved. Its status becomes Approved and the approval is recorded with your name and time.",
         "lockTitle": "Lock this budget?",
-        "lockDescription": "Budget {name} will be locked. Its status becomes Locked.",
+        "lockDescription": "Budget {name} will be locked. A locked budget can no longer be changed.",
         "confirmApprove": "Yes, approve",
         "confirmLock": "Yes, lock",
         "processing": "Processing...",
