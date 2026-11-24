@@ -17,6 +17,7 @@ use App\Http\Resources\PurchaseOrders\PurchaseOrderCollection;
 use App\Http\Resources\PurchaseOrders\PurchaseOrderResource;
 use App\Models\PurchaseOrder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class PurchaseOrderController extends Controller
@@ -95,9 +96,16 @@ class PurchaseOrderController extends Controller
         return $this->destroyModel($purchaseOrder);
     }
 
-    public function itemOptions(PurchaseOrder $purchaseOrder, ListPurchaseOrderItemOptionsAction $action): JsonResponse
-    {
-        return response()->json(['data' => $action->execute($purchaseOrder)]);
+    public function itemOptions(
+        PurchaseOrder $purchaseOrder,
+        ListPurchaseOrderItemOptionsAction $action,
+        Request $request,
+    ): JsonResponse {
+        return response()->json(['data' => $action->execute(
+            $purchaseOrder,
+            $request->string('search')->toString() ?: null,
+            $request->integer('current_line_id') ?: null,
+        )]);
     }
 
     public function export(ExportPurchaseOrderRequest $request, ExportPurchaseOrdersAction $action): JsonResponse

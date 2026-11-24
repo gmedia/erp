@@ -15,7 +15,7 @@ class CoaVersionFactory extends Factory
         return [
             'fiscal_year_id' => FiscalYear::factory(),
             'name' => 'COA ' . $this->faker->year() . ' v' . $this->faker->randomDigitNotNull(),
-            'status' => $this->faker->randomElement(['draft', 'active', 'archived']),
+            'status' => 'active',
         ];
     }
 }

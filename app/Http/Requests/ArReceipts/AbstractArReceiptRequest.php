@@ -48,7 +48,7 @@ abstract class AbstractArReceiptRequest extends AuthorizedFormRequest
     public function withValidator(Validator $validator): void
     {
         $validator->after(function ($validator): void {
-            $receiptId = $this->route('arReceipt')?->id;
+            $receiptId = $this->route('ar_receipt')?->id;
 
             $this->validateAllocationCustomerMatch($validator);
 
@@ -75,7 +75,7 @@ abstract class AbstractArReceiptRequest extends AuthorizedFormRequest
 
     private function validateAllocationCustomerMatch(Validator $validator): void
     {
-        $customerId = (int) $this->input('customer_id');
+        $customerId = (int) ($this->input('customer_id') ?? $this->route('ar_receipt')?->customer_id);
 
         if ($customerId === 0) {
             return;

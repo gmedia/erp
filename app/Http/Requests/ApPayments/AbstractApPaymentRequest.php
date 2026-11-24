@@ -48,7 +48,7 @@ abstract class AbstractApPaymentRequest extends AuthorizedFormRequest
         $validator->after(function ($validator): void {
             $allocations = $this->input('allocations', []);
             $paymentId = $this->route('apPayment')?->id;
-            $supplierId = (int) $this->input('supplier_id');
+            $supplierId = (int) ($this->input('supplier_id') ?? $this->route('apPayment')?->supplier_id);
 
             foreach ($allocations as $index => $allocation) {
                 if (empty($allocation['supplier_bill_id']) || empty($allocation['allocated_amount'])) {

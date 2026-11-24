@@ -21,6 +21,7 @@ use App\Models\GoodsReceipt;
 use App\Services\PurchaseOrderReceiptService;
 use App\Services\StockPostingService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -153,9 +154,16 @@ class GoodsReceiptController extends Controller
         return $this->destroyModel($goodsReceipt);
     }
 
-    public function itemOptions(GoodsReceipt $goodsReceipt, ListGoodsReceiptItemOptionsAction $action): JsonResponse
-    {
-        return response()->json(['data' => $action->execute($goodsReceipt)]);
+    public function itemOptions(
+        GoodsReceipt $goodsReceipt,
+        ListGoodsReceiptItemOptionsAction $action,
+        Request $request,
+    ): JsonResponse {
+        return response()->json(['data' => $action->execute(
+            $goodsReceipt,
+            $request->string('search')->toString() ?: null,
+            $request->integer('current_line_id') ?: null,
+        )]);
     }
 
     public function export(ExportGoodsReceiptRequest $request, ExportGoodsReceiptsAction $action): JsonResponse

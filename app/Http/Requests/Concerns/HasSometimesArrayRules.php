@@ -85,6 +85,7 @@ trait HasSometimesArrayRules
             $isPostable = Account::query()
                 ->whereKey($value)
                 ->where('is_active', true)
+                ->whereHas('coaVersion', fn ($query) => $query->where('status', 'active'))
                 ->whereDoesntHave('children')
                 ->exists();
 
