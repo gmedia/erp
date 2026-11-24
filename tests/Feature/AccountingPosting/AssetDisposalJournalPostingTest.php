@@ -45,9 +45,11 @@ function makeDisposalAccounts(): array
     $accounts = [
         'equipment' => $make('12100', 'Equipment', 'asset', 'debit'),
         'accumulated' => $make('12200', 'Accumulated Depreciation - Equipment', 'asset', 'credit'),
+        'gain' => $make('42000', 'Gain on Disposal of Assets', 'revenue', 'credit'),
         'loss' => $make('52000', 'Loss on Disposal of Assets', 'expense', 'debit'),
     ];
 
+    Setting::set('asset_disposal_gain_account_id', (string) $accounts['gain']->id);
     Setting::set('asset_disposal_loss_account_id', (string) $accounts['loss']->id);
 
     return $accounts;
@@ -102,7 +104,7 @@ it('posts a disposal journal with book value as loss and zeroes asset and accumu
 
 it('omits the loss line when the asset is fully depreciated', function () {
     $accounts = makeDisposalAccounts();
-    $asset = makeDisposedAsset($accounts, 'lost', 'FA-000023', 12000000);
+    $asset = makeDisposedAsset($accounts, 'disposed', 'FA-000023', 12000000);
 
     $entry = app(PostAssetDisposalJournalAction::class)->execute($asset, '2026-06-30');
 
@@ -146,9 +148,29 @@ it('rejects posting into a closed fiscal period', function () {
     expect(JournalEntry::where('reference', 'DISP-FA-000021')->exists())->toBeFalse();
 });
 
-it('does not journal assets that are not disposed or lost', function () {
+it('does not journal assets that are not disposed', function () {
     $accounts = makeDisposalAccounts();
     $asset = makeDisposedAsset($accounts, 'active', 'FA-000022');
 
+    expect(app(PostAssetDisposalJournalAction::class)->isPostable($asset))->toBeFalse()
+        ->and(fn () => app(PostAssetDisposalJournalAction::class)->execute($asset, '2026-06-30'))
+        ->toThrow(ValidationException::class);
+});
+
+it('does not journal a lost asset again because it is already written off as LOSS', function () {
+    $accounts = makeDisposalAccounts();
+    $asset = makeDisposedAsset($accounts, 'lost', 'FA-000024');
+
     expect(app(PostAssetDisposalJournalAction::class)->isPostable($asset))->toBeFalse();
+});
+
+it('rejects posting when the gain account is not configured', function () {
+    $accounts = makeDisposalAccounts();
+    Setting::set('asset_disposal_gain_account_id', '');
+    $asset = makeDisposedAsset($accounts);
+
+    expect(fn () => app(PostAssetDisposalJournalAction::class)->execute($asset, '2026-06-30'))
+        ->toThrow(ValidationException::class);
+
+    expect(JournalEntry::where('reference', 'DISP-FA-000021')->exists())->toBeFalse();
 });

@@ -36,9 +36,13 @@ class PostAssetDisposalJournalAction
         private ResolveControlAccountAction $resolveControlAccount,
     ) {}
 
+    /**
+     * Hanya pelepasan (disposed). Aset hilang sudah dijurnal rugi oleh
+     * PostAssetLossJournalAction (LOSS-), sehingga tidak boleh dijurnal dua kali.
+     */
     public function isPostable(Asset $asset): bool
     {
-        return in_array($asset->status, ['disposed', 'lost'], true);
+        return $asset->status === 'disposed';
     }
 
     public function execute(Asset $asset, string $disposalDate): JournalEntry
@@ -54,6 +58,10 @@ class PostAssetDisposalJournalAction
             return $existing;
         }
 
+        if (! $this->isPostable($asset)) {
+            return $this->notPostable($asset);
+        }
+
         $cost = round((float) $asset->purchase_cost, 2);
         $accumulated = round((float) ($asset->accumulated_depreciation ?? 0), 2);
         $bookValue = round($cost - $accumulated, 2);
@@ -64,6 +72,8 @@ class PostAssetDisposalJournalAction
             ]);
         }
 
+        // Kedua akun wajib diatur (laba dipakai saat ada hasil penjualan, #442).
+        $this->configuredAccountId(self::GAIN_SETTING_KEY);
         $lossAccountId = $this->configuredAccountId(self::LOSS_SETTING_KEY);
 
         return DB::transaction(function () use (
@@ -119,6 +129,16 @@ class PostAssetDisposalJournalAction
                 'lines' => $lines,
             ]);
         });
+    }
+
+    private function notPostable(Asset $asset): never
+    {
+        throw ValidationException::withMessages([
+            'status' => __('accounting_posting.disposal_not_postable', [
+                'code' => $asset->asset_code,
+                'status' => $asset->status,
+            ]),
+        ]);
     }
 
     private function configuredAccountId(string $settingKey): int

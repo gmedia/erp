@@ -46,6 +46,13 @@ beforeEach(function () {
         'normal_balance' => 'credit',
         'is_active' => true,
     ]);
+    $gain = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '42000',
+        'type' => 'revenue',
+        'normal_balance' => 'credit',
+        'is_active' => true,
+    ]);
     $loss = Account::factory()->create([
         'coa_version_id' => $coaVersion->id,
         'code' => '52000',
@@ -53,6 +60,7 @@ beforeEach(function () {
         'normal_balance' => 'debit',
         'is_active' => true,
     ]);
+    Setting::set('asset_disposal_gain_account_id', (string) $gain->id);
     Setting::set('asset_disposal_loss_account_id', (string) $loss->id);
 
     $user = createTestUserWithPermissions([

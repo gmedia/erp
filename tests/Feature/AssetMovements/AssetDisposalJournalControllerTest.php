@@ -54,9 +54,11 @@ function makeControllerDisposalAccounts(): array
     $accounts = [
         'equipment' => $make('12100', 'Equipment', 'asset', 'debit'),
         'accumulated' => $make('12200', 'Accumulated Depreciation - Equipment', 'asset', 'credit'),
+        'gain' => $make('42000', 'Gain on Disposal of Assets', 'revenue', 'credit'),
         'loss' => $make('52000', 'Loss on Disposal of Assets', 'expense', 'debit'),
     ];
 
+    Setting::set('asset_disposal_gain_account_id', (string) $accounts['gain']->id);
     Setting::set('asset_disposal_loss_account_id', (string) $accounts['loss']->id);
 
     return $accounts;
