@@ -76,21 +76,41 @@ class ApprovalRequestStep extends Model
     ];
 
     /**
-     * Delegators whose steps $userId may currently act on (date range, is_active).
-     * Document-type scope is enforced when acting, see ResolveApprovalStepActorAction.
+     * Active delegations to $userId grouped by delegator. A null document-type list means all types.
      *
-     * @return list<int>
+     * @return array<int, list<string>|null>
      */
-    private static function activeDelegatorIdsFor(int $userId): array
+    private static function activeDelegationsFor(int $userId): array
     {
-        return ApprovalDelegation::query()
+        $today = now()->toDateString();
+        $grouped = [];
+
+        ApprovalDelegation::query()
             ->where('delegate_user_id', $userId)
             ->where('is_active', true)
-            ->whereDate('start_date', '<=', now()->toDateString())
-            ->whereDate('end_date', '>=', now()->toDateString())
-            ->pluck('delegator_user_id')
-            ->map(fn ($id) => (int) $id)
-            ->all();
+            ->whereDate('start_date', '<=', $today)
+            ->whereDate('end_date', '>=', $today)
+            ->get(['delegator_user_id', 'approvable_type'])
+            ->each(function (ApprovalDelegation $delegation) use (&$grouped): void {
+                $delegatorId = (int) $delegation->delegator_user_id;
+
+                // A null scope (all document types) wins over any narrower scope for the same delegator.
+                if ($delegation->approvable_type === null) {
+                    $grouped[$delegatorId] = null;
+
+                    return;
+                }
+
+                if (! array_key_exists($delegatorId, $grouped)) {
+                    $grouped[$delegatorId] = [];
+                }
+
+                if ($grouped[$delegatorId] !== null) {
+                    $grouped[$delegatorId][] = $delegation->approvable_type;
+                }
+            });
+
+        return $grouped;
     }
 
     public function request(): BelongsTo
@@ -138,24 +158,47 @@ class ApprovalRequestStep extends Model
         });
     }
 
+    /**
+     * Steps the user can act on right now. Mirrors ResolveApprovalStepActorAction:
+     * the submitter never sees their own request, and delegated steps respect
+     * the delegation's document-type scope.
+     */
     public function scopePendingInboxForUser(Builder $query, int $userId): Builder
     {
+        $delegations = self::activeDelegationsFor($userId);
+
         return $query->where('status', 'pending')
-            ->whereHas('request', function (Builder $requestQuery) {
-                $requestQuery->whereIn('status', ['pending', 'in_progress']);
+            ->whereHas('request', function (Builder $requestQuery) use ($userId) {
+                $requestQuery->whereIn('status', ['pending', 'in_progress'])
+                    ->where('submitted_by', '!=', $userId)
+                    ->whereColumn(
+                        'approval_requests.current_step_order',
+                        'approval_request_steps.step_order',
+                    );
             })
-            ->whereHas('request', function (Builder $requestQuery) {
-                $requestQuery->whereColumn(
-                    'approval_requests.current_step_order',
-                    'approval_request_steps.step_order',
-                );
-            })
-            ->whereHas('flowStep', function (Builder $flowStepQuery) use ($userId) {
-                $flowStepQuery->where('approver_type', 'user')
-                    ->where(function (Builder $approverQuery) use ($userId): void {
-                        $approverQuery->where('approver_user_id', $userId)
-                            ->orWhereIn('approver_user_id', self::activeDelegatorIdsFor($userId));
+            ->where(function (Builder $actorQuery) use ($userId, $delegations): void {
+                $actorQuery->whereHas('flowStep', function (Builder $flowStepQuery) use ($userId): void {
+                    $flowStepQuery->where('approver_type', 'user')
+                        ->where('approver_user_id', $userId);
+                });
+
+                foreach ($delegations as $delegatorId => $documentTypes) {
+                    $actorQuery->orWhere(function (Builder $delegatedQuery) use ($delegatorId, $documentTypes): void {
+                        $delegatedQuery->whereHas(
+                            'flowStep',
+                            fn (Builder $flowStepQuery) => $flowStepQuery
+                                ->where('approver_type', 'user')
+                                ->where('approver_user_id', $delegatorId),
+                        );
+
+                        if ($documentTypes !== null) {
+                            $delegatedQuery->whereHas(
+                                'request',
+                                fn (Builder $requestQuery) => $requestQuery->whereIn('approvable_type', $documentTypes),
+                            );
+                        }
                     });
+                }
             });
     }
 }

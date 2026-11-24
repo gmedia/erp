@@ -1,6 +1,6 @@
 import { expect, Page, test } from '@playwright/test';
 
-import { login } from '../helpers';
+import { approveApprovableAsDelegate, login } from '../helpers';
 import {
     accountId,
     apiGet,
@@ -186,24 +186,7 @@ async function submitAndApprovePurchaseOrder(
     );
     expect(submitted.status).toBeLessThan(400);
 
-    const inbox = await apiGet<{
-        pending: Array<{ request: { id: number; approvable_id: number } }>;
-    }>(page, '/api/my-approvals');
-    const step = inbox.pending.find(
-        (item) => item.request.approvable_id === poId,
-    );
-    expect(
-        step,
-        `approval request for PO ${poId} must be in my-approvals`,
-    ).toBeTruthy();
-
-    const approved = await sendJson(
-        page,
-        'POST',
-        `/api/my-approvals/${step?.request.id}/approve`,
-        { comments: 'E2E P2P' },
-    );
-    expect(approved.status).toBeLessThan(400);
+    await approveApprovableAsDelegate(page, poId, 'E2E P2P');
 }
 
 async function createGoodsReceiptViaUi(
@@ -489,24 +472,7 @@ async function submitAndApprovePurchaseRequest(
     );
     expect(submitted.status).toBeLessThan(400);
 
-    const inbox = await apiGet<{
-        pending: Array<{ request: { id: number; approvable_id: number } }>;
-    }>(page, '/api/my-approvals');
-    const step = inbox.pending.find(
-        (item) => item.request.approvable_id === prId,
-    );
-    expect(
-        step,
-        `approval request for PR ${prId} must be in my-approvals`,
-    ).toBeTruthy();
-
-    const approved = await sendJson(
-        page,
-        'POST',
-        `/api/my-approvals/${step?.request.id}/approve`,
-        { comments: 'E2E P2P' },
-    );
-    expect(approved.status).toBeLessThan(400);
+    await approveApprovableAsDelegate(page, prId, 'E2E P2P');
 
     const pr = await apiGet<{ data: { status: string } }>(
         page,

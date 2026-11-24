@@ -10,6 +10,85 @@ interface LoginOptions {
     requireDashboard?: boolean;
 }
 
+export const E2E_DELEGATE_EMAIL = 'manager.hr@example.com';
+
+async function approveAsDelegate(
+    page: Page,
+    approvalRequestId: number,
+    comments = 'E2E approved',
+): Promise<void> {
+    const adminToken = await page.evaluate(() => localStorage.getItem('api_token'));
+    if (!adminToken) throw new Error('api_token missing from browser localStorage');
+
+    const api = page.context().request;
+    const adminHeaders = { Accept: 'application/json', Authorization: `Bearer ${adminToken}` };
+
+    const meResponse = await api.get('/api/me', { headers: adminHeaders });
+    expect(meResponse.ok()).toBeTruthy();
+    const me = (await meResponse.json()) as { id?: number; user?: { id?: number } };
+    const adminId = me.user?.id ?? me.id;
+    if (!adminId) throw new Error('Could not resolve admin user id');
+
+    const delegateLogin = await api.post('/api/login', {
+        headers: { Accept: 'application/json' },
+        data: { email: E2E_DELEGATE_EMAIL, password: DEFAULT_E2E_PASSWORD },
+    });
+    expect(delegateLogin.ok()).toBeTruthy();
+    const login = (await delegateLogin.json()) as { token?: string; user?: { id?: number } };
+    const delegateId = login.user?.id;
+    const delegateToken = login.token;
+    if (!delegateId || !delegateToken) throw new Error('Delegate login returned no token');
+
+    const inDays = (days: number) =>
+        new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+    const delegation = await api.post('/api/approval-delegations', {
+        headers: adminHeaders,
+        data: {
+            delegator_user_id: adminId,
+            delegate_user_id: delegateId,
+            approvable_type: null,
+            start_date: inDays(-1),
+            end_date: inDays(1),
+            is_active: true,
+        },
+    });
+    expect(delegation.ok()).toBeTruthy();
+
+    const approve = await api.post(`/api/my-approvals/${approvalRequestId}/approve`, {
+        headers: { Accept: 'application/json', Authorization: `Bearer ${delegateToken}` },
+        data: { comments },
+    });
+    expect(approve.ok()).toBeTruthy();
+}
+
+export async function approveApprovableAsDelegate(
+    page: Page,
+    approvableId: number,
+    comments = 'E2E approved',
+): Promise<void> {
+    const delegateLogin = await page.context().request.post('/api/login', {
+        headers: { Accept: 'application/json' },
+        data: { email: E2E_DELEGATE_EMAIL, password: DEFAULT_E2E_PASSWORD },
+    });
+    expect(delegateLogin.ok()).toBeTruthy();
+    const { token } = (await delegateLogin.json()) as { token?: string };
+    if (!token) throw new Error('Delegate login returned no token');
+
+    const inbox = await page.context().request.get('/api/my-approvals', {
+        headers: { Accept: 'application/json', Authorization: `Bearer ${token}` },
+    });
+    expect(inbox.ok()).toBeTruthy();
+    const payload = (await inbox.json()) as {
+        pending?: Array<{ request?: { id?: number; approvable_id?: number } }>;
+    };
+    const step = payload.pending?.find((item) => item.request?.approvable_id === approvableId);
+    const requestId = step?.request?.id;
+    if (!requestId) throw new Error(`No pending approval for approvable ${approvableId}`);
+
+    await approveAsDelegate(page, requestId, comments);
+}
+
 function matchesApiUrl(url: string, matcher: ApiResponseMatcher): boolean {
     if (typeof matcher === 'string') {
         return url.includes(matcher);

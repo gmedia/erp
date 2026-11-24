@@ -1,6 +1,11 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
-import { DEFAULT_E2E_EMAIL, login, searchAndWaitForApi } from '../helpers';
+import {
+    approveApprovableAsDelegate,
+    DEFAULT_E2E_EMAIL,
+    login,
+    searchAndWaitForApi,
+} from '../helpers';
 
 const FORBIDDEN_MANUAL_STATUSES = ['Approved', 'Rejected'];
 
@@ -115,6 +120,7 @@ test.describe('Purchase Request approval flow (UI)', () => {
         const createPayload = await (await createResponse).json();
         const prNumber = String(createPayload?.data?.pr_number ?? '');
         expect(prNumber, 'PR number dari respons POST').not.toBe('');
+        const prId = Number(createPayload?.data?.id);
 
         await searchAndWaitForApi(
             page,
@@ -148,22 +154,7 @@ test.describe('Purchase Request approval flow (UI)', () => {
         await login(page, DEFAULT_E2E_EMAIL, undefined, {
             requireDashboard: false,
         });
-        await page.goto('/my-approvals');
-        await expect(page.getByRole('tab', { name: /Pending/i })).toBeVisible();
-
-        const approveResponse = page.waitForResponse(
-            (response) =>
-                response.url().includes('/api/my-approvals') &&
-                response.status() < 400,
-        );
-        await page
-            .getByRole('button', { name: /^Approve$/ })
-            .first()
-            .click();
-        await page
-            .getByRole('button', { name: 'Confirm Approval', exact: true })
-            .click();
-        await approveResponse;
+        await approveApprovableAsDelegate(page, prId);
 
         await page.goto('/purchase-requests');
         await searchAndWaitForApi(

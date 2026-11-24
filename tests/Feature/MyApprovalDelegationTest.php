@@ -274,3 +274,46 @@ it('flags a pending step as delegated only for the delegate, not the direct appr
     $approverResponse = getJson('/api/my-approvals')->assertOk();
     expect($approverResponse->json('pending.0.is_delegated'))->toBeFalse();
 });
+
+it('omits a delegated step from the inbox when the delegate is its submitter', function () {
+    $approver = User::factory()->create();
+    $delegate = User::factory()->create();
+    makeSingleStepRequest($approver, $delegate);
+
+    ApprovalDelegation::factory()->create([
+        'delegator_user_id' => $approver->id,
+        'delegate_user_id' => $delegate->id,
+        'approvable_type' => null,
+        'start_date' => now()->subDay()->toDateString(),
+        'end_date' => now()->addDay()->toDateString(),
+        'is_active' => true,
+    ]);
+
+    Sanctum::actingAs($delegate, ['*']);
+    $response = getJson('/api/my-approvals')->assertOk();
+
+    expect($response->json('pending'))->toBeEmpty();
+});
+
+it('omits a delegated step from the inbox when the delegation covers another document type', function () {
+    $approver = User::factory()->create();
+    $delegate = User::factory()->create();
+    $submitter = User::factory()->create();
+    ['request' => $request] = makeSingleStepRequest($approver, $submitter);
+
+    ApprovalDelegation::factory()->create([
+        'delegator_user_id' => $approver->id,
+        'delegate_user_id' => $delegate->id,
+        'approvable_type' => 'App\\Models\\SomeOtherDocument',
+        'start_date' => now()->subDay()->toDateString(),
+        'end_date' => now()->addDay()->toDateString(),
+        'is_active' => true,
+    ]);
+
+    expect($request->approvable_type)->not->toBe('App\\Models\\SomeOtherDocument');
+
+    Sanctum::actingAs($delegate, ['*']);
+    $response = getJson('/api/my-approvals')->assertOk();
+
+    expect($response->json('pending'))->toBeEmpty();
+});

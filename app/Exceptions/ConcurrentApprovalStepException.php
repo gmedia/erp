@@ -10,9 +10,9 @@ use RuntimeException;
  */
 class ConcurrentApprovalStepException extends RuntimeException
 {
-    public function __construct(string $message = 'This approval step was already acted on.')
+    public function __construct(?string $message = null)
     {
-        parent::__construct($message);
+        parent::__construct($message ?? __('approval.concurrent_step'));
     }
 
     public function render(): JsonResponse

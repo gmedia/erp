@@ -55,7 +55,9 @@
     "Supplier bill still has active payment allocations. Remove them before cancelling.": "Supplier bill still has active payment allocations. Remove them before cancelling.",
     "Goods receipt still has active supplier returns. Cancel them before cancelling.": "Goods receipt still has active supplier returns. Cancel them before cancelling.",
     "Goods receipt still has active supplier bills. Cancel them before cancelling.": "Goods receipt still has active supplier bills. Cancel them before cancelling.",
-    "approval.transition_forbidden": "You do not have permission to execute this transition.",
+     "approval.transition_forbidden": "You do not have permission to execute this transition.",
+     "approval.concurrent_step": "This approval step was already acted on by another request. Refresh and try again.",
+
     "nav": {
         "platform": "Platform",
         "dashboard": "Dashboard",
