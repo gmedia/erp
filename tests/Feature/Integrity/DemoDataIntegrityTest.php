@@ -105,12 +105,20 @@ beforeEach(function () {
 invariant('W7-01 void, cancelled and draft documents carry no amount due', function () {
     $inactiveStatuses = ['draft', 'cancelled', 'void'];
 
-    foreach (DB::table('customer_invoices')->whereIn('status', $inactiveStatuses)->get(['invoice_number', 'status', 'amount_due']) as $invoice) {
+    $invoices = DB::table('customer_invoices')
+        ->whereIn('status', $inactiveStatuses)
+        ->get(['invoice_number', 'status', 'amount_due']);
+
+    foreach ($invoices as $invoice) {
         expect((float) $invoice->amount_due)
             ->toBe(0.0, "Customer invoice {$invoice->invoice_number} ({$invoice->status}) must have amount due 0");
     }
 
-    foreach (DB::table('supplier_bills')->whereIn('status', $inactiveStatuses)->get(['bill_number', 'status', 'amount_due']) as $bill) {
+    $bills = DB::table('supplier_bills')
+        ->whereIn('status', $inactiveStatuses)
+        ->get(['bill_number', 'status', 'amount_due']);
+
+    foreach ($bills as $bill) {
         expect((float) $bill->amount_due)
             ->toBe(0.0, "Supplier bill {$bill->bill_number} ({$bill->status}) must have amount due 0");
     }
@@ -693,6 +701,26 @@ invariant('W7-05 posted journals are balanced', function () {
 
     expect(round((float) $totals->debit, 2))
         ->toBe(round((float) $totals->credit, 2), 'Total debits must equal total credits across posted journals');
+});
+
+// #437 keputusan 2 — posting ke akun kelompok (punya anak) ditolak; data demo hanya memakai akun daun.
+invariant('W7-06 no journal line posts to a group account', function () {
+    $groupIds = Account::query()
+        ->whereIn('id', Account::query()->whereNotNull('parent_id')->select('parent_id'))
+        ->pluck('id');
+
+    expect($groupIds)->not->toBeEmpty('COA must contain group accounts');
+
+    $offenders = DB::table('journal_entry_lines')
+        ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+        ->whereIn('journal_entry_lines.account_id', $groupIds)
+        ->get(['journal_entries.entry_number', 'journal_entries.description', 'journal_entry_lines.account_id']);
+
+    $details = $offenders
+        ->map(fn ($row) => "{$row->entry_number} ({$row->description}) acct {$row->account_id}")
+        ->implode('; ');
+
+    expect($offenders->all())->toBeEmpty('Journal lines must not post to group accounts: ' . $details);
 });
 
 // Issue #357 (PR #384): every invariant above must also hold after a second `db:seed`.

@@ -21,6 +21,8 @@ trait BuildsSupplierBillReportQuery
         array $extraSelectColumns = [],
         array $extraCasts = [],
         array $extraSelectBindings = [],
+        array $statuses = ['confirmed', 'partially_paid', 'overdue'],
+        ?string $amountDueSql = null,
     ): Builder {
         $baseSelectColumns = [
             'sb.id',
@@ -29,7 +31,7 @@ trait BuildsSupplierBillReportQuery
             'sb.due_date',
             'sb.grand_total',
             'sb.amount_paid',
-            'sb.amount_due',
+            $amountDueSql !== null ? $amountDueSql . ' as amount_due' : 'sb.amount_due',
             'sb.status',
             'sb.currency',
             's.id as supplier_id',
@@ -55,7 +57,7 @@ trait BuildsSupplierBillReportQuery
             ->join('suppliers as s', 'sb.supplier_id', '=', 's.id')
             ->join('branches as b', 'sb.branch_id', '=', 'b.id')
             ->selectRaw(implode(",\n                ", $allSelectColumns), $extraSelectBindings)
-            ->whereIn('sb.status', ['confirmed', 'partially_paid', 'overdue'])
+            ->whereIn('sb.status', $statuses)
             ->withCasts($allCasts);
     }
 

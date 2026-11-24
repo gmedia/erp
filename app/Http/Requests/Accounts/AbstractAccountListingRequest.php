@@ -21,6 +21,7 @@ abstract class AbstractAccountListingRequest extends BaseListingRequest
                 'type' => ['nullable', 'in:asset,liability,equity,revenue,expense'],
                 'is_active' => ['nullable', 'boolean'],
                 'has_children' => ['nullable', 'boolean'],
+                'postable' => ['nullable', 'boolean'],
             ],
         );
     }

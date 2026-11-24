@@ -63,6 +63,9 @@ abstract class AbstractArReceiptRequest extends AuthorizedFormRequest
                 'customer_invoice_id',
                 __('ar_receipt.allocation_exceeds_invoice'),
                 fn (int $invoiceId) => $this->maxInvoiceAllocation($validator, $invoiceId, $receiptId),
+                // Issue #437: kas + diskon sama-sama memakan sisa invoice.
+                fn (array $allocation) => (float) $allocation['allocated_amount']
+                    + (float) ($allocation['discount_given'] ?? 0),
             );
         });
     }
@@ -127,6 +130,7 @@ abstract class AbstractArReceiptRequest extends AuthorizedFormRequest
         }
 
         // Only POSTED receipts consume the quota; drafts are re-checked on confirm.
+        // Issue #437: kas + diskon sama-sama memakan sisa invoice.
         $existingAllocated = ArReceiptAllocation::where('customer_invoice_id', $invoice->id)
             ->whereHas(
                 'receipt',
@@ -134,7 +138,8 @@ abstract class AbstractArReceiptRequest extends AuthorizedFormRequest
                     ->whereIn('status', SyncArReceiptAllocationsAction::POSTED_STATUSES)
                     ->when($receiptId, fn ($q2) => $q2->where('id', '!=', $receiptId)),
             )
-            ->sum('allocated_amount');
+            ->selectRaw('COALESCE(SUM(allocated_amount + discount_given), 0) as settled')
+            ->value('settled');
 
         return (float) $invoice->grand_total
             - (float) $existingAllocated

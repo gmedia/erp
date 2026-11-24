@@ -229,6 +229,7 @@ describe('Aging Dashboard API', function () {
             CustomerInvoice::factory()->create([
                 'customer_id' => $customer->id,
                 'branch_id' => $branch->id,
+                'invoice_date' => '2026-01-15', // sebelum as_of (2026-06-01); tanggal tetap, bukan acak
                 'due_date' => '2026-04-01',
                 'grand_total' => $amount,
                 'amount_received' => 0,
@@ -259,6 +260,7 @@ describe('Aging Dashboard API', function () {
             SupplierBill::factory()->create([
                 'supplier_id' => $supplier->id,
                 'branch_id' => $supplierBranch->id,
+                'bill_date' => '2026-01-15', // sebelum as_of (2026-06-01); tanggal tetap, bukan acak
                 'due_date' => '2026-04-01',
                 'subtotal' => $amount,
                 'tax_amount' => 0,
@@ -361,6 +363,7 @@ describe('Aging Dashboard API', function () {
             CustomerInvoice::factory()->create([
                 'customer_id' => $customer->id,
                 'branch_id' => $branch->id,
+                'invoice_date' => '2026-01-15', // sebelum as_of (2026-06-01); tanggal tetap, bukan acak
                 'due_date' => $case['due_date'],
                 'grand_total' => 100,
                 'amount_received' => 0,

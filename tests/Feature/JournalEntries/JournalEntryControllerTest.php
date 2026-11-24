@@ -142,6 +142,82 @@ describe('Journal Entry API Endpoints', function () {
         expect($journalEntry->total_debit)->toBe(500.0);
     });
 
+    test('store rejects a line that has both debit and credit', function () {
+        FiscalYear::factory()->create([
+            'status' => 'open',
+            'start_date' => '2023-01-01',
+            'end_date' => '2023-12-31',
+        ]);
+        $account1 = Account::factory()->create();
+        $account2 = Account::factory()->create();
+
+        $response = postJson('/api/journal-entries', [
+            'entry_date' => '2023-01-15',
+            'description' => 'Dua sisi',
+            'lines' => [
+                ['account_id' => $account1->id, 'debit' => 100, 'credit' => 100],
+                ['account_id' => $account2->id, 'debit' => 0, 'credit' => 0],
+            ],
+        ]);
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['lines']);
+        expect($response->json('errors.lines.0'))->toBe(__('journal_entry.line_one_side_only'));
+        assertDatabaseMissing('journal_entries', ['description' => 'Dua sisi']);
+    });
+
+    test('store rejects a line with zero debit and zero credit', function () {
+        FiscalYear::factory()->create([
+            'status' => 'open',
+            'start_date' => '2023-01-01',
+            'end_date' => '2023-12-31',
+        ]);
+        $account1 = Account::factory()->create();
+        $account2 = Account::factory()->create();
+
+        $response = postJson('/api/journal-entries', [
+            'entry_date' => '2023-01-15',
+            'description' => 'Baris nol',
+            'lines' => [
+                ['account_id' => $account1->id, 'debit' => 500, 'credit' => 0],
+                ['account_id' => $account2->id, 'debit' => 0, 'credit' => 0],
+            ],
+        ]);
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['lines']);
+        expect($response->json('errors.lines.0'))->toBe(__('journal_entry.line_amount_required'));
+        assertDatabaseMissing('journal_entries', ['description' => 'Baris nol']);
+    });
+
+    test('update rejects a line that has both debit and credit', function () {
+        $fiscalYear = FiscalYear::factory()->create([
+            'status' => 'open',
+            'start_date' => '2023-01-01',
+            'end_date' => '2023-12-31',
+        ]);
+        $journalEntry = JournalEntry::factory()->create([
+            'entry_date' => '2023-01-10',
+            'fiscal_year_id' => $fiscalYear->id,
+            'status' => 'draft',
+        ]);
+        $account1 = Account::factory()->create();
+        $account2 = Account::factory()->create();
+
+        $response = putJson("/api/journal-entries/{$journalEntry->id}", [
+            'entry_date' => '2023-01-20',
+            'description' => 'Update dua sisi',
+            'lines' => [
+                ['account_id' => $account1->id, 'debit' => 50, 'credit' => 50],
+                ['account_id' => $account2->id, 'debit' => 0, 'credit' => 0],
+            ],
+        ]);
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['lines']);
+        expect($journalEntry->fresh()->description)->not->toBe('Update dua sisi');
+    });
+
     test('destroy deletes journal entry', function () {
         $journalEntry = JournalEntry::factory()->create(['status' => 'draft']);
 

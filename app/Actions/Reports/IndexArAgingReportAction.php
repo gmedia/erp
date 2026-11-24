@@ -10,6 +10,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Carbon;
 
 class IndexArAgingReportAction
 {
@@ -22,7 +23,7 @@ class IndexArAgingReportAction
     {
         $this->guardCustomerInvoiceCurrency($request, 'AR Aging Report');
 
-        $query = $this->buildQuery();
+        $query = $this->buildQuery($this->resolveAsOfDate($request));
 
         $this->applyBaseCustomerInvoiceFilters($request, $query);
         $this->applyRequestSorting(
@@ -45,7 +46,8 @@ class IndexArAgingReportAction
      */
     public function summarize(FormRequest $request): array
     {
-        $query = $this->buildQuery();
+        $asOfDate = $this->resolveAsOfDate($request);
+        $query = $this->buildQuery($asOfDate);
 
         $this->applyBaseCustomerInvoiceFilters($request, $query);
 
@@ -59,21 +61,38 @@ class IndexArAgingReportAction
             'aging_31_60',
             'aging_61_90',
             'aging_over_90',
-        ]);
+        ], $asOfDate);
     }
 
-    protected function buildQuery(): Builder
+    /**
+     * Tanggal basis aging: hari ini bila tidak diisi. Semua dokumen dan
+     * pelunasan setelah tanggal ini tidak ikut dihitung.
+     */
+    protected function resolveAsOfDate(FormRequest $request): string
     {
-        $boundaries = $this->agingBoundaries();
+        return $request->filled('as_of_date')
+            ? Carbon::parse($request->string('as_of_date')->toString())->toDateString()
+            : Carbon::today()->toDateString();
+    }
+
+    protected function buildQuery(?string $asOfDate = null): Builder
+    {
+        $asOfDate ??= Carbon::today()->toDateString();
+        $boundaries = $this->agingBoundaries($asOfDate);
+        $dueSql = $this->historicalArDueSql('ci', $asOfDate);
 
         return $this->buildBaseCustomerInvoiceQuery(
-            [$this->agingBucketSelectSql('ci')],
+            [$this->agingBucketSelectSql('ci', $dueSql)],
             $this->agingBucketBindings($boundaries),
+            $dueSql,
+            $this->historicalReceivedSql('ci', $asOfDate),
+            $this->historicalCreditNoteSql('ci', $asOfDate),
         )
-            // Aging hanya piutang berjalan; paid/cancelled/void/draft bukan
-            // saldo tagihan (W5-14, sejajar AR Outstanding).
-            ->whereIn('ci.status', ['sent', 'partially_paid', 'overdue'])
-            ->where('ci.amount_due', '>', 0)
+            // Draft/cancelled/void tidak ikut. Paid tetap tampil bila sisa historis
+            // pada as_of > 0 (lunas setelah as_of); sisa 0 disaring di bawah.
+            ->whereIn('ci.status', ['sent', 'partially_paid', 'overdue', 'paid'])
+            ->whereDate('ci.invoice_date', '<=', $asOfDate)
+            ->whereRaw('(' . $dueSql . ') > 0')
             ->withCasts(array_merge($this->getBaseCasts(), [
                 'aging_current' => 'decimal:2',
                 'aging_1_30' => 'decimal:2',
