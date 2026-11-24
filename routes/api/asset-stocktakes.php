@@ -22,7 +22,8 @@ Route::middleware('permission:asset_stocktake,true')->group(function () {
     Route::post('asset-stocktakes/import', [AssetStocktakeController::class, 'import'])
         ->middleware('permission:asset_stocktake.create,true');
     Route::get('asset-stocktakes/{assetStocktake}/items', [AssetStocktakeItemController::class, 'getItems']);
-    Route::post('asset-stocktakes/{assetStocktake}/items', [AssetStocktakeItemController::class, 'syncItems']);
+    Route::post('asset-stocktakes/{assetStocktake}/items', [AssetStocktakeItemController::class, 'syncItems'])
+        ->middleware('permission:asset_stocktake.edit,true');
     Route::get('asset-stocktake-variances', [AssetStocktakeVarianceController::class, 'index']);
     Route::post('asset-stocktake-variances/export', [AssetStocktakeVarianceController::class, 'export']);
 });

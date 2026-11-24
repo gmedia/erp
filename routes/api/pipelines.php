@@ -25,10 +25,19 @@ Route::middleware('permission:pipeline,true')->group(function () {
         ->middleware('permission:pipeline.create,true');
     Route::apiResource('pipelines.states', PipelineStateController::class)
         ->scoped(['state' => 'id'])
-        ->except(['show']);
+        ->only(['index']);
     Route::apiResource('pipelines.transitions', PipelineTransitionController::class)
         ->scoped(['transition' => 'id'])
-        ->except(['show']);
+        ->only(['index']);
+
+    Route::middleware('permission:pipeline.edit,true')->group(function () {
+        Route::apiResource('pipelines.states', PipelineStateController::class)
+            ->scoped(['state' => 'id'])
+            ->except(['index', 'show']);
+        Route::apiResource('pipelines.transitions', PipelineTransitionController::class)
+            ->scoped(['transition' => 'id'])
+            ->except(['index', 'show']);
+    });
 });
 
 // Entity-state endpoints: `pipeline` permission, or the document module permission
