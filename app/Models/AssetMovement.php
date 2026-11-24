@@ -26,6 +26,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $notes
  * @property string|null $document_path
  * @property string|null $document_name
+ * @property string|null $status_before_disposal
  * @property int|null $created_by
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -90,6 +91,7 @@ class AssetMovement extends Model
         'notes',
         'document_path',
         'document_name',
+        'status_before_disposal',
         'created_by',
     ];
 

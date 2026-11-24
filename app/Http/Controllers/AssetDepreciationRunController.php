@@ -6,6 +6,7 @@ use App\Actions\AssetDepreciationRuns\CalculateDepreciationAction;
 use App\Actions\AssetDepreciationRuns\IndexAssetDepreciationLinesAction;
 use App\Actions\AssetDepreciationRuns\IndexAssetDepreciationRunsAction;
 use App\Actions\AssetDepreciationRuns\PostDepreciationToJournalAction;
+use App\Actions\AssetDepreciationRuns\VoidDepreciationRunAction;
 use App\Http\Requests\AssetDepreciationRuns\CalculateDepreciationRequest;
 use App\Http\Requests\AssetDepreciationRuns\IndexAssetDepreciationRunRequest;
 use App\Http\Resources\AssetDepreciationRuns\AssetDepreciationLineCollection;
@@ -53,6 +54,18 @@ class AssetDepreciationRunController extends Controller
         return response()->json([
             'message' => 'Depreciation successfully posted to journal.',
             'run' => new AssetDepreciationRunResource($assetDepreciationRun->fresh()),
+        ]);
+    }
+
+    public function void(
+        AssetDepreciationRun $assetDepreciationRun,
+        VoidDepreciationRunAction $action,
+    ): JsonResponse {
+        $run = $action->execute($assetDepreciationRun);
+
+        return response()->json([
+            'message' => __('asset_depreciation_runs.voided'),
+            'run' => new AssetDepreciationRunResource($run),
         ]);
     }
 }
