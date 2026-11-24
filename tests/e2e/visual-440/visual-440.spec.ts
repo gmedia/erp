@@ -46,6 +46,29 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
         expect(fade).toBe('none');
     });
 
+    test('accounts 390: aksi baris tree terlihat tanpa hover', async ({
+        page,
+    }) => {
+        await page.setViewportSize({ width: 390, height: 844 });
+        const accountsResponse = page.waitForResponse(
+            (r) => r.url().includes('/api/accounts') && r.status() < 400,
+        );
+        await page.goto('/accounts');
+        await accountsResponse;
+
+        const addChild = page.locator('button:has(svg.lucide-plus)').first();
+        test.skip(
+            (await addChild.count()) === 0,
+            'Tidak ada akun di data seed',
+        );
+        await expect(addChild).toBeVisible();
+        const opacity = await addChild.evaluate(
+            (el) =>
+                getComputedStyle(el.parentElement as HTMLElement).opacity,
+        );
+        expect(opacity).toBe('1');
+    });
+
     test('financial-dashboard 390: nilai KPI tidak terpotong kartu', async ({
         page,
     }) => {
