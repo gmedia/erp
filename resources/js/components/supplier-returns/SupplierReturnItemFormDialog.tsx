@@ -146,10 +146,10 @@ export function SupplierReturnItemFormDialog({
                     url={
                         goodsReceiptId
                             ? buildGoodsReceiptItemOptionsUrl(
-                                goodsReceiptId,
-                                item?.goods_receipt_item_id,
-                                supplierReturnId,
-                            )
+                                  goodsReceiptId,
+                                  item?.goods_receipt_item_id,
+                                  supplierReturnId,
+                              )
                             : null
                     }
                     label={t('supplierReturn.item.gr_item')}
