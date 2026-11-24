@@ -22,7 +22,8 @@ test('period closing actions are forbidden without any period closing permission
     postJson('/api/period-closings/export', [])->assertForbidden();
 });
 
-test('view-only period closing permission cannot create or run actions', function () {
+test('view-only period closing permission can export but cannot create or run actions', function () {
+    Excel::fake();
     $periodClosing = PeriodClosing::factory()->create(['status' => 'draft']);
     Sanctum::actingAs(createTestUserWithPermissions(['period_closing']), ['*']);
 
@@ -30,10 +31,11 @@ test('view-only period closing permission cannot create or run actions', functio
     postJson('/api/period-closings', [])->assertForbidden();
     postJson("/api/period-closings/{$periodClosing->id}/close")->assertForbidden();
     postJson("/api/period-closings/{$periodClosing->id}/reopen")->assertForbidden();
-    postJson('/api/period-closings/export', [])->assertForbidden();
+    postJson('/api/period-closings/export', [])->assertOk();
 });
 
-test('create permission allows creating but not closing or exporting', function () {
+test('create permission allows creating but not closing', function () {
+    Excel::fake();
     $fiscalYear = FiscalYear::factory()->create(['status' => 'open']);
     $periodClosing = PeriodClosing::factory()->create(['status' => 'draft']);
     Sanctum::actingAs(createTestUserWithPermissions(['period_closing', 'period_closing.create']), ['*']);
@@ -46,7 +48,6 @@ test('create permission allows creating but not closing or exporting', function 
     ])->assertCreated();
 
     postJson("/api/period-closings/{$periodClosing->id}/close")->assertForbidden();
-    postJson('/api/period-closings/export', [])->assertForbidden();
 });
 
 test('edit permission allows close, reopen and export', function () {

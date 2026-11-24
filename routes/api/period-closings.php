@@ -14,6 +14,5 @@ Route::middleware(['auth:sanctum', 'permission:period_closing,true'])->group(fun
         ->middleware('permission:period_closing.edit,true');
     Route::post('period-closings/{period_closing}/reopen', [PeriodClosingController::class, 'reopen'])
         ->middleware('permission:period_closing.edit,true');
-    Route::post('period-closings/export', [PeriodClosingController::class, 'export'])
-        ->middleware('permission:period_closing.edit,true');
+    Route::post('period-closings/export', [PeriodClosingController::class, 'export']);
 });
