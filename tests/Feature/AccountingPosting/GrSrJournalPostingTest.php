@@ -194,8 +194,10 @@ test('PostSupplierReturnJournalAction creates a balanced posted journal entry', 
         'journal_entry_id' => $journalEntry->id,
     ]);
 
-    $apLine = $journalEntry->lines()->where('account_id', $accounts['ap']->id)->first();
-    expect((float) $apLine->debit)->toBe(150000.0);
+    // Retur tanpa GR asal berjurnal mendebit GR/IR (21150), bukan AP (keputusan #357 butir 4).
+    $grirLine = $journalEntry->lines()->where('account_id', $accounts['grir']->id)->first();
+    expect((float) $grirLine->debit)->toBe(150000.0)
+        ->and($journalEntry->lines()->where('account_id', $accounts['ap']->id)->exists())->toBeFalse();
 
     $inventoryLine = $journalEntry->lines()->where('account_id', $accounts['inventory']->id)->first();
     expect((float) $inventoryLine->credit)->toBe(150000.0);
