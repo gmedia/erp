@@ -41,7 +41,20 @@ test('users can not authenticate with invalid password', function () {
 
     $this->assertGuest();
     $response->assertStatus(422)
-        ->assertJsonValidationErrors('email');
+        ->assertJsonValidationErrors('email')
+        ->assertJsonPath('errors.email.0', 'These credentials do not match our records.');
+});
+
+test('invalid login message is translated for id', function () {
+    app()->setLocale('id');
+    $user = User::factory()->create();
+
+    $this->postJson('/api/login', [
+        'email' => $user->email,
+        'password' => 'wrong-password',
+    ])
+        ->assertStatus(422)
+        ->assertJsonPath('errors.email.0', 'Kredensial ini tidak cocok dengan data kami.');
 });
 
 test('users can logout', function () {

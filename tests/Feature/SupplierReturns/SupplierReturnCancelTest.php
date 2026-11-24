@@ -103,6 +103,7 @@ function confirmedSupplierReturnForCancel(): array
     ]);
 
     $supplierReturn = SupplierReturn::factory()->create([
+        'return_number' => 'SR-2026-0001',
         'purchase_order_id' => $purchaseOrder->id,
         'goods_receipt_id' => $goodsReceipt->id,
         'supplier_id' => $supplier->id,
@@ -205,6 +206,77 @@ test('cancelling a confirmed supplier return posts a reversing journal that mirr
         expect((float) $mirror->credit)->toBe((float) $line->debit);
     }
 });
+
+test('reversal memo and description are translated', function (string $locale, string $memoPrefix, string $descPrefix) {
+    app()->setLocale($locale);
+    [$supplierReturn] = confirmedSupplierReturnForCancel();
+
+    putJson('/api/supplier-returns/' . $supplierReturn->id, ['status' => 'cancelled'])->assertOk();
+
+    $original = JournalEntry::query()->findOrFail($supplierReturn->refresh()->journal_entry_id);
+    $reversal = JournalEntry::query()
+        ->where('source_type', SupplierReturn::class)
+        ->where('source_id', $supplierReturn->id)
+        ->where('id', '!=', $original->id)
+        ->firstOrFail();
+
+    expect($reversal->description)
+        ->toBe($descPrefix . ' ' . $supplierReturn->return_number)
+        ->not->toContain('supplier_return.');
+
+    $memos = JournalEntryLine::query()->where('journal_entry_id', $reversal->id)->pluck('memo');
+    expect($memos)->not->toBeEmpty();
+    foreach ($memos as $memo) {
+        expect($memo)->toStartWith($memoPrefix)->not->toContain('supplier_return.');
+    }
+})->with([
+    'en' => ['en', 'Reversal: ', 'Reversal Supplier Return'],
+    'id' => ['id', 'Pembalik: ', 'Pembalik Retur Supplier'],
+]);
+
+test('cancelled return repeat cancel shows translated message', function (string $locale, string $expected) {
+    app()->setLocale($locale);
+    [$supplierReturn] = confirmedSupplierReturnForCancel();
+
+    putJson('/api/supplier-returns/' . $supplierReturn->id, ['status' => 'cancelled'])->assertOk();
+
+    putJson('/api/supplier-returns/' . $supplierReturn->id, ['status' => 'cancelled'])
+        ->assertStatus(422)
+        ->assertJsonPath('errors.status.0', $expected);
+})->with([
+    'en' => ['en', 'This supplier return is already cancelled.'],
+    'id' => ['id', 'Retur supplier ini sudah dibatalkan.'],
+]);
+
+test('editing items of a confirmed return shows the translated message', function (string $locale, string $expected) {
+    app()->setLocale($locale);
+    [$supplierReturn, , $product] = confirmedSupplierReturnForCancel();
+
+    $item = $supplierReturn->items()->firstOrFail();
+
+    putJson('/api/supplier-returns/' . $supplierReturn->id, [
+        'items' => [[
+            'goods_receipt_item_id' => $item->goods_receipt_item_id,
+            'product_id' => $product->id,
+            'unit_id' => $item->unit_id,
+            'quantity_returned' => 1,
+            'unit_price' => 5000,
+        ]],
+    ])
+        ->assertStatus(422)
+        ->assertJsonPath('errors.items.0', $expected);
+})->with([
+    'en' => [
+        'en',
+        'Items and quantities cannot change after the supplier return is confirmed. '
+        . 'Cancel it and create a new return instead.',
+    ],
+    'id' => [
+        'id',
+        'Item dan qty tidak bisa diubah setelah retur supplier dikonfirmasi. '
+        . 'Batalkan lalu buat retur baru.',
+    ],
+]);
 
 test('cancelling with a closed fiscal year is rejected with 422 and keeps stock', function () {
     [$supplierReturn, $warehouse, $product] = confirmedSupplierReturnForCancel();
