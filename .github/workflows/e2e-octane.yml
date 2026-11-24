@@ -1,0 +1,223 @@
+name: E2E Octane (weekly)
+
+# Issue #400: E2E penuh dengan Laravel Octane (swoole), mengikuti docker/dist.
+# Tidak menjadi syarat merge; tests.yml tidak diubah.
+on:
+  schedule:
+    - cron: '0 19 * * 0' # Minggu 19:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-octane
+  cancel-in-progress: false
+
+jobs:
+  e2e-octane:
+    name: Playwright E2E via Sail + Octane (shard ${{ matrix.shard }}/6)
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6]
+    permissions:
+      contents: read
+      packages: read
+    env:
+      PLAYWRIGHT_USE_SAIL: '1'
+      PLAYWRIGHT_BASE_URL: http://localhost:82
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@d59004228537ca90c8dca680592a08a675bf52b6 # v2
+        with:
+          php-version: 8.4
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '20'
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          sed -i "s/^WWWUSER=.*/WWWUSER=$(id -u)/" .env
+          sed -i "s/^WWWGROUP=.*/WWWGROUP=$(id -g)/" .env
+          # Bypass API/import/export rate limits under parallel Playwright load.
+          echo "DISABLE_RATE_LIMITING=true" >> .env
+          sed -i "s/^AWS_SECRET_ACCESS_KEY=.*/AWS_SECRET_ACCESS_KEY=password/" .env
+          # Octane (swoole) sebagai proses web, sama dengan docker/dist.
+          # Port publish tetap mengikuti HOST_IP dari .env.example.
+          OCTANE_CMD="/usr/bin/php -d variables_order=EGPCS /var/www/html/artisan"
+          OCTANE_CMD="$OCTANE_CMD octane:swoole --host=0.0.0.0 --port=80"
+          OCTANE_CMD="$OCTANE_CMD --workers=2 --task-workers=1 --max-requests=500"
+          {
+            echo "services:"
+            echo "    laravel.test:"
+            echo "        environment:"
+            echo "            - DISABLE_RATE_LIMITING=true"
+            echo "            - SUPERVISOR_PHP_COMMAND=$OCTANE_CMD"
+          } > docker-compose.override.yml
+          mkdir -p storage/tmp
+          chmod -R u+rwX,g+rwX,o-rwx storage/tmp
+
+      - name: Bootstrap Sail dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Pull CI Sail image
+        shell: bash
+        timeout-minutes: 5
+        run: |
+          candidates=(
+            "ghcr.io/${GITHUB_REPOSITORY}/ci-sail:latest"
+            "ghcr.io/${GITHUB_REPOSITORY}/ci-sail:sha-${GITHUB_SHA::7}"
+          )
+          for image in "${candidates[@]}"; do
+            for attempt in 1 2 3; do
+              if timeout 60s docker pull "$image"; then
+                docker tag "$image" sail-8.4/app
+                exit 0
+              fi
+              if [ "$attempt" -lt 3 ]; then
+                echo "CI Sail image $image not available. Retry ${attempt}/3 in 10s..."
+                sleep 10
+              fi
+            done
+          done
+          echo "::error::Unable to pull any CI Sail image candidate after retries."
+          exit 1
+
+      - name: Start Sail
+        run: |
+          docker volume rm erp_sail-mariadb 2>/dev/null || true
+          ./vendor/bin/sail up -d --wait
+
+      - name: Verify Octane process is running
+        shell: bash
+        run: |
+          for attempt in $(seq 1 30); do
+            probe='grep -l "octane:swoole" /proc/[0-9]*/cmdline'
+            if ./vendor/bin/sail exec -T laravel.test sh -c "$probe" >/dev/null 2>&1; then
+              echo "Octane process is running."
+              ./vendor/bin/sail exec -T laravel.test php artisan octane:status || true
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::Octane process (octane:swoole) tidak berjalan."
+          ./vendor/bin/sail exec -T laravel.test ps aux || true
+          exit 1
+
+      - name: Capture MariaDB logs on failure
+        if: failure()
+        run: |
+          echo "=== MariaDB Container Logs ==="
+          docker logs erp-mariadb-1 2>&1 || echo "Failed to capture MariaDB logs"
+          echo "=== All Container Statuses ==="
+          docker ps -a
+
+      - name: Cache npm dependencies
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-npm-
+
+      - name: Install npm dependencies on runner
+        run: npm ci --prefer-offline --no-audit --fund=false
+
+      - name: Generate application key
+        run: ./vendor/bin/sail artisan key:generate
+
+      - name: Run database migrations and seed
+        run: ./vendor/bin/sail artisan migrate:fresh --seed --force
+
+      - name: Reload Octane after migrate and seed
+        run: ./vendor/bin/sail artisan octane:reload
+
+      - name: Configure MinIO bucket
+        run: |
+          ./vendor/bin/sail exec -T minio mc alias set myminio http://localhost:9000 sail password
+          ./vendor/bin/sail exec -T minio mc mb myminio/local || true
+          ./vendor/bin/sail exec -T minio mc anonymous set download myminio/local || true
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-playwright-
+
+      - name: Configure apt retries
+        run: echo 'Acquire::Retries "10";' | sudo tee /etc/apt/apt.conf.d/80-retries
+
+      - name: Install Playwright browsers
+        shell: bash
+        run: |
+          for attempt in 1 2 3; do
+            if npx playwright install --with-deps chromium; then
+              exit 0
+            fi
+            echo "Playwright browser install failed (attempt ${attempt}/3). Retrying in 15s..."
+            sudo apt-get clean || true
+            sleep 15
+          done
+          echo "::error::Playwright browser install failed after 3 attempts."
+          exit 1
+
+      - name: Run Playwright E2E
+        run: |
+          mapfile -t DIRS < <(
+            find tests/e2e -mindepth 1 -maxdepth 1 -type d -printf '%f\n' \
+              | sort | grep -vxF -f .github/ci/e2e-excluded.txt | sed 's#^#tests/e2e/#'
+          )
+          if [ "${#DIRS[@]}" -eq 0 ]; then echo "No E2E dirs discovered"; exit 1; fi
+          echo "E2E dirs (${#DIRS[@]})"
+          npx playwright test "${DIRS[@]}" --shard=${{ matrix.shard }}/6 --reporter=line --retries=1
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        continue-on-error: true
+        with:
+          name: playwright-report-octane-${{ github.run_id }}-shard-${{ matrix.shard }}
+          path: |
+            e2e/playwright-report
+            e2e/test-results
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Upload Laravel logs on failure
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        continue-on-error: true
+        with:
+          name: e2e-octane-laravel-logs-${{ github.run_id }}-shard-${{ matrix.shard }}
+          path: storage/logs
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Stop Sail
+        if: always()
+        run: |
+          if [ -x ./vendor/bin/sail ]; then
+            ./vendor/bin/sail down -v
+          fi
