@@ -130,7 +130,7 @@ export default function Index() {
                         {item.lines_count || 0} Assets
                     </Badge>
                 </TableCell>
-                <TableCell>
+                <TableCell className="whitespace-nowrap">
                     <Badge
                         variant={statusBadgeVariant(item.status)}
                         className="capitalize"
@@ -152,7 +152,7 @@ export default function Index() {
                         {item.created_by_user?.name || '-'}
                     </span>
                 </TableCell>
-                <TableCell className="sticky right-0 z-20 bg-background text-right">
+                <TableCell className="sticky right-0 z-20 w-[60px] bg-background text-right">
                     <div className="flex justify-end">
                         <GenericActions
                             item={item}
@@ -244,7 +244,9 @@ export default function Index() {
                         <TableHead>Fiscal Year</TableHead>
                         <TableHead>Period</TableHead>
                         <TableHead>Lines</TableHead>
-                        <TableHead>Status</TableHead>
+                        <TableHead className="whitespace-nowrap">
+                            Status
+                        </TableHead>
                         <TableHead>Journal</TableHead>
                         <TableHead>Created By</TableHead>
                         <TableHead className="sticky right-0 z-20 w-[60px] bg-background text-right">

@@ -225,8 +225,7 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
     }) => {
         await page.setViewportSize({ width: 1280, height: 900 });
         const listResponse = page.waitForResponse(
-            (r) =>
-                r.url().includes('/api/stock-movements') && r.status() < 400,
+            (r) => r.url().includes('/api/stock-movements') && r.status() < 400,
         );
         await page.goto('/stock-movements');
         await listResponse;
@@ -276,5 +275,78 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
             (el) => getComputedStyle(el).textAlign,
         );
         expect(align).toBe('right');
+
+        const daysHeader = page
+            .locator('thead th', { hasText: 'Days Overdue' })
+            .first();
+        const daysCell = page
+            .locator('tbody tr td div.tabular-nums.text-right')
+            .last();
+        test.skip(
+            (await daysCell.count()) === 0,
+            'Tidak ada baris Days Overdue di data seed',
+        );
+        const daysAlign = await daysCell.evaluate(
+            (el) => getComputedStyle(el).textAlign,
+        );
+        expect(daysAlign).toBe('right');
+        await expect(daysHeader).toBeVisible();
+    });
+
+    test('aging-dashboard: bucket Over 90 Days terlihat di dalam kartu', async ({
+        page,
+    }) => {
+        await page.setViewportSize({ width: 1280, height: 900 });
+        const agingResponse = page.waitForResponse(
+            (r) => r.url().includes('/api/aging-dashboard') && r.status() < 400,
+        );
+        await page.goto('/aging-dashboard');
+        await agingResponse;
+
+        const bucket = page.getByText('Over 90 Days').first();
+        test.skip(
+            (await bucket.count()) === 0,
+            'Tidak ada data aging di data seed',
+        );
+        await expect(bucket).toBeInViewport();
+    });
+
+    test('depreciation-runs 390: kolom Status tidak tertutup aksi', async ({
+        page,
+    }) => {
+        await page.setViewportSize({ width: 390, height: 844 });
+        const runsResponse = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/asset-depreciation-runs') &&
+                r.status() < 400,
+        );
+        await page.goto('/asset-depreciation-runs');
+        await runsResponse;
+
+        const statusHeader = page
+            .locator('thead th', { hasText: 'Status' })
+            .first();
+        test.skip(
+            (await statusHeader.count()) === 0,
+            'Header Status tidak ada',
+        );
+        const row = page.locator('tbody tr').first();
+        test.skip(
+            (await row.count()) === 0,
+            'Tidak ada depreciation run di data seed',
+        );
+        const cells = row.locator('td');
+        const statusCell = cells.nth(3);
+        const actionCell = cells.last();
+        await expect(statusCell).toBeVisible();
+        const overlapped = await statusCell.evaluate(
+            (el, actionEl) => {
+                const s = el.getBoundingClientRect();
+                const a = (actionEl as HTMLElement).getBoundingClientRect();
+                return s.right > a.left + 1;
+            },
+            await actionCell.elementHandle(),
+        );
+        expect(overlapped).toBe(false);
     });
 });
