@@ -32,6 +32,9 @@ beforeEach(function () {
         'stock_adjustment', 'stock_adjustment.create', 'stock_adjustment.edit', 'stock_adjustment.delete',
     ]);
     actingAs($user);
+
+    // Issue #416: konfirmasi GR membutuhkan COA aktif dan periode fiskal.
+    createAccountingControlFixture();
 });
 
 /**
@@ -67,6 +70,7 @@ function issue356ConfirmGoodsReceipt(PurchaseOrder $purchaseOrder, array $lines)
     $goodsReceipt = GoodsReceipt::factory()->create([
         'purchase_order_id' => $purchaseOrder->id,
         'warehouse_id' => $purchaseOrder->warehouse_id,
+        'receipt_date' => now()->toDateString(), // Issue #416: jurnal butuh tahun fiskal yang memuat tanggal ini.
         'status' => 'draft',
         'confirmed_at' => null,
         'confirmed_by' => null,

@@ -64,13 +64,13 @@ class CreateJournalEntryAction
 
                     if (! $fiscalYear) {
                         throw ValidationException::withMessages([
-                            'entry_date' => 'No fiscal year found for this date.',
+                            'entry_date' => __('journal_entry.fiscal_year_missing'),
                         ]);
                     }
 
                     if (! $fiscalYear->isOpen()) {
                         throw ValidationException::withMessages([
-                            'entry_date' => 'Fiscal year is closed or locked.',
+                            'entry_date' => __('journal_entry.fiscal_year_closed'),
                         ]);
                     }
 

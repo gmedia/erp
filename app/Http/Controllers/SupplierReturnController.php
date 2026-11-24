@@ -21,7 +21,6 @@ use App\Services\StockPostingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class SupplierReturnController extends Controller
@@ -268,18 +267,8 @@ class SupplierReturnController extends Controller
     ): void {
         $stockPosting->assertNoNegativeStock($this->supplierReturnOutflows($supplierReturn));
         $postMovements->execute($supplierReturn->refresh());
-
-        try {
-            $postJournal->execute($supplierReturn->refresh());
-        } catch (ValidationException $e) {
-            // Validation failures (e.g. missing COA mapping) are intentionally
-            // swallowed so the supplier return itself stays confirmed; user can
-            // post the journal later. Non-validation errors propagate and
-            // roll back the entire transaction (status flip included).
-            Log::warning('Supplier return journal posting skipped', [
-                'supplier_return_id' => $supplierReturn->id,
-                'reason' => $e->getMessage(),
-            ]);
-        }
+        // Jurnal gagal (COA/periode) melempar ValidationException: seluruh transaksi
+        // dibatalkan, sehingga dokumen, stok, dan status tidak berubah (Issue #416).
+        $postJournal->execute($supplierReturn->refresh());
     }
 }

@@ -3,6 +3,9 @@
 use App\Actions\AccountingPosting\PostStockAdjustmentJournalAction;
 use App\Actions\AccountingPosting\ResolveControlAccountAction;
 use App\Actions\JournalEntries\CreateJournalEntryAction;
+use App\Models\Account;
+use App\Models\CoaVersion;
+use App\Models\FiscalYear;
 use App\Models\JournalEntry;
 use App\Models\Product;
 use App\Models\StockAdjustment;
@@ -32,6 +35,43 @@ describe('Stock Adjustment API Endpoints', function () {
         ]);
 
         actingAs($user);
+
+        // Jurnal penyesuaian butuh COA aktif yang mencakup tanggal dokumen (Issue #416:
+        // COA tidak lengkap kini menolak dokumen, jadi fixture approve harus lengkap).
+        $fiscalYear = FiscalYear::factory()->create([
+            'name' => 'FY-SA-TEST',
+            'start_date' => '2000-01-01',
+            'end_date' => '2099-12-31',
+            'status' => 'open',
+        ]);
+        $coaVersion = CoaVersion::factory()->create([
+            'fiscal_year_id' => $fiscalYear->id,
+            'status' => 'active',
+        ]);
+        Account::factory()->create([
+            'coa_version_id' => $coaVersion->id,
+            'code' => '11300',
+            'name' => 'Inventory',
+            'type' => 'asset',
+            'normal_balance' => 'debit',
+            'is_active' => true,
+        ]);
+        Account::factory()->create([
+            'coa_version_id' => $coaVersion->id,
+            'code' => '51000',
+            'name' => 'Cost of Goods Sold',
+            'type' => 'expense',
+            'normal_balance' => 'debit',
+            'is_active' => true,
+        ]);
+        Account::factory()->create([
+            'coa_version_id' => $coaVersion->id,
+            'code' => '31000',
+            'name' => 'Owner Capital',
+            'type' => 'equity',
+            'normal_balance' => 'credit',
+            'is_active' => true,
+        ]);
     });
 
     test('index returns paginated adjustments', function () {
@@ -152,6 +192,7 @@ describe('Stock Adjustment API Endpoints', function () {
         $adjustment = StockAdjustment::factory()->create([
             'warehouse_id' => $warehouse->id,
             'status' => 'draft',
+            'adjustment_date' => '2026-06-15',
         ]);
 
         $response = putJson("/api/stock-adjustments/{$adjustment->id}", [
@@ -193,6 +234,7 @@ describe('Stock Adjustment API Endpoints', function () {
             'warehouse_id' => $warehouse->id,
             'status' => 'draft',
             'approved_at' => null,
+            'adjustment_date' => '2026-06-15',
         ]);
 
         // Item sudah tersimpan sebelum approval (alur nyata: draft → approve).
@@ -402,7 +444,7 @@ describe('Stock Adjustment API Endpoints', function () {
             ->assertJsonValidationErrors(['items']);
     });
 
-    test('approving stock adjustment rolls back state when journal posting fails with non-validation error', function () {
+    test('approving stock adjustment rolls back state when journal posting fails (non-validation)', function () {
         $adjustment = StockAdjustment::factory()->create([
             'status' => 'draft',
             'approved_at' => null,
@@ -428,7 +470,46 @@ describe('Stock Adjustment API Endpoints', function () {
         expect($adjustment->approved_by)->toBeNull();
     });
 
-    test('approving stock adjustment swallows validation errors and keeps state approved', function () {
+    test('creating approved stock adjustment is 422 and persists nothing on journal validation failure', function () {
+        $warehouse = Warehouse::factory()->create();
+        $product = Product::factory()->create();
+        $unit = Unit::factory()->create();
+
+        $this->app->bind(PostStockAdjustmentJournalAction::class, function ($app) {
+            return new class($app->make(CreateJournalEntryAction::class), $app->make(ResolveControlAccountAction::class)) extends PostStockAdjustmentJournalAction
+            {
+                public function execute(StockAdjustment $stockAdjustment): ?JournalEntry
+                {
+                    throw ValidationException::withMessages([
+                        'coa' => 'Missing COA mapping for journal posting',
+                    ]);
+                }
+            };
+        });
+
+        postJson('/api/stock-adjustments', [
+            'warehouse_id' => $warehouse->id,
+            'adjustment_date' => now()->toDateString(),
+            'adjustment_type' => 'correction',
+            'status' => 'approved',
+            'items' => [
+                [
+                    'product_id' => $product->id,
+                    'unit_id' => $unit->id,
+                    'quantity_adjusted' => 5,
+                ],
+            ],
+        ])->assertStatus(422)
+            ->assertJsonValidationErrors(['coa']);
+
+        expect(StockAdjustment::query()->count())->toBe(0);
+        expect(StockAdjustmentItem::query()->count())->toBe(0);
+        assertDatabaseMissing('stock_movements', [
+            'reference_type' => StockAdjustment::class,
+        ]);
+    });
+
+    test('approving stock adjustment is 422 and changes nothing when journal posting fails validation', function () {
         $adjustment = StockAdjustment::factory()->create([
             'status' => 'draft',
             'approved_at' => null,
@@ -448,11 +529,17 @@ describe('Stock Adjustment API Endpoints', function () {
         });
 
         putJson('/api/stock-adjustments/' . $adjustment->id, ['status' => 'approved'])
-            ->assertOk()
-            ->assertJsonPath('data.status', 'approved');
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['coa']);
 
         $adjustment->refresh();
-        expect($adjustment->status)->toBe('approved');
-        expect($adjustment->approved_at)->not->toBeNull();
+        expect($adjustment->status)->toBe('draft');
+        expect($adjustment->approved_at)->toBeNull();
+        expect($adjustment->approved_by)->toBeNull();
+        expect($adjustment->journal_entry_id)->toBeNull();
+        assertDatabaseMissing('stock_movements', [
+            'reference_type' => StockAdjustment::class,
+            'reference_id' => $adjustment->id,
+        ]);
     });
 });
