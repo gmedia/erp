@@ -12,7 +12,7 @@ const statusOptions = [
 
 const closingTypeOptions = [
     { value: 'monthly', label: 'Monthly' },
-    { value: 'yearly', label: 'Yearly' },
+    { value: 'annual', label: 'Annual' },
 ];
 
 export function createPeriodClosingFilterFields(): FieldDescriptor[] {

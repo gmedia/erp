@@ -104,7 +104,9 @@
         "processing": "Memproses...",
         "closed": "Periode ditutup.",
         "reopened": "Periode dibuka kembali.",
-        "failed": "Gagal memperbarui periode. Silakan coba lagi."
+        "failed": "Gagal memperbarui periode. Silakan coba lagi.",
+        "typeMonthly": "Bulanan",
+        "typeAnnual": "Tahunan"
     },
     "budgets": {
         "approve": "Setujui Anggaran",

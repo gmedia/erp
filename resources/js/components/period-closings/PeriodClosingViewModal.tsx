@@ -25,10 +25,6 @@ function getStatusVariant(status: PeriodClosing['status']) {
     return status === 'closed' ? 'default' : 'secondary';
 }
 
-function getClosingTypeLabel(type: PeriodClosing['closing_type']) {
-    return type === 'monthly' ? 'Monthly' : 'Yearly';
-}
-
 export function PeriodClosingViewModal({
     item,
     open,
@@ -110,12 +106,19 @@ export function PeriodClosingViewModal({
                     value={view.fiscal_year?.name || '-'}
                 />
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <ViewField label="Period Month" value={view.period_month} />
+                    <ViewField
+                        label="Period Month"
+                        value={view.period_month ?? '-'}
+                    />
                     <ViewField label="Period Year" value={view.period_year} />
                 </div>
                 <ViewField
                     label="Closing Type"
-                    value={getClosingTypeLabel(view.closing_type)}
+                    value={
+                        view.closing_type === 'monthly'
+                            ? t('periodClosings.typeMonthly')
+                            : t('periodClosings.typeAnnual')
+                    }
                 />
                 <ViewField
                     label="Retained Earnings Account"
