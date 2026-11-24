@@ -86,7 +86,7 @@ export function createSortingHeader(label: string) {
         }) => (
             <Button
                 variant="ghost"
-                className="-mx-3 h-8 px-3"
+                className="-ml-2 h-8 px-2"
                 onClick={() =>
                     column.toggleSorting(column.getIsSorted() === 'asc')
                 }

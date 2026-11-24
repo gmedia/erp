@@ -139,4 +139,76 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
             expect(overflow).toBe(false);
         }
     });
+
+    test('asset-categories 390: angka Useful Life rata kanan', async ({
+        page,
+    }) => {
+        await page.setViewportSize({ width: 390, height: 844 });
+        const listResponse = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/asset-categories') && r.status() < 400,
+        );
+        await page.goto('/asset-categories');
+        await listResponse;
+
+        const cell = page
+            .locator('td')
+            .filter({ has: page.locator('div.tabular-nums') })
+            .first();
+        test.skip(
+            (await cell.count()) === 0,
+            'Tidak ada kategori aset di data seed',
+        );
+        const align = await cell.evaluate((el) => {
+            const div = el.querySelector('div') as HTMLElement;
+            return getComputedStyle(div).textAlign;
+        });
+        expect(align).toBe('right');
+    });
+
+    test('account-mappings 390: notes terpotong dengan elipsis', async ({
+        page,
+    }) => {
+        await page.setViewportSize({ width: 390, height: 844 });
+        const listResponse = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/account-mappings') && r.status() < 400,
+        );
+        await page.goto('/account-mappings');
+        await listResponse;
+
+        const notes = page.locator('td div.truncate[title]').first();
+        test.skip(
+            (await notes.count()) === 0,
+            'Tidak ada account mapping di data seed',
+        );
+        const overflow = await notes.evaluate(
+            (el) => getComputedStyle(el).textOverflow,
+        );
+        expect(overflow).toBe('ellipsis');
+    });
+
+    test('asset-categories 390: teks header sortable sejajar isi kolom', async ({
+        page,
+    }) => {
+        await page.setViewportSize({ width: 390, height: 844 });
+        const listResponse = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/asset-categories') && r.status() < 400,
+        );
+        await page.goto('/asset-categories');
+        await listResponse;
+
+        const header = page.getByTestId('sort-code');
+        test.skip(
+            (await header.count()) === 0,
+            'Header sortable tidak ada di tampilan ini',
+        );
+        const body = page.locator('tbody tr td').nth(1);
+        const [hx, bx] = await Promise.all([
+            header.evaluate((el) => el.getBoundingClientRect().left),
+            body.evaluate((el) => el.getBoundingClientRect().left),
+        ]);
+        expect(Math.abs(hx - bx)).toBeLessThanOrEqual(2);
+    });
 });
