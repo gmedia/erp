@@ -57,6 +57,9 @@ function receiptSyncBuildPipeline(): array
  */
 function receiptSyncSetUpConfirmedPo(): array
 {
+    // Issue #416: konfirmasi GR membutuhkan COA aktif dan periode fiskal.
+    createAccountingControlFixture();
+
     $setup = receiptSyncBuildPipeline();
 
     $po = PurchaseOrder::factory()->create(['status' => 'confirmed']);
@@ -111,6 +114,7 @@ function receiptSyncConfirmGoodsReceipt(array $setup, float $accepted): GoodsRec
     $goodsReceipt = GoodsReceipt::factory()->create([
         'purchase_order_id' => $setup['po']->id,
         'warehouse_id' => $setup['po']->warehouse_id,
+        'receipt_date' => now()->toDateString(),
         'status' => 'draft',
         'confirmed_at' => null,
         'confirmed_by' => null,
