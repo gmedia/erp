@@ -90,6 +90,27 @@ test('item-options lists only the lines of the purchase order with remaining qua
         ->and($response->json('data.0.unit_price'))->toBe('5000.00');
 });
 
+test('item-options filters PO lines by the search keyword', function () {
+    [$purchaseOrder, $line] = purchaseOrderWithLine();
+    $line->product->forceFill(['name' => 'Kabel Tembaga Khusus'])->saveQuietly();
+    $otherLine = $purchaseOrder->items()->create([
+        'product_id' => Product::factory()->create(['name' => 'Lampu LED'])->id,
+        'unit_id' => Unit::factory()->create()->id,
+        'quantity' => 3,
+        'unit_price' => 1000,
+        'discount_percent' => 0,
+        'tax_percent' => 0,
+        'line_total' => 3000,
+    ]);
+
+    $response = getJson("/api/purchase-orders/{$purchaseOrder->id}/item-options?search=Tembaga");
+
+    $response->assertOk();
+    expect($response->json('data'))->toHaveCount(1)
+        ->and($response->json('data.0.id'))->toBe($line->id)
+        ->and($response->json('data.0.id'))->not->toBe($otherLine->id);
+});
+
 test('goods receipt item-options returns accepted quantity minus active returns', function () {
     $goodsReceipt = GoodsReceipt::factory()->create();
     $item = GoodsReceiptItem::factory()->create([
