@@ -275,5 +275,27 @@
             "allocated_amount": "Jumlah Dialokasikan",
             "discount_taken": "Diskon Diambil"
         }
+    },
+    "profile.updated": "Profil berhasil diperbarui.",
+    "profile.name_required": "Kolom nama wajib diisi.",
+    "profile.name_string": "Nama harus berupa teks.",
+    "profile.name_max": "Nama tidak boleh lebih dari 255 karakter.",
+    "profile": {
+        "title": "Informasi profil",
+        "description": "Perbarui nama Anda. Alamat email dikelola oleh administrator.",
+        "name_label": "Nama",
+        "name_description": "Ditampilkan di seluruh aplikasi dan pada persetujuan.",
+        "name_placeholder": "Nama lengkap",
+        "email_label": "Alamat email",
+        "email_description": "Hanya baca. Untuk mengubah email, minta administrator memperbaruinya di menu Pengguna.",
+        "update_success": "Profil berhasil diperbarui",
+        "update_validation_error": "Periksa kembali isian formulir",
+        "update_failed": "Gagal memperbarui profil",
+        "notifications_title": "Notifikasi",
+        "notifications_description": "Aktifkan notifikasi push di perangkat ini.",
+        "notifications_enable": "Aktifkan notifikasi",
+        "notifications_enabling": "Mengaktifkan notifikasi...",
+        "notifications_denied": "Izin notifikasi ditolak.",
+        "notifications_failed": "Gagal mengaktifkan notifikasi."
     }
 }

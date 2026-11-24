@@ -9,6 +9,7 @@ use App\Models\Branch;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use RuntimeException;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
@@ -151,6 +152,62 @@ test('it replaces an existing document on update', function () {
 
     Storage::disk('public')->assertMissing('asset-movements/documents/old.pdf');
     expect($movement->fresh()->document_path)->toContain('asset-movements/documents/');
+});
+
+test('it keeps the old document when the update fails to save', function () {
+    Storage::fake('public');
+
+    $movement = AssetMovement::factory()->create([
+        'document_path' => 'asset-movements/documents/old.pdf',
+        'document_name' => 'old.pdf',
+    ]);
+    Storage::disk('public')->put('asset-movements/documents/old.pdf', 'old');
+
+    AssetMovement::updating(function () {
+        throw new RuntimeException('database unavailable');
+    });
+
+    $this->withoutExceptionHandling();
+
+    try {
+        expect(fn () => post("/api/asset-movements/{$movement->id}", [
+            '_method' => 'PUT',
+            'moved_at' => now()->format('Y-m-d H:i:s'),
+            'document' => UploadedFile::fake()->create('replacement.pdf', 128, 'application/pdf'),
+        ]))->toThrow(RuntimeException::class, 'database unavailable');
+    } finally {
+        AssetMovement::getEventDispatcher()->forget('eloquent.updating: ' . AssetMovement::class);
+    }
+
+    Storage::disk('public')->assertExists('asset-movements/documents/old.pdf');
+    expect($movement->fresh()->document_path)->toBe('asset-movements/documents/old.pdf');
+    expect(Storage::disk('public')->allFiles('asset-movements/documents'))->toHaveCount(1);
+});
+
+test('it removes the newly stored document when the store fails to save', function () {
+    Storage::fake('public');
+
+    $asset = Asset::factory()->create();
+
+    AssetMovement::creating(function () {
+        throw new RuntimeException('database unavailable');
+    });
+
+    $this->withoutExceptionHandling();
+
+    try {
+        expect(fn () => post('/api/asset-movements', [
+            'asset_id' => $asset->id,
+            'movement_type' => 'adjustment',
+            'moved_at' => now()->format('Y-m-d H:i:s'),
+            'document' => UploadedFile::fake()->create('movement-proof.pdf', 128, 'application/pdf'),
+        ]))->toThrow(RuntimeException::class, 'database unavailable');
+    } finally {
+        AssetMovement::getEventDispatcher()->forget('eloquent.creating: ' . AssetMovement::class);
+    }
+
+    expect(Storage::disk('public')->allFiles('asset-movements/documents'))->toBeEmpty();
+    expect(AssetMovement::count())->toBe(0);
 });
 
 test('it exposes a null document url when no document is attached', function () {
