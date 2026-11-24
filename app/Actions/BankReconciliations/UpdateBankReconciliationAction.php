@@ -27,6 +27,9 @@ class UpdateBankReconciliationAction
                 }
             }
 
+            // Difference selalu dihitung server dari item, bukan dari nilai klien.
+            $bankReconciliation->recalculateBalances();
+
             return $bankReconciliation->refresh();
         });
     }

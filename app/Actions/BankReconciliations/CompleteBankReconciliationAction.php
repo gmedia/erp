@@ -15,8 +15,27 @@ class CompleteBankReconciliationAction
 
     public function execute(BankReconciliation $bankReconciliation): BankReconciliation
     {
+        if (in_array($bankReconciliation->status, ['completed', 'cancelled'], true)) {
+            $message = 'Bank reconciliation is already ' . $bankReconciliation->status . '.';
+
+            throw ValidationException::withMessages(['status' => $message]);
+        }
+
         if (bccomp((string) $bankReconciliation->difference, '0', 2) !== 0) {
-            throw ValidationException::withMessages(['difference' => 'Bank reconciliation difference must be zero.']);
+            throw ValidationException::withMessages([
+                'difference' => __('bank_reconciliation.difference_must_be_zero'),
+            ]);
+        }
+
+        $hasUnmatchedWithoutAccount = $bankReconciliation->items()
+            ->where('is_reconciled', false)
+            ->whereNull('account_id')
+            ->exists();
+
+        if ($hasUnmatchedWithoutAccount) {
+            $message = __('bank_reconciliation.unmatched_item_requires_account');
+
+            throw ValidationException::withMessages(['items' => $message]);
         }
 
         // Issue #416: status dan jurnal satu transaksi. Jurnal gagal (ValidationException,

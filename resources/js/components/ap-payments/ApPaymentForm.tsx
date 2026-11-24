@@ -247,7 +247,7 @@ export const ApPaymentForm = memo<ApPaymentFormProps>(function ApPaymentForm({
                 <AsyncSelectField
                     name="bank_account_id"
                     label="Bank Account"
-                    url="/api/accounts"
+                    url="/api/accounts?is_active=1&has_children=0"
                     placeholder="Select bank account"
                 />
 

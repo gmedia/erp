@@ -12,6 +12,8 @@ class PostArReceiptJournalAction
 {
     public const AR_CONTROL_ACCOUNT_CODE = '11200';
 
+    public const AR_DISCOUNT_ACCOUNT_CODE = '41900';
+
     public function __construct(
         private CreateJournalEntryAction $createJournalEntry,
         private ResolveControlAccountAction $resolveControlAccount,
@@ -42,6 +44,33 @@ class PostArReceiptJournalAction
             $entryDate = $arReceipt->receipt_date->format('Y-m-d');
             $arAccount = $this->resolveControlAccount->execute(self::AR_CONTROL_ACCOUNT_CODE, $entryDate);
 
+            // Issue #437: diskon alokasi dijurnal ke akun diskon; AR dikredit sebesar kas + diskon.
+            $discount = round((float) $arReceipt->allocations()->sum('discount_given'), 2);
+            $lines = [
+                [
+                    'account_id' => (int) $arReceipt->bank_account_id,
+                    'debit' => $amount,
+                    'credit' => 0,
+                    'memo' => "Receipt {$arReceipt->receipt_number}",
+                ],
+                [
+                    'account_id' => $arAccount->id,
+                    'debit' => 0,
+                    'credit' => round($amount + $discount, 2),
+                    'memo' => "Receipt {$arReceipt->receipt_number}",
+                ],
+            ];
+
+            if ($discount > 0) {
+                $discountAccount = $this->resolveControlAccount->execute(self::AR_DISCOUNT_ACCOUNT_CODE, $entryDate);
+                $lines[] = [
+                    'account_id' => $discountAccount->id,
+                    'debit' => $discount,
+                    'credit' => 0,
+                    'memo' => "Discount {$arReceipt->receipt_number}",
+                ];
+            }
+
             $journalEntry = $this->createJournalEntry->execute([
                 'entry_date' => $entryDate,
                 'reference' => $arReceipt->receipt_number,
@@ -51,20 +80,7 @@ class PostArReceiptJournalAction
                 'source_type' => ArReceipt::class,
                 'source_id' => $arReceipt->id,
                 'branch_id' => $arReceipt->branch_id,
-                'lines' => [
-                    [
-                        'account_id' => (int) $arReceipt->bank_account_id,
-                        'debit' => $amount,
-                        'credit' => 0,
-                        'memo' => "Receipt {$arReceipt->receipt_number}",
-                    ],
-                    [
-                        'account_id' => $arAccount->id,
-                        'debit' => 0,
-                        'credit' => $amount,
-                        'memo' => "Receipt {$arReceipt->receipt_number}",
-                    ],
-                ],
+                'lines' => $lines,
             ]);
 
             $arReceipt->forceFill([

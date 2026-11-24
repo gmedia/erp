@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\ArReceipt;
+use App\Models\ArReceiptAllocation;
 use App\Models\Branch;
 use App\Models\Customer;
 use App\Models\CustomerInvoice;
@@ -64,7 +66,7 @@ test('it excludes paid cancelled void and draft invoices', function () {
     $fiscalYear = FiscalYear::factory()->create();
 
     foreach (['sent', 'paid', 'cancelled', 'void', 'draft'] as $status) {
-        CustomerInvoice::factory()->create([
+        $invoice = CustomerInvoice::factory()->create([
             'customer_id' => $customer->id,
             'fiscal_year_id' => $fiscalYear->id,
             'invoice_number' => 'INV-AGING-' . strtoupper($status),
@@ -75,6 +77,22 @@ test('it excludes paid cancelled void and draft invoices', function () {
             'amount_received' => $status === 'paid' ? 100000 : 0,
             'amount_due' => $status === 'paid' ? 0 : 100000,
         ]);
+
+        // Paid harus punya pelunasan bertanggal (sebelum hari ini) agar sisa
+        // historisnya 0; tanpa ini dianggap terbuka pada tanggal aging.
+        if ($status === 'paid') {
+            $receipt = ArReceipt::factory()->create([
+                'customer_id' => $customer->id,
+                'receipt_date' => '2026-02-01',
+                'status' => 'confirmed',
+            ]);
+            ArReceiptAllocation::create([
+                'ar_receipt_id' => $receipt->id,
+                'customer_invoice_id' => $invoice->id,
+                'allocated_amount' => 100000,
+                'discount_given' => 0,
+            ]);
+        }
     }
 
     Sanctum::actingAs($this->user, ['*']);

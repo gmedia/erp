@@ -1012,7 +1012,7 @@ class PurchasingSampleDataSeeder extends Seeder
             ['number' => "PO-{$year}-000105", 'status' => 'partially_received', 'source_status' => 'partially_ordered'],
             ['number' => "PO-{$year}-000106", 'status' => 'fully_received', 'source_status' => 'fully_ordered'],
             ['number' => "PO-{$year}-000107", 'status' => 'cancelled', 'source_status' => 'approved'],
-            ['number' => "PO-{$year}-000108", 'status' => 'closed', 'source_status' => 'fully_ordered'],
+            ['number' => "PO-{$year}-000108", 'status' => 'partially_received', 'source_status' => 'fully_ordered'],
         ];
 
         $histories = [
@@ -1027,12 +1027,6 @@ class PurchasingSampleDataSeeder extends Seeder
                 ['partially_received', 'fully_received'],
             ],
             'cancelled' => [['draft', 'confirmed'], ['confirmed', 'cancelled']],
-            'closed' => [
-                ['draft', 'confirmed'],
-                ['confirmed', 'partially_received'],
-                ['partially_received', 'fully_received'],
-                ['fully_received', 'closed'],
-            ],
         ];
 
         $purchaseOrders = [];
@@ -1101,6 +1095,13 @@ class PurchasingSampleDataSeeder extends Seeder
             $firstSourceItem = $sourceItems[0] ?? null;
             $secondSourceItem = $sourceItems[1] ?? null;
 
+            // Rotasi produk per PO bisa berubah saat seed ulang; buang baris lama
+            // agar kuantitas PO tidak menggandakan (legacy cleanup, idempotent).
+            $this->purgeStalePurchaseOrderItems(
+                $purchaseOrder->id,
+                [$firstProduct->id, $secondProduct->id],
+            );
+
             $firstItem = PurchaseOrderItem::updateOrCreate(
                 [
                     'purchase_order_id' => $purchaseOrder->id,
@@ -1137,8 +1138,8 @@ class PurchasingSampleDataSeeder extends Seeder
                 ]
             );
 
-            $purchaseOrders[$status] = $purchaseOrder;
-            $purchaseOrderItems[$status] = [$firstItem, $secondItem];
+            $purchaseOrders[$definition['number']] = $purchaseOrder;
+            $purchaseOrderItems[$definition['number']] = [$firstItem, $secondItem];
 
             $documentDate = Carbon::parse($purchaseOrder->order_date);
 
@@ -1178,6 +1179,36 @@ class PurchasingSampleDataSeeder extends Seeder
         }
 
         return [$purchaseOrders, $purchaseOrderItems];
+    }
+
+    /**
+     * Hapus baris item PO demo yang produknya sudah tidak dipakai. Dependen
+     * (retur dan penerimaan) dibersihkan dulu; seeder GR/retur membuatnya ulang.
+     *
+     * @param  array<int, int>  $keepProductIds
+     */
+    private function purgeStalePurchaseOrderItems(int $purchaseOrderId, array $keepProductIds): void
+    {
+        $staleItemIds = PurchaseOrderItem::query()
+            ->where('purchase_order_id', $purchaseOrderId)
+            ->whereNotIn('product_id', $keepProductIds)
+            ->pluck('id');
+
+        if ($staleItemIds->isEmpty()) {
+            return;
+        }
+
+        $receiptItemIds = GoodsReceiptItem::query()
+            ->whereIn('purchase_order_item_id', $staleItemIds)
+            ->pluck('id');
+
+        SupplierReturnItem::query()
+            ->whereIn('goods_receipt_item_id', $receiptItemIds)
+            ->delete();
+
+        GoodsReceiptItem::query()->whereIn('id', $receiptItemIds)->delete();
+
+        PurchaseOrderItem::query()->whereIn('id', $staleItemIds)->delete();
     }
 
     private function syncApprovalRequest(
@@ -1374,7 +1405,7 @@ class PurchasingSampleDataSeeder extends Seeder
             [
                 'number' => "GR-{$year}-000101",
                 'status' => 'draft',
-                'po_status' => 'confirmed',
+                'po_number' => "PO-{$year}-000103",
                 'items' => [
                     ['line' => 0, 'received' => 2.00, 'accepted' => 2.00],
                 ],
@@ -1382,7 +1413,7 @@ class PurchasingSampleDataSeeder extends Seeder
             [
                 'number' => "GR-{$year}-000102",
                 'status' => 'confirmed',
-                'po_status' => 'partially_received',
+                'po_number' => "PO-{$year}-000105",
                 'items' => [
                     ['line' => 0, 'received' => 4.00, 'accepted' => 3.00, 'rejected' => 1.00],
                 ],
@@ -1390,7 +1421,7 @@ class PurchasingSampleDataSeeder extends Seeder
             [
                 'number' => "GR-{$year}-000103",
                 'status' => 'confirmed',
-                'po_status' => 'fully_received',
+                'po_number' => "PO-{$year}-000106",
                 'items' => [
                     ['line' => 0, 'received' => null, 'accepted' => null],
                     ['line' => 1, 'received' => null, 'accepted' => null],
@@ -1399,7 +1430,7 @@ class PurchasingSampleDataSeeder extends Seeder
             [
                 'number' => "GR-{$year}-000104",
                 'status' => 'cancelled',
-                'po_status' => 'cancelled',
+                'po_number' => "PO-{$year}-000107",
                 'items' => [
                     ['line' => 0, 'received' => 0.00, 'accepted' => 0.00, 'rejected' => 0.00],
                 ],
@@ -1407,10 +1438,9 @@ class PurchasingSampleDataSeeder extends Seeder
             [
                 'number' => "GR-{$year}-000105",
                 'status' => 'confirmed',
-                'po_status' => 'closed',
+                'po_number' => "PO-{$year}-000108",
                 'items' => [
                     ['line' => 0, 'received' => null, 'accepted' => null],
-                    ['line' => 1, 'received' => null, 'accepted' => null],
                 ],
             ],
         ];
@@ -1419,8 +1449,8 @@ class PurchasingSampleDataSeeder extends Seeder
         $goodsReceiptItems = [];
 
         foreach ($definitions as $index => $definition) {
-            $purchaseOrder = $purchaseOrders[$definition['po_status']] ?? null;
-            $poItems = $purchaseOrderItems[$definition['po_status']] ?? [];
+            $purchaseOrder = $purchaseOrders[$definition['po_number']] ?? null;
+            $poItems = $purchaseOrderItems[$definition['po_number']] ?? [];
 
             if (! $purchaseOrder) {
                 continue;

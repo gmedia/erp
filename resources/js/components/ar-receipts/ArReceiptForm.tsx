@@ -212,7 +212,7 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
                         name="bank_account_id"
                         label="Bank Account"
                         placeholder="Select Bank Account"
-                        url="/api/accounts"
+                        url="/api/accounts?is_active=1&has_children=0"
                     />
                     <InputField
                         name="total_amount"

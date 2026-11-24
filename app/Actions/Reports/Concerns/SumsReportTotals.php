@@ -20,7 +20,7 @@ trait SumsReportTotals
      * @param  array<int, string>  $columns  alias kolom pada hasil query yang akan dijumlahkan
      * @return array{as_of_date: string, totals: array<string, string>}
      */
-    protected function buildReportSummary(Builder $query, array $columns): array
+    protected function buildReportSummary(Builder $query, array $columns, ?string $asOfDate = null): array
     {
         $inner = (clone $query)->reorder()->toBase();
 
@@ -41,7 +41,9 @@ trait SumsReportTotals
         }
 
         return [
-            'as_of_date' => Carbon::today()->toDateString(),
+            'as_of_date' => $asOfDate !== null && $asOfDate !== ''
+                ? Carbon::parse($asOfDate)->toDateString()
+                : Carbon::today()->toDateString(),
             'totals' => $totals,
         ];
     }

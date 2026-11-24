@@ -68,5 +68,5 @@ test('it fails unbalanced updates', function () {
     $request->withValidator($validator);
 
     expect($validator->fails())->toBeTrue();
-    expect($validator->errors()->first('lines'))->toBe('Total Debit and Total Credit must be equal.');
+    expect($validator->errors()->first('lines'))->toBe(__('journal_entry.lines_not_balanced'));
 });

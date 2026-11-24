@@ -26,11 +26,29 @@ abstract class AbstractJournalEntryRequest extends AuthorizedFormRequest
     {
         $validator->after(function ($validator) {
             $lines = $this->input('lines', []);
+
+            foreach ($lines as $line) {
+                $debit = (float) ($line['debit'] ?? 0);
+                $credit = (float) ($line['credit'] ?? 0);
+
+                if ($debit > 0 && $credit > 0) {
+                    $validator->errors()->add('lines', __('journal_entry.line_one_side_only'));
+
+                    break;
+                }
+
+                if ($debit <= 0 && $credit <= 0) {
+                    $validator->errors()->add('lines', __('journal_entry.line_amount_required'));
+
+                    break;
+                }
+            }
+
             $totalDebit = collect($lines)->sum('debit');
             $totalCredit = collect($lines)->sum('credit');
 
             if (bccomp((string) $totalDebit, (string) $totalCredit, 2) !== 0) {
-                $validator->errors()->add('lines', 'Total Debit and Total Credit must be equal.');
+                $validator->errors()->add('lines', __('journal_entry.lines_not_balanced'));
             }
         });
     }

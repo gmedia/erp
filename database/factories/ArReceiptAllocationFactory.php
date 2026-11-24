@@ -14,13 +14,13 @@ class ArReceiptAllocationFactory extends Factory
     public function definition(): array
     {
         $allocatedAmount = $this->faker->randomFloat(2, 100000, 5000000);
-        $discountGiven = $this->faker->randomFloat(2, 0, $allocatedAmount * 0.05);
 
+        // Diskon alokasi (#437) harus eksplisit: default 0 agar test lain tidak memicu akun diskon.
         return [
             'ar_receipt_id' => ArReceipt::factory(),
             'customer_invoice_id' => CustomerInvoice::factory(),
             'allocated_amount' => $allocatedAmount,
-            'discount_given' => $discountGiven,
+            'discount_given' => 0,
             'notes' => $this->faker->optional()->sentence(),
         ];
     }

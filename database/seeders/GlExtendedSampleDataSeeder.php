@@ -40,7 +40,13 @@ class GlExtendedSampleDataSeeder extends Seeder
      */
     private function accounts(): Collection
     {
-        $accounts = Account::query()->take(5)->get();
+        // Hanya akun daun: akun induk (punya anak) tidak boleh dipakai jurnal (#437).
+        $accounts = Account::query()
+            ->where('is_active', true)
+            ->whereDoesntHave('children')
+            ->orderBy('code')
+            ->take(5)
+            ->get();
 
         if ($accounts->count() >= 5) {
             return $accounts;
