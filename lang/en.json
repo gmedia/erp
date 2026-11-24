@@ -281,7 +281,7 @@
     "accounting_posting.coa_none_active": "No active COA version covers :date. Activate one COA version before posting.",
     "accounting_posting.coa_ambiguous": "More than one active COA version applies to :date. Keep exactly one active COA per fiscal year.",
     "accounting_posting.line_account_outside_coa": "Journal line account :code does not belong to the COA version used for :date.",
-  "accounting_posting.line_account_is_group": "Group account :code cannot be used for journal posting. Choose a detail (leaf) account.",
+  "accounting_posting.line_group_account_not_reducing": "Group account :code can only receive lines that reduce its posted balance. Choose a detail (leaf) account.",
   "bank_reconciliation.unmatched_item_requires_account": "Every unmatched bank item must have an account before completing.",
   "bank_reconciliation.difference_must_be_zero": "Bank reconciliation difference must be zero.",
   "recurring_journal.inactive": "Recurring journal is inactive.",

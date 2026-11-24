@@ -39,10 +39,14 @@ class PostJournalAction
                     app(AssertPeriodOpenForPostingAction::class)
                         ->execute($entry->fiscal_year_id, $entry->entry_date->format('Y-m-d'));
 
-                    $this->assertLinesUseActiveAccounts(
-                        $entry->lines->map(fn ($line): array => ['account_id' => $line->account_id])->all(),
-                        $entry->entry_date->format('Y-m-d'),
-                    );
+                    $lines = $entry->lines->map(fn ($line): array => [
+                        'account_id' => $line->account_id,
+                        'debit' => $line->debit,
+                        'credit' => $line->credit,
+                    ])->all();
+
+                    $this->assertLinesUseActiveAccounts($lines, $entry->entry_date->format('Y-m-d'));
+                    $this->assertGroupAccountLinesReduceBalance($lines);
 
                     $entry->update([
                         'status' => 'posted',

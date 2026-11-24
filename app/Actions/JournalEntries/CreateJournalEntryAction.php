@@ -64,11 +64,6 @@ class CreateJournalEntryAction
 
         if ($validateAccounts) {
             $this->assertLinesUseActiveAccounts($data['lines'], $data['entry_date']);
-        } else {
-            $this->assertNoGroupAccountLines(array_values(array_unique(array_map(
-                fn (array $line): int => (int) $line['account_id'],
-                $data['lines'],
-            ))));
         }
 
         while ($attempts < $maxAttempts) {
@@ -96,6 +91,9 @@ class CreateJournalEntryAction
                     if (! $isPeriodClosingEntry) {
                         app(AssertPeriodOpenForPostingAction::class)->execute($fiscalYear->id, $entryDate);
                     }
+
+                    // Sebelum baris jurnal ditulis, agar saldo posted yang dibaca belum memuat jurnal ini.
+                    $this->assertGroupAccountLinesReduceBalance($data['lines']);
 
                     // Generate Entry Number
                     // We use max() instead of count() to handle deletions correctly (gaps in sequence)
