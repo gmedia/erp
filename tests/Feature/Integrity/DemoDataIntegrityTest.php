@@ -12,7 +12,6 @@ use App\Models\StockAdjustment;
 use App\Models\StockTransfer;
 use App\Models\SupplierBill;
 use App\Models\SupplierReturn;
-use Database\Seeders\SubledgerGlReconciliationSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 
@@ -25,13 +24,38 @@ uses(RefreshDatabase::class)->group('demo-integrity');
  */
 function seedDemoData(): void
 {
+    // Seed exactly what ships. No seeder may write a journal computed from
+    // the difference between GL and subledger (issue #357).
     test()->seed();
+}
 
-    // Production demo installs reconcile GL to the subledger, but
-    // DatabaseSeeder skips that step under the testing environment so that
-    // branch-isolation tests start from a zero clearing balance. Run it here
-    // so the invariants validate the dataset that actually ships.
-    test()->seed(SubledgerGlReconciliationSeeder::class);
+/**
+ * Read-only invariants registered by invariant(), keyed by test name. The replay
+ * test at the end of this file runs all of them against the state after a second `db:seed`.
+ *
+ * @return array<string, Closure>
+ */
+function demoInvariantChecks(?string $name = null, ?Closure $check = null): array
+{
+    static $checks = [];
+
+    if ($name !== null && $check !== null) {
+        $checks[$name] = $check;
+    }
+
+    return $checks;
+}
+
+/**
+ * Registers a non-mutating invariant as a normal test and in the replay registry.
+ * Checks that delete or change data must stay plain `test()` calls, since they
+ * would corrupt the state the other checks read.
+ */
+function invariant(string $name, Closure $check): void
+{
+    demoInvariantChecks($name, $check);
+
+    test($name, $check);
 }
 
 function activeCoaAccountId(string $code): ?int
@@ -77,22 +101,23 @@ beforeEach(function () {
 });
 
 // W7-01 — void/cancelled/draft documents must not carry an outstanding balance.
-test('W7-01 void, cancelled and draft documents carry no amount due', function () {
+// Read the raw column, not the model accessor, so a corrupted DB value cannot hide behind it.
+invariant('W7-01 void, cancelled and draft documents carry no amount due', function () {
     $inactiveStatuses = ['draft', 'cancelled', 'void'];
 
-    foreach (CustomerInvoice::query()->whereIn('status', $inactiveStatuses)->get() as $invoice) {
+    foreach (DB::table('customer_invoices')->whereIn('status', $inactiveStatuses)->get(['invoice_number', 'status', 'amount_due']) as $invoice) {
         expect((float) $invoice->amount_due)
             ->toBe(0.0, "Customer invoice {$invoice->invoice_number} ({$invoice->status}) must have amount due 0");
     }
 
-    foreach (SupplierBill::query()->whereIn('status', $inactiveStatuses)->get() as $bill) {
+    foreach (DB::table('supplier_bills')->whereIn('status', $inactiveStatuses)->get(['bill_number', 'status', 'amount_due']) as $bill) {
         expect((float) $bill->amount_due)
             ->toBe(0.0, "Supplier bill {$bill->bill_number} ({$bill->status}) must have amount due 0");
     }
 });
 
 // W7-02 — AR/AP settlements reconcile with their allocation ledgers.
-test('W7-02 receipt, credit note and payment allocations match settled amounts', function () {
+invariant('W7-02 receipt, credit note and payment allocations match settled amounts', function () {
     foreach (CustomerInvoice::query()->get() as $invoice) {
         $allocated = (float) DB::table('ar_receipt_allocations')
             ->where('customer_invoice_id', $invoice->id)
@@ -119,7 +144,7 @@ test('W7-02 receipt, credit note and payment allocations match settled amounts',
 });
 
 // W7-02 — GL control accounts equal the open subledger balances.
-test('W7-02 GL receivable and payable control accounts equal open subledger balances', function () {
+invariant('W7-02 GL receivable and payable control accounts equal open subledger balances', function () {
     $receivableId = activeCoaAccountId('11200');
     $payableId = activeCoaAccountId('21100');
 
@@ -142,7 +167,7 @@ test('W7-02 GL receivable and payable control accounts equal open subledger bala
 });
 
 // W7-03 — one source of received quantity: confirmed goods receipt lines.
-test('W7-03 purchase order received quantities derive from confirmed goods receipts', function () {
+invariant('W7-03 purchase order received quantities derive from confirmed goods receipts', function () {
     $confirmedByItem = DB::table('goods_receipt_items')
         ->join('goods_receipts', 'goods_receipts.id', '=', 'goods_receipt_items.goods_receipt_id')
         ->where('goods_receipts.status', 'confirmed')
@@ -174,7 +199,7 @@ test('W7-03 purchase order received quantities derive from confirmed goods recei
 });
 
 // W7-03 — a supplier return must belong to the purchase order's supplier.
-test('W7-03 supplier returns belong to the purchase order supplier and receipt', function () {
+invariant('W7-03 supplier returns belong to the purchase order supplier and receipt', function () {
     $returns = DB::table('supplier_returns')
         ->join('purchase_orders', 'purchase_orders.id', '=', 'supplier_returns.purchase_order_id')
         ->select('supplier_returns.id', 'supplier_returns.return_number', 'supplier_returns.supplier_id', 'purchase_orders.supplier_id as po_supplier_id')
@@ -202,7 +227,7 @@ test('W7-03 supplier returns belong to the purchase order supplier and receipt',
 });
 
 // W7-04 — movement ledger chain is internally consistent per product+warehouse.
-test('W7-04 stock movement balances form a correct chain per product and warehouse', function () {
+invariant('W7-04 stock movement balances form a correct chain per product and warehouse', function () {
     $movements = DB::table('stock_movements')
         ->orderBy('product_id')
         ->orderBy('warehouse_id')
@@ -232,8 +257,139 @@ test('W7-04 stock movement balances form a correct chain per product and warehou
     expect(min($balance))->toBeGreaterThanOrEqual(0.0, 'Running stock balance must never go negative');
 });
 
+// W7-04 — the reverse direction: every eligible document line must have a movement with the same quantity.
+invariant('W7-04 every eligible document line has a matching stock movement', function () {
+    $movementSums = DB::table('stock_movements')
+        ->whereNotNull('reference_type')
+        ->groupBy('reference_type', 'reference_id', 'product_id')
+        ->selectRaw('reference_type, reference_id, product_id, SUM(quantity_in) as qty_in, SUM(quantity_out) as qty_out')
+        ->get()
+        ->keyBy(fn ($row) => $row->reference_type . '#' . $row->reference_id . '#' . $row->product_id);
+
+    $checks = [
+        [
+            // Only accepted quantity is posted to stock (StockPostingService::postGoodsReceipt).
+            'type' => GoodsReceipt::class,
+            'header' => 'goods_receipts',
+            'lines' => 'goods_receipt_items',
+            'fk' => 'goods_receipt_id',
+            'status' => 'confirmed',
+            'qty' => 'quantity_accepted',
+            'direction' => 'in',
+        ],
+        [
+            'type' => SupplierReturn::class,
+            'header' => 'supplier_returns',
+            'lines' => 'supplier_return_items',
+            'fk' => 'supplier_return_id',
+            'status' => 'confirmed',
+            'qty' => 'quantity_returned',
+            'direction' => 'out',
+        ],
+        [
+            'type' => StockAdjustment::class,
+            'header' => 'stock_adjustments',
+            'lines' => 'stock_adjustment_items',
+            'fk' => 'stock_adjustment_id',
+            'status' => 'approved',
+            'qty' => 'quantity_adjusted',
+            'direction' => null,
+        ],
+    ];
+
+    $checked = 0;
+    $failures = [];
+
+    foreach ($checks as $check) {
+        $eligibleIds = DB::table($check['header'])->where('status', $check['status'])->pluck('id');
+
+        foreach (DB::table($check['lines'])->whereIn($check['fk'], $eligibleIds)->get() as $line) {
+            $key = $check['type'] . '#' . $line->{$check['fk']} . '#' . $line->product_id;
+            $movement = $movementSums->get($key);
+
+            // Collect every violation instead of stopping at the first, so one broken
+            // document cannot hide a break in another document type.
+            if ($movement === null) {
+                $failures[] = "Eligible {$check['header']}#{$line->{$check['fk']}} product {$line->product_id} must have a stock movement";
+                $checked++;
+
+                continue;
+            }
+
+            $expected = (float) $line->{$check['qty']};
+            $actual = match ($check['direction']) {
+                'in' => (float) $movement->qty_in,
+                'out' => (float) $movement->qty_out,
+                default => (float) $movement->qty_in + (float) $movement->qty_out,
+            };
+
+            if (round($actual, 2) !== round($expected, 2)) {
+                $failures[] = "Movement quantity for {$key} must equal document line quantity";
+            }
+
+            $checked++;
+        }
+    }
+
+    expect($failures)->toBeEmpty(implode(' | ', $failures));
+    expect($checked)->toBeGreaterThan(0, 'Demo data must include eligible stock document lines');
+});
+
+// W7-04 — a received transfer is two legs: transfer_out = dispatched quantity,
+// transfer_in = quantity_received. Every received line must have both movements.
+invariant('W7-04 every received stock transfer line has matching transfer_out and transfer_in movements', function () {
+    $legs = DB::table('stock_movements')
+        ->where('reference_type', StockTransfer::class)
+        ->whereIn('movement_type', ['transfer_out', 'transfer_in'])
+        ->groupBy('reference_id', 'product_id', 'movement_type')
+        ->selectRaw('reference_id, product_id, movement_type, SUM(quantity_in) as qty_in, SUM(quantity_out) as qty_out')
+        ->get()
+        ->keyBy(fn ($row) => $row->reference_id . '#' . $row->product_id . '#' . $row->movement_type);
+
+    $receivedLines = DB::table('stock_transfer_items')
+        ->join('stock_transfers', 'stock_transfers.id', '=', 'stock_transfer_items.stock_transfer_id')
+        ->where('stock_transfers.status', 'received')
+        ->get(['stock_transfer_items.stock_transfer_id', 'stock_transfer_items.product_id', 'stock_transfer_items.quantity', 'stock_transfer_items.quantity_received']);
+
+    expect($receivedLines)->not->toBeEmpty('Demo data must include received stock transfers');
+
+    foreach ($receivedLines as $line) {
+        $key = $line->stock_transfer_id . '#' . $line->product_id;
+
+        $out = $legs->get($key . '#transfer_out');
+        expect($out)->not->toBeNull("Received transfer {$key} must have a transfer_out movement");
+        expect(round((float) $out->qty_out, 2))
+            ->toBe(round((float) $line->quantity, 2), "transfer_out quantity for {$key} must equal dispatched quantity");
+
+        $in = $legs->get($key . '#transfer_in');
+        expect($in)->not->toBeNull("Received transfer {$key} must have a transfer_in movement");
+        expect(round((float) $in->qty_in, 2))
+            ->toBe(round((float) $line->quantity_received, 2), "transfer_in quantity for {$key} must equal quantity received");
+    }
+});
+
+// W7-04 — running balance never goes negative at any movement, not only at the end.
+invariant('W7-04 running stock balance is non-negative at every movement', function () {
+    $movements = DB::table('stock_movements')
+        ->orderBy('product_id')
+        ->orderBy('warehouse_id')
+        ->orderBy('moved_at')
+        ->orderBy('id')
+        ->get(['id', 'product_id', 'warehouse_id', 'quantity_in', 'quantity_out']);
+
+    $balance = [];
+
+    foreach ($movements as $movement) {
+        $key = $movement->product_id . ':' . $movement->warehouse_id;
+        $balance[$key] = ($balance[$key] ?? 0.0) + (float) $movement->quantity_in - (float) $movement->quantity_out;
+
+        expect(round($balance[$key], 2))
+            ->toBeGreaterThanOrEqual(0.0, "Movement {$movement->id} drives {$key} below zero");
+    }
+});
+
 // W7-04 — snapshot quantity equals the latest movement balance (by moved_at, id).
-test('W7-04 stock snapshot uses the latest movement balance', function () {
+invariant('W7-04 stock snapshot uses the latest movement balance', function () {
     $movements = DB::table('stock_movements')
         ->orderBy('product_id')
         ->orderBy('warehouse_id')
@@ -246,21 +402,31 @@ test('W7-04 stock snapshot uses the latest movement balance', function () {
         $latest[$movement->product_id . ':' . $movement->warehouse_id] = (float) $movement->balance_after;
     }
 
-    $request = IndexStockMonitorRequest::create('/api/stock-monitor', 'GET');
+    // Compare the set of product+warehouse pairs, not raw movement rows.
+    $pairs = array_keys($latest);
+    $pairCount = count($pairs);
+
+    // Request a page size larger than the pair count so every row is checked, not just page 1.
+    $request = IndexStockMonitorRequest::create('/api/stock-monitor', 'GET', ['per_page' => max(100, $pairCount)]);
     $result = app(IndexStockMonitorAction::class)->execute($request);
     $snapshot = collect($result['stocks']->items());
 
     expect($snapshot)->not->toBeEmpty('Stock monitor must show stock rows');
 
+    $snapshotPairs = $snapshot->map(fn ($row) => $row->product_id . ':' . $row->warehouse_id)->sort()->values()->all();
+    $expectedPairs = collect($pairs)->sort()->values()->all();
+
+    expect($snapshotPairs)->toBe($expectedPairs, 'Stock snapshot must cover exactly the product and warehouse pairs that have movements');
+
     foreach ($snapshot as $row) {
         $key = $row->product_id . ':' . $row->warehouse_id;
         expect(round((float) $row->quantity_on_hand, 2))
-            ->toBe(round($latest[$key] ?? 0.0, 2), "Stock snapshot for {$key} must equal the latest movement balance");
+            ->toBe(round($latest[$key], 2), "Stock snapshot for {$key} must equal the latest movement balance");
     }
 });
 
 // W7-04 — only stock-affecting document states produce movements.
-test('W7-04 only eligible document states produce stock movements', function () {
+invariant('W7-04 only eligible document states produce stock movements', function () {
     $eligible = DB::table('stock_movements')
         ->whereNotNull('reference_type')
         ->get(['reference_type', 'reference_id'])
@@ -291,7 +457,7 @@ test('W7-04 only eligible document states produce stock movements', function () 
 });
 
 // W7-04 — inventory valuation equals GL 11300.
-test('W7-04 inventory valuation equals GL inventory account', function () {
+invariant('W7-04 inventory valuation equals GL inventory account', function () {
     $inventoryAccountId = activeCoaAccountId('11300');
     expect($inventoryAccountId)->not->toBeNull('Active COA must expose account 11300');
 
@@ -316,12 +482,139 @@ test('W7-04 inventory valuation equals GL inventory account', function () {
         $valuation += (float) $movement->balance_after * $cost;
     }
 
+    // Barang dalam perjalanan tetap persediaan (keputusan #357). Nilainya dari
+    // dokumen transfer in_transit, bukan dari selisih GL.
+    $inTransit = (float) DB::table('stock_transfer_items')
+        ->join('stock_transfers', 'stock_transfers.id', '=', 'stock_transfer_items.stock_transfer_id')
+        ->where('stock_transfers.status', 'in_transit')
+        ->selectRaw('COALESCE(SUM(stock_transfer_items.quantity * stock_transfer_items.unit_cost), 0) as value')
+        ->value('value');
+
     expect(round(postedBalance((int) $inventoryAccountId, true), 2))
-        ->toBe(round($valuation, 2), 'GL 11300 must equal the sum of stock movement valuation');
+        ->toBe(round($valuation + $inTransit, 2), 'GL 11300 must equal stock movement valuation plus goods in transit');
+});
+
+// W7-04 — invarian 11300 harus menangkap kehilangan jurnal selisih transfer dan
+// barang in_transit yang tidak tercatat di GL (issue #357 review PR #384 butir 2).
+test('W7-04 11300 invariant fails when a transfer shortage journal is removed', function () {
+    $inventoryAccountId = activeCoaAccountId('11300');
+
+    $shortageJournalIds = DB::table('stock_transfers')
+        ->whereNotNull('journal_entry_id')
+        ->pluck('journal_entry_id');
+
+    expect($shortageJournalIds)->not->toBeEmpty('Demo data must post at least one transfer shortage journal');
+
+    // Hapus jurnal kekurangan: GL 11300 kehilangan kreditnya, invarian harus merah.
+    DB::table('journal_entry_lines')
+        ->whereIn('journal_entry_id', $shortageJournalIds)
+        ->where('account_id', $inventoryAccountId)
+        ->delete();
+
+    $valuation = 0.0;
+    $latest = [];
+    $movements = DB::table('stock_movements')
+        ->orderBy('moved_at')
+        ->orderBy('id')
+        ->get(['product_id', 'warehouse_id', 'balance_after', 'average_cost_after']);
+
+    foreach ($movements as $movement) {
+        $latest[$movement->product_id . ':' . $movement->warehouse_id] = $movement;
+    }
+    foreach ($latest as $movement) {
+        $cost = $movement->average_cost_after !== null
+            ? (float) $movement->average_cost_after
+            : (float) DB::table('products')->where('id', $movement->product_id)->value('cost');
+        $valuation += (float) $movement->balance_after * $cost;
+    }
+
+    $inTransit = (float) DB::table('stock_transfer_items')
+        ->join('stock_transfers', 'stock_transfers.id', '=', 'stock_transfer_items.stock_transfer_id')
+        ->where('stock_transfers.status', 'in_transit')
+        ->selectRaw('COALESCE(SUM(stock_transfer_items.quantity * stock_transfer_items.unit_cost), 0) as value')
+        ->value('value');
+
+    expect(round(postedBalance((int) $inventoryAccountId, true), 2))
+        ->not->toBe(round($valuation + $inTransit, 2), 'Invarian 11300 harus merah saat jurnal kekurangan hilang');
+});
+
+test('W7-04 11300 invariant depends on in_transit transfer value from the document', function () {
+    $inTransitItem = DB::table('stock_transfer_items')
+        ->join('stock_transfers', 'stock_transfers.id', '=', 'stock_transfer_items.stock_transfer_id')
+        ->where('stock_transfers.status', 'in_transit')
+        ->orderBy('stock_transfer_items.id')
+        ->first(['stock_transfer_items.id', 'stock_transfer_items.quantity', 'stock_transfer_items.unit_cost']);
+
+    expect($inTransitItem)->not->toBeNull('Demo data must include an in_transit transfer line');
+
+    $before = (float) DB::table('stock_transfer_items')
+        ->join('stock_transfers', 'stock_transfers.id', '=', 'stock_transfer_items.stock_transfer_id')
+        ->where('stock_transfers.status', 'in_transit')
+        ->selectRaw('COALESCE(SUM(stock_transfer_items.quantity * stock_transfer_items.unit_cost), 0) as value')
+        ->value('value');
+
+    // Ubah satu baris in_transit: nilai dokumen berubah, jadi invarian yang
+    // memasukkan barang dalam perjalanan juga berubah. Nilai GL tidak ikut berubah.
+    DB::table('stock_transfer_items')
+        ->where('id', $inTransitItem->id)
+        ->update(['quantity' => (float) $inTransitItem->quantity + 1]);
+
+    $after = (float) DB::table('stock_transfer_items')
+        ->join('stock_transfers', 'stock_transfers.id', '=', 'stock_transfer_items.stock_transfer_id')
+        ->where('stock_transfers.status', 'in_transit')
+        ->selectRaw('COALESCE(SUM(stock_transfer_items.quantity * stock_transfer_items.unit_cost), 0) as value')
+        ->value('value');
+
+    expect(round($after - $before, 2))
+        ->toBe(
+            round((float) $inTransitItem->unit_cost, 2),
+            'Adding 1 unit to an in_transit line must add unit_cost to the in-transit value'
+        );
+});
+
+// Every posted document must reference a posted, balanced journal (issue #357 scope 4).
+invariant('W7-02 posted documents reference a posted and balanced journal', function () {
+    $documents = [
+        ['customer_invoices', 'invoice_number', ['sent', 'partially_paid', 'paid', 'overdue']],
+        ['supplier_bills', 'bill_number', ['confirmed', 'partially_paid', 'paid', 'overdue']],
+        ['goods_receipts', 'gr_number', ['confirmed']],
+        ['supplier_returns', 'return_number', ['confirmed']],
+        ['stock_adjustments', 'adjustment_number', ['approved']],
+    ];
+
+    $checked = 0;
+
+    foreach ($documents as [$table, $numberColumn, $postedStatuses]) {
+        $rows = DB::table($table)
+            ->whereIn('status', $postedStatuses)
+            ->get(['id', 'status', 'journal_entry_id', $numberColumn]);
+
+        foreach ($rows as $row) {
+            $label = "{$table} {$row->{$numberColumn}} ({$row->status})";
+
+            expect($row->journal_entry_id)->not->toBeNull("{$label} must reference a journal entry");
+
+            $journal = DB::table('journal_entries')->where('id', $row->journal_entry_id)->first(['status']);
+            expect($journal)->not->toBeNull("{$label} journal must exist");
+            expect($journal->status)->toBe('posted', "{$label} journal must be posted");
+
+            $totals = DB::table('journal_entry_lines')
+                ->where('journal_entry_id', $row->journal_entry_id)
+                ->selectRaw('COALESCE(SUM(debit), 0) as debit, COALESCE(SUM(credit), 0) as credit')
+                ->first();
+
+            expect(round((float) $totals->debit, 2))
+                ->toBe(round((float) $totals->credit, 2), "{$label} journal must balance");
+
+            $checked++;
+        }
+    }
+
+    expect($checked)->toBeGreaterThan(0, 'Demo data must include posted documents with journals');
 });
 
 // W7-05 — book value is always cost minus accumulated depreciation.
-test('W7-05 asset book value equals cost minus accumulated depreciation', function () {
+invariant('W7-05 asset book value equals cost minus accumulated depreciation', function () {
     $assets = DB::table('assets')->get(['asset_code', 'purchase_cost', 'accumulated_depreciation', 'book_value', 'status']);
 
     expect($assets)->not->toBeEmpty('Demo data must include assets');
@@ -344,7 +637,7 @@ test('W7-05 asset book value equals cost minus accumulated depreciation', functi
 });
 
 // W7-05 — GL equipment net of accumulated depreciation equals the in-service register.
-test('W7-05 GL equipment minus accumulated depreciation equals in-service book value', function () {
+invariant('W7-05 GL equipment minus accumulated depreciation equals in-service book value', function () {
     $equipmentId = activeCoaAccountId('12100');
     $accumulatedId = activeCoaAccountId('12200');
 
@@ -363,7 +656,7 @@ test('W7-05 GL equipment minus accumulated depreciation equals in-service book v
 });
 
 // W7-05 — every posted depreciation run has a posted journal.
-test('W7-05 posted depreciation runs have posted journals', function () {
+invariant('W7-05 posted depreciation runs have posted journals', function () {
     $runs = DB::table('asset_depreciation_runs')->where('status', 'posted')->get();
 
     expect($runs)->not->toBeEmpty('Demo data must include a posted depreciation run');
@@ -377,7 +670,7 @@ test('W7-05 posted depreciation runs have posted journals', function () {
 });
 
 // W7-05 — depreciation expense in the GL equals the posted run depreciation.
-test('W7-05 depreciation expense equals posted depreciation run totals', function () {
+invariant('W7-05 depreciation expense equals posted depreciation run totals', function () {
     $expenseId = activeCoaAccountId('53000');
     expect($expenseId)->not->toBeNull('Active COA must expose account 53000');
 
@@ -391,7 +684,7 @@ test('W7-05 depreciation expense equals posted depreciation run totals', functio
 });
 
 // W7-05 — trial balance (all posted journal lines) stays balanced.
-test('W7-05 posted journals are balanced', function () {
+invariant('W7-05 posted journals are balanced', function () {
     $totals = DB::table('journal_entry_lines')
         ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
         ->where('journal_entries.status', 'posted')
@@ -401,3 +694,14 @@ test('W7-05 posted journals are balanced', function () {
     expect(round((float) $totals->debit, 2))
         ->toBe(round((float) $totals->credit, 2), 'Total debits must equal total credits across posted journals');
 });
+
+// Issue #357 (PR #384): every invariant above must also hold after a second `db:seed`.
+// One test seeds twice and runs the registered read-only checks against that state.
+// It seeds only once more than the beforeEach, so the extra cost is one seed run.
+test('all demo invariants also hold after a second db:seed', function () {
+    seedDemoData();
+
+    foreach (demoInvariantChecks() as $name => $check) {
+        $check();
+    }
+})->group('demo-integrity');

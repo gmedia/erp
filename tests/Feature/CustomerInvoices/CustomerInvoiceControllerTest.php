@@ -153,13 +153,16 @@ test('show returns customer invoice detail', function () {
 });
 
 test('update modifies customer invoice and sets sent_by when status changes to sent', function () {
-    FiscalYear::factory()->create([
+    $fiscalYear2026 = FiscalYear::factory()->create([
         'name' => '2026',
         'start_date' => '2026-01-01',
         'end_date' => '2026-12-31',
         'status' => 'open',
     ]);
-    $coaVersion = CoaVersion::factory()->create(['status' => 'active']);
+    $coaVersion = CoaVersion::factory()->create([
+        'fiscal_year_id' => $fiscalYear2026->id,
+        'status' => 'active',
+    ]);
     Account::factory()->create([
         'coa_version_id' => $coaVersion->id,
         'code' => '11200',

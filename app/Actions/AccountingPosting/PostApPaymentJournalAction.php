@@ -39,10 +39,11 @@ class PostApPaymentJournalAction
                 ]);
             }
 
-            $apAccount = $this->resolveControlAccount->execute(self::AP_CONTROL_ACCOUNT_CODE);
+            $entryDate = $apPayment->payment_date->format('Y-m-d');
+            $apAccount = $this->resolveControlAccount->execute(self::AP_CONTROL_ACCOUNT_CODE, $entryDate);
 
             $journalEntry = $this->createJournalEntry->execute([
-                'entry_date' => $apPayment->payment_date->format('Y-m-d'),
+                'entry_date' => $entryDate,
                 'reference' => $apPayment->payment_number,
                 'description' => "AP Payment {$apPayment->payment_number}",
                 'status' => 'posted',

@@ -2,6 +2,8 @@
 
 namespace App\Actions\EntityStates;
 
+use App\Actions\AccountingPosting\PostAssetLossJournalAction;
+use App\Models\Asset;
 use App\Models\PipelineEntityState;
 use App\Models\PipelineStateLog;
 use App\Models\PipelineTransition;
@@ -13,7 +15,8 @@ class ExecuteTransitionAction
 {
     public function __construct(
         protected EvaluateGuardAction $evaluateGuardAction,
-        protected ExecuteTransitionActionsAction $executeTransitionActionsAction
+        protected ExecuteTransitionActionsAction $executeTransitionActionsAction,
+        protected PostAssetLossJournalAction $postAssetLossJournal
     ) {}
 
     /**
@@ -77,6 +80,11 @@ class ExecuteTransitionAction
 
             // 6. Execute Side-Effect Actions
             $actionResults = $this->executeTransitionActionsAction->execute($transition, $entity);
+
+            // Aset yang menjadi hilang dijurnal rugi pelepasannya (#357, keputusan 3).
+            if ($entity instanceof Asset && $entity->fresh()?->status === 'lost') {
+                $this->postAssetLossJournal->execute($entity->fresh());
+            }
 
             $logMetadata = array_merge($metadata, ['action_results' => $actionResults]);
 

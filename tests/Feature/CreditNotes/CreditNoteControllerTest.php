@@ -2,6 +2,7 @@
 
 use App\Models\Account;
 use App\Models\Branch;
+use App\Models\CoaVersion;
 use App\Models\CreditNote;
 use App\Models\Customer;
 use App\Models\CustomerInvoice;
@@ -189,8 +190,40 @@ test('destroy removes credit note', function () {
     assertDatabaseMissing('credit_notes', ['id' => $creditNote->id]);
 });
 
+/**
+ * Apply memposting jurnal (Dr retur, Cr AR 11200), jadi fixture wajib punya
+ * COA aktif berisi akun AR 11200 dan akun retur, serta item credit note.
+ *
+ * @return array{0: Account, 1: Account}
+ */
+function seedCreditNoteApplyAccounts(): array
+{
+    $coaVersion = CoaVersion::factory()->create(['status' => 'active']);
+
+    $ar = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '11200',
+        'name' => 'Accounts Receivable',
+        'type' => 'asset',
+        'normal_balance' => 'debit',
+        'is_active' => true,
+    ]);
+
+    $returns = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '41100',
+        'name' => 'Sales Returns and Allowances',
+        'type' => 'revenue',
+        'normal_balance' => 'debit',
+        'is_active' => true,
+    ]);
+
+    return [$ar, $returns];
+}
+
 test('apply transitions confirmed credit note to applied and reduces invoice amount_due', function () {
     [$customer, $fiscalYear] = createCreditNoteWithItem();
+    [, $returns] = seedCreditNoteApplyAccounts();
 
     $invoice = CustomerInvoice::factory()->create([
         'customer_id' => $customer->id,
@@ -206,7 +239,18 @@ test('apply transitions confirmed credit note to applied and reduces invoice amo
         'customer_id' => $customer->id,
         'fiscal_year_id' => $fiscalYear->id,
         'customer_invoice_id' => $invoice->id,
+        'credit_note_date' => $fiscalYear->start_date->toDateString(),
         'grand_total' => 250000,
+        'subtotal' => 250000,
+        'tax_amount' => 0,
+    ]);
+    $creditNote->items()->create([
+        'account_id' => $returns->id,
+        'description' => 'Retur',
+        'quantity' => 1,
+        'unit_price' => 250000,
+        'tax_percent' => 0,
+        'line_total' => 250000,
     ]);
 
     postJson('/api/credit-notes/' . $creditNote->id . '/apply')
@@ -226,6 +270,7 @@ test('apply transitions confirmed credit note to applied and reduces invoice amo
 
 test('apply settles invoice to paid when credit note covers full outstanding', function () {
     [$customer, $fiscalYear] = createCreditNoteWithItem();
+    [, $returns] = seedCreditNoteApplyAccounts();
 
     $invoice = CustomerInvoice::factory()->create([
         'customer_id' => $customer->id,
@@ -241,7 +286,18 @@ test('apply settles invoice to paid when credit note covers full outstanding', f
         'customer_id' => $customer->id,
         'fiscal_year_id' => $fiscalYear->id,
         'customer_invoice_id' => $invoice->id,
+        'credit_note_date' => $fiscalYear->start_date->toDateString(),
         'grand_total' => 500000,
+        'subtotal' => 500000,
+        'tax_amount' => 0,
+    ]);
+    $creditNote->items()->create([
+        'account_id' => $returns->id,
+        'description' => 'Retur',
+        'quantity' => 1,
+        'unit_price' => 500000,
+        'tax_percent' => 0,
+        'line_total' => 500000,
     ]);
 
     postJson('/api/credit-notes/' . $creditNote->id . '/apply')
