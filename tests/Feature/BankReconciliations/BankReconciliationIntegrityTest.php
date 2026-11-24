@@ -14,7 +14,11 @@ use function Pest\Laravel\putJson;
 uses(RefreshDatabase::class)->group('bank-reconciliations');
 
 beforeEach(function () {
-    $this->user = createTestUserWithPermissions(['bank_reconciliation', 'bank_reconciliation.create', 'bank_reconciliation.edit']);
+    $this->user = createTestUserWithPermissions([
+        'bank_reconciliation',
+        'bank_reconciliation.create',
+        'bank_reconciliation.edit',
+    ]);
     Sanctum::actingAs($this->user, ['*']);
 });
 
@@ -83,7 +87,14 @@ test('the reconciliation difference is calculated by the server, not taken from 
         'book_balance' => 5000,
         'difference' => 0,
         'items' => [
-            ['transaction_date' => '2026-01-15', 'description' => 'Deposit', 'debit' => 0, 'credit' => 500, 'type' => 'deposit', 'is_reconciled' => true],
+            [
+                'transaction_date' => '2026-01-15',
+                'description' => 'Deposit',
+                'debit' => 0,
+                'credit' => 500,
+                'type' => 'deposit',
+                'is_reconciled' => true,
+            ],
         ],
     ];
 

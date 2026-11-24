@@ -9,8 +9,8 @@ trait ValidatesAllocationOverflow
 {
     /**
      * @param  Closure(int): ?float  $getMaxAllocationFor
-     * @param  (Closure(array<string, mixed>): float)|null  $getConsumedAmount
-     *                                                                          Nilai yang memakan sisa (default: allocated_amount)
+     * @param  (Closure(array<string, mixed>): float)|null  $getConsumedAmount  Nilai yang memakan sisa
+     *                                                                          (default: allocated_amount)
      */
     protected function validateAllocationOverflow(
         Validator $validator,

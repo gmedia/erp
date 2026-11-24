@@ -46,7 +46,8 @@ test('customer statement running balance includes receivables before start_date 
         'amount_due' => 50000,
     ]);
 
-    $response = getJson("/api/reports/customer-statement?customer_id={$customer->id}&start_date=2026-02-01&end_date=2026-02-28")
+    $query = "customer_id={$customer->id}&start_date=2026-02-01&end_date=2026-02-28";
+    $response = getJson("/api/reports/customer-statement?{$query}")
         ->assertOk();
 
     expect(collect($response->json('data'))->pluck('customer_invoice.invoice_number')->all())->toBe(['INV-IN-001']);

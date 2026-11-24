@@ -105,12 +105,20 @@ beforeEach(function () {
 invariant('W7-01 void, cancelled and draft documents carry no amount due', function () {
     $inactiveStatuses = ['draft', 'cancelled', 'void'];
 
-    foreach (DB::table('customer_invoices')->whereIn('status', $inactiveStatuses)->get(['invoice_number', 'status', 'amount_due']) as $invoice) {
+    $invoices = DB::table('customer_invoices')
+        ->whereIn('status', $inactiveStatuses)
+        ->get(['invoice_number', 'status', 'amount_due']);
+
+    foreach ($invoices as $invoice) {
         expect((float) $invoice->amount_due)
             ->toBe(0.0, "Customer invoice {$invoice->invoice_number} ({$invoice->status}) must have amount due 0");
     }
 
-    foreach (DB::table('supplier_bills')->whereIn('status', $inactiveStatuses)->get(['bill_number', 'status', 'amount_due']) as $bill) {
+    $bills = DB::table('supplier_bills')
+        ->whereIn('status', $inactiveStatuses)
+        ->get(['bill_number', 'status', 'amount_due']);
+
+    foreach ($bills as $bill) {
         expect((float) $bill->amount_due)
             ->toBe(0.0, "Supplier bill {$bill->bill_number} ({$bill->status}) must have amount due 0");
     }
@@ -708,10 +716,11 @@ invariant('W7-06 no journal line posts to a group account', function () {
         ->whereIn('journal_entry_lines.account_id', $groupIds)
         ->get(['journal_entries.entry_number', 'journal_entries.description', 'journal_entry_lines.account_id']);
 
-    expect($offenders->all())->toBeEmpty(
-        'Journal lines must not post to group accounts: '
-        . $offenders->map(fn ($row) => "{$row->entry_number} ({$row->description}) acct {$row->account_id}")->implode('; ')
-    );
+    $details = $offenders
+        ->map(fn ($row) => "{$row->entry_number} ({$row->description}) acct {$row->account_id}")
+        ->implode('; ');
+
+    expect($offenders->all())->toBeEmpty('Journal lines must not post to group accounts: ' . $details);
 });
 
 // Issue #357 (PR #384): every invariant above must also hold after a second `db:seed`.
