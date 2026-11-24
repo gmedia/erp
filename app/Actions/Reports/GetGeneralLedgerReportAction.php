@@ -14,7 +14,7 @@ class GetGeneralLedgerReportAction
             return collect();
         }
 
-        $running = 0.0;
+        $running = $this->openingBalance($filters);
 
         return JournalEntryLine::query()
             ->with(['account', 'journalEntry'])
@@ -61,5 +61,35 @@ class GetGeneralLedgerReportAction
                     'memo' => $line->memo,
                 ];
             });
+    }
+
+    /**
+     * Saldo awal = akumulasi debit-kredit jurnal posted sebelum start_date
+     * (akun dan tahun fiskal yang sama). Tanpa start_date, saldo awal = 0.
+     */
+    private function openingBalance(array $filters): float
+    {
+        if (empty($filters['start_date'])) {
+            return 0.0;
+        }
+
+        $sum = JournalEntryLine::query()
+            ->where('account_id', $filters['account_id'])
+            ->whereHas('journalEntry', function (Builder $query) use ($filters): void {
+                $query->where('status', 'posted')
+                    ->where('entry_date', '<', $filters['start_date']);
+
+                if (! empty($filters['fiscal_year_id'])) {
+                    $query->where('fiscal_year_id', $filters['fiscal_year_id']);
+                }
+
+                if (! empty($filters['journal_type'])) {
+                    $query->where('journal_type', $filters['journal_type']);
+                }
+            })
+            ->selectRaw('COALESCE(SUM(debit), 0) - COALESCE(SUM(credit), 0) as net')
+            ->value('net');
+
+        return (float) $sum;
     }
 }
