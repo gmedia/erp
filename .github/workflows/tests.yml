@@ -363,6 +363,10 @@ jobs:
         if: steps.autofix.outputs.changed != 'true'
         run: ./vendor/bin/sail npm run check:formatters
 
+      - name: Check flat backend translation keys (lang/en.json + id.json)
+        if: steps.autofix.outputs.changed != 'true'
+        run: ./vendor/bin/sail npm run check:backend-lang-keys
+
       - name: Build assets
         if: steps.autofix.outputs.changed != 'true'
         run: ./vendor/bin/sail npm run build

@@ -10,6 +10,7 @@
         "format:check": "prettier --check resources/",
         "check:menu-icons": "node scripts/check-menu-icons.mjs",
         "check:raw-colors": "node scripts/check-raw-colors.mjs",
+        "check:backend-lang-keys": "node scripts/check-backend-lang-keys.mjs",
         "check:formatters": "node scripts/check-formatters.mjs",
         "lint": "eslint . --fix",
         "lint:check": "eslint . --max-warnings=0",
