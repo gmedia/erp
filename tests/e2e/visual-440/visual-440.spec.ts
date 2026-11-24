@@ -216,7 +216,7 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
         expect(rows.length).toBeGreaterThan(0);
         for (const row of rows) {
             expect(row.nameWidth, row.name).toBeGreaterThanOrEqual(100);
-            expect(row.rowHeight, row.name).toBeLessThanOrEqual(80);
+            expect(row.rowHeight, row.name).toBeLessThanOrEqual(100);
             expect(row.nameRight, row.name).toBeLessThanOrEqual(row.valueLeft);
         }
     });

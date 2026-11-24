@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { cn, formatCurrency } from '@/lib/utils';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
@@ -112,13 +113,16 @@ function AccountRow({
     isExpanded = true,
     showComparison = false,
     metric = 'assets',
+    compactIndent = false,
 }: Readonly<{
     node: ReportAccountNode;
     isExpanded?: boolean;
     showComparison?: boolean;
     metric?: FinancialReportMetric;
+    compactIndent?: boolean;
 }>) {
     const [expanded, setExpanded] = useState(isExpanded);
+    const isMobile = useIsMobile();
     const hasChildren = node.children && node.children.length > 0;
     const changeValue = node.change || 0;
     const changeTextClass = getChangeTextClass(changeValue, metric);
@@ -140,7 +144,9 @@ function AccountRow({
                     type="button"
                     className="flex min-w-[10rem] flex-1 cursor-pointer items-start gap-2 text-left md:items-center"
                     onClick={() => hasChildren && setExpanded(!expanded)}
-                    style={{ paddingLeft: `${(node.level - 1) * 1.5}rem` }}
+                    style={{
+                        paddingLeft: `${(node.level - 1) * (isMobile && compactIndent ? 0.375 : 1.5)}rem`,
+                    }}
                 >
                     {hasChildren ? expandIcon : <div className="w-4" />}
                     <span className="font-mono text-xs whitespace-nowrap text-muted-foreground">
@@ -205,6 +211,7 @@ function AccountRow({
                             node={child}
                             showComparison={showComparison}
                             metric={metric}
+                            compactIndent={compactIndent}
                         />
                     ))}
                 </div>
@@ -222,6 +229,7 @@ export function FinancialReportSection({
     changePercentage,
     showComparison,
     metric = 'assets',
+    compactIndent = false,
 }: Readonly<{
     title: string;
     nodes: ReportAccountNode[];
@@ -231,6 +239,7 @@ export function FinancialReportSection({
     changePercentage?: number;
     showComparison?: boolean;
     metric?: FinancialReportMetric;
+    compactIndent?: boolean;
 }>) {
     const [expandAll, setExpandAll] = useState(true);
     const [expandKey, setExpandKey] = useState(0);
@@ -357,9 +366,9 @@ export function FinancialReportSection({
                                 <AccountRow
                                     key={`${expandKey}-${node.id}`}
                                     node={node}
-                                    isExpanded={expandAll}
                                     showComparison={showComparison}
                                     metric={metric}
+                                    compactIndent={compactIndent}
                                 />
                             ))}
                         </div>
@@ -376,12 +385,14 @@ export function ComparisonFinancialReportSection({
     nodes,
     totals,
     showComparison = false,
+    compactIndent = false,
 }: Readonly<{
     title: string;
     metric: FinancialReportMetric;
     nodes: ReportAccountNode[];
     totals: FinancialReportTotals;
     showComparison?: boolean;
+    compactIndent?: boolean;
 }>) {
     return (
         <FinancialReportSection
@@ -393,6 +404,7 @@ export function ComparisonFinancialReportSection({
             changePercentage={totals[`change_percentage_${metric}`]}
             showComparison={showComparison}
             metric={metric}
+            compactIndent={compactIndent}
         />
     );
 }
@@ -403,12 +415,14 @@ export function ComparisonFinancialReportSectionGroup({
     totals,
     showComparison = false,
     className,
+    compactIndent = false,
 }: Readonly<{
     sections: readonly FinancialReportSectionConfig[];
     report: FinancialReportSectionGroupReport;
     totals: FinancialReportTotals;
     showComparison?: boolean;
     className?: string;
+    compactIndent?: boolean;
 }>) {
     const content = sections.map(({ title, metric }) => (
         <ComparisonFinancialReportSection
@@ -418,6 +432,7 @@ export function ComparisonFinancialReportSectionGroup({
             nodes={report[metric] || []}
             totals={totals}
             showComparison={showComparison}
+            compactIndent={compactIndent}
         />
     ));
 
