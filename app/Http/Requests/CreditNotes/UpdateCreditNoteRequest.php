@@ -21,12 +21,12 @@ class UpdateCreditNoteRequest extends AbstractCreditNoteRequest
         });
     }
 
-    /** Hanya draft yang boleh dikonfirmasi; applied dicapai dari confirmed. */
+    /** Draft boleh langsung applied dari form: controller mengonfirmasi lalu menerapkannya. */
     protected function resultStatusSources(): array
     {
         return [
             'confirmed' => ['draft'],
-            'applied' => ['confirmed'],
+            'applied' => ['draft', 'confirmed'],
             // applied sudah posting (jurnal + sisa invoice); batal lewat jurnal pembalik (#375).
             'cancelled' => ['draft', 'confirmed', 'applied'],
             'void' => ['draft', 'confirmed', 'applied'],
