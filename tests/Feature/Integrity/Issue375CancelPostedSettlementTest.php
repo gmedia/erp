@@ -391,6 +391,25 @@ test('batal credit note applied membalik jurnal dan mengembalikan sisa invoice',
     assertDatabaseHas('credit_notes', ['id' => $creditNote->id, 'status' => 'cancelled']);
 });
 
+test('batal credit note confirmed yang belum applied tidak mengurangi credit note lain', function () {
+    $invoice = settledInvoice();
+    appliedCreditNote($invoice, 200000, 'CN-2026-000385');
+    $before = $invoice->refresh()->only(['credit_note_amount', 'amount_due', 'status']);
+
+    $unapplied = CreditNote::factory()->create([
+        'credit_note_number' => 'CN-2026-000386',
+        'customer_id' => $invoice->customer_id,
+        'customer_invoice_id' => $invoice->id,
+        'grand_total' => 50000,
+        'status' => 'confirmed',
+        'journal_entry_id' => null,
+    ]);
+
+    putJson("/api/credit-notes/{$unapplied->id}", ['status' => 'cancelled'])->assertOk();
+
+    expect($invoice->refresh()->only(['credit_note_amount', 'amount_due', 'status']))->toBe($before);
+});
+
 test('batal credit note applied dua kali diterima 200 tanpa efek: tidak ada pembalik kedua', function () {
     $invoice = settledInvoice();
     $creditNote = appliedCreditNote($invoice, 200000, 'CN-2026-000376');
