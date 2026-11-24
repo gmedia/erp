@@ -7,6 +7,7 @@ use App\Actions\PeriodClosings\AssertPeriodOpenForPostingAction;
 use App\Models\Account;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
+use App\Models\PeriodClosing;
 use App\Services\InterBranchClearingService;
 use Exception;
 use Illuminate\Database\QueryException;
@@ -75,7 +76,12 @@ class CreateJournalEntryAction
                         ]);
                     }
 
-                    app(AssertPeriodOpenForPostingAction::class)->execute($fiscalYear->id, $entryDate);
+                    $isClosingEntry = ($data['journal_type'] ?? null) === 'closing'
+                        && ($data['source_type'] ?? null) === PeriodClosing::class;
+
+                    if (! $isClosingEntry) {
+                        app(AssertPeriodOpenForPostingAction::class)->execute($fiscalYear->id, $entryDate);
+                    }
 
                     // Generate Entry Number
                     // We use max() instead of count() to handle deletions correctly (gaps in sequence)

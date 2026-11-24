@@ -22,15 +22,32 @@ class ReverseDocumentJournalAction
         private CreateJournalEntryAction $createJournalEntry,
     ) {}
 
-    public function execute(Model $document, string $reference, string $label): ?JournalEntry
-    {
-        $journalEntryId = $document->getAttribute('journal_entry_id');
+    /**
+     * @param  string|null  $entryDate  Tanggal pembalik; null = hari ini (pembatalan dokumen).
+     * @param  string|null  $journalType  Tipe jurnal pembalik; null = 'system'.
+     */
+    public function execute(
+        Model $document,
+        string $reference,
+        string $label,
+        ?string $entryDate = null,
+        ?string $journalType = null,
+        ?int $journalEntryId = null,
+    ): ?JournalEntry {
+        $journalEntryId ??= $document->getAttribute('journal_entry_id');
 
         if ($journalEntryId === null) {
             return null;
         }
 
-        return DB::transaction(function () use ($reference, $label, $journalEntryId, $document): JournalEntry {
+        return DB::transaction(function () use (
+            $reference,
+            $label,
+            $journalEntryId,
+            $document,
+            $entryDate,
+            $journalType,
+        ): JournalEntry {
             /** @var JournalEntry $original */
             $original = JournalEntry::query()
                 ->with('lines')
@@ -52,11 +69,11 @@ class ReverseDocumentJournalAction
             ])->all();
 
             return $this->createJournalEntry->execute([
-                'entry_date' => now()->format('Y-m-d'),
+                'entry_date' => $entryDate ?? now()->format('Y-m-d'),
                 'reference' => $reference,
                 'description' => "Reversal {$label} {$reference}",
                 'status' => 'posted',
-                'journal_type' => 'system',
+                'journal_type' => $journalType ?? 'system',
                 'source_type' => $document->getMorphClass(),
                 'source_id' => $document->getKey(),
                 'branch_id' => $original->branch_id,

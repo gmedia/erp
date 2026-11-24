@@ -4,6 +4,7 @@ namespace Tests\Feature\PeriodClosings;
 
 use App\Models\Account;
 use App\Models\Branch;
+use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
 use App\Models\JournalEntryLine;
@@ -25,9 +26,16 @@ beforeEach(function () {
         'start_date' => '2026-01-01',
         'end_date' => '2026-12-31',
     ]);
-    $this->revenue = Account::factory()->create(['type' => 'revenue', 'normal_balance' => 'credit']);
-    $this->expense = Account::factory()->create(['type' => 'expense', 'normal_balance' => 'debit']);
-    $this->retained = Account::factory()->create(['type' => 'equity', 'normal_balance' => 'credit']);
+    $coa = CoaVersion::factory()->create(['status' => 'active']);
+    $this->revenue = Account::factory()->create([
+        'coa_version_id' => $coa->id, 'is_active' => true, 'type' => 'revenue', 'normal_balance' => 'credit',
+    ]);
+    $this->expense = Account::factory()->create([
+        'coa_version_id' => $coa->id, 'is_active' => true, 'type' => 'expense', 'normal_balance' => 'debit',
+    ]);
+    $this->retained = Account::factory()->create([
+        'coa_version_id' => $coa->id, 'is_active' => true, 'type' => 'equity', 'normal_balance' => 'credit',
+    ]);
 });
 
 function seedPostedPnlLine(object $ctx, int $accountId, ?int $branchId, float $debit, float $credit): void
@@ -121,11 +129,16 @@ test('reopen then reclose does not double-count and leaves one closing entry', f
     $firstEntryId = $closing->closing_journal_entry_id;
 
     postJson("/api/period-closings/{$closing->id}/reopen")->assertOk();
-    expect(JournalEntry::find($firstEntryId))->toBeNull();
+    // #423: buka kembali MEMBALIK jurnal penutup, tidak menghapusnya.
+    expect(JournalEntry::find($firstEntryId))->not->toBeNull();
 
     postJson("/api/period-closings/{$closing->id}/close")->assertOk();
     $closing->refresh();
 
     expect(round((float) $closing->net_income, 2))->toBe(4000.0);
-    expect(JournalEntry::where('source_type', PeriodClosing::class)->where('source_id', $closing->id)->count())->toBe(1);
+    // Penutup asli + pembaliknya + penutup baru; laba tidak dihitung dua kali.
+    $closingEntries = JournalEntry::query()
+        ->where('source_type', PeriodClosing::class)
+        ->where('source_id', $closing->id);
+    expect($closingEntries->count())->toBe(3);
 });

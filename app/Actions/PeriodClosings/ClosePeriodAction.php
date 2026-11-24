@@ -7,6 +7,7 @@ use App\Models\JournalEntry;
 use App\Models\PeriodClosing;
 use App\Services\InterBranchClearingService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class ClosePeriodAction
@@ -23,11 +24,6 @@ class ClosePeriodAction
                 throw ValidationException::withMessages([
                     'status' => 'Period is already closed.',
                 ]);
-            }
-
-            if ($periodClosing->closing_journal_entry_id) {
-                JournalEntry::where('id', $periodClosing->closing_journal_entry_id)->delete();
-                $periodClosing->update(['closing_journal_entry_id' => null]);
             }
 
             $month = $periodClosing->period_month ?? 12;
@@ -62,8 +58,8 @@ class ClosePeriodAction
     {
         $entry = JournalEntry::create([
             'fiscal_year_id' => $periodClosing->fiscal_year_id,
-            'entry_number' => 'CL-' . now()->format('YmdHis') . '-' . $periodClosing->id,
-            'entry_date' => now()->toDateString(),
+            'entry_number' => 'CL-' . $periodClosing->id . '-' . now()->format('YmdHis') . '-' . Str::random(6),
+            'entry_date' => $periodClosing->fiscalYear->end_date->toDateString(),
             'reference' => 'Period Closing #' . $periodClosing->id,
             'description' => 'Annual closing entry',
             'status' => 'posted',
