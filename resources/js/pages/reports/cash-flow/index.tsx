@@ -1,9 +1,13 @@
-import { ComputedSectionsCard } from '@/components/reports/financial/ComputedSectionsCard';
+import {
+    ComputedSectionsCard,
+    type ComputedSection,
+} from '@/components/reports/financial/ComputedSectionsCard';
 import { FinancialReportExportButton } from '@/components/reports/financial/FinancialReportExportButton';
 import {
     FinancialReportHeaderMeta,
     type FinancialReportFiscalYear,
 } from '@/components/reports/financial/FinancialReportPageShell';
+import { getSignedAmountTextClass } from '@/components/reports/financial/FinancialReportSection';
 import {
     FinancialTableCard,
     SingleYearFinancialReportPageShell,
@@ -11,8 +15,9 @@ import {
     type FinancialTableRow,
 } from '@/components/reports/financial/FinancialTableReportPage';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useExport } from '@/hooks/useExport';
-import { formatCurrency } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 
 interface CashFlowItem extends FinancialTableRow {
     id: number;
@@ -34,6 +39,175 @@ interface CashFlowResponse {
 
 const emptyCashFlowReport: CashFlowResponse['report'] = [];
 
+function ActivitySectionsCard({
+    title,
+    sections,
+    netChange,
+    netChangeLabel,
+}: Readonly<{
+    title: string;
+    sections: ComputedSection[];
+    netChange: number;
+    netChangeLabel: string;
+}>) {
+    const { t } = useTranslation();
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>{title}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+                {sections.map((section) => {
+                    const key = `reports.sections.${section.code}`;
+                    const translated = t(key);
+                    const label =
+                        translated === key ? section.name : translated;
+
+                    return (
+                        <div
+                            key={section.code}
+                            className="flex items-center justify-between gap-4 py-1"
+                        >
+                            <span className="text-sm text-muted-foreground">
+                                {label}
+                            </span>
+                            <span
+                                className={cn(
+                                    'text-sm font-semibold tabular-nums',
+                                    getSignedAmountTextClass(section.value),
+                                )}
+                            >
+                                {formatCurrency(section.value)}
+                            </span>
+                        </div>
+                    );
+                })}
+                <div className="flex items-center justify-between gap-4 border-t-2 border-foreground/20 pt-2">
+                    <span className="text-sm font-bold">{netChangeLabel}</span>
+                    <span
+                        className={cn(
+                            'text-sm font-bold tabular-nums',
+                            getSignedAmountTextClass(netChange),
+                        )}
+                    >
+                        {formatCurrency(netChange)}
+                    </span>
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
+
+function CashFlowSummaryCards({
+    openingCash,
+    netChange,
+    closingCash,
+}: Readonly<{
+    openingCash: number;
+    netChange: number;
+    closingCash: number;
+}>) {
+    const { t } = useTranslation();
+    const items = [
+        {
+            label: t('reports.sections.opening_cash_balance'),
+            value: openingCash,
+        },
+        { label: t('reports.sections.net_change'), value: netChange },
+        {
+            label: t('reports.sections.closing_cash_balance'),
+            value: closingCash,
+        },
+    ];
+
+    return (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            {items.map((item) => (
+                <Card key={item.label}>
+                    <CardHeader>
+                        <CardTitle>{item.label}</CardTitle>
+                    </CardHeader>
+                    <CardContent
+                        className={cn(
+                            'text-2xl font-semibold tabular-nums',
+                            getSignedAmountTextClass(item.value),
+                        )}
+                    >
+                        {formatCurrency(item.value)}
+                    </CardContent>
+                </Card>
+            ))}
+        </div>
+    );
+}
+
+function CashFlowActivityGrid({
+    activitySections,
+    otherSections,
+    netChange,
+}: Readonly<{
+    activitySections: ComputedSection[];
+    otherSections: ComputedSection[];
+    netChange: number;
+}>) {
+    const { t } = useTranslation();
+
+    return (
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <ActivitySectionsCard
+                title={t('reports.cashFlowActivities.title')}
+                sections={activitySections}
+                netChange={netChange}
+                netChangeLabel={t('reports.sections.net_change')}
+            />
+            <ComputedSectionsCard
+                sections={otherSections}
+                title={t('reports.cashFlowActivities.summary')}
+            />
+        </div>
+    );
+}
+
+function CashFlowDetailTable({
+    items,
+    totalInflow,
+    totalOutflow,
+}: Readonly<{
+    items: CashFlowItem[];
+    totalInflow: number;
+    totalOutflow: number;
+}>) {
+    const { t } = useTranslation();
+
+    return (
+        <FinancialTableCard
+            title={t('reports.cashFlowActivities.detail')}
+            items={items}
+            amountColumns={[
+                {
+                    header: 'Inflow',
+                    total: totalInflow,
+                    value: (item) => item.inflow,
+                },
+                {
+                    header: 'Outflow',
+                    total: totalOutflow,
+                    value: (item) => item.outflow,
+                },
+            ]}
+            emptyMessage="No data available for the selected fiscal year."
+            scrollAreaClassName="max-h-[calc(100vh-22rem)]"
+        />
+    );
+}
+
+const ACTIVITY_SECTION_CODES = [
+    'operating_cash_flow',
+    'investing_cash_flow',
+    'financing_cash_flow',
+] as const;
+
 export default function CashFlow() {
     const {
         fiscalYears,
@@ -41,6 +215,7 @@ export default function CashFlow() {
         branchId,
         report,
         computedSections,
+        rawData,
         selectedFiscalYear,
         handleYearChange,
         handleBranchChange,
@@ -66,6 +241,21 @@ export default function CashFlow() {
     );
     const netCashFlow = totalInflow - totalOutflow;
 
+    const openingCash = rawData?.opening_cash_balance ?? 0;
+    const closingCash =
+        rawData?.closing_cash_balance ?? openingCash + netCashFlow;
+
+    // Angka aktivitas diambil dari section backend agar sama dengan total laporan.
+    const activitySections = computedSections.filter((section) =>
+        (ACTIVITY_SECTION_CODES as readonly string[]).includes(section.code),
+    );
+    const otherSections = computedSections.filter(
+        (section) =>
+            !(ACTIVITY_SECTION_CODES as readonly string[]).includes(
+                section.code,
+            ),
+    );
+
     return (
         <SingleYearFinancialReportPageShell
             title="Cash Flow"
@@ -90,56 +280,23 @@ export default function CashFlow() {
                 />
             }
             preContent={
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Total Inflow</CardTitle>
-                        </CardHeader>
-                        <CardContent className="text-2xl font-semibold tabular-nums">
-                            {formatCurrency(totalInflow)}
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Total Outflow</CardTitle>
-                        </CardHeader>
-                        <CardContent className="text-2xl font-semibold tabular-nums">
-                            {formatCurrency(totalOutflow)}
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Net Cash Flow</CardTitle>
-                        </CardHeader>
-                        <CardContent className="text-2xl font-semibold tabular-nums">
-                            {formatCurrency(netCashFlow)}
-                        </CardContent>
-                    </Card>
-                </div>
+                <CashFlowSummaryCards
+                    openingCash={openingCash}
+                    netChange={netCashFlow}
+                    closingCash={closingCash}
+                />
             }
         >
-            <FinancialTableCard
-                title="Cash Flow Report"
-                items={report}
-                amountColumns={[
-                    {
-                        header: 'Inflow',
-                        total: totalInflow,
-                        value: (item) => item.inflow,
-                    },
-                    {
-                        header: 'Outflow',
-                        total: totalOutflow,
-                        value: (item) => item.outflow,
-                    },
-                ]}
-                emptyMessage="No data available for the selected fiscal year."
-                scrollAreaClassName="max-h-[calc(100vh-22rem)]"
+            <CashFlowActivityGrid
+                activitySections={activitySections}
+                otherSections={otherSections}
+                netChange={netCashFlow}
             />
 
-            <ComputedSectionsCard
-                sections={computedSections}
-                title="Cash Flow Summary"
+            <CashFlowDetailTable
+                items={report}
+                totalInflow={totalInflow}
+                totalOutflow={totalOutflow}
             />
         </SingleYearFinancialReportPageShell>
     );

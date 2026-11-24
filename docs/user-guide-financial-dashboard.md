@@ -124,6 +124,20 @@ Bagian Cash Flow Summary menampilkan ringkasan arus kas perusahaan untuk tahun f
 2. Bandingkan Cash Inflows dengan Cash Outflows untuk melihat net cash flow.
 3. Closing Balance menunjukkan posisi kas akhir setelah seluruh transaksi.
 
+### Laporan Arus Kas per Aktivitas (`/reports/cash-flow`)
+
+Laporan arus kas membagi perubahan kas menjadi tiga aktivitas. Setiap jurnal berstatus posted yang menyentuh akun kas dikelompokkan menurut akun lawannya:
+
+| Aktivitas | Akun lawan |
+|-----------|------------|
+| Operasi | Selain aset tetap, pinjaman jangka panjang, dan ekuitas |
+| Investasi | Aset tetap dan akumulasi penyusutan |
+| Pendanaan | Pinjaman jangka panjang dan ekuitas |
+
+- Transfer antar akun kas tidak dihitung, karena saling meniadakan.
+- Jumlah ketiga aktivitas sama dengan kenaikan bersih kas periode.
+- Saldo kas awal adalah mutasi kas posted sebelum tanggal mulai tahun fiskal. Saldo kas akhir = saldo awal + kenaikan bersih.
+
 ### Catatan:
 
 - Cash Flow Summary dihitung berdasarkan transaksi aktual yang sudah posted.

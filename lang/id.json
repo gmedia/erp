@@ -240,7 +240,14 @@
             "long_term_debt_activity": "Pinjaman Jangka Panjang",
             "equity_activity": "Modal Disetor",
             "financing_cash_flow": "Arus Kas Bersih dari Aktivitas Pendanaan",
-            "net_change": "Kenaikan/Penurunan Kas Bersih"
+            "net_change": "Kenaikan/Penurunan Kas Bersih",
+            "opening_cash_balance": "Kas Awal Periode",
+            "closing_cash_balance": "Kas Akhir Periode"
+        },
+        "cashFlowActivities": {
+            "title": "Arus Kas per Aktivitas",
+            "summary": "Ringkasan Arus Kas",
+            "detail": "Rincian Arus Kas per Akun"
         },
         "selectFilterTitle": "Pilih filter untuk menampilkan laporan",
         "selectFilterBudget": "Pilih budget pada filter untuk melihat varians anggaran.",

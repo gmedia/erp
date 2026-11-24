@@ -240,7 +240,14 @@
             "long_term_debt_activity": "Long-term Borrowings",
             "equity_activity": "Paid-in Capital",
             "financing_cash_flow": "Net Cash from Financing Activities",
-            "net_change": "Net Increase/Decrease in Cash"
+            "net_change": "Net Increase/Decrease in Cash",
+            "opening_cash_balance": "Cash at Beginning of Period",
+            "closing_cash_balance": "Cash at End of Period"
+        },
+        "cashFlowActivities": {
+            "title": "Cash Flows by Activity",
+            "summary": "Cash Flow Summary",
+            "detail": "Cash Flow Detail by Account"
         },
         "selectFilterTitle": "Select a filter to show the report",
         "selectFilterBudget": "Choose a budget in the filters to see the budget variance.",

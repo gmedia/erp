@@ -136,4 +136,46 @@ test.describe('Cash Flow Report', () => {
             /^cash_flow_report_.*\.xlsx$/,
         );
     });
+
+    test('shows activity sections with opening and closing cash', async ({
+        page,
+    }) => {
+        const responsePromise = page.waitForResponse(
+            (r) => {
+                return r.url().includes('/api/reports/cash-flow') &&
+                !r.url().includes('/export') &&
+                r.request().method() === 'GET' &&
+                r.status() < 400;
+            },
+            { timeout: 30000 },
+        );
+
+        await page.goto('/reports/cash-flow');
+        const response = await responsePromise;
+        const body = await response.json();
+
+        expect(body).toHaveProperty('opening_cash_balance');
+        expect(body).toHaveProperty('closing_cash_balance');
+        const codes = (body.computed_sections as { code: string }[]).map(
+            (section) => section.code,
+        );
+        expect(codes).toEqual(
+            expect.arrayContaining([
+                'operating_cash_flow',
+                'investing_cash_flow',
+                'financing_cash_flow',
+                'net_change',
+            ]),
+        );
+
+        await expect(
+            page.getByText('Cash at Beginning of Period', { exact: true }),
+        ).toBeVisible();
+        await expect(
+            page.getByText('Cash at End of Period', { exact: true }),
+        ).toBeVisible();
+        await expect(
+            page.getByText('Cash Flows by Activity', { exact: true }),
+        ).toBeVisible();
+    });
 });

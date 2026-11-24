@@ -89,6 +89,34 @@ class FinancialReportService
     }
 
     /**
+     * Saldo kas awal periode: jumlah mutasi kas posted sebelum tanggal mulai
+     * tahun fiskal. Tanpa kolom saldo awal baru, sehingga tidak perlu migrasi.
+     */
+    public function getOpeningCashBalance(int $fiscalYearId, ?int $branchId = null): float
+    {
+        $fiscalYear = FiscalYear::findOrFail($fiscalYearId);
+        $coaVersion = $this->resolveRequiredCoaVersion($fiscalYearId);
+
+        if (! $coaVersion) {
+            return 0.0;
+        }
+
+        $balance = JournalEntryLine::query()
+            ->toBase()
+            ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+            ->join('accounts as line_accounts', 'line_accounts.id', '=', 'journal_entry_lines.account_id')
+            ->where('journal_entries.status', 'posted')
+            ->where('journal_entries.entry_date', '<', $fiscalYear->start_date->toDateString())
+            ->where('line_accounts.is_cash_flow', true)
+            ->where('line_accounts.coa_version_id', $coaVersion->id)
+            ->when($branchId !== null, fn ($q) => $q->where('journal_entry_lines.branch_id', $branchId))
+            ->selectRaw('COALESCE(SUM(journal_entry_lines.debit - journal_entry_lines.credit), 0) as balance')
+            ->value('balance');
+
+        return round((float) $balance, 2);
+    }
+
+    /**
      * Klasifikasi arus kas per aktivitas (operasi, investasi, pendanaan).
      *
      * Setiap jurnal posted yang menyentuh akun kas dipecah per baris lawan:
