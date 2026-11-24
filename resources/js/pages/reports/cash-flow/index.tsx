@@ -202,7 +202,10 @@ function CashFlowDetailTable({
     );
 }
 
-const ACTIVITY_SECTION_CODES = [
+const EXCLUDED_SUMMARY_SECTION_CODES = [
+    'operating_header',
+    'investing_header',
+    'financing_header',
     'operating_cash_flow',
     'investing_cash_flow',
     'financing_cash_flow',
@@ -280,7 +283,7 @@ export default function CashFlow() {
     ];
     const otherSections = computedSections.filter(
         (section) =>
-            !(ACTIVITY_SECTION_CODES as readonly string[]).includes(
+            !(EXCLUDED_SUMMARY_SECTION_CODES as readonly string[]).includes(
                 section.code,
             ),
     );

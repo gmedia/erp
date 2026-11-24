@@ -168,16 +168,12 @@ test.describe('Cash Flow Report', () => {
 
         expect(body).toHaveProperty('opening_cash_balance');
         expect(body).toHaveProperty('closing_cash_balance');
-        const codes = (body.computed_sections as { code: string }[]).map(
-            (section) => section.code,
-        );
-        expect(codes).toEqual(
-            expect.arrayContaining([
-                'operating_cash_flow',
-                'investing_cash_flow',
-                'financing_cash_flow',
-                'net_change',
-            ]),
+        expect(body.activities).toEqual(
+            expect.objectContaining({
+                operating: expect.any(Number),
+                investing: expect.any(Number),
+                financing: expect.any(Number),
+            }),
         );
 
         await expect(
@@ -216,6 +212,6 @@ test.describe('Cash Flow Report', () => {
             page.getByText('Cash Flows from Operating Activities', {
                 exact: true,
             }),
-        ).toHaveCount(1);
+        ).toHaveCount(0);
     });
 });
