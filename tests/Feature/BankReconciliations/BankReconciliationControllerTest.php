@@ -11,6 +11,7 @@ use App\Models\JournalEntry;
 use App\Models\JournalEntryLine;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\Sanctum;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -114,7 +115,8 @@ test('it cannot complete when difference is not zero', function () {
         ->assertJsonValidationErrors('difference');
 });
 
-test('completing a bank reconciliation keeps state completed when journal posting fails (best-effort)', function () {
+test('completing a bank reconciliation returns 422 when journal posting fails, status unchanged', function () {
+    // Issue #416: kegagalan jurnal tidak ditelan. Dokumen ditolak, sama seperti modul lain.
     $reconciliation = BankReconciliation::factory()->create([
         'difference' => 0,
         'status' => 'in_progress',
@@ -127,18 +129,47 @@ test('completing a bank reconciliation keeps state completed when journal postin
         {
             public function execute(BankReconciliation $bankReconciliation): ?JournalEntry
             {
-                throw new RuntimeException('Simulated journal posting failure');
+                throw ValidationException::withMessages([
+                    'account' => 'Simulated journal posting failure',
+                ]);
             }
         };
     });
 
     postJson("/api/bank-reconciliations/{$reconciliation->id}/complete")
-        ->assertOk()
-        ->assertJsonPath('data.status', 'completed');
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('account');
 
     $reconciliation->refresh();
-    expect($reconciliation->status)->toBe('completed');
-    expect($reconciliation->completed_at)->not->toBeNull();
+    expect($reconciliation->status)->toBe('in_progress');
+    expect($reconciliation->completed_at)->toBeNull();
+    expect($reconciliation->completed_by)->toBeNull();
+});
+
+test('a non-validation journal failure still propagates instead of being swallowed', function () {
+    // Issue #416: galat non-validasi (bug/infra) tetap melempar, tidak ditelan.
+    $reconciliation = BankReconciliation::factory()->create([
+        'difference' => 0,
+        'status' => 'in_progress',
+    ]);
+
+    $this->app->bind(PostBankReconciliationJournalAction::class, function ($app) {
+        return new class($app->make(CreateJournalEntryAction::class)) extends PostBankReconciliationJournalAction
+        {
+            public function execute(BankReconciliation $bankReconciliation): ?JournalEntry
+            {
+                throw new RuntimeException('Simulated infrastructure failure');
+            }
+        };
+    });
+
+    // withoutExceptionHandling: galat non-validasi harus sampai ke test, bukan jadi 500.
+    $this->withoutExceptionHandling();
+
+    expect(fn () => postJson("/api/bank-reconciliations/{$reconciliation->id}/complete"))
+        ->toThrow(RuntimeException::class, 'Simulated infrastructure failure');
+
+    expect($reconciliation->refresh()->status)->toBe('in_progress');
 });
 
 test('it can add an item to a bank reconciliation', function () {

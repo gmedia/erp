@@ -2,8 +2,6 @@
 
 use App\Actions\AccountingPosting\PostGoodsReceiptJournalAction;
 use App\Models\Account;
-use App\Models\CoaVersion;
-use App\Models\FiscalYear;
 use App\Models\GoodsReceipt;
 use App\Models\GoodsReceiptItem;
 use App\Models\JournalEntry;
@@ -42,37 +40,7 @@ function issue372InventoryValuationOn(string $date): float
  */
 function issue372CoaAccounts(): void
 {
-    $fiscalYear = FiscalYear::factory()->create([
-        'name' => '2026',
-        'start_date' => '2026-01-01',
-        'end_date' => '2026-12-31',
-        'status' => 'open',
-    ]);
-
-    // Satu COA aktif saja: resolveVersion() menolak bila ada lebih dari satu.
-    /** @var CoaVersion $coaVersion */
-    $coaVersion = CoaVersion::factory()->create([
-        'fiscal_year_id' => $fiscalYear->id,
-        'status' => 'active',
-    ]);
-
-    Account::factory()->create([
-        'coa_version_id' => $coaVersion->id,
-        'code' => '11300',
-        'name' => 'Inventory',
-        'type' => 'asset',
-        'normal_balance' => 'debit',
-        'is_active' => true,
-    ]);
-
-    Account::factory()->create([
-        'coa_version_id' => $coaVersion->id,
-        'code' => '21150',
-        'name' => 'GR/IR',
-        'type' => 'liability',
-        'normal_balance' => 'credit',
-        'is_active' => true,
-    ]);
+    createAccountingControlFixture('2026');
 }
 
 /**

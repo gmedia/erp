@@ -3,6 +3,9 @@
 use App\Actions\AccountingPosting\PostSupplierReturnJournalAction;
 use App\Actions\AccountingPosting\ResolveControlAccountAction;
 use App\Actions\JournalEntries\CreateJournalEntryAction;
+use App\Models\Account;
+use App\Models\CoaVersion;
+use App\Models\FiscalYear;
 use App\Models\GoodsReceipt;
 use App\Models\JournalEntry;
 use App\Models\Product;
@@ -13,7 +16,6 @@ use App\Models\SupplierReturn;
 use App\Models\Unit;
 use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -34,6 +36,38 @@ beforeEach(function () {
     ]);
     Sanctum::actingAs($user, ['*']);
 });
+
+/**
+ * COA aktif lengkap untuk jurnal retur (persediaan 11300, GR/IR 21150). Issue #416: retur
+ * confirmed tanpa COA lengkap kini ditolak 422.
+ */
+function createSupplierReturnCoaFixture(): void
+{
+    FiscalYear::factory()->create([
+        'name' => '2026',
+        'start_date' => '2026-01-01',
+        'end_date' => '2026-12-31',
+        'status' => 'open',
+    ]);
+    $coaVersion = CoaVersion::factory()->create(['status' => 'active']);
+
+    Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '11300',
+        'name' => 'Persediaan',
+        'type' => 'asset',
+        'normal_balance' => 'debit',
+        'is_active' => true,
+    ]);
+    Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '21150',
+        'name' => 'Barang Diterima Belum Ditagih',
+        'type' => 'liability',
+        'normal_balance' => 'credit',
+        'is_active' => true,
+    ]);
+}
 
 function createGoodsReceiptItemForSupplierReturn(): array
 {
@@ -198,6 +232,7 @@ test('show returns supplier return detail', function () {
 });
 
 test('update modifies supplier return and items', function () {
+    createSupplierReturnCoaFixture();
     [
         $purchaseOrder,
         $goodsReceipt,
@@ -212,6 +247,7 @@ test('update modifies supplier return and items', function () {
         'goods_receipt_id' => $goodsReceipt->id,
         'supplier_id' => $supplier->id,
         'warehouse_id' => $warehouse->id,
+        'return_date' => '2026-04-01',
         'status' => 'draft',
         'confirmed_at' => null,
         'confirmed_by' => null,
@@ -237,6 +273,7 @@ test('update modifies supplier return and items', function () {
 });
 
 test('confirming a supplier return creates supplier return stock movements', function () {
+    createSupplierReturnCoaFixture();
     [
         $purchaseOrder,
         $goodsReceipt,
@@ -251,6 +288,7 @@ test('confirming a supplier return creates supplier return stock movements', fun
         'goods_receipt_id' => $goodsReceipt->id,
         'supplier_id' => $supplier->id,
         'warehouse_id' => $warehouse->id,
+        'return_date' => '2026-04-01',
         'status' => 'draft',
         'confirmed_at' => null,
         'confirmed_by' => null,
@@ -307,35 +345,164 @@ test('confirming supplier return rolls back state when journal posting fails wit
     expect($supplierReturn->confirmed_by)->toBeNull();
 });
 
-test('confirming supplier return swallows validation errors and keeps state confirmed', function () {
+test('confirming supplier return with missing control account is rejected with 422 unchanged', function () {
+    [
+        $purchaseOrder,
+        $goodsReceipt,
+        $goodsReceiptItem,
+        $supplier,
+        $warehouse,
+        $product,
+        $unit,
+    ] = createGoodsReceiptItemForSupplierReturn();
     $supplierReturn = SupplierReturn::factory()->create([
+        'purchase_order_id' => $purchaseOrder->id,
+        'goods_receipt_id' => $goodsReceipt->id,
+        'supplier_id' => $supplier->id,
+        'warehouse_id' => $warehouse->id,
+        'return_date' => '2026-04-01',
         'status' => 'draft',
         'confirmed_at' => null,
         'confirmed_by' => null,
     ]);
 
-    $this->app->bind(PostSupplierReturnJournalAction::class, function ($app) {
-        $journal = $app->make(CreateJournalEntryAction::class);
-        $control = $app->make(ResolveControlAccountAction::class);
+    // Tidak ada COA aktif sama sekali: akun inventory 11300 tidak bisa di-resolve.
+    CoaVersion::query()->delete();
 
-        return new class($journal, $control) extends PostSupplierReturnJournalAction
-        {
-            public function execute(SupplierReturn $supplierReturn): ?JournalEntry
-            {
-                throw ValidationException::withMessages([
-                    'coa' => 'Missing COA mapping for journal posting',
-                ]);
-            }
-        };
-    });
-
-    putJson('/api/supplier-returns/' . $supplierReturn->id, ['status' => 'confirmed'])
-        ->assertOk()
-        ->assertJsonPath('data.status', 'confirmed');
+    putJson('/api/supplier-returns/' . $supplierReturn->id, [
+        'status' => 'confirmed',
+        'items' => [
+            [
+                'goods_receipt_item_id' => $goodsReceiptItem->id,
+                'product_id' => $product->id,
+                'unit_id' => $unit->id,
+                'quantity_returned' => 3,
+                'unit_price' => 10000,
+            ],
+        ],
+    ])->assertStatus(422);
 
     $supplierReturn->refresh();
-    expect($supplierReturn->status)->toBe('confirmed');
-    expect($supplierReturn->confirmed_at)->not->toBeNull();
+    expect($supplierReturn->status)->toBe('draft')
+        ->and($supplierReturn->confirmed_at)->toBeNull()
+        ->and($supplierReturn->confirmed_by)->toBeNull()
+        ->and($supplierReturn->journal_entry_id)->toBeNull()
+        ->and($supplierReturn->items()->count())->toBe(0);
+
+    assertDatabaseMissing('stock_movements', [
+        'movement_type' => 'supplier_return',
+        'reference_type' => SupplierReturn::class,
+        'reference_id' => $supplierReturn->id,
+    ]);
+    assertDatabaseMissing('journal_entries', [
+        'source_type' => SupplierReturn::class,
+        'source_id' => $supplierReturn->id,
+    ]);
+});
+
+test('confirming supplier return in a closed fiscal period is rejected with 422 unchanged', function () {
+    createSupplierReturnCoaFixture();
+    FiscalYear::query()->update(['status' => 'closed']);
+    [
+        $purchaseOrder,
+        $goodsReceipt,
+        $goodsReceiptItem,
+        $supplier,
+        $warehouse,
+        $product,
+        $unit,
+    ] = createGoodsReceiptItemForSupplierReturn();
+    $supplierReturn = SupplierReturn::factory()->create([
+        'purchase_order_id' => $purchaseOrder->id,
+        'goods_receipt_id' => $goodsReceipt->id,
+        'supplier_id' => $supplier->id,
+        'warehouse_id' => $warehouse->id,
+        'return_date' => '2026-04-01',
+        'status' => 'draft',
+        'confirmed_at' => null,
+        'confirmed_by' => null,
+    ]);
+
+    putJson('/api/supplier-returns/' . $supplierReturn->id, [
+        'status' => 'confirmed',
+        'items' => [
+            [
+                'goods_receipt_item_id' => $goodsReceiptItem->id,
+                'product_id' => $product->id,
+                'unit_id' => $unit->id,
+                'quantity_returned' => 3,
+                'unit_price' => 10000,
+            ],
+        ],
+    ])->assertStatus(422);
+
+    $supplierReturn->refresh();
+    expect($supplierReturn->status)->toBe('draft')
+        ->and($supplierReturn->confirmed_at)->toBeNull()
+        ->and($supplierReturn->journal_entry_id)->toBeNull();
+
+    assertDatabaseMissing('stock_movements', [
+        'movement_type' => 'supplier_return',
+        'reference_type' => SupplierReturn::class,
+        'reference_id' => $supplierReturn->id,
+    ]);
+});
+
+test('confirming supplier return with ambiguous COA versions is rejected with 422 unchanged', function () {
+    // Dua COA aktif dan tidak ada tahun fiskal yang mencakup tanggal retur: tidak boleh menebak.
+    // Tahun fiskal eksplisit (bukan acak) agar tidak ada yang mencakup 2026-04-01.
+    foreach ([2020, 2021] as $year) {
+        CoaVersion::factory()->create([
+            'status' => 'active',
+            'fiscal_year_id' => FiscalYear::factory()->create([
+                'start_date' => $year . '-01-01',
+                'end_date' => $year . '-12-31',
+            ])->id,
+        ]);
+    }
+    [
+        $purchaseOrder,
+        $goodsReceipt,
+        $goodsReceiptItem,
+        $supplier,
+        $warehouse,
+        $product,
+        $unit,
+    ] = createGoodsReceiptItemForSupplierReturn();
+    $supplierReturn = SupplierReturn::factory()->create([
+        'purchase_order_id' => $purchaseOrder->id,
+        'goods_receipt_id' => $goodsReceipt->id,
+        'supplier_id' => $supplier->id,
+        'warehouse_id' => $warehouse->id,
+        'return_date' => '2026-04-01',
+        'status' => 'draft',
+        'confirmed_at' => null,
+        'confirmed_by' => null,
+    ]);
+
+    putJson('/api/supplier-returns/' . $supplierReturn->id, [
+        'status' => 'confirmed',
+        'items' => [
+            [
+                'goods_receipt_item_id' => $goodsReceiptItem->id,
+                'product_id' => $product->id,
+                'unit_id' => $unit->id,
+                'quantity_returned' => 3,
+                'unit_price' => 10000,
+            ],
+        ],
+    ])->assertStatus(422)->assertJsonValidationErrors(['coa_version']);
+
+    $supplierReturn->refresh();
+    expect($supplierReturn->status)->toBe('draft')
+        ->and($supplierReturn->confirmed_at)->toBeNull()
+        ->and($supplierReturn->journal_entry_id)->toBeNull();
+
+    assertDatabaseMissing('stock_movements', [
+        'movement_type' => 'supplier_return',
+        'reference_type' => SupplierReturn::class,
+        'reference_id' => $supplierReturn->id,
+    ]);
 });
 
 test('destroy removes a draft supplier return', function () {
