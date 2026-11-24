@@ -74,6 +74,20 @@ test('index supports search and filters', function () {
         ->assertJsonCount(1, 'data');
 });
 
+test('index accepts a list of statuses', function () {
+    PurchaseOrder::factory()->create(['status' => 'confirmed', 'currency' => 'IDR']);
+    PurchaseOrder::factory()->create(['status' => 'partially_received', 'currency' => 'IDR']);
+    PurchaseOrder::factory()->create(['status' => 'draft', 'currency' => 'IDR']);
+
+    getJson('/api/purchase-orders?status[]=confirmed&status[]=partially_received&per_page=50')
+        ->assertOk()
+        ->assertJsonCount(2, 'data');
+
+    getJson('/api/purchase-orders?status[]=bogus')
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('status.0');
+});
+
 test('store rejects manually creating purchase order with confirmed or rejected status', function (string $status) {
     $payload = [
         'supplier_id' => Supplier::factory()->create()->id,

@@ -160,11 +160,18 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
         const [selectedPoStatus, setSelectedPoStatus] = useState<
             string | undefined
         >(activeGoodsReceipt?.purchase_order?.status ?? undefined);
-        const isPoNotConfirmable =
+        const isNewlyConfirming =
             watchedStatus === 'confirmed' &&
+            activeGoodsReceipt?.status !== 'confirmed';
+        const isPoNotConfirmable =
+            isNewlyConfirming &&
             !!watchedPurchaseOrderId &&
             !!selectedPoStatus &&
             !CONFIRMABLE_PO_STATUSES.includes(selectedPoStatus);
+        const purchaseOrderListUrl =
+            watchedStatus === 'confirmed'
+                ? `/api/purchase-orders?${CONFIRMABLE_PO_STATUSES.map((s) => `status[]=${s}`).join('&')}`
+                : '/api/purchase-orders';
         const previousPurchaseOrderIdRef = useRef(
             defaultValues.purchase_order_id,
         );
@@ -249,17 +256,9 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
                         <AsyncSelectField<PurchaseOrderOption>
                             name="purchase_order_id"
                             label="Purchase Order"
-                            url="/api/purchase-orders"
+                            url={purchaseOrderListUrl}
                             placeholder="Select purchase order"
                             labelFn={(po) => po.po_number}
-                            filterItems={(po) =>
-                                CONFIRMABLE_PO_STATUSES.includes(
-                                    po.status ?? '',
-                                ) ||
-                                po.po_number ===
-                                    activeGoodsReceipt?.purchase_order
-                                        ?.po_number
-                            }
                             onItemSelect={(po) =>
                                 setSelectedPoStatus(po.status)
                             }
