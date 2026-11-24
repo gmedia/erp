@@ -157,7 +157,8 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
             if (previousHeaderSourceKeyRef.current === headerSourceKey) {
                 return;
             }
-            const isResetToDefaults = headerSourceKey === defaultHeaderSourceKey;
+            const isResetToDefaults =
+                headerSourceKey === defaultHeaderSourceKey;
             previousHeaderSourceKeyRef.current = headerSourceKey;
             if (isResetToDefaults) {
                 return;

@@ -2,13 +2,6 @@ import { expect, Page, test } from '@playwright/test';
 
 import { login, searchAndWaitForApi } from '../helpers';
 
-const API_HEADERS = (token: string) => ({
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-    'X-Requested-With': 'XMLHttpRequest',
-    Authorization: `Bearer ${token}`,
-});
-
 interface SeedResult {
     customerId: number;
     branchId: number;
