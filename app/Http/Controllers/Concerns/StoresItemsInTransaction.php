@@ -15,6 +15,9 @@ trait StoresItemsInTransaction
      * @param  callable(array<string, mixed>): TModel  $creator
      * @param  callable(TModel): void  $assignDocumentNumber
      * @param  callable(TModel, array<int, array<string, mixed>>): void  $syncItems
+     * @param  (callable(TModel): void)|null  $afterCommit  Hook di transaksi yang sama setelah
+     *                                                      items sync (mis. posting jurnal),
+     *                                                      sehingga gagal posting ikut rollback.
      * @return TModel
      */
     protected function storeWithSyncedItems(
@@ -22,16 +25,28 @@ trait StoresItemsInTransaction
         ?array $items,
         callable $creator,
         callable $assignDocumentNumber,
-        callable $syncItems
+        callable $syncItems,
+        ?callable $afterCommit = null
     ): Model {
         /** @var TModel $model */
-        $model = DB::transaction(function () use ($attributes, $items, $creator, $assignDocumentNumber, $syncItems) {
+        $model = DB::transaction(function () use (
+            $attributes,
+            $items,
+            $creator,
+            $assignDocumentNumber,
+            $syncItems,
+            $afterCommit
+        ) {
             $model = $creator($attributes);
 
             $assignDocumentNumber($model);
 
             if (is_array($items)) {
                 $syncItems($model, $items);
+            }
+
+            if ($afterCommit !== null) {
+                $afterCommit($model);
             }
 
             return $model;

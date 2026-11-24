@@ -87,6 +87,8 @@ Host RAM/CPU is limited. Parallel `Read`/`Edit`/`task` batches have **killed Ope
 - CI memakai **1 worker Playwright per shard**. `PLAYWRIGHT_WORKERS>1` adalah **jalan buntu**: flaky di bawah beban, dan menaikkan `PHP_CLI_SERVER_WORKERS` ke 8 **tetap gagal** (E2E hang >50m, `waitForResponse` timeout massal — lihat #219). Jangan ulangi eksperimen ini; konfigurasi stabil 6 shard × 1 worker.
 - **`sail test --parallel` ditolak** di repo ini. Tanpa `RefreshDatabase` di base `tests/TestCase.php`, worker paralel bertabrakan di DB `testing` (`Table 'testing.*' doesn't exist`). Menambahkan `RefreshDatabase` global pun tidak menolong: uji lokal → 41 failed / 2129 passed, **483s (lebih lambat dari serial ~314s)** karena state eksternal (cache/storage) dibagi antar worker. Pertahankan Pest serial (lihat #162/#183).
 
+- **E2E Octane mingguan** (`.github/workflows/e2e-octane.yml`, Minggu 19:00 UTC + manual, 6 shard): menjalankan E2E dengan `octane:swoole` lewat `docker-compose.override.yml` (`SUPERVISOR_PHP_COMMAND`), tidak menahan merge; `tests.yml` tidak diubah.
+
 ## Workflow
 
 ```

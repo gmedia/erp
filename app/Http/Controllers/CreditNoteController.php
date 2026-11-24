@@ -32,25 +32,42 @@ class CreditNoteController extends Controller
         return (new CreditNoteCollection($creditNotes))->response();
     }
 
-    public function store(StoreCreditNoteRequest $request, SyncCreditNoteItemsAction $syncItems): JsonResponse
-    {
+    public function store(
+        StoreCreditNoteRequest $request,
+        SyncCreditNoteItemsAction $syncItems,
+        ApplyCreditNoteAction $applyAction
+    ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'];
         unset($validated['items']);
 
         $validated['created_by'] = Auth::id();
 
-        $creditNote = $this->storeWithSyncedItems(
-            attributes: $validated,
-            items: $items,
-            creator: static fn (array $attributes): CreditNote => CreditNote::create($attributes),
-            assignDocumentNumber: function (CreditNote $creditNote): void {
-                $this->assignSequentialDocumentNumber($creditNote, 'credit_note_number', 'CN');
-            },
-            syncItems: function (CreditNote $creditNote, array $items) use ($syncItems): void {
-                $syncItems->execute($creditNote, $items);
-            },
-        );
+        $shouldApply = ($validated['status'] ?? null) === 'applied';
+        if ($shouldApply) {
+            $validated['status'] = 'confirmed';
+        }
+
+        try {
+            $creditNote = $this->storeWithSyncedItems(
+                attributes: $validated,
+                items: $items,
+                creator: static fn (array $attributes): CreditNote => CreditNote::create($attributes),
+                assignDocumentNumber: function (CreditNote $creditNote): void {
+                    $this->assignSequentialDocumentNumber($creditNote, 'credit_note_number', 'CN');
+                },
+                syncItems: function (CreditNote $creditNote, array $items) use ($syncItems): void {
+                    $syncItems->execute($creditNote, $items);
+                },
+                afterCommit: $shouldApply
+                    ? static function (CreditNote $creditNote) use ($applyAction): void {
+                        $applyAction->execute($creditNote);
+                    }
+                : null,
+            );
+        } catch (InvalidArgumentException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
 
         return (new CreditNoteResource($this->loadResourceRelations($creditNote)))
             ->response()
@@ -65,28 +82,44 @@ class CreditNoteController extends Controller
     public function update(
         UpdateCreditNoteRequest $request,
         CreditNote $creditNote,
-        SyncCreditNoteItemsAction $syncItems
+        SyncCreditNoteItemsAction $syncItems,
+        ApplyCreditNoteAction $applyAction
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
         unset($validated['items']);
+
+        $shouldApply = ($validated['status'] ?? null) === 'applied'
+            && $creditNote->status !== 'applied';
+        if ($shouldApply) {
+            $validated['status'] = 'confirmed';
+        }
 
         if (($validated['status'] ?? null) === 'confirmed' && $creditNote->confirmed_at === null) {
             $validated['confirmed_by'] = Auth::id();
             $validated['confirmed_at'] = now()->toIso8601String();
         }
 
-        $this->updateWithSyncedItems(
-            model: $creditNote,
-            attributes: $validated,
-            items: $items,
-            payloadResolver: static fn (array $attributes): array => UpdateCreditNoteData::fromArray(
-                $attributes
-            )->toArray(),
-            syncItems: function (CreditNote $creditNote, array $items) use ($syncItems): void {
-                $syncItems->execute($creditNote, $items);
-            },
-        );
+        try {
+            $this->updateWithSyncedItems(
+                model: $creditNote,
+                attributes: $validated,
+                items: $items,
+                payloadResolver: static fn (array $attributes): array => UpdateCreditNoteData::fromArray(
+                    $attributes
+                )->toArray(),
+                syncItems: function (CreditNote $creditNote, array $items) use ($syncItems): void {
+                    $syncItems->execute($creditNote, $items);
+                },
+                afterCommit: $shouldApply
+                    ? static function (CreditNote $creditNote) use ($applyAction): void {
+                        $applyAction->execute($creditNote);
+                    }
+                : null,
+            );
+        } catch (InvalidArgumentException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
 
         return (new CreditNoteResource($this->loadResourceRelations($creditNote)))->response();
     }

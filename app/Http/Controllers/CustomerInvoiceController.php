@@ -31,13 +31,23 @@ class CustomerInvoiceController extends Controller
         return (new CustomerInvoiceCollection($customerInvoices))->response();
     }
 
-    public function store(StoreCustomerInvoiceRequest $request, SyncCustomerInvoiceItemsAction $syncItems): JsonResponse
-    {
+    public function store(
+        StoreCustomerInvoiceRequest $request,
+        SyncCustomerInvoiceItemsAction $syncItems,
+        PostCustomerInvoiceJournalAction $postJournal
+    ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'];
         unset($validated['items']);
 
         $validated['created_by'] = Auth::id();
+
+        $isSentOnCreate = ($validated['status'] ?? null) === 'sent';
+
+        if ($isSentOnCreate) {
+            $validated['sent_by'] = Auth::id();
+            $validated['sent_at'] = now()->toIso8601String();
+        }
 
         $customerInvoice = $this->storeWithSyncedItems(
             attributes: $validated,
@@ -49,6 +59,11 @@ class CustomerInvoiceController extends Controller
             syncItems: function (CustomerInvoice $customerInvoice, array $items) use ($syncItems): void {
                 $syncItems->execute($customerInvoice, $items);
             },
+            afterCommit: $isSentOnCreate
+                ? function (CustomerInvoice $customerInvoice) use ($postJournal): void {
+                    $postJournal->execute($customerInvoice->refresh());
+                }
+            : null,
         );
 
         return (new CustomerInvoiceResource($this->loadResourceRelations($customerInvoice)))

@@ -1,5 +1,8 @@
 <?php
 
+use App\Actions\AccountingPosting\PostCreditNoteJournalAction;
+use App\Actions\AccountingPosting\ResolveControlAccountAction;
+use App\Actions\JournalEntries\CreateJournalEntryAction;
 use App\Models\Account;
 use App\Models\Branch;
 use App\Models\CoaVersion;
@@ -7,10 +10,13 @@ use App\Models\CreditNote;
 use App\Models\Customer;
 use App\Models\CustomerInvoice;
 use App\Models\FiscalYear;
+use App\Models\JournalEntry;
 use App\Models\Product;
 use App\Models\Unit;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
+use RuntimeException;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
@@ -189,6 +195,218 @@ test('destroy removes credit note', function () {
 
     assertDatabaseMissing('credit_notes', ['id' => $creditNote->id]);
 });
+
+test('store with confirmed status does not post journal (Refs #367)', function () {
+    [$customer, $fiscalYear, $invoice, $product] = createCreditNoteWithItem();
+    [, $returns] = seedCreditNoteApplyAccounts();
+
+    $response = postJson('/api/credit-notes', [
+        'customer_id' => $customer->id,
+        'branch_id' => Branch::factory()->create()->id,
+        'fiscal_year_id' => $fiscalYear->id,
+        'customer_invoice_id' => $invoice->id,
+        'credit_note_date' => $fiscalYear->start_date->toDateString(),
+        'reason' => 'return',
+        'status' => 'confirmed',
+        'items' => [
+            [
+                'product_id' => $product->id,
+                'account_id' => $returns->id,
+                'description' => 'Retur',
+                'quantity' => 1,
+                'unit_price' => 250000,
+                'tax_percent' => 0,
+            ],
+        ],
+    ])->assertCreated();
+
+    $creditNote = CreditNote::query()->findOrFail($response->json('data.id'));
+
+    expect($creditNote->status)->toBe('confirmed');
+    expect($creditNote->journal_entry_id)->toBeNull();
+});
+
+test('store with applied status posts journal and reduces invoice amount_due (Refs #367)', function () {
+    [$customer, $fiscalYear, , $product] = createCreditNoteWithItem();
+    [, $returns] = seedCreditNoteApplyAccounts();
+
+    $invoice = CustomerInvoice::factory()->create([
+        'customer_id' => $customer->id,
+        'fiscal_year_id' => $fiscalYear->id,
+        'status' => 'sent',
+        'grand_total' => 1000000,
+        'amount_received' => 0,
+        'credit_note_amount' => 0,
+        'amount_due' => 1000000,
+    ]);
+
+    $response = postJson('/api/credit-notes', [
+        'customer_id' => $customer->id,
+        'branch_id' => Branch::factory()->create()->id,
+        'fiscal_year_id' => $fiscalYear->id,
+        'customer_invoice_id' => $invoice->id,
+        'credit_note_date' => $fiscalYear->start_date->toDateString(),
+        'reason' => 'return',
+        'status' => 'applied',
+        'items' => [
+            [
+                'product_id' => $product->id,
+                'account_id' => $returns->id,
+                'description' => 'Retur',
+                'quantity' => 1,
+                'unit_price' => 250000,
+                'tax_percent' => 0,
+            ],
+        ],
+    ])->assertCreated()
+        ->assertJsonPath('data.status', 'applied');
+
+    $creditNote = CreditNote::query()->findOrFail($response->json('data.id'));
+
+    expect($creditNote->journal_entry_id)->not->toBeNull();
+    expect((float) $invoice->refresh()->amount_due)->toBe(750000.0);
+});
+
+test('store with applied status rejects amount above invoice outstanding (Refs #367)', function () {
+    [$customer, $fiscalYear, , $product] = createCreditNoteWithItem();
+    [, $returns] = seedCreditNoteApplyAccounts();
+
+    $invoice = CustomerInvoice::factory()->create([
+        'customer_id' => $customer->id,
+        'fiscal_year_id' => $fiscalYear->id,
+        'status' => 'sent',
+        'grand_total' => 100000,
+        'amount_received' => 0,
+        'credit_note_amount' => 0,
+        'amount_due' => 100000,
+    ]);
+
+    postJson('/api/credit-notes', [
+        'customer_id' => $customer->id,
+        'branch_id' => Branch::factory()->create()->id,
+        'fiscal_year_id' => $fiscalYear->id,
+        'customer_invoice_id' => $invoice->id,
+        'credit_note_date' => $fiscalYear->start_date->toDateString(),
+        'reason' => 'return',
+        'status' => 'applied',
+        'items' => [
+            [
+                'product_id' => $product->id,
+                'account_id' => $returns->id,
+                'description' => 'Retur',
+                'quantity' => 1,
+                'unit_price' => 250000,
+                'tax_percent' => 0,
+            ],
+        ],
+    ])->assertStatus(422)
+        ->assertJsonPath('message', 'Credit note amount exceeds invoice outstanding.');
+
+    assertDatabaseMissing('credit_notes', ['customer_invoice_id' => $invoice->id]);
+});
+
+test('store with applied status rolls back the credit note when journal posting fails (Refs #367)', function () {
+    [$customer, $fiscalYear, , $product] = createCreditNoteWithItem();
+    [, $returns] = seedCreditNoteApplyAccounts();
+
+    $invoice = CustomerInvoice::factory()->create([
+        'customer_id' => $customer->id,
+        'fiscal_year_id' => $fiscalYear->id,
+        'status' => 'sent',
+        'grand_total' => 1000000,
+        'amount_received' => 0,
+        'credit_note_amount' => 0,
+        'amount_due' => 1000000,
+    ]);
+
+    bindFailingCreditNotePosting($this->app);
+
+    postJson('/api/credit-notes', [
+        'customer_id' => $customer->id,
+        'branch_id' => Branch::factory()->create()->id,
+        'fiscal_year_id' => $fiscalYear->id,
+        'customer_invoice_id' => $invoice->id,
+        'credit_note_date' => $fiscalYear->start_date->toDateString(),
+        'reason' => 'return',
+        'status' => 'applied',
+        'items' => [
+            [
+                'product_id' => $product->id,
+                'account_id' => $returns->id,
+                'description' => 'Retur',
+                'quantity' => 1,
+                'unit_price' => 250000,
+                'tax_percent' => 0,
+            ],
+        ],
+    ])->assertStatus(500);
+
+    assertDatabaseMissing('credit_notes', ['customer_invoice_id' => $invoice->id, 'status' => 'applied']);
+});
+
+test('update to applied status posts journal once and reduces invoice amount_due (Refs #367)', function () {
+    [$customer, $fiscalYear, , $product] = createCreditNoteWithItem();
+    [, $returns] = seedCreditNoteApplyAccounts();
+
+    $invoice = CustomerInvoice::factory()->create([
+        'customer_id' => $customer->id,
+        'fiscal_year_id' => $fiscalYear->id,
+        'status' => 'sent',
+        'grand_total' => 1000000,
+        'amount_received' => 0,
+        'credit_note_amount' => 0,
+        'amount_due' => 1000000,
+    ]);
+
+    $creditNote = CreditNote::factory()->confirmed()->create([
+        'customer_id' => $customer->id,
+        'fiscal_year_id' => $fiscalYear->id,
+        'customer_invoice_id' => $invoice->id,
+        'credit_note_date' => $fiscalYear->start_date->toDateString(),
+        'grand_total' => 250000,
+        'subtotal' => 250000,
+        'tax_amount' => 0,
+    ]);
+
+    putJson('/api/credit-notes/' . $creditNote->id, [
+        'status' => 'applied',
+        'items' => [
+            [
+                'product_id' => $product->id,
+                'account_id' => $returns->id,
+                'description' => 'Retur',
+                'quantity' => 1,
+                'unit_price' => 250000,
+                'tax_percent' => 0,
+            ],
+        ],
+    ])->assertOk()
+        ->assertJsonPath('data.status', 'applied');
+
+    $creditNote->refresh();
+    expect($creditNote->journal_entry_id)->not->toBeNull();
+    expect((float) $invoice->refresh()->amount_due)->toBe(750000.0);
+});
+
+/**
+ * Mengganti aksi posting credit note dengan versi yang selalu gagal, untuk
+ * membuktikan rollback transaksi saat posting jurnal error.
+ */
+function bindFailingCreditNotePosting(Application $app): void
+{
+    $app->bind(PostCreditNoteJournalAction::class, function ($app) {
+        $createJournal = $app->make(CreateJournalEntryAction::class);
+        $resolveAccount = $app->make(ResolveControlAccountAction::class);
+
+        return new class($createJournal, $resolveAccount) extends PostCreditNoteJournalAction
+        {
+            public function execute(CreditNote $creditNote): ?JournalEntry
+            {
+                throw new RuntimeException('Simulated journal posting failure');
+            }
+        };
+    });
+}
 
 /**
  * Apply memposting jurnal (Dr retur, Cr AR 11200), jadi fixture wajib punya

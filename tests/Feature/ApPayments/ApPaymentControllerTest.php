@@ -6,6 +6,7 @@ use App\Models\ApPayment;
 use App\Models\Branch;
 use App\Models\CoaVersion;
 use App\Models\FiscalYear;
+use App\Models\JournalEntry;
 use App\Models\Supplier;
 use App\Models\SupplierBill;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -123,6 +124,100 @@ test('store creates ap payment with allocations', function () {
     $id = $response->json('data.id');
     assertDatabaseHas('ap_payments', ['id' => $id, 'supplier_id' => $supplier->id]);
     assertDatabaseHas('ap_payment_allocations', ['ap_payment_id' => $id, 'supplier_bill_id' => $supplierBill->id]);
+});
+
+function makeApPaymentPostingFixture(): array
+{
+    FiscalYear::factory()->create([
+        'name' => '2026',
+        'start_date' => '2026-01-01',
+        'end_date' => '2026-12-31',
+        'status' => 'open',
+    ]);
+    $coaVersion = CoaVersion::factory()->create(['status' => 'active']);
+    Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '21100',
+        'name' => 'Accounts Payable',
+        'type' => 'liability',
+        'normal_balance' => 'credit',
+        'is_active' => true,
+    ]);
+    $bankAccount = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '11110',
+        'type' => 'asset',
+        'normal_balance' => 'debit',
+        'is_active' => true,
+    ]);
+
+    return [
+        'supplier' => Supplier::factory()->create(),
+        'branch' => Branch::factory()->create(),
+        'fiscal_year' => FiscalYear::query()->where('name', '2026')->firstOrFail(),
+        'bank_account' => $bankAccount,
+    ];
+}
+
+function apPaymentConfirmedPayload(array $fixture, string $paymentNumberSuffix): array
+{
+    $bill = SupplierBill::factory()->confirmed()->create([
+        'supplier_id' => $fixture['supplier']->id,
+        'grand_total' => 500000,
+        'amount_paid' => 0,
+        'amount_due' => 500000,
+    ]);
+
+    return [
+        'supplier_id' => $fixture['supplier']->id,
+        'branch_id' => $fixture['branch']->id,
+        'fiscal_year_id' => $fixture['fiscal_year']->id,
+        'payment_date' => '2026-03-15',
+        'payment_method' => 'bank_transfer',
+        'bank_account_id' => $fixture['bank_account']->id,
+        'currency' => 'IDR',
+        'total_amount' => 500000,
+        'reference' => 'TRF-367-' . $paymentNumberSuffix,
+        'status' => 'confirmed',
+        'allocations' => [
+            [
+                'supplier_bill_id' => $bill->id,
+                'allocated_amount' => 500000,
+            ],
+        ],
+    ];
+}
+
+test('store with confirmed status posts journal in the same transaction (Refs #367)', function () {
+    $fixture = makeApPaymentPostingFixture();
+
+    $response = postJson('/api/ap-payments', apPaymentConfirmedPayload($fixture, '001'));
+
+    $response->assertCreated();
+
+    $payment = ApPayment::query()->findOrFail($response->json('data.id'));
+
+    expect($payment->journal_entry_id)->not->toBeNull();
+    expect(JournalEntry::query()->findOrFail($payment->journal_entry_id)->status)->toBe('posted');
+});
+
+test('store with confirmed status rolls back the payment when journal posting fails (Refs #367)', function () {
+    $fixture = makeApPaymentPostingFixture();
+
+    $this->app->bind(PostApPaymentJournalAction::class, function () {
+        return new class
+        {
+            public function execute(ApPayment $apPayment): void
+            {
+                throw new RuntimeException('Simulated journal posting failure');
+            }
+        };
+    });
+
+    postJson('/api/ap-payments', apPaymentConfirmedPayload($fixture, '002'))
+        ->assertStatus(500);
+
+    assertDatabaseMissing('ap_payments', ['reference' => 'TRF-367-002']);
 });
 
 test('show returns ap payment detail', function () {

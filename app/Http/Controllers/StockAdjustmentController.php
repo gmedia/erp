@@ -34,14 +34,27 @@ class StockAdjustmentController extends Controller
         return (new StockAdjustmentCollection($adjustments))->response();
     }
 
-    public function store(StoreStockAdjustmentRequest $request, SyncStockAdjustmentItemsAction $syncItems): JsonResponse
-    {
+    public function store(
+        StoreStockAdjustmentRequest $request,
+        SyncStockAdjustmentItemsAction $syncItems,
+        PostStockAdjustmentJournalAction $postJournal,
+        PostStockAdjustmentMovementsAction $postMovements,
+    ): JsonResponse {
         $data = $request->validated();
         $items = $data['items'];
         unset($data['items']);
 
         $data['created_by'] = Auth::id();
 
+        $isApprovedOnCreate = ($data['status'] ?? null) === 'approved';
+
+        if ($isApprovedOnCreate) {
+            $data['approved_by'] = Auth::id();
+            $data['approved_at'] = now()->toIso8601String();
+        }
+
+        // Issue #367: penyesuaian yang dibuat langsung approved harus memposting jurnal
+        // dalam transaksi yang sama. Movement stok diposting setelah commit (W5-19).
         $adjustment = $this->storeWithSyncedItems(
             attributes: $data,
             items: $items,
@@ -52,7 +65,25 @@ class StockAdjustmentController extends Controller
             syncItems: function (StockAdjustment $adjustment, array $items) use ($syncItems): void {
                 $syncItems->execute($adjustment, $items);
             },
+            afterCommit: $isApprovedOnCreate
+                ? function (StockAdjustment $adjustment) use ($postJournal): void {
+                    try {
+                        $postJournal->execute($adjustment->refresh());
+                    } catch (ValidationException $e) {
+                        // Sama dengan jalur update: validasi (mis. COA belum lengkap) tidak
+                        // membatalkan penyesuaian; jurnal bisa diposting ulang nanti.
+                        Log::warning('Stock adjustment journal posting skipped', [
+                            'stock_adjustment_id' => $adjustment->id,
+                            'reason' => $e->getMessage(),
+                        ]);
+                    }
+                }
+            : null,
         );
+
+        if ($isApprovedOnCreate) {
+            $postMovements->execute($adjustment->refresh());
+        }
 
         $adjustment->load(['warehouse', 'inventoryStocktake', 'items.product', 'items.unit']);
 

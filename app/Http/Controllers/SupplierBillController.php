@@ -31,13 +31,23 @@ class SupplierBillController extends Controller
         return (new SupplierBillCollection($supplierBills))->response();
     }
 
-    public function store(StoreSupplierBillRequest $request, SyncSupplierBillItemsAction $syncItems): JsonResponse
-    {
+    public function store(
+        StoreSupplierBillRequest $request,
+        SyncSupplierBillItemsAction $syncItems,
+        PostSupplierBillJournalAction $postJournal
+    ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'];
         unset($validated['items']);
 
         $validated['created_by'] = Auth::id();
+
+        $isConfirmedOnCreate = ($validated['status'] ?? null) === 'confirmed';
+
+        if ($isConfirmedOnCreate) {
+            $validated['confirmed_by'] = Auth::id();
+            $validated['confirmed_at'] = now()->toIso8601String();
+        }
 
         $supplierBill = $this->storeWithSyncedItems(
             attributes: $validated,
@@ -49,6 +59,11 @@ class SupplierBillController extends Controller
             syncItems: function (SupplierBill $supplierBill, array $items) use ($syncItems): void {
                 $syncItems->execute($supplierBill, $items);
             },
+            afterCommit: $isConfirmedOnCreate
+                ? function (SupplierBill $supplierBill) use ($postJournal): void {
+                    $postJournal->execute($supplierBill->refresh());
+                }
+            : null,
         );
 
         return (new SupplierBillResource($this->loadResourceRelations($supplierBill)))->response()->setStatusCode(201);
