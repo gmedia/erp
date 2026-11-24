@@ -60,7 +60,7 @@ export const AgingBucketChart = memo<AgingBucketChartProps>(
         }
 
         return (
-            <Card className="flex h-[320px] w-full flex-col">
+            <Card className="flex w-full flex-col">
                 <CardHeader className="pb-2">
                     <CardTitle>{title}</CardTitle>
                     <p className="text-sm text-muted-foreground">

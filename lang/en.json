@@ -57,8 +57,8 @@
     "Supplier bill still has active payment allocations. Remove them before cancelling.": "Supplier bill still has active payment allocations. Remove them before cancelling.",
     "Goods receipt still has active supplier returns. Cancel them before cancelling.": "Goods receipt still has active supplier returns. Cancel them before cancelling.",
     "Goods receipt still has active supplier bills. Cancel them before cancelling.": "Goods receipt still has active supplier bills. Cancel them before cancelling.",
-     "approval.transition_forbidden": "You do not have permission to execute this transition.",
-     "approval.concurrent_step": "This approval step was already acted on by another request. Refresh and try again.",
+    "approval.transition_forbidden": "You do not have permission to execute this transition.",
+    "approval.concurrent_step": "This approval step was already acted on by another request. Refresh and try again.",
 
     "nav": {
         "platform": "Platform",
@@ -140,9 +140,9 @@
     "my_approvals": {
         "request_number": "No. {id}",
         "load_failed": "Failed to load approvals. Please refresh and try again.",
-  "delegated_badge": "Delegated",
-  "delegated_count": "{count} delegated",
-  "delegated_tooltip": "Pending steps you can act on as a delegate"
+        "delegated_badge": "Delegated",
+        "delegated_count": "{count} delegated",
+        "delegated_tooltip": "Pending steps you can act on as a delegate"
     },
     "posted_document": {
         "title": "Posted document",
@@ -260,7 +260,7 @@
         "pageDescriptions": {
             "balance-sheet": "Financial position at a point in time: assets, liabilities, and equity.",
             "cash-flow": "Cash movements grouped into operating, investing, and financing activities.",
-            "comparative": "Compare revenue, expense, and net income across fiscal years.",
+            "comparative": "Compare assets, liabilities, equity, revenue, and expenses across fiscal years.",
             "income-statement": "Revenue and expenses over a period to show net income.",
             "trial-balance": "Debit and credit totals of every account to check that the books balance.",
             "trial-balance-detailed": "Trial balance with opening, movement, and closing balance per account.",
@@ -289,17 +289,18 @@
     },
     "admin": {
         "selectLogo": "Select SVG Logo",
-        "noFileSelected": "No file selected"
+        "noFileSelected": "No file selected",
+        "logoHint": "Upload an SVG file. If empty, the app keeps using the default logo."
     },
     "accounting_posting.control_account_missing": "Control account :code was not found in the active COA version.",
     "accounting_posting.coa_none_active": "No active COA version covers :date. Activate one COA version before posting.",
     "accounting_posting.coa_ambiguous": "More than one active COA version applies to :date. Keep exactly one active COA per fiscal year.",
     "accounting_posting.line_account_outside_coa": "Journal line account :code does not belong to the COA version used for :date.",
-  "accounting_posting.line_group_account_not_reducing": "Group account :code can only receive lines that reduce its posted balance. Choose a detail (leaf) account.",
-  "bank_reconciliation.unmatched_item_requires_account": "Every unmatched bank item must have an account before completing.",
-  "bank_reconciliation.difference_must_be_zero": "Bank reconciliation difference must be zero.",
-  "recurring_journal.inactive": "Recurring journal is inactive.",
-  "recurring_journal.lines_not_balanced": "Recurring journal lines are not balanced.",
+    "accounting_posting.line_group_account_not_reducing": "Group account :code can only receive lines that reduce its posted balance. Choose a detail (leaf) account.",
+    "bank_reconciliation.unmatched_item_requires_account": "Every unmatched bank item must have an account before completing.",
+    "bank_reconciliation.difference_must_be_zero": "Bank reconciliation difference must be zero.",
+    "recurring_journal.inactive": "Recurring journal is inactive.",
+    "recurring_journal.lines_not_balanced": "Recurring journal lines are not balanced.",
     "period_closings.posting_locked": "The period for :date is closed. Reopen the period to post journals on this date.",
     "asset_depreciation_runs.single_month_only": "A depreciation run must cover one calendar month.",
     "asset_depreciation_runs.overlapping_period": "A depreciation run already exists for an overlapping period.",
@@ -334,7 +335,7 @@
     "supplier_return.supplier_mismatch": "The supplier must match the purchase order supplier.",
     "supplier_return.goods_receipt_mismatch": "The goods receipt must belong to the purchase order.",
     "supplier_return.gr_item_mismatch": "The GR item must belong to the selected goods receipt.",
-  "supplier_return.returned_exceeds_received": "Returned quantity exceeds the remaining received quantity of this GR item.",
+    "supplier_return.returned_exceeds_received": "Returned quantity exceeds the remaining received quantity of this GR item.",
     "inventory_stocktake.adjustment_note": "Draft from stocktake :stocktake",
     "goods_receipt.po_item_mismatch": "The PO item must belong to the selected purchase order.",
     "goods_receipt.po_not_approved": "Goods receipt can only be confirmed when the purchase order is confirmed or partially received.",

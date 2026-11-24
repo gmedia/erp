@@ -242,7 +242,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
                         formattedValue={card.formattedValue}
                         iconColor={card.iconColor}
                         valueClassName={cn(
-                            'text-lg sm:text-xl',
+                            'text-base whitespace-nowrap sm:text-xl',
                             card.valueClassName,
                         )}
                     >

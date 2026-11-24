@@ -57,8 +57,8 @@
     "Supplier bill still has active payment allocations. Remove them before cancelling.": "Tagihan supplier masih memiliki alokasi pembayaran aktif. Lepaskan alokasi tersebut sebelum membatalkan.",
     "Goods receipt still has active supplier returns. Cancel them before cancelling.": "Penerimaan barang masih memiliki retur supplier aktif. Batalkan retur tersebut sebelum membatalkan.",
     "Goods receipt still has active supplier bills. Cancel them before cancelling.": "Penerimaan barang masih memiliki tagihan supplier aktif. Batalkan tagihan tersebut sebelum membatalkan.",
-     "approval.transition_forbidden": "Anda tidak memiliki izin untuk menjalankan transisi ini.",
-     "approval.concurrent_step": "Langkah persetujuan ini sudah diproses permintaan lain. Muat ulang lalu coba lagi.",
+    "approval.transition_forbidden": "Anda tidak memiliki izin untuk menjalankan transisi ini.",
+    "approval.concurrent_step": "Langkah persetujuan ini sudah diproses permintaan lain. Muat ulang lalu coba lagi.",
 
     "nav": {
         "platform": "Platform",
@@ -140,9 +140,9 @@
     "my_approvals": {
         "request_number": "No. {id}",
         "load_failed": "Gagal memuat persetujuan. Muat ulang halaman lalu coba lagi.",
-  "delegated_badge": "Delegasi",
-  "delegated_count": "{count} delegasi",
-  "delegated_tooltip": "Langkah menunggu yang dapat Anda setujui sebagai delegasi"
+        "delegated_badge": "Delegasi",
+        "delegated_count": "{count} delegasi",
+        "delegated_tooltip": "Langkah menunggu yang dapat Anda setujui sebagai delegasi"
     },
     "posted_document": {
         "title": "Dokumen terposting",
@@ -260,7 +260,7 @@
         "pageDescriptions": {
             "balance-sheet": "Posisi keuangan pada suatu tanggal: aset, liabilitas, dan ekuitas.",
             "cash-flow": "Pergerakan kas dikelompokkan menjadi aktivitas operasi, investasi, dan pendanaan.",
-            "comparative": "Bandingkan pendapatan, beban, dan laba bersih antar tahun fiskal.",
+            "comparative": "Bandingkan aset, liabilitas, ekuitas, pendapatan, dan beban antar tahun fiskal.",
             "income-statement": "Pendapatan dan beban dalam satu periode untuk menunjukkan laba bersih.",
             "trial-balance": "Total debit dan kredit setiap akun untuk memastikan pembukuan seimbang.",
             "trial-balance-detailed": "Neraca uji dengan saldo awal, mutasi, dan saldo akhir per akun.",
@@ -289,7 +289,8 @@
     },
     "admin": {
         "selectLogo": "Pilih Logo SVG",
-        "noFileSelected": "Belum ada file dipilih"
+        "noFileSelected": "Belum ada file dipilih",
+        "logoHint": "Unggah file SVG. Jika kosong, aplikasi tetap menggunakan logo default."
     },
     "accounting_posting.control_account_missing": "Akun kontrol :code tidak ditemukan di versi COA aktif.",
     "accounting_posting.coa_none_active": "Tidak ada versi COA aktif untuk :date. Aktifkan satu versi COA sebelum posting.",
@@ -301,11 +302,11 @@
     "journal_entry.line_amount_required": "Setiap baris harus memiliki nilai debit atau kredit yang lebih besar dari 0.",
     "journal_entry.lines_not_balanced": "Total debit dan total kredit harus sama.",
     "accounting_posting.line_account_outside_coa": "Akun baris jurnal :code bukan bagian dari versi COA yang dipakai untuk :date.",
-  "accounting_posting.line_group_account_not_reducing": "Akun kelompok :code hanya boleh menerima baris yang memperkecil saldo posted-nya. Pilih akun detail (akun daun).",
-  "bank_reconciliation.unmatched_item_requires_account": "Setiap item bank yang belum dicocokkan harus punya akun sebelum diselesaikan.",
-  "bank_reconciliation.difference_must_be_zero": "Selisih rekonsiliasi bank harus nol.",
-  "recurring_journal.inactive": "Jurnal berulang tidak aktif.",
-  "recurring_journal.lines_not_balanced": "Baris jurnal berulang tidak seimbang.",
+    "accounting_posting.line_group_account_not_reducing": "Akun kelompok :code hanya boleh menerima baris yang memperkecil saldo posted-nya. Pilih akun detail (akun daun).",
+    "bank_reconciliation.unmatched_item_requires_account": "Setiap item bank yang belum dicocokkan harus punya akun sebelum diselesaikan.",
+    "bank_reconciliation.difference_must_be_zero": "Selisih rekonsiliasi bank harus nol.",
+    "recurring_journal.inactive": "Jurnal berulang tidak aktif.",
+    "recurring_journal.lines_not_balanced": "Baris jurnal berulang tidak seimbang.",
     "period_closings.posting_locked": "Periode untuk :date sudah ditutup. Buka kembali periode untuk memposting jurnal pada tanggal ini.",
     "asset_depreciation_runs.single_month_only": "Satu run depresiasi harus mencakup satu bulan kalender.",
     "asset_depreciation_runs.overlapping_period": "Sudah ada run depresiasi untuk periode yang beririsan.",
@@ -334,7 +335,7 @@
     "supplier_return.supplier_mismatch": "Supplier harus sama dengan supplier pada purchase order.",
     "supplier_return.goods_receipt_mismatch": "Goods receipt harus milik purchase order tersebut.",
     "supplier_return.gr_item_mismatch": "Item GR harus milik goods receipt yang dipilih.",
-  "supplier_return.returned_exceeds_received": "Qty retur melebihi sisa qty diterima dari item GR ini.",
+    "supplier_return.returned_exceeds_received": "Qty retur melebihi sisa qty diterima dari item GR ini.",
     "inventory_stocktake.adjustment_note": "Draf dari stock opname :stocktake",
     "goods_receipt.po_item_mismatch": "Item PO harus milik purchase order yang dipilih.",
     "goods_receipt.po_not_approved": "GR hanya bisa dikonfirmasi bila purchase order sudah dikonfirmasi atau diterima sebagian.",

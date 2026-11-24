@@ -62,7 +62,6 @@ export const apPaymentColumns: ColumnDef<ApPayment>[] = [
     createStatusBadgeColumn<ApPayment>({
         accessorKey: 'status',
         label: 'Status',
-        variantMap: { confirmed: 'success' },
     }),
     createRowCurrencyAmountColumn<ApPayment>({
         accessorKey: 'total_amount',

@@ -39,12 +39,14 @@ describe('Asset Dashboard Data API', function () {
     test('calculates summary totals correctly', function () {
         // Create some assets
         Asset::factory()->create([
+            'status' => 'active',
             'purchase_cost' => 1000000,
             'book_value' => 800000,
             'accumulated_depreciation' => 200000,
         ]);
 
         Asset::factory()->create([
+            'status' => 'active',
             'purchase_cost' => 2500000,
             'book_value' => 2000000,
             'accumulated_depreciation' => 500000,
@@ -57,6 +59,41 @@ describe('Asset Dashboard Data API', function () {
             ->assertJsonPath('summary.total_purchase_cost', 3500000)
             ->assertJsonPath('summary.total_book_value', 2800000)
             ->assertJsonPath('summary.total_accumulated_depreciation', 700000);
+    });
+
+    test('value totals exclude draft, disposed and lost assets (V8-07)', function () {
+        Asset::factory()->create([
+            'status' => 'active',
+            'purchase_cost' => 1000000,
+            'book_value' => 800000,
+            'accumulated_depreciation' => 200000,
+        ]);
+        Asset::factory()->create([
+            'status' => 'draft',
+            'purchase_cost' => 165500000,
+            'book_value' => 165500000,
+            'accumulated_depreciation' => 0,
+        ]);
+        Asset::factory()->create([
+            'status' => 'disposed',
+            'purchase_cost' => 27000000,
+            'book_value' => 0,
+            'accumulated_depreciation' => 27000000,
+        ]);
+        Asset::factory()->create([
+            'status' => 'lost',
+            'purchase_cost' => 2800000,
+            'book_value' => 2800000,
+            'accumulated_depreciation' => 0,
+        ]);
+
+        $response = getJson('/api/asset-dashboard/data');
+
+        $response->assertOk()
+            ->assertJsonPath('summary.total_assets', 4)
+            ->assertJsonPath('summary.total_purchase_cost', 1000000)
+            ->assertJsonPath('summary.total_book_value', 800000)
+            ->assertJsonPath('summary.total_accumulated_depreciation', 200000);
     });
 
     test('groups status distribution correctly', function () {

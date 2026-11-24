@@ -32,7 +32,7 @@ export function KpiCard({
                 <div
                     title={formattedValue}
                     className={cn(
-                        'text-xl font-semibold break-keep tabular-nums min-[1400px]:text-2xl',
+                        'min-w-0 text-xl font-semibold break-normal tabular-nums min-[1400px]:text-2xl',
                         valueClassName,
                     )}
                 >

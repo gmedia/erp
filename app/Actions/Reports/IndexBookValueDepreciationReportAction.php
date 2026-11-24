@@ -16,7 +16,9 @@ class IndexBookValueDepreciationReportAction
     {
         $query = Asset::query()
             ->with(['category', 'branch'])
-            ->whereIn('status', ['active', 'maintenance', 'disposed', 'lost']); // Typically draft are not depreciated
+            // Single definition of in-service value (V8-07/V8-08): draft is not depreciated and
+            // disposed/lost assets are off the books, so they must not carry book value.
+            ->whereIn('status', Asset::IN_SERVICE_STATUSES);
 
         $this->applySearchFilter($request, $query, ['asset_code', 'name']);
         $this->applyIntegerFilters($request, $query, [

@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/table';
 import { useAssetDepreciationRuns } from '@/hooks/useAssetDepreciationRuns';
 import { usePermissions } from '@/hooks/usePermissions';
+import { statusBadgeVariant } from '@/lib/status-badge';
 import { BreadcrumbItem } from '@/types';
 import { AssetDepreciationRun } from '@/types/asset-depreciation-run';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
@@ -39,19 +40,6 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Asset Management', href: '/assets' },
     { title: 'Depreciation Runs', href: '/asset-depreciation-runs' },
 ];
-
-function getStatusBadgeVariant(status: AssetDepreciationRun['status']) {
-    switch (status) {
-        case 'calculated':
-            return 'default';
-        case 'posted':
-            return 'secondary';
-        case 'void':
-            return 'destructive';
-        default:
-            return 'outline';
-    }
-}
 
 export default function Index() {
     const {
@@ -142,9 +130,9 @@ export default function Index() {
                         {item.lines_count || 0} Assets
                     </Badge>
                 </TableCell>
-                <TableCell>
+                <TableCell className="whitespace-nowrap">
                     <Badge
-                        variant={getStatusBadgeVariant(item.status)}
+                        variant={statusBadgeVariant(item.status)}
                         className="capitalize"
                     >
                         {item.status}
@@ -164,7 +152,7 @@ export default function Index() {
                         {item.created_by_user?.name || '-'}
                     </span>
                 </TableCell>
-                <TableCell className="sticky right-0 z-20 bg-background text-right">
+                <TableCell className="w-[60px] bg-background text-right md:sticky md:right-0 md:z-20">
                     <div className="flex justify-end">
                         <GenericActions
                             item={item}
@@ -256,10 +244,12 @@ export default function Index() {
                         <TableHead>Fiscal Year</TableHead>
                         <TableHead>Period</TableHead>
                         <TableHead>Lines</TableHead>
-                        <TableHead>Status</TableHead>
+                        <TableHead className="whitespace-nowrap">
+                            Status
+                        </TableHead>
                         <TableHead>Journal</TableHead>
                         <TableHead>Created By</TableHead>
-                        <TableHead className="sticky right-0 z-20 w-[60px] bg-background text-right">
+                        <TableHead className="w-[60px] bg-background text-right md:sticky md:right-0 md:z-20">
                             <span className="sr-only">Actions</span>
                         </TableHead>
                     </TableRow>

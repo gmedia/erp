@@ -93,7 +93,7 @@ function AccountTreeNode({
                     </div>
                 </div>
 
-                <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                <div className="flex items-center gap-1 opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100 md:focus-within:opacity-100">
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>

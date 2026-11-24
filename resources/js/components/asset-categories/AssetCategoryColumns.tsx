@@ -21,7 +21,7 @@ export const assetCategoryColumns: ColumnDef<AssetCategory>[] = [
     createNumberColumn<AssetCategory>({
         accessorKey: 'useful_life_months_default',
         label: 'Default Useful Life (Months)',
-        className: 'text-center',
+        className: 'text-right tabular-nums',
     }),
     createDateColumn<AssetCategory>({
         accessorKey: 'created_at',

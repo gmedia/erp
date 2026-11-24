@@ -64,7 +64,7 @@ export const TopOverdueCustomers = memo<TopOverdueCustomersProps>(
                                 <TableHead className="text-right">
                                     Overdue Amount
                                 </TableHead>
-                                <TableHead className="text-right">
+                                <TableHead className="hidden text-right 2xl:table-cell">
                                     Outstanding
                                 </TableHead>
                                 <TableHead className="hidden text-right 2xl:table-cell">

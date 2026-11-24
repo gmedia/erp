@@ -85,6 +85,45 @@ test('it can filter the report by category and branch', function () {
         ->assertJsonPath('data.0.asset_code', 'FR-001');
 })->group('book-value-depreciation-reports');
 
+test('it excludes disposed, lost and draft assets from book value rows (V8-07/V8-08)', function () {
+    Asset::factory()->create([
+        'asset_code' => 'FA-000007',
+        'name' => 'Laptop Lama',
+        'asset_category_id' => $this->category->id,
+        'branch_id' => $this->branch->id,
+        'status' => 'disposed',
+        'purchase_cost' => 22000000,
+        'book_value' => 0,
+        'accumulated_depreciation' => 22000000,
+    ]);
+    Asset::factory()->create([
+        'asset_code' => 'FA-000008',
+        'name' => 'Asset Hilang',
+        'asset_category_id' => $this->category->id,
+        'branch_id' => $this->branch->id,
+        'status' => 'lost',
+        'purchase_cost' => 2800000,
+        'book_value' => 2193333,
+        'accumulated_depreciation' => 606667,
+    ]);
+    Asset::factory()->create([
+        'asset_code' => 'FA-000009',
+        'name' => 'Draft Baru',
+        'asset_category_id' => $this->category->id,
+        'branch_id' => $this->branch->id,
+        'status' => 'draft',
+        'purchase_cost' => 1000000,
+        'book_value' => 1000000,
+        'accumulated_depreciation' => 0,
+    ]);
+
+    Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/reports/book-value-depreciation')
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.asset_code', 'IT-001');
+})->group('book-value-depreciation-reports');
+
 test('it can export the report data to excel', function () {
     Carbon::setTestNow(Carbon::parse('2026-01-01 10:00:00'));
     Excel::fake();

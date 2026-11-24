@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { cn, formatCurrency } from '@/lib/utils';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
@@ -48,13 +49,18 @@ export const financialPositionSectionConfigs: readonly FinancialReportSectionCon
         { title: 'Equity', metric: 'equity' },
     ];
 
-export const getChangeTextClass = (value: number): string => {
+export const getChangeTextClass = (
+    value: number,
+    metric: FinancialReportMetric = 'assets',
+): string => {
     if (value < 0) {
         return 'text-destructive-foreground';
     }
 
     if (value > 0) {
-        return 'text-success';
+        return metric === 'liabilities' || metric === 'equity'
+            ? 'text-foreground'
+            : 'text-success';
     }
 
     return 'text-muted-foreground';
@@ -106,15 +112,20 @@ function AccountRow({
     node,
     isExpanded = true,
     showComparison = false,
+    metric = 'assets',
+    compactIndent = false,
 }: Readonly<{
     node: ReportAccountNode;
     isExpanded?: boolean;
     showComparison?: boolean;
+    metric?: FinancialReportMetric;
+    compactIndent?: boolean;
 }>) {
     const [expanded, setExpanded] = useState(isExpanded);
+    const isMobile = useIsMobile();
     const hasChildren = node.children && node.children.length > 0;
     const changeValue = node.change || 0;
-    const changeTextClass = getChangeTextClass(changeValue);
+    const changeTextClass = getChangeTextClass(changeValue, metric);
     const expandIcon = expanded ? (
         <ChevronDown className="h-4 w-4 text-muted-foreground" />
     ) : (
@@ -125,26 +136,30 @@ function AccountRow({
         <div className="flex flex-col">
             <div
                 className={cn(
-                    'flex min-w-max items-center gap-2 border-b border-border/40 px-2 py-2 text-sm hover:bg-muted/40',
+                    'flex w-full items-center gap-2 border-b border-border/40 px-2 py-2 text-sm hover:bg-muted/40 md:w-auto md:min-w-max',
                     hasChildren && 'bg-muted/20 font-semibold',
                 )}
             >
                 <button
                     type="button"
-                    className="flex flex-1 cursor-pointer items-center gap-2 text-left"
+                    className="flex min-w-[10rem] flex-1 cursor-pointer items-start gap-2 text-left md:items-center"
                     onClick={() => hasChildren && setExpanded(!expanded)}
-                    style={{ paddingLeft: `${(node.level - 1) * 1.5}rem` }}
+                    style={{
+                        paddingLeft: `${(node.level - 1) * (isMobile && compactIndent ? 0.375 : 1.5)}rem`,
+                    }}
                 >
                     {hasChildren ? expandIcon : <div className="w-4" />}
                     <span className="font-mono text-xs whitespace-nowrap text-muted-foreground">
                         {node.code}
                     </span>
-                    <span className="truncate">{node.name}</span>
+                    <span className="min-w-0 break-words md:truncate">
+                        {node.name}
+                    </span>
                 </button>
-                <div className="flex gap-4 text-right tabular-nums">
+                <div className="flex shrink-0 gap-2 text-right tabular-nums sm:gap-4">
                     <div
                         className={cn(
-                            'w-36',
+                            'w-28 shrink-0 md:w-36',
                             getSignedAmountTextClass(node.balance),
                         )}
                     >
@@ -154,7 +169,7 @@ function AccountRow({
                         <>
                             <div
                                 className={cn(
-                                    'w-36 text-muted-foreground',
+                                    'w-28 shrink-0 text-muted-foreground md:w-36',
                                     getSignedAmountTextClass(
                                         node.comparison_balance || 0,
                                     ),
@@ -162,12 +177,17 @@ function AccountRow({
                             >
                                 {formatCurrency(node.comparison_balance || 0)}
                             </div>
-                            <div className={cn('w-28', changeTextClass)}>
+                            <div
+                                className={cn(
+                                    'w-24 shrink-0 md:w-28',
+                                    changeTextClass,
+                                )}
+                            >
                                 {formatCurrency(changeValue)}
                             </div>
                             <div
                                 className={cn(
-                                    'w-16',
+                                    'w-14 shrink-0 md:w-16',
                                     getChangePercentageTextClass(
                                         node.change_percentage,
                                         node.comparison_balance,
@@ -190,6 +210,8 @@ function AccountRow({
                             key={child.id}
                             node={child}
                             showComparison={showComparison}
+                            metric={metric}
+                            compactIndent={compactIndent}
                         />
                     ))}
                 </div>
@@ -206,6 +228,8 @@ export function FinancialReportSection({
     change,
     changePercentage,
     showComparison,
+    metric = 'assets',
+    compactIndent = false,
 }: Readonly<{
     title: string;
     nodes: ReportAccountNode[];
@@ -214,11 +238,13 @@ export function FinancialReportSection({
     change?: number;
     changePercentage?: number;
     showComparison?: boolean;
+    metric?: FinancialReportMetric;
+    compactIndent?: boolean;
 }>) {
     const [expandAll, setExpandAll] = useState(true);
     const [expandKey, setExpandKey] = useState(0);
     const changeValue = change || 0;
-    const changeTextClass = getChangeTextClass(changeValue);
+    const changeTextClass = getChangeTextClass(changeValue, metric);
 
     const setExpanded = (value: Readonly<boolean>) => {
         setExpandAll(value);
@@ -253,7 +279,7 @@ export function FinancialReportSection({
                     <div className="flex w-full flex-wrap justify-between gap-2 text-right whitespace-nowrap tabular-nums sm:w-auto sm:flex-nowrap sm:justify-end sm:gap-4">
                         <span
                             className={cn(
-                                'text-lg font-bold sm:w-48',
+                                'w-28 text-lg font-bold md:w-36',
                                 getSignedAmountTextClass(total),
                             )}
                         >
@@ -263,7 +289,7 @@ export function FinancialReportSection({
                             <>
                                 <span
                                     className={cn(
-                                        'text-lg font-bold text-muted-foreground sm:w-48',
+                                        'w-28 text-lg font-bold text-muted-foreground md:w-36',
                                         getSignedAmountTextClass(
                                             comparisonTotal || 0,
                                         ),
@@ -273,7 +299,7 @@ export function FinancialReportSection({
                                 </span>
                                 <span
                                     className={cn(
-                                        'text-lg font-bold sm:w-40',
+                                        'w-24 text-lg font-bold md:w-28',
                                         changeTextClass,
                                     )}
                                 >
@@ -281,7 +307,7 @@ export function FinancialReportSection({
                                 </span>
                                 <span
                                     className={cn(
-                                        'text-lg font-bold sm:w-24',
+                                        'w-14 text-lg font-bold md:w-16',
                                         getChangePercentageTextClass(
                                             changePercentage,
                                             comparisonTotal,
@@ -306,22 +332,32 @@ export function FinancialReportSection({
                 ) : (
                     <div className="overflow-hidden rounded-md border">
                         <div className="max-h-[60vh] w-full min-w-0 overflow-auto">
-                            <div className="sticky top-0 z-10 flex min-w-max items-center border-b bg-background px-2 py-2 text-xs font-medium text-muted-foreground">
+                            <div
+                                className={cn(
+                                    'sticky top-0 z-10 flex w-full items-center border-b bg-background px-2 py-2 text-xs font-medium text-muted-foreground md:w-auto md:min-w-max',
+                                )}
+                            >
                                 {/* Spacer selebar ikon expand agar label
                                     sejajar dengan teks baris (W5-12). */}
-                                <div className="flex min-w-40 flex-1 items-center gap-2">
+                                <div className="flex min-w-[10rem] flex-1 items-center gap-2 md:min-w-40">
                                     <div className="w-4" aria-hidden />
                                     <span>Account</span>
                                 </div>
-                                <div className="flex gap-4 text-right tabular-nums">
-                                    <div className="w-36">Current</div>
+                                <div className="flex shrink-0 gap-2 text-right tabular-nums sm:gap-4">
+                                    <div className="w-28 shrink-0 md:w-36">
+                                        Current
+                                    </div>
                                     {showComparison && (
                                         <>
-                                            <div className="w-36">
+                                            <div className="w-28 shrink-0 md:w-36">
                                                 Comparison
                                             </div>
-                                            <div className="w-28">Change</div>
-                                            <div className="w-16">%</div>
+                                            <div className="w-24 shrink-0 md:w-28">
+                                                Change
+                                            </div>
+                                            <div className="w-14 shrink-0 md:w-16">
+                                                %
+                                            </div>
                                         </>
                                     )}
                                 </div>
@@ -330,8 +366,9 @@ export function FinancialReportSection({
                                 <AccountRow
                                     key={`${expandKey}-${node.id}`}
                                     node={node}
-                                    isExpanded={expandAll}
                                     showComparison={showComparison}
+                                    metric={metric}
+                                    compactIndent={compactIndent}
                                 />
                             ))}
                         </div>
@@ -348,12 +385,14 @@ export function ComparisonFinancialReportSection({
     nodes,
     totals,
     showComparison = false,
+    compactIndent = false,
 }: Readonly<{
     title: string;
     metric: FinancialReportMetric;
     nodes: ReportAccountNode[];
     totals: FinancialReportTotals;
     showComparison?: boolean;
+    compactIndent?: boolean;
 }>) {
     return (
         <FinancialReportSection
@@ -364,6 +403,8 @@ export function ComparisonFinancialReportSection({
             change={totals[`change_${metric}`]}
             changePercentage={totals[`change_percentage_${metric}`]}
             showComparison={showComparison}
+            metric={metric}
+            compactIndent={compactIndent}
         />
     );
 }
@@ -374,12 +415,14 @@ export function ComparisonFinancialReportSectionGroup({
     totals,
     showComparison = false,
     className,
+    compactIndent = false,
 }: Readonly<{
     sections: readonly FinancialReportSectionConfig[];
     report: FinancialReportSectionGroupReport;
     totals: FinancialReportTotals;
     showComparison?: boolean;
     className?: string;
+    compactIndent?: boolean;
 }>) {
     const content = sections.map(({ title, metric }) => (
         <ComparisonFinancialReportSection
@@ -389,6 +432,7 @@ export function ComparisonFinancialReportSectionGroup({
             nodes={report[metric] || []}
             totals={totals}
             showComparison={showComparison}
+            compactIndent={compactIndent}
         />
     ));
 

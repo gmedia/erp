@@ -223,7 +223,9 @@ test.describe('Admin Settings', () => {
         await expect(logoInput).toHaveAttribute('accept', '.svg,image/svg+xml');
 
         // Helper text should be visible
-        await expect(page.getByText(/Upload file SVG/)).toBeVisible();
+        await expect(
+            page.getByText(/Upload (an SVG file|file SVG)/),
+        ).toBeVisible();
     });
 
     test('can upload company logo', async ({ page }) => {
