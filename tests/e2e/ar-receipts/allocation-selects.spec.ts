@@ -65,7 +65,7 @@ async function seedAllocationFixtures(page: Page): Promise<SeedResult> {
         }];
 
         const createInvoice = async (
-            status: 'draft' | 'sent' | 'paid',
+            status: 'draft' | 'sent',
             targetCustomerId: number = customerId,
         ) => {
             const created = await (await fetch('/api/customer-invoices', {
@@ -98,26 +98,39 @@ async function seedAllocationFixtures(page: Page): Promise<SeedResult> {
 
         const sent = await createInvoice('sent');
         const draft = await createInvoice('draft');
-        const paid = await createInvoice('paid');
+        const paid = await createInvoice('sent');
         const otherCustomer = await createInvoice('sent', otherCustomerId);
 
-        const receiptResponse = await fetch('/api/ar-receipts', {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({
-                customer_id: customerId,
-                branch_id: branchId,
-                fiscal_year_id: fiscalYearId,
-                receipt_date: today,
-                payment_method: 'bank_transfer',
-                bank_account_id: accountId,
-                currency: 'IDR',
-                total_amount: 300000,
-                status: 'draft',
-                allocations: [{ customer_invoice_id: sent.id, allocated_amount: 300000 }],
-            }),
-        });
-        const receiptPayload = await receiptResponse.json();
+        const createReceipt = async (
+            status: 'draft' | 'confirmed',
+            invoiceId: number,
+            amount: number,
+        ) => {
+            const response = await fetch('/api/ar-receipts', {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({
+                    customer_id: customerId,
+                    branch_id: branchId,
+                    fiscal_year_id: fiscalYearId,
+                    receipt_date: today,
+                    payment_method: 'bank_transfer',
+                    bank_account_id: accountId,
+                    currency: 'IDR',
+                    total_amount: amount,
+                    status,
+                    allocations: [{ customer_invoice_id: invoiceId, allocated_amount: amount }],
+                }),
+            });
+            if (!response.ok) {
+                throw new Error(`receipt ${status} gagal: ${response.status}`);
+            }
+            return response.json();
+        };
+
+        // Faktur menjadi lunas lewat pembayaran terkonfirmasi, bukan lewat status langsung.
+        await createReceipt('confirmed', paid.id, 1000000);
+        const receiptPayload = await createReceipt('draft', sent.id, 300000);
 
         return {
             customerId,

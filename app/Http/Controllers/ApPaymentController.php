@@ -16,7 +16,6 @@ use App\Http\Requests\ApPayments\UpdateApPaymentRequest;
 use App\Http\Resources\ApPayments\ApPaymentCollection;
 use App\Http\Resources\ApPayments\ApPaymentResource;
 use App\Models\ApPayment;
-use App\Models\ApPaymentAllocation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -100,41 +99,51 @@ class ApPaymentController extends Controller
             $validated['approved_at'] = null;
         }
 
-        $this->updateWithSyncedItems(
-            model: $apPayment,
-            attributes: $validated,
-            items: $allocations,
-            payloadResolver: static function (array $attributes): array {
-                return UpdateApPaymentData::fromArray($attributes)->toArray();
-            },
-            syncItems: function (ApPayment $apPayment, array $allocations) use ($syncAllocations): void {
-                $syncAllocations->execute($apPayment, $allocations);
-            },
-            afterCommit: $isNewlyConfirmed
-                ? function (ApPayment $apPayment) use ($postJournal): void {
-                    $postJournal->execute($apPayment->refresh());
-                }
-            : null,
-        );
+        DB::transaction(function () use (
+            $apPayment,
+            $validated,
+            $allocations,
+            $syncAllocations,
+            $postJournal,
+            $isNewlyConfirmed
+        ): void {
+            $this->updateWithSyncedItems(
+                model: $apPayment,
+                attributes: $validated,
+                items: $allocations,
+                payloadResolver: static function (array $attributes): array {
+                    return UpdateApPaymentData::fromArray($attributes)->toArray();
+                },
+                syncItems: function (ApPayment $apPayment, array $allocations) use ($syncAllocations): void {
+                    $syncAllocations->execute($apPayment, $allocations);
+                },
+                afterCommit: $isNewlyConfirmed
+                    ? function (ApPayment $apPayment) use ($postJournal): void {
+                        $postJournal->execute($apPayment->refresh());
+                    }
+                : null,
+            );
+
+            if ($allocations === null && $isNewlyConfirmed) {
+                $syncAllocations->assertStoredWithinOutstanding($apPayment->refresh());
+            }
+
+            // Status-only change (e.g. cancel/void) must still release bill balances
+            // that were counted from this payment.
+            if ($allocations === null) {
+                $syncAllocations->refreshBills($apPayment->allocations()->pluck('supplier_bill_id'));
+            }
+        });
 
         return (new ApPaymentResource($this->loadResourceRelations($apPayment)))->response();
     }
 
-    public function destroy(ApPayment $apPayment): JsonResponse
+    public function destroy(ApPayment $apPayment, SyncApPaymentAllocationsAction $syncAllocations): JsonResponse
     {
-        DB::transaction(function () use ($apPayment): void {
-            /** @var ApPaymentAllocation $allocation */
-            foreach ($apPayment->allocations()->with('supplierBill')->get() as $allocation) {
-                $bill = $allocation->supplierBill;
-
-                $newAmountPaid = (float) $bill->amount_paid - (float) $allocation->allocated_amount;
-                $bill->update([
-                    'amount_paid' => (string) max(0, $newAmountPaid),
-                    'amount_due' => (string) ((float) $bill->grand_total - max(0, $newAmountPaid)),
-                ]);
-                $bill->updatePaymentStatus();
-            }
+        DB::transaction(function () use ($apPayment, $syncAllocations): void {
+            $billIds = $apPayment->allocations()->pluck('supplier_bill_id');
             $apPayment->delete();
+            $syncAllocations->refreshBills($billIds);
         });
 
         return response()->json(null, 204);
