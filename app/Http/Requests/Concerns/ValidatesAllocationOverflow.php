@@ -40,7 +40,7 @@ trait ValidatesAllocationOverflow
             if ($consumed > $maxAllocation) {
                 $validator->errors()->add(
                     "{$inputKey}.{$index}.allocated_amount",
-                    $errorMessagePrefix.': '.$maxAllocation,
+                    $errorMessagePrefix . ': ' . $maxAllocation,
                 );
             }
         }
