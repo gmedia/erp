@@ -82,8 +82,6 @@ abstract class AbstractPurchaseOrderRequest extends AuthorizedFormRequest
             ]),
             'notes' => $this->withSometimes(['nullable', 'string']),
             'shipping_address' => $this->withSometimes(['nullable', 'string']),
-            'approved_by' => $this->withSometimes(['nullable', 'integer', 'exists:users,id']),
-            'approved_at' => $this->withSometimes(['nullable', 'date']),
             ...$this->totalAmountRules(),
 
             'items' => $this->itemsRules(),

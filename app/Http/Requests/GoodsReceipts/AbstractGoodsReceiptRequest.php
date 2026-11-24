@@ -70,8 +70,6 @@ abstract class AbstractGoodsReceiptRequest extends AuthorizedFormRequest
             'status' => $this->withSometimes(['required', 'string', 'in:draft,confirmed,cancelled']),
             'notes' => $this->withSometimes(['nullable', 'string']),
             'received_by' => $this->withSometimes(['nullable', 'integer', 'exists:employees,id']),
-            'confirmed_by' => $this->withSometimes(['nullable', 'integer', 'exists:users,id']),
-            'confirmed_at' => $this->withSometimes(['nullable', 'date']),
 
             'items' => $this->itemsRules(),
             'items.*.purchase_order_item_id' => $this->requiredIntegerItemRule('exists:purchase_order_items,id'),

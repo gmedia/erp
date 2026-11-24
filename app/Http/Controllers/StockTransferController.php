@@ -142,6 +142,9 @@ class StockTransferController extends Controller
                 $this->assertDispatchedItemsUnchanged($stockTransfer, $items);
             }
 
+            // Issue #436: jejak approved/shipped/received diisi server saat transisi, bukan payload.
+            $validated = array_merge($validated, $this->workflowStampsFor($stockTransfer, $nextStatus));
+
             $stockTransfer->update(UpdateStockTransferData::fromArray($validated)->toArray());
 
             // Issue #360 baris 4: pembatalan transfer yang sudah terposting membalik stok,
@@ -204,6 +207,32 @@ class StockTransferController extends Controller
     public function export(ExportStockTransferRequest $request, ExportStockTransfersAction $action): JsonResponse
     {
         return $action->execute($request);
+    }
+
+    /**
+     * Stempel jejak alur (Issue #436). Hanya diisi server saat kolom masih kosong.
+     *
+     * @return array<string, mixed>
+     */
+    private function workflowStampsFor(StockTransfer $stockTransfer, string $nextStatus): array
+    {
+        $now = now()->toIso8601String();
+        $userId = Auth::id();
+        $stamps = [];
+
+        if ($nextStatus === 'approved' && $stockTransfer->approved_at === null) {
+            $stamps += ['approved_by' => $userId, 'approved_at' => $now];
+        }
+
+        if ($nextStatus === 'in_transit' && $stockTransfer->shipped_at === null) {
+            $stamps += ['shipped_by' => $userId, 'shipped_at' => $now];
+        }
+
+        if ($nextStatus === 'received' && $stockTransfer->received_at === null) {
+            $stamps += ['received_by' => $userId, 'received_at' => $now];
+        }
+
+        return $stamps;
     }
 
     private function assertTransitionAllowed(string $from, string $to): void

@@ -65,8 +65,6 @@ abstract class AbstractPurchaseRequestRequest extends AuthorizedFormRequest
             ]),
             'estimated_amount' => $this->withSometimes(['nullable', 'numeric', 'min:0']),
             'notes' => $this->withSometimes(['nullable', 'string']),
-            'approved_by' => $this->withSometimes(['nullable', 'integer', 'exists:users,id']),
-            'approved_at' => $this->withSometimes(['nullable', 'date']),
             'rejection_reason' => $this->withSometimes(['nullable', 'string']),
 
             'items' => $this->itemsRules(),
