@@ -8,6 +8,7 @@ use App\Models\FiscalYear;
 use App\Models\GoodsReceipt;
 use App\Models\GoodsReceiptItem;
 use App\Models\JournalEntry;
+use App\Models\PurchaseOrder;
 use App\Models\StockMovement;
 use App\Models\SupplierReturn;
 use App\Models\SupplierReturnItem;
@@ -259,7 +260,10 @@ test('GoodsReceiptController update triggers journal posting on confirm transiti
     makeGrSrPostingFiscalYear();
     makeGrSrPostingAccounts();
 
+    $purchaseOrder = PurchaseOrder::factory()->create(['status' => 'confirmed']);
+
     $gr = GoodsReceipt::factory()->create([
+        'purchase_order_id' => $purchaseOrder->id,
         'status' => 'draft',
         'gr_number' => 'GR-2026-000003',
         'receipt_date' => '2026-03-15',
