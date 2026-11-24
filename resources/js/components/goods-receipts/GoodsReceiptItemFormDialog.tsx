@@ -15,32 +15,41 @@ import {
     formatSourceLineLabel,
     ItemSourceLineSelectField,
 } from '@/components/common/ItemSourceLineSelectField';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type GoodsReceiptFormData } from '@/types/goods-receipt';
 
-const goodsReceiptItemSchema = z.object({
-    purchase_order_item_id: z
-        .string()
-        .min(1, { message: 'PO Item is required.' }),
-    purchase_order_item_label: z.string().optional(),
-    product_id: z.string().min(1, { message: 'Product is required.' }),
-    product_label: z.string().optional(),
-    unit_id: z.string().min(1, { message: 'Unit is required.' }),
-    unit_label: z.string().optional(),
-    quantity_received: z.coerce
-        .number()
-        .gt(0, { message: 'Quantity received must be greater than 0.' }),
-    quantity_accepted: z.coerce
-        .number()
-        .min(0, { message: 'Quantity accepted must be at least 0.' }),
-    quantity_rejected: z.coerce.number().min(0).optional().default(0),
-    unit_price: z.coerce
-        .number()
-        .min(0, { message: 'Unit price must be at least 0.' }),
-    notes: z.string().optional(),
-});
-
 type GoodsReceiptItemFormData = GoodsReceiptFormData['items'][number];
+
+function buildGoodsReceiptItemSchema(
+    t: (key: string, params?: Record<string, string>) => string,
+) {
+    return z.object({
+        purchase_order_item_id: z.string().min(1, {
+            message: t('goodsReceipt.item.po_item_required'),
+        }),
+        purchase_order_item_label: z.string().optional(),
+        product_id: z.string().min(1, {
+            message: t('goodsReceipt.item.product_required'),
+        }),
+        product_label: z.string().optional(),
+        unit_id: z.string().min(1, {
+            message: t('goodsReceipt.item.unit_required'),
+        }),
+        unit_label: z.string().optional(),
+        quantity_received: z.coerce.number().gt(0, {
+            message: t('goodsReceipt.item.quantity_received_positive'),
+        }),
+        quantity_accepted: z.coerce.number().min(0, {
+            message: t('goodsReceipt.item.quantity_accepted_min'),
+        }),
+        quantity_rejected: z.coerce.number().min(0).optional().default(0),
+        unit_price: z.coerce.number().min(0, {
+            message: t('goodsReceipt.item.unit_price_min'),
+        }),
+        notes: z.string().optional(),
+    });
+}
 
 interface GoodsReceiptItemFormDialogProps {
     readonly open: boolean;
@@ -57,6 +66,11 @@ export function GoodsReceiptItemFormDialog({
     onSave,
     purchaseOrderId,
 }: GoodsReceiptItemFormDialogProps) {
+    const { t } = useTranslation();
+    const goodsReceiptItemSchema = useMemo(
+        () => buildGoodsReceiptItemSchema(t),
+        [t],
+    );
     const defaultValues = useMemo<GoodsReceiptItemFormData>(() => {
         if (!item) {
             return {
@@ -111,7 +125,9 @@ export function GoodsReceiptItemFormDialog({
             item={item}
             form={form}
             onSave={onSave}
-            itemDescription="goods receipt item"
+            itemDescription={t('goodsReceipt.item.description')}
+            titleLabel={t('goodsReceipt.item.title_label')}
+            actionLabel={t('goodsReceipt.item.title_label')}
         >
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <ItemSourceLineSelectField
@@ -122,9 +138,9 @@ export function GoodsReceiptItemFormDialog({
                             ? `/api/purchase-orders/${purchaseOrderId}/item-options${item?.purchase_order_item_id ? `?current_line_id=${item.purchase_order_item_id}` : ''}`
                             : null
                     }
-                    label="PO Item"
-                    placeholder="Select PO item"
-                    emptyHint="Select a purchase order first."
+                    label={t('goodsReceipt.item.po_item')}
+                    placeholder={t('goodsReceipt.item.po_item_placeholder')}
+                    emptyHint={t('goodsReceipt.item.po_item_empty_hint')}
                     initialId={defaultValues.purchase_order_item_id}
                     initialLabel={defaultValues.purchase_order_item_label}
                     onLineSelect={(line) => {
@@ -172,7 +188,7 @@ export function GoodsReceiptItemFormDialog({
                 />
                 <InputField
                     name="quantity_received"
-                    label="Quantity Received"
+                    label={t('goodsReceipt.item.quantity_received')}
                     type="number"
                     min={0}
                     step="any"
@@ -180,7 +196,7 @@ export function GoodsReceiptItemFormDialog({
                 />
                 <InputField
                     name="quantity_accepted"
-                    label="Quantity Accepted"
+                    label={t('goodsReceipt.item.quantity_accepted')}
                     type="number"
                     min={0}
                     step="any"
@@ -188,7 +204,7 @@ export function GoodsReceiptItemFormDialog({
                 />
                 <InputField
                     name="quantity_rejected"
-                    label="Quantity Rejected"
+                    label={t('goodsReceipt.item.quantity_rejected')}
                     type="number"
                     min={0}
                     step="any"
@@ -196,7 +212,7 @@ export function GoodsReceiptItemFormDialog({
                 />
                 <InputField
                     name="unit_price"
-                    label="Unit Price"
+                    label={t('goodsReceipt.item.unit_price')}
                     type="number"
                     min={0}
                     step="any"
@@ -204,7 +220,10 @@ export function GoodsReceiptItemFormDialog({
                 />
             </div>
 
-            <ItemNotesField />
+            <ItemNotesField
+                label={t('goodsReceipt.item.notes')}
+                placeholder={t('goodsReceipt.item.notes_placeholder')}
+            />
         </ItemFormDialogShell>
     );
 }

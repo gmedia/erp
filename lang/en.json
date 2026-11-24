@@ -318,5 +318,47 @@
         "notifications_enabling": "Enabling notifications...",
         "notifications_denied": "Notification permission denied.",
         "notifications_failed": "Failed to enable notifications."
+    },
+    "itemForm": {
+        "account": "Account",
+        "account_placeholder": "Select Account"
+    },
+    "goodsReceipt": {
+        "item": {
+            "title_label": "Item",
+            "description": "goods receipt item",
+            "po_item": "PO Item",
+            "po_item_placeholder": "Select PO item",
+            "po_item_empty_hint": "Select a purchase order first.",
+            "po_item_required": "PO Item is required.",
+            "product_required": "Product is required.",
+            "unit_required": "Unit is required.",
+            "quantity_received": "Quantity Received",
+            "quantity_received_positive": "Quantity received must be greater than 0.",
+            "quantity_accepted": "Quantity Accepted",
+            "quantity_accepted_min": "Quantity accepted must be at least 0.",
+            "quantity_rejected": "Quantity Rejected",
+            "unit_price": "Unit Price",
+            "unit_price_min": "Unit price must be at least 0.",
+            "notes": "Notes",
+            "notes_placeholder": "Item notes"
+        }
+    },
+    "supplierReturn": {
+        "item": {
+            "title_label": "Item",
+            "description": "supplier return item",
+            "gr_item": "GR Item",
+            "gr_item_placeholder": "Select GR item",
+            "gr_item_empty_hint": "Select a goods receipt first.",
+            "gr_item_required": "GR item is required.",
+            "product_required": "Product is required.",
+            "quantity_returned": "Quantity Returned",
+            "quantity_returned_positive": "Quantity returned must be greater than 0.",
+            "unit_price": "Unit Price",
+            "unit_price_min": "Unit price must be at least 0.",
+            "notes": "Notes",
+            "notes_placeholder": "Item notes"
+        }
     }
 }

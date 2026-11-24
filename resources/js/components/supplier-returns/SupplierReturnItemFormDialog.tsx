@@ -15,28 +15,35 @@ import {
     formatSourceLineLabel,
     ItemSourceLineSelectField,
 } from '@/components/common/ItemSourceLineSelectField';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type SupplierReturnFormData } from '@/types/supplier-return';
 
-const supplierReturnItemSchema = z.object({
-    goods_receipt_item_id: z
-        .string()
-        .min(1, { message: 'GR item is required.' }),
-    goods_receipt_item_label: z.string().optional(),
-    product_id: z.string().min(1, { message: 'Product is required.' }),
-    product_label: z.string().optional(),
-    unit_id: z.string().optional(),
-    unit_label: z.string().optional(),
-    quantity_returned: z.coerce
-        .number()
-        .gt(0, { message: 'Quantity returned must be greater than 0.' }),
-    unit_price: z.coerce
-        .number()
-        .min(0, { message: 'Unit price must be at least 0.' }),
-    notes: z.string().optional(),
-});
-
 type SupplierReturnItemFormData = SupplierReturnFormData['items'][number];
+
+function buildSupplierReturnItemSchema(
+    t: (key: string, params?: Record<string, string>) => string,
+) {
+    return z.object({
+        goods_receipt_item_id: z.string().min(1, {
+            message: t('supplierReturn.item.gr_item_required'),
+        }),
+        goods_receipt_item_label: z.string().optional(),
+        product_id: z.string().min(1, {
+            message: t('supplierReturn.item.product_required'),
+        }),
+        product_label: z.string().optional(),
+        unit_id: z.string().optional(),
+        unit_label: z.string().optional(),
+        quantity_returned: z.coerce.number().gt(0, {
+            message: t('supplierReturn.item.quantity_returned_positive'),
+        }),
+        unit_price: z.coerce.number().min(0, {
+            message: t('supplierReturn.item.unit_price_min'),
+        }),
+        notes: z.string().optional(),
+    });
+}
 
 interface SupplierReturnItemFormDialogProps {
     readonly open: boolean;
@@ -53,6 +60,11 @@ export function SupplierReturnItemFormDialog({
     onSave,
     goodsReceiptId,
 }: SupplierReturnItemFormDialogProps) {
+    const { t } = useTranslation();
+    const supplierReturnItemSchema = useMemo(
+        () => buildSupplierReturnItemSchema(t),
+        [t],
+    );
     const defaultValues = useMemo<SupplierReturnItemFormData>(() => {
         if (!item) {
             return {
@@ -103,7 +115,9 @@ export function SupplierReturnItemFormDialog({
             item={item}
             form={form}
             onSave={onSave}
-            itemDescription="supplier return item"
+            itemDescription={t('supplierReturn.item.description')}
+            titleLabel={t('supplierReturn.item.title_label')}
+            actionLabel={t('supplierReturn.item.title_label')}
         >
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <ItemSourceLineSelectField
@@ -114,9 +128,9 @@ export function SupplierReturnItemFormDialog({
                             ? `/api/goods-receipts/${goodsReceiptId}/item-options${item?.goods_receipt_item_id ? `?current_line_id=${item.goods_receipt_item_id}` : ''}`
                             : null
                     }
-                    label="GR Item"
-                    placeholder="Select GR item"
-                    emptyHint="Select a goods receipt first."
+                    label={t('supplierReturn.item.gr_item')}
+                    placeholder={t('supplierReturn.item.gr_item_placeholder')}
+                    emptyHint={t('supplierReturn.item.gr_item_empty_hint')}
                     initialId={defaultValues.goods_receipt_item_id}
                     initialLabel={defaultValues.goods_receipt_item_label}
                     onLineSelect={(line) => {
@@ -164,7 +178,7 @@ export function SupplierReturnItemFormDialog({
                 />
                 <InputField
                     name="quantity_returned"
-                    label="Quantity Returned"
+                    label={t('supplierReturn.item.quantity_returned')}
                     type="number"
                     min={0}
                     step="any"
@@ -172,7 +186,7 @@ export function SupplierReturnItemFormDialog({
                 />
                 <InputField
                     name="unit_price"
-                    label="Unit Price"
+                    label={t('supplierReturn.item.unit_price')}
                     type="number"
                     min={0}
                     step="any"
@@ -180,7 +194,10 @@ export function SupplierReturnItemFormDialog({
                 />
             </div>
 
-            <ItemNotesField />
+            <ItemNotesField
+                label={t('supplierReturn.item.notes')}
+                placeholder={t('supplierReturn.item.notes_placeholder')}
+            />
         </ItemFormDialogShell>
     );
 }

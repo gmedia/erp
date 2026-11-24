@@ -20,6 +20,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Form } from '@/components/ui/form';
+import { useTranslation } from '@/contexts/i18n-context';
 
 interface ItemFormDialogShellProps<TFormValues extends FieldValues> {
     readonly open: boolean;
@@ -191,13 +192,15 @@ export function ItemAccountSelectField<TFormValues extends FieldValues>({
     initialId,
     initialLabel,
 }: Readonly<ItemAccountSelectFieldProps<TFormValues>>) {
+    const { t } = useTranslation();
+
     return (
         <AsyncSelectField<ItemAccountOption>
             key={buildAsyncFieldKey(String(name), initialId, open)}
             name={String(name)}
-            label="Account"
+            label={t('itemForm.account')}
             url={ITEM_ACCOUNT_URL}
-            placeholder="Select Account"
+            placeholder={t('itemForm.account_placeholder')}
             labelFn={(account) => `${account.code} - ${account.name}`}
             valueFn={(account) => String(account.id)}
             initialLabel={initialLabel}

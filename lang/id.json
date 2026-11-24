@@ -318,5 +318,47 @@
         "notifications_enabling": "Mengaktifkan notifikasi...",
         "notifications_denied": "Izin notifikasi ditolak.",
         "notifications_failed": "Gagal mengaktifkan notifikasi."
+    },
+    "itemForm": {
+        "account": "Akun",
+        "account_placeholder": "Pilih Akun"
+    },
+    "goodsReceipt": {
+        "item": {
+            "title_label": "Item",
+            "description": "item penerimaan barang",
+            "po_item": "Item PO",
+            "po_item_placeholder": "Pilih item PO",
+            "po_item_empty_hint": "Pilih pesanan pembelian terlebih dahulu.",
+            "po_item_required": "Item PO wajib dipilih.",
+            "product_required": "Produk wajib dipilih.",
+            "unit_required": "Satuan wajib dipilih.",
+            "quantity_received": "Jumlah Diterima",
+            "quantity_received_positive": "Jumlah diterima harus lebih dari 0.",
+            "quantity_accepted": "Jumlah Diterima Baik",
+            "quantity_accepted_min": "Jumlah diterima baik minimal 0.",
+            "quantity_rejected": "Jumlah Ditolak",
+            "unit_price": "Harga Satuan",
+            "unit_price_min": "Harga satuan minimal 0.",
+            "notes": "Catatan",
+            "notes_placeholder": "Catatan item"
+        }
+    },
+    "supplierReturn": {
+        "item": {
+            "title_label": "Item",
+            "description": "item retur pemasok",
+            "gr_item": "Item GR",
+            "gr_item_placeholder": "Pilih item GR",
+            "gr_item_empty_hint": "Pilih penerimaan barang terlebih dahulu.",
+            "gr_item_required": "Item GR wajib dipilih.",
+            "product_required": "Produk wajib dipilih.",
+            "quantity_returned": "Jumlah Diretur",
+            "quantity_returned_positive": "Jumlah retur harus lebih dari 0.",
+            "unit_price": "Harga Satuan",
+            "unit_price_min": "Harga satuan minimal 0.",
+            "notes": "Catatan",
+            "notes_placeholder": "Catatan item"
+        }
     }
 }
