@@ -17,6 +17,7 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class AssetMovementController extends Controller
 {
@@ -55,40 +56,47 @@ class AssetMovementController extends Controller
 
     public function store(StoreAssetMovementRequest $request): JsonResponse
     {
-        return DB::transaction(function () use ($request) {
-            $asset = Asset::findOrFail($request->asset_id);
+        $document = $this->storeDocument($request->file('document'));
 
-            $validated = $request->validated();
-            unset($validated['document']);
-            $document = $this->storeDocument($request->file('document'));
+        try {
+            return DB::transaction(function () use ($request, $document) {
+                $asset = Asset::findOrFail($request->asset_id);
 
-            $movement = AssetMovement::create([
-                ...$validated,
-                'from_branch_id' => $asset->branch_id,
-                'from_location_id' => $asset->asset_location_id,
-                'from_department_id' => $asset->department_id,
-                'from_employee_id' => $asset->employee_id,
-                'created_by' => Auth::id(),
-                'document_path' => $document['path'] ?? null,
-                'document_name' => $document['name'] ?? null,
-            ]);
+                $validated = $request->validated();
+                unset($validated['document']);
 
-            // Update asset current state
-            $asset->update([
-                'branch_id' => $request->to_branch_id ?? $asset->branch_id,
-                'asset_location_id' => $request->to_location_id ?? $asset->asset_location_id,
-                'department_id' => $request->to_department_id ?? $asset->department_id,
-                'employee_id' => $request->to_employee_id ?? $asset->employee_id,
-            ]);
+                $movement = AssetMovement::create([
+                    ...$validated,
+                    'from_branch_id' => $asset->branch_id,
+                    'from_location_id' => $asset->asset_location_id,
+                    'from_department_id' => $asset->department_id,
+                    'from_employee_id' => $asset->employee_id,
+                    'created_by' => Auth::id(),
+                    'document_path' => $document['path'] ?? null,
+                    'document_name' => $document['name'] ?? null,
+                ]);
 
-            return response()->json([
-                'message' => 'Movement recorded successfully',
-                'data' => new AssetMovementResource($movement->load([
-                    'fromBranch', 'toBranch', 'fromLocation', 'toLocation',
-                    'fromDepartment', 'toDepartment', 'fromEmployee', 'toEmployee', 'createdBy',
-                ])),
-            ], 201);
-        });
+                // Update asset current state
+                $asset->update([
+                    'branch_id' => $request->to_branch_id ?? $asset->branch_id,
+                    'asset_location_id' => $request->to_location_id ?? $asset->asset_location_id,
+                    'department_id' => $request->to_department_id ?? $asset->department_id,
+                    'employee_id' => $request->to_employee_id ?? $asset->employee_id,
+                ]);
+
+                return response()->json([
+                    'message' => 'Movement recorded successfully',
+                    'data' => new AssetMovementResource($movement->load([
+                        'fromBranch', 'toBranch', 'fromLocation', 'toLocation',
+                        'fromDepartment', 'toDepartment', 'fromEmployee', 'toEmployee', 'createdBy',
+                    ])),
+                ], 201);
+            });
+        } catch (Throwable $e) {
+            $this->deleteDocument($document['path'] ?? null);
+
+            throw $e;
+        }
     }
 
     public function show(AssetMovement $asset_movement): JsonResponse
@@ -106,17 +114,26 @@ class AssetMovementController extends Controller
         $validated = $request->validated();
         unset($validated['document']);
 
-        if ($request->hasFile('document')) {
-            if ($asset_movement->document_path) {
-                ExportStorage::disk()->delete($asset_movement->document_path);
-            }
+        $oldDocumentPath = $asset_movement->document_path;
+        $document = $this->storeDocument($request->file('document'));
 
-            $document = $this->storeDocument($request->file('document'));
+        if ($document) {
             $validated['document_path'] = $document['path'];
             $validated['document_name'] = $document['name'];
         }
 
-        $asset_movement->update($validated);
+        try {
+            $asset_movement->update($validated);
+        } catch (Throwable $e) {
+            $this->deleteDocument($document['path'] ?? null);
+
+            throw $e;
+        }
+
+        // Hapus berkas lama hanya setelah perubahan tersimpan.
+        if ($document && $oldDocumentPath) {
+            $this->deleteDocument($oldDocumentPath);
+        }
 
         return response()->json([
             'message' => 'Movement updated successfully',
@@ -193,5 +210,12 @@ class AssetMovementController extends Controller
             'path' => $file->store('asset-movements/documents', ExportStorage::diskName()),
             'name' => $file->getClientOriginalName(),
         ];
+    }
+
+    private function deleteDocument(?string $path): void
+    {
+        if ($path) {
+            ExportStorage::disk()->delete($path);
+        }
     }
 }
