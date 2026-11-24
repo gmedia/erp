@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\SocialAuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -23,6 +24,7 @@ Route::post('social/two-factor/verify', [SocialAuthController::class, 'verifyTwo
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::get('me', [AuthController::class, 'me']);
+    Route::patch('profile', [ProfileController::class, 'update']);
 
     Route::get('social/accounts', [SocialAuthController::class, 'accounts']);
     Route::delete('social/accounts/{socialAccount}', [SocialAuthController::class, 'unlink']);
