@@ -40,7 +40,8 @@ class PostCreditNoteJournalAction
                 ]);
             }
 
-            $arAccount = $this->resolveControlAccount->execute(self::AR_CONTROL_ACCOUNT_CODE);
+            $entryDate = $creditNote->credit_note_date->format('Y-m-d');
+            $arAccount = $this->resolveControlAccount->execute(self::AR_CONTROL_ACCOUNT_CODE, $entryDate);
 
             $debitGrouped = [];
             foreach ($creditNote->items as $item) {
@@ -74,7 +75,7 @@ class PostCreditNoteJournalAction
             ];
 
             $journalEntry = $this->createJournalEntry->execute([
-                'entry_date' => $creditNote->credit_note_date->format('Y-m-d'),
+                'entry_date' => $entryDate,
                 'reference' => $creditNote->credit_note_number,
                 'description' => "Credit Note {$creditNote->credit_note_number}",
                 'status' => 'posted',

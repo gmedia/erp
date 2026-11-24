@@ -59,12 +59,13 @@ class PostStockTransferJournalAction
                 return null;
             }
 
-            $inventoryAccount = $this->resolveControlAccount->execute(self::INVENTORY_ACCOUNT_CODE);
-            $shortageAccount = $this->resolveControlAccount->execute(self::SHORTAGE_EXPENSE_CODE);
+            $entryDate = ($stockTransfer->received_at ?? $stockTransfer->transfer_date)->format('Y-m-d');
+            $inventoryAccount = $this->resolveControlAccount->execute(self::INVENTORY_ACCOUNT_CODE, $entryDate);
+            $shortageAccount = $this->resolveControlAccount->execute(self::SHORTAGE_EXPENSE_CODE, $entryDate);
             $memo = "Transfer {$stockTransfer->transfer_number}";
 
             $journalEntry = $this->createJournalEntry->execute([
-                'entry_date' => ($stockTransfer->received_at ?? $stockTransfer->transfer_date)->format('Y-m-d'),
+                'entry_date' => $entryDate,
                 'reference' => $stockTransfer->transfer_number,
                 'description' => "Selisih transfer {$stockTransfer->transfer_number}",
                 'status' => 'posted',

@@ -93,11 +93,12 @@ class PostAssetAcquisitionJournalAction
                 ->where('end_date', '>=', $purchaseDate->toDateString())
                 ->first();
 
-            $equipment = $this->resolveControlAccount->execute(self::EQUIPMENT_ACCOUNT_CODE);
-
             if ($coveringYear !== null && $coveringYear->isOpen()) {
+                $acquisitionDate = $purchaseDate->toDateString();
+                $equipment = $this->resolveControlAccount->execute(self::EQUIPMENT_ACCOUNT_CODE, $acquisitionDate);
+
                 return $this->createJournalEntry->execute([
-                    'entry_date' => $purchaseDate->toDateString(),
+                    'entry_date' => $acquisitionDate,
                     'reference' => $reference,
                     'description' => "Perolehan aset {$asset->asset_code} - {$asset->name}",
                     'status' => 'posted',
@@ -111,7 +112,7 @@ class PostAssetAcquisitionJournalAction
                             'memo' => 'Perolehan aset tetap',
                         ],
                         [
-                            'account_id' => $this->resolveControlAccount->execute(self::CASH_ACCOUNT_CODE)->id,
+                            'account_id' => $this->resolveControlAccount->execute(self::CASH_ACCOUNT_CODE, $acquisitionDate)->id,
                             'branch_id' => $asset->branch_id,
                             'debit' => 0,
                             'credit' => $amount,
@@ -140,6 +141,8 @@ class PostAssetAcquisitionJournalAction
                 ]);
             }
 
+            $openingEntryDate = $openingDate->toDateString();
+            $equipment = $this->resolveControlAccount->execute(self::EQUIPMENT_ACCOUNT_CODE, $openingEntryDate);
             $accumulated = $this->accumulatedDepreciationUntil($asset, $openingDate, $amount);
             $netBookValue = round($amount - $accumulated, 2);
 
@@ -155,7 +158,7 @@ class PostAssetAcquisitionJournalAction
 
             if ($accumulated > 0) {
                 $lines[] = [
-                    'account_id' => $this->resolveControlAccount->execute(self::ACCUMULATED_DEPRECIATION_ACCOUNT_CODE)->id,
+                    'account_id' => $this->resolveControlAccount->execute(self::ACCUMULATED_DEPRECIATION_ACCOUNT_CODE, $openingEntryDate)->id,
                     'branch_id' => $asset->branch_id,
                     'debit' => 0,
                     'credit' => $accumulated,
@@ -165,7 +168,7 @@ class PostAssetAcquisitionJournalAction
 
             if ($netBookValue > 0) {
                 $lines[] = [
-                    'account_id' => $this->resolveControlAccount->execute(self::RETAINED_EARNINGS_ACCOUNT_CODE)->id,
+                    'account_id' => $this->resolveControlAccount->execute(self::RETAINED_EARNINGS_ACCOUNT_CODE, $openingEntryDate)->id,
                     'branch_id' => $asset->branch_id,
                     'debit' => 0,
                     'credit' => $netBookValue,

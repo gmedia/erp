@@ -45,8 +45,9 @@ class PostSupplierReturnJournalAction
                 ]);
             }
 
-            $inventoryAccount = $this->resolveControlAccount->execute(self::INVENTORY_ACCOUNT_CODE);
-            $fallbackAccount = $this->resolveControlAccount->execute(self::GRIR_CONTROL_ACCOUNT_CODE);
+            $entryDate = $supplierReturn->return_date->format('Y-m-d');
+            $inventoryAccount = $this->resolveControlAccount->execute(self::INVENTORY_ACCOUNT_CODE, $entryDate);
+            $fallbackAccount = $this->resolveControlAccount->execute(self::GRIR_CONTROL_ACCOUNT_CODE, $entryDate);
 
             $memo = "Return {$supplierReturn->return_number}";
             $total = 0.0;
@@ -90,7 +91,7 @@ class PostSupplierReturnJournalAction
             ];
 
             $journalEntry = $this->createJournalEntry->execute([
-                'entry_date' => $supplierReturn->return_date->format('Y-m-d'),
+                'entry_date' => $entryDate,
                 'reference' => $supplierReturn->return_number,
                 'description' => "Supplier Return {$supplierReturn->return_number}",
                 'status' => 'posted',

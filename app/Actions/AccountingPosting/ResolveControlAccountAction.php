@@ -8,17 +8,36 @@ use Illuminate\Validation\ValidationException;
 
 class ResolveControlAccountAction
 {
-    public function execute(string $accountCode): Account
+    /**
+     * Resolve akun kontrol dari COA version yang berlaku untuk tanggal jurnal (#357).
+     *
+     * COA dipilih lewat tahun fiskal yang memuat $entryDate. Bila tahun fiskal itu
+     * tidak punya COA aktif, atau lebih dari satu, posting ditolak dengan 422
+     * agar tidak menebak akun yang salah.
+     */
+    public function execute(string $accountCode, string $entryDate): Account
     {
-        $coaVersion = CoaVersion::where('status', 'active')->first();
+        $coaVersions = CoaVersion::query()
+            ->where('status', 'active')
+            ->whereHas('fiscalYear', fn ($query) => $query
+                ->where('start_date', '<=', $entryDate)
+                ->where('end_date', '>=', $entryDate))
+            ->get();
 
-        if ($coaVersion === null) {
+        if ($coaVersions->isEmpty()) {
             throw ValidationException::withMessages([
-                'coa_version' => 'No active COA version found. Seed or activate a COA version before posting.',
+                'coa_version' => "No active COA version found for date {$entryDate}. Seed or activate a COA version before posting.",
             ]);
         }
 
-        $account = Account::where('coa_version_id', $coaVersion->id)
+        if ($coaVersions->count() > 1) {
+            throw ValidationException::withMessages([
+                'coa_version' => "Multiple active COA versions found for date {$entryDate}. Keep exactly one active COA per fiscal year.",
+            ]);
+        }
+
+        $account = Account::query()
+            ->where('coa_version_id', $coaVersions->first()->id)
             ->where('code', $accountCode)
             ->where('is_active', true)
             ->first();

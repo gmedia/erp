@@ -48,8 +48,9 @@ class PostGoodsReceiptJournalAction
                 ]);
             }
 
-            $inventoryAccount = $this->resolveControlAccount->execute(self::INVENTORY_ACCOUNT_CODE);
-            $grirAccount = $this->resolveControlAccount->execute(self::GRIR_CONTROL_ACCOUNT_CODE);
+            $entryDate = $goodsReceipt->receipt_date->format('Y-m-d');
+            $inventoryAccount = $this->resolveControlAccount->execute(self::INVENTORY_ACCOUNT_CODE, $entryDate);
+            $grirAccount = $this->resolveControlAccount->execute(self::GRIR_CONTROL_ACCOUNT_CODE, $entryDate);
 
             $total = 0.0;
 
@@ -84,7 +85,7 @@ class PostGoodsReceiptJournalAction
             ];
 
             $journalEntry = $this->createJournalEntry->execute([
-                'entry_date' => $goodsReceipt->receipt_date->format('Y-m-d'),
+                'entry_date' => $entryDate,
                 'reference' => $goodsReceipt->gr_number,
                 'description' => "Goods Receipt {$goodsReceipt->gr_number}",
                 'status' => 'posted',

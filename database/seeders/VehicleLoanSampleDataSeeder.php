@@ -556,11 +556,14 @@ class VehicleLoanSampleDataSeeder extends Seeder
             // Register awal = saldo opening dari jurnal ACQ (bukan selisih GL).
             // Kolom book_value default 0 akan membuat run depresiasi melewati
             // kendaraan ini (#357).
+            $accumulatedAccountId = app(ResolveControlAccountAction::class)
+                ->execute('12200', $asset->purchase_date->toDateString())
+                ->id;
             $openingAccumulated = (float) JournalEntryLine::query()
                 ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
                 ->where('journal_entries.reference', 'ACQ-' . $asset->asset_code)
                 ->where('journal_entries.status', 'posted')
-                ->where('journal_entry_lines.account_id', app(ResolveControlAccountAction::class)->execute('12200')->id)
+                ->where('journal_entry_lines.account_id', $accumulatedAccountId)
                 ->sum('journal_entry_lines.credit');
 
             $asset->forceFill([

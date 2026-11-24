@@ -19,43 +19,57 @@ class CoaSeeder extends Seeder
         // ==========================================
         // 2025 Data (Tahun Lalu - Closed)
         // ==========================================
-        $fiscalYear2025 = FiscalYear::create([
-            'name' => '2025',
-            'start_date' => '2025-01-01',
-            'end_date' => '2025-12-31',
-            'status' => 'closed',
-        ]);
+        // Idempoten (#357): db:seed kedua tidak menambah FY/COA/akun, dan COA
+        // buatan pengguna dengan nama lain tidak tersentuh.
+        $fiscalYear2025 = FiscalYear::firstOrCreate(
+            ['name' => '2025'],
+            [
+                'start_date' => '2025-01-01',
+                'end_date' => '2025-12-31',
+                'status' => 'closed',
+            ],
+        );
 
-        $coaVersion2025 = CoaVersion::create([
-            'name' => 'COA 2025 Standard',
-            'fiscal_year_id' => $fiscalYear2025->id,
-            'status' => 'archived',
-        ]);
+        $coaVersion2025 = CoaVersion::firstOrCreate(
+            ['name' => 'COA 2025 Standard'],
+            [
+                'fiscal_year_id' => $fiscalYear2025->id,
+                'status' => 'archived',
+            ],
+        );
 
-        $accounts2025 = $this->getAccounts2025();
-        $this->seedAccountsRecursive($accounts2025, $coaVersion2025->id);
+        if (! Account::where('coa_version_id', $coaVersion2025->id)->exists()) {
+            $accounts2025 = $this->getAccounts2025();
+            $this->seedAccountsRecursive($accounts2025, $coaVersion2025->id);
+        }
 
         // ==========================================
         // 2026 Data (Tahun Berjalan - Active)
         // ==========================================
-        $fiscalYear2026 = FiscalYear::create([
-            'name' => '2026',
-            'start_date' => '2026-01-01',
-            'end_date' => '2026-12-31',
-            'status' => 'open',
-        ]);
+        $fiscalYear2026 = FiscalYear::firstOrCreate(
+            ['name' => '2026'],
+            [
+                'start_date' => '2026-01-01',
+                'end_date' => '2026-12-31',
+                'status' => 'open',
+            ],
+        );
 
-        $coaVersion2026 = CoaVersion::create([
-            'name' => 'COA 2026 Enhanced',
-            'fiscal_year_id' => $fiscalYear2026->id,
-            'status' => 'active',
-        ]);
+        $coaVersion2026 = CoaVersion::firstOrCreate(
+            ['name' => 'COA 2026 Enhanced'],
+            [
+                'fiscal_year_id' => $fiscalYear2026->id,
+                'status' => 'active',
+            ],
+        );
 
         // 2026 structure with changes:
         // 1. "Cash" (11100) split into "Cash in Bank" (11110) and "Petty Cash" (11120)
         // 2. Renamed "Operating Expense" (52000) to "General & Admin Expense" (52000)
-        $accounts2026 = $this->getAccounts2026();
-        $this->seedAccountsRecursive($accounts2026, $coaVersion2026->id);
+        if (! Account::where('coa_version_id', $coaVersion2026->id)->exists()) {
+            $accounts2026 = $this->getAccounts2026();
+            $this->seedAccountsRecursive($accounts2026, $coaVersion2026->id);
+        }
 
         // Fetch account maps from database for reliability
         $accountMap2025 = Account::where('coa_version_id', $coaVersion2025->id)
@@ -68,7 +82,9 @@ class CoaSeeder extends Seeder
         // ==========================================
         // Account Mappings (untuk laporan komparatif)
         // ==========================================
-        $this->createAccountMappings($accountMap2025, $accountMap2026);
+        if (! AccountMapping::query()->whereIn('target_account_id', array_values($accountMap2026))->exists()) {
+            $this->createAccountMappings($accountMap2025, $accountMap2026);
+        }
 
         // ==========================================
         // Saldo awal modal (nilai tetap, diposting lewat action aplikasi).

@@ -19,17 +19,23 @@ uses(RefreshDatabase::class)->group('ap-journal-posting');
 
 function makePostingFiscalYear(): FiscalYear
 {
-    return FiscalYear::factory()->create([
-        'name' => '2026',
-        'start_date' => '2026-01-01',
-        'end_date' => '2026-12-31',
-        'status' => 'open',
-    ]);
+    return FiscalYear::firstOrCreate(
+        ['name' => '2026'],
+        [
+            'start_date' => '2026-01-01',
+            'end_date' => '2026-12-31',
+            'status' => 'open',
+        ],
+    );
 }
 
 function makePostingChartOfAccounts(): array
 {
-    $coaVersion = CoaVersion::factory()->create(['status' => 'active']);
+    // COA aktif harus terikat ke tahun fiskal yang memuat tanggal jurnal (#357).
+    $coaVersion = CoaVersion::factory()->create([
+        'fiscal_year_id' => makePostingFiscalYear()->id,
+        'status' => 'active',
+    ]);
 
     $apAccount = Account::factory()->create([
         'coa_version_id' => $coaVersion->id,

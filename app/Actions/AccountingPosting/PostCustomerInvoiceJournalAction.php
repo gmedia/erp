@@ -44,7 +44,8 @@ class PostCustomerInvoiceJournalAction
                 ]);
             }
 
-            $arAccount = $this->resolveControlAccount->execute(self::AR_CONTROL_ACCOUNT_CODE);
+            $entryDate = $invoice->invoice_date->format('Y-m-d');
+            $arAccount = $this->resolveControlAccount->execute(self::AR_CONTROL_ACCOUNT_CODE, $entryDate);
 
             $creditTotal = 0.0;
             $creditLines = [];
@@ -79,7 +80,7 @@ class PostCustomerInvoiceJournalAction
             ];
 
             $journalEntry = $this->createJournalEntry->execute([
-                'entry_date' => $invoice->invoice_date->format('Y-m-d'),
+                'entry_date' => $entryDate,
                 'reference' => $invoice->invoice_number,
                 'description' => "Customer Invoice {$invoice->invoice_number}",
                 'status' => 'posted',

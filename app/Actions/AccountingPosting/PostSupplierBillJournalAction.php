@@ -54,7 +54,8 @@ class PostSupplierBillJournalAction
                 ]);
             }
 
-            $apAccount = $this->resolveControlAccount->execute(self::AP_CONTROL_ACCOUNT_CODE);
+            $entryDate = $supplierBill->bill_date->format('Y-m-d');
+            $apAccount = $this->resolveControlAccount->execute(self::AP_CONTROL_ACCOUNT_CODE, $entryDate);
 
             $debitTotal = 0.0;
             $debitLines = [];
@@ -101,7 +102,7 @@ class PostSupplierBillJournalAction
 
             // Selisih harga: debit (bill lebih tinggi) atau kredit (bill lebih rendah) ke 51000.
             if ($varianceAmount !== 0.0) {
-                $varianceAccount = $this->resolveControlAccount->execute(self::PRICE_VARIANCE_ACCOUNT_CODE);
+                $varianceAccount = $this->resolveControlAccount->execute(self::PRICE_VARIANCE_ACCOUNT_CODE, $entryDate);
                 $debitLines[] = [
                     'account_id' => $varianceAccount->id,
                     'debit' => $varianceAmount > 0 ? $varianceAmount : 0,
@@ -121,7 +122,7 @@ class PostSupplierBillJournalAction
             ];
 
             $journalEntry = $this->createJournalEntry->execute([
-                'entry_date' => $supplierBill->bill_date->format('Y-m-d'),
+                'entry_date' => $entryDate,
                 'reference' => $supplierBill->bill_number,
                 'description' => "Supplier Bill {$supplierBill->bill_number}",
                 'status' => 'posted',

@@ -44,8 +44,8 @@ class PostOpeningCapitalJournalAction
         }
 
         return DB::transaction(function () use ($entryDate, $amount, $reference, $description): JournalEntry {
-            $bankAccount = $this->resolveControlAccount->execute(self::BANK_ACCOUNT_CODE);
-            $capitalAccount = $this->resolveControlAccount->execute(self::PAID_IN_CAPITAL_CODE);
+            $bankAccount = $this->resolveControlAccount->execute(self::BANK_ACCOUNT_CODE, $entryDate);
+            $capitalAccount = $this->resolveControlAccount->execute(self::PAID_IN_CAPITAL_CODE, $entryDate);
 
             return $this->createJournalEntry->execute([
                 'entry_date' => $entryDate,

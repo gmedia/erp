@@ -46,11 +46,13 @@ class PostStockAdjustmentJournalAction
                 ]);
             }
 
-            $inventoryAccount = $this->resolveControlAccount->execute(self::INVENTORY_ACCOUNT_CODE);
+            $entryDate = $stockAdjustment->adjustment_date->format('Y-m-d');
+            $inventoryAccount = $this->resolveControlAccount->execute(self::INVENTORY_ACCOUNT_CODE, $entryDate);
             $expenseAccount = $this->resolveControlAccount->execute(
                 $stockAdjustment->adjustment_type === 'initial_stock'
                     ? self::OPENING_STOCK_EQUITY_CODE
-                    : self::STOCK_ADJUSTMENT_EXPENSE_CODE
+                    : self::STOCK_ADJUSTMENT_EXPENSE_CODE,
+                $entryDate,
             );
 
             $totalPositive = 0.0;
@@ -103,7 +105,7 @@ class PostStockAdjustmentJournalAction
             }
 
             $journalEntry = $this->createJournalEntry->execute([
-                'entry_date' => $stockAdjustment->adjustment_date->format('Y-m-d'),
+                'entry_date' => $entryDate,
                 'reference' => $stockAdjustment->adjustment_number,
                 'description' => "Stock Adjustment {$stockAdjustment->adjustment_number}",
                 'status' => 'posted',

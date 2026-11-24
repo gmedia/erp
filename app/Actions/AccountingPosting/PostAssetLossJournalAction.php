@@ -65,7 +65,7 @@ class PostAssetLossJournalAction
 
             $lines = [
                 [
-                    'account_id' => $this->resolveControlAccount->execute(self::LOSS_ACCOUNT_CODE)->id,
+                    'account_id' => $this->resolveControlAccount->execute(self::LOSS_ACCOUNT_CODE, $lossDate)->id,
                     'branch_id' => $asset->branch_id,
                     'debit' => $bookValue,
                     'credit' => 0,
@@ -75,7 +75,7 @@ class PostAssetLossJournalAction
 
             if ($accumulated > 0) {
                 $lines[] = [
-                    'account_id' => $this->resolveControlAccount->execute(self::ACCUMULATED_DEPRECIATION_ACCOUNT_CODE)->id,
+                    'account_id' => $this->resolveControlAccount->execute(self::ACCUMULATED_DEPRECIATION_ACCOUNT_CODE, $lossDate)->id,
                     'branch_id' => $asset->branch_id,
                     'debit' => $accumulated,
                     'credit' => 0,
@@ -84,7 +84,7 @@ class PostAssetLossJournalAction
             }
 
             $lines[] = [
-                'account_id' => $this->resolveControlAccount->execute(self::EQUIPMENT_ACCOUNT_CODE)->id,
+                'account_id' => $this->resolveControlAccount->execute(self::EQUIPMENT_ACCOUNT_CODE, $lossDate)->id,
                 'branch_id' => $asset->branch_id,
                 'debit' => 0,
                 'credit' => $cost,
