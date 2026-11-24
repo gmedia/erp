@@ -426,7 +426,7 @@ export function FinancialTableCard<TItem extends FinancialTableRow>({
                                                                     column.header
                                                                 }
                                                                 className={cn(
-                                                                    'text-right tabular-nums',
+                                                                    'text-right whitespace-nowrap tabular-nums',
                                                                     index ===
                                                                         amountColumns.length -
                                                                             1 &&

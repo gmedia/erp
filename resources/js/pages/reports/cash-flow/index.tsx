@@ -74,7 +74,7 @@ function ActivitySectionsCard({
                             </span>
                             <span
                                 className={cn(
-                                    'text-sm font-semibold tabular-nums',
+                                    'text-sm font-semibold whitespace-nowrap tabular-nums',
                                     getSignedAmountTextClass(section.value),
                                 )}
                             >
@@ -87,7 +87,7 @@ function ActivitySectionsCard({
                     <span className="text-sm font-bold">{netChangeLabel}</span>
                     <span
                         className={cn(
-                            'text-sm font-bold tabular-nums',
+                            'text-sm font-bold whitespace-nowrap tabular-nums',
                             getSignedAmountTextClass(netChange),
                         )}
                     >

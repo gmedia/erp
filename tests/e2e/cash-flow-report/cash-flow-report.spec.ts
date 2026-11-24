@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { login } from '../helpers';
 
 test.describe('Cash Flow Report', () => {
@@ -11,10 +11,12 @@ test.describe('Cash Flow Report', () => {
     test('can view cash flow report', async ({ page }) => {
         const responsePromise = page.waitForResponse(
             (r) => {
-                return r.url().includes('/api/reports/cash-flow') &&
-                !r.url().includes('/export') &&
-                r.request().method() === 'GET' &&
-                r.status() < 400;
+                return (
+                    r.url().includes('/api/reports/cash-flow') &&
+                    !r.url().includes('/export') &&
+                    r.request().method() === 'GET' &&
+                    r.status() < 400
+                );
             },
             { timeout: 30000 },
         );
@@ -31,10 +33,12 @@ test.describe('Cash Flow Report', () => {
     test('can change fiscal year selector', async ({ page }) => {
         const initialResponse = page.waitForResponse(
             (r) => {
-                return r.url().includes('/api/reports/cash-flow') &&
-                !r.url().includes('/export') &&
-                r.request().method() === 'GET' &&
-                r.status() < 400;
+                return (
+                    r.url().includes('/api/reports/cash-flow') &&
+                    !r.url().includes('/export') &&
+                    r.request().method() === 'GET' &&
+                    r.status() < 400
+                );
             },
             { timeout: 30000 },
         );
@@ -55,10 +59,12 @@ test.describe('Cash Flow Report', () => {
 
         const refetchPromise = page.waitForResponse(
             (r) => {
-                return r.url().includes('/api/reports/cash-flow') &&
-                !r.url().includes('/export') &&
-                r.request().method() === 'GET' &&
-                r.status() < 400;
+                return (
+                    r.url().includes('/api/reports/cash-flow') &&
+                    !r.url().includes('/export') &&
+                    r.request().method() === 'GET' &&
+                    r.status() < 400
+                );
             },
             { timeout: 15000 },
         );
@@ -70,10 +76,12 @@ test.describe('Cash Flow Report', () => {
     test('can change branch selector', async ({ page }) => {
         const initialResponse = page.waitForResponse(
             (r) => {
-                return r.url().includes('/api/reports/cash-flow') &&
-                !r.url().includes('/export') &&
-                r.request().method() === 'GET' &&
-                r.status() < 400;
+                return (
+                    r.url().includes('/api/reports/cash-flow') &&
+                    !r.url().includes('/export') &&
+                    r.request().method() === 'GET' &&
+                    r.status() < 400
+                );
             },
             { timeout: 30000 },
         );
@@ -86,9 +94,7 @@ test.describe('Cash Flow Report', () => {
         await branchSelector.click();
 
         const branchesResponse = page.waitForResponse(
-            (r) =>
-                r.url().includes('/api/branches') &&
-                r.status() < 400,
+            (r) => r.url().includes('/api/branches') && r.status() < 400,
             { timeout: 15000 },
         );
 
@@ -99,10 +105,12 @@ test.describe('Cash Flow Report', () => {
 
         const refetchPromise = page.waitForResponse(
             (r) => {
-                return r.url().includes('/api/reports/cash-flow') &&
-                !r.url().includes('/export') &&
-                r.request().method() === 'GET' &&
-                r.status() < 400;
+                return (
+                    r.url().includes('/api/reports/cash-flow') &&
+                    !r.url().includes('/export') &&
+                    r.request().method() === 'GET' &&
+                    r.status() < 400
+                );
             },
             { timeout: 15000 },
         );
@@ -114,10 +122,12 @@ test.describe('Cash Flow Report', () => {
     test('can export cash flow report', async ({ page }) => {
         const initialResponse = page.waitForResponse(
             (r) => {
-                return r.url().includes('/api/reports/cash-flow') &&
-                !r.url().includes('/export') &&
-                r.request().method() === 'GET' &&
-                r.status() < 400;
+                return (
+                    r.url().includes('/api/reports/cash-flow') &&
+                    !r.url().includes('/export') &&
+                    r.request().method() === 'GET' &&
+                    r.status() < 400
+                );
             },
             { timeout: 30000 },
         );
@@ -142,10 +152,12 @@ test.describe('Cash Flow Report', () => {
     }) => {
         const responsePromise = page.waitForResponse(
             (r) => {
-                return r.url().includes('/api/reports/cash-flow') &&
-                !r.url().includes('/export') &&
-                r.request().method() === 'GET' &&
-                r.status() < 400;
+                return (
+                    r.url().includes('/api/reports/cash-flow') &&
+                    !r.url().includes('/export') &&
+                    r.request().method() === 'GET' &&
+                    r.status() < 400
+                );
             },
             { timeout: 30000 },
         );
@@ -177,5 +189,33 @@ test.describe('Cash Flow Report', () => {
         await expect(
             page.getByText('Cash Flows by Activity', { exact: true }),
         ).toBeVisible();
+    });
+
+    test('summary card title does not duplicate operating header', async ({
+        page,
+    }) => {
+        const responsePromise = page.waitForResponse(
+            (r) => {
+                return (
+                    r.url().includes('/api/reports/cash-flow') &&
+                    !r.url().includes('/export') &&
+                    r.request().method() === 'GET' &&
+                    r.status() < 400
+                );
+            },
+            { timeout: 30000 },
+        );
+
+        await page.goto('/reports/cash-flow');
+        await responsePromise;
+
+        await expect(
+            page.getByText('Cash Receipts and Payments', { exact: true }),
+        ).toBeVisible();
+        await expect(
+            page.getByText('Cash Flows from Operating Activities', {
+                exact: true,
+            }),
+        ).toHaveCount(1);
     });
 });
