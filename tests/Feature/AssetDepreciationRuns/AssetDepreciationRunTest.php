@@ -361,6 +361,64 @@ test('a monthly run never charges more than one monthly amount before the final 
     ]);
 });
 
+test('void run lines do not count toward remaining life months', function () {
+    // Umur 3 bulan (monthly 333). Bulan 1 posted = 333, plus satu baris dari run void.
+    // Sisa bulan yang benar = 2, jadi bulan 2 hanya membebankan 333 (bukan sisa 667).
+    $asset = Asset::factory()->create([
+        'purchase_cost' => 1000,
+        'salvage_value' => 0,
+        'useful_life_months' => 3,
+        'depreciation_start_date' => '2024-01-01',
+        'depreciation_method' => 'straight_line',
+        'status' => 'active',
+        'book_value' => 667,
+        'accumulated_depreciation' => 333,
+    ]);
+
+    $postedRun = AssetDepreciationRun::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'period_start' => '2024-01-01',
+        'period_end' => '2024-01-31',
+        'status' => 'posted',
+    ]);
+    AssetDepreciationLine::create([
+        'asset_depreciation_run_id' => $postedRun->id,
+        'asset_id' => $asset->id,
+        'amount' => 333,
+        'accumulated_before' => 0,
+        'accumulated_after' => 333,
+        'book_value_after' => 667,
+    ]);
+
+    $voidRun = AssetDepreciationRun::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'period_start' => '2024-02-01',
+        'period_end' => '2024-02-29',
+        'status' => 'void',
+    ]);
+    AssetDepreciationLine::create([
+        'asset_depreciation_run_id' => $voidRun->id,
+        'asset_id' => $asset->id,
+        'amount' => 333,
+        'accumulated_before' => 333,
+        'accumulated_after' => 666,
+        'book_value_after' => 334,
+    ]);
+
+    postJson('/api/asset-depreciation-runs/calculate', [
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'period_start' => '2024-03-01',
+        'period_end' => '2024-03-31',
+    ])->assertStatus(200);
+
+    $this->assertDatabaseHas('asset_depreciation_lines', [
+        'asset_id' => $asset->id,
+        'asset_depreciation_run_id' => AssetDepreciationRun::where('status', 'calculated')->value('id'),
+        'amount' => 333,
+        'book_value_after' => 334,
+    ]);
+});
+
 test('every life month posts exactly one line and only the final month takes the remainder', function () {
     $cases = [[1000, 0, 3], [9500, 500, 12], [2000, 0, 7]];
 

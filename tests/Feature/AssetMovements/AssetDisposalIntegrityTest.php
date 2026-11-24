@@ -168,6 +168,43 @@ test('moving a dispose movement to another asset is rejected with 422', function
     assertDatabaseHas('assets', ['id' => $other->id, 'status' => 'active']);
 });
 
+test('a transfer movement cannot be moved to another asset or type through PUT', function () {
+    $asset = Asset::factory()->create(['status' => 'active']);
+    $other = Asset::factory()->create(['status' => 'active']);
+    $movement = AssetMovement::factory()->create([
+        'asset_id' => $asset->id,
+        'movement_type' => 'transfer',
+    ]);
+
+    putJson("/api/asset-movements/{$movement->id}", [
+        'asset_id' => $other->id,
+        'moved_at' => now()->format('Y-m-d H:i:s'),
+    ])->assertStatus(422)->assertJsonValidationErrors('asset_id');
+
+    putJson("/api/asset-movements/{$movement->id}", [
+        'movement_type' => 'assign',
+        'moved_at' => now()->format('Y-m-d H:i:s'),
+    ])->assertStatus(422)->assertJsonValidationErrors('movement_type');
+
+    expect($movement->fresh()->asset_id)->toBe($asset->id);
+    expect($movement->fresh()->movement_type)->toBe('transfer');
+});
+
+test('a transfer movement accepts PUT that repeats its current asset and type', function () {
+    $asset = Asset::factory()->create(['status' => 'active']);
+    $movement = AssetMovement::factory()->create([
+        'asset_id' => $asset->id,
+        'movement_type' => 'transfer',
+    ]);
+
+    putJson("/api/asset-movements/{$movement->id}", [
+        'asset_id' => $asset->id,
+        'movement_type' => 'transfer',
+        'moved_at' => now()->format('Y-m-d H:i:s'),
+        'notes' => 'tanpa perubahan aset dan tipe',
+    ])->assertStatus(200);
+});
+
 test('editing a dispose movement cannot leave the asset status stale', function () {
     $asset = Asset::factory()->create(['status' => 'active']);
 

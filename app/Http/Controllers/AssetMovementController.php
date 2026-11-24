@@ -119,23 +119,21 @@ class AssetMovementController extends Controller
         $validated = $request->validated();
         unset($validated['document']);
 
-        // Status aset hanya berubah lewat store/destroy. Edit tidak boleh mengubah tipe atau aset
-        // dari/ke dispose, karena itu membuat status aset tertinggal (stale).
-        $isDispose = $asset_movement->movement_type === 'dispose';
-        $typeChangesDispose = array_key_exists('movement_type', $validated)
-            && ($validated['movement_type'] === 'dispose') !== $isDispose;
+        // Aset dan tipe mutasi dikunci setelah dibuat: mengubahnya membuat status aset stale.
         $assetChanges = array_key_exists('asset_id', $validated)
             && (int) $validated['asset_id'] !== $asset_movement->asset_id;
+        $typeChanges = array_key_exists('movement_type', $validated)
+            && $validated['movement_type'] !== $asset_movement->movement_type;
 
-        if ($typeChangesDispose) {
+        if ($typeChanges) {
             throw ValidationException::withMessages([
-                'movement_type' => __('asset_movements.dispose_type_locked'),
+                'movement_type' => __('asset_movements.movement_type_locked'),
             ]);
         }
 
-        if ($isDispose && $assetChanges) {
+        if ($assetChanges) {
             throw ValidationException::withMessages([
-                'asset_id' => __('asset_movements.dispose_type_locked'),
+                'asset_id' => __('asset_movements.asset_locked'),
             ]);
         }
 

@@ -37,8 +37,13 @@ const toOptionalSelectValue = (value: string | number | null | undefined) => {
     return '';
 };
 
-const isMovableAsset = (asset: Asset): boolean =>
-    asset.status !== 'disposed' && asset.status !== 'lost';
+const MOVEMENT_TYPE_OPTIONS = [
+    { value: 'transfer', label: 'Transfer (Location Change)' },
+    { value: 'assign', label: 'Assign (PIC Change)' },
+    { value: 'return', label: 'Return' },
+    { value: 'dispose', label: 'Dispose' },
+    { value: 'adjustment', label: 'Adjustment' },
+];
 
 const ASSET_MOVEMENT_TYPES = [
     'transfer',
@@ -109,6 +114,10 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
         });
 
         const [documentFile, setDocumentFile] = useState<File | null>(null);
+        const [pickedAssetStatus, setPickedAssetStatus] = useState<
+            Asset['status'] | null
+        >(null);
+        const effectiveAssetStatus = asset?.status ?? pickedAssetStatus;
 
         const movementType = form.watch('movement_type');
         const toBranchId = form.watch('to_branch_id');
@@ -153,6 +162,10 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
         };
 
         const isEdit = !!entity;
+        const movementTypeOptions =
+            effectiveAssetStatus === 'lost' && !isEdit
+                ? MOVEMENT_TYPE_OPTIONS.filter((opt) => opt.value === 'dispose')
+                : MOVEMENT_TYPE_OPTIONS;
         let formTitle = 'Record Asset Movement';
 
         if (isEdit) {
@@ -176,12 +189,14 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
                     <div className="space-y-6">
                         {!asset && !isEdit && (
                             <div className="grid grid-cols-1 gap-4">
-                                <AsyncSelectField
+                                <AsyncSelectField<Asset>
                                     name="asset_id"
                                     label="Asset"
-                                    url="/api/assets"
+                                    url="/api/assets?exclude_status=disposed"
                                     placeholder="Select asset"
-                                    filterItems={isMovableAsset}
+                                    onItemSelect={(item) =>
+                                        setPickedAssetStatus(item.status)
+                                    }
                                 />
                             </div>
                         )}
@@ -191,22 +206,7 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
                                 name="movement_type"
                                 label="Movement Type"
                                 disabled={isEdit}
-                                options={[
-                                    {
-                                        value: 'transfer',
-                                        label: 'Transfer (Location Change)',
-                                    },
-                                    {
-                                        value: 'assign',
-                                        label: 'Assign (PIC Change)',
-                                    },
-                                    { value: 'return', label: 'Return' },
-                                    { value: 'dispose', label: 'Dispose' },
-                                    {
-                                        value: 'adjustment',
-                                        label: 'Adjustment',
-                                    },
-                                ]}
+                                options={movementTypeOptions}
                             />
                             <DatePickerField
                                 name="moved_at"

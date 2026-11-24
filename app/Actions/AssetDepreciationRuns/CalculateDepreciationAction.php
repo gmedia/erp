@@ -80,7 +80,10 @@ class CalculateDepreciationAction
 
                 // Sisa hanya dihabiskan pada bulan terakhir umur aset, atau bila sisanya tak cukup
                 // untuk satu bulanan penuh. Bulan lain selalu membebankan tepat satu bulanan.
-                $monthsRemaining = $usefulLife - (int) AssetDepreciationLine::where('asset_id', $asset->id)->count();
+                // Hanya baris dari run calculated/posted yang mengubah akumulasi; void/draft tidak.
+                $monthsRemaining = $usefulLife - (int) AssetDepreciationLine::where('asset_id', $asset->id)
+                    ->whereHas('run', fn ($q) => $q->whereIn('status', ['calculated', 'posted']))
+                    ->count();
                 $isLastMonth = $monthsRemaining <= 1 || $maxDepreciable <= $monthlyAmount;
                 $amount = round($isLastMonth ? $maxDepreciable : $monthlyAmount);
 
