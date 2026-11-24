@@ -129,6 +129,9 @@ class PurchasingSampleDataSeeder extends Seeder
 
         $pipelines = $this->seedPurchasingPipelines($adminUserId);
 
+        // Pengaju dokumen harus user yang bukan approver flow pembelian (W7-16).
+        $documentRequesterId = $this->nonApproverUserId($adminUserId);
+
         [$purchaseRequests, $purchaseRequestItems] = $this->seedPurchaseRequests(
             $adminUserId,
             $branchId,
@@ -136,7 +139,8 @@ class PurchasingSampleDataSeeder extends Seeder
             $requesterId,
             $products,
             $fallbackUnitId,
-            $pipelines['pr']
+            $pipelines['pr'],
+            $documentRequesterId
         );
 
         [$purchaseOrders, $purchaseOrderItems] = $this->seedPurchaseOrders(
@@ -146,7 +150,8 @@ class PurchasingSampleDataSeeder extends Seeder
             $products,
             $fallbackUnitId,
             $purchaseRequestItems,
-            $pipelines['po']
+            $pipelines['po'],
+            $documentRequesterId
         );
 
         [$goodsReceipts, $goodsReceiptItems] = $this->seedGoodsReceipts(
@@ -172,6 +177,20 @@ class PurchasingSampleDataSeeder extends Seeder
             $goodsReceiptItems,
             $fallbackUnitId
         );
+    }
+
+    /**
+     * User pengaju dokumen pembelian: bukan admin dan bukan approver flow pembelian,
+     * sehingga pengaju tidak pernah menyetujui dokumennya sendiri (W7-16).
+     */
+    private function nonApproverUserId(int $adminUserId): int
+    {
+        $approverIds = DB::table('approval_flow_steps')->pluck('approver_user_id')->unique()->all();
+
+        return (int) (User::query()
+            ->whereNotIn('id', array_merge([$adminUserId], $approverIds))
+            ->orderBy('id')
+            ->value('id') ?? $adminUserId);
     }
 
     private function seedPurchasingPipelines(int $adminUserId): array
@@ -779,7 +798,7 @@ class PurchasingSampleDataSeeder extends Seeder
                 );
             }
 
-            $transitions[$fromCode . '->' . $toCode] = $transition;
+            $transitions[$fromCode.'->'.$toCode] = $transition;
         }
 
         return $transitions;
@@ -792,14 +811,15 @@ class PurchasingSampleDataSeeder extends Seeder
         int $requesterId,
         $products,
         int $fallbackUnitId,
-        array $pipelineConfig
+        array $pipelineConfig,
+        int $documentRequesterId
     ): array {
         $year = now()->format('Y');
 
         // Rentang lama 99xxxx → 0001xx (W6-08): rename bila target kosong,
         // hapus duplikat lama bila sudah ada.
         foreach (PurchaseRequest::query()->where('pr_number', 'like', "PR-{$year}-99%")->get() as $legacy) {
-            $target = "PR-{$year}-0001" . substr($legacy->pr_number, -2);
+            $target = "PR-{$year}-0001".substr($legacy->pr_number, -2);
 
             if (PurchaseRequest::query()->where('pr_number', $target)->exists()) {
                 $legacy->delete();
@@ -920,13 +940,17 @@ class PurchasingSampleDataSeeder extends Seeder
             $purchaseRequests[$status] = $purchaseRequest;
             $purchaseRequestItems[$status] = [$firstItem, $secondItem];
 
+            $documentDate = Carbon::parse($purchaseRequest->request_date);
+
             $this->syncEntityPipelineState(
                 $pipelineConfig,
                 'App\\Models\\PurchaseRequest',
                 $purchaseRequest->id,
                 $status,
                 $histories[$status] ?? [],
-                $adminUserId
+                $adminUserId,
+                $documentDate,
+                $documentRequesterId
             );
 
             $approvalRequestStatus = match ($status) {
@@ -937,17 +961,17 @@ class PurchasingSampleDataSeeder extends Seeder
             };
 
             if ($approvalRequestStatus) {
-                $submittedAt = Carbon::parse($purchaseRequest->request_date)->setTime(9, 0);
+                $submittedAt = $documentDate->copy()->setTime(9, 0);
                 $completedAt = $approvalRequestStatus === 'pending'
                     ? null
-                    : Carbon::parse($purchaseRequest->request_date)->addDay()->setTime(15, 0);
+                    : $documentDate->copy()->addDay()->setTime(15, 0);
 
                 $this->syncApprovalRequest(
                     PurchaseRequest::class,
                     $purchaseRequest->id,
                     'purchase_request_default',
                     $approvalRequestStatus,
-                    $adminUserId,
+                    $documentRequesterId,
                     $submittedAt,
                     $completedAt,
                 );
@@ -964,12 +988,13 @@ class PurchasingSampleDataSeeder extends Seeder
         $products,
         int $fallbackUnitId,
         array $purchaseRequestItems,
-        array $pipelineConfig
+        array $pipelineConfig,
+        int $documentRequesterId
     ): array {
         $year = now()->format('Y');
 
         foreach (PurchaseOrder::query()->where('po_number', 'like', "PO-{$year}-99%")->get() as $legacy) {
-            $target = "PO-{$year}-0001" . substr($legacy->po_number, -2);
+            $target = "PO-{$year}-0001".substr($legacy->po_number, -2);
 
             if (PurchaseOrder::query()->where('po_number', $target)->exists()) {
                 $legacy->delete();
@@ -1107,13 +1132,17 @@ class PurchasingSampleDataSeeder extends Seeder
             $purchaseOrders[$status] = $purchaseOrder;
             $purchaseOrderItems[$status] = [$firstItem, $secondItem];
 
+            $documentDate = Carbon::parse($purchaseOrder->order_date);
+
             $this->syncEntityPipelineState(
                 $pipelineConfig,
                 'App\\Models\\PurchaseOrder',
                 $purchaseOrder->id,
                 $status,
                 $histories[$status] ?? [],
-                $adminUserId
+                $adminUserId,
+                $documentDate,
+                $documentRequesterId
             );
 
             $approvalRequestStatus = match ($status) {
@@ -1123,17 +1152,17 @@ class PurchasingSampleDataSeeder extends Seeder
             };
 
             if ($approvalRequestStatus) {
-                $submittedAt = Carbon::parse($purchaseOrder->order_date)->setTime(10, 0);
+                $submittedAt = $documentDate->copy()->setTime(10, 0);
                 $completedAt = $approvalRequestStatus === 'pending'
                     ? null
-                    : Carbon::parse($purchaseOrder->order_date)->addDay()->setTime(16, 0);
+                    : $documentDate->copy()->addDay()->setTime(16, 0);
 
                 $this->syncApprovalRequest(
                     PurchaseOrder::class,
                     $purchaseOrder->id,
                     'purchase_order_default',
                     $approvalRequestStatus,
-                    $adminUserId,
+                    $documentRequesterId,
                     $submittedAt,
                     $completedAt,
                 );
@@ -1322,7 +1351,7 @@ class PurchasingSampleDataSeeder extends Seeder
         $year = now()->format('Y');
 
         foreach (GoodsReceipt::query()->where('gr_number', 'like', "GR-{$year}-99%")->get() as $legacy) {
-            $target = "GR-{$year}-0001" . substr($legacy->gr_number, -2);
+            $target = "GR-{$year}-0001".substr($legacy->gr_number, -2);
 
             if (GoodsReceipt::query()->where('gr_number', $target)->exists()) {
                 $legacy->delete();
@@ -1397,7 +1426,7 @@ class PurchasingSampleDataSeeder extends Seeder
                     'purchase_order_id' => $purchaseOrder->id,
                     'warehouse_id' => $warehouse->id,
                     'receipt_date' => now()->subDays(12 - $index)->toDateString(),
-                    'supplier_delivery_note' => 'SJ-' . $year . '-0001' . str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT),
+                    'supplier_delivery_note' => 'SJ-'.$year.'-0001'.str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT),
                     'status' => $definition['status'],
                     'notes' => 'Penerimaan barang sesuai pesanan pembelian',
                     'received_by' => $requesterId,
@@ -1450,10 +1479,10 @@ class PurchasingSampleDataSeeder extends Seeder
                     ]
                 );
 
-                $goodsReceiptItems[$definition['status'] . '_' . ($index + 1) . '_' . $itemDefinition['line']] = $goodsReceiptItem;
+                $goodsReceiptItems[$definition['status'].'_'.($index + 1).'_'.$itemDefinition['line']] = $goodsReceiptItem;
             }
 
-            $goodsReceipts[$definition['status'] . '_' . ($index + 1)] = $goodsReceipt;
+            $goodsReceipts[$definition['status'].'_'.($index + 1)] = $goodsReceipt;
         }
 
         return [$goodsReceipts, $goodsReceiptItems];
@@ -1491,7 +1520,7 @@ class PurchasingSampleDataSeeder extends Seeder
         $year = now()->format('Y');
 
         foreach (SupplierReturn::query()->where('return_number', 'like', "SR-{$year}-99%")->get() as $legacy) {
-            $target = "SR-{$year}-0001" . substr($legacy->return_number, -2);
+            $target = "SR-{$year}-0001".substr($legacy->return_number, -2);
 
             if (SupplierReturn::query()->where('return_number', $target)->exists()) {
                 $legacy->delete();
@@ -1569,7 +1598,9 @@ class PurchasingSampleDataSeeder extends Seeder
         int $entityId,
         string $targetStateCode,
         array $history,
-        int $adminUserId
+        int $adminUserId,
+        Carbon $documentDate,
+        int $performedBy
     ): void {
         $pipeline = $pipelineConfig['pipeline'];
         $states = $pipelineConfig['states'];
@@ -1582,6 +1613,48 @@ class PurchasingSampleDataSeeder extends Seeder
             return;
         }
 
+        PipelineStateLog::query()
+            ->where('pipeline_entity_state_id', PipelineEntityState::query()
+                ->where('pipeline_id', $pipeline->id)
+                ->where('entity_type', $entityType)
+                ->where('entity_id', $entityId)
+                ->value('id') ?? 0)
+            ->delete();
+
+        // Timestamp mengikuti tanggal dokumen: transisi pertama di hari dokumen,
+        // lalu tiap transisi berikutnya berselang satu jam, tanpa now().
+        $cursor = $documentDate->copy()->startOfDay()->setTime(8, 0);
+        $logs = [];
+
+        $logs[] = [
+            'from_state_id' => null,
+            'to_state_id' => $initialState->id,
+            'transition_id' => null,
+            'comment' => 'Initial pipeline assignment',
+            'created_at' => $cursor->copy(),
+        ];
+
+        foreach ($history as $transitionStep) {
+            [$fromCode, $toCode] = $transitionStep;
+
+            $fromState = $states[$fromCode] ?? null;
+            $toState = $states[$toCode] ?? null;
+            $transition = $transitions[$fromCode.'->'.$toCode] ?? null;
+
+            if (! $fromState || ! $toState) {
+                continue;
+            }
+
+            $cursor = $cursor->copy()->addHour();
+            $logs[] = [
+                'from_state_id' => $fromState->id,
+                'to_state_id' => $toState->id,
+                'transition_id' => $transition?->id,
+                'comment' => null,
+                'created_at' => $cursor->copy(),
+            ];
+        }
+
         $entityState = PipelineEntityState::updateOrCreate(
             [
                 'pipeline_id' => $pipeline->id,
@@ -1590,55 +1663,19 @@ class PurchasingSampleDataSeeder extends Seeder
             ],
             [
                 'current_state_id' => $targetState->id,
-                'last_transitioned_by' => $adminUserId,
-                'last_transitioned_at' => now(),
+                'last_transitioned_by' => $performedBy,
+                'last_transitioned_at' => $cursor->copy(),
                 'metadata' => null,
             ]
         );
 
-        PipelineStateLog::query()
-            ->where('pipeline_entity_state_id', $entityState->id)
-            ->delete();
-
-        $baseDays = max(2, count($history) + 2);
-
-        PipelineStateLog::create([
-            'pipeline_entity_state_id' => $entityState->id,
-            'entity_type' => $entityType,
-            'entity_id' => $entityId,
-            'from_state_id' => null,
-            'to_state_id' => $initialState->id,
-            'transition_id' => null,
-            'performed_by' => $adminUserId,
-            'comment' => 'Initial pipeline assignment',
-            'created_at' => now()->subDays($baseDays)->subMinutes($baseDays * 11),
-        ]);
-
-        $step = $baseDays - 1;
-        foreach ($history as $transitionStep) {
-            [$fromCode, $toCode] = $transitionStep;
-
-            $fromState = $states[$fromCode] ?? null;
-            $toState = $states[$toCode] ?? null;
-            $transition = $transitions[$fromCode . '->' . $toCode] ?? null;
-
-            if (! $fromState || ! $toState) {
-                continue;
-            }
-
-            PipelineStateLog::create([
+        foreach ($logs as $log) {
+            PipelineStateLog::create(array_merge($log, [
                 'pipeline_entity_state_id' => $entityState->id,
                 'entity_type' => $entityType,
                 'entity_id' => $entityId,
-                'from_state_id' => $fromState->id,
-                'to_state_id' => $toState->id,
-                'transition_id' => $transition?->id,
-                'performed_by' => $adminUserId,
-                'comment' => null,
-                'created_at' => now()->subDays(max(1, $step))->subMinutes($step * 11),
-            ]);
-
-            $step--;
+                'performed_by' => $performedBy,
+            ]));
         }
     }
 }

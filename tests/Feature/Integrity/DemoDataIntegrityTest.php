@@ -242,7 +242,7 @@ invariant('W7-04 stock movement balances form a correct chain per product and wa
     $scope = null;
 
     foreach ($movements as $movement) {
-        $key = $movement->product_id . ':' . $movement->warehouse_id;
+        $key = $movement->product_id.':'.$movement->warehouse_id;
 
         if ($key !== $scope) {
             $scope = $key;
@@ -265,7 +265,7 @@ invariant('W7-04 every eligible document line has a matching stock movement', fu
         ->groupBy('reference_type', 'reference_id', 'product_id')
         ->selectRaw('reference_type, reference_id, product_id, SUM(quantity_in) as qty_in, SUM(quantity_out) as qty_out')
         ->get()
-        ->keyBy(fn ($row) => $row->reference_type . '#' . $row->reference_id . '#' . $row->product_id);
+        ->keyBy(fn ($row) => $row->reference_type.'#'.$row->reference_id.'#'.$row->product_id);
 
     $checks = [
         [
@@ -305,7 +305,7 @@ invariant('W7-04 every eligible document line has a matching stock movement', fu
         $eligibleIds = DB::table($check['header'])->where('status', $check['status'])->pluck('id');
 
         foreach (DB::table($check['lines'])->whereIn($check['fk'], $eligibleIds)->get() as $line) {
-            $key = $check['type'] . '#' . $line->{$check['fk']} . '#' . $line->product_id;
+            $key = $check['type'].'#'.$line->{$check['fk']}.'#'.$line->product_id;
             $movement = $movementSums->get($key);
 
             // Collect every violation instead of stopping at the first, so one broken
@@ -345,7 +345,7 @@ invariant('W7-04 every received stock transfer line has matching transfer_out an
         ->groupBy('reference_id', 'product_id', 'movement_type')
         ->selectRaw('reference_id, product_id, movement_type, SUM(quantity_in) as qty_in, SUM(quantity_out) as qty_out')
         ->get()
-        ->keyBy(fn ($row) => $row->reference_id . '#' . $row->product_id . '#' . $row->movement_type);
+        ->keyBy(fn ($row) => $row->reference_id.'#'.$row->product_id.'#'.$row->movement_type);
 
     $receivedLines = DB::table('stock_transfer_items')
         ->join('stock_transfers', 'stock_transfers.id', '=', 'stock_transfer_items.stock_transfer_id')
@@ -355,14 +355,14 @@ invariant('W7-04 every received stock transfer line has matching transfer_out an
     expect($receivedLines)->not->toBeEmpty('Demo data must include received stock transfers');
 
     foreach ($receivedLines as $line) {
-        $key = $line->stock_transfer_id . '#' . $line->product_id;
+        $key = $line->stock_transfer_id.'#'.$line->product_id;
 
-        $out = $legs->get($key . '#transfer_out');
+        $out = $legs->get($key.'#transfer_out');
         expect($out)->not->toBeNull("Received transfer {$key} must have a transfer_out movement");
         expect(round((float) $out->qty_out, 2))
             ->toBe(round((float) $line->quantity, 2), "transfer_out quantity for {$key} must equal dispatched quantity");
 
-        $in = $legs->get($key . '#transfer_in');
+        $in = $legs->get($key.'#transfer_in');
         expect($in)->not->toBeNull("Received transfer {$key} must have a transfer_in movement");
         expect(round((float) $in->qty_in, 2))
             ->toBe(round((float) $line->quantity_received, 2), "transfer_in quantity for {$key} must equal quantity received");
@@ -381,7 +381,7 @@ invariant('W7-04 running stock balance is non-negative at every movement', funct
     $balance = [];
 
     foreach ($movements as $movement) {
-        $key = $movement->product_id . ':' . $movement->warehouse_id;
+        $key = $movement->product_id.':'.$movement->warehouse_id;
         $balance[$key] = ($balance[$key] ?? 0.0) + (float) $movement->quantity_in - (float) $movement->quantity_out;
 
         expect(round($balance[$key], 2))
@@ -400,7 +400,7 @@ invariant('W7-04 stock snapshot uses the latest movement balance', function () {
 
     $latest = [];
     foreach ($movements as $movement) {
-        $latest[$movement->product_id . ':' . $movement->warehouse_id] = (float) $movement->balance_after;
+        $latest[$movement->product_id.':'.$movement->warehouse_id] = (float) $movement->balance_after;
     }
 
     // Compare the set of product+warehouse pairs, not raw movement rows.
@@ -414,13 +414,13 @@ invariant('W7-04 stock snapshot uses the latest movement balance', function () {
 
     expect($snapshot)->not->toBeEmpty('Stock monitor must show stock rows');
 
-    $snapshotPairs = $snapshot->map(fn ($row) => $row->product_id . ':' . $row->warehouse_id)->sort()->values()->all();
+    $snapshotPairs = $snapshot->map(fn ($row) => $row->product_id.':'.$row->warehouse_id)->sort()->values()->all();
     $expectedPairs = collect($pairs)->sort()->values()->all();
 
     expect($snapshotPairs)->toBe($expectedPairs, 'Stock snapshot must cover exactly the product and warehouse pairs that have movements');
 
     foreach ($snapshot as $row) {
-        $key = $row->product_id . ':' . $row->warehouse_id;
+        $key = $row->product_id.':'.$row->warehouse_id;
         expect(round((float) $row->quantity_on_hand, 2))
             ->toBe(round($latest[$key], 2), "Stock snapshot for {$key} must equal the latest movement balance");
     }
@@ -431,7 +431,7 @@ invariant('W7-04 only eligible document states produce stock movements', functio
     $eligible = DB::table('stock_movements')
         ->whereNotNull('reference_type')
         ->get(['reference_type', 'reference_id'])
-        ->map(fn ($row) => $row->reference_type . '#' . $row->reference_id)
+        ->map(fn ($row) => $row->reference_type.'#'.$row->reference_id)
         ->unique();
 
     foreach ($eligible as $pair) {
@@ -471,7 +471,7 @@ invariant('W7-04 inventory valuation equals GL inventory account', function () {
 
     $latest = [];
     foreach ($movements as $movement) {
-        $latest[$movement->product_id . ':' . $movement->warehouse_id] = $movement;
+        $latest[$movement->product_id.':'.$movement->warehouse_id] = $movement;
     }
 
     $valuation = 0.0;
@@ -520,7 +520,7 @@ test('W7-04 11300 invariant fails when a transfer shortage journal is removed', 
         ->get(['product_id', 'warehouse_id', 'balance_after', 'average_cost_after']);
 
     foreach ($movements as $movement) {
-        $latest[$movement->product_id . ':' . $movement->warehouse_id] = $movement;
+        $latest[$movement->product_id.':'.$movement->warehouse_id] = $movement;
     }
     foreach ($latest as $movement) {
         $cost = $movement->average_cost_after !== null
@@ -653,7 +653,7 @@ invariant('W7-15 positions do not mix grade levels with job titles', function ()
     $names = DB::table('positions')->pluck('name')->all();
     $grades = array_values(array_intersect($names, ['Junior', 'Mid-level', 'Senior']));
 
-    expect($grades)->toBeEmpty('Position list must not contain grade levels: ' . implode(', ', $grades));
+    expect($grades)->toBeEmpty('Position list must not contain grade levels: '.implode(', ', $grades));
 });
 
 // W7-15 (keuangan) — anggaran tiap periode tidak boleh melebihi anggaran tahunan.
@@ -936,3 +936,132 @@ test('all demo invariants also hold after a second db:seed', function () {
         $check();
     }
 })->group('demo-integrity');
+
+// W7-16 — rantai transisi pipeline lengkap dari state awal, dengan timestamp mengikuti tanggal dokumen.
+invariant('W7-16 pipeline transition chains start at the initial state and link end to end', function () {
+    $entities = DB::table('pipeline_entity_states')->get(['id', 'entity_type', 'entity_id', 'current_state_id']);
+
+    expect($entities)->not->toBeEmpty('Demo data must include pipeline entity states');
+
+    foreach ($entities as $entity) {
+        $logs = DB::table('pipeline_state_logs')
+            ->where('pipeline_entity_state_id', $entity->id)
+            ->orderBy('created_at')
+            ->orderBy('id')
+            ->get(['id', 'from_state_id', 'to_state_id', 'created_at']);
+
+        $label = "{$entity->entity_type}#{$entity->entity_id}";
+
+        expect($logs)->not->toBeEmpty("{$label} must have a transition history");
+        expect($logs->first()->from_state_id)->toBeNull("{$label} chain must start from the initial state");
+
+        foreach ($logs->values() as $index => $log) {
+            expect($log->created_at)->not->toBeNull("{$label} log {$log->id} created_at must not be null");
+
+            if ($index === 0) {
+                continue;
+            }
+
+            $previous = $logs[$index - 1];
+
+            expect((int) $log->from_state_id)
+                ->toBe((int) $previous->to_state_id, "{$label} log {$log->id} must continue from the previous state");
+        }
+
+        expect((int) $logs->last()->to_state_id)
+            ->toBe((int) $entity->current_state_id, "{$label} chain must end at the current state");
+    }
+});
+
+// W7-16 — timestamp transisi mengikuti tanggal dokumen dan tidak lebih awal dari master.
+invariant('W7-16 pipeline transitions follow the document date', function () {
+    $purchaseRequests = DB::table('purchase_requests')->pluck('request_date', 'id');
+    $purchaseOrders = DB::table('purchase_orders')->pluck('order_date', 'id');
+
+    $documentDates = [
+        'App\\Models\\PurchaseRequest' => $purchaseRequests,
+        'App\\Models\\PurchaseOrder' => $purchaseOrders,
+    ];
+
+    $checked = 0;
+
+    $entityStates = DB::table('pipeline_entity_states')
+        ->whereIn('entity_type', array_keys($documentDates))
+        ->get();
+
+    foreach ($entityStates as $entity) {
+        $documentDate = $documentDates[$entity->entity_type]->get($entity->entity_id);
+        $label = "{$entity->entity_type}#{$entity->entity_id}";
+
+        expect($documentDate)->not->toBeNull("{$label} must reference an existing document");
+
+        $first = DB::table('pipeline_state_logs')
+            ->where('pipeline_entity_state_id', $entity->id)
+            ->orderBy('created_at')
+            ->orderBy('id')
+            ->value('created_at');
+
+        expect($first)->not->toBeNull("{$label} first transition must have created_at");
+
+        // Transisi pertama harus terjadi dalam beberapa hari setelah tanggal dokumen,
+        // bukan di hari seeder dijalankan (now()) dan tidak sebelum dokumen.
+        $gapDays = Carbon::parse($documentDate)->startOfDay()->diffInDays(Carbon::parse($first), false);
+        $dateNote = "document date {$documentDate}";
+
+        expect($gapDays)
+            ->toBeGreaterThanOrEqual(0, "{$label} first transition must not be before the {$dateNote}")
+            ->toBeLessThanOrEqual(7, "{$label} first transition must follow the {$dateNote} within a week");
+
+        $checked++;
+    }
+
+    expect($checked)->toBeGreaterThan(0, 'Demo data must include purchasing pipeline entities');
+});
+
+// W7-16 — pelaku transisi berbeda dari pengaju/pemohon, dan approval tidak dilakukan pengaju sendiri.
+invariant('W7-16 approval actors differ from the requester', function () {
+    $requests = DB::table('approval_requests')->get(['id', 'submitted_by', 'status', 'submitted_at', 'completed_at']);
+
+    expect($requests)->not->toBeEmpty('Demo data must include approval requests');
+
+    foreach ($requests as $request) {
+        expect($request->submitted_at)->not->toBeNull("Approval request {$request->id} must have submitted_at");
+
+        $steps = DB::table('approval_request_steps')
+            ->where('approval_request_id', $request->id)
+            ->whereNotNull('acted_by')
+            ->get(['acted_by']);
+
+        foreach ($steps as $step) {
+            $message = "Approval request {$request->id} must not be acted on by its requester";
+
+            expect((int) $step->acted_by)->not->toBe((int) $request->submitted_by, $message);
+        }
+    }
+
+    $auditCreated = DB::table('approval_audit_logs')->whereNull('created_at')->count();
+    expect($auditCreated)->toBe(0, 'Approval audit logs must have created_at');
+});
+
+// W7-16 — pelaku transisi pipeline pada dokumen pembelian berbeda dari pengajunya.
+invariant('W7-16 purchasing pipeline transitions are performed by someone other than the requester', function () {
+    $requestedBy = DB::table('purchase_requests')->pluck('requested_by', 'id');
+
+    foreach (DB::table('pipeline_entity_states')->where('entity_type', 'App\\Models\\PurchaseRequest')->get(['id', 'entity_id']) as $entity) {
+        $performers = DB::table('pipeline_state_logs')
+            ->where('pipeline_entity_state_id', $entity->id)
+            ->whereNotNull('performed_by')
+            ->pluck('performed_by');
+
+        foreach ($performers as $performer) {
+            expect((int) $performer)
+                ->not->toBe((int) $requestedBy->get($entity->entity_id), "Purchase request {$entity->entity_id} transition must not be performed by its requester");
+        }
+    }
+});
+
+// W7-16 — riwayat transisi dan approval tidak berisi created_at kosong.
+invariant('W7-16 pipeline and approval history rows have timestamps', function () {
+    expect(DB::table('pipeline_state_logs')->whereNull('created_at')->count())->toBe(0);
+    expect(DB::table('approval_request_steps')->where('status', '!=', 'pending')->whereNull('acted_at')->count())->toBe(0);
+});

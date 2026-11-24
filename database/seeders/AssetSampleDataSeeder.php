@@ -29,6 +29,7 @@ use App\Models\SupplierCategory;
 use App\Models\User;
 use Database\Seeders\Concerns\ReopensDemoPeriodClosings;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 
 class AssetSampleDataSeeder extends Seeder
 {
@@ -46,18 +47,6 @@ class AssetSampleDataSeeder extends Seeder
         // Kendaraan dibuat VehicleLoanSampleDataSeeder, tetap bagian dari demo.
         'FA-000013', 'FA-000014', 'FA-000015',
     ];
-
-    /**
-     * Tanggal beli demo: relatif terhadap awal bulan ini, dengan hari yang
-     * berbeda per aset, sehingga tidak semua jatuh di tanggal yang sama (W7-15).
-     */
-    private function purchaseDate(int $monthsAgo, int $dayOfMonth): string
-    {
-        return now()->startOfMonth()
-            ->subMonths($monthsAgo)
-            ->addDays(min($dayOfMonth, 28) - 1)
-            ->toDateString();
-    }
 
     protected function seedDemoData(): void
     {
@@ -159,15 +148,15 @@ class AssetSampleDataSeeder extends Seeder
             $suffix = str_pad((string) $branch->id, 2, '0', STR_PAD_LEFT);
             $office = AssetLocation::updateOrCreate(
                 ['branch_id' => $branch->id, 'code' => "OFFICE-{$suffix}"],
-                ['name' => 'Kantor (' . $branch->name . ')', 'parent_id' => null]
+                ['name' => 'Kantor ('.$branch->name.')', 'parent_id' => null]
             );
             AssetLocation::updateOrCreate(
                 ['branch_id' => $branch->id, 'code' => "IT-ROOM-{$suffix}"],
-                ['name' => 'Ruang TI (' . $branch->name . ')', 'parent_id' => $office->id]
+                ['name' => 'Ruang TI ('.$branch->name.')', 'parent_id' => $office->id]
             );
             AssetLocation::updateOrCreate(
                 ['branch_id' => $branch->id, 'code' => "WAREHOUSE-{$suffix}"],
-                ['name' => 'Gudang (' . $branch->name . ')', 'parent_id' => null]
+                ['name' => 'Gudang ('.$branch->name.')', 'parent_id' => null]
             );
         }
 
@@ -587,7 +576,7 @@ class AssetSampleDataSeeder extends Seeder
                         'to_department_id' => null,
                         'from_employee_id' => $asset->employee_id,
                         'to_employee_id' => null,
-                        'reference' => 'DISP-' . $asset->asset_code,
+                        'reference' => 'DISP-'.$asset->asset_code,
                         'notes' => 'Disposal initiated via seeder',
                         'created_by' => $adminUser?->id,
                     ]
@@ -711,7 +700,7 @@ class AssetSampleDataSeeder extends Seeder
         // Map transition by "from_code -> to_code"
         $transitionMap = [];
         foreach ($transitions as $t) {
-            $key = $t->fromState->code . '->' . $t->toState->code;
+            $key = $t->fromState->code.'->'.$t->toState->code;
             $transitionMap[$key] = $t;
         }
 
@@ -746,7 +735,7 @@ class AssetSampleDataSeeder extends Seeder
                     'active',
                     'disposed',
                     'Laptop sudah melewati masa manfaat 3 tahun, layar retak dan keyboard tidak berfungsi. '
-                        . 'Disetujui untuk dihapusbukukan.',
+                        .'Disetujui untuk dihapusbukukan.',
                     60,
                 ],
             ],
@@ -757,7 +746,7 @@ class AssetSampleDataSeeder extends Seeder
                     'active',
                     'lost',
                     'Filing cabinet tidak ditemukan setelah proses pindah kantor dari Gedung A ke Gedung B. '
-                        . 'Sudah dicari selama 2 minggu.',
+                        .'Sudah dicari selama 2 minggu.',
                     30,
                 ],
             ],
@@ -802,33 +791,27 @@ class AssetSampleDataSeeder extends Seeder
                 ]
             );
 
-            // Create initial log if not exists
+            // Riwayat dibangun ulang setiap seed (idempoten) dan mengikuti tanggal
+            // pembelian aset, bukan now(). Transisi pertama di hari pembelian.
             $history = $transitionHistory[$data['asset_code']] ?? [];
-            $daysAgoInitial = ! empty($history) ? ($history[0][3] ?? 0) + 1 : 5;
+            $purchaseDate = Carbon::parse($asset->purchase_date)->startOfDay()->setTime(8, 0);
+            $performedBy = $adminUser?->id;
 
-            $initialState = $pipelineStates['draft'];
+            PipelineStateLog::query()
+                ->where('pipeline_entity_state_id', $entityState->id)
+                ->delete();
 
-            PipelineStateLog::updateOrCreate(
-                [
-                    'pipeline_entity_state_id' => $entityState->id,
-                    'entity_type' => 'App\Models\Asset',
-                    'entity_id' => $asset->id,
-                    'to_state_id' => $initialState->id,
-                ],
-                [
-                    'from_state_id' => null,
-                    'transition_id' => null,
-                    'performed_by' => $adminUser?->id,
-                    'comment' => 'Initial pipeline assignment',
-                    'created_at' => now()->subDays($daysAgoInitial)->subMinutes($daysAgoInitial * 7),
-                ]
-            );
+            $cursor = $purchaseDate->copy();
+            $logs = [[
+                'from_state_id' => null,
+                'to_state_id' => $pipelineStates['draft']->id,
+                'transition_id' => null,
+                'comment' => 'Initial pipeline assignment',
+                'created_at' => $cursor->copy(),
+            ]];
 
-            // Create transition logs
             foreach ($history as $step) {
-                [$fromCode, $toCode, $comment, $daysAgo] = $step;
-                $transKey = "{$fromCode}->{$toCode}";
-                $transition = $transitionMap[$transKey] ?? null;
+                [$fromCode, $toCode, $comment] = $step;
                 $fromState = $pipelineStates[$fromCode] ?? null;
                 $toState = $pipelineStates[$toCode] ?? null;
 
@@ -836,18 +819,30 @@ class AssetSampleDataSeeder extends Seeder
                     continue;
                 }
 
-                PipelineStateLog::create([
-                    'pipeline_entity_state_id' => $entityState->id,
-                    'entity_type' => 'App\Models\Asset',
-                    'entity_id' => $asset->id,
+                $transition = $transitionMap["{$fromCode}->{$toCode}"] ?? null;
+                $cursor = $cursor->copy()->addHour();
+                $logs[] = [
                     'from_state_id' => $fromState->id,
                     'to_state_id' => $toState->id,
                     'transition_id' => $transition?->id,
-                    'performed_by' => $adminUser?->id,
                     'comment' => $comment,
-                    'created_at' => now()->subDays($daysAgo)->subMinutes($daysAgo * 7),
-                ]);
+                    'created_at' => $cursor->copy(),
+                ];
             }
+
+            foreach ($logs as $log) {
+                PipelineStateLog::create(array_merge($log, [
+                    'pipeline_entity_state_id' => $entityState->id,
+                    'entity_type' => 'App\Models\Asset',
+                    'entity_id' => $asset->id,
+                    'performed_by' => $performedBy,
+                ]));
+            }
+
+            $entityState->update([
+                'current_state_id' => $targetState->id,
+                'last_transitioned_at' => $cursor->copy(),
+            ]);
         }
 
         // ── Additional Sample Data (Movements, Maintenance, etc.) ───
@@ -891,7 +886,7 @@ class AssetSampleDataSeeder extends Seeder
                     'to_location_id' => $office->id,
                     'from_department_id' => $defaultDepartment->id,
                     'to_department_id' => $defaultDepartment->id,
-                    'reference' => 'TRF-' . now()->format('Y') . '-000101',
+                    'reference' => 'TRF-'.now()->format('Y').'-000101',
                     'notes' => 'Dipindahkan ke lantai 2 untuk penggunaan bersama.',
                     'created_by' => $adminUser?->id,
                 ]);
@@ -944,7 +939,7 @@ class AssetSampleDataSeeder extends Seeder
         if (! AssetStocktake::where('branch_id', $headOffice->id)->exists()) {
             $stocktake = AssetStocktake::create([
                 'branch_id' => $headOffice->id,
-                'reference' => 'STO-' . date('Y') . '-000101',
+                'reference' => 'STO-'.date('Y').'-000101',
                 'planned_at' => now()->subDays(1),
                 'performed_at' => now(),
                 'status' => 'completed',
@@ -1006,5 +1001,17 @@ class AssetSampleDataSeeder extends Seeder
                 'accumulated_depr_account_id' => $accumAcc->id,
             ]);
         }
+    }
+
+    /**
+     * Tanggal beli demo: relatif terhadap awal bulan ini, dengan hari yang
+     * berbeda per aset, sehingga tidak semua jatuh di tanggal yang sama (W7-15).
+     */
+    private function purchaseDate(int $monthsAgo, int $dayOfMonth): string
+    {
+        return now()->startOfMonth()
+            ->subMonths($monthsAgo)
+            ->addDays(min($dayOfMonth, 28) - 1)
+            ->toDateString();
     }
 }
