@@ -46,6 +46,7 @@
     "approval.status_manual_forbidden": "This status can only be set through the approval process or by the system.",
     "approval.items_locked": "Items can only be changed while the document is still a draft.",
     "approval.flow_not_found": "Approval flow not found, inactive, or has no steps.",
+    "status_transition.invalid": "Cannot change status from :from to :to.",
     "approval.transition_forbidden": "You do not have permission to execute this transition.",
     "nav": {
         "platform": "Platform",

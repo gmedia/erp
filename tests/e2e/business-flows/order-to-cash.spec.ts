@@ -747,8 +747,6 @@ test.describe('Order-to-cash: invoice sampai pelunasan', () => {
     test('receipt draft tidak mengubah amount_due invoice (#369)', async ({
         page,
     }) => {
-        test.fail(true, 'receipt draft dihitung sebagai alokasi lain (#369)');
-
         const ctx = await createSentInvoice(page);
         const before = await readOutstanding(page, ctx.invoiceId);
 
