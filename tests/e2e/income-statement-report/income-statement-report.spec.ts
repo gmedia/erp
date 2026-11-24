@@ -9,15 +9,15 @@ test.describe('Income Statement Report', () => {
     test('can view income statement report', async ({ page }) => {
         test.setTimeout(60000);
 
-        await page.goto('/reports/income-statement');
-
-        await page.waitForResponse(
+        const initialResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/income-statement') &&
                 !r.url().includes('/export') &&
                 r.status() < 400,
             { timeout: 30000 },
         );
+        await page.goto('/reports/income-statement');
+        await initialResponse;
 
         await expect(
             page.getByRole('heading', { name: 'Income Statement' }),
@@ -29,15 +29,15 @@ test.describe('Income Statement Report', () => {
     test('can change fiscal year selector', async ({ page }) => {
         test.setTimeout(60000);
 
-        await page.goto('/reports/income-statement');
-
-        await page.waitForResponse(
+        const initialResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/income-statement') &&
                 !r.url().includes('/export') &&
                 r.status() < 400,
             { timeout: 30000 },
         );
+        await page.goto('/reports/income-statement');
+        await initialResponse;
 
         const fiscalYearSelector = page.getByRole('combobox').nth(0);
         await expect(fiscalYearSelector).toBeVisible();
@@ -46,9 +46,7 @@ test.describe('Income Statement Report', () => {
         const options = page.locator('[role="option"]:visible');
         await expect(options.first()).toBeVisible({ timeout: 5000 });
         const count = await options.count();
-        await options.nth(count - 1).click({ force: true });
-
-        await page.waitForResponse(
+        const fiscalYearChange = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/income-statement') &&
                 !r.url().includes('/export') &&
@@ -56,20 +54,22 @@ test.describe('Income Statement Report', () => {
                 r.status() < 400,
             { timeout: 15000 },
         );
+        await options.nth(count - 1).click({ force: true });
+        await fiscalYearChange;
     });
 
     test('can change comparison year selector', async ({ page }) => {
         test.setTimeout(60000);
 
-        await page.goto('/reports/income-statement');
-
-        await page.waitForResponse(
+        const initialResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/income-statement') &&
                 !r.url().includes('/export') &&
                 r.status() < 400,
             { timeout: 30000 },
         );
+        await page.goto('/reports/income-statement');
+        await initialResponse;
 
         const comparisonSelector = page.getByRole('combobox').nth(1);
         await expect(comparisonSelector).toBeVisible();
@@ -78,9 +78,7 @@ test.describe('Income Statement Report', () => {
         const options = page.locator('[role="option"]:visible');
         await expect(options.first()).toBeVisible({ timeout: 5000 });
         const count = await options.count();
-        await options.nth(count - 1).click({ force: true });
-
-        await page.waitForResponse(
+        const comparisonChange = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/income-statement') &&
                 !r.url().includes('/export') &&
@@ -88,35 +86,36 @@ test.describe('Income Statement Report', () => {
                 r.status() < 400,
             { timeout: 15000 },
         );
+        await options.nth(count - 1).click({ force: true });
+        await comparisonChange;
     });
 
     test('can change branch selector', async ({ page }) => {
         test.setTimeout(60000);
 
-        await page.goto('/reports/income-statement');
-
-        await page.waitForResponse(
+        const initialResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/income-statement') &&
                 !r.url().includes('/export') &&
                 r.status() < 400,
             { timeout: 30000 },
         );
+        await page.goto('/reports/income-statement');
+        await initialResponse;
 
         const branchSelector = page.getByRole('combobox').nth(2);
         await expect(branchSelector).toBeVisible();
-        await branchSelector.click();
-
-        await page.waitForResponse(
+        const branchesResponse = page.waitForResponse(
             (r) => r.url().includes('/api/branches') && r.status() < 400,
             { timeout: 10000 },
         );
+        await branchSelector.click();
+        await branchesResponse;
 
         const options = page.locator('ul.p-1 li button:visible');
         await expect(options.first()).toBeVisible({ timeout: 5000 });
-        await options.first().click({ force: true });
 
-        await page.waitForResponse(
+        const branchChange = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/income-statement') &&
                 !r.url().includes('/export') &&
@@ -124,20 +123,22 @@ test.describe('Income Statement Report', () => {
                 r.status() < 400,
             { timeout: 15000 },
         );
+        await options.first().click({ force: true });
+        await branchChange;
     });
 
     test('can export income statement report', async ({ page }) => {
         test.setTimeout(60000);
 
-        await page.goto('/reports/income-statement');
-
-        await page.waitForResponse(
+        const initialResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/income-statement') &&
                 !r.url().includes('/export') &&
                 r.status() < 400,
             { timeout: 30000 },
         );
+        await page.goto('/reports/income-statement');
+        await initialResponse;
 
         const [response] = await Promise.all([
             page.waitForResponse(

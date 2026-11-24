@@ -30,8 +30,9 @@ test.describe('Supplier Import E2E Tests', () => {
         fs.writeFileSync(filePath, csvContent);
 
         // 2. Navigate to Suppliers page
+        const listResponse = page.waitForResponse(r => r.url().includes('/api/suppliers') && r.status() === 200);
         await page.goto('/suppliers');
-        await page.waitForResponse(r => r.url().includes('/api/suppliers') && r.status() === 200);
+        await listResponse;
 
         // 3. Open Import Dialog
         const importButton = page.getByRole('button', { name: /import/i });
@@ -67,9 +68,9 @@ test.describe('Supplier Import E2E Tests', () => {
         // Search for the new supplier
         const searchInput = page.getByPlaceholder('Search suppliers...');
         await searchInput.fill(uniqueEmail);
+        const searchResponse = page.waitForResponse(r => r.url().includes('/api/suppliers') && r.status() === 200);
         await searchInput.press('Enter');
-        
-        await page.waitForResponse(r => r.url().includes('/api/suppliers') && r.status() === 200);
+        await searchResponse;
         
         await expect(page.getByText(uniqueEmail)).toBeVisible();
         await expect(page.getByText(`E2E Supplier ${timestamp}`)).toBeVisible();

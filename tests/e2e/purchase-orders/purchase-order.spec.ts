@@ -97,12 +97,13 @@ test.describe('Purchase Orders Module', () => {
 
     test.beforeEach(async ({ page }) => {
         await login(page, undefined, undefined, { requireDashboard: false });
-        await page.goto('/purchase-orders');
-        await page.waitForResponse(
+        const listResponse = page.waitForResponse(
             (response) =>
                 response.url().includes('/api/purchase-orders') &&
                 response.status() < 400,
         );
+        await page.goto('/purchase-orders');
+        await listResponse;
     });
 
     test('add dialog starts with empty items and add item opens a dedicated dialog', async ({
@@ -208,12 +209,13 @@ test.describe('Purchase Orders Module', () => {
     });
 
     test('Grand Total header is sticky left of Actions', async ({ page }) => {
-        await page.goto('/purchase-orders');
-        await page.waitForResponse(
+        const listResponse = page.waitForResponse(
             (response) =>
                 response.url().includes('/api/purchase-orders') &&
                 response.request().method() === 'GET',
         );
+        await page.goto('/purchase-orders');
+        await listResponse;
 
         const grandTotalHead = page.locator(
             'thead [data-sticky-column="grand_total"]',

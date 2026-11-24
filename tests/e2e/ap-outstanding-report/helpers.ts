@@ -9,8 +9,9 @@ export async function waitForApOutstandingReportResponse(page: Page): Promise<vo
 }
 
 export async function openApOutstandingReport(page: Page): Promise<void> {
+    const responsePromise = waitForApOutstandingReportResponse(page);
     await page.goto('/reports/ap-outstanding');
     await page.waitForURL('**/reports/ap-outstanding', { timeout: 15000 });
-    await waitForApOutstandingReportResponse(page);
+    await responsePromise;
     await expect(page.locator('table')).toBeVisible();
 }

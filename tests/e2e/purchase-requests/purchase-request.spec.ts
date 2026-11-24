@@ -94,12 +94,13 @@ test.describe('Purchase Requests Module', () => {
 
     test.beforeEach(async ({ page }) => {
         await login(page, undefined, undefined, { requireDashboard: false });
-        await page.goto('/purchase-requests');
-        await page.waitForResponse(
+        const listResponse = page.waitForResponse(
             (response) =>
                 response.url().includes('/api/purchase-requests') &&
                 response.status() < 400,
         );
+        await page.goto('/purchase-requests');
+        await listResponse;
     });
 
     test('add dialog starts with empty items and add item button shows icon', async ({

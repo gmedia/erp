@@ -56,13 +56,14 @@ test.describe('Fiscal Year auto-select on financial transaction forms', () => {
             await login(page, undefined, undefined, {
                 requireDashboard: false,
             });
-            await page.goto(fyCase.route);
-            await page.waitForResponse(
+            const listResponse = page.waitForResponse(
                 (r) =>
                     r.url().includes(fyCase.route.replace(/^\//, '/api/')) &&
                     r.status() < 400,
                 { timeout: 15000 },
             );
+            await page.goto(fyCase.route);
+            await listResponse;
 
             await openAddDialog(page, fyCase.addDialogTitle);
 

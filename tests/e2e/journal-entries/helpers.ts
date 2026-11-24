@@ -203,6 +203,12 @@ export async function deleteJournalEntry(
         .getByRole('button', { name: 'Actions' })
         .first()
         .click();
+    const deleteResponse = page.waitForResponse(
+        (r) =>
+            r.url().includes('/api/journal-entries') &&
+            [200, 204].includes(r.status()),
+        { timeout: 10000 },
+    );
     await page.getByRole('menuitem', { name: 'Delete' }).click();
 
     const confirmDialog = page.getByRole('alertdialog').first();
@@ -214,10 +220,5 @@ export async function deleteJournalEntry(
         await confirmBtn.first().click();
     }
 
-    await page.waitForResponse(
-        (r) =>
-            r.url().includes('/api/journal-entries') &&
-            [200, 204].includes(r.status()),
-        { timeout: 10000 },
-    );
+    await deleteResponse;
 }

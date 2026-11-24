@@ -4,11 +4,12 @@ import { login } from '../helpers';
 test.describe('Period Closing E2E Tests', () => {
     test.beforeEach(async ({ page }) => {
         await login(page, undefined, undefined, { requireDashboard: false });
-        await page.goto('/period-closings');
-        await page.waitForResponse(
+        const listResponse = page.waitForResponse(
             (r) => r.url().includes('/api/period-closings') && r.status() < 400,
             { timeout: 15000 },
         );
+        await page.goto('/period-closings');
+        await listResponse;
     });
 
     test('can view Period Closings list', async ({ page }) => {
@@ -20,11 +21,12 @@ test.describe('Period Closing E2E Tests', () => {
         const searchInput = page.getByPlaceholder(/Search/i);
         await expect(searchInput).toBeVisible();
         await searchInput.fill('2026');
-        await searchInput.press('Enter');
-        await page.waitForResponse(
+        const searchResponse = page.waitForResponse(
             (r) => r.url().includes('/api/period-closings') && r.status() < 400,
             { timeout: 15000 },
         );
+        await searchInput.press('Enter');
+        await searchResponse;
     });
 
     test('can open actions menu for Period Closing', async ({ page }) => {

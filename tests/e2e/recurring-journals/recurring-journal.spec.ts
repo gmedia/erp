@@ -4,12 +4,13 @@ import { login } from '../helpers';
 test.describe('Recurring Journal E2E Tests', () => {
     test.beforeEach(async ({ page }) => {
         await login(page, undefined, undefined, { requireDashboard: false });
-        await page.goto('/recurring-journals');
-        await page.waitForResponse(
+        const listResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/recurring-journals') && r.status() < 400,
             { timeout: 15000 },
         );
+        await page.goto('/recurring-journals');
+        await listResponse;
     });
 
     test('can view Recurring Journals list', async ({ page }) => {
@@ -21,12 +22,13 @@ test.describe('Recurring Journal E2E Tests', () => {
         const searchInput = page.getByPlaceholder(/Search name, description/i);
         await expect(searchInput).toBeVisible();
         await searchInput.fill('Sample');
-        await searchInput.press('Enter');
-        await page.waitForResponse(
+        const searchResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/recurring-journals') && r.status() < 400,
             { timeout: 15000 },
         );
+        await searchInput.press('Enter');
+        await searchResponse;
         await expect(page.locator('tbody tr').first()).toBeVisible();
     });
 
