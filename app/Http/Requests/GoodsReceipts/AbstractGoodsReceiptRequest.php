@@ -46,7 +46,7 @@ abstract class AbstractGoodsReceiptRequest extends AuthorizedFormRequest
                     if (! $belongs) {
                         $validator->errors()->add(
                             "items.{$index}.purchase_order_item_id",
-                            'The PO item must belong to the selected purchase order.',
+                            __('goods_receipt.po_item_mismatch'),
                         );
                     }
                 }

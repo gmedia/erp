@@ -63,7 +63,7 @@ abstract class AbstractApPaymentRequest extends AuthorizedFormRequest
                 if ($supplierId !== 0 && (int) $bill->supplier_id !== $supplierId) {
                     $validator->errors()->add(
                         "allocations.{$index}.supplier_bill_id",
-                        'Supplier Bill does not belong to the selected supplier.',
+                        __('ap_payment.bill_supplier_mismatch'),
                     );
 
                     continue;
@@ -84,8 +84,9 @@ abstract class AbstractApPaymentRequest extends AuthorizedFormRequest
                 if ($newTotal > (float) $bill->grand_total) {
                     $validator->errors()->add(
                         "allocations.{$index}.allocated_amount",
-                        'Allocation exceeds bill outstanding amount. Maximum: '
-                            . ((float) $bill->grand_total - $existingAllocated)
+                        __('ap_payment.allocation_exceeds_bill', [
+                            'max' => (float) $bill->grand_total - $existingAllocated,
+                        ])
                     );
                 }
             }

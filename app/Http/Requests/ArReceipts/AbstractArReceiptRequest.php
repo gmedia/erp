@@ -56,7 +56,7 @@ abstract class AbstractArReceiptRequest extends AuthorizedFormRequest
                 $validator,
                 'allocations',
                 'customer_invoice_id',
-                'Allocation exceeds invoice outstanding amount. Maximum',
+                __('ar_receipt.allocation_exceeds_invoice'),
                 fn (int $invoiceId) => $this->maxInvoiceAllocation($validator, $invoiceId, $receiptId),
             );
         });
@@ -95,7 +95,7 @@ abstract class AbstractArReceiptRequest extends AuthorizedFormRequest
             if (! $belongsToCustomer) {
                 $validator->errors()->add(
                     "allocations.{$index}.customer_invoice_id",
-                    'Customer Invoice does not belong to the selected customer.',
+                    __('ar_receipt.invoice_customer_mismatch'),
                 );
             }
         }
@@ -115,7 +115,7 @@ abstract class AbstractArReceiptRequest extends AuthorizedFormRequest
         if (in_array($invoice->status, ['void', 'cancelled'], true)) {
             $validator->errors()->add(
                 'allocations.customer_invoice_id',
-                "Cannot allocate to a {$invoice->status} invoice.",
+                __('ar_receipt.invoice_status_not_allocatable', ['status' => $invoice->status]),
             );
 
             return null;

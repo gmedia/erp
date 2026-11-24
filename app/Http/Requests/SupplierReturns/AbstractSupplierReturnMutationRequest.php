@@ -44,14 +44,14 @@ abstract class AbstractSupplierReturnMutationRequest extends AuthorizedFormReque
                 }
 
                 if ($supplierId && (int) $supplierId !== (int) $purchaseOrder->supplier_id) {
-                    $validator->errors()->add('supplier_id', 'The supplier must match the purchase order supplier.');
+                    $validator->errors()->add('supplier_id', __('supplier_return.supplier_mismatch'));
                 }
 
                 if ($goodsReceiptId) {
                     $goodsReceipt = GoodsReceipt::query()->find($goodsReceiptId);
 
                     if ($goodsReceipt && (int) $goodsReceipt->purchase_order_id !== (int) $purchaseOrder->id) {
-                        $validator->errors()->add('goods_receipt_id', 'The goods receipt must belong to the purchase order.');
+                        $validator->errors()->add('goods_receipt_id', __('supplier_return.goods_receipt_mismatch'));
                     }
                 }
             },
@@ -120,7 +120,7 @@ abstract class AbstractSupplierReturnMutationRequest extends AuthorizedFormReque
             if (! $belongs) {
                 $validator->errors()->add(
                     "items.{$index}.goods_receipt_item_id",
-                    'The GR item must belong to the selected goods receipt.',
+                    __('supplier_return.gr_item_mismatch'),
                 );
             }
         }
