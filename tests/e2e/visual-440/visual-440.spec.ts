@@ -336,17 +336,18 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
             'Tidak ada depreciation run di data seed',
         );
         const cells = row.locator('td');
-        const statusCell = cells.nth(3);
         const actionCell = cells.last();
-        await expect(statusCell).toBeVisible();
-        const overlapped = await statusCell.evaluate(
-            (el, actionEl) => {
-                const s = el.getBoundingClientRect();
-                const a = (actionEl as HTMLElement).getBoundingClientRect();
-                return s.right > a.left + 1;
-            },
-            await actionCell.elementHandle(),
-        );
+        await expect(cells.nth(3)).toBeVisible();
+        const overlapped = await row.evaluate((tr) => {
+            const tds = Array.from(tr.querySelectorAll('td'));
+            const action = tds[tds.length - 1].getBoundingClientRect();
+            return tds
+                .slice(0, -1)
+                .some(
+                    (td) => td.getBoundingClientRect().right > action.left + 1,
+                );
+        });
         expect(overlapped).toBe(false);
+        await expect(actionCell).toBeVisible();
     });
 });

@@ -152,7 +152,7 @@ export default function Index() {
                         {item.created_by_user?.name || '-'}
                     </span>
                 </TableCell>
-                <TableCell className="sticky right-0 z-20 w-[60px] bg-background text-right">
+                <TableCell className="w-[60px] bg-background text-right md:sticky md:right-0 md:z-20">
                     <div className="flex justify-end">
                         <GenericActions
                             item={item}
@@ -249,7 +249,7 @@ export default function Index() {
                         </TableHead>
                         <TableHead>Journal</TableHead>
                         <TableHead>Created By</TableHead>
-                        <TableHead className="sticky right-0 z-20 w-[60px] bg-background text-right">
+                        <TableHead className="w-[60px] bg-background text-right md:sticky md:right-0 md:z-20">
                             <span className="sr-only">Actions</span>
                         </TableHead>
                     </TableRow>
