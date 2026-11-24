@@ -106,10 +106,10 @@ SQL;
     private function outstandingQuantitySelectSql(): string
     {
         return <<<'SQL'
-poi.quantity - COALESCE(
+CASE WHEN po.status IN ('cancelled', 'rejected') THEN 0 ELSE poi.quantity - COALESCE(
                     SUM(CASE WHEN gr.id IS NOT NULL THEN gri.quantity_received ELSE 0 END),
                     0
-                ) as outstanding_quantity
+                ) END as outstanding_quantity
 SQL;
     }
 }

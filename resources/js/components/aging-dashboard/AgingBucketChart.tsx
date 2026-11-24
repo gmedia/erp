@@ -67,7 +67,7 @@ export const AgingBucketChart = memo<AgingBucketChartProps>(
                         Total: {formatCurrency(totalOutstanding)}
                     </p>
                 </CardHeader>
-                <CardContent className="flex-1 space-y-3 pb-4">
+                <CardContent className="flex-1 space-y-3 overflow-auto pb-4">
                     {buckets.map((bucket, index) => {
                         const widthPercentage = Math.max(
                             bucket.amount > 0 ? 1 : 0,

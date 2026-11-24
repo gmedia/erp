@@ -5,7 +5,7 @@ import {
     createReportTextColumn,
     createReportWarehouseColumn,
 } from '@/components/common/ReportColumns';
-import { createNumberColumn } from '@/utils/columns';
+import { createCurrencyColumn, createNumberColumn } from '@/utils/columns';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import type { ColumnDef } from '@tanstack/react-table';
 
@@ -72,10 +72,8 @@ export const stockAdjustmentReportColumns: ColumnDef<StockAdjustmentReportItem>[
             minimumFractionDigits: 0,
             maximumFractionDigits: 2,
         }),
-        createNumberColumn<StockAdjustmentReportItem>({
+        createCurrencyColumn<StockAdjustmentReportItem>({
             accessorKey: 'total_adjustment_value',
             label: 'Total Adjustment Value',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 2,
         }),
     ];
