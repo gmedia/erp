@@ -39,6 +39,14 @@ test.describe('Goods Receipt item dialog labels', () => {
         await expect(itemDialog.getByText('Quantity Rejected')).toBeVisible();
         await expect(itemDialog.getByPlaceholder('Item notes')).toBeVisible();
 
+        const poItemPicker = itemDialog.getByRole('combobox', {
+            name: 'PO Item',
+        });
+        await poItemPicker.click();
+        const firstOption = page.locator('ul[aria-busy] button').first();
+        await expect(firstOption).toContainText(/remaining|sisa/);
+        await poItemPicker.click();
+
         await itemDialog.getByRole('button', { name: /Save Item/i }).click();
         await expect(
             itemDialog.getByText('PO Item is required.'),

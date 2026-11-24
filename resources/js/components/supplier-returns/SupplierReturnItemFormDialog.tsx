@@ -136,7 +136,7 @@ export function SupplierReturnItemFormDialog({
                     onLineSelect={(line) => {
                         form.setValue(
                             'goods_receipt_item_label',
-                            formatSourceLineLabel(line),
+                            formatSourceLineLabel(line, t),
                             { shouldDirty: true },
                         );
                         form.setValue(

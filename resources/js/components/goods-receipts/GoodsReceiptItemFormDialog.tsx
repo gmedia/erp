@@ -170,7 +170,7 @@ export function GoodsReceiptItemFormDialog({
                     onLineSelect={(line) => {
                         form.setValue(
                             'purchase_order_item_label',
-                            formatSourceLineLabel(line),
+                            formatSourceLineLabel(line, t),
                             { shouldDirty: true },
                         );
                         form.setValue(

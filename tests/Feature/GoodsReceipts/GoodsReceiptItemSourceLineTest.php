@@ -175,6 +175,27 @@ test('goods receipt item-options hides a fully returned line unless it is the li
         ->and($editing->json('data.0.remaining_quantity'))->toBe('0');
 });
 
+test('item-options on a confirmed goods receipt shows the remaining quantity without its own accepted qty', function () {
+    [$purchaseOrder, $line] = purchaseOrderWithLine();
+    $goodsReceipt = GoodsReceipt::factory()->create([
+        'purchase_order_id' => $purchaseOrder->id,
+        'status' => 'confirmed',
+    ]);
+    GoodsReceiptItem::factory()->create([
+        'goods_receipt_id' => $goodsReceipt->id,
+        'purchase_order_item_id' => $line->id,
+        'quantity_accepted' => 7,
+    ]);
+    $line->forceFill(['quantity_received' => 7])->saveQuietly();
+
+    $response = getJson(
+        "/api/purchase-orders/{$purchaseOrder->id}/item-options?current_line_id={$line->id}"
+        . '&goods_receipt_id=' . $goodsReceipt->id,
+    );
+
+    expect($response->json('data.0.remaining_quantity'))->toBe('10');
+});
+
 test('goods receipt item-options returns accepted quantity minus active returns', function () {
     $goodsReceipt = GoodsReceipt::factory()->create();
     $item = GoodsReceiptItem::factory()->create([

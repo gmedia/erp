@@ -325,7 +325,8 @@
     },
     "itemForm": {
         "account": "Akun",
-        "account_placeholder": "Pilih Akun"
+        "account_placeholder": "Pilih Akun",
+        "source_line_remaining": "{product} · sisa {count}"
     },
     "goodsReceipt": {
         "item": {

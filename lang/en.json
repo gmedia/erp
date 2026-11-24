@@ -325,7 +325,8 @@
     },
     "itemForm": {
         "account": "Account",
-        "account_placeholder": "Select Account"
+        "account_placeholder": "Select Account",
+        "source_line_remaining": "{product} · {count} remaining"
     },
     "goodsReceipt": {
         "item": {

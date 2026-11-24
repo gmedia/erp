@@ -3,6 +3,7 @@
 import { type FieldValues, type Path } from 'react-hook-form';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
+import { useTranslation } from '@/contexts/i18n-context';
 
 export interface SourceLineOption {
     id: number | string;
@@ -14,8 +15,14 @@ export interface SourceLineOption {
     remaining_quantity?: string | null;
 }
 
-export function formatSourceLineLabel(line: SourceLineOption): string {
-    return `${line.product_name ?? line.product_id ?? ''} · ${line.remaining_quantity ?? '0'}`;
+export function formatSourceLineLabel(
+    line: SourceLineOption,
+    t: (key: string, params?: Record<string, string>) => string,
+): string {
+    return t('itemForm.source_line_remaining', {
+        product: String(line.product_name ?? line.product_id ?? ''),
+        count: String(line.remaining_quantity ?? '0'),
+    });
 }
 
 interface ItemSourceLineSelectFieldProps<TFormValues extends FieldValues> {
@@ -41,6 +48,8 @@ export function ItemSourceLineSelectField<TFormValues extends FieldValues>({
     open,
     onLineSelect,
 }: Readonly<ItemSourceLineSelectFieldProps<TFormValues>>) {
+    const { t } = useTranslation();
+
     if (!url) {
         return <p className="text-sm text-muted-foreground">{emptyHint}</p>;
     }
@@ -53,7 +62,7 @@ export function ItemSourceLineSelectField<TFormValues extends FieldValues>({
             url={url}
             placeholder={placeholder}
             initialLabel={initialLabel}
-            labelFn={formatSourceLineLabel}
+            labelFn={(line) => formatSourceLineLabel(line, t)}
             valueFn={(line) => String(line.id)}
             onItemSelect={onLineSelect}
         />
