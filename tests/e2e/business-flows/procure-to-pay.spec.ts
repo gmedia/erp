@@ -514,6 +514,25 @@ async function submitAndApprovePurchaseRequest(
 test.describe('Procure-to-pay: PR sampai pembayaran supplier', () => {
     test.setTimeout(300000);
 
+    let sharedRun: P2pRun | undefined;
+
+    test.beforeAll(async ({ browser }) => {
+        const context = await browser.newContext();
+        try {
+            sharedRun = await runProcureToPay(await context.newPage());
+        } finally {
+            await context.close();
+        }
+    });
+
+    const readSharedRun = (): P2pRun => {
+        if (!sharedRun) {
+            throw new Error('procure-to-pay run was not prepared in beforeAll');
+        }
+
+        return sharedRun;
+    };
+
     test('PR -> approval: PR submit lalu approve, status menjadi approved', async ({
         page,
     }) => {
@@ -524,10 +543,8 @@ test.describe('Procure-to-pay: PR sampai pembayaran supplier', () => {
         expect(run.status).toBe('approved');
     });
 
-    test('PO received qty, stok, bill, dan pembayaran sesuai nilai dokumen', async ({
-        page,
-    }) => {
-        const run = await runProcureToPay(page);
+    test('PO received qty, stok, bill, dan pembayaran sesuai nilai dokumen', async () => {
+        const run = readSharedRun();
 
         expect(run.poReceivedQty).toBe(PO_QTY);
         expect(run.stockDelta).toBeCloseTo(PO_QTY, 2);
@@ -542,10 +559,8 @@ test.describe('Procure-to-pay: PR sampai pembayaran supplier', () => {
         expect(run.billStatusAfterPayment).toBe('paid');
     });
 
-    test('jurnal GR, bill, dan pembayaran posted dan sesuai nilai dokumen', async ({
-        page,
-    }) => {
-        const run = await runProcureToPay(page);
+    test('jurnal GR, bill, dan pembayaran posted dan sesuai nilai dokumen', async () => {
+        const run = readSharedRun();
         const total = PO_QTY * UNIT_PRICE;
 
         for (const journal of [
@@ -620,10 +635,8 @@ test.describe('Procure-to-pay: PR sampai pembayaran supplier', () => {
         expect(journal.status).toBe('posted');
     });
 
-    test('trial balance dan neraca tetap balance setelah siklus P2P', async ({
-        page,
-    }) => {
-        const run = await runProcureToPay(page);
+    test('trial balance dan neraca tetap balance setelah siklus P2P', async () => {
+        const run = readSharedRun();
 
         expect(run.trialBalanceGap).toBeCloseTo(0, 2);
         expect(run.balanceSheetGap).toBeCloseTo(0, 2);
