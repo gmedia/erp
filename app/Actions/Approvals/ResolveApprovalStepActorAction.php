@@ -2,11 +2,11 @@
 
 namespace App\Actions\Approvals;
 
+use App\Exceptions\ConcurrentApprovalStepException;
 use App\Models\ApprovalDelegation;
 use App\Models\ApprovalRequest;
 use App\Models\ApprovalRequestStep;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Carbon;
 
 /**
  * Decides whether a user may act on the current pending step of a request.
@@ -45,6 +45,22 @@ class ResolveApprovalStepActorAction
     }
 
     /**
+     * Locks the step for a decision and returns it, or throws when it is no longer pending.
+     *
+     * @throws ConcurrentApprovalStepException
+     */
+    public function lockPendingStep(ApprovalRequestStep $currentStep): ApprovalRequestStep
+    {
+        $locked = ApprovalRequestStep::query()->whereKey($currentStep->getKey())->lockForUpdate()->first();
+
+        if (! $locked instanceof ApprovalRequestStep || $locked->status !== 'pending') {
+            throw new ConcurrentApprovalStepException;
+        }
+
+        return $locked;
+    }
+
+    /**
      * The approver who delegated this step to $userId, or null when $userId is the direct approver.
      */
     public function delegatorFor(ApprovalRequestStep $step, int $userId): ?int
@@ -61,13 +77,8 @@ class ResolveApprovalStepActorAction
      */
     private function delegatorIdsFor(int $userId, ApprovalRequest $approvalRequest): array
     {
-        $today = Carbon::today()->toDateString();
-
         return ApprovalDelegation::query()
-            ->where('delegate_user_id', $userId)
-            ->where('is_active', true)
-            ->whereDate('start_date', '<=', $today)
-            ->whereDate('end_date', '>=', $today)
+            ->activeForDelegate($userId)
             ->where(function (Builder $scope) use ($approvalRequest): void {
                 $scope->whereNull('approvable_type')
                     ->orWhere('approvable_type', $approvalRequest->approvable_type);

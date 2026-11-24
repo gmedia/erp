@@ -1,8 +1,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
 import {
-    approveApprovableAsDelegate,
-    DEFAULT_E2E_EMAIL,
+    approveViaScreenAsDelegate,
     login,
     searchAndWaitForApi,
 } from '../helpers';
@@ -119,7 +118,6 @@ test.describe('Purchase Order approval flow (UI)', () => {
         const createPayload = await (await createResponse).json();
         const poNumber = String(createPayload?.data?.po_number ?? '');
         expect(poNumber, 'PO number dari respons POST').not.toBe('');
-        const poId = Number(createPayload?.data?.id);
 
         await searchAndWaitForApi(
             page,
@@ -149,11 +147,7 @@ test.describe('Purchase Order approval flow (UI)', () => {
         await page.getByRole('tab', { name: 'Approvals', exact: true }).click();
         await expect(page.getByText(/^Step 1\b/).first()).toBeVisible();
 
-        await page.context().clearCookies();
-        await login(page, DEFAULT_E2E_EMAIL, undefined, {
-            requireDashboard: false,
-        });
-        await approveApprovableAsDelegate(page, poId, 'E2E approved', 'App\\Models\\PurchaseOrder');
+        await approveViaScreenAsDelegate(page, poNumber as string);
 
         await page.goto('/purchase-orders');
         await searchAndWaitForApi(

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { DEFAULT_E2E_EMAIL, approveApprovableAsDelegate, login } from '../helpers';
+import { DEFAULT_E2E_EMAIL, approveViaScreenAsDelegate, login } from '../helpers';
 import {
     VEHICLE_LOAN_DASHBOARD_PATH,
     VEHICLE_LOAN_PICKUP_PATH,
@@ -101,11 +101,11 @@ test.describe('Vehicle Loans', () => {
         page,
     }) => {
         const id = await submitVehicleLoanRequest(page, 'E2E review assignment');
-        await approveApprovableAsDelegate(
+        await approveViaScreenAsDelegate(
             page,
-            id,
             'E2E review assignment',
-            'App\\Models\\VehicleLoan',
+            'Review penugasan kendaraan',
+            '/review-assignment',
         );
 
         const check = await apiRequest(page, 'get', `/api/vehicle-loans/${id}`);

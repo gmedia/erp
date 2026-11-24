@@ -3,7 +3,6 @@
 namespace App\Actions\Approvals;
 
 use App\Events\ApprovalRequestRejected;
-use App\Exceptions\ConcurrentApprovalStepException;
 use App\Models\ApprovalAuditLog;
 use App\Models\ApprovalRequest;
 use App\Models\ApprovalRequestStep;
@@ -20,11 +19,7 @@ class RejectApprovalRequestAction
         DB::transaction(function () use ($approvalRequest, $currentStep, $userId, $comments): void {
             $resolver = app(ResolveApprovalStepActorAction::class);
 
-            $locked = ApprovalRequestStep::query()->whereKey($currentStep->getKey())->lockForUpdate()->first();
-
-            if (! $locked instanceof ApprovalRequestStep || $locked->status !== 'pending') {
-                throw new ConcurrentApprovalStepException;
-            }
+            $resolver->lockPendingStep($currentStep);
 
             $currentStep->update([
                 'status' => 'rejected',

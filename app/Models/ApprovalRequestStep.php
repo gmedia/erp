@@ -82,14 +82,10 @@ class ApprovalRequestStep extends Model
      */
     private static function activeDelegationsFor(int $userId): array
     {
-        $today = now()->toDateString();
         $grouped = [];
 
         ApprovalDelegation::query()
-            ->where('delegate_user_id', $userId)
-            ->where('is_active', true)
-            ->whereDate('start_date', '<=', $today)
-            ->whereDate('end_date', '>=', $today)
+            ->activeForDelegate($userId)
             ->get(['delegator_user_id', 'approvable_type'])
             ->each(function (ApprovalDelegation $delegation) use (&$grouped): void {
                 $delegatorId = (int) $delegation->delegator_user_id;

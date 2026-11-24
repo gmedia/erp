@@ -44,12 +44,7 @@ async function ensureAdminDelegation(
     ensuredDelegations.add(adminId);
 }
 
-export async function approveApprovableAsDelegate(
-    page: Page,
-    approvableId: number,
-    comments = 'E2E approved',
-    approvableType?: string,
-): Promise<void> {
+async function delegateAndLogin(page: Page): Promise<{ delegateId: number; delegateToken: string }> {
     const adminToken = await page.evaluate(() => localStorage.getItem('api_token'));
     if (!adminToken) throw new Error('api_token missing from browser localStorage');
 
@@ -67,6 +62,18 @@ export async function approveApprovableAsDelegate(
     if (!delegateId || !delegateToken) throw new Error('Delegate login returned no token');
 
     await ensureAdminDelegation(api, adminHeaders, delegateId);
+
+    return { delegateId, delegateToken };
+}
+
+export async function approveApprovableAsDelegate(
+    page: Page,
+    approvableId: number,
+    comments = 'E2E approved',
+    approvableType?: string,
+): Promise<void> {
+    const { delegateToken } = await delegateAndLogin(page);
+    const api = page.context().request;
 
     const delegateHeaders = { Accept: 'application/json', Authorization: `Bearer ${delegateToken}` };
     const inbox = await api.get('/api/my-approvals', { headers: delegateHeaders });
@@ -89,6 +96,40 @@ export async function approveApprovableAsDelegate(
         data: { comments },
     });
     expect(approve.ok()).toBeTruthy();
+}
+
+export async function approveViaScreenAsDelegate(
+    page: Page,
+    documentText: string,
+    extraDialogText?: string,
+    confirmResponseMatch = '/api/my-approvals/',
+): Promise<void> {
+    await delegateAndLogin(page);
+    await page.context().clearCookies();
+    await login(page, E2E_DELEGATE_EMAIL, DEFAULT_E2E_PASSWORD, { requireDashboard: false });
+
+    await page.goto('/my-approvals');
+    await expect(page.getByRole('tab', { name: /Pending/i })).toBeVisible();
+
+    const card = page
+        .locator('div')
+        .filter({ has: page.getByRole('button', { name: /^Approve$/ }) })
+        .filter({ hasText: documentText })
+        .last();
+    await expect(card).toBeVisible({ timeout: 15000 });
+    await card.getByRole('button', { name: /^Approve$/ }).click();
+
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    if (extraDialogText) {
+        await expect(dialog.getByText(extraDialogText)).toBeVisible();
+    }
+
+    const approveResponse = page.waitForResponse(
+        (response) => response.url().includes(confirmResponseMatch) && response.status() < 400,
+    );
+    await page.getByRole('button', { name: 'Confirm Approval', exact: true }).click();
+    await approveResponse;
 }
 
 function matchesApiUrl(url: string, matcher: ApiResponseMatcher): boolean {
