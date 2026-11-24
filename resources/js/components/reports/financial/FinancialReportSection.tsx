@@ -138,7 +138,7 @@ function AccountRow({
             >
                 <button
                     type="button"
-                    className="flex min-w-0 flex-1 cursor-pointer items-start gap-2 text-left md:items-center"
+                    className="flex min-w-[10rem] flex-1 cursor-pointer items-start gap-2 text-left md:items-center"
                     onClick={() => hasChildren && setExpanded(!expanded)}
                     style={{ paddingLeft: `${(node.level - 1) * 1.5}rem` }}
                 >
@@ -323,10 +323,14 @@ export function FinancialReportSection({
                 ) : (
                     <div className="overflow-hidden rounded-md border">
                         <div className="max-h-[60vh] w-full min-w-0 overflow-auto">
-                            <div className="sticky top-0 z-10 flex w-full items-center border-b bg-background px-2 py-2 text-xs font-medium text-muted-foreground md:w-auto md:min-w-max">
+                            <div
+                                className={cn(
+                                    'sticky top-0 z-10 flex w-full items-center border-b bg-background px-2 py-2 text-xs font-medium text-muted-foreground md:w-auto md:min-w-max',
+                                )}
+                            >
                                 {/* Spacer selebar ikon expand agar label
                                     sejajar dengan teks baris (W5-12). */}
-                                <div className="flex min-w-0 flex-1 items-center gap-2 md:min-w-40">
+                                <div className="flex min-w-[10rem] flex-1 items-center gap-2 md:min-w-40">
                                     <div className="w-4" aria-hidden />
                                     <span>Account</span>
                                 </div>

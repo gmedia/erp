@@ -159,6 +159,68 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
         });
     }
 
+    test('comparative 390: kolom nama lebar wajar dan tidak beririsan nilai', async ({
+        page,
+    }) => {
+        await page.setViewportSize({ width: 390, height: 844 });
+        const baseResponse = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/reports/comparative') &&
+                r.status() < 400,
+        );
+        await page.goto('/reports/comparative');
+        const base = await (await baseResponse).json();
+        const years: { id: number }[] = base.fiscalYears ?? [];
+        test.skip(years.length < 2, 'Butuh minimal dua tahun fiskal di seed');
+
+        const comparisonId = years.find(
+            (y) => y.id !== base.selectedYearId,
+        )!.id;
+        const compareResponse = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/reports/comparative') &&
+                r.url().includes('comparison_year_id') &&
+                r.status() < 400,
+        );
+        await page.goto(
+            `/reports/comparative?fiscal_year_id=${base.selectedYearId}` +
+                `&comparison_year_id=${comparisonId}`,
+        );
+        await compareResponse;
+
+        const header = page.getByText('Current', { exact: true }).first();
+        await expect(header).toBeVisible();
+
+        const rows = await page
+            .locator('[data-slot="card"]')
+            .filter({ has: page.getByText('Current', { exact: true }) })
+            .locator('button.text-left')
+            .evaluateAll((buttons) =>
+                buttons.map((button) => {
+                    const row = button.parentElement!;
+                    const value = row.querySelector<HTMLElement>(
+                        '.tabular-nums > div:first-child',
+                    );
+                    const nameBox = button.getBoundingClientRect();
+                    const valueBox = value?.getBoundingClientRect();
+                    return {
+                        name: button.textContent?.trim() ?? '',
+                        nameWidth: nameBox.width,
+                        nameRight: nameBox.right,
+                        rowHeight: row.getBoundingClientRect().height,
+                        valueLeft: valueBox?.left ?? Number.NaN,
+                    };
+                }),
+            );
+
+        expect(rows.length).toBeGreaterThan(0);
+        for (const row of rows) {
+            expect(row.nameWidth, row.name).toBeGreaterThanOrEqual(100);
+            expect(row.rowHeight, row.name).toBeLessThanOrEqual(80);
+            expect(row.nameRight, row.name).toBeLessThanOrEqual(row.valueLeft);
+        }
+    });
+
     test('financial-dashboard 390: nilai KPI tidak terpotong kartu', async ({
         page,
     }) => {
