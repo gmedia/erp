@@ -23,6 +23,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { useTranslation } from '@/contexts/i18n-context';
+import { usePermissions } from '@/hooks/usePermissions';
 import { usePostingJournal } from '@/hooks/usePostingJournal';
 import { BreadcrumbItem } from '@/types';
 import { JournalEntry } from '@/types/journal-entry';
@@ -88,6 +89,9 @@ export default function Index() {
     const [viewItem, setViewItem] = useState<JournalEntry | null>(null);
     const [viewOpen, setViewOpen] = useState(false);
 
+    const { can } = usePermissions();
+    const canEdit = can('posting_journal.edit');
+
     const allSelected = data.length > 0 && selectedIds.length === data.length;
 
     const pageTotals = useMemo(() => {
@@ -148,11 +152,13 @@ export default function Index() {
             return (
                 <TableRow key={item.id} className="hover:bg-muted/50">
                     <TableCell className="pt-4 align-top">
-                        <Checkbox
-                            checked={selectedIds.includes(item.id)}
-                            onCheckedChange={() => toggleSelection(item.id)}
-                            aria-label={`Select ${item.entry_number}`}
-                        />
+                        {canEdit && (
+                            <Checkbox
+                                checked={selectedIds.includes(item.id)}
+                                onCheckedChange={() => toggleSelection(item.id)}
+                                aria-label={`Select ${item.entry_number}`}
+                            />
+                        )}
                     </TableCell>
 
                     <TableCell>
@@ -256,19 +262,21 @@ export default function Index() {
                             <X className="mr-2 h-4 w-4" />
                             Clear
                         </Button>
-                        <Button
-                            onClick={postSelected}
-                            disabled={selectedIds.length === 0 || isPosting}
-                        >
-                            {isPosting ? (
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            ) : (
-                                <CheckCircle2 className="mr-2 h-4 w-4" />
-                            )}
-                            {isPosting
-                                ? 'Posting...'
-                                : `Post Selected (${selectedIds.length})`}
-                        </Button>
+                        {canEdit && (
+                            <Button
+                                onClick={postSelected}
+                                disabled={selectedIds.length === 0 || isPosting}
+                            >
+                                {isPosting ? (
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                ) : (
+                                    <CheckCircle2 className="mr-2 h-4 w-4" />
+                                )}
+                                {isPosting
+                                    ? 'Posting...'
+                                    : `Post Selected (${selectedIds.length})`}
+                            </Button>
+                        )}
                     </div>
                 </>
             }
@@ -360,11 +368,13 @@ export default function Index() {
                 <TableHeader className="[&_th]:text-muted-foreground">
                     <TableRow>
                         <TableHead className="w-[52px]">
-                            <Checkbox
-                                checked={allSelected}
-                                onCheckedChange={selectAll}
-                                aria-label="Select all"
-                            />
+                            {canEdit && (
+                                <Checkbox
+                                    checked={allSelected}
+                                    onCheckedChange={selectAll}
+                                    aria-label="Select all"
+                                />
+                            )}
                         </TableHead>
                         <TableHead>Journal</TableHead>
                         <TableHead className="w-[220px]">Lines</TableHead>

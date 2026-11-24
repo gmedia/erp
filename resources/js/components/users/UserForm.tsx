@@ -13,6 +13,7 @@ interface UserFormProps {
         password?: string[];
     };
     onSave: () => void;
+    canEdit?: boolean;
 }
 
 export function UserForm({
@@ -20,6 +21,7 @@ export function UserForm({
     userExists,
     errors,
     onSave,
+    canEdit = true,
 }: Readonly<UserFormProps>) {
     const { register } = useFormContext();
 
@@ -78,10 +80,12 @@ export function UserForm({
                 )}
             </div>
 
-            <Button onClick={onSave} disabled={loading} className="w-full">
-                {loading && <Zap className="mr-2 h-4 w-4 animate-spin" />}
-                Save Changes
-            </Button>
+            {canEdit && (
+                <Button onClick={onSave} disabled={loading} className="w-full">
+                    {loading && <Zap className="mr-2 h-4 w-4 animate-spin" />}
+                    Save Changes
+                </Button>
+            )}
         </div>
     );
 }
