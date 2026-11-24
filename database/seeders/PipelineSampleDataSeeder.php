@@ -105,7 +105,7 @@ class PipelineSampleDataSeeder extends Seeder
         $pipeline = Pipeline::firstOrCreate(
             ['code' => 'ap_payment_lifecycle'],
             [
-                'name' => 'AP Payment Lifecycle',
+                'name' => 'Siklus Hidup Pembayaran Supplier',
                 'code' => 'ap_payment_lifecycle',
                 'entity_type' => 'App\Models\ApPayment',
                 'description' => 'Mengelola siklus hidup pembayaran hutang — dari draft, approval, confirmed, hingga reconciled atau void.',

@@ -578,7 +578,7 @@ class AssetSampleDataSeeder extends Seeder
                         'from_employee_id' => $asset->employee_id,
                         'to_employee_id' => null,
                         'reference' => 'DISP-' . $asset->asset_code,
-                        'notes' => 'Disposal initiated via seeder',
+                        'notes' => 'Penghapusan aset atas persetujuan manajemen',
                         'created_by' => $adminUser?->id,
                     ]
                 );

@@ -1271,6 +1271,25 @@ invariant('W7-17 demo label text is Indonesian (delegation reasons, approval flo
     }
 });
 
+// W7-17 (6c, sisa) — deskripsi/catatan jurnal, recurring, maintenance, movement, dan
+// alur pipeline demo tidak boleh memakai frasa Inggris lama.
+invariant('W7-17 demo journal, recurring, maintenance and pipeline text is Indonesian', function () {
+    $legacy = [
+        'journal_entries' => ['description', ['Credit note item']],
+        'asset_movements' => ['notes', ['Disposal initiated via seeder']],
+        'products' => ['description', [
+            'Medium Density Fiberboard for furniture manufacturing',
+            'Quality wood screws for furniture assembly',
+        ]],
+        'pipelines' => ['name', ['AP Payment Lifecycle']],
+    ];
+
+    foreach ($legacy as $table => [$column, $names]) {
+        expect(DB::table($table)->whereIn($column, $names)->count())
+            ->toBe(0, "label demo {$table}.{$column} masih berbahasa Inggris");
+    }
+});
+
 // W7-17 — nama aset demo bahasa Indonesia; kategori aset tidak berbahasa campur.
 invariant('W7-17 demo master names are Indonesian, not mixed with English labels', function () {
     $englishLabels = ['Mesin Production', 'Vehicles', 'Office Equipment', 'Operating Budget'];

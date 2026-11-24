@@ -37,7 +37,7 @@ class ProductSampleDataSeeder extends Seeder
             ['code' => 'RM-WOOD-001'],
             [
                 'name' => 'MDF Wood Panel 120x240cm',
-                'description' => 'Medium Density Fiberboard for furniture manufacturing',
+                'description' => 'Papan serat kerapatan sedang untuk produksi furnitur',
                 'type' => 'raw_material',
                 'product_category_id' => $rawMaterialWood->id,
                 'unit_id' => $sheetUnit->id,
@@ -63,7 +63,7 @@ class ProductSampleDataSeeder extends Seeder
             ['code' => 'RM-HW-001'],
             [
                 'name' => 'Wood Screws 4x40mm (Box of 100)',
-                'description' => 'Quality wood screws for furniture assembly',
+                'description' => 'Sekrup kayu berkualitas untuk perakitan furnitur',
                 'type' => 'raw_material',
                 'product_category_id' => $rawMaterialHardware->id,
                 'unit_id' => $boxUnit->id,

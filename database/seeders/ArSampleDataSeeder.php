@@ -532,7 +532,7 @@ class ArSampleDataSeeder extends Seeder
                         'tax_percent' => 10,
                         'line_total' => $quantity * $unitPrice,
                         'account_id' => $revenueAccount->id,
-                        'description' => 'Credit note item',
+                        'description' => 'Item nota kredit retur penjualan',
                         'notes' => 'Item nota kredit atas retur penjualan',
                     ]
                 );
