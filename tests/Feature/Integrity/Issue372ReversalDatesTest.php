@@ -17,6 +17,7 @@ use App\Services\StockPostingService;
 use Carbon\CarbonInterface;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
+use Laravel\Sanctum\Sanctum;
 
 uses(RefreshDatabase::class)->group('stock-posting-issue-372');
 
@@ -398,6 +399,68 @@ describe('Issue #372 — langkah 2: edit dan batal stock adjustment, supplier re
 
         expect($thrown)->toBeInstanceOf(ValidationException::class);
         expect($thrown?->status)->toBe(422);
+        expect(StockMovement::query()->where('movement_type', 'adjustment_reversal')->count())->toBe(0);
+    });
+});
+
+describe('Issue #372 — langkah 2: jalur HTTP edit dan batal memakai tanggal yang benar', function () {
+    test('batal stock transfer lewat API membuat pembalik bertanggal hari batal', function () {
+        Sanctum::actingAs(
+            createTestUserWithPermissions(['stock_transfer', 'stock_transfer.delete']),
+            ['*'],
+        );
+
+        $product = Product::factory()->create();
+        $from = Warehouse::factory()->create();
+        $to = Warehouse::factory()->create();
+        $transferDate = now()->subDays(10);
+
+        issue372GoodsReceipt($from, $product, 4, now()->subDays(20));
+
+        $transfer = StockTransfer::factory()->create([
+            'from_warehouse_id' => $from->id,
+            'to_warehouse_id' => $to->id,
+            'transfer_date' => $transferDate->toDateString(),
+            'status' => 'in_transit',
+        ]);
+        StockTransferItem::factory()->create([
+            'stock_transfer_id' => $transfer->id,
+            'product_id' => $product->id,
+            'quantity' => 3,
+        ]);
+        app(StockPostingService::class)->postStockTransferDispatch($transfer->refresh());
+
+        $this->deleteJson('/api/stock-transfers/' . $transfer->id)->assertNoContent();
+
+        $reversal = StockMovement::query()
+            ->where('movement_type', 'transfer_out_reversal')
+            ->where('reference_type', StockTransfer::class)
+            ->where('reference_id', $transfer->id)
+            ->firstOrFail();
+
+        expect($reversal->moved_at->toDateString())->toBe(now()->toDateString());
+        expect(issue372BalanceOn($product, $from, now()->subDays(5)))->toBe(1.0);
+        expect(issue372BalanceOn($product, $from, now()))->toBe(4.0);
+    });
+
+    test('edit stock adjustment yang membuat saldo berjalan negatif setelah pengeluaran ditolak 422', function () {
+        $product = Product::factory()->create();
+        $warehouse = Warehouse::factory()->create();
+
+        $adjustment = issue372Adjustment($warehouse, $product, 4, now()->subDays(10));
+        issue372Outflow($warehouse, $product, 3, now()->subDays(5));
+
+        $thrown = null;
+
+        try {
+            issue372EditAdjustment($adjustment, $product, 2);
+        } catch (ValidationException $e) {
+            $thrown = $e;
+        }
+
+        expect($thrown)->toBeInstanceOf(ValidationException::class);
+        expect($thrown?->status)->toBe(422);
+        expect(issue372BalanceOn($product, $warehouse, now()))->toBe(1.0);
         expect(StockMovement::query()->where('movement_type', 'adjustment_reversal')->count())->toBe(0);
     });
 });
