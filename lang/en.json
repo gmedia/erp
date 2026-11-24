@@ -52,6 +52,8 @@
     "Customer invoice still has active receipt allocations. Remove them before cancelling.": "Customer invoice still has active receipt allocations. Remove them before cancelling.",
     "Customer invoice still has applied credit notes. Void them before cancelling.": "Customer invoice still has applied credit notes. Void them before cancelling.",
     "Supplier bill still has active payment allocations. Remove them before cancelling.": "Supplier bill still has active payment allocations. Remove them before cancelling.",
+    "Goods receipt still has active supplier returns. Cancel them before cancelling.": "Goods receipt still has active supplier returns. Cancel them before cancelling.",
+    "Goods receipt still has active supplier bills. Cancel them before cancelling.": "Goods receipt still has active supplier bills. Cancel them before cancelling.",
     "approval.transition_forbidden": "You do not have permission to execute this transition.",
     "nav": {
         "platform": "Platform",
