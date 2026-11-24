@@ -466,7 +466,7 @@ describe('Issue #372 — langkah 2: jalur HTTP edit dan batal memakai tanggal ya
 });
 
 describe('Issue #372 — langkah 2: batal transfer di periode tertutup', function () {
-    test('batal stock transfer dispatched saat tahun fiskal hari batal tertutup ditolak 422 tanpa pembalik', function () {
+    test('batal stock transfer saat tahun fiskal hari batal tertutup ditolak 422 tanpa pembalik', function () {
         $product = Product::factory()->create();
         $from = Warehouse::factory()->create();
         $to = Warehouse::factory()->create();
