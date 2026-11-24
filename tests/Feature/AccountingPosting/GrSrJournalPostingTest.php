@@ -324,16 +324,31 @@ test('SupplierReturnController update triggers journal posting on confirm transi
         'confirmed_at' => null,
     ]);
 
+    // Retur hanya boleh dari baris GR confirmed (Issue #436 butir 4): buat GR confirmed sebagai sumber.
+    $sourceGoodsReceipt = GoodsReceipt::factory()->create([
+        'purchase_order_id' => makeConfirmedGrSrPurchaseOrder()->id,
+        'status' => 'confirmed',
+    ]);
+    $sourceGoodsReceiptItem = GoodsReceiptItem::factory()->create([
+        'goods_receipt_id' => $sourceGoodsReceipt->id,
+        'quantity_received' => 5,
+        'quantity_accepted' => 5,
+        'quantity_rejected' => 0,
+        'unit_price' => 60000,
+    ]);
+
     $returnItem = SupplierReturnItem::factory()->create([
         'supplier_return_id' => $sr->id,
+        'goods_receipt_item_id' => $sourceGoodsReceiptItem->id,
+        'product_id' => $sourceGoodsReceiptItem->product_id,
         'quantity_returned' => 5,
         'unit_price' => 60000,
     ]);
 
     // Stok masuk sah (penerimaan 5 unit) agar retur confirmed tidak ditolak 422 (cek stok konfirmasi #356).
-    $sourceGoodsReceipt = GoodsReceipt::factory()->create([
-        'purchase_order_id' => makeConfirmedGrSrPurchaseOrder()->id,
-    ]);
+    // Tanggal stok masuk harus SEBELUM return_date (2026-04-01): cek saldo berjalan (Issue #436 butir 3)
+    // memeriksa saldo sejak tanggal retur. Memakai now() membuat stok masuk jatuh SETELAH tanggal retur
+    // lampau sehingga saldo pada tanggal retur = 0 dan konfirmasi ditolak secara acak menurut tanggal sistem.
     StockMovement::factory()->create([
         'movement_type' => 'goods_receipt',
         'reference_type' => GoodsReceipt::class,
@@ -343,7 +358,7 @@ test('SupplierReturnController update triggers journal posting on confirm transi
         'quantity_in' => 5,
         'quantity_out' => 0,
         'balance_after' => 5,
-        'moved_at' => now()->subDay(),
+        'moved_at' => '2026-03-15 08:00:00',
     ]);
 
     putJson("/api/supplier-returns/{$sr->id}", [

@@ -495,3 +495,54 @@ test('destroy removes goods receipt', function () {
 
     assertDatabaseMissing('goods_receipts', ['id' => $goodsReceipt->id]);
 });
+
+test('system confirmation fields in payload are ignored on draft goods receipt', function () {
+    createGoodsReceiptCoaFixture();
+    [$purchaseOrder, $purchaseOrderItem, $product, $unit] = createPurchaseOrderWithItemForGoodsReceipt();
+    $goodsReceipt = GoodsReceipt::factory()->create([
+        'purchase_order_id' => $purchaseOrder->id,
+        'warehouse_id' => $purchaseOrder->warehouse_id,
+        'receipt_date' => '2026-03-06',
+        'status' => 'draft',
+        'confirmed_at' => null,
+        'confirmed_by' => null,
+    ]);
+
+    $items = [[
+        'purchase_order_item_id' => $purchaseOrderItem->id,
+        'product_id' => $product->id,
+        'unit_id' => $unit->id,
+        'quantity_received' => 7,
+        'quantity_accepted' => 6,
+        'quantity_rejected' => 1,
+        'unit_price' => 10000,
+    ]];
+
+    // Payload draft mencoba mengisi field sistem; server harus mengabaikannya.
+    putJson('/api/goods-receipts/' . $goodsReceipt->id, [
+        'status' => 'draft',
+        'confirmed_at' => '2020-01-01 00:00:00',
+        'confirmed_by' => null,
+        'items' => $items,
+    ])->assertOk();
+
+    $goodsReceipt->refresh();
+    expect($goodsReceipt->confirmed_at)->toBeNull();
+    expect($goodsReceipt->confirmed_by)->toBeNull();
+
+    // Konfirmasi berikutnya harus tetap memposting stok dan jurnal.
+    putJson('/api/goods-receipts/' . $goodsReceipt->id, [
+        'status' => 'confirmed',
+        'items' => $items,
+    ])->assertOk();
+
+    assertDatabaseHas('stock_movements', [
+        'movement_type' => 'goods_receipt',
+        'reference_type' => GoodsReceipt::class,
+        'reference_id' => $goodsReceipt->id,
+        'product_id' => $product->id,
+        'quantity_in' => 6,
+    ]);
+    expect($goodsReceipt->refresh()->confirmed_at)->not->toBeNull();
+    expect($goodsReceipt->journal_entry_id)->not->toBeNull();
+});
