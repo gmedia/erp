@@ -241,6 +241,9 @@ class StockAdjustmentController extends Controller
                 $stockAdjustment->id,
                 'adjustment',
                 function () use ($stockAdjustment, $items, $syncItems, $stockPosting): void {
+                    // Item diganti (bukan di-upsert) agar source_line_id movement asli tidak tertimpa
+                    // repost; pembalik tetap utuh di riwayat (Issue #372).
+                    $stockAdjustment->items()->delete();
                     $syncItems->execute($stockAdjustment, $items);
                     $stockPosting->postStockAdjustment($stockAdjustment->refresh());
                 },
