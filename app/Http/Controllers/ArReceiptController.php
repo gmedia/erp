@@ -33,13 +33,23 @@ class ArReceiptController extends Controller
         return (new ArReceiptCollection($arReceipts))->response();
     }
 
-    public function store(StoreArReceiptRequest $request, SyncArReceiptAllocationsAction $syncAllocations): JsonResponse
-    {
+    public function store(
+        StoreArReceiptRequest $request,
+        SyncArReceiptAllocationsAction $syncAllocations,
+        PostArReceiptJournalAction $postJournal
+    ): JsonResponse {
         $validated = $request->validated();
         $allocations = $validated['allocations'];
         unset($validated['allocations']);
 
         $validated['created_by'] = Auth::id();
+
+        $isConfirmedOnCreate = ($validated['status'] ?? null) === 'confirmed';
+
+        if ($isConfirmedOnCreate) {
+            $validated['confirmed_by'] = Auth::id();
+            $validated['confirmed_at'] = now()->toIso8601String();
+        }
 
         $arReceipt = $this->storeWithSyncedItems(
             attributes: $validated,
@@ -51,6 +61,11 @@ class ArReceiptController extends Controller
             syncItems: function (ArReceipt $arReceipt, array $allocations) use ($syncAllocations): void {
                 $syncAllocations->execute($arReceipt, $allocations);
             },
+            afterCommit: $isConfirmedOnCreate
+                ? function (ArReceipt $arReceipt) use ($postJournal): void {
+                    $postJournal->execute($arReceipt->refresh());
+                }
+            : null,
         );
 
         return (new ArReceiptResource($this->loadResourceRelations($arReceipt)))
