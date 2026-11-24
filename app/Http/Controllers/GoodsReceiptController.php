@@ -31,8 +31,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\ValidationException;
 
 class GoodsReceiptController extends Controller
 {
@@ -181,6 +179,9 @@ class GoodsReceiptController extends Controller
             $guardPurchaseOrder,
             $syncItems,
             $postJournal,
+            $postMovements,
+            $stockPosting,
+            $purchaseOrderReceipts,
         ): void {
             // GR yang sudah confirmed tetap sah; aturan PO hanya berlaku saat GR baru dikonfirmasi.
             if ($isNewlyConfirmed) {
@@ -199,31 +200,21 @@ class GoodsReceiptController extends Controller
                     $syncItems->execute($goodsReceipt, $items);
                 },
                 afterCommit: $isNewlyConfirmed
+                    // Jurnal gagal (COA/periode) melempar ValidationException: transaksi dibatalkan,
+                    // dokumen dan stok tidak berubah (Issue #416).
                     ? function (GoodsReceipt $goodsReceipt) use ($postJournal): void {
-                        try {
-                            $postJournal->execute($goodsReceipt->refresh());
-                        } catch (ValidationException $e) {
-                            // Validation failures (e.g. missing COA mapping) are intentionally
-                            // swallowed so the goods receipt itself stays confirmed; user can
-                            // post the journal later. Non-validation errors propagate and
-                            // roll back the entire transaction (status flip included).
-                            Log::warning('Goods receipt journal posting skipped', [
-                                'goods_receipt_id' => $goodsReceipt->id,
-                                'reason' => $e->getMessage(),
-                            ]);
-                        }
+                        $postJournal->execute($goodsReceipt->refresh());
                     }
                 : null,
             );
-        });
 
-        if ($isNewlyConfirmed) {
-            // Setelah commit: movement tetap ada walau posting jurnal gagal.
-            $postMovements->execute($goodsReceipt->refresh());
-        } elseif ($goodsReceipt->status === 'confirmed' && is_array($items)) {
-            // Issue #356: item GR confirmed diedit setelah posting. Movement lama dibalik
-            // (histori tetap), lalu item baru diposting ulang. Tanpa ini stok tidak sesuai item.
-            DB::transaction(function () use ($goodsReceipt, $stockPosting, $purchaseOrderReceipts, $postMovements): void {
+            // Issue #416: dokumen, jurnal, dan stok satu transaksi; bila salah satu ditolak
+            // (422), tidak ada yang berubah.
+            if ($isNewlyConfirmed) {
+                $postMovements->execute($goodsReceipt->refresh());
+            } elseif ($goodsReceipt->status === 'confirmed' && is_array($items)) {
+                // Issue #356: item GR confirmed diedit setelah posting. Movement lama dibalik
+                // (histori tetap), lalu item baru diposting ulang.
                 $stockPosting->editDocument(
                     GoodsReceipt::class,
                     $goodsReceipt->id,
@@ -231,8 +222,8 @@ class GoodsReceiptController extends Controller
                     fn () => $postMovements->execute($goodsReceipt->refresh()),
                 );
                 $purchaseOrderReceipts->syncFromGoodsReceipt($goodsReceipt);
-            });
-        }
+            }
+        });
 
         return (new GoodsReceiptResource($this->loadResourceRelations($goodsReceipt)))->response();
     }
