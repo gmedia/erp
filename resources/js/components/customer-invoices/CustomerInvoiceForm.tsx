@@ -9,6 +9,7 @@ import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
 import { EntityFormItemSectionHeader } from '@/components/common/EntityFormItemTable';
 import { InputField } from '@/components/common/InputField';
+import { PostedDocumentLockNotice } from '@/components/common/PostedDocumentLockNotice';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
 import { TransactionLineItemsTable } from '@/components/common/TransactionLineItemsTable';
@@ -20,6 +21,7 @@ import {
 } from '@/types/customer-invoice';
 import { toDateInputValue } from '@/utils/date-format';
 import { omitItemDisplayLabels } from '@/utils/entity-form-item';
+import { isPostedDocumentLocked } from '@/utils/posted-document-lock';
 import { customerInvoiceFormSchema } from '@/utils/schemas';
 import { CustomerInvoiceItemFormDialog } from './CustomerInvoiceItemFormDialog';
 
@@ -101,6 +103,7 @@ export const CustomerInvoiceForm = memo<CustomerInvoiceFormProps>(
         isLoading = false,
     }) {
         const activeCustomerInvoice = customerInvoice || item || entity;
+        const isLocked = isPostedDocumentLocked(activeCustomerInvoice);
         const defaultValues = useMemo(
             () => getCustomerInvoiceFormDefaults(activeCustomerInvoice),
             [activeCustomerInvoice],
@@ -172,6 +175,7 @@ export const CustomerInvoiceForm = memo<CustomerInvoiceFormProps>(
                     isLoading={isLoading}
                     className="sm:max-w-[1100px]"
                 >
+                    <PostedDocumentLockNotice locked={isLocked} />
                     <div className="grid grid-cols-2 gap-4">
                         <AsyncSelectField
                             name="customer_id"
@@ -218,6 +222,7 @@ export const CustomerInvoiceForm = memo<CustomerInvoiceFormProps>(
                     <EntityFormItemSectionHeader
                         title="Invoice Items"
                         onAddItem={handleCreateNewItem}
+                        locked={isLocked}
                     />
 
                     <TransactionLineItemsTable
@@ -226,6 +231,7 @@ export const CustomerInvoiceForm = memo<CustomerInvoiceFormProps>(
                         currency={selectedCurrency}
                         onEdit={handleEditItem}
                         onRemove={remove}
+                        locked={isLocked}
                     />
                 </EntityForm>
 

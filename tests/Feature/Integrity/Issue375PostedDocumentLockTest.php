@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\ApPayment;
+use App\Models\ArReceipt;
 use App\Models\CustomerInvoice;
 use App\Models\JournalEntry;
 use App\Models\SupplierBill;
@@ -14,6 +16,8 @@ beforeEach(function () {
     $user = createTestUserWithPermissions([
         'customer_invoice', 'customer_invoice.edit',
         'supplier_bill', 'supplier_bill.edit',
+        'ar_receipt', 'ar_receipt.edit',
+        'ap_payment', 'ap_payment.edit',
     ]);
     Sanctum::actingAs($user, ['*']);
 });
@@ -70,4 +74,32 @@ test('dokumen draft tanpa jurnal tetap boleh mengubah nilai', function () {
         'status' => 'draft',
         'grand_total' => 120000,
     ])->assertOk();
+});
+
+test('total ar receipt terposting yang berubah ditolak 422', function () {
+    $receipt = ArReceipt::factory()->create([
+        'status' => 'confirmed',
+        'journal_entry_id' => JournalEntry::factory()->create()->id,
+        'total_amount' => 100000,
+    ]);
+
+    putJson("/api/ar-receipts/{$receipt->id}", [
+        'status' => 'confirmed',
+        'total_amount' => 999999,
+    ])->assertStatus(422)
+        ->assertJsonValidationErrors(['total_amount']);
+});
+
+test('total ap payment terposting yang berubah ditolak 422', function () {
+    $payment = ApPayment::factory()->create([
+        'status' => 'confirmed',
+        'journal_entry_id' => JournalEntry::factory()->create()->id,
+        'total_amount' => 100000,
+    ]);
+
+    putJson("/api/ap-payments/{$payment->id}", [
+        'status' => 'confirmed',
+        'total_amount' => 999999,
+    ])->assertStatus(422)
+        ->assertJsonValidationErrors(['total_amount']);
 });

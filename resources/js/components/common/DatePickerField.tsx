@@ -24,6 +24,7 @@ interface DatePickerFieldProps {
     label: string;
     placeholder?: string;
     disabled?: (date: Date) => boolean;
+    locked?: boolean;
     className?: string;
 }
 
@@ -36,6 +37,7 @@ export function DatePickerField({
     label,
     placeholder = 'Pick a date',
     disabled,
+    locked = false,
     className,
 }: Readonly<DatePickerFieldProps>) {
     return (
@@ -60,6 +62,7 @@ export function DatePickerField({
                                 <FormControl>
                                     <Button
                                         variant="outline"
+                                        disabled={locked}
                                         className={cn(
                                             'w-full pl-3 text-left font-normal',
                                             !field.value &&

@@ -40,6 +40,7 @@ export interface TransactionLineItemsTableProps<T extends TransactionLineItem> {
     onEdit: (index: number) => void;
     onRemove: (index: number) => void;
     emptyMessage?: string;
+    locked?: boolean;
 }
 
 function computeLineTotal(item: TransactionLineItem, includeDiscount: boolean) {
@@ -78,6 +79,7 @@ export function TransactionLineItemsTable<T extends TransactionLineItem>({
     onEdit,
     onRemove,
     emptyMessage = "No items added yet. Click 'Add Item' to start.",
+    locked = false,
 }: Readonly<TransactionLineItemsTableProps<T>>) {
     const colSpan = includeDiscount ? 9 : 8;
 
@@ -151,6 +153,7 @@ export function TransactionLineItemsTable<T extends TransactionLineItem>({
                                 index={index}
                                 onEdit={onEdit}
                                 onRemove={onRemove}
+                                locked={locked}
                             />
                         </TableRow>
                     );

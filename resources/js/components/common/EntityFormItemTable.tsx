@@ -9,12 +9,14 @@ interface EntityFormItemSectionHeaderProps {
     readonly onAddItem: () => void;
     readonly title?: string;
     readonly addLabel?: string;
+    readonly locked?: boolean;
 }
 
 interface EntityFormItemActionsCellProps {
     readonly index: number;
     readonly onEdit: (index: number) => void;
     readonly onRemove: (index: number) => void;
+    readonly locked?: boolean;
 }
 
 interface EntityFormItemEmptyRowProps {
@@ -27,11 +29,17 @@ export function EntityFormItemSectionHeader({
     onAddItem,
     title = 'Items',
     addLabel = 'Add Item',
+    locked = false,
 }: Readonly<EntityFormItemSectionHeaderProps>) {
     return (
         <div className="flex items-center justify-between">
             <div className="text-sm font-semibold">{title}</div>
-            <Button type="button" variant="outline" onClick={onAddItem}>
+            <Button
+                type="button"
+                variant="outline"
+                onClick={onAddItem}
+                disabled={locked}
+            >
                 <Plus className="mr-2 h-4 w-4" />
                 {addLabel}
             </Button>
@@ -43,6 +51,7 @@ export function EntityFormItemActionsCell({
     index,
     onEdit,
     onRemove,
+    locked = false,
 }: Readonly<EntityFormItemActionsCellProps>) {
     return (
         <TableCell className="text-right">
@@ -51,6 +60,7 @@ export function EntityFormItemActionsCell({
                 variant="ghost"
                 size="icon"
                 onClick={() => onEdit(index)}
+                disabled={locked}
                 title="Edit item"
                 aria-label={`Edit item ${index + 1}`}
             >
@@ -61,6 +71,7 @@ export function EntityFormItemActionsCell({
                 variant="ghost"
                 size="icon"
                 onClick={() => onRemove(index)}
+                disabled={locked}
                 title="Remove item"
                 aria-label={`Remove item ${index + 1}`}
             >

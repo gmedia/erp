@@ -23,6 +23,7 @@ interface AsyncSelectFieldProps<T extends object = Record<string, unknown>> {
     readonly onItemSelect?: (item: T) => void;
     readonly preferredMetaKey?: string;
     readonly filterItems?: (item: T) => boolean;
+    readonly disabled?: boolean;
 }
 
 export default function AsyncSelectField<
@@ -40,6 +41,7 @@ export default function AsyncSelectField<
     onItemSelect,
     preferredMetaKey,
     filterItems,
+    disabled = false,
 }: Readonly<AsyncSelectFieldProps<T>>) {
     return (
         <FormField
@@ -62,6 +64,7 @@ export default function AsyncSelectField<
                             label={label}
                             preferredMetaKey={preferredMetaKey}
                             filterItems={filterItems}
+                            disabled={disabled}
                         />
                     </FormControl>
                     <FormMessage />

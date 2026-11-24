@@ -3,6 +3,7 @@ import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
 import { EntityFormItemSectionHeader } from '@/components/common/EntityFormItemTable';
+import { PostedDocumentLockNotice } from '@/components/common/PostedDocumentLockNotice';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
 import { TransactionLineItemsTable } from '@/components/common/TransactionLineItemsTable';
@@ -12,6 +13,7 @@ import { type CreditNote, type CreditNoteFormData } from '@/types/credit-note';
 import { type CustomerInvoice } from '@/types/customer-invoice';
 import { toDateInputValue } from '@/utils/date-format';
 import { omitItemDisplayLabels } from '@/utils/entity-form-item';
+import { isPostedDocumentLocked } from '@/utils/posted-document-lock';
 import { creditNoteFormSchema } from '@/utils/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useMemo } from 'react';
@@ -85,6 +87,7 @@ export const CreditNoteForm = memo<CreditNoteFormProps>(
         isLoading = false,
     }) {
         const activeCreditNote = creditNote || item || entity;
+        const isLocked = isPostedDocumentLocked(activeCreditNote);
         const defaultValues = useMemo(
             () => getCreditNoteFormDefaults(activeCreditNote),
             [activeCreditNote],
@@ -151,6 +154,7 @@ export const CreditNoteForm = memo<CreditNoteFormProps>(
                     isLoading={isLoading}
                     className="sm:max-w-[1100px]"
                 >
+                    <PostedDocumentLockNotice locked={isLocked} />
                     <div className="grid grid-cols-2 gap-4">
                         <AsyncSelectField
                             name="customer_id"
@@ -208,11 +212,13 @@ export const CreditNoteForm = memo<CreditNoteFormProps>(
                     <EntityFormItemSectionHeader
                         title="Credit Note Items"
                         onAddItem={handleCreateNewItem}
+                        locked={isLocked}
                     />
                     <TransactionLineItemsTable
                         items={fields}
                         onEdit={handleEditItem}
                         onRemove={remove}
+                        locked={isLocked}
                     />
                 </EntityForm>
                 <CreditNoteItemFormDialog

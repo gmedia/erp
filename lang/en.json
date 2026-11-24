@@ -107,6 +107,10 @@
         "request_number": "No. {id}",
         "load_failed": "Failed to load approvals. Please refresh and try again."
     },
+    "posted_document": {
+        "title": "Posted document",
+        "values_locked": "This document is already posted. Its items and amounts are locked; use cancel or void instead."
+    },
     "users": {
         "title": "Users",
         "description": "Manage user accounts linked to employees.",

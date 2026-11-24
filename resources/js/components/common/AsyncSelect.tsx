@@ -28,6 +28,7 @@ export interface AsyncSelectProps<T extends object = Record<string, unknown>> {
     /** Meta key to read from API response for auto-selecting a default value when no value is set. */
     preferredMetaKey?: string;
     filterItems?: (item: T) => boolean;
+    disabled?: boolean;
 }
 
 export function AsyncSelect<T extends object = Record<string, unknown>>({
@@ -44,6 +45,7 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
     label,
     preferredMetaKey,
     filterItems,
+    disabled = false,
 }: Readonly<AsyncSelectProps<T>>) {
     const [open, setOpen] = React.useState(false);
     const [search, setSearch] = React.useState('');
@@ -173,11 +175,12 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
     }, [value]);
 
     return (
-        <Popover open={open} onOpenChange={setOpen}>
+        <Popover open={open && !disabled} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
                 <Button
                     variant="outline"
                     role="combobox"
+                    disabled={disabled}
                     aria-label={label}
                     aria-expanded={open}
                     className={cn(
