@@ -68,10 +68,12 @@ class SyncApPaymentAllocationsAction
                 continue;
             }
 
+            // Issue #437: diskon alokasi ikut mengurangi sisa bill (settlement = kas + diskon).
             $totalPaid = ApPaymentAllocation::query()
                 ->where('supplier_bill_id', $billId)
                 ->whereHas('payment', fn ($q) => $q->whereIn('status', self::POSTED_STATUSES))
-                ->sum('allocated_amount');
+                ->selectRaw('COALESCE(SUM(allocated_amount + discount_taken), 0) as settled')
+                ->value('settled');
 
             $bill->update([
                 'amount_paid' => (string) $totalPaid,
@@ -88,7 +90,7 @@ class SyncApPaymentAllocationsAction
     public function assertStoredWithinOutstanding(ApPayment $apPayment): void
     {
         $stored = $apPayment->allocations()
-            ->get(['supplier_bill_id', 'allocated_amount'])
+            ->get(['supplier_bill_id', 'allocated_amount', 'discount_taken'])
             ->toArray();
 
         $this->assertWithinOutstanding($apPayment, $stored);
@@ -102,9 +104,11 @@ class SyncApPaymentAllocationsAction
      */
     private function assertWithinOutstanding(ApPayment $apPayment, array $allocations): void
     {
+        // Issue #437: setiap alokasi memakan kas + diskon dari sisa bill.
         $requested = collect($allocations)
             ->groupBy(fn (array $row) => (int) $row['supplier_bill_id'])
-            ->map(fn ($rows) => $rows->sum(fn (array $row) => (float) $row['allocated_amount']));
+            ->map(fn ($rows) => $rows->sum(fn (array $row) => (float) $row['allocated_amount']
+                + (float) ($row['discount_taken'] ?? 0)));
 
         foreach ($requested as $billId => $amount) {
             $bill = SupplierBill::where('id', $billId)->lockForUpdate()->first();
@@ -116,7 +120,8 @@ class SyncApPaymentAllocationsAction
                 ->where('supplier_bill_id', $billId)
                 ->where('ap_payment_id', '!=', $apPayment->id)
                 ->whereHas('payment', fn ($q) => $q->whereIn('status', self::POSTED_STATUSES))
-                ->sum('allocated_amount');
+                ->selectRaw('COALESCE(SUM(allocated_amount + discount_taken), 0) as settled')
+                ->value('settled');
 
             $max = (float) $bill->grand_total - (float) $postedOthers;
 

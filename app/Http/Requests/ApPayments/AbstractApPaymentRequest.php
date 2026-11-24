@@ -75,6 +75,7 @@ abstract class AbstractApPaymentRequest extends AuthorizedFormRequest
                 }
 
                 // Only posted payments bind the quota; drafts are re-checked on confirm.
+                // Issue #437: kas + diskon sama-sama memakan sisa bill.
                 $existingAllocated = ApPaymentAllocation::where('supplier_bill_id', $bill->id)
                     ->when(
                         $paymentId,
@@ -84,9 +85,11 @@ abstract class AbstractApPaymentRequest extends AuthorizedFormRequest
                         'payment',
                         fn ($q) => $q->whereIn('status', SyncApPaymentAllocationsAction::POSTED_STATUSES),
                     )
-                    ->sum('allocated_amount');
+                    ->selectRaw('COALESCE(SUM(allocated_amount + discount_taken), 0) as settled')
+                    ->value('settled');
 
-                $newTotal = $existingAllocated + (float) $allocation['allocated_amount'];
+                $newTotal = $existingAllocated + (float) $allocation['allocated_amount']
+                    + (float) ($allocation['discount_taken'] ?? 0);
 
                 if ($newTotal > (float) $bill->grand_total) {
                     $validator->errors()->add(

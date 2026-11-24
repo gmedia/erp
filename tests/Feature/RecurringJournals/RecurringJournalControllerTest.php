@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Account;
+use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
 use App\Models\RecurringJournal;
@@ -132,14 +133,26 @@ test('it can export recurring journals', function () {
 test('it can execute a recurring journal and render templates', function () {
     $this->travelTo('2026-01-15 10:00:00');
 
+    $fiscalYear2026 = FiscalYear::factory()->create([
+        'name' => '2026',
+        'start_date' => '2026-01-01',
+        'end_date' => '2026-12-31',
+        'status' => 'open',
+    ]);
+
     $journal = RecurringJournal::factory()->create([
+        'fiscal_year_id' => $fiscalYear2026->id,
         'auto_post' => true,
         'is_active' => true,
         'next_run_date' => '2026-01-15',
         'description' => 'Monthly accrual {MM}/{YYYY}',
         'reference_template' => 'RJ-{YYYY}-{MM}-{DD}',
     ]);
-    $accounts = Account::factory()->count(2)->create();
+    $coaVersion = CoaVersion::factory()->create(['status' => 'active']);
+    $accounts = Account::factory()->count(2)->create([
+        'coa_version_id' => $coaVersion->id,
+        'is_active' => true,
+    ]);
     RecurringJournalLine::factory()->create(['recurring_journal_id' => $journal->id, 'account_id' => $accounts[0]->id, 'debit' => 1000, 'credit' => 0]);
     RecurringJournalLine::factory()->create(['recurring_journal_id' => $journal->id, 'account_id' => $accounts[1]->id, 'debit' => 0, 'credit' => 1000]);
 

@@ -60,6 +60,7 @@ class ArSampleDataSeeder extends Seeder
             ->where('coa_version_id', $activeCoaVersionId)
             ->where('type', 'revenue')
             ->where('is_active', true)
+            ->whereDoesntHave('children')
             ->orderBy('code')
             ->first();
 

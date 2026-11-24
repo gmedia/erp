@@ -7,16 +7,16 @@ trait MapsCustomerInvoiceExportRow
     protected function mapBaseInvoiceColumns($row): array
     {
         return [
-            $row->customer_invoice['invoice_number'] ?? '-',
-            $row->customer_invoice['invoice_date'] ?? '-',
-            $row->customer_invoice['due_date'] ?? '-',
-            $row->customer['name'] ?? '-',
-            $row->branch['name'] ?? '-',
-            $row->amounts['grand_total'] ?? 0,
-            $row->amounts['amount_received'] ?? 0,
-            $row->amounts['credit_note_amount'] ?? 0,
-            $row->amounts['amount_due'] ?? 0,
-            $row->customer_invoice['status'] ?? '-',
+            $row->invoice_number ?? '-',
+            $row->invoice_date ?? '-',
+            $row->due_date ?? '-',
+            $row->customer_name ?? '-',
+            $row->branch_name ?? '-',
+            $row->grand_total ?? 0,
+            $row->amount_received ?? 0,
+            $row->credit_note_amount ?? 0,
+            $row->amount_due ?? 0,
+            $row->status ?? '-',
         ];
     }
 

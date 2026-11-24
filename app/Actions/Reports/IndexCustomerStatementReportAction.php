@@ -16,7 +16,7 @@ class IndexCustomerStatementReportAction
 
     public function execute(FormRequest $request): LengthAwarePaginator|Collection
     {
-        $query = $this->buildQuery();
+        $query = $this->buildQuery($request);
 
         $this->applyCustomerStatementReportFilters($request, $query);
         $this->applyRequestSorting(
@@ -32,9 +32,14 @@ class IndexCustomerStatementReportAction
         return $this->exportOrPaginate($request, $query);
     }
 
-    protected function buildQuery(): Builder
+    protected function buildQuery(FormRequest $request): Builder
     {
-        return $this->buildBaseCustomerInvoiceQuery([$this->runningBalanceSelectSql()])
+        $startDate = $request->filled('start_date') ? $request->string('start_date')->toString() : null;
+
+        return $this->buildBaseCustomerInvoiceQuery(
+            [$this->runningBalanceSelectSql($startDate)],
+            $startDate !== null ? [$startDate] : [],
+        )
             // Running balance hanya transaksi piutang berjalan (W5-14).
             ->whereIn('ci.status', ['sent', 'partially_paid', 'overdue'])
             ->where('ci.amount_due', '>', 0)
@@ -47,6 +52,10 @@ class IndexCustomerStatementReportAction
     {
         if ($request->filled('customer_id')) {
             $query->where('ci.customer_id', $request->integer('customer_id'));
+        }
+
+        if ($request->integer('branch_id') > 0) {
+            $query->where('ci.branch_id', $request->integer('branch_id'));
         }
 
         $this->applyDateRangeFilter($request, $query, 'ci.invoice_date');
@@ -98,12 +107,31 @@ class IndexCustomerStatementReportAction
         return $this->defaultSortBy();
     }
 
-    private function runningBalanceSelectSql(): string
+    /**
+     * Saldo berjalan per customer. Bila start_date diisi, piutang berjalan sebelum
+     * start_date (saldo awal) ikut dijumlahkan sebagai titik awal.
+     */
+    private function runningBalanceSelectSql(?string $startDate): string
     {
-        return 'SUM(ci.amount_due) OVER (
+        $window = 'SUM(ci.amount_due) OVER (
             PARTITION BY ci.customer_id
             ORDER BY ci.invoice_date, ci.id
             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-        ) as running_balance';
+        )';
+
+        if ($startDate === null) {
+            return $window . ' as running_balance';
+        }
+
+        $opening = 'COALESCE((
+            SELECT SUM(prior.amount_due)
+            FROM customer_invoices AS prior
+            WHERE prior.customer_id = ci.customer_id
+              AND prior.status IN (\'sent\', \'partially_paid\', \'overdue\')
+              AND prior.amount_due > 0
+              AND prior.invoice_date < ?
+        ), 0)';
+
+        return $opening . ' + ' . $window . ' as running_balance';
     }
 }

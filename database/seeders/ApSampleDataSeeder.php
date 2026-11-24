@@ -58,6 +58,7 @@ class ApSampleDataSeeder extends Seeder
             ->where('coa_version_id', $activeCoaVersionId)
             ->where('type', 'expense')
             ->where('is_active', true)
+            ->whereDoesntHave('children')
             ->take(3)
             ->get();
 
@@ -65,6 +66,7 @@ class ApSampleDataSeeder extends Seeder
             ->where('coa_version_id', $activeCoaVersionId)
             ->where('type', 'asset')
             ->where('is_active', true)
+            ->whereDoesntHave('children')
             ->take(2)
             ->get();
 

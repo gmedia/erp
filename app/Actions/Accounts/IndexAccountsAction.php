@@ -33,6 +33,10 @@ class IndexAccountsAction extends SimpleCrudIndexAction
             $query->whereDoesntHave('children');
         }
 
+        if ($request->boolean('postable')) {
+            $this->applyPostableFilter($query);
+        }
+
         return $this->handleIndexRequestWithOptionalPagination(
             $request,
             $query,
@@ -58,6 +62,27 @@ class IndexAccountsAction extends SimpleCrudIndexAction
     protected function getSortableFields(): array
     {
         return ['id', 'code', 'name', 'type', 'level', 'created_at', 'updated_at'];
+    }
+
+    /**
+     * Akun yang boleh dipilih di form jurnal manual (#437): akun daun, atau akun kelompok
+     * yang masih punya saldo posted tidak nol (dipakai untuk memindahkan saldo lama ke daun).
+     */
+    private function applyPostableFilter(Builder $query): void
+    {
+        $query->where(function (Builder $postable): void {
+            $postable->whereDoesntHave('children')
+                ->orWhereIn('id', function ($balanced): void {
+                    $balanced->select('journal_entry_lines.account_id')
+                        ->from('journal_entry_lines')
+                        ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+                        ->where('journal_entries.status', 'posted')
+                        ->groupBy('journal_entry_lines.account_id')
+                        ->havingRaw(
+                            'ABS(COALESCE(SUM(journal_entry_lines.debit - journal_entry_lines.credit), 0)) >= 0.005'
+                        );
+                });
+        });
     }
 
     private function applyCoaVersionFilter(FormRequest $request, Builder $query): void

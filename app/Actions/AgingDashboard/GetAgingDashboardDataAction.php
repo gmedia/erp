@@ -3,14 +3,13 @@
 namespace App\Actions\AgingDashboard;
 
 use App\Actions\Concerns\AssertsSingleCurrency;
-use App\Models\CustomerInvoice;
-use App\Models\SupplierBill;
-use Illuminate\Database\Query\Builder;
+use App\Actions\Reports\Concerns\AgingReportBoundaries;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class GetAgingDashboardDataAction
 {
+    use AgingReportBoundaries;
     use AssertsSingleCurrency;
 
     /**
@@ -101,7 +100,6 @@ class GetAgingDashboardDataAction
         );
 
         $arRow = $this->aggregateBuckets(
-            CustomerInvoice::query()->getQuery(),
             'customer_invoices',
             self::AR_OUTSTANDING_STATUSES,
             $branchId,
@@ -112,10 +110,10 @@ class GetAgingDashboardDataAction
             $d60,
             $d61,
             $d90,
+            $this->historicalArDueSql('ci', $asOfStr),
         );
 
         $apRow = $this->aggregateBuckets(
-            SupplierBill::query()->getQuery(),
             'supplier_bills',
             self::AP_OUTSTANDING_STATUSES,
             $branchId,
@@ -126,6 +124,7 @@ class GetAgingDashboardDataAction
             $d60,
             $d61,
             $d90,
+            $this->historicalApDueSql('sb', $asOfStr),
         );
 
         $arSummary = $this->buildSummary($arRow);
@@ -146,7 +145,6 @@ class GetAgingDashboardDataAction
      * @return object
      */
     private function aggregateBuckets(
-        Builder $base,
         string $table,
         array $statuses,
         ?int $branchId,
@@ -157,24 +155,34 @@ class GetAgingDashboardDataAction
         string $d60,
         string $d61,
         string $d90,
+        string $dueSql,
     ) {
-        $query = DB::table($table)
-            ->whereIn('status', $statuses);
+        $alias = $table === 'customer_invoices' ? 'ci' : 'sb';
+        $dateColumn = $table === 'customer_invoices' ? 'invoice_date' : 'bill_date';
+
+        // Basis sama dengan laporan AR/AP: dokumen bertanggal <= as_of, sisa historis > 0.
+        $query = DB::table("{$table} as {$alias}")
+            ->whereIn("{$alias}.status", $statuses)
+            ->whereDate("{$alias}.{$dateColumn}", '<=', $asOfStr)
+            ->whereRaw('(' . $dueSql . ') > 0');
 
         if ($branchId !== null) {
-            $query->where('branch_id', $branchId);
+            $query->where("{$alias}.branch_id", $branchId);
         }
 
+        $due = $dueSql;
+        $dueCol = "{$alias}.due_date";
+
         $row = $query->selectRaw(
-            'COALESCE(SUM(amount_due), 0) AS total_outstanding,
-             COALESCE(SUM(CASE WHEN due_date >= ? THEN amount_due ELSE 0 END), 0) AS current_amount,
-             COALESCE(SUM(CASE WHEN due_date BETWEEN ? AND ? THEN amount_due ELSE 0 END), 0) AS amount_1_30,
-             COALESCE(SUM(CASE WHEN due_date BETWEEN ? AND ? THEN amount_due ELSE 0 END), 0) AS amount_31_60,
-             COALESCE(SUM(CASE WHEN due_date BETWEEN ? AND ? THEN amount_due ELSE 0 END), 0) AS amount_61_90,
-             COALESCE(SUM(CASE WHEN due_date < ? THEN amount_due ELSE 0 END), 0) AS amount_over_90,
-             COALESCE(SUM(CASE WHEN due_date < ? THEN amount_due ELSE 0 END), 0) AS overdue_amount,
+            "COALESCE(SUM({$due}), 0) AS total_outstanding,
+             COALESCE(SUM(CASE WHEN {$dueCol} >= ? THEN {$due} ELSE 0 END), 0) AS current_amount,
+             COALESCE(SUM(CASE WHEN {$dueCol} BETWEEN ? AND ? THEN {$due} ELSE 0 END), 0) AS amount_1_30,
+             COALESCE(SUM(CASE WHEN {$dueCol} BETWEEN ? AND ? THEN {$due} ELSE 0 END), 0) AS amount_31_60,
+             COALESCE(SUM(CASE WHEN {$dueCol} BETWEEN ? AND ? THEN {$due} ELSE 0 END), 0) AS amount_61_90,
+             COALESCE(SUM(CASE WHEN {$dueCol} < ? THEN {$due} ELSE 0 END), 0) AS amount_over_90,
+             COALESCE(SUM(CASE WHEN {$dueCol} < ? THEN {$due} ELSE 0 END), 0) AS overdue_amount,
              COUNT(*) AS invoice_count,
-             COALESCE(SUM(CASE WHEN due_date < ? THEN 1 ELSE 0 END), 0) AS overdue_count',
+             COALESCE(SUM(CASE WHEN {$dueCol} < ? THEN 1 ELSE 0 END), 0) AS overdue_count",
             [
                 $asOfStr,
                 $d30, $d1,
@@ -320,22 +328,29 @@ class GetAgingDashboardDataAction
             $countCol = 'bill_count';
         }
 
+        $dateColumn = $type === 'customer' ? 'invoice_date' : 'bill_date';
+        $dueSql = $type === 'customer'
+            ? $this->historicalArDueSql($tableAlias, $asOfStr)
+            : $this->historicalApDueSql($tableAlias, $asOfStr);
+
         $query = DB::table("{$table} as {$tableAlias}")
             ->join("{$partnerTable} as {$partnerAlias}", "{$partnerAlias}.id", '=', "{$tableAlias}.{$partnerFk}")
-            ->whereIn("{$tableAlias}.status", $statuses);
+            ->whereIn("{$tableAlias}.status", $statuses)
+            ->whereDate("{$tableAlias}.{$dateColumn}", '<=', $asOfStr)
+            ->whereRaw('(' . $dueSql . ') > 0');
 
         if ($branchId !== null) {
             $query->where("{$tableAlias}.branch_id", $branchId);
         }
 
-        $overdueCase = "CASE WHEN {$tableAlias}.due_date < ? THEN {$tableAlias}.amount_due ELSE 0 END";
+        $overdueCase = "CASE WHEN {$tableAlias}.due_date < ? THEN {$dueSql} ELSE 0 END";
 
         $rows = $query
             ->groupBy("{$tableAlias}.{$partnerFk}", "{$partnerAlias}.name")
             ->selectRaw(
                 "{$tableAlias}.{$partnerFk} AS {$partnerFk},
                  {$partnerAlias}.name AS {$partnerNameCol},
-                 COALESCE(SUM({$tableAlias}.amount_due), 0) AS outstanding_amount,
+                 COALESCE(SUM({$dueSql}), 0) AS outstanding_amount,
                  COALESCE(SUM({$overdueCase}), 0) AS overdue_amount,
                  COUNT(*) AS {$countCol},
                  MIN({$tableAlias}.due_date) AS oldest_due_date",

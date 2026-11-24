@@ -2,6 +2,7 @@
 
 namespace App\Actions\AccountingPosting;
 
+use App\Actions\Concerns\RoundsLineAmounts;
 use App\Actions\JournalEntries\CreateJournalEntryAction;
 use App\Models\CustomerInvoice;
 use App\Models\JournalEntry;
@@ -10,6 +11,8 @@ use Illuminate\Validation\ValidationException;
 
 class PostCustomerInvoiceJournalAction
 {
+    use RoundsLineAmounts;
+
     public const AR_CONTROL_ACCOUNT_CODE = '11200';
 
     /** @var list<string> */
@@ -47,13 +50,13 @@ class PostCustomerInvoiceJournalAction
             $entryDate = $invoice->invoice_date->format('Y-m-d');
             $arAccount = $this->resolveControlAccount->execute(self::AR_CONTROL_ACCOUNT_CODE, $entryDate);
 
-            $creditTotal = 0.0;
             $creditLines = [];
             $revenueGrouped = [];
 
             foreach ($invoice->items as $item) {
                 $accountId = (int) $item->account_id;
-                $revenueGrouped[$accountId] = ($revenueGrouped[$accountId] ?? 0.0) + (float) $item->line_total;
+                $revenueGrouped[$accountId] = ($revenueGrouped[$accountId] ?? 0.0)
+                    + $this->roundLineAmount($item->line_total);
             }
 
             foreach ($revenueGrouped as $accountId => $amount) {
@@ -64,13 +67,12 @@ class PostCustomerInvoiceJournalAction
                 $creditLines[] = [
                     'account_id' => $accountId,
                     'debit' => 0,
-                    'credit' => round($amount, 2),
+                    'credit' => $this->roundLineAmount($amount),
                     'memo' => "Invoice {$invoice->invoice_number}",
                 ];
-                $creditTotal += $amount;
             }
 
-            $creditTotal = round($creditTotal, 2);
+            $creditTotal = $this->sumRoundedLineAmounts(array_column($creditLines, 'credit'));
 
             $debitLine = [
                 'account_id' => $arAccount->id,

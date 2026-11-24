@@ -2,6 +2,7 @@
 
 namespace App\Actions\AccountingPosting;
 
+use App\Actions\Concerns\RoundsLineAmounts;
 use App\Actions\JournalEntries\CreateJournalEntryAction;
 use App\Models\GoodsReceipt;
 use App\Models\GoodsReceiptItem;
@@ -14,6 +15,8 @@ use Illuminate\Validation\ValidationException;
 
 class PostSupplierBillJournalAction
 {
+    use RoundsLineAmounts;
+
     public const AP_CONTROL_ACCOUNT_CODE = '21100';
 
     /** Beban selisih harga bill vs GR (keputusan #357 butir 5). */
@@ -57,7 +60,6 @@ class PostSupplierBillJournalAction
             $entryDate = $supplierBill->bill_date->format('Y-m-d');
             $apAccount = $this->resolveControlAccount->execute(self::AP_CONTROL_ACCOUNT_CODE, $entryDate);
 
-            $debitTotal = 0.0;
             $debitLines = [];
             $expenseGrouped = [];
 
@@ -75,16 +77,17 @@ class PostSupplierBillJournalAction
                 if ($grCreditAccountId !== null) {
                     $grValue = $this->grValueForBillItem($item);
                     $expenseGrouped[$grCreditAccountId] = ($expenseGrouped[$grCreditAccountId] ?? 0.0) + $grValue;
-                    $varianceAmount += (float) $item->line_total - $grValue;
+                    $varianceAmount += $this->roundLineAmount($item->line_total) - $grValue;
 
                     continue;
                 }
 
                 $accountId = (int) $item->account_id;
-                $expenseGrouped[$accountId] = ($expenseGrouped[$accountId] ?? 0.0) + (float) $item->line_total;
+                $expenseGrouped[$accountId] = ($expenseGrouped[$accountId] ?? 0.0)
+                    + $this->roundLineAmount($item->line_total);
             }
 
-            $varianceAmount = round($varianceAmount, 2);
+            $varianceAmount = $this->roundLineAmount($varianceAmount);
 
             foreach ($expenseGrouped as $accountId => $amount) {
                 if ($amount <= 0) {
@@ -93,11 +96,10 @@ class PostSupplierBillJournalAction
 
                 $debitLines[] = [
                     'account_id' => $accountId,
-                    'debit' => round($amount, 2),
+                    'debit' => $this->roundLineAmount($amount),
                     'credit' => 0,
                     'memo' => "Bill {$supplierBill->bill_number}",
                 ];
-                $debitTotal += $amount;
             }
 
             // Selisih harga: debit (bill lebih tinggi) atau kredit (bill lebih rendah) ke 51000.
@@ -109,10 +111,13 @@ class PostSupplierBillJournalAction
                     'credit' => $varianceAmount < 0 ? -$varianceAmount : 0,
                     'memo' => "Selisih harga Bill {$supplierBill->bill_number}",
                 ];
-                $debitTotal += $varianceAmount;
             }
 
-            $debitTotal = round($debitTotal, 2);
+            // Total kredit AP = jumlah baris debit bersih (debit - credit), tiap baris sudah dibulatkan.
+            $debitTotal = $this->sumRoundedLineAmounts(array_map(
+                static fn (array $line): float => (float) $line['debit'] - (float) $line['credit'],
+                $debitLines,
+            ));
 
             $creditLine = [
                 'account_id' => $apAccount->id,

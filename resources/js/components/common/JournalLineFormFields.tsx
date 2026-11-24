@@ -17,7 +17,7 @@ export function JournalLineFormFields<TFormValues extends FieldValues>({
     form,
     open,
     defaultValues,
-    accountUrl = '/api/accounts?is_active=1&has_children=0',
+    accountUrl = '/api/accounts?is_active=1&postable=1',
     branchUrl = '/api/branches',
 }: Readonly<JournalLineFormFieldsProps<TFormValues>>) {
     const accountId = (defaultValues as Record<string, unknown>).account_id;
