@@ -104,6 +104,10 @@ export async function approveViaScreenAsDelegate(
     extraDialogText?: string,
     confirmResponseMatch = '/api/my-approvals/',
 ): Promise<void> {
+    if (!documentText.trim()) {
+        throw new Error('approveViaScreenAsDelegate: documentText must not be empty');
+    }
+
     await delegateAndLogin(page);
     await page.context().clearCookies();
     await login(page, E2E_DELEGATE_EMAIL, DEFAULT_E2E_PASSWORD, { requireDashboard: false });
@@ -116,6 +120,7 @@ export async function approveViaScreenAsDelegate(
         .filter({ has: page.getByRole('button', { name: /^Approve$/ }) })
         .filter({ hasText: documentText })
         .last();
+    await expect(card.getByText(documentText).first()).toBeVisible({ timeout: 15000 });
     await expect(card).toBeVisible({ timeout: 15000 });
     await card.getByRole('button', { name: /^Approve$/ }).click();
 

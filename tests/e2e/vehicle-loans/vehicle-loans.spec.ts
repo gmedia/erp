@@ -103,7 +103,14 @@ test.describe('Vehicle Loans', () => {
         const id = await submitVehicleLoanRequest(page, 'E2E review assignment');
         const loan = await apiRequest(page, 'get', `/api/vehicle-loans/${id}`);
         expect(loan.ok()).toBeTruthy();
-        const { code } = (await loan.json()) as { code: string };
+        const body = (await loan.json()) as {
+            data?: { code?: string };
+            code?: string;
+        };
+        const code = body.data?.code ?? body.code;
+        if (!code) {
+            throw new Error(`Vehicle loan ${id} response has no code`);
+        }
 
         await approveViaScreenAsDelegate(
             page,
