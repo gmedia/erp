@@ -33,6 +33,20 @@
         "qty_received_label": "Qty Received",
         "qty_received_placeholder": "Empty = received in full"
     },
+    "approval": {
+        "status_manual_forbidden": "This status can only be set through the approval process or by the system.",
+        "items_locked": "Items can only be changed while the document is still a draft.",
+        "form_locked": "Awaiting or past approval: header and items are read-only. Use status actions instead.",
+        "tab_details": "Details",
+        "tab_timeline": "Timeline",
+        "tab_approvals": "Approvals",
+        "flow_not_found": "Approval flow not found, inactive, or has no steps.",
+        "transition_forbidden": "You do not have permission to execute this transition."
+    },
+    "approval.status_manual_forbidden": "This status can only be set through the approval process or by the system.",
+    "approval.items_locked": "Items can only be changed while the document is still a draft.",
+    "approval.flow_not_found": "Approval flow not found, inactive, or has no steps.",
+    "approval.transition_forbidden": "You do not have permission to execute this transition.",
     "nav": {
         "platform": "Platform",
         "dashboard": "Dashboard",
@@ -71,8 +85,18 @@
             "updated_at": "Updated At"
         }
     },
+    "pipelineDashboard": {
+        "entitiesInState": "entities currently in state"
+    },
+    "postingJournals": {
+        "searchPlaceholder": "Search journals..."
+    },
+    "accounts": {
+        "searchPlaceholder": "Search code or name..."
+    },
     "my_approvals": {
-        "request_number": "No. {id}"
+        "request_number": "No. {id}",
+        "load_failed": "Failed to load approvals. Please refresh and try again."
     },
     "users": {
         "title": "Users",
@@ -233,5 +257,6 @@
     "stock_transfer.cancelled_final": "A cancelled transfer cannot change status.",
     "stock_transfer.items_locked": "Items and dispatched quantities cannot change after dispatch; only the received quantity can change.",
     "stock_transfer.qty_received_exceeds": "Received quantity cannot exceed the transferred quantity.",
-    "account.not_postable": "The selected account is inactive or is not a postable account."
+    "account.not_postable": "The selected account is inactive or is not a postable account.",
+    "admin_settings.logo_upload_failed": "The logo could not be saved. No settings were changed. Please try again."
 }

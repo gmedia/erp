@@ -103,10 +103,12 @@ class TriggerApprovalAction
     {
         $entityType = $entity->getMorphClass();
 
-        // 1. If flow_code is explicitly provided, use it
-        if (isset($params['flow_code'])) {
+        // 1. If flow_code is explicitly provided, use it.
+        // Legacy pipeline configs stored the key as approval_flow_code; accept both.
+        $flowCode = $params['flow_code'] ?? $params['approval_flow_code'] ?? null;
+        if ($flowCode !== null) {
             return ApprovalFlow::where('approvable_type', $entityType)
-                ->where('code', $params['flow_code'])
+                ->where('code', $flowCode)
                 ->where('is_active', true)
                 ->first();
         }

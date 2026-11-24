@@ -231,8 +231,8 @@ class SupplierReturnController extends Controller
     {
         $reason = $validated['notes'] ?? $supplierReturn->notes;
         $stamp = sprintf(
-            '[Cancelled by user #%s at %s]',
-            Auth::id() ?? '-',
+            '[Cancelled by user %s at %s]',
+            Auth::user()->name ?? '-',
             now()->toIso8601String(),
         );
 

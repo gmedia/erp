@@ -33,6 +33,20 @@
         "qty_received_label": "Qty Diterima",
         "qty_received_placeholder": "Kosong = diterima penuh"
     },
+    "approval": {
+        "status_manual_forbidden": "Status ini hanya dapat diisi melalui proses approval atau oleh sistem.",
+        "items_locked": "Item hanya dapat diubah selama dokumen masih draft.",
+        "form_locked": "Menunggu atau sudah melewati approval: header dan item hanya-baca. Gunakan aksi status.",
+        "tab_details": "Detail",
+        "tab_timeline": "Riwayat",
+        "tab_approvals": "Persetujuan",
+        "flow_not_found": "Approval flow tidak ditemukan, tidak aktif, atau tidak memiliki langkah.",
+        "transition_forbidden": "Anda tidak memiliki izin untuk menjalankan transisi ini."
+    },
+    "approval.status_manual_forbidden": "Status ini hanya dapat diisi melalui proses approval atau oleh sistem.",
+    "approval.items_locked": "Item hanya dapat diubah selama dokumen masih draft.",
+    "approval.flow_not_found": "Approval flow tidak ditemukan, tidak aktif, atau tidak memiliki langkah.",
+    "approval.transition_forbidden": "Anda tidak memiliki izin untuk menjalankan transisi ini.",
     "nav": {
         "platform": "Platform",
         "dashboard": "Dasbor",
@@ -71,8 +85,18 @@
             "updated_at": "Diperbarui"
         }
     },
+    "pipelineDashboard": {
+        "entitiesInState": "entitas saat ini dalam status ini"
+    },
+    "postingJournals": {
+        "searchPlaceholder": "Cari jurnal..."
+    },
+    "accounts": {
+        "searchPlaceholder": "Cari kode atau nama..."
+    },
     "my_approvals": {
-        "request_number": "No. {id}"
+        "request_number": "No. {id}",
+        "load_failed": "Gagal memuat persetujuan. Muat ulang halaman lalu coba lagi."
     },
     "users": {
         "title": "Pengguna",
@@ -233,5 +257,6 @@
     "stock_transfer.cancelled_final": "Transfer yang sudah dibatalkan tidak bisa berubah status.",
     "stock_transfer.items_locked": "Item dan qty kirim tidak bisa diubah setelah transfer dikirim; hanya qty diterima yang bisa diubah.",
     "account.not_postable": "Akun yang dipilih tidak aktif atau bukan akun yang bisa diposting.",
-    "stock_transfer.qty_received_exceeds": "Qty diterima tidak boleh melebihi qty yang dikirim."
+    "stock_transfer.qty_received_exceeds": "Qty diterima tidak boleh melebihi qty yang dikirim.",
+    "admin_settings.logo_upload_failed": "Logo tidak dapat disimpan. Tidak ada pengaturan yang diubah. Silakan coba lagi."
 }

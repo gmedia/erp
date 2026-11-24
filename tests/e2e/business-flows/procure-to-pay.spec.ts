@@ -26,7 +26,7 @@ import {
  * before/after deltas.
  *
  * Known defects are asserted with test.fail() and linked to their issue:
- * #368 (PR approval entity state) and #367 (journal on POST confirmed).
+ * #367 (journal on POST confirmed).
  */
 
 const PO_QTY = 4;
@@ -164,6 +164,46 @@ async function createPurchaseOrderViaUi(page: Page): Promise<number> {
     return poId;
 }
 
+async function submitAndApprovePurchaseOrder(
+    page: Page,
+    poId: number,
+): Promise<void> {
+    const transitions = await apiGet<{
+        data: { available_transitions: Array<{ id: number; name: string }> };
+    }>(page, `/api/entity-states/purchase_order/${poId}`);
+    const submit = transitions.data.available_transitions.find(
+        (item) => item.name === 'Submit',
+    );
+    expect(submit, 'PO draft must offer the Submit transition').toBeTruthy();
+
+    const submitted = await sendJson(
+        page,
+        'POST',
+        `/api/entity-states/purchase_order/${poId}/transition`,
+        { transition_id: submit?.id },
+    );
+    expect(submitted.status).toBeLessThan(400);
+
+    const inbox = await apiGet<{
+        pending: Array<{ request: { id: number; approvable_id: number } }>;
+    }>(page, '/api/my-approvals');
+    const step = inbox.pending.find(
+        (item) => item.request.approvable_id === poId,
+    );
+    expect(
+        step,
+        `approval request for PO ${poId} must be in my-approvals`,
+    ).toBeTruthy();
+
+    const approved = await sendJson(
+        page,
+        'POST',
+        `/api/my-approvals/${step?.request.id}/approve`,
+        { comments: 'E2E P2P' },
+    );
+    expect(approved.status).toBeLessThan(400);
+}
+
 async function createGoodsReceiptViaUi(
     page: Page,
     ctx: {
@@ -292,6 +332,7 @@ async function runProcureToPay(page: Page): Promise<P2pRun> {
     const stockBefore = await readStockOnHandFor(page, productId, warehouseId);
 
     const poId = await createPurchaseOrderViaUi(page);
+    await submitAndApprovePurchaseOrder(page, poId);
 
     const poLine = (await readPurchaseOrder(page, poId)).items[0];
     expect(poLine, `PO ${poId} must have one item`).toBeTruthy();
@@ -478,11 +519,6 @@ test.describe('Procure-to-pay: PR sampai pembayaran supplier', () => {
     test('PR -> approval: PR submit lalu approve, status menjadi approved', async ({
         page,
     }) => {
-        test.fail(
-            true,
-            'PurchaseRequest tanpa pipelineEntityState, entity-states 400 (#368)',
-        );
-
         await login(page, undefined, undefined, { requireDashboard: false });
 
         const run = await submitAndApprovePurchaseRequest(page);

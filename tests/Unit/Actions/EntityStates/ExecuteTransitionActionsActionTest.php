@@ -2,11 +2,13 @@
 
 use App\Actions\Approvals\TriggerApprovalAction;
 use App\Actions\EntityStates\ExecuteTransitionActionsAction;
+use App\Models\ApprovalRequest;
 use App\Models\Asset;
 use App\Models\PipelineTransition;
 use App\Models\PipelineTransitionAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 use Mockery\MockInterface;
 use Tests\Unit\Actions\EntityStates\Fixtures\CustomTransitionAction;
 
@@ -123,7 +125,7 @@ test('trigger_approval delegates to TriggerApprovalAction with the entity and pa
 
     /** @var MockInterface $mock */
     $mock = $this->triggerApproval;
-    $mock->expects('execute')->once()->with($this->asset, $params);
+    $mock->expects('execute')->once()->with($this->asset, $params)->andReturn(new ApprovalRequest);
 
     $def = PipelineTransitionAction::factory()->create([
         'pipeline_transition_id' => $this->transition->id,
@@ -134,6 +136,22 @@ test('trigger_approval delegates to TriggerApprovalAction with the entity and pa
     $results = $this->action->execute($this->transition, $this->asset);
 
     expect($results[$def->id]['status'])->toBe('success');
+});
+
+test('trigger_approval without an approval request aborts the transition', function () {
+    /** @var MockInterface $mock */
+    $mock = $this->triggerApproval;
+    $mock->expects('execute')->once()->andReturnNull();
+
+    PipelineTransitionAction::factory()->create([
+        'pipeline_transition_id' => $this->transition->id,
+        'action_type' => 'trigger_approval',
+        'on_failure' => 'abort',
+        'config' => ['flow_code' => 'missing'],
+    ]);
+
+    expect(fn () => $this->action->execute($this->transition, $this->asset))
+        ->toThrow(ValidationException::class);
 });
 
 test('custom action invokes the configured class method with entity and data', function () {

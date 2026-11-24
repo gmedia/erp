@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\ApprovalRequest;
 use App\Models\Asset;
+use App\Models\PurchaseOrder;
+use App\Models\PurchaseRequest;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Http\JsonResponse;
 
@@ -17,7 +19,8 @@ class EntityApprovalHistoryController extends Controller
     {
         $entityMap = [
             'asset' => Asset::class,
-            // Add more as needed, like: 'purchase-request' => \App\Models\PurchaseRequest::class
+            'purchase_order' => PurchaseOrder::class,
+            'purchase_request' => PurchaseRequest::class,
         ];
 
         if (! isset($entityMap[$entityType])) {

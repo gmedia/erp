@@ -8,6 +8,7 @@ use App\Http\Requests\MyApprovals\ApproveMyApprovalRequest;
 use App\Http\Requests\MyApprovals\RejectMyApprovalRequest;
 use App\Models\ApprovalRequest;
 use App\Models\ApprovalRequestStep;
+use App\Support\DocumentNumberResolver;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
@@ -45,6 +46,29 @@ class MyApprovalController extends Controller
                     });
             })
             ->get();
+
+        $resolver = app(DocumentNumberResolver::class);
+        $lists = [$pending, $approvedByMe, $rejectedByMe, $all];
+
+        // Resolve every document number up front: one query per approvable type,
+        // not one per step (avoids N+1 on the inbox lists).
+        $resolver->preload(
+            collect($lists)
+                ->flatten(1)
+                ->map(fn (ApprovalRequestStep $step) => [
+                    $step->request->approvable_type,
+                    $step->request->approvable_id,
+                ]),
+        );
+
+        foreach ($lists as $steps) {
+            $steps->each(function (ApprovalRequestStep $step) use ($resolver): void {
+                $step->request->setAttribute('document_number', $resolver->resolve(
+                    $step->request->approvable_type,
+                    $step->request->approvable_id,
+                ));
+            });
+        }
 
         return response()->json([
             'pending' => $pending,

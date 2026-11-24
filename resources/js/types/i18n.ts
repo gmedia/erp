@@ -69,6 +69,7 @@ export interface Translations {
     };
     my_approvals: {
         request_number: string;
+        load_failed: string;
     };
     users: {
         title: string;
