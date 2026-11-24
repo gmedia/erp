@@ -6,6 +6,7 @@ use App\Support\Database\TransactionRetrier;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 /**
@@ -119,6 +120,19 @@ it('memetakan sisa galat konkurensi di jalur controller menjadi 409 dengan pesan
     expect($thrown)->toBeInstanceOf(ConflictHttpException::class)
         ->and($thrown?->getStatusCode())->toBe(409)
         ->and($thrown?->getMessage())->toBe(__('concurrency.conflict'));
+});
+
+it('menjawab 409 JSON concurrency.conflict bila galat konkurensi tetap terjadi di route API', function (): void {
+    Route::post('/api/_issue439/conflict', function (): void {
+        TransactionRetrier::run(function (): void {
+            throw concurrencyRetryException(1213);
+        });
+    });
+
+    $response = $this->postJson('/api/_issue439/conflict');
+
+    $response->assertStatus(409)
+        ->assertJsonPath('message', __('concurrency.conflict'));
 });
 
 it('tidak menjalankan afterCommit dua kali saat percobaan diulang', function (): void {
