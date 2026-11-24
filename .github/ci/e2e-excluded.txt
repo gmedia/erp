@@ -5,7 +5,6 @@ ap-payment-history-report
 ar-aging-report
 ar-outstanding-report
 budget-variance-report
-budgets
 customer-statement-report
 financial-dashboard
 fiscal-year-auto-select

@@ -1,10 +1,11 @@
 'use client';
 
+import { BudgetRowActions } from '@/components/budgets/BudgetRowActions';
 import { Badge } from '@/components/ui/badge';
 import { formatStatusLabel } from '@/lib/status-badge';
 import { type Budget } from '@/types/budget';
 import {
-    createActionsColumn,
+    type CustomTableMeta,
     createRowCurrencyAmountColumn,
     createSelectColumn,
     createSortingHeader,
@@ -49,5 +50,22 @@ export const budgetColumns: ColumnDef<Budget>[] = [
         cell: ({ row }) =>
             formatDateByRegionalSettings(row.getValue('created_at') as string),
     },
-    createActionsColumn<Budget>(),
+    {
+        id: 'actions_custom',
+        enableHiding: false,
+        size: 56,
+        cell: ({ row, table }) => {
+            const meta = table.options.meta as
+                | CustomTableMeta<Budget>
+                | undefined;
+            return (
+                <BudgetRowActions
+                    item={row.original}
+                    onView={meta?.onView}
+                    onEdit={meta?.onEdit}
+                    onDelete={meta?.onDelete}
+                />
+            );
+        },
+    },
 ];
