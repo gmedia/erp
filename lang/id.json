@@ -46,6 +46,7 @@
     "approval.status_manual_forbidden": "Status ini hanya dapat diisi melalui proses approval atau oleh sistem.",
     "approval.items_locked": "Item hanya dapat diubah selama dokumen masih draft.",
     "approval.flow_not_found": "Approval flow tidak ditemukan, tidak aktif, atau tidak memiliki langkah.",
+    "status_transition.invalid": "Tidak dapat mengubah status dari :from ke :to.",
     "approval.transition_forbidden": "Anda tidak memiliki izin untuk menjalankan transisi ini.",
     "nav": {
         "platform": "Platform",
