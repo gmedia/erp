@@ -31,7 +31,8 @@ abstract class AbstractSupplierBillRequest extends AuthorizedFormRequest
             'status' => $this->withSometimes([
                 'required',
                 'string',
-                'in:draft,confirmed,partially_paid,paid,overdue,cancelled,void',
+                // partially_paid/paid/overdue dihitung dari pembayaran, tidak boleh di-set langsung.
+                'in:draft,confirmed,cancelled,void',
             ]),
             ...$this->totalAmountRules(),
 

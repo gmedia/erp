@@ -25,7 +25,7 @@ abstract class AbstractCustomerInvoiceRequest extends AuthorizedFormRequest
             'status' => $this->withSometimes([
                 'required',
                 'string',
-                'in:draft,sent,partially_paid,paid,overdue,cancelled,void',
+                'in:draft,sent,cancelled,void',
             ]),
             ...$this->totalAmountRules(),
 

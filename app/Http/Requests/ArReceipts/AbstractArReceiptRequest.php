@@ -34,7 +34,8 @@ abstract class AbstractArReceiptRequest extends AuthorizedFormRequest
             'status' => $this->withSometimes([
                 'required',
                 'string',
-                'in:draft,confirmed,reconciled,cancelled,void',
+                // reconciled hanya dicapai lewat rekonsiliasi, tidak boleh di-set langsung.
+                'in:draft,confirmed,cancelled,void',
             ]),
             ...$this->totalAmountRules(),
 
