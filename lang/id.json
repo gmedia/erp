@@ -270,6 +270,7 @@
     "accounting_posting.coa_ambiguous": "Lebih dari satu versi COA aktif berlaku untuk :date. Pertahankan tepat satu COA aktif per tahun fiskal.",
     "accounting_posting.line_account_outside_coa": "Akun baris jurnal :code bukan bagian dari versi COA yang dipakai untuk :date.",
     "stock.insufficient": "Stok tidak cukup untuk :product di :warehouse (tersedia :available, dibutuhkan :required).",
+    "stock.period_closed": "Periode akuntansi untuk :date sudah ditutup. Pergerakan stok di dalamnya tidak dapat diubah.",
     "stock_transfer.already_dispatched": "Transfer yang sudah dikirim tidak bisa kembali ke status :status.",
     "auth.failed": "Kredensial ini tidak cocok dengan data kami.",
     "supplier_return.already_cancelled": "Retur supplier ini sudah dibatalkan.",

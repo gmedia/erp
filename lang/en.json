@@ -270,6 +270,7 @@
     "accounting_posting.coa_ambiguous": "More than one active COA version applies to :date. Keep exactly one active COA per fiscal year.",
     "accounting_posting.line_account_outside_coa": "Journal line account :code does not belong to the COA version used for :date.",
     "stock.insufficient": "Insufficient stock for :product in :warehouse (available :available, required :required).",
+    "stock.period_closed": "The accounting period for :date is closed. Stock movements cannot be changed in it.",
     "stock_transfer.already_dispatched": "A dispatched transfer cannot return to :status.",
     "auth.failed": "These credentials do not match our records.",
     "supplier_return.already_cancelled": "This supplier return is already cancelled.",

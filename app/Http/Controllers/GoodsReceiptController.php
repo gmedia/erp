@@ -154,8 +154,12 @@ class GoodsReceiptController extends Controller
             // Issue #356: item GR confirmed diedit setelah posting. Movement lama dibalik
             // (histori tetap), lalu item baru diposting ulang. Tanpa ini stok tidak sesuai item.
             DB::transaction(function () use ($goodsReceipt, $stockPosting, $purchaseOrderReceipts, $postMovements): void {
-                $stockPosting->reverseDocument(GoodsReceipt::class, $goodsReceipt->id, 'goods_receipt');
-                $postMovements->execute($goodsReceipt->refresh());
+                $stockPosting->editDocument(
+                    GoodsReceipt::class,
+                    $goodsReceipt->id,
+                    'goods_receipt',
+                    fn () => $postMovements->execute($goodsReceipt->refresh()),
+                );
                 $purchaseOrderReceipts->syncFromGoodsReceipt($goodsReceipt);
             });
         }
