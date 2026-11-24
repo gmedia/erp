@@ -59,13 +59,14 @@ class AssetSampleDataSeeder extends Seeder
             $category = SupplierCategory::query()->orderBy('id')->first()
                 ?? SupplierCategory::create(['name' => 'General']);
 
-            $branch = Branch::query()->orderBy('id')->first() ?? Branch::create(['name' => 'Head Office']);
+            $branch = Branch::query()->orderBy('id')->first()
+                ?? Branch::create(['name' => DemoMasterData::BRANCH_HEAD_OFFICE]);
 
             $supplier = Supplier::create([
                 'name' => 'Default Supplier',
                 'email' => 'supplier@example.com',
                 'phone' => '0800000000',
-                'address' => 'Head Office',
+                'address' => DemoMasterData::BRANCH_HEAD_OFFICE,
                 'branch_id' => $branch->id,
                 'category_id' => $category->id,
                 'status' => 'active',

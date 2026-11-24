@@ -30,20 +30,22 @@ class StockTransferSampleDataSeeder extends Seeder
             ->where('email', config('app.admin'))
             ->value('id') ?? Employee::query()->value('id');
 
-        $fromWarehouse = Warehouse::query()->where('code', 'MAIN')->first();
-        $toWarehouse = Warehouse::query()->where('code', 'RTN')->first();
+        $fromWarehouse = Warehouse::query()->where('code', DemoMasterData::WAREHOUSE_MAIN_CODE)->first();
+        $toWarehouse = Warehouse::query()->where('code', DemoMasterData::WAREHOUSE_RETURN_CODE)->first();
 
         if ($fromWarehouse === null || $toWarehouse === null) {
-            $branchId = Branch::query()->where('name', 'Head Office')->value('id') ?? Branch::query()->value('id');
+            $branchId = Branch::query()
+                ->where('name', DemoMasterData::BRANCH_HEAD_OFFICE)
+                ->value('id') ?? Branch::query()->value('id');
 
             $fromWarehouse = Warehouse::updateOrCreate(
-                ['branch_id' => $branchId, 'code' => 'MAIN'],
-                ['name' => 'Main Warehouse']
+                ['branch_id' => $branchId, 'code' => DemoMasterData::WAREHOUSE_MAIN_CODE],
+                ['name' => DemoMasterData::WAREHOUSE_MAIN_NAME]
             );
 
             $toWarehouse = Warehouse::updateOrCreate(
-                ['branch_id' => $branchId, 'code' => 'RTN'],
-                ['name' => 'Return Warehouse']
+                ['branch_id' => $branchId, 'code' => DemoMasterData::WAREHOUSE_RETURN_CODE],
+                ['name' => DemoMasterData::WAREHOUSE_RETURN_NAME]
             );
         }
 
@@ -147,7 +149,7 @@ class StockTransferSampleDataSeeder extends Seeder
 
         // Tujuan bervariasi (W7-17): sebagian ke Gudang Transit (TRN), sisanya ke
         // Gudang Retur (RTN), bukan semua transfer ke satu gudang.
-        $transitWarehouse = Warehouse::query()->where('code', 'TRN')->first()
+        $transitWarehouse = Warehouse::query()->where('code', DemoMasterData::WAREHOUSE_TRANSIT_CODE)->first()
             ?? $toWarehouse;
 
         foreach ($samples as $index => $sample) {

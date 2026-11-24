@@ -18,7 +18,7 @@ test.describe('Asset Import E2E Tests', () => {
             `E2E Asset ${timestamp}`, // name
             'IT Equipment', // asset_category
             '', // asset_model
-            'Head Office', // branch
+            'Kantor Pusat', // branch
             '', // location
             '', // department
             '', // employee
@@ -112,7 +112,7 @@ test.describe('Asset Import E2E Tests', () => {
             'Invalid Asset', // name
             'IT Equipment', // asset_category
             '', // asset_model
-            'Head Office', // branch
+            'Kantor Pusat', // branch
             '', // location
             '', // department
             '', // employee

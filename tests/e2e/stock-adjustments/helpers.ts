@@ -148,7 +148,7 @@ export async function createStockAdjustment(page: Page): Promise<string> {
         page,
         dialog.getByRole('combobox', { name: /Warehouse/i }),
         'Main',
-        'Main Warehouse',
+        'Gudang Utama',
     );
 
     await dialog.getByRole('button', { name: /Add Item/i }).click();

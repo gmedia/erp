@@ -21,13 +21,15 @@ class InventoryStocktakeSampleDataSeeder extends Seeder
             ->where('email', config('app.admin'))
             ->value('id') ?? User::query()->value('id');
 
-        $warehouse = Warehouse::query()->where('code', 'MAIN')->first();
+        $warehouse = Warehouse::query()->where('code', DemoMasterData::WAREHOUSE_MAIN_CODE)->first();
 
         if ($warehouse === null) {
-            $branchId = Branch::query()->where('name', 'Head Office')->value('id') ?? Branch::query()->value('id');
+            $branchId = Branch::query()
+                ->where('name', DemoMasterData::BRANCH_HEAD_OFFICE)
+                ->value('id') ?? Branch::query()->value('id');
             $warehouse = Warehouse::updateOrCreate(
-                ['branch_id' => $branchId, 'code' => 'MAIN'],
-                ['name' => 'Main Warehouse']
+                ['branch_id' => $branchId, 'code' => DemoMasterData::WAREHOUSE_MAIN_CODE],
+                ['name' => DemoMasterData::WAREHOUSE_MAIN_NAME]
             );
         }
 

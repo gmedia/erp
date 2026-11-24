@@ -121,7 +121,7 @@ class ProductSampleDataSeeder extends Seeder
                 'notes' => 'Assembly screws',
             ]);
 
-        $branchId = Branch::query()->value('id') ?? Branch::create(['name' => 'Head Office'])->id;
+        $branchId = Branch::query()->value('id') ?? Branch::create(['name' => DemoMasterData::BRANCH_HEAD_OFFICE])->id;
 
         $productionOrder = ProductionOrder::updateOrCreate(
             ['order_number' => 'MO-2026-000001'],

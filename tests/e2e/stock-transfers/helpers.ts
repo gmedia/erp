@@ -130,13 +130,13 @@ export async function createStockTransfer(page: Page): Promise<string> {
         page,
         dialog.getByRole('combobox', { name: /From Warehouse/i }),
         'Main',
-        'Main Warehouse',
+        'Gudang Utama',
     );
     await selectPersistedAsyncOption(
         page,
         dialog.getByRole('combobox', { name: /To Warehouse/i }),
         'Transit',
-        'Transit Warehouse',
+        'Gudang Transit',
     );
 
     await dialog.getByRole('button', { name: /Add Item/i }).click();

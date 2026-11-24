@@ -12,6 +12,7 @@ use App\Models\StockAdjustment;
 use App\Models\StockTransfer;
 use App\Models\SupplierBill;
 use App\Models\SupplierReturn;
+use Database\Seeders\DemoMasterData;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -1140,6 +1141,24 @@ invariant('W7-17 demo contact emails use neutral example domains and realistic p
     expect(DB::table('settings')->where('value', '+62 21 0000 0000')->exists())->toBeFalse();
 });
 
+// W7-17 (bahasa, cabang & gudang) — nama cabang dan gudang demo berbahasa Indonesia,
+// tanpa sisa nama Inggris dan tanpa ganda akibat rename.
+invariant('W7-17 demo branches and warehouses use Indonesian names without English leftovers', function () {
+    $legacyBranches = ['Head Office', 'Branch 1', 'Branch 2', 'Branch 3'];
+    $legacyWarehouses = ['Main Warehouse', 'Transit Warehouse', 'Return Warehouse', 'Production Warehouse'];
+
+    $legacyBranchCount = DB::table('branches')->whereIn('name', $legacyBranches)->count();
+    $legacyWarehouseCount = DB::table('warehouses')->whereIn('name', $legacyWarehouses)->count();
+    $mainWarehouseName = DB::table('warehouses')
+        ->where('code', DemoMasterData::WAREHOUSE_MAIN_CODE)
+        ->value('name');
+
+    expect($legacyBranchCount)->toBe(0, 'cabang demo masih memakai nama Inggris');
+    expect($legacyWarehouseCount)->toBe(0, 'gudang demo masih memakai nama Inggris');
+    expect(DB::table('branches')->where('name', DemoMasterData::BRANCH_HEAD_OFFICE)->count())->toBe(1);
+    expect($mainWarehouseName)->toBe(DemoMasterData::WAREHOUSE_MAIN_NAME);
+});
+
 // W7-17 — setiap supplier menjual produk pada kategori yang cocok dengan kategori supplier.
 invariant('W7-17 supplier and product categories are mapped consistently', function () {
     $mismatch = DB::table('purchase_order_items')
@@ -1155,7 +1174,7 @@ invariant('W7-17 supplier and product categories are mapped consistently', funct
     expect($mismatch)->toBe(0, 'Supplier Furniture tidak boleh menjual produk SaaS');
 });
 
-// W7-17 — transfer antar gudang bervariasi (tidak semua menuju Return Warehouse).
+// W7-17 — transfer antar gudang bervariasi (tidak semua menuju Gudang Retur).
 invariant('W7-17 stock transfers vary their destination warehouse', function () {
     $destinations = DB::table('stock_transfers')->distinct()->pluck('to_warehouse_id');
 

@@ -32,7 +32,7 @@ export async function createSupplier(
       { name: 'email', type: 'email', defaultValue: defaultEmail },
       { name: 'phone', type: 'text', defaultValue: '08123456789' },
       { name: 'address', type: 'textarea', defaultValue: '456 Supplier Road' },
-      { name: 'branch_id', type: 'select', selector: 'Branch', defaultValue: 'Head Office' },
+      { name: 'branch_id', type: 'select', selector: 'Branch', defaultValue: 'Kantor Pusat' },
       { name: 'category_id', type: 'select', selector: 'Category', defaultValue: 'Office Supplies' },
       { name: 'status', type: 'select', selector: 'Status', defaultValue: 'Active' },
     ],

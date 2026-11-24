@@ -34,7 +34,7 @@ export async function createEmployee(
       { name: 'phone', type: 'text', defaultValue: '08123456789' },
       { name: 'department_id', type: 'select', selector: 'Department', defaultValue: 'Engineering' },
       { name: 'position_id', type: 'select', selector: 'Position', defaultValue: 'Senior Developer' },
-      { name: 'branch_id', type: 'select', selector: 'Branch', defaultValue: 'Head Office' },
+      { name: 'branch_id', type: 'select', selector: 'Branch', defaultValue: 'Kantor Pusat' },
       { name: 'salary', type: 'text', defaultValue: '5000000' },
       { name: 'employment_status', type: 'select', selector: 'Employment Status', defaultValue: 'Regular' },
     ],

@@ -18,7 +18,7 @@ test.describe('Supplier Import E2E Tests', () => {
             uniqueEmail,                 // email
             '08123456789',               // phone
             '123 E2E Street',            // address
-            'Head Office',               // branch
+            'Kantor Pusat',               // branch
             'Electronics',               // category
             'active'                     // status
         ];
@@ -88,7 +88,7 @@ test.describe('Supplier Import E2E Tests', () => {
             'invalid@example.com',    // email
             '08123456789',            // phone
             '123 E2E Street',         // address
-            'Head Office',            // branch
+            'Kantor Pusat',            // branch
             'Electronics',            // category
             'active'                  // status
         ];
