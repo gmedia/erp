@@ -7,19 +7,17 @@ test.describe('Inventory Stocktake Variance Report', () => {
     });
 
     test('can view report, sort, filter and export', async ({ page }) => {
+        const initialResponse = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/reports/inventory-stocktake-variance') &&
+                r.status() < 400,
+            { timeout: 30000 },
+        );
         await page.goto('/reports/inventory-stocktake-variance');
         await page.waitForURL('**/reports/inventory-stocktake-variance', {
             timeout: 15000,
         });
-
-        await page
-            .waitForResponse(
-                (r) =>
-                    r.url().includes('/api/reports/inventory-stocktake-variance') &&
-                    r.status() < 400,
-                { timeout: 30000 },
-            )
-            ;
+        await initialResponse;
 
         await expect(page.locator('table')).toBeVisible();
         await expect(page.locator('tbody tr').first()).toBeVisible();

@@ -380,15 +380,13 @@ export async function editInventoryStocktake(
     }
 
     const updateBtn = dialog.getByRole('button', { name: /Update/i });
-    const updateResponse = page
-        .waitForResponse(
-            (r) =>
-                r.url().includes('/api/inventory-stocktakes/') &&
-                r.request().method() === 'PUT' &&
-                r.status() < 400,
-            { timeout: 45000 },
-        )
-        ;
+    const updateResponse = page.waitForResponse(
+        (r) =>
+            r.url().includes('/api/inventory-stocktakes/') &&
+            r.request().method() === 'PUT' &&
+            r.status() < 400,
+        { timeout: 45000 },
+    );
 
     await updateBtn.click();
     await updateResponse;
