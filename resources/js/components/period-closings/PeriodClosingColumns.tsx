@@ -79,7 +79,7 @@ export const periodClosingColumns: ColumnDef<PeriodClosing>[] = [
         },
     },
     {
-        id: 'actions',
+        id: 'actions_custom',
         enableHiding: false,
         size: 56,
         cell: ({ row, table }) => {
