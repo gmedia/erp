@@ -132,7 +132,7 @@ function AccountRow({
         <div className="flex flex-col">
             <div
                 className={cn(
-                    'flex min-w-max items-center gap-2 border-b border-border/40 px-2 py-2 text-sm hover:bg-muted/40',
+                    'flex items-center gap-2 border-b border-border/40 px-2 py-2 text-sm hover:bg-muted/40 sm:min-w-max',
                     hasChildren && 'bg-muted/20 font-semibold',
                 )}
             >
@@ -148,10 +148,10 @@ function AccountRow({
                     </span>
                     <span className="truncate">{node.name}</span>
                 </button>
-                <div className="flex gap-4 text-right tabular-nums">
+                <div className="flex shrink-0 gap-2 text-right tabular-nums sm:gap-4">
                     <div
                         className={cn(
-                            'w-36',
+                            'w-36 shrink-0',
                             getSignedAmountTextClass(node.balance),
                         )}
                     >
@@ -161,7 +161,7 @@ function AccountRow({
                         <>
                             <div
                                 className={cn(
-                                    'w-36 text-muted-foreground',
+                                    'w-36 shrink-0 text-muted-foreground',
                                     getSignedAmountTextClass(
                                         node.comparison_balance || 0,
                                     ),
@@ -169,12 +169,14 @@ function AccountRow({
                             >
                                 {formatCurrency(node.comparison_balance || 0)}
                             </div>
-                            <div className={cn('w-28', changeTextClass)}>
+                            <div
+                                className={cn('w-28 shrink-0', changeTextClass)}
+                            >
                                 {formatCurrency(changeValue)}
                             </div>
                             <div
                                 className={cn(
-                                    'w-16',
+                                    'w-16 shrink-0',
                                     getChangePercentageTextClass(
                                         node.change_percentage,
                                         node.comparison_balance,
@@ -316,22 +318,26 @@ export function FinancialReportSection({
                 ) : (
                     <div className="overflow-hidden rounded-md border">
                         <div className="max-h-[60vh] w-full min-w-0 overflow-auto">
-                            <div className="sticky top-0 z-10 flex min-w-max items-center border-b bg-background px-2 py-2 text-xs font-medium text-muted-foreground">
+                            <div className="sticky top-0 z-10 flex items-center border-b bg-background px-2 py-2 text-xs font-medium text-muted-foreground sm:min-w-max">
                                 {/* Spacer selebar ikon expand agar label
                                     sejajar dengan teks baris (W5-12). */}
                                 <div className="flex min-w-40 flex-1 items-center gap-2">
                                     <div className="w-4" aria-hidden />
                                     <span>Account</span>
                                 </div>
-                                <div className="flex gap-4 text-right tabular-nums">
-                                    <div className="w-36">Current</div>
+                                <div className="flex shrink-0 gap-2 text-right tabular-nums sm:gap-4">
+                                    <div className="w-36 shrink-0">Current</div>
                                     {showComparison && (
                                         <>
-                                            <div className="w-36">
+                                            <div className="w-36 shrink-0">
                                                 Comparison
                                             </div>
-                                            <div className="w-28">Change</div>
-                                            <div className="w-16">%</div>
+                                            <div className="w-28 shrink-0">
+                                                Change
+                                            </div>
+                                            <div className="w-16 shrink-0">
+                                                %
+                                            </div>
                                         </>
                                     )}
                                 </div>
