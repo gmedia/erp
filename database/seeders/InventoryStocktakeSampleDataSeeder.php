@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\Warehouse;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class InventoryStocktakeSampleDataSeeder extends Seeder
 {
@@ -154,17 +155,23 @@ class InventoryStocktakeSampleDataSeeder extends Seeder
             ->get();
 
         if ($products->count() >= 3) {
-            // Produk stocktake adalah barang fisik: kategorinya disamakan (idempoten),
-            // agar kategori stocktake konsisten dengan barang yang dihitung (PR #432 butir 1).
-            $rawHardwareId = ProductCategory::query()
-                ->where('name', DemoMasterData::PRODUCT_CATEGORY_RAW_HARDWARE)
+            // Barang dagang demo (PR #432 butir 1): kategori Elektronik, harga jual wajar,
+            // kategori stocktake mengikuti kategori barangnya.
+            $electronicsId = ProductCategory::query()
+                ->where('name', DemoMasterData::PRODUCT_CATEGORY_ELECTRONICS)
                 ->value('id');
 
-            if ($rawHardwareId !== null) {
+            if ($electronicsId !== null) {
                 Product::query()
                     ->whereIn('id', $products->pluck('id'))
-                    ->update(['product_category_id' => $rawHardwareId]);
-                $products = $products->each(fn (Product $product) => $product->product_category_id = $rawHardwareId);
+                    ->update([
+                        'product_category_id' => $electronicsId,
+                        'type' => 'finished_good',
+                        'selling_price' => DB::raw(
+                            'CASE WHEN selling_price > 0 THEN selling_price ELSE cost * 1.5 END'
+                        ),
+                    ]);
+                $products = $products->each(fn (Product $product) => $product->product_category_id = $electronicsId);
             }
 
             return $products->take(3);
@@ -187,7 +194,7 @@ class InventoryStocktakeSampleDataSeeder extends Seeder
         }
 
         $categoryId = ProductCategory::query()
-            ->where('name', DemoMasterData::PRODUCT_CATEGORY_RAW_HARDWARE)
+            ->where('name', DemoMasterData::PRODUCT_CATEGORY_ELECTRONICS)
             ->value('id')
             ?? ProductCategory::query()->value('id');
         $unitId = Unit::query()->value('id');
@@ -196,34 +203,34 @@ class InventoryStocktakeSampleDataSeeder extends Seeder
             [
                 'code' => 'INV-2026-001',
                 'name' => 'Kabel HDMI 2 Meter',
-                'type' => 'raw_material',
-                'cost' => 10000,
+                'cost' => 45000,
+                'price' => 75000,
             ],
             [
                 'code' => 'INV-2026-002',
                 'name' => 'Mouse Wireless M170',
-                'type' => 'raw_material',
-                'cost' => 15000,
+                'cost' => 110000,
+                'price' => 165000,
             ],
             [
                 'code' => 'INV-2026-003',
                 'name' => 'Keyboard Mekanik K2',
-                'type' => 'finished_good',
-                'cost' => 25000,
+                'cost' => 420000,
+                'price' => 650000,
             ],
         ];
 
         foreach ($samples as $sample) {
-            $product = Product::updateOrCreate(
+            Product::updateOrCreate(
                 ['code' => $sample['code']],
                 [
                     'name' => $sample['name'],
-                    'type' => $sample['type'],
+                    'type' => 'finished_good',
                     'product_category_id' => $categoryId,
                     'unit_id' => $unitId,
                     'branch_id' => $branchId,
                     'cost' => $sample['cost'],
-                    'selling_price' => 0,
+                    'selling_price' => $sample['price'],
                     'billing_model' => 'one_time',
                     'status' => 'active',
                 ]

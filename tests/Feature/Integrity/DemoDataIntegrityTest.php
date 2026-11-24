@@ -615,6 +615,14 @@ invariant('W7-15 employee demo salaries are realistic for their position', funct
     }
 });
 
+// W7-17 (Butir 5 Review visual akhir PR #432) — urutan default karyawan (dibuat lebih dulu)
+// dimulai dari EMP-000001, bukan EMP-000006.
+invariant('W7-17 review visual akhir butir 5: default employee order starts at EMP-000001', function () {
+    $firstCreated = DB::table('employees')->orderBy('id')->value('employee_id');
+
+    expect($firstCreated)->toBe('EMP-000001', 'Urutan default karyawan harus dimulai dari EMP-000001');
+});
+
 // W7-15 (HR) — kode karyawan demo berurutan mulai dari EMP-000001 tanpa celah di awal.
 invariant('W7-15 employee demo codes start at EMP-000001 and are sequential', function () {
     $codes = DB::table('employees')
@@ -1333,6 +1341,17 @@ invariant('W7-16 purchasing pipeline transitions are performed by someone other 
     }
 });
 
+// W7-17 (Butir 3 Review visual akhir PR #432) — pelaku transisi demo bervariasi
+// (bukan satu orang untuk semua dokumen), dan PO yang lolos approval melewati Pending Approval.
+invariant('W7-17 review visual akhir butir 3: demo pipeline actors vary across documents', function () {
+    $distinctActors = DB::table('pipeline_state_logs')
+        ->whereNotNull('performed_by')
+        ->distinct()
+        ->count('performed_by');
+
+    expect($distinctActors)->toBeGreaterThanOrEqual(3, 'Pelaku transisi demo harus lebih dari satu orang');
+});
+
 // W7-16 — riwayat transisi dan approval tidak berisi created_at kosong.
 invariant('W7-16 pipeline and approval history rows have timestamps', function () {
     expect(DB::table('pipeline_state_logs')->whereNull('created_at')->count())->toBe(0);
@@ -1460,6 +1479,18 @@ invariant('W7-17 customer demo varies branch, category and status', function () 
     expect(DB::table('customers')->distinct()->count('status'))->toBeGreaterThanOrEqual(2);
 });
 
+// W7-17 (Butir 2 Review visual akhir PR #432) — master (cabang, kategori, approval flow) dibuat
+// sebelum transaksi pertama, sehingga tanggal dibuat tidak lebih baru dari transaksi demo.
+invariant('W7-17 review visual akhir butir 2: demo master created_at precedes first transaction', function () {
+    $firstTransaction = DB::table('journal_entries')->min('created_at');
+    expect($firstTransaction)->not->toBeNull();
+
+    foreach (['branches', 'product_categories', 'approval_flows'] as $table) {
+        $late = DB::table($table)->where('created_at', '>', $firstTransaction)->count();
+        expect($late)->toBe(0, "{$table}.created_at tidak boleh lebih baru dari transaksi pertama");
+    }
+});
+
 // W7-17 — tanggal dibuat (created_at) tidak kosong pada master kategori dan satuan.
 invariant('W7-17 product categories and units have created_at', function () {
     expect(DB::table('product_categories')->whereNull('created_at')->count())->toBe(0);
@@ -1567,6 +1598,33 @@ invariant('W7-17 demo master names are Indonesian, not mixed with English labels
     $englishLabels = ['Mesin Production', 'Vehicles', 'Office Equipment', 'Operating Budget'];
 
     expect(DB::table('asset_categories')->whereIn('name', $englishLabels)->count())->toBe(0);
+});
+
+// W7-17 (Butir 1 Review visual akhir PR #432) — produk jual adalah barang dagang dengan harga
+// wajar; produk barang fisik stocktake tidak berada di kategori yang tidak punya produk.
+invariant('W7-17 review visual akhir butir 1: demo goods are sellable with a positive price', function () {
+    $legacyCodes = ['INV-2026-001', 'INV-2026-002', 'INV-2026-003'];
+
+    $products = DB::table('products')->whereIn('code', $legacyCodes)->get();
+    expect($products)->toHaveCount(3);
+
+    foreach ($products as $product) {
+        expect($product->type)->toBe('finished_good', "{$product->code} harus barang dagang");
+        expect((float) $product->selling_price)->toBeGreaterThan(0, "{$product->code} harga jual 0");
+        expect((float) $product->selling_price)->toBeGreaterThanOrEqual((float) $product->cost);
+    }
+});
+
+invariant('W7-17 review visual akhir butir 1: stocktake category holds the counted products', function () {
+    $stocktakeCategoryIds = DB::table('inventory_stocktake_items')
+        ->join('products', 'products.id', '=', 'inventory_stocktake_items.product_id')
+        ->distinct()
+        ->pluck('products.product_category_id');
+
+    foreach ($stocktakeCategoryIds as $categoryId) {
+        expect(DB::table('products')->where('product_category_id', $categoryId)->exists())
+            ->toBeTrue("kategori stocktake {$categoryId} tidak punya produk");
+    }
 });
 
 // W7-17 (Butir 4 Review visual PR #432) — nama produk, aset, dan stok demo berbahasa Indonesia.

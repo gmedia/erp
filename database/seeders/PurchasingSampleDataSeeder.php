@@ -197,6 +197,24 @@ class PurchasingSampleDataSeeder extends Seeder
             ->value('id') ?? $adminUserId);
     }
 
+    /**
+     * Daftar pelaku transisi demo: $performedBy plus user lain yang tersedia (deterministik).
+     *
+     * @return list<int>
+     */
+    private function transitionActorIds(int $performedBy): array
+    {
+        $others = User::query()
+            ->where('id', '!=', $performedBy)
+            ->orderBy('id')
+            ->limit(2)
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        return array_values(array_unique(array_merge([$performedBy], $others)));
+    }
+
     private function seedPurchasingPipelines(int $adminUserId): array
     {
         $prPipeline = Pipeline::firstOrCreate(
@@ -1724,15 +1742,21 @@ class PurchasingSampleDataSeeder extends Seeder
         // Pengajuan (draft -> pending_approval) dilakukan pengaju; transisi lain
         // dilakukan pelaku berwenang (admin). Dengan begitu pelaku tidak sama
         // dengan pengaju pada dokumen yang melewati approval.
-        foreach ($logs as $log) {
+        // Pelaku transisi bervariasi (PR #432 butir 3): transisi selain pengajuan dilakukan
+        // bergilir oleh pelaku berbeda (penyetuju, gudang, admin), bukan satu orang untuk semua.
+        $actors = $this->transitionActorIds($performedBy);
+        foreach ($logs as $index => $log) {
             $isSubmission = $log['from_state_id'] === $states['draft']->id
                 && $log['to_state_id'] === $states['pending_approval']?->id;
+            $actor = $isSubmission && $submittedBy !== null
+                ? $submittedBy
+                : $actors[($entityId + $index) % count($actors)];
 
             PipelineStateLog::create(array_merge($log, [
                 'pipeline_entity_state_id' => $entityState->id,
                 'entity_type' => $entityType,
                 'entity_id' => $entityId,
-                'performed_by' => $isSubmission && $submittedBy !== null ? $submittedBy : $performedBy,
+                'performed_by' => $actor,
             ]));
         }
     }
