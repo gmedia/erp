@@ -46,11 +46,24 @@ class StockAdjustmentSampleDataSeeder extends Seeder
             ->where('stocktake_number', $completedStocktakeNumber)
             ->value('id');
 
+        // Format nomor berubah (SA-…-9100xx → SA-…-000001..): ganti nama HANYA
+        // nomor demo lama, dengan update in-place agar journal & movement yang
+        // menempel tidak menjadi yatim. Nomor pengguna tidak tersentuh.
+        foreach (range(0, 4) as $index) {
+            $legacy = sprintf('SA-%s-9100%02d', $year, $index);
+            $target = sprintf('SA-%s-%06d', $year, $index + 1);
+
+            if (StockAdjustment::query()->where('adjustment_number', $legacy)->exists()
+                && ! StockAdjustment::query()->where('adjustment_number', $target)->exists()) {
+                StockAdjustment::query()->where('adjustment_number', $legacy)->update(['adjustment_number' => $target]);
+            }
+        }
+
         $samples = [
             // Saldo awal stok (approved) agar rantai `balance_after` dimulai
             // dari nilai positif sebelum dokumen lain (W7-04).
             [
-                'adjustment_number' => "SA-{$year}-910000",
+                'adjustment_number' => "SA-{$year}-000001",
                 'status' => 'approved',
                 'adjustment_date' => "{$year}-01-02",
                 'adjustment_type' => 'initial_stock',
@@ -59,7 +72,7 @@ class StockAdjustmentSampleDataSeeder extends Seeder
                 'items' => $this->makeOpeningStockItems(),
             ],
             [
-                'adjustment_number' => "SA-{$year}-910001",
+                'adjustment_number' => "SA-{$year}-000002",
                 'status' => 'draft',
                 'adjustment_date' => now()->subDays(6)->toDateString(),
                 'adjustment_type' => 'other',
@@ -68,7 +81,7 @@ class StockAdjustmentSampleDataSeeder extends Seeder
                 'items' => $this->makeManualAdjustmentItems($products, $branchIdForStock, -2.0),
             ],
             [
-                'adjustment_number' => "SA-{$year}-910002",
+                'adjustment_number' => "SA-{$year}-000003",
                 'status' => 'pending_approval',
                 'adjustment_date' => now()->subDays(5)->toDateString(),
                 'adjustment_type' => 'damage',
@@ -77,7 +90,7 @@ class StockAdjustmentSampleDataSeeder extends Seeder
                 'items' => $this->makeManualAdjustmentItems($products, $branchIdForStock, -5.0),
             ],
             [
-                'adjustment_number' => "SA-{$year}-910003",
+                'adjustment_number' => "SA-{$year}-000004",
                 'status' => 'approved',
                 'adjustment_date' => now()->subDays(3)->toDateString(),
                 'adjustment_type' => $completedStocktakeId ? 'stocktake_result' : 'correction',
@@ -88,7 +101,7 @@ class StockAdjustmentSampleDataSeeder extends Seeder
                     : $this->makeManualAdjustmentItems($products, $branchIdForStock, 3.0),
             ],
             [
-                'adjustment_number' => "SA-{$year}-910004",
+                'adjustment_number' => "SA-{$year}-000005",
                 'status' => 'cancelled',
                 'adjustment_date' => now()->subDays(2)->toDateString(),
                 'adjustment_type' => 'expired',

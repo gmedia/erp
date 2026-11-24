@@ -242,7 +242,7 @@ invariant('W7-04 stock movement balances form a correct chain per product and wa
     $scope = null;
 
     foreach ($movements as $movement) {
-        $key = $movement->product_id.':'.$movement->warehouse_id;
+        $key = $movement->product_id . ':' . $movement->warehouse_id;
 
         if ($key !== $scope) {
             $scope = $key;
@@ -265,7 +265,7 @@ invariant('W7-04 every eligible document line has a matching stock movement', fu
         ->groupBy('reference_type', 'reference_id', 'product_id')
         ->selectRaw('reference_type, reference_id, product_id, SUM(quantity_in) as qty_in, SUM(quantity_out) as qty_out')
         ->get()
-        ->keyBy(fn ($row) => $row->reference_type.'#'.$row->reference_id.'#'.$row->product_id);
+        ->keyBy(fn ($row) => $row->reference_type . '#' . $row->reference_id . '#' . $row->product_id);
 
     $checks = [
         [
@@ -305,7 +305,7 @@ invariant('W7-04 every eligible document line has a matching stock movement', fu
         $eligibleIds = DB::table($check['header'])->where('status', $check['status'])->pluck('id');
 
         foreach (DB::table($check['lines'])->whereIn($check['fk'], $eligibleIds)->get() as $line) {
-            $key = $check['type'].'#'.$line->{$check['fk']}.'#'.$line->product_id;
+            $key = $check['type'] . '#' . $line->{$check['fk']} . '#' . $line->product_id;
             $movement = $movementSums->get($key);
 
             // Collect every violation instead of stopping at the first, so one broken
@@ -345,7 +345,7 @@ invariant('W7-04 every received stock transfer line has matching transfer_out an
         ->groupBy('reference_id', 'product_id', 'movement_type')
         ->selectRaw('reference_id, product_id, movement_type, SUM(quantity_in) as qty_in, SUM(quantity_out) as qty_out')
         ->get()
-        ->keyBy(fn ($row) => $row->reference_id.'#'.$row->product_id.'#'.$row->movement_type);
+        ->keyBy(fn ($row) => $row->reference_id . '#' . $row->product_id . '#' . $row->movement_type);
 
     $receivedLines = DB::table('stock_transfer_items')
         ->join('stock_transfers', 'stock_transfers.id', '=', 'stock_transfer_items.stock_transfer_id')
@@ -355,14 +355,14 @@ invariant('W7-04 every received stock transfer line has matching transfer_out an
     expect($receivedLines)->not->toBeEmpty('Demo data must include received stock transfers');
 
     foreach ($receivedLines as $line) {
-        $key = $line->stock_transfer_id.'#'.$line->product_id;
+        $key = $line->stock_transfer_id . '#' . $line->product_id;
 
-        $out = $legs->get($key.'#transfer_out');
+        $out = $legs->get($key . '#transfer_out');
         expect($out)->not->toBeNull("Received transfer {$key} must have a transfer_out movement");
         expect(round((float) $out->qty_out, 2))
             ->toBe(round((float) $line->quantity, 2), "transfer_out quantity for {$key} must equal dispatched quantity");
 
-        $in = $legs->get($key.'#transfer_in');
+        $in = $legs->get($key . '#transfer_in');
         expect($in)->not->toBeNull("Received transfer {$key} must have a transfer_in movement");
         expect(round((float) $in->qty_in, 2))
             ->toBe(round((float) $line->quantity_received, 2), "transfer_in quantity for {$key} must equal quantity received");
@@ -381,7 +381,7 @@ invariant('W7-04 running stock balance is non-negative at every movement', funct
     $balance = [];
 
     foreach ($movements as $movement) {
-        $key = $movement->product_id.':'.$movement->warehouse_id;
+        $key = $movement->product_id . ':' . $movement->warehouse_id;
         $balance[$key] = ($balance[$key] ?? 0.0) + (float) $movement->quantity_in - (float) $movement->quantity_out;
 
         expect(round($balance[$key], 2))
@@ -400,7 +400,7 @@ invariant('W7-04 stock snapshot uses the latest movement balance', function () {
 
     $latest = [];
     foreach ($movements as $movement) {
-        $latest[$movement->product_id.':'.$movement->warehouse_id] = (float) $movement->balance_after;
+        $latest[$movement->product_id . ':' . $movement->warehouse_id] = (float) $movement->balance_after;
     }
 
     // Compare the set of product+warehouse pairs, not raw movement rows.
@@ -414,13 +414,13 @@ invariant('W7-04 stock snapshot uses the latest movement balance', function () {
 
     expect($snapshot)->not->toBeEmpty('Stock monitor must show stock rows');
 
-    $snapshotPairs = $snapshot->map(fn ($row) => $row->product_id.':'.$row->warehouse_id)->sort()->values()->all();
+    $snapshotPairs = $snapshot->map(fn ($row) => $row->product_id . ':' . $row->warehouse_id)->sort()->values()->all();
     $expectedPairs = collect($pairs)->sort()->values()->all();
 
     expect($snapshotPairs)->toBe($expectedPairs, 'Stock snapshot must cover exactly the product and warehouse pairs that have movements');
 
     foreach ($snapshot as $row) {
-        $key = $row->product_id.':'.$row->warehouse_id;
+        $key = $row->product_id . ':' . $row->warehouse_id;
         expect(round((float) $row->quantity_on_hand, 2))
             ->toBe(round($latest[$key], 2), "Stock snapshot for {$key} must equal the latest movement balance");
     }
@@ -431,7 +431,7 @@ invariant('W7-04 only eligible document states produce stock movements', functio
     $eligible = DB::table('stock_movements')
         ->whereNotNull('reference_type')
         ->get(['reference_type', 'reference_id'])
-        ->map(fn ($row) => $row->reference_type.'#'.$row->reference_id)
+        ->map(fn ($row) => $row->reference_type . '#' . $row->reference_id)
         ->unique();
 
     foreach ($eligible as $pair) {
@@ -471,7 +471,7 @@ invariant('W7-04 inventory valuation equals GL inventory account', function () {
 
     $latest = [];
     foreach ($movements as $movement) {
-        $latest[$movement->product_id.':'.$movement->warehouse_id] = $movement;
+        $latest[$movement->product_id . ':' . $movement->warehouse_id] = $movement;
     }
 
     $valuation = 0.0;
@@ -520,7 +520,7 @@ test('W7-04 11300 invariant fails when a transfer shortage journal is removed', 
         ->get(['product_id', 'warehouse_id', 'balance_after', 'average_cost_after']);
 
     foreach ($movements as $movement) {
-        $latest[$movement->product_id.':'.$movement->warehouse_id] = $movement;
+        $latest[$movement->product_id . ':' . $movement->warehouse_id] = $movement;
     }
     foreach ($latest as $movement) {
         $cost = $movement->average_cost_after !== null
@@ -653,7 +653,7 @@ invariant('W7-15 positions do not mix grade levels with job titles', function ()
     $names = DB::table('positions')->pluck('name')->all();
     $grades = array_values(array_intersect($names, ['Junior', 'Mid-level', 'Senior']));
 
-    expect($grades)->toBeEmpty('Position list must not contain grade levels: '.implode(', ', $grades));
+    expect($grades)->toBeEmpty('Position list must not contain grade levels: ' . implode(', ', $grades));
 });
 
 // W7-15 (keuangan) — anggaran tiap periode tidak boleh melebihi anggaran tahunan.
@@ -1064,4 +1064,120 @@ invariant('W7-16 purchasing pipeline transitions are performed by someone other 
 invariant('W7-16 pipeline and approval history rows have timestamps', function () {
     expect(DB::table('pipeline_state_logs')->whereNull('created_at')->count())->toBe(0);
     expect(DB::table('approval_request_steps')->where('status', '!=', 'pending')->whereNull('acted_at')->count())->toBe(0);
+});
+
+// W7-17 — nomor dokumen demo memakai sequence -000001 dengan jumlah digit seragam (tanpa rentang sintetis).
+invariant('W7-17 demo document numbers start at -000001 with uniform digit width', function () {
+    $prefixes = [
+        'stock_adjustments' => ['adjustment_number', 'SA'],
+        'stock_transfers' => ['transfer_number', 'ST'],
+        'inventory_stocktakes' => ['stocktake_number', 'STO'],
+    ];
+
+    foreach ($prefixes as $table => [$column, $prefix]) {
+        $numbers = DB::table($table)->pluck($column);
+
+        foreach ($numbers as $number) {
+            expect($number)->toMatch(
+                "/^{$prefix}-\\d{4}-\\d{6}$/",
+                "Nomor {$table} {$number} harus memakai 6 digit"
+            );
+            expect((int) substr($number, -6))
+                ->toBeLessThan(900000, "Nomor {$table} {$number} tidak boleh memakai rentang sintetis");
+        }
+
+        if ($numbers->isNotEmpty()) {
+            expect($numbers->map(fn ($n) => (int) substr($n, -6))->min())
+                ->toBeLessThanOrEqual(1, "Sequence {$table} harus dimulai dari -000001");
+        }
+    }
+
+    $journalNumbers = DB::table('journal_entries')->pluck('entry_number');
+
+    foreach ($journalNumbers as $number) {
+        expect($number)->toMatch('/^JV-\d{4}-\d{5}$/', "Nomor jurnal {$number} harus memakai format JV-YYYY-NNNNN");
+    }
+});
+
+// W7-17 — kode akun demo berskema 5 digit (1999-IBC dikecualikan hanya bila masih dirujuk sistem, lihat catatan upgrade).
+invariant('W7-17 demo account codes follow the five-digit scheme', function () {
+    // 1999-IBC dirujuk langsung oleh InterBranchClearingService::CLEARING_CODE dan
+    // migrasi 2026_06_21. Mengubah kodenya butuh migrasi data + catatan upgrade,
+    // jadi di luar cakupan langkah ini (dilaporkan, tidak diubah).
+    $codes = DB::table('accounts')->where('code', '!=', '1999-IBC')->pluck('code')->unique();
+
+    foreach ($codes as $code) {
+        expect($code)->toMatch('/^\d{5}$/', "Kode akun {$code} harus 5 digit");
+    }
+});
+
+// W7-17 — kode lokasi aset unik lintas cabang.
+invariant('W7-17 asset location codes are unique across branches', function () {
+    $duplicates = DB::table('asset_locations')
+        ->select('code')
+        ->groupBy('code')
+        ->havingRaw('COUNT(*) > 1')
+        ->pluck('code');
+
+    expect($duplicates)->toBeEmpty('Kode lokasi aset tidak boleh berulang: ' . $duplicates->implode(', '));
+});
+
+// W7-17 — produk demo tidak memakai kode placeholder SaaS-CLOUD-001.
+invariant('W7-17 demo product codes avoid placeholder SaaS-CLOUD-001', function () {
+    expect(DB::table('products')->where('code', 'SaaS-CLOUD-001')->exists())->toBeFalse();
+});
+
+// W7-17 — email dan telepon demo memakai domain netral dan nomor wajar.
+invariant('W7-17 demo contact emails use neutral example domains and realistic phones', function () {
+    $emails = DB::table('suppliers')->whereNotNull('email')->pluck('email');
+
+    foreach ($emails as $email) {
+        expect($email)->not->toContain('vendor.example', "Email supplier {$email} harus wajar");
+        expect($email)->toMatch('/@[a-z0-9.-]+\.example$/', "Email {$email} harus memakai domain example");
+    }
+
+    expect(DB::table('suppliers')->where('phone', '0215551234')->exists())->toBeFalse();
+    expect(DB::table('settings')->where('value', '+62 21 0000 0000')->exists())->toBeFalse();
+});
+
+// W7-17 — setiap supplier menjual produk pada kategori yang cocok dengan kategori supplier.
+invariant('W7-17 supplier and product categories are mapped consistently', function () {
+    $mismatch = DB::table('purchase_order_items')
+        ->join('purchase_orders', 'purchase_orders.id', '=', 'purchase_order_items.purchase_order_id')
+        ->join('suppliers', 'suppliers.id', '=', 'purchase_orders.supplier_id')
+        ->join('supplier_categories', 'supplier_categories.id', '=', 'suppliers.category_id')
+        ->join('products', 'products.id', '=', 'purchase_order_items.product_id')
+        ->join('product_categories', 'product_categories.id', '=', 'products.product_category_id')
+        ->where('supplier_categories.name', 'Furniture')
+        ->where('products.code', 'SaaS-CLOUD-001')
+        ->count();
+
+    expect($mismatch)->toBe(0, 'Supplier Furniture tidak boleh menjual produk SaaS');
+});
+
+// W7-17 — transfer antar gudang bervariasi (tidak semua menuju Return Warehouse).
+invariant('W7-17 stock transfers vary their destination warehouse', function () {
+    $destinations = DB::table('stock_transfers')->distinct()->pluck('to_warehouse_id');
+
+    expect($destinations->count())->toBeGreaterThanOrEqual(2, 'Transfer harus menuju lebih dari satu gudang');
+});
+
+// W7-17 — customer demo bervariasi cabang, kategori, dan status.
+invariant('W7-17 customer demo varies branch, category and status', function () {
+    expect(DB::table('customers')->distinct()->count('branch_id'))->toBeGreaterThanOrEqual(2);
+    expect(DB::table('customers')->distinct()->count('category_id'))->toBeGreaterThanOrEqual(2);
+    expect(DB::table('customers')->distinct()->count('status'))->toBeGreaterThanOrEqual(2);
+});
+
+// W7-17 — tanggal dibuat (created_at) tidak kosong pada master kategori dan satuan.
+invariant('W7-17 product categories and units have created_at', function () {
+    expect(DB::table('product_categories')->whereNull('created_at')->count())->toBe(0);
+    expect(DB::table('units')->whereNull('created_at')->count())->toBe(0);
+});
+
+// W7-17 — nama aset demo bahasa Indonesia; kategori aset tidak berbahasa campur.
+invariant('W7-17 demo master names are Indonesian, not mixed with English labels', function () {
+    $englishLabels = ['Mesin Production', 'Vehicles', 'Office Equipment', 'Operating Budget'];
+
+    expect(DB::table('asset_categories')->whereIn('name', $englishLabels)->count())->toBe(0);
 });

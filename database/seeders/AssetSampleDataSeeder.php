@@ -148,15 +148,15 @@ class AssetSampleDataSeeder extends Seeder
             $suffix = str_pad((string) $branch->id, 2, '0', STR_PAD_LEFT);
             $office = AssetLocation::updateOrCreate(
                 ['branch_id' => $branch->id, 'code' => "OFFICE-{$suffix}"],
-                ['name' => 'Kantor ('.$branch->name.')', 'parent_id' => null]
+                ['name' => 'Kantor (' . $branch->name . ')', 'parent_id' => null]
             );
             AssetLocation::updateOrCreate(
                 ['branch_id' => $branch->id, 'code' => "IT-ROOM-{$suffix}"],
-                ['name' => 'Ruang TI ('.$branch->name.')', 'parent_id' => $office->id]
+                ['name' => 'Ruang TI (' . $branch->name . ')', 'parent_id' => $office->id]
             );
             AssetLocation::updateOrCreate(
                 ['branch_id' => $branch->id, 'code' => "WAREHOUSE-{$suffix}"],
-                ['name' => 'Gudang ('.$branch->name.')', 'parent_id' => null]
+                ['name' => 'Gudang (' . $branch->name . ')', 'parent_id' => null]
             );
         }
 
@@ -576,7 +576,7 @@ class AssetSampleDataSeeder extends Seeder
                         'to_department_id' => null,
                         'from_employee_id' => $asset->employee_id,
                         'to_employee_id' => null,
-                        'reference' => 'DISP-'.$asset->asset_code,
+                        'reference' => 'DISP-' . $asset->asset_code,
                         'notes' => 'Disposal initiated via seeder',
                         'created_by' => $adminUser?->id,
                     ]
@@ -700,7 +700,7 @@ class AssetSampleDataSeeder extends Seeder
         // Map transition by "from_code -> to_code"
         $transitionMap = [];
         foreach ($transitions as $t) {
-            $key = $t->fromState->code.'->'.$t->toState->code;
+            $key = $t->fromState->code . '->' . $t->toState->code;
             $transitionMap[$key] = $t;
         }
 
@@ -735,7 +735,7 @@ class AssetSampleDataSeeder extends Seeder
                     'active',
                     'disposed',
                     'Laptop sudah melewati masa manfaat 3 tahun, layar retak dan keyboard tidak berfungsi. '
-                        .'Disetujui untuk dihapusbukukan.',
+                        . 'Disetujui untuk dihapusbukukan.',
                     60,
                 ],
             ],
@@ -746,7 +746,7 @@ class AssetSampleDataSeeder extends Seeder
                     'active',
                     'lost',
                     'Filing cabinet tidak ditemukan setelah proses pindah kantor dari Gedung A ke Gedung B. '
-                        .'Sudah dicari selama 2 minggu.',
+                        . 'Sudah dicari selama 2 minggu.',
                     30,
                 ],
             ],
@@ -886,7 +886,7 @@ class AssetSampleDataSeeder extends Seeder
                     'to_location_id' => $office->id,
                     'from_department_id' => $defaultDepartment->id,
                     'to_department_id' => $defaultDepartment->id,
-                    'reference' => 'TRF-'.now()->format('Y').'-000101',
+                    'reference' => 'TRF-' . now()->format('Y') . '-000001',
                     'notes' => 'Dipindahkan ke lantai 2 untuk penggunaan bersama.',
                     'created_by' => $adminUser?->id,
                 ]);
@@ -939,7 +939,7 @@ class AssetSampleDataSeeder extends Seeder
         if (! AssetStocktake::where('branch_id', $headOffice->id)->exists()) {
             $stocktake = AssetStocktake::create([
                 'branch_id' => $headOffice->id,
-                'reference' => 'STO-'.date('Y').'-000101',
+                'reference' => 'STO-' . date('Y') . '-000001',
                 'planned_at' => now()->subDays(1),
                 'performed_at' => now(),
                 'status' => 'completed',

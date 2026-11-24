@@ -51,9 +51,9 @@ class PurchasingSampleDataSeeder extends Seeder
 
         $legacySupplier = Supplier::where('email', 'purchasing.sample@vendor.local')->first();
 
-        if ($legacySupplier && ! Supplier::where('email', 'procurement@vendor.example')->exists()) {
+        if ($legacySupplier && ! Supplier::where('email', 'pengadaan@sumber-makmur.example')->exists()) {
             $legacySupplier->update([
-                'email' => 'procurement@vendor.example',
+                'email' => 'pengadaan@sumber-makmur.example',
                 'name' => 'PT Sumber Makmur Sejahtera',
                 'address' => 'Jl. Industri Raya No. 12, Tangerang',
             ]);
@@ -61,7 +61,7 @@ class PurchasingSampleDataSeeder extends Seeder
 
         // Beberapa supplier dengan kategori yang cocok (W5-23).
         $supplierSeeds = [
-            ['email' => 'procurement@vendor.example', 'name' => 'PT Sumber Makmur Sejahtera', 'category' => 'Office Supplies', 'phone' => '0215551234'],
+            ['email' => 'pengadaan@sumber-makmur.example', 'name' => 'PT Sumber Makmur Sejahtera', 'category' => 'Office Supplies', 'phone' => '0215558001'],
             ['email' => 'sales@nusantara-elektronik.example', 'name' => 'PT Nusantara Elektronik', 'category' => 'Electronics', 'phone' => '0215552345'],
             ['email' => 'order@mebel-jaya.example', 'name' => 'CV Mebel Jaya Abadi', 'category' => 'Furniture', 'phone' => '0225553456'],
             ['email' => 'kontak@logistik-cepat.example', 'name' => 'PT Logistik Cepat Nusantara', 'category' => 'Logistics', 'phone' => '0315554567'],
@@ -100,10 +100,10 @@ class PurchasingSampleDataSeeder extends Seeder
             }
 
             $supplier = Supplier::updateOrCreate(
-                ['email' => 'procurement@vendor.example'],
+                ['email' => 'pengadaan@sumber-makmur.example'],
                 [
                     'name' => 'PT Sumber Makmur Sejahtera',
-                    'phone' => '0215551234',
+                    'phone' => '0215558001',
                     'address' => 'Jl. Industri Raya No. 12, Tangerang',
                     'branch_id' => $branchId,
                     'category_id' => $categoryId,
@@ -798,7 +798,7 @@ class PurchasingSampleDataSeeder extends Seeder
                 );
             }
 
-            $transitions[$fromCode.'->'.$toCode] = $transition;
+            $transitions[$fromCode . '->' . $toCode] = $transition;
         }
 
         return $transitions;
@@ -819,7 +819,7 @@ class PurchasingSampleDataSeeder extends Seeder
         // Rentang lama 99xxxx → 0001xx (W6-08): rename bila target kosong,
         // hapus duplikat lama bila sudah ada.
         foreach (PurchaseRequest::query()->where('pr_number', 'like', "PR-{$year}-99%")->get() as $legacy) {
-            $target = "PR-{$year}-0001".substr($legacy->pr_number, -2);
+            $target = "PR-{$year}-0001" . substr($legacy->pr_number, -2);
 
             if (PurchaseRequest::query()->where('pr_number', $target)->exists()) {
                 $legacy->delete();
@@ -994,7 +994,7 @@ class PurchasingSampleDataSeeder extends Seeder
         $year = now()->format('Y');
 
         foreach (PurchaseOrder::query()->where('po_number', 'like', "PO-{$year}-99%")->get() as $legacy) {
-            $target = "PO-{$year}-0001".substr($legacy->po_number, -2);
+            $target = "PO-{$year}-0001" . substr($legacy->po_number, -2);
 
             if (PurchaseOrder::query()->where('po_number', $target)->exists()) {
                 $legacy->delete();
@@ -1062,11 +1062,17 @@ class PurchasingSampleDataSeeder extends Seeder
 
             $approved = in_array($status, ['confirmed', 'partially_received', 'fully_received', 'closed'], true);
 
-            // Rotasi supplier aktif agar tidak semua PO ke vendor yang sama.
+            // Rotasi supplier aktif agar tidak semua PO ke vendor yang sama. Produk
+            // layanan SaaS hanya dipesan dari supplier kategori IT Services (W7-17).
             $poSuppliers = Supplier::query()->orderBy('id')->get();
-            $poSupplierId = $poSuppliers->isEmpty()
+            $isSoftwareOrder = $firstProduct->code === 'SW-CLD-001' || $secondProduct->code === 'SW-CLD-001';
+            $eligibleSuppliers = $isSoftwareOrder
+                ? $poSuppliers->filter(fn (Supplier $candidate) => $candidate->category?->name === 'IT Services')
+                : $poSuppliers->reject(fn (Supplier $candidate) => $candidate->category?->name === 'IT Services');
+            $eligibleSuppliers = $eligibleSuppliers->isEmpty() ? $poSuppliers : $eligibleSuppliers->values();
+            $poSupplierId = $eligibleSuppliers->isEmpty()
                 ? $supplier->id
-                : $poSuppliers[$index % $poSuppliers->count()]->id;
+                : $eligibleSuppliers[$index % $eligibleSuppliers->count()]->id;
 
             $purchaseOrder = PurchaseOrder::updateOrCreate(
                 ['po_number' => $definition['number']],
@@ -1351,7 +1357,7 @@ class PurchasingSampleDataSeeder extends Seeder
         $year = now()->format('Y');
 
         foreach (GoodsReceipt::query()->where('gr_number', 'like', "GR-{$year}-99%")->get() as $legacy) {
-            $target = "GR-{$year}-0001".substr($legacy->gr_number, -2);
+            $target = "GR-{$year}-0001" . substr($legacy->gr_number, -2);
 
             if (GoodsReceipt::query()->where('gr_number', $target)->exists()) {
                 $legacy->delete();
@@ -1426,7 +1432,7 @@ class PurchasingSampleDataSeeder extends Seeder
                     'purchase_order_id' => $purchaseOrder->id,
                     'warehouse_id' => $warehouse->id,
                     'receipt_date' => now()->subDays(12 - $index)->toDateString(),
-                    'supplier_delivery_note' => 'SJ-'.$year.'-0001'.str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT),
+                    'supplier_delivery_note' => 'SJ-' . $year . '-0001' . str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT),
                     'status' => $definition['status'],
                     'notes' => 'Penerimaan barang sesuai pesanan pembelian',
                     'received_by' => $requesterId,
@@ -1479,10 +1485,10 @@ class PurchasingSampleDataSeeder extends Seeder
                     ]
                 );
 
-                $goodsReceiptItems[$definition['status'].'_'.($index + 1).'_'.$itemDefinition['line']] = $goodsReceiptItem;
+                $goodsReceiptItems[$definition['status'] . '_' . ($index + 1) . '_' . $itemDefinition['line']] = $goodsReceiptItem;
             }
 
-            $goodsReceipts[$definition['status'].'_'.($index + 1)] = $goodsReceipt;
+            $goodsReceipts[$definition['status'] . '_' . ($index + 1)] = $goodsReceipt;
         }
 
         return [$goodsReceipts, $goodsReceiptItems];
@@ -1520,7 +1526,7 @@ class PurchasingSampleDataSeeder extends Seeder
         $year = now()->format('Y');
 
         foreach (SupplierReturn::query()->where('return_number', 'like', "SR-{$year}-99%")->get() as $legacy) {
-            $target = "SR-{$year}-0001".substr($legacy->return_number, -2);
+            $target = "SR-{$year}-0001" . substr($legacy->return_number, -2);
 
             if (SupplierReturn::query()->where('return_number', $target)->exists()) {
                 $legacy->delete();
@@ -1639,7 +1645,7 @@ class PurchasingSampleDataSeeder extends Seeder
 
             $fromState = $states[$fromCode] ?? null;
             $toState = $states[$toCode] ?? null;
-            $transition = $transitions[$fromCode.'->'.$toCode] ?? null;
+            $transition = $transitions[$fromCode . '->' . $toCode] ?? null;
 
             if (! $fromState || ! $toState) {
                 continue;

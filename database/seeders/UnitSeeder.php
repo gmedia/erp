@@ -39,8 +39,10 @@ class UnitSeeder extends Seeder
             // Idempoten: seed ulang tidak boleh melanggar unique(name).
             DB::table('units')->updateOrInsert(
                 ['name' => $unit['name']],
-                [
+                fn (bool $exists) => [
                     'symbol' => $unit['symbol'],
+                    // created_at hanya saat insert, agar seed ulang tidak mengubah tanggal dibuat.
+                    ...($exists ? [] : ['created_at' => now()]),
                     'updated_at' => now(),
                 ],
             );

@@ -173,11 +173,20 @@ class ProductSampleDataSeeder extends Seeder
             'cost' => 500000,
         ]);
 
+        // Kode placeholder SaaS-CLOUD-001 diganti (W7-17). Baris lama di-rename
+        // in-place agar langganan & plan yang menempel tetap terhubung.
+        Product::query()
+            ->where('code', 'SaaS-CLOUD-001')
+            ->when(
+                ! Product::query()->where('code', 'SW-CLD-001')->exists(),
+                fn ($query) => $query->update(['code' => 'SW-CLD-001']),
+            );
+
         $cloudStorage = Product::updateOrCreate(
-            ['code' => 'SaaS-CLOUD-001'],
+            ['code' => 'SW-CLD-001'],
             [
-                'name' => 'Cloud Storage Pro',
-                'description' => 'Premium cloud storage solution with advanced features',
+                'name' => 'Layanan Penyimpanan Awan Pro',
+                'description' => 'Layanan penyimpanan awan dengan fitur lanjutan untuk perusahaan',
                 'type' => 'service',
                 'product_category_id' => $softwareCategory->id,
                 'unit_id' => $serviceUnit->id,
@@ -190,7 +199,7 @@ class ProductSampleDataSeeder extends Seeder
         $monthlyPlan = SubscriptionPlan::updateOrCreate(
             [
                 'product_id' => $cloudStorage->id,
-                'name' => 'Cloud Storage Pro - Monthly',
+                'name' => 'Layanan Penyimpanan Awan Pro - Bulanan',
             ],
             [
                 'billing_interval' => 'monthly',
@@ -203,7 +212,7 @@ class ProductSampleDataSeeder extends Seeder
         SubscriptionPlan::updateOrCreate(
             [
                 'product_id' => $cloudStorage->id,
-                'name' => 'Cloud Storage Pro - Annual',
+                'name' => 'Layanan Penyimpanan Awan Pro - Tahunan',
             ],
             [
                 'billing_interval' => 'annual',

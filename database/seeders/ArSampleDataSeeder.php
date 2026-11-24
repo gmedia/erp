@@ -69,16 +69,20 @@ class ArSampleDataSeeder extends Seeder
 
         $customers = Customer::query()->take(5)->get();
         if ($customers->isEmpty()) {
-            $categoryId = CustomerCategory::query()->value('id');
-            foreach (['PT Maju Bersama', 'CV Sejahtera Abadi', 'PT Karya Mandiri', 'UD Sumber Rezeki', 'PT Global Teknik'] as $name) {
+            // Cabang, kategori, dan status bervariasi agar data demo tidak seragam (W7-17).
+            $categoryIds = CustomerCategory::query()->orderBy('id')->pluck('id')->all();
+            $branchIds = Branch::query()->orderBy('id')->pluck('id')->all();
+            $statuses = ['active', 'active', 'inactive'];
+
+            foreach (['PT Maju Bersama', 'CV Sejahtera Abadi', 'PT Karya Mandiri', 'UD Sumber Rezeki', 'PT Global Teknik'] as $index => $name) {
                 Customer::create([
                     'name' => $name,
                     'email' => strtolower(str_replace([' ', '.'], ['', ''], $name)) . '@example.com',
-                    'phone' => '08' . rand(1000000000, 9999999999),
-                    'address' => 'Jl. Sudirman No. ' . rand(1, 100) . ', Jakarta',
-                    'branch_id' => $branch->id,
-                    'category_id' => $categoryId,
-                    'status' => 'active',
+                    'phone' => '0812' . str_pad((string) (1000000 + $index * 137), 7, '0', STR_PAD_LEFT),
+                    'address' => 'Jl. Sudirman No. ' . (10 + $index * 7) . ', Jakarta',
+                    'branch_id' => $branchIds[$index % count($branchIds)] ?? $branch->id,
+                    'category_id' => $categoryIds[$index % count($categoryIds)] ?? null,
+                    'status' => $statuses[$index % count($statuses)],
                 ]);
             }
             $customers = Customer::query()->take(5)->get();

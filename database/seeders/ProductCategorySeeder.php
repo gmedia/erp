@@ -29,8 +29,10 @@ class ProductCategorySeeder extends Seeder
             // Idempoten: seed ulang tidak boleh melanggar unique(name).
             DB::table('product_categories')->updateOrInsert(
                 ['name' => $category['name']],
-                [
+                fn (bool $exists) => [
                     'description' => $category['description'],
+                    // created_at hanya saat insert, agar seed ulang tidak mengubah tanggal dibuat.
+                    ...($exists ? [] : ['created_at' => now()]),
                     'updated_at' => now(),
                 ],
             );
