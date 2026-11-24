@@ -2,6 +2,7 @@
 
 namespace App\Actions\JournalEntries;
 
+use App\Actions\AccountingPosting\ResolveControlAccountAction;
 use App\Models\Account;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
@@ -48,7 +49,7 @@ class CreateJournalEntryAction
                 ]);
             }
 
-            $this->assertLinesUseActiveAccounts($data['lines']);
+            $this->assertLinesUseActiveAccounts($data['lines'], $data['entry_date']);
         }
 
         while ($attempts < $maxAttempts) {
@@ -166,28 +167,43 @@ class CreateJournalEntryAction
     }
 
     /**
-     * Jurnal posted hanya boleh memakai akun aktif dari COA version aktif (#357).
-     * Akun COA archived/nonaktif ditolak dengan 422 agar tidak menggandakan saldo lama.
+     * Jurnal posted hanya boleh memakai akun aktif dari COA version yang berlaku untuk
+     * tanggal jurnal (#357). Akun COA archived, nonaktif, atau dari COA lain ditolak 422
+     * agar tidak menggandakan saldo lama atau mencampur dua COA dalam satu jurnal.
      *
      * @param  array<int, array<string, mixed>>  $lines
      */
-    private function assertLinesUseActiveAccounts(array $lines): void
+    private function assertLinesUseActiveAccounts(array $lines, string $entryDate): void
     {
+        $coaVersionId = app(ResolveControlAccountAction::class)->resolveVersion($entryDate)->id;
+
         $accountIds = array_values(array_unique(array_map(
             fn (array $line): int => (int) $line['account_id'],
             $lines,
         )));
 
-        $activeCount = Account::query()
+        $accounts = Account::query()
             ->whereIn('id', $accountIds)
-            ->where('is_active', true)
-            ->whereHas('coaVersion', fn ($query) => $query->where('status', 'active'))
-            ->count();
+            ->get(['id', 'code', 'coa_version_id', 'is_active']);
 
-        if ($activeCount !== count($accountIds)) {
+        if ($accounts->count() !== count($accountIds)) {
             throw ValidationException::withMessages([
-                'lines' => 'Journal entry uses an account that is inactive or outside the active COA version.',
+                'lines' => __('accounting_posting.line_account_outside_coa', [
+                    'code' => '#' . implode(',#', $accountIds),
+                    'date' => $entryDate,
+                ]),
             ]);
+        }
+
+        foreach ($accounts as $account) {
+            if (! $account->is_active || $account->coa_version_id !== $coaVersionId) {
+                throw ValidationException::withMessages([
+                    'lines' => __('accounting_posting.line_account_outside_coa', [
+                        'code' => $account->code,
+                        'date' => $entryDate,
+                    ]),
+                ]);
+            }
         }
     }
 }

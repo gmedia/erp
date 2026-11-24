@@ -11,43 +11,71 @@ class ResolveControlAccountAction
     /**
      * Resolve akun kontrol dari COA version yang berlaku untuk tanggal jurnal (#357).
      *
-     * COA dipilih lewat tahun fiskal yang memuat $entryDate. Bila tahun fiskal itu
-     * tidak punya COA aktif, atau lebih dari satu, posting ditolak dengan 422
-     * agar tidak menebak akun yang salah.
+     * Aturan:
+     * 1. Tepat satu COA aktif tertaut ke tahun fiskal yang memuat $entryDate: pakai itu.
+     * 2. Tidak ada COA aktif tertaut ke tahun itu, dan tepat satu COA aktif di seluruh
+     *    sistem: pakai itu (satu COA boleh melayani beberapa tahun fiskal).
+     * 3. Selain itu: 422, agar tidak menebak akun yang salah.
      */
     public function execute(string $accountCode, string $entryDate): Account
     {
-        $coaVersions = CoaVersion::query()
-            ->where('status', 'active')
-            ->whereHas('fiscalYear', fn ($query) => $query
-                ->where('start_date', '<=', $entryDate)
-                ->where('end_date', '>=', $entryDate))
-            ->get();
-
-        if ($coaVersions->isEmpty()) {
-            throw ValidationException::withMessages([
-                'coa_version' => "No active COA version found for date {$entryDate}. Seed or activate a COA version before posting.",
-            ]);
-        }
-
-        if ($coaVersions->count() > 1) {
-            throw ValidationException::withMessages([
-                'coa_version' => "Multiple active COA versions found for date {$entryDate}. Keep exactly one active COA per fiscal year.",
-            ]);
-        }
+        $coaVersion = $this->resolveVersion($entryDate);
 
         $account = Account::query()
-            ->where('coa_version_id', $coaVersions->first()->id)
+            ->where('coa_version_id', $coaVersion->id)
             ->where('code', $accountCode)
             ->where('is_active', true)
             ->first();
 
         if ($account === null) {
             throw ValidationException::withMessages([
-                'account' => "Control account with code '{$accountCode}' was not found in active COA version.",
+                'account' => __('accounting_posting.control_account_missing', ['code' => $accountCode]),
             ]);
         }
 
         return $account;
+    }
+
+    /**
+     * COA version aktif yang berlaku untuk tanggal jurnal. Dipakai juga oleh
+     * validasi baris jurnal agar seluruh akun berasal dari COA yang sama.
+     */
+    public function resolveVersion(string $entryDate): CoaVersion
+    {
+        $linked = CoaVersion::query()
+            ->where('status', 'active')
+            ->whereHas('fiscalYear', fn ($query) => $query
+                ->where('start_date', '<=', $entryDate)
+                ->where('end_date', '>=', $entryDate))
+            ->get();
+
+        if ($linked->count() === 1) {
+            return $linked->first();
+        }
+
+        if ($linked->count() > 1) {
+            throw $this->ambiguous($entryDate);
+        }
+
+        $all = CoaVersion::query()->where('status', 'active')->limit(2)->get();
+
+        if ($all->count() === 1) {
+            return $all->first();
+        }
+
+        if ($all->isEmpty()) {
+            throw ValidationException::withMessages([
+                'coa_version' => __('accounting_posting.coa_none_active', ['date' => $entryDate]),
+            ]);
+        }
+
+        throw $this->ambiguous($entryDate);
+    }
+
+    private function ambiguous(string $entryDate): ValidationException
+    {
+        return ValidationException::withMessages([
+            'coa_version' => __('accounting_posting.coa_ambiguous', ['date' => $entryDate]),
+        ]);
     }
 }

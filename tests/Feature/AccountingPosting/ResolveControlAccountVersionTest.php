@@ -52,8 +52,16 @@ test('resolver memilih akun dari COA aktif tahun fiskal tanggal jurnal, bukan CO
         ->and($account2026->name)->toBe('Kas 2026');
 });
 
-test('resolver menolak 422 bila tahun fiskal tanggal jurnal tidak punya COA aktif', function () {
-    makeCoaForYear('2026', 'active', 'Kas 2026');
+test('resolver memakai satu-satunya COA aktif bila tahun fiskal tanggal jurnal tidak punya COA sendiri', function () {
+    $coa2026 = makeCoaForYear('2026', 'active', 'Kas 2026');
+
+    $account = app(ResolveControlAccountAction::class)->execute('11110', '2025-06-15');
+
+    expect($account->coa_version_id)->toBe($coa2026->id);
+});
+
+test('resolver menolak 422 bila tidak ada COA aktif sama sekali', function () {
+    makeCoaForYear('2026', 'archived', 'Kas 2026');
 
     expect(fn () => app(ResolveControlAccountAction::class)->execute('11110', '2025-06-15'))
         ->toThrow(ValidationException::class);

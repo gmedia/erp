@@ -234,6 +234,10 @@
         "selectLogo": "Pilih Logo SVG",
         "noFileSelected": "Belum ada file dipilih"
     },
+    "accounting_posting.control_account_missing": "Akun kontrol :code tidak ditemukan di versi COA aktif.",
+    "accounting_posting.coa_none_active": "Tidak ada versi COA aktif untuk :date. Aktifkan satu versi COA sebelum posting.",
+    "accounting_posting.coa_ambiguous": "Lebih dari satu versi COA aktif berlaku untuk :date. Pertahankan tepat satu COA aktif per tahun fiskal.",
+    "accounting_posting.line_account_outside_coa": "Akun baris jurnal :code bukan bagian dari versi COA yang dipakai untuk :date.",
     "stock.insufficient": "Stok tidak cukup untuk :product di :warehouse (tersedia :available, dibutuhkan :required).",
     "stock_transfer.already_dispatched": "Transfer yang sudah dikirim tidak bisa kembali ke status :status.",
     "supplier_return": {

@@ -29,7 +29,11 @@ function makeStockAdjPostingFiscalYear(): FiscalYear
 
 function makeStockAdjPostingAccounts(): array
 {
-    $coaVersion = CoaVersion::factory()->create(['status' => 'active']);
+    $fiscalYear = FiscalYear::where('status', 'open')->firstOrFail();
+    $coaVersion = CoaVersion::factory()->create([
+        'fiscal_year_id' => $fiscalYear->id,
+        'status' => 'active',
+    ]);
 
     $inventoryAccount = Account::factory()->create([
         'coa_version_id' => $coaVersion->id,

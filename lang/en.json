@@ -234,6 +234,10 @@
         "selectLogo": "Select SVG Logo",
         "noFileSelected": "No file selected"
     },
+    "accounting_posting.control_account_missing": "Control account :code was not found in the active COA version.",
+    "accounting_posting.coa_none_active": "No active COA version covers :date. Activate one COA version before posting.",
+    "accounting_posting.coa_ambiguous": "More than one active COA version applies to :date. Keep exactly one active COA per fiscal year.",
+    "accounting_posting.line_account_outside_coa": "Journal line account :code does not belong to the COA version used for :date.",
     "stock.insufficient": "Insufficient stock for :product in :warehouse (available :available, required :required).",
     "stock_transfer.already_dispatched": "A dispatched transfer cannot return to :status.",
     "supplier_return": {
