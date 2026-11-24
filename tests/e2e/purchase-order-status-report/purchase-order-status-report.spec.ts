@@ -18,7 +18,9 @@ test.describe('Purchase Order Status Report', () => {
         const sortResponsePromise = page.waitForResponse(
             (response) =>
                 response.url().includes('/api/reports/purchase-order-status') &&
-                response.url().includes('sort_by=purchase_order_status_category') &&
+                response
+                    .url()
+                    .includes('sort_by=purchase_order_status_category') &&
                 response.status() < 400,
         );
         await page
@@ -31,10 +33,14 @@ test.describe('Purchase Order Status Report', () => {
 
         const exportResponsePromise = page.waitForResponse(
             (response) =>
-                response.url().includes('/api/reports/purchase-order-status/export') &&
+                response
+                    .url()
+                    .includes('/api/reports/purchase-order-status/export') &&
                 response.status() < 400,
         );
-        await page.getByRole('button', { name: /export/i }).click({ force: true });
+        await page
+            .getByRole('button', { name: /export/i })
+            .click({ force: true });
         await exportResponsePromise;
 
         const searchInput = page.getByRole('textbox').first();
@@ -56,14 +62,18 @@ test.describe('Purchase Order Status Report', () => {
         await categoryFilter.click({ force: true });
 
         const categoryOption = page
-            .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
+            .locator(
+                '[role="option"]:visible, ul[aria-busy]:visible button:visible',
+            )
             .first();
         await expect(categoryOption).toBeVisible({ timeout: 10000 });
         await categoryOption.click({ force: true });
 
         await Promise.all([
             waitForPurchaseOrderStatusReportResponse(page),
-            filtersDialog.getByRole('button', { name: 'Apply Filters' }).click(),
+            filtersDialog
+                .getByRole('button', { name: 'Apply Filters' })
+                .click(),
         ]);
 
         await expect(page.locator('table')).toBeVisible();

@@ -9,8 +9,7 @@ test.describe('Goods Receipt item dialog labels', () => {
     }) => {
         await login(page, undefined, undefined, { requireDashboard: false });
         const listed = page.waitForResponse(
-            (r) =>
-                r.url().includes('/api/goods-receipts') && r.status() < 400,
+            (r) => r.url().includes('/api/goods-receipts') && r.status() < 400,
             { timeout: 30000 },
         );
         await page.goto('/goods-receipts');

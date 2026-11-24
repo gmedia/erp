@@ -30,10 +30,14 @@ test.describe('Purchase History Report', () => {
         await Promise.all([
             page.waitForResponse(
                 (response) =>
-                    response.url().includes('/api/reports/purchase-history/export') &&
+                    response
+                        .url()
+                        .includes('/api/reports/purchase-history/export') &&
                     response.status() < 400,
             ),
-            page.getByRole('button', { name: /export/i }).click({ force: true }),
+            page
+                .getByRole('button', { name: /export/i })
+                .click({ force: true }),
         ]);
 
         const searchInput = page.getByRole('textbox').first();
@@ -55,14 +59,18 @@ test.describe('Purchase History Report', () => {
         await statusFilter.click({ force: true });
 
         const statusOption = page
-            .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
+            .locator(
+                '[role="option"]:visible, ul[aria-busy]:visible button:visible',
+            )
             .first();
         await expect(statusOption).toBeVisible({ timeout: 10000 });
         await statusOption.click({ force: true });
 
         await Promise.all([
             waitForPurchaseHistoryReportResponse(page),
-            filtersDialog.getByRole('button', { name: 'Apply Filters' }).click(),
+            filtersDialog
+                .getByRole('button', { name: 'Apply Filters' })
+                .click(),
         ]);
 
         await expect(page.locator('table')).toBeVisible();
