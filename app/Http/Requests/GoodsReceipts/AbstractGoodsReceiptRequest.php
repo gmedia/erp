@@ -50,6 +50,8 @@ abstract class AbstractGoodsReceiptRequest extends AuthorizedFormRequest
                         );
                     }
                 }
+
+                $this->validateAcceptedWithinReceived($validator, $items);
             },
         ];
     }
@@ -89,4 +91,34 @@ abstract class AbstractGoodsReceiptRequest extends AuthorizedFormRequest
     }
 
     abstract protected function usesSometimes(): bool;
+
+    /**
+     * Issue #436 butir 2: diterima yang sah = accepted + rejected, tidak boleh melebihi received.
+     *
+     * @param  array<int|string, mixed>  $items
+     */
+    private function validateAcceptedWithinReceived(Validator $validator, array $items): void
+    {
+        foreach ($items as $index => $item) {
+            if (! is_array($item)) {
+                continue;
+            }
+
+            $received = $item['quantity_received'] ?? null;
+            $accepted = $item['quantity_accepted'] ?? null;
+
+            if (! is_numeric($received) || ! is_numeric($accepted)) {
+                continue;
+            }
+
+            $rejected = is_numeric($item['quantity_rejected'] ?? null) ? (float) $item['quantity_rejected'] : 0.0;
+
+            if ((float) $accepted + $rejected > (float) $received + 0.00001) {
+                $validator->errors()->add(
+                    "items.{$index}.quantity_accepted",
+                    __('goods_receipt.accepted_exceeds_received'),
+                );
+            }
+        }
+    }
 }

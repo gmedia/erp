@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\AccountingPosting\PostGoodsReceiptJournalAction;
 use App\Actions\AccountingPosting\ReverseDocumentJournalAction;
 use App\Actions\GoodsReceipts\EnsurePurchaseOrderAllowsConfirmedReceiptAction;
+use App\Actions\GoodsReceipts\EnsurePurchaseOrderLineNotOverReceivedAction;
 use App\Actions\GoodsReceipts\ExportGoodsReceiptsAction;
 use App\Actions\GoodsReceipts\IndexGoodsReceiptsAction;
 use App\Actions\GoodsReceipts\ListGoodsReceiptItemOptionsAction;
@@ -52,6 +53,7 @@ class GoodsReceiptController extends Controller
         PostGoodsReceiptJournalAction $postJournal,
         PostGoodsReceiptMovementsAction $postMovements,
         EnsurePurchaseOrderAllowsConfirmedReceiptAction $guardPurchaseOrder,
+        EnsurePurchaseOrderLineNotOverReceivedAction $guardPurchaseOrderLines,
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'];
@@ -73,12 +75,14 @@ class GoodsReceiptController extends Controller
             $items,
             $isConfirmedOnCreate,
             $guardPurchaseOrder,
+            $guardPurchaseOrderLines,
             $syncItems,
             $postJournal,
             $postMovements,
         ): GoodsReceipt {
             if ($isConfirmedOnCreate) {
                 $guardPurchaseOrder->execute((int) $validated['purchase_order_id']);
+                $guardPurchaseOrderLines->execute((int) $validated['purchase_order_id'], $items);
             }
 
             return $this->storeWithSyncedItems(
@@ -118,6 +122,7 @@ class GoodsReceiptController extends Controller
         PurchaseOrderReceiptService $purchaseOrderReceipts,
         ReverseDocumentJournalAction $reverseJournal,
         EnsurePurchaseOrderAllowsConfirmedReceiptAction $guardPurchaseOrder,
+        EnsurePurchaseOrderLineNotOverReceivedAction $guardPurchaseOrderLines,
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
@@ -177,6 +182,7 @@ class GoodsReceiptController extends Controller
             $items,
             $isNewlyConfirmed,
             $guardPurchaseOrder,
+            $guardPurchaseOrderLines,
             $syncItems,
             $postJournal,
             $postMovements,
@@ -187,6 +193,16 @@ class GoodsReceiptController extends Controller
             if ($isNewlyConfirmed) {
                 $purchaseOrderId = $validated['purchase_order_id'] ?? $goodsReceipt->purchase_order_id;
                 $guardPurchaseOrder->execute((int) $purchaseOrderId);
+                $guardPurchaseOrderLines->execute((int) $purchaseOrderId, $items ?? []);
+            }
+
+            // Edit item GR confirmed: qty baru dihitung terhadap GR lain, bukan GR ini (qty lama dibalik).
+            if (! $isNewlyConfirmed && $goodsReceipt->status === 'confirmed' && is_array($items)) {
+                $guardPurchaseOrderLines->execute(
+                    (int) $goodsReceipt->purchase_order_id,
+                    $items,
+                    $goodsReceipt->id,
+                );
             }
 
             $this->updateWithSyncedItems(
