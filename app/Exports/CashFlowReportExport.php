@@ -2,14 +2,18 @@
 
 namespace App\Exports;
 
+use App\Exports\Concerns\WritesTextCells;
 use App\Services\FinancialReportService;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class CashFlowReportExport implements FromCollection, ShouldAutoSize, WithHeadings
+class CashFlowReportExport implements FromCollection, ShouldAutoSize, WithCustomValueBinder, WithHeadings
 {
+    use WritesTextCells;
+
     public function __construct(
         private array $filters,
     ) {}

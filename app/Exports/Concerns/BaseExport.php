@@ -5,13 +5,15 @@ namespace App\Exports\Concerns;
 use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 
-abstract class BaseExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+abstract class BaseExport implements FromQuery, ShouldAutoSize, WithCustomValueBinder, WithHeadings, WithMapping, WithStyles
 {
     use InteractsWithExportFilters;
+    use WritesTextCells;
 
     /**
      * @param  array<string, mixed>  $filters

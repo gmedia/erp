@@ -2,9 +2,13 @@
 
 namespace App\Support;
 
+use App\Exports\Concerns\TextSafeValueBinder;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\DefaultValueBinder;
+use Maatwebsite\Excel\Excel as ExcelFormat;
 use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Cell\Cell;
 
 /**
  * Resolves where generated files (Excel exports, asset-movement documents) are
@@ -33,7 +37,14 @@ final class ExportStorage
      */
     public static function store(object $export, string $path, ?string $writerType = null): void
     {
-        Excel::store($export, $path, self::diskName(), $writerType);
+        TextSafeValueBinder::neutralizeFormulaPrefixes($writerType === ExcelFormat::CSV);
+
+        try {
+            Excel::store($export, $path, self::diskName(), $writerType);
+        } finally {
+            TextSafeValueBinder::neutralizeFormulaPrefixes(false);
+            self::restoreDefaultValueBinder();
+        }
     }
 
     /**
@@ -55,6 +66,15 @@ final class ExportStorage
         }
 
         return $disk->url($path);
+    }
+
+    /**
+     * Binder ekspor bersifat global (PhpSpreadsheet Cell). Pulihkan binder default
+     * agar pembacaan (impor) sesudahnya tidak ikut memakai binder teks.
+     */
+    private static function restoreDefaultValueBinder(): void
+    {
+        Cell::setValueBinder(app(config('excel.value_binder.default', DefaultValueBinder::class)));
     }
 
     private static function driver(): string

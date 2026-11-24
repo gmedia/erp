@@ -4,11 +4,14 @@ namespace App\Exports\Concerns;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-abstract class AbstractReportIndexExport implements FromCollection, ShouldAutoSize, WithStyles
+abstract class AbstractReportIndexExport implements FromCollection, ShouldAutoSize, WithCustomValueBinder, WithStyles
 {
+    use WritesTextCells;
+
     protected array $filters;
 
     public function __construct(array $filters = [])
