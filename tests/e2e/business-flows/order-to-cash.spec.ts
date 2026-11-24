@@ -451,7 +451,6 @@ interface O2cRun {
     invoiceJournal: JournalEntryRecord;
     revenueBefore: number;
     revenueAfterInvoice: number;
-    revenueAfter: number;
     afterInvoice: InvoiceAmounts;
     afterReceipt: InvoiceAmounts;
     afterCredit: InvoiceAmounts;
@@ -587,7 +586,6 @@ async function runOrderToCash(page: Page): Promise<O2cRun> {
     expect(settle.status).toBeLessThan(400);
 
     const settled = await readInvoice(page, invoiceId);
-    const revenueAfter = (await readReportTotals(page, fiscalYearId)).revenue;
 
     return {
         invoiceId,
@@ -601,7 +599,6 @@ async function runOrderToCash(page: Page): Promise<O2cRun> {
         invoiceJournal,
         revenueBefore,
         revenueAfterInvoice,
-        revenueAfter,
         afterInvoice,
         afterReceipt,
         afterCredit,
