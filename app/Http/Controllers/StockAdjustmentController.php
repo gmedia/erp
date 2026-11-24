@@ -181,23 +181,7 @@ class StockAdjustmentController extends Controller
 
     public function destroy(StockAdjustment $stockAdjustment): JsonResponse
     {
-        // Issue #356 sibling: adjustment yang sudah approved dibatalkan lewat movement
-        // pembalik (histori tidak dihapus), dalam transaksi yang sama.
-        DB::transaction(function () use ($stockAdjustment): void {
-            $wasApproved = $stockAdjustment->status === 'approved';
-
-            $stockAdjustment->update(['status' => 'cancelled']);
-
-            if ($wasApproved) {
-                app(StockPostingService::class)->reverseDocument(
-                    StockAdjustment::class,
-                    $stockAdjustment->id,
-                    'adjustment',
-                );
-            }
-        });
-
-        return response()->json(null, 204);
+        return $this->destroyDraftDocument($stockAdjustment);
     }
 
     public function export(ExportStockAdjustmentRequest $request, ExportStockAdjustmentsAction $action): JsonResponse
@@ -229,6 +213,9 @@ class StockAdjustmentController extends Controller
                 $stockAdjustment->id,
                 'adjustment',
                 function () use ($stockAdjustment, $items, $syncItems, $stockPosting): void {
+                    // Item diganti (bukan di-upsert) agar source_line_id movement asli tidak tertimpa
+                    // repost; pembalik tetap utuh di riwayat (Issue #372).
+                    $stockAdjustment->items()->delete();
                     $syncItems->execute($stockAdjustment, $items);
                     $stockPosting->postStockAdjustment($stockAdjustment->refresh());
                 },

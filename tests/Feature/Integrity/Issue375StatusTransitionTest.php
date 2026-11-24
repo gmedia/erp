@@ -139,6 +139,10 @@ test('status transition per dokumen follows the table', function (
     $record = $modelClass::factory()->create([
         'status' => $from,
         $numberColumns[$modelClass] => 'NO-TRANSISI-' . $endpoint . '-' . uniqid(),
+        // Factory mengisi sent_at acak; tetapkan eksplisit agar posting invoice deterministik.
+        // Sama untuk confirmed_at GR: hanya transisi yang diuji, bukan posting (butuh item dan COA).
+        ...($modelClass === GoodsReceipt::class ? ['confirmed_at' => $to === 'confirmed' ? now() : null] : []),
+        ...($modelClass === CustomerInvoice::class ? ['sent_at' => $to === 'sent' ? now() : null] : []),
     ]);
 
     if ($modelClass === GoodsReceipt::class) {
@@ -149,8 +153,6 @@ test('status transition per dokumen follows the table', function (
     if ($modelClass === CustomerInvoice::class) {
         // Posting invoice tanpa item ditolak 422 (aturan lama); beri satu item agar uji transisi saja.
         CustomerInvoiceItem::factory()->create(['customer_invoice_id' => $record->id]);
-        // Factory mengisi sent_at null untuk draft; set eksplisit agar posting deterministik.
-        $record->update(['sent_at' => $to === 'sent' ? now() : $record->sent_at]);
     }
 
     putJson("/api/{$endpoint}/{$record->id}", ['status' => $to])->assertStatus($expected);

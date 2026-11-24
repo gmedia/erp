@@ -19,7 +19,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\Sanctum;
 
-use function Pest\Laravel\deleteJson;
+use function Pest\Laravel\putJson;
 
 uses(RefreshDatabase::class)->group('stock-posting-issue-372');
 
@@ -417,7 +417,7 @@ describe('Issue #372 — langkah 2: edit dan batal stock adjustment, supplier re
 describe('Issue #372 — langkah 2: jalur HTTP edit dan batal memakai tanggal yang benar', function () {
     test('batal stock transfer lewat API membuat pembalik bertanggal hari batal', function () {
         Sanctum::actingAs(
-            createTestUserWithPermissions(['stock_transfer', 'stock_transfer.delete']),
+            createTestUserWithPermissions(['stock_transfer', 'stock_transfer.edit']),
             ['*'],
         );
 
@@ -441,7 +441,9 @@ describe('Issue #372 — langkah 2: jalur HTTP edit dan batal memakai tanggal ya
         ]);
         app(StockPostingService::class)->postStockTransferDispatch($transfer->refresh());
 
-        deleteJson('/api/stock-transfers/' . $transfer->id)->assertNoContent();
+        // Transfer yang sudah dikirim dibatalkan lewat transisi status (bukan DELETE, yang
+        // hanya untuk draft sejak #375). Jalur ini memanggil reverseTransfer dengan tanggal hari batal.
+        putJson('/api/stock-transfers/' . $transfer->id, ['status' => 'cancelled'])->assertOk();
 
         $reversal = StockMovement::query()
             ->where('movement_type', 'transfer_out_reversal')
@@ -452,6 +454,60 @@ describe('Issue #372 — langkah 2: jalur HTTP edit dan batal memakai tanggal ya
         expect($reversal->moved_at->toDateString())->toBe(now()->toDateString());
         expect(issue372BalanceOn($product, $from, now()->subDays(5)))->toBe(1.0);
         expect(issue372BalanceOn($product, $from, now()))->toBe(4.0);
+    });
+
+    test('edit stock adjustment approved lewat API membuat pembalik bertanggal tanggal adjustment', function () {
+        Sanctum::actingAs(
+            createTestUserWithPermissions(['stock_adjustment', 'stock_adjustment.edit']),
+            ['*'],
+        );
+
+        $product = Product::factory()->create();
+        $warehouse = Warehouse::factory()->create();
+        $adjustmentDate = now()->subDays(10);
+
+        $adjustment = issue372Adjustment($warehouse, $product, 4, $adjustmentDate);
+        $item = $adjustment->items()->firstOrFail();
+
+        putJson('/api/stock-adjustments/' . $adjustment->id, [
+            'status' => 'approved',
+            'items' => [[
+                'id' => $item->id,
+                'product_id' => $product->id,
+                'unit_id' => $item->unit_id,
+                'quantity_adjusted' => 3,
+            ]],
+        ])->assertOk();
+
+        $reversal = StockMovement::query()
+            ->where('movement_type', 'adjustment_reversal')
+            ->where('reference_type', StockAdjustment::class)
+            ->where('reference_id', $adjustment->id)
+            ->latest('id')
+            ->firstOrFail();
+
+        expect($reversal->moved_at->toDateString())->toBe($adjustmentDate->toDateString());
+        expect(issue372BalanceOn($product, $warehouse, now()))->toBe(3.0);
+    });
+
+    test('kirim ulang status approved yang sama pada adjustment approved diterima tanpa pembalik baru', function () {
+        Sanctum::actingAs(
+            createTestUserWithPermissions(['stock_adjustment', 'stock_adjustment.edit']),
+            ['*'],
+        );
+
+        $product = Product::factory()->create();
+        $warehouse = Warehouse::factory()->create();
+
+        $adjustment = issue372Adjustment($warehouse, $product, 4, now()->subDays(10));
+
+        putJson('/api/stock-adjustments/' . $adjustment->id, ['status' => 'approved'])->assertOk();
+
+        expect(StockMovement::query()
+            ->where('movement_type', 'adjustment_reversal')
+            ->where('reference_id', $adjustment->id)
+            ->count())->toBe(0);
+        expect(issue372BalanceOn($product, $warehouse, now()))->toBe(4.0);
     });
 
     test('edit stock adjustment yang membuat saldo berjalan negatif setelah pengeluaran ditolak 422', function () {

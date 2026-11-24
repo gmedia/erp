@@ -115,15 +115,15 @@ class CreditNoteController extends Controller
                 release: static function (Model $document): void {
                     /** @var CreditNote $document */
                     /** @var CustomerInvoice|null $invoice */
-                    $invoice = $document->customerInvoice()->first();
+                    $invoice = $document->customerInvoice()->lockForUpdate()->first();
                     if ($invoice === null) {
                         return;
                     }
 
-                    $creditNoteAmount = max(
-                        0,
-                        (float) $invoice->credit_note_amount - (float) $document->grand_total,
-                    );
+                    // Hanya credit note applied yang mengurangi invoice; yang baru confirmed tidak.
+                    $creditNoteAmount = (float) $invoice->creditNotes()
+                        ->where('status', 'applied')
+                        ->sum('grand_total');
                     $invoice->update([
                         'credit_note_amount' => (string) $creditNoteAmount,
                         'amount_due' => (string) (
