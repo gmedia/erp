@@ -192,6 +192,11 @@ test('re-running demo seeders keeps user payment allocations on demo bills', fun
     $userPayment = ApPayment::factory()->confirmed()->create([
         'supplier_id' => $supplier->id,
         'fiscal_year_id' => $fiscalYear->id,
+        // Akun dari COA aktif yang ada; factory akun membuat COA dan tahun fiskal acak.
+        'bank_account_id' => Account::query()
+            ->where('code', '11110')
+            ->whereHas('coaVersion', fn ($query) => $query->where('status', 'active'))
+            ->value('id'),
         'payment_number' => 'PAY-USER-0001',
         'payment_date' => $fiscalYear->start_date,
         'total_amount' => 1000000,
