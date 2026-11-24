@@ -2,6 +2,7 @@
 
 namespace App\Actions\JournalEntries;
 
+use App\Actions\PeriodClosings\AssertPeriodOpenForPostingAction;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
 use App\Services\InterBranchClearingService;
@@ -24,9 +25,15 @@ class UpdateJournalEntryAction
 
         return DB::transaction(function () use ($journalEntry, $data) {
             $entryDate = $data['entry_date'];
+            $oldDate = $journalEntry->entry_date->format('Y-m-d');
+
+            // Tanggal lama juga harus berada di periode terbuka (#423): jurnal tidak boleh
+            // keluar dari periode yang sudah ditutup.
+            app(AssertPeriodOpenForPostingAction::class)
+                ->execute($journalEntry->fiscal_year_id, $oldDate);
 
             // Check if date changed and if it affects Fiscal Year
-            if ($journalEntry->entry_date->format('Y-m-d') !== $entryDate) {
+            if ($oldDate !== $entryDate) {
                 $fiscalYear = FiscalYear::where('start_date', '<=', $entryDate)
                     ->where('end_date', '>=', $entryDate)
                     ->first();
@@ -42,6 +49,8 @@ class UpdateJournalEntryAction
                         'entry_date' => 'Fiscal year is closed or locked.',
                     ]);
                 }
+
+                app(AssertPeriodOpenForPostingAction::class)->execute($fiscalYear->id, $entryDate);
 
                 // If fiscal year changed, verify if we should change entry number?
                 // For simplicity, we keep entry number or basic logic.

@@ -19,16 +19,19 @@ use App\Models\Supplier;
 use App\Models\SupplierBill;
 use App\Models\SupplierBillItem;
 use App\Models\User;
+use Database\Seeders\Concerns\ReopensDemoPeriodClosings;
 use Illuminate\Database\Seeder;
 
 class ApSampleDataSeeder extends Seeder
 {
+    use ReopensDemoPeriodClosings;
+
     /** Pola nomor dokumen AP demo yang dibuat seeder ini. */
     private const BILL_DEMO = 'BILL-____-00000%';
 
     private const PAYMENT_DEMO = 'PAY-____-00000%';
 
-    public function run(): void
+    protected function seedDemoData(): void
     {
         $adminUserId = User::query()->where('email', config('app.admin'))->value('id') ?? User::query()->value('id');
         $branchId = Branch::query()->value('id');

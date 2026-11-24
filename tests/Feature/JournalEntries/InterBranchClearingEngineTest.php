@@ -34,7 +34,7 @@ beforeEach(function () {
 
 test('single-branch posted entry persists no clearing line (dormant)', function () {
     $entry = $this->action->execute([
-        'entry_date' => '2026-02-01',
+        'entry_date' => '2026-03-02',
         'description' => 'Single-branch entry',
         'status' => 'posted',
         'branch_id' => $this->branchA->id,
@@ -52,7 +52,7 @@ test('single-branch posted entry persists no clearing line (dormant)', function 
 
 test('multi-branch posted entry injects per-branch clearing lines', function () {
     $entry = $this->action->execute([
-        'entry_date' => '2026-02-01',
+        'entry_date' => '2026-03-02',
         'description' => 'Inter-branch cash transfer A -> B',
         'status' => 'posted',
         'lines' => [
@@ -79,7 +79,7 @@ test('multi-branch posted entry injects per-branch clearing lines', function () 
 
 test('multi-branch entry remains globally balanced after injection', function () {
     $entry = $this->action->execute([
-        'entry_date' => '2026-02-01',
+        'entry_date' => '2026-03-02',
         'description' => 'HQ centralized payment for A and B',
         'status' => 'posted',
         'branch_id' => null,

@@ -14,6 +14,7 @@ use App\Models\StockMovement;
 use App\Models\StockTransfer;
 use App\Models\SupplierReturn;
 use App\Services\StockPostingService;
+use Database\Seeders\Concerns\ReopensDemoPeriodClosings;
 use Illuminate\Database\Seeder;
 
 /**
@@ -30,6 +31,8 @@ use Illuminate\Database\Seeder;
  */
 class StockMovementSampleDataSeeder extends Seeder
 {
+    use ReopensDemoPeriodClosings;
+
     /** Pola nomor dokumen demo yang dibuat seeder (lihat seeder masing-masing modul). */
     private const GR_DEMO = 'GR-____-0001%';
 
@@ -39,7 +42,7 @@ class StockMovementSampleDataSeeder extends Seeder
 
     private const ST_DEMO = 'ST-____-9000%';
 
-    public function run(): void
+    protected function seedDemoData(): void
     {
         $stockPosting = app(StockPostingService::class);
 

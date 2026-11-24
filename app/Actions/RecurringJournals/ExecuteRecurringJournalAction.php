@@ -2,6 +2,7 @@
 
 namespace App\Actions\RecurringJournals;
 
+use App\Actions\PeriodClosings\AssertPeriodOpenForPostingAction;
 use App\Models\JournalEntry;
 use App\Models\RecurringJournal;
 use App\Services\InterBranchClearingService;
@@ -29,6 +30,12 @@ class ExecuteRecurringJournalAction
             }
 
             $executedAt = now();
+
+            if ($recurringJournal->auto_post) {
+                app(AssertPeriodOpenForPostingAction::class)
+                    ->execute($recurringJournal->fiscal_year_id, $executedAt->toDateString());
+            }
+
             $reference = $this->renderTemplate($recurringJournal->reference_template, $executedAt);
             $description = $this->renderTemplate($recurringJournal->description, $executedAt);
 

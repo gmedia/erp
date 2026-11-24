@@ -25,6 +25,7 @@ use App\Models\VehicleLoanActivityLog;
 use App\Models\VehicleLoanPickup;
 use App\Models\VehicleLoanReturn;
 use App\Models\VehicleUnit;
+use Database\Seeders\Concerns\ReopensDemoPeriodClosings;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -41,7 +42,9 @@ use Illuminate\Support\Str;
  */
 class VehicleLoanSampleDataSeeder extends Seeder
 {
-    public function run(): void
+    use ReopensDemoPeriodClosings;
+
+    protected function seedDemoData(): void
     {
         $flow = ApprovalFlow::where('code', config('vehicle_loan.approval_flow_code'))->first();
         $flowStep = $flow

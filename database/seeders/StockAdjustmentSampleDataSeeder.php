@@ -12,13 +12,16 @@ use App\Models\StockAdjustmentItem;
 use App\Models\Unit;
 use App\Models\User;
 use App\Models\Warehouse;
+use Database\Seeders\Concerns\ReopensDemoPeriodClosings;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 class StockAdjustmentSampleDataSeeder extends Seeder
 {
-    public function run(): void
+    use ReopensDemoPeriodClosings;
+
+    protected function seedDemoData(): void
     {
         $adminUserId = User::query()
             ->where('email', config('app.admin'))

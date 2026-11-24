@@ -3,6 +3,7 @@
 namespace App\Actions\JournalEntries;
 
 use App\Actions\AccountingPosting\ResolveControlAccountAction;
+use App\Actions\PeriodClosings\AssertPeriodOpenForPostingAction;
 use App\Models\Account;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
@@ -29,7 +30,13 @@ class CreateJournalEntryAction
      * - branch_id: owning branch resolved by the caller; null for company-wide entries.
      * - source_type, source_id: morph reference to the originating document.
      */
-    public function execute(array $data): JournalEntry
+    /**
+     * @param  bool  $isPeriodClosingEntry  Hanya ClosePeriodAction/ReopenPeriodAction (lewat
+     *                                      ReverseDocumentJournalAction) yang boleh mengirim true.
+     *                                      Bukan dari $data, agar payload jurnal manual tidak bisa
+     *                                      melewati penguncian periode (#423).
+     */
+    public function execute(array $data, bool $isPeriodClosingEntry = false): JournalEntry
     {
         $attempts = 0;
         $maxAttempts = 3;
@@ -54,7 +61,7 @@ class CreateJournalEntryAction
 
         while ($attempts < $maxAttempts) {
             try {
-                return DB::transaction(function () use ($data, $status) {
+                return DB::transaction(function () use ($data, $status, $isPeriodClosingEntry) {
                     $entryDate = $data['entry_date'];
 
                     $fiscalYear = FiscalYear::where('start_date', '<=', $entryDate)
@@ -72,6 +79,10 @@ class CreateJournalEntryAction
                         throw ValidationException::withMessages([
                             'entry_date' => __('journal_entry.fiscal_year_closed'),
                         ]);
+                    }
+
+                    if (! $isPeriodClosingEntry) {
+                        app(AssertPeriodOpenForPostingAction::class)->execute($fiscalYear->id, $entryDate);
                     }
 
                     // Generate Entry Number

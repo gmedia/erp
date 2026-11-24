@@ -36,7 +36,7 @@ beforeEach(function () {
 
 test('multi-branch journal created via write-path flows through to per-branch reports', function () {
     $entry = $this->action->execute([
-        'entry_date' => '2026-02-01',
+        'entry_date' => '2026-03-02',
         'description' => 'Branch A pays Branch B expense',
         'status' => 'posted',
         'lines' => [
@@ -75,7 +75,7 @@ test('multi-branch journal created via write-path flows through to per-branch re
 
 test('per-branch income statement reflects expense booked on the receiving branch', function () {
     $this->action->execute([
-        'entry_date' => '2026-02-01',
+        'entry_date' => '2026-03-02',
         'description' => 'Branch A pays Branch B expense',
         'status' => 'posted',
         'lines' => [
@@ -93,7 +93,7 @@ test('per-branch income statement reflects expense booked on the receiving branc
 
 test('clearing nets to zero company-wide after multi-branch posting', function () {
     $this->action->execute([
-        'entry_date' => '2026-02-01',
+        'entry_date' => '2026-03-02',
         'description' => 'Branch A pays Branch B expense',
         'status' => 'posted',
         'lines' => [

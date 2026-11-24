@@ -27,10 +27,13 @@ use App\Models\PipelineTransition;
 use App\Models\Supplier;
 use App\Models\SupplierCategory;
 use App\Models\User;
+use Database\Seeders\Concerns\ReopensDemoPeriodClosings;
 use Illuminate\Database\Seeder;
 
 class AssetSampleDataSeeder extends Seeder
 {
+    use ReopensDemoPeriodClosings;
+
     /**
      * Kode aset demo. Seeder yang menyentuh aset lain (mis. normalisasi
      * depresiasi) wajib membatasi diri ke daftar ini agar aset buatan
@@ -44,7 +47,7 @@ class AssetSampleDataSeeder extends Seeder
         'FA-000013', 'FA-000014', 'FA-000015',
     ];
 
-    public function run(): void
+    protected function seedDemoData(): void
     {
         $adminUser = User::where('email', config('app.admin'))->first();
         $adminEmployee = Employee::where('email', config('app.admin'))->first();
