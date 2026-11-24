@@ -5,6 +5,7 @@ use App\Models\Asset;
 use App\Models\AssetDepreciationLine;
 use App\Models\AssetDepreciationRun;
 use App\Models\Branch;
+use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use App\Models\JournalEntryLine;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -114,7 +115,8 @@ test('user can view depreciation run lines', function () {
 });
 
 test('user can post depreciation run to journal', function () {
-    $account = Account::factory()->create();
+    $coaVersion = CoaVersion::factory()->create(['status' => 'active']);
+    $account = Account::factory()->create(['coa_version_id' => $coaVersion->id, 'is_active' => true]);
 
     $asset = Asset::factory()->create([
         'purchase_cost' => 12000000,
@@ -169,9 +171,10 @@ test('user can post depreciation run to journal', function () {
 test('depreciation posting attributes journal lines per asset branch and injects clearing', function () {
     $branchA = Branch::factory()->create();
     $branchB = Branch::factory()->create();
-    $expenseAccount = Account::factory()->create();
-    $accumulatedAccount = Account::factory()->create();
-    $clearingAccount = Account::factory()->create(['code' => '1999-IBC']);
+    $coaVersion = CoaVersion::factory()->create(['status' => 'active']);
+    $expenseAccount = Account::factory()->create(['coa_version_id' => $coaVersion->id, 'is_active' => true]);
+    $accumulatedAccount = Account::factory()->create(['coa_version_id' => $coaVersion->id, 'is_active' => true]);
+    $clearingAccount = Account::factory()->create(['code' => '1999-IBC', 'coa_version_id' => $coaVersion->id, 'is_active' => true]);
 
     $assetA = Asset::factory()->create([
         'branch_id' => $branchA->id,
