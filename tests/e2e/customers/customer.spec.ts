@@ -34,8 +34,8 @@ generateModuleTests({
     {
         filterName: 'Category',
         filterType: 'combobox',
-        filterValue: 'Retail',
-        expectedText: 'Retail',
+        filterValue: 'Eceran',
+        expectedText: 'Eceran',
     },
     {
         filterName: 'Status',

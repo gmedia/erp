@@ -33,7 +33,7 @@ export async function createCustomer(
       { name: 'phone', type: 'text', defaultValue: '08123456789' },
       { name: 'address', type: 'textarea', defaultValue: '123 Test Street' },
       { name: 'branch_id', type: 'select', selector: 'Branch', defaultValue: 'Kantor Pusat' },
-      { name: 'category_id', type: 'select', selector: 'Category', defaultValue: 'Retail' },
+      { name: 'category_id', type: 'select', selector: 'Category', defaultValue: 'Eceran' },
       { name: 'status', type: 'select', selector: 'Status', defaultValue: 'Active' },
       { name: 'notes', type: 'textarea', defaultValue: 'Test notes' },
     ],
