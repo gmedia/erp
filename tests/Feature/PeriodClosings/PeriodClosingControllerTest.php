@@ -40,6 +40,42 @@ test('it can create a period closing', function () {
     assertDatabaseHas('period_closings', ['period_month' => 1, 'period_year' => 2026, 'status' => 'draft']);
 });
 
+test('it can create an annual period closing without period month', function () {
+    $fiscalYear = FiscalYear::factory()->create(['status' => 'open']);
+    $retained = Account::factory()->create(['type' => 'equity', 'normal_balance' => 'credit']);
+
+    postJson('/api/period-closings', [
+        'fiscal_year_id' => $fiscalYear->id,
+        'period_month' => null,
+        'period_year' => 2026,
+        'closing_type' => 'annual',
+        'retained_earnings_account_id' => $retained->id,
+    ])->assertCreated()->assertJsonPath('data.closing_type', 'annual');
+
+    assertDatabaseHas('period_closings', ['period_month' => null, 'period_year' => 2026, 'closing_type' => 'annual']);
+});
+
+test('it rejects an annual period closing without retained earnings account', function () {
+    $fiscalYear = FiscalYear::factory()->create(['status' => 'open']);
+
+    postJson('/api/period-closings', [
+        'fiscal_year_id' => $fiscalYear->id,
+        'period_year' => 2026,
+        'closing_type' => 'annual',
+    ])->assertUnprocessable()->assertJsonValidationErrors(['retained_earnings_account_id']);
+});
+
+test('it rejects the legacy yearly closing type', function () {
+    $fiscalYear = FiscalYear::factory()->create(['status' => 'open']);
+
+    postJson('/api/period-closings', [
+        'fiscal_year_id' => $fiscalYear->id,
+        'period_month' => 1,
+        'period_year' => 2026,
+        'closing_type' => 'yearly',
+    ])->assertUnprocessable()->assertJsonValidationErrors(['closing_type']);
+});
+
 test('it can show a period closing', function () {
     $periodClosing = PeriodClosing::factory()->create();
 

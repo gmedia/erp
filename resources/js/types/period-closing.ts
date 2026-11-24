@@ -5,10 +5,10 @@ export interface PeriodClosing {
         id: number;
         name: string;
     };
-    period_month: number;
+    period_month: number | null;
     period_year: number;
-    closing_type: 'monthly' | 'yearly';
-    retained_earnings_account_id: number;
+    closing_type: 'monthly' | 'annual';
+    retained_earnings_account_id: number | null;
     retained_earnings_account?: {
         id: number;
         code: string;
