@@ -70,12 +70,18 @@ function makeGrSrPostingAccounts(): array
     ];
 }
 
+function makeConfirmedGrSrPurchaseOrder(): PurchaseOrder
+{
+    return PurchaseOrder::factory()->create(['status' => 'confirmed']);
+}
+
 test('PostGoodsReceiptJournalAction creates a balanced posted journal entry', function () {
     makeGrSrPostingFiscalYear();
     $accounts = makeGrSrPostingAccounts();
     $confirmer = User::factory()->create();
 
     $gr = GoodsReceipt::factory()->create([
+        'purchase_order_id' => makeConfirmedGrSrPurchaseOrder()->id,
         'status' => 'confirmed',
         'gr_number' => 'GR-2026-000001',
         'receipt_date' => '2026-03-15',
@@ -123,6 +129,7 @@ test('PostGoodsReceiptJournalAction is idempotent', function () {
     $confirmer = User::factory()->create();
 
     $gr = GoodsReceipt::factory()->create([
+        'purchase_order_id' => makeConfirmedGrSrPurchaseOrder()->id,
         'status' => 'confirmed',
         'gr_number' => 'GR-2026-000002',
         'receipt_date' => '2026-03-15',
@@ -324,7 +331,9 @@ test('SupplierReturnController update triggers journal posting on confirm transi
     ]);
 
     // Stok masuk sah (penerimaan 5 unit) agar retur confirmed tidak ditolak 422 (cek stok konfirmasi #356).
-    $sourceGoodsReceipt = GoodsReceipt::factory()->create();
+    $sourceGoodsReceipt = GoodsReceipt::factory()->create([
+        'purchase_order_id' => makeConfirmedGrSrPurchaseOrder()->id,
+    ]);
     StockMovement::factory()->create([
         'movement_type' => 'goods_receipt',
         'reference_type' => GoodsReceipt::class,

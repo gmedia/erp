@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
 import { ensureAppOrigin, openModule } from '../helpers';
+import { approvePurchaseOrderFixture } from '../purchase-orders/helpers';
 import { createStockTransfer, searchStockTransfer } from './helpers';
 
 /**
@@ -102,7 +103,7 @@ async function changeStatusViaUi(page: Page, transferNumber: string, status: str
 // Stok disiapkan lewat API (PO → GR confirmed). Jumlahnya harus >= qty transfer,
 // karena dispatch sekarang menolak stok negatif (#356 baris 6).
 async function seedStockAtSource(page: Page, warehouseId: number, productId: number, quantity: number): Promise<void> {
-    const result = await page.evaluate(
+    const draft = await page.evaluate(
         async ({ warehouseId, productId, quantity }) => {
             const apiToken = localStorage.getItem('api_token') || '';
             const headers = {
@@ -135,19 +136,40 @@ async function seedStockAtSource(page: Page, warehouseId: number, productId: num
                 })
             ).json();
 
-            const gr = await fetch('/api/goods-receipts', {
+            return {
+                poId: Number(po.data.id),
+                poNumber: String(po.data.po_number),
+                poItemId: Number(po.data.items[0].id),
+                unitId: Number(unit.id),
+                today,
+            };
+        },
+        { warehouseId, productId, quantity },
+    );
+
+    approvePurchaseOrderFixture(draft.poNumber);
+
+    const gr = await page.evaluate(
+        async ({ draft, warehouseId, productId, quantity }) => {
+            const apiToken = localStorage.getItem('api_token') || '';
+            const response = await fetch('/api/goods-receipts', {
                 method: 'POST',
-                headers,
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${apiToken}`,
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
                 body: JSON.stringify({
-                    purchase_order_id: po.data.id,
+                    purchase_order_id: draft.poId,
                     warehouse_id: warehouseId,
-                    receipt_date: today,
+                    receipt_date: draft.today,
                     supplier_delivery_note: 'SJ-E2E-360',
                     status: 'confirmed',
                     items: [{
-                        purchase_order_item_id: po.data.items[0].id,
+                        purchase_order_item_id: draft.poItemId,
                         product_id: productId,
-                        unit_id: unit.id,
+                        unit_id: draft.unitId,
                         quantity_received: quantity,
                         quantity_accepted: quantity,
                         quantity_rejected: 0,
@@ -156,12 +178,12 @@ async function seedStockAtSource(page: Page, warehouseId: number, productId: num
                 }),
             });
 
-            return gr.ok;
+            return response.ok;
         },
-        { warehouseId, productId, quantity },
+        { draft, warehouseId, productId, quantity },
     );
 
-    expect(result).toBeTruthy();
+    expect(gr).toBeTruthy();
 }
 
 test.describe('Stock Transfer dispatch → receive (Issue #360)', () => {

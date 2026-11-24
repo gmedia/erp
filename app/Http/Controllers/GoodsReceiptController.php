@@ -143,6 +143,9 @@ class GoodsReceiptController extends Controller
             $guardPurchaseOrder,
             $syncItems,
             $postJournal,
+            $postMovements,
+            $stockPosting,
+            $purchaseOrderReceipts,
         ): void {
             // GR yang sudah confirmed tetap sah; aturan PO hanya berlaku saat GR baru dikonfirmasi.
             if ($isNewlyConfirmed) {
@@ -168,25 +171,23 @@ class GoodsReceiptController extends Controller
                     }
                 : null,
             );
-        });
 
-        if ($isNewlyConfirmed) {
-            // Setelah commit: movement tetap ada walau posting jurnal gagal.
-            $postMovements->execute($goodsReceipt->refresh());
-        } elseif ($goodsReceipt->status === 'confirmed' && is_array($items)) {
-            // Issue #356: item GR confirmed diedit setelah posting. Movement lama dibalik
-            // (histori tetap), lalu item baru diposting ulang. Tanpa ini stok tidak sesuai item.
-            DB::transaction(function () use (
-                $goodsReceipt,
-                $stockPosting,
-                $purchaseOrderReceipts,
-                $postMovements,
-            ): void {
-                $stockPosting->reverseDocument(GoodsReceipt::class, $goodsReceipt->id, 'goods_receipt');
+            // Issue #416: dokumen, jurnal, dan stok satu transaksi; bila salah satu ditolak
+            // (422), tidak ada yang berubah.
+            if ($isNewlyConfirmed) {
                 $postMovements->execute($goodsReceipt->refresh());
+            } elseif ($goodsReceipt->status === 'confirmed' && is_array($items)) {
+                // Issue #356: item GR confirmed diedit setelah posting. Movement lama dibalik
+                // (histori tetap), lalu item baru diposting ulang.
+                $stockPosting->editDocument(
+                    GoodsReceipt::class,
+                    $goodsReceipt->id,
+                    'goods_receipt',
+                    fn () => $postMovements->execute($goodsReceipt->refresh()),
+                );
                 $purchaseOrderReceipts->syncFromGoodsReceipt($goodsReceipt);
-            });
-        }
+            }
+        });
 
         return (new GoodsReceiptResource($this->loadResourceRelations($goodsReceipt)))->response();
     }

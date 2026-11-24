@@ -12,6 +12,12 @@ class PurchaseOrderExport extends BaseExport
     {
         $query = PurchaseOrder::query()->with(['supplier', 'warehouse']);
 
+        $statuses = array_filter((array) ($this->filters['status'] ?? []));
+
+        if ($statuses !== []) {
+            $query->whereIn('status', $statuses);
+        }
+
         $this->applyConfiguredFilters(
             $query,
             $this->filters,
@@ -19,7 +25,6 @@ class PurchaseOrderExport extends BaseExport
             [
                 'supplier' => 'supplier_id',
                 'warehouse' => 'warehouse_id',
-                'status' => 'status',
                 'currency' => 'currency',
             ],
             [

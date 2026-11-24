@@ -104,7 +104,9 @@
         "processing": "Memproses...",
         "closed": "Periode ditutup.",
         "reopened": "Periode dibuka kembali.",
-        "failed": "Gagal memperbarui periode. Silakan coba lagi."
+        "failed": "Gagal memperbarui periode. Silakan coba lagi.",
+        "typeMonthly": "Bulanan",
+        "typeAnnual": "Tahunan"
     },
     "budgets": {
         "approve": "Setujui Anggaran",
@@ -270,6 +272,7 @@
     "journal_entry.fiscal_year_closed": "Tahun fiskal untuk tanggal ini sudah ditutup atau dikunci. Buka kembali atau gunakan periode yang terbuka.",
     "accounting_posting.line_account_outside_coa": "Akun baris jurnal :code bukan bagian dari versi COA yang dipakai untuk :date.",
     "stock.insufficient": "Stok tidak cukup untuk :product di :warehouse (tersedia :available, dibutuhkan :required).",
+    "stock.period_closed": "Periode akuntansi untuk :date sudah ditutup. Pergerakan stok di dalamnya tidak dapat diubah.",
     "stock_transfer.already_dispatched": "Transfer yang sudah dikirim tidak bisa kembali ke status :status.",
     "auth.failed": "Kredensial ini tidak cocok dengan data kami.",
     "supplier_return.already_cancelled": "Retur supplier ini sudah dibatalkan.",

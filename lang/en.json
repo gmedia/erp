@@ -104,7 +104,9 @@
         "processing": "Processing...",
         "closed": "Period closed.",
         "reopened": "Period reopened.",
-        "failed": "Failed to update the period. Please try again."
+        "failed": "Failed to update the period. Please try again.",
+        "typeMonthly": "Monthly",
+        "typeAnnual": "Annual"
     },
     "budgets": {
         "approve": "Approve Budget",
@@ -270,6 +272,7 @@
     "journal_entry.fiscal_year_missing": "No fiscal year covers this date. Create the fiscal year before posting.",
     "journal_entry.fiscal_year_closed": "The fiscal year for this date is closed or locked. Reopen it or use an open period.",
     "stock.insufficient": "Insufficient stock for :product in :warehouse (available :available, required :required).",
+    "stock.period_closed": "The accounting period for :date is closed. Stock movements cannot be changed in it.",
     "stock_transfer.already_dispatched": "A dispatched transfer cannot return to :status.",
     "auth.failed": "These credentials do not match our records.",
     "supplier_return.already_cancelled": "This supplier return is already cancelled.",
