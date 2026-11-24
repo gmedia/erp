@@ -94,6 +94,51 @@ test('dispose movement posts the disposal journal on the movement date', functio
     assertDatabaseHas('assets', ['id' => $asset->id, 'status' => 'disposed']);
 });
 
+test('posting a depreciation run calculated before a disposal is rejected for the disposed asset', function () {
+    makeControllerDisposalAccounts();
+    $fiscalYear = FiscalYear::where('name', '2026')->firstOrFail();
+    $asset = Asset::factory()->create([
+        'asset_category_id' => AssetCategory::factory()->create()->id,
+        'branch_id' => Branch::factory()->create()->id,
+        'asset_code' => 'FA-000033',
+        'status' => 'active',
+        'purchase_date' => '2026-01-05',
+        'purchase_cost' => 12000000,
+        'salvage_value' => 0,
+        'depreciation_method' => 'straight_line',
+        'depreciation_start_date' => '2026-01-05',
+        'useful_life_months' => 60,
+        'accumulated_depreciation' => 0,
+        'book_value' => 12000000,
+        'depreciation_expense_account_id' => Account::where('code', '52000')->value('id'),
+        'accumulated_depr_account_id' => Account::where('code', '12200')->value('id'),
+    ]);
+
+    Sanctum::actingAs(createTestUserWithPermissions([
+        'asset_depreciation_run',
+        'asset_depreciation_run.edit',
+        'asset_movement',
+        'asset_movement.create',
+    ]));
+
+    $run = postJson('/api/asset-depreciation-runs/calculate', [
+        'fiscal_year_id' => $fiscalYear->id,
+        'period_start' => '2026-03-01',
+        'period_end' => '2026-03-31',
+    ])->assertStatus(200)->json('run');
+
+    postJson('/api/asset-movements', [
+        'asset_id' => $asset->id,
+        'movement_type' => 'dispose',
+        'moved_at' => '2026-03-15 09:00:00',
+    ])->assertStatus(201);
+
+    postJson("/api/asset-depreciation-runs/{$run['id']}/post")->assertStatus(422);
+
+    expect(JournalEntry::where('reference', 'DEPR-202603')->exists())->toBeFalse()
+        ->and(Asset::find($asset->id)->status)->toBe('disposed');
+});
+
 test('dispose movement is rolled back when the fiscal period is closed', function () {
     $accounts = makeControllerDisposalAccounts();
     FiscalYear::where('name', '2026')->update(['status' => 'closed']);

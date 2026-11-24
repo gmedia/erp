@@ -296,6 +296,7 @@
     "accounting_posting.coa_none_active": "No active COA version covers :date. Activate one COA version before posting.",
     "accounting_posting.disposal_accounts_missing": "Set the gain and loss accounts for asset disposal in settings before posting.",
     "accounting_posting.disposal_not_postable": "Asset :code has status :status and cannot be posted as a disposal.",
+    "asset_depreciation_runs.asset_not_in_service": "Asset :code has status :status and can no longer be depreciated. Recalculate the run.",
     "accounting_posting.coa_ambiguous": "More than one active COA version applies to :date. Keep exactly one active COA per fiscal year.",
     "accounting_posting.line_account_outside_coa": "Journal line account :code does not belong to the COA version used for :date.",
     "accounting_posting.line_group_account_not_reducing": "Group account :code can only receive lines that reduce its posted balance. Choose a detail (leaf) account.",

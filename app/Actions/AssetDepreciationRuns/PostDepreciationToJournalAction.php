@@ -39,6 +39,16 @@ class PostDepreciationToJournalAction
                 // Kunci aset agar akumulasi tidak berubah antara cek dan update.
                 $asset = Asset::whereKey($line->asset_id)->lockForUpdate()->firstOrFail();
 
+                // Aset yang sudah dilepas/hilang tidak boleh disusutkan lagi (#442).
+                if (! in_array($asset->status, Asset::IN_SERVICE_STATUSES, true)) {
+                    throw ValidationException::withMessages([
+                        'lines' => __('asset_depreciation_runs.asset_not_in_service', [
+                            'code' => $asset->asset_code,
+                            'status' => $asset->status,
+                        ]),
+                    ]);
+                }
+
                 $calculatedAccumulated = round((float) $line->accumulated_before, 2);
                 $currentAccumulated = round((float) $asset->accumulated_depreciation, 2);
 
