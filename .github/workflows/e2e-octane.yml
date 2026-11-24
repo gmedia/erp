@@ -150,8 +150,20 @@ jobs:
       - name: Run database migrations and seed
         run: ./vendor/bin/sail artisan migrate:fresh --seed --force
 
-      - name: Reload Octane after migrate and seed
-        run: ./vendor/bin/sail artisan octane:reload
+      # Octane boots before key:generate and seeding; a restart loads both.
+      - name: Restart Octane after migrate and seed
+        shell: bash
+        run: |
+          ./vendor/bin/sail restart laravel.test
+          for attempt in $(seq 1 45); do
+            if curl -sf -o /dev/null "$PLAYWRIGHT_BASE_URL/up"; then
+              ./vendor/bin/sail exec -T laravel.test sh -c 'grep -l "octane:swoole" /proc/[0-9]*/cmdline' && exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::Octane tidak menjawab setelah restart."
+          docker logs --tail 60 erp-laravel.test-1 || true
+          exit 1
 
       - name: Configure MinIO bucket
         run: |
