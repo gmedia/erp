@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Actions\AccountingPosting\PostSupplierBillJournalAction;
+use App\Actions\AccountingPosting\ReverseDocumentJournalAction;
 use App\Actions\SupplierBills\ExportSupplierBillsAction;
 use App\Actions\SupplierBills\IndexSupplierBillsAction;
 use App\Actions\SupplierBills\SyncSupplierBillItemsAction;
 use App\DTOs\SupplierBills\UpdateSupplierBillData;
+use App\Http\Controllers\Concerns\CancelsPostedDocuments;
 use App\Http\Controllers\Concerns\DeletesOnlyDraftDocuments;
 use App\Http\Controllers\Concerns\LoadsResourceRelations;
 use App\Http\Controllers\Concerns\StoresItemsInTransaction;
@@ -22,6 +24,7 @@ use Illuminate\Support\Facades\Auth;
 
 class SupplierBillController extends Controller
 {
+    use CancelsPostedDocuments;
     use DeletesOnlyDraftDocuments;
     use LoadsResourceRelations;
     use StoresItemsInTransaction;
@@ -80,11 +83,32 @@ class SupplierBillController extends Controller
         UpdateSupplierBillRequest $request,
         SupplierBill $supplierBill,
         SyncSupplierBillItemsAction $syncItems,
-        PostSupplierBillJournalAction $postJournal
+        PostSupplierBillJournalAction $postJournal,
+        ReverseDocumentJournalAction $reverseJournal,
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
         unset($validated['items']);
+
+        if (($validated['status'] ?? null) === 'cancelled' && $supplierBill->journal_entry_id !== null) {
+            $this->cancelPostedDocument(
+                document: $supplierBill,
+                attributes: array_merge($validated, ['status' => 'cancelled']),
+                blockers: [
+                    [
+                        static fn (SupplierBill $bill): bool => $bill->paymentAllocations()
+                            ->whereHas('payment', fn ($q) => $q->whereIn('status', ['confirmed', 'reconciled']))
+                            ->exists(),
+                        __('Supplier bill still has active payment allocations. Remove them before cancelling.'),
+                    ],
+                ],
+                reference: $supplierBill->bill_number,
+                label: 'Bill',
+                reverseJournal: $reverseJournal,
+            );
+
+            return (new SupplierBillResource($this->loadResourceRelations($supplierBill)))->response();
+        }
 
         $isNewlyConfirmed = ($validated['status'] ?? null) === 'confirmed' && $supplierBill->confirmed_at === null;
 

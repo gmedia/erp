@@ -48,6 +48,10 @@
     "approval.flow_not_found": "Approval flow tidak ditemukan, tidak aktif, atau tidak memiliki langkah.",
     "status_transition.invalid": "Tidak dapat mengubah status dari :from ke :to.",
     "Only draft documents can be deleted. Cancel the document instead.": "Hanya dokumen draft yang dapat dihapus. Batalkan dokumen sebagai gantinya.",
+    "Document is already cancelled.": "Dokumen sudah dibatalkan.",
+    "Customer invoice still has active receipt allocations. Remove them before cancelling.": "Invoice pelanggan masih memiliki alokasi penerimaan aktif. Lepaskan alokasi tersebut sebelum membatalkan.",
+    "Customer invoice still has applied credit notes. Void them before cancelling.": "Invoice pelanggan masih memiliki credit note yang sudah diterapkan. Void credit note tersebut sebelum membatalkan.",
+    "Supplier bill still has active payment allocations. Remove them before cancelling.": "Tagihan supplier masih memiliki alokasi pembayaran aktif. Lepaskan alokasi tersebut sebelum membatalkan.",
     "approval.transition_forbidden": "Anda tidak memiliki izin untuk menjalankan transisi ini.",
     "nav": {
         "platform": "Platform",

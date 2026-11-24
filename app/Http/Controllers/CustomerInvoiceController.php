@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Actions\AccountingPosting\PostCustomerInvoiceJournalAction;
+use App\Actions\AccountingPosting\ReverseDocumentJournalAction;
 use App\Actions\CustomerInvoices\ExportCustomerInvoicesAction;
 use App\Actions\CustomerInvoices\IndexCustomerInvoicesAction;
 use App\Actions\CustomerInvoices\SyncCustomerInvoiceItemsAction;
 use App\DTOs\CustomerInvoices\UpdateCustomerInvoiceData;
+use App\Http\Controllers\Concerns\CancelsPostedDocuments;
 use App\Http\Controllers\Concerns\DeletesOnlyDraftDocuments;
 use App\Http\Controllers\Concerns\LoadsResourceRelations;
 use App\Http\Controllers\Concerns\StoresItemsInTransaction;
@@ -22,6 +24,7 @@ use Illuminate\Support\Facades\Auth;
 
 class CustomerInvoiceController extends Controller
 {
+    use CancelsPostedDocuments;
     use DeletesOnlyDraftDocuments;
     use LoadsResourceRelations;
     use StoresItemsInTransaction;
@@ -82,11 +85,38 @@ class CustomerInvoiceController extends Controller
         UpdateCustomerInvoiceRequest $request,
         CustomerInvoice $customerInvoice,
         SyncCustomerInvoiceItemsAction $syncItems,
-        PostCustomerInvoiceJournalAction $postJournal
+        PostCustomerInvoiceJournalAction $postJournal,
+        ReverseDocumentJournalAction $reverseJournal,
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
         unset($validated['items']);
+
+        if (($validated['status'] ?? null) === 'cancelled' && $customerInvoice->journal_entry_id !== null) {
+            $this->cancelPostedDocument(
+                document: $customerInvoice,
+                attributes: array_merge($validated, ['status' => 'cancelled']),
+                blockers: [
+                    [
+                        static fn (CustomerInvoice $invoice): bool => $invoice->receiptAllocations()
+                            ->whereHas('receipt', fn ($q) => $q->whereIn('status', ['confirmed', 'reconciled']))
+                            ->exists(),
+                        __('Customer invoice still has active receipt allocations. Remove them before cancelling.'),
+                    ],
+                    [
+                        static fn (CustomerInvoice $invoice): bool => $invoice->creditNotes()
+                            ->where('status', 'applied')
+                            ->exists(),
+                        __('Customer invoice still has applied credit notes. Void them before cancelling.'),
+                    ],
+                ],
+                reference: $customerInvoice->invoice_number,
+                label: 'Invoice',
+                reverseJournal: $reverseJournal,
+            );
+
+            return (new CustomerInvoiceResource($this->loadResourceRelations($customerInvoice)))->response();
+        }
 
         $isNewlySent = ($validated['status'] ?? null) === 'sent' && $customerInvoice->sent_at === null;
 

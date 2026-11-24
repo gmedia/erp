@@ -48,6 +48,10 @@
     "approval.flow_not_found": "Approval flow not found, inactive, or has no steps.",
     "status_transition.invalid": "Cannot change status from :from to :to.",
     "Only draft documents can be deleted. Cancel the document instead.": "Only draft documents can be deleted. Cancel the document instead.",
+    "Document is already cancelled.": "Document is already cancelled.",
+    "Customer invoice still has active receipt allocations. Remove them before cancelling.": "Customer invoice still has active receipt allocations. Remove them before cancelling.",
+    "Customer invoice still has applied credit notes. Void them before cancelling.": "Customer invoice still has applied credit notes. Void them before cancelling.",
+    "Supplier bill still has active payment allocations. Remove them before cancelling.": "Supplier bill still has active payment allocations. Remove them before cancelling.",
     "approval.transition_forbidden": "You do not have permission to execute this transition.",
     "nav": {
         "platform": "Platform",
