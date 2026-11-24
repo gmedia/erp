@@ -286,6 +286,7 @@
     "accounting_posting.line_account_outside_coa": "Journal line account :code does not belong to the COA version used for :date.",
     "period_closings.posting_locked": "The period for :date is closed. Reopen the period to post journals on this date.",
     "journal_entry.fiscal_year_missing": "No fiscal year covers this date. Create the fiscal year before posting.",
+    "concurrency.conflict": "The data is being processed by another user. Reload the page and try again.",
     "journal_entry.fiscal_year_closed": "The fiscal year for this date is closed or locked. Reopen it or use an open period.",
     "stock.insufficient": "Insufficient stock for :product in :warehouse (available :available, required :required).",
     "stock.period_closed": "The accounting period for :date is closed. Stock movements cannot be changed in it.",

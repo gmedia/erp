@@ -6,6 +6,7 @@ use App\Events\ApprovalRequestApproved;
 use App\Models\ApprovalAuditLog;
 use App\Models\ApprovalRequest;
 use App\Models\ApprovalRequestStep;
+use App\Support\Database\TransactionRetrier;
 use Illuminate\Support\Facades\DB;
 
 class ApproveApprovalRequestAction
@@ -16,7 +17,7 @@ class ApproveApprovalRequestAction
         int $userId,
         ?string $comments,
     ): void {
-        DB::transaction(function () use ($approvalRequest, $currentStep, $userId, $comments): void {
+        TransactionRetrier::run(function () use ($approvalRequest, $currentStep, $userId, $comments): void {
             $currentStep->update([
                 'status' => 'approved',
                 'acted_by' => $userId,
