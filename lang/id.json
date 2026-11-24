@@ -91,6 +91,20 @@
     "postingJournals": {
         "searchPlaceholder": "Cari jurnal..."
     },
+    "periodClosings": {
+        "close": "Tutup Periode",
+        "reopen": "Buka Kembali Periode",
+        "closeTitle": "Tutup periode ini?",
+        "closeDescription": "Periode {period} akan ditutup. Statusnya menjadi Ditutup, penutupan dicatat dengan nama dan waktu Anda, serta periode dikunci dari perubahan sampai dibuka kembali.",
+        "reopenTitle": "Buka kembali periode ini?",
+        "reopenDescription": "Periode {period} akan dibuka kembali. Jurnal penutupannya dihapus dan periode dapat diubah lagi. Membuka kembali tidak membatalkan perubahan lain yang dibuat setelah penutupan.",
+        "confirmClose": "Ya, tutup",
+        "confirmReopen": "Ya, buka kembali",
+        "processing": "Memproses...",
+        "closed": "Periode ditutup.",
+        "reopened": "Periode dibuka kembali.",
+        "failed": "Gagal memperbarui periode. Silakan coba lagi."
+    },
     "accounts": {
         "searchPlaceholder": "Cari kode atau nama..."
     },

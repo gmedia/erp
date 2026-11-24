@@ -1,10 +1,11 @@
 'use client';
 
+import { PeriodClosingRowActions } from '@/components/period-closings/PeriodClosingRowActions';
 import { Badge } from '@/components/ui/badge';
 import { formatStatusLabel, statusBadgeVariant } from '@/lib/status-badge';
 import { type PeriodClosing } from '@/types/period-closing';
 import {
-    createActionsColumn,
+    type CustomTableMeta,
     createRowCurrencyAmountColumn,
     createSelectColumn,
     createSortingHeader,
@@ -77,5 +78,22 @@ export const periodClosingColumns: ColumnDef<PeriodClosing>[] = [
             return date ? formatDateByRegionalSettings(date) : '-';
         },
     },
-    createActionsColumn<PeriodClosing>(),
+    {
+        id: 'actions',
+        enableHiding: false,
+        size: 56,
+        cell: ({ row, table }) => {
+            const meta = table.options.meta as
+                | CustomTableMeta<PeriodClosing>
+                | undefined;
+            return (
+                <PeriodClosingRowActions
+                    item={row.original}
+                    onView={meta?.onView}
+                    onEdit={meta?.onEdit}
+                    onDelete={meta?.onDelete}
+                />
+            );
+        },
+    },
 ];
