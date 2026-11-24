@@ -22,7 +22,9 @@ class CompleteBankReconciliationAction
         }
 
         if (bccomp((string) $bankReconciliation->difference, '0', 2) !== 0) {
-            throw ValidationException::withMessages(['difference' => 'Bank reconciliation difference must be zero.']);
+            throw ValidationException::withMessages([
+                'difference' => __('bank_reconciliation.difference_must_be_zero'),
+            ]);
         }
 
         $hasUnmatchedWithoutAccount = $bankReconciliation->items()
@@ -31,7 +33,7 @@ class CompleteBankReconciliationAction
             ->exists();
 
         if ($hasUnmatchedWithoutAccount) {
-            $message = 'Every unmatched bank item must have an account before completing.';
+            $message = __('bank_reconciliation.unmatched_item_requires_account');
 
             throw ValidationException::withMessages(['items' => $message]);
         }

@@ -2,6 +2,8 @@
 
 namespace App\Actions\Reports;
 
+use App\Models\Account;
+use App\Models\FiscalYear;
 use App\Models\JournalEntryLine;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -65,12 +67,14 @@ class GetGeneralLedgerReportAction
 
     /**
      * Saldo awal = akumulasi debit-kredit jurnal posted sebelum start_date
-     * (akun dan tahun fiskal yang sama). Tanpa start_date, saldo awal = 0.
+     * (akun dan tahun fiskal yang sama). Tanpa start_date tetapi dengan tahun fiskal,
+     * akun neraca membawa saldo tahun sebelumnya (konsisten dengan trial balance);
+     * akun laba rugi mulai dari 0.
      */
     private function openingBalance(array $filters): float
     {
         if (empty($filters['start_date'])) {
-            return 0.0;
+            return $this->carryForwardBalance($filters);
         }
 
         $sum = JournalEntryLine::query()
@@ -86,6 +90,34 @@ class GetGeneralLedgerReportAction
                 if (! empty($filters['journal_type'])) {
                     $query->where('journal_type', $filters['journal_type']);
                 }
+            })
+            ->selectRaw('COALESCE(SUM(debit), 0) - COALESCE(SUM(credit), 0) as net')
+            ->value('net');
+
+        return (float) $sum;
+    }
+
+    /**
+     * Saldo tahun sebelumnya untuk akun neraca (bukan revenue/expense) bila tanpa start_date.
+     */
+    private function carryForwardBalance(array $filters): float
+    {
+        if (empty($filters['fiscal_year_id'])) {
+            return 0.0;
+        }
+
+        $fiscalYearStart = FiscalYear::query()->whereKey($filters['fiscal_year_id'])->value('start_date');
+        $accountType = Account::query()->whereKey($filters['account_id'])->value('type');
+
+        if ($fiscalYearStart === null || in_array($accountType, ['revenue', 'expense'], true)) {
+            return 0.0;
+        }
+
+        $sum = JournalEntryLine::query()
+            ->where('account_id', $filters['account_id'])
+            ->whereHas('journalEntry', function (Builder $query) use ($fiscalYearStart): void {
+                $query->where('status', 'posted')
+                    ->where('entry_date', '<', $fiscalYearStart);
             })
             ->selectRaw('COALESCE(SUM(debit), 0) - COALESCE(SUM(credit), 0) as net')
             ->value('net');

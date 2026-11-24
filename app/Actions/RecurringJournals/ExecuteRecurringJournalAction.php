@@ -26,19 +26,14 @@ class ExecuteRecurringJournalAction
             $recurringJournal->load(['lines.account', 'fiscalYear']);
 
             if (! $recurringJournal->is_active) {
-                throw ValidationException::withMessages(['recurring_journal' => 'Recurring journal is inactive.']);
+                throw ValidationException::withMessages(['recurring_journal' => __('recurring_journal.inactive')]);
             }
 
             if (! $recurringJournal->isBalanced()) {
-                throw ValidationException::withMessages(['lines' => 'Recurring journal lines are not balanced.']);
+                throw ValidationException::withMessages(['lines' => __('recurring_journal.lines_not_balanced')]);
             }
 
-            if ($recurringJournal->fiscalYear === null || ! $recurringJournal->fiscalYear->isOpen()) {
-                throw ValidationException::withMessages([
-                    'fiscal_year_id' => 'Recurring journal fiscal year is closed.',
-                ]);
-            }
-
+            // Tahun fiskal jurnal ditentukan tanggal entry (CreateJournalEntryAction), bukan template.
             $executedAt = now();
 
             $reference = $this->renderTemplate($recurringJournal->reference_template, $executedAt);

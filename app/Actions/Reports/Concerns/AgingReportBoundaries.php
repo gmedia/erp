@@ -77,7 +77,8 @@ trait AgingReportBoundaries
     }
 
     /**
-     * Credit note AR (confirmed/applied) bertanggal <= as_of.
+     * Credit note AR yang sudah applied dan bertanggal <= as_of. Konsisten dengan
+     * amount_due tersimpan: credit note confirmed yang belum applied tidak mengurangi sisa.
      */
     protected function historicalCreditNoteSql(string $invoiceAlias, string $asOfDate): string
     {
@@ -85,7 +86,7 @@ trait AgingReportBoundaries
 
         return 'COALESCE((SELECT SUM(cn.grand_total) FROM credit_notes cn'
             . " WHERE cn.customer_invoice_id = {$invoiceAlias}.id"
-            . " AND cn.status IN ('confirmed', 'applied')"
+            . " AND cn.status = 'applied'"
             . " AND cn.credit_note_date <= {$asOf}), 0)";
     }
 

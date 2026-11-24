@@ -179,6 +179,37 @@ test('ar aging counts credit notes dated on or before as_of_date only', function
         ->assertJsonPath('summary.totals.amount_due', '100000.00');
 });
 
+test('ar aging ignores confirmed but not yet applied credit notes like amount_due does', function () {
+    $customer = Customer::factory()->create();
+    CustomerInvoice::factory()->create([
+        'invoice_number' => 'INV-CN-CONFIRMED',
+        'customer_id' => $customer->id,
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'invoice_date' => '2026-01-10',
+        'due_date' => '2026-02-10',
+        'status' => 'sent',
+        'grand_total' => 100000,
+        'credit_note_amount' => 0,
+        'amount_due' => 100000,
+    ]);
+
+    // Confirmed tetapi belum applied: amount_due tersimpan tidak berkurang, jadi aging juga tidak.
+    CreditNote::factory()->confirmed()->create([
+        'customer_id' => $customer->id,
+        'customer_invoice_id' => CustomerInvoice::where('invoice_number', 'INV-CN-CONFIRMED')->value('id'),
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'credit_note_date' => '2026-02-20',
+        'grand_total' => 40000,
+    ]);
+
+    Sanctum::actingAs($this->arUser, ['*']);
+
+    getJson('/api/reports/ar-aging?as_of_date=2026-03-15')
+        ->assertOk()
+        ->assertJsonPath('data.0.customer_invoice.invoice_number', 'INV-CN-CONFIRMED')
+        ->assertJsonPath('summary.totals.amount_due', '100000.00');
+});
+
 test('ar aging keeps a document paid today when it was still open on as_of_date', function () {
     $customer = Customer::factory()->create();
     $invoice = CustomerInvoice::factory()->create([

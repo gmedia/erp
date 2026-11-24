@@ -97,6 +97,29 @@ function guardClosedMonth(FiscalYear $fiscalYear): void
     ]);
 }
 
+test('recurring journal template linked to a closed fiscal year posts into the open fiscal year of the entry date', function () {
+    $closedYear = FiscalYear::factory()->create([
+        'name' => (string) (now()->year - 1),
+        'start_date' => now()->subYear()->startOfYear()->toDateString(),
+        'end_date' => now()->subYear()->endOfYear()->toDateString(),
+        'status' => 'closed',
+    ]);
+    $openYear = guardOpenFiscalYear();
+    $accounts = guardAccounts();
+
+    // Template masih menunjuk tahun lama; jurnal tanggal hari ini harus masuk tahun yang terbuka.
+    $journal = guardDueJournal(
+        $closedYear,
+        $accounts['debit'],
+        $accounts['credit'],
+        ['auto_post' => true],
+    );
+
+    $entry = app(ExecuteRecurringJournalAction::class)->execute($journal);
+
+    expect($entry->fiscal_year_id)->toBe($openYear->id);
+});
+
 test('recurring journal entry number keeps the RJ prefix with fiscal sequence', function () {
     $fiscalYear = guardOpenFiscalYear();
     $accounts = guardAccounts();
