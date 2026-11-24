@@ -273,13 +273,13 @@ function UsersBody({
                 <TableCell className="font-medium">
                     {row.name}
                     {canEdit && !row.employee && (
-                        <span className="mt-1 block text-xs font-normal text-muted-foreground md:hidden">
+                        <span className="mt-1 block max-w-[10rem] text-xs font-normal break-words whitespace-normal text-muted-foreground md:hidden">
                             {t('users.edit_requires_employee')}
                         </span>
                     )}
                 </TableCell>
                 <TableCell
-                    className="max-w-[160px] break-all md:max-w-[220px]"
+                    className="max-w-[140px] break-all md:max-w-[220px]"
                     title={row.email}
                 >
                     {row.email}
