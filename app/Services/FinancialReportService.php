@@ -68,7 +68,8 @@ class FinancialReportService
     /**
      * Total arus kas untuk ringkasan laporan (dipakai config cash_flow).
      *
-     * @return array{cash_inflow: float, cash_outflow: float, net_change: float}
+     * @return array{cash_inflow: float, cash_outflow: float, net_change: float,
+     *     operating_cash_flow: float, investing_cash_flow: float, financing_cash_flow: float}
      */
     public function getCashFlowTotals(int $fiscalYearId, ?int $branchId = null): array
     {
@@ -81,7 +82,8 @@ class FinancialReportService
         return [
             'cash_inflow' => round($inflow, 2),
             'cash_outflow' => round($outflow, 2),
-            'net_change' => round($inflow - $outflow, 2),
+            // Dihitung dari himpunan aktivitas agar invarian operasi+investasi+pendanaan = net_change berlaku.
+            'net_change' => round($activities['operating'] + $activities['investing'] + $activities['financing'], 2),
             'operating_cash_flow' => $activities['operating'],
             'investing_cash_flow' => $activities['investing'],
             'financing_cash_flow' => $activities['financing'],
@@ -95,12 +97,9 @@ class FinancialReportService
     public function getOpeningCashBalance(int $fiscalYearId, ?int $branchId = null): float
     {
         $fiscalYear = FiscalYear::findOrFail($fiscalYearId);
-        $coaVersion = $this->resolveRequiredCoaVersion($fiscalYearId);
 
-        if (! $coaVersion) {
-            return 0.0;
-        }
-
+        // Lintas versi COA: jurnal tahun lalu memakai akun versi lama, jadi akun
+        // kas dikenali dari flag is_cash_flow di versi mana pun, bukan versi terpilih.
         $balance = JournalEntryLine::query()
             ->toBase()
             ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
@@ -108,7 +107,6 @@ class FinancialReportService
             ->where('journal_entries.status', 'posted')
             ->where('journal_entries.entry_date', '<', $fiscalYear->start_date->toDateString())
             ->where('line_accounts.is_cash_flow', true)
-            ->where('line_accounts.coa_version_id', $coaVersion->id)
             ->when($branchId !== null, fn ($q) => $q->where('journal_entry_lines.branch_id', $branchId))
             ->selectRaw('COALESCE(SUM(journal_entry_lines.debit - journal_entry_lines.credit), 0) as balance')
             ->value('balance');
@@ -135,11 +133,8 @@ class FinancialReportService
     {
         $totals = ['operating' => 0.0, 'investing' => 0.0, 'financing' => 0.0];
 
-        $coaVersion = $this->resolveRequiredCoaVersion($fiscalYearId);
-        if (! $coaVersion) {
-            return $totals;
-        }
-
+        // Himpunan jurnal sama dengan net_change (tanpa filter versi COA pada baris
+        // lawan), agar jumlah aktivitas selalu sama dengan perubahan kas.
         // Query builder (bukan model) agar tipe baris jelas dan atribut `type`
         // pada JournalEntryLine yang di-override accessor tidak ikut terbaca.
         $lines = JournalEntryLine::query()
@@ -148,7 +143,6 @@ class FinancialReportService
             ->join('accounts as line_accounts', 'line_accounts.id', '=', 'journal_entry_lines.account_id')
             ->where('journal_entries.fiscal_year_id', $fiscalYearId)
             ->where('journal_entries.status', 'posted')
-            ->where('line_accounts.coa_version_id', $coaVersion->id)
             ->when($branchId !== null, fn ($q) => $q->where('journal_entry_lines.branch_id', $branchId))
             ->get([
                 'journal_entry_lines.journal_entry_id',

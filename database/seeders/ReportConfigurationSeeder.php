@@ -108,17 +108,17 @@ class ReportConfigurationSeeder extends Seeder
             ['cash_outflow', 'Total Cash Outflow', ReportSection::TYPE_SUBTOTAL, null, null, null, null],
             [
                 'operating_cash_flow',
-                'Arus Kas dari Aktivitas Operasi',
+                'Cash Flows from Operating Activities',
                 ReportSection::TYPE_SUBTOTAL, null, null, null, null,
             ],
             [
                 'investing_cash_flow',
-                'Arus Kas dari Aktivitas Investasi',
+                'Cash Flows from Investing Activities',
                 ReportSection::TYPE_SUBTOTAL, null, null, null, null,
             ],
             [
                 'financing_cash_flow',
-                'Arus Kas dari Aktivitas Pendanaan',
+                'Cash Flows from Financing Activities',
                 ReportSection::TYPE_SUBTOTAL, null, null, null, null,
             ],
             ['net_change', 'NET INCREASE/DECREASE IN CASH', ReportSection::TYPE_TOTAL, null, null, null, '{cash_inflow} - {cash_outflow}'],

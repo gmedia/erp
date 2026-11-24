@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Account;
+use App\Models\Branch;
 use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
@@ -101,10 +102,12 @@ function postCashFlowJournal(
     float $cashCredit,
     array $counterLines,
     string $status = 'posted',
+    ?string $entryDate = null,
 ): JournalEntry {
     $journal = JournalEntry::factory()->create([
         'fiscal_year_id' => $fiscalYear->id,
         'status' => $status,
+        'entry_date' => $entryDate ?? $fiscalYear->start_date->toDateString(),
     ]);
 
     JournalEntryLine::factory()->create([
@@ -354,7 +357,8 @@ test('it reports opening and closing cash balance around the period net change',
         'status' => 'posted',
         'entry_date' => '2025-03-15',
     ];
-    foreach ([[300000, 0, 300000, 0], [0, 200000, 0, 200000]] as [$cashDebit, $cashCredit, $recvDebit, $recvCredit]) {
+    // Jurnal seimbang: kas masuk 300.000 (lawan piutang kredit), kas keluar 200.000 (lawan piutang debit).
+    foreach ([[300000, 0, 0, 300000], [0, 200000, 200000, 0]] as [$cashDebit, $cashCredit, $recvDebit, $recvCredit]) {
         $journal = JournalEntry::factory()->create($inPeriod);
         JournalEntryLine::factory()->create([
             'journal_entry_id' => $journal->id,
@@ -427,6 +431,165 @@ test('it reconciles activity totals to the opening to closing cash change', func
 
     expect($total)->toBe(375000.0)
         ->and((float) $sections['net_change']['value'])->toBe(375000.0);
+});
+
+test('it carries opening cash across fiscal years when the coa version changes', function () {
+    Sanctum::actingAs($this->user, ['*']);
+
+    $previousYear = FiscalYear::create([
+        'name' => '2024',
+        'start_date' => '2024-01-01',
+        'end_date' => '2024-12-31',
+        'status' => 'closed',
+    ]);
+    $oldCoa = CoaVersion::factory()->create([
+        'fiscal_year_id' => $previousYear->id,
+        'status' => 'archived',
+    ]);
+    $oldCash = Account::factory()->create([
+        'coa_version_id' => $oldCoa->id,
+        'code' => '11110',
+        'type' => 'asset',
+        'sub_type' => 'current_asset',
+        'normal_balance' => 'debit',
+        'is_cash_flow' => true,
+    ]);
+    $oldEquity = Account::factory()->create([
+        'coa_version_id' => $oldCoa->id,
+        'code' => '31100',
+        'type' => 'equity',
+        'sub_type' => null,
+        'normal_balance' => 'credit',
+    ]);
+    postCashFlowJournal($previousYear, $oldCoa, $oldCash, 400000, 0, [
+        ['account' => $oldEquity, 'debit' => 0, 'credit' => 400000],
+    ], entryDate: '2024-06-01');
+
+    // Tahun berjalan memakai versi COA baru dengan id akun berbeda.
+    $newCoa = CoaVersion::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'status' => 'active',
+    ]);
+    $newCash = Account::factory()->create([
+        'coa_version_id' => $newCoa->id,
+        'code' => '11110',
+        'type' => 'asset',
+        'sub_type' => 'current_asset',
+        'normal_balance' => 'debit',
+        'is_cash_flow' => true,
+    ]);
+    $newReceivable = Account::factory()->create([
+        'coa_version_id' => $newCoa->id,
+        'code' => '11200',
+        'type' => 'asset',
+        'sub_type' => 'current_asset',
+        'normal_balance' => 'debit',
+    ]);
+    postCashFlowJournal($this->fiscalYear, $newCoa, $newCash, 100000, 0, [
+        ['account' => $newReceivable, 'debit' => 0, 'credit' => 100000],
+    ], entryDate: '2025-03-15');
+
+    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
+        ->assertOk();
+
+    expect((float) $response->json('opening_cash_balance'))->toBe(400000.0)
+        ->and((float) $response->json('closing_cash_balance'))->toBe(500000.0);
+
+    // Saldo akhir tahun 2024 harus sama dengan saldo awal tahun 2025.
+    $previous = $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $previousYear->id)
+        ->assertOk();
+    expect((float) $previous->json('closing_cash_balance'))->toBe(400000.0);
+});
+
+test('it keeps activity totals equal to net change when filtered by branch', function () {
+    Sanctum::actingAs($this->user, ['*']);
+
+    $coaVersion = CoaVersion::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'status' => 'active',
+    ]);
+    $cash = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '11110',
+        'type' => 'asset',
+        'sub_type' => 'current_asset',
+        'normal_balance' => 'debit',
+        'is_cash_flow' => true,
+    ]);
+    $equipment = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '12100',
+        'type' => 'asset',
+        'sub_type' => 'non_current_asset',
+        'normal_balance' => 'debit',
+    ]);
+    $sales = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '41000',
+        'type' => 'revenue',
+        'sub_type' => null,
+        'normal_balance' => 'credit',
+    ]);
+    $branch = Branch::factory()->create();
+
+    // Jurnal cabang yang sama: kas +100.000, lawan pendapatan 60.000 dan aset 40.000 (investasi).
+    $journal = postCashFlowJournal($this->fiscalYear, $coaVersion, $cash, 100000, 0, [
+        ['account' => $sales, 'debit' => 0, 'credit' => 60000],
+        ['account' => $equipment, 'debit' => 0, 'credit' => 40000],
+    ]);
+    JournalEntryLine::query()->where('journal_entry_id', $journal->id)->update(['branch_id' => $branch->id]);
+
+    $query = http_build_query([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'branch_id' => $branch->id,
+    ]);
+    $response = $this->getJson('/api/reports/cash-flow?' . $query)
+        ->assertOk();
+
+    $total = (float) $response->json('activities.operating')
+        + (float) $response->json('activities.investing')
+        + (float) $response->json('activities.financing');
+
+    expect($total)->toBe((float) $response->json('net_change'))
+        ->and((float) $response->json('net_change'))->toBe(100000.0)
+        ->and((float) $response->json('activities.operating'))->toBe(60000.0)
+        ->and((float) $response->json('activities.investing'))->toBe(40000.0);
+});
+
+test('it returns activities and net change without seeded cash flow configuration', function () {
+    Sanctum::actingAs($this->user, ['*']);
+
+    $coaVersion = CoaVersion::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'status' => 'active',
+    ]);
+    $cash = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '11110',
+        'type' => 'asset',
+        'sub_type' => 'current_asset',
+        'normal_balance' => 'debit',
+        'is_cash_flow' => true,
+    ]);
+    $receivable = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '11200',
+        'type' => 'asset',
+        'sub_type' => 'current_asset',
+        'normal_balance' => 'debit',
+    ]);
+    postCashFlowJournal($this->fiscalYear, $coaVersion, $cash, 250000, 0, [
+        ['account' => $receivable, 'debit' => 0, 'credit' => 250000],
+    ]);
+
+    // Tanpa $this->seed(ReportConfigurationSeeder::class): konfigurasi aktivitas tidak ada.
+    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
+        ->assertOk();
+
+    expect((float) $response->json('net_change'))->toBe(250000.0)
+        ->and((float) $response->json('activities.operating'))->toBe(250000.0)
+        ->and((float) $response->json('activities.investing'))->toBe(0.0)
+        ->and((float) $response->json('activities.financing'))->toBe(0.0);
 });
 
 test('it can export cash flow report', function () {

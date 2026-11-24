@@ -49,7 +49,12 @@ type SingleYearFinancialReportResponse<TReport> = {
     selectedYearId: number;
     report: TReport;
     computed_sections: ComputedSection[];
-    // Hanya dikirim laporan arus kas (saldo kas awal/akhir).
+    // Hanya dikirim laporan arus kas (saldo kas awal/akhir dan aktivitas).
+    activities?: {
+        operating: number;
+        investing: number;
+        financing: number;
+    };
     opening_cash_balance?: number;
     net_change?: number;
     closing_cash_balance?: number;

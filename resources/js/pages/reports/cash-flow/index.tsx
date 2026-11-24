@@ -245,10 +245,39 @@ export default function CashFlow() {
     const closingCash =
         rawData?.closing_cash_balance ?? openingCash + netCashFlow;
 
-    // Angka aktivitas diambil dari section backend agar sama dengan total laporan.
-    const activitySections = computedSections.filter((section) =>
-        (ACTIVITY_SECTION_CODES as readonly string[]).includes(section.code),
-    );
+    // Angka aktivitas langsung dari service (root `activities`), tanpa bergantung
+    // pada konfigurasi laporan yang sudah diseed ulang.
+    const activities = rawData?.activities ?? {
+        operating: 0,
+        investing: 0,
+        financing: 0,
+    };
+    const activitySections: ComputedSection[] = [
+        {
+            code: 'operating_cash_flow',
+            name: 'Cash Flows from Operating Activities',
+            section_type: 'subtotal',
+            value: activities.operating,
+            formula: null,
+            sort_order: 1,
+        },
+        {
+            code: 'investing_cash_flow',
+            name: 'Cash Flows from Investing Activities',
+            section_type: 'subtotal',
+            value: activities.investing,
+            formula: null,
+            sort_order: 2,
+        },
+        {
+            code: 'financing_cash_flow',
+            name: 'Cash Flows from Financing Activities',
+            section_type: 'subtotal',
+            value: activities.financing,
+            formula: null,
+            sort_order: 3,
+        },
+    ];
     const otherSections = computedSections.filter(
         (section) =>
             !(ACTIVITY_SECTION_CODES as readonly string[]).includes(
