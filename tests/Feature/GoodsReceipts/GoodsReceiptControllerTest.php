@@ -313,10 +313,7 @@ test('confirming goods receipt rolls back state when journal posting fails with 
     ]);
 
     $this->app->bind(PostGoodsReceiptJournalAction::class, function ($app) {
-        return new class(
-            $app->make(CreateJournalEntryAction::class),
-            $app->make(ResolveControlAccountAction::class),
-        ) extends PostGoodsReceiptJournalAction
+        return new class($app->make(CreateJournalEntryAction::class), $app->make(ResolveControlAccountAction::class)) extends PostGoodsReceiptJournalAction
         {
             public function execute(GoodsReceipt $goodsReceipt): ?JournalEntry
             {
