@@ -28,9 +28,9 @@ class ApprovalFlowSampleDataSeeder extends Seeder
         $flows = [
             [
                 'code' => 'asset_registration_high_value',
-                'name' => 'High Value Asset Registration',
+                'name' => 'Pendaftaran Aset Bernilai Tinggi',
                 'approvable_type' => Asset::class,
-                'description' => 'Approval for registering assets with cost > 100M',
+                'description' => 'Persetujuan pendaftaran aset dengan harga perolehan di atas Rp 100 juta',
                 'conditions' => [
                     'field_checks' => [
                         ['field' => 'purchase_cost', 'operator' => '>', 'value' => 100000000],
@@ -39,40 +39,40 @@ class ApprovalFlowSampleDataSeeder extends Seeder
                 'steps' => [
                     [
                         'step_order' => 1,
-                        'name' => 'HR Manager Review',
+                        'name' => 'Review Manajer HR',
                         'approver_user_id' => $hrManager->id,
                     ],
                     [
                         'step_order' => 2,
-                        'name' => 'Finance Director Approval',
+                        'name' => 'Persetujuan Direktur Keuangan',
                         'approver_user_id' => $financeDirector->id,
                     ],
                 ],
             ],
             [
                 'code' => 'purchase_request_default',
-                'name' => 'Purchase Request Default Approval',
+                'name' => 'Persetujuan Default Permintaan Pembelian',
                 'approvable_type' => PurchaseRequest::class,
-                'description' => 'Default approval flow for submitted purchase requests',
+                'description' => 'Alur persetujuan default untuk permintaan pembelian yang diajukan',
                 'conditions' => null,
                 'steps' => [
                     [
                         'step_order' => 1,
-                        'name' => 'Admin Review',
+                        'name' => 'Review Admin',
                         'approver_user_id' => $admin->id,
                     ],
                 ],
             ],
             [
                 'code' => 'purchase_order_default',
-                'name' => 'Purchase Order Default Approval',
+                'name' => 'Persetujuan Default Pesanan Pembelian',
                 'approvable_type' => PurchaseOrder::class,
-                'description' => 'Default approval flow for submitted purchase orders',
+                'description' => 'Alur persetujuan default untuk pesanan pembelian yang diajukan',
                 'conditions' => null,
                 'steps' => [
                     [
                         'step_order' => 1,
-                        'name' => 'Admin Approval',
+                        'name' => 'Persetujuan Admin',
                         'approver_user_id' => $admin->id,
                     ],
                 ],

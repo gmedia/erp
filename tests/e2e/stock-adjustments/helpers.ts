@@ -112,8 +112,8 @@ export async function createStockAdjustment(page: Page): Promise<string> {
     const productCandidates: readonly AsyncOptionCandidate[] = [
         { searchText: 'MDF Wood Panel', optionText: 'MDF Wood Panel' },
         {
-            searchText: 'Executive Office Desk',
-            optionText: 'Executive Office Desk',
+            searchText: 'Meja Kerja Eksekutif',
+            optionText: 'Meja Kerja Eksekutif',
         },
         { searchText: 'Wooden Table Legs', optionText: 'Wooden Table Legs' },
         {

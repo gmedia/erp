@@ -99,7 +99,7 @@ test.describe('Purchase Request approval flow (UI)', () => {
             page,
             itemDialog,
             'Product',
-            'Executive Office Desk',
+            'Meja Kerja Eksekutif',
         );
         await selectAsyncOption(page, itemDialog, 'Unit', 'Buah');
         await itemDialog.getByLabel('Quantity').fill('2');

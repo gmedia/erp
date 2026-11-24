@@ -103,7 +103,7 @@ export async function createStockTransfer(page: Page): Promise<string> {
     const transferNumber = `ST-E2E-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
     const productCandidates: readonly AsyncOptionCandidate[] = [
         { searchText: 'MDF Wood Panel', optionText: 'MDF Wood Panel' },
-        { searchText: 'Executive Office Desk', optionText: 'Executive Office Desk' },
+        { searchText: 'Meja Kerja Eksekutif', optionText: 'Meja Kerja Eksekutif' },
         { searchText: 'Wooden Table Legs', optionText: 'Wooden Table Legs' },
         { searchText: 'Inventory Sample Product', optionText: 'Inventory Sample Product' },
     ];

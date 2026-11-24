@@ -1248,6 +1248,29 @@ invariant('W7-17 depreciation journal text is generated through i18n in en and i
     }
 });
 
+// W7-17 (6c) — label demo yang terlihat pengguna berbahasa Indonesia: alasan delegasi,
+// alur approval, nama produk, dan nama pipeline tidak boleh memakai frasa Inggris lama.
+invariant('W7-17 demo label text is Indonesian (delegation reasons, approval flows, products, pipelines)', function () {
+    $legacy = [
+        'approval_delegations' => ['reason', ['Annual Leave', 'Overseas Duty']],
+        'approval_flows' => ['name', [
+            'High Value Asset Registration', 'HR Manager Review', 'Finance Director Approval',
+            'Purchase Request Default Approval', 'Admin Review', 'Purchase Order Default Approval',
+            'Admin Approval', 'Vehicle Loan Default Approval', 'Vehicle Loan Approval',
+        ]],
+        'products' => ['name', ['Executive Office Desk', 'Ergonomic Office Chair']],
+        'pipelines' => ['name', [
+            'Supplier Bill Lifecycle', 'Customer Invoice Lifecycle', 'Asset Lifecycle',
+            'Purchase Request Lifecycle', 'Purchase Order Lifecycle',
+        ]],
+    ];
+
+    foreach ($legacy as $table => [$column, $names]) {
+        expect(DB::table($table)->whereIn($column, $names)->count())
+            ->toBe(0, "label demo {$table}.{$column} masih berbahasa Inggris");
+    }
+});
+
 // W7-17 — nama aset demo bahasa Indonesia; kategori aset tidak berbahasa campur.
 invariant('W7-17 demo master names are Indonesian, not mixed with English labels', function () {
     $englishLabels = ['Mesin Production', 'Vehicles', 'Office Equipment', 'Operating Budget'];

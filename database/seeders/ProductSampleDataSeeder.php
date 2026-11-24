@@ -75,8 +75,8 @@ class ProductSampleDataSeeder extends Seeder
         $officeDesk = Product::updateOrCreate(
             ['code' => 'FG-FURN-001'],
             [
-                'name' => 'Executive Office Desk',
-                'description' => 'Premium executive office desk with storage',
+                'name' => 'Meja Kerja Eksekutif',
+                'description' => 'Meja kerja eksekutif premium dengan laci penyimpanan',
                 'type' => 'finished_good',
                 'product_category_id' => $furnitureCategory->id,
                 'unit_id' => $pieceUnit->id,
@@ -257,8 +257,8 @@ class ProductSampleDataSeeder extends Seeder
         $deskChair = Product::updateOrCreate(
             ['code' => 'FG-FURN-002'],
             [
-                'name' => 'Ergonomic Office Chair',
-                'description' => 'Comfortable ergonomic chair for office use',
+                'name' => 'Kursi Kantor Ergonomis',
+                'description' => 'Kursi ergonomis yang nyaman untuk penggunaan kantor',
                 'type' => 'finished_good',
                 'product_category_id' => $furnitureCategory->id,
                 'unit_id' => $pieceUnit->id,

@@ -198,7 +198,7 @@ class PurchasingSampleDataSeeder extends Seeder
         $prPipeline = Pipeline::firstOrCreate(
             ['code' => 'pr_lifecycle'],
             [
-                'name' => 'Purchase Request Lifecycle',
+                'name' => 'Siklus Hidup Permintaan Pembelian',
                 'entity_type' => 'App\\Models\\PurchaseRequest',
                 'description' => 'Lifecycle pipeline for purchase request document',
                 'version' => 1,
@@ -428,7 +428,7 @@ class PurchasingSampleDataSeeder extends Seeder
         $poPipeline = Pipeline::firstOrCreate(
             ['code' => 'po_lifecycle'],
             [
-                'name' => 'Purchase Order Lifecycle',
+                'name' => 'Siklus Hidup Pesanan Pembelian',
                 'entity_type' => 'App\\Models\\PurchaseOrder',
                 'description' => 'Lifecycle pipeline for purchase order document',
                 'version' => 1,
