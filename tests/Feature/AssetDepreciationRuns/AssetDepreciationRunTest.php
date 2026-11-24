@@ -223,3 +223,88 @@ test('depreciation posting attributes journal lines per asset branch and injects
         expect($debit)->toBe($credit);
     }
 });
+
+test('calculate rejects a period that overlaps an existing run (422)', function () {
+    AssetDepreciationRun::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'period_start' => '2024-01-01',
+        'period_end' => '2024-01-31',
+        'status' => 'calculated',
+    ]);
+
+    postJson('/api/asset-depreciation-runs/calculate', [
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'period_start' => '2024-01-15',
+        'period_end' => '2024-02-15',
+    ])->assertStatus(422);
+
+    expect(AssetDepreciationRun::count())->toBe(1);
+});
+
+test('calculate accepts an adjacent period that does not overlap', function () {
+    AssetDepreciationRun::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'period_start' => '2024-01-01',
+        'period_end' => '2024-01-31',
+        'status' => 'calculated',
+    ]);
+
+    postJson('/api/asset-depreciation-runs/calculate', [
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'period_start' => '2024-02-01',
+        'period_end' => '2024-02-29',
+    ])->assertStatus(200);
+});
+
+test('calculate uses purchase cost minus accumulated depreciation when book value is empty', function () {
+    $asset = Asset::factory()->create([
+        'purchase_cost' => 1000,
+        'salvage_value' => 0,
+        'useful_life_months' => 10,
+        'depreciation_start_date' => '2024-01-01',
+        'depreciation_method' => 'straight_line',
+        'status' => 'active',
+        'book_value' => null,
+        'accumulated_depreciation' => 300,
+    ]);
+
+    postJson('/api/asset-depreciation-runs/calculate', [
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'period_start' => '2024-04-01',
+        'period_end' => '2024-04-30',
+    ])->assertStatus(200);
+
+    $this->assertDatabaseHas('asset_depreciation_lines', [
+        'asset_id' => $asset->id,
+        'amount' => 100,
+        'accumulated_before' => 300,
+        'accumulated_after' => 400,
+        'book_value_after' => 600,
+    ]);
+});
+
+test('last month consumes the whole rounding remainder so book value reaches salvage', function () {
+    $asset = Asset::factory()->create([
+        'purchase_cost' => 1000,
+        'salvage_value' => 0,
+        'useful_life_months' => 3,
+        'depreciation_start_date' => '2024-01-01',
+        'depreciation_method' => 'straight_line',
+        'status' => 'active',
+        'book_value' => 334,
+        'accumulated_depreciation' => 666,
+    ]);
+
+    postJson('/api/asset-depreciation-runs/calculate', [
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'period_start' => '2024-03-01',
+        'period_end' => '2024-03-31',
+    ])->assertStatus(200);
+
+    $this->assertDatabaseHas('asset_depreciation_lines', [
+        'asset_id' => $asset->id,
+        'amount' => 334,
+        'accumulated_after' => 1000,
+        'book_value_after' => 0,
+    ]);
+});
