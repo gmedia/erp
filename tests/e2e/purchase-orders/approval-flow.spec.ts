@@ -1,6 +1,10 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
-import { DEFAULT_E2E_EMAIL, login, searchAndWaitForApi } from '../helpers';
+import {
+    approveViaScreenAsDelegate,
+    login,
+    searchAndWaitForApi,
+} from '../helpers';
 
 const FORBIDDEN_MANUAL_STATUSES = ['Confirmed', 'Rejected'];
 
@@ -143,26 +147,7 @@ test.describe('Purchase Order approval flow (UI)', () => {
         await page.getByRole('tab', { name: 'Approvals', exact: true }).click();
         await expect(page.getByText(/^Step 1\b/).first()).toBeVisible();
 
-        await page.context().clearCookies();
-        await login(page, DEFAULT_E2E_EMAIL, undefined, {
-            requireDashboard: false,
-        });
-        await page.goto('/my-approvals');
-        await expect(page.getByRole('tab', { name: /Pending/i })).toBeVisible();
-
-        const approveResponse = page.waitForResponse(
-            (response) =>
-                response.url().includes('/api/my-approvals') &&
-                response.status() < 400,
-        );
-        await page
-            .getByRole('button', { name: /^Approve$/ })
-            .first()
-            .click();
-        await page
-            .getByRole('button', { name: 'Confirm Approval', exact: true })
-            .click();
-        await approveResponse;
+        await approveViaScreenAsDelegate(page, poNumber as string);
 
         await page.goto('/purchase-orders');
         await searchAndWaitForApi(

@@ -98,6 +98,9 @@ const defaultTranslations: Translations = {
     my_approvals: {
         request_number: 'No. {id}',
         load_failed: 'Failed to load approvals. Please refresh and try again.',
+        delegated_badge: 'Delegated',
+        delegated_count: '{count} delegated',
+        delegated_tooltip: 'Pending steps you can act on as a delegate',
     },
     posted_document: {
         title: 'Posted document',

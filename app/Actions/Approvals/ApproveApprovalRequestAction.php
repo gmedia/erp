@@ -17,13 +17,8 @@ class ApproveApprovalRequestAction
         ?string $comments,
     ): void {
         DB::transaction(function () use ($approvalRequest, $currentStep, $userId, $comments): void {
-            $currentStep->update([
-                'status' => 'approved',
-                'acted_by' => $userId,
-                'action' => 'approve',
-                'comments' => $comments,
-                'acted_at' => now(),
-            ]);
+            app(ResolveApprovalStepActorAction::class)
+                ->recordDecision($currentStep, $userId, 'approve', $comments);
 
             ApprovalAuditLog::create([
                 'approval_request_id' => $approvalRequest->id,

@@ -17,13 +17,8 @@ class RejectApprovalRequestAction
         string $comments,
     ): void {
         DB::transaction(function () use ($approvalRequest, $currentStep, $userId, $comments): void {
-            $currentStep->update([
-                'status' => 'rejected',
-                'acted_by' => $userId,
-                'action' => 'reject',
-                'comments' => $comments,
-                'acted_at' => now(),
-            ]);
+            app(ResolveApprovalStepActorAction::class)
+                ->recordDecision($currentStep, $userId, 'reject', $comments);
 
             $approvalRequest->update([
                 'status' => 'rejected',

@@ -1,6 +1,6 @@
 import { expect, Page, test } from '@playwright/test';
 
-import { login, searchAndWaitForApi } from '../helpers';
+import { approveApprovableAsDelegate, login, searchAndWaitForApi } from '../helpers';
 
 interface SeedResult {
     receiptNumber: string;
@@ -70,16 +70,6 @@ async function seedGoodsReceiptFixtures(page: Page): Promise<SeedResult> {
                 headers,
                 body: JSON.stringify({ transition_id: submit?.id }),
             });
-            const inbox = await (await fetch('/api/my-approvals', { headers })).json();
-            const step = (inbox.pending ?? []).find(
-                (item: { request: { approvable_id: number } }) =>
-                    item.request.approvable_id === id,
-            );
-            await fetch(`/api/my-approvals/${step?.request.id}/approve`, {
-                method: 'POST',
-                headers,
-                body: JSON.stringify({ comments: 'E2E header selects' }),
-            });
             return {
                 id,
                 number: String(json?.data?.po_number ?? ''),
@@ -144,7 +134,10 @@ test.describe('Goods Receipt header selects', () => {
 
     test.beforeEach(async ({ page }) => {
         await login(page, undefined, undefined, { requireDashboard: false });
-        fixtures ??= await seedGoodsReceiptFixtures(page);
+        if (!fixtures) {
+            fixtures = await seedGoodsReceiptFixtures(page);
+            await approveApprovableAsDelegate(page, fixtures.purchaseOrderId, 'E2E header selects', 'App\\Models\\PurchaseOrder');
+        }
         const listed = page.waitForResponse(
             (r) => r.url().includes('/api/goods-receipts') && r.status() < 400,
             { timeout: 30000 },

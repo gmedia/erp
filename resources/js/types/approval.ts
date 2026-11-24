@@ -64,6 +64,8 @@ export interface ApprovalRequestStep {
     status: 'pending' | 'approved' | 'rejected' | 'skipped';
     acted_by: number | null;
     delegated_from: number | null;
+    /** True when the viewer may act on this step only through a delegation. */
+    is_delegated?: boolean;
     action: 'approve' | 'reject' | 'skip' | 'auto_approve' | null;
     comments: string | null;
     acted_at: string | null;
