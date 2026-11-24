@@ -124,6 +124,10 @@ class ApPaymentController extends Controller
                 : null,
             );
 
+            if ($allocations === null && $isNewlyConfirmed) {
+                $syncAllocations->assertStoredWithinOutstanding($apPayment->refresh());
+            }
+
             // Status-only change (e.g. cancel/void) must still release bill balances
             // that were counted from this payment.
             if ($allocations === null) {

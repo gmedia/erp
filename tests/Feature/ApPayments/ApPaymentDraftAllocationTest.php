@@ -181,6 +181,62 @@ test('second draft exceeding remaining balance is rejected with 422 on confirm',
     expect(ApPayment::find($second['id'])->status)->toBe('draft');
 });
 
+test('confirm without allocations payload still rejects draft exceeding remaining balance', function () {
+    $bill = apDraftBill($this->supplier);
+
+    $first = postJson('/api/ap-payments', apDraftPaymentPayload($this->supplier, $this->bankAccount, [
+        'total_amount' => 800000,
+        'allocations' => [
+            ['supplier_bill_id' => $bill->id, 'allocated_amount' => 800000],
+        ],
+    ]))->assertCreated()->json('data');
+
+    $second = postJson('/api/ap-payments', apDraftPaymentPayload($this->supplier, $this->bankAccount, [
+        'total_amount' => 800000,
+        'allocations' => [
+            ['supplier_bill_id' => $bill->id, 'allocated_amount' => 800000],
+        ],
+    ]))->assertCreated()->json('data');
+
+    putJson('/api/ap-payments/' . $first['id'], [
+        'status' => 'confirmed',
+        'allocations' => [
+            ['supplier_bill_id' => $bill->id, 'allocated_amount' => 800000],
+        ],
+    ])->assertOk();
+
+    putJson('/api/ap-payments/' . $second['id'], ['status' => 'confirmed'])->assertStatus(422);
+
+    $bill->refresh();
+    expect((float) $bill->amount_paid)->toBe(800000.0)
+        ->and(ApPayment::find($second['id'])->status)->toBe('draft');
+});
+
+test('put may resend an unchanged reconciled status and may reconcile a confirmed payment', function () {
+    $bill = apDraftBill($this->supplier);
+
+    $payment = postJson('/api/ap-payments', apDraftPaymentPayload($this->supplier, $this->bankAccount, [
+        'allocations' => [
+            ['supplier_bill_id' => $bill->id, 'allocated_amount' => 500000],
+        ],
+    ]))->assertCreated()->json('data');
+
+    putJson('/api/ap-payments/' . $payment['id'], [
+        'status' => 'confirmed',
+        'allocations' => [
+            ['supplier_bill_id' => $bill->id, 'allocated_amount' => 500000],
+        ],
+    ])->assertOk();
+
+    putJson('/api/ap-payments/' . $payment['id'], ['status' => 'reconciled'])
+        ->assertOk()->assertJsonPath('data.status', 'reconciled');
+
+    putJson('/api/ap-payments/' . $payment['id'], [
+        'status' => 'reconciled',
+        'supplier_id' => $this->supplier->id,
+    ])->assertOk()->assertJsonPath('data.status', 'reconciled');
+});
+
 test('voiding a confirmed payment restores bill due', function () {
     $bill = apDraftBill($this->supplier);
 

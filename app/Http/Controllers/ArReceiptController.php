@@ -120,6 +120,10 @@ class ArReceiptController extends Controller
                 : null,
             );
 
+            if ($allocations === null && $isNewlyConfirmed) {
+                $syncAllocations->assertStoredWithinOutstanding($arReceipt->refresh());
+            }
+
             // Status-only change (no allocations payload, e.g. cancel/void) must still
             // release invoice balances that were counted from this receipt.
             if ($allocations === null) {

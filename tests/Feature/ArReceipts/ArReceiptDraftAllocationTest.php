@@ -144,6 +144,85 @@ test('cancelling a confirmed receipt restores invoice due', function () {
         ->and($invoice->status)->toBe('sent');
 });
 
+test('confirm without allocations payload still rejects draft exceeding remaining balance', function () {
+    $invoice = arDraftInvoice($this->customer);
+
+    $first = postJson('/api/ar-receipts', arDraftReceiptPayload($this->customer, $this->bankAccount, [
+        'allocations' => [
+            ['customer_invoice_id' => $invoice->id, 'allocated_amount' => 800000],
+        ],
+    ]))->assertCreated()->json('data');
+
+    $second = postJson('/api/ar-receipts', arDraftReceiptPayload($this->customer, $this->bankAccount, [
+        'total_amount' => 800000,
+        'allocations' => [
+            ['customer_invoice_id' => $invoice->id, 'allocated_amount' => 800000],
+        ],
+    ]))->assertCreated()->json('data');
+
+    putJson('/api/ar-receipts/' . $first['id'], [
+        'status' => 'confirmed',
+        'allocations' => [
+            ['customer_invoice_id' => $invoice->id, 'allocated_amount' => 800000],
+        ],
+    ])->assertOk();
+
+    putJson('/api/ar-receipts/' . $second['id'], [
+        'status' => 'confirmed',
+    ])->assertStatus(422);
+
+    $invoice->refresh();
+    expect((float) $invoice->amount_received)->toBe(800000.0)
+        ->and(ArReceipt::find($second['id'])->status)->toBe('draft');
+});
+
+test('confirming with allocations persists them on the receipt', function () {
+    $invoice = arDraftInvoice($this->customer);
+
+    $receipt = postJson('/api/ar-receipts', arDraftReceiptPayload($this->customer, $this->bankAccount, [
+        'allocations' => [
+            ['customer_invoice_id' => $invoice->id, 'allocated_amount' => 500000],
+        ],
+    ]))->assertCreated()->json('data');
+
+    putJson('/api/ar-receipts/' . $receipt['id'], [
+        'status' => 'confirmed',
+        'allocations' => [
+            ['customer_invoice_id' => $invoice->id, 'allocated_amount' => 500000],
+        ],
+    ])->assertOk();
+
+    $stored = ArReceipt::find($receipt['id'])->allocations()->get();
+    expect($stored)->toHaveCount(1)
+        ->and((float) $stored->first()->allocated_amount)->toBe(500000.0);
+});
+
+test('put may resend an unchanged reconciled status and may reconcile a confirmed receipt', function () {
+    $invoice = arDraftInvoice($this->customer);
+
+    $receipt = postJson('/api/ar-receipts', arDraftReceiptPayload($this->customer, $this->bankAccount, [
+        'allocations' => [
+            ['customer_invoice_id' => $invoice->id, 'allocated_amount' => 500000],
+        ],
+    ]))->assertCreated()->json('data');
+
+    putJson('/api/ar-receipts/' . $receipt['id'], [
+        'status' => 'confirmed',
+        'allocations' => [
+            ['customer_invoice_id' => $invoice->id, 'allocated_amount' => 500000],
+        ],
+    ])->assertOk();
+
+    putJson('/api/ar-receipts/' . $receipt['id'], [
+        'status' => 'reconciled',
+    ])->assertOk()->assertJsonPath('data.status', 'reconciled');
+
+    putJson('/api/ar-receipts/' . $receipt['id'], [
+        'status' => 'reconciled',
+        'customer_id' => $this->customer->id,
+    ])->assertOk()->assertJsonPath('data.status', 'reconciled');
+});
+
 test('second draft exceeding remaining balance is rejected with 422 on confirm', function () {
     $invoice = arDraftInvoice($this->customer);
 

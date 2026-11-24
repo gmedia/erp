@@ -85,6 +85,19 @@ class SyncArReceiptAllocationsAction
     }
 
     /**
+     * Confirm without an allocations payload: re-check the stored allocations so an
+     * overflowing draft cannot be confirmed by a status-only PUT.
+     */
+    public function assertStoredWithinOutstanding(ArReceipt $arReceipt): void
+    {
+        $stored = $arReceipt->allocations()
+            ->get(['customer_invoice_id', 'allocated_amount'])
+            ->toArray();
+
+        $this->assertWithinOutstanding($arReceipt, $stored);
+    }
+
+    /**
      * Re-check overflow at confirm time, under a row lock, against POSTED receipts
      * only (other drafts do not bind the quota). Prevents two drafts that each fit
      * the outstanding amount from both being confirmed.

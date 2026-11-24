@@ -82,6 +82,19 @@ class SyncApPaymentAllocationsAction
     }
 
     /**
+     * Confirm without an allocations payload: re-check the stored allocations so an
+     * overflowing draft cannot be confirmed by a status-only PUT.
+     */
+    public function assertStoredWithinOutstanding(ApPayment $apPayment): void
+    {
+        $stored = $apPayment->allocations()
+            ->get(['supplier_bill_id', 'allocated_amount'])
+            ->toArray();
+
+        $this->assertWithinOutstanding($apPayment, $stored);
+    }
+
+    /**
      * Re-check overflow at confirm time, under a row lock, against POSTED payments
      * only (other drafts do not bind the quota).
      *

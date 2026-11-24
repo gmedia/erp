@@ -34,8 +34,11 @@ abstract class AbstractArReceiptRequest extends AuthorizedFormRequest
             'status' => $this->withSometimes([
                 'required',
                 'string',
-                // reconciled hanya dicapai lewat rekonsiliasi, tidak boleh di-set langsung.
-                'in:draft,confirmed,cancelled,void',
+                // POST tidak boleh membuat dokumen langsung berstatus hasil rekonsiliasi.
+                // PUT boleh mengirim ulang status tersimpan atau mentransisikan confirmed -> reconciled.
+                $this->usesSometimes()
+                    ? 'in:draft,confirmed,reconciled,cancelled,void'
+                    : 'in:draft,confirmed,cancelled,void',
             ]),
             ...$this->totalAmountRules(),
 

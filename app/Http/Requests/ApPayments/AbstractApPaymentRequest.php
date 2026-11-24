@@ -33,8 +33,11 @@ abstract class AbstractApPaymentRequest extends AuthorizedFormRequest
             'status' => $this->withSometimes([
                 'required',
                 'string',
-                // reconciled hanya dicapai lewat rekonsiliasi, tidak boleh di-set langsung.
-                'in:draft,pending_approval,confirmed,cancelled,void',
+                // POST tidak boleh membuat pembayaran langsung berstatus hasil rekonsiliasi.
+                // PUT boleh mengirim ulang status tersimpan atau mentransisikan confirmed -> reconciled.
+                $this->usesSometimes()
+                    ? 'in:draft,pending_approval,confirmed,reconciled,cancelled,void'
+                    : 'in:draft,pending_approval,confirmed,cancelled,void',
             ]),
 
             'allocations' => $this->itemsRules(),
