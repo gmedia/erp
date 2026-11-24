@@ -1,6 +1,6 @@
 'use client';
 
-import { type FieldValues, type Path } from 'react-hook-form';
+import { type FieldValues, type Path, useFormContext } from 'react-hook-form';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { useTranslation } from '@/contexts/i18n-context';
@@ -34,7 +34,8 @@ interface ItemSourceLineSelectFieldProps<TFormValues extends FieldValues> {
     readonly emptyHint: string;
     readonly initialId?: string;
     readonly initialLabel?: string;
-    readonly onLineSelect: (line: SourceLineOption) => void;
+    /** Field penampung label baris terpilih. */
+    readonly labelName: Path<TFormValues>;
 }
 
 export function ItemSourceLineSelectField<TFormValues extends FieldValues>({
@@ -46,9 +47,26 @@ export function ItemSourceLineSelectField<TFormValues extends FieldValues>({
     initialId,
     initialLabel,
     open,
-    onLineSelect,
+    labelName,
 }: Readonly<ItemSourceLineSelectFieldProps<TFormValues>>) {
     const { t } = useTranslation();
+    const { setValue } = useFormContext();
+
+    // Baris sumber menentukan produk, unit, dan harga item.
+    const applyLine = (line: SourceLineOption) => {
+        const values: Record<string, string | number> = {
+            [labelName]: formatSourceLineLabel(line, t),
+            product_id: String(line.product_id ?? ''),
+            product_label: line.product_name ?? '',
+            unit_id: String(line.unit_id ?? ''),
+            unit_label: line.unit_name ?? '',
+            unit_price: Number(line.unit_price ?? 0),
+        };
+
+        for (const [field, value] of Object.entries(values)) {
+            setValue(field, value, { shouldDirty: true });
+        }
+    };
 
     if (!url) {
         return <p className="text-sm text-muted-foreground">{emptyHint}</p>;
@@ -64,7 +82,7 @@ export function ItemSourceLineSelectField<TFormValues extends FieldValues>({
             initialLabel={initialLabel}
             labelFn={(line) => formatSourceLineLabel(line, t)}
             valueFn={(line) => String(line.id)}
-            onItemSelect={onLineSelect}
+            onItemSelect={applyLine}
         />
     );
 }

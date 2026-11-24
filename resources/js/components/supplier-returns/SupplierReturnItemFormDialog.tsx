@@ -11,10 +11,7 @@ import {
     ItemNotesField,
     ItemProductUnitFields,
 } from '@/components/common/ItemFormDialog';
-import {
-    formatSourceLineLabel,
-    ItemSourceLineSelectField,
-} from '@/components/common/ItemSourceLineSelectField';
+import { ItemSourceLineSelectField } from '@/components/common/ItemSourceLineSelectField';
 import { useTranslation } from '@/contexts/i18n-context';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type SupplierReturnFormData } from '@/types/supplier-return';
@@ -157,40 +154,7 @@ export function SupplierReturnItemFormDialog({
                     emptyHint={t('supplierReturn.item.gr_item_empty_hint')}
                     initialId={defaultValues.goods_receipt_item_id}
                     initialLabel={defaultValues.goods_receipt_item_label}
-                    onLineSelect={(line) => {
-                        form.setValue(
-                            'goods_receipt_item_label',
-                            formatSourceLineLabel(line, t),
-                            { shouldDirty: true },
-                        );
-                        form.setValue(
-                            'product_id',
-                            String(line.product_id ?? ''),
-                            {
-                                shouldDirty: true,
-                            },
-                        );
-                        form.setValue(
-                            'product_label',
-                            line.product_name ?? '',
-                            {
-                                shouldDirty: true,
-                            },
-                        );
-                        form.setValue('unit_id', String(line.unit_id ?? ''), {
-                            shouldDirty: true,
-                        });
-                        form.setValue('unit_label', line.unit_name ?? '', {
-                            shouldDirty: true,
-                        });
-                        form.setValue(
-                            'unit_price',
-                            Number(line.unit_price ?? 0),
-                            {
-                                shouldDirty: true,
-                            },
-                        );
-                    }}
+                    labelName="goods_receipt_item_label"
                 />
                 <ItemProductUnitFields
                     form={form}
