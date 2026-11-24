@@ -42,6 +42,7 @@ class IndexAssetsAction
                 'employee_id',
                 'supplier_id',
                 'status',
+                'exclude_status',
                 'condition',
             ],
             [],
