@@ -34,6 +34,7 @@ import {
 } from '@/components/ui/tooltip';
 import { UserForm } from '@/components/users/UserForm';
 import { useTranslation } from '@/contexts/i18n-context';
+import { usePermissions } from '@/hooks/usePermissions';
 import { useEmployeeUser } from '@/hooks/users/useEmployeeUser';
 import axiosInstance from '@/lib/axios';
 import type { BreadcrumbItem } from '@/types';
@@ -185,6 +186,8 @@ type UsersManager = ReturnType<typeof useUsersManager>;
 
 export default function UsersIndex() {
     const manager = useUsersManager();
+    const { can } = usePermissions();
+    const canEdit = can('user.edit');
 
     return (
         <StandaloneTablePage
@@ -192,9 +195,11 @@ export default function UsersIndex() {
             breadcrumbs={breadcrumbs}
             heading="Users"
             description={<UsersDescription />}
-            actions={<UsersAddButton onAdd={manager.openCreate} />}
+            actions={
+                canEdit ? <UsersAddButton onAdd={manager.openCreate} /> : null
+            }
         >
-            <UsersBody manager={manager} />
+            <UsersBody manager={manager} canEdit={canEdit} />
         </StandaloneTablePage>
     );
 }
@@ -218,7 +223,10 @@ function UsersAddButton({ onAdd }: Readonly<{ onAdd: () => void }>) {
     );
 }
 
-function UsersBody({ manager }: Readonly<{ manager: UsersManager }>) {
+function UsersBody({
+    manager,
+    canEdit,
+}: Readonly<{ manager: UsersManager; canEdit: boolean }>) {
     const { t } = useTranslation();
     const {
         form,
@@ -293,29 +301,31 @@ function UsersBody({ manager }: Readonly<{ manager: UsersManager }>) {
                     </Badge>
                 </TableCell>
                 <TableCell className="bg-background text-right md:sticky md:right-0 md:z-20">
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                {/* Wrapper span: tombol disabled tidak memicu hover tooltip. */}
-                                <span className="inline-flex">
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        disabled={!row.employee}
-                                        onClick={() => openEdit(row)}
-                                        aria-label={t('users.edit_user')}
-                                    >
-                                        <Pencil className="h-4 w-4" />
-                                    </Button>
-                                </span>
-                            </TooltipTrigger>
-                            {!row.employee && (
-                                <TooltipContent>
-                                    {t('users.edit_requires_employee')}
-                                </TooltipContent>
-                            )}
-                        </Tooltip>
-                    </TooltipProvider>
+                    {canEdit && (
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    {/* Wrapper span: tombol disabled tidak memicu hover tooltip. */}
+                                    <span className="inline-flex">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            disabled={!row.employee}
+                                            onClick={() => openEdit(row)}
+                                            aria-label={t('users.edit_user')}
+                                        >
+                                            <Pencil className="h-4 w-4" />
+                                        </Button>
+                                    </span>
+                                </TooltipTrigger>
+                                {!row.employee && (
+                                    <TooltipContent>
+                                        {t('users.edit_requires_employee')}
+                                    </TooltipContent>
+                                )}
+                            </Tooltip>
+                        </TooltipProvider>
+                    )}
                 </TableCell>
             </TableRow>
         ));
@@ -391,6 +401,7 @@ function UsersBody({ manager }: Readonly<{ manager: UsersManager }>) {
                                 userExists={userExists}
                                 errors={errors}
                                 onSave={() => void handleSave()}
+                                canEdit={canEdit}
                             />
                         )}
                     </FormProvider>
