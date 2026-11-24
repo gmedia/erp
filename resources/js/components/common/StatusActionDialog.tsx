@@ -11,41 +11,44 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useTranslation } from '@/contexts/i18n-context';
-import { type BudgetAction } from '@/hooks/useBudgetAction';
-import { type Budget } from '@/types/budget';
 
-interface BudgetActionDialogProps {
-    action: BudgetAction | null;
-    item: Budget | null;
-    processing: boolean;
-    onConfirm: () => void;
-    onOpenChange: (open: boolean) => void;
+export interface StatusActionConfig<A extends string> {
+    action: A;
+    label: string;
+    title: string;
+    description: string;
+    confirmLabel: string;
 }
 
-export function BudgetActionDialog({
-    action,
-    item,
+interface StatusActionDialogProps<A extends string> {
+    config: StatusActionConfig<A> | undefined;
+    processing: boolean;
+    processingLabel: string;
+    onConfirm: () => void;
+    onCancel: () => void;
+}
+
+export function StatusActionDialog<A extends string>({
+    config,
     processing,
+    processingLabel,
     onConfirm,
-    onOpenChange,
-}: Readonly<BudgetActionDialogProps>) {
+    onCancel,
+}: Readonly<StatusActionDialogProps<A>>) {
     const { t } = useTranslation();
-    const name = item?.name ?? '';
-    const isApprove = action === 'approve';
 
     return (
-        <AlertDialog open={action !== null} onOpenChange={onOpenChange}>
+        <AlertDialog
+            open={config !== undefined}
+            onOpenChange={(next) => {
+                if (!next && !processing) onCancel();
+            }}
+        >
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>
-                        {isApprove
-                            ? t('budgets.approveTitle')
-                            : t('budgets.lockTitle')}
-                    </AlertDialogTitle>
+                    <AlertDialogTitle>{config?.title}</AlertDialogTitle>
                     <AlertDialogDescription>
-                        {isApprove
-                            ? t('budgets.approveDescription', { name })
-                            : t('budgets.lockDescription', { name })}
+                        {config?.description}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -59,11 +62,7 @@ export function BudgetActionDialog({
                         }}
                         disabled={processing}
                     >
-                        {processing
-                            ? t('budgets.processing')
-                            : isApprove
-                              ? t('budgets.confirmApprove')
-                              : t('budgets.confirmLock')}
+                        {processing ? processingLabel : config?.confirmLabel}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
