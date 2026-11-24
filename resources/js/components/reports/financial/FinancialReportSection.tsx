@@ -48,13 +48,18 @@ export const financialPositionSectionConfigs: readonly FinancialReportSectionCon
         { title: 'Equity', metric: 'equity' },
     ];
 
-export const getChangeTextClass = (value: number): string => {
+export const getChangeTextClass = (
+    value: number,
+    metric: FinancialReportMetric = 'assets',
+): string => {
     if (value < 0) {
         return 'text-destructive-foreground';
     }
 
     if (value > 0) {
-        return 'text-success';
+        return metric === 'liabilities' || metric === 'equity'
+            ? 'text-foreground'
+            : 'text-success';
     }
 
     return 'text-muted-foreground';
@@ -106,15 +111,17 @@ function AccountRow({
     node,
     isExpanded = true,
     showComparison = false,
+    metric = 'assets',
 }: Readonly<{
     node: ReportAccountNode;
     isExpanded?: boolean;
     showComparison?: boolean;
+    metric?: FinancialReportMetric;
 }>) {
     const [expanded, setExpanded] = useState(isExpanded);
     const hasChildren = node.children && node.children.length > 0;
     const changeValue = node.change || 0;
-    const changeTextClass = getChangeTextClass(changeValue);
+    const changeTextClass = getChangeTextClass(changeValue, metric);
     const expandIcon = expanded ? (
         <ChevronDown className="h-4 w-4 text-muted-foreground" />
     ) : (
@@ -190,6 +197,7 @@ function AccountRow({
                             key={child.id}
                             node={child}
                             showComparison={showComparison}
+                            metric={metric}
                         />
                     ))}
                 </div>
@@ -206,6 +214,7 @@ export function FinancialReportSection({
     change,
     changePercentage,
     showComparison,
+    metric = 'assets',
 }: Readonly<{
     title: string;
     nodes: ReportAccountNode[];
@@ -214,11 +223,12 @@ export function FinancialReportSection({
     change?: number;
     changePercentage?: number;
     showComparison?: boolean;
+    metric?: FinancialReportMetric;
 }>) {
     const [expandAll, setExpandAll] = useState(true);
     const [expandKey, setExpandKey] = useState(0);
     const changeValue = change || 0;
-    const changeTextClass = getChangeTextClass(changeValue);
+    const changeTextClass = getChangeTextClass(changeValue, metric);
 
     const setExpanded = (value: Readonly<boolean>) => {
         setExpandAll(value);
@@ -253,7 +263,7 @@ export function FinancialReportSection({
                     <div className="flex w-full flex-wrap justify-between gap-2 text-right whitespace-nowrap tabular-nums sm:w-auto sm:flex-nowrap sm:justify-end sm:gap-4">
                         <span
                             className={cn(
-                                'text-lg font-bold sm:w-48',
+                                'w-36 text-lg font-bold',
                                 getSignedAmountTextClass(total),
                             )}
                         >
@@ -263,7 +273,7 @@ export function FinancialReportSection({
                             <>
                                 <span
                                     className={cn(
-                                        'text-lg font-bold text-muted-foreground sm:w-48',
+                                        'w-36 text-lg font-bold text-muted-foreground',
                                         getSignedAmountTextClass(
                                             comparisonTotal || 0,
                                         ),
@@ -273,7 +283,7 @@ export function FinancialReportSection({
                                 </span>
                                 <span
                                     className={cn(
-                                        'text-lg font-bold sm:w-40',
+                                        'w-28 text-lg font-bold',
                                         changeTextClass,
                                     )}
                                 >
@@ -281,7 +291,7 @@ export function FinancialReportSection({
                                 </span>
                                 <span
                                     className={cn(
-                                        'text-lg font-bold sm:w-24',
+                                        'w-16 text-lg font-bold',
                                         getChangePercentageTextClass(
                                             changePercentage,
                                             comparisonTotal,
@@ -332,6 +342,7 @@ export function FinancialReportSection({
                                     node={node}
                                     isExpanded={expandAll}
                                     showComparison={showComparison}
+                                    metric={metric}
                                 />
                             ))}
                         </div>
@@ -364,6 +375,7 @@ export function ComparisonFinancialReportSection({
             change={totals[`change_${metric}`]}
             changePercentage={totals[`change_percentage_${metric}`]}
             showComparison={showComparison}
+            metric={metric}
         />
     );
 }

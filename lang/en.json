@@ -248,7 +248,7 @@
         "pageDescriptions": {
             "balance-sheet": "Financial position at a point in time: assets, liabilities, and equity.",
             "cash-flow": "Cash movements grouped into operating, investing, and financing activities.",
-            "comparative": "Compare revenue, expense, and net income across fiscal years.",
+            "comparative": "Compare assets, liabilities, equity, revenue, and expenses across fiscal years.",
             "income-statement": "Revenue and expenses over a period to show net income.",
             "trial-balance": "Debit and credit totals of every account to check that the books balance.",
             "trial-balance-detailed": "Trial balance with opening, movement, and closing balance per account.",

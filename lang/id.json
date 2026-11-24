@@ -248,7 +248,7 @@
         "pageDescriptions": {
             "balance-sheet": "Posisi keuangan pada suatu tanggal: aset, liabilitas, dan ekuitas.",
             "cash-flow": "Pergerakan kas dikelompokkan menjadi aktivitas operasi, investasi, dan pendanaan.",
-            "comparative": "Bandingkan pendapatan, beban, dan laba bersih antar tahun fiskal.",
+            "comparative": "Bandingkan aset, liabilitas, ekuitas, pendapatan, dan beban antar tahun fiskal.",
             "income-statement": "Pendapatan dan beban dalam satu periode untuk menunjukkan laba bersih.",
             "trial-balance": "Total debit dan kredit setiap akun untuk memastikan pembukuan seimbang.",
             "trial-balance-detailed": "Neraca uji dengan saldo awal, mutasi, dan saldo akhir per akun.",
