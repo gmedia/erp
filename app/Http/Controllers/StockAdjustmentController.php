@@ -20,8 +20,6 @@ use App\Services\StockPostingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\ValidationException;
 
 class StockAdjustmentController extends Controller
 {
@@ -53,8 +51,9 @@ class StockAdjustmentController extends Controller
             $data['approved_at'] = now()->toIso8601String();
         }
 
-        // Issue #367: penyesuaian yang dibuat langsung approved harus memposting jurnal
-        // dalam transaksi yang sama. Movement stok diposting setelah commit (W5-19).
+        // Issue #416: jurnal dan movement stok diposting dalam transaksi yang sama.
+        // Jika jurnal gagal (COA/periode), ValidationException membatalkan seluruh
+        // transaksi: dokumen tidak tersimpan dan stok tidak berubah (422).
         $adjustment = $this->storeWithSyncedItems(
             attributes: $data,
             items: $items,
@@ -66,24 +65,12 @@ class StockAdjustmentController extends Controller
                 $syncItems->execute($adjustment, $items);
             },
             afterCommit: $isApprovedOnCreate
-                ? function (StockAdjustment $adjustment) use ($postJournal): void {
-                    try {
-                        $postJournal->execute($adjustment->refresh());
-                    } catch (ValidationException $e) {
-                        // Sama dengan jalur update: validasi (mis. COA belum lengkap) tidak
-                        // membatalkan penyesuaian; jurnal bisa diposting ulang nanti.
-                        Log::warning('Stock adjustment journal posting skipped', [
-                            'stock_adjustment_id' => $adjustment->id,
-                            'reason' => $e->getMessage(),
-                        ]);
-                    }
+                ? function (StockAdjustment $adjustment) use ($postJournal, $postMovements): void {
+                    $postJournal->execute($adjustment->refresh());
+                    $postMovements->execute($adjustment->refresh());
                 }
             : null,
         );
-
-        if ($isApprovedOnCreate) {
-            $postMovements->execute($adjustment->refresh());
-        }
 
         $adjustment->load(['warehouse', 'inventoryStocktake', 'items.product', 'items.unit']);
 
@@ -136,28 +123,13 @@ class StockAdjustmentController extends Controller
                 $syncItems->execute($stockAdjustment, $items);
             },
             afterCommit: $isNewlyApproved
-                ? function (StockAdjustment $stockAdjustment) use ($postJournal): void {
-                    try {
-                        $postJournal->execute($stockAdjustment->refresh());
-                    } catch (ValidationException $e) {
-                        // Validation failures (e.g. missing COA mapping) are intentionally
-                        // swallowed so the stock adjustment itself stays approved; user can
-                        // post the journal later. Non-validation errors propagate and
-                        // roll back the entire transaction (status flip included).
-                        Log::warning('Stock adjustment journal posting skipped', [
-                            'stock_adjustment_id' => $stockAdjustment->id,
-                            'reason' => $e->getMessage(),
-                        ]);
-                    }
+                // Issue #416: jurnal gagal (COA/periode) membatalkan seluruh transaksi.
+                ? function (StockAdjustment $stockAdjustment) use ($postJournal, $postMovements): void {
+                    $postJournal->execute($stockAdjustment->refresh());
+                    $postMovements->execute($stockAdjustment->refresh());
                 }
             : null,
         );
-
-        if ($isNewlyApproved) {
-            // Setelah transaksi commit: movement tidak boleh ikut rollback bila
-            // posting jurnal gagal (W5-19).
-            $postMovements->execute($stockAdjustment->refresh());
-        }
 
         $stockAdjustment->load(['warehouse', 'inventoryStocktake', 'journalEntry', 'items.product', 'items.unit']);
 
