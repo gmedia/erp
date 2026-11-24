@@ -315,6 +315,7 @@ test('StockAdjustmentController update does not double-post on subsequent saves'
         'status' => 'pending_approval',
         'adjustment_number' => 'SA-2026-000005',
         'adjustment_date' => '2026-03-15',
+        'adjustment_type' => 'damage',
         'journal_entry_id' => null,
         'inventory_stocktake_id' => null,
         'approved_by' => null,
