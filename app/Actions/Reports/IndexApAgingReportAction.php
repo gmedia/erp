@@ -9,6 +9,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Carbon;
 
 class IndexApAgingReportAction
 {
@@ -43,12 +44,15 @@ class IndexApAgingReportAction
             'days_31_60',
             'days_61_90',
             'days_over_90',
-        ]);
+        ], $request->filled('as_of_date') ? $request->string('as_of_date')->toString() : null);
     }
 
     private function buildFilteredQuery(FormRequest $request): Builder
     {
-        $boundaries = $this->agingBoundaries();
+        $asOfDate = $request->filled('as_of_date')
+            ? Carbon::parse($request->string('as_of_date')->toString())->toDateString()
+            : Carbon::today()->toDateString();
+        $boundaries = $this->agingBoundaries($asOfDate);
 
         $query = $this->buildBaseSupplierBillQuery(
             extraSelectColumns: [
@@ -72,6 +76,7 @@ class IndexApAgingReportAction
 
         $this->applySupplierBillFilters($request, $query);
         $this->applyDateRangeFilter($request, $query, 'sb.bill_date', 'start_date', 'end_date');
+        $query->whereDate('sb.bill_date', '<=', $asOfDate);
 
         return $query;
     }

@@ -19,9 +19,11 @@ trait AgingReportBoundaries
     /**
      * @return array{today: string, d1: string, d30: string, d31: string, d60: string, d61: string, d90: string}
      */
-    protected function agingBoundaries(): array
+    protected function agingBoundaries(?string $asOfDate = null): array
     {
-        $today = Carbon::today();
+        $today = $asOfDate !== null && $asOfDate !== ''
+            ? Carbon::parse($asOfDate)->startOfDay()
+            : Carbon::today();
 
         return [
             'today' => $today->toDateString(),
@@ -38,7 +40,7 @@ trait AgingReportBoundaries
      * Default AR-style aliases: aging_current, aging_1_30, aging_31_60, aging_61_90, aging_over_90.
      * Pair with {@see agingBucketBindings()} when calling selectRaw().
      */
-    protected function agingBucketSelectSql(string $tableAlias): string
+    protected function agingBucketSelectSql(string $tableAlias, ?string $dueSql = null): string
     {
         return $this->agingBucketSelectSqlWithAliases($tableAlias, [
             'current' => 'aging_current',
@@ -46,7 +48,7 @@ trait AgingReportBoundaries
             '31_60' => 'aging_31_60',
             '61_90' => 'aging_61_90',
             'over_90' => 'aging_over_90',
-        ]);
+        ], $dueSql);
     }
 
     /**
@@ -57,24 +59,28 @@ trait AgingReportBoundaries
      *
      * @param  array{current: string, '1_30': string, '31_60': string, '61_90': string, over_90: string}  $aliases
      */
-    protected function agingBucketSelectSqlWithAliases(string $tableAlias, array $aliases): string
-    {
+    protected function agingBucketSelectSqlWithAliases(
+        string $tableAlias,
+        array $aliases,
+        ?string $dueSql = null,
+    ): string {
         $aCurrent = $aliases['current'];
         $a1_30 = $aliases['1_30'];
         $a31_60 = $aliases['31_60'];
         $a61_90 = $aliases['61_90'];
         $aOver90 = $aliases['over_90'];
+        $due = $dueSql ?? "{$tableAlias}.amount_due";
 
         return "CASE WHEN {$tableAlias}.due_date >= ?"
-            . " THEN {$tableAlias}.amount_due ELSE 0 END as {$aCurrent},"
+            . " THEN {$due} ELSE 0 END as {$aCurrent},"
             . " CASE WHEN {$tableAlias}.due_date BETWEEN ? AND ?"
-            . " THEN {$tableAlias}.amount_due ELSE 0 END as {$a1_30},"
+            . " THEN {$due} ELSE 0 END as {$a1_30},"
             . " CASE WHEN {$tableAlias}.due_date BETWEEN ? AND ?"
-            . " THEN {$tableAlias}.amount_due ELSE 0 END as {$a31_60},"
+            . " THEN {$due} ELSE 0 END as {$a31_60},"
             . " CASE WHEN {$tableAlias}.due_date BETWEEN ? AND ?"
-            . " THEN {$tableAlias}.amount_due ELSE 0 END as {$a61_90},"
+            . " THEN {$due} ELSE 0 END as {$a61_90},"
             . " CASE WHEN {$tableAlias}.due_date < ?"
-            . " THEN {$tableAlias}.amount_due ELSE 0 END as {$aOver90}";
+            . " THEN {$due} ELSE 0 END as {$aOver90}";
     }
 
     /**
