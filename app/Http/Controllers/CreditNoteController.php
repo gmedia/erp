@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\AccountingPosting\ReverseDocumentJournalAction;
 use App\Actions\CreditNotes\ApplyCreditNoteAction;
 use App\Actions\CreditNotes\ExportCreditNotesAction;
 use App\Actions\CreditNotes\IndexCreditNotesAction;
 use App\Actions\CreditNotes\SyncCreditNoteItemsAction;
 use App\DTOs\CreditNotes\UpdateCreditNoteData;
+use App\Http\Controllers\Concerns\CancelsPostedDocuments;
 use App\Http\Controllers\Concerns\DeletesOnlyDraftDocuments;
 use App\Http\Controllers\Concerns\LoadsResourceRelations;
 use App\Http\Controllers\Concerns\StoresItemsInTransaction;
@@ -17,12 +19,15 @@ use App\Http\Requests\CreditNotes\UpdateCreditNoteRequest;
 use App\Http\Resources\CreditNotes\CreditNoteCollection;
 use App\Http\Resources\CreditNotes\CreditNoteResource;
 use App\Models\CreditNote;
+use App\Models\CustomerInvoice;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use InvalidArgumentException;
 
 class CreditNoteController extends Controller
 {
+    use CancelsPostedDocuments;
     use DeletesOnlyDraftDocuments;
     use LoadsResourceRelations;
     use StoresItemsInTransaction;
@@ -85,11 +90,48 @@ class CreditNoteController extends Controller
         UpdateCreditNoteRequest $request,
         CreditNote $creditNote,
         SyncCreditNoteItemsAction $syncItems,
-        ApplyCreditNoteAction $applyAction
+        ApplyCreditNoteAction $applyAction,
+        ReverseDocumentJournalAction $reverseJournal,
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
         unset($validated['items']);
+
+        $isPostedCancel = in_array($validated['status'] ?? null, ['cancelled', 'void'], true)
+            && $creditNote->journal_entry_id !== null;
+
+        if ($isPostedCancel) {
+            $this->cancelPostedDocument(
+                document: $creditNote,
+                attributes: $validated,
+                blockers: [],
+                reference: $creditNote->credit_note_number,
+                label: 'Credit Note',
+                reverseJournal: $reverseJournal,
+                release: static function (Model $document): void {
+                    /** @var CreditNote $document */
+                    /** @var CustomerInvoice|null $invoice */
+                    $invoice = $document->customerInvoice()->first();
+                    if ($invoice === null) {
+                        return;
+                    }
+
+                    $creditNoteAmount = max(
+                        0,
+                        (float) $invoice->credit_note_amount - (float) $document->grand_total,
+                    );
+                    $invoice->update([
+                        'credit_note_amount' => (string) $creditNoteAmount,
+                        'amount_due' => (string) (
+                            (float) $invoice->grand_total - (float) $invoice->amount_received - $creditNoteAmount
+                        ),
+                    ]);
+                    $invoice->updatePaymentStatus();
+                },
+            );
+
+            return (new CreditNoteResource($this->loadResourceRelations($creditNote)))->response();
+        }
 
         $shouldApply = ($validated['status'] ?? null) === 'applied'
             && $creditNote->status !== 'applied';

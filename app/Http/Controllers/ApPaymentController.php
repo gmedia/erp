@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Actions\AccountingPosting\PostApPaymentJournalAction;
+use App\Actions\AccountingPosting\ReverseDocumentJournalAction;
 use App\Actions\ApPayments\ExportApPaymentsAction;
 use App\Actions\ApPayments\IndexApPaymentsAction;
 use App\Actions\ApPayments\SyncApPaymentAllocationsAction;
 use App\DTOs\ApPayments\UpdateApPaymentData;
+use App\Http\Controllers\Concerns\CancelsPostedDocuments;
 use App\Http\Controllers\Concerns\DeletesOnlyDraftDocuments;
 use App\Http\Controllers\Concerns\LoadsResourceRelations;
 use App\Http\Controllers\Concerns\StoresItemsInTransaction;
@@ -17,12 +19,14 @@ use App\Http\Requests\ApPayments\UpdateApPaymentRequest;
 use App\Http\Resources\ApPayments\ApPaymentCollection;
 use App\Http\Resources\ApPayments\ApPaymentResource;
 use App\Models\ApPayment;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ApPaymentController extends Controller
 {
+    use CancelsPostedDocuments;
     use DeletesOnlyDraftDocuments;
     use LoadsResourceRelations;
     use StoresItemsInTransaction;
@@ -83,11 +87,35 @@ class ApPaymentController extends Controller
         UpdateApPaymentRequest $request,
         ApPayment $apPayment,
         SyncApPaymentAllocationsAction $syncAllocations,
-        PostApPaymentJournalAction $postJournal
+        PostApPaymentJournalAction $postJournal,
+        ReverseDocumentJournalAction $reverseJournal,
     ): JsonResponse {
         $validated = $request->validated();
         $allocations = $validated['allocations'] ?? null;
         unset($validated['allocations']);
+
+        $isPostedCancel = in_array($validated['status'] ?? null, ['cancelled', 'void'], true)
+            && $apPayment->journal_entry_id !== null;
+
+        if ($isPostedCancel) {
+            $this->cancelPostedDocument(
+                document: $apPayment,
+                attributes: $validated,
+                blockers: [],
+                reference: $apPayment->payment_number,
+                label: 'Payment',
+                reverseJournal: $reverseJournal,
+                release: static function (Model $document) use ($syncAllocations): void {
+                    /** @var ApPayment $payment */
+                    $payment = $document;
+                    $billIds = $payment->allocations()->pluck('supplier_bill_id');
+                    $payment->allocations()->delete();
+                    $syncAllocations->refreshBills($billIds);
+                },
+            );
+
+            return (new ApPaymentResource($this->loadResourceRelations($apPayment)))->response();
+        }
 
         $isNewlyConfirmed = ($validated['status'] ?? null) === 'confirmed' && $apPayment->confirmed_at === null;
 

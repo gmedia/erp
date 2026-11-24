@@ -20,6 +20,7 @@ trait CancelsPostedDocuments
     /**
      * @param  array<string, mixed>  $attributes  Atribut PUT yang sudah divalidasi (mis. status, notes)
      * @param  array<int, array{0: Closure, 1: string}>  $blockers  [kondisi masih aktif, pesan 422]
+     * @param  (Closure(Model): void)|null  $release  Lepas alokasi & hitung ulang sisa (transaksi sama)
      */
     protected function cancelPostedDocument(
         Model $document,
@@ -28,8 +29,17 @@ trait CancelsPostedDocuments
         string $reference,
         string $label,
         ReverseDocumentJournalAction $reverseJournal,
+        ?Closure $release = null,
     ): void {
-        DB::transaction(function () use ($document, $attributes, $blockers, $reference, $label, $reverseJournal): void {
+        DB::transaction(function () use (
+            $document,
+            $attributes,
+            $blockers,
+            $reference,
+            $label,
+            $reverseJournal,
+            $release,
+        ): void {
             $locked = $document::query()->whereKey($document->getKey())->lockForUpdate()->firstOrFail();
 
             if (in_array($locked->getAttribute('status'), ['cancelled', 'void'], true)) {
@@ -45,6 +55,10 @@ trait CancelsPostedDocuments
             }
 
             $locked->update($attributes);
+
+            if ($release !== null) {
+                $release($locked);
+            }
 
             $reverseJournal->execute($locked, $reference, $label);
 

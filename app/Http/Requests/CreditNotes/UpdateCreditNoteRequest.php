@@ -23,8 +23,9 @@ class UpdateCreditNoteRequest extends AbstractCreditNoteRequest
         return [
             'confirmed' => ['draft'],
             'applied' => ['confirmed'],
-            'cancelled' => ['draft', 'confirmed'],
-            'void' => ['draft', 'confirmed'],
+            // applied sudah posting (jurnal + sisa invoice); batal lewat jurnal pembalik (#375).
+            'cancelled' => ['draft', 'confirmed', 'applied'],
+            'void' => ['draft', 'confirmed', 'applied'],
         ];
     }
 

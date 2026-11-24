@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Actions\AccountingPosting\PostArReceiptJournalAction;
+use App\Actions\AccountingPosting\ReverseDocumentJournalAction;
 use App\Actions\ArReceipts\ExportArReceiptsAction;
 use App\Actions\ArReceipts\IndexArReceiptsAction;
 use App\Actions\ArReceipts\SyncArReceiptAllocationsAction;
 use App\DTOs\ArReceipts\UpdateArReceiptData;
+use App\Http\Controllers\Concerns\CancelsPostedDocuments;
 use App\Http\Controllers\Concerns\DeletesOnlyDraftDocuments;
 use App\Http\Controllers\Concerns\LoadsResourceRelations;
 use App\Http\Controllers\Concerns\StoresItemsInTransaction;
@@ -18,12 +20,14 @@ use App\Http\Resources\ArReceipts\ArReceiptCollection;
 use App\Http\Resources\ArReceipts\ArReceiptResource;
 use App\Models\ArReceipt;
 use App\Models\ArReceiptAllocation;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ArReceiptController extends Controller
 {
+    use CancelsPostedDocuments;
     use DeletesOnlyDraftDocuments;
     use LoadsResourceRelations;
     use StoresItemsInTransaction;
@@ -84,11 +88,35 @@ class ArReceiptController extends Controller
         UpdateArReceiptRequest $request,
         ArReceipt $arReceipt,
         SyncArReceiptAllocationsAction $syncAllocations,
-        PostArReceiptJournalAction $postJournal
+        PostArReceiptJournalAction $postJournal,
+        ReverseDocumentJournalAction $reverseJournal,
     ): JsonResponse {
         $validated = $request->validated();
         $allocations = $validated['allocations'] ?? null;
         unset($validated['allocations']);
+
+        $isPostedCancel = in_array($validated['status'] ?? null, ['cancelled', 'void'], true)
+            && $arReceipt->journal_entry_id !== null;
+
+        if ($isPostedCancel) {
+            $this->cancelPostedDocument(
+                document: $arReceipt,
+                attributes: $validated,
+                blockers: [],
+                reference: $arReceipt->receipt_number,
+                label: 'Receipt',
+                reverseJournal: $reverseJournal,
+                release: static function (Model $document) use ($syncAllocations): void {
+                    /** @var ArReceipt $receipt */
+                    $receipt = $document;
+                    $invoiceIds = $receipt->allocations()->pluck('customer_invoice_id');
+                    $receipt->allocations()->delete();
+                    $syncAllocations->refreshInvoices($invoiceIds);
+                },
+            );
+
+            return (new ArReceiptResource($this->loadResourceRelations($arReceipt)))->response();
+        }
 
         $isNewlyConfirmed = ($validated['status'] ?? null) === 'confirmed' && $arReceipt->confirmed_at === null;
 
