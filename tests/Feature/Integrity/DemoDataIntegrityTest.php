@@ -650,10 +650,9 @@ invariant('W7-15 employee demo departments are not concentrated in HR', function
 // W7-15 (HR) — jabatan hanya berisi jabatan, tidak mencampur grade (Junior/Mid-level/Senior).
 invariant('W7-15 positions do not mix grade levels with job titles', function () {
     $names = DB::table('positions')->pluck('name')->all();
+    $grades = array_values(array_intersect($names, ['Junior', 'Mid-level', 'Senior']));
 
-    foreach (['Junior', 'Mid-level', 'Senior'] as $grade) {
-        expect($names)->not->toContain($grade, "Position list must not contain grade {$grade}");
-    }
+    expect($grades)->toBeEmpty('Position list must not contain grade levels: ' . implode(', ', $grades));
 });
 
 // Every posted document must reference a posted, balanced journal (issue #357 scope 4).
