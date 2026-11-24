@@ -465,6 +465,43 @@ describe('Issue #372 — langkah 2: jalur HTTP edit dan batal memakai tanggal ya
     });
 });
 
+describe('Issue #372 — langkah 2: batal transfer di periode tertutup', function () {
+    test('batal stock transfer dispatched saat tahun fiskal hari batal tertutup ditolak 422 tanpa pembalik', function () {
+        $product = Product::factory()->create();
+        $from = Warehouse::factory()->create();
+        $to = Warehouse::factory()->create();
+
+        issue372GoodsReceipt($from, $product, 4, now()->subDays(20));
+
+        $transfer = StockTransfer::factory()->create([
+            'from_warehouse_id' => $from->id,
+            'to_warehouse_id' => $to->id,
+            'transfer_date' => now()->subDays(10)->toDateString(),
+            'status' => 'in_transit',
+        ]);
+        StockTransferItem::factory()->create([
+            'stock_transfer_id' => $transfer->id,
+            'product_id' => $product->id,
+            'quantity' => 3,
+        ]);
+        app(StockPostingService::class)->postStockTransferDispatch($transfer->refresh());
+
+        closeFiscalYearContaining(now());
+
+        $thrown = null;
+
+        try {
+            app(StockPostingService::class)->reverseTransfer($transfer->refresh());
+        } catch (ValidationException $e) {
+            $thrown = $e;
+        }
+
+        expect($thrown)->toBeInstanceOf(ValidationException::class);
+        expect($thrown?->status)->toBe(422);
+        expect(StockMovement::query()->where('movement_type', 'transfer_out_reversal')->count())->toBe(0);
+    });
+});
+
 describe('Issue #372 — dua gudang tidak saling memengaruhi saldo', function () {
     test('edit GR gudang A tidak mengubah saldo gudang B', function () {
         $product = Product::factory()->create();

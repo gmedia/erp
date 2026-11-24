@@ -381,6 +381,9 @@ class StockPostingService
      */
     public function reverseTransfer(StockTransfer $stockTransfer): void
     {
+        // Issue #372: batal memakai tanggal pembatalan (hari ini); periode tertutup 422.
+        $this->assertFiscalYearOpen(now());
+
         $this->reverseMovementsOfType(StockTransfer::class, $stockTransfer->id, 'transfer_out', 'transfer_out_reversal');
         $this->reverseMovementsOfType(StockTransfer::class, $stockTransfer->id, 'transfer_in', 'transfer_in_reversal');
     }
