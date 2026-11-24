@@ -105,6 +105,20 @@
         "reopened": "Period reopened.",
         "failed": "Failed to update the period. Please try again."
     },
+    "budgets": {
+        "approve": "Approve Budget",
+        "lock": "Lock Budget",
+        "approveTitle": "Approve this budget?",
+        "approveDescription": "Budget {name} will be approved. Its status becomes Approved and the approval is recorded with your name and time.",
+        "lockTitle": "Lock this budget?",
+        "lockDescription": "Budget {name} will be locked. A locked budget can no longer be changed.",
+        "confirmApprove": "Yes, approve",
+        "confirmLock": "Yes, lock",
+        "processing": "Processing...",
+        "approved": "Budget approved.",
+        "locked": "Budget locked.",
+        "actionFailed": "Failed to update the budget. Please try again."
+    },
     "accounts": {
         "searchPlaceholder": "Search code or name..."
     },

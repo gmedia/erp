@@ -105,6 +105,20 @@
         "reopened": "Periode dibuka kembali.",
         "failed": "Gagal memperbarui periode. Silakan coba lagi."
     },
+    "budgets": {
+        "approve": "Setujui Anggaran",
+        "lock": "Kunci Anggaran",
+        "approveTitle": "Setujui anggaran ini?",
+        "approveDescription": "Anggaran {name} akan disetujui. Statusnya menjadi Disetujui dan persetujuan dicatat dengan nama dan waktu Anda.",
+        "lockTitle": "Kunci anggaran ini?",
+        "lockDescription": "Anggaran {name} akan dikunci. Anggaran yang terkunci tidak dapat diubah lagi.",
+        "confirmApprove": "Ya, setujui",
+        "confirmLock": "Ya, kunci",
+        "processing": "Memproses...",
+        "approved": "Anggaran disetujui.",
+        "locked": "Anggaran dikunci.",
+        "actionFailed": "Gagal memperbarui anggaran. Silakan coba lagi."
+    },
     "accounts": {
         "searchPlaceholder": "Cari kode atau nama..."
     },
