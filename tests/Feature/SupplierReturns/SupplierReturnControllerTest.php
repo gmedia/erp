@@ -450,7 +450,16 @@ test('confirming supplier return in a closed fiscal period is rejected with 422 
 
 test('confirming supplier return with ambiguous COA versions is rejected with 422 unchanged', function () {
     // Dua COA aktif dan tidak ada tahun fiskal yang mencakup tanggal retur: tidak boleh menebak.
-    CoaVersion::factory()->count(2)->create(['status' => 'active']);
+    // Tahun fiskal eksplisit (bukan acak) agar tidak ada yang mencakup 2026-04-01.
+    foreach ([2020, 2021] as $year) {
+        CoaVersion::factory()->create([
+            'status' => 'active',
+            'fiscal_year_id' => FiscalYear::factory()->create([
+                'start_date' => $year . '-01-01',
+                'end_date' => $year . '-12-31',
+            ])->id,
+        ]);
+    }
     [
         $purchaseOrder,
         $goodsReceipt,

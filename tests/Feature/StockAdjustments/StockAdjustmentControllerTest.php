@@ -444,7 +444,7 @@ describe('Stock Adjustment API Endpoints', function () {
             ->assertJsonValidationErrors(['items']);
     });
 
-    test('approving stock adjustment rolls back state when journal posting fails with non-validation error', function () {
+    test('approving stock adjustment rolls back state when journal posting fails (non-validation)', function () {
         $adjustment = StockAdjustment::factory()->create([
             'status' => 'draft',
             'approved_at' => null,
@@ -470,7 +470,7 @@ describe('Stock Adjustment API Endpoints', function () {
         expect($adjustment->approved_by)->toBeNull();
     });
 
-    test('creating approved stock adjustment is rejected with 422 and nothing is persisted when journal posting fails validation', function () {
+    test('creating approved stock adjustment is 422 and persists nothing on journal validation failure', function () {
         $warehouse = Warehouse::factory()->create();
         $product = Product::factory()->create();
         $unit = Unit::factory()->create();
@@ -509,7 +509,7 @@ describe('Stock Adjustment API Endpoints', function () {
         ]);
     });
 
-    test('approving stock adjustment is rejected with 422 and nothing changes when journal posting fails validation', function () {
+    test('approving stock adjustment is 422 and changes nothing when journal posting fails validation', function () {
         $adjustment = StockAdjustment::factory()->create([
             'status' => 'draft',
             'approved_at' => null,

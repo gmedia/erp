@@ -146,7 +146,11 @@ class StockAdjustmentController extends Controller
             $stockAdjustment->update(['status' => 'cancelled']);
 
             if ($wasApproved) {
-                app(StockPostingService::class)->reverseDocument(StockAdjustment::class, $stockAdjustment->id, 'adjustment');
+                app(StockPostingService::class)->reverseDocument(
+                    StockAdjustment::class,
+                    $stockAdjustment->id,
+                    'adjustment',
+                );
             }
         });
 

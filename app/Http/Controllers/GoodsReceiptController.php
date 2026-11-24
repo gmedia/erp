@@ -176,7 +176,12 @@ class GoodsReceiptController extends Controller
         } elseif ($goodsReceipt->status === 'confirmed' && is_array($items)) {
             // Issue #356: item GR confirmed diedit setelah posting. Movement lama dibalik
             // (histori tetap), lalu item baru diposting ulang. Tanpa ini stok tidak sesuai item.
-            DB::transaction(function () use ($goodsReceipt, $stockPosting, $purchaseOrderReceipts, $postMovements): void {
+            DB::transaction(function () use (
+                $goodsReceipt,
+                $stockPosting,
+                $purchaseOrderReceipts,
+                $postMovements,
+            ): void {
                 $stockPosting->reverseDocument(GoodsReceipt::class, $goodsReceipt->id, 'goods_receipt');
                 $postMovements->execute($goodsReceipt->refresh());
                 $purchaseOrderReceipts->syncFromGoodsReceipt($goodsReceipt);
