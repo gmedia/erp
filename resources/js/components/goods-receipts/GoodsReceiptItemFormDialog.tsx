@@ -51,12 +51,31 @@ function buildGoodsReceiptItemSchema(
     });
 }
 
+function buildPoItemOptionsUrl(
+    purchaseOrderId: string,
+    currentLineId?: string,
+    goodsReceiptId?: string,
+): string {
+    const params = new URLSearchParams();
+
+    if (currentLineId) {
+        params.set('current_line_id', currentLineId);
+    }
+    if (goodsReceiptId) {
+        params.set('goods_receipt_id', goodsReceiptId);
+    }
+    const query = params.toString();
+
+    return `/api/purchase-orders/${purchaseOrderId}/item-options${query ? `?${query}` : ''}`;
+}
+
 interface GoodsReceiptItemFormDialogProps {
     readonly open: boolean;
     readonly onOpenChange: (open: boolean) => void;
     readonly item: GoodsReceiptItemFormData | null;
     readonly onSave: (data: GoodsReceiptItemFormData) => void;
     readonly purchaseOrderId?: string;
+    readonly goodsReceiptId?: string;
 }
 
 export function GoodsReceiptItemFormDialog({
@@ -65,6 +84,7 @@ export function GoodsReceiptItemFormDialog({
     item,
     onSave,
     purchaseOrderId,
+    goodsReceiptId,
 }: GoodsReceiptItemFormDialogProps) {
     const { t } = useTranslation();
     const goodsReceiptItemSchema = useMemo(
@@ -135,7 +155,11 @@ export function GoodsReceiptItemFormDialog({
                     name="purchase_order_item_id"
                     url={
                         purchaseOrderId
-                            ? `/api/purchase-orders/${purchaseOrderId}/item-options${item?.purchase_order_item_id ? `?current_line_id=${item.purchase_order_item_id}` : ''}`
+                            ? buildPoItemOptionsUrl(
+                                  purchaseOrderId,
+                                  item?.purchase_order_item_id,
+                                  goodsReceiptId,
+                              )
                             : null
                     }
                     label={t('goodsReceipt.item.po_item')}

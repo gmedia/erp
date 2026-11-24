@@ -9,8 +9,9 @@ export async function waitForApAgingReportResponse(page: Page): Promise<void> {
 }
 
 export async function openApAgingReport(page: Page): Promise<void> {
+    const responsePromise = waitForApAgingReportResponse(page);
     await page.goto('/reports/ap-aging');
     await page.waitForURL('**/reports/ap-aging', { timeout: 15000 });
-    await waitForApAgingReportResponse(page);
+    await responsePromise;
     await expect(page.locator('table')).toBeVisible();
 }

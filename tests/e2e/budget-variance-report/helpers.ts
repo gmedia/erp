@@ -37,15 +37,15 @@ async function selectFirstComboboxOption(
 }
 
 export async function ensureBudgetExists(page: Page): Promise<string> {
-    await page.goto('/budgets');
-    await page.waitForURL('**/budgets', { timeout: 15000 });
-
-    await page
+    const budgetsResponse = page
         .waitForResponse(
             (r) => r.url().includes('/api/budgets') && r.status() < 400,
             { timeout: 30000 },
         )
         .catch(() => null);
+    await page.goto('/budgets');
+    await page.waitForURL('**/budgets', { timeout: 15000 });
+    await budgetsResponse;
 
     const emptyState = page.getByText(/no results|no data|no budgets/i);
     const hasRows = await page

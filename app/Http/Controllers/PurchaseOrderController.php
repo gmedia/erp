@@ -105,6 +105,7 @@ class PurchaseOrderController extends Controller
             $purchaseOrder,
             $request->string('search')->toString() ?: null,
             $request->integer('current_line_id') ?: null,
+            $request->integer('goods_receipt_id') ?: null,
         )]);
     }
 

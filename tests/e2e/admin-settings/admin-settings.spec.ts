@@ -30,8 +30,8 @@ function collectCspViolations(page: Page): string[] {
     return violations;
 }
 
-async function waitForAdminSettingsRefresh(page: Page) {
-    await page.waitForResponse(
+function waitForAdminSettingsRefresh(page: Page): Promise<Response> {
+    return page.waitForResponse(
         (response: Response) =>
             response.url().includes('/api/admin-settings') &&
             response.request().method() === 'GET' &&
@@ -208,8 +208,9 @@ test.describe('Admin Settings', () => {
         await logoInput.setInputFiles('public/logo.svg');
 
         // Save settings
+        const refreshResponse = waitForAdminSettingsRefresh(page);
         await saveAdminSettings(page, 'save-general-settings');
-        await waitForAdminSettingsRefresh(page);
+        await refreshResponse;
 
         // Logo preview should now be visible after query refresh
         const logoPreview = page.locator('img[alt="Current company logo"]');

@@ -74,19 +74,22 @@ export async function createPurchaseHistoryReportData(
 export async function waitForPurchaseHistoryReportResponse(
     page: Page,
 ): Promise<void> {
-    await page
-        .waitForResponse(
-            (response) =>
-                response.url().includes('/api/reports/purchase-history') &&
-                response.status() < 400,
-        )
-        ;
+    await page.waitForResponse(
+        (response) =>
+            response.url().includes('/api/reports/purchase-history') &&
+            response.status() < 400,
+    );
 }
 
 export async function openPurchaseHistoryReport(page: Page): Promise<void> {
+    const initialResponse = page.waitForResponse(
+        (response) =>
+            response.url().includes('/api/reports/purchase-history') &&
+            response.status() < 400,
+    );
     await page.goto('/reports/purchase-history');
     await page.waitForURL('**/reports/purchase-history', { timeout: 15000 });
-    await waitForPurchaseHistoryReportResponse(page);
+    await initialResponse;
 
     await expect(page.locator('table')).toBeVisible();
     await expect(page.locator('tbody tr').first()).toBeVisible();

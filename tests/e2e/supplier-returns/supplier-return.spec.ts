@@ -93,12 +93,13 @@ test.describe('Supplier Returns Module', () => {
 
     test.beforeEach(async ({ page }) => {
         await login(page, undefined, undefined, { requireDashboard: false });
-        await page.goto('/supplier-returns');
-        await page.waitForResponse(
+        const listResponse = page.waitForResponse(
             (response) =>
                 response.url().includes('/api/supplier-returns') &&
                 response.status() < 400,
         );
+        await page.goto('/supplier-returns');
+        await listResponse;
     });
 
     test('add dialog starts with empty items and add item opens a dedicated dialog', async ({

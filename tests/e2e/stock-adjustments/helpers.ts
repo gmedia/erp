@@ -418,15 +418,13 @@ export async function editStockAdjustment(
     const updateBtn = dialog.getByRole('button', { name: /Update/i });
     await expect(updateBtn).toBeVisible({ timeout: 10000 });
 
-    const updateResponse = page
-        .waitForResponse(
-            (r) =>
-                r.url().includes('/api/stock-adjustments/') &&
-                r.request().method() === 'PUT' &&
-                r.status() < 400,
-            { timeout: 45000 },
-        )
-        ;
+    const updateResponse = page.waitForResponse(
+        (r) =>
+            r.url().includes('/api/stock-adjustments/') &&
+            r.request().method() === 'PUT' &&
+            r.status() < 400,
+        { timeout: 45000 },
+    );
 
     await updateBtn.scrollIntoViewIfNeeded();
     await updateBtn.click({ force: true });

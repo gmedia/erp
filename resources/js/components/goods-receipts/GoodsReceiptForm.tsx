@@ -361,6 +361,11 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
                     item={selectedItem}
                     onSave={handleSaveItem}
                     purchaseOrderId={watchedPurchaseOrderId}
+                    goodsReceiptId={
+                        activeGoodsReceipt?.id
+                            ? String(activeGoodsReceipt.id)
+                            : undefined
+                    }
                 />
             </EntityForm>
         );

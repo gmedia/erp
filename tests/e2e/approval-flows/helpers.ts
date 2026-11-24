@@ -75,15 +75,15 @@ export async function createApprovalFlow(
 
   const userSearchInput = page.getByPlaceholder('Search...').last();
   await expect(userSearchInput).toBeVisible();
+  const usersResponse = page.waitForResponse(
+    response =>
+      response.url().includes('/api/users') &&
+      response.request().method() === 'GET' &&
+      response.status() < 400,
+    { timeout: 10000 },
+  );
   await userSearchInput.fill('Admin User');
-  await page
-    .waitForResponse(
-      response =>
-        response.url().includes('/api/users') &&
-        response.request().method() === 'GET' &&
-        response.status() < 400,
-      { timeout: 10000 },
-    );
+  await usersResponse;
 
   await clickDropdownOption(page, 'Admin User');
   await expect(approverCombobox).toHaveText(/Admin User/);

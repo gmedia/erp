@@ -35,11 +35,11 @@ test.describe('Dashboard', () => {
     await page.waitForLoadState('networkidle');
 
     const sidebarLink = page.getByRole('link', { name: 'Dashboard' }).first();
-    await sidebarLink.click();
-
-    await page.waitForResponse(
+    const dashboardResponse = page.waitForResponse(
       (r) => r.url().includes('/api/dashboard') && r.status() < 400,
     );
+    await sidebarLink.click();
+    await dashboardResponse;
 
     await expect(page).toHaveURL(/\/dashboard/);
   });
@@ -47,10 +47,11 @@ test.describe('Dashboard', () => {
   test('dashboard cards display numeric values', async ({ page }) => {
     await login(page, undefined, undefined, { requireDashboard: false });
 
-    await page.goto('/dashboard');
-    await page.waitForResponse(
+    const dashboardResponse = page.waitForResponse(
       (r) => r.url().includes('/api/dashboard') && r.status() < 400,
     );
+    await page.goto('/dashboard');
+    await dashboardResponse;
 
     const cardLabels = [
       'Total Customer',
@@ -76,10 +77,11 @@ test.describe('Dashboard', () => {
   test('dashboard page has correct title', async ({ page }) => {
     await login(page, undefined, undefined, { requireDashboard: false });
 
-    await page.goto('/dashboard');
-    await page.waitForResponse(
+    const dashboardResponse = page.waitForResponse(
       (r) => r.url().includes('/api/dashboard') && r.status() < 400,
     );
+    await page.goto('/dashboard');
+    await dashboardResponse;
 
     await expect(page).toHaveTitle(/Dashboard/, { timeout: 10000 });
   });
@@ -89,10 +91,11 @@ test.describe('Dashboard', () => {
   }) => {
     await login(page, undefined, undefined, { requireDashboard: false });
 
-    await page.goto('/dashboard');
-    await page.waitForResponse(
+    const dashboardResponse = page.waitForResponse(
       (r) => r.url().includes('/api/dashboard') && r.status() < 400,
     );
+    await page.goto('/dashboard');
+    await dashboardResponse;
 
     const shortcuts = page.getByTestId('dashboard-shortcuts');
     await expect(
