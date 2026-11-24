@@ -25,7 +25,8 @@
         "fill_details": "Please fill in the details below.",
         "view_details": "Here are the details for this item.",
         "stocktake_adjustment_draft": "Stock Adjustment Draft",
-        "stocktake_adjustment_none": "-"
+        "stocktake_adjustment_none": "-",
+  "stocktake_adjustment_note": "Draft from stocktake :stocktake"
     },
     "permissions": {
         "empty_title": "No employee selected",

@@ -11,6 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\getJson;
+use function Pest\Laravel\postJson;
 use function Pest\Laravel\putJson;
 
 /**
@@ -22,6 +23,7 @@ uses(RefreshDatabase::class)->group('issue-436-stocktake-adjustment-draft');
 beforeEach(function () {
     $user = createTestUserWithPermissions([
         'inventory_stocktake',
+        'inventory_stocktake.create',
         'inventory_stocktake.edit',
         'stock_adjustment',
         'stock_adjustment.create',
@@ -122,6 +124,39 @@ test('detail stocktake menampilkan nomor draft penyesuaian yang dibuatnya', func
         ->assertJsonPath('data.stock_adjustment_draft.id', $draft->id)
         ->assertJsonPath('data.stock_adjustment_draft.adjustment_number', 'SA-2026-000001')
         ->assertJsonPath('data.stock_adjustment_draft.status', 'draft');
+});
+
+test('draft stocktake memakai biaya rata-rata produk, bukan nol', function () {
+    $stocktake = issue436OpenStocktake();
+    $product = $stocktake->items()->where('variance', '>', 0)->firstOrFail()->product;
+    $product->update(['cost' => 2500]);
+
+    issue436CompleteStocktake($stocktake);
+
+    $line = StockAdjustment::where('inventory_stocktake_id', $stocktake->id)->firstOrFail()
+        ->items()->where('product_id', $product->id)->firstOrFail();
+
+    expect((float) $line->unit_cost)->toBe(2500.0);
+});
+
+test('stocktake yang langsung dibuat completed juga membuat draft penyesuaian', function () {
+    $warehouse = Warehouse::factory()->create();
+    $unit = Unit::factory()->create();
+    $product = Product::factory()->create();
+
+    $response = postJson('/api/inventory-stocktakes', [
+        'warehouse_id' => $warehouse->id,
+        'stocktake_date' => now()->toDateString(),
+        'status' => 'completed',
+        'items' => [[
+            'product_id' => $product->id,
+            'unit_id' => $unit->id,
+            'system_quantity' => 10,
+            'counted_quantity' => 7,
+        ]],
+    ])->assertStatus(201);
+
+    expect(StockAdjustment::where('inventory_stocktake_id', $response->json('data.id'))->count())->toBe(1);
 });
 
 test('stocktake tanpa selisih tidak membuat draft penyesuaian', function () {

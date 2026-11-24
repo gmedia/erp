@@ -167,9 +167,11 @@ class StockAdjustmentController extends Controller
             syncItems: function (StockAdjustment $stockAdjustment, array $items) use ($syncItems): void {
                 $syncItems->execute($stockAdjustment, $items);
             },
+            // Issue #416: jurnal gagal (COA/periode) membatalkan seluruh transaksi.
+            // Issue #436 butir 5: approve lewat PUT juga menolak stok negatif.
             afterCommit: $isNewlyApproved
-                // Issue #416: jurnal gagal (COA/periode) membatalkan seluruh transaksi.
-                ? function (StockAdjustment $stockAdjustment) use ($postJournal, $postMovements): void {
+                ? function (StockAdjustment $stockAdjustment) use ($postJournal, $postMovements, $stockPosting): void {
+                    $stockPosting->assertNoNegativeStock($this->stockAdjustmentOutflows($stockAdjustment->refresh()));
                     $postJournal->execute($stockAdjustment->refresh());
                     $postMovements->execute($stockAdjustment->refresh());
                 }
@@ -228,20 +230,23 @@ class StockAdjustmentController extends Controller
         DB::transaction(function () use ($stockAdjustment, $validated, $items, $syncItems, $stockPosting): void {
             $stockAdjustment->update(UpdateStockAdjustmentData::fromArray($validated)->toArray());
 
+            // Item diganti (bukan di-upsert) agar source_line_id movement asli tidak tertimpa
+            // repost; pembalik tetap utuh di riwayat (Issue #372).
+            // editDocument menghitung ulang saldo lalu menolak saldo negatif yang memburuk (422).
             $stockPosting->editDocument(
                 StockAdjustment::class,
                 $stockAdjustment->id,
                 'adjustment',
                 function () use ($stockAdjustment, $items, $syncItems, $stockPosting): void {
-                    // Item diganti (bukan di-upsert) agar source_line_id movement asli tidak tertimpa
-                    // repost; pembalik tetap utuh di riwayat (Issue #372).
                     $stockAdjustment->items()->delete();
                     $syncItems->execute($stockAdjustment, $items);
-                    // Issue #436 butir 3: saldo dicek setelah pembalik, sebelum repost item baru.
-                    $stockPosting->assertNoNegativeStock($this->stockAdjustmentOutflows($stockAdjustment->refresh()));
                     $stockPosting->postStockAdjustment($stockAdjustment->refresh());
                 },
             );
+
+            // Issue #436 butir 5: cek stok keluar dilakukan setelah pembalik dan repost sudah
+            // dihitung ulang, sehingga balance_after yang dibaca sudah mencerminkan dokumen ini.
+            $stockPosting->assertNoNegativeStock($this->stockAdjustmentOutflows($stockAdjustment->refresh()));
         });
     }
 }

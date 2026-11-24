@@ -110,6 +110,36 @@ test('create approved penyesuaian keluar tidak melebihi stok diterima', function
         ->assertStatus(201);
 });
 
+test('approve lewat PUT penyesuaian keluar melebihi stok ditolak 422 dan tidak memposting', function () {
+    [$warehouse, $product, $unit] = issue436StockWithBalance(5);
+
+    $response = postJson('/api/stock-adjustments', issue436OutflowPayload($warehouse, $product, $unit, -3))
+        ->assertStatus(201);
+    $adjustmentId = $response->json('data.id');
+
+    // Dokumen dibuat pending_approval (belum terposting), lalu disetujui lewat PUT.
+    StockAdjustment::query()->whereKey($adjustmentId)->update(['status' => 'pending_approval', 'approved_at' => null]);
+    StockMovement::query()->where('reference_type', StockAdjustment::class)
+        ->where('reference_id', $adjustmentId)->delete();
+
+    putJson('/api/stock-adjustments/' . $adjustmentId, [
+        'status' => 'approved',
+        'items' => [[
+            'product_id' => $product->id,
+            'unit_id' => $unit->id,
+            'quantity_before' => 5,
+            'quantity_adjusted' => -9,
+            'unit_cost' => 1000,
+        ]],
+    ])->assertStatus(422);
+
+    expect(StockAdjustment::query()->whereKey($adjustmentId)->value('status'))->toBe('pending_approval');
+    expect(StockMovement::query()
+        ->where('reference_type', StockAdjustment::class)
+        ->where('reference_id', $adjustmentId)
+        ->count())->toBe(0);
+});
+
 test('edit approved penyesuaian keluar yang membuat saldo negatif ditolak 422 dan saldo tetap', function () {
     [$warehouse, $product, $unit] = issue436StockWithBalance(5);
 

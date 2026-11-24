@@ -31,7 +31,8 @@ class InventoryStocktakeController extends Controller
 
     public function store(
         StoreInventoryStocktakeRequest $request,
-        SyncInventoryStocktakeItemsAction $syncItems
+        SyncInventoryStocktakeItemsAction $syncItems,
+        CreateStocktakeAdjustmentDraftAction $createDraft,
     ): JsonResponse {
         $data = $request->validated();
         $items = $data['items'] ?? null;
@@ -39,6 +40,14 @@ class InventoryStocktakeController extends Controller
 
         $data['created_by'] = Auth::id();
 
+        $isCreatedCompleted = ($data['status'] ?? null) === 'completed';
+
+        if ($isCreatedCompleted) {
+            $data['completed_by'] = Auth::id();
+            $data['completed_at'] = now()->toIso8601String();
+        }
+
+        // Issue #436 butir 6: stocktake yang langsung completed juga membuat draft penyesuaian.
         $stocktake = $this->storeWithSyncedItems(
             attributes: $data,
             items: $items,
@@ -49,6 +58,11 @@ class InventoryStocktakeController extends Controller
             syncItems: function (InventoryStocktake $stocktake, array $items) use ($syncItems): void {
                 $syncItems->execute($stocktake, $items);
             },
+            afterCommit: $isCreatedCompleted
+                ? static function (InventoryStocktake $stocktake) use ($createDraft): void {
+                    $createDraft->execute($stocktake->refresh());
+                }
+            : null,
         );
 
         $stocktake->load([
