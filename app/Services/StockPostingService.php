@@ -63,7 +63,7 @@ class StockPostingService
             ->orderBy('moved_at')
             ->orderBy('id')
             ->get()
-            ->groupBy(fn (StockMovement $movement): string => $movement->product_id.':'.$movement->warehouse_id);
+            ->groupBy(fn (StockMovement $movement): string => $movement->product_id . ':' . $movement->warehouse_id);
 
         foreach ($grouped as $movements) {
             $balance = 0.0;
@@ -348,7 +348,7 @@ class StockPostingService
                 continue;
             }
 
-            $key = $productId.':'.$warehouseId;
+            $key = $productId . ':' . $warehouseId;
             $required[$key] = ($required[$key] ?? 0.0) + $quantity;
         }
 
@@ -370,8 +370,8 @@ class StockPostingService
 
                 throw ValidationException::withMessages([
                     'items' => [__('stock.insufficient', [
-                        'product' => $productName ?? '#'.$productId,
-                        'warehouse' => $warehouseName ?? '#'.$warehouseId,
+                        'product' => $productName ?? '#' . $productId,
+                        'warehouse' => $warehouseName ?? '#' . $warehouseId,
                         'available' => $available,
                         'required' => $quantity,
                     ])],
@@ -389,8 +389,18 @@ class StockPostingService
         // Issue #372: batal memakai tanggal pembatalan (hari ini); periode tertutup 422.
         $this->assertFiscalYearOpen(now());
 
-        $this->reverseMovementsOfType(StockTransfer::class, $stockTransfer->id, 'transfer_out', 'transfer_out_reversal');
-        $this->reverseMovementsOfType(StockTransfer::class, $stockTransfer->id, 'transfer_in', 'transfer_in_reversal');
+        $this->reverseMovementsOfType(
+            StockTransfer::class,
+            $stockTransfer->id,
+            'transfer_out',
+            'transfer_out_reversal',
+        );
+        $this->reverseMovementsOfType(
+            StockTransfer::class,
+            $stockTransfer->id,
+            'transfer_in',
+            'transfer_in_reversal',
+        );
     }
 
     /**
@@ -422,7 +432,7 @@ class StockPostingService
 
         foreach ($originals as $original) {
             $alreadyReversed = StockMovement::query()
-                ->where('movement_type', $reversalType.'_reversal')
+                ->where('movement_type', $reversalType . '_reversal')
                 ->where('reference_type', $referenceType)
                 ->where('reference_id', $referenceId)
                 ->where('source_line_id', $original->source_line_id)
@@ -437,7 +447,7 @@ class StockPostingService
             $movedAt = $this->reversalMovedAt($original, $trigger);
 
             $this->record([
-                'movement_type' => $reversalType.'_reversal',
+                'movement_type' => $reversalType . '_reversal',
                 'reference_type' => $referenceType,
                 'reference_id' => $referenceId,
                 'reference_number' => $original->reference_number,
@@ -483,7 +493,7 @@ class StockPostingService
         $earliestByScope = [];
 
         foreach ($scopes as [$productId, $warehouseId, $movedAt]) {
-            $key = $productId.':'.$warehouseId;
+            $key = $productId . ':' . $warehouseId;
 
             if (! isset($earliestByScope[$key]) || $movedAt->lt($earliestByScope[$key][2])) {
                 $earliestByScope[$key] = [$productId, $warehouseId, $movedAt];
@@ -539,7 +549,7 @@ class StockPostingService
                 ->min('balance_after');
 
             if ($worst !== null) {
-                $snapshot[$scope->product_id.':'.$scope->warehouse_id] = (float) $worst;
+                $snapshot[$scope->product_id . ':' . $scope->warehouse_id] = (float) $worst;
             }
         }
 
@@ -616,8 +626,8 @@ class StockPostingService
 
         throw ValidationException::withMessages([
             'items' => [__('stock.insufficient', [
-                'product' => $productName ?? '#'.$productId,
-                'warehouse' => $warehouseName ?? '#'.$warehouseId,
+                'product' => $productName ?? '#' . $productId,
+                'warehouse' => $warehouseName ?? '#' . $warehouseId,
                 'available' => $available,
                 'required' => $required,
             ])],
