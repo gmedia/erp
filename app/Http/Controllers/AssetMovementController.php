@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\AccountingPosting\PostAssetDisposalJournalAction;
+use App\Actions\AccountingPosting\ReverseDocumentJournalAction;
 use App\Actions\AssetMovements\ExportAssetMovementsAction;
 use App\Domain\AssetMovements\AssetMovementFilterService;
 use App\Http\Requests\AssetMovements\ExportAssetMovementRequest;
@@ -11,6 +12,7 @@ use App\Http\Requests\AssetMovements\UpdateAssetMovementRequest;
 use App\Http\Resources\AssetMovements\AssetMovementResource;
 use App\Models\Asset;
 use App\Models\AssetMovement;
+use App\Models\JournalEntry;
 use App\Support\ExportStorage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -26,6 +28,7 @@ class AssetMovementController extends Controller
 {
     public function __construct(
         private PostAssetDisposalJournalAction $postAssetDisposalJournal,
+        private ReverseDocumentJournalAction $reverseDisposalJournal,
     ) {}
 
     public function index(Request $request, AssetMovementFilterService $filterService): AnonymousResourceCollection
@@ -101,6 +104,8 @@ class AssetMovementController extends Controller
                     $this->postAssetDisposalJournal->execute(
                         $asset,
                         Carbon::parse($movement->moved_at)->toDateString(),
+                        $movement->sale_amount !== null ? (float) $movement->sale_amount : null,
+                        $movement->sale_account_id,
                     );
                 }
 
@@ -222,16 +227,36 @@ class AssetMovementController extends Controller
                 }
             }
 
+            $isDisposal = $asset_movement->movement_type === 'dispose';
+            $disposalJournalId = $isDisposal
+                ? JournalEntry::where('reference', 'DISP-' . $asset->asset_code)
+                    ->where('journal_type', 'system')
+                    ->value('id')
+                : null;
+
             $asset_movement->delete();
 
-            // Membatalkan pelepasan: status kembali ke sebelum dispose bila tidak ada dispose lain.
-            if ($asset_movement->movement_type === 'dispose') {
+            // Membatalkan pelepasan (#442): jurnal DISP- dibalik, status/nilai aset dikembalikan.
+            if ($isDisposal) {
                 $stillDisposed = AssetMovement::where('asset_id', $asset->id)
                     ->where('movement_type', 'dispose')
                     ->exists();
 
                 if (! $stillDisposed && $asset->status === 'disposed') {
-                    $asset->update(['status' => $asset_movement->status_before_disposal ?? 'active']);
+                    if ($disposalJournalId !== null) {
+                        $this->reverseDisposalJournal->execute(
+                            $asset,
+                            'REV-DISP-' . $asset->asset_code,
+                            'Pelepasan aset',
+                            now()->toDateString(),
+                            null,
+                            $disposalJournalId,
+                        );
+                    }
+
+                    $asset->update([
+                        'status' => $asset_movement->status_before_disposal ?? 'active',
+                    ]);
                 }
             }
 

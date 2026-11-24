@@ -92,6 +92,8 @@ class AssetMovement extends Model
         'document_path',
         'document_name',
         'status_before_disposal',
+        'sale_amount',
+        'sale_account_id',
         'created_by',
     ];
 
@@ -100,6 +102,8 @@ class AssetMovement extends Model
      */
     protected $casts = [
         'moved_at' => 'datetime',
+        'sale_amount' => 'decimal:2',
+        'sale_account_id' => 'integer',
         'asset_id' => 'integer',
         'from_branch_id' => 'integer',
         'to_branch_id' => 'integer',

@@ -3,6 +3,7 @@
 namespace App\Actions\AccountingPosting;
 
 use App\Actions\JournalEntries\CreateJournalEntryAction;
+use App\Models\Account;
 use App\Models\Asset;
 use App\Models\JournalEntry;
 use App\Models\Setting;
@@ -45,8 +46,16 @@ class PostAssetDisposalJournalAction
         return $asset->status === 'disposed';
     }
 
-    public function execute(Asset $asset, string $disposalDate): JournalEntry
-    {
+    /**
+     * @param  float|null  $saleAmount  Hasil penjualan; null/0 = tanpa hasil (rugi = nilai buku).
+     * @param  int|null  $saleAccountId  Akun penerimaan (kas/bank/piutang); wajib bila ada hasil.
+     */
+    public function execute(
+        Asset $asset,
+        string $disposalDate,
+        ?float $saleAmount = null,
+        ?int $saleAccountId = null,
+    ): JournalEntry {
         $reference = 'DISP-' . $asset->asset_code;
 
         $existing = JournalEntry::query()
@@ -72,8 +81,22 @@ class PostAssetDisposalJournalAction
             ]);
         }
 
+        $sale = round((float) ($saleAmount ?? 0), 2);
+
+        if ($saleAmount !== null && $sale <= 0) {
+            throw ValidationException::withMessages([
+                'sale_amount' => __('accounting_posting.disposal_sale_invalid'),
+            ]);
+        }
+
+        if ($sale > 0 && $saleAccountId === null) {
+            throw ValidationException::withMessages([
+                'sale_account_id' => __('accounting_posting.disposal_sale_account_missing'),
+            ]);
+        }
+
         // Kedua akun wajib diatur (laba dipakai saat ada hasil penjualan, #442).
-        $this->configuredAccountId(self::GAIN_SETTING_KEY);
+        $gainAccountId = $this->configuredAccountId(self::GAIN_SETTING_KEY);
         $lossAccountId = $this->configuredAccountId(self::LOSS_SETTING_KEY);
 
         return DB::transaction(function () use (
@@ -81,6 +104,9 @@ class PostAssetDisposalJournalAction
             $cost,
             $accumulated,
             $bookValue,
+            $sale,
+            $saleAccountId,
+            $gainAccountId,
             $disposalDate,
             $reference,
             $lossAccountId,
@@ -92,6 +118,17 @@ class PostAssetDisposalJournalAction
 
             $lines = [];
 
+            if ($sale > 0) {
+                $this->assertLeafReceiptAccount((int) $saleAccountId, $entryDate);
+                $lines[] = [
+                    'account_id' => $saleAccountId,
+                    'branch_id' => $asset->branch_id,
+                    'debit' => $sale,
+                    'credit' => 0,
+                    'memo' => 'Hasil penjualan aset',
+                ];
+            }
+
             if ($accumulated > 0) {
                 $lines[] = [
                     'account_id' => $accumulatedAccountId,
@@ -102,13 +139,24 @@ class PostAssetDisposalJournalAction
                 ];
             }
 
-            if ($bookValue > 0) {
+            // Selisih terhadap nilai buku: laba (kredit) bila hasil > nilai buku, rugi (debit) bila sebaliknya.
+            $difference = round($sale - $bookValue, 2);
+
+            if ($difference > 0) {
+                $lines[] = [
+                    'account_id' => $gainAccountId,
+                    'branch_id' => $asset->branch_id,
+                    'debit' => 0,
+                    'credit' => $difference,
+                    'memo' => 'Laba pelepasan aset',
+                ];
+            } elseif ($difference < 0) {
                 $lines[] = [
                     'account_id' => $lossAccountId,
                     'branch_id' => $asset->branch_id,
-                    'debit' => $bookValue,
+                    'debit' => -$difference,
                     'credit' => 0,
-                    'memo' => 'Rugi pelepasan aset (nilai buku)',
+                    'memo' => 'Rugi pelepasan aset',
                 ];
             }
 
@@ -139,6 +187,32 @@ class PostAssetDisposalJournalAction
                 'status' => $asset->status,
             ]),
         ]);
+    }
+
+    /**
+     * Akun penerimaan hasil penjualan wajib akun daun aktif dari COA yang berlaku (#442).
+     */
+    private function assertLeafReceiptAccount(int $accountId, string $entryDate): void
+    {
+        $coaVersionId = $this->resolveControlAccount->resolveVersion($entryDate)->id;
+
+        $account = Account::query()
+            ->where('id', $accountId)
+            ->where('coa_version_id', $coaVersionId)
+            ->where('is_active', true)
+            ->first();
+
+        if ($account === null) {
+            throw ValidationException::withMessages([
+                'sale_account_id' => __('accounting_posting.disposal_sale_account_invalid'),
+            ]);
+        }
+
+        if ($account->children()->exists()) {
+            throw ValidationException::withMessages([
+                'sale_account_id' => __('accounting_posting.disposal_sale_account_group'),
+            ]);
+        }
     }
 
     private function configuredAccountId(string $settingKey): int
