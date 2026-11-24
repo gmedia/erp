@@ -1,62 +1,63 @@
-# Upgrade: Posting jurnal ke akun kelompok ditolak (Issue #437, langkah 5)
+# Upgrade: Posting jurnal ke akun kelompok (Issue #437)
 
 ## Perubahan perilaku
 
-- Akun **kelompok** adalah akun yang punya anak (`parent_id` dari akun lain). Akun kelompok hanya
-  agregasi laporan; jurnal tidak boleh memposting ke sana.
-- Penolakan berlaku di **semua jalur jurnal**, untuk status draft maupun posted:
-  - `CreateJournalEntryAction` (jurnal manual, jurnal berulang, dan semua posting dokumen otomatis),
-  - `PostJournalAction` (posting massal draft).
-- Respons: **422** pada field `lines` dengan pesan `accounting_posting.line_account_is_group`.
-- Form jurnal manual dan jurnal berulang hanya menawarkan akun dengan `has_children=0`
-  (`JournalLineFormFields`), sehingga akun kelompok tidak bisa dipilih dari UI.
-- Akun kontrol posting dokumen (AR `11200`, AP `21100`, GR/IR `21150`, inter-branch `1999-IBC`)
-  adalah akun daun di COA. Data demo (COA dan dokumen) hanya memakai akun daun; invarian
-  `W7-06` di `tests/Feature/Integrity/DemoDataIntegrityTest.php` menjaga hal ini.
+- Akun **kelompok** adalah akun yang punya anak. Akun kelompok hanya agregasi laporan.
+- Baris jurnal ke akun kelompok **hanya diterima bila memperkecil saldo posted** akun itu:
+  - tanda nilai baris berlawanan dengan saldo posted (saldo debit dikurangi kredit), dan
+  - nilai mutlak total baris per akun tidak melebihi nilai mutlak saldo (tidak melewati nol).
+- Aturan ini berlaku untuk draft maupun posted, di semua jalur jurnal
+  (`CreateJournalEntryAction`, `PostJournalAction`). Penolakan: **422** pada field `lines`
+  dengan pesan `accounting_posting.line_group_account_not_reducing`.
+- Pembalik (reversal) dari baris jurnal asli selalu diterima. Ini diatur di server, bukan dari payload.
+- Picker akun di form jurnal manual dan jurnal berulang memakai `/api/accounts?postable=1`:
+  akun daun, atau akun kelompok yang saldo posted-nya tidak nol. Akun kelompok bersaldo nol
+  tidak ditawarkan.
+- Filter `postable=1` ada di server (`IndexAccountsAction`); `has_children=0` tetap berfungsi seperti
+  sebelumnya untuk pemakai lain.
 
-## Dampak pada instalasi lama (penting)
+## Dampak pada instalasi lama
 
 Instalasi yang sudah punya jurnal ke akun kelompok **tidak diubah otomatis**. Baris lama tetap
-ada, tetapi jurnal draft tersebut tidak bisa diposting dan jurnal baru ke akun itu ditolak.
+ada. Jurnal draft yang menunjuk akun kelompok tidak bisa diposting kecuali memperkecil saldo.
 
-Cara membereskan (dijalankan oleh admin, satu per satu):
+### Langkah 1: cari baris yang menunjuk akun kelompok
 
-1. Cari baris jurnal yang menunjuk akun kelompok:
+```bash
+./vendor/bin/sail artisan tinker --execute='
+  $groupIds = \App\Models\Account::whereHas("children")->pluck("id");
+  echo \Illuminate\Support\Facades\DB::table("journal_entry_lines")
+    ->join("journal_entries", "journal_entries.id", "=", "journal_entry_lines.journal_entry_id")
+    ->whereIn("journal_entry_lines.account_id", $groupIds)
+    ->select("journal_entries.entry_number", "journal_entries.status", "journal_entry_lines.account_id")
+    ->get()->toJson();'
+```
 
-   ```bash
-   ./vendor/bin/sail artisan tinker --execute='
-     $ids = \App\Models\Account::whereIn("id", \App\Models\Account::whereNotNull("parent_id")->select("parent_id"))->pluck("code","id");
-     echo \Illuminate\Support\Facades\DB::table("journal_entry_lines")->whereIn("account_id", $ids->keys())
-       ->join("journal_entries","journal_entries.id","=","journal_entry_lines.journal_entry_id")
-       ->select("journal_entries.entry_number","journal_entries.status","journal_entry_lines.account_id")
-       ->get()->toJson();'
-   ```
+### Langkah 2: jurnal draft
 
-2. Untuk jurnal **draft**: ubah akun baris ke akun daun yang benar (lewat layar jurnal, edit draft),
-   lalu posting.
-3. Untuk jurnal **posted**: jangan ubah baris langsung. Buat jurnal pembalik (reversal) dari layar
-   jurnal, lalu buat jurnal baru ke akun daun yang benar. Jurnal asli tetap utuh untuk audit.
-4. Jalankan ulang pemeriksaan di atas sampai hasilnya kosong.
+Ubah akun baris ke akun daun yang benar lewat layar edit draft, lalu posting.
 
-Jangan menjalankan perubahan massal ke baris posted tanpa persetujuan product owner.
+### Langkah 3: jurnal posted (jangan ubah baris langsung)
 
-### Memindahkan saldo akun kelompok (pemetaan COA)
+1. Batalkan dokumen lama lewat layar dokumen. Sistem membuat jurnal pembalik yang diterima
+   walaupun memakai akun kelompok (pembalik dari baris asli). Jurnal asli tetap utuh untuk audit.
+2. Jika saldo kelompok masih ada setelah pembatalan, buat **jurnal manual** yang memindahkan
+   saldo itu ke akun daun: baris ke akun kelompok berlawanan tanda dengan saldonya, dengan nilai
+   tidak melebihi saldo; sisi lawan ke akun daun.
+3. Jurnal manual seperti itu hanya diterima bila memperkecil saldo. Yang menambah atau membalik tanda ditolak 422.
 
-Instalasi lama bisa punya saldo di akun kelompok (mis. `11000`). Saldo itu perlu dipindahkan ke
-akun daun lewat **Pemetaan Akun**:
+### Langkah 4: verifikasi
 
-- **Sumber** = akun kelompok (boleh; ini yang dipetakan).
-- **Target** = akun daun di COA versi lain (wajib daun; akun kelompok ditolak 422 dengan pesan
-  `account_mapping.target_must_be_leaf`).
-- Pilih jenis pemetaan (`merge`, `split`, atau `rename`) sesuai perpindahan saldo, lalu simpan.
+Ulangi langkah 1 sampai hasilnya kosong, dan saldo akun kelompok di Neraca Saldo sudah nol.
 
-Pemetaan hanya mengatur perbandingan saldo lintas COA; ia tidak memindahkan baris jurnal. Untuk
-saldo posted di akun kelompok, pastikan jurnal pemindahan tetap dibuat ke akun daun (lihat langkah
-posted di atas).
+Jangan melakukan perubahan massal pada baris posted tanpa persetujuan product owner.
 
-## Verifikasi
+## Verifikasi (test)
 
-- `tests/Feature/JournalEntries/PostingToGroupAccountTest.php`: posted ditolak, draft ditolak,
-  posting massal ditolak, akun daun tetap bisa dipakai.
+- `tests/Feature/JournalEntries/PostingToGroupAccountTest.php`: draft dan posted ke kelompok yang
+  menambah saldo ditolak; yang memperkecil diterima; nol tidak lolos; pembalik dokumen lama diterima;
+  posting ulang draft diperiksa ulang.
+- `tests/Feature/JournalEntries/AccountPostablePickerTest.php`: `postable=1` menampilkan akun daun dan
+  kelompok bersaldo, menyembunyikan kelompok bersaldo nol.
 - `tests/Feature/Integrity/DemoDataIntegrityTest.php` invarian `W7-06`: data demo tidak memposting
   ke akun kelompok.
