@@ -19,6 +19,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\Sanctum;
 
+use function Pest\Laravel\deleteJson;
+
 uses(RefreshDatabase::class)->group('stock-posting-issue-372');
 
 /**
@@ -30,6 +32,7 @@ function issue372GoodsReceipt(
     float $quantity,
     CarbonInterface $receiptDate,
 ): GoodsReceipt {
+    /** @var GoodsReceipt $receipt */
     $receipt = GoodsReceipt::factory()->create([
         'warehouse_id' => $warehouse->id,
         'receipt_date' => $receiptDate->toDateString(),
@@ -46,7 +49,8 @@ function issue372GoodsReceipt(
         'quantity_rejected' => 0,
     ]);
 
-    $receipt = $receipt->refresh();
+    /** @var GoodsReceipt $receipt */
+    $receipt = GoodsReceipt::query()->findOrFail($receipt->id);
     app(StockPostingService::class)->postGoodsReceipt($receipt);
 
     return $receipt;
@@ -81,6 +85,8 @@ function issue372EditGoodsReceipt(GoodsReceipt $receipt, Product $product, float
  */
 function issue372Outflow(Warehouse $warehouse, Product $product, float $quantity, CarbonInterface $date): void
 {
+    /** @var StockAdjustment $adjustment */
+    /** @var StockAdjustment $adjustment */
     $adjustment = StockAdjustment::factory()->create([
         'warehouse_id' => $warehouse->id,
         'adjustment_date' => $date->toDateString(),
@@ -97,7 +103,8 @@ function issue372Outflow(Warehouse $warehouse, Product $product, float $quantity
         'quantity_adjusted' => -$quantity,
     ]);
 
-    $adjustment = $adjustment->refresh();
+    /** @var StockAdjustment $adjustment */
+    $adjustment = StockAdjustment::query()->findOrFail($adjustment->id);
     app(StockPostingService::class)->postStockAdjustment($adjustment);
 }
 
@@ -124,6 +131,7 @@ function issue372Adjustment(
     float $quantity,
     CarbonInterface $date,
 ): StockAdjustment {
+    /** @var StockAdjustment $adjustment */
     $adjustment = StockAdjustment::factory()->create([
         'warehouse_id' => $warehouse->id,
         'adjustment_date' => $date->toDateString(),
@@ -140,9 +148,11 @@ function issue372Adjustment(
         'quantity_adjusted' => $quantity,
     ]);
 
-    app(StockPostingService::class)->postStockAdjustment($adjustment->refresh());
+    /** @var StockAdjustment $adjustment */
+    $adjustment = StockAdjustment::query()->findOrFail($adjustment->id);
+    app(StockPostingService::class)->postStockAdjustment($adjustment);
 
-    return $adjustment->refresh();
+    return $adjustment;
 }
 
 /**
@@ -296,6 +306,7 @@ describe('Issue #372 — langkah 2: batal supplier return dan stock transfer ber
         $warehouse = Warehouse::factory()->create();
         $returnDate = now()->subDays(10);
 
+        /** @var SupplierReturn $supplierReturn */
         $supplierReturn = SupplierReturn::factory()->create([
             'warehouse_id' => $warehouse->id,
             'return_date' => $returnDate->toDateString(),
@@ -430,7 +441,7 @@ describe('Issue #372 — langkah 2: jalur HTTP edit dan batal memakai tanggal ya
         ]);
         app(StockPostingService::class)->postStockTransferDispatch($transfer->refresh());
 
-        $this->deleteJson('/api/stock-transfers/' . $transfer->id)->assertNoContent();
+        deleteJson('/api/stock-transfers/'.$transfer->id)->assertNoContent();
 
         $reversal = StockMovement::query()
             ->where('movement_type', 'transfer_out_reversal')
@@ -518,5 +529,116 @@ describe('Issue #372 — dua gudang tidak saling memengaruhi saldo', function ()
         expect(issue372BalanceOn($product, $warehouseB, now()))->toBe(6.0);
         expect(issue372BalanceOn($product, $warehouseA, now()->subDays(5)))->toBe(1.0);
         expect(issue372BalanceOn($product, $warehouseA, now()))->toBe(1.0);
+    });
+});
+
+/**
+ * Movement mentah (tanpa dokumen) untuk menyiapkan riwayat saldo negatif lama,
+ * misalnya data sebelum #356. Saldo dihitung ulang setelah dibuat.
+ *
+ * @param  array<string, mixed>  $attributes
+ */
+function issue372RawMovement(
+    Product $product,
+    Warehouse $warehouse,
+    float $quantityIn,
+    float $quantityOut,
+    CarbonInterface $movedAt,
+    array $attributes = [],
+): StockMovement {
+    $movement = StockMovement::factory()->create($attributes + [
+        'product_id' => $product->id,
+        'warehouse_id' => $warehouse->id,
+        'movement_type' => $quantityOut > 0 ? 'sales' : 'adjustment_in',
+        'quantity_in' => $quantityIn,
+        'quantity_out' => $quantityOut,
+        'reference_type' => null,
+        'reference_id' => null,
+        'reference_number' => null,
+        'moved_at' => $movedAt,
+    ]);
+
+    app(StockPostingService::class)->rebuildBalances([[$product->id, $warehouse->id]]);
+
+    return $movement;
+}
+
+describe('Issue #372 — review #420: riwayat saldo negatif lama tidak memblokir, perburukan ditolak', function () {
+    test('batal penyesuaian keluar pada riwayat yang sudah negatif lolos bila tidak memperburuk', function () {
+        $product = Product::factory()->create();
+        $warehouse = Warehouse::factory()->create();
+
+        // Riwayat negatif lama: keluar 3 pada 15 hari lalu (saldo -3).
+        issue372RawMovement($product, $warehouse, 0, 3, now()->subDays(15));
+
+        // Penyesuaian keluar 2 pada 5 hari lalu (saldo -5), lalu dibatalkan hari ini.
+        /** @var StockAdjustment $adjustment */
+        $adjustment = StockAdjustment::factory()->create(['warehouse_id' => $warehouse->id]);
+        issue372RawMovement($product, $warehouse, 0, 2, now()->subDays(5), [
+            'movement_type' => 'adjustment_out',
+            'reference_type' => StockAdjustment::class,
+            'reference_id' => $adjustment->id,
+        ]);
+
+        app(StockPostingService::class)->reverseDocument(StockAdjustment::class, $adjustment->id, 'adjustment');
+
+        expect(issue372BalanceOn($product, $warehouse, now()))->toBe(-3.0);
+    });
+
+    test('edit yang menaikkan stok pada riwayat yang sudah negatif lolos', function () {
+        $product = Product::factory()->create();
+        $warehouse = Warehouse::factory()->create();
+
+        issue372RawMovement($product, $warehouse, 0, 3, now()->subDays(15));
+        $receipt = issue372GoodsReceipt($warehouse, $product, 4, now()->subDays(5));
+
+        issue372EditGoodsReceipt($receipt, $product, 5);
+
+        expect(issue372BalanceOn($product, $warehouse, now()))->toBe(2.0);
+    });
+
+    test('edit yang memperburuk saldo negatif lama ditolak 422 tanpa menyisakan pembalik', function () {
+        $product = Product::factory()->create();
+        $warehouse = Warehouse::factory()->create();
+
+        // Riwayat negatif lama: keluar 3 pada 15 hari lalu (saldo -3). GR 4 pada 10 hari
+        // lalu (saldo 1), keluar 2 pada 5 hari lalu (saldo -1). Edit GR menjadi 0 membuat
+        // saldo -5 pada 5 hari lalu, lebih buruk dari riwayat -3 -> harus ditolak.
+        issue372RawMovement($product, $warehouse, 0, 3, now()->subDays(15));
+        $receipt = issue372GoodsReceipt($warehouse, $product, 4, now()->subDays(10));
+        issue372Outflow($warehouse, $product, 2, now()->subDays(5));
+
+        $thrown = null;
+
+        try {
+            issue372EditGoodsReceipt($receipt, $product, 0);
+        } catch (ValidationException $e) {
+            $thrown = $e;
+        }
+
+        expect($thrown)->toBeInstanceOf(ValidationException::class);
+        expect($thrown?->status)->toBe(422);
+        expect(StockMovement::query()->where('movement_type', 'goods_receipt_reversal')->count())->toBe(0);
+    });
+
+    test('batal GR yang membuat saldo berjalan menjadi lebih negatif dari riwayat lama ditolak 422', function () {
+        $product = Product::factory()->create();
+        $warehouse = Warehouse::factory()->create();
+
+        issue372RawMovement($product, $warehouse, 0, 3, now()->subDays(15));
+        $receipt = issue372GoodsReceipt($warehouse, $product, 4, now()->subDays(10));
+        issue372Outflow($warehouse, $product, 2, now()->subDays(5));
+
+        $thrown = null;
+
+        try {
+            app(StockPostingService::class)->reverseDocument(GoodsReceipt::class, $receipt->id, 'goods_receipt');
+        } catch (ValidationException $e) {
+            $thrown = $e;
+        }
+
+        expect($thrown)->toBeInstanceOf(ValidationException::class);
+        expect($thrown?->status)->toBe(422);
+        expect(StockMovement::query()->where('movement_type', 'goods_receipt_reversal')->count())->toBe(0);
     });
 });

@@ -63,7 +63,7 @@ class StockPostingService
             ->orderBy('moved_at')
             ->orderBy('id')
             ->get()
-            ->groupBy(fn (StockMovement $movement): string => $movement->product_id . ':' . $movement->warehouse_id);
+            ->groupBy(fn (StockMovement $movement): string => $movement->product_id.':'.$movement->warehouse_id);
 
         foreach ($grouped as $movements) {
             $balance = 0.0;
@@ -289,12 +289,16 @@ class StockPostingService
         ?int $createdBy = null,
         string $trigger = self::TRIGGER_CANCEL,
     ): void {
-        $scopes = $this->appendReversals($referenceType, $referenceId, $reversalType, $createdBy, $trigger);
+        // Atomik: bila saldo ditolak (422), pembalik yang sudah ditulis ikut dibatalkan.
+        DB::transaction(function () use ($referenceType, $referenceId, $reversalType, $createdBy, $trigger): void {
+            $snapshot = $this->negativeBalanceSnapshot($referenceType, $referenceId, $reversalType);
+            $scopes = $this->appendReversals($referenceType, $referenceId, $reversalType, $createdBy, $trigger);
 
-        // Batal memakai tanggal pembatalan (hari ini). Periode tertutup ditolak oleh
-        // jurnal pembalik (#357, error entry_date), bukan guard stok, agar kontrak
-        // batal yang sudah ada tetap.
-        $this->recalculateFromMovedAt($scopes, enforceOpenPeriod: false);
+            // Batal memakai tanggal pembatalan (hari ini). Periode tertutup ditolak oleh
+            // jurnal pembalik (#357, error entry_date), bukan guard stok, agar kontrak
+            // batal yang sudah ada tetap.
+            $this->recalculateFromMovedAt($scopes, enforceOpenPeriod: false, baseline: $snapshot);
+        });
     }
 
     /**
@@ -312,6 +316,7 @@ class StockPostingService
         ?int $createdBy = null,
     ): void {
         DB::transaction(function () use ($referenceType, $referenceId, $reversalType, $repost, $createdBy): void {
+            $snapshot = $this->negativeBalanceSnapshot($referenceType, $referenceId, $reversalType);
             $scopes = $this->appendReversals(
                 $referenceType,
                 $referenceId,
@@ -322,7 +327,7 @@ class StockPostingService
 
             $repost();
 
-            $this->recalculateFromMovedAt($scopes);
+            $this->recalculateFromMovedAt($scopes, baseline: $snapshot);
         });
     }
 
@@ -343,7 +348,7 @@ class StockPostingService
                 continue;
             }
 
-            $key = $productId . ':' . $warehouseId;
+            $key = $productId.':'.$warehouseId;
             $required[$key] = ($required[$key] ?? 0.0) + $quantity;
         }
 
@@ -365,8 +370,8 @@ class StockPostingService
 
                 throw ValidationException::withMessages([
                     'items' => [__('stock.insufficient', [
-                        'product' => $productName ?? '#' . $productId,
-                        'warehouse' => $warehouseName ?? '#' . $warehouseId,
+                        'product' => $productName ?? '#'.$productId,
+                        'warehouse' => $warehouseName ?? '#'.$warehouseId,
                         'available' => $available,
                         'required' => $quantity,
                     ])],
@@ -417,7 +422,7 @@ class StockPostingService
 
         foreach ($originals as $original) {
             $alreadyReversed = StockMovement::query()
-                ->where('movement_type', $reversalType . '_reversal')
+                ->where('movement_type', $reversalType.'_reversal')
                 ->where('reference_type', $referenceType)
                 ->where('reference_id', $referenceId)
                 ->where('source_line_id', $original->source_line_id)
@@ -432,7 +437,7 @@ class StockPostingService
             $movedAt = $this->reversalMovedAt($original, $trigger);
 
             $this->record([
-                'movement_type' => $reversalType . '_reversal',
+                'movement_type' => $reversalType.'_reversal',
                 'reference_type' => $referenceType,
                 'reference_id' => $referenceId,
                 'reference_number' => $original->reference_number,
@@ -469,7 +474,7 @@ class StockPostingService
      *
      * @param  array<int, array{0:int,1:int,2:CarbonInterface}>  $scopes
      */
-    private function recalculateFromMovedAt(array $scopes, bool $enforceOpenPeriod = true): void
+    private function recalculateFromMovedAt(array $scopes, bool $enforceOpenPeriod = true, array $baseline = []): void
     {
         if ($scopes === []) {
             return;
@@ -478,7 +483,7 @@ class StockPostingService
         $earliestByScope = [];
 
         foreach ($scopes as [$productId, $warehouseId, $movedAt]) {
-            $key = $productId . ':' . $warehouseId;
+            $key = $productId.':'.$warehouseId;
 
             if (! isset($earliestByScope[$key]) || $movedAt->lt($earliestByScope[$key][2])) {
                 $earliestByScope[$key] = [$productId, $warehouseId, $movedAt];
@@ -491,14 +496,92 @@ class StockPostingService
             }
         }
 
-        $this->rebuildBalances(array_map(
+        $scopePairs = array_map(
             static fn (array $scope): array => [$scope[0], $scope[1]],
             array_values($earliestByScope),
-        ));
+        );
 
-        foreach ($earliestByScope as [$productId, $warehouseId]) {
-            $this->assertRunningBalanceNotNegative($productId, $warehouseId);
+        $this->rebuildBalances($scopePairs);
+
+        foreach ($earliestByScope as $key => [$productId, $warehouseId, $movedAt]) {
+            $this->assertNoWorsenedNegativeBalance(
+                $productId,
+                $warehouseId,
+                $movedAt,
+                $baseline[$key] ?? null,
+            );
         }
+    }
+
+    /**
+     * Baseline sebelum pembalik/repost: saldo terburuk per scope (product+warehouse)
+     * yang dimiliki dokumen, dihitung dari seluruh riwayat scope. Dipakai untuk
+     * membedakan riwayat negatif lama dari negatif yang dibuat operasi ini (review #420).
+     *
+     * @return array<string, float> key "product:warehouse" => saldo terburuk (<0)
+     */
+    private function negativeBalanceSnapshot(string $referenceType, int $referenceId, string $reversalType): array
+    {
+        $scopes = StockMovement::query()
+            ->where('reference_type', $referenceType)
+            ->where('reference_id', $referenceId)
+            ->select('product_id', 'warehouse_id')
+            ->distinct()
+            ->get();
+
+        $snapshot = [];
+
+        foreach ($scopes as $scope) {
+            $worst = StockMovement::query()
+                ->where('product_id', $scope->product_id)
+                ->where('warehouse_id', $scope->warehouse_id)
+                ->where('balance_after', '<', 0)
+                ->min('balance_after');
+
+            if ($worst !== null) {
+                $snapshot[$scope->product_id.':'.$scope->warehouse_id] = (float) $worst;
+            }
+        }
+
+        return $snapshot;
+    }
+
+    /**
+     * Tolak (422) hanya bila operasi ini membuat saldo negatif baru, atau memperburuk
+     * saldo negatif yang sudah ada, pada rentang moved_at >= $from. Riwayat negatif
+     * lama yang tidak diperburuk tidak memblokir (review #420).
+     */
+    private function assertNoWorsenedNegativeBalance(
+        int $productId,
+        int $warehouseId,
+        CarbonInterface $from,
+        ?float $balanceBefore,
+    ): void {
+        $balanceAfter = StockMovement::query()
+            ->where('product_id', $productId)
+            ->where('warehouse_id', $warehouseId)
+            ->where('moved_at', '>=', $from)
+            ->where('balance_after', '<', 0)
+            ->min('balance_after');
+
+        if ($balanceAfter === null) {
+            return;
+        }
+
+        if ($balanceBefore !== null && (float) $balanceAfter >= $balanceBefore) {
+            return;
+        }
+
+        $negative = StockMovement::query()
+            ->where('product_id', $productId)
+            ->where('warehouse_id', $warehouseId)
+            ->where('moved_at', '>=', $from)
+            ->where('balance_after', '=', $balanceAfter)
+            ->orderBy('moved_at')
+            ->orderBy('id')
+            ->first();
+
+        $this->throwInsufficientStock($productId, $warehouseId, $negative);
     }
 
     /**
@@ -519,29 +602,24 @@ class StockPostingService
         }
     }
 
-    private function assertRunningBalanceNotNegative(int $productId, int $warehouseId): void
+    private function throwInsufficientStock(int $productId, int $warehouseId, ?StockMovement $negative): void
     {
-        $negative = StockMovement::query()
-            ->where('product_id', $productId)
-            ->where('warehouse_id', $warehouseId)
-            ->where('balance_after', '<', 0)
-            ->orderBy('moved_at')
-            ->orderBy('id')
-            ->first();
-
-        if ($negative === null) {
-            return;
-        }
-
         $productName = Product::query()->whereKey($productId)->value('name');
         $warehouseName = Warehouse::query()->whereKey($warehouseId)->value('name');
 
+        // available = saldo sebelum movement negatif tersebut; required = jumlah keluarnya.
+        // Bila movement negatif bukan pengeluaran, required 0 dan available tetap saldo sebelumnya.
+        $required = $negative === null ? 0.0 : (float) $negative->quantity_out;
+        $available = $negative === null
+            ? 0.0
+            : (float) $negative->balance_after - (float) $negative->quantity_in + (float) $negative->quantity_out;
+
         throw ValidationException::withMessages([
             'items' => [__('stock.insufficient', [
-                'product' => $productName ?? '#' . $productId,
-                'warehouse' => $warehouseName ?? '#' . $warehouseId,
-                'available' => (float) $negative->balance_after + (float) $negative->quantity_out,
-                'required' => (float) $negative->quantity_out,
+                'product' => $productName ?? '#'.$productId,
+                'warehouse' => $warehouseName ?? '#'.$warehouseId,
+                'available' => $available,
+                'required' => $required,
             ])],
         ])->status(422);
     }
