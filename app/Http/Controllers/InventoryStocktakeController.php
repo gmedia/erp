@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\InventoryStocktakes\CreateStocktakeAdjustmentDraftAction;
 use App\Actions\InventoryStocktakes\ExportInventoryStocktakesAction;
 use App\Actions\InventoryStocktakes\IndexInventoryStocktakesAction;
 use App\Actions\InventoryStocktakes\SyncInventoryStocktakeItemsAction;
@@ -83,13 +84,17 @@ class InventoryStocktakeController extends Controller
     public function update(
         UpdateInventoryStocktakeRequest $request,
         InventoryStocktake $inventoryStocktake,
-        SyncInventoryStocktakeItemsAction $syncItems
+        SyncInventoryStocktakeItemsAction $syncItems,
+        CreateStocktakeAdjustmentDraftAction $createDraft,
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
         unset($validated['items']);
 
-        if (($validated['status'] ?? null) === 'completed' && $inventoryStocktake->completed_at === null) {
+        $isCompleting = ($validated['status'] ?? null) === 'completed'
+            && $inventoryStocktake->completed_at === null;
+
+        if ($isCompleting) {
             $validated['completed_by'] = Auth::id();
             $validated['completed_at'] = now()->toIso8601String();
         }
@@ -104,6 +109,11 @@ class InventoryStocktakeController extends Controller
             syncItems: function (InventoryStocktake $inventoryStocktake, array $items) use ($syncItems): void {
                 $syncItems->execute($inventoryStocktake, $items);
             },
+            afterCommit: $isCompleting
+                ? static function (InventoryStocktake $inventoryStocktake) use ($createDraft): void {
+                    $createDraft->execute($inventoryStocktake->refresh());
+                }
+            : null,
         );
 
         $inventoryStocktake->load(['warehouse', 'productCategory', 'items.product', 'items.unit', 'items.countedBy']);
