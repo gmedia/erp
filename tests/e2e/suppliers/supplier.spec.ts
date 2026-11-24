@@ -34,8 +34,8 @@ generateModuleTests({
     {
         filterName: 'Category',
         filterType: 'combobox',
-        filterValue: 'Office Supplies',
-        expectedText: 'Office Supplies',
+        filterValue: 'Perlengkapan Kantor',
+        expectedText: 'Perlengkapan Kantor',
     },
     {
         filterName: 'Status',

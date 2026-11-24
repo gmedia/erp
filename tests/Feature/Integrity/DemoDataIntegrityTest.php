@@ -642,7 +642,7 @@ invariant('W7-15 employee demo departments are not concentrated in HR', function
     $hr = DB::table('employments')
         ->join('departments', 'departments.id', '=', 'employments.department_id')
         ->where('employments.is_current', true)
-        ->where('departments.name', 'HR')
+        ->where('departments.name', DemoMasterData::DEPARTMENT_HR)
         ->count();
 
     expect($total)->toBeGreaterThan(0);
@@ -881,7 +881,7 @@ invariant('W7-15 inventory stocktake demo uses goods categories, not services', 
     expect($categoryNames)->not->toBeEmpty('Demo data must include inventory stocktakes');
 
     foreach ($categoryNames as $name) {
-        expect($name)->not->toBe('Consulting Services', 'Stocktake must not count service categories');
+        expect($name)->not->toBe(DemoMasterData::PRODUCT_CATEGORY_CONSULTING, 'Stocktake must not count service categories');
     }
 });
 
@@ -1167,7 +1167,7 @@ invariant('W7-17 supplier and product categories are mapped consistently', funct
         ->join('supplier_categories', 'supplier_categories.id', '=', 'suppliers.category_id')
         ->join('products', 'products.id', '=', 'purchase_order_items.product_id')
         ->join('product_categories', 'product_categories.id', '=', 'products.product_category_id')
-        ->where('supplier_categories.name', 'Furniture')
+        ->where('supplier_categories.name', 'Furnitur')
         ->where('products.code', 'SaaS-CLOUD-001')
         ->count();
 
@@ -1192,6 +1192,40 @@ invariant('W7-17 customer demo varies branch, category and status', function () 
 invariant('W7-17 product categories and units have created_at', function () {
     expect(DB::table('product_categories')->whereNull('created_at')->count())->toBe(0);
     expect(DB::table('units')->whereNull('created_at')->count())->toBe(0);
+});
+
+// W7-17 (bahasa, master) — master demo kategori, departemen, jabatan, satuan, dan lokasi
+// memakai Bahasa Indonesia; nama Inggris lama tidak boleh tersisa.
+invariant('W7-17 demo master categories, departments, positions, units and locations are Indonesian', function () {
+    $legacy = [
+        'product_categories' => ['Electronics', 'Office Supplies', 'Furniture', 'Consulting Services', 'Software & SaaS'],
+        'supplier_categories' => ['Electronics', 'Office Supplies', 'Furniture', 'IT Services', 'Logistics'],
+        'customer_categories' => ['Retail', 'Wholesale', 'Government', 'Corporate', 'Walk-in'],
+        'departments' => ['HR', 'Engineering', 'Sales', 'Marketing', 'Finance', 'Operations', 'Legal'],
+        'positions' => ['Staff', 'Driver', 'Senior Developer', 'Manager', 'Director', 'Lead', 'VP', 'C-level'],
+        'units' => ['Piece', 'Box', 'Hour', 'Day', 'Week', 'Month', 'Year', 'Set', 'Pair', 'Sheet', 'Service'],
+        'asset_locations' => ['Office', 'IT Room', 'Warehouse'],
+    ];
+
+    foreach ($legacy as $table => $names) {
+        expect(DB::table($table)->whereIn('name', $names)->count())
+            ->toBe(0, "master demo {$table} masih memakai nama Inggris");
+    }
+});
+
+// W7-17 (kode) — kode lokasi aset demo unik lintas cabang dan tidak memakai kode lama tanpa akhiran.
+invariant('W7-17 demo asset location codes are unique and suffixed', function () {
+    $legacyCodes = DB::table('asset_locations')
+        ->whereIn('code', ['OFFICE', 'IT-ROOM', 'WAREHOUSE'])
+        ->count();
+    $duplicates = DB::table('asset_locations')
+        ->select('code')
+        ->groupBy('code')
+        ->havingRaw('COUNT(*) > 1')
+        ->count();
+
+    expect($legacyCodes)->toBe(0, 'kode lokasi demo lama tanpa akhiran cabang masih ada');
+    expect($duplicates)->toBe(0, 'kode lokasi aset tidak unik');
 });
 
 // W7-17 (i18n) — teks jurnal yang dibuat aplikasi lewat i18n, bukan hardcode Inggris.

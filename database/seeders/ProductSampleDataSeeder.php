@@ -20,18 +20,18 @@ class ProductSampleDataSeeder extends Seeder
 {
     public function run(): void
     {
-        $electronicsCategory = ProductCategory::where('name', 'Electronics')->first();
-        $furnitureCategory = ProductCategory::where('name', 'Finished Goods - Furniture')->first();
-        $rawMaterialWood = ProductCategory::where('name', 'Raw Materials - Wood')->first();
-        $rawMaterialHardware = ProductCategory::where('name', 'Raw Materials - Hardware')->first();
-        $softwareCategory = ProductCategory::where('name', 'Software & SaaS')->first();
+        $electronicsCategory = ProductCategory::where('name', DemoMasterData::PRODUCT_CATEGORY_ELECTRONICS)->first();
+        $furnitureCategory = ProductCategory::where('name', DemoMasterData::PRODUCT_CATEGORY_FINISHED_FURNITURE)->first();
+        $rawMaterialWood = ProductCategory::where('name', DemoMasterData::PRODUCT_CATEGORY_RAW_WOOD)->first();
+        $rawMaterialHardware = ProductCategory::where('name', DemoMasterData::PRODUCT_CATEGORY_RAW_HARDWARE)->first();
+        $softwareCategory = ProductCategory::where('name', DemoMasterData::PRODUCT_CATEGORY_SOFTWARE)->first();
 
         $pieceUnit = Unit::where('symbol', 'pcs')->first();
         $meterUnit = Unit::where('symbol', 'm')->first();
-        $sheetUnit = Unit::where('name', 'Sheet')->first();
-        $setUnit = Unit::where('name', 'Set')->first();
-        $boxUnit = Unit::where('name', 'Box')->first();
-        $serviceUnit = Unit::where('name', 'Service')->first();
+        $sheetUnit = Unit::where('name', DemoMasterData::UNIT_SHEET)->first();
+        $setUnit = Unit::where('name', DemoMasterData::UNIT_SET)->first();
+        $boxUnit = Unit::where('name', DemoMasterData::UNIT_BOX)->first();
+        $serviceUnit = Unit::where('name', DemoMasterData::UNIT_SERVICE)->first();
 
         $woodPanel = Product::updateOrCreate(
             ['code' => 'RM-WOOD-001'],

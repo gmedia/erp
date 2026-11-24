@@ -11,12 +11,26 @@ class PositionSeeder extends Seeder
     public function run(): void
     {
         // Hanya jabatan, bukan tingkat grade (Junior/Mid-level/Senior). W7-15.
-        $positions = [
-            'Staff', 'Supervisor', 'Driver', 'Senior Developer',
-            'Lead', 'Manager', 'Director', 'VP', 'C-level',
+        // Nama Inggris lama di-rename (bukan dihapus) agar relasi karyawan tetap utuh.
+        $legacyNames = [
+            'Staff' => 'Staf',
+            'Supervisor' => 'Supervisor',
+            'Driver' => DemoMasterData::POSITION_DRIVER,
+            'Senior Developer' => DemoMasterData::POSITION_SENIOR_DEVELOPER,
+            'Lead' => DemoMasterData::POSITION_LEAD,
+            'Manager' => DemoMasterData::POSITION_MANAGER,
+            'Director' => DemoMasterData::POSITION_DIRECTOR,
+            'VP' => 'Wakil Presiden',
+            'C-level' => 'Eksekutif Puncak',
         ];
 
-        foreach ($positions as $name) {
+        foreach ($legacyNames as $legacy => $replacement) {
+            if (! Position::query()->where('name', $replacement)->exists()) {
+                Position::query()->where('name', $legacy)->update(['name' => $replacement]);
+            }
+        }
+
+        foreach (array_values($legacyNames) as $name) {
             Position::updateOrCreate(['name' => $name]);
         }
 

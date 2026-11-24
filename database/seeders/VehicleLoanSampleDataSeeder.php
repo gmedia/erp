@@ -449,8 +449,8 @@ class VehicleLoanSampleDataSeeder extends Seeder
         $companyId = Company::query()->value('id');
         $branchId = Branch::query()->orderBy('id')->value('id');
         // Driver kendaraan adalah staf operasional, bukan HR/Finance.
-        $departmentId = Department::query()->where('name', 'Operations')->value('id');
-        $positionId = Position::query()->where('name', 'Driver')->value('id');
+        $departmentId = Department::query()->where('name', DemoMasterData::DEPARTMENT_OPERATIONS)->value('id');
+        $positionId = Position::query()->where('name', DemoMasterData::POSITION_DRIVER)->value('id');
 
         $drivers = [];
 
@@ -538,7 +538,7 @@ class VehicleLoanSampleDataSeeder extends Seeder
         ];
 
         // Kendaraan operasional berada di department Operations (W6-16).
-        $operationsDepartment = Department::query()->where('name', 'Operations')->first();
+        $operationsDepartment = Department::query()->where('name', DemoMasterData::DEPARTMENT_OPERATIONS)->first();
 
         $units = [];
 

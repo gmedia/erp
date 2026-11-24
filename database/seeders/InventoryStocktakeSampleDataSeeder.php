@@ -36,13 +36,13 @@ class InventoryStocktakeSampleDataSeeder extends Seeder
         $branchIdForStock = $warehouse->branch_id ?? Branch::query()->value('id');
         $products = $this->ensureProductsWithStock($branchIdForStock);
         // Stocktake menghitung barang fisik. Kategori dipilih dari barang
-        // (bukan jasa, mis. Consulting Services) agar sesuai isinya (W7-15).
+        // (bukan jasa, mis. Jasa Konsultasi) agar sesuai isinya (W7-15).
         $categoryId = ProductCategory::query()
             ->whereNotIn('name', [
-                'Consulting Services',
-                'Maintenance Services',
-                'Training Services',
-                'Software & SaaS',
+                DemoMasterData::PRODUCT_CATEGORY_CONSULTING,
+                DemoMasterData::PRODUCT_CATEGORY_MAINTENANCE,
+                DemoMasterData::PRODUCT_CATEGORY_TRAINING,
+                DemoMasterData::PRODUCT_CATEGORY_SOFTWARE,
             ])
             ->orderBy('id')
             ->value('id')

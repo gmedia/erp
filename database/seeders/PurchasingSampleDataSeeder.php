@@ -61,11 +61,11 @@ class PurchasingSampleDataSeeder extends Seeder
 
         // Beberapa supplier dengan kategori yang cocok (W5-23).
         $supplierSeeds = [
-            ['email' => 'pengadaan@sumber-makmur.example', 'name' => 'PT Sumber Makmur Sejahtera', 'category' => 'Office Supplies', 'phone' => '0215558001'],
-            ['email' => 'sales@nusantara-elektronik.example', 'name' => 'PT Nusantara Elektronik', 'category' => 'Electronics', 'phone' => '0215552345'],
-            ['email' => 'order@mebel-jaya.example', 'name' => 'CV Mebel Jaya Abadi', 'category' => 'Furniture', 'phone' => '0225553456'],
-            ['email' => 'kontak@logistik-cepat.example', 'name' => 'PT Logistik Cepat Nusantara', 'category' => 'Logistics', 'phone' => '0315554567'],
-            ['email' => 'it@solusi-digital.example', 'name' => 'PT Solusi Digital Teknologi', 'category' => 'IT Services', 'phone' => '0215555678'],
+            ['email' => 'pengadaan@sumber-makmur.example', 'name' => 'PT Sumber Makmur Sejahtera', 'category' => 'Perlengkapan Kantor', 'phone' => '0215558001'],
+            ['email' => 'sales@nusantara-elektronik.example', 'name' => 'PT Nusantara Elektronik', 'category' => 'Elektronik', 'phone' => '0215552345'],
+            ['email' => 'order@mebel-jaya.example', 'name' => 'CV Mebel Jaya Abadi', 'category' => 'Furnitur', 'phone' => '0225553456'],
+            ['email' => 'kontak@logistik-cepat.example', 'name' => 'PT Logistik Cepat Nusantara', 'category' => 'Logistik', 'phone' => '0315554567'],
+            ['email' => 'it@solusi-digital.example', 'name' => 'PT Solusi Digital Teknologi', 'category' => DemoMasterData::SUPPLIER_CATEGORY_IT_SERVICES, 'phone' => '0215555678'],
         ];
 
         foreach ($supplierSeeds as $seed) {
@@ -1063,12 +1063,13 @@ class PurchasingSampleDataSeeder extends Seeder
             $approved = in_array($status, ['confirmed', 'partially_received', 'fully_received', 'closed'], true);
 
             // Rotasi supplier aktif agar tidak semua PO ke vendor yang sama. Produk
-            // layanan SaaS hanya dipesan dari supplier kategori IT Services (W7-17).
+            // layanan SaaS hanya dipesan dari supplier kategori Jasa TI (W7-17).
             $poSuppliers = Supplier::query()->orderBy('id')->get();
             $isSoftwareOrder = $firstProduct->code === 'SW-CLD-001' || $secondProduct->code === 'SW-CLD-001';
+            $itServicesCategory = DemoMasterData::SUPPLIER_CATEGORY_IT_SERVICES;
             $eligibleSuppliers = $isSoftwareOrder
-                ? $poSuppliers->filter(fn (Supplier $candidate) => $candidate->category?->name === 'IT Services')
-                : $poSuppliers->reject(fn (Supplier $candidate) => $candidate->category?->name === 'IT Services');
+                ? $poSuppliers->filter(fn (Supplier $candidate) => $candidate->category?->name === $itServicesCategory)
+                : $poSuppliers->reject(fn (Supplier $candidate) => $candidate->category?->name === $itServicesCategory);
             $eligibleSuppliers = $eligibleSuppliers->isEmpty() ? $poSuppliers : $eligibleSuppliers->values();
             $poSupplierId = $eligibleSuppliers->isEmpty()
                 ? $supplier->id

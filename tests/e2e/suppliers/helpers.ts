@@ -33,7 +33,7 @@ export async function createSupplier(
       { name: 'phone', type: 'text', defaultValue: '08123456789' },
       { name: 'address', type: 'textarea', defaultValue: '456 Supplier Road' },
       { name: 'branch_id', type: 'select', selector: 'Branch', defaultValue: 'Kantor Pusat' },
-      { name: 'category_id', type: 'select', selector: 'Category', defaultValue: 'Office Supplies' },
+      { name: 'category_id', type: 'select', selector: 'Category', defaultValue: 'Perlengkapan Kantor' },
       { name: 'status', type: 'select', selector: 'Status', defaultValue: 'Active' },
     ],
   };

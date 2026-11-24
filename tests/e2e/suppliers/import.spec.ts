@@ -19,7 +19,7 @@ test.describe('Supplier Import E2E Tests', () => {
             '08123456789',               // phone
             '123 E2E Street',            // address
             'Kantor Pusat',               // branch
-            'Electronics',               // category
+            'Elektronik',                // category
             'active'                     // status
         ];
         
@@ -89,7 +89,7 @@ test.describe('Supplier Import E2E Tests', () => {
             '08123456789',            // phone
             '123 E2E Street',         // address
             'Kantor Pusat',            // branch
-            'Electronics',            // category
+            'Elektronik',             // category
             'active'                  // status
         ];
         

@@ -54,7 +54,7 @@ export async function createProduct(
     const catPopover = page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').last();
     await expect(catPopover).toBeVisible({ timeout: 15000 });
     const catSearch = page.getByPlaceholder('Search...').filter({ visible: true }).last();
-    const catName = overrides.category_id ?? 'Electronics';
+        const catName = overrides.category_id ?? 'Elektronik';
     if (await catSearch.isVisible()) {
         const categoryResponsePromise = page.waitForResponse(
             r => r.url().includes('/api/product-categories') && r.status() < 400,
@@ -77,7 +77,7 @@ export async function createProduct(
     const unitPopover = page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').last();
     await expect(unitPopover).toBeVisible({ timeout: 15000 });
     const unitSearch = page.getByPlaceholder('Search...').filter({ visible: true }).last();
-    const unitName = overrides.unit_id ?? 'Piece';
+        const unitName = overrides.unit_id ?? 'Buah';
     if (await unitSearch.isVisible()) {
         const unitResponsePromise = page.waitForResponse(
             r => r.url().includes('/api/units') && r.status() < 400,

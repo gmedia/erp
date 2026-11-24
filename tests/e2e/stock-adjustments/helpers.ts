@@ -122,10 +122,10 @@ export async function createStockAdjustment(page: Page): Promise<string> {
         },
     ];
     const unitCandidates: readonly AsyncOptionCandidate[] = [
-        { searchText: 'Sheet', optionText: 'Sheet' },
+        { searchText: 'Lembar', optionText: 'Lembar' },
         { searchText: 'pcs', optionText: 'pcs' },
-        { searchText: 'Set', optionText: 'Set' },
-        { searchText: 'Box', optionText: 'Box' },
+        { searchText: 'Perangkat', optionText: 'Perangkat' },
+        { searchText: 'Kotak', optionText: 'Kotak' },
     ];
 
     const addButton = page.getByRole('button', { name: /Add/i });

@@ -849,9 +849,9 @@ class AssetSampleDataSeeder extends Seeder
         // ── Additional Sample Data (Movements, Maintenance, etc.) ───
         // Department mengikuti jenis aset, bukan default HR (W6-16).
         $departmentByAssetCode = [
-            'FA-000003' => 'Operations',
-            'FA-000010' => 'Engineering',
-            'FA-000011' => 'Operations',
+            'FA-000003' => DemoMasterData::DEPARTMENT_OPERATIONS,
+            'FA-000010' => DemoMasterData::DEPARTMENT_ENGINEERING,
+            'FA-000011' => DemoMasterData::DEPARTMENT_OPERATIONS,
         ];
 
         foreach ($departmentByAssetCode as $assetCode => $departmentName) {

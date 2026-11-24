@@ -101,7 +101,7 @@ test.describe('Purchase Request approval flow (UI)', () => {
             'Product',
             'Executive Office Desk',
         );
-        await selectAsyncOption(page, itemDialog, 'Unit', 'Piece');
+        await selectAsyncOption(page, itemDialog, 'Unit', 'Buah');
         await itemDialog.getByLabel('Quantity').fill('2');
         await itemDialog.getByRole('button', { name: /Save Item/i }).click();
 
