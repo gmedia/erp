@@ -1,4 +1,4 @@
-import { Locator, Page, expect } from '@playwright/test';
+import { APIRequestContext, Locator, Page, expect } from '@playwright/test';
 
 type ApiResponseMatcher = string | RegExp | ((url: string) => boolean);
 
@@ -12,32 +12,19 @@ interface LoginOptions {
 
 export const E2E_DELEGATE_EMAIL = 'manager.hr@example.com';
 
-async function approveAsDelegate(
-    page: Page,
-    approvalRequestId: number,
-    comments = 'E2E approved',
+const ensuredDelegations = new Set<number>();
+
+async function ensureAdminDelegation(
+    api: APIRequestContext,
+    adminHeaders: Record<string, string>,
+    delegateId: number,
 ): Promise<void> {
-    const adminToken = await page.evaluate(() => localStorage.getItem('api_token'));
-    if (!adminToken) throw new Error('api_token missing from browser localStorage');
-
-    const api = page.context().request;
-    const adminHeaders = { Accept: 'application/json', Authorization: `Bearer ${adminToken}` };
-
     const meResponse = await api.get('/api/me', { headers: adminHeaders });
     expect(meResponse.ok()).toBeTruthy();
     const me = (await meResponse.json()) as { id?: number; user?: { id?: number } };
     const adminId = me.user?.id ?? me.id;
     if (!adminId) throw new Error('Could not resolve admin user id');
-
-    const delegateLogin = await api.post('/api/login', {
-        headers: { Accept: 'application/json' },
-        data: { email: E2E_DELEGATE_EMAIL, password: DEFAULT_E2E_PASSWORD },
-    });
-    expect(delegateLogin.ok()).toBeTruthy();
-    const login = (await delegateLogin.json()) as { token?: string; user?: { id?: number } };
-    const delegateId = login.user?.id;
-    const delegateToken = login.token;
-    if (!delegateId || !delegateToken) throw new Error('Delegate login returned no token');
+    if (ensuredDelegations.has(adminId)) return;
 
     const inDays = (days: number) =>
         new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
@@ -54,12 +41,7 @@ async function approveAsDelegate(
         },
     });
     expect(delegation.ok()).toBeTruthy();
-
-    const approve = await api.post(`/api/my-approvals/${approvalRequestId}/approve`, {
-        headers: { Accept: 'application/json', Authorization: `Bearer ${delegateToken}` },
-        data: { comments },
-    });
-    expect(approve.ok()).toBeTruthy();
+    ensuredDelegations.add(adminId);
 }
 
 export async function approveApprovableAsDelegate(
@@ -68,17 +50,26 @@ export async function approveApprovableAsDelegate(
     comments = 'E2E approved',
     approvableType?: string,
 ): Promise<void> {
-    const delegateLogin = await page.context().request.post('/api/login', {
+    const adminToken = await page.evaluate(() => localStorage.getItem('api_token'));
+    if (!adminToken) throw new Error('api_token missing from browser localStorage');
+
+    const api = page.context().request;
+    const adminHeaders = { Accept: 'application/json', Authorization: `Bearer ${adminToken}` };
+
+    const delegateLogin = await api.post('/api/login', {
         headers: { Accept: 'application/json' },
         data: { email: E2E_DELEGATE_EMAIL, password: DEFAULT_E2E_PASSWORD },
     });
     expect(delegateLogin.ok()).toBeTruthy();
-    const { token } = (await delegateLogin.json()) as { token?: string };
-    if (!token) throw new Error('Delegate login returned no token');
+    const login = (await delegateLogin.json()) as { token?: string; user?: { id?: number } };
+    const delegateId = login.user?.id;
+    const delegateToken = login.token;
+    if (!delegateId || !delegateToken) throw new Error('Delegate login returned no token');
 
-    const inbox = await page.context().request.get('/api/my-approvals', {
-        headers: { Accept: 'application/json', Authorization: `Bearer ${token}` },
-    });
+    await ensureAdminDelegation(api, adminHeaders, delegateId);
+
+    const delegateHeaders = { Accept: 'application/json', Authorization: `Bearer ${delegateToken}` };
+    const inbox = await api.get('/api/my-approvals', { headers: delegateHeaders });
     expect(inbox.ok()).toBeTruthy();
     const payload = (await inbox.json()) as {
         pending?: Array<{
@@ -93,7 +84,11 @@ export async function approveApprovableAsDelegate(
     const requestId = step?.request?.id;
     if (!requestId) throw new Error(`No pending approval for approvable ${approvableId}`);
 
-    await approveAsDelegate(page, requestId, comments);
+    const approve = await api.post(`/api/my-approvals/${requestId}/approve`, {
+        headers: delegateHeaders,
+        data: { comments },
+    });
+    expect(approve.ok()).toBeTruthy();
 }
 
 function matchesApiUrl(url: string, matcher: ApiResponseMatcher): boolean {

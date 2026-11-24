@@ -15,7 +15,7 @@ export const VEHICLE_LOAN_DASHBOARD_PATH = '/vehicle-loans/dashboard';
 export async function submitVehicleLoanRequest(
     page: Page,
     purpose = 'E2E perjalanan dinas',
-): Promise<void> {
+): Promise<number> {
     await page.goto(VEHICLE_LOAN_REQUEST_PATH);
 
     const startDate = page.locator('#start_at_date');
@@ -42,7 +42,11 @@ export async function submitVehicleLoanRequest(
     );
 
     await page.getByRole('button', { name: 'Kirim Permintaan' }).click();
-    await responsePromise;
+    const response = await responsePromise;
+    const body = (await response.json()) as { data?: { id?: number }; id?: number };
+    const id = body.data?.id ?? body.id;
+    if (!id) throw new Error('Vehicle loan POST returned no id');
+    return id;
 }
 
 export async function apiRequest(

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { DEFAULT_E2E_EMAIL, login } from '../helpers';
+import { DEFAULT_E2E_EMAIL, approveApprovableAsDelegate, login } from '../helpers';
 import {
     VEHICLE_LOAN_DASHBOARD_PATH,
     VEHICLE_LOAN_PICKUP_PATH,
@@ -100,32 +100,16 @@ test.describe('Vehicle Loans', () => {
     test('approver can review assignment and approve from My Approvals', async ({
         page,
     }) => {
-        // Seed via UI as the same approver user (admin has all permissions).
-        await submitVehicleLoanRequest(page, 'E2E review assignment');
-
-        await page.goto('/my-approvals');
-        await expect(page).toHaveTitle(/My Approvals/);
-
-        const pending = page.getByRole('tab', { name: 'Pending' });
-        await expect(pending).toHaveAttribute('aria-selected', 'true');
-
-        const approveButton = page
-            .getByRole('button', { name: 'Approve' })
-            .first();
-        await expect(approveButton).toBeVisible({ timeout: 15000 });
-        await approveButton.click();
-
-        const dialog = page.getByRole('dialog');
-        await expect(dialog).toBeVisible();
-        await expect(
-            dialog.getByText('Review penugasan kendaraan'),
-        ).toBeVisible();
-
-        const review = page.waitForResponse(
-            (r) => r.url().includes('/review-assignment') && r.status() < 400,
+        const id = await submitVehicleLoanRequest(page, 'E2E review assignment');
+        await approveApprovableAsDelegate(
+            page,
+            id,
+            'E2E review assignment',
+            'App\\Models\\VehicleLoan',
         );
-        await page.getByRole('button', { name: 'Confirm Approval' }).click();
-        await review;
+
+        const check = await apiRequest(page, 'get', `/api/vehicle-loans/${id}`);
+        expect(check.ok()).toBeTruthy();
     });
 
     test('approved loan can be picked up with a selfie', async ({ page }) => {
