@@ -1,13 +1,17 @@
 <?php
 
+use App\Models\Account;
 use App\Models\ApPayment;
 use App\Models\ApPaymentAllocation;
 use App\Models\ArReceipt;
 use App\Models\ArReceiptAllocation;
+use App\Models\CoaVersion;
 use App\Models\CreditNote;
 use App\Models\Customer;
 use App\Models\CustomerInvoice;
 use App\Models\FiscalYear;
+use App\Models\JournalEntry;
+use App\Models\JournalEntryLine;
 use App\Models\Supplier;
 use App\Models\SupplierBill;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -288,9 +292,32 @@ test('ap aging subtracts payments and discounts dated on or before as_of_date on
         'discount_taken' => 0,
     ]);
 
+    // Diskon hanya mengurangi sisa bila jurnal payment memuat akun diskon (#437).
+    $earlyEntry = JournalEntry::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'status' => 'posted',
+        'source_type' => ApPayment::class,
+        'source_id' => $early->id,
+    ]);
+    $discountAccount = Account::factory()->create([
+        'coa_version_id' => CoaVersion::factory()->create(['status' => 'active'])->id,
+        'code' => '51900',
+        'name' => 'Purchase Discount',
+        'type' => 'expense',
+        'normal_balance' => 'credit',
+        'is_active' => true,
+    ]);
+    JournalEntryLine::factory()->create([
+        'journal_entry_id' => $earlyEntry->id,
+        'account_id' => $discountAccount->id,
+        'debit' => 0,
+        'credit' => 10000,
+    ]);
+    $early->forceFill(['journal_entry_id' => $earlyEntry->id])->save();
+
     Sanctum::actingAs($this->apUser, ['*']);
 
-    // Per 2026-03-15: hanya alokasi 20000 + diskon 10000 yang berlaku -> sisa 70000.
+    // Per 2026-03-15: hanya alokasi 20000 + diskon 10000 (terjurnal) yang berlaku -> sisa 70000.
     getJson('/api/reports/ap-aging?as_of_date=2026-03-15')
         ->assertOk()
         ->assertJsonPath('data.0.bill.number', 'BILL-HIST')
