@@ -98,7 +98,7 @@ test('store creates credit note with items', function () {
     [$customer, $fiscalYear, $invoice, $product, $unit] = createCreditNoteWithItem();
 
     $branch = Branch::factory()->create();
-    $account = Account::factory()->create();
+    $account = Account::factory()->inActiveCoa()->create();
 
     $payload = [
         'customer_id' => $customer->id,
@@ -166,7 +166,7 @@ test('update modifies credit note and items', function () {
         'status' => 'draft',
     ]);
 
-    $account = Account::factory()->create();
+    $account = Account::factory()->inActiveCoa()->create();
     $payload = [
         'status' => 'confirmed',
         'items' => [

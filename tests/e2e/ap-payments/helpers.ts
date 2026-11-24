@@ -18,23 +18,26 @@ export async function createApPayment(page: Page): Promise<string> {
             return Number(rows[0].id);
         };
 
-        const getFirstAccount = async (): Promise<number> => {
-            const response = await fetch('/api/accounts?per_page=1', {
+        const getPostableAccount = async (): Promise<number> => {
+            const response = await fetch('/api/accounts?per_page=100', {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'Authorization': `Bearer ${apiToken}`,
                 },
             });
             const json = await response.json();
-            const rows = json.data || json;
-            return Number(rows[0].id);
+            const row = (json.data || []).find((a: { code: string }) => a.code === '11110');
+            if (!row) {
+                throw new Error('akun postable 11110 tidak ditemukan');
+            }
+            return Number(row.id);
         };
 
         const [supplierId, branchId, fiscalYearId, bankAccountId] = await Promise.all([
             getFirstId('/api/suppliers?per_page=1'),
             getFirstId('/api/branches?per_page=1'),
             getFirstId('/api/fiscal-years?per_page=1'),
-            getFirstAccount(),
+            getPostableAccount(),
         ]);
 
         const billResponse = await fetch('/api/supplier-bills', {
@@ -55,7 +58,7 @@ export async function createApPayment(page: Page): Promise<string> {
                 status: 'confirmed',
                 items: [
                     {
-                        account_id: await getFirstAccount(),
+                        account_id: await getPostableAccount(),
                         description: 'E2E Test Bill for Payment',
                         quantity: 1,
                         unit_price: 1000000,

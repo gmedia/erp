@@ -41,7 +41,7 @@ function createCustomerInvoiceWithItem(): array
     $fiscalYear = FiscalYear::factory()->create();
     $product = Product::factory()->create();
     $unit = Unit::factory()->create();
-    $account = Account::factory()->create();
+    $account = Account::factory()->inActiveCoa()->create();
 
     return [$customer, $branch, $fiscalYear, $product, $unit, $account];
 }

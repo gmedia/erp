@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\PurchaseOrders\ExportPurchaseOrdersAction;
 use App\Actions\PurchaseOrders\IndexPurchaseOrdersAction;
+use App\Actions\PurchaseOrders\ListPurchaseOrderItemOptionsAction;
 use App\Actions\PurchaseOrders\SyncPurchaseOrderItemsAction;
 use App\DTOs\PurchaseOrders\UpdatePurchaseOrderData;
 use App\Http\Controllers\Concerns\LoadsResourceRelations;
@@ -16,6 +17,7 @@ use App\Http\Resources\PurchaseOrders\PurchaseOrderCollection;
 use App\Http\Resources\PurchaseOrders\PurchaseOrderResource;
 use App\Models\PurchaseOrder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class PurchaseOrderController extends Controller
@@ -92,6 +94,19 @@ class PurchaseOrderController extends Controller
     public function destroy(PurchaseOrder $purchaseOrder): JsonResponse
     {
         return $this->destroyModel($purchaseOrder);
+    }
+
+    public function itemOptions(
+        PurchaseOrder $purchaseOrder,
+        ListPurchaseOrderItemOptionsAction $action,
+        Request $request,
+    ): JsonResponse {
+        return response()->json(['data' => $action->execute(
+            $purchaseOrder,
+            $request->string('search')->toString() ?: null,
+            $request->integer('current_line_id') ?: null,
+            $request->integer('goods_receipt_id') ?: null,
+        )]);
     }
 
     public function export(ExportPurchaseOrderRequest $request, ExportPurchaseOrdersAction $action): JsonResponse

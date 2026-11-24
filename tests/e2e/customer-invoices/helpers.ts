@@ -18,11 +18,26 @@ export async function createCustomerInvoice(page: Page): Promise<string> {
             return Number(rows[0].id);
         };
 
+        const postableAccountId = async (): Promise<number> => {
+            const response = await fetch('/api/accounts?per_page=100', {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    Authorization: `Bearer ${apiToken}`,
+                },
+            });
+            const json = await response.json();
+            const row = (json.data || []).find((a: { code: string }) => a.code === '11110');
+            if (!row) {
+                throw new Error('akun postable 11110 tidak ditemukan');
+            }
+            return Number(row.id);
+        };
+
         const [customerId, branchId, fiscalYearId, accountId] = await Promise.all([
             getFirstId('/api/customers?per_page=1'),
             getFirstId('/api/branches?per_page=1'),
             getFirstId('/api/fiscal-years?per_page=1'),
-            getFirstId('/api/accounts?per_page=1'),
+            postableAccountId(),
         ]);
 
         const today = new Date().toISOString().slice(0, 10);
