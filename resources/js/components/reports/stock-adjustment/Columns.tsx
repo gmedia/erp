@@ -23,6 +23,8 @@ export type StockAdjustmentReportItem = {
     };
     adjustment_count: number;
     total_quantity_adjusted: string;
+    total_increase_quantity: string;
+    total_decrease_quantity: string;
     total_adjustment_value: string;
 };
 
@@ -69,6 +71,18 @@ export const stockAdjustmentReportColumns: ColumnDef<StockAdjustmentReportItem>[
         createNumberColumn<StockAdjustmentReportItem>({
             accessorKey: 'total_quantity_adjusted',
             label: 'Total Qty Adjusted',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2,
+        }),
+        createNumberColumn<StockAdjustmentReportItem>({
+            accessorKey: 'total_increase_quantity',
+            label: 'Increase Qty',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2,
+        }),
+        createNumberColumn<StockAdjustmentReportItem>({
+            accessorKey: 'total_decrease_quantity',
+            label: 'Decrease Qty',
             minimumFractionDigits: 0,
             maximumFractionDigits: 2,
         }),

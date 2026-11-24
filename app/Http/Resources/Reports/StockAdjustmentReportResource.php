@@ -30,6 +30,8 @@ class StockAdjustmentReportResource extends JsonResource
             ],
             'adjustment_count' => (int) $this->adjustment_count,
             'total_quantity_adjusted' => (string) $this->total_quantity_adjusted,
+            'total_increase_quantity' => (string) $this->total_increase_quantity,
+            'total_decrease_quantity' => (string) $this->total_decrease_quantity,
             'total_adjustment_value' => (string) $this->total_adjustment_value,
         ];
     }

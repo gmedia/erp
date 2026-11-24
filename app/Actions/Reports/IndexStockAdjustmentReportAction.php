@@ -32,6 +32,8 @@ class IndexStockAdjustmentReportAction
                 b.name as branch_name,
                 COUNT(DISTINCT sa.id) as adjustment_count,
                 SUM(sai.quantity_adjusted) as total_quantity_adjusted,
+                COALESCE(SUM(CASE WHEN sai.quantity_adjusted > 0 THEN sai.quantity_adjusted ELSE 0 END), 0) as total_increase_quantity,
+                COALESCE(SUM(CASE WHEN sai.quantity_adjusted < 0 THEN -sai.quantity_adjusted ELSE 0 END), 0) as total_decrease_quantity,
                 SUM(sai.total_cost) as total_adjustment_value
             ')
             ->groupBy([
@@ -50,6 +52,8 @@ class IndexStockAdjustmentReportAction
                 'adjustment_date' => 'date',
                 'adjustment_count' => 'integer',
                 'total_quantity_adjusted' => 'decimal:2',
+                'total_increase_quantity' => 'decimal:2',
+                'total_decrease_quantity' => 'decimal:2',
                 'total_adjustment_value' => 'decimal:2',
             ]);
 

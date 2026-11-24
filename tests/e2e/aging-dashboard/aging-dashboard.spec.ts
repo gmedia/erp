@@ -131,4 +131,22 @@ test.describe('Aging Dashboard', () => {
             ).toBeVisible();
         }
     });
+
+    test('top overdue customers table keeps Days Late as the last column', async ({
+        page,
+    }) => {
+        await page.goto('/aging-dashboard');
+        await waitForAgingDashboardData(page);
+
+        const card = page
+            .locator('[data-slot="card"]')
+            .filter({ hasText: 'Top Overdue Customers' })
+            .first();
+        await expect(card).toBeVisible({ timeout: 10000 });
+
+        const headers = card.locator('thead th');
+        await expect(headers.nth(0)).toHaveText('Customer');
+        await expect(headers.nth(1)).toHaveText('Overdue Amount');
+        await expect(headers.last()).toHaveText('Days Late');
+    });
 });

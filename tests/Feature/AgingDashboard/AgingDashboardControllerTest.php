@@ -479,4 +479,32 @@ describe('Aging Dashboard API', function () {
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['currency']);
     });
+
+    test('top overdue customer row carries days late and outstanding in their own fields', function () {
+        $branch = Branch::factory()->create();
+        $customer = Customer::factory()->create(['branch_id' => $branch->id, 'name' => 'PT Contoh Pelanggan']);
+
+        CustomerInvoice::factory()->create([
+            'customer_id' => $customer->id,
+            'branch_id' => $branch->id,
+            'due_date' => '2026-04-01',
+            'grand_total' => 30000000,
+            'amount_received' => 0,
+            'credit_note_amount' => 0,
+            'amount_due' => 30000000,
+            'status' => 'overdue',
+        ]);
+
+        Sanctum::actingAs($this->createTestUserWithPermissions(['aging_dashboard']), ['*']);
+
+        $response = getJson('/api/aging-dashboard?as_of_date=2026-04-09');
+
+        $response->assertOk();
+        $row = $response->json('top_overdue_customers.0');
+
+        expect($row)->toHaveKeys(['overdue_amount', 'outstanding_amount', 'max_days_overdue'])
+            ->and((float) $row['overdue_amount'])->toBe(30000000.0)
+            ->and((float) $row['outstanding_amount'])->toBe(30000000.0)
+            ->and($row['max_days_overdue'])->toBe(8);
+    });
 });

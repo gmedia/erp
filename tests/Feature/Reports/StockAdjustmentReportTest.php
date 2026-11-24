@@ -121,6 +121,35 @@ test('it can filter by warehouse branch type status and date', function () {
         ->assertJsonPath('data.0.adjustment_date', '2026-03-10');
 });
 
+test('it splits adjusted quantity into increase and decrease by sign', function () {
+    $warehouse = Warehouse::factory()->create();
+    $adjustment = StockAdjustment::factory()->create([
+        'warehouse_id' => $warehouse->id,
+        'adjustment_date' => '2026-03-05',
+        'adjustment_type' => 'damage',
+        'status' => 'approved',
+    ]);
+
+    StockAdjustmentItem::factory()->create([
+        'stock_adjustment_id' => $adjustment->id,
+        'quantity_adjusted' => -2,
+        'total_cost' => 200,
+    ]);
+    StockAdjustmentItem::factory()->create([
+        'stock_adjustment_id' => $adjustment->id,
+        'quantity_adjusted' => 3,
+        'total_cost' => 300,
+    ]);
+
+    Sanctum::actingAs($this->user, ['*']);
+    $this->getJson('/api/reports/stock-adjustment')
+        ->assertOk()
+        ->assertJsonPath('data.0.total_increase_quantity', '3.00')
+        ->assertJsonPath('data.0.total_decrease_quantity', '2.00')
+        ->assertJsonPath('data.0.total_quantity_adjusted', '1.00')
+        ->assertJsonPath('data.0.total_adjustment_value', '500.00');
+});
+
 test('it can export stock adjustment report', function () {
     Carbon::setTestNow(Carbon::parse('2026-03-04 12:00:00'));
     Excel::fake();
