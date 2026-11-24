@@ -41,7 +41,7 @@ function nonGetPermissionExemptions(): array
         'POST api/my-approvals/{approvalRequest}/reject' => $approver,
         'POST api/vehicle-loans/{vehicle_loan}/review-assignment' => $approver,
         'POST api/entity-states/{entityType}/{entityId}/transition' => 'Endpoint entity-states; '
-            .'izin dicek middleware entity-state-permission.',
+            . 'izin dicek middleware entity-state-permission.',
     ];
 }
 
