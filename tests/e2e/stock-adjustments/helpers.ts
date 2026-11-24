@@ -412,7 +412,7 @@ export async function editStockAdjustment(
     }
 
     // Click dialog title area to dismiss any floating popover/listbox
-    await dialog.locator('[class*="DialogHeader"], [class*="dialog-header"]').first().click().catch(() => null);
+    await dialog.locator('[data-slot="dialog-header"]').click().catch(() => null);
     await page.waitForTimeout(300);
 
     const updateBtn = dialog.getByRole('button', { name: /Update/i });
