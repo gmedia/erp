@@ -168,7 +168,9 @@ test('editing confirmed GR item beyond PO line quantity is rejected with 422', f
         ->assertStatus(201);
 
     // Edit GR A menjadi 5 -> total 11 > 10 harus ditolak.
-    putJson('/api/goods-receipts/' . $first->json('data.id'), issue436ReceiptPayload($purchaseOrder, $item, 'confirmed', 5, 5))
+    $payload = issue436ReceiptPayload($purchaseOrder, $item, 'confirmed', 5, 5);
+
+    putJson('/api/goods-receipts/' . $first->json('data.id'), $payload)
         ->assertStatus(422)
         ->assertJsonValidationErrors(['items.0.quantity_received']);
 
