@@ -4,6 +4,7 @@ use App\Models\JournalEntry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
 use Laravel\Sanctum\Sanctum;
+
 use function Pest\Laravel\postJson;
 
 uses(RefreshDatabase::class)->group('journal-entries');
