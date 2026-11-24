@@ -1175,6 +1175,26 @@ invariant('W7-17 product categories and units have created_at', function () {
     expect(DB::table('units')->whereNull('created_at')->count())->toBe(0);
 });
 
+// W7-17 (i18n) — teks jurnal yang dibuat aplikasi lewat i18n, bukan hardcode Inggris.
+// Kunci harus ada di lang/en.json dan lang/id.json agar mengikuti bahasa UI.
+invariant('W7-17 depreciation journal text is generated through i18n in en and id', function () {
+    $source = file_get_contents(base_path('app/Actions/AssetDepreciationRuns/PostDepreciationToJournalAction.php'));
+
+    expect($source)
+        ->not->toContain("'Depreciation Run for '")
+        ->not->toContain("'Accumulated Depreciation'")
+        ->not->toContain("'Depreciation Expense'")
+        ->toContain("__('asset_depreciation_run.");
+
+    foreach (['en', 'id'] as $locale) {
+        $strings = json_decode(file_get_contents(lang_path("{$locale}.json")), true, 512, JSON_THROW_ON_ERROR);
+
+        foreach (['asset_depreciation_run.journal_description', 'asset_depreciation_run.memo_expense', 'asset_depreciation_run.memo_accumulated'] as $key) {
+            expect(array_key_exists($key, $strings))->toBeTrue("lang/{$locale}.json must define {$key}");
+        }
+    }
+});
+
 // W7-17 — nama aset demo bahasa Indonesia; kategori aset tidak berbahasa campur.
 invariant('W7-17 demo master names are Indonesian, not mixed with English labels', function () {
     $englishLabels = ['Mesin Production', 'Vehicles', 'Office Equipment', 'Operating Budget'];
