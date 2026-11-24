@@ -1,10 +1,11 @@
 'use client';
 
+import { ArReceiptRowActions } from '@/components/ar-receipts/ArReceiptRowActions';
 import { Badge } from '@/components/ui/badge';
 import { formatStatusLabel } from '@/lib/status-badge';
 import { ArReceipt } from '@/types/ar-receipt';
 import {
-    createActionsColumn,
+    type CustomTableMeta,
     createDateColumn,
     createRowCurrencyAmountColumn,
     createSelectColumn,
@@ -70,5 +71,22 @@ export const arReceiptColumns: ColumnDef<ArReceipt>[] = [
         accessorKey: 'total_unallocated',
         label: 'Unallocated',
     }),
-    createActionsColumn<ArReceipt>(),
+    {
+        id: 'actions_custom',
+        enableHiding: false,
+        size: 56,
+        cell: ({ row, table }) => {
+            const meta = table.options.meta as
+                | CustomTableMeta<ArReceipt>
+                | undefined;
+            return (
+                <ArReceiptRowActions
+                    item={row.original}
+                    onView={meta?.onView}
+                    onEdit={meta?.onEdit}
+                    onDelete={meta?.onDelete}
+                />
+            );
+        },
+    },
 ];

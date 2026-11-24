@@ -1,8 +1,9 @@
 'use client';
 
+import { SupplierBillRowActions } from '@/components/supplier-bills/SupplierBillRowActions';
 import { SupplierBill } from '@/types/supplier-bill';
 import {
-    createActionsColumn,
+    type CustomTableMeta,
     createDateColumn,
     createSelectColumn,
     createSortingHeader,
@@ -81,5 +82,22 @@ export const supplierBillColumns: ColumnDef<SupplierBill>[] = [
             </div>
         ),
     },
-    createActionsColumn<SupplierBill>(),
+    {
+        id: 'actions_custom',
+        enableHiding: false,
+        size: 56,
+        cell: ({ row, table }) => {
+            const meta = table.options.meta as
+                | CustomTableMeta<SupplierBill>
+                | undefined;
+            return (
+                <SupplierBillRowActions
+                    item={row.original}
+                    onView={meta?.onView}
+                    onEdit={meta?.onEdit}
+                    onDelete={meta?.onDelete}
+                />
+            );
+        },
+    },
 ];

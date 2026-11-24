@@ -12,6 +12,13 @@ interface UseEntityStatusActionOptions<T, A extends string> {
     successMessages: Record<A, string>;
     failedMessage: string;
     onSuccess?: (item: T) => void;
+    request?: (action: A, id: number | string) => ActionRequest;
+}
+
+interface ActionRequest {
+    method: 'post' | 'put';
+    url: string;
+    body?: object;
 }
 
 function getErrorMessage(error: unknown, fallback: string): string {
@@ -34,6 +41,7 @@ export function useEntityStatusAction<
     successMessages,
     failedMessage,
     onSuccess,
+    request,
 }: UseEntityStatusActionOptions<T, A>) {
     const queryClient = useQueryClient();
     const [processing, setProcessing] = useState(false);
@@ -41,9 +49,15 @@ export function useEntityStatusAction<
     const run = async (item: T, action: A): Promise<boolean> => {
         setProcessing(true);
         try {
-            const response = await axiosInstance.post<{ data: T }>(
-                `${endpoint}/${item.id}/${action}`,
-            );
+            const { method, url, body } = request?.(action, item.id) ?? {
+                method: 'post' as const,
+                url: `${endpoint}/${item.id}/${action}`,
+            };
+            const response = await axiosInstance.request<{ data: T }>({
+                method,
+                url,
+                data: body,
+            });
 
             toast.success(successMessages[action]);
             void queryClient.invalidateQueries({ queryKey: [queryKey] });

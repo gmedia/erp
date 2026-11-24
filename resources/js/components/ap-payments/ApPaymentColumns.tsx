@@ -1,10 +1,11 @@
 'use client';
 
+import { ApPaymentRowActions } from '@/components/ap-payments/ApPaymentRowActions';
 import { Badge } from '@/components/ui/badge';
 import { formatStatusLabel } from '@/lib/status-badge';
 import { ApPayment } from '@/types/ap-payment';
 import {
-    createActionsColumn,
+    type CustomTableMeta,
     createDateColumn,
     createRowCurrencyAmountColumn,
     createSelectColumn,
@@ -71,5 +72,22 @@ export const apPaymentColumns: ColumnDef<ApPayment>[] = [
         accessorKey: 'total_unallocated',
         label: 'Unallocated',
     }),
-    createActionsColumn<ApPayment>(),
+    {
+        id: 'actions_custom',
+        enableHiding: false,
+        size: 56,
+        cell: ({ row, table }) => {
+            const meta = table.options.meta as
+                | CustomTableMeta<ApPayment>
+                | undefined;
+            return (
+                <ApPaymentRowActions
+                    item={row.original}
+                    onView={meta?.onView}
+                    onEdit={meta?.onEdit}
+                    onDelete={meta?.onDelete}
+                />
+            );
+        },
+    },
 ];

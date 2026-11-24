@@ -1,8 +1,9 @@
 'use client';
 
+import { CustomerInvoiceRowActions } from '@/components/customer-invoices/CustomerInvoiceRowActions';
 import { CustomerInvoice } from '@/types/customer-invoice';
 import {
-    createActionsColumn,
+    type CustomTableMeta,
     createDateColumn,
     createRowCurrencyAmountColumn,
     createSelectColumn,
@@ -63,5 +64,22 @@ export const customerInvoiceColumns: ColumnDef<CustomerInvoice>[] = [
         accessorKey: 'amount_due',
         label: 'Amount Due',
     }),
-    createActionsColumn<CustomerInvoice>(),
+    {
+        id: 'actions_custom',
+        enableHiding: false,
+        size: 56,
+        cell: ({ row, table }) => {
+            const meta = table.options.meta as
+                | CustomTableMeta<CustomerInvoice>
+                | undefined;
+            return (
+                <CustomerInvoiceRowActions
+                    item={row.original}
+                    onView={meta?.onView}
+                    onEdit={meta?.onEdit}
+                    onDelete={meta?.onDelete}
+                />
+            );
+        },
+    },
 ];

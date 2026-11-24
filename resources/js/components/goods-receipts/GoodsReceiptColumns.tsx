@@ -1,8 +1,9 @@
 'use client';
 
+import { GoodsReceiptRowActions } from '@/components/goods-receipts/GoodsReceiptRowActions';
 import { GoodsReceipt } from '@/types/goods-receipt';
 import {
-    createActionsColumn,
+    type CustomTableMeta,
     createDateColumn,
     createSelectColumn,
     createSortingHeader,
@@ -48,5 +49,22 @@ export const goodsReceiptColumns: ColumnDef<GoodsReceipt>[] = [
         accessorKey: 'status',
         label: 'Status',
     }),
-    createActionsColumn<GoodsReceipt>(),
+    {
+        id: 'actions_custom',
+        enableHiding: false,
+        size: 56,
+        cell: ({ row, table }) => {
+            const meta = table.options.meta as
+                | CustomTableMeta<GoodsReceipt>
+                | undefined;
+            return (
+                <GoodsReceiptRowActions
+                    item={row.original}
+                    onView={meta?.onView}
+                    onEdit={meta?.onEdit}
+                    onDelete={meta?.onDelete}
+                />
+            );
+        },
+    },
 ];
