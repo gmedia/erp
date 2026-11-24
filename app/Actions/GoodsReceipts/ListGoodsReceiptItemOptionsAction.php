@@ -13,6 +13,7 @@ class ListGoodsReceiptItemOptionsAction
         GoodsReceipt $goodsReceipt,
         ?string $search = null,
         ?int $currentLineId = null,
+        ?int $editingSupplierReturnId = null,
     ): Collection {
         $items = GoodsReceiptItem::query()
             ->where('goods_receipt_id', $goodsReceipt->id)
@@ -24,10 +25,15 @@ class ListGoodsReceiptItemOptionsAction
             ->orderBy('id')
             ->get();
 
+        // Qty retur yang sedang diedit tidak boleh dihitung sebagai pemakaian sisa dirinya sendiri.
         $returnedByItem = SupplierReturnItem::query()
             ->selectRaw('goods_receipt_item_id, SUM(quantity_returned) AS returned')
             ->whereIn('goods_receipt_item_id', $items->pluck('id'))
             ->whereHas('supplierReturn', fn ($query) => $query->where('status', '!=', 'cancelled'))
+            ->when(
+                $editingSupplierReturnId !== null,
+                fn ($query) => $query->where('supplier_return_id', '!=', $editingSupplierReturnId),
+            )
             ->groupBy('goods_receipt_item_id')
             ->pluck('returned', 'goods_receipt_item_id');
 

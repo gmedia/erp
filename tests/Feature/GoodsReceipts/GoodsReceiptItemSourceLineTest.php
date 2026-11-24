@@ -196,6 +196,27 @@ test('item-options on a confirmed goods receipt shows the remaining quantity wit
     expect($response->json('data.0.remaining_quantity'))->toBe('10');
 });
 
+test('goods receipt item-options does not count the edited supplier return own quantity against the line', function () {
+    $goodsReceipt = GoodsReceipt::factory()->create();
+    $item = GoodsReceiptItem::factory()->create([
+        'goods_receipt_id' => $goodsReceipt->id,
+        'quantity_accepted' => 10,
+    ]);
+    $editedReturn = SupplierReturn::factory()->create(['status' => 'draft']);
+    SupplierReturnItem::factory()->create([
+        'supplier_return_id' => $editedReturn->id,
+        'goods_receipt_item_id' => $item->id,
+        'quantity_returned' => 4,
+    ]);
+
+    $response = getJson(
+        "/api/goods-receipts/{$goodsReceipt->id}/item-options?current_line_id={$item->id}"
+        . '&supplier_return_id=' . $editedReturn->id,
+    );
+
+    expect($response->json('data.0.remaining_quantity'))->toBe('10');
+});
+
 test('goods receipt item-options returns accepted quantity minus active returns', function () {
     $goodsReceipt = GoodsReceipt::factory()->create();
     $item = GoodsReceiptItem::factory()->create([

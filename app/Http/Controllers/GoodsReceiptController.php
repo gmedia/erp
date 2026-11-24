@@ -163,6 +163,7 @@ class GoodsReceiptController extends Controller
             $goodsReceipt,
             $request->string('search')->toString() ?: null,
             $request->integer('current_line_id') ?: null,
+            $request->integer('supplier_return_id') ?: null,
         )]);
     }
 

@@ -367,6 +367,7 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
                     item={selectedItem}
                     onSave={handleSaveItem}
                     goodsReceiptId={watchedGoodsReceiptId}
+                    supplierReturnId={activeSupplierReturn?.id}
                 />
             </EntityForm>
         );

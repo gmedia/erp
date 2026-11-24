@@ -45,12 +45,31 @@ function buildSupplierReturnItemSchema(
     });
 }
 
+function buildGoodsReceiptItemOptionsUrl(
+    goodsReceiptId: string,
+    currentLineId?: string,
+    supplierReturnId?: number,
+): string {
+    const params = new URLSearchParams();
+
+    if (currentLineId) {
+        params.set('current_line_id', currentLineId);
+    }
+    if (supplierReturnId) {
+        params.set('supplier_return_id', String(supplierReturnId));
+    }
+    const query = params.toString();
+
+    return `/api/goods-receipts/${goodsReceiptId}/item-options${query ? `?${query}` : ''}`;
+}
+
 interface SupplierReturnItemFormDialogProps {
     readonly open: boolean;
     readonly onOpenChange: (open: boolean) => void;
     readonly item: SupplierReturnItemFormData | null;
     readonly onSave: (data: SupplierReturnItemFormData) => void;
     readonly goodsReceiptId?: string;
+    readonly supplierReturnId?: number;
 }
 
 export function SupplierReturnItemFormDialog({
@@ -59,6 +78,7 @@ export function SupplierReturnItemFormDialog({
     item,
     onSave,
     goodsReceiptId,
+    supplierReturnId,
 }: SupplierReturnItemFormDialogProps) {
     const { t } = useTranslation();
     const supplierReturnItemSchema = useMemo(
@@ -125,7 +145,11 @@ export function SupplierReturnItemFormDialog({
                     name="goods_receipt_item_id"
                     url={
                         goodsReceiptId
-                            ? `/api/goods-receipts/${goodsReceiptId}/item-options${item?.goods_receipt_item_id ? `?current_line_id=${item.goods_receipt_item_id}` : ''}`
+                            ? buildGoodsReceiptItemOptionsUrl(
+                                goodsReceiptId,
+                                item?.goods_receipt_item_id,
+                                supplierReturnId,
+                            )
                             : null
                     }
                     label={t('supplierReturn.item.gr_item')}
