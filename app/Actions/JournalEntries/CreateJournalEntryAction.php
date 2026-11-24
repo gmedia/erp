@@ -30,6 +30,8 @@ class CreateJournalEntryAction
      * - journal_type: e.g. 'general', 'adjusting', 'closing', 'recurring', 'system'.
      * - branch_id: owning branch resolved by the caller; null for company-wide entries.
      * - source_type, source_id: morph reference to the originating document.
+     * - entry_number_prefix: prefix nomor jurnal (default 'JV-'). Urutan dihitung per prefix dan tahun fiskal.
+     * - validate_accounts: true memeriksa akun aktif COA untuk semua status (default: hanya posted).
      */
     /**
      * @param  bool  $isPeriodClosingEntry  Hanya ClosePeriodAction/ReopenPeriodAction (lewat
@@ -43,6 +45,8 @@ class CreateJournalEntryAction
         $maxAttempts = 3;
 
         $status = $data['status'] ?? 'draft';
+        $entryNumberPrefix = $data['entry_number_prefix'] ?? 'JV-';
+        $validateAccounts = ($data['validate_accounts'] ?? false) || $status === 'posted';
 
         if ($status === 'posted') {
             $totalDebit = 0.0;
@@ -56,13 +60,15 @@ class CreateJournalEntryAction
                     'lines' => 'Journal entry is not balanced (debit must equal credit).',
                 ]);
             }
+        }
 
+        if ($validateAccounts) {
             $this->assertLinesUseActiveAccounts($data['lines'], $data['entry_date']);
         }
 
         while ($attempts < $maxAttempts) {
             try {
-                return DB::transaction(function () use ($data, $status, $isPeriodClosingEntry) {
+                return DB::transaction(function () use ($data, $status, $isPeriodClosingEntry, $entryNumberPrefix) {
                     $entryDate = $data['entry_date'];
 
                     $fiscalYear = FiscalYear::where('start_date', '<=', $entryDate)
@@ -91,7 +97,7 @@ class CreateJournalEntryAction
                     // Format: JV-{Year}-XXXXX
                     // Batasi ke prefix JV-<tahun> agar entri non-JV (mis. saldo
                     // awal REC-) tidak merusak urutan nomor.
-                    $entryPrefix = 'JV-' . $fiscalYear->name . '-';
+                    $entryPrefix = $entryNumberPrefix . $fiscalYear->name . '-';
 
                     $lastEntry = JournalEntry::where('fiscal_year_id', $fiscalYear->id)
                         ->where('entry_number', 'like', $entryPrefix . '%')
@@ -107,7 +113,7 @@ class CreateJournalEntryAction
                         $count = 1;
                     }
 
-                    $entryNumber = 'JV-' . $fiscalYear->name . '-' . str_pad((string) $count, 5, '0', STR_PAD_LEFT);
+                    $entryNumber = $entryPrefix . str_pad((string) $count, 5, '0', STR_PAD_LEFT);
 
                     $userId = Auth::id();
 

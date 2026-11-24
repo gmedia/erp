@@ -2,10 +2,9 @@
 
 namespace App\Actions\RecurringJournals;
 
-use App\Actions\PeriodClosings\AssertPeriodOpenForPostingAction;
+use App\Actions\JournalEntries\CreateJournalEntryAction;
 use App\Models\JournalEntry;
 use App\Models\RecurringJournal;
-use App\Services\InterBranchClearingService;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -13,9 +12,14 @@ use Illuminate\Validation\ValidationException;
 class ExecuteRecurringJournalAction
 {
     public function __construct(
-        private InterBranchClearingService $clearing,
+        private CreateJournalEntryAction $createJournalEntry,
     ) {}
 
+    /**
+     * Membuat jurnal dari template. Jurnal lewat CreateJournalEntryAction sehingga draft dan
+     * auto_post sama-sama memeriksa periode, tahun fiskal, dan akun aktif. last_run_date dan
+     * next_run_date hanya maju bila jurnal berhasil dibuat (satu transaksi).
+     */
     public function execute(RecurringJournal $recurringJournal): JournalEntry
     {
         return DB::transaction(function () use ($recurringJournal): JournalEntry {
@@ -29,12 +33,13 @@ class ExecuteRecurringJournalAction
                 throw ValidationException::withMessages(['lines' => 'Recurring journal lines are not balanced.']);
             }
 
-            $executedAt = now();
-
-            if ($recurringJournal->auto_post) {
-                app(AssertPeriodOpenForPostingAction::class)
-                    ->execute($recurringJournal->fiscal_year_id, $executedAt->toDateString());
+            if ($recurringJournal->fiscalYear === null || ! $recurringJournal->fiscalYear->isOpen()) {
+                throw ValidationException::withMessages([
+                    'fiscal_year_id' => 'Recurring journal fiscal year is closed.',
+                ]);
             }
+
+            $executedAt = now();
 
             $reference = $this->renderTemplate($recurringJournal->reference_template, $executedAt);
             $description = $this->renderTemplate($recurringJournal->description, $executedAt);
@@ -43,9 +48,9 @@ class ExecuteRecurringJournalAction
                 $description = $recurringJournal->name;
             }
 
-            $entry = JournalEntry::create([
-                'fiscal_year_id' => $recurringJournal->fiscal_year_id,
-                'entry_number' => $this->nextEntryNumber(),
+            $entry = $this->createJournalEntry->execute([
+                'entry_number_prefix' => 'RJ-',
+                'validate_accounts' => true,
                 'entry_date' => $executedAt->toDateString(),
                 'reference' => $reference,
                 'description' => $description,
@@ -53,32 +58,14 @@ class ExecuteRecurringJournalAction
                 'journal_type' => 'recurring',
                 'source_type' => RecurringJournal::class,
                 'source_id' => $recurringJournal->id,
-                'created_by' => auth()->id(),
-                'posted_by' => $recurringJournal->auto_post ? auth()->id() : null,
-                'posted_at' => $recurringJournal->auto_post ? now() : null,
+                'lines' => $recurringJournal->lines->map(fn ($line): array => [
+                    'account_id' => $line->account_id,
+                    'branch_id' => $line->branch_id ?? null,
+                    'debit' => $line->debit,
+                    'credit' => $line->credit,
+                    'memo' => $line->memo,
+                ])->all(),
             ]);
-
-            $resolvedLines = $recurringJournal->lines->map(fn ($line): array => [
-                'account_id' => $line->account_id,
-                'branch_id' => $line->branch_id ?? null,
-                'debit' => $line->debit,
-                'credit' => $line->credit,
-                'memo' => $line->memo,
-            ])->all();
-
-            $clearingAccountId = $this->clearing->resolveAccountIdForFiscalYear($recurringJournal->fiscal_year_id);
-            $resolvedLines = $this->clearing->inject($resolvedLines, $clearingAccountId);
-            $this->clearing->assertBalancedPerBranch($resolvedLines);
-
-            foreach ($resolvedLines as $line) {
-                $entry->lines()->create([
-                    'account_id' => $line['account_id'],
-                    'branch_id' => $line['branch_id'] ?? null,
-                    'debit' => $line['debit'],
-                    'credit' => $line['credit'],
-                    'memo' => $line['memo'] ?? null,
-                ]);
-            }
 
             $recurringJournal->update([
                 'last_run_date' => $executedAt->toDateString(),
@@ -100,11 +87,6 @@ class ExecuteRecurringJournalAction
             [$date->format('Y'), $date->format('m'), $date->format('d')],
             $template,
         );
-    }
-
-    private function nextEntryNumber(): string
-    {
-        return 'RJ-' . now()->format('YmdHis') . '-' . str_pad((string) random_int(1, 999), 3, '0', STR_PAD_LEFT);
     }
 
     private function nextRunDate(RecurringJournal $recurringJournal): CarbonInterface
