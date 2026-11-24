@@ -13,6 +13,7 @@ use App\Models\StockTransfer;
 use App\Models\SupplierBill;
 use App\Models\SupplierReturn;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 uses(RefreshDatabase::class)->group('demo-integrity');
@@ -653,6 +654,98 @@ invariant('W7-15 positions do not mix grade levels with job titles', function ()
     $grades = array_values(array_intersect($names, ['Junior', 'Mid-level', 'Senior']));
 
     expect($grades)->toBeEmpty('Position list must not contain grade levels: ' . implode(', ', $grades));
+});
+
+// W7-15 (keuangan) — anggaran tiap periode tidak boleh melebihi anggaran tahunan.
+invariant('W7-15 budget period lines do not exceed the annual budget total', function () {
+    $budgets = DB::table('budgets')->get(['id', 'name', 'total_amount']);
+
+    expect($budgets)->not->toBeEmpty('Demo data must include budgets');
+
+    foreach ($budgets as $budget) {
+        $lineTotal = (float) DB::table('budget_lines')->where('budget_id', $budget->id)->sum('allocated_amount');
+
+        expect($lineTotal)->toBeLessThanOrEqual(
+            (float) $budget->total_amount,
+            "Budget {$budget->name} lines must not exceed its total",
+        );
+    }
+
+    $annual = $budgets->firstWhere('name', 'Anggaran Operasional FY 2026')
+        ?? $budgets->first(fn ($budget) => ! str_contains($budget->name, 'Triwulan'));
+    $quarterly = $budgets->first(fn ($budget) => str_contains($budget->name, 'Triwulan I'));
+
+    expect($annual)->not->toBeNull('Demo data must include the annual operational budget');
+    expect($quarterly)->not->toBeNull('Demo data must include the Triwulan I budget');
+    expect((float) $quarterly->total_amount)->toBeLessThanOrEqual(
+        (float) $annual->total_amount,
+        'Anggaran triwulan I tidak boleh melebihi anggaran tahunan',
+    );
+});
+
+// W7-15 (keuangan) — rekonsiliasi Completed hanya untuk periode yang sudah berakhir, dan
+// rekonsiliasi dengan selisih 0 tidak boleh In Progress.
+invariant('W7-15 bank reconciliations are Completed only after the period ends', function () {
+    $today = now()->startOfDay();
+
+    $reconciliations = DB::table('bank_reconciliations')->get([
+        'id', 'period_end', 'status', 'difference',
+    ]);
+
+    expect($reconciliations)->not->toBeEmpty('Demo data must include bank reconciliations');
+
+    foreach ($reconciliations as $row) {
+        $label = "Bank reconciliation {$row->id} ({$row->period_end})";
+
+        if ($row->status === 'completed') {
+            expect(Carbon::parse($row->period_end)->lt($today))
+                ->toBeTrue("{$label} is Completed before its period ends");
+        }
+
+        if ((float) $row->difference === 0.0) {
+            expect($row->status)->not->toBe('in_progress', "{$label} has zero difference and must not be In Progress");
+        }
+    }
+});
+
+// W7-15 (keuangan) — recurring journal Monthly berjarak tepat satu bulan, dan nilainya wajar.
+invariant('W7-15 monthly recurring journals run one month apart with plausible amounts', function () {
+    $journals = DB::table('recurring_journals')
+        ->where('frequency', 'monthly')
+        ->orderBy('next_run_date')
+        ->get(['name', 'next_run_date', 'total_amount']);
+
+    expect($journals)->not->toBeEmpty('Demo data must include monthly recurring journals');
+
+    $dates = $journals->pluck('next_run_date')->map(fn ($date) => Carbon::parse($date)->startOfMonth()->toDateString())->unique()->values();
+    expect($dates->count())->toBe(1, 'Monthly recurring journals must share a single schedule month');
+
+    $amounts = $journals->keyBy('name');
+    $rent = (float) ($amounts['Sewa Kantor Bulanan']->total_amount ?? 0);
+    $cleaning = (float) ($amounts['Jasa Kebersihan']->total_amount ?? 0);
+
+    expect($rent)->toBeGreaterThan(0.0);
+    expect($rent)->toBeGreaterThan($cleaning, 'Sewa kantor harus lebih besar dari jasa kebersihan');
+});
+
+// W7-15 (keuangan) — periode closing Jan/Feb ditutup pada awal bulan berikutnya, bukan tanggal seed.
+invariant('W7-15 monthly period closings are closed at the start of the following month', function () {
+    $closings = DB::table('period_closings')
+        ->where('status', 'closed')
+        ->where('closing_type', 'monthly')
+        ->get(['period_month', 'period_year', 'closed_at']);
+
+    expect($closings)->not->toBeEmpty('Demo data must include closed monthly periods');
+
+    foreach ($closings as $closing) {
+        $expected = Carbon::create($closing->period_year, $closing->period_month, 1)->addMonth()->startOfDay();
+        $actual = Carbon::parse($closing->closed_at)->startOfDay();
+
+        expect($actual->toDateString())->toBe(
+            $expected->toDateString(),
+            "Period {$closing->period_month}/{$closing->period_year} must be closed on the start of the next month",
+        );
+    }
 });
 
 // Every posted document must reference a posted, balanced journal (issue #357 scope 4).
