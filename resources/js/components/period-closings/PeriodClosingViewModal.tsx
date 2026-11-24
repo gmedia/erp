@@ -3,6 +3,7 @@ import { ViewField } from '@/components/common/ViewField';
 import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/contexts/i18n-context';
 import {
     type PeriodClosingAction,
     usePeriodClosingAction,
@@ -28,6 +29,7 @@ export function PeriodClosingViewModal({
     open,
     onClose,
 }: Readonly<PeriodClosingViewModalProps>) {
+    const { t } = useTranslation();
     const [pendingAction, setPendingAction] =
         useState<PeriodClosingAction | null>(null);
     // Hasil aksi hanya berlaku untuk item yang sedang dibuka; data baris baru mengalahkannya.
