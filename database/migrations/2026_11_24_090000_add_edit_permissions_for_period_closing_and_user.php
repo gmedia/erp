@@ -1127,19 +1127,21 @@ return new class extends Migration
         $preExistingIds = DB::table('permissions')->pluck('id')->all();
 
         foreach (self::PERMISSIONS as $permission) {
+            if (in_array($permission['name'], $existingNames, true)) {
+                continue;
+            }
+
             $parentId = $permission['parent'] === null
                 ? null
                 : DB::table('permissions')->where('name', $permission['parent'])->value('id');
 
-            DB::table('permissions')->updateOrInsert(
-                ['name' => $permission['name']],
-                [
-                    'display_name' => $permission['display_name'],
-                    'parent_id' => $parentId,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ],
-            );
+            DB::table('permissions')->insert([
+                'name' => $permission['name'],
+                'display_name' => $permission['display_name'],
+                'parent_id' => $parentId,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
 
         $this->grantUserEditToFullHoldersIfLockedOut($preExistingIds);

@@ -20,7 +20,7 @@ Alur approver (`my-approvals`, `review-assignment`) dan endpoint milik sendiri (
 
 ## Permission Baru
 
-Migration `2026_11_24_090000_add_edit_permissions_for_period_closing_and_user` menambahkan dua permission. Migration bersifat idempoten dan hanya menambah baris. Tidak ada izin yang diberikan otomatis, kecuali pengecekan pemulihan di bawah.
+Migration `2026_11_24_090000_add_edit_permissions_for_period_closing_and_user` menambahkan permission yang dipakai route dan belum ada di instalasi. Permission yang sudah ada tidak diubah, dan migration aman dijalankan ulang. Dua yang baru pada semua instalasi: Tidak ada izin yang diberikan otomatis, kecuali pengecekan pemulihan di bawah.
 
 | Permission | Fungsi |
 |-----------|--------|
@@ -31,7 +31,8 @@ Migration `2026_11_24_090000_add_edit_permissions_for_period_closing_and_user` m
 
 Setelah upgrade, peran yang sebelumnya bisa mengubah data perlu izin aksi baru agar tidak kehilangan akses:
 
-- **Peran pengelola modul** (mis. purchasing, keuangan, gudang): berikan `modul.edit` dan `modul.create` sesuai tugasnya.
+- **Peran pengelola modul** (mis. purchasing, keuangan, gudang): berikan `modul.create`, `modul.edit`, dan `modul.delete` sesuai tugasnya.
+- **Pemohon peminjaman kendaraan**: berikan `vehicle_loan.request`.
 - **Peran penutup periode**: berikan `period_closing` dan `period_closing.edit`.
 - **Peran administrator user**: berikan `user` dan `user.edit`.
 - **Peran hanya baca**: cukup `modul` (GET).
@@ -43,7 +44,7 @@ Pemberian izin dilakukan dari menu pengaturan permission karyawan.
 Migration memberikan `user.edit` secara otomatis hanya bila tidak ada satu pun karyawan yang memegang `user.edit` setelah migration. Ini mencegah terkunci total. Jika tetap tidak ada yang punya `user.edit`, berikan lewat command:
 
 ```bash
-./vendor/bin/sail artisan permissions:grant-user-edit {email}
+php artisan permissions:grant-user-edit {email}
 ```
 
 Ganti `{email}` dengan email karyawan yang akan diberi izin. Command akan gagal dengan pesan jelas bila permission belum ada (jalankan migrate dahulu) atau email tidak ditemukan.
@@ -51,12 +52,11 @@ Ganti `{email}` dengan email karyawan yang akan diberi izin. Command akan gagal 
 ## Langkah Upgrade
 
 1. Pull branch atau rilis terbaru.
-2. Jalankan `./vendor/bin/sail artisan migrate --force`.
+2. Jalankan `php artisan migrate --force`.
 3. Periksa karyawan yang memegang `user.edit`. Bila belum ada, jalankan command pemulihan di atas.
 4. Berikan izin aksi baru sesuai tabel peran di atas.
-5. Jalankan `./vendor/bin/sail artisan db:seed --force` bila memakai data demo. Seeder bersifat idempoten.
 
 ## Verifikasi
 
 - Login sebagai karyawan yang diberi izin, lalu buka modul terkait.
-- Tombol aksi hanya tampil dan berfungsi bila izin `modul.edit` atau `modul.create` dimiliki.
+- Aksi tambah, ubah, dan hapus ditolak bila izin aksinya belum dimiliki. Tombolnya masih dapat terlihat sampai penyesuaian tampilan dirilis.
