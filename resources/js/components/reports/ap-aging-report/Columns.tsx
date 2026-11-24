@@ -111,7 +111,7 @@ export const apAgingReportColumns: ColumnDef<ApAgingReportItem>[] = [
     }),
     createReportTextColumn<ApAgingReportItem>({
         id: 'days_over_90',
-        header: '>90 Days',
+        header: 'Over 90 Days',
         getValue: (item) => formatAmount(item.aging_buckets?.days_over_90),
         align: 'right',
     }),

@@ -77,7 +77,7 @@ export function SummaryCards({ data, isLoading }: Readonly<SummaryCardsProps>) {
                 )}
             >
                 <p className="mt-1 text-xs text-muted-foreground">
-                    total value deprecated
+                    total value depreciated
                 </p>
             </KpiCard>
         </div>

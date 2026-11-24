@@ -31,6 +31,11 @@ export const fiscalYearColumns: ColumnDef<FiscalYear>[] = [
     createStatusBadgeColumn<FiscalYear>({
         accessorKey: 'status',
         label: 'Status',
+        variantMap: {
+            open: 'info',
+            closed: 'secondary',
+            locked: 'destructive-soft',
+        },
     }),
     createDateColumn<FiscalYear>({
         accessorKey: 'created_at',

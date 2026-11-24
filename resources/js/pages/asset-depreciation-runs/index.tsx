@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/table';
 import { useAssetDepreciationRuns } from '@/hooks/useAssetDepreciationRuns';
 import { usePermissions } from '@/hooks/usePermissions';
+import { statusBadgeVariant } from '@/lib/status-badge';
 import { BreadcrumbItem } from '@/types';
 import { AssetDepreciationRun } from '@/types/asset-depreciation-run';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
@@ -39,19 +40,6 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Asset Management', href: '/assets' },
     { title: 'Depreciation Runs', href: '/asset-depreciation-runs' },
 ];
-
-function getStatusBadgeVariant(status: AssetDepreciationRun['status']) {
-    switch (status) {
-        case 'calculated':
-            return 'default';
-        case 'posted':
-            return 'secondary';
-        case 'void':
-            return 'destructive';
-        default:
-            return 'outline';
-    }
-}
 
 export default function Index() {
     const {
@@ -144,7 +132,7 @@ export default function Index() {
                 </TableCell>
                 <TableCell>
                     <Badge
-                        variant={getStatusBadgeVariant(item.status)}
+                        variant={statusBadgeVariant(item.status)}
                         className="capitalize"
                     >
                         {item.status}

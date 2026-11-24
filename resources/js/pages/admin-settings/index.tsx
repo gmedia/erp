@@ -243,7 +243,7 @@ function GeneralSettings({
                 <SettingsRow
                     label="Company Logo (SVG)"
                     htmlFor="company_logo"
-                    description="Upload file SVG. Jika kosong, aplikasi tetap menggunakan logo default."
+                    description={t('admin.logoHint')}
                     error={errors.company_logo}
                 >
                     {settings?.company_logo_url && (

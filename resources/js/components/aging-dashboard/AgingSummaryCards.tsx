@@ -26,11 +26,10 @@ export const AgingSummaryCards = memo<AgingSummaryCardsProps>(
 
         const getOverdueBadgeVariant = (
             percentage: number,
-        ): 'default' | 'secondary' | 'destructive' => {
-            if (percentage === 0) return 'default';
-            if (percentage < 10) return 'secondary';
-            if (percentage < 25) return 'default';
-            return 'destructive';
+        ): 'success' | 'warning' | 'destructive-soft' => {
+            if (percentage === 0) return 'success';
+            if (percentage < 10) return 'warning';
+            return 'destructive-soft';
         };
 
         const cards = [

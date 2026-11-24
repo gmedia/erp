@@ -8,6 +8,7 @@ import {
 import { formatCurrency } from '@/lib/utils';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import type { ColumnDef } from '@tanstack/react-table';
+import { createElement } from 'react';
 
 export interface ArInvoiceReportBase {
     customer_invoice: {
@@ -36,6 +37,16 @@ export function formatArReportCurrency(
 ): string {
     return formatCurrency(value);
 }
+
+const MONEY_CELL_CLASS = 'text-right tabular-nums';
+const moneyHeader = (label: string) =>
+    createElement('div', { className: 'text-right' }, label);
+const moneyCell = (value: string | null | undefined) =>
+    createElement(
+        'div',
+        { className: MONEY_CELL_CLASS },
+        formatArReportCurrency(value),
+    );
 
 export function createArInvoiceBaseColumns<
     T extends ArInvoiceReportBase,
@@ -68,27 +79,24 @@ export function createArInvoiceBaseColumns<
         }),
         {
             id: 'grand_total',
-            header: 'Grand Total',
-            cell: ({ row }) =>
-                formatArReportCurrency(row.original.amounts.grand_total),
+            header: () => moneyHeader('Grand Total'),
+            cell: ({ row }) => moneyCell(row.original.amounts.grand_total),
         },
         {
             id: 'amount_received',
-            header: 'Amount Received',
-            cell: ({ row }) =>
-                formatArReportCurrency(row.original.amounts.amount_received),
+            header: () => moneyHeader('Amount Received'),
+            cell: ({ row }) => moneyCell(row.original.amounts.amount_received),
         },
         {
             id: 'credit_note_amount',
-            header: 'Credit Note Amount',
+            header: () => moneyHeader('Credit Note Amount'),
             cell: ({ row }) =>
-                formatArReportCurrency(row.original.amounts.credit_note_amount),
+                moneyCell(row.original.amounts.credit_note_amount),
         },
         {
             id: 'amount_due',
-            header: 'Amount Due',
-            cell: ({ row }) =>
-                formatArReportCurrency(row.original.amounts.amount_due),
+            header: () => moneyHeader('Amount Due'),
+            cell: ({ row }) => moneyCell(row.original.amounts.amount_due),
         },
     ];
 }

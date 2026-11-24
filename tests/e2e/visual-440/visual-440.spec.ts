@@ -211,4 +211,27 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
         ]);
         expect(Math.abs(hx - bx)).toBeLessThanOrEqual(2);
     });
+
+    test('ar-outstanding: kolom uang rata kanan', async ({ page }) => {
+        await page.setViewportSize({ width: 1280, height: 900 });
+        const reportResponse = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/reports/ar-outstanding') &&
+                r.status() < 400,
+        );
+        await page.goto('/reports/ar-outstanding');
+        await reportResponse;
+
+        const amountCell = page
+            .locator('td div.tabular-nums.text-right')
+            .first();
+        test.skip(
+            (await amountCell.count()) === 0,
+            'Tidak ada piutang outstanding di data seed',
+        );
+        const align = await amountCell.evaluate(
+            (el) => getComputedStyle(el).textAlign,
+        );
+        expect(align).toBe('right');
+    });
 });
