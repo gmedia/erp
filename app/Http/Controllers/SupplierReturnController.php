@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\AccountingPosting\PostSupplierReturnJournalAction;
 use App\Actions\AccountingPosting\ReverseSupplierReturnJournalAction;
+use App\Actions\SupplierReturns\EnsureGoodsReceiptItemNotOverReturnedAction;
 use App\Actions\SupplierReturns\ExportSupplierReturnsAction;
 use App\Actions\SupplierReturns\IndexSupplierReturnsAction;
 use App\Actions\SupplierReturns\PostSupplierReturnMovementsAction;
@@ -46,6 +47,7 @@ class SupplierReturnController extends Controller
         PostSupplierReturnJournalAction $postJournal,
         PostSupplierReturnMovementsAction $postMovements,
         StockPostingService $stockPosting,
+        EnsureGoodsReceiptItemNotOverReturnedAction $overReturn,
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'];
@@ -69,7 +71,16 @@ class SupplierReturnController extends Controller
             assignDocumentNumber: function (SupplierReturn $supplierReturn): void {
                 $this->assignSequentialDocumentNumber($supplierReturn, 'return_number', 'SR');
             },
-            syncItems: function (SupplierReturn $supplierReturn, array $items) use ($syncItems): void {
+            syncItems: function (SupplierReturn $supplierReturn, array $items) use (
+                $syncItems,
+                $overReturn,
+                $isConfirmedOnCreate,
+            ): void {
+                // Butir 4: draft tidak mengikat kuota; dicek ulang saat konfirmasi.
+                if ($isConfirmedOnCreate) {
+                    $overReturn->execute($items);
+                }
+
                 $syncItems->execute($supplierReturn, $items);
             },
             afterCommit: $isConfirmedOnCreate
@@ -115,6 +126,7 @@ class SupplierReturnController extends Controller
         PostSupplierReturnMovementsAction $postMovements,
         StockPostingService $stockPosting,
         ReverseSupplierReturnJournalAction $reverseJournal,
+        EnsureGoodsReceiptItemNotOverReturnedAction $overReturn,
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
@@ -171,22 +183,56 @@ class SupplierReturnController extends Controller
             $validated['confirmed_at'] = now()->toIso8601String();
         }
 
-        $this->updateWithSyncedItems(
-            model: $supplierReturn,
-            attributes: $validated,
-            items: $items,
-            payloadResolver: static function (array $attributes): array {
-                return UpdateSupplierReturnData::fromArray($attributes)->toArray();
-            },
-            syncItems: function (SupplierReturn $supplierReturn, array $items) use ($syncItems): void {
-                $syncItems->execute($supplierReturn, $items);
-            },
-            afterCommit: $isNewlyConfirmed
-                ? function (SupplierReturn $supplierReturn) use ($postJournal, $postMovements, $stockPosting): void {
-                    $this->postConfirmedReturn($supplierReturn, $postJournal, $postMovements, $stockPosting);
-                }
-            : null,
-        );
+        // Butir 1 review: konfirmasi yang hanya membawa status dicek terhadap item tersimpan,
+        // di dalam transaksi dengan lock baris GR (sama seperti jalur items).
+        $confirmsWithoutItems = $isNewlyConfirmed && $items === null;
+
+        DB::transaction(function () use (
+            $supplierReturn,
+            $validated,
+            $items,
+            $nextStatus,
+            $confirmsWithoutItems,
+            $isNewlyConfirmed,
+            $overReturn,
+            $syncItems,
+            $postJournal,
+            $postMovements,
+            $stockPosting,
+        ): void {
+            if ($confirmsWithoutItems) {
+                $overReturn->execute($supplierReturn->items()->get()->toArray(), $supplierReturn->id);
+            }
+
+            $this->updateWithSyncedItems(
+                model: $supplierReturn,
+                attributes: $validated,
+                items: $items,
+                payloadResolver: static function (array $attributes): array {
+                    return UpdateSupplierReturnData::fromArray($attributes)->toArray();
+                },
+                syncItems: function (SupplierReturn $supplierReturn, array $items) use (
+                    $syncItems,
+                    $overReturn,
+                    $nextStatus,
+                ): void {
+                    if ($nextStatus === 'confirmed') {
+                        $overReturn->execute($items, $supplierReturn->id);
+                    }
+
+                    $syncItems->execute($supplierReturn, $items);
+                },
+                afterCommit: $isNewlyConfirmed
+                    ? function (SupplierReturn $supplierReturn) use (
+                        $postJournal,
+                        $postMovements,
+                        $stockPosting,
+                    ): void {
+                        $this->postConfirmedReturn($supplierReturn, $postJournal, $postMovements, $stockPosting);
+                    }
+                : null,
+            );
+        });
 
         $supplierReturn->load([
             'purchaseOrder',
@@ -265,8 +311,18 @@ class SupplierReturnController extends Controller
         PostSupplierReturnMovementsAction $postMovements,
         StockPostingService $stockPosting,
     ): void {
-        $stockPosting->assertNoNegativeStock($this->supplierReturnOutflows($supplierReturn));
+        $outflows = $this->supplierReturnOutflows($supplierReturn);
+        $stockPosting->assertNoNegativeStock($outflows);
         $postMovements->execute($supplierReturn->refresh());
+
+        // Review putaran 3 butir 2: retur bertanggal mundur memeriksa saldo berjalan sejak tanggal
+        // retur, bukan hanya saldo akhir. Dicek setelah movement terposting; 422 membatalkan transaksi.
+        // Retur hari ini tetap dijaga oleh assertNoNegativeStock di atas.
+        $returnDate = $supplierReturn->return_date->copy()->startOfDay();
+
+        if ($returnDate->lt(now()->startOfDay())) {
+            $stockPosting->assertNoNegativeStockFrom($outflows, $returnDate);
+        }
         // Jurnal gagal (COA/periode) melempar ValidationException: seluruh transaksi
         // dibatalkan, sehingga dokumen, stok, dan status tidak berubah (Issue #416).
         $postJournal->execute($supplierReturn->refresh());

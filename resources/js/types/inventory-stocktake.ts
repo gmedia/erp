@@ -31,6 +31,11 @@ export interface InventoryStocktake extends BaseEntity {
     product_category?: { id: number; name: string } | null;
     notes?: string | null;
     items?: InventoryStocktakeItem[];
+    stock_adjustment_draft?: {
+        id: number;
+        adjustment_number: string | null;
+        status: string;
+    } | null;
 }
 
 export interface InventoryStocktakeFilters {

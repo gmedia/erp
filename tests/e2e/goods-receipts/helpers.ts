@@ -176,8 +176,6 @@ export async function editGoodsReceipt(
                 status: detail.status,
                 notes: detail.notes ?? '',
                 received_by: detail.received_by?.id ?? null,
-                confirmed_by: detail.confirmed_by?.id ?? null,
-                confirmed_at: detail.confirmed_at ?? null,
                 items: (detail.items as GoodsReceiptDetailItem[] || []).map((item) => ({
                     purchase_order_item_id: item.purchase_order_item_id,
                     product_id: item.product?.id,

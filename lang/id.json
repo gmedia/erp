@@ -23,7 +23,9 @@
         "error": "Kesalahan",
         "warning": "Peringatan",
         "fill_details": "Silakan isi detail di bawah ini.",
-        "view_details": "Berikut adalah detail untuk item ini."
+        "view_details": "Berikut adalah detail untuk item ini.",
+        "stocktake_adjustment_draft": "Draf Penyesuaian Stok",
+        "stocktake_adjustment_none": "-"
     },
     "permissions": {
         "empty_title": "Belum ada karyawan dipilih",
@@ -313,8 +315,12 @@
     "supplier_return.supplier_mismatch": "Supplier harus sama dengan supplier pada purchase order.",
     "supplier_return.goods_receipt_mismatch": "Goods receipt harus milik purchase order tersebut.",
     "supplier_return.gr_item_mismatch": "Item GR harus milik goods receipt yang dipilih.",
+  "supplier_return.returned_exceeds_received": "Qty retur melebihi sisa qty diterima dari item GR ini.",
+    "inventory_stocktake.adjustment_note": "Draf dari stock opname :stocktake",
     "goods_receipt.po_item_mismatch": "Item PO harus milik purchase order yang dipilih.",
     "goods_receipt.po_not_approved": "GR hanya bisa dikonfirmasi bila purchase order sudah dikonfirmasi atau diterima sebagian.",
+    "goods_receipt.accepted_exceeds_received": "Jumlah diterima baik ditambah ditolak tidak boleh melebihi jumlah diterima.",
+    "goods_receipt.received_exceeds_po_quantity": "Total jumlah diterima untuk baris PO ini tidak boleh melebihi jumlah baris PO.",
     "ap_payment.bill_supplier_mismatch": "Supplier Bill tidak milik supplier yang dipilih.",
     "ap_payment.allocation_exceeds_bill": "Alokasi melebihi sisa tagihan. Maksimum: :max",
     "ar_receipt.allocation_exceeds_invoice": "Alokasi melebihi sisa invoice. Maksimum: :max",
@@ -405,6 +411,7 @@
             "quantity_received_positive": "Jumlah diterima harus lebih dari 0.",
             "quantity_accepted": "Jumlah Diterima Baik",
             "quantity_accepted_min": "Jumlah diterima baik minimal 0.",
+            "quantity_accepted_exceeds_received": "Jumlah diterima baik ditambah ditolak tidak boleh melebihi jumlah diterima.",
             "quantity_rejected": "Jumlah Ditolak",
             "unit_price": "Harga Satuan",
             "unit_price_min": "Harga satuan minimal 0.",
