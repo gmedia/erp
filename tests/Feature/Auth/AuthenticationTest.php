@@ -46,10 +46,9 @@ test('users can not authenticate with invalid password', function () {
 });
 
 test('invalid login message is translated for id', function () {
-    app()->setLocale('id');
     $user = User::factory()->create();
 
-    $this->postJson('/api/login', [
+    $this->withHeaders(['Accept-Language' => 'id'])->postJson('/api/login', [
         'email' => $user->email,
         'password' => 'wrong-password',
     ])

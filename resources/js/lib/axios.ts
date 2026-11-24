@@ -1,3 +1,4 @@
+import { getStoredLocale } from '@/lib/locale-storage';
 import { clearToken, getToken } from '@/lib/token-storage';
 import baseAxios from 'axios';
 
@@ -16,6 +17,7 @@ axios.interceptors.request.use((config) => {
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
+    config.headers['X-Locale'] = getStoredLocale();
     return config;
 });
 
