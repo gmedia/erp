@@ -132,7 +132,7 @@ test.describe('Goods Receipts Module', () => {
                 page,
                 '/api/products?search=Executive%20Office%20Desk',
             ),
-            getFirstAsyncOption(page, '/api/units?search=Piece'),
+            getFirstAsyncOption(page, '/api/units?search=Buah'),
         ]);
 
         await page.getByRole('button', { name: /^Add$/i }).first().click();
@@ -192,7 +192,7 @@ test.describe('Goods Receipts Module', () => {
                 page,
                 '/api/products?search=Executive%20Office%20Desk',
             ),
-            getFirstAsyncOption(page, '/api/units?search=Piece'),
+            getFirstAsyncOption(page, '/api/units?search=Buah'),
         ]);
 
         const goodsReceiptNumber = await createGoodsReceipt(page);

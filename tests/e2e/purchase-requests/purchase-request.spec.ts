@@ -128,7 +128,7 @@ test.describe('Purchase Requests Module', () => {
                 page,
                 '/api/products?search=Executive%20Office%20Desk',
             ),
-            getFirstAsyncOption(page, '/api/units?search=Piece'),
+            getFirstAsyncOption(page, '/api/units?search=Buah'),
         ]);
 
         await page.getByRole('button', { name: /^Add$/i }).first().click();
@@ -167,7 +167,7 @@ test.describe('Purchase Requests Module', () => {
                 page,
                 '/api/products?search=Executive%20Office%20Desk',
             ),
-            getFirstAsyncOption(page, '/api/units?search=Piece'),
+            getFirstAsyncOption(page, '/api/units?search=Buah'),
         ]);
 
         const purchaseRequestNumber = await createPurchaseRequest(page);

@@ -1,6 +1,10 @@
 import { expect, Page, test } from '@playwright/test';
 
-import { approveApprovableAsDelegate, login, searchAndWaitForApi } from '../helpers';
+import {
+    approveApprovableAsDelegate,
+    login,
+    searchAndWaitForApi,
+} from '../helpers';
 
 interface SeedResult {
     receiptNumber: string;
@@ -28,8 +32,10 @@ async function seedGoodsReceiptFixtures(page: Page): Promise<SeedResult> {
         const [supplierId, warehouseId, productId, unitId] = await Promise.all([
             firstId('/api/suppliers?per_page=1'),
             firstId('/api/warehouses?per_page=1'),
-            firstId('/api/products?search=Executive%20Office%20Desk&per_page=1'),
-            firstId('/api/units?search=Piece&per_page=1'),
+            firstId(
+                '/api/products?search=Executive%20Office%20Desk&per_page=1',
+            ),
+            firstId('/api/units?search=Buah&per_page=1'),
         ]);
 
         const today = new Date().toISOString().slice(0, 10);
@@ -45,23 +51,26 @@ async function seedGoodsReceiptFixtures(page: Page): Promise<SeedResult> {
         ];
 
         const createPo = async () => {
-            const json = await (await fetch('/api/purchase-orders', {
-                method: 'POST',
-                headers,
-                body: JSON.stringify({
-                    supplier_id: supplierId,
-                    warehouse_id: warehouseId,
-                    order_date: today,
-                    currency: 'IDR',
-                    status: 'draft',
-                    items: poItems,
-                }),
-            })).json();
+            const json = await (
+                await fetch('/api/purchase-orders', {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({
+                        supplier_id: supplierId,
+                        warehouse_id: warehouseId,
+                        order_date: today,
+                        currency: 'IDR',
+                        status: 'draft',
+                        items: poItems,
+                    }),
+                })
+            ).json();
             const id = Number(json?.data?.id);
-            const transitions = await (await fetch(
-                `/api/entity-states/purchase_order/${id}`,
-                { headers },
-            )).json();
+            const transitions = await (
+                await fetch(`/api/entity-states/purchase_order/${id}`, {
+                    headers,
+                })
+            ).json();
             const submit = (transitions.data?.available_transitions ?? []).find(
                 (t: { name: string }) => t.name === 'Submit',
             );
@@ -103,7 +112,9 @@ async function seedGoodsReceiptFixtures(page: Page): Promise<SeedResult> {
             }),
         });
         const grPayload = await grResponse.json();
-        const productJson = await (await fetch(`/api/products/${productId}`, { headers })).json();
+        const productJson = await (
+            await fetch(`/api/products/${productId}`, { headers })
+        ).json();
 
         return {
             receiptNumber: String(grPayload?.data?.gr_number ?? ''),
@@ -115,14 +126,20 @@ async function seedGoodsReceiptFixtures(page: Page): Promise<SeedResult> {
     });
 }
 
-async function openGoodsReceiptEdit(page: Page, receiptNumber: string): Promise<void> {
+async function openGoodsReceiptEdit(
+    page: Page,
+    receiptNumber: string,
+): Promise<void> {
     await searchAndWaitForApi(
         page,
         page.getByPlaceholder(/search/i),
         receiptNumber,
         '/api/goods-receipts',
     );
-    const row = page.locator('tbody tr').filter({ hasText: receiptNumber }).first();
+    const row = page
+        .locator('tbody tr')
+        .filter({ hasText: receiptNumber })
+        .first();
     await row.getByRole('button').last().click();
     await page.getByRole('menuitem', { name: 'Edit' }).click();
 }
@@ -136,7 +153,12 @@ test.describe('Goods Receipt header selects', () => {
         await login(page, undefined, undefined, { requireDashboard: false });
         if (!fixtures) {
             fixtures = await seedGoodsReceiptFixtures(page);
-            await approveApprovableAsDelegate(page, fixtures.purchaseOrderId, 'E2E header selects', 'App\\Models\\PurchaseOrder');
+            await approveApprovableAsDelegate(
+                page,
+                fixtures.purchaseOrderId,
+                'E2E header selects',
+                'App\\Models\\PurchaseOrder',
+            );
         }
         const listed = page.waitForResponse(
             (r) => r.url().includes('/api/goods-receipts') && r.status() < 400,
@@ -146,24 +168,36 @@ test.describe('Goods Receipt header selects', () => {
         await listed;
     });
 
-    test('edit dokumen lama menampilkan baris PO item yang terpilih', async ({ page }) => {
+    test('edit dokumen lama menampilkan baris PO item yang terpilih', async ({
+        page,
+    }) => {
         expect(fixtures.receiptNumber).not.toBe('');
 
         await openGoodsReceiptEdit(page, fixtures.receiptNumber);
         const formDialog = page.getByRole('dialog').first();
         await expect(formDialog).toBeVisible();
 
-        const purchaseOrderSelect = formDialog.getByRole('combobox', { name: 'Purchase Order' });
-        await expect(purchaseOrderSelect).toContainText(fixtures.purchaseOrderNumber);
-        await expect(formDialog.locator('tbody tr').first()).toContainText(fixtures.productName);
+        const purchaseOrderSelect = formDialog.getByRole('combobox', {
+            name: 'Purchase Order',
+        });
+        await expect(purchaseOrderSelect).toContainText(
+            fixtures.purchaseOrderNumber,
+        );
+        await expect(formDialog.locator('tbody tr').first()).toContainText(
+            fixtures.productName,
+        );
     });
 
     test('ganti PO di header mengosongkan baris item', async ({ page }) => {
         await openGoodsReceiptEdit(page, fixtures.receiptNumber);
         const formDialog = page.getByRole('dialog').first();
-        await expect(formDialog.locator('tbody tr').first()).toContainText(fixtures.productName);
+        await expect(formDialog.locator('tbody tr').first()).toContainText(
+            fixtures.productName,
+        );
 
-        const purchaseOrderSelect = formDialog.getByRole('combobox', { name: 'Purchase Order' });
+        const purchaseOrderSelect = formDialog.getByRole('combobox', {
+            name: 'Purchase Order',
+        });
         const listed = page.waitForResponse(
             (r) => r.url().includes('/api/purchase-orders') && r.ok(),
         );
@@ -172,33 +206,55 @@ test.describe('Goods Receipt header selects', () => {
         const searched = page.waitForResponse(
             (r) => r.url().includes('/api/purchase-orders') && r.ok(),
         );
-        await page.getByPlaceholder('Search...').fill(fixtures.otherPurchaseOrderNumber);
+        await page
+            .getByPlaceholder('Search...')
+            .fill(fixtures.otherPurchaseOrderNumber);
         await searched;
         await page
-            .getByRole('button', { name: new RegExp(fixtures.otherPurchaseOrderNumber) })
+            .getByRole('button', {
+                name: new RegExp(fixtures.otherPurchaseOrderNumber),
+            })
             .first()
             .click();
 
         await expect(formDialog.getByText('No items added yet.')).toBeVisible();
-        await expect(formDialog.locator('tbody tr').filter({ hasText: fixtures.productName })).toHaveCount(0);
+        await expect(
+            formDialog
+                .locator('tbody tr')
+                .filter({ hasText: fixtures.productName }),
+        ).toHaveCount(0);
     });
 
-    test('pencarian Purchase Order menyaring opsi sesuai nomor', async ({ page }) => {
+    test('pencarian Purchase Order menyaring opsi sesuai nomor', async ({
+        page,
+    }) => {
         await page.getByRole('button', { name: /^Add$/i }).first().click();
-        const formDialog = page.getByRole('dialog', { name: /Add New Goods Receipt/i });
+        const formDialog = page.getByRole('dialog', {
+            name: /Add New Goods Receipt/i,
+        });
 
-        await formDialog.getByRole('combobox', { name: 'Purchase Order' }).click();
+        await formDialog
+            .getByRole('combobox', { name: 'Purchase Order' })
+            .click();
         const listed = page.waitForResponse(
             (r) => r.url().includes('/api/purchase-orders') && r.ok(),
         );
-        await page.getByPlaceholder('Search...').fill(fixtures.purchaseOrderNumber);
+        await page
+            .getByPlaceholder('Search...')
+            .fill(fixtures.purchaseOrderNumber);
         await listed;
 
         await expect(
-            page.getByRole('button', { name: new RegExp(fixtures.purchaseOrderNumber) }).first(),
+            page
+                .getByRole('button', {
+                    name: new RegExp(fixtures.purchaseOrderNumber),
+                })
+                .first(),
         ).toBeVisible();
         await expect(
-            page.getByRole('button', { name: new RegExp(fixtures.otherPurchaseOrderNumber) }),
+            page.getByRole('button', {
+                name: new RegExp(fixtures.otherPurchaseOrderNumber),
+            }),
         ).toHaveCount(0);
     });
 });

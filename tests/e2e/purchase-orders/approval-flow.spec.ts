@@ -150,12 +150,15 @@ test.describe('Purchase Order approval flow (UI)', () => {
         await approveViaScreenAsDelegate(page, poNumber as string);
 
         await page.goto('/purchase-orders');
+        await expect(page.locator('tbody tr').first()).toBeVisible();
+        const searchInput = page.getByPlaceholder(/search/i);
         await searchAndWaitForApi(
             page,
-            page.getByPlaceholder(/search/i),
+            searchInput,
             poNumber as string,
             '/api/purchase-orders',
         );
+        await expect(searchInput).toHaveValue(poNumber as string);
         await expect(
             page
                 .locator('tbody tr')

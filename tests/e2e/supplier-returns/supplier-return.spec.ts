@@ -130,7 +130,7 @@ test.describe('Supplier Returns Module', () => {
                 page,
                 '/api/products?search=Executive%20Office%20Desk',
             ),
-            getFirstAsyncOption(page, '/api/units?search=Piece'),
+            getFirstAsyncOption(page, '/api/units?search=Buah'),
         ]);
 
         await page.getByRole('button', { name: /^Add$/i }).first().click();
@@ -189,7 +189,7 @@ test.describe('Supplier Returns Module', () => {
                 page,
                 '/api/products?search=Executive%20Office%20Desk',
             ),
-            getFirstAsyncOption(page, '/api/units?search=Piece'),
+            getFirstAsyncOption(page, '/api/units?search=Buah'),
         ]);
 
         const supplierReturnNumber = await createSupplierReturn(page);

@@ -2,7 +2,9 @@ import { expect, Page } from '@playwright/test';
 
 import { ensureAppOrigin } from '../helpers';
 
-export async function createPurchaseOrderReportData(page: Page): Promise<string> {
+export async function createPurchaseOrderReportData(
+    page: Page,
+): Promise<string> {
     await ensureAppOrigin(page);
 
     const createResult = await page.evaluate(async () => {
@@ -22,8 +24,10 @@ export async function createPurchaseOrderReportData(page: Page): Promise<string>
         const [supplierId, warehouseId, productId, unitId] = await Promise.all([
             getFirstId('/api/suppliers?per_page=1'),
             getFirstId('/api/warehouses?per_page=1'),
-            getFirstId('/api/products?search=Executive%20Office%20Desk&per_page=1'),
-            getFirstId('/api/units?search=Piece&per_page=1'),
+            getFirstId(
+                '/api/products?search=Executive%20Office%20Desk&per_page=1',
+            ),
+            getFirstId('/api/units?search=Buah&per_page=1'),
         ]);
 
         const apiToken = localStorage.getItem('api_token') || '';
@@ -67,7 +71,9 @@ export async function createPurchaseOrderReportData(page: Page): Promise<string>
     return String(createResult.poNumber);
 }
 
-export async function waitForPurchaseOrderStatusReportResponse(page: Page): Promise<void> {
+export async function waitForPurchaseOrderStatusReportResponse(
+    page: Page,
+): Promise<void> {
     await page.waitForResponse(
         (response) =>
             response.url().includes('/api/reports/purchase-order-status') &&
@@ -82,7 +88,9 @@ export async function openPurchaseOrderStatusReport(page: Page): Promise<void> {
             response.status() < 400,
     );
     await page.goto('/reports/purchase-order-status');
-    await page.waitForURL('**/reports/purchase-order-status', { timeout: 15000 });
+    await page.waitForURL('**/reports/purchase-order-status', {
+        timeout: 15000,
+    });
     await initialResponse;
 
     await expect(page.locator('table')).toBeVisible();
