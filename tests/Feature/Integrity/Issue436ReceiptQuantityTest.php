@@ -12,6 +12,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\postJson;
+use function Pest\Laravel\putJson;
 
 uses(RefreshDatabase::class)->group('issue-436-receipt-quantity');
 
@@ -155,6 +156,24 @@ test('accepted over received returns localized message in indonesian', function 
     $response->assertStatus(422);
     expect($response->json('errors')['items.0.quantity_accepted'][0] ?? null)
         ->toBe(__('goods_receipt.accepted_exceeds_received', [], 'id'));
+});
+
+test('editing confirmed GR item beyond PO line quantity is rejected with 422', function () {
+    [$purchaseOrder, $item] = issue436ConfirmedPo(10);
+
+    // GR A confirmed 4 dari 10; GR B confirmed 6 (total 10, masih pas).
+    $first = postJson('/api/goods-receipts', issue436ReceiptPayload($purchaseOrder, $item, 'confirmed', 4, 4));
+    $first->assertStatus(201);
+    postJson('/api/goods-receipts', issue436ReceiptPayload($purchaseOrder, $item, 'confirmed', 6, 6))
+        ->assertStatus(201);
+
+    // Edit GR A menjadi 5 -> total 11 > 10 harus ditolak.
+    putJson('/api/goods-receipts/' . $first->json('data.id'), issue436ReceiptPayload($purchaseOrder, $item, 'confirmed', 5, 5))
+        ->assertStatus(422)
+        ->assertJsonValidationErrors(['items.0.quantity_received']);
+
+    expect(GoodsReceipt::query()->findOrFail($first->json('data.id'))->items()->value('quantity_received'))
+        ->toEqual(4.0);
 });
 
 test('confirmed GR within PO line quantity is accepted', function () {
