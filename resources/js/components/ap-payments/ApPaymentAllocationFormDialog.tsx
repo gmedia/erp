@@ -15,16 +15,6 @@ import { type ApPaymentFormData } from '@/types/ap-payment';
 import { type SupplierBill } from '@/types/supplier-bill';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 
-const apPaymentAllocationSchema = z.object({
-    supplier_bill_id: z.string().min(1, { message: 'Bill is required.' }),
-    bill_label: z.string().optional(),
-    allocated_amount: z.coerce
-        .number()
-        .gt(0, { message: 'Allocated amount must be greater than 0.' }),
-    discount_taken: z.coerce.number().min(0).optional().default(0),
-    notes: z.string().optional(),
-});
-
 type ApPaymentAllocationFormData = ApPaymentFormData['allocations'][number];
 
 interface ApPaymentAllocationFormDialogProps {
@@ -63,6 +53,21 @@ export function ApPaymentAllocationFormDialog({
     supplierId,
 }: ApPaymentAllocationFormDialogProps) {
     const { t } = useTranslation();
+    const apPaymentAllocationSchema = useMemo(
+        () =>
+            z.object({
+                supplier_bill_id: z.string().min(1, {
+                    message: t('apPayment.allocation.bill_required'),
+                }),
+                bill_label: z.string().optional(),
+                allocated_amount: z.coerce.number().gt(0, {
+                    message: t('apPayment.allocation.amount_positive'),
+                }),
+                discount_taken: z.coerce.number().min(0).optional().default(0),
+                notes: z.string().optional(),
+            }),
+        [t],
+    );
     const defaultValues = useMemo<ApPaymentAllocationFormData>(() => {
         if (!item) {
             return {
@@ -106,6 +111,8 @@ export function ApPaymentAllocationFormDialog({
             form={form}
             onSave={onSave}
             itemDescription="payment allocation"
+            titleLabel={t('apPayment.allocation.title_label')}
+            actionLabel={t('apPayment.allocation.title_label')}
         >
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {supplierId ? (
@@ -151,8 +158,8 @@ export function ApPaymentAllocationFormDialog({
 
             <TextareaField
                 name="notes"
-                label="Notes"
-                placeholder="Allocation notes"
+                label={t('apPayment.allocation.notes')}
+                placeholder={t('apPayment.allocation.notes_placeholder')}
                 rows={2}
             />
         </ItemFormDialogShell>

@@ -274,7 +274,13 @@
             "invoice": "Faktur Pelanggan",
             "invoice_placeholder": "Pilih Faktur Pelanggan",
             "select_customer_first": "Pilih pelanggan terlebih dahulu untuk memilih faktur.",
-            "allocated_amount": "Jumlah Dialokasikan"
+            "allocated_amount": "Jumlah Dialokasikan",
+            "title_label": "Alokasi",
+            "discount_given": "Diskon Diberikan",
+            "invoice_required": "Faktur pelanggan wajib dipilih.",
+            "amount_positive": "Jumlah alokasi harus lebih dari 0.",
+            "notes": "Catatan",
+            "notes_placeholder": "Catatan alokasi"
         }
     },
     "apPayment": {
@@ -283,7 +289,12 @@
             "bill_placeholder": "Pilih Tagihan Pemasok",
             "select_supplier_first": "Pilih pemasok terlebih dahulu untuk memilih tagihan.",
             "allocated_amount": "Jumlah Dialokasikan",
-            "discount_taken": "Diskon Diambil"
+            "discount_taken": "Diskon Diambil",
+            "title_label": "Alokasi Pembayaran",
+            "bill_required": "Tagihan pemasok wajib dipilih.",
+            "amount_positive": "Jumlah alokasi harus lebih dari 0.",
+            "notes": "Catatan",
+            "notes_placeholder": "Catatan alokasi"
         }
     },
     "profile.updated": "Profil berhasil diperbarui.",

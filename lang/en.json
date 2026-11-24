@@ -274,7 +274,13 @@
             "invoice": "Customer Invoice",
             "invoice_placeholder": "Select Customer Invoice",
             "select_customer_first": "Select a customer first to choose an invoice.",
-            "allocated_amount": "Allocated Amount"
+            "allocated_amount": "Allocated Amount",
+            "title_label": "Allocation",
+            "discount_given": "Discount Given",
+            "invoice_required": "Customer Invoice is required.",
+            "amount_positive": "Allocated amount must be greater than 0.",
+            "notes": "Notes",
+            "notes_placeholder": "Allocation notes"
         }
     },
     "apPayment": {
@@ -283,7 +289,12 @@
             "bill_placeholder": "Select Supplier Bill",
             "select_supplier_first": "Select a supplier first to choose a bill.",
             "allocated_amount": "Allocated Amount",
-            "discount_taken": "Discount Taken"
+            "discount_taken": "Discount Taken",
+            "title_label": "Payment Allocation",
+            "bill_required": "Bill is required.",
+            "amount_positive": "Allocated amount must be greater than 0.",
+            "notes": "Notes",
+            "notes_placeholder": "Allocation notes"
         }
     },
     "profile.updated": "Profile updated successfully.",

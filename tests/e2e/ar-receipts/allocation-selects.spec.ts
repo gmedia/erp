@@ -172,6 +172,18 @@ test.describe('AR Receipt allocation selects', () => {
         await expect(page.getByRole('button', { name: new RegExp(fixtures.sentInvoiceNumber) })).toHaveCount(1);
     });
 
+    test('label, placeholder, dan pesan validasi alokasi memakai terjemahan', async ({ page }) => {
+        await openReceiptEdit(page, fixtures.receiptNumber);
+        await page.getByRole('button', { name: 'Add Item' }).click();
+        const allocationDialog = page.getByRole('dialog').last();
+
+        await expect(allocationDialog.getByText('Discount Given')).toBeVisible();
+        await expect(allocationDialog.getByPlaceholder('Allocation notes')).toBeVisible();
+
+        await allocationDialog.getByRole('button', { name: 'Save Allocation' }).click();
+        await expect(allocationDialog.getByText('Customer Invoice is required.')).toBeVisible();
+    });
+
     test('ganti pelanggan di header mengosongkan baris alokasi', async ({ page }) => {
         await openReceiptEdit(page, fixtures.receiptNumber);
         await expect(page.getByRole('row').filter({ hasText: fixtures.sentInvoiceNumber })).toHaveCount(1);

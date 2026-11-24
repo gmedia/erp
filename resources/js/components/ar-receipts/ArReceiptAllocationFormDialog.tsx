@@ -27,18 +27,6 @@ const isOpenInvoice = (invoice: CustomerInvoice): boolean =>
     OPEN_INVOICE_STATUSES.includes(invoice.status) &&
     Number(invoice.amount_due) > 0;
 
-const arReceiptAllocationSchema = z.object({
-    customer_invoice_id: z
-        .string()
-        .min(1, { message: 'Customer Invoice is required.' }),
-    invoice_label: z.string().optional(),
-    allocated_amount: z.coerce
-        .number()
-        .gt(0, { message: 'Allocated amount must be greater than 0.' }),
-    discount_given: z.coerce.number().min(0).optional().default(0),
-    notes: z.string().optional(),
-});
-
 type ArReceiptAllocationFormData = ArReceiptFormData['allocations'][number];
 
 interface ArReceiptAllocationFormDialogProps {
@@ -68,6 +56,21 @@ export function ArReceiptAllocationFormDialog({
     customerId,
 }: ArReceiptAllocationFormDialogProps) {
     const { t } = useTranslation();
+    const arReceiptAllocationSchema = useMemo(
+        () =>
+            z.object({
+                customer_invoice_id: z.string().min(1, {
+                    message: t('arReceipt.allocation.invoice_required'),
+                }),
+                invoice_label: z.string().optional(),
+                allocated_amount: z.coerce.number().gt(0, {
+                    message: t('arReceipt.allocation.amount_positive'),
+                }),
+                discount_given: z.coerce.number().min(0).optional().default(0),
+                notes: z.string().optional(),
+            }),
+        [t],
+    );
     const defaultValues = useMemo<ArReceiptAllocationFormData>(() => {
         if (!item) {
             return {
@@ -111,6 +114,8 @@ export function ArReceiptAllocationFormDialog({
             form={form}
             onSave={onSave}
             itemDescription="allocation"
+            titleLabel={t('arReceipt.allocation.title_label')}
+            actionLabel={t('arReceipt.allocation.title_label')}
         >
             <div className="grid grid-cols-1 gap-4">
                 {customerId ? (
@@ -150,13 +155,16 @@ export function ArReceiptAllocationFormDialog({
                 />
                 <InputField
                     name="discount_given"
-                    label="Discount Given"
+                    label={t('arReceipt.allocation.discount_given')}
                     type="number"
                     min={0}
                     step={0.01}
                 />
             </div>
-            <ItemNotesField />
+            <ItemNotesField
+                label={t('arReceipt.allocation.notes')}
+                placeholder={t('arReceipt.allocation.notes_placeholder')}
+            />
         </ItemFormDialogShell>
     );
 }
