@@ -149,4 +149,26 @@ test.describe('Aging Dashboard', () => {
         await expect(headers.nth(1)).toHaveText('Overdue Amount');
         await expect(headers.last()).toHaveText('Days Late');
     });
+
+    test('Over 90 Days bar stays inside the AR bucket card', async ({
+        page,
+    }) => {
+        await page.goto('/aging-dashboard');
+        await waitForAgingDashboardData(page);
+
+        const card = page
+            .locator('[data-slot="card"]')
+            .filter({ hasText: 'Receivables (AR)' })
+            .first();
+        const overBucket = card.getByText('Over 90 Days', { exact: true });
+        await expect(overBucket).toBeVisible({ timeout: 10000 });
+
+        const cardBox = await card.boundingBox();
+        const rowBox = await overBucket.boundingBox();
+        expect(cardBox).not.toBeNull();
+        expect(rowBox).not.toBeNull();
+        expect(rowBox!.y + rowBox!.height).toBeLessThanOrEqual(
+            cardBox!.y + cardBox!.height,
+        );
+    });
 });
