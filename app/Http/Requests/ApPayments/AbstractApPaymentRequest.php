@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\ApPayments;
 
+use App\Actions\ApPayments\SyncApPaymentAllocationsAction;
 use App\Http\Requests\AuthorizedFormRequest;
 use App\Http\Requests\Concerns\HasBankPaymentRules;
 use App\Http\Requests\Concerns\HasSometimesArrayRules;
@@ -59,13 +60,15 @@ abstract class AbstractApPaymentRequest extends AuthorizedFormRequest
                     continue;
                 }
 
+                // Only posted payments bind the quota; drafts are re-checked on confirm.
                 $existingAllocated = ApPaymentAllocation::where('supplier_bill_id', $bill->id)
                     ->when(
                         $paymentId,
-                        fn ($q) => $q->whereHas(
-                            'payment',
-                            fn ($q2) => $q2->where('id', '!=', $paymentId),
-                        ),
+                        fn ($q) => $q->where('ap_payment_id', '!=', $paymentId),
+                    )
+                    ->whereHas(
+                        'payment',
+                        fn ($q) => $q->whereIn('status', SyncApPaymentAllocationsAction::POSTED_STATUSES),
                     )
                     ->sum('allocated_amount');
 

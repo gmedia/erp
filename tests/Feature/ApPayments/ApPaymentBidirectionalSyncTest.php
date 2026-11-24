@@ -3,6 +3,7 @@
 use App\Models\Account;
 use App\Models\ApPayment;
 use App\Models\Branch;
+use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use App\Models\Supplier;
 use App\Models\SupplierBill;
@@ -28,8 +29,28 @@ beforeEach(function () {
 test('creating payment updates supplier bill amount_paid and amount_due', function () {
     $supplier = Supplier::factory()->create();
     $branch = Branch::factory()->create();
-    $fiscalYear = FiscalYear::factory()->create();
-    $bankAccount = Account::factory()->create(['type' => 'asset']);
+    $fiscalYear = FiscalYear::factory()->create([
+        'name' => '2026',
+        'start_date' => '2026-01-01',
+        'end_date' => '2026-12-31',
+        'status' => 'open',
+    ]);
+    $coaVersion = CoaVersion::factory()->create(['status' => 'active']);
+    Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '21100',
+        'name' => 'Accounts Payable',
+        'type' => 'liability',
+        'normal_balance' => 'credit',
+        'is_active' => true,
+    ]);
+    $bankAccount = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '11110',
+        'type' => 'asset',
+        'normal_balance' => 'debit',
+        'is_active' => true,
+    ]);
     $supplierBill = SupplierBill::factory()->confirmed()->create([
         'grand_total' => 1000000,
         'amount_paid' => 0,
@@ -46,7 +67,7 @@ test('creating payment updates supplier bill amount_paid and amount_due', functi
         'bank_account_id' => $bankAccount->id,
         'currency' => 'IDR',
         'total_amount' => 500000,
-        'status' => 'draft',
+        'status' => 'confirmed',
         'allocations' => [
             [
                 'supplier_bill_id' => $supplierBill->id,
@@ -82,6 +103,7 @@ test('updating payment allocation updates supplier bill amounts', function () {
         'fiscal_year_id' => $fiscalYear->id,
         'bank_account_id' => $bankAccount->id,
         'total_amount' => 500000,
+        'status' => 'confirmed',
         'total_allocated' => 500000,
         'total_unallocated' => 0,
     ]);
