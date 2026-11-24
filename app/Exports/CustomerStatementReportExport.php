@@ -28,14 +28,14 @@ class CustomerStatementReportExport extends AbstractReportIndexExport implements
     public function map($row): array
     {
         return [
-            $row->customer_invoice['invoice_number'] ?? '-',
-            $row->customer_invoice['invoice_date'] ?? '-',
-            $row->customer_invoice['due_date'] ?? '-',
-            $row->amounts['grand_total'] ?? 0,
-            $row->amounts['amount_received'] ?? 0,
-            $row->amounts['credit_note_amount'] ?? 0,
-            $row->amounts['amount_due'] ?? 0,
-            $row->customer_invoice['status'] ?? '-',
+            $row->invoice_number ?? '-',
+            $row->invoice_date ?? '-',
+            $row->due_date ?? '-',
+            $row->grand_total ?? 0,
+            $row->amount_received ?? 0,
+            $row->credit_note_amount ?? 0,
+            $row->amount_due ?? 0,
+            $row->status ?? '-',
             $row->running_balance ?? 0,
         ];
     }
