@@ -127,10 +127,11 @@ class StockAdjustmentController extends Controller
         $items = $validated['items'] ?? null;
         unset($validated['items']);
 
-        // Issue #375 (review #426 butir 7): pembatalan dokumen approved membalik stok dan jurnal
-        // dalam satu transaksi. Dokumen tanpa jurnal (belum approved) tidak punya yang perlu dibalik.
+        // Issue #375 (review #426 butir 2 & 7): pembatalan dokumen approved membalik stok dan,
+        // bila ada, jurnal dalam satu transaksi. Data lama approved tanpa jurnal tetap dibatalkan.
+        // Draft/pending_approval belum terposting: dibatalkan tanpa pembalik.
         $isPostedCancel = ($validated['status'] ?? null) === 'cancelled'
-            && $stockAdjustment->journal_entry_id !== null;
+            && $stockAdjustment->status === 'approved';
 
         if ($isPostedCancel) {
             $this->cancelPostedDocument(

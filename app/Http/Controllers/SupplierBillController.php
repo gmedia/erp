@@ -90,7 +90,16 @@ class SupplierBillController extends Controller
         $items = $validated['items'] ?? null;
         unset($validated['items']);
 
-        if (($validated['status'] ?? null) === 'cancelled' && $supplierBill->journal_entry_id !== null) {
+        // Issue #375 (review #426 butir 5 & 6): bill yang sudah membawa pembayaran (partially_paid,
+        // paid, overdue) dibatalkan lewat jalur ini walau jurnalnya kosong (data lama), supaya alokasi
+        // dilepas. Draft dan confirmed tanpa jurnal tetap lewat update biasa.
+        $isPostedCancel = ($validated['status'] ?? null) === 'cancelled'
+            && (
+                $supplierBill->journal_entry_id !== null
+                || in_array($supplierBill->status, ['partially_paid', 'paid', 'overdue'], true)
+            );
+
+        if ($isPostedCancel) {
             $this->cancelPostedDocument(
                 document: $supplierBill,
                 attributes: array_merge($validated, ['status' => 'cancelled']),

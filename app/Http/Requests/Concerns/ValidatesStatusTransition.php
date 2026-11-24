@@ -40,10 +40,13 @@ trait ValidatesStatusTransition
             return;
         }
 
-        $blocked = $target === 'draft'
+        $sourcesByTarget = $this->resultStatusSources();
+
+        // Kembali ke draft hanya bila target draft didaftarkan eksplisit di resultStatusSources.
+        $blocked = ($target === 'draft' && ! array_key_exists('draft', $sourcesByTarget))
             || in_array($current, $this->finalResultStatuses(), true);
 
-        $sources = $this->resultStatusSources()[$target] ?? null;
+        $sources = $sourcesByTarget[$target] ?? null;
 
         if (! $blocked && ($sources === null || in_array($current, $sources, true))) {
             return;

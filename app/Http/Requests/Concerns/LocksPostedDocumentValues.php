@@ -37,8 +37,9 @@ trait LocksPostedDocumentValues
     {
         return [
             'customer_id', 'supplier_id', 'branch_id', 'fiscal_year_id', 'currency',
+            'customer_invoice_id', 'goods_receipt_id', 'purchase_order_id', 'payment_method',
             'invoice_date', 'bill_date', 'receipt_date', 'payment_date', 'supplier_invoice_date',
-            'due_date', 'bank_account_id', 'account_id',
+            'credit_note_date', 'due_date', 'bank_account_id', 'account_id',
         ];
     }
 
@@ -151,7 +152,7 @@ trait LocksPostedDocumentValues
         return [
             'account_id', 'product_id', 'unit_id', 'quantity', 'unit_price',
             'discount_percent', 'tax_percent', 'line_total', 'allocated_amount',
-            'customer_invoice_id', 'supplier_bill_id', 'discount_id',
+            'customer_invoice_id', 'supplier_bill_id', 'discount_given', 'discount_taken',
         ];
     }
 

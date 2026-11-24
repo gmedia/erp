@@ -2,6 +2,8 @@
 
 use App\Actions\StockAdjustments\PostStockAdjustmentMovementsAction;
 use App\Models\Account;
+use App\Models\ArReceipt;
+use App\Models\ArReceiptAllocation;
 use App\Models\CoaVersion;
 use App\Models\CustomerInvoice;
 use App\Models\FiscalYear;
@@ -49,6 +51,7 @@ beforeEach(function () {
         'customer_invoice', 'customer_invoice.edit',
         'supplier_bill', 'supplier_bill.edit',
         'stock_adjustment', 'stock_adjustment.edit',
+        'ar_receipt', 'ar_receipt.edit',
     ]), ['*']);
 });
 
@@ -196,4 +199,148 @@ test('stock adjustment approved tidak bisa kembali ke draft', function () {
     putJson("/api/stock-adjustments/{$adjustment->id}", ['status' => 'draft'])
         ->assertStatus(422)
         ->assertJsonValidationErrors(['status']);
+});
+
+/*
+ * Review PR #426, butir 1: draft dan pending_approval tetap bisa dibatalkan tanpa pembalik;
+ * pending_approval boleh kembali ke draft.
+ */
+test('stock adjustment draft bisa dibatalkan tanpa jurnal pembalik', function () {
+    $adjustment = StockAdjustment::factory()->create([
+        'status' => 'draft',
+        'warehouse_id' => Warehouse::factory()->create()->id,
+        'journal_entry_id' => null,
+    ]);
+
+    putJson("/api/stock-adjustments/{$adjustment->id}", ['status' => 'cancelled'])->assertOk();
+
+    expect($adjustment->fresh()->status)->toBe('cancelled');
+});
+
+test('stock adjustment pending_approval bisa dibatalkan dan bisa kembali ke draft', function () {
+    $pending = StockAdjustment::factory()->create([
+        'status' => 'pending_approval',
+        'warehouse_id' => Warehouse::factory()->create()->id,
+    ]);
+    $back = StockAdjustment::factory()->create([
+        'status' => 'pending_approval',
+        'warehouse_id' => Warehouse::factory()->create()->id,
+    ]);
+
+    putJson("/api/stock-adjustments/{$pending->id}", ['status' => 'cancelled'])->assertOk();
+    putJson("/api/stock-adjustments/{$back->id}", ['status' => 'draft'])->assertOk();
+
+    expect($pending->fresh()->status)->toBe('cancelled')
+        ->and($back->fresh()->status)->toBe('draft');
+});
+
+/*
+ * Review PR #426, butir 2: approved tanpa jurnal (data lama) tetap bisa dibatalkan.
+ */
+test('stock adjustment approved tanpa jurnal bisa dibatalkan', function () {
+    $adjustment = StockAdjustment::factory()->create([
+        'status' => 'approved',
+        'warehouse_id' => Warehouse::factory()->create()->id,
+        'journal_entry_id' => null,
+    ]);
+
+    putJson("/api/stock-adjustments/{$adjustment->id}", ['status' => 'cancelled'])->assertOk();
+
+    expect($adjustment->fresh()->status)->toBe('cancelled');
+});
+
+/*
+ * Review PR #426, butir 3: stock adjustment tidak lagi mengunci nilai dokumen approved.
+ */
+test('stock adjustment approved boleh diubah catatannya walau sudah berjurnal', function () {
+    $entry = prReview426PostedJournal();
+    $adjustment = StockAdjustment::factory()->create([
+        'status' => 'approved',
+        'warehouse_id' => Warehouse::factory()->create()->id,
+        'journal_entry_id' => $entry->id,
+        'notes' => 'awal',
+    ]);
+
+    putJson("/api/stock-adjustments/{$adjustment->id}", [
+        'status' => 'approved',
+        'notes' => 'revisi',
+    ])->assertOk();
+
+    expect($adjustment->fresh()->notes)->toBe('revisi');
+});
+
+/*
+ * Review PR #426, butir 4: nama field alokasi dan header yang dikunci sesuai model.
+ */
+test('header posted yang dikunci dengan nilai berbeda ditolak', function (string $field, string $value) {
+    $entry = prReview426PostedJournal();
+    $invoice = CustomerInvoice::factory()->create([
+        'status' => 'sent',
+        'journal_entry_id' => $entry->id,
+        'grand_total' => 100000,
+    ]);
+
+    putJson("/api/customer-invoices/{$invoice->id}", [
+        'status' => 'sent',
+        $field => $value,
+    ])->assertStatus(422)->assertJsonValidationErrors([$field]);
+})->with([
+    'invoice_date' => ['invoice_date', '2000-01-01'],
+    'customer_id' => ['customer_id', '999999'],
+]);
+
+test('alokasi posted memakai discount_given dan tidak bisa diubah', function () {
+    $entry = prReview426PostedJournal();
+    $invoice = CustomerInvoice::factory()->create([
+        'status' => 'paid',
+        'journal_entry_id' => $entry->id,
+        'grand_total' => 100000,
+        'amount_received' => 100000,
+    ]);
+    $receipt = ArReceipt::factory()->create(['status' => 'confirmed', 'journal_entry_id' => $entry->id]);
+    ArReceiptAllocation::query()->create([
+        'ar_receipt_id' => $receipt->id,
+        'customer_invoice_id' => $invoice->id,
+        'allocated_amount' => 100000,
+        'discount_given' => 0,
+    ]);
+
+    putJson("/api/ar-receipts/{$receipt->id}", [
+        'status' => 'confirmed',
+        'allocations' => [[
+            'customer_invoice_id' => $invoice->id,
+            'allocated_amount' => 100000,
+            'discount_given' => 5000,
+        ]],
+    ])->assertStatus(422)->assertJsonValidationErrors(['allocations']);
+});
+
+/*
+ * Review PR #426, butir 5: receipt terposting menurut status tanpa jurnal tetap dilepas dan dihitung ulang.
+ */
+test('receipt confirmed tanpa jurnal dibatalkan dan alokasinya dilepas', function () {
+    $invoice = CustomerInvoice::factory()->create([
+        'status' => 'sent',
+        'grand_total' => 100000,
+        'amount_received' => 40000,
+        'credit_note_amount' => 0,
+    ]);
+    $receipt = ArReceipt::factory()->create([
+        'receipt_number' => 'AR-2026-000901',
+        'status' => 'confirmed',
+        'journal_entry_id' => null,
+        'total_amount' => 40000,
+    ]);
+    ArReceiptAllocation::query()->create([
+        'ar_receipt_id' => $receipt->id,
+        'customer_invoice_id' => $invoice->id,
+        'allocated_amount' => 40000,
+        'discount_given' => 0,
+    ]);
+
+    putJson("/api/ar-receipts/{$receipt->id}", ['status' => 'cancelled'])->assertOk();
+
+    expect($receipt->fresh()->status)->toBe('cancelled')
+        ->and(ArReceiptAllocation::query()->where('ar_receipt_id', $receipt->id)->exists())->toBeFalse()
+        ->and((float) $invoice->fresh()->amount_received)->toBe(0.0);
 });
