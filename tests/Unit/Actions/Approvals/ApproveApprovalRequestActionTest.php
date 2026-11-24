@@ -70,8 +70,9 @@ test('approving a single-step request marks the request approved and logs comple
     expect($request->status)->toBe('approved');
     expect($request->completed_at)->not->toBeNull();
 
-    expect(ApprovalAuditLog::where('approval_request_id', $request->id)->where('event', 'step_approved')->count())->toBe(1);
-    expect(ApprovalAuditLog::where('approval_request_id', $request->id)->where('event', 'completed')->count())->toBe(1);
+    $auditLogs = ApprovalAuditLog::where('approval_request_id', $request->id);
+    expect((clone $auditLogs)->where('event', 'step_approved')->count())->toBe(1);
+    expect((clone $auditLogs)->where('event', 'completed')->count())->toBe(1);
 });
 
 test('approve does not retry a deadlock: the error propagates after a single attempt', function () {
