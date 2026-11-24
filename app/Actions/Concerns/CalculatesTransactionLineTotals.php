@@ -77,12 +77,15 @@ trait CalculatesTransactionLineTotals
         $balance = $this->roundLineAmount($grandTotal - $subtotal + $discount - $tax);
 
         if ($balance !== 0.0) {
-            if ($tax > 0.0) {
-                $tax = $this->roundLineAmount($tax + $balance);
-            } elseif ($discount > 0.0 && $discount - $balance >= 0.0) {
-                $discount = $this->roundLineAmount($discount - $balance);
+            $taxAfter = $this->roundLineAmount($tax + $balance);
+            $discountAfter = $this->roundLineAmount($discount - $balance);
+
+            if ($tax > 0.0 && $taxAfter >= 0.0) {
+                $tax = $taxAfter;
+            } elseif ($discount > 0.0 && $discountAfter >= 0.0) {
+                $discount = $discountAfter;
             } else {
-                $subtotal = $grandTotal;
+                $subtotal = $this->roundLineAmount($grandTotal + $discount - $tax);
             }
         }
 

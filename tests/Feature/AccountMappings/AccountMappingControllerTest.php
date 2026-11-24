@@ -137,6 +137,54 @@ describe('Account Mapping API Endpoints', function () {
             ->assertJsonValidationErrors(['target_account_id']);
     });
 
+    test('store accepts a group account as source (legacy balance to remap)', function () {
+        $group = Account::factory()->create([
+            'coa_version_id' => $this->sourceVersion->id,
+            'code' => '11000',
+            'name' => 'Current Assets',
+        ]);
+        Account::factory()->create([
+            'coa_version_id' => $this->sourceVersion->id,
+            'parent_id' => $group->id,
+            'code' => '11101',
+            'name' => 'Cash On Hand',
+        ]);
+
+        $response = postJson('/api/account-mappings', [
+            'source_account_id' => $group->id,
+            'target_account_id' => $this->targetAccount->id,
+            'type' => 'merge',
+        ]);
+
+        $response->assertStatus(201);
+        assertDatabaseHas('account_mappings', [
+            'source_account_id' => $group->id,
+            'target_account_id' => $this->targetAccount->id,
+        ]);
+    });
+
+    test('account picker for source does not filter out group accounts', function () {
+        $group = Account::factory()->create([
+            'coa_version_id' => $this->sourceVersion->id,
+            'code' => '11000',
+            'name' => 'Current Assets',
+        ]);
+        Account::factory()->create([
+            'coa_version_id' => $this->sourceVersion->id,
+            'parent_id' => $group->id,
+            'code' => '11101',
+            'name' => 'Cash On Hand',
+        ]);
+
+        // Endpoint akun butuh izin `account` (lihat routes/api/accounts.php).
+        actingAs(createTestUserWithPermissions(['account']));
+
+        $response = getJson('/api/accounts?coa_version_id=' . $this->sourceVersion->id);
+
+        $response->assertOk();
+        expect(collect($response->json('data'))->pluck('id'))->toContain($group->id);
+    });
+
     test('update modifies mapping', function () {
         $mapping = AccountMapping::create([
             'source_account_id' => $this->sourceAccount->id,

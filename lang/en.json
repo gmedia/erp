@@ -338,6 +338,7 @@
     "stock_transfer.items_locked": "Items and dispatched quantities cannot change after dispatch; only the received quantity can change.",
     "stock_transfer.qty_received_exceeds": "Received quantity cannot exceed the transferred quantity.",
     "account.not_postable": "The selected account is inactive or is not a postable account.",
+    "account_mapping.target_must_be_leaf": "The target account must be a postable (leaf) account, not a group account.",
     "admin_settings.logo_upload_failed": "The logo could not be saved. No settings were changed. Please try again.",
     "arReceipt": {
         "allocation": {

@@ -40,6 +40,20 @@ Cara membereskan (dijalankan oleh admin, satu per satu):
 
 Jangan menjalankan perubahan massal ke baris posted tanpa persetujuan product owner.
 
+### Memindahkan saldo akun kelompok (pemetaan COA)
+
+Instalasi lama bisa punya saldo di akun kelompok (mis. `11000`). Saldo itu perlu dipindahkan ke
+akun daun lewat **Pemetaan Akun**:
+
+- **Sumber** = akun kelompok (boleh; ini yang dipetakan).
+- **Target** = akun daun di COA versi lain (wajib daun; akun kelompok ditolak 422 dengan pesan
+  `account_mapping.target_must_be_leaf`).
+- Pilih jenis pemetaan (`merge`, `split`, atau `rename`) sesuai perpindahan saldo, lalu simpan.
+
+Pemetaan hanya mengatur perbandingan saldo lintas COA; ia tidak memindahkan baris jurnal. Untuk
+saldo posted di akun kelompok, pastikan jurnal pemindahan tetap dibuat ke akun daun (lihat langkah
+posted di atas).
+
 ## Verifikasi
 
 - `tests/Feature/JournalEntries/PostingToGroupAccountTest.php`: posted ditolak, draft ditolak,

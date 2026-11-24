@@ -38,15 +38,13 @@ abstract class AbstractAccountMappingRequest extends AuthorizedFormRequest
                 $validator->errors()->add('target_account_id', 'Target account must be from a different COA version.');
             }
 
-            // Pemetaan hanya untuk akun posting; akun kelompok (punya anak) ditolak.
-            $message = 'Account must be a postable account, not a group account.';
-
+            // Target harus akun daun (posting). Sumber boleh akun kelompok: instalasi lama
+            // bisa punya saldo di akun kelompok yang perlu dipetakan ke akun daun.
             if (Account::query()->whereKey($target->id)->whereHas('children')->exists()) {
-                $validator->errors()->add('target_account_id', $message);
-            }
-
-            if (Account::query()->whereKey($source->id)->whereHas('children')->exists()) {
-                $validator->errors()->add('source_account_id', $message);
+                $validator->errors()->add(
+                    'target_account_id',
+                    __('account_mapping.target_must_be_leaf'),
+                );
             }
         });
     }
