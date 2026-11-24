@@ -6,6 +6,7 @@ use App\Models\Asset;
 use App\Models\AssetDepreciationLine;
 use App\Models\AssetDepreciationRun;
 use App\Models\FiscalYear;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -15,6 +16,8 @@ class CalculateDepreciationAction
     public function execute(array $data): AssetDepreciationRun
     {
         return DB::transaction(function () use ($data) {
+            $this->assertSingleCalendarMonth($data);
+
             // Kunci tahun fiscal agar dua run bersamaan tidak lolos cek tumpang-tindih.
             FiscalYear::whereKey($data['fiscal_year_id'])->lockForUpdate()->first();
 
@@ -27,7 +30,7 @@ class CalculateDepreciationAction
 
             if ($overlappingRun) {
                 throw ValidationException::withMessages([
-                    'period_start' => 'A depreciation run already exists for an overlapping period.',
+                    'period_start' => __('asset_depreciation_runs.overlapping_period'),
                 ]);
             }
 
@@ -75,9 +78,11 @@ class CalculateDepreciationAction
                     continue; // Already fully depreciated
                 }
 
-                // Bulan terakhir menghabiskan sisa pembulatan (tidak menyisakan rupiah).
-                $isLastMonth = $maxDepreciable - $monthlyAmount < $monthlyAmount;
-                $amount = round($isLastMonth ? $maxDepreciable : min($monthlyAmount, $maxDepreciable));
+                // Sisa hanya dihabiskan pada bulan terakhir umur aset, atau bila sisanya tak cukup
+                // untuk satu bulanan penuh. Bulan lain selalu membebankan tepat satu bulanan.
+                $monthsRemaining = $usefulLife - (int) AssetDepreciationLine::where('asset_id', $asset->id)->count();
+                $isLastMonth = $monthsRemaining <= 1 || $maxDepreciable <= $monthlyAmount;
+                $amount = round($isLastMonth ? $maxDepreciable : $monthlyAmount);
 
                 $accumulatedAfter = $accumulatedBefore + $amount;
                 $bookValueAfter = $bookValueBefore - $amount;
@@ -100,5 +105,22 @@ class CalculateDepreciationAction
 
             return $run->loadCount('lines');
         });
+    }
+
+    /**
+     * Satu run hanya boleh mencakup satu bulan kalender agar beban tiap bulan tercatat sekali.
+     *
+     * @param  array{period_start: string, period_end: string}  $data
+     */
+    private function assertSingleCalendarMonth(array $data): void
+    {
+        $start = Carbon::parse($data['period_start']);
+        $end = Carbon::parse($data['period_end']);
+
+        if (! $start->isSameMonth($end)) {
+            throw ValidationException::withMessages([
+                'period_end' => __('asset_depreciation_runs.single_month_only'),
+            ]);
+        }
     }
 }

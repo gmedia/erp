@@ -9,6 +9,7 @@ use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use App\Models\JournalEntryLine;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\get;
@@ -295,6 +296,22 @@ test('last month consumes the whole rounding remainder so book value reaches sal
         'accumulated_depreciation' => 666,
     ]);
 
+    // Dua bulan pertama sudah dibebankan (333 + 333 = 666) sehingga bulan ketiga adalah bulan terakhir.
+    // Satu line per aset per run (unik), jadi tiap bulan butuh run sendiri.
+    foreach (['2024-01-01', '2024-02-01'] as $periodStart) {
+        $priorRun = AssetDepreciationRun::factory()->create([
+            'fiscal_year_id' => $this->fiscalYear->id,
+            'period_start' => $periodStart,
+            'period_end' => Carbon::parse($periodStart)->endOfMonth()->toDateString(),
+            'status' => 'posted',
+        ]);
+        AssetDepreciationLine::factory()->create([
+            'asset_depreciation_run_id' => $priorRun->id,
+            'asset_id' => $asset->id,
+            'amount' => 333,
+        ]);
+    }
+
     postJson('/api/asset-depreciation-runs/calculate', [
         'fiscal_year_id' => $this->fiscalYear->id,
         'period_start' => '2024-03-01',
@@ -307,4 +324,86 @@ test('last month consumes the whole rounding remainder so book value reaches sal
         'accumulated_after' => 1000,
         'book_value_after' => 0,
     ]);
+});
+
+test('calculate rejects a run that spans more than one calendar month (422)', function () {
+    postJson('/api/asset-depreciation-runs/calculate', [
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'period_start' => '2024-05-01',
+        'period_end' => '2024-07-31',
+    ])->assertStatus(422)->assertJsonValidationErrors('period_end');
+
+    expect(AssetDepreciationRun::count())->toBe(0);
+});
+
+test('a monthly run never charges more than one monthly amount before the final month', function () {
+    $asset = Asset::factory()->create([
+        'purchase_cost' => 1000,
+        'salvage_value' => 0,
+        'useful_life_months' => 10,
+        'depreciation_start_date' => '2024-01-01',
+        'depreciation_method' => 'straight_line',
+        'status' => 'active',
+        'book_value' => 190,
+        'accumulated_depreciation' => 810,
+    ]);
+
+    postJson('/api/asset-depreciation-runs/calculate', [
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'period_start' => '2024-03-01',
+        'period_end' => '2024-03-31',
+    ])->assertStatus(200);
+
+    $this->assertDatabaseHas('asset_depreciation_lines', [
+        'asset_id' => $asset->id,
+        'amount' => 100,
+        'book_value_after' => 90,
+    ]);
+});
+
+test('every life month posts exactly one line and only the final month takes the remainder', function () {
+    $cases = [[1000, 0, 3], [9500, 500, 12], [2000, 0, 7]];
+
+    foreach ($cases as $index => [$cost, $salvage, $life]) {
+        $year = 2024 + $index;
+        $fiscalYear = FiscalYear::factory()->create([
+            'start_date' => "{$year}-01-01",
+            'end_date' => "{$year}-12-31",
+            'status' => 'open',
+        ]);
+        $asset = Asset::factory()->create([
+            'purchase_cost' => $cost,
+            'salvage_value' => $salvage,
+            'useful_life_months' => $life,
+            'depreciation_start_date' => "{$year}-01-01",
+            'depreciation_method' => 'straight_line',
+            'status' => 'active',
+            'book_value' => $cost,
+            'accumulated_depreciation' => 0,
+        ]);
+
+        $depreciable = $cost - $salvage;
+        $monthly = round($depreciable / $life);
+        $accumulated = 0;
+
+        for ($month = 1; $month <= $life; $month++) {
+            $asset->update(['accumulated_depreciation' => $accumulated, 'book_value' => $cost - $accumulated]);
+            $periodStart = Carbon::create($year, $month, 1);
+
+            postJson('/api/asset-depreciation-runs/calculate', [
+                'fiscal_year_id' => $fiscalYear->id,
+                'period_start' => $periodStart->toDateString(),
+                'period_end' => $periodStart->copy()->endOfMonth()->toDateString(),
+            ])->assertStatus(200);
+
+            $amount = (float) AssetDepreciationLine::where('asset_id', $asset->id)->latest('id')->value('amount');
+            $expected = $month < $life ? $monthly : $depreciable - $monthly * ($life - 1);
+
+            expect($amount)->toBe((float) $expected);
+            $accumulated += $amount;
+        }
+
+        expect(AssetDepreciationLine::where('asset_id', $asset->id)->count())->toBe($life);
+        expect($accumulated)->toBe((float) $depreciable);
+    }
 });
