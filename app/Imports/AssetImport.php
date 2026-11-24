@@ -113,7 +113,8 @@ class AssetImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                 );
             },
             true,
-            true
+            true,
+            fn (array $rowData): array => ['asset_code', $rowData['asset_code']]
         );
     }
 

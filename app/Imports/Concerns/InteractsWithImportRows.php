@@ -9,6 +9,9 @@ use Throwable;
 
 trait InteractsWithImportRows
 {
+    /** @var array<string, true> Identity keys already persisted from earlier rows of this file. */
+    protected array $claimedImportKeys = [];
+
     /**
      * @param  array<string, array{model: class-string, key?: string}>  $configs
      * @return array<string, Collection>
@@ -82,8 +85,11 @@ trait InteractsWithImportRows
         array $lookupConfigs,
         callable $operation,
         bool $incrementSkippedOnValidation = false,
-        bool $incrementSkippedOnError = false
+        bool $incrementSkippedOnError = false,
+        ?callable $identityKey = null
     ): void {
+        $this->claimedImportKeys = [];
+
         foreach ($rows as $index => $row) {
             $rowNumber = $index + 2;
             $rowData = $this->rowToArray($row);
@@ -95,6 +101,16 @@ trait InteractsWithImportRows
             $resolvedLookups = $this->resolveLookupAssignments($rowData, $rowNumber, $lookupConfigs);
             if ($resolvedLookups === null) {
                 continue;
+            }
+
+            if ($identityKey !== null) {
+                [$keyLabel, $keyValue] = $identityKey($rowData);
+
+                if (! $this->claimImportKey($keyLabel . '=' . $keyValue)) {
+                    $this->recordDuplicateKeyError($rowNumber, $keyLabel, (string) $keyValue);
+
+                    continue;
+                }
             }
 
             $this->performImportUpsert(
@@ -169,6 +185,32 @@ trait InteractsWithImportRows
             'field' => $field,
             'message' => $entity . " '" . $value . "' not found.",
         ];
+    }
+
+    /**
+     * Claim an identity key for this file. Returns false when an earlier row
+     * in the same file already used the key, so the duplicate is reported
+     * instead of silently overwriting the earlier row.
+     */
+    protected function claimImportKey(string $key): bool
+    {
+        if (isset($this->claimedImportKeys[$key])) {
+            return false;
+        }
+
+        $this->claimedImportKeys[$key] = true;
+
+        return true;
+    }
+
+    protected function recordDuplicateKeyError(int $rowNumber, string $keyLabel, string $keyValue): void
+    {
+        $this->errors[] = [
+            'row' => $rowNumber,
+            'field' => 'Duplicate',
+            'message' => $keyLabel . " '" . $keyValue . "' already appears in an earlier row of this file.",
+        ];
+        $this->skippedCount++;
     }
 
     protected function recordSystemError(int $rowNumber, Throwable $exception): void

@@ -60,16 +60,8 @@ class SupplierImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                 ],
             ],
             function (array $rowData, array $resolvedLookups): void {
-                $matchAttributes = [];
-
-                if (! empty($rowData['email'])) {
-                    $matchAttributes['email'] = $rowData['email'];
-                } else {
-                    $matchAttributes['name'] = $rowData['name'];
-                }
-
                 Supplier::updateOrCreate(
-                    $matchAttributes,
+                    $this->matchAttributes($rowData),
                     [
                         'name' => $rowData['name'],
                         'email' => $rowData['email'] ?? null,
@@ -80,7 +72,28 @@ class SupplierImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                         'status' => $rowData['status'],
                     ]
                 );
+            },
+            false,
+            false,
+            function (array $rowData): array {
+                $match = $this->matchAttributes($rowData);
+                $field = array_key_first($match);
+
+                return [$field, $match[$field]];
             }
         );
+    }
+
+    /**
+     * @param  array<string, mixed>  $rowData
+     * @return array<string, mixed>
+     */
+    private function matchAttributes(array $rowData): array
+    {
+        if (! empty($rowData['email'])) {
+            return ['email' => $rowData['email']];
+        }
+
+        return ['name' => $rowData['name']];
     }
 }

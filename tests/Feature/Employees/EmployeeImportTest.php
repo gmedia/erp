@@ -137,6 +137,35 @@ test('skips/upserts existing email', function () {
     ]);
 })->group('employees');
 
+test('reports duplicate email within one file instead of overwriting', function () {
+    $csvContent = implode("\n", [
+        'employee_id,name,email,phone,department,position,branch,salary,hire_date,employment_status',
+        'EMP-010,First Person,dup@example.com,0812345,IT,Developer,Head Office,5000000,2023-01-01,regular',
+        'EMP-011,Second Person,dup@example.com,0812345,IT,Developer,Head Office,6000000,2023-01-01,regular',
+    ]);
+
+    $file = UploadedFile::fake()->createWithContent('employees_dup.csv', $csvContent);
+
+    $response = $this->postJson('/api/employees/import', [
+        'file' => $file,
+    ]);
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'imported' => 1,
+            'skipped' => 1,
+        ]);
+
+    $errors = collect($response->json('errors'));
+    expect($errors)->toHaveCount(1);
+    expect($errors->first())->toMatchArray(['row' => 3, 'field' => 'Duplicate']);
+
+    $this->assertDatabaseHas('employees', [
+        'email' => 'dup@example.com',
+        'name' => 'First Person',
+    ]);
+})->group('employees');
+
 test('validates file type', function () {
     $file = UploadedFile::fake()->create('document.pdf', 100);
 
