@@ -101,9 +101,13 @@ test.describe('Vehicle Loans', () => {
         page,
     }) => {
         const id = await submitVehicleLoanRequest(page, 'E2E review assignment');
+        const loan = await apiRequest(page, 'get', `/api/vehicle-loans/${id}`);
+        expect(loan.ok()).toBeTruthy();
+        const { code } = (await loan.json()) as { code: string };
+
         await approveViaScreenAsDelegate(
             page,
-            'E2E review assignment',
+            code,
             'Review penugasan kendaraan',
             '/review-assignment',
         );

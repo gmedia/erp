@@ -86,6 +86,24 @@ class ApprovalDelegation extends Model
     }
 
     /**
+     * Keep delegations whose document-type scope covers $approvableType.
+     * A null scope means all document types.
+     *
+     * @param  Builder<static>  $query
+     * @return Builder<static>
+     */
+    public function scopeCoveringApprovable(Builder $query, ?string $approvableType): Builder
+    {
+        return $query->where(function (Builder $scope) use ($approvableType): void {
+            $scope->whereNull('approvable_type');
+
+            if ($approvableType !== null) {
+                $scope->orWhere('approvable_type', $approvableType);
+            }
+        });
+    }
+
+    /**
      * Get the user who delegated their approval rights.
      */
     public function delegator(): BelongsTo

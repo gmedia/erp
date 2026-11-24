@@ -17,18 +17,8 @@ class ApproveApprovalRequestAction
         ?string $comments,
     ): void {
         DB::transaction(function () use ($approvalRequest, $currentStep, $userId, $comments): void {
-            $resolver = app(ResolveApprovalStepActorAction::class);
-
-            $resolver->lockPendingStep($currentStep);
-
-            $currentStep->update([
-                'status' => 'approved',
-                'acted_by' => $userId,
-                'delegated_from' => $resolver->delegatorFor($currentStep, $userId),
-                'action' => 'approve',
-                'comments' => $comments,
-                'acted_at' => now(),
-            ]);
+            app(ResolveApprovalStepActorAction::class)
+                ->recordDecision($currentStep, $userId, 'approve', $comments);
 
             ApprovalAuditLog::create([
                 'approval_request_id' => $approvalRequest->id,

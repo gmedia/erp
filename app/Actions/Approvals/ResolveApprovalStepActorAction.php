@@ -61,7 +61,37 @@ class ResolveApprovalStepActorAction
     }
 
     /**
-     * The approver who delegated this step to $userId, or null when $userId is the direct approver.
+     * Locks the step and records a decision ('approve' or 'reject') by $userId.
+     * Returns the attributes written to the step.
+     *
+     * @return array<string, mixed>
+     *
+     * @throws ConcurrentApprovalStepException
+     */
+    public function recordDecision(
+        ApprovalRequestStep $currentStep,
+        int $userId,
+        string $decision,
+        ?string $comments,
+    ): array {
+        $this->lockPendingStep($currentStep);
+
+        $attributes = [
+            'status' => $decision === 'approve' ? 'approved' : 'rejected',
+            'acted_by' => $userId,
+            'delegated_from' => $this->delegatorFor($currentStep, $userId),
+            'action' => $decision,
+            'comments' => $comments,
+            'acted_at' => now(),
+        ];
+
+        $currentStep->update($attributes);
+
+        return $attributes;
+    }
+
+    /**
+     * The approver who delegated this step to $userId, or null when the direct approver acts.
      */
     public function delegatorFor(ApprovalRequestStep $step, int $userId): ?int
     {
@@ -79,10 +109,7 @@ class ResolveApprovalStepActorAction
     {
         return ApprovalDelegation::query()
             ->activeForDelegate($userId)
-            ->where(function (Builder $scope) use ($approvalRequest): void {
-                $scope->whereNull('approvable_type')
-                    ->orWhere('approvable_type', $approvalRequest->approvable_type);
-            })
+            ->coveringApprovable($approvalRequest->approvable_type)
             ->pluck('delegator_user_id')
             ->map(fn ($id) => (int) $id)
             ->all();

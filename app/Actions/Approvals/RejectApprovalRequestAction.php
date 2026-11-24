@@ -17,18 +17,8 @@ class RejectApprovalRequestAction
         string $comments,
     ): void {
         DB::transaction(function () use ($approvalRequest, $currentStep, $userId, $comments): void {
-            $resolver = app(ResolveApprovalStepActorAction::class);
-
-            $resolver->lockPendingStep($currentStep);
-
-            $currentStep->update([
-                'status' => 'rejected',
-                'acted_by' => $userId,
-                'delegated_from' => $resolver->delegatorFor($currentStep, $userId),
-                'action' => 'reject',
-                'comments' => $comments,
-                'acted_at' => now(),
-            ]);
+            app(ResolveApprovalStepActorAction::class)
+                ->recordDecision($currentStep, $userId, 'reject', $comments);
 
             $approvalRequest->update([
                 'status' => 'rejected',
