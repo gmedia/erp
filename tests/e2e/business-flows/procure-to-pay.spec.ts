@@ -168,7 +168,6 @@ async function createGoodsReceiptViaUi(
     page: Page,
     ctx: {
         poId: number;
-        poItemId: number;
         warehouseId: number;
         productId: number;
         unitId: number;
@@ -208,7 +207,14 @@ async function createGoodsReceiptViaUi(
     await dialog.getByRole('button', { name: 'Add Item' }).click();
     const itemDialog = page.getByRole('dialog', { name: /Add Item/i });
     await expect(itemDialog).toBeVisible();
-    await itemDialog.getByLabel('PO Item ID').fill(String(ctx.poItemId));
+    await itemDialog.getByRole('combobox', { name: 'PO Item' }).click();
+    await page
+        .getByRole('dialog')
+        .last()
+        .getByRole('listitem')
+        .first()
+        .getByRole('button')
+        .click();
     await itemDialog.getByRole('combobox', { name: 'Product' }).click();
     await page
         .getByRole('dialog')
@@ -292,7 +298,6 @@ async function runProcureToPay(page: Page): Promise<P2pRun> {
 
     const grNumber = await createGoodsReceiptViaUi(page, {
         poId,
-        poItemId: poLine.id,
         warehouseId,
         productId,
         unitId,

@@ -189,7 +189,17 @@ async function createInvoiceViaUi(
     await dialog.getByRole('button', { name: 'Add Item' }).click();
     const itemDialog = page.getByRole('dialog', { name: /Add Item/i });
     await expect(itemDialog).toBeVisible();
-    await itemDialog.getByLabel('Account').fill(String(ctx.accountId));
+    await itemDialog.getByRole('combobox', { name: 'Account' }).click();
+    const accountPicker = page.getByRole('dialog').last();
+    await accountPicker
+        .getByPlaceholder('Search...')
+        .fill(REVENUE_ACCOUNT_CODE);
+    await accountPicker
+        .getByRole('listitem')
+        .filter({ hasText: REVENUE_ACCOUNT_CODE })
+        .first()
+        .getByRole('button')
+        .click();
     await itemDialog.getByLabel('Description').fill(ctx.description);
     await itemDialog.getByLabel(/Quantity/i).fill('1');
     await itemDialog.getByLabel(/Unit Price/i).fill(String(INVOICE_TOTAL));
@@ -275,6 +285,7 @@ async function createReceiptViaUi(
         fiscalYearId: number;
         cashAccountId: number;
         invoiceId: number;
+        invoiceNumber: string;
         amount: number;
     },
 ): Promise<{ id: number; receipt_number: string }> {
@@ -324,8 +335,16 @@ async function createReceiptViaUi(
     const allocDialog = page.getByRole('dialog', { name: /Add Item/i });
     await expect(allocDialog).toBeVisible();
     await allocDialog
-        .getByLabel('Customer Invoice')
-        .fill(String(ctx.invoiceId));
+        .getByRole('combobox', { name: 'Customer Invoice' })
+        .click();
+    const invoicePicker = page.getByRole('dialog').last();
+    await invoicePicker.getByPlaceholder('Search...').fill(ctx.invoiceNumber);
+    await invoicePicker
+        .getByRole('listitem')
+        .filter({ hasText: ctx.invoiceNumber })
+        .first()
+        .getByRole('button')
+        .click();
     await allocDialog.getByLabel('Allocated Amount').fill(String(ctx.amount));
     await allocDialog.getByRole('button', { name: 'Save Item' }).click();
     await expect(allocDialog).toBeHidden();
@@ -498,6 +517,7 @@ async function runOrderToCash(page: Page): Promise<O2cRun> {
         fiscalYearId,
         cashAccountId,
         invoiceId,
+        invoiceNumber: invoice.invoice_number,
         amount: RECEIPT_PART,
     });
     const receiptNumber = receipt.receipt_number;
@@ -673,8 +693,6 @@ test.describe('Order-to-cash: invoice sampai pelunasan', () => {
     test('picker Customer Invoice di form credit note menampilkan nomor invoice (#373)', async ({
         page,
     }) => {
-        test.fail(true, 'picker Customer Invoice credit note kosong (#373)');
-
         const ctx = await createSentInvoice(page);
         const invoice = await readInvoice(page, ctx.invoiceId);
 
