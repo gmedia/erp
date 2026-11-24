@@ -34,7 +34,12 @@ import type { FieldDescriptor } from './filters';
 // (scroll horizontal) memudar, bukan terpotong tajam di atas latar datar.
 const STICKY_EDGE_SHADOW =
     'before:pointer-events-none before:absolute before:inset-y-0 before:-left-6 before:w-6 before:bg-linear-to-r before:from-transparent before:to-background';
-const STICKY_ACTIONS_CELL = `sticky right-0 z-20 bg-inherit`;
+// Sel body aksi wajib berlatar solid: `bg-inherit` mewarisi transparan dari
+// <tr>, sehingga teks kolom lain tembus saat tabel di-scroll horizontal.
+const STICKY_ACTIONS_CELL = [
+    'sticky right-0 z-20 bg-background',
+    'group-hover:bg-muted group-data-[state=selected]:bg-muted',
+].join(' ');
 const STICKY_ACTIONS_HEAD = `sticky right-0 z-30 bg-background`;
 const STICKY_GRAND_TOTAL_CELL = `lg:sticky lg:right-14 lg:z-10 min-w-28 bg-background whitespace-nowrap ${STICKY_EDGE_SHADOW}`;
 const STICKY_GRAND_TOTAL_HEAD = `lg:sticky lg:right-14 lg:z-20 min-w-28 bg-background whitespace-nowrap ${STICKY_EDGE_SHADOW}`;
@@ -156,6 +161,7 @@ export interface DataTableProps<T> {
     onResetFilters: () => void;
     /** Optional endpoint for export requests */
     exportEndpoint?: string;
+    edgeFade?: boolean;
     /** Optional fields to render inside the filter modal */
     filterFields?: FieldDescriptor[];
     /** Optional callbacks for row actions */
@@ -214,6 +220,7 @@ export function DataTable<T>({
     defaultColumnVisibility,
     controlsDisabled = false,
     footer,
+    edgeFade = true,
 }: Readonly<DataTableProps<T>>) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnVisibility, setColumnVisibility] =
@@ -421,7 +428,7 @@ export function DataTable<T>({
             <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && 'selected'}
-                className="hover:bg-muted/50"
+                className="group hover:bg-muted/50"
             >
                 {row.getVisibleCells().map((cell, index, cells) => {
                     return (
@@ -520,7 +527,7 @@ export function DataTable<T>({
             )}
 
             <div className="overflow-x-auto">
-                <Table className="min-w-max">
+                <Table className="min-w-max" edgeFade={edgeFade}>
                     <TableHeader className="[&_th]:text-muted-foreground">
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>

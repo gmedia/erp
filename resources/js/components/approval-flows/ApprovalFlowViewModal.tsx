@@ -2,6 +2,7 @@ import { ViewField } from '@/components/common/ViewField';
 import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
 import { useTranslation } from '@/contexts/i18n-context';
+import { formatClassName } from '@/lib/status-badge';
 import { type ApprovalFlow } from '@/types/entity';
 import { memo } from 'react';
 
@@ -32,7 +33,7 @@ export const ApprovalFlowViewModal = memo<ApprovalFlowViewModalProps>(
                             <ViewField label="Name" value={item.name} />
                             <ViewField
                                 label="Approvable Type"
-                                value={item.approvable_type}
+                                value={formatClassName(item.approvable_type)}
                             />
                             <ViewField
                                 label="Created By"
@@ -105,9 +106,8 @@ export const ApprovalFlowViewModal = memo<ApprovalFlowViewModalProps>(
                                             <div>
                                                 Approver Type:{' '}
                                                 <span className="font-medium text-foreground capitalize">
-                                                    {step.approver_type.replace(
-                                                        '_',
-                                                        ' ',
+                                                    {formatClassName(
+                                                        step.approver_type,
                                                     )}
                                                 </span>
                                             </div>

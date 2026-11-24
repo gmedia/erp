@@ -65,4 +65,41 @@ class DocumentNumberResolver
 
         return $this->resolved[$type][$key];
     }
+
+    /**
+     * Preload document numbers for many (type, id) pairs with one query per type.
+     *
+     * @param  iterable<array{0: string|int|null, 1: string|int|null}>  $references
+     */
+    public function preload(iterable $references): void
+    {
+        $idsByType = [];
+
+        foreach ($references as [$type, $id]) {
+            if (! $type || $id === null || $id === '' || ! isset(self::ATTRIBUTES[$type])) {
+                continue;
+            }
+
+            $idsByType[$type][(string) $id] = $id;
+        }
+
+        foreach ($idsByType as $type => $idMap) {
+            $ids = array_values($idMap);
+            $attribute = self::ATTRIBUTES[$type];
+            $unresolved = array_diff_key($idMap, $this->resolved[$type] ?? []);
+
+            if ($unresolved === [] || ! class_exists($type)) {
+                continue;
+            }
+
+            $numbers = $type::query()
+                ->whereKey($ids)
+                ->pluck($attribute, (new $type)->getKeyName());
+
+            foreach ($unresolved as $key => $id) {
+                $value = $numbers->get((int) $id) ?? $numbers->get((string) $id);
+                $this->resolved[$type][$key] = is_string($value) ? $value : null;
+            }
+        }
+    }
 }

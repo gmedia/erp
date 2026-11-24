@@ -25,8 +25,9 @@ import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
 import { cn } from '@/lib/utils';
 import { ApprovalRequest, ApprovalRequestStep } from '@/types/approval';
+import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { format, formatDistanceToNow, isValid, parseISO } from 'date-fns';
+import { formatDistanceToNow, isValid, parseISO } from 'date-fns';
 import { Check, Clock, Eye, Loader2, X } from 'lucide-react';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -125,7 +126,7 @@ function formatSubmittedAt(submittedAt: string | null | undefined): {
     }
     return {
         relative: formatDistanceToNow(date, { addSuffix: true }),
-        absolute: format(date, 'dd MMM yyyy HH:mm'),
+        absolute: formatDateTimeByRegionalSettings(date),
     };
 }
 
@@ -133,7 +134,7 @@ function StatusBadge({ status }: Readonly<{ status: string }>) {
     switch (status) {
         case 'pending':
             return (
-                <Badge variant="secondary" className="gap-1 font-normal">
+                <Badge variant="warning" className="gap-1 font-normal">
                     <Clock className="h-3 w-3" /> Pending
                 </Badge>
             );
@@ -184,13 +185,28 @@ interface AssignmentOptions {
     units: AssignmentOption[];
 }
 
-function RequestNumber({ id }: Readonly<{ id: number | string }>) {
+function RequestNumber({
+    id,
+    documentNumber,
+}: Readonly<{ id: number | string; documentNumber?: string | null }>) {
     const { t } = useTranslation();
 
     return (
         <span className="font-mono text-[11px] text-muted-foreground tabular-nums">
-            {t('my_approvals.request_number', { id: String(id) })}
+            {documentNumber
+                ? documentNumber
+                : t('my_approvals.request_number', { id: String(id) })}
         </span>
+    );
+}
+
+function LoadFailedAlert() {
+    const { t } = useTranslation();
+
+    return (
+        <div className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-sm text-destructive">
+            {t('my_approvals.load_failed')}
+        </div>
     );
 }
 
@@ -402,6 +418,10 @@ export default function MyApprovalsPage() {
                                                         step.request
                                                             .approvable_id
                                                     }
+                                                    documentNumber={
+                                                        step.request
+                                                            .document_number
+                                                    }
                                                 />
                                                 <StatusBadge
                                                     status={step.status}
@@ -543,11 +563,7 @@ export default function MyApprovalsPage() {
                     </div>
                 )}
 
-                {error && (
-                    <div className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-sm text-destructive">
-                        Failed to load approvals. Please refresh and try again.
-                    </div>
-                )}
+                {error && <LoadFailedAlert />}
 
                 <Tabs defaultValue="pending" className="w-full gap-3">
                     <TabsList className="grid h-9 w-full grid-cols-4 lg:w-[28rem]">

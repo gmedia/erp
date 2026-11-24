@@ -8,12 +8,16 @@ import { cn } from "@/lib/utils"
 const TABLE_EDGE_RIGHT =
   "after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-4 after:bg-linear-to-r after:from-background after:to-transparent"
 
+type TableProps = React.ComponentProps<"table"> & { edgeFade?: boolean }
+
 function Table({
   className,
+  edgeFade = true,
   ...props
-}: Readonly<React.ComponentProps<"table">>) {
+}: Readonly<TableProps>) {
   const scrollRef = React.useRef<HTMLDivElement>(null)
   const [canScrollRight, setCanScrollRight] = React.useState(false)
+  const showEdgeFade = edgeFade && canScrollRight
 
   React.useEffect(() => {
     const el = scrollRef.current
@@ -51,8 +55,8 @@ function Table({
       data-overflow-right={canScrollRight || undefined}
       className={cn(
         "relative @container w-full min-w-0",
-        canScrollRight && TABLE_EDGE_RIGHT,
-        canScrollRight &&
+        showEdgeFade && TABLE_EDGE_RIGHT,
+        showEdgeFade &&
           "[&_td:last-child]:pr-5 [&_th:last-child]:pr-5"
       )}
     >

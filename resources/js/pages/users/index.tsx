@@ -262,8 +262,18 @@ function UsersBody({ manager }: Readonly<{ manager: UsersManager }>) {
     } else {
         tableBody = rows.map((row) => (
             <TableRow key={row.id} data-testid="user-row">
-                <TableCell className="font-medium">{row.name}</TableCell>
-                <TableCell className="max-w-[220px] truncate" title={row.email}>
+                <TableCell className="font-medium">
+                    {row.name}
+                    {!row.employee && (
+                        <span className="mt-1 block text-xs font-normal text-muted-foreground md:hidden">
+                            {t('users.edit_requires_employee')}
+                        </span>
+                    )}
+                </TableCell>
+                <TableCell
+                    className="max-w-[160px] break-all md:max-w-[220px]"
+                    title={row.email}
+                >
                     {row.email}
                 </TableCell>
                 <TableCell>
@@ -282,7 +292,7 @@ function UsersBody({ manager }: Readonly<{ manager: UsersManager }>) {
                             : t('users.status_unlinked')}
                     </Badge>
                 </TableCell>
-                <TableCell className="sticky right-0 z-20 bg-background text-right">
+                <TableCell className="bg-background text-right md:sticky md:right-0 md:z-20">
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
@@ -332,7 +342,7 @@ function UsersBody({ manager }: Readonly<{ manager: UsersManager }>) {
                         <TableHead>{t('users.columns.email')}</TableHead>
                         <TableHead>{t('users.columns.employee')}</TableHead>
                         <TableHead>{t('users.columns.status')}</TableHead>
-                        <TableHead className="sticky right-0 z-20 w-[60px] bg-background text-right">
+                        <TableHead className="w-[60px] bg-background text-right md:sticky md:right-0 md:z-20">
                             <span className="sr-only">
                                 {t('common.actions')}
                             </span>

@@ -42,6 +42,33 @@ interface TrialBalanceResponse {
 
 const emptyTrialBalanceReport: TrialBalanceResponse['report'] = [];
 
+const CELL_PADDING_CLASS = 'pl-1.5 pr-1.5 md:pl-2 md:pr-2';
+
+const NAME_CELL_CLASS = [
+    'min-w-[104px] break-words whitespace-normal md:min-w-0',
+    CELL_PADDING_CLASS,
+].join(' ');
+
+const AMOUNT_HEAD_CLASS = [
+    'min-w-[80px] text-right text-xs whitespace-nowrap tabular-nums md:min-w-0 md:text-sm',
+    CELL_PADDING_CLASS,
+].join(' ');
+
+const AMOUNT_CELL_CLASS = [
+    'text-right text-xs whitespace-nowrap tabular-nums md:text-sm',
+    CELL_PADDING_CLASS,
+].join(' ');
+
+const CODE_CELL_CLASS = [
+    'font-mono text-xs text-muted-foreground',
+    CELL_PADDING_CLASS,
+].join(' ');
+
+const TOTAL_CELL_CLASS = [
+    'text-right text-xs font-semibold whitespace-nowrap tabular-nums md:text-sm',
+    CELL_PADDING_CLASS,
+].join(' ');
+
 export default function TrialBalance() {
     const {
         fiscalYears,
@@ -90,7 +117,7 @@ export default function TrialBalance() {
                         <FinancialStatusBadge
                             isPositive={isBalanced}
                             positiveLabel="Balanced"
-                            negativeLabel={`Unbalanced • ${formatCurrency(difference)}`}
+                            negativeLabel={`Unbalanced • ${formatCurrency(difference, 0)}`}
                         />
                     )}
                 </FinancialReportHeaderMeta>
@@ -110,19 +137,21 @@ export default function TrialBalance() {
                         <Table className="md:min-w-[760px]">
                             <TableHeader className="[&_th]:text-muted-foreground">
                                 <TableRow>
-                                    <TableHead className="w-[64px] md:w-[120px]">
+                                    <TableHead
+                                        className={`w-[52px] md:w-[120px] ${CELL_PADDING_CLASS}`}
+                                    >
                                         Code
                                     </TableHead>
-                                    <TableHead className="max-w-[104px] md:max-w-none">
+                                    <TableHead className={NAME_CELL_CLASS}>
                                         Account Name
                                     </TableHead>
                                     <TableHead className="hidden w-[120px] md:table-cell">
                                         Type
                                     </TableHead>
-                                    <TableHead className="text-right text-xs whitespace-nowrap tabular-nums md:text-sm">
+                                    <TableHead className={AMOUNT_HEAD_CLASS}>
                                         Debit
                                     </TableHead>
-                                    <TableHead className="text-right text-xs whitespace-nowrap tabular-nums md:text-sm">
+                                    <TableHead className={AMOUNT_HEAD_CLASS}>
                                         Credit
                                     </TableHead>
                                 </TableRow>
@@ -141,12 +170,16 @@ export default function TrialBalance() {
                                 ) : (
                                     report.map((item) => (
                                         <TableRow key={item.id}>
-                                            <TableCell className="font-mono text-xs text-muted-foreground">
+                                            <TableCell
+                                                className={CODE_CELL_CLASS}
+                                            >
                                                 {item.code}
                                             </TableCell>
-                                            <TableCell className="max-w-[104px] md:max-w-none">
+                                            <TableCell
+                                                className={NAME_CELL_CLASS}
+                                            >
                                                 <div
-                                                    className="truncate"
+                                                    className="break-words"
                                                     style={{
                                                         paddingLeft: `${Math.max(0, item.level - 1) * 1.25}rem`,
                                                     }}
@@ -157,18 +190,24 @@ export default function TrialBalance() {
                                             <TableCell className="hidden text-muted-foreground capitalize md:table-cell">
                                                 {item.type}
                                             </TableCell>
-                                            <TableCell className="text-right text-xs whitespace-nowrap tabular-nums md:text-sm">
+                                            <TableCell
+                                                className={AMOUNT_CELL_CLASS}
+                                            >
                                                 {item.debit === 0
                                                     ? '-'
                                                     : formatCurrency(
                                                           item.debit,
+                                                          0,
                                                       )}
                                             </TableCell>
-                                            <TableCell className="text-right text-xs whitespace-nowrap tabular-nums md:text-sm">
+                                            <TableCell
+                                                className={AMOUNT_CELL_CLASS}
+                                            >
                                                 {item.credit === 0
                                                     ? '-'
                                                     : formatCurrency(
                                                           item.credit,
+                                                          0,
                                                       )}
                                             </TableCell>
                                         </TableRow>
@@ -185,14 +224,14 @@ export default function TrialBalance() {
                                             Total
                                         </TableCell>
                                         <TableCell
-                                            className={`text-right font-semibold tabular-nums ${isBalanced ? '' : 'text-destructive'}`}
+                                            className={`${TOTAL_CELL_CLASS} ${isBalanced ? '' : 'text-destructive'}`}
                                         >
-                                            {formatCurrency(totalDebit)}
+                                            {formatCurrency(totalDebit, 0)}
                                         </TableCell>
                                         <TableCell
-                                            className={`text-right font-semibold tabular-nums ${isBalanced ? '' : 'text-destructive'}`}
+                                            className={`${TOTAL_CELL_CLASS} ${isBalanced ? '' : 'text-destructive'}`}
                                         >
-                                            {formatCurrency(totalCredit)}
+                                            {formatCurrency(totalCredit, 0)}
                                         </TableCell>
                                     </TableRow>
                                 </TableFooter>
@@ -203,7 +242,7 @@ export default function TrialBalance() {
                 {!isBalanced && report.length > 0 && (
                     <div className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
                         Trial balance is not balanced. Difference:{' '}
-                        {formatCurrency(difference)}
+                        {formatCurrency(difference, 0)}
                     </div>
                 )}
             </div>

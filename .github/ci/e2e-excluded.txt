@@ -10,6 +10,5 @@ customer-statement-report
 financial-dashboard
 fiscal-year-auto-select
 per-branch-financial-reports
-social-login
 vehicle-loans
 visual-audit

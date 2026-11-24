@@ -17,7 +17,7 @@ class ApPaymentHistoryReportController extends Controller
     ): ApPaymentHistoryReportCollection {
         $rows = $action->execute($request);
 
-        return new ApPaymentHistoryReportCollection($rows);
+        return new ApPaymentHistoryReportCollection($rows, $action->summarize($request));
     }
 
     public function export(

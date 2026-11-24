@@ -135,7 +135,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             icon: Wallet,
             iconColor: MUTED_ICON,
             value: data.revenue.value,
-            formattedValue: formatCurrency(data.revenue.value),
+            formattedValue: formatCurrency(data.revenue.value, 0),
             footer: comparisonFooter(
                 data.revenue.change,
                 false,
@@ -148,7 +148,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             icon: Receipt,
             iconColor: MUTED_ICON,
             value: data.expenses.value,
-            formattedValue: formatCurrency(data.expenses.value),
+            formattedValue: formatCurrency(data.expenses.value, 0),
             footer: comparisonFooter(
                 data.expenses.change,
                 true,
@@ -162,7 +162,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             iconColor: MUTED_ICON,
             ...signedBalanceChrome(data.net_income.value),
             value: data.net_income.value,
-            formattedValue: formatCurrency(data.net_income.value),
+            formattedValue: formatCurrency(data.net_income.value, 0),
             footer: comparisonFooter(
                 data.net_income.change,
                 false,
@@ -175,7 +175,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             icon: Building2,
             iconColor: MUTED_ICON,
             value: data.total_assets.value,
-            formattedValue: formatCurrency(data.total_assets.value),
+            formattedValue: formatCurrency(data.total_assets.value, 0),
             footer: comparisonFooter(
                 data.total_assets.change,
                 false,
@@ -188,7 +188,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             icon: CreditCard,
             iconColor: MUTED_ICON,
             value: data.total_liabilities.value,
-            formattedValue: formatCurrency(data.total_liabilities.value),
+            formattedValue: formatCurrency(data.total_liabilities.value, 0),
             footer: comparisonFooter(
                 data.total_liabilities.change,
                 true,
@@ -202,7 +202,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             iconColor: MUTED_ICON,
             ...signedBalanceChrome(data.equity.value),
             value: data.equity.value,
-            formattedValue: formatCurrency(data.equity.value),
+            formattedValue: formatCurrency(data.equity.value, 0),
             footer: comparisonFooter(
                 data.equity.change,
                 false,
@@ -216,7 +216,7 @@ export const SummaryCards = memo<SummaryCardsProps>(function SummaryCards({
             iconColor: MUTED_ICON,
             ...signedBalanceChrome(data.cash_balance.value),
             value: data.cash_balance.value,
-            formattedValue: formatCurrency(data.cash_balance.value),
+            formattedValue: formatCurrency(data.cash_balance.value, 0),
             footer: comparisonFooter(
                 data.cash_balance.change,
                 false,
