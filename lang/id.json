@@ -294,6 +294,7 @@
     },
     "accounting_posting.control_account_missing": "Akun kontrol :code tidak ditemukan di versi COA aktif.",
     "accounting_posting.coa_none_active": "Tidak ada versi COA aktif untuk :date. Aktifkan satu versi COA sebelum posting.",
+    "accounting_posting.disposal_accounts_missing": "Atur akun laba dan rugi pelepasan aset di pengaturan sebelum posting.",
     "accounting_posting.coa_ambiguous": "Lebih dari satu versi COA aktif berlaku untuk :date. Pertahankan tepat satu COA aktif per tahun fiskal.",
     "journal_entry.fiscal_year_missing": "Tidak ada tahun fiskal yang mencakup tanggal ini. Buat tahun fiskal sebelum posting.",
     "concurrency.conflict": "Data sedang diproses oleh pengguna lain. Muat ulang halaman lalu coba lagi.",

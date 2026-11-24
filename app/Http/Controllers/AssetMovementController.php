@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\AccountingPosting\PostAssetDisposalJournalAction;
 use App\Actions\AssetMovements\ExportAssetMovementsAction;
 use App\Domain\AssetMovements\AssetMovementFilterService;
 use App\Http\Requests\AssetMovements\ExportAssetMovementRequest;
@@ -15,6 +16,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -22,6 +24,10 @@ use Throwable;
 
 class AssetMovementController extends Controller
 {
+    public function __construct(
+        private PostAssetDisposalJournalAction $postAssetDisposalJournal,
+    ) {}
+
     public function index(Request $request, AssetMovementFilterService $filterService): AnonymousResourceCollection
     {
         $query = AssetMovement::with([
@@ -88,6 +94,15 @@ class AssetMovementController extends Controller
                     'employee_id' => $request->to_employee_id ?? $asset->employee_id,
                     'status' => $request->movement_type === 'dispose' ? 'disposed' : $asset->status,
                 ]);
+
+                // Pelepasan tanpa hasil penjualan dijurnal pada tanggal pelepasan (#442).
+                if ($request->movement_type === 'dispose') {
+                    $asset->refresh();
+                    $this->postAssetDisposalJournal->execute(
+                        $asset,
+                        Carbon::parse($movement->moved_at)->toDateString(),
+                    );
+                }
 
                 return response()->json([
                     'message' => 'Movement recorded successfully',

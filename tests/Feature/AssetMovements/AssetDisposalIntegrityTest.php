@@ -2,11 +2,14 @@
 
 namespace Tests\Feature\AssetMovements;
 
+use App\Models\Account;
 use App\Models\Asset;
 use App\Models\AssetDepreciationLine;
 use App\Models\AssetDepreciationRun;
 use App\Models\AssetMovement;
+use App\Models\CoaVersion;
 use App\Models\FiscalYear;
+use App\Models\Setting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 
@@ -18,6 +21,40 @@ use function Pest\Laravel\putJson;
 uses(RefreshDatabase::class)->group('asset-movements');
 
 beforeEach(function () {
+    // Pelepasan dijurnal (#442): butuh COA aktif dan akun rugi pelepasan yang sudah diatur.
+    $fiscalYear = FiscalYear::factory()->create([
+        'name' => '2026',
+        'start_date' => '2026-01-01',
+        'end_date' => '2026-12-31',
+        'status' => 'open',
+    ]);
+    $coaVersion = CoaVersion::factory()->create([
+        'fiscal_year_id' => $fiscalYear->id,
+        'status' => 'active',
+    ]);
+    $equipment = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '12100',
+        'type' => 'asset',
+        'normal_balance' => 'debit',
+        'is_active' => true,
+    ]);
+    $accumulated = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '12200',
+        'type' => 'asset',
+        'normal_balance' => 'credit',
+        'is_active' => true,
+    ]);
+    $loss = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '52000',
+        'type' => 'expense',
+        'normal_balance' => 'debit',
+        'is_active' => true,
+    ]);
+    Setting::set('asset_disposal_loss_account_id', (string) $loss->id);
+
     $user = createTestUserWithPermissions([
         'asset_movement',
         'asset_movement.create',
