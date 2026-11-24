@@ -3,7 +3,10 @@
 use App\Actions\AccountingPosting\PostGoodsReceiptJournalAction;
 use App\Actions\AccountingPosting\ResolveControlAccountAction;
 use App\Actions\JournalEntries\CreateJournalEntryAction;
+use App\Models\Account;
+use App\Models\CoaVersion;
 use App\Models\Employee;
+use App\Models\FiscalYear;
 use App\Models\GoodsReceipt;
 use App\Models\JournalEntry;
 use App\Models\Product;
@@ -11,7 +14,6 @@ use App\Models\PurchaseOrder;
 use App\Models\Unit;
 use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -32,6 +34,38 @@ beforeEach(function () {
     ]);
     Sanctum::actingAs($user, ['*']);
 });
+
+/**
+ * COA aktif lengkap untuk jurnal GR (persediaan 11300, GR/IR 21150). Issue #416: COA harus
+ * lengkap sebelum GR confirmed; tanpa ini konfirmasi kini ditolak 422.
+ */
+function createGoodsReceiptCoaFixture(): void
+{
+    FiscalYear::factory()->create([
+        'name' => '2026',
+        'start_date' => '2026-01-01',
+        'end_date' => '2026-12-31',
+        'status' => 'open',
+    ]);
+    $coaVersion = CoaVersion::factory()->create(['status' => 'active']);
+
+    Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '11300',
+        'name' => 'Persediaan',
+        'type' => 'asset',
+        'normal_balance' => 'debit',
+        'is_active' => true,
+    ]);
+    Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '21150',
+        'name' => 'Barang Diterima Belum Ditagih',
+        'type' => 'liability',
+        'normal_balance' => 'credit',
+        'is_active' => true,
+    ]);
+}
 
 function createPurchaseOrderWithItemForGoodsReceipt(): array
 {
@@ -196,8 +230,12 @@ test('show returns goods receipt detail', function () {
 });
 
 test('update modifies goods receipt and items', function () {
+    createGoodsReceiptCoaFixture();
     [$purchaseOrder, $purchaseOrderItem, $product, $unit] = createPurchaseOrderWithItemForGoodsReceipt();
-    $goodsReceipt = GoodsReceipt::factory()->create(['purchase_order_id' => $purchaseOrder->id]);
+    $goodsReceipt = GoodsReceipt::factory()->create([
+        'purchase_order_id' => $purchaseOrder->id,
+        'receipt_date' => '2026-03-06',
+    ]);
 
     $payload = [
         'status' => 'confirmed',
@@ -221,10 +259,12 @@ test('update modifies goods receipt and items', function () {
 });
 
 test('confirming a goods receipt creates goods receipt stock movements', function () {
+    createGoodsReceiptCoaFixture();
     [$purchaseOrder, $purchaseOrderItem, $product, $unit] = createPurchaseOrderWithItemForGoodsReceipt();
     $goodsReceipt = GoodsReceipt::factory()->create([
         'purchase_order_id' => $purchaseOrder->id,
         'warehouse_id' => $purchaseOrder->warehouse_id,
+        'receipt_date' => '2026-03-06',
         'status' => 'draft',
         'confirmed_at' => null,
         'confirmed_by' => null,
@@ -273,7 +313,10 @@ test('confirming goods receipt rolls back state when journal posting fails with 
     ]);
 
     $this->app->bind(PostGoodsReceiptJournalAction::class, function ($app) {
-        return new class($app->make(CreateJournalEntryAction::class), $app->make(ResolveControlAccountAction::class)) extends PostGoodsReceiptJournalAction
+        return new class(
+            $app->make(CreateJournalEntryAction::class),
+            $app->make(ResolveControlAccountAction::class),
+        ) extends PostGoodsReceiptJournalAction
         {
             public function execute(GoodsReceipt $goodsReceipt): ?JournalEntry
             {
@@ -291,33 +334,132 @@ test('confirming goods receipt rolls back state when journal posting fails with 
     expect($goodsReceipt->confirmed_by)->toBeNull();
 });
 
-test('confirming goods receipt swallows validation errors and keeps state confirmed', function () {
+test('confirming goods receipt is rejected with 422 when control account is missing and nothing changes', function () {
+    [$purchaseOrder, $purchaseOrderItem, $product, $unit] = createPurchaseOrderWithItemForGoodsReceipt();
     $goodsReceipt = GoodsReceipt::factory()->create([
-        'purchase_order_id' => PurchaseOrder::factory()->create(['status' => 'confirmed'])->id,
+        'purchase_order_id' => $purchaseOrder->id,
+        'warehouse_id' => $purchaseOrder->warehouse_id,
+        'receipt_date' => '2026-03-06',
         'status' => 'draft',
         'confirmed_at' => null,
         'confirmed_by' => null,
     ]);
 
-    $this->app->bind(PostGoodsReceiptJournalAction::class, function ($app) {
-        return new class($app->make(CreateJournalEntryAction::class), $app->make(ResolveControlAccountAction::class)) extends PostGoodsReceiptJournalAction
-        {
-            public function execute(GoodsReceipt $goodsReceipt): ?JournalEntry
-            {
-                throw ValidationException::withMessages([
-                    'coa' => 'Missing COA mapping for journal posting',
-                ]);
-            }
-        };
-    });
+    // Tidak ada COA aktif sama sekali: akun persediaan/GR-IR tidak bisa di-resolve.
+    CoaVersion::query()->delete();
 
-    putJson('/api/goods-receipts/' . $goodsReceipt->id, ['status' => 'confirmed'])
-        ->assertOk()
-        ->assertJsonPath('data.status', 'confirmed');
+    putJson('/api/goods-receipts/' . $goodsReceipt->id, [
+        'status' => 'confirmed',
+        'items' => [
+            [
+                'purchase_order_item_id' => $purchaseOrderItem->id,
+                'product_id' => $product->id,
+                'unit_id' => $unit->id,
+                'quantity_received' => 7,
+                'quantity_accepted' => 6,
+                'quantity_rejected' => 1,
+                'unit_price' => 10000,
+            ],
+        ],
+    ])->assertStatus(422);
 
     $goodsReceipt->refresh();
-    expect($goodsReceipt->status)->toBe('confirmed');
-    expect($goodsReceipt->confirmed_at)->not->toBeNull();
+    expect($goodsReceipt->status)->toBe('draft')
+        ->and($goodsReceipt->confirmed_at)->toBeNull()
+        ->and($goodsReceipt->confirmed_by)->toBeNull()
+        ->and($goodsReceipt->journal_entry_id)->toBeNull()
+        ->and($goodsReceipt->items()->count())->toBe(0);
+
+    assertDatabaseMissing('stock_movements', [
+        'movement_type' => 'goods_receipt',
+        'reference_type' => GoodsReceipt::class,
+        'reference_id' => $goodsReceipt->id,
+    ]);
+    assertDatabaseMissing('journal_entries', [
+        'source_type' => GoodsReceipt::class,
+        'source_id' => $goodsReceipt->id,
+    ]);
+});
+
+test('confirming goods receipt is rejected with 422 when fiscal period is closed and nothing changes', function () {
+    createGoodsReceiptCoaFixture();
+    FiscalYear::query()->update(['status' => 'closed']);
+    [$purchaseOrder, $purchaseOrderItem, $product, $unit] = createPurchaseOrderWithItemForGoodsReceipt();
+    $goodsReceipt = GoodsReceipt::factory()->create([
+        'purchase_order_id' => $purchaseOrder->id,
+        'warehouse_id' => $purchaseOrder->warehouse_id,
+        'receipt_date' => '2026-03-06',
+        'status' => 'draft',
+        'confirmed_at' => null,
+        'confirmed_by' => null,
+    ]);
+
+    putJson('/api/goods-receipts/' . $goodsReceipt->id, [
+        'status' => 'confirmed',
+        'items' => [
+            [
+                'purchase_order_item_id' => $purchaseOrderItem->id,
+                'product_id' => $product->id,
+                'unit_id' => $unit->id,
+                'quantity_received' => 7,
+                'quantity_accepted' => 6,
+                'quantity_rejected' => 1,
+                'unit_price' => 10000,
+            ],
+        ],
+    ])->assertStatus(422);
+
+    $goodsReceipt->refresh();
+    expect($goodsReceipt->status)->toBe('draft')
+        ->and($goodsReceipt->confirmed_at)->toBeNull()
+        ->and($goodsReceipt->journal_entry_id)->toBeNull();
+
+    assertDatabaseMissing('stock_movements', [
+        'movement_type' => 'goods_receipt',
+        'reference_type' => GoodsReceipt::class,
+        'reference_id' => $goodsReceipt->id,
+    ]);
+});
+
+test('confirming goods receipt without account 21150 is rejected with 422 unchanged', function () {
+    createGoodsReceiptCoaFixture();
+    // Hapus akun GR/IR 21150; persediaan 11300 tetap ada. Fallback debit tidak bisa di-resolve.
+    Account::query()->where('code', '21150')->delete();
+    [$purchaseOrder, $purchaseOrderItem, $product, $unit] = createPurchaseOrderWithItemForGoodsReceipt();
+    $goodsReceipt = GoodsReceipt::factory()->create([
+        'purchase_order_id' => $purchaseOrder->id,
+        'warehouse_id' => $purchaseOrder->warehouse_id,
+        'receipt_date' => '2026-03-06',
+        'status' => 'draft',
+        'confirmed_at' => null,
+        'confirmed_by' => null,
+    ]);
+
+    putJson('/api/goods-receipts/' . $goodsReceipt->id, [
+        'status' => 'confirmed',
+        'items' => [
+            [
+                'purchase_order_item_id' => $purchaseOrderItem->id,
+                'product_id' => $product->id,
+                'unit_id' => $unit->id,
+                'quantity_received' => 7,
+                'quantity_accepted' => 6,
+                'quantity_rejected' => 1,
+                'unit_price' => 10000,
+            ],
+        ],
+    ])->assertStatus(422);
+
+    $goodsReceipt->refresh();
+    expect($goodsReceipt->status)->toBe('draft')
+        ->and($goodsReceipt->confirmed_at)->toBeNull()
+        ->and($goodsReceipt->journal_entry_id)->toBeNull();
+
+    assertDatabaseMissing('stock_movements', [
+        'movement_type' => 'goods_receipt',
+        'reference_type' => GoodsReceipt::class,
+        'reference_id' => $goodsReceipt->id,
+    ]);
 });
 
 test('destroy removes goods receipt', function () {

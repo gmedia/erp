@@ -26,7 +26,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\ValidationException;
 
 class GoodsReceiptController extends Controller
 {
@@ -163,19 +162,10 @@ class GoodsReceiptController extends Controller
                     $syncItems->execute($goodsReceipt, $items);
                 },
                 afterCommit: $isNewlyConfirmed
+                    // Jurnal gagal (COA/periode) melempar ValidationException: transaksi dibatalkan,
+                    // dokumen dan stok tidak berubah (Issue #416).
                     ? function (GoodsReceipt $goodsReceipt) use ($postJournal): void {
-                        try {
-                            $postJournal->execute($goodsReceipt->refresh());
-                        } catch (ValidationException $e) {
-                            // Validation failures (e.g. missing COA mapping) are intentionally
-                            // swallowed so the goods receipt itself stays confirmed; user can
-                            // post the journal later. Non-validation errors propagate and
-                            // roll back the entire transaction (status flip included).
-                            Log::warning('Goods receipt journal posting skipped', [
-                                'goods_receipt_id' => $goodsReceipt->id,
-                                'reason' => $e->getMessage(),
-                            ]);
-                        }
+                        $postJournal->execute($goodsReceipt->refresh());
                     }
                 : null,
             );
