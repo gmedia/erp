@@ -22,6 +22,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { useAssetDepreciationRuns } from '@/hooks/useAssetDepreciationRuns';
+import { usePermissions } from '@/hooks/usePermissions';
 import { BreadcrumbItem } from '@/types';
 import { AssetDepreciationRun } from '@/types/asset-depreciation-run';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
@@ -64,6 +65,9 @@ export default function Index() {
     const [isCalcOpen, setIsCalcOpen] = useState(false);
     const [viewRunId, setViewRunId] = useState<number | null>(null);
 
+    const { can } = usePermissions();
+    const canEdit = can('asset_depreciation_run.edit');
+
     const paginationView = buildStandalonePaginationView(meta, data.length);
 
     let tableBodyContent: React.ReactNode;
@@ -85,13 +89,15 @@ export default function Index() {
                 title="No runs found"
                 description="Start by running a new calculation."
                 action={
-                    <Button
-                        variant="outline"
-                        className="mt-4"
-                        onClick={() => setIsCalcOpen(true)}
-                    >
-                        <Plus className="mr-2 h-4 w-4" /> Calculate Now
-                    </Button>
+                    canEdit ? (
+                        <Button
+                            variant="outline"
+                            className="mt-4"
+                            onClick={() => setIsCalcOpen(true)}
+                        >
+                            <Plus className="mr-2 h-4 w-4" /> Calculate Now
+                        </Button>
+                    ) : undefined
                 }
             />
         );
@@ -144,7 +150,7 @@ export default function Index() {
                             item={item}
                             onView={() => setViewRunId(item.id)}
                             extraItems={
-                                item.status === 'calculated'
+                                item.status === 'calculated' && canEdit
                                     ? [
                                           <DropdownMenuItem
                                               key="post"
@@ -202,10 +208,12 @@ export default function Index() {
                 </>
             }
             actions={
-                <Button onClick={() => setIsCalcOpen(true)}>
-                    <Calculator className="mr-2 h-4 w-4" />
-                    Run Calculation
-                </Button>
+                canEdit ? (
+                    <Button onClick={() => setIsCalcOpen(true)}>
+                        <Calculator className="mr-2 h-4 w-4" />
+                        Run Calculation
+                    </Button>
+                ) : undefined
             }
         >
             <Table>

@@ -31,6 +31,12 @@ export interface FormProps<T extends object, FormData = unknown> {
     isLoading: boolean;
 }
 
+export interface CrudPageActionAccess {
+    canCreate: boolean;
+    canEdit: boolean;
+    canDelete: boolean;
+}
+
 export interface CrudPageConfig<
     T extends object,
     FormData,
@@ -38,6 +44,8 @@ export interface CrudPageConfig<
 > extends BaseCrudPageConfig<T, FilterType> {
     // UI configuration
     entityNamePlural: string;
+    /** Izin tombol aksi; undefined = semua tampil (perilaku lama). */
+    actionAccess?: CrudPageActionAccess;
     /** Judul halaman memakai entityNamePlural; deskripsi opsional di bawahnya. */
     description?: string;
     breadcrumbs: BreadcrumbItem[];
@@ -54,9 +62,9 @@ export interface CrudPageConfig<
 
     mapDataTableProps: (props: {
         data: T[];
-        onAdd: () => void;
-        onEdit: (item: T) => void;
-        onDelete: (item: T) => void;
+        onAdd: (() => void) | undefined;
+        onEdit: ((item: T) => void) | undefined;
+        onDelete: ((item: T) => void) | undefined;
         onView: (item: T) => void;
         pagination: {
             page: number;
@@ -121,14 +129,25 @@ export function CrudPage<
         detailLoadErrorMessage: config.detailLoadErrorMessage,
     });
 
+    const access = config.actionAccess;
+
     // Prepare data table props
     const dataTableProps = useMemo(
         () =>
             config.mapDataTableProps({
                 data: crudState.data,
-                onAdd: crudState.handleAdd,
-                onEdit: crudState.handleEdit,
-                onDelete: crudState.handleDelete,
+                onAdd:
+                    access?.canCreate === false
+                        ? undefined
+                        : crudState.handleAdd,
+                onEdit:
+                    access?.canEdit === false
+                        ? undefined
+                        : crudState.handleEdit,
+                onDelete:
+                    access?.canDelete === false
+                        ? undefined
+                        : crudState.handleDelete,
                 onView: crudState.handleView,
                 pagination: crudState.tablePagination,
                 onPageChange: crudState.handlePageChange,
@@ -142,6 +161,7 @@ export function CrudPage<
             }),
         [
             config,
+            access,
             crudState.data,
             crudState.handleAdd,
             crudState.handleEdit,

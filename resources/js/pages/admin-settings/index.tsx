@@ -16,6 +16,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/contexts/auth-context';
 import { useTranslation } from '@/contexts/i18n-context';
+import { usePermissions } from '@/hooks/usePermissions';
 import AdminSettingsLayout from '@/layouts/admin-settings/layout';
 import AppLayout from '@/layouts/app-layout';
 import axiosInstance from '@/lib/axios';
@@ -118,6 +119,8 @@ function GeneralSettings({
     onSaved?: () => Promise<void> | void;
 }>) {
     const { t } = useTranslation();
+    const { can } = usePermissions();
+    const canEdit = can('admin_setting.edit');
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -170,6 +173,7 @@ function GeneralSettings({
                     processing={processing}
                     recentlySuccessful={recentlySuccessful}
                     testId="save-general-settings"
+                    hidden={!canEdit}
                 />
             }
         >
@@ -286,6 +290,8 @@ function RegionalSettings({
 }: Readonly<{
     settings: SettingsData['regional'];
 }>) {
+    const { can } = usePermissions();
+    const canEdit = can('admin_setting.edit');
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -353,6 +359,7 @@ function RegionalSettings({
                     processing={processing}
                     recentlySuccessful={recentlySuccessful}
                     testId="save-regional-settings"
+                    hidden={!canEdit}
                 />
             }
         >
@@ -459,6 +466,8 @@ function RegionalSettings({
 function SmtpSettings({
     settings,
 }: Readonly<{ settings: SettingsData['smtp'] }>) {
+    const { can } = usePermissions();
+    const canEdit = can('admin_setting.edit');
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -506,6 +515,7 @@ function SmtpSettings({
                         processing={processing}
                         recentlySuccessful={recentlySuccessful}
                         testId="save-smtp-settings"
+                        hidden={!canEdit}
                     />
                 }
             >
@@ -636,18 +646,20 @@ function SmtpSettings({
                                 placeholder="Enter email to test..."
                                 className="flex-1"
                             />
-                            <Button
-                                variant="secondary"
-                                disabled={testProcessing}
-                                data-testid="send-test-email"
-                            >
-                                {testProcessing ? (
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                ) : null}
-                                {testProcessing
-                                    ? 'Sending...'
-                                    : 'Send Test Email'}
-                            </Button>
+                            {canEdit && (
+                                <Button
+                                    variant="secondary"
+                                    disabled={testProcessing}
+                                    data-testid="send-test-email"
+                                >
+                                    {testProcessing ? (
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    ) : null}
+                                    {testProcessing
+                                        ? 'Sending...'
+                                        : 'Send Test Email'}
+                                </Button>
+                            )}
                         </div>
                         <Transition
                             show={testRecentlySuccessful}
@@ -678,6 +690,8 @@ function AuthenticationSettings({
     settings: SettingsData['authentication'];
     onSaved?: () => Promise<void> | void;
 }>) {
+    const { can } = usePermissions();
+    const canEdit = can('admin_setting.edit');
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -779,6 +793,7 @@ function AuthenticationSettings({
                     processing={processing}
                     recentlySuccessful={recentlySuccessful}
                     testId="save-authentication-settings"
+                    hidden={!canEdit}
                 />
             }
         >

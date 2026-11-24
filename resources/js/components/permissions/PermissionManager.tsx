@@ -9,6 +9,7 @@ interface PermissionManagerProps {
     onSelectionChange: (ids: number[]) => void;
     onSave: () => void;
     loading: boolean;
+    canEdit?: boolean;
 }
 
 export function PermissionManager({
@@ -17,19 +18,24 @@ export function PermissionManager({
     onSelectionChange,
     onSave,
     loading,
+    canEdit = true,
 }: Readonly<PermissionManagerProps>) {
     return (
         <div className="space-y-4">
             <div className="flex items-center justify-between">
                 <h3 className="text-lg font-medium">Permissions</h3>
-                <Button
-                    onClick={onSave}
-                    disabled={loading}
-                    data-testid="save-permissions-btn"
-                >
-                    {loading && <Zap className="mr-2 h-4 w-4 animate-spin" />}
-                    Save Changes
-                </Button>
+                {canEdit && (
+                    <Button
+                        onClick={onSave}
+                        disabled={loading}
+                        data-testid="save-permissions-btn"
+                    >
+                        {loading && (
+                            <Zap className="mr-2 h-4 w-4 animate-spin" />
+                        )}
+                        Save Changes
+                    </Button>
+                )}
             </div>
             <div className="rounded-md border p-4">
                 <TreeView
