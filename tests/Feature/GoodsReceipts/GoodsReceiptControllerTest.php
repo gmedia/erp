@@ -36,35 +36,11 @@ beforeEach(function () {
 });
 
 /**
- * COA aktif lengkap untuk jurnal GR (persediaan 11300, GR/IR 21150). Issue #416: COA harus
- * lengkap sebelum GR confirmed; tanpa ini konfirmasi kini ditolak 422.
+ * COA aktif lengkap untuk jurnal GR (Issue #416), lihat createAccountingControlFixture().
  */
 function createGoodsReceiptCoaFixture(): void
 {
-    FiscalYear::factory()->create([
-        'name' => '2026',
-        'start_date' => '2026-01-01',
-        'end_date' => '2026-12-31',
-        'status' => 'open',
-    ]);
-    $coaVersion = CoaVersion::factory()->create(['status' => 'active']);
-
-    Account::factory()->create([
-        'coa_version_id' => $coaVersion->id,
-        'code' => '11300',
-        'name' => 'Persediaan',
-        'type' => 'asset',
-        'normal_balance' => 'debit',
-        'is_active' => true,
-    ]);
-    Account::factory()->create([
-        'coa_version_id' => $coaVersion->id,
-        'code' => '21150',
-        'name' => 'Barang Diterima Belum Ditagih',
-        'type' => 'liability',
-        'normal_balance' => 'credit',
-        'is_active' => true,
-    ]);
+    createAccountingControlFixture();
 }
 
 function createPurchaseOrderWithItemForGoodsReceipt(): array
@@ -313,10 +289,7 @@ test('confirming goods receipt rolls back state when journal posting fails with 
     ]);
 
     $this->app->bind(PostGoodsReceiptJournalAction::class, function ($app) {
-        return new class(
-            $app->make(CreateJournalEntryAction::class),
-            $app->make(ResolveControlAccountAction::class),
-        ) extends PostGoodsReceiptJournalAction
+        return new class($app->make(CreateJournalEntryAction::class), $app->make(ResolveControlAccountAction::class)) extends PostGoodsReceiptJournalAction
         {
             public function execute(GoodsReceipt $goodsReceipt): ?JournalEntry
             {
