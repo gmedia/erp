@@ -172,8 +172,9 @@ test('editing confirmed GR item beyond PO line quantity is rejected with 422', f
         ->assertStatus(422)
         ->assertJsonValidationErrors(['items.0.quantity_received']);
 
-    expect(GoodsReceipt::query()->findOrFail($first->json('data.id'))->items()->value('quantity_received'))
-        ->toEqual(4.0);
+    $stored = GoodsReceipt::query()->findOrFail($first->json('data.id'));
+
+    expect($stored->items()->value('quantity_received'))->toEqual(4.0);
 });
 
 test('confirmed GR within PO line quantity is accepted', function () {
