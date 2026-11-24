@@ -412,6 +412,25 @@ class ArSampleDataSeeder extends Seeder
         return $receipts;
     }
 
+    /**
+     * Menyelaraskan credit_note_amount/amount_due invoice dengan CN applied dan
+     * penerimaan yang tersisa. Rumus sama dengan ApplyCreditNoteAction.
+     */
+    private function restoreInvoiceSettlement(CustomerInvoice $invoice): void
+    {
+        $credited = (float) CreditNote::query()
+            ->where('customer_invoice_id', $invoice->id)
+            ->where('status', 'applied')
+            ->sum('grand_total');
+
+        $invoice->credit_note_amount = $credited;
+        $invoice->amount_due = (float) $invoice->grand_total
+            - (float) $invoice->amount_received
+            - $credited;
+        $invoice->save();
+        $invoice->updatePaymentStatus();
+    }
+
     private function seedCreditNotes(
         int $adminUserId,
         Branch $branch,
@@ -516,6 +535,12 @@ class ArSampleDataSeeder extends Seeder
             // (PostCreditNoteJournalAction) dan memperbarui credit_note_amount/amount_due invoice.
             if ($definition['applied'] && $invoice && $creditNote->fresh()->status === 'confirmed') {
                 app(ApplyCreditNoteAction::class)->execute($creditNote->fresh());
+            }
+
+            // Seed ulang: invoice di-upsert dengan credit_note_amount = 0, sehingga CN yang sudah
+            // applied (dan jurnalnya) tidak lagi tercermin di invoice. Pulihkan dari CN applied.
+            if ($definition['applied'] && $invoice) {
+                $this->restoreInvoiceSettlement($invoice);
             }
         }
     }

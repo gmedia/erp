@@ -2,6 +2,8 @@
 
 use App\Actions\AccountingPosting\PostSupplierBillJournalAction;
 use App\Models\Account;
+use App\Models\ApPayment;
+use App\Models\ApPaymentAllocation;
 use App\Models\Asset;
 use App\Models\AssetDepreciationLine;
 use App\Models\AssetDepreciationRun;
@@ -172,4 +174,43 @@ test('re-running demo seeders does not touch user-created assets or their deprec
         ->and(AssetDepreciationRun::query()->whereKey($userRun->id)->exists())->toBeTrue()
         ->and(AssetDepreciationRun::query()->whereKey($userRun->id)->value('status'))->toBe('calculated')
         ->and(AssetDepreciationLine::query()->whereKey($userLine->id)->exists())->toBeTrue();
+});
+
+// Issue #357 (PR #384): pembayaran pengguna yang dialokasikan ke tagihan demo harus
+// tetap utuh setelah db:seed kedua. Seeder hanya boleh membangun ulang alokasi demo.
+test('re-running demo seeders keeps user payment allocations on demo bills', function () {
+    test()->seed();
+
+    $fiscalYear = FiscalYear::query()->where('status', 'open')->firstOrFail();
+    $supplier = Supplier::query()->firstOrFail();
+    $bill = SupplierBill::query()
+        ->where('bill_number', 'like', 'BILL-____-00000%')
+        ->where('status', 'confirmed')
+        ->firstOrFail();
+    $billBefore = (float) $bill->amount_paid;
+
+    $userPayment = ApPayment::factory()->confirmed()->create([
+        'supplier_id' => $supplier->id,
+        'fiscal_year_id' => $fiscalYear->id,
+        'payment_number' => 'PAY-USER-0001',
+        'payment_date' => $fiscalYear->start_date,
+        'total_amount' => 1000000,
+        'total_allocated' => 1000000,
+        'total_unallocated' => 0,
+    ]);
+    $userAllocation = ApPaymentAllocation::factory()->create([
+        'ap_payment_id' => $userPayment->id,
+        'supplier_bill_id' => $bill->id,
+        'allocated_amount' => 1000000,
+    ]);
+
+    $bill->refresh();
+    $bill->amount_paid = $billBefore + 1000000;
+    $bill->amount_due = (float) $bill->grand_total - $bill->amount_paid;
+    $bill->save();
+
+    test()->seed();
+
+    expect(ApPaymentAllocation::query()->whereKey($userAllocation->id)->exists())->toBeTrue()
+        ->and((float) SupplierBill::query()->whereKey($bill->id)->value('amount_paid'))->toBe($billBefore + 1000000);
 });

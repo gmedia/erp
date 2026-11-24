@@ -89,6 +89,23 @@ class ApSampleDataSeeder extends Seeder
         );
     }
 
+    /**
+     * Menyelaraskan amount_paid/amount_due tagihan dengan seluruh alokasi yang masih
+     * ada di ledger (demo maupun buatan pengguna). Upsert tagihan mereset amount_paid
+     * ke 0, sehingga tanpa ini seed ulang menghapus pembayaran yang sudah dialokasikan.
+     */
+    private function restoreBillSettlement(SupplierBill $bill): void
+    {
+        $paid = (float) ApPaymentAllocation::query()
+            ->where('supplier_bill_id', $bill->id)
+            ->sum('allocated_amount');
+
+        $bill->amount_paid = $paid;
+        $bill->amount_due = (float) $bill->grand_total - $paid;
+        $bill->save();
+        $bill->updatePaymentStatus();
+    }
+
     private function seedSupplierBills(
         int $adminUserId,
         int $branchId,
@@ -226,6 +243,7 @@ class ApSampleDataSeeder extends Seeder
             );
 
             $this->seedSupplierBillItems($supplierBill, $items);
+            $this->restoreBillSettlement($supplierBill);
 
             $supplierBills[] = $supplierBill;
         }
@@ -427,13 +445,10 @@ class ApSampleDataSeeder extends Seeder
             }
         }
 
-        foreach ($billAllocations as $billId => $allocatedAmount) {
+        foreach (array_keys($billAllocations) as $billId) {
             $bill = SupplierBill::find($billId);
             if ($bill) {
-                $bill->amount_paid = $allocatedAmount;
-                $bill->amount_due = $bill->grand_total - $allocatedAmount;
-                $bill->updatePaymentStatus();
-                $bill->save();
+                $this->restoreBillSettlement($bill);
             }
         }
 

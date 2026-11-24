@@ -29,6 +29,35 @@ function seedDemoData(): void
     test()->seed();
 }
 
+/**
+ * Read-only invariants registered by invariant(), keyed by test name. The replay
+ * test at the end of this file runs all of them against the state after a second `db:seed`.
+ *
+ * @return array<string, Closure>
+ */
+function demoInvariantChecks(?string $name = null, ?Closure $check = null): array
+{
+    static $checks = [];
+
+    if ($name !== null && $check !== null) {
+        $checks[$name] = $check;
+    }
+
+    return $checks;
+}
+
+/**
+ * Registers a non-mutating invariant as a normal test and in the replay registry.
+ * Checks that delete or change data must stay plain `test()` calls, since they
+ * would corrupt the state the other checks read.
+ */
+function invariant(string $name, Closure $check): void
+{
+    demoInvariantChecks($name, $check);
+
+    test($name, $check);
+}
+
 function activeCoaAccountId(string $code): ?int
 {
     $fiscalYear = FiscalYear::query()->where('status', 'open')->first();
@@ -73,7 +102,7 @@ beforeEach(function () {
 
 // W7-01 — void/cancelled/draft documents must not carry an outstanding balance.
 // Read the raw column, not the model accessor, so a corrupted DB value cannot hide behind it.
-test('W7-01 void, cancelled and draft documents carry no amount due', function () {
+invariant('W7-01 void, cancelled and draft documents carry no amount due', function () {
     $inactiveStatuses = ['draft', 'cancelled', 'void'];
 
     foreach (DB::table('customer_invoices')->whereIn('status', $inactiveStatuses)->get(['invoice_number', 'status', 'amount_due']) as $invoice) {
@@ -88,7 +117,7 @@ test('W7-01 void, cancelled and draft documents carry no amount due', function (
 });
 
 // W7-02 — AR/AP settlements reconcile with their allocation ledgers.
-test('W7-02 receipt, credit note and payment allocations match settled amounts', function () {
+invariant('W7-02 receipt, credit note and payment allocations match settled amounts', function () {
     foreach (CustomerInvoice::query()->get() as $invoice) {
         $allocated = (float) DB::table('ar_receipt_allocations')
             ->where('customer_invoice_id', $invoice->id)
@@ -115,7 +144,7 @@ test('W7-02 receipt, credit note and payment allocations match settled amounts',
 });
 
 // W7-02 — GL control accounts equal the open subledger balances.
-test('W7-02 GL receivable and payable control accounts equal open subledger balances', function () {
+invariant('W7-02 GL receivable and payable control accounts equal open subledger balances', function () {
     $receivableId = activeCoaAccountId('11200');
     $payableId = activeCoaAccountId('21100');
 
@@ -138,7 +167,7 @@ test('W7-02 GL receivable and payable control accounts equal open subledger bala
 });
 
 // W7-03 — one source of received quantity: confirmed goods receipt lines.
-test('W7-03 purchase order received quantities derive from confirmed goods receipts', function () {
+invariant('W7-03 purchase order received quantities derive from confirmed goods receipts', function () {
     $confirmedByItem = DB::table('goods_receipt_items')
         ->join('goods_receipts', 'goods_receipts.id', '=', 'goods_receipt_items.goods_receipt_id')
         ->where('goods_receipts.status', 'confirmed')
@@ -170,7 +199,7 @@ test('W7-03 purchase order received quantities derive from confirmed goods recei
 });
 
 // W7-03 — a supplier return must belong to the purchase order's supplier.
-test('W7-03 supplier returns belong to the purchase order supplier and receipt', function () {
+invariant('W7-03 supplier returns belong to the purchase order supplier and receipt', function () {
     $returns = DB::table('supplier_returns')
         ->join('purchase_orders', 'purchase_orders.id', '=', 'supplier_returns.purchase_order_id')
         ->select('supplier_returns.id', 'supplier_returns.return_number', 'supplier_returns.supplier_id', 'purchase_orders.supplier_id as po_supplier_id')
@@ -198,7 +227,7 @@ test('W7-03 supplier returns belong to the purchase order supplier and receipt',
 });
 
 // W7-04 — movement ledger chain is internally consistent per product+warehouse.
-test('W7-04 stock movement balances form a correct chain per product and warehouse', function () {
+invariant('W7-04 stock movement balances form a correct chain per product and warehouse', function () {
     $movements = DB::table('stock_movements')
         ->orderBy('product_id')
         ->orderBy('warehouse_id')
@@ -229,7 +258,7 @@ test('W7-04 stock movement balances form a correct chain per product and warehou
 });
 
 // W7-04 — the reverse direction: every eligible document line must have a movement with the same quantity.
-test('W7-04 every eligible document line has a matching stock movement', function () {
+invariant('W7-04 every eligible document line has a matching stock movement', function () {
     $movementSums = DB::table('stock_movements')
         ->whereNotNull('reference_type')
         ->groupBy('reference_type', 'reference_id', 'product_id')
@@ -308,7 +337,7 @@ test('W7-04 every eligible document line has a matching stock movement', functio
 
 // W7-04 — a received transfer is two legs: transfer_out = dispatched quantity,
 // transfer_in = quantity_received. Every received line must have both movements.
-test('W7-04 every received stock transfer line has matching transfer_out and transfer_in movements', function () {
+invariant('W7-04 every received stock transfer line has matching transfer_out and transfer_in movements', function () {
     $legs = DB::table('stock_movements')
         ->where('reference_type', StockTransfer::class)
         ->whereIn('movement_type', ['transfer_out', 'transfer_in'])
@@ -340,7 +369,7 @@ test('W7-04 every received stock transfer line has matching transfer_out and tra
 });
 
 // W7-04 — running balance never goes negative at any movement, not only at the end.
-test('W7-04 running stock balance is non-negative at every movement', function () {
+invariant('W7-04 running stock balance is non-negative at every movement', function () {
     $movements = DB::table('stock_movements')
         ->orderBy('product_id')
         ->orderBy('warehouse_id')
@@ -360,7 +389,7 @@ test('W7-04 running stock balance is non-negative at every movement', function (
 });
 
 // W7-04 — snapshot quantity equals the latest movement balance (by moved_at, id).
-test('W7-04 stock snapshot uses the latest movement balance', function () {
+invariant('W7-04 stock snapshot uses the latest movement balance', function () {
     $movements = DB::table('stock_movements')
         ->orderBy('product_id')
         ->orderBy('warehouse_id')
@@ -397,7 +426,7 @@ test('W7-04 stock snapshot uses the latest movement balance', function () {
 });
 
 // W7-04 — only stock-affecting document states produce movements.
-test('W7-04 only eligible document states produce stock movements', function () {
+invariant('W7-04 only eligible document states produce stock movements', function () {
     $eligible = DB::table('stock_movements')
         ->whereNotNull('reference_type')
         ->get(['reference_type', 'reference_id'])
@@ -428,7 +457,7 @@ test('W7-04 only eligible document states produce stock movements', function () 
 });
 
 // W7-04 — inventory valuation equals GL 11300.
-test('W7-04 inventory valuation equals GL inventory account', function () {
+invariant('W7-04 inventory valuation equals GL inventory account', function () {
     $inventoryAccountId = activeCoaAccountId('11300');
     expect($inventoryAccountId)->not->toBeNull('Active COA must expose account 11300');
 
@@ -544,7 +573,7 @@ test('W7-04 11300 invariant depends on in_transit transfer value from the docume
 });
 
 // Every posted document must reference a posted, balanced journal (issue #357 scope 4).
-test('W7-02 posted documents reference a posted and balanced journal', function () {
+invariant('W7-02 posted documents reference a posted and balanced journal', function () {
     $documents = [
         ['customer_invoices', 'invoice_number', ['sent', 'partially_paid', 'paid', 'overdue']],
         ['supplier_bills', 'bill_number', ['confirmed', 'partially_paid', 'paid', 'overdue']],
@@ -585,7 +614,7 @@ test('W7-02 posted documents reference a posted and balanced journal', function 
 });
 
 // W7-05 — book value is always cost minus accumulated depreciation.
-test('W7-05 asset book value equals cost minus accumulated depreciation', function () {
+invariant('W7-05 asset book value equals cost minus accumulated depreciation', function () {
     $assets = DB::table('assets')->get(['asset_code', 'purchase_cost', 'accumulated_depreciation', 'book_value', 'status']);
 
     expect($assets)->not->toBeEmpty('Demo data must include assets');
@@ -608,7 +637,7 @@ test('W7-05 asset book value equals cost minus accumulated depreciation', functi
 });
 
 // W7-05 — GL equipment net of accumulated depreciation equals the in-service register.
-test('W7-05 GL equipment minus accumulated depreciation equals in-service book value', function () {
+invariant('W7-05 GL equipment minus accumulated depreciation equals in-service book value', function () {
     $equipmentId = activeCoaAccountId('12100');
     $accumulatedId = activeCoaAccountId('12200');
 
@@ -627,7 +656,7 @@ test('W7-05 GL equipment minus accumulated depreciation equals in-service book v
 });
 
 // W7-05 — every posted depreciation run has a posted journal.
-test('W7-05 posted depreciation runs have posted journals', function () {
+invariant('W7-05 posted depreciation runs have posted journals', function () {
     $runs = DB::table('asset_depreciation_runs')->where('status', 'posted')->get();
 
     expect($runs)->not->toBeEmpty('Demo data must include a posted depreciation run');
@@ -641,7 +670,7 @@ test('W7-05 posted depreciation runs have posted journals', function () {
 });
 
 // W7-05 — depreciation expense in the GL equals the posted run depreciation.
-test('W7-05 depreciation expense equals posted depreciation run totals', function () {
+invariant('W7-05 depreciation expense equals posted depreciation run totals', function () {
     $expenseId = activeCoaAccountId('53000');
     expect($expenseId)->not->toBeNull('Active COA must expose account 53000');
 
@@ -655,7 +684,7 @@ test('W7-05 depreciation expense equals posted depreciation run totals', functio
 });
 
 // W7-05 — trial balance (all posted journal lines) stays balanced.
-test('W7-05 posted journals are balanced', function () {
+invariant('W7-05 posted journals are balanced', function () {
     $totals = DB::table('journal_entry_lines')
         ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
         ->where('journal_entries.status', 'posted')
@@ -665,3 +694,14 @@ test('W7-05 posted journals are balanced', function () {
     expect(round((float) $totals->debit, 2))
         ->toBe(round((float) $totals->credit, 2), 'Total debits must equal total credits across posted journals');
 });
+
+// Issue #357 (PR #384): every invariant above must also hold after a second `db:seed`.
+// One test seeds twice and runs the registered read-only checks against that state.
+// It seeds only once more than the beforeEach, so the extra cost is one seed run.
+test('all demo invariants also hold after a second db:seed', function () {
+    seedDemoData();
+
+    foreach (demoInvariantChecks() as $name => $check) {
+        $check();
+    }
+})->group('demo-integrity');
