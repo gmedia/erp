@@ -65,6 +65,15 @@ test('social redirect endpoint is called with the selected provider', async ({
 });
 
 test('callback exchanges ticket and lands on dashboard', async ({ page }) => {
+  // The token is fake: any dashboard request reaching the real backend returns 401
+  // and the app clears the token, so every other API call is stubbed first.
+  await page.route('**/api/**', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ data: [] }),
+    }),
+  );
   await stubPolicy(page);
   await page.route('**/api/social/exchange', (route) =>
     route.fulfill({
