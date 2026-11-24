@@ -34,6 +34,16 @@ class CalculateDepreciationAction
                 ]);
             }
 
+            // Run calculated yang belum diposting menyimpan akumulasi basi. Menghitung bulan berikutnya
+            // di atasnya membuat posting run kedua menimpa accumulated_depreciation dengan nilai yang sama.
+            $unpostedRun = AssetDepreciationRun::where('status', 'calculated')->exists();
+
+            if ($unpostedRun) {
+                throw ValidationException::withMessages([
+                    'period_start' => __('asset_depreciation_runs.unposted_run_exists'),
+                ]);
+            }
+
             $run = AssetDepreciationRun::create([
                 'fiscal_year_id' => $data['fiscal_year_id'],
                 'period_start' => $data['period_start'],
@@ -80,9 +90,9 @@ class CalculateDepreciationAction
 
                 // Sisa hanya dihabiskan pada bulan terakhir umur aset, atau bila sisanya tak cukup
                 // untuk satu bulanan penuh. Bulan lain selalu membebankan tepat satu bulanan.
-                // Hanya baris dari run calculated/posted yang mengubah akumulasi; void/draft tidak.
+                // Hanya run posted yang sudah mengubah akumulasi aset; calculated/void/draft tidak.
                 $monthsRemaining = $usefulLife - (int) AssetDepreciationLine::where('asset_id', $asset->id)
-                    ->whereHas('run', fn ($q) => $q->whereIn('status', ['calculated', 'posted']))
+                    ->whereHas('run', fn ($q) => $q->where('status', 'posted'))
                     ->count();
                 $isLastMonth = $monthsRemaining <= 1 || $maxDepreciable <= $monthlyAmount;
                 $amount = round($isLastMonth ? $maxDepreciable : $monthlyAmount);

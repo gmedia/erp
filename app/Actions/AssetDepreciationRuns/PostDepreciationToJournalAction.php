@@ -3,6 +3,7 @@
 namespace App\Actions\AssetDepreciationRuns;
 
 use App\Actions\JournalEntries\CreateJournalEntryAction;
+use App\Models\Asset;
 use App\Models\AssetDepreciationRun;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -35,7 +36,15 @@ class PostDepreciationToJournalAction
             $summary = [];
 
             foreach ($run->lines as $line) {
-                $asset = $line->asset;
+                // Kunci aset agar akumulasi tidak berubah antara cek dan update.
+                $asset = Asset::whereKey($line->asset_id)->lockForUpdate()->firstOrFail();
+
+                if ((float) $line->accumulated_before !== (float) $asset->accumulated_depreciation) {
+                    throw ValidationException::withMessages([
+                        'lines' => "Asset {$asset->asset_code} changed after this run was calculated.",
+                    ]);
+                }
+
                 $expenseAccount = $asset->depreciation_expense_account_id;
                 $accumulatedAccount = $asset->accumulated_depr_account_id;
 
