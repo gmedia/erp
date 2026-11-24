@@ -12,11 +12,17 @@ use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
  *
  * Binder default PhpSpreadsheet menentukan tipe sel dari isi string (mis. awalan "="
  * menjadi formula). Binder ini menentukan tipe dari tipe PHP: string tetap string,
- * sedangkan angka, bool, null, dan tanggal mengikuti perilaku default.
+ * kecuali string yang berbentuk angka desimal valid (ditulis sebagai angka), sedangkan
+ * angka, bool, null, dan tanggal mengikuti perilaku default.
  */
 class TextSafeValueBinder extends DefaultValueBinder
 {
     private static bool $neutralizePrefixes = false;
+    /**
+     * Angka desimal dari string (mis. hasil cast decimal Eloquent "1500000.00") tetap
+     * ditulis sebagai angka. Nol di depan, awalan "+", dan notasi eksponen tetap teks.
+     */
+    private const NUMERIC_PATTERN = '/^-?(0|[1-9][0-9]{0,14})(\.[0-9]+)?$/';
 
     /**
      * Awalan yang membuat pembaca spreadsheet menganggap teks sebagai formula atau
@@ -32,6 +38,12 @@ class TextSafeValueBinder extends DefaultValueBinder
 
     public function bindValue(Cell $cell, $value): bool
     {
+        if (is_string($value) && preg_match(self::NUMERIC_PATTERN, $value) === 1) {
+            $number = str_contains($value, '.') ? (float) $value : (int) $value;
+
+            return parent::bindValue($cell, $number);
+        }
+
         if (is_string($value)) {
             $text = $this->sanitizeText($value);
 

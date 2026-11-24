@@ -167,6 +167,36 @@ describe('TextSafeValueBinder', function () {
             ->and($sheet->getCell('B1')->getDataType())->toBe(DataType::TYPE_NUMERIC);
     });
 
+    test('string desimal dari cast decimal ditulis sebagai angka', function () {
+        $sheet = textCellRoundTrip(makeTextCellExport([['1500000.00', '-250.5', '0', '0.75']]), 'xlsx')->getActiveSheet();
+
+        foreach (['A1', 'B1', 'C1', 'D1'] as $address) {
+            expect($sheet->getCell($address)->getDataType())->toBe(DataType::TYPE_NUMERIC);
+        }
+
+        expect($sheet->getCell('A1')->getValue())->toBe(1500000.0)
+            ->and($sheet->getCell('B1')->getValue())->toBe(-250.5)
+            ->and($sheet->getCell('D1')->getValue())->toBe(0.75);
+    });
+
+    test('string berawalan nol atau plus tetap teks walau berisi digit', function () {
+        $sheet = textCellRoundTrip(makeTextCellExport([['0812345678', '+62', '00.5']]), 'xlsx')->getActiveSheet();
+
+        foreach (['A1', 'B1', 'C1'] as $address) {
+            expect($sheet->getCell($address)->getDataType())->toBe(DataType::TYPE_STRING);
+        }
+
+        expect($sheet->getCell('A1')->getValue())->toBe('0812345678');
+    });
+
+    test('csv tidak memberi apostrof pada angka negatif dari string desimal', function () {
+        $sheet = textCellRoundTrip(makeTextCellExport([['-1500000.00', '-1']]), 'csv')->getActiveSheet();
+
+        // CSV tidak punya tipe sel; pembaca mengembalikan angka tanpa apostrof.
+        expect($sheet->getCell('A1')->getValue())->toEqual(-1500000)
+            ->and($sheet->getCell('B1')->getValue())->toEqual(-1);
+    });
+
     test('csv menetralkan awalan berbahaya dengan apostrof dan tidak menulis formula', function () {
         $sheet = textCellRoundTrip(makeTextCellExport([['=SUM(1,2)', '+62812', 'aman']]), 'csv')->getActiveSheet();
 
@@ -240,12 +270,15 @@ describe('satu dataset lintas kelas ekspor', function () {
         foreach ([$direct, $inherited] as $export) {
             $sheet = textCellRoundTrip($export, 'xlsx')->getActiveSheet();
 
-            foreach (['A1', 'B1', 'C1', 'D1', 'E1'] as $address) {
+            foreach (['A1', 'B1', 'D1', 'E1', 'F1'] as $address) {
                 expect($sheet->getCell($address)->getDataType())->toBe(DataType::TYPE_STRING)
                     ->and($sheet->getCell($address)->isFormula())->toBeFalse();
             }
 
-            expect($sheet->getCell('A1')->getValue())->toBe('=HYPERLINK("x")')
+            // '-1' adalah string desimal valid, sehingga ditulis sebagai angka.
+            expect($sheet->getCell('C1')->getDataType())->toBe(DataType::TYPE_NUMERIC)
+                ->and($sheet->getCell('C1')->getValue())->toEqual(-1)
+                ->and($sheet->getCell('A1')->getValue())->toBe('=HYPERLINK("x")')
                 ->and($sheet->getCell('B1')->getValue())->toBe('+62812')
                 ->and($sheet->getCell('F1')->getValue())->toBe('aman')
                 ->and($sheet->getCell('G1')->getDataType())->toBe(DataType::TYPE_NUMERIC);
