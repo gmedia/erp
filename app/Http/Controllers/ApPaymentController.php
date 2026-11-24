@@ -33,8 +33,11 @@ class ApPaymentController extends Controller
         return (new ApPaymentCollection($apPayments))->response();
     }
 
-    public function store(StoreApPaymentRequest $request, SyncApPaymentAllocationsAction $syncAllocations): JsonResponse
-    {
+    public function store(
+        StoreApPaymentRequest $request,
+        SyncApPaymentAllocationsAction $syncAllocations,
+        PostApPaymentJournalAction $postJournal
+    ): JsonResponse {
         $validated = $request->validated();
         $allocations = $validated['allocations'];
         unset($validated['allocations']);
@@ -42,6 +45,13 @@ class ApPaymentController extends Controller
         $validated['created_by'] = Auth::id();
         $validated['total_allocated'] = 0;
         $validated['total_unallocated'] = $validated['total_amount'];
+
+        $isConfirmedOnCreate = ($validated['status'] ?? null) === 'confirmed';
+
+        if ($isConfirmedOnCreate) {
+            $validated['confirmed_by'] = Auth::id();
+            $validated['confirmed_at'] = now()->toIso8601String();
+        }
 
         $apPayment = $this->storeWithSyncedItems(
             attributes: $validated,
@@ -53,6 +63,11 @@ class ApPaymentController extends Controller
             syncItems: function (ApPayment $apPayment, array $allocations) use ($syncAllocations): void {
                 $syncAllocations->execute($apPayment, $allocations);
             },
+            afterCommit: $isConfirmedOnCreate
+                ? function (ApPayment $apPayment) use ($postJournal): void {
+                    $postJournal->execute($apPayment->refresh());
+                }
+            : null,
         );
 
         return (new ApPaymentResource($this->loadResourceRelations($apPayment)))->response()->setStatusCode(201);
