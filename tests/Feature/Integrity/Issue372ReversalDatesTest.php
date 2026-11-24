@@ -1,11 +1,16 @@
 <?php
 
+use App\Models\FiscalYear;
 use App\Models\GoodsReceipt;
 use App\Models\GoodsReceiptItem;
 use App\Models\Product;
 use App\Models\StockAdjustment;
 use App\Models\StockAdjustmentItem;
 use App\Models\StockMovement;
+use App\Models\StockTransfer;
+use App\Models\StockTransferItem;
+use App\Models\SupplierReturn;
+use App\Models\SupplierReturnItem;
 use App\Models\User;
 use App\Models\Warehouse;
 use App\Services\StockPostingService;
@@ -109,6 +114,78 @@ function issue372BalanceOn(Product $product, Warehouse $warehouse, CarbonInterfa
         ->value('balance_after');
 }
 
+/**
+ * Penyesuaian approved dengan satu baris $quantity bertanggal $date.
+ */
+function issue372Adjustment(
+    Warehouse $warehouse,
+    Product $product,
+    float $quantity,
+    CarbonInterface $date,
+): StockAdjustment {
+    $adjustment = StockAdjustment::factory()->create([
+        'warehouse_id' => $warehouse->id,
+        'adjustment_date' => $date->toDateString(),
+        'status' => 'approved',
+        'inventory_stocktake_id' => null,
+        'journal_entry_id' => null,
+        'approved_by' => User::factory()->create()->id,
+        'approved_at' => now(),
+    ]);
+
+    StockAdjustmentItem::factory()->create([
+        'stock_adjustment_id' => $adjustment->id,
+        'product_id' => $product->id,
+        'quantity_adjusted' => $quantity,
+    ]);
+
+    app(StockPostingService::class)->postStockAdjustment($adjustment->refresh());
+
+    return $adjustment->refresh();
+}
+
+/**
+ * Edit item penyesuaian approved: pembalik bertanggal movement asli, lalu item baru
+ * diposting ulang (alur yang sama dengan StockAdjustmentController::update).
+ */
+function issue372EditAdjustment(StockAdjustment $adjustment, Product $product, float $quantity): void
+{
+    $service = app(StockPostingService::class);
+
+    $repost = function () use ($adjustment, $product, $quantity, $service): void {
+        $adjustment->items()->delete();
+        StockAdjustmentItem::factory()->create([
+            'stock_adjustment_id' => $adjustment->id,
+            'product_id' => $product->id,
+            'quantity_adjusted' => $quantity,
+        ]);
+
+        $service->postStockAdjustment($adjustment->refresh());
+    };
+
+    $service->editDocument(StockAdjustment::class, $adjustment->id, 'adjustment', $repost);
+}
+
+/**
+ * Menutup tahun fiskal yang memuat $date (tahun fiskal dibuat jika belum ada).
+ */
+function closeFiscalYearContaining(CarbonInterface $date): void
+{
+    $fiscalYear = FiscalYear::query()
+        ->where('start_date', '<=', $date->toDateString())
+        ->where('end_date', '>=', $date->toDateString())
+        ->first();
+
+    if ($fiscalYear === null) {
+        $fiscalYear = FiscalYear::factory()->create([
+            'start_date' => $date->copy()->startOfYear()->toDateString(),
+            'end_date' => $date->copy()->endOfYear()->toDateString(),
+        ]);
+    }
+
+    $fiscalYear->update(['status' => 'closed']);
+}
+
 function issue372Reversal(GoodsReceipt $receipt): StockMovement
 {
     return StockMovement::query()
@@ -209,6 +286,119 @@ describe('Issue #372 — batal: pembalik bertanggal tanggal pembatalan', functio
         expect(issue372Reversal($receipt)->moved_at->toDateString())->toBe(now()->toDateString());
         expect(issue372BalanceOn($product, $warehouse, now()->subDays(5)))->toBe(4.0);
         expect(issue372BalanceOn($product, $warehouse, now()))->toBe(0.0);
+    });
+});
+
+describe('Issue #372 — langkah 2: batal supplier return dan stock transfer bertanggal hari batal', function () {
+    test('batal supplier return confirmed membuat pembalik bertanggal hari ini, riwayat tetap', function () {
+        $product = Product::factory()->create();
+        $warehouse = Warehouse::factory()->create();
+        $returnDate = now()->subDays(10);
+
+        $supplierReturn = SupplierReturn::factory()->create([
+            'warehouse_id' => $warehouse->id,
+            'return_date' => $returnDate->toDateString(),
+            'status' => 'confirmed',
+            'confirmed_by' => User::factory()->create()->id,
+            'confirmed_at' => now(),
+        ]);
+        // Stok awal 5 agar retur 2 tidak membuat saldo negatif.
+        issue372GoodsReceipt($warehouse, $product, 5, now()->subDays(20));
+        SupplierReturnItem::factory()->create([
+            'supplier_return_id' => $supplierReturn->id,
+            'product_id' => $product->id,
+            'quantity_returned' => 2,
+        ]);
+
+        app(StockPostingService::class)->postSupplierReturn($supplierReturn->refresh());
+        app(StockPostingService::class)->reverseDocument(SupplierReturn::class, $supplierReturn->id, 'supplier_return');
+
+        $reversal = StockMovement::query()
+            ->where('movement_type', 'supplier_return_reversal')
+            ->where('reference_type', SupplierReturn::class)
+            ->where('reference_id', $supplierReturn->id)
+            ->firstOrFail();
+
+        expect($reversal->moved_at->toDateString())->toBe(now()->toDateString());
+        expect(issue372BalanceOn($product, $warehouse, now()->subDays(5)))->toBe(3.0);
+        expect(issue372BalanceOn($product, $warehouse, now()))->toBe(5.0);
+    });
+
+    test('batal stock transfer dispatched membuat pembalik bertanggal hari ini', function () {
+        $product = Product::factory()->create();
+        $from = Warehouse::factory()->create();
+        $to = Warehouse::factory()->create();
+        $transferDate = now()->subDays(10);
+
+        issue372GoodsReceipt($from, $product, 4, now()->subDays(20));
+
+        $transfer = StockTransfer::factory()->create([
+            'from_warehouse_id' => $from->id,
+            'to_warehouse_id' => $to->id,
+            'transfer_date' => $transferDate->toDateString(),
+            'status' => 'in_transit',
+        ]);
+        StockTransferItem::factory()->create([
+            'stock_transfer_id' => $transfer->id,
+            'product_id' => $product->id,
+            'quantity' => 3,
+        ]);
+
+        app(StockPostingService::class)->postStockTransferDispatch($transfer->refresh());
+        app(StockPostingService::class)->reverseTransfer($transfer->refresh());
+
+        $reversal = StockMovement::query()
+            ->where('movement_type', 'transfer_out_reversal')
+            ->where('reference_type', StockTransfer::class)
+            ->where('reference_id', $transfer->id)
+            ->firstOrFail();
+
+        expect($reversal->moved_at->toDateString())->toBe(now()->toDateString());
+        expect(issue372BalanceOn($product, $from, now()->subDays(5)))->toBe(1.0);
+        expect(issue372BalanceOn($product, $from, now()))->toBe(4.0);
+    });
+});
+
+describe('Issue #372 — langkah 2: edit dan batal stock adjustment, supplier return, stock transfer', function () {
+    test('edit stock adjustment approved membuat pembalik bertanggal tanggal adjustment, bukan hari edit', function () {
+        $product = Product::factory()->create();
+        $warehouse = Warehouse::factory()->create();
+        $adjustmentDate = now()->subDays(10);
+
+        $adjustment = issue372Adjustment($warehouse, $product, 4, $adjustmentDate);
+        issue372EditAdjustment($adjustment, $product, 3);
+
+        $reversal = StockMovement::query()
+            ->where('movement_type', 'adjustment_reversal')
+            ->where('reference_type', StockAdjustment::class)
+            ->where('reference_id', $adjustment->id)
+            ->latest('id')
+            ->firstOrFail();
+
+        expect($reversal->moved_at->toDateString())->toBe($adjustmentDate->toDateString());
+        expect(issue372BalanceOn($product, $warehouse, now()->subDays(5)))->toBe(3.0);
+        expect(issue372BalanceOn($product, $warehouse, now()))->toBe(3.0);
+    });
+
+    test('edit stock adjustment yang menyentuh periode tahun fiskal tertutup ditolak 422', function () {
+        $product = Product::factory()->create();
+        $warehouse = Warehouse::factory()->create();
+        $adjustmentDate = now()->subYears(2);
+
+        $adjustment = issue372Adjustment($warehouse, $product, 4, $adjustmentDate);
+        closeFiscalYearContaining($adjustmentDate);
+
+        $thrown = null;
+
+        try {
+            issue372EditAdjustment($adjustment, $product, 3);
+        } catch (ValidationException $e) {
+            $thrown = $e;
+        }
+
+        expect($thrown)->toBeInstanceOf(ValidationException::class);
+        expect($thrown?->status)->toBe(422);
+        expect(StockMovement::query()->where('movement_type', 'adjustment_reversal')->count())->toBe(0);
     });
 });
 

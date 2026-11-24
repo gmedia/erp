@@ -113,16 +113,28 @@ class StockAdjustmentController extends Controller
         SyncStockAdjustmentItemsAction $syncItems,
         PostStockAdjustmentJournalAction $postJournal,
         PostStockAdjustmentMovementsAction $postMovements,
+        StockPostingService $stockPosting,
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
         unset($validated['items']);
 
         $isNewlyApproved = ($validated['status'] ?? null) === 'approved' && $stockAdjustment->approved_at === null;
+        $isEditingApproved = $stockAdjustment->status === 'approved' && ! $isNewlyApproved && is_array($items);
 
         if ($isNewlyApproved) {
             $validated['approved_by'] = Auth::id();
             $validated['approved_at'] = now()->toIso8601String();
+        }
+
+        if ($isEditingApproved) {
+            // Issue #372: edit adjustment approved membalik movement asli (bertanggal
+            // moved_at asli), lalu item baru diposting ulang, dalam satu transaksi.
+            $this->updateApprovedAdjustment($stockAdjustment, $validated, $items, $syncItems, $stockPosting);
+
+            $stockAdjustment->load(['warehouse', 'inventoryStocktake', 'journalEntry', 'items.product', 'items.unit']);
+
+            return (new StockAdjustmentResource($stockAdjustment))->response();
         }
 
         $this->updateWithSyncedItems(
@@ -184,5 +196,31 @@ class StockAdjustmentController extends Controller
     public function export(ExportStockAdjustmentRequest $request, ExportStockAdjustmentsAction $action): JsonResponse
     {
         return $action->execute($request);
+    }
+
+    /**
+     * @param  array<string, mixed>  $validated
+     * @param  array<int, array<string, mixed>>  $items
+     */
+    private function updateApprovedAdjustment(
+        StockAdjustment $stockAdjustment,
+        array $validated,
+        array $items,
+        SyncStockAdjustmentItemsAction $syncItems,
+        StockPostingService $stockPosting,
+    ): void {
+        DB::transaction(function () use ($stockAdjustment, $validated, $items, $syncItems, $stockPosting): void {
+            $stockAdjustment->update(UpdateStockAdjustmentData::fromArray($validated)->toArray());
+
+            $stockPosting->editDocument(
+                StockAdjustment::class,
+                $stockAdjustment->id,
+                'adjustment',
+                function () use ($stockAdjustment, $items, $syncItems, $stockPosting): void {
+                    $syncItems->execute($stockAdjustment, $items);
+                    $stockPosting->postStockAdjustment($stockAdjustment->refresh());
+                },
+            );
+        });
     }
 }

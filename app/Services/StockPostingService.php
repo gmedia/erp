@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\FiscalYear;
 use App\Models\GoodsReceipt;
 use App\Models\Product;
 use App\Models\StockAdjustment;
@@ -290,7 +291,10 @@ class StockPostingService
     ): void {
         $scopes = $this->appendReversals($referenceType, $referenceId, $reversalType, $createdBy, $trigger);
 
-        $this->recalculateFromMovedAt($scopes);
+        // Batal memakai tanggal pembatalan (hari ini). Periode tertutup ditolak oleh
+        // jurnal pembalik (#357, error entry_date), bukan guard stok, agar kontrak
+        // batal yang sudah ada tetap.
+        $this->recalculateFromMovedAt($scopes, enforceOpenPeriod: false);
     }
 
     /**
@@ -462,7 +466,7 @@ class StockPostingService
      *
      * @param  array<int, array{0:int,1:int,2:CarbonInterface}>  $scopes
      */
-    private function recalculateFromMovedAt(array $scopes): void
+    private function recalculateFromMovedAt(array $scopes, bool $enforceOpenPeriod = true): void
     {
         if ($scopes === []) {
             return;
@@ -478,6 +482,12 @@ class StockPostingService
             }
         }
 
+        if ($enforceOpenPeriod) {
+            foreach ($earliestByScope as [, , $movedAt]) {
+                $this->assertFiscalYearOpen($movedAt);
+            }
+        }
+
         $this->rebuildBalances(array_map(
             static fn (array $scope): array => [$scope[0], $scope[1]],
             array_values($earliestByScope),
@@ -485,6 +495,24 @@ class StockPostingService
 
         foreach ($earliestByScope as [$productId, $warehouseId]) {
             $this->assertRunningBalanceNotNegative($productId, $warehouseId);
+        }
+    }
+
+    /**
+     * Tolak (422) bila tanggal jatuh di tahun fiskal yang tidak terbuka, selaras
+     * dengan aturan jurnal (#357). Dipanggil sebelum saldo dihitung ulang.
+     */
+    private function assertFiscalYearOpen(CarbonInterface $date): void
+    {
+        $fiscalYear = FiscalYear::query()
+            ->where('start_date', '<=', $date->toDateString())
+            ->where('end_date', '>=', $date->toDateString())
+            ->first();
+
+        if ($fiscalYear !== null && ! $fiscalYear->isOpen()) {
+            throw ValidationException::withMessages([
+                'items' => [__('stock.period_closed', ['date' => $date->toDateString()])],
+            ])->status(422);
         }
     }
 
