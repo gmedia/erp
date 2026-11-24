@@ -30,9 +30,12 @@ class UpdateCustomerInvoiceRequest extends AbstractCustomerInvoiceRequest
     protected function resultStatusSources(): array
     {
         return [
+            'sent' => ['draft'],
             'partially_paid' => [],
             'paid' => [],
             'overdue' => self::OVERDUE_FROM,
+            'cancelled' => ['draft', 'sent'],
+            'void' => ['draft', 'sent'],
         ];
     }
 

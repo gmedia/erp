@@ -21,7 +21,11 @@ class UpdateApPaymentRequest extends AbstractApPaymentRequest
 
     protected function resultStatusSources(): array
     {
-        return ['reconciled' => ['confirmed', 'reconciled']];
+        return [
+            'reconciled' => ['confirmed', 'reconciled'],
+            'cancelled' => ['draft', 'confirmed'],
+            'void' => ['draft', 'confirmed'],
+        ];
     }
 
     protected function paymentNumberUniqueRule(): object

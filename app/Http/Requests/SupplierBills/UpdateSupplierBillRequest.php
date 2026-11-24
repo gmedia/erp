@@ -33,6 +33,7 @@ class UpdateSupplierBillRequest extends AbstractSupplierBillRequest
             'partially_paid' => [],
             'paid' => [],
             'overdue' => self::OVERDUE_FROM,
+            'cancelled' => ['draft', 'confirmed'],
         ];
     }
 

@@ -5,10 +5,14 @@ namespace App\Http\Requests\Concerns;
 use Illuminate\Contracts\Validation\Validator;
 
 /**
- * Membatasi status hasil pembayaran/rekonsiliasi saat PUT.
+ * Membatasi transisi status saat PUT (Issue #375).
  *
- * Status hasil hanya boleh dikirim ulang bila sama dengan status tersimpan,
- * atau dicapai dari status sumber yang diizinkan. Pesan dari lang/{locale}.json.
+ * Aturan:
+ * - status sama dengan tersimpan selalu diterima (kirim ulang aman);
+ * - status tersimpan yang sudah final (lihat finalResultStatuses) tidak bisa diubah;
+ * - tidak bisa mundur ke draft;
+ * - target lain hanya sah bila status tersimpan ada di daftar sumber target.
+ * Pesan dari lang/{locale}.json.
  */
 trait ValidatesStatusTransition
 {
@@ -16,6 +20,17 @@ trait ValidatesStatusTransition
      * @return array<string, array<int, string>> target => status tersimpan yang boleh menuju target
      */
     abstract protected function resultStatusSources(): array;
+
+    /**
+     * Status batal/void yang tidak boleh berpindah ke status lain.
+     * Kirim ulang status yang sama tetap diterima (dicek sebelum daftar ini).
+     *
+     * @return array<int, string>
+     */
+    protected function finalResultStatuses(): array
+    {
+        return ['cancelled', 'void'];
+    }
 
     protected function validateResultStatusTransition(Validator $validator, ?string $current): void
     {
@@ -25,9 +40,12 @@ trait ValidatesStatusTransition
             return;
         }
 
+        $blocked = $target === 'draft'
+            || in_array($current, $this->finalResultStatuses(), true);
+
         $sources = $this->resultStatusSources()[$target] ?? null;
 
-        if ($sources === null || in_array($current, $sources, true)) {
+        if (! $blocked && ($sources === null || in_array($current, $sources, true))) {
             return;
         }
 
