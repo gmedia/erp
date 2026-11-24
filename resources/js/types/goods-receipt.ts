@@ -19,6 +19,7 @@ export interface GoodsReceipt extends BaseEntity {
     purchase_order: {
         id: number;
         po_number: string | null;
+        status?: string | null;
         supplier: SimpleEntity | null;
     } | null;
     warehouse: SimpleEntity | null;

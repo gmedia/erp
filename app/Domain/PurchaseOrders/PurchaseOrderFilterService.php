@@ -11,13 +11,17 @@ class PurchaseOrderFilterService
 
     public function applyAdvancedFilters(Builder $query, array $filters): void
     {
+        $statuses = array_values(array_filter((array) ($filters['status'] ?? []), fn ($s) => $s !== ''));
+        if ($statuses !== []) {
+            $query->whereIn('status', $statuses);
+        }
+
         $this->applyConfiguredFilters(
             $query,
             $filters,
             [
                 'supplier_id' => 'supplier_id',
                 'warehouse_id' => 'warehouse_id',
-                'status' => 'status',
                 'currency' => 'currency',
             ],
             [

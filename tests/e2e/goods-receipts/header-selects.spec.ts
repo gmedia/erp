@@ -57,8 +57,31 @@ async function seedGoodsReceiptFixtures(page: Page): Promise<SeedResult> {
                     items: poItems,
                 }),
             })).json();
+            const id = Number(json?.data?.id);
+            const transitions = await (await fetch(
+                `/api/entity-states/purchase_order/${id}`,
+                { headers },
+            )).json();
+            const submit = (transitions.data?.available_transitions ?? []).find(
+                (t: { name: string }) => t.name === 'Submit',
+            );
+            await fetch(`/api/entity-states/purchase_order/${id}/transition`, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({ transition_id: submit?.id }),
+            });
+            const inbox = await (await fetch('/api/my-approvals', { headers })).json();
+            const step = (inbox.pending ?? []).find(
+                (item: { request: { approvable_id: number } }) =>
+                    item.request.approvable_id === id,
+            );
+            await fetch(`/api/my-approvals/${step?.request.id}/approve`, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({ comments: 'E2E header selects' }),
+            });
             return {
-                id: Number(json?.data?.id),
+                id,
                 number: String(json?.data?.po_number ?? ''),
                 itemId: Number(json?.data?.items?.[0]?.id),
             };
@@ -148,12 +171,16 @@ test.describe('Goods Receipt header selects', () => {
         await expect(formDialog.locator('tbody tr').first()).toContainText(fixtures.productName);
 
         const purchaseOrderSelect = formDialog.getByRole('combobox', { name: 'Purchase Order' });
-        await purchaseOrderSelect.click();
         const listed = page.waitForResponse(
             (r) => r.url().includes('/api/purchase-orders') && r.ok(),
         );
-        await page.getByPlaceholder('Search...').fill(fixtures.otherPurchaseOrderNumber);
+        await purchaseOrderSelect.click();
         await listed;
+        const searched = page.waitForResponse(
+            (r) => r.url().includes('/api/purchase-orders') && r.ok(),
+        );
+        await page.getByPlaceholder('Search...').fill(fixtures.otherPurchaseOrderNumber);
+        await searched;
         await page
             .getByRole('button', { name: new RegExp(fixtures.otherPurchaseOrderNumber) })
             .first()

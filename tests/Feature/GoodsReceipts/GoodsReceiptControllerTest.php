@@ -35,7 +35,8 @@ beforeEach(function () {
 
 function createPurchaseOrderWithItemForGoodsReceipt(): array
 {
-    $purchaseOrder = PurchaseOrder::factory()->create();
+    // Issue #380: GR confirmed hanya diterima untuk PO confirmed/partially_received.
+    $purchaseOrder = PurchaseOrder::factory()->create(['status' => 'confirmed']);
     $product = Product::factory()->create();
     $unit = Unit::factory()->create();
 
@@ -265,6 +266,7 @@ test('update keeps current goods receipt number unique', function () {
 
 test('confirming goods receipt rolls back state when journal posting fails with non-validation error', function () {
     $goodsReceipt = GoodsReceipt::factory()->create([
+        'purchase_order_id' => PurchaseOrder::factory()->create(['status' => 'confirmed'])->id,
         'status' => 'draft',
         'confirmed_at' => null,
         'confirmed_by' => null,
@@ -291,6 +293,7 @@ test('confirming goods receipt rolls back state when journal posting fails with 
 
 test('confirming goods receipt swallows validation errors and keeps state confirmed', function () {
     $goodsReceipt = GoodsReceipt::factory()->create([
+        'purchase_order_id' => PurchaseOrder::factory()->create(['status' => 'confirmed'])->id,
         'status' => 'draft',
         'confirmed_at' => null,
         'confirmed_by' => null,
