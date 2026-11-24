@@ -35,18 +35,9 @@ class InventoryStocktakeSampleDataSeeder extends Seeder
 
         $branchIdForStock = $warehouse->branch_id ?? Branch::query()->value('id');
         $products = $this->ensureProductsWithStock($branchIdForStock);
-        // Stocktake menghitung barang fisik. Kategori dipilih dari barang
-        // (bukan jasa, mis. Jasa Konsultasi) agar sesuai isinya (W7-15).
-        $categoryId = ProductCategory::query()
-            ->whereNotIn('name', [
-                DemoMasterData::PRODUCT_CATEGORY_CONSULTING,
-                DemoMasterData::PRODUCT_CATEGORY_MAINTENANCE,
-                DemoMasterData::PRODUCT_CATEGORY_TRAINING,
-                DemoMasterData::PRODUCT_CATEGORY_SOFTWARE,
-            ])
-            ->orderBy('id')
-            ->value('id')
-            ?? $products->first()?->category_id;
+        // Kategori stocktake = kategori barang yang dihitung (semua baris berasal dari
+        // produk ini), bukan kategori pertama di master (PR #432 butir 1).
+        $categoryId = (int) $products->first()->product_category_id;
 
         $year = now()->format('Y');
 
@@ -163,15 +154,42 @@ class InventoryStocktakeSampleDataSeeder extends Seeder
             ->get();
 
         if ($products->count() >= 3) {
+            // Produk stocktake adalah barang fisik: kategorinya disamakan (idempoten),
+            // agar kategori stocktake konsisten dengan barang yang dihitung (PR #432 butir 1).
+            $rawHardwareId = ProductCategory::query()
+                ->where('name', DemoMasterData::PRODUCT_CATEGORY_RAW_HARDWARE)
+                ->value('id');
+
+            if ($rawHardwareId !== null) {
+                Product::query()
+                    ->whereIn('id', $products->pluck('id'))
+                    ->update(['product_category_id' => $rawHardwareId]);
+                $products = $products->each(fn (Product $product) => $product->product_category_id = $rawHardwareId);
+            }
+
             return $products->take(3);
         }
 
-        $products = Product::query()->orderBy('id')->take(3)->get();
+        // Fallback: tiga barang fisik dari satu kategori yang sama, agar kategori stocktake
+        // konsisten dengan barang yang dihitung (PR #432 butir 1).
+        $fallbackCategoryId = Product::query()
+            ->where('type', '!=', 'service')
+            ->orderBy('id')
+            ->value('product_category_id');
+        $products = Product::query()
+            ->where('type', '!=', 'service')
+            ->where('product_category_id', $fallbackCategoryId)
+            ->orderBy('id')
+            ->take(3)
+            ->get();
         if ($products->count() >= 3) {
             return $products;
         }
 
-        $categoryId = ProductCategory::query()->value('id');
+        $categoryId = ProductCategory::query()
+            ->where('name', DemoMasterData::PRODUCT_CATEGORY_RAW_HARDWARE)
+            ->value('id')
+            ?? ProductCategory::query()->value('id');
         $unitId = Unit::query()->value('id');
 
         $samples = [
@@ -201,18 +219,12 @@ class InventoryStocktakeSampleDataSeeder extends Seeder
                 [
                     'name' => $sample['name'],
                     'type' => $sample['type'],
-                    'category_id' => $categoryId,
+                    'product_category_id' => $categoryId,
                     'unit_id' => $unitId,
                     'branch_id' => $branchId,
                     'cost' => $sample['cost'],
                     'selling_price' => 0,
                     'billing_model' => 'one_time',
-                    'is_recurring' => false,
-                    'allow_one_time_purchase' => true,
-                    'is_manufactured' => false,
-                    'is_purchasable' => true,
-                    'is_sellable' => true,
-                    'is_taxable' => false,
                     'status' => 'active',
                 ]
             );

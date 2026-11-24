@@ -44,6 +44,9 @@ class VehicleLoanApprovalFlowSeeder extends Seeder
             }
         }
 
+        // Master dibuat sebelum transaksi pertama; created_at hanya saat insert (idempoten).
+        $isNew = ! ApprovalFlow::query()->where('code', $targetCode)->exists();
+
         $flow = ApprovalFlow::updateOrCreate(
             ['code' => $targetCode],
             [
@@ -53,7 +56,7 @@ class VehicleLoanApprovalFlowSeeder extends Seeder
                 'is_active' => true,
                 'conditions' => null,
                 'created_by' => $approver->id,
-            ],
+            ] + ($isNew ? ['created_at' => now()->subDays(60)] : []),
         );
 
         ApprovalFlowStep::updateOrCreate(

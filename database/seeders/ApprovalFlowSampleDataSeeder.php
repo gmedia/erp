@@ -82,6 +82,10 @@ class ApprovalFlowSampleDataSeeder extends Seeder
         foreach ($flows as $flowDefinition) {
             $steps = $flowDefinition['steps'];
 
+            // Master dibuat sebelum transaksi pertama (approval request paling awal ~35 hari lalu).
+            // created_at hanya saat insert, agar seed ulang tidak menggeser tanggal master.
+            $existing = ApprovalFlow::query()->where('code', $flowDefinition['code'])->exists();
+
             $flow = ApprovalFlow::updateOrCreate(
                 ['code' => $flowDefinition['code']],
                 [
@@ -91,7 +95,7 @@ class ApprovalFlowSampleDataSeeder extends Seeder
                     'is_active' => true,
                     'conditions' => $flowDefinition['conditions'],
                     'created_by' => $admin->id,
-                ]
+                ] + ($existing ? [] : ['created_at' => now()->subDays(60)])
             );
 
             foreach ($steps as $stepDefinition) {

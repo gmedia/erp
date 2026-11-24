@@ -905,6 +905,101 @@ invariant('W7-15 asset purchase dates vary across the demo register', function (
         ->toBeGreaterThanOrEqual(4, 'Purchase dates must not all fall on the same day of month');
 });
 
+// PR #432 review butir 1 — kategori stocktake harus memuat produk yang ada di baris stocktake.
+invariant('PR432 stocktake category contains the products counted in its lines', function () {
+    $stocktakes = DB::table('inventory_stocktakes')->get(['id', 'stocktake_number', 'product_category_id']);
+
+    expect($stocktakes)->not->toBeEmpty('Demo data must include inventory stocktakes');
+
+    foreach ($stocktakes as $stocktake) {
+        $lineCategories = DB::table('inventory_stocktake_items')
+            ->join('products', 'products.id', '=', 'inventory_stocktake_items.product_id')
+            ->where('inventory_stocktake_items.inventory_stocktake_id', $stocktake->id)
+            ->pluck('products.product_category_id')
+            ->unique()
+            ->all();
+
+        expect($lineCategories)->not->toBeEmpty("Stocktake {$stocktake->stocktake_number} must count products");
+
+        foreach ($lineCategories as $categoryId) {
+            expect((int) $categoryId)->toBe(
+                (int) $stocktake->product_category_id,
+                "Stocktake {$stocktake->stocktake_number} category must match the counted products",
+            );
+        }
+    }
+});
+
+// PR #432 review butir 2 — timestamp master/konfigurasi sebelum transaksi pertama.
+invariant('PR432 approval flows are created before the first approval request', function () {
+    $firstRequest = DB::table('approval_requests')->min('submitted_at');
+
+    expect($firstRequest)->not->toBeNull('Demo data must include approval requests');
+
+    $flowsAfter = DB::table('approval_flows')
+        ->where('created_at', '>', $firstRequest)
+        ->count();
+
+    expect($flowsAfter)->toBe(0, 'Approval flow created_at must not be later than the first approval request');
+});
+
+// PR #432 review butir 6 — alokasi pembayaran AR/AP hanya untuk pihak dokumen yang sama.
+invariant('PR432 payment allocations belong to the same party as the document', function () {
+    $arMismatch = DB::table('ar_receipt_allocations')
+        ->join('ar_receipts', 'ar_receipts.id', '=', 'ar_receipt_allocations.ar_receipt_id')
+        ->join('customer_invoices', 'customer_invoices.id', '=', 'ar_receipt_allocations.customer_invoice_id')
+        ->whereColumn('ar_receipts.customer_id', '!=', 'customer_invoices.customer_id')
+        ->count();
+
+    $apMismatch = DB::table('ap_payment_allocations')
+        ->join('ap_payments', 'ap_payments.id', '=', 'ap_payment_allocations.ap_payment_id')
+        ->join('supplier_bills', 'supplier_bills.id', '=', 'ap_payment_allocations.supplier_bill_id')
+        ->whereColumn('ap_payments.supplier_id', '!=', 'supplier_bills.supplier_id')
+        ->count();
+
+    expect($arMismatch)->toBe(0, 'AR receipt allocations must match the invoice customer');
+    expect($apMismatch)->toBe(0, 'AP payment allocations must match the bill supplier');
+});
+
+// PR #432 review butir 6 — produk Service tidak punya pergerakan stok.
+invariant('PR432 service products have no stock movements', function () {
+    $serviceMovements = DB::table('stock_movements')
+        ->join('products', 'products.id', '=', 'stock_movements.product_id')
+        ->where('products.type', 'service')
+        ->count();
+
+    expect($serviceMovements)->toBe(0, 'Service products must not carry stock movements');
+});
+
+// PR #432 review butir 6 — kuantitas GR yang diterima (accepted) sama dengan stok masuk.
+invariant('PR432 goods receipt accepted quantity equals stock movement quantity', function () {
+    $receipts = DB::table('goods_receipt_items')
+        ->join('goods_receipts', 'goods_receipts.id', '=', 'goods_receipt_items.goods_receipt_id')
+        ->where('goods_receipts.status', 'confirmed')
+        ->get([
+            'goods_receipt_items.goods_receipt_id',
+            'goods_receipt_items.product_id',
+            'goods_receipt_items.quantity_received',
+            'goods_receipt_items.quantity_accepted',
+        ]);
+
+    expect($receipts)->not->toBeEmpty('Demo data must include confirmed goods receipts');
+
+    foreach ($receipts as $item) {
+        $movementIn = (float) DB::table('stock_movements')
+            ->where('reference_type', GoodsReceipt::class)
+            ->where('reference_id', $item->goods_receipt_id)
+            ->where('product_id', $item->product_id)
+            ->sum('quantity_in');
+
+        expect(round($movementIn, 2))->toBe(
+            round((float) $item->quantity_accepted, 2),
+            "GR #{$item->goods_receipt_id} product {$item->product_id} stock in must equal accepted quantity",
+        );
+        expect((float) $item->quantity_accepted)->toBeLessThanOrEqual((float) $item->quantity_received);
+    }
+});
+
 // W7-17 (aset) — nama aset demo bukan label placeholder.
 invariant('W7-17 asset demo names avoid placeholder labels', function () {
     $placeholders = DB::table('assets')

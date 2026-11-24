@@ -356,7 +356,11 @@ class ArSampleDataSeeder extends Seeder
         ];
 
         foreach ($receiptDefinitions as $index => $definition) {
-            $customer = $customers[$index % $customers->count()];
+            // Pihak penerimaan = pihak invoice yang dialokasikan (AR allocation harus satu customer).
+            $allocatedInvoice = $invoices[$definition['allocations'][0]['invoice'] ?? ''] ?? null;
+            $customer = $allocatedInvoice !== null
+                ? $customers->firstWhere('id', $allocatedInvoice->customer_id)
+                : $customers[$index % $customers->count()];
             $receiptDate = now()->subDays(30 - $index * 3);
 
             $receipt = ArReceipt::updateOrCreate(
@@ -385,6 +389,12 @@ class ArSampleDataSeeder extends Seeder
                 $invoice = $invoices[$allocationData['invoice']] ?? null;
                 if (! $invoice) {
                     continue;
+                }
+
+                // Satu penerimaan hanya boleh mengalokasikan invoice milik pihak yang sama.
+                if ((int) $invoice->customer_id !== (int) $receipt->customer_id) {
+                    $invoice->update(['customer_id' => $receipt->customer_id]);
+                    $invoice->refresh();
                 }
 
                 ArReceiptAllocation::updateOrCreate(

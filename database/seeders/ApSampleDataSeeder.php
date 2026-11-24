@@ -381,7 +381,11 @@ class ApSampleDataSeeder extends Seeder
         $billAllocations = [];
 
         foreach ($paymentDefinitions as $index => $definition) {
-            $supplier = $suppliers[$definition['supplier_index'] % $suppliers->count()];
+            // Pihak pembayaran = pihak tagihan yang dialokasikan (AP allocation harus satu supplier).
+            $allocatedBill = $supplierBills[$definition['allocations'][0]['bill_index'] ?? -1] ?? null;
+            $supplier = $allocatedBill !== null
+                ? $suppliers->firstWhere('id', $allocatedBill->supplier_id)
+                : $suppliers[$definition['supplier_index'] % $suppliers->count()];
             $paymentDate = now()->subDays(30 - $index);
 
             $apPayment = ApPayment::updateOrCreate(
@@ -411,6 +415,12 @@ class ApSampleDataSeeder extends Seeder
                 $bill = $supplierBills[$allocation['bill_index']] ?? null;
                 if (! $bill) {
                     continue;
+                }
+
+                // Satu pembayaran hanya boleh mengalokasikan tagihan milik pihak yang sama.
+                if ((int) $bill->supplier_id !== (int) $apPayment->supplier_id) {
+                    $bill->update(['supplier_id' => $apPayment->supplier_id]);
+                    $bill->refresh();
                 }
 
                 // Hanya pembayaran confirmed yang punya jurnal dan boleh tercatat sebagai alokasi.

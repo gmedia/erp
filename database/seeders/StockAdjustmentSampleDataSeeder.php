@@ -223,18 +223,12 @@ class StockAdjustmentSampleDataSeeder extends Seeder
                 [
                     'name' => $sample['name'],
                     'type' => $sample['type'],
-                    'category_id' => $categoryId,
+                    'product_category_id' => $categoryId,
                     'unit_id' => $unitId,
                     'branch_id' => $branchId,
                     'cost' => $sample['cost'],
                     'selling_price' => 0,
                     'billing_model' => 'one_time',
-                    'is_recurring' => false,
-                    'allow_one_time_purchase' => true,
-                    'is_manufactured' => false,
-                    'is_purchasable' => true,
-                    'is_sellable' => true,
-                    'is_taxable' => false,
                     'status' => 'active',
                 ]
             );
@@ -257,7 +251,8 @@ class StockAdjustmentSampleDataSeeder extends Seeder
         $items = [];
         $baseQuantity = 50.0;
 
-        foreach (Product::query()->orderBy('id')->get() as $product) {
+        // Produk jasa (type=service) tidak disimpan di gudang, jadi tidak punya saldo awal.
+        foreach (Product::query()->where('type', '!=', 'service')->orderBy('id')->get() as $product) {
             $unitCost = (float) $product->cost;
 
             $items[] = [

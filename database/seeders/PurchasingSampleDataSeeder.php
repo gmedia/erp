@@ -117,7 +117,8 @@ class PurchasingSampleDataSeeder extends Seeder
             return;
         }
 
-        $products = Product::query()->orderBy('id')->take(6)->get();
+        // Barang fisik saja: produk jasa (type=service) tidak menghasilkan penerimaan/stok.
+        $products = Product::query()->where('type', '!=', 'service')->orderBy('id')->take(6)->get();
         if ($products->isEmpty()) {
             return;
         }
