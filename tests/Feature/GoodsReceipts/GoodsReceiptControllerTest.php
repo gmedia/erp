@@ -439,7 +439,17 @@ test('confirming goods receipt without account 21150 is rejected with 422 unchan
 
 test('confirming goods receipt with ambiguous COA versions is rejected with 422 unchanged', function () {
     // Dua COA aktif dan tidak ada tahun fiskal yang mencakup tanggal GR: tidak boleh menebak.
-    CoaVersion::factory()->count(2)->create(['status' => 'active']);
+    foreach ([2001, 2002] as $year) {
+        CoaVersion::factory()->create([
+            'status' => 'active',
+            'fiscal_year_id' => FiscalYear::factory()->create([
+                'name' => (string) $year,
+                'start_date' => "{$year}-01-01",
+                'end_date' => "{$year}-12-31",
+            ])->id,
+        ]);
+    }
+
     [$purchaseOrder, $purchaseOrderItem, $product, $unit] = createPurchaseOrderWithItemForGoodsReceipt();
     $goodsReceipt = GoodsReceipt::factory()->create([
         'purchase_order_id' => $purchaseOrder->id,

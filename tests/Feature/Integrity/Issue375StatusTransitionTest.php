@@ -140,6 +140,8 @@ test('status transition per dokumen follows the table', function (
         'status' => $from,
         $numberColumns[$modelClass] => 'NO-TRANSISI-' . $endpoint . '-' . uniqid(),
         // Factory mengisi sent_at acak; tetapkan eksplisit agar posting invoice deterministik.
+        // Sama untuk confirmed_at GR: hanya transisi yang diuji, bukan posting (butuh item dan COA).
+        ...($modelClass === GoodsReceipt::class ? ['confirmed_at' => $to === 'confirmed' ? now() : null] : []),
         ...($modelClass === CustomerInvoice::class ? ['sent_at' => $to === 'sent' ? now() : null] : []),
     ]);
 
