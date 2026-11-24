@@ -112,6 +112,28 @@ test('annual closing mengunci lewat fiscal_year_id walau tahun fiskal tidak sama
         ->toThrow(ValidationException::class);
 });
 
+test('jurnal manual berjurnal_type closing tetap ditolak di periode tertutup', function () {
+    [$fiscalYear, $a, $b] = periodLockAccounts();
+    PeriodClosing::factory()->closed()->create([
+        'fiscal_year_id' => $fiscalYear->id,
+        'closing_type' => 'monthly',
+        'period_year' => 2026,
+        'period_month' => 4,
+    ]);
+
+    // Pengecualian jurnal penutup tidak boleh bisa dipakai lewat data jurnal manual.
+    expect(fn () => app(CreateJournalEntryAction::class)->execute([
+        'entry_date' => '2026-04-20',
+        'description' => 'manual closing spoof',
+        'status' => 'posted',
+        'journal_type' => 'closing',
+        'source_type' => PeriodClosing::class,
+        'source_id' => 1,
+        'lines' => periodLockLines($a->id, $b->id),
+    ]))->toThrow(ValidationException::class);
+    expect(JournalEntry::where('description', 'manual closing spoof')->count())->toBe(0);
+});
+
 test('status reopened dan draft tidak mengunci periode', function () {
     [$fiscalYear, $a, $b] = periodLockAccounts();
     PeriodClosing::factory()->create([

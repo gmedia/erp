@@ -7,7 +7,6 @@ use App\Actions\PeriodClosings\AssertPeriodOpenForPostingAction;
 use App\Models\Account;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
-use App\Models\PeriodClosing;
 use App\Services\InterBranchClearingService;
 use Exception;
 use Illuminate\Database\QueryException;
@@ -31,7 +30,13 @@ class CreateJournalEntryAction
      * - branch_id: owning branch resolved by the caller; null for company-wide entries.
      * - source_type, source_id: morph reference to the originating document.
      */
-    public function execute(array $data): JournalEntry
+    /**
+     * @param  bool  $isPeriodClosingEntry  Hanya ClosePeriodAction/ReopenPeriodAction (lewat
+     *                                      ReverseDocumentJournalAction) yang boleh mengirim true.
+     *                                      Bukan dari $data, agar payload jurnal manual tidak bisa
+     *                                      melewati penguncian periode (#423).
+     */
+    public function execute(array $data, bool $isPeriodClosingEntry = false): JournalEntry
     {
         $attempts = 0;
         $maxAttempts = 3;
@@ -56,7 +61,7 @@ class CreateJournalEntryAction
 
         while ($attempts < $maxAttempts) {
             try {
-                return DB::transaction(function () use ($data, $status) {
+                return DB::transaction(function () use ($data, $status, $isPeriodClosingEntry) {
                     $entryDate = $data['entry_date'];
 
                     $fiscalYear = FiscalYear::where('start_date', '<=', $entryDate)
@@ -76,10 +81,7 @@ class CreateJournalEntryAction
                         ]);
                     }
 
-                    $isClosingEntry = ($data['journal_type'] ?? null) === 'closing'
-                        && ($data['source_type'] ?? null) === PeriodClosing::class;
-
-                    if (! $isClosingEntry) {
+                    if (! $isPeriodClosingEntry) {
                         app(AssertPeriodOpenForPostingAction::class)->execute($fiscalYear->id, $entryDate);
                     }
 

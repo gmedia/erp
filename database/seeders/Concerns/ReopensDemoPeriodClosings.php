@@ -19,7 +19,18 @@ trait ReopensDemoPeriodClosings
     /** Titik masuk seeder: isi seeder ada di seedDemoData(). */
     public function run(): void
     {
-        $fiscalYear = FiscalYear::query()->where('status', 'open')->orderBy('start_date')->first();
+        // Tahun fiskal demo = tahun yang memuat periode monthly demo (bulan 1-2), bukan
+        // sekadar fiscal year open pertama. Tahun lain (mis. data test) tidak boleh
+        // menggeser pilihan ini, agar periode demo selalu dibuka sebelum posting.
+        $demoFiscalYearId = PeriodClosing::query()
+            ->where('closing_type', 'monthly')
+            ->whereIn('period_month', [1, 2])
+            ->orderBy('period_year')
+            ->value('fiscal_year_id');
+
+        $fiscalYear = $demoFiscalYearId !== null
+            ? FiscalYear::query()->find($demoFiscalYearId)
+            : FiscalYear::query()->where('status', 'open')->orderBy('start_date')->first();
 
         if ($fiscalYear === null) {
             $this->seedDemoData();

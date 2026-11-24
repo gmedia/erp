@@ -33,6 +33,7 @@ class ReverseDocumentJournalAction
         ?string $entryDate = null,
         ?string $journalType = null,
         ?int $journalEntryId = null,
+        bool $isPeriodClosingEntry = false,
     ): ?JournalEntry {
         $journalEntryId ??= $document->getAttribute('journal_entry_id');
 
@@ -47,6 +48,7 @@ class ReverseDocumentJournalAction
             $document,
             $entryDate,
             $journalType,
+            $isPeriodClosingEntry,
         ): JournalEntry {
             /** @var JournalEntry $original */
             $original = JournalEntry::query()
@@ -78,7 +80,7 @@ class ReverseDocumentJournalAction
                 'source_id' => $document->getKey(),
                 'branch_id' => $original->branch_id,
                 'lines' => $lines,
-            ]);
+            ], $isPeriodClosingEntry);
         });
     }
 }

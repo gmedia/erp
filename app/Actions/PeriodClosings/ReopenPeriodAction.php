@@ -31,6 +31,7 @@ class ReopenPeriodAction
                     $original->entry_date->toDateString(),
                     'closing',
                     $originalId,
+                    isPeriodClosingEntry: true,
                 );
             }
 
