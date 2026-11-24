@@ -45,14 +45,14 @@ function creditNotePayloadWithAccount(int $accountId): array
 }
 
 test('store accepts an active postable account on an item', function () {
-    $account = Account::factory()->create(['is_active' => true]);
+    $account = Account::factory()->inActiveCoa()->create(['is_active' => true]);
 
     postJson('/api/credit-notes', creditNotePayloadWithAccount($account->id))
         ->assertCreated();
 });
 
 test('store rejects an inactive account on an item', function () {
-    $account = Account::factory()->create(['is_active' => false]);
+    $account = Account::factory()->inActiveCoa()->create(['is_active' => false]);
 
     postJson('/api/credit-notes', creditNotePayloadWithAccount($account->id))
         ->assertUnprocessable()
@@ -60,7 +60,7 @@ test('store rejects an inactive account on an item', function () {
 });
 
 test('store rejects a parent account that has children on an item', function () {
-    $parent = Account::factory()->create(['is_active' => true]);
+    $parent = Account::factory()->inActiveCoa()->create(['is_active' => true]);
     Account::factory()->create([
         'coa_version_id' => $parent->coa_version_id,
         'parent_id' => $parent->id,
