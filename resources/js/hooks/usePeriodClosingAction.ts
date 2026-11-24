@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslation } from '@/contexts/i18n-context';
 import axiosInstance from '@/lib/axios';
 import { type PeriodClosing } from '@/types/period-closing';
 import { useQueryClient } from '@tanstack/react-query';
@@ -9,22 +10,24 @@ import { toast } from 'sonner';
 
 export type PeriodClosingAction = 'close' | 'reopen';
 
-const FALLBACK_ERROR = 'Failed to update the period. Please try again.';
-
-export function getPeriodClosingErrorMessage(error: unknown): string {
-    if (!axios.isAxiosError(error)) return FALLBACK_ERROR;
+export function getPeriodClosingErrorMessage(
+    error: unknown,
+    fallback: string,
+): string {
+    if (!axios.isAxiosError(error)) return fallback;
 
     const data = error.response?.data as
         | { message?: string; errors?: Record<string, string[]> }
         | undefined;
 
-    return data?.errors?.status?.[0] || data?.message || FALLBACK_ERROR;
+    return data?.errors?.status?.[0] || data?.message || fallback;
 }
 
 export function usePeriodClosingAction(options?: {
     onSuccess?: (item: PeriodClosing) => void;
     successMessages?: Record<PeriodClosingAction, string>;
 }) {
+    const { t } = useTranslation();
     const queryClient = useQueryClient();
     const [processing, setProcessing] = useState<PeriodClosingAction | null>(
         null,
@@ -42,9 +45,11 @@ export function usePeriodClosingAction(options?: {
 
             toast.success(
                 options?.successMessages?.[action] ??
-                    (action === 'close'
-                        ? 'Period closed.'
-                        : 'Period reopened.'),
+                    t(
+                        action === 'close'
+                            ? 'periodClosings.closed'
+                            : 'periodClosings.reopened',
+                    ),
             );
             void queryClient.invalidateQueries({
                 queryKey: ['period-closings'],
@@ -52,7 +57,9 @@ export function usePeriodClosingAction(options?: {
             options?.onSuccess?.(response.data.data);
             return true;
         } catch (error: unknown) {
-            toast.error(getPeriodClosingErrorMessage(error));
+            toast.error(
+                getPeriodClosingErrorMessage(error, t('periodClosings.failed')),
+            );
             return false;
         } finally {
             setProcessing(null);

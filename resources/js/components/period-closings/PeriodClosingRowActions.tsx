@@ -2,6 +2,7 @@
 
 import { GenericActions } from '@/components/common/ActionsDropdown';
 import { PeriodClosingActionDialog } from '@/components/period-closings/PeriodClosingActionDialog';
+import { useTranslation } from '@/contexts/i18n-context';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import {
     type PeriodClosingAction,
@@ -24,6 +25,7 @@ export function PeriodClosingRowActions({
     onEdit,
     onDelete,
 }: Readonly<PeriodClosingRowActionsProps>) {
+    const { t } = useTranslation();
     const { can } = usePermissions();
     const canEdit = can('period_closing.edit');
     const [pendingAction, setPendingAction] =
@@ -39,7 +41,7 @@ export function PeriodClosingRowActions({
                 key="close"
                 onSelect={() => setPendingAction('close')}
             >
-                Close Period
+                {t('periodClosings.close')}
             </DropdownMenuItem>
         ),
         showReopen && (
@@ -47,7 +49,7 @@ export function PeriodClosingRowActions({
                 key="reopen"
                 onSelect={() => setPendingAction('reopen')}
             >
-                Reopen Period
+                {t('periodClosings.reopen')}
             </DropdownMenuItem>
         ),
     ].filter(Boolean);
