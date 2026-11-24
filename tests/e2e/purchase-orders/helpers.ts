@@ -11,7 +11,7 @@ export async function createPurchaseOrder(page: Page): Promise<string> {
             const response = await fetch(url, {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
-                    'Authorization': `Bearer ${apiToken}`,
+                    Authorization: `Bearer ${apiToken}`,
                 },
             });
             const json = await response.json();
@@ -22,7 +22,9 @@ export async function createPurchaseOrder(page: Page): Promise<string> {
         const [supplierId, warehouseId, productId, unitId] = await Promise.all([
             getFirstId('/api/suppliers?per_page=1'),
             getFirstId('/api/warehouses?per_page=1'),
-            getFirstId('/api/products?search=Meja%20Kerja%20Eksekutif&per_page=1'),
+            getFirstId(
+                '/api/products?search=Meja%20Kerja%20Eksekutif&per_page=1',
+            ),
             getFirstId('/api/units?search=Buah&per_page=1'),
         ]);
 
@@ -32,7 +34,7 @@ export async function createPurchaseOrder(page: Page): Promise<string> {
                 'Content-Type': 'application/json',
                 Accept: 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
-                'Authorization': `Bearer ${apiToken}`,
+                Authorization: `Bearer ${apiToken}`,
             },
             body: JSON.stringify({
                 supplier_id: supplierId,
@@ -68,7 +70,10 @@ export async function createPurchaseOrder(page: Page): Promise<string> {
     return String(createResult.poNumber);
 }
 
-export async function searchPurchaseOrder(page: Page, identifier: string): Promise<void> {
+export async function searchPurchaseOrder(
+    page: Page,
+    identifier: string,
+): Promise<void> {
     await searchAndWaitForApi(
         page,
         page.getByPlaceholder(/search/i),
@@ -104,23 +109,31 @@ export async function editPurchaseOrder(
                 {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
-                        'Authorization': `Bearer ${apiToken}`,
+                        Authorization: `Bearer ${apiToken}`,
                     },
                 },
             );
             const findPayload = await findResponse.json();
             const row = (findPayload.data || [])[0];
             if (!row?.id) {
-                return { ok: false, step: 'find', status: findResponse.status, body: findPayload };
+                return {
+                    ok: false,
+                    step: 'find',
+                    status: findResponse.status,
+                    body: findPayload,
+                };
             }
 
-            const detailResponse = await fetch(`/api/purchase-orders/${row.id}`, {
-                headers: {
-                    Accept: 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Authorization': `Bearer ${apiToken}`,
+            const detailResponse = await fetch(
+                `/api/purchase-orders/${row.id}`,
+                {
+                    headers: {
+                        Accept: 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        Authorization: `Bearer ${apiToken}`,
+                    },
                 },
-            });
+            );
             const detailPayload = await detailResponse.json().catch(() => ({}));
             const detail = detailPayload?.data;
 
@@ -144,28 +157,34 @@ export async function editPurchaseOrder(
                 status: detail.status,
                 notes: detail.notes ?? '',
                 shipping_address: detail.shipping_address ?? '',
-                items: (detail.items as PurchaseOrderDetailItem[] || []).map((item) => ({
-                    purchase_request_item_id: item.purchase_request_item_id ?? null,
-                    product_id: item.product?.id,
-                    unit_id: item.unit?.id,
-                    quantity: item.quantity,
-                    unit_price: item.unit_price,
-                    discount_percent: item.discount_percent ?? 0,
-                    tax_percent: item.tax_percent ?? 0,
-                    notes: item.notes ?? '',
-                })),
+                items: ((detail.items as PurchaseOrderDetailItem[]) || []).map(
+                    (item) => ({
+                        purchase_request_item_id:
+                            item.purchase_request_item_id ?? null,
+                        product_id: item.product?.id,
+                        unit_id: item.unit?.id,
+                        quantity: item.quantity,
+                        unit_price: item.unit_price,
+                        discount_percent: item.discount_percent ?? 0,
+                        tax_percent: item.tax_percent ?? 0,
+                        notes: item.notes ?? '',
+                    }),
+                ),
             };
 
-            const updateResponse = await fetch(`/api/purchase-orders/${row.id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Authorization': `Bearer ${apiToken}`,
+            const updateResponse = await fetch(
+                `/api/purchase-orders/${row.id}`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Accept: 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        Authorization: `Bearer ${apiToken}`,
+                    },
+                    body: JSON.stringify(payload),
                 },
-                body: JSON.stringify(payload),
-            });
+            );
 
             const updatePayload = await updateResponse.json().catch(() => ({}));
 
@@ -179,7 +198,9 @@ export async function editPurchaseOrder(
         { findBy: identifier, nextPoNumber: updatedPoNumber },
     );
 
-    expect(updateResult, JSON.stringify(updateResult)).toMatchObject({ ok: true });
+    expect(updateResult, JSON.stringify(updateResult)).toMatchObject({
+        ok: true,
+    });
 
     await reloadAndWaitForApi(page, '/api/purchase-orders');
 }
@@ -188,5 +209,9 @@ export function approvePurchaseOrderFixture(poNumber: string): void {
     const php =
         `\\App\\Models\\PurchaseOrder::where('po_number', '${poNumber}')` +
         `->update(['status' => 'confirmed', 'approved_at' => now()]);`;
-    execFileSync('./vendor/bin/sail', ['artisan', 'tinker', `--execute=${php}`], { encoding: 'utf8' });
+    execFileSync(
+        './vendor/bin/sail',
+        ['artisan', 'tinker', `--execute=${php}`],
+        { encoding: 'utf8' },
+    );
 }
