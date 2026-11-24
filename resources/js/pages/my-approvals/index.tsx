@@ -28,7 +28,7 @@ import { ApprovalRequest, ApprovalRequestStep } from '@/types/approval';
 import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { formatDistanceToNow, isValid, parseISO } from 'date-fns';
-import { Check, Clock, Eye, Loader2, X } from 'lucide-react';
+import { Check, Clock, Eye, Loader2, UserRoundCheck, X } from 'lucide-react';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
@@ -162,6 +162,17 @@ function StatusBadge({ status }: Readonly<{ status: string }>) {
     }
 }
 
+function DelegatedBadge() {
+    const { t } = useTranslation();
+
+    return (
+        <Badge variant="outline" className="h-5 gap-1 px-1.5 font-normal">
+            <UserRoundCheck className="h-3 w-3" />
+            {t('my_approvals.delegated_badge')}
+        </Badge>
+    );
+}
+
 function TabCount({ count }: Readonly<{ count: number }>) {
     return (
         <span
@@ -207,6 +218,20 @@ function LoadFailedAlert() {
         <div className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-sm text-destructive">
             {t('my_approvals.load_failed')}
         </div>
+    );
+}
+
+function DelegatedCount({ count }: Readonly<{ count: number }>) {
+    const { t } = useTranslation();
+
+    return (
+        <span
+            className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground"
+            title={t('my_approvals.delegated_tooltip')}
+        >
+            <UserRoundCheck className="h-3 w-3" />
+            {t('my_approvals.delegated_count', { count: String(count) })}
+        </span>
     );
 }
 
@@ -267,6 +292,9 @@ export default function MyApprovalsPage() {
     const approved = data?.approved ?? [];
     const rejected = data?.rejected ?? [];
     const all = data?.all ?? [];
+    const delegatedPendingCount = pending.filter(
+        (step) => step.is_delegated,
+    ).length;
 
     const isVehicleLoan = (step: ApprovalRequestStep | null): boolean =>
         shortApprovableType(step?.request.approvable_type ?? '') ===
@@ -426,6 +454,9 @@ export default function MyApprovalsPage() {
                                                 <StatusBadge
                                                     status={step.status}
                                                 />
+                                                {step.is_delegated ? (
+                                                    <DelegatedBadge />
+                                                ) : null}
                                             </div>
                                             <h4 className="text-sm leading-snug font-semibold tracking-tight text-foreground">
                                                 {title}
@@ -573,6 +604,9 @@ export default function MyApprovalsPage() {
                         >
                             Pending
                             <TabCount count={pending.length} />
+                            {delegatedPendingCount > 0 ? (
+                                <DelegatedCount count={delegatedPendingCount} />
+                            ) : null}
                         </TabsTrigger>
                         <TabsTrigger
                             value="approved"

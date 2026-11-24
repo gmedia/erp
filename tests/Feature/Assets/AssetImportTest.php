@@ -162,6 +162,35 @@ test('upserts existing asset by asset code', function () {
     ]);
 })->group('assets');
 
+test('reports duplicate asset code within one file instead of overwriting', function () {
+    $csvContent = implode("\n", [
+        $this->csvHeader,
+        $this->csvRowValid,
+        str_replace('Laptop Mac', 'Second Laptop', $this->csvRowValid),
+    ]);
+
+    $file = UploadedFile::fake()->createWithContent('assets_dup.csv', $csvContent);
+
+    $response = $this->postJson('/api/assets/import', [
+        'file' => $file,
+    ]);
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'imported' => 1,
+            'skipped' => 1,
+        ]);
+
+    $errors = collect($response->json('errors'));
+    expect($errors)->toHaveCount(1);
+    expect($errors->first())->toMatchArray(['row' => 3, 'field' => 'Duplicate']);
+
+    $this->assertDatabaseHas('assets', [
+        'asset_code' => 'AST-001',
+        'name' => 'Laptop Mac',
+    ]);
+})->group('assets');
+
 test('validates file type', function () {
     $file = UploadedFile::fake()->create('document.pdf', 100);
 

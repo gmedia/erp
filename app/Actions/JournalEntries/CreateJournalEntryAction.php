@@ -7,10 +7,8 @@ use App\Actions\PeriodClosings\AssertPeriodOpenForPostingAction;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
 use App\Services\InterBranchClearingService;
-use Exception;
-use Illuminate\Database\QueryException;
+use App\Support\Database\TransactionRetrier;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class CreateJournalEntryAction
@@ -42,11 +40,11 @@ class CreateJournalEntryAction
      *                                    agar pembalik baris asli ke akun kelompok selalu diterima (#437).
      *                                    Bukan dari $data, agar payload API tidak bisa mengaktifkannya.
      */
-    public function execute(array $data, bool $isPeriodClosingEntry = false, bool $allowGroupAccounts = false): JournalEntry
-    {
-        $attempts = 0;
-        $maxAttempts = 3;
-
+    public function execute(
+        array $data,
+        bool $isPeriodClosingEntry = false,
+        bool $allowGroupAccounts = false,
+    ): JournalEntry {
         $status = $data['status'] ?? 'draft';
         $entryNumberPrefix = $data['entry_number_prefix'] ?? 'JV-';
         $validateAccounts = ($data['validate_accounts'] ?? false) || $status === 'posted';
@@ -69,126 +67,115 @@ class CreateJournalEntryAction
             $this->assertLinesUseActiveAccounts($data['lines'], $data['entry_date']);
         }
 
-        while ($attempts < $maxAttempts) {
-            try {
-                return DB::transaction(function () use ($data, $status, $isPeriodClosingEntry, $allowGroupAccounts, $entryNumberPrefix) {
-                    $entryDate = $data['entry_date'];
+        return TransactionRetrier::run(function () use (
+            $data,
+            $status,
+            $isPeriodClosingEntry,
+            $allowGroupAccounts,
+            $entryNumberPrefix,
+        ) {
+            $entryDate = $data['entry_date'];
 
-                    $fiscalYear = FiscalYear::where('start_date', '<=', $entryDate)
-                        ->where('end_date', '>=', $entryDate)
-                        ->lockForUpdate()
-                        ->first();
+            $fiscalYear = FiscalYear::where('start_date', '<=', $entryDate)
+                ->where('end_date', '>=', $entryDate)
+                ->lockForUpdate()
+                ->first();
 
-                    if (! $fiscalYear) {
-                        throw ValidationException::withMessages([
-                            'entry_date' => __('journal_entry.fiscal_year_missing'),
-                        ]);
-                    }
-
-                    if (! $fiscalYear->isOpen()) {
-                        throw ValidationException::withMessages([
-                            'entry_date' => __('journal_entry.fiscal_year_closed'),
-                        ]);
-                    }
-
-                    if (! $isPeriodClosingEntry) {
-                        app(AssertPeriodOpenForPostingAction::class)->execute($fiscalYear->id, $entryDate);
-                    }
-
-                    // Sebelum baris jurnal ditulis, agar saldo posted yang dibaca belum memuat jurnal ini.
-                    if (! $allowGroupAccounts) {
-                        $this->assertGroupAccountLinesReduceBalance($data['lines']);
-                    }
-
-                    // Generate Entry Number
-                    // We use max() instead of count() to handle deletions correctly (gaps in sequence)
-                    // Format: JV-{Year}-XXXXX
-                    // Batasi ke prefix JV-<tahun> agar entri non-JV (mis. saldo
-                    // awal REC-) tidak merusak urutan nomor.
-                    $entryPrefix = $entryNumberPrefix . $fiscalYear->name . '-';
-
-                    $lastEntry = JournalEntry::where('fiscal_year_id', $fiscalYear->id)
-                        ->where('entry_number', 'like', $entryPrefix . '%')
-                        ->lockForUpdate()
-                        ->orderBy('entry_number', 'desc')
-                        ->first();
-
-                    if ($lastEntry) {
-                        $parts = explode('-', $lastEntry->entry_number);
-                        $lastSequence = intval(end($parts));
-                        $count = $lastSequence + 1;
-                    } else {
-                        $count = 1;
-                    }
-
-                    $entryNumber = $entryPrefix . str_pad((string) $count, 5, '0', STR_PAD_LEFT);
-
-                    $userId = Auth::id();
-
-                    $attributes = [
-                        'fiscal_year_id' => $fiscalYear->id,
-                        'entry_number' => $entryNumber,
-                        'entry_date' => $data['entry_date'],
-                        'reference' => $data['reference'] ?? null,
-                        'description' => $data['description'],
-                        'status' => $status,
-                        'journal_type' => $data['journal_type'] ?? 'general',
-                        'branch_id' => $data['branch_id'] ?? null,
-                        'source_type' => $data['source_type'] ?? null,
-                        'source_id' => $data['source_id'] ?? null,
-                        'created_by' => $userId,
-                    ];
-
-                    if ($status === 'posted') {
-                        $attributes['posted_by'] = $userId;
-                        $attributes['posted_at'] = now();
-                    }
-
-                    $journalEntry = JournalEntry::create($attributes);
-
-                    $headerBranchId = $data['branch_id'] ?? null;
-                    $resolvedLines = array_map(
-                        fn (array $line): array => [
-                            'account_id' => $line['account_id'],
-                            'branch_id' => $line['branch_id'] ?? $headerBranchId,
-                            'debit' => $line['debit'],
-                            'credit' => $line['credit'],
-                            'memo' => $line['memo'] ?? null,
-                        ],
-                        $data['lines'],
-                    );
-
-                    $clearingAccountId = $this->clearing->resolveAccountIdForFiscalYear($fiscalYear->id);
-                    $resolvedLines = $this->clearing->inject($resolvedLines, $clearingAccountId);
-                    $this->clearing->assertBalancedPerBranch($resolvedLines);
-
-                    foreach ($resolvedLines as $lineData) {
-                        $journalEntry->lines()->create([
-                            'account_id' => $lineData['account_id'],
-                            'branch_id' => $lineData['branch_id'] ?? null,
-                            'debit' => $lineData['debit'],
-                            'credit' => $lineData['credit'],
-                            'memo' => $lineData['memo'] ?? null,
-                        ]);
-                    }
-
-                    return $journalEntry;
-                });
-            } catch (QueryException $e) {
-                // Check for unique duplicate error (SQLSTATE 23000)
-                if ($e->getCode() == 23000 && str_contains($e->getMessage(), 'journal_entries_entry_number_unique')) {
-                    $attempts++;
-                    if ($attempts >= $maxAttempts) {
-                        throw $e;
-                    }
-
-                    // Retry
-                    continue;
-                }
-                throw $e;
+            if (! $fiscalYear) {
+                throw ValidationException::withMessages([
+                    'entry_date' => __('journal_entry.fiscal_year_missing'),
+                ]);
             }
-        }
 
-        throw new Exception("Failed to create journal entry after {$maxAttempts} attempts.");
+            if (! $fiscalYear->isOpen()) {
+                throw ValidationException::withMessages([
+                    'entry_date' => __('journal_entry.fiscal_year_closed'),
+                ]);
+            }
+
+            if (! $isPeriodClosingEntry) {
+                app(AssertPeriodOpenForPostingAction::class)->execute($fiscalYear->id, $entryDate);
+            }
+
+            // Sebelum baris jurnal ditulis, agar saldo posted yang dibaca belum memuat jurnal ini.
+            // Ada di dalam callback sehingga ikut terulang pada setiap percobaan TransactionRetrier.
+            if (! $allowGroupAccounts) {
+                $this->assertGroupAccountLinesReduceBalance($data['lines']);
+            }
+
+            // Generate Entry Number
+            // We use max() instead of count() to handle deletions correctly (gaps in sequence)
+            // Format: JV-{Year}-XXXXX
+            // Batasi ke prefix JV-<tahun> agar entri non-JV (mis. saldo
+            // awal REC-) tidak merusak urutan nomor.
+            $entryPrefix = $entryNumberPrefix . $fiscalYear->name . '-';
+
+            $lastEntry = JournalEntry::where('fiscal_year_id', $fiscalYear->id)
+                ->where('entry_number', 'like', $entryPrefix . '%')
+                ->lockForUpdate()
+                ->orderBy('entry_number', 'desc')
+                ->first();
+
+            if ($lastEntry) {
+                $parts = explode('-', $lastEntry->entry_number);
+                $lastSequence = intval(end($parts));
+                $count = $lastSequence + 1;
+            } else {
+                $count = 1;
+            }
+
+            $entryNumber = $entryPrefix . str_pad((string) $count, 5, '0', STR_PAD_LEFT);
+
+            $userId = Auth::id();
+
+            $attributes = [
+                'fiscal_year_id' => $fiscalYear->id,
+                'entry_number' => $entryNumber,
+                'entry_date' => $data['entry_date'],
+                'reference' => $data['reference'] ?? null,
+                'description' => $data['description'],
+                'status' => $status,
+                'journal_type' => $data['journal_type'] ?? 'general',
+                'branch_id' => $data['branch_id'] ?? null,
+                'source_type' => $data['source_type'] ?? null,
+                'source_id' => $data['source_id'] ?? null,
+                'created_by' => $userId,
+            ];
+
+            if ($status === 'posted') {
+                $attributes['posted_by'] = $userId;
+                $attributes['posted_at'] = now();
+            }
+
+            $journalEntry = JournalEntry::create($attributes);
+
+            $headerBranchId = $data['branch_id'] ?? null;
+            $resolvedLines = array_map(
+                fn (array $line): array => [
+                    'account_id' => $line['account_id'],
+                    'branch_id' => $line['branch_id'] ?? $headerBranchId,
+                    'debit' => $line['debit'],
+                    'credit' => $line['credit'],
+                    'memo' => $line['memo'] ?? null,
+                ],
+                $data['lines'],
+            );
+
+            $clearingAccountId = $this->clearing->resolveAccountIdForFiscalYear($fiscalYear->id);
+            $resolvedLines = $this->clearing->inject($resolvedLines, $clearingAccountId);
+            $this->clearing->assertBalancedPerBranch($resolvedLines);
+
+            foreach ($resolvedLines as $lineData) {
+                $journalEntry->lines()->create([
+                    'account_id' => $lineData['account_id'],
+                    'branch_id' => $lineData['branch_id'] ?? null,
+                    'debit' => $lineData['debit'],
+                    'credit' => $lineData['credit'],
+                    'memo' => $lineData['memo'] ?? null,
+                ]);
+            }
+
+            return $journalEntry;
+        });
     }
 }

@@ -70,6 +70,9 @@ export interface Translations {
     my_approvals: {
         request_number: string;
         load_failed: string;
+        delegated_badge: string;
+        delegated_count: string;
+        delegated_tooltip: string;
     };
     posted_document: {
         title: string;

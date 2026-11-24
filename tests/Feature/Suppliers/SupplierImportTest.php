@@ -156,6 +156,36 @@ test('upserts existing supplier by name if email is absent', function () {
     ]);
 })->group('suppliers');
 
+test('reports duplicate identity key within one file instead of overwriting', function () {
+    $csvContent = implode("\n", [
+        'name,email,phone,address,branch,category,status',
+        'First Supplier,dup@example.com,0812345,123 St,Head Office,IT Equipment,active',
+        'Second Supplier,dup@example.com,0899999,456 St,Head Office,IT Equipment,inactive',
+    ]);
+
+    $file = UploadedFile::fake()->createWithContent('suppliers_dup.csv', $csvContent);
+
+    $response = $this->postJson('/api/suppliers/import', [
+        'file' => $file,
+    ]);
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'imported' => 1,
+            'skipped' => 1,
+        ]);
+
+    $errors = collect($response->json('errors'));
+    expect($errors)->toHaveCount(1);
+    expect($errors->first())->toMatchArray(['row' => 3, 'field' => 'Duplicate']);
+
+    $this->assertDatabaseHas('suppliers', [
+        'email' => 'dup@example.com',
+        'name' => 'First Supplier',
+        'status' => 'active',
+    ]);
+})->group('suppliers');
+
 test('validates file type', function () {
     $file = UploadedFile::fake()->create('document.pdf', 100);
 

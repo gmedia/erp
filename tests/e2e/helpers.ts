@@ -1,4 +1,4 @@
-import { Locator, Page, expect } from '@playwright/test';
+import { APIRequestContext, Locator, Page, expect } from '@playwright/test';
 
 type ApiResponseMatcher = string | RegExp | ((url: string) => boolean);
 
@@ -8,6 +8,133 @@ const DEFAULT_E2E_PASSWORD = 'password';
 
 interface LoginOptions {
     requireDashboard?: boolean;
+}
+
+export const E2E_DELEGATE_EMAIL = 'manager.hr@example.com';
+
+const ensuredDelegations = new Set<number>();
+
+async function ensureAdminDelegation(
+    api: APIRequestContext,
+    adminHeaders: Record<string, string>,
+    delegateId: number,
+): Promise<void> {
+    const meResponse = await api.get('/api/me', { headers: adminHeaders });
+    expect(meResponse.ok()).toBeTruthy();
+    const me = (await meResponse.json()) as { id?: number; user?: { id?: number } };
+    const adminId = me.user?.id ?? me.id;
+    if (!adminId) throw new Error('Could not resolve admin user id');
+    if (ensuredDelegations.has(adminId)) return;
+
+    const inDays = (days: number) =>
+        new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+    const delegation = await api.post('/api/approval-delegations', {
+        headers: adminHeaders,
+        data: {
+            delegator_user_id: adminId,
+            delegate_user_id: delegateId,
+            approvable_type: null,
+            start_date: inDays(-1),
+            end_date: inDays(1),
+            is_active: true,
+        },
+    });
+    expect(delegation.ok()).toBeTruthy();
+    ensuredDelegations.add(adminId);
+}
+
+async function delegateAndLogin(page: Page): Promise<{ delegateId: number; delegateToken: string }> {
+    const adminToken = await page.evaluate(() => localStorage.getItem('api_token'));
+    if (!adminToken) throw new Error('api_token missing from browser localStorage');
+
+    const api = page.context().request;
+    const adminHeaders = { Accept: 'application/json', Authorization: `Bearer ${adminToken}` };
+
+    const delegateLogin = await api.post('/api/login', {
+        headers: { Accept: 'application/json' },
+        data: { email: E2E_DELEGATE_EMAIL, password: DEFAULT_E2E_PASSWORD },
+    });
+    expect(delegateLogin.ok()).toBeTruthy();
+    const login = (await delegateLogin.json()) as { token?: string; user?: { id?: number } };
+    const delegateId = login.user?.id;
+    const delegateToken = login.token;
+    if (!delegateId || !delegateToken) throw new Error('Delegate login returned no token');
+
+    await ensureAdminDelegation(api, adminHeaders, delegateId);
+
+    return { delegateId, delegateToken };
+}
+
+export async function approveApprovableAsDelegate(
+    page: Page,
+    approvableId: number,
+    comments = 'E2E approved',
+    approvableType?: string,
+): Promise<void> {
+    const { delegateToken } = await delegateAndLogin(page);
+    const api = page.context().request;
+
+    const delegateHeaders = { Accept: 'application/json', Authorization: `Bearer ${delegateToken}` };
+    const inbox = await api.get('/api/my-approvals', { headers: delegateHeaders });
+    expect(inbox.ok()).toBeTruthy();
+    const payload = (await inbox.json()) as {
+        pending?: Array<{
+            request?: { id?: number; approvable_id?: number; approvable_type?: string };
+        }>;
+    };
+    const step = payload.pending?.find(
+        (item) =>
+            item.request?.approvable_id === approvableId &&
+            (approvableType === undefined || item.request?.approvable_type === approvableType),
+    );
+    const requestId = step?.request?.id;
+    if (!requestId) throw new Error(`No pending approval for approvable ${approvableId}`);
+
+    const approve = await api.post(`/api/my-approvals/${requestId}/approve`, {
+        headers: delegateHeaders,
+        data: { comments },
+    });
+    expect(approve.ok()).toBeTruthy();
+}
+
+export async function approveViaScreenAsDelegate(
+    page: Page,
+    documentText: string,
+    extraDialogText?: string,
+    confirmResponseMatch = '/api/my-approvals/',
+): Promise<void> {
+    if (!documentText.trim()) {
+        throw new Error('approveViaScreenAsDelegate: documentText must not be empty');
+    }
+
+    await delegateAndLogin(page);
+    await page.context().clearCookies();
+    await login(page, E2E_DELEGATE_EMAIL, DEFAULT_E2E_PASSWORD, { requireDashboard: false });
+
+    await page.goto('/my-approvals');
+    await expect(page.getByRole('tab', { name: /Pending/i })).toBeVisible();
+
+    const card = page
+        .locator('div')
+        .filter({ has: page.getByRole('button', { name: /^Approve$/ }) })
+        .filter({ hasText: documentText })
+        .last();
+    await expect(card.getByText(documentText).first()).toBeVisible({ timeout: 15000 });
+    await expect(card).toBeVisible({ timeout: 15000 });
+    await card.getByRole('button', { name: /^Approve$/ }).click();
+
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    if (extraDialogText) {
+        await expect(dialog.getByText(extraDialogText)).toBeVisible();
+    }
+
+    const approveResponse = page.waitForResponse(
+        (response) => response.url().includes(confirmResponseMatch) && response.status() < 400,
+    );
+    await page.getByRole('button', { name: 'Confirm Approval', exact: true }).click();
+    await approveResponse;
 }
 
 function matchesApiUrl(url: string, matcher: ApiResponseMatcher): boolean {

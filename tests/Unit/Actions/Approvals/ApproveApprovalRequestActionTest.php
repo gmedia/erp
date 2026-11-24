@@ -8,6 +8,8 @@ use App\Models\ApprovalRequest;
 use App\Models\ApprovalRequestStep;
 use App\Models\PurchaseRequest;
 use App\Models\User;
+use Illuminate\Database\DeadlockException;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('my-approvals');
@@ -68,8 +70,40 @@ test('approving a single-step request marks the request approved and logs comple
     expect($request->status)->toBe('approved');
     expect($request->completed_at)->not->toBeNull();
 
-    expect(ApprovalAuditLog::where('approval_request_id', $request->id)->where('event', 'step_approved')->count())->toBe(1);
-    expect(ApprovalAuditLog::where('approval_request_id', $request->id)->where('event', 'completed')->count())->toBe(1);
+    $auditLogs = ApprovalAuditLog::where('approval_request_id', $request->id);
+    expect((clone $auditLogs)->where('event', 'step_approved')->count())->toBe(1);
+    expect((clone $auditLogs)->where('event', 'completed')->count())->toBe(1);
+});
+
+test('approve does not retry a deadlock: the error propagates after a single attempt', function () {
+    $request = makeApprovalRequestWithSteps(1, $this->actor, $this->entity);
+    $step = $request->steps()->where('step_order', 1)->firstOrFail();
+
+    $attempts = 0;
+    $listener = function () use (&$attempts) {
+        $attempts++;
+
+        throw new QueryException(
+            'mariadb',
+            'update `approval_request_steps` set `status` = ? where `id` = ?',
+            [],
+            new RuntimeException('Deadlock found when trying to get lock'),
+        );
+    };
+    ApprovalRequestStep::updating($listener);
+
+    try {
+        // Laravel membungkus errno 1213 menjadi DeadlockException (turunan QueryException).
+        expect(fn () => $this->action->execute($request, $step, $this->actor->id, null))
+            ->toThrow(DeadlockException::class);
+    } finally {
+        ApprovalRequestStep::getEventDispatcher()
+            ->forget('eloquent.updating: ' . ApprovalRequestStep::class);
+    }
+
+    expect($attempts)->toBe(1);
+    expect($step->fresh()->status)->toBe('pending');
+    expect(ApprovalAuditLog::where('approval_request_id', $request->id)->count())->toBe(0);
 });
 
 test('approving a non-final step advances current_step_order and keeps request in_progress', function () {
