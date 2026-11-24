@@ -167,20 +167,22 @@ test('batal receipt confirmed melepas alokasi, menghitung ulang sisa invoice, da
     assertDatabaseHas('ar_receipts', ['id' => $receipt->id, 'status' => 'cancelled']);
 });
 
-test('batal receipt dua kali ditolak 422 dan tidak membuat pembalik kedua', function () {
+test('batal receipt dua kali diterima 200 tanpa efek: tidak ada pembalik kedua dan alokasi tetap nol', function () {
     $invoice = settledInvoice();
     $receipt = confirmedReceipt($invoice, 400000, 'RCV-2026-000376');
 
     putJson("/api/ar-receipts/{$receipt->id}", ['status' => 'cancelled'])->assertOk();
+    $invoiceAfterFirst = $invoice->refresh()->only(['amount_received', 'amount_due', 'status']);
 
-    putJson("/api/ar-receipts/{$receipt->id}", ['status' => 'cancelled'])->assertStatus(422);
+    putJson("/api/ar-receipts/{$receipt->id}", ['status' => 'cancelled'])->assertOk();
 
-    $reversals = JournalEntry::query()
+    expect(JournalEntry::query()
         ->where('source_type', ArReceipt::class)
         ->where('source_id', $receipt->id)
-        ->count();
-
-    expect($reversals)->toBe(2);
+        ->count())->toBe(2)
+        ->and($receipt->refresh()->status)->toBe('cancelled')
+        ->and(ArReceiptAllocation::query()->where('ar_receipt_id', $receipt->id)->count())->toBe(0)
+        ->and($invoice->refresh()->only(['amount_received', 'amount_due', 'status']))->toBe($invoiceAfterFirst);
 });
 
 test('batal receipt ditolak 422 bila periode jurnal sudah tertutup, alokasi tetap utuh', function () {
@@ -294,18 +296,22 @@ test('batal payment confirmed melepas alokasi, menghitung ulang sisa bill, dan m
     assertDatabaseHas('ap_payments', ['id' => $payment->id, 'status' => 'cancelled']);
 });
 
-test('batal payment dua kali ditolak 422 dan tidak membuat pembalik kedua', function () {
+test('batal payment dua kali diterima 200 tanpa efek: tidak ada pembalik kedua dan alokasi tetap nol', function () {
     $bill = settledBill();
     $payment = confirmedPayment($bill, 300000, 'PAY-2026-000376');
 
     putJson("/api/ap-payments/{$payment->id}", ['status' => 'cancelled'])->assertOk();
+    $billAfterFirst = $bill->refresh()->only(['amount_paid', 'amount_due', 'status']);
 
-    putJson("/api/ap-payments/{$payment->id}", ['status' => 'cancelled'])->assertStatus(422);
+    putJson("/api/ap-payments/{$payment->id}", ['status' => 'cancelled'])->assertOk();
 
     expect(JournalEntry::query()
         ->where('source_type', ApPayment::class)
         ->where('source_id', $payment->id)
-        ->count())->toBe(2);
+        ->count())->toBe(2)
+        ->and($payment->refresh()->status)->toBe('cancelled')
+        ->and(ApPaymentAllocation::query()->where('ap_payment_id', $payment->id)->count())->toBe(0)
+        ->and($bill->refresh()->only(['amount_paid', 'amount_due', 'status']))->toBe($billAfterFirst);
 });
 
 test('batal payment ditolak 422 bila periode jurnal sudah tertutup, alokasi tetap utuh', function () {
@@ -385,18 +391,21 @@ test('batal credit note applied membalik jurnal dan mengembalikan sisa invoice',
     assertDatabaseHas('credit_notes', ['id' => $creditNote->id, 'status' => 'cancelled']);
 });
 
-test('batal credit note applied dua kali ditolak 422 tanpa pembalik kedua', function () {
+test('batal credit note applied dua kali diterima 200 tanpa efek: tidak ada pembalik kedua', function () {
     $invoice = settledInvoice();
     $creditNote = appliedCreditNote($invoice, 200000, 'CN-2026-000376');
 
     putJson("/api/credit-notes/{$creditNote->id}", ['status' => 'cancelled'])->assertOk();
+    $invoiceAfterFirst = $invoice->refresh()->only(['credit_note_amount', 'amount_due', 'status']);
 
-    putJson("/api/credit-notes/{$creditNote->id}", ['status' => 'cancelled'])->assertStatus(422);
+    putJson("/api/credit-notes/{$creditNote->id}", ['status' => 'cancelled'])->assertOk();
 
     expect(JournalEntry::query()
         ->where('source_type', CreditNote::class)
         ->where('source_id', $creditNote->id)
-        ->count())->toBe(2);
+        ->count())->toBe(2)
+        ->and($creditNote->refresh()->status)->toBe('cancelled')
+        ->and($invoice->refresh()->only(['credit_note_amount', 'amount_due', 'status']))->toBe($invoiceAfterFirst);
 });
 
 /**

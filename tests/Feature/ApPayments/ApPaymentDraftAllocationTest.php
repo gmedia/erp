@@ -6,6 +6,7 @@ use App\Models\Branch;
 use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use App\Models\Supplier;
+use App\Models\ApPaymentAllocation;
 use App\Models\SupplierBill;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
@@ -278,7 +279,7 @@ test('deleting a draft payment leaves bill due unchanged', function () {
         ->and($bill->status)->toBe('confirmed');
 });
 
-test('moving a confirmed payment allocation off a bill restores that bill due', function () {
+test('moving a confirmed payment allocation off a bill is locked 422 and leaves allocation unchanged', function () {
     $billA = apDraftBill($this->supplier);
     $billB = apDraftBill($this->supplier);
 
@@ -299,13 +300,18 @@ test('moving a confirmed payment allocation off a bill restores that bill due', 
         'allocations' => [
             ['supplier_bill_id' => $billB->id, 'allocated_amount' => 500000],
         ],
-    ])->assertOk();
+    ])->assertStatus(422);
 
     $billA->refresh();
     $billB->refresh();
-    expect((float) $billA->amount_paid)->toBe(0.0)
-        ->and((float) $billA->amount_due)->toBe(1000000.0)
-        ->and($billA->status)->toBe('confirmed')
-        ->and((float) $billB->amount_paid)->toBe(500000.0)
-        ->and($billB->status)->toBe('partially_paid');
+    expect((float) $billA->amount_paid)->toBe(500000.0)
+        ->and((float) $billA->amount_due)->toBe(500000.0)
+        ->and($billA->status)->toBe('partially_paid')
+        ->and((float) $billB->amount_paid)->toBe(0.0)
+        ->and((float) $billB->amount_due)->toBe(1000000.0)
+        ->and($billB->status)->toBe('confirmed');
+    expect(ApPaymentAllocation::query()
+        ->where('ap_payment_id', $payment['id'])
+        ->pluck('supplier_bill_id')
+        ->all())->toBe([$billA->id]);
 });
