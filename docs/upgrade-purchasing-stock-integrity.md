@@ -17,7 +17,7 @@ Dokumen ini untuk administrator dan tim yang mengoperasikan ERP setelah pembarua
 |---------|--------------------|
 | goods-receipts | Field sistem diabaikan; accepted + rejected <= received; total tidak boleh melebihi qty PO |
 | purchase-orders, purchase-requests | `approved_*` diabaikan dari payload |
-| stock-adjustments | `approved_*` dan field jurnal diabaikan; keluar tidak boleh membuat saldo negatif |
+| stock-adjustments | `approved_*` dan field jurnal diabaikan; keluar tidak boleh membuat saldo negatif (berlaku juga untuk approve lewat PUT) |
 | stock-transfers | `shipped_at` dan `received_at` diisi server saat transisi |
 | supplier-returns | Qty retur dibatasi sisa qty diterima |
 | inventory-stocktakes | Selesai membuat draft penyesuaian (lihat butir di atas) |
