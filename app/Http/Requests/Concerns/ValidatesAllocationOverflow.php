@@ -9,6 +9,8 @@ trait ValidatesAllocationOverflow
 {
     /**
      * @param  Closure(int): ?float  $getMaxAllocationFor
+     * @param  (Closure(array<string, mixed>): float)|null  $getConsumedAmount
+     *                                                                          Nilai yang memakan sisa (default: allocated_amount)
      */
     protected function validateAllocationOverflow(
         Validator $validator,
@@ -16,6 +18,7 @@ trait ValidatesAllocationOverflow
         string $referenceIdKey,
         string $errorMessagePrefix,
         Closure $getMaxAllocationFor,
+        ?Closure $getConsumedAmount = null,
     ): void {
         $allocations = $this->input($inputKey, []);
 
@@ -30,10 +33,14 @@ trait ValidatesAllocationOverflow
                 continue;
             }
 
-            if ((float) $allocation['allocated_amount'] > $maxAllocation) {
+            $consumed = $getConsumedAmount !== null
+                ? $getConsumedAmount($allocation)
+                : (float) $allocation['allocated_amount'];
+
+            if ($consumed > $maxAllocation) {
                 $validator->errors()->add(
                     "{$inputKey}.{$index}.allocated_amount",
-                    $errorMessagePrefix . ': ' . $maxAllocation,
+                    $errorMessagePrefix.': '.$maxAllocation,
                 );
             }
         }

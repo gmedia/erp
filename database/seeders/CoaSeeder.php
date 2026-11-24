@@ -156,7 +156,7 @@ class CoaSeeder extends Seeder
         app(PostOpeningCapitalJournalAction::class)->execute(
             $fiscalYear->start_date->format('Y-m-d'),
             500000000,
-            'OPEN-CAP-' . $fiscalYear->name,
+            'OPEN-CAP-'.$fiscalYear->name,
             'Saldo awal modal disetor pemilik',
         );
     }
@@ -319,6 +319,13 @@ class CoaSeeder extends Seeder
                         'normal_balance' => 'credit',
                         'level' => 2,
                     ],
+                    [
+                        'code' => '41900',
+                        'name' => 'Sales Discount',
+                        'type' => 'revenue',
+                        'normal_balance' => 'debit',
+                        'level' => 2,
+                    ],
                 ],
             ],
             // Expense
@@ -334,6 +341,13 @@ class CoaSeeder extends Seeder
                         'name' => 'Cost of Goods Sold',
                         'type' => 'expense',
                         'normal_balance' => 'debit',
+                        'level' => 2,
+                    ],
+                    [
+                        'code' => '51900',
+                        'name' => 'Purchase Discount',
+                        'type' => 'expense',
+                        'normal_balance' => 'credit',
                         'level' => 2,
                     ],
                     [
@@ -523,6 +537,13 @@ class CoaSeeder extends Seeder
                         'normal_balance' => 'credit',
                         'level' => 2,
                     ],
+                    [
+                        'code' => '41900',
+                        'name' => 'Sales Discount',
+                        'type' => 'revenue',
+                        'normal_balance' => 'debit',
+                        'level' => 2,
+                    ],
                 ],
             ],
             // Expense
@@ -538,6 +559,13 @@ class CoaSeeder extends Seeder
                         'name' => 'Cost of Goods Sold',
                         'type' => 'expense',
                         'normal_balance' => 'debit',
+                        'level' => 2,
+                    ],
+                    [
+                        'code' => '51900',
+                        'name' => 'Purchase Discount',
+                        'type' => 'expense',
+                        'normal_balance' => 'credit',
                         'level' => 2,
                     ],
                     // CHANGE 2: Renamed Operating Expense to General & Admin Expense

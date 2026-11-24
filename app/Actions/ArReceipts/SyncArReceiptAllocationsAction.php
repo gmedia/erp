@@ -69,10 +69,12 @@ class SyncArReceiptAllocationsAction
                 continue;
             }
 
+            // Issue #437: diskon alokasi ikut mengurangi sisa invoice (settlement = kas + diskon).
             $totalReceived = ArReceiptAllocation::query()
                 ->where('customer_invoice_id', $invoiceId)
                 ->whereHas('receipt', fn ($q) => $q->whereIn('status', self::POSTED_STATUSES))
-                ->sum('allocated_amount');
+                ->selectRaw('COALESCE(SUM(allocated_amount + discount_given), 0) as settled')
+                ->value('settled');
             $amountDue = (float) $invoice->grand_total
                 - $totalReceived
                 - (float) $invoice->credit_note_amount;
@@ -91,7 +93,7 @@ class SyncArReceiptAllocationsAction
     public function assertStoredWithinOutstanding(ArReceipt $arReceipt): void
     {
         $stored = $arReceipt->allocations()
-            ->get(['customer_invoice_id', 'allocated_amount'])
+            ->get(['customer_invoice_id', 'allocated_amount', 'discount_given'])
             ->toArray();
 
         $this->assertWithinOutstanding($arReceipt, $stored);
@@ -106,9 +108,11 @@ class SyncArReceiptAllocationsAction
      */
     private function assertWithinOutstanding(ArReceipt $arReceipt, array $allocations): void
     {
+        // Issue #437: setiap alokasi memakan kas + diskon dari sisa invoice.
         $requested = collect($allocations)
             ->groupBy(fn (array $row) => (int) $row['customer_invoice_id'])
-            ->map(fn ($rows) => $rows->sum(fn (array $row) => (float) $row['allocated_amount']));
+            ->map(fn ($rows) => $rows->sum(fn (array $row) => (float) $row['allocated_amount']
+                + (float) ($row['discount_given'] ?? 0)));
 
         foreach ($requested as $invoiceId => $amount) {
             $invoice = CustomerInvoice::where('id', $invoiceId)->lockForUpdate()->first();
@@ -120,7 +124,8 @@ class SyncArReceiptAllocationsAction
                 ->where('customer_invoice_id', $invoiceId)
                 ->where('ar_receipt_id', '!=', $arReceipt->id)
                 ->whereHas('receipt', fn ($q) => $q->whereIn('status', self::POSTED_STATUSES))
-                ->sum('allocated_amount');
+                ->selectRaw('COALESCE(SUM(allocated_amount + discount_given), 0) as settled')
+                ->value('settled');
 
             $max = (float) $invoice->grand_total - (float) $postedOthers - (float) $invoice->credit_note_amount;
 
