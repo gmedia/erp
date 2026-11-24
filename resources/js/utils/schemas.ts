@@ -252,6 +252,20 @@ export const journalEntryFormSchema = z.object({
         )
         .min(2, { message: 'At least 2 lines are required.' })
         .refine(
+            (lines) =>
+                lines.every((line) => {
+                    const hasDebit = line.debit > 0;
+                    const hasCredit = line.credit > 0;
+
+                    return hasDebit !== hasCredit;
+                }),
+            {
+                message:
+                    'Each line must have an amount on either debit or credit, not both.',
+                path: ['root'],
+            },
+        )
+        .refine(
             (lines) => {
                 const totalDebit = lines.reduce(
                     (sum, line) => sum + (line.debit || 0),
@@ -264,7 +278,7 @@ export const journalEntryFormSchema = z.object({
                 return Math.abs(totalDebit - totalCredit) < 0.01;
             },
             {
-                message: 'Total Debit and Total Credit must be equal.',
+                message: 'Total debit and total credit must be equal.',
                 path: ['root'],
             },
         ),

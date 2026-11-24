@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Account;
+use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
 use App\Models\JournalEntryLine;
@@ -41,7 +42,11 @@ test('it can list draft journal entries', function () {
 });
 
 test('it can bulk post balanced journals', function () {
-    $accounts = Account::factory()->count(2)->create();
+    $coa = CoaVersion::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'status' => 'active',
+    ]);
+    $accounts = Account::factory()->count(2)->create(['coa_version_id' => $coa->id]);
 
     $entry1 = JournalEntry::factory()->create(['status' => 'draft', 'fiscal_year_id' => $this->fiscalYear->id]);
     JournalEntryLine::create([
@@ -82,6 +87,41 @@ test('it can bulk post balanced journals', function () {
         ->and($entry2->fresh()->status)->toBe('posted')
         ->and($entry1->fresh()->posted_at)->not->toBeNull()
         ->and($entry1->fresh()->posted_by)->toBe($this->user->id);
+});
+
+test('it rejects posting a journal that uses an inactive account', function () {
+    $coa = CoaVersion::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'status' => 'active',
+    ]);
+    $activeAccount = Account::factory()->create(['coa_version_id' => $coa->id]);
+    $inactiveAccount = Account::factory()->create([
+        'coa_version_id' => $coa->id,
+        'is_active' => false,
+    ]);
+
+    $entry = JournalEntry::factory()->create(['status' => 'draft', 'fiscal_year_id' => $this->fiscalYear->id]);
+    JournalEntryLine::create([
+        'journal_entry_id' => $entry->id,
+        'account_id' => $activeAccount->id,
+        'debit' => 300,
+        'credit' => 0,
+    ]);
+    JournalEntryLine::create([
+        'journal_entry_id' => $entry->id,
+        'account_id' => $inactiveAccount->id,
+        'debit' => 0,
+        'credit' => 300,
+    ]);
+
+    $response = postJson('/api/posting-journals/post', [
+        'ids' => [$entry->id],
+    ]);
+
+    $response->assertStatus(200);
+    $response->assertJson(['success_count' => 0]);
+    expect($response->json('failures'))->toHaveKey((string) $entry->id)
+        ->and($entry->fresh()->status)->toBe('draft');
 });
 
 test('it fails to post unbalanced journals', function () {
