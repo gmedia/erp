@@ -54,7 +54,9 @@ function buildGoodsReceiptItemSchema(
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     path: ['quantity_accepted'],
-                    message: t('goodsReceipt.item.quantity_accepted_exceeds_received'),
+                    message: t(
+                        'goodsReceipt.item.quantity_accepted_exceeds_received',
+                    ),
                 });
             }
         });
