@@ -4,6 +4,7 @@ import { PermissionManager } from '@/components/permissions/PermissionManager';
 import { Card, CardContent } from '@/components/ui/card';
 import { useTranslation } from '@/contexts/i18n-context';
 import { useEmployeePermissions } from '@/hooks/permissions/useEmployeePermissions';
+import { usePermissions } from '@/hooks/usePermissions';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
 import { BreadcrumbItem } from '@/types';
@@ -28,6 +29,8 @@ function PermissionsEmptyState() {
 }
 
 export default function PermissionsIndex() {
+    const { can } = usePermissions();
+    const canEdit = can('user.edit');
     const [permissions, setPermissions] = useState<Permission[]>([]);
 
     useEffect(() => {
@@ -103,6 +106,7 @@ export default function PermissionsIndex() {
                                     onSelectionChange={setSelectedPermissions}
                                     onSave={handleSave}
                                     loading={loading}
+                                    canEdit={canEdit}
                                 />
                             ) : (
                                 <PermissionsEmptyState />

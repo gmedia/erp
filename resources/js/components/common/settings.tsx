@@ -147,6 +147,7 @@ export function SettingsSaveButton({
     testId,
     dataTest,
     label = 'Save',
+    hidden = false,
 }: Readonly<{
     formId: string;
     processing: boolean;
@@ -155,7 +156,12 @@ export function SettingsSaveButton({
     /** Atribut `data-test` lama yang masih dipakai E2E. */
     dataTest?: string;
     label?: string;
+    hidden?: boolean;
 }>) {
+    if (hidden) {
+        return null;
+    }
+
     return (
         <>
             <Transition

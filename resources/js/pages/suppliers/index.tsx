@@ -8,6 +8,7 @@ const config = {
     ...supplierConfig,
     toolbarActions: (
         <ImportDialog
+            permission="supplier.create"
             title="Import Suppliers"
             importRoute="/api/suppliers/import"
             templateHeaders={[

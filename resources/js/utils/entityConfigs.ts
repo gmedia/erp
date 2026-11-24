@@ -30,6 +30,8 @@ export interface BaseEntityConfig<
     readonly breadcrumbs: readonly BreadcrumbItem[];
     readonly getDeleteMessage: (item: T) => string;
     readonly initialFilters?: FilterType;
+    /** Prefix permission modul (`department` -> `.create/.edit/.delete`). Kosong = tanpa gating. */
+    readonly permissionPrefix?: string;
 }
 
 // Configuration for entities with custom components and stricter typing
@@ -167,6 +169,7 @@ export interface SimpleEntityConfigOptions<T = unknown> {
     description?: string;
     apiBase: string;
     filterPlaceholder: string;
+    permissionPrefix?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     viewModalComponent?: React.ComponentType<any>;
     getDeleteMessage?: (item: T) => string;
@@ -194,6 +197,7 @@ export interface ComplexEntityConfigOptions<T = Record<string, unknown>> {
     defaultColumnVisibility?: Record<string, boolean>;
     loadDetailOnEdit?: boolean;
     detailLoadErrorMessage?: string;
+    permissionPrefix?: string;
 }
 
 // Factory to create a bound SimpleEntityViewModal for a specific entity
@@ -225,12 +229,14 @@ function createSimpleEntityConfig<
         description,
         apiBase,
         filterPlaceholder,
+        permissionPrefix,
     } = options;
 
     return {
         entityName,
         entityNamePlural,
         description,
+        permissionPrefix,
         apiEndpoint: `/api/${apiBase}`,
         exportEndpoint: `/api/${apiBase}/export`,
         queryKey: [apiBase],
@@ -270,6 +276,7 @@ function createComplexEntityConfig<T = Record<string, unknown>>(
         defaultColumnVisibility: options.defaultColumnVisibility,
         loadDetailOnEdit: options.loadDetailOnEdit,
         detailLoadErrorMessage: options.detailLoadErrorMessage,
+        permissionPrefix: options.permissionPrefix,
     };
 }
 
@@ -280,6 +287,7 @@ export const departmentConfig = createSimpleEntityConfig({
     description: 'Organizational units used to group employees and assets.',
     apiBase: 'departments',
     filterPlaceholder: 'Search departments...',
+    permissionPrefix: 'department',
 });
 
 export const positionConfig = createSimpleEntityConfig({
@@ -288,6 +296,7 @@ export const positionConfig = createSimpleEntityConfig({
     description: 'Job titles assignable to employees.',
     apiBase: 'positions',
     filterPlaceholder: 'Search positions...',
+    permissionPrefix: 'position',
 });
 
 export const branchConfig = createSimpleEntityConfig({
@@ -296,6 +305,7 @@ export const branchConfig = createSimpleEntityConfig({
     description: 'Company branches used across transactions and reports.',
     apiBase: 'branches',
     filterPlaceholder: 'Search branches...',
+    permissionPrefix: 'branch',
 });
 
 export const warehouseConfig = createComplexEntityConfig<Warehouse>({
@@ -312,6 +322,7 @@ export const warehouseConfig = createComplexEntityConfig<Warehouse>({
     formComponent: WarehouseForm,
     formType: 'complex',
     entityNameForSearch: 'warehouse',
+    permissionPrefix: 'warehouse',
     viewModalComponent: WarehouseViewModal,
     getDeleteMessage: (item: { name?: string; code?: string }) =>
         `This action cannot be undone. This will permanently delete warehouse ${item.code} (${item.name}).`,
@@ -338,6 +349,7 @@ export const employeeConfig = createComplexEntityConfig({
     formComponent: EmployeeForm,
     formType: 'complex',
     entityNameForSearch: 'employee',
+    permissionPrefix: 'employee',
     viewModalComponent: EmployeeViewModal,
     getDeleteMessage: (employee: { name?: string }) =>
         `This action cannot be undone. This will permanently delete ${employee.name}'s employee record.`,
@@ -363,6 +375,7 @@ export const customerConfig = createComplexEntityConfig({
     formComponent: CustomerForm,
     formType: 'complex',
     entityNameForSearch: 'customer',
+    permissionPrefix: 'customer',
     viewModalComponent: CustomerViewModal,
     getDeleteMessage: (customer: { name?: string }) =>
         `This action cannot be undone. This will permanently delete ${customer.name}'s customer record.`,
@@ -388,6 +401,7 @@ export const supplierConfig = createComplexEntityConfig({
     formComponent: SupplierForm,
     formType: 'complex',
     entityNameForSearch: 'supplier',
+    permissionPrefix: 'supplier',
     viewModalComponent: SupplierViewModal,
     getDeleteMessage: (supplier: { name?: string }) =>
         `This action cannot be undone. This will permanently delete ${supplier.name}'s supplier record.`,
@@ -420,6 +434,7 @@ export const stockTransferConfig = createComplexEntityConfig<StockTransfer>({
     viewModalComponent: StockTransferViewModal,
     getDeleteMessage: (transfer: { transfer_number?: string | null }) =>
         `This action cannot be undone. This will cancel stock transfer ${transfer.transfer_number || ''}.`,
+    permissionPrefix: 'stock_transfer',
 });
 
 export const inventoryStocktakeConfig =
@@ -448,6 +463,7 @@ export const inventoryStocktakeConfig =
         viewModalComponent: InventoryStocktakeViewModal,
         getDeleteMessage: (stocktake: { stocktake_number?: string | null }) =>
             `This action cannot be undone. This will cancel inventory stocktake ${stocktake.stocktake_number || ''}.`,
+        permissionPrefix: 'inventory_stocktake',
     });
 
 export const stockAdjustmentConfig = createComplexEntityConfig<StockAdjustment>(
@@ -476,6 +492,7 @@ export const stockAdjustmentConfig = createComplexEntityConfig<StockAdjustment>(
         viewModalComponent: StockAdjustmentViewModal,
         getDeleteMessage: (adjustment: { adjustment_number?: string | null }) =>
             `This action cannot be undone. This will cancel stock adjustment ${adjustment.adjustment_number || ''}.`,
+        permissionPrefix: 'stock_adjustment',
     },
 );
 
@@ -515,6 +532,7 @@ export const purchaseRequestConfig = createComplexEntityConfig<PurchaseRequest>(
         viewModalComponent: PurchaseRequestViewModal,
         getDeleteMessage: (purchaseRequest: { pr_number?: string | null }) =>
             `This action cannot be undone. This will cancel purchase request ${purchaseRequest.pr_number || ''}.`,
+        permissionPrefix: 'purchase_request',
     },
 );
 
@@ -548,6 +566,7 @@ export const purchaseOrderConfig = createComplexEntityConfig<PurchaseOrder>({
     viewModalComponent: PurchaseOrderViewModal,
     getDeleteMessage: (purchaseOrder: { po_number?: string | null }) =>
         `This action cannot be undone. This will delete purchase order ${purchaseOrder.po_number || ''}.`,
+    permissionPrefix: 'purchase_order',
 });
 
 export const goodsReceiptConfig = createComplexEntityConfig<GoodsReceipt>({
@@ -575,6 +594,7 @@ export const goodsReceiptConfig = createComplexEntityConfig<GoodsReceipt>({
     viewModalComponent: GoodsReceiptViewModal,
     getDeleteMessage: (goodsReceipt: { gr_number?: string | null }) =>
         `This action cannot be undone. This will delete goods receipt ${goodsReceipt.gr_number || ''}.`,
+    permissionPrefix: 'goods_receipt',
 });
 
 export const supplierReturnConfig = createComplexEntityConfig<SupplierReturn>({
@@ -609,6 +629,7 @@ export const supplierReturnConfig = createComplexEntityConfig<SupplierReturn>({
     viewModalComponent: SupplierReturnViewModal,
     getDeleteMessage: (supplierReturn: { return_number?: string | null }) =>
         `This action cannot be undone. This will delete supplier return ${supplierReturn.return_number || ''}.`,
+    permissionPrefix: 'supplier_return',
 });
 
 export const supplierCategoryConfig = createSimpleEntityConfig({
@@ -617,6 +638,7 @@ export const supplierCategoryConfig = createSimpleEntityConfig({
     description: 'Categories used to group suppliers.',
     apiBase: 'supplier-categories',
     filterPlaceholder: 'Search supplier categories...',
+    permissionPrefix: 'supplier_category',
 });
 
 export const customerCategoryConfig = createSimpleEntityConfig({
@@ -625,6 +647,7 @@ export const customerCategoryConfig = createSimpleEntityConfig({
     description: 'Categories used to group customers.',
     apiBase: 'customer-categories',
     filterPlaceholder: 'Search customer categories...',
+    permissionPrefix: 'customer_category',
 });
 
 export const assetCategoryConfig = createComplexEntityConfig<AssetCategory>({
@@ -641,6 +664,7 @@ export const assetCategoryConfig = createComplexEntityConfig<AssetCategory>({
     formComponent: AssetCategoryForm,
     formType: 'complex',
     entityNameForSearch: 'asset category',
+    permissionPrefix: 'asset_category',
     viewModalComponent: AssetCategoryViewModal,
     getDeleteMessage: createGenericDeleteMessage('Asset Category'),
 });
@@ -664,6 +688,7 @@ export const productCategoryConfig = createComplexEntityConfig<ProductCategory>(
         formComponent: ProductCategoryForm,
         formType: 'complex',
         entityNameForSearch: 'product category',
+        permissionPrefix: 'product_category',
         viewModalComponent: ProductCategoryViewModal,
         getDeleteMessage: createGenericDeleteMessage('Product Category'),
     },
@@ -683,6 +708,7 @@ export const unitConfig = createComplexEntityConfig<Unit>({
     formComponent: UnitForm,
     formType: 'complex',
     entityNameForSearch: 'unit',
+    permissionPrefix: 'unit',
     viewModalComponent: UnitViewModal,
     getDeleteMessage: createGenericDeleteMessage('Unit'),
 });
@@ -709,6 +735,7 @@ export const productConfig = createComplexEntityConfig({
     formComponent: ProductForm,
     formType: 'complex',
     entityNameForSearch: 'product',
+    permissionPrefix: 'product',
     viewModalComponent: ProductViewModal,
     getDeleteMessage: (product: { name?: string }) =>
         `This action cannot be undone. This will permanently delete ${product.name}'s product record.`,
@@ -725,6 +752,7 @@ export const fiscalYearConfig = createComplexEntityConfig<FiscalYear>({
     description:
         'Accounting periods that scope journals and financial reports.',
     apiEndpoint: '/api/fiscal-years',
+    permissionPrefix: 'fiscal_year',
     exportEndpoint: '/api/fiscal-years/export',
     queryKey: ['fiscal-years'],
     breadcrumbs: [{ title: 'Fiscal Years', href: '/fiscal-years' }],
@@ -749,6 +777,7 @@ export const coaVersionConfig = createComplexEntityConfig<CoaVersion>({
     entityNamePlural: 'COA Versions',
     description: 'Chart of accounts versions per fiscal year.',
     apiEndpoint: '/api/coa-versions',
+    permissionPrefix: 'coa_version',
     exportEndpoint: '/api/coa-versions/export',
     queryKey: ['coa-versions'],
     breadcrumbs: [{ title: 'COA Versions', href: '/coa-versions' }],
@@ -773,6 +802,7 @@ export const accountMappingConfig = createComplexEntityConfig<AccountMapping>({
     entityNamePlural: 'Account Mappings',
     description: 'Maps control accounts to transaction types.',
     apiEndpoint: '/api/account-mappings',
+    permissionPrefix: 'account_mapping',
     exportEndpoint: '/api/account-mappings/export',
     queryKey: ['account-mappings'],
     breadcrumbs: [{ title: 'Account Mappings', href: '/account-mappings' }],
@@ -808,6 +838,7 @@ export const journalEntryConfig = createComplexEntityConfig<JournalEntry>({
     entityNamePlural: 'Journal Entries',
     description: 'Manual journal entries with debit and credit lines.',
     apiEndpoint: '/api/journal-entries',
+    permissionPrefix: 'journal_entry',
     exportEndpoint: '/api/journal-entries/export',
     queryKey: ['journal-entries'],
     breadcrumbs: [{ title: 'Journal Entries', href: '/journal-entries' }],
@@ -846,6 +877,7 @@ export const assetModelConfig = createComplexEntityConfig<AssetModel>({
     viewModalComponent: AssetModelViewModal,
     getDeleteMessage: (item: { model_name?: string }) =>
         `This action cannot be undone. This will permanently delete ${item.model_name || 'this asset model'}.`,
+    permissionPrefix: 'asset_model',
 });
 
 import { assetLocationColumns } from '@/components/asset-locations/AssetLocationColumns';
@@ -871,6 +903,7 @@ export const assetLocationConfig = createComplexEntityConfig<AssetLocation>({
     viewModalComponent: AssetLocationViewModal,
     getDeleteMessage: (item: { name?: string }) =>
         `This action cannot be undone. This will permanently delete ${item.name || 'this asset location'}.`,
+    permissionPrefix: 'asset_location',
 });
 
 export const assetConfig = createComplexEntityConfig<Asset>({
@@ -902,6 +935,7 @@ export const assetConfig = createComplexEntityConfig<Asset>({
     viewModalComponent: AssetViewModal,
     getDeleteMessage: (item: { name?: string; asset_code?: string }) =>
         `This action cannot be undone. This will permanently delete asset ${item.asset_code} (${item.name}).`,
+    permissionPrefix: 'asset',
 });
 
 export const assetMovementConfig = createComplexEntityConfig({
@@ -925,6 +959,7 @@ export const assetMovementConfig = createComplexEntityConfig({
     viewModalComponent: AssetMovementViewModal,
     getDeleteMessage: () =>
         'This action cannot be undone. This will permanently delete this movement record.',
+    permissionPrefix: 'asset_movement',
 });
 
 export const assetMaintenanceConfig =
@@ -964,6 +999,7 @@ export const assetMaintenanceConfig =
         },
         getDeleteMessage: () =>
             'This action cannot be undone. This will permanently delete this maintenance record.',
+        permissionPrefix: 'asset_maintenance',
     });
 
 import { assetStocktakeColumns } from '@/components/asset-stocktakes/AssetStocktakeColumns';
@@ -996,6 +1032,7 @@ export const assetStocktakeConfig = createComplexEntityConfig<AssetStocktake>({
     viewModalComponent: AssetStocktakeViewModal,
     getDeleteMessage: (item: { reference?: string }) =>
         `This action cannot be undone. This will permanently delete stocktake ${item.reference}.`,
+    permissionPrefix: 'asset_stocktake',
 });
 
 import { pipelineColumns } from '@/components/pipelines/PipelineColumns';
@@ -1008,6 +1045,7 @@ export const pipelineConfig = createComplexEntityConfig<Pipeline>({
     entityNamePlural: 'Pipelines',
     description: 'Workflow pipelines and the states entities move through.',
     apiEndpoint: '/api/pipelines',
+    permissionPrefix: 'pipeline',
     exportEndpoint: '/api/pipelines/export',
     queryKey: ['pipelines'],
     breadcrumbs: [{ title: 'Pipelines', href: '/pipelines' }],
@@ -1034,6 +1072,7 @@ export const approvalFlowConfig = createComplexEntityConfig<ApprovalFlow>({
     entityNamePlural: 'Approval Flows',
     description: 'Approval definitions with ordered steps and approvers.',
     apiEndpoint: '/api/approval-flows',
+    permissionPrefix: 'approval_flow',
     exportEndpoint: '/api/approval-flows/export',
     queryKey: ['approval-flows'],
     breadcrumbs: [{ title: 'Approval Flows', href: '/approval-flows' }],
@@ -1097,6 +1136,7 @@ export const supplierBillConfig = createComplexEntityConfig<SupplierBill>({
     viewModalComponent: SupplierBillViewModal,
     getDeleteMessage: (bill: { bill_number?: string | null }) =>
         `This action cannot be undone. This will delete supplier bill ${bill.bill_number || ''}.`,
+    permissionPrefix: 'supplier_bill',
 });
 
 export const apPaymentConfig = createComplexEntityConfig<ApPayment>({
@@ -1134,6 +1174,7 @@ export const apPaymentConfig = createComplexEntityConfig<ApPayment>({
     viewModalComponent: ApPaymentViewModal,
     getDeleteMessage: (payment: { payment_number?: string | null }) =>
         `This action cannot be undone. This will delete AP payment ${payment.payment_number || ''}.`,
+    permissionPrefix: 'ap_payment',
 });
 
 export const approvalDelegationConfig =
@@ -1143,6 +1184,7 @@ export const approvalDelegationConfig =
         description:
             'Delegations that let another user approve on your behalf for a period.',
         apiEndpoint: '/api/approval-delegations',
+        permissionPrefix: 'approval_delegation',
         exportEndpoint: '/api/approval-delegations/export',
         queryKey: ['approval-delegations'],
         breadcrumbs: [
@@ -1220,6 +1262,7 @@ export const customerInvoiceConfig = createComplexEntityConfig<CustomerInvoice>(
         viewModalComponent: CustomerInvoiceViewModal,
         getDeleteMessage: (item: { invoice_number?: string | null }) =>
             `This action cannot be undone. This will permanently delete invoice ${item.invoice_number}.`,
+        permissionPrefix: 'customer_invoice',
     },
 );
 
@@ -1258,6 +1301,7 @@ export const arReceiptConfig = createComplexEntityConfig<ArReceipt>({
     viewModalComponent: ArReceiptViewModal,
     getDeleteMessage: (item: { receipt_number?: string | null }) =>
         `This action cannot be undone. This will permanently delete receipt ${item.receipt_number}.`,
+    permissionPrefix: 'ar_receipt',
 });
 
 export const creditNoteConfig = createComplexEntityConfig<CreditNote>({
@@ -1265,6 +1309,7 @@ export const creditNoteConfig = createComplexEntityConfig<CreditNote>({
     entityNamePlural: 'Credit Notes',
     description: 'Credit notes that reduce customer invoice balances.',
     apiEndpoint: '/api/credit-notes',
+    permissionPrefix: 'credit_note',
     exportEndpoint: '/api/credit-notes/export',
     queryKey: ['credit-notes'],
     breadcrumbs: [{ title: 'Credit Notes', href: '/credit-notes' }],
@@ -1307,6 +1352,7 @@ export const recurringJournalConfig =
         entityNamePlural: 'Recurring Journals',
         description: 'Templates for journals that repeat on a schedule.',
         apiEndpoint: '/api/recurring-journals',
+        permissionPrefix: 'recurring_journal',
         exportEndpoint: '/api/recurring-journals/export',
         queryKey: ['recurring-journals'],
         breadcrumbs: [
@@ -1339,6 +1385,7 @@ export const bankReconciliationConfig =
         description:
             'Match bank statement balances with the books for each account.',
         apiEndpoint: '/api/bank-reconciliations',
+        permissionPrefix: 'bank_reconciliation',
         exportEndpoint: '/api/bank-reconciliations/export',
         queryKey: ['bank-reconciliations'],
         breadcrumbs: [
@@ -1366,6 +1413,7 @@ export const periodClosingConfig = createComplexEntityConfig<PeriodClosing>({
     entityNamePlural: 'Period Closings',
     description: 'Close accounting periods and carry balances forward.',
     apiEndpoint: '/api/period-closings',
+    permissionPrefix: 'period_closing',
     exportEndpoint: '/api/period-closings/export',
     queryKey: ['period-closings'],
     breadcrumbs: [{ title: 'Period Closings', href: '/period-closings' }],
@@ -1398,6 +1446,7 @@ export const reportConfigurationConfig =
         description:
             'Settings that define how each report is generated and displayed.',
         apiEndpoint: '/api/report-configurations',
+        permissionPrefix: 'report_configuration',
         exportEndpoint: '/api/report-configurations/export',
         queryKey: ['report-configurations'],
         breadcrumbs: [
@@ -1419,6 +1468,7 @@ export const budgetConfig = createComplexEntityConfig<Budget>({
     entityNamePlural: 'Budgets',
     description: 'Budget plans per account with period breakdown.',
     apiEndpoint: '/api/budgets',
+    permissionPrefix: 'budget',
     exportEndpoint: '/api/budgets/export',
     queryKey: ['budgets'],
     breadcrumbs: [{ title: 'Budgets', href: '/budgets' }],
