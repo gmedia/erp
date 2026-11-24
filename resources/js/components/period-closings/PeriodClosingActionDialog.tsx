@@ -24,7 +24,9 @@ interface PeriodClosingActionDialogProps {
 
 /** Label periode untuk pesan konfirmasi, mengikuti bahasa aktif. */
 function formatPeriodLabel(item: PeriodClosing, locale: string): string {
-    if (item.closing_type === 'yearly') return String(item.period_year);
+    if (item.closing_type !== 'monthly' || !item.period_month) {
+        return String(item.period_year);
+    }
 
     return new Intl.DateTimeFormat(locale, {
         month: 'long',
