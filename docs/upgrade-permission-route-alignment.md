@@ -74,4 +74,4 @@ Bila tombol ini ditambahkan di kemudian hari, tombolnya wajib digate dengan perm
 ## Verifikasi
 
 - Login sebagai karyawan yang diberi izin, lalu buka modul terkait.
-- Aksi tambah, ubah, dan hapus ditolak bila izin aksinya belum dimiliki. Tombolnya masih dapat terlihat sampai penyesuaian tampilan dirilis.
+- Aksi tambah, ubah, dan hapus ditolak bila izin aksinya belum dimiliki. Tombol Add, Edit, dan Delete (serta aksi khusus) disembunyikan bila izin yang sesuai belum dimiliki. Baris aksi yang tidak punya aksi yang diizinkan tidak menampilkan menu.
