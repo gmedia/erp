@@ -41,8 +41,9 @@ test.describe('Asset Import E2E Tests', () => {
         fs.writeFileSync(filePath, csvContent);
 
         // 2. Navigate to Assets page
+        const listResponse = page.waitForResponse(r => r.url().includes('/api/assets') && r.status() === 200);
         await page.goto('/assets');
-        await page.waitForResponse(r => r.url().includes('/api/assets') && r.status() === 200);
+        await listResponse;
 
         // 3. Open Import Dialog
         const importButton = page.getByRole('button', { name: /import/i });
@@ -79,9 +80,9 @@ test.describe('Asset Import E2E Tests', () => {
         // Search for the new asset
         const searchInput = page.getByPlaceholder('Search assets...');
         await searchInput.fill(uniqueAssetCode);
+        const searchResponse = page.waitForResponse(r => r.url().includes('/api/assets') && r.status() === 200);
         await searchInput.press('Enter');
-        
-        await page.waitForResponse(r => r.url().includes('/api/assets') && r.status() === 200);
+        await searchResponse;
         
         await expect(page.getByText(uniqueAssetCode)).toBeVisible();
         await expect(page.getByText(`E2E Asset ${timestamp}`)).toBeVisible();

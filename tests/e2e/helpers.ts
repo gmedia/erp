@@ -191,12 +191,13 @@ export async function openModule(
     apiPath: string,
 ): Promise<void> {
     await login(page, undefined, undefined, { requireDashboard: false });
-    await page.goto(route);
-    await page.waitForResponse(
+    const responsePromise = page.waitForResponse(
         (response) =>
             response.url().includes(apiPath) && response.status() < 400,
         { timeout: 15000 },
     );
+    await page.goto(route);
+    await responsePromise;
 }
 
 export async function createEntity(
