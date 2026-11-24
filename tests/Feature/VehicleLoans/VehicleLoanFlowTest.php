@@ -20,7 +20,12 @@ uses(RefreshDatabase::class, CreatesTestUserWithPermissions::class)->group('vehi
 beforeEach(function () {
     Mail::fake();
     $this->user = $this->createTestUserWithPermissions([
-        'vehicle_loan', 'vehicle_loan.pickup', 'vehicle_loan.return', 'vehicle_loan.security', 'my_approvals',
+        'vehicle_loan',
+        'vehicle_loan.request',
+        'vehicle_loan.pickup',
+        'vehicle_loan.return',
+        'vehicle_loan.security',
+        'my_approvals',
     ]);
     Sanctum::actingAs($this->user, ['*']);
 });

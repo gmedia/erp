@@ -40,12 +40,17 @@ Route::middleware('permission:vehicle_loan,true')->group(function () {
     ]);
 
     Route::get('vehicle-loans/{vehicle_loan}', [VehicleLoanController::class, 'show']);
-    Route::post('vehicle-loans', [VehicleLoanController::class, 'store']);
-    Route::put('vehicle-loans/{vehicle_loan}', [VehicleLoanController::class, 'update']);
-    Route::delete('vehicle-loans/{vehicle_loan}', [VehicleLoanController::class, 'destroy']);
+    // Requester actions: the controller limits update/submit to the loan's own requester.
+    Route::post('vehicle-loans', [VehicleLoanController::class, 'store'])
+        ->middleware('permission:vehicle_loan.request,true');
+    Route::put('vehicle-loans/{vehicle_loan}', [VehicleLoanController::class, 'update'])
+        ->middleware('permission:vehicle_loan.request,true');
+    Route::delete('vehicle-loans/{vehicle_loan}', [VehicleLoanController::class, 'destroy'])
+        ->middleware('permission:vehicle_loan.request,true');
 
     // Submit is validated against the stored draft in the controller.
-    Route::post('vehicle-loans/{vehicle_loan}/submit', [VehicleLoanController::class, 'submit']);
+    Route::post('vehicle-loans/{vehicle_loan}/submit', [VehicleLoanController::class, 'submit'])
+        ->middleware('permission:vehicle_loan.request,true');
 
     Route::post('vehicle-loans/{vehicle_loan}/pickups', [
         VehicleLoanController::class, 'storePickup',
