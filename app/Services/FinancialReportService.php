@@ -68,7 +68,8 @@ class FinancialReportService
     /**
      * Total arus kas untuk ringkasan laporan (dipakai config cash_flow).
      *
-     * @return array{cash_inflow: float, cash_outflow: float, net_change: float}
+     * @return array{cash_inflow: float, cash_outflow: float, net_change: float,
+     *     operating_cash_flow: float, investing_cash_flow: float, financing_cash_flow: float}
      */
     public function getCashFlowTotals(int $fiscalYearId, ?int $branchId = null): array
     {
@@ -76,11 +77,125 @@ class FinancialReportService
 
         $inflow = array_sum(array_column($rows, 'inflow'));
         $outflow = array_sum(array_column($rows, 'outflow'));
+        $activities = $this->getCashFlowActivityTotals($fiscalYearId, $branchId);
 
         return [
             'cash_inflow' => round($inflow, 2),
             'cash_outflow' => round($outflow, 2),
-            'net_change' => round($inflow - $outflow, 2),
+            // Independen dari klasifikasi: perubahan kas langsung dari baris akun kas.
+            'net_change' => $this->getCashNetChange($fiscalYearId, $branchId),
+            'operating_cash_flow' => $activities['operating'],
+            'investing_cash_flow' => $activities['investing'],
+            'financing_cash_flow' => $activities['financing'],
+        ];
+    }
+
+    /**
+     * Perubahan kas periode: jumlah (debit - kredit) seluruh baris akun kas pada
+     * jurnal posted tahun fiskal. Himpunan jurnal sama dengan klasifikasi aktivitas.
+     */
+    public function getCashNetChange(int $fiscalYearId, ?int $branchId = null): float
+    {
+        $balance = JournalEntryLine::query()
+            ->toBase()
+            ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+            ->join('accounts as line_accounts', 'line_accounts.id', '=', 'journal_entry_lines.account_id')
+            ->where('journal_entries.fiscal_year_id', $fiscalYearId)
+            ->where('journal_entries.status', 'posted')
+            ->where('line_accounts.is_cash_flow', true)
+            ->when($branchId !== null, fn ($q) => $q->where('journal_entry_lines.branch_id', $branchId))
+            ->selectRaw('COALESCE(SUM(journal_entry_lines.debit - journal_entry_lines.credit), 0) as balance')
+            ->value('balance');
+
+        return round((float) $balance, 2);
+    }
+
+    /**
+     * Saldo kas awal periode: jumlah mutasi kas posted sebelum tanggal mulai
+     * tahun fiskal. Tanpa kolom saldo awal baru, sehingga tidak perlu migrasi.
+     */
+    public function getOpeningCashBalance(int $fiscalYearId, ?int $branchId = null): float
+    {
+        $fiscalYear = FiscalYear::findOrFail($fiscalYearId);
+
+        // Lintas versi COA: jurnal tahun lalu memakai akun versi lama, jadi akun
+        // kas dikenali dari flag is_cash_flow di versi mana pun, bukan versi terpilih.
+        $balance = JournalEntryLine::query()
+            ->toBase()
+            ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+            ->join('accounts as line_accounts', 'line_accounts.id', '=', 'journal_entry_lines.account_id')
+            ->where('journal_entries.status', 'posted')
+            ->where('journal_entries.entry_date', '<', $fiscalYear->start_date->toDateString())
+            ->where('line_accounts.is_cash_flow', true)
+            ->when($branchId !== null, fn ($q) => $q->where('journal_entry_lines.branch_id', $branchId))
+            ->selectRaw('COALESCE(SUM(journal_entry_lines.debit - journal_entry_lines.credit), 0) as balance')
+            ->value('balance');
+
+        return round((float) $balance, 2);
+    }
+
+    /**
+     * Klasifikasi arus kas per aktivitas (operasi, investasi, pendanaan).
+     *
+     * Setiap jurnal posted yang menyentuh akun kas dipecah per baris lawan:
+     * kontribusi baris lawan = kredit - debit (kas masuk bernilai positif).
+     * Karena jurnal seimbang, jumlah kontribusi sama dengan perubahan kas.
+     * Baris lawan yang juga akun kas (transfer antar kas) saling meniadakan.
+     *
+     * Kelompok ditentukan dari akun lawan:
+     * - investasi: sub_type non_current_asset (aset tetap & akumulasi penyusutan)
+     * - pendanaan: sub_type non_current_liability atau type equity
+     * - operasi: selain itu
+     *
+     * @return array{operating: float, investing: float, financing: float}
+     */
+    public function getCashFlowActivityTotals(int $fiscalYearId, ?int $branchId = null): array
+    {
+        $totals = ['operating' => 0.0, 'investing' => 0.0, 'financing' => 0.0];
+
+        // Himpunan jurnal sama dengan net_change (tanpa filter versi COA pada baris
+        // lawan), agar jumlah aktivitas selalu sama dengan perubahan kas.
+        // Query builder (bukan model) agar tipe baris jelas dan atribut `type`
+        // pada JournalEntryLine yang di-override accessor tidak ikut terbaca.
+        $lines = JournalEntryLine::query()
+            ->toBase()
+            ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+            ->join('accounts as line_accounts', 'line_accounts.id', '=', 'journal_entry_lines.account_id')
+            ->where('journal_entries.fiscal_year_id', $fiscalYearId)
+            ->where('journal_entries.status', 'posted')
+            ->when($branchId !== null, fn ($q) => $q->where('journal_entry_lines.branch_id', $branchId))
+            ->get([
+                'journal_entry_lines.journal_entry_id',
+                'journal_entry_lines.debit',
+                'journal_entry_lines.credit',
+                'line_accounts.is_cash_flow',
+                'line_accounts.type as account_type',
+                'line_accounts.sub_type as account_sub_type',
+            ]);
+
+        foreach ($lines->groupBy('journal_entry_id') as $journalLines) {
+            $hasCashLine = $journalLines->contains(fn (object $line): bool => (bool) $line->is_cash_flow);
+            if (! $hasCashLine) {
+                continue;
+            }
+
+            $counterLines = $journalLines->reject(fn (object $line): bool => (bool) $line->is_cash_flow);
+
+            foreach ($counterLines as $counter) {
+                $contribution = (float) $counter->credit - (float) $counter->debit;
+                if ($contribution === 0.0) {
+                    continue;
+                }
+
+                $activity = $this->classifyCashFlowActivity($counter->account_type, $counter->account_sub_type);
+                $totals[$activity] += $contribution;
+            }
+        }
+
+        return [
+            'operating' => round($totals['operating'], 2),
+            'investing' => round($totals['investing'], 2),
+            'financing' => round($totals['financing'], 2),
         ];
     }
 
@@ -836,6 +951,19 @@ class FinancialReportService
         }
 
         return $chain;
+    }
+
+    private function classifyCashFlowActivity(?string $type, ?string $subType): string
+    {
+        if ($subType === 'non_current_asset') {
+            return 'investing';
+        }
+
+        if ($subType === 'non_current_liability' || $type === 'equity') {
+            return 'financing';
+        }
+
+        return 'operating';
     }
 
     private function accountsWithPostedSums(int $coaVersionId, int $fiscalYearId, ?int $branchId = null): Builder
