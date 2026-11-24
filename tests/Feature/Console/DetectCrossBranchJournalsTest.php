@@ -35,7 +35,7 @@ beforeEach(function () {
 
 test('detects zero multi-branch journals on single-branch data', function () {
     $this->action->execute([
-        'entry_date' => '2026-02-01',
+        'entry_date' => '2026-03-02',
         'description' => 'Single-branch entry',
         'status' => 'posted',
         'branch_id' => $this->branchA->id,
@@ -52,7 +52,7 @@ test('detects zero multi-branch journals on single-branch data', function () {
 
 test('detects multi-branch journals and clearing lines once a cross-branch entry exists', function () {
     $this->action->execute([
-        'entry_date' => '2026-02-01',
+        'entry_date' => '2026-03-02',
         'description' => 'Inter-branch cash transfer A -> B',
         'status' => 'posted',
         'lines' => [
@@ -68,7 +68,7 @@ test('detects multi-branch journals and clearing lines once a cross-branch entry
 
 test('posted-only scope ignores draft cross-branch journals', function () {
     $this->action->execute([
-        'entry_date' => '2026-02-01',
+        'entry_date' => '2026-03-02',
         'description' => 'Draft inter-branch entry',
         'status' => 'draft',
         'lines' => [
@@ -86,7 +86,7 @@ test('logs a warning when multi-branch journals are detected', function () {
     Log::spy();
 
     $this->action->execute([
-        'entry_date' => '2026-02-01',
+        'entry_date' => '2026-03-02',
         'description' => 'Inter-branch cash transfer A -> B',
         'status' => 'posted',
         'lines' => [
@@ -109,7 +109,7 @@ test('does not log a warning when no multi-branch journals exist', function () {
     Log::spy();
 
     $this->action->execute([
-        'entry_date' => '2026-02-01',
+        'entry_date' => '2026-03-02',
         'description' => 'Single-branch entry',
         'status' => 'posted',
         'branch_id' => $this->branchA->id,
@@ -141,7 +141,7 @@ test('captures a Sentry message when multi-branch journals are detected', functi
 
     try {
         $this->action->execute([
-            'entry_date' => '2026-02-01',
+            'entry_date' => '2026-03-02',
             'description' => 'Inter-branch cash transfer A -> B',
             'status' => 'posted',
             'lines' => [
