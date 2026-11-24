@@ -77,6 +77,7 @@ class AssetMovementController extends Controller
                     'created_by' => Auth::id(),
                     'document_path' => $document['path'] ?? null,
                     'document_name' => $document['name'] ?? null,
+                    'status_before_disposal' => $request->movement_type === 'dispose' ? $asset->status : null,
                 ]);
 
                 // Update asset current state
@@ -117,6 +118,26 @@ class AssetMovementController extends Controller
     {
         $validated = $request->validated();
         unset($validated['document']);
+
+        // Status aset hanya berubah lewat store/destroy. Edit tidak boleh mengubah tipe atau aset
+        // dari/ke dispose, karena itu membuat status aset tertinggal (stale).
+        $isDispose = $asset_movement->movement_type === 'dispose';
+        $typeChangesDispose = array_key_exists('movement_type', $validated)
+            && ($validated['movement_type'] === 'dispose') !== $isDispose;
+        $assetChanges = array_key_exists('asset_id', $validated)
+            && (int) $validated['asset_id'] !== $asset_movement->asset_id;
+
+        if ($typeChangesDispose) {
+            throw ValidationException::withMessages([
+                'movement_type' => __('asset_movements.dispose_type_locked'),
+            ]);
+        }
+
+        if ($isDispose && $assetChanges) {
+            throw ValidationException::withMessages([
+                'asset_id' => __('asset_movements.dispose_type_locked'),
+            ]);
+        }
 
         $oldDocumentPath = $asset_movement->document_path;
         $document = $this->storeDocument($request->file('document'));
@@ -196,8 +217,8 @@ class AssetMovementController extends Controller
                     ->where('movement_type', 'dispose')
                     ->exists();
 
-                if (! $stillDisposed) {
-                    $asset->update(['status' => $asset->status === 'disposed' ? 'active' : $asset->status]);
+                if (! $stillDisposed && $asset->status === 'disposed') {
+                    $asset->update(['status' => $asset_movement->status_before_disposal ?? 'active']);
                 }
             }
 
@@ -220,7 +241,7 @@ class AssetMovementController extends Controller
         if ($movementType === 'dispose') {
             if ($asset->status === 'disposed') {
                 throw ValidationException::withMessages([
-                    'movement_type' => 'Aset sudah dilepas (disposed).',
+                    'movement_type' => __('asset_movements.dispose_already_disposed'),
                 ]);
             }
 
@@ -229,7 +250,10 @@ class AssetMovementController extends Controller
 
         if (in_array($asset->status, ['disposed', 'lost'], true)) {
             throw ValidationException::withMessages([
-                'asset_id' => "Mutasi '{$movementType}' tidak diizinkan untuk aset berstatus {$asset->status}.",
+                'asset_id' => __('asset_movements.movement_not_allowed_for_status', [
+                    'type' => $movementType,
+                    'status' => $asset->status,
+                ]),
             ]);
         }
     }

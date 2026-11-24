@@ -94,6 +94,80 @@ test('deleting the dispose movement restores the asset status', function () {
     assertDatabaseHas('assets', ['id' => $asset->id, 'status' => 'active']);
 });
 
+test('deleting a dispose movement restores the status the asset had before disposal', function () {
+    $asset = Asset::factory()->create(['status' => 'maintenance']);
+
+    postJson('/api/asset-movements', [
+        'asset_id' => $asset->id,
+        'movement_type' => 'dispose',
+        'moved_at' => now()->format('Y-m-d H:i:s'),
+    ])->assertStatus(201);
+
+    $movement = AssetMovement::where('asset_id', $asset->id)->firstOrFail();
+    deleteJson("/api/asset-movements/{$movement->id}")->assertStatus(200);
+
+    assertDatabaseHas('assets', ['id' => $asset->id, 'status' => 'maintenance']);
+});
+
+test('deleting a legacy dispose movement without a saved status restores active', function () {
+    $asset = Asset::factory()->create(['status' => 'disposed']);
+    $movement = AssetMovement::create([
+        'asset_id' => $asset->id,
+        'movement_type' => 'dispose',
+        'moved_at' => now(),
+        'from_branch_id' => $asset->branch_id,
+        'from_location_id' => $asset->asset_location_id,
+        'from_department_id' => $asset->department_id,
+        'from_employee_id' => $asset->employee_id,
+        'created_by' => null,
+        'status_before_disposal' => null,
+    ]);
+
+    deleteJson("/api/asset-movements/{$movement->id}")->assertStatus(200);
+
+    assertDatabaseHas('assets', ['id' => $asset->id, 'status' => 'active']);
+});
+
+test('changing the movement type of a dispose movement is rejected with 422', function () {
+    $asset = Asset::factory()->create(['status' => 'active']);
+
+    postJson('/api/asset-movements', [
+        'asset_id' => $asset->id,
+        'movement_type' => 'dispose',
+        'moved_at' => now()->format('Y-m-d H:i:s'),
+    ])->assertStatus(201);
+
+    $movement = AssetMovement::where('asset_id', $asset->id)->firstOrFail();
+    putJson("/api/asset-movements/{$movement->id}", [
+        'movement_type' => 'adjustment',
+        'moved_at' => now()->format('Y-m-d H:i:s'),
+    ])->assertStatus(422)->assertJsonValidationErrors('movement_type');
+
+    expect($movement->fresh()->movement_type)->toBe('dispose');
+    assertDatabaseHas('assets', ['id' => $asset->id, 'status' => 'disposed']);
+});
+
+test('moving a dispose movement to another asset is rejected with 422', function () {
+    $asset = Asset::factory()->create(['status' => 'active']);
+    $other = Asset::factory()->create(['status' => 'active']);
+
+    postJson('/api/asset-movements', [
+        'asset_id' => $asset->id,
+        'movement_type' => 'dispose',
+        'moved_at' => now()->format('Y-m-d H:i:s'),
+    ])->assertStatus(201);
+
+    $movement = AssetMovement::where('asset_id', $asset->id)->firstOrFail();
+    putJson("/api/asset-movements/{$movement->id}", [
+        'asset_id' => $other->id,
+        'moved_at' => now()->format('Y-m-d H:i:s'),
+    ])->assertStatus(422)->assertJsonValidationErrors('asset_id');
+
+    expect($movement->fresh()->asset_id)->toBe($asset->id);
+    assertDatabaseHas('assets', ['id' => $asset->id, 'status' => 'disposed']);
+    assertDatabaseHas('assets', ['id' => $other->id, 'status' => 'active']);
+});
+
 test('editing a dispose movement cannot leave the asset status stale', function () {
     $asset = Asset::factory()->create(['status' => 'active']);
 
