@@ -36,21 +36,43 @@ class CalculateDepreciationAction
 
             // Run calculated yang belum diposting menyimpan akumulasi basi. Menghitung bulan berikutnya
             // di atasnya membuat posting run kedua menimpa accumulated_depreciation dengan nilai yang sama.
-            $unpostedRun = AssetDepreciationRun::where('status', 'calculated')->exists();
+            // Cek ini global (lintas tahun fiskal). Baris run calculated dikunci (urut id) agar
+            // posting bersamaan tidak lolos cek, dan exists() tidak mengabaikan lock.
+            $unpostedRun = AssetDepreciationRun::where('status', 'calculated')
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->first(['id']);
 
-            if ($unpostedRun) {
+            if ($unpostedRun !== null) {
                 throw ValidationException::withMessages([
                     'period_start' => __('asset_depreciation_runs.unposted_run_exists'),
                 ]);
             }
 
-            $run = AssetDepreciationRun::create([
-                'fiscal_year_id' => $data['fiscal_year_id'],
-                'period_start' => $data['period_start'],
-                'period_end' => $data['period_end'],
-                'status' => 'calculated',
-                'created_by' => Auth::id(),
-            ]);
+            // Unique (fiscal_year_id, period_start, period_end) tidak mengenal status, jadi run void
+            // untuk periode persis sama dihidupkan kembali sebagai calculated, bukan di-insert ulang.
+            $voidRun = AssetDepreciationRun::where('fiscal_year_id', $data['fiscal_year_id'])
+                ->where('period_start', $data['period_start'])
+                ->where('period_end', $data['period_end'])
+                ->where('status', 'void')
+                ->first();
+
+            if ($voidRun) {
+                AssetDepreciationLine::where('asset_depreciation_run_id', $voidRun->id)->delete();
+                $voidRun->update([
+                    'status' => 'calculated',
+                    'created_by' => Auth::id(),
+                ]);
+                $run = $voidRun;
+            } else {
+                $run = AssetDepreciationRun::create([
+                    'fiscal_year_id' => $data['fiscal_year_id'],
+                    'period_start' => $data['period_start'],
+                    'period_end' => $data['period_end'],
+                    'status' => 'calculated',
+                    'created_by' => Auth::id(),
+                ]);
+            }
 
             // Find eligible assets (optionally limited to $data['asset_codes'], used by seeders)
             $assets = Asset::whereIn('status', ['active', 'maintenance'])

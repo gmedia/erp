@@ -39,9 +39,14 @@ class PostDepreciationToJournalAction
                 // Kunci aset agar akumulasi tidak berubah antara cek dan update.
                 $asset = Asset::whereKey($line->asset_id)->lockForUpdate()->firstOrFail();
 
-                if ((float) $line->accumulated_before !== (float) $asset->accumulated_depreciation) {
+                $calculatedAccumulated = round((float) $line->accumulated_before, 2);
+                $currentAccumulated = round((float) $asset->accumulated_depreciation, 2);
+
+                if ($calculatedAccumulated !== $currentAccumulated) {
                     throw ValidationException::withMessages([
-                        'lines' => "Asset {$asset->asset_code} changed after this run was calculated.",
+                        'lines' => __('asset_depreciation_runs.asset_changed_after_calculated', [
+                            'code' => $asset->asset_code,
+                        ]),
                     ]);
                 }
 

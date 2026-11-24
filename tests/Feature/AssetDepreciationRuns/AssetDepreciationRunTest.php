@@ -626,3 +626,160 @@ test('every life month posts exactly one line and only the final month takes the
         expect($accumulated)->toBe((float) $depreciable);
     }
 });
+
+test('review 443 putaran 4 butir 1: void a calculated run unblocks the next calculation', function () {
+    $asset = Asset::factory()->create([
+        'purchase_cost' => 1000,
+        'salvage_value' => 0,
+        'useful_life_months' => 3,
+        'depreciation_start_date' => '2024-01-01',
+        'depreciation_method' => 'straight_line',
+        'status' => 'active',
+        'book_value' => 1000,
+        'accumulated_depreciation' => 0,
+    ]);
+
+    $run = postJson('/api/asset-depreciation-runs/calculate', [
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'period_start' => '2024-01-01',
+        'period_end' => '2024-01-31',
+    ])->assertStatus(200)->json('run');
+
+    postJson("/api/asset-depreciation-runs/{$run['id']}/void")
+        ->assertStatus(200)
+        ->assertJsonPath('run.status', 'void');
+
+    expect(AssetDepreciationRun::find($run['id'])->status)->toBe('void');
+    expect(AssetDepreciationLine::where('asset_id', $asset->id)
+        ->where('asset_depreciation_run_id', $run['id'])
+        ->exists())->toBeTrue();
+
+    // Run void tidak memblokir perhitungan periode yang sama: run dihidupkan kembali (unique periode),
+    // dan lines lama dari run void dihapus sehingga tidak ada dobel baris.
+    postJson('/api/asset-depreciation-runs/calculate', [
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'period_start' => '2024-01-01',
+        'period_end' => '2024-01-31',
+    ])->assertStatus(200)->assertJsonPath('run.status', 'calculated');
+
+    expect(AssetDepreciationRun::count())->toBe(1);
+    expect(AssetDepreciationRun::where('status', 'calculated')->count())->toBe(1);
+    expect(AssetDepreciationLine::where('asset_id', $asset->id)->count())->toBe(1);
+});
+
+test('review 443 putaran 4 butir 1: void is idempotent and rejects a posted run (422)', function () {
+    $run = AssetDepreciationRun::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'period_start' => '2024-01-01',
+        'period_end' => '2024-01-31',
+        'status' => 'calculated',
+    ]);
+
+    postJson("/api/asset-depreciation-runs/{$run->id}/void")->assertStatus(200);
+    postJson("/api/asset-depreciation-runs/{$run->id}/void")->assertStatus(422);
+
+    expect($run->fresh()->status)->toBe('void');
+
+    $posted = AssetDepreciationRun::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'period_start' => '2024-02-01',
+        'period_end' => '2024-02-29',
+        'status' => 'posted',
+    ]);
+
+    postJson("/api/asset-depreciation-runs/{$posted->id}/void")->assertStatus(422);
+    expect($posted->fresh()->status)->toBe('posted');
+});
+
+test('review 443 putaran 4 butir 2: stale-accumulation message is translated and compares to 2 decimals', function () {
+    $coaVersion = CoaVersion::factory()->create(['status' => 'active']);
+    $account = Account::factory()->create(['coa_version_id' => $coaVersion->id, 'is_active' => true]);
+
+    $asset = Asset::factory()->create([
+        'asset_code' => 'AST-REV443',
+        'purchase_cost' => 1000,
+        'salvage_value' => 0,
+        'useful_life_months' => 3,
+        'depreciation_start_date' => '2024-01-01',
+        'depreciation_method' => 'straight_line',
+        'status' => 'active',
+        'book_value' => 667,
+        'accumulated_depreciation' => 333.004,
+        'depreciation_expense_account_id' => $account->id,
+        'accumulated_depr_account_id' => $account->id,
+    ]);
+
+    $run = AssetDepreciationRun::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'period_start' => '2024-02-01',
+        'period_end' => '2024-02-29',
+        'status' => 'calculated',
+    ]);
+    AssetDepreciationLine::factory()->create([
+        'asset_depreciation_run_id' => $run->id,
+        'asset_id' => $asset->id,
+        'amount' => 333,
+        'accumulated_before' => 333.0,
+        'accumulated_after' => 666,
+        'book_value_after' => 334,
+    ]);
+
+    // Selisih 0.004 dibulatkan ke 2 desimal, jadi dianggap sama (tidak ditolak).
+    postJson("/api/asset-depreciation-runs/{$run->id}/post")->assertStatus(200);
+
+    $stale = AssetDepreciationRun::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'period_start' => '2024-03-01',
+        'period_end' => '2024-03-31',
+        'status' => 'calculated',
+    ]);
+    AssetDepreciationLine::factory()->create([
+        'asset_depreciation_run_id' => $stale->id,
+        'asset_id' => $asset->id,
+        'amount' => 10,
+        'accumulated_before' => 1,
+        'accumulated_after' => 11,
+        'book_value_after' => 0,
+    ]);
+
+    $response = postJson("/api/asset-depreciation-runs/{$stale->id}/post")->assertStatus(422);
+    $expectedMessage = __('asset_depreciation_runs.asset_changed_after_calculated', [
+        'code' => 'AST-REV443',
+    ]);
+    expect(json_encode($response->json('errors')))->toContain($expectedMessage);
+});
+
+test('review 443 putaran 4 butir 3: a calculated run in another fiscal year still blocks calculate (422)', function () {
+    $otherFiscalYear = FiscalYear::factory()->create([
+        'start_date' => '2025-01-01',
+        'end_date' => '2025-12-31',
+        'status' => 'open',
+    ]);
+
+    Asset::factory()->create([
+        'purchase_cost' => 1000,
+        'salvage_value' => 0,
+        'useful_life_months' => 3,
+        'depreciation_start_date' => '2024-01-01',
+        'depreciation_method' => 'straight_line',
+        'status' => 'active',
+        'book_value' => 1000,
+        'accumulated_depreciation' => 0,
+    ]);
+
+    // Run belum diposting di tahun fiskal lain; calculate di tahun ini harus tetap ditolak.
+    AssetDepreciationRun::factory()->create([
+        'fiscal_year_id' => $otherFiscalYear->id,
+        'period_start' => '2025-01-01',
+        'period_end' => '2025-01-31',
+        'status' => 'calculated',
+    ]);
+
+    postJson('/api/asset-depreciation-runs/calculate', [
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'period_start' => '2024-01-01',
+        'period_end' => '2024-01-31',
+    ])->assertStatus(422)->assertJsonValidationErrors('period_start');
+
+    expect(AssetDepreciationRun::where('fiscal_year_id', $this->fiscalYear->id)->count())->toBe(0);
+});
