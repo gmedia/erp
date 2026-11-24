@@ -328,13 +328,6 @@ jobs:
           echo "::warning::Failed to push autofixes after 3 attempts; continuing. Please apply formatting locally."
           exit 0
 
-      - name: Configure MinIO bucket
-        if: steps.autofix.outputs.changed != 'true'
-        run: |
-          ./vendor/bin/sail exec -T minio mc alias set myminio http://localhost:9000 sail password
-          ./vendor/bin/sail exec -T minio mc mb myminio/local || true
-          ./vendor/bin/sail exec -T minio mc anonymous set download myminio/local || true
-
       - name: Generate Application Key
         if: steps.autofix.outputs.changed != 'true'
         run: ./vendor/bin/sail artisan key:generate
@@ -375,23 +368,138 @@ jobs:
         if: steps.autofix.outputs.changed != 'true'
         run: ./vendor/bin/sail npm run build:mobile
 
+      - name: Stop Sail
+        if: always()
+        run: |
+          if [ -x ./vendor/bin/sail ]; then
+            ./vendor/bin/sail down -v
+          fi
+
+  pest:
+    name: Pest & Sonar via Sail
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    # Runs next to Quality. When Quality pushes autofixes, the `ci` job fails this run
+    # and the follow-up run re-tests the new commit.
+    permissions:
+      contents: read
+      packages: read
+      pull-requests: read
+
+    steps:
+      - name: Checkout source branch
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          repository: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@d59004228537ca90c8dca680592a08a675bf52b6 # v2
+        with:
+          php-version: 8.4
+          tools: composer:v2
+          coverage: none
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          sed -i "s/^WWWUSER=.*/WWWUSER=$(id -u)/" .env
+          sed -i "s/^WWWGROUP=.*/WWWGROUP=$(id -g)/" .env
+          mkdir -p storage/tmp
+          chmod -R u+rwX,g+rwX,o-rwx storage/tmp
+
+      - name: Bootstrap Sail dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Pull CI Sail image
+        shell: bash
+        timeout-minutes: 5
+        run: |
+          branch_tag="${GITHUB_BASE_REF:-${GITHUB_REF_NAME}}"
+          branch_tag=$(echo "$branch_tag" | tr -cd '[:alnum:]._-')
+
+          candidates=(
+            "$CI_SAIL_IMAGE"
+            "ghcr.io/${GITHUB_REPOSITORY}/ci-sail:${branch_tag}"
+            "ghcr.io/${GITHUB_REPOSITORY}/ci-sail:latest"
+          )
+
+          for image in "${candidates[@]}"; do
+            for attempt in 1 2 3; do
+              if timeout 60s docker pull "$image"; then
+                docker tag "$image" sail-8.4/app
+                exit 0
+              fi
+
+              if [ "$attempt" -lt 3 ]; then
+                echo "CI Sail image $image not available. Retry ${attempt}/3 in 10s..."
+                sleep 10
+              fi
+            done
+          done
+
+          echo "::error::Unable to pull any CI Sail image candidate after retries."
+          exit 1
+
+      - name: Start Sail
+        run: |
+          docker volume rm erp_sail-mariadb 2>/dev/null || true
+          ./vendor/bin/sail up -d --wait
+
+      - name: Capture MariaDB logs on failure
+        if: failure()
+        run: |
+          echo "::group::MariaDB container logs"
+          docker logs erp-mariadb-1 2>&1 || true
+          echo "::endgroup::"
+          echo "::group::All container status"
+          docker ps -a 2>&1 || true
+          echo "::endgroup::"
+
+      - name: Cache npm dependencies
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-npm-
+
+      - name: Install Node dependencies
+        run: ./vendor/bin/sail npm ci
+
+      - name: Configure MinIO bucket
+        run: |
+          ./vendor/bin/sail exec -T minio mc alias set myminio http://localhost:9000 sail password
+          ./vendor/bin/sail exec -T minio mc mb myminio/local || true
+          ./vendor/bin/sail exec -T minio mc anonymous set download myminio/local || true
+
+      - name: Generate Application Key
+        run: ./vendor/bin/sail artisan key:generate
+
+      - name: Clear configuration cache
+        run: ./vendor/bin/sail artisan config:clear
+
+      - name: Build assets
+        run: ./vendor/bin/sail npm run build
+
       - name: Run tests with coverage
-        if: ${{ steps.autofix.outputs.changed != 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+        if: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
         run: ./vendor/bin/sail test --colors=always --coverage-clover=coverage.xml
 
       - name: Run tests
-        if: ${{ steps.autofix.outputs.changed != 'true' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
         run: ./vendor/bin/sail test --colors=always
 
       - name: Setup Java for Sonar scanner
-        if: ${{ success() && steps.autofix.outputs.changed != 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+        if: ${{ success() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
         uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4.8.0
         with:
           distribution: temurin
           java-version: '21'
 
       - name: Run SonarQube Cloud scan
-        if: ${{ success() && steps.autofix.outputs.changed != 'true' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+        if: ${{ success() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
         uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -405,7 +513,7 @@ jobs:
             -Dsonar.projectKey=gmedia_erp
 
       - name: Upload failure logs
-        if: failure() && steps.autofix.outputs.changed != 'true'
+        if: failure()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         continue-on-error: true
         with:
@@ -718,7 +826,7 @@ jobs:
 
   ci:
     name: Test suite via Sail
-    needs: [quality, e2e, mobile_android]
+    needs: [quality, pest, e2e, mobile_android]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -730,9 +838,10 @@ jobs:
             exit 1
           fi
 
-          echo "quality=${{ needs.quality.result }} e2e=${{ needs.e2e.result }} mobile=${{ needs.mobile_android.result }}"
+          echo "quality=${{ needs.quality.result }} pest=${{ needs.pest.result }} e2e=${{ needs.e2e.result }} mobile=${{ needs.mobile_android.result }}"
 
           quality_result="${{ needs.quality.result }}"
+          pest_result="${{ needs.pest.result }}"
           e2e_result="${{ needs.e2e.result }}"
           mobile_result="${{ needs.mobile_android.result }}"
 
@@ -744,8 +853,16 @@ jobs:
             quality_passed=false
           fi
 
-          if [[ "$e2e_result" == "success" || "$e2e_result" == "skipped" || "$e2e_result" == "cancelled" ]]; then
-            echo "✅ e2e=$e2e_result (non-blocking)"
+          if [[ "$pest_result" == "success" ]]; then
+            echo "✅ pest=success"
+            pest_passed=true
+          else
+            echo "❌ pest=$pest_result"
+            pest_passed=false
+          fi
+
+          if [[ "$e2e_result" == "success" ]]; then
+            echo "✅ e2e=success"
             e2e_passed=true
           else
             echo "❌ e2e=$e2e_result"
@@ -760,7 +877,7 @@ jobs:
             mobile_passed=false
           fi
 
-          if [[ "$quality_passed" == "true" ]] && [[ "$e2e_passed" == "true" ]] && [[ "$mobile_passed" == "true" ]]; then
+          if [[ "$quality_passed" == "true" ]] && [[ "$pest_passed" == "true" ]] && [[ "$e2e_passed" == "true" ]] && [[ "$mobile_passed" == "true" ]]; then
             echo "CI=success"
             echo "ci=success" >> "$GITHUB_OUTPUT"
             exit 0
