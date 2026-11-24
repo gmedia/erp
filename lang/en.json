@@ -25,8 +25,7 @@
         "fill_details": "Please fill in the details below.",
         "view_details": "Here are the details for this item.",
         "stocktake_adjustment_draft": "Stock Adjustment Draft",
-        "stocktake_adjustment_none": "-",
-  "stocktake_adjustment_note": "Draft from stocktake :stocktake"
+        "stocktake_adjustment_none": "-"
     },
     "permissions": {
         "empty_title": "No employee selected",
@@ -312,6 +311,7 @@
     "supplier_return.goods_receipt_mismatch": "The goods receipt must belong to the purchase order.",
     "supplier_return.gr_item_mismatch": "The GR item must belong to the selected goods receipt.",
   "supplier_return.returned_exceeds_received": "Returned quantity exceeds the remaining received quantity of this GR item.",
+    "inventory_stocktake.adjustment_note": "Draft from stocktake :stocktake",
     "goods_receipt.po_item_mismatch": "The PO item must belong to the selected purchase order.",
     "goods_receipt.po_not_approved": "Goods receipt can only be confirmed when the purchase order is confirmed or partially received.",
     "goods_receipt.accepted_exceeds_received": "Accepted plus rejected quantity cannot exceed the received quantity.",
