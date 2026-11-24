@@ -3,6 +3,7 @@
 namespace App\Actions\Approvals;
 
 use App\Events\ApprovalRequestApproved;
+use App\Exceptions\ConcurrentApprovalStepException;
 use App\Models\ApprovalAuditLog;
 use App\Models\ApprovalRequest;
 use App\Models\ApprovalRequestStep;
@@ -17,9 +18,18 @@ class ApproveApprovalRequestAction
         ?string $comments,
     ): void {
         DB::transaction(function () use ($approvalRequest, $currentStep, $userId, $comments): void {
+            $resolver = app(ResolveApprovalStepActorAction::class);
+
+            $locked = ApprovalRequestStep::query()->whereKey($currentStep->getKey())->lockForUpdate()->first();
+
+            if (! $locked instanceof ApprovalRequestStep || $locked->status !== 'pending') {
+                throw new ConcurrentApprovalStepException;
+            }
+
             $currentStep->update([
                 'status' => 'approved',
                 'acted_by' => $userId,
+                'delegated_from' => $resolver->delegatorFor($currentStep, $userId),
                 'action' => 'approve',
                 'comments' => $comments,
                 'acted_at' => now(),

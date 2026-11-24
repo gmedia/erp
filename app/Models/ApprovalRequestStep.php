@@ -75,6 +75,24 @@ class ApprovalRequestStep extends Model
         'due_at' => 'datetime',
     ];
 
+    /**
+     * Delegators whose steps $userId may currently act on (date range, is_active).
+     * Document-type scope is enforced when acting, see ResolveApprovalStepActorAction.
+     *
+     * @return list<int>
+     */
+    private static function activeDelegatorIdsFor(int $userId): array
+    {
+        return ApprovalDelegation::query()
+            ->where('delegate_user_id', $userId)
+            ->where('is_active', true)
+            ->whereDate('start_date', '<=', now()->toDateString())
+            ->whereDate('end_date', '>=', now()->toDateString())
+            ->pluck('delegator_user_id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+    }
+
     public function request(): BelongsTo
     {
         return $this->belongsTo(ApprovalRequest::class, 'approval_request_id');
@@ -134,7 +152,10 @@ class ApprovalRequestStep extends Model
             })
             ->whereHas('flowStep', function (Builder $flowStepQuery) use ($userId) {
                 $flowStepQuery->where('approver_type', 'user')
-                    ->where('approver_user_id', $userId);
+                    ->where(function (Builder $approverQuery) use ($userId): void {
+                        $approverQuery->where('approver_user_id', $userId)
+                            ->orWhereIn('approver_user_id', self::activeDelegatorIdsFor($userId));
+                    });
             });
     }
 }

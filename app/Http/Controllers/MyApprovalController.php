@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Approvals\ApproveApprovalRequestAction;
 use App\Actions\Approvals\RejectApprovalRequestAction;
+use App\Actions\Approvals\ResolveApprovalStepActorAction;
 use App\Http\Requests\MyApprovals\ApproveMyApprovalRequest;
 use App\Http\Requests\MyApprovals\RejectMyApprovalRequest;
 use App\Models\ApprovalRequest;
@@ -116,16 +117,6 @@ class MyApprovalController extends Controller
         ApprovalRequest $approvalRequest,
         int $userId,
     ): ?ApprovalRequestStep {
-        /** @var ApprovalRequestStep|null $step */
-        $step = $approvalRequest->steps()
-            ->where('status', 'pending')
-            ->where('step_order', $approvalRequest->current_step_order)
-            ->whereHas('flowStep', function ($flowStepQuery) use ($userId) {
-                $flowStepQuery->where('approver_type', 'user')
-                    ->where('approver_user_id', $userId);
-            })
-            ->first();
-
-        return $step;
+        return app(ResolveApprovalStepActorAction::class)->execute($approvalRequest, $userId);
     }
 }
