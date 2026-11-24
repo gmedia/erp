@@ -4,15 +4,20 @@ namespace App\Actions\AccountingPosting;
 
 use App\Actions\JournalEntries\CreateJournalEntryAction;
 use App\Models\GoodsReceipt;
+use App\Models\GoodsReceiptItem;
 use App\Models\JournalEntry;
 use App\Models\JournalEntryLine;
 use App\Models\SupplierBill;
+use App\Models\SupplierBillItem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class PostSupplierBillJournalAction
 {
     public const AP_CONTROL_ACCOUNT_CODE = '21100';
+
+    /** Beban selisih harga bill vs GR (keputusan #357 butir 5). */
+    public const PRICE_VARIANCE_ACCOUNT_CODE = '51000';
 
     /**
      * Tagihan yang sudah dikonfirmasi lalu berubah menjadi overdue/partially_paid/paid
@@ -55,16 +60,30 @@ class PostSupplierBillJournalAction
             $debitLines = [];
             $expenseGrouped = [];
 
-            // Bill atas GR: akun debit = akun yang benar-benar dikredit jurnal GR terkait
+            // Item bill atas GR: akun debit = akun yang benar-benar dikredit jurnal GR asalnya
             // (GR/IR untuk GR baru, 21100 untuk GR lama), supaya utang tidak tercatat ganda.
-            $grCreditAccountId = $this->grCreditAccountIdFor($supplierBill);
+            // GR/IR dikosongkan sebesar nilai penerimaan untuk qty yang ditagih (harga GR);
+            // selisih harga bill vs GR masuk 51000.
+            $varianceAmount = 0.0;
 
             foreach ($supplierBill->items as $item) {
-                $accountId = $item->goods_receipt_item_id !== null && $grCreditAccountId !== null
-                    ? $grCreditAccountId
-                    : (int) $item->account_id;
+                $grCreditAccountId = $item->goods_receipt_item_id !== null
+                    ? $this->grCreditAccountIdFor($item)
+                    : null;
+
+                if ($grCreditAccountId !== null) {
+                    $grValue = $this->grValueForBillItem($item);
+                    $expenseGrouped[$grCreditAccountId] = ($expenseGrouped[$grCreditAccountId] ?? 0.0) + $grValue;
+                    $varianceAmount += (float) $item->line_total - $grValue;
+
+                    continue;
+                }
+
+                $accountId = (int) $item->account_id;
                 $expenseGrouped[$accountId] = ($expenseGrouped[$accountId] ?? 0.0) + (float) $item->line_total;
             }
+
+            $varianceAmount = round($varianceAmount, 2);
 
             foreach ($expenseGrouped as $accountId => $amount) {
                 if ($amount <= 0) {
@@ -78,6 +97,18 @@ class PostSupplierBillJournalAction
                     'memo' => "Bill {$supplierBill->bill_number}",
                 ];
                 $debitTotal += $amount;
+            }
+
+            // Selisih harga: debit (bill lebih tinggi) atau kredit (bill lebih rendah) ke 51000.
+            if ($varianceAmount !== 0.0) {
+                $varianceAccount = $this->resolveControlAccount->execute(self::PRICE_VARIANCE_ACCOUNT_CODE);
+                $debitLines[] = [
+                    'account_id' => $varianceAccount->id,
+                    'debit' => $varianceAmount > 0 ? $varianceAmount : 0,
+                    'credit' => $varianceAmount < 0 ? -$varianceAmount : 0,
+                    'memo' => "Selisih harga Bill {$supplierBill->bill_number}",
+                ];
+                $debitTotal += $varianceAmount;
             }
 
             $debitTotal = round($debitTotal, 2);
@@ -110,16 +141,49 @@ class PostSupplierBillJournalAction
     }
 
     /**
+     * Nilai penerimaan GR untuk qty bill ini: qty x harga GR. Qty yang sudah ditagih
+     * bill lain (yang sudah diposting) untuk item GR yang sama tidak dihitung lagi.
+     */
+    private function grValueForBillItem(SupplierBillItem $item): float
+    {
+        $grItem = GoodsReceiptItem::query()->find($item->goods_receipt_item_id);
+
+        if ($grItem === null) {
+            return 0.0;
+        }
+
+        $alreadyBilled = (float) SupplierBillItem::query()
+            ->join('supplier_bills', 'supplier_bills.id', '=', 'supplier_bill_items.supplier_bill_id')
+            ->where('supplier_bill_items.goods_receipt_item_id', $grItem->id)
+            ->where('supplier_bill_items.supplier_bill_id', '!=', $item->supplier_bill_id)
+            ->whereIn('supplier_bills.status', self::POSTABLE_STATUSES)
+            ->sum('supplier_bill_items.quantity');
+
+        $remainingQty = round((float) $grItem->quantity_accepted - $alreadyBilled, 2);
+        $qty = (float) $item->quantity;
+
+        if ($qty > $remainingQty) {
+            throw ValidationException::withMessages([
+                'items' => "Qty bill melebihi sisa qty GR {$grItem->id} (sisa {$remainingQty}).",
+            ]);
+        }
+
+        return round($qty * (float) $grItem->unit_price, 2);
+    }
+
+    /**
      * Akun kredit pada jurnal GR terkait yang bukan AP. Null bila bill tanpa GR
      * atau GR belum punya jurnal; bill tanpa GR memakai akun item seperti biasa.
      */
-    private function grCreditAccountIdFor(SupplierBill $supplierBill): ?int
+    private function grCreditAccountIdFor(SupplierBillItem $item): ?int
     {
-        if ($supplierBill->goods_receipt_id === null) {
+        $grItem = GoodsReceiptItem::query()->find($item->goods_receipt_item_id);
+
+        if ($grItem === null) {
             return null;
         }
 
-        $goodsReceipt = GoodsReceipt::query()->find($supplierBill->goods_receipt_id);
+        $goodsReceipt = GoodsReceipt::query()->find($grItem->goods_receipt_id);
 
         if ($goodsReceipt === null || $goodsReceipt->journal_entry_id === null) {
             return null;
