@@ -248,3 +248,25 @@ test('batal bill terposting membalik baris jurnal asli, jurnal asli tetap posted
 
     assertDatabaseHas('supplier_bills', ['id' => $bill->id, 'status' => 'cancelled']);
 });
+
+test('batal invoice menyisakan saldo GL piutang nol (GL = subledger setelah batal)', function () {
+    $accounts = cancelTestAccounts();
+    $invoice = cancelTestInvoice($accounts);
+    app(PostCustomerInvoiceJournalAction::class)->execute($invoice->fresh());
+
+    putJson("/api/customer-invoices/{$invoice->id}", ['status' => 'cancelled'])->assertOk();
+
+    $glReceivable = round(
+        JournalEntryLine::query()
+            ->whereHas('journalEntry', fn ($q) => $q->where('status', 'posted'))
+            ->where('account_id', $accounts['ar']->id)
+            ->get(['debit', 'credit'])
+            ->sum(fn ($l) => (float) $l->debit - (float) $l->credit),
+        2,
+    );
+
+    $subledger = (float) $invoice->refresh()->amount_due;
+
+    expect($glReceivable)->toBe(0.0)
+        ->and($subledger)->toBe(0.0);
+});
