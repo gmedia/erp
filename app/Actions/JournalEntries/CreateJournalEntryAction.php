@@ -3,6 +3,7 @@
 namespace App\Actions\JournalEntries;
 
 use App\Actions\AccountingPosting\ResolveControlAccountAction;
+use App\Actions\PeriodClosings\AssertPeriodOpenForPostingAction;
 use App\Models\Account;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
@@ -73,6 +74,8 @@ class CreateJournalEntryAction
                             'entry_date' => 'Fiscal year is closed or locked.',
                         ]);
                     }
+
+                    app(AssertPeriodOpenForPostingAction::class)->execute($fiscalYear->id, $entryDate);
 
                     // Generate Entry Number
                     // We use max() instead of count() to handle deletions correctly (gaps in sequence)

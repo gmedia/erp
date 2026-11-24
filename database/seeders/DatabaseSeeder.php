@@ -246,14 +246,14 @@ class DatabaseSeeder extends Seeder
             StockAdjustmentSampleDataSeeder::class,
             StockMovementSampleDataSeeder::class,
             ArSampleDataSeeder::class,
+            // Normalisasi depresiasi aset (semua aset, termasuk kendaraan, sudah
+            // ada) sebelum rekonsiliasi GL (W7-05). Harus sebelum GlExtendedSampleDataSeeder,
+            // karena periode bulan yang diposting di sini ditutup di seeder tersebut (#423).
+            AssetDepreciationNormalizationSeeder::class,
             GlExtendedSampleDataSeeder::class,
             ReportConfigurationSeeder::class,
             BudgetSampleDataSeeder::class,
         ]);
-
-        // Normalisasi depresiasi aset (semua aset, termasuk kendaraan, sudah
-        // ada) sebelum rekonsiliasi GL (W7-05).
-        $this->call(AssetDepreciationNormalizationSeeder::class);
 
         $this->spreadIdenticalAuditTimestamps();
 

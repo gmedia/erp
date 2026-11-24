@@ -2,6 +2,7 @@
 
 namespace App\Actions\JournalEntries;
 
+use App\Actions\PeriodClosings\AssertPeriodOpenForPostingAction;
 use App\Models\JournalEntry;
 use Exception;
 use Illuminate\Support\Facades\Auth;
@@ -32,6 +33,9 @@ class PostJournalAction
                 }
 
                 DB::transaction(function () use ($entry) {
+                    app(AssertPeriodOpenForPostingAction::class)
+                        ->execute($entry->fiscal_year_id, $entry->entry_date->format('Y-m-d'));
+
                     $entry->update([
                         'status' => 'posted',
                         'posted_at' => now(),
