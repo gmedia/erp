@@ -10,6 +10,7 @@ use App\Models\SupplierBill;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 
+use function Pest\Laravel\deleteJson;
 use function Pest\Laravel\postJson;
 use function Pest\Laravel\putJson;
 
@@ -178,4 +179,77 @@ test('second draft exceeding remaining balance is rejected with 422 on confirm',
     expect((float) $bill->amount_paid)->toBe(800000.0)
         ->and((float) $bill->amount_due)->toBe(200000.0);
     expect(ApPayment::find($second['id'])->status)->toBe('draft');
+});
+
+test('voiding a confirmed payment restores bill due', function () {
+    $bill = apDraftBill($this->supplier);
+
+    $payment = postJson('/api/ap-payments', apDraftPaymentPayload($this->supplier, $this->bankAccount, [
+        'allocations' => [
+            ['supplier_bill_id' => $bill->id, 'allocated_amount' => 500000],
+        ],
+    ]))->assertCreated()->json('data');
+
+    putJson('/api/ap-payments/' . $payment['id'], [
+        'status' => 'confirmed',
+        'allocations' => [
+            ['supplier_bill_id' => $bill->id, 'allocated_amount' => 500000],
+        ],
+    ])->assertOk();
+
+    putJson('/api/ap-payments/' . $payment['id'], ['status' => 'void'])->assertOk();
+
+    $bill->refresh();
+    expect((float) $bill->amount_paid)->toBe(0.0)
+        ->and((float) $bill->amount_due)->toBe(1000000.0)
+        ->and($bill->status)->toBe('confirmed');
+});
+
+test('deleting a draft payment leaves bill due unchanged', function () {
+    $bill = apDraftBill($this->supplier);
+
+    $payment = postJson('/api/ap-payments', apDraftPaymentPayload($this->supplier, $this->bankAccount, [
+        'allocations' => [
+            ['supplier_bill_id' => $bill->id, 'allocated_amount' => 500000],
+        ],
+    ]))->assertCreated()->json('data');
+
+    deleteJson('/api/ap-payments/' . $payment['id'])->assertNoContent();
+
+    $bill->refresh();
+    expect((float) $bill->amount_paid)->toBe(0.0)
+        ->and((float) $bill->amount_due)->toBe(1000000.0)
+        ->and($bill->status)->toBe('confirmed');
+});
+
+test('moving a confirmed payment allocation off a bill restores that bill due', function () {
+    $billA = apDraftBill($this->supplier);
+    $billB = apDraftBill($this->supplier);
+
+    $payment = postJson('/api/ap-payments', apDraftPaymentPayload($this->supplier, $this->bankAccount, [
+        'allocations' => [
+            ['supplier_bill_id' => $billA->id, 'allocated_amount' => 500000],
+        ],
+    ]))->assertCreated()->json('data');
+
+    putJson('/api/ap-payments/' . $payment['id'], [
+        'status' => 'confirmed',
+        'allocations' => [
+            ['supplier_bill_id' => $billA->id, 'allocated_amount' => 500000],
+        ],
+    ])->assertOk();
+
+    putJson('/api/ap-payments/' . $payment['id'], [
+        'allocations' => [
+            ['supplier_bill_id' => $billB->id, 'allocated_amount' => 500000],
+        ],
+    ])->assertOk();
+
+    $billA->refresh();
+    $billB->refresh();
+    expect((float) $billA->amount_paid)->toBe(0.0)
+        ->and((float) $billA->amount_due)->toBe(1000000.0)
+        ->and($billA->status)->toBe('confirmed')
+        ->and((float) $billB->amount_paid)->toBe(500000.0)
+        ->and($billB->status)->toBe('partially_paid');
 });
