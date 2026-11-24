@@ -689,22 +689,8 @@ jobs:
           key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-playwright-
 
-      - name: Configure apt retries
-        run: echo 'Acquire::Retries "10";' | sudo tee /etc/apt/apt.conf.d/80-retries
-
       - name: Install Playwright browsers
-        shell: bash
-        run: |
-          for attempt in 1 2 3; do
-            if npx playwright install --with-deps chromium; then
-              exit 0
-            fi
-            echo "Playwright browser install failed (attempt ${attempt}/3). Retrying in 15s..."
-            sudo apt-get clean || true
-            sleep 15
-          done
-          echo "::error::Playwright browser install failed after 3 attempts."
-          exit 1
+        run: bash scripts/ci-install-playwright.sh
 
       - name: Run Playwright E2E
         run: |
