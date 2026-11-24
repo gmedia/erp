@@ -149,7 +149,9 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
         });
         const watchedItems = form.watch('items');
         const watchedPurchaseOrderId = form.watch('purchase_order_id');
-        const previousPurchaseOrderIdRef = useRef(watchedPurchaseOrderId);
+        const previousPurchaseOrderIdRef = useRef(
+            defaultValues.purchase_order_id,
+        );
         useEffect(() => {
             if (previousPurchaseOrderIdRef.current === watchedPurchaseOrderId) {
                 return;

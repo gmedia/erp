@@ -149,7 +149,9 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
         });
         const watchedItems = form.watch('items');
         const watchedGoodsReceiptId = form.watch('goods_receipt_id');
-        const previousGoodsReceiptIdRef = useRef(watchedGoodsReceiptId);
+        const previousGoodsReceiptIdRef = useRef(
+            defaultValues.goods_receipt_id,
+        );
         useEffect(() => {
             if (previousGoodsReceiptIdRef.current === watchedGoodsReceiptId) {
                 return;
