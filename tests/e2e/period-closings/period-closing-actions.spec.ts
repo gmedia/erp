@@ -86,7 +86,9 @@ test.describe('Period closing actions (close/reopen)', () => {
 
         const row = await openFixtureRow(page);
         await row.getByRole('button', { name: 'Actions' }).click();
-        await page.getByRole('menuitem', { name: 'Close Period' }).click();
+        const closeItem = page.getByRole('menuitem', { name: 'Close Period' });
+        await expect(closeItem).toBeVisible({ timeout: 15000 });
+        await closeItem.click();
 
         const dialog = page.getByRole('alertdialog');
         await expect(dialog).toBeVisible();
@@ -102,7 +104,9 @@ test.describe('Period closing actions (close/reopen)', () => {
         await expect(row).toContainText('Closed');
 
         await row.getByRole('button', { name: 'Actions' }).click();
-        await page.getByRole('menuitem', { name: 'Reopen Period' }).click();
+        const reopenItem = page.getByRole('menuitem', { name: 'Reopen Period' });
+        await expect(reopenItem).toBeVisible({ timeout: 15000 });
+        await reopenItem.click();
 
         const reopenDialog = page.getByRole('alertdialog');
         await expect(reopenDialog).toContainText(/will be reopened/i);
