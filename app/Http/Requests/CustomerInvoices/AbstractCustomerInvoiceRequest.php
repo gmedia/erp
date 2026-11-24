@@ -25,7 +25,11 @@ abstract class AbstractCustomerInvoiceRequest extends AuthorizedFormRequest
             'status' => $this->withSometimes([
                 'required',
                 'string',
-                'in:draft,sent,partially_paid,paid,overdue,cancelled,void',
+                // POST tidak boleh membuat invoice langsung berstatus hasil pembayaran.
+                // PUT boleh mengirim ulang status tersimpan atau mentransisikan sent -> overdue.
+                $this->usesSometimes()
+                    ? 'in:draft,sent,overdue,partially_paid,paid,cancelled,void'
+                    : 'in:draft,sent,cancelled,void',
             ]),
             ...$this->totalAmountRules(),
 
