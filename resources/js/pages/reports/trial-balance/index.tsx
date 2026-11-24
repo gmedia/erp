@@ -42,11 +42,32 @@ interface TrialBalanceResponse {
 
 const emptyTrialBalanceReport: TrialBalanceResponse['report'] = [];
 
-const NAME_CELL_CLASS =
-    'min-w-[136px] break-words whitespace-normal md:min-w-0';
+const CELL_PADDING_CLASS = 'pl-1.5 pr-1.5 md:pl-2 md:pr-2';
 
-const AMOUNT_HEAD_CLASS =
-    'min-w-[92px] text-right text-xs whitespace-nowrap tabular-nums md:min-w-0 md:text-sm';
+const NAME_CELL_CLASS = [
+    'min-w-[104px] break-words whitespace-normal md:min-w-0',
+    CELL_PADDING_CLASS,
+].join(' ');
+
+const AMOUNT_HEAD_CLASS = [
+    'min-w-[80px] text-right text-xs whitespace-nowrap tabular-nums md:min-w-0 md:text-sm',
+    CELL_PADDING_CLASS,
+].join(' ');
+
+const AMOUNT_CELL_CLASS = [
+    'text-right text-xs whitespace-nowrap tabular-nums md:text-sm',
+    CELL_PADDING_CLASS,
+].join(' ');
+
+const CODE_CELL_CLASS = [
+    'font-mono text-xs text-muted-foreground',
+    CELL_PADDING_CLASS,
+].join(' ');
+
+const TOTAL_CELL_CLASS = [
+    'text-right text-xs font-semibold whitespace-nowrap tabular-nums md:text-sm',
+    CELL_PADDING_CLASS,
+].join(' ');
 
 export default function TrialBalance() {
     const {
@@ -116,10 +137,12 @@ export default function TrialBalance() {
                         <Table className="md:min-w-[760px]">
                             <TableHeader className="[&_th]:text-muted-foreground">
                                 <TableRow>
-                                    <TableHead className="w-[64px] md:w-[120px]">
+                                    <TableHead
+                                        className={`w-[52px] md:w-[120px] ${CELL_PADDING_CLASS}`}
+                                    >
                                         Code
                                     </TableHead>
-                                    <TableHead className="min-w-[136px] md:min-w-0">
+                                    <TableHead className={NAME_CELL_CLASS}>
                                         Account Name
                                     </TableHead>
                                     <TableHead className="hidden w-[120px] md:table-cell">
@@ -147,7 +170,9 @@ export default function TrialBalance() {
                                 ) : (
                                     report.map((item) => (
                                         <TableRow key={item.id}>
-                                            <TableCell className="font-mono text-xs text-muted-foreground">
+                                            <TableCell
+                                                className={CODE_CELL_CLASS}
+                                            >
                                                 {item.code}
                                             </TableCell>
                                             <TableCell
@@ -165,7 +190,9 @@ export default function TrialBalance() {
                                             <TableCell className="hidden text-muted-foreground capitalize md:table-cell">
                                                 {item.type}
                                             </TableCell>
-                                            <TableCell className="text-right text-xs whitespace-nowrap tabular-nums md:text-sm">
+                                            <TableCell
+                                                className={AMOUNT_CELL_CLASS}
+                                            >
                                                 {item.debit === 0
                                                     ? '-'
                                                     : formatCurrency(
@@ -173,7 +200,9 @@ export default function TrialBalance() {
                                                           0,
                                                       )}
                                             </TableCell>
-                                            <TableCell className="text-right text-xs whitespace-nowrap tabular-nums md:text-sm">
+                                            <TableCell
+                                                className={AMOUNT_CELL_CLASS}
+                                            >
                                                 {item.credit === 0
                                                     ? '-'
                                                     : formatCurrency(
@@ -195,12 +224,12 @@ export default function TrialBalance() {
                                             Total
                                         </TableCell>
                                         <TableCell
-                                            className={`text-right font-semibold tabular-nums ${isBalanced ? '' : 'text-destructive'}`}
+                                            className={`${TOTAL_CELL_CLASS} ${isBalanced ? '' : 'text-destructive'}`}
                                         >
                                             {formatCurrency(totalDebit, 0)}
                                         </TableCell>
                                         <TableCell
-                                            className={`text-right font-semibold tabular-nums ${isBalanced ? '' : 'text-destructive'}`}
+                                            className={`${TOTAL_CELL_CLASS} ${isBalanced ? '' : 'text-destructive'}`}
                                         >
                                             {formatCurrency(totalCredit, 0)}
                                         </TableCell>

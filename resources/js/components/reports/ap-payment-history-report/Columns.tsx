@@ -97,5 +97,9 @@ export const apPaymentHistoryReportColumns: ColumnDef<ApPaymentHistoryReportItem
             accessorKey: 'payment.status',
             header: 'Status',
             getValue: (item) => item.payment?.status,
+            getVariant: (item) =>
+                item.payment?.status?.toLowerCase() === 'confirmed'
+                    ? 'success'
+                    : undefined,
         }),
     ];
