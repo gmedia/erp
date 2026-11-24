@@ -34,7 +34,8 @@ class UpdateSupplierBillRequest extends AbstractSupplierBillRequest
             'partially_paid' => [],
             'paid' => [],
             'overdue' => self::OVERDUE_FROM,
-            'cancelled' => ['draft', 'confirmed'],
+            // Issue #375 (review #426 butir 6): bill overdue tanpa pembayaran bisa dibatalkan.
+            'cancelled' => ['draft', 'confirmed', 'overdue'],
         ];
     }
 

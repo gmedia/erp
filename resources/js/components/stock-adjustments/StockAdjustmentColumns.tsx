@@ -1,6 +1,6 @@
 'use client';
 
-import { GenericActions } from '@/components/common/ActionsDropdown';
+import { StockAdjustmentRowActions } from '@/components/stock-adjustments/StockAdjustmentRowActions';
 import { type StockAdjustment } from '@/types/stock-adjustment';
 import {
     createAdjustmentTypeBadgeColumn,
@@ -50,7 +50,7 @@ export const stockAdjustmentColumns: ColumnDef<StockAdjustment>[] = [
             const item = row.original;
             const meta = table.options.meta as CustomTableMeta<StockAdjustment>;
             return (
-                <GenericActions
+                <StockAdjustmentRowActions
                     item={item}
                     onView={meta?.onView}
                     onEdit={meta?.onEdit}
