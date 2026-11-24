@@ -2,6 +2,7 @@
 
 import { PeriodClosingRowActions } from '@/components/period-closings/PeriodClosingRowActions';
 import { Badge } from '@/components/ui/badge';
+import { useTranslation } from '@/contexts/i18n-context';
 import { formatStatusLabel, statusBadgeVariant } from '@/lib/status-badge';
 import { type PeriodClosing } from '@/types/period-closing';
 import {
@@ -25,8 +26,11 @@ function formatMonthName(value: unknown): string {
     });
 }
 
-function getClosingTypeLabel(type: PeriodClosing['closing_type']) {
-    return type === 'monthly' ? 'Monthly' : 'Yearly';
+function ClosingTypeCell({ type }: { type: PeriodClosing['closing_type'] }) {
+    const { t } = useTranslation();
+    return type === 'monthly'
+        ? t('periodClosings.typeMonthly')
+        : t('periodClosings.typeAnnual');
 }
 
 export const periodClosingColumns: ColumnDef<PeriodClosing>[] = [
@@ -50,7 +54,9 @@ export const periodClosingColumns: ColumnDef<PeriodClosing>[] = [
     {
         accessorKey: 'closing_type',
         ...createSortingHeader('Closing Type'),
-        cell: ({ row }) => getClosingTypeLabel(row.getValue('closing_type')),
+        cell: ({ row }) => (
+            <ClosingTypeCell type={row.getValue('closing_type')} />
+        ),
     },
     {
         accessorKey: 'status',

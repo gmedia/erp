@@ -8,10 +8,11 @@ const FIXTURE_PASSWORD = 'password';
 
 const FIXTURE_YEAR = 2099;
 const FIXTURE_MONTH = 12;
+const ANNUAL_YEAR = 2098;
 
 const FIXTURE_PHP = [
     `$hash = \\Illuminate\\Support\\Facades\\Hash::make('${FIXTURE_PASSWORD}');`,
-    `$names = ['period_closing', 'period_closing.edit'];`,
+    `$names = ['period_closing', 'period_closing.create', 'period_closing.edit', 'fiscal_year', 'account'];`,
     `$perms = \\App\\Models\\Permission::whereIn('name', $names)->get()->keyBy('name');`,
     `$make = function (string $email, string $name, array $codes) use ($hash, $perms) {`,
     `    $user = \\App\\Models\\User::updateOrCreate(['email' => $email], [`,
@@ -24,9 +25,10 @@ const FIXTURE_PHP = [
     `    $emp->permissions()->sync(collect($codes)->map(fn ($n) => $perms[$n]->id)->all());`,
     `};`,
     `$make('${VIEWER_EMAIL}', 'Period Viewer', ['period_closing']);`,
-    `$make('${EDITOR_EMAIL}', 'Period Editor', ['period_closing', 'period_closing.edit']);`,
+    `$make('${EDITOR_EMAIL}', 'Period Editor', ['period_closing', 'period_closing.create', 'period_closing.edit', 'fiscal_year', 'account']);`,
     `$fy = \\App\\Models\\FiscalYear::where('name', 'like', '%${FIXTURE_YEAR}%')->first()`,
     `    ?? \\App\\Models\\FiscalYear::first();`,
+    `\\App\\Models\\FiscalYear::firstOrCreate(['name' => 'FY ${ANNUAL_YEAR}'], ['start_date' => '${ANNUAL_YEAR}-01-01', 'end_date' => '${ANNUAL_YEAR}-12-31', 'status' => 'open']);`,
     `$account = \\App\\Models\\Account::first();`,
     `$creator = \\App\\Models\\User::where('email', '${EDITOR_EMAIL}')->first();`,
     `\\App\\Models\\PeriodClosing::updateOrCreate(`,
@@ -104,7 +106,9 @@ test.describe('Period closing actions (close/reopen)', () => {
         await expect(row).toContainText('Closed');
 
         await row.getByRole('button', { name: 'Actions' }).click();
-        const reopenItem = page.getByRole('menuitem', { name: 'Reopen Period' });
+        const reopenItem = page.getByRole('menuitem', {
+            name: 'Reopen Period',
+        });
         await expect(reopenItem).toBeVisible({ timeout: 15000 });
         await reopenItem.click();
 
@@ -151,6 +155,56 @@ test.describe('Period closing actions (close/reopen)', () => {
         await expect(
             modal.getByRole('button', { name: 'Close Period' }),
         ).toHaveCount(0);
+    });
+
+    test('editor membuat penutupan tahunan dari form', async ({ page }) => {
+        await login(page, EDITOR_EMAIL, FIXTURE_PASSWORD, {
+            requireDashboard: false,
+        });
+        await page.goto('/period-closings');
+
+        await page.getByRole('button', { name: /^Add/ }).first().click();
+        const dialog = page.getByRole('dialog');
+        await expect(dialog).toBeVisible();
+
+        // Pilihan AsyncSelect ada di popover; 'li button' polos juga cocok dengan menu sidebar.
+        const options = page.locator('[data-slot="popover-content"] li button');
+
+        await dialog.getByRole('combobox', { name: 'Closing Type' }).click();
+        await page.getByRole('option', { name: 'Annual', exact: true }).click();
+
+        await dialog.getByRole('combobox', { name: 'Fiscal Year' }).click();
+        await options
+            .filter({ hasText: String(ANNUAL_YEAR) })
+            .first()
+            .click();
+
+        await dialog.getByLabel('Period Year').fill(String(ANNUAL_YEAR));
+
+        await dialog
+            .getByRole('combobox', { name: /Retained Earnings Account/ })
+            .click();
+        await options.first().click();
+
+        const submitResponse = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/period-closings') &&
+                r.request().method() === 'POST',
+        );
+        await dialog.getByRole('button', { name: 'Add', exact: true }).click();
+        const response = await submitResponse;
+        expect(response.status()).toBeLessThan(300);
+
+        const row = page
+            .locator('tbody tr', { hasText: String(ANNUAL_YEAR) })
+            .first();
+        await expect(row).toBeVisible({ timeout: 15000 });
+        await expect(row).toContainText(/Annual/i);
+
+        await row.getByRole('button', { name: 'Actions' }).click();
+        await page.getByRole('menuitem', { name: 'Close Period' }).click();
+        await page.getByRole('button', { name: 'Yes, close' }).click();
+        await expect(row).toContainText('Closed', { timeout: 15000 });
     });
 
     test('pengguna lihat-saja tidak melihat aksi close/reopen', async ({
