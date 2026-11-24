@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\ArReceipts;
 
+use App\Actions\ArReceipts\SyncArReceiptAllocationsAction;
 use App\Http\Requests\AuthorizedFormRequest;
 use App\Http\Requests\Concerns\HasBankPaymentRules;
 use App\Http\Requests\Concerns\HasSometimesArrayRules;
@@ -91,13 +92,13 @@ abstract class AbstractArReceiptRequest extends AuthorizedFormRequest
             return null;
         }
 
+        // Only POSTED receipts consume the quota; drafts are re-checked on confirm.
         $existingAllocated = ArReceiptAllocation::where('customer_invoice_id', $invoice->id)
-            ->when(
-                $receiptId,
-                fn ($q) => $q->whereHas(
-                    'receipt',
-                    fn ($q2) => $q2->where('id', '!=', $receiptId),
-                ),
+            ->whereHas(
+                'receipt',
+                fn ($q) => $q
+                    ->whereIn('status', SyncArReceiptAllocationsAction::POSTED_STATUSES)
+                    ->when($receiptId, fn ($q2) => $q2->where('id', '!=', $receiptId)),
             )
             ->sum('allocated_amount');
 

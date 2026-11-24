@@ -95,22 +95,39 @@ class ArReceiptController extends Controller
             $validated['confirmed_at'] = now()->toIso8601String();
         }
 
-        $this->updateWithSyncedItems(
-            model: $arReceipt,
-            attributes: $validated,
-            items: $allocations,
-            payloadResolver: static fn (array $attributes): array => UpdateArReceiptData::fromArray(
-                $attributes
-            )->toArray(),
-            syncItems: function (ArReceipt $arReceipt, array $allocations) use ($syncAllocations): void {
-                $syncAllocations->execute($arReceipt, $allocations);
-            },
-            afterCommit: $isNewlyConfirmed
-                ? function (ArReceipt $arReceipt) use ($postJournal): void {
-                    $postJournal->execute($arReceipt->refresh());
-                }
-            : null,
-        );
+        DB::transaction(function () use (
+            $arReceipt,
+            $validated,
+            $allocations,
+            $syncAllocations,
+            $postJournal,
+            $isNewlyConfirmed
+        ): void {
+            $this->updateWithSyncedItems(
+                model: $arReceipt,
+                attributes: $validated,
+                items: $allocations,
+                payloadResolver: static fn (array $attributes): array => UpdateArReceiptData::fromArray(
+                    $attributes
+                )->toArray(),
+                syncItems: function (ArReceipt $arReceipt, array $allocations) use ($syncAllocations): void {
+                    $syncAllocations->execute($arReceipt, $allocations);
+                },
+                afterCommit: $isNewlyConfirmed
+                    ? function (ArReceipt $arReceipt) use ($postJournal): void {
+                        $postJournal->execute($arReceipt->refresh());
+                    }
+                : null,
+            );
+
+            // Status-only change (no allocations payload, e.g. cancel/void) must still
+            // release invoice balances that were counted from this receipt.
+            if ($allocations === null) {
+                $syncAllocations->refreshInvoices(
+                    $arReceipt->allocations()->pluck('customer_invoice_id')
+                );
+            }
+        });
 
         return (new ArReceiptResource($this->loadResourceRelations($arReceipt)))->response();
     }
