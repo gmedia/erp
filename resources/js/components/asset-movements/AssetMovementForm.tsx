@@ -37,6 +37,9 @@ const toOptionalSelectValue = (value: string | number | null | undefined) => {
     return '';
 };
 
+const isMovableAsset = (asset: Asset): boolean =>
+    asset.status !== 'disposed' && asset.status !== 'lost';
+
 const ASSET_MOVEMENT_TYPES = [
     'transfer',
     'assign',
@@ -178,6 +181,7 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
                                     label="Asset"
                                     url="/api/assets"
                                     placeholder="Select asset"
+                                    filterItems={isMovableAsset}
                                 />
                             </div>
                         )}
