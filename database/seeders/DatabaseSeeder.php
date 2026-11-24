@@ -255,12 +255,6 @@ class DatabaseSeeder extends Seeder
         // ada) sebelum rekonsiliasi GL (W7-05).
         $this->call(AssetDepreciationNormalizationSeeder::class);
 
-        // Rekonsiliasi GL↔subledger hanya untuk dataset demo (bukan test),
-        // karena test isolasi cabang menguji saldo clearing dari nol.
-        if (! app()->environment('testing')) {
-            $this->call(SubledgerGlReconciliationSeeder::class);
-        }
-
         $this->spreadIdenticalAuditTimestamps();
 
         // Assign all permissions to sample users for easy testing

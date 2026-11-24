@@ -37,10 +37,14 @@ class InventoryStocktakeSampleDataSeeder extends Seeder
 
         $year = now()->format('Y');
 
-        // Format kode berubah (SO-… → STO-…): bersihkan baris demo lama agar
-        // seed ulang tidak menyisakan prefix yang bentrok dengan Sales Order.
+        // Format kode berubah (SO-… → STO-…): bersihkan HANYA nomor demo lama
+        // (SO-{tahun}-920001..920009). Nomor pengguna tidak ikut terhapus.
+        $legacyDemoNumbers = array_map(
+            fn (int $n) => sprintf('SO-%s-92%04d', $year, $n),
+            range(1, 9),
+        );
         InventoryStocktake::query()
-            ->where('stocktake_number', 'like', 'SO-%-92%')
+            ->whereIn('stocktake_number', $legacyDemoNumbers)
             ->delete();
 
         $samples = [

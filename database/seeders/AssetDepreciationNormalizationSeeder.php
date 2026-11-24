@@ -2,185 +2,166 @@
 
 namespace Database\Seeders;
 
+use App\Actions\AccountingPosting\PostAssetLossJournalAction;
 use App\Actions\AssetDepreciationRuns\CalculateDepreciationAction;
 use App\Actions\AssetDepreciationRuns\PostDepreciationToJournalAction;
 use App\Models\Account;
 use App\Models\Asset;
+use App\Models\AssetDepreciationLine;
 use App\Models\AssetDepreciationRun;
 use App\Models\CoaVersion;
 use App\Models\FiscalYear;
-use App\Models\JournalEntry;
+use App\Models\JournalEntryLine;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 
 /**
- * Normalise asset depreciation so the demo data is internally consistent and
- * reconciles with the GL (W7-05):
- *   - every in-service asset (active/maintenance) carries a method, useful
- *     life, depreciation start date and the dedicated expense/accumulated
- *     accounts;
- *   - accumulated depreciation reflects the asset's age (straight line from
- *     the start date up to the previous month), rounded to whole rupiah;
- *   - book value = cost − accumulated for every asset;
- *   - exactly one posted depreciation run exists for the previous month, with
- *     a posted journal (Dr Depreciation Expense / Cr Accumulated Depreciation).
+ * Menormalkan depresiasi aset demo (W7-05, #357).
+ *
+ * Akumulasi penyusutan register TIDAK ditulis langsung oleh seeder. Sumbernya hanya:
+ *   1. saldo awal per aset dari PostAssetAcquisitionJournalAction (aset lama), dan
+ *   2. run depresiasi bulanan yang dibuat dan diposting lewat action aplikasi
+ *      (CalculateDepreciationAction + PostDepreciationToJournalAction).
+ *
+ * Run dibuat untuk setiap bulan fiscal year terbuka, dari bulan pertama FY
+ * sampai bulan terakhir yang sudah lewat. Aset draft tidak diposting.
  */
 class AssetDepreciationNormalizationSeeder extends Seeder
 {
     public function run(): void
     {
-        $adminUserId = User::query()
-            ->where('email', config('app.admin'))
-            ->value('id') ?? User::query()->value('id');
+        $fiscalYear = FiscalYear::query()->where('status', 'open')->orderBy('start_date')->first();
 
-        $fiscalYear = FiscalYear::query()->where('status', 'open')->first();
-        $coaVersionId = $fiscalYear
-            ? CoaVersion::query()
-                ->where('fiscal_year_id', $fiscalYear->id)
-                ->orderByRaw("CASE status WHEN 'active' THEN 0 ELSE 1 END")
-                ->value('id')
-            : null;
+        if (! $fiscalYear) {
+            return;
+        }
 
-        $accountId = static fn (string $code): ?int => $coaVersionId
-            ? Account::query()->where('coa_version_id', $coaVersionId)->where('code', $code)->value('id')
-            : null;
-
-        $expenseAccountId = $accountId('53000');
-        $accumulatedAccountId = $accountId('12200');
+        $expenseAccountId = $this->accountId($fiscalYear, '53000');
+        $accumulatedAccountId = $this->accountId($fiscalYear, '12200');
 
         if (! $expenseAccountId || ! $accumulatedAccountId) {
             return;
         }
 
-        $periodStart = now()->subMonth()->startOfMonth();
-        $periodEnd = now()->subMonth()->endOfMonth();
+        $adminUserId = User::query()
+            ->where('email', config('app.admin'))
+            ->value('id') ?? User::query()->value('id');
 
-        $existingRun = $this->findPostedRun($fiscalYear, $periodStart);
+        $this->stampAssetMetadata($expenseAccountId, $accumulatedAccountId);
 
-        if ($existingRun) {
-            // Re-seeding: keep the posted run and its journal; normalise assets
-            // through the run period so the values stay identical (idempotent).
-            $normaliseUntil = $periodEnd;
-        } else {
-            // First seed: normalise through the month before the run, then let
-            // the run add exactly one more month.
-            $normaliseUntil = $periodStart->copy()->subDay()->endOfMonth();
-            $this->purgeSeededRuns();
+        $fiscalStart = Carbon::parse($fiscalYear->start_date)->startOfMonth();
+        $fiscalEnd = Carbon::parse($fiscalYear->end_date)->startOfMonth();
+        $lastClosedMonth = now()->subMonth()->startOfMonth();
+
+        for ($cursor = $fiscalStart->copy(); $cursor->lessThanOrEqualTo($fiscalEnd) && $cursor->lessThanOrEqualTo($lastClosedMonth); $cursor->addMonth()) {
+            $this->postMonthlyRun($fiscalYear, $cursor->copy(), $adminUserId);
         }
 
-        foreach (Asset::query()->orderBy('id')->get() as $asset) {
-            $isInService = in_array($asset->status, ['active', 'maintenance'], true);
-            $isDisposed = $asset->status === 'disposed';
-            $cost = (float) $asset->purchase_cost;
-            $salvage = (float) ($asset->salvage_value ?? 0);
+        $this->syncRegisterFromPostedSources();
 
-            if ($isDisposed) {
-                $this->applyDepreciation($asset, $cost, $expenseAccountId, $accumulatedAccountId);
+        // Jurnal aset hilang hanya setelah akumulasi register final. Dipost
+        // lebih awal, akun 12200 tidak ikut didebit (#357, FA-000008).
+        $this->demoAssets()->get()->each(function (Asset $asset): void {
+            $lossJournal = app(PostAssetLossJournalAction::class);
 
-                continue;
+            if ($lossJournal->isPostable($asset)) {
+                $lossJournal->execute($asset);
             }
-
-            if (! $isInService && $asset->status !== 'lost') {
-                // Draft assets are not capitalised; no depreciation yet.
-                $this->applyDepreciation($asset, 0.0, $expenseAccountId, $accumulatedAccountId);
-
-                continue;
-            }
-
-            $usefulLife = (int) ($asset->useful_life_months ?? 0);
-            if ($usefulLife <= 0) {
-                $usefulLife = 60;
-            }
-
-            $startDate = $asset->depreciation_start_date
-                ?? $asset->purchase_date
-                ?? $normaliseUntil;
-
-            // Whole months only, and whole-rupiah monthly amount, so the
-            // demo never shows fractional cents (W7-05).
-            $months = (int) floor(Carbon::parse($startDate)->startOfDay()->diffInMonths($normaliseUntil->copy()->startOfDay()));
-            $monthly = (int) round(($cost - $salvage) / $usefulLife);
-            $accumulated = min($cost, (float) ($monthly * $months));
-
-            $asset->forceFill([
-                'depreciation_method' => $asset->depreciation_method ?: 'straight_line',
-                'depreciation_start_date' => Carbon::parse($startDate)->toDateString(),
-                'useful_life_months' => $usefulLife,
-                'salvage_value' => $salvage,
-            ]);
-
-            $this->applyDepreciation($asset, (float) $accumulated, $expenseAccountId, $accumulatedAccountId);
-        }
-
-        if (! $existingRun) {
-            $this->createPostedRun($adminUserId, $expenseAccountId, $accumulatedAccountId, $periodStart, $periodEnd);
-        }
+        });
     }
 
     /**
-     * @param  float  $accumulated  accumulated depreciation *before* the run
+     * Hanya aset demo (AssetSampleDataSeeder::DEMO_ASSET_CODES). Aset buatan
+     * pengguna, beserta run dan jurnal depresiasinya, tidak disentuh (#357).
      */
-    private function applyDepreciation(Asset $asset, float $accumulated, int $expenseAccountId, int $accumulatedAccountId): void
+    private function demoAssets()
     {
-        $cost = (float) $asset->purchase_cost;
-        $accumulated = min($cost, round($accumulated));
-
-        $asset->forceFill([
-            'depreciation_expense_account_id' => $expenseAccountId,
-            'accumulated_depr_account_id' => $accumulatedAccountId,
-            'accumulated_depreciation' => $accumulated,
-            'book_value' => $cost - $accumulated,
-        ])->saveQuietly();
+        return Asset::query()
+            ->whereIn('asset_code', AssetSampleDataSeeder::DEMO_ASSET_CODES)
+            ->orderBy('id');
     }
 
-    private function findPostedRun(?FiscalYear $fiscalYear, Carbon $periodStart): ?AssetDepreciationRun
+    /**
+     * Register (accumulated_depreciation, book_value) = saldo awal opening
+     * (jurnal ACQ-* dari PostAssetAcquisitionJournalAction) + total run terposting.
+     * Nilai hardcode di sample aset digantikan agar register sama dengan GL.
+     */
+    private function syncRegisterFromPostedSources(): void
     {
-        if (! $fiscalYear) {
-            return null;
-        }
-
-        $run = AssetDepreciationRun::query()
-            ->where('fiscal_year_id', $fiscalYear->id)
-            ->where('period_start', $periodStart->toDateString())
-            ->where('status', 'posted')
-            ->first();
-
-        if (! $run || ! $run->journal_entry_id) {
-            return null;
-        }
-
-        $journalStatus = JournalEntry::query()->whereKey($run->journal_entry_id)->value('status');
-
-        return $journalStatus === 'posted' ? $run : null;
-    }
-
-    private function purgeSeededRuns(): void
-    {
-        $runs = AssetDepreciationRun::query()->get();
-
-        foreach ($runs as $run) {
-            if ($run->journal_entry_id) {
-                DB::table('journal_entry_lines')->where('journal_entry_id', $run->journal_entry_id)->delete();
-                JournalEntry::query()->whereKey($run->journal_entry_id)->delete();
+        $this->demoAssets()->get()->each(function (Asset $asset): void {
+            if (in_array($asset->status, ['draft', 'cancelled'], true)) {
+                return;
             }
 
-            DB::table('asset_depreciation_lines')->where('asset_depreciation_run_id', $run->id)->delete();
-            $run->delete();
-        }
+            $openingAccumulated = (float) JournalEntryLine::query()
+                ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+                ->where('journal_entries.reference', 'ACQ-' . $asset->asset_code)
+                ->where('journal_entries.status', 'posted')
+                ->where('journal_entry_lines.account_id', $asset->accumulated_depr_account_id)
+                ->sum('journal_entry_lines.credit');
+
+            $runAccumulated = (float) AssetDepreciationLine::query()
+                ->join('asset_depreciation_runs', 'asset_depreciation_runs.id', '=', 'asset_depreciation_lines.asset_depreciation_run_id')
+                ->where('asset_depreciation_lines.asset_id', $asset->id)
+                ->where('asset_depreciation_runs.status', 'posted')
+                ->sum('asset_depreciation_lines.amount');
+
+            $accumulated = $openingAccumulated + $runAccumulated;
+            $cost = (float) $asset->purchase_cost;
+
+            $asset->forceFill([
+                'accumulated_depreciation' => $accumulated,
+                'book_value' => $cost - $accumulated,
+            ])->saveQuietly();
+        });
     }
 
-    private function createPostedRun(
-        ?int $adminUserId,
-        int $expenseAccountId,
-        int $accumulatedAccountId,
-        Carbon $periodStart,
-        Carbon $periodEnd
-    ): void {
-        $fiscalYear = FiscalYear::query()->where('status', 'open')->first();
+    private function accountId(FiscalYear $fiscalYear, string $code): ?int
+    {
+        $coaVersionId = CoaVersion::query()
+            ->where('fiscal_year_id', $fiscalYear->id)
+            ->orderByRaw("CASE status WHEN 'active' THEN 0 ELSE 1 END")
+            ->value('id');
 
-        if (! $fiscalYear) {
+        return $coaVersionId
+            ? Account::query()->where('coa_version_id', $coaVersionId)->where('code', $code)->value('id')
+            : null;
+    }
+
+    /**
+     * Hanya metadata konfigurasi depresiasi. Kolom nilai (accumulated_depreciation,
+     * book_value) tidak disentuh; keduanya dikelola opening dan run.
+     */
+    private function stampAssetMetadata(int $expenseAccountId, int $accumulatedAccountId): void
+    {
+        $this->demoAssets()->get()->each(function (Asset $asset) use ($expenseAccountId, $accumulatedAccountId): void {
+            if (in_array($asset->status, ['draft', 'cancelled'], true)) {
+                return;
+            }
+
+            $asset->forceFill([
+                'depreciation_method' => $asset->depreciation_method ?: 'straight_line',
+                'depreciation_start_date' => $asset->depreciation_start_date ?? $asset->purchase_date,
+                'useful_life_months' => (int) $asset->useful_life_months > 0 ? $asset->useful_life_months : 60,
+                'salvage_value' => $asset->salvage_value ?? 0,
+                'depreciation_expense_account_id' => $expenseAccountId,
+                'accumulated_depr_account_id' => $accumulatedAccountId,
+            ])->saveQuietly();
+        });
+    }
+
+    private function postMonthlyRun(FiscalYear $fiscalYear, Carbon $periodStart, ?int $adminUserId): void
+    {
+        $periodEnd = $periodStart->copy()->endOfMonth();
+
+        $exists = AssetDepreciationRun::query()
+            ->where('fiscal_year_id', $fiscalYear->id)
+            ->where('period_start', $periodStart->toDateString())
+            ->whereIn('status', ['draft', 'calculated', 'posted'])
+            ->exists();
+
+        if ($exists) {
             return;
         }
 
@@ -188,7 +169,12 @@ class AssetDepreciationNormalizationSeeder extends Seeder
             'fiscal_year_id' => $fiscalYear->id,
             'period_start' => $periodStart->toDateString(),
             'period_end' => $periodEnd->toDateString(),
+            'asset_codes' => AssetSampleDataSeeder::DEMO_ASSET_CODES,
         ]);
+
+        if ($run->lines_count === 0) {
+            return;
+        }
 
         app(PostDepreciationToJournalAction::class)->execute($run);
 

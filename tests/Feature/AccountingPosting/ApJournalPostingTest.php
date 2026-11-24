@@ -19,17 +19,23 @@ uses(RefreshDatabase::class)->group('ap-journal-posting');
 
 function makePostingFiscalYear(): FiscalYear
 {
-    return FiscalYear::factory()->create([
-        'name' => '2026',
-        'start_date' => '2026-01-01',
-        'end_date' => '2026-12-31',
-        'status' => 'open',
-    ]);
+    return FiscalYear::firstOrCreate(
+        ['name' => '2026'],
+        [
+            'start_date' => '2026-01-01',
+            'end_date' => '2026-12-31',
+            'status' => 'open',
+        ],
+    );
 }
 
 function makePostingChartOfAccounts(): array
 {
-    $coaVersion = CoaVersion::factory()->create(['status' => 'active']);
+    // COA aktif harus terikat ke tahun fiskal yang memuat tanggal jurnal (#357).
+    $coaVersion = CoaVersion::factory()->create([
+        'fiscal_year_id' => makePostingFiscalYear()->id,
+        'status' => 'active',
+    ]);
 
     $apAccount = Account::factory()->create([
         'coa_version_id' => $coaVersion->id,
@@ -157,6 +163,42 @@ test('PostSupplierBillJournalAction returns null when bill is not confirmed', fu
     expect($action->execute($supplierBill))->toBeNull();
     expect(JournalEntry::count())->toBe(0);
 });
+
+test('PostSupplierBillJournalAction posts bills that moved past confirmed', function (string $status) {
+    makePostingFiscalYear();
+    $accounts = makePostingChartOfAccounts();
+
+    $supplierBill = SupplierBill::factory()->confirmed()->create([
+        'bill_date' => '2026-03-15',
+        'grand_total' => 500000,
+        'amount_due' => 500000,
+        'status' => $status,
+    ]);
+    $supplierBill->items()->create([
+        'account_id' => $accounts['expense']->id,
+        'description' => 'Item',
+        'quantity' => 1,
+        'unit_price' => 500000,
+        'discount_percent' => 0,
+        'tax_percent' => 0,
+        'line_total' => 500000,
+    ]);
+
+    $journalEntry = app(PostSupplierBillJournalAction::class)->execute($supplierBill->fresh());
+
+    expect($journalEntry)->not->toBeNull()
+        ->and((float) $journalEntry->total_credit)->toBe(500000.0);
+})->with(['overdue', 'partially_paid', 'paid']);
+
+test('PostSupplierBillJournalAction returns null for draft, cancelled and void bills', function (string $status) {
+    makePostingFiscalYear();
+    makePostingChartOfAccounts();
+
+    $supplierBill = SupplierBill::factory()->create(['status' => $status]);
+
+    expect(app(PostSupplierBillJournalAction::class)->execute($supplierBill))->toBeNull()
+        ->and(JournalEntry::count())->toBe(0);
+})->with(['draft', 'cancelled', 'void']);
 
 test('PostSupplierBillJournalAction throws when no items exist', function () {
     makePostingFiscalYear();

@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Actions\AccountingPosting\PostApPaymentJournalAction;
+use App\Actions\AccountingPosting\PostSupplierBillJournalAction;
 use App\Models\Account;
 use App\Models\ApPayment;
 use App\Models\ApPaymentAllocation;
@@ -21,6 +23,11 @@ use Illuminate\Database\Seeder;
 
 class ApSampleDataSeeder extends Seeder
 {
+    /** Pola nomor dokumen AP demo yang dibuat seeder ini. */
+    private const BILL_DEMO = 'BILL-____-00000%';
+
+    private const PAYMENT_DEMO = 'PAY-____-00000%';
+
     public function run(): void
     {
         $adminUserId = User::query()->where('email', config('app.admin'))->value('id') ?? User::query()->value('id');
@@ -41,13 +48,18 @@ class ApSampleDataSeeder extends Seeder
             return;
         }
 
+        // Hanya akun dari COA version aktif: akun COA archived tidak boleh dipakai posting.
+        $activeCoaVersionId = CoaVersion::query()->where('status', 'active')->value('id');
+
         $expenseAccounts = Account::query()
+            ->where('coa_version_id', $activeCoaVersionId)
             ->where('type', 'expense')
             ->where('is_active', true)
             ->take(3)
             ->get();
 
         $assetAccounts = Account::query()
+            ->where('coa_version_id', $activeCoaVersionId)
             ->where('type', 'asset')
             ->where('is_active', true)
             ->take(2)
@@ -75,6 +87,23 @@ class ApSampleDataSeeder extends Seeder
             $suppliers,
             $supplierBills
         );
+    }
+
+    /**
+     * Menyelaraskan amount_paid/amount_due tagihan dengan seluruh alokasi yang masih
+     * ada di ledger (demo maupun buatan pengguna). Upsert tagihan mereset amount_paid
+     * ke 0, sehingga tanpa ini seed ulang menghapus pembayaran yang sudah dialokasikan.
+     */
+    private function restoreBillSettlement(SupplierBill $bill): void
+    {
+        $paid = (float) ApPaymentAllocation::query()
+            ->where('supplier_bill_id', $bill->id)
+            ->sum('allocated_amount');
+
+        $bill->amount_paid = $paid;
+        $bill->amount_due = (float) $bill->grand_total - $paid;
+        $bill->save();
+        $bill->updatePaymentStatus();
     }
 
     private function seedSupplierBills(
@@ -172,15 +201,16 @@ class ApSampleDataSeeder extends Seeder
 
             // Tanggal dokumen lebih tua untuk bill overdue agar jatuh tempo
             // tetap setelah tanggal dokumen (W5-20).
-            $billDate = now()->subDays(
-                $definition['bill_date_days_ago'] ?? (60 - $index),
-            );
+            $billDate = now()->subDays($definition['bill_date_days_ago']);
             $dueDate = $billDate->copy()->addDays($definition['due_date_offset']);
 
-            $subtotal = $definition['total_amount'] * 0.85;
-            $taxAmount = $definition['total_amount'] * 0.11;
-            $discountAmount = $definition['total_amount'] * 0.04;
-            $grandTotal = $subtotal + $taxAmount - $discountAmount;
+            // Total dokumen diturunkan dari item (sumber jurnal AP), bukan rasio tetap,
+            // agar Σ line_total = grand_total dan GL 21100 = subledger.
+            $items = $this->billItemDefinitions($products, $expenseAccounts, $assetAccounts, $definition['item_count'], $index);
+            $subtotal = array_sum(array_column($items, 'base'));
+            $discountAmount = array_sum(array_column($items, 'discount'));
+            $taxAmount = array_sum(array_column($items, 'tax'));
+            $grandTotal = array_sum(array_column($items, 'line_total'));
 
             $supplierBill = SupplierBill::updateOrCreate(
                 ['bill_number' => $definition['number']],
@@ -212,14 +242,8 @@ class ApSampleDataSeeder extends Seeder
                 ]
             );
 
-            $this->seedSupplierBillItems(
-                $supplierBill,
-                $products,
-                $expenseAccounts,
-                $assetAccounts,
-                $definition['item_count'],
-                $index
-            );
+            $this->seedSupplierBillItems($supplierBill, $items);
+            $this->restoreBillSettlement($supplierBill);
 
             $supplierBills[] = $supplierBill;
         }
@@ -227,39 +251,69 @@ class ApSampleDataSeeder extends Seeder
         return $supplierBills;
     }
 
-    private function seedSupplierBillItems(
-        SupplierBill $supplierBill,
+    /**
+     * Definisi item tagihan. Nilai per baris dibulatkan 2 desimal; grand_total bill
+     * diturunkan dari Σ line_total sehingga sama dengan jurnal AP.
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function billItemDefinitions(
         $products,
         $expenseAccounts,
         $assetAccounts,
         int $itemCount,
         int $billIndex
-    ): void {
-        for ($i = 0; $i < $itemCount; $i++) {
-            $product = $products[($billIndex + $i) % $products->count()];
-            $account = $i % 2 === 0
-                ? $expenseAccounts[$i % $expenseAccounts->count()]
-                : $assetAccounts[$i % $assetAccounts->count()];
+    ): array {
+        $items = [];
 
+        for ($i = 0; $i < $itemCount; $i++) {
             $quantity = 10 + ($i * 5);
             $unitPrice = 100000 + ($i * 25000);
             $discountPercent = $i === 0 ? 5.0 : 0.0;
             $taxPercent = 11.0;
-            $lineTotal = $quantity * $unitPrice * (1 - $discountPercent / 100) * (1 + $taxPercent / 100);
 
+            $base = round($quantity * $unitPrice, 2);
+            $discount = round($base * $discountPercent / 100, 2);
+            $tax = round(($base - $discount) * $taxPercent / 100, 2);
+
+            $items[] = [
+                'product' => $products[($billIndex + $i) % $products->count()],
+                'account' => $i % 2 === 0
+                    ? $expenseAccounts[$i % $expenseAccounts->count()]
+                    : $assetAccounts[$i % $assetAccounts->count()],
+                'quantity' => $quantity,
+                'unit_price' => $unitPrice,
+                'discount_percent' => $discountPercent,
+                'tax_percent' => $taxPercent,
+                'base' => $base,
+                'discount' => $discount,
+                'tax' => $tax,
+                'line_total' => round($base - $discount + $tax, 2),
+            ];
+        }
+
+        return $items;
+    }
+
+    /**
+     * @param  list<array<string, mixed>>  $items
+     */
+    private function seedSupplierBillItems(SupplierBill $supplierBill, array $items): void
+    {
+        foreach ($items as $index => $item) {
             SupplierBillItem::updateOrCreate(
                 [
                     'supplier_bill_id' => $supplierBill->id,
-                    'product_id' => $product->id,
+                    'product_id' => $item['product']->id,
                 ],
                 [
-                    'account_id' => $account->id,
-                    'description' => $product->name . ' - Item ' . ($i + 1),
-                    'quantity' => $quantity,
-                    'unit_price' => $unitPrice,
-                    'discount_percent' => $discountPercent,
-                    'tax_percent' => $taxPercent,
-                    'line_total' => $lineTotal,
+                    'account_id' => $item['account']->id,
+                    'description' => $item['product']->name . ' - Item ' . ($index + 1),
+                    'quantity' => $item['quantity'],
+                    'unit_price' => $item['unit_price'],
+                    'discount_percent' => $item['discount_percent'],
+                    'tax_percent' => $item['tax_percent'],
+                    'line_total' => $item['line_total'],
                     'notes' => 'Item tagihan sesuai faktur supplier',
                 ]
             );
@@ -275,8 +329,10 @@ class ApSampleDataSeeder extends Seeder
     ): void {
         $year = now()->format('Y');
 
-        $bill3GrandTotal = (float) ($supplierBills[2]->grand_total ?? 0);
+        // Alokasi diturunkan dari grand_total bill agar tidak pernah melebihi tagihan.
         $bill4GrandTotal = (float) ($supplierBills[3]->grand_total ?? 0);
+        $bill5GrandTotal = (float) ($supplierBills[4]->grand_total ?? 0);
+        $bill3Partial = 5000000.0;
 
         $paymentDefinitions = [
             [
@@ -301,24 +357,22 @@ class ApSampleDataSeeder extends Seeder
                 'number' => "PAY-{$year}-000003",
                 'status' => 'confirmed',
                 'supplier_index' => 0,
-                'total_amount' => 15000000,
+                'total_amount' => $bill3Partial + $bill5GrandTotal,
                 'allocations' => [
-                    ['bill_index' => 2, 'amount' => 5000000],
-                    ['bill_index' => 4, 'amount' => 10000000],
+                    ['bill_index' => 2, 'amount' => $bill3Partial],
+                    ['bill_index' => 4, 'amount' => $bill5GrandTotal],
                 ],
             ],
         ];
 
-        // Akun harus dari COA versi tahun fiskal ini agar posting sejalan dengan
-        // laporan (W6-06). Transfer bank memakai akun bank (11110), bukan Cash.
-        $coaVersionId = CoaVersion::query()
-            ->where('fiscal_year_id', $fiscalYearId)
-            ->orderByRaw("CASE status WHEN 'active' THEN 0 ELSE 1 END")
-            ->value('id');
+        // Akun bank harus dari COA version aktif agar posting sejalan dengan laporan
+        // (W6-06). Transfer bank memakai akun bank (11110), bukan Cash.
+        $activeCoaVersionId = CoaVersion::query()->where('status', 'active')->value('id');
 
         $bankAccount = Account::query()
-            ->when($coaVersionId, fn ($query) => $query->where('coa_version_id', $coaVersionId))
+            ->where('coa_version_id', $activeCoaVersionId)
             ->where('code', '11110')
+            ->where('is_active', true)
             ->first();
 
         $billAllocations = [];
@@ -356,6 +410,18 @@ class ApSampleDataSeeder extends Seeder
                     continue;
                 }
 
+                // Hanya pembayaran confirmed yang punya jurnal dan boleh tercatat sebagai alokasi.
+                // Alokasi dari pembayaran draft tidak masuk ledger, sehingga subledger
+                // (ap_payment_allocations) sejalan dengan amount_paid dan GL 21100.
+                if ($definition['status'] !== 'confirmed') {
+                    ApPaymentAllocation::query()
+                        ->where('ap_payment_id', $apPayment->id)
+                        ->where('supplier_bill_id', $bill->id)
+                        ->delete();
+
+                    continue;
+                }
+
                 ApPaymentAllocation::updateOrCreate(
                     [
                         'ap_payment_id' => $apPayment->id,
@@ -369,11 +435,7 @@ class ApSampleDataSeeder extends Seeder
                 );
 
                 $totalAllocated += $allocation['amount'];
-
-                if (! isset($billAllocations[$bill->id])) {
-                    $billAllocations[$bill->id] = 0;
-                }
-                $billAllocations[$bill->id] += $allocation['amount'];
+                $billAllocations[$bill->id] = ($billAllocations[$bill->id] ?? 0) + $allocation['amount'];
             }
 
             if ($totalAllocated > 0) {
@@ -383,92 +445,67 @@ class ApSampleDataSeeder extends Seeder
             }
         }
 
-        foreach ($billAllocations as $billId => $allocatedAmount) {
+        foreach (array_keys($billAllocations) as $billId) {
             $bill = SupplierBill::find($billId);
             if ($bill) {
-                $bill->amount_paid = $allocatedAmount;
-                $bill->amount_due = $bill->grand_total - $allocatedAmount;
-                $bill->updatePaymentStatus();
-                $bill->save();
+                $this->restoreBillSettlement($bill);
             }
         }
 
-        $this->seedPaymentJournals($fiscalYearId, $bankAccount, $adminUserId);
+        $this->postConfirmedJournals($fiscalYearId);
     }
 
     /**
-     * Posting kas untuk pembayaran AP yang confirmed agar arus kas dan GL
-     * sejalan dengan subledger (W6-06). Idempoten via prefix APP-.
+     * Posting jurnal AP lewat action aplikasi (sama dengan controller saat confirm).
+     * Idempoten: action mengembalikan jurnal yang sudah ada bila `journal_entry_id` terisi.
      */
-    private function seedPaymentJournals(
-        int $fiscalYearId,
-        ?Account $bankAccount,
-        int $adminUserId,
-    ): void {
-        $coaVersionId = CoaVersion::query()
+    private function postConfirmedJournals(int $fiscalYearId): void
+    {
+        $postBill = app(PostSupplierBillJournalAction::class);
+        $postPayment = app(PostApPaymentJournalAction::class);
+
+        // Jurnal demo AP dibuat ulang setiap run agar nilainya mengikuti dokumen terbaru.
+        // Hanya bill/payment demo (nomor dari seeder ini) yang jurnalnya dilepas dan
+        // diposting ulang; jurnal dokumen buatan pengguna tidak disentuh (issue #357).
+        // Action mengembalikan jurnal lama bila journal_entry_id masih terisi, jadi harus dilepas dulu.
+        $billIds = SupplierBill::query()
             ->where('fiscal_year_id', $fiscalYearId)
-            ->orderByRaw("CASE status WHEN 'active' THEN 0 ELSE 1 END")
-            ->value('id');
-
-        $payableAccount = Account::query()
-            ->when($coaVersionId, fn ($query) => $query->where('coa_version_id', $coaVersionId))
-            ->where('code', '21100')
-            ->first();
-
-        if (! $payableAccount || ! $bankAccount) {
-            return;
-        }
-
-        $existing = JournalEntry::query()
-            ->where('entry_number', 'like', 'APP-%')
+            ->where('bill_number', 'like', self::BILL_DEMO)
+            ->pluck('id');
+        $paymentIds = ApPayment::query()
+            ->where('fiscal_year_id', $fiscalYearId)
+            ->where('payment_number', 'like', self::PAYMENT_DEMO)
             ->pluck('id');
 
-        if ($existing->isNotEmpty()) {
-            JournalEntryLine::query()
-                ->whereIn('journal_entry_id', $existing)
-                ->delete();
-            JournalEntry::query()->whereIn('id', $existing)->delete();
+        // Termasuk prefix APP- dari seeder lama yang memposting kas tulis-tangan (sudah dihapus).
+        $staleEntryIds = JournalEntry::query()
+            ->where(fn ($query) => $query
+                ->where(fn ($q) => $q->where('source_type', SupplierBill::class)->whereIn('source_id', $billIds))
+                ->orWhere(fn ($q) => $q->where('source_type', ApPayment::class)->whereIn('source_id', $paymentIds))
+                ->orWhere(fn ($q) => $q->where('entry_number', 'like', 'APP-%')->where('source_type', ApPayment::class)))
+            ->pluck('id');
+
+        if ($staleEntryIds->isNotEmpty()) {
+            SupplierBill::query()->whereIn('journal_entry_id', $staleEntryIds)->update(['journal_entry_id' => null]);
+            ApPayment::query()->whereIn('journal_entry_id', $staleEntryIds)->update(['journal_entry_id' => null]);
+            JournalEntryLine::query()->whereIn('journal_entry_id', $staleEntryIds)->delete();
+            JournalEntry::query()->whereIn('id', $staleEntryIds)->delete();
         }
 
-        $payments = ApPayment::query()
+        SupplierBill::query()
+            ->where('fiscal_year_id', $fiscalYearId)
+            ->where('bill_number', 'like', self::BILL_DEMO)
+            ->whereIn('status', PostSupplierBillJournalAction::POSTABLE_STATUSES)
+            ->orderBy('bill_number')
+            ->get()
+            ->each(fn (SupplierBill $bill) => $postBill->execute($bill->refresh()));
+
+        ApPayment::query()
+            ->where('fiscal_year_id', $fiscalYearId)
+            ->where('payment_number', 'like', self::PAYMENT_DEMO)
             ->where('status', 'confirmed')
             ->orderBy('payment_number')
-            ->get();
-
-        foreach ($payments as $payment) {
-            $amount = (float) $payment->total_amount;
-
-            if ($amount <= 0) {
-                continue;
-            }
-
-            $entry = JournalEntry::create([
-                'fiscal_year_id' => $fiscalYearId,
-                'entry_number' => 'APP-' . $payment->payment_number,
-                'entry_date' => $payment->payment_date->toDateString(),
-                'reference' => $payment->payment_number,
-                'description' => 'Pembayaran tagihan supplier ' . $payment->payment_number,
-                'status' => 'posted',
-                'journal_type' => 'payment',
-                'created_by' => $adminUserId,
-                'posted_by' => $adminUserId,
-                'posted_at' => $payment->confirmed_at ?? now(),
-            ]);
-
-            $entry->lines()->createMany([
-                [
-                    'account_id' => $payableAccount->id,
-                    'debit' => $amount,
-                    'credit' => 0,
-                    'memo' => 'Pelunasan utang usaha',
-                ],
-                [
-                    'account_id' => $bankAccount->id,
-                    'debit' => 0,
-                    'credit' => $amount,
-                    'memo' => 'Kas keluar untuk pembayaran supplier',
-                ],
-            ]);
-        }
+            ->get()
+            ->each(fn (ApPayment $payment) => $postPayment->execute($payment->refresh()));
     }
 }

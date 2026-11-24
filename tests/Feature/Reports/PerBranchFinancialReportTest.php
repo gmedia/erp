@@ -311,13 +311,38 @@ test('per-branch comparative report scopes all sections', function () {
 test('omitting branchId reproduces company-wide income statement', function () {
     seedTwoBranchFixtures($this);
 
-    $scopedSum = $this->service->getIncomeStatement($this->fiscalYear->id, null, $this->branchA->id)['totals']['net_income']
-        + $this->service->getIncomeStatement($this->fiscalYear->id, null, $this->branchB->id)['totals']['net_income'];
+    // Partisi lengkap: seluruh cabang yang punya baris jurnal di tahun fiskal ini
+    // (termasuk cabang dari data demo), bukan hanya fixture Branch A/B.
+    $branchIds = JournalEntryLine::query()
+        ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+        ->where('journal_entries.fiscal_year_id', $this->fiscalYear->id)
+        ->where('journal_entries.status', 'posted')
+        ->whereNotNull('journal_entry_lines.branch_id')
+        ->distinct()
+        ->pluck('journal_entry_lines.branch_id')
+        ->all();
+
+    $scopedSum = collect($branchIds)->sum(
+        fn (int $branchId) => $this->service
+            ->getIncomeStatement($this->fiscalYear->id, null, $branchId)['totals']['net_income'],
+    );
     $companyWide = $this->service->getIncomeStatement($this->fiscalYear->id);
 
-    // Branch fixtures contribute net income 1,400,000; company-wide also includes NULL-branch journals.
+    // Persamaan tepat: company-wide = Σ semua cabang + jurnal tanpa cabang (branch_id NULL).
+    // Net income baris tanpa cabang dihitung langsung dari baris jurnal, bukan dari asumsi.
+    // Partisi memakai kunci yang sama dengan laporan: branch pada BARIS (bukan header).
+    $nullBranchNetIncome = (float) JournalEntryLine::query()
+        ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+        ->join('accounts', 'accounts.id', '=', 'journal_entry_lines.account_id')
+        ->where('journal_entries.fiscal_year_id', $this->fiscalYear->id)
+        ->where('journal_entries.status', 'posted')
+        ->whereNull('journal_entry_lines.branch_id')
+        ->whereIn('accounts.type', ['revenue', 'expense'])
+        ->selectRaw('COALESCE(SUM(journal_entry_lines.credit - journal_entry_lines.debit), 0) AS net')
+        ->value('net');
+
     expect(round($companyWide['totals']['net_income'], 2))
-        ->toBeGreaterThanOrEqual(round($scopedSum, 2));
+        ->toBe(round($scopedSum + $nullBranchNetIncome, 2));
 });
 
 test('income statement endpoint accepts branch_id and scopes the report', function () {
