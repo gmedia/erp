@@ -658,6 +658,89 @@ invariant('W7-15 employee demo emails use person names, not job titles', functio
     }
 });
 
+// PR432 butir 5 — karyawan demo tidak menumpuk di satu departemen (maks. 50%).
+invariant('PR432 employee demo is not concentrated in one department', function () {
+    $demoEmployments = DB::table('employments')
+        ->join('employees', 'employees.id', '=', 'employments.employee_id')
+        ->where('employments.is_current', true)
+        ->where('employees.employee_id', 'like', 'EMP-%');
+    $total = (clone $demoEmployments)->count();
+    $largest = (int) (clone $demoEmployments)
+        ->select('employments.department_id', DB::raw('COUNT(*) as headcount'))
+        ->groupBy('employments.department_id')
+        ->orderByDesc('headcount')
+        ->first()?->headcount;
+
+    expect($total)->toBeGreaterThan(0);
+    expect($largest / $total)->toBeLessThanOrEqual(
+        0.5,
+        'No single department may hold more than half of demo employees'
+    );
+});
+
+// PR432 butir 5 — kode karyawan demo tidak hanya di awal sebaran:
+// tiga kode pertama tidak boleh berada di satu departemen.
+invariant('PR432 employee demo spreads codes across departments, not only the first ones', function () {
+    $firstDepartments = DB::table('employments')
+        ->join('employees', 'employees.id', '=', 'employments.employee_id')
+        ->join('departments', 'departments.id', '=', 'employments.department_id')
+        ->where('employments.is_current', true)
+        ->orderBy('employees.employee_id')
+        ->limit(3)
+        ->pluck('departments.name')
+        ->unique();
+
+    expect($firstDepartments->count())->toBeGreaterThan(
+        1,
+        'The first three employee codes must not share a single department'
+    );
+});
+
+// PR432 butir 3 — PO yang melewati approval punya transisi Pending Approval sebelum Confirmed.
+invariant('PR432 approved purchase orders record a Pending Approval transition before Confirmed', function () {
+    $entities = DB::table('pipeline_entity_states')
+        ->join('purchase_orders', 'purchase_orders.id', '=', 'pipeline_entity_states.entity_id')
+        ->where('pipeline_entity_states.entity_type', 'App\\Models\\PurchaseOrder')
+        ->where('purchase_orders.po_number', 'like', 'PO-%-0001%')
+        ->pluck('pipeline_entity_states.id', 'pipeline_entity_states.entity_id');
+
+    expect($entities)->not->toBeEmpty();
+
+    foreach ($entities as $purchaseOrderId => $entityStateId) {
+        $states = DB::table('pipeline_state_logs')
+            ->join('pipeline_states', 'pipeline_states.id', '=', 'pipeline_state_logs.to_state_id')
+            ->where('pipeline_state_logs.pipeline_entity_state_id', $entityStateId)
+            ->orderBy('pipeline_state_logs.id')
+            ->pluck('pipeline_states.name')
+            ->all();
+
+        if (! in_array('Confirmed', $states, true)) {
+            continue;
+        }
+
+        expect(in_array('Pending Approval', $states, true))->toBeTrue(
+            "Purchase order {$purchaseOrderId} must pass Pending Approval before Confirmed"
+        );
+    }
+});
+
+// PR432 butir 3 — pelaku transisi PO dan aset bervariasi, tidak semuanya satu orang.
+invariant('PR432 purchase order transitions are performed by more than one actor', function () {
+    $performers = DB::table('pipeline_state_logs')
+        ->join(
+            'pipeline_entity_states',
+            'pipeline_entity_states.id',
+            '=',
+            'pipeline_state_logs.pipeline_entity_state_id'
+        )
+        ->where('pipeline_entity_states.entity_type', 'App\\Models\\PurchaseOrder')
+        ->whereNotNull('pipeline_state_logs.performed_by')
+        ->distinct()
+        ->count('pipeline_state_logs.performed_by');
+
+    expect($performers)->toBeGreaterThan(1, 'Purchase order transitions must be performed by different users');
+});
+
 // W7-15 (HR) — departemen karyawan demo tersebar, tidak menumpuk di HR.
 invariant('W7-15 employee demo departments are not concentrated in HR', function () {
     $total = DB::table('employments')->where('is_current', true)->count();

@@ -122,7 +122,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'code' => 'EMP-000002', 'name' => 'Admin User', 'email' => config('app.admin'),
-                'phone' => '081234567801', 'department' => DemoMasterData::DEPARTMENT_OPERATIONS,
+                'phone' => '081234567801', 'department' => DemoMasterData::DEPARTMENT_ENGINEERING,
                 'position' => DemoMasterData::POSITION_LEAD,
                 'salary' => 12000000, 'years' => 4, 'user' => $admin,
             ],

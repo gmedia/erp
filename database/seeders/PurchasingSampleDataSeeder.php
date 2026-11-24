@@ -1018,15 +1018,24 @@ class PurchasingSampleDataSeeder extends Seeder
         $histories = [
             'draft' => [],
             'pending_approval' => [['draft', 'pending_approval']],
-            'confirmed' => [['draft', 'confirmed']],
+            'confirmed' => [['draft', 'pending_approval'], ['pending_approval', 'confirmed']],
             'rejected' => [['draft', 'pending_approval'], ['pending_approval', 'rejected']],
-            'partially_received' => [['draft', 'confirmed'], ['confirmed', 'partially_received']],
+            'partially_received' => [
+                ['draft', 'pending_approval'],
+                ['pending_approval', 'confirmed'],
+                ['confirmed', 'partially_received'],
+            ],
             'fully_received' => [
-                ['draft', 'confirmed'],
+                ['draft', 'pending_approval'],
+                ['pending_approval', 'confirmed'],
                 ['confirmed', 'partially_received'],
                 ['partially_received', 'fully_received'],
             ],
-            'cancelled' => [['draft', 'confirmed'], ['confirmed', 'cancelled']],
+            'cancelled' => [
+                ['draft', 'pending_approval'],
+                ['pending_approval', 'confirmed'],
+                ['confirmed', 'cancelled'],
+            ],
         ];
 
         $purchaseOrders = [];
@@ -1151,6 +1160,7 @@ class PurchasingSampleDataSeeder extends Seeder
                 $histories[$status] ?? [],
                 $adminUserId,
                 $documentDate,
+                $adminUserId,
                 $documentRequesterId
             );
 
@@ -1638,7 +1648,8 @@ class PurchasingSampleDataSeeder extends Seeder
         array $history,
         int $adminUserId,
         Carbon $documentDate,
-        int $performedBy
+        int $performedBy,
+        ?int $submittedBy = null
     ): void {
         $pipeline = $pipelineConfig['pipeline'];
         $states = $pipelineConfig['states'];
@@ -1707,12 +1718,18 @@ class PurchasingSampleDataSeeder extends Seeder
             ]
         );
 
+        // Pengajuan (draft -> pending_approval) dilakukan pengaju; transisi lain
+        // dilakukan pelaku berwenang (admin). Dengan begitu pelaku tidak sama
+        // dengan pengaju pada dokumen yang melewati approval.
         foreach ($logs as $log) {
+            $isSubmission = $log['from_state_id'] === $states['draft']->id
+                && $log['to_state_id'] === $states['pending_approval']?->id;
+
             PipelineStateLog::create(array_merge($log, [
                 'pipeline_entity_state_id' => $entityState->id,
                 'entity_type' => $entityType,
                 'entity_id' => $entityId,
-                'performed_by' => $performedBy,
+                'performed_by' => $isSubmission && $submittedBy !== null ? $submittedBy : $performedBy,
             ]));
         }
     }
