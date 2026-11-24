@@ -59,16 +59,27 @@ trait CalculatesTransactionLineTotals
     }
 
     /**
+     * Header harus seimbang: grand_total = subtotal - diskon + pajak.
+     * Selisih sen akibat pembulatan per komponen dibebankan ke pajak
+     * sebagai penyeimbang, supaya tampilan dan jurnal tidak berselisih.
+     *
      * @param  array<int, array<string, mixed>>  $normalizedItems
      * @return array<string, string>
      */
     protected function calculateHeaderTotals(array $normalizedItems): array
     {
+        $subtotal = $this->calculateSubtotal($normalizedItems);
+        $discount = $this->calculateDiscountAmount($normalizedItems);
+        $tax = $this->calculateTaxAmount($normalizedItems);
+        $grandTotal = $this->calculateGrandTotal($normalizedItems);
+
+        $tax = $this->roundLineAmount($grandTotal - $subtotal + $discount);
+
         return [
-            'subtotal' => (string) $this->calculateSubtotal($normalizedItems),
-            'discount_amount' => (string) $this->calculateDiscountAmount($normalizedItems),
-            'tax_amount' => (string) $this->calculateTaxAmount($normalizedItems),
-            'grand_total' => (string) $this->calculateGrandTotal($normalizedItems),
+            'subtotal' => (string) $subtotal,
+            'discount_amount' => (string) $discount,
+            'tax_amount' => (string) $tax,
+            'grand_total' => (string) $grandTotal,
         ];
     }
 }
