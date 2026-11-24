@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Approvals\ApproveApprovalRequestAction;
 use App\Actions\Approvals\RejectApprovalRequestAction;
+use App\Actions\Approvals\ResolveApprovalStepActorAction;
 use App\Http\Requests\MyApprovals\ApproveMyApprovalRequest;
 use App\Http\Requests\MyApprovals\RejectMyApprovalRequest;
 use App\Models\ApprovalRequest;
@@ -49,6 +50,14 @@ class MyApprovalController extends Controller
 
         $resolver = app(DocumentNumberResolver::class);
         $lists = [$pending, $approvedByMe, $rejectedByMe, $all];
+
+        // Flag steps the viewer acts on as a delegate (approver differs from viewer).
+        $resolveActor = app(ResolveApprovalStepActorAction::class);
+        foreach ($lists as $steps) {
+            $steps->each(function (ApprovalRequestStep $step) use ($resolveActor, $userId): void {
+                $step->setAttribute('is_delegated', $resolveActor->delegatorFor($step, $userId) !== null);
+            });
+        }
 
         // Resolve every document number up front: one query per approvable type,
         // not one per step (avoids N+1 on the inbox lists).
@@ -116,16 +125,6 @@ class MyApprovalController extends Controller
         ApprovalRequest $approvalRequest,
         int $userId,
     ): ?ApprovalRequestStep {
-        /** @var ApprovalRequestStep|null $step */
-        $step = $approvalRequest->steps()
-            ->where('status', 'pending')
-            ->where('step_order', $approvalRequest->current_step_order)
-            ->whereHas('flowStep', function ($flowStepQuery) use ($userId) {
-                $flowStepQuery->where('approver_type', 'user')
-                    ->where('approver_user_id', $userId);
-            })
-            ->first();
-
-        return $step;
+        return app(ResolveApprovalStepActorAction::class)->execute($approvalRequest, $userId);
     }
 }

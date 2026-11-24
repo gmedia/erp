@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Concerns;
 
+use App\Support\Database\TransactionRetrier;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 trait StoresItemsInTransaction
 {
@@ -29,7 +29,7 @@ trait StoresItemsInTransaction
         ?callable $afterCommit = null
     ): Model {
         /** @var TModel $model */
-        $model = DB::transaction(function () use (
+        $model = TransactionRetrier::run(function () use (
             $attributes,
             $items,
             $creator,
@@ -103,7 +103,11 @@ trait StoresItemsInTransaction
     ): void {
         $payload = $payloadResolver($attributes);
 
-        DB::transaction(function () use ($model, $payload, $items, $syncItems, $afterCommit): void {
+        TransactionRetrier::run(function () use ($model, $payload, $items, $syncItems, $afterCommit): void {
+            // Instance yang sama dimuat ulang tiap percobaan: setelah rollback, atribut yang
+            // sudah di-set pada percobaan sebelumnya tidak boleh dianggap "tersimpan" (dirty),
+            // dan pemanggil tetap memegang instance dengan nilai terbaru.
+            $model->refresh();
             $model->update($payload);
 
             if (is_array($items)) {
