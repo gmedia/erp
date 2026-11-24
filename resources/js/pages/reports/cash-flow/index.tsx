@@ -130,7 +130,7 @@ function CashFlowSummaryCards({
                     </CardHeader>
                     <CardContent
                         className={cn(
-                            'whitespace-nowrap text-2xl font-semibold tabular-nums',
+                            'text-2xl font-semibold whitespace-nowrap tabular-nums',
                             getSignedAmountTextClass(item.value),
                         )}
                     >
