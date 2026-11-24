@@ -270,6 +270,22 @@ jobs:
       - name: Install Node dependencies
         run: ./vendor/bin/sail npm ci
 
+      # Pint and PHPStan key their caches on file contents, rules and tool version.
+      - name: Cache Pint and PHPStan results
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
+        with:
+          path: ${{ runner.temp }}/lint-cache
+          key: ${{ runner.os }}-lint-${{ hashFiles('composer.lock', 'phpstan.neon', 'pint.json') }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: ${{ runner.os }}-lint-${{ hashFiles('composer.lock', 'phpstan.neon', 'pint.json') }}-
+
+      - name: Load lint caches into Sail
+        continue-on-error: true
+        run: |
+          mkdir -p "$RUNNER_TEMP/lint-cache"
+          ls -la "$RUNNER_TEMP/lint-cache"
+          docker cp "$RUNNER_TEMP/lint-cache/." erp-laravel.test-1:/tmp/
+          docker exec -u root erp-laravel.test-1 sh -c 'chmod 1777 /tmp; find /tmp -mindepth 1 -maxdepth 1 -exec chown -R sail {} +'
+
       - name: Run Duster
         run: ./vendor/bin/sail bin duster fix --no-interaction
 
@@ -367,6 +383,14 @@ jobs:
       - name: Build mobile bundle
         if: steps.autofix.outputs.changed != 'true'
         run: ./vendor/bin/sail npm run build:mobile
+
+      - name: Save lint caches
+        if: always()
+        continue-on-error: true
+        run: |
+          rm -rf "$RUNNER_TEMP/lint-cache" && mkdir -p "$RUNNER_TEMP/lint-cache"
+          docker exec erp-laravel.test-1 sh -c 'cd /tmp && find . -maxdepth 1 \( -name phpstan -o -regex "\./[0-9a-f]+" \) -print0 | tar --null -cf - -T -' | tar -xf - -C "$RUNNER_TEMP/lint-cache"
+          ls -la "$RUNNER_TEMP/lint-cache"
 
       - name: Stop Sail
         if: always()
