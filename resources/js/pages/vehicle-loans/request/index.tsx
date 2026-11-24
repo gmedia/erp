@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { RequiredLabel } from '@/components/vehicle-loans/RequiredLabel';
 import { VehicleLoanDateTimeFields } from '@/components/vehicle-loans/VehicleLoanDateTimeFields';
 import { VehicleLoanQrPanel } from '@/components/vehicle-loans/VehicleLoanQrPanel';
+import { usePermissions } from '@/hooks/usePermissions';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
 import { useQuery } from '@tanstack/react-query';
@@ -45,6 +46,8 @@ export default function VehicleLoanRequestPage() {
     const [form, setForm] = useState<LoanForm>(emptyForm);
     const [draftId, setDraftId] = useState<number | null>(null);
     const [loading, setLoading] = useState(false);
+    const { can } = usePermissions();
+    const canRequest = can('vehicle_loan.request');
 
     const { data: options } = useQuery({
         queryKey: ['vehicle-loans', 'assignment-options'],
@@ -264,23 +267,30 @@ export default function VehicleLoanRequestPage() {
                     </CardContent>
                 </Card>
 
-                <div className="sticky bottom-0 -mx-4 flex gap-2 border-t bg-background/95 p-4 backdrop-blur md:-mx-6 md:px-6">
-                    <Button
-                        variant="outline"
-                        onClick={() => void saveDraft()}
-                        disabled={loading}
-                        className="min-h-11 flex-1"
+                {canRequest && (
+                    <div
+                        className={[
+                            'sticky bottom-0 -mx-4 flex gap-2 border-t',
+                            'bg-background/95 p-4 backdrop-blur md:-mx-6 md:px-6',
+                        ].join(' ')}
                     >
-                        Simpan Draf
-                    </Button>
-                    <Button
-                        onClick={() => void submit()}
-                        disabled={loading}
-                        className="min-h-11 flex-1"
-                    >
-                        Kirim Permintaan
-                    </Button>
-                </div>
+                        <Button
+                            variant="outline"
+                            onClick={() => void saveDraft()}
+                            disabled={loading}
+                            className="min-h-11 flex-1"
+                        >
+                            Simpan Draf
+                        </Button>
+                        <Button
+                            onClick={() => void submit()}
+                            disabled={loading}
+                            className="min-h-11 flex-1"
+                        >
+                            Kirim Permintaan
+                        </Button>
+                    </div>
+                )}
             </div>
         </AppLayout>
     );
