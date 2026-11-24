@@ -47,6 +47,18 @@ class AssetSampleDataSeeder extends Seeder
         'FA-000013', 'FA-000014', 'FA-000015',
     ];
 
+    /**
+     * Tanggal beli demo: relatif terhadap awal bulan ini, dengan hari yang
+     * berbeda per aset, sehingga tidak semua jatuh di tanggal yang sama (W7-15).
+     */
+    private function purchaseDate(int $monthsAgo, int $dayOfMonth): string
+    {
+        return now()->startOfMonth()
+            ->subMonths($monthsAgo)
+            ->addDays(min($dayOfMonth, 28) - 1)
+            ->toDateString();
+    }
+
     protected function seedDemoData(): void
     {
         $adminUser = User::where('email', config('app.admin'))->first();
@@ -141,18 +153,21 @@ class AssetSampleDataSeeder extends Seeder
 
         // ── Asset Locations ─────────────────────────────────────────
         $branches = Branch::query()->orderBy('id')->get();
+        // Kode lokasi diberi akhiran cabang (mis. OFFICE-01) agar unik lintas
+        // cabang, bukan hanya per cabang (W7-17).
         foreach ($branches as $branch) {
+            $suffix = str_pad((string) $branch->id, 2, '0', STR_PAD_LEFT);
             $office = AssetLocation::updateOrCreate(
-                ['branch_id' => $branch->id, 'code' => 'OFFICE'],
-                ['name' => 'Office (' . $branch->name . ')', 'parent_id' => null]
+                ['branch_id' => $branch->id, 'code' => "OFFICE-{$suffix}"],
+                ['name' => 'Kantor (' . $branch->name . ')', 'parent_id' => null]
             );
             AssetLocation::updateOrCreate(
-                ['branch_id' => $branch->id, 'code' => 'IT-ROOM'],
-                ['name' => 'IT Room (' . $branch->name . ')', 'parent_id' => $office->id]
+                ['branch_id' => $branch->id, 'code' => "IT-ROOM-{$suffix}"],
+                ['name' => 'Ruang TI (' . $branch->name . ')', 'parent_id' => $office->id]
             );
             AssetLocation::updateOrCreate(
-                ['branch_id' => $branch->id, 'code' => 'WAREHOUSE'],
-                ['name' => 'Warehouse (' . $branch->name . ')', 'parent_id' => null]
+                ['branch_id' => $branch->id, 'code' => "WAREHOUSE-{$suffix}"],
+                ['name' => 'Gudang (' . $branch->name . ')', 'parent_id' => null]
             );
         }
 
@@ -161,9 +176,22 @@ class AssetSampleDataSeeder extends Seeder
             return;
         }
 
-        $itRoom = AssetLocation::where('branch_id', $headOffice->id)->where('code', 'IT-ROOM')->first();
-        $office = AssetLocation::where('branch_id', $headOffice->id)->where('code', 'OFFICE')->first();
-        $warehouse = AssetLocation::where('branch_id', $headOffice->id)->where('code', 'WAREHOUSE')->first();
+        // Kode lokasi demo lama (tanpa akhiran cabang) dilepas dari aset dulu,
+        // lalu baris lamanya dihapus. Hanya tiga kode demo yang dicocokkan.
+        $legacyLocationIds = AssetLocation::query()
+            ->whereIn('code', ['OFFICE', 'IT-ROOM', 'WAREHOUSE'])
+            ->pluck('id');
+
+        if ($legacyLocationIds->isNotEmpty()) {
+            Asset::query()->whereIn('asset_location_id', $legacyLocationIds)->update(['asset_location_id' => null]);
+            AssetLocation::query()->whereIn('id', $legacyLocationIds)->update(['parent_id' => null]);
+            AssetLocation::query()->whereIn('id', $legacyLocationIds)->delete();
+        }
+
+        $suffix = str_pad((string) $headOffice->id, 2, '0', STR_PAD_LEFT);
+        $itRoom = AssetLocation::where('branch_id', $headOffice->id)->where('code', "IT-ROOM-{$suffix}")->first();
+        $office = AssetLocation::where('branch_id', $headOffice->id)->where('code', "OFFICE-{$suffix}")->first();
+        $warehouse = AssetLocation::where('branch_id', $headOffice->id)->where('code', "WAREHOUSE-{$suffix}")->first();
 
         // ── Retrieve Models ─────────────────────────────────────────
         $laptopModel = AssetModel::where('model_name', 'Laptop Latitude 5430')->first();
@@ -191,7 +219,7 @@ class AssetSampleDataSeeder extends Seeder
             // ─── ACTIVE ─────────────────────────────────────────────
             [
                 'asset_code' => 'FA-000001',
-                'name' => 'Laptop Admin',
+                'name' => 'Laptop Kerja Admin',
                 'asset_model_id' => $laptopModel?->id,
                 'asset_category_id' => $itCategory?->id,
                 'serial_number' => 'SN-DELL-001',
@@ -200,14 +228,14 @@ class AssetSampleDataSeeder extends Seeder
                 'department_id' => $defaultDepartment?->id,
                 'employee_id' => $adminEmployee?->id,
                 'supplier_id' => $supplier->id,
-                'purchase_date' => now()->subMonths(10)->toDateString(),
+                'purchase_date' => $this->purchaseDate(10, 7),
                 'purchase_cost' => 18000000,
                 'currency' => 'IDR',
                 'warranty_end_date' => now()->addMonths(14)->toDateString(),
                 'status' => 'active',
                 'condition' => 'good',
                 'depreciation_method' => 'straight_line',
-                'depreciation_start_date' => now()->subMonths(10)->toDateString(),
+                'depreciation_start_date' => $this->purchaseDate(10, 7),
                 'useful_life_months' => 36,
                 'salvage_value' => 0,
                 'accumulated_depreciation' => 0,
@@ -225,14 +253,14 @@ class AssetSampleDataSeeder extends Seeder
                 'department_id' => $defaultDepartment?->id,
                 'employee_id' => null,
                 'supplier_id' => $supplier->id,
-                'purchase_date' => now()->subMonths(6)->toDateString(),
+                'purchase_date' => $this->purchaseDate(6, 13),
                 'purchase_cost' => 4500000,
                 'currency' => 'IDR',
                 'warranty_end_date' => now()->addMonths(18)->toDateString(),
                 'status' => 'active',
                 'condition' => 'good',
                 'depreciation_method' => 'straight_line',
-                'depreciation_start_date' => now()->subMonths(6)->toDateString(),
+                'depreciation_start_date' => $this->purchaseDate(6, 13),
                 'useful_life_months' => 36,
                 'salvage_value' => 0,
                 'accumulated_depreciation' => 0,
@@ -250,14 +278,14 @@ class AssetSampleDataSeeder extends Seeder
                 'department_id' => $defaultDepartment?->id,
                 'employee_id' => $adminEmployee?->id,
                 'supplier_id' => $supplier->id,
-                'purchase_date' => now()->subMonths(20)->toDateString(),
+                'purchase_date' => $this->purchaseDate(20, 3),
                 'purchase_cost' => 260000000,
                 'currency' => 'IDR',
                 'warranty_end_date' => null,
                 'status' => 'active',
                 'condition' => 'good',
                 'depreciation_method' => 'straight_line',
-                'depreciation_start_date' => now()->subMonths(20)->toDateString(),
+                'depreciation_start_date' => $this->purchaseDate(20, 3),
                 'useful_life_months' => 60,
                 'salvage_value' => 0,
                 'accumulated_depreciation' => 0,
@@ -329,14 +357,14 @@ class AssetSampleDataSeeder extends Seeder
                 'department_id' => $defaultDepartment?->id,
                 'employee_id' => null,
                 'supplier_id' => $supplier->id,
-                'purchase_date' => now()->subMonths(18)->toDateString(),
+                'purchase_date' => $this->purchaseDate(18, 19),
                 'purchase_cost' => 45000000,
                 'currency' => 'IDR',
                 'warranty_end_date' => now()->subMonths(6)->toDateString(),
                 'status' => 'maintenance',
                 'condition' => 'needs_repair',
                 'depreciation_method' => 'straight_line',
-                'depreciation_start_date' => now()->subMonths(18)->toDateString(),
+                'depreciation_start_date' => $this->purchaseDate(18, 19),
                 'useful_life_months' => 60,
                 'salvage_value' => 0,
                 'accumulated_depreciation' => 0,
@@ -347,7 +375,7 @@ class AssetSampleDataSeeder extends Seeder
             // ─── DISPOSED ───────────────────────────────────────────
             [
                 'asset_code' => 'FA-000007',
-                'name' => 'Laptop Lama',
+                'name' => 'Laptop Divisi Keuangan',
                 'asset_model_id' => $thinkpadModel?->id,
                 'asset_category_id' => $itCategory?->id,
                 'serial_number' => 'SN-LNV-001',
@@ -356,14 +384,14 @@ class AssetSampleDataSeeder extends Seeder
                 'department_id' => $defaultDepartment?->id,
                 'employee_id' => null,
                 'supplier_id' => $supplier->id,
-                'purchase_date' => now()->subYears(4)->toDateString(),
+                'purchase_date' => $this->purchaseDate(48, 11),
                 'purchase_cost' => 22000000,
                 'currency' => 'IDR',
                 'warranty_end_date' => now()->subYears(2)->toDateString(),
                 'status' => 'disposed',
                 'condition' => 'damaged',
                 'depreciation_method' => 'straight_line',
-                'depreciation_start_date' => now()->subYears(4)->toDateString(),
+                'depreciation_start_date' => $this->purchaseDate(48, 11),
                 'useful_life_months' => 36,
                 'salvage_value' => 0,
                 'accumulated_depreciation' => 22000000,
@@ -383,14 +411,14 @@ class AssetSampleDataSeeder extends Seeder
                 'department_id' => $defaultDepartment?->id,
                 'employee_id' => null,
                 'supplier_id' => $supplier->id,
-                'purchase_date' => now()->subYears(2)->toDateString(),
+                'purchase_date' => $this->purchaseDate(24, 5),
                 'purchase_cost' => 2800000,
                 'currency' => 'IDR',
                 'warranty_end_date' => null,
                 'status' => 'lost',
                 'condition' => 'good',
                 'depreciation_method' => 'straight_line',
-                'depreciation_start_date' => now()->subYears(2)->toDateString(),
+                'depreciation_start_date' => $this->purchaseDate(24, 5),
                 'useful_life_months' => 60,
                 'salvage_value' => 0,
                 'accumulated_depreciation' => 0,
@@ -464,14 +492,14 @@ class AssetSampleDataSeeder extends Seeder
                 'department_id' => $defaultDepartment?->id,
                 'employee_id' => null,
                 'supplier_id' => $supplier->id,
-                'purchase_date' => now()->subYears(1)->toDateString(),
+                'purchase_date' => $this->purchaseDate(14, 21),
                 'purchase_cost' => 450000000,
                 'currency' => 'IDR',
                 'warranty_end_date' => null,
                 'status' => 'active',
                 'condition' => 'good',
                 'depreciation_method' => 'straight_line',
-                'depreciation_start_date' => now()->subYears(1)->toDateString(),
+                'depreciation_start_date' => $this->purchaseDate(14, 21),
                 'useful_life_months' => 60,
                 'salvage_value' => 0,
                 'accumulated_depreciation' => 90000000,

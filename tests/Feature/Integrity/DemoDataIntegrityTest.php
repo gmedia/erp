@@ -871,6 +871,61 @@ invariant('W7-05 posted journals are balanced', function () {
         ->toBe(round((float) $totals->credit, 2), 'Total debits must equal total credits across posted journals');
 });
 
+// W7-15 (aset) — stocktake demo hanya memakai kategori barang, bukan jasa.
+invariant('W7-15 inventory stocktake demo uses goods categories, not services', function () {
+    $categoryNames = DB::table('inventory_stocktakes')
+        ->join('product_categories', 'product_categories.id', '=', 'inventory_stocktakes.product_category_id')
+        ->pluck('product_categories.name');
+
+    expect($categoryNames)->not->toBeEmpty('Demo data must include inventory stocktakes');
+
+    foreach ($categoryNames as $name) {
+        expect($name)->not->toBe('Consulting Services', 'Stocktake must not count service categories');
+    }
+});
+
+// W7-15 (aset) — harga motor berbeda wajar dari mobil (motor jauh lebih murah).
+invariant('W7-15 motorcycle assets cost far less than cars', function () {
+    $motorcycle = DB::table('assets')->where('name', 'like', '%Vario%')->value('purchase_cost');
+    $car = DB::table('assets')->where('name', 'like', '%Avanza%')->value('purchase_cost');
+
+    expect($motorcycle)->not->toBeNull('Demo data must include a motorcycle asset');
+    expect($car)->not->toBeNull('Demo data must include a car asset');
+    expect((float) $motorcycle)->toBeLessThan((float) $car * 0.5, 'A motorcycle must cost well under half a car');
+    expect((float) $motorcycle)->toBeGreaterThanOrEqual(15000000.0, 'Motorcycle price must be realistic');
+});
+
+// W7-15 (aset) — tanggal beli aset bervariasi, tidak semua tanggal yang sama.
+invariant('W7-15 asset purchase dates vary across the demo register', function () {
+    $dates = DB::table('assets')->distinct()->pluck('purchase_date');
+
+    expect($dates->count())->toBeGreaterThanOrEqual(8, 'Purchase dates must vary, not repeat one day');
+    expect($dates->map(fn ($d) => Carbon::parse($d)->day)->unique()->count())
+        ->toBeGreaterThanOrEqual(4, 'Purchase dates must not all fall on the same day of month');
+});
+
+// W7-17 (aset) — nama aset demo bukan label placeholder.
+invariant('W7-17 asset demo names avoid placeholder labels', function () {
+    $placeholders = DB::table('assets')
+        ->whereIn('name', ['Laptop Admin', 'Laptop Lama'])
+        ->pluck('name')
+        ->all();
+
+    expect($placeholders)->toBeEmpty('Asset demo names must not be placeholder labels');
+});
+
+// W7-17 (aset) — kode lokasi aset (OFFICE, IT-ROOM, WAREHOUSE) tidak berulang lintas cabang.
+invariant('W7-17 asset location codes are not repeated across branches', function () {
+    $repeated = DB::table('asset_locations')
+        ->select('code', DB::raw('COUNT(*) as total'))
+        ->groupBy('code')
+        ->having('total', '>', 1)
+        ->pluck('code')
+        ->all();
+
+    expect($repeated)->toBeEmpty('Asset location codes must not be repeated across branches');
+});
+
 // Issue #357 (PR #384): every invariant above must also hold after a second `db:seed`.
 // One test seeds twice and runs the registered read-only checks against that state.
 // It seeds only once more than the beforeEach, so the extra cost is one seed run.
