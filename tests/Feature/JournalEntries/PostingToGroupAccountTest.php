@@ -2,10 +2,12 @@
 
 namespace Tests\Feature\JournalEntries;
 
+use App\Actions\AccountingPosting\ReverseDocumentJournalAction;
 use App\Actions\JournalEntries\CreateJournalEntryAction;
 use App\Actions\JournalEntries\PostJournalAction;
 use App\Models\Account;
 use App\Models\CoaVersion;
+use App\Models\CustomerInvoice;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
 use App\Models\JournalEntryLine;
@@ -254,6 +256,60 @@ test('group balance includes posted journals from every fiscal year', function (
     );
 
     expect($entry->status)->toBe('posted');
+});
+
+test('reversing an original journal that posted to a group account is accepted', function () {
+    // Jurnal asli dibuat sebelum aturan berlaku (instalasi lama): saldo kelompok jadi nol lalu terbalik.
+    $original = JournalEntry::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'entry_date' => '2026-02-01',
+        'status' => 'posted',
+        'source_type' => 'customer_invoice',
+        'source_id' => 1,
+    ]);
+    JournalEntryLine::factory()->create([
+        'journal_entry_id' => $original->id,
+        'account_id' => $this->group->id,
+        'debit' => 500000,
+        'credit' => 0,
+    ]);
+    JournalEntryLine::factory()->create([
+        'journal_entry_id' => $original->id,
+        'account_id' => $this->otherLeaf->id,
+        'debit' => 0,
+        'credit' => 500000,
+    ]);
+    // Saldo kelompok sudah nol karena jurnal lain: pembalik (kredit 500000) akan menambah saldo
+    // negatif dan hanya lolos lewat allowGroupAccounts.
+    seedPostedGroupBalance($this, 0, 500000, '2026-02-10');
+
+    $document = CustomerInvoice::factory()->create([
+        'journal_entry_id' => $original->id,
+    ]);
+
+    $reversal = app(ReverseDocumentJournalAction::class)->execute(
+        $document,
+        'INV-TEST-0001',
+        'Faktur penjualan',
+    );
+
+    expect($reversal)->not->toBeNull()
+        ->and($reversal->status)->toBe('posted');
+
+    $groupLine = $reversal->lines()->where('account_id', $this->group->id)->first();
+    expect((float) $groupLine->credit)->toBe(500000.0)
+        ->and((float) $groupLine->debit)->toBe(0.0);
+});
+
+test('payload cannot enable group account bypass for a manual journal', function () {
+    seedPostedGroupBalance($this, 500000, 0);
+
+    $payload = groupJournalPayload($this, [['debit' => 0, 'credit' => 600000]]);
+    $payload['allow_group_accounts'] = true;
+    $payload['allowGroupAccounts'] = true;
+
+    expect(fn () => app(CreateJournalEntryAction::class)->execute($payload))
+        ->toThrow(ValidationException::class);
 });
 
 test('draft saved under the rule is rechecked when posted', function () {

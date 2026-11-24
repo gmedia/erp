@@ -80,7 +80,8 @@ class ReverseDocumentJournalAction
                 'source_id' => $document->getKey(),
                 'branch_id' => $original->branch_id,
                 'lines' => $lines,
-            ], $isPeriodClosingEntry);
+                // Pembalik baris asli selalu diterima walau akunnya kelompok (#437): flag PHP, bukan payload.
+            ], $isPeriodClosingEntry, allowGroupAccounts: true);
         });
     }
 }

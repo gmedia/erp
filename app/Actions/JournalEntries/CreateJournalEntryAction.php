@@ -38,8 +38,11 @@ class CreateJournalEntryAction
      *                                      ReverseDocumentJournalAction) yang boleh mengirim true.
      *                                      Bukan dari $data, agar payload jurnal manual tidak bisa
      *                                      melewati penguncian periode (#423).
+     * @param  bool  $allowGroupAccounts  Hanya ReverseDocumentJournalAction yang boleh mengirim true,
+     *                                    agar pembalik baris asli ke akun kelompok selalu diterima (#437).
+     *                                    Bukan dari $data, agar payload API tidak bisa mengaktifkannya.
      */
-    public function execute(array $data, bool $isPeriodClosingEntry = false): JournalEntry
+    public function execute(array $data, bool $isPeriodClosingEntry = false, bool $allowGroupAccounts = false): JournalEntry
     {
         $attempts = 0;
         $maxAttempts = 3;
@@ -68,7 +71,7 @@ class CreateJournalEntryAction
 
         while ($attempts < $maxAttempts) {
             try {
-                return DB::transaction(function () use ($data, $status, $isPeriodClosingEntry, $entryNumberPrefix) {
+                return DB::transaction(function () use ($data, $status, $isPeriodClosingEntry, $allowGroupAccounts, $entryNumberPrefix) {
                     $entryDate = $data['entry_date'];
 
                     $fiscalYear = FiscalYear::where('start_date', '<=', $entryDate)
@@ -93,7 +96,9 @@ class CreateJournalEntryAction
                     }
 
                     // Sebelum baris jurnal ditulis, agar saldo posted yang dibaca belum memuat jurnal ini.
-                    $this->assertGroupAccountLinesReduceBalance($data['lines']);
+                    if (! $allowGroupAccounts) {
+                        $this->assertGroupAccountLinesReduceBalance($data['lines']);
+                    }
 
                     // Generate Entry Number
                     // We use max() instead of count() to handle deletions correctly (gaps in sequence)
