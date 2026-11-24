@@ -861,8 +861,8 @@ jobs:
             pest_passed=false
           fi
 
-          if [[ "$e2e_result" == "success" || "$e2e_result" == "skipped" || "$e2e_result" == "cancelled" ]]; then
-            echo "✅ e2e=$e2e_result (non-blocking)"
+          if [[ "$e2e_result" == "success" ]]; then
+            echo "✅ e2e=success"
             e2e_passed=true
           else
             echo "❌ e2e=$e2e_result"
