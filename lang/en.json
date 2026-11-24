@@ -47,6 +47,7 @@
     "approval.items_locked": "Items can only be changed while the document is still a draft.",
     "approval.flow_not_found": "Approval flow not found, inactive, or has no steps.",
     "status_transition.invalid": "Cannot change status from :from to :to.",
+    "Only draft documents can be deleted. Cancel the document instead.": "Only draft documents can be deleted. Cancel the document instead.",
     "approval.transition_forbidden": "You do not have permission to execute this transition.",
     "nav": {
         "platform": "Platform",

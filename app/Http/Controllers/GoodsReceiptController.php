@@ -9,6 +9,7 @@ use App\Actions\GoodsReceipts\ListGoodsReceiptItemOptionsAction;
 use App\Actions\GoodsReceipts\PostGoodsReceiptMovementsAction;
 use App\Actions\GoodsReceipts\SyncGoodsReceiptItemsAction;
 use App\DTOs\GoodsReceipts\UpdateGoodsReceiptData;
+use App\Http\Controllers\Concerns\DeletesOnlyDraftDocuments;
 use App\Http\Controllers\Concerns\LoadsResourceRelations;
 use App\Http\Controllers\Concerns\StoresItemsInTransaction;
 use App\Http\Requests\GoodsReceipts\ExportGoodsReceiptRequest;
@@ -29,6 +30,7 @@ use Illuminate\Validation\ValidationException;
 
 class GoodsReceiptController extends Controller
 {
+    use DeletesOnlyDraftDocuments;
     use LoadsResourceRelations;
     use StoresItemsInTransaction;
 
@@ -165,7 +167,7 @@ class GoodsReceiptController extends Controller
 
     public function destroy(GoodsReceipt $goodsReceipt): JsonResponse
     {
-        return $this->destroyModel($goodsReceipt);
+        return $this->destroyDraftDocument($goodsReceipt);
     }
 
     public function itemOptions(

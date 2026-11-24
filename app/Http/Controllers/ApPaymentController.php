@@ -7,6 +7,7 @@ use App\Actions\ApPayments\ExportApPaymentsAction;
 use App\Actions\ApPayments\IndexApPaymentsAction;
 use App\Actions\ApPayments\SyncApPaymentAllocationsAction;
 use App\DTOs\ApPayments\UpdateApPaymentData;
+use App\Http\Controllers\Concerns\DeletesOnlyDraftDocuments;
 use App\Http\Controllers\Concerns\LoadsResourceRelations;
 use App\Http\Controllers\Concerns\StoresItemsInTransaction;
 use App\Http\Requests\ApPayments\ExportApPaymentRequest;
@@ -22,6 +23,7 @@ use Illuminate\Support\Facades\DB;
 
 class ApPaymentController extends Controller
 {
+    use DeletesOnlyDraftDocuments;
     use LoadsResourceRelations;
     use StoresItemsInTransaction;
 
@@ -140,13 +142,13 @@ class ApPaymentController extends Controller
 
     public function destroy(ApPayment $apPayment, SyncApPaymentAllocationsAction $syncAllocations): JsonResponse
     {
-        DB::transaction(function () use ($apPayment, $syncAllocations): void {
-            $billIds = $apPayment->allocations()->pluck('supplier_bill_id');
-            $apPayment->delete();
-            $syncAllocations->refreshBills($billIds);
+        return $this->destroyDraftDocument($apPayment, function () use ($apPayment, $syncAllocations): void {
+            DB::transaction(function () use ($apPayment, $syncAllocations): void {
+                $billIds = $apPayment->allocations()->pluck('supplier_bill_id');
+                $apPayment->delete();
+                $syncAllocations->refreshBills($billIds);
+            });
         });
-
-        return response()->json(null, 204);
     }
 
     public function export(ExportApPaymentRequest $request, ExportApPaymentsAction $action): JsonResponse

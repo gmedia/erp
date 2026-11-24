@@ -47,6 +47,7 @@
     "approval.items_locked": "Item hanya dapat diubah selama dokumen masih draft.",
     "approval.flow_not_found": "Approval flow tidak ditemukan, tidak aktif, atau tidak memiliki langkah.",
     "status_transition.invalid": "Tidak dapat mengubah status dari :from ke :to.",
+    "Only draft documents can be deleted. Cancel the document instead.": "Hanya dokumen draft yang dapat dihapus. Batalkan dokumen sebagai gantinya.",
     "approval.transition_forbidden": "Anda tidak memiliki izin untuk menjalankan transisi ini.",
     "nav": {
         "platform": "Platform",

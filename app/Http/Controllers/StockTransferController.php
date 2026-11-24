@@ -7,6 +7,7 @@ use App\Actions\StockTransfers\ExportStockTransfersAction;
 use App\Actions\StockTransfers\IndexStockTransfersAction;
 use App\Actions\StockTransfers\SyncStockTransferItemsAction;
 use App\DTOs\StockTransfers\UpdateStockTransferData;
+use App\Http\Controllers\Concerns\DeletesOnlyDraftDocuments;
 use App\Http\Controllers\Concerns\StoresItemsInTransaction;
 use App\Http\Requests\StockTransfers\ExportStockTransferRequest;
 use App\Http\Requests\StockTransfers\IndexStockTransferRequest;
@@ -24,6 +25,7 @@ use Illuminate\Validation\ValidationException;
 
 class StockTransferController extends Controller
 {
+    use DeletesOnlyDraftDocuments;
     use StoresItemsInTransaction;
 
     /**
@@ -196,19 +198,7 @@ class StockTransferController extends Controller
 
     public function destroy(StockTransfer $stockTransfer): JsonResponse
     {
-        // Issue #356 baris 4: transfer yang sudah dikirim dibatalkan lewat movement
-        // pembalik (histori tidak dihapus), dalam transaksi yang sama.
-        DB::transaction(function () use ($stockTransfer): void {
-            $wasPosted = in_array($stockTransfer->status, ['in_transit', 'received'], true);
-
-            $stockTransfer->update(['status' => 'cancelled']);
-
-            if ($wasPosted) {
-                app(StockPostingService::class)->reverseTransfer($stockTransfer->refresh());
-            }
-        });
-
-        return response()->json(null, 204);
+        return $this->destroyDraftDocument($stockTransfer);
     }
 
     public function export(ExportStockTransferRequest $request, ExportStockTransfersAction $action): JsonResponse

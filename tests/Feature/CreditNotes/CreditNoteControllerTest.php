@@ -188,7 +188,7 @@ test('update modifies credit note and items', function () {
 });
 
 test('destroy removes credit note', function () {
-    $creditNote = CreditNote::factory()->create();
+    $creditNote = CreditNote::factory()->create(['status' => 'draft']);
 
     deleteJson('/api/credit-notes/' . $creditNote->id)
         ->assertNoContent();

@@ -237,7 +237,7 @@ test('update modifies ar receipt and allocations', function () {
 });
 
 test('destroy removes ar receipt', function () {
-    $receipt = ArReceipt::factory()->create();
+    $receipt = ArReceipt::factory()->create(['status' => 'draft']);
 
     deleteJson('/api/ar-receipts/' . $receipt->id)
         ->assertNoContent();

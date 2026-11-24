@@ -7,6 +7,7 @@ use App\Actions\SupplierBills\ExportSupplierBillsAction;
 use App\Actions\SupplierBills\IndexSupplierBillsAction;
 use App\Actions\SupplierBills\SyncSupplierBillItemsAction;
 use App\DTOs\SupplierBills\UpdateSupplierBillData;
+use App\Http\Controllers\Concerns\DeletesOnlyDraftDocuments;
 use App\Http\Controllers\Concerns\LoadsResourceRelations;
 use App\Http\Controllers\Concerns\StoresItemsInTransaction;
 use App\Http\Requests\SupplierBills\ExportSupplierBillRequest;
@@ -21,6 +22,7 @@ use Illuminate\Support\Facades\Auth;
 
 class SupplierBillController extends Controller
 {
+    use DeletesOnlyDraftDocuments;
     use LoadsResourceRelations;
     use StoresItemsInTransaction;
 
@@ -113,7 +115,7 @@ class SupplierBillController extends Controller
 
     public function destroy(SupplierBill $supplierBill): JsonResponse
     {
-        return $this->destroyModel($supplierBill);
+        return $this->destroyDraftDocument($supplierBill);
     }
 
     public function export(ExportSupplierBillRequest $request, ExportSupplierBillsAction $action): JsonResponse

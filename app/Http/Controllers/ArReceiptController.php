@@ -7,6 +7,7 @@ use App\Actions\ArReceipts\ExportArReceiptsAction;
 use App\Actions\ArReceipts\IndexArReceiptsAction;
 use App\Actions\ArReceipts\SyncArReceiptAllocationsAction;
 use App\DTOs\ArReceipts\UpdateArReceiptData;
+use App\Http\Controllers\Concerns\DeletesOnlyDraftDocuments;
 use App\Http\Controllers\Concerns\LoadsResourceRelations;
 use App\Http\Controllers\Concerns\StoresItemsInTransaction;
 use App\Http\Requests\ArReceipts\ExportArReceiptRequest;
@@ -23,6 +24,7 @@ use Illuminate\Support\Facades\DB;
 
 class ArReceiptController extends Controller
 {
+    use DeletesOnlyDraftDocuments;
     use LoadsResourceRelations;
     use StoresItemsInTransaction;
 
@@ -138,27 +140,27 @@ class ArReceiptController extends Controller
 
     public function destroy(ArReceipt $arReceipt): JsonResponse
     {
-        DB::transaction(function () use ($arReceipt) {
-            /** @var ArReceiptAllocation $allocation */
-            foreach ($arReceipt->allocations()->with('customerInvoice')->get() as $allocation) {
-                $invoice = $allocation->customerInvoice;
+        return $this->destroyDraftDocument($arReceipt, function () use ($arReceipt): void {
+            DB::transaction(function () use ($arReceipt): void {
+                /** @var ArReceiptAllocation $allocation */
+                foreach ($arReceipt->allocations()->with('customerInvoice')->get() as $allocation) {
+                    $invoice = $allocation->customerInvoice;
 
-                $newAmountReceived = (float) $invoice->amount_received - (float) $allocation->allocated_amount;
-                $clampedAmount = max(0, $newAmountReceived);
-                $invoice->update([
-                    'amount_received' => (string) $clampedAmount,
-                    'amount_due' => (string) (
-                        (float) $invoice->grand_total
-                        - $clampedAmount
-                        - (float) $invoice->credit_note_amount
-                    ),
-                ]);
-                $invoice->updatePaymentStatus();
-            }
-            $arReceipt->delete();
+                    $newAmountReceived = (float) $invoice->amount_received - (float) $allocation->allocated_amount;
+                    $clampedAmount = max(0, $newAmountReceived);
+                    $invoice->update([
+                        'amount_received' => (string) $clampedAmount,
+                        'amount_due' => (string) (
+                            (float) $invoice->grand_total
+                            - $clampedAmount
+                            - (float) $invoice->credit_note_amount
+                        ),
+                    ]);
+                    $invoice->updatePaymentStatus();
+                }
+                $arReceipt->delete();
+            });
         });
-
-        return response()->json(null, 204);
     }
 
     public function export(ExportArReceiptRequest $request, ExportArReceiptsAction $action): JsonResponse

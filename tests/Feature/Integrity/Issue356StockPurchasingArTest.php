@@ -18,6 +18,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 
 use function Pest\Laravel\actingAs;
+use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\deleteJson;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\putJson;
@@ -146,7 +147,7 @@ describe('Issue #356 — baris 3: pembatalan GR confirmed membalik stok', functi
 });
 
 describe('Issue #356 — baris 4: hapus transfer in_transit mengembalikan stok asal', function () {
-    test('DELETE transfer in_transit mengembalikan stok gudang asal (net 0 untuk transfer)', function () {
+    test('batal transfer in_transit mengembalikan stok gudang asal (net 0 untuk transfer)', function () {
         $from = Warehouse::factory()->create();
         $to = Warehouse::factory()->create();
         $product = Product::factory()->create();
@@ -178,7 +179,8 @@ describe('Issue #356 — baris 4: hapus transfer in_transit mengembalikan stok a
         ]);
         app(StockPostingService::class)->postStockTransferDispatch($transfer->refresh());
 
-        deleteJson('/api/stock-transfers/' . $transfer->id)->assertNoContent();
+        // #375: dokumen terposting tidak boleh di-DELETE; pembatalan lewat transisi status.
+        putJson('/api/stock-transfers/' . $transfer->id, ['status' => 'cancelled'])->assertOk();
 
         $balance = (float) StockMovement::query()
             ->where('product_id', $product->id)
@@ -304,7 +306,7 @@ describe('Issue #356 — edit item GR confirmed setelah posting tidak menggandak
 });
 
 describe('Issue #356 — sibling: adjustment approved yang dibatalkan membalik stok', function () {
-    test('DELETE adjustment approved (+5) mengembalikan saldo ke 10 lewat movement pembalik', function () {
+    test('DELETE adjustment approved (+5) ditolak 422 dan movement tidak dibalik (#375)', function () {
         $warehouse = Warehouse::factory()->create();
         $product = Product::factory()->create();
         $unit = Unit::factory()->create();
@@ -321,7 +323,9 @@ describe('Issue #356 — sibling: adjustment approved yang dibatalkan membalik s
         ]);
         app(StockPostingService::class)->postStockAdjustment($adjustment->refresh());
 
-        deleteJson('/api/stock-adjustments/' . $adjustment->id)->assertNoContent();
+        // #375: adjustment approved tidak boleh di-DELETE (422); saldo tetap, baris tetap ada.
+        deleteJson('/api/stock-adjustments/' . $adjustment->id)->assertUnprocessable();
+        assertDatabaseHas('stock_adjustments', ['id' => $adjustment->id, 'status' => 'approved']);
 
         $net = (float) StockMovement::query()
             ->where('reference_type', StockAdjustment::class)
@@ -329,7 +333,7 @@ describe('Issue #356 — sibling: adjustment approved yang dibatalkan membalik s
             ->selectRaw('COALESCE(SUM(quantity_in) - SUM(quantity_out), 0) as net')
             ->value('net');
 
-        expect($net)->toBe(0.0);
+        expect($net)->toBe(5.0);
     });
 });
 

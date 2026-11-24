@@ -240,7 +240,7 @@ test('marking customer invoice sent rolls back state when journal posting fails'
 });
 
 test('destroy removes customer invoice', function () {
-    $invoice = CustomerInvoice::factory()->create();
+    $invoice = CustomerInvoice::factory()->create(['status' => 'draft']);
 
     deleteJson('/api/customer-invoices/' . $invoice->id)
         ->assertNoContent();

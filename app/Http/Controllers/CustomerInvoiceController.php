@@ -7,6 +7,7 @@ use App\Actions\CustomerInvoices\ExportCustomerInvoicesAction;
 use App\Actions\CustomerInvoices\IndexCustomerInvoicesAction;
 use App\Actions\CustomerInvoices\SyncCustomerInvoiceItemsAction;
 use App\DTOs\CustomerInvoices\UpdateCustomerInvoiceData;
+use App\Http\Controllers\Concerns\DeletesOnlyDraftDocuments;
 use App\Http\Controllers\Concerns\LoadsResourceRelations;
 use App\Http\Controllers\Concerns\StoresItemsInTransaction;
 use App\Http\Requests\CustomerInvoices\ExportCustomerInvoiceRequest;
@@ -21,6 +22,7 @@ use Illuminate\Support\Facades\Auth;
 
 class CustomerInvoiceController extends Controller
 {
+    use DeletesOnlyDraftDocuments;
     use LoadsResourceRelations;
     use StoresItemsInTransaction;
 
@@ -115,7 +117,7 @@ class CustomerInvoiceController extends Controller
 
     public function destroy(CustomerInvoice $customerInvoice): JsonResponse
     {
-        return $this->destroyModel($customerInvoice);
+        return $this->destroyDraftDocument($customerInvoice);
     }
 
     public function export(ExportCustomerInvoiceRequest $request, ExportCustomerInvoicesAction $action): JsonResponse

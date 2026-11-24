@@ -7,6 +7,7 @@ use App\Actions\CreditNotes\ExportCreditNotesAction;
 use App\Actions\CreditNotes\IndexCreditNotesAction;
 use App\Actions\CreditNotes\SyncCreditNoteItemsAction;
 use App\DTOs\CreditNotes\UpdateCreditNoteData;
+use App\Http\Controllers\Concerns\DeletesOnlyDraftDocuments;
 use App\Http\Controllers\Concerns\LoadsResourceRelations;
 use App\Http\Controllers\Concerns\StoresItemsInTransaction;
 use App\Http\Requests\CreditNotes\ExportCreditNoteRequest;
@@ -22,6 +23,7 @@ use InvalidArgumentException;
 
 class CreditNoteController extends Controller
 {
+    use DeletesOnlyDraftDocuments;
     use LoadsResourceRelations;
     use StoresItemsInTransaction;
 
@@ -126,7 +128,7 @@ class CreditNoteController extends Controller
 
     public function destroy(CreditNote $creditNote): JsonResponse
     {
-        return $this->destroyModel($creditNote);
+        return $this->destroyDraftDocument($creditNote);
     }
 
     public function apply(CreditNote $creditNote, ApplyCreditNoteAction $action): JsonResponse

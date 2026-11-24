@@ -289,13 +289,13 @@ describe('Stock Adjustment API Endpoints', function () {
             ->assertJsonCount(1, 'data.items');
     });
 
-    test('destroy cancels adjustment', function () {
+    test('destroy removes draft adjustment', function () {
         $adjustment = StockAdjustment::factory()->create(['status' => 'draft']);
 
         $response = deleteJson("/api/stock-adjustments/{$adjustment->id}");
 
         $response->assertNoContent();
-        assertDatabaseHas('stock_adjustments', ['id' => $adjustment->id, 'status' => 'cancelled']);
+        assertDatabaseMissing('stock_adjustments', ['id' => $adjustment->id]);
     });
 
     test('getItems returns nested items with product and unit relations', function () {

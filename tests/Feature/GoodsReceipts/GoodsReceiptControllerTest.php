@@ -318,7 +318,7 @@ test('confirming goods receipt swallows validation errors and keeps state confir
 });
 
 test('destroy removes goods receipt', function () {
-    $goodsReceipt = GoodsReceipt::factory()->create();
+    $goodsReceipt = GoodsReceipt::factory()->create(['status' => 'draft']);
 
     deleteJson('/api/goods-receipts/' . $goodsReceipt->id)
         ->assertNoContent();
