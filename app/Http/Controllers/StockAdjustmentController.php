@@ -45,6 +45,7 @@ class StockAdjustmentController extends Controller
         SyncStockAdjustmentItemsAction $syncItems,
         PostStockAdjustmentJournalAction $postJournal,
         PostStockAdjustmentMovementsAction $postMovements,
+        StockPostingService $stockPosting,
     ): JsonResponse {
         $data = $request->validated();
         $items = $data['items'];
@@ -73,7 +74,8 @@ class StockAdjustmentController extends Controller
                 $syncItems->execute($adjustment, $items);
             },
             afterCommit: $isApprovedOnCreate
-                ? function (StockAdjustment $adjustment) use ($postJournal, $postMovements): void {
+                ? function (StockAdjustment $adjustment) use ($postJournal, $postMovements, $stockPosting): void {
+                    $stockPosting->assertNoNegativeStock($this->stockAdjustmentOutflows($adjustment->refresh()));
                     $postJournal->execute($adjustment->refresh());
                     $postMovements->execute($adjustment->refresh());
                 }
@@ -195,6 +197,24 @@ class StockAdjustmentController extends Controller
     }
 
     /**
+     * Baris penyesuaian negatif sebagai pengeluaran (Issue #436 butir 3).
+     *
+     * @return array<int, array{0:int,1:int,2:float}>
+     */
+    private function stockAdjustmentOutflows(StockAdjustment $stockAdjustment): array
+    {
+        return $stockAdjustment->load('items')->items
+            ->filter(fn ($item): bool => (float) $item->quantity_adjusted < 0)
+            ->map(fn ($item): array => [
+                (int) $item->product_id,
+                (int) $stockAdjustment->warehouse_id,
+                abs((float) $item->quantity_adjusted),
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
      * @param  array<string, mixed>  $validated
      * @param  array<int, array<string, mixed>>  $items
      */
@@ -217,6 +237,8 @@ class StockAdjustmentController extends Controller
                     // repost; pembalik tetap utuh di riwayat (Issue #372).
                     $stockAdjustment->items()->delete();
                     $syncItems->execute($stockAdjustment, $items);
+                    // Issue #436 butir 3: saldo dicek setelah pembalik, sebelum repost item baru.
+                    $stockPosting->assertNoNegativeStock($this->stockAdjustmentOutflows($stockAdjustment->refresh()));
                     $stockPosting->postStockAdjustment($stockAdjustment->refresh());
                 },
             );

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\AccountingPosting\PostSupplierReturnJournalAction;
 use App\Actions\AccountingPosting\ReverseSupplierReturnJournalAction;
+use App\Actions\SupplierReturns\EnsureGoodsReceiptItemNotOverReturnedAction;
 use App\Actions\SupplierReturns\ExportSupplierReturnsAction;
 use App\Actions\SupplierReturns\IndexSupplierReturnsAction;
 use App\Actions\SupplierReturns\PostSupplierReturnMovementsAction;
@@ -46,6 +47,7 @@ class SupplierReturnController extends Controller
         PostSupplierReturnJournalAction $postJournal,
         PostSupplierReturnMovementsAction $postMovements,
         StockPostingService $stockPosting,
+        EnsureGoodsReceiptItemNotOverReturnedAction $overReturn,
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'];
@@ -69,7 +71,8 @@ class SupplierReturnController extends Controller
             assignDocumentNumber: function (SupplierReturn $supplierReturn): void {
                 $this->assignSequentialDocumentNumber($supplierReturn, 'return_number', 'SR');
             },
-            syncItems: function (SupplierReturn $supplierReturn, array $items) use ($syncItems): void {
+            syncItems: function (SupplierReturn $supplierReturn, array $items) use ($syncItems, $overReturn): void {
+                $overReturn->execute($items);
                 $syncItems->execute($supplierReturn, $items);
             },
             afterCommit: $isConfirmedOnCreate
@@ -115,6 +118,7 @@ class SupplierReturnController extends Controller
         PostSupplierReturnMovementsAction $postMovements,
         StockPostingService $stockPosting,
         ReverseSupplierReturnJournalAction $reverseJournal,
+        EnsureGoodsReceiptItemNotOverReturnedAction $overReturn,
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
@@ -178,7 +182,8 @@ class SupplierReturnController extends Controller
             payloadResolver: static function (array $attributes): array {
                 return UpdateSupplierReturnData::fromArray($attributes)->toArray();
             },
-            syncItems: function (SupplierReturn $supplierReturn, array $items) use ($syncItems): void {
+            syncItems: function (SupplierReturn $supplierReturn, array $items) use ($syncItems, $overReturn): void {
+                $overReturn->execute($items, $supplierReturn->id);
                 $syncItems->execute($supplierReturn, $items);
             },
             afterCommit: $isNewlyConfirmed

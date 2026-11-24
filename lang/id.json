@@ -298,6 +298,7 @@
     "supplier_return.supplier_mismatch": "Supplier harus sama dengan supplier pada purchase order.",
     "supplier_return.goods_receipt_mismatch": "Goods receipt harus milik purchase order tersebut.",
     "supplier_return.gr_item_mismatch": "Item GR harus milik goods receipt yang dipilih.",
+  "supplier_return.returned_exceeds_received": "Qty retur melebihi sisa qty diterima dari item GR ini.",
     "goods_receipt.po_item_mismatch": "Item PO harus milik purchase order yang dipilih.",
     "goods_receipt.po_not_approved": "GR hanya bisa dikonfirmasi bila purchase order sudah dikonfirmasi atau diterima sebagian.",
     "goods_receipt.accepted_exceeds_received": "Jumlah diterima baik ditambah ditolak tidak boleh melebihi jumlah diterima.",
