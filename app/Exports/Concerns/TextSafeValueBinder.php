@@ -18,6 +18,7 @@ use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
 class TextSafeValueBinder extends DefaultValueBinder
 {
     private static bool $neutralizePrefixes = false;
+
     /**
      * Angka desimal dari string (mis. hasil cast decimal Eloquent "1500000.00") tetap
      * ditulis sebagai angka. Nol di depan, awalan "+", dan notasi eksponen tetap teks.
