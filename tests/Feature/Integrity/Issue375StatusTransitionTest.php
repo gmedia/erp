@@ -106,7 +106,20 @@ test('status transition per dokumen follows the table', function (
     string $to,
     int $expected,
 ) {
-    $record = $modelClass::factory()->create(['status' => $from]);
+    // Dokumen nyata selalu bernomor; jalur batal dokumen terposting membutuhkan nomor sebagai referensi.
+    $numberColumns = [
+        GoodsReceipt::class => 'gr_number',
+        CustomerInvoice::class => 'invoice_number',
+        SupplierBill::class => 'bill_number',
+        ApPayment::class => 'payment_number',
+        ArReceipt::class => 'receipt_number',
+        CreditNote::class => 'credit_note_number',
+    ];
+
+    $record = $modelClass::factory()->create([
+        'status' => $from,
+        $numberColumns[$modelClass] => 'NO-TRANSISI-' . $endpoint . '-' . uniqid(),
+    ]);
 
     if ($modelClass === CustomerInvoice::class) {
         // Posting invoice tanpa item ditolak 422 (aturan lama); beri satu item agar uji transisi saja.

@@ -209,7 +209,8 @@ class SupplierBill extends Model
             $this->update(['status' => 'paid']);
         } elseif ($paid > 0 && $paid < $total) {
             $this->update(['status' => 'partially_paid']);
-        } elseif ($paid <= 0 && $this->status === 'partially_paid') {
+        } elseif ($paid <= 0 && in_array($this->status, ['partially_paid', 'paid'], true)) {
+            // Issue #375 (review #426 butir 5): bill paid yang pembayarannya dibatalkan kembali ke confirmed.
             $this->update(['status' => 'confirmed']);
         }
     }

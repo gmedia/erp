@@ -54,7 +54,7 @@ trait CancelsPostedDocuments
                 }
             }
 
-            $locked->update($attributes);
+            $locked->update(array_intersect_key($attributes, array_flip(['status', 'notes'])));
 
             if ($release !== null) {
                 $release($locked);

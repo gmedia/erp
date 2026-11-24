@@ -35,8 +35,9 @@ class UpdateCustomerInvoiceRequest extends AbstractCustomerInvoiceRequest
             'partially_paid' => [],
             'paid' => [],
             'overdue' => self::OVERDUE_FROM,
-            'cancelled' => ['draft', 'sent'],
-            'void' => ['draft', 'sent'],
+            // Issue #375 (review #426 butir 6): invoice overdue tanpa pembayaran bisa dibatalkan.
+            'cancelled' => ['draft', 'sent', 'overdue'],
+            'void' => ['draft', 'sent', 'overdue'],
         ];
     }
 

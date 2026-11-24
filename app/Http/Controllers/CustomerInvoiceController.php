@@ -92,10 +92,19 @@ class CustomerInvoiceController extends Controller
         $items = $validated['items'] ?? null;
         unset($validated['items']);
 
-        if (($validated['status'] ?? null) === 'cancelled' && $customerInvoice->journal_entry_id !== null) {
+        // Issue #375 (review #426 butir 5 & 6): invoice yang sudah membawa settlement (paid,
+        // partially_paid, overdue) dibatalkan lewat jalur ini walau jurnalnya kosong (data lama),
+        // supaya alokasi dilepas. Draft dan sent tanpa jurnal tetap lewat update biasa.
+        $isPostedCancel = in_array($validated['status'] ?? null, ['cancelled', 'void'], true)
+            && (
+                $customerInvoice->journal_entry_id !== null
+                || in_array($customerInvoice->status, ['partially_paid', 'paid', 'overdue'], true)
+            );
+
+        if ($isPostedCancel) {
             $this->cancelPostedDocument(
                 document: $customerInvoice,
-                attributes: array_merge($validated, ['status' => 'cancelled']),
+                attributes: $validated,
                 blockers: [
                     [
                         static fn (CustomerInvoice $invoice): bool => $invoice->receiptAllocations()

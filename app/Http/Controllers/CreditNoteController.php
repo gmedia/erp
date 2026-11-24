@@ -97,8 +97,10 @@ class CreditNoteController extends Controller
         $items = $validated['items'] ?? null;
         unset($validated['items']);
 
+        // Issue #375 (review #426 butir 5): credit note terposting menurut status dibatalkan lewat jalur
+        // ini walau jurnalnya kosong (data lama), supaya credit_note_amount invoice dihitung ulang.
         $isPostedCancel = in_array($validated['status'] ?? null, ['cancelled', 'void'], true)
-            && $creditNote->journal_entry_id !== null;
+            && $creditNote->status !== 'draft';
 
         if ($isPostedCancel) {
             $this->cancelPostedDocument(

@@ -94,8 +94,12 @@ class ApPaymentController extends Controller
         $allocations = $validated['allocations'] ?? null;
         unset($validated['allocations']);
 
-        $isPostedCancel = in_array($validated['status'] ?? null, ['cancelled', 'void'], true)
-            && $apPayment->journal_entry_id !== null;
+        // Issue #375 (review #426 butir 5): payment terposting menurut status dibatalkan lewat jalur
+        // ini walau jurnalnya kosong (data lama), supaya alokasi dilepas dan sisa bill dihitung ulang.
+        $targetStatus = $validated['status'] ?? null;
+        $isPostedCancel = in_array($targetStatus, ['cancelled', 'void'], true)
+            && $apPayment->status !== 'draft'
+            && $apPayment->status !== $targetStatus;
 
         if ($isPostedCancel) {
             $this->cancelPostedDocument(
