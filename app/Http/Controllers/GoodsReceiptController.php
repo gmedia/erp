@@ -28,6 +28,7 @@ use App\Models\SupplierBill;
 use App\Models\SupplierReturn;
 use App\Services\PurchaseOrderReceiptService;
 use App\Services\StockPostingService;
+use App\Support\Database\TransactionRetrier;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -71,7 +72,7 @@ class GoodsReceiptController extends Controller
 
         // Issue #367: GR yang dibuat langsung confirmed harus membentuk stok dan jurnal
         // dalam transaksi yang sama. Kegagalan posting ikut membatalkan dokumen.
-        $goodsReceipt = DB::transaction(function () use (
+        $goodsReceipt = TransactionRetrier::run(function () use (
             $validated,
             $items,
             $isConfirmedOnCreate,

@@ -72,6 +72,16 @@ class TransactionRetrier
 
         $errno = $exception->errorInfo[1] ?? null;
 
-        return is_int($errno) && in_array($errno, self::RETRYABLE_ERRNOS, true);
+        if (! is_int($errno) || ! in_array($errno, self::RETRYABLE_ERRNOS, true)) {
+            return false;
+        }
+
+        // 1062 hanya dianggap konkurensi bila berasal dari indeks nomor dokumen
+        // (`*_number_unique`). Duplicate key lain tetap galat data dan tidak diulang.
+        if ($errno === 1062) {
+            return (bool) preg_match('/for key \'[^\']*_number_unique\'/', $exception->getMessage());
+        }
+
+        return true;
     }
 }

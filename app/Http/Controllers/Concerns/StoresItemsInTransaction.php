@@ -104,14 +104,17 @@ trait StoresItemsInTransaction
         $payload = $payloadResolver($attributes);
 
         TransactionRetrier::run(function () use ($model, $payload, $items, $syncItems, $afterCommit): void {
-            $model->update($payload);
+            // Instance dimuat ulang tiap percobaan: setelah rollback, atribut yang sudah
+            // di-set pada percobaan sebelumnya tidak boleh dianggap "tersimpan" (dirty).
+            $current = $model->fresh() ?? $model;
+            $current->update($payload);
 
             if (is_array($items)) {
-                $syncItems($model, $items);
+                $syncItems($current, $items);
             }
 
             if ($afterCommit !== null) {
-                $afterCommit($model);
+                $afterCommit($current);
             }
         });
     }

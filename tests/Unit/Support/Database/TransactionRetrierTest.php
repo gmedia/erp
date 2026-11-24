@@ -14,24 +14,43 @@ beforeEach(function (): void {
 /**
  * Membuat QueryException yang menyerupai galat driver MySQL/MariaDB dengan errno tertentu.
  */
-function queryExceptionWithErrno(int $errno): QueryException
+function queryExceptionWithErrno(int $errno, string $message = 'simulated driver error'): QueryException
 {
     $exception = new QueryException(
         'mysql',
         'update `documents` set `number` = ? where `id` = ?',
         [],
-        new RuntimeException('simulated driver error'),
+        new RuntimeException($message),
     );
 
     $property = new ReflectionProperty($exception, 'errorInfo');
-    $property->setValue($exception, ['40001', $errno, 'simulated']);
+    $property->setValue($exception, ['40001', $errno, $message]);
 
     return $exception;
 }
 
+/**
+ * Duplicate entry pada indeks nomor dokumen (1062 yang boleh diulang).
+ */
+function documentNumberDuplicate(): QueryException
+{
+    return queryExceptionWithErrno(
+        1062,
+        "Duplicate entry 'PO-2026-0001' for key 'purchase_orders_number_unique'",
+    );
+}
+
 it('mengenali galat konkurensi sementara', function (int $errno): void {
     expect(TransactionRetrier::isRetryable(queryExceptionWithErrno($errno)))->toBeTrue();
-})->with([1213, 1205, 1020, 1062]);
+})->with([1213, 1205, 1020]);
+
+it('mengenali duplicate entry hanya pada indeks nomor dokumen', function (): void {
+    expect(TransactionRetrier::isRetryable(documentNumberDuplicate()))->toBeTrue()
+        ->and(TransactionRetrier::isRetryable(queryExceptionWithErrno(
+            1062,
+            "Duplicate entry 'ABC' for key 'units_code_unique'",
+        )))->toBeFalse();
+});
 
 it('tidak mengulang galat yang bukan konkurensi', function (): void {
     expect(TransactionRetrier::isRetryable(queryExceptionWithErrno(1452)))->toBeFalse()
@@ -62,7 +81,7 @@ it('mengulang duplicate entry nomor dokumen lalu berhasil', function (): void {
         $attempts++;
 
         if ($attempts < 3) {
-            throw queryExceptionWithErrno(1062);
+            throw documentNumberDuplicate();
         }
 
         return 'ok';
@@ -83,7 +102,7 @@ it('menjawab 409 dengan pesan i18n bila galat konkurensi tetap terjadi', functio
 
             throw queryExceptionWithErrno(1205);
         });
-    } catch (\Throwable $exception) {
+    } catch (Throwable $exception) {
         $thrown = $exception;
     }
 
