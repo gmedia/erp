@@ -14,6 +14,7 @@ const config = {
     },
     toolbarActions: (
         <ImportDialog
+            permission="employee.create"
             title="Import Employees"
             importRoute="/api/employees/import"
             templateHeaders={[

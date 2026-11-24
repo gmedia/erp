@@ -272,7 +272,7 @@ function UsersBody({
             <TableRow key={row.id} data-testid="user-row">
                 <TableCell className="font-medium">
                     {row.name}
-                    {!row.employee && (
+                    {canEdit && !row.employee && (
                         <span className="mt-1 block text-xs font-normal text-muted-foreground md:hidden">
                             {t('users.edit_requires_employee')}
                         </span>

@@ -1,3 +1,4 @@
+import { usePermissions } from '@/hooks/usePermissions';
 import { ImportResultSummary } from '@/components/common/ImportResultSummary';
 import { Button } from '@/components/ui/button';
 import {
@@ -26,7 +27,21 @@ interface ImportDialogProps {
     onSuccess?: () => void;
 }
 
+/**
+ * Tombol import hanya tampil bila pengguna punya `permission` (sama dengan middleware route import).
+ */
 export default function ImportDialog({
+    permission,
+    ...props
+}: Readonly<ImportDialogProps & { permission?: string }>) {
+    const { can } = usePermissions();
+
+    if (permission && !can(permission)) return null;
+
+    return <ImportDialogContent {...props} />;
+}
+
+function ImportDialogContent({
     title = 'Import Data',
     trigger,
     importRoute,

@@ -15,6 +15,7 @@ const config = {
     },
     toolbarActions: (
         <ImportDialog
+            permission="asset.create"
             title="Import Assets"
             importRoute="/api/assets/import"
             templateHeaders={[
