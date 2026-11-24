@@ -9,6 +9,8 @@ const POLICY = {
   providers: ['google', 'microsoft'],
 };
 
+const byTest = (id: string) => `[data-test="${id}"]`;
+
 async function stubPolicy(page: import('@playwright/test').Page, overrides = {}) {
   await page.route('**/api/social/policy', (route) =>
     route.fulfill({
@@ -26,9 +28,9 @@ test('login page shows social buttons and hides password form when disabled', as
 
   await page.goto('/login');
 
-  await expect(page.getByTestId('social-login-google')).toBeVisible();
-  await expect(page.getByTestId('social-login-microsoft')).toBeVisible();
-  await expect(page.getByTestId('login-button')).toHaveCount(0);
+  await expect(page.locator(byTest('social-login-google'))).toBeVisible();
+  await expect(page.locator(byTest('social-login-microsoft'))).toBeVisible();
+  await expect(page.locator(byTest('login-button'))).toHaveCount(0);
 });
 
 test('login page hides social buttons when social login is disabled', async ({
@@ -38,8 +40,8 @@ test('login page hides social buttons when social login is disabled', async ({
 
   await page.goto('/login');
 
-  await expect(page.getByTestId('social-login-google')).toHaveCount(0);
-  await expect(page.getByTestId('login-button')).toBeVisible();
+  await expect(page.locator(byTest('social-login-google'))).toHaveCount(0);
+  await expect(page.locator(byTest('login-button'))).toBeVisible();
 });
 
 test('social redirect endpoint is called with the selected provider', async ({
@@ -57,7 +59,7 @@ test('social redirect endpoint is called with the selected provider', async ({
   });
 
   await page.goto('/login');
-  await page.getByTestId('social-login-google').click();
+  await page.locator(byTest('social-login-google')).click();
 
   expect(requested).toContain('/api/social/google/redirect');
 });
@@ -95,7 +97,7 @@ test('callback shows an actionable message for domain_not_allowed', async ({
   await page.goto('/auth/social/callback#error=domain_not_allowed');
 
   await expect(page.getByText(/domain is not allowed/i)).toBeVisible();
-  await expect(page.getByTestId('social-callback-back')).toBeVisible();
+  await expect(page.locator(byTest('social-callback-back'))).toBeVisible();
 });
 
 test('callback shows account_not_registered message', async ({ page }) => {

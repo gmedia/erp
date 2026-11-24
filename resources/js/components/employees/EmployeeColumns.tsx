@@ -11,37 +11,9 @@ import {
     createSortingHeader,
     createTextColumn,
 } from '@/utils/columns';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
+import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { ColumnDef } from '@tanstack/react-table';
-
-const formatCurrency = (value: string | null | undefined): string => {
-    if (!value) {
-        return '-';
-    }
-
-    const amount = Number(value);
-    if (Number.isNaN(amount)) {
-        return value;
-    }
-
-    return new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        maximumFractionDigits: 0,
-    }).format(amount);
-};
-
-const formatDate = (value: string | null | undefined): string => {
-    if (!value) {
-        return '-';
-    }
-
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) {
-        return value;
-    }
-
-    return date.toLocaleDateString('id-ID');
-};
 
 export const employeeColumns: ColumnDef<Employee>[] = [
     createSelectColumn<Employee>(),
@@ -104,7 +76,10 @@ export const employeeColumns: ColumnDef<Employee>[] = [
         ...createSortingHeader('Salary'),
         cell: ({ row }) => (
             <div className="text-right tabular-nums">
-                {formatCurrency(row.original.current_employment?.salary)}
+                {formatCurrencyByRegionalSettings(
+                    row.original.current_employment?.salary ?? '',
+                    { locale: 'id-ID', currency: 'IDR' },
+                )}
             </div>
         ),
     },
@@ -113,7 +88,11 @@ export const employeeColumns: ColumnDef<Employee>[] = [
         accessorFn: (row) => row.current_employment?.hire_date,
         ...createSortingHeader('Hire Date'),
         cell: ({ row }) => (
-            <div>{formatDate(row.original.current_employment?.hire_date)}</div>
+            <div>
+                {formatDateByRegionalSettings(
+                    row.original.current_employment?.hire_date,
+                )}
+            </div>
         ),
     },
     createActionsColumn<Employee>(),

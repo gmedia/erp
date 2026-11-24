@@ -30,6 +30,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useExport } from '@/hooks/useExport';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
@@ -42,6 +43,30 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Master Data', href: '#' },
     { title: 'Chart of Accounts', href: '/accounts' },
 ];
+
+// useTranslation requires AppI18nProvider, which wraps AppLayout. Keep the
+// translated input as a child component so it renders inside that provider.
+function AccountSearchInput({
+    value,
+    onChange,
+    onEnter,
+}: Readonly<{
+    value: string;
+    onChange: (value: string) => void;
+    onEnter: () => void;
+}>) {
+    const { t } = useTranslation();
+
+    return (
+        <Input
+            placeholder={t('accounts.searchPlaceholder')}
+            className="pl-8"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && onEnter()}
+        />
+    );
+}
 
 export default function AccountIndex() {
     const [coaVersions, setCoaVersions] = useState<CoaVersion[]>([]);
@@ -248,14 +273,10 @@ export default function AccountIndex() {
                 <div className="flex max-w-md items-center gap-2">
                     <div className="relative flex-1">
                         <Search className="absolute top-2.5 left-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input
-                            placeholder="Search code or name..."
-                            className="pl-8"
+                        <AccountSearchInput
                             value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            onKeyDown={(e) =>
-                                e.key === 'Enter' && fetchAccounts()
-                            }
+                            onChange={setSearch}
+                            onEnter={fetchAccounts}
                         />
                     </div>
                     <Button onClick={() => fetchAccounts()}>Search</Button>

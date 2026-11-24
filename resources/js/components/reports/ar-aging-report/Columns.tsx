@@ -79,50 +79,58 @@ export const arAgingReportColumns: ColumnDef<ArAgingReportItem>[] = [
         header: 'Status',
         getValue: (item) => item.customer_invoice?.status,
     }),
-    {
+    createReportTextColumn<ArAgingReportItem>({
         id: 'grand_total',
         header: 'Grand Total',
-        cell: ({ row }) => formatCurrency(row.original.amounts.grand_total),
-    },
-    {
+        align: 'right',
+        getValue: (item) => formatCurrency(item.amounts.grand_total),
+    }),
+    createReportTextColumn<ArAgingReportItem>({
         id: 'amount_received',
         header: 'Amount Received',
-        cell: ({ row }) => formatCurrency(row.original.amounts.amount_received),
-    },
-    {
+        align: 'right',
+        getValue: (item) => formatCurrency(item.amounts.amount_received),
+    }),
+    createReportTextColumn<ArAgingReportItem>({
         id: 'credit_note_amount',
         header: 'Credit Note Amount',
-        cell: ({ row }) =>
-            formatCurrency(row.original.amounts.credit_note_amount),
-    },
-    {
+        align: 'right',
+        getValue: (item) => formatCurrency(item.amounts.credit_note_amount),
+    }),
+    createReportTextColumn<ArAgingReportItem>({
         id: 'amount_due',
         header: 'Amount Due',
-        cell: ({ row }) => formatCurrency(row.original.amounts.amount_due),
-    },
-    {
+        align: 'right',
+        getValue: (item) => formatCurrency(item.amounts.amount_due),
+    }),
+    createReportTextColumn<ArAgingReportItem>({
         id: 'current',
         header: 'Current',
-        cell: ({ row }) => formatCurrency(row.original.aging_buckets.current),
-    },
-    {
+        align: 'right',
+        getValue: (item) => formatCurrency(item.aging_buckets.current),
+    }),
+    createReportTextColumn<ArAgingReportItem>({
         id: '1_30',
         header: '1-30 Days',
-        cell: ({ row }) => formatCurrency(row.original.aging_buckets['1_30']),
-    },
-    {
+        align: 'right',
+        getValue: (item) => formatCurrency(item.aging_buckets['1_30']),
+    }),
+    createReportTextColumn<ArAgingReportItem>({
         id: '31_60',
         header: '31-60 Days',
-        cell: ({ row }) => formatCurrency(row.original.aging_buckets['31_60']),
-    },
-    {
+        align: 'right',
+        getValue: (item) => formatCurrency(item.aging_buckets['31_60']),
+    }),
+    createReportTextColumn<ArAgingReportItem>({
         id: '61_90',
         header: '61-90 Days',
-        cell: ({ row }) => formatCurrency(row.original.aging_buckets['61_90']),
-    },
-    {
+        align: 'right',
+        getValue: (item) => formatCurrency(item.aging_buckets['61_90']),
+    }),
+    createReportTextColumn<ArAgingReportItem>({
         id: 'over_90',
         header: 'Over 90 Days',
-        cell: ({ row }) => formatCurrency(row.original.aging_buckets.over_90),
-    },
+        align: 'right',
+        getValue: (item) => formatCurrency(item.aging_buckets.over_90),
+    }),
 ];

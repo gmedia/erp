@@ -49,7 +49,7 @@ export function SummaryCards({ data, isLoading }: Readonly<SummaryCardsProps>) {
                 title="Purchase Cost"
                 icon={Calculator}
                 iconColor="text-success"
-                formattedValue={formatCurrency(data.total_purchase_cost)}
+                formattedValue={formatCurrency(data.total_purchase_cost, 0)}
             >
                 <p className="mt-1 text-xs text-muted-foreground">
                     total acquisition value
@@ -60,7 +60,7 @@ export function SummaryCards({ data, isLoading }: Readonly<SummaryCardsProps>) {
                 title="Book Value"
                 icon={BarChart}
                 iconColor="text-chart-3"
-                formattedValue={formatCurrency(data.total_book_value)}
+                formattedValue={formatCurrency(data.total_book_value, 0)}
             >
                 <p className="mt-1 text-xs text-muted-foreground">
                     current estimated value
@@ -73,6 +73,7 @@ export function SummaryCards({ data, isLoading }: Readonly<SummaryCardsProps>) {
                 iconColor="text-destructive-foreground"
                 formattedValue={formatCurrency(
                     data.total_accumulated_depreciation,
+                    0,
                 )}
             >
                 <p className="mt-1 text-xs text-muted-foreground">

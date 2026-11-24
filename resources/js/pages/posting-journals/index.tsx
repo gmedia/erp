@@ -22,6 +22,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useTranslation } from '@/contexts/i18n-context';
 import { usePostingJournal } from '@/hooks/usePostingJournal';
 import { BreadcrumbItem } from '@/types';
 import { JournalEntry } from '@/types/journal-entry';
@@ -48,6 +49,23 @@ function getStatusBadgeVariant(status: JournalEntry['status']) {
     if (status === 'posted') return 'default';
     if (status === 'void') return 'destructive';
     return 'secondary';
+}
+
+// Kept as a child: `actions` renders outside the AppI18nProvider scope.
+function PostingJournalSearchInput({
+    value,
+    onChange,
+}: Readonly<{ value: string; onChange: (value: string) => void }>) {
+    const { t } = useTranslation();
+
+    return (
+        <Input
+            value={value}
+            placeholder={t('postingJournals.searchPlaceholder')}
+            className="pl-9"
+            onChange={(e) => onChange(e.target.value)}
+        />
+    );
 }
 
 export default function Index() {
@@ -223,11 +241,9 @@ export default function Index() {
                 <>
                     <div className="relative sm:w-80">
                         <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                        <Input
+                        <PostingJournalSearchInput
                             value={searchQuery}
-                            placeholder="Search journals..."
-                            className="pl-9"
-                            onChange={(e) => handleSearch(e.target.value)}
+                            onChange={handleSearch}
                         />
                     </div>
 

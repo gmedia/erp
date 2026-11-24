@@ -358,3 +358,13 @@ Checklist `docs/ui-design-rules.md` Bagian 3 dipakai dalam mode **code-backed re
 | A–C, F–G (chrome, toolbar, form/modal, teknis) | Tidak diverifikasi visual pada sesi ini                                                                                                               | UNCLEAR                 |
 
 Catatan: untuk verdict visual penuh (SHELL-01/02/03/06/08, double title), diperlukan agent dengan kemampuan vision atau OCR terstruktur. Tidak ada finding baru yang ditambahkan; ini hanya konfirmasi bahwa perbaikan lama masih hadir di kode setelah re-smoke.
+
+### Verifikasi #363 langkah 3 (2026-11-23)
+
+Screenshot 17 route x light/dark x 1440/390 disimpan di luar repo (`~/.erp-agent/shots363`, 68 file). Dibuka dan dinilai visual; hasil per butir ada di PR #382 (hanya butir yang terbukti ditandai `fixed`).
+
+Temuan terbuka dari screenshot:
+- `trial-balance` 390: kolom Credit masih terpotong di tepi layar; nama akun wrap tanpa elipsis.
+- `my-approvals` chip `Pending` masih abu-abu.
+- `users` 390: email tidak terlihat di viewport; tombol edit nonaktif sudah ada keterangannya.
+- `pipeline-audit-trail`: badge PO/PR sudah pill; `Posted`/`Disposed`/`Lost` belum muncul di data screenshot.

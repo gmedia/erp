@@ -14,6 +14,7 @@ export const formatDate = (value: string | Date) =>
 /** Formatter uang bersama: kebijakan desimal tunggal 0–2 digit; kosong → `-`. */
 export const formatCurrency = (
     value: string | number | null | undefined,
+    maximumFractionDigits = 2,
 ): string => {
     if (value === null || value === undefined || value === '') {
         return '-';
@@ -22,6 +23,6 @@ export const formatCurrency = (
     return formatCurrencyByRegionalSettings(value, {
         locale: 'id-ID',
         minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
+        maximumFractionDigits,
     });
 };
