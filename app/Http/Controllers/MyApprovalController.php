@@ -51,6 +51,14 @@ class MyApprovalController extends Controller
         $resolver = app(DocumentNumberResolver::class);
         $lists = [$pending, $approvedByMe, $rejectedByMe, $all];
 
+        // Flag steps the viewer acts on as a delegate (approver differs from viewer).
+        $resolveActor = app(ResolveApprovalStepActorAction::class);
+        foreach ($lists as $steps) {
+            $steps->each(function (ApprovalRequestStep $step) use ($resolveActor, $userId): void {
+                $step->setAttribute('is_delegated', $resolveActor->delegatorFor($step, $userId) !== null);
+            });
+        }
+
         // Resolve every document number up front: one query per approvable type,
         // not one per step (avoids N+1 on the inbox lists).
         $resolver->preload(

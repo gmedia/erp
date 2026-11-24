@@ -250,3 +250,27 @@ it('rejects a second approve on a step already acted on', function () {
         'event' => 'step_approved',
     ]);
 });
+
+it('flags a pending step as delegated only for the delegate, not the direct approver', function () {
+    $approver = User::factory()->create();
+    $delegate = User::factory()->create();
+    $submitter = User::factory()->create();
+    makeSingleStepRequest($approver, $submitter);
+
+    ApprovalDelegation::factory()->create([
+        'delegator_user_id' => $approver->id,
+        'delegate_user_id' => $delegate->id,
+        'approvable_type' => null,
+        'start_date' => now()->subDay()->toDateString(),
+        'end_date' => now()->addDay()->toDateString(),
+        'is_active' => true,
+    ]);
+
+    Sanctum::actingAs($delegate, ['*']);
+    $delegateResponse = getJson('/api/my-approvals')->assertOk();
+    expect($delegateResponse->json('pending.0.is_delegated'))->toBeTrue();
+
+    Sanctum::actingAs($approver, ['*']);
+    $approverResponse = getJson('/api/my-approvals')->assertOk();
+    expect($approverResponse->json('pending.0.is_delegated'))->toBeFalse();
+});
