@@ -53,6 +53,7 @@ class IndexApAgingReportAction
             ? Carbon::parse($request->string('as_of_date')->toString())->toDateString()
             : Carbon::today()->toDateString();
         $boundaries = $this->agingBoundaries($asOfDate);
+        $dueSql = $this->historicalApDueSql('sb', $asOfDate);
 
         $query = $this->buildBaseSupplierBillQuery(
             extraSelectColumns: [
@@ -62,7 +63,7 @@ class IndexApAgingReportAction
                     '31_60' => 'days_31_60',
                     '61_90' => 'days_61_90',
                     'over_90' => 'days_over_90',
-                ]),
+                ], $dueSql),
             ],
             extraCasts: [
                 'current_amount' => 'decimal:2',
@@ -72,11 +73,15 @@ class IndexApAgingReportAction
                 'days_over_90' => 'decimal:2',
             ],
             extraSelectBindings: $this->agingBucketBindings($boundaries),
+            // Paid tetap tampil bila sisa historis pada as_of > 0 (lunas setelah as_of).
+            statuses: ['confirmed', 'partially_paid', 'overdue', 'paid'],
+            amountDueSql: $dueSql,
         );
 
         $this->applySupplierBillFilters($request, $query);
         $this->applyDateRangeFilter($request, $query, 'sb.bill_date', 'start_date', 'end_date');
-        $query->whereDate('sb.bill_date', '<=', $asOfDate);
+        $query->whereDate('sb.bill_date', '<=', $asOfDate)
+            ->whereRaw('(' . $dueSql . ') > 0');
 
         return $query;
     }

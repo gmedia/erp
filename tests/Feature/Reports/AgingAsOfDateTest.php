@@ -1,12 +1,16 @@
 <?php
 
+use App\Models\ApPayment;
+use App\Models\ApPaymentAllocation;
+use App\Models\ArReceipt;
+use App\Models\ArReceiptAllocation;
+use App\Models\CreditNote;
 use App\Models\Customer;
 use App\Models\CustomerInvoice;
 use App\Models\FiscalYear;
 use App\Models\Supplier;
 use App\Models\SupplierBill;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Carbon;
 use Laravel\Sanctum\Sanctum;
 
 use function Pest\Laravel\getJson;
@@ -86,24 +90,24 @@ test('ar aging historical balance subtracts receipts dated on or before as_of_da
         'amount_due' => 40000,
     ]);
 
-    $early = \App\Models\ArReceipt::factory()->create([
+    $early = ArReceipt::factory()->create([
         'customer_id' => $customer->id,
         'receipt_date' => '2026-02-01',
         'status' => 'confirmed',
     ]);
-    $late = \App\Models\ArReceipt::factory()->create([
+    $late = ArReceipt::factory()->create([
         'customer_id' => $customer->id,
         'receipt_date' => '2026-04-01',
         'status' => 'confirmed',
     ]);
 
-    \App\Models\ArReceiptAllocation::create([
+    ArReceiptAllocation::create([
         'ar_receipt_id' => $early->id,
         'customer_invoice_id' => $invoice->id,
         'allocated_amount' => 30000,
         'discount_given' => 0,
     ]);
-    \App\Models\ArReceiptAllocation::create([
+    ArReceiptAllocation::create([
         'ar_receipt_id' => $late->id,
         'customer_invoice_id' => $invoice->id,
         'allocated_amount' => 30000,
@@ -138,6 +142,191 @@ test('ap aging excludes bills dated after as_of_date', function () {
         ->assertOk()
         ->assertJsonCount(0, 'data')
         ->assertJsonPath('summary.as_of_date', '2026-03-15');
+});
+
+test('ar aging counts credit notes dated on or before as_of_date only', function () {
+    $customer = Customer::factory()->create();
+    $invoice = CustomerInvoice::factory()->create([
+        'invoice_number' => 'INV-CN-DATE',
+        'customer_id' => $customer->id,
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'invoice_date' => '2026-01-10',
+        'due_date' => '2026-02-10',
+        'status' => 'partially_paid',
+        'grand_total' => 100000,
+        'credit_note_amount' => 40000,
+        'amount_due' => 60000,
+    ]);
+
+    // Credit note 40000 baru dibuat setelah as_of -> belum mengurangi sisa.
+    CreditNote::factory()->confirmed()->create([
+        'customer_id' => $customer->id,
+        'customer_invoice_id' => $invoice->id,
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'credit_note_date' => '2026-04-01',
+        'grand_total' => 40000,
+    ]);
+
+    Sanctum::actingAs($this->arUser, ['*']);
+
+    getJson('/api/reports/ar-aging?as_of_date=2026-03-15')
+        ->assertOk()
+        ->assertJsonPath('data.0.customer_invoice.invoice_number', 'INV-CN-DATE')
+        ->assertJsonPath('summary.totals.amount_due', '100000.00');
+});
+
+test('ar aging keeps a document paid today when it was still open on as_of_date', function () {
+    $customer = Customer::factory()->create();
+    $invoice = CustomerInvoice::factory()->create([
+        'invoice_number' => 'INV-PAID-LATER',
+        'customer_id' => $customer->id,
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'invoice_date' => '2026-01-10',
+        'due_date' => '2026-02-10',
+        'status' => 'paid',
+        'grand_total' => 100000,
+        'amount_received' => 100000,
+        'amount_due' => 0,
+    ]);
+
+    $receipt = ArReceipt::factory()->create([
+        'customer_id' => $customer->id,
+        'receipt_date' => '2026-04-01',
+        'status' => 'confirmed',
+    ]);
+    ArReceiptAllocation::create([
+        'ar_receipt_id' => $receipt->id,
+        'customer_invoice_id' => $invoice->id,
+        'allocated_amount' => 100000,
+        'discount_given' => 0,
+    ]);
+
+    Sanctum::actingAs($this->arUser, ['*']);
+
+    getJson('/api/reports/ar-aging?as_of_date=2026-03-15')
+        ->assertOk()
+        ->assertJsonPath('data.0.customer_invoice.invoice_number', 'INV-PAID-LATER')
+        ->assertJsonPath('summary.totals.amount_due', '100000.00');
+});
+
+test('ar aging amount_received on rows follows as_of_date', function () {
+    $customer = Customer::factory()->create();
+    $invoice = CustomerInvoice::factory()->create([
+        'invoice_number' => 'INV-RCV-HIST',
+        'customer_id' => $customer->id,
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'invoice_date' => '2026-01-10',
+        'due_date' => '2026-02-10',
+        'status' => 'partially_paid',
+        'grand_total' => 100000,
+        'amount_received' => 60000,
+        'amount_due' => 40000,
+    ]);
+
+    $early = ArReceipt::factory()->create([
+        'customer_id' => $customer->id,
+        'receipt_date' => '2026-02-01',
+        'status' => 'confirmed',
+    ]);
+    $late = ArReceipt::factory()->create([
+        'customer_id' => $customer->id,
+        'receipt_date' => '2026-04-01',
+        'status' => 'confirmed',
+    ]);
+    ArReceiptAllocation::create([
+        'ar_receipt_id' => $early->id,
+        'customer_invoice_id' => $invoice->id,
+        'allocated_amount' => 30000,
+        'discount_given' => 0,
+    ]);
+    ArReceiptAllocation::create([
+        'ar_receipt_id' => $late->id,
+        'customer_invoice_id' => $invoice->id,
+        'allocated_amount' => 30000,
+        'discount_given' => 0,
+    ]);
+
+    Sanctum::actingAs($this->arUser, ['*']);
+
+    getJson('/api/reports/ar-aging?as_of_date=2026-03-15')
+        ->assertOk()
+        ->assertJsonPath('data.0.amounts.amount_received', '30000.00');
+});
+
+test('ap aging subtracts payments and discounts dated on or before as_of_date only', function () {
+    $supplier = Supplier::factory()->create();
+    $bill = SupplierBill::factory()->confirmed()->create([
+        'bill_number' => 'BILL-HIST',
+        'supplier_id' => $supplier->id,
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'bill_date' => '2026-01-10',
+        'due_date' => '2026-02-10',
+        'grand_total' => 100000,
+        'amount_paid' => 60000,
+        'amount_due' => 40000,
+    ]);
+
+    $early = ApPayment::factory()->confirmed()->create([
+        'supplier_id' => $supplier->id,
+        'payment_date' => '2026-02-01',
+    ]);
+    $late = ApPayment::factory()->confirmed()->create([
+        'supplier_id' => $supplier->id,
+        'payment_date' => '2026-04-01',
+    ]);
+
+    ApPaymentAllocation::create([
+        'ap_payment_id' => $early->id,
+        'supplier_bill_id' => $bill->id,
+        'allocated_amount' => 20000,
+        'discount_taken' => 10000,
+    ]);
+    ApPaymentAllocation::create([
+        'ap_payment_id' => $late->id,
+        'supplier_bill_id' => $bill->id,
+        'allocated_amount' => 30000,
+        'discount_taken' => 0,
+    ]);
+
+    Sanctum::actingAs($this->apUser, ['*']);
+
+    // Per 2026-03-15: hanya alokasi 20000 + diskon 10000 yang berlaku -> sisa 70000.
+    getJson('/api/reports/ap-aging?as_of_date=2026-03-15')
+        ->assertOk()
+        ->assertJsonPath('data.0.bill.number', 'BILL-HIST')
+        ->assertJsonPath('summary.totals.amount_due', '70000.00');
+});
+
+test('ap aging keeps a bill paid today when it was still open on as_of_date', function () {
+    $supplier = Supplier::factory()->create();
+    $bill = SupplierBill::factory()->paid()->create([
+        'bill_number' => 'BILL-PAID-LATER',
+        'supplier_id' => $supplier->id,
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'bill_date' => '2026-01-10',
+        'due_date' => '2026-02-10',
+        'grand_total' => 100000,
+        'amount_paid' => 100000,
+        'amount_due' => 0,
+    ]);
+
+    $payment = ApPayment::factory()->confirmed()->create([
+        'supplier_id' => $supplier->id,
+        'payment_date' => '2026-04-01',
+    ]);
+    ApPaymentAllocation::create([
+        'ap_payment_id' => $payment->id,
+        'supplier_bill_id' => $bill->id,
+        'allocated_amount' => 100000,
+        'discount_taken' => 0,
+    ]);
+
+    Sanctum::actingAs($this->apUser, ['*']);
+
+    getJson('/api/reports/ap-aging?as_of_date=2026-03-15')
+        ->assertOk()
+        ->assertJsonPath('data.0.bill.number', 'BILL-PAID-LATER')
+        ->assertJsonPath('summary.totals.amount_due', '100000.00');
 });
 
 test('ap aging buckets are computed relative to as_of_date', function () {

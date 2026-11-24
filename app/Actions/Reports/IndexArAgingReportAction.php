@@ -2,7 +2,6 @@
 
 namespace App\Actions\Reports;
 
-use App\Actions\ArReceipts\SyncArReceiptAllocationsAction;
 use App\Actions\Reports\Concerns\AgingReportBoundaries;
 use App\Actions\Reports\Concerns\BuildsCustomerInvoiceReportQuery;
 use App\Actions\Reports\Concerns\HandlesReportQuery;
@@ -80,16 +79,18 @@ class IndexArAgingReportAction
     {
         $asOfDate ??= Carbon::today()->toDateString();
         $boundaries = $this->agingBoundaries($asOfDate);
-        $dueSql = $this->historicalDueSql($asOfDate);
+        $dueSql = $this->historicalArDueSql('ci', $asOfDate);
 
         return $this->buildBaseCustomerInvoiceQuery(
             [$this->agingBucketSelectSql('ci', $dueSql)],
             $this->agingBucketBindings($boundaries),
             $dueSql,
+            $this->historicalReceivedSql('ci', $asOfDate),
+            $this->historicalCreditNoteSql('ci', $asOfDate),
         )
-            // Aging hanya piutang berjalan; paid/cancelled/void/draft bukan
-            // saldo tagihan (W5-14, sejajar AR Outstanding).
-            ->whereIn('ci.status', ['sent', 'partially_paid', 'overdue'])
+            // Draft/cancelled/void tidak ikut. Paid tetap tampil bila sisa historis
+            // pada as_of > 0 (lunas setelah as_of); sisa 0 disaring di bawah.
+            ->whereIn('ci.status', ['sent', 'partially_paid', 'overdue', 'paid'])
             ->whereDate('ci.invoice_date', '<=', $asOfDate)
             ->whereRaw('(' . $dueSql . ') > 0')
             ->withCasts(array_merge($this->getBaseCasts(), [
@@ -99,26 +100,6 @@ class IndexArAgingReportAction
                 'aging_61_90' => 'decimal:2',
                 'aging_over_90' => 'decimal:2',
             ]));
-    }
-
-    /**
-     * Sisa tagihan per tanggal as_of, dihitung ulang dari pelunasan posted yang
-     * bertanggal <= as_of (bukan dari amount_due hari ini). Nilai tanggal berasal
-     * dari Carbon::toDateString(), jadi aman disisipkan sebagai literal.
-     */
-    protected function historicalDueSql(string $asOfDate): string
-    {
-        $posted = "'" . implode("','", SyncArReceiptAllocationsAction::POSTED_STATUSES) . "'";
-        $asOf = "'" . Carbon::parse($asOfDate)->toDateString() . "'";
-
-        return '(ci.grand_total - ci.credit_note_amount - COALESCE(('
-            . 'SELECT SUM(ara.allocated_amount + ara.discount_given)'
-            . ' FROM ar_receipt_allocations ara'
-            . ' JOIN ar_receipts arr ON arr.id = ara.ar_receipt_id'
-            . ' WHERE ara.customer_invoice_id = ci.id'
-            . " AND arr.status IN ({$posted})"
-            . " AND arr.receipt_date <= {$asOf}"
-            . '), 0))';
     }
 
     protected function defaultSortBy(): string

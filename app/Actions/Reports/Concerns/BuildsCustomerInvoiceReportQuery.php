@@ -21,6 +21,8 @@ trait BuildsCustomerInvoiceReportQuery
         array $additionalColumns = [],
         array $additionalBindings = [],
         ?string $amountDueSql = null,
+        ?string $amountReceivedSql = null,
+        ?string $creditNoteAmountSql = null,
     ): Builder {
         $baseColumns = [
             'ci.id as customer_invoice_id',
@@ -28,8 +30,8 @@ trait BuildsCustomerInvoiceReportQuery
             'ci.invoice_date',
             'ci.due_date',
             'ci.grand_total',
-            'ci.amount_received',
-            'ci.credit_note_amount',
+            $amountReceivedSql !== null ? $amountReceivedSql . ' as amount_received' : 'ci.amount_received',
+            $creditNoteAmountSql !== null ? $creditNoteAmountSql . ' as credit_note_amount' : 'ci.credit_note_amount',
             $amountDueSql !== null ? $amountDueSql . ' as amount_due' : 'ci.amount_due',
             'ci.status',
             'c.id as customer_id',

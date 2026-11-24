@@ -3,6 +3,8 @@
 namespace App\Actions\Reports\Concerns;
 
 use App\Actions\AgingDashboard\GetAgingDashboardDataAction;
+use App\Actions\ApPayments\SyncApPaymentAllocationsAction;
+use App\Actions\ArReceipts\SyncArReceiptAllocationsAction;
 use Illuminate\Support\Carbon;
 
 /**
@@ -34,6 +36,66 @@ trait AgingReportBoundaries
             'd61' => $today->copy()->subDays(61)->toDateString(),
             'd90' => $today->copy()->subDays(90)->toDateString(),
         ];
+    }
+
+    /**
+     * Sisa AR per tanggal as_of: grand_total - credit note bertanggal <= as_of
+     * - pelunasan posted bertanggal <= as_of (alokasi + diskon). Dipakai bersama
+     * oleh aging dan outstanding agar basis historisnya sama.
+     * Tanggal berasal dari Carbon::toDateString(), aman disisipkan sebagai literal.
+     */
+    protected function historicalArDueSql(string $invoiceAlias, string $asOfDate): string
+    {
+        return "({$invoiceAlias}.grand_total"
+            . ' - ' . $this->historicalCreditNoteSql($invoiceAlias, $asOfDate)
+            . ' - ' . $this->historicalReceivedSql($invoiceAlias, $asOfDate) . ')';
+    }
+
+    /**
+     * Pelunasan AR (alokasi + diskon) posted bertanggal <= as_of.
+     */
+    protected function historicalReceivedSql(string $invoiceAlias, string $asOfDate): string
+    {
+        $posted = "'" . implode("','", SyncArReceiptAllocationsAction::POSTED_STATUSES) . "'";
+        $asOf = "'" . Carbon::parse($asOfDate)->toDateString() . "'";
+
+        return 'COALESCE((SELECT SUM(ara.allocated_amount + ara.discount_given)'
+            . ' FROM ar_receipt_allocations ara'
+            . ' JOIN ar_receipts arr ON arr.id = ara.ar_receipt_id'
+            . " WHERE ara.customer_invoice_id = {$invoiceAlias}.id"
+            . " AND arr.status IN ({$posted})"
+            . " AND arr.receipt_date <= {$asOf}), 0)";
+    }
+
+    /**
+     * Credit note AR (confirmed/applied) bertanggal <= as_of.
+     */
+    protected function historicalCreditNoteSql(string $invoiceAlias, string $asOfDate): string
+    {
+        $asOf = "'" . Carbon::parse($asOfDate)->toDateString() . "'";
+
+        return 'COALESCE((SELECT SUM(cn.grand_total) FROM credit_notes cn'
+            . " WHERE cn.customer_invoice_id = {$invoiceAlias}.id"
+            . " AND cn.status IN ('confirmed', 'applied')"
+            . " AND cn.credit_note_date <= {$asOf}), 0)";
+    }
+
+    /**
+     * Sisa AP per tanggal as_of: grand_total - pelunasan posted bertanggal
+     * payment_date <= as_of (alokasi + diskon). Pola sama dengan historicalArDueSql.
+     */
+    protected function historicalApDueSql(string $billAlias, string $asOfDate): string
+    {
+        $posted = "'" . implode("','", SyncApPaymentAllocationsAction::POSTED_STATUSES) . "'";
+        $asOf = "'" . Carbon::parse($asOfDate)->toDateString() . "'";
+
+        return "({$billAlias}.grand_total"
+            . ' - COALESCE((SELECT SUM(apa.allocated_amount + apa.discount_taken)'
+            . ' FROM ap_payment_allocations apa'
+            . ' JOIN ap_payments app ON app.id = apa.ap_payment_id'
+            . " WHERE apa.supplier_bill_id = {$billAlias}.id"
+            . " AND app.status IN ({$posted})"
+            . " AND app.payment_date <= {$asOf}), 0))";
     }
 
     /**
