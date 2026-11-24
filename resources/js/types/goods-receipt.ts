@@ -43,6 +43,7 @@ export interface GoodsReceiptFormData {
     notes?: string;
     items: Array<{
         purchase_order_item_id: string;
+        purchase_order_item_label?: string;
         product_id: string;
         product_label?: string;
         unit_id: string;

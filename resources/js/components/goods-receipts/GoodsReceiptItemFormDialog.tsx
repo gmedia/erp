@@ -11,37 +11,68 @@ import {
     ItemNotesField,
     ItemProductUnitFields,
 } from '@/components/common/ItemFormDialog';
+import { ItemSourceLineSelectField } from '@/components/common/ItemSourceLineSelectField';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type GoodsReceiptFormData } from '@/types/goods-receipt';
 
-const goodsReceiptItemSchema = z.object({
-    purchase_order_item_id: z
-        .string()
-        .min(1, { message: 'PO Item is required.' }),
-    product_id: z.string().min(1, { message: 'Product is required.' }),
-    product_label: z.string().optional(),
-    unit_id: z.string().min(1, { message: 'Unit is required.' }),
-    unit_label: z.string().optional(),
-    quantity_received: z.coerce
-        .number()
-        .gt(0, { message: 'Quantity received must be greater than 0.' }),
-    quantity_accepted: z.coerce
-        .number()
-        .min(0, { message: 'Quantity accepted must be at least 0.' }),
-    quantity_rejected: z.coerce.number().min(0).optional().default(0),
-    unit_price: z.coerce
-        .number()
-        .min(0, { message: 'Unit price must be at least 0.' }),
-    notes: z.string().optional(),
-});
-
 type GoodsReceiptItemFormData = GoodsReceiptFormData['items'][number];
+
+function buildGoodsReceiptItemSchema(
+    t: (key: string, params?: Record<string, string>) => string,
+) {
+    return z.object({
+        purchase_order_item_id: z.string().min(1, {
+            message: t('goodsReceipt.item.po_item_required'),
+        }),
+        purchase_order_item_label: z.string().optional(),
+        product_id: z.string().min(1, {
+            message: t('goodsReceipt.item.product_required'),
+        }),
+        product_label: z.string().optional(),
+        unit_id: z.string().min(1, {
+            message: t('goodsReceipt.item.unit_required'),
+        }),
+        unit_label: z.string().optional(),
+        quantity_received: z.coerce.number().gt(0, {
+            message: t('goodsReceipt.item.quantity_received_positive'),
+        }),
+        quantity_accepted: z.coerce.number().min(0, {
+            message: t('goodsReceipt.item.quantity_accepted_min'),
+        }),
+        quantity_rejected: z.coerce.number().min(0).optional().default(0),
+        unit_price: z.coerce.number().min(0, {
+            message: t('goodsReceipt.item.unit_price_min'),
+        }),
+        notes: z.string().optional(),
+    });
+}
+
+function buildPoItemOptionsUrl(
+    purchaseOrderId: string,
+    currentLineId?: string,
+    goodsReceiptId?: string,
+): string {
+    const params = new URLSearchParams();
+
+    if (currentLineId) {
+        params.set('current_line_id', currentLineId);
+    }
+    if (goodsReceiptId) {
+        params.set('goods_receipt_id', goodsReceiptId);
+    }
+    const query = params.toString();
+
+    return `/api/purchase-orders/${purchaseOrderId}/item-options${query ? `?${query}` : ''}`;
+}
 
 interface GoodsReceiptItemFormDialogProps {
     readonly open: boolean;
     readonly onOpenChange: (open: boolean) => void;
     readonly item: GoodsReceiptItemFormData | null;
     readonly onSave: (data: GoodsReceiptItemFormData) => void;
+    readonly purchaseOrderId?: string;
+    readonly goodsReceiptId?: string;
 }
 
 export function GoodsReceiptItemFormDialog({
@@ -49,11 +80,19 @@ export function GoodsReceiptItemFormDialog({
     onOpenChange,
     item,
     onSave,
+    purchaseOrderId,
+    goodsReceiptId,
 }: GoodsReceiptItemFormDialogProps) {
+    const { t } = useTranslation();
+    const goodsReceiptItemSchema = useMemo(
+        () => buildGoodsReceiptItemSchema(t),
+        [t],
+    );
     const defaultValues = useMemo<GoodsReceiptItemFormData>(() => {
         if (!item) {
             return {
                 purchase_order_item_id: '',
+                purchase_order_item_label: '',
                 product_id: '',
                 product_label: '',
                 unit_id: '',
@@ -68,6 +107,7 @@ export function GoodsReceiptItemFormDialog({
 
         return {
             purchase_order_item_id: item.purchase_order_item_id || '',
+            purchase_order_item_label: item.purchase_order_item_label || '',
             product_id: item.product_id || '',
             product_label: item.product_label || '',
             unit_id: item.unit_id || '',
@@ -102,16 +142,29 @@ export function GoodsReceiptItemFormDialog({
             item={item}
             form={form}
             onSave={onSave}
-            itemDescription="goods receipt item"
+            itemDescription={t('goodsReceipt.item.description')}
+            titleLabel={t('goodsReceipt.item.title_label')}
+            actionLabel={t('goodsReceipt.item.title_label')}
         >
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <InputField
+                <ItemSourceLineSelectField
+                    open={open}
                     name="purchase_order_item_id"
-                    label="PO Item ID"
-                    type="number"
-                    min={1}
-                    step="1"
-                    placeholder="1"
+                    url={
+                        purchaseOrderId
+                            ? buildPoItemOptionsUrl(
+                                  purchaseOrderId,
+                                  item?.purchase_order_item_id,
+                                  goodsReceiptId,
+                              )
+                            : null
+                    }
+                    label={t('goodsReceipt.item.po_item')}
+                    placeholder={t('goodsReceipt.item.po_item_placeholder')}
+                    emptyHint={t('goodsReceipt.item.po_item_empty_hint')}
+                    initialId={defaultValues.purchase_order_item_id}
+                    initialLabel={defaultValues.purchase_order_item_label}
+                    labelName="purchase_order_item_label"
                 />
                 <ItemProductUnitFields
                     form={form}
@@ -123,7 +176,7 @@ export function GoodsReceiptItemFormDialog({
                 />
                 <InputField
                     name="quantity_received"
-                    label="Quantity Received"
+                    label={t('goodsReceipt.item.quantity_received')}
                     type="number"
                     min={0}
                     step="any"
@@ -131,7 +184,7 @@ export function GoodsReceiptItemFormDialog({
                 />
                 <InputField
                     name="quantity_accepted"
-                    label="Quantity Accepted"
+                    label={t('goodsReceipt.item.quantity_accepted')}
                     type="number"
                     min={0}
                     step="any"
@@ -139,7 +192,7 @@ export function GoodsReceiptItemFormDialog({
                 />
                 <InputField
                     name="quantity_rejected"
-                    label="Quantity Rejected"
+                    label={t('goodsReceipt.item.quantity_rejected')}
                     type="number"
                     min={0}
                     step="any"
@@ -147,7 +200,7 @@ export function GoodsReceiptItemFormDialog({
                 />
                 <InputField
                     name="unit_price"
-                    label="Unit Price"
+                    label={t('goodsReceipt.item.unit_price')}
                     type="number"
                     min={0}
                     step="any"
@@ -155,7 +208,10 @@ export function GoodsReceiptItemFormDialog({
                 />
             </div>
 
-            <ItemNotesField />
+            <ItemNotesField
+                label={t('goodsReceipt.item.notes')}
+                placeholder={t('goodsReceipt.item.notes_placeholder')}
+            />
         </ItemFormDialogShell>
     );
 }

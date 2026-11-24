@@ -78,9 +78,6 @@ export const GoodsReceiptViewModal = React.memo(
                                     <thead>
                                         <tr className="border-b">
                                             <th className="p-2 text-left">
-                                                PO Item ID
-                                            </th>
-                                            <th className="p-2 text-left">
                                                 Product
                                             </th>
                                             <th className="p-2 text-left">
@@ -106,9 +103,6 @@ export const GoodsReceiptViewModal = React.memo(
                                                 key={it.id}
                                                 className="border-b last:border-b-0"
                                             >
-                                                <td className="p-2">
-                                                    {it.purchase_order_item_id}
-                                                </td>
                                                 <td className="p-2">
                                                     {it.product?.name || '-'}
                                                 </td>

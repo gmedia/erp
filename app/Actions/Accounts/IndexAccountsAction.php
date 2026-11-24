@@ -29,6 +29,10 @@ class IndexAccountsAction extends SimpleCrudIndexAction
 
         $this->applyCoaVersionFilter($request, $query);
 
+        if ($request->filled('has_children') && ! $request->boolean('has_children')) {
+            $query->whereDoesntHave('children');
+        }
+
         return $this->handleIndexRequestWithOptionalPagination(
             $request,
             $query,
@@ -68,8 +72,7 @@ class IndexAccountsAction extends SimpleCrudIndexAction
             ->where('status', 'active')
             ->value('id');
 
-        if ($activeVersionId !== null) {
-            $query->where('coa_version_id', $activeVersionId);
-        }
+        // Tanpa COA aktif tidak ada akun yang boleh ditawarkan.
+        $query->where('coa_version_id', $activeVersionId ?? 0);
     }
 }

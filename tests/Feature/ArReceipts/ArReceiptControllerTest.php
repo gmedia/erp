@@ -122,6 +122,44 @@ test('store creates ar receipt with allocations', function () {
     ]);
 });
 
+test('store rejects allocation whose invoice belongs to another customer', function () {
+    $customer = Customer::factory()->create();
+    $otherCustomer = Customer::factory()->create();
+    $branch = Branch::factory()->create();
+    $fiscalYear = FiscalYear::factory()->create();
+    $bankAccount = Account::factory()->create();
+    $foreignInvoice = CustomerInvoice::factory()->create([
+        'customer_id' => $otherCustomer->id,
+        'fiscal_year_id' => $fiscalYear->id,
+        'grand_total' => 100000,
+        'status' => 'sent',
+    ]);
+
+    $payload = [
+        'customer_id' => $customer->id,
+        'branch_id' => $branch->id,
+        'fiscal_year_id' => $fiscalYear->id,
+        'receipt_date' => '2026-03-06',
+        'payment_method' => 'bank_transfer',
+        'bank_account_id' => $bankAccount->id,
+        'currency' => 'IDR',
+        'total_amount' => 50000,
+        'status' => 'draft',
+        'allocations' => [
+            [
+                'customer_invoice_id' => $foreignInvoice->id,
+                'allocated_amount' => 50000,
+            ],
+        ],
+    ];
+
+    postJson('/api/ar-receipts', $payload)
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['allocations.0.customer_invoice_id']);
+
+    assertDatabaseMissing('ar_receipt_allocations', ['customer_invoice_id' => $foreignInvoice->id]);
+});
+
 test('show returns ar receipt detail', function () {
     $customer = Customer::factory()->create();
     $fiscalYear = FiscalYear::factory()->create();

@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { memo, useMemo } from 'react';
+import { memo, useEffect, useMemo, useRef } from 'react';
 import { type Resolver, useFieldArray, useForm } from 'react-hook-form';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
@@ -50,6 +50,7 @@ interface GoodsReceiptFormProps {
 const createEmptyGoodsReceiptItem =
     (): GoodsReceiptFormData['items'][number] => ({
         purchase_order_item_id: '',
+        purchase_order_item_label: '',
         product_id: '',
         product_label: '',
         unit_id: '',
@@ -98,6 +99,7 @@ const getGoodsReceiptFormDefaults = (
         items: (goodsReceipt.items || []).length
             ? (goodsReceipt.items || []).map((it) => ({
                   purchase_order_item_id: String(it.purchase_order_item_id),
+                  purchase_order_item_label: it.product?.name || '',
                   product_id: it.product?.id ? String(it.product.id) : '',
                   product_label: it.product?.name || '',
                   unit_id: it.unit?.id ? String(it.unit.id) : '',
@@ -146,6 +148,22 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
             name: 'items',
         });
         const watchedItems = form.watch('items');
+        const watchedPurchaseOrderId = form.watch('purchase_order_id');
+        const previousPurchaseOrderIdRef = useRef(
+            defaultValues.purchase_order_id,
+        );
+        useEffect(() => {
+            if (previousPurchaseOrderIdRef.current === watchedPurchaseOrderId) {
+                return;
+            }
+            const isResetToDefaults =
+                watchedPurchaseOrderId === defaultValues.purchase_order_id;
+            previousPurchaseOrderIdRef.current = watchedPurchaseOrderId;
+            if (isResetToDefaults) {
+                return;
+            }
+            remove();
+        }, [watchedPurchaseOrderId, defaultValues.purchase_order_id, remove]);
         const {
             isItemDialogOpen,
             item: selectedItem,
@@ -200,11 +218,12 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
                         placeholder="Select status"
                     />
 
-                    <AsyncSelectField
+                    <AsyncSelectField<{ po_number: string }>
                         name="purchase_order_id"
                         label="Purchase Order"
                         url="/api/purchase-orders"
                         placeholder="Select purchase order"
+                        labelFn={(po) => po.po_number}
                     />
 
                     <AsyncSelectField
@@ -248,9 +267,6 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="w-[140px]">
-                                        PO Item ID
-                                    </TableHead>
                                     <TableHead className="w-[220px]">
                                         Product
                                     </TableHead>
@@ -283,12 +299,6 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
 
                                     return (
                                         <TableRow key={field.id}>
-                                            <TableCell>
-                                                {formatItemReference(
-                                                    undefined,
-                                                    goodsReceiptItem.purchase_order_item_id,
-                                                )}
-                                            </TableCell>
                                             <TableCell>
                                                 {formatItemReference(
                                                     goodsReceiptItem.product_label,
@@ -329,7 +339,7 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
                                     );
                                 })}
                                 {fields.length === 0 && (
-                                    <EntityFormItemEmptyRow colSpan={9} />
+                                    <EntityFormItemEmptyRow colSpan={8} />
                                 )}
                             </TableBody>
                         </Table>
@@ -341,6 +351,12 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
                     onOpenChange={handleItemDialogOpenChange}
                     item={selectedItem}
                     onSave={handleSaveItem}
+                    purchaseOrderId={watchedPurchaseOrderId}
+                    goodsReceiptId={
+                        activeGoodsReceipt?.id
+                            ? String(activeGoodsReceipt.id)
+                            : undefined
+                    }
                 />
             </EntityForm>
         );

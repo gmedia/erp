@@ -53,13 +53,15 @@ abstract class AbstractArReceiptRequest extends AuthorizedFormRequest
     public function withValidator(Validator $validator): void
     {
         $validator->after(function ($validator): void {
-            $receiptId = $this->route('arReceipt')?->id;
+            $receiptId = $this->route('ar_receipt')?->id;
+
+            $this->validateAllocationCustomerMatch($validator);
 
             $this->validateAllocationOverflow(
                 $validator,
                 'allocations',
                 'customer_invoice_id',
-                'Allocation exceeds invoice outstanding amount. Maximum',
+                __('ar_receipt.allocation_exceeds_invoice'),
                 fn (int $invoiceId) => $this->maxInvoiceAllocation($validator, $invoiceId, $receiptId),
             );
         });
@@ -76,6 +78,34 @@ abstract class AbstractArReceiptRequest extends AuthorizedFormRequest
         ];
     }
 
+    private function validateAllocationCustomerMatch(Validator $validator): void
+    {
+        $customerId = (int) ($this->input('customer_id') ?? $this->route('ar_receipt')?->customer_id);
+
+        if ($customerId === 0) {
+            return;
+        }
+
+        foreach ($this->input('allocations', []) as $index => $allocation) {
+            $invoiceId = $allocation['customer_invoice_id'] ?? null;
+
+            if (empty($invoiceId)) {
+                continue;
+            }
+
+            $belongsToCustomer = CustomerInvoice::whereKey($invoiceId)
+                ->where('customer_id', $customerId)
+                ->exists();
+
+            if (! $belongsToCustomer) {
+                $validator->errors()->add(
+                    "allocations.{$index}.customer_invoice_id",
+                    __('ar_receipt.invoice_customer_mismatch'),
+                );
+            }
+        }
+    }
+
     private function maxInvoiceAllocation(
         Validator $validator,
         int $invoiceId,
@@ -90,7 +120,7 @@ abstract class AbstractArReceiptRequest extends AuthorizedFormRequest
         if (in_array($invoice->status, ['void', 'cancelled'], true)) {
             $validator->errors()->add(
                 'allocations.customer_invoice_id',
-                "Cannot allocate to a {$invoice->status} invoice.",
+                __('ar_receipt.invoice_status_not_allocatable', ['status' => $invoice->status]),
             );
 
             return null;

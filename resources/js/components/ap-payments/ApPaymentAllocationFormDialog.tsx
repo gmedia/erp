@@ -5,21 +5,15 @@ import { useMemo } from 'react';
 import { type Resolver, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { InputField } from '@/components/common/InputField';
 import { ItemFormDialogShell } from '@/components/common/ItemFormDialog';
 import { TextareaField } from '@/components/common/TextareaField';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type ApPaymentFormData } from '@/types/ap-payment';
-
-const apPaymentAllocationSchema = z.object({
-    supplier_bill_id: z.string().min(1, { message: 'Bill is required.' }),
-    bill_label: z.string().optional(),
-    allocated_amount: z.coerce
-        .number()
-        .gt(0, { message: 'Allocated amount must be greater than 0.' }),
-    discount_taken: z.coerce.number().min(0).optional().default(0),
-    notes: z.string().optional(),
-});
+import { type SupplierBill } from '@/types/supplier-bill';
+import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 
 type ApPaymentAllocationFormData = ApPaymentFormData['allocations'][number];
 
@@ -28,14 +22,52 @@ interface ApPaymentAllocationFormDialogProps {
     readonly onOpenChange: (open: boolean) => void;
     readonly item: ApPaymentAllocationFormData | null;
     readonly onSave: (data: ApPaymentAllocationFormData) => void;
+    readonly supplierId?: string;
 }
+
+const OPEN_BILL_STATUSES: readonly string[] = [
+    'confirmed',
+    'partially_paid',
+    'overdue',
+];
+
+const isOpenBill = (bill: SupplierBill): boolean =>
+    OPEN_BILL_STATUSES.includes(bill.status) && Number(bill.amount_due) > 0;
+
+const billLabel = (bill: SupplierBill): string =>
+    `${bill.bill_number ?? String(bill.id)} — ${formatCurrencyByRegionalSettings(
+        bill.amount_due,
+        {
+            locale: 'id-ID',
+            currency: bill.currency || 'IDR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2,
+        },
+    )}`;
 
 export function ApPaymentAllocationFormDialog({
     open,
     onOpenChange,
     item,
     onSave,
+    supplierId,
 }: ApPaymentAllocationFormDialogProps) {
+    const { t } = useTranslation();
+    const apPaymentAllocationSchema = useMemo(
+        () =>
+            z.object({
+                supplier_bill_id: z.string().min(1, {
+                    message: t('apPayment.allocation.bill_required'),
+                }),
+                bill_label: z.string().optional(),
+                allocated_amount: z.coerce.number().gt(0, {
+                    message: t('apPayment.allocation.amount_positive'),
+                }),
+                discount_taken: z.coerce.number().min(0).optional().default(0),
+                notes: z.string().optional(),
+            }),
+        [t],
+    );
     const defaultValues = useMemo<ApPaymentAllocationFormData>(() => {
         if (!item) {
             return {
@@ -79,17 +111,36 @@ export function ApPaymentAllocationFormDialog({
             form={form}
             onSave={onSave}
             itemDescription="payment allocation"
+            titleLabel={t('apPayment.allocation.title_label')}
+            actionLabel={t('apPayment.allocation.title_label')}
         >
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <InputField
-                    name="supplier_bill_id"
-                    label="Supplier Bill ID"
-                    placeholder="Supplier Bill ID"
-                    disabled
-                />
+                {supplierId ? (
+                    <AsyncSelectField<SupplierBill>
+                        name="supplier_bill_id"
+                        label={t('apPayment.allocation.bill')}
+                        placeholder={t('apPayment.allocation.bill_placeholder')}
+                        url={`/api/supplier-bills?supplier_id=${supplierId}`}
+                        labelFn={billLabel}
+                        valueFn={(bill) => String(bill.id)}
+                        filterItems={isOpenBill}
+                        initialLabel={defaultValues.bill_label || undefined}
+                        onItemSelect={(bill) => {
+                            form.setValue('bill_label', bill.bill_number ?? '');
+                            form.setValue(
+                                'allocated_amount',
+                                Number(bill.amount_due),
+                            );
+                        }}
+                    />
+                ) : (
+                    <p className="text-sm text-muted-foreground md:col-span-2">
+                        {t('apPayment.allocation.select_supplier_first')}
+                    </p>
+                )}
                 <InputField
                     name="allocated_amount"
-                    label="Allocated Amount"
+                    label={t('apPayment.allocation.allocated_amount')}
                     type="number"
                     min={0}
                     step="any"
@@ -97,7 +148,7 @@ export function ApPaymentAllocationFormDialog({
                 />
                 <InputField
                     name="discount_taken"
-                    label="Discount Taken"
+                    label={t('apPayment.allocation.discount_taken')}
                     type="number"
                     min={0}
                     step="any"
@@ -107,8 +158,8 @@ export function ApPaymentAllocationFormDialog({
 
             <TextareaField
                 name="notes"
-                label="Notes"
-                placeholder="Allocation notes"
+                label={t('apPayment.allocation.notes')}
+                placeholder={t('apPayment.allocation.notes_placeholder')}
                 rows={2}
             />
         </ItemFormDialogShell>

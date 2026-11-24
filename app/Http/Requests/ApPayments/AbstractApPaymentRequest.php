@@ -53,6 +53,7 @@ abstract class AbstractApPaymentRequest extends AuthorizedFormRequest
         $validator->after(function ($validator): void {
             $allocations = $this->input('allocations', []);
             $paymentId = $this->route('apPayment')?->id;
+            $supplierId = (int) ($this->input('supplier_id') ?? $this->route('apPayment')?->supplier_id);
 
             foreach ($allocations as $index => $allocation) {
                 if (empty($allocation['supplier_bill_id']) || empty($allocation['allocated_amount'])) {
@@ -61,6 +62,15 @@ abstract class AbstractApPaymentRequest extends AuthorizedFormRequest
 
                 $bill = SupplierBill::find($allocation['supplier_bill_id']);
                 if ($bill === null) {
+                    continue;
+                }
+
+                if ($supplierId !== 0 && (int) $bill->supplier_id !== $supplierId) {
+                    $validator->errors()->add(
+                        "allocations.{$index}.supplier_bill_id",
+                        __('ap_payment.bill_supplier_mismatch'),
+                    );
+
                     continue;
                 }
 
@@ -81,8 +91,9 @@ abstract class AbstractApPaymentRequest extends AuthorizedFormRequest
                 if ($newTotal > (float) $bill->grand_total) {
                     $validator->errors()->add(
                         "allocations.{$index}.allocated_amount",
-                        'Allocation exceeds bill outstanding amount. Maximum: '
-                            . ((float) $bill->grand_total - $existingAllocated)
+                        __('ap_payment.allocation_exceeds_bill', [
+                            'max' => (float) $bill->grand_total - $existingAllocated,
+                        ])
                     );
                 }
             }

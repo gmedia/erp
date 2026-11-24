@@ -189,7 +189,17 @@ async function createInvoiceViaUi(
     await dialog.getByRole('button', { name: 'Add Item' }).click();
     const itemDialog = page.getByRole('dialog', { name: /Add Item/i });
     await expect(itemDialog).toBeVisible();
-    await itemDialog.getByLabel('Account').fill(String(ctx.accountId));
+    await itemDialog.getByRole('combobox', { name: 'Account' }).click();
+    const accountPicker = page.getByRole('dialog').last();
+    await accountPicker
+        .getByPlaceholder('Search...')
+        .fill(REVENUE_ACCOUNT_CODE);
+    await accountPicker
+        .getByRole('listitem')
+        .filter({ hasText: REVENUE_ACCOUNT_CODE })
+        .first()
+        .getByRole('button')
+        .click();
     await itemDialog.getByLabel('Description').fill(ctx.description);
     await itemDialog.getByLabel(/Quantity/i).fill('1');
     await itemDialog.getByLabel(/Unit Price/i).fill(String(INVOICE_TOTAL));
@@ -275,6 +285,7 @@ async function createReceiptViaUi(
         fiscalYearId: number;
         cashAccountId: number;
         invoiceId: number;
+        invoiceNumber: string;
         amount: number;
     },
 ): Promise<{ id: number; receipt_number: string }> {
@@ -321,14 +332,22 @@ async function createReceiptViaUi(
     await dialog.getByLabel('Total Amount').fill(String(ctx.amount));
 
     await dialog.getByRole('button', { name: 'Add Item' }).click();
-    const allocDialog = page.getByRole('dialog', { name: /Add Item/i });
+    const allocDialog = page.getByRole('dialog').last();
     await expect(allocDialog).toBeVisible();
     await allocDialog
-        .getByLabel('Customer Invoice')
-        .fill(String(ctx.invoiceId));
+        .getByRole('combobox', { name: 'Customer Invoice' })
+        .click();
+    const invoicePicker = page.getByRole('dialog').last();
+    await invoicePicker.getByPlaceholder('Search...').fill(ctx.invoiceNumber);
+    await invoicePicker
+        .getByRole('listitem')
+        .filter({ hasText: ctx.invoiceNumber })
+        .first()
+        .getByRole('button')
+        .click();
     await allocDialog.getByLabel('Allocated Amount').fill(String(ctx.amount));
-    await allocDialog.getByRole('button', { name: 'Save Item' }).click();
-    await expect(allocDialog).toBeHidden();
+    await allocDialog.getByRole('button', { name: 'Save Allocation' }).click();
+    await expect(page.getByRole('dialog')).toHaveCount(1);
 
     const createResponse = page.waitForResponse(
         (response) =>
@@ -451,7 +470,6 @@ interface O2cRun {
     invoiceJournal: JournalEntryRecord;
     revenueBefore: number;
     revenueAfterInvoice: number;
-    revenueAfter: number;
     afterInvoice: InvoiceAmounts;
     afterReceipt: InvoiceAmounts;
     afterCredit: InvoiceAmounts;
@@ -498,6 +516,7 @@ async function runOrderToCash(page: Page): Promise<O2cRun> {
         fiscalYearId,
         cashAccountId,
         invoiceId,
+        invoiceNumber: invoice.invoice_number,
         amount: RECEIPT_PART,
     });
     const receiptNumber = receipt.receipt_number;
@@ -587,7 +606,6 @@ async function runOrderToCash(page: Page): Promise<O2cRun> {
     expect(settle.status).toBeLessThan(400);
 
     const settled = await readInvoice(page, invoiceId);
-    const revenueAfter = (await readReportTotals(page, fiscalYearId)).revenue;
 
     return {
         invoiceId,
@@ -601,7 +619,6 @@ async function runOrderToCash(page: Page): Promise<O2cRun> {
         invoiceJournal,
         revenueBefore,
         revenueAfterInvoice,
-        revenueAfter,
         afterInvoice,
         afterReceipt,
         afterCredit,
@@ -612,10 +629,27 @@ async function runOrderToCash(page: Page): Promise<O2cRun> {
 test.describe('Order-to-cash: invoice sampai pelunasan', () => {
     test.setTimeout(300000);
 
-    test('invoice -> receipt sebagian -> credit note -> pelunasan mengosongkan piutang', async ({
-        page,
-    }) => {
-        const run = await runOrderToCash(page);
+    let sharedRun: O2cRun | undefined;
+
+    test.beforeAll(async ({ browser }) => {
+        const context = await browser.newContext();
+        try {
+            sharedRun = await runOrderToCash(await context.newPage());
+        } finally {
+            await context.close();
+        }
+    });
+
+    const readSharedRun = (): O2cRun => {
+        if (!sharedRun) {
+            throw new Error('order-to-cash run was not prepared in beforeAll');
+        }
+
+        return sharedRun;
+    };
+
+    test('invoice -> receipt sebagian -> credit note -> pelunasan mengosongkan piutang', async () => {
+        const run = readSharedRun();
 
         expect(run.settled.amount_received).toBeCloseTo(
             INVOICE_TOTAL - CREDIT_NOTE_AMOUNT,
@@ -629,10 +663,8 @@ test.describe('Order-to-cash: invoice sampai pelunasan', () => {
         expect(run.settled.status).toBe('paid');
     });
 
-    test('jurnal invoice posted: Dr AR 11200 / Cr Pendapatan 41000 sebesar total', async ({
-        page,
-    }) => {
-        const run = await runOrderToCash(page);
+    test('jurnal invoice posted: Dr AR 11200 / Cr Pendapatan 41000 sebesar total', async () => {
+        const run = readSharedRun();
 
         expect(run.invoiceJournal.status).toBe('posted');
         expect(netForAccount(run.invoiceJournal, run.arAccountId)).toBeCloseTo(
@@ -644,10 +676,8 @@ test.describe('Order-to-cash: invoice sampai pelunasan', () => {
         ).toBeCloseTo(-INVOICE_TOTAL, 2);
     });
 
-    test('invoice dikirim menaikkan pendapatan 41000 sebesar total invoice', async ({
-        page,
-    }) => {
-        const run = await runOrderToCash(page);
+    test('invoice dikirim menaikkan pendapatan 41000 sebesar total invoice', async () => {
+        const run = readSharedRun();
 
         expect(run.revenueAfterInvoice - run.revenueBefore).toBeCloseTo(
             INVOICE_TOTAL,
@@ -655,10 +685,8 @@ test.describe('Order-to-cash: invoice sampai pelunasan', () => {
         );
     });
 
-    test('jurnal receipt posted: Dr kas / Cr AR 11200 sebesar pembayaran sebagian', async ({
-        page,
-    }) => {
-        const run = await runOrderToCash(page);
+    test('jurnal receipt posted: Dr kas / Cr AR 11200 sebesar pembayaran sebagian', async () => {
+        const run = readSharedRun();
 
         expect(run.receiptJournal.status).toBe('posted');
         expect(
@@ -673,8 +701,6 @@ test.describe('Order-to-cash: invoice sampai pelunasan', () => {
     test('picker Customer Invoice di form credit note menampilkan nomor invoice (#373)', async ({
         page,
     }) => {
-        test.fail(true, 'picker Customer Invoice credit note kosong (#373)');
-
         const ctx = await createSentInvoice(page);
         const invoice = await readInvoice(page, ctx.invoiceId);
 
@@ -750,7 +776,8 @@ test.describe('Order-to-cash: invoice sampai pelunasan', () => {
     test('jurnal credit note posted: Dr pendapatan 41000 / Cr AR 11200 sebesar CN', async ({
         page,
     }) => {
-        const run = await runOrderToCash(page);
+        const run = readSharedRun();
+        await login(page, undefined, undefined, { requireDashboard: false });
         const creditNoteJournal = await readJournalByReference(
             page,
             run.creditNoteNumber,

@@ -19,15 +19,18 @@ export async function createSupplierBill(page: Page): Promise<string> {
         };
 
         const getFirstAccount = async (): Promise<number> => {
-            const response = await fetch('/api/accounts?per_page=1', {
+            const response = await fetch('/api/accounts?per_page=100', {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'Authorization': `Bearer ${apiToken}`,
                 },
             });
             const json = await response.json();
-            const rows = json.data || json;
-            return Number(rows[0].id);
+            const row = (json.data || []).find((a: { code: string }) => a.code === '11110');
+            if (!row) {
+                throw new Error('akun postable 11110 tidak ditemukan');
+            }
+            return Number(row.id);
         };
 
         const [supplierId, branchId, fiscalYearId, accountId] = await Promise.all([

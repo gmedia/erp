@@ -38,7 +38,11 @@ abstract class AbstractCreditNoteRequest extends AuthorizedFormRequest
 
             'items' => $this->itemsRules(),
             'items.*.product_id' => $this->nullableIntegerItemRule('exists:products,id'),
-            'items.*.account_id' => $this->requiredIntegerItemRule('exists:accounts,id'),
+            'items.*.account_id' => [
+                $this->itemRequiredRule(),
+                'integer',
+                $this->postableAccountRule(),
+            ],
             'items.*.description' => [$this->itemRequiredRule(), 'string', 'max:255'],
             'items.*.quantity' => $this->requiredNumericItemRule('gt:0'),
             'items.*.unit_price' => $this->requiredNumericItemRule('min:0'),
