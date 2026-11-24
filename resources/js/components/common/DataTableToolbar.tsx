@@ -93,7 +93,7 @@ export function DataTableToolbar<T>({
                 value={searchValue}
                 onChange={handleSearchChange}
                 onKeyDown={handleSearchKeyDown}
-                className="h-9 w-full min-w-0 border-border bg-background placeholder:text-muted-foreground sm:max-w-sm sm:flex-1"
+                className="h-9 w-full min-w-0 border-border bg-background text-ellipsis placeholder:text-muted-foreground sm:max-w-sm sm:flex-1"
                 data-testid="search-input"
             />
 

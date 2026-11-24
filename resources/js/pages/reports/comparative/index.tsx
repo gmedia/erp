@@ -131,12 +131,14 @@ export default function ComparativeReport() {
                     report={report}
                     totals={report.totals}
                     showComparison={!!comparisonYearId}
+                    compactIndent
                 />
                 <ComparisonFinancialReportSectionGroup
                     sections={comparativePerformanceSections}
                     report={report}
                     totals={report.totals}
                     showComparison={!!comparisonYearId}
+                    compactIndent
                 />
             </div>
         </FinancialReportPageShell>

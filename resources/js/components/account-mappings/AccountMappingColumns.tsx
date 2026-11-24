@@ -7,7 +7,6 @@ import {
     createDateColumn,
     createSelectColumn,
     createSortingHeader,
-    createTextColumn,
 } from '@/utils/columns';
 import { ColumnDef } from '@tanstack/react-table';
 
@@ -46,10 +45,22 @@ export const accountMappingColumns: ColumnDef<AccountMapping>[] = [
         colorMap: {
             rename: 'bg-muted text-foreground',
             merge: 'bg-info/10 text-info',
-            split: 'bg-chart-3/10 text-chart-3',
+            split: 'bg-warning-soft text-warning',
         },
     }),
-    createTextColumn<AccountMapping>({ accessorKey: 'notes', label: 'Notes' }),
+    {
+        id: 'notes',
+        accessorKey: 'notes',
+        ...createSortingHeader('Notes'),
+        cell: ({ row }) => {
+            const notes = row.original.notes ?? '-';
+            return (
+                <div className="max-w-64 truncate" title={notes}>
+                    {notes}
+                </div>
+            );
+        },
+    },
     createDateColumn<AccountMapping>({
         accessorKey: 'created_at',
         label: 'Created At',

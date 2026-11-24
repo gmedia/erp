@@ -301,6 +301,8 @@ export function formatCurrencyByRegionalSettings(
         currency: resolvedCurrency,
         currencyDisplay,
         useGrouping,
+        // 'negative' = nol negatif (-0 / pembulatan ke 0) tampil tanpa tanda minus.
+        signDisplay: 'negative',
         ...fractionDigits,
     });
 

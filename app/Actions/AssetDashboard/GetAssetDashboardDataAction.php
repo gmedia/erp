@@ -12,13 +12,18 @@ class GetAssetDashboardDataAction
 {
     public function execute(?int $branchId = null): array
     {
+        // Count covers every register row; value totals use the same in-service definition as the
+        // book-value report (Asset::IN_SERVICE_STATUSES), so draft/disposed/lost do not inflate them.
+        $inService = implode(', ', array_fill(0, count(Asset::IN_SERVICE_STATUSES), '?'));
         $summaryStats = $this->scopeBranch(Asset::query(), $branchId)
-            ->selectRaw('
-                COUNT(*) as total_assets,
-                SUM(purchase_cost) as total_purchase_cost,
-                SUM(book_value) as total_book_value,
-                SUM(accumulated_depreciation) as total_accumulated_depreciation
-            ')
+            ->selectRaw(
+                "COUNT(*) as total_assets,
+                SUM(CASE WHEN status IN ({$inService}) THEN purchase_cost ELSE 0 END) as total_purchase_cost,
+                SUM(CASE WHEN status IN ({$inService}) THEN book_value ELSE 0 END) as total_book_value,
+                SUM(CASE WHEN status IN ({$inService}) THEN accumulated_depreciation ELSE 0 END)
+                    as total_accumulated_depreciation",
+                array_merge(...array_fill(0, 3, Asset::IN_SERVICE_STATUSES)),
+            )
             ->first();
 
         $statusCounts = $this->scopeBranch(Asset::query(), $branchId)

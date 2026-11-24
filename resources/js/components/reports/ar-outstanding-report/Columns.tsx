@@ -1,6 +1,6 @@
 'use client';
 
-import { formatNumberByRegionalSettings } from '@/utils/number-format';
+import { createNumberColumn } from '@/utils/columns';
 import type { ColumnDef } from '@tanstack/react-table';
 import {
     type ArInvoiceReportBase,
@@ -14,18 +14,12 @@ export type ArOutstandingReportItem = ArInvoiceReportBase & {
 export const arOutstandingReportColumns: ColumnDef<ArOutstandingReportItem>[] =
     [
         ...createArInvoiceBaseColumns<ArOutstandingReportItem>(),
-        {
-            id: 'days_overdue',
+        createNumberColumn<ArOutstandingReportItem>({
             accessorKey: 'days_overdue',
-            header: 'Days Overdue',
-            cell: ({ row }) => {
-                const value = row.original.days_overdue;
-                if (value === null || value === undefined) return '-';
-                return formatNumberByRegionalSettings(value, {
-                    locale: 'id-ID',
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0,
-                });
-            },
-        },
+            label: 'Days Overdue',
+            locale: 'id-ID',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+            className: 'text-right tabular-nums',
+        }),
     ];

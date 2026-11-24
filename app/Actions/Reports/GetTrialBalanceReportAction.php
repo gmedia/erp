@@ -167,12 +167,23 @@ class GetTrialBalanceReportAction
             'account_type' => $balance->account_type,
             'period_month' => $periodMonth,
             'period_year' => $periodYear,
-            'opening_balance' => round($opening, 2),
-            'debit_total' => round($debitTotal, 2),
-            'credit_total' => round($creditTotal, 2),
-            'closing_balance' => round($closing, 2),
-            'debit_balance' => round($debitBalance >= 0 ? $debitBalance : 0, 2),
-            'credit_balance' => round($debitBalance < 0 ? abs($debitBalance) : 0, 2),
+            'opening_balance' => $this->money($opening),
+            'debit_total' => $this->money($debitTotal),
+            'credit_total' => $this->money($creditTotal),
+            'closing_balance' => $this->money($closing),
+            'debit_balance' => $this->money($debitBalance >= 0 ? $debitBalance : 0),
+            'credit_balance' => $this->money($debitBalance < 0 ? abs($debitBalance) : 0),
         ];
+    }
+
+    /**
+     * Bulatkan nominal ke 2 desimal dan normalkan nol negatif (-0.0) menjadi 0.0,
+     * agar JSON tidak membawa "-0" yang tampil sebagai "-Rp 0".
+     */
+    private function money(float $amount): float
+    {
+        $rounded = round($amount, 2);
+
+        return $rounded == 0.0 ? 0.0 : $rounded;
     }
 }

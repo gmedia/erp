@@ -2,6 +2,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatCurrency } from '@/lib/utils';
 import { ChartColumn } from 'lucide-react';
 import { memo } from 'react';
+import {
+    barHeightPx,
+    formatCompactSigned,
+    trendMaxAbs,
+} from './monthlyTrendFormat';
 
 export interface MonthlyTrendItem {
     month: number;
@@ -30,14 +35,6 @@ const PLACEHOLDER_BARS = [
     { month: 11, height: 45 },
     { month: 12, height: 70 },
 ] as const;
-
-function formatCompact(value: number): string {
-    const absValue = Math.abs(value);
-    if (absValue === 0) return '0';
-    if (absValue < 1000) return absValue.toString();
-    if (absValue < 1000000) return `${(absValue / 1000).toFixed(1)}K`;
-    return `${(absValue / 1000000).toFixed(1)}M`;
-}
 
 function netIncomeColorClass(value: number): string {
     if (value > 0) return 'text-success';
@@ -87,10 +84,7 @@ export const MonthlyTrendChart = memo<MonthlyTrendChartProps>(
             );
         }
 
-        const maxValue = Math.max(
-            ...data.map((d) => Math.max(d.revenue, d.expenses)),
-            1,
-        );
+        const maxAbs = trendMaxAbs(data);
 
         return (
             <Card className="w-full">
@@ -117,15 +111,14 @@ export const MonthlyTrendChart = memo<MonthlyTrendChartProps>(
                     <div className="overflow-x-auto">
                         <div className="flex min-w-max items-end justify-between space-x-4 px-2">
                             {data.map((item) => {
-                                const revenueHeight = Math.max(
-                                    (item.revenue / maxValue) * 160,
-                                    2,
+                                const revenueHeight = barHeightPx(
+                                    item.revenue,
+                                    maxAbs,
                                 );
-                                const expensesHeight = Math.max(
-                                    (item.expenses / maxValue) * 160,
-                                    2,
+                                const expensesHeight = barHeightPx(
+                                    item.expenses,
+                                    maxAbs,
                                 );
-
                                 const netIncomeColor = netIncomeColorClass(
                                     item.net_income,
                                 );
@@ -133,11 +126,11 @@ export const MonthlyTrendChart = memo<MonthlyTrendChartProps>(
                                 return (
                                     <div
                                         key={item.month}
-                                        className="flex flex-col items-center space-y-2"
+                                        className="flex w-16 flex-col items-center space-y-2"
                                     >
                                         <div className="flex h-[160px] items-end space-x-1">
                                             <div
-                                                className="group relative w-6 rounded-t bg-success transition-all hover:opacity-80"
+                                                className={`group relative w-6 rounded-t transition-all hover:opacity-80 ${item.revenue < 0 ? 'bg-destructive-foreground' : 'bg-success'}`}
                                                 style={{
                                                     height: `${revenueHeight}px`,
                                                 }}
@@ -167,28 +160,25 @@ export const MonthlyTrendChart = memo<MonthlyTrendChartProps>(
                                             <span className="text-xs font-medium text-muted-foreground">
                                                 {item.label}
                                             </span>
-                                            {/* Label per seri (W5-18): nilai
-                                                revenue & expense tidak lagi
-                                                digabung jadi satu angka. */}
-                                            {item.revenue > 0 && (
-                                                <span className="text-xs font-semibold text-success">
-                                                    {formatCompact(
-                                                        item.revenue,
-                                                    )}
-                                                </span>
-                                            )}
-                                            {item.expenses > 0 && (
-                                                <span className="text-xs font-semibold text-destructive-foreground">
-                                                    {formatCompact(
-                                                        item.expenses,
-                                                    )}
-                                                </span>
-                                            )}
+                                            <span
+                                                className={`text-xs font-semibold ${item.revenue < 0 ? 'text-destructive-foreground' : 'text-success'}`}
+                                            >
+                                                {formatCompactSigned(
+                                                    item.revenue,
+                                                )}
+                                            </span>
+                                            <span className="text-xs font-semibold text-destructive-foreground">
+                                                {formatCompactSigned(
+                                                    item.expenses,
+                                                )}
+                                            </span>
                                             <span
                                                 className={`text-xs ${netIncomeColor}`}
                                                 title={`Net income: ${formatCurrency(item.net_income)}`}
                                             >
-                                                {formatCompact(item.net_income)}
+                                                {formatCompactSigned(
+                                                    item.net_income,
+                                                )}
                                             </span>
                                         </div>
                                     </div>

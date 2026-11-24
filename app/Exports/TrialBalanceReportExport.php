@@ -29,6 +29,7 @@ class TrialBalanceReportExport implements FromCollection, ShouldAutoSize, WithCu
             $row['opening_balance'],
             $row['debit_total'],
             $row['credit_total'],
+            $row['closing_balance'],
             $row['debit_balance'],
             $row['credit_balance'],
         ]);
@@ -43,6 +44,7 @@ class TrialBalanceReportExport implements FromCollection, ShouldAutoSize, WithCu
             'Opening Balance',
             'Debit Total',
             'Credit Total',
+            'Closing Balance',
             'Debit Balance',
             'Credit Balance',
         ];

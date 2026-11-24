@@ -55,6 +55,36 @@ test('it does not classify draft pending cancelled or rejected as outstanding', 
         ->and($rows->firstWhere('purchase_order.po_number', 'PO-REJECTED-001')['purchase_order']['status_category'])->toBe('cancelled');
 });
 
+dataset('purchase_order_statuses', [
+    'draft' => ['draft'],
+    'pending_approval' => ['pending_approval'],
+    'confirmed' => ['confirmed'],
+    'rejected' => ['rejected'],
+    'partially_received' => ['partially_received'],
+    'fully_received' => ['fully_received'],
+    'cancelled' => ['cancelled'],
+    'closed' => ['closed'],
+]);
+
+test('it reports the same status label as the purchase order list for every status', function (string $status) {
+    $po = PurchaseOrder::factory()->create([
+        'po_number' => 'PO-SAME-' . strtoupper($status),
+        'status' => $status,
+    ]);
+
+    PurchaseOrderItem::factory()->create([
+        'purchase_order_id' => $po->id,
+        'quantity' => 5,
+        'quantity_received' => 0,
+    ]);
+
+    Sanctum::actingAs($this->testUser, ['*']);
+    $row = collect($this->getJson('/api/reports/purchase-order-status')->assertOk()->json('data'))
+        ->firstWhere('purchase_order.po_number', 'PO-SAME-' . strtoupper($status));
+
+    expect($row['purchase_order']['status'])->toBe($status);
+})->with('purchase_order_statuses');
+
 test('it requires permission to access purchase order status report', function () {
     Sanctum::actingAs($this->otherUserAccount, ['*']);
     $this->getJson('/api/reports/purchase-order-status')

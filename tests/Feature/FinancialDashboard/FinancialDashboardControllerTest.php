@@ -206,6 +206,60 @@ describe('Financial Dashboard API', function () {
         expect($byMonth[3]['label'])->toBe('Mar');
     });
 
+    test('keeps a negative revenue month negative in monthly trends (V8-17)', function () {
+        $fiscalYear = FiscalYear::factory()->create([
+            'status' => 'open',
+            'start_date' => '2024-01-01',
+            'end_date' => '2024-12-31',
+        ]);
+        $coaVersion = CoaVersion::factory()->create([
+            'fiscal_year_id' => $fiscalYear->id,
+            'status' => 'active',
+        ]);
+
+        $revenueAccount = Account::factory()->create([
+            'coa_version_id' => $coaVersion->id,
+            'type' => 'revenue',
+            'normal_balance' => 'credit',
+            'level' => 1,
+            'parent_id' => null,
+        ]);
+        $expenseAccount = Account::factory()->create([
+            'coa_version_id' => $coaVersion->id,
+            'type' => 'expense',
+            'normal_balance' => 'debit',
+            'level' => 1,
+            'parent_id' => null,
+        ]);
+
+        $november = JournalEntry::factory()->create([
+            'fiscal_year_id' => $fiscalYear->id,
+            'status' => 'posted',
+            'entry_date' => '2024-11-10',
+        ]);
+        JournalEntryLine::factory()->create([
+            'journal_entry_id' => $november->id,
+            'account_id' => $revenueAccount->id,
+            'debit' => 2000000,
+            'credit' => 0,
+        ]);
+        JournalEntryLine::factory()->create([
+            'journal_entry_id' => $november->id,
+            'account_id' => $expenseAccount->id,
+            'debit' => 1300000,
+            'credit' => 0,
+        ]);
+
+        $response = getJson("/api/financial-dashboard?fiscal_year_id={$fiscalYear->id}");
+        $response->assertOk();
+
+        $november = collect($response->json('monthly_trends'))->firstWhere('month', 11);
+
+        expect((float) $november['revenue'])->toBe(-2000000.0)
+            ->and((float) $november['expenses'])->toBe(1300000.0)
+            ->and((float) $november['net_income'])->toBe(-3300000.0);
+    });
+
     test('requires authentication', function () {
         // Reset auth
         app('auth')->forgetGuards();

@@ -117,6 +117,15 @@ class Asset extends Model
     use BuildsAttributeCasts, HasFactory, HasPipeline, HasSupplierRelation, HasUlids, SoftDeletes;
 
     /**
+     * Single definition of an asset that still carries value on the books
+     * (book value / depreciation reports and asset dashboard totals).
+     * Draft has not been capitalised; disposed and lost are written off.
+     *
+     * @var list<string>
+     */
+    public const IN_SERVICE_STATUSES = ['active', 'maintenance'];
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>

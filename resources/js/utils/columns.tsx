@@ -74,7 +74,11 @@ export type ActionsColumnOptions<T = Record<string, unknown>> = {
 };
 
 // Helper function to create sorting header
-export function createSortingHeader(label: string) {
+export function createSortingHeader(
+    label: string,
+    options: { align?: 'left' | 'right' } = {},
+) {
+    const isRight = options.align === 'right';
     return {
         header: ({
             column,
@@ -84,17 +88,19 @@ export function createSortingHeader(label: string) {
                 getIsSorted: () => 'asc' | 'desc' | false;
             };
         }) => (
-            <Button
-                variant="ghost"
-                className="-mx-3 h-8 px-3"
-                onClick={() =>
-                    column.toggleSorting(column.getIsSorted() === 'asc')
-                }
-                data-testid={`sort-${label.toLowerCase().replaceAll(/\s+/g, '-')}`}
-            >
-                {label}
-                <ArrowUpDown className="ml-2 h-4 w-4 shrink-0" />
-            </Button>
+            <div className={cn(isRight && 'flex justify-end')}>
+                <Button
+                    variant="ghost"
+                    className={cn('-ml-2 h-8 px-2', isRight && '-mr-2 ml-0')}
+                    onClick={() =>
+                        column.toggleSorting(column.getIsSorted() === 'asc')
+                    }
+                    data-testid={`sort-${label.toLowerCase().replaceAll(/\s+/g, '-')}`}
+                >
+                    {label}
+                    <ArrowUpDown className="ml-2 h-4 w-4 shrink-0" />
+                </Button>
+            </div>
         ),
     };
 }
@@ -240,14 +246,14 @@ export function createCurrencyColumn<T = Record<string, unknown>>(
     if (enableSorting) {
         return {
             ...baseColumn,
-            ...createSortingHeader(label),
+            ...createSortingHeader(label, { align: 'right' }),
         };
     }
 
     return {
         ...baseColumn,
         enableSorting: false,
-        header: label,
+        header: () => <div className="text-right">{label}</div>,
     };
 }
 
@@ -288,14 +294,14 @@ export function createNumberColumn<T = Record<string, unknown>>(
     if (enableSorting) {
         return {
             ...baseColumn,
-            ...createSortingHeader(label),
+            ...createSortingHeader(label, { align: 'right' }),
         };
     }
 
     return {
         ...baseColumn,
         enableSorting: false,
-        header: label,
+        header: () => <div className="text-right">{label}</div>,
     };
 }
 

@@ -32,6 +32,7 @@ export function statusBadgeVariant(
         case 'posted':
         case 'received':
         case 'fully_received':
+        case 'fully_ordered':
         case 'full_paid':
         case 'paid':
         case 'returned':
@@ -49,6 +50,7 @@ export function statusBadgeVariant(
         case 'outstanding':
         case 'confirmed':
         case 'partially_received':
+        case 'partially_ordered':
         case 'partially_paid':
         case 'partially_processed':
         case 'in_transit':

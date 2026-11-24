@@ -197,3 +197,38 @@ test('it can export purchase history report', function () {
     Excel::assertStored('exports/' . $filename, 'public');
     Carbon::setTestNow();
 });
+
+test('it reports zero outstanding for cancelled or rejected purchase orders', function () {
+    $supplier = Supplier::factory()->create(['name' => 'Supplier Batal']);
+    $warehouse = Warehouse::factory()->create(['name' => 'Gudang Batal', 'code' => 'WH-BTL']);
+    $product = Product::factory()->create(['name' => 'Produk Batal', 'code' => 'PBT-001']);
+    $unit = Unit::factory()->create(['name' => 'PCS']);
+
+    foreach (['cancelled' => 'PO-HIS-CXL', 'rejected' => 'PO-HIS-REJ'] as $status => $poNumber) {
+        $po = PurchaseOrder::factory()->create([
+            'po_number' => $poNumber,
+            'supplier_id' => $supplier->id,
+            'warehouse_id' => $warehouse->id,
+            'order_date' => '2026-03-01',
+            'status' => $status,
+        ]);
+
+        PurchaseOrderItem::factory()->create([
+            'purchase_order_id' => $po->id,
+            'product_id' => $product->id,
+            'unit_id' => $unit->id,
+            'quantity' => 10,
+            'line_total' => 120000,
+        ]);
+    }
+
+    Sanctum::actingAs($this->testUser, ['*']);
+    $this->getJson('/api/reports/purchase-history')
+        ->assertOk()
+        ->assertJson(fn (AssertableJson $json) => $json
+            ->has('data', 2)
+            ->where('data.0.outstanding_quantity', '0.00')
+            ->where('data.1.outstanding_quantity', '0.00')
+            ->etc()
+        );
+});

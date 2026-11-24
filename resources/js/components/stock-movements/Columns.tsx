@@ -80,6 +80,10 @@ function getReferenceUrl(referenceNumber: string | null): string | undefined {
         return `/inventory-stocktakes?search=${encodeURIComponent(referenceNumber)}`;
     }
 
+    if (ref.startsWith('SR-')) {
+        return `/supplier-returns?search=${encodeURIComponent(referenceNumber)}`;
+    }
+
     return undefined;
 }
 
