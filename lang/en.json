@@ -100,6 +100,34 @@
     "postingJournals": {
         "searchPlaceholder": "Search journals..."
     },
+    "periodClosings": {
+        "close": "Close Period",
+        "reopen": "Reopen Period",
+        "closeTitle": "Close this period?",
+        "closeDescription": "Period {period} will be closed. Its status becomes Closed and the closing is recorded with your name and time. The period record can be reopened later.",
+        "reopenTitle": "Reopen this period?",
+        "reopenDescription": "Period {period} will be reopened. Its closing journal entry is deleted and the period becomes editable again. Reopening does not undo other changes made after closing.",
+        "confirmClose": "Yes, close",
+        "confirmReopen": "Yes, reopen",
+        "processing": "Processing...",
+        "closed": "Period closed.",
+        "reopened": "Period reopened.",
+        "failed": "Failed to update the period. Please try again."
+    },
+    "budgets": {
+        "approve": "Approve Budget",
+        "lock": "Lock Budget",
+        "approveTitle": "Approve this budget?",
+        "approveDescription": "Budget {name} will be approved. Its status becomes Approved and the approval is recorded with your name and time.",
+        "lockTitle": "Lock this budget?",
+        "lockDescription": "Budget {name} will be locked. A locked budget can no longer be changed.",
+        "confirmApprove": "Yes, approve",
+        "confirmLock": "Yes, lock",
+        "processing": "Processing...",
+        "approved": "Budget approved.",
+        "locked": "Budget locked.",
+        "actionFailed": "Failed to update the budget. Please try again."
+    },
     "accounts": {
         "searchPlaceholder": "Search code or name..."
     },
