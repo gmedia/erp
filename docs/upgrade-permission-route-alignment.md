@@ -56,6 +56,21 @@ Ganti `{email}` dengan email karyawan yang akan diberi izin. Command akan gagal 
 3. Periksa karyawan yang memegang `user.edit`. Bila belum ada, jalankan command pemulihan di atas.
 4. Berikan izin aksi baru sesuai tabel peran di atas.
 
+## Aksi Tanpa Tombol UI
+
+Aksi berikut hanya tersedia sebagai endpoint API. Halaman belum punya tombol untuk memanggilnya, sehingga tidak ada yang perlu disembunyikan di UI. Permission route-nya tetap berlaku.
+
+| Modul | Aksi (endpoint) | Permission | Catatan |
+|-------|-----------------|-----------|---------|
+| credit-notes | `POST /api/credit-notes/{id}/apply` | `credit_note.edit` | Tidak ada tombol apply di UI |
+| budgets | `POST /api/budgets/{id}/approve` | `budget.edit` | Tidak ada tombol approve di UI |
+| budgets | `POST /api/budgets/{id}/lock` | `budget.edit` | Tidak ada tombol lock di UI |
+| period-closings | `POST /api/period-closings/{id}/close` | `period_closing.edit` | Tidak ada tombol close di UI |
+| period-closings | `POST /api/period-closings/{id}/reopen` | `period_closing.edit` | Tidak ada tombol reopen di UI |
+| recurring-journals | `POST /api/recurring-journals/{id}/execute` | `recurring_journal.edit` | Tidak ada tombol execute di UI |
+
+Bila tombol ini ditambahkan di kemudian hari, tombolnya wajib digate dengan permission `.edit` yang sama.
+
 ## Verifikasi
 
 - Login sebagai karyawan yang diberi izin, lalu buka modul terkait.
