@@ -121,7 +121,10 @@ class EmployeeImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                         'is_current' => true,
                     ]
                 );
-            }
+            },
+            false,
+            false,
+            fn (array $rowData): array => ['email', $rowData['email']]
         );
     }
 }

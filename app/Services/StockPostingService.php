@@ -11,6 +11,7 @@ use App\Models\StockMovement;
 use App\Models\StockTransfer;
 use App\Models\SupplierReturn;
 use App\Models\Warehouse;
+use App\Support\Database\TransactionRetrier;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -291,7 +292,13 @@ class StockPostingService
         string $trigger = self::TRIGGER_CANCEL,
     ): void {
         // Atomik: bila saldo ditolak (422), pembalik yang sudah ditulis ikut dibatalkan.
-        DB::transaction(function () use ($referenceType, $referenceId, $reversalType, $createdBy, $trigger): void {
+        TransactionRetrier::run(function () use (
+            $referenceType,
+            $referenceId,
+            $reversalType,
+            $createdBy,
+            $trigger,
+        ): void {
             $snapshot = $this->balanceSnapshot($referenceType, $referenceId);
             $scopes = $this->appendReversals($referenceType, $referenceId, $reversalType, $createdBy, $trigger);
 

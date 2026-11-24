@@ -5,7 +5,9 @@ use App\Http\Middleware\CheckPermission;
 use App\Http\Middleware\ContentSecurityPolicy;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\SetLocaleMiddleware;
+use App\Support\Database\TransactionRetrier;
 use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -47,6 +49,16 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->shouldRenderJsonWhen(fn (Request $request) => $request->is('api/*'));
+
+        // Galat konkurensi yang lolos dari TransactionRetrier (jalur DB::transaction biasa)
+        // dijawab 409 i18n. Laporan (report) tetap dijalankan oleh handler default.
+        $exceptions->render(function (QueryException $exception, Request $request) {
+            if (! $request->expectsJson() || ! TransactionRetrier::isRetryable($exception)) {
+                return null;
+            }
+
+            return response()->json(['message' => __('concurrency.conflict')], 409);
+        });
 
         Integration::handles($exceptions);
     })->create();
