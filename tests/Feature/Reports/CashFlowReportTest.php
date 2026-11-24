@@ -7,6 +7,7 @@ use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
 use App\Models\JournalEntryLine;
+use App\Models\ReportSection;
 use Database\Seeders\ReportConfigurationSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -184,10 +185,9 @@ test('it splits cash movements into operating, investing and financing activitie
     $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
         ->assertOk();
 
-    $sections = collect($response->json('computed_sections'))->keyBy('code');
-    expect((float) $sections['operating_cash_flow']['value'])->toBe(300000.0)
-        ->and((float) $sections['investing_cash_flow']['value'])->toBe(-200000.0)
-        ->and((float) $sections['financing_cash_flow']['value'])->toBe(150000.0);
+    expect((float) $response->json('activities.operating'))->toBe(300000.0)
+        ->and((float) $response->json('activities.investing'))->toBe(-200000.0)
+        ->and((float) $response->json('activities.financing'))->toBe(150000.0);
 });
 
 test('it excludes transfers between cash accounts from cash flow activities', function () {
@@ -223,11 +223,10 @@ test('it excludes transfers between cash accounts from cash flow activities', fu
     $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
         ->assertOk();
 
-    $sections = collect($response->json('computed_sections'))->keyBy('code');
-    expect((float) $sections['operating_cash_flow']['value'])->toBe(0.0)
-        ->and((float) $sections['investing_cash_flow']['value'])->toBe(0.0)
-        ->and((float) $sections['financing_cash_flow']['value'])->toBe(0.0)
-        ->and((float) $sections['net_change']['value'])->toBe(0.0);
+    expect((float) $response->json('activities.operating'))->toBe(0.0)
+        ->and((float) $response->json('activities.investing'))->toBe(0.0)
+        ->and((float) $response->json('activities.financing'))->toBe(0.0)
+        ->and((float) $response->json('net_change'))->toBe(0.0);
 });
 
 test('it attributes counter lines net of cash in a mixed journal and totals equal cash change', function () {
@@ -281,11 +280,10 @@ test('it attributes counter lines net of cash in a mixed journal and totals equa
     $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
         ->assertOk();
 
-    $sections = collect($response->json('computed_sections'))->keyBy('code');
-    $operating = (float) $sections['operating_cash_flow']['value'];
-    $investing = (float) $sections['investing_cash_flow']['value'];
-    $financing = (float) $sections['financing_cash_flow']['value'];
-    $netChange = (float) $sections['net_change']['value'];
+    $operating = (float) $response->json('activities.operating');
+    $investing = (float) $response->json('activities.investing');
+    $financing = (float) $response->json('activities.financing');
+    $netChange = (float) $response->json('net_change');
 
     expect($operating)->toBe(40000.0)
         ->and($investing)->toBe(-30000.0)
@@ -425,13 +423,12 @@ test('it reconciles activity totals to the opening to closing cash change', func
     $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
         ->assertOk();
 
-    $sections = collect($response->json('computed_sections'))->keyBy('code');
-    $total = (float) $sections['operating_cash_flow']['value']
-        + (float) $sections['investing_cash_flow']['value']
-        + (float) $sections['financing_cash_flow']['value'];
+    $total = (float) $response->json('activities.operating')
+        + (float) $response->json('activities.investing')
+        + (float) $response->json('activities.financing');
 
     expect($total)->toBe(375000.0)
-        ->and((float) $sections['net_change']['value'])->toBe(375000.0);
+        ->and((float) $response->json('net_change'))->toBe(375000.0);
 });
 
 test('it carries opening cash across fiscal years when the coa version changes', function () {
@@ -591,6 +588,88 @@ test('it returns activities and net change without seeded cash flow configuratio
         ->and((float) $response->json('activities.operating'))->toBe(250000.0)
         ->and((float) $response->json('activities.investing'))->toBe(0.0)
         ->and((float) $response->json('activities.financing'))->toBe(0.0);
+});
+
+test('it derives net change from cash lines independently of activity totals', function () {
+    Sanctum::actingAs($this->user, ['*']);
+
+    $previousYear = FiscalYear::create([
+        'name' => '2024',
+        'start_date' => '2024-01-01',
+        'end_date' => '2024-12-31',
+        'status' => 'closed',
+    ]);
+    $oldCoa = CoaVersion::factory()->create(['fiscal_year_id' => $previousYear->id, 'status' => 'active']);
+    $oldCash = Account::factory()->create([
+        'coa_version_id' => $oldCoa->id, 'code' => '11110', 'type' => 'asset',
+        'sub_type' => 'current_asset', 'normal_balance' => 'debit', 'is_cash_flow' => true,
+    ]);
+    $oldSales = Account::factory()->create([
+        'coa_version_id' => $oldCoa->id, 'code' => '41000', 'type' => 'revenue',
+        'sub_type' => null, 'normal_balance' => 'credit',
+    ]);
+    // Saldo kas awal tahun berjalan: 80.000.
+    postCashFlowJournal($previousYear, $oldCoa, $oldCash, 80000, 0, [
+        ['account' => $oldSales, 'debit' => 0, 'credit' => 80000],
+    ], 'posted', '2024-06-01');
+
+    $coaVersion = CoaVersion::factory()->create(['fiscal_year_id' => $this->fiscalYear->id, 'status' => 'active']);
+    $cash = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id, 'code' => '11110', 'type' => 'asset',
+        'sub_type' => 'current_asset', 'normal_balance' => 'debit', 'is_cash_flow' => true,
+    ]);
+    $sales = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id, 'code' => '41000', 'type' => 'revenue',
+        'sub_type' => null, 'normal_balance' => 'credit',
+    ]);
+    $equipment = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id, 'code' => '12100', 'type' => 'asset',
+        'sub_type' => 'non_current_asset', 'normal_balance' => 'debit',
+    ]);
+    $equity = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id, 'code' => '31000', 'type' => 'equity',
+        'sub_type' => null, 'normal_balance' => 'credit',
+    ]);
+
+    // Operasi +50.000, investasi -30.000, pendanaan +20.000 => net_change +40.000.
+    postCashFlowJournal($this->fiscalYear, $coaVersion, $cash, 50000, 0, [
+        ['account' => $sales, 'debit' => 0, 'credit' => 50000],
+    ]);
+    postCashFlowJournal($this->fiscalYear, $coaVersion, $cash, 0, 30000, [
+        ['account' => $equipment, 'debit' => 30000, 'credit' => 0],
+    ]);
+    postCashFlowJournal($this->fiscalYear, $coaVersion, $cash, 20000, 0, [
+        ['account' => $equity, 'debit' => 0, 'credit' => 20000],
+    ]);
+
+    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
+        ->assertOk();
+
+    $netChange = (float) $response->json('net_change');
+    $activitySum = (float) $response->json('activities.operating')
+        + (float) $response->json('activities.investing')
+        + (float) $response->json('activities.financing');
+
+    expect($netChange)->toBe(40000.0)
+        ->and($activitySum)->toBe($netChange)
+        ->and((float) $response->json('opening_cash_balance'))->toBe(80000.0)
+        ->and((float) $response->json('closing_cash_balance'))->toBe(120000.0)
+        ->and((float) $response->json('closing_cash_balance') - (float) $response->json('opening_cash_balance'))
+        ->toBe($netChange);
+});
+
+test('cash flow configuration seeder does not contain activity rows', function () {
+    $this->seed(ReportConfigurationSeeder::class);
+
+    $codes = ReportSection::query()
+        ->whereHas('reportConfiguration', fn ($q) => $q->where('code', 'cash_flow'))
+        ->pluck('code')
+        ->all();
+
+    expect($codes)->not->toContain('operating_cash_flow')
+        ->and($codes)->not->toContain('investing_cash_flow')
+        ->and($codes)->not->toContain('financing_cash_flow')
+        ->and($codes)->toContain('net_change');
 });
 
 test('it can export cash flow report', function () {

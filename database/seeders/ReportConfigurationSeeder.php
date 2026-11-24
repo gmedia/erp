@@ -106,21 +106,6 @@ class ReportConfigurationSeeder extends Seeder
             ['operating_header', 'CASH RECEIPTS AND PAYMENTS', ReportSection::TYPE_HEADER, null, null, null, null],
             ['cash_inflow', 'Total Cash Inflow', ReportSection::TYPE_SUBTOTAL, null, null, null, null],
             ['cash_outflow', 'Total Cash Outflow', ReportSection::TYPE_SUBTOTAL, null, null, null, null],
-            [
-                'operating_cash_flow',
-                'Cash Flows from Operating Activities',
-                ReportSection::TYPE_SUBTOTAL, null, null, null, null,
-            ],
-            [
-                'investing_cash_flow',
-                'Cash Flows from Investing Activities',
-                ReportSection::TYPE_SUBTOTAL, null, null, null, null,
-            ],
-            [
-                'financing_cash_flow',
-                'Cash Flows from Financing Activities',
-                ReportSection::TYPE_SUBTOTAL, null, null, null, null,
-            ],
             ['net_change', 'NET INCREASE/DECREASE IN CASH', ReportSection::TYPE_TOTAL, null, null, null, '{cash_inflow} - {cash_outflow}'],
         ];
 

@@ -82,12 +82,32 @@ class FinancialReportService
         return [
             'cash_inflow' => round($inflow, 2),
             'cash_outflow' => round($outflow, 2),
-            // Dihitung dari himpunan aktivitas agar invarian operasi+investasi+pendanaan = net_change berlaku.
-            'net_change' => round($activities['operating'] + $activities['investing'] + $activities['financing'], 2),
+            // Independen dari klasifikasi: perubahan kas langsung dari baris akun kas.
+            'net_change' => $this->getCashNetChange($fiscalYearId, $branchId),
             'operating_cash_flow' => $activities['operating'],
             'investing_cash_flow' => $activities['investing'],
             'financing_cash_flow' => $activities['financing'],
         ];
+    }
+
+    /**
+     * Perubahan kas periode: jumlah (debit - kredit) seluruh baris akun kas pada
+     * jurnal posted tahun fiskal. Himpunan jurnal sama dengan klasifikasi aktivitas.
+     */
+    public function getCashNetChange(int $fiscalYearId, ?int $branchId = null): float
+    {
+        $balance = JournalEntryLine::query()
+            ->toBase()
+            ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+            ->join('accounts as line_accounts', 'line_accounts.id', '=', 'journal_entry_lines.account_id')
+            ->where('journal_entries.fiscal_year_id', $fiscalYearId)
+            ->where('journal_entries.status', 'posted')
+            ->where('line_accounts.is_cash_flow', true)
+            ->when($branchId !== null, fn ($q) => $q->where('journal_entry_lines.branch_id', $branchId))
+            ->selectRaw('COALESCE(SUM(journal_entry_lines.debit - journal_entry_lines.credit), 0) as balance')
+            ->value('balance');
+
+        return round((float) $balance, 2);
     }
 
     /**
