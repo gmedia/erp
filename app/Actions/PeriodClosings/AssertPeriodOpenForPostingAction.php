@@ -10,7 +10,8 @@ use Illuminate\Validation\ValidationException;
  * Guard bersama penguncian periode (#423).
  *
  * Jurnal bertanggal di periode yang berstatus closed ditolak 422. Monthly mengunci
- * bulannya; annual mengunci seluruh tahun fiskalnya. Status reopened/draft tidak mengunci.
+ * bulannya; annual mengunci seluruh tahun fiskal (fiscal_year_id), bukan tahun kalender.
+ * Status reopened/draft tidak mengunci.
  */
 class AssertPeriodOpenForPostingAction
 {
@@ -26,10 +27,7 @@ class AssertPeriodOpenForPostingAction
                     $monthly->where('closing_type', 'monthly')
                         ->where('period_year', $date->year)
                         ->where('period_month', $date->month);
-                })->orWhere(function ($annual) use ($date): void {
-                    $annual->where('closing_type', 'annual')
-                        ->where('period_year', $date->year);
-                });
+                })->orWhere('closing_type', 'annual');
             })
             ->exists();
 

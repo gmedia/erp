@@ -90,6 +90,28 @@ test('jurnal bertanggal di tahun fiskal yang ditutup annual ditolak 422', functi
         ->toThrow(ValidationException::class);
 });
 
+test('annual closing mengunci lewat fiscal_year_id walau tahun fiskal tidak sama dengan tahun kalender', function () {
+    // Tahun fiskal Jul 2026 - Jun 2027. period_year annual bisa berbeda dari tahun kalender.
+    $fiscalYear = FiscalYear::factory()->create([
+        'name' => 'FY 2026/2027',
+        'start_date' => '2026-07-01',
+        'end_date' => '2027-06-30',
+    ]);
+    $coa = CoaVersion::factory()->create(['status' => 'active']);
+    $a = Account::factory()->create(['coa_version_id' => $coa->id, 'is_active' => true]);
+    $b = Account::factory()->create(['coa_version_id' => $coa->id, 'is_active' => true]);
+    PeriodClosing::factory()->annual()->closed()->create([
+        'fiscal_year_id' => $fiscalYear->id,
+        'period_year' => 2026,
+        'period_month' => null,
+    ]);
+
+    expect(fn () => postEntryOn('2027-02-10', $a->id, $b->id))
+        ->toThrow(ValidationException::class);
+    expect(fn () => postEntryOn('2026-08-10', $a->id, $b->id))
+        ->toThrow(ValidationException::class);
+});
+
 test('status reopened dan draft tidak mengunci periode', function () {
     [$fiscalYear, $a, $b] = periodLockAccounts();
     PeriodClosing::factory()->create([
@@ -173,4 +195,26 @@ test('ubah tanggal draft ke periode tertutup ditolak 422', function () {
         'description' => 'draft pindah tanggal',
     ]))->toThrow(ValidationException::class);
     expect($draft->refresh()->entry_date->format('Y-m-d'))->toBe('2026-08-10');
+});
+
+test('ubah draft dari tanggal di periode tertutup ke periode terbuka ditolak 422', function () {
+    [$fiscalYear, $a, $b] = periodLockAccounts();
+    $draft = app(CreateJournalEntryAction::class)->execute([
+        'entry_date' => '2026-10-10',
+        'description' => 'draft keluar dari periode tertutup',
+        'status' => 'draft',
+        'lines' => periodLockLines($a->id, $b->id),
+    ]);
+    PeriodClosing::factory()->closed()->create([
+        'fiscal_year_id' => $fiscalYear->id,
+        'closing_type' => 'monthly',
+        'period_year' => 2026,
+        'period_month' => 10,
+    ]);
+
+    expect(fn () => app(UpdateJournalEntryAction::class)->execute($draft, [
+        'entry_date' => '2026-11-05',
+        'description' => 'draft keluar dari periode tertutup',
+    ]))->toThrow(ValidationException::class);
+    expect($draft->refresh()->entry_date->format('Y-m-d'))->toBe('2026-10-10');
 });

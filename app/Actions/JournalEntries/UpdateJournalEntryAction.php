@@ -25,9 +25,15 @@ class UpdateJournalEntryAction
 
         return DB::transaction(function () use ($journalEntry, $data) {
             $entryDate = $data['entry_date'];
+            $oldDate = $journalEntry->entry_date->format('Y-m-d');
+
+            // Tanggal lama juga harus berada di periode terbuka (#423): jurnal tidak boleh
+            // keluar dari periode yang sudah ditutup.
+            app(AssertPeriodOpenForPostingAction::class)
+                ->execute($journalEntry->fiscal_year_id, $oldDate);
 
             // Check if date changed and if it affects Fiscal Year
-            if ($journalEntry->entry_date->format('Y-m-d') !== $entryDate) {
+            if ($oldDate !== $entryDate) {
                 $fiscalYear = FiscalYear::where('start_date', '<=', $entryDate)
                     ->where('end_date', '>=', $entryDate)
                     ->first();

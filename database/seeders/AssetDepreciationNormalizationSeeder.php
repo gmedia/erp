@@ -13,6 +13,7 @@ use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use App\Models\JournalEntryLine;
 use App\Models\User;
+use Database\Seeders\Concerns\ReopensDemoPeriodClosings;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 
@@ -29,6 +30,8 @@ use Illuminate\Support\Carbon;
  */
 class AssetDepreciationNormalizationSeeder extends Seeder
 {
+    use ReopensDemoPeriodClosings;
+
     public function run(): void
     {
         $fiscalYear = FiscalYear::query()->where('status', 'open')->orderBy('start_date')->first();
@@ -37,6 +40,11 @@ class AssetDepreciationNormalizationSeeder extends Seeder
             return;
         }
 
+        $this->withDemoPeriodsReopened($fiscalYear, fn () => $this->postDemoDepreciation($fiscalYear));
+    }
+
+    private function postDemoDepreciation(FiscalYear $fiscalYear): void
+    {
         $expenseAccountId = $this->accountId($fiscalYear, '53000');
         $accumulatedAccountId = $this->accountId($fiscalYear, '12200');
 
