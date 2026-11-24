@@ -2,13 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Actions\AccountingPosting\PostOpeningCapitalJournalAction;
 use App\Models\Account;
 use App\Models\AccountMapping;
 use App\Models\CoaVersion;
 use App\Models\FiscalYear;
-use App\Models\JournalEntry;
-use App\Models\JournalEntryLine;
-use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class CoaSeeder extends Seeder
@@ -21,43 +19,57 @@ class CoaSeeder extends Seeder
         // ==========================================
         // 2025 Data (Tahun Lalu - Closed)
         // ==========================================
-        $fiscalYear2025 = FiscalYear::create([
-            'name' => '2025',
-            'start_date' => '2025-01-01',
-            'end_date' => '2025-12-31',
-            'status' => 'closed',
-        ]);
+        // Idempoten (#357): db:seed kedua tidak menambah FY/COA/akun, dan COA
+        // buatan pengguna dengan nama lain tidak tersentuh.
+        $fiscalYear2025 = FiscalYear::firstOrCreate(
+            ['name' => '2025'],
+            [
+                'start_date' => '2025-01-01',
+                'end_date' => '2025-12-31',
+                'status' => 'closed',
+            ],
+        );
 
-        $coaVersion2025 = CoaVersion::create([
-            'name' => 'COA 2025 Standard',
-            'fiscal_year_id' => $fiscalYear2025->id,
-            'status' => 'archived',
-        ]);
+        $coaVersion2025 = CoaVersion::firstOrCreate(
+            ['name' => 'COA 2025 Standard'],
+            [
+                'fiscal_year_id' => $fiscalYear2025->id,
+                'status' => 'archived',
+            ],
+        );
 
-        $accounts2025 = $this->getAccounts2025();
-        $this->seedAccountsRecursive($accounts2025, $coaVersion2025->id);
+        if (! Account::where('coa_version_id', $coaVersion2025->id)->exists()) {
+            $accounts2025 = $this->getAccounts2025();
+            $this->seedAccountsRecursive($accounts2025, $coaVersion2025->id);
+        }
 
         // ==========================================
         // 2026 Data (Tahun Berjalan - Active)
         // ==========================================
-        $fiscalYear2026 = FiscalYear::create([
-            'name' => '2026',
-            'start_date' => '2026-01-01',
-            'end_date' => '2026-12-31',
-            'status' => 'open',
-        ]);
+        $fiscalYear2026 = FiscalYear::firstOrCreate(
+            ['name' => '2026'],
+            [
+                'start_date' => '2026-01-01',
+                'end_date' => '2026-12-31',
+                'status' => 'open',
+            ],
+        );
 
-        $coaVersion2026 = CoaVersion::create([
-            'name' => 'COA 2026 Enhanced',
-            'fiscal_year_id' => $fiscalYear2026->id,
-            'status' => 'active',
-        ]);
+        $coaVersion2026 = CoaVersion::firstOrCreate(
+            ['name' => 'COA 2026 Enhanced'],
+            [
+                'fiscal_year_id' => $fiscalYear2026->id,
+                'status' => 'active',
+            ],
+        );
 
         // 2026 structure with changes:
         // 1. "Cash" (11100) split into "Cash in Bank" (11110) and "Petty Cash" (11120)
         // 2. Renamed "Operating Expense" (52000) to "General & Admin Expense" (52000)
-        $accounts2026 = $this->getAccounts2026();
-        $this->seedAccountsRecursive($accounts2026, $coaVersion2026->id);
+        if (! Account::where('coa_version_id', $coaVersion2026->id)->exists()) {
+            $accounts2026 = $this->getAccounts2026();
+            $this->seedAccountsRecursive($accounts2026, $coaVersion2026->id);
+        }
 
         // Fetch account maps from database for reliability
         $accountMap2025 = Account::where('coa_version_id', $coaVersion2025->id)
@@ -70,12 +82,15 @@ class CoaSeeder extends Seeder
         // ==========================================
         // Account Mappings (untuk laporan komparatif)
         // ==========================================
-        $this->createAccountMappings($accountMap2025, $accountMap2026);
+        if (! AccountMapping::query()->whereIn('target_account_id', array_values($accountMap2026))->exists()) {
+            $this->createAccountMappings($accountMap2025, $accountMap2026);
+        }
 
         // ==========================================
-        // Sample Journal Entries (2026)
+        // Saldo awal modal (nilai tetap, diposting lewat action aplikasi).
+        // Transaksi dokumen demo diposting oleh seeder dokumen masing-masing.
         // ==========================================
-        $this->seedSampleJournalEntries($fiscalYear2026, $accountMap2026);
+        $this->seedOpeningCapital($fiscalYear2026);
     }
 
     /**
@@ -133,357 +148,17 @@ class CoaSeeder extends Seeder
     }
 
     /**
-     * Create sample journal entries for demonstration
+     * Saldo awal modal disetor Rp 500.000.000 ke bank (nilai tetap).
+     * Idempoten lewat PostOpeningCapitalJournalAction.
      */
-    private function seedSampleJournalEntries(FiscalYear $fiscalYear, array $accountMap): void
+    private function seedOpeningCapital(FiscalYear $fiscalYear): void
     {
-        $user = User::first();
-
-        // Idempoten: hapus jurnal demo lama beserta barisnya sebelum dibuat
-        // ulang, sehingga seed berulang tidak melanggar unique(entry_number).
-        // Hanya nomor jurnal milik seeder ini (jangan hapus jurnal seeder lain).
-        $demoEntryNumbers = [
-            'JV-2026-00001', 'JV-2026-00002', 'JV-2026-00003',
-            'JV-2026-00004', 'JV-2026-00005', 'JV-2026-00006',
-            'JV-2026-00007', 'JV-2026-00008', 'JV-2026-00009',
-            'JV-2026-00010', 'JV-2026-00011',
-        ];
-
-        $demoEntryIds = JournalEntry::query()
-            ->whereIn('entry_number', $demoEntryNumbers)
-            ->pluck('id');
-
-        if ($demoEntryIds->isNotEmpty()) {
-            JournalEntryLine::query()
-                ->whereIn('journal_entry_id', $demoEntryIds)
-                ->delete();
-            JournalEntry::query()->whereIn('id', $demoEntryIds)->delete();
-        }
-
-        // Sample Journal 1: Cash Sales
-        $journal1 = JournalEntry::create([
-            'fiscal_year_id' => $fiscalYear->id,
-            'entry_number' => 'JV-2026-00001',
-            'entry_date' => '2026-01-15',
-            'reference' => 'INV-2026-000101',
-            'description' => 'Penjualan tunai produk',
-            'status' => 'posted',
-            'created_by' => $user?->id,
-            'posted_by' => $user?->id,
-            'posted_at' => now(),
-        ]);
-
-        // Debit: Cash in Bank (11110) - Asset bertambah
-        JournalEntryLine::create([
-            'journal_entry_id' => $journal1->id,
-            'account_id' => $accountMap['11110'],
-            'debit' => 5000000,
-            'credit' => 0,
-            'memo' => 'Penerimaan kas dari penjualan',
-        ]);
-
-        // Credit: Sales Revenue (41000) - Revenue bertambah
-        JournalEntryLine::create([
-            'journal_entry_id' => $journal1->id,
-            'account_id' => $accountMap['41000'],
-            'debit' => 0,
-            'credit' => 5000000,
-            'memo' => 'Pendapatan penjualan',
-        ]);
-
-        // Sample Journal 2: Purchase on Account
-        $journal2 = JournalEntry::create([
-            'fiscal_year_id' => $fiscalYear->id,
-            'entry_number' => 'JV-2026-00002',
-            'entry_date' => '2026-01-20',
-            'reference' => 'PO-2026-000101',
-            'description' => 'Pembelian barang dagangan secara kredit',
-            'status' => 'posted',
-            'created_by' => $user?->id,
-            'posted_by' => $user?->id,
-            'posted_at' => now(),
-        ]);
-
-        // Debit: Inventory (11300) - Asset bertambah
-        JournalEntryLine::create([
-            'journal_entry_id' => $journal2->id,
-            'account_id' => $accountMap['11300'],
-            'debit' => 3000000,
-            'credit' => 0,
-            'memo' => 'Penambahan persediaan barang',
-        ]);
-
-        // Credit: Accounts Payable (21100) - Liability bertambah
-        JournalEntryLine::create([
-            'journal_entry_id' => $journal2->id,
-            'account_id' => $accountMap['21100'],
-            'debit' => 0,
-            'credit' => 3000000,
-            'memo' => 'Utang dagang kepada supplier',
-        ]);
-
-        // Sample Journal 3: Pay Operating Expense
-        $journal3 = JournalEntry::create([
-            'fiscal_year_id' => $fiscalYear->id,
-            'entry_number' => 'JV-2026-00003',
-            'entry_date' => '2026-01-25',
-            'reference' => 'EXP-2026-000101',
-            'description' => 'Pembayaran biaya listrik dan telepon',
-            'status' => 'posted',
-            'created_by' => $user?->id,
-            'posted_by' => $user?->id,
-            'posted_at' => now(),
-        ]);
-
-        // Debit: General & Admin Expense (52000) - Expense bertambah
-        JournalEntryLine::create([
-            'journal_entry_id' => $journal3->id,
-            'account_id' => $accountMap['52000'],
-            'debit' => 500000,
-            'credit' => 0,
-            'memo' => 'Biaya utilitas bulan Januari',
-        ]);
-
-        // Credit: Petty Cash (11120) - Asset berkurang
-        JournalEntryLine::create([
-            'journal_entry_id' => $journal3->id,
-            'account_id' => $accountMap['11120'],
-            'debit' => 0,
-            'credit' => 500000,
-            'memo' => 'Pengeluaran dari kas kecil',
-        ]);
-
-        // Sample Journal 4: Service Revenue
-        $journal4 = JournalEntry::create([
-            'fiscal_year_id' => $fiscalYear->id,
-            'entry_number' => 'JV-2026-00004',
-            'entry_date' => '2026-02-05',
-            'reference' => 'INV-2026-000102',
-            'description' => 'Pendapatan jasa konsultasi',
-            'status' => 'posted',
-            'created_by' => $user?->id,
-            'posted_by' => $user?->id,
-            'posted_at' => now(),
-        ]);
-
-        JournalEntryLine::create([
-            'journal_entry_id' => $journal4->id,
-            'account_id' => $accountMap['11110'],
-            'debit' => 10000000,
-            'credit' => 0,
-            'memo' => 'Penerimaan kas dari jasa konsultasi',
-        ]);
-
-        JournalEntryLine::create([
-            'journal_entry_id' => $journal4->id,
-            'account_id' => $accountMap['41000'],
-            'debit' => 0,
-            'credit' => 10000000,
-            'memo' => 'Pendapatan jasa konsultasi',
-        ]);
-
-        // Sample Journal 5: Pay Operating Expense (additional)
-        $journal5 = JournalEntry::create([
-            'fiscal_year_id' => $fiscalYear->id,
-            'entry_number' => 'JV-2026-00005',
-            'entry_date' => '2026-02-10',
-            'reference' => 'EXP-2026-000102',
-            'description' => 'Pembayaran biaya sewa kantor',
-            'status' => 'posted',
-            'created_by' => $user?->id,
-            'posted_by' => $user?->id,
-            'posted_at' => now(),
-        ]);
-
-        JournalEntryLine::create([
-            'journal_entry_id' => $journal5->id,
-            'account_id' => $accountMap['52000'],
-            'debit' => 2500000,
-            'credit' => 0,
-            'memo' => 'Biaya sewa kantor bulan Februari',
-        ]);
-
-        JournalEntryLine::create([
-            'journal_entry_id' => $journal5->id,
-            'account_id' => $accountMap['11110'],
-            'debit' => 0,
-            'credit' => 2500000,
-            'memo' => 'Pembayaran sewa dari bank',
-        ]);
-
-        // Sample Journal 6: Asset Purchase
-        $journal6 = JournalEntry::create([
-            'fiscal_year_id' => $fiscalYear->id,
-            'entry_number' => 'JV-2026-00006',
-            'entry_date' => '2026-02-15',
-            'reference' => 'PO-2026-000102',
-            'description' => 'Pembelian peralatan kantor',
-            'status' => 'posted',
-            'created_by' => $user?->id,
-            'posted_by' => $user?->id,
-            'posted_at' => now(),
-        ]);
-
-        JournalEntryLine::create([
-            'journal_entry_id' => $journal6->id,
-            'account_id' => $accountMap['12100'],
-            'debit' => 7500000,
-            'credit' => 0,
-            'memo' => 'Penambahan peralatan kantor',
-        ]);
-
-        JournalEntryLine::create([
-            'journal_entry_id' => $journal6->id,
-            'account_id' => $accountMap['21100'],
-            'debit' => 0,
-            'credit' => 7500000,
-            'memo' => 'Utang pembelian peralatan',
-        ]);
-
-        // Sample Journal 7: Liability Payment
-        $journal7 = JournalEntry::create([
-            'fiscal_year_id' => $fiscalYear->id,
-            'entry_number' => 'JV-2026-00007',
-            'entry_date' => '2026-02-20',
-            'reference' => 'PAY-2026-000101',
-            'description' => 'Pembayaran utang dagang',
-            'status' => 'posted',
-            'created_by' => $user?->id,
-            'posted_by' => $user?->id,
-            'posted_at' => now(),
-        ]);
-
-        JournalEntryLine::create([
-            'journal_entry_id' => $journal7->id,
-            'account_id' => $accountMap['21100'],
-            'debit' => 3000000,
-            'credit' => 0,
-            'memo' => 'Pelunasan utang dagang',
-        ]);
-
-        JournalEntryLine::create([
-            'journal_entry_id' => $journal7->id,
-            'account_id' => $accountMap['11110'],
-            'debit' => 0,
-            'credit' => 3000000,
-            'memo' => 'Pembayaran dari bank',
-        ]);
-
-        // Sample Journal 8: Equity Contribution
-        $journal8 = JournalEntry::create([
-            'fiscal_year_id' => $fiscalYear->id,
-            'entry_number' => 'JV-2026-00008',
-            'entry_date' => '2026-03-01',
-            'reference' => 'EQ-2026-000101',
-            'description' => 'Setoran modal pemilik',
-            'status' => 'posted',
-            'created_by' => $user?->id,
-            'posted_by' => $user?->id,
-            'posted_at' => now(),
-        ]);
-
-        JournalEntryLine::create([
-            'journal_entry_id' => $journal8->id,
-            'account_id' => $accountMap['11110'],
-            'debit' => 50000000,
-            'credit' => 0,
-            'memo' => 'Penerimaan setoran modal',
-        ]);
-
-        JournalEntryLine::create([
-            'journal_entry_id' => $journal8->id,
-            'account_id' => $accountMap['31000'],
-            'debit' => 0,
-            'credit' => 50000000,
-            'memo' => 'Modal disetor pemilik',
-        ]);
-
-        // Sample Journal 9: Depreciation Expense
-        $journal9 = JournalEntry::create([
-            'fiscal_year_id' => $fiscalYear->id,
-            'entry_number' => 'JV-2026-00009',
-            'entry_date' => '2026-03-15',
-            'reference' => 'DEP-2026-000101',
-            'description' => 'Penyusutan peralatan kantor bulan Maret',
-            'status' => 'posted',
-            'created_by' => $user?->id,
-            'posted_by' => $user?->id,
-            'posted_at' => now(),
-        ]);
-
-        JournalEntryLine::create([
-            'journal_entry_id' => $journal9->id,
-            'account_id' => $accountMap['52000'],
-            'debit' => 625000,
-            'credit' => 0,
-            'memo' => 'Beban penyusutan peralatan kantor',
-        ]);
-
-        JournalEntryLine::create([
-            'journal_entry_id' => $journal9->id,
-            'account_id' => $accountMap['12100'],
-            'debit' => 0,
-            'credit' => 625000,
-            'memo' => 'Akumulasi penyusutan peralatan (contra asset)',
-        ]);
-
-        // Sample Journal 10: Penjualan kredit
-        $journal10 = JournalEntry::create([
-            'fiscal_year_id' => $fiscalYear->id,
-            'entry_number' => 'JV-2026-00010',
-            'entry_date' => '2026-03-20',
-            'reference' => 'INV-2026-000201',
-            'description' => 'Penjualan kredit produk jadi',
-            'status' => 'posted',
-            'created_by' => $user?->id,
-            'posted_by' => $user?->id,
-            'posted_at' => now(),
-        ]);
-
-        JournalEntryLine::create([
-            'journal_entry_id' => $journal10->id,
-            'account_id' => $accountMap['11200'],
-            'debit' => 30000000,
-            'credit' => 0,
-            'memo' => 'Piutang usaha dari penjualan kredit',
-        ]);
-
-        JournalEntryLine::create([
-            'journal_entry_id' => $journal10->id,
-            'account_id' => $accountMap['41000'],
-            'debit' => 0,
-            'credit' => 30000000,
-            'memo' => 'Pendapatan penjualan',
-        ]);
-
-        // Sample Journal 11: Harga pokok penjualan
-        $journal11 = JournalEntry::create([
-            'fiscal_year_id' => $fiscalYear->id,
-            'entry_number' => 'JV-2026-00011',
-            'entry_date' => '2026-03-20',
-            'reference' => 'INV-2026-000201',
-            'description' => 'Harga pokok penjualan atas penjualan kredit',
-            'status' => 'posted',
-            'created_by' => $user?->id,
-            'posted_by' => $user?->id,
-            'posted_at' => now(),
-        ]);
-
-        JournalEntryLine::create([
-            'journal_entry_id' => $journal11->id,
-            'account_id' => $accountMap['51000'],
-            'debit' => 18000000,
-            'credit' => 0,
-            'memo' => 'Beban pokok penjualan',
-        ]);
-
-        JournalEntryLine::create([
-            'journal_entry_id' => $journal11->id,
-            'account_id' => $accountMap['11300'],
-            'debit' => 0,
-            'credit' => 18000000,
-            'memo' => 'Pengurangan persediaan atas penjualan',
-        ]);
+        app(PostOpeningCapitalJournalAction::class)->execute(
+            $fiscalYear->start_date->format('Y-m-d'),
+            500000000,
+            'OPEN-CAP-' . $fiscalYear->name,
+            'Saldo awal modal disetor pemilik',
+        );
     }
 
     private function getAccounts2025(): array
@@ -588,6 +263,14 @@ class CoaSeeder extends Seeder
                             [
                                 'code' => '21100',
                                 'name' => 'Accounts Payable',
+                                'type' => 'liability',
+                                'sub_type' => 'current_liability',
+                                'normal_balance' => 'credit',
+                                'level' => 3,
+                            ],
+                            [
+                                'code' => '21150',
+                                'name' => 'Goods Received Not Invoiced (GR/IR)',
                                 'type' => 'liability',
                                 'sub_type' => 'current_liability',
                                 'normal_balance' => 'credit',
@@ -784,6 +467,14 @@ class CoaSeeder extends Seeder
                             [
                                 'code' => '21100',
                                 'name' => 'Accounts Payable',
+                                'type' => 'liability',
+                                'sub_type' => 'current_liability',
+                                'normal_balance' => 'credit',
+                                'level' => 3,
+                            ],
+                            [
+                                'code' => '21150',
+                                'name' => 'Goods Received Not Invoiced (GR/IR)',
                                 'type' => 'liability',
                                 'sub_type' => 'current_liability',
                                 'normal_balance' => 'credit',

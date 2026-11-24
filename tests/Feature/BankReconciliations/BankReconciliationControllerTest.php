@@ -5,6 +5,7 @@ use App\Actions\JournalEntries\CreateJournalEntryAction;
 use App\Models\Account;
 use App\Models\BankReconciliation;
 use App\Models\BankReconciliationItem;
+use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
 use App\Models\JournalEntryLine;
@@ -611,8 +612,9 @@ test('assign account validates account_id exists', function () {
 // ─── Complete with Journal Posting ────────────────────────────────────────────
 
 test('completing a reconciliation posts journal for unmatched items with accounts', function () {
-    $bankAccount = Account::factory()->create(['code' => 'BANK-001']);
-    $expenseAccount = Account::factory()->create();
+    $coaVersion = CoaVersion::factory()->create(['status' => 'active']);
+    $bankAccount = Account::factory()->create(['code' => 'BANK-001', 'coa_version_id' => $coaVersion->id, 'is_active' => true]);
+    $expenseAccount = Account::factory()->create(['coa_version_id' => $coaVersion->id, 'is_active' => true]);
     $fiscalYear = FiscalYear::factory()->create([
         'status' => 'open',
         'start_date' => '2026-01-01',

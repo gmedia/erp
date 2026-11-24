@@ -15,6 +15,12 @@ class PostGoodsReceiptJournalAction
 
     public const AP_CONTROL_ACCOUNT_CODE = '21100';
 
+    /**
+     * Akun perantara penerimaan barang (GR/IR). GR mengkredit akun ini, bukan AP;
+     * bill atas GR yang membalikkannya lalu mengkredit AP.
+     */
+    public const GRIR_CONTROL_ACCOUNT_CODE = '21150';
+
     public function __construct(
         private CreateJournalEntryAction $createJournalEntry,
         private ResolveControlAccountAction $resolveControlAccount,
@@ -42,8 +48,9 @@ class PostGoodsReceiptJournalAction
                 ]);
             }
 
-            $inventoryAccount = $this->resolveControlAccount->execute(self::INVENTORY_ACCOUNT_CODE);
-            $apAccount = $this->resolveControlAccount->execute(self::AP_CONTROL_ACCOUNT_CODE);
+            $entryDate = $goodsReceipt->receipt_date->format('Y-m-d');
+            $inventoryAccount = $this->resolveControlAccount->execute(self::INVENTORY_ACCOUNT_CODE, $entryDate);
+            $grirAccount = $this->resolveControlAccount->execute(self::GRIR_CONTROL_ACCOUNT_CODE, $entryDate);
 
             $total = 0.0;
 
@@ -70,7 +77,7 @@ class PostGoodsReceiptJournalAction
                     'memo' => $memo,
                 ],
                 [
-                    'account_id' => $apAccount->id,
+                    'account_id' => $grirAccount->id,
                     'debit' => 0,
                     'credit' => $total,
                     'memo' => $memo,
@@ -78,7 +85,7 @@ class PostGoodsReceiptJournalAction
             ];
 
             $journalEntry = $this->createJournalEntry->execute([
-                'entry_date' => $goodsReceipt->receipt_date->format('Y-m-d'),
+                'entry_date' => $entryDate,
                 'reference' => $goodsReceipt->gr_number,
                 'description' => "Goods Receipt {$goodsReceipt->gr_number}",
                 'status' => 'posted',

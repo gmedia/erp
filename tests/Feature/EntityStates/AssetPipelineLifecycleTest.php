@@ -1,6 +1,9 @@
 <?php
 
+use App\Models\Account;
 use App\Models\Asset;
+use App\Models\CoaVersion;
+use App\Models\FiscalYear;
 use App\Models\Pipeline;
 use App\Models\PipelineState;
 use App\Models\PipelineTransition;
@@ -27,6 +30,29 @@ beforeEach(function () {
         'assets.manage',
         'assets.dispose',
     ]);
+
+    // COA aktif dan fiscal year terbuka untuk jurnal aset hilang (#357).
+    FiscalYear::factory()->create([
+        'name' => (string) now()->year,
+        'start_date' => now()->startOfYear()->toDateString(),
+        'end_date' => now()->endOfYear()->toDateString(),
+        'status' => 'open',
+    ]);
+    $coaVersion = CoaVersion::factory()->create(['status' => 'active']);
+    foreach ([
+        ['12100', 'Equipment', 'asset', 'debit'],
+        ['12200', 'Accumulated Depreciation - Equipment', 'asset', 'credit'],
+        ['52000', 'Operating Expense', 'expense', 'debit'],
+    ] as [$code, $name, $type, $normal]) {
+        Account::factory()->create([
+            'coa_version_id' => $coaVersion->id,
+            'code' => $code,
+            'name' => $name,
+            'type' => $type,
+            'normal_balance' => $normal,
+            'is_active' => true,
+        ]);
+    }
 
     // Create the full Asset Lifecycle pipeline
     $this->pipeline = Pipeline::factory()->create([
@@ -291,6 +317,13 @@ it('can mark as lost: active → lost with confirmation and comment', function (
         ->assertJsonPath('data.current_state.code', 'lost');
 
     expect($this->asset->fresh()->status)->toBe('lost');
+
+    // #357 keputusan 3: transisi ke lost wajib menjurnal rugi pelepasan.
+    $this->assertDatabaseHas('journal_entries', [
+        'reference' => 'LOSS-' . $this->asset->fresh()->asset_code,
+        'journal_type' => 'system',
+        'status' => 'posted',
+    ]);
 });
 
 // ── Validation ───────────────────────────────────────────────────────
