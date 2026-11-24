@@ -143,6 +143,95 @@ test.describe('Asset Depreciation Runs', () => {
         await expect(dialog).toContainText('AST-0001');
     });
 
+    test('can void a calculated run and calculate the same period again', async ({
+        page,
+    }) => {
+        let runStatus: 'calculated' | 'void' = 'calculated';
+
+        await page.route(
+            /\/api\/asset-depreciation-runs(\?.*)?$/,
+            async (route) => {
+                await route.fulfill({
+                    status: 200,
+                    contentType: 'application/json',
+                    body: JSON.stringify({
+                        data: [
+                            {
+                                id: 901,
+                                fiscal_year_id: 1,
+                                fiscal_year: { id: 1, name: 'FY 2024' },
+                                period_start: '2024-01-01',
+                                period_end: '2024-01-31',
+                                status: runStatus,
+                                journal_entry_id: null,
+                                journal_entry: null,
+                                created_by: 1,
+                                created_by_user: { id: 1, name: 'E2E User' },
+                                posted_by: null,
+                                posted_by_user: null,
+                                posted_at: null,
+                                lines_count: 1,
+                            },
+                        ],
+                        meta: {
+                            current_page: 1,
+                            per_page: 25,
+                            total: 1,
+                            last_page: 1,
+                            from: 1,
+                            to: 1,
+                        },
+                    }),
+                });
+            },
+        );
+
+        await page.route(
+            '**/api/asset-depreciation-runs/901/void',
+            async (route) => {
+                runStatus = 'void';
+                await route.fulfill({
+                    status: 200,
+                    contentType: 'application/json',
+                    body: JSON.stringify({
+                        message: 'Depreciation run voided.',
+                        run: { id: 901, status: 'void' },
+                    }),
+                });
+            },
+        );
+
+        await page.goto('/asset-depreciation-runs');
+        await expect(page.getByText('FY 2024')).toBeVisible();
+
+        await page
+            .locator('tbody tr')
+            .first()
+            .getByRole('button', { name: 'Actions' })
+            .click();
+        await page.getByRole('menuitem', { name: 'Void' }).click();
+
+        const confirm = page.getByRole('alertdialog', {
+            name: 'Void depreciation run?',
+        });
+        await expect(confirm).toBeVisible();
+
+        const voidResponse = page.waitForResponse(
+            '**/api/asset-depreciation-runs/901/void',
+        );
+        await confirm.getByRole('button', { name: 'Void run' }).click();
+        await voidResponse;
+
+        await expect(page.getByText('Depreciation run voided.')).toBeVisible();
+        await expect(confirm).toBeHidden();
+        await expect(
+            page
+                .locator('tbody tr')
+                .first()
+                .getByRole('cell', { name: 'void' }),
+        ).toBeVisible();
+    });
+
     test('can post a calculated depreciation run to journal', async ({
         page,
     }) => {
