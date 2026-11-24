@@ -3,12 +3,16 @@
 namespace App\Exports;
 
 use App\Actions\Reports\GetGeneralLedgerReportAction;
+use App\Exports\Concerns\WritesTextCells;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class GeneralLedgerReportExport implements FromCollection, ShouldAutoSize, WithHeadings
+class GeneralLedgerReportExport implements FromCollection, ShouldAutoSize, WithCustomValueBinder, WithHeadings
 {
+    use WritesTextCells;
+
     public function __construct(
         private array $filters,
     ) {}

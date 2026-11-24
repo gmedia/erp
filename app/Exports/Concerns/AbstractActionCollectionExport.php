@@ -5,11 +5,14 @@ namespace App\Exports\Concerns;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-abstract class AbstractActionCollectionExport implements FromCollection, ShouldAutoSize, WithStyles
+abstract class AbstractActionCollectionExport implements FromCollection, ShouldAutoSize, WithCustomValueBinder, WithStyles
 {
+    use WritesTextCells;
+
     /**
      * @param  array<string, mixed>  $filters
      */
