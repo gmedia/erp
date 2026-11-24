@@ -23,7 +23,9 @@
         "error": "Error",
         "warning": "Warning",
         "fill_details": "Please fill in the details below.",
-        "view_details": "Here are the details for this item."
+        "view_details": "Here are the details for this item.",
+        "stocktake_adjustment_draft": "Stock Adjustment Draft",
+        "stocktake_adjustment_none": "-"
     },
     "permissions": {
         "empty_title": "No employee selected",
@@ -308,8 +310,12 @@
     "supplier_return.supplier_mismatch": "The supplier must match the purchase order supplier.",
     "supplier_return.goods_receipt_mismatch": "The goods receipt must belong to the purchase order.",
     "supplier_return.gr_item_mismatch": "The GR item must belong to the selected goods receipt.",
+  "supplier_return.returned_exceeds_received": "Returned quantity exceeds the remaining received quantity of this GR item.",
+    "inventory_stocktake.adjustment_note": "Draft from stocktake :stocktake",
     "goods_receipt.po_item_mismatch": "The PO item must belong to the selected purchase order.",
     "goods_receipt.po_not_approved": "Goods receipt can only be confirmed when the purchase order is confirmed or partially received.",
+    "goods_receipt.accepted_exceeds_received": "Accepted plus rejected quantity cannot exceed the received quantity.",
+    "goods_receipt.received_exceeds_po_quantity": "Total received quantity for this PO line cannot exceed the PO line quantity.",
     "ap_payment.bill_supplier_mismatch": "Supplier Bill does not belong to the selected supplier.",
     "ap_payment.allocation_exceeds_bill": "Allocation exceeds bill outstanding amount. Maximum: :max",
     "ar_receipt.allocation_exceeds_invoice": "Allocation exceeds invoice outstanding amount. Maximum: :max",
@@ -400,6 +406,7 @@
             "quantity_received_positive": "Quantity received must be greater than 0.",
             "quantity_accepted": "Quantity Accepted",
             "quantity_accepted_min": "Quantity accepted must be at least 0.",
+            "quantity_accepted_exceeds_received": "Accepted plus rejected quantity cannot exceed the received quantity.",
             "quantity_rejected": "Quantity Rejected",
             "unit_price": "Unit Price",
             "unit_price_min": "Unit price must be at least 0.",

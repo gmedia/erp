@@ -44,9 +44,6 @@ abstract class AbstractStockAdjustmentRequest extends AuthorizedFormRequest
             'status' => $this->withSometimes(['required', 'string', 'in:draft,pending_approval,approved,cancelled']),
             'inventory_stocktake_id' => $this->withSometimes(['nullable', 'exists:inventory_stocktakes,id']),
             'notes' => $this->withSometimes(['nullable', 'string']),
-            'journal_entry_id' => $this->withSometimes(['nullable', 'exists:journal_entries,id']),
-            'approved_by' => $this->withSometimes(['nullable', 'exists:users,id']),
-            'approved_at' => $this->withSometimes(['nullable', 'date']),
 
             'items' => $this->itemsRules(),
             'items.*.product_id' => [$this->itemRequiredRule(), 'exists:products,id'],

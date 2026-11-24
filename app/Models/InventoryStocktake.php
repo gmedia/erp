@@ -92,6 +92,11 @@ class InventoryStocktake extends Model
         return $this->hasMany(InventoryStocktakeItem::class);
     }
 
+    public function stockAdjustments(): HasMany
+    {
+        return $this->hasMany(StockAdjustment::class);
+    }
+
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');

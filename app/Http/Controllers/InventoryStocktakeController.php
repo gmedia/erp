@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\InventoryStocktakes\CreateStocktakeAdjustmentDraftAction;
 use App\Actions\InventoryStocktakes\ExportInventoryStocktakesAction;
 use App\Actions\InventoryStocktakes\IndexInventoryStocktakesAction;
 use App\Actions\InventoryStocktakes\SyncInventoryStocktakeItemsAction;
@@ -30,7 +31,8 @@ class InventoryStocktakeController extends Controller
 
     public function store(
         StoreInventoryStocktakeRequest $request,
-        SyncInventoryStocktakeItemsAction $syncItems
+        SyncInventoryStocktakeItemsAction $syncItems,
+        CreateStocktakeAdjustmentDraftAction $createDraft,
     ): JsonResponse {
         $data = $request->validated();
         $items = $data['items'] ?? null;
@@ -38,6 +40,14 @@ class InventoryStocktakeController extends Controller
 
         $data['created_by'] = Auth::id();
 
+        $isCreatedCompleted = ($data['status'] ?? null) === 'completed';
+
+        if ($isCreatedCompleted) {
+            $data['completed_by'] = Auth::id();
+            $data['completed_at'] = now()->toIso8601String();
+        }
+
+        // Issue #436 butir 6: stocktake yang langsung completed juga membuat draft penyesuaian.
         $stocktake = $this->storeWithSyncedItems(
             attributes: $data,
             items: $items,
@@ -48,6 +58,11 @@ class InventoryStocktakeController extends Controller
             syncItems: function (InventoryStocktake $stocktake, array $items) use ($syncItems): void {
                 $syncItems->execute($stocktake, $items);
             },
+            afterCommit: $isCreatedCompleted
+                ? static function (InventoryStocktake $stocktake) use ($createDraft): void {
+                    $createDraft->execute($stocktake->refresh());
+                }
+            : null,
         );
 
         $stocktake->load([
@@ -75,6 +90,7 @@ class InventoryStocktakeController extends Controller
             'items.product',
             'items.unit',
             'items.countedBy',
+            'stockAdjustments',
         ]);
 
         return (new InventoryStocktakeResource($inventoryStocktake))->response();
@@ -83,13 +99,17 @@ class InventoryStocktakeController extends Controller
     public function update(
         UpdateInventoryStocktakeRequest $request,
         InventoryStocktake $inventoryStocktake,
-        SyncInventoryStocktakeItemsAction $syncItems
+        SyncInventoryStocktakeItemsAction $syncItems,
+        CreateStocktakeAdjustmentDraftAction $createDraft,
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
         unset($validated['items']);
 
-        if (($validated['status'] ?? null) === 'completed' && $inventoryStocktake->completed_at === null) {
+        $isCompleting = ($validated['status'] ?? null) === 'completed'
+            && $inventoryStocktake->completed_at === null;
+
+        if ($isCompleting) {
             $validated['completed_by'] = Auth::id();
             $validated['completed_at'] = now()->toIso8601String();
         }
@@ -104,9 +124,21 @@ class InventoryStocktakeController extends Controller
             syncItems: function (InventoryStocktake $inventoryStocktake, array $items) use ($syncItems): void {
                 $syncItems->execute($inventoryStocktake, $items);
             },
+            afterCommit: $isCompleting
+                ? static function (InventoryStocktake $inventoryStocktake) use ($createDraft): void {
+                    $createDraft->execute($inventoryStocktake->refresh());
+                }
+            : null,
         );
 
-        $inventoryStocktake->load(['warehouse', 'productCategory', 'items.product', 'items.unit', 'items.countedBy']);
+        $inventoryStocktake->load([
+            'warehouse',
+            'productCategory',
+            'items.product',
+            'items.unit',
+            'items.countedBy',
+            'stockAdjustments',
+        ]);
 
         return (new InventoryStocktakeResource($inventoryStocktake))->response();
     }

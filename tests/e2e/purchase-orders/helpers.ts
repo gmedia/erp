@@ -144,8 +144,6 @@ export async function editPurchaseOrder(
                 status: detail.status,
                 notes: detail.notes ?? '',
                 shipping_address: detail.shipping_address ?? '',
-                approved_by: detail.approved_by?.id ?? null,
-                approved_at: detail.approved_at ?? null,
                 items: (detail.items as PurchaseOrderDetailItem[] || []).map((item) => ({
                     purchase_request_item_id: item.purchase_request_item_id ?? null,
                     product_id: item.product?.id,
