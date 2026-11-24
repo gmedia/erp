@@ -134,7 +134,7 @@ export default function TrialBalance() {
             <div className="flex flex-col gap-3">
                 <div className="overflow-hidden rounded-md border">
                     <div className="overflow-x-auto">
-                        <Table className="md:min-w-[760px]">
+                        <Table className="md:min-w-[760px]" edgeFade={false}>
                             <TableHeader className="[&_th]:text-muted-foreground">
                                 <TableRow>
                                     <TableHead

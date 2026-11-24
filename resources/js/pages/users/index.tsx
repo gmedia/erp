@@ -300,7 +300,7 @@ function UsersBody({
                             : t('users.status_unlinked')}
                     </Badge>
                 </TableCell>
-                <TableCell className="bg-background text-right md:sticky md:right-0 md:z-20">
+                <TableCell className="sticky right-0 z-20 bg-background text-right">
                     {canEdit && (
                         <TooltipProvider>
                             <Tooltip>
@@ -352,7 +352,7 @@ function UsersBody({
                         <TableHead>{t('users.columns.email')}</TableHead>
                         <TableHead>{t('users.columns.employee')}</TableHead>
                         <TableHead>{t('users.columns.status')}</TableHead>
-                        <TableHead className="w-[60px] bg-background text-right md:sticky md:right-0 md:z-20">
+                        <TableHead className="sticky right-0 z-30 w-[60px] bg-background text-right">
                             <span className="sr-only">
                                 {t('common.actions')}
                             </span>
