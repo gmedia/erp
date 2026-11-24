@@ -23,13 +23,14 @@ const reportTypeLabels: Record<string, string> = {
 export const reportConfigurationColumns: ColumnDef<ReportConfiguration>[] = [
     createSelectColumn<ReportConfiguration>(),
     createTextColumn<ReportConfiguration>({
-        accessorKey: 'code',
-        label: 'Code',
-        enableSorting: true,
-    }),
-    createTextColumn<ReportConfiguration>({
         accessorKey: 'name',
         label: 'Name',
+        enableSorting: true,
+        primary: true,
+    }),
+    createTextColumn<ReportConfiguration>({
+        accessorKey: 'code',
+        label: 'Code',
         enableSorting: true,
     }),
     {

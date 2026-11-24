@@ -212,6 +212,69 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
         expect(Math.abs(hx - bx)).toBeLessThanOrEqual(2);
     });
 
+    test('asset-categories 390: header Useful Life rata kanan seperti angkanya', async ({
+        page,
+    }) => {
+        await page.setViewportSize({ width: 390, height: 844 });
+        const listResponse = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/asset-categories') && r.status() < 400,
+        );
+        await page.goto('/asset-categories');
+        await listResponse;
+
+        const header = page.getByRole('button', {
+            name: /Default Useful Life/,
+        });
+        test.skip(
+            (await header.count()) === 0,
+            'Header Useful Life tidak ada di tampilan ini',
+        );
+        const [hx, bx] = await Promise.all([
+            header.evaluate((el) => el.getBoundingClientRect().right),
+            page
+                .locator('tbody tr td div.tabular-nums')
+                .first()
+                .evaluate((el) => el.getBoundingClientRect().right),
+        ]);
+        expect(Math.abs(hx - bx)).toBeLessThanOrEqual(12);
+    });
+
+    test('stock-movements: referensi SR- ditautkan seperti ST/SA', async ({
+        page,
+    }) => {
+        await page.setViewportSize({ width: 1280, height: 900 });
+        const listResponse = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/stock-movements') && r.status() < 400,
+        );
+        await page.goto('/stock-movements');
+        await listResponse;
+
+        const srLink = page.locator('a[href^="/supplier-returns?search=SR-"]');
+        test.skip(
+            (await srLink.count()) === 0,
+            'Tidak ada referensi SR- di data seed',
+        );
+        await expect(srLink.first()).toBeVisible();
+    });
+
+    test('report-configurations: nama tampil sebagai kolom utama', async ({
+        page,
+    }) => {
+        await page.setViewportSize({ width: 1280, height: 900 });
+        const listResponse = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/report-configurations') &&
+                r.status() < 400,
+        );
+        await page.goto('/report-configurations');
+        await listResponse;
+
+        const firstHeader = page.locator('thead th').nth(1);
+        await expect(firstHeader).toContainText('Name');
+    });
+
     test('ar-outstanding: kolom uang rata kanan', async ({ page }) => {
         await page.setViewportSize({ width: 1280, height: 900 });
         const reportResponse = page.waitForResponse(
