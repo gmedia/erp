@@ -16,4 +16,8 @@ Route::middleware('permission:asset_depreciation_run,true')->group(function () {
         'asset-depreciation-runs/{assetDepreciationRun}/post',
         [AssetDepreciationRunController::class, 'postToJournal']
     )->middleware('permission:asset_depreciation_run.edit,true');
+    Route::post(
+        'asset-depreciation-runs/{assetDepreciationRun}/void',
+        [AssetDepreciationRunController::class, 'void']
+    )->middleware('permission:asset_depreciation_run.edit,true');
 });

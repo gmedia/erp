@@ -17,6 +17,7 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class AssetMovementController extends Controller
@@ -60,7 +61,9 @@ class AssetMovementController extends Controller
 
         try {
             return DB::transaction(function () use ($request, $document) {
-                $asset = Asset::findOrFail($request->asset_id);
+                $asset = Asset::whereKey($request->asset_id)->lockForUpdate()->firstOrFail();
+
+                $this->assertMovementAllowed($asset, (string) $request->movement_type);
 
                 $validated = $request->validated();
                 unset($validated['document']);
@@ -74,6 +77,7 @@ class AssetMovementController extends Controller
                     'created_by' => Auth::id(),
                     'document_path' => $document['path'] ?? null,
                     'document_name' => $document['name'] ?? null,
+                    'status_before_disposal' => $request->movement_type === 'dispose' ? $asset->status : null,
                 ]);
 
                 // Update asset current state
@@ -82,6 +86,7 @@ class AssetMovementController extends Controller
                     'asset_location_id' => $request->to_location_id ?? $asset->asset_location_id,
                     'department_id' => $request->to_department_id ?? $asset->department_id,
                     'employee_id' => $request->to_employee_id ?? $asset->employee_id,
+                    'status' => $request->movement_type === 'dispose' ? 'disposed' : $asset->status,
                 ]);
 
                 return response()->json([
@@ -113,6 +118,24 @@ class AssetMovementController extends Controller
     {
         $validated = $request->validated();
         unset($validated['document']);
+
+        // Aset dan tipe mutasi dikunci setelah dibuat: mengubahnya membuat status aset stale.
+        $assetChanges = array_key_exists('asset_id', $validated)
+            && (int) $validated['asset_id'] !== $asset_movement->asset_id;
+        $typeChanges = array_key_exists('movement_type', $validated)
+            && $validated['movement_type'] !== $asset_movement->movement_type;
+
+        if ($typeChanges) {
+            throw ValidationException::withMessages([
+                'movement_type' => __('asset_movements.movement_type_locked'),
+            ]);
+        }
+
+        if ($assetChanges) {
+            throw ValidationException::withMessages([
+                'asset_id' => __('asset_movements.asset_locked'),
+            ]);
+        }
 
         $oldDocumentPath = $asset_movement->document_path;
         $document = $this->storeDocument($request->file('document'));
@@ -186,6 +209,17 @@ class AssetMovementController extends Controller
 
             $asset_movement->delete();
 
+            // Membatalkan pelepasan: status kembali ke sebelum dispose bila tidak ada dispose lain.
+            if ($asset_movement->movement_type === 'dispose') {
+                $stillDisposed = AssetMovement::where('asset_id', $asset->id)
+                    ->where('movement_type', 'dispose')
+                    ->exists();
+
+                if (! $stillDisposed && $asset->status === 'disposed') {
+                    $asset->update(['status' => $asset_movement->status_before_disposal ?? 'active']);
+                }
+            }
+
             return response()->json([
                 'message' => 'Movement deleted successfully',
             ]);
@@ -195,6 +229,31 @@ class AssetMovementController extends Controller
     public function export(ExportAssetMovementRequest $request, ExportAssetMovementsAction $action): JsonResponse
     {
         return $action->execute($request);
+    }
+
+    /**
+     * Aset yang sudah dilepas atau hilang hanya boleh menerima mutasi dispose yang sah (sekali).
+     */
+    private function assertMovementAllowed(Asset $asset, string $movementType): void
+    {
+        if ($movementType === 'dispose') {
+            if ($asset->status === 'disposed') {
+                throw ValidationException::withMessages([
+                    'movement_type' => __('asset_movements.dispose_already_disposed'),
+                ]);
+            }
+
+            return;
+        }
+
+        if (in_array($asset->status, ['disposed', 'lost'], true)) {
+            throw ValidationException::withMessages([
+                'asset_id' => __('asset_movements.movement_not_allowed_for_status', [
+                    'type' => $movementType,
+                    'status' => $asset->status,
+                ]),
+            ]);
+        }
     }
 
     /**
