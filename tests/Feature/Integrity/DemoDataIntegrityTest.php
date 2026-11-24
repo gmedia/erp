@@ -572,6 +572,90 @@ test('W7-04 11300 invariant depends on in_transit transfer value from the docume
         );
 });
 
+// W7-15 (HR) — karyawan demo punya gaji realistis sesuai jabatan (8,5–25 jt).
+invariant('W7-15 employee demo salaries are realistic for their position', function () {
+    $rows = DB::table('employments')
+        ->join('employees', 'employees.id', '=', 'employments.employee_id')
+        ->join('positions', 'positions.id', '=', 'employments.position_id')
+        ->where('employments.is_current', true)
+        ->get(['employees.employee_id', 'employments.salary', 'positions.name as position']);
+
+    expect($rows)->not->toBeEmpty('Demo data must include current employments');
+
+    foreach ($rows as $row) {
+        $label = "Employee {$row->employee_id} ({$row->position})";
+
+        expect((float) $row->salary)
+            ->toBeGreaterThanOrEqual(8500000.0, "{$label} salary must be at least Rp 8.500.000")
+            ->toBeLessThanOrEqual(25000000.0, "{$label} salary must be at most Rp 25.000.000");
+    }
+});
+
+// W7-15 (HR) — kode karyawan demo berurutan mulai dari EMP-000001 tanpa celah di awal.
+invariant('W7-15 employee demo codes start at EMP-000001 and are sequential', function () {
+    $codes = DB::table('employees')
+        ->where('employee_id', 'like', 'EMP-______')
+        ->orderBy('employee_id')
+        ->pluck('employee_id')
+        ->values()
+        ->all();
+
+    expect($codes)->not->toBeEmpty('Demo data must include employee codes');
+    expect($codes[0])->toBe('EMP-000001', 'Employee code sequence must start at EMP-000001');
+
+    foreach ($codes as $index => $code) {
+        expect($code)->toBe(sprintf('EMP-%06d', $index + 1), "Employee code {$code} must follow the sequence");
+    }
+});
+
+// W7-15 (HR) — Admin User adalah akun admin, bukan karyawan bergaji ganjil; gajinya wajar.
+invariant('W7-15 admin account has a realistic salary', function () {
+    $admin = DB::table('employees')
+        ->join('employments', 'employments.employee_id', '=', 'employees.id')
+        ->where('employments.is_current', true)
+        ->where('employees.name', 'Admin User')
+        ->first(['employees.id', 'employments.salary']);
+
+    expect($admin)->not->toBeNull('Admin account must keep a matching employee row for CheckPermission');
+    expect((float) $admin->salary)->toBeGreaterThanOrEqual(8500000.0);
+});
+
+// W7-15 (HR) — email karyawan memakai nama orang, bukan jabatan (mis. manager.hr@).
+invariant('W7-15 employee demo emails use person names, not job titles', function () {
+    $emails = DB::table('employees')->whereNotNull('email')->pluck('email');
+
+    expect($emails)->not->toBeEmpty();
+
+    foreach ($emails as $email) {
+        expect($email)->not->toMatch(
+            '/^(manager|director|staff|admin|hr|finance|it|lead|vp|ceo)[._-]/i',
+            "Employee email {$email} must use a person name, not a job title"
+        );
+    }
+});
+
+// W7-15 (HR) — departemen karyawan demo tersebar, tidak menumpuk di HR.
+invariant('W7-15 employee demo departments are not concentrated in HR', function () {
+    $total = DB::table('employments')->where('is_current', true)->count();
+    $hr = DB::table('employments')
+        ->join('departments', 'departments.id', '=', 'employments.department_id')
+        ->where('employments.is_current', true)
+        ->where('departments.name', 'HR')
+        ->count();
+
+    expect($total)->toBeGreaterThan(0);
+    expect($hr / $total)->toBeLessThanOrEqual(0.25, 'No more than a quarter of demo employees may sit in HR');
+});
+
+// W7-15 (HR) — jabatan hanya berisi jabatan, tidak mencampur grade (Junior/Mid-level/Senior).
+invariant('W7-15 positions do not mix grade levels with job titles', function () {
+    $names = DB::table('positions')->pluck('name')->all();
+
+    foreach (['Junior', 'Mid-level', 'Senior'] as $grade) {
+        expect($names)->not->toContain($grade, "Position list must not contain grade {$grade}");
+    }
+});
+
 // Every posted document must reference a posted, balanced journal (issue #357 scope 4).
 invariant('W7-02 posted documents reference a posted and balanced journal', function () {
     $documents = [
