@@ -632,6 +632,58 @@ invariant('W7-15 employee demo codes start at EMP-000001 and are sequential', fu
     }
 });
 
+// PR432 — seed di atas data demo lama (email karyawan `main` masih `manager.hr@` dst.)
+// tidak boleh membuat baris karyawan kedua: satu user_id = satu karyawan demo.
+test('PR432 re-seeding over the main-branch employee emails does not duplicate employees', function () {
+    seedDemoData();
+
+    $before = DB::table('employees')->count();
+    $legacyEmails = [
+        'hendra.wijaya@example.com' => 'manager.hr@example.com',
+        'dewi.anggraini@example.com' => 'director.finance@example.com',
+        'agus.prasetyo@example.com' => 'staff.it@example.com',
+    ];
+
+    foreach ($legacyEmails as $newEmail => $userEmail) {
+        DB::table('employees')
+            ->where('email', $newEmail)
+            ->update(['email' => $userEmail]);
+    }
+
+    seedDemoData();
+
+    expect(DB::table('employees')->count())->toBe($before);
+
+    $duplicateUsers = DB::table('employees')
+        ->whereNotNull('user_id')
+        ->groupBy('user_id')
+        ->havingRaw('COUNT(*) > 1')
+        ->pluck('user_id');
+
+    expect($duplicateUsers)->toBeEmpty('Each demo user must map to exactly one employee row');
+});
+
+// PR432 — supplier demo tidak boleh ganda saat seed ulang di atas data demo `main`
+// (email supplier berubah antar versi seed; nama perusahaan tetap).
+test('PR432 re-seeding does not duplicate demo supplier names', function () {
+    seedDemoData();
+
+    // Simulasikan supplier demo yang di-seed versi `main` (email lain, nama sama).
+    DB::table('suppliers')
+        ->where('name', 'PT Sumber Makmur Sejahtera')
+        ->update(['email' => 'procurement@vendor.example']);
+
+    seedDemoData();
+
+    $duplicates = DB::table('suppliers')
+        ->select('name')
+        ->groupBy('name')
+        ->havingRaw('COUNT(*) > 1')
+        ->pluck('name');
+
+    expect($duplicates)->toBeEmpty('Each demo supplier name must map to exactly one row');
+});
+
 // W7-15 (HR) — Admin User adalah akun admin, bukan karyawan bergaji ganjil; gajinya wajar.
 invariant('W7-15 admin account has a realistic salary', function () {
     $admin = DB::table('employees')

@@ -74,9 +74,12 @@ class PurchasingSampleDataSeeder extends Seeder
                 ->value('id')
                 ?? SupplierCategory::query()->value('id');
 
+            // Kunci: nama perusahaan (stabil). Email supplier demo berubah antar
+            // versi seed; mencari dengan email membuat baris supplier ganda.
             Supplier::updateOrCreate(
-                ['email' => $seed['email']],
+                ['name' => $seed['name']],
                 [
+                    'email' => $seed['email'],
                     'name' => $seed['name'],
                     'phone' => $seed['phone'],
                     'address' => 'Jl. Industri Raya No. 12, Tangerang',

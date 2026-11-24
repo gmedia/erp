@@ -469,7 +469,8 @@ class VehicleLoanSampleDataSeeder extends Seeder
                 'name' => $person['name'],
                 'email' => $person['email'],
                 'phone' => $person['phone'],
-                'user_id' => $admin->id,
+                // Driver tidak punya akun login; jangan menumpang di akun admin.
+                'user_id' => null,
             ])->save();
 
             if ($companyId !== null) {

@@ -150,10 +150,12 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($demoEmployees as $person) {
+            // Kunci: user_id (stabil). Email demo bisa berubah antar versi seed;
+            // mencari dengan email ikut berubah dan menimbulkan baris ganda.
             $employee = Employee::updateOrCreate([
-                'email' => $person['email'],
                 'user_id' => $person['user']->id,
             ], [
+                'email' => $person['email'],
                 'employee_id' => $person['code'],
                 'name' => $person['name'],
                 'phone' => $person['phone'],
