@@ -17,6 +17,7 @@ interface SeedResult {
     sentInvoiceNumber: string;
     draftInvoiceNumber: string;
     paidInvoiceNumber: string;
+    otherCustomerInvoiceNumber: string;
     receiptId: number;
     receiptNumber: string;
 }
@@ -51,17 +52,34 @@ async function seedAllocationFixtures(page: Page): Promise<SeedResult> {
             firstId('/api/fiscal-years?per_page=1'),
             postableAccountId(),
         ]);
+        const otherCustomerId = await (async () => {
+            const json = await (await fetch('/api/customers?per_page=5', { headers })).json();
+            const other = (json.data || []).find((c: { id: number }) => Number(c.id) !== customerId);
+            if (!other) {
+                throw new Error('customer kedua tidak ditemukan');
+            }
+            return Number(other.id);
+        })();
 
         const today = new Date().toISOString().slice(0, 10);
         const dueDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
-        const items = [{ account_id: accountId, description: 'Allocation select test', quantity: 1, unit_price: 1000000, tax_percent: 0 }];
+        const items = [{
+            account_id: accountId,
+            description: 'Allocation select test',
+            quantity: 1,
+            unit_price: 1000000,
+            tax_percent: 0,
+        }];
 
-        const createInvoice = async (status: 'draft' | 'sent' | 'paid') => {
+        const createInvoice = async (
+            status: 'draft' | 'sent' | 'paid',
+            targetCustomerId: number = customerId,
+        ) => {
             const created = await (await fetch('/api/customer-invoices', {
                 method: 'POST',
                 headers,
                 body: JSON.stringify({
-                    customer_id: customerId,
+                    customer_id: targetCustomerId,
                     branch_id: branchId,
                     fiscal_year_id: fiscalYearId,
                     invoice_date: today,
@@ -88,6 +106,7 @@ async function seedAllocationFixtures(page: Page): Promise<SeedResult> {
         const sent = await createInvoice('sent');
         const draft = await createInvoice('draft');
         const paid = await createInvoice('paid');
+        const otherCustomer = await createInvoice('sent', otherCustomerId);
 
         const receiptResponse = await fetch('/api/ar-receipts', {
             method: 'POST',
@@ -115,6 +134,7 @@ async function seedAllocationFixtures(page: Page): Promise<SeedResult> {
             sentInvoiceNumber: sent.number,
             draftInvoiceNumber: draft.number,
             paidInvoiceNumber: paid.number,
+            otherCustomerInvoiceNumber: otherCustomer.number,
             receiptId: Number(receiptPayload?.data?.id),
             receiptNumber: String(receiptPayload?.data?.receipt_number ?? ''),
         };
@@ -166,7 +186,12 @@ test.describe('AR Receipt allocation selects', () => {
         await allocationDialog.getByRole('combobox', { name: /customer invoice/i }).click();
         await listed;
 
-        for (const hidden of [fixtures.draftInvoiceNumber, fixtures.paidInvoiceNumber]) {
+        const hiddenNumbers = [
+            fixtures.draftInvoiceNumber,
+            fixtures.paidInvoiceNumber,
+            fixtures.otherCustomerInvoiceNumber,
+        ];
+        for (const hidden of hiddenNumbers) {
             await expect(page.getByRole('button', { name: new RegExp(hidden) })).toHaveCount(0);
         }
         await expect(page.getByRole('button', { name: new RegExp(fixtures.sentInvoiceNumber) })).toHaveCount(1);
