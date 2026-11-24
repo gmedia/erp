@@ -434,6 +434,7 @@ export const stockTransferConfig = createComplexEntityConfig<StockTransfer>({
     viewModalComponent: StockTransferViewModal,
     getDeleteMessage: (transfer: { transfer_number?: string | null }) =>
         `This action cannot be undone. This will cancel stock transfer ${transfer.transfer_number || ''}.`,
+    permissionPrefix: 'stock_transfer',
 });
 
 export const inventoryStocktakeConfig =
@@ -462,6 +463,7 @@ export const inventoryStocktakeConfig =
         viewModalComponent: InventoryStocktakeViewModal,
         getDeleteMessage: (stocktake: { stocktake_number?: string | null }) =>
             `This action cannot be undone. This will cancel inventory stocktake ${stocktake.stocktake_number || ''}.`,
+        permissionPrefix: 'inventory_stocktake',
     });
 
 export const stockAdjustmentConfig = createComplexEntityConfig<StockAdjustment>(
@@ -490,6 +492,7 @@ export const stockAdjustmentConfig = createComplexEntityConfig<StockAdjustment>(
         viewModalComponent: StockAdjustmentViewModal,
         getDeleteMessage: (adjustment: { adjustment_number?: string | null }) =>
             `This action cannot be undone. This will cancel stock adjustment ${adjustment.adjustment_number || ''}.`,
+        permissionPrefix: 'stock_adjustment',
     },
 );
 
@@ -529,6 +532,7 @@ export const purchaseRequestConfig = createComplexEntityConfig<PurchaseRequest>(
         viewModalComponent: PurchaseRequestViewModal,
         getDeleteMessage: (purchaseRequest: { pr_number?: string | null }) =>
             `This action cannot be undone. This will cancel purchase request ${purchaseRequest.pr_number || ''}.`,
+        permissionPrefix: 'purchase_request',
     },
 );
 
@@ -562,6 +566,7 @@ export const purchaseOrderConfig = createComplexEntityConfig<PurchaseOrder>({
     viewModalComponent: PurchaseOrderViewModal,
     getDeleteMessage: (purchaseOrder: { po_number?: string | null }) =>
         `This action cannot be undone. This will delete purchase order ${purchaseOrder.po_number || ''}.`,
+    permissionPrefix: 'purchase_order',
 });
 
 export const goodsReceiptConfig = createComplexEntityConfig<GoodsReceipt>({
@@ -589,6 +594,7 @@ export const goodsReceiptConfig = createComplexEntityConfig<GoodsReceipt>({
     viewModalComponent: GoodsReceiptViewModal,
     getDeleteMessage: (goodsReceipt: { gr_number?: string | null }) =>
         `This action cannot be undone. This will delete goods receipt ${goodsReceipt.gr_number || ''}.`,
+    permissionPrefix: 'goods_receipt',
 });
 
 export const supplierReturnConfig = createComplexEntityConfig<SupplierReturn>({
@@ -623,6 +629,7 @@ export const supplierReturnConfig = createComplexEntityConfig<SupplierReturn>({
     viewModalComponent: SupplierReturnViewModal,
     getDeleteMessage: (supplierReturn: { return_number?: string | null }) =>
         `This action cannot be undone. This will delete supplier return ${supplierReturn.return_number || ''}.`,
+    permissionPrefix: 'supplier_return',
 });
 
 export const supplierCategoryConfig = createSimpleEntityConfig({
@@ -866,6 +873,7 @@ export const assetModelConfig = createComplexEntityConfig<AssetModel>({
     viewModalComponent: AssetModelViewModal,
     getDeleteMessage: (item: { model_name?: string }) =>
         `This action cannot be undone. This will permanently delete ${item.model_name || 'this asset model'}.`,
+    permissionPrefix: 'asset_model',
 });
 
 import { assetLocationColumns } from '@/components/asset-locations/AssetLocationColumns';
@@ -891,6 +899,7 @@ export const assetLocationConfig = createComplexEntityConfig<AssetLocation>({
     viewModalComponent: AssetLocationViewModal,
     getDeleteMessage: (item: { name?: string }) =>
         `This action cannot be undone. This will permanently delete ${item.name || 'this asset location'}.`,
+    permissionPrefix: 'asset_location',
 });
 
 export const assetConfig = createComplexEntityConfig<Asset>({
@@ -922,6 +931,7 @@ export const assetConfig = createComplexEntityConfig<Asset>({
     viewModalComponent: AssetViewModal,
     getDeleteMessage: (item: { name?: string; asset_code?: string }) =>
         `This action cannot be undone. This will permanently delete asset ${item.asset_code} (${item.name}).`,
+    permissionPrefix: 'asset',
 });
 
 export const assetMovementConfig = createComplexEntityConfig({
@@ -945,6 +955,7 @@ export const assetMovementConfig = createComplexEntityConfig({
     viewModalComponent: AssetMovementViewModal,
     getDeleteMessage: () =>
         'This action cannot be undone. This will permanently delete this movement record.',
+    permissionPrefix: 'asset_movement',
 });
 
 export const assetMaintenanceConfig =
@@ -984,6 +995,7 @@ export const assetMaintenanceConfig =
         },
         getDeleteMessage: () =>
             'This action cannot be undone. This will permanently delete this maintenance record.',
+        permissionPrefix: 'asset_maintenance',
     });
 
 import { assetStocktakeColumns } from '@/components/asset-stocktakes/AssetStocktakeColumns';
@@ -1016,6 +1028,7 @@ export const assetStocktakeConfig = createComplexEntityConfig<AssetStocktake>({
     viewModalComponent: AssetStocktakeViewModal,
     getDeleteMessage: (item: { reference?: string }) =>
         `This action cannot be undone. This will permanently delete stocktake ${item.reference}.`,
+    permissionPrefix: 'asset_stocktake',
 });
 
 import { pipelineColumns } from '@/components/pipelines/PipelineColumns';
@@ -1117,6 +1130,7 @@ export const supplierBillConfig = createComplexEntityConfig<SupplierBill>({
     viewModalComponent: SupplierBillViewModal,
     getDeleteMessage: (bill: { bill_number?: string | null }) =>
         `This action cannot be undone. This will delete supplier bill ${bill.bill_number || ''}.`,
+    permissionPrefix: 'supplier_bill',
 });
 
 export const apPaymentConfig = createComplexEntityConfig<ApPayment>({
@@ -1151,6 +1165,7 @@ export const apPaymentConfig = createComplexEntityConfig<ApPayment>({
     viewModalComponent: ApPaymentViewModal,
     getDeleteMessage: (payment: { payment_number?: string | null }) =>
         `This action cannot be undone. This will delete AP payment ${payment.payment_number || ''}.`,
+    permissionPrefix: 'ap_payment',
 });
 
 export const approvalDelegationConfig =
@@ -1237,6 +1252,7 @@ export const customerInvoiceConfig = createComplexEntityConfig<CustomerInvoice>(
         viewModalComponent: CustomerInvoiceViewModal,
         getDeleteMessage: (item: { invoice_number?: string | null }) =>
             `This action cannot be undone. This will permanently delete invoice ${item.invoice_number}.`,
+        permissionPrefix: 'customer_invoice',
     },
 );
 
@@ -1272,6 +1288,7 @@ export const arReceiptConfig = createComplexEntityConfig<ArReceipt>({
     viewModalComponent: ArReceiptViewModal,
     getDeleteMessage: (item: { receipt_number?: string | null }) =>
         `This action cannot be undone. This will permanently delete receipt ${item.receipt_number}.`,
+    permissionPrefix: 'ar_receipt',
 });
 
 export const creditNoteConfig = createComplexEntityConfig<CreditNote>({
