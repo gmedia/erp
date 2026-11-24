@@ -33,11 +33,6 @@ export default function TrialBalanceDetailedReportPage() {
             exportEndpoint="/api/reports/trial-balance-detailed/export"
             requiredFilters={['fiscal_year_id']}
             requiredFilterHintKey="reports.selectFilterFiscalYear"
-            defaultColumnVisibility={{
-                opening_balance: false,
-                debit_total: false,
-                credit_total: false,
-            }}
         />
     );
 }

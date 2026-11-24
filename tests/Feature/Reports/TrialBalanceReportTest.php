@@ -240,8 +240,68 @@ test('ekspor trial balance memakai basis jurnal posted yang sama dengan laporan'
 
     $cashRow = $rows->firstWhere(0, '1010');
     expect($cashRow)->not->toBeNull()
-        ->and((float) $cashRow[6])->toBe(750.0)
-        ->and((float) $cashRow[7])->toBe(0.0);
+        ->and((float) $cashRow[7])->toBe(750.0)
+        ->and((float) $cashRow[8])->toBe(0.0);
+});
+
+test('ekspor trial balance memuat saldo awal, mutasi, dan saldo akhir', function () {
+    $previous = tbFiscalYear(2025, 'closed');
+    $fiscalYear = tbFiscalYear(2026);
+    $cash = tbAccount('1010', 'Kas', 'asset', 'debit');
+    $equity = tbAccount('3010', 'Modal', 'equity', 'credit');
+
+    tbJournal($previous, '2025-06-01', [[$cash, 300, 0], [$equity, 0, 300]]);
+    tbJournal($fiscalYear, '2026-03-10', [[$cash, 0, 120], [$equity, 120, 0]]);
+
+    $rows = (new TrialBalanceReportExport([
+        'fiscal_year_id' => $fiscalYear->id,
+        'period_month' => 3,
+        'period_year' => 2026,
+    ]))->collection();
+
+    $cashRow = $rows->firstWhere(0, '1010');
+    expect((float) $cashRow[3])->toBe(300.0)
+        ->and((float) $cashRow[4])->toBe(0.0)
+        ->and((float) $cashRow[5])->toBe(120.0)
+        ->and((float) $cashRow[6])->toBe(180.0);
+});
+
+test('saldo awal + mutasi debit - kredit = saldo akhir per akun dan total seimbang', function () {
+    $previous = tbFiscalYear(2025, 'closed');
+    $fiscalYear = tbFiscalYear(2026);
+    $cash = tbAccount('1010', 'Kas', 'asset', 'debit');
+    $bank = tbAccount('1020', 'Bank', 'asset', 'debit');
+    $revenue = tbAccount('4010', 'Penjualan', 'revenue', 'credit');
+    $equity = tbAccount('3010', 'Modal', 'equity', 'credit');
+
+    tbJournal($previous, '2025-06-01', [[$cash, 300, 0], [$equity, 0, 300]]);
+    tbJournal($fiscalYear, '2026-02-05', [[$bank, 500, 0], [$cash, 0, 500]]);
+    tbJournal($fiscalYear, '2026-03-10', [[$cash, 200, 0], [$revenue, 0, 200]]);
+
+    $report = tbReport($fiscalYear, '&period_month=3&period_year=2026');
+
+    // Saldo normal kredit (equity, revenue): saldo positif = arah kredit.
+    $creditNormal = ['equity', 'revenue'];
+    foreach ($report['data'] as $row) {
+        $sign = in_array($row['account_type'], $creditNormal, true) ? -1 : 1;
+        $movement = $sign * ((float) $row['debit_total'] - (float) $row['credit_total']);
+
+        expect(round((float) $row['opening_balance'] + $movement, 2))
+            ->toBe((float) $row['closing_balance']);
+    }
+
+    // Kas: awal = 300 - 500 = -200 (sebelum Maret), mutasi Maret debit 200, akhir 0.
+    expect((float) tbRow($report, '1010')['opening_balance'])->toBe(-200.0)
+        ->and((float) tbRow($report, '1010')['debit_total'])->toBe(200.0)
+        ->and((float) tbRow($report, '1010')['credit_total'])->toBe(0.0)
+        ->and((float) tbRow($report, '1010')['closing_balance'])->toBe(0.0)
+        // Penjualan (kredit-normal): awal 0, mutasi kredit 200, akhir 200.
+        ->and((float) tbRow($report, '4010')['opening_balance'])->toBe(0.0)
+        ->and((float) tbRow($report, '4010')['credit_total'])->toBe(200.0)
+        ->and((float) tbRow($report, '4010')['closing_balance'])->toBe(200.0)
+        // Total debit dan kredit saldo akhir tetap seimbang.
+        ->and((float) $report['summary']['total_debit'])->toBe((float) $report['summary']['total_credit'])
+        ->and($report['summary']['is_balanced'])->toBeTrue();
 });
 
 test('it can export trial balance report', function () {
