@@ -83,7 +83,7 @@ it('menjawab 409 dengan pesan i18n bila galat konkurensi tetap terjadi', functio
 
             throw queryExceptionWithErrno(1205);
         });
-    } catch (\Throwable $exception) {
+    } catch (Throwable $exception) {
         $thrown = $exception;
     }
 
