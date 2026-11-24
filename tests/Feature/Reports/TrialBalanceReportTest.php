@@ -21,7 +21,7 @@ beforeEach(function () {
 
 test('it can get trial balance report', function () {
     $fiscalYear = FiscalYear::factory()->create(['status' => 'open']);
-    $account = Account::factory()->create(['code' => '1010', 'name' => 'Cash', 'type' => 'asset']);
+    $account = Account::factory()->create(['code' => '1010', 'name' => 'Cash', 'type' => 'asset', 'normal_balance' => 'debit']);
     AccountBalance::factory()->create(['account_id' => $account->id, 'fiscal_year_id' => $fiscalYear->id, 'period_month' => 1, 'period_year' => 2026, 'closing_balance' => 1000]);
 
     getJson("/api/reports/trial-balance-detailed?fiscal_year_id={$fiscalYear->id}&period_month=1&period_year=2026")

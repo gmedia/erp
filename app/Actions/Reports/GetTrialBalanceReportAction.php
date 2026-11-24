@@ -115,7 +115,11 @@ class GetTrialBalanceReportAction
 
     private function row(AccountBalance $balance): array
     {
+        // closing_balance memakai konvensi normal balance akun. Saldo positif berarti
+        // searah normal balance, jadi untuk akun kredit-normal saldo positif = kolom kredit.
         $closing = (float) $balance->closing_balance;
+        $isCreditNormal = $balance->account->normal_balance === 'credit';
+        $debitBalance = $isCreditNormal ? -$closing : $closing;
 
         return [
             'account_id' => $balance->account_id,
@@ -128,8 +132,8 @@ class GetTrialBalanceReportAction
             'debit_total' => (float) $balance->debit_total,
             'credit_total' => (float) $balance->credit_total,
             'closing_balance' => $closing,
-            'debit_balance' => $closing >= 0 ? $closing : 0,
-            'credit_balance' => $closing < 0 ? abs($closing) : 0,
+            'debit_balance' => $debitBalance >= 0 ? $debitBalance : 0,
+            'credit_balance' => $debitBalance < 0 ? abs($debitBalance) : 0,
         ];
     }
 }
