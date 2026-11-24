@@ -281,6 +281,7 @@
     "accounting_posting.coa_none_active": "No active COA version covers :date. Activate one COA version before posting.",
     "accounting_posting.coa_ambiguous": "More than one active COA version applies to :date. Keep exactly one active COA per fiscal year.",
     "accounting_posting.line_account_outside_coa": "Journal line account :code does not belong to the COA version used for :date.",
+  "accounting_posting.line_account_is_group": "Group account :code cannot be used for journal posting. Choose a detail (leaf) account.",
     "period_closings.posting_locked": "The period for :date is closed. Reopen the period to post journals on this date.",
     "journal_entry.fiscal_year_missing": "No fiscal year covers this date. Create the fiscal year before posting.",
     "journal_entry.fiscal_year_closed": "The fiscal year for this date is closed or locked. Reopen it or use an open period.",

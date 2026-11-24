@@ -47,5 +47,29 @@ trait AssertsJournalLineAccounts
                 ]);
             }
         }
+
+        $this->assertNoGroupAccountLines($accountIds);
+    }
+
+    /**
+     * Akun kelompok (punya anak) hanya agregasi; jurnal tidak boleh memposting ke sana (#437).
+     *
+     * @param  array<int, int>  $accountIds
+     */
+    protected function assertNoGroupAccountLines(array $accountIds): void
+    {
+        $groupCodes = Account::query()
+            ->whereIn('id', $accountIds)
+            ->whereHas('children')
+            ->pluck('code')
+            ->all();
+
+        if ($groupCodes !== []) {
+            throw ValidationException::withMessages([
+                'lines' => __('accounting_posting.line_account_is_group', [
+                    'code' => implode(', ', $groupCodes),
+                ]),
+            ]);
+        }
     }
 }

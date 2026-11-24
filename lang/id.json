@@ -286,6 +286,7 @@
     "journal_entry.line_amount_required": "Setiap baris harus memiliki nilai debit atau kredit yang lebih besar dari 0.",
     "journal_entry.lines_not_balanced": "Total debit dan total kredit harus sama.",
     "accounting_posting.line_account_outside_coa": "Akun baris jurnal :code bukan bagian dari versi COA yang dipakai untuk :date.",
+  "accounting_posting.line_account_is_group": "Akun kelompok :code tidak dapat dipakai untuk posting jurnal. Pilih akun detail (akun daun).",
     "period_closings.posting_locked": "Periode untuk :date sudah ditutup. Buka kembali periode untuk memposting jurnal pada tanggal ini.",
     "stock.insufficient": "Stok tidak cukup untuk :product di :warehouse (tersedia :available, dibutuhkan :required).",
     "stock.period_closed": "Periode akuntansi untuk :date sudah ditutup. Pergerakan stok di dalamnya tidak dapat diubah.",

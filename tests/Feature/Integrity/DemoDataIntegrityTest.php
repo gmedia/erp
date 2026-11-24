@@ -695,6 +695,25 @@ invariant('W7-05 posted journals are balanced', function () {
         ->toBe(round((float) $totals->credit, 2), 'Total debits must equal total credits across posted journals');
 });
 
+// #437 keputusan 2 — posting ke akun kelompok (punya anak) ditolak; data demo hanya memakai akun daun.
+invariant('W7-06 no journal line posts to a group account', function () {
+    $groupIds = Account::query()
+        ->whereIn('id', Account::query()->whereNotNull('parent_id')->select('parent_id'))
+        ->pluck('id');
+
+    expect($groupIds)->not->toBeEmpty('COA must contain group accounts');
+
+    $offenders = DB::table('journal_entry_lines')
+        ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+        ->whereIn('journal_entry_lines.account_id', $groupIds)
+        ->get(['journal_entries.entry_number', 'journal_entries.description', 'journal_entry_lines.account_id']);
+
+    expect($offenders->all())->toBeEmpty(
+        'Journal lines must not post to group accounts: '
+        . $offenders->map(fn ($row) => "{$row->entry_number} ({$row->description}) acct {$row->account_id}")->implode('; ')
+    );
+});
+
 // Issue #357 (PR #384): every invariant above must also hold after a second `db:seed`.
 // One test seeds twice and runs the registered read-only checks against that state.
 // It seeds only once more than the beforeEach, so the extra cost is one seed run.

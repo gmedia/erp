@@ -64,6 +64,11 @@ class CreateJournalEntryAction
 
         if ($validateAccounts) {
             $this->assertLinesUseActiveAccounts($data['lines'], $data['entry_date']);
+        } else {
+            $this->assertNoGroupAccountLines(array_values(array_unique(array_map(
+                fn (array $line): int => (int) $line['account_id'],
+                $data['lines'],
+            ))));
         }
 
         while ($attempts < $maxAttempts) {
