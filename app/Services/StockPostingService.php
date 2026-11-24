@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\FiscalYear;
 use App\Models\GoodsReceipt;
 use App\Models\Product;
 use App\Models\StockAdjustment;
@@ -9,7 +10,9 @@ use App\Models\StockMovement;
 use App\Models\StockTransfer;
 use App\Models\SupplierReturn;
 use App\Models\Warehouse;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -23,6 +26,16 @@ use Illuminate\Validation\ValidationException;
  */
 class StockPostingService
 {
+    /**
+     * Pembalik karena dokumen dibatalkan: bertanggal saat pembatalan (Issue #372).
+     */
+    public const TRIGGER_CANCEL = 'cancel';
+
+    /**
+     * Pembalik karena dokumen diedit: bertanggal movement asli (Issue #372).
+     */
+    public const TRIGGER_EDIT = 'edit';
+
     /**
      * Rebuild the `balance_after` chain for one or more product+warehouse
      * scopes. Pass null to rebuild every scope.
@@ -269,58 +282,53 @@ class StockPostingService
      * Pembalik dibuat per movement asal dan bersifat idempoten: jika pembalik
      * untuk movement asal sudah ada, tidak dibuat lagi.
      */
-    public function reverseDocument(string $referenceType, int $referenceId, string $reversalType, ?int $createdBy = null): void
-    {
-        $originals = StockMovement::query()
-            ->where('reference_type', $referenceType)
-            ->where('reference_id', $referenceId)
-            ->whereNotIn('movement_type', [
-                'goods_receipt_reversal',
-                'supplier_return_reversal',
-                'adjustment_reversal',
-                'transfer_out_reversal',
-                'transfer_in_reversal',
-            ])
-            ->get();
+    public function reverseDocument(
+        string $referenceType,
+        int $referenceId,
+        string $reversalType,
+        ?int $createdBy = null,
+        string $trigger = self::TRIGGER_CANCEL,
+    ): void {
+        // Atomik: bila saldo ditolak (422), pembalik yang sudah ditulis ikut dibatalkan.
+        DB::transaction(function () use ($referenceType, $referenceId, $reversalType, $createdBy, $trigger): void {
+            $snapshot = $this->balanceSnapshot($referenceType, $referenceId);
+            $scopes = $this->appendReversals($referenceType, $referenceId, $reversalType, $createdBy, $trigger);
 
-        $scopes = [];
+            // Batal memakai tanggal pembatalan (hari ini). Periode tertutup ditolak oleh
+            // jurnal pembalik (#357, error entry_date), bukan guard stok, agar kontrak
+            // batal yang sudah ada tetap.
+            $this->recalculateFromMovedAt($scopes, enforceOpenPeriod: false, baseline: $snapshot);
+        });
+    }
 
-        foreach ($originals as $original) {
-            $alreadyReversed = StockMovement::query()
-                ->where('movement_type', $reversalType . '_reversal')
-                ->where('reference_type', $referenceType)
-                ->where('reference_id', $referenceId)
-                ->where('source_line_id', $original->source_line_id)
-                ->where('warehouse_id', $original->warehouse_id)
-                ->where('product_id', $original->product_id)
-                ->exists();
+    /**
+     * Edit dokumen terposting (Issue #372): pembalik bertanggal movement asli,
+     * lalu $repost memposting ulang item baru, lalu saldo dihitung ulang dan
+     * ditolak (422) bila ada saldo berjalan negatif. Semua dalam satu transaksi.
+     *
+     * @param  callable(): void  $repost
+     */
+    public function editDocument(
+        string $referenceType,
+        int $referenceId,
+        string $reversalType,
+        callable $repost,
+        ?int $createdBy = null,
+    ): void {
+        DB::transaction(function () use ($referenceType, $referenceId, $reversalType, $repost, $createdBy): void {
+            $snapshot = $this->balanceSnapshot($referenceType, $referenceId);
+            $scopes = $this->appendReversals(
+                $referenceType,
+                $referenceId,
+                $reversalType,
+                $createdBy,
+                self::TRIGGER_EDIT,
+            );
 
-            if ($alreadyReversed) {
-                continue;
-            }
+            $repost();
 
-            $this->record([
-                'movement_type' => $reversalType . '_reversal',
-                'reference_type' => $referenceType,
-                'reference_id' => $referenceId,
-                'reference_number' => $original->reference_number,
-                'source_line_id' => $original->source_line_id,
-                'warehouse_id' => $original->warehouse_id,
-                'product_id' => $original->product_id,
-                'quantity_in' => (float) $original->quantity_out,
-                'quantity_out' => (float) $original->quantity_in,
-                'unit_cost' => $original->unit_cost,
-                'notes' => 'Pembalik dokumen dibatalkan',
-                'moved_at' => now(),
-                'created_by' => $createdBy ?? Auth::id(),
-            ]);
-
-            $scopes[] = [(int) $original->product_id, (int) $original->warehouse_id];
-        }
-
-        if ($scopes !== []) {
-            $this->rebuildBalances($scopes);
-        }
+            $this->recalculateFromMovedAt($scopes, baseline: $snapshot);
+        });
     }
 
     /**
@@ -378,8 +386,278 @@ class StockPostingService
      */
     public function reverseTransfer(StockTransfer $stockTransfer): void
     {
-        $this->reverseMovementsOfType(StockTransfer::class, $stockTransfer->id, 'transfer_out', 'transfer_out_reversal');
-        $this->reverseMovementsOfType(StockTransfer::class, $stockTransfer->id, 'transfer_in', 'transfer_in_reversal');
+        // Issue #372: batal memakai tanggal pembatalan (hari ini); periode tertutup 422.
+        $this->assertFiscalYearOpen(now());
+
+        $this->reverseMovementsOfType(
+            StockTransfer::class,
+            $stockTransfer->id,
+            'transfer_out',
+            'transfer_out_reversal',
+        );
+        $this->reverseMovementsOfType(
+            StockTransfer::class,
+            $stockTransfer->id,
+            'transfer_in',
+            'transfer_in_reversal',
+        );
+    }
+
+    /**
+     * Membuat pembalik per movement asal yang belum dibalik. Mengembalikan scope
+     * yang terdampak beserta tanggal pembalik.
+     *
+     * @return array<int, array{0:int,1:int,2:CarbonInterface}>
+     */
+    private function appendReversals(
+        string $referenceType,
+        int $referenceId,
+        string $reversalType,
+        ?int $createdBy,
+        string $trigger,
+    ): array {
+        $originals = StockMovement::query()
+            ->where('reference_type', $referenceType)
+            ->where('reference_id', $referenceId)
+            ->whereNotIn('movement_type', [
+                'goods_receipt_reversal',
+                'supplier_return_reversal',
+                'adjustment_reversal',
+                'transfer_out_reversal',
+                'transfer_in_reversal',
+            ])
+            ->get();
+
+        $scopes = [];
+
+        foreach ($originals as $original) {
+            $alreadyReversed = StockMovement::query()
+                ->where('movement_type', $reversalType . '_reversal')
+                ->where('reference_type', $referenceType)
+                ->where('reference_id', $referenceId)
+                ->where('source_line_id', $original->source_line_id)
+                ->where('warehouse_id', $original->warehouse_id)
+                ->where('product_id', $original->product_id)
+                ->exists();
+
+            if ($alreadyReversed) {
+                continue;
+            }
+
+            $movedAt = $this->reversalMovedAt($original, $trigger);
+
+            $this->record([
+                'movement_type' => $reversalType . '_reversal',
+                'reference_type' => $referenceType,
+                'reference_id' => $referenceId,
+                'reference_number' => $original->reference_number,
+                'source_line_id' => $original->source_line_id,
+                'warehouse_id' => $original->warehouse_id,
+                'product_id' => $original->product_id,
+                'quantity_in' => (float) $original->quantity_out,
+                'quantity_out' => (float) $original->quantity_in,
+                'unit_cost' => $original->unit_cost,
+                'notes' => 'Pembalik dokumen dibatalkan',
+                'moved_at' => $movedAt,
+                'created_by' => $createdBy ?? Auth::id(),
+            ]);
+
+            $scopes[] = [(int) $original->product_id, (int) $original->warehouse_id, $movedAt];
+        }
+
+        return $scopes;
+    }
+
+    /**
+     * Tanggal pembalik (Issue #372): edit memakai moved_at movement asli agar
+     * kartu stok historis tetap benar; batal memakai waktu pembatalan.
+     */
+    private function reversalMovedAt(StockMovement $original, string $trigger): CarbonInterface
+    {
+        return $trigger === self::TRIGGER_EDIT ? $original->moved_at : now();
+    }
+
+    /**
+     * Hitung ulang saldo setiap scope terdampak (seluruh rantai ledger scope
+     * tersebut, urut moved_at, id), lalu tolak bila ada saldo berjalan yang
+     * negatif (422, Issue #372).
+     *
+     * @param  array<int, array{0:int,1:int,2:CarbonInterface}>  $scopes
+     */
+    private function recalculateFromMovedAt(array $scopes, bool $enforceOpenPeriod = true, array $baseline = []): void
+    {
+        if ($scopes === []) {
+            return;
+        }
+
+        $earliestByScope = [];
+
+        foreach ($scopes as [$productId, $warehouseId, $movedAt]) {
+            $key = $productId . ':' . $warehouseId;
+
+            if (! isset($earliestByScope[$key]) || $movedAt->lt($earliestByScope[$key][2])) {
+                $earliestByScope[$key] = [$productId, $warehouseId, $movedAt];
+            }
+        }
+
+        if ($enforceOpenPeriod) {
+            foreach ($earliestByScope as [, , $movedAt]) {
+                $this->assertFiscalYearOpen($movedAt);
+            }
+        }
+
+        $scopePairs = array_map(
+            static fn (array $scope): array => [$scope[0], $scope[1]],
+            array_values($earliestByScope),
+        );
+
+        $this->rebuildBalances($scopePairs);
+
+        foreach ($earliestByScope as $key => [$productId, $warehouseId, $movedAt]) {
+            $this->assertNoWorsenedNegativeBalance(
+                $productId,
+                $warehouseId,
+                $movedAt,
+                $baseline[$key] ?? [],
+            );
+        }
+    }
+
+    /**
+     * Saldo per tanggal sebelum operasi, untuk setiap scope (product+warehouse) milik
+     * dokumen. Pembanding agar riwayat negatif lama tidak memblokir (review #420).
+     *
+     * @return array<string, array<string, float>> key "product:warehouse" => [moved_at => saldo]
+     */
+    private function balanceSnapshot(string $referenceType, int $referenceId): array
+    {
+        $scopes = StockMovement::query()
+            ->where('reference_type', $referenceType)
+            ->where('reference_id', $referenceId)
+            ->select('product_id', 'warehouse_id')
+            ->distinct()
+            ->get();
+
+        $snapshot = [];
+
+        foreach ($scopes as $scope) {
+            $productId = (int) $scope->product_id;
+            $warehouseId = (int) $scope->warehouse_id;
+
+            $snapshot[$productId . ':' . $warehouseId] = $this->closingBalances($productId, $warehouseId);
+        }
+
+        return $snapshot;
+    }
+
+    /**
+     * Saldo akhir pada setiap moved_at (urut waktu). Movement dengan moved_at sama
+     * dinilai hasil akhirnya, sehingga pembalik dan repost tidak terbaca sebagai negatif sesaat.
+     *
+     * @return array<string, float>
+     */
+    private function closingBalances(int $productId, int $warehouseId): array
+    {
+        $balances = [];
+
+        $movements = StockMovement::query()
+            ->where('product_id', $productId)
+            ->where('warehouse_id', $warehouseId)
+            ->orderBy('moved_at')
+            ->orderBy('id')
+            ->get(['id', 'moved_at', 'balance_after']);
+
+        foreach ($movements as $movement) {
+            $balances[$movement->moved_at->format('Y-m-d H:i:s')] = (float) $movement->balance_after;
+        }
+
+        return $balances;
+    }
+
+    /**
+     * Tolak (422) hanya bila pada suatu waktu >= $from saldo menjadi negatif dan lebih
+     * rendah daripada saldo pada waktu yang sama sebelum operasi ini (review #420).
+     *
+     * @param  array<string, float>  $before
+     */
+    private function assertNoWorsenedNegativeBalance(
+        int $productId,
+        int $warehouseId,
+        CarbonInterface $from,
+        array $before,
+    ): void {
+        $fromKey = $from->format('Y-m-d H:i:s');
+
+        foreach ($this->closingBalances($productId, $warehouseId) as $movedAt => $balance) {
+            if ($movedAt < $fromKey || $balance >= 0) {
+                continue;
+            }
+
+            $balanceBefore = 0.0;
+
+            foreach ($before as $beforeMovedAt => $value) {
+                if ($beforeMovedAt > $movedAt) {
+                    break;
+                }
+
+                $balanceBefore = $value;
+            }
+
+            if ($balance >= $balanceBefore) {
+                continue;
+            }
+
+            $this->throwInsufficientStock(
+                $productId,
+                $warehouseId,
+                StockMovement::query()
+                    ->where('product_id', $productId)
+                    ->where('warehouse_id', $warehouseId)
+                    ->where('moved_at', $movedAt)
+                    ->orderByDesc('id')
+                    ->first(),
+            );
+        }
+    }
+
+    /**
+     * Tolak (422) bila tanggal jatuh di tahun fiskal yang tidak terbuka, selaras
+     * dengan aturan jurnal (#357). Dipanggil sebelum saldo dihitung ulang.
+     */
+    private function assertFiscalYearOpen(CarbonInterface $date): void
+    {
+        $fiscalYear = FiscalYear::query()
+            ->where('start_date', '<=', $date->toDateString())
+            ->where('end_date', '>=', $date->toDateString())
+            ->first();
+
+        if ($fiscalYear !== null && ! $fiscalYear->isOpen()) {
+            throw ValidationException::withMessages([
+                'items' => [__('stock.period_closed', ['date' => $date->toDateString()])],
+            ])->status(422);
+        }
+    }
+
+    private function throwInsufficientStock(int $productId, int $warehouseId, ?StockMovement $negative): void
+    {
+        $productName = Product::query()->whereKey($productId)->value('name');
+        $warehouseName = Warehouse::query()->whereKey($warehouseId)->value('name');
+
+        // available = saldo sebelum movement negatif tersebut; required = jumlah keluarnya.
+        // Bila movement negatif bukan pengeluaran, required 0 dan available tetap saldo sebelumnya.
+        $required = $negative === null ? 0.0 : (float) $negative->quantity_out;
+        $available = $negative === null
+            ? 0.0
+            : (float) $negative->balance_after - (float) $negative->quantity_in + (float) $negative->quantity_out;
+
+        throw ValidationException::withMessages([
+            'items' => [__('stock.insufficient', [
+                'product' => $productName ?? '#' . $productId,
+                'warehouse' => $warehouseName ?? '#' . $warehouseId,
+                'available' => $available,
+                'required' => $required,
+            ])],
+        ])->status(422);
     }
 
     private function reverseMovementsOfType(string $referenceType, int $referenceId, string $originalType, string $reversalType): void

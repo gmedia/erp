@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\AccountingPosting\PostGoodsReceiptJournalAction;
 use App\Actions\AccountingPosting\ReverseDocumentJournalAction;
+use App\Actions\GoodsReceipts\EnsurePurchaseOrderAllowsConfirmedReceiptAction;
 use App\Actions\GoodsReceipts\ExportGoodsReceiptsAction;
 use App\Actions\GoodsReceipts\IndexGoodsReceiptsAction;
 use App\Actions\GoodsReceipts\ListGoodsReceiptItemOptionsAction;
@@ -52,6 +53,7 @@ class GoodsReceiptController extends Controller
         SyncGoodsReceiptItemsAction $syncItems,
         PostGoodsReceiptJournalAction $postJournal,
         PostGoodsReceiptMovementsAction $postMovements,
+        EnsurePurchaseOrderAllowsConfirmedReceiptAction $guardPurchaseOrder,
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'];
@@ -68,23 +70,37 @@ class GoodsReceiptController extends Controller
 
         // Issue #367: GR yang dibuat langsung confirmed harus membentuk stok dan jurnal
         // dalam transaksi yang sama. Kegagalan posting ikut membatalkan dokumen.
-        $goodsReceipt = $this->storeWithSyncedItems(
-            attributes: $validated,
-            items: $items,
-            creator: static fn (array $attributes): GoodsReceipt => GoodsReceipt::create($attributes),
-            assignDocumentNumber: function (GoodsReceipt $goodsReceipt): void {
-                $this->assignSequentialDocumentNumber($goodsReceipt, 'gr_number', 'GR');
-            },
-            syncItems: function (GoodsReceipt $goodsReceipt, array $items) use ($syncItems): void {
-                $syncItems->execute($goodsReceipt, $items);
-            },
-            afterCommit: $isConfirmedOnCreate
-                ? function (GoodsReceipt $goodsReceipt) use ($postJournal, $postMovements): void {
-                    $postJournal->execute($goodsReceipt->refresh());
-                    $postMovements->execute($goodsReceipt->refresh());
-                }
-            : null,
-        );
+        $goodsReceipt = DB::transaction(function () use (
+            $validated,
+            $items,
+            $isConfirmedOnCreate,
+            $guardPurchaseOrder,
+            $syncItems,
+            $postJournal,
+            $postMovements,
+        ): GoodsReceipt {
+            if ($isConfirmedOnCreate) {
+                $guardPurchaseOrder->execute((int) $validated['purchase_order_id']);
+            }
+
+            return $this->storeWithSyncedItems(
+                attributes: $validated,
+                items: $items,
+                creator: static fn (array $attributes): GoodsReceipt => GoodsReceipt::create($attributes),
+                assignDocumentNumber: function (GoodsReceipt $goodsReceipt): void {
+                    $this->assignSequentialDocumentNumber($goodsReceipt, 'gr_number', 'GR');
+                },
+                syncItems: function (GoodsReceipt $goodsReceipt, array $items) use ($syncItems): void {
+                    $syncItems->execute($goodsReceipt, $items);
+                },
+                afterCommit: $isConfirmedOnCreate
+                    ? function (GoodsReceipt $goodsReceipt) use ($postJournal, $postMovements): void {
+                        $postJournal->execute($goodsReceipt->refresh());
+                        $postMovements->execute($goodsReceipt->refresh());
+                    }
+                : null,
+            );
+        });
 
         return (new GoodsReceiptResource($this->loadResourceRelations($goodsReceipt)))->response()->setStatusCode(201);
     }
@@ -103,6 +119,7 @@ class GoodsReceiptController extends Controller
         StockPostingService $stockPosting,
         PurchaseOrderReceiptService $purchaseOrderReceipts,
         ReverseDocumentJournalAction $reverseJournal,
+        EnsurePurchaseOrderAllowsConfirmedReceiptAction $guardPurchaseOrder,
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
@@ -156,33 +173,49 @@ class GoodsReceiptController extends Controller
             return (new GoodsReceiptResource($this->loadResourceRelations($goodsReceipt)))->response();
         }
 
-        $this->updateWithSyncedItems(
-            model: $goodsReceipt,
-            attributes: $validated,
-            items: $items,
-            payloadResolver: static function (array $attributes): array {
-                return UpdateGoodsReceiptData::fromArray($attributes)->toArray();
-            },
-            syncItems: function (GoodsReceipt $goodsReceipt, array $items) use ($syncItems): void {
-                $syncItems->execute($goodsReceipt, $items);
-            },
-            afterCommit: $isNewlyConfirmed
-                ? function (GoodsReceipt $goodsReceipt) use ($postJournal): void {
-                    try {
-                        $postJournal->execute($goodsReceipt->refresh());
-                    } catch (ValidationException $e) {
-                        // Validation failures (e.g. missing COA mapping) are intentionally
-                        // swallowed so the goods receipt itself stays confirmed; user can
-                        // post the journal later. Non-validation errors propagate and
-                        // roll back the entire transaction (status flip included).
-                        Log::warning('Goods receipt journal posting skipped', [
-                            'goods_receipt_id' => $goodsReceipt->id,
-                            'reason' => $e->getMessage(),
-                        ]);
+        DB::transaction(function () use (
+            $goodsReceipt,
+            $validated,
+            $items,
+            $isNewlyConfirmed,
+            $guardPurchaseOrder,
+            $syncItems,
+            $postJournal,
+        ): void {
+            // GR yang sudah confirmed tetap sah; aturan PO hanya berlaku saat GR baru dikonfirmasi.
+            if ($isNewlyConfirmed) {
+                $purchaseOrderId = $validated['purchase_order_id'] ?? $goodsReceipt->purchase_order_id;
+                $guardPurchaseOrder->execute((int) $purchaseOrderId);
+            }
+
+            $this->updateWithSyncedItems(
+                model: $goodsReceipt,
+                attributes: $validated,
+                items: $items,
+                payloadResolver: static function (array $attributes): array {
+                    return UpdateGoodsReceiptData::fromArray($attributes)->toArray();
+                },
+                syncItems: function (GoodsReceipt $goodsReceipt, array $items) use ($syncItems): void {
+                    $syncItems->execute($goodsReceipt, $items);
+                },
+                afterCommit: $isNewlyConfirmed
+                    ? function (GoodsReceipt $goodsReceipt) use ($postJournal): void {
+                        try {
+                            $postJournal->execute($goodsReceipt->refresh());
+                        } catch (ValidationException $e) {
+                            // Validation failures (e.g. missing COA mapping) are intentionally
+                            // swallowed so the goods receipt itself stays confirmed; user can
+                            // post the journal later. Non-validation errors propagate and
+                            // roll back the entire transaction (status flip included).
+                            Log::warning('Goods receipt journal posting skipped', [
+                                'goods_receipt_id' => $goodsReceipt->id,
+                                'reason' => $e->getMessage(),
+                            ]);
+                        }
                     }
-                }
-            : null,
-        );
+                : null,
+            );
+        });
 
         if ($isNewlyConfirmed) {
             // Setelah commit: movement tetap ada walau posting jurnal gagal.
@@ -191,8 +224,12 @@ class GoodsReceiptController extends Controller
             // Issue #356: item GR confirmed diedit setelah posting. Movement lama dibalik
             // (histori tetap), lalu item baru diposting ulang. Tanpa ini stok tidak sesuai item.
             DB::transaction(function () use ($goodsReceipt, $stockPosting, $purchaseOrderReceipts, $postMovements): void {
-                $stockPosting->reverseDocument(GoodsReceipt::class, $goodsReceipt->id, 'goods_receipt');
-                $postMovements->execute($goodsReceipt->refresh());
+                $stockPosting->editDocument(
+                    GoodsReceipt::class,
+                    $goodsReceipt->id,
+                    'goods_receipt',
+                    fn () => $postMovements->execute($goodsReceipt->refresh()),
+                );
                 $purchaseOrderReceipts->syncFromGoodsReceipt($goodsReceipt);
             });
         }

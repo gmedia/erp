@@ -42,7 +42,8 @@ beforeEach(function () {
  */
 function issue356PurchaseOrder(int $lines = 1): array
 {
-    $purchaseOrder = PurchaseOrder::factory()->create();
+    // Issue #380: GR confirmed hanya diterima untuk PO confirmed/partially_received.
+    $purchaseOrder = PurchaseOrder::factory()->create(['status' => 'confirmed']);
     $product = Product::factory()->create();
     $unit = Unit::factory()->create();
     $items = [];
