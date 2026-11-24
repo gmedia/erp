@@ -422,6 +422,11 @@ class PermissionSeeder extends Seeder
                         'display_name' => 'Create Period Closing',
                         'child' => [],
                     ],
+                    [
+                        'name' => 'period_closing.edit',
+                        'display_name' => 'Edit Period Closing',
+                        'child' => [],
+                    ],
                 ],
             ],
             [
@@ -1054,7 +1059,13 @@ class PermissionSeeder extends Seeder
             [
                 'name' => 'user',
                 'display_name' => 'User',
-                'child' => [],
+                'child' => [
+                    [
+                        'name' => 'user.edit',
+                        'display_name' => 'Edit User',
+                        'child' => [],
+                    ],
+                ],
             ],
             [
                 'name' => 'admin_setting',

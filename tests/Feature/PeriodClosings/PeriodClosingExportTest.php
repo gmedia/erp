@@ -9,7 +9,7 @@ use function Pest\Laravel\postJson;
 uses(RefreshDatabase::class)->group('period-closings');
 
 test('it exports period closings to xlsx', function () {
-    Sanctum::actingAs(createTestUserWithPermissions(['period_closing']), ['*']);
+    Sanctum::actingAs(createTestUserWithPermissions(['period_closing', 'period_closing.edit']), ['*']);
     PeriodClosing::factory()->count(2)->create();
 
     $response = postJson('/api/period-closings/export', [])->assertOk()->assertJsonStructure(['url', 'filename']);

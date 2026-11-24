@@ -24,7 +24,9 @@ Route::middleware('permission:employee,true')->group(function () {
 
 Route::middleware('permission:user,true')->group(function () {
     Route::get('employees/{employee}/permissions', [EmployeeController::class, 'permissions']);
-    Route::post('employees/{employee}/permissions', [EmployeeController::class, 'syncPermissions']);
+    Route::post('employees/{employee}/permissions', [EmployeeController::class, 'syncPermissions'])
+        ->middleware('permission:user.edit,true');
     Route::get('employees/{employee}/user', [UserController::class, 'getUserByEmployee']);
-    Route::post('employees/{employee}/user', [UserController::class, 'updateUser']);
+    Route::post('employees/{employee}/user', [UserController::class, 'updateUser'])
+        ->middleware('permission:user.edit,true');
 });
