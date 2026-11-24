@@ -84,12 +84,43 @@ test('index supports search and filters', function () {
         ->assertJsonCount(1, 'data');
 });
 
+test('store rejects allocation whose bill belongs to another supplier', function () {
+    $supplier = Supplier::factory()->create();
+    $otherSupplier = Supplier::factory()->create();
+    $bankAccount = Account::factory()->create(['type' => 'asset']);
+    $foreignBill = SupplierBill::factory()->confirmed()->create(['supplier_id' => $otherSupplier->id]);
+
+    $payload = [
+        'supplier_id' => $supplier->id,
+        'branch_id' => Branch::factory()->create()->id,
+        'fiscal_year_id' => FiscalYear::factory()->create()->id,
+        'payment_date' => '2026-03-05',
+        'payment_method' => 'bank_transfer',
+        'bank_account_id' => $bankAccount->id,
+        'currency' => 'IDR',
+        'total_amount' => 1000,
+        'status' => 'draft',
+        'allocations' => [
+            [
+                'supplier_bill_id' => $foreignBill->id,
+                'allocated_amount' => 1000,
+            ],
+        ],
+    ];
+
+    postJson('/api/ap-payments', $payload)
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['allocations.0.supplier_bill_id']);
+
+    assertDatabaseMissing('ap_payment_allocations', ['supplier_bill_id' => $foreignBill->id]);
+});
+
 test('store creates ap payment with allocations', function () {
     $supplier = Supplier::factory()->create();
     $branch = Branch::factory()->create();
     $fiscalYear = FiscalYear::factory()->create();
     $bankAccount = Account::factory()->create(['type' => 'asset']);
-    $supplierBill = SupplierBill::factory()->confirmed()->create();
+    $supplierBill = SupplierBill::factory()->confirmed()->create(['supplier_id' => $supplier->id]);
 
     $allocationAmount = (int) $supplierBill->grand_total;
 

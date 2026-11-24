@@ -139,12 +139,29 @@ test.describe('Supplier Returns Module', () => {
             name: /Add New Supplier Return/i,
         });
         await supplierReturnDialog
+            .getByRole('combobox', { name: 'Goods Receipt' })
+            .click();
+        await page
+            .getByRole('dialog')
+            .last()
+            .getByRole('listitem')
+            .first()
+            .getByRole('button')
+            .click();
+        await supplierReturnDialog
             .getByRole('button', { name: /Add Item/i })
             .click();
 
         const itemDialog = page.getByRole('dialog', { name: /^Add Item$/i });
 
-        await itemDialog.getByLabel('GR Item ID').fill('1');
+        await itemDialog.getByRole('combobox', { name: 'GR Item' }).click();
+        await page
+            .getByRole('dialog')
+            .last()
+            .getByRole('listitem')
+            .first()
+            .getByRole('button')
+            .click();
         await selectAsyncOption(page, itemDialog, 'Product', product.name);
         await selectAsyncOption(page, itemDialog, 'Unit', unit.name);
         await itemDialog.getByLabel('Quantity Returned').fill('2');
@@ -207,6 +224,8 @@ test.describe('Supplier Returns Module', () => {
         await expect(
             itemDialog.getByRole('combobox', { name: 'Unit' }),
         ).toContainText(unit.name);
-        await expect(itemDialog.getByLabel('GR Item ID')).not.toHaveValue('');
+        await expect(
+            itemDialog.getByRole('combobox', { name: 'GR Item' }),
+        ).not.toContainText('Select GR item');
     });
 });

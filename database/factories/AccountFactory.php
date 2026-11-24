@@ -36,4 +36,14 @@ class AccountFactory extends Factory
             'description' => $this->faker->sentence(),
         ];
     }
+
+    /**
+     * Akun dari COA aktif (syarat akun bisa diposting).
+     */
+    public function inActiveCoa(): static
+    {
+        return $this->state(fn (): array => [
+            'coa_version_id' => CoaVersion::factory()->state(['status' => 'active']),
+        ]);
+    }
 }

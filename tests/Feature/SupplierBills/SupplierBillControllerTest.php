@@ -93,7 +93,7 @@ test('store creates supplier bill with items', function () {
     $fiscalYear = FiscalYear::factory()->create();
     $product = Product::factory()->create();
     $unit = Unit::factory()->create();
-    $account = Account::factory()->create();
+    $account = Account::factory()->inActiveCoa()->create();
 
     $payload = [
         'supplier_id' => $supplier->id,

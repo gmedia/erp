@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\AccountingPosting\PostGoodsReceiptJournalAction;
 use App\Actions\GoodsReceipts\ExportGoodsReceiptsAction;
 use App\Actions\GoodsReceipts\IndexGoodsReceiptsAction;
+use App\Actions\GoodsReceipts\ListGoodsReceiptItemOptionsAction;
 use App\Actions\GoodsReceipts\PostGoodsReceiptMovementsAction;
 use App\Actions\GoodsReceipts\SyncGoodsReceiptItemsAction;
 use App\DTOs\GoodsReceipts\UpdateGoodsReceiptData;
@@ -20,6 +21,7 @@ use App\Models\GoodsReceipt;
 use App\Services\PurchaseOrderReceiptService;
 use App\Services\StockPostingService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -164,6 +166,19 @@ class GoodsReceiptController extends Controller
     public function destroy(GoodsReceipt $goodsReceipt): JsonResponse
     {
         return $this->destroyModel($goodsReceipt);
+    }
+
+    public function itemOptions(
+        GoodsReceipt $goodsReceipt,
+        ListGoodsReceiptItemOptionsAction $action,
+        Request $request,
+    ): JsonResponse {
+        return response()->json(['data' => $action->execute(
+            $goodsReceipt,
+            $request->string('search')->toString() ?: null,
+            $request->integer('current_line_id') ?: null,
+            $request->integer('supplier_return_id') ?: null,
+        )]);
     }
 
     public function export(ExportGoodsReceiptRequest $request, ExportGoodsReceiptsAction $action): JsonResponse

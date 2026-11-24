@@ -20,6 +20,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Form } from '@/components/ui/form';
+import { useTranslation } from '@/contexts/i18n-context';
 
 interface ItemFormDialogShellProps<TFormValues extends FieldValues> {
     readonly open: boolean;
@@ -164,6 +165,57 @@ export function ItemUnitSelectField<TFormValues extends FieldValues>(
     props: Readonly<ItemEntitySelectFieldProps<TFormValues>>,
 ) {
     return <ItemProductSelectField {...props} />;
+}
+
+const ITEM_ACCOUNT_URL = '/api/accounts?is_active=1&has_children=0';
+
+interface ItemAccountOption {
+    id: number | string;
+    code: string;
+    name: string;
+}
+
+interface ItemAccountSelectFieldProps<TFormValues extends FieldValues> {
+    readonly form: UseFormReturn<TFormValues>;
+    readonly open: boolean;
+    readonly name: Path<TFormValues>;
+    readonly labelName: Path<TFormValues>;
+    readonly initialId?: string;
+    readonly initialLabel?: string;
+}
+
+export function ItemAccountSelectField<TFormValues extends FieldValues>({
+    form,
+    open,
+    name,
+    labelName,
+    initialId,
+    initialLabel,
+}: Readonly<ItemAccountSelectFieldProps<TFormValues>>) {
+    const { t } = useTranslation();
+
+    return (
+        <AsyncSelectField<ItemAccountOption>
+            key={buildAsyncFieldKey(String(name), initialId, open)}
+            name={String(name)}
+            label={t('itemForm.account')}
+            url={ITEM_ACCOUNT_URL}
+            placeholder={t('itemForm.account_placeholder')}
+            labelFn={(account) => `${account.code} - ${account.name}`}
+            valueFn={(account) => String(account.id)}
+            initialLabel={initialLabel}
+            onItemSelect={(account) => {
+                form.setValue(
+                    labelName,
+                    (account?.name || '') as PathValue<
+                        TFormValues,
+                        typeof labelName
+                    >,
+                    { shouldDirty: true },
+                );
+            }}
+        />
+    );
 }
 
 export function ItemProductUnitFields<TFormValues extends FieldValues>({
