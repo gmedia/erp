@@ -92,10 +92,12 @@ class CustomerInvoiceController extends Controller
         $items = $validated['items'] ?? null;
         unset($validated['items']);
 
-        if (($validated['status'] ?? null) === 'cancelled' && $customerInvoice->journal_entry_id !== null) {
+        $isPostedCancel = in_array($validated['status'] ?? null, ['cancelled', 'void'], true);
+
+        if ($isPostedCancel && $customerInvoice->journal_entry_id !== null) {
             $this->cancelPostedDocument(
                 document: $customerInvoice,
-                attributes: array_merge($validated, ['status' => 'cancelled']),
+                attributes: $validated,
                 blockers: [
                     [
                         static fn (CustomerInvoice $invoice): bool => $invoice->receiptAllocations()
