@@ -369,6 +369,16 @@ Temuan terbuka dari screenshot:
 - `users` 390: email tidak terlihat di viewport; tombol edit nonaktif sudah ada keterangannya.
 - `pipeline-audit-trail`: badge PO/PR sudah pill; `Posted`/`Disposed`/`Lost` belum muncul di data screenshot.
 
+### Status W7-15/16/17 #345 (2026-11-24, langkah 8c)
+
+Seed segar (`migrate:fresh --seed`) lalu `db:seed` kedua berhasil. Pest `DemoDataIntegrityTest` + `DemoSeederPreservesUserDataTest` hijau (62 passed). Screenshot 23 route × light/dark × desktop/mobile di `~/.erp-agent/shots345` (di luar repo). Verifikasi visual per gambar belum bisa dilakukan di sesi ini; status di bawah berdasar query DB dan test.
+
+| ID | Status | Bukti | Sisa |
+|----|--------|-------|------|
+| W7-15 | partial | Gaji karyawan dan anggaran tidak diverifikasi ulang di sesi ini (kolom gaji tidak ada di `employees`). Email jabatan pada nama orang: 0 baris. `Admin User` sebagai karyawan: 1 baris (`EMP-000002`, `admin@example.com`, akun seed). | Verifikasi gaji/anggaran/rekonsiliasi/recurring/stocktake dari screenshot; `Admin User` sebagai karyawan belum dihapus; dominasi HR (W6-16) belum dicek. |
+| W7-16 | partial | Self-approval (`submitted_by` = `actor_user_id` pada `approved`): 0. `pipeline_state_logs` 68 baris, 26 hari berbeda; PO entity 8 punya 5 transisi. | Timestamp audit trail belum divalidasi visual; approval-flows vs approval Oktober belum dicek. |
+| W7-17 | partial | Test i18n dan Indonesian label (4 test W7-17) hijau. | Sequence `-000001`, kode akun `1999-IBC`, kode asset-location unik per cabang, mapping supplier–kategori produk, `Created At` kosong, dan email/telepon supplier belum dikerjakan. |
+
 ### Screenshot #370 langkah 7 (2026-11-24)
 
 Tujuh dialog item/alokasi dengan select terbuka (Customer Invoice item, Credit Note item, Supplier Bill item, AR Receipt alokasi, AP Payment alokasi, GR item, SR item) diambil light/dark x 1440/390: 28 berkas di `~/.erp-agent/shots370` (di luar repo, tidak di-commit). Tema dipaksa lewat `localStorage.appearance` dan kelas `dark` diverifikasi per berkas. Pada sampel visual, select terbuka dan pilihan berlabel terlihat (akun COA, nomor invoice/bill dengan sisa tagihan, baris PO/GR). Alokasi AR/AP hanya menampilkan pilihan setelah customer/supplier induk dipilih; daftar kosong bila pihak tidak punya dokumen terbuka.
