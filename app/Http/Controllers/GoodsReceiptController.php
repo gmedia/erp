@@ -37,19 +37,27 @@ class GoodsReceiptController extends Controller
         return (new GoodsReceiptCollection($goodsReceipts))->response();
     }
 
-    public function store(StoreGoodsReceiptRequest $request, SyncGoodsReceiptItemsAction $syncItems): JsonResponse
-    {
+    public function store(
+        StoreGoodsReceiptRequest $request,
+        SyncGoodsReceiptItemsAction $syncItems,
+        PostGoodsReceiptJournalAction $postJournal,
+        PostGoodsReceiptMovementsAction $postMovements,
+    ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'];
         unset($validated['items']);
 
         $validated['created_by'] = Auth::id();
 
-        if (($validated['status'] ?? null) === 'confirmed') {
+        $isConfirmedOnCreate = ($validated['status'] ?? null) === 'confirmed';
+
+        if ($isConfirmedOnCreate) {
             $validated['confirmed_by'] = Auth::id();
             $validated['confirmed_at'] = now()->toIso8601String();
         }
 
+        // Issue #367: GR yang dibuat langsung confirmed harus membentuk stok dan jurnal
+        // dalam transaksi yang sama. Kegagalan posting ikut membatalkan dokumen.
         $goodsReceipt = $this->storeWithSyncedItems(
             attributes: $validated,
             items: $items,
@@ -60,6 +68,12 @@ class GoodsReceiptController extends Controller
             syncItems: function (GoodsReceipt $goodsReceipt, array $items) use ($syncItems): void {
                 $syncItems->execute($goodsReceipt, $items);
             },
+            afterCommit: $isConfirmedOnCreate
+                ? function (GoodsReceipt $goodsReceipt) use ($postJournal, $postMovements): void {
+                    $postJournal->execute($goodsReceipt->refresh());
+                    $postMovements->execute($goodsReceipt->refresh());
+                }
+            : null,
         );
 
         return (new GoodsReceiptResource($this->loadResourceRelations($goodsReceipt)))->response()->setStatusCode(201);
