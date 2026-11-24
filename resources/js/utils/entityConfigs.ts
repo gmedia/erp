@@ -296,6 +296,7 @@ export const positionConfig = createSimpleEntityConfig({
     description: 'Job titles assignable to employees.',
     apiBase: 'positions',
     filterPlaceholder: 'Search positions...',
+    permissionPrefix: 'position',
 });
 
 export const branchConfig = createSimpleEntityConfig({
@@ -304,6 +305,7 @@ export const branchConfig = createSimpleEntityConfig({
     description: 'Company branches used across transactions and reports.',
     apiBase: 'branches',
     filterPlaceholder: 'Search branches...',
+    permissionPrefix: 'branch',
 });
 
 export const warehouseConfig = createComplexEntityConfig<Warehouse>({
@@ -320,6 +322,7 @@ export const warehouseConfig = createComplexEntityConfig<Warehouse>({
     formComponent: WarehouseForm,
     formType: 'complex',
     entityNameForSearch: 'warehouse',
+    permissionPrefix: 'warehouse',
     viewModalComponent: WarehouseViewModal,
     getDeleteMessage: (item: { name?: string; code?: string }) =>
         `This action cannot be undone. This will permanently delete warehouse ${item.code} (${item.name}).`,
@@ -346,6 +349,7 @@ export const employeeConfig = createComplexEntityConfig({
     formComponent: EmployeeForm,
     formType: 'complex',
     entityNameForSearch: 'employee',
+    permissionPrefix: 'employee',
     viewModalComponent: EmployeeViewModal,
     getDeleteMessage: (employee: { name?: string }) =>
         `This action cannot be undone. This will permanently delete ${employee.name}'s employee record.`,
@@ -371,6 +375,7 @@ export const customerConfig = createComplexEntityConfig({
     formComponent: CustomerForm,
     formType: 'complex',
     entityNameForSearch: 'customer',
+    permissionPrefix: 'customer',
     viewModalComponent: CustomerViewModal,
     getDeleteMessage: (customer: { name?: string }) =>
         `This action cannot be undone. This will permanently delete ${customer.name}'s customer record.`,
@@ -396,6 +401,7 @@ export const supplierConfig = createComplexEntityConfig({
     formComponent: SupplierForm,
     formType: 'complex',
     entityNameForSearch: 'supplier',
+    permissionPrefix: 'supplier',
     viewModalComponent: SupplierViewModal,
     getDeleteMessage: (supplier: { name?: string }) =>
         `This action cannot be undone. This will permanently delete ${supplier.name}'s supplier record.`,
@@ -625,6 +631,7 @@ export const supplierCategoryConfig = createSimpleEntityConfig({
     description: 'Categories used to group suppliers.',
     apiBase: 'supplier-categories',
     filterPlaceholder: 'Search supplier categories...',
+    permissionPrefix: 'supplier_category',
 });
 
 export const customerCategoryConfig = createSimpleEntityConfig({
@@ -633,6 +640,7 @@ export const customerCategoryConfig = createSimpleEntityConfig({
     description: 'Categories used to group customers.',
     apiBase: 'customer-categories',
     filterPlaceholder: 'Search customer categories...',
+    permissionPrefix: 'customer_category',
 });
 
 export const assetCategoryConfig = createComplexEntityConfig<AssetCategory>({
@@ -649,6 +657,7 @@ export const assetCategoryConfig = createComplexEntityConfig<AssetCategory>({
     formComponent: AssetCategoryForm,
     formType: 'complex',
     entityNameForSearch: 'asset category',
+    permissionPrefix: 'asset_category',
     viewModalComponent: AssetCategoryViewModal,
     getDeleteMessage: createGenericDeleteMessage('Asset Category'),
 });
@@ -672,6 +681,7 @@ export const productCategoryConfig = createComplexEntityConfig<ProductCategory>(
         formComponent: ProductCategoryForm,
         formType: 'complex',
         entityNameForSearch: 'product category',
+        permissionPrefix: 'product_category',
         viewModalComponent: ProductCategoryViewModal,
         getDeleteMessage: createGenericDeleteMessage('Product Category'),
     },
@@ -691,6 +701,7 @@ export const unitConfig = createComplexEntityConfig<Unit>({
     formComponent: UnitForm,
     formType: 'complex',
     entityNameForSearch: 'unit',
+    permissionPrefix: 'unit',
     viewModalComponent: UnitViewModal,
     getDeleteMessage: createGenericDeleteMessage('Unit'),
 });
@@ -717,6 +728,7 @@ export const productConfig = createComplexEntityConfig({
     formComponent: ProductForm,
     formType: 'complex',
     entityNameForSearch: 'product',
+    permissionPrefix: 'product',
     viewModalComponent: ProductViewModal,
     getDeleteMessage: (product: { name?: string }) =>
         `This action cannot be undone. This will permanently delete ${product.name}'s product record.`,
