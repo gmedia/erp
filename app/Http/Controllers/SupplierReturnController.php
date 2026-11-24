@@ -71,8 +71,16 @@ class SupplierReturnController extends Controller
             assignDocumentNumber: function (SupplierReturn $supplierReturn): void {
                 $this->assignSequentialDocumentNumber($supplierReturn, 'return_number', 'SR');
             },
-            syncItems: function (SupplierReturn $supplierReturn, array $items) use ($syncItems, $overReturn): void {
-                $overReturn->execute($items);
+            syncItems: function (SupplierReturn $supplierReturn, array $items) use (
+                $syncItems,
+                $overReturn,
+                $isConfirmedOnCreate,
+            ): void {
+                // Butir 4: draft tidak mengikat kuota; dicek ulang saat konfirmasi.
+                if ($isConfirmedOnCreate) {
+                    $overReturn->execute($items);
+                }
+
                 $syncItems->execute($supplierReturn, $items);
             },
             afterCommit: $isConfirmedOnCreate
@@ -175,23 +183,56 @@ class SupplierReturnController extends Controller
             $validated['confirmed_at'] = now()->toIso8601String();
         }
 
-        $this->updateWithSyncedItems(
-            model: $supplierReturn,
-            attributes: $validated,
-            items: $items,
-            payloadResolver: static function (array $attributes): array {
-                return UpdateSupplierReturnData::fromArray($attributes)->toArray();
-            },
-            syncItems: function (SupplierReturn $supplierReturn, array $items) use ($syncItems, $overReturn): void {
-                $overReturn->execute($items, $supplierReturn->id);
-                $syncItems->execute($supplierReturn, $items);
-            },
-            afterCommit: $isNewlyConfirmed
-                ? function (SupplierReturn $supplierReturn) use ($postJournal, $postMovements, $stockPosting): void {
-                    $this->postConfirmedReturn($supplierReturn, $postJournal, $postMovements, $stockPosting);
-                }
-            : null,
-        );
+        // Butir 1 review: konfirmasi yang hanya membawa status dicek terhadap item tersimpan,
+        // di dalam transaksi dengan lock baris GR (sama seperti jalur items).
+        $confirmsWithoutItems = $isNewlyConfirmed && $items === null;
+
+        DB::transaction(function () use (
+            $supplierReturn,
+            $validated,
+            $items,
+            $nextStatus,
+            $confirmsWithoutItems,
+            $isNewlyConfirmed,
+            $overReturn,
+            $syncItems,
+            $postJournal,
+            $postMovements,
+            $stockPosting,
+        ): void {
+            if ($confirmsWithoutItems) {
+                $overReturn->execute($supplierReturn->items()->get()->toArray(), $supplierReturn->id);
+            }
+
+            $this->updateWithSyncedItems(
+                model: $supplierReturn,
+                attributes: $validated,
+                items: $items,
+                payloadResolver: static function (array $attributes): array {
+                    return UpdateSupplierReturnData::fromArray($attributes)->toArray();
+                },
+                syncItems: function (SupplierReturn $supplierReturn, array $items) use (
+                    $syncItems,
+                    $overReturn,
+                    $nextStatus,
+                ): void {
+                    if ($nextStatus === 'confirmed') {
+                        $overReturn->execute($items, $supplierReturn->id);
+                    }
+
+                    $syncItems->execute($supplierReturn, $items);
+                },
+                afterCommit: $isNewlyConfirmed
+                    ? function (SupplierReturn $supplierReturn) use (
+                        $postJournal,
+                        $postMovements,
+                        $stockPosting,
+                    ): void {
+                        $this->postConfirmedReturn($supplierReturn, $postJournal, $postMovements, $stockPosting);
+                    }
+                : null,
+            );
+        });
 
         $supplierReturn->load([
             'purchaseOrder',

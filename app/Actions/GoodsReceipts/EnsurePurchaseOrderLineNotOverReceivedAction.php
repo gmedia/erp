@@ -16,10 +16,16 @@ use Illuminate\Validation\ValidationException;
 class EnsurePurchaseOrderLineNotOverReceivedAction
 {
     /**
-     * @param  array<int, array<string, mixed>>  $items
+     * Butir 2 dan 3: qty yang dihitung adalah quantity_accepted, dijumlahkan per baris PO
+     * (beberapa baris GR untuk satu baris PO tidak boleh lolos satu per satu).
+     *
+     * @param  array<int, array<string, mixed>>  $items  item GR yang akan dikonfirmasi
      */
     public function execute(int $purchaseOrderId, array $items, ?int $excludeGoodsReceiptId = null): void
     {
+        $incomingByLine = [];
+        $indexByLine = [];
+
         foreach ($items as $index => $item) {
             $lineId = (int) ($item['purchase_order_item_id'] ?? 0);
 
@@ -27,6 +33,11 @@ class EnsurePurchaseOrderLineNotOverReceivedAction
                 continue;
             }
 
+            $incomingByLine[$lineId] = ($incomingByLine[$lineId] ?? 0.0) + (float) ($item['quantity_accepted'] ?? 0);
+            $indexByLine[$lineId] ??= $index;
+        }
+
+        foreach ($incomingByLine as $lineId => $incoming) {
             $line = PurchaseOrderItem::query()
                 ->whereKey($lineId)
                 ->where('purchase_order_id', $purchaseOrderId)
@@ -46,14 +57,14 @@ class EnsurePurchaseOrderLineNotOverReceivedAction
                         $query->whereKeyNot($excludeGoodsReceiptId);
                     }
                 })
-                ->sum('quantity_received');
-
-            $incoming = (float) ($item['quantity_received'] ?? 0);
+                ->sum('quantity_accepted');
 
             if ($alreadyReceived + $incoming > (float) $line->quantity + 0.00001) {
                 throw ValidationException::withMessages([
-                    "items.{$index}.quantity_received" => [__('goods_receipt.received_exceeds_po_quantity')],
-                ]);
+                    'items.' . $indexByLine[$lineId] . '.quantity_received' => [
+                        __('goods_receipt.received_exceeds_po_quantity'),
+                    ],
+                ])->status(422);
             }
         }
     }

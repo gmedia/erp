@@ -35,19 +35,25 @@ class EnsureGoodsReceiptItemNotOverReturnedAction
         }
 
         foreach ($requested as $lineId => $incoming) {
+            // Butir 4: hanya baris GR confirmed; batas memakai quantity_accepted (yang ditolak tidak masuk stok).
             $line = GoodsReceiptItem::query()
                 ->whereKey($lineId)
+                ->whereHas('goodsReceipt', static fn ($query) => $query->where('status', 'confirmed'))
                 ->lockForUpdate()
                 ->first();
 
             if ($line === null) {
-                continue;
+                throw ValidationException::withMessages([
+                    'items.' . $indexByLine[$lineId] . '.goods_receipt_item_id' => [
+                        __('supplier_return.returned_exceeds_received'),
+                    ],
+                ])->status(422);
             }
 
             $alreadyReturned = (float) SupplierReturnItem::query()
                 ->where('goods_receipt_item_id', $lineId)
                 ->whereHas('supplierReturn', function ($query) use ($excludeSupplierReturnId): void {
-                    $query->where('status', '!=', 'cancelled');
+                    $query->where('status', 'confirmed');
 
                     if ($excludeSupplierReturnId !== null) {
                         $query->whereKeyNot($excludeSupplierReturnId);
@@ -55,7 +61,7 @@ class EnsureGoodsReceiptItemNotOverReturnedAction
                 })
                 ->sum('quantity_returned');
 
-            if ($alreadyReturned + $incoming > (float) $line->quantity_received + 0.00001) {
+            if ($alreadyReturned + $incoming > (float) $line->quantity_accepted + 0.00001) {
                 throw ValidationException::withMessages([
                     'items.' . $indexByLine[$lineId] . '.quantity_returned' => [
                         __('supplier_return.returned_exceeds_received'),

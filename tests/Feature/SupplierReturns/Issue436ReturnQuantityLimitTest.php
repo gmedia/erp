@@ -1,12 +1,14 @@
 <?php
 
+use App\Models\Account;
+use App\Models\CoaVersion;
+use App\Models\FiscalYear;
 use App\Models\GoodsReceipt;
 use App\Models\GoodsReceiptItem;
-use App\Models\Product;
 use App\Models\PurchaseOrder;
+use App\Models\StockMovement;
 use App\Models\SupplierReturn;
 use App\Models\Unit;
-use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 
@@ -26,6 +28,30 @@ beforeEach(function () {
         'supplier_return.edit',
     ]);
     Sanctum::actingAs($user, ['*']);
+
+    // Retur confirmed memposting jurnal: butuh periode dan COA aktif (2026-03-06).
+    FiscalYear::factory()->create([
+        'name' => '2026',
+        'start_date' => '2026-01-01',
+        'end_date' => '2026-12-31',
+        'status' => 'open',
+    ]);
+
+    $coaVersion = CoaVersion::factory()->create(['status' => 'active']);
+
+    foreach ([
+        ['11300', 'Persediaan', 'asset', 'debit'],
+        ['21150', 'Barang Diterima Belum Ditagih', 'liability', 'credit'],
+    ] as [$code, $name, $type, $normal]) {
+        Account::factory()->create([
+            'coa_version_id' => $coaVersion->id,
+            'code' => $code,
+            'name' => $name,
+            'type' => $type,
+            'normal_balance' => $normal,
+            'is_active' => true,
+        ]);
+    }
 });
 
 /**
@@ -33,12 +59,26 @@ beforeEach(function () {
  */
 function issue436ReturnableLine(float $received): array
 {
-    $goodsReceipt = GoodsReceipt::factory()->create();
+    // Retur hanya boleh untuk baris GR confirmed (butir 4). Factory memilih status acak, jadi dipaksa.
+    $goodsReceipt = GoodsReceipt::factory()->create(['status' => 'confirmed']);
     $line = GoodsReceiptItem::factory()->create([
         'goods_receipt_id' => $goodsReceipt->id,
         'quantity_received' => $received,
         'quantity_accepted' => $received,
         'quantity_rejected' => 0,
+    ]);
+
+    // Stok masuk sah dari penerimaan, supaya konfirmasi retur tidak membuat saldo negatif (#356).
+    StockMovement::factory()->create([
+        'movement_type' => 'goods_receipt',
+        'reference_type' => GoodsReceipt::class,
+        'reference_id' => $goodsReceipt->id,
+        'product_id' => $line->product_id,
+        'warehouse_id' => $goodsReceipt->warehouse_id,
+        'quantity_in' => $received,
+        'quantity_out' => 0,
+        'balance_after' => $received,
+        'moved_at' => now()->subDay(),
     ]);
 
     return [$goodsReceipt, $line];
@@ -59,7 +99,7 @@ function issue436ReturnPayload(
         'purchase_order_id' => $purchaseOrder->id,
         'goods_receipt_id' => $goodsReceipt->id,
         'supplier_id' => $purchaseOrder->supplier_id,
-        'warehouse_id' => Warehouse::factory()->create()->id,
+        'warehouse_id' => $goodsReceipt->warehouse_id,
         'return_date' => '2026-03-06',
         'reason' => 'defective',
         'status' => $status,
@@ -76,7 +116,7 @@ function issue436ReturnPayload(
 test('retur melebihi qty diterima GR item ditolak 422', function () {
     [$goodsReceipt, $line] = issue436ReturnableLine(10);
 
-    postJson('/api/supplier-returns', issue436ReturnPayload($goodsReceipt, $line, 11))
+    postJson('/api/supplier-returns', issue436ReturnPayload($goodsReceipt, $line, 11, 'confirmed'))
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['items.0.quantity_returned']);
 
@@ -86,10 +126,10 @@ test('retur melebihi qty diterima GR item ditolak 422', function () {
 test('retur kedua untuk GR item yang sama ditolak bila total melampaui qty diterima', function () {
     [$goodsReceipt, $line] = issue436ReturnableLine(10);
 
-    postJson('/api/supplier-returns', issue436ReturnPayload($goodsReceipt, $line, 6))
+    postJson('/api/supplier-returns', issue436ReturnPayload($goodsReceipt, $line, 6, 'confirmed'))
         ->assertCreated();
 
-    postJson('/api/supplier-returns', issue436ReturnPayload($goodsReceipt, $line, 5))
+    postJson('/api/supplier-returns', issue436ReturnPayload($goodsReceipt, $line, 5, 'confirmed'))
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['items.0.quantity_returned']);
 
@@ -99,42 +139,55 @@ test('retur kedua untuk GR item yang sama ditolak bila total melampaui qty diter
 test('retur kedua untuk GR item yang sama diterima bila total tidak melampaui qty diterima', function () {
     [$goodsReceipt, $line] = issue436ReturnableLine(10);
 
-    postJson('/api/supplier-returns', issue436ReturnPayload($goodsReceipt, $line, 6))
+    postJson('/api/supplier-returns', issue436ReturnPayload($goodsReceipt, $line, 6, 'confirmed'))
         ->assertCreated();
 
-    postJson('/api/supplier-returns', issue436ReturnPayload($goodsReceipt, $line, 4))
+    postJson('/api/supplier-returns', issue436ReturnPayload($goodsReceipt, $line, 4, 'confirmed'))
+        ->assertCreated();
+});
+
+test('draft retur tidak mengikat kuota GR item sampai dikonfirmasi', function () {
+    [$goodsReceipt, $line] = issue436ReturnableLine(10);
+
+    postJson('/api/supplier-returns', issue436ReturnPayload($goodsReceipt, $line, 8))
+        ->assertCreated();
+
+    postJson('/api/supplier-returns', issue436ReturnPayload($goodsReceipt, $line, 10, 'confirmed'))
         ->assertCreated();
 });
 
 test('retur cancelled tidak mengurangi sisa qty yang boleh diretur', function () {
     [$goodsReceipt, $line] = issue436ReturnableLine(10);
 
-    $first = postJson('/api/supplier-returns', issue436ReturnPayload($goodsReceipt, $line, 8))
+    $first = postJson('/api/supplier-returns', issue436ReturnPayload($goodsReceipt, $line, 8, 'confirmed'))
         ->assertCreated();
 
     putJson('/api/supplier-returns/' . $first->json('data.id'), ['status' => 'cancelled'])
         ->assertOk();
 
-    postJson('/api/supplier-returns', issue436ReturnPayload($goodsReceipt, $line, 10))
+    postJson('/api/supplier-returns', issue436ReturnPayload($goodsReceipt, $line, 10, 'confirmed'))
         ->assertCreated();
 });
 
-test('edit retur yang menaikkan qty melampaui sisa GR item ditolak 422', function () {
+test('konfirmasi retur draft yang melampaui sisa GR item ditolak 422', function () {
     [$goodsReceipt, $line] = issue436ReturnableLine(10);
 
-    $first = postJson('/api/supplier-returns', issue436ReturnPayload($goodsReceipt, $line, 6))
+    // Draft boleh diedit dan tidak mengikat kuota (butir 4). Retur confirmed 3 sudah mengikat.
+    $draft = postJson('/api/supplier-returns', issue436ReturnPayload($goodsReceipt, $line, 6))
         ->assertCreated();
-    postJson('/api/supplier-returns', issue436ReturnPayload($goodsReceipt, $line, 3))
+    postJson('/api/supplier-returns', issue436ReturnPayload($goodsReceipt, $line, 3, 'confirmed'))
         ->assertCreated();
 
-    // Retur pertama naik 6 -> 8: total 8 + 3 = 11 > 10 harus ditolak.
-    $payload = issue436ReturnPayload($goodsReceipt, $line, 8);
-    unset($payload['purchase_order_id'], $payload['goods_receipt_id'], $payload['supplier_id'], $payload['warehouse_id']);
+    // Draft naik 6 -> 8 lalu dikonfirmasi: 8 + 3 = 11 > 10 harus ditolak saat konfirmasi.
+    $payload = issue436ReturnPayload($goodsReceipt, $line, 8, 'confirmed');
+    unset($payload['purchase_order_id'], $payload['goods_receipt_id']);
+    unset($payload['supplier_id'], $payload['warehouse_id']);
 
-    putJson('/api/supplier-returns/' . $first->json('data.id'), $payload)
+    putJson('/api/supplier-returns/' . $draft->json('data.id'), $payload)
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['items.0.quantity_returned']);
 
-    expect((float) SupplierReturn::query()->findOrFail($first->json('data.id'))->items()->value('quantity_returned'))
+    expect(SupplierReturn::query()->findOrFail($draft->json('data.id'))->status)->toBe('draft');
+    expect((float) SupplierReturn::query()->findOrFail($draft->json('data.id'))->items()->value('quantity_returned'))
         ->toBe(6.0);
 });

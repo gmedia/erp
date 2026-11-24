@@ -179,6 +179,46 @@ test('editing confirmed GR item beyond PO line quantity is rejected with 422', f
     expect($stored->items()->value('quantity_received'))->toEqual(4.0);
 });
 
+test('confirming draft GR with status only is checked against stored items', function () {
+    [$purchaseOrder, $item] = issue436ConfirmedPo(10);
+
+    $draft = postJson('/api/goods-receipts', issue436ReceiptPayload($purchaseOrder, $item, 'draft', 8, 8));
+    $draft->assertStatus(201);
+    postJson('/api/goods-receipts', issue436ReceiptPayload($purchaseOrder, $item, 'confirmed', 8, 8))
+        ->assertStatus(201);
+
+    putJson('/api/goods-receipts/' . $draft->json('data.id'), ['status' => 'confirmed'])
+        ->assertStatus(422)
+        ->assertJsonValidationErrors(['items.0.quantity_received']);
+
+    expect(GoodsReceipt::query()->findOrFail($draft->json('data.id'))->status)->toBe('draft');
+});
+
+test('two lines of one GR for the same PO line are summed against PO quantity', function () {
+    [$purchaseOrder, $item] = issue436ConfirmedPo(10);
+
+    $payload = issue436ReceiptPayload($purchaseOrder, $item, 'confirmed', 6, 6);
+    $payload['items'][] = $payload['items'][0];
+
+    postJson('/api/goods-receipts', $payload)
+        ->assertStatus(422)
+        ->assertJsonValidationErrors(['items.0.quantity_received']);
+
+    expect(GoodsReceipt::query()->where('purchase_order_id', $purchaseOrder->id)->count())->toBe(0);
+});
+
+test('rejected quantity does not count against PO line quantity', function () {
+    [$purchaseOrder, $item] = issue436ConfirmedPo(10);
+
+    // Diterima 10, ditolak 2, diterima baik 8: sah.
+    postJson('/api/goods-receipts', issue436ReceiptPayload($purchaseOrder, $item, 'confirmed', 10, 8, 2))
+        ->assertStatus(201);
+
+    // Dikirim ulang 2 yang ditolak sebelumnya: accepted total 10, masih sah.
+    postJson('/api/goods-receipts', issue436ReceiptPayload($purchaseOrder, $item, 'confirmed', 2, 2))
+        ->assertStatus(201);
+});
+
 test('confirmed GR within PO line quantity is accepted', function () {
     [$purchaseOrder, $item] = issue436ConfirmedPo(10);
 

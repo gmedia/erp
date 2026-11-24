@@ -90,9 +90,11 @@ function createGoodsReceiptItemForSupplierReturn(): array
         'line_total' => 55500,
     ]);
 
+    // Retur hanya untuk GR confirmed (Issue #436 butir 4); factory memilih status acak.
     $goodsReceipt = GoodsReceipt::factory()->create([
         'purchase_order_id' => $purchaseOrder->id,
         'warehouse_id' => $warehouse->id,
+        'status' => 'confirmed',
     ]);
 
     $goodsReceiptItem = $goodsReceipt->items()->create([

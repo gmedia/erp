@@ -190,10 +190,14 @@ class GoodsReceiptController extends Controller
             $purchaseOrderReceipts,
         ): void {
             // GR yang sudah confirmed tetap sah; aturan PO hanya berlaku saat GR baru dikonfirmasi.
+            // Konfirmasi memakai item yang tersimpan bila payload tidak membawa items (butir 1 review).
             if ($isNewlyConfirmed) {
                 $purchaseOrderId = $validated['purchase_order_id'] ?? $goodsReceipt->purchase_order_id;
                 $guardPurchaseOrder->execute((int) $purchaseOrderId);
-                $guardPurchaseOrderLines->execute((int) $purchaseOrderId, $items ?? []);
+                $guardPurchaseOrderLines->execute(
+                    (int) $purchaseOrderId,
+                    is_array($items) ? $items : $goodsReceipt->items()->get()->toArray(),
+                );
             }
 
             // Edit item GR confirmed: qty baru dihitung terhadap GR lain, bukan GR ini (qty lama dibalik).
