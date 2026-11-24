@@ -98,15 +98,16 @@ export async function editBankReconciliation(
     await expect(row).toBeVisible();
 
     await row.getByRole('button').last().click();
+
+    const detailResponse = page.waitForResponse(
+        (r) => r.url().includes('/api/bank-reconciliations/') && r.request().method() === 'GET',
+        { timeout: 15000 },
+    );
     await page.getByRole('menuitem', { name: 'Edit' }).click();
 
     const dialog = page.getByRole('dialog').first();
     await expect(dialog).toBeVisible();
-
-    await page.waitForResponse(
-        (r) => r.url().includes('/api/bank-reconciliations/') && r.request().method() === 'GET',
-        { timeout: 15000 },
-    );
+    await detailResponse;
 
     if (updates.statement_balance) {
         await dialog.locator('input[name="statement_balance"]').fill(updates.statement_balance);

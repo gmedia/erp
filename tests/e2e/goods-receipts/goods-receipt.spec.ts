@@ -84,10 +84,11 @@ test.describe('Goods Receipts Module', () => {
 
     test.beforeEach(async ({ page }) => {
         await login(page, undefined, undefined, { requireDashboard: false });
+        const listResponse = page.waitForResponse(
+            (response) => response.url().includes('/api/goods-receipts') && response.status() < 400,
+        );
         await page.goto('/goods-receipts');
-        await page
-            .waitForResponse((response) => response.url().includes('/api/goods-receipts') && response.status() < 400)
-            ;
+        await listResponse;
     });
 
     test('add dialog starts with empty items and add item opens a dedicated dialog', async ({ page }) => {

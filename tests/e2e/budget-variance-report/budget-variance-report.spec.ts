@@ -120,8 +120,11 @@ test.describe('Budget Variance Report', () => {
             exact: true,
         });
         if (await sortButton.isVisible().catch(() => false)) {
+            const sortResponse = waitForBudgetVarianceReportResponse(page).catch(
+                () => null,
+            );
             await sortButton.click({ force: true });
-            await waitForBudgetVarianceReportResponse(page).catch(() => null);
+            await sortResponse;
             await expect(page.locator('table').first()).toBeVisible();
         }
     });

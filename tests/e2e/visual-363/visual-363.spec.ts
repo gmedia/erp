@@ -10,10 +10,11 @@ test.describe('Visual #363 review fixes', () => {
         page,
     }) => {
         await page.setViewportSize({ width: 390, height: 844 });
-        await page.goto('/users');
-        await page.waitForResponse(
+        const usersResponse = page.waitForResponse(
             (r) => r.url().includes('/api/users') && r.status() < 400,
         );
+        await page.goto('/users');
+        await usersResponse;
 
         const row = page.getByTestId('user-row').first();
         await expect(row).toBeVisible();
@@ -60,12 +61,13 @@ test.describe('Visual #363 review fixes', () => {
     test('ap-payment-history: status Confirmed (final) tidak memakai warning', async ({
         page,
     }) => {
-        await page.goto('/reports/ap-payment-history');
-        await page.waitForResponse(
+        const historyResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/ap-payment-history') &&
                 r.status() < 400,
         );
+        await page.goto('/reports/ap-payment-history');
+        await historyResponse;
         await expect(page.locator('table')).toBeVisible();
 
         const chip = page
@@ -92,8 +94,7 @@ test.describe('Visual #363 review fixes', () => {
 
     test('trial-balance 390: kolom Credit terjangkau', async ({ page }) => {
         await page.setViewportSize({ width: 390, height: 844 });
-        await page.goto('/reports/trial-balance');
-        await page.waitForResponse(
+        const trialBalanceResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/trial-balance') &&
                 r.status() < 400,
@@ -101,6 +102,8 @@ test.describe('Visual #363 review fixes', () => {
                 timeout: 30000,
             },
         );
+        await page.goto('/reports/trial-balance');
+        await trialBalanceResponse;
 
         const creditCell = page
             .locator('table thead th', { hasText: 'Credit' })

@@ -31,12 +31,12 @@ test.describe('Approval History', () => {
 
     // Click on Approvals tab
     const approvalsTab = page.getByRole('tab', { name: /Approvals/i });
-    await approvalsTab.click();
 
-    // Wait for the API response
-    await page.waitForResponse(
+    const approvalsResponse = page.waitForResponse(
         r => r.url().includes('/api/entity-states/asset/') && r.url().includes('/approvals') && r.status() < 400
     );
+    await approvalsTab.click();
+    await approvalsResponse;
 
     // Verify the tab panel is visible
     const tabContent = page.getByRole('tabpanel', { name: /Approvals/i });

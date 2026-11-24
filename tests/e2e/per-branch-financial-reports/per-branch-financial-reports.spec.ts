@@ -44,15 +44,15 @@ test.describe('Per-branch financial report filter', () => {
         test(`${report.name} scopes the report by branch`, async ({ page }) => {
             test.setTimeout(60000);
 
-            await page.goto(report.route);
-
-            await page.waitForResponse(
+            const initialResponse = page.waitForResponse(
                 (r) =>
                     r.url().includes(report.api) &&
                     !r.url().includes('/export') &&
                     r.status() < 400,
                 { timeout: 30000 },
             );
+            await page.goto(report.route);
+            await initialResponse;
 
             const branchSelect = page
                 .getByRole('combobox')

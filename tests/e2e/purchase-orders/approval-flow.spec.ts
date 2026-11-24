@@ -39,12 +39,13 @@ async function selectAsyncOption(
 }
 
 async function openCreateForm(page: Page): Promise<void> {
-    await page.goto('/purchase-orders');
-    await page.waitForResponse(
+    const listResponse = page.waitForResponse(
         (response) =>
             response.url().includes('/api/purchase-orders') &&
             response.status() < 400,
     );
+    await page.goto('/purchase-orders');
+    await listResponse;
     await page.getByRole('button', { name: /^Add$/i }).first().click();
     await expect(
         page.getByRole('dialog', { name: /Add New Purchase Order/i }),
