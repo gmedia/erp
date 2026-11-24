@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Actions\AccountingPosting\PostAssetLossJournalAction;
 use App\Actions\AssetDepreciationRuns\CalculateDepreciationAction;
 use App\Actions\AssetDepreciationRuns\PostDepreciationToJournalAction;
 use App\Models\Account;
@@ -58,6 +59,16 @@ class AssetDepreciationNormalizationSeeder extends Seeder
         }
 
         $this->syncRegisterFromPostedSources();
+
+        // Jurnal aset hilang hanya setelah akumulasi register final. Dipost
+        // lebih awal, akun 12200 tidak ikut didebit (#357, FA-000008).
+        $this->demoAssets()->get()->each(function (Asset $asset): void {
+            $lossJournal = app(PostAssetLossJournalAction::class);
+
+            if ($lossJournal->isPostable($asset)) {
+                $lossJournal->execute($asset);
+            }
+        });
     }
 
     /**

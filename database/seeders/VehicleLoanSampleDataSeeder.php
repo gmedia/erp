@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Actions\AccountingPosting\PostAssetAcquisitionJournalAction;
+use App\Actions\AccountingPosting\ResolveControlAccountAction;
 use App\Models\ApprovalFlow;
 use App\Models\ApprovalFlowStep;
 use App\Models\ApprovalRequest;
@@ -14,6 +15,7 @@ use App\Models\Company;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Employment;
+use App\Models\JournalEntryLine;
 use App\Models\Position;
 use App\Models\Setting;
 use App\Models\User;
@@ -550,6 +552,21 @@ class VehicleLoanSampleDataSeeder extends Seeder
             // Kendaraan dibuat setelah AssetSampleDataSeeder, jadi perolehannya
             // harus dijurnal di sini lewat action (#357).
             app(PostAssetAcquisitionJournalAction::class)->execute($asset);
+
+            // Register awal = saldo opening dari jurnal ACQ (bukan selisih GL).
+            // Kolom book_value default 0 akan membuat run depresiasi melewati
+            // kendaraan ini (#357).
+            $openingAccumulated = (float) JournalEntryLine::query()
+                ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+                ->where('journal_entries.reference', 'ACQ-' . $asset->asset_code)
+                ->where('journal_entries.status', 'posted')
+                ->where('journal_entry_lines.account_id', app(ResolveControlAccountAction::class)->execute('12200')->id)
+                ->sum('journal_entry_lines.credit');
+
+            $asset->forceFill([
+                'accumulated_depreciation' => $openingAccumulated,
+                'book_value' => (float) $asset->purchase_cost - $openingAccumulated,
+            ])->saveQuietly();
 
             // `asset_id` dan `plate_number` sama-sama unik; cocokkan keduanya
             // agar unit lama dengan plat yang sama tidak memicu duplikat.

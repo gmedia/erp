@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Actions\AccountingPosting\PostAssetAcquisitionJournalAction;
-use App\Actions\AccountingPosting\PostAssetLossJournalAction;
 use App\Models\Account;
 use App\Models\ApprovalAuditLog;
 use App\Models\ApprovalFlow;
@@ -524,14 +523,6 @@ class AssetSampleDataSeeder extends Seeder
 
             if ($acquisitionJournal->isPostable($asset)) {
                 $acquisitionJournal->execute($asset);
-            }
-
-            // Aset hilang dijurnal rugi pelepasan lewat action yang sama dengan
-            // jalur transisi pipeline (#357, keputusan 3).
-            $lossJournal = app(PostAssetLossJournalAction::class);
-
-            if ($lossJournal->isPostable($asset)) {
-                $lossJournal->execute($asset);
             }
 
             AssetMovement::updateOrCreate(
