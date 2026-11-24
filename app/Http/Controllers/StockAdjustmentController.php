@@ -78,6 +78,10 @@ class StockAdjustmentController extends Controller
                     $stockPosting->assertNoNegativeStock($this->stockAdjustmentOutflows($adjustment->refresh()));
                     $postJournal->execute($adjustment->refresh());
                     $postMovements->execute($adjustment->refresh());
+                    $stockPosting->assertNoNegativeStockFrom(
+                        $this->stockAdjustmentOutflows($adjustment->refresh()),
+                        $adjustment->adjustment_date->copy()->startOfDay(),
+                    );
                 }
             : null,
         );
@@ -174,6 +178,10 @@ class StockAdjustmentController extends Controller
                     $stockPosting->assertNoNegativeStock($this->stockAdjustmentOutflows($stockAdjustment->refresh()));
                     $postJournal->execute($stockAdjustment->refresh());
                     $postMovements->execute($stockAdjustment->refresh());
+                    $stockPosting->assertNoNegativeStockFrom(
+                        $this->stockAdjustmentOutflows($stockAdjustment->refresh()),
+                        $stockAdjustment->adjustment_date->copy()->startOfDay(),
+                    );
                 }
             : null,
         );
@@ -244,9 +252,6 @@ class StockAdjustmentController extends Controller
                 },
             );
 
-            // Issue #436 butir 5: cek stok keluar dilakukan setelah pembalik dan repost sudah
-            // dihitung ulang, sehingga balance_after yang dibaca sudah mencerminkan dokumen ini.
-            $stockPosting->assertNoNegativeStock($this->stockAdjustmentOutflows($stockAdjustment->refresh()));
         });
     }
 }

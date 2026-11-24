@@ -46,7 +46,7 @@ beforeEach(function () {
  *
  * @return array{0: Warehouse, 1: Product, 2: Unit}
  */
-function issue436StockWithBalance(float $quantity): array
+function issue436StockWithBalance(float $quantity, ?string $inboundDate = null): array
 {
     $warehouse = Warehouse::factory()->create();
     $product = Product::factory()->create();
@@ -55,6 +55,7 @@ function issue436StockWithBalance(float $quantity): array
     $inbound = StockAdjustment::factory()->create([
         'warehouse_id' => $warehouse->id,
         'status' => 'approved',
+        'adjustment_date' => $inboundDate ?? now()->toDateString(),
     ]);
     StockAdjustmentItem::factory()->create([
         'stock_adjustment_id' => $inbound->id,
@@ -138,6 +139,50 @@ test('approve lewat PUT penyesuaian keluar melebihi stok ditolak 422 dan tidak m
         ->where('reference_type', StockAdjustment::class)
         ->where('reference_id', $adjustmentId)
         ->count())->toBe(0);
+});
+
+test('edit approved penyesuaian keluar yang valid tidak dihitung dua kali (review #444 butir 1)', function () {
+    // Stok 5 + masuk 5 = 10, keluar 8 disetujui -> sisa 2. Edit keluar menjadi 6 harus
+    // lolos (tersedia 10 setelah pembalik, perlu 6), bukan dihitung ganda menjadi 422.
+    [$warehouse, $product, $unit] = issue436StockWithBalance(10);
+
+    $response = postJson('/api/stock-adjustments', issue436OutflowPayload($warehouse, $product, $unit, -8))
+        ->assertStatus(201);
+    $adjustmentId = $response->json('data.id');
+
+    putJson('/api/stock-adjustments/' . $adjustmentId, [
+        'items' => [[
+            'product_id' => $product->id,
+            'unit_id' => $unit->id,
+            'quantity_before' => 10,
+            'quantity_adjusted' => -6,
+            'unit_cost' => 1000,
+        ]],
+    ])->assertOk();
+
+    expect((float) StockMovement::query()
+        ->where('product_id', $product->id)
+        ->where('warehouse_id', $warehouse->id)
+        ->orderByDesc('moved_at')
+        ->orderByDesc('id')
+        ->value('balance_after'))
+        ->toBe(4.0);
+});
+
+test('keluar bertanggal mundur ditolak bila saldo berjalan sejak tanggal dokumen negatif', function () {
+    // Masuk 10 pada hari ini-3, lalu keluar 5 bertanggal hari ini-8 (sebelum masuk):
+    // saldo berjalan pada tanggal keluar = -5 walau saldo akhir = 5.
+    [$warehouse, $product, $unit] = issue436StockWithBalance(10, now()->subDays(3)->toDateString());
+
+    $payload = issue436OutflowPayload($warehouse, $product, $unit, -5);
+    $payload['adjustment_date'] = now()->subDays(8)->toDateString();
+
+    postJson('/api/stock-adjustments', $payload)->assertStatus(422);
+
+    expect(StockAdjustment::query()
+        ->where('warehouse_id', $warehouse->id)
+        ->where('status', 'approved')
+        ->count())->toBe(1);
 });
 
 test('edit approved penyesuaian keluar yang membuat saldo negatif ditolak 422 dan saldo tetap', function () {

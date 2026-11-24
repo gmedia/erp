@@ -109,6 +109,8 @@ function makeSrSaPostOnCreateFixture(): array
     ]);
 
     // Stok masuk sah agar retur confirmed tidak membuat saldo negatif (#356).
+    // Tanggal masuk harus mendahului tanggal penyesuaian keluar di saPostOnCreatePayload
+    // (review #444 butir 2: saldo berjalan sejak tanggal dokumen ikut dicek).
     StockMovement::factory()->create([
         'movement_type' => 'goods_receipt',
         'reference_type' => GoodsReceipt::class,
@@ -118,7 +120,7 @@ function makeSrSaPostOnCreateFixture(): array
         'quantity_in' => 5,
         'quantity_out' => 0,
         'balance_after' => 5,
-        'moved_at' => now()->subDay(),
+        'moved_at' => '2026-03-01 00:00:00',
     ]);
 
     return [

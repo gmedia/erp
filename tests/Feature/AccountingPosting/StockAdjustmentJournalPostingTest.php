@@ -8,6 +8,7 @@ use App\Models\JournalEntry;
 use App\Models\StockAdjustment;
 use App\Models\StockAdjustmentItem;
 use App\Models\User;
+use App\Services\StockPostingService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\Sanctum;
@@ -58,6 +59,31 @@ function makeStockAdjPostingAccounts(): array
         'inventory' => $inventoryAccount,
         'expense' => $expenseAccount,
     ];
+}
+
+/**
+ * Stok masuk sah (penyesuaian approved, tanggal lebih awal) agar penyesuaian keluar
+ * tidak ditolak karena stok negatif (review #444 butir 2 & #436 butir 3).
+ */
+function stockAdjPostingSeedStock(StockAdjustment $target, int $productId, float $quantity): void
+{
+    $inbound = StockAdjustment::factory()->create([
+        'warehouse_id' => $target->warehouse_id,
+        'status' => 'approved',
+        'adjustment_date' => '2026-03-01',
+        'journal_entry_id' => null,
+        'inventory_stocktake_id' => null,
+    ]);
+
+    StockAdjustmentItem::factory()->create([
+        'stock_adjustment_id' => $inbound->id,
+        'product_id' => $productId,
+        'quantity_adjusted' => $quantity,
+        'unit_cost' => 1000,
+        'total_cost' => $quantity * 1000,
+    ]);
+
+    app(StockPostingService::class)->postStockAdjustment($inbound->refresh());
 }
 
 test('PostStockAdjustmentJournalAction creates a balanced posted journal entry for negative adjustment', function () {
@@ -276,12 +302,14 @@ test('StockAdjustmentController update triggers journal posting on approve trans
         'approved_at' => null,
     ]);
 
-    StockAdjustmentItem::factory()->create([
+    $outflowItem = StockAdjustmentItem::factory()->create([
         'stock_adjustment_id' => $adjustment->id,
         'quantity_adjusted' => -20,
         'unit_cost' => 25000,
         'total_cost' => 500000,
     ]);
+
+    stockAdjPostingSeedStock($adjustment, $outflowItem->product_id, 50);
 
     putJson("/api/stock-adjustments/{$adjustment->id}", [
         'status' => 'approved',
@@ -322,12 +350,14 @@ test('StockAdjustmentController update does not double-post on subsequent saves'
         'approved_at' => null,
     ]);
 
-    StockAdjustmentItem::factory()->create([
+    $outflowItem = StockAdjustmentItem::factory()->create([
         'stock_adjustment_id' => $adjustment->id,
         'quantity_adjusted' => -10,
         'unit_cost' => 100000,
         'total_cost' => 1000000,
     ]);
+
+    stockAdjPostingSeedStock($adjustment, $outflowItem->product_id, 50);
 
     putJson("/api/stock-adjustments/{$adjustment->id}", ['status' => 'approved'])->assertOk();
     putJson("/api/stock-adjustments/{$adjustment->id}", ['notes' => 'updated after approval'])->assertOk();
