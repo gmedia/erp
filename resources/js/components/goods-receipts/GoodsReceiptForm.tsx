@@ -156,9 +156,14 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
             if (previousPurchaseOrderIdRef.current === watchedPurchaseOrderId) {
                 return;
             }
+            const isResetToDefaults =
+                watchedPurchaseOrderId === defaultValues.purchase_order_id;
             previousPurchaseOrderIdRef.current = watchedPurchaseOrderId;
+            if (isResetToDefaults) {
+                return;
+            }
             remove();
-        }, [watchedPurchaseOrderId, remove]);
+        }, [watchedPurchaseOrderId, defaultValues.purchase_order_id, remove]);
         const {
             isItemDialogOpen,
             item: selectedItem,
@@ -213,11 +218,12 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
                         placeholder="Select status"
                     />
 
-                    <AsyncSelectField
+                    <AsyncSelectField<{ po_number: string }>
                         name="purchase_order_id"
                         label="Purchase Order"
                         url="/api/purchase-orders"
                         placeholder="Select purchase order"
+                        labelFn={(po) => po.po_number}
                     />
 
                     <AsyncSelectField

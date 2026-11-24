@@ -148,17 +148,22 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
             name: 'items',
         });
         const watchedItems = form.watch('items');
+        const watchedPurchaseOrderId = form.watch('purchase_order_id');
         const watchedGoodsReceiptId = form.watch('goods_receipt_id');
-        const previousGoodsReceiptIdRef = useRef(
-            defaultValues.goods_receipt_id,
-        );
+        const headerSourceKey = `${watchedPurchaseOrderId}|${watchedGoodsReceiptId}`;
+        const defaultHeaderSourceKey = `${defaultValues.purchase_order_id}|${defaultValues.goods_receipt_id}`;
+        const previousHeaderSourceKeyRef = useRef(defaultHeaderSourceKey);
         useEffect(() => {
-            if (previousGoodsReceiptIdRef.current === watchedGoodsReceiptId) {
+            if (previousHeaderSourceKeyRef.current === headerSourceKey) {
                 return;
             }
-            previousGoodsReceiptIdRef.current = watchedGoodsReceiptId;
+            const isResetToDefaults = headerSourceKey === defaultHeaderSourceKey;
+            previousHeaderSourceKeyRef.current = headerSourceKey;
+            if (isResetToDefaults) {
+                return;
+            }
             remove();
-        }, [watchedGoodsReceiptId, remove]);
+        }, [headerSourceKey, defaultHeaderSourceKey, remove]);
         const {
             isItemDialogOpen,
             item: selectedItem,
@@ -213,18 +218,20 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
                         placeholder="Select status"
                     />
 
-                    <AsyncSelectField
+                    <AsyncSelectField<{ po_number: string }>
                         name="purchase_order_id"
                         label="Purchase Order"
                         url="/api/purchase-orders"
                         placeholder="Select purchase order"
+                        labelFn={(po) => po.po_number}
                     />
 
-                    <AsyncSelectField
+                    <AsyncSelectField<{ gr_number: string }>
                         name="goods_receipt_id"
                         label="Goods Receipt"
                         url="/api/goods-receipts"
                         placeholder="Select goods receipt"
+                        labelFn={(gr) => gr.gr_number}
                     />
 
                     <AsyncSelectField

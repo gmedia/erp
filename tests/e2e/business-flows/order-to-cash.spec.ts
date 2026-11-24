@@ -332,7 +332,7 @@ async function createReceiptViaUi(
     await dialog.getByLabel('Total Amount').fill(String(ctx.amount));
 
     await dialog.getByRole('button', { name: 'Add Item' }).click();
-    const allocDialog = page.getByRole('dialog', { name: /Add Item/i });
+    const allocDialog = page.getByRole('dialog').last();
     await expect(allocDialog).toBeVisible();
     await allocDialog
         .getByRole('combobox', { name: 'Customer Invoice' })
@@ -346,8 +346,8 @@ async function createReceiptViaUi(
         .getByRole('button')
         .click();
     await allocDialog.getByLabel('Allocated Amount').fill(String(ctx.amount));
-    await allocDialog.getByRole('button', { name: 'Save Item' }).click();
-    await expect(allocDialog).toBeHidden();
+    await allocDialog.getByRole('button', { name: 'Save Allocation' }).click();
+    await expect(page.getByRole('dialog')).toHaveCount(1);
 
     const createResponse = page.waitForResponse(
         (response) =>
