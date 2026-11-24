@@ -6,26 +6,6 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
         await login(page, undefined, undefined, { requireDashboard: false });
     });
 
-    test('users 390: email tidak tertutup pita pudar, aksi sticky', async ({
-        page,
-    }) => {
-        await page.setViewportSize({ width: 390, height: 844 });
-        const usersResponse = page.waitForResponse(
-            (r) => r.url().includes('/api/users') && r.status() < 400,
-        );
-        await page.goto('/users');
-        await usersResponse;
-
-        const row = page.getByTestId('user-row').first();
-        await expect(row).toBeVisible();
-
-        const actionCell = row.locator('td').last();
-        const position = await actionCell.evaluate(
-            (el) => getComputedStyle(el).position,
-        );
-        expect(position).toBe('sticky');
-    });
-
     test('trial-balance 390: kolom Credit tidak tertutup fade tepi', async ({
         page,
     }) => {

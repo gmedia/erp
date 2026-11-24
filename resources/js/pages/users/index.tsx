@@ -273,13 +273,13 @@ function UsersBody({
                 <TableCell className="font-medium">
                     {row.name}
                     {canEdit && !row.employee && (
-                        <span className="mt-1 block max-w-[10rem] text-xs font-normal break-words whitespace-normal text-muted-foreground md:hidden">
+                        <span className="mt-1 block text-xs font-normal text-muted-foreground md:hidden">
                             {t('users.edit_requires_employee')}
                         </span>
                     )}
                 </TableCell>
                 <TableCell
-                    className="max-w-[140px] break-all md:max-w-[220px]"
+                    className="max-w-[160px] break-all md:max-w-[220px]"
                     title={row.email}
                 >
                     {row.email}
@@ -300,7 +300,7 @@ function UsersBody({
                             : t('users.status_unlinked')}
                     </Badge>
                 </TableCell>
-                <TableCell className="sticky right-0 z-20 bg-background text-right">
+                <TableCell className="bg-background text-right md:sticky md:right-0 md:z-20">
                     {canEdit && (
                         <TooltipProvider>
                             <Tooltip>
@@ -352,7 +352,7 @@ function UsersBody({
                         <TableHead>{t('users.columns.email')}</TableHead>
                         <TableHead>{t('users.columns.employee')}</TableHead>
                         <TableHead>{t('users.columns.status')}</TableHead>
-                        <TableHead className="sticky right-0 z-30 w-[60px] bg-background text-right">
+                        <TableHead className="w-[60px] bg-background text-right md:sticky md:right-0 md:z-20">
                             <span className="sr-only">
                                 {t('common.actions')}
                             </span>
