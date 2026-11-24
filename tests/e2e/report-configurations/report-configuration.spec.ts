@@ -5,13 +5,14 @@ import { searchReportConfiguration } from './helpers';
 test.describe('Report Configuration E2E Tests', () => {
     test.beforeEach(async ({ page }) => {
         await login(page, undefined, undefined, { requireDashboard: false });
-        await page.goto('/report-configurations');
-        await page.waitForResponse(
+        const listResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/report-configurations') &&
                 r.status() < 400,
             { timeout: 15000 },
         );
+        await page.goto('/report-configurations');
+        await listResponse;
     });
 
     test('can view Report Configurations list with seeded defaults', async ({

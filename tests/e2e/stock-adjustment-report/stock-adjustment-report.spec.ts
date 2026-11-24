@@ -7,17 +7,15 @@ test.describe('Stock Adjustment Report', () => {
     });
 
     test('can view report, sort, filter, and export', async ({ page }) => {
+        const initialResponsePromise = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/reports/stock-adjustment') &&
+                r.status() < 400,
+            { timeout: 30000 },
+        );
         await page.goto('/reports/stock-adjustment');
         await page.waitForURL('**/reports/stock-adjustment', { timeout: 15000 });
-
-        await page
-            .waitForResponse(
-                (r) =>
-                    r.url().includes('/api/reports/stock-adjustment') &&
-                    r.status() < 400,
-                { timeout: 30000 },
-            )
-            ;
+        await initialResponsePromise;
 
         await expect(page.locator('table')).toBeVisible();
         await expect(page.locator('tbody tr').first()).toBeVisible();
@@ -61,13 +59,11 @@ test.describe('Stock Adjustment Report', () => {
         await typeOption.click({ force: true });
 
         await Promise.all([
-            page
-                .waitForResponse(
-                    (r) =>
-                        r.url().includes('/api/reports/stock-adjustment') &&
-                        r.status() < 400,
-                )
-                ,
+            page.waitForResponse(
+                (r) =>
+                    r.url().includes('/api/reports/stock-adjustment') &&
+                    r.status() < 400,
+            ),
             filtersDialog.getByRole('button', { name: 'Apply Filters' }).click(),
         ]);
     });

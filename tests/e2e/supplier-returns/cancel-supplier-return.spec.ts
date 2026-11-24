@@ -100,12 +100,13 @@ async function countReversalMovements(
 test.describe('Supplier Return cancel (confirmed)', () => {
     test.beforeEach(async ({ page }) => {
         await login(page, undefined, undefined, { requireDashboard: false });
-        await page.goto('/supplier-returns');
-        await page.waitForResponse(
+        const listResponse = page.waitForResponse(
             (response) =>
                 response.url().includes('/api/supplier-returns') &&
                 response.status() < 400,
         );
+        await page.goto('/supplier-returns');
+        await listResponse;
     });
 
     test('cancel confirmed supplier return from detail dialog reverses stock and status', async ({

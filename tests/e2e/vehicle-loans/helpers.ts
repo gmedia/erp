@@ -152,14 +152,15 @@ function toDisplayDate(date: Date): string {
 export async function submitVehicleLoanPickup(page: Page): Promise<void> {
     await page.goto(VEHICLE_LOAN_PICKUP_PATH);
 
-    await page
-        .getByRole('button', { name: /Muat Permintaan Disetujui/i })
-        .click();
-    await page.waitForResponse(
+    const loadResponse = page.waitForResponse(
         (response) =>
             response.url().includes('/api/vehicle-loans?status=approved') &&
             response.status() < 400,
     );
+    await page
+        .getByRole('button', { name: /Muat Permintaan Disetujui/i })
+        .click();
+    await loadResponse;
 
     const loanSelect = page.locator('#loan');
     await expect(loanSelect).toBeVisible();
@@ -242,14 +243,15 @@ export async function seedHandedOverPickup(page: Page): Promise<number> {
 export async function submitVehicleLoanReturn(page: Page): Promise<void> {
     await page.goto(VEHICLE_LOAN_RETURN_PATH);
 
-    await page
-        .getByRole('button', { name: /Muat Data Pengambilan Saya/i })
-        .click();
-    await page.waitForResponse(
+    const loadResponse = page.waitForResponse(
         (response) =>
             response.url().includes('/api/vehicle-loans/my') &&
             response.status() < 400,
     );
+    await page
+        .getByRole('button', { name: /Muat Data Pengambilan Saya/i })
+        .click();
+    await loadResponse;
 
     const pickupSelect = page.locator('#pickup');
     await expect(pickupSelect).toBeVisible();

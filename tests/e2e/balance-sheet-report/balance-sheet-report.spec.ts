@@ -9,15 +9,15 @@ test.describe('Balance Sheet Report', () => {
     test('can view balance sheet report', async ({ page }) => {
         test.setTimeout(60000);
 
-        await page.goto('/reports/balance-sheet');
-
-        await page.waitForResponse(
+        const reportResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/balance-sheet') &&
                 !r.url().includes('/export') &&
                 r.status() < 400,
             { timeout: 30000 },
         );
+        await page.goto('/reports/balance-sheet');
+        await reportResponse;
 
         await expect(
             page.getByRole('heading', { name: 'Balance Sheet' }),
@@ -37,15 +37,15 @@ test.describe('Balance Sheet Report', () => {
     test('can change fiscal year selector', async ({ page }) => {
         test.setTimeout(60000);
 
-        await page.goto('/reports/balance-sheet');
-
-        await page.waitForResponse(
+        const initialResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/balance-sheet') &&
                 !r.url().includes('/export') &&
                 r.status() < 400,
             { timeout: 30000 },
         );
+        await page.goto('/reports/balance-sheet');
+        await initialResponse;
 
         const fiscalYearSelector = page.getByRole('combobox').nth(0);
         await expect(fiscalYearSelector).toBeVisible();
@@ -54,10 +54,8 @@ test.describe('Balance Sheet Report', () => {
         const options = page.locator('[role="option"]:visible');
         await expect(options.first()).toBeVisible({ timeout: 5000 });
         const count = await options.count();
-        // Pick last option to ensure it differs from current selection
-        await options.nth(count - 1).click({ force: true });
 
-        await page.waitForResponse(
+        const refetchResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/balance-sheet') &&
                 !r.url().includes('/export') &&
@@ -65,20 +63,23 @@ test.describe('Balance Sheet Report', () => {
                 r.status() < 400,
             { timeout: 15000 },
         );
+        // Pick last option to ensure it differs from current selection
+        await options.nth(count - 1).click({ force: true });
+        await refetchResponse;
     });
 
     test('can change comparison year selector', async ({ page }) => {
         test.setTimeout(60000);
 
-        await page.goto('/reports/balance-sheet');
-
-        await page.waitForResponse(
+        const initialResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/balance-sheet') &&
                 !r.url().includes('/export') &&
                 r.status() < 400,
             { timeout: 30000 },
         );
+        await page.goto('/reports/balance-sheet');
+        await initialResponse;
 
         const comparisonSelector = page.getByRole('combobox').nth(1);
         await expect(comparisonSelector).toBeVisible();
@@ -87,10 +88,8 @@ test.describe('Balance Sheet Report', () => {
         const options = page.locator('[role="option"]:visible');
         await expect(options.first()).toBeVisible({ timeout: 5000 });
         const count = await options.count();
-        // Pick last option (a fiscal year, not "None") to trigger comparison refetch
-        await options.nth(count - 1).click({ force: true });
 
-        await page.waitForResponse(
+        const refetchResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/balance-sheet') &&
                 !r.url().includes('/export') &&
@@ -98,35 +97,38 @@ test.describe('Balance Sheet Report', () => {
                 r.status() < 400,
             { timeout: 15000 },
         );
+        // Pick last option (a fiscal year, not "None") to trigger comparison refetch
+        await options.nth(count - 1).click({ force: true });
+        await refetchResponse;
     });
 
     test('can change branch selector', async ({ page }) => {
         test.setTimeout(60000);
 
-        await page.goto('/reports/balance-sheet');
-
-        await page.waitForResponse(
+        const initialResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/balance-sheet') &&
                 !r.url().includes('/export') &&
                 r.status() < 400,
             { timeout: 30000 },
         );
+        await page.goto('/reports/balance-sheet');
+        await initialResponse;
 
         const branchSelector = page.getByRole('combobox').nth(2);
         await expect(branchSelector).toBeVisible();
-        await branchSelector.click();
 
-        await page.waitForResponse(
+        const branchesResponse = page.waitForResponse(
             (r) => r.url().includes('/api/branches') && r.status() < 400,
             { timeout: 10000 },
         );
+        await branchSelector.click();
+        await branchesResponse;
 
         const options = page.locator('ul.p-1 li button:visible');
         await expect(options.first()).toBeVisible({ timeout: 5000 });
-        await options.first().click({ force: true });
 
-        await page.waitForResponse(
+        const refetchResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/balance-sheet') &&
                 !r.url().includes('/export') &&
@@ -134,20 +136,22 @@ test.describe('Balance Sheet Report', () => {
                 r.status() < 400,
             { timeout: 15000 },
         );
+        await options.first().click({ force: true });
+        await refetchResponse;
     });
 
     test('can export balance sheet report', async ({ page }) => {
         test.setTimeout(60000);
 
-        await page.goto('/reports/balance-sheet');
-
-        await page.waitForResponse(
+        const initialResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/balance-sheet') &&
                 !r.url().includes('/export') &&
                 r.status() < 400,
             { timeout: 30000 },
         );
+        await page.goto('/reports/balance-sheet');
+        await initialResponse;
 
         const [response] = await Promise.all([
             page.waitForResponse(

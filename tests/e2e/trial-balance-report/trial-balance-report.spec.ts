@@ -7,15 +7,15 @@ test.describe('Trial Balance Report', () => {
     });
 
     test('can view trial balance report with fiscal year selector', async ({ page }) => {
-        await page.goto('/reports/trial-balance');
-        await page.waitForURL('**/reports/trial-balance', { timeout: 15000 });
-
-        await page.waitForResponse(
+        const initialResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/trial-balance') &&
                 r.status() < 400,
             { timeout: 30000 },
         );
+        await page.goto('/reports/trial-balance');
+        await page.waitForURL('**/reports/trial-balance', { timeout: 15000 });
+        await initialResponse;
 
         await expect(page.getByRole('heading', { name: 'Trial Balance' })).toBeVisible();
 
@@ -40,14 +40,15 @@ test.describe('Trial Balance Report', () => {
     test('can export trial balance report', async ({ page }) => {
         test.setTimeout(60000);
 
-        await page.goto('/reports/trial-balance');
-        await page.waitForResponse(
+        const initialResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/trial-balance') &&
                 !r.url().includes('/export') &&
                 r.status() < 400,
             { timeout: 30000 },
         );
+        await page.goto('/reports/trial-balance');
+        await initialResponse;
 
         const [exportResponse] = await Promise.all([
             page.waitForResponse(
