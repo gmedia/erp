@@ -3,11 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Actions\AccountingPosting\PostStockAdjustmentJournalAction;
+use App\Actions\AccountingPosting\ReverseDocumentJournalAction;
 use App\Actions\StockAdjustments\ExportStockAdjustmentsAction;
 use App\Actions\StockAdjustments\IndexStockAdjustmentsAction;
 use App\Actions\StockAdjustments\PostStockAdjustmentMovementsAction;
 use App\Actions\StockAdjustments\SyncStockAdjustmentItemsAction;
 use App\DTOs\StockAdjustments\UpdateStockAdjustmentData;
+use App\Http\Controllers\Concerns\CancelsPostedDocuments;
+use App\Http\Controllers\Concerns\DeletesOnlyDraftDocuments;
+use App\Http\Controllers\Concerns\LoadsResourceRelations;
 use App\Http\Controllers\Concerns\StoresItemsInTransaction;
 use App\Http\Requests\StockAdjustments\ExportStockAdjustmentRequest;
 use App\Http\Requests\StockAdjustments\IndexStockAdjustmentRequest;
@@ -17,12 +21,16 @@ use App\Http\Resources\StockAdjustments\StockAdjustmentCollection;
 use App\Http\Resources\StockAdjustments\StockAdjustmentResource;
 use App\Models\StockAdjustment;
 use App\Services\StockPostingService;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class StockAdjustmentController extends Controller
 {
+    use CancelsPostedDocuments;
+    use DeletesOnlyDraftDocuments;
+    use LoadsResourceRelations;
     use StoresItemsInTransaction;
 
     public function index(IndexStockAdjustmentRequest $request, IndexStockAdjustmentsAction $action): JsonResponse
@@ -100,11 +108,34 @@ class StockAdjustmentController extends Controller
         SyncStockAdjustmentItemsAction $syncItems,
         PostStockAdjustmentJournalAction $postJournal,
         PostStockAdjustmentMovementsAction $postMovements,
+        ReverseDocumentJournalAction $reverseJournal,
         StockPostingService $stockPosting,
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
         unset($validated['items']);
+
+        // Issue #375 (review #426 butir 2 & 7): pembatalan dokumen approved membalik stok dan,
+        // bila ada, jurnal dalam satu transaksi. Data lama approved tanpa jurnal tetap dibatalkan.
+        // Draft/pending_approval belum terposting: dibatalkan tanpa pembalik.
+        $isPostedCancel = ($validated['status'] ?? null) === 'cancelled'
+            && $stockAdjustment->status === 'approved';
+
+        if ($isPostedCancel) {
+            $this->cancelPostedDocument(
+                document: $stockAdjustment,
+                attributes: $validated,
+                blockers: [],
+                reference: (string) $stockAdjustment->adjustment_number,
+                label: 'Stock Adjustment',
+                reverseJournal: $reverseJournal,
+                release: static function (Model $adjustment) use ($stockPosting): void {
+                    $stockPosting->reverseDocument(StockAdjustment::class, (int) $adjustment->getKey(), 'adjustment');
+                },
+            );
+
+            return (new StockAdjustmentResource($this->loadResourceRelations($stockAdjustment)))->response();
+        }
 
         $isNewlyApproved = ($validated['status'] ?? null) === 'approved' && $stockAdjustment->approved_at === null;
         $isEditingApproved = $stockAdjustment->status === 'approved' && ! $isNewlyApproved && is_array($items);
@@ -150,28 +181,17 @@ class StockAdjustmentController extends Controller
 
     public function destroy(StockAdjustment $stockAdjustment): JsonResponse
     {
-        // Issue #356 sibling: adjustment yang sudah approved dibatalkan lewat movement
-        // pembalik (histori tidak dihapus), dalam transaksi yang sama.
-        DB::transaction(function () use ($stockAdjustment): void {
-            $wasApproved = $stockAdjustment->status === 'approved';
-
-            $stockAdjustment->update(['status' => 'cancelled']);
-
-            if ($wasApproved) {
-                app(StockPostingService::class)->reverseDocument(
-                    StockAdjustment::class,
-                    $stockAdjustment->id,
-                    'adjustment',
-                );
-            }
-        });
-
-        return response()->json(null, 204);
+        return $this->destroyDraftDocument($stockAdjustment);
     }
 
     public function export(ExportStockAdjustmentRequest $request, ExportStockAdjustmentsAction $action): JsonResponse
     {
         return $action->execute($request);
+    }
+
+    protected function resourceRelations(): array
+    {
+        return ['warehouse', 'inventoryStocktake', 'journalEntry', 'items.product', 'items.unit'];
     }
 
     /**
@@ -193,6 +213,9 @@ class StockAdjustmentController extends Controller
                 $stockAdjustment->id,
                 'adjustment',
                 function () use ($stockAdjustment, $items, $syncItems, $stockPosting): void {
+                    // Item diganti (bukan di-upsert) agar source_line_id movement asli tidak tertimpa
+                    // repost; pembalik tetap utuh di riwayat (Issue #372).
+                    $stockAdjustment->items()->delete();
                     $syncItems->execute($stockAdjustment, $items);
                     $stockPosting->postStockAdjustment($stockAdjustment->refresh());
                 },

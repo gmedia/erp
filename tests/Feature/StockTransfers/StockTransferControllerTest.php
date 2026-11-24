@@ -244,13 +244,13 @@ describe('Stock Transfer API Endpoints', function () {
             ->assertJsonCount(1, 'data.items');
     });
 
-    test('destroy cancels transfer', function () {
+    test('destroy removes draft transfer', function () {
         $transfer = StockTransfer::factory()->create(['status' => 'draft']);
 
         $response = deleteJson("/api/stock-transfers/{$transfer->id}");
 
         $response->assertNoContent();
-        assertDatabaseHas('stock_transfers', ['id' => $transfer->id, 'status' => 'cancelled']);
+        assertDatabaseMissing('stock_transfers', ['id' => $transfer->id]);
     });
 
     test('getItems returns nested items with product and unit relations', function () {

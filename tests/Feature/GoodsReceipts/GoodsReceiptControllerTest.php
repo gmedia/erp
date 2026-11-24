@@ -208,8 +208,10 @@ test('show returns goods receipt detail', function () {
 test('update modifies goods receipt and items', function () {
     createGoodsReceiptCoaFixture();
     [$purchaseOrder, $purchaseOrderItem, $product, $unit] = createPurchaseOrderWithItemForGoodsReceipt();
+    // Mulai dari draft agar transisi draft -> confirmed deterministik (factory status acak).
     $goodsReceipt = GoodsReceipt::factory()->create([
         'purchase_order_id' => $purchaseOrder->id,
+        'status' => 'draft',
         'receipt_date' => '2026-03-06',
     ]);
 
@@ -437,7 +439,17 @@ test('confirming goods receipt without account 21150 is rejected with 422 unchan
 
 test('confirming goods receipt with ambiguous COA versions is rejected with 422 unchanged', function () {
     // Dua COA aktif dan tidak ada tahun fiskal yang mencakup tanggal GR: tidak boleh menebak.
-    CoaVersion::factory()->count(2)->create(['status' => 'active']);
+    foreach ([2001, 2002] as $year) {
+        CoaVersion::factory()->create([
+            'status' => 'active',
+            'fiscal_year_id' => FiscalYear::factory()->create([
+                'name' => (string) $year,
+                'start_date' => "{$year}-01-01",
+                'end_date' => "{$year}-12-31",
+            ])->id,
+        ]);
+    }
+
     [$purchaseOrder, $purchaseOrderItem, $product, $unit] = createPurchaseOrderWithItemForGoodsReceipt();
     $goodsReceipt = GoodsReceipt::factory()->create([
         'purchase_order_id' => $purchaseOrder->id,
@@ -476,7 +488,7 @@ test('confirming goods receipt with ambiguous COA versions is rejected with 422 
 });
 
 test('destroy removes goods receipt', function () {
-    $goodsReceipt = GoodsReceipt::factory()->create();
+    $goodsReceipt = GoodsReceipt::factory()->create(['status' => 'draft']);
 
     deleteJson('/api/goods-receipts/' . $goodsReceipt->id)
         ->assertNoContent();

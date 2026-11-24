@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\AccountingPosting\PostGoodsReceiptJournalAction;
+use App\Actions\AccountingPosting\ReverseDocumentJournalAction;
 use App\Actions\GoodsReceipts\EnsurePurchaseOrderAllowsConfirmedReceiptAction;
 use App\Actions\GoodsReceipts\ExportGoodsReceiptsAction;
 use App\Actions\GoodsReceipts\IndexGoodsReceiptsAction;
@@ -10,6 +11,8 @@ use App\Actions\GoodsReceipts\ListGoodsReceiptItemOptionsAction;
 use App\Actions\GoodsReceipts\PostGoodsReceiptMovementsAction;
 use App\Actions\GoodsReceipts\SyncGoodsReceiptItemsAction;
 use App\DTOs\GoodsReceipts\UpdateGoodsReceiptData;
+use App\Http\Controllers\Concerns\CancelsPostedDocuments;
+use App\Http\Controllers\Concerns\DeletesOnlyDraftDocuments;
 use App\Http\Controllers\Concerns\LoadsResourceRelations;
 use App\Http\Controllers\Concerns\StoresItemsInTransaction;
 use App\Http\Requests\GoodsReceipts\ExportGoodsReceiptRequest;
@@ -19,8 +22,11 @@ use App\Http\Requests\GoodsReceipts\UpdateGoodsReceiptRequest;
 use App\Http\Resources\GoodsReceipts\GoodsReceiptCollection;
 use App\Http\Resources\GoodsReceipts\GoodsReceiptResource;
 use App\Models\GoodsReceipt;
+use App\Models\SupplierBill;
+use App\Models\SupplierReturn;
 use App\Services\PurchaseOrderReceiptService;
 use App\Services\StockPostingService;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,6 +34,8 @@ use Illuminate\Support\Facades\DB;
 
 class GoodsReceiptController extends Controller
 {
+    use CancelsPostedDocuments;
+    use DeletesOnlyDraftDocuments;
     use LoadsResourceRelations;
     use StoresItemsInTransaction;
 
@@ -108,6 +116,7 @@ class GoodsReceiptController extends Controller
         PostGoodsReceiptMovementsAction $postMovements,
         StockPostingService $stockPosting,
         PurchaseOrderReceiptService $purchaseOrderReceipts,
+        ReverseDocumentJournalAction $reverseJournal,
         EnsurePurchaseOrderAllowsConfirmedReceiptAction $guardPurchaseOrder,
     ): JsonResponse {
         $validated = $request->validated();
@@ -116,7 +125,7 @@ class GoodsReceiptController extends Controller
 
         $isNewlyConfirmed = ($validated['status'] ?? null) === 'confirmed' && $goodsReceipt->confirmed_at === null;
         $isCancellingConfirmed = ($validated['status'] ?? null) === 'cancelled'
-            && $goodsReceipt->status === 'confirmed';
+            && ($goodsReceipt->status === 'confirmed' || $goodsReceipt->journal_entry_id !== null);
 
         if ($isNewlyConfirmed) {
             $validated['confirmed_by'] = Auth::id();
@@ -125,12 +134,39 @@ class GoodsReceiptController extends Controller
 
         if ($isCancellingConfirmed) {
             // Issue #356 baris 3: GR confirmed yang dibatalkan harus membalik stok
-            // dan received qty PO, dalam transaksi yang sama dengan perubahan status.
-            DB::transaction(function () use ($goodsReceipt, $validated, $stockPosting, $purchaseOrderReceipts): void {
-                $goodsReceipt->update(UpdateGoodsReceiptData::fromArray($validated)->toArray());
-                $stockPosting->reverseDocument(GoodsReceipt::class, $goodsReceipt->id, 'goods_receipt');
-                $purchaseOrderReceipts->syncFromGoodsReceipt($goodsReceipt->refresh());
-            });
+            // dan received qty PO. Issue #375: jurnal GR ikut dibalik. Semuanya dalam
+            // satu transaksi dengan perubahan status (lihat CancelsPostedDocuments).
+            $this->cancelPostedDocument(
+                document: $goodsReceipt,
+                attributes: UpdateGoodsReceiptData::fromArray($validated)->toArray(),
+                blockers: [
+                    [
+                        static fn (GoodsReceipt $receipt): bool => SupplierReturn::query()
+                            ->where('goods_receipt_id', $receipt->id)
+                            ->where('status', 'confirmed')
+                            ->exists(),
+                        __('Goods receipt still has active supplier returns. Cancel them before cancelling.'),
+                    ],
+                    [
+                        static fn (GoodsReceipt $receipt): bool => SupplierBill::query()
+                            ->where('goods_receipt_id', $receipt->id)
+                            ->whereNotIn('status', ['cancelled', 'void'])
+                            ->exists(),
+                        __('Goods receipt still has active supplier bills. Cancel them before cancelling.'),
+                    ],
+                ],
+                reference: (string) $goodsReceipt->gr_number,
+                label: 'Goods Receipt',
+                reverseJournal: $reverseJournal,
+                release: static function (Model $receipt) use ($stockPosting, $purchaseOrderReceipts): void {
+                    if (! $receipt instanceof GoodsReceipt) {
+                        return;
+                    }
+
+                    $stockPosting->reverseDocument(GoodsReceipt::class, $receipt->id, 'goods_receipt');
+                    $purchaseOrderReceipts->syncFromGoodsReceipt($receipt->refresh());
+                },
+            );
 
             return (new GoodsReceiptResource($this->loadResourceRelations($goodsReceipt)))->response();
         }
@@ -194,7 +230,7 @@ class GoodsReceiptController extends Controller
 
     public function destroy(GoodsReceipt $goodsReceipt): JsonResponse
     {
-        return $this->destroyModel($goodsReceipt);
+        return $this->destroyDraftDocument($goodsReceipt);
     }
 
     public function itemOptions(

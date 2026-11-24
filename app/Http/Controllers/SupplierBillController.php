@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Actions\AccountingPosting\PostSupplierBillJournalAction;
+use App\Actions\AccountingPosting\ReverseDocumentJournalAction;
 use App\Actions\SupplierBills\ExportSupplierBillsAction;
 use App\Actions\SupplierBills\IndexSupplierBillsAction;
 use App\Actions\SupplierBills\SyncSupplierBillItemsAction;
 use App\DTOs\SupplierBills\UpdateSupplierBillData;
+use App\Http\Controllers\Concerns\CancelsPostedDocuments;
+use App\Http\Controllers\Concerns\DeletesOnlyDraftDocuments;
 use App\Http\Controllers\Concerns\LoadsResourceRelations;
 use App\Http\Controllers\Concerns\StoresItemsInTransaction;
 use App\Http\Requests\SupplierBills\ExportSupplierBillRequest;
@@ -21,6 +24,8 @@ use Illuminate\Support\Facades\Auth;
 
 class SupplierBillController extends Controller
 {
+    use CancelsPostedDocuments;
+    use DeletesOnlyDraftDocuments;
     use LoadsResourceRelations;
     use StoresItemsInTransaction;
 
@@ -78,11 +83,41 @@ class SupplierBillController extends Controller
         UpdateSupplierBillRequest $request,
         SupplierBill $supplierBill,
         SyncSupplierBillItemsAction $syncItems,
-        PostSupplierBillJournalAction $postJournal
+        PostSupplierBillJournalAction $postJournal,
+        ReverseDocumentJournalAction $reverseJournal,
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
         unset($validated['items']);
+
+        // Issue #375 (review #426 butir 5 & 6): bill yang sudah membawa pembayaran (partially_paid,
+        // paid, overdue) dibatalkan lewat jalur ini walau jurnalnya kosong (data lama), supaya alokasi
+        // dilepas. Draft dan confirmed tanpa jurnal tetap lewat update biasa.
+        $isPostedCancel = ($validated['status'] ?? null) === 'cancelled'
+            && (
+                $supplierBill->journal_entry_id !== null
+                || in_array($supplierBill->status, ['partially_paid', 'paid', 'overdue'], true)
+            );
+
+        if ($isPostedCancel) {
+            $this->cancelPostedDocument(
+                document: $supplierBill,
+                attributes: array_merge($validated, ['status' => 'cancelled']),
+                blockers: [
+                    [
+                        static fn (SupplierBill $bill): bool => $bill->paymentAllocations()
+                            ->whereHas('payment', fn ($q) => $q->whereIn('status', ['confirmed', 'reconciled']))
+                            ->exists(),
+                        __('Supplier bill still has active payment allocations. Remove them before cancelling.'),
+                    ],
+                ],
+                reference: $supplierBill->bill_number,
+                label: 'Bill',
+                reverseJournal: $reverseJournal,
+            );
+
+            return (new SupplierBillResource($this->loadResourceRelations($supplierBill)))->response();
+        }
 
         $isNewlyConfirmed = ($validated['status'] ?? null) === 'confirmed' && $supplierBill->confirmed_at === null;
 
@@ -113,7 +148,7 @@ class SupplierBillController extends Controller
 
     public function destroy(SupplierBill $supplierBill): JsonResponse
     {
-        return $this->destroyModel($supplierBill);
+        return $this->destroyDraftDocument($supplierBill);
     }
 
     public function export(ExportSupplierBillRequest $request, ExportSupplierBillsAction $action): JsonResponse

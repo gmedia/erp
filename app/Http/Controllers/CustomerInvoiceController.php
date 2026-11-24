@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Actions\AccountingPosting\PostCustomerInvoiceJournalAction;
+use App\Actions\AccountingPosting\ReverseDocumentJournalAction;
 use App\Actions\CustomerInvoices\ExportCustomerInvoicesAction;
 use App\Actions\CustomerInvoices\IndexCustomerInvoicesAction;
 use App\Actions\CustomerInvoices\SyncCustomerInvoiceItemsAction;
 use App\DTOs\CustomerInvoices\UpdateCustomerInvoiceData;
+use App\Http\Controllers\Concerns\CancelsPostedDocuments;
+use App\Http\Controllers\Concerns\DeletesOnlyDraftDocuments;
 use App\Http\Controllers\Concerns\LoadsResourceRelations;
 use App\Http\Controllers\Concerns\StoresItemsInTransaction;
 use App\Http\Requests\CustomerInvoices\ExportCustomerInvoiceRequest;
@@ -21,6 +24,8 @@ use Illuminate\Support\Facades\Auth;
 
 class CustomerInvoiceController extends Controller
 {
+    use CancelsPostedDocuments;
+    use DeletesOnlyDraftDocuments;
     use LoadsResourceRelations;
     use StoresItemsInTransaction;
 
@@ -80,11 +85,47 @@ class CustomerInvoiceController extends Controller
         UpdateCustomerInvoiceRequest $request,
         CustomerInvoice $customerInvoice,
         SyncCustomerInvoiceItemsAction $syncItems,
-        PostCustomerInvoiceJournalAction $postJournal
+        PostCustomerInvoiceJournalAction $postJournal,
+        ReverseDocumentJournalAction $reverseJournal,
     ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'] ?? null;
         unset($validated['items']);
+
+        // Issue #375 (review #426 butir 5 & 6): invoice yang sudah membawa settlement (paid,
+        // partially_paid, overdue) dibatalkan lewat jalur ini walau jurnalnya kosong (data lama),
+        // supaya alokasi dilepas. Draft dan sent tanpa jurnal tetap lewat update biasa.
+        $isPostedCancel = in_array($validated['status'] ?? null, ['cancelled', 'void'], true)
+            && (
+                $customerInvoice->journal_entry_id !== null
+                || in_array($customerInvoice->status, ['partially_paid', 'paid', 'overdue'], true)
+            );
+
+        if ($isPostedCancel) {
+            $this->cancelPostedDocument(
+                document: $customerInvoice,
+                attributes: $validated,
+                blockers: [
+                    [
+                        static fn (CustomerInvoice $invoice): bool => $invoice->receiptAllocations()
+                            ->whereHas('receipt', fn ($q) => $q->whereIn('status', ['confirmed', 'reconciled']))
+                            ->exists(),
+                        __('Customer invoice still has active receipt allocations. Remove them before cancelling.'),
+                    ],
+                    [
+                        static fn (CustomerInvoice $invoice): bool => $invoice->creditNotes()
+                            ->where('status', 'applied')
+                            ->exists(),
+                        __('Customer invoice still has applied credit notes. Void them before cancelling.'),
+                    ],
+                ],
+                reference: $customerInvoice->invoice_number,
+                label: 'Invoice',
+                reverseJournal: $reverseJournal,
+            );
+
+            return (new CustomerInvoiceResource($this->loadResourceRelations($customerInvoice)))->response();
+        }
 
         $isNewlySent = ($validated['status'] ?? null) === 'sent' && $customerInvoice->sent_at === null;
 
@@ -115,7 +156,7 @@ class CustomerInvoiceController extends Controller
 
     public function destroy(CustomerInvoice $customerInvoice): JsonResponse
     {
-        return $this->destroyModel($customerInvoice);
+        return $this->destroyDraftDocument($customerInvoice);
     }
 
     public function export(ExportCustomerInvoiceRequest $request, ExportCustomerInvoicesAction $action): JsonResponse

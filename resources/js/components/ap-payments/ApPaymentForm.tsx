@@ -13,6 +13,7 @@ import {
     EntityFormItemSectionHeader,
 } from '@/components/common/EntityFormItemTable';
 import { InputField } from '@/components/common/InputField';
+import { PostedDocumentLockNotice } from '@/components/common/PostedDocumentLockNotice';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
 import {
@@ -29,6 +30,7 @@ import { type ApPayment, type ApPaymentFormData } from '@/types/ap-payment';
 import { toDateInputValue } from '@/utils/date-format';
 import { formatItemReference } from '@/utils/entity-form-item';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
+import { isPostedDocumentLocked } from '@/utils/posted-document-lock';
 import { apPaymentFormSchema } from '@/utils/schemas';
 import { ApPaymentAllocationFormDialog } from './ApPaymentAllocationFormDialog';
 
@@ -112,6 +114,7 @@ export const ApPaymentForm = memo<ApPaymentFormProps>(function ApPaymentForm({
     onSubmit,
     isLoading = false,
 }) {
+    const isLocked = isPostedDocumentLocked(entity);
     const defaultValues = useMemo(
         () => getApPaymentFormDefaults(entity),
         [entity],
@@ -179,6 +182,7 @@ export const ApPaymentForm = memo<ApPaymentFormProps>(function ApPaymentForm({
             isLoading={isLoading}
             className="sm:max-w-[1100px]"
         >
+            <PostedDocumentLockNotice locked={isLocked} />
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <InputField
                     name="payment_number"
@@ -254,6 +258,7 @@ export const ApPaymentForm = memo<ApPaymentFormProps>(function ApPaymentForm({
                     min={0}
                     step="any"
                     placeholder="0"
+                    disabled={isLocked}
                 />
 
                 <InputField
@@ -273,7 +278,10 @@ export const ApPaymentForm = memo<ApPaymentFormProps>(function ApPaymentForm({
             </div>
 
             <div className="mt-2 space-y-3 border-t pt-4">
-                <EntityFormItemSectionHeader onAddItem={handleCreateNewItem} />
+                <EntityFormItemSectionHeader
+                    onAddItem={handleCreateNewItem}
+                    locked={isLocked}
+                />
 
                 <div className="rounded-md border">
                     <Table>
@@ -342,6 +350,7 @@ export const ApPaymentForm = memo<ApPaymentFormProps>(function ApPaymentForm({
                                             index={index}
                                             onEdit={handleEditItem}
                                             onRemove={remove}
+                                            locked={isLocked}
                                         />
                                     </TableRow>
                                 );

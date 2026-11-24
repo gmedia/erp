@@ -279,13 +279,14 @@ describe('Issue #360 batal via PUT (cancelled) pada in_transit membalik stok asa
             ->and(issue360Balance($from->id, $product->id))->toBe(5.0);
     });
 
-    test('DELETE in_transit mengembalikan saldo asal (baseline, sudah benar dari #356)', function () {
+    test('batal in_transit mengembalikan saldo asal (baseline, sudah benar dari #356)', function () {
         [$transfer, $from, $to, $product, $unit] = issue360Transfer(5, 5);
 
         putJson("/api/stock-transfers/{$transfer->id}", issue360Payload('in_transit', $product->id, $unit->id))
             ->assertOk();
 
-        deleteJson("/api/stock-transfers/{$transfer->id}")->assertNoContent();
+        // #375: dokumen terposting tidak boleh di-DELETE; pembatalan lewat transisi status.
+        putJson("/api/stock-transfers/{$transfer->id}", ['status' => 'cancelled'])->assertOk();
 
         expect(issue360Net($from->id, $product->id))->toBe(5.0);
     });
@@ -454,16 +455,16 @@ describe('Issue #360 keputusan 3: item dan qty kirim terkunci setelah dispatch',
     });
 });
 
-describe('Issue #360: DELETE dan PUT setara untuk pembatalan posted', function () {
-    test('DELETE pada received membalik dua sisi', function () {
+describe('Issue #375: DELETE pada transfer terposting ditolak, pembatalan lewat PUT', function () {
+    test('DELETE pada received ditolak 422 dan stok tidak berubah', function () {
         [$transfer, $from, $to, $product, $unit] = issue360Transfer(5, 5);
 
         putJson("/api/stock-transfers/{$transfer->id}", issue360Payload('in_transit', $product->id, $unit->id))->assertOk();
         putJson("/api/stock-transfers/{$transfer->id}", issue360Payload('received', $product->id, $unit->id, 5.0))->assertOk();
 
-        deleteJson("/api/stock-transfers/{$transfer->id}")->assertNoContent();
+        deleteJson("/api/stock-transfers/{$transfer->id}")->assertUnprocessable();
 
-        expect(issue360Net($from->id, $product->id))->toBe(5.0)
-            ->and(issue360Net($to->id, $product->id))->toBe(0.0);
+        expect(issue360Net($from->id, $product->id))->toBe(0.0)
+            ->and(issue360Net($to->id, $product->id))->toBe(5.0);
     });
 });

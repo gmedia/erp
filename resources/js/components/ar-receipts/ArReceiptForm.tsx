@@ -8,6 +8,7 @@ import {
     EntityFormItemSectionHeader,
 } from '@/components/common/EntityFormItemTable';
 import { InputField } from '@/components/common/InputField';
+import { PostedDocumentLockNotice } from '@/components/common/PostedDocumentLockNotice';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
 import {
@@ -23,6 +24,7 @@ import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues
 import { type ArReceipt, type ArReceiptFormData } from '@/types/ar-receipt';
 import { toDateInputValue } from '@/utils/date-format';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
+import { isPostedDocumentLocked } from '@/utils/posted-document-lock';
 import { arReceiptFormSchema } from '@/utils/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo, useRef } from 'react';
@@ -99,6 +101,7 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
     isLoading = false,
 }) {
     const activeArReceipt = arReceipt || item || entity;
+    const isLocked = isPostedDocumentLocked(activeArReceipt);
     const defaultValues = useMemo(
         () => getArReceiptFormDefaults(activeArReceipt),
         [activeArReceipt],
@@ -177,6 +180,7 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
                 isLoading={isLoading}
                 className="sm:max-w-[1100px]"
             >
+                <PostedDocumentLockNotice locked={isLocked} />
                 <div className="grid grid-cols-2 gap-4">
                     <AsyncSelectField
                         name="customer_id"
@@ -216,6 +220,7 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
                         type="number"
                         min={0}
                         step={0.01}
+                        disabled={isLocked}
                     />
                     <InputField
                         name="reference"
@@ -237,6 +242,7 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
                 <EntityFormItemSectionHeader
                     title="Allocations"
                     onAddItem={handleCreateNewItem}
+                    locked={isLocked}
                 />
                 <Table>
                     {fields.length === 0 ? (
@@ -305,6 +311,7 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
                                             index={index}
                                             onEdit={() => handleEditItem(index)}
                                             onRemove={() => remove(index)}
+                                            locked={isLocked}
                                         />
                                     </TableRow>
                                 ))}

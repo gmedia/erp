@@ -47,6 +47,14 @@
     "approval.items_locked": "Item hanya dapat diubah selama dokumen masih draft.",
     "approval.flow_not_found": "Approval flow tidak ditemukan, tidak aktif, atau tidak memiliki langkah.",
     "status_transition.invalid": "Tidak dapat mengubah status dari :from ke :to.",
+    "posted_document.values_locked": "Dokumen sudah diposting. Item dan nilainya terkunci; gunakan batal atau void.",
+    "Only draft documents can be deleted. Cancel the document instead.": "Hanya dokumen draft yang dapat dihapus. Batalkan dokumen sebagai gantinya.",
+    "Document is already cancelled.": "Dokumen sudah dibatalkan.",
+    "Customer invoice still has active receipt allocations. Remove them before cancelling.": "Invoice pelanggan masih memiliki alokasi penerimaan aktif. Lepaskan alokasi tersebut sebelum membatalkan.",
+    "Customer invoice still has applied credit notes. Void them before cancelling.": "Invoice pelanggan masih memiliki credit note yang sudah diterapkan. Void credit note tersebut sebelum membatalkan.",
+    "Supplier bill still has active payment allocations. Remove them before cancelling.": "Tagihan supplier masih memiliki alokasi pembayaran aktif. Lepaskan alokasi tersebut sebelum membatalkan.",
+    "Goods receipt still has active supplier returns. Cancel them before cancelling.": "Penerimaan barang masih memiliki retur supplier aktif. Batalkan retur tersebut sebelum membatalkan.",
+    "Goods receipt still has active supplier bills. Cancel them before cancelling.": "Penerimaan barang masih memiliki tagihan supplier aktif. Batalkan tagihan tersebut sebelum membatalkan.",
     "approval.transition_forbidden": "Anda tidak memiliki izin untuk menjalankan transisi ini.",
     "nav": {
         "platform": "Platform",
@@ -128,6 +136,10 @@
     "my_approvals": {
         "request_number": "No. {id}",
         "load_failed": "Gagal memuat persetujuan. Muat ulang halaman lalu coba lagi."
+    },
+    "posted_document": {
+        "title": "Dokumen terposting",
+        "values_locked": "Dokumen sudah diposting. Item dan nilainya terkunci; gunakan batal atau void."
     },
     "users": {
         "title": "Pengguna",

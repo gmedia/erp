@@ -13,6 +13,7 @@ import {
     EntityFormItemSectionHeader,
 } from '@/components/common/EntityFormItemTable';
 import { InputField } from '@/components/common/InputField';
+import { PostedDocumentLockNotice } from '@/components/common/PostedDocumentLockNotice';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
 import {
@@ -38,6 +39,7 @@ import {
     formatCurrencyByRegionalSettings,
     formatNumberByRegionalSettings,
 } from '@/utils/number-format';
+import { isPostedDocumentLocked } from '@/utils/posted-document-lock';
 import { supplierBillFormSchema } from '@/utils/schemas';
 import { SupplierBillItemFormDialog } from './SupplierBillItemFormDialog';
 
@@ -148,6 +150,7 @@ export const SupplierBillForm = memo<SupplierBillFormProps>(
         onSubmit,
         isLoading = false,
     }) {
+        const isLocked = isPostedDocumentLocked(entity);
         const defaultValues = useMemo(
             () => getSupplierBillFormDefaults(entity),
             [entity],
@@ -204,6 +207,7 @@ export const SupplierBillForm = memo<SupplierBillFormProps>(
                 isLoading={isLoading}
                 className="sm:max-w-[1100px]"
             >
+                <PostedDocumentLockNotice locked={isLocked} />
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <InputField
                         name="bill_number"
@@ -298,6 +302,7 @@ export const SupplierBillForm = memo<SupplierBillFormProps>(
                 <div className="mt-2 space-y-3 border-t pt-4">
                     <EntityFormItemSectionHeader
                         onAddItem={handleCreateNewItem}
+                        locked={isLocked}
                     />
 
                     <div className="rounded-md border">
@@ -402,6 +407,7 @@ export const SupplierBillForm = memo<SupplierBillFormProps>(
                                                 index={index}
                                                 onEdit={handleEditItem}
                                                 onRemove={remove}
+                                                locked={isLocked}
                                             />
                                         </TableRow>
                                     );

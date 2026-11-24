@@ -71,6 +71,10 @@ export interface Translations {
         request_number: string;
         load_failed: string;
     };
+    posted_document: {
+        title: string;
+        values_locked: string;
+    };
     users: {
         title: string;
         description: string;

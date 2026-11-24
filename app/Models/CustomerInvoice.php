@@ -194,11 +194,13 @@ class CustomerInvoice extends Model
         $total = (float) $this->grand_total;
         $totalSettled = $received + $creditNotes;
 
+        // Issue #375 (review #426 butir 5): status paid/partially_paid ikut turun bila settlement dibatalkan.
+        // Invoice overdue tidak diturunkan di sini: overdue ditentukan oleh jatuh tempo, bukan settlement.
         if ($total > 0 && $totalSettled >= $total) {
             $this->update(['status' => 'paid']);
         } elseif ($totalSettled > 0 && $totalSettled < $total) {
             $this->update(['status' => 'partially_paid']);
-        } elseif ($totalSettled <= 0 && $this->status === 'partially_paid') {
+        } elseif ($totalSettled <= 0 && in_array($this->status, ['partially_paid', 'paid'], true)) {
             $this->update(['status' => 'sent']);
         }
     }

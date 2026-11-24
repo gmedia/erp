@@ -1,10 +1,11 @@
 'use client';
 
+import { CreditNoteRowActions } from '@/components/credit-notes/CreditNoteRowActions';
 import { Badge } from '@/components/ui/badge';
 import { formatStatusLabel } from '@/lib/status-badge';
 import { CreditNote } from '@/types/credit-note';
 import {
-    createActionsColumn,
+    type CustomTableMeta,
     createDateColumn,
     createSelectColumn,
     createSortingHeader,
@@ -70,5 +71,22 @@ export const creditNoteColumns: ColumnDef<CreditNote>[] = [
             </div>
         ),
     },
-    createActionsColumn<CreditNote>(),
+    {
+        id: 'actions_custom',
+        enableHiding: false,
+        size: 56,
+        cell: ({ row, table }) => {
+            const meta = table.options.meta as
+                | CustomTableMeta<CreditNote>
+                | undefined;
+            return (
+                <CreditNoteRowActions
+                    item={row.original}
+                    onView={meta?.onView}
+                    onEdit={meta?.onEdit}
+                    onDelete={meta?.onDelete}
+                />
+            );
+        },
+    },
 ];

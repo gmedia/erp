@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Actions\AccountingPosting\PostArReceiptJournalAction;
+use App\Actions\AccountingPosting\ReverseDocumentJournalAction;
 use App\Actions\ArReceipts\ExportArReceiptsAction;
 use App\Actions\ArReceipts\IndexArReceiptsAction;
 use App\Actions\ArReceipts\SyncArReceiptAllocationsAction;
 use App\DTOs\ArReceipts\UpdateArReceiptData;
+use App\Http\Controllers\Concerns\CancelsPostedDocuments;
+use App\Http\Controllers\Concerns\DeletesOnlyDraftDocuments;
 use App\Http\Controllers\Concerns\LoadsResourceRelations;
 use App\Http\Controllers\Concerns\StoresItemsInTransaction;
 use App\Http\Requests\ArReceipts\ExportArReceiptRequest;
@@ -17,12 +20,15 @@ use App\Http\Resources\ArReceipts\ArReceiptCollection;
 use App\Http\Resources\ArReceipts\ArReceiptResource;
 use App\Models\ArReceipt;
 use App\Models\ArReceiptAllocation;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ArReceiptController extends Controller
 {
+    use CancelsPostedDocuments;
+    use DeletesOnlyDraftDocuments;
     use LoadsResourceRelations;
     use StoresItemsInTransaction;
 
@@ -82,11 +88,39 @@ class ArReceiptController extends Controller
         UpdateArReceiptRequest $request,
         ArReceipt $arReceipt,
         SyncArReceiptAllocationsAction $syncAllocations,
-        PostArReceiptJournalAction $postJournal
+        PostArReceiptJournalAction $postJournal,
+        ReverseDocumentJournalAction $reverseJournal,
     ): JsonResponse {
         $validated = $request->validated();
         $allocations = $validated['allocations'] ?? null;
         unset($validated['allocations']);
+
+        // Issue #375 (review #426 butir 5): receipt terposting menurut status dibatalkan lewat jalur
+        // ini walau jurnalnya kosong (data lama), supaya alokasi dilepas dan sisa invoice dihitung ulang.
+        $targetStatus = $validated['status'] ?? null;
+        $isPostedCancel = in_array($targetStatus, ['cancelled', 'void'], true)
+            && $arReceipt->status !== 'draft'
+            && $arReceipt->status !== $targetStatus;
+
+        if ($isPostedCancel) {
+            $this->cancelPostedDocument(
+                document: $arReceipt,
+                attributes: $validated,
+                blockers: [],
+                reference: $arReceipt->receipt_number,
+                label: 'Receipt',
+                reverseJournal: $reverseJournal,
+                release: static function (Model $document) use ($syncAllocations): void {
+                    /** @var ArReceipt $receipt */
+                    $receipt = $document;
+                    $invoiceIds = $receipt->allocations()->pluck('customer_invoice_id');
+                    $receipt->allocations()->delete();
+                    $syncAllocations->refreshInvoices($invoiceIds);
+                },
+            );
+
+            return (new ArReceiptResource($this->loadResourceRelations($arReceipt)))->response();
+        }
 
         $isNewlyConfirmed = ($validated['status'] ?? null) === 'confirmed' && $arReceipt->confirmed_at === null;
 
@@ -138,27 +172,27 @@ class ArReceiptController extends Controller
 
     public function destroy(ArReceipt $arReceipt): JsonResponse
     {
-        DB::transaction(function () use ($arReceipt) {
-            /** @var ArReceiptAllocation $allocation */
-            foreach ($arReceipt->allocations()->with('customerInvoice')->get() as $allocation) {
-                $invoice = $allocation->customerInvoice;
+        return $this->destroyDraftDocument($arReceipt, function () use ($arReceipt): void {
+            DB::transaction(function () use ($arReceipt): void {
+                /** @var ArReceiptAllocation $allocation */
+                foreach ($arReceipt->allocations()->with('customerInvoice')->get() as $allocation) {
+                    $invoice = $allocation->customerInvoice;
 
-                $newAmountReceived = (float) $invoice->amount_received - (float) $allocation->allocated_amount;
-                $clampedAmount = max(0, $newAmountReceived);
-                $invoice->update([
-                    'amount_received' => (string) $clampedAmount,
-                    'amount_due' => (string) (
-                        (float) $invoice->grand_total
-                        - $clampedAmount
-                        - (float) $invoice->credit_note_amount
-                    ),
-                ]);
-                $invoice->updatePaymentStatus();
-            }
-            $arReceipt->delete();
+                    $newAmountReceived = (float) $invoice->amount_received - (float) $allocation->allocated_amount;
+                    $clampedAmount = max(0, $newAmountReceived);
+                    $invoice->update([
+                        'amount_received' => (string) $clampedAmount,
+                        'amount_due' => (string) (
+                            (float) $invoice->grand_total
+                            - $clampedAmount
+                            - (float) $invoice->credit_note_amount
+                        ),
+                    ]);
+                    $invoice->updatePaymentStatus();
+                }
+                $arReceipt->delete();
+            });
         });
-
-        return response()->json(null, 204);
     }
 
     public function export(ExportArReceiptRequest $request, ExportArReceiptsAction $action): JsonResponse
