@@ -258,5 +258,22 @@
     "stock_transfer.items_locked": "Items and dispatched quantities cannot change after dispatch; only the received quantity can change.",
     "stock_transfer.qty_received_exceeds": "Received quantity cannot exceed the transferred quantity.",
     "account.not_postable": "The selected account is inactive or is not a postable account.",
-    "admin_settings.logo_upload_failed": "The logo could not be saved. No settings were changed. Please try again."
+    "admin_settings.logo_upload_failed": "The logo could not be saved. No settings were changed. Please try again.",
+    "arReceipt": {
+        "allocation": {
+            "invoice": "Customer Invoice",
+            "invoice_placeholder": "Select Customer Invoice",
+            "select_customer_first": "Select a customer first to choose an invoice.",
+            "allocated_amount": "Allocated Amount"
+        }
+    },
+    "apPayment": {
+        "allocation": {
+            "bill": "Supplier Bill",
+            "bill_placeholder": "Select Supplier Bill",
+            "select_supplier_first": "Select a supplier first to choose a bill.",
+            "allocated_amount": "Allocated Amount",
+            "discount_taken": "Discount Taken"
+        }
+    }
 }

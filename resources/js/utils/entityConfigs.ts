@@ -1106,6 +1106,9 @@ export const apPaymentConfig = createComplexEntityConfig<ApPayment>({
     apiEndpoint: '/api/ap-payments',
     exportEndpoint: '/api/ap-payments/export',
     queryKey: ['ap-payments'],
+    loadDetailOnEdit: true,
+    detailLoadErrorMessage:
+        'Failed to load AP payment details. Please try again.',
     breadcrumbs: [{ title: 'AP Payments', href: '/ap-payments' }],
     initialFilters: {
         search: '',
@@ -1227,6 +1230,9 @@ export const arReceiptConfig = createComplexEntityConfig<ArReceipt>({
     apiEndpoint: '/api/ar-receipts',
     exportEndpoint: '/api/ar-receipts/export',
     queryKey: ['ar-receipts'],
+    loadDetailOnEdit: true,
+    detailLoadErrorMessage:
+        'Failed to load AR receipt details. Please try again.',
     breadcrumbs: [{ title: 'AR Receipts', href: '/ar-receipts' }],
     initialFilters: {
         search: '',

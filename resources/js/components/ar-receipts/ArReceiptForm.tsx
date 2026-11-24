@@ -25,7 +25,7 @@ import { toDateInputValue } from '@/utils/date-format';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { arReceiptFormSchema } from '@/utils/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { memo, useMemo } from 'react';
+import { memo, useEffect, useMemo, useRef } from 'react';
 import { type Resolver, useFieldArray, useForm } from 'react-hook-form';
 import { ArReceiptAllocationFormDialog } from './ArReceiptAllocationFormDialog';
 interface ArReceiptFormProps {
@@ -111,7 +111,7 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
         >,
         defaultValues,
     });
-    const { fields, append, remove, update } = useFieldArray({
+    const { fields, append, remove, update, replace } = useFieldArray({
         control: form.control,
         name: 'allocations',
     });
@@ -131,6 +131,14 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
         updateItem: update,
     });
     useResetFormOnDefaultValues(form, defaultValues);
+    const previousCustomerIdRef = useRef(selectedCustomerId);
+    useEffect(() => {
+        const previous = previousCustomerIdRef.current;
+        previousCustomerIdRef.current = selectedCustomerId;
+        if (previous && previous !== selectedCustomerId) {
+            replace([]);
+        }
+    }, [selectedCustomerId, replace]);
     const arReceiptStatusOptions = [
         { value: 'draft', label: 'Draft' },
         { value: 'confirmed', label: 'Confirmed' },

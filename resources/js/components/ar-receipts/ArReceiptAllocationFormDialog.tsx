@@ -1,7 +1,5 @@
 'use client';
 
-'use client';
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMemo } from 'react';
 import { type Resolver, useForm } from 'react-hook-form';
@@ -13,9 +11,21 @@ import {
     ItemFormDialogShell,
     ItemNotesField,
 } from '@/components/common/ItemFormDialog';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type ArReceiptFormData } from '@/types/ar-receipt';
 import { type CustomerInvoice } from '@/types/customer-invoice';
+import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
+
+const OPEN_INVOICE_STATUSES: readonly string[] = [
+    'sent',
+    'partially_paid',
+    'overdue',
+];
+
+const isOpenInvoice = (invoice: CustomerInvoice): boolean =>
+    OPEN_INVOICE_STATUSES.includes(invoice.status) &&
+    Number(invoice.amount_due) > 0;
 
 const arReceiptAllocationSchema = z.object({
     customer_invoice_id: z
@@ -40,7 +50,15 @@ interface ArReceiptAllocationFormDialogProps {
 }
 
 const invoiceLabel = (invoice: CustomerInvoice): string =>
-    `${invoice.invoice_number ?? String(invoice.id)} — ${invoice.amount_due}`;
+    `${invoice.invoice_number ?? String(invoice.id)} — ${formatCurrencyByRegionalSettings(
+        invoice.amount_due,
+        {
+            locale: 'id-ID',
+            currency: invoice.currency || 'IDR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2,
+        },
+    )}`;
 
 export function ArReceiptAllocationFormDialog({
     open,
@@ -49,6 +67,7 @@ export function ArReceiptAllocationFormDialog({
     onSave,
     customerId,
 }: ArReceiptAllocationFormDialogProps) {
+    const { t } = useTranslation();
     const defaultValues = useMemo<ArReceiptAllocationFormData>(() => {
         if (!item) {
             return {
@@ -97,11 +116,15 @@ export function ArReceiptAllocationFormDialog({
                 {customerId ? (
                     <AsyncSelectField<CustomerInvoice>
                         name="customer_invoice_id"
-                        label="Customer Invoice"
-                        placeholder="Select Customer Invoice"
+                        label={t('arReceipt.allocation.invoice')}
+                        placeholder={t(
+                            'arReceipt.allocation.invoice_placeholder',
+                        )}
                         url={`/api/customer-invoices?customer_id=${customerId}`}
                         labelFn={invoiceLabel}
                         valueFn={(invoice) => String(invoice.id)}
+                        filterItems={isOpenInvoice}
+                        initialLabel={defaultValues.invoice_label || undefined}
                         onItemSelect={(invoice) => {
                             form.setValue(
                                 'invoice_label',
@@ -115,12 +138,12 @@ export function ArReceiptAllocationFormDialog({
                     />
                 ) : (
                     <p className="text-sm text-muted-foreground">
-                        Select a customer first to choose an invoice.
+                        {t('arReceipt.allocation.select_customer_first')}
                     </p>
                 )}
                 <InputField
                     name="allocated_amount"
-                    label="Allocated Amount"
+                    label={t('arReceipt.allocation.allocated_amount')}
                     type="number"
                     min={0}
                     step={0.01}

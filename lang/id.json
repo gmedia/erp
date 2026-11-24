@@ -258,5 +258,22 @@
     "stock_transfer.items_locked": "Item dan qty kirim tidak bisa diubah setelah transfer dikirim; hanya qty diterima yang bisa diubah.",
     "account.not_postable": "Akun yang dipilih tidak aktif atau bukan akun yang bisa diposting.",
     "stock_transfer.qty_received_exceeds": "Qty diterima tidak boleh melebihi qty yang dikirim.",
-    "admin_settings.logo_upload_failed": "Logo tidak dapat disimpan. Tidak ada pengaturan yang diubah. Silakan coba lagi."
+    "admin_settings.logo_upload_failed": "Logo tidak dapat disimpan. Tidak ada pengaturan yang diubah. Silakan coba lagi.",
+    "arReceipt": {
+        "allocation": {
+            "invoice": "Faktur Pelanggan",
+            "invoice_placeholder": "Pilih Faktur Pelanggan",
+            "select_customer_first": "Pilih pelanggan terlebih dahulu untuk memilih faktur.",
+            "allocated_amount": "Jumlah Dialokasikan"
+        }
+    },
+    "apPayment": {
+        "allocation": {
+            "bill": "Tagihan Pemasok",
+            "bill_placeholder": "Pilih Tagihan Pemasok",
+            "select_supplier_first": "Pilih pemasok terlebih dahulu untuk memilih tagihan.",
+            "allocated_amount": "Jumlah Dialokasikan",
+            "discount_taken": "Diskon Diambil"
+        }
+    }
 }

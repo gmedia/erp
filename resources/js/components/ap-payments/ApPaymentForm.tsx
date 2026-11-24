@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { memo, useMemo } from 'react';
+import { memo, useEffect, useMemo, useRef } from 'react';
 import { type Resolver, useFieldArray, useForm } from 'react-hook-form';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
@@ -126,7 +126,7 @@ export const ApPaymentForm = memo<ApPaymentFormProps>(function ApPaymentForm({
         defaultValues,
     });
 
-    const { fields, append, remove, update } = useFieldArray({
+    const { fields, append, remove, update, replace } = useFieldArray({
         control: form.control,
         name: 'allocations',
     });
@@ -160,6 +160,14 @@ export const ApPaymentForm = memo<ApPaymentFormProps>(function ApPaymentForm({
     };
 
     useResetFormOnDefaultValues(form, defaultValues);
+    const previousSupplierIdRef = useRef(selectedSupplierId);
+    useEffect(() => {
+        const previous = previousSupplierIdRef.current;
+        previousSupplierIdRef.current = selectedSupplierId;
+        if (previous && previous !== selectedSupplierId) {
+            replace([]);
+        }
+    }, [selectedSupplierId, replace]);
 
     return (
         <EntityForm<ApPaymentFormData>
