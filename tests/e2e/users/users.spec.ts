@@ -1,6 +1,7 @@
-import { test, expect, Page } from '@playwright/test';
-import { login } from '../helpers';
+import { expect, Page, test } from '@playwright/test';
+import { execFileSync } from 'node:child_process';
 import { createEmployee } from '../employees/helpers';
+import { login } from '../helpers';
 
 function createUserAccessCode(seed: number): string {
     return `User-${seed}-Aa1!`;
@@ -8,8 +9,15 @@ function createUserAccessCode(seed: number): string {
 
 async function selectAsyncOption(page: Page, text: string): Promise<void> {
     const option = page
-        .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
-        .filter({ hasText: new RegExp(text.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`), 'i') })
+        .locator(
+            '[role="option"]:visible, ul[aria-busy]:visible button:visible',
+        )
+        .filter({
+            hasText: new RegExp(
+                text.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`),
+                'i',
+            ),
+        })
         .first();
 
     await expect(option).toBeVisible({ timeout: 10000 });
@@ -24,7 +32,9 @@ async function openUsersPage(page: Page): Promise<void> {
 
 async function searchUsers(page: Page, text: string): Promise<void> {
     await page.getByPlaceholder('Search users...').fill(text);
-    await expect(page.getByTestId('user-row').filter({ hasText: text }).first()).toBeVisible({
+    await expect(
+        page.getByTestId('user-row').filter({ hasText: text }).first(),
+    ).toBeVisible({
         timeout: 10000,
     });
 }
@@ -34,8 +44,13 @@ async function openCreateDialog(page: Page): Promise<void> {
     await expect(page.getByRole('dialog')).toBeVisible();
 }
 
-async function chooseEmployeeInDialog(page: Page, employeeName: string): Promise<void> {
-    const selectTrigger = page.getByRole('dialog').locator('button[role="combobox"]');
+async function chooseEmployeeInDialog(
+    page: Page,
+    employeeName: string,
+): Promise<void> {
+    const selectTrigger = page
+        .getByRole('dialog')
+        .locator('button[role="combobox"]');
     await expect(selectTrigger).toBeVisible();
     await selectTrigger.click();
 
@@ -46,7 +61,10 @@ async function chooseEmployeeInDialog(page: Page, employeeName: string): Promise
 
 async function openEditForUser(page: Page, userName: string): Promise<void> {
     await searchUsers(page, userName);
-    const row = page.getByTestId('user-row').filter({ hasText: userName }).first();
+    const row = page
+        .getByTestId('user-row')
+        .filter({ hasText: userName })
+        .first();
     await row.getByRole('button', { name: 'Edit User' }).click();
     await expect(page.getByRole('dialog')).toBeVisible();
 }
@@ -86,7 +104,7 @@ test.describe('User Management', () => {
         await expect(page.locator('input#password')).toHaveAttribute(
             'placeholder',
             'Leave empty to keep current password',
-            { timeout: 10000 }
+            { timeout: 10000 },
         );
 
         await page.reload();
@@ -119,7 +137,7 @@ test.describe('User Management', () => {
         await expect(page.locator('input#password')).toHaveAttribute(
             'placeholder',
             'Leave empty to keep current password',
-            { timeout: 10000 }
+            { timeout: 10000 },
         );
 
         await page.reload();
@@ -135,7 +153,9 @@ test.describe('User Management', () => {
 
         await page.getByRole('button', { name: 'Save Changes' }).click();
 
-        await expect(page.getByRole('button', { name: 'Save Changes' })).toBeEnabled({ timeout: 10000 });
+        await expect(
+            page.getByRole('button', { name: 'Save Changes' }),
+        ).toBeEnabled({ timeout: 10000 });
         await page.waitForTimeout(500);
 
         await page.reload();
@@ -169,7 +189,7 @@ test.describe('User Management', () => {
         await expect(page.locator('input#password')).toHaveAttribute(
             'placeholder',
             'Leave empty to keep current password',
-            { timeout: 10000 }
+            { timeout: 10000 },
         );
 
         await page.keyboard.press('Escape');
@@ -182,7 +202,9 @@ test.describe('User Management', () => {
 
         await page.getByRole('button', { name: 'Save Changes' }).click();
 
-        await expect(page.getByText('The email has already been taken')).toBeVisible({ timeout: 10000 });
+        await expect(
+            page.getByText('The email has already been taken'),
+        ).toBeVisible({ timeout: 10000 });
     });
 
     test('shows password required error for new user', async ({ page }) => {
@@ -199,6 +221,81 @@ test.describe('User Management', () => {
 
         await page.getByRole('button', { name: 'Save Changes' }).click();
 
-        await expect(page.getByText('The password field is required')).toBeVisible({ timeout: 10000 });
+        await expect(
+            page.getByText('The password field is required'),
+        ).toBeVisible({ timeout: 10000 });
+    });
+});
+
+const USER_VIEWER_EMAIL = 'user-viewer@example.com';
+const USER_FULL_EMAIL = 'user-full@example.com';
+const USER_FIXTURE_PASSWORD = 'password';
+
+function ensureUserActionFixtures(): void {
+    const php = [
+        `$hash = \\Illuminate\\Support\\Facades\\Hash::make('${USER_FIXTURE_PASSWORD}');`,
+        `$perms = \\App\\Models\\Permission::whereIn('name', ['user', 'user.edit'])->get()->keyBy('name');`,
+        `$make = function (string $email, string $name, array $names) use ($hash, $perms) {`,
+        `    $user = \\App\\Models\\User::updateOrCreate(['email' => $email], [`,
+        `        'name' => $name, 'password' => $hash, 'email_verified_at' => now(),`,
+        `    ]);`,
+        `    $code = 'EMP-' . strtoupper(substr(md5($email), 0, 8));`,
+        `    $emp = \\App\\Models\\Employee::updateOrCreate(['user_id' => $user->id], [`,
+        `        'employee_id' => $code, 'name' => $name, 'email' => $email,`,
+        `    ]);`,
+        `    $emp->permissions()->sync(collect($names)->map(fn ($n) => $perms[$n]->id)->all());`,
+        `};`,
+        `$make('${USER_VIEWER_EMAIL}', 'User Viewer', ['user']);`,
+        `$make('${USER_FULL_EMAIL}', 'User Full', ['user', 'user.edit']);`,
+    ].join('\n');
+
+    execFileSync(
+        './vendor/bin/sail',
+        ['artisan', 'tinker', `--execute=${php}`],
+        { stdio: 'inherit' },
+    );
+}
+
+test.describe('User action permissions', () => {
+    test.beforeAll(() => {
+        ensureUserActionFixtures();
+    });
+
+    test('pengguna lihat-saja tidak melihat tombol Add dan Edit', async ({
+        page,
+    }) => {
+        await login(page, USER_VIEWER_EMAIL, USER_FIXTURE_PASSWORD, {
+            requireDashboard: false,
+        });
+        await openUsersPage(page);
+
+        await expect(
+            page.getByRole('button', { name: 'Add User' }),
+        ).toHaveCount(0);
+
+        const firstRow = page.getByTestId('user-row').first();
+        await expect(firstRow).toBeVisible();
+        await expect(
+            firstRow.getByRole('button', { name: 'Edit User' }),
+        ).toHaveCount(0);
+    });
+
+    test('pengguna berizin penuh tetap melihat tombol Add dan Edit', async ({
+        page,
+    }) => {
+        await login(page, USER_FULL_EMAIL, USER_FIXTURE_PASSWORD, {
+            requireDashboard: false,
+        });
+        await openUsersPage(page);
+
+        await expect(
+            page.getByRole('button', { name: 'Add User' }),
+        ).toBeVisible();
+
+        const firstRow = page.getByTestId('user-row').first();
+        await expect(firstRow).toBeVisible();
+        await expect(
+            firstRow.getByRole('button', { name: 'Edit User' }),
+        ).toBeVisible();
     });
 });

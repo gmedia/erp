@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { usePermissions } from '@/hooks/usePermissions';
 import axios from '@/lib/axios';
 import rawAxios from 'axios';
 import { Download, Loader2, Upload } from 'lucide-react';
@@ -26,7 +27,21 @@ interface ImportDialogProps {
     onSuccess?: () => void;
 }
 
+/**
+ * Tombol import hanya tampil bila pengguna punya `permission` (sama dengan middleware route import).
+ */
 export default function ImportDialog({
+    permission,
+    ...props
+}: Readonly<ImportDialogProps & { permission?: string }>) {
+    const { can } = usePermissions();
+
+    if (permission && !can(permission)) return null;
+
+    return <ImportDialogContent {...props} />;
+}
+
+function ImportDialogContent({
     title = 'Import Data',
     trigger,
     importRoute,

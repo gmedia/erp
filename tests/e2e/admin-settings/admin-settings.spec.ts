@@ -1,5 +1,36 @@
 import { expect, test, type Page, type Response } from '@playwright/test';
+import { execFileSync } from 'node:child_process';
 import { DEFAULT_E2E_EMAIL, login } from '../helpers';
+
+const SETTINGS_VIEWER_EMAIL = 'settings-viewer@example.com';
+const SETTINGS_FULL_EMAIL = 'settings-full@example.com';
+const SETTINGS_FIXTURE_PASSWORD = 'password';
+
+function ensureAdminSettingFixtures(): void {
+    const php = [
+        `$hash = \\Illuminate\\Support\\Facades\\Hash::make('${SETTINGS_FIXTURE_PASSWORD}');`,
+        `$perms = \\App\\Models\\Permission::whereIn('name', ['admin_setting', 'admin_setting.edit'])`,
+        `    ->get()->keyBy('name');`,
+        `$make = function (string $email, string $name, array $names) use ($hash, $perms) {`,
+        `    $user = \\App\\Models\\User::updateOrCreate(['email' => $email], [`,
+        `        'name' => $name, 'password' => $hash, 'email_verified_at' => now(),`,
+        `    ]);`,
+        `    $code = 'EMP-' . strtoupper(substr(md5($email), 0, 8));`,
+        `    $emp = \\App\\Models\\Employee::updateOrCreate(['user_id' => $user->id], [`,
+        `        'employee_id' => $code, 'name' => $name, 'email' => $email,`,
+        `    ]);`,
+        `    $emp->permissions()->sync(collect($names)->map(fn ($n) => $perms[$n]->id)->all());`,
+        `};`,
+        `$make('${SETTINGS_VIEWER_EMAIL}', 'Settings Viewer', ['admin_setting']);`,
+        `$make('${SETTINGS_FULL_EMAIL}', 'Settings Full', ['admin_setting', 'admin_setting.edit']);`,
+    ].join('\n');
+
+    execFileSync(
+        './vendor/bin/sail',
+        ['artisan', 'tinker', `--execute=${php}`],
+        { stdio: 'inherit' },
+    );
+}
 
 async function saveAdminSettings(
     page: Page,
@@ -348,5 +379,41 @@ test.describe('Admin Settings', () => {
         await expect(successMessage.or(errorMessage)).toBeVisible({
             timeout: 5000,
         });
+    });
+});
+
+test.describe('Admin settings action permissions', () => {
+    test.beforeAll(() => {
+        ensureAdminSettingFixtures();
+    });
+
+    test('pengguna lihat-saja tidak melihat tombol simpan dan kirim test SMTP', async ({
+        page,
+    }) => {
+        await login(page, SETTINGS_VIEWER_EMAIL, SETTINGS_FIXTURE_PASSWORD, {
+            requireDashboard: false,
+        });
+
+        await page.goto('/admin-settings');
+        await expect(page.getByTestId('save-general-settings')).toHaveCount(0);
+
+        await page.goto('/admin-settings?group=smtp');
+        await expect(page.getByTestId('save-smtp-settings')).toHaveCount(0);
+        await expect(page.getByTestId('send-test-email')).toHaveCount(0);
+    });
+
+    test('pengguna berizin penuh tetap melihat tombol simpan dan kirim test SMTP', async ({
+        page,
+    }) => {
+        await login(page, SETTINGS_FULL_EMAIL, SETTINGS_FIXTURE_PASSWORD, {
+            requireDashboard: false,
+        });
+
+        await page.goto('/admin-settings');
+        await expect(page.getByTestId('save-general-settings')).toBeVisible();
+
+        await page.goto('/admin-settings?group=smtp');
+        await expect(page.getByTestId('save-smtp-settings')).toBeVisible();
+        await expect(page.getByTestId('send-test-email')).toBeVisible();
     });
 });

@@ -10,6 +10,7 @@ import {
 import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { usePermissions } from '@/hooks/usePermissions';
 import {
     BankReconciliation,
     type BankReconciliationItem,
@@ -67,6 +68,9 @@ export const BankReconciliationViewModal =
     memo<BankReconciliationViewModalProps>(
         function BankReconciliationViewModal({ item, open, onClose }) {
             const [workspaceOpen, setWorkspaceOpen] = useState(false);
+            const { can } = usePermissions();
+            const canEdit = can('bank_reconciliation.edit');
+            const canCreate = can('bank_reconciliation.create');
 
             if (!item) return null;
 
@@ -88,26 +92,33 @@ export const BankReconciliationViewModal =
                     >
                         <div className="min-h-0 flex-1 overflow-y-auto sm:pr-4">
                             <div className="space-y-6 py-2">
-                                {item.status !== 'completed' && (
-                                    <div className="flex justify-end gap-2">
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() =>
-                                                setWorkspaceOpen(true)
-                                            }
-                                        >
-                                            <GitMerge className="mr-2 size-4" />
-                                            Reconcile
-                                        </Button>
-                                        <ImportBankStatementDialog
-                                            bankReconciliationId={item.id}
-                                            onSuccess={() => {
-                                                onClose();
-                                            }}
-                                        />
-                                    </div>
-                                )}
+                                {item.status !== 'completed' &&
+                                    (canEdit || canCreate) && (
+                                        <div className="flex justify-end gap-2">
+                                            {canEdit && (
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() =>
+                                                        setWorkspaceOpen(true)
+                                                    }
+                                                >
+                                                    <GitMerge className="mr-2 size-4" />
+                                                    Reconcile
+                                                </Button>
+                                            )}
+                                            {canCreate && (
+                                                <ImportBankStatementDialog
+                                                    bankReconciliationId={
+                                                        item.id
+                                                    }
+                                                    onSuccess={() => {
+                                                        onClose();
+                                                    }}
+                                                />
+                                            )}
+                                        </div>
+                                    )}
 
                                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                     <ViewField
