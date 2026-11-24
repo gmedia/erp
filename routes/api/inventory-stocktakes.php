@@ -27,5 +27,5 @@ Route::middleware('permission:inventory_stocktake,true')->group(function () {
     Route::post(
         'inventory-stocktakes/{inventoryStocktake}/items',
         [InventoryStocktakeItemController::class, 'syncItems']
-    );
+    )->middleware('permission:inventory_stocktake.edit,true');
 });

@@ -21,5 +21,6 @@ Route::middleware('permission:stock_transfer,true')->group(function () {
     Route::post('stock-transfers/import', [StockTransferController::class, 'import'])
         ->middleware('permission:stock_transfer.create,true');
     Route::get('stock-transfers/{stockTransfer}/items', [StockTransferItemController::class, 'getItems']);
-    Route::post('stock-transfers/{stockTransfer}/items', [StockTransferItemController::class, 'syncItems']);
+    Route::post('stock-transfers/{stockTransfer}/items', [StockTransferItemController::class, 'syncItems'])
+        ->middleware('permission:stock_transfer.edit,true');
 });
