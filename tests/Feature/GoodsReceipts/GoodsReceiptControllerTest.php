@@ -197,7 +197,11 @@ test('show returns goods receipt detail', function () {
 
 test('update modifies goods receipt and items', function () {
     [$purchaseOrder, $purchaseOrderItem, $product, $unit] = createPurchaseOrderWithItemForGoodsReceipt();
-    $goodsReceipt = GoodsReceipt::factory()->create(['purchase_order_id' => $purchaseOrder->id]);
+    // Mulai dari draft agar transisi draft -> confirmed deterministik (factory status acak).
+    $goodsReceipt = GoodsReceipt::factory()->create([
+        'purchase_order_id' => $purchaseOrder->id,
+        'status' => 'draft',
+    ]);
 
     $payload = [
         'status' => 'confirmed',

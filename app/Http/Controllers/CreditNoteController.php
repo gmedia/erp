@@ -99,8 +99,10 @@ class CreditNoteController extends Controller
 
         // Issue #375 (review #426 butir 5): credit note terposting menurut status dibatalkan lewat jalur
         // ini walau jurnalnya kosong (data lama), supaya credit_note_amount invoice dihitung ulang.
-        $isPostedCancel = in_array($validated['status'] ?? null, ['cancelled', 'void'], true)
-            && $creditNote->status !== 'draft';
+        $targetStatus = $validated['status'] ?? null;
+        $isPostedCancel = in_array($targetStatus, ['cancelled', 'void'], true)
+            && $creditNote->status !== 'draft'
+            && $creditNote->status !== $targetStatus;
 
         if ($isPostedCancel) {
             $this->cancelPostedDocument(

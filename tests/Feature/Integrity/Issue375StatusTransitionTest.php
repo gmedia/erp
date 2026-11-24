@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Account;
 use App\Models\ApPayment;
 use App\Models\ArReceipt;
 use App\Models\CoaVersion;
@@ -34,9 +35,28 @@ beforeEach(function () {
         'end_date' => '1998-12-31',
         'status' => 'open',
     ]);
-    CoaVersion::factory()->create([
+    $coa = CoaVersion::factory()->create([
         'fiscal_year_id' => $fiscalYear->id,
         'status' => 'active',
+    ]);
+
+    // Akun COA lengkap agar posting invoice (draft -> sent) deterministik, tanpa
+    // bergantung pada factory acak: 11200 (AR) dan akun item.
+    Account::factory()->create([
+        'coa_version_id' => $coa->id,
+        'code' => '11200',
+        'name' => 'Accounts Receivable',
+        'type' => 'asset',
+        'normal_balance' => 'debit',
+        'is_active' => true,
+    ]);
+    Account::factory()->create([
+        'coa_version_id' => $coa->id,
+        'code' => '41000',
+        'name' => 'Sales Revenue',
+        'type' => 'revenue',
+        'normal_balance' => 'credit',
+        'is_active' => true,
     ]);
 });
 
@@ -121,9 +141,16 @@ test('status transition per dokumen follows the table', function (
         $numberColumns[$modelClass] => 'NO-TRANSISI-' . $endpoint . '-' . uniqid(),
     ]);
 
+    if ($modelClass === GoodsReceipt::class) {
+        // Konfirmasi GR butuh PO confirmed/partially_received; factory memberi status PO acak.
+        $record->purchaseOrder()->update(['status' => 'confirmed']);
+    }
+
     if ($modelClass === CustomerInvoice::class) {
         // Posting invoice tanpa item ditolak 422 (aturan lama); beri satu item agar uji transisi saja.
         CustomerInvoiceItem::factory()->create(['customer_invoice_id' => $record->id]);
+        // Factory mengisi sent_at null untuk draft; set eksplisit agar posting deterministik.
+        $record->update(['sent_at' => $to === 'sent' ? now() : $record->sent_at]);
     }
 
     putJson("/api/{$endpoint}/{$record->id}", ['status' => $to])->assertStatus($expected);
