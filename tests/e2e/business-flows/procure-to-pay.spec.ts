@@ -590,8 +590,6 @@ test.describe('Procure-to-pay: PR sampai pembayaran supplier', () => {
     test('bill dan pembayaran dengan status confirmed lewat POST langsung memposting jurnal', async ({
         page,
     }) => {
-        test.fail(true, 'POST status confirmed tidak memposting jurnal (#367)');
-
         await login(page, undefined, undefined, { requireDashboard: false });
         const fiscalYearId = await getFiscalYearId(page);
         const supplierId = await firstId(page, '/api/suppliers?per_page=1');

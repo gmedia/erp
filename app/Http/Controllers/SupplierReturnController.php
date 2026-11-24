@@ -41,14 +41,28 @@ class SupplierReturnController extends Controller
         return (new SupplierReturnCollection($supplierReturns))->response();
     }
 
-    public function store(StoreSupplierReturnRequest $request, SyncSupplierReturnItemsAction $syncItems): JsonResponse
-    {
+    public function store(
+        StoreSupplierReturnRequest $request,
+        SyncSupplierReturnItemsAction $syncItems,
+        PostSupplierReturnJournalAction $postJournal,
+        PostSupplierReturnMovementsAction $postMovements,
+        StockPostingService $stockPosting,
+    ): JsonResponse {
         $validated = $request->validated();
         $items = $validated['items'];
         unset($validated['items']);
 
         $validated['created_by'] = Auth::id();
 
+        $isConfirmedOnCreate = ($validated['status'] ?? null) === 'confirmed';
+
+        if ($isConfirmedOnCreate) {
+            $validated['confirmed_by'] = Auth::id();
+            $validated['confirmed_at'] = now()->toIso8601String();
+        }
+
+        // Issue #367: retur yang dibuat langsung confirmed harus membentuk stok dan jurnal
+        // dalam transaksi yang sama. Kegagalan posting ikut membatalkan dokumen.
         $supplierReturn = $this->storeWithSyncedItems(
             attributes: $validated,
             items: $items,
@@ -59,6 +73,11 @@ class SupplierReturnController extends Controller
             syncItems: function (SupplierReturn $supplierReturn, array $items) use ($syncItems): void {
                 $syncItems->execute($supplierReturn, $items);
             },
+            afterCommit: $isConfirmedOnCreate
+                ? function (SupplierReturn $supplierReturn) use ($postJournal, $postMovements, $stockPosting): void {
+                    $this->postConfirmedReturn($supplierReturn, $postJournal, $postMovements, $stockPosting);
+                }
+            : null,
         );
 
         $supplierReturn->load([
@@ -165,21 +184,7 @@ class SupplierReturnController extends Controller
             },
             afterCommit: $isNewlyConfirmed
                 ? function (SupplierReturn $supplierReturn) use ($postJournal, $postMovements, $stockPosting): void {
-                    $stockPosting->assertNoNegativeStock($this->supplierReturnOutflows($supplierReturn));
-                    $postMovements->execute($supplierReturn->refresh());
-
-                    try {
-                        $postJournal->execute($supplierReturn->refresh());
-                    } catch (ValidationException $e) {
-                        // Validation failures (e.g. missing COA mapping) are intentionally
-                        // swallowed so the supplier return itself stays confirmed; user can
-                        // post the journal later. Non-validation errors propagate and
-                        // roll back the entire transaction (status flip included).
-                        Log::warning('Supplier return journal posting skipped', [
-                            'supplier_return_id' => $supplierReturn->id,
-                            'reason' => $e->getMessage(),
-                        ]);
-                    }
+                    $this->postConfirmedReturn($supplierReturn, $postJournal, $postMovements, $stockPosting);
                 }
             : null,
         );
@@ -250,5 +255,31 @@ class SupplierReturnController extends Controller
             : __('supplier_return.invalid_transition');
 
         throw ValidationException::withMessages(['status' => [$message]])->status(422);
+    }
+
+    /**
+     * Stok dan jurnal retur confirmed, dipakai create dan update dalam transaksi yang sama.
+     */
+    private function postConfirmedReturn(
+        SupplierReturn $supplierReturn,
+        PostSupplierReturnJournalAction $postJournal,
+        PostSupplierReturnMovementsAction $postMovements,
+        StockPostingService $stockPosting,
+    ): void {
+        $stockPosting->assertNoNegativeStock($this->supplierReturnOutflows($supplierReturn));
+        $postMovements->execute($supplierReturn->refresh());
+
+        try {
+            $postJournal->execute($supplierReturn->refresh());
+        } catch (ValidationException $e) {
+            // Validation failures (e.g. missing COA mapping) are intentionally
+            // swallowed so the supplier return itself stays confirmed; user can
+            // post the journal later. Non-validation errors propagate and
+            // roll back the entire transaction (status flip included).
+            Log::warning('Supplier return journal posting skipped', [
+                'supplier_return_id' => $supplierReturn->id,
+                'reason' => $e->getMessage(),
+            ]);
+        }
     }
 }

@@ -131,6 +131,118 @@ test('store creates supplier bill with items', function () {
     assertDatabaseHas('supplier_bill_items', ['supplier_bill_id' => $id, 'product_id' => $product->id]);
 });
 
+function makeConfirmedSupplierBillCoaFixture(): Account
+{
+    FiscalYear::factory()->create([
+        'name' => '2026',
+        'start_date' => '2026-01-01',
+        'end_date' => '2026-12-31',
+        'status' => 'open',
+    ]);
+    $coaVersion = CoaVersion::factory()->create(['status' => 'active']);
+    Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '21100',
+        'name' => 'Accounts Payable',
+        'type' => 'liability',
+        'normal_balance' => 'credit',
+        'is_active' => true,
+    ]);
+
+    return Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '61100',
+        'name' => 'Beban Pembelian',
+        'type' => 'expense',
+        'normal_balance' => 'debit',
+        'is_active' => true,
+    ]);
+}
+
+test('store with confirmed status posts journal in the same transaction (Refs #367)', function () {
+    $account = makeConfirmedSupplierBillCoaFixture();
+    $supplier = Supplier::factory()->create();
+    $branch = Branch::factory()->create();
+    $fiscalYear = FiscalYear::query()->where('name', '2026')->firstOrFail();
+    $product = Product::factory()->create();
+
+    $response = postJson('/api/supplier-bills', [
+        'supplier_id' => $supplier->id,
+        'branch_id' => $branch->id,
+        'fiscal_year_id' => $fiscalYear->id,
+        'supplier_invoice_number' => 'INV-367-001',
+        'supplier_invoice_date' => '2026-03-05',
+        'bill_date' => '2026-03-05',
+        'due_date' => '2026-04-05',
+        'payment_terms' => 'Net 30',
+        'currency' => 'IDR',
+        'status' => 'confirmed',
+        'items' => [
+            [
+                'product_id' => $product->id,
+                'account_id' => $account->id,
+                'description' => 'Product purchase',
+                'quantity' => 2,
+                'unit_price' => 5000,
+                'discount_percent' => 0,
+                'tax_percent' => 0,
+            ],
+        ],
+    ]);
+
+    $response->assertCreated();
+
+    $bill = SupplierBill::query()->findOrFail($response->json('data.id'));
+
+    expect($bill->journal_entry_id)->not->toBeNull();
+    expect(JournalEntry::query()->findOrFail($bill->journal_entry_id)->status)->toBe('posted');
+});
+
+test('store with confirmed status rolls back the bill when journal posting fails (Refs #367)', function () {
+    $account = makeConfirmedSupplierBillCoaFixture();
+
+    $this->app->bind(PostSupplierBillJournalAction::class, function ($app) {
+        return new class($app->make(CreateJournalEntryAction::class), $app->make(ResolveControlAccountAction::class)) extends PostSupplierBillJournalAction
+        {
+            public function execute(SupplierBill $supplierBill): ?JournalEntry
+            {
+                throw new RuntimeException('Simulated journal posting failure');
+            }
+        };
+    });
+
+    $supplier = Supplier::factory()->create();
+    $branch = Branch::factory()->create();
+    $fiscalYear = FiscalYear::query()->where('name', '2026')->firstOrFail();
+    $product = Product::factory()->create();
+
+    postJson('/api/supplier-bills', [
+        'supplier_id' => $supplier->id,
+        'branch_id' => $branch->id,
+        'fiscal_year_id' => $fiscalYear->id,
+        'supplier_invoice_number' => 'INV-367-002',
+        'supplier_invoice_date' => '2026-03-05',
+        'bill_date' => '2026-03-05',
+        'due_date' => '2026-04-05',
+        'payment_terms' => 'Net 30',
+        'currency' => 'IDR',
+        'status' => 'confirmed',
+        'items' => [
+            [
+                'product_id' => $product->id,
+                'account_id' => $account->id,
+                'description' => 'Product purchase',
+                'quantity' => 2,
+                'unit_price' => 5000,
+                'discount_percent' => 0,
+                'tax_percent' => 0,
+            ],
+        ],
+    ])->assertStatus(500);
+
+    assertDatabaseMissing('supplier_bills', ['supplier_invoice_number' => 'INV-367-002']);
+});
+
 test('show returns supplier bill detail', function () {
     $supplierBill = SupplierBill::factory()->create();
     $product = Product::factory()->create();
