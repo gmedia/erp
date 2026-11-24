@@ -136,7 +136,7 @@ test.describe('Goods Receipt header selects', () => {
         await login(page, undefined, undefined, { requireDashboard: false });
         if (!fixtures) {
             fixtures = await seedGoodsReceiptFixtures(page);
-            await approveApprovableAsDelegate(page, fixtures.purchaseOrderId, 'E2E header selects');
+            await approveApprovableAsDelegate(page, fixtures.purchaseOrderId, 'E2E header selects', 'App\\Models\\PurchaseOrder');
         }
         const listed = page.waitForResponse(
             (r) => r.url().includes('/api/goods-receipts') && r.status() < 400,

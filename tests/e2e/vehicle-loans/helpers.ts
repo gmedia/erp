@@ -105,7 +105,7 @@ export async function seedApprovedLoan(page: Page): Promise<number> {
     );
     expect(submit.ok()).toBeTruthy();
 
-    await approveApprovableAsDelegate(page, id, 'E2ESeed approved');
+        await approveApprovableAsDelegate(page, id, 'E2ESeed approved', 'App\\Models\\VehicleLoan');
 
     for (let attempt = 0; attempt < 20; attempt++) {
         const check = await apiRequest(page, 'get', `/api/vehicle-loans/${id}`);

@@ -66,6 +66,7 @@ export async function approveApprovableAsDelegate(
     page: Page,
     approvableId: number,
     comments = 'E2E approved',
+    approvableType?: string,
 ): Promise<void> {
     const delegateLogin = await page.context().request.post('/api/login', {
         headers: { Accept: 'application/json' },
@@ -80,9 +81,15 @@ export async function approveApprovableAsDelegate(
     });
     expect(inbox.ok()).toBeTruthy();
     const payload = (await inbox.json()) as {
-        pending?: Array<{ request?: { id?: number; approvable_id?: number } }>;
+        pending?: Array<{
+            request?: { id?: number; approvable_id?: number; approvable_type?: string };
+        }>;
     };
-    const step = payload.pending?.find((item) => item.request?.approvable_id === approvableId);
+    const step = payload.pending?.find(
+        (item) =>
+            item.request?.approvable_id === approvableId &&
+            (approvableType === undefined || item.request?.approvable_type === approvableType),
+    );
     const requestId = step?.request?.id;
     if (!requestId) throw new Error(`No pending approval for approvable ${approvableId}`);
 

@@ -153,7 +153,7 @@ test.describe('Purchase Order approval flow (UI)', () => {
         await login(page, DEFAULT_E2E_EMAIL, undefined, {
             requireDashboard: false,
         });
-        await approveApprovableAsDelegate(page, poId);
+        await approveApprovableAsDelegate(page, poId, 'E2E approved', 'App\\Models\\PurchaseOrder');
 
         await page.goto('/purchase-orders');
         await searchAndWaitForApi(

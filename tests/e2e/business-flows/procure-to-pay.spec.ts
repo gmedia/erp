@@ -186,7 +186,7 @@ async function submitAndApprovePurchaseOrder(
     );
     expect(submitted.status).toBeLessThan(400);
 
-    await approveApprovableAsDelegate(page, poId, 'E2E P2P');
+    await approveApprovableAsDelegate(page, poId, 'E2E P2P', 'App\\Models\\PurchaseOrder');
 }
 
 async function createGoodsReceiptViaUi(
@@ -472,7 +472,7 @@ async function submitAndApprovePurchaseRequest(
     );
     expect(submitted.status).toBeLessThan(400);
 
-    await approveApprovableAsDelegate(page, prId, 'E2E P2P');
+    await approveApprovableAsDelegate(page, prId, 'E2E P2P', 'App\\Models\\PurchaseRequest');
 
     const pr = await apiGet<{ data: { status: string } }>(
         page,
