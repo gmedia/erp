@@ -25,8 +25,7 @@
         "fill_details": "Silakan isi detail di bawah ini.",
         "view_details": "Berikut adalah detail untuk item ini.",
         "stocktake_adjustment_draft": "Draf Penyesuaian Stok",
-        "stocktake_adjustment_none": "-",
-  "stocktake_adjustment_note": "Draf dari stock opname :stocktake"
+        "stocktake_adjustment_none": "-"
     },
     "permissions": {
         "empty_title": "Belum ada karyawan dipilih",
@@ -303,6 +302,7 @@
     "supplier_return.goods_receipt_mismatch": "Goods receipt harus milik purchase order tersebut.",
     "supplier_return.gr_item_mismatch": "Item GR harus milik goods receipt yang dipilih.",
   "supplier_return.returned_exceeds_received": "Qty retur melebihi sisa qty diterima dari item GR ini.",
+    "inventory_stocktake.adjustment_note": "Draf dari stock opname :stocktake",
     "goods_receipt.po_item_mismatch": "Item PO harus milik purchase order yang dipilih.",
     "goods_receipt.po_not_approved": "GR hanya bisa dikonfirmasi bila purchase order sudah dikonfirmasi atau diterima sebagian.",
     "goods_receipt.accepted_exceeds_received": "Jumlah diterima baik ditambah ditolak tidak boleh melebihi jumlah diterima.",

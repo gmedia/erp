@@ -48,7 +48,7 @@ class CreateStocktakeAdjustmentDraftAction
             'adjustment_type' => 'stocktake_result',
             'status' => 'draft',
             'inventory_stocktake_id' => $stocktake->id,
-            'notes' => __('common.stocktake_adjustment_note', ['stocktake' => $stocktake->stocktake_number]),
+            'notes' => __('inventory_stocktake.adjustment_note', ['stocktake' => $stocktake->stocktake_number]),
             'created_by' => Auth::id(),
         ]);
 
