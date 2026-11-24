@@ -31,6 +31,7 @@ test('it has fillable attributes', function () {
         'notes',
         'document_path',
         'document_name',
+        'status_before_disposal',
         'created_by',
     ]);
 });

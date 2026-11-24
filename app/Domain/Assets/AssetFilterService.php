@@ -27,6 +27,10 @@ class AssetFilterService
             'status' => 'status',
             'condition' => 'condition',
         ]);
+
+        if (! empty($filters['exclude_status'])) {
+            $query->where('status', '!=', $filters['exclude_status']);
+        }
     }
 
     public function applySorting(Builder $query, string $sortBy, string $sortDirection, array $allowedSorts): void
