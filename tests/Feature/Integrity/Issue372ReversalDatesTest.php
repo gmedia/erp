@@ -441,7 +441,7 @@ describe('Issue #372 — langkah 2: jalur HTTP edit dan batal memakai tanggal ya
         ]);
         app(StockPostingService::class)->postStockTransferDispatch($transfer->refresh());
 
-        deleteJson('/api/stock-transfers/' . $transfer->id)->assertNoContent();
+        deleteJson('/api/stock-transfers/'.$transfer->id)->assertNoContent();
 
         $reversal = StockMovement::query()
             ->where('movement_type', 'transfer_out_reversal')
@@ -640,5 +640,31 @@ describe('Issue #372 — review #420: riwayat saldo negatif lama tidak memblokir
         expect($thrown)->toBeInstanceOf(ValidationException::class);
         expect($thrown?->status)->toBe(422);
         expect(StockMovement::query()->where('movement_type', 'goods_receipt_reversal')->count())->toBe(0);
+    });
+
+    test('negatif lama yang sudah pulih tidak menutupi negatif baru: edit ditolak 422', function () {
+        $product = Product::factory()->create();
+        $warehouse = Warehouse::factory()->create();
+
+        // Saldo -10 pada 30 hari lalu, pulih ke 0 pada 25 hari lalu.
+        issue372RawMovement($product, $warehouse, 0, 10, now()->subDays(30));
+        issue372RawMovement($product, $warehouse, 10, 0, now()->subDays(25));
+        $receipt = issue372GoodsReceipt($warehouse, $product, 4, now()->subDays(10));
+        issue372Outflow($warehouse, $product, 4, now()->subDays(5));
+
+        expect(fn () => issue372EditGoodsReceipt($receipt, $product, 1))->toThrow(ValidationException::class);
+        expect(issue372BalanceOn($product, $warehouse, now()))->toBe(0.0);
+    });
+
+    test('negatif terburuk di tanggal lain tidak menutupi perburukan pada tanggal berikutnya', function () {
+        $product = Product::factory()->create();
+        $warehouse = Warehouse::factory()->create();
+
+        // GR 4 pada 20 hari lalu; saldo -6 pada 15 hari lalu; pulih ke 0 pada 10 hari lalu.
+        $receipt = issue372GoodsReceipt($warehouse, $product, 4, now()->subDays(20));
+        issue372RawMovement($product, $warehouse, 0, 10, now()->subDays(15));
+        issue372RawMovement($product, $warehouse, 6, 0, now()->subDays(10));
+
+        expect(fn () => issue372EditGoodsReceipt($receipt, $product, 3))->toThrow(ValidationException::class);
     });
 });

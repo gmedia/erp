@@ -63,7 +63,7 @@ class StockPostingService
             ->orderBy('moved_at')
             ->orderBy('id')
             ->get()
-            ->groupBy(fn (StockMovement $movement): string => $movement->product_id . ':' . $movement->warehouse_id);
+            ->groupBy(fn (StockMovement $movement): string => $movement->product_id.':'.$movement->warehouse_id);
 
         foreach ($grouped as $movements) {
             $balance = 0.0;
@@ -291,7 +291,7 @@ class StockPostingService
     ): void {
         // Atomik: bila saldo ditolak (422), pembalik yang sudah ditulis ikut dibatalkan.
         DB::transaction(function () use ($referenceType, $referenceId, $reversalType, $createdBy, $trigger): void {
-            $snapshot = $this->negativeBalanceSnapshot($referenceType, $referenceId, $reversalType);
+            $snapshot = $this->balanceSnapshot($referenceType, $referenceId);
             $scopes = $this->appendReversals($referenceType, $referenceId, $reversalType, $createdBy, $trigger);
 
             // Batal memakai tanggal pembatalan (hari ini). Periode tertutup ditolak oleh
@@ -316,7 +316,7 @@ class StockPostingService
         ?int $createdBy = null,
     ): void {
         DB::transaction(function () use ($referenceType, $referenceId, $reversalType, $repost, $createdBy): void {
-            $snapshot = $this->negativeBalanceSnapshot($referenceType, $referenceId, $reversalType);
+            $snapshot = $this->balanceSnapshot($referenceType, $referenceId);
             $scopes = $this->appendReversals(
                 $referenceType,
                 $referenceId,
@@ -348,7 +348,7 @@ class StockPostingService
                 continue;
             }
 
-            $key = $productId . ':' . $warehouseId;
+            $key = $productId.':'.$warehouseId;
             $required[$key] = ($required[$key] ?? 0.0) + $quantity;
         }
 
@@ -370,8 +370,8 @@ class StockPostingService
 
                 throw ValidationException::withMessages([
                     'items' => [__('stock.insufficient', [
-                        'product' => $productName ?? '#' . $productId,
-                        'warehouse' => $warehouseName ?? '#' . $warehouseId,
+                        'product' => $productName ?? '#'.$productId,
+                        'warehouse' => $warehouseName ?? '#'.$warehouseId,
                         'available' => $available,
                         'required' => $quantity,
                     ])],
@@ -432,7 +432,7 @@ class StockPostingService
 
         foreach ($originals as $original) {
             $alreadyReversed = StockMovement::query()
-                ->where('movement_type', $reversalType . '_reversal')
+                ->where('movement_type', $reversalType.'_reversal')
                 ->where('reference_type', $referenceType)
                 ->where('reference_id', $referenceId)
                 ->where('source_line_id', $original->source_line_id)
@@ -447,7 +447,7 @@ class StockPostingService
             $movedAt = $this->reversalMovedAt($original, $trigger);
 
             $this->record([
-                'movement_type' => $reversalType . '_reversal',
+                'movement_type' => $reversalType.'_reversal',
                 'reference_type' => $referenceType,
                 'reference_id' => $referenceId,
                 'reference_number' => $original->reference_number,
@@ -493,7 +493,7 @@ class StockPostingService
         $earliestByScope = [];
 
         foreach ($scopes as [$productId, $warehouseId, $movedAt]) {
-            $key = $productId . ':' . $warehouseId;
+            $key = $productId.':'.$warehouseId;
 
             if (! isset($earliestByScope[$key]) || $movedAt->lt($earliestByScope[$key][2])) {
                 $earliestByScope[$key] = [$productId, $warehouseId, $movedAt];
@@ -518,19 +518,18 @@ class StockPostingService
                 $productId,
                 $warehouseId,
                 $movedAt,
-                $baseline[$key] ?? null,
+                $baseline[$key] ?? [],
             );
         }
     }
 
     /**
-     * Baseline sebelum pembalik/repost: saldo terburuk per scope (product+warehouse)
-     * yang dimiliki dokumen, dihitung dari seluruh riwayat scope. Dipakai untuk
-     * membedakan riwayat negatif lama dari negatif yang dibuat operasi ini (review #420).
+     * Saldo per tanggal sebelum operasi, untuk setiap scope (product+warehouse) milik
+     * dokumen. Pembanding agar riwayat negatif lama tidak memblokir (review #420).
      *
-     * @return array<string, float> key "product:warehouse" => saldo terburuk (<0)
+     * @return array<string, array<string, float>> key "product:warehouse" => [moved_at => saldo]
      */
-    private function negativeBalanceSnapshot(string $referenceType, int $referenceId, string $reversalType): array
+    private function balanceSnapshot(string $referenceType, int $referenceId): array
     {
         $scopes = StockMovement::query()
             ->where('reference_type', $referenceType)
@@ -542,56 +541,83 @@ class StockPostingService
         $snapshot = [];
 
         foreach ($scopes as $scope) {
-            $worst = StockMovement::query()
-                ->where('product_id', $scope->product_id)
-                ->where('warehouse_id', $scope->warehouse_id)
-                ->where('balance_after', '<', 0)
-                ->min('balance_after');
+            $productId = (int) $scope->product_id;
+            $warehouseId = (int) $scope->warehouse_id;
 
-            if ($worst !== null) {
-                $snapshot[$scope->product_id . ':' . $scope->warehouse_id] = (float) $worst;
-            }
+            $snapshot[$productId.':'.$warehouseId] = $this->closingBalances($productId, $warehouseId);
         }
 
         return $snapshot;
     }
 
     /**
-     * Tolak (422) hanya bila operasi ini membuat saldo negatif baru, atau memperburuk
-     * saldo negatif yang sudah ada, pada rentang moved_at >= $from. Riwayat negatif
-     * lama yang tidak diperburuk tidak memblokir (review #420).
+     * Saldo akhir pada setiap moved_at (urut waktu). Movement dengan moved_at sama
+     * dinilai hasil akhirnya, sehingga pembalik dan repost tidak terbaca sebagai negatif sesaat.
+     *
+     * @return array<string, float>
+     */
+    private function closingBalances(int $productId, int $warehouseId): array
+    {
+        $balances = [];
+
+        $movements = StockMovement::query()
+            ->where('product_id', $productId)
+            ->where('warehouse_id', $warehouseId)
+            ->orderBy('moved_at')
+            ->orderBy('id')
+            ->get(['id', 'moved_at', 'balance_after']);
+
+        foreach ($movements as $movement) {
+            $balances[$movement->moved_at->format('Y-m-d H:i:s')] = (float) $movement->balance_after;
+        }
+
+        return $balances;
+    }
+
+    /**
+     * Tolak (422) hanya bila pada suatu waktu >= $from saldo menjadi negatif dan lebih
+     * rendah daripada saldo pada waktu yang sama sebelum operasi ini (review #420).
+     *
+     * @param  array<string, float>  $before
      */
     private function assertNoWorsenedNegativeBalance(
         int $productId,
         int $warehouseId,
         CarbonInterface $from,
-        ?float $balanceBefore,
+        array $before,
     ): void {
-        $balanceAfter = StockMovement::query()
-            ->where('product_id', $productId)
-            ->where('warehouse_id', $warehouseId)
-            ->where('moved_at', '>=', $from)
-            ->where('balance_after', '<', 0)
-            ->min('balance_after');
+        $fromKey = $from->format('Y-m-d H:i:s');
 
-        if ($balanceAfter === null) {
-            return;
+        foreach ($this->closingBalances($productId, $warehouseId) as $movedAt => $balance) {
+            if ($movedAt < $fromKey || $balance >= 0) {
+                continue;
+            }
+
+            $balanceBefore = 0.0;
+
+            foreach ($before as $beforeMovedAt => $value) {
+                if ($beforeMovedAt > $movedAt) {
+                    break;
+                }
+
+                $balanceBefore = $value;
+            }
+
+            if ($balance >= $balanceBefore) {
+                continue;
+            }
+
+            $this->throwInsufficientStock(
+                $productId,
+                $warehouseId,
+                StockMovement::query()
+                    ->where('product_id', $productId)
+                    ->where('warehouse_id', $warehouseId)
+                    ->where('moved_at', $movedAt)
+                    ->orderByDesc('id')
+                    ->first(),
+            );
         }
-
-        if ($balanceBefore !== null && (float) $balanceAfter >= $balanceBefore) {
-            return;
-        }
-
-        $negative = StockMovement::query()
-            ->where('product_id', $productId)
-            ->where('warehouse_id', $warehouseId)
-            ->where('moved_at', '>=', $from)
-            ->where('balance_after', '=', $balanceAfter)
-            ->orderBy('moved_at')
-            ->orderBy('id')
-            ->first();
-
-        $this->throwInsufficientStock($productId, $warehouseId, $negative);
     }
 
     /**
@@ -626,8 +652,8 @@ class StockPostingService
 
         throw ValidationException::withMessages([
             'items' => [__('stock.insufficient', [
-                'product' => $productName ?? '#' . $productId,
-                'warehouse' => $warehouseName ?? '#' . $warehouseId,
+                'product' => $productName ?? '#'.$productId,
+                'warehouse' => $warehouseName ?? '#'.$warehouseId,
                 'available' => $available,
                 'required' => $required,
             ])],
