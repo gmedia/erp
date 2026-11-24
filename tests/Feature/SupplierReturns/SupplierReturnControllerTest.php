@@ -448,6 +448,54 @@ test('confirming supplier return in a closed fiscal period is rejected with 422 
     ]);
 });
 
+test('confirming supplier return with ambiguous COA versions is rejected with 422 unchanged', function () {
+    // Dua COA aktif dan tidak ada tahun fiskal yang mencakup tanggal retur: tidak boleh menebak.
+    CoaVersion::factory()->count(2)->create(['status' => 'active']);
+    [
+        $purchaseOrder,
+        $goodsReceipt,
+        $goodsReceiptItem,
+        $supplier,
+        $warehouse,
+        $product,
+        $unit,
+    ] = createGoodsReceiptItemForSupplierReturn();
+    $supplierReturn = SupplierReturn::factory()->create([
+        'purchase_order_id' => $purchaseOrder->id,
+        'goods_receipt_id' => $goodsReceipt->id,
+        'supplier_id' => $supplier->id,
+        'warehouse_id' => $warehouse->id,
+        'return_date' => '2026-04-01',
+        'status' => 'draft',
+        'confirmed_at' => null,
+        'confirmed_by' => null,
+    ]);
+
+    putJson('/api/supplier-returns/' . $supplierReturn->id, [
+        'status' => 'confirmed',
+        'items' => [
+            [
+                'goods_receipt_item_id' => $goodsReceiptItem->id,
+                'product_id' => $product->id,
+                'unit_id' => $unit->id,
+                'quantity_returned' => 3,
+                'unit_price' => 10000,
+            ],
+        ],
+    ])->assertStatus(422)->assertJsonValidationErrors(['coa_version']);
+
+    $supplierReturn->refresh();
+    expect($supplierReturn->status)->toBe('draft')
+        ->and($supplierReturn->confirmed_at)->toBeNull()
+        ->and($supplierReturn->journal_entry_id)->toBeNull();
+
+    assertDatabaseMissing('stock_movements', [
+        'movement_type' => 'supplier_return',
+        'reference_type' => SupplierReturn::class,
+        'reference_id' => $supplierReturn->id,
+    ]);
+});
+
 test('destroy removes a draft supplier return', function () {
     $supplierReturn = SupplierReturn::factory()->create(['status' => 'draft']);
 

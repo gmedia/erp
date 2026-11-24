@@ -462,6 +462,46 @@ test('confirming goods receipt without account 21150 is rejected with 422 unchan
     ]);
 });
 
+test('confirming goods receipt with ambiguous COA versions is rejected with 422 unchanged', function () {
+    // Dua COA aktif dan tidak ada tahun fiskal yang mencakup tanggal GR: tidak boleh menebak.
+    CoaVersion::factory()->count(2)->create(['status' => 'active']);
+    [$purchaseOrder, $purchaseOrderItem, $product, $unit] = createPurchaseOrderWithItemForGoodsReceipt();
+    $goodsReceipt = GoodsReceipt::factory()->create([
+        'purchase_order_id' => $purchaseOrder->id,
+        'warehouse_id' => $purchaseOrder->warehouse_id,
+        'receipt_date' => '2026-03-06',
+        'status' => 'draft',
+        'confirmed_at' => null,
+        'confirmed_by' => null,
+    ]);
+
+    putJson('/api/goods-receipts/' . $goodsReceipt->id, [
+        'status' => 'confirmed',
+        'items' => [
+            [
+                'purchase_order_item_id' => $purchaseOrderItem->id,
+                'product_id' => $product->id,
+                'unit_id' => $unit->id,
+                'quantity_received' => 7,
+                'quantity_accepted' => 6,
+                'quantity_rejected' => 1,
+                'unit_price' => 10000,
+            ],
+        ],
+    ])->assertStatus(422)->assertJsonValidationErrors(['coa_version']);
+
+    $goodsReceipt->refresh();
+    expect($goodsReceipt->status)->toBe('draft')
+        ->and($goodsReceipt->confirmed_at)->toBeNull()
+        ->and($goodsReceipt->journal_entry_id)->toBeNull();
+
+    assertDatabaseMissing('stock_movements', [
+        'movement_type' => 'goods_receipt',
+        'reference_type' => GoodsReceipt::class,
+        'reference_id' => $goodsReceipt->id,
+    ]);
+});
+
 test('destroy removes goods receipt', function () {
     $goodsReceipt = GoodsReceipt::factory()->create();
 
