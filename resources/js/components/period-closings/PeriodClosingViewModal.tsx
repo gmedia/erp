@@ -1,14 +1,12 @@
+import { StatusActionDialog } from '@/components/common/StatusActionDialog';
 import { ViewField } from '@/components/common/ViewField';
 import { ViewModalShell } from '@/components/common/ViewModalShell';
-import { PeriodClosingActionDialog } from '@/components/period-closings/PeriodClosingActionDialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useTranslation } from '@/contexts/i18n-context';
 import {
     type PeriodClosingAction,
     usePeriodClosingAction,
 } from '@/hooks/usePeriodClosingAction';
-import { usePermissions } from '@/hooks/usePermissions';
 import { formatStatusLabel } from '@/lib/status-badge';
 import { PeriodClosing } from '@/types/period-closing';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
@@ -30,10 +28,6 @@ export function PeriodClosingViewModal({
     open,
     onClose,
 }: Readonly<PeriodClosingViewModalProps>) {
-    const { t } = useTranslation();
-    const { can } = usePermissions();
-    const canEdit = can('period_closing.edit');
-
     const [pendingAction, setPendingAction] =
         useState<PeriodClosingAction | null>(null);
     // Hasil aksi hanya berlaku untuk item yang sedang dibuka; data baris baru mengalahkannya.
@@ -41,16 +35,13 @@ export function PeriodClosingViewModal({
         source: PeriodClosing | null;
         next: PeriodClosing;
     } | null>(null);
-    const { run, processing } = usePeriodClosingAction({
-        onSuccess: (next) => setUpdated({ source: item, next }),
-    });
+    const { run, processing, processingLabel, getActions } =
+        usePeriodClosingAction((next) => setUpdated({ source: item, next }));
 
     if (!item) return null;
 
     const view = updated?.source === item ? updated.next : item;
-    const isBusy = processing !== null;
-    const canClose = canEdit && view.status !== 'closed';
-    const canReopen = canEdit && view.status === 'closed';
+    const actions = getActions(view);
 
     const handleConfirm = async () => {
         if (!pendingAction) return;
@@ -59,27 +50,19 @@ export function PeriodClosingViewModal({
     };
 
     const footer =
-        canClose || canReopen ? (
+        actions.length > 0 ? (
             <div className="flex w-full flex-wrap items-center justify-end gap-2">
-                {canClose && (
+                {actions.map(({ action, label }) => (
                     <Button
+                        key={action}
                         type="button"
-                        onClick={() => setPendingAction('close')}
-                        disabled={isBusy}
+                        variant={action === 'reopen' ? 'outline' : 'default'}
+                        onClick={() => setPendingAction(action)}
+                        disabled={processing}
                     >
-                        {t('periodClosings.close')}
+                        {label}
                     </Button>
-                )}
-                {canReopen && (
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => setPendingAction('reopen')}
-                        disabled={isBusy}
-                    >
-                        {t('periodClosings.reopen')}
-                    </Button>
-                )}
+                ))}
             </div>
         ) : undefined;
 
@@ -91,14 +74,12 @@ export function PeriodClosingViewModal({
             description="View complete details of this period closing"
             footer={footer}
         >
-            <PeriodClosingActionDialog
-                action={pendingAction}
-                item={view}
-                processing={isBusy}
+            <StatusActionDialog
+                config={actions.find(({ action }) => action === pendingAction)}
+                processing={processing}
+                processingLabel={processingLabel}
                 onConfirm={() => void handleConfirm()}
-                onOpenChange={(next) => {
-                    if (!next && !isBusy) setPendingAction(null);
-                }}
+                onCancel={() => setPendingAction(null)}
             />
             <div className="space-y-4 py-4">
                 <ViewField
