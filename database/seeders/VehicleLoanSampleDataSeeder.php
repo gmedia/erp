@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Actions\AccountingPosting\PostAssetAcquisitionJournalAction;
+use App\Actions\AccountingPosting\ResolveControlAccountAction;
 use App\Models\ApprovalFlow;
 use App\Models\ApprovalFlowStep;
 use App\Models\ApprovalRequest;
@@ -13,6 +15,7 @@ use App\Models\Company;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Employment;
+use App\Models\JournalEntryLine;
 use App\Models\Position;
 use App\Models\Setting;
 use App\Models\User;
@@ -539,8 +542,34 @@ class VehicleLoanSampleDataSeeder extends Seeder
                     'currency' => 'IDR',
                     'status' => 'active',
                     'condition' => 'good',
+                    'depreciation_method' => 'straight_line',
+                    'depreciation_start_date' => now()->subYears(3)->toDateString(),
+                    'useful_life_months' => 60,
+                    'salvage_value' => 0,
                 ],
             );
+
+            // Kendaraan dibuat setelah AssetSampleDataSeeder, jadi perolehannya
+            // harus dijurnal di sini lewat action (#357).
+            app(PostAssetAcquisitionJournalAction::class)->execute($asset);
+
+            // Register awal = saldo opening dari jurnal ACQ (bukan selisih GL).
+            // Kolom book_value default 0 akan membuat run depresiasi melewati
+            // kendaraan ini (#357).
+            $accumulatedAccountId = app(ResolveControlAccountAction::class)
+                ->execute('12200', $asset->purchase_date->toDateString())
+                ->id;
+            $openingAccumulated = (float) JournalEntryLine::query()
+                ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+                ->where('journal_entries.reference', 'ACQ-' . $asset->asset_code)
+                ->where('journal_entries.status', 'posted')
+                ->where('journal_entry_lines.account_id', $accumulatedAccountId)
+                ->sum('journal_entry_lines.credit');
+
+            $asset->forceFill([
+                'accumulated_depreciation' => $openingAccumulated,
+                'book_value' => (float) $asset->purchase_cost - $openingAccumulated,
+            ])->saveQuietly();
 
             // `asset_id` dan `plate_number` sama-sama unik; cocokkan keduanya
             // agar unit lama dengan plat yang sama tidak memicu duplikat.

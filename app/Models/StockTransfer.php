@@ -27,6 +27,7 @@ use Illuminate\Support\Carbon;
  * @property int|null $received_by
  * @property Carbon|null $received_at
  * @property int|null $created_by
+ * @property int|null $journal_entry_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read User|null $approvedBy
@@ -88,6 +89,7 @@ class StockTransfer extends Model
         'received_by',
         'received_at',
         'created_by',
+        'journal_entry_id',
     ];
 
     /**
@@ -114,6 +116,11 @@ class StockTransfer extends Model
     public function items(): HasMany
     {
         return $this->hasMany(StockTransferItem::class);
+    }
+
+    public function journalEntry(): BelongsTo
+    {
+        return $this->belongsTo(JournalEntry::class);
     }
 
     public function requestedBy(): BelongsTo

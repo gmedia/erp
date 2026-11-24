@@ -33,6 +33,7 @@ const PO_QTY = 4;
 const UNIT_PRICE = 250000;
 const INVENTORY_ACCOUNT_CODE = '11300';
 const AP_ACCOUNT_CODE = '21100';
+const GRIR_ACCOUNT_CODE = '21150';
 const EXPENSE_ACCOUNT_CODE = '51000';
 const CASH_ACCOUNT_CODE = '11110';
 
@@ -91,6 +92,7 @@ interface P2pRun {
     accounts: {
         inventory: number;
         ap: number;
+        grir: number;
         expense: number;
         cash: number;
     };
@@ -324,6 +326,7 @@ async function runProcureToPay(page: Page): Promise<P2pRun> {
     const accounts = {
         inventory: await accountId(page, INVENTORY_ACCOUNT_CODE),
         ap: await accountId(page, AP_ACCOUNT_CODE),
+        grir: await accountId(page, GRIR_ACCOUNT_CODE),
         expense: await accountId(page, EXPENSE_ACCOUNT_CODE),
         cash: await accountId(page, CASH_ACCOUNT_CODE),
     };
@@ -560,13 +563,17 @@ test.describe('Procure-to-pay: PR sampai pembayaran supplier', () => {
         expect(
             netForAccount(run.grJournal, run.accounts.inventory),
         ).toBeCloseTo(total, 2);
-        expect(netForAccount(run.grJournal, run.accounts.ap)).toBeCloseTo(
+        expect(netForAccount(run.grJournal, run.accounts.grir)).toBeCloseTo(
             -total,
             2,
         );
         expect(
             netForAccount(run.billJournal, run.accounts.expense),
         ).toBeCloseTo(total, 2);
+        expect(netForAccount(run.billJournal, run.accounts.grir)).toBeCloseTo(
+            0,
+            2,
+        );
         expect(netForAccount(run.billJournal, run.accounts.ap)).toBeCloseTo(
             -total,
             2,

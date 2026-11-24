@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Actions\AccountingPosting\PostAssetAcquisitionJournalAction;
 use App\Models\Account;
 use App\Models\ApprovalAuditLog;
 use App\Models\ApprovalFlow;
@@ -30,6 +31,19 @@ use Illuminate\Database\Seeder;
 
 class AssetSampleDataSeeder extends Seeder
 {
+    /**
+     * Kode aset demo. Seeder yang menyentuh aset lain (mis. normalisasi
+     * depresiasi) wajib membatasi diri ke daftar ini agar aset buatan
+     * pengguna tidak ikut berubah (#357).
+     */
+    public const DEMO_ASSET_CODES = [
+        'FA-000001', 'FA-000002', 'FA-000003', 'FA-000004',
+        'FA-000005', 'FA-000006', 'FA-000007', 'FA-000008',
+        'FA-000009', 'FA-000010', 'FA-000011', 'FA-000012',
+        // Kendaraan dibuat VehicleLoanSampleDataSeeder, tetap bagian dari demo.
+        'FA-000013', 'FA-000014', 'FA-000015',
+    ];
+
     public function run(): void
     {
         $adminUser = User::where('email', config('app.admin'))->first();
@@ -502,6 +516,15 @@ class AssetSampleDataSeeder extends Seeder
 
             $asset = Asset::updateOrCreate(['asset_code' => $data['asset_code']], $data);
 
+            // Perolehan dijurnal dari nilai register (#357). Draft dan aset
+            // yang dibatalkan belum dikapitalisasi, jadi tidak diposting.
+            // Aset disposed sebelum fiscal year terbuka tidak masuk saldo awal.
+            $acquisitionJournal = app(PostAssetAcquisitionJournalAction::class);
+
+            if ($acquisitionJournal->isPostable($asset)) {
+                $acquisitionJournal->execute($asset);
+            }
+
             AssetMovement::updateOrCreate(
                 ['asset_id' => $asset->id, 'movement_type' => 'acquired', 'moved_at' => $asset->purchase_date],
                 [
@@ -947,7 +970,7 @@ class AssetSampleDataSeeder extends Seeder
         $accumAcc = Account::query()->where('code', '12200')->first();
 
         if ($expenseAcc && $accumAcc) {
-            Asset::query()->update([
+            Asset::query()->whereIn('asset_code', self::DEMO_ASSET_CODES)->update([
                 'depreciation_expense_account_id' => $expenseAcc->id,
                 'accumulated_depr_account_id' => $accumAcc->id,
             ]);

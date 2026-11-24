@@ -73,6 +73,8 @@ Host RAM/CPU is limited. Parallel `Read`/`Edit`/`task` batches have **killed Ope
   - `bash scripts/e2e-full.sh` → seluruh direktori E2E (CI list)
   - `bash scripts/e2e-full.sh tests/e2e/branches` → hanya modul tertentu
   - `bash scripts/e2e-full.sh --shard=1/4 --reporter=line` → shard seperti CI
+  - Build aset **dilewati** bila sumbernya sama dengan build terakhir (`E2E_FULL_FORCE_BUILD=1` memaksa).
+  - **Hemat waktu:** buktikan dulu lewat Pest/`types`/lint. Setelah putaran pertama, ulang yang gagal saja (`bash scripts/e2e-full.sh tests/e2e/<modul> --last-failed`), lalu folder penuh **sekali** di akhir langkah. Maksimal dua putaran perbaikan per langkah; bila masih merah, berhenti dan laporkan penyebabnya.
   - Exit code = exit Playwright; `bootstrap/cache/config.php` dijamin tidak tersisa.
 - Supaya `global-setup` tetap menjalankan Artisan **di dalam container**, set `PLAYWRIGHT_PHP_BINARY` ke wrapper:
   `#!/usr/bin/env bash; exec ./vendor/bin/sail php "$@"` (simpan di `scripts/sail-php`, chmod +x). Tanpa ini, `tryLocalPhpBinary()` akan memakai `php` host dan gagal terkoneksi ke DB.

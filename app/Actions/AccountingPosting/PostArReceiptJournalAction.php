@@ -39,10 +39,11 @@ class PostArReceiptJournalAction
                 ]);
             }
 
-            $arAccount = $this->resolveControlAccount->execute(self::AR_CONTROL_ACCOUNT_CODE);
+            $entryDate = $arReceipt->receipt_date->format('Y-m-d');
+            $arAccount = $this->resolveControlAccount->execute(self::AR_CONTROL_ACCOUNT_CODE, $entryDate);
 
             $journalEntry = $this->createJournalEntry->execute([
-                'entry_date' => $arReceipt->receipt_date->format('Y-m-d'),
+                'entry_date' => $entryDate,
                 'reference' => $arReceipt->receipt_number,
                 'description' => "AR Receipt {$arReceipt->receipt_number}",
                 'status' => 'posted',

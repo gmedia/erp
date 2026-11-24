@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\AccountingPosting\PostStockTransferJournalAction;
 use App\Actions\StockTransfers\ExportStockTransfersAction;
 use App\Actions\StockTransfers\IndexStockTransfersAction;
 use App\Actions\StockTransfers\SyncStockTransferItemsAction;
@@ -65,6 +66,9 @@ class StockTransferController extends Controller
                 $syncItems->execute($transfer, $items);
             },
         );
+
+        // Create langsung berstatus received: jurnal selisih ikut diposting (Issue #357).
+        app(PostStockTransferJournalAction::class)->execute($transfer->refresh());
 
         $transfer->load(['fromWarehouse', 'toWarehouse', 'items.product', 'items.unit']);
 
@@ -182,6 +186,7 @@ class StockTransferController extends Controller
 
             $stockPosting->postStockTransferDispatch($stockTransfer);
             $stockPosting->postStockTransferReceive($stockTransfer);
+            app(PostStockTransferJournalAction::class)->execute($stockTransfer->refresh());
         });
 
         $stockTransfer->load(['fromWarehouse', 'toWarehouse', 'items.product', 'items.unit']);

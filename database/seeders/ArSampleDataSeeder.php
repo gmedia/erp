@@ -2,10 +2,14 @@
 
 namespace Database\Seeders;
 
+use App\Actions\AccountingPosting\PostArReceiptJournalAction;
+use App\Actions\AccountingPosting\PostCustomerInvoiceJournalAction;
+use App\Actions\CreditNotes\ApplyCreditNoteAction;
 use App\Models\Account;
 use App\Models\ArReceipt;
 use App\Models\ArReceiptAllocation;
 use App\Models\Branch;
+use App\Models\CoaVersion;
 use App\Models\CreditNote;
 use App\Models\CreditNoteItem;
 use App\Models\Customer;
@@ -20,6 +24,12 @@ use Illuminate\Database\Seeder;
 
 class ArSampleDataSeeder extends Seeder
 {
+    /**
+     * Status invoice yang pernah dikirim sehingga jurnal AR-nya sudah diposting
+     * (sama seperti CustomerInvoiceController saat transisi ke "sent").
+     */
+    private const POSTED_INVOICE_STATUSES = ['sent', 'partially_paid', 'paid', 'overdue'];
+
     public function run(): void
     {
         Customer::where('address', 'like', 'Jl. Sample No.%')
@@ -42,8 +52,12 @@ class ArSampleDataSeeder extends Seeder
         $fiscalYear = FiscalYear::query()->where('status', 'open')->first();
         $products = Product::query()->take(5)->get();
         $units = Unit::query()->take(3)->get();
+        $activeCoaVersionId = CoaVersion::query()->where('status', 'active')->value('id');
         $revenueAccount = Account::query()
+            ->where('coa_version_id', $activeCoaVersionId)
             ->where('type', 'revenue')
+            ->where('is_active', true)
+            ->orderBy('code')
             ->first();
 
         if (! $branch || ! $fiscalYear || $products->isEmpty() || $units->isEmpty() || ! $revenueAccount) {
@@ -113,6 +127,7 @@ class ArSampleDataSeeder extends Seeder
         string $year
     ): array {
         $invoices = [];
+        $postJournal = app(PostCustomerInvoiceJournalAction::class);
 
         $invoiceDefinitions = [
             [
@@ -234,18 +249,25 @@ class ArSampleDataSeeder extends Seeder
                         : $definition['grand_total'] - $definition['amount_received'] - $definition['credit_note_amount'],
                     'status' => $definition['status'],
                     'notes' => 'Invoice penjualan sesuai pesanan pelanggan',
-                    'journal_entry_id' => null,
                     'created_by' => $adminUserId,
                     'sent_by' => $definition['sent_by'],
                     'sent_at' => $definition['sent_at'],
                 ]
             );
 
+            // Total baris dibulatkan ke rupiah penuh; selisih pembulatan dibebankan
+            // ke baris terakhir agar Σ line_total = grand_total (jurnal AR = invoice).
+            $lineTotalBase = round($definition['grand_total'] / $definition['item_count'], 2);
+            $lineTotalRemainder = round($definition['grand_total'] - $lineTotalBase * $definition['item_count'], 2);
+
             for ($i = 0; $i < $definition['item_count']; $i++) {
                 $product = $products[($index + $i) % $products->count()];
                 $unit = $units[($index + $i) % $units->count()];
                 $quantity = ($i + 1) * 2;
-                $unitPrice = ($definition['grand_total'] / $definition['item_count']) / $quantity;
+                $lineTotal = $i === $definition['item_count'] - 1
+                    ? round($lineTotalBase + $lineTotalRemainder, 2)
+                    : $lineTotalBase;
+                $unitPrice = round($lineTotal / $quantity, 2);
 
                 CustomerInvoiceItem::updateOrCreate(
                     [
@@ -258,7 +280,7 @@ class ArSampleDataSeeder extends Seeder
                         'unit_price' => $unitPrice,
                         'discount_percent' => 0,
                         'tax_percent' => 10,
-                        'line_total' => $quantity * $unitPrice,
+                        'line_total' => $lineTotal,
                         'account_id' => $revenueAccount->id,
                         'description' => 'Penjualan barang sesuai pesanan',
                         'notes' => 'Item invoice sesuai pesanan pelanggan',
@@ -266,7 +288,11 @@ class ArSampleDataSeeder extends Seeder
                 );
             }
 
-            $invoices[$definition['status']] = $invoice;
+            if (in_array($definition['status'], self::POSTED_INVOICE_STATUSES, true)) {
+                $postJournal->execute($invoice->refresh());
+            }
+
+            $invoices[$definition['status']] = $invoice->refresh();
         }
 
         return $invoices;
@@ -281,9 +307,12 @@ class ArSampleDataSeeder extends Seeder
         string $year
     ): array {
         $receipts = [];
+        $postReceiptJournal = app(PostArReceiptJournalAction::class);
 
         $bankAccount = Account::query()
+            ->where('coa_version_id', CoaVersion::query()->where('status', 'active')->value('id'))
             ->where('code', '11110')
+            ->where('is_active', true)
             ->first();
 
         if (! $bankAccount) {
@@ -339,7 +368,6 @@ class ArSampleDataSeeder extends Seeder
                     'reference' => 'TRF-' . now()->format('Ymd') . '-' . ($index + 1),
                     'status' => $definition['status'],
                     'notes' => 'Penerimaan pembayaran melalui transfer bank',
-                    'journal_entry_id' => null,
                     'created_by' => $adminUserId,
                     'confirmed_by' => $definition['status'] === 'confirmed' ? $adminUserId : null,
                     'confirmed_at' => $definition['status'] === 'confirmed' ? now()->subDays(2) : null,
@@ -374,10 +402,33 @@ class ArSampleDataSeeder extends Seeder
                 }
             }
 
+            if ($definition['status'] === 'confirmed') {
+                $postReceiptJournal->execute($receipt->refresh());
+            }
+
             $receipts[$definition['status'] . '_' . ($index + 1)] = $receipt;
         }
 
         return $receipts;
+    }
+
+    /**
+     * Menyelaraskan credit_note_amount/amount_due invoice dengan CN applied dan
+     * penerimaan yang tersisa. Rumus sama dengan ApplyCreditNoteAction.
+     */
+    private function restoreInvoiceSettlement(CustomerInvoice $invoice): void
+    {
+        $credited = (float) CreditNote::query()
+            ->where('customer_invoice_id', $invoice->id)
+            ->where('status', 'applied')
+            ->sum('grand_total');
+
+        $invoice->credit_note_amount = $credited;
+        $invoice->amount_due = (float) $invoice->grand_total
+            - (float) $invoice->amount_received
+            - $credited;
+        $invoice->save();
+        $invoice->updatePaymentStatus();
     }
 
     private function seedCreditNotes(
@@ -426,6 +477,16 @@ class ArSampleDataSeeder extends Seeder
             $subtotal = $definition['grand_total'] * 0.9;
             $taxAmount = $definition['grand_total'] - $subtotal;
 
+            // CN "applied" dibuat confirmed dulu; status applied diset oleh ApplyCreditNoteAction.
+            // Seed ulang tidak boleh menurunkan CN yang sudah applied kembali ke confirmed.
+            $existingStatus = CreditNote::query()
+                ->where('credit_note_number', $definition['number'])
+                ->value('status');
+            $targetStatus = $definition['applied'] ? 'confirmed' : $definition['status'];
+            if ($existingStatus === 'applied') {
+                $targetStatus = 'applied';
+            }
+
             $creditNote = CreditNote::updateOrCreate(
                 ['credit_note_number' => $definition['number']],
                 [
@@ -438,9 +499,8 @@ class ArSampleDataSeeder extends Seeder
                     'subtotal' => $subtotal,
                     'tax_amount' => $taxAmount,
                     'grand_total' => $definition['grand_total'],
-                    'status' => $definition['status'],
+                    'status' => $targetStatus,
                     'notes' => 'Nota kredit atas retur penjualan',
-                    'journal_entry_id' => null,
                     'created_by' => $adminUserId,
                     'confirmed_by' => in_array($definition['status'], ['confirmed', 'applied'], true) ? $adminUserId : null,
                     'confirmed_at' => in_array($definition['status'], ['confirmed', 'applied'], true) ? now()->subDays(1) : null,
@@ -471,14 +531,16 @@ class ArSampleDataSeeder extends Seeder
                 );
             }
 
-            // Update invoice credit_note_amount if applied
+            // Credit note applied: lewat ApplyCreditNoteAction, yang memposting jurnal
+            // (PostCreditNoteJournalAction) dan memperbarui credit_note_amount/amount_due invoice.
+            if ($definition['applied'] && $invoice && $creditNote->fresh()->status === 'confirmed') {
+                app(ApplyCreditNoteAction::class)->execute($creditNote->fresh());
+            }
+
+            // Seed ulang: invoice di-upsert dengan credit_note_amount = 0, sehingga CN yang sudah
+            // applied (dan jurnalnya) tidak lagi tercermin di invoice. Pulihkan dari CN applied.
             if ($definition['applied'] && $invoice) {
-                $newCreditNoteAmount = (float) $invoice->credit_note_amount + $definition['grand_total'];
-                $invoice->update([
-                    'credit_note_amount' => $newCreditNoteAmount,
-                    'amount_due' => $invoice->grand_total - $invoice->amount_received - $newCreditNoteAmount,
-                ]);
-                $invoice->updatePaymentStatus();
+                $this->restoreInvoiceSettlement($invoice);
             }
         }
     }

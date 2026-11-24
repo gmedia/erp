@@ -57,6 +57,14 @@ function makeBranchWritePathAccounts(): array
             'normal_balance' => 'debit',
             'is_active' => true,
         ]),
+        'grir' => Account::factory()->create([
+            'coa_version_id' => $coaVersion->id,
+            'code' => '21150',
+            'name' => 'Goods Received Not Invoiced (GR/IR)',
+            'type' => 'liability',
+            'normal_balance' => 'credit',
+            'is_active' => true,
+        ]),
     ];
 }
 
@@ -104,11 +112,12 @@ it('defaults branch_id to null when not provided', function () {
 
 it('posts a direct-branch source with its own branch_id', function () {
     makeBranchWritePathFiscalYear();
-    makeBranchWritePathAccounts();
+    $accounts = makeBranchWritePathAccounts();
     $branch = Branch::factory()->create();
 
     $payment = ApPayment::factory()->confirmed()->create([
         'branch_id' => $branch->id,
+        'bank_account_id' => $accounts['bank']->id,
         'payment_date' => '2026-03-15',
         'total_amount' => 750000,
         'journal_entry_id' => null,

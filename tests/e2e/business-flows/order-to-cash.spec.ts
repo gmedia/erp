@@ -770,11 +770,6 @@ test.describe('Order-to-cash: invoice sampai pelunasan', () => {
     test('jurnal credit note posted: Dr pendapatan 41000 / Cr AR 11200 sebesar CN', async ({
         page,
     }) => {
-        test.fail(
-            true,
-            'credit note tidak memposting jurnal, delta pendapatan 1.000.000 vs 900.000 (#357)',
-        );
-
         const run = await runOrderToCash(page);
         const creditNoteJournal = await readJournalByReference(
             page,
