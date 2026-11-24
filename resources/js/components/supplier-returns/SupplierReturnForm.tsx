@@ -286,9 +286,6 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="w-[140px]">
-                                        GR Item ID
-                                    </TableHead>
                                     <TableHead className="w-[220px]">
                                         Product
                                     </TableHead>
@@ -315,12 +312,6 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
 
                                     return (
                                         <TableRow key={field.id}>
-                                            <TableCell>
-                                                {formatItemReference(
-                                                    undefined,
-                                                    supplierReturnItem.goods_receipt_item_id,
-                                                )}
-                                            </TableCell>
                                             <TableCell>
                                                 {formatItemReference(
                                                     supplierReturnItem.product_label,
@@ -354,7 +345,7 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
                                     );
                                 })}
                                 {fields.length === 0 && (
-                                    <EntityFormItemEmptyRow colSpan={7} />
+                                    <EntityFormItemEmptyRow colSpan={6} />
                                 )}
                             </TableBody>
                         </Table>

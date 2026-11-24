@@ -267,9 +267,6 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead className="w-[140px]">
-                                        PO Item ID
-                                    </TableHead>
                                     <TableHead className="w-[220px]">
                                         Product
                                     </TableHead>
@@ -302,12 +299,6 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
 
                                     return (
                                         <TableRow key={field.id}>
-                                            <TableCell>
-                                                {formatItemReference(
-                                                    undefined,
-                                                    goodsReceiptItem.purchase_order_item_id,
-                                                )}
-                                            </TableCell>
                                             <TableCell>
                                                 {formatItemReference(
                                                     goodsReceiptItem.product_label,
@@ -348,7 +339,7 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
                                     );
                                 })}
                                 {fields.length === 0 && (
-                                    <EntityFormItemEmptyRow colSpan={9} />
+                                    <EntityFormItemEmptyRow colSpan={8} />
                                 )}
                             </TableBody>
                         </Table>

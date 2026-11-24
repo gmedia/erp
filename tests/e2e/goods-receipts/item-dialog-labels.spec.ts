@@ -34,7 +34,8 @@ test.describe('Goods Receipt item dialog labels', () => {
         await expect(formDialog).toBeVisible();
         await formDialog.getByRole('button', { name: 'Add Item' }).click();
 
-        const itemDialog = page.getByRole('dialog').last();
+        // Daftar pilihan yang terbuka juga ber-role dialog, jadi dialog item dipilih lewat namanya.
+        const itemDialog = page.getByRole('dialog', { name: 'Add Item' });
         await expect(itemDialog.getByText('Quantity Received')).toBeVisible();
         await expect(itemDialog.getByText('Quantity Rejected')).toBeVisible();
         await expect(itemDialog.getByPlaceholder('Item notes')).toBeVisible();
