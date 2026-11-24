@@ -346,6 +346,9 @@ test('SupplierReturnController update triggers journal posting on confirm transi
     ]);
 
     // Stok masuk sah (penerimaan 5 unit) agar retur confirmed tidak ditolak 422 (cek stok konfirmasi #356).
+    // Tanggal stok masuk harus SEBELUM return_date (2026-04-01): cek saldo berjalan (Issue #436 butir 3)
+    // memeriksa saldo sejak tanggal retur. Memakai now() membuat stok masuk jatuh SETELAH tanggal retur
+    // lampau sehingga saldo pada tanggal retur = 0 dan konfirmasi ditolak secara acak menurut tanggal sistem.
     StockMovement::factory()->create([
         'movement_type' => 'goods_receipt',
         'reference_type' => GoodsReceipt::class,
@@ -355,7 +358,7 @@ test('SupplierReturnController update triggers journal posting on confirm transi
         'quantity_in' => 5,
         'quantity_out' => 0,
         'balance_after' => 5,
-        'moved_at' => now()->subDay(),
+        'moved_at' => '2026-03-15 08:00:00',
     ]);
 
     putJson("/api/supplier-returns/{$sr->id}", [

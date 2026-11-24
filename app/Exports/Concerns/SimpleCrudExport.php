@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
@@ -20,8 +21,10 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
  * - Auto-sized columns
  * - Bold header row
  */
-abstract class SimpleCrudExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping, WithStyles
+abstract class SimpleCrudExport implements FromQuery, ShouldAutoSize, WithCustomValueBinder, WithHeadings, WithMapping, WithStyles
 {
+    use WritesTextCells;
+
     /**
      * @var array<string, mixed>
      */
