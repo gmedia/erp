@@ -324,8 +324,11 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
                                         </TableCell>
                                         <TableCell>
                                             <div className="font-medium">
-                                            {field.invoice_label ||
-                                                fl('no_invoice', 'No Invoice')}
+                                                {field.invoice_label ||
+                                                    fl(
+                                                        'no_invoice',
+                                                        'No Invoice',
+                                                    )}
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-right">
