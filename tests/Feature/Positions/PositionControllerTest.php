@@ -124,4 +124,14 @@ describe('Position API Endpoints', function () {
         $response->assertNoContent();
         assertDatabaseMissing('positions', ['id' => $position->id]);
     });
+
+    test('index default order is newest first with id tie-break', function () {
+        $sameTime = '2026-02-01 08:00:00';
+        $older = Position::factory()->create(['created_at' => $sameTime, 'updated_at' => $sameTime]);
+        $newer = Position::factory()->create(['created_at' => $sameTime, 'updated_at' => $sameTime]);
+
+        $ids = collect(getJson('/api/positions?per_page=100')->json('data'))->pluck('id')->all();
+
+        expect(array_search($newer->id, $ids, true))->toBeLessThan(array_search($older->id, $ids, true));
+    });
 });

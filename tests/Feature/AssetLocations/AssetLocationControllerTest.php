@@ -151,4 +151,14 @@ describe('Asset Location API Endpoints', function () {
         $response->assertNoContent();
         assertDatabaseMissing('asset_locations', ['id' => $assetLocation->id]);
     });
+
+    test('index default order is newest first with id tie-break', function () {
+        $sameTime = '2026-02-01 08:00:00';
+        $older = AssetLocation::factory()->create(['created_at' => $sameTime, 'updated_at' => $sameTime]);
+        $newer = AssetLocation::factory()->create(['created_at' => $sameTime, 'updated_at' => $sameTime]);
+
+        $ids = collect(getJson('/api/asset-locations?per_page=100')->json('data'))->pluck('id')->all();
+
+        expect(array_search($newer->id, $ids, true))->toBeLessThan(array_search($older->id, $ids, true));
+    });
 });

@@ -199,6 +199,11 @@ trait BaseFilterService
 
         if (! $this->applyMappedRelationSorting($query, $sortBy, $sortDirection, $relationSortMap, $baseTable)) {
             $query->orderBy($sortBy, $sortDirection);
+
+            // Tie-break by primary key so rows with the same timestamp keep a stable order.
+            if ($sortBy !== 'id') {
+                $query->orderBy($query->getModel()->getQualifiedKeyName(), $sortDirection);
+            }
         }
     }
 
