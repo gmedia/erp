@@ -1,5 +1,11 @@
 import { Page, expect } from '@playwright/test';
-import { ensureAppOrigin, login, searchAndWaitForApi, waitForApiAfterAction } from '../helpers';
+import {
+  ensureAppOrigin,
+  expectResponseOk,
+  login,
+  searchAndWaitForApi,
+  waitForApiAfterAction,
+} from '../helpers';
 
 async function pickAsyncOption(page: Page, label: string): Promise<void> {
   const option = page
@@ -104,23 +110,21 @@ export async function createAsset(
   const createResponsePromise = page.waitForResponse(
     response =>
       response.url().includes('/api/assets') &&
-      response.request().method() === 'POST' &&
-      response.status() < 400,
+      response.request().method() === 'POST',
     { timeout: 15000 },
   );
   const reloadResponsePromise = page.waitForResponse(
     response =>
       response.url().includes('/api/assets') &&
-      response.request().method() === 'GET' &&
-      response.status() < 400,
+      response.request().method() === 'GET',
     { timeout: 15000 },
   );
   await submitBtn.click();
-  await createResponsePromise;
+  await expectResponseOk(await createResponsePromise);
 
   // Wait for dialog to disappear, using passive wait pattern
   await expect(dialog).not.toBeVisible({ timeout: 15000 });
-  await reloadResponsePromise;
+  await expectResponseOk(await reloadResponsePromise);
 
   return assetName; // Returning name as it's often the primary column for verify
 }
@@ -174,13 +178,12 @@ export async function editAsset(
   const updateResponsePromise = page.waitForResponse(
     (response) =>
       response.url().includes('/api/assets') &&
-      ['PUT', 'PATCH'].includes(response.request().method()) &&
-      response.status() < 400,
+      ['PUT', 'PATCH'].includes(response.request().method()),
     { timeout: 15000 },
   );
 
   await dialog.getByRole('button', { name: /Update|Save/i }).last().click();
-  await updateResponsePromise;
+  await expectResponseOk(await updateResponsePromise);
   await expect(dialog).not.toBeVisible({ timeout: 15000 });
 }
 

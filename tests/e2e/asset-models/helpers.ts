@@ -1,5 +1,6 @@
 import { Page, expect } from '@playwright/test';
 import { createAssetCategory } from '../asset-categories/helpers';
+import { expectResponseOk } from '../helpers';
 
 /**
  * Create a new asset model via the UI.
@@ -54,7 +55,6 @@ export async function createAssetModel(
   if (await searchInput.isVisible()) {
     await searchInput.fill(categoryName);
   }
-  await page.waitForTimeout(500);
   const categoryOption = page
     .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
     .filter({ hasText: new RegExp(`^${categoryName}$`, 'i') })
@@ -96,7 +96,7 @@ export async function searchAssetModel(page: Page, query: string): Promise<void>
 
   // Start listening for response before triggering search
   const responsePromise = page.waitForResponse(resp => 
-    resp.url().includes('/api/asset-models') && resp.status() < 400
+    resp.url().includes('/api/asset-models') && resp.request().method() === 'GET'
   );
 
   await searchInput.clear();
@@ -104,7 +104,7 @@ export async function searchAssetModel(page: Page, query: string): Promise<void>
   await searchInput.press('Enter');
   
   // Wait for the table to refresh
-  await responsePromise;
+  await expectResponseOk(await responsePromise);
 }
 
 /**
@@ -153,11 +153,11 @@ export async function editAssetModel(
   await expect(updateBtn).toBeVisible();
   
   const responsePromise = page.waitForResponse(resp => 
-    resp.url().includes('/api/asset-models') && resp.status() < 400
+    resp.url().includes('/api/asset-models') && resp.request().method() === 'PUT'
   );
 
   await updateBtn.click();
-  await responsePromise;
+  await expectResponseOk(await responsePromise);
 
   // Wait for dialog to close
   await expect(dialog).not.toBeVisible({ timeout: 15000 });
@@ -170,11 +170,11 @@ async function searchInputSafeClear(page: Page) {
   const searchInput = page.getByPlaceholder('Search by model name or manufacturer...');
   if (await searchInput.isVisible()) {
     const responsePromise = page.waitForResponse(resp => 
-      resp.url().includes('/api/asset-models') && resp.status() < 400
+      resp.url().includes('/api/asset-models') && resp.request().method() === 'GET'
     );
     await searchInput.clear();
     await searchInput.press('Enter');
-    await responsePromise;
+    await expectResponseOk(await responsePromise);
   }
 }
 
@@ -205,12 +205,12 @@ export async function deleteAssetModel(page: Page, modelName: string): Promise<v
   const deleteBtnConfirm = page.getByRole('button', { name: /Delete/i }).last();
   
   const responsePromise = page.waitForResponse(resp => 
-    resp.url().includes('/api/asset-models') && resp.status() < 400
+    resp.url().includes('/api/asset-models') && resp.request().method() === 'DELETE'
   );
   
   await deleteBtnConfirm.click();
-  await responsePromise;
+  await expectResponseOk(await responsePromise);
 
   // Wait for deletion
-  await page.waitForTimeout(500); 
+  await expect(row).not.toBeVisible({ timeout: 10000 });
 }
