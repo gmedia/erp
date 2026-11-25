@@ -3,6 +3,7 @@
 namespace App\Http\Resources\AssetMovements;
 
 use App\Models\AssetMovement;
+use App\Models\JournalEntry;
 use App\Support\ExportStorage;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -55,8 +56,28 @@ class AssetMovementResource extends JsonResource
             'document_url' => $this->document_path
                 ? ExportStorage::url($this->document_path)
                 : null,
+            'sale_amount' => $this->sale_amount !== null ? (float) $this->sale_amount : null,
+            'sale_account_id' => $this->sale_account_id,
+            'disposal_journal_id' => $this->disposalJournalId(),
             'created_by' => $this->createdBy?->name,
             'created_at' => $this->created_at?->toIso8601String(),
         ];
+    }
+
+    /**
+     * Jurnal pelepasan aset (DISP- atau LOSS-) untuk tautan di UI (#442).
+     */
+    private function disposalJournalId(): ?int
+    {
+        if ($this->movement_type !== 'dispose' || ! $this->relationLoaded('asset')) {
+            return null;
+        }
+
+        $assetCode = $this->asset->asset_code;
+
+        return JournalEntry::query()
+            ->where('journal_type', 'system')
+            ->whereIn('reference', ['DISP-'.$assetCode, 'LOSS-'.$assetCode])
+            ->value('id');
     }
 }

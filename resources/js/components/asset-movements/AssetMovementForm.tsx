@@ -12,6 +12,7 @@ import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
+import { useTranslation } from '@/contexts/i18n-context';
 import { Asset, AssetMovement } from '@/types/asset';
 
 import { toDateInputValue } from '@/utils/date-format';
@@ -78,6 +79,11 @@ const getAssetMovementFormDefaults = (
             to_employee_id: toOptionalSelectValue(item.to_employee_id),
             reference: item.reference || '',
             notes: item.notes || '',
+            sale_amount:
+                item.sale_amount !== null && item.sale_amount !== undefined
+                    ? String(item.sale_amount)
+                    : '',
+            sale_account_id: toOptionalSelectValue(item.sale_account_id),
         };
     }
 
@@ -91,6 +97,8 @@ const getAssetMovementFormDefaults = (
         to_employee_id: toOptionalSelectValue(asset?.employee_id),
         reference: '',
         notes: '',
+        sale_amount: '',
+        sale_account_id: '',
     };
 };
 
@@ -103,6 +111,7 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
         onSubmit,
         isLoading = false,
     }) {
+        const { t } = useTranslation();
         const defaultValues = useMemo(
             () => getAssetMovementFormDefaults(entity, asset),
             [entity, asset],
@@ -121,6 +130,8 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
 
         const movementType = form.watch('movement_type');
         const toBranchId = form.watch('to_branch_id');
+        const saleAmountValue = Number(form.watch('sale_amount') ?? '');
+        const hasSaleProceeds = saleAmountValue > 0;
 
         useEffect(() => {
             if (open) {
@@ -153,6 +164,13 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
                     formData.append(key, value);
                 }
             });
+
+            // Hasil penjualan hanya untuk pelepasan (#442); nilai 0/kosong = tanpa hasil.
+            const saleAmount = Number(data.sale_amount ?? '');
+            if (data.movement_type === 'dispose' && saleAmount > 0) {
+                formData.append('sale_amount', String(saleAmount));
+                formData.append('sale_account_id', data.sale_account_id ?? '');
+            }
 
             if (documentFile) {
                 formData.append('document', documentFile);
@@ -265,6 +283,37 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
                                         placeholder="Select employee"
                                         initialLabel={asset?.employee?.name}
                                     />
+                                </div>
+                            </div>
+                        )}
+
+                        {movementType === 'dispose' && !isEdit && (
+                            <div className="space-y-4">
+                                <h4 className="text-sm font-medium">
+                                    {t('assets.disposal.saleSection')}
+                                </h4>
+                                <p className="text-xs text-muted-foreground">
+                                    {t('assets.disposal.saleHint')}
+                                </p>
+                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                    <InputField
+                                        name="sale_amount"
+                                        label={t('assets.disposal.saleAmount')}
+                                        type="number"
+                                        placeholder="0"
+                                    />
+                                    {hasSaleProceeds && (
+                                        <AsyncSelectField
+                                            name="sale_account_id"
+                                            label={t(
+                                                'assets.disposal.receiptAccount',
+                                            )}
+                                            url="/api/accounts?is_active=1&has_children=0"
+                                            placeholder={t(
+                                                'assets.disposal.receiptPlaceholder',
+                                            )}
+                                        />
+                                    )}
                                 </div>
                             </div>
                         )}

@@ -59,7 +59,6 @@
     "Goods receipt still has active supplier bills. Cancel them before cancelling.": "Goods receipt still has active supplier bills. Cancel them before cancelling.",
     "approval.transition_forbidden": "You do not have permission to execute this transition.",
     "approval.concurrent_step": "This approval step was already acted on by another request. Refresh and try again.",
-
     "nav": {
         "platform": "Platform",
         "dashboard": "Dashboard",
@@ -290,7 +289,16 @@
     "admin": {
         "selectLogo": "Select SVG Logo",
         "noFileSelected": "No file selected",
-        "logoHint": "Upload an SVG file. If empty, the app keeps using the default logo."
+        "logoHint": "Upload an SVG file. If empty, the app keeps using the default logo.",
+        "accounting": {
+            "title": "Asset Disposal Accounts",
+            "description": "Gain and loss accounts for asset disposal journals. The receipt account is chosen when an asset is disposed.",
+            "gainLabel": "Asset disposal gain account",
+            "gainHint": "Credited when sale proceeds exceed the book value.",
+            "lossLabel": "Asset disposal loss account",
+            "lossHint": "Debited when the book value exceeds sale proceeds (including lost assets).",
+            "placeholder": "Select account"
+        }
     },
     "accounting_posting.control_account_missing": "Control account :code was not found in the active COA version.",
     "accounting_posting.coa_none_active": "No active COA version covers :date. Activate one COA version before posting.",
@@ -462,6 +470,18 @@
             "unit_price_min": "Unit price must be at least 0.",
             "notes": "Notes",
             "notes_placeholder": "Item notes"
+        }
+    },
+    "assets": {
+        "disposal": {
+            "saleSection": "Sale Proceeds (optional)",
+            "saleHint": "Leave empty for a disposal without sale proceeds (scrapped or lost). The book value becomes a loss.",
+            "saleAmount": "Sale Amount",
+            "receiptAccount": "Receipt Account (cash/bank/receivable)",
+            "receiptPlaceholder": "Select receipt account",
+            "viewJournal": "View disposal journal",
+            "noSale": "No sale proceeds",
+            "saleValue": "Sale: :amount"
         }
     }
 }

@@ -59,7 +59,6 @@
     "Goods receipt still has active supplier bills. Cancel them before cancelling.": "Penerimaan barang masih memiliki tagihan supplier aktif. Batalkan tagihan tersebut sebelum membatalkan.",
     "approval.transition_forbidden": "Anda tidak memiliki izin untuk menjalankan transisi ini.",
     "approval.concurrent_step": "Langkah persetujuan ini sudah diproses permintaan lain. Muat ulang lalu coba lagi.",
-
     "nav": {
         "platform": "Platform",
         "dashboard": "Dasbor",
@@ -290,7 +289,16 @@
     "admin": {
         "selectLogo": "Pilih Logo SVG",
         "noFileSelected": "Belum ada file dipilih",
-        "logoHint": "Unggah file SVG. Jika kosong, aplikasi tetap menggunakan logo default."
+        "logoHint": "Unggah file SVG. Jika kosong, aplikasi tetap menggunakan logo default.",
+        "accounting": {
+            "title": "Akun Pelepasan Aset",
+            "description": "Akun laba dan rugi untuk jurnal pelepasan aset. Akun penerimaan dipilih saat aset dilepas.",
+            "gainLabel": "Akun laba pelepasan aset",
+            "gainHint": "Dikreditkan bila hasil penjualan melebihi nilai buku.",
+            "lossLabel": "Akun rugi pelepasan aset",
+            "lossHint": "Didebitkan bila nilai buku melebihi hasil penjualan (termasuk aset hilang).",
+            "placeholder": "Pilih akun"
+        }
     },
     "accounting_posting.control_account_missing": "Akun kontrol :code tidak ditemukan di versi COA aktif.",
     "accounting_posting.coa_none_active": "Tidak ada versi COA aktif untuk :date. Aktifkan satu versi COA sebelum posting.",
@@ -462,6 +470,18 @@
             "unit_price_min": "Harga satuan minimal 0.",
             "notes": "Catatan",
             "notes_placeholder": "Catatan item"
+        }
+    },
+    "assets": {
+        "disposal": {
+            "saleSection": "Hasil Penjualan (opsional)",
+            "saleHint": "Kosongkan bila pelepasan tanpa hasil penjualan (dibuang atau hilang). Nilai buku menjadi rugi.",
+            "saleAmount": "Nilai Penjualan",
+            "receiptAccount": "Akun Penerimaan (kas/bank/piutang)",
+            "receiptPlaceholder": "Pilih akun penerimaan",
+            "viewJournal": "Lihat jurnal pelepasan",
+            "noSale": "Tanpa hasil jual",
+            "saleValue": "Hasil jual: :amount"
         }
     }
 }

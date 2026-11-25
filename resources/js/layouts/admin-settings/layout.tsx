@@ -27,6 +27,11 @@ const sidebarNavItems: NavItem[] = [
         href: '/admin-settings?group=authentication',
         icon: null,
     },
+    {
+        title: 'Accounting',
+        href: '/admin-settings?group=accounting',
+        icon: null,
+    },
 ];
 
 export default function AdminSettingsLayout({

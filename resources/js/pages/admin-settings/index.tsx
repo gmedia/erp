@@ -1,3 +1,4 @@
+import { AsyncSelect } from '@/components/common/AsyncSelect';
 import {
     SettingsRow,
     SettingsSaveButton,
@@ -64,6 +65,12 @@ interface SettingsData {
         social_login_jit_provisioning?: boolean;
         social_login_allowed_domains?: string[];
         social_login_allowed_tenants?: string[];
+    };
+    accounting?: {
+        asset_disposal_gain_account_id?: string | number | null;
+        asset_disposal_gain_account_label?: string | null;
+        asset_disposal_loss_account_id?: string | number | null;
+        asset_disposal_loss_account_label?: string | null;
     };
 }
 
@@ -866,6 +873,143 @@ function AuthenticationSettings({
     );
 }
 
+type LeafAccount = { id: number; code?: string; name: string };
+
+function DisposalAccountField({
+    id,
+    label,
+    description,
+    value,
+    initialLabel,
+    onChange,
+    disabled,
+    error,
+}: Readonly<{
+    id: string;
+    label: string;
+    description: string;
+    value: string;
+    initialLabel: string;
+    onChange: (value: string) => void;
+    disabled: boolean;
+    error?: string;
+}>) {
+    const { t } = useTranslation();
+
+    return (
+        <SettingsRow
+            label={label}
+            htmlFor={id}
+            description={description}
+            error={error}
+        >
+            <AsyncSelect<LeafAccount>
+                value={value || undefined}
+                onValueChange={onChange}
+                url="/api/accounts?is_active=1&has_children=0"
+                placeholder={t('admin.accounting.placeholder')}
+                initialLabel={initialLabel}
+                labelFn={(item) =>
+                    `${item.code ? `${item.code} - ` : ''}${item.name}`
+                }
+                disabled={disabled}
+            />
+        </SettingsRow>
+    );
+}
+
+function AccountingSettings({
+    settings,
+    onSaved,
+}: Readonly<{
+    settings: SettingsData['accounting'];
+    onSaved?: () => Promise<void> | void;
+}>) {
+    const { t } = useTranslation();
+    const { can } = usePermissions();
+    const canEdit = can('admin_setting.edit');
+    const [processing, setProcessing] = useState(false);
+    const [recentlySuccessful, setRecentlySuccessful] = useState(false);
+    const [errors, setErrors] = useState<Record<string, string>>({});
+    const [gainId, setGainId] = useState(
+        String(settings?.asset_disposal_gain_account_id ?? ''),
+    );
+    const [lossId, setLossId] = useState(
+        String(settings?.asset_disposal_loss_account_id ?? ''),
+    );
+
+    const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setProcessing(true);
+        setErrors({});
+        setRecentlySuccessful(false);
+
+        try {
+            await axiosInstance.put('/api/admin-settings', {
+                asset_disposal_gain_account_id: gainId || null,
+                asset_disposal_loss_account_id: lossId || null,
+            });
+            await onSaved?.();
+            setRecentlySuccessful(true);
+            setTimeout(() => setRecentlySuccessful(false), 3000);
+        } catch (error: unknown) {
+            const newErrors = mapFirstValidationErrors(error);
+            if (Object.keys(newErrors).length > 0) {
+                setErrors(newErrors);
+            }
+        } finally {
+            setProcessing(false);
+        }
+    };
+
+    return (
+        <SettingsSection
+            title={t('admin.accounting.title')}
+            description={t('admin.accounting.description')}
+            actions={
+                <SettingsSaveButton
+                    formId="accounting-settings-form"
+                    processing={processing}
+                    recentlySuccessful={recentlySuccessful}
+                    testId="save-accounting-settings"
+                    hidden={!canEdit}
+                />
+            }
+        >
+            <form
+                id="accounting-settings-form"
+                onSubmit={handleSubmit}
+                data-testid="accounting-settings-form"
+            >
+                <DisposalAccountField
+                    id="asset_disposal_gain_account_id"
+                    label={t('admin.accounting.gainLabel')}
+                    description={t('admin.accounting.gainHint')}
+                    value={gainId}
+                    initialLabel={
+                        settings?.asset_disposal_gain_account_label ?? ''
+                    }
+                    onChange={setGainId}
+                    disabled={!canEdit}
+                    error={errors.asset_disposal_gain_account_id}
+                />
+                <DisposalAccountField
+                    id="asset_disposal_loss_account_id"
+                    label={t('admin.accounting.lossLabel')}
+                    description={t('admin.accounting.lossHint')}
+                    value={lossId}
+                    initialLabel={
+                        settings?.asset_disposal_loss_account_label ?? ''
+                    }
+                    onChange={setLossId}
+                    disabled={!canEdit}
+                    error={errors.asset_disposal_loss_account_id}
+                />
+            </form>
+        </SettingsSection>
+    );
+}
+
 export default function AdminSettings() {
     const [searchParams] = useSearchParams();
     const currentGroup = searchParams.get('group') || 'general';
@@ -938,6 +1082,12 @@ export default function AdminSettings() {
                 {currentGroup === 'authentication' && (
                     <AuthenticationSettings
                         settings={data?.settings?.authentication}
+                        onSaved={handleGeneralSettingsSaved}
+                    />
+                )}
+                {currentGroup === 'accounting' && (
+                    <AccountingSettings
+                        settings={data?.settings?.accounting}
                         onSaved={handleGeneralSettingsSaved}
                     />
                 )}
