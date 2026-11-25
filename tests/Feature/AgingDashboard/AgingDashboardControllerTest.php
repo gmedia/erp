@@ -125,6 +125,7 @@ describe('Aging Dashboard API', function () {
             CustomerInvoice::factory()->create([
                 'customer_id' => $customer->id,
                 'branch_id' => $branch->id,
+                'invoice_date' => '2026-01-15',
                 'due_date' => $case['due_date'],
                 'grand_total' => 1000,
                 'amount_received' => 0,
@@ -160,6 +161,7 @@ describe('Aging Dashboard API', function () {
         CustomerInvoice::factory()->create([
             'customer_id' => $customerA->id,
             'branch_id' => $branchA->id,
+            'invoice_date' => '2026-05-01',
             'due_date' => '2026-06-30',
             'grand_total' => 5000,
             'amount_received' => 0,
@@ -171,6 +173,7 @@ describe('Aging Dashboard API', function () {
         CustomerInvoice::factory()->create([
             'customer_id' => $customerB->id,
             'branch_id' => $branchB->id,
+            'invoice_date' => '2026-05-01',
             'due_date' => '2026-06-30',
             'grand_total' => 7000,
             'amount_received' => 0,
@@ -198,6 +201,7 @@ describe('Aging Dashboard API', function () {
             CustomerInvoice::factory()->create([
                 'customer_id' => $customer->id,
                 'branch_id' => $branch->id,
+                'invoice_date' => '2026-05-01',
                 'due_date' => '2026-06-30',
                 'grand_total' => 1000,
                 'amount_received' => $status === 'paid' ? 1000 : 0,
@@ -315,6 +319,7 @@ describe('Aging Dashboard API', function () {
             CustomerInvoice::factory()->create([
                 'customer_id' => $customer->id,
                 'branch_id' => $branch->id,
+                'invoice_date' => '2026-01-15',
                 'due_date' => $dueDate,
                 'grand_total' => 1000 + ($i * 250),
                 'amount_received' => 0,
@@ -406,6 +411,7 @@ describe('Aging Dashboard API', function () {
         CustomerInvoice::factory()->create([
             'customer_id' => $customer->id,
             'branch_id' => $branch->id,
+            'invoice_date' => '2026-01-15',
             'due_date' => '2026-03-15',
             'grand_total' => 500,
             'amount_received' => 0,
@@ -490,6 +496,7 @@ describe('Aging Dashboard API', function () {
         CustomerInvoice::factory()->create([
             'customer_id' => $customer->id,
             'branch_id' => $branch->id,
+            'invoice_date' => '2026-01-15',
             'due_date' => '2026-04-01',
             'grand_total' => 30000000,
             'amount_received' => 0,
