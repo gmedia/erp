@@ -42,6 +42,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
     {
         title: 'Posting Journals',
+        titleKey: 'page.posting_journals.title',
         href: '/posting-journals',
     },
 ];
@@ -70,6 +71,7 @@ function PostingJournalSearchInput({
 }
 
 export default function Index() {
+    const { t } = useTranslation();
     const {
         data,
         meta,
@@ -235,14 +237,9 @@ export default function Index() {
 
     return (
         <StandaloneTablePage
-            title="Posting Journals"
+            title={t('page.posting_journals.title')}
             breadcrumbs={breadcrumbs}
-            description={
-                <>
-                    Review draft journal entries and post them to the general
-                    ledger.
-                </>
-            }
+            description={t('page.posting_journals.description')}
             actions={
                 <>
                     <div className="relative sm:w-80">

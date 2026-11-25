@@ -845,7 +845,15 @@ export const fiscalYearConfig = createComplexEntityConfig<FiscalYear>({
     permissionPrefix: 'fiscal_year',
     exportEndpoint: '/api/fiscal-years/export',
     queryKey: ['fiscal-years'],
-    breadcrumbs: [{ title: 'Fiscal Years', href: '/fiscal-years' }],
+    titleKey: 'menu.fiscal_year',
+    descriptionKey: 'page.fiscal_years.description',
+    breadcrumbs: [
+        {
+            title: 'Fiscal Years',
+            titleKey: 'menu.fiscal_year',
+            href: '/fiscal-years',
+        },
+    ],
     initialFilters: { search: '', status: '' },
     columns: fiscalYearColumns,
     filterFields: createFiscalYearFilterFields(),
@@ -870,7 +878,15 @@ export const coaVersionConfig = createComplexEntityConfig<CoaVersion>({
     permissionPrefix: 'coa_version',
     exportEndpoint: '/api/coa-versions/export',
     queryKey: ['coa-versions'],
-    breadcrumbs: [{ title: 'COA Versions', href: '/coa-versions' }],
+    titleKey: 'menu.coa_version',
+    descriptionKey: 'page.coa_versions.description',
+    breadcrumbs: [
+        {
+            title: 'COA Versions',
+            titleKey: 'menu.coa_version',
+            href: '/coa-versions',
+        },
+    ],
     initialFilters: { search: '', status: '', fiscal_year_id: '' },
     columns: coaVersionColumns,
     filterFields: createCoaVersionFilterFields(),
@@ -896,7 +912,15 @@ export const accountMappingConfig = createComplexEntityConfig<AccountMapping>({
     permissionPrefix: 'account_mapping',
     exportEndpoint: '/api/account-mappings/export',
     queryKey: ['account-mappings'],
-    breadcrumbs: [{ title: 'Account Mappings', href: '/account-mappings' }],
+    titleKey: 'menu.account_mapping',
+    descriptionKey: 'page.account_mappings.description',
+    breadcrumbs: [
+        {
+            title: 'Account Mappings',
+            titleKey: 'menu.account_mapping',
+            href: '/account-mappings',
+        },
+    ],
     initialFilters: {
         search: '',
         type: '',
@@ -1218,7 +1242,15 @@ export const supplierBillConfig = createComplexEntityConfig<SupplierBill>({
     apiEndpoint: '/api/supplier-bills',
     exportEndpoint: '/api/supplier-bills/export',
     queryKey: ['supplier-bills'],
-    breadcrumbs: [{ title: 'Supplier Bills', href: '/supplier-bills' }],
+    titleKey: 'menu.supplier_bill',
+    descriptionKey: 'page.supplier_bills.description',
+    breadcrumbs: [
+        {
+            title: 'Supplier Bills',
+            titleKey: 'menu.supplier_bill',
+            href: '/supplier-bills',
+        },
+    ],
     initialFilters: {
         search: '',
         supplier_id: '',
@@ -1256,7 +1288,15 @@ export const apPaymentConfig = createComplexEntityConfig<ApPayment>({
     loadDetailOnEdit: true,
     detailLoadErrorMessage:
         'Failed to load AP payment details. Please try again.',
-    breadcrumbs: [{ title: 'AP Payments', href: '/ap-payments' }],
+    titleKey: 'menu.ap_payment',
+    descriptionKey: 'page.ap_payments.description',
+    breadcrumbs: [
+        {
+            title: 'AP Payments',
+            titleKey: 'menu.ap_payment',
+            href: '/ap-payments',
+        },
+    ],
     initialFilters: {
         search: '',
         supplier_id: '',
@@ -1342,8 +1382,14 @@ export const customerInvoiceConfig = createComplexEntityConfig<CustomerInvoice>(
         apiEndpoint: '/api/customer-invoices',
         exportEndpoint: '/api/customer-invoices/export',
         queryKey: ['customer-invoices'],
+        titleKey: 'menu.customer_invoice',
+        descriptionKey: 'page.customer_invoices.description',
         breadcrumbs: [
-            { title: 'Customer Invoices', href: '/customer-invoices' },
+            {
+                title: 'Customer Invoices',
+                titleKey: 'menu.customer_invoice',
+                href: '/customer-invoices',
+            },
         ],
         initialFilters: {
             search: '',
@@ -1383,7 +1429,15 @@ export const arReceiptConfig = createComplexEntityConfig<ArReceipt>({
     loadDetailOnEdit: true,
     detailLoadErrorMessage:
         'Failed to load AR receipt details. Please try again.',
-    breadcrumbs: [{ title: 'AR Receipts', href: '/ar-receipts' }],
+    titleKey: 'menu.ar_receipt',
+    descriptionKey: 'page.ar_receipts.description',
+    breadcrumbs: [
+        {
+            title: 'AR Receipts',
+            titleKey: 'menu.ar_receipt',
+            href: '/ar-receipts',
+        },
+    ],
     initialFilters: {
         search: '',
         customer_id: '',
@@ -1419,7 +1473,15 @@ export const creditNoteConfig = createComplexEntityConfig<CreditNote>({
     permissionPrefix: 'credit_note',
     exportEndpoint: '/api/credit-notes/export',
     queryKey: ['credit-notes'],
-    breadcrumbs: [{ title: 'Credit Notes', href: '/credit-notes' }],
+    titleKey: 'menu.credit_note',
+    descriptionKey: 'page.credit_notes.description',
+    breadcrumbs: [
+        {
+            title: 'Credit Notes',
+            titleKey: 'menu.credit_note',
+            href: '/credit-notes',
+        },
+    ],
     initialFilters: {
         search: '',
         customer_id: '',
@@ -1462,8 +1524,14 @@ export const recurringJournalConfig =
         permissionPrefix: 'recurring_journal',
         exportEndpoint: '/api/recurring-journals/export',
         queryKey: ['recurring-journals'],
+        titleKey: 'menu.recurring_journal',
+        descriptionKey: 'page.recurring_journals.description',
         breadcrumbs: [
-            { title: 'Recurring Journals', href: '/recurring-journals' },
+            {
+                title: 'Recurring Journals',
+                titleKey: 'menu.recurring_journal',
+                href: '/recurring-journals',
+            },
         ],
         initialFilters: { search: '', frequency: '', is_active: '' },
         columns: recurringJournalColumns,
@@ -1495,8 +1563,14 @@ export const bankReconciliationConfig =
         permissionPrefix: 'bank_reconciliation',
         exportEndpoint: '/api/bank-reconciliations/export',
         queryKey: ['bank-reconciliations'],
+        titleKey: 'menu.bank_reconciliation',
+        descriptionKey: 'page.bank_reconciliations.description',
         breadcrumbs: [
-            { title: 'Bank Reconciliations', href: '/bank-reconciliations' },
+            {
+                title: 'Bank Reconciliations',
+                titleKey: 'menu.bank_reconciliation',
+                href: '/bank-reconciliations',
+            },
         ],
         initialFilters: { search: '', status: '', account_id: '' },
         columns: bankReconciliationColumns,
@@ -1523,7 +1597,15 @@ export const periodClosingConfig = createComplexEntityConfig<PeriodClosing>({
     permissionPrefix: 'period_closing',
     exportEndpoint: '/api/period-closings/export',
     queryKey: ['period-closings'],
-    breadcrumbs: [{ title: 'Period Closings', href: '/period-closings' }],
+    titleKey: 'menu.period_closing',
+    descriptionKey: 'page.period_closings.description',
+    breadcrumbs: [
+        {
+            title: 'Period Closings',
+            titleKey: 'menu.period_closing',
+            href: '/period-closings',
+        },
+    ],
     initialFilters: {
         search: '',
         status: '',
@@ -1578,7 +1660,11 @@ export const budgetConfig = createComplexEntityConfig<Budget>({
     permissionPrefix: 'budget',
     exportEndpoint: '/api/budgets/export',
     queryKey: ['budgets'],
-    breadcrumbs: [{ title: 'Budgets', href: '/budgets' }],
+    titleKey: 'menu.budget',
+    descriptionKey: 'page.budgets.description',
+    breadcrumbs: [
+        { title: 'Budgets', titleKey: 'menu.budget', href: '/budgets' },
+    ],
     initialFilters: {
         search: '',
         status: '',

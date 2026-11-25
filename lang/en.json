@@ -959,6 +959,62 @@
         "supplier_returns": {
             "title": "Supplier Returns",
             "description": "Return received goods to suppliers with stock deduction."
+        },
+        "accounts": {
+            "title": "Chart of Accounts",
+            "description": "Manage hierarchical accounts and COA versions."
+        },
+        "posting_journals": {
+            "title": "Posting Journals",
+            "description": "Review draft journal entries and post them to the general ledger."
+        },
+        "fiscal_years": {
+            "title": "Fiscal Year",
+            "description": "Accounting periods that scope journals and financial reports."
+        },
+        "coa_versions": {
+            "title": "COA Version",
+            "description": "Chart of accounts versions per fiscal year."
+        },
+        "account_mappings": {
+            "title": "Account Mappings",
+            "description": "Account mappings between COA versions (rename, merge, split) for balance and reference migration."
+        },
+        "budgets": {
+            "title": "Budgets",
+            "description": "Budget plans per account with period breakdown."
+        },
+        "bank_reconciliations": {
+            "title": "Bank Reconciliations",
+            "description": "Match bank statement balances with the books for each account."
+        },
+        "recurring_journals": {
+            "title": "Recurring Journals",
+            "description": "Templates for journals that repeat on a schedule."
+        },
+        "period_closings": {
+            "title": "Period Closings",
+            "description": "Close accounting periods and carry balances forward."
+        },
+        "supplier_bills": {
+            "title": "Supplier Bills",
+            "description": "Supplier invoices that create accounts payable."
+        },
+        "ap_payments": {
+            "title": "AP Payments",
+            "description": "Payments to suppliers allocated against outstanding bills."
+        },
+        "customer_invoices": {
+            "title": "Customer Invoices",
+            "description": "Customer invoices that create accounts receivable."
+        },
+        "ar_receipts": {
+            "title": "AR Receipts",
+            "description": "Customer payments allocated against outstanding invoices."
+        },
+        "credit_notes": {
+            "title": "Credit Notes",
+            "description": "Credit notes that reduce customer invoice balances."
         }
     },
     "stock_monitor_summary": {

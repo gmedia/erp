@@ -220,6 +220,87 @@ test('asset column labels keep english text and are translated to indonesian', f
         ->and($id['purchase_date'])->toBe('Tanggal Perolehan');
 });
 
+test('accounting and ap/ar page strings keep the english labels', function () {
+    $en = localePageTranslations('en.json');
+
+    expect($en['accounts']['title'])->toBe('Chart of Accounts')
+        ->and($en['accounts']['description'])->toBe('Manage hierarchical accounts and COA versions.')
+        ->and($en['journal_entries']['description'])->toBe('Manual journal entries with debit and credit lines.')
+        ->and($en['posting_journals']['title'])->toBe('Posting Journals')
+        ->and($en['posting_journals']['description'])->toBe(
+            'Review draft journal entries and post them to the general ledger.',
+        )
+        ->and($en['fiscal_years']['description'])->toBe(
+            'Accounting periods that scope journals and financial reports.',
+        )
+        ->and($en['coa_versions']['description'])->toBe('Chart of accounts versions per fiscal year.')
+        ->and($en['bank_reconciliations']['description'])->toBe(
+            'Match bank statement balances with the books for each account.',
+        )
+        ->and($en['credit_notes']['description'])->toBe('Credit notes that reduce customer invoice balances.');
+});
+
+test('accounting and ap/ar page strings are translated to indonesian', function () {
+    $en = localePageTranslations('en.json');
+    $id = localePageTranslations('id.json');
+
+    $modules = [
+        'accounts',
+        'journal_entries',
+        'posting_journals',
+        'fiscal_years',
+        'coa_versions',
+        'account_mappings',
+        'budgets',
+        'bank_reconciliations',
+        'recurring_journals',
+        'period_closings',
+        'supplier_bills',
+        'ap_payments',
+        'customer_invoices',
+        'ar_receipts',
+        'credit_notes',
+    ];
+
+    foreach ($modules as $module) {
+        foreach (array_keys($en[$module]) as $field) {
+            expect($id[$module][$field])->not->toBe($en[$module][$field], "page.{$module}.{$field} not translated");
+        }
+    }
+
+    expect($id['accounts']['title'])->toBe('Bagan Akun')
+        ->and($id['journal_entries']['title'])->toBe('Jurnal Umum')
+        ->and($id['ap_payments']['title'])->toBe('Pembayaran Hutang');
+});
+
+test('accounting and ap/ar page titles match the sidebar menu labels', function () {
+    $pairs = [
+        'accounts' => 'chart_of_accounts',
+        'posting_journals' => 'posting_journal',
+        'fiscal_years' => 'fiscal_year',
+        'coa_versions' => 'coa_version',
+        'account_mappings' => 'account_mapping',
+        'budgets' => 'budget',
+        'bank_reconciliations' => 'bank_reconciliation',
+        'recurring_journals' => 'recurring_journal',
+        'period_closings' => 'period_closing',
+        'supplier_bills' => 'supplier_bill',
+        'ap_payments' => 'ap_payment',
+        'customer_invoices' => 'customer_invoice',
+        'ar_receipts' => 'ar_receipt',
+        'credit_notes' => 'credit_note',
+    ];
+
+    foreach (['en.json', 'id.json'] as $file) {
+        $menu = json_decode(File::get(lang_path($file)), true, 512, JSON_THROW_ON_ERROR)['menu'];
+        $page = localePageTranslations($file);
+
+        foreach ($pairs as $pageKey => $menuKey) {
+            expect($page[$pageKey]['title'])->toBe($menu[$menuKey], "page.{$pageKey}.title != menu.{$menuKey}");
+        }
+    }
+});
+
 test('page translation values are non-empty strings', function () {
     foreach (['en.json', 'id.json'] as $file) {
         foreach (localePageTranslations($file) as $module => $strings) {

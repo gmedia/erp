@@ -959,6 +959,62 @@
         "supplier_returns": {
             "title": "Retur Pemasok",
             "description": "Kembalikan barang yang diterima ke pemasok dengan pengurangan stok."
+        },
+        "accounts": {
+            "title": "Bagan Akun",
+            "description": "Kelola akun hierarkis dan versi bagan akun (COA)."
+        },
+        "posting_journals": {
+            "title": "Jurnal Posting",
+            "description": "Tinjau draf jurnal dan posting ke buku besar."
+        },
+        "fiscal_years": {
+            "title": "Tahun Fiskal",
+            "description": "Periode akuntansi yang membatasi jurnal dan laporan keuangan."
+        },
+        "coa_versions": {
+            "title": "Versi Bagan Akun",
+            "description": "Versi bagan akun per tahun fiskal."
+        },
+        "account_mappings": {
+            "title": "Pemetaan Akun",
+            "description": "Pemetaan akun antarversi COA (rename, merge, split) untuk migrasi saldo dan referensi."
+        },
+        "budgets": {
+            "title": "Anggaran",
+            "description": "Rencana anggaran per akun dengan rincian per periode."
+        },
+        "bank_reconciliations": {
+            "title": "Rekonsiliasi Bank",
+            "description": "Cocokkan saldo mutasi bank dengan pembukuan untuk setiap akun."
+        },
+        "recurring_journals": {
+            "title": "Jurnal Berulang",
+            "description": "Templat jurnal yang berulang sesuai jadwal."
+        },
+        "period_closings": {
+            "title": "Penutupan Periode",
+            "description": "Tutup periode akuntansi dan teruskan saldo ke periode berikutnya."
+        },
+        "supplier_bills": {
+            "title": "Tagihan Pemasok",
+            "description": "Faktur pemasok yang membentuk hutang usaha."
+        },
+        "ap_payments": {
+            "title": "Pembayaran Hutang",
+            "description": "Pembayaran ke pemasok yang dialokasikan ke tagihan yang belum lunas."
+        },
+        "customer_invoices": {
+            "title": "Faktur Pelanggan",
+            "description": "Faktur pelanggan yang membentuk piutang usaha."
+        },
+        "ar_receipts": {
+            "title": "Penerimaan Piutang",
+            "description": "Pembayaran pelanggan yang dialokasikan ke faktur yang belum lunas."
+        },
+        "credit_notes": {
+            "title": "Nota Kredit",
+            "description": "Nota kredit yang mengurangi saldo faktur pelanggan."
         }
     },
     "stock_monitor_summary": {
