@@ -8,6 +8,7 @@ use App\Models\Supplier;
 use App\Models\SupplierBill;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Carbon;
 
 class SupplierBillFactory extends Factory
 {
@@ -15,6 +16,10 @@ class SupplierBillFactory extends Factory
 
     public function definition(): array
     {
+        // Relatif terhadap now() (ikut Carbon::setTestNow) agar tanggal dokumen
+        // tidak pernah melewati as_of yang dibekukan test.
+        $billDate = now()->subDays($this->faker->numberBetween(1, 60));
+
         $subtotal = $this->faker->randomFloat(2, 500000, 50000000);
         $taxAmount = round($subtotal * 0.11, 2);
         $discountAmount = $this->faker->randomFloat(2, 0, $subtotal * 0.05);
@@ -29,8 +34,8 @@ class SupplierBillFactory extends Factory
             'goods_receipt_id' => null,
             'supplier_invoice_number' => $this->faker->optional()->numerify('INV-####'),
             'supplier_invoice_date' => $this->faker->optional()->date(),
-            'bill_date' => $this->faker->date(),
-            'due_date' => $this->faker->dateTimeBetween('+7 days', '+60 days')->format('Y-m-d'),
+            'bill_date' => $billDate->format('Y-m-d'),
+            'due_date' => $this->faker->dateTimeBetween($billDate->copy()->addDays(7), $billDate->copy()->addDays(60))->format('Y-m-d'),
             'payment_terms' => $this->faker->optional()->randomElement(['Net 7', 'Net 14', 'Net 30', 'Net 60']),
             'currency' => 'IDR',
             'subtotal' => $subtotal,
@@ -70,12 +75,16 @@ class SupplierBillFactory extends Factory
 
     public function overdue(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'status' => 'overdue',
-            'due_date' => $this->faker->dateTimeBetween('-30 days', '-1 day')->format('Y-m-d'),
-            'confirmed_by' => User::factory(),
-            'confirmed_at' => now(),
-        ]);
+        return $this->state(function (array $attributes) {
+            $billDate = Carbon::parse($attributes['bill_date']);
+
+            return [
+                'status' => 'overdue',
+                'due_date' => $this->faker->dateTimeBetween($billDate, now()->subDay())->format('Y-m-d'),
+                'confirmed_by' => User::factory(),
+                'confirmed_at' => now(),
+            ];
+        });
     }
 
     public function cancelled(): static
