@@ -330,6 +330,8 @@
             "gainHint": "Dikreditkan bila hasil penjualan melebihi nilai buku.",
             "lossLabel": "Akun rugi pelepasan aset",
             "lossHint": "Didebitkan bila nilai buku melebihi hasil penjualan (termasuk aset hilang).",
+            "inTransitLabel": "Akun persediaan dalam perjalanan",
+            "inTransitHint": "Didebitkan saat barang dikirim antar gudang sampai barang diterima.",
             "placeholder": "Pilih akun"
         }
     },

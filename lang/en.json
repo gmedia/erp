@@ -330,6 +330,8 @@
             "gainHint": "Credited when sale proceeds exceed the book value.",
             "lossLabel": "Asset disposal loss account",
             "lossHint": "Debited when the book value exceeds sale proceeds (including lost assets).",
+            "inTransitLabel": "Inventory in transit account",
+            "inTransitHint": "Debited when goods are dispatched between warehouses until they are received.",
             "placeholder": "Select account"
         }
     },
