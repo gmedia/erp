@@ -682,13 +682,13 @@ export default function AssetProfile() {
                                                                             )}
                                                                         </span>
                                                                     )}
-                                                                     {m.disposal_journal_id ? (
-                                                                         <a
-                                                                             href={
-                                                                                 m.disposal_journal_number
-                                                                                     ? `/journal-entries?search=${encodeURIComponent(m.disposal_journal_number)}`
-                                                                                     : '/journal-entries'
-                                                                             }
+                                                                    {m.disposal_journal_id ? (
+                                                                        <a
+                                                                            href={
+                                                                                m.disposal_journal_number
+                                                                                    ? `/journal-entries?search=${encodeURIComponent(m.disposal_journal_number)}`
+                                                                                    : '/journal-entries'
+                                                                            }
                                                                             className="ml-2 text-primary underline"
                                                                             data-testid="disposal-journal-link"
                                                                             data-journal-id={
