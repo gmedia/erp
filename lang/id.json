@@ -704,5 +704,27 @@
         "high": "Tinggi",
         "normal": "Normal",
         "low": "Rendah"
+    },
+    "page": {
+        "purchase_orders": {
+            "title": "Pesanan Pembelian",
+            "description": "Pesanan yang dikirim ke pemasok beserta progres penerimaan dan penagihan.",
+            "search_placeholder": "Cari pesanan pembelian..."
+        },
+        "products": {
+            "title": "Produk",
+            "description": "Produk, bahan, dan jasa beserta pengaturan harga dan stok.",
+            "search_placeholder": "Cari produk..."
+        }
+    },
+    "stock_monitor_summary": {
+        "total_sku_warehouse": "Total SKU-Gudang",
+        "total_quantity": "Total Kuantitas",
+        "total_stock_value": "Total Nilai Stok",
+        "low_stock_items": "Item Stok Rendah",
+        "stock_by_warehouse": "Stok per Gudang",
+        "stock_by_category": "Stok per Kategori",
+        "stock_by_branch": "Stok per Cabang",
+        "no_data": "Tidak ada data"
     }
 }

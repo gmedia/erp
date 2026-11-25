@@ -704,5 +704,27 @@
         "high": "High",
         "normal": "Normal",
         "low": "Low"
+    },
+    "page": {
+        "purchase_orders": {
+            "title": "Purchase Orders",
+            "description": "Orders sent to suppliers with receipt and billing progress.",
+            "search_placeholder": "Search purchase orders..."
+        },
+        "products": {
+            "title": "Products",
+            "description": "Products, materials, and services with pricing and stock settings.",
+            "search_placeholder": "Search products..."
+        }
+    },
+    "stock_monitor_summary": {
+        "total_sku_warehouse": "Total SKU-Warehouse",
+        "total_quantity": "Total Quantity",
+        "total_stock_value": "Total Stock Value",
+        "low_stock_items": "Low Stock Items",
+        "stock_by_warehouse": "Stock by Warehouse",
+        "stock_by_category": "Stock by Category",
+        "stock_by_branch": "Stock by Branch",
+        "no_data": "No data"
     }
 }

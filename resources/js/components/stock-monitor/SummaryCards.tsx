@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useTranslation } from '@/contexts/i18n-context';
 import { formatCurrency } from '@/lib/utils';
 import { formatNumberByRegionalSettings } from '@/utils/number-format';
 
@@ -27,8 +28,13 @@ function formatNumber(value: string | number): string {
 }
 
 function TopSummaryList({ items }: Readonly<{ items: SummaryBucket[] }>) {
+    const { t } = useTranslation();
     if (items.length === 0) {
-        return <p className="text-sm text-muted-foreground">No data</p>;
+        return (
+            <p className="text-sm text-muted-foreground">
+                {t('stock_monitor_summary.no_data')}
+            </p>
+        );
     }
 
     return (
@@ -51,12 +57,13 @@ function TopSummaryList({ items }: Readonly<{ items: SummaryBucket[] }>) {
 export function StockMonitorSummaryCards({
     summary,
 }: Readonly<SummaryCardsProps>) {
+    const { t } = useTranslation();
     return (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <Card>
                 <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium">
-                        Total SKU-Warehouse
+                        {t('stock_monitor_summary.total_sku_warehouse')}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -68,7 +75,7 @@ export function StockMonitorSummaryCards({
             <Card>
                 <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium">
-                        Total Quantity
+                        {t('stock_monitor_summary.total_quantity')}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -80,7 +87,7 @@ export function StockMonitorSummaryCards({
             <Card>
                 <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium">
-                        Total Stock Value
+                        {t('stock_monitor_summary.total_stock_value')}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -92,7 +99,7 @@ export function StockMonitorSummaryCards({
             <Card>
                 <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium">
-                        Low Stock Items
+                        {t('stock_monitor_summary.low_stock_items')}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -104,7 +111,7 @@ export function StockMonitorSummaryCards({
             <Card>
                 <CardHeader>
                     <CardTitle className="text-sm font-medium">
-                        Stock by Warehouse
+                        {t('stock_monitor_summary.stock_by_warehouse')}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -114,7 +121,7 @@ export function StockMonitorSummaryCards({
             <Card>
                 <CardHeader>
                     <CardTitle className="text-sm font-medium">
-                        Stock by Category
+                        {t('stock_monitor_summary.stock_by_category')}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -124,7 +131,7 @@ export function StockMonitorSummaryCards({
             <Card>
                 <CardHeader>
                     <CardTitle className="text-sm font-medium">
-                        Stock by Branch
+                        {t('stock_monitor_summary.stock_by_branch')}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>

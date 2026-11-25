@@ -108,6 +108,76 @@ test.describe('i18n shell (locale en)', () => {
     });
 });
 
+test.describe('i18n page titles (locale id)', () => {
+    test('purchase orders page title and description are Indonesian', async ({
+        page,
+    }) => {
+        await page.addInitScript((k) => {
+            localStorage.setItem(k, 'id');
+        }, LOCALE_KEY);
+
+        await login(page);
+        await page.goto('/purchase-orders', { waitUntil: 'domcontentloaded' });
+
+        await expect(
+            page.getByRole('heading', { level: 1, name: 'Pesanan Pembelian' }),
+        ).toBeVisible({ timeout: 15000 });
+        await expect(
+            page.getByText(
+                'Pesanan yang dikirim ke pemasok beserta progres penerimaan dan penagihan.',
+            ),
+        ).toBeVisible();
+        await expect(
+            page.getByRole('heading', { level: 1, name: 'Purchase Orders' }),
+        ).toHaveCount(0);
+    });
+
+    test('products page title and description are Indonesian', async ({
+        page,
+    }) => {
+        await page.addInitScript((k) => {
+            localStorage.setItem(k, 'id');
+        }, LOCALE_KEY);
+
+        await login(page);
+        await page.goto('/products', { waitUntil: 'domcontentloaded' });
+
+        await expect(
+            page.getByRole('heading', { level: 1, name: 'Produk' }),
+        ).toBeVisible({ timeout: 15000 });
+        await expect(
+            page.getByText(
+                'Produk, bahan, dan jasa beserta pengaturan harga dan stok.',
+            ),
+        ).toBeVisible();
+    });
+});
+
+test.describe('i18n page titles (locale en)', () => {
+    test('products page title and description keep English labels', async ({
+        page,
+    }) => {
+        await page.addInitScript((k) => {
+            localStorage.setItem(k, 'en');
+        }, LOCALE_KEY);
+
+        await login(page);
+        await page.goto('/products', { waitUntil: 'domcontentloaded' });
+
+        await expect(
+            page.getByRole('heading', { level: 1, name: 'Products' }),
+        ).toBeVisible({ timeout: 15000 });
+        await expect(
+            page.getByText(
+                'Products, materials, and services with pricing and stock settings.',
+            ),
+        ).toBeVisible();
+        await expect(
+            page.getByRole('heading', { level: 1, name: 'Produk' }),
+        ).toHaveCount(0);
+    });
+});
+
 test.describe('i18n shell (locale id) columns', () => {
     test('purchase orders column headers use Indonesian labels', async ({
         page,
