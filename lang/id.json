@@ -603,7 +603,11 @@
         "received_by": "Diterima Oleh",
         "return_number": "No. Retur",
         "return_date": "Tanggal Retur",
-        "reason": "Alasan"
+        "reason": "Alasan",
+        "order_date_from": "Tanggal Pesan Dari",
+        "order_date_to": "Tanggal Pesan Sampai",
+        "request_date_from": "Tanggal Permintaan Dari",
+        "request_date_to": "Tanggal Permintaan Sampai"
     },
     "status": {
         "draft": "Draf",

@@ -35,12 +35,18 @@ export function createPurchaseRequestFilterFields(): FieldDescriptor[] {
         ...createDateFilterFields([
             {
                 name: 'request_date_from',
-                label: 'Request Date From',
+                label: {
+                    key: 'column.request_date_from',
+                    fallback: 'Request Date From',
+                },
                 placeholder: 'Request Date From',
             },
             {
                 name: 'request_date_to',
-                label: 'Request Date To',
+                label: {
+                    key: 'column.request_date_to',
+                    fallback: 'Request Date To',
+                },
                 placeholder: 'Request Date To',
             },
         ]),

@@ -31,6 +31,17 @@ test('english column translations keep the original english labels', function ()
         ->and($en['grand_total'])->toBe('Grand Total');
 });
 
+test('purchase order and request filter date labels have translations', function () {
+    $en = localeColumnTranslations('en.json');
+    $id = localeColumnTranslations('id.json');
+
+    foreach (['order_date_from', 'order_date_to', 'request_date_from', 'request_date_to'] as $key) {
+        expect($en)->toHaveKey($key)
+            ->and($id)->toHaveKey($key)
+            ->and($id[$key])->not->toBe($en[$key]);
+    }
+});
+
 test('column translation values are non-empty strings', function () {
     foreach (['en.json', 'id.json'] as $file) {
         foreach (localeColumnTranslations($file) as $key => $value) {

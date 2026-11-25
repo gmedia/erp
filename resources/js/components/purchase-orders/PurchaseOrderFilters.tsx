@@ -35,12 +35,18 @@ export function createPurchaseOrderFilterFields(): FieldDescriptor[] {
         ...createDateFilterFields([
             {
                 name: 'order_date_from',
-                label: 'Order Date From',
+                label: {
+                    key: 'column.order_date_from',
+                    fallback: 'Order Date From',
+                },
                 placeholder: 'Order Date From',
             },
             {
                 name: 'order_date_to',
-                label: 'Order Date To',
+                label: {
+                    key: 'column.order_date_to',
+                    fallback: 'Order Date To',
+                },
                 placeholder: 'Order Date To',
             },
         ]),

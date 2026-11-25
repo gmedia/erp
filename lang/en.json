@@ -603,7 +603,11 @@
         "received_by": "Received By",
         "return_number": "Return Number",
         "return_date": "Return Date",
-        "reason": "Reason"
+        "reason": "Reason",
+        "order_date_from": "Order Date From",
+        "order_date_to": "Order Date To",
+        "request_date_from": "Request Date From",
+        "request_date_to": "Request Date To"
     },
     "status": {
         "draft": "Draft",
