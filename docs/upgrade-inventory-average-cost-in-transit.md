@@ -19,8 +19,9 @@ Dokumen ini untuk administrator dan tim yang mengoperasikan ERP setelah pembarua
 ## Langkah Upgrade
 
 1. Deploy kode.
-2. Jalankan migration: `./vendor/bin/sail artisan migrate --force`. Migration menambahkan setting akun in-transit.
-3. Pastikan akun **Persediaan dalam Perjalanan** terisi di Admin Settings > Accounting. CoA seed mengisinya otomatis bila setting masih kosong.
+2. Jalankan migration: `./vendor/bin/sail artisan migrate --force`. Migration menambahkan setting `inventory_in_transit_account_id`, lalu mengisinya otomatis dengan akun berkode **11310** bila akun itu aktif di CoA yang aktif. Bila tidak ada, setting dibiarkan kosong. Migration idempoten dan tidak menimpa setting yang sudah terisi.
+3. Pastikan setting akun **Persediaan dalam Perjalanan** terisi di Admin Settings > Accounting.
+   - **Penting:** bila akun tidak terisi otomatis, **pengiriman transfer DITOLAK (422)** sampai akun diatur. Penolakan ini disengaja, konsisten dengan akun pelepasan aset, dan bukan galat aplikasi. Atur akun sebelum pengguna mulai mengirim transfer.
 4. Jalankan dry-run untuk melihat selisih:
    `./vendor/bin/sail artisan stock:recalculate-average-cost --dry-run`
 5. Jalankan tanpa dry-run untuk menulis average cost historis:
