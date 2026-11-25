@@ -11,6 +11,7 @@ import {
     ItemNotesField,
     ItemProductUnitFields,
 } from '@/components/common/ItemFormDialog';
+import { TranslatedText } from '@/components/common/TranslatedText';
 import { useTranslation } from '@/contexts/i18n-context';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import {
@@ -117,20 +118,35 @@ export function StockTransferItemFormDialog({
             {locked ? (
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div className="space-y-1 text-sm">
-                        <div className="font-medium">Product</div>
+                        <div className="font-medium">
+                            <TranslatedText
+                                k="form_fields.stock_transfers.item_product"
+                                fallback="Product"
+                            />
+                        </div>
                         <div>
                             {defaultValues.product_label ||
                                 defaultValues.product_id}
                         </div>
                     </div>
                     <div className="space-y-1 text-sm">
-                        <div className="font-medium">Unit</div>
+                        <div className="font-medium">
+                            <TranslatedText
+                                k="form_fields.stock_transfers.item_unit"
+                                fallback="Unit"
+                            />
+                        </div>
                         <div>
                             {defaultValues.unit_label || defaultValues.unit_id}
                         </div>
                     </div>
                     <div className="space-y-1 text-sm">
-                        <div className="font-medium">Quantity</div>
+                        <div className="font-medium">
+                            <TranslatedText
+                                k="form_fields.stock_transfers.item_quantity_label"
+                                fallback="Quantity"
+                            />
+                        </div>
                         <div>{defaultValues.quantity}</div>
                     </div>
                     <InputField
@@ -153,7 +169,10 @@ export function StockTransferItemFormDialog({
                     />
                     <InputField
                         name="quantity"
-                        label="Quantity"
+                        label={{
+                            key: 'form_fields.stock_transfers.item_quantity_label',
+                            fallback: 'Quantity',
+                        }}
                         type="number"
                         min={0}
                         step="any"
@@ -171,7 +190,10 @@ export function StockTransferItemFormDialog({
                     />
                     <InputField
                         name="unit_cost"
-                        label="Unit Cost"
+                        label={{
+                            key: 'form_fields.stock_transfers.item_unit_cost',
+                            fallback: 'Unit Cost',
+                        }}
                         type="number"
                         min={0}
                         step="any"

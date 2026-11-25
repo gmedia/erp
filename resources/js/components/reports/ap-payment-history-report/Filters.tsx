@@ -22,11 +22,11 @@ export function createApPaymentHistoryReportFilterFields(): FieldDescriptor[] {
     ];
 
     return [
-        createTextFilterField(
-            'search',
-            'Search',
-            'Search payment number, supplier, branch, bank account, reference, or notes...',
-        ),
+        createTextFilterField('search', 'Search', {
+            key: 'page.ap_payment_history.search_placeholder',
+            fallback:
+                'Search payment number, supplier, branch, bank account, reference, or notes...',
+        }),
         createAsyncSelectFilterField(
             'supplier_id',
             'Supplier',

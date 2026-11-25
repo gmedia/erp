@@ -15,11 +15,11 @@ export function createApAgingReportFilterFields(): FieldDescriptor[] {
     ];
 
     return [
-        createTextFilterField(
-            'search',
-            'Search',
-            'Search bill number, supplier invoice, supplier, branch, PO number, GR number, or notes...',
-        ),
+        createTextFilterField('search', 'Search', {
+            key: 'page.ap_aging.search_placeholder',
+            fallback:
+                'Search bill number, supplier invoice, supplier, branch, PO number, GR number, or notes...',
+        }),
         createAsyncSelectFilterField(
             'supplier_id',
             'Supplier',

@@ -11,7 +11,10 @@ export function createCoaVersionFilterFields(): FieldDescriptor[] {
         createTextFilterField(
             'search',
             { key: 'column.search', fallback: 'Search' },
-            'Search COA versions...',
+            {
+                key: 'page.coa_versions.search_placeholder',
+                fallback: 'Search COA versions...',
+            },
         ),
         createCoaVersionStatusFilterField(),
         // Note: Fiscal year list should ideally be dynamic, but for simple CRUD pattern it's often passed via props or fetched.

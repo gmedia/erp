@@ -8,11 +8,10 @@ import {
 
 export function createInventoryStocktakeFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField(
-            'search',
-            'Search',
-            'Search inventory stocktakes...',
-        ),
+        createTextFilterField('search', 'Search', {
+            key: 'page.inventory_stocktakes.search_placeholder',
+            fallback: 'Search inventory stocktakes...',
+        }),
         ...createInventoryStocktakeFilterSelectFields(),
     ];
 }

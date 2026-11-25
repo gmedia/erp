@@ -14,7 +14,7 @@ export function createStockAdjustmentReportFilterFields(): FieldDescriptor[] {
             'search',
             { key: 'column.search', fallback: 'Search' },
             {
-                key: 'filter.adjustment_search_placeholder',
+                key: 'page.stock_adjustment.search_placeholder',
                 fallback: 'Search number, warehouse, branch, type, status...',
             },
         ),

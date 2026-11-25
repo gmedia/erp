@@ -11,11 +11,10 @@ import {
 
 export function createStockAdjustmentFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField(
-            'search',
-            'Search',
-            'Search stock adjustments...',
-        ),
+        createTextFilterField('search', 'Search', {
+            key: 'page.stock_adjustments.search_placeholder',
+            fallback: 'Search stock adjustments...',
+        }),
         ...createWarehouseStatusFilterFields(
             approvalWorkflowStatusOptions,
             'Select warehouse',

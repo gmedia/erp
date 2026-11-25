@@ -135,6 +135,12 @@ export const PurchaseRequestForm = memo<PurchaseRequestFormProps>(
             activePurchaseRequest && activePurchaseRequest.status !== 'draft',
         );
         const { t } = useTranslation();
+        const fl = (key: string, fallback: string) => {
+            const translated = t(`form_fields.purchase_requests.${key}`);
+            return translated === `form_fields.purchase_requests.${key}`
+                ? fallback
+                : translated;
+        };
         const defaultValues = useMemo(
             () => getPurchaseRequestFormDefaults(activePurchaseRequest),
             [activePurchaseRequest],
@@ -187,8 +193,8 @@ export const PurchaseRequestForm = memo<PurchaseRequestFormProps>(
                 onOpenChange={onOpenChange}
                 title={
                     activePurchaseRequest
-                        ? 'Edit Purchase Request'
-                        : 'Add New Purchase Request'
+                        ? fl('edit_title', 'Edit Purchase Request')
+                        : fl('add_title', 'Add New Purchase Request')
                 }
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
@@ -206,83 +212,144 @@ export const PurchaseRequestForm = memo<PurchaseRequestFormProps>(
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <InputField
                             name="pr_number"
-                            label="PR Number"
-                            placeholder="Auto-generated if empty"
+                            label={fl('pr_number', 'PR Number')}
+                            placeholder={fl(
+                                'pr_number_placeholder',
+                                'Auto-generated if empty',
+                            )}
                         />
 
                         <SelectField
                             name="priority"
-                            label="Priority"
+                            label={fl('priority', 'Priority')}
                             options={[
-                                { value: 'low', label: 'Low' },
-                                { value: 'normal', label: 'Normal' },
-                                { value: 'high', label: 'High' },
-                                { value: 'urgent', label: 'Urgent' },
+                                {
+                                    value: 'low',
+                                    label: fl('priority_low', 'Low'),
+                                },
+                                {
+                                    value: 'normal',
+                                    label: fl('priority_normal', 'Normal'),
+                                },
+                                {
+                                    value: 'high',
+                                    label: fl('priority_high', 'High'),
+                                },
+                                {
+                                    value: 'urgent',
+                                    label: fl('priority_urgent', 'Urgent'),
+                                },
                             ]}
-                            placeholder="Select priority"
+                            placeholder={fl(
+                                'priority_placeholder',
+                                'Select priority',
+                            )}
                         />
 
                         <SelectField
                             name="status"
-                            label="Status"
+                            label={fl('status', 'Status')}
                             options={[
-                                { value: 'draft', label: 'Draft' },
+                                {
+                                    value: 'draft',
+                                    label: fl('status_draft', 'Draft'),
+                                },
                                 {
                                     value: 'pending_approval',
-                                    label: 'Pending Approval',
+                                    label: fl(
+                                        'status_pending_approval',
+                                        'Pending Approval',
+                                    ),
                                 },
                                 ...(purchaseRequest?.status === 'approved'
-                                    ? [{ value: 'approved', label: 'Approved' }]
+                                    ? [
+                                          {
+                                              value: 'approved',
+                                              label: fl(
+                                                  'status_approved',
+                                                  'Approved',
+                                              ),
+                                          },
+                                      ]
                                     : []),
                                 ...(purchaseRequest?.status === 'rejected'
-                                    ? [{ value: 'rejected', label: 'Rejected' }]
+                                    ? [
+                                          {
+                                              value: 'rejected',
+                                              label: fl(
+                                                  'status_rejected',
+                                                  'Rejected',
+                                              ),
+                                          },
+                                      ]
                                     : []),
                                 {
                                     value: 'partially_ordered',
-                                    label: 'Partially Ordered',
+                                    label: fl(
+                                        'status_partially_ordered',
+                                        'Partially Ordered',
+                                    ),
                                 },
                                 {
                                     value: 'fully_ordered',
-                                    label: 'Fully Ordered',
+                                    label: fl(
+                                        'status_fully_ordered',
+                                        'Fully Ordered',
+                                    ),
                                 },
-                                { value: 'cancelled', label: 'Cancelled' },
+                                {
+                                    value: 'cancelled',
+                                    label: fl('status_cancelled', 'Cancelled'),
+                                },
                             ]}
-                            placeholder="Select status"
+                            placeholder={fl(
+                                'status_placeholder',
+                                'Select status',
+                            )}
                         />
 
                         <AsyncSelectField
                             name="branch_id"
-                            label="Branch"
+                            label={fl('branch', 'Branch')}
                             url="/api/branches"
-                            placeholder="Select branch"
+                            placeholder={fl(
+                                'branch_placeholder',
+                                'Select branch',
+                            )}
                         />
 
                         <AsyncSelectField
                             name="department_id"
-                            label="Department"
+                            label={fl('department', 'Department')}
                             url="/api/departments"
-                            placeholder="Select department"
+                            placeholder={fl(
+                                'department_placeholder',
+                                'Select department',
+                            )}
                         />
 
                         <AsyncSelectField
                             name="requested_by"
-                            label="Requested By"
+                            label={fl('requested_by', 'Requested By')}
                             url="/api/employees"
-                            placeholder="Select requester"
+                            placeholder={fl(
+                                'requested_by_placeholder',
+                                'Select requester',
+                            )}
                         />
 
                         <DatePickerField
                             name="request_date"
-                            label="Request Date"
+                            label={fl('request_date', 'Request Date')}
                         />
                         <DatePickerField
                             name="required_date"
-                            label="Required Date"
+                            label={fl('required_date', 'Required Date')}
                         />
 
                         <InputField
                             name="estimated_amount"
-                            label="Estimated Amount"
+                            label={fl('estimated_amount', 'Estimated Amount')}
                             type="number"
                             placeholder="0"
                         />
@@ -290,8 +357,8 @@ export const PurchaseRequestForm = memo<PurchaseRequestFormProps>(
                         <div className="md:col-span-2">
                             <TextareaField
                                 name="notes"
-                                label="Notes"
-                                placeholder="Notes"
+                                label={fl('notes', 'Notes')}
+                                placeholder={fl('notes_placeholder', 'Notes')}
                                 rows={2}
                             />
                         </div>
@@ -299,8 +366,14 @@ export const PurchaseRequestForm = memo<PurchaseRequestFormProps>(
                         <div className="md:col-span-2">
                             <TextareaField
                                 name="rejection_reason"
-                                label="Rejection Reason"
-                                placeholder="Reason if rejected"
+                                label={fl(
+                                    'rejection_reason',
+                                    'Rejection Reason',
+                                )}
+                                placeholder={fl(
+                                    'rejection_reason_placeholder',
+                                    'Reason if rejected',
+                                )}
                                 rows={2}
                             />
                         </div>
@@ -316,20 +389,25 @@ export const PurchaseRequestForm = memo<PurchaseRequestFormProps>(
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead className="w-[180px]">
-                                            Product
+                                            {fl('item_product', 'Product')}
                                         </TableHead>
                                         <TableHead className="w-[140px]">
-                                            Unit
+                                            {fl('item_unit', 'Unit')}
                                         </TableHead>
                                         <TableHead className="w-[130px]">
-                                            Quantity
+                                            {fl('item_quantity', 'Quantity')}
                                         </TableHead>
                                         <TableHead className="w-[160px]">
-                                            Est. Unit Price
+                                            {fl(
+                                                'item_estimated_unit_price',
+                                                'Est. Unit Price',
+                                            )}
                                         </TableHead>
-                                        <TableHead>Notes</TableHead>
+                                        <TableHead>
+                                            {fl('item_notes', 'Notes')}
+                                        </TableHead>
                                         <TableHead className="w-[160px] text-right">
-                                            Action
+                                            {fl('item_action', 'Action')}
                                         </TableHead>
                                     </TableRow>
                                 </TableHeader>

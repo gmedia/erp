@@ -12,7 +12,10 @@ export function createSupplierFilterFields(): FieldDescriptor[] {
         createTextFilterField(
             'search',
             { key: 'column.search', fallback: 'Search' },
-            'Search suppliers...',
+            {
+                key: 'page.suppliers.search_placeholder',
+                fallback: 'Search suppliers...',
+            },
         ),
         ...createSupplierFilterSelectFields(),
     ];

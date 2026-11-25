@@ -15,7 +15,10 @@ export function createBankReconciliationFilterFields(): FieldDescriptor[] {
         createTextFilterField(
             'search',
             { key: 'column.search', fallback: 'Search' },
-            'Search...',
+            {
+                key: 'page.bank_reconciliations.search_placeholder',
+                fallback: 'Search...',
+            },
         ),
         createSelectFilterField(
             'status',

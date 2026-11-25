@@ -3,10 +3,10 @@
 import axios from '@/lib/axios';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo, useRef } from 'react';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { AsyncSelect } from '@/components/common/AsyncSelect';
+import { ControlledAsyncSelectField } from '@/components/common/ControlledAsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
 import {
@@ -15,16 +15,14 @@ import {
     EntityFormItemSectionHeader,
 } from '@/components/common/EntityFormItemTable';
 import { InputField } from '@/components/common/InputField';
-import SelectField from '@/components/common/SelectField';
-import { TextareaField } from '@/components/common/TextareaField';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+    ItemTableHeader,
+    type ItemTableColumn,
+} from '@/components/common/ItemTableHeader';
+import { NotesTextareaField } from '@/components/common/NotesTextareaField';
+import { StatusSelectField } from '@/components/common/StatusSelectField';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type InventoryStocktake } from '@/types/inventory-stocktake';
@@ -39,6 +37,13 @@ import {
 } from '@/utils/schemas';
 import { InventoryStocktakeItemFormDialog } from './InventoryStocktakeItemFormDialog';
 
+const STOCKTAKE_STATUSES = [
+    ['draft', 'Draft'],
+    ['in_progress', 'In Progress'],
+    ['completed', 'Completed'],
+    ['cancelled', 'Cancelled'],
+] as const;
+
 type InventoryStocktakeFormInput = z.input<typeof inventoryStocktakeFormSchema>;
 
 interface InventoryStocktakeFormProps {
@@ -50,6 +55,23 @@ interface InventoryStocktakeFormProps {
     onSubmit: (data: InventoryStocktakeFormData) => void;
     isLoading?: boolean;
 }
+
+const INVENTORY_STOCKTAKE_ITEM_COLUMNS: readonly ItemTableColumn[] = [
+    { key: 'item_product', fallback: 'Product', className: 'w-[220px]' },
+    { key: 'item_unit', fallback: 'Unit', className: 'w-[160px]' },
+    { key: 'item_system_qty', fallback: 'System Qty', className: 'w-[140px]' },
+    {
+        key: 'item_counted_qty',
+        fallback: 'Counted Qty',
+        className: 'w-[140px]',
+    },
+    { key: 'item_notes', fallback: 'Notes' },
+    {
+        key: 'item_action',
+        fallback: 'Action',
+        className: 'w-[120px] text-right',
+    },
+];
 
 const createEmptyInventoryStocktakeItem =
     (): InventoryStocktakeFormData['items'][number] => ({
@@ -137,6 +159,13 @@ export const InventoryStocktakeForm = memo<InventoryStocktakeFormProps>(
     }) {
         const activeStocktake = inventoryStocktake || item || entity;
         const loadedIdRef = useRef<number | null>(null);
+        const { t } = useTranslation();
+        const fl = (key: string, fallback: string) => {
+            const translated = t(`form_fields.inventory_stocktakes.${key}`);
+            return translated === `form_fields.inventory_stocktakes.${key}`
+                ? fallback
+                : translated;
+        };
 
         const defaultValues = useMemo(
             () => getInventoryStocktakeFormDefaults(activeStocktake),
@@ -212,8 +241,8 @@ export const InventoryStocktakeForm = memo<InventoryStocktakeFormProps>(
                 onOpenChange={onOpenChange}
                 title={
                     activeStocktake
-                        ? 'Edit Inventory Stocktake'
-                        : 'Add New Inventory Stocktake'
+                        ? fl('edit_title', 'Edit Inventory Stocktake')
+                        : fl('add_title', 'Add New Inventory Stocktake')
                 }
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
@@ -223,73 +252,49 @@ export const InventoryStocktakeForm = memo<InventoryStocktakeFormProps>(
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <InputField
                             name="stocktake_number"
-                            label="Stocktake Number"
-                            placeholder="Auto-generated if empty"
-                        />
-                        <SelectField
-                            name="status"
-                            label="Status"
-                            options={[
-                                { value: 'draft', label: 'Draft' },
-                                { value: 'in_progress', label: 'In Progress' },
-                                { value: 'completed', label: 'Completed' },
-                                { value: 'cancelled', label: 'Cancelled' },
-                            ]}
-                            placeholder="Select status"
-                        />
-                        <Controller
-                            control={form.control}
-                            name="warehouse_id"
-                            render={({ field }) => (
-                                <div className="space-y-2">
-                                    <div className="text-sm leading-none font-medium">
-                                        Warehouse
-                                    </div>
-                                    <AsyncSelect
-                                        value={
-                                            field.value
-                                                ? String(field.value)
-                                                : undefined
-                                        }
-                                        onValueChange={field.onChange}
-                                        url="/api/warehouses"
-                                        placeholder="Select warehouse"
-                                        label="Warehouse"
-                                    />
-                                </div>
+                            label={fl('stocktake_number', 'Stocktake Number')}
+                            placeholder={fl(
+                                'stocktake_number_placeholder',
+                                'Auto-generated if empty',
                             )}
                         />
-                        <Controller
+                        <StatusSelectField
+                            fl={fl}
+                            label={fl('status', 'Status')}
+                            placeholder={fl(
+                                'status_placeholder',
+                                'Select status',
+                            )}
+                            statuses={STOCKTAKE_STATUSES}
+                        />
+                        <ControlledAsyncSelectField
+                            control={form.control}
+                            name="warehouse_id"
+                            label={fl('warehouse', 'Warehouse')}
+                            url="/api/warehouses"
+                            placeholder={fl(
+                                'warehouse_placeholder',
+                                'Select warehouse',
+                            )}
+                        />
+                        <ControlledAsyncSelectField
                             control={form.control}
                             name="product_category_id"
-                            render={({ field }) => (
-                                <div className="space-y-2">
-                                    <div className="text-sm leading-none font-medium">
-                                        Product Category
-                                    </div>
-                                    <AsyncSelect
-                                        value={
-                                            field.value
-                                                ? String(field.value)
-                                                : undefined
-                                        }
-                                        onValueChange={field.onChange}
-                                        url="/api/product-categories"
-                                        placeholder="All categories"
-                                        label="Product Category"
-                                    />
-                                </div>
+                            label={fl('product_category', 'Product Category')}
+                            url="/api/product-categories"
+                            placeholder={fl(
+                                'product_category_placeholder',
+                                'All categories',
                             )}
                         />
                         <DatePickerField
                             name="stocktake_date"
-                            label="Stocktake Date"
+                            label={fl('stocktake_date', 'Stocktake Date')}
                         />
-                        <TextareaField
-                            name="notes"
-                            label="Notes"
-                            placeholder="Notes"
-                            rows={2}
+                        <NotesTextareaField
+                            label={fl('notes', 'Notes')}
+                            placeholder={fl('notes_placeholder', 'Notes')}
+                            spanTwoColumns={false}
                         />
                     </div>
 
@@ -299,26 +304,10 @@ export const InventoryStocktakeForm = memo<InventoryStocktakeFormProps>(
 
                     <div className="rounded-md border">
                         <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[220px]">
-                                        Product
-                                    </TableHead>
-                                    <TableHead className="w-[160px]">
-                                        Unit
-                                    </TableHead>
-                                    <TableHead className="w-[140px]">
-                                        System Qty
-                                    </TableHead>
-                                    <TableHead className="w-[140px]">
-                                        Counted Qty
-                                    </TableHead>
-                                    <TableHead>Notes</TableHead>
-                                    <TableHead className="w-[120px] text-right">
-                                        Action
-                                    </TableHead>
-                                </TableRow>
-                            </TableHeader>
+                            <ItemTableHeader
+                                columns={INVENTORY_STOCKTAKE_ITEM_COLUMNS}
+                                translate={fl}
+                            />
                             <TableBody>
                                 {fields.length === 0 ? (
                                     <EntityFormItemEmptyRow

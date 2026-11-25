@@ -10,7 +10,10 @@ import { APPROVABLE_TYPE_OPTIONS } from '@/constants/model-options';
 
 export function createApprovalFlowFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', 'Search by Code or Name...'),
+        createTextFilterField('search', 'Search', {
+            key: 'page.approval_flows.search_placeholder',
+            fallback: 'Search by Code or Name...',
+        }),
         createSelectFilterField(
             'approvable_type',
             'Approvable Type',
