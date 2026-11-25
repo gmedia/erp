@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 
 test.describe('Balance Sheet Report', () => {
     test.beforeEach(async ({ page }) => {
@@ -12,12 +12,11 @@ test.describe('Balance Sheet Report', () => {
         const reportResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/balance-sheet') &&
-                !r.url().includes('/export') &&
-                r.status() < 400,
+                !r.url().includes('/export'),
             { timeout: 30000 },
         );
         await page.goto('/reports/balance-sheet');
-        await reportResponse;
+        await expectResponseOk(await reportResponse);
 
         await expect(
             page.getByRole('heading', { name: 'Balance Sheet' }),
@@ -40,12 +39,11 @@ test.describe('Balance Sheet Report', () => {
         const initialResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/balance-sheet') &&
-                !r.url().includes('/export') &&
-                r.status() < 400,
+                !r.url().includes('/export'),
             { timeout: 30000 },
         );
         await page.goto('/reports/balance-sheet');
-        await initialResponse;
+        await expectResponseOk(await initialResponse);
 
         const fiscalYearSelector = page.getByRole('combobox').nth(0);
         await expect(fiscalYearSelector).toBeVisible();
@@ -59,13 +57,12 @@ test.describe('Balance Sheet Report', () => {
             (r) =>
                 r.url().includes('/api/reports/balance-sheet') &&
                 !r.url().includes('/export') &&
-                r.request().method() === 'GET' &&
-                r.status() < 400,
+                r.request().method() === 'GET',
             { timeout: 15000 },
         );
         // Pick last option to ensure it differs from current selection
         await options.nth(count - 1).click({ force: true });
-        await refetchResponse;
+        await expectResponseOk(await refetchResponse);
     });
 
     test('can change comparison year selector', async ({ page }) => {
@@ -74,12 +71,11 @@ test.describe('Balance Sheet Report', () => {
         const initialResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/balance-sheet') &&
-                !r.url().includes('/export') &&
-                r.status() < 400,
+                !r.url().includes('/export'),
             { timeout: 30000 },
         );
         await page.goto('/reports/balance-sheet');
-        await initialResponse;
+        await expectResponseOk(await initialResponse);
 
         const comparisonSelector = page.getByRole('combobox').nth(1);
         await expect(comparisonSelector).toBeVisible();
@@ -93,13 +89,12 @@ test.describe('Balance Sheet Report', () => {
             (r) =>
                 r.url().includes('/api/reports/balance-sheet') &&
                 !r.url().includes('/export') &&
-                r.request().method() === 'GET' &&
-                r.status() < 400,
+                r.request().method() === 'GET',
             { timeout: 15000 },
         );
         // Pick last option (a fiscal year, not "None") to trigger comparison refetch
         await options.nth(count - 1).click({ force: true });
-        await refetchResponse;
+        await expectResponseOk(await refetchResponse);
     });
 
     test('can change branch selector', async ({ page }) => {
@@ -108,22 +103,21 @@ test.describe('Balance Sheet Report', () => {
         const initialResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/balance-sheet') &&
-                !r.url().includes('/export') &&
-                r.status() < 400,
+                !r.url().includes('/export'),
             { timeout: 30000 },
         );
         await page.goto('/reports/balance-sheet');
-        await initialResponse;
+        await expectResponseOk(await initialResponse);
 
         const branchSelector = page.getByRole('combobox').nth(2);
         await expect(branchSelector).toBeVisible();
 
         const branchesResponse = page.waitForResponse(
-            (r) => r.url().includes('/api/branches') && r.status() < 400,
+            (r) => r.url().includes('/api/branches'),
             { timeout: 10000 },
         );
         await branchSelector.click();
-        await branchesResponse;
+        await expectResponseOk(await branchesResponse);
 
         const options = page.locator('ul.p-1 li button:visible');
         await expect(options.first()).toBeVisible({ timeout: 5000 });
@@ -132,12 +126,11 @@ test.describe('Balance Sheet Report', () => {
             (r) =>
                 r.url().includes('/api/reports/balance-sheet') &&
                 !r.url().includes('/export') &&
-                r.request().method() === 'GET' &&
-                r.status() < 400,
+                r.request().method() === 'GET',
             { timeout: 15000 },
         );
         await options.first().click({ force: true });
-        await refetchResponse;
+        await expectResponseOk(await refetchResponse);
     });
 
     test('can export balance sheet report', async ({ page }) => {
@@ -146,22 +139,20 @@ test.describe('Balance Sheet Report', () => {
         const initialResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/balance-sheet') &&
-                !r.url().includes('/export') &&
-                r.status() < 400,
+                !r.url().includes('/export'),
             { timeout: 30000 },
         );
         await page.goto('/reports/balance-sheet');
-        await initialResponse;
+        await expectResponseOk(await initialResponse);
 
         const [response] = await Promise.all([
             page.waitForResponse(
-                (r) =>
-                    r.url().includes('/api/reports/balance-sheet/export') &&
-                    r.status() < 400,
+                (r) => r.url().includes('/api/reports/balance-sheet/export'),
                 { timeout: 30000 },
             ),
             page.getByRole('button', { name: /^Export$/i }).click(),
         ]);
+        await expectResponseOk(response);
 
         const body = await response.json();
         expect(body).toHaveProperty('url');

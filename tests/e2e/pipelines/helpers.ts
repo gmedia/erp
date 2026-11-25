@@ -1,5 +1,5 @@
 import { Page, expect } from '@playwright/test';
-import { createEntity, EntityConfig } from '../helpers';
+import { createEntity, EntityConfig, expectResponseOk } from '../helpers';
 
 /**
  * Create a new pipeline via the UI.
@@ -54,14 +54,14 @@ export async function searchPipeline(page: Page, code: string): Promise<void> {
   }
 
   const responsePromise = page.waitForResponse(
-    r => r.url().includes('/api/pipelines') && r.status() === 200
+    r => r.url().includes('/api/pipelines')
   );
   await searchInput.clear();
   await searchInput.type(normalizedCode);
   await page.keyboard.press('Enter');
-  
-  await responsePromise;
-  await page.waitForTimeout(500);
+
+  await expectResponseOk(await responsePromise);
+  await expect(page.locator('tr').filter({ hasText: normalizedCode }).first()).toBeVisible();
 }
 
 /**

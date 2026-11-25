@@ -31,7 +31,6 @@ test.describe('Pipeline Transition Configuration', () => {
     await stateRow.locator('input[type="number"]').fill('10');
     await stateRow.getByTitle('Save state').click();
     await expect(page.getByText('Pipeline state created successfully.')).toBeVisible();
-    await page.waitForTimeout(500);
 
     // Add Final State
     await page.getByRole('button', { name: 'Add State' }).click();
@@ -43,7 +42,6 @@ test.describe('Pipeline Transition Configuration', () => {
     await stateRow.locator('input[type="number"]').fill('20');
     await stateRow.getByTitle('Save state').click();
     await expect(page.getByText('Pipeline state created successfully.')).toBeVisible();
-    await page.waitForTimeout(500);
 
     // 3. Go to Transitions Tab
     await page.getByRole('tab', { name: 'Transitions' }).click();
@@ -81,7 +79,6 @@ test.describe('Pipeline Transition Configuration', () => {
     
     // Verify Toast and Table
     await expect(page.getByText('Pipeline transition created successfully.')).toBeVisible();
-    await page.waitForTimeout(500);
     
     const transRow = page.locator('tr').filter({ hasText: 'Approve Pipeline' });
     await expect(transRow).toBeVisible();
@@ -99,7 +96,6 @@ test.describe('Pipeline Transition Configuration', () => {
     
     await page.getByRole('button', { name: 'Save Transition' }).click();
     await expect(page.getByText('Pipeline transition updated successfully.')).toBeVisible();
-    await page.waitForTimeout(500);
     
     // Verify Updates Table
     await expect(page.locator('tr').filter({ hasText: 'Approve Pipeline Updated' })).toBeVisible();
