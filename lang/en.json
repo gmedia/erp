@@ -757,7 +757,12 @@
         "salary": "Salary",
         "hire_date": "Hire Date",
         "position": "Position",
-        "symbol": "Symbol"
+        "symbol": "Symbol",
+        "current": "Current",
+        "days_1_30": "1-30 Days",
+        "days_31_60": "31-60 Days",
+        "days_61_90": "61-90 Days",
+        "days_over_90": "Over 90 Days"
     },
     "movement_type": {
         "transfer": "Transfer",

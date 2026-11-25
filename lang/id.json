@@ -757,7 +757,12 @@
         "salary": "Gaji",
         "hire_date": "Tanggal Masuk",
         "position": "Jabatan",
-        "symbol": "Simbol"
+        "symbol": "Simbol",
+        "current": "Belum Jatuh Tempo",
+        "days_1_30": "1-30 Hari",
+        "days_31_60": "31-60 Hari",
+        "days_61_90": "61-90 Hari",
+        "days_over_90": "Lebih 90 Hari"
     },
     "movement_type": {
         "transfer": "Pemindahan",
