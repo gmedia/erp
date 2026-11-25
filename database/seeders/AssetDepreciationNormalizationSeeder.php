@@ -91,7 +91,7 @@ class AssetDepreciationNormalizationSeeder extends Seeder
     private function hasAcquisitionJournal(Asset $asset): bool
     {
         return JournalEntry::query()
-            ->where('reference', 'ACQ-'.$asset->asset_code)
+            ->where('reference', 'ACQ-' . $asset->asset_code)
             ->where('status', 'posted')
             ->exists();
     }
@@ -123,7 +123,7 @@ class AssetDepreciationNormalizationSeeder extends Seeder
 
             $openingAccumulated = (float) JournalEntryLine::query()
                 ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
-                ->where('journal_entries.reference', 'ACQ-'.$asset->asset_code)
+                ->where('journal_entries.reference', 'ACQ-' . $asset->asset_code)
                 ->where('journal_entries.status', 'posted')
                 ->where('journal_entry_lines.account_id', $asset->accumulated_depr_account_id)
                 ->sum('journal_entry_lines.credit');

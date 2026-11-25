@@ -69,7 +69,7 @@ class AssetMovementResource extends JsonResource
      */
     private function disposalJournalId(): ?int
     {
-        if ($this->movement_type !== 'dispose' || ! $this->relationLoaded('asset')) {
+        if ($this->movement_type !== 'dispose' || ! $this->relationLoaded('asset') || $this->asset === null) {
             return null;
         }
 
@@ -77,7 +77,7 @@ class AssetMovementResource extends JsonResource
 
         return JournalEntry::query()
             ->where('journal_type', 'system')
-            ->whereIn('reference', ['DISP-'.$assetCode, 'LOSS-'.$assetCode])
+            ->whereIn('reference', ['DISP-' . $assetCode, 'LOSS-' . $assetCode])
             ->value('id');
     }
 }

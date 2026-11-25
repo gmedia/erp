@@ -60,7 +60,7 @@ test('user can list depreciation runs with filters', function () {
         'status' => 'calculated',
     ]);
 
-    $response = getJson('/api/asset-depreciation-runs?fiscal_year_id='.$this->fiscalYear->id.'&status=calculated&start_date=2024-02-01&end_date=2024-02-29&sort_by=period_start&sort_direction=asc&per_page=10');
+    $response = getJson('/api/asset-depreciation-runs?fiscal_year_id=' . $this->fiscalYear->id . '&status=calculated&start_date=2024-02-01&end_date=2024-02-29&sort_by=period_start&sort_direction=asc&per_page=10');
 
     $response->assertStatus(200)
         ->assertJsonCount(1, 'data')
