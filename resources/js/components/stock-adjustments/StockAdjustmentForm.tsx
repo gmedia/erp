@@ -15,16 +15,13 @@ import {
     EntityFormItemSectionHeader,
 } from '@/components/common/EntityFormItemTable';
 import { InputField } from '@/components/common/InputField';
-import SelectField from '@/components/common/SelectField';
-import { TextareaField } from '@/components/common/TextareaField';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+    ItemTableHeader,
+    type ItemTableColumn,
+} from '@/components/common/ItemTableHeader';
+import { NotesTextareaField } from '@/components/common/NotesTextareaField';
+import SelectField from '@/components/common/SelectField';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
@@ -51,6 +48,24 @@ interface StockAdjustmentFormProps {
     onSubmit: (data: StockAdjustmentFormData) => void;
     isLoading?: boolean;
 }
+
+const STOCK_ADJUSTMENT_ITEM_COLUMNS: readonly ItemTableColumn[] = [
+    { key: 'item_product', fallback: 'Product', className: 'w-[250px]' },
+    { key: 'item_unit', fallback: 'Unit', className: 'w-[160px]' },
+    { key: 'item_qty_before', fallback: 'Qty Before', className: 'w-[140px]' },
+    {
+        key: 'item_qty_adjusted',
+        fallback: 'Qty Adjusted',
+        className: 'w-[160px]',
+    },
+    { key: 'item_unit_cost', fallback: 'Unit Cost', className: 'w-[140px]' },
+    { key: 'item_reason', fallback: 'Reason' },
+    {
+        key: 'item_action',
+        fallback: 'Action',
+        className: 'w-[120px] text-right',
+    },
+];
 
 const createEmptyStockAdjustmentItem =
     (): StockAdjustmentFormData['items'][number] => ({
@@ -404,14 +419,10 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
                             </div>
                         )}
                     />
-                    <div className="md:col-span-2">
-                        <TextareaField
-                            name="notes"
-                            label={fl('notes', 'Notes')}
-                            placeholder={fl('notes_placeholder', 'Notes')}
-                            rows={2}
-                        />
-                    </div>
+                    <NotesTextareaField
+                        label={fl('notes', 'Notes')}
+                        placeholder={fl('notes_placeholder', 'Notes')}
+                    />
                 </div>
 
                 <div className="mt-2 space-y-3 border-t pt-4">
@@ -421,34 +432,10 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
 
                     <div className="rounded-md border">
                         <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[250px]">
-                                        {fl('item_product', 'Product')}
-                                    </TableHead>
-                                    <TableHead className="w-[160px]">
-                                        {fl('item_unit', 'Unit')}
-                                    </TableHead>
-                                    <TableHead className="w-[140px]">
-                                        {fl('item_qty_before', 'Qty Before')}
-                                    </TableHead>
-                                    <TableHead className="w-[160px]">
-                                        {fl(
-                                            'item_qty_adjusted',
-                                            'Qty Adjusted',
-                                        )}
-                                    </TableHead>
-                                    <TableHead className="w-[140px]">
-                                        {fl('item_unit_cost', 'Unit Cost')}
-                                    </TableHead>
-                                    <TableHead>
-                                        {fl('item_reason', 'Reason')}
-                                    </TableHead>
-                                    <TableHead className="w-[120px] text-right">
-                                        {fl('item_action', 'Action')}
-                                    </TableHead>
-                                </TableRow>
-                            </TableHeader>
+                            <ItemTableHeader
+                                columns={STOCK_ADJUSTMENT_ITEM_COLUMNS}
+                                translate={fl}
+                            />
                             <TableBody>
                                 {fields.length === 0 ? (
                                     <EntityFormItemEmptyRow

@@ -15,16 +15,13 @@ import {
     EntityFormItemSectionHeader,
 } from '@/components/common/EntityFormItemTable';
 import { InputField } from '@/components/common/InputField';
-import SelectField from '@/components/common/SelectField';
-import { TextareaField } from '@/components/common/TextareaField';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+    ItemTableHeader,
+    type ItemTableColumn,
+} from '@/components/common/ItemTableHeader';
+import { NotesTextareaField } from '@/components/common/NotesTextareaField';
+import SelectField from '@/components/common/SelectField';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
@@ -51,6 +48,23 @@ interface InventoryStocktakeFormProps {
     onSubmit: (data: InventoryStocktakeFormData) => void;
     isLoading?: boolean;
 }
+
+const INVENTORY_STOCKTAKE_ITEM_COLUMNS: readonly ItemTableColumn[] = [
+    { key: 'item_product', fallback: 'Product', className: 'w-[220px]' },
+    { key: 'item_unit', fallback: 'Unit', className: 'w-[160px]' },
+    { key: 'item_system_qty', fallback: 'System Qty', className: 'w-[140px]' },
+    {
+        key: 'item_counted_qty',
+        fallback: 'Counted Qty',
+        className: 'w-[140px]',
+    },
+    { key: 'item_notes', fallback: 'Notes' },
+    {
+        key: 'item_action',
+        fallback: 'Action',
+        className: 'w-[120px] text-right',
+    },
+];
 
 const createEmptyInventoryStocktakeItem =
     (): InventoryStocktakeFormData['items'][number] => ({
@@ -326,11 +340,10 @@ export const InventoryStocktakeForm = memo<InventoryStocktakeFormProps>(
                             name="stocktake_date"
                             label={fl('stocktake_date', 'Stocktake Date')}
                         />
-                        <TextareaField
-                            name="notes"
+                        <NotesTextareaField
                             label={fl('notes', 'Notes')}
                             placeholder={fl('notes_placeholder', 'Notes')}
-                            rows={2}
+                            spanTwoColumns={false}
                         />
                     </div>
 
@@ -340,28 +353,10 @@ export const InventoryStocktakeForm = memo<InventoryStocktakeFormProps>(
 
                     <div className="rounded-md border">
                         <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[220px]">
-                                        {fl('item_product', 'Product')}
-                                    </TableHead>
-                                    <TableHead className="w-[160px]">
-                                        {fl('item_unit', 'Unit')}
-                                    </TableHead>
-                                    <TableHead className="w-[140px]">
-                                        {fl('item_system_qty', 'System Qty')}
-                                    </TableHead>
-                                    <TableHead className="w-[140px]">
-                                        {fl('item_counted_qty', 'Counted Qty')}
-                                    </TableHead>
-                                    <TableHead>
-                                        {fl('item_notes', 'Notes')}
-                                    </TableHead>
-                                    <TableHead className="w-[120px] text-right">
-                                        {fl('item_action', 'Action')}
-                                    </TableHead>
-                                </TableRow>
-                            </TableHeader>
+                            <ItemTableHeader
+                                columns={INVENTORY_STOCKTAKE_ITEM_COLUMNS}
+                                translate={fl}
+                            />
                             <TableBody>
                                 {fields.length === 0 ? (
                                     <EntityFormItemEmptyRow

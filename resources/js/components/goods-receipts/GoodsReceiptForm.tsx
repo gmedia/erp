@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
-import { type Resolver, useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm, type Resolver } from 'react-hook-form';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
@@ -13,17 +13,14 @@ import {
     EntityFormItemSectionHeader,
 } from '@/components/common/EntityFormItemTable';
 import { InputField } from '@/components/common/InputField';
-import SelectField from '@/components/common/SelectField';
-import { TextareaField } from '@/components/common/TextareaField';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+    ItemTableHeader,
+    type ItemTableColumn,
+} from '@/components/common/ItemTableHeader';
+import { NotesTextareaField } from '@/components/common/NotesTextareaField';
+import SelectField from '@/components/common/SelectField';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
@@ -50,6 +47,33 @@ interface GoodsReceiptFormProps {
 }
 
 const CONFIRMABLE_PO_STATUSES = ['confirmed', 'partially_received'];
+
+const GOODS_RECEIPT_ITEM_COLUMNS: readonly ItemTableColumn[] = [
+    { key: 'item_product', fallback: 'Product', className: 'w-[220px]' },
+    { key: 'item_unit', fallback: 'Unit', className: 'w-[140px]' },
+    {
+        key: 'item_qty_received',
+        fallback: 'Qty Received',
+        className: 'w-[120px]',
+    },
+    {
+        key: 'item_qty_accepted',
+        fallback: 'Qty Accepted',
+        className: 'w-[120px]',
+    },
+    {
+        key: 'item_qty_rejected',
+        fallback: 'Qty Rejected',
+        className: 'w-[120px]',
+    },
+    { key: 'item_unit_price', fallback: 'Unit Price', className: 'w-[140px]' },
+    { key: 'item_notes', fallback: 'Notes' },
+    {
+        key: 'item_action',
+        fallback: 'Action',
+        className: 'w-[120px] text-right',
+    },
+];
 
 type PurchaseOrderOption = { po_number: string; status?: string };
 
@@ -327,14 +351,10 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
                         placeholder="SJ-0001"
                     />
 
-                    <div className="md:col-span-2">
-                        <TextareaField
-                            name="notes"
-                            label={fl('notes', 'Notes')}
-                            placeholder={fl('notes_placeholder', 'Notes')}
-                            rows={2}
-                        />
-                    </div>
+                    <NotesTextareaField
+                        label={fl('notes', 'Notes')}
+                        placeholder={fl('notes_placeholder', 'Notes')}
+                    />
                 </div>
 
                 <div className="mt-2 space-y-3 border-t pt-4">
@@ -344,43 +364,10 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
 
                     <div className="rounded-md border">
                         <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[220px]">
-                                        {fl('item_product', 'Product')}
-                                    </TableHead>
-                                    <TableHead className="w-[140px]">
-                                        {fl('item_unit', 'Unit')}
-                                    </TableHead>
-                                    <TableHead className="w-[120px]">
-                                        {fl(
-                                            'item_qty_received',
-                                            'Qty Received',
-                                        )}
-                                    </TableHead>
-                                    <TableHead className="w-[120px]">
-                                        {fl(
-                                            'item_qty_accepted',
-                                            'Qty Accepted',
-                                        )}
-                                    </TableHead>
-                                    <TableHead className="w-[120px]">
-                                        {fl(
-                                            'item_qty_rejected',
-                                            'Qty Rejected',
-                                        )}
-                                    </TableHead>
-                                    <TableHead className="w-[140px]">
-                                        {fl('item_unit_price', 'Unit Price')}
-                                    </TableHead>
-                                    <TableHead>
-                                        {fl('item_notes', 'Notes')}
-                                    </TableHead>
-                                    <TableHead className="w-[120px] text-right">
-                                        {fl('item_action', 'Action')}
-                                    </TableHead>
-                                </TableRow>
-                            </TableHeader>
+                            <ItemTableHeader
+                                columns={GOODS_RECEIPT_ITEM_COLUMNS}
+                                translate={fl}
+                            />
                             <TableBody>
                                 {fields.map((field, index) => {
                                     const goodsReceiptItem =

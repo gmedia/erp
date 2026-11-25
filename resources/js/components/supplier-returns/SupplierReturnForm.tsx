@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo, useRef } from 'react';
-import { type Resolver, useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm, type Resolver } from 'react-hook-form';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
@@ -13,16 +13,13 @@ import {
     EntityFormItemSectionHeader,
 } from '@/components/common/EntityFormItemTable';
 import { InputField } from '@/components/common/InputField';
-import SelectField from '@/components/common/SelectField';
-import { TextareaField } from '@/components/common/TextareaField';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+    ItemTableHeader,
+    type ItemTableColumn,
+} from '@/components/common/ItemTableHeader';
+import { NotesTextareaField } from '@/components/common/NotesTextareaField';
+import SelectField from '@/components/common/SelectField';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
@@ -47,6 +44,23 @@ interface SupplierReturnFormProps {
     onSubmit: (data: SupplierReturnFormData) => void;
     isLoading?: boolean;
 }
+
+const SUPPLIER_RETURN_ITEM_COLUMNS: readonly ItemTableColumn[] = [
+    { key: 'item_product', fallback: 'Product', className: 'w-[220px]' },
+    { key: 'item_unit', fallback: 'Unit', className: 'w-[140px]' },
+    {
+        key: 'item_qty_returned',
+        fallback: 'Qty Returned',
+        className: 'w-[120px]',
+    },
+    { key: 'item_unit_price', fallback: 'Unit Price', className: 'w-[140px]' },
+    { key: 'item_notes', fallback: 'Notes' },
+    {
+        key: 'item_action',
+        fallback: 'Action',
+        className: 'w-[120px] text-right',
+    },
+];
 
 const createEmptySupplierReturnItem =
     (): SupplierReturnFormData['items'][number] => ({
@@ -317,14 +331,10 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
                         placeholder={fl('reason_placeholder', 'Select reason')}
                     />
 
-                    <div className="md:col-span-2">
-                        <TextareaField
-                            name="notes"
-                            label={fl('notes', 'Notes')}
-                            placeholder={fl('notes_placeholder', 'Notes')}
-                            rows={2}
-                        />
-                    </div>
+                    <NotesTextareaField
+                        label={fl('notes', 'Notes')}
+                        placeholder={fl('notes_placeholder', 'Notes')}
+                    />
                 </div>
 
                 <div className="mt-2 space-y-3 border-t pt-4">
@@ -334,31 +344,10 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
 
                     <div className="rounded-md border">
                         <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[220px]">
-                                        {fl('item_product', 'Product')}
-                                    </TableHead>
-                                    <TableHead className="w-[140px]">
-                                        {fl('item_unit', 'Unit')}
-                                    </TableHead>
-                                    <TableHead className="w-[120px]">
-                                        {fl(
-                                            'item_qty_returned',
-                                            'Qty Returned',
-                                        )}
-                                    </TableHead>
-                                    <TableHead className="w-[140px]">
-                                        {fl('item_unit_price', 'Unit Price')}
-                                    </TableHead>
-                                    <TableHead>
-                                        {fl('item_notes', 'Notes')}
-                                    </TableHead>
-                                    <TableHead className="w-[120px] text-right">
-                                        {fl('item_action', 'Action')}
-                                    </TableHead>
-                                </TableRow>
-                            </TableHeader>
+                            <ItemTableHeader
+                                columns={SUPPLIER_RETURN_ITEM_COLUMNS}
+                                translate={fl}
+                            />
                             <TableBody>
                                 {fields.map((field, index) => {
                                     const supplierReturnItem =

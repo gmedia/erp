@@ -15,17 +15,14 @@ import {
     EntityFormItemSectionHeader,
 } from '@/components/common/EntityFormItemTable';
 import { InputField } from '@/components/common/InputField';
-import SelectField from '@/components/common/SelectField';
-import { TextareaField } from '@/components/common/TextareaField';
-import { Button } from '@/components/ui/button';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+    ItemTableHeader,
+    type ItemTableColumn,
+} from '@/components/common/ItemTableHeader';
+import { NotesTextareaField } from '@/components/common/NotesTextareaField';
+import SelectField from '@/components/common/SelectField';
+import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
@@ -52,6 +49,27 @@ interface StockTransferFormProps {
     onSubmit: (data: StockTransferFormData) => void;
     isLoading?: boolean;
 }
+
+const buildStockTransferItemColumns = (
+    qtyReceivedLabel: string,
+): readonly ItemTableColumn[] => [
+    { key: 'item_product', fallback: 'Product', className: 'w-[220px]' },
+    { key: 'item_unit', fallback: 'Unit', className: 'w-[160px]' },
+    { key: 'item_qty', fallback: 'Qty', className: 'w-[120px]' },
+    {
+        key: 'qty_received',
+        fallback: '',
+        className: 'w-[140px]',
+        label: qtyReceivedLabel,
+    },
+    { key: 'item_unit_cost', fallback: 'Unit Cost', className: 'w-[140px]' },
+    { key: 'item_notes', fallback: 'Notes' },
+    {
+        key: 'item_action',
+        fallback: 'Action',
+        className: 'w-[120px] text-right',
+    },
+];
 
 const createEmptyStockTransferItem =
     (): StockTransferFormData['items'][number] => ({
@@ -392,16 +410,14 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                             </div>
                         )}
                     />
-                    <div className="md:col-span-2">
-                        <TextareaField
-                            name="notes"
-                            label={fl('notes', 'Notes')}
-                            placeholder={fl(
-                                'notes_placeholder',
-                                'Additional notes...',
-                            )}
-                        />
-                    </div>
+                    <NotesTextareaField
+                        label={fl('notes', 'Notes')}
+                        placeholder={fl(
+                            'notes_placeholder',
+                            'Additional notes...',
+                        )}
+                        rows={3}
+                    />
                 </div>
 
                 <div className="mt-2 space-y-3 border-t pt-4">
@@ -417,31 +433,12 @@ export const StockTransferForm = memo<StockTransferFormProps>(
 
                     <div className="rounded-md border">
                         <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[220px]">
-                                        {fl('item_product', 'Product')}
-                                    </TableHead>
-                                    <TableHead className="w-[160px]">
-                                        {fl('item_unit', 'Unit')}
-                                    </TableHead>
-                                    <TableHead className="w-[120px]">
-                                        {fl('item_qty', 'Qty')}
-                                    </TableHead>
-                                    <TableHead className="w-[140px]">
-                                        {t('stockTransfer.qty_received_label')}
-                                    </TableHead>
-                                    <TableHead className="w-[140px]">
-                                        {fl('item_unit_cost', 'Unit Cost')}
-                                    </TableHead>
-                                    <TableHead>
-                                        {fl('item_notes', 'Notes')}
-                                    </TableHead>
-                                    <TableHead className="w-[120px] text-right">
-                                        {fl('item_action', 'Action')}
-                                    </TableHead>
-                                </TableRow>
-                            </TableHeader>
+                            <ItemTableHeader
+                                columns={buildStockTransferItemColumns(
+                                    t('stockTransfer.qty_received_label'),
+                                )}
+                                translate={fl}
+                            />
                             <TableBody>
                                 {fields.length === 0 ? (
                                     <EntityFormItemEmptyRow
