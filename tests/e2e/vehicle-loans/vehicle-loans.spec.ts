@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { DEFAULT_E2E_EMAIL, approveViaScreenAsDelegate, login } from '../helpers';
+import { DEFAULT_E2E_EMAIL, approveViaScreenAsDelegate, expectResponseOk, login } from '../helpers';
 import {
     VEHICLE_LOAN_DASHBOARD_PATH,
     VEHICLE_LOAN_PICKUP_PATH,
@@ -52,20 +52,20 @@ test.describe('Vehicle Loans', () => {
         const draftResponse = page.waitForResponse(
             (response) =>
                 response.url().endsWith('/api/vehicle-loans') &&
-                response.request().method() === 'POST' &&
-                response.status() === 201,
+                response.request().method() === 'POST',
         );
         await page.getByRole('button', { name: 'Simpan Draf' }).click();
-        await draftResponse;
+        const draft = await draftResponse;
+        await expectResponseOk(draft);
+        expect(draft.status()).toBe(201);
 
         const submitResponse = page.waitForResponse(
             (response) =>
                 response.url().includes('/submit') &&
-                response.request().method() === 'POST' &&
-                response.status() < 400,
+                response.request().method() === 'POST',
         );
         await page.getByRole('button', { name: 'Kirim Permintaan' }).click();
-        await submitResponse;
+        await expectResponseOk(await submitResponse);
     });
 
     test('submits a request with driver and unit selected from master options', async ({
@@ -76,10 +76,10 @@ test.describe('Vehicle Loans', () => {
                 response
                     .url()
                     .includes('/api/vehicle-loans/assignment-options') &&
-                response.status() < 400,
+                response.request().method() === 'GET',
         );
         await page.goto(VEHICLE_LOAN_REQUEST_PATH);
-        await options;
+        await expectResponseOk(await options);
 
         await submitVehicleLoanRequest(page, 'E2E pilih driver & unit');
     });
@@ -148,20 +148,20 @@ test.describe('Vehicle Loans', () => {
         const response = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/vehicle-loans/security-queue') &&
-                r.status() < 400,
+                r.request().method() === 'GET',
         );
         await page.reload();
-        await response;
+        await expectResponseOk(await response);
 
         const handover = page
             .getByRole('button', { name: 'Serahkan Kunci' })
             .first();
         if (await handover.isVisible().catch(() => false)) {
             const handoverResponse = page.waitForResponse(
-                (r) => r.url().includes('/handover') && r.status() < 400,
+                (r) => r.url().includes('/handover') && r.request().method() === 'POST',
             );
             await handover.click();
-            await handoverResponse;
+            await expectResponseOk(await handoverResponse);
             await expect(page.getByText('Kunci diserahkan.')).toBeVisible();
         }
     });
@@ -196,10 +196,10 @@ test.describe('Vehicle Loans', () => {
         const base = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/vehicle-loans/mobile-config') &&
-                r.status() < 400,
+                r.request().method() === 'GET',
         );
         await page.goto(VEHICLE_LOAN_REQUEST_PATH);
-        await base;
+        await expectResponseOk(await base);
 
         for (const path of [
             VEHICLE_LOAN_REQUEST_PATH,
