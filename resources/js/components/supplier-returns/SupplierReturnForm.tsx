@@ -6,19 +6,20 @@ import { useFieldArray, useForm, type Resolver } from 'react-hook-form';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
+import { DocumentNumberField } from '@/components/common/DocumentNumberField';
 import EntityForm from '@/components/common/EntityForm';
 import {
     EntityFormItemActionsCell,
     EntityFormItemEmptyRow,
     EntityFormItemSectionHeader,
 } from '@/components/common/EntityFormItemTable';
-import { InputField } from '@/components/common/InputField';
 import {
     ItemTableHeader,
     type ItemTableColumn,
 } from '@/components/common/ItemTableHeader';
 import { NotesTextareaField } from '@/components/common/NotesTextareaField';
 import SelectField from '@/components/common/SelectField';
+import { StatusSelectField } from '@/components/common/StatusSelectField';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
@@ -44,6 +45,12 @@ interface SupplierReturnFormProps {
     onSubmit: (data: SupplierReturnFormData) => void;
     isLoading?: boolean;
 }
+
+const SUPPLIER_RETURN_STATUSES = [
+    ['draft', 'Draft'],
+    ['confirmed', 'Confirmed'],
+    ['cancelled', 'Cancelled'],
+] as const;
 
 const SUPPLIER_RETURN_ITEM_COLUMNS: readonly ItemTableColumn[] = [
     { key: 'item_product', fallback: 'Product', className: 'w-[220px]' },
@@ -224,33 +231,18 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
                 className="sm:max-w-[1100px]"
             >
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <InputField
+                    <DocumentNumberField
+                        fl={fl}
                         name="return_number"
                         label={fl('return_number', 'Return Number')}
-                        placeholder={fl(
-                            'return_number_placeholder',
-                            'Auto-generated if empty',
-                        )}
+                        placeholderKey="return_number_placeholder"
                     />
 
-                    <SelectField
-                        name="status"
+                    <StatusSelectField
+                        fl={fl}
                         label={fl('status', 'Status')}
-                        options={[
-                            {
-                                value: 'draft',
-                                label: fl('status_draft', 'Draft'),
-                            },
-                            {
-                                value: 'confirmed',
-                                label: fl('status_confirmed', 'Confirmed'),
-                            },
-                            {
-                                value: 'cancelled',
-                                label: fl('status_cancelled', 'Cancelled'),
-                            },
-                        ]}
                         placeholder={fl('status_placeholder', 'Select status')}
+                        statuses={SUPPLIER_RETURN_STATUSES}
                     />
 
                     <AsyncSelectField<{ po_number: string }>
