@@ -45,9 +45,13 @@ async function expectRoomBeforeActions(page: Page): Promise<void> {
         if (scroller) scroller.scrollLeft = scroller.scrollWidth;
     });
     const beforeHead = actionsHead.locator('xpath=preceding-sibling::th[1]');
-    const actionsBox = await boxOf(actionsHead);
-    const beforeBox = await boxOf(beforeHead);
-    expect(beforeBox.x + beforeBox.width).toBeLessThanOrEqual(actionsBox.x + 1);
+    await expect
+        .poll(async () => {
+            const actionsBox = await boxOf(actionsHead);
+            const beforeBox = await boxOf(beforeHead);
+            return beforeBox.x + beforeBox.width <= actionsBox.x + 1;
+        })
+        .toBe(true);
 }
 
 test.describe('Budgets - kolom angka & layout', () => {
