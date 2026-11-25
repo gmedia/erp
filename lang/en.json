@@ -331,10 +331,13 @@
             "gainHint": "Credited when sale proceeds exceed the book value.",
             "lossLabel": "Asset disposal loss account",
             "lossHint": "Debited when the book value exceeds sale proceeds (including lost assets).",
+            "inTransitLabel": "Inventory in transit account",
+            "inTransitHint": "Debited when goods are dispatched between warehouses until they are received.",
             "placeholder": "Select account"
         }
     },
     "accounting_posting.control_account_missing": "Control account :code was not found in the active COA version.",
+    "accounting_posting.in_transit_account_missing": "The inventory in-transit account is not set or is not active in the COA version. Set it in Admin Settings > Accounting.",
     "accounting_posting.coa_none_active": "No active COA version covers :date. Activate one COA version before posting.",
     "accounting_posting.disposal_accounts_missing": "Set the gain and loss accounts for asset disposal in settings before posting.",
     "accounting_posting.disposal_not_postable": "Asset :code has status :status and cannot be posted as a disposal.",

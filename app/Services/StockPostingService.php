@@ -69,12 +69,39 @@ class StockPostingService
 
         foreach ($grouped as $movements) {
             $balance = 0.0;
+            $averageCost = 0.0;
 
             foreach ($movements as $movement) {
-                $balance += (float) $movement->quantity_in - (float) $movement->quantity_out;
+                $quantityIn = (float) $movement->quantity_in;
+                $quantityOut = (float) $movement->quantity_out;
 
-                if ((float) $movement->balance_after !== $balance) {
-                    $movement->forceFill(['balance_after' => $balance])->saveQuietly();
+                // Issue #495: rata-rata tertimbang bergerak per produk+gudang.
+                // Masuk: avg baru = (saldo_positif × avg_lama + qty_masuk × biaya_masuk)
+                //        / (saldo_positif + qty_masuk).
+                // Keluar: dinilai dengan avg berjalan (unit_cost = avg) dan avg tidak berubah.
+                $positiveBalance = max($balance, 0.0);
+
+                if ($quantityIn > 0) {
+                    $unitCostIn = (float) $movement->unit_cost;
+                    $averageCost = $positiveBalance + $quantityIn > 0
+                        ? (($positiveBalance * $averageCost) + ($quantityIn * $unitCostIn))
+                            / ($positiveBalance + $quantityIn)
+                        : $unitCostIn;
+                } elseif ($quantityOut > 0) {
+                    $movement->unit_cost = round($averageCost, 2);
+                }
+
+                $balance += $quantityIn - $quantityOut;
+
+                $averageCostRounded = round($averageCost, 2);
+
+                if ((float) $movement->balance_after !== $balance
+                    || (float) $movement->average_cost_after !== $averageCostRounded
+                    || $movement->isDirty('unit_cost')) {
+                    $movement->forceFill([
+                        'balance_after' => $balance,
+                        'average_cost_after' => $averageCostRounded,
+                    ])->saveQuietly();
                 }
             }
         }
@@ -265,7 +292,9 @@ class StockPostingService
                 'product_id' => (int) $item->product_id,
                 'quantity_in' => $quantity,
                 'quantity_out' => 0,
-                'unit_cost' => $item->unit_cost,
+                // Issue #495: biaya kirim = avg asal saat dispatch (transfer_out baris yang sama),
+                // bukan item.unit_cost (isian form). Data lama tanpa dispatch memakai avg asal saat itu.
+                'unit_cost' => $this->transferShipmentUnitCost($stockTransfer, $item),
                 'notes' => $stockTransfer->notes,
                 'moved_at' => ($stockTransfer->received_at ?? $stockTransfer->transfer_date)->copy()->startOfDay(),
                 'created_by' => $stockTransfer->received_by ?? Auth::id(),
@@ -424,6 +453,35 @@ class StockPostingService
             'transfer_in',
             'transfer_in_reversal',
         );
+    }
+
+    /**
+     * Biaya kirim satu baris transfer (Issue #495). Sumber utama: unit_cost movement
+     * transfer_out baris yang sama. Fallback data lama tanpa dispatch: avg gudang asal
+     * pada movement terakhir hingga tanggal transfer, bukan item.unit_cost.
+     */
+    private function transferShipmentUnitCost(StockTransfer $stockTransfer, object $item): float
+    {
+        $dispatchCost = StockMovement::query()
+            ->where('reference_type', StockTransfer::class)
+            ->where('reference_id', $stockTransfer->id)
+            ->where('movement_type', 'transfer_out')
+            ->where('source_line_id', (int) $item->id)
+            ->value('unit_cost');
+
+        if ($dispatchCost !== null) {
+            return (float) $dispatchCost;
+        }
+
+        $sourceAverage = StockMovement::query()
+            ->where('product_id', (int) $item->product_id)
+            ->where('warehouse_id', (int) $stockTransfer->from_warehouse_id)
+            ->where('moved_at', '<=', $stockTransfer->transfer_date->copy()->endOfDay())
+            ->orderByDesc('moved_at')
+            ->orderByDesc('id')
+            ->value('average_cost_after');
+
+        return (float) ($sourceAverage ?? 0);
     }
 
     /**

@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Http\Requests\Concerns\HasSupportedCurrencyRules;
+use App\Models\Account;
+use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 
 class AdminSettingRequest extends AuthorizedFormRequest
@@ -49,6 +51,28 @@ class AdminSettingRequest extends AuthorizedFormRequest
             // Akun laba/rugi pelepasan aset (#442): id akun daun di COA aktif.
             'asset_disposal_gain_account_id' => ['nullable', 'integer', 'exists:accounts,id'],
             'asset_disposal_loss_account_id' => ['nullable', 'integer', 'exists:accounts,id'],
+
+            // Akun persediaan dalam perjalanan (#495): akun daun aktif di COA aktif.
+            'inventory_in_transit_account_id' => ['nullable', 'integer', $this->postableAccountRule()],
         ];
+    }
+
+    /**
+     * Akun harus aktif, berada di COA aktif, dan bukan induk (daun).
+     */
+    private function postableAccountRule(): Closure
+    {
+        return function (string $attribute, mixed $value, Closure $fail): void {
+            $isPostable = Account::query()
+                ->whereKey($value)
+                ->where('is_active', true)
+                ->whereHas('coaVersion', fn ($query) => $query->where('status', 'active'))
+                ->whereDoesntHave('children')
+                ->exists();
+
+            if (! $isPostable) {
+                $fail(__('account.not_postable'));
+            }
+        };
     }
 }

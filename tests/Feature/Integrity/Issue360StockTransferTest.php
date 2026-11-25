@@ -1,7 +1,11 @@
 <?php
 
+use App\Models\Account;
+use App\Models\CoaVersion;
+use App\Models\FiscalYear;
 use App\Models\GoodsReceipt;
 use App\Models\Product;
+use App\Models\Setting;
 use App\Models\StockMovement;
 use App\Models\StockTransfer;
 use App\Models\StockTransferItem;
@@ -20,7 +24,50 @@ beforeEach(function () {
     actingAs(createTestUserWithPermissions([
         'stock_transfer', 'stock_transfer.create', 'stock_transfer.edit', 'stock_transfer.delete',
     ]));
+    issue360InTransitAccount();
 });
+
+/**
+ * Jurnal dispatch (issue #495) membutuhkan akun persediaan dalam perjalanan aktif
+ * di COA yang berlaku untuk tanggal hari ini. Akun disediakan agar tes alur transfer
+ * tetap menguji perilaku stok, bukan penolakan akun yang belum diatur.
+ */
+function issue360InTransitAccount(): void
+{
+    $year = now()->year;
+    $fiscalYear = FiscalYear::factory()->create([
+        'name' => (string) $year,
+        'start_date' => "{$year}-01-01",
+        'end_date' => "{$year}-12-31",
+        'status' => 'open',
+    ]);
+    $coaVersion = CoaVersion::factory()->create([
+        'status' => 'active',
+        'fiscal_year_id' => $fiscalYear->id,
+    ]);
+
+    foreach ([['11300', 'Inventory', 'asset'], ['51000', 'Inventory Shortage Expense', 'expense']] as [$code, $name, $type]) {
+        Account::factory()->create([
+            'coa_version_id' => $coaVersion->id,
+            'code' => $code,
+            'name' => $name,
+            'type' => $type,
+            'normal_balance' => 'debit',
+            'is_active' => true,
+        ]);
+    }
+
+    $transit = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '11310',
+        'name' => 'Persediaan dalam Perjalanan',
+        'type' => 'asset',
+        'normal_balance' => 'debit',
+        'is_active' => true,
+    ]);
+
+    Setting::set('inventory_in_transit_account_id', (string) $transit->id);
+}
 
 /**
  * Gudang asal berisi $stock unit (movement goods_receipt), satu transfer draft $qty unit.

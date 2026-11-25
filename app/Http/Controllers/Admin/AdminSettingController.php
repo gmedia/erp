@@ -33,7 +33,13 @@ class AdminSettingController extends Controller
         $settings = Setting::getGrouped();
         $settings['general']['company_logo_url'] = $this->getCompanyLogoUrl();
 
-        foreach (['asset_disposal_gain_account_id', 'asset_disposal_loss_account_id'] as $key) {
+        $accountKeys = [
+            'asset_disposal_gain_account_id',
+            'asset_disposal_loss_account_id',
+            'inventory_in_transit_account_id',
+        ];
+
+        foreach ($accountKeys as $key) {
             $accountId = $settings['accounting'][$key] ?? null;
             $labelKey = str_replace('_account_id', '_account_label', $key);
             $settings['accounting'][$key] = $accountId ? (string) $accountId : null;

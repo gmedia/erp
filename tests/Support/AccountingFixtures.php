@@ -3,6 +3,7 @@
 use App\Models\Account;
 use App\Models\CoaVersion;
 use App\Models\FiscalYear;
+use App\Models\Setting;
 
 /**
  * COA aktif lengkap untuk jurnal GR (Issue #416): tahun fiskal yang memuat periode
@@ -57,4 +58,31 @@ function createAccountingControlFixture(?string $year = null): CoaVersion
     ]);
 
     return $coaVersion;
+}
+
+/**
+ * Akun barang dalam perjalanan 11310 di COA aktif, lalu Setting inventory_in_transit_account_id
+ * menunjuk ke akun itu. Dispatch transfer ditolak 422 tanpa setting ini (Issue #495), jadi test
+ * yang mengirim transfer ke in_transit/received wajib memanggil helper ini.
+ *
+ * Idempoten: bila akun 11310 sudah ada di COA aktif, akun itu dipakai ulang.
+ */
+function createInTransitAccountFixture(): Account
+{
+    $coaVersion = CoaVersion::query()->where('status', 'active')->first()
+        ?? createAccountingControlFixture();
+
+    $account = Account::query()->firstOrCreate(
+        ['coa_version_id' => $coaVersion->id, 'code' => '11310'],
+        [
+            'name' => 'Persediaan dalam Perjalanan',
+            'type' => 'asset',
+            'normal_balance' => 'debit',
+            'is_active' => true,
+        ],
+    );
+
+    Setting::set('inventory_in_transit_account_id', (string) $account->id);
+
+    return $account;
 }
