@@ -276,9 +276,15 @@ class StockMovementSampleDataSeeder extends Seeder
     {
         $demoEntryIds = JournalEntry::query()
             ->where(fn ($query) => $query
-                ->where(fn ($q) => $q->where('source_type', GoodsReceipt::class)->whereIn('source_id', $this->demoIds(GoodsReceipt::class, 'gr_number', self::GR_DEMO)))
-                ->orWhere(fn ($q) => $q->where('source_type', SupplierReturn::class)->whereIn('source_id', $this->demoIds(SupplierReturn::class, 'return_number', self::SR_DEMO)))
-                ->orWhere(fn ($q) => $q->where('source_type', StockAdjustment::class)->whereIn('source_id', $this->demoIds(StockAdjustment::class, 'adjustment_number', self::SA_DEMO))))
+                ->where(fn ($q) => $q
+                    ->where('source_type', GoodsReceipt::class)
+                    ->whereIn('source_id', $this->demoIds(GoodsReceipt::class, 'gr_number', self::GR_DEMO)))
+                ->orWhere(fn ($q) => $q
+                    ->where('source_type', SupplierReturn::class)
+                    ->whereIn('source_id', $this->demoIds(SupplierReturn::class, 'return_number', self::SR_DEMO)))
+                ->orWhere(fn ($q) => $q
+                    ->where('source_type', StockAdjustment::class)
+                    ->whereIn('source_id', $this->demoIds(StockAdjustment::class, 'adjustment_number', self::SA_DEMO))))
             ->pluck('id');
 
         if ($demoEntryIds->isNotEmpty()) {
