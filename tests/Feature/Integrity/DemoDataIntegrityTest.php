@@ -2046,6 +2046,64 @@ invariant('W8-459 purchase order requester never performs its own pipeline trans
     }
 });
 
+// #494 butir 1 — JE posted tidak boleh dicatat setelah periode tempatnya ditutup.
+invariant('W9-494 posted journal entries are not posted after their period was closed', function () {
+    $violations = DB::table('journal_entries')
+        ->join('period_closings', function ($join): void {
+            $join->on('period_closings.fiscal_year_id', '=', 'journal_entries.fiscal_year_id')
+                ->whereColumn(
+                    DB::raw('period_closings.period_year'),
+                    '=',
+                    DB::raw('YEAR(journal_entries.entry_date)'),
+                )
+                ->whereColumn(
+                    DB::raw('period_closings.period_month'),
+                    '=',
+                    DB::raw('MONTH(journal_entries.entry_date)'),
+                );
+        })
+        ->where('period_closings.closing_type', 'monthly')
+        ->where('period_closings.status', 'closed')
+        ->where('journal_entries.status', 'posted')
+        ->whereColumn('journal_entries.posted_at', '>', 'period_closings.closed_at')
+        ->get(['journal_entries.entry_number', 'period_closings.closed_at']);
+
+    expect($violations)->toBeEmpty(
+        'Posted journal entries must not be posted after their period closed: '
+        . $violations->pluck('entry_number')->implode(', '),
+    );
+});
+
+// #494 butir 2 — JE transfer demo sama dengan rumus aplikasi: (qty - qty_received) x unit_cost.
+invariant('W9-494 demo transfer journals equal the shortage formula (quantity - quantity_received) x unit_cost', function () {
+    $transfers = StockTransfer::query()
+        ->whereNotNull('journal_entry_id')
+        ->with('items')
+        ->get();
+
+    expect($transfers)->not->toBeEmpty('Demo data must post at least one transfer journal');
+
+    foreach ($transfers as $transfer) {
+        $expected = 0.0;
+
+        foreach ($transfer->items as $item) {
+            $missing = max(0.0, (float) $item->quantity - (float) $item->quantity_received);
+            $expected += $missing * (float) $item->unit_cost;
+        }
+
+        $debit = (float) DB::table('journal_entry_lines')
+            ->join('accounts', 'accounts.id', '=', 'journal_entry_lines.account_id')
+            ->where('journal_entry_lines.journal_entry_id', $transfer->journal_entry_id)
+            ->where('accounts.code', '51000')
+            ->sum('journal_entry_lines.debit');
+
+        expect(round($debit, 2))->toBe(
+            round($expected, 2),
+            "Transfer {$transfer->transfer_number} journal debit must equal its shortage formula",
+        );
+    }
+});
+
 // #459 butir 6 — submitted_at aset tidak lebih awal dari log Draft (Initial -> Draft) pada tanggal dokumen.
 invariant('W8-459 asset approval submitted_at is not earlier than its Draft pipeline log', function () {
     $requests = DB::table('approval_requests')
