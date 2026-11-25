@@ -93,7 +93,10 @@ export const arAgingReportColumns: ColumnDef<ArAgingReportItem>[] = [
     }),
     createReportTextColumn<ArAgingReportItem>({
         id: 'credit_note_amount',
-        header: { key: 'column.credit_note_amount', fallback: 'Credit Note Amount' },
+        header: {
+            key: 'column.credit_note_amount',
+            fallback: 'Credit Note Amount',
+        },
         align: 'right',
         getValue: (item) => formatCurrency(item.amounts.credit_note_amount),
     }),
