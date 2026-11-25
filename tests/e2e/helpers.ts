@@ -1,6 +1,24 @@
-import { APIRequestContext, Locator, Page, expect } from '@playwright/test';
+import {
+    APIRequestContext,
+    Locator,
+    Page,
+    Response as PlaywrightResponse,
+    expect,
+} from '@playwright/test';
 
 type ApiResponseMatcher = string | RegExp | ((url: string) => boolean);
+
+export async function expectResponseOk(response: PlaywrightResponse): Promise<void> {
+    const status = response.status();
+    if (status < 400) {
+        return;
+    }
+    const body = await response.text().catch(() => '<body unavailable>');
+    expect(
+        status,
+        `${response.request().method()} ${response.url()} -> ${body.slice(0, 500)}`,
+    ).toBeLessThan(400);
+}
 
 const pageDebugListenersAttached = new WeakSet<Page>();
 export const DEFAULT_E2E_EMAIL = process.env.APP_ADMIN ?? 'admin@example.com';
@@ -131,10 +149,12 @@ export async function approveViaScreenAsDelegate(
     }
 
     const approveResponse = page.waitForResponse(
-        (response) => response.url().includes(confirmResponseMatch) && response.status() < 400,
+        (response) =>
+            response.url().includes(confirmResponseMatch) &&
+            response.request().method() === 'POST',
     );
     await page.getByRole('button', { name: 'Confirm Approval', exact: true }).click();
-    await approveResponse;
+    await expectResponseOk(await approveResponse);
 }
 
 function matchesApiUrl(url: string, matcher: ApiResponseMatcher): boolean {
@@ -156,13 +176,12 @@ export async function waitForApiAfterAction(
     timeout = 10000,
 ): Promise<void> {
     const responsePromise = page.waitForResponse(
-        (response) =>
-            matchesApiUrl(response.url(), matcher) && response.status() < 400,
+        (response) => matchesApiUrl(response.url(), matcher),
         { timeout },
     );
 
     await action();
-    await responsePromise;
+    await expectResponseOk(await responsePromise);
 }
 
 export async function reloadAndWaitForApi(
@@ -319,12 +338,11 @@ export async function openModule(
 ): Promise<void> {
     await login(page, undefined, undefined, { requireDashboard: false });
     const responsePromise = page.waitForResponse(
-        (response) =>
-            response.url().includes(apiPath) && response.status() < 400,
+        (response) => response.url().includes(apiPath),
         { timeout: 15000 },
     );
     await page.goto(route);
-    await responsePromise;
+    await expectResponseOk(await responsePromise);
 }
 
 export async function createEntity(
@@ -599,8 +617,7 @@ export async function login(
     const authStateResponse = page.waitForResponse(
         (response) =>
             response.url().includes('/api/me') &&
-            response.request().method() === 'GET' &&
-            response.status() < 400,
+            response.request().method() === 'GET',
         { timeout: 60000 },
     );
 
@@ -611,11 +628,11 @@ export async function login(
         .first()
         .click({ force: true });
 
-    await loginResponse;
+    await expectResponseOk(await loginResponse);
     if (requireDashboard) {
         await page.waitForURL('**/dashboard', { timeout: 60000 });
     }
-    await authStateResponse;
+    await expectResponseOk(await authStateResponse);
     await expect
         .poll(async () =>
             page
