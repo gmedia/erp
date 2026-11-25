@@ -131,6 +131,12 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
         isLoading = false,
     }) {
         const { t } = useTranslation();
+        const fl = (key: string, fallback: string) => {
+            const translated = t(`form_fields.goods_receipts.${key}`);
+            return translated === `form_fields.goods_receipts.${key}`
+                ? fallback
+                : translated;
+        };
         const activeGoodsReceipt = goodsReceipt || item || entity;
         const defaultValues = useMemo(
             () => getGoodsReceiptFormDefaults(activeGoodsReceipt),
@@ -227,8 +233,8 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
                 onOpenChange={onOpenChange}
                 title={
                     activeGoodsReceipt
-                        ? 'Edit Goods Receipt'
-                        : 'Add New Goods Receipt'
+                        ? fl('edit_title', 'Edit Goods Receipt')
+                        : fl('add_title', 'Add New Goods Receipt')
                 }
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
@@ -237,27 +243,42 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <InputField
                         name="gr_number"
-                        label="GR Number"
-                        placeholder="Auto-generated if empty"
+                        label={fl('gr_number', 'GR Number')}
+                        placeholder={fl(
+                            'gr_number_placeholder',
+                            'Auto-generated if empty',
+                        )}
                     />
 
                     <SelectField
                         name="status"
-                        label="Status"
+                        label={fl('status', 'Status')}
                         options={[
-                            { value: 'draft', label: 'Draft' },
-                            { value: 'confirmed', label: 'Confirmed' },
-                            { value: 'cancelled', label: 'Cancelled' },
+                            {
+                                value: 'draft',
+                                label: fl('status_draft', 'Draft'),
+                            },
+                            {
+                                value: 'confirmed',
+                                label: fl('status_confirmed', 'Confirmed'),
+                            },
+                            {
+                                value: 'cancelled',
+                                label: fl('status_cancelled', 'Cancelled'),
+                            },
                         ]}
-                        placeholder="Select status"
+                        placeholder={fl('status_placeholder', 'Select status')}
                     />
 
                     <div className="space-y-2">
                         <AsyncSelectField<PurchaseOrderOption>
                             name="purchase_order_id"
-                            label="Purchase Order"
+                            label={fl('purchase_order', 'Purchase Order')}
                             url={purchaseOrderListUrl}
-                            placeholder="Select purchase order"
+                            placeholder={fl(
+                                'purchase_order_placeholder',
+                                'Select purchase order',
+                            )}
                             labelFn={(po) => po.po_number}
                             onItemSelect={(po) =>
                                 setSelectedPoStatus(po.status)
@@ -274,31 +295,43 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
 
                     <AsyncSelectField
                         name="warehouse_id"
-                        label="Warehouse"
+                        label={fl('warehouse', 'Warehouse')}
                         url="/api/warehouses"
-                        placeholder="Select warehouse"
+                        placeholder={fl(
+                            'warehouse_placeholder',
+                            'Select warehouse',
+                        )}
                     />
 
-                    <DatePickerField name="receipt_date" label="Receipt Date" />
+                    <DatePickerField
+                        name="receipt_date"
+                        label={fl('receipt_date', 'Receipt Date')}
+                    />
 
                     <AsyncSelectField
                         name="received_by"
-                        label="Received By"
+                        label={fl('received_by', 'Received By')}
                         url="/api/employees"
-                        placeholder="Select employee"
+                        placeholder={fl(
+                            'received_by_placeholder',
+                            'Select employee',
+                        )}
                     />
 
                     <InputField
                         name="supplier_delivery_note"
-                        label="Supplier Delivery Note"
+                        label={fl(
+                            'supplier_delivery_note',
+                            'Supplier Delivery Note',
+                        )}
                         placeholder="SJ-0001"
                     />
 
                     <div className="md:col-span-2">
                         <TextareaField
                             name="notes"
-                            label="Notes"
-                            placeholder="Notes"
+                            label={fl('notes', 'Notes')}
+                            placeholder={fl('notes_placeholder', 'Notes')}
                             rows={2}
                         />
                     </div>
@@ -314,26 +347,37 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
                             <TableHeader>
                                 <TableRow>
                                     <TableHead className="w-[220px]">
-                                        Product
+                                        {fl('item_product', 'Product')}
                                     </TableHead>
                                     <TableHead className="w-[140px]">
-                                        Unit
+                                        {fl('item_unit', 'Unit')}
                                     </TableHead>
                                     <TableHead className="w-[120px]">
-                                        Qty Received
+                                        {fl(
+                                            'item_qty_received',
+                                            'Qty Received',
+                                        )}
                                     </TableHead>
                                     <TableHead className="w-[120px]">
-                                        Qty Accepted
+                                        {fl(
+                                            'item_qty_accepted',
+                                            'Qty Accepted',
+                                        )}
                                     </TableHead>
                                     <TableHead className="w-[120px]">
-                                        Qty Rejected
+                                        {fl(
+                                            'item_qty_rejected',
+                                            'Qty Rejected',
+                                        )}
                                     </TableHead>
                                     <TableHead className="w-[140px]">
-                                        Unit Price
+                                        {fl('item_unit_price', 'Unit Price')}
                                     </TableHead>
-                                    <TableHead>Notes</TableHead>
+                                    <TableHead>
+                                        {fl('item_notes', 'Notes')}
+                                    </TableHead>
                                     <TableHead className="w-[120px] text-right">
-                                        Action
+                                        {fl('item_action', 'Action')}
                                     </TableHead>
                                 </TableRow>
                             </TableHeader>
