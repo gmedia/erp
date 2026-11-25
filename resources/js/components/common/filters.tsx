@@ -500,7 +500,7 @@ export function createSupplierCategoryFilterField(
 
 export function createProductCategoryFilterField(
     name = 'product_category_id',
-    label = 'Category',
+    label: TranslatableLabel = 'Category',
     placeholder = 'Select category',
 ): FieldDescriptor {
     return createAsyncSelectFilterField(
@@ -823,12 +823,12 @@ export function createInventoryStocktakeFilterSelectFields(): FieldDescriptor[] 
         createWarehouseFilterField('Select warehouse'),
         createProductCategoryFilterField(
             'product_category_id',
-            'Product Category',
+            { key: 'column.product_category', fallback: 'Product Category' },
             'Select category',
         ),
         createSelectFilterField(
             'status',
-            'Status',
+            { key: 'column.status', fallback: 'Status' },
             inventoryStocktakeStatusOptions,
             'Select status',
         ),
