@@ -2,9 +2,21 @@
 set -euo pipefail
 
 usage() {
-    echo "Usage: $0 <company-slug> <company-name> <api-url> <google-services.json> [keystore-file] [keystore-password] [key-alias] [key-password]" >&2
-    echo "Example: $0 nama-perusahaan \"Nama Perusahaan\" https://nama-perusahaan.app.dokfin.id ./google-services.json" >&2
+    echo "Usage: MOBILE_APP_ID_PREFIX=<prefix> $0 <company-slug> <company-name> <api-url> <google-services.json> [keystore-file] [keystore-password] [key-alias] [key-password]" >&2
+    echo "Example: MOBILE_APP_ID_PREFIX=com.perusahaan.contoh $0 nama-perusahaan \"Nama Perusahaan\" https://<slug>.app.perusahaan.contoh ./google-services.json" >&2
+    echo "MOBILE_APP_ID_PREFIX wajib diisi: appId = \${MOBILE_APP_ID_PREFIX}.app_<slug>. Pakai awalan yang sama dengan build sebelumnya (lihat docs/mobile-multi-company-build.md)." >&2
 }
+
+if [ -z "${MOBILE_APP_ID_PREFIX:-}" ]; then
+    echo "MOBILE_APP_ID_PREFIX belum diisi. Set awalan appId (mis. com.perusahaan.contoh) yang sama dengan build sebelumnya." >&2
+    usage
+    exit 1
+fi
+
+if ! printf '%s' "$MOBILE_APP_ID_PREFIX" | grep -Eq '^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$'; then
+    echo "MOBILE_APP_ID_PREFIX tidak valid: '$MOBILE_APP_ID_PREFIX'. Gunakan huruf kecil, angka, underscore, dipisah titik (mis. com.perusahaan.contoh), tanpa spasi." >&2
+    exit 1
+fi
 
 if [ "$#" -lt 4 ]; then
     usage
@@ -46,7 +58,7 @@ case "$API_URL" in
 esac
 
 app_slug="$(printf '%s' "$COMPANY_SLUG" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/_/g')"
-APP_ID="com.dokfin.app_${app_slug}"
+APP_ID="${MOBILE_APP_ID_PREFIX}.app_${app_slug}"
 
 package_name="$(python3 -c 'import json,sys; data=json.load(open(sys.argv[1])); print(data["client"][0]["client_info"]["android_client_info"]["package_name"])' "$GOOGLE_SERVICES_JSON")"
 

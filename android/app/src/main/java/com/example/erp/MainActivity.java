@@ -1,4 +1,4 @@
-package com.dokfin.erp;
+package com.example.erp;
 
 import com.getcapacitor.BridgeActivity;
 
