@@ -997,6 +997,49 @@ invariant('W7-05 GL equipment minus accumulated depreciation equals in-service b
         ->toBe(round($registerBookValue, 2), 'GL equipment net of accumulated depreciation must equal in-service book value');
 });
 
+// #442 — every disposed or lost demo asset has exactly one posted release journal
+// whose lines zero its cost and accumulated depreciation.
+invariant('#442 disposed and lost assets carry one posted release journal', function () {
+    $assets = DB::table('assets')
+        ->whereIn('status', ['disposed', 'lost'])
+        ->get(['asset_code', 'status', 'purchase_cost', 'accumulated_depreciation']);
+
+    expect($assets)->not->toBeEmpty('Demo data must include disposed or lost assets');
+
+    $equipmentId = activeCoaAccountId('12100');
+    $accumulatedId = activeCoaAccountId('12200');
+
+    foreach ($assets as $asset) {
+        $prefix = $asset->status === 'disposed' ? 'DISP-' : 'LOSS-';
+        $journals = DB::table('journal_entries')
+            ->where('reference', $prefix . $asset->asset_code)
+            ->where('journal_type', 'system')
+            ->get(['id', 'status']);
+
+        expect($journals)->toHaveCount(1, "Asset {$asset->asset_code} must have exactly one release journal");
+        expect($journals[0]->status)->toBe('posted');
+
+        $credit = (float) DB::table('journal_entry_lines')
+            ->where('journal_entry_id', $journals[0]->id)
+            ->where('account_id', $equipmentId)
+            ->sum('credit');
+
+        expect(round($credit, 2))
+            ->toBe(round((float) $asset->purchase_cost, 2), "Asset {$asset->asset_code} release must credit its cost");
+
+        $debitAccumulated = (float) DB::table('journal_entry_lines')
+            ->where('journal_entry_id', $journals[0]->id)
+            ->where('account_id', $accumulatedId)
+            ->sum('debit');
+
+        expect(round($debitAccumulated, 2))
+            ->toBe(
+                round((float) $asset->accumulated_depreciation, 2),
+                "Asset {$asset->asset_code} release must debit its accumulated depreciation"
+            );
+    }
+});
+
 // W7-05 — every posted depreciation run has a posted journal.
 invariant('W7-05 posted depreciation runs have posted journals', function () {
     $runs = DB::table('asset_depreciation_runs')->where('status', 'posted')->get();
