@@ -14,6 +14,16 @@ function localeFormFieldTranslations(string $file): array
     return $decoded['form_fields'] ?? [];
 }
 
+/**
+ * @return array<string, string>
+ */
+function localeValidationTranslations(string $file): array
+{
+    $decoded = json_decode(File::get(lang_path($file)), true, 512, JSON_THROW_ON_ERROR);
+
+    return $decoded['validation'] ?? [];
+}
+
 test('form field translation keys exist in both english and indonesian locales', function () {
     $en = localeFormFieldTranslations('en.json');
     $id = localeFormFieldTranslations('id.json');
@@ -38,6 +48,35 @@ test('purchase order form labels keep the english text', function () {
         ->and($en['purchase_orders']['order_date'])->toBe('Order Date')
         ->and($en['purchase_orders']['payment_terms_placeholder'])->toBe('Net 30')
         ->and($en['purchase_orders']['item_unit_price'])->toBe('Unit Price');
+});
+
+test('purchase order status options and validation messages keep the english text', function () {
+    $en = localeFormFieldTranslations('en.json');
+    $enValidation = localeValidationTranslations('en.json');
+
+    expect($en['purchase_orders']['status_draft'])->toBe('Draft')
+        ->and($en['purchase_orders']['status_pending_approval'])->toBe('Pending Approval')
+        ->and($en['purchase_orders']['status_confirmed'])->toBe('Confirmed')
+        ->and($en['purchase_orders']['status_rejected'])->toBe('Rejected')
+        ->and($en['purchase_orders']['status_partially_received'])->toBe('Partially Received')
+        ->and($en['purchase_orders']['status_fully_received'])->toBe('Fully Received')
+        ->and($en['purchase_orders']['status_cancelled'])->toBe('Cancelled')
+        ->and($en['purchase_orders']['status_closed'])->toBe('Closed')
+        ->and($enValidation['supplier_required'])->toBe('Supplier is required.')
+        ->and($enValidation['quantity_gt_zero'])->toBe('Quantity must be greater than 0.')
+        ->and($enValidation['unit_price_min_zero'])->toBe('Unit price must be at least 0.');
+});
+
+test('validation message keys exist in both english and indonesian locales', function () {
+    $en = localeValidationTranslations('en.json');
+    $id = localeValidationTranslations('id.json');
+
+    expect($en)->not->toBeEmpty();
+    expect(array_keys($en))->toEqual(array_keys($id));
+
+    foreach (array_keys($en) as $key) {
+        expect($id[$key])->not->toBe('', "validation.{$key} empty");
+    }
 });
 
 test('purchase order form labels are translated to indonesian', function () {

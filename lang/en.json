@@ -1321,7 +1321,15 @@
             "item_discount": "Disc %",
             "item_tax": "Tax %",
             "item_notes": "Notes",
-            "item_action": "Action"
+            "item_action": "Action",
+            "status_draft": "Draft",
+            "status_pending_approval": "Pending Approval",
+            "status_confirmed": "Confirmed",
+            "status_rejected": "Rejected",
+            "status_partially_received": "Partially Received",
+            "status_fully_received": "Fully Received",
+            "status_cancelled": "Cancelled",
+            "status_closed": "Closed"
         },
         "purchase_requests": {
             "add_title": "Add New Purchase Request",
@@ -1564,5 +1572,17 @@
             "branch": "Branch",
             "branch_placeholder": "Select a branch"
         }
+    },
+    "validation": {
+        "supplier_required": "Supplier is required.",
+        "warehouse_required": "Warehouse is required.",
+        "order_date_required": "Order date is required.",
+        "currency_required": "Currency is required.",
+        "status_required": "Status is required.",
+        "items_min_one": "At least 1 item is required.",
+        "product_required": "Product is required.",
+        "unit_required": "Unit is required.",
+        "quantity_gt_zero": "Quantity must be greater than 0.",
+        "unit_price_min_zero": "Unit price must be at least 0."
     }
 }

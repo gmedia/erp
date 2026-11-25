@@ -1321,7 +1321,15 @@
             "item_discount": "Diskon %",
             "item_tax": "Pajak %",
             "item_notes": "Catatan",
-            "item_action": "Aksi"
+            "item_action": "Aksi",
+            "status_draft": "Draf",
+            "status_pending_approval": "Menunggu Persetujuan",
+            "status_confirmed": "Dikonfirmasi",
+            "status_rejected": "Ditolak",
+            "status_partially_received": "Diterima Sebagian",
+            "status_fully_received": "Diterima Penuh",
+            "status_cancelled": "Dibatalkan",
+            "status_closed": "Ditutup"
         },
         "purchase_requests": {
             "add_title": "Tambah Permintaan Pembelian Baru",
@@ -1564,5 +1572,17 @@
             "branch": "Cabang",
             "branch_placeholder": "Pilih cabang"
         }
+    },
+    "validation": {
+        "supplier_required": "Pemasok wajib diisi.",
+        "warehouse_required": "Gudang wajib diisi.",
+        "order_date_required": "Tanggal pesanan wajib diisi.",
+        "currency_required": "Mata uang wajib diisi.",
+        "status_required": "Status wajib diisi.",
+        "items_min_one": "Minimal 1 item wajib diisi.",
+        "product_required": "Produk wajib diisi.",
+        "unit_required": "Satuan wajib diisi.",
+        "quantity_gt_zero": "Jumlah harus lebih dari 0.",
+        "unit_price_min_zero": "Harga satuan minimal 0."
     }
 }

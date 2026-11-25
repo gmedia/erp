@@ -229,32 +229,61 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(
                             name="status"
                             label={fl('status', 'Status')}
                             options={[
-                                { value: 'draft', label: 'Draft' },
+                                {
+                                    value: 'draft',
+                                    label: fl('status_draft', 'Draft'),
+                                },
                                 {
                                     value: 'pending_approval',
-                                    label: 'Pending Approval',
+                                    label: fl(
+                                        'status_pending_approval',
+                                        'Pending Approval',
+                                    ),
                                 },
                                 ...(purchaseOrder?.status === 'confirmed'
                                     ? [
                                           {
                                               value: 'confirmed',
-                                              label: 'Confirmed',
+                                              label: fl(
+                                                  'status_confirmed',
+                                                  'Confirmed',
+                                              ),
                                           },
                                       ]
                                     : []),
                                 ...(purchaseOrder?.status === 'rejected'
-                                    ? [{ value: 'rejected', label: 'Rejected' }]
+                                    ? [
+                                          {
+                                              value: 'rejected',
+                                              label: fl(
+                                                  'status_rejected',
+                                                  'Rejected',
+                                              ),
+                                          },
+                                      ]
                                     : []),
                                 {
                                     value: 'partially_received',
-                                    label: 'Partially Received',
+                                    label: fl(
+                                        'status_partially_received',
+                                        'Partially Received',
+                                    ),
                                 },
                                 {
                                     value: 'fully_received',
-                                    label: 'Fully Received',
+                                    label: fl(
+                                        'status_fully_received',
+                                        'Fully Received',
+                                    ),
                                 },
-                                { value: 'cancelled', label: 'Cancelled' },
-                                { value: 'closed', label: 'Closed' },
+                                {
+                                    value: 'cancelled',
+                                    label: fl('status_cancelled', 'Cancelled'),
+                                },
+                                {
+                                    value: 'closed',
+                                    label: fl('status_closed', 'Closed'),
+                                },
                             ]}
                             placeholder={fl(
                                 'status_placeholder',
