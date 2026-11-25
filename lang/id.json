@@ -1574,15 +1574,17 @@
         }
     },
     "validation": {
-        "supplier_required": "Pemasok wajib diisi.",
-        "warehouse_required": "Gudang wajib diisi.",
-        "order_date_required": "Tanggal pesanan wajib diisi.",
-        "currency_required": "Mata uang wajib diisi.",
-        "status_required": "Status wajib diisi.",
-        "items_min_one": "Minimal 1 item wajib diisi.",
-        "product_required": "Produk wajib diisi.",
-        "unit_required": "Satuan wajib diisi.",
-        "quantity_gt_zero": "Jumlah harus lebih dari 0.",
-        "unit_price_min_zero": "Harga satuan minimal 0."
+        "purchase_order": {
+            "supplier_required": "Pemasok wajib diisi.",
+            "warehouse_required": "Gudang wajib diisi.",
+            "order_date_required": "Tanggal pesanan wajib diisi.",
+            "currency_required": "Mata uang wajib diisi.",
+            "status_required": "Status wajib diisi.",
+            "items_min_one": "Minimal 1 item wajib diisi.",
+            "product_required": "Produk wajib diisi.",
+            "unit_required": "Satuan wajib diisi.",
+            "quantity_gt_zero": "Jumlah harus lebih dari 0.",
+            "unit_price_min_zero": "Harga satuan minimal 0."
+        }
     }
 }

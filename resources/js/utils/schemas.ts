@@ -855,12 +855,21 @@ export type PurchaseRequestFormData = z.infer<typeof purchaseRequestFormSchema>;
 
 export const purchaseOrderFormSchema = z.object({
     po_number: z.string().optional(),
-    supplier_id: z.string().min(1, { message: 'Supplier is required.' }),
-    warehouse_id: z.string().min(1, { message: 'Warehouse is required.' }),
-    order_date: z.string().min(1, { message: 'Order date is required.' }),
+    supplier_id: z
+        .string()
+        .min(1, { message: 'validation.purchase_order.supplier_required' }),
+    warehouse_id: z
+        .string()
+        .min(1, { message: 'validation.purchase_order.warehouse_required' }),
+    order_date: z
+        .string()
+        .min(1, { message: 'validation.purchase_order.order_date_required' }),
     expected_delivery_date: z.string().optional().nullable(),
     payment_terms: z.string().optional(),
-    currency: z.string().min(3, { message: 'Currency is required.' }).max(3),
+    currency: z
+        .string()
+        .min(3, { message: 'validation.purchase_order.currency_required' })
+        .max(3),
     status: z.enum(
         [
             'draft',
@@ -873,7 +882,7 @@ export const purchaseOrderFormSchema = z.object({
             'closed',
         ],
         {
-            message: 'Status is required.',
+            message: 'validation.purchase_order.status_required',
         },
     ),
     notes: z.string().optional(),
@@ -882,16 +891,18 @@ export const purchaseOrderFormSchema = z.object({
         .array(
             z.object({
                 purchase_request_item_id: z.string().optional(),
-                product_id: z
-                    .string()
-                    .min(1, { message: 'Product is required.' }),
-                unit_id: z.string().min(1, { message: 'Unit is required.' }),
-                quantity: z.coerce
-                    .number()
-                    .gt(0, { message: 'Quantity must be greater than 0.' }),
-                unit_price: z.coerce
-                    .number()
-                    .min(0, { message: 'Unit price must be at least 0.' }),
+                product_id: z.string().min(1, {
+                    message: 'validation.purchase_order.product_required',
+                }),
+                unit_id: z.string().min(1, {
+                    message: 'validation.purchase_order.unit_required',
+                }),
+                quantity: z.coerce.number().gt(0, {
+                    message: 'validation.purchase_order.quantity_gt_zero',
+                }),
+                unit_price: z.coerce.number().min(0, {
+                    message: 'validation.purchase_order.unit_price_min_zero',
+                }),
                 discount_percent: z.coerce
                     .number()
                     .min(0)
@@ -907,7 +918,7 @@ export const purchaseOrderFormSchema = z.object({
                 notes: z.string().optional(),
             }),
         )
-        .min(1, { message: 'At least 1 item is required.' }),
+        .min(1, { message: 'validation.purchase_order.items_min_one' }),
 });
 
 export type PurchaseOrderFormData = z.infer<typeof purchaseOrderFormSchema>;

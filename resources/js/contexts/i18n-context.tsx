@@ -366,6 +366,11 @@ export function useLocale() {
  * Hook to get raw translations object.
  * Useful for accessing the entire translations structure.
  */
+export function useOptionalTranslation(): { t: (key: string) => string } {
+    const context = useContext(I18nContext);
+    return { t: (key: string) => (context ? context.t(key) : key) };
+}
+
 export function useTranslations(): Translations {
     const context = useContext(I18nContext);
     if (!context) {

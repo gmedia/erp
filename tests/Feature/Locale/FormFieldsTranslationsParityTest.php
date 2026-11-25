@@ -62,9 +62,9 @@ test('purchase order status options and validation messages keep the english tex
         ->and($en['purchase_orders']['status_fully_received'])->toBe('Fully Received')
         ->and($en['purchase_orders']['status_cancelled'])->toBe('Cancelled')
         ->and($en['purchase_orders']['status_closed'])->toBe('Closed')
-        ->and($enValidation['supplier_required'])->toBe('Supplier is required.')
-        ->and($enValidation['quantity_gt_zero'])->toBe('Quantity must be greater than 0.')
-        ->and($enValidation['unit_price_min_zero'])->toBe('Unit price must be at least 0.');
+        ->and($enValidation['purchase_order']['supplier_required'])->toBe('Supplier is required.')
+        ->and($enValidation['purchase_order']['quantity_gt_zero'])->toBe('Quantity must be greater than 0.')
+        ->and($enValidation['purchase_order']['unit_price_min_zero'])->toBe('Unit price must be at least 0.');
 });
 
 test('validation message keys exist in both english and indonesian locales', function () {
@@ -74,8 +74,12 @@ test('validation message keys exist in both english and indonesian locales', fun
     expect($en)->not->toBeEmpty();
     expect(array_keys($en))->toEqual(array_keys($id));
 
-    foreach (array_keys($en) as $key) {
-        expect($id[$key])->not->toBe('', "validation.{$key} empty");
+    foreach ($en as $form => $rules) {
+        expect(array_keys($rules))->toEqual(array_keys($id[$form]), "validation.{$form} keys differ");
+
+        foreach (array_keys($rules) as $rule) {
+            expect($id[$form][$rule])->not->toBe('', "validation.{$form}.{$rule} empty");
+        }
     }
 });
 
@@ -92,6 +96,27 @@ test('purchase order form labels are translated to indonesian', function () {
         ->and($id['purchase_orders']['edit_title'])->toBe('Ubah Pesanan Pembelian')
         ->and($id['purchase_orders']['supplier'])->toBe('Pemasok')
         ->and($id['purchase_orders']['warehouse'])->toBe('Gudang');
+});
+
+test('purchase order validation messages are translated to indonesian', function () {
+    $en = localeValidationTranslations('en.json');
+    $id = localeValidationTranslations('id.json');
+
+    expect($en['purchase_order'])->toHaveKeys([
+        'supplier_required',
+        'warehouse_required',
+        'order_date_required',
+        'currency_required',
+        'status_required',
+        'items_min_one',
+        'product_required',
+        'unit_required',
+        'quantity_gt_zero',
+        'unit_price_min_zero',
+    ])
+        ->and($id['purchase_order']['supplier_required'])->toBe('Pemasok wajib diisi.')
+        ->and($id['purchase_order']['quantity_gt_zero'])->toBe('Jumlah harus lebih dari 0.')
+        ->and($id['purchase_order']['unit_price_min_zero'])->toBe('Harga satuan minimal 0.');
 });
 
 test('purchase request and goods receipt form labels keep the english text', function () {
