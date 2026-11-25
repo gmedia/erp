@@ -141,7 +141,7 @@ export function createTextColumn<T = Record<string, unknown>>(
             }
 
             return (
-                <div className="min-w-0 max-w-56">
+                <div className="max-w-56 min-w-0">
                     <div
                         className={cn(
                             'truncate',
