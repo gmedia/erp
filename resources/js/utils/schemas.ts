@@ -10,6 +10,17 @@ const requiredMessage = (label: string) => ({
 
 const atLeastOneItemMessage = requiredMessage('At least 1 item');
 
+const linePricingFields = (messages: {
+    quantity: string;
+    unitPrice: string;
+}) => ({
+    quantity: z.coerce.number().gt(0, { message: messages.quantity }),
+    unit_price: z.coerce.number().min(0, { message: messages.unitPrice }),
+    discount_percent: percentField(),
+    tax_percent: percentField(),
+    notes: z.string().optional(),
+});
+
 const isValidEmailAddress = (value: string): boolean => {
     if (!value || value.includes(' ')) {
         return false;
@@ -891,15 +902,10 @@ export const purchaseOrderFormSchema = z.object({
                 unit_id: z.string().min(1, {
                     message: 'validation.purchase_order.unit_required',
                 }),
-                quantity: z.coerce.number().gt(0, {
-                    message: 'validation.purchase_order.quantity_gt_zero',
+                ...linePricingFields({
+                    quantity: 'validation.purchase_order.quantity_gt_zero',
+                    unitPrice: 'validation.purchase_order.unit_price_min_zero',
                 }),
-                unit_price: z.coerce.number().min(0, {
-                    message: 'validation.purchase_order.unit_price_min_zero',
-                }),
-                discount_percent: percentField(),
-                tax_percent: percentField(),
-                notes: z.string().optional(),
             }),
         )
         .min(1, { message: 'validation.purchase_order.items_min_one' }),
@@ -1102,15 +1108,10 @@ export const customerInvoiceFormSchema = z.object({
                 description: z
                     .string()
                     .min(1, { message: 'Description is required.' }),
-                quantity: z.coerce.number().gt(0, {
-                    message: 'Quantity must be greater than 0.',
+                ...linePricingFields({
+                    quantity: 'Quantity must be greater than 0.',
+                    unitPrice: 'Unit price must be at least 0.',
                 }),
-                unit_price: z.coerce.number().min(0, {
-                    message: 'Unit price must be at least 0.',
-                }),
-                discount_percent: percentField(),
-                tax_percent: percentField(),
-                notes: z.string().optional(),
             }),
         )
         .min(1, atLeastOneItemMessage),
