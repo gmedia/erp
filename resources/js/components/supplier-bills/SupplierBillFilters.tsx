@@ -23,31 +23,31 @@ export function createSupplierBillFilterFields(): FieldDescriptor[] {
     return [
         createTextFilterField(
             'search',
-            'Search',
+            { key: 'column.search', fallback: 'Search' },
             'Search bill number, supplier invoice number, or notes...',
         ),
         createAsyncSelectFilterField(
             'supplier_id',
-            'Supplier',
+            { key: 'column.supplier', fallback: 'Supplier' },
             '/api/suppliers',
             'All suppliers',
         ),
         createAsyncSelectFilterField(
             'branch_id',
-            'Branch',
+            { key: 'column.branch', fallback: 'Branch' },
             '/api/branches',
             'All branches',
         ),
         ...createSelectFilterFields([
             {
                 name: 'status',
-                label: 'Status',
+                label: { key: 'column.status', fallback: 'Status' },
                 options: supplierBillStatusOptions,
                 placeholder: 'Select Status',
             },
             {
                 name: 'currency',
-                label: 'Currency',
+                label: { key: 'column.currency', fallback: 'Currency' },
                 options: currencyOptions,
                 placeholder: 'Select Currency',
             },
@@ -55,22 +55,28 @@ export function createSupplierBillFilterFields(): FieldDescriptor[] {
         ...createDateFilterFields([
             {
                 name: 'bill_date_from',
-                label: 'Bill Date From',
+                label: {
+                    key: 'column.bill_date_from',
+                    fallback: 'Bill Date From',
+                },
                 placeholder: 'Bill Date From',
             },
             {
                 name: 'bill_date_to',
-                label: 'Bill Date To',
+                label: { key: 'column.bill_date_to', fallback: 'Bill Date To' },
                 placeholder: 'Bill Date To',
             },
             {
                 name: 'due_date_from',
-                label: 'Due Date From',
+                label: {
+                    key: 'column.due_date_from',
+                    fallback: 'Due Date From',
+                },
                 placeholder: 'Due Date From',
             },
             {
                 name: 'due_date_to',
-                label: 'Due Date To',
+                label: { key: 'column.due_date_to', fallback: 'Due Date To' },
                 placeholder: 'Due Date To',
             },
         ]),

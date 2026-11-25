@@ -26,13 +26,13 @@ export function createCustomerInvoiceFilterFields(): FieldDescriptor[] {
         ...createSelectFilterFields([
             {
                 name: 'status',
-                label: 'Status',
+                label: { key: 'column.status', fallback: 'Status' },
                 options: customerInvoiceStatusOptions,
                 placeholder: 'Select Status',
             },
             {
                 name: 'currency',
-                label: 'Currency',
+                label: { key: 'column.currency', fallback: 'Currency' },
                 options: currencyOptions,
                 placeholder: 'Select Currency',
             },
@@ -40,22 +40,31 @@ export function createCustomerInvoiceFilterFields(): FieldDescriptor[] {
         ...createDateFilterFields([
             {
                 name: 'invoice_date_from',
-                label: 'Invoice Date From',
+                label: {
+                    key: 'column.invoice_date_from',
+                    fallback: 'Invoice Date From',
+                },
                 placeholder: 'Invoice Date From',
             },
             {
                 name: 'invoice_date_to',
-                label: 'Invoice Date To',
+                label: {
+                    key: 'column.invoice_date_to',
+                    fallback: 'Invoice Date To',
+                },
                 placeholder: 'Invoice Date To',
             },
             {
                 name: 'due_date_from',
-                label: 'Due Date From',
+                label: {
+                    key: 'column.due_date_from',
+                    fallback: 'Due Date From',
+                },
                 placeholder: 'Due Date From',
             },
             {
                 name: 'due_date_to',
-                label: 'Due Date To',
+                label: { key: 'column.due_date_to', fallback: 'Due Date To' },
                 placeholder: 'Due Date To',
             },
         ]),
