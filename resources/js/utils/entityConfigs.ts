@@ -803,12 +803,12 @@ export const productConfig = createComplexEntityConfig({
     apiEndpoint: '/api/products',
     exportEndpoint: '/api/products/export',
     queryKey: ['products'],
-    titleKey: 'page.products.title',
+    titleKey: 'menu.product',
     descriptionKey: 'page.products.description',
     breadcrumbs: [
         {
-            title: 'Products',
-            titleKey: 'page.products.title',
+            title: 'Product',
+            titleKey: 'menu.product',
             href: '/products',
         },
     ],

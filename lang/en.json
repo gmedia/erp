@@ -904,7 +904,7 @@
             "search_placeholder": "Search purchase orders..."
         },
         "products": {
-            "title": "Products",
+            "title": "Product",
             "description": "Products, materials, and services with pricing and stock settings.",
             "search_placeholder": "Search products..."
         },

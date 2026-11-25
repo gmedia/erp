@@ -34,7 +34,7 @@ test('purchase orders and products page strings keep the english labels', functi
             'Orders sent to suppliers with receipt and billing progress.',
         )
         ->and($en['purchase_orders']['search_placeholder'])->toBe('Search purchase orders...')
-        ->and($en['products']['title'])->toBe('Products')
+        ->and($en['products']['title'])->toBe('Product')
         ->and($en['products']['description'])->toBe(
             'Products, materials, and services with pricing and stock settings.',
         )
@@ -188,6 +188,9 @@ test('inventory and purchasing page titles match the sidebar menu labels', funct
         'purchase_requests' => 'purchase_request',
         'goods_receipts' => 'goods_receipt',
         'supplier_returns' => 'supplier_return',
+        'products' => 'product',
+        'purchase_orders' => 'purchase_order',
+        'stock_monitor' => 'stock_monitor',
     ];
 
     foreach (['en.json', 'id.json'] as $file) {
