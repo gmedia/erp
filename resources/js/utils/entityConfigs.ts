@@ -356,7 +356,7 @@ export const employeeConfig = createComplexEntityConfig({
     breadcrumbs: [
         {
             title: 'Employee',
-            titleKey: 'page.employees.title',
+            titleKey: 'menu.employee',
             href: '/employees',
         },
     ],
@@ -963,7 +963,7 @@ export const assetConfig = createComplexEntityConfig<Asset>({
     breadcrumbs: [
         {
             title: 'Asset Data',
-            titleKey: 'page.assets.title',
+            titleKey: 'menu.asset_data',
             href: '/assets',
         },
     ],

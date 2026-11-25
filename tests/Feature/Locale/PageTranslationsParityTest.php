@@ -109,6 +109,16 @@ test('assets and employees page strings are translated to indonesian', function 
         ->and($id['employees']['title'])->toBe('Karyawan');
 });
 
+test('assets and employees page titles match the sidebar menu labels', function () {
+    foreach (['en.json', 'id.json'] as $file) {
+        $menu = json_decode(File::get(lang_path($file)), true, 512, JSON_THROW_ON_ERROR)['menu'];
+        $page = localePageTranslations($file);
+
+        expect($page['assets']['title'])->toBe($menu['asset_data'])
+            ->and($page['employees']['title'])->toBe($menu['employee']);
+    }
+});
+
 test('asset column labels keep english text and are translated to indonesian', function () {
     $en = json_decode(File::get(lang_path('en.json')), true, 512, JSON_THROW_ON_ERROR)['column'];
     $id = json_decode(File::get(lang_path('id.json')), true, 512, JSON_THROW_ON_ERROR)['column'];
