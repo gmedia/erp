@@ -187,11 +187,13 @@ test('GR response exposes purchase order status for the form warning', function 
 test('blocked confirmed GR returns localized message in indonesian', function () {
     [$purchaseOrder, $item] = purchaseOrderWithStatusForGoodsReceiptGate('draft');
 
-    // SetLocaleMiddleware membaca session/cookie; di sini locale diset langsung agar
-    // pesan yang diuji adalah terjemahan id, bukan fallback en.
-    app()->setLocale('id');
-
-    $response = postJson('/api/goods-receipts', goodsReceiptGatePayload($purchaseOrder, $item, 'confirmed'));
+    // SetLocaleMiddleware menetapkan locale per request dari header X-Locale;
+    // tanpa header ini pesan yang diuji jatuh ke fallback en.
+    $response = postJson(
+        '/api/goods-receipts',
+        goodsReceiptGatePayload($purchaseOrder, $item, 'confirmed'),
+        ['X-Locale' => 'id'],
+    );
 
     $response->assertStatus(422);
     expect($response->json('errors.status.0'))->toBe(__('goods_receipt.po_not_approved', [], 'id'));
