@@ -1238,15 +1238,15 @@ export const budgetLineFormSchema = z.object({
 });
 
 export const budgetFormSchema = z.object({
-    name: z.string().min(1, { message: 'Name is required.' }),
+    name: z.string().min(1, { message: 'validation.budget.name_required' }),
     description: z.string().nullable().optional(),
     fiscal_year_id: z.coerce
         .number()
-        .min(1, { message: 'Fiscal year is required.' }),
+        .min(1, { message: 'validation.budget.fiscal_year_required' }),
     budget_type: z.enum(['operational', 'capital', 'project', 'revenue']),
     lines: z
         .array(budgetLineFormSchema)
-        .min(1, { message: 'At least one line is required.' }),
+        .min(1, { message: 'validation.budget.lines_min_one' }),
 });
 
 export type BudgetLineFormData = z.infer<typeof budgetLineFormSchema>;

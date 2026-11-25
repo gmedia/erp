@@ -377,3 +377,67 @@ test('stock adjustment item dialog labels keep the english text', function () {
         ->and($en['stock_adjustments']['item_reason_label'])->toBe('Reason')
         ->and($en['stock_adjustments']['item_reason_placeholder'])->toBe('Item reason');
 });
+
+test('budget, bank reconciliation, recurring journal and period closing form labels keep the english text', function () {
+    $en = localeFormFieldTranslations('en.json');
+
+    expect($en['budgets']['add_title'])->toBe('Add New Budget')
+        ->and($en['budgets']['edit_title'])->toBe('Edit Budget')
+        ->and($en['budgets']['budget_type'])->toBe('Budget Type')
+        ->and($en['budgets']['type_operational'])->toBe('Operational')
+        ->and($en['budgets']['lines_title'])->toBe('Budget Lines')
+        ->and($en['budgets']['column_allocated_amount'])->toBe('Allocated Amount')
+        ->and($en['budgets']['lines_error_fallback'])->toBe('Please fix the errors in the lines.')
+        ->and($en['bank_reconciliations']['add_title'])->toBe('Add New Bank Reconciliation')
+        ->and($en['bank_reconciliations']['edit_title'])->toBe('Edit Bank Reconciliation')
+        ->and($en['bank_reconciliations']['bank_account'])->toBe('Bank Account')
+        ->and($en['bank_reconciliations']['statement_balance_placeholder'])->toBe('0.00')
+        ->and($en['recurring_journals']['add_title'])->toBe('Add New Recurring Journal')
+        ->and($en['recurring_journals']['frequency_annual'])->toBe('Yearly')
+        ->and($en['recurring_journals']['auto_post'])->toBe('Auto Post')
+        ->and($en['recurring_journals']['unbalanced_warning'])->toBe('Warning: Total Debit and Total Credit must be equal.')
+        ->and($en['recurring_journals']['no_lines'])->toBe('No lines added yet. Click "Add Line" to start.')
+        ->and($en['period_closings']['add_title'])->toBe('Add New Period Closing')
+        ->and($en['period_closings']['closing_type_annual'])->toBe('Annual')
+        ->and($en['period_closings']['retained_earnings_account_required'])->toBe('Retained Earnings Account *');
+});
+
+test('budget, bank reconciliation, recurring journal and period closing form field keys are complete in both locales', function () {
+    $en = localeFormFieldTranslations('en.json');
+    $id = localeFormFieldTranslations('id.json');
+
+    foreach (['budgets', 'bank_reconciliations', 'recurring_journals', 'period_closings'] as $module) {
+        expect(array_keys($en[$module]))->not->toBeEmpty();
+        expect(array_keys($en[$module]))->toEqual(array_keys($id[$module]), "form_fields.{$module} keys differ");
+
+        foreach (array_keys($en[$module]) as $field) {
+            expect($id[$module][$field])
+                ->not->toBe('', "form_fields.{$module}.{$field} empty");
+        }
+    }
+
+    expect($id['budgets']['add_title'])->toBe('Tambah Anggaran Baru')
+        ->and($id['bank_reconciliations']['add_title'])->toBe('Tambah Rekonsiliasi Bank Baru')
+        ->and($id['recurring_journals']['frequency_annual'])->toBe('Tahunan')
+        ->and($id['period_closings']['closing_type_annual'])->toBe('Tahunan');
+});
+
+test('budget, bank reconciliation, recurring journal and period closing validation messages are translated', function () {
+    $en = localeValidationTranslations('en.json');
+    $id = localeValidationTranslations('id.json');
+
+    expect($en['budget']['name_required'])->toBe('Name is required.')
+        ->and($en['budget']['lines_min_one'])->toBe('At least one line is required.')
+        ->and($en['bank_reconciliation']['period_end_after_start'])
+        ->toBe('Period end must be after or equal to period start.')
+        ->and($en['recurring_journal']['lines_min_one'])->toBe('At least one line is required.')
+        ->and($en['period_closing']['period_month_range'])->toBe('Period month must be between 1 and 12.')
+        ->and($en['period_closing']['period_year_range'])->toBe('Period year must be between 2000 and 2100.');
+
+    foreach (['budget', 'bank_reconciliation', 'recurring_journal', 'period_closing'] as $form) {
+        expect(array_keys($en[$form]))->toEqual(array_keys($id[$form]), "validation.{$form} keys differ");
+    }
+
+    expect($id['budget']['name_required'])->toBe('Nama wajib diisi.')
+        ->and($id['period_closing']['period_month_range'])->toBe('Bulan periode harus antara 1 dan 12.');
+});

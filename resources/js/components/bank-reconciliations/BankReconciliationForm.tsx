@@ -6,6 +6,7 @@ import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityForm } from '@/hooks/useEntityForm';
 import { type BankReconciliation } from '@/types/bank-reconciliation';
 import { toDateInputValue } from '@/utils/date-format';
@@ -13,25 +14,33 @@ import * as z from 'zod';
 
 const bankReconciliationFormSchema = z
     .object({
-        account_id: z.string().min(1, { message: 'Account is required.' }),
-        fiscal_year_id: z
+        account_id: z
             .string()
-            .min(1, { message: 'Fiscal year is required.' }),
-        reconciliation_date: z
-            .string()
-            .min(1, { message: 'Reconciliation date is required.' }),
-        period_start: z
-            .string()
-            .min(1, { message: 'Period start is required.' }),
-        period_end: z.string().min(1, { message: 'Period end is required.' }),
+            .min(1, {
+                message: 'validation.bank_reconciliation.account_required',
+            }),
+        fiscal_year_id: z.string().min(1, {
+            message: 'validation.bank_reconciliation.fiscal_year_required',
+        }),
+        reconciliation_date: z.string().min(1, {
+            message:
+                'validation.bank_reconciliation.reconciliation_date_required',
+        }),
+        period_start: z.string().min(1, {
+            message: 'validation.bank_reconciliation.period_start_required',
+        }),
+        period_end: z.string().min(1, {
+            message: 'validation.bank_reconciliation.period_end_required',
+        }),
         statement_balance: z.coerce.number({
-            message: 'Statement balance is required.',
+            message:
+                'validation.bank_reconciliation.statement_balance_required',
         }),
         book_balance: z.coerce.number(),
         branch_id: z.string().optional(),
     })
     .refine((data) => data.period_end >= data.period_start, {
-        message: 'Period end must be after or equal to period start.',
+        message: 'validation.bank_reconciliation.period_end_after_start',
         path: ['period_end'],
     });
 
@@ -82,6 +91,14 @@ export const BankReconciliationForm = memo<BankReconciliationFormProps>(
         onSubmit,
         isLoading = false,
     }) {
+        const { t } = useTranslation();
+        const fl = (key: string, fallback: string) => {
+            const translated = t(`form_fields.bank_reconciliations.${key}`);
+            return translated === `form_fields.bank_reconciliations.${key}`
+                ? fallback
+                : translated;
+        };
+
         const form = useEntityForm<
             BankReconciliationFormData,
             BankReconciliation
@@ -103,8 +120,8 @@ export const BankReconciliationForm = memo<BankReconciliationFormProps>(
                 onOpenChange={onOpenChange}
                 title={
                     entity
-                        ? 'Edit Bank Reconciliation'
-                        : 'Add New Bank Reconciliation'
+                        ? fl('edit_title', 'Edit Bank Reconciliation')
+                        : fl('add_title', 'Add New Bank Reconciliation')
                 }
                 onSubmit={onSubmit}
                 isLoading={isLoading}
@@ -115,9 +132,12 @@ export const BankReconciliationForm = memo<BankReconciliationFormProps>(
                         name: string;
                     }>
                         name="account_id"
-                        label="Bank Account"
+                        label={fl('bank_account', 'Bank Account')}
                         url="/api/accounts?is_active=1&has_children=0"
-                        placeholder="Select Bank Account"
+                        placeholder={fl(
+                            'bank_account_placeholder',
+                            'Select Bank Account',
+                        )}
                         labelFn={(acc) => `${acc.code} - ${acc.name}`}
                         initialLabel={
                             accountCode && accountName
@@ -129,9 +149,12 @@ export const BankReconciliationForm = memo<BankReconciliationFormProps>(
                         name: string;
                     }>
                         name="fiscal_year_id"
-                        label="Fiscal Year"
+                        label={fl('fiscal_year', 'Fiscal Year')}
                         url="/api/fiscal-years?status=open"
-                        placeholder="Select Fiscal Year"
+                        placeholder={fl(
+                            'fiscal_year_placeholder',
+                            'Select Fiscal Year',
+                        )}
                         labelFn={(fy) => fy.name}
                         initialLabel={fiscalYearName || ''}
                         preferredMetaKey="preferred_fiscal_year_id"
@@ -139,23 +162,32 @@ export const BankReconciliationForm = memo<BankReconciliationFormProps>(
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <DatePickerField name="period_start" label="Period Start" />
-                    <DatePickerField name="period_end" label="Period End" />
+                    <DatePickerField
+                        name="period_start"
+                        label={fl('period_start', 'Period Start')}
+                    />
+                    <DatePickerField
+                        name="period_end"
+                        label={fl('period_end', 'Period End')}
+                    />
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <InputField
                         name="statement_balance"
-                        label="Statement Balance"
+                        label={fl('statement_balance', 'Statement Balance')}
                         type="number"
                         step="0.01"
-                        placeholder="0.00"
+                        placeholder={fl(
+                            'statement_balance_placeholder',
+                            '0.00',
+                        )}
                     />
                     <AsyncSelectField<{ name: string }>
                         name="branch_id"
-                        label="Branch"
+                        label={fl('branch', 'Branch')}
                         url="/api/branches"
-                        placeholder="Select branch"
+                        placeholder={fl('branch_placeholder', 'Select branch')}
                         initialLabel={branchName || ''}
                     />
                 </div>

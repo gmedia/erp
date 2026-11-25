@@ -26,16 +26,17 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useTranslation } from '@/contexts/i18n-context';
 import { type Budget } from '@/types/budget';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { budgetFormSchema, type BudgetFormData } from '@/utils/schemas';
 
-const budgetTypeOptions = [
-    { value: 'operational', label: 'Operational' },
-    { value: 'capital', label: 'Capital' },
-    { value: 'project', label: 'Project' },
-    { value: 'revenue', label: 'Revenue' },
-];
+const budgetTypeKeys = [
+    { value: 'operational', key: 'type_operational', fallback: 'Operational' },
+    { value: 'capital', key: 'type_capital', fallback: 'Capital' },
+    { value: 'project', key: 'type_project', fallback: 'Project' },
+    { value: 'revenue', key: 'type_revenue', fallback: 'Revenue' },
+] as const;
 
 interface BudgetFormProps {
     open: boolean;
@@ -81,6 +82,14 @@ export const BudgetForm = memo<BudgetFormProps>(function BudgetForm({
     onSubmit,
     isLoading = false,
 }) {
+    const { t } = useTranslation();
+    const fl = (key: string, fallback: string) => {
+        const translated = t(`form_fields.budgets.${key}`);
+        return translated === `form_fields.budgets.${key}`
+            ? fallback
+            : translated;
+    };
+
     const isEdit = !!entity;
 
     const defaultValues = useMemo(
@@ -136,7 +145,11 @@ export const BudgetForm = memo<BudgetFormProps>(function BudgetForm({
             form={form as UseFormReturn<BudgetFormData>}
             open={open}
             onOpenChange={onOpenChange}
-            title={isEdit ? 'Edit Budget' : 'Add New Budget'}
+            title={
+                isEdit
+                    ? fl('edit_title', 'Edit Budget')
+                    : fl('add_title', 'Add New Budget')
+            }
             onSubmit={onSubmit}
             isLoading={isLoading}
             className="sm:max-w-4xl"
@@ -146,35 +159,44 @@ export const BudgetForm = memo<BudgetFormProps>(function BudgetForm({
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <InputField
                             name="name"
-                            label="Name"
-                            placeholder="Budget name"
+                            label={fl('name', 'Name')}
+                            placeholder={fl('name_placeholder', 'Budget name')}
                         />
                         <SelectField
                             name="budget_type"
-                            label="Budget Type"
-                            options={budgetTypeOptions}
+                            label={fl('budget_type', 'Budget Type')}
+                            options={budgetTypeKeys.map((option) => ({
+                                value: option.value,
+                                label: fl(option.key, option.fallback),
+                            }))}
                         />
                     </div>
 
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <AsyncSelectField
                             name="fiscal_year_id"
-                            label="Fiscal Year"
+                            label={fl('fiscal_year', 'Fiscal Year')}
                             url="/api/fiscal-years"
-                            placeholder="Select fiscal year"
+                            placeholder={fl(
+                                'fiscal_year_placeholder',
+                                'Select fiscal year',
+                            )}
                             preferredMetaKey="preferred_fiscal_year_id"
                         />
                         <InputField
                             name="description"
-                            label="Description"
-                            placeholder="Optional description"
+                            label={fl('description', 'Description')}
+                            placeholder={fl(
+                                'description_placeholder',
+                                'Optional description',
+                            )}
                         />
                     </div>
 
                     <div className="space-y-2">
                         <div className="flex items-center justify-between">
                             <h3 className="text-lg font-semibold">
-                                Budget Lines
+                                {fl('lines_title', 'Budget Lines')}
                             </h3>
                             <Button
                                 type="button"
@@ -183,7 +205,7 @@ export const BudgetForm = memo<BudgetFormProps>(function BudgetForm({
                                 onClick={handleAddLine}
                             >
                                 <Plus className="mr-2 h-4 w-4" />
-                                Add Line
+                                {fl('add_line', 'Add Line')}
                             </Button>
                         </div>
 
@@ -192,19 +214,28 @@ export const BudgetForm = memo<BudgetFormProps>(function BudgetForm({
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead className="w-[25%]">
-                                            Account
+                                            {fl('column_account', 'Account')}
                                         </TableHead>
                                         <TableHead className="w-[18%]">
-                                            Period Start
+                                            {fl(
+                                                'column_period_start',
+                                                'Period Start',
+                                            )}
                                         </TableHead>
                                         <TableHead className="w-[18%]">
-                                            Period End
+                                            {fl(
+                                                'column_period_end',
+                                                'Period End',
+                                            )}
                                         </TableHead>
                                         <TableHead className="w-[20%] text-right">
-                                            Allocated Amount
+                                            {fl(
+                                                'column_allocated_amount',
+                                                'Allocated Amount',
+                                            )}
                                         </TableHead>
                                         <TableHead className="w-[15%]">
-                                            Notes
+                                            {fl('column_notes', 'Notes')}
                                         </TableHead>
                                         <TableHead className="w-[4%]"></TableHead>
                                     </TableRow>
@@ -216,7 +247,10 @@ export const BudgetForm = memo<BudgetFormProps>(function BudgetForm({
                                                 colSpan={6}
                                                 className="h-24 text-center text-muted-foreground"
                                             >
-                                                No lines added yet.
+                                                {fl(
+                                                    'no_lines',
+                                                    'No lines added yet.',
+                                                )}
                                             </TableCell>
                                         </TableRow>
                                     ) : (
@@ -234,21 +268,30 @@ export const BudgetForm = memo<BudgetFormProps>(function BudgetForm({
                                                                 name={`lines.${index}.account_id`}
                                                                 label=""
                                                                 url="/api/accounts"
-                                                                placeholder="Select account"
+                                                                placeholder={fl(
+                                                                    'account_placeholder',
+                                                                    'Select account',
+                                                                )}
                                                             />
                                                         </TableCell>
                                                         <TableCell>
                                                             <DatePickerField
                                                                 name={`lines.${index}.period_start`}
                                                                 label=""
-                                                                placeholder="Pick start date"
+                                                                placeholder={fl(
+                                                                    'pick_start_date',
+                                                                    'Pick start date',
+                                                                )}
                                                             />
                                                         </TableCell>
                                                         <TableCell>
                                                             <DatePickerField
                                                                 name={`lines.${index}.period_end`}
                                                                 label=""
-                                                                placeholder="Pick end date"
+                                                                placeholder={fl(
+                                                                    'pick_end_date',
+                                                                    'Pick end date',
+                                                                )}
                                                             />
                                                         </TableCell>
                                                         <TableCell>
@@ -256,14 +299,20 @@ export const BudgetForm = memo<BudgetFormProps>(function BudgetForm({
                                                                 name={`lines.${index}.allocated_amount`}
                                                                 label=""
                                                                 type="number"
-                                                                placeholder="0"
+                                                                placeholder={fl(
+                                                                    'amount_placeholder',
+                                                                    '0',
+                                                                )}
                                                             />
                                                         </TableCell>
                                                         <TableCell>
                                                             <InputField
                                                                 name={`lines.${index}.notes`}
                                                                 label=""
-                                                                placeholder="Optional notes"
+                                                                placeholder={fl(
+                                                                    'notes_placeholder',
+                                                                    'Optional notes',
+                                                                )}
                                                             />
                                                         </TableCell>
                                                         <TableCell>
@@ -291,7 +340,10 @@ export const BudgetForm = memo<BudgetFormProps>(function BudgetForm({
                                                             ? `${current.account_code} - `
                                                             : ''}
                                                         {current.account_name ||
-                                                            'Selected Account'}
+                                                            fl(
+                                                                'selected_account',
+                                                                'Selected Account',
+                                                            )}
                                                     </TableCell>
                                                     <TableCell>
                                                         {current.period_start ||
@@ -354,7 +406,7 @@ export const BudgetForm = memo<BudgetFormProps>(function BudgetForm({
                                             colSpan={3}
                                             className="font-bold"
                                         >
-                                            Total
+                                            {fl('total', 'Total')}
                                         </TableCell>
                                         <TableCell className="text-right font-bold">
                                             {formatCurrencyByRegionalSettings(
@@ -371,15 +423,26 @@ export const BudgetForm = memo<BudgetFormProps>(function BudgetForm({
                             </Table>
                             {form.formState.errors.lines && (
                                 <p className="p-4 text-sm text-destructive-foreground">
-                                    {typeof form.formState.errors.lines ===
-                                        'object' &&
-                                    'message' in form.formState.errors.lines
-                                        ? (
-                                              form.formState.errors.lines as {
-                                                  message?: string;
-                                              }
-                                          ).message
-                                        : 'Please fix the errors in the lines.'}
+                                    {(() => {
+                                        const linesError =
+                                            form.formState.errors.lines;
+                                        const message =
+                                            typeof linesError === 'object' &&
+                                            linesError !== null &&
+                                            'message' in linesError
+                                                ? String(linesError.message)
+                                                : '';
+                                        if (!message) {
+                                            return fl(
+                                                'lines_error_fallback',
+                                                'Please fix the errors in the lines.',
+                                            );
+                                        }
+                                        const translated = t(message);
+                                        return translated === message
+                                            ? message
+                                            : translated;
+                                    })()}
                                 </p>
                             )}
                         </div>
