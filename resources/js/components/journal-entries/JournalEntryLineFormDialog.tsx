@@ -11,7 +11,9 @@ import { type JournalEntryFormData } from '@/utils/schemas';
 
 const journalEntryLineSchema = z
     .object({
-        account_id: z.string().min(1, { message: 'Account is required.' }),
+        account_id: z.string().min(1, {
+            message: 'validation.journal_entry.account_required',
+        }),
         account_name: z.string().optional(),
         account_code: z.string().optional(),
         debit: z.coerce.number().min(0).optional().default(0),
@@ -28,7 +30,7 @@ const journalEntryLineSchema = z
             return true;
         },
         {
-            message: 'Must specify Debit or Credit.',
+            message: 'validation.journal_entry.line_debit_or_credit_required',
             path: ['root'],
         },
     );

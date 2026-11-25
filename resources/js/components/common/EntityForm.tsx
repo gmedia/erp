@@ -4,6 +4,10 @@ import * as React from 'react';
 import { useEffect } from 'react';
 
 import NameField from '@/components/common/NameField';
+import {
+    type TranslatableLabel,
+    useTranslatableText,
+} from '@/components/common/TranslatedText';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -167,7 +171,8 @@ export function SimpleEntityForm({
     onSubmit,
     isLoading = false,
     entityName,
-}: Readonly<SimpleEntityFormProps>) {
+    formKey,
+}: Readonly<SimpleEntityFormProps & { formKey?: string }>) {
     const form = useForm<SimpleEntityFormData>({
         resolver: zodResolver(simpleEntitySchema),
         defaultValues: entity ? { name: entity.name } : { name: '' },
@@ -178,22 +183,54 @@ export function SimpleEntityForm({
         form.reset(entity ? { name: entity.name } : { name: '' });
     }, [form, entity]);
 
+    const ft = (key: string, fallback: string): TranslatableLabel =>
+        formKey ? { key: `form_fields.${formKey}.${key}`, fallback } : fallback;
+
+    const title = useTranslatableText(
+        entity
+            ? ft('edit_title', `Edit ${entityName}`)
+            : ft('add_title', `Add New ${entityName}`),
+    );
+
     return (
         <EntityForm
             form={form}
             open={open}
             onOpenChange={onOpenChange}
-            title={entity ? `Edit ${entityName}` : `Add New ${entityName}`}
+            title={title}
             onSubmit={onSubmit}
             isLoading={isLoading}
         >
             <NameField
                 name="name"
-                label="Name"
-                placeholder={`e.g., ${entityName}`}
+                label={ft('name', 'Name')}
+                placeholder={ft('name_placeholder', `e.g., ${entityName}`)}
             >
                 <FormMessage />
             </NameField>
         </EntityForm>
     );
+}
+
+const simpleEntityFormCache = new Map<
+    string,
+    React.ComponentType<Readonly<SimpleEntityFormProps>>
+>();
+
+/**
+ * Komponen dicache per formKey agar identitasnya stabil (tidak remount tiap render).
+ */
+export function createSimpleEntityForm(
+    formKey: string,
+): React.ComponentType<Readonly<SimpleEntityFormProps>> {
+    const cached = simpleEntityFormCache.get(formKey);
+    if (cached) {
+        return cached;
+    }
+    const Component = (props: Readonly<SimpleEntityFormProps>) => (
+        <SimpleEntityForm {...props} formKey={formKey} />
+    );
+    Component.displayName = `SimpleEntityForm(${formKey})`;
+    simpleEntityFormCache.set(formKey, Component);
+    return Component;
 }

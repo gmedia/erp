@@ -9,7 +9,9 @@ import { ItemFormDialogShell } from '@/components/common/ItemFormDialog';
 import { JournalLineFormFields } from '@/components/common/JournalLineFormFields';
 
 const recurringJournalLineSchema = z.object({
-    account_id: z.coerce.number().min(1, { message: 'Account is required.' }),
+    account_id: z.coerce.number().min(1, {
+        message: 'validation.recurring_journal.account_required',
+    }),
     account_name: z.string().optional(),
     account_code: z.string().optional(),
     debit: z.coerce.number().min(0).optional().default(0),

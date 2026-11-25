@@ -4,6 +4,7 @@ import AsyncSelectField from '@/components/common/AsyncSelectField';
 import EntityForm from '@/components/common/EntityForm';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
+import { useTranslation } from '@/contexts/i18n-context';
 import { type Account } from '@/types/account';
 import { type AccountMapping } from '@/types/account-mapping';
 import { type CoaVersion } from '@/types/coa-version';
@@ -42,6 +43,13 @@ export function AccountMappingForm({
     isLoading = false,
 }: Readonly<AccountMappingFormProps>) {
     const activeEntity = accountMapping || entity || item;
+    const { t } = useTranslation();
+    const fl = (key: string, fallback: string) => {
+        const translated = t(`form_fields.account_mappings.${key}`);
+        return translated === `form_fields.account_mappings.${key}`
+            ? fallback
+            : translated;
+    };
 
     const defaultValues = useMemo<AccountMappingFormData>(
         () => ({
@@ -120,7 +128,9 @@ export function AccountMappingForm({
             open={open}
             onOpenChange={onOpenChange}
             title={
-                activeEntity ? 'Edit Account Mapping' : 'Create Account Mapping'
+                activeEntity
+                    ? fl('edit_title', 'Edit Account Mapping')
+                    : fl('create_title', 'Create Account Mapping')
             }
             form={form}
             onSubmit={onSubmit}
@@ -128,51 +138,63 @@ export function AccountMappingForm({
         >
             <AsyncSelectField<CoaVersion>
                 name="source_coa_version_id"
-                label="Source COA Version"
+                label={fl('source_coa_version', 'Source COA Version')}
                 url="/api/coa-versions"
-                placeholder="Select source COA version"
+                placeholder={fl(
+                    'source_coa_version_placeholder',
+                    'Select source COA version',
+                )}
                 labelFn={coaVersionLabel}
             />
 
             <AsyncSelectField<Account>
                 name="source_account_id"
-                label="Source Account"
+                label={fl('source_account', 'Source Account')}
                 url={sourceAccountsUrl}
-                placeholder="Select source account"
+                placeholder={fl(
+                    'source_account_placeholder',
+                    'Select source account',
+                )}
                 labelFn={accountLabel}
             />
 
             <AsyncSelectField<CoaVersion>
                 name="target_coa_version_id"
-                label="Target COA Version"
+                label={fl('target_coa_version', 'Target COA Version')}
                 url="/api/coa-versions"
-                placeholder="Select target COA version"
+                placeholder={fl(
+                    'target_coa_version_placeholder',
+                    'Select target COA version',
+                )}
                 labelFn={coaVersionLabel}
             />
 
             <AsyncSelectField<Account>
                 name="target_account_id"
-                label="Target Account"
+                label={fl('target_account', 'Target Account')}
                 url={targetAccountsUrl}
-                placeholder="Select target account"
+                placeholder={fl(
+                    'target_account_placeholder',
+                    'Select target account',
+                )}
                 labelFn={accountLabel}
             />
 
             <SelectField
                 name="type"
-                label="Type"
-                placeholder="Select type"
+                label={fl('type', 'Type')}
+                placeholder={fl('type_placeholder', 'Select type')}
                 options={[
-                    { label: 'Rename', value: 'rename' },
-                    { label: 'Merge', value: 'merge' },
-                    { label: 'Split', value: 'split' },
+                    { label: fl('type_rename', 'Rename'), value: 'rename' },
+                    { label: fl('type_merge', 'Merge'), value: 'merge' },
+                    { label: fl('type_split', 'Split'), value: 'split' },
                 ]}
             />
 
             <TextareaField
                 name="notes"
-                label="Notes"
-                placeholder="Optional notes"
+                label={fl('notes', 'Notes')}
+                placeholder={fl('notes_placeholder', 'Optional notes')}
                 rows={3}
             />
         </EntityForm>

@@ -8,6 +8,7 @@ import * as z from 'zod';
 import EntityForm from '@/components/common/EntityForm';
 import NameField from '@/components/common/NameField';
 import SelectField from '@/components/common/SelectField';
+import { useTranslation } from '@/contexts/i18n-context';
 import axios from '@/lib/axios';
 import { type CoaVersion } from '@/types/coa-version';
 import { coaVersionFormSchema, type CoaVersionFormData } from '@/utils/schemas';
@@ -30,6 +31,13 @@ export function CoaVersionForm({
     isLoading = false,
 }: Readonly<CoaVersionFormProps>) {
     const activeEntity = coaVersion || entity;
+    const { t } = useTranslation();
+    const fl = (key: string, fallback: string) => {
+        const translated = t(`form_fields.coa_versions.${key}`);
+        return translated === `form_fields.coa_versions.${key}`
+            ? fallback
+            : translated;
+    };
     const [fiscalYears, setFiscalYears] = useState<
         { label: string; value: string }[]
     >([]);
@@ -79,7 +87,11 @@ export function CoaVersionForm({
         <EntityForm
             open={open}
             onOpenChange={onOpenChange}
-            title={activeEntity ? 'Edit COA Version' : 'Create COA Version'}
+            title={
+                activeEntity
+                    ? fl('edit_title', 'Edit COA Version')
+                    : fl('create_title', 'Create COA Version')
+            }
             form={
                 form as unknown as UseFormReturn<
                     CoaVersionFormData,
@@ -90,23 +102,29 @@ export function CoaVersionForm({
             onSubmit={handleFormSubmit}
             isLoading={isLoading}
         >
-            <NameField name="name" />
+            <NameField name="name" label={fl('name', 'Name')} />
 
             <SelectField
                 name="fiscal_year_id"
-                label="Fiscal Year"
-                placeholder="Select fiscal year"
+                label={fl('fiscal_year', 'Fiscal Year')}
+                placeholder={fl(
+                    'fiscal_year_placeholder',
+                    'Select fiscal year',
+                )}
                 options={fiscalYears}
             />
 
             <SelectField
                 name="status"
-                label="Status"
-                placeholder="Select status"
+                label={fl('status', 'Status')}
+                placeholder={fl('status_placeholder', 'Select status')}
                 options={[
-                    { label: 'Draft', value: 'draft' },
-                    { label: 'Active', value: 'active' },
-                    { label: 'Archived', value: 'archived' },
+                    { label: fl('status_draft', 'Draft'), value: 'draft' },
+                    { label: fl('status_active', 'Active'), value: 'active' },
+                    {
+                        label: fl('status_archived', 'Archived'),
+                        value: 'archived',
+                    },
                 ]}
             />
         </EntityForm>

@@ -3,7 +3,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMemo } from 'react';
 import { type Resolver, useForm } from 'react-hook-form';
-import { z } from 'zod';
 
 import { InputField } from '@/components/common/InputField';
 import {
@@ -13,24 +12,10 @@ import {
     ItemProductUnitFields,
 } from '@/components/common/ItemFormDialog';
 import { ItemPricingFields } from '@/components/common/ItemPricingFields';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type CreditNoteFormData } from '@/types/credit-note';
-
-const creditNoteItemSchema = z.object({
-    product_id: z.string().optional(),
-    product_label: z.string().optional(),
-    account_id: z.string().min(1, { message: 'Account is required.' }),
-    account_label: z.string().optional(),
-    description: z.string().min(1, { message: 'Description is required.' }),
-    quantity: z.coerce
-        .number()
-        .gt(0, { message: 'Quantity must be greater than 0.' }),
-    unit_price: z.coerce
-        .number()
-        .min(0, { message: 'Unit price must be at least 0.' }),
-    tax_percent: z.coerce.number().min(0).max(100).optional().default(0),
-    notes: z.string().optional(),
-});
+import { creditNoteItemSchema } from '@/utils/schemas';
 
 type CreditNoteItemFormData = CreditNoteFormData['items'][number];
 
@@ -47,6 +32,13 @@ export function CreditNoteItemFormDialog({
     item,
     onSave,
 }: CreditNoteItemFormDialogProps) {
+    const { t } = useTranslation();
+    const fl = (key: string, fallback: string) => {
+        const translated = t(`form_fields.credit_notes.${key}`);
+        return translated === `form_fields.credit_notes.${key}`
+            ? fallback
+            : translated;
+    };
     const defaultValues = useMemo<CreditNoteItemFormData>(() => {
         if (!item) {
             return {
@@ -116,8 +108,11 @@ export function CreditNoteItemFormDialog({
                 />
                 <InputField
                     name="description"
-                    label="Description"
-                    placeholder="Enter description"
+                    label={fl('item_description', 'Description')}
+                    placeholder={fl(
+                        'item_description_placeholder',
+                        'Enter description',
+                    )}
                 />
             </div>
             <ItemPricingFields includeDiscount={false} />

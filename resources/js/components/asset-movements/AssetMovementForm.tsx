@@ -39,12 +39,23 @@ const toOptionalSelectValue = (value: string | number | null | undefined) => {
     return '';
 };
 
-const MOVEMENT_TYPE_OPTIONS = [
-    { value: 'transfer', label: 'Transfer (Location Change)' },
-    { value: 'assign', label: 'Assign (PIC Change)' },
-    { value: 'return', label: 'Return' },
-    { value: 'dispose', label: 'Dispose' },
-    { value: 'adjustment', label: 'Adjustment' },
+type MovementFieldLabeler = (key: string, fallback: string) => string;
+
+const getMovementTypeOptions = (fl: MovementFieldLabeler) => [
+    {
+        value: 'transfer',
+        label: fl('movement_type_transfer', 'Transfer (Location Change)'),
+    },
+    {
+        value: 'assign',
+        label: fl('movement_type_assign', 'Assign (PIC Change)'),
+    },
+    { value: 'return', label: fl('movement_type_return', 'Return') },
+    { value: 'dispose', label: fl('movement_type_dispose', 'Dispose') },
+    {
+        value: 'adjustment',
+        label: fl('movement_type_adjustment', 'Adjustment'),
+    },
 ];
 
 const MOVEMENT_REFERENCE_PREFIX: Record<
@@ -124,6 +135,12 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
         isLoading = false,
     }) {
         const { t } = useTranslation();
+        const fl: MovementFieldLabeler = (key, fallback) => {
+            const translated = t(`form_fields.asset_movements.${key}`);
+            return translated === `form_fields.asset_movements.${key}`
+                ? fallback
+                : translated;
+        };
         const defaultValues = useMemo(
             () => getAssetMovementFormDefaults(entity, asset),
             [entity, asset],
@@ -141,7 +158,15 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
         const effectiveAssetStatus = asset?.status ?? pickedAssetStatus;
 
         const movementType = form.watch('movement_type');
-        const referencePlaceholder = `e.g. ${MOVEMENT_REFERENCE_PREFIX[movementType] ?? 'TRF'}-${new Date().getFullYear()}-001`;
+        const referencePlaceholder = fl(
+            'reference_placeholder_prefix',
+            'e.g. {prefix}-{year}-001',
+        )
+            .replace(
+                '{prefix}',
+                MOVEMENT_REFERENCE_PREFIX[movementType] ?? 'TRF',
+            )
+            .replace('{year}', String(new Date().getFullYear()));
         const toBranchId = form.watch('to_branch_id');
         const saleAmountValue = Number(form.watch('sale_amount') ?? '');
         const hasSaleProceeds = saleAmountValue > 0;
@@ -193,16 +218,22 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
         };
 
         const isEdit = !!entity;
+        const allMovementTypeOptions = getMovementTypeOptions(fl);
         const movementTypeOptions =
             effectiveAssetStatus === 'lost' && !isEdit
-                ? MOVEMENT_TYPE_OPTIONS.filter((opt) => opt.value === 'dispose')
-                : MOVEMENT_TYPE_OPTIONS;
-        let formTitle = 'Record Asset Movement';
+                ? allMovementTypeOptions.filter(
+                      (opt) => opt.value === 'dispose',
+                  )
+                : allMovementTypeOptions;
+        let formTitle = fl('record_title', 'Record Asset Movement');
 
         if (isEdit) {
-            formTitle = 'Edit Movement';
+            formTitle = fl('edit_title', 'Edit Movement');
         } else if (asset) {
-            formTitle = `Record Movement for ${asset.asset_code}`;
+            formTitle = fl(
+                'record_for_title',
+                'Record Movement for {code}',
+            ).replace('{code}', asset.asset_code);
         }
 
         return (
@@ -211,7 +242,11 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
                 open={open}
                 onOpenChange={onOpenChange}
                 title={formTitle}
-                submitLabel={isEdit ? 'Update Movement' : 'Record Movement'}
+                submitLabel={
+                    isEdit
+                        ? fl('submit_update', 'Update Movement')
+                        : fl('submit_record', 'Record Movement')
+                }
                 onSubmit={handleFormSubmit}
                 isLoading={isLoading}
                 className="sm:max-w-[600px]"
@@ -222,9 +257,12 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
                             <div className="grid grid-cols-1 gap-4">
                                 <AsyncSelectField<Asset>
                                     name="asset_id"
-                                    label="Asset"
+                                    label={fl('asset', 'Asset')}
                                     url="/api/assets?exclude_status=disposed"
-                                    placeholder="Select asset"
+                                    placeholder={fl(
+                                        'asset_placeholder',
+                                        'Select asset',
+                                    )}
                                     onItemSelect={(item) =>
                                         setPickedAssetStatus(item.status)
                                     }
@@ -235,13 +273,13 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <SelectField
                                 name="movement_type"
-                                label="Movement Type"
+                                label={fl('movement_type', 'Movement Type')}
                                 disabled={isEdit}
                                 options={movementTypeOptions}
                             />
                             <DatePickerField
                                 name="moved_at"
-                                label="Movement Date"
+                                label={fl('moved_at', 'Movement Date')}
                             />
                         </div>
 
@@ -250,25 +288,34 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
                         {movementType === 'transfer' && !isEdit && (
                             <div className="space-y-4">
                                 <h4 className="text-sm font-medium">
-                                    Destination Details
+                                    {fl(
+                                        'destination_title',
+                                        'Destination Details',
+                                    )}
                                 </h4>
                                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                     <AsyncSelectField
                                         name="to_branch_id"
-                                        label="To Branch"
+                                        label={fl('to_branch', 'To Branch')}
                                         url="/api/branches"
-                                        placeholder="Select destination branch"
+                                        placeholder={fl(
+                                            'to_branch_placeholder',
+                                            'Select destination branch',
+                                        )}
                                         initialLabel={asset?.branch?.name}
                                     />
                                     <AsyncSelectField
                                         name="to_location_id"
-                                        label="To Location"
+                                        label={fl('to_location', 'To Location')}
                                         url={
                                             toBranchId
                                                 ? `/api/asset-locations?branch_id=${toBranchId}`
                                                 : '/api/asset-locations'
                                         }
-                                        placeholder="Select destination location"
+                                        placeholder={fl(
+                                            'to_location_placeholder',
+                                            'Select destination location',
+                                        )}
                                         key={`location-select-${toBranchId}`}
                                         initialLabel={asset?.location?.name}
                                     />
@@ -279,21 +326,33 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
                         {movementType === 'assign' && !isEdit && (
                             <div className="space-y-4">
                                 <h4 className="text-sm font-medium">
-                                    Assignment Details
+                                    {fl(
+                                        'assignment_title',
+                                        'Assignment Details',
+                                    )}
                                 </h4>
                                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                     <AsyncSelectField
                                         name="to_department_id"
-                                        label="To Department"
+                                        label={fl(
+                                            'to_department',
+                                            'To Department',
+                                        )}
                                         url="/api/departments"
-                                        placeholder="Select department"
+                                        placeholder={fl(
+                                            'to_department_placeholder',
+                                            'Select department',
+                                        )}
                                         initialLabel={asset?.department?.name}
                                     />
                                     <AsyncSelectField
                                         name="to_employee_id"
-                                        label="To Employee"
+                                        label={fl('to_employee', 'To Employee')}
                                         url="/api/employees"
-                                        placeholder="Select employee"
+                                        placeholder={fl(
+                                            'to_employee_placeholder',
+                                            'Select employee',
+                                        )}
                                         initialLabel={asset?.employee?.name}
                                     />
                                 </div>
@@ -333,24 +392,30 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
 
                         <div className="space-y-4">
                             <h4 className="text-sm font-medium">
-                                Reference & Notes
+                                {fl('reference_title', 'Reference & Notes')}
                             </h4>
                             <InputField
                                 name="reference"
-                                label="Reference / Document #"
+                                label={fl(
+                                    'reference',
+                                    'Reference / Document #',
+                                )}
                                 placeholder={referencePlaceholder}
                             />
                             <TextareaField
                                 name="notes"
-                                label="Notes"
-                                placeholder="Reason for movement..."
+                                label={fl('notes', 'Notes')}
+                                placeholder={fl(
+                                    'notes_placeholder',
+                                    'Reason for movement...',
+                                )}
                             />
                             <div className="space-y-2">
                                 <label
                                     htmlFor="movement-document"
                                     className="text-sm font-medium"
                                 >
-                                    Supporting Document
+                                    {fl('document', 'Supporting Document')}
                                 </label>
                                 <FileUploadInput
                                     id="movement-document"
@@ -360,7 +425,13 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
                                 />
                                 {entity?.document_name && (
                                     <p className="text-xs text-muted-foreground">
-                                        Current: {entity.document_name}
+                                        {fl(
+                                            'document_current',
+                                            'Current: {name}',
+                                        ).replace(
+                                            '{name}',
+                                            entity.document_name,
+                                        )}
                                     </p>
                                 )}
                             </div>

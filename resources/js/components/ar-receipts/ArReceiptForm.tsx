@@ -19,6 +19,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type ArReceipt, type ArReceiptFormData } from '@/types/ar-receipt';
@@ -100,6 +101,13 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
     onSubmit,
     isLoading = false,
 }) {
+    const { t } = useTranslation();
+    const fl = (key: string, fallback: string) => {
+        const translated = t(`form_fields.ar_receipts.${key}`);
+        return translated === `form_fields.ar_receipts.${key}`
+            ? fallback
+            : translated;
+    };
     const activeArReceipt = arReceipt || item || entity;
     const isLocked = isPostedDocumentLocked(activeArReceipt);
     const defaultValues = useMemo(
@@ -143,19 +151,25 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
         }
     }, [selectedCustomerId, replace]);
     const arReceiptStatusOptions = [
-        { value: 'draft', label: 'Draft' },
-        { value: 'confirmed', label: 'Confirmed' },
-        { value: 'reconciled', label: 'Reconciled' },
-        { value: 'cancelled', label: 'Cancelled' },
-        { value: 'void', label: 'Void' },
+        { value: 'draft', label: fl('status_draft', 'Draft') },
+        { value: 'confirmed', label: fl('status_confirmed', 'Confirmed') },
+        { value: 'reconciled', label: fl('status_reconciled', 'Reconciled') },
+        { value: 'cancelled', label: fl('status_cancelled', 'Cancelled') },
+        { value: 'void', label: fl('status_void', 'Void') },
     ];
     const arReceiptPaymentMethodOptions = [
-        { value: 'bank_transfer', label: 'Bank Transfer' },
-        { value: 'cash', label: 'Cash' },
-        { value: 'check', label: 'Check' },
-        { value: 'giro', label: 'Giro' },
-        { value: 'credit_card', label: 'Credit Card' },
-        { value: 'other', label: 'Other' },
+        {
+            value: 'bank_transfer',
+            label: fl('method_bank_transfer', 'Bank Transfer'),
+        },
+        { value: 'cash', label: fl('method_cash', 'Cash') },
+        { value: 'check', label: fl('method_check', 'Check') },
+        { value: 'giro', label: fl('method_giro', 'Giro') },
+        {
+            value: 'credit_card',
+            label: fl('method_credit_card', 'Credit Card'),
+        },
+        { value: 'other', label: fl('method_other', 'Other') },
     ];
     const handleSubmit = (data: ArReceiptFormData) => {
         onSubmit({
@@ -175,7 +189,11 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
                 form={form}
                 open={open}
                 onOpenChange={onOpenChange}
-                title={activeArReceipt ? 'Edit AR Receipt' : 'Add AR Receipt'}
+                title={
+                    activeArReceipt
+                        ? fl('edit_title', 'Edit AR Receipt')
+                        : fl('add_title', 'Add AR Receipt')
+                }
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
                 className="sm:max-w-[1100px]"
@@ -184,39 +202,54 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
                 <div className="grid grid-cols-2 gap-4">
                     <AsyncSelectField
                         name="customer_id"
-                        label="Customer"
-                        placeholder="Select Customer"
+                        label={fl('customer', 'Customer')}
+                        placeholder={fl(
+                            'customer_placeholder',
+                            'Select Customer',
+                        )}
                         url="/api/customers"
                     />
                     <AsyncSelectField
                         name="branch_id"
-                        label="Branch"
-                        placeholder="Select Branch"
+                        label={fl('branch', 'Branch')}
+                        placeholder={fl('branch_placeholder', 'Select Branch')}
                         url="/api/branches"
                     />
                     <AsyncSelectField
                         name="fiscal_year_id"
-                        label="Fiscal Year"
-                        placeholder="Select Fiscal Year"
+                        label={fl('fiscal_year', 'Fiscal Year')}
+                        placeholder={fl(
+                            'fiscal_year_placeholder',
+                            'Select Fiscal Year',
+                        )}
                         url="/api/fiscal-years"
                         preferredMetaKey="preferred_fiscal_year_id"
                     />
-                    <DatePickerField name="receipt_date" label="Receipt Date" />
+                    <DatePickerField
+                        name="receipt_date"
+                        label={fl('receipt_date', 'Receipt Date')}
+                    />
                     <SelectField
                         name="payment_method"
-                        label="Payment Method"
+                        label={fl('payment_method', 'Payment Method')}
                         options={arReceiptPaymentMethodOptions}
-                        placeholder="Select Payment Method"
+                        placeholder={fl(
+                            'payment_method_placeholder',
+                            'Select Payment Method',
+                        )}
                     />
                     <AsyncSelectField
                         name="bank_account_id"
-                        label="Bank Account"
-                        placeholder="Select Bank Account"
+                        label={fl('bank_account', 'Bank Account')}
+                        placeholder={fl(
+                            'bank_account_placeholder',
+                            'Select Bank Account',
+                        )}
                         url="/api/accounts?is_active=1&has_children=0"
                     />
                     <InputField
                         name="total_amount"
-                        label="Total Amount"
+                        label={fl('total_amount', 'Total Amount')}
                         type="number"
                         min={0}
                         step={0.01}
@@ -224,23 +257,26 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
                     />
                     <InputField
                         name="reference"
-                        label="Reference"
-                        placeholder="e.g., Bank reference number"
+                        label={fl('reference', 'Reference')}
+                        placeholder={fl(
+                            'reference_placeholder',
+                            'e.g., Bank reference number',
+                        )}
                     />
                     <SelectField
                         name="status"
-                        label="Status"
+                        label={fl('status', 'Status')}
                         options={arReceiptStatusOptions}
-                        placeholder="Select Status"
+                        placeholder={fl('status_placeholder', 'Select Status')}
                     />
                 </div>
                 <TextareaField
                     name="notes"
-                    label="Notes"
-                    placeholder="Additional notes..."
+                    label={fl('notes', 'Notes')}
+                    placeholder={fl('notes_placeholder', 'Additional notes...')}
                 />
                 <EntityFormItemSectionHeader
-                    title="Allocations"
+                    title={fl('allocations_title', 'Allocations')}
                     onAddItem={handleCreateNewItem}
                     locked={isLocked}
                 />
@@ -249,7 +285,10 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
                         <TableBody>
                             <EntityFormItemEmptyRow
                                 colSpan={5}
-                                message="No allocations added yet. Click 'Add Allocation' to start."
+                                message={fl(
+                                    'no_allocations',
+                                    "No allocations added yet. Click 'Add Allocation' to start.",
+                                )}
                             />
                         </TableBody>
                     ) : (
@@ -257,15 +296,23 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
                             <TableHeader>
                                 <TableRow>
                                     <TableHead className="w-12">#</TableHead>
-                                    <TableHead>Invoice</TableHead>
-                                    <TableHead className="text-right">
-                                        Allocated Amount
+                                    <TableHead>
+                                        {fl('column_invoice', 'Invoice')}
                                     </TableHead>
                                     <TableHead className="text-right">
-                                        Discount Given
+                                        {fl(
+                                            'column_allocated_amount',
+                                            'Allocated Amount',
+                                        )}
+                                    </TableHead>
+                                    <TableHead className="text-right">
+                                        {fl(
+                                            'column_discount_given',
+                                            'Discount Given',
+                                        )}
                                     </TableHead>
                                     <TableHead className="w-20">
-                                        Actions
+                                        {fl('column_actions', 'Actions')}
                                     </TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -278,7 +325,10 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
                                         <TableCell>
                                             <div className="font-medium">
                                                 {field.invoice_label ||
-                                                    'No Invoice'}
+                                                    fl(
+                                                        'no_invoice',
+                                                        'No Invoice',
+                                                    )}
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-right">

@@ -4,6 +4,7 @@ import { memo } from 'react';
 
 import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityForm } from '@/hooks/useEntityForm';
 import { AssetCategory } from '@/types/asset-category';
 import {
@@ -33,6 +34,13 @@ export const AssetCategoryForm = memo<AssetCategoryFormProps>(
         onSubmit,
         isLoading = false,
     }) {
+        const { t } = useTranslation();
+        const fl = (key: string, fallback: string) => {
+            const translated = t(`form_fields.asset_categories.${key}`);
+            return translated === `form_fields.asset_categories.${key}`
+                ? fallback
+                : translated;
+        };
         const form = useEntityForm<AssetCategoryFormData, AssetCategory>({
             schema: assetCategoryFormSchema,
             getDefaults,
@@ -45,22 +53,34 @@ export const AssetCategoryForm = memo<AssetCategoryFormProps>(
                 open={open}
                 onOpenChange={onOpenChange}
                 title={
-                    entity ? 'Edit Asset Category' : 'Add New Asset Category'
+                    entity
+                        ? fl('edit_title', 'Edit Asset Category')
+                        : fl('add_title', 'Add New Asset Category')
                 }
                 onSubmit={onSubmit}
                 isLoading={isLoading}
             >
-                <InputField name="code" label="Code" placeholder="e.g., KND" />
+                <InputField
+                    name="code"
+                    label={fl('code', 'Code')}
+                    placeholder={fl('code_placeholder', 'e.g., KND')}
+                />
                 <InputField
                     name="name"
-                    label="Name"
-                    placeholder="e.g., Kendaraan"
+                    label={fl('name', 'Name')}
+                    placeholder={fl('name_placeholder', 'e.g., Kendaraan')}
                 />
                 <InputField
                     name="useful_life_months_default"
-                    label="Default Useful Life (Months)"
+                    label={fl(
+                        'useful_life_months_default',
+                        'Default Useful Life (Months)',
+                    )}
                     type="number"
-                    placeholder="e.g., 48"
+                    placeholder={fl(
+                        'useful_life_months_default_placeholder',
+                        'e.g., 48',
+                    )}
                 />
             </EntityForm>
         );

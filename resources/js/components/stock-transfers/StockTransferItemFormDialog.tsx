@@ -3,7 +3,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMemo } from 'react';
 import { type Resolver, useForm } from 'react-hook-form';
-import { z } from 'zod';
 
 import { InputField } from '@/components/common/InputField';
 import {
@@ -16,21 +15,8 @@ import { useTranslation } from '@/contexts/i18n-context';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import {
     type StockTransferFormData,
-    stockTransferQuantityReceivedSchema,
+    stockTransferItemSchema,
 } from '@/utils/schemas';
-
-const stockTransferItemSchema = z.object({
-    product_id: z.string().min(1, { message: 'Product is required.' }),
-    product_label: z.string().optional(),
-    unit_id: z.string().min(1, { message: 'Unit is required.' }),
-    unit_label: z.string().optional(),
-    quantity: z.coerce
-        .number()
-        .gt(0, { message: 'Quantity must be greater than 0.' }),
-    quantity_received: stockTransferQuantityReceivedSchema,
-    unit_cost: z.coerce.number().min(0).optional().default(0),
-    notes: z.string().optional(),
-});
 
 type StockTransferItemFormData = StockTransferFormData['items'][number];
 

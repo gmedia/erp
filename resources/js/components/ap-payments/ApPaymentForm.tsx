@@ -15,6 +15,7 @@ import {
 import { InputField } from '@/components/common/InputField';
 import { PostedDocumentLockNotice } from '@/components/common/PostedDocumentLockNotice';
 import SelectField from '@/components/common/SelectField';
+import { StatusSelectField } from '@/components/common/StatusSelectField';
 import { TextareaField } from '@/components/common/TextareaField';
 import {
     Table,
@@ -24,6 +25,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type ApPayment, type ApPaymentFormData } from '@/types/ap-payment';
@@ -114,6 +116,13 @@ export const ApPaymentForm = memo<ApPaymentFormProps>(function ApPaymentForm({
     onSubmit,
     isLoading = false,
 }) {
+    const { t } = useTranslation();
+    const fl = (key: string, fallback: string) => {
+        const translated = t(`form_fields.ap_payments.${key}`);
+        return translated === `form_fields.ap_payments.${key}`
+            ? fallback
+            : translated;
+    };
     const isLocked = isPostedDocumentLocked(entity);
     const defaultValues = useMemo(
         () => getApPaymentFormDefaults(entity),
@@ -177,7 +186,11 @@ export const ApPaymentForm = memo<ApPaymentFormProps>(function ApPaymentForm({
             form={form}
             open={open}
             onOpenChange={onOpenChange}
-            title={entity ? 'Edit AP Payment' : 'Add New AP Payment'}
+            title={
+                entity
+                    ? fl('edit_title', 'Edit AP Payment')
+                    : fl('add_title', 'Add New AP Payment')
+            }
             onSubmit={handleSubmit}
             isLoading={isLoading}
             className="sm:max-w-[1100px]"
@@ -186,74 +199,101 @@ export const ApPaymentForm = memo<ApPaymentFormProps>(function ApPaymentForm({
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <InputField
                     name="payment_number"
-                    label="Payment Number"
-                    placeholder="Auto-generated if empty"
+                    label={fl('payment_number', 'Payment Number')}
+                    placeholder={fl(
+                        'payment_number_placeholder',
+                        'Auto-generated if empty',
+                    )}
                 />
 
-                <SelectField
-                    name="status"
-                    label="Status"
-                    options={[
-                        { value: 'draft', label: 'Draft' },
-                        {
-                            value: 'pending_approval',
-                            label: 'Pending Approval',
-                        },
-                        { value: 'confirmed', label: 'Confirmed' },
-                        { value: 'reconciled', label: 'Reconciled' },
-                        { value: 'cancelled', label: 'Cancelled' },
-                        { value: 'void', label: 'Void' },
+                <StatusSelectField
+                    fl={fl}
+                    label={fl('status', 'Status')}
+                    placeholder={fl('status_placeholder', 'Select status')}
+                    statuses={[
+                        ['draft', 'Draft'],
+                        ['pending_approval', 'Pending Approval'],
+                        ['confirmed', 'Confirmed'],
+                        ['reconciled', 'Reconciled'],
+                        ['cancelled', 'Cancelled'],
+                        ['void', 'Void'],
                     ]}
-                    placeholder="Select status"
                 />
 
                 <AsyncSelectField
                     name="supplier_id"
-                    label="Supplier"
+                    label={fl('supplier', 'Supplier')}
                     url="/api/suppliers"
-                    placeholder="Select supplier"
+                    placeholder={fl('supplier_placeholder', 'Select supplier')}
                 />
 
                 <AsyncSelectField
                     name="branch_id"
-                    label="Branch"
+                    label={fl('branch', 'Branch')}
                     url="/api/branches"
-                    placeholder="Select branch"
+                    placeholder={fl('branch_placeholder', 'Select branch')}
                 />
 
                 <AsyncSelectField
                     name="fiscal_year_id"
-                    label="Fiscal Year"
+                    label={fl('fiscal_year', 'Fiscal Year')}
                     url="/api/fiscal-years"
-                    placeholder="Select fiscal year"
+                    placeholder={fl(
+                        'fiscal_year_placeholder',
+                        'Select fiscal year',
+                    )}
                     preferredMetaKey="preferred_fiscal_year_id"
                 />
 
-                <DatePickerField name="payment_date" label="Payment Date" />
+                <DatePickerField
+                    name="payment_date"
+                    label={fl('payment_date', 'Payment Date')}
+                />
 
                 <SelectField
                     name="payment_method"
-                    label="Payment Method"
+                    label={fl('payment_method', 'Payment Method')}
                     options={[
-                        { value: 'bank_transfer', label: 'Bank Transfer' },
-                        { value: 'cash', label: 'Cash' },
-                        { value: 'check', label: 'Check' },
-                        { value: 'giro', label: 'Giro' },
-                        { value: 'other', label: 'Other' },
+                        {
+                            value: 'bank_transfer',
+                            label: fl('method_bank_transfer', 'Bank Transfer'),
+                        },
+                        {
+                            value: 'cash',
+                            label: fl('method_cash', 'Cash'),
+                        },
+                        {
+                            value: 'check',
+                            label: fl('method_check', 'Check'),
+                        },
+                        {
+                            value: 'giro',
+                            label: fl('method_giro', 'Giro'),
+                        },
+                        {
+                            value: 'other',
+                            label: fl('method_other', 'Other'),
+                        },
                     ]}
-                    placeholder="Select payment method"
+                    placeholder={fl(
+                        'payment_method_placeholder',
+                        'Select payment method',
+                    )}
                 />
 
                 <AsyncSelectField
                     name="bank_account_id"
-                    label="Bank Account"
+                    label={fl('bank_account', 'Bank Account')}
                     url="/api/accounts?is_active=1&has_children=0"
-                    placeholder="Select bank account"
+                    placeholder={fl(
+                        'bank_account_placeholder',
+                        'Select bank account',
+                    )}
                 />
 
                 <InputField
                     name="total_amount"
-                    label="Total Amount"
+                    label={fl('total_amount', 'Total Amount')}
                     type="number"
                     min={0}
                     step="any"
@@ -263,15 +303,18 @@ export const ApPaymentForm = memo<ApPaymentFormProps>(function ApPaymentForm({
 
                 <InputField
                     name="reference"
-                    label="Reference"
-                    placeholder="Payment reference"
+                    label={fl('reference', 'Reference')}
+                    placeholder={fl(
+                        'reference_placeholder',
+                        'Payment reference',
+                    )}
                 />
 
                 <div className="md:col-span-2">
                     <TextareaField
                         name="notes"
-                        label="Notes"
-                        placeholder="Notes"
+                        label={fl('notes', 'Notes')}
+                        placeholder={fl('notes_placeholder', 'Notes')}
                         rows={2}
                     />
                 </div>
@@ -288,17 +331,25 @@ export const ApPaymentForm = memo<ApPaymentFormProps>(function ApPaymentForm({
                         <TableHeader>
                             <TableRow>
                                 <TableHead className="w-[220px]">
-                                    Bill Number
+                                    {fl('column_bill_number', 'Bill Number')}
                                 </TableHead>
                                 <TableHead className="w-[140px]">
-                                    Allocated Amount
+                                    {fl(
+                                        'column_allocated_amount',
+                                        'Allocated Amount',
+                                    )}
                                 </TableHead>
                                 <TableHead className="w-[130px]">
-                                    Discount Taken
+                                    {fl(
+                                        'column_discount_taken',
+                                        'Discount Taken',
+                                    )}
                                 </TableHead>
-                                <TableHead>Notes</TableHead>
+                                <TableHead>
+                                    {fl('column_notes', 'Notes')}
+                                </TableHead>
                                 <TableHead className="w-[120px] text-right">
-                                    Action
+                                    {fl('column_action', 'Action')}
                                 </TableHead>
                             </TableRow>
                         </TableHeader>

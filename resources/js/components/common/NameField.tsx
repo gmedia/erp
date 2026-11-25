@@ -7,10 +7,16 @@ import {
 import { Input } from '@/components/ui/input';
 import { type ReactNode } from 'react';
 
+import {
+    LabelText,
+    type TranslatableLabel,
+    useTranslatableText,
+} from './TranslatedText';
+
 interface NameFieldProps {
     name: string;
-    label?: string;
-    placeholder?: string;
+    label?: TranslatableLabel;
+    placeholder?: TranslatableLabel;
     className?: string;
     children?: ReactNode;
 }
@@ -25,14 +31,19 @@ export default function NameField({
     className,
     children,
 }: Readonly<NameFieldProps>) {
+    const translatedPlaceholder = useTranslatableText(placeholder);
     return (
         <FormField
             name={name}
             render={({ field }) => (
                 <FormItem className={className}>
-                    {label && <FormLabel>{label}</FormLabel>}
+                    {label && (
+                        <FormLabel>
+                            <LabelText label={label} />
+                        </FormLabel>
+                    )}
                     <FormControl>
-                        <Input placeholder={placeholder} {...field} />
+                        <Input placeholder={translatedPlaceholder} {...field} />
                     </FormControl>
                     {children}
                 </FormItem>

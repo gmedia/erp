@@ -13,6 +13,7 @@ import { PostedDocumentLockNotice } from '@/components/common/PostedDocumentLock
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
 import { TransactionLineItemsTable } from '@/components/common/TransactionLineItemsTable';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import {
@@ -102,6 +103,13 @@ export const CustomerInvoiceForm = memo<CustomerInvoiceFormProps>(
         onSubmit,
         isLoading = false,
     }) {
+        const { t } = useTranslation();
+        const fl = (key: string, fallback: string) => {
+            const translated = t(`form_fields.customer_invoices.${key}`);
+            return translated === `form_fields.customer_invoices.${key}`
+                ? fallback
+                : translated;
+        };
         const activeCustomerInvoice = customerInvoice || item || entity;
         const isLocked = isPostedDocumentLocked(activeCustomerInvoice);
         const defaultValues = useMemo(
@@ -144,13 +152,19 @@ export const CustomerInvoiceForm = memo<CustomerInvoiceFormProps>(
         useResetFormOnDefaultValues(form, defaultValues);
 
         const customerInvoiceStatusOptions = [
-            { value: 'draft', label: 'Draft' },
-            { value: 'sent', label: 'Sent' },
-            { value: 'partially_paid', label: 'Partially Paid' },
-            { value: 'paid', label: 'Paid' },
-            { value: 'overdue', label: 'Overdue' },
-            { value: 'cancelled', label: 'Cancelled' },
-            { value: 'void', label: 'Void' },
+            { value: 'draft', label: fl('status_draft', 'Draft') },
+            { value: 'sent', label: fl('status_sent', 'Sent') },
+            {
+                value: 'partially_paid',
+                label: fl('status_partially_paid', 'Partially Paid'),
+            },
+            { value: 'paid', label: fl('status_paid', 'Paid') },
+            { value: 'overdue', label: fl('status_overdue', 'Overdue') },
+            {
+                value: 'cancelled',
+                label: fl('status_cancelled', 'Cancelled'),
+            },
+            { value: 'void', label: fl('status_void', 'Void') },
         ];
 
         const handleSubmit = (data: CustomerInvoiceFormData) => {
@@ -168,8 +182,8 @@ export const CustomerInvoiceForm = memo<CustomerInvoiceFormProps>(
                     onOpenChange={onOpenChange}
                     title={
                         activeCustomerInvoice
-                            ? 'Edit Customer Invoice'
-                            : 'Add Customer Invoice'
+                            ? fl('edit_title', 'Edit Customer Invoice')
+                            : fl('add_title', 'Add Customer Invoice')
                     }
                     onSubmit={handleSubmit}
                     isLoading={isLoading}
@@ -179,48 +193,69 @@ export const CustomerInvoiceForm = memo<CustomerInvoiceFormProps>(
                     <div className="grid grid-cols-2 gap-4">
                         <AsyncSelectField
                             name="customer_id"
-                            label="Customer"
-                            placeholder="Select Customer"
+                            label={fl('customer', 'Customer')}
+                            placeholder={fl(
+                                'customer_placeholder',
+                                'Select Customer',
+                            )}
                             url="/api/customers"
                         />
                         <AsyncSelectField
                             name="branch_id"
-                            label="Branch"
-                            placeholder="Select Branch"
+                            label={fl('branch', 'Branch')}
+                            placeholder={fl(
+                                'branch_placeholder',
+                                'Select Branch',
+                            )}
                             url="/api/branches"
                         />
                         <AsyncSelectField
                             name="fiscal_year_id"
-                            label="Fiscal Year"
-                            placeholder="Select Fiscal Year"
+                            label={fl('fiscal_year', 'Fiscal Year')}
+                            placeholder={fl(
+                                'fiscal_year_placeholder',
+                                'Select Fiscal Year',
+                            )}
                             url="/api/fiscal-years"
                             preferredMetaKey="preferred_fiscal_year_id"
                         />
                         <DatePickerField
                             name="invoice_date"
-                            label="Invoice Date"
+                            label={fl('invoice_date', 'Invoice Date')}
                         />
-                        <DatePickerField name="due_date" label="Due Date" />
+                        <DatePickerField
+                            name="due_date"
+                            label={fl('due_date', 'Due Date')}
+                        />
                         <InputField
                             name="payment_terms"
-                            label="Payment Terms"
-                            placeholder="e.g., Net 30"
+                            label={fl('payment_terms', 'Payment Terms')}
+                            placeholder={fl(
+                                'payment_terms_placeholder',
+                                'e.g., Net 30',
+                            )}
                         />
                         <SelectField
                             name="status"
-                            label="Status"
+                            label={fl('status', 'Status')}
                             options={customerInvoiceStatusOptions}
-                            placeholder="Select Status"
+                            placeholder={fl(
+                                'status_placeholder',
+                                'Select Status',
+                            )}
                         />
                     </div>
                     <TextareaField
                         name="notes"
-                        label="Notes"
-                        placeholder="Additional notes..."
+                        label={fl('notes', 'Notes')}
+                        placeholder={fl(
+                            'notes_placeholder',
+                            'Additional notes...',
+                        )}
                     />
 
                     <EntityFormItemSectionHeader
-                        title="Invoice Items"
+                        title={fl('items_title', 'Invoice Items')}
                         onAddItem={handleCreateNewItem}
                         locked={isLocked}
                     />

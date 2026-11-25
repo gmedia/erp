@@ -7,6 +7,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useTranslation } from '@/contexts/i18n-context';
 import { Edit, Plus, Trash } from 'lucide-react';
 import { useState } from 'react';
 import { UseFieldArrayReturn } from 'react-hook-form';
@@ -52,6 +53,13 @@ export function ApprovalFlowStepManager({
     errorMessage,
 }: Readonly<ApprovalFlowStepManagerProps>) {
     const { fields, append, remove, update } = fieldArrayProps;
+    const { t } = useTranslation();
+    const fl = (key: string, fallback: string) => {
+        const translated = t(`form_fields.approval_flow_steps.${key}`);
+        return translated === `form_fields.approval_flow_steps.${key}`
+            ? fallback
+            : translated;
+    };
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -70,7 +78,14 @@ export function ApprovalFlowStepManager({
         editingIndex === null ? null : (fields[editingIndex] ?? null);
 
     const handleDelete = (index: number) => {
-        if (globalThis.confirm('Are you sure you want to delete this step?')) {
+        if (
+            globalThis.confirm(
+                fl(
+                    'delete_confirm',
+                    'Are you sure you want to delete this step?',
+                ),
+            )
+        ) {
             remove(index);
         }
     };
@@ -80,8 +95,11 @@ export function ApprovalFlowStepManager({
         const approverLabel =
             typeof approverValue === 'string' ||
             typeof approverValue === 'number'
-                ? `User ID: ${approverValue}`
-                : 'User ID: -';
+                ? fl('user_id_label', 'User ID: {id}').replace(
+                      '{id}',
+                      String(approverValue),
+                  )
+                : fl('user_id_empty', 'User ID: -');
 
         return (
             <TableRow key={step.fieldId}>
@@ -100,7 +118,7 @@ export function ApprovalFlowStepManager({
                         variant="ghost"
                         size="icon"
                         onClick={() => handleEdit(index)}
-                        title="Edit step"
+                        title={fl('edit_step', 'Edit step')}
                     >
                         <Edit className="h-4 w-4" />
                     </Button>
@@ -109,7 +127,7 @@ export function ApprovalFlowStepManager({
                         variant="ghost"
                         size="icon"
                         onClick={() => handleDelete(index)}
-                        title="Delete step"
+                        title={fl('delete_step', 'Delete step')}
                         disabled={fields.length === 1}
                     >
                         <Trash className="h-4 w-4" />
@@ -123,10 +141,14 @@ export function ApprovalFlowStepManager({
         <div className="mt-8 border-t border-border pt-6">
             <div className="mb-4 flex items-center justify-between">
                 <div>
-                    <h3 className="text-lg font-medium">Approval Steps</h3>
+                    <h3 className="text-lg font-medium">
+                        {fl('manager_title', 'Approval Steps')}
+                    </h3>
                     <p className="text-sm text-muted-foreground">
-                        Define the ordered steps that will receive and process
-                        this approval.
+                        {fl(
+                            'manager_description',
+                            'Define the ordered steps that will receive and process this approval.',
+                        )}
                     </p>
                     {errorMessage && (
                         <p className="mt-2 text-sm font-medium text-destructive">
@@ -141,7 +163,7 @@ export function ApprovalFlowStepManager({
                     onClick={handleCreateNew}
                 >
                     <Plus className="mr-2 h-4 w-4" />
-                    Add Step
+                    {fl('add_step', 'Add Step')}
                 </Button>
             </div>
 
@@ -149,12 +171,25 @@ export function ApprovalFlowStepManager({
                 <Table>
                     <TableHeader className="bg-muted/50">
                         <TableRow>
-                            <TableHead className="w-12">#</TableHead>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Required Action</TableHead>
-                            <TableHead>Approver Type</TableHead>
-                            <TableHead>Target</TableHead>
-                            <TableHead className="text-right">Manage</TableHead>
+                            <TableHead className="w-12">
+                                {fl('column_number', '#')}
+                            </TableHead>
+                            <TableHead>{fl('column_name', 'Name')}</TableHead>
+                            <TableHead>
+                                {fl(
+                                    'column_required_action',
+                                    'Required Action',
+                                )}
+                            </TableHead>
+                            <TableHead>
+                                {fl('column_approver_type', 'Approver Type')}
+                            </TableHead>
+                            <TableHead>
+                                {fl('column_target', 'Target')}
+                            </TableHead>
+                            <TableHead className="text-right">
+                                {fl('column_manage', 'Manage')}
+                            </TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -165,8 +200,10 @@ export function ApprovalFlowStepManager({
                                     colSpan={6}
                                     className="py-6 text-center text-muted-foreground"
                                 >
-                                    No steps defined. Add one to enable approval
-                                    flow.
+                                    {fl(
+                                        'empty',
+                                        'No steps defined. Add one to enable approval flow.',
+                                    )}
                                 </TableCell>
                             </TableRow>
                         )}

@@ -20,6 +20,7 @@ import SelectField from '@/components/common/SelectField';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { useTranslation } from '@/contexts/i18n-context';
 
 import {
     type RecurringJournal,
@@ -30,7 +31,9 @@ import { RecurringJournalLineFormDialog } from './RecurringJournalLineFormDialog
 import { RecurringJournalLinesTable } from './RecurringJournalLinesTable';
 
 const recurringJournalLineSchema = z.object({
-    account_id: z.coerce.number().min(1, { message: 'Account is required.' }),
+    account_id: z.coerce.number().min(1, {
+        message: 'validation.recurring_journal.account_required',
+    }),
     account_name: z.string().optional(),
     account_code: z.string().optional(),
     debit: z.coerce.number().min(0).default(0),
@@ -39,19 +42,23 @@ const recurringJournalLineSchema = z.object({
 });
 
 const recurringJournalFormSchema = z.object({
-    name: z.string().min(1, { message: 'Name is required.' }),
-    frequency: z.enum(['daily', 'weekly', 'monthly', 'quarterly', 'annual'], {
-        message: 'Frequency is required.',
+    name: z.string().min(1, {
+        message: 'validation.recurring_journal.name_required',
     }),
-    next_run_date: z.string().min(1, { message: 'Next run date is required.' }),
+    frequency: z.enum(['daily', 'weekly', 'monthly', 'quarterly', 'annual'], {
+        message: 'validation.recurring_journal.frequency_required',
+    }),
+    next_run_date: z.string().min(1, {
+        message: 'validation.recurring_journal.next_run_date_required',
+    }),
     auto_post: z.boolean().default(false),
     is_active: z.boolean().default(true),
     reference_template: z.string().optional(),
-    description_template: z
-        .string()
-        .min(1, { message: 'Description template is required.' }),
+    description_template: z.string().min(1, {
+        message: 'validation.recurring_journal.description_template_required',
+    }),
     lines: z.array(recurringJournalLineSchema).min(1, {
-        message: 'At least one line is required.',
+        message: 'validation.recurring_journal.lines_min_one',
     }),
 });
 
@@ -102,16 +109,24 @@ const getRecurringJournalFormDefaults = (
 
 const LineActions = memo<{
     index: number;
+    editTitle: string;
+    removeTitle: string;
     onEditLine: (index: number) => void;
     onRemoveLine: (index: number) => void;
-}>(function LineActions({ index, onEditLine, onRemoveLine }) {
+}>(function LineActions({
+    index,
+    editTitle,
+    removeTitle,
+    onEditLine,
+    onRemoveLine,
+}) {
     return (
         <>
             <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => onEditLine(index)}
-                title="Edit line"
+                title={editTitle}
             >
                 <Pencil className="h-4 w-4" />
             </Button>
@@ -119,7 +134,7 @@ const LineActions = memo<{
                 variant="ghost"
                 size="icon"
                 onClick={() => onRemoveLine(index)}
-                title="Remove line"
+                title={removeTitle}
             >
                 <Trash2 className="h-4 w-4" />
             </Button>
@@ -135,6 +150,14 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
         onSubmit,
         isLoading = false,
     }) {
+        const { t } = useTranslation();
+        const fl = (key: string, fallback: string) => {
+            const translated = t(`form_fields.recurring_journals.${key}`);
+            return translated === `form_fields.recurring_journals.${key}`
+                ? fallback
+                : translated;
+        };
+
         const isEdit = !!entity;
 
         const defaultValues = useMemo(
@@ -202,6 +225,8 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
         const renderLineActions = (index: number) => (
             <LineActions
                 index={index}
+                editTitle={fl('edit_line', 'Edit line')}
+                removeTitle={fl('remove_line', 'Remove line')}
                 onEditLine={lineDialog.handleEditItem}
                 onRemoveLine={handleRemoveLine}
             />
@@ -215,8 +240,8 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                     onOpenChange={onOpenChange}
                     title={
                         isEdit
-                            ? 'Edit Recurring Journal'
-                            : 'Add New Recurring Journal'
+                            ? fl('edit_title', 'Edit Recurring Journal')
+                            : fl('add_title', 'Add New Recurring Journal')
                     }
                     onSubmit={onSubmit}
                     isLoading={isLoading}
@@ -226,21 +251,51 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <InputField
                                     name="name"
-                                    label="Name"
-                                    placeholder="Recurring Journal Name"
+                                    label={fl('name', 'Name')}
+                                    placeholder={fl(
+                                        'name_placeholder',
+                                        'Recurring Journal Name',
+                                    )}
                                 />
                                 <SelectField
                                     name="frequency"
-                                    label="Frequency"
+                                    label={fl('frequency', 'Frequency')}
                                     options={[
-                                        { value: 'daily', label: 'Daily' },
-                                        { value: 'weekly', label: 'Weekly' },
-                                        { value: 'monthly', label: 'Monthly' },
+                                        {
+                                            value: 'daily',
+                                            label: fl(
+                                                'frequency_daily',
+                                                'Daily',
+                                            ),
+                                        },
+                                        {
+                                            value: 'weekly',
+                                            label: fl(
+                                                'frequency_weekly',
+                                                'Weekly',
+                                            ),
+                                        },
+                                        {
+                                            value: 'monthly',
+                                            label: fl(
+                                                'frequency_monthly',
+                                                'Monthly',
+                                            ),
+                                        },
                                         {
                                             value: 'quarterly',
-                                            label: 'Quarterly',
+                                            label: fl(
+                                                'frequency_quarterly',
+                                                'Quarterly',
+                                            ),
                                         },
-                                        { value: 'annual', label: 'Yearly' },
+                                        {
+                                            value: 'annual',
+                                            label: fl(
+                                                'frequency_annual',
+                                                'Yearly',
+                                            ),
+                                        },
                                     ]}
                                 />
                             </div>
@@ -248,7 +303,7 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <DatePickerField
                                     name="next_run_date"
-                                    label="Next Run Date"
+                                    label={fl('next_run_date', 'Next Run Date')}
                                 />
                                 <div className="flex flex-col gap-4">
                                     <div className="flex items-center space-x-2">
@@ -263,7 +318,7 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                                             }
                                         />
                                         <Label htmlFor="auto_post">
-                                            Auto Post
+                                            {fl('auto_post', 'Auto Post')}
                                         </Label>
                                     </div>
                                     <div className="flex items-center space-x-2">
@@ -278,7 +333,7 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                                             }
                                         />
                                         <Label htmlFor="is_active">
-                                            Is Active
+                                            {fl('is_active', 'Is Active')}
                                         </Label>
                                     </div>
                                 </div>
@@ -286,20 +341,32 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
 
                             <InputField
                                 name="reference_template"
-                                label="Reference Template"
-                                placeholder="e.g., RJ-{YYYY}-{MM}-{DD}"
+                                label={fl(
+                                    'reference_template',
+                                    'Reference Template',
+                                )}
+                                placeholder={fl(
+                                    'reference_template_placeholder',
+                                    'e.g., RJ-{YYYY}-{MM}-{DD}',
+                                )}
                             />
 
                             <InputField
                                 name="description_template"
-                                label="Description Template"
-                                placeholder="Recurring journal description"
+                                label={fl(
+                                    'description_template',
+                                    'Description Template',
+                                )}
+                                placeholder={fl(
+                                    'description_template_placeholder',
+                                    'Recurring journal description',
+                                )}
                             />
 
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-lg font-semibold">
-                                        Lines
+                                        {fl('lines_title', 'Lines')}
                                     </h3>
                                     <Button
                                         type="button"
@@ -308,14 +375,16 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                                         onClick={lineDialog.handleCreateNewItem}
                                     >
                                         <Plus className="mr-2 h-4 w-4" />
-                                        Add Line
+                                        {fl('add_line', 'Add Line')}
                                     </Button>
                                 </div>
 
                                 {!isBalanced && lines && lines.length > 0 && (
                                     <div className="rounded-md bg-warning-soft p-3 text-sm text-warning">
-                                        Warning: Total Debit and Total Credit
-                                        must be equal.
+                                        {fl(
+                                            'unbalanced_warning',
+                                            'Warning: Total Debit and Total Credit must be equal.',
+                                        )}
                                     </div>
                                 )}
 
@@ -336,7 +405,10 @@ export const RecurringJournalForm = memo<RecurringJournalFormProps>(
                                     }))}
                                     totalDebit={totalDebit}
                                     totalCredit={totalCredit}
-                                    emptyMessage='No lines added yet. Click "Add Line" to start.'
+                                    emptyMessage={fl(
+                                        'no_lines',
+                                        'No lines added yet. Click "Add Line" to start.',
+                                    )}
                                     actions={renderLineActions}
                                 />
                             </div>

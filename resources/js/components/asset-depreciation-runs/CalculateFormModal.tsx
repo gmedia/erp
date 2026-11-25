@@ -50,7 +50,8 @@ export function CalculateFormModal({
         if (!data.period_start) {
             setError('period_start', {
                 type: 'required',
-                message: 'Start date is required',
+                message:
+                    'validation.asset_depreciation_calculation.period_start_date_required',
             });
 
             return;
@@ -59,7 +60,8 @@ export function CalculateFormModal({
         if (!data.period_end) {
             setError('period_end', {
                 type: 'required',
-                message: 'End date is required',
+                message:
+                    'validation.asset_depreciation_calculation.period_end_date_required',
             });
 
             return;

@@ -15,13 +15,17 @@ import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues
 import { type PurchaseRequestFormData } from '@/types/purchase-request';
 
 const purchaseRequestItemSchema = z.object({
-    product_id: z.string().min(1, { message: 'Product is required.' }),
+    product_id: z.string().min(1, {
+        message: 'validation.purchase_request.product_required',
+    }),
     product_label: z.string().optional(),
-    unit_id: z.string().min(1, { message: 'Unit is required.' }),
+    unit_id: z.string().min(1, {
+        message: 'validation.purchase_request.unit_required',
+    }),
     unit_label: z.string().optional(),
-    quantity: z.coerce
-        .number()
-        .gt(0, { message: 'Quantity must be greater than 0.' }),
+    quantity: z.coerce.number().gt(0, {
+        message: 'validation.purchase_request.quantity_gt_zero',
+    }),
     estimated_unit_price: z.coerce.number().min(0).optional().default(0),
     notes: z.string().optional(),
 });

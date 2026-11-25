@@ -87,7 +87,7 @@ import { assetColumns } from '@/components/assets/AssetColumns';
 import { createAssetFilterFields } from '@/components/assets/AssetFilters';
 import { AssetForm } from '@/components/assets/AssetForm';
 import { AssetViewModal } from '@/components/assets/AssetViewModal';
-import { SimpleEntityForm } from '@/components/common/EntityForm';
+import { createSimpleEntityForm } from '@/components/common/EntityForm';
 import { SimpleEntityViewModal } from '@/components/common/SimpleEntityViewModal';
 import { customerColumns } from '@/components/customers/CustomerColumns';
 import { createCustomerFilterFields } from '@/components/customers/CustomerFilters';
@@ -181,6 +181,7 @@ export interface SimpleEntityConfigOptions<T = unknown> {
     defaultSorting?: SortingState;
     titleKey?: string;
     descriptionKey?: string;
+    formKey?: string;
 }
 
 export interface ComplexEntityConfigOptions<T = Record<string, unknown>> {
@@ -244,6 +245,7 @@ function createSimpleEntityConfig<
         defaultSorting,
         titleKey,
         descriptionKey,
+        formKey,
     } = options;
 
     return {
@@ -261,7 +263,7 @@ function createSimpleEntityConfig<
         initialFilters: { search: '' },
         columns: createSimpleEntityColumns<T>(),
         filterFields: createSimpleEntityFilterFields(filterPlaceholder),
-        formComponent: SimpleEntityForm,
+        formComponent: createSimpleEntityForm(formKey ?? apiBase),
         formType: 'simple',
         entityNameForSearch: entityName.toLowerCase(),
         getDeleteMessage: createGenericDeleteMessage(entityName),
@@ -313,6 +315,7 @@ export const departmentConfig = createSimpleEntityConfig({
         fallback: 'Search departments...',
     },
     permissionPrefix: 'department',
+    formKey: 'departments',
 });
 
 export const positionConfig = createSimpleEntityConfig({
@@ -328,6 +331,7 @@ export const positionConfig = createSimpleEntityConfig({
     },
     permissionPrefix: 'position',
     defaultSorting: [{ id: 'created_at', desc: true }],
+    formKey: 'positions',
 });
 
 export const branchConfig = createSimpleEntityConfig({
@@ -342,6 +346,7 @@ export const branchConfig = createSimpleEntityConfig({
         fallback: 'Search branches...',
     },
     permissionPrefix: 'branch',
+    formKey: 'branches',
 });
 
 export const warehouseConfig = createComplexEntityConfig<Warehouse>({
@@ -764,6 +769,7 @@ export const supplierCategoryConfig = createSimpleEntityConfig({
         fallback: 'Search supplier categories...',
     },
     permissionPrefix: 'supplier_category',
+    formKey: 'supplier_categories',
 });
 
 export const customerCategoryConfig = createSimpleEntityConfig({
@@ -778,6 +784,7 @@ export const customerCategoryConfig = createSimpleEntityConfig({
         fallback: 'Search customer categories...',
     },
     permissionPrefix: 'customer_category',
+    formKey: 'customer_categories',
 });
 
 export const assetCategoryConfig = createComplexEntityConfig<AssetCategory>({

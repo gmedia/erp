@@ -10,6 +10,7 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityForm } from '@/hooks/useEntityForm';
 import {
     productCategoryFormSchema,
@@ -43,6 +44,13 @@ export function ProductCategoryForm({
     onSubmit,
     isLoading = false,
 }: Readonly<ProductCategoryFormProps>) {
+    const { t } = useTranslation();
+    const tf = (key: string, fallback: string) => {
+        const translated = t(`form_fields.product_categories.${key}`);
+        return translated === `form_fields.product_categories.${key}`
+            ? fallback
+            : translated;
+    };
     const form = useEntityForm<ProductCategoryFormData, ProductCategoryEntity>({
         schema: productCategoryFormSchema,
         getDefaults,
@@ -55,12 +63,24 @@ export function ProductCategoryForm({
             open={open}
             onOpenChange={onOpenChange}
             title={
-                entity ? 'Edit Product Category' : 'Add New Product Category'
+                entity
+                    ? tf('edit_title', 'Edit Product Category')
+                    : tf('add_title', 'Add New Product Category')
             }
             onSubmit={onSubmit}
             isLoading={isLoading}
         >
-            <NameField name="name" label="Name" placeholder="e.g., Electronics">
+            <NameField
+                name="name"
+                label={{
+                    key: 'form_fields.product_categories.name',
+                    fallback: 'Name',
+                }}
+                placeholder={{
+                    key: 'form_fields.product_categories.name_placeholder',
+                    fallback: 'e.g., Electronics',
+                }}
+            >
                 <FormMessage />
             </NameField>
 
@@ -69,10 +89,15 @@ export function ProductCategoryForm({
                 name="description"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Description</FormLabel>
+                        <FormLabel>
+                            {tf('description', 'Description')}
+                        </FormLabel>
                         <FormControl>
                             <Textarea
-                                placeholder="Describe this category..."
+                                placeholder={tf(
+                                    'description_placeholder',
+                                    'Describe this category...',
+                                )}
                                 className="min-h-[100px] resize-none"
                                 {...field}
                                 value={field.value || ''}

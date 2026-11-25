@@ -28,6 +28,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 
+import { useTranslation } from '@/contexts/i18n-context';
 import { JournalEntry } from '@/types/journal-entry';
 import { toDateInputValue } from '@/utils/date-format';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
@@ -87,6 +88,13 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
         // Consolidate the input data source
         const data = journalEntry || item || entity;
         const isEdit = !!data;
+        const { t } = useTranslation();
+        const fl = (key: string, fallback: string) => {
+            const translated = t(`form_fields.journal_entries.${key}`);
+            return translated === `form_fields.journal_entries.${key}`
+                ? fallback
+                : translated;
+        };
 
         const defaultValues = useMemo(
             () => getJournalEntryFormDefaults(data),
@@ -145,7 +153,11 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                 }
                 open={open}
                 onOpenChange={onOpenChange}
-                title={isEdit ? 'Edit Journal Entry' : 'Add New Journal Entry'}
+                title={
+                    isEdit
+                        ? fl('edit_title', 'Edit Journal Entry')
+                        : fl('add_title', 'Add New Journal Entry')
+                }
                 onSubmit={handleFormSubmit}
                 isLoading={isLoading}
                 submitDisabled={Math.abs(difference) > 0.01}
@@ -156,19 +168,37 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                         <DatePickerField
                             name="entry_date"
-                            label="Date"
-                            placeholder="Pick a date"
+                            label={{
+                                key: 'form_fields.journal_entries.date',
+                                fallback: 'Date',
+                            }}
+                            placeholder={{
+                                key: 'form_fields.journal_entries.date_placeholder',
+                                fallback: 'Pick a date',
+                            }}
                         />
                         <InputField
                             name="reference"
-                            label="Reference"
-                            placeholder="Ref No."
+                            label={{
+                                key: 'form_fields.journal_entries.reference',
+                                fallback: 'Reference',
+                            }}
+                            placeholder={{
+                                key: 'form_fields.journal_entries.reference_placeholder',
+                                fallback: 'Ref No.',
+                            }}
                         />
                         <div className="md:col-span-3">
                             <InputField
                                 name="description"
-                                label="Description"
-                                placeholder="Enter description"
+                                label={{
+                                    key: 'form_fields.journal_entries.description',
+                                    fallback: 'Description',
+                                }}
+                                placeholder={{
+                                    key: 'form_fields.journal_entries.description_placeholder',
+                                    fallback: 'Enter description',
+                                }}
                             />
                         </div>
                     </div>
@@ -177,7 +207,7 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                     <div className="space-y-4">
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <h3 className="text-lg font-medium">
-                                Journal Lines
+                                {fl('lines_title', 'Journal Lines')}
                             </h3>
                             <Button
                                 type="button"
@@ -187,7 +217,7 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                                 className="w-full sm:w-auto"
                             >
                                 <Plus className="mr-2 h-4 w-4" />
-                                Add Line
+                                {fl('add_line', 'Add Line')}
                             </Button>
                         </div>
                         <div className="min-w-0 rounded-md border">
@@ -195,16 +225,16 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead className="w-[30%]">
-                                            Account
+                                            {fl('column_account', 'Account')}
                                         </TableHead>
                                         <TableHead className="w-[20%] text-right">
-                                            Debit
+                                            {fl('column_debit', 'Debit')}
                                         </TableHead>
                                         <TableHead className="w-[20%] text-right">
-                                            Credit
+                                            {fl('column_credit', 'Credit')}
                                         </TableHead>
                                         <TableHead className="w-[20%]">
-                                            Memo
+                                            {fl('column_memo', 'Memo')}
                                         </TableHead>
                                         <TableHead className="w-[10%] text-right"></TableHead>
                                     </TableRow>
@@ -216,7 +246,10 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                                                 colSpan={5}
                                                 className="h-24 text-center text-muted-foreground"
                                             >
-                                                No lines added yet.
+                                                {fl(
+                                                    'no_lines',
+                                                    'No lines added yet.',
+                                                )}
                                             </TableCell>
                                         </TableRow>
                                     ) : (
@@ -230,7 +263,10 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                                                             ? `${currentLine.account_code} - `
                                                             : ''}
                                                         {currentLine.account_name ||
-                                                            'Selected Account'}
+                                                            fl(
+                                                                'selected_account',
+                                                                'Selected Account',
+                                                            )}
                                                     </TableCell>
                                                     <TableCell className="text-right">
                                                         {formatCurrencyByRegionalSettings(
@@ -300,7 +336,7 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                                 <TableFooter>
                                     <TableRow>
                                         <TableCell className="font-bold">
-                                            Total
+                                            {fl('total', 'Total')}
                                         </TableCell>
                                         <TableCell className="text-right font-bold">
                                             {formatCurrencyByRegionalSettings(
@@ -331,7 +367,7 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                                                         : 'font-bold text-success'
                                                 }
                                             >
-                                                Diff:{' '}
+                                                {fl('difference', 'Diff')}:{' '}
                                                 {formatCurrencyByRegionalSettings(
                                                     difference,
                                                     {

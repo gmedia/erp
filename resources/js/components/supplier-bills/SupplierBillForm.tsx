@@ -14,7 +14,7 @@ import {
 } from '@/components/common/EntityFormItemTable';
 import { InputField } from '@/components/common/InputField';
 import { PostedDocumentLockNotice } from '@/components/common/PostedDocumentLockNotice';
-import SelectField from '@/components/common/SelectField';
+import { StatusSelectField } from '@/components/common/StatusSelectField';
 import { TextareaField } from '@/components/common/TextareaField';
 import {
     Table,
@@ -24,6 +24,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import {
@@ -150,6 +151,13 @@ export const SupplierBillForm = memo<SupplierBillFormProps>(
         onSubmit,
         isLoading = false,
     }) {
+        const { t } = useTranslation();
+        const fl = (key: string, fallback: string) => {
+            const translated = t(`form_fields.supplier_bills.${key}`);
+            return translated === `form_fields.supplier_bills.${key}`
+                ? fallback
+                : translated;
+        };
         const isLocked = isPostedDocumentLocked(entity);
         const defaultValues = useMemo(
             () => getSupplierBillFormDefaults(entity),
@@ -202,7 +210,11 @@ export const SupplierBillForm = memo<SupplierBillFormProps>(
                 form={form}
                 open={open}
                 onOpenChange={onOpenChange}
-                title={entity ? 'Edit Supplier Bill' : 'Add New Supplier Bill'}
+                title={
+                    entity
+                        ? fl('edit_title', 'Edit Supplier Bill')
+                        : fl('add_title', 'Add New Supplier Bill')
+                }
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
                 className="sm:max-w-[1100px]"
@@ -211,89 +223,116 @@ export const SupplierBillForm = memo<SupplierBillFormProps>(
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <InputField
                         name="bill_number"
-                        label="Bill Number"
-                        placeholder="Auto-generated if empty"
+                        label={fl('bill_number', 'Bill Number')}
+                        placeholder={fl(
+                            'bill_number_placeholder',
+                            'Auto-generated if empty',
+                        )}
                     />
 
-                    <SelectField
-                        name="status"
-                        label="Status"
-                        options={[
-                            { value: 'draft', label: 'Draft' },
-                            { value: 'confirmed', label: 'Confirmed' },
-                            {
-                                value: 'partially_paid',
-                                label: 'Partially Paid',
-                            },
-                            { value: 'paid', label: 'Paid' },
-                            { value: 'overdue', label: 'Overdue' },
-                            { value: 'cancelled', label: 'Cancelled' },
-                            { value: 'void', label: 'Void' },
+                    <StatusSelectField
+                        fl={fl}
+                        label={fl('status', 'Status')}
+                        placeholder={fl('status_placeholder', 'Select status')}
+                        statuses={[
+                            ['draft', 'Draft'],
+                            ['confirmed', 'Confirmed'],
+                            ['partially_paid', 'Partially Paid'],
+                            ['paid', 'Paid'],
+                            ['overdue', 'Overdue'],
+                            ['cancelled', 'Cancelled'],
+                            ['void', 'Void'],
                         ]}
-                        placeholder="Select status"
                     />
 
                     <AsyncSelectField
                         name="supplier_id"
-                        label="Supplier"
+                        label={fl('supplier', 'Supplier')}
                         url="/api/suppliers"
-                        placeholder="Select supplier"
+                        placeholder={fl(
+                            'supplier_placeholder',
+                            'Select supplier',
+                        )}
                     />
 
                     <AsyncSelectField
                         name="branch_id"
-                        label="Branch"
+                        label={fl('branch', 'Branch')}
                         url="/api/branches"
-                        placeholder="Select branch"
+                        placeholder={fl('branch_placeholder', 'Select branch')}
                     />
 
                     <AsyncSelectField
                         name="fiscal_year_id"
-                        label="Fiscal Year"
+                        label={fl('fiscal_year', 'Fiscal Year')}
                         url="/api/fiscal-years"
-                        placeholder="Select fiscal year"
+                        placeholder={fl(
+                            'fiscal_year_placeholder',
+                            'Select fiscal year',
+                        )}
                         preferredMetaKey="preferred_fiscal_year_id"
                     />
 
                     <AsyncSelectField
                         name="purchase_order_id"
-                        label="Purchase Order"
+                        label={fl('purchase_order', 'Purchase Order')}
                         url="/api/purchase-orders"
-                        placeholder="Select purchase order"
+                        placeholder={fl(
+                            'purchase_order_placeholder',
+                            'Select purchase order',
+                        )}
                     />
 
                     <AsyncSelectField
                         name="goods_receipt_id"
-                        label="Goods Receipt"
+                        label={fl('goods_receipt', 'Goods Receipt')}
                         url="/api/goods-receipts"
-                        placeholder="Select goods receipt"
+                        placeholder={fl(
+                            'goods_receipt_placeholder',
+                            'Select goods receipt',
+                        )}
                     />
 
                     <InputField
                         name="supplier_invoice_number"
-                        label="Supplier Invoice Number"
-                        placeholder="Supplier invoice number"
+                        label={fl(
+                            'supplier_invoice_number',
+                            'Supplier Invoice Number',
+                        )}
+                        placeholder={fl(
+                            'supplier_invoice_number_placeholder',
+                            'Supplier invoice number',
+                        )}
                     />
 
                     <DatePickerField
                         name="supplier_invoice_date"
-                        label="Supplier Invoice Date"
+                        label={fl(
+                            'supplier_invoice_date',
+                            'Supplier Invoice Date',
+                        )}
                     />
 
-                    <DatePickerField name="bill_date" label="Bill Date" />
-                    <DatePickerField name="due_date" label="Due Date" />
+                    <DatePickerField
+                        name="bill_date"
+                        label={fl('bill_date', 'Bill Date')}
+                    />
+                    <DatePickerField
+                        name="due_date"
+                        label={fl('due_date', 'Due Date')}
+                    />
 
                     <InputField
                         name="payment_terms"
-                        label="Payment Terms"
-                        placeholder="Net 30"
+                        label={fl('payment_terms', 'Payment Terms')}
+                        placeholder={fl('payment_terms_placeholder', 'Net 30')}
                     />
 
                     <div className="md:col-span-2">
                         <TextareaField
                             name="notes"
-                            label="Notes"
-                            placeholder="Notes"
+                            label={fl('notes', 'Notes')}
+                            placeholder={fl('notes_placeholder', 'Notes')}
                             rows={2}
                         />
                     </div>
@@ -310,26 +349,31 @@ export const SupplierBillForm = memo<SupplierBillFormProps>(
                             <TableHeader>
                                 <TableRow>
                                     <TableHead className="w-[220px]">
-                                        Description
+                                        {fl(
+                                            'column_description',
+                                            'Description',
+                                        )}
                                     </TableHead>
                                     <TableHead className="w-[140px]">
-                                        Account
+                                        {fl('column_account', 'Account')}
                                     </TableHead>
                                     <TableHead className="w-[120px]">
-                                        Qty
+                                        {fl('column_qty', 'Qty')}
                                     </TableHead>
                                     <TableHead className="w-[140px]">
-                                        Unit Price
+                                        {fl('column_unit_price', 'Unit Price')}
                                     </TableHead>
                                     <TableHead className="w-[130px]">
-                                        Disc %
+                                        {fl('column_disc_percent', 'Disc %')}
                                     </TableHead>
                                     <TableHead className="w-[130px]">
-                                        Tax %
+                                        {fl('column_tax_percent', 'Tax %')}
                                     </TableHead>
-                                    <TableHead>Notes</TableHead>
+                                    <TableHead>
+                                        {fl('column_notes', 'Notes')}
+                                    </TableHead>
                                     <TableHead className="w-[120px] text-right">
-                                        Action
+                                        {fl('column_action', 'Action')}
                                     </TableHead>
                                 </TableRow>
                             </TableHeader>

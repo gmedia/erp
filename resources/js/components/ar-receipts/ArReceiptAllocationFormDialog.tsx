@@ -60,16 +60,16 @@ export function ArReceiptAllocationFormDialog({
         () =>
             z.object({
                 customer_invoice_id: z.string().min(1, {
-                    message: t('arReceipt.allocation.invoice_required'),
+                    message: 'validation.ar_receipt.invoice_required',
                 }),
                 invoice_label: z.string().optional(),
                 allocated_amount: z.coerce.number().gt(0, {
-                    message: t('arReceipt.allocation.amount_positive'),
+                    message: 'validation.ar_receipt.allocated_amount_gt_zero',
                 }),
                 discount_given: z.coerce.number().min(0).optional().default(0),
                 notes: z.string().optional(),
             }),
-        [t],
+        [],
     );
     const defaultValues = useMemo<ArReceiptAllocationFormData>(() => {
         if (!item) {

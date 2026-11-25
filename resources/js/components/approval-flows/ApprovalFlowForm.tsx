@@ -11,6 +11,7 @@ import NameField from '@/components/common/NameField';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
 import { APPROVABLE_TYPE_OPTIONS } from '@/constants/model-options';
+import { useTranslation } from '@/contexts/i18n-context';
 import { type ApprovalFlow } from '@/types/entity';
 import {
     approvalFlowFormSchema,
@@ -89,6 +90,13 @@ export const ApprovalFlowForm = memo<ApprovalFlowFormProps>(
         onSubmit,
         isLoading = false,
     }) {
+        const { t } = useTranslation();
+        const fl = (key: string, fallback: string) => {
+            const translated = t(`form_fields.approval_flows.${key}`);
+            return translated === `form_fields.approval_flows.${key}`
+                ? fallback
+                : translated;
+        };
         const defaultValues = useMemo(() => getFormDefaults(entity), [entity]);
 
         const form = useForm<
@@ -132,7 +140,11 @@ export const ApprovalFlowForm = memo<ApprovalFlowFormProps>(
                 form={form}
                 open={open}
                 onOpenChange={onOpenChange}
-                title={entity ? 'Edit Approval Flow' : 'Add New Approval Flow'}
+                title={
+                    entity
+                        ? fl('edit_title', 'Edit Approval Flow')
+                        : fl('add_title', 'Add New Approval Flow')
+                }
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
                 className="max-w-4xl"
@@ -141,43 +153,61 @@ export const ApprovalFlowForm = memo<ApprovalFlowFormProps>(
                     <div className="grid grid-cols-2 gap-4">
                         <NameField
                             name="name"
-                            label="Flow Name"
-                            placeholder="e.g. Standard PR Flow"
+                            label={fl('name', 'Flow Name')}
+                            placeholder={fl(
+                                'name_placeholder',
+                                'e.g. Standard PR Flow',
+                            )}
                         />
                         <InputField
                             name="code"
-                            label="Code"
-                            placeholder="e.g. std_pr_flow"
+                            label={fl('code', 'Code')}
+                            placeholder={fl(
+                                'code_placeholder',
+                                'e.g. std_pr_flow',
+                            )}
                         />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <SelectField
                             name="approvable_type"
-                            label="Approvable Type"
+                            label={fl('approvable_type', 'Approvable Type')}
                             options={[...APPROVABLE_TYPE_OPTIONS]}
                         />
                         <SelectField
                             name="is_active"
-                            label="Status"
+                            label={fl('status', 'Status')}
                             options={[
-                                { value: 'true', label: 'Active' },
-                                { value: 'false', label: 'Inactive' },
+                                {
+                                    value: 'true',
+                                    label: fl('status_active', 'Active'),
+                                },
+                                {
+                                    value: 'false',
+                                    label: fl('status_inactive', 'Inactive'),
+                                },
                             ]}
                         />
                     </div>
 
                     <TextareaField
                         name="description"
-                        label="Description"
-                        placeholder="Enter flow description"
+                        label={fl('description', 'Description')}
+                        placeholder={fl(
+                            'description_placeholder',
+                            'Enter flow description',
+                        )}
                         rows={2}
                     />
 
                     <TextareaField
                         name="conditions"
-                        label="Conditions (JSON)"
-                        placeholder='e.g. {"field": "amount", "operator": ">", "value": 1000}'
+                        label={fl('conditions', 'Conditions (JSON)')}
+                        placeholder={fl(
+                            'conditions_placeholder',
+                            'e.g. {"field": "amount", "operator": ">", "value": 1000}',
+                        )}
                         rows={2}
                     />
 

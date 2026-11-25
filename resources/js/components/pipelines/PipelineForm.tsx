@@ -10,6 +10,7 @@ import { InputField } from '@/components/common/InputField';
 import NameField from '@/components/common/NameField';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
+import { useTranslation } from '@/contexts/i18n-context';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { APPROVABLE_TYPE_OPTIONS } from '@/constants/model-options';
@@ -26,52 +27,60 @@ interface PipelineFormProps {
     isLoading?: boolean;
 }
 
-const renderBasicInfoSection = () => (
+type PipelineFieldLabeler = (key: string, fallback: string) => string;
+
+const renderBasicInfoSection = (fl: PipelineFieldLabeler) => (
     <>
         <NameField
             name="name"
-            label="Pipeline Name"
-            placeholder="e.g. Asset Lifecycle"
+            label={fl('name', 'Pipeline Name')}
+            placeholder={fl('name_placeholder', 'e.g. Asset Lifecycle')}
         />
         <InputField
             name="code"
-            label="Code"
-            placeholder="e.g. asset_lifecycle"
+            label={fl('code', 'Code')}
+            placeholder={fl('code_placeholder', 'e.g. asset_lifecycle')}
         />
         <SelectField
             name="entity_type"
-            label="Entity Type"
+            label={fl('entity_type', 'Entity Type')}
             options={[...APPROVABLE_TYPE_OPTIONS]}
         />
         <InputField
             name="version"
-            label="Version"
+            label={fl('version', 'Version')}
             type="number"
-            placeholder="1"
+            placeholder={fl('version_placeholder', '1')}
         />
     </>
 );
 
-const renderDetailsSection = () => (
+const renderDetailsSection = (fl: PipelineFieldLabeler) => (
     <>
         <TextareaField
             name="description"
-            label="Description"
-            placeholder="Enter pipeline description"
+            label={fl('description', 'Description')}
+            placeholder={fl(
+                'description_placeholder',
+                'Enter pipeline description',
+            )}
             rows={2}
         />
         <TextareaField
             name="conditions"
-            label="Conditions (JSON)"
-            placeholder='e.g. {"asset_type": "vehicle"}'
+            label={fl('conditions', 'Conditions (JSON)')}
+            placeholder={fl(
+                'conditions_placeholder',
+                'e.g. {"asset_type": "vehicle"}',
+            )}
             rows={3}
         />
         <SelectField
             name="is_active"
-            label="Status"
+            label={fl('status', 'Status')}
             options={[
-                { value: 'true', label: 'Active' },
-                { value: 'false', label: 'Inactive' },
+                { value: 'true', label: fl('status_active', 'Active') },
+                { value: 'false', label: fl('status_inactive', 'Inactive') },
             ]}
         />
     </>
@@ -110,6 +119,13 @@ export const PipelineForm = memo<PipelineFormProps>(function PipelineForm({
     onSubmit,
     isLoading = false,
 }) {
+    const { t } = useTranslation();
+    const fl: PipelineFieldLabeler = (key, fallback) => {
+        const translated = t(`form_fields.pipelines.${key}`);
+        return translated === `form_fields.pipelines.${key}`
+            ? fallback
+            : translated;
+    };
     const defaultValues = useMemo(
         () => getPipelineFormDefaults(entity),
         [entity],
@@ -144,23 +160,31 @@ export const PipelineForm = memo<PipelineFormProps>(function PipelineForm({
             }
             open={open}
             onOpenChange={onOpenChange}
-            title={entity ? 'Edit Pipeline' : 'Add New Pipeline'}
+            title={
+                entity
+                    ? fl('edit_title', 'Edit Pipeline')
+                    : fl('add_title', 'Add New Pipeline')
+            }
             onSubmit={handleSubmit}
             isLoading={isLoading}
         >
             {entity ? (
                 <Tabs defaultValue="details">
                     <TabsList className="mb-4">
-                        <TabsTrigger value="details">Details</TabsTrigger>
-                        <TabsTrigger value="states">States</TabsTrigger>
+                        <TabsTrigger value="details">
+                            {fl('tab_details', 'Details')}
+                        </TabsTrigger>
+                        <TabsTrigger value="states">
+                            {fl('tab_states', 'States')}
+                        </TabsTrigger>
                         <TabsTrigger value="transitions">
-                            Transitions
+                            {fl('tab_transitions', 'Transitions')}
                         </TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="details" className="space-y-4">
-                        {renderBasicInfoSection()}
-                        {renderDetailsSection()}
+                        {renderBasicInfoSection(fl)}
+                        {renderDetailsSection(fl)}
                     </TabsContent>
 
                     <TabsContent value="states" className="space-y-4">
@@ -173,8 +197,8 @@ export const PipelineForm = memo<PipelineFormProps>(function PipelineForm({
                 </Tabs>
             ) : (
                 <div className="space-y-4">
-                    {renderBasicInfoSection()}
-                    {renderDetailsSection()}
+                    {renderBasicInfoSection(fl)}
+                    {renderDetailsSection(fl)}
                 </div>
             )}
         </EntityForm>

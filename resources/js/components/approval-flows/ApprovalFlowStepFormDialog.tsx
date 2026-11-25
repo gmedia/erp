@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { Form } from '@/components/ui/form';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useTranslation } from '@/contexts/i18n-context';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
@@ -36,6 +37,13 @@ export function ApprovalFlowStepFormDialog({
     step,
     onSave,
 }: Readonly<ApprovalFlowStepFormDialogProps>) {
+    const { t } = useTranslation();
+    const fl = (key: string, fallback: string) => {
+        const translated = t(`form_fields.approval_flow_steps.${key}`);
+        return translated === `form_fields.approval_flow_steps.${key}`
+            ? fallback
+            : translated;
+    };
     const defaultValues = useMemo<ApprovalFlowStepFormInput>(() => {
         if (!step) {
             return {
@@ -83,12 +91,20 @@ export function ApprovalFlowStepFormDialog({
             <DialogContent className="flex max-h-[90vh] max-w-xl flex-col overflow-hidden">
                 <DialogHeader>
                     <DialogTitle>
-                        {step ? 'Edit Approval Step' : 'Add Approval Step'}
+                        {step
+                            ? fl('dialog_edit_title', 'Edit Approval Step')
+                            : fl('dialog_add_title', 'Add Approval Step')}
                     </DialogTitle>
                     <DialogDescription className="sr-only">
                         {step
-                            ? 'Edit the details of this approval step.'
-                            : 'Add a new approval step to the flow.'}
+                            ? fl(
+                                  'dialog_edit_description',
+                                  'Edit the details of this approval step.',
+                              )
+                            : fl(
+                                  'dialog_add_description',
+                                  'Add a new approval step to the flow.',
+                              )}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -105,24 +121,39 @@ export function ApprovalFlowStepFormDialog({
                                 <div className="grid grid-cols-2 gap-4">
                                     <InputField
                                         name="name"
-                                        label="Step Name"
-                                        placeholder="e.g. Manager Approval"
+                                        label={fl('name', 'Step Name')}
+                                        placeholder={fl(
+                                            'name_placeholder',
+                                            'e.g. Manager Approval',
+                                        )}
                                     />
                                     <SelectField
                                         name="required_action"
-                                        label="Required Action"
+                                        label={fl(
+                                            'required_action',
+                                            'Required Action',
+                                        )}
                                         options={[
                                             {
                                                 value: 'approve',
-                                                label: 'Approve',
+                                                label: fl(
+                                                    'action_approve',
+                                                    'Approve',
+                                                ),
                                             },
                                             {
                                                 value: 'review',
-                                                label: 'Review',
+                                                label: fl(
+                                                    'action_review',
+                                                    'Review',
+                                                ),
                                             },
                                             {
                                                 value: 'acknowledge',
-                                                label: 'Acknowledge',
+                                                label: fl(
+                                                    'action_acknowledge',
+                                                    'Acknowledge',
+                                                ),
                                             },
                                         ]}
                                     />
@@ -131,7 +162,7 @@ export function ApprovalFlowStepFormDialog({
                                 <div className="grid grid-cols-2 gap-4">
                                     <AsyncSelectField
                                         name="approver_user_id"
-                                        label="Approver"
+                                        label={fl('approver', 'Approver')}
                                         url="/api/users"
                                         labelFn={(
                                             user: Record<string, unknown>,
@@ -139,26 +170,44 @@ export function ApprovalFlowStepFormDialog({
                                         valueFn={(
                                             user: Record<string, unknown>,
                                         ) => String(user.id)}
-                                        placeholder="Select approver..."
+                                        placeholder={fl(
+                                            'approver_placeholder',
+                                            'Select approver...',
+                                        )}
                                     />
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <InputField
                                         name="auto_approve_after_hours"
-                                        label="Auto Approve After (Hours)"
+                                        label={fl(
+                                            'auto_approve_after_hours',
+                                            'Auto Approve After (Hours)',
+                                        )}
                                         type="number"
-                                        placeholder="e.g. 48"
+                                        placeholder={fl(
+                                            'auto_approve_after_hours_placeholder',
+                                            'e.g. 48',
+                                        )}
                                     />
                                     <InputField
                                         name="escalate_after_hours"
-                                        label="Escalate After (Hours)"
+                                        label={fl(
+                                            'escalate_after_hours',
+                                            'Escalate After (Hours)',
+                                        )}
                                         type="number"
-                                        placeholder="e.g. 24"
+                                        placeholder={fl(
+                                            'escalate_after_hours_placeholder',
+                                            'e.g. 24',
+                                        )}
                                     />
                                     <AsyncSelectField
                                         name="escalation_user_id"
-                                        label="Escalate To User"
+                                        label={fl(
+                                            'escalation_user',
+                                            'Escalate To User',
+                                        )}
                                         url="/api/users"
                                         labelFn={(
                                             user: Record<string, unknown>,
@@ -166,14 +215,29 @@ export function ApprovalFlowStepFormDialog({
                                         valueFn={(
                                             user: Record<string, unknown>,
                                         ) => String(user.id)}
-                                        placeholder="Select user..."
+                                        placeholder={fl(
+                                            'escalation_user_placeholder',
+                                            'Select user...',
+                                        )}
                                     />
                                     <SelectField
                                         name="can_reject"
-                                        label="Can Reject"
+                                        label={fl('can_reject', 'Can Reject')}
                                         options={[
-                                            { value: 'true', label: 'Yes' },
-                                            { value: 'false', label: 'No' },
+                                            {
+                                                value: 'true',
+                                                label: fl(
+                                                    'can_reject_yes',
+                                                    'Yes',
+                                                ),
+                                            },
+                                            {
+                                                value: 'false',
+                                                label: fl(
+                                                    'can_reject_no',
+                                                    'No',
+                                                ),
+                                            },
                                         ]}
                                     />
                                 </div>
@@ -186,9 +250,11 @@ export function ApprovalFlowStepFormDialog({
                                 variant="outline"
                                 onClick={() => onOpenChange(false)}
                             >
-                                Cancel
+                                {fl('cancel', 'Cancel')}
                             </Button>
-                            <Button type="submit">Save Step</Button>
+                            <Button type="submit">
+                                {fl('save', 'Save Step')}
+                            </Button>
                         </DialogFooter>
                     </form>
                 </Form>

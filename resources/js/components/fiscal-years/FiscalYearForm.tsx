@@ -6,6 +6,7 @@ import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
 import NameField from '@/components/common/NameField';
 import SelectField from '@/components/common/SelectField';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityForm } from '@/hooks/useEntityForm';
 import { type FiscalYear } from '@/types/entity';
 import { fiscalYearFormSchema, type FiscalYearFormData } from '@/utils/schemas';
@@ -34,6 +35,14 @@ export function FiscalYearForm({
     onSubmit,
     isLoading = false,
 }: Readonly<FiscalYearFormProps>) {
+    const { t } = useTranslation();
+    const fl = (key: string, fallback: string) => {
+        const translated = t(`form_fields.fiscal_years.${key}`);
+        return translated === `form_fields.fiscal_years.${key}`
+            ? fallback
+            : translated;
+    };
+
     const form = useEntityForm<FiscalYearFormInput, FiscalYear>({
         schema: fiscalYearFormSchema,
         getDefaults,
@@ -49,25 +58,39 @@ export function FiscalYearForm({
             form={form}
             open={open}
             onOpenChange={onOpenChange}
-            title={entity ? 'Edit Fiscal Year' : 'Add New Fiscal Year'}
+            title={
+                entity
+                    ? fl('edit_title', 'Edit Fiscal Year')
+                    : fl('add_title', 'Add New Fiscal Year')
+            }
             onSubmit={handleFormSubmit}
             isLoading={isLoading}
         >
-            <NameField name="name" label="Name" placeholder="e.g., 2026" />
+            <NameField
+                name="name"
+                label={fl('name', 'Name')}
+                placeholder={fl('name_placeholder', 'e.g., 2026')}
+            />
 
             <div className="grid grid-cols-2 gap-4">
-                <DatePickerField name="start_date" label="Start Date" />
-                <DatePickerField name="end_date" label="End Date" />
+                <DatePickerField
+                    name="start_date"
+                    label={fl('start_date', 'Start Date')}
+                />
+                <DatePickerField
+                    name="end_date"
+                    label={fl('end_date', 'End Date')}
+                />
             </div>
 
             <SelectField
                 name="status"
-                label="Status"
-                placeholder="Select status"
+                label={fl('status', 'Status')}
+                placeholder={fl('status_placeholder', 'Select status')}
                 options={[
-                    { label: 'Open', value: 'open' },
-                    { label: 'Closed', value: 'closed' },
-                    { label: 'Locked', value: 'locked' },
+                    { label: fl('status_open', 'Open'), value: 'open' },
+                    { label: fl('status_closed', 'Closed'), value: 'closed' },
+                    { label: fl('status_locked', 'Locked'), value: 'locked' },
                 ]}
             />
         </EntityForm>

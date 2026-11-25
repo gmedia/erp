@@ -12,6 +12,7 @@ import {
 } from '@/components/common/ItemFormDialog';
 import { ItemPricingFields } from '@/components/common/ItemPricingFields';
 import { TextareaField } from '@/components/common/TextareaField';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type SupplierBillFormData } from '@/types/supplier-bill';
 import { transactionItemPricingSchema } from '@/utils/schemas';
@@ -19,9 +20,13 @@ import { transactionItemPricingSchema } from '@/utils/schemas';
 const supplierBillItemSchema = z.object({
     product_id: z.string().optional(),
     product_label: z.string().optional(),
-    account_id: z.string().min(1, { message: 'Account is required.' }),
+    account_id: z.string().min(1, {
+        message: 'validation.supplier_bill.account_required',
+    }),
     account_label: z.string().optional(),
-    description: z.string().min(1, { message: 'Description is required.' }),
+    description: z.string().min(1, {
+        message: 'validation.supplier_bill.description_required',
+    }),
     ...transactionItemPricingSchema,
     goods_receipt_item_id: z.string().optional(),
     notes: z.string().optional(),
@@ -42,6 +47,13 @@ export function SupplierBillItemFormDialog({
     item,
     onSave,
 }: SupplierBillItemFormDialogProps) {
+    const { t } = useTranslation();
+    const fl = (key: string, fallback: string) => {
+        const translated = t(`form_fields.supplier_bills.${key}`);
+        return translated === `form_fields.supplier_bills.${key}`
+            ? fallback
+            : translated;
+    };
     const defaultValues = useMemo<SupplierBillItemFormData>(() => {
         if (!item) {
             return {
@@ -101,8 +113,11 @@ export function SupplierBillItemFormDialog({
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <InputField
                     name="description"
-                    label="Description"
-                    placeholder="Item description"
+                    label={fl('item_description', 'Description')}
+                    placeholder={fl(
+                        'item_description_placeholder',
+                        'Item description',
+                    )}
                 />
                 <ItemAccountSelectField
                     form={form}
@@ -117,8 +132,8 @@ export function SupplierBillItemFormDialog({
 
             <TextareaField
                 name="notes"
-                label="Notes"
-                placeholder="Item notes"
+                label={fl('item_notes', 'Notes')}
+                placeholder={fl('item_notes_placeholder', 'Item notes')}
                 rows={2}
             />
         </ItemFormDialogShell>
