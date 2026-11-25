@@ -2314,6 +2314,12 @@
         }
     },
     "validation": {
+        "common": {
+            "email_invalid": "Masukkan alamat email yang valid.",
+            "phone_min_10": "Nomor telepon minimal 10 digit.",
+            "phone_invalid": "Masukkan nomor telepon yang valid.",
+            "salary_invalid": "Masukkan nominal gaji yang valid (mis. 50000 atau 50000.00)."
+        },
         "pipeline": {
             "name_min_2": "Nama minimal 2 karakter.",
             "code_min_2": "Kode minimal 2 karakter.",

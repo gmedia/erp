@@ -656,3 +656,17 @@ test('simple entity form keys keep the english text and exist in both locales', 
     expect($id['departments']['add_title'])->toBe('Tambah Departemen Baru')
         ->and($id['customer_categories']['add_title'])->toBe('Tambah Kategori Pelanggan Baru');
 });
+
+test('shared validation messages keep the english text and exist in both locales', function () {
+    $enValidation = localeValidationTranslations('en.json');
+    $idValidation = localeValidationTranslations('id.json');
+
+    expect($enValidation['common'])->toEqual([
+        'email_invalid' => 'Please enter a valid email address.',
+        'phone_min_10' => 'Phone number must be at least 10 digits.',
+        'phone_invalid' => 'Please enter a valid phone number.',
+        'salary_invalid' => 'Please enter a valid salary amount (e.g., 50000 or 50000.00).',
+    ])
+        ->and(array_keys($idValidation['common']))->toEqual(array_keys($enValidation['common']))
+        ->and($idValidation['common']['phone_invalid'])->toBe('Masukkan nomor telepon yang valid.');
+});

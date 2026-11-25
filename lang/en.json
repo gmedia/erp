@@ -2314,6 +2314,12 @@
         }
     },
     "validation": {
+        "common": {
+            "email_invalid": "Please enter a valid email address.",
+            "phone_min_10": "Phone number must be at least 10 digits.",
+            "phone_invalid": "Please enter a valid phone number.",
+            "salary_invalid": "Please enter a valid salary amount (e.g., 50000 or 50000.00)."
+        },
         "pipeline": {
             "name_min_2": "Name must be at least 2 characters.",
             "code_min_2": "Code must be at least 2 characters.",

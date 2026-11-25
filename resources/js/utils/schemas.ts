@@ -48,7 +48,7 @@ const isValidEmailAddress = (value: string): boolean => {
 
 const emailValidator = () =>
     z.string().refine((value) => isValidEmailAddress(value), {
-        message: 'Please enter a valid email address.',
+        message: 'validation.common.email_invalid',
     });
 
 // Schema for approval delegations
@@ -126,9 +126,9 @@ export const employeeFormSchema = z.object({
     email: emailValidator(),
     phone: z
         .string()
-        .min(10, { message: 'Phone number must be at least 10 digits.' })
+        .min(10, { message: 'validation.common.phone_min_10' })
         .regex(/^[\d\s\-+().]+$/, {
-            message: 'Please enter a valid phone number.',
+            message: 'validation.common.phone_invalid',
         })
         .or(z.literal(''))
         .optional(),
@@ -152,8 +152,7 @@ export const employeeFormSchema = z.object({
             z.union([
                 z.literal(''),
                 z.string().regex(/^\d+(\.\d{1,2})?$/, {
-                    message:
-                        'Please enter a valid salary amount (e.g., 50000 or 50000.00).',
+                    message: 'validation.common.salary_invalid',
                 }),
             ]),
         ),
@@ -174,9 +173,9 @@ export const customerFormSchema = z.object({
     email: emailValidator(),
     phone: z
         .string()
-        .min(10, { message: 'Phone number must be at least 10 digits.' })
+        .min(10, { message: 'validation.common.phone_min_10' })
         .regex(/^[\d\s\-+().]+$/, {
-            message: 'Please enter a valid phone number.',
+            message: 'validation.common.phone_invalid',
         })
         .or(z.literal('')),
     address: z
@@ -202,9 +201,9 @@ export const supplierFormSchema = z.object({
     email: z.union([emailValidator(), z.literal('')]).optional(),
     phone: z
         .string()
-        .min(10, { message: 'Phone number must be at least 10 digits.' })
+        .min(10, { message: 'validation.common.phone_min_10' })
         .regex(/^[\d\s\-+().]+$/, {
-            message: 'Please enter a valid phone number.',
+            message: 'validation.common.phone_invalid',
         })
         .or(z.literal('')),
     address: z.string().optional(),
