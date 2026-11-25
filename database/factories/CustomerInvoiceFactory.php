@@ -8,6 +8,7 @@ use App\Models\CustomerInvoice;
 use App\Models\FiscalYear;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Carbon;
 
 class CustomerInvoiceFactory extends Factory
 {
@@ -15,6 +16,10 @@ class CustomerInvoiceFactory extends Factory
 
     public function definition(): array
     {
+        // Relatif terhadap now() (ikut Carbon::setTestNow) agar tanggal dokumen
+        // tidak pernah melewati as_of yang dibekukan test.
+        $invoiceDate = now()->subDays($this->faker->numberBetween(1, 60));
+
         $status = $this->faker->randomElement([
             'draft',
             'sent',
@@ -35,8 +40,8 @@ class CustomerInvoiceFactory extends Factory
             'customer_id' => Customer::factory(),
             'branch_id' => Branch::factory(),
             'fiscal_year_id' => FiscalYear::factory(),
-            'invoice_date' => $this->faker->date(),
-            'due_date' => $this->faker->dateTimeBetween('now', '+60 days')->format('Y-m-d'),
+            'invoice_date' => $invoiceDate->format('Y-m-d'),
+            'due_date' => $this->faker->dateTimeBetween($invoiceDate, $invoiceDate->copy()->addDays(60))->format('Y-m-d'),
             'payment_terms' => $this->faker->optional()->randomElement(['Net 7', 'Net 14', 'Net 30', 'Net 60', 'COD']),
             'currency' => 'IDR',
             'subtotal' => $this->faker->randomFloat(2, 100000, 10000000),
@@ -81,12 +86,16 @@ class CustomerInvoiceFactory extends Factory
 
     public function overdue(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'status' => 'overdue',
-            'due_date' => $this->faker->dateTimeBetween('-30 days', '-1 day')->format('Y-m-d'),
-            'sent_by' => User::factory(),
-            'sent_at' => now(),
-        ]);
+        return $this->state(function (array $attributes) {
+            $invoiceDate = Carbon::parse($attributes['invoice_date']);
+
+            return [
+                'status' => 'overdue',
+                'due_date' => $this->faker->dateTimeBetween($invoiceDate, now()->subDay())->format('Y-m-d'),
+                'sent_by' => User::factory(),
+                'sent_at' => now(),
+            ];
+        });
     }
 
     public function cancelled(): static
