@@ -55,13 +55,41 @@ export function NavMain({ items = [] }: Readonly<{ items: NavItem[] }>) {
 
     const allHrefs = useMemo(() => collectNavHrefs(items), [items]);
 
-    // Item aktif di bawah area fade harus ikut terlihat (W5-12).
+    // Item aktif di bawah area fade harus ikut terlihat (W5-12), tanpa
+    // tertutup header logo (#504 butir 5).
     useEffect(() => {
-        const active = document.querySelector<HTMLElement>(
-            '[data-slot="sidebar-content"] [data-active="true"]',
-        );
+        const frame = requestAnimationFrame(() => {
+            const active = document.querySelector<HTMLElement>(
+                '[data-slot="sidebar-content"] [data-active="true"]',
+            );
+            const container = active?.closest<HTMLElement>(
+                '[data-slot="sidebar-content"]',
+            );
+            const header = document.querySelector<HTMLElement>(
+                '[data-slot="sidebar-header"]',
+            );
+            if (!active || !container || !header) return;
 
-        active?.scrollIntoView({ block: 'center', inline: 'nearest' });
+            const activeRect = active.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            const safeTop = Math.max(
+                containerRect.top,
+                header.getBoundingClientRect().bottom,
+            );
+            const safeBottom = containerRect.bottom;
+            if (
+                activeRect.top >= safeTop &&
+                activeRect.bottom <= safeBottom
+            ) {
+                return;
+            }
+
+            container.scrollTop +=
+                activeRect.top < safeTop
+                    ? activeRect.top - safeTop
+                    : activeRect.bottom - safeBottom;
+        });
+        return () => cancelAnimationFrame(frame);
     }, [location.pathname]);
 
     return (
