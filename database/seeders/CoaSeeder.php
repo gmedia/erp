@@ -206,7 +206,7 @@ class CoaSeeder extends Seeder
         app(PostOpeningCapitalJournalAction::class)->execute(
             $fiscalYear->start_date->format('Y-m-d'),
             500000000,
-            'OPEN-CAP-' . $fiscalYear->name,
+            'OPEN-CAP-'.$fiscalYear->name,
             'Saldo awal modal disetor pemilik',
         );
     }

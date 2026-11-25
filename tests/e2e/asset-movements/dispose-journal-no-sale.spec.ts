@@ -37,7 +37,7 @@ test('pelepasan tanpa hasil penjualan tidak menampilkan akun penerimaan dan ters
     expect((await disposeResponse).status()).toBeLessThan(400);
 });
 
-test('profil aset disposed menampilkan hasil penjualan kosong dan tautan jurnal pelepasan', async ({
+test('profil aset disposed tanpa jurnal menampilkan teks tanpa jurnal dan tanpa tautan', async ({
     page,
 }) => {
     await page.goto('/assets');
@@ -72,10 +72,8 @@ test('profil aset disposed menampilkan hasil penjualan kosong dan tautan jurnal 
 
     await page.getByRole('tab', { name: /Movements/ }).click();
     await expect(page.getByText('No sale proceeds').first()).toBeVisible();
-    await expect(
-        page.getByTestId('disposal-journal-link').first(),
-    ).toBeVisible();
-    await expect(page.getByTestId('disposal-journal-link').first()).toHaveText(
-        /View disposal journal/i,
+    await expect(page.getByTestId('disposal-no-journal').first()).toHaveText(
+        /no journal/i,
     );
+    await expect(page.getByTestId('disposal-journal-link')).toHaveCount(0);
 });

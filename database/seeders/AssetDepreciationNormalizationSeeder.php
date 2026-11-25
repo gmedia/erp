@@ -12,6 +12,7 @@ use App\Models\AssetDepreciationLine;
 use App\Models\AssetDepreciationRun;
 use App\Models\CoaVersion;
 use App\Models\FiscalYear;
+use App\Models\JournalEntry;
 use App\Models\JournalEntryLine;
 use App\Models\User;
 use Database\Seeders\Concerns\ReopensDemoPeriodClosings;
@@ -71,13 +72,28 @@ class AssetDepreciationNormalizationSeeder extends Seeder
 
         // Jurnal pelepasan (disposed) dan aset hilang hanya setelah akumulasi
         // register final. Dipost lebih awal, akun 12200 tidak ikut didebit (#357, #442).
+        // Hanya aset yang dikapitalisasi di GL (punya jurnal ACQ) yang dijurnal.
+        // Aset yang diperoleh dan dilepas sebelum FY terbuka tidak pernah ada di
+        // buku besar, sehingga pelepasannya tidak dijurnal (keputusan reviewer #442).
         $this->demoAssets()->get()->each(function (Asset $asset): void {
+            if (! $this->hasAcquisitionJournal($asset)) {
+                return;
+            }
+
             if ($asset->status === 'disposed') {
                 app(PostAssetDisposalJournalAction::class)->execute($asset, now()->toDateString());
             } elseif (app(PostAssetLossJournalAction::class)->isPostable($asset)) {
                 app(PostAssetLossJournalAction::class)->execute($asset);
             }
         });
+    }
+
+    private function hasAcquisitionJournal(Asset $asset): bool
+    {
+        return JournalEntry::query()
+            ->where('reference', 'ACQ-'.$asset->asset_code)
+            ->where('status', 'posted')
+            ->exists();
     }
 
     /**
@@ -107,7 +123,7 @@ class AssetDepreciationNormalizationSeeder extends Seeder
 
             $openingAccumulated = (float) JournalEntryLine::query()
                 ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
-                ->where('journal_entries.reference', 'ACQ-' . $asset->asset_code)
+                ->where('journal_entries.reference', 'ACQ-'.$asset->asset_code)
                 ->where('journal_entries.status', 'posted')
                 ->where('journal_entry_lines.account_id', $asset->accumulated_depr_account_id)
                 ->sum('journal_entry_lines.credit');

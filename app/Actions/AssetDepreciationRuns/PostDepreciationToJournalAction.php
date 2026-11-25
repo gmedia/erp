@@ -70,10 +70,10 @@ class PostDepreciationToJournalAction
                 }
 
                 $branchId = $asset->branch_id;
-                $expenseKey = $expenseAccount . '-'
-                    . $branchId;
-                $accumulatedKey = $accumulatedAccount . '-'
-                    . $branchId;
+                $expenseKey = $expenseAccount.'-'
+                    .$branchId;
+                $accumulatedKey = $accumulatedAccount.'-'
+                    .$branchId;
 
                 if (! isset($summary[$expenseKey])) {
                     $summary[$expenseKey] = [
@@ -124,7 +124,7 @@ class PostDepreciationToJournalAction
 
             $journalEntryData = [
                 'entry_date' => $run->period_end->format('Y-m-d'),
-                'reference' => 'DEPR-' . $run->period_start->format('Ym'),
+                'reference' => 'DEPR-'.$run->period_start->format('Ym'),
                 'description' => __('asset_depreciation_run.journal_description', [
                     'period' => $run->period_start->format('M Y'),
                 ]),

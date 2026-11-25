@@ -682,7 +682,7 @@ export default function AssetProfile() {
                                                                             )}
                                                                         </span>
                                                                     )}
-                                                                    {m.disposal_journal_id && (
+                                                                    {m.disposal_journal_id ? (
                                                                         <a
                                                                             href="/journal-entries"
                                                                             className="ml-2 text-primary underline"
@@ -695,6 +695,15 @@ export default function AssetProfile() {
                                                                                 'assets.disposal.viewJournal',
                                                                             )}
                                                                         </a>
+                                                                    ) : (
+                                                                        <span
+                                                                            className="ml-2 text-muted-foreground"
+                                                                            data-testid="disposal-no-journal"
+                                                                        >
+                                                                            {t(
+                                                                                'assets.disposal.noJournal',
+                                                                            )}
+                                                                        </span>
                                                                     )}
                                                                 </div>
                                                             )}

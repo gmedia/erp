@@ -229,7 +229,7 @@ class AssetMovementController extends Controller
 
             $isDisposal = $asset_movement->movement_type === 'dispose';
             $disposalJournalId = $isDisposal
-                ? JournalEntry::where('reference', 'DISP-' . $asset->asset_code)
+                ? JournalEntry::where('reference', 'DISP-'.$asset->asset_code)
                     ->where('journal_type', 'system')
                     ->value('id')
                 : null;
@@ -246,7 +246,7 @@ class AssetMovementController extends Controller
                     if ($disposalJournalId !== null) {
                         $this->reverseDisposalJournal->execute(
                             $asset,
-                            'REV-DISP-' . $asset->asset_code,
+                            'REV-DISP-'.$asset->asset_code,
                             'Pelepasan aset',
                             now()->toDateString(),
                             null,

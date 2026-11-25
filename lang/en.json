@@ -481,6 +481,7 @@
             "receiptPlaceholder": "Select receipt account",
             "viewJournal": "View disposal journal",
             "noSale": "No sale proceeds",
+            "noJournal": "no journal",
             "saleValue": "Sale: :amount"
         }
     },

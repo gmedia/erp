@@ -481,6 +481,7 @@
             "receiptPlaceholder": "Pilih akun penerimaan",
             "viewJournal": "Lihat jurnal pelepasan",
             "noSale": "Tanpa hasil jual",
+            "noJournal": "tanpa jurnal",
             "saleValue": "Hasil jual: :amount"
         }
     },

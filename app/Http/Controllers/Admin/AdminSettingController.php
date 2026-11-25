@@ -114,8 +114,8 @@ class AdminSettingController extends Controller
             return response()->json(['message' => 'Test email sent successfully. Please check your inbox.']);
         } catch (Exception $e) {
             return response()->json([
-                'message' => 'Failed to send email: ' . $e->getMessage(),
-                'errors' => ['test_email' => ['Failed to send email: ' . $e->getMessage()]],
+                'message' => 'Failed to send email: '.$e->getMessage(),
+                'errors' => ['test_email' => ['Failed to send email: '.$e->getMessage()]],
             ], 422);
         }
     }
@@ -133,7 +133,7 @@ class AdminSettingController extends Controller
 
     protected function storeLogoSvg(string $svg): string|false
     {
-        $path = 'branding/logos/company-logo-' . Str::uuid() . '.svg';
+        $path = 'branding/logos/company-logo-'.Str::uuid().'.svg';
 
         try {
             $stored = Storage::disk(config('filesystems.default'))->put($path, $svg);
