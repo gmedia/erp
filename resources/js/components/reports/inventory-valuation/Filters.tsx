@@ -10,7 +10,7 @@ export function createInventoryValuationFilterFields(): FieldDescriptor[] {
             'search',
             { key: 'column.search', fallback: 'Search' },
             {
-                key: 'filter.valuation_search_placeholder',
+                key: 'page.inventory_valuation.search_placeholder',
                 fallback: 'Search product, category, warehouse, branch...',
             },
         ),

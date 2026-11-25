@@ -13,11 +13,10 @@ import {
 
 export function createSupplierReturnFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField(
-            'search',
-            'Search',
-            'Search return number or notes...',
-        ),
+        createTextFilterField('search', 'Search', {
+            key: 'page.supplier_returns.search_placeholder',
+            fallback: 'Search return number or notes...',
+        }),
         createPurchaseOrderFilterField(),
         ...createAsyncSelectFilterFields([
             {

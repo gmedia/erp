@@ -100,7 +100,10 @@ export function PurchaseRequestItemFormDialog({
                 />
                 <InputField
                     name="quantity"
-                    label="Quantity"
+                    label={{
+                        key: 'form_fields.purchase_requests.item_quantity',
+                        fallback: 'Quantity',
+                    }}
                     type="number"
                     min={0}
                     step="any"
@@ -108,7 +111,10 @@ export function PurchaseRequestItemFormDialog({
                 />
                 <InputField
                     name="estimated_unit_price"
-                    label="Est. Unit Price"
+                    label={{
+                        key: 'form_fields.purchase_requests.item_estimated_unit_price',
+                        fallback: 'Est. Unit Price',
+                    }}
                     type="number"
                     min={0}
                     step="any"

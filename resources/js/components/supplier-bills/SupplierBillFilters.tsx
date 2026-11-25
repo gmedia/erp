@@ -24,7 +24,11 @@ export function createSupplierBillFilterFields(): FieldDescriptor[] {
         createTextFilterField(
             'search',
             { key: 'column.search', fallback: 'Search' },
-            'Search bill number, supplier invoice number, or notes...',
+            {
+                key: 'page.supplier_bills.search_placeholder',
+                fallback:
+                    'Search bill number, supplier invoice number, or notes...',
+            },
         ),
         createAsyncSelectFilterField(
             'supplier_id',

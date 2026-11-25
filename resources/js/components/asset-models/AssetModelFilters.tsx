@@ -9,7 +9,10 @@ export function createAssetModelFilterFields(): FieldDescriptor[] {
         createTextFilterField(
             'search',
             { key: 'column.search', fallback: 'Search' },
-            'Search by model name or manufacturer...',
+            {
+                key: 'page.asset_models.search_placeholder',
+                fallback: 'Search by model name or manufacturer...',
+            },
         ),
         createAssetCategoryFilterField('All Categories'),
     ];

@@ -20,9 +20,10 @@ export function createCustomerInvoiceFilterFields(): FieldDescriptor[] {
     ];
 
     return [
-        ...createCustomerFinancialFilterFields(
-            'Search invoice number, customer, or notes...',
-        ),
+        ...createCustomerFinancialFilterFields({
+            key: 'page.customer_invoices.search_placeholder',
+            fallback: 'Search invoice number, customer, or notes...',
+        }),
         ...createSelectFilterFields([
             {
                 name: 'status',

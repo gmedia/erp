@@ -12,7 +12,10 @@ export function createAccountMappingFilterFields(): FieldDescriptor[] {
         createTextFilterField(
             'search',
             { key: 'column.search', fallback: 'Search' },
-            'Search account mappings...',
+            {
+                key: 'page.account_mappings.search_placeholder',
+                fallback: 'Search account mappings...',
+            },
         ),
         createSelectFilterField(
             'type',

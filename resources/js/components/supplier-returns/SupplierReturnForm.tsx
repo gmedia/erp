@@ -2,27 +2,26 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo, useRef } from 'react';
-import { type Resolver, useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm, type Resolver } from 'react-hook-form';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
+import { DocumentNumberField } from '@/components/common/DocumentNumberField';
 import EntityForm from '@/components/common/EntityForm';
 import {
     EntityFormItemActionsCell,
     EntityFormItemEmptyRow,
     EntityFormItemSectionHeader,
 } from '@/components/common/EntityFormItemTable';
-import { InputField } from '@/components/common/InputField';
-import SelectField from '@/components/common/SelectField';
-import { TextareaField } from '@/components/common/TextareaField';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+    ItemTableHeader,
+    type ItemTableColumn,
+} from '@/components/common/ItemTableHeader';
+import { NotesTextareaField } from '@/components/common/NotesTextareaField';
+import SelectField from '@/components/common/SelectField';
+import { StatusSelectField } from '@/components/common/StatusSelectField';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import {
@@ -46,6 +45,29 @@ interface SupplierReturnFormProps {
     onSubmit: (data: SupplierReturnFormData) => void;
     isLoading?: boolean;
 }
+
+const SUPPLIER_RETURN_STATUSES = [
+    ['draft', 'Draft'],
+    ['confirmed', 'Confirmed'],
+    ['cancelled', 'Cancelled'],
+] as const;
+
+const SUPPLIER_RETURN_ITEM_COLUMNS: readonly ItemTableColumn[] = [
+    { key: 'item_product', fallback: 'Product', className: 'w-[220px]' },
+    { key: 'item_unit', fallback: 'Unit', className: 'w-[140px]' },
+    {
+        key: 'item_qty_returned',
+        fallback: 'Qty Returned',
+        className: 'w-[120px]',
+    },
+    { key: 'item_unit_price', fallback: 'Unit Price', className: 'w-[140px]' },
+    { key: 'item_notes', fallback: 'Notes' },
+    {
+        key: 'item_action',
+        fallback: 'Action',
+        className: 'w-[120px] text-right',
+    },
+];
 
 const createEmptySupplierReturnItem =
     (): SupplierReturnFormData['items'][number] => ({
@@ -124,6 +146,13 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
         onSubmit,
         isLoading = false,
     }) {
+        const { t } = useTranslation();
+        const fl = (key: string, fallback: string) => {
+            const translated = t(`form_fields.supplier_returns.${key}`);
+            return translated === `form_fields.supplier_returns.${key}`
+                ? fallback
+                : translated;
+        };
         const activeSupplierReturn = supplierReturn || item || entity;
         const defaultValues = useMemo(
             () => getSupplierReturnFormDefaults(activeSupplierReturn),
@@ -194,87 +223,110 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
                 onOpenChange={onOpenChange}
                 title={
                     activeSupplierReturn
-                        ? 'Edit Supplier Return'
-                        : 'Add New Supplier Return'
+                        ? fl('edit_title', 'Edit Supplier Return')
+                        : fl('add_title', 'Add New Supplier Return')
                 }
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
                 className="sm:max-w-[1100px]"
             >
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <InputField
+                    <DocumentNumberField
+                        fl={fl}
                         name="return_number"
-                        label="Return Number"
-                        placeholder="Auto-generated if empty"
+                        label={fl('return_number', 'Return Number')}
+                        placeholderKey="return_number_placeholder"
                     />
 
-                    <SelectField
-                        name="status"
-                        label="Status"
-                        options={[
-                            { value: 'draft', label: 'Draft' },
-                            { value: 'confirmed', label: 'Confirmed' },
-                            { value: 'cancelled', label: 'Cancelled' },
-                        ]}
-                        placeholder="Select status"
+                    <StatusSelectField
+                        fl={fl}
+                        label={fl('status', 'Status')}
+                        placeholder={fl('status_placeholder', 'Select status')}
+                        statuses={SUPPLIER_RETURN_STATUSES}
                     />
 
                     <AsyncSelectField<{ po_number: string }>
                         name="purchase_order_id"
-                        label="Purchase Order"
+                        label={fl('purchase_order', 'Purchase Order')}
                         url="/api/purchase-orders"
-                        placeholder="Select purchase order"
+                        placeholder={fl(
+                            'purchase_order_placeholder',
+                            'Select purchase order',
+                        )}
                         labelFn={(po) => po.po_number}
                     />
 
                     <AsyncSelectField<{ gr_number: string }>
                         name="goods_receipt_id"
-                        label="Goods Receipt"
+                        label={fl('goods_receipt', 'Goods Receipt')}
                         url="/api/goods-receipts"
-                        placeholder="Select goods receipt"
+                        placeholder={fl(
+                            'goods_receipt_placeholder',
+                            'Select goods receipt',
+                        )}
                         labelFn={(gr) => gr.gr_number}
                     />
 
                     <AsyncSelectField
                         name="supplier_id"
-                        label="Supplier"
+                        label={fl('supplier', 'Supplier')}
                         url="/api/suppliers"
-                        placeholder="Select supplier"
+                        placeholder={fl(
+                            'supplier_placeholder',
+                            'Select supplier',
+                        )}
                     />
 
                     <AsyncSelectField
                         name="warehouse_id"
-                        label="Warehouse"
+                        label={fl('warehouse', 'Warehouse')}
                         url="/api/warehouses"
-                        placeholder="Select warehouse"
+                        placeholder={fl(
+                            'warehouse_placeholder',
+                            'Select warehouse',
+                        )}
                     />
 
-                    <DatePickerField name="return_date" label="Return Date" />
+                    <DatePickerField
+                        name="return_date"
+                        label={fl('return_date', 'Return Date')}
+                    />
 
                     <SelectField
                         name="reason"
-                        label="Reason"
+                        label={fl('reason', 'Reason')}
                         options={[
-                            { value: 'defective', label: 'Defective' },
-                            { value: 'wrong_item', label: 'Wrong Item' },
+                            {
+                                value: 'defective',
+                                label: fl('reason_defective', 'Defective'),
+                            },
+                            {
+                                value: 'wrong_item',
+                                label: fl('reason_wrong_item', 'Wrong Item'),
+                            },
                             {
                                 value: 'excess_quantity',
-                                label: 'Excess Quantity',
+                                label: fl(
+                                    'reason_excess_quantity',
+                                    'Excess Quantity',
+                                ),
                             },
-                            { value: 'damaged', label: 'Damaged' },
-                            { value: 'other', label: 'Other' },
+                            {
+                                value: 'damaged',
+                                label: fl('reason_damaged', 'Damaged'),
+                            },
+                            {
+                                value: 'other',
+                                label: fl('reason_other', 'Other'),
+                            },
                         ]}
-                        placeholder="Select reason"
+                        placeholder={fl('reason_placeholder', 'Select reason')}
                     />
 
-                    <div className="md:col-span-2">
-                        <TextareaField
-                            name="notes"
-                            label="Notes"
-                            placeholder="Notes"
-                            rows={2}
-                        />
-                    </div>
+                    <NotesTextareaField
+                        label={fl('notes', 'Notes')}
+                        placeholder={fl('notes_placeholder', 'Notes')}
+                    />
                 </div>
 
                 <div className="mt-2 space-y-3 border-t pt-4">
@@ -284,26 +336,10 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
 
                     <div className="rounded-md border">
                         <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[220px]">
-                                        Product
-                                    </TableHead>
-                                    <TableHead className="w-[140px]">
-                                        Unit
-                                    </TableHead>
-                                    <TableHead className="w-[120px]">
-                                        Qty Returned
-                                    </TableHead>
-                                    <TableHead className="w-[140px]">
-                                        Unit Price
-                                    </TableHead>
-                                    <TableHead>Notes</TableHead>
-                                    <TableHead className="w-[120px] text-right">
-                                        Action
-                                    </TableHead>
-                                </TableRow>
-                            </TableHeader>
+                            <ItemTableHeader
+                                columns={SUPPLIER_RETURN_ITEM_COLUMNS}
+                                translate={fl}
+                            />
                             <TableBody>
                                 {fields.map((field, index) => {
                                     const supplierReturnItem =

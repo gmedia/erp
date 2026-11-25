@@ -255,13 +255,13 @@ export type DateFilterConfig = {
 
 // Generic filter fields for simple entities
 export function createSimpleEntityFilterFields(
-    placeholder: string,
+    placeholder: TranslatableLabel,
 ): FieldDescriptor[] {
     return [
         {
             name: 'search',
             label: 'Search',
-            component: <Input placeholder={placeholder} />,
+            component: <TranslatedPlaceholderInput placeholder={placeholder} />,
         },
     ];
 }
@@ -756,7 +756,7 @@ export function createAssetCategoryBranchFilterFields(): FieldDescriptor[] {
 }
 
 export function createAssetReportScopeFilterFields(
-    searchPlaceholder = 'Search code, name...',
+    searchPlaceholder: TranslatableLabel = 'Search code, name...',
 ): FieldDescriptor[] {
     return [
         createTextFilterField('search', 'Search', searchPlaceholder),
@@ -966,7 +966,7 @@ export function createInventoryReportScopeFilterFields(
 }
 
 export function createCustomerFinancialFilterFields(
-    searchPlaceholder: string,
+    searchPlaceholder: TranslatableLabel,
 ): FieldDescriptor[] {
     return [
         createTextFilterField('search', 'Search', searchPlaceholder),

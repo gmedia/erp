@@ -10,13 +10,19 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { type ReactNode } from 'react';
 
+import {
+    LabelText,
+    type TranslatableLabel,
+    useTranslatableText,
+} from './TranslatedText';
+
 interface TextareaFieldProps extends Omit<
     React.ComponentProps<'textarea'>,
-    'name'
+    'name' | 'placeholder'
 > {
     name: string;
-    label: string;
-    placeholder?: string;
+    label: TranslatableLabel;
+    placeholder?: TranslatableLabel;
     className?: string;
     children?: ReactNode;
     rows?: number;
@@ -31,15 +37,22 @@ export function TextareaField({
     rows = 3,
     ...props
 }: Readonly<TextareaFieldProps>) {
+    const translatedPlaceholder = useTranslatableText(placeholder ?? '');
     return (
         <FormField
             name={name}
             render={({ field }) => (
                 <FormItem className={className}>
-                    <FormLabel>{label}</FormLabel>
+                    <FormLabel>
+                        <LabelText label={label} />
+                    </FormLabel>
                     <FormControl>
                         <Textarea
-                            placeholder={placeholder}
+                            placeholder={
+                                placeholder === undefined
+                                    ? undefined
+                                    : translatedPlaceholder
+                            }
                             value={field.value as string | undefined}
                             onChange={field.onChange}
                             onBlur={field.onBlur}

@@ -22,7 +22,10 @@ export function createRecurringJournalFilterFields(): FieldDescriptor[] {
         createTextFilterField(
             'search',
             { key: 'column.search', fallback: 'Search' },
-            'Search name, description...',
+            {
+                key: 'page.recurring_journals.search_placeholder',
+                fallback: 'Search name, description...',
+            },
         ),
         createSelectFilterField(
             'frequency',

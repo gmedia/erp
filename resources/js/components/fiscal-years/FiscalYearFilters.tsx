@@ -11,7 +11,10 @@ export function createFiscalYearFilterFields(): FieldDescriptor[] {
         createTextFilterField(
             'search',
             { key: 'column.search', fallback: 'Search' },
-            'Search fiscal years...',
+            {
+                key: 'page.fiscal_years.search_placeholder',
+                fallback: 'Search fiscal years...',
+            },
         ),
         createFiscalYearStatusFilterField(),
     ];

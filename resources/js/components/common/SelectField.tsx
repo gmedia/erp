@@ -15,6 +15,12 @@ import {
 } from '@/components/ui/select';
 import { type ReactNode } from 'react';
 
+import {
+    LabelText,
+    type TranslatableLabel,
+    useTranslatableText,
+} from './TranslatedText';
+
 export interface Option {
     value: string;
     label: string;
@@ -22,9 +28,9 @@ export interface Option {
 
 interface SelectFieldProps {
     name: string;
-    label?: string;
+    label?: TranslatableLabel;
     options: Option[];
-    placeholder?: string;
+    placeholder?: TranslatableLabel;
     className?: string;
     children?: ReactNode;
     disabled?: boolean;
@@ -42,12 +48,18 @@ export default function SelectField({
     children,
     disabled,
 }: Readonly<SelectFieldProps>) {
+    const translatedPlaceholder = useTranslatableText(placeholder);
+    const translatedLabel = useTranslatableText(label ?? '');
     return (
         <FormField
             name={name}
             render={({ field }) => (
                 <FormItem className={className}>
-                    {label && <FormLabel>{label}</FormLabel>}
+                    {label && (
+                        <FormLabel>
+                            <LabelText label={label} />
+                        </FormLabel>
+                    )}
                     <FormControl>
                         <Select
                             onValueChange={field.onChange}
@@ -61,7 +73,11 @@ export default function SelectField({
                         >
                             <SelectTrigger
                                 className="w-full min-w-0 overflow-hidden"
-                                aria-label={label}
+                                aria-label={
+                                    label === undefined
+                                        ? undefined
+                                        : translatedLabel
+                                }
                             >
                                 <span className="flex-1 truncate text-left">
                                     {field.value !== undefined &&
@@ -72,7 +88,7 @@ export default function SelectField({
                                                   String(o.value) ===
                                                   String(field.value),
                                           )?.label
-                                        : placeholder}
+                                        : translatedPlaceholder}
                                 </span>
                             </SelectTrigger>
                             <SelectContent>

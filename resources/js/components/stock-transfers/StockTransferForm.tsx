@@ -3,10 +3,10 @@
 import axios from '@/lib/axios';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo, useRef } from 'react';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { AsyncSelect } from '@/components/common/AsyncSelect';
+import { ControlledAsyncSelectField } from '@/components/common/ControlledAsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
 import {
@@ -15,17 +15,14 @@ import {
     EntityFormItemSectionHeader,
 } from '@/components/common/EntityFormItemTable';
 import { InputField } from '@/components/common/InputField';
-import SelectField from '@/components/common/SelectField';
-import { TextareaField } from '@/components/common/TextareaField';
-import { Button } from '@/components/ui/button';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+    ItemTableHeader,
+    type ItemTableColumn,
+} from '@/components/common/ItemTableHeader';
+import { NotesTextareaField } from '@/components/common/NotesTextareaField';
+import { StatusSelectField } from '@/components/common/StatusSelectField';
+import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
@@ -41,6 +38,15 @@ import {
 } from '@/utils/schemas';
 import { StockTransferItemFormDialog } from './StockTransferItemFormDialog';
 
+const TRANSFER_STATUSES = [
+    ['draft', 'Draft'],
+    ['pending_approval', 'Pending Approval'],
+    ['approved', 'Approved'],
+    ['in_transit', 'In Transit'],
+    ['received', 'Received'],
+    ['cancelled', 'Cancelled'],
+] as const;
+
 type StockTransferFormInput = z.input<typeof stockTransferFormSchema>;
 
 interface StockTransferFormProps {
@@ -52,6 +58,27 @@ interface StockTransferFormProps {
     onSubmit: (data: StockTransferFormData) => void;
     isLoading?: boolean;
 }
+
+const buildStockTransferItemColumns = (
+    qtyReceivedLabel: string,
+): readonly ItemTableColumn[] => [
+    { key: 'item_product', fallback: 'Product', className: 'w-[220px]' },
+    { key: 'item_unit', fallback: 'Unit', className: 'w-[160px]' },
+    { key: 'item_qty', fallback: 'Qty', className: 'w-[120px]' },
+    {
+        key: 'qty_received',
+        fallback: '',
+        className: 'w-[140px]',
+        label: qtyReceivedLabel,
+    },
+    { key: 'item_unit_cost', fallback: 'Unit Cost', className: 'w-[140px]' },
+    { key: 'item_notes', fallback: 'Notes' },
+    {
+        key: 'item_action',
+        fallback: 'Action',
+        className: 'w-[120px] text-right',
+    },
+];
 
 const createEmptyStockTransferItem =
     (): StockTransferFormData['items'][number] => ({
@@ -152,6 +179,12 @@ export const StockTransferForm = memo<StockTransferFormProps>(
         isLoading = false,
     }) {
         const { t } = useTranslation();
+        const fl = (key: string, fallback: string) => {
+            const translated = t(`form_fields.stock_transfers.${key}`);
+            return translated === `form_fields.stock_transfers.${key}`
+                ? fallback
+                : translated;
+        };
         const activeStockTransfer = stockTransfer || item || entity;
         const loadedIdRef = useRef<number | null>(null);
         const itemsLocked =
@@ -236,8 +269,8 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                 onOpenChange={onOpenChange}
                 title={
                     activeStockTransfer
-                        ? 'Edit Stock Transfer'
-                        : 'Add New Stock Transfer'
+                        ? fl('edit_title', 'Edit Stock Transfer')
+                        : fl('add_title', 'Add New Stock Transfer')
                 }
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
@@ -246,113 +279,77 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <InputField
                         name="transfer_number"
-                        label="Transfer Number"
-                        placeholder="Auto-generated if empty"
+                        label={fl('transfer_number', 'Transfer Number')}
+                        placeholder={fl(
+                            'transfer_number_placeholder',
+                            'Auto-generated if empty',
+                        )}
                     />
-                    <SelectField
-                        name="status"
-                        label="Status"
-                        options={[
-                            { value: 'draft', label: 'Draft' },
-                            {
-                                value: 'pending_approval',
-                                label: 'Pending Approval',
-                            },
-                            { value: 'approved', label: 'Approved' },
-                            { value: 'in_transit', label: 'In Transit' },
-                            { value: 'received', label: 'Received' },
-                            { value: 'cancelled', label: 'Cancelled' },
-                        ]}
-                        placeholder="Select status"
+                    <StatusSelectField
+                        fl={fl}
+                        label={fl('status', 'Status')}
+                        placeholder={fl('status_placeholder', 'Select status')}
+                        statuses={TRANSFER_STATUSES}
                     />
                     <div className="grid grid-cols-1 gap-4 md:col-span-2 md:grid-cols-2">
-                        <Controller
+                        <ControlledAsyncSelectField
                             control={form.control}
                             name="from_warehouse_id"
-                            render={({ field }) => (
-                                <div className="space-y-2">
-                                    <div className="text-sm leading-none font-medium">
-                                        From Warehouse
-                                    </div>
-                                    <AsyncSelect
-                                        value={
-                                            field.value
-                                                ? String(field.value)
-                                                : undefined
-                                        }
-                                        onValueChange={field.onChange}
-                                        url="/api/warehouses"
-                                        placeholder="Select warehouse"
-                                        label="From Warehouse"
-                                    />
-                                </div>
+                            label={fl('from_warehouse', 'From Warehouse')}
+                            url="/api/warehouses"
+                            placeholder={fl(
+                                'warehouse_placeholder',
+                                'Select warehouse',
                             )}
                         />
-                        <Controller
+                        <ControlledAsyncSelectField
                             control={form.control}
                             name="to_warehouse_id"
-                            render={({ field }) => (
-                                <div className="space-y-2">
-                                    <div className="text-sm leading-none font-medium">
-                                        To Warehouse
-                                    </div>
-                                    <AsyncSelect
-                                        value={
-                                            field.value
-                                                ? String(field.value)
-                                                : undefined
-                                        }
-                                        onValueChange={field.onChange}
-                                        url="/api/warehouses"
-                                        placeholder="Select warehouse"
-                                        label="To Warehouse"
-                                    />
-                                </div>
+                            label={fl('to_warehouse', 'To Warehouse')}
+                            url="/api/warehouses"
+                            placeholder={fl(
+                                'warehouse_placeholder',
+                                'Select warehouse',
                             )}
                         />
                     </div>
                     <DatePickerField
                         name="transfer_date"
-                        label="Transfer Date"
+                        label={fl('transfer_date', 'Transfer Date')}
                     />
                     <DatePickerField
                         name="expected_arrival_date"
-                        label="Expected Arrival Date"
-                    />
-                    <Controller
-                        control={form.control}
-                        name="requested_by"
-                        render={({ field }) => (
-                            <div className="space-y-2">
-                                <div className="text-sm leading-none font-medium">
-                                    Requested By (Employee)
-                                </div>
-                                <AsyncSelect
-                                    value={
-                                        field.value
-                                            ? String(field.value)
-                                            : undefined
-                                    }
-                                    onValueChange={field.onChange}
-                                    url="/api/employees"
-                                    placeholder="Select employee"
-                                    label="Requested By"
-                                />
-                            </div>
+                        label={fl(
+                            'expected_arrival_date',
+                            'Expected Arrival Date',
                         )}
                     />
-                    <div className="md:col-span-2">
-                        <TextareaField
-                            name="notes"
-                            label="Notes"
-                            placeholder="Additional notes..."
-                        />
-                    </div>
+                    <ControlledAsyncSelectField
+                        control={form.control}
+                        name="requested_by"
+                        label={fl('requested_by', 'Requested By (Employee)')}
+                        selectLabel={fl('requested_by_select', 'Requested By')}
+                        url="/api/employees"
+                        placeholder={fl(
+                            'requested_by_placeholder',
+                            'Select employee',
+                        )}
+                    />
+                    <NotesTextareaField
+                        label={fl('notes', 'Notes')}
+                        placeholder={fl(
+                            'notes_placeholder',
+                            'Additional notes...',
+                        )}
+                        rows={3}
+                    />
                 </div>
 
                 <div className="mt-2 space-y-3 border-t pt-4">
                     {itemsLocked ? (
-                        <div className="text-sm font-semibold">Items</div>
+                        <div className="text-sm font-semibold">
+                            {fl('items', 'Items')}
+                        </div>
                     ) : (
                         <EntityFormItemSectionHeader
                             onAddItem={handleCreateNewItem}
@@ -361,29 +358,12 @@ export const StockTransferForm = memo<StockTransferFormProps>(
 
                     <div className="rounded-md border">
                         <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[220px]">
-                                        Product
-                                    </TableHead>
-                                    <TableHead className="w-[160px]">
-                                        Unit
-                                    </TableHead>
-                                    <TableHead className="w-[120px]">
-                                        Qty
-                                    </TableHead>
-                                    <TableHead className="w-[140px]">
-                                        {t('stockTransfer.qty_received_label')}
-                                    </TableHead>
-                                    <TableHead className="w-[140px]">
-                                        Unit Cost
-                                    </TableHead>
-                                    <TableHead>Notes</TableHead>
-                                    <TableHead className="w-[120px] text-right">
-                                        Action
-                                    </TableHead>
-                                </TableRow>
-                            </TableHeader>
+                            <ItemTableHeader
+                                columns={buildStockTransferItemColumns(
+                                    t('stockTransfer.qty_received_label'),
+                                )}
+                                translate={fl}
+                            />
                             <TableBody>
                                 {fields.length === 0 ? (
                                     <EntityFormItemEmptyRow

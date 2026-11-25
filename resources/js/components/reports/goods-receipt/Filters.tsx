@@ -11,7 +11,7 @@ export function createGoodsReceiptReportFilterFields(): FieldDescriptor[] {
             'search',
             { key: 'column.search', fallback: 'Search' },
             {
-                key: 'filter.goods_receipt_search_placeholder',
+                key: 'page.goods_receipt.search_placeholder',
                 fallback:
                     'Search GR number, PO number, supplier, warehouse, or product...',
             },

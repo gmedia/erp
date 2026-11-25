@@ -12,11 +12,10 @@ import {
 
 export function createPurchaseRequestFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField(
-            'search',
-            'Search',
-            'Search PR number, notes, or rejection reason...',
-        ),
+        createTextFilterField('search', 'Search', {
+            key: 'page.purchase_requests.search_placeholder',
+            fallback: 'Search PR number, notes, or rejection reason...',
+        }),
         ...createPurchaseRequestContextFilterFields(),
         ...createSelectFilterFields([
             {

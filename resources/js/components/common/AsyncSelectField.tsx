@@ -9,12 +9,17 @@ import {
 } from '@/components/ui/form';
 import { type ReactNode } from 'react';
 import { AsyncSelect } from './AsyncSelect';
+import {
+    LabelText,
+    type TranslatableLabel,
+    useTranslatableText,
+} from './TranslatedText';
 
 interface AsyncSelectFieldProps<T extends object = Record<string, unknown>> {
     readonly name: string;
-    readonly label?: string;
+    readonly label?: TranslatableLabel;
     readonly url: string; // API URL
-    readonly placeholder?: string;
+    readonly placeholder?: TranslatableLabel;
     readonly className?: string;
     readonly children?: ReactNode;
     readonly labelFn?: (item: T) => string;
@@ -43,12 +48,18 @@ export default function AsyncSelectField<
     filterItems,
     disabled = false,
 }: Readonly<AsyncSelectFieldProps<T>>) {
+    const translatedPlaceholder = useTranslatableText(placeholder);
+    const translatedLabel = useTranslatableText(label ?? '');
     return (
         <FormField
             name={name}
             render={({ field }) => (
                 <FormItem className={className}>
-                    {label && <FormLabel>{label}</FormLabel>}
+                    {label && (
+                        <FormLabel>
+                            <LabelText label={label} />
+                        </FormLabel>
+                    )}
                     <FormControl>
                         <AsyncSelect<T>
                             value={
@@ -56,12 +67,16 @@ export default function AsyncSelectField<
                             }
                             onValueChange={field.onChange}
                             url={url}
-                            placeholder={placeholder}
+                            placeholder={translatedPlaceholder}
                             labelFn={labelFn}
                             valueFn={valueFn}
                             initialLabel={initialLabel}
                             onItemSelect={onItemSelect}
-                            label={label}
+                            label={
+                                label === undefined
+                                    ? undefined
+                                    : translatedLabel
+                            }
                             preferredMetaKey={preferredMetaKey}
                             filterItems={filterItems}
                             disabled={disabled}

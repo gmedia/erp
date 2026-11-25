@@ -27,9 +27,10 @@ export function createArReceiptFilterFields(): FieldDescriptor[] {
     ];
 
     return [
-        ...createCustomerFinancialFilterFields(
-            'Search receipt number, customer, or reference...',
-        ),
+        ...createCustomerFinancialFilterFields({
+            key: 'page.ar_receipts.search_placeholder',
+            fallback: 'Search receipt number, customer, or reference...',
+        }),
         ...createSelectFilterFields([
             {
                 name: 'status',

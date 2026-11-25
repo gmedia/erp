@@ -10,7 +10,10 @@ import {
 
 export function createStockTransferFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', 'Search stock transfers...'),
+        createTextFilterField('search', 'Search', {
+            key: 'page.stock_transfers.search_placeholder',
+            fallback: 'Search stock transfers...',
+        }),
         ...createAsyncSelectFilterFields([
             {
                 name: 'from_warehouse_id',

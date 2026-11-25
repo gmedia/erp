@@ -20,7 +20,10 @@ export function createPeriodClosingFilterFields(): FieldDescriptor[] {
         createTextFilterField(
             'search',
             { key: 'column.search', fallback: 'Search' },
-            'Search...',
+            {
+                key: 'page.period_closings.search_placeholder',
+                fallback: 'Search...',
+            },
         ),
         createSelectFilterField(
             'status',

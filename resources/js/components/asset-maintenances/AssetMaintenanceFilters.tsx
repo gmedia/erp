@@ -11,7 +11,10 @@ export const createAssetMaintenanceFilterFields = (): FieldDescriptor[] => [
     createTextFilterField(
         'search',
         { key: 'column.search', fallback: 'Search' },
-        'Search maintenances...',
+        {
+            key: 'page.asset_maintenances.search_placeholder',
+            fallback: 'Search maintenances...',
+        },
     ),
     ...createAssetSupplierFilterFields('Filter by asset', 'Filter by supplier'),
     ...createMaintenanceTypeStatusFilterFields(
