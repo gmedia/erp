@@ -114,6 +114,7 @@ test('it can fetch purchase history data via json', function () {
             ->where('data.0.receipt_count', 1)
             ->where('data.0.last_receipt_date', '2026-03-05')
             ->where('data.0.total_purchase_value', '120000.00')
+            ->has('summary')
             ->has('meta')
             ->has('links')
         );
@@ -196,6 +197,82 @@ test('it can export purchase history report', function () {
 
     Excel::assertStored('exports/' . $filename, 'public');
     Carbon::setTestNow();
+});
+
+test('it returns totals across all filtered rows including supplier filter', function () {
+    $warehouse = Warehouse::factory()->create(['name' => 'Gudang Total PH', 'code' => 'WH-TPH']);
+    $unit = Unit::factory()->create(['name' => 'PCS']);
+    $supplierA = Supplier::factory()->create(['name' => 'Supplier PH A']);
+    $supplierB = Supplier::factory()->create(['name' => 'Supplier PH B']);
+
+    $makePoItem = function (
+        Supplier $supplier,
+        string $poNumber,
+        float $qty,
+        float $lineTotal,
+    ) use ($warehouse, $unit) {
+        $product = Product::factory()->create();
+        $po = PurchaseOrder::factory()->create([
+            'po_number' => $poNumber,
+            'supplier_id' => $supplier->id,
+            'warehouse_id' => $warehouse->id,
+            'order_date' => '2026-03-01',
+            'status' => 'confirmed',
+        ]);
+
+        return PurchaseOrderItem::factory()->create([
+            'purchase_order_id' => $po->id,
+            'product_id' => $product->id,
+            'unit_id' => $unit->id,
+            'quantity' => $qty,
+            'line_total' => $lineTotal,
+        ]);
+    };
+
+    $makePoItem($supplierA, 'PO-TOT-A1', 10, 100000);
+    $makePoItem($supplierA, 'PO-TOT-A2', 5, 50000);
+    $makePoItem($supplierB, 'PO-TOT-B1', 7, 70000);
+
+    Sanctum::actingAs($this->testUser, ['*']);
+
+    $this->getJson('/api/reports/purchase-history')
+        ->assertOk()
+        ->assertJsonPath('summary.totals.ordered_quantity', '22.00')
+        ->assertJsonPath('summary.totals.total_purchase_value', '220000.00');
+
+    $this->getJson('/api/reports/purchase-history?supplier_id=' . $supplierA->id)
+        ->assertOk()
+        ->assertJsonCount(2, 'data')
+        ->assertJsonPath('summary.totals.ordered_quantity', '15.00')
+        ->assertJsonPath('summary.totals.outstanding_quantity', '15.00')
+        ->assertJsonPath('summary.totals.total_purchase_value', '150000.00');
+});
+
+test('it exposes purchase order status so zero outstanding can be understood', function () {
+    $supplier = Supplier::factory()->create(['name' => 'Supplier Status PH']);
+    $warehouse = Warehouse::factory()->create(['name' => 'Gudang Status PH', 'code' => 'WH-SPH']);
+    $product = Product::factory()->create(['name' => 'Produk Status PH', 'code' => 'PSP-001']);
+    $unit = Unit::factory()->create(['name' => 'PCS']);
+
+    $po = PurchaseOrder::factory()->create([
+        'po_number' => 'PO-HIS-STS',
+        'supplier_id' => $supplier->id,
+        'warehouse_id' => $warehouse->id,
+        'order_date' => '2026-03-01',
+        'status' => 'cancelled',
+    ]);
+    PurchaseOrderItem::factory()->create([
+        'purchase_order_id' => $po->id,
+        'product_id' => $product->id,
+        'unit_id' => $unit->id,
+        'quantity' => 10,
+        'line_total' => 120000,
+    ]);
+
+    $this->getJson('/api/reports/purchase-history')
+        ->assertOk()
+        ->assertJsonPath('data.0.purchase_order.status', 'cancelled')
+        ->assertJsonPath('data.0.outstanding_quantity', '0.00');
 });
 
 test('it reports zero outstanding for cancelled or rejected purchase orders', function () {
