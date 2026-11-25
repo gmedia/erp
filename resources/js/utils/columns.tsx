@@ -15,8 +15,20 @@ import {
     formatNumberByRegionalSettings,
 } from '@/utils/number-format';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import type { ReactNode } from 'react';
+
+function SortDirectionIcon({ sorted }: { sorted: 'asc' | 'desc' | false }) {
+    if (sorted === 'asc') {
+        return <ArrowUp className="ml-2 h-4 w-4 shrink-0 text-foreground" />;
+    }
+    if (sorted === 'desc') {
+        return <ArrowDown className="ml-2 h-4 w-4 shrink-0 text-foreground" />;
+    }
+    return (
+        <ArrowUpDown className="ml-2 h-4 w-4 shrink-0 text-muted-foreground" />
+    );
+}
 
 // Type definitions for better type safety
 export type ColumnBuilderOptions<T = Record<string, unknown>> = {
@@ -91,14 +103,17 @@ export function createSortingHeader(
             <div className={cn(isRight && 'flex justify-end')}>
                 <Button
                     variant="ghost"
-                    className={cn('-ml-2 h-8 px-2', isRight && '-mr-2 ml-0')}
+                    className={cn(
+                        '-ml-2 h-8 px-2',
+                        isRight && 'mr-2 ml-auto max-w-full pr-0',
+                    )}
                     onClick={() =>
                         column.toggleSorting(column.getIsSorted() === 'asc')
                     }
                     data-testid={`sort-${label.toLowerCase().replaceAll(/\s+/g, '-')}`}
                 >
                     {label}
-                    <ArrowUpDown className="ml-2 h-4 w-4 shrink-0" />
+                    <SortDirectionIcon sorted={column.getIsSorted()} />
                 </Button>
             </div>
         ),
@@ -133,13 +148,21 @@ export function createTextColumn<T = Record<string, unknown>>(
             const meta = description?.(row.original);
 
             if (!primary && !meta) {
-                return <div>{text}</div>;
+                return (
+                    <div className="max-w-56 truncate" title={text}>
+                        {text}
+                    </div>
+                );
             }
 
             return (
-                <div className="min-w-0">
+                <div className="max-w-56 min-w-0">
                     <div
-                        className={cn(primary && 'font-medium text-foreground')}
+                        className={cn(
+                            'truncate',
+                            primary && 'font-medium text-foreground',
+                        )}
+                        title={text}
                     >
                         {text}
                     </div>
@@ -273,6 +296,7 @@ export function createNumberColumn<T = Record<string, unknown>>(
 
     const baseColumn: ColumnDef<T> = {
         accessorKey: accessorKey as string,
+        meta: { numeric: true },
         cell: ({ row }) => {
             const value = Number.parseFloat(
                 row.getValue(accessorKey as string) as string,
@@ -645,7 +669,8 @@ export function createRowCurrencyAmountColumn<
 
     return {
         accessorKey: accessorKey as string,
-        ...createSortingHeader(label),
+        meta: { numeric: true },
+        ...createSortingHeader(label, { align: 'right' }),
         cell: ({ row }) => (
             <div className={className}>
                 {formatCurrencyByRegionalSettings(

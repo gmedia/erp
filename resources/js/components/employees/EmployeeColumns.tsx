@@ -73,7 +73,7 @@ export const employeeColumns: ColumnDef<Employee>[] = [
     {
         id: 'employments.salary',
         accessorFn: (row) => row.current_employment?.salary,
-        ...createSortingHeader('Salary'),
+        ...createSortingHeader('Salary', { align: 'right' }),
         cell: ({ row }) => (
             <div className="text-right tabular-nums">
                 {formatCurrencyByRegionalSettings(
