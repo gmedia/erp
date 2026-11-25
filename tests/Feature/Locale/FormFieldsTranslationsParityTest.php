@@ -657,6 +657,18 @@ test('simple entity form keys keep the english text and exist in both locales', 
         ->and($id['customer_categories']['add_title'])->toBe('Tambah Kategori Pelanggan Baru');
 });
 
+test('purchase order item validation messages keep the english text and exist in both locales', function () {
+    $enValidation = localeValidationTranslations('en.json');
+    $idValidation = localeValidationTranslations('id.json');
+
+    expect($enValidation['purchase_order']['product_required'])->toBe('Product is required.')
+        ->and($enValidation['purchase_order']['unit_required'])->toBe('Unit is required.')
+        ->and($enValidation['purchase_order']['quantity_gt_zero'])->toBe('Quantity must be greater than 0.')
+        ->and($enValidation['purchase_order']['unit_price_min_zero'])->toBe('Unit price must be at least 0.')
+        ->and($idValidation['purchase_order']['product_required'])->toBe('Produk wajib diisi.')
+        ->and($idValidation['purchase_order']['unit_required'])->toBe('Satuan wajib diisi.');
+});
+
 test('shared validation messages keep the english text and exist in both locales', function () {
     $enValidation = localeValidationTranslations('en.json');
     $idValidation = localeValidationTranslations('id.json');
