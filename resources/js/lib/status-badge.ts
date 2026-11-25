@@ -11,11 +11,13 @@ const DANGER: BadgeVariant = 'destructive-soft';
 // Status yang selesai/diproses tanpa konotasi sukses penuh (mis. in_transit,
 // approved, fully received, stocktake_result) memakai tone info.
 const INFO: BadgeVariant = 'info';
-const CONFIRMED: BadgeVariant = 'default';
+const CONFIRMED: BadgeVariant = 'info';
 const AWAITING: BadgeVariant = 'warning';
 const PARTIAL: BadgeVariant = 'info';
 const LOCKED: BadgeVariant = 'outline';
 const SEVERE: BadgeVariant = 'destructive';
+const CANCELLED: BadgeVariant = 'neutral';
+const VOIDED: BadgeVariant = 'outline';
 
 export { BadgeVariant };
 
@@ -90,10 +92,6 @@ export function statusBadgeVariant(
         // Negatif/danger: ditolak, dibatalkan, gagal, telat.
         case 'rejected':
         case 'step_rejected':
-        case 'cancelled':
-        case 'canceled':
-        case 'void':
-        case 'voided':
         case 'failed':
         case 'overdue':
         case 'discontinued':
@@ -103,6 +101,14 @@ export function statusBadgeVariant(
 
         case 'lost':
             return SEVERE;
+
+        case 'cancelled':
+        case 'canceled':
+            return CANCELLED;
+
+        case 'void':
+        case 'voided':
+            return VOIDED;
 
         default:
             return NEUTRAL;
@@ -148,9 +154,6 @@ export function approvalEventBadgeVariant(
     }
     if (key.includes('approved')) {
         return POSITIVE;
-    }
-    if (key === 'cancelled' || key === 'canceled' || key === 'voided') {
-        return DANGER;
     }
     if (key === 'delegated' || key === 'escalated' || key === 'submitted') {
         return MUTED;

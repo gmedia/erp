@@ -179,6 +179,7 @@ function createReportDisplayColumn<TData>({
             id: columnId,
             accessorKey,
             cell,
+            meta: align === 'right' ? { numeric: true } : undefined,
             ...(align === 'right'
                 ? {
                       header: (
@@ -193,20 +194,15 @@ function createReportDisplayColumn<TData>({
         };
     }
 
-    if (accessorKey) {
-        return {
-            id: columnId,
-            accessorKey,
-            enableSorting: false,
-            header,
-            cell,
-        };
-    }
-
     return {
         id: columnId,
+        ...(accessorKey ? { accessorKey } : {}),
+        meta: align === 'right' ? { numeric: true } : undefined,
         enableSorting: false,
-        header,
+        header:
+            align === 'right'
+                ? () => <div className="text-right">{header}</div>
+                : header,
         cell,
     };
 }
