@@ -152,6 +152,12 @@ export const StockTransferForm = memo<StockTransferFormProps>(
         isLoading = false,
     }) {
         const { t } = useTranslation();
+        const fl = (key: string, fallback: string) => {
+            const translated = t(`form_fields.stock_transfers.${key}`);
+            return translated === `form_fields.stock_transfers.${key}`
+                ? fallback
+                : translated;
+        };
         const activeStockTransfer = stockTransfer || item || entity;
         const loadedIdRef = useRef<number | null>(null);
         const itemsLocked =
@@ -236,8 +242,8 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                 onOpenChange={onOpenChange}
                 title={
                     activeStockTransfer
-                        ? 'Edit Stock Transfer'
-                        : 'Add New Stock Transfer'
+                        ? fl('edit_title', 'Edit Stock Transfer')
+                        : fl('add_title', 'Add New Stock Transfer')
                 }
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
@@ -246,24 +252,45 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <InputField
                         name="transfer_number"
-                        label="Transfer Number"
-                        placeholder="Auto-generated if empty"
+                        label={fl('transfer_number', 'Transfer Number')}
+                        placeholder={fl(
+                            'transfer_number_placeholder',
+                            'Auto-generated if empty',
+                        )}
                     />
                     <SelectField
                         name="status"
-                        label="Status"
+                        label={fl('status', 'Status')}
                         options={[
-                            { value: 'draft', label: 'Draft' },
+                            {
+                                value: 'draft',
+                                label: fl('status_draft', 'Draft'),
+                            },
                             {
                                 value: 'pending_approval',
-                                label: 'Pending Approval',
+                                label: fl(
+                                    'status_pending_approval',
+                                    'Pending Approval',
+                                ),
                             },
-                            { value: 'approved', label: 'Approved' },
-                            { value: 'in_transit', label: 'In Transit' },
-                            { value: 'received', label: 'Received' },
-                            { value: 'cancelled', label: 'Cancelled' },
+                            {
+                                value: 'approved',
+                                label: fl('status_approved', 'Approved'),
+                            },
+                            {
+                                value: 'in_transit',
+                                label: fl('status_in_transit', 'In Transit'),
+                            },
+                            {
+                                value: 'received',
+                                label: fl('status_received', 'Received'),
+                            },
+                            {
+                                value: 'cancelled',
+                                label: fl('status_cancelled', 'Cancelled'),
+                            },
                         ]}
-                        placeholder="Select status"
+                        placeholder={fl('status_placeholder', 'Select status')}
                     />
                     <div className="grid grid-cols-1 gap-4 md:col-span-2 md:grid-cols-2">
                         <Controller
@@ -272,7 +299,7 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                             render={({ field }) => (
                                 <div className="space-y-2">
                                     <div className="text-sm leading-none font-medium">
-                                        From Warehouse
+                                        {fl('from_warehouse', 'From Warehouse')}
                                     </div>
                                     <AsyncSelect
                                         value={
@@ -282,8 +309,14 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                                         }
                                         onValueChange={field.onChange}
                                         url="/api/warehouses"
-                                        placeholder="Select warehouse"
-                                        label="From Warehouse"
+                                        placeholder={fl(
+                                            'warehouse_placeholder',
+                                            'Select warehouse',
+                                        )}
+                                        label={fl(
+                                            'from_warehouse',
+                                            'From Warehouse',
+                                        )}
                                     />
                                 </div>
                             )}
@@ -294,7 +327,7 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                             render={({ field }) => (
                                 <div className="space-y-2">
                                     <div className="text-sm leading-none font-medium">
-                                        To Warehouse
+                                        {fl('to_warehouse', 'To Warehouse')}
                                     </div>
                                     <AsyncSelect
                                         value={
@@ -304,8 +337,14 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                                         }
                                         onValueChange={field.onChange}
                                         url="/api/warehouses"
-                                        placeholder="Select warehouse"
-                                        label="To Warehouse"
+                                        placeholder={fl(
+                                            'warehouse_placeholder',
+                                            'Select warehouse',
+                                        )}
+                                        label={fl(
+                                            'to_warehouse',
+                                            'To Warehouse',
+                                        )}
                                     />
                                 </div>
                             )}
@@ -313,11 +352,14 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                     </div>
                     <DatePickerField
                         name="transfer_date"
-                        label="Transfer Date"
+                        label={fl('transfer_date', 'Transfer Date')}
                     />
                     <DatePickerField
                         name="expected_arrival_date"
-                        label="Expected Arrival Date"
+                        label={fl(
+                            'expected_arrival_date',
+                            'Expected Arrival Date',
+                        )}
                     />
                     <Controller
                         control={form.control}
@@ -325,7 +367,10 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                         render={({ field }) => (
                             <div className="space-y-2">
                                 <div className="text-sm leading-none font-medium">
-                                    Requested By (Employee)
+                                    {fl(
+                                        'requested_by',
+                                        'Requested By (Employee)',
+                                    )}
                                 </div>
                                 <AsyncSelect
                                     value={
@@ -335,8 +380,11 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                                     }
                                     onValueChange={field.onChange}
                                     url="/api/employees"
-                                    placeholder="Select employee"
-                                    label="Requested By"
+                                    placeholder={fl(
+                                        'requested_by_placeholder',
+                                        'Select employee',
+                                    )}
+                                    label={fl('requested_by', 'Requested By')}
                                 />
                             </div>
                         )}
@@ -344,15 +392,20 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                     <div className="md:col-span-2">
                         <TextareaField
                             name="notes"
-                            label="Notes"
-                            placeholder="Additional notes..."
+                            label={fl('notes', 'Notes')}
+                            placeholder={fl(
+                                'notes_placeholder',
+                                'Additional notes...',
+                            )}
                         />
                     </div>
                 </div>
 
                 <div className="mt-2 space-y-3 border-t pt-4">
                     {itemsLocked ? (
-                        <div className="text-sm font-semibold">Items</div>
+                        <div className="text-sm font-semibold">
+                            {fl('items', 'Items')}
+                        </div>
                     ) : (
                         <EntityFormItemSectionHeader
                             onAddItem={handleCreateNewItem}
@@ -364,23 +417,25 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                             <TableHeader>
                                 <TableRow>
                                     <TableHead className="w-[220px]">
-                                        Product
+                                        {fl('item_product', 'Product')}
                                     </TableHead>
                                     <TableHead className="w-[160px]">
-                                        Unit
+                                        {fl('item_unit', 'Unit')}
                                     </TableHead>
                                     <TableHead className="w-[120px]">
-                                        Qty
+                                        {fl('item_qty', 'Qty')}
                                     </TableHead>
                                     <TableHead className="w-[140px]">
                                         {t('stockTransfer.qty_received_label')}
                                     </TableHead>
                                     <TableHead className="w-[140px]">
-                                        Unit Cost
+                                        {fl('item_unit_cost', 'Unit Cost')}
                                     </TableHead>
-                                    <TableHead>Notes</TableHead>
+                                    <TableHead>
+                                        {fl('item_notes', 'Notes')}
+                                    </TableHead>
                                     <TableHead className="w-[120px] text-right">
-                                        Action
+                                        {fl('item_action', 'Action')}
                                     </TableHead>
                                 </TableRow>
                             </TableHeader>

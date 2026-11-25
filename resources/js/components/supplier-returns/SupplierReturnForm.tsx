@@ -23,6 +23,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import {
@@ -124,6 +125,13 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
         onSubmit,
         isLoading = false,
     }) {
+        const { t } = useTranslation();
+        const fl = (key: string, fallback: string) => {
+            const translated = t(`form_fields.supplier_returns.${key}`);
+            return translated === `form_fields.supplier_returns.${key}`
+                ? fallback
+                : translated;
+        };
         const activeSupplierReturn = supplierReturn || item || entity;
         const defaultValues = useMemo(
             () => getSupplierReturnFormDefaults(activeSupplierReturn),
@@ -194,8 +202,8 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
                 onOpenChange={onOpenChange}
                 title={
                     activeSupplierReturn
-                        ? 'Edit Supplier Return'
-                        : 'Add New Supplier Return'
+                        ? fl('edit_title', 'Edit Supplier Return')
+                        : fl('add_title', 'Add New Supplier Return')
                 }
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
@@ -204,74 +212,116 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <InputField
                         name="return_number"
-                        label="Return Number"
-                        placeholder="Auto-generated if empty"
+                        label={fl('return_number', 'Return Number')}
+                        placeholder={fl(
+                            'return_number_placeholder',
+                            'Auto-generated if empty',
+                        )}
                     />
 
                     <SelectField
                         name="status"
-                        label="Status"
+                        label={fl('status', 'Status')}
                         options={[
-                            { value: 'draft', label: 'Draft' },
-                            { value: 'confirmed', label: 'Confirmed' },
-                            { value: 'cancelled', label: 'Cancelled' },
+                            {
+                                value: 'draft',
+                                label: fl('status_draft', 'Draft'),
+                            },
+                            {
+                                value: 'confirmed',
+                                label: fl('status_confirmed', 'Confirmed'),
+                            },
+                            {
+                                value: 'cancelled',
+                                label: fl('status_cancelled', 'Cancelled'),
+                            },
                         ]}
-                        placeholder="Select status"
+                        placeholder={fl('status_placeholder', 'Select status')}
                     />
 
                     <AsyncSelectField<{ po_number: string }>
                         name="purchase_order_id"
-                        label="Purchase Order"
+                        label={fl('purchase_order', 'Purchase Order')}
                         url="/api/purchase-orders"
-                        placeholder="Select purchase order"
+                        placeholder={fl(
+                            'purchase_order_placeholder',
+                            'Select purchase order',
+                        )}
                         labelFn={(po) => po.po_number}
                     />
 
                     <AsyncSelectField<{ gr_number: string }>
                         name="goods_receipt_id"
-                        label="Goods Receipt"
+                        label={fl('goods_receipt', 'Goods Receipt')}
                         url="/api/goods-receipts"
-                        placeholder="Select goods receipt"
+                        placeholder={fl(
+                            'goods_receipt_placeholder',
+                            'Select goods receipt',
+                        )}
                         labelFn={(gr) => gr.gr_number}
                     />
 
                     <AsyncSelectField
                         name="supplier_id"
-                        label="Supplier"
+                        label={fl('supplier', 'Supplier')}
                         url="/api/suppliers"
-                        placeholder="Select supplier"
+                        placeholder={fl(
+                            'supplier_placeholder',
+                            'Select supplier',
+                        )}
                     />
 
                     <AsyncSelectField
                         name="warehouse_id"
-                        label="Warehouse"
+                        label={fl('warehouse', 'Warehouse')}
                         url="/api/warehouses"
-                        placeholder="Select warehouse"
+                        placeholder={fl(
+                            'warehouse_placeholder',
+                            'Select warehouse',
+                        )}
                     />
 
-                    <DatePickerField name="return_date" label="Return Date" />
+                    <DatePickerField
+                        name="return_date"
+                        label={fl('return_date', 'Return Date')}
+                    />
 
                     <SelectField
                         name="reason"
-                        label="Reason"
+                        label={fl('reason', 'Reason')}
                         options={[
-                            { value: 'defective', label: 'Defective' },
-                            { value: 'wrong_item', label: 'Wrong Item' },
+                            {
+                                value: 'defective',
+                                label: fl('reason_defective', 'Defective'),
+                            },
+                            {
+                                value: 'wrong_item',
+                                label: fl('reason_wrong_item', 'Wrong Item'),
+                            },
                             {
                                 value: 'excess_quantity',
-                                label: 'Excess Quantity',
+                                label: fl(
+                                    'reason_excess_quantity',
+                                    'Excess Quantity',
+                                ),
                             },
-                            { value: 'damaged', label: 'Damaged' },
-                            { value: 'other', label: 'Other' },
+                            {
+                                value: 'damaged',
+                                label: fl('reason_damaged', 'Damaged'),
+                            },
+                            {
+                                value: 'other',
+                                label: fl('reason_other', 'Other'),
+                            },
                         ]}
-                        placeholder="Select reason"
+                        placeholder={fl('reason_placeholder', 'Select reason')}
                     />
 
                     <div className="md:col-span-2">
                         <TextareaField
                             name="notes"
-                            label="Notes"
-                            placeholder="Notes"
+                            label={fl('notes', 'Notes')}
+                            placeholder={fl('notes_placeholder', 'Notes')}
                             rows={2}
                         />
                     </div>
@@ -287,20 +337,25 @@ export const SupplierReturnForm = memo<SupplierReturnFormProps>(
                             <TableHeader>
                                 <TableRow>
                                     <TableHead className="w-[220px]">
-                                        Product
+                                        {fl('item_product', 'Product')}
                                     </TableHead>
                                     <TableHead className="w-[140px]">
-                                        Unit
+                                        {fl('item_unit', 'Unit')}
                                     </TableHead>
                                     <TableHead className="w-[120px]">
-                                        Qty Returned
+                                        {fl(
+                                            'item_qty_returned',
+                                            'Qty Returned',
+                                        )}
                                     </TableHead>
                                     <TableHead className="w-[140px]">
-                                        Unit Price
+                                        {fl('item_unit_price', 'Unit Price')}
                                     </TableHead>
-                                    <TableHead>Notes</TableHead>
+                                    <TableHead>
+                                        {fl('item_notes', 'Notes')}
+                                    </TableHead>
                                     <TableHead className="w-[120px] text-right">
-                                        Action
+                                        {fl('item_action', 'Action')}
                                     </TableHead>
                                 </TableRow>
                             </TableHeader>

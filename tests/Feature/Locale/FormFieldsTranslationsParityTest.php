@@ -99,3 +99,38 @@ test('purchase request and goods receipt form labels are translated to indonesia
         ->and($id['goods_receipts']['add_title'])->toBe('Tambah Penerimaan Barang Baru')
         ->and($id['goods_receipts']['warehouse'])->toBe('Gudang');
 });
+
+test('supplier return and stock transfer form labels keep the english text', function () {
+    $en = localeFormFieldTranslations('en.json');
+
+    expect($en['supplier_returns']['add_title'])->toBe('Add New Supplier Return')
+        ->and($en['supplier_returns']['edit_title'])->toBe('Edit Supplier Return')
+        ->and($en['supplier_returns']['return_number'])->toBe('Return Number')
+        ->and($en['supplier_returns']['reason_excess_quantity'])->toBe('Excess Quantity')
+        ->and($en['supplier_returns']['item_qty_returned'])->toBe('Qty Returned')
+        ->and($en['stock_transfers']['add_title'])->toBe('Add New Stock Transfer')
+        ->and($en['stock_transfers']['edit_title'])->toBe('Edit Stock Transfer')
+        ->and($en['stock_transfers']['from_warehouse'])->toBe('From Warehouse')
+        ->and($en['stock_transfers']['requested_by'])->toBe('Requested By (Employee)')
+        ->and($en['stock_transfers']['status_in_transit'])->toBe('In Transit')
+        ->and($en['stock_transfers']['item_unit_cost'])->toBe('Unit Cost');
+});
+
+test('supplier return and stock transfer form field keys are complete in both locales', function () {
+    $en = localeFormFieldTranslations('en.json');
+    $id = localeFormFieldTranslations('id.json');
+
+    foreach (['supplier_returns', 'stock_transfers'] as $module) {
+        expect(array_keys($en[$module]))->not->toBeEmpty();
+        expect(array_keys($en[$module]))->toEqual(array_keys($id[$module]), "form_fields.{$module} keys differ");
+
+        foreach (array_keys($en[$module]) as $field) {
+            expect($id[$module][$field])
+                ->not->toBe('', "form_fields.{$module}.{$field} empty");
+        }
+    }
+
+    expect($id['supplier_returns']['add_title'])->toBe('Tambah Retur Pemasok Baru')
+        ->and($id['stock_transfers']['add_title'])->toBe('Tambah Transfer Stok Baru')
+        ->and($id['stock_transfers']['from_warehouse'])->toBe('Dari Gudang');
+});
