@@ -40,6 +40,7 @@ export default function MaintenanceCostReport() {
                 scheduled_at: false,
                 performed_at: false,
             }}
+            summaryColumns={[{ key: 'cost', label: 'Total Cost' }]}
         />
     );
 }

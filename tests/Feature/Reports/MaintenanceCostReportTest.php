@@ -67,6 +67,7 @@ test('it can fetch maintenance cost report data via json', function () {
                 )
                 ->has('meta')
                 ->has('links')
+                ->has('summary')
         );
 });
 
@@ -134,6 +135,32 @@ test('it can filter the report by various parameters', function () {
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.asset_code', 'FR-001'); // IT-001 performed_at is 2025-01-01
 });
+
+test('it returns total cost across all filtered rows', function () {
+    AssetMaintenance::create([
+        'asset_id' => $this->asset->id,
+        'maintenance_type' => 'corrective',
+        'status' => 'completed',
+        'scheduled_at' => now()->subDays(4),
+        'performed_at' => now()->subDays(1),
+        'supplier_id' => $this->supplier->id,
+        'cost' => 250.50,
+        'notes' => 'Replace fan',
+        'created_by' => $this->user->id,
+    ]);
+
+    Sanctum::actingAs($this->user, ['*']);
+
+    $this->getJson('/api/reports/maintenance-cost')
+        ->assertOk()
+        ->assertJsonPath('summary.totals.cost', '750.50')
+        ->assertJsonCount(2, 'data');
+
+    $this->getJson('/api/reports/maintenance-cost?maintenance_type=corrective')
+        ->assertOk()
+        ->assertJsonPath('summary.totals.cost', '250.50')
+        ->assertJsonCount(1, 'data');
+})->group('maintenance-cost-reports');
 
 test('it can export the report data to excel', function () {
     Carbon::setTestNow(Carbon::parse('2026-02-01 10:00:00'));
