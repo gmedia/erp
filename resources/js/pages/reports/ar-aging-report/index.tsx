@@ -40,12 +40,20 @@ export default function ArAgingReportPage() {
                 amount_due: false,
             }}
             summaryColumns={[
-                { key: 'amount_due', label: 'Amount Due' },
-                { key: 'aging_current', label: 'Current' },
-                { key: 'aging_1_30', label: '1-30 Days' },
-                { key: 'aging_31_60', label: '31-60 Days' },
-                { key: 'aging_61_90', label: '61-90 Days' },
-                { key: 'aging_over_90', label: 'Over 90 Days' },
+                {
+                    key: 'amount_due',
+                    label: 'Amount Due',
+                    columnId: 'amount_due',
+                },
+                { key: 'aging_current', label: 'Current', columnId: 'current' },
+                { key: 'aging_1_30', label: '1-30 Days', columnId: '1_30' },
+                { key: 'aging_31_60', label: '31-60 Days', columnId: '31_60' },
+                { key: 'aging_61_90', label: '61-90 Days', columnId: '61_90' },
+                {
+                    key: 'aging_over_90',
+                    label: 'Over 90 Days',
+                    columnId: 'over_90',
+                },
             ]}
         />
     );

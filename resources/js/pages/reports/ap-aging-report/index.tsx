@@ -38,12 +38,32 @@ export default function ApAgingReportPage() {
                 bill_status: false,
             }}
             summaryColumns={[
-                { key: 'amount_due', label: 'Amount Due' },
-                { key: 'current_amount', label: 'Current' },
-                { key: 'days_1_30', label: '1-30 Days' },
-                { key: 'days_31_60', label: '31-60 Days' },
-                { key: 'days_61_90', label: '61-90 Days' },
-                { key: 'days_over_90', label: '>90 Days' },
+                {
+                    key: 'amount_due',
+                    label: 'Amount Due',
+                    columnId: 'amount_due',
+                },
+                {
+                    key: 'current_amount',
+                    label: 'Current',
+                    columnId: 'current',
+                },
+                { key: 'days_1_30', label: '1-30 Days', columnId: 'days_1_30' },
+                {
+                    key: 'days_31_60',
+                    label: '31-60 Days',
+                    columnId: 'days_31_60',
+                },
+                {
+                    key: 'days_61_90',
+                    label: '61-90 Days',
+                    columnId: 'days_61_90',
+                },
+                {
+                    key: 'days_over_90',
+                    label: '>90 Days',
+                    columnId: 'days_over_90',
+                },
             ]}
         />
     );

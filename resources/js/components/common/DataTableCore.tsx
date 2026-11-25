@@ -10,6 +10,7 @@ import {
     Table,
     TableBody,
     TableCell,
+    TableFooter,
     TableHead,
     TableHeader,
     TableRow,
@@ -184,6 +185,11 @@ export interface DataTableProps<T> {
     controlsDisabled?: boolean;
     /** Baris ringkasan (mis. total) yang tampil tepat di bawah tabel, di atas pagination. */
     footer?: React.ReactNode;
+    summaryRow?: {
+        label: React.ReactNode;
+        values: Record<string, React.ReactNode>;
+        labelColumnId?: string;
+    };
 }
 
 /**
@@ -223,6 +229,7 @@ export function DataTable<T>({
     defaultSorting,
     controlsDisabled = false,
     footer,
+    summaryRow,
     edgeFade = true,
 }: Readonly<DataTableProps<T>>) {
     const [sorting, setSorting] = React.useState<SortingState>(
@@ -573,6 +580,34 @@ export function DataTable<T>({
                         ))}
                     </TableHeader>
                     <TableBody>{tableContent}</TableBody>
+                    {summaryRow ? (
+                        <TableFooter>
+                            <TableRow>
+                                {table.getVisibleLeafColumns().map((column) => {
+                                    const labelColumnId =
+                                        summaryRow.labelColumnId ??
+                                        table.getVisibleLeafColumns()[0]?.id;
+                                    const isLabel = column.id === labelColumnId;
+                                    return (
+                                        <TableCell
+                                            key={column.id}
+                                            data-testid={`report-total-cell-${column.id}`}
+                                            className={cn(
+                                                'border-border px-2 py-1.5 tabular-nums',
+                                                !isLabel && 'text-right',
+                                            )}
+                                        >
+                                            {isLabel
+                                                ? summaryRow.label
+                                                : (summaryRow.values[
+                                                      column.id
+                                                  ] ?? null)}
+                                        </TableCell>
+                                    );
+                                })}
+                            </TableRow>
+                        </TableFooter>
+                    ) : null}
                 </Table>
             </div>
 
