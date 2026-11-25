@@ -77,10 +77,7 @@ export function NavMain({ items = [] }: Readonly<{ items: NavItem[] }>) {
                 header.getBoundingClientRect().bottom,
             );
             const safeBottom = containerRect.bottom;
-            if (
-                activeRect.top >= safeTop &&
-                activeRect.bottom <= safeBottom
-            ) {
+            if (activeRect.top >= safeTop && activeRect.bottom <= safeBottom) {
                 return;
             }
 
