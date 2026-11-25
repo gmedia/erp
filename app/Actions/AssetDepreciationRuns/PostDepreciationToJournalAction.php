@@ -108,7 +108,7 @@ class PostDepreciationToJournalAction
                         'branch_id' => $amounts['branch_id'],
                         'debit' => $amounts['debit'],
                         'credit' => 0,
-                        'memo' => 'Depreciation Expense',
+                        'memo' => __('asset_depreciation_run.memo_expense'),
                     ];
                 }
                 if ($amounts['credit'] > 0) {
@@ -117,7 +117,7 @@ class PostDepreciationToJournalAction
                         'branch_id' => $amounts['branch_id'],
                         'debit' => 0,
                         'credit' => $amounts['credit'],
-                        'memo' => 'Accumulated Depreciation',
+                        'memo' => __('asset_depreciation_run.memo_accumulated'),
                     ];
                 }
             }
@@ -125,7 +125,9 @@ class PostDepreciationToJournalAction
             $journalEntryData = [
                 'entry_date' => $run->period_end->format('Y-m-d'),
                 'reference' => 'DEPR-' . $run->period_start->format('Ym'),
-                'description' => 'Depreciation Run for ' . $run->period_start->format('M Y'),
+                'description' => __('asset_depreciation_run.journal_description', [
+                    'period' => $run->period_start->format('M Y'),
+                ]),
                 // A posted depreciation run must leave a posted journal so the
                 // expense and accumulated depreciation reach the GL (W7-05).
                 'status' => 'posted',

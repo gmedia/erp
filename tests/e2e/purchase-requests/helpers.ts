@@ -10,7 +10,7 @@ export async function createPurchaseRequest(page: Page): Promise<string> {
             const response = await fetch(url, {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
-                    'Authorization': `Bearer ${apiToken}`,
+                    Authorization: `Bearer ${apiToken}`,
                 },
             });
             const json = await response.json();
@@ -23,8 +23,10 @@ export async function createPurchaseRequest(page: Page): Promise<string> {
                 getFirstId('/api/branches?per_page=1'),
                 getFirstId('/api/departments?per_page=1'),
                 getFirstId('/api/employees?per_page=1'),
-                getFirstId('/api/products?search=Executive%20Office%20Desk&per_page=1'),
-                getFirstId('/api/units?search=Piece&per_page=1'),
+                getFirstId(
+                    '/api/products?search=Meja%20Kerja%20Eksekutif&per_page=1',
+                ),
+                getFirstId('/api/units?search=Buah&per_page=1'),
             ]);
 
         const response = await fetch('/api/purchase-requests', {
@@ -33,7 +35,7 @@ export async function createPurchaseRequest(page: Page): Promise<string> {
                 'Content-Type': 'application/json',
                 Accept: 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
-                'Authorization': `Bearer ${apiToken}`,
+                Authorization: `Bearer ${apiToken}`,
             },
             body: JSON.stringify({
                 branch_id: branchId,
@@ -68,7 +70,10 @@ export async function createPurchaseRequest(page: Page): Promise<string> {
     return String(createResult.prNumber);
 }
 
-export async function searchPurchaseRequest(page: Page, identifier: string): Promise<void> {
+export async function searchPurchaseRequest(
+    page: Page,
+    identifier: string,
+): Promise<void> {
     await searchAndWaitForApi(
         page,
         page.getByPlaceholder(/search/i),
@@ -101,23 +106,31 @@ export async function editPurchaseRequest(
                 {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
-                        'Authorization': `Bearer ${apiToken}`,
+                        Authorization: `Bearer ${apiToken}`,
                     },
                 },
             );
             const findPayload = await findResponse.json();
             const row = (findPayload.data || [])[0];
             if (!row?.id) {
-                return { ok: false, step: 'find', status: findResponse.status, body: findPayload };
+                return {
+                    ok: false,
+                    step: 'find',
+                    status: findResponse.status,
+                    body: findPayload,
+                };
             }
 
-            const detailResponse = await fetch(`/api/purchase-requests/${row.id}`, {
-                headers: {
-                    Accept: 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Authorization': `Bearer ${apiToken}`,
+            const detailResponse = await fetch(
+                `/api/purchase-requests/${row.id}`,
+                {
+                    headers: {
+                        Accept: 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        Authorization: `Bearer ${apiToken}`,
+                    },
                 },
-            });
+            );
             const detailPayload = await detailResponse.json().catch(() => ({}));
             const detail = detailPayload?.data;
 
@@ -141,7 +154,9 @@ export async function editPurchaseRequest(
                 status: detail.status,
                 notes: detail.notes ?? '',
                 rejection_reason: detail.rejection_reason ?? '',
-                items: (detail.items as PurchaseRequestDetailItem[] || []).map((item) => ({
+                items: (
+                    (detail.items as PurchaseRequestDetailItem[]) || []
+                ).map((item) => ({
                     product_id: item.product?.id,
                     unit_id: item.unit?.id,
                     quantity: item.quantity,
@@ -150,16 +165,19 @@ export async function editPurchaseRequest(
                 })),
             };
 
-            const updateResponse = await fetch(`/api/purchase-requests/${row.id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Authorization': `Bearer ${apiToken}`,
+            const updateResponse = await fetch(
+                `/api/purchase-requests/${row.id}`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Accept: 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        Authorization: `Bearer ${apiToken}`,
+                    },
+                    body: JSON.stringify(payload),
                 },
-                body: JSON.stringify(payload),
-            });
+            );
 
             const updatePayload = await updateResponse.json().catch(() => ({}));
 
@@ -173,7 +191,9 @@ export async function editPurchaseRequest(
         { findBy: identifier, nextPrNumber: updatedPrNumber },
     );
 
-    expect(updateResult, JSON.stringify(updateResult)).toMatchObject({ ok: true });
+    expect(updateResult, JSON.stringify(updateResult)).toMatchObject({
+        ok: true,
+    });
 
     await reloadAndWaitForApi(page, '/api/purchase-requests');
 }

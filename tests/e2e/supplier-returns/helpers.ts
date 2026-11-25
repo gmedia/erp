@@ -33,8 +33,10 @@ export async function createSupplierReturn(page: Page): Promise<string> {
         const [supplierId, warehouseId, productId, unitId] = await Promise.all([
             getFirstId('/api/suppliers?per_page=1'),
             getFirstId('/api/warehouses?per_page=1'),
-            getFirstId('/api/products?search=Executive%20Office%20Desk&per_page=1'),
-            getFirstId('/api/units?search=Piece&per_page=1'),
+            getFirstId(
+                '/api/products?search=Meja%20Kerja%20Eksekutif&per_page=1',
+            ),
+            getFirstId('/api/units?search=Buah&per_page=1'),
         ]);
 
         const today = new Date().toISOString().slice(0, 10);
@@ -153,7 +155,9 @@ export async function createSupplierReturn(page: Page): Promise<string> {
         };
     }, draft);
 
-    expect(createResult, JSON.stringify(createResult)).toMatchObject({ ok: true });
+    expect(createResult, JSON.stringify(createResult)).toMatchObject({
+        ok: true,
+    });
     expect(createResult.returnNumber).not.toBe('');
 
     await reloadAndWaitForApi(page, '/api/supplier-returns');
@@ -161,7 +165,10 @@ export async function createSupplierReturn(page: Page): Promise<string> {
     return String(createResult.returnNumber);
 }
 
-export async function searchSupplierReturn(page: Page, identifier: string): Promise<void> {
+export async function searchSupplierReturn(
+    page: Page,
+    identifier: string,
+): Promise<void> {
     await searchAndWaitForApi(
         page,
         page.getByPlaceholder(/search/i),
@@ -210,13 +217,16 @@ export async function editSupplierReturn(
                 };
             }
 
-            const detailResponse = await fetch(`/api/supplier-returns/${row.id}`, {
-                headers: {
-                    Accept: 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    Authorization: `Bearer ${apiToken}`,
+            const detailResponse = await fetch(
+                `/api/supplier-returns/${row.id}`,
+                {
+                    headers: {
+                        Accept: 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        Authorization: `Bearer ${apiToken}`,
+                    },
                 },
-            });
+            );
             const detailPayload = await detailResponse.json().catch(() => ({}));
             const detail = detailPayload?.data;
 
@@ -239,26 +249,31 @@ export async function editSupplierReturn(
                 reason: detail.reason,
                 status: detail.status,
                 notes: detail.notes ?? '',
-                items: (detail.items as SupplierReturnDetailItem[] || []).map((item) => ({
-                    goods_receipt_item_id: item.goods_receipt_item_id,
-                    product_id: item.product?.id,
-                    unit_id: item.unit?.id,
-                    quantity_returned: item.quantity_returned,
-                    unit_price: item.unit_price,
-                    notes: item.notes ?? '',
-                })),
+                items: ((detail.items as SupplierReturnDetailItem[]) || []).map(
+                    (item) => ({
+                        goods_receipt_item_id: item.goods_receipt_item_id,
+                        product_id: item.product?.id,
+                        unit_id: item.unit?.id,
+                        quantity_returned: item.quantity_returned,
+                        unit_price: item.unit_price,
+                        notes: item.notes ?? '',
+                    }),
+                ),
             };
 
-            const updateResponse = await fetch(`/api/supplier-returns/${row.id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                    Authorization: `Bearer ${apiToken}`,
-                    'X-Requested-With': 'XMLHttpRequest',
+            const updateResponse = await fetch(
+                `/api/supplier-returns/${row.id}`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Accept: 'application/json',
+                        Authorization: `Bearer ${apiToken}`,
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: JSON.stringify(payload),
                 },
-                body: JSON.stringify(payload),
-            });
+            );
 
             const updatePayload = await updateResponse.json().catch(() => ({}));
 
@@ -272,7 +287,9 @@ export async function editSupplierReturn(
         { findBy: identifier, nextReturnNumber: updatedReturnNumber },
     );
 
-    expect(updateResult, JSON.stringify(updateResult)).toMatchObject({ ok: true });
+    expect(updateResult, JSON.stringify(updateResult)).toMatchObject({
+        ok: true,
+    });
 
     await reloadAndWaitForApi(page, '/api/supplier-returns');
 }

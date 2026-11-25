@@ -38,9 +38,11 @@ class StockMovementSampleDataSeeder extends Seeder
 
     private const SR_DEMO = 'SR-____-0001%';
 
-    private const SA_DEMO = 'SA-____-9100%';
+    // Nomor demo SA/ST berurutan kecil (-000001..). Nomor lama 9100xx/9000xx
+    // sudah di-rename oleh seeder masing-masing, jadi pola lama tidak dipakai lagi.
+    private const SA_DEMO = 'SA-____-00000_';
 
-    private const ST_DEMO = 'ST-____-9000%';
+    private const ST_DEMO = 'ST-____-00000_';
 
     protected function seedDemoData(): void
     {

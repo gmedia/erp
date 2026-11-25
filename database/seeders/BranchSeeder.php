@@ -15,13 +15,14 @@ class BranchSeeder extends Seeder
         );
 
         $branches = [
-            'Head Office',
+            DemoMasterData::BRANCH_HEAD_OFFICE,
             'Jakarta Selatan',
             'Bandung',
             'Surabaya',
         ];
 
         $legacyNames = [
+            DemoMasterData::LEGACY_BRANCH_HEAD_OFFICE => DemoMasterData::BRANCH_HEAD_OFFICE,
             'Branch 1' => 'Jakarta Selatan',
             'Branch 2' => 'Bandung',
             'Branch 3' => 'Surabaya',
@@ -34,9 +35,9 @@ class BranchSeeder extends Seeder
                 continue;
             }
 
+            // Baris lama di-rename, bukan dihapus: banyak tabel mereferensi branch_id.
+            // Bila nama baru sudah ada (ganda), baris lama dipertahankan apa adanya.
             if (Branch::query()->where('name', $replacement)->exists()) {
-                $branch->delete();
-
                 continue;
             }
 

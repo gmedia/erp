@@ -16,9 +16,9 @@ test.describe('Asset Import E2E Tests', () => {
         const rowData = [
             uniqueAssetCode, // asset_code
             `E2E Asset ${timestamp}`, // name
-            'IT Equipment', // asset_category
+            'Peralatan TI', // asset_category
             '', // asset_model
-            'Head Office', // branch
+            'Kantor Pusat', // branch
             '', // location
             '', // department
             '', // employee
@@ -110,9 +110,9 @@ test.describe('Asset Import E2E Tests', () => {
         const rowData = [
             '', // asset_code
             'Invalid Asset', // name
-            'IT Equipment', // asset_category
+            'Peralatan TI', // asset_category
             '', // asset_model
-            'Head Office', // branch
+            'Kantor Pusat', // branch
             '', // location
             '', // department
             '', // employee

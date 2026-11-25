@@ -36,7 +36,7 @@ class PipelineSampleDataSeeder extends Seeder
         $pipeline = Pipeline::firstOrCreate(
             ['code' => 'supplier_bill_lifecycle'],
             [
-                'name' => 'Supplier Bill Lifecycle',
+                'name' => 'Siklus Hidup Tagihan Supplier',
                 'code' => 'supplier_bill_lifecycle',
                 'entity_type' => 'App\Models\SupplierBill',
                 'description' => 'Mengelola siklus hidup tagihan supplier — dari draft, confirmed, pembayaran, hingga lunas atau void.',
@@ -105,7 +105,7 @@ class PipelineSampleDataSeeder extends Seeder
         $pipeline = Pipeline::firstOrCreate(
             ['code' => 'ap_payment_lifecycle'],
             [
-                'name' => 'AP Payment Lifecycle',
+                'name' => 'Siklus Hidup Pembayaran Supplier',
                 'code' => 'ap_payment_lifecycle',
                 'entity_type' => 'App\Models\ApPayment',
                 'description' => 'Mengelola siklus hidup pembayaran hutang — dari draft, approval, confirmed, hingga reconciled atau void.',
@@ -170,7 +170,7 @@ class PipelineSampleDataSeeder extends Seeder
         $pipeline = Pipeline::firstOrCreate(
             ['code' => 'customer_invoice_lifecycle'],
             [
-                'name' => 'Customer Invoice Lifecycle',
+                'name' => 'Siklus Hidup Faktur Pelanggan',
                 'code' => 'customer_invoice_lifecycle',
                 'entity_type' => 'App\Models\CustomerInvoice',
                 'description' => 'Mengelola siklus hidup invoice pelanggan — dari draft, sent, paid, hingga cancelled atau void.',
@@ -258,7 +258,7 @@ class PipelineSampleDataSeeder extends Seeder
         $pipeline = Pipeline::firstOrCreate(
             ['code' => 'asset_lifecycle'],
             [
-                'name' => 'Asset Lifecycle',
+                'name' => 'Siklus Hidup Aset',
                 'code' => 'asset_lifecycle',
                 'entity_type' => 'App\Models\Asset',
                 'description' => 'Mengelola siklus hidup aset — dari draft, aktif, maintenance, hingga disposed/lost/cancelled.',
