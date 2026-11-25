@@ -44,7 +44,12 @@ test('english table empty state keeps the original text', function () {
 });
 
 test('file upload translation keys exist in both locales with matching placeholders', function () {
-    $decode = fn (string $file): array => json_decode(File::get(lang_path($file)), true, 512, JSON_THROW_ON_ERROR)['file_upload'] ?? [];
+    $decode = fn (string $file): array => json_decode(
+        File::get(lang_path($file)),
+        true,
+        512,
+        JSON_THROW_ON_ERROR,
+    )['file_upload'] ?? [];
     $en = $decode('en.json');
     $id = $decode('id.json');
 
