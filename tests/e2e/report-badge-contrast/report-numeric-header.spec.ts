@@ -1,6 +1,10 @@
 import { expect, test, type Page } from '@playwright/test';
 import { openModule } from '../helpers';
 
+// Standar repo (#463, budgets/table-numeric-layout.spec.ts) + keputusan
+// reviewer terbaru di #473:
+// - header SORTABLE: tepi kanan TOMBOL header (label + ikon sort) vs teks nilai, <= 4px
+// - header NON-sortable: tepi kanan teks LABEL vs teks nilai, <= 4px
 async function expectReportNumericHeaderRightAligned(
     page: Page,
     label: string,
@@ -16,21 +20,24 @@ async function expectReportNumericHeaderRightAligned(
         .first();
     await expect(valueText).toBeVisible();
 
-    const headTarget =
-        (await head.locator('button').count()) > 0
-            ? head.locator('button').first()
-            : head.locator('div, span').first();
+    const isSortable = (await head.locator('button').count()) > 0;
+    const headTarget = isSortable
+        ? head.locator('button').first()
+        : head.locator('div, span').first();
     const textRight = (el: Element) => {
         const range = document.createRange();
         range.selectNodeContents(el);
         return range.getBoundingClientRect().right;
     };
-    const headRight = await headTarget.evaluate(textRight);
+    const buttonRight = (el: Element) => el.getBoundingClientRect().right;
+    const headRight = await headTarget.evaluate(
+        isSortable ? buttonRight : textRight,
+    );
     const valueRight = await valueText.evaluate(textRight);
     expect(
         Math.abs(headRight - valueRight),
         `${label}: head right=${headRight} vs value text right=${valueRight}`,
-    ).toBeLessThanOrEqual(2);
+    ).toBeLessThanOrEqual(4);
 }
 
 async function expectTotalAlignedWithFirstRow(
