@@ -11,28 +11,37 @@ test.describe('DataTable layout di mobile (390px)', () => {
 
         const actionsHead = page.locator('th[data-sticky-column="actions"]');
         await expect(actionsHead).toBeVisible();
-        await actionsHead.evaluate((el) => {
-            const scroller = el.closest('.overflow-x-auto');
-            if (scroller) scroller.scrollLeft = scroller.scrollWidth;
-        });
+        await page.evaluate(() => document.fonts.ready);
 
         const lastBeforeActions = actionsHead.locator(
             'xpath=preceding-sibling::th[1]',
         );
-        const actionsBox = await actionsHead.boundingBox();
-        const beforeBox = await lastBeforeActions.boundingBox();
-        expect(actionsBox).not.toBeNull();
-        expect(beforeBox).not.toBeNull();
-        expect(beforeBox!.x + beforeBox!.width).toBeLessThanOrEqual(
-            actionsBox!.x + 1,
-        );
+        await expect
+            .poll(
+                async () => {
+                    await actionsHead.evaluate((el) => {
+                        const scroller = el.closest('.overflow-x-auto');
+                        if (scroller) {
+                            scroller.scrollLeft = scroller.scrollWidth;
+                        }
+                    });
+                    const actionsBox = await actionsHead.boundingBox();
+                    const beforeBox = await lastBeforeActions.boundingBox();
+                    if (!actionsBox || !beforeBox)
+                        return Number.POSITIVE_INFINITY;
+                    return beforeBox.x + beforeBox.width - (actionsBox.x + 1);
+                },
+                { timeout: 10000 },
+            )
+            .toBeLessThanOrEqual(0);
 
         const salaryHead = page.locator('th', { hasText: 'Salary' }).first();
         await expect(salaryHead).toBeVisible();
         const headerAlign = await salaryHead.evaluate((el) => {
             const sortButton = el.querySelector('button');
             return sortButton
-                ? getComputedStyle(sortButton.parentElement as Element).justifyContent
+                ? getComputedStyle(sortButton.parentElement as Element)
+                      .justifyContent
                 : getComputedStyle(el).textAlign;
         });
         expect(['flex-end', 'end', 'right']).toContain(headerAlign);
