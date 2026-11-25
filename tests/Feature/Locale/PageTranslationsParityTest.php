@@ -119,6 +119,87 @@ test('assets and employees page titles match the sidebar menu labels', function 
     }
 });
 
+test('inventory and purchasing page strings keep the english labels', function () {
+    $en = localePageTranslations('en.json');
+
+    expect($en['warehouses']['title'])->toBe('Warehouse')
+        ->and($en['warehouses']['description'])->toBe('Storage locations that hold product stock.')
+        ->and($en['stock_transfers']['title'])->toBe('Stock Transfers')
+        ->and($en['stock_transfers']['description'])->toBe(
+            'Move stock between warehouses with approval and receipt tracking.',
+        )
+        ->and($en['stock_adjustments']['title'])->toBe('Stock Adjustments')
+        ->and($en['stock_adjustments']['description'])->toBe(
+            'Record stock corrections with approval and journal posting.',
+        )
+        ->and($en['inventory_stocktakes']['title'])->toBe('Inventory Stocktakes')
+        ->and($en['inventory_stocktakes']['description'])->toBe(
+            'Physical counts of warehouse stock with variance results.',
+        )
+        ->and($en['stock_movements']['title'])->toBe('Stock Movements')
+        ->and($en['stock_movements']['description'])->toBe(
+            'Digital stock card — product movements by warehouse, type, and period.',
+        )
+        ->and($en['purchase_requests']['title'])->toBe('Purchase Requests')
+        ->and($en['purchase_requests']['description'])->toBe(
+            'Internal requests for goods before a purchase order is raised.',
+        )
+        ->and($en['goods_receipts']['title'])->toBe('Goods Receipts')
+        ->and($en['goods_receipts']['description'])->toBe('Record received goods and update warehouse stock.')
+        ->and($en['supplier_returns']['title'])->toBe('Supplier Returns')
+        ->and($en['supplier_returns']['description'])->toBe(
+            'Return received goods to suppliers with stock deduction.',
+        );
+});
+
+test('inventory and purchasing page strings are translated to indonesian', function () {
+    $en = localePageTranslations('en.json');
+    $id = localePageTranslations('id.json');
+
+    $modules = [
+        'warehouses',
+        'stock_transfers',
+        'stock_adjustments',
+        'inventory_stocktakes',
+        'stock_movements',
+        'purchase_requests',
+        'goods_receipts',
+        'supplier_returns',
+    ];
+
+    foreach ($modules as $module) {
+        foreach (array_keys($en[$module]) as $field) {
+            expect($id[$module][$field])->not->toBe($en[$module][$field], "page.{$module}.{$field} not translated");
+        }
+    }
+
+    expect($id['warehouses']['title'])->toBe('Gudang')
+        ->and($id['stock_transfers']['title'])->toBe('Transfer Stok')
+        ->and($id['goods_receipts']['title'])->toBe('Penerimaan Barang');
+});
+
+test('inventory and purchasing page titles match the sidebar menu labels', function () {
+    $pairs = [
+        'warehouses' => 'warehouse',
+        'stock_transfers' => 'stock_transfer',
+        'stock_adjustments' => 'stock_adjustment',
+        'inventory_stocktakes' => 'inventory_stocktake',
+        'stock_movements' => 'stock_movement',
+        'purchase_requests' => 'purchase_request',
+        'goods_receipts' => 'goods_receipt',
+        'supplier_returns' => 'supplier_return',
+    ];
+
+    foreach (['en.json', 'id.json'] as $file) {
+        $menu = json_decode(File::get(lang_path($file)), true, 512, JSON_THROW_ON_ERROR)['menu'];
+        $page = localePageTranslations($file);
+
+        foreach ($pairs as $pageKey => $menuKey) {
+            expect($page[$pageKey]['title'])->toBe($menu[$menuKey], "page.{$pageKey}.title != menu.{$menuKey}");
+        }
+    }
+});
+
 test('asset column labels keep english text and are translated to indonesian', function () {
     $en = json_decode(File::get(lang_path('en.json')), true, 512, JSON_THROW_ON_ERROR)['column'];
     $id = json_decode(File::get(lang_path('id.json')), true, 512, JSON_THROW_ON_ERROR)['column'];

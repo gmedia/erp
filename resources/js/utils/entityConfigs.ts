@@ -329,7 +329,15 @@ export const warehouseConfig = createComplexEntityConfig<Warehouse>({
     apiEndpoint: '/api/warehouses',
     exportEndpoint: '/api/warehouses/export',
     queryKey: ['warehouses'],
-    breadcrumbs: [{ title: 'Warehouses', href: '/warehouses' }],
+    titleKey: 'page.warehouses.title',
+    descriptionKey: 'page.warehouses.description',
+    breadcrumbs: [
+        {
+            title: 'Warehouses',
+            titleKey: 'menu.warehouse',
+            href: '/warehouses',
+        },
+    ],
     initialFilters: { search: '', branch_id: '' },
     columns: warehouseColumns,
     filterFields: createWarehouseFilterFields(),
@@ -437,7 +445,15 @@ export const stockTransferConfig = createComplexEntityConfig<StockTransfer>({
     apiEndpoint: '/api/stock-transfers',
     exportEndpoint: '/api/stock-transfers/export',
     queryKey: ['stock-transfers'],
-    breadcrumbs: [{ title: 'Stock Transfers', href: '/stock-transfers' }],
+    titleKey: 'page.stock_transfers.title',
+    descriptionKey: 'page.stock_transfers.description',
+    breadcrumbs: [
+        {
+            title: 'Stock Transfers',
+            titleKey: 'menu.stock_transfer',
+            href: '/stock-transfers',
+        },
+    ],
     initialFilters: {
         search: '',
         from_warehouse_id: '',
@@ -469,8 +485,14 @@ export const inventoryStocktakeConfig =
         apiEndpoint: '/api/inventory-stocktakes',
         exportEndpoint: '/api/inventory-stocktakes/export',
         queryKey: ['inventory-stocktakes'],
+        titleKey: 'page.inventory_stocktakes.title',
+        descriptionKey: 'page.inventory_stocktakes.description',
         breadcrumbs: [
-            { title: 'Inventory Stocktakes', href: '/inventory-stocktakes' },
+            {
+                title: 'Inventory Stocktakes',
+                titleKey: 'menu.inventory_stocktake',
+                href: '/inventory-stocktakes',
+            },
         ],
         initialFilters: {
             search: '',
@@ -498,8 +520,14 @@ export const stockAdjustmentConfig = createComplexEntityConfig<StockAdjustment>(
         apiEndpoint: '/api/stock-adjustments',
         exportEndpoint: '/api/stock-adjustments/export',
         queryKey: ['stock-adjustments'],
+        titleKey: 'page.stock_adjustments.title',
+        descriptionKey: 'page.stock_adjustments.description',
         breadcrumbs: [
-            { title: 'Stock Adjustments', href: '/stock-adjustments' },
+            {
+                title: 'Stock Adjustments',
+                titleKey: 'menu.stock_adjustment',
+                href: '/stock-adjustments',
+            },
         ],
         initialFilters: {
             search: '',
@@ -529,8 +557,14 @@ export const purchaseRequestConfig = createComplexEntityConfig<PurchaseRequest>(
         apiEndpoint: '/api/purchase-requests',
         exportEndpoint: '/api/purchase-requests/export',
         queryKey: ['purchase-requests'],
+        titleKey: 'page.purchase_requests.title',
+        descriptionKey: 'page.purchase_requests.description',
         breadcrumbs: [
-            { title: 'Purchase Requests', href: '/purchase-requests' },
+            {
+                title: 'Purchase Requests',
+                titleKey: 'menu.purchase_request',
+                href: '/purchase-requests',
+            },
         ],
         initialFilters: {
             search: '',
@@ -569,7 +603,13 @@ export const purchaseOrderConfig = createComplexEntityConfig<PurchaseOrder>({
     queryKey: ['purchase-orders'],
     titleKey: 'page.purchase_orders.title',
     descriptionKey: 'page.purchase_orders.description',
-    breadcrumbs: [{ title: 'Purchase Orders', href: '/purchase-orders' }],
+    breadcrumbs: [
+        {
+            title: 'Purchase Orders',
+            titleKey: 'menu.purchase_order',
+            href: '/purchase-orders',
+        },
+    ],
     initialFilters: {
         search: '',
         supplier_id: '',
@@ -602,7 +642,15 @@ export const goodsReceiptConfig = createComplexEntityConfig<GoodsReceipt>({
     apiEndpoint: '/api/goods-receipts',
     exportEndpoint: '/api/goods-receipts/export',
     queryKey: ['goods-receipts'],
-    breadcrumbs: [{ title: 'Goods Receipts', href: '/goods-receipts' }],
+    titleKey: 'page.goods_receipts.title',
+    descriptionKey: 'page.goods_receipts.description',
+    breadcrumbs: [
+        {
+            title: 'Goods Receipts',
+            titleKey: 'menu.goods_receipt',
+            href: '/goods-receipts',
+        },
+    ],
     initialFilters: {
         search: '',
         purchase_order_id: '',
@@ -630,7 +678,15 @@ export const supplierReturnConfig = createComplexEntityConfig<SupplierReturn>({
     apiEndpoint: '/api/supplier-returns',
     exportEndpoint: '/api/supplier-returns/export',
     queryKey: ['supplier-returns'],
-    breadcrumbs: [{ title: 'Supplier Returns', href: '/supplier-returns' }],
+    titleKey: 'page.supplier_returns.title',
+    descriptionKey: 'page.supplier_returns.description',
+    breadcrumbs: [
+        {
+            title: 'Supplier Returns',
+            titleKey: 'menu.supplier_return',
+            href: '/supplier-returns',
+        },
+    ],
     initialFilters: {
         search: '',
         purchase_order_id: '',

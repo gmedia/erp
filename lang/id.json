@@ -927,6 +927,38 @@
             "title": "Karyawan",
             "description": "Data karyawan dengan riwayat kepegawaian, departemen, dan jabatan.",
             "search_placeholder": "Cari karyawan..."
+        },
+        "warehouses": {
+            "title": "Gudang",
+            "description": "Lokasi penyimpanan yang menampung stok produk."
+        },
+        "stock_transfers": {
+            "title": "Transfer Stok",
+            "description": "Pindahkan stok antar gudang dengan persetujuan dan pelacakan penerimaan."
+        },
+        "stock_adjustments": {
+            "title": "Penyesuaian Stok",
+            "description": "Catat koreksi stok dengan persetujuan dan posting jurnal."
+        },
+        "inventory_stocktakes": {
+            "title": "Stock Opname Persediaan",
+            "description": "Hitung fisik stok gudang beserta hasil selisihnya."
+        },
+        "stock_movements": {
+            "title": "Mutasi Stok",
+            "description": "Kartu stok digital — pergerakan produk per gudang, jenis, dan periode."
+        },
+        "purchase_requests": {
+            "title": "Permintaan Pembelian",
+            "description": "Permintaan barang internal sebelum pesanan pembelian dibuat."
+        },
+        "goods_receipts": {
+            "title": "Penerimaan Barang",
+            "description": "Catat barang yang diterima dan perbarui stok gudang."
+        },
+        "supplier_returns": {
+            "title": "Retur Pemasok",
+            "description": "Kembalikan barang yang diterima ke pemasok dengan pengurangan stok."
         }
     },
     "stock_monitor_summary": {

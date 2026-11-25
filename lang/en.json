@@ -927,6 +927,38 @@
             "title": "Employee",
             "description": "Staff records with employment, department, and position history.",
             "search_placeholder": "Search employee..."
+        },
+        "warehouses": {
+            "title": "Warehouse",
+            "description": "Storage locations that hold product stock."
+        },
+        "stock_transfers": {
+            "title": "Stock Transfers",
+            "description": "Move stock between warehouses with approval and receipt tracking."
+        },
+        "stock_adjustments": {
+            "title": "Stock Adjustments",
+            "description": "Record stock corrections with approval and journal posting."
+        },
+        "inventory_stocktakes": {
+            "title": "Inventory Stocktakes",
+            "description": "Physical counts of warehouse stock with variance results."
+        },
+        "stock_movements": {
+            "title": "Stock Movements",
+            "description": "Digital stock card — product movements by warehouse, type, and period."
+        },
+        "purchase_requests": {
+            "title": "Purchase Requests",
+            "description": "Internal requests for goods before a purchase order is raised."
+        },
+        "goods_receipts": {
+            "title": "Goods Receipts",
+            "description": "Record received goods and update warehouse stock."
+        },
+        "supplier_returns": {
+            "title": "Supplier Returns",
+            "description": "Return received goods to suppliers with stock deduction."
         }
     },
     "stock_monitor_summary": {

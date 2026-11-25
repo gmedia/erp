@@ -14,10 +14,16 @@ export default function StockMovementsPage() {
     return (
         <ReportDataTablePage<StockMovementItem>
             title="Stock Movements"
+            titleKey="page.stock_movements.title"
             description="Digital stock card — product movements by warehouse, type, and period."
+            descriptionKey="page.stock_movements.description"
             breadcrumbs={[
                 { title: 'Inventory', href: '#' },
-                { title: 'Stock Movements', href: '/stock-movements' },
+                {
+                    title: 'Stock Movements',
+                    titleKey: 'menu.stock_movement',
+                    href: '/stock-movements',
+                },
             ]}
             columns={createStockMovementsColumns()}
             filterFields={createStockMovementsFilterFields()}
