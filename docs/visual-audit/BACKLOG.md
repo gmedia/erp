@@ -131,7 +131,7 @@ Matriks tema/viewport (opsional): `VISUAL_AUDIT_THEMES=light,dark VISUAL_AUDIT_V
 
 ## Next agent action
 
-0. **2026-11-25 (wave-8):** tindak lanjut ada di issue #456 (warna status, Rp 0 draft, urutan default, status PO, tie-break audit trail), #459 (data demo stok/transfer/approval PO), #460 (tabel mobile, perataan angka, kontras gelap, sidebar), #453 (pemilih bahasa), dan issue i18n (V8-57). Detail dan status klaim di `FINDINGS.md` → **Audit independen wave-8**. Jangan kerjakan ulang V8-05, V8-06, V8-10, V8-31, V8-61; V8-39 ditunda.
+0. **2026-11-25 (wave-8):** tindak lanjut ada di issue #456 (warna status, Rp 0 draft, urutan default, status PO, tie-break audit trail), #459 (data demo stok/transfer/approval PO), #460 (tabel mobile, perataan angka, kontras gelap, sidebar), #453 (pemilih bahasa), dan issue #462 (V8-57). Detail dan status klaim di `FINDINGS.md` → **Audit independen wave-8**. Jangan kerjakan ulang V8-05, V8-06, V8-10, V8-31, V8-61; V8-39 ditunda.
 
 0a. **2026-11-23:** kerjakan grup `W7-G1`…`W7-G6` (#340–#345) berurutan — detail di `FINDINGS.md` → **Audit independen wave-7**. W5/W6 ditutup; beberapa klaim fixed-nya reproduksi dan dipindah ke W7.
 

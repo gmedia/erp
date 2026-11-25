@@ -21,19 +21,20 @@ Error konsol 0 · overflow level halaman 0 · sel terpotong 0–1 (desktop), 2�
 | V8-32                         | masih ada                                                                 | → #459           |
 | V8-13 daftar status cancelled | kini by design: daftar menyembunyikan cancelled bila filter status kosong | diubah di #456   |
 | V8-39                         | —                                                                         | ditunda          |
-| V8-57                         | —                                                                         | masuk issue i18n |
+| V8-57                         | —                                                                         | masuk issue #462 |
 
 ### Temuan baru
 
-| Temuan                                                                                              | Tindak lanjut |
-| --------------------------------------------------------------------------------------------------- | ------------- |
-| Trial Balance ringkasan Rp 0                                                                        | #457          |
-| Data demo stok, transfer, dan approval PO                                                           | #459          |
-| Tabel mobile, perataan angka, kontras mode gelap, sidebar                                           | #460          |
-| Warna status, Rp 0 pada draft, urutan default, status PO di Purchase History, tie-break audit trail | #456          |
-| Pemilih bahasa tidak mengubah bahasa                                                                | #453          |
-| Jurnal pelepasan aset                                                                               | #442          |
-| Arus kas                                                                                            | #441          |
+| Temuan                                                                                              | Tindak lanjut           |
+| --------------------------------------------------------------------------------------------------- | ----------------------- |
+| Ringkasan Trial Balance tidak lagi Rp 0 (PR #458 merged)                                            | —                       |
+| Trial Balance ringkasan Rp 0                                                                        | #457 (selesai, PR #458) |
+| Data demo stok, transfer, dan approval PO                                                           | #459                    |
+| Tabel mobile, perataan angka, kontras mode gelap, sidebar                                           | #460                    |
+| Warna status, Rp 0 pada draft, urutan default, status PO di Purchase History, tie-break audit trail | #456                    |
+| Pemilih bahasa tidak mengubah bahasa                                                                | #453                    |
+| Jurnal pelepasan aset                                                                               | #442                    |
+| Arus kas                                                                                            | #441                    |
 
 **Keamanan:** temuan hak akses ditangani terpisah dan tidak dirinci di dokumen publik.
 
