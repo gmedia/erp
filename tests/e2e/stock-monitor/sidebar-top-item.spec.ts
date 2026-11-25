@@ -25,6 +25,9 @@ test.describe('Sidebar top item visibility (#504)', () => {
         expect(headerBox).not.toBeNull();
         const headerBottom = headerBox!.y + headerBox!.height;
 
+        const scrollTop = await content.evaluate((el) => el.scrollTop);
+        expect(scrollTop).toBeGreaterThanOrEqual(0);
+
         const activeBox = await active.boundingBox();
         expect(activeBox).not.toBeNull();
         expect(activeBox!.y).toBeGreaterThanOrEqual(headerBottom - 1);

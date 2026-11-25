@@ -76,4 +76,37 @@ test.describe('Stock Monitor Dashboard', () => {
 
         await expect(page.getByText('In-Transit Stock Value')).toBeVisible();
     });
+
+    test('header kolom angka sejajar kanan dengan nilainya di viewport 1440', async ({ page }) => {
+        await page.setViewportSize({ width: 1440, height: 900 });
+        const responsePromise = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/stock-monitor') &&
+                !r.url().includes('export') &&
+                r.request().headers()['accept']?.includes('application/json'),
+        );
+        await page.goto('/stock-monitor');
+        await expectResponseOk(await responsePromise);
+        await expect(page.locator('tbody tr').first()).toBeVisible();
+
+        const aligned = await page.evaluate(() => {
+            const headers = Array.from(document.querySelectorAll('thead th'));
+            const firstRow = document.querySelector('tbody tr');
+            const cells = Array.from(firstRow?.querySelectorAll('td') ?? []);
+            const pairs = ['Qty On Hand', 'Avg Cost', 'Stock Value'].map((label) => {
+                const index = headers.findIndex((th) => th.textContent?.includes(label));
+                const th = headers[index];
+                const td = cells[index];
+                if (!th || !td) return null;
+                const valueRight = td.getBoundingClientRect().right;
+                const headerRight = th.getBoundingClientRect().right;
+                return Math.abs(valueRight - headerRight);
+            });
+            return pairs;
+        });
+        for (const gap of aligned) {
+            expect(gap).not.toBeNull();
+            expect(gap!).toBeLessThanOrEqual(12);
+        }
+    });
 });
