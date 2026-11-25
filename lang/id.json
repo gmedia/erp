@@ -220,6 +220,13 @@
         "select_all": "Pilih semua",
         "selected": "dipilih"
     },
+    "shell": {
+        "filters": "Filter",
+        "add": "Tambah",
+        "export": "Ekspor",
+        "columns": "Kolom",
+        "user_guide": "Panduan Pengguna"
+    },
     "language": {
         "switch": "Bahasa",
         "en": "Inggris",

@@ -14,6 +14,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useTranslation } from '@/contexts/i18n-context';
 import React from 'react';
 
 export function PaginationControls({
@@ -36,10 +37,14 @@ export function PaginationControls({
     renderPageNumbers: () => React.ReactNode;
     disabled?: boolean;
 }>) {
+    const { t } = useTranslation();
+
     return (
         <div className="flex flex-col gap-2 py-2 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:text-sm">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-                <p className="whitespace-nowrap">Rows per page</p>
+                <p className="whitespace-nowrap">
+                    {t('pagination.rows_per_page')}
+                </p>
                 <Select
                     value={String(pagination.per_page)}
                     onValueChange={onPageSizeChange}
@@ -57,8 +62,9 @@ export function PaginationControls({
                     </SelectContent>
                 </Select>
                 <p className="text-foreground/80">
-                    Showing {pagination.from} to {pagination.to} of{' '}
-                    {pagination.total} entries
+                    {t('pagination.showing')} {pagination.from}{' '}
+                    {t('pagination.to')} {pagination.to} {t('pagination.of')}{' '}
+                    {pagination.total} {t('pagination.entries')}
                 </p>
             </div>
 
@@ -67,6 +73,7 @@ export function PaginationControls({
                     <PaginationItem>
                         <PaginationPrevious
                             href="#"
+                            text={t('pagination.previous')}
                             onClick={(e) => {
                                 e.preventDefault();
                                 if (pagination.page > 1) {
@@ -87,6 +94,7 @@ export function PaginationControls({
                     <PaginationItem>
                         <PaginationNext
                             href="#"
+                            text={t('pagination.next')}
                             onClick={(e) => {
                                 e.preventDefault();
                                 if (pagination.page < pagination.last_page) {

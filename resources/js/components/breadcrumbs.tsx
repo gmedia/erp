@@ -7,6 +7,7 @@ import {
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { useAuth } from '@/contexts/auth-context';
+import { useTranslation } from '@/contexts/i18n-context';
 import { resolveBreadcrumbs } from '@/lib/breadcrumb-trail';
 import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
 import { Fragment } from 'react';
@@ -18,8 +19,18 @@ export function Breadcrumbs({
     breadcrumbs?: BreadcrumbItemType[];
 }>) {
     const { menus } = useAuth();
+    const { t } = useTranslation();
     const { pathname } = useLocation();
-    const items = resolveBreadcrumbs(menus ?? [], pathname, breadcrumbs);
+    const items = resolveBreadcrumbs(
+        menus ?? [],
+        pathname,
+        breadcrumbs,
+        (name, displayName) => {
+            const key = `menu.${name}`;
+            const translated = t(key);
+            return translated === key ? displayName : translated;
+        },
+    );
 
     if (items.length === 0) {
         return null;

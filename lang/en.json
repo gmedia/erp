@@ -220,6 +220,13 @@
         "select_all": "Select all",
         "selected": "selected"
     },
+    "shell": {
+        "filters": "Filters",
+        "add": "Add",
+        "export": "Export",
+        "columns": "Columns",
+        "user_guide": "User Guide"
+    },
     "language": {
         "switch": "Language",
         "en": "English",

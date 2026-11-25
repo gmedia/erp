@@ -12,6 +12,10 @@ type TrailNode = {
     href: string;
 };
 
+export type MenuTitleResolver = (name: string, displayName: string) => string;
+
+const fallbackTitle: MenuTitleResolver = (_name, displayName) => displayName;
+
 function normalizePath(path: string | null | undefined): string {
     if (!path) {
         return '';
@@ -39,15 +43,16 @@ function findMenuTrail(
     items: readonly TrailMenuNode[],
     pathname: string,
     ancestors: TrailNode[],
+    resolveTitle: MenuTitleResolver,
 ): TrailNode[] | null {
     for (const item of items) {
         const href = normalizePath(item.url);
-        const title = item.display_name || item.name;
+        const title = resolveTitle(item.name, item.display_name || item.name);
         const here = [...ancestors, { title, href }];
 
         if (href && pathMatches(pathname, href)) {
             const deeper = item.children
-                ? findMenuTrail(item.children, pathname, here)
+                ? findMenuTrail(item.children, pathname, here, resolveTitle)
                 : null;
 
             // Halaman detail (mis. /asset-stocktakes/:id/perform) bukan lokasi
@@ -56,10 +61,35 @@ function findMenuTrail(
         }
 
         if (item.children?.length) {
-            const nested = findMenuTrail(item.children, pathname, here);
+            const nested = findMenuTrail(
+                item.children,
+                pathname,
+                here,
+                resolveTitle,
+            );
             if (nested) {
                 return nested;
             }
+        }
+    }
+
+    return null;
+}
+
+function findMenuTitleByDisplayName(
+    items: readonly TrailMenuNode[],
+    displayName: string,
+): TrailMenuNode | null {
+    for (const item of items) {
+        if (item.display_name === displayName) {
+            return item;
+        }
+
+        const nested = item.children
+            ? findMenuTitleByDisplayName(item.children, displayName)
+            : null;
+        if (nested) {
+            return nested;
         }
     }
 
@@ -73,13 +103,14 @@ function findMenuTrail(
 export function resolveMenuBreadcrumbTrail(
     menus: readonly TrailMenuNode[],
     pathname: string,
+    resolveTitle: MenuTitleResolver = fallbackTitle,
 ): BreadcrumbItem[] | null {
     const path = normalizePath(pathname);
     if (!path) {
         return null;
     }
 
-    const trail = findMenuTrail(menus, path, []);
+    const trail = findMenuTrail(menus, path, [], resolveTitle);
     if (!trail || trail.length === 0) {
         return null;
     }
@@ -103,8 +134,9 @@ export function resolveBreadcrumbs(
     menus: readonly TrailMenuNode[],
     pathname: string,
     explicit: readonly BreadcrumbItem[] | undefined,
+    resolveTitle: MenuTitleResolver = fallbackTitle,
 ): BreadcrumbItem[] {
-    const menuTrail = resolveMenuBreadcrumbTrail(menus, pathname);
+    const menuTrail = resolveMenuBreadcrumbTrail(menus, pathname, resolveTitle);
 
     if (!menuTrail || menuTrail.length === 0) {
         return explicit ? [...explicit] : [];
@@ -122,8 +154,11 @@ export function resolveBreadcrumbs(
     }
 
     const merged = [...menuTrail];
+    const leafMenu = findMenuTitleByDisplayName(menus, leaf.title);
     merged[merged.length - 1] = {
-        title: leaf.title,
+        title: leafMenu
+            ? resolveTitle(leafMenu.name, leafMenu.display_name)
+            : leaf.title,
         href:
             leaf.href && leaf.href !== '#' ? leaf.href : menuTrail.at(-1)!.href,
     };
