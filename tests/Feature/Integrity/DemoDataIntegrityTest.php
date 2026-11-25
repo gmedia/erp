@@ -1845,3 +1845,103 @@ invariant('W8-459 partially received transfers post transfer_in equal to quantit
         );
     }
 });
+
+// #459 butir 4 — setiap log Pending Approval -> Confirmed pada PO punya approval request approved + audit.
+invariant('W8-459 purchase orders passing Pending Approval have an approved request and audit', function () {
+    $entityStates = DB::table('pipeline_entity_states')
+        ->where('entity_type', PurchaseOrder::class)
+        ->get(['id', 'entity_id']);
+
+    $passed = 0;
+
+    foreach ($entityStates as $entityState) {
+        $transitions = DB::table('pipeline_state_logs')
+            ->join('pipeline_states as to_state', 'to_state.id', '=', 'pipeline_state_logs.to_state_id')
+            ->join('pipeline_states as from_state', 'from_state.id', '=', 'pipeline_state_logs.from_state_id')
+            ->where('pipeline_state_logs.pipeline_entity_state_id', $entityState->id)
+            ->where('from_state.name', 'Pending Approval')
+            ->where('to_state.name', 'Confirmed')
+            ->count();
+
+        if ($transitions === 0) {
+            continue;
+        }
+
+        $passed++;
+
+        $request = DB::table('approval_requests')
+            ->where('approvable_type', PurchaseOrder::class)
+            ->where('approvable_id', $entityState->entity_id)
+            ->first(['id', 'status']);
+
+        expect($request)->not->toBeNull("Purchase order {$entityState->entity_id} passed approval without an approval request");
+        expect($request->status)->toBe('approved', "Purchase order {$entityState->entity_id} request must be approved");
+        expect(
+            DB::table('approval_audit_logs')->where('approval_request_id', $request->id)->count()
+        )->toBeGreaterThan(0, "Purchase order {$entityState->entity_id} approval must have audit rows");
+    }
+
+    expect($passed)->toBeGreaterThan(0, 'Demo data must include a purchase order passing Pending Approval');
+});
+
+// #459 butir 5 — pengaju dokumen (submitted_by) bukan pelaku transisi lain pada dokumen yang sama.
+invariant('W8-459 purchase order requester never performs its own pipeline transitions', function () {
+    $requests = DB::table('approval_requests')
+        ->where('approvable_type', PurchaseOrder::class)
+        ->get(['approvable_id', 'submitted_by']);
+
+    expect($requests)->not->toBeEmpty('Demo data must include purchase order approval requests');
+
+    foreach ($requests as $request) {
+        $performers = DB::table('pipeline_state_logs')
+            ->join(
+                'pipeline_entity_states',
+                'pipeline_entity_states.id',
+                '=',
+                'pipeline_state_logs.pipeline_entity_state_id'
+            )
+            ->where('pipeline_entity_states.entity_type', PurchaseOrder::class)
+            ->where('pipeline_entity_states.entity_id', $request->approvable_id)
+            ->whereNotNull('pipeline_state_logs.performed_by')
+            ->pluck('pipeline_state_logs.performed_by');
+
+        foreach ($performers as $performer) {
+            expect((int) $performer)->not->toBe(
+                (int) $request->submitted_by,
+                "Purchase order {$request->approvable_id} requester must not perform its own transitions",
+            );
+        }
+    }
+});
+
+// #459 butir 6 — submitted_at aset tidak lebih awal dari log Draft (Initial -> Draft) pada tanggal dokumen.
+invariant('W8-459 asset approval submitted_at is not earlier than its Draft pipeline log', function () {
+    $requests = DB::table('approval_requests')
+        ->where('approvable_type', 'App\\Models\\Asset')
+        ->get(['approvable_id', 'submitted_at']);
+
+    expect($requests)->not->toBeEmpty('Demo data must include asset approval requests');
+
+    foreach ($requests as $request) {
+        $draftAt = DB::table('pipeline_state_logs')
+            ->join(
+                'pipeline_entity_states',
+                'pipeline_entity_states.id',
+                '=',
+                'pipeline_state_logs.pipeline_entity_state_id'
+            )
+            ->join('pipeline_states as to_state', 'to_state.id', '=', 'pipeline_state_logs.to_state_id')
+            ->where('pipeline_entity_states.entity_type', 'App\\Models\\Asset')
+            ->where('pipeline_entity_states.entity_id', $request->approvable_id)
+            ->where('to_state.name', 'Draft')
+            ->value('pipeline_state_logs.created_at');
+
+        if ($draftAt === null) {
+            continue;
+        }
+
+        expect(Carbon::parse($request->submitted_at)->gte(Carbon::parse($draftAt)))->toBeTrue(
+            "Asset {$request->approvable_id} submitted_at must not precede its Draft log",
+        );
+    }
+});

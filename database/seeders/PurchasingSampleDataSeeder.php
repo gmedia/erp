@@ -1213,9 +1213,12 @@ class PurchasingSampleDataSeeder extends Seeder
                 $documentRequesterId
             );
 
+            // Dokumen yang pernah melewati Pending Approval wajib punya request + audit
+            // yang cocok dengan log pipeline (#459 butir 4).
             $approvalRequestStatus = match ($status) {
                 'pending_approval' => 'pending',
                 'rejected' => 'rejected',
+                'confirmed', 'partially_received', 'fully_received', 'cancelled' => 'approved',
                 default => null,
             };
 
