@@ -89,7 +89,9 @@ export type SimpleEntityFormData = z.infer<typeof simpleEntitySchema>;
  * Product category form schema with name and description.
  */
 export const productCategoryFormSchema = z.object({
-    name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
+    name: z
+        .string()
+        .min(2, { message: 'validation.product_category.name_min_2' }),
     description: z.string().optional(),
 });
 
@@ -99,10 +101,10 @@ export type ProductCategoryFormData = z.infer<typeof productCategoryFormSchema>;
  * Unit form schema with name and symbol.
  */
 export const unitFormSchema = z.object({
-    name: z.string().min(1, { message: 'Name is required' }),
+    name: z.string().min(1, { message: 'validation.unit.name_required' }),
     symbol: z
         .string()
-        .max(10, { message: 'Symbol cannot exceed 10 characters' })
+        .max(10, { message: 'validation.unit.symbol_max_10' })
         .optional()
         .nullable(),
 });
@@ -111,8 +113,10 @@ export type UnitFormData = z.infer<typeof unitFormSchema>;
 
 // Schema for employee form data
 export const employeeFormSchema = z.object({
-    employee_id: z.string().min(1, { message: 'Employee ID is required.' }),
-    name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
+    employee_id: z
+        .string()
+        .min(1, { message: 'validation.employee.employee_id_required' }),
+    name: z.string().min(2, { message: 'validation.employee.name_min_2' }),
     email: emailValidator(),
     phone: z
         .string()
@@ -122,10 +126,18 @@ export const employeeFormSchema = z.object({
         })
         .or(z.literal(''))
         .optional(),
-    company_id: z.string().min(1, { message: 'Company is required.' }),
-    department_id: z.string().min(1, { message: 'Department is required.' }),
-    position_id: z.string().min(1, { message: 'Position is required.' }),
-    branch_id: z.string().min(1, { message: 'Branch is required.' }),
+    company_id: z
+        .string()
+        .min(1, { message: 'validation.employee.company_required' }),
+    department_id: z
+        .string()
+        .min(1, { message: 'validation.employee.department_required' }),
+    position_id: z
+        .string()
+        .min(1, { message: 'validation.employee.position_required' }),
+    branch_id: z
+        .string()
+        .min(1, { message: 'validation.employee.branch_required' }),
     salary: z
         .string()
         .optional()
@@ -139,9 +151,11 @@ export const employeeFormSchema = z.object({
                 }),
             ]),
         ),
-    hire_date: z.string().min(1, { message: 'Hire date is required.' }),
+    hire_date: z
+        .string()
+        .min(1, { message: 'validation.employee.hire_date_required' }),
     employment_status: z.enum(['regular', 'intern'], {
-        message: 'Employment status is required.',
+        message: 'validation.employee.employment_status_required',
     }),
     termination_date: z.string().optional().nullable(),
 });
@@ -150,7 +164,7 @@ export type EmployeeFormData = z.infer<typeof employeeFormSchema>;
 
 // Schema for customer form data
 export const customerFormSchema = z.object({
-    name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
+    name: z.string().min(2, { message: 'validation.customer.name_min_2' }),
     email: emailValidator(),
     phone: z
         .string()
@@ -161,11 +175,15 @@ export const customerFormSchema = z.object({
         .or(z.literal('')),
     address: z
         .string()
-        .min(5, { message: 'Address must be at least 5 characters.' }),
-    branch_id: z.string().min(1, { message: 'Branch is required.' }),
-    category_id: z.string().min(1, { message: 'Category is required.' }),
+        .min(5, { message: 'validation.customer.address_min_5' }),
+    branch_id: z
+        .string()
+        .min(1, { message: 'validation.customer.branch_required' }),
+    category_id: z
+        .string()
+        .min(1, { message: 'validation.customer.category_required' }),
     status: z.enum(['active', 'inactive'], {
-        message: 'Status is required.',
+        message: 'validation.customer.status_required',
     }),
     notes: z.string(),
 });
@@ -174,7 +192,7 @@ export type CustomerFormData = z.infer<typeof customerFormSchema>;
 
 // Schema for supplier form data
 export const supplierFormSchema = z.object({
-    name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
+    name: z.string().min(2, { message: 'validation.supplier.name_min_2' }),
     email: z.union([emailValidator(), z.literal('')]).optional(),
     phone: z
         .string()
@@ -185,9 +203,11 @@ export const supplierFormSchema = z.object({
         .or(z.literal('')),
     address: z.string().optional(),
     branch_id: z.string().optional(),
-    category_id: z.string().min(1, { message: 'Category is required.' }),
+    category_id: z
+        .string()
+        .min(1, { message: 'validation.supplier.category_required' }),
     status: z.enum(['active', 'inactive'], {
-        message: 'Status is required.',
+        message: 'validation.supplier.status_required',
     }),
 });
 
@@ -1157,7 +1177,8 @@ export const customerInvoiceFormSchema = z.object({
                 }),
                 ...linePricingFields({
                     quantity: 'validation.customer_invoice.quantity_gt_zero',
-                    unitPrice: 'validation.customer_invoice.unit_price_min_zero',
+                    unitPrice:
+                        'validation.customer_invoice.unit_price_min_zero',
                 }),
             }),
         )

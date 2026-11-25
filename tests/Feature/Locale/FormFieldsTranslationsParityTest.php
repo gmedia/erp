@@ -488,6 +488,59 @@ test('supplier bill, ap payment, customer invoice, ar receipt and credit note va
     expect($id['supplier_bill']['supplier_required'])->toBe('Pemasok wajib diisi.');
 });
 
+test('master data form field keys are complete in both locales', function () {
+    $en = localeFormFieldTranslations('en.json');
+    $id = localeFormFieldTranslations('id.json');
+
+    foreach (['employees', 'customers', 'suppliers', 'product_categories', 'units'] as $module) {
+        expect(array_keys($en[$module]))->not->toBeEmpty();
+        expect(array_keys($en[$module]))->toEqual(array_keys($id[$module]), "form_fields.{$module} keys differ");
+
+        foreach (array_keys($en[$module]) as $field) {
+            expect($id[$module][$field])->not->toBe('', "form_fields.{$module}.{$field} empty");
+        }
+    }
+});
+
+test('master data form labels keep the english text', function () {
+    $en = localeFormFieldTranslations('en.json');
+
+    expect($en['employees']['add_title'])->toBe('Add New Employee')
+        ->and($en['employees']['edit_title'])->toBe('Edit Employee')
+        ->and($en['employees']['employee_id'])->toBe('Employee ID (NIK)')
+        ->and($en['employees']['employment_status'])->toBe('Employment Status')
+        ->and($en['employees']['status_intern'])->toBe('Intern')
+        ->and($en['employees']['termination_date'])->toBe('Termination Date (Optional)')
+        ->and($en['customers']['add_title'])->toBe('Add New Customer')
+        ->and($en['customers']['address_placeholder'])->toBe('Full address')
+        ->and($en['customers']['notes_placeholder'])->toBe('Additional notes (optional)')
+        ->and($en['customers']['status_inactive'])->toBe('Inactive')
+        ->and($en['suppliers']['add_title'])->toBe('Add New Supplier')
+        ->and($en['suppliers']['name_placeholder'])->toBe('Supplier Name')
+        ->and($en['suppliers']['address_placeholder'])->toBe('123 Main St, City, Country')
+        ->and($en['product_categories']['add_title'])->toBe('Add New Product Category')
+        ->and($en['product_categories']['description_placeholder'])->toBe('Describe this category...')
+        ->and($en['units']['add_title'])->toBe('Add New Unit')
+        ->and($en['units']['symbol_placeholder'])->toBe('e.g., kg');
+});
+
+test('master data validation messages keep the english text and have keys in both locales', function () {
+    $en = localeValidationTranslations('en.json');
+    $id = localeValidationTranslations('id.json');
+
+    expect($en['employee']['employee_id_required'])->toBe('Employee ID is required.')
+        ->and($en['employee']['company_required'])->toBe('Company is required.')
+        ->and($en['customer']['address_min_5'])->toBe('Address must be at least 5 characters.')
+        ->and($en['supplier']['category_required'])->toBe('Category is required.')
+        ->and($en['unit']['name_required'])->toBe('Name is required')
+        ->and($en['unit']['symbol_max_10'])->toBe('Symbol cannot exceed 10 characters')
+        ->and($en['product_category']['name_min_2'])->toBe('Name must be at least 2 characters.');
+
+    foreach (['employee', 'customer', 'supplier', 'unit', 'product_category'] as $form) {
+        expect(array_keys($en[$form]))->toEqual(array_keys($id[$form]), "validation.{$form} keys differ");
+    }
+});
+
 test('budget, bank reconciliation, recurring journal and period closing validation messages are translated', function () {
     $en = localeValidationTranslations('en.json');
     $id = localeValidationTranslations('id.json');

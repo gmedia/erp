@@ -8,6 +8,7 @@ import { InputField } from '@/components/common/InputField';
 import NameField from '@/components/common/NameField';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityForm } from '@/hooks/useEntityForm';
 
 import { Supplier, SupplierFormData } from '@/types/entity';
@@ -20,6 +21,11 @@ interface SupplierFormProps {
     onSubmit: (data: SupplierFormData) => void;
     isLoading?: boolean;
 }
+
+const ft = (key: string, fallback: string) => ({
+    key: `form_fields.suppliers.${key}`,
+    fallback,
+});
 
 const getSupplierFormDefaults = (
     entity?: Supplier | null,
@@ -54,6 +60,13 @@ export const SupplierForm = memo<SupplierFormProps>(function SupplierForm({
     onSubmit,
     isLoading = false,
 }) {
+    const { t } = useTranslation();
+    const tf = (key: string, fallback: string) => {
+        const translated = t(`form_fields.suppliers.${key}`);
+        return translated === `form_fields.suppliers.${key}`
+            ? fallback
+            : translated;
+    };
     const form = useEntityForm<SupplierFormData, Supplier>({
         schema: supplierFormSchema,
         getDefaults: getSupplierFormDefaults,
@@ -65,47 +78,61 @@ export const SupplierForm = memo<SupplierFormProps>(function SupplierForm({
             form={form}
             open={open}
             onOpenChange={onOpenChange}
-            title={entity ? 'Edit Supplier' : 'Add New Supplier'}
+            title={
+                entity
+                    ? tf('edit_title', 'Edit Supplier')
+                    : tf('add_title', 'Add New Supplier')
+            }
             onSubmit={onSubmit}
             isLoading={isLoading}
         >
-            <NameField name="name" label="Name" placeholder="Supplier Name" />
+            <NameField
+                name="name"
+                label={ft('name', 'Name')}
+                placeholder={ft('name_placeholder', 'Supplier Name')}
+            />
             <InputField
                 name="email"
-                label="Email"
+                label={ft('email', 'Email')}
                 type="email"
-                placeholder="supplier@example.com"
+                placeholder={ft('email_placeholder', 'supplier@example.com')}
             />
             <InputField
                 name="phone"
-                label="Phone"
-                placeholder="+1 (555) 123-4567"
+                label={ft('phone', 'Phone')}
+                placeholder={ft('phone_placeholder', '+1 (555) 123-4567')}
             />
             <AsyncSelectField
                 name="branch_id"
-                label="Branch"
+                label={ft('branch', 'Branch')}
                 url="/api/branches"
-                placeholder="Select a branch"
+                placeholder={ft('branch_placeholder', 'Select a branch')}
             />
             <AsyncSelectField
                 name="category_id"
-                label="Category"
+                label={ft('category', 'Category')}
                 url="/api/supplier-categories"
-                placeholder="Select a category"
+                placeholder={ft('category_placeholder', 'Select a category')}
             />
             <SelectField
                 name="status"
-                label="Status"
+                label={ft('status', 'Status')}
                 options={[
-                    { value: 'active', label: 'Active' },
-                    { value: 'inactive', label: 'Inactive' },
+                    { value: 'active', label: ft('status_active', 'Active') },
+                    {
+                        value: 'inactive',
+                        label: ft('status_inactive', 'Inactive'),
+                    },
                 ]}
-                placeholder="Select status"
+                placeholder={ft('status_placeholder', 'Select status')}
             />
             <TextareaField
                 name="address"
-                label="Address"
-                placeholder="123 Main St, City, Country"
+                label={ft('address', 'Address')}
+                placeholder={ft(
+                    'address_placeholder',
+                    '123 Main St, City, Country',
+                )}
             />
         </EntityForm>
     );

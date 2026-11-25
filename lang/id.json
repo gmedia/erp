@@ -1943,6 +1943,88 @@
             "items_title": "Item Nota Kredit",
             "item_description": "Deskripsi",
             "item_description_placeholder": "Masukkan deskripsi"
+        },
+        "employees": {
+            "add_title": "Tambah Karyawan Baru",
+            "edit_title": "Ubah Karyawan",
+            "employee_id": "ID Karyawan (NIK)",
+            "name": "Nama",
+            "name_placeholder": "Budi Santoso",
+            "email": "Email",
+            "email_placeholder": "budi.santoso@example.com",
+            "phone": "Telepon",
+            "phone_placeholder": "+62 812 3456 7890",
+            "employment_status": "Status Kepegawaian",
+            "status_regular": "Tetap",
+            "status_intern": "Magang",
+            "department": "Departemen",
+            "department_placeholder": "Pilih departemen",
+            "position": "Jabatan",
+            "position_placeholder": "Pilih jabatan",
+            "branch": "Cabang",
+            "branch_placeholder": "Pilih cabang",
+            "salary": "Gaji (Opsional)",
+            "hire_date": "Tanggal Masuk",
+            "termination_date": "Tanggal Berhenti (Opsional)",
+            "pick_date": "Pilih tanggal"
+        },
+        "customers": {
+            "add_title": "Tambah Pelanggan Baru",
+            "edit_title": "Ubah Pelanggan",
+            "name": "Nama",
+            "name_placeholder": "Nama pelanggan",
+            "email": "Email",
+            "email_placeholder": "pelanggan@example.com",
+            "phone": "Telepon",
+            "phone_placeholder": "+62 812 3456 7890",
+            "address": "Alamat",
+            "address_placeholder": "Alamat lengkap",
+            "branch": "Cabang",
+            "branch_placeholder": "Pilih cabang",
+            "category": "Kategori",
+            "category_placeholder": "Pilih kategori",
+            "status": "Status",
+            "status_placeholder": "Pilih status",
+            "status_active": "Aktif",
+            "status_inactive": "Nonaktif",
+            "notes": "Catatan",
+            "notes_placeholder": "Catatan tambahan (opsional)"
+        },
+        "suppliers": {
+            "add_title": "Tambah Pemasok Baru",
+            "edit_title": "Ubah Pemasok",
+            "name": "Nama",
+            "name_placeholder": "Nama pemasok",
+            "email": "Email",
+            "email_placeholder": "pemasok@example.com",
+            "phone": "Telepon",
+            "phone_placeholder": "+62 812 3456 7890",
+            "address": "Alamat",
+            "address_placeholder": "Jl. Contoh No. 1, Kota, Negara",
+            "branch": "Cabang",
+            "branch_placeholder": "Pilih cabang",
+            "category": "Kategori",
+            "category_placeholder": "Pilih kategori",
+            "status": "Status",
+            "status_placeholder": "Pilih status",
+            "status_active": "Aktif",
+            "status_inactive": "Nonaktif"
+        },
+        "product_categories": {
+            "add_title": "Tambah Kategori Produk Baru",
+            "edit_title": "Ubah Kategori Produk",
+            "name": "Nama",
+            "name_placeholder": "mis., Elektronik",
+            "description": "Deskripsi",
+            "description_placeholder": "Jelaskan kategori ini..."
+        },
+        "units": {
+            "add_title": "Tambah Satuan Baru",
+            "edit_title": "Ubah Satuan",
+            "name": "Nama",
+            "name_placeholder": "mis., Kilogram",
+            "symbol": "Simbol",
+            "symbol_placeholder": "mis., kg"
         }
     },
     "validation": {
@@ -2084,6 +2166,35 @@
             "closing_type_required": "Jenis penutupan wajib diisi.",
             "period_month_range": "Bulan periode harus antara 1 dan 12.",
             "retained_earnings_account_required": "Akun laba ditahan wajib diisi."
+        },
+        "product_category": {
+            "name_min_2": "Nama minimal 2 karakter."
+        },
+        "unit": {
+            "name_required": "Nama wajib diisi",
+            "symbol_max_10": "Simbol tidak boleh lebih dari 10 karakter"
+        },
+        "employee": {
+            "employee_id_required": "ID karyawan wajib diisi.",
+            "name_min_2": "Nama minimal 2 karakter.",
+            "company_required": "Perusahaan wajib diisi.",
+            "department_required": "Departemen wajib diisi.",
+            "position_required": "Jabatan wajib diisi.",
+            "branch_required": "Cabang wajib diisi.",
+            "hire_date_required": "Tanggal masuk wajib diisi.",
+            "employment_status_required": "Status kepegawaian wajib diisi."
+        },
+        "customer": {
+            "name_min_2": "Nama minimal 2 karakter.",
+            "address_min_5": "Alamat minimal 5 karakter.",
+            "branch_required": "Cabang wajib diisi.",
+            "category_required": "Kategori wajib diisi.",
+            "status_required": "Status wajib diisi."
+        },
+        "supplier": {
+            "name_min_2": "Nama minimal 2 karakter.",
+            "category_required": "Kategori wajib diisi.",
+            "status_required": "Status wajib diisi."
         }
     },
     "item_dialog": {

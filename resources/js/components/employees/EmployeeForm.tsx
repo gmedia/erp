@@ -12,6 +12,7 @@ import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
 import NameField from '@/components/common/NameField';
 import SelectField from '@/components/common/SelectField';
+import { useTranslation } from '@/contexts/i18n-context';
 
 import { Employee } from '@/types/entity';
 import { toDateInputValue } from '@/utils/date-format';
@@ -106,24 +107,33 @@ const toApiPayload = (data: EmployeeFormData): Record<string, unknown> => {
     };
 };
 
+const ft = (key: string, fallback: string) => ({
+    key: `form_fields.employees.${key}`,
+    fallback,
+});
+
 const renderEmployeeBasicInfoSection = () => (
     <>
         <InputField
             name="employee_id"
-            label="Employee ID (NIK)"
+            label={ft('employee_id', 'Employee ID (NIK)')}
             placeholder="EMP-001"
         />
-        <NameField name="name" label="Name" placeholder="John Doe" />
+        <NameField
+            name="name"
+            label={ft('name', 'Name')}
+            placeholder={ft('name_placeholder', 'John Doe')}
+        />
         <InputField
             name="email"
-            label="Email"
+            label={ft('email', 'Email')}
             type="email"
-            placeholder="john.doe@example.com"
+            placeholder={ft('email_placeholder', 'john.doe@example.com')}
         />
         <InputField
             name="phone"
-            label="Phone"
-            placeholder="+1 (555) 123-4567"
+            label={ft('phone', 'Phone')}
+            placeholder={ft('phone_placeholder', '+1 (555) 123-4567')}
         />
     </>
 );
@@ -133,8 +143,8 @@ const renderEmployeeHireDateSection = () => (
         <div className="flex-1">
             <DatePickerField
                 name="hire_date"
-                label="Hire Date"
-                placeholder="Pick a date"
+                label={ft('hire_date', 'Hire Date')}
+                placeholder={ft('pick_date', 'Pick a date')}
                 disabled={(date: Date) =>
                     date > new Date() || date < new Date('1900-01-01')
                 }
@@ -143,8 +153,8 @@ const renderEmployeeHireDateSection = () => (
         <div className="flex-1">
             <DatePickerField
                 name="termination_date"
-                label="Termination Date (Optional)"
-                placeholder="Pick a date"
+                label={ft('termination_date', 'Termination Date (Optional)')}
+                placeholder={ft('pick_date', 'Pick a date')}
                 disabled={(date: Date) => date < new Date('1900-01-01')}
             />
         </div>
@@ -158,6 +168,13 @@ export const EmployeeForm = memo<EmployeeFormProps>(function EmployeeForm({
     onSubmit,
     isLoading = false,
 }) {
+    const { t } = useTranslation();
+    const tf = (key: string, fallback: string) => {
+        const translated = t(`form_fields.employees.${key}`);
+        return translated === `form_fields.employees.${key}`
+            ? fallback
+            : translated;
+    };
     const defaultValues = useMemo(
         () => getEmployeeFormDefaults(entity),
         [entity],
@@ -193,42 +210,51 @@ export const EmployeeForm = memo<EmployeeFormProps>(function EmployeeForm({
             form={form}
             open={open}
             onOpenChange={onOpenChange}
-            title={entity ? 'Edit Employee' : 'Add New Employee'}
+            title={tf(
+                entity ? 'edit_title' : 'add_title',
+                entity ? 'Edit Employee' : 'Add New Employee',
+            )}
             onSubmit={handleFormSubmit}
             isLoading={isLoading}
         >
             {renderEmployeeBasicInfoSection()}
             <SelectField
                 name="employment_status"
-                label="Employment Status"
+                label={ft('employment_status', 'Employment Status')}
                 options={[
-                    { value: 'regular', label: 'Regular' },
-                    { value: 'intern', label: 'Intern' },
+                    {
+                        value: 'regular',
+                        label: ft('status_regular', 'Regular'),
+                    },
+                    { value: 'intern', label: ft('status_intern', 'Intern') },
                 ]}
             />
             <AsyncSelectField
                 name="department_id"
-                label="Department"
+                label={ft('department', 'Department')}
                 url="/api/departments"
-                placeholder="Select a department"
+                placeholder={ft(
+                    'department_placeholder',
+                    'Select a department',
+                )}
             />
             <AsyncSelectField
                 name="position_id"
-                label="Position"
+                label={ft('position', 'Position')}
                 url="/api/positions"
-                placeholder="Select a position"
+                placeholder={ft('position_placeholder', 'Select a position')}
             />
             <AsyncSelectField<BranchOption>
                 name="branch_id"
-                label="Branch"
+                label={ft('branch', 'Branch')}
                 url="/api/branches"
-                placeholder="Select a branch"
+                placeholder={ft('branch_placeholder', 'Select a branch')}
                 onItemSelect={handleBranchSelect}
             />
             <input type="hidden" {...form.register('company_id')} />
             <InputField
                 name="salary"
-                label="Salary (Optional)"
+                label={ft('salary', 'Salary (Optional)')}
                 type="number"
                 placeholder="50000"
                 prefix="Rp"

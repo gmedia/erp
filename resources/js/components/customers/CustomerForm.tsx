@@ -8,6 +8,7 @@ import { InputField } from '@/components/common/InputField';
 import NameField from '@/components/common/NameField';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityForm } from '@/hooks/useEntityForm';
 
 import { Customer, CustomerFormData } from '@/types/entity';
@@ -21,9 +22,14 @@ interface CustomerFormProps {
     isLoading?: boolean;
 }
 
+const ft = (key: string, fallback: string) => ({
+    key: `form_fields.customers.${key}`,
+    fallback,
+});
+
 const statusOptions = [
-    { value: 'active', label: 'Active' },
-    { value: 'inactive', label: 'Inactive' },
+    { value: 'active', label: ft('status_active', 'Active') },
+    { value: 'inactive', label: ft('status_inactive', 'Inactive') },
 ];
 
 const getCustomerFormDefaults = (
@@ -67,6 +73,13 @@ export const CustomerForm = memo<CustomerFormProps>(function CustomerForm({
     onSubmit,
     isLoading = false,
 }) {
+    const { t } = useTranslation();
+    const tf = (key: string, fallback: string) => {
+        const translated = t(`form_fields.customers.${key}`);
+        return translated === `form_fields.customers.${key}`
+            ? fallback
+            : translated;
+    };
     const form = useEntityForm<CustomerFormData, Customer>({
         schema: customerFormSchema,
         getDefaults: getCustomerFormDefaults,
@@ -78,50 +91,61 @@ export const CustomerForm = memo<CustomerFormProps>(function CustomerForm({
             form={form}
             open={open}
             onOpenChange={onOpenChange}
-            title={entity ? 'Edit Customer' : 'Add New Customer'}
+            title={
+                entity
+                    ? tf('edit_title', 'Edit Customer')
+                    : tf('add_title', 'Add New Customer')
+            }
             onSubmit={onSubmit}
             isLoading={isLoading}
         >
-            <NameField name="name" label="Name" placeholder="Customer name" />
+            <NameField
+                name="name"
+                label={ft('name', 'Name')}
+                placeholder={ft('name_placeholder', 'Customer name')}
+            />
             <InputField
                 name="email"
-                label="Email"
+                label={ft('email', 'Email')}
                 type="email"
-                placeholder="customer@example.com"
+                placeholder={ft('email_placeholder', 'customer@example.com')}
             />
             <InputField
                 name="phone"
-                label="Phone"
-                placeholder="+62 812 3456 7890"
+                label={ft('phone', 'Phone')}
+                placeholder={ft('phone_placeholder', '+62 812 3456 7890')}
             />
             <TextareaField
                 name="address"
-                label="Address"
-                placeholder="Full address"
+                label={ft('address', 'Address')}
+                placeholder={ft('address_placeholder', 'Full address')}
                 rows={3}
             />
             <AsyncSelectField
                 name="branch_id"
-                label="Branch"
+                label={ft('branch', 'Branch')}
                 url="/api/branches"
-                placeholder="Select a branch"
+                placeholder={ft('branch_placeholder', 'Select a branch')}
             />
             <AsyncSelectField
                 name="category_id"
-                label="Category"
+                label={ft('category', 'Category')}
                 url="/api/customer-categories"
-                placeholder="Select a category"
+                placeholder={ft('category_placeholder', 'Select a category')}
             />
             <SelectField
                 name="status"
-                label="Status"
+                label={ft('status', 'Status')}
                 options={statusOptions}
-                placeholder="Select status"
+                placeholder={ft('status_placeholder', 'Select status')}
             />
             <TextareaField
                 name="notes"
-                label="Notes"
-                placeholder="Additional notes (optional)"
+                label={ft('notes', 'Notes')}
+                placeholder={ft(
+                    'notes_placeholder',
+                    'Additional notes (optional)',
+                )}
                 rows={2}
             />
         </EntityForm>

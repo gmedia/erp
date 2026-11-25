@@ -1943,6 +1943,88 @@
             "items_title": "Credit Note Items",
             "item_description": "Description",
             "item_description_placeholder": "Enter description"
+        },
+        "employees": {
+            "add_title": "Add New Employee",
+            "edit_title": "Edit Employee",
+            "employee_id": "Employee ID (NIK)",
+            "name": "Name",
+            "name_placeholder": "John Doe",
+            "email": "Email",
+            "email_placeholder": "john.doe@example.com",
+            "phone": "Phone",
+            "phone_placeholder": "+1 (555) 123-4567",
+            "employment_status": "Employment Status",
+            "status_regular": "Regular",
+            "status_intern": "Intern",
+            "department": "Department",
+            "department_placeholder": "Select a department",
+            "position": "Position",
+            "position_placeholder": "Select a position",
+            "branch": "Branch",
+            "branch_placeholder": "Select a branch",
+            "salary": "Salary (Optional)",
+            "hire_date": "Hire Date",
+            "termination_date": "Termination Date (Optional)",
+            "pick_date": "Pick a date"
+        },
+        "customers": {
+            "add_title": "Add New Customer",
+            "edit_title": "Edit Customer",
+            "name": "Name",
+            "name_placeholder": "Customer name",
+            "email": "Email",
+            "email_placeholder": "customer@example.com",
+            "phone": "Phone",
+            "phone_placeholder": "+62 812 3456 7890",
+            "address": "Address",
+            "address_placeholder": "Full address",
+            "branch": "Branch",
+            "branch_placeholder": "Select a branch",
+            "category": "Category",
+            "category_placeholder": "Select a category",
+            "status": "Status",
+            "status_placeholder": "Select status",
+            "status_active": "Active",
+            "status_inactive": "Inactive",
+            "notes": "Notes",
+            "notes_placeholder": "Additional notes (optional)"
+        },
+        "suppliers": {
+            "add_title": "Add New Supplier",
+            "edit_title": "Edit Supplier",
+            "name": "Name",
+            "name_placeholder": "Supplier Name",
+            "email": "Email",
+            "email_placeholder": "supplier@example.com",
+            "phone": "Phone",
+            "phone_placeholder": "+1 (555) 123-4567",
+            "address": "Address",
+            "address_placeholder": "123 Main St, City, Country",
+            "branch": "Branch",
+            "branch_placeholder": "Select a branch",
+            "category": "Category",
+            "category_placeholder": "Select a category",
+            "status": "Status",
+            "status_placeholder": "Select status",
+            "status_active": "Active",
+            "status_inactive": "Inactive"
+        },
+        "product_categories": {
+            "add_title": "Add New Product Category",
+            "edit_title": "Edit Product Category",
+            "name": "Name",
+            "name_placeholder": "e.g., Electronics",
+            "description": "Description",
+            "description_placeholder": "Describe this category..."
+        },
+        "units": {
+            "add_title": "Add New Unit",
+            "edit_title": "Edit Unit",
+            "name": "Name",
+            "name_placeholder": "e.g., Kilogram",
+            "symbol": "Symbol",
+            "symbol_placeholder": "e.g., kg"
         }
     },
     "validation": {
@@ -2084,6 +2166,35 @@
             "closing_type_required": "Closing type is required.",
             "period_month_range": "Period month must be between 1 and 12.",
             "retained_earnings_account_required": "Retained earnings account is required."
+        },
+        "product_category": {
+            "name_min_2": "Name must be at least 2 characters."
+        },
+        "unit": {
+            "name_required": "Name is required",
+            "symbol_max_10": "Symbol cannot exceed 10 characters"
+        },
+        "employee": {
+            "employee_id_required": "Employee ID is required.",
+            "name_min_2": "Name must be at least 2 characters.",
+            "company_required": "Company is required.",
+            "department_required": "Department is required.",
+            "position_required": "Position is required.",
+            "branch_required": "Branch is required.",
+            "hire_date_required": "Hire date is required.",
+            "employment_status_required": "Employment status is required."
+        },
+        "customer": {
+            "name_min_2": "Name must be at least 2 characters.",
+            "address_min_5": "Address must be at least 5 characters.",
+            "branch_required": "Branch is required.",
+            "category_required": "Category is required.",
+            "status_required": "Status is required."
+        },
+        "supplier": {
+            "name_min_2": "Name must be at least 2 characters.",
+            "category_required": "Category is required.",
+            "status_required": "Status is required."
         }
     },
     "item_dialog": {
