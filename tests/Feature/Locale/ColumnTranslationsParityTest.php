@@ -218,6 +218,26 @@ test('ar aging report column keys have translations', function () {
         ->and($en['days_over_90'])->toBe('Over 90 Days');
 });
 
+test('ap outstanding and payment history column keys have translations', function () {
+    $en = localeColumnTranslations('en.json');
+    $id = localeColumnTranslations('id.json');
+
+    $keys = [
+        'payment_number', 'payment_method', 'bank_account', 'amount_paid',
+        'allocated', 'unallocated', 'total_amount',
+    ];
+
+    foreach ($keys as $key) {
+        expect($en)->toHaveKey($key)
+            ->and($id)->toHaveKey($key)
+            ->and($id[$key])->not->toBe($en[$key], "column.{$key} not translated");
+    }
+
+    expect($en['bank_account'])->toBe('Bank Account')
+        ->and($en['amount_paid'])->toBe('Amount Paid')
+        ->and($en['allocated'])->toBe('Allocated');
+});
+
 test('column translation values are non-empty strings', function () {
     foreach (['en.json', 'id.json'] as $file) {
         foreach (localeColumnTranslations($file) as $key => $value) {
