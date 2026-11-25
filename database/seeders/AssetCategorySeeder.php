@@ -17,7 +17,7 @@ class AssetCategorySeeder extends Seeder
             ],
             [
                 'code' => 'IT',
-                'name' => 'IT Equipment',
+                'name' => 'Peralatan TI',
                 'useful_life_months_default' => 48,
             ],
             [

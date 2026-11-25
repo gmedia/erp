@@ -62,7 +62,7 @@ export async function createAsset(
   await categoryTrigger.click();
   const categorySearchInput = page.getByPlaceholder('Search...').last();
   await expect(categorySearchInput).toBeVisible();
-  const categoryName = overrides.category ?? 'IT Equipment'; // Ensure this category exists in seed
+  const categoryName = overrides.category ?? 'Peralatan TI'; // Ensure this category exists in seed
   await categorySearchInput.fill(categoryName);
   
   // Strict check might fail if 'IT' matches multiple. distinct name is better.
@@ -79,7 +79,7 @@ export async function createAsset(
   await branchTrigger.click();
   const branchSearchInput = page.getByPlaceholder('Search...').last();
   await expect(branchSearchInput).toBeVisible();
-  const branchName = overrides.branch ?? 'Head Office';
+  const branchName = overrides.branch ?? 'Kantor Pusat';
   await branchSearchInput.fill(branchName);
   
   try {
@@ -200,8 +200,8 @@ export async function createHighValueAsset(
   return createAsset(page, {
     asset_code: overrides.asset_code ?? `HVA-${Date.now()}`,
     name: overrides.name ?? `High Value Asset ${Date.now()}`,
-    category: overrides.category ?? 'IT Equipment',
-    branch: overrides.branch ?? 'Head Office',
+    category: overrides.category ?? 'Peralatan TI',
+    branch: overrides.branch ?? 'Kantor Pusat',
     purchase_cost: overrides.purchase_cost ?? '150000000', // 150M > 100M threshold
     ...overrides,
   });

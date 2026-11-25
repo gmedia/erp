@@ -96,8 +96,6 @@ class DatabaseSeeder extends Seeder
             AssetCategorySeeder::class,
         ]);
 
-        $departmentId = Department::query()->value('id');
-        $positionId = Position::query()->value('id');
         $branchId = Branch::query()->value('id');
         $companyId = Company::query()->value('id')
             ?? Company::query()->firstOrCreate(['name' => 'PT. Default Company'])->id;
@@ -113,120 +111,69 @@ class DatabaseSeeder extends Seeder
         }
 
         // Demo user employee (ensures CheckPermission middleware finds employee)
-        $testEmployee = Employee::updateOrCreate([
-            'email' => 'rina.kartika@example.com',
-            'user_id' => $testUser->id,
-        ], [
-            'employee_id' => 'EMP-000001',
-            'name' => 'Rina Kartika',
-            'phone' => '081234567800',
-        ]);
-
-        Employment::updateOrCreate(
-            ['employee_id' => $testEmployee->id, 'is_current' => true],
+        // Karyawan demo: kode berurutan EMP-000001.. tanpa celah. Admin User adalah akun
+        // admin (CheckPermission membutuhkan baris employee), bergaji wajar.
+        $demoEmployees = [
             [
-                'company_id' => $companyId,
-                'department_id' => $departmentId,
-                'position_id' => $positionId,
-                'branch_id' => $branchId,
-                'salary' => 50000,
-                'hire_date' => now(),
-                'employment_status' => 'regular',
+                'code' => 'EMP-000001', 'name' => 'Rina Kartika', 'email' => 'rina.kartika@example.com',
+                'phone' => '081234567800', 'department' => DemoMasterData::DEPARTMENT_OPERATIONS,
+                'position' => DemoMasterData::POSITION_MANAGER,
+                'salary' => 15000000, 'years' => 3, 'user' => $testUser,
             ],
-        );
-
-        // Admin Employee
-        $adminEmployee = Employee::updateOrCreate([
-            'email' => config('app.admin'),
-            'user_id' => $admin->id,
-        ], [
-            'employee_id' => 'EMP-000002',
-            'name' => 'Admin User',
-            'phone' => '081234567801',
-        ]);
-
-        Employment::updateOrCreate(
-            ['employee_id' => $adminEmployee->id, 'is_current' => true],
             [
-                'company_id' => $companyId,
-                'department_id' => $departmentId,
-                'position_id' => $positionId,
-                'branch_id' => $branchId,
-                'salary' => 100000,
-                'hire_date' => now(),
-                'employment_status' => 'regular',
+                'code' => 'EMP-000002', 'name' => 'Admin User', 'email' => config('app.admin'),
+                'phone' => '081234567801', 'department' => DemoMasterData::DEPARTMENT_ENGINEERING,
+                'position' => DemoMasterData::POSITION_LEAD,
+                'salary' => 12000000, 'years' => 4, 'user' => $admin,
             ],
-        );
-
-        // Sample Employees for Approvals
-        $hrManagerUser = User::where('email', 'manager.hr@example.com')->first();
-        $hrManagerEmployee = Employee::updateOrCreate([
-            'email' => 'manager.hr@example.com',
-            'user_id' => $hrManagerUser->id,
-        ], [
-            'employee_id' => 'EMP-000003',
-            'name' => 'Hendra Wijaya',
-            'phone' => '081234567891',
-        ]);
-
-        Employment::updateOrCreate(
-            ['employee_id' => $hrManagerEmployee->id, 'is_current' => true],
             [
-                'company_id' => $companyId,
-                'department_id' => Department::where('name', 'HR')->value('id'),
-                'position_id' => Position::where('name', 'Manager')->value('id'),
-                'branch_id' => $branchId,
-                'salary' => 15000000,
-                'hire_date' => now()->subYears(2),
-                'employment_status' => 'regular',
+                'code' => 'EMP-000003', 'name' => 'Hendra Wijaya', 'email' => 'hendra.wijaya@example.com',
+                'phone' => '081234567891', 'department' => DemoMasterData::DEPARTMENT_HR,
+                'position' => DemoMasterData::POSITION_MANAGER,
+                'salary' => 15000000, 'years' => 2,
+                'user' => User::where('email', 'manager.hr@example.com')->first(),
             ],
-        );
-
-        $financeDirectorUser = User::where('email', 'director.finance@example.com')->first();
-        $financeDirectorEmployee = Employee::updateOrCreate([
-            'email' => 'director.finance@example.com',
-            'user_id' => $financeDirectorUser->id,
-        ], [
-            'employee_id' => 'EMP-000004',
-            'name' => 'Dewi Anggraini',
-            'phone' => '081234567892',
-        ]);
-
-        Employment::updateOrCreate(
-            ['employee_id' => $financeDirectorEmployee->id, 'is_current' => true],
             [
-                'company_id' => $companyId,
-                'department_id' => Department::where('name', 'Finance')->value('id'),
-                'position_id' => Position::where('name', 'Director')->value('id'),
-                'branch_id' => $branchId,
-                'salary' => 25000000,
-                'hire_date' => now()->subYears(5),
-                'employment_status' => 'regular',
+                'code' => 'EMP-000004', 'name' => 'Dewi Anggraini', 'email' => 'dewi.anggraini@example.com',
+                'phone' => '081234567892', 'department' => DemoMasterData::DEPARTMENT_FINANCE,
+                'position' => DemoMasterData::POSITION_DIRECTOR,
+                'salary' => 25000000, 'years' => 5,
+                'user' => User::where('email', 'director.finance@example.com')->first(),
             ],
-        );
-
-        $itStaffUser = User::where('email', 'staff.it@example.com')->first();
-        $itStaffEmployee = Employee::updateOrCreate([
-            'email' => 'staff.it@example.com',
-            'user_id' => $itStaffUser->id,
-        ], [
-            'employee_id' => 'EMP-000005',
-            'name' => 'Agus Prasetyo',
-            'phone' => '081234567893',
-        ]);
-
-        Employment::updateOrCreate(
-            ['employee_id' => $itStaffEmployee->id, 'is_current' => true],
             [
-                'company_id' => $companyId,
-                'department_id' => Department::where('name', 'Engineering')->value('id'),
-                'position_id' => Position::where('name', 'Senior')->value('id'),
-                'branch_id' => $branchId,
-                'salary' => 12000000,
-                'hire_date' => now()->subYears(1),
-                'employment_status' => 'regular',
+                'code' => 'EMP-000005', 'name' => 'Agus Prasetyo', 'email' => 'agus.prasetyo@example.com',
+                'phone' => '081234567893', 'department' => DemoMasterData::DEPARTMENT_ENGINEERING,
+                'position' => DemoMasterData::POSITION_SENIOR_DEVELOPER,
+                'salary' => 12000000, 'years' => 1,
+                'user' => User::where('email', 'staff.it@example.com')->first(),
             ],
-        );
+        ];
+
+        foreach ($demoEmployees as $person) {
+            // Kunci: user_id (stabil). Email demo bisa berubah antar versi seed;
+            // mencari dengan email ikut berubah dan menimbulkan baris ganda.
+            $employee = Employee::updateOrCreate([
+                'user_id' => $person['user']->id,
+            ], [
+                'email' => $person['email'],
+                'employee_id' => $person['code'],
+                'name' => $person['name'],
+                'phone' => $person['phone'],
+            ]);
+
+            Employment::updateOrCreate(
+                ['employee_id' => $employee->id, 'is_current' => true],
+                [
+                    'company_id' => $companyId,
+                    'department_id' => Department::where('name', $person['department'])->value('id'),
+                    'position_id' => Position::where('name', $person['position'])->value('id'),
+                    'branch_id' => $branchId,
+                    'salary' => $person['salary'],
+                    'hire_date' => now()->subYears($person['years']),
+                    'employment_status' => 'regular',
+                ],
+            );
+        }
 
         $this->call([
             PermissionSeeder::class,
@@ -257,7 +204,8 @@ class DatabaseSeeder extends Seeder
 
         $this->spreadIdenticalAuditTimestamps();
 
-        // Assign all permissions to sample users for easy testing
+        // Assign all permissions to sample users for easy testing. Cari karyawan lewat
+        // user_id: email karyawan bisa berbeda dari email user di data demo lama (PR432).
         $allPermissions = Permission::all();
         foreach ([
             'rina.kartika@example.com',
@@ -266,7 +214,12 @@ class DatabaseSeeder extends Seeder
             'director.finance@example.com',
             'staff.it@example.com',
         ] as $email) {
-            $employee = Employee::where('email', $email)->first();
+            $user = User::where('email', $email)->first();
+            $employee = $user
+                ? Employee::where('user_id', $user->id)->first()
+                : null;
+            $employee ??= Employee::where('email', $email)->first();
+
             if ($employee) {
                 $employee->permissions()->sync($allPermissions);
             }

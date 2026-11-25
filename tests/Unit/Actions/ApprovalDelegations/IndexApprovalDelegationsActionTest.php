@@ -29,18 +29,18 @@ test('executes query with sorting and pagination', function () {
 });
 
 test('executes query with search filter', function () {
-    ApprovalDelegation::factory()->create(['reason' => 'Annual Leave']);
+    ApprovalDelegation::factory()->create(['reason' => 'Cuti tahunan']);
     ApprovalDelegation::factory()->create(['reason' => 'Business Trip']);
 
     $action = app(IndexApprovalDelegationsAction::class);
     $request = Mockery::mock(IndexApprovalDelegationRequest::class);
-    $request->shouldReceive('validated')->once()->andReturn(['search' => 'Annual']);
+    $request->shouldReceive('validated')->once()->andReturn(['search' => 'Cuti']);
     $request->shouldReceive('get')->with('per_page', 10)->once()->andReturn(10);
     $request->shouldReceive('get')->with('page', 1)->once()->andReturn(1);
     $result = $action->execute($request);
 
     expect($result->total())->toBe(1)
-        ->and($result->items()[0]->reason)->toBe('Annual Leave');
+        ->and($result->items()[0]->reason)->toBe('Cuti tahunan');
 });
 
 test('executes query with delegator filter', function () {

@@ -30,20 +30,22 @@ class StockTransferSampleDataSeeder extends Seeder
             ->where('email', config('app.admin'))
             ->value('id') ?? Employee::query()->value('id');
 
-        $fromWarehouse = Warehouse::query()->where('code', 'MAIN')->first();
-        $toWarehouse = Warehouse::query()->where('code', 'RTN')->first();
+        $fromWarehouse = Warehouse::query()->where('code', DemoMasterData::WAREHOUSE_MAIN_CODE)->first();
+        $toWarehouse = Warehouse::query()->where('code', DemoMasterData::WAREHOUSE_RETURN_CODE)->first();
 
         if ($fromWarehouse === null || $toWarehouse === null) {
-            $branchId = Branch::query()->where('name', 'Head Office')->value('id') ?? Branch::query()->value('id');
+            $branchId = Branch::query()
+                ->where('name', DemoMasterData::BRANCH_HEAD_OFFICE)
+                ->value('id') ?? Branch::query()->value('id');
 
             $fromWarehouse = Warehouse::updateOrCreate(
-                ['branch_id' => $branchId, 'code' => 'MAIN'],
-                ['name' => 'Main Warehouse']
+                ['branch_id' => $branchId, 'code' => DemoMasterData::WAREHOUSE_MAIN_CODE],
+                ['name' => DemoMasterData::WAREHOUSE_MAIN_NAME]
             );
 
             $toWarehouse = Warehouse::updateOrCreate(
-                ['branch_id' => $branchId, 'code' => 'RTN'],
-                ['name' => 'Return Warehouse']
+                ['branch_id' => $branchId, 'code' => DemoMasterData::WAREHOUSE_RETURN_CODE],
+                ['name' => DemoMasterData::WAREHOUSE_RETURN_NAME]
             );
         }
 
@@ -52,9 +54,21 @@ class StockTransferSampleDataSeeder extends Seeder
 
         $year = now()->format('Y');
 
+        // Format nomor berubah (ST-…-9000xx → ST-…-000001..): ganti nama HANYA
+        // nomor demo lama, dengan update in-place agar item & movement tetap terhubung.
+        foreach (range(1, 6) as $index) {
+            $legacy = sprintf('ST-%s-9000%02d', $year, $index);
+            $target = sprintf('ST-%s-%06d', $year, $index);
+
+            if (StockTransfer::query()->where('transfer_number', $legacy)->exists()
+                && ! StockTransfer::query()->where('transfer_number', $target)->exists()) {
+                StockTransfer::query()->where('transfer_number', $legacy)->update(['transfer_number' => $target]);
+            }
+        }
+
         $samples = [
             [
-                'transfer_number' => "ST-{$year}-900001",
+                'transfer_number' => "ST-{$year}-000001",
                 'status' => 'draft',
                 'transfer_date' => now()->subDays(10)->toDateString(),
                 'expected_arrival_date' => now()->subDays(7)->toDateString(),
@@ -65,7 +79,7 @@ class StockTransferSampleDataSeeder extends Seeder
                 'items' => $this->makeTransferItems($products, false),
             ],
             [
-                'transfer_number' => "ST-{$year}-900002",
+                'transfer_number' => "ST-{$year}-000002",
                 'status' => 'pending_approval',
                 'transfer_date' => now()->subDays(9)->toDateString(),
                 'expected_arrival_date' => now()->subDays(6)->toDateString(),
@@ -76,7 +90,7 @@ class StockTransferSampleDataSeeder extends Seeder
                 'items' => $this->makeTransferItems($products, false),
             ],
             [
-                'transfer_number' => "ST-{$year}-900003",
+                'transfer_number' => "ST-{$year}-000003",
                 'status' => 'approved',
                 'transfer_date' => now()->subDays(8)->toDateString(),
                 'expected_arrival_date' => now()->subDays(5)->toDateString(),
@@ -89,7 +103,7 @@ class StockTransferSampleDataSeeder extends Seeder
                 'items' => $this->makeTransferItems($products, false),
             ],
             [
-                'transfer_number' => "ST-{$year}-900004",
+                'transfer_number' => "ST-{$year}-000004",
                 'status' => 'in_transit',
                 'transfer_date' => now()->subDays(6)->toDateString(),
                 'expected_arrival_date' => now()->subDays(3)->toDateString(),
@@ -104,7 +118,7 @@ class StockTransferSampleDataSeeder extends Seeder
                 'items' => $this->makeTransferItems($products, false),
             ],
             [
-                'transfer_number' => "ST-{$year}-900005",
+                'transfer_number' => "ST-{$year}-000005",
                 'status' => 'received',
                 'transfer_date' => now()->subDays(5)->toDateString(),
                 'expected_arrival_date' => now()->subDays(2)->toDateString(),
@@ -121,7 +135,7 @@ class StockTransferSampleDataSeeder extends Seeder
                 'items' => $this->makeTransferItems($products, true),
             ],
             [
-                'transfer_number' => "ST-{$year}-900006",
+                'transfer_number' => "ST-{$year}-000006",
                 'status' => 'cancelled',
                 'transfer_date' => now()->subDays(4)->toDateString(),
                 'expected_arrival_date' => null,
@@ -133,15 +147,22 @@ class StockTransferSampleDataSeeder extends Seeder
             ],
         ];
 
-        foreach ($samples as $sample) {
+        // Tujuan bervariasi (W7-17): sebagian ke Gudang Transit (TRN), sisanya ke
+        // Gudang Retur (RTN), bukan semua transfer ke satu gudang.
+        $transitWarehouse = Warehouse::query()->where('code', DemoMasterData::WAREHOUSE_TRANSIT_CODE)->first()
+            ?? $toWarehouse;
+
+        foreach ($samples as $index => $sample) {
             $items = $sample['items'];
             unset($sample['items']);
+
+            $destination = $index % 2 === 0 ? $transitWarehouse : $toWarehouse;
 
             $transfer = StockTransfer::updateOrCreate(
                 ['transfer_number' => $sample['transfer_number']],
                 array_merge([
                     'from_warehouse_id' => $fromWarehouse->id,
-                    'to_warehouse_id' => $toWarehouse->id,
+                    'to_warehouse_id' => $destination->id,
                     'notes' => 'Pemindahan stok antar gudang',
                 ], $sample['actors'], [
                     'transfer_date' => $sample['transfer_date'],
@@ -234,18 +255,12 @@ class StockTransferSampleDataSeeder extends Seeder
                 [
                     'name' => $sample['name'],
                     'type' => $sample['type'],
-                    'category_id' => $categoryId,
+                    'product_category_id' => $categoryId,
                     'unit_id' => $unitId,
                     'branch_id' => $branchId,
                     'cost' => $sample['cost'],
                     'selling_price' => 0,
                     'billing_model' => 'one_time',
-                    'is_recurring' => false,
-                    'allow_one_time_purchase' => true,
-                    'is_manufactured' => false,
-                    'is_purchasable' => true,
-                    'is_sellable' => true,
-                    'is_taxable' => false,
                     'status' => 'active',
                 ]
             );

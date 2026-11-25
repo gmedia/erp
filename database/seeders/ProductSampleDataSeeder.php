@@ -20,24 +20,24 @@ class ProductSampleDataSeeder extends Seeder
 {
     public function run(): void
     {
-        $electronicsCategory = ProductCategory::where('name', 'Electronics')->first();
-        $furnitureCategory = ProductCategory::where('name', 'Finished Goods - Furniture')->first();
-        $rawMaterialWood = ProductCategory::where('name', 'Raw Materials - Wood')->first();
-        $rawMaterialHardware = ProductCategory::where('name', 'Raw Materials - Hardware')->first();
-        $softwareCategory = ProductCategory::where('name', 'Software & SaaS')->first();
+        $electronicsCategory = ProductCategory::where('name', DemoMasterData::PRODUCT_CATEGORY_ELECTRONICS)->first();
+        $furnitureCategory = ProductCategory::where('name', DemoMasterData::PRODUCT_CATEGORY_FINISHED_FURNITURE)->first();
+        $rawMaterialWood = ProductCategory::where('name', DemoMasterData::PRODUCT_CATEGORY_RAW_WOOD)->first();
+        $rawMaterialHardware = ProductCategory::where('name', DemoMasterData::PRODUCT_CATEGORY_RAW_HARDWARE)->first();
+        $softwareCategory = ProductCategory::where('name', DemoMasterData::PRODUCT_CATEGORY_SOFTWARE)->first();
 
         $pieceUnit = Unit::where('symbol', 'pcs')->first();
         $meterUnit = Unit::where('symbol', 'm')->first();
-        $sheetUnit = Unit::where('name', 'Sheet')->first();
-        $setUnit = Unit::where('name', 'Set')->first();
-        $boxUnit = Unit::where('name', 'Box')->first();
-        $serviceUnit = Unit::where('name', 'Service')->first();
+        $sheetUnit = Unit::where('name', DemoMasterData::UNIT_SHEET)->first();
+        $setUnit = Unit::where('name', DemoMasterData::UNIT_SET)->first();
+        $boxUnit = Unit::where('name', DemoMasterData::UNIT_BOX)->first();
+        $serviceUnit = Unit::where('name', DemoMasterData::UNIT_SERVICE)->first();
 
         $woodPanel = Product::updateOrCreate(
             ['code' => 'RM-WOOD-001'],
             [
-                'name' => 'MDF Wood Panel 120x240cm',
-                'description' => 'Medium Density Fiberboard for furniture manufacturing',
+                'name' => 'Papan MDF 120x240cm',
+                'description' => 'Papan serat kerapatan sedang untuk produksi furnitur',
                 'type' => 'raw_material',
                 'product_category_id' => $rawMaterialWood->id,
                 'unit_id' => $sheetUnit->id,
@@ -49,7 +49,7 @@ class ProductSampleDataSeeder extends Seeder
         $tableLegs = Product::updateOrCreate(
             ['code' => 'RM-WOOD-002'],
             [
-                'name' => 'Wooden Table Legs (Set of 4)',
+                'name' => 'Kaki Meja Kayu (Isi 4)',
                 'description' => 'Premium wooden table legs',
                 'type' => 'raw_material',
                 'product_category_id' => $rawMaterialWood->id,
@@ -62,8 +62,8 @@ class ProductSampleDataSeeder extends Seeder
         $screws = Product::updateOrCreate(
             ['code' => 'RM-HW-001'],
             [
-                'name' => 'Wood Screws 4x40mm (Box of 100)',
-                'description' => 'Quality wood screws for furniture assembly',
+                'name' => 'Sekrup Kayu 4x40mm (Box isi 100)',
+                'description' => 'Sekrup kayu berkualitas untuk perakitan furnitur',
                 'type' => 'raw_material',
                 'product_category_id' => $rawMaterialHardware->id,
                 'unit_id' => $boxUnit->id,
@@ -75,8 +75,8 @@ class ProductSampleDataSeeder extends Seeder
         $officeDesk = Product::updateOrCreate(
             ['code' => 'FG-FURN-001'],
             [
-                'name' => 'Executive Office Desk',
-                'description' => 'Premium executive office desk with storage',
+                'name' => 'Meja Kerja Eksekutif',
+                'description' => 'Meja kerja eksekutif premium dengan laci penyimpanan',
                 'type' => 'finished_good',
                 'product_category_id' => $furnitureCategory->id,
                 'unit_id' => $pieceUnit->id,
@@ -121,7 +121,7 @@ class ProductSampleDataSeeder extends Seeder
                 'notes' => 'Assembly screws',
             ]);
 
-        $branchId = Branch::query()->value('id') ?? Branch::create(['name' => 'Head Office'])->id;
+        $branchId = Branch::query()->value('id') ?? Branch::create(['name' => DemoMasterData::BRANCH_HEAD_OFFICE])->id;
 
         $productionOrder = ProductionOrder::updateOrCreate(
             ['order_number' => 'MO-2026-000001'],
@@ -173,11 +173,20 @@ class ProductSampleDataSeeder extends Seeder
             'cost' => 500000,
         ]);
 
+        // Kode placeholder SaaS-CLOUD-001 diganti (W7-17). Baris lama di-rename
+        // in-place agar langganan & plan yang menempel tetap terhubung.
+        Product::query()
+            ->where('code', 'SaaS-CLOUD-001')
+            ->when(
+                ! Product::query()->where('code', 'SW-CLD-001')->exists(),
+                fn ($query) => $query->update(['code' => 'SW-CLD-001']),
+            );
+
         $cloudStorage = Product::updateOrCreate(
-            ['code' => 'SaaS-CLOUD-001'],
+            ['code' => 'SW-CLD-001'],
             [
-                'name' => 'Cloud Storage Pro',
-                'description' => 'Premium cloud storage solution with advanced features',
+                'name' => 'Layanan Penyimpanan Awan Pro',
+                'description' => 'Layanan penyimpanan awan dengan fitur lanjutan untuk perusahaan',
                 'type' => 'service',
                 'product_category_id' => $softwareCategory->id,
                 'unit_id' => $serviceUnit->id,
@@ -190,7 +199,7 @@ class ProductSampleDataSeeder extends Seeder
         $monthlyPlan = SubscriptionPlan::updateOrCreate(
             [
                 'product_id' => $cloudStorage->id,
-                'name' => 'Cloud Storage Pro - Monthly',
+                'name' => 'Layanan Penyimpanan Awan Pro - Bulanan',
             ],
             [
                 'billing_interval' => 'monthly',
@@ -203,7 +212,7 @@ class ProductSampleDataSeeder extends Seeder
         SubscriptionPlan::updateOrCreate(
             [
                 'product_id' => $cloudStorage->id,
-                'name' => 'Cloud Storage Pro - Annual',
+                'name' => 'Layanan Penyimpanan Awan Pro - Tahunan',
             ],
             [
                 'billing_interval' => 'annual',
@@ -248,8 +257,8 @@ class ProductSampleDataSeeder extends Seeder
         $deskChair = Product::updateOrCreate(
             ['code' => 'FG-FURN-002'],
             [
-                'name' => 'Ergonomic Office Chair',
-                'description' => 'Comfortable ergonomic chair for office use',
+                'name' => 'Kursi Kantor Ergonomis',
+                'description' => 'Kursi ergonomis yang nyaman untuk penggunaan kantor',
                 'type' => 'finished_good',
                 'product_category_id' => $furnitureCategory->id,
                 'unit_id' => $pieceUnit->id,

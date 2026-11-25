@@ -43,20 +43,20 @@ generateModuleTests({
         {
             filterName: 'Department',
             filterType: 'combobox',
-            filterValue: 'Engineering',
-            expectedText: 'Engineering',
+            filterValue: 'Teknik',
+            expectedText: 'Teknik',
         },
         {
             filterName: 'Position',
             filterType: 'combobox',
-            filterValue: 'Senior Developer',
-            expectedText: 'Senior Developer',
+            filterValue: 'Pengembang Senior',
+            expectedText: 'Pengembang Senior',
         },
         {
             filterName: 'Branch',
             filterType: 'combobox',
-            filterValue: 'Head Office',
-            expectedText: 'Head Office',
+            filterValue: 'Kantor Pusat',
+            expectedText: 'Kantor Pusat',
         },
     ],
 });

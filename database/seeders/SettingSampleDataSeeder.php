@@ -30,7 +30,7 @@ class SettingSampleDataSeeder extends Seeder
             [
                 'group' => 'general',
                 'key' => 'company_phone',
-                'value' => '+62 21 0000 0000',
+                'value' => '+62 21 5550 1000',
                 'type' => 'string',
             ],
             [

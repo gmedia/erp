@@ -1,5 +1,5 @@
+import { expect, Page } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
-import { Page, expect } from '@playwright/test';
 import { createEntity, EntityConfig } from '../helpers';
 
 /**
@@ -10,37 +10,65 @@ import { createEntity, EntityConfig } from '../helpers';
  * @returns The unique email used for the created employee.
  */
 export async function createEmployee(
-  page: Page,
-  overrides: Partial<{
-    name: string;
-    email: string;
-    phone: string;
-    salary: string;
-    department_id: string;
-    position_id: string;
-    branch_id: string;
-  }> = {}
+    page: Page,
+    overrides: Partial<{
+        name: string;
+        email: string;
+        phone: string;
+        salary: string;
+        department_id: string;
+        position_id: string;
+        branch_id: string;
+    }> = {},
 ): Promise<string> {
-  const timestamp = Date.now();
-  const defaultEmail = `${randomUUID().slice(0, 5)}${timestamp}@example.com`;
+    const timestamp = Date.now();
+    const defaultEmail = `${randomUUID().slice(0, 5)}${timestamp}@example.com`;
 
-  const config: EntityConfig = {
-    route: '/employees',
-    returnField: 'email',
-    fields: [
-      { name: 'employee_id', type: 'text', defaultValue: `EMP-${timestamp.toString().slice(-5)}` },
-      { name: 'name', type: 'text', defaultValue: `Employee ${timestamp}` },
-      { name: 'email', type: 'email', defaultValue: defaultEmail },
-      { name: 'phone', type: 'text', defaultValue: '08123456789' },
-      { name: 'department_id', type: 'select', selector: 'Department', defaultValue: 'Engineering' },
-      { name: 'position_id', type: 'select', selector: 'Position', defaultValue: 'Senior Developer' },
-      { name: 'branch_id', type: 'select', selector: 'Branch', defaultValue: 'Head Office' },
-      { name: 'salary', type: 'text', defaultValue: '5000000' },
-      { name: 'employment_status', type: 'select', selector: 'Employment Status', defaultValue: 'Regular' },
-    ],
-  };
+    const config: EntityConfig = {
+        route: '/employees',
+        returnField: 'email',
+        fields: [
+            {
+                name: 'employee_id',
+                type: 'text',
+                defaultValue: `EMP-${timestamp.toString().slice(-5)}`,
+            },
+            {
+                name: 'name',
+                type: 'text',
+                defaultValue: `Employee ${timestamp}`,
+            },
+            { name: 'email', type: 'email', defaultValue: defaultEmail },
+            { name: 'phone', type: 'text', defaultValue: '08123456789' },
+            {
+                name: 'department_id',
+                type: 'select',
+                selector: 'Department',
+                defaultValue: 'Teknik',
+            },
+            {
+                name: 'position_id',
+                type: 'select',
+                selector: 'Position',
+                defaultValue: 'Pengembang Senior',
+            },
+            {
+                name: 'branch_id',
+                type: 'select',
+                selector: 'Branch',
+                defaultValue: 'Kantor Pusat',
+            },
+            { name: 'salary', type: 'text', defaultValue: '5000000' },
+            {
+                name: 'employment_status',
+                type: 'select',
+                selector: 'Employment Status',
+                defaultValue: 'Regular',
+            },
+        ],
+    };
 
-  return createEntity(page, config, overrides);
+    return createEntity(page, config, overrides);
 }
 
 /**
@@ -50,25 +78,25 @@ export async function createEmployee(
  * @param email - Email address to search for.
  */
 export async function searchEmployee(page: Page, email: string): Promise<void> {
-  const searchInput = page.getByPlaceholder('Search employees...');
-  await expect(searchInput).toBeVisible();
-  const normalizedEmail = email.trim();
-  if ((await searchInput.inputValue()).trim() === normalizedEmail) {
-    return;
-  }
+    const searchInput = page.getByPlaceholder('Search employees...');
+    await expect(searchInput).toBeVisible();
+    const normalizedEmail = email.trim();
+    if ((await searchInput.inputValue()).trim() === normalizedEmail) {
+        return;
+    }
 
-  const responsePromise = page.waitForResponse(
-    r => r.url().includes('/api/employees') && r.status() === 200
-  );
-  await searchInput.clear();
-  await searchInput.fill(normalizedEmail);
-  await searchInput.press('Enter');
-  
-  // Wait for API response
-  await responsePromise;
-  
-  // Small delay for UI stabilization
-  await page.waitForTimeout(500);
+    const responsePromise = page.waitForResponse(
+        (r) => r.url().includes('/api/employees') && r.status() === 200,
+    );
+    await searchInput.clear();
+    await searchInput.fill(normalizedEmail);
+    await searchInput.press('Enter');
+
+    // Wait for API response
+    await responsePromise;
+
+    // Small delay for UI stabilization
+    await page.waitForTimeout(500);
 }
 
 /**
@@ -79,40 +107,40 @@ export async function searchEmployee(page: Page, email: string): Promise<void> {
  * @param updates - Fields to update (name and/or salary).
  */
 export async function editEmployee(
-  page: Page,
-  email: string,
-  updates: { name?: string; salary?: string }
+    page: Page,
+    email: string,
+    updates: { name?: string; salary?: string },
 ): Promise<void> {
-  // Locate the employee first
-  await searchEmployee(page, email);
+    // Locate the employee first
+    await searchEmployee(page, email);
 
-  // Locate the row and open the Actions menu
-  const row = page.locator('tr', { hasText: email }).first();
-  await expect(row).toBeVisible();
-  await row.waitFor({ state: 'attached' });
-  const actionsBtn = row.getByRole('button', { name: /Actions/i });
-  await expect(actionsBtn).toBeVisible();
-  await actionsBtn.click({ force: true });
+    // Locate the row and open the Actions menu
+    const row = page.locator('tr', { hasText: email }).first();
+    await expect(row).toBeVisible();
+    await row.waitFor({ state: 'attached' });
+    const actionsBtn = row.getByRole('button', { name: /Actions/i });
+    await expect(actionsBtn).toBeVisible();
+    await actionsBtn.click({ force: true });
 
-  // Click the Edit menu item
-  const editItem = page.getByRole('menuitem', { name: /Edit/i });
-  await expect(editItem).toBeVisible();
-  await editItem.click({ force: true });
+    // Click the Edit menu item
+    const editItem = page.getByRole('menuitem', { name: /Edit/i });
+    await expect(editItem).toBeVisible();
+    await editItem.click({ force: true });
 
-  // Update fields if provided
-  if (updates.name) {
-    await page.fill('input[name="name"]', updates.name);
-  }
-  if (updates.salary) {
-    await page.fill('input[name="salary"]', updates.salary);
-  }
+    // Update fields if provided
+    if (updates.name) {
+        await page.fill('input[name="name"]', updates.name);
+    }
+    if (updates.salary) {
+        await page.fill('input[name="salary"]', updates.salary);
+    }
 
-  // Submit the edit dialog
-  await page.waitForSelector(String.raw`.fixed.inset-0.bg-black\/50`, {
-    state: 'detached',
-  });
-  const editDialog = page.getByRole('dialog');
-  const updateBtn = editDialog.getByRole('button', { name: /Update/ });
-  await expect(updateBtn).toBeVisible();
-  await updateBtn.click();
+    // Submit the edit dialog
+    await page.waitForSelector(String.raw`.fixed.inset-0.bg-black\/50`, {
+        state: 'detached',
+    });
+    const editDialog = page.getByRole('dialog');
+    const updateBtn = editDialog.getByRole('button', { name: /Update/ });
+    await expect(updateBtn).toBeVisible();
+    await updateBtn.click();
 }
