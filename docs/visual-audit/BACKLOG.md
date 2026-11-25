@@ -129,6 +129,8 @@ VISUAL_AUDIT=1 VISUAL_AUDIT_PRESET=shells PLAYWRIGHT_BASE_URL=http://127.0.0.1:8
 
 Matriks tema/viewport (opsional): `VISUAL_AUDIT_THEMES=light,dark VISUAL_AUDIT_VIEWPORTS=desktop,mobile` → `<slug>--<theme>--<viewport>.png` + `report.jsonl` (overflow horizontal, kelas `.dark`, error console). Hentikan Vite dev dan `npm run build` dulu; jangan commit PNG/`report.jsonl`.
 
+Locale (opsional): `VISUAL_AUDIT_LOCALE=id` mengatur `localStorage['app_locale']` (mekanisme `setLocale` di `resources/js/contexts/i18n-context.tsx`), reload, memotret, lalu mengembalikan locale semula. Keluaran masuk ke `<wave>/<locale>/` dan setiap baris `report.jsonl` memuat field `locale` (`null` bila tanpa env). Locale yang didukung: `en`, `id`.
+
 ## Next agent action
 
 0. **2026-11-25 (wave-8):** tindak lanjut ada di issue #456 (warna status, Rp 0 draft, urutan default, status PO, tie-break audit trail), #459 (data demo stok/transfer/approval PO), #460 (tabel mobile, perataan angka, kontras gelap, sidebar), #453 (pemilih bahasa), dan issue #462 (V8-57). Detail dan status klaim di `FINDINGS.md` → **Audit independen wave-8**. Jangan kerjakan ulang V8-05, V8-06, V8-10, V8-31, V8-61; V8-39 ditunda.
