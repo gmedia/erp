@@ -89,10 +89,15 @@ test.describe('Asset Import E2E Tests', () => {
         // 7. Verify Data in List
         // Search for the new asset
         const searchInput = page.getByPlaceholder('Search assets...');
-        await searchInput.fill(uniqueAssetCode);
+        await expect(searchInput).toBeVisible({ timeout: 15000 });
         const searchResponse = page.waitForResponse(
-            (r) => r.url().includes('/api/assets') && r.status() === 200,
+            (r) =>
+                r.url().includes('/api/assets') &&
+                r.request().method() === 'GET' &&
+                r.url().includes('search='),
+            { timeout: 15000 },
         );
+        await searchInput.fill(uniqueAssetCode);
         await searchInput.press('Enter');
         await searchResponse;
 
@@ -140,6 +145,9 @@ test.describe('Asset Import E2E Tests', () => {
 
         // 2. Open Import Dialog
         await page.goto('/assets');
+        await expect(page.getByPlaceholder('Search assets...')).toBeVisible({
+            timeout: 15000,
+        });
         const importButton = page.getByRole('button', { name: /import/i });
         await importButton.click();
 
