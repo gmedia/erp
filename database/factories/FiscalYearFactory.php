@@ -19,7 +19,9 @@ class FiscalYearFactory extends Factory
      */
     public function definition(): array
     {
-        $year = 2020 + random_int(0, 50);
+        // Tahun acak dihindarkan dari 2026 (tahun yang sering dipasang eksplisit di test)
+        // agar tidak menghasilkan dua COA aktif untuk tanggal yang sama.
+        $year = random_int(2100, 2199);
 
         return [
             'name' => fn () => 'FY-' . $year . '-' . uniqid() . '-' . random_int(0, 9999),
