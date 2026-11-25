@@ -4,19 +4,29 @@
 
 Setiap perusahaan mendapat:
 
-- Web Laravel: `https://<company-slug>.app.dokfin.id`
-- Android appId: `com.dokfin.app_<company_slug>` (huruf kecil, non-alfanumerik menjadi `_`)
+- Web Laravel: `https://<company-slug>.app.perusahaan.contoh`
+- Android appId: `<MOBILE_APP_ID_PREFIX>.app_<company_slug>` (huruf kecil, non-alfanumerik menjadi `_`)
 - Nama aplikasi: nama perusahaan
 - Firebase Android app + `google-services.json` (package = appId)
 - Backend FCM service account untuk project Firebase perusahaan tersebut
 
 Repo ini menyimpan **template netral**:
 
-- `capacitor.config.ts` default `com.dokfin.erp`
-- `android/` template `com.dokfin.erp`
+- `capacitor.config.ts` default `com.example.erp`
+- `android/` template `com.example.erp`
 - Tidak ada domain/appId tenant yang di-commit
 
-Konfigurasi perusahaan (URL, appId, nama) diberikan saat build melalui environment/argumen.
+Konfigurasi perusahaan (awalan appId, URL, nama) diberikan saat build melalui environment/argumen.
+
+## Awalan appId (`MOBILE_APP_ID_PREFIX`) — WAJIB
+
+`MOBILE_APP_ID_PREFIX` wajib diisi setiap build. Tidak ada default; skrip gagal bila kosong. Format: huruf kecil, angka, underscore, dipisah titik, tanpa spasi (contoh `com.perusahaan.contoh`).
+
+### Perusahaan yang sudah terpasang
+
+Perusahaan yang build Android-nya sudah pernah terbit/terpasang **wajib** memakai awalan yang sama dengan build sebelumnya. Ambil nilainya dari build terakhir (mis. dari `applicationId` APK yang sudah terpasang atau dari `google-services.json` lama), jangan menebak.
+
+Alasan: ID aplikasi Android bersifat permanen. Bila berubah, Android menganggapnya aplikasi baru, pengguna harus memasang ulang, dan notifikasi Firebase harus didaftarkan ulang.
 
 ## Prasyarat
 
@@ -29,27 +39,27 @@ Konfigurasi perusahaan (URL, appId, nama) diberikan saat build melalui environme
 ## Build
 
 ```bash
-scripts/build-company-mobile.sh \
+MOBILE_APP_ID_PREFIX=<prefix> scripts/build-company-mobile.sh \
   <company-slug> \
   "<Company Name>" \
-  "https://<company-slug>.app.dokfin.id" \
+  "https://<company-slug>.app.perusahaan.contoh" \
   /path/to/google-services.json
 ```
 
 Dengan signing release:
 
 ```bash
-scripts/build-company-mobile.sh \
+MOBILE_APP_ID_PREFIX=<prefix> scripts/build-company-mobile.sh \
   <company-slug> \
   "<Company Name>" \
-  "https://<company-slug>.app.dokfin.id" \
+  "https://<company-slug>.app.perusahaan.contoh" \
   /path/to/google-services.json \
   /path/to/release.keystore <store-password> <key-alias> <key-password>
 ```
 
 Script akan:
 
-1. Menurunkan appId menjadi `com.dokfin.app_<company_slug>`.
+1. Menurunkan appId menjadi `${MOBILE_APP_ID_PREFIX}.app_<company_slug>`.
 2. Memvalidasi `package_name` di `google-services.json` sama dengan appId.
 3. Membuat worktree sementara dari `HEAD` (source yang sudah di-commit).
 4. Meregenerasi `android/` dengan appId tersebut.
@@ -70,7 +80,7 @@ Set environment Laravel:
 
 ```dotenv
 APP_NAME="<Company Name>"
-APP_URL=https://<company-slug>.app.dokfin.id
+APP_URL=https://<company-slug>.app.perusahaan.contoh
 PUSH_DRIVER=fcm
 FCM_PROJECT_ID=<firebase-project-id>
 FCM_CREDENTIALS=/path/inside/container/service-account.json
