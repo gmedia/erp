@@ -234,6 +234,7 @@ test('butir 2: stock transfer dispatch dated before a negative running balance i
 });
 
 test('butir 2: stock transfer dispatch within available running balance is accepted', function () {
+    createInTransitAccountFixture();
     [$warehouse, $product, $unit] = review3StockWithBalance(10, now()->subDays(3)->toDateString());
     $destination = Warehouse::factory()->create();
 
