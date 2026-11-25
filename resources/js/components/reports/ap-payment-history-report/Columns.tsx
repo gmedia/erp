@@ -38,7 +38,10 @@ export const apPaymentHistoryReportColumns: ColumnDef<ApPaymentHistoryReportItem
     [
         createReportSummaryColumn<ApPaymentHistoryReportItem>({
             accessorKey: 'payment.number',
-            header: { key: 'column.payment_number', fallback: 'Payment Number' },
+            header: {
+                key: 'column.payment_number',
+                fallback: 'Payment Number',
+            },
             getPrimary: (item) => item.payment?.number,
             getSecondary: (item) => formatDate(item.payment?.date),
             sortable: true,
@@ -63,7 +66,10 @@ export const apPaymentHistoryReportColumns: ColumnDef<ApPaymentHistoryReportItem
         }),
         createReportTextColumn<ApPaymentHistoryReportItem>({
             accessorKey: 'payment.method',
-            header: { key: 'column.payment_method', fallback: 'Payment Method' },
+            header: {
+                key: 'column.payment_method',
+                fallback: 'Payment Method',
+            },
             getValue: (item) => formatStatusLabel(item.payment?.method),
             sortable: true,
         }),
