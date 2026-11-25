@@ -10,6 +10,7 @@ import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
+import { useTranslation } from '@/contexts/i18n-context';
 
 import { Product, ProductFormData } from '@/types/entity';
 import { productFormSchema } from '@/utils/schemas';
@@ -22,62 +23,87 @@ interface ProductFormProps {
     isLoading?: boolean;
 }
 
-const renderGeneralInfoSection = () => (
+type FormLabelFn = (key: string, fallback: string) => string;
+
+const renderGeneralInfoSection = (fl: FormLabelFn) => (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <InputField name="code" label="Code" placeholder="PROD-001" />
-        <InputField name="name" label="Name" placeholder="Product Name" />
+        <InputField
+            name="code"
+            label={fl('code', 'Code')}
+            placeholder={fl('code_placeholder', 'PROD-001')}
+        />
+        <InputField
+            name="name"
+            label={fl('name', 'Name')}
+            placeholder={fl('name_placeholder', 'Product Name')}
+        />
         <div className="md:col-span-2">
             <TextareaField
                 name="description"
-                label="Description"
-                placeholder="Product description..."
+                label={fl('description', 'Description')}
+                placeholder={fl(
+                    'description_placeholder',
+                    'Product description...',
+                )}
             />
         </div>
         <AsyncSelectField
             name="product_category_id"
-            label="Category"
+            label={fl('category', 'Category')}
             url="/api/product-categories"
-            placeholder="Select category"
+            placeholder={fl('category_placeholder', 'Select category')}
         />
         <AsyncSelectField
             name="unit_id"
-            label="Unit"
+            label={fl('unit', 'Unit')}
             url="/api/units"
-            placeholder="Select unit"
+            placeholder={fl('unit_placeholder', 'Select unit')}
         />
         <AsyncSelectField
             name="branch_id"
-            label="Branch"
+            label={fl('branch', 'Branch')}
             url="/api/branches"
-            placeholder="Select branch (optional)"
+            placeholder={fl('branch_placeholder', 'Select branch (optional)')}
         />
         <SelectField
             name="type"
-            label="Type"
+            label={fl('type', 'Type')}
             options={[
-                { value: 'raw_material', label: 'Raw Material' },
-                { value: 'work_in_progress', label: 'WIP' },
-                { value: 'finished_good', label: 'Finished Good' },
-                { value: 'purchased_good', label: 'Purchased Good' },
-                { value: 'service', label: 'Service' },
+                {
+                    value: 'raw_material',
+                    label: fl('type_raw_material', 'Raw Material'),
+                },
+                {
+                    value: 'work_in_progress',
+                    label: fl('type_work_in_progress', 'WIP'),
+                },
+                {
+                    value: 'finished_good',
+                    label: fl('type_finished_good', 'Finished Good'),
+                },
+                {
+                    value: 'purchased_good',
+                    label: fl('type_purchased_good', 'Purchased Good'),
+                },
+                { value: 'service', label: fl('type_service', 'Service') },
             ]}
-            placeholder="Select type"
+            placeholder={fl('type_placeholder', 'Select type')}
         />
     </div>
 );
 
-const renderPricingSection = () => (
+const renderPricingSection = (fl: FormLabelFn) => (
     <div className="mt-2 grid grid-cols-1 gap-4 border-t pt-4 md:grid-cols-2">
         <InputField
             name="cost"
-            label="Cost"
+            label={fl('cost', 'Cost')}
             type="number"
             placeholder="0.00"
             prefix="Rp"
         />
         <InputField
             name="selling_price"
-            label="Selling Price"
+            label={fl('selling_price', 'Selling Price')}
             type="number"
             placeholder="0.00"
             prefix="Rp"
@@ -85,37 +111,49 @@ const renderPricingSection = () => (
     </div>
 );
 
-const renderConfigSection = () => (
+const renderConfigSection = (fl: FormLabelFn) => (
     <div className="mt-2 grid grid-cols-1 gap-4 border-t pt-4 md:grid-cols-2">
         <SelectField
             name="billing_model"
-            label="Billing Model"
+            label={fl('billing_model', 'Billing Model')}
             options={[
-                { value: 'one_time', label: 'One Time' },
-                { value: 'subscription', label: 'Subscription' },
-                { value: 'both', label: 'Both' },
+                {
+                    value: 'one_time',
+                    label: fl('billing_model_one_time', 'One Time'),
+                },
+                {
+                    value: 'subscription',
+                    label: fl('billing_model_subscription', 'Subscription'),
+                },
+                { value: 'both', label: fl('billing_model_both', 'Both') },
             ]}
-            placeholder="Select model"
+            placeholder={fl('billing_model_placeholder', 'Select model')}
         />
         <SelectField
             name="status"
-            label="Status"
+            label={fl('status', 'Status')}
             options={[
-                { value: 'active', label: 'Active' },
-                { value: 'inactive', label: 'Inactive' },
-                { value: 'discontinued', label: 'Discontinued' },
+                { value: 'active', label: fl('status_active', 'Active') },
+                {
+                    value: 'inactive',
+                    label: fl('status_inactive', 'Inactive'),
+                },
+                {
+                    value: 'discontinued',
+                    label: fl('status_discontinued', 'Discontinued'),
+                },
             ]}
-            placeholder="Select status"
+            placeholder={fl('status_placeholder', 'Select status')}
         />
     </div>
 );
 
-const renderOtherSection = () => (
+const renderOtherSection = (fl: FormLabelFn) => (
     <div className="mt-2 grid grid-cols-1 gap-4 border-t pt-4">
         <TextareaField
             name="notes"
-            label="Notes"
-            placeholder="Additional notes..."
+            label={fl('notes', 'Notes')}
+            placeholder={fl('notes_placeholder', 'Additional notes...')}
         />
     </div>
 );
@@ -161,6 +199,13 @@ export const ProductForm = memo<ProductFormProps>(function ProductForm({
     onSubmit,
     isLoading = false,
 }) {
+    const { t } = useTranslation();
+    const fl: FormLabelFn = (key, fallback) => {
+        const translated = t(`form_fields.products.${key}`);
+        return translated === `form_fields.products.${key}`
+            ? fallback
+            : translated;
+    };
     const defaultValues = useMemo(
         () => getProductFormDefaults(entity),
         [entity],
@@ -180,14 +225,18 @@ export const ProductForm = memo<ProductFormProps>(function ProductForm({
             form={form}
             open={open}
             onOpenChange={onOpenChange}
-            title={entity ? 'Edit Product/Service' : 'Add New Product/Service'}
+            title={
+                entity
+                    ? fl('edit_title', 'Edit Product/Service')
+                    : fl('add_title', 'Add New Product/Service')
+            }
             onSubmit={onSubmit}
             isLoading={isLoading}
         >
-            {renderGeneralInfoSection()}
-            {renderPricingSection()}
-            {renderConfigSection()}
-            {renderOtherSection()}
+            {renderGeneralInfoSection(fl)}
+            {renderPricingSection(fl)}
+            {renderConfigSection(fl)}
+            {renderOtherSection(fl)}
         </EntityForm>
     );
 });

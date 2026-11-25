@@ -135,6 +135,42 @@ test('supplier return and stock transfer form field keys are complete in both lo
         ->and($id['stock_transfers']['from_warehouse'])->toBe('Dari Gudang');
 });
 
+test('product and warehouse form labels keep the english text', function () {
+    $en = localeFormFieldTranslations('en.json');
+
+    expect($en['products']['add_title'])->toBe('Add New Product/Service')
+        ->and($en['products']['edit_title'])->toBe('Edit Product/Service')
+        ->and($en['products']['code_placeholder'])->toBe('PROD-001')
+        ->and($en['products']['category'])->toBe('Category')
+        ->and($en['products']['branch_placeholder'])->toBe('Select branch (optional)')
+        ->and($en['products']['type_work_in_progress'])->toBe('WIP')
+        ->and($en['products']['billing_model_both'])->toBe('Both')
+        ->and($en['products']['status_discontinued'])->toBe('Discontinued')
+        ->and($en['warehouses']['add_title'])->toBe('Add New Warehouse')
+        ->and($en['warehouses']['edit_title'])->toBe('Edit Warehouse')
+        ->and($en['warehouses']['code_placeholder'])->toBe('Enter warehouse code')
+        ->and($en['warehouses']['branch_placeholder'])->toBe('Select a branch');
+});
+
+test('product and warehouse form field keys are complete in both locales', function () {
+    $en = localeFormFieldTranslations('en.json');
+    $id = localeFormFieldTranslations('id.json');
+
+    foreach (['products', 'warehouses'] as $module) {
+        expect(array_keys($en[$module]))->not->toBeEmpty();
+        expect(array_keys($en[$module]))->toEqual(array_keys($id[$module]), "form_fields.{$module} keys differ");
+
+        foreach (array_keys($en[$module]) as $field) {
+            expect($id[$module][$field])
+                ->not->toBe('', "form_fields.{$module}.{$field} empty");
+        }
+    }
+
+    expect($id['products']['add_title'])->toBe('Tambah Produk/Layanan Baru')
+        ->and($id['warehouses']['add_title'])->toBe('Tambah Gudang Baru')
+        ->and($id['warehouses']['branch'])->toBe('Cabang');
+});
+
 test('stock adjustment and inventory stocktake form labels keep the english text', function () {
     $en = localeFormFieldTranslations('en.json');
 
