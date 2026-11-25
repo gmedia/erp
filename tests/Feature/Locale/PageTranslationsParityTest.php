@@ -683,6 +683,74 @@ test('inventory and purchasing report titles follow the menu-or-exception decisi
     }
 });
 
+test('asset report and dashboard group page strings keep the english labels', function () {
+    $en = localePageTranslations('en.json');
+
+    expect($en['assets_register']['title'])->toBe('Asset Register Report')
+        ->and($en['assets_register']['description'])->toBe(
+            'Fixed asset list with acquisition, location, and current status.',
+        )
+        ->and($en['book_value_depreciation']['title'])->toBe('Book Value & Depreciation Report')
+        ->and($en['book_value_depreciation']['description'])->toBe(
+            'Acquisition cost, accumulated depreciation, and book value per asset.',
+        )
+        ->and($en['maintenance_cost']['title'])->toBe('Maintenance Cost Report')
+        ->and($en['maintenance_cost']['description'])->toBe(
+            'Maintenance spending per asset over the selected period.',
+        )
+        ->and($en['asset_stocktake_variances']['title'])->toBe('Stocktake Variance Report')
+        ->and($en['asset_stocktake_variances']['description'])->toBe(
+            'Differences between recorded and physically counted assets.',
+        )
+        ->and($en['asset_dashboard']['description'])->toBe(
+            "Monitor the status, value, and health of your organization's assets.",
+        )
+        ->and($en['dashboard']['description'])->toBe(
+            'At-a-glance entity counts, operational shortcuts, and master-data mix. Financial KPIs stay on Financial Dashboard.',
+        );
+});
+
+test('asset report and dashboard group page strings are translated to indonesian', function () {
+    $en = localePageTranslations('en.json');
+    $id = localePageTranslations('id.json');
+
+    $modules = [
+        'assets_register',
+        'book_value_depreciation',
+        'maintenance_cost',
+        'asset_stocktake_variances',
+        'asset_dashboard',
+        'dashboard',
+    ];
+
+    foreach ($modules as $module) {
+        foreach (array_keys($en[$module]) as $field) {
+            expect($id[$module][$field])->not->toBe($en[$module][$field], "page.{$module}.{$field} not translated");
+        }
+    }
+
+    expect($id['assets_register']['title'])->toBe('Laporan Register Aset');
+});
+
+test('asset report page titles are explicit exceptions to the menu labels', function () {
+    // Aturan (issue #462 <!-- decision -->): judul English berbeda dengan menu, jadi tetap page.<slug>.title.
+    $exceptions = [
+        'assets_register' => 'asset_register_report',
+        'book_value_depreciation' => 'book_value_depreciation_report',
+        'maintenance_cost' => 'maintenance_cost_report',
+        'asset_stocktake_variances' => 'stocktake_variance_report',
+    ];
+
+    $en = json_decode(File::get(lang_path('en.json')), true, 512, JSON_THROW_ON_ERROR);
+
+    foreach ($exceptions as $pageKey => $menuKey) {
+        expect($en['page'][$pageKey]['title'])->not->toBe(
+            $en['menu'][$menuKey],
+            "page.{$pageKey}.title equals menu.{$menuKey}; move it out of the exception list",
+        );
+    }
+});
+
 test('page translation values are non-empty strings', function () {
     foreach (['en.json', 'id.json'] as $file) {
         foreach (localePageTranslations($file) as $module => $strings) {

@@ -924,6 +924,28 @@
             "description": "Fixed asset register with cost, depreciation, and assignment.",
             "search_placeholder": "Search asset code, name, serial number..."
         },
+        "assets_register": {
+            "title": "Asset Register Report",
+            "description": "Fixed asset list with acquisition, location, and current status."
+        },
+        "book_value_depreciation": {
+            "title": "Book Value & Depreciation Report",
+            "description": "Acquisition cost, accumulated depreciation, and book value per asset."
+        },
+        "maintenance_cost": {
+            "title": "Maintenance Cost Report",
+            "description": "Maintenance spending per asset over the selected period."
+        },
+        "asset_stocktake_variances": {
+            "title": "Stocktake Variance Report",
+            "description": "Differences between recorded and physically counted assets."
+        },
+        "asset_dashboard": {
+            "description": "Monitor the status, value, and health of your organization's assets."
+        },
+        "dashboard": {
+            "description": "At-a-glance entity counts, operational shortcuts, and master-data mix. Financial KPIs stay on Financial Dashboard."
+        },
         "employees": {
             "title": "Employee",
             "description": "Staff records with employment, department, and position history.",

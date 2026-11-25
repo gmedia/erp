@@ -23,6 +23,7 @@ export default function AssetDashboard() {
             title="Asset Dashboard"
             heading="Asset Management Overview"
             description="Monitor the status, value, and health of your organization's assets."
+            descriptionKey="page.asset_dashboard.description"
             breadcrumbs={breadcrumbs}
             isLoading={isLoading}
             isError={isError}

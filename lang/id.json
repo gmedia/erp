@@ -924,6 +924,28 @@
             "description": "Register aset tetap dengan biaya, penyusutan, dan penugasan.",
             "search_placeholder": "Cari kode aset, nama, nomor seri..."
         },
+        "assets_register": {
+            "title": "Laporan Register Aset",
+            "description": "Daftar aset tetap dengan perolehan, lokasi, dan status terkini."
+        },
+        "book_value_depreciation": {
+            "title": "Laporan Penyusutan Nilai Buku",
+            "description": "Harga perolehan, akumulasi penyusutan, dan nilai buku per aset."
+        },
+        "maintenance_cost": {
+            "title": "Laporan Biaya Pemeliharaan",
+            "description": "Biaya pemeliharaan per aset dalam periode yang dipilih."
+        },
+        "asset_stocktake_variances": {
+            "title": "Laporan Selisih Stock Opname",
+            "description": "Selisih antara aset tercatat dan hasil hitung fisik."
+        },
+        "asset_dashboard": {
+            "description": "Pantau status, nilai, dan kondisi aset organisasi Anda."
+        },
+        "dashboard": {
+            "description": "Ringkasan jumlah entitas, pintasan operasional, dan komposisi data master. KPI keuangan ada di Dasbor Keuangan."
+        },
         "employees": {
             "title": "Karyawan",
             "description": "Data karyawan dengan riwayat kepegawaian, departemen, dan jabatan.",
