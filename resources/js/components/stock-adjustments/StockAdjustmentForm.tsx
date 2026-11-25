@@ -25,6 +25,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type StockAdjustment } from '@/types/stock-adjustment';
@@ -159,6 +160,13 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
     }) {
         const activeStockAdjustment = stockAdjustment || item || entity;
         const loadedIdRef = useRef<number | null>(null);
+        const { t } = useTranslation();
+        const fl = (key: string, fallback: string) => {
+            const translated = t(`form_fields.stock_adjustments.${key}`);
+            return translated === `form_fields.stock_adjustments.${key}`
+                ? fallback
+                : translated;
+        };
 
         const defaultValues = useMemo(
             () => getStockAdjustmentFormDefaults(activeStockAdjustment),
@@ -242,8 +250,8 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
                 onOpenChange={onOpenChange}
                 title={
                     activeStockAdjustment
-                        ? 'Edit Stock Adjustment'
-                        : 'Add New Stock Adjustment'
+                        ? fl('edit_title', 'Edit Stock Adjustment')
+                        : fl('add_title', 'Add New Stock Adjustment')
                 }
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
@@ -252,22 +260,37 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <InputField
                         name="adjustment_number"
-                        label="Adjustment Number"
-                        placeholder="Auto-generated if empty"
+                        label={fl('adjustment_number', 'Adjustment Number')}
+                        placeholder={fl(
+                            'adjustment_number_placeholder',
+                            'Auto-generated if empty',
+                        )}
                     />
                     <SelectField
                         name="status"
-                        label="Status"
+                        label={fl('status', 'Status')}
                         options={[
-                            { value: 'draft', label: 'Draft' },
+                            {
+                                value: 'draft',
+                                label: fl('status_draft', 'Draft'),
+                            },
                             {
                                 value: 'pending_approval',
-                                label: 'Pending Approval',
+                                label: fl(
+                                    'status_pending_approval',
+                                    'Pending Approval',
+                                ),
                             },
-                            { value: 'approved', label: 'Approved' },
-                            { value: 'cancelled', label: 'Cancelled' },
+                            {
+                                value: 'approved',
+                                label: fl('status_approved', 'Approved'),
+                            },
+                            {
+                                value: 'cancelled',
+                                label: fl('status_cancelled', 'Cancelled'),
+                            },
                         ]}
-                        placeholder="Select status"
+                        placeholder={fl('status_placeholder', 'Select status')}
                     />
                     <Controller
                         control={form.control}
@@ -275,7 +298,7 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
                         render={({ field }) => (
                             <div className="space-y-2">
                                 <div className="text-sm leading-none font-medium">
-                                    Warehouse
+                                    {fl('warehouse', 'Warehouse')}
                                 </div>
                                 <AsyncSelect
                                     value={
@@ -285,32 +308,68 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
                                     }
                                     onValueChange={field.onChange}
                                     url="/api/warehouses"
-                                    placeholder="Select warehouse"
-                                    label="Warehouse"
+                                    placeholder={fl(
+                                        'warehouse_placeholder',
+                                        'Select warehouse',
+                                    )}
+                                    label={fl('warehouse', 'Warehouse')}
                                 />
                             </div>
                         )}
                     />
                     <SelectField
                         name="adjustment_type"
-                        label="Adjustment Type"
+                        label={fl('adjustment_type', 'Adjustment Type')}
                         options={[
-                            { value: 'damage', label: 'Damage' },
-                            { value: 'expired', label: 'Expired' },
-                            { value: 'shrinkage', label: 'Shrinkage' },
-                            { value: 'correction', label: 'Correction' },
+                            {
+                                value: 'damage',
+                                label: fl('adjustment_type_damage', 'Damage'),
+                            },
+                            {
+                                value: 'expired',
+                                label: fl('adjustment_type_expired', 'Expired'),
+                            },
+                            {
+                                value: 'shrinkage',
+                                label: fl(
+                                    'adjustment_type_shrinkage',
+                                    'Shrinkage',
+                                ),
+                            },
+                            {
+                                value: 'correction',
+                                label: fl(
+                                    'adjustment_type_correction',
+                                    'Correction',
+                                ),
+                            },
                             {
                                 value: 'stocktake_result',
-                                label: 'Stocktake Result',
+                                label: fl(
+                                    'adjustment_type_stocktake_result',
+                                    'Stocktake Result',
+                                ),
                             },
-                            { value: 'initial_stock', label: 'Initial Stock' },
-                            { value: 'other', label: 'Other' },
+                            {
+                                value: 'initial_stock',
+                                label: fl(
+                                    'adjustment_type_initial_stock',
+                                    'Initial Stock',
+                                ),
+                            },
+                            {
+                                value: 'other',
+                                label: fl('adjustment_type_other', 'Other'),
+                            },
                         ]}
-                        placeholder="Select type"
+                        placeholder={fl(
+                            'adjustment_type_placeholder',
+                            'Select type',
+                        )}
                     />
                     <DatePickerField
                         name="adjustment_date"
-                        label="Adjustment Date"
+                        label={fl('adjustment_date', 'Adjustment Date')}
                     />
                     <Controller
                         control={form.control}
@@ -318,7 +377,10 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
                         render={({ field }) => (
                             <div className="space-y-2">
                                 <div className="text-sm leading-none font-medium">
-                                    Inventory Stocktake (Optional)
+                                    {fl(
+                                        'inventory_stocktake',
+                                        'Inventory Stocktake (Optional)',
+                                    )}
                                 </div>
                                 <AsyncSelect
                                     value={
@@ -328,8 +390,14 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
                                     }
                                     onValueChange={field.onChange}
                                     url="/api/inventory-stocktakes"
-                                    placeholder="Select stocktake"
-                                    label="Inventory Stocktake"
+                                    placeholder={fl(
+                                        'inventory_stocktake_placeholder',
+                                        'Select stocktake',
+                                    )}
+                                    label={fl(
+                                        'inventory_stocktake',
+                                        'Inventory Stocktake',
+                                    )}
                                     labelFn={getInventoryStocktakeOptionLabel}
                                     valueFn={(it) => String(it.id)}
                                 />
@@ -339,8 +407,8 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
                     <div className="md:col-span-2">
                         <TextareaField
                             name="notes"
-                            label="Notes"
-                            placeholder="Notes"
+                            label={fl('notes', 'Notes')}
+                            placeholder={fl('notes_placeholder', 'Notes')}
                             rows={2}
                         />
                     </div>
@@ -356,23 +424,28 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
                             <TableHeader>
                                 <TableRow>
                                     <TableHead className="w-[250px]">
-                                        Product
+                                        {fl('item_product', 'Product')}
                                     </TableHead>
                                     <TableHead className="w-[160px]">
-                                        Unit
+                                        {fl('item_unit', 'Unit')}
                                     </TableHead>
                                     <TableHead className="w-[140px]">
-                                        Qty Before
+                                        {fl('item_qty_before', 'Qty Before')}
                                     </TableHead>
                                     <TableHead className="w-[160px]">
-                                        Qty Adjusted
+                                        {fl(
+                                            'item_qty_adjusted',
+                                            'Qty Adjusted',
+                                        )}
                                     </TableHead>
                                     <TableHead className="w-[140px]">
-                                        Unit Cost
+                                        {fl('item_unit_cost', 'Unit Cost')}
                                     </TableHead>
-                                    <TableHead>Reason</TableHead>
+                                    <TableHead>
+                                        {fl('item_reason', 'Reason')}
+                                    </TableHead>
                                     <TableHead className="w-[120px] text-right">
-                                        Action
+                                        {fl('item_action', 'Action')}
                                     </TableHead>
                                 </TableRow>
                             </TableHeader>

@@ -134,3 +134,43 @@ test('supplier return and stock transfer form field keys are complete in both lo
         ->and($id['stock_transfers']['add_title'])->toBe('Tambah Transfer Stok Baru')
         ->and($id['stock_transfers']['from_warehouse'])->toBe('Dari Gudang');
 });
+
+test('stock adjustment and inventory stocktake form labels keep the english text', function () {
+    $en = localeFormFieldTranslations('en.json');
+
+    expect($en['stock_adjustments']['add_title'])->toBe('Add New Stock Adjustment')
+        ->and($en['stock_adjustments']['edit_title'])->toBe('Edit Stock Adjustment')
+        ->and($en['stock_adjustments']['adjustment_number'])->toBe('Adjustment Number')
+        ->and($en['stock_adjustments']['adjustment_number_placeholder'])->toBe('Auto-generated if empty')
+        ->and($en['stock_adjustments']['adjustment_type_stocktake_result'])->toBe('Stocktake Result')
+        ->and($en['stock_adjustments']['inventory_stocktake'])->toBe('Inventory Stocktake (Optional)')
+        ->and($en['stock_adjustments']['item_qty_adjusted'])->toBe('Qty Adjusted')
+        ->and($en['stock_adjustments']['item_reason'])->toBe('Reason')
+        ->and($en['inventory_stocktakes']['add_title'])->toBe('Add New Inventory Stocktake')
+        ->and($en['inventory_stocktakes']['edit_title'])->toBe('Edit Inventory Stocktake')
+        ->and($en['inventory_stocktakes']['stocktake_number'])->toBe('Stocktake Number')
+        ->and($en['inventory_stocktakes']['product_category_placeholder'])->toBe('All categories')
+        ->and($en['inventory_stocktakes']['status_in_progress'])->toBe('In Progress')
+        ->and($en['inventory_stocktakes']['item_system_qty'])->toBe('System Qty')
+        ->and($en['inventory_stocktakes']['item_counted_qty'])->toBe('Counted Qty');
+});
+
+test('stock adjustment and inventory stocktake form field keys are complete in both locales', function () {
+    $en = localeFormFieldTranslations('en.json');
+    $id = localeFormFieldTranslations('id.json');
+
+    foreach (['stock_adjustments', 'inventory_stocktakes'] as $module) {
+        expect(array_keys($en[$module]))->not->toBeEmpty();
+        expect(array_keys($en[$module]))->toEqual(array_keys($id[$module]), "form_fields.{$module} keys differ");
+
+        foreach (array_keys($en[$module]) as $field) {
+            expect($id[$module][$field])
+                ->not->toBe('', "form_fields.{$module}.{$field} empty");
+        }
+    }
+
+    expect($id['stock_adjustments']['add_title'])->toBe('Tambah Penyesuaian Stok Baru')
+        ->and($id['stock_adjustments']['status_approved'])->toBe('Disetujui')
+        ->and($id['inventory_stocktakes']['add_title'])->toBe('Tambah Stock Opname Persediaan Baru')
+        ->and($id['inventory_stocktakes']['item_counted_qty'])->toBe('Qty Hitung');
+});

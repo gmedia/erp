@@ -25,6 +25,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type InventoryStocktake } from '@/types/inventory-stocktake';
@@ -137,6 +138,13 @@ export const InventoryStocktakeForm = memo<InventoryStocktakeFormProps>(
     }) {
         const activeStocktake = inventoryStocktake || item || entity;
         const loadedIdRef = useRef<number | null>(null);
+        const { t } = useTranslation();
+        const fl = (key: string, fallback: string) => {
+            const translated = t(`form_fields.inventory_stocktakes.${key}`);
+            return translated === `form_fields.inventory_stocktakes.${key}`
+                ? fallback
+                : translated;
+        };
 
         const defaultValues = useMemo(
             () => getInventoryStocktakeFormDefaults(activeStocktake),
@@ -212,8 +220,8 @@ export const InventoryStocktakeForm = memo<InventoryStocktakeFormProps>(
                 onOpenChange={onOpenChange}
                 title={
                     activeStocktake
-                        ? 'Edit Inventory Stocktake'
-                        : 'Add New Inventory Stocktake'
+                        ? fl('edit_title', 'Edit Inventory Stocktake')
+                        : fl('add_title', 'Add New Inventory Stocktake')
                 }
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
@@ -223,19 +231,40 @@ export const InventoryStocktakeForm = memo<InventoryStocktakeFormProps>(
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <InputField
                             name="stocktake_number"
-                            label="Stocktake Number"
-                            placeholder="Auto-generated if empty"
+                            label={fl('stocktake_number', 'Stocktake Number')}
+                            placeholder={fl(
+                                'stocktake_number_placeholder',
+                                'Auto-generated if empty',
+                            )}
                         />
                         <SelectField
                             name="status"
-                            label="Status"
+                            label={fl('status', 'Status')}
                             options={[
-                                { value: 'draft', label: 'Draft' },
-                                { value: 'in_progress', label: 'In Progress' },
-                                { value: 'completed', label: 'Completed' },
-                                { value: 'cancelled', label: 'Cancelled' },
+                                {
+                                    value: 'draft',
+                                    label: fl('status_draft', 'Draft'),
+                                },
+                                {
+                                    value: 'in_progress',
+                                    label: fl(
+                                        'status_in_progress',
+                                        'In Progress',
+                                    ),
+                                },
+                                {
+                                    value: 'completed',
+                                    label: fl('status_completed', 'Completed'),
+                                },
+                                {
+                                    value: 'cancelled',
+                                    label: fl('status_cancelled', 'Cancelled'),
+                                },
                             ]}
-                            placeholder="Select status"
+                            placeholder={fl(
+                                'status_placeholder',
+                                'Select status',
+                            )}
                         />
                         <Controller
                             control={form.control}
@@ -243,7 +272,7 @@ export const InventoryStocktakeForm = memo<InventoryStocktakeFormProps>(
                             render={({ field }) => (
                                 <div className="space-y-2">
                                     <div className="text-sm leading-none font-medium">
-                                        Warehouse
+                                        {fl('warehouse', 'Warehouse')}
                                     </div>
                                     <AsyncSelect
                                         value={
@@ -253,8 +282,11 @@ export const InventoryStocktakeForm = memo<InventoryStocktakeFormProps>(
                                         }
                                         onValueChange={field.onChange}
                                         url="/api/warehouses"
-                                        placeholder="Select warehouse"
-                                        label="Warehouse"
+                                        placeholder={fl(
+                                            'warehouse_placeholder',
+                                            'Select warehouse',
+                                        )}
+                                        label={fl('warehouse', 'Warehouse')}
                                     />
                                 </div>
                             )}
@@ -265,7 +297,10 @@ export const InventoryStocktakeForm = memo<InventoryStocktakeFormProps>(
                             render={({ field }) => (
                                 <div className="space-y-2">
                                     <div className="text-sm leading-none font-medium">
-                                        Product Category
+                                        {fl(
+                                            'product_category',
+                                            'Product Category',
+                                        )}
                                     </div>
                                     <AsyncSelect
                                         value={
@@ -275,20 +310,26 @@ export const InventoryStocktakeForm = memo<InventoryStocktakeFormProps>(
                                         }
                                         onValueChange={field.onChange}
                                         url="/api/product-categories"
-                                        placeholder="All categories"
-                                        label="Product Category"
+                                        placeholder={fl(
+                                            'product_category_placeholder',
+                                            'All categories',
+                                        )}
+                                        label={fl(
+                                            'product_category',
+                                            'Product Category',
+                                        )}
                                     />
                                 </div>
                             )}
                         />
                         <DatePickerField
                             name="stocktake_date"
-                            label="Stocktake Date"
+                            label={fl('stocktake_date', 'Stocktake Date')}
                         />
                         <TextareaField
                             name="notes"
-                            label="Notes"
-                            placeholder="Notes"
+                            label={fl('notes', 'Notes')}
+                            placeholder={fl('notes_placeholder', 'Notes')}
                             rows={2}
                         />
                     </div>
@@ -302,20 +343,22 @@ export const InventoryStocktakeForm = memo<InventoryStocktakeFormProps>(
                             <TableHeader>
                                 <TableRow>
                                     <TableHead className="w-[220px]">
-                                        Product
+                                        {fl('item_product', 'Product')}
                                     </TableHead>
                                     <TableHead className="w-[160px]">
-                                        Unit
+                                        {fl('item_unit', 'Unit')}
                                     </TableHead>
                                     <TableHead className="w-[140px]">
-                                        System Qty
+                                        {fl('item_system_qty', 'System Qty')}
                                     </TableHead>
                                     <TableHead className="w-[140px]">
-                                        Counted Qty
+                                        {fl('item_counted_qty', 'Counted Qty')}
                                     </TableHead>
-                                    <TableHead>Notes</TableHead>
+                                    <TableHead>
+                                        {fl('item_notes', 'Notes')}
+                                    </TableHead>
                                     <TableHead className="w-[120px] text-right">
-                                        Action
+                                        {fl('item_action', 'Action')}
                                     </TableHead>
                                 </TableRow>
                             </TableHeader>
