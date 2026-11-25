@@ -127,7 +127,9 @@ export function StockMonitorSummaryCards({
                     </div>
                     <p className="text-xs text-muted-foreground">
                         {t('stock_monitor_summary.in_transit_detail', {
-                            items: String(summary?.in_transit?.total_items ?? 0),
+                            items: String(
+                                summary?.in_transit?.total_items ?? 0,
+                            ),
                             quantity: formatNumber(
                                 summary?.in_transit?.total_quantity ?? 0,
                             ),
