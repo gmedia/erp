@@ -899,6 +899,33 @@
         "low": "Low"
     },
     "page": {
+        "approval_flows": {
+            "title": "Approval Flows",
+            "description": "Approval definitions with ordered steps and approvers."
+        },
+        "approval_delegations": {
+            "title": "Approval Delegations",
+            "description": "Delegations that let another user approve on your behalf for a period."
+        },
+        "pipelines": {
+            "title": "Pipelines",
+            "description": "Workflow pipelines and the states entities move through."
+        },
+        "pipeline_dashboard": {
+            "description": "Monitor state distributions and identify bottlenecks across your active pipelines."
+        },
+        "my_approvals": {
+            "description": "Review and act on documents waiting for your decision."
+        },
+        "approval_monitoring": {
+            "description": "Monitor approval workflows and overdue tasks."
+        },
+        "approval_audit_trail": {
+            "description": "History of approval actions taken on requests."
+        },
+        "pipeline_audit_trail": {
+            "description": "History of state transitions on pipeline records."
+        },
         "purchase_orders": {
             "title": "Purchase Orders",
             "description": "Orders sent to suppliers with receipt and billing progress.",

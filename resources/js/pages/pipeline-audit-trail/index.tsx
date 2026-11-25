@@ -12,7 +12,8 @@ export default function PipelineAuditTrail() {
     return (
         <AuditTrailPage<PipelineAuditTrailItem>
             title="Pipeline Audit Trail"
-            descriptionKey="reports.pageDescriptions.pipeline-audit-trail"
+            titleKey="menu.pipeline_audit_trail"
+            descriptionKey="page.pipeline_audit_trail.description"
             breadcrumbs={[
                 { title: 'Admin', href: '#' },
                 {

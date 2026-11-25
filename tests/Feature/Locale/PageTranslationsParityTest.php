@@ -752,6 +752,86 @@ test('asset report page titles are explicit exceptions to the menu labels', func
     }
 });
 
+test('approval and pipeline group page strings keep the english labels', function () {
+    $en = localePageTranslations('en.json');
+
+    expect($en['approval_flows']['title'])->toBe('Approval Flows')
+        ->and($en['approval_flows']['description'])->toBe('Approval definitions with ordered steps and approvers.')
+        ->and($en['approval_delegations']['title'])->toBe('Approval Delegations')
+        ->and($en['approval_delegations']['description'])->toBe(
+            'Delegations that let another user approve on your behalf for a period.',
+        )
+        ->and($en['pipelines']['title'])->toBe('Pipelines')
+        ->and($en['pipelines']['description'])->toBe('Workflow pipelines and the states entities move through.')
+        ->and($en['pipeline_dashboard']['description'])->toBe(
+            'Monitor state distributions and identify bottlenecks across your active pipelines.',
+        )
+        ->and($en['my_approvals']['description'])->toBe(
+            'Review and act on documents waiting for your decision.',
+        )
+        ->and($en['approval_monitoring']['description'])->toBe('Monitor approval workflows and overdue tasks.')
+        ->and($en['approval_audit_trail']['description'])->toBe('History of approval actions taken on requests.')
+        ->and($en['pipeline_audit_trail']['description'])->toBe('History of state transitions on pipeline records.');
+});
+
+test('approval and pipeline group page strings are translated to indonesian', function () {
+    $en = localePageTranslations('en.json');
+    $id = localePageTranslations('id.json');
+
+    $modules = [
+        'approval_flows',
+        'approval_delegations',
+        'pipelines',
+        'pipeline_dashboard',
+        'my_approvals',
+        'approval_monitoring',
+        'approval_audit_trail',
+        'pipeline_audit_trail',
+    ];
+
+    foreach ($modules as $module) {
+        foreach (array_keys($en[$module]) as $field) {
+            expect($id[$module][$field])->not->toBe($en[$module][$field], "page.{$module}.{$field} not translated");
+        }
+    }
+
+    expect($id['approval_flows']['title'])->toBe('Alur Persetujuan')
+        ->and($id['approval_delegations']['title'])->toBe('Delegasi Persetujuan')
+        ->and($id['pipelines']['title'])->toBe('Pipeline');
+});
+
+test('approval and pipeline group page titles follow the menu-or-exception decision', function () {
+    // Aturan (issue #462 <!-- decision -->): judul memakai menu.* bila teks English sama.
+    // Judul yang English-nya sama dengan menu tidak punya kunci page.*.title (memakai menu.*).
+    $menuTitles = [
+        'my_approvals' => 'my_approvals',
+        'approval_monitoring' => 'approval_monitoring',
+        'approval_audit_trail' => 'approval_audit_trail',
+        'pipeline_dashboard' => 'pipeline_dashboard',
+        'pipeline_audit_trail' => 'pipeline_audit_trail',
+    ];
+    // Pengecualian eksplisit: judul English berbeda dengan menu, tetap page.<slug>.title.
+    $exceptions = [
+        'approval_flows' => 'approval_flow',
+        'approval_delegations' => 'approval_delegation',
+        'pipelines' => 'pipeline',
+    ];
+
+    $en = json_decode(File::get(lang_path('en.json')), true, 512, JSON_THROW_ON_ERROR);
+
+    foreach ($menuTitles as $pageKey => $menuKey) {
+        expect(array_key_exists('title', $en['page'][$pageKey] ?? []))->toBeFalse("page.{$pageKey}.title must use menu.*");
+        expect($en['menu'])->toHaveKey($menuKey);
+    }
+
+    foreach ($exceptions as $pageKey => $menuKey) {
+        expect($en['page'][$pageKey]['title'])->not->toBe(
+            $en['menu'][$menuKey],
+            "page.{$pageKey}.title equals menu.{$menuKey}; move it out of the exception list",
+        );
+    }
+});
+
 test('page translation values are non-empty strings', function () {
     foreach (['en.json', 'id.json'] as $file) {
         foreach (localePageTranslations($file) as $module => $strings) {

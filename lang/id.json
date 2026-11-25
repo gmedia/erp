@@ -899,6 +899,33 @@
         "low": "Rendah"
     },
     "page": {
+        "approval_flows": {
+            "title": "Alur Persetujuan",
+            "description": "Definisi persetujuan dengan langkah berurutan dan approver."
+        },
+        "approval_delegations": {
+            "title": "Delegasi Persetujuan",
+            "description": "Delegasi yang memungkinkan pengguna lain menyetujui atas nama Anda untuk periode tertentu."
+        },
+        "pipelines": {
+            "title": "Pipeline",
+            "description": "Pipeline alur kerja dan status yang dilalui entitas."
+        },
+        "pipeline_dashboard": {
+            "description": "Pantau distribusi status dan temukan hambatan di pipeline aktif Anda."
+        },
+        "my_approvals": {
+            "description": "Tinjau dan tindak lanjuti dokumen yang menunggu keputusan Anda."
+        },
+        "approval_monitoring": {
+            "description": "Pantau alur persetujuan dan tugas yang melewati tenggat."
+        },
+        "approval_audit_trail": {
+            "description": "Riwayat tindakan persetujuan pada permintaan."
+        },
+        "pipeline_audit_trail": {
+            "description": "Riwayat perpindahan status pada rekaman pipeline."
+        },
         "purchase_orders": {
             "title": "Pesanan Pembelian",
             "description": "Pesanan yang dikirim ke pemasok beserta progres penerimaan dan penagihan.",

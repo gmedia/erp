@@ -14,6 +14,7 @@ type BreadcrumbItem = {
 
 type AuditTrailPageProps<TItem, TFilters extends FilterState = FilterState> = {
     title: string;
+    titleKey?: string;
     description?: string;
     descriptionKey?: string;
     breadcrumbs: BreadcrumbItem[];
@@ -39,6 +40,7 @@ export function AuditTrailPage<
     TFilters extends FilterState = FilterState,
 >({
     title,
+    titleKey,
     description,
     descriptionKey,
     breadcrumbs,
@@ -65,6 +67,7 @@ export function AuditTrailPage<
     return (
         <ReportDataTablePage<TItem, TFilters>
             title={title}
+            titleKey={titleKey}
             description={description}
             descriptionKey={descriptionKey}
             breadcrumbs={breadcrumbs}

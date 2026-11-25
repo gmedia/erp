@@ -2,6 +2,7 @@ import { PipelineFilter } from '@/components/pipeline-dashboard/PipelineFilter';
 import { StaleEntitiesTable } from '@/components/pipeline-dashboard/StaleEntitiesTable';
 import { StateDistributionChart } from '@/components/pipeline-dashboard/StateDistributionChart';
 import { StateSummaryCards } from '@/components/pipeline-dashboard/StateSummaryCards';
+import { useTranslation } from '@/contexts/i18n-context';
 import { usePipelineDashboard } from '@/hooks/usePipelineDashboard';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
@@ -11,11 +12,14 @@ import axios from '@/lib/axios';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Pipeline Dashboard', href: '/pipeline-dashboard' },
-];
-
 export default function PipelineDashboard() {
+    const { t } = useTranslation();
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: t('menu.pipeline_dashboard'),
+            href: '/pipeline-dashboard',
+        },
+    ];
     const { data: pipelinesResponse, isLoading: pipelinesLoading } = useQuery({
         queryKey: ['pipelines-list'],
         queryFn: async () => {
@@ -43,7 +47,7 @@ export default function PipelineDashboard() {
             <AppLayout breadcrumbs={breadcrumbs}>
                 <Helmet>
                     <title>
-                        Pipeline Dashboard -{' '}
+                        {t('menu.pipeline_dashboard')} -{' '}
                         {import.meta.env.VITE_APP_NAME || 'ERP'}
                     </title>
                 </Helmet>
@@ -79,7 +83,7 @@ export default function PipelineDashboard() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Helmet>
                 <title>
-                    Pipeline Dashboard -{' '}
+                    {t('menu.pipeline_dashboard')} -{' '}
                     {import.meta.env.VITE_APP_NAME || 'ERP'}
                 </title>
             </Helmet>
@@ -87,11 +91,10 @@ export default function PipelineDashboard() {
             <div className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-6 p-4 pb-20 md:p-6">
                 <div className="flex flex-col gap-2">
                     <h1 className="text-2xl font-bold tracking-tight text-foreground">
-                        Pipeline Dashboard
+                        {t('menu.pipeline_dashboard')}
                     </h1>
                     <p className="text-muted-foreground">
-                        Monitor state distributions and identify bottlenecks
-                        across your active pipelines.
+                        {t('page.pipeline_dashboard.description')}
                     </p>
                 </div>
 

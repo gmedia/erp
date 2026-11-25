@@ -10,27 +10,32 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useApprovalMonitoring } from '@/hooks/useApprovalMonitoring';
 import AppLayout from '@/layouts/app-layout';
 import { Helmet } from 'react-helmet-async';
 
 export default function ApprovalMonitoringDashboard() {
+    const { t } = useTranslation();
     const { data, isLoading, filters, handleFilterChange } =
         useApprovalMonitoring();
 
     return (
         <AppLayout
             breadcrumbs={[
-                { title: 'Approval Monitoring', href: '/approval-monitoring' },
+                {
+                    title: t('menu.approval_monitoring'),
+                    href: '/approval-monitoring',
+                },
             ]}
         >
             <Helmet>
-                <title>Approval Monitoring</title>
+                <title>{t('menu.approval_monitoring')}</title>
             </Helmet>
             <div className="flex h-full flex-1 flex-col gap-6 p-4">
                 <PageHeader
-                    title="Approval Monitoring"
-                    description="Monitor approval workflows and overdue tasks."
+                    title={t('menu.approval_monitoring')}
+                    description={t('page.approval_monitoring.description')}
                 />
 
                 <SummaryCards summary={data?.summary} isLoading={isLoading} />
