@@ -14,7 +14,7 @@ export function createAssetFilterFields(): FieldDescriptor[] {
             { key: 'column.search', fallback: 'Search' },
             {
                 key: 'page.assets.search_placeholder',
-                fallback: 'Search asset code, name, serial number...',
+                fallback: 'Search assets...',
             },
         ),
         ...createAsyncSelectFilterFields([

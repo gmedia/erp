@@ -15,7 +15,7 @@ export function createEmployeeFilterFields(): FieldDescriptor[] {
             { key: 'column.search', fallback: 'Search' },
             {
                 key: 'page.employees.search_placeholder',
-                fallback: 'Search employee...',
+                fallback: 'Search employees...',
             },
         ),
         ...createEmployeeOrganizationFilterFields(),

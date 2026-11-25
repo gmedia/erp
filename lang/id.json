@@ -951,7 +951,7 @@
         "assets": {
             "title": "Data Aset",
             "description": "Register aset tetap dengan biaya, penyusutan, dan penugasan.",
-            "search_placeholder": "Cari kode aset, nama, nomor seri..."
+            "search_placeholder": "Cari aset..."
         },
         "assets_register": {
             "title": "Laporan Register Aset",

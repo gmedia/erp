@@ -844,10 +844,38 @@ test('assets and employees search placeholders keep english and are translated t
     $en = localePageTranslations('en.json');
     $id = localePageTranslations('id.json');
 
-    expect($en['assets']['search_placeholder'])->toBe('Search asset code, name, serial number...')
-        ->and($en['employees']['search_placeholder'])->toBe('Search employee...')
-        ->and($id['assets']['search_placeholder'])->toBe('Cari kode aset, nama, nomor seri...')
+    expect($en['assets']['search_placeholder'])->toBe('Search assets...')
+        ->and($en['employees']['search_placeholder'])->toBe('Search employees...')
+        ->and($id['assets']['search_placeholder'])->toBe('Cari aset...')
         ->and($id['employees']['search_placeholder'])->toBe('Cari karyawan...');
+});
+
+test('search placeholders keep the english text of main per page', function () {
+    // Aturan (issue #462 <!-- decision --> 2026-11-25T12:51Z): teks English placeholder pencarian
+    // harus PERSIS sama dengan origin/main. Daftar eksplisit; id boleh diterjemahkan bebas.
+    $expected = [
+        'assets' => 'Search assets...',
+        'employees' => 'Search employees...',
+        'journal_entries' => 'Search entry...',
+        'stock_monitor' => 'Search product, category, warehouse, branch...',
+    ];
+    $expectedFilter = [
+        'products' => 'Search code, name...',
+        'purchase_orders' => 'Search PO number, payment terms, notes, or shipping address...',
+    ];
+
+    $en = localePageTranslations('en.json');
+    $id = localePageTranslations('id.json');
+
+    foreach ($expected as $page => $placeholder) {
+        expect($en[$page]['search_placeholder'])->toBe($placeholder, "en page.{$page}.search_placeholder drifted from main");
+        expect($id[$page]['search_placeholder'])->not->toBe($placeholder, "page.{$page}.search_placeholder not translated");
+    }
+
+    foreach ($expectedFilter as $page => $placeholder) {
+        expect($en[$page]['filter_search_placeholder'])->toBe($placeholder, "en page.{$page}.filter_search_placeholder drifted from main");
+        expect($id[$page]['filter_search_placeholder'])->not->toBe($placeholder, "page.{$page}.filter_search_placeholder not translated");
+    }
 });
 
 test('products and purchase orders filter placeholders keep english and are translated to indonesian', function () {

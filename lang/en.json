@@ -951,7 +951,7 @@
         "assets": {
             "title": "Assets",
             "description": "Fixed asset register with cost, depreciation, and assignment.",
-            "search_placeholder": "Search asset code, name, serial number..."
+            "search_placeholder": "Search assets..."
         },
         "assets_register": {
             "title": "Asset Register Report",
@@ -979,7 +979,7 @@
         "employees": {
             "title": "Employees",
             "description": "Staff records with employment, department, and position history.",
-            "search_placeholder": "Search employee..."
+            "search_placeholder": "Search employees..."
         },
         "warehouses": {
             "title": "Warehouses",

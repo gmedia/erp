@@ -25,7 +25,7 @@ test.describe('i18n page titles (locale id) assets and employees', () => {
             page.getByRole('heading', { level: 1, name: 'Asset Data' }),
         ).toHaveCount(0);
         await expect(
-            page.getByPlaceholder('Cari kode aset, nama, nomor seri...'),
+            page.getByPlaceholder('Cari aset...'),
         ).toBeVisible();
     });
 
