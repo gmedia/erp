@@ -1584,6 +1584,93 @@
             "name_placeholder": "Enter warehouse name",
             "branch": "Branch",
             "branch_placeholder": "Select a branch"
+        },
+        "fiscal_years": {
+            "add_title": "Add New Fiscal Year",
+            "edit_title": "Edit Fiscal Year",
+            "name": "Name",
+            "name_placeholder": "e.g., 2026",
+            "start_date": "Start Date",
+            "end_date": "End Date",
+            "status": "Status",
+            "status_placeholder": "Select status",
+            "status_open": "Open",
+            "status_closed": "Closed",
+            "status_locked": "Locked"
+        },
+        "coa_versions": {
+            "create_title": "Create COA Version",
+            "edit_title": "Edit COA Version",
+            "name": "Name",
+            "fiscal_year": "Fiscal Year",
+            "fiscal_year_placeholder": "Select fiscal year",
+            "status": "Status",
+            "status_placeholder": "Select status",
+            "status_draft": "Draft",
+            "status_active": "Active",
+            "status_archived": "Archived"
+        },
+        "account_mappings": {
+            "create_title": "Create Account Mapping",
+            "edit_title": "Edit Account Mapping",
+            "source_coa_version": "Source COA Version",
+            "source_coa_version_placeholder": "Select source COA version",
+            "source_account": "Source Account",
+            "source_account_placeholder": "Select source account",
+            "target_coa_version": "Target COA Version",
+            "target_coa_version_placeholder": "Select target COA version",
+            "target_account": "Target Account",
+            "target_account_placeholder": "Select target account",
+            "type": "Type",
+            "type_placeholder": "Select type",
+            "type_rename": "Rename",
+            "type_merge": "Merge",
+            "type_split": "Split",
+            "notes": "Notes",
+            "notes_placeholder": "Optional notes"
+        },
+        "accounts": {
+            "create_title": "Create Account",
+            "edit_title": "Edit Account",
+            "parent": "Parent",
+            "code": "Code",
+            "name": "Name",
+            "type": "Type",
+            "type_placeholder": "Select type",
+            "type_asset": "Asset",
+            "type_liability": "Liability",
+            "type_equity": "Equity",
+            "type_revenue": "Revenue",
+            "type_expense": "Expense",
+            "normal_balance": "Normal Balance",
+            "normal_balance_placeholder": "Select normal balance",
+            "normal_balance_debit": "Debit",
+            "normal_balance_credit": "Credit",
+            "active": "Active",
+            "active_hint": "Account is available for transactions",
+            "cash_flow": "Cash Flow",
+            "cash_flow_hint": "Include in Cash Flow report",
+            "description": "Description"
+        },
+        "journal_entries": {
+            "add_title": "Add New Journal Entry",
+            "edit_title": "Edit Journal Entry",
+            "date": "Date",
+            "date_placeholder": "Pick a date",
+            "reference": "Reference",
+            "reference_placeholder": "Ref No.",
+            "description": "Description",
+            "description_placeholder": "Enter description",
+            "lines_title": "Journal Lines",
+            "add_line": "Add Line",
+            "column_account": "Account",
+            "column_debit": "Debit",
+            "column_credit": "Credit",
+            "column_memo": "Memo",
+            "no_lines": "No lines added yet.",
+            "selected_account": "Selected Account",
+            "total": "Total",
+            "difference": "Diff"
         }
     },
     "validation": {
@@ -1598,6 +1685,44 @@
             "unit_required": "Unit is required.",
             "quantity_gt_zero": "Quantity must be greater than 0.",
             "unit_price_min_zero": "Unit price must be at least 0."
+        },
+        "fiscal_year": {
+            "name_min_2": "Name must be at least 2 characters.",
+            "start_date_required": "Start date is required.",
+            "end_date_required": "End date is required.",
+            "status_required": "Status is required."
+        },
+        "account_mapping": {
+            "source_coa_version_required": "Source COA Version is required.",
+            "target_coa_version_required": "Target COA Version is required.",
+            "source_account_required": "Source account is required.",
+            "target_account_required": "Target account is required.",
+            "type_required": "Type is required.",
+            "versions_must_differ": "Source and target COA versions must be different."
+        },
+        "coa_version": {
+            "name_required": "Name is required",
+            "fiscal_year_required": "Fiscal Year is required"
+        },
+        "account": {
+            "code_required": "Code is required",
+            "name_required": "Name is required"
+        },
+        "journal_entry": {
+            "date_required": "Date is required.",
+            "description_required": "Description is required.",
+            "account_required": "Account is required.",
+            "lines_min_two": "At least 2 lines are required.",
+            "line_debit_or_credit": "Each line must have an amount on either debit or credit, not both.",
+            "line_debit_or_credit_required": "Must specify Debit or Credit.",
+            "totals_must_balance": "Total debit and total credit must be equal."
         }
+    },
+    "item_dialog": {
+        "add": "Add",
+        "edit": "Edit",
+        "save": "Save",
+        "update": "Update",
+        "cancel": "Cancel"
     }
 }

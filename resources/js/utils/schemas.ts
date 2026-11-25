@@ -231,21 +231,27 @@ export type ProductFormData = z.infer<typeof productFormSchema>;
  * Fiscal year form schema.
  */
 export const fiscalYearFormSchema = z.object({
-    name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
-    start_date: z.string().min(1, { message: 'Start date is required.' }),
-    end_date: z.string().min(1, { message: 'End date is required.' }),
+    name: z.string().min(2, {
+        message: 'validation.fiscal_year.name_min_2',
+    }),
+    start_date: z.string().min(1, {
+        message: 'validation.fiscal_year.start_date_required',
+    }),
+    end_date: z.string().min(1, {
+        message: 'validation.fiscal_year.end_date_required',
+    }),
     status: z.enum(['open', 'closed', 'locked'], {
-        message: 'Status is required.',
+        message: 'validation.fiscal_year.status_required',
     }),
 });
 
 export type FiscalYearFormData = z.infer<typeof fiscalYearFormSchema>;
 export const coaVersionFormSchema = z.object({
-    name: z.string().min(1, 'Name is required').max(255),
+    name: z.string().min(1, 'validation.coa_version.name_required').max(255),
     fiscal_year_id: z
         .union([z.number(), z.string()])
         .transform(Number)
-        .pipe(z.number().min(1, 'Fiscal Year is required')),
+        .pipe(z.number().min(1, 'validation.coa_version.fiscal_year_required')),
     status: z.enum(['draft', 'active', 'archived']),
 });
 
@@ -253,15 +259,19 @@ export type CoaVersionFormData = z.infer<typeof coaVersionFormSchema>;
 
 // Schema for Journal Entry
 export const journalEntryFormSchema = z.object({
-    entry_date: z.string().min(1, { message: 'Date is required.' }),
+    entry_date: z.string().min(1, {
+        message: 'validation.journal_entry.date_required',
+    }),
     reference: z.string().optional(),
-    description: z.string().min(1, { message: 'Description is required.' }),
+    description: z.string().min(1, {
+        message: 'validation.journal_entry.description_required',
+    }),
     lines: z
         .array(
             z.object({
-                account_id: z
-                    .string()
-                    .min(1, { message: 'Account is required.' }),
+                account_id: z.string().min(1, {
+                    message: 'validation.journal_entry.account_required',
+                }),
                 debit: z.coerce.number().min(0),
                 credit: z.coerce.number().min(0),
                 memo: z.string().optional(),
@@ -271,7 +281,7 @@ export const journalEntryFormSchema = z.object({
                 branch_name: z.string().optional(),
             }),
         )
-        .min(2, { message: 'At least 2 lines are required.' })
+        .min(2, { message: 'validation.journal_entry.lines_min_two' })
         .refine(
             (lines) =>
                 lines.every((line) => {
@@ -281,8 +291,7 @@ export const journalEntryFormSchema = z.object({
                     return hasDebit !== hasCredit;
                 }),
             {
-                message:
-                    'Each line must have an amount on either debit or credit, not both.',
+                message: 'validation.journal_entry.line_debit_or_credit',
                 path: ['root'],
             },
         )
@@ -299,7 +308,7 @@ export const journalEntryFormSchema = z.object({
                 return Math.abs(totalDebit - totalCredit) < 0.01;
             },
             {
-                message: 'Total debit and total credit must be equal.',
+                message: 'validation.journal_entry.totals_must_balance',
                 path: ['root'],
             },
         ),
@@ -350,27 +359,27 @@ export type AssetModelFormData = z.infer<typeof assetModelFormSchema>;
 
 export const accountMappingFormSchema = z
     .object({
-        source_coa_version_id: z
-            .string()
-            .min(1, { message: 'Source COA Version is required.' }),
-        target_coa_version_id: z
-            .string()
-            .min(1, { message: 'Target COA Version is required.' }),
-        source_account_id: z
-            .string()
-            .min(1, { message: 'Source account is required.' }),
-        target_account_id: z
-            .string()
-            .min(1, { message: 'Target account is required.' }),
+        source_coa_version_id: z.string().min(1, {
+            message: 'validation.account_mapping.source_coa_version_required',
+        }),
+        target_coa_version_id: z.string().min(1, {
+            message: 'validation.account_mapping.target_coa_version_required',
+        }),
+        source_account_id: z.string().min(1, {
+            message: 'validation.account_mapping.source_account_required',
+        }),
+        target_account_id: z.string().min(1, {
+            message: 'validation.account_mapping.target_account_required',
+        }),
         type: z.enum(['merge', 'split', 'rename'], {
-            message: 'Type is required.',
+            message: 'validation.account_mapping.type_required',
         }),
         notes: z.string().optional(),
     })
     .refine(
         (data) => data.source_coa_version_id !== data.target_coa_version_id,
         {
-            message: 'Source and target COA versions must be different.',
+            message: 'validation.account_mapping.versions_must_differ',
             path: ['target_coa_version_id'],
         },
     );

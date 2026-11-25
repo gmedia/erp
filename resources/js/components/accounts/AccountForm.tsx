@@ -17,6 +17,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { useTranslation } from '@/contexts/i18n-context';
 import {
     type Account,
     type AccountType,
@@ -26,8 +27,8 @@ import {
 const accountSchema = z.object({
     coa_version_id: z.number(),
     parent_id: z.number().nullable(),
-    code: z.string().min(1, 'Code is required'),
-    name: z.string().min(1, 'Name is required'),
+    code: z.string().min(1, 'validation.account.code_required'),
+    name: z.string().min(1, 'validation.account.name_required'),
     type: z.enum(['asset', 'liability', 'equity', 'revenue', 'expense']),
     sub_type: z.string().optional().nullable(),
     normal_balance: z.enum(['debit', 'credit']),
@@ -58,6 +59,20 @@ export function AccountForm({
     onSubmit,
     isLoading = false,
 }: Readonly<AccountFormProps>) {
+    const { t } = useTranslation();
+    const fl = (key: string, fallback: string) => {
+        const translated = t(`form_fields.accounts.${key}`);
+        return translated === `form_fields.accounts.${key}`
+            ? fallback
+            : translated;
+    };
+    const translateAccountMessage = (message?: string) => {
+        if (!message) {
+            return message;
+        }
+        const translated = t(message);
+        return translated === message ? message : translated;
+    };
     const form = useForm<z.input<typeof accountSchema>>({
         resolver: zodResolver(accountSchema),
         defaultValues: {
@@ -127,7 +142,11 @@ export function AccountForm({
         <EntityForm
             open={open}
             onOpenChange={onOpenChange}
-            title={account ? 'Edit Account' : 'Create Account'}
+            title={
+                account
+                    ? fl('edit_title', 'Edit Account')
+                    : fl('create_title', 'Create Account')
+            }
             form={
                 form as unknown as UseFormReturn<
                     AccountFormData,
@@ -145,7 +164,7 @@ export function AccountForm({
             <div className="grid gap-4 py-4">
                 {parentAccount && (
                     <div className="rounded-md bg-muted p-2 text-sm">
-                        Parent:{' '}
+                        {fl('parent', 'Parent')}:{' '}
                         <strong>
                             {parentAccount.code} - {parentAccount.name}
                         </strong>
@@ -154,13 +173,15 @@ export function AccountForm({
 
                 <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="code" className="text-right">
-                        Code
+                        {fl('code', 'Code')}
                     </Label>
                     <div className="col-span-3">
                         <Input id="code" {...form.register('code')} />
                         {form.formState.errors.code && (
                             <p className="mt-1 text-xs text-destructive">
-                                {form.formState.errors.code.message}
+                                {translateAccountMessage(
+                                    form.formState.errors.code.message,
+                                )}
                             </p>
                         )}
                     </div>
@@ -168,13 +189,15 @@ export function AccountForm({
 
                 <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="name" className="text-right">
-                        Name
+                        {fl('name', 'Name')}
                     </Label>
                     <div className="col-span-3">
                         <Input id="name" {...form.register('name')} />
                         {form.formState.errors.name && (
                             <p className="mt-1 text-xs text-destructive">
-                                {form.formState.errors.name.message}
+                                {translateAccountMessage(
+                                    form.formState.errors.name.message,
+                                )}
                             </p>
                         )}
                     </div>
@@ -182,7 +205,7 @@ export function AccountForm({
 
                 <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="type" className="text-right">
-                        Type
+                        {fl('type', 'Type')}
                     </Label>
                     <div className="col-span-3">
                         <Select
@@ -193,16 +216,29 @@ export function AccountForm({
                             disabled={!!parentAccount}
                         >
                             <SelectTrigger>
-                                <SelectValue placeholder="Select type" />
+                                <SelectValue
+                                    placeholder={fl(
+                                        'type_placeholder',
+                                        'Select type',
+                                    )}
+                                />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="asset">Asset</SelectItem>
-                                <SelectItem value="liability">
-                                    Liability
+                                <SelectItem value="asset">
+                                    {fl('type_asset', 'Asset')}
                                 </SelectItem>
-                                <SelectItem value="equity">Equity</SelectItem>
-                                <SelectItem value="revenue">Revenue</SelectItem>
-                                <SelectItem value="expense">Expense</SelectItem>
+                                <SelectItem value="liability">
+                                    {fl('type_liability', 'Liability')}
+                                </SelectItem>
+                                <SelectItem value="equity">
+                                    {fl('type_equity', 'Equity')}
+                                </SelectItem>
+                                <SelectItem value="revenue">
+                                    {fl('type_revenue', 'Revenue')}
+                                </SelectItem>
+                                <SelectItem value="expense">
+                                    {fl('type_expense', 'Expense')}
+                                </SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -210,7 +246,7 @@ export function AccountForm({
 
                 <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="normal_balance" className="text-right">
-                        Normal Balance
+                        {fl('normal_balance', 'Normal Balance')}
                     </Label>
                     <div className="col-span-3">
                         <Select
@@ -223,11 +259,20 @@ export function AccountForm({
                             }
                         >
                             <SelectTrigger>
-                                <SelectValue placeholder="Select normal balance" />
+                                <SelectValue
+                                    placeholder={fl(
+                                        'normal_balance_placeholder',
+                                        'Select normal balance',
+                                    )}
+                                />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="debit">Debit</SelectItem>
-                                <SelectItem value="credit">Credit</SelectItem>
+                                <SelectItem value="debit">
+                                    {fl('normal_balance_debit', 'Debit')}
+                                </SelectItem>
+                                <SelectItem value="credit">
+                                    {fl('normal_balance_credit', 'Credit')}
+                                </SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -235,7 +280,7 @@ export function AccountForm({
 
                 <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="is_active" className="text-right">
-                        Active
+                        {fl('active', 'Active')}
                     </Label>
                     <div className="col-span-3 flex items-center space-x-2">
                         <Checkbox
@@ -249,14 +294,17 @@ export function AccountForm({
                             htmlFor="is_active"
                             className="text-sm font-normal"
                         >
-                            Account is available for transactions
+                            {fl(
+                                'active_hint',
+                                'Account is available for transactions',
+                            )}
                         </Label>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="is_cash_flow" className="text-right">
-                        Cash Flow
+                        {fl('cash_flow', 'Cash Flow')}
                     </Label>
                     <div className="col-span-3 flex items-center space-x-2">
                         <Checkbox
@@ -270,14 +318,17 @@ export function AccountForm({
                             htmlFor="is_cash_flow"
                             className="text-sm font-normal"
                         >
-                            Include in Cash Flow report
+                            {fl(
+                                'cash_flow_hint',
+                                'Include in Cash Flow report',
+                            )}
                         </Label>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-4 items-start gap-4">
                     <Label htmlFor="description" className="mt-2 text-right">
-                        Description
+                        {fl('description', 'Description')}
                     </Label>
                     <div className="col-span-3">
                         <Textarea

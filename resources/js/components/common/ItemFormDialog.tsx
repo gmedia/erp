@@ -81,17 +81,25 @@ export function ItemFormDialogShell<TFormValues extends FieldValues>({
     titleLabel = 'Item',
     actionLabel = 'Item',
 }: Readonly<ItemFormDialogShellProps<TFormValues>>) {
+    const { t } = useTranslation();
+    const fl = (key: string, fallback: string) => {
+        const translated = t(`item_dialog.${key}`);
+        return translated === `item_dialog.${key}` ? fallback : translated;
+    };
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-2xl">
                 <DialogHeader>
                     <DialogTitle>
-                        {item ? `Edit ${titleLabel}` : `Add ${titleLabel}`}
+                        {item
+                            ? `${fl('edit', 'Edit')} ${titleLabel}`
+                            : `${fl('add', 'Add')} ${titleLabel}`}
                     </DialogTitle>
                     <DialogDescription className="sr-only">
                         {item
-                            ? `Edit ${itemDescription}.`
-                            : `Add ${itemDescription}.`}
+                            ? `${fl('edit', 'Edit')} ${itemDescription}.`
+                            : `${fl('add', 'Add')} ${itemDescription}.`}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -111,12 +119,12 @@ export function ItemFormDialogShell<TFormValues extends FieldValues>({
                                 variant="outline"
                                 onClick={() => onOpenChange(false)}
                             >
-                                Cancel
+                                {fl('cancel', 'Cancel')}
                             </Button>
                             <Button type="submit">
                                 {item
-                                    ? `Update ${actionLabel}`
-                                    : `Save ${actionLabel}`}
+                                    ? `${fl('update', 'Update')} ${actionLabel}`
+                                    : `${fl('save', 'Save')} ${actionLabel}`}
                             </Button>
                         </DialogFooter>
                     </form>

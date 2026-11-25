@@ -1584,6 +1584,93 @@
             "name_placeholder": "Masukkan nama gudang",
             "branch": "Cabang",
             "branch_placeholder": "Pilih cabang"
+        },
+        "fiscal_years": {
+            "add_title": "Tambah Tahun Fiskal Baru",
+            "edit_title": "Ubah Tahun Fiskal",
+            "name": "Nama",
+            "name_placeholder": "mis., 2026",
+            "start_date": "Tanggal Mulai",
+            "end_date": "Tanggal Selesai",
+            "status": "Status",
+            "status_placeholder": "Pilih status",
+            "status_open": "Terbuka",
+            "status_closed": "Tertutup",
+            "status_locked": "Dikunci"
+        },
+        "coa_versions": {
+            "create_title": "Buat Versi COA",
+            "edit_title": "Ubah Versi COA",
+            "name": "Nama",
+            "fiscal_year": "Tahun Fiskal",
+            "fiscal_year_placeholder": "Pilih tahun fiskal",
+            "status": "Status",
+            "status_placeholder": "Pilih status",
+            "status_draft": "Draf",
+            "status_active": "Aktif",
+            "status_archived": "Diarsipkan"
+        },
+        "account_mappings": {
+            "create_title": "Buat Pemetaan Akun",
+            "edit_title": "Ubah Pemetaan Akun",
+            "source_coa_version": "Versi COA Sumber",
+            "source_coa_version_placeholder": "Pilih versi COA sumber",
+            "source_account": "Akun Sumber",
+            "source_account_placeholder": "Pilih akun sumber",
+            "target_coa_version": "Versi COA Tujuan",
+            "target_coa_version_placeholder": "Pilih versi COA tujuan",
+            "target_account": "Akun Tujuan",
+            "target_account_placeholder": "Pilih akun tujuan",
+            "type": "Jenis",
+            "type_placeholder": "Pilih jenis",
+            "type_rename": "Ganti nama",
+            "type_merge": "Gabung",
+            "type_split": "Pecah",
+            "notes": "Catatan",
+            "notes_placeholder": "Catatan (opsional)"
+        },
+        "accounts": {
+            "create_title": "Buat Akun",
+            "edit_title": "Ubah Akun",
+            "parent": "Induk",
+            "code": "Kode",
+            "name": "Nama",
+            "type": "Jenis",
+            "type_placeholder": "Pilih jenis",
+            "type_asset": "Aset",
+            "type_liability": "Kewajiban",
+            "type_equity": "Ekuitas",
+            "type_revenue": "Pendapatan",
+            "type_expense": "Beban",
+            "normal_balance": "Saldo Normal",
+            "normal_balance_placeholder": "Pilih saldo normal",
+            "normal_balance_debit": "Debit",
+            "normal_balance_credit": "Kredit",
+            "active": "Aktif",
+            "active_hint": "Akun tersedia untuk transaksi",
+            "cash_flow": "Arus Kas",
+            "cash_flow_hint": "Sertakan dalam laporan arus kas",
+            "description": "Deskripsi"
+        },
+        "journal_entries": {
+            "add_title": "Tambah Jurnal Baru",
+            "edit_title": "Ubah Jurnal",
+            "date": "Tanggal",
+            "date_placeholder": "Pilih tanggal",
+            "reference": "Referensi",
+            "reference_placeholder": "No. Ref.",
+            "description": "Deskripsi",
+            "description_placeholder": "Masukkan deskripsi",
+            "lines_title": "Baris Jurnal",
+            "add_line": "Tambah Baris",
+            "column_account": "Akun",
+            "column_debit": "Debit",
+            "column_credit": "Kredit",
+            "column_memo": "Memo",
+            "no_lines": "Belum ada baris.",
+            "selected_account": "Akun Terpilih",
+            "total": "Total",
+            "difference": "Selisih"
         }
     },
     "validation": {
@@ -1598,6 +1685,44 @@
             "unit_required": "Satuan wajib diisi.",
             "quantity_gt_zero": "Jumlah harus lebih dari 0.",
             "unit_price_min_zero": "Harga satuan minimal 0."
+        },
+        "fiscal_year": {
+            "name_min_2": "Nama minimal 2 karakter.",
+            "start_date_required": "Tanggal mulai wajib diisi.",
+            "end_date_required": "Tanggal selesai wajib diisi.",
+            "status_required": "Status wajib diisi."
+        },
+        "account_mapping": {
+            "source_coa_version_required": "Versi COA sumber wajib diisi.",
+            "target_coa_version_required": "Versi COA tujuan wajib diisi.",
+            "source_account_required": "Akun sumber wajib diisi.",
+            "target_account_required": "Akun tujuan wajib diisi.",
+            "type_required": "Jenis wajib diisi.",
+            "versions_must_differ": "Versi COA sumber dan tujuan harus berbeda."
+        },
+        "coa_version": {
+            "name_required": "Nama wajib diisi",
+            "fiscal_year_required": "Tahun fiskal wajib diisi"
+        },
+        "account": {
+            "code_required": "Kode wajib diisi",
+            "name_required": "Nama wajib diisi"
+        },
+        "journal_entry": {
+            "date_required": "Tanggal wajib diisi.",
+            "description_required": "Deskripsi wajib diisi.",
+            "account_required": "Akun wajib diisi.",
+            "lines_min_two": "Minimal 2 baris diperlukan.",
+            "line_debit_or_credit": "Setiap baris harus berisi nilai di debit atau kredit, tidak keduanya.",
+            "line_debit_or_credit_required": "Isi Debit atau Kredit.",
+            "totals_must_balance": "Total debit dan total kredit harus sama."
         }
+    },
+    "item_dialog": {
+        "add": "Tambah",
+        "edit": "Ubah",
+        "save": "Simpan",
+        "update": "Perbarui",
+        "cancel": "Batal"
     }
 }

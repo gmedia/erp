@@ -298,6 +298,76 @@ test('inventory stocktake item dialog labels keep the english text', function ()
         ->and($en['inventory_stocktakes']['item_counted_quantity'])->toBe('Counted Quantity');
 });
 
+test('fiscal year, coa version, account mapping, account and journal entry forms keep the english text', function () {
+    $en = localeFormFieldTranslations('en.json');
+    $enValidation = localeValidationTranslations('en.json');
+
+    expect($en['fiscal_years']['add_title'])->toBe('Add New Fiscal Year')
+        ->and($en['fiscal_years']['edit_title'])->toBe('Edit Fiscal Year')
+        ->and($en['fiscal_years']['name_placeholder'])->toBe('e.g., 2026')
+        ->and($en['fiscal_years']['status_locked'])->toBe('Locked')
+        ->and($en['coa_versions']['create_title'])->toBe('Create COA Version')
+        ->and($en['coa_versions']['fiscal_year'])->toBe('Fiscal Year')
+        ->and($en['coa_versions']['status_archived'])->toBe('Archived')
+        ->and($en['account_mappings']['create_title'])->toBe('Create Account Mapping')
+        ->and($en['account_mappings']['source_coa_version'])->toBe('Source COA Version')
+        ->and($en['account_mappings']['type_split'])->toBe('Split')
+        ->and($en['accounts']['create_title'])->toBe('Create Account')
+        ->and($en['accounts']['normal_balance'])->toBe('Normal Balance')
+        ->and($en['accounts']['active_hint'])->toBe('Account is available for transactions')
+        ->and($en['journal_entries']['add_title'])->toBe('Add New Journal Entry')
+        ->and($en['journal_entries']['lines_title'])->toBe('Journal Lines')
+        ->and($en['journal_entries']['no_lines'])->toBe('No lines added yet.')
+        ->and($en['journal_entries']['difference'])->toBe('Diff');
+
+    expect($enValidation['fiscal_year']['name_min_2'])->toBe('Name must be at least 2 characters.')
+        ->and($enValidation['account_mapping']['versions_must_differ'])
+        ->toBe('Source and target COA versions must be different.')
+        ->and($enValidation['coa_version']['fiscal_year_required'])->toBe('Fiscal Year is required')
+        ->and($enValidation['account']['code_required'])->toBe('Code is required')
+        ->and($enValidation['journal_entry']['line_debit_or_credit'])
+        ->toBe('Each line must have an amount on either debit or credit, not both.')
+        ->and($enValidation['journal_entry']['line_debit_or_credit_required'])->toBe('Must specify Debit or Credit.')
+        ->and($enValidation['journal_entry']['totals_must_balance'])
+        ->toBe('Total debit and total credit must be equal.');
+});
+
+test('item dialog shell labels keep the english text', function () {
+    $decoded = json_decode(File::get(lang_path('en.json')), true, 512, JSON_THROW_ON_ERROR);
+
+    expect($decoded['item_dialog'])->toBe([
+        'add' => 'Add',
+        'edit' => 'Edit',
+        'save' => 'Save',
+        'update' => 'Update',
+        'cancel' => 'Cancel',
+    ]);
+});
+
+test('new form field and validation keys are complete in both locales', function () {
+    $en = localeFormFieldTranslations('en.json');
+    $id = localeFormFieldTranslations('id.json');
+    $enValidation = localeValidationTranslations('en.json');
+    $idValidation = localeValidationTranslations('id.json');
+
+    foreach (['fiscal_years', 'coa_versions', 'account_mappings', 'accounts', 'journal_entries'] as $module) {
+        expect(array_keys($en[$module]))->not->toBeEmpty();
+        expect(array_keys($en[$module]))->toEqual(array_keys($id[$module]), "form_fields.{$module} keys differ");
+
+        foreach (array_keys($en[$module]) as $field) {
+            expect($id[$module][$field])->not->toBe('', "form_fields.{$module}.{$field} empty");
+        }
+    }
+
+    foreach (['fiscal_year', 'account_mapping', 'coa_version', 'account', 'journal_entry'] as $form) {
+        expect(array_keys($enValidation[$form]))
+            ->toEqual(array_keys($idValidation[$form]), "validation.{$form} keys differ");
+    }
+
+    expect($id['fiscal_years']['add_title'])->toBe('Tambah Tahun Fiskal Baru')
+        ->and($id['journal_entries']['add_line'])->toBe('Tambah Baris');
+});
+
 test('stock adjustment item dialog labels keep the english text', function () {
     $en = localeFormFieldTranslations('en.json');
 
