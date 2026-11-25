@@ -347,7 +347,7 @@ function SidebarHeader({
       data-slot="sidebar-header"
       data-sidebar="header"
       className={cn(
-        "bg-sidebar border-sidebar-border flex flex-col gap-2 border-t p-2",
+        "bg-sidebar border-sidebar-border flex shrink-0 flex-col gap-2 border-t p-2",
         className
       )}
       {...props}
