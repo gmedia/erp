@@ -30,6 +30,7 @@ export const purchaseOrderColumns: ColumnDef<PurchaseOrder>[] = [
         accessorKey: 'po_number',
         label: { key: 'column.po_number', fallback: 'PO Number' },
         primary: true,
+        description: (row) => row.supplier?.name ?? null,
     }),
     {
         accessorKey: 'supplier',

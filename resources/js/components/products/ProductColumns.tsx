@@ -59,6 +59,7 @@ export const productColumns: ColumnDef<Product>[] = [
         accessorKey: 'name',
         label: { key: 'column.name', fallback: 'Name' },
         primary: true,
+        description: (row) => row.category?.name ?? null,
     }),
     {
         accessorKey: 'type',

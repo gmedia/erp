@@ -53,14 +53,30 @@ export const assetColumns: ColumnDef<Asset>[] = [
     {
         accessorKey: 'name',
         ...createSortingHeader({ key: 'column.name', fallback: 'Name' }),
-        cell: ({ row }) => (
-            <Link
-                to={`/assets/${row.original.ulid}`}
-                className="font-medium text-primary hover:underline"
-            >
-                {row.original.name}
-            </Link>
-        ),
+        cell: ({ row }) => {
+            const meta = [
+                row.original.category?.name,
+                row.original.model?.model_name,
+            ]
+                .filter(Boolean)
+                .join(' · ');
+
+            return (
+                <div className="max-w-56 min-w-0">
+                    <Link
+                        to={`/assets/${row.original.ulid}`}
+                        className="block truncate font-medium text-primary hover:underline"
+                    >
+                        {row.original.name}
+                    </Link>
+                    {meta ? (
+                        <div className="truncate text-xs text-muted-foreground">
+                            {meta}
+                        </div>
+                    ) : null}
+                </div>
+            );
+        },
     },
     createAssetRelationColumn('category', {
         key: 'column.category',
