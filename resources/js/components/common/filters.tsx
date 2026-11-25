@@ -134,8 +134,11 @@ export const activeInactiveStatusOptions: SelectOption[] = [
 ];
 
 export const employmentStatusOptions: SelectOption[] = [
-    { value: 'regular', label: 'Regular' },
-    { value: 'intern', label: 'Intern' },
+    {
+        value: 'regular',
+        label: { key: 'status.regular', fallback: 'Regular' },
+    },
+    { value: 'intern', label: { key: 'status.intern', fallback: 'Intern' } },
 ];
 
 export const productTypeOptions: SelectOption[] = [
@@ -810,7 +813,7 @@ export function createEmploymentStatusFilterField(
 ): FieldDescriptor {
     return createSelectFilterField(
         'employment_status',
-        'Status',
+        { key: 'column.status', fallback: 'Status' },
         employmentStatusOptions,
         placeholder,
     );

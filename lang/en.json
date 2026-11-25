@@ -750,7 +750,14 @@
         "performed_date": "Performed Date",
         "planned_from": "Planned From",
         "planned_to": "Planned To",
-        "perform": "Perform"
+        "perform": "Perform",
+        "nik": "NIK",
+        "email": "Email",
+        "phone": "Phone",
+        "salary": "Salary",
+        "hire_date": "Hire Date",
+        "position": "Position",
+        "symbol": "Symbol"
     },
     "movement_type": {
         "transfer": "Transfer",

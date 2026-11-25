@@ -750,7 +750,14 @@
         "performed_date": "Tanggal Pelaksanaan",
         "planned_from": "Rencana Dari",
         "planned_to": "Rencana Sampai",
-        "perform": "Laksanakan"
+        "perform": "Laksanakan",
+        "nik": "NIK",
+        "email": "Email",
+        "phone": "Telepon",
+        "salary": "Gaji",
+        "hire_date": "Tanggal Masuk",
+        "position": "Jabatan",
+        "symbol": "Simbol"
     },
     "movement_type": {
         "transfer": "Pemindahan",

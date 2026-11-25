@@ -10,7 +10,11 @@ import {
 // Employee-specific filter fields
 export function createEmployeeFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', 'Search employees...'),
+        createTextFilterField(
+            'search',
+            { key: 'column.search', fallback: 'Search' },
+            'Search employees...',
+        ),
         ...createEmployeeOrganizationFilterFields(),
         createEmploymentStatusFilterField(),
     ];

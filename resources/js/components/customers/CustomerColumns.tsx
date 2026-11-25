@@ -47,24 +47,33 @@ export const customerColumns: ColumnDef<Customer>[] = [
     createSelectColumn<Customer>(),
     createTextColumn<Customer>({
         accessorKey: 'name',
-        label: 'Name',
+        label: { key: 'column.name', fallback: 'Name' },
         primary: true,
     }),
-    createEmailColumn<Customer>({ accessorKey: 'email', label: 'Email' }),
-    createPhoneColumn<Customer>({ accessorKey: 'phone', label: 'Phone' }),
+    createEmailColumn<Customer>({
+        accessorKey: 'email',
+        label: { key: 'column.email', fallback: 'Email' },
+    }),
+    createPhoneColumn<Customer>({
+        accessorKey: 'phone',
+        label: { key: 'column.phone', fallback: 'Phone' },
+    }),
     {
         accessorKey: 'branch_id',
-        ...createSortingHeader('Branch'),
+        ...createSortingHeader({ key: 'column.branch', fallback: 'Branch' }),
         cell: renderBranchCell,
     },
     {
         accessorKey: 'category_id',
-        ...createSortingHeader('Category'),
+        ...createSortingHeader({
+            key: 'column.category',
+            fallback: 'Category',
+        }),
         cell: renderCategoryCell,
     },
     {
         accessorKey: 'status',
-        ...createSortingHeader('Status'),
+        ...createSortingHeader({ key: 'column.status', fallback: 'Status' }),
         cell: renderStatusCell,
     },
     createActionsColumn<Customer>(),

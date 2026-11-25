@@ -158,6 +158,27 @@ test('asset module column and filter keys have translations', function () {
         ->and($en['performed_to'])->toBe('Performed To');
 });
 
+test('master data column and filter keys exist in both locales', function () {
+    $en = localeColumnTranslations('en.json');
+    $id = localeColumnTranslations('id.json');
+
+    // Keys whose Indonesian text intentionally equals English (NIK, Email, Status) are checked for presence only.
+    $sameInBoth = ['nik', 'email'];
+    $translated = ['phone', 'salary', 'hire_date', 'position', 'symbol'];
+
+    foreach (array_merge($sameInBoth, $translated) as $key) {
+        expect($en)->toHaveKey($key)
+            ->and($id)->toHaveKey($key);
+    }
+
+    foreach ($translated as $key) {
+        expect($id[$key])->not->toBe($en[$key], "column.{$key} not translated");
+    }
+
+    expect($en['hire_date'])->toBe('Hire Date')
+        ->and($en['symbol'])->toBe('Symbol');
+});
+
 test('asset movement type labels are translated in both locales', function () {
     $en = json_decode(File::get(lang_path('en.json')), true, 512, JSON_THROW_ON_ERROR)['movement_type'];
     $id = json_decode(File::get(lang_path('id.json')), true, 512, JSON_THROW_ON_ERROR)['movement_type'];
