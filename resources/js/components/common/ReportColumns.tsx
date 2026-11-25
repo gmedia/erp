@@ -94,7 +94,7 @@ export function SummaryCell({
     secondary: DisplayValue;
 }>) {
     return (
-        <div className="max-w-[16rem] space-y-0.5">
+        <div className="max-w-[11rem] space-y-0.5">
             <TruncatedText className="font-medium" value={primary} />
             <TruncatedText
                 className="text-xs text-muted-foreground"
@@ -129,7 +129,7 @@ export function TextCell({
 }>) {
     return (
         <TruncatedText
-            className={cn('max-w-[12rem]', className)}
+            className={cn('max-w-[9rem]', className)}
             value={value}
         />
     );
