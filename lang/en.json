@@ -791,7 +791,19 @@
         "unit": "Unit",
         "total_in": "Total In",
         "total_out": "Total Out",
-        "ending_balance": "Ending Balance"
+        "ending_balance": "Ending Balance",
+        "status_category": "Status Category",
+        "ordered_qty": "Ordered Qty",
+        "received_qty": "Received Qty",
+        "outstanding_qty": "Outstanding Qty",
+        "receipt_progress": "Receipt Progress (%)",
+        "receipt_count": "Receipt Count",
+        "last_receipt": "Last Receipt",
+        "total_value": "Total Value",
+        "item_count": "Item Count",
+        "accepted_qty": "Accepted Qty",
+        "rejected_qty": "Rejected Qty",
+        "po_status": "PO Status"
     },
     "movement_type": {
         "transfer": "Transfer",
@@ -898,6 +910,8 @@
         "stock_movement_search_placeholder": "Search product, category, warehouse, branch...",
         "stocktake_variance_search_placeholder": "Search stocktake, product, category, warehouse...",
         "valuation_search_placeholder": "Search product, category, warehouse, branch...",
-        "adjustment_search_placeholder": "Search number, warehouse, branch, type, status..."
+        "adjustment_search_placeholder": "Search number, warehouse, branch, type, status...",
+        "purchase_search_placeholder": "Search PO number, supplier, warehouse, or product...",
+        "goods_receipt_search_placeholder": "Search GR number, PO number, supplier, warehouse, or product..."
     }
 }

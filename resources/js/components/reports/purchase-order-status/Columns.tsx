@@ -49,60 +49,69 @@ export const purchaseOrderStatusReportColumns: ColumnDef<PurchaseOrderStatusRepo
     [
         createReportSummaryColumn<PurchaseOrderStatusReportItem>({
             accessorKey: 'purchase_order.po_number',
-            header: 'PO Number',
+            header: { key: 'column.po_number', fallback: 'PO Number' },
             getPrimary: (item) => item.purchase_order?.po_number,
             getSecondary: (item) => formatDate(item.purchase_order?.order_date),
             sortable: true,
         }),
         createReportTextColumn<PurchaseOrderStatusReportItem>({
             accessorKey: 'supplier.name',
-            header: 'Supplier',
+            header: { key: 'column.supplier', fallback: 'Supplier' },
             getValue: (item) => item.supplier?.name,
             sortable: true,
         }),
         createReportWarehouseColumn<PurchaseOrderStatusReportItem>({
             accessorKey: 'warehouse.name',
-            header: 'Warehouse',
+            header: { key: 'column.warehouse', fallback: 'Warehouse' },
             getWarehouse: (item) => item.warehouse,
             sortable: true,
         }),
         createReportStatusBadgeColumn<PurchaseOrderStatusReportItem>({
             accessorKey: 'purchase_order.status',
-            header: 'Status',
+            header: { key: 'column.status', fallback: 'Status' },
             getValue: (item) => item.purchase_order?.status,
         }),
         createReportStatusBadgeColumn<PurchaseOrderStatusReportItem>({
             accessorKey: 'purchase_order.status_category',
-            header: 'Status Category',
+            header: {
+                key: 'column.status_category',
+                fallback: 'Status Category',
+            },
             getValue: (item) => item.purchase_order?.status_category,
         }),
         createNumberColumn<PurchaseOrderStatusReportItem>({
             accessorKey: 'ordered_quantity',
-            label: 'Ordered Qty',
+            label: { key: 'column.ordered_qty', fallback: 'Ordered Qty' },
             minimumFractionDigits: 0,
             maximumFractionDigits: 2,
         }),
         createNumberColumn<PurchaseOrderStatusReportItem>({
             accessorKey: 'received_quantity',
-            label: 'Received Qty',
+            label: { key: 'column.received_qty', fallback: 'Received Qty' },
             minimumFractionDigits: 0,
             maximumFractionDigits: 2,
         }),
         createNumberColumn<PurchaseOrderStatusReportItem>({
             accessorKey: 'outstanding_quantity',
-            label: 'Outstanding Qty',
+            label: {
+                key: 'column.outstanding_qty',
+                fallback: 'Outstanding Qty',
+            },
             minimumFractionDigits: 0,
             maximumFractionDigits: 2,
         }),
         createNumberColumn<PurchaseOrderStatusReportItem>({
             accessorKey: 'receipt_progress_percent',
-            label: 'Receipt Progress (%)',
+            label: {
+                key: 'column.receipt_progress',
+                fallback: 'Receipt Progress (%)',
+            },
             minimumFractionDigits: 0,
             maximumFractionDigits: 2,
         }),
         createCurrencyColumn<PurchaseOrderStatusReportItem>({
             accessorKey: 'grand_total',
-            label: 'Grand Total',
+            label: { key: 'column.grand_total', fallback: 'Grand Total' },
             currency: 'IDR',
             locale: 'id-ID',
             minimumFractionDigits: 0,
@@ -110,7 +119,10 @@ export const purchaseOrderStatusReportColumns: ColumnDef<PurchaseOrderStatusRepo
         }),
         createReportTextColumn<PurchaseOrderStatusReportItem>({
             accessorKey: 'purchase_order.expected_delivery_date',
-            header: 'Expected Delivery',
+            header: {
+                key: 'column.expected_delivery',
+                fallback: 'Expected Delivery',
+            },
             getValue: (item) =>
                 formatDate(item.purchase_order?.expected_delivery_date),
             sortable: true,

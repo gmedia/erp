@@ -791,7 +791,19 @@
         "unit": "Satuan",
         "total_in": "Total Masuk",
         "total_out": "Total Keluar",
-        "ending_balance": "Saldo Akhir"
+        "ending_balance": "Saldo Akhir",
+        "status_category": "Kategori Status",
+        "ordered_qty": "Qty Dipesan",
+        "received_qty": "Qty Diterima",
+        "outstanding_qty": "Qty Belum Diterima",
+        "receipt_progress": "Progres Penerimaan (%)",
+        "receipt_count": "Jumlah Penerimaan",
+        "last_receipt": "Penerimaan Terakhir",
+        "total_value": "Total Nilai",
+        "item_count": "Jumlah Item",
+        "accepted_qty": "Qty Diterima Baik",
+        "rejected_qty": "Qty Ditolak",
+        "po_status": "Status PO"
     },
     "movement_type": {
         "transfer": "Pemindahan",
@@ -898,6 +910,8 @@
         "stock_movement_search_placeholder": "Cari produk, kategori, gudang, cabang...",
         "stocktake_variance_search_placeholder": "Cari opname, produk, kategori, gudang...",
         "valuation_search_placeholder": "Cari produk, kategori, gudang, cabang...",
-        "adjustment_search_placeholder": "Cari nomor, gudang, cabang, jenis, status..."
+        "adjustment_search_placeholder": "Cari nomor, gudang, cabang, jenis, status...",
+        "purchase_search_placeholder": "Cari no. PO, pemasok, gudang, atau produk...",
+        "goods_receipt_search_placeholder": "Cari no. GR, no. PO, pemasok, gudang, atau produk..."
     }
 }

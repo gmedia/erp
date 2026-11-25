@@ -14,6 +14,16 @@ function localeColumnTranslations(string $file): array
     return $decoded['column'] ?? [];
 }
 
+/**
+ * @return array<string, string>
+ */
+function localeFilterTranslations(string $file): array
+{
+    $decoded = json_decode(File::get(lang_path($file)), true, 512, JSON_THROW_ON_ERROR);
+
+    return $decoded['filter'] ?? [];
+}
+
 test('column translation keys exist in both english and indonesian locales', function () {
     $en = localeColumnTranslations('en.json');
     $id = localeColumnTranslations('id.json');
@@ -285,6 +295,56 @@ test('report filter placeholders have translations in both locales', function ()
             ->and($id)->toHaveKey($key)
             ->and($id[$key])->not->toBe($en[$key], "filter.{$key} not translated");
     }
+});
+
+test('purchase order status, purchase history and goods receipt report keys have translations', function () {
+    $en = localeColumnTranslations('en.json');
+    $id = localeColumnTranslations('id.json');
+
+    $keys = [
+        'po_number', 'supplier', 'warehouse', 'product', 'status', 'status_category',
+        'ordered_qty', 'received_qty', 'outstanding_qty', 'receipt_progress',
+        'receipt_count', 'last_receipt', 'total_value', 'grand_total',
+        'expected_delivery', 'gr_number', 'item_count', 'accepted_qty',
+        'rejected_qty', 'search',
+    ];
+
+    foreach ($keys as $key) {
+        expect($en)->toHaveKey($key)->and($id)->toHaveKey($key);
+    }
+
+    // Label yang memang sama di kedua bahasa (mis. Status, Grand Total) tidak diuji "harus beda".
+    $differentLabels = [
+        'status_category', 'ordered_qty', 'received_qty', 'outstanding_qty',
+        'receipt_progress', 'receipt_count', 'last_receipt', 'total_value',
+        'item_count', 'accepted_qty', 'rejected_qty', 'expected_delivery',
+        'po_number', 'gr_number', 'search', 'supplier', 'warehouse', 'product',
+    ];
+
+    foreach ($differentLabels as $key) {
+        expect($id[$key])->not->toBe($en[$key], "column.{$key} not translated");
+    }
+
+    expect($en['status_category'])->toBe('Status Category')
+        ->and($en['receipt_progress'])->toBe('Receipt Progress (%)')
+        ->and($en['outstanding_qty'])->toBe('Outstanding Qty')
+        ->and($en['rejected_qty'])->toBe('Rejected Qty');
+});
+
+test('purchasing report filter placeholders have translations', function () {
+    $en = localeColumnTranslations('en.json');
+    $id = localeColumnTranslations('id.json');
+    $enFilter = localeFilterTranslations('en.json');
+    $idFilter = localeFilterTranslations('id.json');
+
+    foreach (['purchase_search_placeholder', 'goods_receipt_search_placeholder'] as $key) {
+        expect($enFilter)->toHaveKey($key)
+            ->and($idFilter)->toHaveKey($key)
+            ->and($idFilter[$key])->not->toBe($enFilter[$key], "filter.{$key} not translated");
+    }
+
+    expect($en)->toHaveKey('search')
+        ->and($id)->toHaveKey('search');
 });
 
 test('column translation values are non-empty strings', function () {
