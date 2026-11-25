@@ -212,7 +212,7 @@ function createReportDisplayColumn<TData>({
                       header: (
                           context: Parameters<typeof sortingHeader.header>[0],
                       ) => (
-                          <div className="flex justify-end">
+                          <div className="flex justify-end [&_button]:mr-0 [&_button]:ml-auto">
                               {sortingHeader.header(context)}
                           </div>
                       ),
@@ -225,7 +225,7 @@ function createReportDisplayColumn<TData>({
     const alignedHeader =
         align === 'right'
             ? () => (
-                  <div className="pr-2 text-right">
+                  <div className="text-right">
                       <LabelText label={header} />
                   </div>
               )

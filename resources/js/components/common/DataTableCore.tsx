@@ -570,6 +570,9 @@ export function DataTable<T>({
                                                 )}
                                                 className={cn(
                                                     'h-9 border-border px-2 py-1.5 text-sm font-medium select-none',
+                                                    isNumericColumn(
+                                                        header.column.columnDef,
+                                                    ) && 'pr-4',
                                                     stickyHeadClass(
                                                         header.column.id,
                                                         hasStickyGrandTotal,
@@ -611,6 +614,11 @@ export function DataTable<T>({
                                             className={cn(
                                                 'border-border px-2 py-1.5 tabular-nums',
                                                 !isLabel && 'text-right',
+                                                !isLabel &&
+                                                    isNumericColumn(
+                                                        column.columnDef,
+                                                    ) &&
+                                                    'pr-4',
                                             )}
                                         >
                                             {isLabel

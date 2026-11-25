@@ -13,10 +13,10 @@ const DANGER: BadgeVariant = 'destructive-soft';
 const INFO: BadgeVariant = 'info';
 const CONFIRMED: BadgeVariant = 'info';
 const AWAITING: BadgeVariant = 'warning';
-const PARTIAL: BadgeVariant = 'info';
+const PARTIAL: BadgeVariant = 'warning';
 const LOCKED: BadgeVariant = 'outline';
 const SEVERE: BadgeVariant = 'destructive';
-const CANCELLED: BadgeVariant = 'neutral';
+const CANCELLED: BadgeVariant = 'outline';
 const VOIDED: BadgeVariant = 'outline';
 
 export { BadgeVariant };

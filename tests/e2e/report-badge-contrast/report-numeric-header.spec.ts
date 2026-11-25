@@ -30,7 +30,76 @@ async function expectReportNumericHeaderRightAligned(
     expect(
         Math.abs(headRight - valueRight),
         `${label}: head right=${headRight} vs value text right=${valueRight}`,
-    ).toBeLessThanOrEqual(4);
+    ).toBeLessThanOrEqual(2);
+}
+
+async function expectTotalAlignedWithFirstRow(
+    page: Page,
+    scrollerSelector: string,
+): Promise<void> {
+    const pairs = await page
+        .locator(`${scrollerSelector} table`)
+        .first()
+        .evaluate((table) => {
+            const first = table.tBodies[0]?.rows[0];
+            const foot = table.tFoot?.rows[0];
+            if (!first || !foot) {
+                return [];
+            }
+            const textRight = (el: Element | null) => {
+                if (!el) {
+                    return null;
+                }
+                const range = document.createRange();
+                range.selectNodeContents(el);
+                return range.getBoundingClientRect().right;
+            };
+            const numeric: { col: number; data: number; total: number }[] = [];
+            for (let i = 0; i < foot.cells.length; i++) {
+                const totalCell = foot.cells[i];
+                const dataCell = first.cells[i];
+                if (
+                    !totalCell ||
+                    !dataCell ||
+                    totalCell.textContent?.trim() === ''
+                ) {
+                    continue;
+                }
+                const totalText = totalCell.querySelector('*') ?? totalCell;
+                const dataText = dataCell.querySelector('div') ?? dataCell;
+                const total = textRight(totalText);
+                const data = textRight(dataText);
+                if (total !== null && data !== null && totalCell.className.includes('text-right')) {
+                    numeric.push({ col: i, data, total });
+                }
+            }
+            return numeric;
+        });
+
+    expect(pairs.length).toBeGreaterThan(0);
+    for (const pair of pairs) {
+        expect(
+            Math.abs(pair.total - pair.data),
+            `kolom ${pair.col}: total right=${pair.total} vs nilai baris pertama right=${pair.data}`,
+        ).toBeLessThanOrEqual(2);
+    }
+}
+
+async function expectRightEdgeShadowVisibleWhenOverflowing(
+    page: Page,
+): Promise<void> {
+    const container = page.locator('[data-slot="table-container"]').first();
+    await expect(container).toHaveAttribute('data-overflow-right', 'true');
+    const shadow = await container.evaluate((el) => {
+        const style = getComputedStyle(el, '::after');
+        return {
+            content: style.content,
+            width: parseFloat(style.width),
+            image: style.backgroundImage,
+        };
+    });
+    expect(shadow.image).not.toBe('none');
+    expect(shadow.width).toBeGreaterThanOrEqual(8);
 }
 
 test.describe('Report Purchase History - lebar 1440', () => {
@@ -123,6 +192,19 @@ test.describe('Report AP Aging - header angka', () => {
         await expectReportNumericHeaderRightAligned(page, 'Amount Due');
     });
 
+    test('baris total sejajar kolom angka (<= 2px) dan bayangan kanan aktif saat overflow', async ({
+        page,
+    }) => {
+        await page.setViewportSize({ width: 1440, height: 900 });
+        await openModule(page, '/reports/ap-aging', '/api/reports/ap-aging');
+
+        await expectRightEdgeShadowVisibleWhenOverflowing(page);
+        await expectTotalAlignedWithFirstRow(
+            page,
+            '[data-slot="table-container"]',
+        );
+    });
+
     test('header kolom aging non-sortable Current rata kanan', async ({
         page,
     }) => {
@@ -135,5 +217,36 @@ test.describe('Report AP Aging - header angka', () => {
             (el) => getComputedStyle(el.querySelector('div') ?? el).textAlign,
         );
         expect(['right', 'end']).toContain(alignment);
+    });
+});
+
+test.describe('Badge status - tone dibedakan', () => {
+    test('Cancelled berbeda dari Draft; Partially Received berbeda dari Confirmed', async () => {
+        const { statusBadgeVariant } = await import(
+            '../../../resources/js/lib/status-badge'
+        );
+
+        expect(statusBadgeVariant('cancelled')).not.toBe(
+            statusBadgeVariant('draft'),
+        );
+        expect(statusBadgeVariant('partially_received')).not.toBe(
+            statusBadgeVariant('confirmed'),
+        );
+        expect(statusBadgeVariant('partially_received')).toBe('warning');
+        expect(statusBadgeVariant('cancelled')).toBe('outline');
+    });
+});
+
+test.describe('Stock Monitor - header angka dan geser 1440', () => {
+    test('header Qty On Hand, Avg Cost, Stock Value sejajar nilai (<= 2px) dan kolom terakhir punya bayangan', async ({
+        page,
+    }) => {
+        await page.setViewportSize({ width: 1440, height: 900 });
+        await openModule(page, '/stock-monitor', '/api/stock-monitor');
+
+        for (const label of ['Qty On Hand', 'Avg Cost', 'Stock Value']) {
+            await expectReportNumericHeaderRightAligned(page, label);
+        }
+        await expectRightEdgeShadowVisibleWhenOverflowing(page);
     });
 });
