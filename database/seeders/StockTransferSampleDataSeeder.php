@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Branch;
 use App\Models\Employee;
-use App\Models\Product;
 use App\Models\StockTransfer;
 use App\Models\StockTransferItem;
 use App\Models\User;
@@ -200,16 +199,13 @@ class StockTransferSampleDataSeeder extends Seeder
      */
     private function ensureProducts(): Collection
     {
-        $products = Product::query()
-            ->whereIn('code', DemoMasterData::STOCK_DEMO_PRODUCT_CODES)
-            ->orderBy('id')
-            ->get();
+        $products = DemoMasterData::stockDemoProducts();
 
         if ($products->count() < count(DemoMasterData::STOCK_DEMO_PRODUCT_CODES)) {
             throw new RuntimeException('Katalog demo belum lengkap; jalankan ProductSampleDataSeeder dulu.');
         }
 
-        return $products->values();
+        return $products;
     }
 
     private function makeTransferItems(Collection $products, bool $partialReceive): array

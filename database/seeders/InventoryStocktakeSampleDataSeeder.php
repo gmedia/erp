@@ -6,7 +6,6 @@ use App\Models\Branch;
 use App\Models\InventoryStocktake;
 use App\Models\InventoryStocktakeItem;
 use App\Models\Product;
-use App\Models\StockAdjustmentItem;
 use App\Models\User;
 use App\Models\Warehouse;
 use Illuminate\Database\Seeder;
@@ -134,60 +133,72 @@ class InventoryStocktakeSampleDataSeeder extends Seeder
      */
     private function ensureProductsWithStock(): Collection
     {
-        $products = Product::query()
-            ->whereIn('code', DemoMasterData::STOCK_DEMO_PRODUCT_CODES)
-            ->orderByRaw('FIELD(code, ' . implode(',', array_map(
-                fn (string $code) => "'{$code}'",
-                DemoMasterData::STOCK_DEMO_PRODUCT_CODES,
-            )) . ')')
-            ->get();
+        $this->retireLegacyDuplicateProducts();
+
+        $products = DemoMasterData::stockDemoProducts();
 
         if ($products->count() < count(DemoMasterData::STOCK_DEMO_PRODUCT_CODES)) {
             throw new RuntimeException('Katalog demo belum lengkap; jalankan ProductSampleDataSeeder dulu.');
         }
 
-        $this->retireLegacyDuplicateProducts();
-
-        return $products->values();
+        return $products;
     }
 
     /**
-     * Mengalihkan item stocktake dari produk `INV-2026-*` lama ke produk katalog dengan nama sama,
-     * lalu menghapus produk duplikat. Dijalankan ulang tanpa efek bila tidak ada yang tersisa.
+     * Membereskan produk `INV-2026-*` lama yang menduplikasi katalog (#503 butir 1).
+     *
+     * Relasi TIDAK dialihkan: pengalihan tidak aman karena produk punya banyak tabel transaksi
+     * (FK product_id) dan mengubah stock_movements membuat saldo/avg cost kartu stok tidak
+     * konsisten. Aturannya:
+     * - tidak ada referensi sama sekali -> dihapus;
+     * - ada referensi -> dinonaktifkan (status inactive) dan diberi nama arsip yang jelas,
+     *   sehingga tidak lagi tampil sebagai produk aktif duplikat.
+     * Idempoten: produk yang sudah diarsipkan tidak diproses ulang.
      */
     private function retireLegacyDuplicateProducts(): void
     {
         $legacy = Product::query()
             ->whereIn('code', DemoMasterData::LEGACY_STOCK_DEMO_PRODUCT_CODES)
-            ->get(['id', 'name']);
+            ->get();
 
         foreach ($legacy as $duplicate) {
-            $canonicalId = Product::query()
-                ->where('name', $duplicate->name)
-                ->where('status', 'active')
-                ->whereNotIn('code', DemoMasterData::LEGACY_STOCK_DEMO_PRODUCT_CODES)
-                ->orderBy('id')
-                ->value('id');
-
-            if ($canonicalId === null) {
+            if ($duplicate->status === 'inactive' && str_starts_with((string) $duplicate->name, 'Arsip duplikat')) {
                 continue;
             }
 
-            InventoryStocktakeItem::query()
-                ->where('product_id', $duplicate->id)
-                ->update(['product_id' => $canonicalId]);
+            if (! $this->isProductReferenced($duplicate->id)) {
+                $duplicate->delete();
 
-            // Item penyesuaian dan mutasi stok demo juga menunjuk duplikat yang sama; dialihkan agar tidak yatim.
-            StockAdjustmentItem::query()
-                ->where('product_id', $duplicate->id)
-                ->update(['product_id' => $canonicalId]);
+                continue;
+            }
 
-            DB::table('stock_movements')
-                ->where('product_id', $duplicate->id)
-                ->update(['product_id' => $canonicalId]);
-
-            $duplicate->delete();
+            $duplicate->update([
+                'status' => 'inactive',
+                'name' => 'Arsip duplikat ' . $duplicate->code . ' - ' . $duplicate->name,
+            ]);
         }
+    }
+
+    /**
+     * Apakah produk dirujuk tabel mana pun (semua FK product_id di migrasi).
+     */
+    private function isProductReferenced(int $productId): bool
+    {
+        $referencingTables = [
+            'stock_movements', 'stock_transfer_items', 'stock_adjustment_items',
+            'inventory_stocktake_items', 'purchase_request_items', 'purchase_order_items',
+            'goods_receipt_items', 'supplier_return_items', 'supplier_bill_items',
+            'customer_invoice_items', 'credit_note_items', 'production_orders',
+            'production_order_items', 'customer_subscriptions',
+        ];
+
+        foreach ($referencingTables as $table) {
+            if (DB::table($table)->where('product_id', $productId)->exists()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function makeStocktakeItems(Collection $products, int $branchId, int $adminUserId, string $mode): array

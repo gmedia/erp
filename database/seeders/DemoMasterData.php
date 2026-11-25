@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Product;
+use Illuminate\Support\Collection;
+
 /**
  * Nama dan kode master demo (cabang, gudang) dalam satu tempat.
  * Seeder dan pencari data demo wajib memakai konstanta ini, bukan string literal,
@@ -116,5 +119,23 @@ final class DemoMasterData
     private function __construct()
     {
         // Intentionally empty. Kelas ini hanya berisi konstanta.
+    }
+
+    /**
+     * Ambil produk demo stok sesuai urutan konstanta (urutan sama di semua seeder stok).
+     *
+     * @return Collection<int, Product>
+     */
+    public static function stockDemoProducts(): Collection
+    {
+        $byCode = Product::query()
+            ->whereIn('code', self::STOCK_DEMO_PRODUCT_CODES)
+            ->get()
+            ->keyBy('code');
+
+        return collect(self::STOCK_DEMO_PRODUCT_CODES)
+            ->map(fn (string $code) => $byCode->get($code))
+            ->filter()
+            ->values();
     }
 }

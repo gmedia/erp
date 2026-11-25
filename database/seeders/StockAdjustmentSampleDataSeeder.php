@@ -156,16 +156,13 @@ class StockAdjustmentSampleDataSeeder extends Seeder
      */
     private function ensureProductsWithStock(): Collection
     {
-        $products = Product::query()
-            ->whereIn('code', DemoMasterData::STOCK_DEMO_PRODUCT_CODES)
-            ->orderBy('id')
-            ->get();
+        $products = DemoMasterData::stockDemoProducts();
 
         if ($products->count() < count(DemoMasterData::STOCK_DEMO_PRODUCT_CODES)) {
             throw new RuntimeException('Katalog demo belum lengkap; jalankan ProductSampleDataSeeder dulu.');
         }
 
-        return $products->values();
+        return $products;
     }
 
     /**
