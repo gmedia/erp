@@ -22,6 +22,7 @@ export default function AssetDashboard() {
         <DashboardPageShell
             title="Asset Dashboard"
             heading="Asset Management Overview"
+            headingKey="page.asset_dashboard.title"
             description="Monitor the status, value, and health of your organization's assets."
             descriptionKey="page.asset_dashboard.description"
             breadcrumbs={breadcrumbs}

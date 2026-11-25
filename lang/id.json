@@ -941,6 +941,7 @@
             "description": "Selisih antara aset tercatat dan hasil hitung fisik."
         },
         "asset_dashboard": {
+            "title": "Ikhtisar Manajemen Aset",
             "description": "Pantau status, nilai, dan kondisi aset organisasi Anda."
         },
         "dashboard": {

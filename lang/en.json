@@ -941,6 +941,7 @@
             "description": "Differences between recorded and physically counted assets."
         },
         "asset_dashboard": {
+            "title": "Asset Management Overview",
             "description": "Monitor the status, value, and health of your organization's assets."
         },
         "dashboard": {

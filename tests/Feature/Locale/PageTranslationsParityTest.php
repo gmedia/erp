@@ -702,6 +702,7 @@ test('asset report and dashboard group page strings keep the english labels', fu
         ->and($en['asset_stocktake_variances']['description'])->toBe(
             'Differences between recorded and physically counted assets.',
         )
+        ->and($en['asset_dashboard']['title'])->toBe('Asset Management Overview')
         ->and($en['asset_dashboard']['description'])->toBe(
             "Monitor the status, value, and health of your organization's assets.",
         )
