@@ -596,7 +596,7 @@ export function DataTable<T>({
                     <TableBody>{tableContent}</TableBody>
                     {summaryRow ? (
                         <TableFooter>
-                            <TableRow>
+                            <TableRow className="border-t-2 border-border bg-muted/70 font-semibold">
                                 {table.getVisibleLeafColumns().map((column) => {
                                     const labelColumnId =
                                         summaryRow.labelColumnId ??

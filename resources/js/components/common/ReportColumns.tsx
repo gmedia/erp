@@ -89,11 +89,28 @@ export function SummaryCell({
     secondary: DisplayValue;
 }>) {
     return (
-        <div className="space-y-0.5">
-            <div className="font-medium">{resolveDisplayValue(primary)}</div>
-            <div className="text-xs text-muted-foreground">
-                {resolveDisplayValue(secondary)}
-            </div>
+        <div className="max-w-[16rem] space-y-0.5">
+            <TruncatedText className="font-medium" value={primary} />
+            <TruncatedText
+                className="text-xs text-muted-foreground"
+                value={secondary}
+            />
+        </div>
+    );
+}
+
+function TruncatedText({
+    value,
+    className,
+}: Readonly<{
+    value: DisplayValue;
+    className?: string;
+}>) {
+    const display = resolveDisplayValue(value);
+    const title = typeof display === 'string' ? display : undefined;
+    return (
+        <div className={cn('truncate', className)} title={title}>
+            {display}
         </div>
     );
 }
@@ -105,7 +122,12 @@ export function TextCell({
     value: DisplayValue;
     className?: string;
 }>) {
-    return <div className={className}>{resolveDisplayValue(value)}</div>;
+    return (
+        <TruncatedText
+            className={cn('max-w-[12rem]', className)}
+            value={value}
+        />
+    );
 }
 
 export function WarehouseSummaryCell({

@@ -139,7 +139,7 @@
     --secondary: oklch(0.209 0 0); /* #181818 */
     --secondary-foreground: oklch(0.961 0 0);
     --muted: oklch(0.209 0 0);
-    --muted-foreground: oklch(0.708 0 0);
+    --muted-foreground: oklch(0.78 0 0);
     --accent: oklch(0.209 0 0);
     --accent-foreground: oklch(0.961 0 0);
     --destructive: oklch(0.396 0.141 25.723);

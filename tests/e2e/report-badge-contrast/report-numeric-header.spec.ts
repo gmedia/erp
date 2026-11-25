@@ -8,7 +8,8 @@ async function expectReportNumericHeaderRightAligned(
     const head = page.locator('th', { hasText: label }).first();
     await expect(head).toBeVisible();
     const index = await head.evaluate(
-        (el) => Array.prototype.indexOf.call(el.parentElement!.children, el) + 1,
+        (el) =>
+            Array.prototype.indexOf.call(el.parentElement!.children, el) + 1,
     );
     const valueText = page
         .locator(`tbody tr:first-child td:nth-child(${index}) > div`)
@@ -32,16 +33,43 @@ async function expectReportNumericHeaderRightAligned(
     ).toBeLessThanOrEqual(4);
 }
 
+test.describe('Report Purchase History - lebar 1440', () => {
+    test('kolom Total Value terlihat tanpa geser di 1440', async ({ page }) => {
+        await page.setViewportSize({ width: 1440, height: 900 });
+        await openModule(
+            page,
+            '/reports/purchase-history',
+            '/api/reports/purchase-history',
+        );
+
+        await page.getByTestId('columns-button').click();
+        await page
+            .getByRole('menuitemcheckbox', { name: 'total_purchase_value' })
+            .click();
+        await page.keyboard.press('Escape');
+
+        const totalHead = page
+            .locator('th', { hasText: 'Total Value' })
+            .first();
+        await expect(totalHead).toBeVisible();
+        const box = await totalHead.boundingBox();
+        expect(box).not.toBeNull();
+        expect(box!.x + box!.width).toBeLessThanOrEqual(1440);
+
+        const scroller = page.locator('.overflow-x-auto').first();
+        const overflows = await scroller.evaluate(
+            (el) => el.scrollWidth > el.clientWidth,
+        );
+        expect(overflows).toBe(false);
+    });
+});
+
 test.describe('Report AP Aging - header angka', () => {
     test('header Amount Due rata kanan sejajar teks nilai di 1440', async ({
         page,
     }) => {
         await page.setViewportSize({ width: 1440, height: 900 });
-        await openModule(
-            page,
-            '/reports/ap-aging',
-            '/api/reports/ap-aging',
-        );
+        await openModule(page, '/reports/ap-aging', '/api/reports/ap-aging');
 
         await expectReportNumericHeaderRightAligned(page, 'Amount Due');
     });
@@ -50,11 +78,7 @@ test.describe('Report AP Aging - header angka', () => {
         page,
     }) => {
         await page.setViewportSize({ width: 1440, height: 900 });
-        await openModule(
-            page,
-            '/reports/ap-aging',
-            '/api/reports/ap-aging',
-        );
+        await openModule(page, '/reports/ap-aging', '/api/reports/ap-aging');
 
         const head = page.locator('th', { hasText: 'Current' }).first();
         await expect(head).toBeVisible();
