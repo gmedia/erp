@@ -9,6 +9,12 @@ type SummaryBucket = {
     value: string;
 };
 
+type InTransitSummary = {
+    total_items: number;
+    total_quantity: string;
+    total_value: string;
+};
+
 type StockMonitorSummary = {
     total_items: number;
     total_quantity: string;
@@ -17,6 +23,7 @@ type StockMonitorSummary = {
     by_warehouse: SummaryBucket[];
     by_category: SummaryBucket[];
     by_branch: SummaryBucket[];
+    in_transit?: InTransitSummary;
 };
 
 type SummaryCardsProps = {
@@ -106,6 +113,26 @@ export function StockMonitorSummaryCards({
                     <div className="text-2xl font-bold">
                         {summary?.low_stock_items ?? 0}
                     </div>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium">
+                        {t('stock_monitor_summary.in_transit_value')}
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">
+                        {formatCurrency(summary?.in_transit?.total_value ?? 0)}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                        {t('stock_monitor_summary.in_transit_detail', {
+                            items: String(summary?.in_transit?.total_items ?? 0),
+                            quantity: formatNumber(
+                                summary?.in_transit?.total_quantity ?? 0,
+                            ),
+                        })}
+                    </p>
                 </CardContent>
             </Card>
             <Card>

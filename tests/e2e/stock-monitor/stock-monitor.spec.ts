@@ -53,4 +53,27 @@ test.describe('Stock Monitor Dashboard', () => {
         await expect(page.getByText('Low Stock Items')).toBeVisible();
 
     });
+
+    test('menampilkan kartu nilai stok dalam perjalanan dari ringkasan', async ({ page }) => {
+        const responsePromise = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/stock-monitor') &&
+                !r.url().includes('export') &&
+                r.request().headers()['accept']?.includes('application/json'),
+        );
+        await page.goto('/stock-monitor');
+        const response = await responsePromise;
+        await expectResponseOk(response);
+
+        const body = await response.json();
+        expect(body.summary.in_transit).toEqual(
+            expect.objectContaining({
+                total_items: expect.any(Number),
+                total_quantity: expect.any(String),
+                total_value: expect.any(String),
+            }),
+        );
+
+        await expect(page.getByText('In-Transit Stock Value')).toBeVisible();
+    });
 });

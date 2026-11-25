@@ -1228,6 +1228,8 @@
         "total_quantity": "Total Quantity",
         "total_stock_value": "Total Stock Value",
         "low_stock_items": "Low Stock Items",
+        "in_transit_value": "In-Transit Stock Value",
+        "in_transit_detail": "{items} transfer lines · {quantity} qty",
         "stock_by_warehouse": "Stock by Warehouse",
         "stock_by_category": "Stock by Category",
         "stock_by_branch": "Stock by Branch",
