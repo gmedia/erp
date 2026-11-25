@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 
 test.describe('Stock Monitor Dashboard', () => {
     test.beforeEach(async ({ page }) => {
@@ -10,35 +10,31 @@ test.describe('Stock Monitor Dashboard', () => {
         const initialResponsePromise = page.waitForResponse(
             (r) =>
                 r.url().includes('/stock-monitor') &&
-                r.request().headers()['accept']?.includes('application/json') &&
-                r.status() < 400,
+                r.request().headers()['accept']?.includes('application/json'),
         );
         await page.goto('/stock-monitor');
         await page.waitForURL('**/stock-monitor', { timeout: 15000 });
-        await initialResponsePromise;
+        await expectResponseOk(await initialResponsePromise);
 
         await expect(page.getByText('Total SKU-Warehouse')).toBeVisible();
         await expect(page.locator('table')).toBeVisible();
         await expect(page.locator('tbody tr').first()).toBeVisible();
 
         const exportResponsePromise = page.waitForResponse(
-            (r) =>
-                r.url().includes('/api/stock-monitor/export') &&
-                r.status() < 400,
+            (r) => r.url().includes('/api/stock-monitor/export'),
         );
         await page.getByRole('button', { name: /export/i }).click();
-        await exportResponsePromise;
+        await expectResponseOk(await exportResponsePromise);
 
         const searchInput = page.getByRole('textbox').first();
         await searchInput.fill('P-');
         const searchResponsePromise = page.waitForResponse(
             (r) =>
                 r.url().includes('/stock-monitor') &&
-                r.request().headers()['accept']?.includes('application/json') &&
-                r.status() < 400,
+                r.request().headers()['accept']?.includes('application/json'),
         );
         await searchInput.press('Enter');
-        await searchResponsePromise;
+        await expectResponseOk(await searchResponsePromise);
 
         await expect(page.locator('tbody tr')).toHaveCount(1, {
             timeout: 15000,
@@ -49,11 +45,10 @@ test.describe('Stock Monitor Dashboard', () => {
         const filterResponsePromise = page.waitForResponse(
             (r) =>
                 r.url().includes('/stock-monitor') &&
-                r.request().headers()['accept']?.includes('application/json') &&
-                r.status() < 400,
+                r.request().headers()['accept']?.includes('application/json'),
         );
         await page.getByRole('button', { name: 'Apply Filters' }).click();
-        await filterResponsePromise;
+        await expectResponseOk(await filterResponsePromise);
 
         await expect(page.getByText('Low Stock Items')).toBeVisible();
 
