@@ -11,13 +11,19 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { type ReactNode } from 'react';
 
+import {
+    LabelText,
+    type TranslatableLabel,
+    useTranslatableText,
+} from './TranslatedText';
+
 interface InputFieldProps extends Omit<
     React.ComponentProps<'input'>,
-    'name' | 'prefix'
+    'name' | 'prefix' | 'placeholder'
 > {
     name: string;
-    label: string;
-    placeholder?: string;
+    label: TranslatableLabel;
+    placeholder?: TranslatableLabel;
     className?: string;
     prefix?: ReactNode;
     suffix?: ReactNode;
@@ -35,12 +41,15 @@ export function InputField({
     children,
     ...props
 }: Readonly<InputFieldProps>) {
+    const translatedPlaceholder = useTranslatableText(placeholder ?? '');
     return (
         <FormField
             name={name}
             render={({ field }) => (
                 <FormItem className={className}>
-                    <FormLabel>{label}</FormLabel>
+                    <FormLabel>
+                        <LabelText label={label} />
+                    </FormLabel>
                     <div className="relative flex items-center">
                         {prefix && (
                             <div className="pointer-events-none absolute left-3 flex items-center text-muted-foreground select-none">
@@ -50,7 +59,11 @@ export function InputField({
                         <FormControl>
                             <Input
                                 type={type}
-                                placeholder={placeholder}
+                                placeholder={
+                                    placeholder === undefined
+                                        ? undefined
+                                        : translatedPlaceholder
+                                }
                                 className={cn(
                                     prefix && 'pl-10',
                                     suffix && 'pr-10',

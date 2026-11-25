@@ -140,6 +140,12 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(
             activePurchaseOrder && activePurchaseOrder.status !== 'draft',
         );
         const { t } = useTranslation();
+        const fl = (key: string, fallback: string) => {
+            const translated = t(`form_fields.purchase_orders.${key}`);
+            return translated === `form_fields.purchase_orders.${key}`
+                ? fallback
+                : translated;
+        };
         const defaultValues = useMemo(
             () => getPurchaseOrderFormDefaults(activePurchaseOrder),
             [activePurchaseOrder],
@@ -193,8 +199,8 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(
                 onOpenChange={onOpenChange}
                 title={
                     activePurchaseOrder
-                        ? 'Edit Purchase Order'
-                        : 'Add New Purchase Order'
+                        ? fl('edit_title', 'Edit Purchase Order')
+                        : fl('add_title', 'Add New Purchase Order')
                 }
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
@@ -212,13 +218,16 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <InputField
                             name="po_number"
-                            label="PO Number"
-                            placeholder="Auto-generated if empty"
+                            label={fl('po_number', 'PO Number')}
+                            placeholder={fl(
+                                'po_number_placeholder',
+                                'Auto-generated if empty',
+                            )}
                         />
 
                         <SelectField
                             name="status"
-                            label="Status"
+                            label={fl('status', 'Status')}
                             options={[
                                 { value: 'draft', label: 'Draft' },
                                 {
@@ -247,40 +256,64 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(
                                 { value: 'cancelled', label: 'Cancelled' },
                                 { value: 'closed', label: 'Closed' },
                             ]}
-                            placeholder="Select status"
+                            placeholder={fl(
+                                'status_placeholder',
+                                'Select status',
+                            )}
                         />
 
                         <AsyncSelectField
                             name="supplier_id"
-                            label="Supplier"
+                            label={fl('supplier', 'Supplier')}
                             url="/api/suppliers"
-                            placeholder="Select supplier"
+                            placeholder={fl(
+                                'supplier_placeholder',
+                                'Select supplier',
+                            )}
                         />
 
                         <AsyncSelectField
                             name="warehouse_id"
-                            label="Warehouse"
+                            label={fl('warehouse', 'Warehouse')}
                             url="/api/warehouses"
-                            placeholder="Select warehouse"
+                            placeholder={fl(
+                                'warehouse_placeholder',
+                                'Select warehouse',
+                            )}
                         />
 
-                        <DatePickerField name="order_date" label="Order Date" />
+                        <DatePickerField
+                            name="order_date"
+                            label={fl('order_date', 'Order Date')}
+                        />
                         <DatePickerField
                             name="expected_delivery_date"
-                            label="Expected Delivery Date"
+                            label={fl(
+                                'expected_delivery_date',
+                                'Expected Delivery Date',
+                            )}
                         />
 
                         <InputField
                             name="payment_terms"
-                            label="Payment Terms"
-                            placeholder="Net 30"
+                            label={fl('payment_terms', 'Payment Terms')}
+                            placeholder={fl(
+                                'payment_terms_placeholder',
+                                'Net 30',
+                            )}
                         />
 
                         <div className="md:col-span-2">
                             <TextareaField
                                 name="shipping_address"
-                                label="Shipping Address"
-                                placeholder="Shipping address"
+                                label={fl(
+                                    'shipping_address',
+                                    'Shipping Address',
+                                )}
+                                placeholder={fl(
+                                    'shipping_address_placeholder',
+                                    'Shipping address',
+                                )}
                                 rows={2}
                             />
                         </div>
@@ -288,8 +321,8 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(
                         <div className="md:col-span-2">
                             <TextareaField
                                 name="notes"
-                                label="Notes"
-                                placeholder="Notes"
+                                label={fl('notes', 'Notes')}
+                                placeholder={fl('notes_placeholder', 'Notes')}
                                 rows={2}
                             />
                         </div>
@@ -305,26 +338,31 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead className="w-[220px]">
-                                            Product
+                                            {fl('item_product', 'Product')}
                                         </TableHead>
                                         <TableHead className="w-[140px]">
-                                            Unit
+                                            {fl('item_unit', 'Unit')}
                                         </TableHead>
                                         <TableHead className="w-[120px]">
-                                            Qty
+                                            {fl('item_qty', 'Qty')}
                                         </TableHead>
                                         <TableHead className="w-[140px]">
-                                            Unit Price
+                                            {fl(
+                                                'item_unit_price',
+                                                'Unit Price',
+                                            )}
                                         </TableHead>
                                         <TableHead className="w-[130px]">
-                                            Disc %
+                                            {fl('item_discount', 'Disc %')}
                                         </TableHead>
                                         <TableHead className="w-[130px]">
-                                            Tax %
+                                            {fl('item_tax', 'Tax %')}
                                         </TableHead>
-                                        <TableHead>Notes</TableHead>
+                                        <TableHead>
+                                            {fl('item_notes', 'Notes')}
+                                        </TableHead>
                                         <TableHead className="w-[120px] text-right">
-                                            Action
+                                            {fl('item_action', 'Action')}
                                         </TableHead>
                                     </TableRow>
                                 </TableHeader>

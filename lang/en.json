@@ -1293,5 +1293,35 @@
         "adjustment_search_placeholder": "Search number, warehouse, branch, type, status...",
         "purchase_search_placeholder": "Search PO number, supplier, warehouse, or product...",
         "goods_receipt_search_placeholder": "Search GR number, PO number, supplier, warehouse, or product..."
+    },
+    "form_fields": {
+        "purchase_orders": {
+            "add_title": "Add New Purchase Order",
+            "edit_title": "Edit Purchase Order",
+            "po_number": "PO Number",
+            "po_number_placeholder": "Auto-generated if empty",
+            "status": "Status",
+            "status_placeholder": "Select status",
+            "supplier": "Supplier",
+            "supplier_placeholder": "Select supplier",
+            "warehouse": "Warehouse",
+            "warehouse_placeholder": "Select warehouse",
+            "order_date": "Order Date",
+            "expected_delivery_date": "Expected Delivery Date",
+            "payment_terms": "Payment Terms",
+            "payment_terms_placeholder": "Net 30",
+            "shipping_address": "Shipping Address",
+            "shipping_address_placeholder": "Shipping address",
+            "notes": "Notes",
+            "notes_placeholder": "Notes",
+            "item_product": "Product",
+            "item_unit": "Unit",
+            "item_qty": "Qty",
+            "item_unit_price": "Unit Price",
+            "item_discount": "Disc %",
+            "item_tax": "Tax %",
+            "item_notes": "Notes",
+            "item_action": "Action"
+        }
     }
 }

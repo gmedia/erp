@@ -1293,5 +1293,35 @@
         "adjustment_search_placeholder": "Cari nomor, gudang, cabang, jenis, status...",
         "purchase_search_placeholder": "Cari no. PO, pemasok, gudang, atau produk...",
         "goods_receipt_search_placeholder": "Cari no. GR, no. PO, pemasok, gudang, atau produk..."
+    },
+    "form_fields": {
+        "purchase_orders": {
+            "add_title": "Tambah Pesanan Pembelian Baru",
+            "edit_title": "Ubah Pesanan Pembelian",
+            "po_number": "No. PO",
+            "po_number_placeholder": "Dibuat otomatis jika kosong",
+            "status": "Status",
+            "status_placeholder": "Pilih status",
+            "supplier": "Pemasok",
+            "supplier_placeholder": "Pilih pemasok",
+            "warehouse": "Gudang",
+            "warehouse_placeholder": "Pilih gudang",
+            "order_date": "Tanggal Pesanan",
+            "expected_delivery_date": "Perkiraan Tanggal Kirim",
+            "payment_terms": "Syarat Pembayaran",
+            "payment_terms_placeholder": "Net 30",
+            "shipping_address": "Alamat Pengiriman",
+            "shipping_address_placeholder": "Alamat pengiriman",
+            "notes": "Catatan",
+            "notes_placeholder": "Catatan",
+            "item_product": "Produk",
+            "item_unit": "Satuan",
+            "item_qty": "Qty",
+            "item_unit_price": "Harga Satuan",
+            "item_discount": "Diskon %",
+            "item_tax": "Pajak %",
+            "item_notes": "Catatan",
+            "item_action": "Aksi"
+        }
     }
 }
