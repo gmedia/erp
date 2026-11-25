@@ -289,7 +289,7 @@ export function createSelectFilterField(
 // Generic text input filter field creator
 export function createTextFilterField(
     name: string,
-    label: string,
+    label: TranslatableLabel,
     placeholder: string,
 ): FieldDescriptor {
     return {

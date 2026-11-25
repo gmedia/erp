@@ -63,6 +63,28 @@ test('stock transfer, adjustment and stocktake column keys have translations', f
         ->and($en['stocktake_number'])->toBe('Stocktake Number');
 });
 
+test('products, warehouses and stock report column keys have translations', function () {
+    $en = localeColumnTranslations('en.json');
+    $id = localeColumnTranslations('id.json');
+
+    $keys = [
+        'code', 'name', 'type', 'category', 'cost', 'price', 'product',
+        'moved_at', 'reference', 'movement_type', 'qty_in', 'qty_out', 'balance',
+        'unit_cost', 'avg_cost', 'created_by', 'qty_on_hand', 'stock_value',
+        'last_movement', 'start_date', 'end_date', 'low_stock_threshold', 'search',
+    ];
+
+    foreach ($keys as $key) {
+        expect($en)->toHaveKey($key)
+            ->and($id)->toHaveKey($key)
+            ->and($id[$key])->not->toBe($en[$key]);
+    }
+
+    expect($en['moved_at'])->toBe('Moved At')
+        ->and($en['qty_on_hand'])->toBe('Qty On Hand')
+        ->and($en['low_stock_threshold'])->toBe('Low Stock Threshold');
+});
+
 test('column translation values are non-empty strings', function () {
     foreach (['en.json', 'id.json'] as $file) {
         foreach (localeColumnTranslations($file) as $key => $value) {

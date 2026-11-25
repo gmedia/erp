@@ -6,6 +6,10 @@ import {
     WarehouseSummaryCell,
 } from '@/components/common/ReportColumns';
 import {
+    LabelText,
+    type TranslatableLabel,
+} from '@/components/common/TranslatedText';
+import {
     createCurrencyColumn,
     createNumberColumn,
     createSortingHeader,
@@ -41,7 +45,7 @@ function createStockMovementNumberColumn(
         | 'balance_after'
         | 'unit_cost'
         | 'average_cost_after',
-    label: string,
+    label: TranslatableLabel,
 ): ColumnDef<StockMovementItem> {
     return createNumberColumn<StockMovementItem>({
         accessorKey,
@@ -92,14 +96,21 @@ export function createStockMovementsColumns(): ColumnDef<StockMovementItem>[] {
         {
             id: 'moved_at',
             accessorFn: (row) => row.moved_at,
-            ...createSortingHeader('Moved At'),
+            ...createSortingHeader({
+                key: 'column.moved_at',
+                fallback: 'Moved At',
+            }),
             cell: ({ row }) => (
                 <TextCell value={formatDateTime(row.original.moved_at)} />
             ),
         },
         {
             id: 'product_name',
-            header: 'Product',
+            header: () => (
+                <LabelText
+                    label={{ key: 'column.product', fallback: 'Product' }}
+                />
+            ),
             cell: ({ row }) => (
                 <SummaryCell
                     primary={row.original.product?.name}
@@ -109,21 +120,31 @@ export function createStockMovementsColumns(): ColumnDef<StockMovementItem>[] {
         },
         {
             id: 'warehouse_name',
-            header: 'Warehouse',
+            header: () => (
+                <LabelText
+                    label={{ key: 'column.warehouse', fallback: 'Warehouse' }}
+                />
+            ),
             cell: ({ row }) => (
                 <WarehouseSummaryCell warehouse={row.original.warehouse} />
             ),
         },
         {
             accessorKey: 'movement_type',
-            ...createSortingHeader('Type'),
+            ...createSortingHeader({
+                key: 'column.movement_type',
+                fallback: 'Movement Type',
+            }),
             cell: ({ row }) => (
                 <div>{formatMovementType(row.original.movement_type)}</div>
             ),
         },
         {
             accessorKey: 'reference_number',
-            ...createSortingHeader('Reference'),
+            ...createSortingHeader({
+                key: 'column.reference',
+                fallback: 'Reference',
+            }),
             cell: ({ row }) => {
                 const ref = row.original.reference_number;
                 const url = getReferenceUrl(ref);
@@ -139,22 +160,35 @@ export function createStockMovementsColumns(): ColumnDef<StockMovementItem>[] {
                 );
             },
         },
-        createStockMovementNumberColumn('quantity_in', 'Qty In'),
-        createStockMovementNumberColumn('quantity_out', 'Qty Out'),
-        createStockMovementNumberColumn('balance_after', 'Balance'),
+        createStockMovementNumberColumn('quantity_in', {
+            key: 'column.qty_in',
+            fallback: 'Qty In',
+        }),
+        createStockMovementNumberColumn('quantity_out', {
+            key: 'column.qty_out',
+            fallback: 'Qty Out',
+        }),
+        createStockMovementNumberColumn('balance_after', {
+            key: 'column.balance',
+            fallback: 'Balance',
+        }),
         createCurrencyColumn<StockMovementItem>({
             accessorKey: 'unit_cost',
-            label: 'Unit Cost',
+            label: { key: 'column.unit_cost', fallback: 'Unit Cost' },
             maximumFractionDigits: 0,
         }),
         createCurrencyColumn<StockMovementItem>({
             accessorKey: 'average_cost_after',
-            label: 'Avg Cost',
+            label: { key: 'column.avg_cost', fallback: 'Avg Cost' },
             maximumFractionDigits: 0,
         }),
         {
             id: 'created_by',
-            header: 'Created By',
+            header: () => (
+                <LabelText
+                    label={{ key: 'column.created_by', fallback: 'Created By' }}
+                />
+            ),
             cell: ({ row }) => (
                 <TextCell value={row.original.created_by?.name} />
             ),

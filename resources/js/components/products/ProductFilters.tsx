@@ -12,7 +12,11 @@ import {
  */
 export function createProductFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', 'Search code, name...'),
+        createTextFilterField(
+            'search',
+            { key: 'column.search', fallback: 'Search' },
+            'Search code, name...',
+        ),
         ...createProductCatalogAsyncFilterFields(),
         ...createProductTypeStatusFilterFields(),
     ];
