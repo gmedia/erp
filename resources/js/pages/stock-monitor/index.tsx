@@ -148,11 +148,22 @@ export default function StockMonitorPage() {
 
     return (
         <DataTablePage<StockMonitorItem, Record<string, string>>
-            title="Stock Monitor"
-            description="Stock on hand, value, and low-stock items per product and warehouse."
+            title={{
+                key: 'page.stock_monitor.title',
+                fallback: 'Stock Monitor',
+            }}
+            description={{
+                key: 'page.stock_monitor.description',
+                fallback:
+                    'Stock on hand, value, and low-stock items per product and warehouse.',
+            }}
             breadcrumbs={[
                 { title: 'Inventory', href: '#' },
-                { title: 'Stock Monitor', href: '/stock-monitor' },
+                {
+                    title: 'Stock Monitor',
+                    titleKey: 'page.stock_monitor.title',
+                    href: '/stock-monitor',
+                },
             ]}
             columns={columns}
             data={data}

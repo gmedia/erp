@@ -55,6 +55,35 @@ test('purchase orders and products page strings are translated to indonesian', f
         ->and($id['products']['title'])->toBe('Produk');
 });
 
+test('journal entries and stock monitor page strings keep the english labels', function () {
+    $en = localePageTranslations('en.json');
+
+    expect($en['journal_entries']['title'])->toBe('Journal Entries')
+        ->and($en['journal_entries']['description'])->toBe('Manual journal entries with debit and credit lines.')
+        ->and($en['journal_entries']['search_placeholder'])->toBe('Search entry...')
+        ->and($en['stock_monitor']['title'])->toBe('Stock Monitor')
+        ->and($en['stock_monitor']['description'])->toBe(
+            'Stock on hand, value, and low-stock items per product and warehouse.',
+        )
+        ->and($en['stock_monitor']['search_placeholder'])->toBe(
+            'Search product, category, warehouse, branch...',
+        );
+});
+
+test('journal entries and stock monitor page strings are translated to indonesian', function () {
+    $en = localePageTranslations('en.json');
+    $id = localePageTranslations('id.json');
+
+    foreach (['journal_entries', 'stock_monitor'] as $module) {
+        foreach (array_keys($en[$module]) as $field) {
+            expect($id[$module][$field])->not->toBe($en[$module][$field], "page.{$module}.{$field} not translated");
+        }
+    }
+
+    expect($id['journal_entries']['title'])->toBe('Jurnal Umum')
+        ->and($id['stock_monitor']['title'])->toBe('Pemantauan Stok');
+});
+
 test('page translation values are non-empty strings', function () {
     foreach (['en.json', 'id.json'] as $file) {
         foreach (localePageTranslations($file) as $module => $strings) {

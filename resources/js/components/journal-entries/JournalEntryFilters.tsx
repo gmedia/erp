@@ -10,7 +10,10 @@ export function createJournalEntryFilterFields(): FieldDescriptor[] {
         createTextFilterField(
             'search',
             { key: 'column.search', fallback: 'Search' },
-            'Search entry...',
+            {
+                key: 'page.journal_entries.search_placeholder',
+                fallback: 'Search entry...',
+            },
         ),
         createJournalEntryStatusFilterField(),
         ...createDateRangeFilterFields(),

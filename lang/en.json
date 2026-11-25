@@ -769,6 +769,16 @@
             "title": "Products",
             "description": "Products, materials, and services with pricing and stock settings.",
             "search_placeholder": "Search products..."
+        },
+        "journal_entries": {
+            "title": "Journal Entries",
+            "description": "Manual journal entries with debit and credit lines.",
+            "search_placeholder": "Search entry..."
+        },
+        "stock_monitor": {
+            "title": "Stock Monitor",
+            "description": "Stock on hand, value, and low-stock items per product and warehouse.",
+            "search_placeholder": "Search product, category, warehouse, branch..."
         }
     },
     "stock_monitor_summary": {

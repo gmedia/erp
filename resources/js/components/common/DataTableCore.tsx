@@ -30,6 +30,7 @@ import { useTranslation } from '@/contexts/i18n-context';
 import { useExport } from '@/hooks/useExport';
 import { cn } from '@/lib/utils';
 import * as React from 'react';
+import type { TranslatableLabel } from './TranslatedText';
 import type { FieldDescriptor } from './filters';
 
 // Tepi kiri kolom sticky: fade ke latar halaman agar kolom yang tertutup
@@ -108,6 +109,7 @@ function stickyHeadClass(
 // Helper function to safely extract placeholder from filter fields
 function getPlaceholderFromFilterFields(
     filterFields: FieldDescriptor[],
+    translate: (key: string) => string,
 ): string {
     if (filterFields.length === 0) return 'Search...';
 
@@ -117,9 +119,15 @@ function getPlaceholderFromFilterFields(
     const component = firstField.component;
 
     if (React.isValidElement(component)) {
-        const placeholder = (component.props as { placeholder?: string })
-            ?.placeholder;
-        return placeholder || 'Search...';
+        const placeholder = (
+            component.props as { placeholder?: TranslatableLabel }
+        )?.placeholder;
+        if (!placeholder) return 'Search...';
+        if (typeof placeholder === 'string') return placeholder;
+        const translated = translate(placeholder.key);
+        return translated === placeholder.key
+            ? placeholder.fallback
+            : translated;
     }
 
     return 'Search...';
@@ -503,7 +511,7 @@ export function DataTable<T>({
                 onSearchSubmit={onSearchChange}
                 searchPlaceholder={
                     defaultFilterFields && defaultFilterFields.length > 0
-                        ? getPlaceholderFromFilterFields(defaultFilterFields)
+                        ? getPlaceholderFromFilterFields(defaultFilterFields, t)
                         : 'Search...'
                 }
                 filterFields={defaultFilterFields}

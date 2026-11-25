@@ -3,6 +3,7 @@
 import { AsyncSelect } from '@/components/common/AsyncSelect';
 import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 import type { TranslatableLabel } from '@/components/common/TranslatedText';
+import { useTranslation } from '@/contexts/i18n-context';
 
 import { Input } from '@/components/ui/input';
 import {
@@ -287,15 +288,34 @@ export function createSelectFilterField(
 }
 
 // Generic text input filter field creator
+export function TranslatedPlaceholderInput({
+    placeholder,
+}: Readonly<{ placeholder: TranslatableLabel }>) {
+    const { t } = useTranslation();
+    if (typeof placeholder === 'string') {
+        return <Input placeholder={placeholder} />;
+    }
+    const translated = t(placeholder.key);
+    return (
+        <Input
+            placeholder={
+                translated === placeholder.key
+                    ? placeholder.fallback
+                    : translated
+            }
+        />
+    );
+}
+
 export function createTextFilterField(
     name: string,
     label: TranslatableLabel,
-    placeholder: string,
+    placeholder: TranslatableLabel,
 ): FieldDescriptor {
     return {
         name,
         label,
-        component: <Input placeholder={placeholder} />,
+        component: <TranslatedPlaceholderInput placeholder={placeholder} />,
     };
 }
 

@@ -184,6 +184,58 @@ test.describe('i18n page titles (locale en)', () => {
     });
 });
 
+test.describe('i18n page titles (locale id) journal and stock monitor', () => {
+    test('journal entries page title is Indonesian', async ({ page }) => {
+        await page.addInitScript((k) => {
+            localStorage.setItem(k, 'id');
+        }, LOCALE_KEY);
+
+        await login(page);
+        await page.goto('/journal-entries', { waitUntil: 'domcontentloaded' });
+
+        await expect(
+            page.getByRole('heading', { level: 1, name: 'Jurnal Umum' }),
+        ).toBeVisible({ timeout: 15000 });
+        await expect(
+            page.getByRole('heading', { level: 1, name: 'Journal Entries' }),
+        ).toHaveCount(0);
+    });
+
+    test('stock monitor page title is Indonesian', async ({ page }) => {
+        await page.addInitScript((k) => {
+            localStorage.setItem(k, 'id');
+        }, LOCALE_KEY);
+
+        await login(page);
+        await page.goto('/stock-monitor', { waitUntil: 'domcontentloaded' });
+
+        await expect(
+            page.getByRole('heading', { level: 1, name: 'Pemantauan Stok' }),
+        ).toBeVisible({ timeout: 15000 });
+        await expect(
+            page.getByRole('heading', { level: 1, name: 'Stock Monitor' }),
+        ).toHaveCount(0);
+    });
+});
+
+test.describe('i18n page titles (locale en) journal and stock monitor', () => {
+    test('stock monitor page title keeps English', async ({ page }) => {
+        await page.addInitScript((k) => {
+            localStorage.setItem(k, 'en');
+        }, LOCALE_KEY);
+
+        await login(page);
+        await page.goto('/stock-monitor', { waitUntil: 'domcontentloaded' });
+
+        await expect(
+            page.getByRole('heading', { level: 1, name: 'Stock Monitor' }),
+        ).toBeVisible({ timeout: 15000 });
+        await expect(
+            page.getByRole('heading', { level: 1, name: 'Pemantauan Stok' }),
+        ).toHaveCount(0);
+    });
+});
+
 test.describe('i18n shell (locale id) columns', () => {
     test('purchase orders column headers use Indonesian labels', async ({
         page,

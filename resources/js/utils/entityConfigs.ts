@@ -868,7 +868,15 @@ export const journalEntryConfig = createComplexEntityConfig<JournalEntry>({
     permissionPrefix: 'journal_entry',
     exportEndpoint: '/api/journal-entries/export',
     queryKey: ['journal-entries'],
-    breadcrumbs: [{ title: 'Journal Entries', href: '/journal-entries' }],
+    titleKey: 'page.journal_entries.title',
+    descriptionKey: 'page.journal_entries.description',
+    breadcrumbs: [
+        {
+            title: 'Journal Entries',
+            titleKey: 'page.journal_entries.title',
+            href: '/journal-entries',
+        },
+    ],
     initialFilters: { search: '', status: '', start_date: '', end_date: '' },
     columns: journalEntryColumns,
     filterFields: createJournalEntryFilterFields(),

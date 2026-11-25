@@ -19,7 +19,10 @@ export function createStockMonitorFilterFields(
         createTextFilterField(
             'search',
             { key: 'column.search', fallback: 'Search' },
-            'Search product, category, warehouse, branch...',
+            {
+                key: 'page.stock_monitor.search_placeholder',
+                fallback: 'Search product, category, warehouse, branch...',
+            },
         ),
         createSelectFilterField(
             'product_id',

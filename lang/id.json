@@ -769,6 +769,16 @@
             "title": "Produk",
             "description": "Produk, bahan, dan jasa beserta pengaturan harga dan stok.",
             "search_placeholder": "Cari produk..."
+        },
+        "journal_entries": {
+            "title": "Jurnal Umum",
+            "description": "Jurnal manual dengan baris debit dan kredit.",
+            "search_placeholder": "Cari jurnal..."
+        },
+        "stock_monitor": {
+            "title": "Pemantauan Stok",
+            "description": "Stok tersedia, nilai, dan item stok rendah per produk dan gudang.",
+            "search_placeholder": "Cari produk, kategori, gudang, cabang..."
         }
     },
     "stock_monitor_summary": {
