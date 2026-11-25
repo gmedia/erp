@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '@/contexts/auth-context';
+import { getStoredLocale, setStoredLocale } from '@/lib/locale-storage';
 import { type Translations } from '@/types/i18n';
 import {
     createContext,
@@ -247,17 +248,9 @@ export function I18nProvider({
     availableLocales = ['en', 'id'],
     translations = defaultTranslations,
 }: I18nProviderProps) {
-    // Function to switch locale - triggers full page reload to ensure all translations are updated
-    const setLocale = useCallback(async (newLocale: string) => {
-        try {
-            // Note: need to implement /locale/{locale} API later,
-            // or we handle this differently if purely SPA.
-            // For now, reload to fetch new translations from /api/v1/me
-            await fetch(`/locale/${newLocale}`, { method: 'POST' });
-            globalThis.window.location.reload();
-        } catch (e) {
-            console.error(e);
-        }
+    const setLocale = useCallback((newLocale: string) => {
+        setStoredLocale(newLocale);
+        globalThis.window.location.reload();
     }, []);
 
     /**
@@ -328,7 +321,7 @@ export function AppI18nProvider({ children }: AppI18nProviderProps) {
 
     return (
         <I18nProvider
-            locale={locale || 'en'}
+            locale={locale || getStoredLocale()}
             availableLocales={availableLocales}
             translations={(translations as Translations) || defaultTranslations}
         >

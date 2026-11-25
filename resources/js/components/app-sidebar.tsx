@@ -19,15 +19,21 @@ import { Link } from 'react-router-dom';
 import AppLogo from './app-logo';
 
 export function AppSidebar() {
-    useTranslation();
+    const { t } = useTranslation();
     const { menus } = useAuth();
 
+    const menuTitle = (name: string, displayName: string): string => {
+        const key = `menu.${name}`;
+        const translated = t(key);
+        return translated === key ? displayName : translated;
+    };
+
     const mainNavItems: NavItem[] = menus.map((menu) => ({
-        title: menu.display_name,
+        title: menuTitle(menu.name, menu.display_name),
         href: menu.url ?? '#',
         icon: getIcon(menu.icon),
         children: menu.children?.map((child) => ({
-            title: child.display_name,
+            title: menuTitle(child.name, child.display_name),
             href: child.url ?? '#',
             icon: getIcon(child.icon),
         })),
