@@ -1932,7 +1932,9 @@ invariant('W8-459 purchase orders passing Pending Approval have an approved requ
             ->where('approvable_id', $entityState->entity_id)
             ->first(['id', 'status']);
 
-        expect($request)->not->toBeNull("Purchase order {$entityState->entity_id} passed approval without an approval request");
+        expect($request)->not->toBeNull(
+            "Purchase order {$entityState->entity_id} passed approval without an approval request",
+        );
         expect($request->status)->toBe('approved', "Purchase order {$entityState->entity_id} request must be approved");
         expect(
             DB::table('approval_audit_logs')->where('approval_request_id', $request->id)->count()

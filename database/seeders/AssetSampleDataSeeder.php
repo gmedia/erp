@@ -591,7 +591,9 @@ class AssetSampleDataSeeder extends Seeder
                     // Pengajuan mengikuti tanggal pembelian (setelah log Draft 08:00 pada hari itu),
                     // bukan now(), agar tidak lebih awal dari riwayat pipeline (#459 butir 6).
                     $submittedAt = Carbon::parse($asset->purchase_date)->startOfDay()->setTime(10, 0);
-                    $completedAt = in_array($approvalStatus, ['approved'], true) ? $submittedAt->copy()->addHour() : null;
+                    $completedAt = $approvalStatus === 'approved'
+                        ? $submittedAt->copy()->addHour()
+                        : null;
 
                     $request = ApprovalRequest::updateOrCreate(
                         [
