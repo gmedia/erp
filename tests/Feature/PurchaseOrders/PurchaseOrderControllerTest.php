@@ -251,7 +251,6 @@ test('update rejects editing items of a purchase order awaiting approval or conf
 })->with(['pending_approval', 'confirmed']);
 
 test('locked items message is translated for en and id', function (string $locale, string $expected) {
-    app()->setLocale($locale);
     $purchaseOrder = PurchaseOrder::factory()->create(['status' => 'confirmed']);
 
     $response = putJson('/api/purchase-orders/' . $purchaseOrder->id, [
@@ -263,7 +262,7 @@ test('locked items message is translated for en and id', function (string $local
                 'unit_price' => 1000,
             ],
         ],
-    ])->assertUnprocessable();
+    ], ['X-Locale' => $locale])->assertUnprocessable();
 
     expect($response->json('errors.items.0'))->toBe($expected);
 })->with([
