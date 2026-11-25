@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 
 test.describe('Book Value & Depreciation Report', () => {
     test.beforeEach(async ({ page }) => {
@@ -25,12 +25,13 @@ test.describe('Book Value & Depreciation Report', () => {
 
     test('should be able to search for an asset', async ({ page }) => {
         const searchInput = page.getByPlaceholder('Search code, name...');
-        await searchInput.fill('IT-001'); // Assuming IT-001 exists from seeders or we just search
-        
-        // Wait for debounce and API
-        await page.waitForTimeout(1500);
-        
-        // Assert we are still on the page and no crash occurred
+        const searchResponse = page.waitForResponse(
+            (r) => r.url().includes('/api/reports/book-value-depreciation') && r.request().method() === 'GET',
+            { timeout: 15000 },
+        );
+        await searchInput.fill('IT-001');
+        await expectResponseOk(await searchResponse);
+
         await expect(searchInput).toBeVisible();
     });
 

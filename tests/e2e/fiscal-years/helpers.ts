@@ -24,7 +24,6 @@ export async function pickDate(
 
   const calendar = page.locator('[data-slot="calendar"]').last();
   await calendar.waitFor({ state: 'visible', timeout: 15000 });
-  await page.waitForTimeout(500);
 
   const dayButton = calendar.locator('button').filter({ hasText: new RegExp(`^${day}$`) }).first();
   await dayButton.waitFor({ state: 'visible' });

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 import { createJournalEntry } from '../journal-entries/helpers';
 
 test.describe('Posting Journal End-to-End', () => {
@@ -30,9 +30,12 @@ test.describe('Posting Journal End-to-End', () => {
 
     // 4. Search for the entry to ensure it's visible and handles pagination
     const searchInput = page.getByPlaceholder(/Search journals\.\.\./i);
+    const searchResponse = page.waitForResponse(
+      (r) => r.url().includes('/api/posting-journals') && r.request().method() === 'GET',
+      { timeout: 15000 },
+    );
     await searchInput.fill(description);
-    await page.waitForTimeout(1000); // Wait for debounce if any, or just network load
-    await page.waitForLoadState('networkidle');
+    await expectResponseOk(await searchResponse);
 
     // 5. Verify the entry is in the list (using description as it's visible)
     const row = page.locator('tr').filter({ hasText: description });

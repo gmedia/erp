@@ -301,6 +301,7 @@ export async function ensureAppOrigin(page: Page): Promise<void> {
                 throw error;
             }
 
+            // Backoff sebelum retry navigasi; tidak ada elemen UI yang bisa ditunggu saat navigasi gagal.
             await page.waitForTimeout(750);
         }
     }
@@ -402,8 +403,6 @@ export async function createEntity(
                 .last();
             if (await searchInput.isVisible().catch(() => false)) {
                 await searchInput.fill(value);
-                // Wait for debounce and fetch
-                await page.waitForTimeout(500);
             }
 
             // Click the option
@@ -524,6 +523,7 @@ export async function login(
                     message.toLowerCase().includes('frame was detached') ||
                     message.toLowerCase().includes('navigation');
                 if (!retriable) throw err;
+                // Backoff sebelum retry navigasi; tidak ada elemen UI yang bisa ditunggu saat navigasi gagal.
                 await page.waitForTimeout(750);
             }
         }

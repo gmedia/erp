@@ -83,10 +83,15 @@ test.describe('Recurring Journal E2E Tests', () => {
                 .locator('thead')
                 .getByRole('button', { name: column, exact: true });
             await expect(sortButton).toBeVisible();
-            await sortButton.click();
-            await page.waitForTimeout(500);
-            await sortButton.click();
-            await page.waitForTimeout(500);
+            for (let click = 0; click < 2; click++) {
+                const sortResponse = page.waitForResponse(
+                    (r) =>
+                        r.url().includes('/api/recurring-journals') && r.request().method() === 'GET',
+                    { timeout: 15000 },
+                );
+                await sortButton.click();
+                await expectResponseOk(await sortResponse);
+            }
         }
     });
 

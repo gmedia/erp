@@ -24,9 +24,6 @@ async function selectAsyncOption(
         const searchInput = page.locator('input[placeholder="Search..."]:visible').last();
         if (searchText && await searchInput.isVisible().catch(() => false)) {
             await searchInput.fill(searchText);
-            await page.waitForTimeout(800);
-        } else {
-            await page.waitForTimeout(500);
         }
 
         const option = popoverList
@@ -37,12 +34,12 @@ async function selectAsyncOption(
         try {
             await expect(option).toBeVisible({ timeout: 5000 });
             await option.click({ force: true });
-            await page.waitForTimeout(300);
+            await expect(popoverList).toHaveCount(0, { timeout: 5000 });
             return;
         } catch (e) {
             if (attempt === 2) throw e;
             await page.keyboard.press('Escape').catch(() => null);
-            await page.waitForTimeout(300);
+            await expect(popoverList).toHaveCount(0, { timeout: 5000 });
         }
     }
 }

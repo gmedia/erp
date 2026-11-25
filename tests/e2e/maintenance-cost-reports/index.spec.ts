@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 
 test.describe('Maintenance Cost Report', () => {
     test.beforeEach(async ({ page }) => {
@@ -26,12 +26,13 @@ test.describe('Maintenance Cost Report', () => {
 
     test('should be able to search for a maintenance record', async ({ page }) => {
         const searchInput = page.getByPlaceholder('Search code, name, notes...');
+        const searchResponse = page.waitForResponse(
+            (r) => r.url().includes('/api/reports/maintenance-cost') && r.request().method() === 'GET',
+            { timeout: 15000 },
+        );
         await searchInput.fill('Preventive');
-        
-        // Wait for debounce and API
-        await page.waitForTimeout(1500);
-        
-        // Assert we are still on the page and no crash occurred
+        await expectResponseOk(await searchResponse);
+
         await expect(searchInput).toBeVisible();
     });
 

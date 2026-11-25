@@ -162,6 +162,7 @@ test.describe('visual audit capture', () => {
                 await page
                     .waitForLoadState('networkidle', { timeout: 15_000 })
                     .catch(() => undefined);
+                // Harness screenshot: jeda render stabil (animasi/paint) sebelum capture; tidak ada elemen tunggal yang menandai kesiapan.
                 await page.waitForTimeout(500);
             };
 
@@ -182,6 +183,7 @@ test.describe('visual audit capture', () => {
 
                 for (const theme of themes) {
                     await page.emulateMedia({ colorScheme: theme });
+                    // Harness screenshot: jeda transisi tema (CSS) sebelum metrik dan capture.
                     await page.waitForTimeout(300);
 
                     const metrics = await page.evaluate(() => ({
