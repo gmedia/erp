@@ -5,10 +5,10 @@
  * All modules MUST comply with the ModuleTestConfig interface.
  */
 
-import { expect, Locator, Page, test } from '@playwright/test';
+import { expect, Locator, Page, Response, test } from '@playwright/test';
 import ExcelJS from 'exceljs';
 import * as fs from 'node:fs';
-import { login } from './helpers';
+import { expectResponseOk, login } from './helpers';
 
 // ==================== INTERFACES ====================
 
@@ -69,13 +69,10 @@ export interface ModuleTestConfig {
 
 // ==================== HELPER FUNCTIONS ====================
 
-async function waitForApiResponse(page: Page, apiPath: string): Promise<void> {
-    await page.waitForResponse(
-        (r) => r.url().includes(apiPath) && r.status() < 400,
-        {
-            timeout: 30000,
-        },
-    );
+function waitForApiResponse(page: Page, apiPath: string): Promise<Response> {
+    return page.waitForResponse((r) => r.url().includes(apiPath), {
+        timeout: 30000,
+    });
 }
 
 async function navigateToModule(
@@ -85,7 +82,7 @@ async function navigateToModule(
 ): Promise<void> {
     const responsePromise = waitForApiResponse(page, apiPath);
     await page.goto(route);
-    await responsePromise;
+    await expectResponseOk(await responsePromise);
 }
 
 function findTableRow(page: Page, identifier: string): Locator {
@@ -213,7 +210,7 @@ export function generateModuleTests(config: ModuleTestConfig) {
             });
             const responsePromise = waitForApiResponse(page, config.apiPath);
             await confirmButton.first().click();
-            await responsePromise;
+            await expectResponseOk(await responsePromise);
 
             await config.searchEntity(page, identifier);
             if (config.deleteMode === 'soft-cancel') {
@@ -314,7 +311,7 @@ export function generateModuleTests(config: ModuleTestConfig) {
                     config.apiPath,
                 );
                 await sortButton.click();
-                await ascResponsePromise;
+                await expectResponseOk(await ascResponsePromise);
 
                 // Sort DESC
                 const descResponsePromise = waitForApiResponse(
@@ -322,7 +319,7 @@ export function generateModuleTests(config: ModuleTestConfig) {
                     config.apiPath,
                 );
                 await sortButton.click();
-                await descResponsePromise;
+                await expectResponseOk(await descResponsePromise);
             }
         });
 
@@ -399,7 +396,7 @@ export function generateModuleTests(config: ModuleTestConfig) {
 
             const responsePromise = waitForApiResponse(page, config.apiPath);
             await applyButton.click();
-            await responsePromise;
+            await expectResponseOk(await responsePromise);
         });
     });
 }

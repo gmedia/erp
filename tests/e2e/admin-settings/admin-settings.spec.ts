@@ -1,6 +1,6 @@
 import { expect, test, type Page, type Response } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
-import { DEFAULT_E2E_EMAIL, login } from '../helpers';
+import { DEFAULT_E2E_EMAIL, expectResponseOk, login } from '../helpers';
 
 const SETTINGS_VIEWER_EMAIL = 'settings-viewer@example.com';
 const SETTINGS_FULL_EMAIL = 'settings-full@example.com';
@@ -42,13 +42,12 @@ async function saveAdminSettings(
     const responsePromise = page.waitForResponse(
         (response: Response) =>
             response.url().includes('/api/admin-settings') &&
-            ['POST', 'PUT'].includes(response.request().method()) &&
-            response.status() < 400,
+            ['POST', 'PUT'].includes(response.request().method()),
     );
 
     await page.getByTestId(saveButtonTestId).click();
 
-    await responsePromise;
+    await expectResponseOk(await responsePromise);
 }
 
 function collectCspViolations(page: Page): string[] {
@@ -65,8 +64,7 @@ function waitForAdminSettingsRefresh(page: Page): Promise<Response> {
     return page.waitForResponse(
         (response: Response) =>
             response.url().includes('/api/admin-settings') &&
-            response.request().method() === 'GET' &&
-            response.status() < 400,
+            response.request().method() === 'GET',
     );
 }
 
@@ -243,7 +241,7 @@ test.describe('Admin Settings', () => {
         // Save settings
         const refreshResponse = waitForAdminSettingsRefresh(page);
         await saveAdminSettings(page, 'save-general-settings');
-        await refreshResponse;
+        await expectResponseOk(await refreshResponse);
 
         // Logo preview should now be visible after query refresh
         const logoPreview = page.locator('img[alt="Current company logo"]');
@@ -336,11 +334,7 @@ test.describe('Admin Settings', () => {
         await hostInput.fill('smtp.mailtrap.io');
 
         // Save
-        const saveButton = page.getByTestId('save-smtp-settings');
-        await saveButton.click();
-
-        // Wait for page to reload/settle
-        await page.waitForTimeout(1000);
+        await saveAdminSettings(page, 'save-smtp-settings');
 
         // Verify persistence
         await page.reload();
@@ -351,8 +345,7 @@ test.describe('Admin Settings', () => {
         // Restore original host so we don't break the next test
         await hostInput.clear();
         await hostInput.fill(originalHost);
-        await saveButton.click();
-        await page.waitForTimeout(1000);
+        await saveAdminSettings(page, 'save-smtp-settings');
     });
 
     test('can send test smtp email', async ({ page }) => {
