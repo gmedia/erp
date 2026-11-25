@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test.use({ viewport: { width: 390, height: 844 } });
+test.use({ viewport: { width: 390, height: 844 }, colorScheme: 'dark' });
 
 test('TabsList profil aset di mobile 390 tetap satu baris dan bisa di-scroll horizontal', async ({
     page,
@@ -51,4 +51,44 @@ test('TabsList profil aset di mobile 390 tetap satu baris dan bisa di-scroll hor
         (el) => getComputedStyle(el).overflowX,
     );
     expect(overflowX).toBe('auto');
+
+    await expect
+        .poll(() =>
+            tabsList.evaluate((el) => el.getAttribute('data-scroll-end')),
+        )
+        .toBe('false');
+    await expect
+        .poll(() =>
+            tabsList.evaluate((el) => getComputedStyle(el).maskImage),
+        )
+        .toContain('linear-gradient');
+
+    await tabsList.evaluate((el) => {
+        el.scrollLeft = el.scrollWidth;
+        el.dispatchEvent(new Event('scroll'));
+    });
+    await expect
+        .poll(() =>
+            tabsList.evaluate((el) => el.getAttribute('data-scroll-end')),
+        )
+        .toBe('true');
+    await expect
+        .poll(() =>
+            tabsList.evaluate((el) => getComputedStyle(el).maskImage),
+        )
+        .toBe('none');
+
+    const tabStyles = await tabsList.evaluate((el) => {
+        const active = el.querySelector('[data-state="active"]');
+        const inactive = el.querySelector('[data-state="inactive"]');
+        if (!active || !inactive) {
+            return null;
+        }
+        return {
+            activeBg: getComputedStyle(active).backgroundColor,
+            inactiveBg: getComputedStyle(inactive).backgroundColor,
+        };
+    });
+    expect(tabStyles).not.toBeNull();
+    expect(tabStyles!.activeBg).not.toBe(tabStyles!.inactiveBg);
 });
