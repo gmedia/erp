@@ -552,6 +552,7 @@
         "vehicle_loan_dashboard": "Dasbor Pinjaman Kendaraan",
         "vehicle_loan_request": "Permohonan Pinjaman Kendaraan",
         "vehicle_loan_security": "Jaminan Pinjaman Kendaraan",
-        "warehouse": "Gudang"
+        "warehouse": "Gudang",
+        "master.data": "Data Master"
     }
 }
