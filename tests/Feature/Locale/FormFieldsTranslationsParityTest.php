@@ -422,6 +422,72 @@ test('budget, bank reconciliation, recurring journal and period closing form fie
         ->and($id['period_closings']['closing_type_annual'])->toBe('Tahunan');
 });
 
+test('supplier bill, ap payment, customer invoice, ar receipt and credit note form keys are complete in both locales', function () {
+    $en = localeFormFieldTranslations('en.json');
+    $id = localeFormFieldTranslations('id.json');
+
+    foreach (['supplier_bills', 'ap_payments', 'customer_invoices', 'ar_receipts', 'credit_notes'] as $module) {
+        expect(array_keys($en[$module]))->not->toBeEmpty();
+        expect(array_keys($en[$module]))->toEqual(array_keys($id[$module]), "form_fields.{$module} keys differ");
+
+        foreach (array_keys($en[$module]) as $field) {
+            expect($id[$module][$field])
+                ->not->toBe('', "form_fields.{$module}.{$field} empty");
+        }
+    }
+
+    expect($id['supplier_bills']['add_title'])->toBe('Tambah Tagihan Pemasok Baru')
+        ->and($id['ap_payments']['add_title'])->toBe('Tambah Pembayaran AP Baru')
+        ->and($id['customer_invoices']['add_title'])->toBe('Tambah Faktur Pelanggan')
+        ->and($id['ar_receipts']['add_title'])->toBe('Tambah Penerimaan AR')
+        ->and($id['credit_notes']['add_title'])->toBe('Tambah Nota Kredit');
+});
+
+test('supplier bill, ap payment, customer invoice, ar receipt and credit note form labels keep the english text', function () {
+    $en = localeFormFieldTranslations('en.json');
+
+    expect($en['supplier_bills']['add_title'])->toBe('Add New Supplier Bill')
+        ->and($en['supplier_bills']['edit_title'])->toBe('Edit Supplier Bill')
+        ->and($en['supplier_bills']['bill_number'])->toBe('Bill Number')
+        ->and($en['supplier_bills']['status_partially_paid'])->toBe('Partially Paid')
+        ->and($en['supplier_bills']['column_disc_percent'])->toBe('Disc %')
+        ->and($en['ap_payments']['add_title'])->toBe('Add New AP Payment')
+        ->and($en['ap_payments']['status_pending_approval'])->toBe('Pending Approval')
+        ->and($en['ap_payments']['method_bank_transfer'])->toBe('Bank Transfer')
+        ->and($en['ap_payments']['column_discount_taken'])->toBe('Discount Taken')
+        ->and($en['customer_invoices']['add_title'])->toBe('Add Customer Invoice')
+        ->and($en['customer_invoices']['items_title'])->toBe('Invoice Items')
+        ->and($en['customer_invoices']['payment_terms_placeholder'])->toBe('e.g., Net 30')
+        ->and($en['ar_receipts']['add_title'])->toBe('Add AR Receipt')
+        ->and($en['ar_receipts']['no_allocations'])->toBe("No allocations added yet. Click 'Add Allocation' to start.")
+        ->and($en['ar_receipts']['method_credit_card'])->toBe('Credit Card')
+        ->and($en['credit_notes']['add_title'])->toBe('Add Credit Note')
+        ->and($en['credit_notes']['customer_invoice_optional'])->toBe('Customer Invoice (Optional)')
+        ->and($en['credit_notes']['reason_bad_debt'])->toBe('Bad Debt');
+});
+
+test('supplier bill, ap payment, customer invoice, ar receipt and credit note validation messages keep the english text', function () {
+    $en = localeValidationTranslations('en.json');
+    $id = localeValidationTranslations('id.json');
+
+    expect($en['supplier_bill']['supplier_required'])->toBe('Supplier is required.')
+        ->and($en['supplier_bill']['quantity_gt_zero'])->toBe('Quantity must be > 0.')
+        ->and($en['supplier_bill']['items_min_one'])->toBe('At least one item is required.')
+        ->and($en['ap_payment']['total_amount_gt_zero'])->toBe('Total amount must be > 0.')
+        ->and($en['ap_payment']['allocations_min_one'])->toBe('At least one allocation is required.')
+        ->and($en['customer_invoice']['quantity_gt_zero'])->toBe('Quantity must be greater than 0.')
+        ->and($en['customer_invoice']['items_min_one'])->toBe('At least 1 item is required.')
+        ->and($en['ar_receipt']['total_amount_gt_zero'])->toBe('Total amount must be greater than 0.')
+        ->and($en['ar_receipt']['allocations_min_one'])->toBe('At least 1 allocation is required.')
+        ->and($en['credit_note']['reason_required'])->toBe('Reason is required.');
+
+    foreach (['supplier_bill', 'ap_payment', 'customer_invoice', 'ar_receipt', 'credit_note'] as $form) {
+        expect(array_keys($en[$form]))->toEqual(array_keys($id[$form]), "validation.{$form} keys differ");
+    }
+
+    expect($id['supplier_bill']['supplier_required'])->toBe('Pemasok wajib diisi.');
+});
+
 test('budget, bank reconciliation, recurring journal and period closing validation messages are translated', function () {
     $en = localeValidationTranslations('en.json');
     $id = localeValidationTranslations('id.json');

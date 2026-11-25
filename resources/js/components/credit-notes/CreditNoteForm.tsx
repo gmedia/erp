@@ -7,6 +7,7 @@ import { PostedDocumentLockNotice } from '@/components/common/PostedDocumentLock
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
 import { TransactionLineItemsTable } from '@/components/common/TransactionLineItemsTable';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type CreditNote, type CreditNoteFormData } from '@/types/credit-note';
@@ -86,6 +87,13 @@ export const CreditNoteForm = memo<CreditNoteFormProps>(
         onSubmit,
         isLoading = false,
     }) {
+        const { t } = useTranslation();
+        const fl = (key: string, fallback: string) => {
+            const translated = t(`form_fields.credit_notes.${key}`);
+            return translated === `form_fields.credit_notes.${key}`
+                ? fallback
+                : translated;
+        };
         const activeCreditNote = creditNote || item || entity;
         const isLocked = isPostedDocumentLocked(activeCreditNote);
         const defaultValues = useMemo(
@@ -120,18 +128,21 @@ export const CreditNoteForm = memo<CreditNoteFormProps>(
 
         useResetFormOnDefaultValues(form, defaultValues);
         const creditNoteStatusOptions = [
-            { value: 'draft', label: 'Draft' },
-            { value: 'confirmed', label: 'Confirmed' },
-            { value: 'applied', label: 'Applied' },
-            { value: 'cancelled', label: 'Cancelled' },
-            { value: 'void', label: 'Void' },
+            { value: 'draft', label: fl('status_draft', 'Draft') },
+            { value: 'confirmed', label: fl('status_confirmed', 'Confirmed') },
+            { value: 'applied', label: fl('status_applied', 'Applied') },
+            { value: 'cancelled', label: fl('status_cancelled', 'Cancelled') },
+            { value: 'void', label: fl('status_void', 'Void') },
         ];
         const creditNoteReasonOptions = [
-            { value: 'return', label: 'Return' },
-            { value: 'discount', label: 'Discount' },
-            { value: 'correction', label: 'Correction' },
-            { value: 'bad_debt', label: 'Bad Debt' },
-            { value: 'other', label: 'Other' },
+            { value: 'return', label: fl('reason_return', 'Return') },
+            { value: 'discount', label: fl('reason_discount', 'Discount') },
+            {
+                value: 'correction',
+                label: fl('reason_correction', 'Correction'),
+            },
+            { value: 'bad_debt', label: fl('reason_bad_debt', 'Bad Debt') },
+            { value: 'other', label: fl('reason_other', 'Other') },
         ];
         const handleSubmit = (data: CreditNoteFormData) => {
             onSubmit({
@@ -147,8 +158,8 @@ export const CreditNoteForm = memo<CreditNoteFormProps>(
                     onOpenChange={onOpenChange}
                     title={
                         activeCreditNote
-                            ? 'Edit Credit Note'
-                            : 'Add Credit Note'
+                            ? fl('edit_title', 'Edit Credit Note')
+                            : fl('add_title', 'Add Credit Note')
                     }
                     onSubmit={handleSubmit}
                     isLoading={isLoading}
@@ -158,16 +169,25 @@ export const CreditNoteForm = memo<CreditNoteFormProps>(
                     <div className="grid grid-cols-2 gap-4">
                         <AsyncSelectField
                             name="customer_id"
-                            label="Customer"
-                            placeholder="Select Customer"
+                            label={fl('customer', 'Customer')}
+                            placeholder={fl(
+                                'customer_placeholder',
+                                'Select Customer',
+                            )}
                             url="/api/customers"
                         />
                         <AsyncSelectField<
                             Pick<CustomerInvoice, 'id' | 'invoice_number'>
                         >
                             name="customer_invoice_id"
-                            label="Customer Invoice (Optional)"
-                            placeholder="Select Customer Invoice"
+                            label={fl(
+                                'customer_invoice_optional',
+                                'Customer Invoice (Optional)',
+                            )}
+                            placeholder={fl(
+                                'customer_invoice_placeholder',
+                                'Select Customer Invoice',
+                            )}
                             url="/api/customer-invoices"
                             labelFn={(invoice) =>
                                 invoice.invoice_number ?? String(invoice.id)
@@ -176,41 +196,56 @@ export const CreditNoteForm = memo<CreditNoteFormProps>(
                         />
                         <AsyncSelectField
                             name="branch_id"
-                            label="Branch"
-                            placeholder="Select Branch"
+                            label={fl('branch', 'Branch')}
+                            placeholder={fl(
+                                'branch_placeholder',
+                                'Select Branch',
+                            )}
                             url="/api/branches"
                         />
                         <AsyncSelectField
                             name="fiscal_year_id"
-                            label="Fiscal Year"
-                            placeholder="Select Fiscal Year"
+                            label={fl('fiscal_year', 'Fiscal Year')}
+                            placeholder={fl(
+                                'fiscal_year_placeholder',
+                                'Select Fiscal Year',
+                            )}
                             url="/api/fiscal-years"
                             preferredMetaKey="preferred_fiscal_year_id"
                         />
                         <DatePickerField
                             name="credit_note_date"
-                            label="Credit Note Date"
+                            label={fl('credit_note_date', 'Credit Note Date')}
                         />
                         <SelectField
                             name="reason"
-                            label="Reason"
+                            label={fl('reason', 'Reason')}
                             options={creditNoteReasonOptions}
-                            placeholder="Select Reason"
+                            placeholder={fl(
+                                'reason_placeholder',
+                                'Select Reason',
+                            )}
                         />
                         <SelectField
                             name="status"
-                            label="Status"
+                            label={fl('status', 'Status')}
                             options={creditNoteStatusOptions}
-                            placeholder="Select Status"
+                            placeholder={fl(
+                                'status_placeholder',
+                                'Select Status',
+                            )}
                         />
                     </div>
                     <TextareaField
                         name="notes"
-                        label="Notes"
-                        placeholder="Additional notes..."
+                        label={fl('notes', 'Notes')}
+                        placeholder={fl(
+                            'notes_placeholder',
+                            'Additional notes...',
+                        )}
                     />
                     <EntityFormItemSectionHeader
-                        title="Credit Note Items"
+                        title={fl('items_title', 'Credit Note Items')}
                         onAddItem={handleCreateNewItem}
                         locked={isLocked}
                     />

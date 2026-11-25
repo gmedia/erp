@@ -57,16 +57,16 @@ export function ApPaymentAllocationFormDialog({
         () =>
             z.object({
                 supplier_bill_id: z.string().min(1, {
-                    message: t('apPayment.allocation.bill_required'),
+                    message: 'validation.ap_payment.bill_required',
                 }),
                 bill_label: z.string().optional(),
                 allocated_amount: z.coerce.number().gt(0, {
-                    message: t('apPayment.allocation.amount_positive'),
+                    message: 'validation.ap_payment.amount_gt_zero',
                 }),
                 discount_taken: z.coerce.number().min(0).optional().default(0),
                 notes: z.string().optional(),
             }),
-        [t],
+        [],
     );
     const defaultValues = useMemo<ApPaymentAllocationFormData>(() => {
         if (!item) {

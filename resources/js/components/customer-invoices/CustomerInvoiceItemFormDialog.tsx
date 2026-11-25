@@ -13,23 +13,28 @@ import {
     ItemProductUnitFields,
 } from '@/components/common/ItemFormDialog';
 import { ItemPricingFields } from '@/components/common/ItemPricingFields';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type CustomerInvoiceFormData } from '@/types/customer-invoice';
 
 const customerInvoiceItemSchema = z.object({
     product_id: z.string().optional(),
     product_label: z.string().optional(),
-    account_id: z.string().min(1, { message: 'Account is required.' }),
+    account_id: z.string().min(1, {
+        message: 'validation.customer_invoice.account_required',
+    }),
     account_label: z.string().optional(),
     unit_id: z.string().optional(),
     unit_label: z.string().optional(),
-    description: z.string().min(1, { message: 'Description is required.' }),
-    quantity: z.coerce
-        .number()
-        .gt(0, { message: 'Quantity must be greater than 0.' }),
-    unit_price: z.coerce
-        .number()
-        .min(0, { message: 'Unit price must be at least 0.' }),
+    description: z.string().min(1, {
+        message: 'validation.customer_invoice.description_required',
+    }),
+    quantity: z.coerce.number().gt(0, {
+        message: 'validation.customer_invoice.quantity_gt_zero',
+    }),
+    unit_price: z.coerce.number().min(0, {
+        message: 'validation.customer_invoice.unit_price_min_zero',
+    }),
     discount_percent: z.coerce.number().min(0).max(100).optional().default(0),
     tax_percent: z.coerce.number().min(0).max(100).optional().default(0),
     notes: z.string().optional(),
@@ -50,6 +55,13 @@ export function CustomerInvoiceItemFormDialog({
     item,
     onSave,
 }: CustomerInvoiceItemFormDialogProps) {
+    const { t } = useTranslation();
+    const fl = (key: string, fallback: string) => {
+        const translated = t(`form_fields.customer_invoices.${key}`);
+        return translated === `form_fields.customer_invoices.${key}`
+            ? fallback
+            : translated;
+    };
     const defaultValues = useMemo<CustomerInvoiceItemFormData>(() => {
         if (!item) {
             return {
@@ -127,8 +139,11 @@ export function CustomerInvoiceItemFormDialog({
                 />
                 <InputField
                     name="description"
-                    label="Description"
-                    placeholder="Enter description"
+                    label={fl('item_description', 'Description')}
+                    placeholder={fl(
+                        'item_description_placeholder',
+                        'Enter description',
+                    )}
                 />
             </div>
             <ItemPricingFields />
