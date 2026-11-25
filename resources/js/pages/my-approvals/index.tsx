@@ -236,6 +236,7 @@ function DelegatedCount({ count }: Readonly<{ count: number }>) {
 }
 
 export default function MyApprovalsPage() {
+    const { t } = useTranslation();
     const queryClient = useQueryClient();
     const [actionDialog, setActionDialog] = useState<{
         open: boolean;
@@ -564,19 +565,20 @@ export default function MyApprovalsPage() {
         <AppLayout
             breadcrumbs={[
                 { title: 'Dashboard', href: '/dashboard' },
-                { title: 'My Approvals', href: '/my-approvals' },
+                { title: t('menu.my_approvals'), href: '/my-approvals' },
             ]}
         >
             <Helmet>
                 <title>
-                    My Approvals - {import.meta.env.VITE_APP_NAME || 'ERP'}
+                    {t('menu.my_approvals')} -{' '}
+                    {import.meta.env.VITE_APP_NAME || 'ERP'}
                 </title>
             </Helmet>
 
             <div className="flex w-full flex-col gap-4 p-4 sm:p-5">
                 <PageHeader
-                    title="My Approvals"
-                    description="Review and act on documents waiting for your decision."
+                    title={t('menu.my_approvals')}
+                    description={t('page.my_approvals.description')}
                     meta={
                         !isLoading && !error ? (
                             <span>

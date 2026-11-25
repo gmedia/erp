@@ -12,7 +12,10 @@ export function createAssetFilterFields(): FieldDescriptor[] {
         createTextFilterField(
             'search',
             { key: 'column.search', fallback: 'Search' },
-            'Search assets...',
+            {
+                key: 'page.assets.search_placeholder',
+                fallback: 'Search assets...',
+            },
         ),
         ...createAsyncSelectFilterFields([
             {

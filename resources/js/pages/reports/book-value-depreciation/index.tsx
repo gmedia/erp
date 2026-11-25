@@ -14,7 +14,8 @@ export default function BookValueDepreciationReport() {
     return (
         <ReportDataTablePage<BookValueDepreciationReportItem>
             title="Book Value & Depreciation Report"
-            descriptionKey="reports.pageDescriptions.book-value-depreciation"
+            titleKey="page.book_value_depreciation.title"
+            descriptionKey="page.book_value_depreciation.description"
             breadcrumbs={createReportBreadcrumbs(
                 'Book Value & Depreciation',
                 '/reports/book-value-depreciation',

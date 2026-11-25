@@ -15,7 +15,8 @@ export default function ApOutstandingReportPage() {
     return (
         <ReportDataTablePage<ApOutstandingReportItem>
             title="AP Outstanding Report"
-            descriptionKey="reports.pageDescriptions.ap-outstanding"
+            titleKey="page.ap_outstanding.title"
+            descriptionKey="page.ap_outstanding.description"
             breadcrumbs={createReportBreadcrumbs(
                 'AP Outstanding',
                 '/reports/ap-outstanding',

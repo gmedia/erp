@@ -178,6 +178,8 @@ export interface SimpleEntityConfigOptions<T = unknown> {
     viewModalComponent?: React.ComponentType<any>;
     getDeleteMessage?: (item: T) => string;
     defaultSorting?: SortingState;
+    titleKey?: string;
+    descriptionKey?: string;
 }
 
 export interface ComplexEntityConfigOptions<T = Record<string, unknown>> {
@@ -239,6 +241,8 @@ function createSimpleEntityConfig<
         filterPlaceholder,
         permissionPrefix,
         defaultSorting,
+        titleKey,
+        descriptionKey,
     } = options;
 
     return {
@@ -247,6 +251,8 @@ function createSimpleEntityConfig<
         description,
         permissionPrefix,
         defaultSorting,
+        titleKey,
+        descriptionKey,
         apiEndpoint: `/api/${apiBase}`,
         exportEndpoint: `/api/${apiBase}/export`,
         queryKey: [apiBase],
@@ -298,6 +304,8 @@ export const departmentConfig = createSimpleEntityConfig({
     entityName: 'Department',
     entityNamePlural: 'Departments',
     description: 'Organizational units used to group employees and assets.',
+    titleKey: 'page.departments.title',
+    descriptionKey: 'page.departments.description',
     apiBase: 'departments',
     filterPlaceholder: 'Search departments...',
     permissionPrefix: 'department',
@@ -307,6 +315,8 @@ export const positionConfig = createSimpleEntityConfig({
     entityName: 'Position',
     entityNamePlural: 'Positions',
     description: 'Job titles assignable to employees.',
+    titleKey: 'page.positions.title',
+    descriptionKey: 'page.positions.description',
     apiBase: 'positions',
     filterPlaceholder: 'Search positions...',
     permissionPrefix: 'position',
@@ -317,6 +327,8 @@ export const branchConfig = createSimpleEntityConfig({
     entityName: 'Branch',
     entityNamePlural: 'Branches',
     description: 'Company branches used across transactions and reports.',
+    titleKey: 'page.branches.title',
+    descriptionKey: 'page.branches.description',
     apiBase: 'branches',
     filterPlaceholder: 'Search branches...',
     permissionPrefix: 'branch',
@@ -329,7 +341,15 @@ export const warehouseConfig = createComplexEntityConfig<Warehouse>({
     apiEndpoint: '/api/warehouses',
     exportEndpoint: '/api/warehouses/export',
     queryKey: ['warehouses'],
-    breadcrumbs: [{ title: 'Warehouses', href: '/warehouses' }],
+    titleKey: 'page.warehouses.title',
+    descriptionKey: 'page.warehouses.description',
+    breadcrumbs: [
+        {
+            title: 'Warehouses',
+            titleKey: 'page.warehouses.title',
+            href: '/warehouses',
+        },
+    ],
     initialFilters: { search: '', branch_id: '' },
     columns: warehouseColumns,
     filterFields: createWarehouseFilterFields(),
@@ -348,10 +368,18 @@ export const employeeConfig = createComplexEntityConfig({
     entityNamePlural: 'Employees',
     description:
         'Staff records with employment, department, and position history.',
+    titleKey: 'page.employees.title',
+    descriptionKey: 'page.employees.description',
     apiEndpoint: '/api/employees',
     exportEndpoint: '/api/employees/export',
     queryKey: ['employees'],
-    breadcrumbs: [{ title: 'Employees', href: '/employees' }],
+    breadcrumbs: [
+        {
+            title: 'Employees',
+            titleKey: 'page.employees.title',
+            href: '/employees',
+        },
+    ],
     initialFilters: {
         search: '',
         department_id: '',
@@ -374,10 +402,18 @@ export const customerConfig = createComplexEntityConfig({
     entityName: 'Customer',
     entityNamePlural: 'Customers',
     description: 'Customer master data with billing and contact details.',
+    titleKey: 'page.customers.title',
+    descriptionKey: 'page.customers.description',
     apiEndpoint: '/api/customers',
     exportEndpoint: '/api/customers/export',
     queryKey: ['customers'],
-    breadcrumbs: [{ title: 'Customers', href: '/customers' }],
+    breadcrumbs: [
+        {
+            title: 'Customers',
+            titleKey: 'page.customers.title',
+            href: '/customers',
+        },
+    ],
     initialFilters: {
         search: '',
         branch_id: '',
@@ -400,10 +436,18 @@ export const supplierConfig = createComplexEntityConfig({
     entityName: 'Supplier',
     entityNamePlural: 'Suppliers',
     description: 'Vendor master data used by purchasing and payables.',
+    titleKey: 'page.suppliers.title',
+    descriptionKey: 'page.suppliers.description',
     apiEndpoint: '/api/suppliers',
     exportEndpoint: '/api/suppliers/export',
     queryKey: ['suppliers'],
-    breadcrumbs: [{ title: 'Suppliers', href: '/suppliers' }],
+    breadcrumbs: [
+        {
+            title: 'Suppliers',
+            titleKey: 'page.suppliers.title',
+            href: '/suppliers',
+        },
+    ],
     initialFilters: {
         search: '',
         branch_id: '',
@@ -429,7 +473,15 @@ export const stockTransferConfig = createComplexEntityConfig<StockTransfer>({
     apiEndpoint: '/api/stock-transfers',
     exportEndpoint: '/api/stock-transfers/export',
     queryKey: ['stock-transfers'],
-    breadcrumbs: [{ title: 'Stock Transfers', href: '/stock-transfers' }],
+    titleKey: 'page.stock_transfers.title',
+    descriptionKey: 'page.stock_transfers.description',
+    breadcrumbs: [
+        {
+            title: 'Stock Transfers',
+            titleKey: 'menu.stock_transfer',
+            href: '/stock-transfers',
+        },
+    ],
     initialFilters: {
         search: '',
         from_warehouse_id: '',
@@ -461,8 +513,14 @@ export const inventoryStocktakeConfig =
         apiEndpoint: '/api/inventory-stocktakes',
         exportEndpoint: '/api/inventory-stocktakes/export',
         queryKey: ['inventory-stocktakes'],
+        titleKey: 'page.inventory_stocktakes.title',
+        descriptionKey: 'page.inventory_stocktakes.description',
         breadcrumbs: [
-            { title: 'Inventory Stocktakes', href: '/inventory-stocktakes' },
+            {
+                title: 'Inventory Stocktakes',
+                titleKey: 'menu.inventory_stocktake',
+                href: '/inventory-stocktakes',
+            },
         ],
         initialFilters: {
             search: '',
@@ -490,8 +548,14 @@ export const stockAdjustmentConfig = createComplexEntityConfig<StockAdjustment>(
         apiEndpoint: '/api/stock-adjustments',
         exportEndpoint: '/api/stock-adjustments/export',
         queryKey: ['stock-adjustments'],
+        titleKey: 'page.stock_adjustments.title',
+        descriptionKey: 'page.stock_adjustments.description',
         breadcrumbs: [
-            { title: 'Stock Adjustments', href: '/stock-adjustments' },
+            {
+                title: 'Stock Adjustments',
+                titleKey: 'menu.stock_adjustment',
+                href: '/stock-adjustments',
+            },
         ],
         initialFilters: {
             search: '',
@@ -521,8 +585,14 @@ export const purchaseRequestConfig = createComplexEntityConfig<PurchaseRequest>(
         apiEndpoint: '/api/purchase-requests',
         exportEndpoint: '/api/purchase-requests/export',
         queryKey: ['purchase-requests'],
+        titleKey: 'page.purchase_requests.title',
+        descriptionKey: 'page.purchase_requests.description',
         breadcrumbs: [
-            { title: 'Purchase Requests', href: '/purchase-requests' },
+            {
+                title: 'Purchase Requests',
+                titleKey: 'menu.purchase_request',
+                href: '/purchase-requests',
+            },
         ],
         initialFilters: {
             search: '',
@@ -561,7 +631,13 @@ export const purchaseOrderConfig = createComplexEntityConfig<PurchaseOrder>({
     queryKey: ['purchase-orders'],
     titleKey: 'page.purchase_orders.title',
     descriptionKey: 'page.purchase_orders.description',
-    breadcrumbs: [{ title: 'Purchase Orders', href: '/purchase-orders' }],
+    breadcrumbs: [
+        {
+            title: 'Purchase Orders',
+            titleKey: 'menu.purchase_order',
+            href: '/purchase-orders',
+        },
+    ],
     initialFilters: {
         search: '',
         supplier_id: '',
@@ -594,7 +670,15 @@ export const goodsReceiptConfig = createComplexEntityConfig<GoodsReceipt>({
     apiEndpoint: '/api/goods-receipts',
     exportEndpoint: '/api/goods-receipts/export',
     queryKey: ['goods-receipts'],
-    breadcrumbs: [{ title: 'Goods Receipts', href: '/goods-receipts' }],
+    titleKey: 'page.goods_receipts.title',
+    descriptionKey: 'page.goods_receipts.description',
+    breadcrumbs: [
+        {
+            title: 'Goods Receipts',
+            titleKey: 'menu.goods_receipt',
+            href: '/goods-receipts',
+        },
+    ],
     initialFilters: {
         search: '',
         purchase_order_id: '',
@@ -622,7 +706,15 @@ export const supplierReturnConfig = createComplexEntityConfig<SupplierReturn>({
     apiEndpoint: '/api/supplier-returns',
     exportEndpoint: '/api/supplier-returns/export',
     queryKey: ['supplier-returns'],
-    breadcrumbs: [{ title: 'Supplier Returns', href: '/supplier-returns' }],
+    titleKey: 'page.supplier_returns.title',
+    descriptionKey: 'page.supplier_returns.description',
+    breadcrumbs: [
+        {
+            title: 'Supplier Returns',
+            titleKey: 'menu.supplier_return',
+            href: '/supplier-returns',
+        },
+    ],
     initialFilters: {
         search: '',
         purchase_order_id: '',
@@ -654,6 +746,8 @@ export const supplierCategoryConfig = createSimpleEntityConfig({
     entityName: 'Supplier Category',
     entityNamePlural: 'Supplier Categories',
     description: 'Categories used to group suppliers.',
+    titleKey: 'page.supplier_categories.title',
+    descriptionKey: 'page.supplier_categories.description',
     apiBase: 'supplier-categories',
     filterPlaceholder: 'Search supplier categories...',
     permissionPrefix: 'supplier_category',
@@ -663,6 +757,8 @@ export const customerCategoryConfig = createSimpleEntityConfig({
     entityName: 'Customer Category',
     entityNamePlural: 'Customer Categories',
     description: 'Categories used to group customers.',
+    titleKey: 'page.customer_categories.title',
+    descriptionKey: 'page.customer_categories.description',
     apiBase: 'customer-categories',
     filterPlaceholder: 'Search customer categories...',
     permissionPrefix: 'customer_category',
@@ -672,10 +768,18 @@ export const assetCategoryConfig = createComplexEntityConfig<AssetCategory>({
     entityName: 'Asset Category',
     entityNamePlural: 'Asset Categories',
     description: 'Categories used to classify fixed assets.',
+    titleKey: 'page.asset_categories.title',
+    descriptionKey: 'page.asset_categories.description',
     apiEndpoint: '/api/asset-categories',
     exportEndpoint: '/api/asset-categories/export',
     queryKey: ['asset-categories'],
-    breadcrumbs: [{ title: 'Asset Categories', href: '/asset-categories' }],
+    breadcrumbs: [
+        {
+            title: 'Asset Categories',
+            titleKey: 'page.asset_categories.title',
+            href: '/asset-categories',
+        },
+    ],
     initialFilters: { search: '' },
     columns: assetCategoryColumns,
     filterFields: createSimpleEntityFilterFields('Search asset categories...'),
@@ -692,11 +796,17 @@ export const productCategoryConfig = createComplexEntityConfig<ProductCategory>(
         entityName: 'Product Category',
         entityNamePlural: 'Product Categories',
         description: 'Categories used to classify products and materials.',
+        titleKey: 'page.product_categories.title',
+        descriptionKey: 'page.product_categories.description',
         apiEndpoint: '/api/product-categories',
         exportEndpoint: '/api/product-categories/export',
         queryKey: ['product-categories'],
         breadcrumbs: [
-            { title: 'Product Categories', href: '/product-categories' },
+            {
+                title: 'Product Categories',
+                titleKey: 'page.product_categories.title',
+                href: '/product-categories',
+            },
         ],
         initialFilters: { search: '' },
         columns: productCategoryColumns,
@@ -716,10 +826,14 @@ export const unitConfig = createComplexEntityConfig<Unit>({
     entityName: 'Unit',
     entityNamePlural: 'Units',
     description: 'Units of measure used by products and transactions.',
+    titleKey: 'page.units.title',
+    descriptionKey: 'page.units.description',
     apiEndpoint: '/api/units',
     exportEndpoint: '/api/units/export',
     queryKey: ['units'],
-    breadcrumbs: [{ title: 'Units', href: '/units' }],
+    breadcrumbs: [
+        { title: 'Units', titleKey: 'page.units.title', href: '/units' },
+    ],
     initialFilters: { search: '' },
     columns: unitColumns,
     filterFields: createSimpleEntityFilterFields('Search units...'),
@@ -781,7 +895,15 @@ export const fiscalYearConfig = createComplexEntityConfig<FiscalYear>({
     permissionPrefix: 'fiscal_year',
     exportEndpoint: '/api/fiscal-years/export',
     queryKey: ['fiscal-years'],
-    breadcrumbs: [{ title: 'Fiscal Years', href: '/fiscal-years' }],
+    titleKey: 'page.fiscal_years.title',
+    descriptionKey: 'page.fiscal_years.description',
+    breadcrumbs: [
+        {
+            title: 'Fiscal Years',
+            titleKey: 'page.fiscal_years.title',
+            href: '/fiscal-years',
+        },
+    ],
     initialFilters: { search: '', status: '' },
     columns: fiscalYearColumns,
     filterFields: createFiscalYearFilterFields(),
@@ -806,7 +928,15 @@ export const coaVersionConfig = createComplexEntityConfig<CoaVersion>({
     permissionPrefix: 'coa_version',
     exportEndpoint: '/api/coa-versions/export',
     queryKey: ['coa-versions'],
-    breadcrumbs: [{ title: 'COA Versions', href: '/coa-versions' }],
+    titleKey: 'page.coa_versions.title',
+    descriptionKey: 'page.coa_versions.description',
+    breadcrumbs: [
+        {
+            title: 'COA Versions',
+            titleKey: 'page.coa_versions.title',
+            href: '/coa-versions',
+        },
+    ],
     initialFilters: { search: '', status: '', fiscal_year_id: '' },
     columns: coaVersionColumns,
     filterFields: createCoaVersionFilterFields(),
@@ -832,7 +962,15 @@ export const accountMappingConfig = createComplexEntityConfig<AccountMapping>({
     permissionPrefix: 'account_mapping',
     exportEndpoint: '/api/account-mappings/export',
     queryKey: ['account-mappings'],
-    breadcrumbs: [{ title: 'Account Mappings', href: '/account-mappings' }],
+    titleKey: 'menu.account_mapping',
+    descriptionKey: 'page.account_mappings.description',
+    breadcrumbs: [
+        {
+            title: 'Account Mappings',
+            titleKey: 'menu.account_mapping',
+            href: '/account-mappings',
+        },
+    ],
     initialFilters: {
         search: '',
         type: '',
@@ -899,10 +1037,18 @@ export const assetModelConfig = createComplexEntityConfig<AssetModel>({
     entityName: 'Asset Model',
     entityNamePlural: 'Asset Models',
     description: 'Manufacturer models used as templates for assets.',
+    titleKey: 'page.asset_models.title',
+    descriptionKey: 'page.asset_models.description',
     apiEndpoint: '/api/asset-models',
     exportEndpoint: '/api/asset-models/export',
     queryKey: ['asset-models'],
-    breadcrumbs: [{ title: 'Asset Models', href: '/asset-models' }],
+    breadcrumbs: [
+        {
+            title: 'Asset Models',
+            titleKey: 'page.asset_models.title',
+            href: '/asset-models',
+        },
+    ],
     initialFilters: { search: '', asset_category_id: '' },
     columns: assetModelColumns,
     filterFields: createAssetModelFilterFields(),
@@ -925,10 +1071,18 @@ export const assetLocationConfig = createComplexEntityConfig<AssetLocation>({
     entityName: 'Asset Location',
     entityNamePlural: 'Asset Locations',
     description: 'Physical locations within branches for asset placement.',
+    titleKey: 'page.asset_locations.title',
+    descriptionKey: 'page.asset_locations.description',
     apiEndpoint: '/api/asset-locations',
     exportEndpoint: '/api/asset-locations/export',
     queryKey: ['asset-locations'],
-    breadcrumbs: [{ title: 'Asset Locations', href: '/asset-locations' }],
+    breadcrumbs: [
+        {
+            title: 'Asset Locations',
+            titleKey: 'page.asset_locations.title',
+            href: '/asset-locations',
+        },
+    ],
     initialFilters: { search: '', branch_id: '', parent_id: '' },
     columns: assetLocationColumns,
     filterFields: createAssetLocationFilterFields(),
@@ -946,11 +1100,19 @@ export const assetConfig = createComplexEntityConfig<Asset>({
     entityNamePlural: 'Assets',
     description:
         'Fixed asset register with cost, depreciation, and assignment.',
+    titleKey: 'page.assets.title',
+    descriptionKey: 'page.assets.description',
     apiEndpoint: '/api/assets',
     exportEndpoint: '/api/assets/export',
     queryKey: ['assets'],
     identifierKey: 'ulid',
-    breadcrumbs: [{ title: 'Assets', href: '/assets' }],
+    breadcrumbs: [
+        {
+            title: 'Assets',
+            titleKey: 'page.assets.title',
+            href: '/assets',
+        },
+    ],
     initialFilters: {
         search: '',
         asset_category_id: '',
@@ -977,10 +1139,18 @@ export const assetMovementConfig = createComplexEntityConfig({
     entityName: 'Asset Movement',
     entityNamePlural: 'Asset Movements',
     description: 'Transfer and assignment history of fixed assets.',
+    titleKey: 'page.asset_movements.title',
+    descriptionKey: 'page.asset_movements.description',
     apiEndpoint: '/api/asset-movements',
     exportEndpoint: '/api/asset-movements/export',
     queryKey: ['asset-movements'],
-    breadcrumbs: [{ title: 'Asset Movements', href: '/asset-movements' }],
+    breadcrumbs: [
+        {
+            title: 'Asset Movements',
+            titleKey: 'page.asset_movements.title',
+            href: '/asset-movements',
+        },
+    ],
     initialFilters: {
         search: '',
         asset_id: '',
@@ -1002,11 +1172,17 @@ export const assetMaintenanceConfig =
         entityName: 'Asset Maintenance',
         entityNamePlural: 'Asset Maintenances',
         description: 'Scheduled and performed maintenance for fixed assets.',
+        titleKey: 'page.asset_maintenances.title',
+        descriptionKey: 'page.asset_maintenances.description',
         apiEndpoint: '/api/asset-maintenances',
         exportEndpoint: '/api/asset-maintenances/export',
         queryKey: ['asset-maintenances'],
         breadcrumbs: [
-            { title: 'Asset Maintenances', href: '/asset-maintenances' },
+            {
+                title: 'Asset Maintenances',
+                titleKey: 'page.asset_maintenances.title',
+                href: '/asset-maintenances',
+            },
         ],
         initialFilters: {
             search: '',
@@ -1047,11 +1223,19 @@ export const assetStocktakeConfig = createComplexEntityConfig<AssetStocktake>({
     entityName: 'Asset Stocktake',
     entityNamePlural: 'Asset Stocktakes',
     description: 'Physical verification of fixed assets per branch.',
+    titleKey: 'page.asset_stocktakes.title',
+    descriptionKey: 'page.asset_stocktakes.description',
     apiEndpoint: '/api/asset-stocktakes',
     exportEndpoint: '/api/asset-stocktakes/export',
     queryKey: ['asset-stocktakes'],
     identifierKey: 'ulid',
-    breadcrumbs: [{ title: 'Asset Stocktakes', href: '/asset-stocktakes' }],
+    breadcrumbs: [
+        {
+            title: 'Asset Stocktakes',
+            titleKey: 'page.asset_stocktakes.title',
+            href: '/asset-stocktakes',
+        },
+    ],
     initialFilters: {
         search: '',
         branch_id: '',
@@ -1079,11 +1263,19 @@ export const pipelineConfig = createComplexEntityConfig<Pipeline>({
     entityName: 'Pipeline',
     entityNamePlural: 'Pipelines',
     description: 'Workflow pipelines and the states entities move through.',
+    titleKey: 'page.pipelines.title',
+    descriptionKey: 'page.pipelines.description',
     apiEndpoint: '/api/pipelines',
     permissionPrefix: 'pipeline',
     exportEndpoint: '/api/pipelines/export',
     queryKey: ['pipelines'],
-    breadcrumbs: [{ title: 'Pipelines', href: '/pipelines' }],
+    breadcrumbs: [
+        {
+            title: 'Pipelines',
+            titleKey: 'page.pipelines.title',
+            href: '/pipelines',
+        },
+    ],
     initialFilters: { search: '', entity_type: '', is_active: '' },
     columns: pipelineColumns,
     filterFields: createPipelineFilterFields(),
@@ -1106,11 +1298,19 @@ export const approvalFlowConfig = createComplexEntityConfig<ApprovalFlow>({
     entityName: 'Approval Flow',
     entityNamePlural: 'Approval Flows',
     description: 'Approval definitions with ordered steps and approvers.',
+    titleKey: 'page.approval_flows.title',
+    descriptionKey: 'page.approval_flows.description',
     apiEndpoint: '/api/approval-flows',
     permissionPrefix: 'approval_flow',
     exportEndpoint: '/api/approval-flows/export',
     queryKey: ['approval-flows'],
-    breadcrumbs: [{ title: 'Approval Flows', href: '/approval-flows' }],
+    breadcrumbs: [
+        {
+            title: 'Approval Flows',
+            titleKey: 'page.approval_flows.title',
+            href: '/approval-flows',
+        },
+    ],
     initialFilters: { search: '', approvable_type: '', is_active: '' },
     columns: approvalFlowColumns,
     filterFields: createApprovalFlowFilterFields(),
@@ -1146,7 +1346,15 @@ export const supplierBillConfig = createComplexEntityConfig<SupplierBill>({
     apiEndpoint: '/api/supplier-bills',
     exportEndpoint: '/api/supplier-bills/export',
     queryKey: ['supplier-bills'],
-    breadcrumbs: [{ title: 'Supplier Bills', href: '/supplier-bills' }],
+    titleKey: 'menu.supplier_bill',
+    descriptionKey: 'page.supplier_bills.description',
+    breadcrumbs: [
+        {
+            title: 'Supplier Bills',
+            titleKey: 'menu.supplier_bill',
+            href: '/supplier-bills',
+        },
+    ],
     initialFilters: {
         search: '',
         supplier_id: '',
@@ -1184,7 +1392,15 @@ export const apPaymentConfig = createComplexEntityConfig<ApPayment>({
     loadDetailOnEdit: true,
     detailLoadErrorMessage:
         'Failed to load AP payment details. Please try again.',
-    breadcrumbs: [{ title: 'AP Payments', href: '/ap-payments' }],
+    titleKey: 'menu.ap_payment',
+    descriptionKey: 'page.ap_payments.description',
+    breadcrumbs: [
+        {
+            title: 'AP Payments',
+            titleKey: 'menu.ap_payment',
+            href: '/ap-payments',
+        },
+    ],
     initialFilters: {
         search: '',
         supplier_id: '',
@@ -1218,12 +1434,18 @@ export const approvalDelegationConfig =
         entityNamePlural: 'Approval Delegations',
         description:
             'Delegations that let another user approve on your behalf for a period.',
+        titleKey: 'page.approval_delegations.title',
+        descriptionKey: 'page.approval_delegations.description',
         apiEndpoint: '/api/approval-delegations',
         permissionPrefix: 'approval_delegation',
         exportEndpoint: '/api/approval-delegations/export',
         queryKey: ['approval-delegations'],
         breadcrumbs: [
-            { title: 'Approval Delegations', href: '/approval-delegations' },
+            {
+                title: 'Approval Delegations',
+                titleKey: 'page.approval_delegations.title',
+                href: '/approval-delegations',
+            },
         ],
         initialFilters: {
             search: '',
@@ -1270,8 +1492,14 @@ export const customerInvoiceConfig = createComplexEntityConfig<CustomerInvoice>(
         apiEndpoint: '/api/customer-invoices',
         exportEndpoint: '/api/customer-invoices/export',
         queryKey: ['customer-invoices'],
+        titleKey: 'menu.customer_invoice',
+        descriptionKey: 'page.customer_invoices.description',
         breadcrumbs: [
-            { title: 'Customer Invoices', href: '/customer-invoices' },
+            {
+                title: 'Customer Invoices',
+                titleKey: 'menu.customer_invoice',
+                href: '/customer-invoices',
+            },
         ],
         initialFilters: {
             search: '',
@@ -1311,7 +1539,15 @@ export const arReceiptConfig = createComplexEntityConfig<ArReceipt>({
     loadDetailOnEdit: true,
     detailLoadErrorMessage:
         'Failed to load AR receipt details. Please try again.',
-    breadcrumbs: [{ title: 'AR Receipts', href: '/ar-receipts' }],
+    titleKey: 'menu.ar_receipt',
+    descriptionKey: 'page.ar_receipts.description',
+    breadcrumbs: [
+        {
+            title: 'AR Receipts',
+            titleKey: 'menu.ar_receipt',
+            href: '/ar-receipts',
+        },
+    ],
     initialFilters: {
         search: '',
         customer_id: '',
@@ -1347,7 +1583,15 @@ export const creditNoteConfig = createComplexEntityConfig<CreditNote>({
     permissionPrefix: 'credit_note',
     exportEndpoint: '/api/credit-notes/export',
     queryKey: ['credit-notes'],
-    breadcrumbs: [{ title: 'Credit Notes', href: '/credit-notes' }],
+    titleKey: 'menu.credit_note',
+    descriptionKey: 'page.credit_notes.description',
+    breadcrumbs: [
+        {
+            title: 'Credit Notes',
+            titleKey: 'menu.credit_note',
+            href: '/credit-notes',
+        },
+    ],
     initialFilters: {
         search: '',
         customer_id: '',
@@ -1390,8 +1634,14 @@ export const recurringJournalConfig =
         permissionPrefix: 'recurring_journal',
         exportEndpoint: '/api/recurring-journals/export',
         queryKey: ['recurring-journals'],
+        titleKey: 'menu.recurring_journal',
+        descriptionKey: 'page.recurring_journals.description',
         breadcrumbs: [
-            { title: 'Recurring Journals', href: '/recurring-journals' },
+            {
+                title: 'Recurring Journals',
+                titleKey: 'menu.recurring_journal',
+                href: '/recurring-journals',
+            },
         ],
         initialFilters: { search: '', frequency: '', is_active: '' },
         columns: recurringJournalColumns,
@@ -1423,8 +1673,14 @@ export const bankReconciliationConfig =
         permissionPrefix: 'bank_reconciliation',
         exportEndpoint: '/api/bank-reconciliations/export',
         queryKey: ['bank-reconciliations'],
+        titleKey: 'menu.bank_reconciliation',
+        descriptionKey: 'page.bank_reconciliations.description',
         breadcrumbs: [
-            { title: 'Bank Reconciliations', href: '/bank-reconciliations' },
+            {
+                title: 'Bank Reconciliations',
+                titleKey: 'menu.bank_reconciliation',
+                href: '/bank-reconciliations',
+            },
         ],
         initialFilters: { search: '', status: '', account_id: '' },
         columns: bankReconciliationColumns,
@@ -1451,7 +1707,15 @@ export const periodClosingConfig = createComplexEntityConfig<PeriodClosing>({
     permissionPrefix: 'period_closing',
     exportEndpoint: '/api/period-closings/export',
     queryKey: ['period-closings'],
-    breadcrumbs: [{ title: 'Period Closings', href: '/period-closings' }],
+    titleKey: 'menu.period_closing',
+    descriptionKey: 'page.period_closings.description',
+    breadcrumbs: [
+        {
+            title: 'Period Closings',
+            titleKey: 'menu.period_closing',
+            href: '/period-closings',
+        },
+    ],
     initialFilters: {
         search: '',
         status: '',
@@ -1484,8 +1748,14 @@ export const reportConfigurationConfig =
         permissionPrefix: 'report_configuration',
         exportEndpoint: '/api/report-configurations/export',
         queryKey: ['report-configurations'],
+        titleKey: 'page.report_configurations.title',
+        descriptionKey: 'page.report_configurations.description',
         breadcrumbs: [
-            { title: 'Report Configurations', href: '/report-configurations' },
+            {
+                title: 'Report Configurations',
+                titleKey: 'page.report_configurations.title',
+                href: '/report-configurations',
+            },
         ],
         initialFilters: { search: '', report_type: '', is_active: '' },
         columns: reportConfigurationColumns,
@@ -1506,7 +1776,11 @@ export const budgetConfig = createComplexEntityConfig<Budget>({
     permissionPrefix: 'budget',
     exportEndpoint: '/api/budgets/export',
     queryKey: ['budgets'],
-    breadcrumbs: [{ title: 'Budgets', href: '/budgets' }],
+    titleKey: 'menu.budget',
+    descriptionKey: 'page.budgets.description',
+    breadcrumbs: [
+        { title: 'Budgets', titleKey: 'menu.budget', href: '/budgets' },
+    ],
     initialFilters: {
         search: '',
         status: '',

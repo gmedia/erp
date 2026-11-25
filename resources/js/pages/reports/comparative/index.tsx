@@ -93,7 +93,8 @@ export default function ComparativeReport() {
     return (
         <FinancialReportPageShell
             title="Comparative Report"
-            descriptionKey="reports.pageDescriptions.comparative"
+            titleKey="page.comparative.title"
+            descriptionKey="page.comparative.description"
             path="/reports/comparative"
             fiscalYears={fiscalYears}
             selectedYearId={selectedYearId}

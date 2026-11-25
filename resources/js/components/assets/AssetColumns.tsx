@@ -1,8 +1,7 @@
 'use client';
 
+import { StatusBadgeLabel } from '@/components/common/StatusBadgeLabel';
 import type { TranslatableLabel } from '@/components/common/TranslatedText';
-import { Badge } from '@/components/ui/badge';
-import { formatStatusLabel, statusBadgeVariant } from '@/lib/status-badge';
 import { Asset } from '@/types/asset';
 import {
     createActionsColumn,
@@ -41,14 +40,9 @@ const createAssetRelationColumn = (
     cell: renderRelationCell(accessorKey),
 });
 
-const renderStatusCell = ({ row }: { row: { original: Asset } }) => {
-    const status = row.original.status;
-    return (
-        <Badge variant={statusBadgeVariant(status)}>
-            {formatStatusLabel(status)}
-        </Badge>
-    );
-};
+const renderStatusCell = ({ row }: { row: { original: Asset } }) => (
+    <StatusBadgeLabel status={row.original.status} />
+);
 
 export const assetColumns: ColumnDef<Asset>[] = [
     createSelectColumn<Asset>(),

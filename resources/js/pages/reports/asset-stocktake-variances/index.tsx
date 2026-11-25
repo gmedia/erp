@@ -14,7 +14,8 @@ export default function StocktakeVarianceReport() {
     return (
         <ReportDataTablePage<AssetStocktakeVarianceItem>
             title="Stocktake Variance Report"
-            descriptionKey="reports.pageDescriptions.asset-stocktake-variances"
+            titleKey="page.asset_stocktake_variances.title"
+            descriptionKey="page.asset_stocktake_variances.description"
             breadcrumbs={createReportBreadcrumbs(
                 'Stocktake Variance',
                 '/reports/asset-stocktake-variances',

@@ -2,7 +2,6 @@
 
 import {
     createEmptyReportFilters,
-    createReportBreadcrumbs,
     ReportDataTablePage,
 } from '@/components/common/ReportDataTablePage';
 import {
@@ -15,11 +14,20 @@ export default function ApAgingReportPage() {
     return (
         <ReportDataTablePage<ApAgingReportItem>
             title="AP Aging Report"
-            descriptionKey="reports.pageDescriptions.ap-aging"
-            breadcrumbs={createReportBreadcrumbs(
-                'AP Aging Report',
-                '/reports/ap-aging',
-            )}
+            titleKey="menu.ap_aging_report"
+            descriptionKey="page.ap_aging.description"
+            breadcrumbs={[
+                {
+                    title: 'Reports',
+                    titleKey: 'reports.breadcrumbGroup',
+                    href: '#',
+                },
+                {
+                    title: 'AP Aging Report',
+                    titleKey: 'menu.ap_aging_report',
+                    href: '/reports/ap-aging',
+                },
+            ]}
             columns={apAgingReportColumns}
             filterFields={createApAgingReportFilterFields()}
             initialFilters={createEmptyReportFilters([

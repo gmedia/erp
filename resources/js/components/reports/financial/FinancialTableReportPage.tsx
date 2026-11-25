@@ -19,6 +19,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useTranslation } from '@/contexts/i18n-context';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
 import { formatStatusLabel } from '@/lib/status-badge';
@@ -75,6 +76,7 @@ type FinancialAmountColumn<TItem extends FinancialTableRow> = {
 
 type SingleYearFinancialReportPageShellProps = {
     title: string;
+    titleKey?: string;
     description?: string;
     descriptionKey?: string;
     path: string;
@@ -104,8 +106,24 @@ type FinancialTableCardProps<TItem extends FinancialTableRow> = {
     children?: ReactNode;
 };
 
-const buildBreadcrumbs = (title: string, path: string): BreadcrumbItem[] => [
-    { title: 'Reports', href: '#' },
+export const resolveShellTitle = (
+    t: (key: string) => string,
+    key: string | undefined,
+    fallback: string,
+): string => {
+    if (!key) {
+        return fallback;
+    }
+    const translated = t(key);
+    return translated === key ? fallback : translated;
+};
+
+const buildBreadcrumbs = (
+    t: (key: string) => string,
+    title: string,
+    path: string,
+): BreadcrumbItem[] => [
+    { title: t('reports.breadcrumbGroup'), href: '#' },
     { title, href: path },
 ];
 
@@ -223,7 +241,8 @@ export function useSingleYearFinancialReportPage<TReport>({
 }
 
 export function SingleYearFinancialReportPageShell({
-    title,
+    title: fallbackTitle,
+    titleKey,
     description,
     descriptionKey,
     path,
@@ -239,6 +258,8 @@ export function SingleYearFinancialReportPageShell({
     hasError = false,
     children,
 }: Readonly<SingleYearFinancialReportPageShellProps>) {
+    const { t } = useTranslation();
+    const title = resolveShellTitle(t, titleKey, fallbackTitle);
     let content: ReactNode;
     if (isLoading) {
         content = (
@@ -319,7 +340,7 @@ export function SingleYearFinancialReportPageShell({
     }
 
     return (
-        <AppLayout breadcrumbs={buildBreadcrumbs(title, path)}>
+        <AppLayout breadcrumbs={buildBreadcrumbs(t, title, path)}>
             <Helmet>
                 <title>{title}</title>
             </Helmet>

@@ -7,10 +7,21 @@ import { BreadcrumbItem } from '@/types';
 import { RefreshCw } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 
+const translateOr = (
+    t: (key: string) => string,
+    key: string,
+    fallback: string,
+): string => {
+    const translated = t(key);
+    return translated === key ? fallback : translated;
+};
+
 interface DashboardPageShellProps {
     title: string;
     heading: string;
+    headingKey?: string;
     description: string;
+    descriptionKey?: string;
     breadcrumbs: BreadcrumbItem[];
     toolbar?: React.ReactNode;
     isLoading: boolean;
@@ -24,8 +35,10 @@ interface DashboardPageShellProps {
 
 export default function DashboardPageShell({
     title,
-    heading,
-    description,
+    heading: fallbackHeading,
+    headingKey,
+    description: fallbackDescription,
+    descriptionKey,
     breadcrumbs,
     toolbar,
     isLoading,
@@ -37,6 +50,12 @@ export default function DashboardPageShell({
     children,
 }: Readonly<DashboardPageShellProps>) {
     const { t } = useTranslation();
+    const heading = headingKey
+        ? translateOr(t, headingKey, fallbackHeading)
+        : fallbackHeading;
+    const description = descriptionKey
+        ? translateOr(t, descriptionKey, fallbackDescription)
+        : fallbackDescription;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

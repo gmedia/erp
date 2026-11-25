@@ -2,7 +2,6 @@
 
 import {
     createEmptyReportFilters,
-    createReportBreadcrumbs,
     ReportDataTablePage,
 } from '@/components/common/ReportDataTablePage';
 import {
@@ -15,11 +14,20 @@ export default function GeneralLedgerReportPage() {
     return (
         <ReportDataTablePage<GeneralLedgerItem>
             title="General Ledger Report"
-            descriptionKey="reports.pageDescriptions.general-ledger"
-            breadcrumbs={createReportBreadcrumbs(
-                'General Ledger',
-                '/reports/general-ledger',
-            )}
+            titleKey="page.general_ledger.title"
+            descriptionKey="page.general_ledger.description"
+            breadcrumbs={[
+                {
+                    title: 'Reports',
+                    titleKey: 'reports.breadcrumbGroup',
+                    href: '#',
+                },
+                {
+                    title: 'General Ledger',
+                    titleKey: 'menu.general_ledger_report',
+                    href: '/reports/general-ledger',
+                },
+            ]}
             columns={generalLedgerColumns}
             filterFields={createGeneralLedgerFilterFields()}
             initialFilters={createEmptyReportFilters([

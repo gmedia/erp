@@ -25,6 +25,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useAssetDepreciationRuns } from '@/hooks/useAssetDepreciationRuns';
 import { usePermissions } from '@/hooks/usePermissions';
 import { statusBadgeVariant } from '@/lib/status-badge';
@@ -38,10 +39,15 @@ import { useState } from 'react';
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
     { title: 'Asset Management', href: '/assets' },
-    { title: 'Depreciation Runs', href: '/asset-depreciation-runs' },
+    {
+        title: 'Depreciation Runs',
+        titleKey: 'menu.asset_depreciation_run',
+        href: '/asset-depreciation-runs',
+    },
 ];
 
 export default function Index() {
+    const { t } = useTranslation();
     const {
         data,
         meta,
@@ -220,15 +226,10 @@ export default function Index() {
 
     return (
         <StandaloneTablePage
-            title="Asset Depreciation Runs"
-            heading="Depreciation Runs"
+            title={t('page.asset_depreciation_runs.title')}
+            heading={t('menu.asset_depreciation_run')}
             breadcrumbs={breadcrumbs}
-            description={
-                <>
-                    Calculate and review asset depreciation. Once verified, post
-                    the calculated amounts to the general ledger.
-                </>
-            }
+            description={t('page.asset_depreciation_runs.description')}
             actions={
                 canEdit ? (
                     <Button onClick={() => setIsCalcOpen(true)}>

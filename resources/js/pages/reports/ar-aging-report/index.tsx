@@ -15,7 +15,8 @@ export default function ArAgingReportPage() {
     return (
         <ReportDataTablePage<ArAgingReportItem>
             title="AR Aging Report"
-            descriptionKey="reports.pageDescriptions.ar-aging"
+            titleKey="menu.ar_aging_report"
+            descriptionKey="page.ar_aging.description"
             breadcrumbs={createReportBreadcrumbs(
                 'AR Aging Report',
                 '/reports/ar-aging',

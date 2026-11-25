@@ -15,7 +15,8 @@ export default function CustomerStatementReportPage() {
     return (
         <ReportDataTablePage<CustomerStatementReportItem>
             title="Customer Statement Report"
-            descriptionKey="reports.pageDescriptions.customer-statement"
+            titleKey="page.customer_statement.title"
+            descriptionKey="page.customer_statement.description"
             breadcrumbs={createReportBreadcrumbs(
                 'Customer Statement',
                 '/reports/customer-statement',

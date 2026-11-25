@@ -85,7 +85,8 @@ export default function IncomeStatement() {
     return (
         <FinancialReportPageShell
             title="Income Statement"
-            descriptionKey="reports.pageDescriptions.income-statement"
+            titleKey="menu.income_statement_report"
+            descriptionKey="page.income_statement.description"
             path="/reports/income-statement"
             fiscalYears={fiscalYears}
             selectedYearId={selectedYearId}

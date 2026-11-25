@@ -15,7 +15,10 @@ export function createProductFilterFields(): FieldDescriptor[] {
         createTextFilterField(
             'search',
             { key: 'column.search', fallback: 'Search' },
-            'Search code, name...',
+            {
+                key: 'page.products.filter_search_placeholder',
+                fallback: 'Search code, name...',
+            },
         ),
         ...createProductCatalogAsyncFilterFields(),
         ...createProductTypeStatusFilterFields(),

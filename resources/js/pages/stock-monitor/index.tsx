@@ -161,7 +161,7 @@ export default function StockMonitorPage() {
                 { title: 'Inventory', href: '#' },
                 {
                     title: 'Stock Monitor',
-                    titleKey: 'page.stock_monitor.title',
+                    titleKey: 'menu.stock_monitor',
                     href: '/stock-monitor',
                 },
             ]}
