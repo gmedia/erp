@@ -2,10 +2,10 @@ import type { BadgeVariant } from '@/components/ui/badge';
 
 // Peta semantik status → tone badge (docs/ui-design-rules.md §0.1 & §2.5).
 // Sumber: docs/visual-audit/FINDINGS.md W4-01/W4-02.
-const NEUTRAL: BadgeVariant = 'outline';
+const NEUTRAL: BadgeVariant = 'neutral';
 const POSITIVE: BadgeVariant = 'success';
 const PENDING: BadgeVariant = 'warning';
-const MUTED: BadgeVariant = 'secondary';
+const MUTED: BadgeVariant = 'neutral';
 const DANGER: BadgeVariant = 'destructive-soft';
 
 // Status yang selesai/diproses tanpa konotasi sukses penuh (mis. in_transit,
