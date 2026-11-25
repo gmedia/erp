@@ -899,6 +899,16 @@ test('ap aging report title uses the sidebar menu label in both locales', functi
         ->and($id['page']['ap_aging']['description'])->not->toBe($en['page']['ap_aging']['description']);
 });
 
+test('stock movements breadcrumb group label uses the inventory menu key in both locales', function () {
+    $en = json_decode(File::get(lang_path('en.json')), true, 512, JSON_THROW_ON_ERROR);
+    $id = json_decode(File::get(lang_path('id.json')), true, 512, JSON_THROW_ON_ERROR);
+
+    expect($en['menu']['inventory'])->toBe('Inventory')
+        ->and($id['menu']['inventory'])->toBe('Persediaan')
+        ->and($id['menu']['inventory'])->not->toBe($en['menu']['inventory'])
+        ->and($en['page']['stock_movements']['title'])->toBe('Stock Movements');
+});
+
 test('page translation values are non-empty strings', function () {
     foreach (['en.json', 'id.json'] as $file) {
         foreach (localePageTranslations($file) as $module => $strings) {

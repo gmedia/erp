@@ -18,7 +18,7 @@ export default function StockMovementsPage() {
             description="Digital stock card — product movements by warehouse, type, and period."
             descriptionKey="page.stock_movements.description"
             breadcrumbs={[
-                { title: 'Inventory', href: '#' },
+                { title: 'Inventory', titleKey: 'menu.inventory', href: '#' },
                 {
                     title: 'Stock Movements',
                     titleKey: 'menu.stock_movement',
