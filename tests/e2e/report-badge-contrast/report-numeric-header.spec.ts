@@ -15,17 +15,20 @@ async function expectReportNumericHeaderRightAligned(
         .first();
     await expect(valueText).toBeVisible();
 
-    // Tepi kanan tombol header dibandingkan dengan teks nilai (pola #463).
-    const headRight = await head
-        .locator('button')
-        .first()
-        .evaluate((el) => el.getBoundingClientRect().right);
-    const valueRight = await valueText.evaluate(
-        (el) => el.getBoundingClientRect().right,
-    );
+    const headTarget =
+        (await head.locator('button').count()) > 0
+            ? head.locator('button').first()
+            : head.locator('div, span').first();
+    const textRight = (el: Element) => {
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        return range.getBoundingClientRect().right;
+    };
+    const headRight = await headTarget.evaluate(textRight);
+    const valueRight = await valueText.evaluate(textRight);
     expect(
         Math.abs(headRight - valueRight),
-        `${label}: head button right=${headRight} vs value text right=${valueRight}`,
+        `${label}: head right=${headRight} vs value text right=${valueRight}`,
     ).toBeLessThanOrEqual(4);
 }
 

@@ -201,7 +201,7 @@ function createReportDisplayColumn<TData>({
         enableSorting: false,
         header:
             align === 'right'
-                ? () => <div className="text-right">{header}</div>
+                ? () => <div className="pr-2 text-right">{header}</div>
                 : header,
         cell,
     };
