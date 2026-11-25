@@ -25,6 +25,11 @@ type StockMonitorSummary = {
     by_warehouse: { name: string; quantity: string; value: string }[];
     by_category: { name: string; quantity: string; value: string }[];
     by_branch: { name: string; quantity: string; value: string }[];
+    in_transit?: {
+        total_items: number;
+        total_quantity: string;
+        total_value: string;
+    };
 };
 
 type StockMonitorResponse = {

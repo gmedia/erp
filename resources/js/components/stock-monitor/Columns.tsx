@@ -73,6 +73,7 @@ export function createStockMonitorColumns(): ColumnDef<StockMonitorItem>[] {
             },
             getValue: (item) => formatDate(item.moved_at),
             sortable: true,
+            className: 'max-w-44 whitespace-nowrap',
         }),
     ];
 }

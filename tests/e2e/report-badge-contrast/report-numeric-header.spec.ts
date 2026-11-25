@@ -239,8 +239,12 @@ test.describe('Badge status - tone dibedakan', () => {
         expect(statusBadgeVariant('partially_received')).not.toBe(
             statusBadgeVariant('confirmed'),
         );
-        expect(statusBadgeVariant('partially_received')).toBe('warning');
-        expect(statusBadgeVariant('cancelled')).toBe('outline');
+        expect(statusBadgeVariant('partially_received')).not.toBe(
+            statusBadgeVariant('pending_approval'),
+        );
+        expect(statusBadgeVariant('partially_received')).toBe('outline');
+        expect(statusBadgeVariant('pending_approval')).toBe('warning');
+        expect(statusBadgeVariant('cancelled')).toBe('destructive-soft');
     });
 });
 

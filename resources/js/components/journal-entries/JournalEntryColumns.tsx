@@ -28,10 +28,21 @@ export const journalEntryColumns: ColumnDef<JournalEntry>[] = [
         cell: ({ row }) =>
             formatDateByRegionalSettings(row.getValue('entry_date') as string),
     },
-    createTextColumn<JournalEntry>({
+    {
         accessorKey: 'description',
-        label: { key: 'column.description', fallback: 'Description' },
-    }),
+        ...createSortingHeader({
+            key: 'column.description',
+            fallback: 'Description',
+        }),
+        cell: ({ row }) => {
+            const text = row.original.description || '-';
+            return (
+                <div className="w-40 truncate sm:w-56" title={text}>
+                    {text}
+                </div>
+            );
+        },
+    },
     createTextColumn<JournalEntry>({
         accessorKey: 'reference',
         label: { key: 'column.reference', fallback: 'Reference' },

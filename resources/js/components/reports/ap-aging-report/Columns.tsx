@@ -57,6 +57,7 @@ export const apAgingReportColumns: ColumnDef<ApAgingReportItem>[] = [
         accessorKey: 'supplier.name',
         header: { key: 'column.supplier', fallback: 'Supplier' },
         getValue: (item) => item.supplier?.name,
+        className: 'max-w-40 sm:max-w-[12rem]',
         sortable: true,
     }),
     createReportTextColumn<ApAgingReportItem>({
