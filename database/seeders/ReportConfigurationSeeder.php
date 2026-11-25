@@ -124,6 +124,9 @@ class ReportConfigurationSeeder extends Seeder
             ]
         );
 
+        // Kedua section tanpa filter akun dan tanpa formula mengambil nilai dari
+        // total trial balance (debit net) yang dipasok ReportController, dikunci
+        // berdasarkan kode section. Tidak ada formula agar tidak tergantung urutan.
         $sections = [
             ['all_accounts', 'Semua Akun', ReportSection::TYPE_DETAIL, null, null, null, null],
             ['total_debit_credit', 'TOTAL', ReportSection::TYPE_TOTAL, null, null, null, null],
