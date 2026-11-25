@@ -77,7 +77,7 @@ class AssetMovementResource extends JsonResource
 
         return JournalEntry::query()
             ->where('journal_type', 'system')
-            ->whereIn('reference', ['DISP-'.$assetCode, 'LOSS-'.$assetCode])
+            ->whereIn('reference', ['DISP-' . $assetCode, 'LOSS-' . $assetCode])
             ->value('id');
     }
 }
