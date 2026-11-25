@@ -28,6 +28,13 @@ export const employeeColumns: ColumnDef<Employee>[] = [
         accessorKey: 'name',
         label: { key: 'column.name', fallback: 'Name' },
         primary: true,
+        description: (row) =>
+            [
+                row.current_employment?.position?.name,
+                row.current_employment?.department?.name,
+            ]
+                .filter(Boolean)
+                .join(' · ') || null,
     }),
     {
         id: 'employments.employment_status',
