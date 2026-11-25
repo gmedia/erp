@@ -596,7 +596,14 @@
         "request_date": "Tanggal Permintaan",
         "required_date": "Tanggal Dibutuhkan",
         "priority": "Prioritas",
-        "estimated_amount": "Estimasi Nilai"
+        "estimated_amount": "Estimasi Nilai",
+        "gr_number": "No. GR",
+        "receipt_date": "Tanggal Terima",
+        "supplier_delivery_note": "Surat Jalan Pemasok",
+        "received_by": "Diterima Oleh",
+        "return_number": "No. Retur",
+        "return_date": "Tanggal Retur",
+        "reason": "Alasan"
     },
     "status": {
         "draft": "Draf",

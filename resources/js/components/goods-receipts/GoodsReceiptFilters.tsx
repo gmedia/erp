@@ -25,7 +25,7 @@ export function createGoodsReceiptFilterFields(): FieldDescriptor[] {
         ),
         createEmployeeLookupFilterField(
             'received_by',
-            'Received By',
+            { key: 'column.received_by', fallback: 'Received By' },
             'Select employee',
         ),
         ...createDateFilterFields([

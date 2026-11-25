@@ -228,7 +228,7 @@ export const assetStocktakeVarianceResultOptions: SelectOption[] = [
 
 export type AsyncSelectFilterConfig = {
     name: string;
-    label: string;
+    label: TranslatableLabel;
     url: string;
     placeholder: string;
 };
@@ -302,7 +302,7 @@ export function createTextFilterField(
 // Generic async select filter field creator
 export function createAsyncSelectFilterField(
     name: string,
-    label: string,
+    label: TranslatableLabel,
     url: string,
     placeholder: string,
 ): FieldDescriptor {
@@ -410,7 +410,7 @@ export function createProductFilterField(
 
 export function createEmployeeLookupFilterField(
     name = 'employee_id',
-    label = 'Employee',
+    label: TranslatableLabel = 'Employee',
     placeholder = 'Select employee',
 ): FieldDescriptor {
     return createAsyncSelectFilterField(

@@ -596,7 +596,14 @@
         "request_date": "Request Date",
         "required_date": "Required Date",
         "priority": "Priority",
-        "estimated_amount": "Estimated Amount"
+        "estimated_amount": "Estimated Amount",
+        "gr_number": "GR Number",
+        "receipt_date": "Receipt Date",
+        "supplier_delivery_note": "Supplier Delivery Note",
+        "received_by": "Received By",
+        "return_number": "Return Number",
+        "return_date": "Return Date",
+        "reason": "Reason"
     },
     "status": {
         "draft": "Draft",
