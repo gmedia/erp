@@ -1109,6 +1109,31 @@
         },
         "aging_dashboard": {
             "description": "Monitor outstanding receivables and payables bucketed by overdue age."
+        },
+        "ap_aging": {
+            "description": "Payables grouped by age bucket to show overdue supplier balances."
+        },
+        "ap_outstanding": {
+            "title": "AP Outstanding Report",
+            "description": "Open supplier bills that still have an unpaid balance."
+        },
+        "ap_payment_history": {
+            "description": "Payments made to suppliers within the selected period."
+        },
+        "ar_aging": {
+            "description": "Receivables grouped by age bucket to show overdue customer balances."
+        },
+        "ar_outstanding": {
+            "title": "AR Outstanding Report",
+            "description": "Open customer invoices that still have an unpaid balance."
+        },
+        "customer_statement": {
+            "title": "Customer Statement Report",
+            "description": "Transaction history and outstanding balance for one customer."
+        },
+        "budget_variance": {
+            "title": "Budget Variance Report",
+            "description": "Compare actual spending against the approved budget per account."
         }
     },
     "stock_monitor_summary": {

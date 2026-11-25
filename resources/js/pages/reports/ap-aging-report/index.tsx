@@ -15,7 +15,7 @@ export default function ApAgingReportPage() {
         <ReportDataTablePage<ApAgingReportItem>
             title="AP Aging Report"
             titleKey="menu.ap_aging_report"
-            descriptionKey="reports.pageDescriptions.ap-aging"
+            descriptionKey="page.ap_aging.description"
             breadcrumbs={[
                 {
                     title: 'Reports',

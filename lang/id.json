@@ -1109,6 +1109,31 @@
         },
         "aging_dashboard": {
             "description": "Pantau piutang dan utang yang belum dibayar, dikelompokkan berdasarkan umur jatuh tempo."
+        },
+        "ap_aging": {
+            "description": "Utang dikelompokkan per umur untuk melihat saldo pemasok yang jatuh tempo."
+        },
+        "ap_outstanding": {
+            "title": "Laporan Hutang Belum Lunas",
+            "description": "Tagihan pemasok yang masih memiliki saldo belum dibayar."
+        },
+        "ap_payment_history": {
+            "description": "Pembayaran ke pemasok dalam periode yang dipilih."
+        },
+        "ar_aging": {
+            "description": "Piutang dikelompokkan per umur untuk melihat saldo pelanggan yang jatuh tempo."
+        },
+        "ar_outstanding": {
+            "title": "Laporan Piutang Belum Lunas",
+            "description": "Faktur pelanggan yang masih memiliki saldo belum dibayar."
+        },
+        "customer_statement": {
+            "title": "Laporan Mutasi Pelanggan",
+            "description": "Riwayat transaksi dan saldo belum dibayar untuk satu pelanggan."
+        },
+        "budget_variance": {
+            "title": "Laporan Selisih Anggaran",
+            "description": "Bandingkan realisasi belanja dengan anggaran yang disetujui per akun."
         }
     },
     "stock_monitor_summary": {

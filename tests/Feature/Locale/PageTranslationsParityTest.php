@@ -534,6 +534,84 @@ test('financial report group page titles follow the menu-or-exception decision',
         ->and($en['menu']['aging_dashboard'])->toBe('Aging Dashboard');
 });
 
+test('ap/ar and budget variance report page strings keep the english labels', function () {
+    $en = localePageTranslations('en.json');
+
+    expect($en['ap_aging']['description'])->toBe('Payables grouped by age bucket to show overdue supplier balances.')
+        ->and($en['ap_outstanding']['title'])->toBe('AP Outstanding Report')
+        ->and($en['ap_outstanding']['description'])->toBe('Open supplier bills that still have an unpaid balance.')
+        ->and($en['ap_payment_history']['description'])->toBe('Payments made to suppliers within the selected period.')
+        ->and($en['ar_aging']['description'])->toBe(
+            'Receivables grouped by age bucket to show overdue customer balances.',
+        )
+        ->and($en['ar_outstanding']['title'])->toBe('AR Outstanding Report')
+        ->and($en['ar_outstanding']['description'])->toBe('Open customer invoices that still have an unpaid balance.')
+        ->and($en['customer_statement']['title'])->toBe('Customer Statement Report')
+        ->and($en['customer_statement']['description'])->toBe(
+            'Transaction history and outstanding balance for one customer.',
+        )
+        ->and($en['budget_variance']['title'])->toBe('Budget Variance Report')
+        ->and($en['budget_variance']['description'])->toBe(
+            'Compare actual spending against the approved budget per account.',
+        );
+});
+
+test('ap/ar and budget variance report page strings are translated to indonesian', function () {
+    $en = localePageTranslations('en.json');
+    $id = localePageTranslations('id.json');
+
+    $modules = [
+        'ap_aging',
+        'ap_outstanding',
+        'ap_payment_history',
+        'ar_aging',
+        'ar_outstanding',
+        'customer_statement',
+        'budget_variance',
+    ];
+
+    foreach ($modules as $module) {
+        foreach (array_keys($en[$module]) as $field) {
+            expect($id[$module][$field])->not->toBe($en[$module][$field], "page.{$module}.{$field} not translated");
+        }
+    }
+
+    expect($id['ap_outstanding']['title'])->toBe('Laporan Hutang Belum Lunas')
+        ->and($id['budget_variance']['title'])->toBe('Laporan Selisih Anggaran');
+});
+
+test('ap/ar and budget variance report titles follow the menu-or-exception decision', function () {
+    // Aturan (issue #462 <!-- decision -->): judul memakai menu.* bila teks English sama.
+    // Pengecualian eksplisit: judul English beda dengan menu, jadi tetap page.<slug>.title.
+    // Judul yang English-nya sama dengan menu memakai menu.* (tidak ada kunci page.*.title).
+    $menuTitles = [
+        'ap_aging' => ['menu' => 'ap_aging_report', 'title' => 'AP Aging Report'],
+        'ap_payment_history' => ['menu' => 'ap_payment_history_report', 'title' => 'AP Payment History'],
+        'ar_aging' => ['menu' => 'ar_aging_report', 'title' => 'AR Aging Report'],
+    ];
+    // Pengecualian eksplisit: judul English berbeda dengan menu, tetap page.<slug>.title.
+    $exceptions = [
+        'ap_outstanding' => 'ap_outstanding_report',
+        'ar_outstanding' => 'ar_outstanding_report',
+        'customer_statement' => 'customer_statement_report',
+        'budget_variance' => 'budget_variance_report',
+    ];
+
+    $en = json_decode(File::get(lang_path('en.json')), true, 512, JSON_THROW_ON_ERROR);
+
+    foreach ($menuTitles as $pageKey => $menuTitle) {
+        expect($en['menu'][$menuTitle['menu']])->toBe($menuTitle['title']);
+        expect(array_key_exists('title', $en['page'][$pageKey]))->toBeFalse();
+    }
+
+    foreach ($exceptions as $pageKey => $menuKey) {
+        expect($en['page'][$pageKey]['title'])->not->toBe(
+            $en['menu'][$menuKey],
+            "page.{$pageKey}.title equals menu.{$menuKey}; move it out of the exception list",
+        );
+    }
+});
+
 test('page translation values are non-empty strings', function () {
     foreach (['en.json', 'id.json'] as $file) {
         foreach (localePageTranslations($file) as $module => $strings) {
