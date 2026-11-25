@@ -49,6 +49,28 @@ describe('Inventory Stocktake API Endpoints', function () {
             ]);
     });
 
+    test('index includes cancelled stocktakes by default (V8-13)', function () {
+        InventoryStocktake::factory()->create(['status' => 'cancelled']);
+        InventoryStocktake::factory()->create(['status' => 'draft']);
+
+        $response = getJson('/api/inventory-stocktakes');
+        $response->assertOk();
+
+        expect($response->json('data'))->toHaveCount(2)
+            ->and($response->json('data.*.status'))->toContain('cancelled', 'draft');
+    });
+
+    test('index default order is newest first (V8-44)', function () {
+        $older = InventoryStocktake::factory()->create(['status' => 'draft', 'created_at' => '2026-01-01 08:00:00']);
+        $newer = InventoryStocktake::factory()->create(['status' => 'draft', 'created_at' => '2026-03-01 08:00:00']);
+
+        $response = getJson('/api/inventory-stocktakes');
+        $response->assertOk();
+
+        expect($response->json('data.0.id'))->toBe($newer->id)
+            ->and($response->json('data.1.id'))->toBe($older->id);
+    });
+
     test('store creates a stocktake with items and auto-generates number', function () {
         $warehouse = Warehouse::factory()->create();
         $product = Product::factory()->create();

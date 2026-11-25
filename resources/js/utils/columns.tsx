@@ -111,6 +111,7 @@ export function createSortingHeader(
                         column.toggleSorting(column.getIsSorted() === 'asc')
                     }
                     data-testid={`sort-${label.toLowerCase().replaceAll(/\s+/g, '-')}`}
+                    data-sort-state={column.getIsSorted() || 'none'}
                 >
                     {label}
                     <SortDirectionIcon sorted={column.getIsSorted()} />

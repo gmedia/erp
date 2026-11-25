@@ -20,7 +20,7 @@ class IndexStockAdjustmentsAction
     {
         $query = StockAdjustment::query()->with(['warehouse', 'inventoryStocktake']);
 
-        return $this->handleIndexRequestWithStatusExclusion(
+        return $this->handleIndexRequest(
             $request,
             $query,
             $this->filterService,
@@ -48,7 +48,6 @@ class IndexStockAdjustmentsAction
                 'created_at',
                 'updated_at',
             ],
-            'cancelled',
         );
     }
 }

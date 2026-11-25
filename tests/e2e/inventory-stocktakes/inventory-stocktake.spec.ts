@@ -26,6 +26,9 @@ generateModuleTests({
 
     viewType: 'dialog',
 
+    deleteMode: 'soft-cancel',
+    expectedStatusLabel: 'Cancelled',
+
     exportApiPath: '/api/inventory-stocktakes/export',
     expectedExportColumns: [
         'ID',

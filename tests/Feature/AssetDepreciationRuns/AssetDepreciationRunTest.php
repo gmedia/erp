@@ -71,6 +71,23 @@ test('user can list depreciation runs with filters', function () {
         ->assertJsonPath('meta.total', 1);
 });
 
+test('depreciation run list exposes total depreciation amount (V8-26)', function () {
+    $run = AssetDepreciationRun::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'period_start' => '2024-02-01',
+        'period_end' => '2024-02-29',
+        'status' => 'calculated',
+    ]);
+    AssetDepreciationLine::factory()->create(['asset_depreciation_run_id' => $run->id, 'amount' => 150000]);
+    AssetDepreciationLine::factory()->create(['asset_depreciation_run_id' => $run->id, 'amount' => 250000]);
+
+    $response = getJson('/api/asset-depreciation-runs?fiscal_year_id=' . $this->fiscalYear->id . '&per_page=10');
+
+    $response->assertOk()
+        ->assertJsonPath('data.0.id', $run->id)
+        ->assertJsonPath('data.0.total_amount', 400000);
+});
+
 test('user can calculate depreciation', function () {
     Asset::factory()->create([
         'purchase_cost' => 12000000,

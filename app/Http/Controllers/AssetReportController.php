@@ -18,7 +18,7 @@ class AssetReportController extends Controller
     {
         $assets = $action->execute($request);
 
-        return new AssetCollection($assets);
+        return new AssetCollection($assets, $action->summarize($request));
     }
 
     /**

@@ -17,7 +17,7 @@ class IndexAssetDepreciationRunRequest extends BaseListingRequest
                 'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
                 'status' => ['nullable', Rule::in(['draft', 'calculated', 'posted', 'void'])],
             ],
-            $this->listingSortRules('period_start,period_end,status,created_at'),
+            $this->listingSortRules('period_start,period_end,status,total_amount,created_at'),
             $this->paginationRules(),
         );
     }

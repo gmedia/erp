@@ -16,7 +16,9 @@ class IndexJournalEntryRequest extends BaseListingRequest
                 'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
                 'status' => ['nullable', Rule::in(['draft', 'posted', 'void'])],
             ],
-            $this->listingSortRules('entry_date,entry_number,description,reference,total_debit,status,created_at'),
+            $this->listingSortRules(
+                'entry_date,entry_number,description,reference,total_debit,total_credit,status,created_at',
+            ),
             $this->paginationRules(),
         );
     }

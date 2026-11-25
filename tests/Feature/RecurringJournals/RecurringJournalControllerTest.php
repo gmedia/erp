@@ -176,6 +176,16 @@ test('it validates lines must be balanced', function () {
         ->assertJsonValidationErrors('lines');
 });
 
+test('index default order is newest first with id tie-break', function () {
+    $sameTime = '2026-02-01 08:00:00';
+    $older = RecurringJournal::factory()->create(['created_at' => $sameTime, 'updated_at' => $sameTime]);
+    $newer = RecurringJournal::factory()->create(['created_at' => $sameTime, 'updated_at' => $sameTime]);
+
+    $ids = collect(getJson('/api/recurring-journals?per_page=100')->json('data'))->pluck('id')->all();
+
+    expect(array_search($newer->id, $ids, true))->toBeLessThan(array_search($older->id, $ids, true));
+});
+
 test('it returns 403 without recurring_journal permission', function () {
     $user = createTestUserWithPermissions([]);
     Sanctum::actingAs($user, ['*']);

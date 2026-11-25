@@ -71,6 +71,7 @@ type ReportDataTablePageProps<
 export type ReportSummaryColumn = {
     key: string;
     label: string;
+    columnId?: string;
 };
 
 function formatSummaryAmount(value: string | undefined): string {
@@ -89,53 +90,51 @@ export function ReportPageDescription({
     return <>{t(descriptionKey)}</>;
 }
 
-function ReportSummaryFooter({
-    summary,
-    columns,
-}: Readonly<{
-    summary: { as_of_date?: string; totals?: Record<string, string> };
-    columns: readonly ReportSummaryColumn[];
-}>) {
+type ReportSummary = {
+    as_of_date?: string;
+    totals?: Record<string, string>;
+};
+
+function ReportSummaryAsOf({ summary }: Readonly<{ summary: ReportSummary }>) {
     const { t } = useTranslation();
 
+    if (!summary.as_of_date) {
+        return null;
+    }
+
     return (
-        <div
-            data-testid="report-summary"
-            className="flex flex-wrap items-center justify-between gap-2 border-t bg-muted/40 px-4 py-2 text-sm"
+        <p
+            data-testid="report-as-of"
+            className="px-2 text-xs text-muted-foreground"
         >
-            <div className="flex flex-col">
-                <span className="font-medium text-foreground">
-                    {t('reports.totalRow')}
-                </span>
-                {summary.as_of_date ? (
-                    <span
-                        data-testid="report-as-of"
-                        className="text-xs text-muted-foreground"
-                    >
-                        {t('reports.asOfDate').replace(
-                            '{date}',
-                            formatDateByRegionalSettings(summary.as_of_date),
-                        )}
-                    </span>
-                ) : null}
-            </div>
-            <dl className="flex flex-wrap gap-x-6 gap-y-2">
-                {columns.map((column) => (
-                    <div key={column.key} className="flex flex-col items-end">
-                        <dt className="text-xs text-muted-foreground">
-                            {column.label}
-                        </dt>
-                        <dd
-                            data-testid={`report-total-${column.key}`}
-                            className="font-medium text-foreground tabular-nums"
-                        >
-                            {formatSummaryAmount(summary.totals?.[column.key])}
-                        </dd>
-                    </div>
-                ))}
-            </dl>
-        </div>
+            {t('reports.asOfDate').replace(
+                '{date}',
+                formatDateByRegionalSettings(summary.as_of_date),
+            )}
+        </p>
     );
+}
+
+function buildSummaryRow(
+    summary: ReportSummary,
+    columns: readonly ReportSummaryColumn[],
+    label: string,
+) {
+    return {
+        label,
+        values: Object.fromEntries(
+            columns.map((column) => [
+                column.columnId ?? column.key,
+                <span
+                    key={column.key}
+                    data-testid={`report-total-${column.key}`}
+                    className="font-medium text-foreground"
+                >
+                    {formatSummaryAmount(summary.totals?.[column.key])}
+                </span>,
+            ]),
+        ),
+    };
 }
 
 function hasAllRequiredFilters(
@@ -199,6 +198,7 @@ export function ReportDataTablePage<
     defaultColumnVisibility,
     summaryColumns,
 }: Readonly<ReportDataTablePageProps<TData, TFilters>>) {
+    const { t } = useTranslation();
     const {
         filters,
         pagination,
@@ -250,6 +250,9 @@ export function ReportDataTablePage<
                             entityName={entityName}
                         />
                     )}
+                    {ready && summary ? (
+                        <ReportSummaryAsOf summary={summary} />
+                    ) : null}
                     <div>
                         <DataTable
                             columns={columns}
@@ -282,13 +285,14 @@ export function ReportDataTablePage<
                             onView={onView}
                             defaultColumnVisibility={defaultColumnVisibility}
                             emptyState={ready ? undefined : ''}
-                            footer={
-                                ready && summaryColumns && summary ? (
-                                    <ReportSummaryFooter
-                                        summary={summary}
-                                        columns={summaryColumns}
-                                    />
-                                ) : undefined
+                            summaryRow={
+                                ready && summaryColumns && summary
+                                    ? buildSummaryRow(
+                                          summary,
+                                          summaryColumns,
+                                          t('reports.totalRow'),
+                                      )
+                                    : undefined
                             }
                         />
                     </div>

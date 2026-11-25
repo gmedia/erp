@@ -17,7 +17,7 @@ class GoodsReceiptReportController extends Controller
     ): GoodsReceiptReportCollection {
         $rows = $action->execute($request);
 
-        return new GoodsReceiptReportCollection($rows);
+        return new GoodsReceiptReportCollection($rows, $action->summarize($request));
     }
 
     public function export(

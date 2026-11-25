@@ -50,6 +50,8 @@ class JournalEntryExport extends BaseExport
             'Reference' => fn (JournalEntry $je): mixed => $je->reference,
             'Description' => fn (JournalEntry $je): mixed => $je->description,
             'Total Amount' => fn (JournalEntry $je): mixed => (float) $je->lines->sum('debit'),
+            'Total Debit' => fn (JournalEntry $je): mixed => (float) $je->lines->sum('debit'),
+            'Total Credit' => fn (JournalEntry $je): mixed => (float) $je->lines->sum('credit'),
             'Fiscal Year' => fn (JournalEntry $je): mixed => $this->relatedAttribute($je, 'fiscalYear', 'name'),
             'Status' => fn (JournalEntry $je): mixed => $je->status,
             'Created By' => fn (JournalEntry $je): mixed => $this->relatedAttribute($je, 'createdBy', 'name'),

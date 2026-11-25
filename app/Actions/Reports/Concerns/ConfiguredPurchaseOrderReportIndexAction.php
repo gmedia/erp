@@ -10,8 +10,49 @@ use Illuminate\Foundation\Http\FormRequest;
 abstract class ConfiguredPurchaseOrderReportIndexAction
 {
     use HandlesReportQuery;
+    use SumsReportTotals;
 
     public function execute(FormRequest $request): LengthAwarePaginator|Collection
+    {
+        $query = $this->buildFilteredQuery($request);
+
+        $this->applyRequestSorting(
+            $request,
+            $query,
+            $this->defaultSortBy(),
+            $this->sortAliases(),
+            $this->plainSortableColumns(),
+            $this->aggregateSortableColumns(),
+            $this->fallbackSortBy(),
+        );
+
+        return $this->exportOrPaginate($request, $query);
+    }
+
+    /**
+     * Total untuk SELURUH hasil filter (termasuk supplier, gudang, produk, status, tanggal, search).
+     *
+     * @return array{as_of_date: string, totals: array<string, string>}
+     */
+    public function summarize(FormRequest $request): array
+    {
+        return $this->buildReportSummary(
+            $this->buildFilteredQuery($request),
+            $this->summaryTotalColumns(),
+        );
+    }
+
+    /**
+     * Kolom hasil query (alias) yang dijumlahkan pada footer total.
+     *
+     * @return array<int, string>
+     */
+    protected function summaryTotalColumns(): array
+    {
+        return [];
+    }
+
+    protected function buildFilteredQuery(FormRequest $request): Builder
     {
         $query = $this->buildQuery();
 
@@ -27,17 +68,7 @@ abstract class ConfiguredPurchaseOrderReportIndexAction
 
         $this->applyAdditionalFilters($request, $query);
 
-        $this->applyRequestSorting(
-            $request,
-            $query,
-            $this->defaultSortBy(),
-            $this->sortAliases(),
-            $this->plainSortableColumns(),
-            $this->aggregateSortableColumns(),
-            $this->fallbackSortBy(),
-        );
-
-        return $this->exportOrPaginate($request, $query);
+        return $query;
     }
 
     abstract protected function buildQuery(): Builder;

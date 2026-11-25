@@ -62,6 +62,9 @@ export interface ModuleTestConfig {
     customViewAction?: (page: Page) => Promise<void>;
     customEditAction?: (page: Page) => Promise<void>;
     customDeleteAction?: (page: Page) => Promise<void>;
+
+    deleteMode?: 'hard' | 'soft-cancel';
+    expectedStatusLabel?: string;
 }
 
 // ==================== HELPER FUNCTIONS ====================
@@ -212,8 +215,22 @@ export function generateModuleTests(config: ModuleTestConfig) {
             await confirmButton.first().click();
             await responsePromise;
 
-            // Verify deleted — search should not find it
             await config.searchEntity(page, identifier);
+            if (config.deleteMode === 'soft-cancel') {
+                if (!config.expectedStatusLabel) {
+                    throw new Error(
+                        `${config.entityName}: expectedStatusLabel wajib untuk deleteMode 'soft-cancel'`,
+                    );
+                }
+                await expect(findTableRow(page, identifier)).toBeVisible();
+                await expect(
+                    findTableRow(page, identifier).getByText(
+                        config.expectedStatusLabel,
+                        { exact: true },
+                    ),
+                ).toBeVisible();
+                return;
+            }
             await expect(findTableRow(page, identifier)).not.toBeVisible();
         });
 

@@ -36,7 +36,7 @@ test('execute filters by search term', function () {
         ->and($items[0]->stocktake_number)->toBe('SO-ABC-001');
 });
 
-test('execute excludes cancelled by default', function () {
+test('execute includes cancelled by default', function () {
     InventoryStocktake::factory()->create(['status' => 'cancelled']);
     InventoryStocktake::factory()->create(['status' => 'draft']);
 
@@ -44,10 +44,10 @@ test('execute excludes cancelled by default', function () {
     $request = new IndexInventoryStocktakeRequest;
 
     $result = $action->execute($request);
-    $items = $result->items();
+    $statuses = collect($result->items())->pluck('status')->all();
 
-    expect($items)->toHaveCount(1)
-        ->and($items[0]->status)->toBe('draft');
+    expect($statuses)->toHaveCount(2)
+        ->and($statuses)->toContain('cancelled', 'draft');
 });
 
 test('execute can include cancelled when status filter set', function () {

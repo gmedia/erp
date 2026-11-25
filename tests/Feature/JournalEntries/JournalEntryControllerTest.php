@@ -3,6 +3,7 @@
 use App\Models\Account;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
+use App\Models\JournalEntryLine;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use function Pest\Laravel\actingAs;
@@ -57,6 +58,32 @@ describe('Journal Entry API Endpoints', function () {
         expect($response->json('meta.total'))->toBe(15)
             ->and($response->json('meta.per_page'))->toBe(10)
             ->and($response->json('data'))->toHaveCount(10);
+    });
+
+    test('index total_debit and total_credit reflect line totals (V8-26)', function () {
+        $entry = JournalEntry::factory()->create();
+        JournalEntryLine::factory()->create(['journal_entry_id' => $entry->id, 'debit' => 500, 'credit' => 0]);
+        JournalEntryLine::factory()->create(['journal_entry_id' => $entry->id, 'debit' => 0, 'credit' => 500]);
+
+        $response = getJson('/api/journal-entries?per_page=10');
+        $response->assertOk();
+
+        $row = collect($response->json('data'))->firstWhere('id', $entry->id);
+        expect((float) $row['total_debit'])->toBe(500.0)
+            ->and((float) $row['total_credit'])->toBe(500.0);
+    });
+
+    test('index can sort by total_credit (V8-26)', function () {
+        $small = JournalEntry::factory()->create(['entry_date' => '2026-01-05']);
+        JournalEntryLine::factory()->create(['journal_entry_id' => $small->id, 'debit' => 0, 'credit' => 100]);
+        $large = JournalEntry::factory()->create(['entry_date' => '2026-01-06']);
+        JournalEntryLine::factory()->create(['journal_entry_id' => $large->id, 'debit' => 0, 'credit' => 900]);
+
+        $response = getJson('/api/journal-entries?sort_by=total_credit&sort_direction=desc');
+        $response->assertOk();
+
+        expect($response->json('data.0.id'))->toBe($large->id)
+            ->and($response->json('data.1.id'))->toBe($small->id);
     });
 
     test('store creates journal entry with lines', function () {

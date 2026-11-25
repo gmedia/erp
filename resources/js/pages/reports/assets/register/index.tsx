@@ -30,7 +30,7 @@ export default function AssetRegisterReport() {
                 status: '',
                 condition: '',
             }}
-            endpoint="/api/assets"
+            endpoint="/api/reports/assets/register"
             queryKey={['assets-report']}
             entityName="Asset"
             exportEndpoint="/reports/assets/register/export"
@@ -41,6 +41,13 @@ export default function AssetRegisterReport() {
                 location: false,
                 purchase_date: false,
             }}
+            summaryColumns={[
+                {
+                    key: 'purchase_cost',
+                    label: 'Total Cost',
+                    columnId: 'purchase_cost',
+                },
+            ]}
         />
     );
 }
