@@ -1037,6 +1037,10 @@
             "title": "Budgets",
             "description": "Budget plans per account with period breakdown."
         },
+        "report_configurations": {
+            "title": "Report Configurations",
+            "description": "Settings that define how each report is generated and displayed."
+        },
         "bank_reconciliations": {
             "title": "Bank Reconciliations",
             "description": "Match bank statement balances with the books for each account."

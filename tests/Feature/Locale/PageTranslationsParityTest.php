@@ -919,3 +919,35 @@ test('page translation values are non-empty strings', function () {
         }
     }
 });
+
+test('report configurations page title and description are translated in both locales', function () {
+    $en = localePageTranslations('en.json')['report_configurations'];
+    $id = localePageTranslations('id.json')['report_configurations'];
+
+    expect($en['title'])->toBe('Report Configurations')
+        ->and($en['description'])->toBe('Settings that define how each report is generated and displayed.')
+        ->and($id['title'])->toBe('Konfigurasi Laporan')
+        ->and($id['title'])->not->toBe($en['title'])
+        ->and($id['description'])->not->toBe($en['description']);
+});
+
+test('breadcrumb titles that match page titles reuse the page translation keys', function () {
+    $en = localePageTranslations('en.json');
+    $id = localePageTranslations('id.json');
+
+    $modules = [
+        'customers', 'suppliers', 'asset_categories', 'product_categories', 'units',
+        'asset_models', 'asset_locations', 'asset_movements', 'asset_maintenances',
+        'asset_stocktakes', 'pipelines', 'approval_flows', 'approval_delegations',
+    ];
+
+    foreach ($modules as $module) {
+        expect($en[$module]['title'])->not->toBeEmpty()
+            ->and($id[$module]['title'])->not->toBeEmpty();
+    }
+
+    expect($en['customers']['title'])->toBe('Customers')
+        ->and($en['asset_maintenances']['title'])->toBe('Asset Maintenances')
+        ->and($en['approval_delegations']['title'])->toBe('Approval Delegations')
+        ->and($id['customers']['title'])->toBe('Pelanggan');
+});

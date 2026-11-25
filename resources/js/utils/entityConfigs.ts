@@ -407,7 +407,13 @@ export const customerConfig = createComplexEntityConfig({
     apiEndpoint: '/api/customers',
     exportEndpoint: '/api/customers/export',
     queryKey: ['customers'],
-    breadcrumbs: [{ title: 'Customers', href: '/customers' }],
+    breadcrumbs: [
+        {
+            title: 'Customers',
+            titleKey: 'page.customers.title',
+            href: '/customers',
+        },
+    ],
     initialFilters: {
         search: '',
         branch_id: '',
@@ -435,7 +441,13 @@ export const supplierConfig = createComplexEntityConfig({
     apiEndpoint: '/api/suppliers',
     exportEndpoint: '/api/suppliers/export',
     queryKey: ['suppliers'],
-    breadcrumbs: [{ title: 'Suppliers', href: '/suppliers' }],
+    breadcrumbs: [
+        {
+            title: 'Suppliers',
+            titleKey: 'page.suppliers.title',
+            href: '/suppliers',
+        },
+    ],
     initialFilters: {
         search: '',
         branch_id: '',
@@ -761,7 +773,13 @@ export const assetCategoryConfig = createComplexEntityConfig<AssetCategory>({
     apiEndpoint: '/api/asset-categories',
     exportEndpoint: '/api/asset-categories/export',
     queryKey: ['asset-categories'],
-    breadcrumbs: [{ title: 'Asset Categories', href: '/asset-categories' }],
+    breadcrumbs: [
+        {
+            title: 'Asset Categories',
+            titleKey: 'page.asset_categories.title',
+            href: '/asset-categories',
+        },
+    ],
     initialFilters: { search: '' },
     columns: assetCategoryColumns,
     filterFields: createSimpleEntityFilterFields('Search asset categories...'),
@@ -784,7 +802,11 @@ export const productCategoryConfig = createComplexEntityConfig<ProductCategory>(
         exportEndpoint: '/api/product-categories/export',
         queryKey: ['product-categories'],
         breadcrumbs: [
-            { title: 'Product Categories', href: '/product-categories' },
+            {
+                title: 'Product Categories',
+                titleKey: 'page.product_categories.title',
+                href: '/product-categories',
+            },
         ],
         initialFilters: { search: '' },
         columns: productCategoryColumns,
@@ -809,7 +831,9 @@ export const unitConfig = createComplexEntityConfig<Unit>({
     apiEndpoint: '/api/units',
     exportEndpoint: '/api/units/export',
     queryKey: ['units'],
-    breadcrumbs: [{ title: 'Units', href: '/units' }],
+    breadcrumbs: [
+        { title: 'Units', titleKey: 'page.units.title', href: '/units' },
+    ],
     initialFilters: { search: '' },
     columns: unitColumns,
     filterFields: createSimpleEntityFilterFields('Search units...'),
@@ -1018,7 +1042,13 @@ export const assetModelConfig = createComplexEntityConfig<AssetModel>({
     apiEndpoint: '/api/asset-models',
     exportEndpoint: '/api/asset-models/export',
     queryKey: ['asset-models'],
-    breadcrumbs: [{ title: 'Asset Models', href: '/asset-models' }],
+    breadcrumbs: [
+        {
+            title: 'Asset Models',
+            titleKey: 'page.asset_models.title',
+            href: '/asset-models',
+        },
+    ],
     initialFilters: { search: '', asset_category_id: '' },
     columns: assetModelColumns,
     filterFields: createAssetModelFilterFields(),
@@ -1046,7 +1076,13 @@ export const assetLocationConfig = createComplexEntityConfig<AssetLocation>({
     apiEndpoint: '/api/asset-locations',
     exportEndpoint: '/api/asset-locations/export',
     queryKey: ['asset-locations'],
-    breadcrumbs: [{ title: 'Asset Locations', href: '/asset-locations' }],
+    breadcrumbs: [
+        {
+            title: 'Asset Locations',
+            titleKey: 'page.asset_locations.title',
+            href: '/asset-locations',
+        },
+    ],
     initialFilters: { search: '', branch_id: '', parent_id: '' },
     columns: assetLocationColumns,
     filterFields: createAssetLocationFilterFields(),
@@ -1108,7 +1144,13 @@ export const assetMovementConfig = createComplexEntityConfig({
     apiEndpoint: '/api/asset-movements',
     exportEndpoint: '/api/asset-movements/export',
     queryKey: ['asset-movements'],
-    breadcrumbs: [{ title: 'Asset Movements', href: '/asset-movements' }],
+    breadcrumbs: [
+        {
+            title: 'Asset Movements',
+            titleKey: 'page.asset_movements.title',
+            href: '/asset-movements',
+        },
+    ],
     initialFilters: {
         search: '',
         asset_id: '',
@@ -1136,7 +1178,11 @@ export const assetMaintenanceConfig =
         exportEndpoint: '/api/asset-maintenances/export',
         queryKey: ['asset-maintenances'],
         breadcrumbs: [
-            { title: 'Asset Maintenances', href: '/asset-maintenances' },
+            {
+                title: 'Asset Maintenances',
+                titleKey: 'page.asset_maintenances.title',
+                href: '/asset-maintenances',
+            },
         ],
         initialFilters: {
             search: '',
@@ -1183,7 +1229,13 @@ export const assetStocktakeConfig = createComplexEntityConfig<AssetStocktake>({
     exportEndpoint: '/api/asset-stocktakes/export',
     queryKey: ['asset-stocktakes'],
     identifierKey: 'ulid',
-    breadcrumbs: [{ title: 'Asset Stocktakes', href: '/asset-stocktakes' }],
+    breadcrumbs: [
+        {
+            title: 'Asset Stocktakes',
+            titleKey: 'page.asset_stocktakes.title',
+            href: '/asset-stocktakes',
+        },
+    ],
     initialFilters: {
         search: '',
         branch_id: '',
@@ -1217,7 +1269,13 @@ export const pipelineConfig = createComplexEntityConfig<Pipeline>({
     permissionPrefix: 'pipeline',
     exportEndpoint: '/api/pipelines/export',
     queryKey: ['pipelines'],
-    breadcrumbs: [{ title: 'Pipelines', href: '/pipelines' }],
+    breadcrumbs: [
+        {
+            title: 'Pipelines',
+            titleKey: 'page.pipelines.title',
+            href: '/pipelines',
+        },
+    ],
     initialFilters: { search: '', entity_type: '', is_active: '' },
     columns: pipelineColumns,
     filterFields: createPipelineFilterFields(),
@@ -1246,7 +1304,13 @@ export const approvalFlowConfig = createComplexEntityConfig<ApprovalFlow>({
     permissionPrefix: 'approval_flow',
     exportEndpoint: '/api/approval-flows/export',
     queryKey: ['approval-flows'],
-    breadcrumbs: [{ title: 'Approval Flows', href: '/approval-flows' }],
+    breadcrumbs: [
+        {
+            title: 'Approval Flows',
+            titleKey: 'page.approval_flows.title',
+            href: '/approval-flows',
+        },
+    ],
     initialFilters: { search: '', approvable_type: '', is_active: '' },
     columns: approvalFlowColumns,
     filterFields: createApprovalFlowFilterFields(),
@@ -1377,7 +1441,11 @@ export const approvalDelegationConfig =
         exportEndpoint: '/api/approval-delegations/export',
         queryKey: ['approval-delegations'],
         breadcrumbs: [
-            { title: 'Approval Delegations', href: '/approval-delegations' },
+            {
+                title: 'Approval Delegations',
+                titleKey: 'page.approval_delegations.title',
+                href: '/approval-delegations',
+            },
         ],
         initialFilters: {
             search: '',
@@ -1680,8 +1748,14 @@ export const reportConfigurationConfig =
         permissionPrefix: 'report_configuration',
         exportEndpoint: '/api/report-configurations/export',
         queryKey: ['report-configurations'],
+        titleKey: 'page.report_configurations.title',
+        descriptionKey: 'page.report_configurations.description',
         breadcrumbs: [
-            { title: 'Report Configurations', href: '/report-configurations' },
+            {
+                title: 'Report Configurations',
+                titleKey: 'page.report_configurations.title',
+                href: '/report-configurations',
+            },
         ],
         initialFilters: { search: '', report_type: '', is_active: '' },
         columns: reportConfigurationColumns,

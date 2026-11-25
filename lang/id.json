@@ -1037,6 +1037,10 @@
             "title": "Anggaran",
             "description": "Rencana anggaran per akun dengan rincian per periode."
         },
+        "report_configurations": {
+            "title": "Konfigurasi Laporan",
+            "description": "Pengaturan yang menentukan cara setiap laporan dibuat dan ditampilkan."
+        },
         "bank_reconciliations": {
             "title": "Rekonsiliasi Bank",
             "description": "Cocokkan saldo mutasi bank dengan pembukuan untuk setiap akun."
