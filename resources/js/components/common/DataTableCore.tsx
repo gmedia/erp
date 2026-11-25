@@ -589,6 +589,11 @@ export function DataTable<T>({
                                                         headers[index + 1]
                                                             ?.column.id ?? '',
                                                     ) &&
+                                                        !(
+                                                            header.column.id ===
+                                                                'grand_total' &&
+                                                            hasStickyGrandTotal
+                                                        ) &&
                                                         CELL_BEFORE_STICKY_ACTIONS,
                                                 )}
                                             >

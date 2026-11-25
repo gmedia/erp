@@ -53,10 +53,14 @@ export const bookValueDepreciationColumns: ColumnDef<BookValueDepreciationReport
         }),
         {
             accessorKey: 'purchase_cost',
-            ...createSortingHeader({
-                key: 'column.asset_purchase_cost',
-                fallback: 'Purchase Cost',
-            }),
+            meta: { numeric: true },
+            ...createSortingHeader(
+                {
+                    key: 'column.asset_purchase_cost',
+                    fallback: 'Purchase Cost',
+                },
+                { align: 'right' },
+            ),
             cell: ({ row }) => (
                 <div className="text-right">
                     {formatCurrency(row.getValue('purchase_cost'))}
@@ -103,10 +107,14 @@ export const bookValueDepreciationColumns: ColumnDef<BookValueDepreciationReport
         },
         {
             accessorKey: 'accumulated_depreciation',
-            ...createSortingHeader({
-                key: 'column.accumulated_depreciation',
-                fallback: 'Accum. Depreciation',
-            }),
+            meta: { numeric: true },
+            ...createSortingHeader(
+                {
+                    key: 'column.accumulated_depreciation',
+                    fallback: 'Accum. Depreciation',
+                },
+                { align: 'right' },
+            ),
             cell: ({ row }) => (
                 <div className="text-right">
                     {formatCurrency(row.getValue('accumulated_depreciation'))}
@@ -115,10 +123,14 @@ export const bookValueDepreciationColumns: ColumnDef<BookValueDepreciationReport
         },
         {
             accessorKey: 'book_value',
-            ...createSortingHeader({
-                key: 'column.book_value',
-                fallback: 'Book Value',
-            }),
+            meta: { numeric: true },
+            ...createSortingHeader(
+                {
+                    key: 'column.book_value',
+                    fallback: 'Book Value',
+                },
+                { align: 'right' },
+            ),
             cell: ({ row }) => (
                 <div className="text-right font-medium">
                     {formatCurrency(row.getValue('book_value'))}
