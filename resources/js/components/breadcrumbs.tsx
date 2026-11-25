@@ -24,7 +24,16 @@ export function Breadcrumbs({
     const items = resolveBreadcrumbs(
         menus ?? [],
         pathname,
-        breadcrumbs,
+        breadcrumbs?.map((item) => {
+            if (!item.titleKey) {
+                return item;
+            }
+            const translated = t(item.titleKey);
+            return {
+                ...item,
+                title: translated === item.titleKey ? item.title : translated,
+            };
+        }),
         (name, displayName) => {
             const key = `menu.${name}`;
             const translated = t(key);

@@ -731,7 +731,13 @@ export const productConfig = createComplexEntityConfig({
     queryKey: ['products'],
     titleKey: 'page.products.title',
     descriptionKey: 'page.products.description',
-    breadcrumbs: [{ title: 'Products', href: '/products' }],
+    breadcrumbs: [
+        {
+            title: 'Products',
+            titleKey: 'page.products.title',
+            href: '/products',
+        },
+    ],
     initialFilters: {
         search: '',
         product_category_id: '',

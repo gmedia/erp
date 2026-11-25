@@ -142,6 +142,12 @@ test.describe('i18n page titles (locale id)', () => {
         await login(page);
         await page.goto('/products', { waitUntil: 'domcontentloaded' });
 
+        const breadcrumb = page.locator('nav[aria-label="breadcrumb"]').first();
+        await expect(
+            breadcrumb.getByText('Produk', { exact: true }),
+        ).toBeVisible({
+            timeout: 15000,
+        });
         await expect(
             page.getByRole('heading', { level: 1, name: 'Produk' }),
         ).toBeVisible({ timeout: 15000 });
