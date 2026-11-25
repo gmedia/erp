@@ -16,6 +16,15 @@ test('factory creates a valid fiscal year', function () {
         ->and($fiscalYear->status)->not->toBeEmpty();
 });
 
+test('factory default year never collides with explicit 2026 fixtures', function () {
+    for ($i = 0; $i < 60; $i++) {
+        $fiscalYear = FiscalYear::factory()->make();
+
+        expect($fiscalYear->start_date->year)->not->toBe(2026)
+            ->and($fiscalYear->end_date->year)->toBe($fiscalYear->start_date->year);
+    }
+});
+
 test('fillable attributes are defined correctly', function () {
     $fillable = (new FiscalYear)->getFillable();
 
