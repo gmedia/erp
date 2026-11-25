@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Actions\AccountingPosting\PostAssetDisposalJournalAction;
 use App\Actions\AccountingPosting\PostAssetLossJournalAction;
 use App\Actions\AssetDepreciationRuns\CalculateDepreciationAction;
 use App\Actions\AssetDepreciationRuns\PostDepreciationToJournalAction;
@@ -68,13 +69,13 @@ class AssetDepreciationNormalizationSeeder extends Seeder
 
         $this->syncRegisterFromPostedSources();
 
-        // Jurnal aset hilang hanya setelah akumulasi register final. Dipost
-        // lebih awal, akun 12200 tidak ikut didebit (#357, FA-000008).
+        // Jurnal pelepasan (disposed) dan aset hilang hanya setelah akumulasi
+        // register final. Dipost lebih awal, akun 12200 tidak ikut didebit (#357, #442).
         $this->demoAssets()->get()->each(function (Asset $asset): void {
-            $lossJournal = app(PostAssetLossJournalAction::class);
-
-            if ($lossJournal->isPostable($asset)) {
-                $lossJournal->execute($asset);
+            if ($asset->status === 'disposed') {
+                app(PostAssetDisposalJournalAction::class)->execute($asset, now()->toDateString());
+            } elseif (app(PostAssetLossJournalAction::class)->isPostable($asset)) {
+                app(PostAssetLossJournalAction::class)->execute($asset);
             }
         });
     }
@@ -98,7 +99,9 @@ class AssetDepreciationNormalizationSeeder extends Seeder
     private function syncRegisterFromPostedSources(): void
     {
         $this->demoAssets()->get()->each(function (Asset $asset): void {
-            if (in_array($asset->status, ['draft', 'cancelled'], true)) {
+            // Aset disposed mempertahankan akumulasi dari data aset (#442): jurnal
+            // pelepasan memakai nilai itu, dan sumber ACQ/run tidak memuat aset tersebut.
+            if (in_array($asset->status, ['draft', 'cancelled', 'disposed'], true)) {
                 return;
             }
 
