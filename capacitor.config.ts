@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import type { CapacitorConfig } from '@capacitor/cli';
 
-const appId = process.env.CAPACITOR_APP_ID ?? 'com.dokfin.erp';
+const appId = process.env.CAPACITOR_APP_ID ?? 'com.example.erp';
 const appName =
     process.env.CAPACITOR_APP_NAME ?? process.env.APP_NAME ?? 'ERP';
 

@@ -278,7 +278,7 @@ ERP ini dipasang di banyak perusahaan berbeda (on premise). Kode, UI, dan dokume
 3. **Sebelum commit**, periksa file yang diubah untuk string brand yang tidak disengaja; ganti dengan `Setting`/config/env.
 4. **Perilaku produk tidak boleh bergantung pada identitas organisasi tertentu** — pakai flag/konfigurasi (mis. allowlist domain dari `settings`).
 
-**Pengecualian** (bukan branding produk): identifier infrastruktur repo — org GitHub `gmedia/erp`, project key SonarCloud `gmedia_erp`, remote git, URL issue tracker, nama CI image, path filesistem bersejarah — dan file arsip/jurnal lama.
+**Pengecualian** (bukan branding produk): identifier infrastruktur repo — org GitHub `gmedia/erp`, project key SonarCloud `gmedia_erp`, remote git, URL issue tracker, nama CI image, path filesistem bersejarah — dan file arsip/jurnal lama. Tag runner di `.gitlab-ci.yml` termasuk identifier infrastruktur dan sengaja tidak diubah.
 
 ---
 
