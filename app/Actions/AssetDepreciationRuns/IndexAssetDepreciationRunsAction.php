@@ -20,7 +20,8 @@ class IndexAssetDepreciationRunsAction
     {
         $query = AssetDepreciationRun::query()
             ->with(['fiscalYear', 'createdBy', 'postedBy', 'journalEntry'])
-            ->withCount('lines');
+            ->withCount('lines')
+            ->withSum('lines as total_amount', 'amount');
 
         return $this->handleFilteredIndexRequest(
             $request,
@@ -28,7 +29,7 @@ class IndexAssetDepreciationRunsAction
             $this->filterService,
             ['fiscal_year_id', 'start_date', 'end_date', 'status'],
             'period_start',
-            ['period_start', 'period_end', 'status', 'created_at'],
+            ['period_start', 'period_end', 'status', 'total_amount', 'created_at'],
         );
     }
 }

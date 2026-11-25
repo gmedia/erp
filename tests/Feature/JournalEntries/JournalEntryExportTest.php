@@ -1,5 +1,6 @@
 <?php
 
+use App\Exports\JournalEntryExport;
 use App\Models\JournalEntry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -28,6 +29,12 @@ describe('Journal Entry Export', function () {
         $data = $response->json();
         expect($data['url'])->toBeString();
         expect($data['filename'])->toContain('journal_entries_export');
+    });
+
+    test('export includes total debit and total credit columns (V8-26)', function () {
+        $headings = (new JournalEntryExport([]))->headings();
+
+        expect($headings)->toContain('Total Debit', 'Total Credit');
     });
 
     test('export respects filters', function () {

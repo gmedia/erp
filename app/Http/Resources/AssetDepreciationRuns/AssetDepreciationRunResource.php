@@ -38,6 +38,10 @@ class AssetDepreciationRunResource extends JsonResource
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
             'lines_count' => $this->whenCounted('lines'),
+            'total_amount' => $this->when(
+                array_key_exists('total_amount', $this->resource->getAttributes()),
+                fn () => (float) $this->resource->getAttribute('total_amount'),
+            ),
         ];
     }
 }
