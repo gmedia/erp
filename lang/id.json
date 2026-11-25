@@ -1134,6 +1134,34 @@
         "budget_variance": {
             "title": "Laporan Selisih Anggaran",
             "description": "Bandingkan realisasi belanja dengan anggaran yang disetujui per akun."
+        },
+        "inventory_valuation": {
+            "title": "Laporan Nilai Persediaan",
+            "description": "Jumlah dan nilai stok per produk dan gudang."
+        },
+        "stock_movement": {
+            "title": "Laporan Mutasi Stok",
+            "description": "Stok masuk dan keluar per produk beserta dokumen sumbernya."
+        },
+        "stock_adjustment": {
+            "title": "Laporan Penyesuaian Stok",
+            "description": "Penyesuaian stok yang mengubah jumlah, beserta alasannya."
+        },
+        "inventory_stocktake_variance": {
+            "title": "Laporan Selisih Stock Opname",
+            "description": "Selisih antara stok sistem dan hasil stock opname fisik."
+        },
+        "purchase_order_status": {
+            "title": "Laporan Status Pesanan Pembelian",
+            "description": "Progres pesanan pembelian dari penerbitan hingga penerimaan dan penagihan."
+        },
+        "purchase_history": {
+            "title": "Laporan Riwayat Pembelian",
+            "description": "Transaksi pembelian beserta detail pemasok dan produk."
+        },
+        "goods_receipt": {
+            "title": "Laporan Penerimaan Barang",
+            "description": "Barang yang diterima dari pemasok berdasarkan pesanan pembelian."
         }
     },
     "stock_monitor_summary": {

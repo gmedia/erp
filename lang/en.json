@@ -1134,6 +1134,34 @@
         "budget_variance": {
             "title": "Budget Variance Report",
             "description": "Compare actual spending against the approved budget per account."
+        },
+        "inventory_valuation": {
+            "title": "Inventory Valuation Report",
+            "description": "Stock quantity and value per product and warehouse."
+        },
+        "stock_movement": {
+            "title": "Stock Movement Report",
+            "description": "Stock in and out per product, with source document."
+        },
+        "stock_adjustment": {
+            "title": "Stock Adjustment Report",
+            "description": "Stock adjustments that changed quantities, with reason."
+        },
+        "inventory_stocktake_variance": {
+            "title": "Inventory Stocktake Variance Report",
+            "description": "Differences between system stock and physical stocktake counts."
+        },
+        "purchase_order_status": {
+            "title": "Purchase Order Status Report",
+            "description": "Progress of purchase orders from issue to receipt and billing."
+        },
+        "purchase_history": {
+            "title": "Purchase History Report",
+            "description": "Purchase transactions with supplier and product detail."
+        },
+        "goods_receipt": {
+            "title": "Goods Receipt Report",
+            "description": "Goods received from suppliers against purchase orders."
         }
     },
     "stock_monitor_summary": {

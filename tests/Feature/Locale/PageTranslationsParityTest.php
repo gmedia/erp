@@ -612,6 +612,77 @@ test('ap/ar and budget variance report titles follow the menu-or-exception decis
     }
 });
 
+test('inventory and purchasing report group page strings keep the english labels', function () {
+    $en = localePageTranslations('en.json');
+
+    expect($en['inventory_valuation']['title'])->toBe('Inventory Valuation Report')
+        ->and($en['inventory_valuation']['description'])->toBe('Stock quantity and value per product and warehouse.')
+        ->and($en['stock_movement']['title'])->toBe('Stock Movement Report')
+        ->and($en['stock_movement']['description'])->toBe('Stock in and out per product, with source document.')
+        ->and($en['stock_adjustment']['title'])->toBe('Stock Adjustment Report')
+        ->and($en['stock_adjustment']['description'])->toBe('Stock adjustments that changed quantities, with reason.')
+        ->and($en['inventory_stocktake_variance']['title'])->toBe('Inventory Stocktake Variance Report')
+        ->and($en['inventory_stocktake_variance']['description'])->toBe(
+            'Differences between system stock and physical stocktake counts.',
+        )
+        ->and($en['purchase_order_status']['title'])->toBe('Purchase Order Status Report')
+        ->and($en['purchase_order_status']['description'])->toBe(
+            'Progress of purchase orders from issue to receipt and billing.',
+        )
+        ->and($en['purchase_history']['title'])->toBe('Purchase History Report')
+        ->and($en['purchase_history']['description'])->toBe('Purchase transactions with supplier and product detail.')
+        ->and($en['goods_receipt']['title'])->toBe('Goods Receipt Report')
+        ->and($en['goods_receipt']['description'])->toBe('Goods received from suppliers against purchase orders.');
+});
+
+test('inventory and purchasing report group page strings are translated to indonesian', function () {
+    $en = localePageTranslations('en.json');
+    $id = localePageTranslations('id.json');
+
+    $modules = [
+        'inventory_valuation',
+        'stock_movement',
+        'stock_adjustment',
+        'inventory_stocktake_variance',
+        'purchase_order_status',
+        'purchase_history',
+        'goods_receipt',
+    ];
+
+    foreach ($modules as $module) {
+        foreach (array_keys($en[$module]) as $field) {
+            expect($id[$module][$field])->not->toBe($en[$module][$field], "page.{$module}.{$field} not translated");
+        }
+    }
+
+    expect($id['inventory_valuation']['title'])->toBe('Laporan Nilai Persediaan')
+        ->and($id['goods_receipt']['title'])->toBe('Laporan Penerimaan Barang');
+});
+
+test('inventory and purchasing report titles follow the menu-or-exception decision', function () {
+    // Aturan (issue #462 <!-- decision -->): judul memakai menu.* bila teks English sama.
+    // Semua judul di grup ini English-nya beda dengan menu (mis. "Stock Movement Report" vs "Stock Movement"),
+    // jadi seluruhnya masuk pengecualian dan tetap page.<slug>.title.
+    $exceptions = [
+        'inventory_valuation' => 'inventory_valuation_report',
+        'stock_movement' => 'stock_movement_report',
+        'stock_adjustment' => 'stock_adjustment_report',
+        'inventory_stocktake_variance' => 'inventory_stocktake_variance_report',
+        'purchase_order_status' => 'purchase_order_status_report',
+        'purchase_history' => 'purchase_history_report',
+        'goods_receipt' => 'goods_receipt_report',
+    ];
+
+    $en = json_decode(File::get(lang_path('en.json')), true, 512, JSON_THROW_ON_ERROR);
+
+    foreach ($exceptions as $pageKey => $menuKey) {
+        expect($en['page'][$pageKey]['title'])->not->toBe(
+            $en['menu'][$menuKey],
+            "page.{$pageKey}.title equals menu.{$menuKey}; move it out of the exception list",
+        );
+    }
+});
+
 test('page translation values are non-empty strings', function () {
     foreach (['en.json', 'id.json'] as $file) {
         foreach (localePageTranslations($file) as $module => $strings) {
