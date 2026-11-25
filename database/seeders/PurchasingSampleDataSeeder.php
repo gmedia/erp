@@ -129,7 +129,8 @@ class PurchasingSampleDataSeeder extends Seeder
         }
 
         // Barang fisik saja: produk jasa (type=service) tidak menghasilkan penerimaan/stok.
-        $products = Product::query()->where('type', '!=', 'service')->orderBy('id')->take(6)->get();
+        // Semua barang fisik agar setiap pemasok punya produk dari kategorinya (#459 butir 8).
+        $products = Product::query()->where('type', '!=', 'service')->orderBy('id')->get();
         if ($products->isEmpty()) {
             return;
         }
@@ -1031,17 +1032,6 @@ class PurchasingSampleDataSeeder extends Seeder
         return [$purchaseRequests, $purchaseRequestItems];
     }
 
-    /**
-     * Dua produk dianggap dipasok supplier yang sama bila ada satu kategori supplier
-     * demo yang memasok keduanya (#459 butir 8).
-     */
-    private function sameSupplierCategory(Product $candidate, Product $reference): bool
-    {
-        return collect(DemoMasterData::SUPPLIER_PRODUCT_CATEGORY_MAP)
-            ->contains(fn (array $allowed) => $this->isInAllowedCategories($candidate, $allowed)
-                && $this->isInAllowedCategories($reference, $allowed));
-    }
-
     private function supplierSuppliesProduct(Supplier $supplier, Product $product): bool
     {
         $allowed = DemoMasterData::SUPPLIER_PRODUCT_CATEGORY_MAP[$supplier->category?->name] ?? [];
@@ -1116,16 +1106,31 @@ class PurchasingSampleDataSeeder extends Seeder
         $purchaseOrders = [];
         $purchaseOrderItems = [];
 
+        // Pemasok barang fisik saja (kategori yang punya pemetaan barang di DemoMasterData),
+        // diurutkan stabil agar rotasi bergilir tetap deterministik antar seed.
+        $physicalSuppliers = Supplier::query()->with('category')->orderBy('id')->get()
+            ->filter(fn (Supplier $candidate) => $products->contains(
+                fn (Product $product) => $this->supplierSuppliesProduct($candidate, $product),
+            ))
+            ->values();
+        if ($physicalSuppliers->isEmpty()) {
+            $physicalSuppliers = collect([$supplier]);
+        }
+
         foreach ($definitions as $index => $definition) {
             $status = $definition['status'];
             $sourceItems = $purchaseRequestItems[$definition['source_status']] ?? [];
 
-            $firstProduct = $products[($index + 2) % $products->count()];
-            // Produk kedua harus dipasok supplier yang sama dengan produk pertama (#459 butir 8).
-            // Jika tidak ada pasangan yang sepemasok, produk pertama dipakai dua kali.
-            $secondProduct = $products->first(
-                fn (Product $candidate) => $candidate->id !== $firstProduct->id
-                    && $this->sameSupplierCategory($candidate, $firstProduct),
+            // Pemasok dipilih bergilir dulu (W5-23), lalu produk diambil dari kategori yang
+            // dipasok pemasok itu (#459 butir 8). Dengan urutan ini semua pemasok barang fisik
+            // ikut terwakili, tidak hanya satu vendor.
+            $poSupplier = $physicalSuppliers->values()[$index % $physicalSuppliers->count()];
+            $supplierProducts = $products
+                ->filter(fn (Product $candidate) => $this->supplierSuppliesProduct($poSupplier, $candidate))
+                ->values();
+            $firstProduct = $supplierProducts[$index % $supplierProducts->count()];
+            $secondProduct = $supplierProducts->first(
+                fn (Product $candidate) => $candidate->id !== $firstProduct->id,
             ) ?? $firstProduct;
 
             // Kuantitas bervariasi agar data demo tidak seragam (W5-23).
@@ -1146,22 +1151,10 @@ class PurchasingSampleDataSeeder extends Seeder
 
             $approved = in_array($status, ['confirmed', 'partially_received', 'fully_received', 'closed'], true);
 
-            // Rotasi supplier aktif agar tidak semua PO ke vendor yang sama. Produk
-            // layanan SaaS hanya dipesan dari supplier kategori Jasa TI (W7-17).
-            // Pemasok dipilih dari kategori barang PO agar pasangan pemasok–barang masuk akal (#459 butir 8).
-            $poSuppliers = Supplier::query()->with('category')->orderBy('id')->get();
-            $eligibleSuppliers = $poSuppliers->filter(
-                fn (Supplier $candidate) => $this->supplierSuppliesProduct($candidate, $firstProduct)
-                    && $this->supplierSuppliesProduct($candidate, $secondProduct),
-            )->values();
-            $poSupplierId = $eligibleSuppliers->isEmpty()
-                ? $supplier->id
-                : $eligibleSuppliers[$index % $eligibleSuppliers->count()]->id;
-
             $purchaseOrder = PurchaseOrder::updateOrCreate(
                 ['po_number' => $definition['number']],
                 [
-                    'supplier_id' => $poSupplierId,
+                    'supplier_id' => $poSupplier->id,
                     'warehouse_id' => $warehouse->id,
                     'order_date' => now()->subDays(24 - $index)->toDateString(),
                     'expected_delivery_date' => now()->subDays(18 - $index)->toDateString(),

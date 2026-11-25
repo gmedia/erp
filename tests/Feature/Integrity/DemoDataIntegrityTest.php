@@ -940,6 +940,15 @@ invariant('#459 demo purchase orders match the supplier category to the product 
     }
 });
 
+// #459 butir 8 (lanjutan) — PO demo tidak boleh jatuh ke satu pemasok saja (rotasi vendor, W5-23).
+invariant('#459 demo purchase orders are spread across at least three suppliers', function () {
+    $suppliers = DB::table('purchase_orders')
+        ->distinct()
+        ->pluck('supplier_id');
+
+    expect($suppliers->count())->toBeGreaterThanOrEqual(3, 'Demo POs must be spread across at least three suppliers');
+});
+
 // W7-15 (keuangan) — recurring journal Monthly berjarak tepat satu bulan, dan nilainya wajar.
 invariant('W7-15 monthly recurring journals run one month apart with plausible amounts', function () {
     $journals = DB::table('recurring_journals')
