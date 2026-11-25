@@ -682,3 +682,28 @@ test('shared validation messages keep the english text and exist in both locales
         ->and(array_keys($idValidation['common']))->toEqual(array_keys($enValidation['common']))
         ->and($idValidation['common']['phone_invalid'])->toBe('Masukkan nomor telepon yang valid.');
 });
+
+test('purchase request, stock transfer, report config validation messages keep english text', function () {
+    $enValidation = localeValidationTranslations('en.json');
+    $idValidation = localeValidationTranslations('id.json');
+
+    expect($enValidation['purchase_request'])->toEqual([
+        'product_required' => 'Product is required.',
+        'unit_required' => 'Unit is required.',
+        'quantity_gt_zero' => 'Quantity must be greater than 0.',
+    ])
+        ->and($enValidation['stock_transfer'])->toEqual([
+            'product_required' => 'Product is required.',
+            'unit_required' => 'Unit is required.',
+            'quantity_gt_zero' => 'Quantity must be greater than 0.',
+        ])
+        ->and($enValidation['report_configuration'])->toEqual([
+            'section_code_required' => 'Section code is required.',
+            'section_name_required' => 'Section name is required.',
+            'code_required' => 'Code is required.',
+            'name_required' => 'Name is required.',
+        ])
+        ->and($idValidation['purchase_request']['product_required'])->toBe('Produk wajib diisi.')
+        ->and($idValidation['stock_transfer']['quantity_gt_zero'])->toBe('Jumlah harus lebih dari 0.')
+        ->and($idValidation['report_configuration']['name_required'])->toBe('Nama wajib diisi.');
+});

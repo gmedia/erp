@@ -20,13 +20,17 @@ import {
 } from '@/utils/schemas';
 
 const stockTransferItemSchema = z.object({
-    product_id: z.string().min(1, { message: 'Product is required.' }),
+    product_id: z.string().min(1, {
+        message: 'validation.stock_transfer.product_required',
+    }),
     product_label: z.string().optional(),
-    unit_id: z.string().min(1, { message: 'Unit is required.' }),
+    unit_id: z.string().min(1, {
+        message: 'validation.stock_transfer.unit_required',
+    }),
     unit_label: z.string().optional(),
-    quantity: z.coerce
-        .number()
-        .gt(0, { message: 'Quantity must be greater than 0.' }),
+    quantity: z.coerce.number().gt(0, {
+        message: 'validation.stock_transfer.quantity_gt_zero',
+    }),
     quantity_received: stockTransferQuantityReceivedSchema,
     unit_cost: z.coerce.number().min(0).optional().default(0),
     notes: z.string().optional(),

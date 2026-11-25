@@ -25,8 +25,12 @@ import { type ReportConfiguration } from '@/types/report-configuration';
 
 const reportSectionSchema = z.object({
     id: z.number().optional(),
-    code: z.string().min(1, { message: 'Section code is required.' }),
-    name: z.string().min(1, { message: 'Section name is required.' }),
+    code: z.string().min(1, {
+        message: 'validation.report_configuration.section_code_required',
+    }),
+    name: z.string().min(1, {
+        message: 'validation.report_configuration.section_name_required',
+    }),
     sort_order: z.coerce.number().int().min(0).default(0),
     section_type: z.enum([
         'header',
@@ -44,8 +48,14 @@ const reportSectionSchema = z.object({
 });
 
 const reportConfigurationFormSchema = z.object({
-    code: z.string().min(1, { message: 'Code is required.' }).max(255),
-    name: z.string().min(1, { message: 'Name is required.' }).max(255),
+    code: z
+        .string()
+        .min(1, { message: 'validation.report_configuration.code_required' })
+        .max(255),
+    name: z
+        .string()
+        .min(1, { message: 'validation.report_configuration.name_required' })
+        .max(255),
     description: z.string().optional().nullable(),
     report_type: z.enum([
         'balance_sheet',

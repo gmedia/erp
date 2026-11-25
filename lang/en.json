@@ -2553,6 +2553,22 @@
         },
         "simple_entity": {
             "name_min_2": "Name must be at least 2 characters."
+        },
+        "purchase_request": {
+            "product_required": "Product is required.",
+            "unit_required": "Unit is required.",
+            "quantity_gt_zero": "Quantity must be greater than 0."
+        },
+        "stock_transfer": {
+            "product_required": "Product is required.",
+            "unit_required": "Unit is required.",
+            "quantity_gt_zero": "Quantity must be greater than 0."
+        },
+        "report_configuration": {
+            "section_code_required": "Section code is required.",
+            "section_name_required": "Section name is required.",
+            "code_required": "Code is required.",
+            "name_required": "Name is required."
         }
     },
     "item_dialog": {

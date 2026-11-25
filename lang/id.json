@@ -2553,6 +2553,22 @@
         },
         "simple_entity": {
             "name_min_2": "Nama minimal 2 karakter."
+        },
+        "purchase_request": {
+            "product_required": "Produk wajib diisi.",
+            "unit_required": "Satuan wajib diisi.",
+            "quantity_gt_zero": "Jumlah harus lebih dari 0."
+        },
+        "stock_transfer": {
+            "product_required": "Produk wajib diisi.",
+            "unit_required": "Satuan wajib diisi.",
+            "quantity_gt_zero": "Jumlah harus lebih dari 0."
+        },
+        "report_configuration": {
+            "section_code_required": "Kode bagian wajib diisi.",
+            "section_name_required": "Nama bagian wajib diisi.",
+            "code_required": "Kode wajib diisi.",
+            "name_required": "Nama wajib diisi."
         }
     },
     "item_dialog": {
