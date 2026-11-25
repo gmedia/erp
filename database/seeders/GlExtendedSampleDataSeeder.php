@@ -210,6 +210,8 @@ class GlExtendedSampleDataSeeder extends Seeder
                     'created_by' => $user->id,
                 ],
             );
+
+            $this->alignPostedAtWithPeriodClose($fiscalYear, $periodYear, $month);
         }
 
         PeriodClosing::updateOrCreate(
@@ -225,6 +227,24 @@ class GlExtendedSampleDataSeeder extends Seeder
                 'created_by' => $user->id,
             ],
         );
+    }
+
+    /**
+     * Jurnal demo di periode yang sudah ditutup harus tercatat sebelum penutupannya.
+     * Posting dijalankan saat seed (posted_at = sekarang), jadi posted_at dibatasi
+     * ke tanggal jurnal pada jam kerja agar tidak melewati closed_at (W9-04, #494).
+     */
+    private function alignPostedAtWithPeriodClose(FiscalYear $fiscalYear, int $periodYear, int $month): void
+    {
+        DB::table('journal_entries')
+            ->where('fiscal_year_id', $fiscalYear->id)
+            ->where('status', 'posted')
+            ->whereYear('entry_date', $periodYear)
+            ->whereMonth('entry_date', $month)
+            ->whereRaw('posted_at > ?', [Carbon::create($periodYear, $month, 1)->addMonth()->startOfDay()])
+            ->update([
+                'posted_at' => DB::raw('DATE_ADD(entry_date, INTERVAL 16 HOUR)'),
+            ]);
     }
 
     /**
