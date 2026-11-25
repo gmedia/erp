@@ -917,6 +917,16 @@
             "title": "Stock Monitor",
             "description": "Stock on hand, value, and low-stock items per product and warehouse.",
             "search_placeholder": "Search product, category, warehouse, branch..."
+        },
+        "assets": {
+            "title": "Asset Data",
+            "description": "Fixed asset register with cost, depreciation, and assignment.",
+            "search_placeholder": "Search asset code, name, serial number..."
+        },
+        "employees": {
+            "title": "Employee",
+            "description": "Staff records with employment, department, and position history.",
+            "search_placeholder": "Search employee..."
         }
     },
     "stock_monitor_summary": {

@@ -348,10 +348,18 @@ export const employeeConfig = createComplexEntityConfig({
     entityNamePlural: 'Employees',
     description:
         'Staff records with employment, department, and position history.',
+    titleKey: 'page.employees.title',
+    descriptionKey: 'page.employees.description',
     apiEndpoint: '/api/employees',
     exportEndpoint: '/api/employees/export',
     queryKey: ['employees'],
-    breadcrumbs: [{ title: 'Employees', href: '/employees' }],
+    breadcrumbs: [
+        {
+            title: 'Employee',
+            titleKey: 'page.employees.title',
+            href: '/employees',
+        },
+    ],
     initialFilters: {
         search: '',
         department_id: '',
@@ -946,11 +954,19 @@ export const assetConfig = createComplexEntityConfig<Asset>({
     entityNamePlural: 'Assets',
     description:
         'Fixed asset register with cost, depreciation, and assignment.',
+    titleKey: 'page.assets.title',
+    descriptionKey: 'page.assets.description',
     apiEndpoint: '/api/assets',
     exportEndpoint: '/api/assets/export',
     queryKey: ['assets'],
     identifierKey: 'ulid',
-    breadcrumbs: [{ title: 'Assets', href: '/assets' }],
+    breadcrumbs: [
+        {
+            title: 'Asset Data',
+            titleKey: 'page.assets.title',
+            href: '/assets',
+        },
+    ],
     initialFilters: {
         search: '',
         asset_category_id: '',

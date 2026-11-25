@@ -17,8 +17,22 @@ import { Helmet } from 'react-helmet-async';
 
 type BreadcrumbItem = {
     title: string;
+    titleKey?: string;
     href: string;
 };
+
+/** Resolves an i18n key; falls back when the key has no translation. */
+function resolveTitle(
+    t: (key: string) => string,
+    key: string | undefined,
+    fallback: string,
+): string {
+    if (!key) {
+        return fallback;
+    }
+    const translated = t(key);
+    return translated === key ? fallback : translated;
+}
 
 export function createReportBreadcrumbs(
     title: string,
@@ -43,6 +57,8 @@ type ReportDataTablePageProps<
     TFilters extends FilterState = FilterState,
 > = {
     title: string;
+    /** Kunci i18n judul H1; `title` dipakai sebagai fallback. */
+    titleKey?: string;
     description?: string;
     descriptionKey?: string;
     breadcrumbs: BreadcrumbItem[];
@@ -180,10 +196,11 @@ export function ReportDataTablePage<
     TData,
     TFilters extends FilterState = FilterState,
 >({
-    title,
+    title: fallbackTitle,
+    titleKey,
     description,
     descriptionKey,
-    breadcrumbs,
+    breadcrumbs: fallbackBreadcrumbs,
     columns,
     filterFields,
     initialFilters,
@@ -199,6 +216,12 @@ export function ReportDataTablePage<
     summaryColumns,
 }: Readonly<ReportDataTablePageProps<TData, TFilters>>) {
     const { t } = useTranslation();
+    const title = resolveTitle(t, titleKey, fallbackTitle);
+    const breadcrumbs = fallbackBreadcrumbs.map((item) =>
+        item.titleKey
+            ? { ...item, title: resolveTitle(t, item.titleKey, item.title) }
+            : item,
+    );
     const {
         filters,
         pagination,

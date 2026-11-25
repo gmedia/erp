@@ -84,6 +84,31 @@ test('journal entries and stock monitor page strings are translated to indonesia
         ->and($id['stock_monitor']['title'])->toBe('Pemantauan Stok');
 });
 
+test('assets and employees page strings keep the english labels', function () {
+    $en = localePageTranslations('en.json');
+
+    expect($en['assets']['title'])->toBe('Asset Data')
+        ->and($en['assets']['description'])->toBe('Fixed asset register with cost, depreciation, and assignment.')
+        ->and($en['employees']['title'])->toBe('Employee')
+        ->and($en['employees']['description'])->toBe(
+            'Staff records with employment, department, and position history.',
+        );
+});
+
+test('assets and employees page strings are translated to indonesian', function () {
+    $en = localePageTranslations('en.json');
+    $id = localePageTranslations('id.json');
+
+    foreach (['assets', 'employees'] as $module) {
+        foreach (array_keys($en[$module]) as $field) {
+            expect($id[$module][$field])->not->toBe($en[$module][$field], "page.{$module}.{$field} not translated");
+        }
+    }
+
+    expect($id['assets']['title'])->toBe('Data Aset')
+        ->and($id['employees']['title'])->toBe('Karyawan');
+});
+
 test('asset column labels keep english text and are translated to indonesian', function () {
     $en = json_decode(File::get(lang_path('en.json')), true, 512, JSON_THROW_ON_ERROR)['column'];
     $id = json_decode(File::get(lang_path('id.json')), true, 512, JSON_THROW_ON_ERROR)['column'];
