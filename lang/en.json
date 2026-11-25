@@ -724,7 +724,11 @@
         "receipt_date_from": "Receipt Date From",
         "receipt_date_to": "Receipt Date To",
         "credit_note_date_from": "Credit Note Date From",
-        "credit_note_date_to": "Credit Note Date To"
+        "credit_note_date_to": "Credit Note Date To",
+        "location": "Location",
+        "employee": "Employee",
+        "purchase_cost": "Cost",
+        "purchase_date": "Purchase Date"
     },
     "status": {
         "draft": "Draft",

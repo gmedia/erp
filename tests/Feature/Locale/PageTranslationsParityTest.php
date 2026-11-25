@@ -84,6 +84,23 @@ test('journal entries and stock monitor page strings are translated to indonesia
         ->and($id['stock_monitor']['title'])->toBe('Pemantauan Stok');
 });
 
+test('asset column labels keep english text and are translated to indonesian', function () {
+    $en = json_decode(File::get(lang_path('en.json')), true, 512, JSON_THROW_ON_ERROR)['column'];
+    $id = json_decode(File::get(lang_path('id.json')), true, 512, JSON_THROW_ON_ERROR)['column'];
+
+    $keys = ['location', 'employee', 'purchase_cost', 'purchase_date'];
+
+    foreach ($keys as $key) {
+        expect($en)->toHaveKey($key)
+            ->and($id)->toHaveKey($key)
+            ->and($id[$key])->not->toBe($en[$key], "column.{$key} not translated");
+    }
+
+    expect($en['purchase_cost'])->toBe('Cost')
+        ->and($en['purchase_date'])->toBe('Purchase Date')
+        ->and($id['purchase_date'])->toBe('Tanggal Perolehan');
+});
+
 test('page translation values are non-empty strings', function () {
     foreach (['en.json', 'id.json'] as $file) {
         foreach (localePageTranslations($file) as $module => $strings) {

@@ -1,5 +1,6 @@
 'use client';
 
+import type { TranslatableLabel } from '@/components/common/TranslatedText';
 import { Badge } from '@/components/ui/badge';
 import { formatStatusLabel, statusBadgeVariant } from '@/lib/status-badge';
 import { Asset } from '@/types/asset';
@@ -33,7 +34,7 @@ const createAssetRelationColumn = (
         | 'department'
         | 'employee'
         | 'supplier',
-    label: string,
+    label: TranslatableLabel,
 ): ColumnDef<Asset> => ({
     accessorKey,
     ...createSortingHeader(label),
@@ -51,10 +52,13 @@ const renderStatusCell = ({ row }: { row: { original: Asset } }) => {
 
 export const assetColumns: ColumnDef<Asset>[] = [
     createSelectColumn<Asset>(),
-    createTextColumn<Asset>({ accessorKey: 'asset_code', label: 'Code' }),
+    createTextColumn<Asset>({
+        accessorKey: 'asset_code',
+        label: { key: 'column.code', fallback: 'Code' },
+    }),
     {
         accessorKey: 'name',
-        ...createSortingHeader('Name'),
+        ...createSortingHeader({ key: 'column.name', fallback: 'Name' }),
         cell: ({ row }) => (
             <Link
                 to={`/assets/${row.original.ulid}`}
@@ -64,27 +68,45 @@ export const assetColumns: ColumnDef<Asset>[] = [
             </Link>
         ),
     },
-    createAssetRelationColumn('category', 'Category'),
-    createAssetRelationColumn('branch', 'Branch'),
-    createAssetRelationColumn('location', 'Location'),
-    createAssetRelationColumn('department', 'Department'),
-    createAssetRelationColumn('employee', 'Employee'),
-    createAssetRelationColumn('supplier', 'Supplier'),
+    createAssetRelationColumn('category', {
+        key: 'column.category',
+        fallback: 'Category',
+    }),
+    createAssetRelationColumn('branch', {
+        key: 'column.branch',
+        fallback: 'Branch',
+    }),
+    createAssetRelationColumn('location', {
+        key: 'column.location',
+        fallback: 'Location',
+    }),
+    createAssetRelationColumn('department', {
+        key: 'column.department',
+        fallback: 'Department',
+    }),
+    createAssetRelationColumn('employee', {
+        key: 'column.employee',
+        fallback: 'Employee',
+    }),
+    createAssetRelationColumn('supplier', {
+        key: 'column.supplier',
+        fallback: 'Supplier',
+    }),
     {
         accessorKey: 'status',
-        ...createSortingHeader('Status'),
+        ...createSortingHeader({ key: 'column.status', fallback: 'Status' }),
         cell: renderStatusCell,
     },
     createCurrencyColumn<Asset>({
         accessorKey: 'purchase_cost',
-        label: 'Cost',
+        label: { key: 'column.purchase_cost', fallback: 'Cost' },
         currency: 'IDR',
         locale: 'id-ID',
         minimumFractionDigits: 0,
     }),
     createDateColumn<Asset>({
         accessorKey: 'purchase_date',
-        label: 'Purchase Date',
+        label: { key: 'column.purchase_date', fallback: 'Purchase Date' },
     }),
     createActionsColumn<Asset>({
         viewPath: (asset) => `/assets/${asset.ulid}`,

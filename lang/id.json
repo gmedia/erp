@@ -724,7 +724,11 @@
         "receipt_date_from": "Tanggal Penerimaan Dari",
         "receipt_date_to": "Tanggal Penerimaan Sampai",
         "credit_note_date_from": "Tanggal Nota Kredit Dari",
-        "credit_note_date_to": "Tanggal Nota Kredit Sampai"
+        "credit_note_date_to": "Tanggal Nota Kredit Sampai",
+        "location": "Lokasi",
+        "employee": "Karyawan",
+        "purchase_cost": "Harga Perolehan",
+        "purchase_date": "Tanggal Perolehan"
     },
     "status": {
         "draft": "Draf",
