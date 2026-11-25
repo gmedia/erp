@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 
 test.describe('Visual #440 wave 8 mobile fixes', () => {
     test.beforeEach(async ({ page }) => {
@@ -13,10 +13,10 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
         const reportResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/trial-balance') &&
-                r.status() < 400,
+                r.request().method() === 'GET',
         );
         await page.goto('/reports/trial-balance');
-        await reportResponse;
+        await expectResponseOk(await reportResponse);
 
         const container = page.locator('[data-slot="table-container"]').first();
         await expect(container).toBeVisible();
@@ -31,10 +31,12 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
     }) => {
         await page.setViewportSize({ width: 390, height: 844 });
         const accountsResponse = page.waitForResponse(
-            (r) => r.url().includes('/api/accounts') && r.status() < 400,
+            (r) =>
+                r.url().includes('/api/accounts') &&
+                r.request().method() === 'GET',
         );
         await page.goto('/accounts');
-        await accountsResponse;
+        await expectResponseOk(await accountsResponse);
 
         const addChild = page.locator('button:has(svg.lucide-plus)').first();
         test.skip(
@@ -55,10 +57,12 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
         const baseResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/balance-sheet') &&
-                r.status() < 400,
+                r.request().method() === 'GET',
         );
         await page.goto('/reports/balance-sheet');
-        const base = await (await baseResponse).json();
+        const baseRes = await baseResponse;
+        await expectResponseOk(baseRes);
+        const base = await baseRes.json();
         const years: { id: number }[] = base.fiscalYears ?? [];
         test.skip(years.length < 2, 'Butuh minimal dua tahun fiskal di seed');
 
@@ -66,7 +70,7 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
             (r) =>
                 r.url().includes('/api/reports/balance-sheet') &&
                 r.url().includes('comparison_year_id') &&
-                r.status() < 400,
+                r.request().method() === 'GET',
         );
         const comparisonId = years.find(
             (y) => y.id !== base.selectedYearId,
@@ -75,7 +79,7 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
             `/reports/balance-sheet?fiscal_year_id=${base.selectedYearId}` +
                 `&comparison_year_id=${comparisonId}`,
         );
-        await compareResponse;
+        await expectResponseOk(await compareResponse);
 
         const header = page.getByText('Comparison', { exact: true }).first();
         await expect(header).toBeVisible();
@@ -106,10 +110,12 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
             const baseResponse = page.waitForResponse(
                 (r) =>
                     r.url().includes(`/api/reports/${report.slug}`) &&
-                    r.status() < 400,
+                    r.request().method() === 'GET',
             );
             await page.goto(`/reports/${report.slug}`);
-            const base = await (await baseResponse).json();
+            const baseRes = await baseResponse;
+            await expectResponseOk(baseRes);
+            const base = await baseRes.json();
             const years: { id: number }[] = base.fiscalYears ?? [];
             test.skip(
                 years.length < 2,
@@ -123,13 +129,13 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
                 (r) =>
                     r.url().includes(`/api/reports/${report.slug}`) &&
                     r.url().includes('comparison_year_id') &&
-                    r.status() < 400,
+                    r.request().method() === 'GET',
             );
             await page.goto(
                 `/reports/${report.slug}?fiscal_year_id=${base.selectedYearId}` +
                     `&comparison_year_id=${comparisonId}`,
             );
-            await compareResponse;
+            await expectResponseOk(await compareResponse);
 
             const header = page.getByText('Current', { exact: true }).first();
             await expect(header).toBeVisible();
@@ -166,10 +172,12 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
         const baseResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/comparative') &&
-                r.status() < 400,
+                r.request().method() === 'GET',
         );
         await page.goto('/reports/comparative');
-        const base = await (await baseResponse).json();
+        const baseRes = await baseResponse;
+        await expectResponseOk(baseRes);
+        const base = await baseRes.json();
         const years: { id: number }[] = base.fiscalYears ?? [];
         test.skip(years.length < 2, 'Butuh minimal dua tahun fiskal di seed');
 
@@ -180,13 +188,13 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
             (r) =>
                 r.url().includes('/api/reports/comparative') &&
                 r.url().includes('comparison_year_id') &&
-                r.status() < 400,
+                r.request().method() === 'GET',
         );
         await page.goto(
             `/reports/comparative?fiscal_year_id=${base.selectedYearId}` +
                 `&comparison_year_id=${comparisonId}`,
         );
-        await compareResponse;
+        await expectResponseOk(await compareResponse);
 
         const header = page.getByText('Current', { exact: true }).first();
         await expect(header).toBeVisible();
@@ -228,10 +236,10 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
         const summaryResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/financial-dashboard') &&
-                r.status() < 400,
+                r.request().method() === 'GET',
         );
         await page.goto('/financial-dashboard');
-        await summaryResponse;
+        await expectResponseOk(await summaryResponse);
 
         const values = page.locator('.tabular-nums.font-semibold').filter({
             hasText: 'Rp',
@@ -255,10 +263,11 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
         await page.setViewportSize({ width: 390, height: 844 });
         const listResponse = page.waitForResponse(
             (r) =>
-                r.url().includes('/api/asset-categories') && r.status() < 400,
+                r.url().includes('/api/asset-categories') &&
+                r.request().method() === 'GET',
         );
         await page.goto('/asset-categories');
-        await listResponse;
+        await expectResponseOk(await listResponse);
 
         const cell = page
             .locator('td')
@@ -281,10 +290,11 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
         await page.setViewportSize({ width: 390, height: 844 });
         const listResponse = page.waitForResponse(
             (r) =>
-                r.url().includes('/api/account-mappings') && r.status() < 400,
+                r.url().includes('/api/account-mappings') &&
+                r.request().method() === 'GET',
         );
         await page.goto('/account-mappings');
-        await listResponse;
+        await expectResponseOk(await listResponse);
 
         const notes = page.locator('td div.truncate[title]').first();
         test.skip(
@@ -303,10 +313,11 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
         await page.setViewportSize({ width: 390, height: 844 });
         const listResponse = page.waitForResponse(
             (r) =>
-                r.url().includes('/api/asset-categories') && r.status() < 400,
+                r.url().includes('/api/asset-categories') &&
+                r.request().method() === 'GET',
         );
         await page.goto('/asset-categories');
-        await listResponse;
+        await expectResponseOk(await listResponse);
 
         const header = page.getByTestId('sort-code');
         test.skip(
@@ -327,10 +338,11 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
         await page.setViewportSize({ width: 390, height: 844 });
         const listResponse = page.waitForResponse(
             (r) =>
-                r.url().includes('/api/asset-categories') && r.status() < 400,
+                r.url().includes('/api/asset-categories') &&
+                r.request().method() === 'GET',
         );
         await page.goto('/asset-categories');
-        await listResponse;
+        await expectResponseOk(await listResponse);
 
         const header = page.getByRole('button', {
             name: /Default Useful Life/,
@@ -354,10 +366,12 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
     }) => {
         await page.setViewportSize({ width: 1280, height: 900 });
         const listResponse = page.waitForResponse(
-            (r) => r.url().includes('/api/stock-movements') && r.status() < 400,
+            (r) =>
+                r.url().includes('/api/stock-movements') &&
+                r.request().method() === 'GET',
         );
         await page.goto('/stock-movements');
-        await listResponse;
+        await expectResponseOk(await listResponse);
 
         const srLink = page.locator('a[href^="/supplier-returns?search=SR-"]');
         test.skip(
@@ -374,10 +388,10 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
         const listResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/report-configurations') &&
-                r.status() < 400,
+                r.request().method() === 'GET',
         );
         await page.goto('/report-configurations');
-        await listResponse;
+        await expectResponseOk(await listResponse);
 
         const firstHeader = page.locator('thead th').nth(1);
         await expect(firstHeader).toContainText('Name');
@@ -388,10 +402,10 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
         const reportResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/ar-outstanding') &&
-                r.status() < 400,
+                r.request().method() === 'GET',
         );
         await page.goto('/reports/ar-outstanding');
-        await reportResponse;
+        await expectResponseOk(await reportResponse);
 
         const amountCell = page
             .locator('td div.tabular-nums.text-right')
@@ -427,10 +441,12 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
     }) => {
         await page.setViewportSize({ width: 1280, height: 900 });
         const agingResponse = page.waitForResponse(
-            (r) => r.url().includes('/api/aging-dashboard') && r.status() < 400,
+            (r) =>
+                r.url().includes('/api/aging-dashboard') &&
+                r.request().method() === 'GET',
         );
         await page.goto('/aging-dashboard');
-        await agingResponse;
+        await expectResponseOk(await agingResponse);
 
         const bucket = page.getByText('Over 90 Days').first();
         test.skip(
@@ -447,10 +463,10 @@ test.describe('Visual #440 wave 8 mobile fixes', () => {
         const runsResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/asset-depreciation-runs') &&
-                r.status() < 400,
+                r.request().method() === 'GET',
         );
         await page.goto('/asset-depreciation-runs');
-        await runsResponse;
+        await expectResponseOk(await runsResponse);
 
         const statusHeader = page
             .locator('thead th', { hasText: 'Status' })
