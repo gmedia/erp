@@ -47,6 +47,17 @@ const MOVEMENT_TYPE_OPTIONS = [
     { value: 'adjustment', label: 'Adjustment' },
 ];
 
+const MOVEMENT_REFERENCE_PREFIX: Record<
+    AssetMovementFormData['movement_type'],
+    string
+> = {
+    transfer: 'TRF',
+    assign: 'ASG',
+    return: 'RTN',
+    dispose: 'DSP',
+    adjustment: 'ADJ',
+};
+
 const ASSET_MOVEMENT_TYPES = [
     'transfer',
     'assign',
@@ -130,7 +141,7 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
         const effectiveAssetStatus = asset?.status ?? pickedAssetStatus;
 
         const movementType = form.watch('movement_type');
-        const referencePlaceholder = `e.g. ${movementType === 'dispose' ? 'DSP' : 'TRF'}-${new Date().getFullYear()}-001`;
+        const referencePlaceholder = `e.g. ${MOVEMENT_REFERENCE_PREFIX[movementType] ?? 'TRF'}-${new Date().getFullYear()}-001`;
         const toBranchId = form.watch('to_branch_id');
         const saleAmountValue = Number(form.watch('sale_amount') ?? '');
         const hasSaleProceeds = saleAmountValue > 0;
