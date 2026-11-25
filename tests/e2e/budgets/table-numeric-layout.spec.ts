@@ -119,6 +119,27 @@ test.describe('Purchase Orders & Assets - kolom uang rata kanan', () => {
     });
 });
 
+test.describe('Meta baris kedua tidak menduplikasi kolom', () => {
+    test('Purchase Orders: meta memakai gudang, bukan supplier yang sudah punya kolom', async ({
+        page,
+    }) => {
+        await page.setViewportSize({ width: 1440, height: 900 });
+        await openModule(page, '/purchase-orders', '/api/purchase-orders');
+
+        const row = page.locator('tbody tr').first();
+        const supplierHead = page.locator('th', { hasText: 'Supplier' }).first();
+        const supplierIndex = await columnIndexOf(supplierHead);
+        const supplierCell = row.locator(`td:nth-child(${supplierIndex})`);
+        const supplierName = (await supplierCell.innerText()).trim();
+        const meta = row.locator('td div.text-xs');
+        if ((await meta.count()) > 0 && supplierName) {
+            expect((await meta.first().innerText()).trim()).not.toBe(
+                supplierName,
+            );
+        }
+    });
+});
+
 test.describe('Bank reconciliations - kolom angka & layout', () => {
     test('header angka Statement, Book, Difference rata kanan di 1440', async ({
         page,
