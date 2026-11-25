@@ -5,6 +5,7 @@ import { memo } from 'react';
 import AsyncSelectField from '@/components/common/AsyncSelectField';
 import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityForm } from '@/hooks/useEntityForm';
 
 import { AssetLocation, AssetLocationFormData } from '@/types/entity';
@@ -47,6 +48,13 @@ export const AssetLocationForm = memo<AssetLocationFormProps>(
         onSubmit,
         isLoading = false,
     }) {
+        const { t } = useTranslation();
+        const fl = (key: string, fallback: string) => {
+            const translated = t(`form_fields.asset_locations.${key}`);
+            return translated === `form_fields.asset_locations.${key}`
+                ? fallback
+                : translated;
+        };
         const form = useEntityForm<AssetLocationFormData, AssetLocation>({
             schema: assetLocationFormSchema,
             getDefaults: getAssetLocationFormDefaults,
@@ -66,33 +74,38 @@ export const AssetLocationForm = memo<AssetLocationFormProps>(
                 open={open}
                 onOpenChange={onOpenChange}
                 title={
-                    entity ? 'Edit Asset Location' : 'Add New Asset Location'
+                    entity
+                        ? fl('edit_title', 'Edit Asset Location')
+                        : fl('add_title', 'Add New Asset Location')
                 }
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
             >
                 <InputField
                     name="code"
-                    label="Code"
-                    placeholder="Enter location code"
+                    label={fl('code', 'Code')}
+                    placeholder={fl('code_placeholder', 'Enter location code')}
                 />
                 <InputField
                     name="name"
-                    label="Name"
-                    placeholder="Enter location name"
+                    label={fl('name', 'Name')}
+                    placeholder={fl('name_placeholder', 'Enter location name')}
                 />
                 <AsyncSelectField
                     name="branch_id"
-                    label="Branch"
+                    label={fl('branch', 'Branch')}
                     url="/api/branches"
-                    placeholder="Select a branch"
+                    placeholder={fl('branch_placeholder', 'Select a branch')}
                     initialLabel={entity?.branch?.name}
                 />
                 <AsyncSelectField
                     name="parent_id"
-                    label="Parent Location (optional)"
+                    label={fl('parent', 'Parent Location (optional)')}
                     url="/api/asset-locations"
-                    placeholder="Select a parent location"
+                    placeholder={fl(
+                        'parent_placeholder',
+                        'Select a parent location',
+                    )}
                     initialLabel={entity?.parent?.name}
                 />
             </EntityForm>

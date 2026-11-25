@@ -12,6 +12,7 @@ import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
+import { useTranslation } from '@/contexts/i18n-context';
 
 import { Asset } from '@/types/asset';
 import { toDateInputValue } from '@/utils/date-format';
@@ -157,6 +158,13 @@ export const AssetForm = memo<AssetFormProps>(function AssetForm({
     onSubmit,
     isLoading = false,
 }) {
+    const { t } = useTranslation();
+    const fl = (key: string, fallback: string) => {
+        const translated = t(`form_fields.assets.${key}`);
+        return translated === `form_fields.assets.${key}`
+            ? fallback
+            : translated;
+    };
     const defaultValues = useMemo(() => getAssetFormDefaults(entity), [entity]);
 
     type AssetFormInput = z.input<typeof assetFormSchema>;
@@ -237,7 +245,11 @@ export const AssetForm = memo<AssetFormProps>(function AssetForm({
             }
             open={open}
             onOpenChange={onOpenChange}
-            title={entity ? 'Edit Asset' : 'Add New Asset'}
+            title={
+                entity
+                    ? fl('edit_title', 'Edit Asset')
+                    : fl('add_title', 'Add New Asset')
+            }
             onSubmit={handleFormSubmit}
             isLoading={isLoading}
             className="sm:max-w-[700px]"
@@ -245,35 +257,47 @@ export const AssetForm = memo<AssetFormProps>(function AssetForm({
             <div className="space-y-6">
                 <div>
                     <h3 className="mb-4 text-lg font-medium">
-                        Basic Information
+                        {fl('section_basic', 'Basic Information')}
                     </h3>
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <InputField
                             name="asset_code"
-                            label="Asset Code"
-                            placeholder="FA-000001"
+                            label={fl('asset_code', 'Asset Code')}
+                            placeholder={fl(
+                                'asset_code_placeholder',
+                                'FA-000001',
+                            )}
                         />
                         <InputField
                             name="name"
-                            label="Asset Name"
-                            placeholder="Laptop Dell Latitude"
+                            label={fl('name', 'Asset Name')}
+                            placeholder={fl(
+                                'name_placeholder',
+                                'Laptop Dell Latitude',
+                            )}
                         />
                         <AsyncSelectField
                             name="asset_category_id"
-                            label="Category"
+                            label={fl('category', 'Category')}
                             url="/api/asset-categories"
-                            placeholder="Select a category"
+                            placeholder={fl(
+                                'category_placeholder',
+                                'Select a category',
+                            )}
                             initialLabel={entity?.category?.name}
                         />
                         <AsyncSelectField
                             name="asset_model_id"
-                            label="Model"
+                            label={fl('model', 'Model')}
                             url={
                                 categoryId
                                     ? `/api/asset-models?asset_category_id=${categoryId}`
                                     : '/api/asset-models'
                             }
-                            placeholder="Select a model"
+                            placeholder={fl(
+                                'model_placeholder',
+                                'Select a model',
+                            )}
                             key={`model-select-${categoryId}`} // More stable key
                             initialLabel={
                                 entity?.model?.name || entity?.model?.model_name
@@ -282,60 +306,78 @@ export const AssetForm = memo<AssetFormProps>(function AssetForm({
                         />
                         <InputField
                             name="serial_number"
-                            label="Serial Number"
-                            placeholder="SN-123456"
+                            label={fl('serial_number', 'Serial Number')}
+                            placeholder={fl(
+                                'serial_number_placeholder',
+                                'SN-123456',
+                            )}
                         />
                         <InputField
                             name="barcode"
-                            label="Barcode"
-                            placeholder="BC-123456"
+                            label={fl('barcode', 'Barcode')}
+                            placeholder={fl('barcode_placeholder', 'BC-123456')}
                         />
                     </div>
                 </div>
                 <hr />
                 <div>
                     <h3 className="mb-4 text-lg font-medium">
-                        Ownership & Location
+                        {fl('section_ownership', 'Ownership & Location')}
                     </h3>
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <AsyncSelectField
                             name="branch_id"
-                            label="Branch"
+                            label={fl('branch', 'Branch')}
                             url="/api/branches"
-                            placeholder="Select a branch"
+                            placeholder={fl(
+                                'branch_placeholder',
+                                'Select a branch',
+                            )}
                             initialLabel={entity?.branch?.name}
                         />
                         <AsyncSelectField
                             name="asset_location_id"
-                            label="Location"
+                            label={fl('location', 'Location')}
                             url={
                                 branchId
                                     ? `/api/asset-locations?branch_id=${branchId}`
                                     : '/api/asset-locations'
                             }
-                            placeholder="Select a location"
+                            placeholder={fl(
+                                'location_placeholder',
+                                'Select a location',
+                            )}
                             key={`location-select-${branchId}`}
                             initialLabel={entity?.location?.name}
                         />
                         <AsyncSelectField
                             name="department_id"
-                            label="Department"
+                            label={fl('department', 'Department')}
                             url="/api/departments"
-                            placeholder="Select a department"
+                            placeholder={fl(
+                                'department_placeholder',
+                                'Select a department',
+                            )}
                             initialLabel={entity?.department?.name}
                         />
                         <AsyncSelectField
                             name="employee_id"
-                            label="Employee"
+                            label={fl('employee', 'Employee')}
                             url="/api/employees"
-                            placeholder="Select an employee"
+                            placeholder={fl(
+                                'employee_placeholder',
+                                'Select an employee',
+                            )}
                             initialLabel={entity?.employee?.name}
                         />
                         <AsyncSelectField
                             name="supplier_id"
-                            label="Supplier"
+                            label={fl('supplier', 'Supplier')}
                             url="/api/suppliers"
-                            placeholder="Select a supplier"
+                            placeholder={fl(
+                                'supplier_placeholder',
+                                'Select a supplier',
+                            )}
                             initialLabel={entity?.supplier?.name}
                         />
                     </div>
@@ -343,61 +385,105 @@ export const AssetForm = memo<AssetFormProps>(function AssetForm({
                 <hr />
                 <div>
                     <h3 className="mb-4 text-lg font-medium">
-                        Financial Details
+                        {fl('section_financial', 'Financial Details')}
                     </h3>
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <DatePickerField
                             name="purchase_date"
-                            label="Purchase Date"
-                            placeholder="Pick a date"
+                            label={fl('purchase_date', 'Purchase Date')}
+                            placeholder={fl(
+                                'purchase_date_placeholder',
+                                'Pick a date',
+                            )}
                         />
                         <InputField
                             name="purchase_cost"
-                            label="Purchase Cost"
+                            label={fl('purchase_cost', 'Purchase Cost')}
                             type="number"
-                            placeholder="0"
+                            placeholder={fl('purchase_cost_placeholder', '0')}
                         />
                         <DatePickerField
                             name="warranty_end_date"
-                            label="Warranty End Date"
-                            placeholder="Pick a date"
+                            label={fl('warranty_end_date', 'Warranty End Date')}
+                            placeholder={fl(
+                                'warranty_end_date_placeholder',
+                                'Pick a date',
+                            )}
                         />
                     </div>
                 </div>
                 <hr />
                 <div>
-                    <h3 className="mb-4 text-lg font-medium">Status & Notes</h3>
+                    <h3 className="mb-4 text-lg font-medium">
+                        {fl('section_status', 'Status & Notes')}
+                    </h3>
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <SelectField
                             name="status"
-                            label="Status"
+                            label={fl('status', 'Status')}
                             options={[
-                                { value: 'draft', label: 'Draft' },
-                                { value: 'active', label: 'Active' },
-                                { value: 'maintenance', label: 'Maintenance' },
-                                { value: 'disposed', label: 'Disposed' },
-                                { value: 'lost', label: 'Lost' },
+                                {
+                                    value: 'draft',
+                                    label: fl('status_draft', 'Draft'),
+                                },
+                                {
+                                    value: 'active',
+                                    label: fl('status_active', 'Active'),
+                                },
+                                {
+                                    value: 'maintenance',
+                                    label: fl(
+                                        'status_maintenance',
+                                        'Maintenance',
+                                    ),
+                                },
+                                {
+                                    value: 'disposed',
+                                    label: fl('status_disposed', 'Disposed'),
+                                },
+                                {
+                                    value: 'lost',
+                                    label: fl('status_lost', 'Lost'),
+                                },
                             ]}
-                            placeholder="Select status"
+                            placeholder={fl(
+                                'status_placeholder',
+                                'Select status',
+                            )}
                         />
                         <SelectField
                             name="condition"
-                            label="Condition"
+                            label={fl('condition', 'Condition')}
                             options={[
-                                { value: 'good', label: 'Good' },
+                                {
+                                    value: 'good',
+                                    label: fl('condition_good', 'Good'),
+                                },
                                 {
                                     value: 'needs_repair',
-                                    label: 'Needs Repair',
+                                    label: fl(
+                                        'condition_needs_repair',
+                                        'Needs Repair',
+                                    ),
                                 },
-                                { value: 'damaged', label: 'Damaged' },
+                                {
+                                    value: 'damaged',
+                                    label: fl('condition_damaged', 'Damaged'),
+                                },
                             ]}
-                            placeholder="Select condition"
+                            placeholder={fl(
+                                'condition_placeholder',
+                                'Select condition',
+                            )}
                         />
                         <div className="md:col-span-2">
                             <TextareaField
                                 name="notes"
-                                label="Notes"
-                                placeholder="Additional notes..."
+                                label={fl('notes', 'Notes')}
+                                placeholder={fl(
+                                    'notes_placeholder',
+                                    'Additional notes...',
+                                )}
                             />
                         </div>
                     </div>

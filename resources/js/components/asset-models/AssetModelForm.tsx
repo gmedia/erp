@@ -8,6 +8,7 @@ import AsyncSelectField from '@/components/common/AsyncSelectField';
 import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
 import { TextareaField } from '@/components/common/TextareaField';
+import { useTranslation } from '@/contexts/i18n-context';
 
 import { AssetModel, AssetModelFormData } from '@/types/entity';
 import { assetModelFormSchema } from '@/utils/schemas';
@@ -20,35 +21,40 @@ interface AssetModelFormProps {
     isLoading?: boolean;
 }
 
-const renderBasicInfoSection = () => (
+type FieldLabeler = (key: string, fallback: string) => string;
+
+const renderBasicInfoSection = (fl: FieldLabeler) => (
     <>
         <InputField
             name="model_name"
-            label="Model Name"
-            placeholder="Enter model name"
+            label={fl('model_name', 'Model Name')}
+            placeholder={fl('model_name_placeholder', 'Enter model name')}
         />
         <InputField
             name="manufacturer"
-            label="Manufacturer"
-            placeholder="Enter manufacturer (optional)"
+            label={fl('manufacturer', 'Manufacturer')}
+            placeholder={fl(
+                'manufacturer_placeholder',
+                'Enter manufacturer (optional)',
+            )}
         />
     </>
 );
 
-const renderCategorySection = () => (
+const renderCategorySection = (fl: FieldLabeler) => (
     <AsyncSelectField
         name="asset_category_id"
-        label="Category"
+        label={fl('category', 'Category')}
         url="/api/asset-categories"
-        placeholder="Select a category"
+        placeholder={fl('category_placeholder', 'Select a category')}
     />
 );
 
-const renderSpecsSection = () => (
+const renderSpecsSection = (fl: FieldLabeler) => (
     <TextareaField
         name="specs"
-        label="Specifications (JSON)"
-        placeholder='{"cpu": "i7", "ram_gb": 16}'
+        label={fl('specs', 'Specifications (JSON)')}
+        placeholder={fl('specs_placeholder', '{"cpu": "i7", "ram_gb": 16}')}
         rows={3}
     />
 );
@@ -84,6 +90,13 @@ export const AssetModelForm = memo<AssetModelFormProps>(
         onSubmit,
         isLoading = false,
     }) {
+        const { t } = useTranslation();
+        const fl: FieldLabeler = (key, fallback) => {
+            const translated = t(`form_fields.asset_models.${key}`);
+            return translated === `form_fields.asset_models.${key}`
+                ? fallback
+                : translated;
+        };
         const defaultValues = useMemo(
             () => getAssetModelFormDefaults(entity),
             [entity],
@@ -111,13 +124,17 @@ export const AssetModelForm = memo<AssetModelFormProps>(
                 form={form}
                 open={open}
                 onOpenChange={onOpenChange}
-                title={entity ? 'Edit Asset Model' : 'Add New Asset Model'}
+                title={
+                    entity
+                        ? fl('edit_title', 'Edit Asset Model')
+                        : fl('add_title', 'Add New Asset Model')
+                }
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
             >
-                {renderBasicInfoSection()}
-                {renderCategorySection()}
-                {renderSpecsSection()}
+                {renderBasicInfoSection(fl)}
+                {renderCategorySection(fl)}
+                {renderSpecsSection(fl)}
             </EntityForm>
         );
     },

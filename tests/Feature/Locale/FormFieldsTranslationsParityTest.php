@@ -561,6 +561,74 @@ test('budget, bank reconciliation, recurring journal and period closing validati
         ->and($id['period_closing']['period_month_range'])->toBe('Bulan periode harus antara 1 dan 12.');
 });
 
+test('asset, approval and pipeline form keys keep the english text and exist in both locales', function () {
+    $en = localeFormFieldTranslations('en.json');
+    $id = localeFormFieldTranslations('id.json');
+    $enValidation = localeValidationTranslations('en.json');
+    $idValidation = localeValidationTranslations('id.json');
+
+    $modules = [
+        'assets', 'asset_categories', 'asset_locations', 'asset_models',
+        'asset_movements', 'asset_maintenances', 'asset_stocktakes',
+        'approval_delegations', 'approval_flows', 'pipelines', 'approval_flow_steps',
+    ];
+
+    foreach ($modules as $module) {
+        expect(array_keys($en[$module]))->not->toBeEmpty();
+        expect(array_keys($en[$module]))->toEqual(array_keys($id[$module]), "form_fields.{$module} keys differ");
+
+        foreach (array_keys($en[$module]) as $field) {
+            expect($id[$module][$field])->not->toBe('', "form_fields.{$module}.{$field} empty");
+        }
+    }
+
+    foreach (['asset', 'asset_category', 'asset_location', 'asset_model', 'asset_movement', 'asset_maintenance', 'asset_stocktake', 'approval_delegation', 'approval_flow', 'pipeline'] as $form) {
+        expect(array_keys($enValidation[$form]))->toEqual(array_keys($idValidation[$form]), "validation.{$form} keys differ");
+    }
+
+    expect($en['assets']['add_title'])->toBe('Add New Asset')
+        ->and($en['assets']['edit_title'])->toBe('Edit Asset')
+        ->and($en['assets']['asset_code'])->toBe('Asset Code')
+        ->and($en['assets']['name'])->toBe('Asset Name')
+        ->and($en['assets']['section_status'])->toBe('Status & Notes')
+        ->and($en['assets']['status_disposed'])->toBe('Disposed')
+        ->and($en['assets']['condition_needs_repair'])->toBe('Needs Repair')
+        ->and($en['asset_categories']['useful_life_months_default'])->toBe('Default Useful Life (Months)')
+        ->and($en['asset_locations']['parent'])->toBe('Parent Location (optional)')
+        ->and($en['asset_models']['specs'])->toBe('Specifications (JSON)')
+        ->and($en['asset_movements']['movement_type_transfer'])->toBe('Transfer (Location Change)')
+        ->and($en['asset_movements']['record_for_title'])->toBe('Record Movement for {code}')
+        ->and($en['asset_movements']['reference_placeholder_prefix'])->toBe('e.g. {prefix}-{year}-001')
+        ->and($en['asset_maintenances']['submit_save'])->toBe('Save Maintenance')
+        ->and($en['asset_maintenances']['maintenance_type_calibration'])->toBe('Calibration')
+        ->and($en['asset_stocktakes']['reference_placeholder'])->toBe('ST-2024-001')
+        ->and($en['asset_stocktakes']['status_in_progress'])->toBe('In Progress')
+        ->and($en['approval_delegations']['approvable_type'])->toBe('Approvable Type (e.g. App\\Models\\PurchaseOrder)')
+        ->and($en['approval_delegations']['reason_placeholder'])->toBe('Reason for delegation...')
+        ->and($en['approval_flows']['name_placeholder'])->toBe('e.g. Standard PR Flow')
+        ->and($en['approval_flows']['conditions_placeholder'])->toBe('e.g. {"field": "amount", "operator": ">", "value": 1000}')
+        ->and($en['pipelines']['tab_transitions'])->toBe('Transitions')
+        ->and($en['pipelines']['conditions_placeholder'])->toBe('e.g. {"asset_type": "vehicle"}')
+        ->and($en['approval_flow_steps']['dialog_add_title'])->toBe('Add Approval Step')
+        ->and($en['approval_flow_steps']['delete_confirm'])->toBe('Are you sure you want to delete this step?')
+        ->and($en['approval_flow_steps']['empty'])->toBe('No steps defined. Add one to enable approval flow.')
+        ->and($en['approval_flow_steps']['user_id_label'])->toBe('User ID: {id}');
+
+    expect($enValidation['asset']['asset_code_min_2'])->toBe('Asset code must be at least 2 characters.')
+        ->and($enValidation['asset_category']['useful_life_min_1'])->toBe('Useful life must be at least 1 month.')
+        ->and($enValidation['asset_movement']['moved_at_required'])->toBe('Movement date is required.')
+        ->and($enValidation['asset_stocktake']['planned_at_required'])->toBe('Planned date is required.')
+        ->and($enValidation['approval_delegation']['end_before_start'])->toBe('End date must be after or equal to start date.')
+        ->and($enValidation['approval_flow']['steps_min_one'])->toBe('At least one approval step is required')
+        ->and($enValidation['pipeline']['conditions_json'])->toBe('Conditions must be valid JSON.');
+
+    expect($id['assets']['add_title'])->toBe('Tambah Aset Baru')
+        ->and($id['approval_flows']['add_title'])->toBe('Tambah Alur Persetujuan Baru')
+        ->and($id['pipelines']['add_title'])->toBe('Tambah Pipeline Baru')
+        ->and($idValidation['asset_movement']['asset_required'])->toBe('Aset wajib diisi.')
+        ->and($idValidation['pipeline']['entity_type_required'])->toBe('Tipe entitas wajib diisi.');
+});
+
 test('simple entity form keys keep the english text and exist in both locales', function () {
     $en = localeFormFieldTranslations('en.json');
     $id = localeFormFieldTranslations('id.json');

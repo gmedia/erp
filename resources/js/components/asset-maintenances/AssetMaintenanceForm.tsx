@@ -12,6 +12,7 @@ import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
+import { useTranslation } from '@/contexts/i18n-context';
 import { type AssetMaintenance } from '@/types/asset-maintenance';
 import { toDateInputValue } from '@/utils/date-format';
 import {
@@ -67,6 +68,13 @@ export const AssetMaintenanceForm = memo<AssetMaintenanceFormProps>(
         onSubmit,
         isLoading = false,
     }) {
+        const { t } = useTranslation();
+        const fl = (key: string, fallback: string) => {
+            const translated = t(`form_fields.asset_maintenances.${key}`);
+            return translated === `form_fields.asset_maintenances.${key}`
+                ? fallback
+                : translated;
+        };
         const defaultValues = useMemo(
             () => getAssetMaintenanceFormDefaults(entity),
             [entity],
@@ -122,10 +130,14 @@ export const AssetMaintenanceForm = memo<AssetMaintenanceFormProps>(
                 onOpenChange={onOpenChange}
                 title={
                     entity
-                        ? 'Edit Asset Maintenance'
-                        : 'Add New Asset Maintenance'
+                        ? fl('edit_title', 'Edit Asset Maintenance')
+                        : fl('add_title', 'Add New Asset Maintenance')
                 }
-                submitLabel={entity ? 'Update Maintenance' : 'Save Maintenance'}
+                submitLabel={
+                    entity
+                        ? fl('submit_update', 'Update Maintenance')
+                        : fl('submit_save', 'Save Maintenance')
+                }
                 onSubmit={handleFormSubmit}
                 isLoading={isLoading}
                 className="sm:max-w-[650px]"
@@ -133,9 +145,9 @@ export const AssetMaintenanceForm = memo<AssetMaintenanceFormProps>(
                 <div className="space-y-6">
                     <AsyncSelectField
                         name="asset_id"
-                        label="Asset"
+                        label={fl('asset', 'Asset')}
                         url="/api/assets"
-                        placeholder="Select asset"
+                        placeholder={fl('asset_placeholder', 'Select asset')}
                         initialLabel={initialAssetLabel}
                         labelFn={(a: Record<string, unknown>) =>
                             `${(a.asset_code as string) || ''} ${(a.name as string) || ''}`.trim()
@@ -145,34 +157,76 @@ export const AssetMaintenanceForm = memo<AssetMaintenanceFormProps>(
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <SelectField
                             name="maintenance_type"
-                            label="Maintenance Type"
+                            label={fl('maintenance_type', 'Maintenance Type')}
                             options={[
-                                { value: 'preventive', label: 'Preventive' },
-                                { value: 'corrective', label: 'Corrective' },
-                                { value: 'calibration', label: 'Calibration' },
-                                { value: 'other', label: 'Other' },
+                                {
+                                    value: 'preventive',
+                                    label: fl(
+                                        'maintenance_type_preventive',
+                                        'Preventive',
+                                    ),
+                                },
+                                {
+                                    value: 'corrective',
+                                    label: fl(
+                                        'maintenance_type_corrective',
+                                        'Corrective',
+                                    ),
+                                },
+                                {
+                                    value: 'calibration',
+                                    label: fl(
+                                        'maintenance_type_calibration',
+                                        'Calibration',
+                                    ),
+                                },
+                                {
+                                    value: 'other',
+                                    label: fl(
+                                        'maintenance_type_other',
+                                        'Other',
+                                    ),
+                                },
                             ]}
                         />
                         <SelectField
                             name="status"
-                            label="Status"
+                            label={fl('status', 'Status')}
                             options={[
-                                { value: 'scheduled', label: 'Scheduled' },
-                                { value: 'in_progress', label: 'In Progress' },
-                                { value: 'completed', label: 'Completed' },
-                                { value: 'cancelled', label: 'Cancelled' },
+                                {
+                                    value: 'scheduled',
+                                    label: fl('status_scheduled', 'Scheduled'),
+                                },
+                                {
+                                    value: 'in_progress',
+                                    label: fl(
+                                        'status_in_progress',
+                                        'In Progress',
+                                    ),
+                                },
+                                {
+                                    value: 'completed',
+                                    label: fl('status_completed', 'Completed'),
+                                },
+                                {
+                                    value: 'cancelled',
+                                    label: fl('status_cancelled', 'Cancelled'),
+                                },
                             ]}
                         />
                         <DatePickerField
                             name="scheduled_at"
-                            label="Scheduled At"
-                            placeholder="Pick a date"
+                            label={fl('scheduled_at', 'Scheduled At')}
+                            placeholder={fl('date_placeholder', 'Pick a date')}
                         />
                         {status === 'completed' && (
                             <DatePickerField
                                 name="performed_at"
-                                label="Performed At"
-                                placeholder="Pick a date"
+                                label={fl('performed_at', 'Performed At')}
+                                placeholder={fl(
+                                    'date_placeholder',
+                                    'Pick a date',
+                                )}
                             />
                         )}
                     </div>
@@ -180,24 +234,30 @@ export const AssetMaintenanceForm = memo<AssetMaintenanceFormProps>(
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <AsyncSelectField
                             name="supplier_id"
-                            label="Supplier"
+                            label={fl('supplier', 'Supplier')}
                             url="/api/suppliers"
-                            placeholder="Select supplier"
+                            placeholder={fl(
+                                'supplier_placeholder',
+                                'Select supplier',
+                            )}
                             initialLabel={entity?.supplier || undefined}
                         />
                         <InputField
                             name="cost"
-                            label="Cost"
+                            label={fl('cost', 'Cost')}
                             type="number"
-                            placeholder="0"
+                            placeholder={fl('cost_placeholder', '0')}
                             min={0}
                         />
                     </div>
 
                     <TextareaField
                         name="notes"
-                        label="Notes"
-                        placeholder="Additional notes..."
+                        label={fl('notes', 'Notes')}
+                        placeholder={fl(
+                            'notes_placeholder',
+                            'Additional notes...',
+                        )}
                         rows={3}
                     />
                 </div>

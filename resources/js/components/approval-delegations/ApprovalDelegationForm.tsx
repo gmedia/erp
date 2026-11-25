@@ -10,6 +10,7 @@ import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
 import SelectField from '@/components/common/SelectField';
+import { useTranslation } from '@/contexts/i18n-context';
 
 import {
     ApprovalDelegation,
@@ -66,6 +67,13 @@ export const ApprovalDelegationForm = memo<ApprovalDelegationFormProps>(
         onSubmit,
         isLoading = false,
     }) {
+        const { t } = useTranslation();
+        const fl = (key: string, fallback: string) => {
+            const translated = t(`form_fields.approval_delegations.${key}`);
+            return translated === `form_fields.approval_delegations.${key}`
+                ? fallback
+                : translated;
+        };
         const defaultValues = useMemo(
             () => getApprovalDelegationFormDefaults(entity),
             [entity],
@@ -95,68 +103,89 @@ export const ApprovalDelegationForm = memo<ApprovalDelegationFormProps>(
                 onOpenChange={onOpenChange}
                 title={
                     entity
-                        ? 'Edit Approval Delegation'
-                        : 'Add New Approval Delegation'
+                        ? fl('edit_title', 'Edit Approval Delegation')
+                        : fl('add_title', 'Add New Approval Delegation')
                 }
                 onSubmit={onSubmit}
                 isLoading={isLoading}
             >
                 <div className="space-y-4">
                     <span className="mt-4 mb-2 block text-sm font-medium text-muted-foreground">
-                        Delegation Details
+                        {fl('details_title', 'Delegation Details')}
                     </span>
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <AsyncSelectField
                             name="delegator_user_id"
-                            label="Delegator"
+                            label={fl('delegator', 'Delegator')}
                             url="/api/users"
-                            placeholder="Select delegator..."
+                            placeholder={fl(
+                                'delegator_placeholder',
+                                'Select delegator...',
+                            )}
                         />
 
                         <AsyncSelectField
                             name="delegate_user_id"
-                            label="Delegate"
+                            label={fl('delegate', 'Delegate')}
                             url="/api/users"
-                            placeholder="Select delegate..."
+                            placeholder={fl(
+                                'delegate_placeholder',
+                                'Select delegate...',
+                            )}
                         />
 
                         <DatePickerField
                             name="start_date"
-                            label="Start Date"
-                            placeholder="Pick a date"
+                            label={fl('start_date', 'Start Date')}
+                            placeholder={fl('date_placeholder', 'Pick a date')}
                         />
 
                         <DatePickerField
                             name="end_date"
-                            label="End Date"
-                            placeholder="Pick a date"
+                            label={fl('end_date', 'End Date')}
+                            placeholder={fl('date_placeholder', 'Pick a date')}
                         />
                     </div>
 
                     <span className="mt-4 mb-2 block text-sm font-medium text-muted-foreground">
-                        Additional Info
+                        {fl('additional_title', 'Additional Info')}
                     </span>
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <InputField
                             name="approvable_type"
-                            label="Approvable Type (e.g. App\Models\PurchaseOrder)"
-                            placeholder="All types (optional)"
+                            label={fl(
+                                'approvable_type',
+                                'Approvable Type (e.g. App\\Models\\PurchaseOrder)',
+                            )}
+                            placeholder={fl(
+                                'approvable_type_placeholder',
+                                'All types (optional)',
+                            )}
                         />
 
                         <SelectField
                             name="is_active"
-                            label="Status"
+                            label={fl('status', 'Status')}
                             options={[
-                                { label: 'Active', value: '1' },
-                                { label: 'Inactive', value: '0' },
+                                {
+                                    label: fl('status_active', 'Active'),
+                                    value: '1',
+                                },
+                                {
+                                    label: fl('status_inactive', 'Inactive'),
+                                    value: '0',
+                                },
                             ]}
                         />
                     </div>
 
                     <InputField
                         name="reason"
-                        label="Reason"
-                        placeholder="Reason for delegation..."
+                        label={fl('reason', 'Reason')}
+                        placeholder={fl(
+                            'reason_placeholder',
+                            'Reason for delegation...',
+                        )}
                     />
                 </div>
             </EntityForm>

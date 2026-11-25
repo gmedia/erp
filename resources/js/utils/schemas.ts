@@ -54,15 +54,19 @@ const emailValidator = () =>
 // Schema for approval delegations
 export const approvalDelegationFormSchema = z
     .object({
-        delegator_user_id: z
-            .string()
-            .min(1, { message: 'Delegator is required.' }),
-        delegate_user_id: z
-            .string()
-            .min(1, { message: 'Delegate is required.' }),
+        delegator_user_id: z.string().min(1, {
+            message: 'validation.approval_delegation.delegator_required',
+        }),
+        delegate_user_id: z.string().min(1, {
+            message: 'validation.approval_delegation.delegate_required',
+        }),
         approvable_type: z.string().optional(),
-        start_date: z.string().min(1, { message: 'Start date is required.' }),
-        end_date: z.string().min(1, { message: 'End date is required.' }),
+        start_date: z.string().min(1, {
+            message: 'validation.approval_delegation.start_date_required',
+        }),
+        end_date: z.string().min(1, {
+            message: 'validation.approval_delegation.end_date_required',
+        }),
         reason: z.string().optional(),
         is_active: z
             .union([z.boolean(), z.string()])
@@ -70,11 +74,11 @@ export const approvalDelegationFormSchema = z
             .transform((val) => val === true || val === 'true' || val === '1'),
     })
     .refine((data) => data.delegator_user_id !== data.delegate_user_id, {
-        message: 'Delegator and Delegate cannot be the same user.',
+        message: 'validation.approval_delegation.same_user',
         path: ['delegate_user_id'],
     })
     .refine((data) => data.end_date >= data.start_date, {
-        message: 'End date must be after or equal to start date.',
+        message: 'validation.approval_delegation.end_before_start',
         path: ['end_date'],
     });
 
@@ -342,11 +346,15 @@ export type JournalEntryFormData = z.infer<typeof journalEntryFormSchema>;
  * Asset category form schema with code, name, and useful life.
  */
 export const assetCategoryFormSchema = z.object({
-    code: z.string().min(2, { message: 'Code must be at least 2 characters.' }),
-    name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
-    useful_life_months_default: z.coerce
-        .number()
-        .min(1, { message: 'Useful life must be at least 1 month.' }),
+    code: z.string().min(2, {
+        message: 'validation.asset_category.code_min_2',
+    }),
+    name: z.string().min(2, {
+        message: 'validation.asset_category.name_min_2',
+    }),
+    useful_life_months_default: z.coerce.number().min(1, {
+        message: 'validation.asset_category.useful_life_min_1',
+    }),
 });
 
 export type AssetCategoryFormData = z.infer<typeof assetCategoryFormSchema>;
@@ -355,11 +363,13 @@ export type AssetCategoryFormData = z.infer<typeof assetCategoryFormSchema>;
  * Asset model form schema.
  */
 export const assetModelFormSchema = z.object({
-    model_name: z
-        .string()
-        .min(2, { message: 'Model name must be at least 2 characters.' }),
+    model_name: z.string().min(2, {
+        message: 'validation.asset_model.model_name_min_2',
+    }),
     manufacturer: z.string().optional(),
-    asset_category_id: z.string().min(1, { message: 'Category is required.' }),
+    asset_category_id: z.string().min(1, {
+        message: 'validation.asset_model.category_required',
+    }),
     specs: z
         .string()
         .optional()
@@ -373,7 +383,7 @@ export const assetModelFormSchema = z.object({
                     return false;
                 }
             },
-            { message: 'Specs must be valid JSON.' },
+            { message: 'validation.asset_model.specs_json' },
         ),
 });
 
@@ -412,9 +422,15 @@ export type AccountMappingFormData = z.infer<typeof accountMappingFormSchema>;
  * Asset location form schema.
  */
 export const assetLocationFormSchema = z.object({
-    code: z.string().min(1, { message: 'Code is required.' }),
-    name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
-    branch_id: z.string().min(1, { message: 'Branch is required.' }),
+    code: z.string().min(1, {
+        message: 'validation.asset_location.code_required',
+    }),
+    name: z.string().min(2, {
+        message: 'validation.asset_location.name_min_2',
+    }),
+    branch_id: z.string().min(1, {
+        message: 'validation.asset_location.branch_required',
+    }),
     parent_id: z.string().optional(),
 });
 
@@ -432,25 +448,33 @@ export type WarehouseFormData = z.infer<typeof warehouseFormSchema>;
  * Asset form schema.
  */
 export const assetFormSchema = z.object({
-    asset_code: z
-        .string()
-        .min(2, { message: 'Asset code must be at least 2 characters.' }),
-    name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
-    asset_category_id: z.string().min(1, { message: 'Category is required.' }),
+    asset_code: z.string().min(2, {
+        message: 'validation.asset.asset_code_min_2',
+    }),
+    name: z.string().min(2, { message: 'validation.asset.name_min_2' }),
+    asset_category_id: z.string().min(1, {
+        message: 'validation.asset.category_required',
+    }),
     asset_model_id: z.string().default(''),
     serial_number: z.string().default(''),
     barcode: z.string().default(''),
-    branch_id: z.string().min(1, { message: 'Branch is required.' }),
+    branch_id: z.string().min(1, {
+        message: 'validation.asset.branch_required',
+    }),
     asset_location_id: z.string().default(''),
     department_id: z.string().default(''),
     employee_id: z.string().default(''),
     supplier_id: z.string().default(''),
-    purchase_date: z.string().min(1, { message: 'Purchase date is required.' }),
-    purchase_cost: z.string().min(1, { message: 'Purchase cost is required.' }),
+    purchase_date: z.string().min(1, {
+        message: 'validation.asset.purchase_date_required',
+    }),
+    purchase_cost: z.string().min(1, {
+        message: 'validation.asset.purchase_cost_required',
+    }),
     currency: z.string().min(3).max(3).default('IDR'),
     warranty_end_date: z.string().optional().nullable(),
     status: z.enum(['draft', 'active', 'maintenance', 'disposed', 'lost'], {
-        message: 'Status is required.',
+        message: 'validation.asset.status_required',
     }),
     condition: z
         .enum(['good', 'needs_repair', 'damaged'])
@@ -473,14 +497,18 @@ export type AssetFormData = z.infer<typeof assetFormSchema>;
  * Asset movement form schema.
  */
 export const assetMovementFormSchema = z.object({
-    asset_id: z.string().min(1, { message: 'Asset is required.' }),
+    asset_id: z.string().min(1, {
+        message: 'validation.asset_movement.asset_required',
+    }),
     movement_type: z.enum(
         ['transfer', 'assign', 'return', 'dispose', 'adjustment'],
         {
-            message: 'Movement type is required.',
+            message: 'validation.asset_movement.movement_type_required',
         },
     ),
-    moved_at: z.string().min(1, { message: 'Movement date is required.' }),
+    moved_at: z.string().min(1, {
+        message: 'validation.asset_movement.moved_at_required',
+    }),
     to_branch_id: z.string().optional(),
     to_location_id: z.string().optional(),
     to_department_id: z.string().optional(),
@@ -494,17 +522,21 @@ export const assetMovementFormSchema = z.object({
 export type AssetMovementFormData = z.infer<typeof assetMovementFormSchema>;
 
 export const assetMaintenanceFormSchema = z.object({
-    asset_id: z.string().min(1, { message: 'Asset is required.' }),
+    asset_id: z.string().min(1, {
+        message: 'validation.asset_maintenance.asset_required',
+    }),
     maintenance_type: z.enum(
         ['preventive', 'corrective', 'calibration', 'other'],
         {
-            message: 'Maintenance type is required.',
+            message: 'validation.asset_maintenance.maintenance_type_required',
         },
     ),
     status: z.enum(['scheduled', 'in_progress', 'completed', 'cancelled'], {
-        message: 'Status is required.',
+        message: 'validation.asset_maintenance.status_required',
     }),
-    scheduled_at: z.string().min(1, { message: 'Scheduled date is required.' }),
+    scheduled_at: z.string().min(1, {
+        message: 'validation.asset_maintenance.scheduled_at_required',
+    }),
     performed_at: z.string().optional().nullable(),
     supplier_id: z.string().default(''),
     cost: z.string().default('0'),
@@ -516,12 +548,18 @@ export type AssetMaintenanceFormData = z.infer<
 >;
 
 export const assetStocktakeFormSchema = z.object({
-    branch_id: z.string().min(1, { message: 'Branch is required.' }),
-    reference: z.string().min(1, { message: 'Reference is required.' }),
-    planned_at: z.string().min(1, { message: 'Planned date is required.' }),
+    branch_id: z.string().min(1, {
+        message: 'validation.asset_stocktake.branch_required',
+    }),
+    reference: z.string().min(1, {
+        message: 'validation.asset_stocktake.reference_required',
+    }),
+    planned_at: z.string().min(1, {
+        message: 'validation.asset_stocktake.planned_at_required',
+    }),
     performed_at: z.string().optional().nullable(),
     status: z.enum(['draft', 'in_progress', 'completed', 'cancelled'], {
-        message: 'Status is required.',
+        message: 'validation.asset_stocktake.status_required',
     }),
 });
 
@@ -538,9 +576,11 @@ export type AssetDepreciationCalculationFormData = z.infer<
 >;
 
 export const pipelineFormSchema = z.object({
-    name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
-    code: z.string().min(2, { message: 'Code must be at least 2 characters.' }),
-    entity_type: z.string().min(1, { message: 'Entity Type is required.' }),
+    name: z.string().min(2, { message: 'validation.pipeline.name_min_2' }),
+    code: z.string().min(2, { message: 'validation.pipeline.code_min_2' }),
+    entity_type: z.string().min(1, {
+        message: 'validation.pipeline.entity_type_required',
+    }),
     description: z.string().optional(),
     version: z.string().optional(),
     is_active: z.union([z.boolean(), z.string()]).default(true),
@@ -557,7 +597,7 @@ export const pipelineFormSchema = z.object({
                     return false;
                 }
             },
-            { message: 'Conditions must be valid JSON.' },
+            { message: 'validation.pipeline.conditions_json' },
         ),
 });
 
@@ -667,7 +707,7 @@ export type PipelineTransitionFormData = z.infer<
 
 export const approvalFlowStepSchema = z.object({
     id: z.number().optional(),
-    name: z.string().min(1, 'Step name is required'),
+    name: z.string().min(1, 'validation.approval_flow.step_name_required'),
     approver_type: z.literal('user'),
     approver_user_id: z.preprocess(
         (val) => (val === '' || val === null ? null : Number(val)),
@@ -675,7 +715,7 @@ export const approvalFlowStepSchema = z.object({
             .number()
             .nullable()
             .refine((value) => value !== null, {
-                message: 'Approver user is required',
+                message: 'validation.approval_flow.approver_user_required',
             }),
     ),
     required_action: z.enum(['approve', 'review', 'acknowledge']),
@@ -698,9 +738,11 @@ export const approvalFlowStepSchema = z.object({
 });
 
 export const approvalFlowFormSchema = z.object({
-    name: z.string().min(1, 'Name is required'),
-    code: z.string().min(1, 'Code is required'),
-    approvable_type: z.string().min(1, 'Approvable Type is required'),
+    name: z.string().min(1, 'validation.approval_flow.name_required'),
+    code: z.string().min(1, 'validation.approval_flow.code_required'),
+    approvable_type: z
+        .string()
+        .min(1, 'validation.approval_flow.approvable_type_required'),
     description: z.string().nullable().optional(),
     is_active: z
         .union([z.boolean(), z.string()])
@@ -708,7 +750,7 @@ export const approvalFlowFormSchema = z.object({
     conditions: z.string().nullable().optional(),
     steps: z
         .array(approvalFlowStepSchema)
-        .min(1, 'At least one approval step is required'),
+        .min(1, 'validation.approval_flow.steps_min_one'),
 });
 
 export type ApprovalFlowFormData = z.infer<typeof approvalFlowFormSchema>;

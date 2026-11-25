@@ -9,6 +9,7 @@ import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
 import SelectField from '@/components/common/SelectField';
+import { useTranslation } from '@/contexts/i18n-context';
 
 import { AssetStocktake } from '@/types/asset-stocktake';
 import {
@@ -86,6 +87,13 @@ export const AssetStocktakeForm = memo<AssetStocktakeFormProps>(
         onSubmit,
         isLoading = false,
     }) {
+        const { t } = useTranslation();
+        const fl = (key: string, fallback: string) => {
+            const translated = t(`form_fields.asset_stocktakes.${key}`);
+            return translated === `form_fields.asset_stocktakes.${key}`
+                ? fallback
+                : translated;
+        };
         const activeAssetStocktake = assetStocktake || item || entity;
 
         const defaultValues = useMemo(
@@ -109,8 +117,8 @@ export const AssetStocktakeForm = memo<AssetStocktakeFormProps>(
                 onOpenChange={onOpenChange}
                 title={
                     activeAssetStocktake
-                        ? 'Edit Asset Stocktake'
-                        : 'Add New Asset Stocktake'
+                        ? fl('edit_title', 'Edit Asset Stocktake')
+                        : fl('add_title', 'Add New Asset Stocktake')
                 }
                 onSubmit={onSubmit}
                 isLoading={isLoading}
@@ -119,26 +127,44 @@ export const AssetStocktakeForm = memo<AssetStocktakeFormProps>(
                 <AsyncSelectField
                     key={`branch-select-${activeAssetStocktake?.id || 'new'}`}
                     name="branch_id"
-                    label="Branch"
+                    label={fl('branch', 'Branch')}
                     url="/api/branches"
-                    placeholder="Select a branch"
+                    placeholder={fl('branch_placeholder', 'Select a branch')}
                     initialLabel={activeAssetStocktake?.branch?.name}
                 />
                 <InputField
                     name="reference"
-                    label="Reference"
-                    placeholder="ST-2024-001"
+                    label={fl('reference', 'Reference')}
+                    placeholder={fl('reference_placeholder', 'ST-2024-001')}
                 />
-                <DatePickerField name="planned_at" label="Planned Date" />
-                <DatePickerField name="performed_at" label="Performed Date" />
+                <DatePickerField
+                    name="planned_at"
+                    label={fl('planned_at', 'Planned Date')}
+                />
+                <DatePickerField
+                    name="performed_at"
+                    label={fl('performed_at', 'Performed Date')}
+                />
                 <SelectField
                     name="status"
-                    label="Status"
+                    label={fl('status', 'Status')}
                     options={[
-                        { value: 'draft', label: 'Draft' },
-                        { value: 'in_progress', label: 'In Progress' },
-                        { value: 'completed', label: 'Completed' },
-                        { value: 'cancelled', label: 'Cancelled' },
+                        {
+                            value: 'draft',
+                            label: fl('status_draft', 'Draft'),
+                        },
+                        {
+                            value: 'in_progress',
+                            label: fl('status_in_progress', 'In Progress'),
+                        },
+                        {
+                            value: 'completed',
+                            label: fl('status_completed', 'Completed'),
+                        },
+                        {
+                            value: 'cancelled',
+                            label: fl('status_cancelled', 'Cancelled'),
+                        },
                     ]}
                 />
             </EntityForm>
