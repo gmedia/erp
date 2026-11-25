@@ -32,7 +32,7 @@ async function clickFirstMatchingOption(
                 throw error;
             }
 
-            await page.waitForTimeout(200);
+            await expect(option).toBeVisible({ timeout: 5000 });
         }
     }
 
@@ -84,9 +84,6 @@ export async function createAccountMapping(page: Page): Promise<{
     const selectFirstOptionAndGetCode = async (
         retries = 3,
     ): Promise<string> => {
-        // Small wait to ensure dropdown animations or data loading has started
-        await page.waitForTimeout(500);
-
         for (let i = 0; i < retries; i++) {
             try {
                 // Wait for listbox to finish loading
@@ -121,7 +118,9 @@ export async function createAccountMapping(page: Page): Promise<{
                 return code;
             } catch (e) {
                 if (i === retries - 1) throw e;
-                await page.waitForTimeout(1000);
+                await expect(
+                    page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').last(),
+                ).toBeVisible({ timeout: 5000 });
             }
         }
         return ''; // Should not reach here

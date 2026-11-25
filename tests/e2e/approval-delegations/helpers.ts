@@ -1,5 +1,5 @@
 import { Page, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 
 async function pickAsyncOption(page: Page, value: string): Promise<void> {
   const listbox = page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').last();
@@ -7,9 +7,25 @@ async function pickAsyncOption(page: Page, value: string): Promise<void> {
 
   const searchInput = page.locator('input[placeholder="Search..."]:visible').last();
   if (await searchInput.isVisible().catch(() => false)) {
+    // AsyncSelect mendebounce pencarian (300ms). Tunggu respons pencarian
+    // dengan query = value agar opsi dari daftar lama tidak ikut terklik.
+    const responsePromise = page.waitForResponse(
+      r => r.request().method() === 'GET'
+        && r.url().includes('/api/')
+        && new URL(r.url()).searchParams.get('search') === value,
+    );
     await searchInput.fill(value);
-    await page.waitForTimeout(500);
+    await expectResponseOk(await responsePromise);
   }
+
+  // Opsi yang tampil harus sudah sesuai value (tidak ada opsi lama yang tersisa).
+  await expect.poll(
+    () => page
+      .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
+      .filter({ hasNotText: new RegExp(value, 'i') })
+      .count(),
+    { timeout: 15000 },
+  ).toBe(0);
 
   const option = page
     .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
@@ -120,7 +136,7 @@ export async function searchApprovalDelegation(page: Page, query: string): Promi
   await searchInput.press('Enter');
   
   await responsePromise;
-  await page.waitForTimeout(500);
+  await expect(page.locator('tr').filter({ hasText: normalizedQuery }).first()).toBeVisible();
 }
 
 export async function editApprovalDelegation(

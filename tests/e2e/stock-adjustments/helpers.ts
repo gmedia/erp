@@ -23,7 +23,6 @@ async function selectAsyncOption(
                 .last();
             if (await searchInput.isVisible().catch(() => false)) {
                 await searchInput.fill(searchText);
-                await page.waitForTimeout(250);
             }
         }
 
@@ -41,7 +40,9 @@ async function selectAsyncOption(
             return;
         } catch (e) {
             if (attempt === 2) throw e;
-            await page.waitForTimeout(200);
+            await expect(listbox)
+                .toBeHidden({ timeout: 2000 })
+                .catch(() => null);
         }
     }
 }
@@ -207,7 +208,9 @@ export async function createStockAdjustment(page: Page): Promise<string> {
             await itemDialog
                 .locator('input[name="quantity_adjusted"]')
                 .fill('2');
-            await page.waitForTimeout(250);
+            await expect(
+                itemDialog.locator('input[name="quantity_adjusted"]'),
+            ).toHaveValue('2');
         }
     }
 
@@ -261,10 +264,13 @@ export async function createStockAdjustment(page: Page): Promise<string> {
             await searchStockAdjustment(page, adjustmentNumber).catch(
                 () => null,
             );
-            if (await createdRow.isVisible().catch(() => false)) {
+            const visible = await createdRow
+                .waitFor({ state: 'visible', timeout: 3000 })
+                .then(() => true)
+                .catch(() => false);
+            if (visible) {
                 return true;
             }
-            await page.waitForTimeout(300 * confirmAttempt);
         }
 
         return false;
@@ -284,7 +290,9 @@ export async function createStockAdjustment(page: Page): Promise<string> {
                     'Stock adjustment dialog closed before creation could be confirmed.',
                 );
             }
-            await page.waitForTimeout(300 * attempt);
+            await expect(dialog)
+                .toBeHidden({ timeout: 3000 })
+                .catch(() => null);
             continue;
         }
 
@@ -454,12 +462,11 @@ export async function editStockAdjustment(
 
     await detailResponse;
 
-    // Wait for form to fully settle after detail data is loaded and re-rendered
-    await page.waitForTimeout(2000);
+    const adjNumInput = dialog.locator('input[name="adjustment_number"]');
+    await expect(adjNumInput).toBeVisible();
+    await expect(adjNumInput).not.toHaveValue('');
 
     if (updates.adjustment_number) {
-        const adjNumInput = dialog.locator('input[name="adjustment_number"]');
-        await expect(adjNumInput).toBeVisible();
         await adjNumInput.click();
         await adjNumInput.fill(updates.adjustment_number);
     }
@@ -469,7 +476,9 @@ export async function editStockAdjustment(
         .locator('[data-slot="dialog-header"]')
         .click()
         .catch(() => null);
-    await page.waitForTimeout(300);
+    await expect(page.locator('[role="listbox"]:visible')).toHaveCount(0, {
+        timeout: 2000,
+    });
 
     const updateBtn = dialog.getByRole('button', { name: /Update/i });
     await expect(updateBtn).toBeVisible({ timeout: 10000 });
@@ -482,6 +491,7 @@ export async function editStockAdjustment(
     );
 
     await updateBtn.scrollIntoViewIfNeeded();
+    await expect(updateBtn).toBeEnabled();
     await updateBtn.click({ force: true });
     await expectResponseOk(await updateResponse);
 
