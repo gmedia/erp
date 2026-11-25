@@ -8,11 +8,15 @@ import {
 
 export function createAssetStocktakeFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', 'Search by reference...'),
+        createTextFilterField(
+            'search',
+            { key: 'column.search', fallback: 'Search' },
+            'Search by reference...',
+        ),
         ...createAsyncSelectFilterFields([
             {
                 name: 'branch_id',
-                label: 'Branch',
+                label: { key: 'column.branch', fallback: 'Branch' },
                 url: '/api/branches',
                 placeholder: 'All Branches',
             },
@@ -20,12 +24,33 @@ export function createAssetStocktakeFilterFields(): FieldDescriptor[] {
         ...createSelectFilterFields([
             {
                 name: 'status',
-                label: 'Status',
+                label: { key: 'column.status', fallback: 'Status' },
                 options: [
-                    { value: 'draft', label: 'Draft' },
-                    { value: 'in_progress', label: 'In Progress' },
-                    { value: 'completed', label: 'Completed' },
-                    { value: 'cancelled', label: 'Cancelled' },
+                    {
+                        value: 'draft',
+                        label: { key: 'status.draft', fallback: 'Draft' },
+                    },
+                    {
+                        value: 'in_progress',
+                        label: {
+                            key: 'status.in_progress',
+                            fallback: 'In Progress',
+                        },
+                    },
+                    {
+                        value: 'completed',
+                        label: {
+                            key: 'status.completed',
+                            fallback: 'Completed',
+                        },
+                    },
+                    {
+                        value: 'cancelled',
+                        label: {
+                            key: 'status.cancelled',
+                            fallback: 'Cancelled',
+                        },
+                    },
                 ],
                 placeholder: 'All Statuses',
             },
@@ -33,12 +58,15 @@ export function createAssetStocktakeFilterFields(): FieldDescriptor[] {
         ...createDateFilterFields([
             {
                 name: 'planned_at_from',
-                label: 'Planned From',
+                label: {
+                    key: 'column.planned_from',
+                    fallback: 'Planned From',
+                },
                 placeholder: 'Planned From',
             },
             {
                 name: 'planned_at_to',
-                label: 'Planned To',
+                label: { key: 'column.planned_to', fallback: 'Planned To' },
                 placeholder: 'Planned To',
             },
         ]),

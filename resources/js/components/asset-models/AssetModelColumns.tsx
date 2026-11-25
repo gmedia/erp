@@ -1,5 +1,6 @@
 'use client';
 
+import { TranslatedText } from '@/components/common/TranslatedText';
 import { Badge } from '@/components/ui/badge';
 import { formatStatusLabel } from '@/lib/status-badge';
 import { ColumnDef } from '@tanstack/react-table';
@@ -99,20 +100,23 @@ export const assetModelColumns: ColumnDef<AssetModel>[] = [
     createSelectColumn<AssetModel>(),
     createTextColumn<AssetModel>({
         accessorKey: 'model_name',
-        label: 'Model Name',
+        label: { key: 'column.model_name', fallback: 'Model Name' },
     }),
     createTextColumn<AssetModel>({
         accessorKey: 'manufacturer',
-        label: 'Manufacturer',
+        label: { key: 'column.manufacturer', fallback: 'Manufacturer' },
     }),
     {
         accessorKey: 'category',
-        ...createSortingHeader('Category'),
+        ...createSortingHeader({
+            key: 'column.category',
+            fallback: 'Category',
+        }),
         cell: renderCategoryCell,
     },
     {
         accessorKey: 'specs',
-        header: 'Specs',
+        header: () => <TranslatedText k="column.specs" fallback="Specs" />,
         cell: renderSpecsCell,
         enableSorting: false,
     },

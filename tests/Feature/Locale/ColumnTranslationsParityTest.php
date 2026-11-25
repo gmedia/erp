@@ -134,6 +134,44 @@ test('ap and ar module column and filter keys have translations', function () {
         ->and($en['unallocated'])->toBe('Unallocated');
 });
 
+test('asset module column and filter keys have translations', function () {
+    $en = localeColumnTranslations('en.json');
+    $id = localeColumnTranslations('id.json');
+
+    $keys = [
+        'default_useful_life_months', 'parent_location', 'updated_at', 'model_name',
+        'manufacturer', 'specs', 'asset', 'origin', 'destination', 'ref_notes',
+        'scheduled', 'performed', 'scheduled_from', 'scheduled_to', 'performed_from',
+        'performed_to', 'planned_date', 'performed_date', 'planned_from', 'planned_to',
+        'perform',
+    ];
+
+    foreach ($keys as $key) {
+        expect($en)->toHaveKey($key)
+            ->and($id)->toHaveKey($key)
+            ->and($id[$key])->not->toBe($en[$key], "column.{$key} not translated");
+    }
+
+    expect($en['default_useful_life_months'])->toBe('Default Useful Life (Months)')
+        ->and($en['parent_location'])->toBe('Parent Location')
+        ->and($en['ref_notes'])->toBe('Ref/Notes')
+        ->and($en['performed_to'])->toBe('Performed To');
+});
+
+test('asset movement type labels are translated in both locales', function () {
+    $en = json_decode(File::get(lang_path('en.json')), true, 512, JSON_THROW_ON_ERROR)['movement_type'];
+    $id = json_decode(File::get(lang_path('id.json')), true, 512, JSON_THROW_ON_ERROR)['movement_type'];
+
+    expect(array_keys($id))->toEqual(array_keys($en));
+
+    foreach ($en as $key => $label) {
+        expect($id[$key])->not->toBe($label, "movement_type.{$key} not translated");
+    }
+
+    expect($en['transfer'])->toBe('Transfer')
+        ->and($en['adjustment'])->toBe('Adjustment');
+});
+
 test('column translation values are non-empty strings', function () {
     foreach (['en.json', 'id.json'] as $file) {
         foreach (localeColumnTranslations($file) as $key => $value) {

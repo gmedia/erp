@@ -12,24 +12,30 @@ import { ColumnDef } from '@tanstack/react-table';
 
 export const assetCategoryColumns: ColumnDef<AssetCategory>[] = [
     createSelectColumn<AssetCategory>(),
-    createTextColumn<AssetCategory>({ accessorKey: 'code', label: 'Code' }),
+    createTextColumn<AssetCategory>({
+        accessorKey: 'code',
+        label: { key: 'column.code', fallback: 'Code' },
+    }),
     createTextColumn<AssetCategory>({
         accessorKey: 'name',
-        label: 'Name',
+        label: { key: 'column.name', fallback: 'Name' },
         primary: true,
     }),
     createNumberColumn<AssetCategory>({
         accessorKey: 'useful_life_months_default',
-        label: 'Default Useful Life (Months)',
+        label: {
+            key: 'column.default_useful_life_months',
+            fallback: 'Default Useful Life (Months)',
+        },
         className: 'text-right tabular-nums',
     }),
     createDateColumn<AssetCategory>({
         accessorKey: 'created_at',
-        label: 'Created At',
+        label: { key: 'column.created_at', fallback: 'Created At' },
     }),
     createDateColumn<AssetCategory>({
         accessorKey: 'updated_at',
-        label: 'Updated At',
+        label: { key: 'column.updated_at', fallback: 'Updated At' },
     }),
     createActionsColumn<AssetCategory>(),
 ];

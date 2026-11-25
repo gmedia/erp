@@ -8,7 +8,7 @@ export function createAssetModelFilterFields(): FieldDescriptor[] {
     return [
         createTextFilterField(
             'search',
-            'Search',
+            { key: 'column.search', fallback: 'Search' },
             'Search by model name or manufacturer...',
         ),
         createAssetCategoryFilterField('All Categories'),

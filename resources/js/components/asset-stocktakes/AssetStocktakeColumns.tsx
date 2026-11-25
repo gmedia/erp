@@ -1,6 +1,7 @@
 'use client';
 
 import { GenericActions } from '@/components/common/ActionsDropdown';
+import { LabelText } from '@/components/common/TranslatedText';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { AssetStocktake } from '@/types/asset-stocktake';
 import {
@@ -18,30 +19,33 @@ export const assetStocktakeColumns: ColumnDef<AssetStocktake>[] = [
     createSelectColumn<AssetStocktake>(),
     createTextColumn<AssetStocktake>({
         accessorKey: 'reference',
-        label: 'Reference',
+        label: { key: 'column.reference', fallback: 'Reference' },
     }),
     {
         id: 'branch',
         accessorFn: (row) => row.branch?.name ?? '',
-        ...createSortingHeader('Branch'),
+        ...createSortingHeader({ key: 'column.branch', fallback: 'Branch' }),
         cell: ({ row }) => row.original.branch?.name || '-',
     },
     createDateColumn<AssetStocktake>({
         accessorKey: 'planned_at',
-        label: 'Planned Date',
+        label: { key: 'column.planned_date', fallback: 'Planned Date' },
     }),
     createDateColumn<AssetStocktake>({
         accessorKey: 'performed_at',
-        label: 'Performed Date',
+        label: { key: 'column.performed_date', fallback: 'Performed Date' },
     }),
     createStatusBadgeColumn<AssetStocktake>({
         accessorKey: 'status',
-        label: 'Status',
+        label: { key: 'column.status', fallback: 'Status' },
     }),
     {
         id: 'created_by',
         accessorFn: (row) => row.created_by?.name ?? '',
-        ...createSortingHeader('Created By'),
+        ...createSortingHeader({
+            key: 'column.created_by',
+            fallback: 'Created By',
+        }),
         cell: ({ row }) => row.original.created_by?.name || '-',
     },
     {
@@ -64,7 +68,12 @@ export const assetStocktakeColumns: ColumnDef<AssetStocktake>[] = [
                                 to={`/asset-stocktakes/${item.ulid}/perform`}
                                 className="w-full"
                             >
-                                Perform
+                                <LabelText
+                                    label={{
+                                        key: 'column.perform',
+                                        fallback: 'Perform',
+                                    }}
+                                />
                             </Link>
                         </DropdownMenuItem>,
                     ]}

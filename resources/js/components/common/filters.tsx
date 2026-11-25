@@ -2,7 +2,10 @@
 
 import { AsyncSelect } from '@/components/common/AsyncSelect';
 import { FilterDatePicker } from '@/components/common/FilterDatePicker';
-import type { TranslatableLabel } from '@/components/common/TranslatedText';
+import {
+    LabelText,
+    type TranslatableLabel,
+} from '@/components/common/TranslatedText';
 import { useTranslation } from '@/contexts/i18n-context';
 
 import { Input } from '@/components/ui/input';
@@ -23,7 +26,7 @@ export type FieldDescriptor = {
 
 export type SelectOption = {
     value: string;
-    label: string;
+    label: TranslatableLabel;
 };
 
 export const purchaseOrderStatusOptions: SelectOption[] = [
@@ -278,7 +281,7 @@ export function createSelectFilterField(
                 <SelectContent className="border-border bg-background text-foreground">
                     {options.map((option) => (
                         <SelectItem key={option.value} value={option.value}>
-                            {option.label}
+                            <LabelText label={option.label} />
                         </SelectItem>
                     ))}
                 </SelectContent>

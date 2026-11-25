@@ -6,22 +6,44 @@ import {
 } from '@/components/common/filters';
 
 export const createAssetMovementFilterFields = (): FieldDescriptor[] => [
-    createTextFilterField('search', 'Search', 'Search movements...'),
+    createTextFilterField(
+        'search',
+        { key: 'column.search', fallback: 'Search' },
+        'Search movements...',
+    ),
     createAsyncSelectFilterField(
         'asset_id',
-        'Asset',
+        { key: 'column.asset', fallback: 'Asset' },
         '/api/assets',
         'Filter by asset',
     ),
     createSelectFilterField(
         'movement_type',
-        'Type',
+        { key: 'column.type', fallback: 'Type' },
         [
-            { value: 'transfer', label: 'Transfer' },
-            { value: 'assign', label: 'Assign' },
-            { value: 'return', label: 'Return' },
-            { value: 'dispose', label: 'Dispose' },
-            { value: 'adjustment', label: 'Adjustment' },
+            {
+                value: 'transfer',
+                label: { key: 'movement_type.transfer', fallback: 'Transfer' },
+            },
+            {
+                value: 'assign',
+                label: { key: 'movement_type.assign', fallback: 'Assign' },
+            },
+            {
+                value: 'return',
+                label: { key: 'movement_type.return', fallback: 'Return' },
+            },
+            {
+                value: 'dispose',
+                label: { key: 'movement_type.dispose', fallback: 'Dispose' },
+            },
+            {
+                value: 'adjustment',
+                label: {
+                    key: 'movement_type.adjustment',
+                    fallback: 'Adjustment',
+                },
+            },
         ],
         'Filter by type',
     ),

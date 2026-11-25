@@ -1,5 +1,6 @@
 'use client';
 
+import { TranslatedText } from '@/components/common/TranslatedText';
 import { Badge } from '@/components/ui/badge';
 import {
     createActionsColumn,
@@ -37,7 +38,7 @@ export const assetMovementColumns: ColumnDef<AssetMovement>[] = [
     createSelectColumn<AssetMovement>(),
     {
         accessorKey: 'asset',
-        ...createSortingHeader('Asset'),
+        ...createSortingHeader({ key: 'column.asset', fallback: 'Asset' }),
         cell: ({ row }) => {
             const asset = row.original.asset;
             if (!asset) return '-';
@@ -53,7 +54,7 @@ export const assetMovementColumns: ColumnDef<AssetMovement>[] = [
     },
     {
         accessorKey: 'movement_type',
-        ...createSortingHeader('Type'),
+        ...createSortingHeader({ key: 'column.type', fallback: 'Type' }),
         cell: ({ row }) => (
             <Badge variant="outline" className="capitalize">
                 {row.getValue('movement_type')}
@@ -62,7 +63,7 @@ export const assetMovementColumns: ColumnDef<AssetMovement>[] = [
     },
     {
         accessorKey: 'moved_at',
-        ...createSortingHeader('Date'),
+        ...createSortingHeader({ key: 'column.date', fallback: 'Date' }),
         cell: ({ row }) => {
             const date = row.getValue('moved_at') as string;
             return formatDateByRegionalSettings(date);
@@ -70,7 +71,7 @@ export const assetMovementColumns: ColumnDef<AssetMovement>[] = [
     },
     {
         id: 'origin',
-        header: 'Origin',
+        header: () => <TranslatedText k="column.origin" fallback="Origin" />,
         cell: ({ row }) => {
             const m = row.original;
             return (
@@ -92,7 +93,9 @@ export const assetMovementColumns: ColumnDef<AssetMovement>[] = [
     },
     {
         id: 'destination',
-        header: 'Destination',
+        header: () => (
+            <TranslatedText k="column.destination" fallback="Destination" />
+        ),
         cell: ({ row }) => {
             const m = row.original;
             return (
@@ -114,7 +117,10 @@ export const assetMovementColumns: ColumnDef<AssetMovement>[] = [
     },
     {
         accessorKey: 'reference',
-        ...createSortingHeader('Ref/Notes'),
+        ...createSortingHeader({
+            key: 'column.ref_notes',
+            fallback: 'Ref/Notes',
+        }),
         cell: ({ row }) => (
             <div className="max-w-[200px]">
                 <div className="text-xs font-semibold">
@@ -128,7 +134,7 @@ export const assetMovementColumns: ColumnDef<AssetMovement>[] = [
     },
     {
         accessorKey: 'created_by',
-        ...createSortingHeader('PIC'),
+        ...createSortingHeader({ key: 'column.pic', fallback: 'PIC' }),
     },
     createActionsColumn<AssetMovement>(),
 ];
