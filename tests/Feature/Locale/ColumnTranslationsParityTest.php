@@ -42,6 +42,27 @@ test('purchase order and request filter date labels have translations', function
     }
 });
 
+test('stock transfer, adjustment and stocktake column keys have translations', function () {
+    $en = localeColumnTranslations('en.json');
+    $id = localeColumnTranslations('id.json');
+
+    $keys = [
+        'transfer_number', 'from_warehouse', 'to_warehouse', 'transfer_date', 'expected_arrival',
+        'adjustment_number', 'adjustment_date', 'adjustment_type',
+        'stocktake_number', 'stocktake_date', 'product_category',
+    ];
+
+    foreach ($keys as $key) {
+        expect($en)->toHaveKey($key)
+            ->and($id)->toHaveKey($key)
+            ->and($id[$key])->not->toBe($en[$key]);
+    }
+
+    expect($en['transfer_number'])->toBe('Transfer Number')
+        ->and($en['adjustment_type'])->toBe('Adjustment Type')
+        ->and($en['stocktake_number'])->toBe('Stocktake Number');
+});
+
 test('column translation values are non-empty strings', function () {
     foreach (['en.json', 'id.json'] as $file) {
         foreach (localeColumnTranslations($file) as $key => $value) {

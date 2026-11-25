@@ -607,7 +607,18 @@
         "order_date_from": "Order Date From",
         "order_date_to": "Order Date To",
         "request_date_from": "Request Date From",
-        "request_date_to": "Request Date To"
+        "request_date_to": "Request Date To",
+        "transfer_number": "Transfer Number",
+        "from_warehouse": "From Warehouse",
+        "to_warehouse": "To Warehouse",
+        "transfer_date": "Transfer Date",
+        "expected_arrival": "Expected Arrival",
+        "adjustment_number": "Adjustment Number",
+        "adjustment_date": "Adjustment Date",
+        "adjustment_type": "Adjustment Type",
+        "stocktake_number": "Stocktake Number",
+        "stocktake_date": "Stocktake Date",
+        "product_category": "Product Category"
     },
     "status": {
         "draft": "Draft",

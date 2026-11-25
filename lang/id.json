@@ -607,7 +607,18 @@
         "order_date_from": "Tanggal Pesan Dari",
         "order_date_to": "Tanggal Pesan Sampai",
         "request_date_from": "Tanggal Permintaan Dari",
-        "request_date_to": "Tanggal Permintaan Sampai"
+        "request_date_to": "Tanggal Permintaan Sampai",
+        "transfer_number": "No. Transfer",
+        "from_warehouse": "Gudang Asal",
+        "to_warehouse": "Gudang Tujuan",
+        "transfer_date": "Tanggal Transfer",
+        "expected_arrival": "Perkiraan Tiba",
+        "adjustment_number": "No. Penyesuaian",
+        "adjustment_date": "Tanggal Penyesuaian",
+        "adjustment_type": "Jenis Penyesuaian",
+        "stocktake_number": "No. Opname",
+        "stocktake_date": "Tanggal Opname",
+        "product_category": "Kategori Produk"
     },
     "status": {
         "draft": "Draf",

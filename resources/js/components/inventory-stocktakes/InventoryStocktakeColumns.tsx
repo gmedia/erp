@@ -16,27 +16,36 @@ export const inventoryStocktakeColumns: ColumnDef<InventoryStocktake>[] = [
     createSelectColumn<InventoryStocktake>(),
     createTextColumn<InventoryStocktake>({
         accessorKey: 'stocktake_number',
-        label: 'Stocktake Number',
+        label: {
+            key: 'column.stocktake_number',
+            fallback: 'Stocktake Number',
+        },
     }),
     {
         id: 'warehouse_id',
         accessorFn: (row) => row.warehouse?.name ?? '',
-        ...createSortingHeader('Warehouse'),
+        ...createSortingHeader({
+            key: 'column.warehouse',
+            fallback: 'Warehouse',
+        }),
         cell: ({ row }) => row.original.warehouse?.name || '-',
     },
     {
         id: 'product_category_id',
         accessorFn: (row) => row.product_category?.name ?? '',
-        ...createSortingHeader('Product Category'),
+        ...createSortingHeader({
+            key: 'column.product_category',
+            fallback: 'Product Category',
+        }),
         cell: ({ row }) => row.original.product_category?.name || '-',
     },
     createDateColumn<InventoryStocktake>({
         accessorKey: 'stocktake_date',
-        label: 'Stocktake Date',
+        label: { key: 'column.stocktake_date', fallback: 'Stocktake Date' },
     }),
     createStatusBadgeColumn<InventoryStocktake>({
         accessorKey: 'status',
-        label: 'Status',
+        label: { key: 'column.status', fallback: 'Status' },
     }),
     {
         id: 'actions',
