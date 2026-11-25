@@ -3,10 +3,10 @@
 import axios from '@/lib/axios';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo, useRef } from 'react';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { AsyncSelect } from '@/components/common/AsyncSelect';
+import { ControlledAsyncSelectField } from '@/components/common/ControlledAsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
 import {
@@ -20,7 +20,7 @@ import {
     type ItemTableColumn,
 } from '@/components/common/ItemTableHeader';
 import { NotesTextareaField } from '@/components/common/NotesTextareaField';
-import SelectField from '@/components/common/SelectField';
+import { StatusSelectField } from '@/components/common/StatusSelectField';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import { useTranslation } from '@/contexts/i18n-context';
@@ -37,6 +37,15 @@ import {
     type StockTransferFormData,
 } from '@/utils/schemas';
 import { StockTransferItemFormDialog } from './StockTransferItemFormDialog';
+
+const TRANSFER_STATUSES = [
+    ['draft', 'Draft'],
+    ['pending_approval', 'Pending Approval'],
+    ['approved', 'Approved'],
+    ['in_transit', 'In Transit'],
+    ['received', 'Received'],
+    ['cancelled', 'Cancelled'],
+] as const;
 
 type StockTransferFormInput = z.input<typeof stockTransferFormSchema>;
 
@@ -276,95 +285,31 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                             'Auto-generated if empty',
                         )}
                     />
-                    <SelectField
-                        name="status"
+                    <StatusSelectField
+                        fl={fl}
                         label={fl('status', 'Status')}
-                        options={[
-                            {
-                                value: 'draft',
-                                label: fl('status_draft', 'Draft'),
-                            },
-                            {
-                                value: 'pending_approval',
-                                label: fl(
-                                    'status_pending_approval',
-                                    'Pending Approval',
-                                ),
-                            },
-                            {
-                                value: 'approved',
-                                label: fl('status_approved', 'Approved'),
-                            },
-                            {
-                                value: 'in_transit',
-                                label: fl('status_in_transit', 'In Transit'),
-                            },
-                            {
-                                value: 'received',
-                                label: fl('status_received', 'Received'),
-                            },
-                            {
-                                value: 'cancelled',
-                                label: fl('status_cancelled', 'Cancelled'),
-                            },
-                        ]}
                         placeholder={fl('status_placeholder', 'Select status')}
+                        statuses={TRANSFER_STATUSES}
                     />
                     <div className="grid grid-cols-1 gap-4 md:col-span-2 md:grid-cols-2">
-                        <Controller
+                        <ControlledAsyncSelectField
                             control={form.control}
                             name="from_warehouse_id"
-                            render={({ field }) => (
-                                <div className="space-y-2">
-                                    <div className="text-sm leading-none font-medium">
-                                        {fl('from_warehouse', 'From Warehouse')}
-                                    </div>
-                                    <AsyncSelect
-                                        value={
-                                            field.value
-                                                ? String(field.value)
-                                                : undefined
-                                        }
-                                        onValueChange={field.onChange}
-                                        url="/api/warehouses"
-                                        placeholder={fl(
-                                            'warehouse_placeholder',
-                                            'Select warehouse',
-                                        )}
-                                        label={fl(
-                                            'from_warehouse',
-                                            'From Warehouse',
-                                        )}
-                                    />
-                                </div>
+                            label={fl('from_warehouse', 'From Warehouse')}
+                            url="/api/warehouses"
+                            placeholder={fl(
+                                'warehouse_placeholder',
+                                'Select warehouse',
                             )}
                         />
-                        <Controller
+                        <ControlledAsyncSelectField
                             control={form.control}
                             name="to_warehouse_id"
-                            render={({ field }) => (
-                                <div className="space-y-2">
-                                    <div className="text-sm leading-none font-medium">
-                                        {fl('to_warehouse', 'To Warehouse')}
-                                    </div>
-                                    <AsyncSelect
-                                        value={
-                                            field.value
-                                                ? String(field.value)
-                                                : undefined
-                                        }
-                                        onValueChange={field.onChange}
-                                        url="/api/warehouses"
-                                        placeholder={fl(
-                                            'warehouse_placeholder',
-                                            'Select warehouse',
-                                        )}
-                                        label={fl(
-                                            'to_warehouse',
-                                            'To Warehouse',
-                                        )}
-                                    />
-                                </div>
+                            label={fl('to_warehouse', 'To Warehouse')}
+                            url="/api/warehouses"
+                            placeholder={fl(
+                                'warehouse_placeholder',
+                                'Select warehouse',
                             )}
                         />
                     </div>
@@ -379,35 +324,15 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                             'Expected Arrival Date',
                         )}
                     />
-                    <Controller
+                    <ControlledAsyncSelectField
                         control={form.control}
                         name="requested_by"
-                        render={({ field }) => (
-                            <div className="space-y-2">
-                                <div className="text-sm leading-none font-medium">
-                                    {fl(
-                                        'requested_by',
-                                        'Requested By (Employee)',
-                                    )}
-                                </div>
-                                <AsyncSelect
-                                    value={
-                                        field.value
-                                            ? String(field.value)
-                                            : undefined
-                                    }
-                                    onValueChange={field.onChange}
-                                    url="/api/employees"
-                                    placeholder={fl(
-                                        'requested_by_placeholder',
-                                        'Select employee',
-                                    )}
-                                    label={fl(
-                                        'requested_by_select',
-                                        'Requested By',
-                                    )}
-                                />
-                            </div>
+                        label={fl('requested_by', 'Requested By (Employee)')}
+                        selectLabel={fl('requested_by_select', 'Requested By')}
+                        url="/api/employees"
+                        placeholder={fl(
+                            'requested_by_placeholder',
+                            'Select employee',
                         )}
                     />
                     <NotesTextareaField

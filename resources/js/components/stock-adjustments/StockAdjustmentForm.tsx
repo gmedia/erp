@@ -3,10 +3,10 @@
 import axios from '@/lib/axios';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo, useRef } from 'react';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { AsyncSelect } from '@/components/common/AsyncSelect';
+import { ControlledAsyncSelectField } from '@/components/common/ControlledAsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
 import {
@@ -21,6 +21,7 @@ import {
 } from '@/components/common/ItemTableHeader';
 import { NotesTextareaField } from '@/components/common/NotesTextareaField';
 import SelectField from '@/components/common/SelectField';
+import { StatusSelectField } from '@/components/common/StatusSelectField';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
@@ -36,6 +37,13 @@ import {
     type StockAdjustmentFormData,
 } from '@/utils/schemas';
 import { StockAdjustmentItemFormDialog } from './StockAdjustmentItemFormDialog';
+
+const ADJUSTMENT_STATUSES = [
+    ['draft', 'Draft'],
+    ['pending_approval', 'Pending Approval'],
+    ['approved', 'Approved'],
+    ['cancelled', 'Cancelled'],
+] as const;
 
 type StockAdjustmentFormInput = z.input<typeof stockAdjustmentFormSchema>;
 
@@ -281,55 +289,20 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
                             'Auto-generated if empty',
                         )}
                     />
-                    <SelectField
-                        name="status"
+                    <StatusSelectField
+                        fl={fl}
                         label={fl('status', 'Status')}
-                        options={[
-                            {
-                                value: 'draft',
-                                label: fl('status_draft', 'Draft'),
-                            },
-                            {
-                                value: 'pending_approval',
-                                label: fl(
-                                    'status_pending_approval',
-                                    'Pending Approval',
-                                ),
-                            },
-                            {
-                                value: 'approved',
-                                label: fl('status_approved', 'Approved'),
-                            },
-                            {
-                                value: 'cancelled',
-                                label: fl('status_cancelled', 'Cancelled'),
-                            },
-                        ]}
                         placeholder={fl('status_placeholder', 'Select status')}
+                        statuses={ADJUSTMENT_STATUSES}
                     />
-                    <Controller
+                    <ControlledAsyncSelectField
                         control={form.control}
                         name="warehouse_id"
-                        render={({ field }) => (
-                            <div className="space-y-2">
-                                <div className="text-sm leading-none font-medium">
-                                    {fl('warehouse', 'Warehouse')}
-                                </div>
-                                <AsyncSelect
-                                    value={
-                                        field.value
-                                            ? String(field.value)
-                                            : undefined
-                                    }
-                                    onValueChange={field.onChange}
-                                    url="/api/warehouses"
-                                    placeholder={fl(
-                                        'warehouse_placeholder',
-                                        'Select warehouse',
-                                    )}
-                                    label={fl('warehouse', 'Warehouse')}
-                                />
-                            </div>
+                        label={fl('warehouse', 'Warehouse')}
+                        url="/api/warehouses"
+                        placeholder={fl(
+                            'warehouse_placeholder',
+                            'Select warehouse',
                         )}
                     />
                     <SelectField
@@ -386,38 +359,24 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
                         name="adjustment_date"
                         label={fl('adjustment_date', 'Adjustment Date')}
                     />
-                    <Controller
+                    <ControlledAsyncSelectField
                         control={form.control}
                         name="inventory_stocktake_id"
-                        render={({ field }) => (
-                            <div className="space-y-2">
-                                <div className="text-sm leading-none font-medium">
-                                    {fl(
-                                        'inventory_stocktake',
-                                        'Inventory Stocktake (Optional)',
-                                    )}
-                                </div>
-                                <AsyncSelect
-                                    value={
-                                        field.value
-                                            ? String(field.value)
-                                            : undefined
-                                    }
-                                    onValueChange={field.onChange}
-                                    url="/api/inventory-stocktakes"
-                                    placeholder={fl(
-                                        'inventory_stocktake_placeholder',
-                                        'Select stocktake',
-                                    )}
-                                    label={fl(
-                                        'inventory_stocktake_select',
-                                        'Inventory Stocktake',
-                                    )}
-                                    labelFn={getInventoryStocktakeOptionLabel}
-                                    valueFn={(it) => String(it.id)}
-                                />
-                            </div>
+                        label={fl(
+                            'inventory_stocktake',
+                            'Inventory Stocktake (Optional)',
                         )}
+                        selectLabel={fl(
+                            'inventory_stocktake_select',
+                            'Inventory Stocktake',
+                        )}
+                        url="/api/inventory-stocktakes"
+                        placeholder={fl(
+                            'inventory_stocktake_placeholder',
+                            'Select stocktake',
+                        )}
+                        labelFn={getInventoryStocktakeOptionLabel}
+                        valueFn={(it) => String(it.id)}
                     />
                     <NotesTextareaField
                         label={fl('notes', 'Notes')}

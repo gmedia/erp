@@ -3,10 +3,10 @@
 import axios from '@/lib/axios';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo, useRef } from 'react';
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { AsyncSelect } from '@/components/common/AsyncSelect';
+import { ControlledAsyncSelectField } from '@/components/common/ControlledAsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
 import {
@@ -20,7 +20,7 @@ import {
     type ItemTableColumn,
 } from '@/components/common/ItemTableHeader';
 import { NotesTextareaField } from '@/components/common/NotesTextareaField';
-import SelectField from '@/components/common/SelectField';
+import { StatusSelectField } from '@/components/common/StatusSelectField';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
@@ -36,6 +36,13 @@ import {
     type InventoryStocktakeFormData,
 } from '@/utils/schemas';
 import { InventoryStocktakeItemFormDialog } from './InventoryStocktakeItemFormDialog';
+
+const STOCKTAKE_STATUSES = [
+    ['draft', 'Draft'],
+    ['in_progress', 'In Progress'],
+    ['completed', 'Completed'],
+    ['cancelled', 'Cancelled'],
+] as const;
 
 type InventoryStocktakeFormInput = z.input<typeof inventoryStocktakeFormSchema>;
 
@@ -251,89 +258,33 @@ export const InventoryStocktakeForm = memo<InventoryStocktakeFormProps>(
                                 'Auto-generated if empty',
                             )}
                         />
-                        <SelectField
-                            name="status"
+                        <StatusSelectField
+                            fl={fl}
                             label={fl('status', 'Status')}
-                            options={[
-                                {
-                                    value: 'draft',
-                                    label: fl('status_draft', 'Draft'),
-                                },
-                                {
-                                    value: 'in_progress',
-                                    label: fl(
-                                        'status_in_progress',
-                                        'In Progress',
-                                    ),
-                                },
-                                {
-                                    value: 'completed',
-                                    label: fl('status_completed', 'Completed'),
-                                },
-                                {
-                                    value: 'cancelled',
-                                    label: fl('status_cancelled', 'Cancelled'),
-                                },
-                            ]}
                             placeholder={fl(
                                 'status_placeholder',
                                 'Select status',
                             )}
+                            statuses={STOCKTAKE_STATUSES}
                         />
-                        <Controller
+                        <ControlledAsyncSelectField
                             control={form.control}
                             name="warehouse_id"
-                            render={({ field }) => (
-                                <div className="space-y-2">
-                                    <div className="text-sm leading-none font-medium">
-                                        {fl('warehouse', 'Warehouse')}
-                                    </div>
-                                    <AsyncSelect
-                                        value={
-                                            field.value
-                                                ? String(field.value)
-                                                : undefined
-                                        }
-                                        onValueChange={field.onChange}
-                                        url="/api/warehouses"
-                                        placeholder={fl(
-                                            'warehouse_placeholder',
-                                            'Select warehouse',
-                                        )}
-                                        label={fl('warehouse', 'Warehouse')}
-                                    />
-                                </div>
+                            label={fl('warehouse', 'Warehouse')}
+                            url="/api/warehouses"
+                            placeholder={fl(
+                                'warehouse_placeholder',
+                                'Select warehouse',
                             )}
                         />
-                        <Controller
+                        <ControlledAsyncSelectField
                             control={form.control}
                             name="product_category_id"
-                            render={({ field }) => (
-                                <div className="space-y-2">
-                                    <div className="text-sm leading-none font-medium">
-                                        {fl(
-                                            'product_category',
-                                            'Product Category',
-                                        )}
-                                    </div>
-                                    <AsyncSelect
-                                        value={
-                                            field.value
-                                                ? String(field.value)
-                                                : undefined
-                                        }
-                                        onValueChange={field.onChange}
-                                        url="/api/product-categories"
-                                        placeholder={fl(
-                                            'product_category_placeholder',
-                                            'All categories',
-                                        )}
-                                        label={fl(
-                                            'product_category',
-                                            'Product Category',
-                                        )}
-                                    />
-                                </div>
+                            label={fl('product_category', 'Product Category')}
+                            url="/api/product-categories"
+                            placeholder={fl(
+                                'product_category_placeholder',
+                                'All categories',
                             )}
                         />
                         <DatePickerField

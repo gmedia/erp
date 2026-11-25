@@ -1,5 +1,9 @@
 import * as z from 'zod';
 
+/** Percentage 0-100, optional, defaults to 0 (shared by line items). */
+const percentField = () =>
+    z.coerce.number().min(0).max(100).optional().default(0);
+
 const requiredMessage = (label: string) => ({
     message: `${label} is required.`,
 });
@@ -893,18 +897,8 @@ export const purchaseOrderFormSchema = z.object({
                 unit_price: z.coerce.number().min(0, {
                     message: 'validation.purchase_order.unit_price_min_zero',
                 }),
-                discount_percent: z.coerce
-                    .number()
-                    .min(0)
-                    .max(100)
-                    .optional()
-                    .default(0),
-                tax_percent: z.coerce
-                    .number()
-                    .min(0)
-                    .max(100)
-                    .optional()
-                    .default(0),
+                discount_percent: percentField(),
+                tax_percent: percentField(),
                 notes: z.string().optional(),
             }),
         )
@@ -1024,18 +1018,8 @@ export const supplierBillFormSchema = z.object({
                     .number()
                     .gt(0, { message: 'Quantity must be > 0.' }),
                 unit_price: z.coerce.number().min(0),
-                discount_percent: z.coerce
-                    .number()
-                    .min(0)
-                    .max(100)
-                    .optional()
-                    .default(0),
-                tax_percent: z.coerce
-                    .number()
-                    .min(0)
-                    .max(100)
-                    .optional()
-                    .default(0),
+                discount_percent: percentField(),
+                tax_percent: percentField(),
                 goods_receipt_item_id: z.string().optional(),
                 notes: z.string().optional(),
             }),
@@ -1124,18 +1108,8 @@ export const customerInvoiceFormSchema = z.object({
                 unit_price: z.coerce.number().min(0, {
                     message: 'Unit price must be at least 0.',
                 }),
-                discount_percent: z.coerce
-                    .number()
-                    .min(0)
-                    .max(100)
-                    .optional()
-                    .default(0),
-                tax_percent: z.coerce
-                    .number()
-                    .min(0)
-                    .max(100)
-                    .optional()
-                    .default(0),
+                discount_percent: percentField(),
+                tax_percent: percentField(),
                 notes: z.string().optional(),
             }),
         )
