@@ -384,7 +384,10 @@ export const StockTransferForm = memo<StockTransferFormProps>(
                                         'requested_by_placeholder',
                                         'Select employee',
                                     )}
-                                    label={fl('requested_by', 'Requested By')}
+                                    label={fl(
+                                        'requested_by_select',
+                                        'Requested By',
+                                    )}
                                 />
                             </div>
                         )}

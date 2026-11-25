@@ -255,6 +255,15 @@ test('stock adjustment and inventory stocktake form labels keep the english text
         ->and($en['inventory_stocktakes']['item_counted_qty'])->toBe('Counted Qty');
 });
 
+test('stock transfer and stock adjustment select labels keep the english fallback text', function () {
+    $en = localeFormFieldTranslations('en.json');
+
+    expect($en['stock_transfers']['requested_by'])->toBe('Requested By (Employee)')
+        ->and($en['stock_transfers']['requested_by_select'])->toBe('Requested By')
+        ->and($en['stock_adjustments']['inventory_stocktake'])->toBe('Inventory Stocktake (Optional)')
+        ->and($en['stock_adjustments']['inventory_stocktake_select'])->toBe('Inventory Stocktake');
+});
+
 test('stock adjustment and inventory stocktake form field keys are complete in both locales', function () {
     $en = localeFormFieldTranslations('en.json');
     $id = localeFormFieldTranslations('id.json');

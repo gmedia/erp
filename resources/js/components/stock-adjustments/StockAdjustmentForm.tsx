@@ -395,7 +395,7 @@ export const StockAdjustmentForm = memo<StockAdjustmentFormProps>(
                                         'Select stocktake',
                                     )}
                                     label={fl(
-                                        'inventory_stocktake',
+                                        'inventory_stocktake_select',
                                         'Inventory Stocktake',
                                     )}
                                     labelFn={getInventoryStocktakeOptionLabel}
