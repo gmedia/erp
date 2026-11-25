@@ -38,6 +38,10 @@ return Application::configure(basePath: dirname(__DIR__))
             ContentSecurityPolicy::class,
         ]);
 
+        $middleware->api(prepend: [
+            SetLocaleMiddleware::class,
+        ]);
+
         $middleware->api(append: [
             ThrottleRequests::class . ':api',
         ]);

@@ -6,6 +6,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { BrowserRouter } from 'react-router-dom';
 import AppRoutes from './app-routes';
 import { AuthProvider } from './contexts/auth-context';
+import { AppI18nProvider } from './contexts/i18n-context';
 import { initializeTheme } from './hooks/use-appearance';
 
 const queryClient = new QueryClient();
@@ -25,8 +26,10 @@ root.render(
         <QueryClientProvider client={queryClient}>
             <BrowserRouter>
                 <AuthProvider>
-                    <AppRoutes />
-                    <Toaster />
+                    <AppI18nProvider>
+                        <AppRoutes />
+                        <Toaster />
+                    </AppI18nProvider>
                 </AuthProvider>
             </BrowserRouter>
         </QueryClientProvider>

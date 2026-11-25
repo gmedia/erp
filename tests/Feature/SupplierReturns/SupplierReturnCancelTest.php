@@ -210,10 +210,13 @@ test('cancelling a confirmed supplier return posts a reversing journal that mirr
 });
 
 test('reversal memo and description are translated', function (string $locale, string $memoPrefix, string $descPrefix) {
-    app()->setLocale($locale);
     [$supplierReturn] = confirmedSupplierReturnForCancel();
 
-    putJson('/api/supplier-returns/' . $supplierReturn->id, ['status' => 'cancelled'])->assertOk();
+    putJson(
+        '/api/supplier-returns/' . $supplierReturn->id,
+        ['status' => 'cancelled'],
+        ['X-Locale' => $locale],
+    )->assertOk();
 
     $original = JournalEntry::query()->findOrFail($supplierReturn->refresh()->journal_entry_id);
     $reversal = JournalEntry::query()
@@ -237,12 +240,11 @@ test('reversal memo and description are translated', function (string $locale, s
 ]);
 
 test('cancelled return repeat cancel shows translated message', function (string $locale, string $expected) {
-    app()->setLocale($locale);
     [$supplierReturn] = confirmedSupplierReturnForCancel();
 
     putJson('/api/supplier-returns/' . $supplierReturn->id, ['status' => 'cancelled'])->assertOk();
 
-    putJson('/api/supplier-returns/' . $supplierReturn->id, ['status' => 'cancelled'])
+    putJson('/api/supplier-returns/' . $supplierReturn->id, ['status' => 'cancelled'], ['X-Locale' => $locale])
         ->assertStatus(422)
         ->assertJsonPath('errors.status.0', $expected);
 })->with([
@@ -251,7 +253,6 @@ test('cancelled return repeat cancel shows translated message', function (string
 ]);
 
 test('editing items of a confirmed return shows the translated message', function (string $locale, string $expected) {
-    app()->setLocale($locale);
     [$supplierReturn, , $product] = confirmedSupplierReturnForCancel();
 
     $item = $supplierReturn->items()->firstOrFail();
@@ -264,7 +265,7 @@ test('editing items of a confirmed return shows the translated message', functio
             'quantity_returned' => 1,
             'unit_price' => 5000,
         ]],
-    ])
+    ], ['X-Locale' => $locale])
         ->assertStatus(422)
         ->assertJsonPath('errors.items.0', $expected);
 })->with([
