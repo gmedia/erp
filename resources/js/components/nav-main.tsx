@@ -129,7 +129,7 @@ export function NavMain({ items = [] }: Readonly<{ items: NavItem[] }>) {
                                                                     pendingCount >
                                                                         0 && (
                                                                         <Badge
-                                                                            variant="destructive"
+                                                                            variant="destructive-soft"
                                                                             className="ml-auto flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1 text-[10px]"
                                                                         >
                                                                             {
@@ -173,7 +173,7 @@ export function NavMain({ items = [] }: Readonly<{ items: NavItem[] }>) {
                                     {item.href === '/my-approvals' &&
                                         pendingCount > 0 && (
                                             <Badge
-                                                variant="destructive"
+                                                variant="destructive-soft"
                                                 className="ml-auto flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1 text-[10px]"
                                             >
                                                 {pendingCount}

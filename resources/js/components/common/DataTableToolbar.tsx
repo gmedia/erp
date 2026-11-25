@@ -8,14 +8,13 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import { Table } from '@tanstack/react-table';
 import {
-    ChevronDown,
-    Download,
-    Filter,
-    Loader2,
-    PlusCircle,
-} from 'lucide-react';
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { Table } from '@tanstack/react-table';
+import { Columns3, Download, Filter, Loader2, PlusCircle } from 'lucide-react';
 import * as React from 'react';
 import { FilterModal } from './FilterModal';
 import type { FieldDescriptor } from './filters';
@@ -152,16 +151,24 @@ export function DataTableToolbar<T>({
                 </Button>
 
                 <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            aria-label="Columns"
-                        >
-                            <span className="hidden sm:inline">Columns</span>
-                            <ChevronDown className="h-4 w-4 sm:ml-2" />
-                        </Button>
-                    </DropdownMenuTrigger>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    aria-label="Columns"
+                                    data-testid="columns-button"
+                                >
+                                    <Columns3 className="h-4 w-4 sm:mr-2" />
+                                    <span className="hidden sm:inline">
+                                        Columns
+                                    </span>
+                                </Button>
+                            </DropdownMenuTrigger>
+                        </TooltipTrigger>
+                        <TooltipContent>Columns</TooltipContent>
+                    </Tooltip>
                     <DropdownMenuContent
                         align="end"
                         className="border-border bg-background text-foreground"
