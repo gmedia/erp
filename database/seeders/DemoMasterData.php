@@ -54,6 +54,26 @@ final class DemoMasterData
     // Kategori supplier demo.
     public const SUPPLIER_CATEGORY_IT_SERVICES = 'Jasa TI';
 
+    public const SUPPLIER_CATEGORY_LOGISTICS = 'Logistik';
+
+    /**
+     * Kategori barang yang boleh dipasok tiap kategori supplier demo (#459 butir 8).
+     * Supplier Logistik hanya mengirim jasa angkut, tidak memasok barang fisik.
+     *
+     * @var array<string, list<string>>
+     */
+    public const SUPPLIER_PRODUCT_CATEGORY_MAP = [
+        'Perlengkapan Kantor' => [self::PRODUCT_CATEGORY_OFFICE_SUPPLIES],
+        'Elektronik' => [self::PRODUCT_CATEGORY_ELECTRONICS],
+        'Furnitur' => [
+            self::PRODUCT_CATEGORY_RAW_WOOD,
+            self::PRODUCT_CATEGORY_RAW_HARDWARE,
+            self::PRODUCT_CATEGORY_FINISHED_FURNITURE,
+            self::PRODUCT_CATEGORY_FURNITURE,
+        ],
+        self::SUPPLIER_CATEGORY_IT_SERVICES => [self::PRODUCT_CATEGORY_SOFTWARE],
+    ];
+
     // Satuan demo.
     public const UNIT_BOX = 'Kotak';
 
