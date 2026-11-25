@@ -143,8 +143,8 @@
     --accent: oklch(0.209 0 0);
     --accent-foreground: oklch(0.961 0 0);
     --destructive: oklch(0.396 0.141 25.723);
-    --destructive-foreground: oklch(0.637 0.237 25.331);
-    --destructive-soft: oklch(0.187 0.028 23.9); /* #1e0e0d */
+    --destructive-foreground: oklch(0.85 0.1 25.331);
+    --destructive-soft: oklch(0.25 0.04 23.9);
     --success: oklch(0.765 0.177 163.223); /* emerald-400 */
     --success-soft: oklch(0.194 0.029 167.2); /* #061912 */
     --warning: oklch(0.828 0.189 84.429); /* amber-400 */
