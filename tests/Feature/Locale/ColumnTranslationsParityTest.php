@@ -193,6 +193,31 @@ test('asset movement type labels are translated in both locales', function () {
         ->and($en['adjustment'])->toBe('Adjustment');
 });
 
+test('ar aging report column keys have translations', function () {
+    $en = localeColumnTranslations('en.json');
+    $id = localeColumnTranslations('id.json');
+
+    $keys = [
+        'invoice_number', 'customer', 'branch',
+        'amount_received', 'credit_note_amount', 'amount_due', 'current',
+        'days_1_30', 'days_31_60', 'days_61_90', 'days_over_90',
+    ];
+
+    foreach ($keys as $key) {
+        expect($en)->toHaveKey($key)
+            ->and($id)->toHaveKey($key)
+            ->and($id[$key])->not->toBe($en[$key], "column.{$key} not translated");
+    }
+
+    // "Grand Total" and "Status" are intentionally identical in Indonesian.
+    expect($en)->toHaveKey('grand_total')
+        ->and($id)->toHaveKey('grand_total')
+        ->and($en['status'])->toBe('Status')
+        ->and($en['amount_received'])->toBe('Amount Received')
+        ->and($en['credit_note_amount'])->toBe('Credit Note Amount')
+        ->and($en['days_over_90'])->toBe('Over 90 Days');
+});
+
 test('column translation values are non-empty strings', function () {
     foreach (['en.json', 'id.json'] as $file) {
         foreach (localeColumnTranslations($file) as $key => $value) {

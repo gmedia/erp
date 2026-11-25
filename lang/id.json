@@ -707,6 +707,8 @@
         "bill_date": "Tanggal Tagihan",
         "credit_note_date": "Tanggal Nota Kredit",
         "amount_due": "Sisa Tagihan",
+        "amount_received": "Jumlah Diterima",
+        "credit_note_amount": "Jumlah Nota Kredit",
         "unallocated": "Belum Dialokasikan",
         "payment_number": "No. Pembayaran",
         "bill_number": "No. Tagihan",

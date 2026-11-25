@@ -707,6 +707,8 @@
         "bill_date": "Bill Date",
         "credit_note_date": "Credit Note Date",
         "amount_due": "Amount Due",
+        "amount_received": "Amount Received",
+        "credit_note_amount": "Credit Note Amount",
         "unallocated": "Unallocated",
         "payment_number": "Payment Number",
         "bill_number": "Bill Number",
