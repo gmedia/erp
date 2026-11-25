@@ -27,42 +27,45 @@ export const customerInvoiceColumns: ColumnDef<CustomerInvoice>[] = [
     createSelectColumn<CustomerInvoice>(),
     createTextColumn<CustomerInvoice>({
         accessorKey: 'invoice_number',
-        label: 'Invoice Number',
+        label: { key: 'column.invoice_number', fallback: 'Invoice Number' },
         primary: true,
     }),
     {
         accessorKey: 'customer',
-        ...createSortingHeader('Customer'),
+        ...createSortingHeader({
+            key: 'column.customer',
+            fallback: 'Customer',
+        }),
         cell: renderCustomerCell,
     },
     {
         accessorKey: 'branch',
-        ...createSortingHeader('Branch'),
+        ...createSortingHeader({ key: 'column.branch', fallback: 'Branch' }),
         cell: renderBranchCell,
     },
     createDateColumn<CustomerInvoice>({
         accessorKey: 'invoice_date',
-        label: 'Invoice Date',
+        label: { key: 'column.invoice_date', fallback: 'Invoice Date' },
     }),
     createDateColumn<CustomerInvoice>({
         accessorKey: 'due_date',
-        label: 'Due Date',
+        label: { key: 'column.due_date', fallback: 'Due Date' },
     }),
     createTextColumn<CustomerInvoice>({
         accessorKey: 'currency',
-        label: 'Currency',
+        label: { key: 'column.currency', fallback: 'Currency' },
     }),
     createStatusBadgeColumn<CustomerInvoice>({
         accessorKey: 'status',
-        label: 'Status',
+        label: { key: 'column.status', fallback: 'Status' },
     }),
     createRowCurrencyAmountColumn<CustomerInvoice>({
         accessorKey: 'grand_total',
-        label: 'Grand Total',
+        label: { key: 'column.grand_total', fallback: 'Grand Total' },
     }),
     createRowCurrencyAmountColumn<CustomerInvoice>({
         accessorKey: 'amount_due',
-        label: 'Amount Due',
+        label: { key: 'column.amount_due', fallback: 'Amount Due' },
     }),
     {
         id: 'actions_custom',

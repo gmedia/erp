@@ -26,6 +26,7 @@ import {
     useReactTable,
 } from '@tanstack/react-table';
 
+import { useTranslation } from '@/contexts/i18n-context';
 import { useExport } from '@/hooks/useExport';
 import { cn } from '@/lib/utils';
 import * as React from 'react';
@@ -240,6 +241,7 @@ export function DataTable<T>({
     summaryRow,
     edgeFade = true,
 }: Readonly<DataTableProps<T>>) {
+    const { t } = useTranslation();
     const [sorting, setSorting] = React.useState<SortingState>(
         defaultSorting ?? [],
     );
@@ -487,7 +489,7 @@ export function DataTable<T>({
                     colSpan={columnsWithActions.length}
                     className="h-16 py-6 text-center text-sm text-muted-foreground"
                 >
-                    {emptyState ?? 'No results.'}
+                    {emptyState ?? t('table.no_results')}
                 </TableCell>
             </TableRow>
         );

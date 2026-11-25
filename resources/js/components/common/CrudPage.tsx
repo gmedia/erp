@@ -6,6 +6,7 @@ import { Helmet } from 'react-helmet-async';
 import { DataTableProps as BaseDataTableProps } from '@/components/common/DataTableCore';
 import { DeleteConfirmationDialog } from '@/components/common/DeleteConfirmationDialog';
 import { PageHeader } from '@/components/common/PageHeader';
+import { useTranslation } from '@/contexts/i18n-context';
 import { type FilterState } from '@/hooks/useCrudFilters';
 import {
     useCrudPage,
@@ -48,6 +49,8 @@ export interface CrudPageConfig<
     actionAccess?: CrudPageActionAccess;
     /** Judul halaman memakai entityNamePlural; deskripsi opsional di bawahnya. */
     description?: string;
+    titleKey?: string;
+    descriptionKey?: string;
     breadcrumbs: BreadcrumbItem[];
     identifierKey?: string;
     loadDetailOnEdit?: boolean;
@@ -128,6 +131,19 @@ export function CrudPage<
         loadDetailOnEdit: config.loadDetailOnEdit,
         detailLoadErrorMessage: config.detailLoadErrorMessage,
     });
+
+    const { t } = useTranslation();
+    const translate = (key: string | undefined, fallback: string) => {
+        if (!key) {
+            return fallback;
+        }
+        const translated = t(key);
+        return translated === key ? fallback : translated;
+    };
+    const pageTitle = translate(config.titleKey, config.entityNamePlural);
+    const pageDescription = config.description
+        ? translate(config.descriptionKey, config.description)
+        : undefined;
 
     const access = config.actionAccess;
 
@@ -225,14 +241,14 @@ export function CrudPage<
     return (
         <>
             <Helmet>
-                <title>{config.entityNamePlural}</title>
+                <title>{pageTitle}</title>
             </Helmet>
 
             <AppLayout breadcrumbs={config.breadcrumbs}>
                 <div className="flex w-full flex-col gap-3 overflow-x-auto p-4">
                     <PageHeader
-                        title={config.entityNamePlural}
-                        description={config.description}
+                        title={pageTitle}
+                        description={pageDescription}
                     />
                     <div>
                         <config.DataTableComponent {...dataTableProps} />

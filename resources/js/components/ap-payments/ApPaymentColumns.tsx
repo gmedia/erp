@@ -33,43 +33,49 @@ export const apPaymentColumns: ColumnDef<ApPayment>[] = [
     createSelectColumn<ApPayment>(),
     createTextColumn<ApPayment>({
         accessorKey: 'payment_number',
-        label: 'Payment Number',
+        label: { key: 'column.payment_number', fallback: 'Payment Number' },
         primary: true,
     }),
     {
         accessorKey: 'supplier',
-        ...createSortingHeader('Supplier'),
+        ...createSortingHeader({
+            key: 'column.supplier',
+            fallback: 'Supplier',
+        }),
         cell: renderSupplierCell,
     },
     {
         accessorKey: 'branch',
-        ...createSortingHeader('Branch'),
+        ...createSortingHeader({ key: 'column.branch', fallback: 'Branch' }),
         cell: renderBranchCell,
     },
     createDateColumn<ApPayment>({
         accessorKey: 'payment_date',
-        label: 'Payment Date',
+        label: { key: 'column.payment_date', fallback: 'Payment Date' },
     }),
     {
         accessorKey: 'payment_method',
-        ...createSortingHeader('Payment Method'),
+        ...createSortingHeader({
+            key: 'column.payment_method',
+            fallback: 'Payment Method',
+        }),
         cell: renderPaymentMethodCell,
     },
     createTextColumn<ApPayment>({
         accessorKey: 'currency',
-        label: 'Currency',
+        label: { key: 'column.currency', fallback: 'Currency' },
     }),
     createStatusBadgeColumn<ApPayment>({
         accessorKey: 'status',
-        label: 'Status',
+        label: { key: 'column.status', fallback: 'Status' },
     }),
     createRowCurrencyAmountColumn<ApPayment>({
         accessorKey: 'total_amount',
-        label: 'Total Amount',
+        label: { key: 'column.total_amount', fallback: 'Total Amount' },
     }),
     createRowCurrencyAmountColumn<ApPayment>({
         accessorKey: 'total_unallocated',
-        label: 'Unallocated',
+        label: { key: 'column.unallocated', fallback: 'Unallocated' },
     }),
     {
         id: 'actions_custom',

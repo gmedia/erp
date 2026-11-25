@@ -13,6 +13,7 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { useTranslation } from '@/contexts/i18n-context';
 import { Table } from '@tanstack/react-table';
 import { Columns3, Download, Filter, Loader2, PlusCircle } from 'lucide-react';
 import * as React from 'react';
@@ -74,6 +75,7 @@ export function DataTableToolbar<T>({
     exportDisabled = false,
     table,
 }: Readonly<DataTableToolbarProps<T>>) {
+    const { t } = useTranslation();
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         onSearchChange(e.target.value);
     };
@@ -102,11 +104,13 @@ export function DataTableToolbar<T>({
                     variant="outline"
                     size="sm"
                     onClick={() => setIsFilterModalOpen(true)}
-                    aria-label="Filters"
+                    aria-label={t('shell.filters')}
                     data-testid="filter-button"
                 >
                     <Filter className="h-4 w-4 sm:mr-2" />
-                    <span className="hidden sm:inline">Filters</span>
+                    <span className="hidden sm:inline">
+                        {t('shell.filters')}
+                    </span>
                 </Button>
 
                 <FilterModal
@@ -124,11 +128,13 @@ export function DataTableToolbar<T>({
                     <Button
                         size="sm"
                         onClick={onAdd}
-                        aria-label="Add"
+                        aria-label={t('shell.add')}
                         data-testid="add-button"
                     >
                         <PlusCircle className="h-4 w-4 sm:mr-2" />
-                        <span className="hidden sm:inline">Add</span>
+                        <span className="hidden sm:inline">
+                            {t('shell.add')}
+                        </span>
                     </Button>
                 )}
 
@@ -139,7 +145,7 @@ export function DataTableToolbar<T>({
                     size="sm"
                     onClick={onExport}
                     disabled={exporting || exportDisabled}
-                    aria-label="Export"
+                    aria-label={t('shell.export')}
                     data-testid="export-button"
                 >
                     {exporting ? (
@@ -147,7 +153,9 @@ export function DataTableToolbar<T>({
                     ) : (
                         <Download className="h-4 w-4 sm:mr-2" />
                     )}
-                    <span className="hidden sm:inline">Export</span>
+                    <span className="hidden sm:inline">
+                        {t('shell.export')}
+                    </span>
                 </Button>
 
                 <DropdownMenu>
@@ -157,17 +165,17 @@ export function DataTableToolbar<T>({
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    aria-label="Columns"
+                                    aria-label={t('shell.columns')}
                                     data-testid="columns-button"
                                 >
                                     <Columns3 className="h-4 w-4 sm:mr-2" />
                                     <span className="hidden sm:inline">
-                                        Columns
+                                        {t('shell.columns')}
                                     </span>
                                 </Button>
                             </DropdownMenuTrigger>
                         </TooltipTrigger>
-                        <TooltipContent>Columns</TooltipContent>
+                        <TooltipContent>{t('shell.columns')}</TooltipContent>
                     </Tooltip>
                     <DropdownMenuContent
                         align="end"

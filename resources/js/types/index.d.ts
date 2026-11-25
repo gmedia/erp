@@ -16,6 +16,7 @@ export interface SimpleEntityFilters {
 
 export interface BreadcrumbItem {
     title: string;
+    titleKey?: string;
     href: string;
 }
 

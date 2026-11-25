@@ -33,43 +33,49 @@ export const arReceiptColumns: ColumnDef<ArReceipt>[] = [
     createSelectColumn<ArReceipt>(),
     createTextColumn<ArReceipt>({
         accessorKey: 'receipt_number',
-        label: 'Receipt Number',
+        label: { key: 'column.receipt_number', fallback: 'Receipt Number' },
         primary: true,
     }),
     {
         accessorKey: 'customer',
-        ...createSortingHeader('Customer'),
+        ...createSortingHeader({
+            key: 'column.customer',
+            fallback: 'Customer',
+        }),
         cell: renderCustomerCell,
     },
     {
         accessorKey: 'branch',
-        ...createSortingHeader('Branch'),
+        ...createSortingHeader({ key: 'column.branch', fallback: 'Branch' }),
         cell: renderBranchCell,
     },
     createDateColumn<ArReceipt>({
         accessorKey: 'receipt_date',
-        label: 'Receipt Date',
+        label: { key: 'column.receipt_date', fallback: 'Receipt Date' },
     }),
     {
         accessorKey: 'payment_method',
-        ...createSortingHeader('Payment Method'),
+        ...createSortingHeader({
+            key: 'column.payment_method',
+            fallback: 'Payment Method',
+        }),
         cell: renderPaymentMethodCell,
     },
     createTextColumn<ArReceipt>({
         accessorKey: 'currency',
-        label: 'Currency',
+        label: { key: 'column.currency', fallback: 'Currency' },
     }),
     createStatusBadgeColumn<ArReceipt>({
         accessorKey: 'status',
-        label: 'Status',
+        label: { key: 'column.status', fallback: 'Status' },
     }),
     createRowCurrencyAmountColumn<ArReceipt>({
         accessorKey: 'total_amount',
-        label: 'Total Amount',
+        label: { key: 'column.total_amount', fallback: 'Total Amount' },
     }),
     createRowCurrencyAmountColumn<ArReceipt>({
         accessorKey: 'total_unallocated',
-        label: 'Unallocated',
+        label: { key: 'column.unallocated', fallback: 'Unallocated' },
     }),
     {
         id: 'actions_custom',

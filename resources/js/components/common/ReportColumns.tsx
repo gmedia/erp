@@ -1,5 +1,10 @@
 'use client';
 
+import {
+    labelFallbackText,
+    LabelText,
+    type TranslatableLabel,
+} from '@/components/common/TranslatedText';
 import { Badge } from '@/components/ui/badge';
 import { formatStatusLabel, statusBadgeVariant } from '@/lib/status-badge';
 import { cn } from '@/lib/utils';
@@ -18,7 +23,7 @@ type WarehouseSummary = {
 type SummaryColumnOptions<TData> = {
     id?: string;
     accessorKey?: string;
-    header: string;
+    header: TranslatableLabel;
     getPrimary: (row: TData) => DisplayValue;
     getSecondary: (row: TData) => DisplayValue;
     sortable?: boolean;
@@ -27,7 +32,7 @@ type SummaryColumnOptions<TData> = {
 type TextColumnOptions<TData> = {
     id?: string;
     accessorKey?: string;
-    header: string;
+    header: TranslatableLabel;
     getValue: (row: TData) => DisplayValue;
     className?: string;
     sortable?: boolean;
@@ -37,7 +42,7 @@ type TextColumnOptions<TData> = {
 type WarehouseColumnOptions<TData> = {
     id?: string;
     accessorKey?: string;
-    header: string;
+    header: TranslatableLabel;
     getWarehouse: (row: TData) => WarehouseSummary;
     sortable?: boolean;
 };
@@ -45,7 +50,7 @@ type WarehouseColumnOptions<TData> = {
 type StatusBadgeColumnOptions<TData> = {
     id?: string;
     accessorKey: string;
-    header: string;
+    header: TranslatableLabel;
     getValue: (row: TData) => string | null | undefined;
     getVariant?: (
         row: TData,
@@ -55,7 +60,7 @@ type StatusBadgeColumnOptions<TData> = {
 type ReportDisplayColumnOptions<TData> = {
     id?: string;
     accessorKey?: string;
-    header: string;
+    header: TranslatableLabel;
     sortable?: boolean;
     align?: 'left' | 'right';
     renderCell: (row: TData) => ReactNode;
@@ -144,7 +149,7 @@ function resolveReportColumnId({
 }: {
     id?: string;
     accessorKey?: string;
-    header: string;
+    header: TranslatableLabel;
 }): string {
     if (id) {
         return id;
@@ -154,7 +159,7 @@ function resolveReportColumnId({
         return accessorKey.replaceAll('.', '_');
     }
 
-    return header.toLowerCase().replaceAll(/\s+/g, '_');
+    return labelFallbackText(header).toLowerCase().replaceAll(/\s+/g, '_');
 }
 
 function createReportDisplayColumn<TData>({
@@ -193,12 +198,14 @@ function createReportDisplayColumn<TData>({
         };
     }
 
+    const plainHeader = () => <LabelText label={header} />;
+
     if (accessorKey) {
         return {
             id: columnId,
             accessorKey,
             enableSorting: false,
-            header,
+            header: plainHeader,
             cell,
         };
     }
@@ -206,7 +213,7 @@ function createReportDisplayColumn<TData>({
     return {
         id: columnId,
         enableSorting: false,
-        header,
+        header: plainHeader,
         cell,
     };
 }

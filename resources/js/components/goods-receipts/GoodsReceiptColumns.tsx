@@ -24,30 +24,39 @@ export const goodsReceiptColumns: ColumnDef<GoodsReceipt>[] = [
     createSelectColumn<GoodsReceipt>(),
     createTextColumn<GoodsReceipt>({
         accessorKey: 'gr_number',
-        label: 'GR Number',
+        label: { key: 'column.gr_number', fallback: 'GR Number' },
         primary: true,
     }),
     {
         accessorKey: 'purchase_order',
-        ...createSortingHeader('PO Number'),
+        ...createSortingHeader({
+            key: 'column.po_number',
+            fallback: 'PO Number',
+        }),
         cell: renderPoNumberCell,
     },
     {
         accessorKey: 'warehouse',
-        ...createSortingHeader('Warehouse'),
+        ...createSortingHeader({
+            key: 'column.warehouse',
+            fallback: 'Warehouse',
+        }),
         cell: renderWarehouseCell,
     },
     createDateColumn<GoodsReceipt>({
         accessorKey: 'receipt_date',
-        label: 'Receipt Date',
+        label: { key: 'column.receipt_date', fallback: 'Receipt Date' },
     }),
     createTextColumn<GoodsReceipt>({
         accessorKey: 'supplier_delivery_note',
-        label: 'Supplier Delivery Note',
+        label: {
+            key: 'column.supplier_delivery_note',
+            fallback: 'Supplier Delivery Note',
+        },
     }),
     createStatusBadgeColumn<GoodsReceipt>({
         accessorKey: 'status',
-        label: 'Status',
+        label: { key: 'column.status', fallback: 'Status' },
     }),
     {
         id: 'actions_custom',

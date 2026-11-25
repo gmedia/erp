@@ -40,42 +40,54 @@ export const supplierReturnColumns: ColumnDef<SupplierReturn>[] = [
     createSelectColumn<SupplierReturn>(),
     createTextColumn<SupplierReturn>({
         accessorKey: 'return_number',
-        label: 'Return Number',
+        label: { key: 'column.return_number', fallback: 'Return Number' },
     }),
     {
         accessorKey: 'purchase_order',
-        ...createSortingHeader('PO Number'),
+        ...createSortingHeader({
+            key: 'column.po_number',
+            fallback: 'PO Number',
+        }),
         cell: renderPoNumberCell,
     },
     {
         accessorKey: 'goods_receipt',
-        ...createSortingHeader('GR Number'),
+        ...createSortingHeader({
+            key: 'column.gr_number',
+            fallback: 'GR Number',
+        }),
         cell: renderGrNumberCell,
     },
     {
         accessorKey: 'supplier',
-        ...createSortingHeader('Supplier'),
+        ...createSortingHeader({
+            key: 'column.supplier',
+            fallback: 'Supplier',
+        }),
         cell: renderSupplierCell,
     },
     {
         accessorKey: 'warehouse',
-        ...createSortingHeader('Warehouse'),
+        ...createSortingHeader({
+            key: 'column.warehouse',
+            fallback: 'Warehouse',
+        }),
         cell: renderWarehouseCell,
     },
     createDateColumn<SupplierReturn>({
         accessorKey: 'return_date',
-        label: 'Return Date',
+        label: { key: 'column.return_date', fallback: 'Return Date' },
     }),
     {
         accessorKey: 'reason',
-        ...createSortingHeader('Reason'),
+        ...createSortingHeader({ key: 'column.reason', fallback: 'Reason' }),
         cell: ({ row }) => (
             <span>{formatStatusLabel(row.original.reason)}</span>
         ),
     },
     {
         accessorKey: 'status',
-        ...createSortingHeader('Status'),
+        ...createSortingHeader({ key: 'column.status', fallback: 'Status' }),
         cell: renderStatusCell,
     },
     createActionsColumn<SupplierReturn>(),

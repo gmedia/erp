@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useTranslation } from '@/contexts/i18n-context';
 import { usePermissions } from '@/hooks/usePermissions';
 import axios from '@/lib/axios';
 import rawAxios from 'axios';
@@ -42,13 +43,15 @@ export default function ImportDialog({
 }
 
 function ImportDialogContent({
-    title = 'Import Data',
+    title,
     trigger,
     importRoute,
     templateHeaders,
     sampleData = [],
     onSuccess,
 }: Readonly<ImportDialogProps>) {
+    const { t } = useTranslation();
+    const dialogTitle = title ?? t('shell.import_title');
     const [open, setOpen] = useState(false);
     const [file, setFile] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
@@ -128,18 +131,20 @@ function ImportDialogContent({
             setLoading(false);
             setResult(response.data);
             if (response.data.imported > 0) {
-                toast.success('Import Completed', {
-                    description: `Successfully imported ${response.data.imported} rows.`,
+                toast.success(t('shell.import_completed'), {
+                    description: t('shell.import_success_rows', {
+                        count: String(response.data.imported),
+                    }),
                 });
                 if (onSuccess) onSuccess();
                 globalThis.location.reload();
             } else if (response.data.errors.length > 0) {
-                toast.error('Import Finished with Errors', {
-                    description: 'Check the error list below.',
+                toast.error(t('shell.import_finished_with_errors'), {
+                    description: t('shell.import_check_errors'),
                 });
             } else {
-                toast.success('Import Completed', {
-                    description: 'No data was imported.',
+                toast.success(t('shell.import_completed'), {
+                    description: t('shell.import_no_data'),
                 });
             }
         } catch (error: unknown) {
@@ -148,12 +153,14 @@ function ImportDialogContent({
                 rawAxios.isAxiosError(error) &&
                 error.response?.status === 422
             ) {
-                toast.error('Validation Error', {
-                    description: error.response.data.message || 'Invalid file.',
+                toast.error(t('shell.import_validation_error'), {
+                    description:
+                        error.response.data.message ||
+                        t('shell.import_invalid_file'),
                 });
             } else {
-                toast.error('Import Failed', {
-                    description: 'An unexpected error occurred.',
+                toast.error(t('shell.import_failed'), {
+                    description: t('shell.import_unexpected_error'),
                 });
             }
         }
@@ -163,23 +170,25 @@ function ImportDialogContent({
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 {trigger || (
-                    <Button variant="outline" aria-label="Import">
+                    <Button variant="outline" aria-label={t('shell.import')}>
                         <Upload className="h-4 w-4 sm:mr-2" />
-                        <span className="hidden sm:inline">Import</span>
+                        <span className="hidden sm:inline">
+                            {t('shell.import')}
+                        </span>
                     </Button>
                 )}
             </DialogTrigger>
             <DialogContent className="sm:max-w-md md:max-w-lg">
                 <DialogHeader>
-                    <DialogTitle>{title}</DialogTitle>
+                    <DialogTitle>{dialogTitle}</DialogTitle>
                     <DialogDescription>
-                        Upload an Excel or CSV file to import data.
+                        {t('shell.import_description')}
                     </DialogDescription>
                 </DialogHeader>
 
                 <div className="grid gap-4 py-4">
                     <div className="flex items-center justify-between">
-                        <Label>Template</Label>
+                        <Label>{t('shell.import_template')}</Label>
                         <Button
                             variant="link"
                             size="sm"
@@ -187,12 +196,12 @@ function ImportDialogContent({
                             className="h-auto p-0 text-primary"
                         >
                             <Download className="mr-2 h-3.5 w-3.5" />
-                            Download Template
+                            {t('shell.import_download_template')}
                         </Button>
                     </div>
 
                     <div className="grid w-full max-w-sm items-center gap-1.5">
-                        <Label htmlFor="file">File</Label>
+                        <Label htmlFor="file">{t('shell.import_file')}</Label>
                         <Input
                             id="file"
                             type="file"
@@ -212,7 +221,7 @@ function ImportDialogContent({
                         variant="secondary"
                         onClick={() => setOpen(false)}
                     >
-                        Close
+                        {t('shell.import_close')}
                     </Button>
                     <Button
                         type="button"
@@ -222,7 +231,7 @@ function ImportDialogContent({
                         {loading && (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         )}
-                        Import
+                        {t('shell.import')}
                     </Button>
                 </DialogFooter>
             </DialogContent>

@@ -9,10 +9,14 @@ import {
 
 export function createAccountMappingFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', 'Search account mappings...'),
+        createTextFilterField(
+            'search',
+            { key: 'column.search', fallback: 'Search' },
+            'Search account mappings...',
+        ),
         createSelectFilterField(
             'type',
-            'Type',
+            { key: 'column.type', fallback: 'Type' },
             [
                 { label: 'Rename', value: 'rename' },
                 { label: 'Merge', value: 'merge' },
@@ -22,13 +26,19 @@ export function createAccountMappingFilterFields(): FieldDescriptor[] {
         ),
         createAsyncSelectFilterField(
             'source_coa_version_id',
-            'Source COA Version',
+            {
+                key: 'column.source_coa_version',
+                fallback: 'Source COA Version',
+            },
             '/api/coa-versions',
             'Select source COA version',
         ),
         createAsyncSelectFilterField(
             'target_coa_version_id',
-            'Target COA Version',
+            {
+                key: 'column.target_coa_version',
+                fallback: 'Target COA Version',
+            },
             '/api/coa-versions',
             'Select target COA version',
         ),

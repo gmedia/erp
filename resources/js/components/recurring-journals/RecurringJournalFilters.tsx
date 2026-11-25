@@ -21,18 +21,18 @@ export function createRecurringJournalFilterFields(): FieldDescriptor[] {
     return [
         createTextFilterField(
             'search',
-            'Search',
+            { key: 'column.search', fallback: 'Search' },
             'Search name, description...',
         ),
         createSelectFilterField(
             'frequency',
-            'Frequency',
+            { key: 'column.frequency', fallback: 'Frequency' },
             frequencyOptions,
             'Select Frequency',
         ),
         createSelectFilterField(
             'is_active',
-            'Status',
+            { key: 'column.status', fallback: 'Status' },
             activeStatusOptions,
             'Select Status',
         ),

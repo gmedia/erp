@@ -21,22 +21,26 @@ const budgetTypeOptions = [
 
 export function createBudgetFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', 'Search budgets...'),
+        createTextFilterField(
+            'search',
+            { key: 'column.search', fallback: 'Search' },
+            'Search budgets...',
+        ),
         createSelectFilterField(
             'status',
-            'Status',
+            { key: 'column.status', fallback: 'Status' },
             budgetStatusOptions,
             'All statuses',
         ),
         createSelectFilterField(
             'budget_type',
-            'Budget Type',
+            { key: 'column.budget_type', fallback: 'Budget Type' },
             budgetTypeOptions,
             'All types',
         ),
         {
             name: 'fiscal_year_id',
-            label: 'Fiscal Year',
+            label: { key: 'column.fiscal_year', fallback: 'Fiscal Year' },
             component: (
                 <AsyncSelect
                     url="/api/fiscal-years"

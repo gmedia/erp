@@ -28,13 +28,13 @@ export function createSupplierReturnFilterFields(): FieldDescriptor[] {
             },
             {
                 name: 'supplier_id',
-                label: 'Supplier',
+                label: { key: 'column.supplier', fallback: 'Supplier' },
                 url: '/api/suppliers',
                 placeholder: 'Select supplier',
             },
             {
                 name: 'warehouse_id',
-                label: 'Warehouse',
+                label: { key: 'column.warehouse', fallback: 'Warehouse' },
                 url: '/api/warehouses',
                 placeholder: 'Select warehouse',
             },
@@ -42,13 +42,13 @@ export function createSupplierReturnFilterFields(): FieldDescriptor[] {
         ...createSelectFilterFields([
             {
                 name: 'reason',
-                label: 'Reason',
+                label: { key: 'column.reason', fallback: 'Reason' },
                 options: supplierReturnReasonOptions,
                 placeholder: 'Select reason',
             },
             {
                 name: 'status',
-                label: 'Status',
+                label: { key: 'column.status', fallback: 'Status' },
                 options: draftConfirmedCancelledStatusOptions,
                 placeholder: 'Select status',
             },

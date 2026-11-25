@@ -22,26 +22,32 @@ export const stockAdjustmentColumns: ColumnDef<StockAdjustment>[] = [
     createSelectColumn<StockAdjustment>(),
     createTextColumn<StockAdjustment>({
         accessorKey: 'adjustment_number',
-        label: 'Adjustment Number',
+        label: {
+            key: 'column.adjustment_number',
+            fallback: 'Adjustment Number',
+        },
         primary: true,
     }),
     {
         id: 'warehouse_id',
         accessorFn: (row) => row.warehouse?.name ?? '',
-        ...createSortingHeader('Warehouse'),
+        ...createSortingHeader({
+            key: 'column.warehouse',
+            fallback: 'Warehouse',
+        }),
         cell: ({ row }) => row.original.warehouse?.name || '-',
     },
     createDateColumn<StockAdjustment>({
         accessorKey: 'adjustment_date',
-        label: 'Adjustment Date',
+        label: { key: 'column.adjustment_date', fallback: 'Adjustment Date' },
     }),
     createAdjustmentTypeBadgeColumn<StockAdjustment>({
         accessorKey: 'adjustment_type',
-        label: 'Adjustment Type',
+        label: { key: 'column.adjustment_type', fallback: 'Adjustment Type' },
     }),
     createStatusBadgeColumn<StockAdjustment>({
         accessorKey: 'status',
-        label: 'Status',
+        label: { key: 'column.status', fallback: 'Status' },
     }),
     {
         id: 'actions',

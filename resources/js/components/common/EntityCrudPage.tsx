@@ -116,6 +116,8 @@ export function createEntityCrudPage<T extends object>(
                         entityName: config.entityName,
                         entityNamePlural: config.entityNamePlural,
                         description: config.description,
+                        titleKey: config.titleKey,
+                        descriptionKey: config.descriptionKey,
                         actionAccess,
                         apiEndpoint: config.apiEndpoint,
                         queryKey: [...config.queryKey],
