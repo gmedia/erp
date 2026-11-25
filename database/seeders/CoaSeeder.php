@@ -7,6 +7,7 @@ use App\Models\Account;
 use App\Models\AccountMapping;
 use App\Models\CoaVersion;
 use App\Models\FiscalYear;
+use App\Models\Setting;
 use Illuminate\Database\Seeder;
 
 class CoaSeeder extends Seeder
@@ -70,6 +71,10 @@ class CoaSeeder extends Seeder
             $accounts2026 = $this->getAccounts2026();
             $this->seedAccountsRecursive($accounts2026, $coaVersion2026->id);
         }
+
+        // Akun laba/rugi pelepasan aset (#442). Ditambahkan idempoten agar
+        // COA yang sudah ada ikut memperoleh akun ini tanpa diseed ulang.
+        $this->ensureAssetDisposalAccounts($coaVersion2026->id);
 
         // Fetch account maps from database for reliability
         $accountMap2025 = Account::where('coa_version_id', $coaVersion2025->id)
@@ -145,6 +150,51 @@ class CoaSeeder extends Seeder
                 'notes' => 'Operating Expense renamed to General & Admin Expense',
             ]);
         }
+    }
+
+    /**
+     * Akun laba dan rugi pelepasan aset (#442), dipasang sebagai anak grup
+     * Revenue (laba, kredit) dan Expense (rugi, debit) lalu diset ke Setting.
+     */
+    private function ensureAssetDisposalAccounts(int $coaVersionId): void
+    {
+        $gain = $this->firstOrCreateAccount($coaVersionId, '40000', [
+            'code' => '41800',
+            'name' => 'Gain on Asset Disposal',
+            'type' => 'revenue',
+            'normal_balance' => 'credit',
+            'level' => 2,
+        ]);
+
+        $loss = $this->firstOrCreateAccount($coaVersionId, '50000', [
+            'code' => '53100',
+            'name' => 'Loss on Asset Disposal',
+            'type' => 'expense',
+            'normal_balance' => 'debit',
+            'level' => 2,
+        ]);
+
+        Setting::updateOrCreate(
+            ['key' => 'asset_disposal_gain_account_id'],
+            ['group' => 'accounting', 'value' => (string) $gain->id, 'type' => 'string'],
+        );
+        Setting::updateOrCreate(
+            ['key' => 'asset_disposal_loss_account_id'],
+            ['group' => 'accounting', 'value' => (string) $loss->id, 'type' => 'string'],
+        );
+    }
+
+    private function firstOrCreateAccount(int $coaVersionId, string $parentCode, array $attributes): Account
+    {
+        $parent = Account::query()
+            ->where('coa_version_id', $coaVersionId)
+            ->where('code', $parentCode)
+            ->firstOrFail();
+
+        return Account::firstOrCreate(
+            ['coa_version_id' => $coaVersionId, 'code' => $attributes['code']],
+            [...$attributes, 'coa_version_id' => $coaVersionId, 'parent_id' => $parent->id],
+        );
     }
 
     /**

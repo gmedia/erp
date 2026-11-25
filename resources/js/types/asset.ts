@@ -34,6 +34,9 @@ export interface AssetMovement extends EntityWithId {
     document_url?: string | null;
     pic: string | null;
     created_by?: string | number | null;
+    sale_amount?: number | null;
+    sale_account_id?: number | null;
+    disposal_journal_id?: number | null;
 }
 
 export interface AssetStocktakeItem extends EntityWithId {
