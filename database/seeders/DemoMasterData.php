@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Product;
+use Illuminate\Support\Collection;
+
 /**
  * Nama dan kode master demo (cabang, gudang) dalam satu tempat.
  * Seeder dan pencari data demo wajib memakai konstanta ini, bukan string literal,
@@ -29,6 +32,17 @@ final class DemoMasterData
     public const WAREHOUSE_PRODUCTION_CODE = 'PRD';
 
     public const WAREHOUSE_PRODUCTION_NAME = 'Gudang Produksi';
+
+    /**
+     * Barang demo stok (opname, penyesuaian, transfer) memakai produk katalog yang sudah ada
+     * (#503 butir 1). Kode `INV-2026-*` lama adalah duplikat dan dibersihkan seeder.
+     *
+     * @var list<string>
+     */
+    public const STOCK_DEMO_PRODUCT_CODES = ['EL-PER-001', 'EL-PER-002'];
+
+    /** @var list<string> Kode duplikat lama (#503 butir 1). */
+    public const LEGACY_STOCK_DEMO_PRODUCT_CODES = ['INV-2026-001', 'INV-2026-002', 'INV-2026-003'];
 
     // Kategori produk demo (Bahasa Indonesia, W7-17).
     public const PRODUCT_CATEGORY_ELECTRONICS = 'Elektronik';
@@ -105,5 +119,23 @@ final class DemoMasterData
     private function __construct()
     {
         // Intentionally empty. Kelas ini hanya berisi konstanta.
+    }
+
+    /**
+     * Ambil produk demo stok sesuai urutan konstanta (urutan sama di semua seeder stok).
+     *
+     * @return Collection<int, Product>
+     */
+    public static function stockDemoProducts(): Collection
+    {
+        $byCode = Product::query()
+            ->whereIn('code', self::STOCK_DEMO_PRODUCT_CODES)
+            ->get()
+            ->keyBy('code');
+
+        return collect(self::STOCK_DEMO_PRODUCT_CODES)
+            ->map(fn (string $code) => $byCode->get($code))
+            ->filter()
+            ->values();
     }
 }

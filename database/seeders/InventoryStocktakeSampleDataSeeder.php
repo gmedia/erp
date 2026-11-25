@@ -6,13 +6,12 @@ use App\Models\Branch;
 use App\Models\InventoryStocktake;
 use App\Models\InventoryStocktakeItem;
 use App\Models\Product;
-use App\Models\ProductCategory;
-use App\Models\Unit;
 use App\Models\User;
 use App\Models\Warehouse;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use RuntimeException;
 
 class InventoryStocktakeSampleDataSeeder extends Seeder
 {
@@ -34,11 +33,10 @@ class InventoryStocktakeSampleDataSeeder extends Seeder
             );
         }
 
-        $branchIdForStock = $warehouse->branch_id ?? Branch::query()->value('id');
-        $products = $this->ensureProductsWithStock($branchIdForStock);
-        // Kategori stocktake = kategori barang yang dihitung (semua baris berasal dari
-        // produk ini), bukan kategori pertama di master (PR #432 butir 1).
+        $products = $this->ensureProductsWithStock();
+        // Kategori stocktake = kategori barang yang dihitung, bukan kategori pertama di master (PR #432 butir 1).
         $categoryId = (int) $products->first()->product_category_id;
+        $branchIdForStock = $warehouse->branch_id ?? Branch::query()->value('id');
 
         $year = now()->format('Y');
 
@@ -129,119 +127,78 @@ class InventoryStocktakeSampleDataSeeder extends Seeder
         }
     }
 
-    private function renameLegacyProducts(): void
+    /**
+     * Barang opname = produk katalog yang sudah ada (#503 butir 1). Produk `INV-2026-*` lama
+     * yang menduplikasi katalog dipindahkan relasinya ke katalog lalu dihapus (idempoten).
+     */
+    private function ensureProductsWithStock(): Collection
     {
-        $map = [
-            'INV-SMP-001' => 'INV-2026-001',
-            'INV-SMP-002' => 'INV-2026-002',
-            'INV-SMP-003' => 'INV-2026-003',
-        ];
+        $this->retireLegacyDuplicateProducts();
 
-        foreach ($map as $legacy => $current) {
-            if (Product::where('code', $current)->exists()) {
+        $products = DemoMasterData::stockDemoProducts();
+
+        if ($products->count() < count(DemoMasterData::STOCK_DEMO_PRODUCT_CODES)) {
+            throw new RuntimeException('Katalog demo belum lengkap; jalankan ProductSampleDataSeeder dulu.');
+        }
+
+        return $products;
+    }
+
+    /**
+     * Membereskan produk `INV-2026-*` lama yang menduplikasi katalog (#503 butir 1).
+     *
+     * Relasi TIDAK dialihkan: pengalihan tidak aman karena produk punya banyak tabel transaksi
+     * (FK product_id) dan mengubah stock_movements membuat saldo/avg cost kartu stok tidak
+     * konsisten. Aturannya:
+     * - tidak ada referensi sama sekali -> dihapus;
+     * - ada referensi -> dinonaktifkan (status inactive) dan diberi nama arsip yang jelas,
+     *   sehingga tidak lagi tampil sebagai produk aktif duplikat.
+     * Idempoten: produk yang sudah diarsipkan tidak diproses ulang.
+     */
+    private function retireLegacyDuplicateProducts(): void
+    {
+        $legacy = Product::query()
+            ->whereIn('code', DemoMasterData::LEGACY_STOCK_DEMO_PRODUCT_CODES)
+            ->get();
+
+        foreach ($legacy as $duplicate) {
+            if ($duplicate->status === 'inactive' && str_starts_with((string) $duplicate->name, 'Arsip duplikat')) {
                 continue;
             }
 
-            Product::where('code', $legacy)->update(['code' => $current]);
+            if (! $this->isProductReferenced($duplicate->id)) {
+                $duplicate->delete();
+
+                continue;
+            }
+
+            $duplicate->update([
+                'status' => 'inactive',
+                'name' => 'Arsip duplikat ' . $duplicate->code . ' - ' . $duplicate->name,
+            ]);
         }
     }
 
-    private function ensureProductsWithStock(int $branchId): Collection
+    /**
+     * Apakah produk dirujuk tabel mana pun (semua FK product_id di migrasi).
+     */
+    private function isProductReferenced(int $productId): bool
     {
-        $this->renameLegacyProducts();
-        $products = Product::query()
-            ->whereIn('code', ['INV-2026-001', 'INV-2026-002', 'INV-2026-003'])
-            ->orderBy('id')
-            ->get();
-
-        if ($products->count() >= 3) {
-            // Barang dagang demo (PR #432 butir 1): kategori Elektronik, harga jual wajar,
-            // kategori stocktake mengikuti kategori barangnya.
-            $electronicsId = ProductCategory::query()
-                ->where('name', DemoMasterData::PRODUCT_CATEGORY_ELECTRONICS)
-                ->value('id');
-
-            if ($electronicsId !== null) {
-                Product::query()
-                    ->whereIn('id', $products->pluck('id'))
-                    ->update([
-                        'product_category_id' => $electronicsId,
-                        'type' => 'finished_good',
-                        'selling_price' => DB::raw(
-                            'CASE WHEN selling_price > 0 THEN selling_price ELSE cost * 1.5 END'
-                        ),
-                    ]);
-                $products = $products->each(fn (Product $product) => $product->product_category_id = $electronicsId);
-            }
-
-            return $products->take(3);
-        }
-
-        // Fallback: tiga barang fisik dari satu kategori yang sama, agar kategori stocktake
-        // konsisten dengan barang yang dihitung (PR #432 butir 1).
-        $fallbackCategoryId = Product::query()
-            ->where('type', '!=', 'service')
-            ->orderBy('id')
-            ->value('product_category_id');
-        $products = Product::query()
-            ->where('type', '!=', 'service')
-            ->where('product_category_id', $fallbackCategoryId)
-            ->orderBy('id')
-            ->take(3)
-            ->get();
-        if ($products->count() >= 3) {
-            return $products;
-        }
-
-        $categoryId = ProductCategory::query()
-            ->where('name', DemoMasterData::PRODUCT_CATEGORY_ELECTRONICS)
-            ->value('id')
-            ?? ProductCategory::query()->value('id');
-        $unitId = Unit::query()->value('id');
-
-        $samples = [
-            [
-                'code' => 'INV-2026-001',
-                'name' => 'Kabel HDMI 2 Meter',
-                'cost' => 45000,
-                'price' => 75000,
-            ],
-            [
-                'code' => 'INV-2026-002',
-                'name' => 'Mouse Wireless M170',
-                'cost' => 110000,
-                'price' => 165000,
-            ],
-            [
-                'code' => 'INV-2026-003',
-                'name' => 'Keyboard Mekanik K2',
-                'cost' => 420000,
-                'price' => 650000,
-            ],
+        $referencingTables = [
+            'stock_movements', 'stock_transfer_items', 'stock_adjustment_items',
+            'inventory_stocktake_items', 'purchase_request_items', 'purchase_order_items',
+            'goods_receipt_items', 'supplier_return_items', 'supplier_bill_items',
+            'customer_invoice_items', 'credit_note_items', 'production_orders',
+            'production_order_items', 'customer_subscriptions',
         ];
 
-        foreach ($samples as $sample) {
-            Product::updateOrCreate(
-                ['code' => $sample['code']],
-                [
-                    'name' => $sample['name'],
-                    'type' => 'finished_good',
-                    'product_category_id' => $categoryId,
-                    'unit_id' => $unitId,
-                    'branch_id' => $branchId,
-                    'cost' => $sample['cost'],
-                    'selling_price' => $sample['price'],
-                    'billing_model' => 'one_time',
-                    'status' => 'active',
-                ]
-            );
+        foreach ($referencingTables as $table) {
+            if (DB::table($table)->where('product_id', $productId)->exists()) {
+                return true;
+            }
         }
 
-        return Product::query()
-            ->whereIn('code', ['INV-2026-001', 'INV-2026-002', 'INV-2026-003'])
-            ->orderBy('id')
-            ->get()
-            ->take(3);
+        return false;
     }
 
     private function makeStocktakeItems(Collection $products, int $branchId, int $adminUserId, string $mode): array

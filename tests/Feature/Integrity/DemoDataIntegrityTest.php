@@ -1566,6 +1566,57 @@ invariant('W7-17 demo account codes follow the five-digit scheme', function () {
     }
 });
 
+// #503 butir 1 — tidak ada dua produk aktif dengan nama sama (opname demo memakai katalog).
+invariant('#503 no two active demo products share the same name', function () {
+    $duplicates = DB::table('products')
+        ->where('status', 'active')
+        ->select('name')
+        ->groupBy('name')
+        ->havingRaw('COUNT(*) > 1')
+        ->pluck('name');
+
+    expect($duplicates)->toBeEmpty('Produk aktif tidak boleh ganda nama: ' . $duplicates->implode(', '));
+});
+
+// #503 butir 2 — nama akun default seed tidak campur bahasa (daftar eksplisit).
+invariant('#503 default seeded account names are not mixed-language', function () {
+    $expected = [
+        '11300' => 'Inventory',
+        '11310' => 'Inventory in Transit',
+    ];
+
+    foreach ($expected as $code => $name) {
+        expect(DB::table('accounts')->where('code', $code)->value('name'))
+            ->toBe($name, "Nama akun {$code} harus \"{$name}\"");
+    }
+
+    expect(DB::table('accounts')->where('name', 'Persediaan dalam Perjalanan')->exists())->toBeFalse();
+});
+
+// #503 butir 3 — nomor JV demo naik sesuai tanggal jurnal (urut kronologis per tahun fiskal).
+invariant('#503 demo journal numbers ascend with entry date per fiscal year', function () {
+    $entries = DB::table('journal_entries')
+        ->orderBy('fiscal_year_id')
+        ->orderBy('entry_date')
+        ->orderBy('entry_number')
+        ->get(['fiscal_year_id', 'entry_number', 'entry_date']);
+
+    $previousByYear = [];
+    foreach ($entries as $entry) {
+        $sequence = (int) substr($entry->entry_number, -5);
+        $previous = $previousByYear[$entry->fiscal_year_id] ?? null;
+
+        if ($previous !== null) {
+            expect($sequence)->toBeGreaterThanOrEqual(
+                $previous,
+                "Nomor {$entry->entry_number} tanggal {$entry->entry_date} lebih awal dari nomor sebelumnya",
+            );
+        }
+
+        $previousByYear[$entry->fiscal_year_id] = $sequence;
+    }
+});
+
 // W7-17 — kode lokasi aset unik lintas cabang.
 invariant('W7-17 asset location codes are unique across branches', function () {
     $duplicates = DB::table('asset_locations')
@@ -1766,10 +1817,11 @@ invariant('W7-17 demo master names are Indonesian, not mixed with English labels
 // W7-17 (Butir 1 Review visual akhir PR #432) — produk jual adalah barang dagang dengan harga
 // wajar; produk barang fisik stocktake tidak berada di kategori yang tidak punya produk.
 invariant('W7-17 review visual akhir butir 1: demo goods are sellable with a positive price', function () {
-    $legacyCodes = ['INV-2026-001', 'INV-2026-002', 'INV-2026-003'];
+    // #503 butir 1: barang stok demo = produk katalog (bukan INV-2026-* duplikat).
+    $codes = DemoMasterData::STOCK_DEMO_PRODUCT_CODES;
 
-    $products = DB::table('products')->whereIn('code', $legacyCodes)->get();
-    expect($products)->toHaveCount(3);
+    $products = DB::table('products')->whereIn('code', $codes)->get();
+    expect($products)->toHaveCount(count($codes));
 
     foreach ($products as $product) {
         expect($product->type)->toBe('finished_good', "{$product->code} harus barang dagang");

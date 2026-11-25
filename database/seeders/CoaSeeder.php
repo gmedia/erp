@@ -195,7 +195,7 @@ class CoaSeeder extends Seeder
     {
         $inTransit = $this->firstOrCreateAccount($coaVersionId, '11000', [
             'code' => '11310',
-            'name' => 'Persediaan dalam Perjalanan',
+            'name' => 'Inventory in Transit',
             'type' => 'asset',
             'sub_type' => 'current_asset',
             'normal_balance' => 'debit',
