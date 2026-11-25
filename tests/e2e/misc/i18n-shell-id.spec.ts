@@ -236,6 +236,33 @@ test.describe('i18n page titles (locale en) journal and stock monitor', () => {
     });
 });
 
+test.describe('i18n filter inputs (locale id)', () => {
+    test('stock monitor text filter applies its value in Indonesian', async ({
+        page,
+    }) => {
+        await page.addInitScript((k) => {
+            localStorage.setItem(k, 'id');
+        }, LOCALE_KEY);
+
+        await login(page, undefined, undefined, { requireDashboard: false });
+        await page.goto('/stock-monitor', { waitUntil: 'domcontentloaded' });
+
+        await page.getByRole('button', { name: /filter/i }).click();
+        const dialog = page.getByRole('dialog');
+        const thresholdInput = dialog.getByPlaceholder('Example: 10');
+        await expect(thresholdInput).toBeVisible({ timeout: 15000 });
+        await thresholdInput.fill('1000');
+
+        const filterRequest = page.waitForRequest(
+            (r) =>
+                r.url().includes('/stock-monitor') &&
+                r.url().includes('low_stock_threshold=1000'),
+        );
+        await page.getByRole('button', { name: 'Apply Filters' }).click();
+        await filterRequest;
+    });
+});
+
 test.describe('i18n shell (locale id) columns', () => {
     test('purchase orders column headers use Indonesian labels', async ({
         page,

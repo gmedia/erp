@@ -296,14 +296,20 @@ export function createSelectFilterField(
 // Generic text input filter field creator
 export function TranslatedPlaceholderInput({
     placeholder,
-}: Readonly<{ placeholder: TranslatableLabel }>) {
+    ...rest
+}: Readonly<
+    Omit<React.ComponentProps<typeof Input>, 'placeholder'> & {
+        placeholder: TranslatableLabel;
+    }
+>) {
     const { t } = useTranslation();
     if (typeof placeholder === 'string') {
-        return <Input placeholder={placeholder} />;
+        return <Input placeholder={placeholder} {...rest} />;
     }
     const translated = t(placeholder.key);
     return (
         <Input
+            {...rest}
             placeholder={
                 translated === placeholder.key
                     ? placeholder.fallback
