@@ -49,7 +49,6 @@ export const supplierColumns: ColumnDef<Supplier>[] = [
         accessorKey: 'name',
         label: { key: 'column.name', fallback: 'Name' },
         primary: true,
-        description: (row) => row.category?.name ?? null,
     }),
     createEmailColumn<Supplier>({
         accessorKey: 'email',

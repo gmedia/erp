@@ -76,7 +76,11 @@ export const maintenanceCostColumns: ColumnDef<MaintenanceCostReportItem>[] = [
     }),
     {
         accessorKey: 'cost',
-        ...createSortingHeader({ key: 'column.cost', fallback: 'Cost' }),
+        meta: { numeric: true },
+        ...createSortingHeader(
+            { key: 'column.cost', fallback: 'Cost' },
+            { align: 'right' },
+        ),
         cell: ({ row }) => (
             <div className="text-right">
                 {formatCurrency(row.getValue('cost'))}
