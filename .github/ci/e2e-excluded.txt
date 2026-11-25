@@ -1,11 +1,5 @@
 aging-dashboard
-ap-aging-report
-ap-outstanding-report
-ap-payment-history-report
-ar-aging-report
-ar-outstanding-report
 budget-variance-report
-customer-statement-report
 financial-dashboard
 fiscal-year-auto-select
 per-branch-financial-reports
