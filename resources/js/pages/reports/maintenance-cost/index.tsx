@@ -14,7 +14,8 @@ export default function MaintenanceCostReport() {
     return (
         <ReportDataTablePage<MaintenanceCostReportItem>
             title="Maintenance Cost Report"
-            descriptionKey="reports.pageDescriptions.maintenance-cost"
+            titleKey="page.maintenance_cost.title"
+            descriptionKey="page.maintenance_cost.description"
             breadcrumbs={createReportBreadcrumbs(
                 'Maintenance Cost',
                 '/reports/maintenance-cost',

@@ -171,7 +171,11 @@ test.describe('i18n page titles (locale en)', () => {
         await page.goto('/products', { waitUntil: 'domcontentloaded' });
 
         await expect(
-            page.getByRole('heading', { level: 1, name: 'Products' }),
+            page.getByRole('heading', {
+                level: 1,
+                name: 'Products',
+                exact: true,
+            }),
         ).toBeVisible({ timeout: 15000 });
         await expect(
             page.getByText(

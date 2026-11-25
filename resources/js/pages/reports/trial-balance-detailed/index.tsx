@@ -2,7 +2,6 @@
 
 import {
     createEmptyReportFilters,
-    createReportBreadcrumbs,
     ReportDataTablePage,
 } from '@/components/common/ReportDataTablePage';
 import {
@@ -15,11 +14,20 @@ export default function TrialBalanceDetailedReportPage() {
     return (
         <ReportDataTablePage<TrialBalanceDetailedItem>
             title="Trial Balance Detailed"
-            descriptionKey="reports.pageDescriptions.trial-balance-detailed"
-            breadcrumbs={createReportBreadcrumbs(
-                'Trial Balance Detailed',
-                '/reports/trial-balance-detailed',
-            )}
+            titleKey="menu.trial_balance_detailed_report"
+            descriptionKey="page.trial_balance_detailed.description"
+            breadcrumbs={[
+                {
+                    title: 'Reports',
+                    titleKey: 'reports.breadcrumbGroup',
+                    href: '#',
+                },
+                {
+                    title: 'Trial Balance Detailed',
+                    titleKey: 'menu.trial_balance_detailed_report',
+                    href: '/reports/trial-balance-detailed',
+                },
+            ]}
             columns={trialBalanceDetailedColumns}
             filterFields={createTrialBalanceDetailedFilterFields()}
             initialFilters={createEmptyReportFilters([

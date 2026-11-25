@@ -259,6 +259,7 @@
         "id": "Indonesian"
     },
     "reports": {
+        "breadcrumbGroup": "Reports",
         "sections": {
             "operating_header": "Cash Flows from Operating Activities",
             "net_income_source": "Net Income",
@@ -901,15 +902,44 @@
         "low": "Low"
     },
     "page": {
+        "approval_flows": {
+            "title": "Approval Flows",
+            "description": "Approval definitions with ordered steps and approvers."
+        },
+        "approval_delegations": {
+            "title": "Approval Delegations",
+            "description": "Delegations that let another user approve on your behalf for a period."
+        },
+        "pipelines": {
+            "title": "Pipelines",
+            "description": "Workflow pipelines and the states entities move through."
+        },
+        "pipeline_dashboard": {
+            "description": "Monitor state distributions and identify bottlenecks across your active pipelines."
+        },
+        "my_approvals": {
+            "description": "Review and act on documents waiting for your decision."
+        },
+        "approval_monitoring": {
+            "description": "Monitor approval workflows and overdue tasks."
+        },
+        "approval_audit_trail": {
+            "description": "History of approval actions taken on requests."
+        },
+        "pipeline_audit_trail": {
+            "description": "History of state transitions on pipeline records."
+        },
         "purchase_orders": {
             "title": "Purchase Orders",
             "description": "Orders sent to suppliers with receipt and billing progress.",
-            "search_placeholder": "Search purchase orders..."
+            "search_placeholder": "Search purchase orders...",
+            "filter_search_placeholder": "Search PO number, payment terms, notes, or shipping address..."
         },
         "products": {
             "title": "Products",
             "description": "Products, materials, and services with pricing and stock settings.",
-            "search_placeholder": "Search products..."
+            "search_placeholder": "Search products...",
+            "filter_search_placeholder": "Search code, name..."
         },
         "journal_entries": {
             "title": "Journal Entries",
@@ -920,6 +950,277 @@
             "title": "Stock Monitor",
             "description": "Stock on hand, value, and low-stock items per product and warehouse.",
             "search_placeholder": "Search product, category, warehouse, branch..."
+        },
+        "assets": {
+            "title": "Assets",
+            "description": "Fixed asset register with cost, depreciation, and assignment.",
+            "search_placeholder": "Search assets..."
+        },
+        "assets_register": {
+            "title": "Asset Register Report",
+            "description": "Fixed asset list with acquisition, location, and current status."
+        },
+        "book_value_depreciation": {
+            "title": "Book Value & Depreciation Report",
+            "description": "Acquisition cost, accumulated depreciation, and book value per asset."
+        },
+        "maintenance_cost": {
+            "title": "Maintenance Cost Report",
+            "description": "Maintenance spending per asset over the selected period."
+        },
+        "asset_stocktake_variances": {
+            "title": "Stocktake Variance Report",
+            "description": "Differences between recorded and physically counted assets."
+        },
+        "asset_dashboard": {
+            "title": "Asset Management Overview",
+            "description": "Monitor the status, value, and health of your organization's assets."
+        },
+        "dashboard": {
+            "description": "At-a-glance entity counts, operational shortcuts, and master-data mix. Financial KPIs stay on Financial Dashboard."
+        },
+        "employees": {
+            "title": "Employees",
+            "description": "Staff records with employment, department, and position history.",
+            "search_placeholder": "Search employees..."
+        },
+        "warehouses": {
+            "title": "Warehouses",
+            "description": "Storage locations that hold product stock."
+        },
+        "stock_transfers": {
+            "title": "Stock Transfers",
+            "description": "Move stock between warehouses with approval and receipt tracking."
+        },
+        "stock_adjustments": {
+            "title": "Stock Adjustments",
+            "description": "Record stock corrections with approval and journal posting."
+        },
+        "inventory_stocktakes": {
+            "title": "Inventory Stocktakes",
+            "description": "Physical counts of warehouse stock with variance results."
+        },
+        "stock_movements": {
+            "title": "Stock Movements",
+            "description": "Digital stock card — product movements by warehouse, type, and period."
+        },
+        "purchase_requests": {
+            "title": "Purchase Requests",
+            "description": "Internal requests for goods before a purchase order is raised."
+        },
+        "goods_receipts": {
+            "title": "Goods Receipts",
+            "description": "Record received goods and update warehouse stock."
+        },
+        "supplier_returns": {
+            "title": "Supplier Returns",
+            "description": "Return received goods to suppliers with stock deduction."
+        },
+        "accounts": {
+            "title": "Chart of Accounts",
+            "description": "Manage hierarchical accounts and COA versions."
+        },
+        "posting_journals": {
+            "title": "Posting Journals",
+            "description": "Review draft journal entries and post them to the general ledger."
+        },
+        "fiscal_years": {
+            "title": "Fiscal Years",
+            "description": "Accounting periods that scope journals and financial reports."
+        },
+        "coa_versions": {
+            "title": "COA Versions",
+            "description": "Chart of accounts versions per fiscal year."
+        },
+        "account_mappings": {
+            "title": "Account Mappings",
+            "description": "Account mappings between COA versions (rename, merge, split) for balance and reference migration."
+        },
+        "budgets": {
+            "title": "Budgets",
+            "description": "Budget plans per account with period breakdown."
+        },
+        "report_configurations": {
+            "title": "Report Configurations",
+            "description": "Settings that define how each report is generated and displayed."
+        },
+        "bank_reconciliations": {
+            "title": "Bank Reconciliations",
+            "description": "Match bank statement balances with the books for each account."
+        },
+        "recurring_journals": {
+            "title": "Recurring Journals",
+            "description": "Templates for journals that repeat on a schedule."
+        },
+        "period_closings": {
+            "title": "Period Closings",
+            "description": "Close accounting periods and carry balances forward."
+        },
+        "supplier_bills": {
+            "title": "Supplier Bills",
+            "description": "Supplier invoices that create accounts payable."
+        },
+        "ap_payments": {
+            "title": "AP Payments",
+            "description": "Payments to suppliers allocated against outstanding bills."
+        },
+        "customer_invoices": {
+            "title": "Customer Invoices",
+            "description": "Customer invoices that create accounts receivable."
+        },
+        "ar_receipts": {
+            "title": "AR Receipts",
+            "description": "Customer payments allocated against outstanding invoices."
+        },
+        "credit_notes": {
+            "title": "Credit Notes",
+            "description": "Credit notes that reduce customer invoice balances."
+        },
+        "customers": {
+            "title": "Customers",
+            "description": "Customer master data with billing and contact details."
+        },
+        "suppliers": {
+            "title": "Suppliers",
+            "description": "Vendor master data used by purchasing and payables."
+        },
+        "departments": {
+            "title": "Departments",
+            "description": "Organizational units used to group employees and assets."
+        },
+        "positions": {
+            "title": "Positions",
+            "description": "Job titles assignable to employees."
+        },
+        "branches": {
+            "title": "Branches",
+            "description": "Company branches used across transactions and reports."
+        },
+        "customer_categories": {
+            "title": "Customer Categories",
+            "description": "Categories used to group customers."
+        },
+        "supplier_categories": {
+            "title": "Supplier Categories",
+            "description": "Categories used to group suppliers."
+        },
+        "product_categories": {
+            "title": "Product Categories",
+            "description": "Categories used to classify products and materials."
+        },
+        "units": {
+            "title": "Units",
+            "description": "Units of measure used by products and transactions."
+        },
+        "asset_categories": {
+            "title": "Asset Categories",
+            "description": "Categories used to classify fixed assets."
+        },
+        "asset_locations": {
+            "title": "Asset Locations",
+            "description": "Physical locations within branches for asset placement."
+        },
+        "asset_models": {
+            "title": "Asset Models",
+            "description": "Manufacturer models used as templates for assets."
+        },
+        "asset_movements": {
+            "title": "Asset Movements",
+            "description": "Transfer and assignment history of fixed assets."
+        },
+        "asset_maintenances": {
+            "title": "Asset Maintenances",
+            "description": "Scheduled and performed maintenance for fixed assets."
+        },
+        "asset_stocktakes": {
+            "title": "Asset Stocktakes",
+            "description": "Physical verification of fixed assets per branch."
+        },
+        "asset_depreciation_runs": {
+            "title": "Asset Depreciation Runs",
+            "description": "Calculate and review asset depreciation. Once verified, post the calculated amounts to the general ledger."
+        },
+        "balance_sheet": {
+            "description": "Financial position at a point in time: assets, liabilities, and equity."
+        },
+        "income_statement": {
+            "description": "Revenue and expenses over a period to show net income."
+        },
+        "cash_flow": {
+            "description": "Cash movements grouped into operating, investing, and financing activities."
+        },
+        "comparative": {
+            "title": "Comparative Report",
+            "description": "Compare assets, liabilities, equity, revenue, and expenses across fiscal years."
+        },
+        "trial_balance": {
+            "description": "Debit and credit totals of every account to check that the books balance."
+        },
+        "trial_balance_detailed": {
+            "description": "Trial balance with opening, movement, and closing balance per account."
+        },
+        "general_ledger": {
+            "title": "General Ledger Report",
+            "description": "Every journal line posted to an account within a period, with running balance."
+        },
+        "financial_dashboard": {
+            "description": "Monitor key financial metrics, cash flow, and expense trends."
+        },
+        "aging_dashboard": {
+            "description": "Monitor outstanding receivables and payables bucketed by overdue age."
+        },
+        "ap_aging": {
+            "description": "Payables grouped by age bucket to show overdue supplier balances."
+        },
+        "ap_outstanding": {
+            "title": "AP Outstanding Report",
+            "description": "Open supplier bills that still have an unpaid balance."
+        },
+        "ap_payment_history": {
+            "description": "Payments made to suppliers within the selected period."
+        },
+        "ar_aging": {
+            "description": "Receivables grouped by age bucket to show overdue customer balances."
+        },
+        "ar_outstanding": {
+            "title": "AR Outstanding Report",
+            "description": "Open customer invoices that still have an unpaid balance."
+        },
+        "customer_statement": {
+            "title": "Customer Statement Report",
+            "description": "Transaction history and outstanding balance for one customer."
+        },
+        "budget_variance": {
+            "title": "Budget Variance Report",
+            "description": "Compare actual spending against the approved budget per account."
+        },
+        "inventory_valuation": {
+            "title": "Inventory Valuation Report",
+            "description": "Stock quantity and value per product and warehouse."
+        },
+        "stock_movement": {
+            "title": "Stock Movement Report",
+            "description": "Stock in and out per product, with source document."
+        },
+        "stock_adjustment": {
+            "title": "Stock Adjustment Report",
+            "description": "Stock adjustments that changed quantities, with reason."
+        },
+        "inventory_stocktake_variance": {
+            "title": "Inventory Stocktake Variance Report",
+            "description": "Differences between system stock and physical stocktake counts."
+        },
+        "purchase_order_status": {
+            "title": "Purchase Order Status Report",
+            "description": "Progress of purchase orders from issue to receipt and billing."
+        },
+        "purchase_history": {
+            "title": "Purchase History Report",
+            "description": "Purchase transactions with supplier and product detail."
+        },
+        "goods_receipt": {
+            "title": "Goods Receipt Report",
+            "description": "Goods received from suppliers against purchase orders."
         }
     },
     "stock_monitor_summary": {

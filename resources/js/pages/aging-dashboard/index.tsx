@@ -17,6 +17,7 @@ import {
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Aging Dashboard',
+        titleKey: 'menu.aging_dashboard',
         href: '/aging-dashboard',
     },
 ];
@@ -73,7 +74,9 @@ export default function AgingDashboard() {
         <DashboardPageShell
             title="Aging Dashboard"
             heading="Aging Dashboard"
+            headingKey="menu.aging_dashboard"
             description="Monitor outstanding receivables and payables bucketed by overdue age."
+            descriptionKey="page.aging_dashboard.description"
             breadcrumbs={breadcrumbs}
             toolbar={
                 data?.branches ? (

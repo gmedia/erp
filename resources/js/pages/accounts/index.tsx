@@ -41,7 +41,11 @@ import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Master Data', href: '#' },
-    { title: 'Chart of Accounts', href: '/accounts' },
+    {
+        title: 'Chart of Accounts',
+        titleKey: 'menu.chart_of_accounts',
+        href: '/accounts',
+    },
 ];
 
 // useTranslation requires AppI18nProvider, which wraps AppLayout. Keep the
@@ -69,6 +73,7 @@ function AccountSearchInput({
 }
 
 export default function AccountIndex() {
+    const { t } = useTranslation();
     const [coaVersions, setCoaVersions] = useState<CoaVersion[]>([]);
     const [selectedVersionId, setSelectedVersionId] = useState<string | null>(
         null,
@@ -226,13 +231,13 @@ export default function AccountIndex() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Helmet>
-                <title>Chart of Accounts</title>
+                <title>{t('page.accounts.title')}</title>
             </Helmet>
 
             <div className="flex h-full flex-col space-y-6 p-4">
                 <PageHeader
-                    title="Chart of Accounts"
-                    description="Manage hierarchical accounts and COA versions."
+                    title={t('page.accounts.title')}
+                    description={t('page.accounts.description')}
                     actions={
                         <div className="flex flex-wrap items-center gap-2">
                             <Select

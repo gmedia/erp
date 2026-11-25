@@ -12,7 +12,8 @@ export default function ApprovalAuditTrail() {
     return (
         <AuditTrailPage<ApprovalAuditTrailItem>
             title="Approval Audit Trail"
-            descriptionKey="reports.pageDescriptions.approval-audit-trail"
+            titleKey="menu.approval_audit_trail"
+            descriptionKey="page.approval_audit_trail.description"
             breadcrumbs={[
                 { title: 'Admin', href: '#' },
                 {

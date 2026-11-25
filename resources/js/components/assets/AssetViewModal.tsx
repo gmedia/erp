@@ -1,5 +1,6 @@
 'use client';
 
+import { StatusBadgeLabel } from '@/components/common/StatusBadgeLabel';
 import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
 import { type Asset } from '@/types/asset';
@@ -30,21 +31,6 @@ export function AssetViewModal({
             locale: 'en-US',
             currency: item.currency || 'USD',
         });
-    };
-
-    const getStatusVariant = (status: Asset['status']) => {
-        switch (status) {
-            case 'active':
-                return 'default';
-            case 'maintenance':
-                return 'outline';
-            case 'disposed':
-                return 'destructive';
-            case 'lost':
-                return 'destructive';
-            default:
-                return 'secondary';
-        }
     };
 
     const getConditionVariant = (condition: Asset['condition']) => {
@@ -121,12 +107,7 @@ export function AssetViewModal({
                                     <span className="text-muted-foreground">
                                         Status:
                                     </span>
-                                    <Badge
-                                        variant={getStatusVariant(item.status)}
-                                    >
-                                        {item.status.charAt(0).toUpperCase() +
-                                            item.status.slice(1)}
-                                    </Badge>
+                                    <StatusBadgeLabel status={item.status} />
                                 </div>
                                 <div className="flex justify-between border-b border-muted py-1">
                                     <span className="text-muted-foreground">

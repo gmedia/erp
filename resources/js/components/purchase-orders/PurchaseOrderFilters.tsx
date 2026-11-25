@@ -14,8 +14,12 @@ export function createPurchaseOrderFilterFields(): FieldDescriptor[] {
     return [
         createTextFilterField(
             'search',
-            'Search',
-            'Search PO number, payment terms, notes, or shipping address...',
+            { key: 'column.search', fallback: 'Search' },
+            {
+                key: 'page.purchase_orders.filter_search_placeholder',
+                fallback:
+                    'Search PO number, payment terms, notes, or shipping address...',
+            },
         ),
         ...createSupplierWarehouseFilterFields(),
         ...createSelectFilterFields([

@@ -15,7 +15,8 @@ export default function ApPaymentHistoryReportPage() {
     return (
         <ReportDataTablePage<ApPaymentHistoryReportItem>
             title="AP Payment History"
-            descriptionKey="reports.pageDescriptions.ap-payment-history"
+            titleKey="menu.ap_payment_history_report"
+            descriptionKey="page.ap_payment_history.description"
             breadcrumbs={createReportBreadcrumbs(
                 'AP Payment History',
                 '/reports/ap-payment-history',

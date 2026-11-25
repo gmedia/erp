@@ -130,7 +130,9 @@ export default function Dashboard() {
         <DashboardPageShell
             title="Dashboard"
             heading="Dashboard"
+            headingKey="menu.dashboard"
             description="At-a-glance entity counts, operational shortcuts, and master-data mix. Financial KPIs stay on Financial Dashboard."
+            descriptionKey="page.dashboard.description"
             breadcrumbs={breadcrumbs}
             isLoading={isLoading}
             isError={isError}
