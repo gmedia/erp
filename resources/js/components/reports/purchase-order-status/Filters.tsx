@@ -10,8 +10,12 @@ export function createPurchaseOrderStatusReportFilterFields(): FieldDescriptor[]
     return [
         createTextFilterField(
             'search',
-            'Search',
-            'Search PO number, supplier, warehouse, or product...',
+            { key: 'column.search', fallback: 'Search' },
+            {
+                key: 'filter.purchase_search_placeholder',
+                fallback:
+                    'Search PO number, supplier, warehouse, or product...',
+            },
         ),
         ...createPurchasingReportScopeFilterFields(),
         createPurchaseOrderStatusCategoryFilterField(),

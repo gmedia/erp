@@ -9,7 +9,11 @@ import {
 // Customer-specific filter fields
 export function createCustomerFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', 'Search customers...'),
+        createTextFilterField(
+            'search',
+            { key: 'column.search', fallback: 'Search' },
+            'Search customers...',
+        ),
         ...createCustomerFilterSelectFields(),
     ];
 }

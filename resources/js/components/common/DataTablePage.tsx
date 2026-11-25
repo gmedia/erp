@@ -2,17 +2,18 @@
 
 import { DataTable } from '@/components/common/DataTableCore';
 import { PageHeader } from '@/components/common/PageHeader';
+import {
+    LabelText,
+    labelFallbackText,
+    type TranslatableLabel,
+} from '@/components/common/TranslatedText';
 import type { FieldDescriptor } from '@/components/common/filters';
 import type { FilterState } from '@/hooks/useCrudFilters';
 import AppLayout from '@/layouts/app-layout';
+import type { BreadcrumbItem } from '@/types';
 import type { ColumnDef } from '@tanstack/react-table';
 import type { ReactNode } from 'react';
 import { Helmet } from 'react-helmet-async';
-
-type BreadcrumbItem = {
-    title: string;
-    href: string;
-};
 
 type PaginationMeta = {
     current_page: number;
@@ -24,8 +25,8 @@ type PaginationMeta = {
 };
 
 type DataTablePageProps<TData, TFilters extends FilterState = FilterState> = {
-    title: string;
-    description?: string;
+    title: TranslatableLabel;
+    description?: TranslatableLabel;
     breadcrumbs: BreadcrumbItem[];
     columns: ColumnDef<TData>[];
     data: TData[];
@@ -68,15 +69,23 @@ export function DataTablePage<
     description,
 }: Readonly<DataTablePageProps<TData, TFilters>>) {
     const tableFilters = filters as Record<string, string | number | undefined>;
+    const pageTitle = labelFallbackText(title);
 
     return (
         <>
             <Helmet>
-                <title>{title}</title>
+                <title>{pageTitle}</title>
             </Helmet>
             <AppLayout breadcrumbs={breadcrumbs}>
                 <div className="flex w-full flex-col gap-3 overflow-x-auto p-4">
-                    <PageHeader title={title} description={description} />
+                    <PageHeader
+                        title={<LabelText label={title} />}
+                        description={
+                            description ? (
+                                <LabelText label={description} />
+                            ) : undefined
+                        }
+                    />
                     {children}
                     <div>
                         <DataTable

@@ -1,6 +1,8 @@
 'use client';
 
+import { LabelText } from '@/components/common/TranslatedText';
 import type { ColumnDef } from '@tanstack/react-table';
+import { createElement } from 'react';
 import {
     type ArInvoiceReportBase,
     createArInvoiceBaseColumns,
@@ -17,7 +19,13 @@ export const customerStatementReportColumns: ColumnDef<CustomerStatementReportIt
         {
             id: 'running_balance',
             accessorKey: 'running_balance',
-            header: 'Running Balance',
+            header: () =>
+                createElement(LabelText, {
+                    label: {
+                        key: 'column.running_balance',
+                        fallback: 'Running Balance',
+                    },
+                }),
             cell: ({ row }) =>
                 formatArReportCurrency(row.original.running_balance),
         },

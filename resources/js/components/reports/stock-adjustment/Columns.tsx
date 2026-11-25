@@ -32,13 +32,16 @@ export const stockAdjustmentReportColumns: ColumnDef<StockAdjustmentReportItem>[
     [
         createReportTextColumn<StockAdjustmentReportItem>({
             accessorKey: 'adjustment_number',
-            header: 'Adjustment No.',
+            header: { key: 'column.adjustment_no', fallback: 'Adjustment No.' },
             getValue: (item) => item.adjustment_number,
             sortable: true,
         }),
         createReportTextColumn<StockAdjustmentReportItem>({
             accessorKey: 'adjustment_date',
-            header: 'Adjustment Date',
+            header: {
+                key: 'column.adjustment_date',
+                fallback: 'Adjustment Date',
+            },
             getValue: (item) =>
                 item.adjustment_date
                     ? formatDateByRegionalSettings(item.adjustment_date)
@@ -47,47 +50,59 @@ export const stockAdjustmentReportColumns: ColumnDef<StockAdjustmentReportItem>[
         }),
         createReportStatusBadgeColumn<StockAdjustmentReportItem>({
             accessorKey: 'adjustment_type',
-            header: 'Adjustment Type',
+            header: {
+                key: 'column.adjustment_type',
+                fallback: 'Adjustment Type',
+            },
             getValue: (item) => item.adjustment_type,
             getVariant: () => 'outline',
         }),
         createReportStatusBadgeColumn<StockAdjustmentReportItem>({
             accessorKey: 'status',
-            header: 'Status',
+            header: { key: 'column.status', fallback: 'Status' },
             getValue: (item) => item.status,
         }),
         createReportWarehouseColumn<StockAdjustmentReportItem>({
             accessorKey: 'warehouse.name',
-            header: 'Warehouse',
+            header: { key: 'column.warehouse', fallback: 'Warehouse' },
             getWarehouse: (item) => item.warehouse,
             sortable: true,
         }),
         createNumberColumn<StockAdjustmentReportItem>({
             accessorKey: 'adjustment_count',
-            label: 'Adjustment Count',
+            label: {
+                key: 'column.adjustment_count',
+                fallback: 'Adjustment Count',
+            },
             minimumFractionDigits: 0,
             maximumFractionDigits: 0,
         }),
         createNumberColumn<StockAdjustmentReportItem>({
             accessorKey: 'total_quantity_adjusted',
-            label: 'Total Qty Adjusted',
+            label: {
+                key: 'column.total_qty_adjusted',
+                fallback: 'Total Qty Adjusted',
+            },
             minimumFractionDigits: 0,
             maximumFractionDigits: 2,
         }),
         createNumberColumn<StockAdjustmentReportItem>({
             accessorKey: 'total_increase_quantity',
-            label: 'Increase Qty',
+            label: { key: 'column.increase_qty', fallback: 'Increase Qty' },
             minimumFractionDigits: 0,
             maximumFractionDigits: 2,
         }),
         createNumberColumn<StockAdjustmentReportItem>({
             accessorKey: 'total_decrease_quantity',
-            label: 'Decrease Qty',
+            label: { key: 'column.decrease_qty', fallback: 'Decrease Qty' },
             minimumFractionDigits: 0,
             maximumFractionDigits: 2,
         }),
         createCurrencyColumn<StockAdjustmentReportItem>({
             accessorKey: 'total_adjustment_value',
-            label: 'Total Adjustment Value',
+            label: {
+                key: 'column.total_adjustment_value',
+                fallback: 'Total Adjustment Value',
+            },
         }),
     ];

@@ -9,41 +9,45 @@ import {
 
 export function createAssetFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', 'Search assets...'),
+        createTextFilterField(
+            'search',
+            { key: 'column.search', fallback: 'Search' },
+            'Search assets...',
+        ),
         ...createAsyncSelectFilterFields([
             {
                 name: 'asset_category_id',
-                label: 'Category',
+                label: { key: 'column.category', fallback: 'Category' },
                 url: '/api/asset-categories',
                 placeholder: 'Select a category',
             },
             {
                 name: 'asset_location_id',
-                label: 'Location',
+                label: { key: 'column.location', fallback: 'Location' },
                 url: '/api/asset-locations',
                 placeholder: 'Select a location',
             },
             {
                 name: 'department_id',
-                label: 'Department',
+                label: { key: 'column.department', fallback: 'Department' },
                 url: '/api/departments',
                 placeholder: 'Select a department',
             },
             {
                 name: 'employee_id',
-                label: 'Employee',
+                label: { key: 'column.employee', fallback: 'Employee' },
                 url: '/api/employees',
                 placeholder: 'Select an employee',
             },
             {
                 name: 'supplier_id',
-                label: 'Supplier',
+                label: { key: 'column.supplier', fallback: 'Supplier' },
                 url: '/api/suppliers',
                 placeholder: 'Select a supplier',
             },
             {
                 name: 'branch_id',
-                label: 'Branch',
+                label: { key: 'column.branch', fallback: 'Branch' },
                 url: '/api/branches',
                 placeholder: 'Select a branch',
             },

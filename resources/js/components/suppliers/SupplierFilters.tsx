@@ -9,7 +9,11 @@ import {
 // Supplier-specific filter fields
 export function createSupplierFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', 'Search suppliers...'),
+        createTextFilterField(
+            'search',
+            { key: 'column.search', fallback: 'Search' },
+            'Search suppliers...',
+        ),
         ...createSupplierFilterSelectFields(),
     ];
 }

@@ -2,7 +2,11 @@
 
 import { AsyncSelect } from '@/components/common/AsyncSelect';
 import { FilterDatePicker } from '@/components/common/FilterDatePicker';
-import type { TranslatableLabel } from '@/components/common/TranslatedText';
+import {
+    LabelText,
+    type TranslatableLabel,
+} from '@/components/common/TranslatedText';
+import { useTranslation } from '@/contexts/i18n-context';
 
 import { Input } from '@/components/ui/input';
 import {
@@ -22,7 +26,7 @@ export type FieldDescriptor = {
 
 export type SelectOption = {
     value: string;
-    label: string;
+    label: TranslatableLabel;
 };
 
 export const purchaseOrderStatusOptions: SelectOption[] = [
@@ -130,8 +134,11 @@ export const activeInactiveStatusOptions: SelectOption[] = [
 ];
 
 export const employmentStatusOptions: SelectOption[] = [
-    { value: 'regular', label: 'Regular' },
-    { value: 'intern', label: 'Intern' },
+    {
+        value: 'regular',
+        label: { key: 'status.regular', fallback: 'Regular' },
+    },
+    { value: 'intern', label: { key: 'status.intern', fallback: 'Intern' } },
 ];
 
 export const productTypeOptions: SelectOption[] = [
@@ -277,7 +284,7 @@ export function createSelectFilterField(
                 <SelectContent className="border-border bg-background text-foreground">
                     {options.map((option) => (
                         <SelectItem key={option.value} value={option.value}>
-                            {option.label}
+                            <LabelText label={option.label} />
                         </SelectItem>
                     ))}
                 </SelectContent>
@@ -287,15 +294,40 @@ export function createSelectFilterField(
 }
 
 // Generic text input filter field creator
+export function TranslatedPlaceholderInput({
+    placeholder,
+    ...rest
+}: Readonly<
+    Omit<React.ComponentProps<typeof Input>, 'placeholder'> & {
+        placeholder: TranslatableLabel;
+    }
+>) {
+    const { t } = useTranslation();
+    if (typeof placeholder === 'string') {
+        return <Input placeholder={placeholder} {...rest} />;
+    }
+    const translated = t(placeholder.key);
+    return (
+        <Input
+            {...rest}
+            placeholder={
+                translated === placeholder.key
+                    ? placeholder.fallback
+                    : translated
+            }
+        />
+    );
+}
+
 export function createTextFilterField(
     name: string,
     label: TranslatableLabel,
-    placeholder: string,
+    placeholder: TranslatableLabel,
 ): FieldDescriptor {
     return {
         name,
         label,
-        component: <Input placeholder={placeholder} />,
+        component: <TranslatedPlaceholderInput placeholder={placeholder} />,
     };
 }
 
@@ -787,7 +819,7 @@ export function createEmploymentStatusFilterField(
 ): FieldDescriptor {
     return createSelectFilterField(
         'employment_status',
-        'Status',
+        { key: 'column.status', fallback: 'Status' },
         employmentStatusOptions,
         placeholder,
     );

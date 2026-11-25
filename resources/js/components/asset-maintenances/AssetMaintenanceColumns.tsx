@@ -17,7 +17,7 @@ export const assetMaintenanceColumns: ColumnDef<AssetMaintenance>[] = [
     createSelectColumn<AssetMaintenance>(),
     {
         accessorKey: 'asset',
-        ...createSortingHeader('Asset'),
+        ...createSortingHeader({ key: 'column.asset', fallback: 'Asset' }),
         cell: ({ row }) => {
             const asset = row.original.asset;
             if (!asset) return '-';
@@ -33,7 +33,7 @@ export const assetMaintenanceColumns: ColumnDef<AssetMaintenance>[] = [
     },
     {
         accessorKey: 'maintenance_type',
-        ...createSortingHeader('Type'),
+        ...createSortingHeader({ key: 'column.type', fallback: 'Type' }),
         cell: ({ row }) => (
             <Badge variant="outline">
                 {formatStatusLabel(row.getValue('maintenance_type') as string)}
@@ -42,11 +42,14 @@ export const assetMaintenanceColumns: ColumnDef<AssetMaintenance>[] = [
     },
     createStatusBadgeColumn<AssetMaintenance>({
         accessorKey: 'status',
-        label: 'Status',
+        label: { key: 'column.status', fallback: 'Status' },
     }),
     {
         accessorKey: 'scheduled_at',
-        ...createSortingHeader('Scheduled'),
+        ...createSortingHeader({
+            key: 'column.scheduled',
+            fallback: 'Scheduled',
+        }),
         cell: ({ row }) => {
             const date = row.getValue('scheduled_at') as string | null;
             return formatDateByRegionalSettings(date);
@@ -54,7 +57,10 @@ export const assetMaintenanceColumns: ColumnDef<AssetMaintenance>[] = [
     },
     {
         accessorKey: 'performed_at',
-        ...createSortingHeader('Performed'),
+        ...createSortingHeader({
+            key: 'column.performed',
+            fallback: 'Performed',
+        }),
         cell: ({ row }) => {
             const date = row.getValue('performed_at') as string | null;
             return formatDateByRegionalSettings(date);
@@ -62,12 +68,15 @@ export const assetMaintenanceColumns: ColumnDef<AssetMaintenance>[] = [
     },
     {
         accessorKey: 'supplier',
-        ...createSortingHeader('Supplier'),
+        ...createSortingHeader({
+            key: 'column.supplier',
+            fallback: 'Supplier',
+        }),
         cell: ({ row }) => row.original.supplier || '-',
     },
     {
         accessorKey: 'notes',
-        ...createSortingHeader('Notes'),
+        ...createSortingHeader({ key: 'column.notes', fallback: 'Notes' }),
         cell: ({ row }) => (
             <div className="max-w-[220px] truncate text-muted-foreground">
                 {row.original.notes || '-'}
@@ -76,7 +85,7 @@ export const assetMaintenanceColumns: ColumnDef<AssetMaintenance>[] = [
     },
     {
         accessorKey: 'cost',
-        ...createSortingHeader('Cost'),
+        ...createSortingHeader({ key: 'column.cost', fallback: 'Cost' }),
         cell: ({ row }) => {
             const cost = Number(row.original.cost);
             if (Number.isNaN(cost)) return '-';

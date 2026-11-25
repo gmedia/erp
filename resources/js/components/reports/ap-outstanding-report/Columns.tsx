@@ -37,46 +37,46 @@ export const apOutstandingReportColumns: ColumnDef<ApOutstandingReportItem>[] =
     [
         createReportSummaryColumn<ApOutstandingReportItem>({
             accessorKey: 'bill.number',
-            header: 'Bill Number',
+            header: { key: 'column.bill_number', fallback: 'Bill Number' },
             getPrimary: (item) => item.bill?.number,
             getSecondary: (item) => formatDate(item.bill?.bill_date),
             sortable: true,
         }),
         createReportTextColumn<ApOutstandingReportItem>({
             accessorKey: 'supplier.name',
-            header: 'Supplier',
+            header: { key: 'column.supplier', fallback: 'Supplier' },
             getValue: (item) => item.supplier?.name,
             sortable: true,
         }),
         createReportTextColumn<ApOutstandingReportItem>({
             accessorKey: 'branch.name',
-            header: 'Branch',
+            header: { key: 'column.branch', fallback: 'Branch' },
             getValue: (item) => item.branch?.name,
             sortable: true,
         }),
         createReportTextColumn<ApOutstandingReportItem>({
             accessorKey: 'bill.due_date',
-            header: 'Due Date',
+            header: { key: 'column.due_date', fallback: 'Due Date' },
             getValue: (item) => formatDate(item.bill?.due_date),
             sortable: true,
         }),
         createReportTextColumn<ApOutstandingReportItem>({
             id: 'grand_total',
-            header: 'Grand Total',
+            header: { key: 'column.grand_total', fallback: 'Grand Total' },
             getValue: (item) => formatAmount(item.amounts?.grand_total),
             sortable: true,
             align: 'right',
         }),
         createReportTextColumn<ApOutstandingReportItem>({
             id: 'amount_paid',
-            header: 'Amount Paid',
+            header: { key: 'column.amount_paid', fallback: 'Amount Paid' },
             getValue: (item) => formatAmount(item.amounts?.amount_paid),
             sortable: true,
             align: 'right',
         }),
         createReportTextColumn<ApOutstandingReportItem>({
             id: 'amount_due',
-            header: 'Amount Due',
+            header: { key: 'column.amount_due', fallback: 'Amount Due' },
             getValue: (item) => formatAmount(item.amounts?.amount_due),
             sortable: true,
             align: 'right',
@@ -89,7 +89,7 @@ export const apOutstandingReportColumns: ColumnDef<ApOutstandingReportItem>[] =
         }),
         createReportStatusBadgeColumn<ApOutstandingReportItem>({
             accessorKey: 'bill.status',
-            header: 'Status',
+            header: { key: 'column.status', fallback: 'Status' },
             getValue: (item) => item.bill?.status,
         }),
     ];

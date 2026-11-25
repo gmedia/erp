@@ -8,8 +8,11 @@ export function createInventoryValuationFilterFields(): FieldDescriptor[] {
     return [
         createTextFilterField(
             'search',
-            'Search',
-            'Search product, category, warehouse, branch...',
+            { key: 'column.search', fallback: 'Search' },
+            {
+                key: 'filter.valuation_search_placeholder',
+                fallback: 'Search product, category, warehouse, branch...',
+            },
         ),
         ...createInventoryReportScopeFilterFields(),
     ];

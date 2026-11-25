@@ -6,16 +6,20 @@ import {
 
 export function createAssetLocationFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', 'Search asset locations...'),
+        createTextFilterField(
+            'search',
+            { key: 'column.search', fallback: 'Search' },
+            'Search asset locations...',
+        ),
         createAsyncSelectFilterField(
             'branch_id',
-            'Branch',
+            { key: 'column.branch', fallback: 'Branch' },
             '/api/branches',
             'All Branches',
         ),
         createAsyncSelectFilterField(
             'parent_id',
-            'Parent Location',
+            { key: 'column.parent_location', fallback: 'Parent Location' },
             '/api/asset-locations',
             'All Locations',
         ),

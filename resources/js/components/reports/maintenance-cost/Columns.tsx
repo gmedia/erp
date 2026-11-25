@@ -25,58 +25,58 @@ export interface MaintenanceCostReportItem {
 export const maintenanceCostColumns: ColumnDef<MaintenanceCostReportItem>[] = [
     createReportTextColumn<MaintenanceCostReportItem>({
         accessorKey: 'asset_code',
-        header: 'Asset Code',
+        header: { key: 'column.asset_code', fallback: 'Asset Code' },
         getValue: (item) => item.asset_code,
         className: 'font-medium',
         sortable: true,
     }),
     createReportTextColumn<MaintenanceCostReportItem>({
         accessorKey: 'asset_name',
-        header: 'Asset Name',
+        header: { key: 'column.asset_name', fallback: 'Asset Name' },
         getValue: (item) => item.asset_name,
         sortable: true,
     }),
     createReportTextColumn<MaintenanceCostReportItem>({
         accessorKey: 'category_name',
-        header: 'Category',
+        header: { key: 'column.category', fallback: 'Category' },
         getValue: (item) => item.category_name,
     }),
     createReportTextColumn<MaintenanceCostReportItem>({
         accessorKey: 'branch_name',
-        header: 'Branch',
+        header: { key: 'column.branch', fallback: 'Branch' },
         getValue: (item) => item.branch_name,
     }),
     createReportStatusBadgeColumn<MaintenanceCostReportItem>({
         accessorKey: 'maintenance_type',
-        header: 'Type',
+        header: { key: 'column.maintenance_type', fallback: 'Type' },
         getValue: (item) => item.maintenance_type,
     }),
     createReportStatusBadgeColumn<MaintenanceCostReportItem>({
         accessorKey: 'status',
-        header: 'Status',
+        header: { key: 'column.status', fallback: 'Status' },
         getValue: (item) => item.status,
     }),
     createReportTextColumn<MaintenanceCostReportItem>({
         accessorKey: 'scheduled_at',
-        header: 'Scheduled At',
+        header: { key: 'column.scheduled_at', fallback: 'Scheduled At' },
         getValue: (item) => formatDateByRegionalSettings(item.scheduled_at),
         sortable: true,
     }),
     createReportTextColumn<MaintenanceCostReportItem>({
         accessorKey: 'performed_at',
-        header: 'Performed At',
+        header: { key: 'column.performed_at', fallback: 'Performed At' },
         getValue: (item) => formatDateByRegionalSettings(item.performed_at),
         sortable: true,
     }),
     createReportTextColumn<MaintenanceCostReportItem>({
         accessorKey: 'supplier_name',
-        header: 'Vendor',
+        header: { key: 'column.vendor', fallback: 'Vendor' },
         getValue: (item) => item.supplier_name,
         sortable: true,
     }),
     {
         accessorKey: 'cost',
-        ...createSortingHeader('Cost'),
+        ...createSortingHeader({ key: 'column.cost', fallback: 'Cost' }),
         cell: ({ row }) => (
             <div className="text-right">
                 {formatCurrency(row.getValue('cost'))}

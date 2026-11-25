@@ -5,6 +5,10 @@ import {
     createReportSummaryColumn,
     createReportTextColumn,
 } from '@/components/common/ReportColumns';
+import {
+    LabelText,
+    type TranslatableLabel,
+} from '@/components/common/TranslatedText';
 import { formatCurrency } from '@/lib/utils';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import type { ColumnDef } from '@tanstack/react-table';
@@ -39,8 +43,12 @@ export function formatArReportCurrency(
 }
 
 const MONEY_CELL_CLASS = 'text-right tabular-nums';
-const moneyHeader = (label: string) =>
-    createElement('div', { className: 'text-right' }, label);
+const moneyHeader = (label: TranslatableLabel) =>
+    createElement(
+        'div',
+        { className: 'text-right' },
+        createElement(LabelText, { label }),
+    );
 const moneyCell = (value: string | null | undefined) =>
     createElement(
         'div',
@@ -54,7 +62,10 @@ export function createArInvoiceBaseColumns<
     return [
         createReportSummaryColumn<T>({
             accessorKey: 'customer_invoice.invoice_number',
-            header: 'Invoice Number',
+            header: {
+                key: 'column.invoice_number',
+                fallback: 'Invoice Number',
+            },
             getPrimary: (item) => item.customer_invoice?.invoice_number,
             getSecondary: (item) =>
                 formatArReportDate(item.customer_invoice?.invoice_date),
@@ -62,40 +73,56 @@ export function createArInvoiceBaseColumns<
         }),
         createReportTextColumn<T>({
             accessorKey: 'customer.name',
-            header: 'Customer',
+            header: { key: 'column.customer', fallback: 'Customer' },
             getValue: (item) => item.customer?.name,
             sortable: true,
         }),
         createReportTextColumn<T>({
             accessorKey: 'branch.name',
-            header: 'Branch',
+            header: { key: 'column.branch', fallback: 'Branch' },
             getValue: (item) => item.branch?.name,
             sortable: true,
         }),
         createReportStatusBadgeColumn<T>({
             accessorKey: 'customer_invoice.status',
-            header: 'Status',
+            header: { key: 'column.status', fallback: 'Status' },
             getValue: (item) => item.customer_invoice?.status,
         }),
         {
             id: 'grand_total',
-            header: () => moneyHeader('Grand Total'),
+            header: () =>
+                moneyHeader({
+                    key: 'column.grand_total',
+                    fallback: 'Grand Total',
+                }),
             cell: ({ row }) => moneyCell(row.original.amounts.grand_total),
         },
         {
             id: 'amount_received',
-            header: () => moneyHeader('Amount Received'),
+            header: () =>
+                moneyHeader({
+                    key: 'column.amount_received',
+                    fallback: 'Amount Received',
+                }),
             cell: ({ row }) => moneyCell(row.original.amounts.amount_received),
         },
         {
             id: 'credit_note_amount',
-            header: () => moneyHeader('Credit Note Amount'),
+            header: () =>
+                moneyHeader({
+                    key: 'column.credit_note_amount',
+                    fallback: 'Credit Note Amount',
+                }),
             cell: ({ row }) =>
                 moneyCell(row.original.amounts.credit_note_amount),
         },
         {
             id: 'amount_due',
-            header: () => moneyHeader('Amount Due'),
+            header: () =>
+                moneyHeader({
+                    key: 'column.amount_due',
+                    fallback: 'Amount Due',
+                }),
             cell: ({ row }) => moneyCell(row.original.amounts.amount_due),
         },
     ];

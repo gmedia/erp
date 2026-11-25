@@ -12,19 +12,22 @@ export function createStockAdjustmentReportFilterFields(): FieldDescriptor[] {
     return [
         createTextFilterField(
             'search',
-            'Search',
-            'Search number, warehouse, branch, type, status...',
+            { key: 'column.search', fallback: 'Search' },
+            {
+                key: 'filter.adjustment_search_placeholder',
+                fallback: 'Search number, warehouse, branch, type, status...',
+            },
         ),
         ...createWarehouseBranchFilterFields(),
         createSelectFilterField(
             'adjustment_type',
-            'Adjustment Type',
+            { key: 'column.adjustment_type', fallback: 'Adjustment Type' },
             stockAdjustmentTypeOptions,
             'All types',
         ),
         createSelectFilterField(
             'status',
-            'Status',
+            { key: 'column.status', fallback: 'Status' },
             stockAdjustmentStatusOptions,
             'All statuses',
         ),

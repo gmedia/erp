@@ -47,24 +47,33 @@ export const supplierColumns: ColumnDef<Supplier>[] = [
     createSelectColumn<Supplier>(),
     createTextColumn<Supplier>({
         accessorKey: 'name',
-        label: 'Name',
+        label: { key: 'column.name', fallback: 'Name' },
         primary: true,
     }),
-    createEmailColumn<Supplier>({ accessorKey: 'email', label: 'Email' }),
-    createPhoneColumn<Supplier>({ accessorKey: 'phone', label: 'Phone' }),
+    createEmailColumn<Supplier>({
+        accessorKey: 'email',
+        label: { key: 'column.email', fallback: 'Email' },
+    }),
+    createPhoneColumn<Supplier>({
+        accessorKey: 'phone',
+        label: { key: 'column.phone', fallback: 'Phone' },
+    }),
     {
         accessorKey: 'branch',
-        ...createSortingHeader('Branch'),
+        ...createSortingHeader({ key: 'column.branch', fallback: 'Branch' }),
         cell: renderBranchCell,
     },
     {
         accessorKey: 'category',
-        ...createSortingHeader('Category'),
+        ...createSortingHeader({
+            key: 'column.category',
+            fallback: 'Category',
+        }),
         cell: renderCategoryCell,
     },
     {
         accessorKey: 'status',
-        ...createSortingHeader('Status'),
+        ...createSortingHeader({ key: 'column.status', fallback: 'Status' }),
         cell: renderStatusCell,
     },
     createActionsColumn<Supplier>(),
