@@ -588,7 +588,15 @@
         "expected_delivery": "Expected Delivery",
         "currency": "Currency",
         "status": "Status",
-        "grand_total": "Grand Total"
+        "grand_total": "Grand Total",
+        "pr_number": "PR Number",
+        "branch": "Branch",
+        "department": "Department",
+        "requester": "Requester",
+        "request_date": "Request Date",
+        "required_date": "Required Date",
+        "priority": "Priority",
+        "estimated_amount": "Estimated Amount"
     },
     "status": {
         "draft": "Draft",

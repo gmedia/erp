@@ -21,13 +21,13 @@ export function createPurchaseOrderFilterFields(): FieldDescriptor[] {
         ...createSelectFilterFields([
             {
                 name: 'status',
-                label: 'Status',
+                label: { key: 'column.status', fallback: 'Status' },
                 options: purchaseOrderStatusOptions,
                 placeholder: 'Select Status',
             },
             {
                 name: 'currency',
-                label: 'Currency',
+                label: { key: 'column.currency', fallback: 'Currency' },
                 options: currencyOptions,
                 placeholder: 'Select Currency',
             },

@@ -2,6 +2,7 @@
 
 import { AsyncSelect } from '@/components/common/AsyncSelect';
 import { FilterDatePicker } from '@/components/common/FilterDatePicker';
+import type { TranslatableLabel } from '@/components/common/TranslatedText';
 
 import { Input } from '@/components/ui/input';
 import {
@@ -15,7 +16,7 @@ import * as React from 'react';
 
 export type FieldDescriptor = {
     name: string;
-    label: string;
+    label: TranslatableLabel;
     component: React.ReactNode;
 };
 
@@ -234,14 +235,14 @@ export type AsyncSelectFilterConfig = {
 
 export type SelectFilterConfig = {
     name: string;
-    label: string;
+    label: TranslatableLabel;
     options: SelectOption[];
     placeholder: string;
 };
 
 export type DateFilterConfig = {
     name: string;
-    label: string;
+    label: TranslatableLabel;
     placeholder: string;
 };
 
@@ -261,7 +262,7 @@ export function createSimpleEntityFilterFields(
 // Generic select filter field creator
 export function createSelectFilterField(
     name: string,
-    label: string,
+    label: TranslatableLabel,
     options: SelectOption[],
     placeholder: string,
 ): FieldDescriptor {

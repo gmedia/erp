@@ -21,13 +21,13 @@ export function createPurchaseRequestFilterFields(): FieldDescriptor[] {
         ...createSelectFilterFields([
             {
                 name: 'priority',
-                label: 'Priority',
+                label: { key: 'column.priority', fallback: 'Priority' },
                 options: purchaseRequestPriorityOptions,
                 placeholder: 'Select Priority',
             },
             {
                 name: 'status',
-                label: 'Status',
+                label: { key: 'column.status', fallback: 'Status' },
                 options: purchaseRequestStatusOptions,
                 placeholder: 'Select Status',
             },

@@ -62,7 +62,9 @@ test.describe('i18n shell (locale id)', () => {
         await expect(
             page.getByRole('columnheader', { name: 'Status' }),
         ).toBeVisible({ timeout: 15000 });
-        await expect(page.getByText('Draf', { exact: true }).first()).toBeVisible();
+        await expect(
+            page.getByText('Draf', { exact: true }).first(),
+        ).toBeVisible();
         await expect(page.getByText('Draft', { exact: true })).toHaveCount(0);
     });
 });
@@ -81,7 +83,50 @@ test.describe('i18n shell (locale en)', () => {
         await expect(
             page.getByRole('columnheader', { name: 'Status' }),
         ).toBeVisible({ timeout: 15000 });
-        await expect(page.getByText('Draft', { exact: true }).first()).toBeVisible();
+        await expect(
+            page.getByText('Draft', { exact: true }).first(),
+        ).toBeVisible();
         await expect(page.getByText('Draf', { exact: true })).toHaveCount(0);
+    });
+
+    test('purchase orders column headers keep English labels', async ({
+        page,
+    }) => {
+        await page.addInitScript((k) => {
+            localStorage.setItem(k, 'en');
+        }, LOCALE_KEY);
+
+        await login(page);
+        await page.goto('/purchase-orders', { waitUntil: 'domcontentloaded' });
+
+        await expect(
+            page.getByRole('button', { name: 'PO Number' }),
+        ).toBeVisible({ timeout: 15000 });
+        await expect(page.getByRole('button', { name: 'No. PO' })).toHaveCount(
+            0,
+        );
+    });
+});
+
+test.describe('i18n shell (locale id) columns', () => {
+    test('purchase orders column headers use Indonesian labels', async ({
+        page,
+    }) => {
+        await page.addInitScript((k) => {
+            localStorage.setItem(k, 'id');
+        }, LOCALE_KEY);
+
+        await login(page);
+        await page.goto('/purchase-orders', { waitUntil: 'domcontentloaded' });
+
+        await expect(page.getByRole('button', { name: 'No. PO' })).toBeVisible({
+            timeout: 15000,
+        });
+        await expect(
+            page.getByRole('button', { name: 'Pemasok' }),
+        ).toBeVisible();
+        await expect(
+            page.getByRole('button', { name: 'PO Number' }),
+        ).toHaveCount(0);
     });
 });
