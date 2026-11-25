@@ -50,6 +50,35 @@ beforeEach(function () {
 });
 
 describe('index', function () {
+    it('breaks created_at ties by id so same-timestamp events keep a stable order', function () {
+        $sameTime = now()->subHour();
+        $first = ApprovalAuditLog::factory()->create([
+            'approval_request_id' => $this->approvalRequest->id,
+            'approvable_type' => Asset::class,
+            'approvable_id' => $this->asset->id,
+            'event' => 'completed',
+            'actor_user_id' => $this->superAdmin->id,
+            'step_order' => 1,
+            'created_at' => $sameTime,
+        ]);
+        $second = ApprovalAuditLog::factory()->create([
+            'approval_request_id' => $this->approvalRequest->id,
+            'approvable_type' => Asset::class,
+            'approvable_id' => $this->asset->id,
+            'event' => 'step_approved',
+            'actor_user_id' => $this->superAdmin->id,
+            'step_order' => 1,
+            'created_at' => $sameTime,
+        ]);
+
+        Sanctum::actingAs($this->user, ['*']);
+        $response = getJson('/api/approval-audit-trail?sort_by=created_at&sort_direction=desc');
+        $response->assertOk();
+
+        $ids = collect($response->json('data'))->pluck('id')->all();
+        expect(array_search($second->id, $ids, true))->toBeLessThan(array_search($first->id, $ids, true));
+    });
+
     it('requires authentication', function () {
         getJson('/api/approval-audit-trail')->assertUnauthorized();
     });

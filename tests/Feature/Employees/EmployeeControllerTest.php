@@ -165,6 +165,18 @@ describe('Employee API Endpoints', function () {
             ->and($data[0]['current_employment']['department']['id'])->toBe($engineering->id);
     });
 
+    test('index default order is newest first with id tie-break (V8-44 urutan default)', function () {
+        $sameTime = '2026-02-01 08:00:00';
+        $older = Employee::factory()->create(['created_at' => $sameTime, 'updated_at' => $sameTime]);
+        $newer = Employee::factory()->create(['created_at' => $sameTime, 'updated_at' => $sameTime]);
+
+        $response = getJson('/api/employees?per_page=100');
+        $response->assertOk();
+
+        $ids = collect($response->json('data'))->pluck('id')->all();
+        expect(array_search($newer->id, $ids, true))->toBeLessThan(array_search($older->id, $ids, true));
+    });
+
     test('index supports sorting by different fields', function () {
         Employee::factory()->create(['name' => 'Z Employee']);
         Employee::factory()->create(['name' => 'A Employee']);
