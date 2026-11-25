@@ -118,28 +118,7 @@ jobs:
         shell: bash
         timeout-minutes: 5
         run: |
-          branch_tag="${GITHUB_BASE_REF:-${GITHUB_REF_NAME}}"
-          branch_tag=$(echo "$branch_tag" | tr -cd '[:alnum:]._-')
-          candidates=(
-            "ghcr.io/${GITHUB_REPOSITORY}/ci-sail:sha-${GITHUB_SHA::7}"
-            "$CI_SAIL_IMAGE"
-            "ghcr.io/${GITHUB_REPOSITORY}/ci-sail:${branch_tag}"
-            "ghcr.io/${GITHUB_REPOSITORY}/ci-sail:latest"
-          )
-          for image in "${candidates[@]}"; do
-            for attempt in 1 2 3; do
-              if timeout 60s docker pull "$image"; then
-                docker tag "$image" sail-8.4/app
-                exit 0
-              fi
-              if [ "$attempt" -lt 3 ]; then
-                echo "CI Sail image $image not available. Retry ${attempt}/3 in 10s..."
-                sleep 10
-              fi
-            done
-          done
-          echo "::error::Unable to pull any CI Sail image candidate after retries."
-          exit 1
+          bash scripts/ci/pull-sail-image.sh
 
       - name: Start Sail
         run: |
@@ -219,31 +198,7 @@ jobs:
         shell: bash
         timeout-minutes: 5
         run: |
-          branch_tag="${GITHUB_BASE_REF:-${GITHUB_REF_NAME}}"
-          branch_tag=$(echo "$branch_tag" | tr -cd '[:alnum:]._-')
-
-          candidates=(
-            "$CI_SAIL_IMAGE"
-            "ghcr.io/${GITHUB_REPOSITORY}/ci-sail:${branch_tag}"
-            "ghcr.io/${GITHUB_REPOSITORY}/ci-sail:latest"
-          )
-
-          for image in "${candidates[@]}"; do
-            for attempt in 1 2 3; do
-              if timeout 60s docker pull "$image"; then
-                docker tag "$image" sail-8.4/app
-                exit 0
-              fi
-
-              if [ "$attempt" -lt 3 ]; then
-                echo "CI Sail image $image not available. Retry ${attempt}/3 in 10s..."
-                sleep 10
-              fi
-            done
-          done
-
-          echo "::error::Unable to pull any CI Sail image candidate after retries."
-          exit 1
+          bash scripts/ci/pull-sail-image.sh
 
       - name: Start Sail
         run: |
@@ -441,31 +396,7 @@ jobs:
         shell: bash
         timeout-minutes: 5
         run: |
-          branch_tag="${GITHUB_BASE_REF:-${GITHUB_REF_NAME}}"
-          branch_tag=$(echo "$branch_tag" | tr -cd '[:alnum:]._-')
-
-          candidates=(
-            "$CI_SAIL_IMAGE"
-            "ghcr.io/${GITHUB_REPOSITORY}/ci-sail:${branch_tag}"
-            "ghcr.io/${GITHUB_REPOSITORY}/ci-sail:latest"
-          )
-
-          for image in "${candidates[@]}"; do
-            for attempt in 1 2 3; do
-              if timeout 60s docker pull "$image"; then
-                docker tag "$image" sail-8.4/app
-                exit 0
-              fi
-
-              if [ "$attempt" -lt 3 ]; then
-                echo "CI Sail image $image not available. Retry ${attempt}/3 in 10s..."
-                sleep 10
-              fi
-            done
-          done
-
-          echo "::error::Unable to pull any CI Sail image candidate after retries."
-          exit 1
+          bash scripts/ci/pull-sail-image.sh
 
       - name: Start Sail
         run: |
@@ -619,32 +550,7 @@ jobs:
         shell: bash
         timeout-minutes: 5
         run: |
-          branch_tag="${GITHUB_BASE_REF:-${GITHUB_REF_NAME}}"
-          branch_tag=$(echo "$branch_tag" | tr -cd '[:alnum:]._-')
-
-          candidates=(
-            "ghcr.io/${GITHUB_REPOSITORY}/ci-sail:sha-${GITHUB_SHA::7}"
-            "$CI_SAIL_IMAGE"
-            "ghcr.io/${GITHUB_REPOSITORY}/ci-sail:${branch_tag}"
-            "ghcr.io/${GITHUB_REPOSITORY}/ci-sail:latest"
-          )
-
-          for image in "${candidates[@]}"; do
-            for attempt in 1 2 3; do
-              if timeout 60s docker pull "$image"; then
-                docker tag "$image" sail-8.4/app
-                exit 0
-              fi
-
-              if [ "$attempt" -lt 3 ]; then
-                echo "CI Sail image $image not available. Retry ${attempt}/3 in 10s..."
-                sleep 10
-              fi
-            done
-          done
-
-          echo "::error::Unable to pull any CI Sail image candidate after retries."
-          exit 1
+          bash scripts/ci/pull-sail-image.sh
 
       - name: Start Sail
         run: |
