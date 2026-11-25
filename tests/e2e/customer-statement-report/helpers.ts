@@ -1,11 +1,14 @@
 import { expect, Page } from '@playwright/test';
+import { expectResponseOk } from '../helpers';
 
 export async function waitForCustomerStatementReportResponse(page: Page): Promise<void> {
-    await page.waitForResponse(
-        (response) =>
-            response.url().includes('/api/reports/customer-statement') &&
-            response.status() < 400,
+    const response = await page.waitForResponse(
+        (r) =>
+            r.request().method() === 'GET' &&
+            r.url().includes('/api/reports/customer-statement') &&
+            !r.url().includes('/export'),
     );
+    await expectResponseOk(response);
 }
 
 export async function openCustomerStatementReport(page: Page): Promise<void> {
@@ -30,10 +33,9 @@ export async function openCustomerStatementReport(page: Page): Promise<void> {
     await expect(option).toBeVisible({ timeout: 10000 });
     await option.click();
 
-    await Promise.all([
-        waitForCustomerStatementReportResponse(page),
-        filtersDialog.getByRole('button', { name: 'Apply Filters' }).click(),
-    ]);
+    const responsePromise = waitForCustomerStatementReportResponse(page);
+    await filtersDialog.getByRole('button', { name: 'Apply Filters' }).click();
+    await responsePromise;
 
     await expect(page.locator('table')).toBeVisible({ timeout: 15000 });
 }
