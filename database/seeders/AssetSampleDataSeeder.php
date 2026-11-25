@@ -528,7 +528,9 @@ class AssetSampleDataSeeder extends Seeder
             $pipelineStateCode = $data['pipeline_state'];
             $approvalFlowCode = $data['approval_flow_code'] ?? null;
             $approvalStatus = $data['approval_status'] ?? null;
-            $isDisposal = $data['is_disposal'] ?? false;
+            // Aset disposed wajib punya movement dispose (jalur resmi pelepasan,
+            // sumber jurnal pelepasan dan tautan di profil aset).
+            $isDisposal = $data['is_disposal'] ?? ($data['status'] === 'disposed');
 
             unset($data['pipeline_state']);
             unset($data['approval_flow_code']);
@@ -588,6 +590,13 @@ class AssetSampleDataSeeder extends Seeder
             if ($approvalFlowCode) {
                 $flow = ApprovalFlow::where('code', $approvalFlowCode)->first();
                 if ($flow) {
+                    // Pengajuan mengikuti tanggal pembelian (setelah log Draft 08:00 pada hari itu),
+                    // bukan now(), agar tidak lebih awal dari riwayat pipeline (#459 butir 6).
+                    $submittedAt = Carbon::parse($asset->purchase_date)->startOfDay()->setTime(10, 0);
+                    $completedAt = $approvalStatus === 'approved'
+                        ? $submittedAt->copy()->addHour()
+                        : null;
+
                     $request = ApprovalRequest::updateOrCreate(
                         [
                             'approvable_type' => Asset::class,
@@ -598,8 +607,8 @@ class AssetSampleDataSeeder extends Seeder
                             'current_step_order' => $approvalStatus === 'approved' ? $flow->steps()->count() : 1,
                             'status' => $approvalStatus,
                             'submitted_by' => $adminUser?->id,
-                            'submitted_at' => now(),
-                            'completed_at' => $approvalStatus === 'approved' ? now() : null,
+                            'submitted_at' => $submittedAt,
+                            'completed_at' => $completedAt,
                         ]
                     );
 
@@ -615,6 +624,7 @@ class AssetSampleDataSeeder extends Seeder
                             'step_order' => null,
                             'ip_address' => '127.0.0.1',
                             'user_agent' => 'Seeder',
+                            'created_at' => $submittedAt,
                             'metadata' => [
                                 'source' => 'AssetSampleDataSeeder',
                                 'approval_status' => $approvalStatus,

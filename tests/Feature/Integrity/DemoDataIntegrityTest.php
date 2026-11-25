@@ -98,6 +98,23 @@ function postedBalance(int $accountId, bool $debitNormal): float
     return $debitNormal ? $debit - $credit : $credit - $debit;
 }
 
+/**
+ * Saldo kartu stok produk+gudang setelah seluruh movement pada tanggal tersebut
+ * (balance_after movement terakhir, urutan moved_at lalu id).
+ */
+function stockCardBalanceOn(int $productId, int $warehouseId, string $date): float
+{
+    $balance = DB::table('stock_movements')
+        ->where('product_id', $productId)
+        ->where('warehouse_id', $warehouseId)
+        ->whereDate('moved_at', '<=', $date)
+        ->orderByDesc('moved_at')
+        ->orderByDesc('id')
+        ->value('balance_after');
+
+    return (float) ($balance ?? 0.0);
+}
+
 beforeEach(function () {
     seedDemoData();
 });
@@ -874,6 +891,64 @@ invariant('W7-15 bank reconciliations are Completed only after the period ends',
     }
 });
 
+// #459 butir 7 — penerimaan AR draft harus punya invoice terbuka milik pelanggan yang sama.
+invariant('#459 draft AR receipts have an open invoice of the same customer', function () {
+    $openStatuses = ['sent', 'partially_paid', 'overdue'];
+
+    $drafts = DB::table('ar_receipts')->where('status', 'draft')->get(['id', 'receipt_number', 'customer_id']);
+
+    expect($drafts)->not->toBeEmpty('Demo data must include a draft AR receipt');
+
+    foreach ($drafts as $draft) {
+        $hasOpenInvoice = DB::table('customer_invoices')
+            ->where('customer_id', $draft->customer_id)
+            ->whereIn('status', $openStatuses)
+            ->where('amount_due', '>', 0)
+            ->exists();
+
+        expect($hasOpenInvoice)->toBeTrue(
+            "Draft receipt {$draft->receipt_number} must have an open invoice of its customer",
+        );
+    }
+});
+
+// #459 butir 8 — pemasok demo memasok kategori barang yang sesuai dengan kategorinya.
+invariant('#459 demo purchase orders match the supplier category to the product category', function () {
+    $pairs = DB::table('purchase_order_items')
+        ->join('purchase_orders', 'purchase_orders.id', '=', 'purchase_order_items.purchase_order_id')
+        ->join('suppliers', 'suppliers.id', '=', 'purchase_orders.supplier_id')
+        ->join('supplier_categories', 'supplier_categories.id', '=', 'suppliers.category_id')
+        ->join('products', 'products.id', '=', 'purchase_order_items.product_id')
+        ->join('product_categories', 'product_categories.id', '=', 'products.product_category_id')
+        ->get([
+            'purchase_orders.po_number',
+            'suppliers.name as supplier',
+            'supplier_categories.name as supplier_category',
+            'products.name as product',
+            'product_categories.name as product_category',
+        ]);
+
+    expect($pairs)->not->toBeEmpty('Demo data must include purchase order items');
+
+    foreach ($pairs as $pair) {
+        $allowed = DemoMasterData::SUPPLIER_PRODUCT_CATEGORY_MAP[$pair->supplier_category] ?? [];
+
+        expect(in_array($pair->product_category, $allowed, true))->toBeTrue(
+            "{$pair->po_number}: supplier {$pair->supplier} ({$pair->supplier_category}) "
+            . "must not supply {$pair->product} ({$pair->product_category})",
+        );
+    }
+});
+
+// #459 butir 8 (lanjutan) — PO demo tidak boleh jatuh ke satu pemasok saja (rotasi vendor, W5-23).
+invariant('#459 demo purchase orders are spread across at least three suppliers', function () {
+    $suppliers = DB::table('purchase_orders')
+        ->distinct()
+        ->pluck('supplier_id');
+
+    expect($suppliers->count())->toBeGreaterThanOrEqual(3, 'Demo POs must be spread across at least three suppliers');
+});
+
 // W7-15 (keuangan) — recurring journal Monthly berjarak tepat satu bulan, dan nilainya wajar.
 invariant('W7-15 monthly recurring journals run one month apart with plausible amounts', function () {
     $journals = DB::table('recurring_journals')
@@ -995,6 +1070,78 @@ invariant('W7-05 GL equipment minus accumulated depreciation equals in-service b
 
     expect(round($glEquipment - $glAccumulated, 2))
         ->toBe(round($registerBookValue, 2), 'GL equipment net of accumulated depreciation must equal in-service book value');
+});
+
+// #442 — an asset capitalised in the GL (has a posted ACQ journal) that is disposed
+// or lost carries exactly one posted release journal whose lines zero its cost and
+// accumulated depreciation. A disposed asset without an ACQ journal (acquired and
+// released before the first open fiscal year) has no release journal at all.
+// Every DISP/LOSS journal belongs to an asset with the same ACQ journal.
+invariant('#442 disposed and lost assets carry one posted release journal', function () {
+    $assets = DB::table('assets')
+        ->whereIn('status', ['disposed', 'lost'])
+        ->get(['asset_code', 'status', 'purchase_cost', 'accumulated_depreciation']);
+
+    expect($assets)->not->toBeEmpty('Demo data must include disposed or lost assets');
+
+    $equipmentId = activeCoaAccountId('12100');
+    $accumulatedId = activeCoaAccountId('12200');
+
+    foreach ($assets as $asset) {
+        $prefix = $asset->status === 'disposed' ? 'DISP-' : 'LOSS-';
+        $journals = DB::table('journal_entries')
+            ->where('reference', $prefix . $asset->asset_code)
+            ->where('journal_type', 'system')
+            ->get(['id', 'status']);
+
+        $hasAcquisition = DB::table('journal_entries')
+            ->where('reference', 'ACQ-' . $asset->asset_code)
+            ->where('status', 'posted')
+            ->exists();
+
+        if (! $hasAcquisition) {
+            expect($journals)->toBeEmpty("Asset {$asset->asset_code} without ACQ journal must have no release journal");
+
+            continue;
+        }
+
+        expect($journals)->toHaveCount(1, "Asset {$asset->asset_code} must have exactly one release journal");
+        expect($journals[0]->status)->toBe('posted');
+
+        $credit = (float) DB::table('journal_entry_lines')
+            ->where('journal_entry_id', $journals[0]->id)
+            ->where('account_id', $equipmentId)
+            ->sum('credit');
+
+        expect(round($credit, 2))
+            ->toBe(round((float) $asset->purchase_cost, 2), "Asset {$asset->asset_code} release must credit its cost");
+
+        $debitAccumulated = (float) DB::table('journal_entry_lines')
+            ->where('journal_entry_id', $journals[0]->id)
+            ->where('account_id', $accumulatedId)
+            ->sum('debit');
+
+        expect(round($debitAccumulated, 2))
+            ->toBe(
+                round((float) $asset->accumulated_depreciation, 2),
+                "Asset {$asset->asset_code} release must debit its accumulated depreciation"
+            );
+    }
+
+    $releaseReferences = DB::table('journal_entries')
+        ->where('journal_type', 'system')
+        ->where(fn ($query) => $query->where('reference', 'like', 'DISP-%')->orWhere('reference', 'like', 'LOSS-%'))
+        ->pluck('reference');
+
+    foreach ($releaseReferences as $reference) {
+        $assetCode = substr((string) $reference, 5);
+
+        expect(DB::table('journal_entries')
+            ->where('reference', 'ACQ-' . $assetCode)
+            ->where('status', 'posted')
+            ->exists())
+            ->toBeTrue("Release journal {$reference} must have a posted ACQ journal for the same asset");
+    }
 });
 
 // W7-05 — every posted depreciation run has a posted journal.
@@ -1675,5 +1822,258 @@ test('PR432 demo users keep their permissions after seeding over legacy employee
 
         $granted = DB::table('employee_permission')->where('employee_id', $employee->id)->count();
         expect($granted)->toBe($permissionCount, "Karyawan demo {$email} harus punya seluruh izin");
+    }
+});
+
+// #459 butir 1 — qty sistem stok opname = saldo kartu stok produk+gudang pada tanggal opname.
+invariant('W8-459 stocktake system quantity equals the stock card balance on the stocktake date', function () {
+    $items = DB::table('inventory_stocktake_items')
+        ->join(
+            'inventory_stocktakes',
+            'inventory_stocktakes.id',
+            '=',
+            'inventory_stocktake_items.inventory_stocktake_id',
+        )
+        ->get([
+            'inventory_stocktakes.stocktake_number',
+            'inventory_stocktakes.warehouse_id',
+            'inventory_stocktakes.stocktake_date',
+            'inventory_stocktake_items.product_id',
+            'inventory_stocktake_items.system_quantity',
+            'inventory_stocktake_items.counted_quantity',
+            'inventory_stocktake_items.variance',
+        ]);
+
+    expect($items)->not->toBeEmpty('Demo data must include stocktake lines');
+
+    foreach ($items as $item) {
+        $label = "Stocktake {$item->stocktake_number} product {$item->product_id}";
+        $expected = round(stockCardBalanceOn(
+            (int) $item->product_id,
+            (int) $item->warehouse_id,
+            (string) $item->stocktake_date,
+        ), 2);
+
+        expect(round((float) $item->system_quantity, 2))
+            ->toBe($expected, "{$label} system quantity must equal the stock card balance");
+
+        if ($item->counted_quantity !== null) {
+            $countedVariance = (float) $item->counted_quantity - (float) $item->system_quantity;
+
+            expect(round((float) $item->variance, 2))
+                ->toBe(round($countedVariance, 2), "{$label} variance must equal counted minus system");
+        }
+    }
+});
+
+// #459 butir 2 — stock opname completed yang berselisih punya draft SA stocktake_result terhubung.
+invariant('W8-459 completed stocktakes with variance have a linked stocktake_result adjustment', function () {
+    $completed = DB::table('inventory_stocktakes')->where('status', 'completed')->get(['id', 'stocktake_number']);
+
+    expect($completed)->not->toBeEmpty('Demo data must include a completed stocktake');
+
+    foreach ($completed as $stocktake) {
+        $hasVariance = DB::table('inventory_stocktake_items')
+            ->where('inventory_stocktake_id', $stocktake->id)
+            ->whereNotNull('variance')
+            ->where('variance', '!=', 0)
+            ->exists();
+
+        if (! $hasVariance) {
+            continue;
+        }
+
+        $adjustment = DB::table('stock_adjustments')
+            ->where('inventory_stocktake_id', $stocktake->id)
+            ->where('adjustment_type', 'stocktake_result')
+            ->first(['id', 'status']);
+
+        expect($adjustment)->not->toBeNull(
+            "Completed stocktake {$stocktake->stocktake_number} must have a stocktake_result adjustment",
+        );
+    }
+});
+
+// #459 butir 2 — SA stocktake_result: quantity_before sama dengan saldo kartu stok, dan
+// quantity_adjusted sama dengan selisih stok opname.
+invariant('W8-459 stocktake_result adjustments match the stock card and the stocktake variance', function () {
+    $adjustments = DB::table('stock_adjustments')
+        ->join('inventory_stocktakes', 'inventory_stocktakes.id', '=', 'stock_adjustments.inventory_stocktake_id')
+        ->where('stock_adjustments.adjustment_type', 'stocktake_result')
+        ->whereNotNull('stock_adjustments.inventory_stocktake_id')
+        ->get([
+            'stock_adjustments.id',
+            'stock_adjustments.adjustment_number',
+            'stock_adjustments.warehouse_id',
+            'stock_adjustments.inventory_stocktake_id',
+            'inventory_stocktakes.stocktake_date',
+        ]);
+
+    expect($adjustments)->not->toBeEmpty('Demo data must include a stocktake_result adjustment');
+
+    foreach ($adjustments as $adjustment) {
+        $items = DB::table('stock_adjustment_items')
+            ->where('stock_adjustment_id', $adjustment->id)
+            ->get(['product_id', 'quantity_before', 'quantity_adjusted']);
+
+        foreach ($items as $item) {
+            $label = "Adjustment {$adjustment->adjustment_number} product {$item->product_id}";
+
+            $line = DB::table('inventory_stocktake_items')
+                ->where('inventory_stocktake_id', $adjustment->inventory_stocktake_id)
+                ->where('product_id', $item->product_id)
+                ->first(['system_quantity', 'variance']);
+
+            expect($line)->not->toBeNull("{$label} must come from a stocktake line");
+            expect(round((float) $item->quantity_adjusted, 2))
+                ->toBe(round((float) $line->variance, 2), "{$label} adjusted quantity must equal stocktake variance");
+            expect(round((float) $item->quantity_before, 2))->toBe(
+                round((float) $line->system_quantity, 2),
+                "{$label} quantity before must equal stocktake system quantity",
+            );
+
+            $cardBalance = stockCardBalanceOn(
+                (int) $item->product_id,
+                (int) $adjustment->warehouse_id,
+                (string) $adjustment->stocktake_date,
+            );
+
+            expect(round((float) $item->quantity_before, 2))->toBe(
+                round($cardBalance, 2),
+                "{$label} quantity before must equal the stock card balance on the stocktake date",
+            );
+        }
+    }
+});
+
+// #459 butir 3 — transfer_in memakai quantity_received (bukan quantity kirim).
+invariant('W8-459 partially received transfers post transfer_in equal to quantity received', function () {
+    $partial = DB::table('stock_transfer_items')
+        ->join('stock_transfers', 'stock_transfers.id', '=', 'stock_transfer_items.stock_transfer_id')
+        ->where('stock_transfers.status', 'received')
+        ->whereColumn('stock_transfer_items.quantity_received', '<', 'stock_transfer_items.quantity')
+        ->get([
+            'stock_transfer_items.stock_transfer_id',
+            'stock_transfer_items.product_id',
+            'stock_transfers.transfer_number',
+            'stock_transfer_items.quantity_received',
+        ]);
+
+    expect($partial)->not->toBeEmpty('Demo data must include a partially received transfer');
+
+    foreach ($partial as $line) {
+        $in = (float) DB::table('stock_movements')
+            ->where('reference_type', StockTransfer::class)
+            ->where('reference_id', $line->stock_transfer_id)
+            ->where('product_id', $line->product_id)
+            ->where('movement_type', 'transfer_in')
+            ->sum('quantity_in');
+
+        expect(round($in, 2))->toBe(
+            round((float) $line->quantity_received, 2),
+            "Transfer {$line->transfer_number} transfer_in must equal quantity received",
+        );
+    }
+});
+
+// #459 butir 4 — setiap log Pending Approval -> Confirmed pada PO punya approval request approved + audit.
+invariant('W8-459 purchase orders passing Pending Approval have an approved request and audit', function () {
+    $entityStates = DB::table('pipeline_entity_states')
+        ->where('entity_type', PurchaseOrder::class)
+        ->get(['id', 'entity_id']);
+
+    $passed = 0;
+
+    foreach ($entityStates as $entityState) {
+        $transitions = DB::table('pipeline_state_logs')
+            ->join('pipeline_states as to_state', 'to_state.id', '=', 'pipeline_state_logs.to_state_id')
+            ->join('pipeline_states as from_state', 'from_state.id', '=', 'pipeline_state_logs.from_state_id')
+            ->where('pipeline_state_logs.pipeline_entity_state_id', $entityState->id)
+            ->where('from_state.name', 'Pending Approval')
+            ->where('to_state.name', 'Confirmed')
+            ->count();
+
+        if ($transitions === 0) {
+            continue;
+        }
+
+        $passed++;
+
+        $request = DB::table('approval_requests')
+            ->where('approvable_type', PurchaseOrder::class)
+            ->where('approvable_id', $entityState->entity_id)
+            ->first(['id', 'status']);
+
+        expect($request)->not->toBeNull(
+            "Purchase order {$entityState->entity_id} passed approval without an approval request",
+        );
+        expect($request->status)->toBe('approved', "Purchase order {$entityState->entity_id} request must be approved");
+        expect(
+            DB::table('approval_audit_logs')->where('approval_request_id', $request->id)->count()
+        )->toBeGreaterThan(0, "Purchase order {$entityState->entity_id} approval must have audit rows");
+    }
+
+    expect($passed)->toBeGreaterThan(0, 'Demo data must include a purchase order passing Pending Approval');
+});
+
+// #459 butir 5 — pengaju dokumen (submitted_by) bukan pelaku transisi lain pada dokumen yang sama.
+invariant('W8-459 purchase order requester never performs its own pipeline transitions', function () {
+    $requests = DB::table('approval_requests')
+        ->where('approvable_type', PurchaseOrder::class)
+        ->get(['approvable_id', 'submitted_by']);
+
+    expect($requests)->not->toBeEmpty('Demo data must include purchase order approval requests');
+
+    foreach ($requests as $request) {
+        $performers = DB::table('pipeline_state_logs')
+            ->join(
+                'pipeline_entity_states',
+                'pipeline_entity_states.id',
+                '=',
+                'pipeline_state_logs.pipeline_entity_state_id'
+            )
+            ->where('pipeline_entity_states.entity_type', PurchaseOrder::class)
+            ->where('pipeline_entity_states.entity_id', $request->approvable_id)
+            ->whereNotNull('pipeline_state_logs.performed_by')
+            ->pluck('pipeline_state_logs.performed_by');
+
+        foreach ($performers as $performer) {
+            expect((int) $performer)->not->toBe(
+                (int) $request->submitted_by,
+                "Purchase order {$request->approvable_id} requester must not perform its own transitions",
+            );
+        }
+    }
+});
+
+// #459 butir 6 — submitted_at aset tidak lebih awal dari log Draft (Initial -> Draft) pada tanggal dokumen.
+invariant('W8-459 asset approval submitted_at is not earlier than its Draft pipeline log', function () {
+    $requests = DB::table('approval_requests')
+        ->where('approvable_type', 'App\\Models\\Asset')
+        ->get(['approvable_id', 'submitted_at']);
+
+    expect($requests)->not->toBeEmpty('Demo data must include asset approval requests');
+
+    foreach ($requests as $request) {
+        $draftAt = DB::table('pipeline_state_logs')
+            ->join(
+                'pipeline_entity_states',
+                'pipeline_entity_states.id',
+                '=',
+                'pipeline_state_logs.pipeline_entity_state_id'
+            )
+            ->join('pipeline_states as to_state', 'to_state.id', '=', 'pipeline_state_logs.to_state_id')
+            ->where('pipeline_entity_states.entity_type', 'App\\Models\\Asset')
+            ->where('pipeline_entity_states.entity_id', $request->approvable_id)
+            ->where('to_state.name', 'Draft')
+            ->value('pipeline_state_logs.created_at');
+
+        if ($draftAt === null) {
+            continue;
+        }
+
+        expect(Carbon::parse($request->submitted_at)->gte(Carbon::parse($draftAt)))->toBeTrue(
+            "Asset {$request->approvable_id} submitted_at must not precede its Draft log",
+        );
     }
 });

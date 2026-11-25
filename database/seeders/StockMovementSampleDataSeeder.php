@@ -5,7 +5,9 @@ namespace Database\Seeders;
 use App\Actions\AccountingPosting\PostGoodsReceiptJournalAction;
 use App\Actions\AccountingPosting\PostStockAdjustmentJournalAction;
 use App\Actions\AccountingPosting\PostSupplierReturnJournalAction;
+use App\Actions\InventoryStocktakes\CreateStocktakeAdjustmentDraftAction;
 use App\Models\GoodsReceipt;
+use App\Models\InventoryStocktake;
 use App\Models\JournalEntry;
 use App\Models\JournalEntryLine;
 use App\Models\StockAdjustment;
@@ -89,6 +91,10 @@ class StockMovementSampleDataSeeder extends Seeder
 
         $stockPosting->rebuildBalances();
 
+        // Qty sistem stok opname dan draft SA stocktake_result dibentuk setelah saldo
+        // kartu stok tersedia (#459 butir 1-2). Urutan ini harus sebelum journal.
+        $this->syncStocktakeFromStockCard();
+
         $this->postInventoryJournals();
 
         // Keep the approved adjustment's recorded `quantity_after` in sync with
@@ -113,6 +119,110 @@ class StockMovementSampleDataSeeder extends Seeder
                 }
             }
         }
+    }
+
+    /**
+     * Qty sistem baris stok opname diambil dari saldo kartu stok pada tanggal opname
+     * (#459 butir 1). Opname completed yang berselisih lalu memakai alur aplikasi:
+     * satu draft SA stocktake_result lewat CreateStocktakeAdjustmentDraftAction (#459 butir 2).
+     */
+    private function syncStocktakeFromStockCard(): void
+    {
+        InventoryStocktake::query()
+            ->where('stocktake_number', 'like', 'STO-%')
+            ->with('items')
+            ->orderBy('id')
+            ->get()
+            ->each(function (InventoryStocktake $stocktake): void {
+                foreach ($stocktake->items as $index => $line) {
+                    $systemQuantity = $this->stockCardBalance(
+                        (int) $line->product_id,
+                        (int) $stocktake->warehouse_id,
+                        (string) $stocktake->stocktake_date,
+                    );
+
+                    $line->system_quantity = $systemQuantity;
+
+                    if ($line->counted_quantity !== null) {
+                        $line->counted_quantity = $this->demoCountedQuantity(
+                            $stocktake->status,
+                            $index,
+                            $systemQuantity,
+                        );
+                        $line->variance = round((float) $line->counted_quantity - $systemQuantity, 2);
+                        $line->result = $this->resultFor((float) $line->variance);
+                    }
+
+                    $line->save();
+                }
+
+                // Draft lama dari seed sebelumnya dilepas dulu. CreateStocktakeAdjustmentDraftAction
+                // melewati stocktake yang sudah punya SA, sehingga quantity_before tidak ikut saldo baru.
+                $this->deleteStocktakeAdjustmentDrafts($stocktake);
+
+                if ($stocktake->status === 'completed') {
+                    app(CreateStocktakeAdjustmentDraftAction::class)->execute($stocktake->refresh());
+                }
+            });
+    }
+
+    /**
+     * Lepas draft SA stocktake_result milik opname demo beserta barisnya. Hanya SA
+     * tanpa jurnal yang dilepas; SA yang sudah disetujui tidak disentuh di sini.
+     */
+    private function deleteStocktakeAdjustmentDrafts(InventoryStocktake $stocktake): void
+    {
+        $adjustmentIds = StockAdjustment::query()
+            ->where('inventory_stocktake_id', $stocktake->id)
+            ->where('adjustment_type', 'stocktake_result')
+            ->where('status', 'draft')
+            ->pluck('id');
+
+        if ($adjustmentIds->isEmpty()) {
+            return;
+        }
+
+        StockAdjustmentItem::query()->whereIn('stock_adjustment_id', $adjustmentIds)->delete();
+        StockAdjustment::query()->whereIn('id', $adjustmentIds)->delete();
+    }
+
+    /**
+     * Hitung fisik demo relatif terhadap saldo kartu stok: baris pertama sesuai,
+     * kedua surplus +3, sisanya defisit −2 (pola selisih demo lama).
+     */
+    private function demoCountedQuantity(string $status, int $index, float $systemQuantity): float
+    {
+        if ($status !== 'completed') {
+            return $systemQuantity;
+        }
+
+        return match ($index) {
+            0 => $systemQuantity,
+            1 => $systemQuantity + 3.0,
+            default => max(0.0, $systemQuantity - 2.0),
+        };
+    }
+
+    private function resultFor(float $variance): string
+    {
+        return match (true) {
+            $variance === 0.0 => 'match',
+            $variance > 0.0 => 'surplus',
+            default => 'deficit',
+        };
+    }
+
+    private function stockCardBalance(int $productId, int $warehouseId, string $date): float
+    {
+        $balance = StockMovement::query()
+            ->where('product_id', $productId)
+            ->where('warehouse_id', $warehouseId)
+            ->whereDate('moved_at', '<=', $date)
+            ->orderByDesc('moved_at')
+            ->orderByDesc('id')
+            ->value('balance_after');
+
+        return (float) ($balance ?? 0.0);
     }
 
     /**
@@ -166,9 +276,15 @@ class StockMovementSampleDataSeeder extends Seeder
     {
         $demoEntryIds = JournalEntry::query()
             ->where(fn ($query) => $query
-                ->where(fn ($q) => $q->where('source_type', GoodsReceipt::class)->whereIn('source_id', $this->demoIds(GoodsReceipt::class, 'gr_number', self::GR_DEMO)))
-                ->orWhere(fn ($q) => $q->where('source_type', SupplierReturn::class)->whereIn('source_id', $this->demoIds(SupplierReturn::class, 'return_number', self::SR_DEMO)))
-                ->orWhere(fn ($q) => $q->where('source_type', StockAdjustment::class)->whereIn('source_id', $this->demoIds(StockAdjustment::class, 'adjustment_number', self::SA_DEMO))))
+                ->where(fn ($q) => $q
+                    ->where('source_type', GoodsReceipt::class)
+                    ->whereIn('source_id', $this->demoIds(GoodsReceipt::class, 'gr_number', self::GR_DEMO)))
+                ->orWhere(fn ($q) => $q
+                    ->where('source_type', SupplierReturn::class)
+                    ->whereIn('source_id', $this->demoIds(SupplierReturn::class, 'return_number', self::SR_DEMO)))
+                ->orWhere(fn ($q) => $q
+                    ->where('source_type', StockAdjustment::class)
+                    ->whereIn('source_id', $this->demoIds(StockAdjustment::class, 'adjustment_number', self::SA_DEMO))))
             ->pluck('id');
 
         if ($demoEntryIds->isNotEmpty()) {

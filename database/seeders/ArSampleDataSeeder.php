@@ -306,6 +306,21 @@ class ArSampleDataSeeder extends Seeder
         return $invoices;
     }
 
+    /**
+     * Pelanggan pertama yang punya invoice terbuka (sent/partially_paid/overdue),
+     * agar penerimaan draft bisa dialokasikan ke invoice miliknya (#459 butir 7).
+     */
+    private function customerWithOpenInvoice($customers, array $invoices): mixed
+    {
+        // Invoice partially_paid dialokasikan penerimaan confirmed dan tetap terbuka sampai
+        // akhir seed; pelanggannya tidak dipindahkan oleh alokasi penerimaan lain.
+        $openInvoice = $invoices['partially_paid'] ?? null;
+
+        return $openInvoice !== null
+            ? $customers->firstWhere('id', $openInvoice->customer_id) ?? $customers[0]
+            : $customers[0];
+    }
+
     private function seedArReceipts(
         int $adminUserId,
         Branch $branch,
@@ -358,10 +373,11 @@ class ArSampleDataSeeder extends Seeder
 
         foreach ($receiptDefinitions as $index => $definition) {
             // Pihak penerimaan = pihak invoice yang dialokasikan (AR allocation harus satu customer).
+            // Draft tanpa alokasi mengambil pelanggan yang punya invoice terbuka (#459 butir 7).
             $allocatedInvoice = $invoices[$definition['allocations'][0]['invoice'] ?? ''] ?? null;
             $customer = $allocatedInvoice !== null
                 ? $customers->firstWhere('id', $allocatedInvoice->customer_id)
-                : $customers[$index % $customers->count()];
+                : $this->customerWithOpenInvoice($customers, $invoices);
             $receiptDate = now()->subDays(30 - $index * 3);
 
             $receipt = ArReceipt::updateOrCreate(

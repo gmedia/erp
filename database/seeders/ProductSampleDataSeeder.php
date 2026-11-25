@@ -25,6 +25,8 @@ class ProductSampleDataSeeder extends Seeder
         $rawMaterialWood = ProductCategory::where('name', DemoMasterData::PRODUCT_CATEGORY_RAW_WOOD)->first();
         $rawMaterialHardware = ProductCategory::where('name', DemoMasterData::PRODUCT_CATEGORY_RAW_HARDWARE)->first();
         $softwareCategory = ProductCategory::where('name', DemoMasterData::PRODUCT_CATEGORY_SOFTWARE)->first();
+        $officeSuppliesCategory = ProductCategory::where('name', DemoMasterData::PRODUCT_CATEGORY_OFFICE_SUPPLIES)
+            ->first();
 
         $pieceUnit = Unit::where('symbol', 'pcs')->first();
         $meterUnit = Unit::where('symbol', 'm')->first();
@@ -82,6 +84,61 @@ class ProductSampleDataSeeder extends Seeder
                 'unit_id' => $pieceUnit->id,
                 'cost' => 850000,
                 'selling_price' => 1500000,
+                'status' => 'active',
+            ]);
+
+        // Perlengkapan Kantor dipasok PT Sumber Makmur Sejahtera (#459 butir 8).
+        Product::updateOrCreate(
+            ['code' => 'OS-ATK-001'],
+            [
+                'name' => 'Kertas HVS A4 80gsm (Rim 500 lembar)',
+                'description' => 'Kertas HVS putih untuk cetak dokumen kantor',
+                'type' => 'raw_material',
+                'product_category_id' => $officeSuppliesCategory->id,
+                'unit_id' => $boxUnit->id,
+                'cost' => 62000,
+                'selling_price' => 0,
+                'status' => 'active',
+            ]);
+
+        Product::updateOrCreate(
+            ['code' => 'OS-ATK-002'],
+            [
+                'name' => 'Tinta Printer Hitam 003 (Botol 65ml)',
+                'description' => 'Tinta cadangan printer inkjet untuk kebutuhan kantor',
+                'type' => 'raw_material',
+                'product_category_id' => $officeSuppliesCategory->id,
+                'unit_id' => $pieceUnit->id,
+                'cost' => 85000,
+                'selling_price' => 0,
+                'status' => 'active',
+            ]);
+
+        // Elektronik dipasok PT Nusantara Elektronik (#459 butir 8). Disiapkan di sini agar
+        // PO demo (dibuat sebelum seeder inventaris) juga bisa memakainya.
+        Product::updateOrCreate(
+            ['code' => 'EL-PER-001'],
+            [
+                'name' => 'Mouse Wireless M170',
+                'description' => 'Mouse nirkabel ukuran standar untuk perkantoran',
+                'type' => 'finished_good',
+                'product_category_id' => $electronicsCategory->id,
+                'unit_id' => $pieceUnit->id,
+                'cost' => 110000,
+                'selling_price' => 165000,
+                'status' => 'active',
+            ]);
+
+        Product::updateOrCreate(
+            ['code' => 'EL-PER-002'],
+            [
+                'name' => 'Kabel HDMI 2 Meter',
+                'description' => 'Kabel HDMI high speed untuk monitor dan proyektor',
+                'type' => 'finished_good',
+                'product_category_id' => $electronicsCategory->id,
+                'unit_id' => $pieceUnit->id,
+                'cost' => 45000,
+                'selling_price' => 75000,
                 'status' => 'active',
             ]);
 

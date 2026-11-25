@@ -314,10 +314,26 @@
     "admin": {
         "selectLogo": "Select SVG Logo",
         "noFileSelected": "No file selected",
-        "logoHint": "Upload an SVG file. If empty, the app keeps using the default logo."
+        "logoHint": "Upload an SVG file. If empty, the app keeps using the default logo.",
+        "accounting": {
+            "title": "Asset Disposal Accounts",
+            "description": "Gain and loss accounts for asset disposal journals. The receipt account is chosen when an asset is disposed.",
+            "gainLabel": "Asset disposal gain account",
+            "gainHint": "Credited when sale proceeds exceed the book value.",
+            "lossLabel": "Asset disposal loss account",
+            "lossHint": "Debited when the book value exceeds sale proceeds (including lost assets).",
+            "placeholder": "Select account"
+        }
     },
     "accounting_posting.control_account_missing": "Control account :code was not found in the active COA version.",
     "accounting_posting.coa_none_active": "No active COA version covers :date. Activate one COA version before posting.",
+    "accounting_posting.disposal_accounts_missing": "Set the gain and loss accounts for asset disposal in settings before posting.",
+    "accounting_posting.disposal_not_postable": "Asset :code has status :status and cannot be posted as a disposal.",
+    "accounting_posting.disposal_sale_invalid": "Sale proceeds must be greater than 0.",
+    "accounting_posting.disposal_sale_account_missing": "Choose the receipt account for the sale proceeds (cash, bank, or receivable).",
+    "accounting_posting.disposal_sale_account_invalid": "The receipt account is not in the active COA or is inactive.",
+    "accounting_posting.disposal_sale_account_group": "The receipt account must be a leaf account, not a group account.",
+    "asset_depreciation_runs.asset_not_in_service": "Asset :code has status :status and can no longer be depreciated. Recalculate the run.",
     "accounting_posting.coa_ambiguous": "More than one active COA version applies to :date. Keep exactly one active COA per fiscal year.",
     "accounting_posting.line_account_outside_coa": "Journal line account :code does not belong to the COA version used for :date.",
     "accounting_posting.line_group_account_not_reducing": "Group account :code can only receive lines that reduce its posted balance. Choose a detail (leaf) account.",
@@ -479,6 +495,19 @@
             "unit_price_min": "Unit price must be at least 0.",
             "notes": "Notes",
             "notes_placeholder": "Item notes"
+        }
+    },
+    "assets": {
+        "disposal": {
+            "saleSection": "Sale Proceeds (optional)",
+            "saleHint": "Leave empty for a disposal without sale proceeds (scrapped or lost). The book value becomes a loss.",
+            "saleAmount": "Sale Amount",
+            "receiptAccount": "Receipt Account (cash/bank/receivable)",
+            "receiptPlaceholder": "Select receipt account",
+            "viewJournal": "View disposal journal",
+            "noSale": "No sale proceeds",
+            "noJournal": "no journal",
+            "saleValue": "Sale: :amount"
         }
     },
     "menu": {

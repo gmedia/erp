@@ -10,6 +10,12 @@ class StoreAssetMovementRequest extends AbstractAssetMovementRequest
     {
         return array_merge(
             [
+                // Field sistem diatur server, bukan payload (#442).
+                'status' => ['prohibited'],
+                'status_before_disposal' => ['prohibited'],
+                'accumulated_depreciation' => ['prohibited'],
+                'book_value' => ['prohibited'],
+                'created_by' => ['prohibited'],
                 'asset_id' => ['required', 'exists:assets,id'],
                 'movement_type' => [
                     'required',
@@ -35,6 +41,19 @@ class StoreAssetMovementRequest extends AbstractAssetMovementRequest
                     'nullable',
                     'exists:employees,id',
                     Rule::requiredIf(fn () => in_array($this->movement_type, ['assign'])),
+                ],
+                // Hasil penjualan pelepasan (#442): opsional, tapi bila diisi wajib > 0 dan ada akun penerimaan.
+                'sale_amount' => [
+                    'nullable',
+                    'numeric',
+                    'gt:0',
+                    Rule::requiredIf(fn () => $this->filled('sale_account_id')),
+                ],
+                'sale_account_id' => [
+                    'nullable',
+                    'integer',
+                    'exists:accounts,id',
+                    Rule::requiredIf(fn () => $this->filled('sale_amount')),
                 ],
             ],
             $this->baseRules(),

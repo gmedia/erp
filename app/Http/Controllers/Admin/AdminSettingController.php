@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminSettingRequest;
 use App\Mail\TestSmtpMail;
+use App\Models\Account;
 use App\Models\Setting;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -31,6 +32,15 @@ class AdminSettingController extends Controller
     {
         $settings = Setting::getGrouped();
         $settings['general']['company_logo_url'] = $this->getCompanyLogoUrl();
+
+        foreach (['asset_disposal_gain_account_id', 'asset_disposal_loss_account_id'] as $key) {
+            $accountId = $settings['accounting'][$key] ?? null;
+            $labelKey = str_replace('_account_id', '_account_label', $key);
+            $settings['accounting'][$key] = $accountId ? (string) $accountId : null;
+            $settings['accounting'][$labelKey] = $accountId
+                ? Account::query()->whereKey($accountId)->value('name')
+                : null;
+        }
 
         return response()->json(['settings' => $settings]);
     }

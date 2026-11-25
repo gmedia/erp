@@ -3,8 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Branch;
-use App\Models\InventoryStocktake;
-use App\Models\InventoryStocktakeItem;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\StockAdjustment;
@@ -43,10 +41,6 @@ class StockAdjustmentSampleDataSeeder extends Seeder
         $products = $this->ensureProductsWithStock($branchIdForStock);
 
         $year = now()->format('Y');
-        $completedStocktakeNumber = "SO-{$year}-920003";
-        $completedStocktakeId = InventoryStocktake::query()
-            ->where('stocktake_number', $completedStocktakeNumber)
-            ->value('id');
 
         // Format nomor berubah (SA-…-9100xx → SA-…-000001..): ganti nama HANYA
         // nomor demo lama, dengan update in-place agar journal & movement yang
@@ -95,12 +89,10 @@ class StockAdjustmentSampleDataSeeder extends Seeder
                 'adjustment_number' => "SA-{$year}-000004",
                 'status' => 'approved',
                 'adjustment_date' => now()->subDays(3)->toDateString(),
-                'adjustment_type' => $completedStocktakeId ? 'stocktake_result' : 'correction',
-                'inventory_stocktake_id' => $completedStocktakeId,
+                'adjustment_type' => 'correction',
+                'inventory_stocktake_id' => null,
                 'approved' => ['approved_by' => $adminUserId, 'approved_at' => now()->subDays(2)],
-                'items' => $completedStocktakeId
-                    ? $this->makeStocktakeResultAdjustmentItems($completedStocktakeId, $branchIdForStock)
-                    : $this->makeManualAdjustmentItems($products, $branchIdForStock, 3.0),
+                'items' => $this->makeManualAdjustmentItems($products, $branchIdForStock, 3.0),
             ],
             [
                 'adjustment_number' => "SA-{$year}-000005",
@@ -298,49 +290,6 @@ class StockAdjustmentSampleDataSeeder extends Seeder
                 'total_cost' => $totalCost,
                 'reason' => 'Penyesuaian stok hasil opname fisik',
             ];
-        }
-
-        return $items;
-    }
-
-    private function makeStocktakeResultAdjustmentItems(int $inventoryStocktakeId, int $branchId): array
-    {
-        $items = [];
-
-        $stocktakeItems = InventoryStocktakeItem::query()
-            ->where('inventory_stocktake_id', $inventoryStocktakeId)
-            ->orderBy('id')
-            ->get();
-
-        foreach ($stocktakeItems as $stItem) {
-            $product = Product::query()->find($stItem->product_id);
-            if ($product === null) {
-                continue;
-            }
-
-            $quantityBefore = (float) ($stItem->system_quantity ?? 100);
-
-            $quantityAdjusted = (float) ($stItem->variance ?? 0);
-            $quantityAfter = $quantityBefore + $quantityAdjusted;
-            $unitCost = (float) $product->cost;
-            $totalCost = abs($quantityAdjusted) * $unitCost;
-
-            $items[] = [
-                'product_id' => (int) $product->id,
-                'unit_id' => (int) $product->unit_id,
-                'quantity_before' => $quantityBefore,
-                'quantity_adjusted' => $quantityAdjusted,
-                'quantity_after' => $quantityAfter,
-                'unit_cost' => $unitCost,
-                'total_cost' => $totalCost,
-                'reason' => 'Penyesuaian dari hasil stocktake',
-            ];
-        }
-
-        if (empty($items)) {
-            $products = $this->ensureProductsWithStock($branchId);
-
-            return $this->makeManualAdjustmentItems($products, $branchId, -1.0);
         }
 
         return $items;

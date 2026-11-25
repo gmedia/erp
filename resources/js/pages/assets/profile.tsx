@@ -18,6 +18,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useTranslation } from '@/contexts/i18n-context';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
 import {
@@ -59,6 +60,7 @@ import { Helmet } from 'react-helmet-async';
 import { useParams } from 'react-router-dom';
 
 export default function AssetProfile() {
+    const { t } = useTranslation();
     const { id } = useParams<{ id: string }>();
     const [timelineKey, setTimelineKey] = useState(Date.now());
     const queryClient = useQueryClient();
@@ -657,6 +659,52 @@ export default function AssetProfile() {
                                                             {m.notes && (
                                                                 <div className="truncate text-xs text-muted-foreground">
                                                                     {m.notes}
+                                                                </div>
+                                                            )}
+                                                            {m.movement_type ===
+                                                                'dispose' && (
+                                                                <div className="mt-1 text-xs">
+                                                                    {m.sale_amount ? (
+                                                                        <span>
+                                                                            {t(
+                                                                                'assets.disposal.saleValue',
+                                                                                {
+                                                                                    amount: formatCurrencyByRegionalSettings(
+                                                                                        m.sale_amount,
+                                                                                    ),
+                                                                                },
+                                                                            )}
+                                                                        </span>
+                                                                    ) : (
+                                                                        <span className="text-muted-foreground">
+                                                                            {t(
+                                                                                'assets.disposal.noSale',
+                                                                            )}
+                                                                        </span>
+                                                                    )}
+                                                                    {m.disposal_journal_id ? (
+                                                                        <a
+                                                                            href="/journal-entries"
+                                                                            className="ml-2 text-primary underline"
+                                                                            data-testid="disposal-journal-link"
+                                                                            data-journal-id={
+                                                                                m.disposal_journal_id
+                                                                            }
+                                                                        >
+                                                                            {t(
+                                                                                'assets.disposal.viewJournal',
+                                                                            )}
+                                                                        </a>
+                                                                    ) : (
+                                                                        <span
+                                                                            className="ml-2 text-muted-foreground"
+                                                                            data-testid="disposal-no-journal"
+                                                                        >
+                                                                            {t(
+                                                                                'assets.disposal.noJournal',
+                                                                            )}
+                                                                        </span>
+                                                                    )}
                                                                 </div>
                                                             )}
                                                         </TableCell>

@@ -32,6 +32,8 @@ test('it has fillable attributes', function () {
         'document_path',
         'document_name',
         'status_before_disposal',
+        'sale_amount',
+        'sale_account_id',
         'created_by',
     ]);
 });
