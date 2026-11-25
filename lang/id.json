@@ -1015,6 +1015,70 @@
         "credit_notes": {
             "title": "Nota Kredit",
             "description": "Nota kredit yang mengurangi saldo faktur pelanggan."
+        },
+        "customers": {
+            "title": "Pelanggan",
+            "description": "Data master pelanggan dengan detail penagihan dan kontak."
+        },
+        "suppliers": {
+            "title": "Pemasok",
+            "description": "Data master vendor untuk pembelian dan utang usaha."
+        },
+        "departments": {
+            "title": "Departemen",
+            "description": "Unit organisasi untuk mengelompokkan karyawan dan aset."
+        },
+        "positions": {
+            "title": "Jabatan",
+            "description": "Jabatan yang dapat ditugaskan kepada karyawan."
+        },
+        "branches": {
+            "title": "Cabang",
+            "description": "Cabang perusahaan yang dipakai di seluruh transaksi dan laporan."
+        },
+        "customer_categories": {
+            "title": "Kategori Pelanggan",
+            "description": "Kategori untuk mengelompokkan pelanggan."
+        },
+        "supplier_categories": {
+            "title": "Kategori Pemasok",
+            "description": "Kategori untuk mengelompokkan pemasok."
+        },
+        "product_categories": {
+            "title": "Kategori Produk",
+            "description": "Kategori untuk mengklasifikasikan produk dan bahan."
+        },
+        "units": {
+            "title": "Satuan",
+            "description": "Satuan ukur yang dipakai oleh produk dan transaksi."
+        },
+        "asset_categories": {
+            "title": "Kategori Aset",
+            "description": "Kategori untuk mengklasifikasikan aset tetap."
+        },
+        "asset_locations": {
+            "title": "Lokasi Aset",
+            "description": "Lokasi fisik di dalam cabang untuk penempatan aset."
+        },
+        "asset_models": {
+            "title": "Model Aset",
+            "description": "Model pabrikan yang dipakai sebagai templat aset."
+        },
+        "asset_movements": {
+            "title": "Mutasi Aset",
+            "description": "Riwayat pemindahan dan penugasan aset tetap."
+        },
+        "asset_maintenances": {
+            "title": "Pemeliharaan Aset",
+            "description": "Pemeliharaan aset tetap yang dijadwalkan dan dilaksanakan."
+        },
+        "asset_stocktakes": {
+            "title": "Stock Opname Aset",
+            "description": "Verifikasi fisik aset tetap per cabang."
+        },
+        "asset_depreciation_runs": {
+            "title": "Penyusutan Aset",
+            "description": "Hitung dan tinjau penyusutan aset. Setelah diverifikasi, posting jumlah yang dihitung ke buku besar."
         }
     },
     "stock_monitor_summary": {

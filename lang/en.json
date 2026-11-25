@@ -1015,6 +1015,70 @@
         "credit_notes": {
             "title": "Credit Notes",
             "description": "Credit notes that reduce customer invoice balances."
+        },
+        "customers": {
+            "title": "Customers",
+            "description": "Customer master data with billing and contact details."
+        },
+        "suppliers": {
+            "title": "Suppliers",
+            "description": "Vendor master data used by purchasing and payables."
+        },
+        "departments": {
+            "title": "Departments",
+            "description": "Organizational units used to group employees and assets."
+        },
+        "positions": {
+            "title": "Positions",
+            "description": "Job titles assignable to employees."
+        },
+        "branches": {
+            "title": "Branches",
+            "description": "Company branches used across transactions and reports."
+        },
+        "customer_categories": {
+            "title": "Customer Categories",
+            "description": "Categories used to group customers."
+        },
+        "supplier_categories": {
+            "title": "Supplier Categories",
+            "description": "Categories used to group suppliers."
+        },
+        "product_categories": {
+            "title": "Product Categories",
+            "description": "Categories used to classify products and materials."
+        },
+        "units": {
+            "title": "Units",
+            "description": "Units of measure used by products and transactions."
+        },
+        "asset_categories": {
+            "title": "Asset Categories",
+            "description": "Categories used to classify fixed assets."
+        },
+        "asset_locations": {
+            "title": "Asset Locations",
+            "description": "Physical locations within branches for asset placement."
+        },
+        "asset_models": {
+            "title": "Asset Models",
+            "description": "Manufacturer models used as templates for assets."
+        },
+        "asset_movements": {
+            "title": "Asset Movements",
+            "description": "Transfer and assignment history of fixed assets."
+        },
+        "asset_maintenances": {
+            "title": "Asset Maintenances",
+            "description": "Scheduled and performed maintenance for fixed assets."
+        },
+        "asset_stocktakes": {
+            "title": "Asset Stocktakes",
+            "description": "Physical verification of fixed assets per branch."
+        },
+        "asset_depreciation_runs": {
+            "title": "Asset Depreciation Runs",
+            "description": "Calculate and review asset depreciation. Once verified, post the calculated amounts to the general ledger."
         }
     },
     "stock_monitor_summary": {

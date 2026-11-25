@@ -301,6 +301,122 @@ test('accounting and ap/ar page titles match the sidebar menu labels', function 
     }
 });
 
+test('master data and asset page strings keep the english labels', function () {
+    $en = localePageTranslations('en.json');
+
+    expect($en['customers']['title'])->toBe('Customers')
+        ->and($en['customers']['description'])->toBe('Customer master data with billing and contact details.')
+        ->and($en['suppliers']['title'])->toBe('Suppliers')
+        ->and($en['suppliers']['description'])->toBe('Vendor master data used by purchasing and payables.')
+        ->and($en['departments']['title'])->toBe('Departments')
+        ->and($en['departments']['description'])->toBe('Organizational units used to group employees and assets.')
+        ->and($en['positions']['title'])->toBe('Positions')
+        ->and($en['positions']['description'])->toBe('Job titles assignable to employees.')
+        ->and($en['branches']['title'])->toBe('Branches')
+        ->and($en['branches']['description'])->toBe('Company branches used across transactions and reports.')
+        ->and($en['customer_categories']['title'])->toBe('Customer Categories')
+        ->and($en['customer_categories']['description'])->toBe('Categories used to group customers.')
+        ->and($en['supplier_categories']['title'])->toBe('Supplier Categories')
+        ->and($en['supplier_categories']['description'])->toBe('Categories used to group suppliers.')
+        ->and($en['product_categories']['title'])->toBe('Product Categories')
+        ->and($en['product_categories']['description'])->toBe('Categories used to classify products and materials.')
+        ->and($en['units']['title'])->toBe('Units')
+        ->and($en['units']['description'])->toBe('Units of measure used by products and transactions.')
+        ->and($en['asset_categories']['title'])->toBe('Asset Categories')
+        ->and($en['asset_categories']['description'])->toBe('Categories used to classify fixed assets.')
+        ->and($en['asset_locations']['title'])->toBe('Asset Locations')
+        ->and($en['asset_locations']['description'])->toBe('Physical locations within branches for asset placement.')
+        ->and($en['asset_models']['title'])->toBe('Asset Models')
+        ->and($en['asset_models']['description'])->toBe('Manufacturer models used as templates for assets.')
+        ->and($en['asset_movements']['title'])->toBe('Asset Movements')
+        ->and($en['asset_movements']['description'])->toBe('Transfer and assignment history of fixed assets.')
+        ->and($en['asset_maintenances']['title'])->toBe('Asset Maintenances')
+        ->and($en['asset_maintenances']['description'])->toBe(
+            'Scheduled and performed maintenance for fixed assets.',
+        )
+        ->and($en['asset_stocktakes']['title'])->toBe('Asset Stocktakes')
+        ->and($en['asset_stocktakes']['description'])->toBe('Physical verification of fixed assets per branch.')
+        ->and($en['asset_depreciation_runs']['title'])->toBe('Asset Depreciation Runs')
+        ->and($en['asset_depreciation_runs']['description'])->toBe(
+            'Calculate and review asset depreciation. Once verified, post the calculated amounts to the general ledger.',
+        );
+});
+
+test('master data and asset page strings are translated to indonesian', function () {
+    $en = localePageTranslations('en.json');
+    $id = localePageTranslations('id.json');
+
+    $modules = [
+        'customers',
+        'suppliers',
+        'departments',
+        'positions',
+        'branches',
+        'customer_categories',
+        'supplier_categories',
+        'product_categories',
+        'units',
+        'asset_categories',
+        'asset_locations',
+        'asset_models',
+        'asset_movements',
+        'asset_maintenances',
+        'asset_stocktakes',
+        'asset_depreciation_runs',
+    ];
+
+    foreach ($modules as $module) {
+        foreach (array_keys($en[$module]) as $field) {
+            expect($id[$module][$field])->not->toBe($en[$module][$field], "page.{$module}.{$field} not translated");
+        }
+    }
+
+    expect($id['customers']['title'])->toBe('Pelanggan')
+        ->and($id['asset_depreciation_runs']['title'])->toBe('Penyusutan Aset');
+});
+
+test('master data and asset page titles follow the menu-or-exception decision', function () {
+    // Aturan (issue #462 <!-- decision -->): judul memakai menu.* hanya bila teks English sama.
+    // Daftar di bawah adalah PENGECUALIAN EKSPLISIT: judul English beda dengan menu, jadi tetap page.<slug>.title.
+    $exceptions = [
+        'customers' => 'customer',
+        'suppliers' => 'supplier',
+        'departments' => 'department',
+        'positions' => 'position',
+        'branches' => 'branch',
+        'customer_categories' => 'customer_category',
+        'supplier_categories' => 'supplier_category',
+        'product_categories' => 'product_category',
+        'units' => 'unit',
+        'asset_categories' => 'asset_category',
+        'asset_locations' => 'asset_location',
+        'asset_models' => 'asset_model',
+        'asset_movements' => 'asset_movement',
+        'asset_maintenances' => 'asset_maintenance',
+        'asset_stocktakes' => 'asset_stocktake',
+        'asset_depreciation_runs' => 'asset_depreciation_run',
+    ];
+
+    $en = json_decode(File::get(lang_path('en.json')), true, 512, JSON_THROW_ON_ERROR);
+
+    foreach ($exceptions as $pageKey => $menuKey) {
+        expect($en['page'][$pageKey]['title'])->not->toBe(
+            $en['menu'][$menuKey],
+            "page.{$pageKey}.title equals menu.{$menuKey}; move it out of the exception list",
+        );
+    }
+
+    foreach (['en.json', 'id.json'] as $file) {
+        $menu = json_decode(File::get(lang_path($file)), true, 512, JSON_THROW_ON_ERROR)['menu'];
+        $page = localePageTranslations($file);
+
+        foreach ($exceptions as $pageKey => $menuKey) {
+            expect(array_key_exists('title', $page[$pageKey]))->toBeTrue("page.{$pageKey}.title missing");
+            expect(array_key_exists($menuKey, $menu))->toBeTrue("menu.{$menuKey} missing");
+        }
+    }
+});
+
 test('page translation values are non-empty strings', function () {
     foreach (['en.json', 'id.json'] as $file) {
         foreach (localePageTranslations($file) as $module => $strings) {
