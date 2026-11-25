@@ -12,7 +12,10 @@ export function createStockMovementsFilterFields(): FieldDescriptor[] {
         createTextFilterField(
             'search',
             { key: 'column.search', fallback: 'Search' },
-            'Search reference, notes, product, warehouse...',
+            {
+                key: 'page.stock_movements.search_placeholder',
+                fallback: 'Search reference, notes, product, warehouse...',
+            },
         ),
         ...createProductWarehouseFilterFields(),
         createSelectFilterField(

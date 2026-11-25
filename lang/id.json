@@ -901,15 +901,18 @@
     "page": {
         "approval_flows": {
             "title": "Alur Persetujuan",
-            "description": "Definisi persetujuan dengan langkah berurutan dan approver."
+            "description": "Definisi persetujuan dengan langkah berurutan dan approver.",
+            "search_placeholder": "Cari berdasarkan Kode atau Nama..."
         },
         "approval_delegations": {
             "title": "Delegasi Persetujuan",
-            "description": "Delegasi yang memungkinkan pengguna lain menyetujui atas nama Anda untuk periode tertentu."
+            "description": "Delegasi yang memungkinkan pengguna lain menyetujui atas nama Anda untuk periode tertentu.",
+            "search_placeholder": "Cari alasan..."
         },
         "pipelines": {
             "title": "Pipeline",
-            "description": "Pipeline alur kerja dan status yang dilalui entitas."
+            "description": "Pipeline alur kerja dan status yang dilalui entitas.",
+            "search_placeholder": "Cari nama, kode, atau deskripsi..."
         },
         "pipeline_dashboard": {
             "description": "Pantau distribusi status dan temukan hambatan di pipeline aktif Anda."
@@ -921,10 +924,12 @@
             "description": "Pantau alur persetujuan dan tugas yang melewati tenggat."
         },
         "approval_audit_trail": {
-            "description": "Riwayat tindakan persetujuan pada permintaan."
+            "description": "Riwayat tindakan persetujuan pada permintaan.",
+            "search_placeholder": "Cari IP, ID dokumen, pengguna..."
         },
         "pipeline_audit_trail": {
-            "description": "Riwayat perpindahan status pada rekaman pipeline."
+            "description": "Riwayat perpindahan status pada rekaman pipeline.",
+            "search_placeholder": "Cari ID entitas, pelaku, komentar..."
         },
         "purchase_orders": {
             "title": "Pesanan Pembelian",
@@ -963,11 +968,13 @@
         },
         "maintenance_cost": {
             "title": "Laporan Biaya Pemeliharaan",
-            "description": "Biaya pemeliharaan per aset dalam periode yang dipilih."
+            "description": "Biaya pemeliharaan per aset dalam periode yang dipilih.",
+            "search_placeholder": "Cari kode, nama, catatan..."
         },
         "asset_stocktake_variances": {
             "title": "Laporan Selisih Stock Opname",
-            "description": "Selisih antara aset tercatat dan hasil hitung fisik."
+            "description": "Selisih antara aset tercatat dan hasil hitung fisik.",
+            "search_placeholder": "Cari kode, nama, catatan..."
         },
         "asset_dashboard": {
             "title": "Ikhtisar Manajemen Aset",
@@ -983,35 +990,43 @@
         },
         "warehouses": {
             "title": "Gudang",
-            "description": "Lokasi penyimpanan yang menampung stok produk."
+            "description": "Lokasi penyimpanan yang menampung stok produk.",
+            "search_placeholder": "Cari gudang..."
         },
         "stock_transfers": {
             "title": "Transfer Stok",
-            "description": "Pindahkan stok antar gudang dengan persetujuan dan pelacakan penerimaan."
+            "description": "Pindahkan stok antar gudang dengan persetujuan dan pelacakan penerimaan.",
+            "search_placeholder": "Cari transfer stok..."
         },
         "stock_adjustments": {
             "title": "Penyesuaian Stok",
-            "description": "Catat koreksi stok dengan persetujuan dan posting jurnal."
+            "description": "Catat koreksi stok dengan persetujuan dan posting jurnal.",
+            "search_placeholder": "Cari penyesuaian stok..."
         },
         "inventory_stocktakes": {
             "title": "Stock Opname Persediaan",
-            "description": "Hitung fisik stok gudang beserta hasil selisihnya."
+            "description": "Hitung fisik stok gudang beserta hasil selisihnya.",
+            "search_placeholder": "Cari stok opname..."
         },
         "stock_movements": {
             "title": "Mutasi Stok",
-            "description": "Kartu stok digital — pergerakan produk per gudang, jenis, dan periode."
+            "description": "Kartu stok digital — pergerakan produk per gudang, jenis, dan periode.",
+            "search_placeholder": "Cari referensi, catatan, produk, gudang..."
         },
         "purchase_requests": {
             "title": "Permintaan Pembelian",
-            "description": "Permintaan barang internal sebelum pesanan pembelian dibuat."
+            "description": "Permintaan barang internal sebelum pesanan pembelian dibuat.",
+            "search_placeholder": "Cari no. PR, catatan, atau alasan penolakan..."
         },
         "goods_receipts": {
             "title": "Penerimaan Barang",
-            "description": "Catat barang yang diterima dan perbarui stok gudang."
+            "description": "Catat barang yang diterima dan perbarui stok gudang.",
+            "search_placeholder": "Cari no. GR, surat jalan pemasok, atau catatan..."
         },
         "supplier_returns": {
             "title": "Retur Pemasok",
-            "description": "Kembalikan barang yang diterima ke pemasok dengan pengurangan stok."
+            "description": "Kembalikan barang yang diterima ke pemasok dengan pengurangan stok.",
+            "search_placeholder": "Cari no. retur atau catatan..."
         },
         "accounts": {
             "title": "Bagan Akun",
@@ -1023,115 +1038,143 @@
         },
         "fiscal_years": {
             "title": "Tahun Fiskal",
-            "description": "Periode akuntansi yang membatasi jurnal dan laporan keuangan."
+            "description": "Periode akuntansi yang membatasi jurnal dan laporan keuangan.",
+            "search_placeholder": "Cari tahun fiskal..."
         },
         "coa_versions": {
             "title": "Versi Bagan Akun",
-            "description": "Versi bagan akun per tahun fiskal."
+            "description": "Versi bagan akun per tahun fiskal.",
+            "search_placeholder": "Cari versi COA..."
         },
         "account_mappings": {
             "title": "Pemetaan Akun",
-            "description": "Pemetaan akun antarversi COA (rename, merge, split) untuk migrasi saldo dan referensi."
+            "description": "Pemetaan akun antarversi COA (rename, merge, split) untuk migrasi saldo dan referensi.",
+            "search_placeholder": "Cari pemetaan akun..."
         },
         "budgets": {
             "title": "Anggaran",
-            "description": "Rencana anggaran per akun dengan rincian per periode."
+            "description": "Rencana anggaran per akun dengan rincian per periode.",
+            "search_placeholder": "Cari anggaran..."
         },
         "report_configurations": {
             "title": "Konfigurasi Laporan",
-            "description": "Pengaturan yang menentukan cara setiap laporan dibuat dan ditampilkan."
+            "description": "Pengaturan yang menentukan cara setiap laporan dibuat dan ditampilkan.",
+            "search_placeholder": "Cari kode, nama, deskripsi..."
         },
         "bank_reconciliations": {
             "title": "Rekonsiliasi Bank",
-            "description": "Cocokkan saldo mutasi bank dengan pembukuan untuk setiap akun."
+            "description": "Cocokkan saldo mutasi bank dengan pembukuan untuk setiap akun.",
+            "search_placeholder": "Cari..."
         },
         "recurring_journals": {
             "title": "Jurnal Berulang",
-            "description": "Templat jurnal yang berulang sesuai jadwal."
+            "description": "Templat jurnal yang berulang sesuai jadwal.",
+            "search_placeholder": "Cari nama, deskripsi..."
         },
         "period_closings": {
             "title": "Penutupan Periode",
-            "description": "Tutup periode akuntansi dan teruskan saldo ke periode berikutnya."
+            "description": "Tutup periode akuntansi dan teruskan saldo ke periode berikutnya.",
+            "search_placeholder": "Cari..."
         },
         "supplier_bills": {
             "title": "Tagihan Pemasok",
-            "description": "Faktur pemasok yang membentuk hutang usaha."
+            "description": "Faktur pemasok yang membentuk hutang usaha.",
+            "search_placeholder": "Cari no. tagihan, no. faktur pemasok, atau catatan..."
         },
         "ap_payments": {
             "title": "Pembayaran Hutang",
-            "description": "Pembayaran ke pemasok yang dialokasikan ke tagihan yang belum lunas."
+            "description": "Pembayaran ke pemasok yang dialokasikan ke tagihan yang belum lunas.",
+            "search_placeholder": "Cari no. pembayaran, referensi, atau catatan..."
         },
         "customer_invoices": {
             "title": "Faktur Pelanggan",
-            "description": "Faktur pelanggan yang membentuk piutang usaha."
+            "description": "Faktur pelanggan yang membentuk piutang usaha.",
+            "search_placeholder": "Cari no. faktur, pelanggan, atau catatan..."
         },
         "ar_receipts": {
             "title": "Penerimaan Piutang",
-            "description": "Pembayaran pelanggan yang dialokasikan ke faktur yang belum lunas."
+            "description": "Pembayaran pelanggan yang dialokasikan ke faktur yang belum lunas.",
+            "search_placeholder": "Cari no. penerimaan, pelanggan, atau referensi..."
         },
         "credit_notes": {
             "title": "Nota Kredit",
-            "description": "Nota kredit yang mengurangi saldo faktur pelanggan."
+            "description": "Nota kredit yang mengurangi saldo faktur pelanggan.",
+            "search_placeholder": "Cari no. nota kredit, pelanggan, atau catatan..."
         },
         "customers": {
             "title": "Pelanggan",
-            "description": "Data master pelanggan dengan detail penagihan dan kontak."
+            "description": "Data master pelanggan dengan detail penagihan dan kontak.",
+            "search_placeholder": "Cari pelanggan..."
         },
         "suppliers": {
             "title": "Pemasok",
-            "description": "Data master vendor untuk pembelian dan utang usaha."
+            "description": "Data master vendor untuk pembelian dan utang usaha.",
+            "search_placeholder": "Cari pemasok..."
         },
         "departments": {
             "title": "Departemen",
-            "description": "Unit organisasi untuk mengelompokkan karyawan dan aset."
+            "description": "Unit organisasi untuk mengelompokkan karyawan dan aset.",
+            "search_placeholder": "Cari departemen..."
         },
         "positions": {
             "title": "Jabatan",
-            "description": "Jabatan yang dapat ditugaskan kepada karyawan."
+            "description": "Jabatan yang dapat ditugaskan kepada karyawan.",
+            "search_placeholder": "Cari jabatan..."
         },
         "branches": {
             "title": "Cabang",
-            "description": "Cabang perusahaan yang dipakai di seluruh transaksi dan laporan."
+            "description": "Cabang perusahaan yang dipakai di seluruh transaksi dan laporan.",
+            "search_placeholder": "Cari cabang..."
         },
         "customer_categories": {
             "title": "Kategori Pelanggan",
-            "description": "Kategori untuk mengelompokkan pelanggan."
+            "description": "Kategori untuk mengelompokkan pelanggan.",
+            "search_placeholder": "Cari kategori pelanggan..."
         },
         "supplier_categories": {
             "title": "Kategori Pemasok",
-            "description": "Kategori untuk mengelompokkan pemasok."
+            "description": "Kategori untuk mengelompokkan pemasok.",
+            "search_placeholder": "Cari kategori pemasok..."
         },
         "product_categories": {
             "title": "Kategori Produk",
-            "description": "Kategori untuk mengklasifikasikan produk dan bahan."
+            "description": "Kategori untuk mengklasifikasikan produk dan bahan.",
+            "search_placeholder": "Cari kategori produk..."
         },
         "units": {
             "title": "Satuan",
-            "description": "Satuan ukur yang dipakai oleh produk dan transaksi."
+            "description": "Satuan ukur yang dipakai oleh produk dan transaksi.",
+            "search_placeholder": "Cari satuan..."
         },
         "asset_categories": {
             "title": "Kategori Aset",
-            "description": "Kategori untuk mengklasifikasikan aset tetap."
+            "description": "Kategori untuk mengklasifikasikan aset tetap.",
+            "search_placeholder": "Cari kategori aset..."
         },
         "asset_locations": {
             "title": "Lokasi Aset",
-            "description": "Lokasi fisik di dalam cabang untuk penempatan aset."
+            "description": "Lokasi fisik di dalam cabang untuk penempatan aset.",
+            "search_placeholder": "Cari lokasi aset..."
         },
         "asset_models": {
             "title": "Model Aset",
-            "description": "Model pabrikan yang dipakai sebagai templat aset."
+            "description": "Model pabrikan yang dipakai sebagai templat aset.",
+            "search_placeholder": "Cari berdasarkan nama model atau pabrikan..."
         },
         "asset_movements": {
             "title": "Mutasi Aset",
-            "description": "Riwayat pemindahan dan penugasan aset tetap."
+            "description": "Riwayat pemindahan dan penugasan aset tetap.",
+            "search_placeholder": "Cari mutasi..."
         },
         "asset_maintenances": {
             "title": "Pemeliharaan Aset",
-            "description": "Pemeliharaan aset tetap yang dijadwalkan dan dilaksanakan."
+            "description": "Pemeliharaan aset tetap yang dijadwalkan dan dilaksanakan.",
+            "search_placeholder": "Cari pemeliharaan..."
         },
         "asset_stocktakes": {
             "title": "Stock Opname Aset",
-            "description": "Verifikasi fisik aset tetap per cabang."
+            "description": "Verifikasi fisik aset tetap per cabang.",
+            "search_placeholder": "Cari berdasarkan referensi..."
         },
         "asset_depreciation_runs": {
             "title": "Penyusutan Aset",
@@ -1167,25 +1210,31 @@
             "description": "Pantau piutang dan utang yang belum dibayar, dikelompokkan berdasarkan umur jatuh tempo."
         },
         "ap_aging": {
-            "description": "Utang dikelompokkan per umur untuk melihat saldo pemasok yang jatuh tempo."
+            "description": "Utang dikelompokkan per umur untuk melihat saldo pemasok yang jatuh tempo.",
+            "search_placeholder": "Cari no. tagihan, faktur pemasok, pemasok, cabang, no. PO, no. GR, atau catatan..."
         },
         "ap_outstanding": {
             "title": "Laporan Hutang Belum Lunas",
-            "description": "Tagihan pemasok yang masih memiliki saldo belum dibayar."
+            "description": "Tagihan pemasok yang masih memiliki saldo belum dibayar.",
+            "search_placeholder": "Cari no. tagihan, faktur pemasok, pemasok, cabang, no. PO, no. GR, atau catatan..."
         },
         "ap_payment_history": {
-            "description": "Pembayaran ke pemasok dalam periode yang dipilih."
+            "description": "Pembayaran ke pemasok dalam periode yang dipilih.",
+            "search_placeholder": "Cari no. pembayaran, pemasok, cabang, rekening bank, referensi, atau catatan..."
         },
         "ar_aging": {
-            "description": "Piutang dikelompokkan per umur untuk melihat saldo pelanggan yang jatuh tempo."
+            "description": "Piutang dikelompokkan per umur untuk melihat saldo pelanggan yang jatuh tempo.",
+            "search_placeholder": "Cari no. faktur, pelanggan, atau cabang..."
         },
         "ar_outstanding": {
             "title": "Laporan Piutang Belum Lunas",
-            "description": "Faktur pelanggan yang masih memiliki saldo belum dibayar."
+            "description": "Faktur pelanggan yang masih memiliki saldo belum dibayar.",
+            "search_placeholder": "Cari no. faktur, pelanggan, atau cabang..."
         },
         "customer_statement": {
             "title": "Laporan Mutasi Pelanggan",
-            "description": "Riwayat transaksi dan saldo belum dibayar untuk satu pelanggan."
+            "description": "Riwayat transaksi dan saldo belum dibayar untuk satu pelanggan.",
+            "search_placeholder": "Cari no. faktur..."
         },
         "budget_variance": {
             "title": "Laporan Selisih Anggaran",
@@ -1193,31 +1242,38 @@
         },
         "inventory_valuation": {
             "title": "Laporan Nilai Persediaan",
-            "description": "Jumlah dan nilai stok per produk dan gudang."
+            "description": "Jumlah dan nilai stok per produk dan gudang.",
+            "search_placeholder": "Cari produk, kategori, gudang, cabang..."
         },
         "stock_movement": {
             "title": "Laporan Mutasi Stok",
-            "description": "Stok masuk dan keluar per produk beserta dokumen sumbernya."
+            "description": "Stok masuk dan keluar per produk beserta dokumen sumbernya.",
+            "search_placeholder": "Cari produk, kategori, gudang, cabang..."
         },
         "stock_adjustment": {
             "title": "Laporan Penyesuaian Stok",
-            "description": "Penyesuaian stok yang mengubah jumlah, beserta alasannya."
+            "description": "Penyesuaian stok yang mengubah jumlah, beserta alasannya.",
+            "search_placeholder": "Cari nomor, gudang, cabang, jenis, status..."
         },
         "inventory_stocktake_variance": {
             "title": "Laporan Selisih Stock Opname",
-            "description": "Selisih antara stok sistem dan hasil stock opname fisik."
+            "description": "Selisih antara stok sistem dan hasil stock opname fisik.",
+            "search_placeholder": "Cari opname, produk, kategori, gudang..."
         },
         "purchase_order_status": {
             "title": "Laporan Status Pesanan Pembelian",
-            "description": "Progres pesanan pembelian dari penerbitan hingga penerimaan dan penagihan."
+            "description": "Progres pesanan pembelian dari penerbitan hingga penerimaan dan penagihan.",
+            "search_placeholder": "Cari no. PO, pemasok, gudang, atau produk..."
         },
         "purchase_history": {
             "title": "Laporan Riwayat Pembelian",
-            "description": "Transaksi pembelian beserta detail pemasok dan produk."
+            "description": "Transaksi pembelian beserta detail pemasok dan produk.",
+            "search_placeholder": "Cari no. PO, pemasok, gudang, atau produk..."
         },
         "goods_receipt": {
             "title": "Laporan Penerimaan Barang",
-            "description": "Barang yang diterima dari pemasok berdasarkan pesanan pembelian."
+            "description": "Barang yang diterima dari pemasok berdasarkan pesanan pembelian.",
+            "search_placeholder": "Cari no. GR, no. PO, pemasok, gudang, atau produk..."
         }
     },
     "stock_monitor_summary": {

@@ -878,6 +878,28 @@ test('search placeholders keep the english text of main per page', function () {
     }
 });
 
+test('search placeholder english text is pinned to the main branch values', function () {
+    // Kunci English placeholder pencarian untuk modul yang disentuh issue #462 fase 5.
+    // Nilai ini harus persis sama dengan origin/main (lihat decision reviewer 2026-11-25T12:51Z).
+    $pinned = [
+        'assets' => 'Search assets...',
+        'employees' => 'Search employees...',
+        'products' => 'Search products...',
+        'purchase_orders' => 'Search purchase orders...',
+        'journal_entries' => 'Search entry...',
+        'stock_monitor' => 'Search product, category, warehouse, branch...',
+    ];
+
+    $en = localePageTranslations('en.json');
+
+    foreach ($pinned as $page => $placeholder) {
+        expect($en[$page]['search_placeholder'])->toBe(
+            $placeholder,
+            "en page.{$page}.search_placeholder drifted from main",
+        );
+    }
+});
+
 test('products and purchase orders filter placeholders keep english and are translated to indonesian', function () {
     $en = localePageTranslations('en.json');
     $id = localePageTranslations('id.json');

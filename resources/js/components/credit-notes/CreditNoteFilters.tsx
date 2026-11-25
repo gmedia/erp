@@ -25,9 +25,10 @@ export function createCreditNoteFilterFields(): FieldDescriptor[] {
     ];
 
     return [
-        ...createCustomerFinancialFilterFields(
-            'Search credit note number, customer, or notes...',
-        ),
+        ...createCustomerFinancialFilterFields({
+            key: 'page.credit_notes.search_placeholder',
+            fallback: 'Search credit note number, customer, or notes...',
+        }),
         ...createSelectFilterFields([
             {
                 name: 'reason',

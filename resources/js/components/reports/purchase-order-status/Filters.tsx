@@ -12,7 +12,7 @@ export function createPurchaseOrderStatusReportFilterFields(): FieldDescriptor[]
             'search',
             { key: 'column.search', fallback: 'Search' },
             {
-                key: 'filter.purchase_search_placeholder',
+                key: 'page.purchase_order_status.search_placeholder',
                 fallback:
                     'Search PO number, supplier, warehouse, or product...',
             },

@@ -12,7 +12,10 @@ export function createCustomerFilterFields(): FieldDescriptor[] {
         createTextFilterField(
             'search',
             { key: 'column.search', fallback: 'Search' },
-            'Search customers...',
+            {
+                key: 'page.customers.search_placeholder',
+                fallback: 'Search customers...',
+            },
         ),
         ...createCustomerFilterSelectFields(),
     ];

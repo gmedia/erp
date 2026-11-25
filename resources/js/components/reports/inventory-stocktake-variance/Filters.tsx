@@ -13,7 +13,7 @@ export function createInventoryStocktakeVarianceFilterFields(): FieldDescriptor[
             'search',
             { key: 'column.search', fallback: 'Search' },
             {
-                key: 'filter.stocktake_variance_search_placeholder',
+                key: 'page.inventory_stocktake_variance.search_placeholder',
                 fallback: 'Search stocktake, product, category, warehouse...',
             },
         ),

@@ -8,7 +8,10 @@ import {
 
 export function createMaintenanceCostReportFilterFields(): FieldDescriptor[] {
     return [
-        ...createAssetReportScopeFilterFields('Search code, name, notes...'),
+        ...createAssetReportScopeFilterFields({
+            key: 'page.maintenance_cost.search_placeholder',
+            fallback: 'Search code, name, notes...',
+        }),
         createSupplierFilterField('Select a vendor', 'Vendor'),
         ...createMaintenanceTypeStatusFilterFields(),
         ...createDateRangeFilterFields(),

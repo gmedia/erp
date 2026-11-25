@@ -11,7 +11,7 @@ export function createPurchaseHistoryReportFilterFields(): FieldDescriptor[] {
             'search',
             { key: 'column.search', fallback: 'Search' },
             {
-                key: 'filter.purchase_search_placeholder',
+                key: 'page.purchase_history.search_placeholder',
                 fallback:
                     'Search PO number, supplier, warehouse, or product...',
             },

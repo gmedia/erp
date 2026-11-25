@@ -24,7 +24,10 @@ export function createBudgetFilterFields(): FieldDescriptor[] {
         createTextFilterField(
             'search',
             { key: 'column.search', fallback: 'Search' },
-            'Search budgets...',
+            {
+                key: 'page.budgets.search_placeholder',
+                fallback: 'Search budgets...',
+            },
         ),
         createSelectFilterField(
             'status',

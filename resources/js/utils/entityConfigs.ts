@@ -3,6 +3,7 @@ import {
     createSimpleEntityFilterFields,
     type FieldDescriptor,
 } from '@/components/common/filters';
+import { type TranslatableLabel } from '@/components/common/TranslatedText';
 import { type FilterState } from '@/hooks/useCrudFilters';
 import { type BreadcrumbItem } from '@/types';
 import {
@@ -172,7 +173,7 @@ export interface SimpleEntityConfigOptions<T = unknown> {
     entityNamePlural: string;
     description?: string;
     apiBase: string;
-    filterPlaceholder: string;
+    filterPlaceholder: TranslatableLabel;
     permissionPrefix?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     viewModalComponent?: React.ComponentType<any>;
@@ -307,7 +308,10 @@ export const departmentConfig = createSimpleEntityConfig({
     titleKey: 'page.departments.title',
     descriptionKey: 'page.departments.description',
     apiBase: 'departments',
-    filterPlaceholder: 'Search departments...',
+    filterPlaceholder: {
+        key: 'page.departments.search_placeholder',
+        fallback: 'Search departments...',
+    },
     permissionPrefix: 'department',
 });
 
@@ -318,7 +322,10 @@ export const positionConfig = createSimpleEntityConfig({
     titleKey: 'page.positions.title',
     descriptionKey: 'page.positions.description',
     apiBase: 'positions',
-    filterPlaceholder: 'Search positions...',
+    filterPlaceholder: {
+        key: 'page.positions.search_placeholder',
+        fallback: 'Search positions...',
+    },
     permissionPrefix: 'position',
     defaultSorting: [{ id: 'created_at', desc: true }],
 });
@@ -330,7 +337,10 @@ export const branchConfig = createSimpleEntityConfig({
     titleKey: 'page.branches.title',
     descriptionKey: 'page.branches.description',
     apiBase: 'branches',
-    filterPlaceholder: 'Search branches...',
+    filterPlaceholder: {
+        key: 'page.branches.search_placeholder',
+        fallback: 'Search branches...',
+    },
     permissionPrefix: 'branch',
 });
 
@@ -749,7 +759,10 @@ export const supplierCategoryConfig = createSimpleEntityConfig({
     titleKey: 'page.supplier_categories.title',
     descriptionKey: 'page.supplier_categories.description',
     apiBase: 'supplier-categories',
-    filterPlaceholder: 'Search supplier categories...',
+    filterPlaceholder: {
+        key: 'page.supplier_categories.search_placeholder',
+        fallback: 'Search supplier categories...',
+    },
     permissionPrefix: 'supplier_category',
 });
 
@@ -760,7 +773,10 @@ export const customerCategoryConfig = createSimpleEntityConfig({
     titleKey: 'page.customer_categories.title',
     descriptionKey: 'page.customer_categories.description',
     apiBase: 'customer-categories',
-    filterPlaceholder: 'Search customer categories...',
+    filterPlaceholder: {
+        key: 'page.customer_categories.search_placeholder',
+        fallback: 'Search customer categories...',
+    },
     permissionPrefix: 'customer_category',
 });
 
@@ -782,7 +798,10 @@ export const assetCategoryConfig = createComplexEntityConfig<AssetCategory>({
     ],
     initialFilters: { search: '' },
     columns: assetCategoryColumns,
-    filterFields: createSimpleEntityFilterFields('Search asset categories...'),
+    filterFields: createSimpleEntityFilterFields({
+        key: 'page.asset_categories.search_placeholder',
+        fallback: 'Search asset categories...',
+    }),
     formComponent: AssetCategoryForm,
     formType: 'complex',
     entityNameForSearch: 'asset category',
@@ -810,9 +829,10 @@ export const productCategoryConfig = createComplexEntityConfig<ProductCategory>(
         ],
         initialFilters: { search: '' },
         columns: productCategoryColumns,
-        filterFields: createSimpleEntityFilterFields(
-            'Search product categories...',
-        ),
+        filterFields: createSimpleEntityFilterFields({
+            key: 'page.product_categories.search_placeholder',
+            fallback: 'Search product categories...',
+        }),
         formComponent: ProductCategoryForm,
         formType: 'complex',
         entityNameForSearch: 'product category',
@@ -836,7 +856,10 @@ export const unitConfig = createComplexEntityConfig<Unit>({
     ],
     initialFilters: { search: '' },
     columns: unitColumns,
-    filterFields: createSimpleEntityFilterFields('Search units...'),
+    filterFields: createSimpleEntityFilterFields({
+        key: 'page.units.search_placeholder',
+        fallback: 'Search units...',
+    }),
     formComponent: UnitForm,
     formType: 'complex',
     entityNameForSearch: 'unit',

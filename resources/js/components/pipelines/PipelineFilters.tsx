@@ -8,11 +8,10 @@ import { APPROVABLE_TYPE_OPTIONS } from '@/constants/model-options';
 
 export function createPipelineFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField(
-            'search',
-            'Search',
-            'Search name, code, or description...',
-        ),
+        createTextFilterField('search', 'Search', {
+            key: 'page.pipelines.search_placeholder',
+            fallback: 'Search name, code, or description...',
+        }),
         createSelectFilterField(
             'entity_type',
             'Entity Type',

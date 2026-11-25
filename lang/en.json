@@ -901,15 +901,18 @@
     "page": {
         "approval_flows": {
             "title": "Approval Flows",
-            "description": "Approval definitions with ordered steps and approvers."
+            "description": "Approval definitions with ordered steps and approvers.",
+            "search_placeholder": "Search by Code or Name..."
         },
         "approval_delegations": {
             "title": "Approval Delegations",
-            "description": "Delegations that let another user approve on your behalf for a period."
+            "description": "Delegations that let another user approve on your behalf for a period.",
+            "search_placeholder": "Search reason..."
         },
         "pipelines": {
             "title": "Pipelines",
-            "description": "Workflow pipelines and the states entities move through."
+            "description": "Workflow pipelines and the states entities move through.",
+            "search_placeholder": "Search name, code, or description..."
         },
         "pipeline_dashboard": {
             "description": "Monitor state distributions and identify bottlenecks across your active pipelines."
@@ -921,10 +924,12 @@
             "description": "Monitor approval workflows and overdue tasks."
         },
         "approval_audit_trail": {
-            "description": "History of approval actions taken on requests."
+            "description": "History of approval actions taken on requests.",
+            "search_placeholder": "Search IP, Document ID, user..."
         },
         "pipeline_audit_trail": {
-            "description": "History of state transitions on pipeline records."
+            "description": "History of state transitions on pipeline records.",
+            "search_placeholder": "Search entity ID, performer, comment..."
         },
         "purchase_orders": {
             "title": "Purchase Orders",
@@ -963,11 +968,13 @@
         },
         "maintenance_cost": {
             "title": "Maintenance Cost Report",
-            "description": "Maintenance spending per asset over the selected period."
+            "description": "Maintenance spending per asset over the selected period.",
+            "search_placeholder": "Search code, name, notes..."
         },
         "asset_stocktake_variances": {
             "title": "Stocktake Variance Report",
-            "description": "Differences between recorded and physically counted assets."
+            "description": "Differences between recorded and physically counted assets.",
+            "search_placeholder": "Search code, name, notes..."
         },
         "asset_dashboard": {
             "title": "Asset Management Overview",
@@ -983,35 +990,43 @@
         },
         "warehouses": {
             "title": "Warehouses",
-            "description": "Storage locations that hold product stock."
+            "description": "Storage locations that hold product stock.",
+            "search_placeholder": "Search warehouses..."
         },
         "stock_transfers": {
             "title": "Stock Transfers",
-            "description": "Move stock between warehouses with approval and receipt tracking."
+            "description": "Move stock between warehouses with approval and receipt tracking.",
+            "search_placeholder": "Search stock transfers..."
         },
         "stock_adjustments": {
             "title": "Stock Adjustments",
-            "description": "Record stock corrections with approval and journal posting."
+            "description": "Record stock corrections with approval and journal posting.",
+            "search_placeholder": "Search stock adjustments..."
         },
         "inventory_stocktakes": {
             "title": "Inventory Stocktakes",
-            "description": "Physical counts of warehouse stock with variance results."
+            "description": "Physical counts of warehouse stock with variance results.",
+            "search_placeholder": "Search inventory stocktakes..."
         },
         "stock_movements": {
             "title": "Stock Movements",
-            "description": "Digital stock card — product movements by warehouse, type, and period."
+            "description": "Digital stock card — product movements by warehouse, type, and period.",
+            "search_placeholder": "Search reference, notes, product, warehouse..."
         },
         "purchase_requests": {
             "title": "Purchase Requests",
-            "description": "Internal requests for goods before a purchase order is raised."
+            "description": "Internal requests for goods before a purchase order is raised.",
+            "search_placeholder": "Search PR number, notes, or rejection reason..."
         },
         "goods_receipts": {
             "title": "Goods Receipts",
-            "description": "Record received goods and update warehouse stock."
+            "description": "Record received goods and update warehouse stock.",
+            "search_placeholder": "Search GR number, supplier delivery note, or notes..."
         },
         "supplier_returns": {
             "title": "Supplier Returns",
-            "description": "Return received goods to suppliers with stock deduction."
+            "description": "Return received goods to suppliers with stock deduction.",
+            "search_placeholder": "Search return number or notes..."
         },
         "accounts": {
             "title": "Chart of Accounts",
@@ -1023,115 +1038,143 @@
         },
         "fiscal_years": {
             "title": "Fiscal Years",
-            "description": "Accounting periods that scope journals and financial reports."
+            "description": "Accounting periods that scope journals and financial reports.",
+            "search_placeholder": "Search fiscal years..."
         },
         "coa_versions": {
             "title": "COA Versions",
-            "description": "Chart of accounts versions per fiscal year."
+            "description": "Chart of accounts versions per fiscal year.",
+            "search_placeholder": "Search COA versions..."
         },
         "account_mappings": {
             "title": "Account Mappings",
-            "description": "Account mappings between COA versions (rename, merge, split) for balance and reference migration."
+            "description": "Account mappings between COA versions (rename, merge, split) for balance and reference migration.",
+            "search_placeholder": "Search account mappings..."
         },
         "budgets": {
             "title": "Budgets",
-            "description": "Budget plans per account with period breakdown."
+            "description": "Budget plans per account with period breakdown.",
+            "search_placeholder": "Search budgets..."
         },
         "report_configurations": {
             "title": "Report Configurations",
-            "description": "Settings that define how each report is generated and displayed."
+            "description": "Settings that define how each report is generated and displayed.",
+            "search_placeholder": "Search code, name, description..."
         },
         "bank_reconciliations": {
             "title": "Bank Reconciliations",
-            "description": "Match bank statement balances with the books for each account."
+            "description": "Match bank statement balances with the books for each account.",
+            "search_placeholder": "Search..."
         },
         "recurring_journals": {
             "title": "Recurring Journals",
-            "description": "Templates for journals that repeat on a schedule."
+            "description": "Templates for journals that repeat on a schedule.",
+            "search_placeholder": "Search name, description..."
         },
         "period_closings": {
             "title": "Period Closings",
-            "description": "Close accounting periods and carry balances forward."
+            "description": "Close accounting periods and carry balances forward.",
+            "search_placeholder": "Search..."
         },
         "supplier_bills": {
             "title": "Supplier Bills",
-            "description": "Supplier invoices that create accounts payable."
+            "description": "Supplier invoices that create accounts payable.",
+            "search_placeholder": "Search bill number, supplier invoice number, or notes..."
         },
         "ap_payments": {
             "title": "AP Payments",
-            "description": "Payments to suppliers allocated against outstanding bills."
+            "description": "Payments to suppliers allocated against outstanding bills.",
+            "search_placeholder": "Search payment number, reference, or notes..."
         },
         "customer_invoices": {
             "title": "Customer Invoices",
-            "description": "Customer invoices that create accounts receivable."
+            "description": "Customer invoices that create accounts receivable.",
+            "search_placeholder": "Search invoice number, customer, or notes..."
         },
         "ar_receipts": {
             "title": "AR Receipts",
-            "description": "Customer payments allocated against outstanding invoices."
+            "description": "Customer payments allocated against outstanding invoices.",
+            "search_placeholder": "Search receipt number, customer, or reference..."
         },
         "credit_notes": {
             "title": "Credit Notes",
-            "description": "Credit notes that reduce customer invoice balances."
+            "description": "Credit notes that reduce customer invoice balances.",
+            "search_placeholder": "Search credit note number, customer, or notes..."
         },
         "customers": {
             "title": "Customers",
-            "description": "Customer master data with billing and contact details."
+            "description": "Customer master data with billing and contact details.",
+            "search_placeholder": "Search customers..."
         },
         "suppliers": {
             "title": "Suppliers",
-            "description": "Vendor master data used by purchasing and payables."
+            "description": "Vendor master data used by purchasing and payables.",
+            "search_placeholder": "Search suppliers..."
         },
         "departments": {
             "title": "Departments",
-            "description": "Organizational units used to group employees and assets."
+            "description": "Organizational units used to group employees and assets.",
+            "search_placeholder": "Search departments..."
         },
         "positions": {
             "title": "Positions",
-            "description": "Job titles assignable to employees."
+            "description": "Job titles assignable to employees.",
+            "search_placeholder": "Search positions..."
         },
         "branches": {
             "title": "Branches",
-            "description": "Company branches used across transactions and reports."
+            "description": "Company branches used across transactions and reports.",
+            "search_placeholder": "Search branches..."
         },
         "customer_categories": {
             "title": "Customer Categories",
-            "description": "Categories used to group customers."
+            "description": "Categories used to group customers.",
+            "search_placeholder": "Search customer categories..."
         },
         "supplier_categories": {
             "title": "Supplier Categories",
-            "description": "Categories used to group suppliers."
+            "description": "Categories used to group suppliers.",
+            "search_placeholder": "Search supplier categories..."
         },
         "product_categories": {
             "title": "Product Categories",
-            "description": "Categories used to classify products and materials."
+            "description": "Categories used to classify products and materials.",
+            "search_placeholder": "Search product categories..."
         },
         "units": {
             "title": "Units",
-            "description": "Units of measure used by products and transactions."
+            "description": "Units of measure used by products and transactions.",
+            "search_placeholder": "Search units..."
         },
         "asset_categories": {
             "title": "Asset Categories",
-            "description": "Categories used to classify fixed assets."
+            "description": "Categories used to classify fixed assets.",
+            "search_placeholder": "Search asset categories..."
         },
         "asset_locations": {
             "title": "Asset Locations",
-            "description": "Physical locations within branches for asset placement."
+            "description": "Physical locations within branches for asset placement.",
+            "search_placeholder": "Search asset locations..."
         },
         "asset_models": {
             "title": "Asset Models",
-            "description": "Manufacturer models used as templates for assets."
+            "description": "Manufacturer models used as templates for assets.",
+            "search_placeholder": "Search by model name or manufacturer..."
         },
         "asset_movements": {
             "title": "Asset Movements",
-            "description": "Transfer and assignment history of fixed assets."
+            "description": "Transfer and assignment history of fixed assets.",
+            "search_placeholder": "Search movements..."
         },
         "asset_maintenances": {
             "title": "Asset Maintenances",
-            "description": "Scheduled and performed maintenance for fixed assets."
+            "description": "Scheduled and performed maintenance for fixed assets.",
+            "search_placeholder": "Search maintenances..."
         },
         "asset_stocktakes": {
             "title": "Asset Stocktakes",
-            "description": "Physical verification of fixed assets per branch."
+            "description": "Physical verification of fixed assets per branch.",
+            "search_placeholder": "Search by reference..."
         },
         "asset_depreciation_runs": {
             "title": "Asset Depreciation Runs",
@@ -1167,25 +1210,31 @@
             "description": "Monitor outstanding receivables and payables bucketed by overdue age."
         },
         "ap_aging": {
-            "description": "Payables grouped by age bucket to show overdue supplier balances."
+            "description": "Payables grouped by age bucket to show overdue supplier balances.",
+            "search_placeholder": "Search bill number, supplier invoice, supplier, branch, PO number, GR number, or notes..."
         },
         "ap_outstanding": {
             "title": "AP Outstanding Report",
-            "description": "Open supplier bills that still have an unpaid balance."
+            "description": "Open supplier bills that still have an unpaid balance.",
+            "search_placeholder": "Search bill number, supplier invoice, supplier, branch, PO number, GR number, or notes..."
         },
         "ap_payment_history": {
-            "description": "Payments made to suppliers within the selected period."
+            "description": "Payments made to suppliers within the selected period.",
+            "search_placeholder": "Search payment number, supplier, branch, bank account, reference, or notes..."
         },
         "ar_aging": {
-            "description": "Receivables grouped by age bucket to show overdue customer balances."
+            "description": "Receivables grouped by age bucket to show overdue customer balances.",
+            "search_placeholder": "Search invoice number, customer, or branch..."
         },
         "ar_outstanding": {
             "title": "AR Outstanding Report",
-            "description": "Open customer invoices that still have an unpaid balance."
+            "description": "Open customer invoices that still have an unpaid balance.",
+            "search_placeholder": "Search invoice number, customer, or branch..."
         },
         "customer_statement": {
             "title": "Customer Statement Report",
-            "description": "Transaction history and outstanding balance for one customer."
+            "description": "Transaction history and outstanding balance for one customer.",
+            "search_placeholder": "Search invoice number..."
         },
         "budget_variance": {
             "title": "Budget Variance Report",
@@ -1193,31 +1242,38 @@
         },
         "inventory_valuation": {
             "title": "Inventory Valuation Report",
-            "description": "Stock quantity and value per product and warehouse."
+            "description": "Stock quantity and value per product and warehouse.",
+            "search_placeholder": "Search product, category, warehouse, branch..."
         },
         "stock_movement": {
             "title": "Stock Movement Report",
-            "description": "Stock in and out per product, with source document."
+            "description": "Stock in and out per product, with source document.",
+            "search_placeholder": "Search product, category, warehouse, branch..."
         },
         "stock_adjustment": {
             "title": "Stock Adjustment Report",
-            "description": "Stock adjustments that changed quantities, with reason."
+            "description": "Stock adjustments that changed quantities, with reason.",
+            "search_placeholder": "Search number, warehouse, branch, type, status..."
         },
         "inventory_stocktake_variance": {
             "title": "Inventory Stocktake Variance Report",
-            "description": "Differences between system stock and physical stocktake counts."
+            "description": "Differences between system stock and physical stocktake counts.",
+            "search_placeholder": "Search stocktake, product, category, warehouse..."
         },
         "purchase_order_status": {
             "title": "Purchase Order Status Report",
-            "description": "Progress of purchase orders from issue to receipt and billing."
+            "description": "Progress of purchase orders from issue to receipt and billing.",
+            "search_placeholder": "Search PO number, supplier, warehouse, or product..."
         },
         "purchase_history": {
             "title": "Purchase History Report",
-            "description": "Purchase transactions with supplier and product detail."
+            "description": "Purchase transactions with supplier and product detail.",
+            "search_placeholder": "Search PO number, supplier, warehouse, or product..."
         },
         "goods_receipt": {
             "title": "Goods Receipt Report",
-            "description": "Goods received from suppliers against purchase orders."
+            "description": "Goods received from suppliers against purchase orders.",
+            "search_placeholder": "Search GR number, PO number, supplier, warehouse, or product..."
         }
     },
     "stock_monitor_summary": {
