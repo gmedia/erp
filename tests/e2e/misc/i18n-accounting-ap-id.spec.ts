@@ -97,8 +97,12 @@ test.describe('i18n column headers (locale id, asset and report)', () => {
         await expect(
             page.getByRole('button', { name: 'Kode', exact: true }),
         ).toBeVisible({ timeout: 15000 });
-        await expect(page.getByRole('button', { name: 'Nama', exact: true })).toBeVisible();
-        await expect(page.getByRole('button', { name: 'Code', exact: true })).toHaveCount(0);
+        await expect(
+            page.getByRole('button', { name: 'Nama', exact: true }),
+        ).toBeVisible();
+        await expect(
+            page.getByRole('button', { name: 'Code', exact: true }),
+        ).toHaveCount(0);
     });
 
     test('ap aging report column headers are Indonesian', async ({ page }) => {
@@ -114,7 +118,9 @@ test.describe('i18n column headers (locale id, asset and report)', () => {
         await expect(
             thead.getByText('Belum Jatuh Tempo', { exact: true }),
         ).toBeVisible();
-        await expect(thead.getByText('Current', { exact: true })).toHaveCount(0);
+        await expect(thead.getByText('Current', { exact: true })).toHaveCount(
+            0,
+        );
     });
 });
 
