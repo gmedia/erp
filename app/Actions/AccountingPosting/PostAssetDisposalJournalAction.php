@@ -56,7 +56,7 @@ class PostAssetDisposalJournalAction
         ?float $saleAmount = null,
         ?int $saleAccountId = null,
     ): JournalEntry {
-        $reference = 'DISP-'.$asset->asset_code;
+        $reference = 'DISP-' . $asset->asset_code;
 
         $existing = JournalEntry::query()
             ->where('reference', $reference)

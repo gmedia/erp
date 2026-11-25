@@ -210,7 +210,7 @@ invariant('W7-03 purchase order received quantities derive from confirmed goods 
 
 // W7-03 (keputusan 10a) — PO-000108 sebagian diterima dan masih menyisakan 13 unit.
 invariant('W7-03 demo purchase order PO-000108 is partially received with 13 units outstanding', function () {
-    $poNumber = 'PO-'.Carbon::now()->format('Y').'-000108';
+    $poNumber = 'PO-' . Carbon::now()->format('Y') . '-000108';
     $order = PurchaseOrder::query()->where('po_number', $poNumber)->first();
 
     expect($order)->not->toBeNull("Demo data must include purchase order {$poNumber}");
@@ -265,7 +265,7 @@ invariant('W7-04 stock movement balances form a correct chain per product and wa
     $scope = null;
 
     foreach ($movements as $movement) {
-        $key = $movement->product_id.':'.$movement->warehouse_id;
+        $key = $movement->product_id . ':' . $movement->warehouse_id;
 
         if ($key !== $scope) {
             $scope = $key;
@@ -288,7 +288,7 @@ invariant('W7-04 every eligible document line has a matching stock movement', fu
         ->groupBy('reference_type', 'reference_id', 'product_id')
         ->selectRaw('reference_type, reference_id, product_id, SUM(quantity_in) as qty_in, SUM(quantity_out) as qty_out')
         ->get()
-        ->keyBy(fn ($row) => $row->reference_type.'#'.$row->reference_id.'#'.$row->product_id);
+        ->keyBy(fn ($row) => $row->reference_type . '#' . $row->reference_id . '#' . $row->product_id);
 
     $checks = [
         [
@@ -328,7 +328,7 @@ invariant('W7-04 every eligible document line has a matching stock movement', fu
         $eligibleIds = DB::table($check['header'])->where('status', $check['status'])->pluck('id');
 
         foreach (DB::table($check['lines'])->whereIn($check['fk'], $eligibleIds)->get() as $line) {
-            $key = $check['type'].'#'.$line->{$check['fk']}.'#'.$line->product_id;
+            $key = $check['type'] . '#' . $line->{$check['fk']} . '#' . $line->product_id;
             $movement = $movementSums->get($key);
 
             // Collect every violation instead of stopping at the first, so one broken
@@ -368,7 +368,7 @@ invariant('W7-04 every received stock transfer line has matching transfer_out an
         ->groupBy('reference_id', 'product_id', 'movement_type')
         ->selectRaw('reference_id, product_id, movement_type, SUM(quantity_in) as qty_in, SUM(quantity_out) as qty_out')
         ->get()
-        ->keyBy(fn ($row) => $row->reference_id.'#'.$row->product_id.'#'.$row->movement_type);
+        ->keyBy(fn ($row) => $row->reference_id . '#' . $row->product_id . '#' . $row->movement_type);
 
     $receivedLines = DB::table('stock_transfer_items')
         ->join('stock_transfers', 'stock_transfers.id', '=', 'stock_transfer_items.stock_transfer_id')
@@ -378,14 +378,14 @@ invariant('W7-04 every received stock transfer line has matching transfer_out an
     expect($receivedLines)->not->toBeEmpty('Demo data must include received stock transfers');
 
     foreach ($receivedLines as $line) {
-        $key = $line->stock_transfer_id.'#'.$line->product_id;
+        $key = $line->stock_transfer_id . '#' . $line->product_id;
 
-        $out = $legs->get($key.'#transfer_out');
+        $out = $legs->get($key . '#transfer_out');
         expect($out)->not->toBeNull("Received transfer {$key} must have a transfer_out movement");
         expect(round((float) $out->qty_out, 2))
             ->toBe(round((float) $line->quantity, 2), "transfer_out quantity for {$key} must equal dispatched quantity");
 
-        $in = $legs->get($key.'#transfer_in');
+        $in = $legs->get($key . '#transfer_in');
         expect($in)->not->toBeNull("Received transfer {$key} must have a transfer_in movement");
         expect(round((float) $in->qty_in, 2))
             ->toBe(round((float) $line->quantity_received, 2), "transfer_in quantity for {$key} must equal quantity received");
@@ -404,7 +404,7 @@ invariant('W7-04 running stock balance is non-negative at every movement', funct
     $balance = [];
 
     foreach ($movements as $movement) {
-        $key = $movement->product_id.':'.$movement->warehouse_id;
+        $key = $movement->product_id . ':' . $movement->warehouse_id;
         $balance[$key] = ($balance[$key] ?? 0.0) + (float) $movement->quantity_in - (float) $movement->quantity_out;
 
         expect(round($balance[$key], 2))
@@ -423,7 +423,7 @@ invariant('W7-04 stock snapshot uses the latest movement balance', function () {
 
     $latest = [];
     foreach ($movements as $movement) {
-        $latest[$movement->product_id.':'.$movement->warehouse_id] = (float) $movement->balance_after;
+        $latest[$movement->product_id . ':' . $movement->warehouse_id] = (float) $movement->balance_after;
     }
 
     // Compare the set of product+warehouse pairs, not raw movement rows.
@@ -437,13 +437,13 @@ invariant('W7-04 stock snapshot uses the latest movement balance', function () {
 
     expect($snapshot)->not->toBeEmpty('Stock monitor must show stock rows');
 
-    $snapshotPairs = $snapshot->map(fn ($row) => $row->product_id.':'.$row->warehouse_id)->sort()->values()->all();
+    $snapshotPairs = $snapshot->map(fn ($row) => $row->product_id . ':' . $row->warehouse_id)->sort()->values()->all();
     $expectedPairs = collect($pairs)->sort()->values()->all();
 
     expect($snapshotPairs)->toBe($expectedPairs, 'Stock snapshot must cover exactly the product and warehouse pairs that have movements');
 
     foreach ($snapshot as $row) {
-        $key = $row->product_id.':'.$row->warehouse_id;
+        $key = $row->product_id . ':' . $row->warehouse_id;
         expect(round((float) $row->quantity_on_hand, 2))
             ->toBe(round($latest[$key], 2), "Stock snapshot for {$key} must equal the latest movement balance");
     }
@@ -454,7 +454,7 @@ invariant('W7-04 only eligible document states produce stock movements', functio
     $eligible = DB::table('stock_movements')
         ->whereNotNull('reference_type')
         ->get(['reference_type', 'reference_id'])
-        ->map(fn ($row) => $row->reference_type.'#'.$row->reference_id)
+        ->map(fn ($row) => $row->reference_type . '#' . $row->reference_id)
         ->unique();
 
     foreach ($eligible as $pair) {
@@ -494,7 +494,7 @@ invariant('W7-04 inventory valuation equals GL inventory account', function () {
 
     $latest = [];
     foreach ($movements as $movement) {
-        $latest[$movement->product_id.':'.$movement->warehouse_id] = $movement;
+        $latest[$movement->product_id . ':' . $movement->warehouse_id] = $movement;
     }
 
     $valuation = 0.0;
@@ -543,7 +543,7 @@ test('W7-04 11300 invariant fails when a transfer shortage journal is removed', 
         ->get(['product_id', 'warehouse_id', 'balance_after', 'average_cost_after']);
 
     foreach ($movements as $movement) {
-        $latest[$movement->product_id.':'.$movement->warehouse_id] = $movement;
+        $latest[$movement->product_id . ':' . $movement->warehouse_id] = $movement;
     }
     foreach ($latest as $movement) {
         $cost = $movement->average_cost_after !== null
@@ -819,7 +819,7 @@ invariant('W7-15 positions do not mix grade levels with job titles', function ()
     $names = DB::table('positions')->pluck('name')->all();
     $grades = array_values(array_intersect($names, ['Junior', 'Mid-level', 'Senior']));
 
-    expect($grades)->toBeEmpty('Position list must not contain grade levels: '.implode(', ', $grades));
+    expect($grades)->toBeEmpty('Position list must not contain grade levels: ' . implode(', ', $grades));
 });
 
 // W7-15 (keuangan) — anggaran tiap periode tidak boleh melebihi anggaran tahunan.
@@ -1015,12 +1015,12 @@ invariant('#442 disposed and lost assets carry one posted release journal', func
     foreach ($assets as $asset) {
         $prefix = $asset->status === 'disposed' ? 'DISP-' : 'LOSS-';
         $journals = DB::table('journal_entries')
-            ->where('reference', $prefix.$asset->asset_code)
+            ->where('reference', $prefix . $asset->asset_code)
             ->where('journal_type', 'system')
             ->get(['id', 'status']);
 
         $hasAcquisition = DB::table('journal_entries')
-            ->where('reference', 'ACQ-'.$asset->asset_code)
+            ->where('reference', 'ACQ-' . $asset->asset_code)
             ->where('status', 'posted')
             ->exists();
 
@@ -1062,7 +1062,7 @@ invariant('#442 disposed and lost assets carry one posted release journal', func
         $assetCode = substr((string) $reference, 5);
 
         expect(DB::table('journal_entries')
-            ->where('reference', 'ACQ-'.$assetCode)
+            ->where('reference', 'ACQ-' . $assetCode)
             ->where('status', 'posted')
             ->exists())
             ->toBeTrue("Release journal {$reference} must have a posted ACQ journal for the same asset");
@@ -1276,7 +1276,7 @@ invariant('W7-06 no journal line posts to a group account', function () {
         ->map(fn ($row) => "{$row->entry_number} ({$row->description}) acct {$row->account_id}")
         ->implode('; ');
 
-    expect($offenders->all())->toBeEmpty('Journal lines must not post to group accounts: '.$details);
+    expect($offenders->all())->toBeEmpty('Journal lines must not post to group accounts: ' . $details);
 });
 
 // Issue #357 (PR #384): every invariant above must also hold after a second `db:seed`.
@@ -1486,7 +1486,7 @@ invariant('W7-17 asset location codes are unique across branches', function () {
         ->havingRaw('COUNT(*) > 1')
         ->pluck('code');
 
-    expect($duplicates)->toBeEmpty('Kode lokasi aset tidak boleh berulang: '.$duplicates->implode(', '));
+    expect($duplicates)->toBeEmpty('Kode lokasi aset tidak boleh berulang: ' . $duplicates->implode(', '));
 });
 
 // W7-17 — produk demo tidak memakai kode placeholder SaaS-CLOUD-001.

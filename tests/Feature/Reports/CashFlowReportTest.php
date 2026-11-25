@@ -32,13 +32,13 @@ beforeEach(function () {
 
 test('it requires permission to access cash flow report', function () {
     Sanctum::actingAs($this->otherUser, ['*']);
-    $this->getJson('/api/reports/cash-flow?fiscal_year_id='.$this->fiscalYear->id)
+    $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
         ->assertForbidden();
 });
 
 test('it can fetch cash flow data via json', function () {
     Sanctum::actingAs($this->user, ['*']);
-    $this->getJson('/api/reports/cash-flow?fiscal_year_id='.$this->fiscalYear->id)
+    $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
         ->assertOk()
         ->assertJsonStructure([
             'selectedYearId',
@@ -80,7 +80,7 @@ test('it reports cash debit as inflow and credit as outflow', function () {
         'credit' => 0,
     ]);
 
-    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id='.$this->fiscalYear->id)
+    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
         ->assertOk();
 
     $row = collect($response->json('report'))->firstWhere('code', '11110');
@@ -183,7 +183,7 @@ test('it splits cash movements into operating, investing and financing activitie
         ['account' => $longTermLoan, 'debit' => 0, 'credit' => 150000],
     ]);
 
-    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id='.$this->fiscalYear->id)
+    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
         ->assertOk();
 
     expect((float) $response->json('activities.operating'))->toBe(300000.0)
@@ -221,7 +221,7 @@ test('it excludes transfers between cash accounts from cash flow activities', fu
         ['account' => $bank, 'debit' => 0, 'credit' => 100000],
     ]);
 
-    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id='.$this->fiscalYear->id)
+    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
         ->assertOk();
 
     expect((float) $response->json('activities.operating'))->toBe(0.0)
@@ -278,7 +278,7 @@ test('it attributes counter lines net of cash in a mixed journal and totals equa
         ['account' => $equipment, 'debit' => 30000, 'credit' => 0],
     ]);
 
-    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id='.$this->fiscalYear->id)
+    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
         ->assertOk();
 
     $operating = (float) $response->json('activities.operating');
@@ -374,7 +374,7 @@ test('it reports opening and closing cash balance around the period net change',
         ]);
     }
 
-    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id='.$this->fiscalYear->id)
+    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
         ->assertOk();
 
     expect((float) $response->json('opening_cash_balance'))->toBe(400000.0)
@@ -421,7 +421,7 @@ test('it reconciles activity totals to the opening to closing cash change', func
         ['account' => $equipment, 'debit' => 125000, 'credit' => 0],
     ]);
 
-    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id='.$this->fiscalYear->id)
+    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
         ->assertOk();
 
     $total = (float) $response->json('activities.operating')
@@ -488,14 +488,14 @@ test('it carries opening cash across fiscal years when the coa version changes',
         ['account' => $newReceivable, 'debit' => 0, 'credit' => 100000],
     ], entryDate: '2025-03-15');
 
-    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id='.$this->fiscalYear->id)
+    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
         ->assertOk();
 
     expect((float) $response->json('opening_cash_balance'))->toBe(400000.0)
         ->and((float) $response->json('closing_cash_balance'))->toBe(500000.0);
 
     // Saldo akhir tahun 2024 harus sama dengan saldo awal tahun 2025.
-    $previous = $this->getJson('/api/reports/cash-flow?fiscal_year_id='.$previousYear->id)
+    $previous = $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $previousYear->id)
         ->assertOk();
     expect((float) $previous->json('closing_cash_balance'))->toBe(400000.0);
 });
@@ -542,7 +542,7 @@ test('it keeps activity totals equal to net change when filtered by branch', fun
         'fiscal_year_id' => $this->fiscalYear->id,
         'branch_id' => $branch->id,
     ]);
-    $response = $this->getJson('/api/reports/cash-flow?'.$query)
+    $response = $this->getJson('/api/reports/cash-flow?' . $query)
         ->assertOk();
 
     $total = (float) $response->json('activities.operating')
@@ -582,7 +582,7 @@ test('it returns activities and net change without seeded cash flow configuratio
     ]);
 
     // Tanpa $this->seed(ReportConfigurationSeeder::class): konfigurasi aktivitas tidak ada.
-    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id='.$this->fiscalYear->id)
+    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
         ->assertOk();
 
     expect((float) $response->json('net_change'))->toBe(250000.0)
@@ -643,7 +643,7 @@ test('it derives net change from cash lines independently of activity totals', f
         ['account' => $equity, 'debit' => 0, 'credit' => 20000],
     ]);
 
-    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id='.$this->fiscalYear->id)
+    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
         ->assertOk();
 
     $netChange = (float) $response->json('net_change');
@@ -689,7 +689,7 @@ test('it can export cash flow report', function () {
     expect($filename)->toStartWith('cash_flow_report_2026-03-04_10-00-00_');
     expect($filename)->toEndWith('.xlsx');
 
-    Excel::assertStored('exports/'.$filename, 'public');
+    Excel::assertStored('exports/' . $filename, 'public');
     Carbon::setTestNow();
 });
 
@@ -827,7 +827,7 @@ test('it classifies asset disposal gain and loss as investing activity', functio
         ['account' => $gain, 'debit' => 0, 'credit' => 30],
     ]);
 
-    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id='.$this->fiscalYear->id)
+    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
         ->assertOk();
 
     expect((float) $response->json('activities.operating'))->toBe(0.0)
@@ -891,7 +891,7 @@ test('it classifies asset disposal loss from a sale below book value as investin
         ['account' => $equipment, 'debit' => 0, 'credit' => 100],
     ]);
 
-    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id='.$this->fiscalYear->id)
+    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
         ->assertOk();
 
     expect((float) $response->json('activities.operating'))->toBe(0.0)
