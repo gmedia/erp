@@ -2569,6 +2569,27 @@
             "section_name_required": "Nama bagian wajib diisi.",
             "code_required": "Kode wajib diisi.",
             "name_required": "Nama wajib diisi."
+        },
+        "product": {
+            "code_min_2": "Kode minimal 2 karakter.",
+            "name_min_2": "Nama minimal 2 karakter.",
+            "type_required": "Tipe produk wajib diisi.",
+            "category_required": "Kategori wajib diisi.",
+            "unit_required": "Satuan wajib diisi.",
+            "cost_required": "Harga pokok wajib diisi.",
+            "selling_price_required": "Harga jual wajib diisi.",
+            "billing_model_required": "Model penagihan wajib diisi.",
+            "status_required": "Status wajib diisi."
+        },
+        "warehouse": {
+            "code_required": "Kode wajib diisi.",
+            "name_min_2": "Nama minimal 2 karakter.",
+            "branch_required": "Cabang wajib diisi."
+        },
+        "asset_depreciation_calculation": {
+            "fiscal_year_required": "Tahun fiskal wajib diisi.",
+            "period_start_required": "Periode awal wajib diisi.",
+            "period_end_required": "Periode akhir wajib diisi."
         }
     },
     "item_dialog": {

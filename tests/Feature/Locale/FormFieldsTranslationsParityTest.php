@@ -707,3 +707,42 @@ test('purchase request, stock transfer, report config validation messages keep e
         ->and($idValidation['stock_transfer']['quantity_gt_zero'])->toBe('Jumlah harus lebih dari 0.')
         ->and($idValidation['report_configuration']['name_required'])->toBe('Nama wajib diisi.');
 });
+
+test('product, warehouse and asset depreciation calculation validation messages keep the english text', function () {
+    $enValidation = localeValidationTranslations('en.json');
+    $idValidation = localeValidationTranslations('id.json');
+
+    expect($enValidation['product'])->toEqual([
+        'code_min_2' => 'Code must be at least 2 characters.',
+        'name_min_2' => 'Name must be at least 2 characters.',
+        'type_required' => 'Product type is required.',
+        'category_required' => 'Category is required.',
+        'unit_required' => 'Unit is required.',
+        'cost_required' => 'Cost is required.',
+        'selling_price_required' => 'Selling price is required.',
+        'billing_model_required' => 'Billing model is required.',
+        'status_required' => 'Status is required.',
+    ])
+        ->and($enValidation['warehouse'])->toEqual([
+            'code_required' => 'Code is required.',
+            'name_min_2' => 'Name must be at least 2 characters.',
+            'branch_required' => 'Branch is required.',
+        ])
+        ->and($enValidation['asset_depreciation_calculation'])->toEqual([
+            'fiscal_year_required' => 'Fiscal year is required.',
+            'period_start_required' => 'Start period is required.',
+            'period_end_required' => 'End period is required.',
+        ])
+        ->and($idValidation['product']['unit_required'])->toBe('Satuan wajib diisi.')
+        ->and($idValidation['warehouse']['branch_required'])->toBe('Cabang wajib diisi.')
+        ->and($idValidation['asset_depreciation_calculation']['period_end_required'])->toBe('Periode akhir wajib diisi.');
+});
+
+test('validation keys used by schemas.ts section A exist in both locales', function () {
+    $en = localeValidationTranslations('en.json');
+    $id = localeValidationTranslations('id.json');
+
+    foreach (['product', 'warehouse', 'asset_depreciation_calculation'] as $form) {
+        expect(array_keys($en[$form]))->toEqual(array_keys($id[$form]), "validation.{$form} keys differ");
+    }
+});

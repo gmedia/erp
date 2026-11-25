@@ -219,8 +219,8 @@ export const supplierFormSchema = z.object({
 export type SupplierFormData = z.infer<typeof supplierFormSchema>;
 
 export const productFormSchema = z.object({
-    code: z.string().min(2, { message: 'Code must be at least 2 characters.' }),
-    name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
+    code: z.string().min(2, { message: 'validation.product.code_min_2' }),
+    name: z.string().min(2, { message: 'validation.product.name_min_2' }),
     description: z.string().optional(),
     type: z.enum(
         [
@@ -231,21 +231,25 @@ export const productFormSchema = z.object({
             'service',
         ],
         {
-            message: 'Product type is required.',
+            message: 'validation.product.type_required',
         },
     ),
     product_category_id: z
         .string()
-        .min(1, { message: 'Category is required.' }),
-    unit_id: z.string().min(1, requiredMessage('Unit')),
+        .min(1, { message: 'validation.product.category_required' }),
+    unit_id: z
+        .string()
+        .min(1, { message: 'validation.product.unit_required' }),
     branch_id: z.string().optional(),
-    cost: z.string().min(1, { message: 'Cost is required.' }),
-    selling_price: z.string().min(1, { message: 'Selling price is required.' }),
+    cost: z.string().min(1, { message: 'validation.product.cost_required' }),
+    selling_price: z
+        .string()
+        .min(1, { message: 'validation.product.selling_price_required' }),
     billing_model: z.enum(['one_time', 'subscription', 'both'], {
-        message: 'Billing model is required.',
+        message: 'validation.product.billing_model_required',
     }),
     status: z.enum(['active', 'inactive', 'discontinued'], {
-        message: 'Status is required.',
+        message: 'validation.product.status_required',
     }),
     notes: z.string().optional(),
 });
@@ -436,9 +440,11 @@ export const assetLocationFormSchema = z.object({
 export type AssetLocationFormData = z.infer<typeof assetLocationFormSchema>;
 
 export const warehouseFormSchema = z.object({
-    code: z.string().min(1, { message: 'Code is required.' }),
-    name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
-    branch_id: z.string().min(1, { message: 'Branch is required.' }),
+    code: z.string().min(1, { message: 'validation.warehouse.code_required' }),
+    name: z.string().min(2, { message: 'validation.warehouse.name_min_2' }),
+    branch_id: z
+        .string()
+        .min(1, { message: 'validation.warehouse.branch_required' }),
 });
 
 export type WarehouseFormData = z.infer<typeof warehouseFormSchema>;
@@ -565,9 +571,15 @@ export const assetStocktakeFormSchema = z.object({
 export type AssetStocktakeFormData = z.infer<typeof assetStocktakeFormSchema>;
 
 export const assetDepreciationCalculationFormSchema = z.object({
-    fiscal_year_id: z.string().min(1, { message: 'Fiscal year is required.' }),
-    period_start: z.string().min(1, { message: 'Start period is required.' }),
-    period_end: z.string().min(1, { message: 'End period is required.' }),
+    fiscal_year_id: z.string().min(1, {
+        message: 'validation.asset_depreciation_calculation.fiscal_year_required',
+    }),
+    period_start: z.string().min(1, {
+        message: 'validation.asset_depreciation_calculation.period_start_required',
+    }),
+    period_end: z.string().min(1, {
+        message: 'validation.asset_depreciation_calculation.period_end_required',
+    }),
 });
 
 export type AssetDepreciationCalculationFormData = z.infer<

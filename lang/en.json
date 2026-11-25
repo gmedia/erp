@@ -2569,6 +2569,27 @@
             "section_name_required": "Section name is required.",
             "code_required": "Code is required.",
             "name_required": "Name is required."
+        },
+        "product": {
+            "code_min_2": "Code must be at least 2 characters.",
+            "name_min_2": "Name must be at least 2 characters.",
+            "type_required": "Product type is required.",
+            "category_required": "Category is required.",
+            "unit_required": "Unit is required.",
+            "cost_required": "Cost is required.",
+            "selling_price_required": "Selling price is required.",
+            "billing_model_required": "Billing model is required.",
+            "status_required": "Status is required."
+        },
+        "warehouse": {
+            "code_required": "Code is required.",
+            "name_min_2": "Name must be at least 2 characters.",
+            "branch_required": "Branch is required."
+        },
+        "asset_depreciation_calculation": {
+            "fiscal_year_required": "Fiscal year is required.",
+            "period_start_required": "Start period is required.",
+            "period_end_required": "End period is required."
         }
     },
     "item_dialog": {
