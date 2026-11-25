@@ -1080,6 +1080,35 @@
         "asset_depreciation_runs": {
             "title": "Penyusutan Aset",
             "description": "Hitung dan tinjau penyusutan aset. Setelah diverifikasi, posting jumlah yang dihitung ke buku besar."
+        },
+        "balance_sheet": {
+            "description": "Posisi keuangan pada suatu tanggal: aset, liabilitas, dan ekuitas."
+        },
+        "income_statement": {
+            "description": "Pendapatan dan beban dalam satu periode untuk menunjukkan laba bersih."
+        },
+        "cash_flow": {
+            "description": "Pergerakan kas dikelompokkan menjadi aktivitas operasi, investasi, dan pendanaan."
+        },
+        "comparative": {
+            "title": "Laporan Perbandingan",
+            "description": "Bandingkan aset, liabilitas, ekuitas, pendapatan, dan beban antar tahun fiskal."
+        },
+        "trial_balance": {
+            "description": "Total debit dan kredit setiap akun untuk memastikan pembukuan seimbang."
+        },
+        "trial_balance_detailed": {
+            "description": "Neraca uji dengan saldo awal, mutasi, dan saldo akhir per akun."
+        },
+        "general_ledger": {
+            "title": "Laporan Buku Besar",
+            "description": "Setiap baris jurnal yang diposting ke akun dalam satu periode, dengan saldo berjalan."
+        },
+        "financial_dashboard": {
+            "description": "Pantau metrik keuangan utama, arus kas, dan tren beban."
+        },
+        "aging_dashboard": {
+            "description": "Pantau piutang dan utang yang belum dibayar, dikelompokkan berdasarkan umur jatuh tempo."
         }
     },
     "stock_monitor_summary": {

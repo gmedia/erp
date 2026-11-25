@@ -50,6 +50,7 @@ type ComparisonFinancialReportPageOptions<TReport> = {
 
 type FinancialReportPageShellProps = {
     title: string;
+    titleKey?: string;
     description?: string;
     descriptionKey?: string;
     path: string;
@@ -282,7 +283,8 @@ export function FinancialReportHeaderMeta({
 }
 
 export function FinancialReportPageShell({
-    title,
+    title: fallbackTitle,
+    titleKey,
     description,
     descriptionKey,
     path,
@@ -300,6 +302,9 @@ export function FinancialReportPageShell({
     children,
 }: Readonly<FinancialReportPageShellProps>) {
     const { t } = useTranslation();
+    const title = titleKey
+        ? translateOr(t, titleKey, fallbackTitle)
+        : fallbackTitle;
     const breadcrumbs = buildBreadcrumbs(t, title, path);
 
     let content: ReactNode;

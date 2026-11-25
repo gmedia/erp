@@ -425,6 +425,115 @@ test('reports breadcrumb group label is translated in both locales', function ()
         ->and($id['breadcrumbGroup'])->toBe('Laporan');
 });
 
+test('financial report group page strings keep the english labels', function () {
+    $en = localePageTranslations('en.json');
+
+    expect($en['balance_sheet']['description'])->toBe(
+        'Financial position at a point in time: assets, liabilities, and equity.',
+    )
+        ->and($en['income_statement']['description'])->toBe(
+            'Revenue and expenses over a period to show net income.',
+        )
+        ->and($en['cash_flow']['description'])->toBe(
+            'Cash movements grouped into operating, investing, and financing activities.',
+        )
+        ->and($en['comparative']['title'])->toBe('Comparative Report')
+        ->and($en['comparative']['description'])->toBe(
+            'Compare assets, liabilities, equity, revenue, and expenses across fiscal years.',
+        )
+        ->and($en['trial_balance']['description'])->toBe(
+            'Debit and credit totals of every account to check that the books balance.',
+        )
+        ->and($en['trial_balance_detailed']['description'])->toBe(
+            'Trial balance with opening, movement, and closing balance per account.',
+        )
+        ->and($en['general_ledger']['title'])->toBe('General Ledger Report')
+        ->and($en['general_ledger']['description'])->toBe(
+            'Every journal line posted to an account within a period, with running balance.',
+        )
+        ->and($en['financial_dashboard']['description'])->toBe(
+            'Monitor key financial metrics, cash flow, and expense trends.',
+        )
+        ->and($en['aging_dashboard']['description'])->toBe(
+            'Monitor outstanding receivables and payables bucketed by overdue age.',
+        );
+});
+
+test('financial report group page strings are translated to indonesian', function () {
+    $en = localePageTranslations('en.json');
+    $id = localePageTranslations('id.json');
+
+    $modules = [
+        'balance_sheet',
+        'income_statement',
+        'cash_flow',
+        'comparative',
+        'trial_balance',
+        'trial_balance_detailed',
+        'general_ledger',
+        'financial_dashboard',
+        'aging_dashboard',
+    ];
+
+    foreach ($modules as $module) {
+        foreach (array_keys($en[$module]) as $field) {
+            expect($id[$module][$field])->not->toBe($en[$module][$field], "page.{$module}.{$field} not translated");
+        }
+    }
+
+    expect($id['comparative']['title'])->toBe('Laporan Perbandingan')
+        ->and($id['general_ledger']['title'])->toBe('Laporan Buku Besar');
+});
+
+test('financial report group page titles follow the menu-or-exception decision', function () {
+    // Aturan (issue #462 <!-- decision -->): judul memakai menu.* bila teks English sama.
+    // Pengecualian eksplisit: judul English beda dengan menu, jadi tetap page.<slug>.title.
+    $menuTitles = [
+        'balance_sheet' => 'balance_sheet_report',
+        'income_statement' => 'income_statement_report',
+        'cash_flow' => 'cash_flow_report',
+        'trial_balance' => 'trial_balance_report',
+        'trial_balance_detailed' => 'trial_balance_detailed_report',
+        'financial_dashboard' => 'financial_dashboard',
+        'aging_dashboard' => 'aging_dashboard',
+    ];
+    $exceptions = [
+        'comparative' => 'comparative_report',
+        'general_ledger' => 'general_ledger_report',
+    ];
+
+    $en = json_decode(File::get(lang_path('en.json')), true, 512, JSON_THROW_ON_ERROR);
+
+    foreach ($exceptions as $pageKey => $menuKey) {
+        expect($en['page'][$pageKey]['title'])->not->toBe(
+            $en['menu'][$menuKey],
+            "page.{$pageKey}.title equals menu.{$menuKey}; move it out of the exception list",
+        );
+    }
+
+    foreach (['en.json', 'id.json'] as $file) {
+        $menu = json_decode(File::get(lang_path($file)), true, 512, JSON_THROW_ON_ERROR)['menu'];
+        $page = localePageTranslations($file);
+
+        foreach ($menuTitles as $menuKey) {
+            expect(array_key_exists($menuKey, $menu))->toBeTrue("menu.{$menuKey} missing");
+        }
+
+        foreach ($exceptions as $pageKey => $menuKey) {
+            expect(array_key_exists('title', $page[$pageKey]))->toBeTrue("page.{$pageKey}.title missing");
+            expect(array_key_exists($menuKey, $menu))->toBeTrue("menu.{$menuKey} missing");
+        }
+    }
+
+    expect($en['menu']['balance_sheet_report'])->toBe('Balance Sheet')
+        ->and($en['menu']['income_statement_report'])->toBe('Income Statement')
+        ->and($en['menu']['cash_flow_report'])->toBe('Cash Flow')
+        ->and($en['menu']['trial_balance_report'])->toBe('Trial Balance')
+        ->and($en['menu']['trial_balance_detailed_report'])->toBe('Trial Balance Detailed')
+        ->and($en['menu']['financial_dashboard'])->toBe('Financial Dashboard')
+        ->and($en['menu']['aging_dashboard'])->toBe('Aging Dashboard');
+});
+
 test('page translation values are non-empty strings', function () {
     foreach (['en.json', 'id.json'] as $file) {
         foreach (localePageTranslations($file) as $module => $strings) {

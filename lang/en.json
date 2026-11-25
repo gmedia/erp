@@ -1080,6 +1080,35 @@
         "asset_depreciation_runs": {
             "title": "Asset Depreciation Runs",
             "description": "Calculate and review asset depreciation. Once verified, post the calculated amounts to the general ledger."
+        },
+        "balance_sheet": {
+            "description": "Financial position at a point in time: assets, liabilities, and equity."
+        },
+        "income_statement": {
+            "description": "Revenue and expenses over a period to show net income."
+        },
+        "cash_flow": {
+            "description": "Cash movements grouped into operating, investing, and financing activities."
+        },
+        "comparative": {
+            "title": "Comparative Report",
+            "description": "Compare assets, liabilities, equity, revenue, and expenses across fiscal years."
+        },
+        "trial_balance": {
+            "description": "Debit and credit totals of every account to check that the books balance."
+        },
+        "trial_balance_detailed": {
+            "description": "Trial balance with opening, movement, and closing balance per account."
+        },
+        "general_ledger": {
+            "title": "General Ledger Report",
+            "description": "Every journal line posted to an account within a period, with running balance."
+        },
+        "financial_dashboard": {
+            "description": "Monitor key financial metrics, cash flow, and expense trends."
+        },
+        "aging_dashboard": {
+            "description": "Monitor outstanding receivables and payables bucketed by overdue age."
         }
     },
     "stock_monitor_summary": {

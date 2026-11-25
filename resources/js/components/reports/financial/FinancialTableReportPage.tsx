@@ -76,6 +76,7 @@ type FinancialAmountColumn<TItem extends FinancialTableRow> = {
 
 type SingleYearFinancialReportPageShellProps = {
     title: string;
+    titleKey?: string;
     description?: string;
     descriptionKey?: string;
     path: string;
@@ -103,6 +104,18 @@ type FinancialTableCardProps<TItem extends FinancialTableRow> = {
     footerColSpan?: number;
     footerLeadingCell?: ReactNode;
     children?: ReactNode;
+};
+
+export const resolveShellTitle = (
+    t: (key: string) => string,
+    key: string | undefined,
+    fallback: string,
+): string => {
+    if (!key) {
+        return fallback;
+    }
+    const translated = t(key);
+    return translated === key ? fallback : translated;
 };
 
 const buildBreadcrumbs = (
@@ -228,7 +241,8 @@ export function useSingleYearFinancialReportPage<TReport>({
 }
 
 export function SingleYearFinancialReportPageShell({
-    title,
+    title: fallbackTitle,
+    titleKey,
     description,
     descriptionKey,
     path,
@@ -245,6 +259,7 @@ export function SingleYearFinancialReportPageShell({
     children,
 }: Readonly<SingleYearFinancialReportPageShellProps>) {
     const { t } = useTranslation();
+    const title = resolveShellTitle(t, titleKey, fallbackTitle);
     let content: ReactNode;
     if (isLoading) {
         content = (
