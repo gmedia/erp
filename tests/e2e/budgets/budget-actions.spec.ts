@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 import { login } from '../helpers';
+import { searchBudget } from './helpers';
 
 const EDITOR_EMAIL = 'budget-editor@example.com';
 const VIEWER_EMAIL = 'budget-viewer@example.com';
@@ -52,6 +53,7 @@ function resetFixtureBudget(status: 'draft' | 'approved'): void {
 }
 
 async function openFixtureRow(page: import('@playwright/test').Page) {
+    await searchBudget(page, FIXTURE_NAME);
     const row = page.locator('tbody tr', { hasText: FIXTURE_NAME }).first();
     await expect(row).toBeVisible({ timeout: 15000 });
     return row;

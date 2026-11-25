@@ -1,4 +1,5 @@
 import { Page, expect } from '@playwright/test';
+import { expectResponseOk } from '../helpers';
 
 /**
  * Pick a day from an open DatePicker calendar (line-row placeholders).
@@ -57,6 +58,10 @@ export async function createBudget(
 
   const addButton = page.getByRole('button', { name: /Add/i });
   await expect(addButton).toBeVisible();
+  const fyMeta = page.waitForResponse(
+    (r) => r.url().includes('/api/fiscal-years') && r.request().method() === 'GET',
+    { timeout: 15000 },
+  );
   await addButton.click();
 
   const dialog = page.getByRole('dialog', { name: /Add New Budget/i });
@@ -73,13 +78,15 @@ export async function createBudget(
       .click();
   }
 
-  // Fiscal year — preferred meta may auto-select; otherwise pick first option
-  const fyTrigger = dialog.locator('button').filter({ hasText: /Select fiscal year/i });
-  if (await fyTrigger.isVisible().catch(() => false)) {
-    await selectFirstComboboxOption(page, fyTrigger);
+  const fyResponse = await fyMeta;
+  await expectResponseOk(fyResponse);
+  const fyTrigger = dialog.getByRole('combobox', { name: 'Fiscal Year' });
+  await expect(fyTrigger).toBeVisible();
+  const preferredFiscalYearId = (await fyResponse.json())?.meta?.preferred_fiscal_year_id;
+  if (preferredFiscalYearId) {
+    await expect(fyTrigger).not.toHaveText(/Select fiscal year/i);
   } else {
-    // Already auto-selected — wait briefly for preferred resolution
-    await page.waitForTimeout(500);
+    await selectFirstComboboxOption(page, fyTrigger);
   }
 
   // Add one budget line (inline editing row)
@@ -108,17 +115,14 @@ export async function createBudget(
   }
 
   const responsePromise = page.waitForResponse(
-    (r) =>
-      r.url().includes('/api/budgets') &&
-      r.request().method() === 'POST' &&
-      r.status() < 400,
+    (r) => r.url().includes('/api/budgets') && r.request().method() === 'POST',
     { timeout: 20000 },
   );
 
   const submitButton = dialog.getByRole('button', { name: /Add/i }).last();
   await expect(submitButton).toBeVisible();
   await submitButton.click();
-  await responsePromise;
+  await expectResponseOk(await responsePromise);
   await expect(dialog).not.toBeVisible({ timeout: 15000 });
 
   return name;
@@ -136,12 +140,12 @@ export async function searchBudget(page: Page, name: string): Promise<void> {
   }
 
   const responsePromise = page.waitForResponse(
-    (r) => r.url().includes('/api/budgets') && r.status() < 400,
+    (r) => r.url().includes('/api/budgets') && r.request().method() === 'GET',
   );
   await searchInput.clear();
   await searchInput.fill(normalized);
   await searchInput.press('Enter');
-  await responsePromise;
+  await expectResponseOk(await responsePromise);
 }
 
 /**
@@ -174,6 +178,6 @@ export async function editBudget(
   const updateBtn = dialog.getByRole('button', { name: /Update/i });
   await expect(updateBtn).toBeVisible();
   await updateBtn.click();
-  await responsePromise;
+  await expectResponseOk(await responsePromise);
   await expect(dialog).not.toBeVisible({ timeout: 15000 });
 }
