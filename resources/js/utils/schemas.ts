@@ -777,19 +777,15 @@ export const stockTransferQuantityReceivedSchema = z.preprocess(
 
 export const stockTransferFormSchema = z.object({
     transfer_number: z.string().optional(),
-    from_warehouse_id: z
-        .string()
-        .min(1, {
-            message: 'validation.stock_transfer.from_warehouse_required',
-        }),
+    from_warehouse_id: z.string().min(1, {
+        message: 'validation.stock_transfer.from_warehouse_required',
+    }),
     to_warehouse_id: z
         .string()
         .min(1, { message: 'validation.stock_transfer.to_warehouse_required' }),
-    transfer_date: z
-        .string()
-        .min(1, {
-            message: 'validation.stock_transfer.transfer_date_required',
-        }),
+    transfer_date: z.string().min(1, {
+        message: 'validation.stock_transfer.transfer_date_required',
+    }),
     expected_arrival_date: z.string().optional().nullable(),
     status: z.enum(
         [
@@ -809,23 +805,17 @@ export const stockTransferFormSchema = z.object({
     items: z
         .array(
             z.object({
-                product_id: z
-                    .string()
-                    .min(1, {
-                        message: 'validation.stock_transfer.product_required',
-                    }),
+                product_id: z.string().min(1, {
+                    message: 'validation.stock_transfer.product_required',
+                }),
                 product_label: z.string().optional(),
-                unit_id: z
-                    .string()
-                    .min(1, {
-                        message: 'validation.stock_transfer.unit_required',
-                    }),
+                unit_id: z.string().min(1, {
+                    message: 'validation.stock_transfer.unit_required',
+                }),
                 unit_label: z.string().optional(),
-                quantity: z.coerce
-                    .number()
-                    .gt(0, {
-                        message: 'validation.stock_transfer.quantity_gt_zero',
-                    }),
+                quantity: z.coerce.number().gt(0, {
+                    message: 'validation.stock_transfer.quantity_gt_zero',
+                }),
                 quantity_received: stockTransferQuantityReceivedSchema,
                 unit_cost: z.coerce.number().min(0).optional().default(0),
                 notes: z.string().optional(),
@@ -845,11 +835,9 @@ export const inventoryStocktakeItemSchema = z.object({
         .string()
         .min(1, { message: 'validation.inventory_stocktake.unit_required' }),
     unit_label: z.string().optional(),
-    system_quantity: z.coerce
-        .number()
-        .min(0, {
-            message: 'validation.inventory_stocktake.system_quantity_min_zero',
-        }),
+    system_quantity: z.coerce.number().min(0, {
+        message: 'validation.inventory_stocktake.system_quantity_min_zero',
+    }),
     counted_quantity: z.coerce
         .number()
         .min(0, {
@@ -862,16 +850,12 @@ export const inventoryStocktakeItemSchema = z.object({
 
 export const inventoryStocktakeFormSchema = z.object({
     stocktake_number: z.string().optional(),
-    warehouse_id: z
-        .string()
-        .min(1, {
-            message: 'validation.inventory_stocktake.warehouse_required',
-        }),
-    stocktake_date: z
-        .string()
-        .min(1, {
-            message: 'validation.inventory_stocktake.stocktake_date_required',
-        }),
+    warehouse_id: z.string().min(1, {
+        message: 'validation.inventory_stocktake.warehouse_required',
+    }),
+    stocktake_date: z.string().min(1, {
+        message: 'validation.inventory_stocktake.stocktake_date_required',
+    }),
     status: z.enum(['draft', 'in_progress', 'completed', 'cancelled'], {
         message: 'validation.inventory_stocktake.status_required',
     }),
@@ -918,11 +902,9 @@ export const stockAdjustmentFormSchema = z.object({
     warehouse_id: z
         .string()
         .min(1, { message: 'validation.stock_adjustment.warehouse_required' }),
-    adjustment_date: z
-        .string()
-        .min(1, {
-            message: 'validation.stock_adjustment.adjustment_date_required',
-        }),
+    adjustment_date: z.string().min(1, {
+        message: 'validation.stock_adjustment.adjustment_date_required',
+    }),
     adjustment_type: z.enum(
         [
             'damage',
@@ -956,11 +938,9 @@ export const purchaseRequestFormSchema = z.object({
         .min(1, { message: 'validation.purchase_request.branch_required' }),
     department_id: z.string().optional(),
     requested_by: z.string().optional(),
-    request_date: z
-        .string()
-        .min(1, {
-            message: 'validation.purchase_request.request_date_required',
-        }),
+    request_date: z.string().min(1, {
+        message: 'validation.purchase_request.request_date_required',
+    }),
     required_date: z.string().optional().nullable(),
     priority: z.enum(['low', 'normal', 'high', 'urgent'], {
         message: 'validation.purchase_request.priority_required',
@@ -985,21 +965,15 @@ export const purchaseRequestFormSchema = z.object({
     items: z
         .array(
             z.object({
-                product_id: z
-                    .string()
-                    .min(1, {
-                        message: 'validation.purchase_request.product_required',
-                    }),
-                unit_id: z
-                    .string()
-                    .min(1, {
-                        message: 'validation.purchase_request.unit_required',
-                    }),
-                quantity: z.coerce
-                    .number()
-                    .gt(0, {
-                        message: 'validation.purchase_request.quantity_gt_zero',
-                    }),
+                product_id: z.string().min(1, {
+                    message: 'validation.purchase_request.product_required',
+                }),
+                unit_id: z.string().min(1, {
+                    message: 'validation.purchase_request.unit_required',
+                }),
+                quantity: z.coerce.number().gt(0, {
+                    message: 'validation.purchase_request.quantity_gt_zero',
+                }),
                 estimated_unit_price: z.coerce
                     .number()
                     .min(0)
@@ -1070,11 +1044,9 @@ export type PurchaseOrderFormData = z.infer<typeof purchaseOrderFormSchema>;
 
 export const goodsReceiptFormSchema = z.object({
     gr_number: z.string().optional(),
-    purchase_order_id: z
-        .string()
-        .min(1, {
-            message: 'validation.goods_receipt.purchase_order_required',
-        }),
+    purchase_order_id: z.string().min(1, {
+        message: 'validation.goods_receipt.purchase_order_required',
+    }),
     warehouse_id: z
         .string()
         .min(1, { message: 'validation.goods_receipt.warehouse_required' }),
@@ -1090,21 +1062,15 @@ export const goodsReceiptFormSchema = z.object({
     items: z
         .array(
             z.object({
-                purchase_order_item_id: z
-                    .string()
-                    .min(1, {
-                        message: 'validation.goods_receipt.po_item_required',
-                    }),
-                product_id: z
-                    .string()
-                    .min(1, {
-                        message: 'validation.goods_receipt.product_required',
-                    }),
-                unit_id: z
-                    .string()
-                    .min(1, {
-                        message: 'validation.goods_receipt.unit_required',
-                    }),
+                purchase_order_item_id: z.string().min(1, {
+                    message: 'validation.goods_receipt.po_item_required',
+                }),
+                product_id: z.string().min(1, {
+                    message: 'validation.goods_receipt.product_required',
+                }),
+                unit_id: z.string().min(1, {
+                    message: 'validation.goods_receipt.unit_required',
+                }),
                 quantity_received: z.coerce.number().gt(0, {
                     message:
                         'validation.goods_receipt.quantity_received_gt_zero',
@@ -1118,11 +1084,9 @@ export const goodsReceiptFormSchema = z.object({
                     .min(0)
                     .optional()
                     .default(0),
-                unit_price: z.coerce
-                    .number()
-                    .min(0, {
-                        message: 'validation.goods_receipt.unit_price_min_zero',
-                    }),
+                unit_price: z.coerce.number().min(0, {
+                    message: 'validation.goods_receipt.unit_price_min_zero',
+                }),
                 notes: z.string().optional(),
             }),
         )
@@ -1133,11 +1097,9 @@ export type GoodsReceiptFormData = z.infer<typeof goodsReceiptFormSchema>;
 
 export const supplierReturnFormSchema = z.object({
     return_number: z.string().optional(),
-    purchase_order_id: z
-        .string()
-        .min(1, {
-            message: 'validation.supplier_return.purchase_order_required',
-        }),
+    purchase_order_id: z.string().min(1, {
+        message: 'validation.supplier_return.purchase_order_required',
+    }),
     goods_receipt_id: z.string().optional(),
     supplier_id: z
         .string()
@@ -1161,27 +1123,20 @@ export const supplierReturnFormSchema = z.object({
     items: z
         .array(
             z.object({
-                goods_receipt_item_id: z
-                    .string()
-                    .min(1, {
-                        message: 'validation.supplier_return.gr_item_required',
-                    }),
-                product_id: z
-                    .string()
-                    .min(1, {
-                        message: 'validation.supplier_return.product_required',
-                    }),
+                goods_receipt_item_id: z.string().min(1, {
+                    message: 'validation.supplier_return.gr_item_required',
+                }),
+                product_id: z.string().min(1, {
+                    message: 'validation.supplier_return.product_required',
+                }),
                 unit_id: z.string().optional(),
                 quantity_returned: z.coerce.number().gt(0, {
                     message:
                         'validation.supplier_return.quantity_returned_gt_zero',
                 }),
-                unit_price: z.coerce
-                    .number()
-                    .min(0, {
-                        message:
-                            'validation.supplier_return.unit_price_min_zero',
-                    }),
+                unit_price: z.coerce.number().min(0, {
+                    message: 'validation.supplier_return.unit_price_min_zero',
+                }),
                 notes: z.string().optional(),
             }),
         )
@@ -1457,16 +1412,12 @@ export const creditNoteFormSchema = z.object({
 export type CreditNoteFormData = z.infer<typeof creditNoteFormSchema>;
 
 export const transactionItemPricingSchema = {
-    quantity: z.coerce
-        .number()
-        .gt(0, {
-            message: 'validation.transaction_item_pricing.quantity_gt_zero',
-        }),
-    unit_price: z.coerce
-        .number()
-        .min(0, {
-            message: 'validation.transaction_item_pricing.unit_price_min_zero',
-        }),
+    quantity: z.coerce.number().gt(0, {
+        message: 'validation.transaction_item_pricing.quantity_gt_zero',
+    }),
+    unit_price: z.coerce.number().min(0, {
+        message: 'validation.transaction_item_pricing.unit_price_min_zero',
+    }),
     discount_percent: z.coerce.number().min(0).max(100).optional().default(0),
     tax_percent: z.coerce.number().min(0).max(100).optional().default(0),
 };
