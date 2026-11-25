@@ -15,7 +15,7 @@ import {
     formatNumberByRegionalSettings,
 } from '@/utils/number-format';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 // Type definitions for better type safety
@@ -87,21 +87,40 @@ export function createSortingHeader(
                 toggleSorting: (value: boolean) => void;
                 getIsSorted: () => 'asc' | 'desc' | false;
             };
-        }) => (
-            <div className={cn(isRight && 'flex justify-end')}>
-                <Button
-                    variant="ghost"
-                    className={cn('-ml-2 h-8 px-2', isRight && '-mr-2 ml-0')}
-                    onClick={() =>
-                        column.toggleSorting(column.getIsSorted() === 'asc')
-                    }
-                    data-testid={`sort-${label.toLowerCase().replaceAll(/\s+/g, '-')}`}
-                >
-                    {label}
-                    <ArrowUpDown className="ml-2 h-4 w-4 shrink-0" />
-                </Button>
-            </div>
-        ),
+        }) => {
+            const sorted = column.getIsSorted();
+            const SortIcon =
+                sorted === 'asc'
+                    ? ArrowUp
+                    : sorted === 'desc'
+                      ? ArrowDown
+                      : ArrowUpDown;
+            return (
+                <div className={cn(isRight && 'flex justify-end')}>
+                    <Button
+                        variant="ghost"
+                        className={cn(
+                            '-ml-2 h-8 px-2',
+                            isRight && '-mr-2 ml-0',
+                            sorted && 'text-foreground',
+                        )}
+                        onClick={() =>
+                            column.toggleSorting(column.getIsSorted() === 'asc')
+                        }
+                        data-testid={`sort-${label.toLowerCase().replaceAll(/\s+/g, '-')}`}
+                        data-sort-state={sorted || 'none'}
+                    >
+                        {label}
+                        <SortIcon
+                            className={cn(
+                                'ml-2 h-4 w-4 shrink-0',
+                                !sorted && 'text-muted-foreground',
+                            )}
+                        />
+                    </Button>
+                </div>
+            );
+        },
     };
 }
 

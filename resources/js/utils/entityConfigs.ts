@@ -11,7 +11,7 @@ import {
     type Pipeline,
     type Warehouse,
 } from '@/types/entity';
-import { type ColumnDef } from '@tanstack/react-table';
+import { type ColumnDef, type SortingState } from '@tanstack/react-table';
 import * as React from 'react';
 
 // Base configuration interface for all entities with improved typing
@@ -55,6 +55,8 @@ export interface CustomEntityConfig<
     readonly viewModalComponent?: React.ComponentType<any>;
     // Kolom yang disembunyikan default (dapat diaktifkan lewat menu Columns)
     readonly defaultColumnVisibility?: Record<string, boolean>;
+    // Urutan awal sama dengan default backend (indikator sort aktif di header)
+    readonly defaultSorting?: SortingState;
     // Opt-in: saat Edit, muat detail (GET /:id) sebelum form dibuka. Default off;
     // hanya entity yang item-nya tidak ada di respons list (mis. stock transfer).
     readonly loadDetailOnEdit?: boolean;
@@ -173,6 +175,7 @@ export interface SimpleEntityConfigOptions<T = unknown> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     viewModalComponent?: React.ComponentType<any>;
     getDeleteMessage?: (item: T) => string;
+    defaultSorting?: SortingState;
 }
 
 export interface ComplexEntityConfigOptions<T = Record<string, unknown>> {
@@ -195,6 +198,7 @@ export interface ComplexEntityConfigOptions<T = Record<string, unknown>> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     viewModalComponent?: React.ComponentType<any>;
     defaultColumnVisibility?: Record<string, boolean>;
+    defaultSorting?: SortingState;
     loadDetailOnEdit?: boolean;
     detailLoadErrorMessage?: string;
     permissionPrefix?: string;
@@ -230,6 +234,7 @@ function createSimpleEntityConfig<
         apiBase,
         filterPlaceholder,
         permissionPrefix,
+        defaultSorting,
     } = options;
 
     return {
@@ -237,6 +242,7 @@ function createSimpleEntityConfig<
         entityNamePlural,
         description,
         permissionPrefix,
+        defaultSorting,
         apiEndpoint: `/api/${apiBase}`,
         exportEndpoint: `/api/${apiBase}/export`,
         queryKey: [apiBase],
@@ -274,6 +280,7 @@ function createComplexEntityConfig<T = Record<string, unknown>>(
         getDeleteMessage: options.getDeleteMessage,
         viewModalComponent: options.viewModalComponent,
         defaultColumnVisibility: options.defaultColumnVisibility,
+        defaultSorting: options.defaultSorting,
         loadDetailOnEdit: options.loadDetailOnEdit,
         detailLoadErrorMessage: options.detailLoadErrorMessage,
         permissionPrefix: options.permissionPrefix,
@@ -297,6 +304,7 @@ export const positionConfig = createSimpleEntityConfig({
     apiBase: 'positions',
     filterPlaceholder: 'Search positions...',
     permissionPrefix: 'position',
+    defaultSorting: [{ id: 'created_at', desc: true }],
 });
 
 export const branchConfig = createSimpleEntityConfig({
@@ -431,6 +439,7 @@ export const stockTransferConfig = createComplexEntityConfig<StockTransfer>({
     detailLoadErrorMessage:
         'Failed to load stock transfer details. Please try again.',
     entityNameForSearch: 'stock transfer',
+    defaultSorting: [{ id: 'created_at', desc: true }],
     viewModalComponent: StockTransferViewModal,
     getDeleteMessage: (transfer: { transfer_number?: string | null }) =>
         `This action cannot be undone. This will cancel stock transfer ${transfer.transfer_number || ''}.`,
@@ -489,6 +498,7 @@ export const stockAdjustmentConfig = createComplexEntityConfig<StockAdjustment>(
         formComponent: StockAdjustmentForm,
         formType: 'complex',
         entityNameForSearch: 'stock adjustment',
+        defaultSorting: [{ id: 'created_at', desc: true }],
         viewModalComponent: StockAdjustmentViewModal,
         getDeleteMessage: (adjustment: { adjustment_number?: string | null }) =>
             `This action cannot be undone. This will cancel stock adjustment ${adjustment.adjustment_number || ''}.`,

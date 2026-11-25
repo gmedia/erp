@@ -179,6 +179,8 @@ export interface DataTableProps<T> {
     emptyState?: React.ReactNode;
     /** Kolom yang disembunyikan secara default (dapat diaktifkan via Columns). */
     defaultColumnVisibility?: Record<string, boolean>;
+    /** Urutan awal yang sama dengan default backend; menampilkan indikator sort aktif. */
+    defaultSorting?: SortingState;
     controlsDisabled?: boolean;
     /** Baris ringkasan (mis. total) yang tampil tepat di bawah tabel, di atas pagination. */
     footer?: React.ReactNode;
@@ -218,11 +220,14 @@ export function DataTable<T>({
     entityName,
     emptyState,
     defaultColumnVisibility,
+    defaultSorting,
     controlsDisabled = false,
     footer,
     edgeFade = true,
 }: Readonly<DataTableProps<T>>) {
-    const [sorting, setSorting] = React.useState<SortingState>([]);
+    const [sorting, setSorting] = React.useState<SortingState>(
+        defaultSorting ?? [],
+    );
     const [columnVisibility, setColumnVisibility] =
         React.useState<VisibilityState>(defaultColumnVisibility ?? {});
     const [rowSelection, setRowSelection] = React.useState({});
