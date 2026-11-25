@@ -156,10 +156,34 @@ class StockMovementSampleDataSeeder extends Seeder
                     $line->save();
                 }
 
+                // Draft lama dari seed sebelumnya dilepas dulu. CreateStocktakeAdjustmentDraftAction
+                // melewati stocktake yang sudah punya SA, sehingga quantity_before tidak ikut saldo baru.
+                $this->deleteStocktakeAdjustmentDrafts($stocktake);
+
                 if ($stocktake->status === 'completed') {
                     app(CreateStocktakeAdjustmentDraftAction::class)->execute($stocktake->refresh());
                 }
             });
+    }
+
+    /**
+     * Lepas draft SA stocktake_result milik opname demo beserta barisnya. Hanya SA
+     * tanpa jurnal yang dilepas; SA yang sudah disetujui tidak disentuh di sini.
+     */
+    private function deleteStocktakeAdjustmentDrafts(InventoryStocktake $stocktake): void
+    {
+        $adjustmentIds = StockAdjustment::query()
+            ->where('inventory_stocktake_id', $stocktake->id)
+            ->where('adjustment_type', 'stocktake_result')
+            ->where('status', 'draft')
+            ->pluck('id');
+
+        if ($adjustmentIds->isEmpty()) {
+            return;
+        }
+
+        StockAdjustmentItem::query()->whereIn('stock_adjustment_id', $adjustmentIds)->delete();
+        StockAdjustment::query()->whereIn('id', $adjustmentIds)->delete();
     }
 
     /**
