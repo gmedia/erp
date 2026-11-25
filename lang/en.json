@@ -929,12 +929,14 @@
         "purchase_orders": {
             "title": "Purchase Orders",
             "description": "Orders sent to suppliers with receipt and billing progress.",
-            "search_placeholder": "Search purchase orders..."
+            "search_placeholder": "Search purchase orders...",
+            "filter_search_placeholder": "Search PO number, payment terms, notes, or shipping address..."
         },
         "products": {
             "title": "Product",
             "description": "Products, materials, and services with pricing and stock settings.",
-            "search_placeholder": "Search products..."
+            "search_placeholder": "Search products...",
+            "filter_search_placeholder": "Search code, name..."
         },
         "journal_entries": {
             "title": "Journal Entries",

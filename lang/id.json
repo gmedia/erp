@@ -929,12 +929,14 @@
         "purchase_orders": {
             "title": "Pesanan Pembelian",
             "description": "Pesanan yang dikirim ke pemasok beserta progres penerimaan dan penagihan.",
-            "search_placeholder": "Cari pesanan pembelian..."
+            "search_placeholder": "Cari pesanan pembelian...",
+            "filter_search_placeholder": "Cari no. PO, term pembayaran, catatan, atau alamat pengiriman..."
         },
         "products": {
             "title": "Produk",
             "description": "Produk, bahan, dan jasa beserta pengaturan harga dan stok.",
-            "search_placeholder": "Cari produk..."
+            "search_placeholder": "Cari produk...",
+            "filter_search_placeholder": "Cari kode, nama..."
         },
         "journal_entries": {
             "title": "Jurnal Umum",

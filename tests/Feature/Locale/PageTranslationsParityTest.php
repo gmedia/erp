@@ -842,6 +842,20 @@ test('assets and employees search placeholders keep english and are translated t
         ->and($id['employees']['search_placeholder'])->toBe('Cari karyawan...');
 });
 
+test('products and purchase orders filter placeholders keep english and are translated to indonesian', function () {
+    $en = localePageTranslations('en.json');
+    $id = localePageTranslations('id.json');
+
+    expect($en['products']['filter_search_placeholder'])->toBe('Search code, name...')
+        ->and($en['purchase_orders']['filter_search_placeholder'])->toBe(
+            'Search PO number, payment terms, notes, or shipping address...',
+        )
+        ->and($id['products']['filter_search_placeholder'])->toBe('Cari kode, nama...')
+        ->and($id['purchase_orders']['filter_search_placeholder'])->not->toBe(
+            $en['purchase_orders']['filter_search_placeholder'],
+        );
+});
+
 test('ap aging report title uses the sidebar menu label in both locales', function () {
     foreach (['en.json', 'id.json'] as $file) {
         $menu = json_decode(File::get(lang_path($file)), true, 512, JSON_THROW_ON_ERROR)['menu'];
