@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Actions\AccountingPosting\PostAssetDisposalJournalAction;
 use App\Actions\AccountingPosting\PostAssetLossJournalAction;
 use App\Actions\AssetDepreciationRuns\CalculateDepreciationAction;
 use App\Actions\AssetDepreciationRuns\PostDepreciationToJournalAction;
@@ -11,6 +12,7 @@ use App\Models\AssetDepreciationLine;
 use App\Models\AssetDepreciationRun;
 use App\Models\CoaVersion;
 use App\Models\FiscalYear;
+use App\Models\JournalEntry;
 use App\Models\JournalEntryLine;
 use App\Models\User;
 use Database\Seeders\Concerns\ReopensDemoPeriodClosings;
@@ -68,15 +70,30 @@ class AssetDepreciationNormalizationSeeder extends Seeder
 
         $this->syncRegisterFromPostedSources();
 
-        // Jurnal aset hilang hanya setelah akumulasi register final. Dipost
-        // lebih awal, akun 12200 tidak ikut didebit (#357, FA-000008).
+        // Jurnal pelepasan (disposed) dan aset hilang hanya setelah akumulasi
+        // register final. Dipost lebih awal, akun 12200 tidak ikut didebit (#357, #442).
+        // Hanya aset yang dikapitalisasi di GL (punya jurnal ACQ) yang dijurnal.
+        // Aset yang diperoleh dan dilepas sebelum FY terbuka tidak pernah ada di
+        // buku besar, sehingga pelepasannya tidak dijurnal (keputusan reviewer #442).
         $this->demoAssets()->get()->each(function (Asset $asset): void {
-            $lossJournal = app(PostAssetLossJournalAction::class);
+            if (! $this->hasAcquisitionJournal($asset)) {
+                return;
+            }
 
-            if ($lossJournal->isPostable($asset)) {
-                $lossJournal->execute($asset);
+            if ($asset->status === 'disposed') {
+                app(PostAssetDisposalJournalAction::class)->execute($asset, now()->toDateString());
+            } elseif (app(PostAssetLossJournalAction::class)->isPostable($asset)) {
+                app(PostAssetLossJournalAction::class)->execute($asset);
             }
         });
+    }
+
+    private function hasAcquisitionJournal(Asset $asset): bool
+    {
+        return JournalEntry::query()
+            ->where('reference', 'ACQ-' . $asset->asset_code)
+            ->where('status', 'posted')
+            ->exists();
     }
 
     /**
@@ -98,7 +115,9 @@ class AssetDepreciationNormalizationSeeder extends Seeder
     private function syncRegisterFromPostedSources(): void
     {
         $this->demoAssets()->get()->each(function (Asset $asset): void {
-            if (in_array($asset->status, ['draft', 'cancelled'], true)) {
+            // Aset disposed mempertahankan akumulasi dari data aset (#442): jurnal
+            // pelepasan memakai nilai itu, dan sumber ACQ/run tidak memuat aset tersebut.
+            if (in_array($asset->status, ['draft', 'cancelled', 'disposed'], true)) {
                 return;
             }
 

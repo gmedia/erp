@@ -8,6 +8,7 @@ use App\Models\FiscalYear;
 use App\Models\JournalEntry;
 use App\Models\JournalEntryLine;
 use App\Models\ReportSection;
+use App\Models\Setting;
 use Database\Seeders\ReportConfigurationSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -769,4 +770,131 @@ test('it validates fiscal_year_id when exporting cash flow', function () {
     ])
         ->assertUnprocessable()
         ->assertJsonValidationErrors(['fiscal_year_id']);
+});
+
+test('it classifies asset disposal gain and loss as investing activity', function () {
+    $this->seed(ReportConfigurationSeeder::class);
+    Sanctum::actingAs($this->user, ['*']);
+
+    $coaVersion = CoaVersion::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'status' => 'active',
+    ]);
+    $cash = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '11100',
+        'type' => 'asset',
+        'sub_type' => 'current_asset',
+        'normal_balance' => 'debit',
+        'is_cash_flow' => true,
+    ]);
+    $equipment = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '12100',
+        'type' => 'asset',
+        'sub_type' => 'non_current_asset',
+        'normal_balance' => 'debit',
+    ]);
+    $accumulated = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '12200',
+        'type' => 'asset',
+        'sub_type' => 'non_current_asset',
+        'normal_balance' => 'credit',
+    ]);
+    $gain = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '42000',
+        'type' => 'revenue',
+        'sub_type' => null,
+        'normal_balance' => 'credit',
+    ]);
+    $loss = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '52000',
+        'type' => 'expense',
+        'sub_type' => null,
+        'normal_balance' => 'debit',
+    ]);
+
+    Setting::set('asset_disposal_gain_account_id', (string) $gain->id);
+    Setting::set('asset_disposal_loss_account_id', (string) $loss->id);
+
+    // Harga perolehan 100, akumulasi 30 -> nilai buku 70. Dijual 100 -> laba 30.
+    postCashFlowJournal($this->fiscalYear, $coaVersion, $cash, 100, 0, [
+        ['account' => $accumulated, 'debit' => 30, 'credit' => 0],
+        ['account' => $equipment, 'debit' => 0, 'credit' => 100],
+        ['account' => $gain, 'debit' => 0, 'credit' => 30],
+    ]);
+
+    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
+        ->assertOk();
+
+    expect((float) $response->json('activities.operating'))->toBe(0.0)
+        ->and((float) $response->json('activities.investing'))->toBe(100.0)
+        ->and((float) $response->json('activities.financing'))->toBe(0.0)
+        ->and((float) $response->json('net_change'))->toBe(100.0);
+});
+
+test('it classifies asset disposal loss from a sale below book value as investing activity', function () {
+    $this->seed(ReportConfigurationSeeder::class);
+    Sanctum::actingAs($this->user, ['*']);
+
+    $coaVersion = CoaVersion::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'status' => 'active',
+    ]);
+    $cash = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '11100',
+        'type' => 'asset',
+        'sub_type' => 'current_asset',
+        'normal_balance' => 'debit',
+        'is_cash_flow' => true,
+    ]);
+    $equipment = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '12100',
+        'type' => 'asset',
+        'sub_type' => 'non_current_asset',
+        'normal_balance' => 'debit',
+    ]);
+    $accumulated = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '12200',
+        'type' => 'asset',
+        'sub_type' => 'non_current_asset',
+        'normal_balance' => 'credit',
+    ]);
+    $gain = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '42000',
+        'type' => 'revenue',
+        'sub_type' => null,
+        'normal_balance' => 'credit',
+    ]);
+    $loss = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '52000',
+        'type' => 'expense',
+        'sub_type' => null,
+        'normal_balance' => 'debit',
+    ]);
+
+    Setting::set('asset_disposal_gain_account_id', (string) $gain->id);
+    Setting::set('asset_disposal_loss_account_id', (string) $loss->id);
+
+    // Harga perolehan 100, akumulasi 30 -> nilai buku 70. Dijual 50 -> rugi 20.
+    postCashFlowJournal($this->fiscalYear, $coaVersion, $cash, 50, 0, [
+        ['account' => $loss, 'debit' => 20, 'credit' => 0],
+        ['account' => $accumulated, 'debit' => 30, 'credit' => 0],
+        ['account' => $equipment, 'debit' => 0, 'credit' => 100],
+    ]);
+
+    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
+        ->assertOk();
+
+    expect((float) $response->json('activities.operating'))->toBe(0.0)
+        ->and((float) $response->json('activities.investing'))->toBe(50.0)
+        ->and((float) $response->json('net_change'))->toBe(50.0);
 });

@@ -435,6 +435,8 @@ export const assetMovementFormSchema = z.object({
     to_employee_id: z.string().optional(),
     reference: z.string().optional(),
     notes: z.string().optional(),
+    sale_amount: z.string().optional(),
+    sale_account_id: z.string().optional(),
 });
 
 export type AssetMovementFormData = z.infer<typeof assetMovementFormSchema>;

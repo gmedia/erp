@@ -320,6 +320,35 @@ Halaman `/asset-movements` menampilkan histori semua pergerakan aset.
 
 Biasanya movement auto-created saat edit aset. Namun bisa juga tambah manual via menu Asset Movements untuk kasus khusus seperti disposal.
 
+### 5.4 Pelepasan Aset (Dispose) dan Jurnal Laba/Rugi
+
+Pelepasan dicatat lewat movement bertipe **Dispose**. Saat dicatat, sistem membuat jurnal laba/rugi otomatis.
+
+**Pengaturan awal (sekali):** buka **Admin Settings > Accounting** dan pilih akun laba dan akun rugi pelepasan aset (akun daun aktif di COA). Tanpa ini, pelepasan ditolak.
+
+**Pelepasan tanpa hasil penjualan** (dibuang atau hilang):
+1. Buka Asset Movements, klik Add, pilih aset, lalu pilih tipe **Dispose**.
+2. Isi tanggal pelepasan dan catatan. Kosongkan **Sale Amount**.
+3. Klik Record Movement.
+
+Sisa nilai buku (harga perolehan dikurangi akumulasi penyusutan) dicatat sebagai rugi pelepasan.
+
+**Pelepasan dengan hasil penjualan:**
+1. Pada tipe **Dispose**, isi **Sale Amount** dengan nilai hasil penjualan.
+2. Pilih **Receipt Account** (kas, bank, atau piutang). Kolom ini muncul setelah nilai lebih dari 0.
+3. Klik Record Movement.
+
+Selisih hasil penjualan terhadap nilai buku menjadi laba (jika hasil lebih besar) atau rugi (jika lebih kecil).
+
+**Tanggal dan pembatalan:**
+- Tanggal jurnal mengikuti tanggal pelepasan. Jika periode sudah ditutup, jurnal ditolak.
+- Menghapus movement Dispose membalik jurnalnya dan mengembalikan status aset.
+- Hasil penjualan masuk arus kas investasi. Laba atau rugi pelepasan tidak masuk arus kas operasi.
+
+**Melihat jurnal:** buka detail aset, tab Movements. Pelepasan yang sudah dijurnal menampilkan tautan **Lihat jurnal pelepasan**.
+
+**Catatan aset lama:** aset yang sudah disposed atau lost sebelum fitur ini tidak dijurnal otomatis.
+
 ## 6. Asset Maintenances
 
 ### 6.1 Konsep Maintenance
@@ -567,9 +596,7 @@ A: Edit aset dan ubah field Location, Branch, Department, atau Employee. Sistem 
 
 ### Q: Bagaimana cara mendispose aset?
 
-A: Ada dua cara:
-1. Edit aset dan ubah status ke "disposed"
-2. Buat movement record manual dengan type "disposed"
+A: Catat movement bertipe **Dispose** di menu Asset Movements (lihat 5.4). Pelepasan ini menghasilkan jurnal laba/rugi. Mengubah status aset saja tidak membuat jurnal pelepasan.
 
 ### Q: Mengapa aset tidak masuk dalam depreciation run?
 
