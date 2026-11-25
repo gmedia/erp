@@ -149,9 +149,12 @@ test('draft GR exceeding PO line quantity is not blocked', function () {
 
 test('accepted over received returns localized message in indonesian', function () {
     [$purchaseOrder, $item] = issue436ConfirmedPo(10);
-    app()->setLocale('id');
 
-    $response = postJson('/api/goods-receipts', issue436ReceiptPayload($purchaseOrder, $item, 'draft', 4, 9));
+    $response = postJson(
+        '/api/goods-receipts',
+        issue436ReceiptPayload($purchaseOrder, $item, 'draft', 4, 9),
+        ['X-Locale' => 'id'],
+    );
 
     $response->assertStatus(422);
     expect($response->json('errors')['items.0.quantity_accepted'][0] ?? null)

@@ -44,12 +44,11 @@ test('customer invoice status message is translated for en and id', function (
     string $locale,
     string $expected,
 ) {
-    app()->setLocale($locale);
     $invoice = CustomerInvoice::factory()->create(['status' => 'draft']);
 
     $response = putJson('/api/customer-invoices/' . $invoice->id, [
         'status' => 'paid',
-    ])->assertStatus(422);
+    ], ['X-Locale' => $locale])->assertStatus(422);
 
     expect($response->json('errors.status.0'))->toBe($expected);
 })->with([

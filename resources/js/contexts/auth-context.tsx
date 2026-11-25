@@ -125,7 +125,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         await initTokenStorage();
         const token = getToken();
         if (!token) {
-            setIsLoading(false);
+            try {
+                const { data } = await axiosInstance.get<{
+                    locale: string;
+                    translations: Translations;
+                }>('/api/locale/translations');
+                setTranslations(data.translations || {});
+                setLocale(data.locale || 'en');
+            } catch {
+                setTranslations({});
+                setLocale('en');
+            } finally {
+                setIsLoading(false);
+            }
             return;
         }
 

@@ -41,12 +41,11 @@ test('put status transition for a supplier bill follows the whitelist', function
 ]);
 
 test('supplier bill status rejection message is translated for en and id', function (string $locale, string $expected) {
-    app()->setLocale($locale);
     $bill = SupplierBill::factory()->create(['status' => 'draft']);
 
     $response = putJson('/api/supplier-bills/' . $bill->id, [
         'status' => 'paid',
-    ])->assertStatus(422);
+    ], ['X-Locale' => $locale])->assertStatus(422);
 
     expect($response->json('errors.status.0'))->toBe($expected);
 })->with([
