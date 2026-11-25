@@ -977,7 +977,10 @@ test('six redesigned page titles keep the english text of main and are menu-labe
 
     foreach ($expected as $pageKey => $spec) {
         expect($en['page'][$pageKey]['title'])->toBe($spec['title'], "en page.{$pageKey}.title drifted from main");
-        expect($en['menu'][$spec['menu']])->not->toBe($spec['title'], "menu.{$spec['menu']} now equals page title; drop exception");
+        expect($en['menu'][$spec['menu']])->not->toBe(
+            $spec['title'],
+            "menu.{$spec['menu']} now equals page title; drop exception",
+        );
         expect($id['page'][$pageKey]['title'])->not->toBe($spec['title'], "page.{$pageKey}.title not translated");
     }
 });
