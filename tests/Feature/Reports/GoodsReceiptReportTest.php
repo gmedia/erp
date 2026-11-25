@@ -88,6 +88,7 @@ test('it can fetch aggregated goods receipt report data', function () {
             ->where('data.0.total_accepted_quantity', '8.00')
             ->where('data.0.total_rejected_quantity', '2.00')
             ->where('data.0.total_receipt_value', '10000.00')
+            ->has('summary')
             ->has('meta')
             ->has('links')
         );
@@ -176,6 +177,62 @@ test('it can filter by supplier warehouse product status and date range', functi
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.goods_receipt.gr_number', 'GR-FLT-002');
+});
+
+test('it returns totals across all filtered rows including supplier filter', function () {
+    $unit = Unit::factory()->create();
+    $warehouse = Warehouse::factory()->create(['name' => 'Gudang Total GR']);
+    $supplierA = Supplier::factory()->create(['name' => 'Supplier Total A']);
+    $supplierB = Supplier::factory()->create(['name' => 'Supplier Total B']);
+
+    $makeReceipt = function (Supplier $supplier, string $grNumber, float $qty, float $price) use ($warehouse, $unit) {
+        $product = Product::factory()->create();
+        $po = PurchaseOrder::factory()->create([
+            'supplier_id' => $supplier->id,
+            'warehouse_id' => $warehouse->id,
+        ]);
+        $poItem = PurchaseOrderItem::factory()->create([
+            'purchase_order_id' => $po->id,
+            'product_id' => $product->id,
+            'unit_id' => $unit->id,
+        ]);
+        $gr = GoodsReceipt::factory()->create([
+            'gr_number' => $grNumber,
+            'purchase_order_id' => $po->id,
+            'warehouse_id' => $warehouse->id,
+            'status' => 'confirmed',
+            'receipt_date' => '2026-03-10',
+        ]);
+        GoodsReceiptItem::factory()->create([
+            'goods_receipt_id' => $gr->id,
+            'purchase_order_item_id' => $poItem->id,
+            'product_id' => $product->id,
+            'unit_id' => $unit->id,
+            'quantity_received' => $qty,
+            'quantity_accepted' => $qty,
+            'quantity_rejected' => 0,
+            'unit_price' => $price,
+        ]);
+    };
+
+    $makeReceipt($supplierA, 'GR-TOT-A1', 4, 1000);
+    $makeReceipt($supplierA, 'GR-TOT-A2', 6, 2000);
+    $makeReceipt($supplierB, 'GR-TOT-B1', 100, 5000);
+
+    Sanctum::actingAs($this->user, ['*']);
+
+    getJson('/api/reports/goods-receipt')
+        ->assertOk()
+        ->assertJsonPath('summary.totals.total_received_quantity', '110.00')
+        ->assertJsonPath('summary.totals.total_receipt_value', '516000.00')
+        ->assertJsonPath('summary.totals.item_count', '3.00');
+
+    getJson('/api/reports/goods-receipt?supplier_id=' . $supplierA->id)
+        ->assertOk()
+        ->assertJsonCount(2, 'data')
+        ->assertJsonPath('summary.totals.total_received_quantity', '10.00')
+        ->assertJsonPath('summary.totals.total_receipt_value', '16000.00')
+        ->assertJsonPath('summary.totals.item_count', '2.00');
 });
 
 test('it can export goods receipt report', function () {

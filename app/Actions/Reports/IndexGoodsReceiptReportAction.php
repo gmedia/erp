@@ -59,6 +59,20 @@ class IndexGoodsReceiptReportAction extends ConfiguredPurchaseOrderReportIndexAc
             ]);
     }
 
+    /**
+     * @return array<int, string>
+     */
+    protected function summaryTotalColumns(): array
+    {
+        return [
+            'item_count',
+            'total_received_quantity',
+            'total_accepted_quantity',
+            'total_rejected_quantity',
+            'total_receipt_value',
+        ];
+    }
+
     protected function warehouseColumn(): string
     {
         return 'gr.warehouse_id';

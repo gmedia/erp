@@ -98,19 +98,6 @@ trait InteractsWithIndexRequest
         );
     }
 
-    private function excludeStatusWhenFilterMissing(
-        Request $request,
-        Builder $query,
-        string $excludedStatus,
-        string $statusField = 'status'
-    ): void {
-        if ($request->filled($statusField)) {
-            return;
-        }
-
-        $query->where($statusField, '!=', $excludedStatus);
-    }
-
     /**
      * @param  object{applySorting: callable}  $filterService
      * @param  array<int, string>  $allowedSorts
@@ -129,33 +116,6 @@ trait InteractsWithIndexRequest
             $this->normalizeIndexSortDirection($request->get($sortDirectionField, 'desc')),
             $allowedSorts,
         );
-    }
-
-    /**
-     * @param  object{applySearch: callable, applyAdvancedFilters: callable, applySorting: callable}  $filterService
-     * @param  array<int, string>  $searchFields
-     * @param  array<int, string>  $filterKeys
-     * @param  array<int, string>  $allowedSorts
-     */
-    private function handleIndexRequestWithStatusExclusion(
-        Request $request,
-        Builder $query,
-        object $filterService,
-        array $searchFields,
-        array $filterKeys,
-        string $defaultSortBy,
-        array $allowedSorts,
-        string $excludedStatus,
-        string $statusField = 'status'
-    ): LengthAwarePaginator {
-        ['perPage' => $perPage, 'page' => $page] = $this->getPaginationParams($request);
-
-        $this->applyRequestSearch($request, $query, $filterService, $searchFields);
-        $this->excludeStatusWhenFilterMissing($request, $query, $excludedStatus, $statusField);
-        $this->applyRequestFilters($request, $query, $filterService, $filterKeys);
-        $this->applyIndexSorting($request, $query, $filterService, $defaultSortBy, $allowedSorts);
-
-        return $this->paginateIndexQuery($query, $perPage, $page);
     }
 
     /**

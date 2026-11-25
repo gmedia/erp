@@ -20,7 +20,7 @@ class MaintenanceCostReportController extends Controller
     ): MaintenanceCostCollection {
         $maintenances = $action->execute($request);
 
-        return new MaintenanceCostCollection($maintenances);
+        return new MaintenanceCostCollection($maintenances, $action->summarize($request));
     }
 
     /**

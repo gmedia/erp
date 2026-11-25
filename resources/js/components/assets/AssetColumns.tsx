@@ -18,13 +18,11 @@ const renderRelationCell =
     (key: keyof Asset) =>
     ({ row }: { row: { original: Asset } }) => {
         const val = row.original[key];
-        return (
-            <div>
-                {typeof val === 'object' && val !== null
-                    ? (val as { name: string }).name
-                    : (val as string | number | null)}
-            </div>
-        );
+        const label =
+            typeof val === 'object' && val !== null
+                ? (val as { name: string }).name
+                : (val as string | number | null);
+        return <div>{label ?? '-'}</div>;
     };
 
 const createAssetRelationColumn = (

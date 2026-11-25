@@ -117,6 +117,7 @@ export function createSortingHeader(
                         column.toggleSorting(column.getIsSorted() === 'asc')
                     }
                     data-testid={`sort-${testIdSource.toLowerCase().replaceAll(/\s+/g, '-')}`}
+                    data-sort-state={column.getIsSorted() || 'none'}
                 >
                     <span className="line-clamp-2 max-w-full min-w-0 text-left whitespace-normal">
                         <LabelText label={label} />

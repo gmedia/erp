@@ -59,10 +59,11 @@ export const supplierBillColumns: ColumnDef<SupplierBill>[] = [
     }),
     {
         accessorKey: 'grand_total',
-        ...createSortingHeader({
-            key: 'column.grand_total',
-            fallback: 'Grand Total',
-        }),
+        meta: { numeric: true },
+        ...createSortingHeader(
+            { key: 'column.grand_total', fallback: 'Grand Total' },
+            { align: 'right' },
+        ),
         cell: ({ row }) => (
             <div className="text-right">
                 {formatCurrencyByRegionalSettings(row.original.grand_total, {
@@ -76,20 +77,32 @@ export const supplierBillColumns: ColumnDef<SupplierBill>[] = [
     },
     {
         accessorKey: 'amount_due',
-        ...createSortingHeader({
-            key: 'column.amount_due',
-            fallback: 'Amount Due',
-        }),
-        cell: ({ row }) => (
-            <div className="text-right">
-                {formatCurrencyByRegionalSettings(row.original.amount_due, {
-                    locale: 'id-ID',
-                    currency: row.original.currency || undefined,
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 2,
-                })}
-            </div>
+        meta: { numeric: true },
+        ...createSortingHeader(
+            { key: 'column.amount_due', fallback: 'Amount Due' },
+            { align: 'right' },
         ),
+        cell: ({ row }) => {
+            const { status, amount_due: amountDue, currency } = row.original;
+            const hasNoDue = ['draft', 'void', 'cancelled'].includes(
+                status ?? '',
+            );
+
+            return (
+                <div
+                    className={`text-right ${Number(amountDue) < 0 ? 'text-destructive' : ''}`}
+                >
+                    {hasNoDue
+                        ? '-'
+                        : formatCurrencyByRegionalSettings(amountDue, {
+                              locale: 'id-ID',
+                              currency: currency || undefined,
+                              minimumFractionDigits: 0,
+                              maximumFractionDigits: 2,
+                          })}
+                </div>
+            );
+        },
     },
     {
         id: 'actions_custom',

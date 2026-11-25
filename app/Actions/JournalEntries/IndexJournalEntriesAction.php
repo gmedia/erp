@@ -20,7 +20,8 @@ class IndexJournalEntriesAction
     {
         $query = JournalEntry::query()
             ->with(['lines.account', 'fiscalYear', 'createdBy', 'postedBy'])
-            ->withSum('lines as total_debit', 'debit');
+            ->withSum('lines as total_debit', 'debit')
+            ->withSum('lines as total_credit', 'credit');
 
         return $this->handleIndexRequest(
             $request,
@@ -29,7 +30,16 @@ class IndexJournalEntriesAction
             ['entry_number', 'description', 'reference'],
             ['start_date', 'end_date', 'status'],
             'entry_date',
-            ['entry_date', 'entry_number', 'description', 'reference', 'total_debit', 'status', 'created_at'],
+            [
+                'entry_date',
+                'entry_number',
+                'description',
+                'reference',
+                'total_debit',
+                'total_credit',
+                'status',
+                'created_at',
+            ],
         );
     }
 }

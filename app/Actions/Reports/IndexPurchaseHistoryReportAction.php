@@ -61,6 +61,19 @@ class IndexPurchaseHistoryReportAction extends ConfiguredPurchaseOrderReportInde
     }
 
     /**
+     * @return array<int, string>
+     */
+    protected function summaryTotalColumns(): array
+    {
+        return [
+            'ordered_quantity',
+            'received_quantity',
+            'outstanding_quantity',
+            'total_purchase_value',
+        ];
+    }
+
+    /**
      * @return array<string, string>
      */
     protected function sortAliases(): array

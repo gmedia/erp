@@ -33,11 +33,17 @@ trait InteractsWithAuditTrailIndex
         if ($sortBy === $userSortKey) {
             $query->leftJoin('users', $userForeignKey, '=', 'users.id')
                 ->orderBy('users.name', $sortDirection)
+                ->orderBy($table . '.id', $sortDirection)
                 ->select($table . '.*');
 
             return;
         }
 
         $query->orderBy($table . '.' . $sortBy, $sortDirection);
+
+        if ($sortBy !== 'id') {
+            // Tie-break: events with the same timestamp keep a stable, deterministic order.
+            $query->orderBy($table . '.id', $sortDirection);
+        }
     }
 }

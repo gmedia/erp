@@ -48,10 +48,10 @@ export const accountMappingColumns: ColumnDef<AccountMapping>[] = [
     createBadgeColumn<AccountMapping>({
         accessorKey: 'type',
         label: { key: 'column.type', fallback: 'Type' },
-        colorMap: {
-            rename: 'bg-muted text-foreground',
-            merge: 'bg-info/10 text-info',
-            split: 'bg-warning-soft text-warning',
+        variantMap: {
+            rename: 'outline',
+            merge: 'info',
+            split: 'warning',
         },
     }),
     {
@@ -61,7 +61,7 @@ export const accountMappingColumns: ColumnDef<AccountMapping>[] = [
         cell: ({ row }) => {
             const notes = row.original.notes ?? '-';
             return (
-                <div className="max-w-64 truncate" title={notes}>
+                <div className="max-w-48 truncate" title={notes}>
                     {notes}
                 </div>
             );

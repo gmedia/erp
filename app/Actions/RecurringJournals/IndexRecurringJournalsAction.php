@@ -26,7 +26,7 @@ class IndexRecurringJournalsAction
             $this->filterService,
             ['name', 'description'],
             ['frequency', 'is_active', 'fiscal_year_id', 'next_run_from', 'next_run_to'],
-            'next_run_date',
+            'created_at',
             [
                 'name',
                 'frequency',

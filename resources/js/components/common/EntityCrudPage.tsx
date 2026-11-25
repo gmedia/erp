@@ -4,6 +4,7 @@ import { CrudPage } from '@/components/common/CrudPage';
 import { DataTable } from '@/components/common/DataTableCore';
 import { usePermissions } from '@/hooks/usePermissions';
 import { CustomEntityConfig } from '@/utils/entityConfigs';
+import type { SortingState } from '@tanstack/react-table';
 import React, { useMemo } from 'react';
 
 // Form component types
@@ -15,6 +16,7 @@ export type EntityCrudConfig<T extends object = object> =
         toolbarActions?: React.ReactNode;
         /** Kolom yang disembunyikan default agar kolom kunci muat di 1440px. */
         defaultColumnVisibility?: Record<string, boolean>;
+        defaultSorting?: SortingState;
     };
 
 type CrudFormProps<T extends object> = {
@@ -138,6 +140,7 @@ export function createEntityCrudPage<T extends object>(
                             extraToolbarActions: config.toolbarActions,
                             defaultColumnVisibility:
                                 config.defaultColumnVisibility,
+                            defaultSorting: config.defaultSorting,
                         }),
 
                         mapFormProps: createFormPropsMapper(config),

@@ -17,7 +17,7 @@ class PurchaseHistoryReportController extends Controller
     ): PurchaseHistoryReportCollection {
         $rows = $action->execute($request);
 
-        return new PurchaseHistoryReportCollection($rows);
+        return new PurchaseHistoryReportCollection($rows, $action->summarize($request));
     }
 
     public function export(

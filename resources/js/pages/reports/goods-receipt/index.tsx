@@ -41,6 +41,13 @@ export default function GoodsReceiptReportPage() {
                 total_rejected_quantity: false,
                 total_accepted_quantity: false,
             }}
+            summaryColumns={[
+                { key: 'item_count', label: 'Item Count' },
+                { key: 'total_received_quantity', label: 'Received Qty' },
+                { key: 'total_accepted_quantity', label: 'Accepted Qty' },
+                { key: 'total_rejected_quantity', label: 'Rejected Qty' },
+                { key: 'total_receipt_value', label: 'Total Value' },
+            ]}
         />
     );
 }

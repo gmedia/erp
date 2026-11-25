@@ -34,7 +34,7 @@ test('execute filters by search term', function () {
         ->and($result->first()->adjustment_number)->toBe('SA-ABC-001');
 });
 
-test('execute excludes cancelled by default', function () {
+test('execute includes cancelled by default', function () {
     StockAdjustment::factory()->create(['status' => 'cancelled']);
     StockAdjustment::factory()->create(['status' => 'draft']);
 
@@ -43,8 +43,8 @@ test('execute excludes cancelled by default', function () {
 
     $result = $action->execute($request);
 
-    expect($result->count())->toBe(1)
-        ->and($result->first()->status)->toBe('draft');
+    expect($result->count())->toBe(2)
+        ->and($result->pluck('status')->all())->toContain('cancelled', 'draft');
 });
 
 test('execute can include cancelled when status filter set', function () {

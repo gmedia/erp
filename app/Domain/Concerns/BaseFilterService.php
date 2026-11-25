@@ -155,8 +155,16 @@ trait BaseFilterService
      */
     public function applySorting(Builder $query, string $sortBy, string $sortDirection, array $allowedSorts): void
     {
-        if (in_array($sortBy, $allowedSorts, true)) {
-            $query->orderBy($sortBy, $this->normalizeSortDirection($sortDirection));
+        if (! in_array($sortBy, $allowedSorts, true)) {
+            return;
+        }
+
+        $direction = $this->normalizeSortDirection($sortDirection);
+        $query->orderBy($sortBy, $direction);
+
+        // Tie-break by primary key so rows with the same timestamp keep a stable order.
+        if ($sortBy !== 'id') {
+            $query->orderBy($query->getModel()->getQualifiedKeyName(), $direction);
         }
     }
 
@@ -191,6 +199,11 @@ trait BaseFilterService
 
         if (! $this->applyMappedRelationSorting($query, $sortBy, $sortDirection, $relationSortMap, $baseTable)) {
             $query->orderBy($sortBy, $sortDirection);
+
+            // Tie-break by primary key so rows with the same timestamp keep a stable order.
+            if ($sortBy !== 'id') {
+                $query->orderBy($query->getModel()->getQualifiedKeyName(), $sortDirection);
+            }
         }
     }
 

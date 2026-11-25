@@ -11,6 +11,11 @@ const DANGER: BadgeVariant = 'destructive-soft';
 // Status yang selesai/diproses tanpa konotasi sukses penuh (mis. in_transit,
 // approved, fully received, stocktake_result) memakai tone info.
 const INFO: BadgeVariant = 'info';
+const CONFIRMED: BadgeVariant = 'default';
+const AWAITING: BadgeVariant = 'warning';
+const PARTIAL: BadgeVariant = 'info';
+const LOCKED: BadgeVariant = 'outline';
+const SEVERE: BadgeVariant = 'destructive';
 
 export { BadgeVariant };
 
@@ -44,17 +49,20 @@ export function statusBadgeVariant(
 
         // Menunggu/terbuka: pending, draft terbuka, partially paid/received.
         case 'pending':
-        case 'pending_approval':
         case 'scheduled':
         case 'reopened':
         case 'outstanding':
-        case 'confirmed':
-        case 'partially_received':
         case 'partially_ordered':
         case 'partially_paid':
         case 'partially_processed':
-        case 'in_transit':
             return PENDING;
+
+        case 'confirmed':
+            return CONFIRMED;
+        case 'pending_approval':
+            return AWAITING;
+        case 'partially_received':
+            return PARTIAL;
 
         // Sedang berjalan / disetujui (info, bukan sukses).
         case 'in_progress':
@@ -64,7 +72,12 @@ export function statusBadgeVariant(
         case 'stocktake_result':
         case 'on_hold':
         case 'sent':
+        case 'in_transit':
+        case 'step_approved':
             return INFO;
+
+        case 'locked':
+            return LOCKED;
 
         // Netral-tenang: draft, tidak aktif.
         case 'draft':
@@ -72,7 +85,6 @@ export function statusBadgeVariant(
         case 'inactive':
         case 'archived':
         case 'idle':
-        case 'locked':
             return MUTED;
 
         // Negatif/danger: ditolak, dibatalkan, gagal, telat.
@@ -87,8 +99,10 @@ export function statusBadgeVariant(
         case 'discontinued':
         case 'expired':
         case 'disposed':
-        case 'lost':
             return DANGER;
+
+        case 'lost':
+            return SEVERE;
 
         default:
             return NEUTRAL;
