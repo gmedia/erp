@@ -66,7 +66,9 @@ function stickyCellClass(
     return false;
 }
 
-const CELL_BEFORE_STICKY_ACTIONS = 'pr-6';
+// Ruang kanan = lebar kolom aksi sticky (size 56px), agar isi kolom terakhir
+// tidak tertutup saat tabel di-scroll horizontal di mobile.
+const CELL_BEFORE_STICKY_ACTIONS = 'pr-14';
 
 function stickyColumnAttr(
     columnId: string,

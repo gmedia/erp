@@ -133,13 +133,21 @@ export function createTextColumn<T = Record<string, unknown>>(
             const meta = description?.(row.original);
 
             if (!primary && !meta) {
-                return <div>{text}</div>;
+                return (
+                    <div className="max-w-56 truncate" title={text}>
+                        {text}
+                    </div>
+                );
             }
 
             return (
-                <div className="min-w-0">
+                <div className="min-w-0 max-w-56">
                     <div
-                        className={cn(primary && 'font-medium text-foreground')}
+                        className={cn(
+                            'truncate',
+                            primary && 'font-medium text-foreground',
+                        )}
+                        title={text}
                     >
                         {text}
                     </div>
@@ -645,7 +653,7 @@ export function createRowCurrencyAmountColumn<
 
     return {
         accessorKey: accessorKey as string,
-        ...createSortingHeader(label),
+        ...createSortingHeader(label, { align: 'right' }),
         cell: ({ row }) => (
             <div className={className}>
                 {formatCurrencyByRegionalSettings(
