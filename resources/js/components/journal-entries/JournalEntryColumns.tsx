@@ -38,10 +38,14 @@ export const journalEntryColumns: ColumnDef<JournalEntry>[] = [
     }),
     {
         accessorKey: 'total_debit',
-        ...createSortingHeader({
-            key: 'column.total_amount',
-            fallback: 'Total Amount',
-        }),
+        meta: { numeric: true },
+        ...createSortingHeader(
+            {
+                key: 'column.total_amount',
+                fallback: 'Total Amount',
+            },
+            { align: 'right' },
+        ),
         cell: ({ row }) => {
             const amount = Number.parseFloat(row.getValue('total_debit'));
             return (

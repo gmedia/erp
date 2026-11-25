@@ -30,7 +30,7 @@ export const purchaseOrderColumns: ColumnDef<PurchaseOrder>[] = [
         accessorKey: 'po_number',
         label: { key: 'column.po_number', fallback: 'PO Number' },
         primary: true,
-        description: (row) => row.supplier?.name ?? null,
+        description: (row) => row.warehouse?.name ?? null,
     }),
     {
         accessorKey: 'supplier',
@@ -70,10 +70,14 @@ export const purchaseOrderColumns: ColumnDef<PurchaseOrder>[] = [
     },
     {
         accessorKey: 'grand_total',
-        ...createSortingHeader({
-            key: 'column.grand_total',
-            fallback: 'Grand Total',
-        }),
+        meta: { numeric: true },
+        ...createSortingHeader(
+            {
+                key: 'column.grand_total',
+                fallback: 'Grand Total',
+            },
+            { align: 'right' },
+        ),
         cell: ({ row }) => (
             <div className="text-right">
                 {formatCurrencyByRegionalSettings(row.original.grand_total, {

@@ -101,6 +101,24 @@ test.describe('Budgets - kolom angka & layout', () => {
     });
 });
 
+test.describe('Purchase Orders & Assets - kolom uang rata kanan', () => {
+    test('header Grand Total PO rata kanan dengan nilai di 1440', async ({
+        page,
+    }) => {
+        await page.setViewportSize({ width: 1440, height: 900 });
+        await openModule(page, '/purchase-orders', '/api/purchase-orders');
+        await expectNumericHeaderRightAligned(page, 'Grand Total');
+    });
+
+    test('header Cost Assets rata kanan dengan nilai di 1440', async ({
+        page,
+    }) => {
+        await page.setViewportSize({ width: 1440, height: 900 });
+        await openModule(page, '/assets', '/api/assets');
+        await expectNumericHeaderRightAligned(page, 'Cost');
+    });
+});
+
 test.describe('Bank reconciliations - kolom angka & layout', () => {
     test('header angka Statement, Book, Difference rata kanan di 1440', async ({
         page,
