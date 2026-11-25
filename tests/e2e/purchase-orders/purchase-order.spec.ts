@@ -1,6 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 import {
     generateModuleTests,
     ModuleTestConfig,
@@ -97,13 +97,11 @@ test.describe('Purchase Orders Module', () => {
 
     test.beforeEach(async ({ page }) => {
         await login(page, undefined, undefined, { requireDashboard: false });
-        const listResponse = page.waitForResponse(
-            (response) =>
-                response.url().includes('/api/purchase-orders') &&
-                response.status() < 400,
+        const listResponse = page.waitForResponse((response) =>
+            response.url().includes('/api/purchase-orders'),
         );
         await page.goto('/purchase-orders');
-        await listResponse;
+        await expectResponseOk(await listResponse);
     });
 
     test('add dialog starts with empty items and add item opens a dedicated dialog', async ({

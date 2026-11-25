@@ -2,6 +2,7 @@ import { expect, Page, test } from '@playwright/test';
 
 import {
     approveApprovableAsDelegate,
+    expectResponseOk,
     login,
     searchAndWaitForApi,
 } from '../helpers';
@@ -159,11 +160,11 @@ test.describe('Goods Receipt header selects', () => {
             );
         }
         const listed = page.waitForResponse(
-            (r) => r.url().includes('/api/goods-receipts') && r.status() < 400,
+            (r) => r.url().includes('/api/goods-receipts'),
             { timeout: 30000 },
         );
         await page.goto('/goods-receipts');
-        await listed;
+        await expectResponseOk(await listed);
     });
 
     test('edit dokumen lama menampilkan baris PO item yang terpilih', async ({

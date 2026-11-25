@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 import {
     createPurchaseOrderReportData,
     openPurchaseOrderStatusReport,
@@ -20,8 +20,7 @@ test.describe('Purchase Order Status Report', () => {
                 response.url().includes('/api/reports/purchase-order-status') &&
                 response
                     .url()
-                    .includes('sort_by=purchase_order_status_category') &&
-                response.status() < 400,
+                    .includes('sort_by=purchase_order_status_category'),
         );
         await page
             .getByRole('button', {
@@ -29,19 +28,17 @@ test.describe('Purchase Order Status Report', () => {
                 exact: true,
             })
             .click({ force: true });
-        await sortResponsePromise;
+        await expectResponseOk(await sortResponsePromise);
 
-        const exportResponsePromise = page.waitForResponse(
-            (response) =>
-                response
-                    .url()
-                    .includes('/api/reports/purchase-order-status/export') &&
-                response.status() < 400,
+        const exportResponsePromise = page.waitForResponse((response) =>
+            response
+                .url()
+                .includes('/api/reports/purchase-order-status/export'),
         );
         await page
             .getByRole('button', { name: /export/i })
             .click({ force: true });
-        await exportResponsePromise;
+        await expectResponseOk(await exportResponsePromise);
 
         const searchInput = page.getByRole('textbox').first();
         await Promise.all([

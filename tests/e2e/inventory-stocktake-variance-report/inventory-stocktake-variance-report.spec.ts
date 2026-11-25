@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 
 test.describe('Inventory Stocktake Variance Report', () => {
     test.beforeEach(async ({ page }) => {
@@ -8,40 +8,38 @@ test.describe('Inventory Stocktake Variance Report', () => {
 
     test('can view report, sort, filter and export', async ({ page }) => {
         const initialResponse = page.waitForResponse(
-            (r) =>
-                r.url().includes('/api/reports/inventory-stocktake-variance') &&
-                r.status() < 400,
+            (r) => r.url().includes('/api/reports/inventory-stocktake-variance'),
             { timeout: 30000 },
         );
         await page.goto('/reports/inventory-stocktake-variance');
         await page.waitForURL('**/reports/inventory-stocktake-variance', {
             timeout: 15000,
         });
-        await initialResponse;
+        await expectResponseOk(await initialResponse);
 
         await expect(page.locator('table')).toBeVisible();
         await expect(page.locator('tbody tr').first()).toBeVisible();
 
-        await Promise.all([
+        const [sortResponse] = await Promise.all([
             page.waitForResponse(
                 (r) =>
                     r.url().includes('/api/reports/inventory-stocktake-variance') &&
-                    r.url().includes('sort_by=category_name') &&
-                    r.status() < 400,
+                    r.url().includes('sort_by=category_name'),
                 { timeout: 30000 },
             ),
             page.getByRole('button', { name: 'Category', exact: true }).click(),
         ]);
+        await expectResponseOk(sortResponse);
 
-        await Promise.all([
-            page.waitForResponse(
-                (r) =>
-                    r.url().includes(
-                        '/api/reports/inventory-stocktake-variance/export',
-                    ) && r.status() < 400,
+        const [exportResponse] = await Promise.all([
+            page.waitForResponse((r) =>
+                r.url().includes(
+                    '/api/reports/inventory-stocktake-variance/export',
+                ),
             ),
             page.getByRole('button', { name: /export/i }).click(),
         ]);
+        await expectResponseOk(exportResponse);
 
         await page.getByRole('button', { name: /filters/i }).click();
         const filtersDialog = page.getByRole('dialog');
@@ -59,15 +57,12 @@ test.describe('Inventory Stocktake Variance Report', () => {
         await expect(resultOption).toBeVisible({ timeout: 10000 });
         await resultOption.click({ force: true });
 
-        await Promise.all([
-            page
-                .waitForResponse(
-                    (r) =>
-                        r.url().includes('/api/reports/inventory-stocktake-variance') &&
-                        r.status() < 400,
-                )
-                ,
+        const [filterResponse] = await Promise.all([
+            page.waitForResponse((r) =>
+                r.url().includes('/api/reports/inventory-stocktake-variance'),
+            ),
             filtersDialog.getByRole('button', { name: 'Apply Filters' }).click(),
         ]);
+        await expectResponseOk(filterResponse);
     });
 });
