@@ -39,7 +39,11 @@ export function createReportBreadcrumbs(
     href: string,
 ): BreadcrumbItem[] {
     return [
-        { title: 'Reports', href: '#' },
+        {
+            title: 'Reports',
+            titleKey: 'reports.breadcrumbGroup',
+            href: '#',
+        },
         { title, href },
     ];
 }

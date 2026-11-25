@@ -19,6 +19,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useTranslation } from '@/contexts/i18n-context';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
 import { formatStatusLabel } from '@/lib/status-badge';
@@ -104,8 +105,12 @@ type FinancialTableCardProps<TItem extends FinancialTableRow> = {
     children?: ReactNode;
 };
 
-const buildBreadcrumbs = (title: string, path: string): BreadcrumbItem[] => [
-    { title: 'Reports', href: '#' },
+const buildBreadcrumbs = (
+    t: (key: string) => string,
+    title: string,
+    path: string,
+): BreadcrumbItem[] => [
+    { title: t('reports.breadcrumbGroup'), href: '#' },
     { title, href: path },
 ];
 
@@ -239,6 +244,7 @@ export function SingleYearFinancialReportPageShell({
     hasError = false,
     children,
 }: Readonly<SingleYearFinancialReportPageShellProps>) {
+    const { t } = useTranslation();
     let content: ReactNode;
     if (isLoading) {
         content = (
@@ -319,7 +325,7 @@ export function SingleYearFinancialReportPageShell({
     }
 
     return (
-        <AppLayout breadcrumbs={buildBreadcrumbs(title, path)}>
+        <AppLayout breadcrumbs={buildBreadcrumbs(t, title, path)}>
             <Helmet>
                 <title>{title}</title>
             </Helmet>

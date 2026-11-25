@@ -417,6 +417,14 @@ test('master data and asset page titles follow the menu-or-exception decision', 
     }
 });
 
+test('reports breadcrumb group label is translated in both locales', function () {
+    $en = json_decode(File::get(lang_path('en.json')), true, 512, JSON_THROW_ON_ERROR)['reports'];
+    $id = json_decode(File::get(lang_path('id.json')), true, 512, JSON_THROW_ON_ERROR)['reports'];
+
+    expect($en['breadcrumbGroup'])->toBe('Reports')
+        ->and($id['breadcrumbGroup'])->toBe('Laporan');
+});
+
 test('page translation values are non-empty strings', function () {
     foreach (['en.json', 'id.json'] as $file) {
         foreach (localePageTranslations($file) as $module => $strings) {

@@ -259,6 +259,7 @@
         "id": "Indonesia"
     },
     "reports": {
+        "breadcrumbGroup": "Laporan",
         "sections": {
             "operating_header": "Arus Kas dari Aktivitas Operasi",
             "net_income_source": "Laba Bersih",

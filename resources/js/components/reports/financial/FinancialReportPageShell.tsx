@@ -76,8 +76,12 @@ const translateOr = (
     return translated === key ? fallback : translated;
 };
 
-const buildBreadcrumbs = (title: string, path: string): BreadcrumbItem[] => [
-    { title: 'Reports', href: '#' },
+const buildBreadcrumbs = (
+    t: (key: string) => string,
+    title: string,
+    path: string,
+): BreadcrumbItem[] => [
+    { title: t('reports.breadcrumbGroup'), href: '#' },
     { title, href: path },
 ];
 
@@ -296,7 +300,7 @@ export function FinancialReportPageShell({
     children,
 }: Readonly<FinancialReportPageShellProps>) {
     const { t } = useTranslation();
-    const breadcrumbs = buildBreadcrumbs(title, path);
+    const breadcrumbs = buildBreadcrumbs(t, title, path);
 
     let content: ReactNode;
     if (isLoading) {

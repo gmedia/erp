@@ -17,7 +17,11 @@ export default function ApAgingReportPage() {
             titleKey="menu.ap_aging_report"
             descriptionKey="reports.pageDescriptions.ap-aging"
             breadcrumbs={[
-                { title: 'Reports', href: '#' },
+                {
+                    title: 'Reports',
+                    titleKey: 'reports.breadcrumbGroup',
+                    href: '#',
+                },
                 {
                     title: 'AP Aging Report',
                     titleKey: 'menu.ap_aging_report',
