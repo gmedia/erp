@@ -2557,12 +2557,22 @@
         "purchase_request": {
             "product_required": "Produk wajib diisi.",
             "unit_required": "Satuan wajib diisi.",
-            "quantity_gt_zero": "Jumlah harus lebih dari 0."
+            "quantity_gt_zero": "Jumlah harus lebih dari 0.",
+            "branch_required": "Cabang wajib diisi.",
+            "items_min_one": "Minimal 1 item wajib diisi.",
+            "priority_required": "Prioritas wajib diisi.",
+            "request_date_required": "Tanggal permintaan wajib diisi.",
+            "status_required": "Status wajib diisi."
         },
         "stock_transfer": {
             "product_required": "Produk wajib diisi.",
             "unit_required": "Satuan wajib diisi.",
-            "quantity_gt_zero": "Jumlah harus lebih dari 0."
+            "quantity_gt_zero": "Jumlah harus lebih dari 0.",
+            "from_warehouse_required": "Gudang asal wajib diisi.",
+            "items_min_one": "Minimal 1 item wajib diisi.",
+            "status_required": "Status wajib diisi.",
+            "to_warehouse_required": "Gudang tujuan wajib diisi.",
+            "transfer_date_required": "Tanggal transfer wajib diisi."
         },
         "report_configuration": {
             "section_code_required": "Kode bagian wajib diisi.",
@@ -2590,6 +2600,76 @@
             "fiscal_year_required": "Tahun fiskal wajib diisi.",
             "period_start_required": "Periode awal wajib diisi.",
             "period_end_required": "Periode akhir wajib diisi."
+        },
+        "budget_line": {
+            "account_required": "Akun wajib diisi.",
+            "amount_min_zero": "Jumlah harus non-negatif.",
+            "period_end_required": "Akhir periode wajib diisi.",
+            "period_start_required": "Awal periode wajib diisi."
+        },
+        "goods_receipt": {
+            "items_min_one": "Minimal 1 item wajib diisi.",
+            "po_item_required": "Item PO wajib diisi.",
+            "product_required": "Produk wajib diisi.",
+            "purchase_order_required": "Pesanan pembelian wajib diisi.",
+            "quantity_accepted_min_zero": "Jumlah diterima harus minimal 0.",
+            "quantity_received_gt_zero": "Jumlah yang diterima harus lebih dari 0.",
+            "receipt_date_required": "Tanggal penerimaan wajib diisi.",
+            "status_required": "Status wajib diisi.",
+            "unit_price_min_zero": "Harga satuan minimal 0.",
+            "unit_required": "Satuan wajib diisi.",
+            "warehouse_required": "Gudang wajib diisi."
+        },
+        "inventory_stocktake": {
+            "counted_quantity_min_zero": "Jumlah hitung harus minimal 0.",
+            "items_min_one": "Minimal 1 item wajib diisi.",
+            "product_required": "Produk wajib diisi.",
+            "status_required": "Status wajib diisi.",
+            "stocktake_date_required": "Tanggal stock opname wajib diisi.",
+            "system_quantity_min_zero": "Jumlah sistem harus minimal 0.",
+            "unit_required": "Satuan wajib diisi.",
+            "warehouse_required": "Gudang wajib diisi."
+        },
+        "stock_adjustment": {
+            "adjustment_date_required": "Tanggal penyesuaian wajib diisi.",
+            "adjustment_type_required": "Jenis penyesuaian wajib diisi.",
+            "items_min_one": "Minimal 1 item wajib diisi.",
+            "product_required": "Produk wajib diisi.",
+            "quantity_adjusted_not_zero": "Jumlah penyesuaian tidak boleh 0.",
+            "quantity_before_min_zero": "Jumlah sebelum harus minimal 0.",
+            "status_required": "Status wajib diisi.",
+            "unit_cost_min_zero": "Harga pokok satuan minimal 0.",
+            "unit_required": "Satuan wajib diisi.",
+            "warehouse_required": "Gudang wajib diisi."
+        },
+        "supplier_return": {
+            "gr_item_required": "Item penerimaan barang wajib diisi.",
+            "items_min_one": "Minimal 1 item wajib diisi.",
+            "product_required": "Produk wajib diisi.",
+            "purchase_order_required": "Pesanan pembelian wajib diisi.",
+            "quantity_returned_gt_zero": "Jumlah retur harus lebih dari 0.",
+            "reason_required": "Alasan wajib diisi.",
+            "return_date_required": "Tanggal retur wajib diisi.",
+            "status_required": "Status wajib diisi.",
+            "supplier_required": "Pemasok wajib diisi.",
+            "unit_price_min_zero": "Harga satuan minimal 0.",
+            "warehouse_required": "Gudang wajib diisi."
+        },
+        "transaction_item_pricing": {
+            "quantity_gt_zero": "Jumlah harus lebih dari 0.",
+            "unit_price_min_zero": "Harga satuan minimal 0."
+        },
+        "pipeline_state": {
+            "code_required": "Kode wajib diisi.",
+            "name_required": "Nama wajib diisi."
+        },
+        "pipeline_transition": {
+            "name_required": "Nama wajib diisi.",
+            "code_required": "Kode wajib diisi.",
+            "guard_conditions_json": "Kondisi guard harus berupa JSON yang valid."
+        },
+        "pipeline_transition_action": {
+            "config_json": "Konfigurasi harus berupa JSON yang valid."
         }
     },
     "item_dialog": {

@@ -2557,12 +2557,22 @@
         "purchase_request": {
             "product_required": "Product is required.",
             "unit_required": "Unit is required.",
-            "quantity_gt_zero": "Quantity must be greater than 0."
+            "quantity_gt_zero": "Quantity must be greater than 0.",
+            "branch_required": "Branch is required.",
+            "request_date_required": "Request date is required.",
+            "priority_required": "Priority is required.",
+            "status_required": "Status is required.",
+            "items_min_one": "At least 1 item is required."
         },
         "stock_transfer": {
             "product_required": "Product is required.",
             "unit_required": "Unit is required.",
-            "quantity_gt_zero": "Quantity must be greater than 0."
+            "quantity_gt_zero": "Quantity must be greater than 0.",
+            "from_warehouse_required": "From warehouse is required.",
+            "to_warehouse_required": "To warehouse is required.",
+            "transfer_date_required": "Transfer date is required.",
+            "status_required": "Status is required.",
+            "items_min_one": "At least 1 item is required."
         },
         "report_configuration": {
             "section_code_required": "Section code is required.",
@@ -2590,6 +2600,76 @@
             "fiscal_year_required": "Fiscal year is required.",
             "period_start_required": "Start period is required.",
             "period_end_required": "End period is required."
+        },
+        "inventory_stocktake": {
+            "product_required": "Product is required.",
+            "unit_required": "Unit is required.",
+            "system_quantity_min_zero": "System quantity must be at least 0.",
+            "counted_quantity_min_zero": "Counted quantity must be at least 0.",
+            "warehouse_required": "Warehouse is required.",
+            "stocktake_date_required": "Stocktake date is required.",
+            "status_required": "Status is required.",
+            "items_min_one": "At least 1 item is required."
+        },
+        "stock_adjustment": {
+            "product_required": "Product is required.",
+            "unit_required": "Unit is required.",
+            "quantity_before_min_zero": "Quantity before must be at least 0.",
+            "quantity_adjusted_not_zero": "Quantity adjusted cannot be 0.",
+            "unit_cost_min_zero": "Unit cost must be at least 0.",
+            "warehouse_required": "Warehouse is required.",
+            "adjustment_date_required": "Adjustment date is required.",
+            "adjustment_type_required": "Adjustment type is required.",
+            "status_required": "Status is required.",
+            "items_min_one": "At least 1 item is required."
+        },
+        "goods_receipt": {
+            "purchase_order_required": "Purchase order is required.",
+            "warehouse_required": "Warehouse is required.",
+            "receipt_date_required": "Receipt date is required.",
+            "status_required": "Status is required.",
+            "po_item_required": "PO Item is required.",
+            "product_required": "Product is required.",
+            "unit_required": "Unit is required.",
+            "quantity_received_gt_zero": "Quantity received must be greater than 0.",
+            "quantity_accepted_min_zero": "Quantity accepted must be at least 0.",
+            "unit_price_min_zero": "Unit price must be at least 0.",
+            "items_min_one": "At least 1 item is required."
+        },
+        "supplier_return": {
+            "purchase_order_required": "Purchase order is required.",
+            "supplier_required": "Supplier is required.",
+            "warehouse_required": "Warehouse is required.",
+            "return_date_required": "Return date is required.",
+            "reason_required": "Reason is required.",
+            "status_required": "Status is required.",
+            "gr_item_required": "GR item is required.",
+            "product_required": "Product is required.",
+            "quantity_returned_gt_zero": "Quantity returned must be greater than 0.",
+            "unit_price_min_zero": "Unit price must be at least 0.",
+            "items_min_one": "At least 1 item is required."
+        },
+        "transaction_item_pricing": {
+            "quantity_gt_zero": "Quantity must be greater than 0.",
+            "unit_price_min_zero": "Unit price must be at least 0."
+        },
+        "budget_line": {
+            "account_required": "Account is required.",
+            "period_start_required": "Period start is required.",
+            "period_end_required": "Period end is required.",
+            "amount_min_zero": "Amount must be non-negative."
+        },
+        "pipeline_state": {
+            "code_required": "Code is required",
+            "name_required": "Name is required"
+        },
+        "pipeline_transition": {
+            "name_required": "Name is required",
+            "code_required": "Code is required",
+            "guard_conditions_json": "Guard conditions must be valid JSON."
+        },
+        "pipeline_transition_action": {
+            "config_json": "Config must be valid JSON."
         }
     },
     "item_dialog": {

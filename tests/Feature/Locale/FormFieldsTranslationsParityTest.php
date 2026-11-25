@@ -15,6 +15,20 @@ function localeFormFieldTranslations(string $file): array
 }
 
 /**
+ * Key set comparison: order of keys in the JSON files is not significant.
+ *
+ * @param  array<string, mixed>  $values
+ * @return list<string>
+ */
+function sortedKeys(array $values): array
+{
+    $keys = array_keys($values);
+    sort($keys);
+
+    return $keys;
+}
+
+/**
  * @return array<string, string>
  */
 function localeValidationTranslations(string $file): array
@@ -72,10 +86,10 @@ test('validation message keys exist in both english and indonesian locales', fun
     $id = localeValidationTranslations('id.json');
 
     expect($en)->not->toBeEmpty();
-    expect(array_keys($en))->toEqual(array_keys($id));
+    expect(sortedKeys($en))->toEqual(sortedKeys($id));
 
     foreach ($en as $form => $rules) {
-        expect(array_keys($rules))->toEqual(array_keys($id[$form]), "validation.{$form} keys differ");
+        expect(sortedKeys($rules))->toEqual(sortedKeys($id[$form]), "validation.{$form} keys differ");
 
         foreach (array_keys($rules) as $rule) {
             expect($id[$form][$rule])->not->toBe('', "validation.{$form}.{$rule} empty");
@@ -687,12 +701,12 @@ test('purchase request, stock transfer, report config validation messages keep e
     $enValidation = localeValidationTranslations('en.json');
     $idValidation = localeValidationTranslations('id.json');
 
-    expect($enValidation['purchase_request'])->toEqual([
+    expect($enValidation['purchase_request'])->toMatchArray([
         'product_required' => 'Product is required.',
         'unit_required' => 'Unit is required.',
         'quantity_gt_zero' => 'Quantity must be greater than 0.',
     ])
-        ->and($enValidation['stock_transfer'])->toEqual([
+        ->and($enValidation['stock_transfer'])->toMatchArray([
             'product_required' => 'Product is required.',
             'unit_required' => 'Unit is required.',
             'quantity_gt_zero' => 'Quantity must be greater than 0.',
@@ -744,5 +758,106 @@ test('validation keys used by schemas.ts section A exist in both locales', funct
 
     foreach (['product', 'warehouse', 'asset_depreciation_calculation'] as $form) {
         expect(array_keys($en[$form]))->toEqual(array_keys($id[$form]), "validation.{$form} keys differ");
+    }
+});
+
+test('validation keys used by schemas.ts section B keep the english text and exist in both locales', function () {
+    $en = localeValidationTranslations('en.json');
+    $id = localeValidationTranslations('id.json');
+
+    $forms = [
+        'pipeline_state' => ['code_required' => 'Code is required', 'name_required' => 'Name is required'],
+        'pipeline_transition' => [
+            'name_required' => 'Name is required',
+            'code_required' => 'Code is required',
+            'guard_conditions_json' => 'Guard conditions must be valid JSON.',
+        ],
+        'pipeline_transition_action' => ['config_json' => 'Config must be valid JSON.'],
+        'stock_transfer' => [
+            'from_warehouse_required' => 'From warehouse is required.',
+            'to_warehouse_required' => 'To warehouse is required.',
+            'transfer_date_required' => 'Transfer date is required.',
+            'status_required' => 'Status is required.',
+            'product_required' => 'Product is required.',
+            'unit_required' => 'Unit is required.',
+            'quantity_gt_zero' => 'Quantity must be greater than 0.',
+            'items_min_one' => 'At least 1 item is required.',
+        ],
+        'inventory_stocktake' => [
+            'warehouse_required' => 'Warehouse is required.',
+            'stocktake_date_required' => 'Stocktake date is required.',
+            'status_required' => 'Status is required.',
+            'product_required' => 'Product is required.',
+            'unit_required' => 'Unit is required.',
+            'system_quantity_min_zero' => 'System quantity must be at least 0.',
+            'counted_quantity_min_zero' => 'Counted quantity must be at least 0.',
+            'items_min_one' => 'At least 1 item is required.',
+        ],
+        'stock_adjustment' => [
+            'warehouse_required' => 'Warehouse is required.',
+            'adjustment_date_required' => 'Adjustment date is required.',
+            'adjustment_type_required' => 'Adjustment type is required.',
+            'status_required' => 'Status is required.',
+            'product_required' => 'Product is required.',
+            'unit_required' => 'Unit is required.',
+            'quantity_before_min_zero' => 'Quantity before must be at least 0.',
+            'quantity_adjusted_not_zero' => 'Quantity adjusted cannot be 0.',
+            'unit_cost_min_zero' => 'Unit cost must be at least 0.',
+            'items_min_one' => 'At least 1 item is required.',
+        ],
+        'purchase_request' => [
+            'branch_required' => 'Branch is required.',
+            'request_date_required' => 'Request date is required.',
+            'priority_required' => 'Priority is required.',
+            'status_required' => 'Status is required.',
+            'product_required' => 'Product is required.',
+            'unit_required' => 'Unit is required.',
+            'quantity_gt_zero' => 'Quantity must be greater than 0.',
+            'items_min_one' => 'At least 1 item is required.',
+        ],
+        'goods_receipt' => [
+            'purchase_order_required' => 'Purchase order is required.',
+            'warehouse_required' => 'Warehouse is required.',
+            'receipt_date_required' => 'Receipt date is required.',
+            'status_required' => 'Status is required.',
+            'po_item_required' => 'PO Item is required.',
+            'product_required' => 'Product is required.',
+            'unit_required' => 'Unit is required.',
+            'quantity_received_gt_zero' => 'Quantity received must be greater than 0.',
+            'quantity_accepted_min_zero' => 'Quantity accepted must be at least 0.',
+            'unit_price_min_zero' => 'Unit price must be at least 0.',
+            'items_min_one' => 'At least 1 item is required.',
+        ],
+        'supplier_return' => [
+            'purchase_order_required' => 'Purchase order is required.',
+            'supplier_required' => 'Supplier is required.',
+            'warehouse_required' => 'Warehouse is required.',
+            'return_date_required' => 'Return date is required.',
+            'reason_required' => 'Reason is required.',
+            'status_required' => 'Status is required.',
+            'gr_item_required' => 'GR item is required.',
+            'product_required' => 'Product is required.',
+            'quantity_returned_gt_zero' => 'Quantity returned must be greater than 0.',
+            'unit_price_min_zero' => 'Unit price must be at least 0.',
+            'items_min_one' => 'At least 1 item is required.',
+        ],
+        'transaction_item_pricing' => [
+            'quantity_gt_zero' => 'Quantity must be greater than 0.',
+            'unit_price_min_zero' => 'Unit price must be at least 0.',
+        ],
+        'budget_line' => [
+            'account_required' => 'Account is required.',
+            'period_start_required' => 'Period start is required.',
+            'period_end_required' => 'Period end is required.',
+            'amount_min_zero' => 'Amount must be non-negative.',
+        ],
+    ];
+
+    foreach ($forms as $form => $rules) {
+        foreach ($rules as $rule => $text) {
+            expect($en[$form][$rule])->toBe($text, "validation.{$form}.{$rule} en text changed");
+            expect($id[$form][$rule])->not->toBe('', "validation.{$form}.{$rule} id empty");
+        }
+        expect(sortedKeys($en[$form]))->toEqual(sortedKeys($id[$form]), "validation.{$form} keys differ");
     }
 });
