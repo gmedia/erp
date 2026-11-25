@@ -40,14 +40,27 @@ async function expectNumericHeaderRightAligned(
 async function expectRoomBeforeActions(page: Page): Promise<void> {
     const actionsHead = page.locator('th[data-sticky-column="actions"]');
     await expect(actionsHead).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
     await actionsHead.evaluate((el) => {
         const scroller = el.closest('.overflow-x-auto');
-        if (scroller) scroller.scrollLeft = scroller.scrollWidth;
+        if (scroller) scroller.scrollLeft = 0;
     });
     const beforeHead = actionsHead.locator('xpath=preceding-sibling::th[1]');
-    const actionsBox = await boxOf(actionsHead);
-    const beforeBox = await boxOf(beforeHead);
-    expect(beforeBox.x + beforeBox.width).toBeLessThanOrEqual(actionsBox.x + 1);
+
+    await expect
+        .poll(
+            async () => {
+                await actionsHead.evaluate((el) => {
+                    const scroller = el.closest('.overflow-x-auto');
+                    if (scroller) scroller.scrollLeft = scroller.scrollWidth;
+                });
+                const actionsBox = await boxOf(actionsHead);
+                const beforeBox = await boxOf(beforeHead);
+                return beforeBox.x + beforeBox.width - (actionsBox.x + 1);
+            },
+            { timeout: 10000 },
+        )
+        .toBeLessThanOrEqual(0);
 }
 
 test.describe('Budgets - kolom angka & layout', () => {

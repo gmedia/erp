@@ -578,6 +578,9 @@ export function DataTable<T>({
                                                 )}
                                                 className={cn(
                                                     'h-9 border-border px-2 py-1.5 text-sm font-medium select-none',
+                                                    isNumericColumn(
+                                                        header.column.columnDef,
+                                                    ) && 'pr-4',
                                                     stickyHeadClass(
                                                         header.column.id,
                                                         hasStickyGrandTotal,
@@ -606,7 +609,7 @@ export function DataTable<T>({
                     <TableBody>{tableContent}</TableBody>
                     {summaryRow ? (
                         <TableFooter>
-                            <TableRow>
+                            <TableRow className="border-t-2 border-border bg-muted/70 font-semibold">
                                 {table.getVisibleLeafColumns().map((column) => {
                                     const labelColumnId =
                                         summaryRow.labelColumnId ??
@@ -619,6 +622,11 @@ export function DataTable<T>({
                                             className={cn(
                                                 'border-border px-2 py-1.5 tabular-nums',
                                                 !isLabel && 'text-right',
+                                                !isLabel &&
+                                                    isNumericColumn(
+                                                        column.columnDef,
+                                                    ) &&
+                                                    'pr-4',
                                             )}
                                         >
                                             {isLabel

@@ -138,30 +138,41 @@ test.describe('Issue #460: petunjuk scroll kolom aksi di 390', () => {
 
     test('garis bawah sel aksi sejajar dengan baris', async ({ page }) => {
         await login(page);
+        const listResponse = page.waitForResponse(
+            (response) =>
+                response.url().includes('/api/budgets') &&
+                response.status() < 400,
+            { timeout: 15000 },
+        );
         await page.goto('/budgets');
-        await page.waitForLoadState('networkidle');
+        await listResponse;
+        await page.evaluate(() => document.fonts.ready);
 
         const row = page.locator('tbody tr').first();
         await expect(row).toBeVisible();
 
-        const bottoms = await row.evaluate((tr) => {
-            const actions = tr.querySelector(
-                'td[data-sticky-column="actions"]',
-            );
-            const first = tr.querySelector('td');
-            if (!actions || !first) {
-                throw new Error('Sel aksi atau sel pertama tidak ditemukan');
-            }
+        await expect
+            .poll(
+                () =>
+                    row.evaluate((tr) => {
+                        const actions = tr.querySelector(
+                            'td[data-sticky-column="actions"]',
+                        );
+                        const first = tr.querySelector('td');
+                        if (!actions || !first) {
+                            throw new Error(
+                                'Sel aksi atau sel pertama tidak ditemukan',
+                            );
+                        }
 
-            return {
-                actions: actions.getBoundingClientRect().bottom,
-                first: first.getBoundingClientRect().bottom,
-            };
-        });
-
-        expect(Math.abs(bottoms.actions - bottoms.first)).toBeLessThanOrEqual(
-            1,
-        );
+                        return Math.abs(
+                            actions.getBoundingClientRect().bottom -
+                                first.getBoundingClientRect().bottom,
+                        );
+                    }),
+                { timeout: 10000 },
+            )
+            .toBeLessThanOrEqual(1);
     });
 });
 
