@@ -37,7 +37,6 @@ export default function ArAgingReportPage() {
                 grand_total: false,
                 amount_received: false,
                 credit_note_amount: false,
-                amount_due: false,
             }}
             summaryColumns={[
                 {
