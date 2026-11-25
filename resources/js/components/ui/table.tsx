@@ -8,6 +8,9 @@ import { cn } from "@/lib/utils"
 const TABLE_EDGE_RIGHT =
   "after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-4 after:bg-linear-to-r after:from-background after:to-transparent"
 
+const ACTIONS_SHADOW =
+  "[&_[data-sticky-column=actions]]:before:content-[''] [&_[data-sticky-column=actions]]:before:pointer-events-none [&_[data-sticky-column=actions]]:before:absolute [&_[data-sticky-column=actions]]:before:inset-y-0 [&_[data-sticky-column=actions]]:before:-left-3 [&_[data-sticky-column=actions]]:before:w-3 [&_[data-sticky-column=actions]]:before:bg-linear-to-l [&_[data-sticky-column=actions]]:before:from-foreground/15 [&_[data-sticky-column=actions]]:before:to-transparent"
+
 type TableProps = React.ComponentProps<"table"> & { edgeFade?: boolean }
 
 function Table({
@@ -57,7 +60,8 @@ function Table({
         "relative @container w-full min-w-0",
         showEdgeFade && TABLE_EDGE_RIGHT,
         showEdgeFade &&
-          "[&_td:last-child]:pr-5 [&_th:last-child]:pr-5"
+          "[&_td:last-child]:pr-5 [&_th:last-child]:pr-5",
+        showEdgeFade && ACTIONS_SHADOW
       )}
     >
       <div

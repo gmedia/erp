@@ -49,13 +49,19 @@ function isActionsColumn(columnId: string): boolean {
     return columnId === 'actions' || columnId === 'actions_custom';
 }
 
+function isNumericColumn(columnDef: object): boolean {
+    return (
+        (columnDef as { meta?: { numeric?: boolean } }).meta?.numeric === true
+    );
+}
+
 function stickyCellClass(
     columnId: string,
     hasGrandTotal: boolean,
     isBeforeActions = false,
 ): string | false {
     if (isActionsColumn(columnId)) {
-        return cn(STICKY_ACTIONS_CELL, !hasGrandTotal && STICKY_EDGE_SHADOW);
+        return STICKY_ACTIONS_CELL;
     }
     if (columnId === 'grand_total' && hasGrandTotal) {
         return STICKY_GRAND_TOTAL_CELL;
@@ -67,7 +73,9 @@ function stickyCellClass(
     return false;
 }
 
-const CELL_BEFORE_STICKY_ACTIONS = 'pr-6';
+// Ruang kanan = lebar kolom aksi sticky (size 56px), agar isi kolom terakhir
+// tidak tertutup saat tabel di-scroll horizontal di mobile.
+const CELL_BEFORE_STICKY_ACTIONS = 'pr-14';
 
 function stickyColumnAttr(
     columnId: string,
@@ -87,7 +95,7 @@ function stickyHeadClass(
     hasGrandTotal: boolean,
 ): string | false {
     if (isActionsColumn(columnId)) {
-        return cn(STICKY_ACTIONS_HEAD, !hasGrandTotal && STICKY_EDGE_SHADOW);
+        return STICKY_ACTIONS_HEAD;
     }
     if (columnId === 'grand_total' && hasGrandTotal) {
         return STICKY_GRAND_TOTAL_HEAD;
@@ -436,8 +444,14 @@ export function DataTable<T>({
                     return (
                         <TableCell
                             key={cell.id}
+                            data-sticky-column={stickyColumnAttr(
+                                cell.column.id,
+                                hasStickyGrandTotal,
+                            )}
                             className={cn(
                                 'border-border px-2 py-1.5',
+                                isNumericColumn(cell.column.columnDef) &&
+                                    'pr-4',
                                 stickyCellClass(
                                     cell.column.id,
                                     hasStickyGrandTotal,
