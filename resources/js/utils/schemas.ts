@@ -775,6 +775,23 @@ export const stockTransferQuantityReceivedSchema = z.preprocess(
     z.number().min(0).nullable(),
 );
 
+export const stockTransferItemSchema = z.object({
+    product_id: z.string().min(1, {
+        message: 'validation.stock_transfer.product_required',
+    }),
+    product_label: z.string().optional(),
+    unit_id: z.string().min(1, {
+        message: 'validation.stock_transfer.unit_required',
+    }),
+    unit_label: z.string().optional(),
+    quantity: z.coerce.number().gt(0, {
+        message: 'validation.stock_transfer.quantity_gt_zero',
+    }),
+    quantity_received: stockTransferQuantityReceivedSchema,
+    unit_cost: z.coerce.number().min(0).optional().default(0),
+    notes: z.string().optional(),
+});
+
 export const stockTransferFormSchema = z.object({
     transfer_number: z.string().optional(),
     from_warehouse_id: z.string().min(1, {
@@ -803,24 +820,7 @@ export const stockTransferFormSchema = z.object({
     notes: z.string().optional(),
     requested_by: z.string().optional(),
     items: z
-        .array(
-            z.object({
-                product_id: z.string().min(1, {
-                    message: 'validation.stock_transfer.product_required',
-                }),
-                product_label: z.string().optional(),
-                unit_id: z.string().min(1, {
-                    message: 'validation.stock_transfer.unit_required',
-                }),
-                unit_label: z.string().optional(),
-                quantity: z.coerce.number().gt(0, {
-                    message: 'validation.stock_transfer.quantity_gt_zero',
-                }),
-                quantity_received: stockTransferQuantityReceivedSchema,
-                unit_cost: z.coerce.number().min(0).optional().default(0),
-                notes: z.string().optional(),
-            }),
-        )
+        .array(stockTransferItemSchema)
         .min(1, { message: 'validation.stock_transfer.items_min_one' }),
 });
 
@@ -1251,6 +1251,37 @@ export const apPaymentFormSchema = z.object({
 
 export type ApPaymentFormData = z.infer<typeof apPaymentFormSchema>;
 
+const salesDocumentItemBaseSchema = (prefix: string) =>
+    z.object({
+        product_id: z.string().optional(),
+        product_label: z.string().optional(),
+        account_id: z.string().min(1, {
+            message: `validation.${prefix}.account_required`,
+        }),
+        account_label: z.string().optional(),
+        description: z.string().min(1, {
+            message: `validation.${prefix}.description_required`,
+        }),
+        quantity: z.coerce.number().gt(0, {
+            message: `validation.${prefix}.quantity_gt_zero`,
+        }),
+        unit_price: z.coerce.number().min(0, {
+            message: `validation.${prefix}.unit_price_min_zero`,
+        }),
+        tax_percent: percentField(),
+        notes: z.string().optional(),
+    });
+
+export const creditNoteItemSchema = salesDocumentItemBaseSchema('credit_note');
+
+export const customerInvoiceItemSchema = salesDocumentItemBaseSchema(
+    'customer_invoice',
+).extend({
+    unit_id: z.string().optional(),
+    unit_label: z.string().optional(),
+    discount_percent: percentField(),
+});
+
 export const customerInvoiceFormSchema = z.object({
     customer_id: z
         .string()
@@ -1285,26 +1316,7 @@ export const customerInvoiceFormSchema = z.object({
     ),
     notes: z.string().optional(),
     items: z
-        .array(
-            z.object({
-                product_id: z.string().optional(),
-                product_label: z.string().optional(),
-                account_id: z.string().min(1, {
-                    message: 'validation.customer_invoice.account_required',
-                }),
-                account_label: z.string().optional(),
-                unit_id: z.string().optional(),
-                unit_label: z.string().optional(),
-                description: z.string().min(1, {
-                    message: 'validation.customer_invoice.description_required',
-                }),
-                ...linePricingFields({
-                    quantity: 'validation.customer_invoice.quantity_gt_zero',
-                    unitPrice:
-                        'validation.customer_invoice.unit_price_min_zero',
-                }),
-            }),
-        )
+        .array(customerInvoiceItemSchema)
         .min(1, { message: 'validation.customer_invoice.items_min_one' }),
 });
 
@@ -1380,32 +1392,7 @@ export const creditNoteFormSchema = z.object({
     }),
     notes: z.string().optional(),
     items: z
-        .array(
-            z.object({
-                product_id: z.string().optional(),
-                product_label: z.string().optional(),
-                account_id: z.string().min(1, {
-                    message: 'validation.credit_note.account_required',
-                }),
-                account_label: z.string().optional(),
-                description: z.string().min(1, {
-                    message: 'validation.credit_note.description_required',
-                }),
-                quantity: z.coerce.number().gt(0, {
-                    message: 'validation.credit_note.quantity_gt_zero',
-                }),
-                unit_price: z.coerce.number().min(0, {
-                    message: 'validation.credit_note.unit_price_min_zero',
-                }),
-                tax_percent: z.coerce
-                    .number()
-                    .min(0)
-                    .max(100)
-                    .optional()
-                    .default(0),
-                notes: z.string().optional(),
-            }),
-        )
+        .array(creditNoteItemSchema)
         .min(1, { message: 'validation.credit_note.items_min_one' }),
 });
 

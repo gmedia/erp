@@ -15,6 +15,7 @@ import {
 import { InputField } from '@/components/common/InputField';
 import { PostedDocumentLockNotice } from '@/components/common/PostedDocumentLockNotice';
 import SelectField from '@/components/common/SelectField';
+import { StatusSelectField } from '@/components/common/StatusSelectField';
 import { TextareaField } from '@/components/common/TextareaField';
 import {
     Table,
@@ -205,39 +206,18 @@ export const ApPaymentForm = memo<ApPaymentFormProps>(function ApPaymentForm({
                     )}
                 />
 
-                <SelectField
-                    name="status"
+                <StatusSelectField
+                    fl={fl}
                     label={fl('status', 'Status')}
-                    options={[
-                        {
-                            value: 'draft',
-                            label: fl('status_draft', 'Draft'),
-                        },
-                        {
-                            value: 'pending_approval',
-                            label: fl(
-                                'status_pending_approval',
-                                'Pending Approval',
-                            ),
-                        },
-                        {
-                            value: 'confirmed',
-                            label: fl('status_confirmed', 'Confirmed'),
-                        },
-                        {
-                            value: 'reconciled',
-                            label: fl('status_reconciled', 'Reconciled'),
-                        },
-                        {
-                            value: 'cancelled',
-                            label: fl('status_cancelled', 'Cancelled'),
-                        },
-                        {
-                            value: 'void',
-                            label: fl('status_void', 'Void'),
-                        },
-                    ]}
                     placeholder={fl('status_placeholder', 'Select status')}
+                    statuses={[
+                        ['draft', 'Draft'],
+                        ['pending_approval', 'Pending Approval'],
+                        ['confirmed', 'Confirmed'],
+                        ['reconciled', 'Reconciled'],
+                        ['cancelled', 'Cancelled'],
+                        ['void', 'Void'],
+                    ]}
                 />
 
                 <AsyncSelectField

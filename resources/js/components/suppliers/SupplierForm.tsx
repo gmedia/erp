@@ -2,10 +2,12 @@
 
 import { memo } from 'react';
 
-import AsyncSelectField from '@/components/common/AsyncSelectField';
 import EntityForm from '@/components/common/EntityForm';
-import { InputField } from '@/components/common/InputField';
 import NameField from '@/components/common/NameField';
+import {
+    PartyBranchCategoryFields,
+    PartyEmailPhoneFields,
+} from '@/components/common/PartyContactFields';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
 import { useTranslation } from '@/contexts/i18n-context';
@@ -91,28 +93,15 @@ export const SupplierForm = memo<SupplierFormProps>(function SupplierForm({
                 label={ft('name', 'Name')}
                 placeholder={ft('name_placeholder', 'Supplier Name')}
             />
-            <InputField
-                name="email"
-                label={ft('email', 'Email')}
-                type="email"
-                placeholder={ft('email_placeholder', 'supplier@example.com')}
+            <PartyEmailPhoneFields
+                fl={ft}
+                emailPlaceholder="supplier@example.com"
+                phonePlaceholder="+1 (555) 123-4567"
             />
-            <InputField
-                name="phone"
-                label={ft('phone', 'Phone')}
-                placeholder={ft('phone_placeholder', '+1 (555) 123-4567')}
-            />
-            <AsyncSelectField
-                name="branch_id"
-                label={ft('branch', 'Branch')}
-                url="/api/branches"
-                placeholder={ft('branch_placeholder', 'Select a branch')}
-            />
-            <AsyncSelectField
-                name="category_id"
-                label={ft('category', 'Category')}
-                url="/api/supplier-categories"
-                placeholder={ft('category_placeholder', 'Select a category')}
+            <PartyBranchCategoryFields
+                fl={ft}
+                categoryUrl="/api/supplier-categories"
+                categoryPlaceholder="Select a category"
             />
             <SelectField
                 name="status"

@@ -14,7 +14,7 @@ import {
 } from '@/components/common/EntityFormItemTable';
 import { InputField } from '@/components/common/InputField';
 import { PostedDocumentLockNotice } from '@/components/common/PostedDocumentLockNotice';
-import SelectField from '@/components/common/SelectField';
+import { StatusSelectField } from '@/components/common/StatusSelectField';
 import { TextareaField } from '@/components/common/TextareaField';
 import {
     Table,
@@ -230,43 +230,19 @@ export const SupplierBillForm = memo<SupplierBillFormProps>(
                         )}
                     />
 
-                    <SelectField
-                        name="status"
+                    <StatusSelectField
+                        fl={fl}
                         label={fl('status', 'Status')}
-                        options={[
-                            {
-                                value: 'draft',
-                                label: fl('status_draft', 'Draft'),
-                            },
-                            {
-                                value: 'confirmed',
-                                label: fl('status_confirmed', 'Confirmed'),
-                            },
-                            {
-                                value: 'partially_paid',
-                                label: fl(
-                                    'status_partially_paid',
-                                    'Partially Paid',
-                                ),
-                            },
-                            {
-                                value: 'paid',
-                                label: fl('status_paid', 'Paid'),
-                            },
-                            {
-                                value: 'overdue',
-                                label: fl('status_overdue', 'Overdue'),
-                            },
-                            {
-                                value: 'cancelled',
-                                label: fl('status_cancelled', 'Cancelled'),
-                            },
-                            {
-                                value: 'void',
-                                label: fl('status_void', 'Void'),
-                            },
-                        ]}
                         placeholder={fl('status_placeholder', 'Select status')}
+                        statuses={[
+                            ['draft', 'Draft'],
+                            ['confirmed', 'Confirmed'],
+                            ['partially_paid', 'Partially Paid'],
+                            ['paid', 'Paid'],
+                            ['overdue', 'Overdue'],
+                            ['cancelled', 'Cancelled'],
+                            ['void', 'Void'],
+                        ]}
                     />
 
                     <AsyncSelectField

@@ -3,7 +3,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMemo } from 'react';
 import { type Resolver, useForm } from 'react-hook-form';
-import { z } from 'zod';
 
 import { InputField } from '@/components/common/InputField';
 import {
@@ -16,29 +15,7 @@ import { ItemPricingFields } from '@/components/common/ItemPricingFields';
 import { useTranslation } from '@/contexts/i18n-context';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type CustomerInvoiceFormData } from '@/types/customer-invoice';
-
-const customerInvoiceItemSchema = z.object({
-    product_id: z.string().optional(),
-    product_label: z.string().optional(),
-    account_id: z.string().min(1, {
-        message: 'validation.customer_invoice.account_required',
-    }),
-    account_label: z.string().optional(),
-    unit_id: z.string().optional(),
-    unit_label: z.string().optional(),
-    description: z.string().min(1, {
-        message: 'validation.customer_invoice.description_required',
-    }),
-    quantity: z.coerce.number().gt(0, {
-        message: 'validation.customer_invoice.quantity_gt_zero',
-    }),
-    unit_price: z.coerce.number().min(0, {
-        message: 'validation.customer_invoice.unit_price_min_zero',
-    }),
-    discount_percent: z.coerce.number().min(0).max(100).optional().default(0),
-    tax_percent: z.coerce.number().min(0).max(100).optional().default(0),
-    notes: z.string().optional(),
-});
+import { customerInvoiceItemSchema } from '@/utils/schemas';
 
 type CustomerInvoiceItemFormData = CustomerInvoiceFormData['items'][number];
 

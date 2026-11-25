@@ -2,10 +2,12 @@
 
 import { memo } from 'react';
 
-import AsyncSelectField from '@/components/common/AsyncSelectField';
 import EntityForm from '@/components/common/EntityForm';
-import { InputField } from '@/components/common/InputField';
 import NameField from '@/components/common/NameField';
+import {
+    PartyBranchCategoryFields,
+    PartyEmailPhoneFields,
+} from '@/components/common/PartyContactFields';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
 import { useTranslation } from '@/contexts/i18n-context';
@@ -104,16 +106,10 @@ export const CustomerForm = memo<CustomerFormProps>(function CustomerForm({
                 label={ft('name', 'Name')}
                 placeholder={ft('name_placeholder', 'Customer name')}
             />
-            <InputField
-                name="email"
-                label={ft('email', 'Email')}
-                type="email"
-                placeholder={ft('email_placeholder', 'customer@example.com')}
-            />
-            <InputField
-                name="phone"
-                label={ft('phone', 'Phone')}
-                placeholder={ft('phone_placeholder', '+62 812 3456 7890')}
+            <PartyEmailPhoneFields
+                fl={ft}
+                emailPlaceholder="customer@example.com"
+                phonePlaceholder="+62 812 3456 7890"
             />
             <TextareaField
                 name="address"
@@ -121,17 +117,10 @@ export const CustomerForm = memo<CustomerFormProps>(function CustomerForm({
                 placeholder={ft('address_placeholder', 'Full address')}
                 rows={3}
             />
-            <AsyncSelectField
-                name="branch_id"
-                label={ft('branch', 'Branch')}
-                url="/api/branches"
-                placeholder={ft('branch_placeholder', 'Select a branch')}
-            />
-            <AsyncSelectField
-                name="category_id"
-                label={ft('category', 'Category')}
-                url="/api/customer-categories"
-                placeholder={ft('category_placeholder', 'Select a category')}
+            <PartyBranchCategoryFields
+                fl={ft}
+                categoryUrl="/api/customer-categories"
+                categoryPlaceholder="Select a category"
             />
             <SelectField
                 name="status"

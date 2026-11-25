@@ -11,6 +11,7 @@ import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
 import { InputField } from '@/components/common/InputField';
 import SelectField from '@/components/common/SelectField';
+import { StatusSelectField } from '@/components/common/StatusSelectField';
 import { TextareaField } from '@/components/common/TextareaField';
 import { useTranslation } from '@/contexts/i18n-context';
 
@@ -418,38 +419,20 @@ export const AssetForm = memo<AssetFormProps>(function AssetForm({
                         {fl('section_status', 'Status & Notes')}
                     </h3>
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        <SelectField
-                            name="status"
+                        <StatusSelectField
+                            fl={fl}
                             label={fl('status', 'Status')}
-                            options={[
-                                {
-                                    value: 'draft',
-                                    label: fl('status_draft', 'Draft'),
-                                },
-                                {
-                                    value: 'active',
-                                    label: fl('status_active', 'Active'),
-                                },
-                                {
-                                    value: 'maintenance',
-                                    label: fl(
-                                        'status_maintenance',
-                                        'Maintenance',
-                                    ),
-                                },
-                                {
-                                    value: 'disposed',
-                                    label: fl('status_disposed', 'Disposed'),
-                                },
-                                {
-                                    value: 'lost',
-                                    label: fl('status_lost', 'Lost'),
-                                },
-                            ]}
                             placeholder={fl(
                                 'status_placeholder',
                                 'Select status',
                             )}
+                            statuses={[
+                                ['draft', 'Draft'],
+                                ['active', 'Active'],
+                                ['maintenance', 'Maintenance'],
+                                ['disposed', 'Disposed'],
+                                ['lost', 'Lost'],
+                            ]}
                         />
                         <SelectField
                             name="condition"
