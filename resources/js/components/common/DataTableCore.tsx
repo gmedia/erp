@@ -625,7 +625,7 @@ export function DataTable<T>({
                                             key={column.id}
                                             data-testid={`report-total-cell-${column.id}`}
                                             className={cn(
-                                                'border-border px-2 py-1.5 tabular-nums',
+                                                'border-border bg-muted/70 px-2 py-1.5 tabular-nums',
                                                 !isLabel && 'text-right',
                                                 !isLabel &&
                                                     isNumericColumn(

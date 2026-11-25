@@ -1284,6 +1284,8 @@
         "total_quantity": "Total Kuantitas",
         "total_stock_value": "Total Nilai Stok",
         "low_stock_items": "Item Stok Rendah",
+        "in_transit_value": "Nilai Stok Dalam Perjalanan",
+        "in_transit_detail": "{items} baris transfer · {quantity} qty",
         "stock_by_warehouse": "Stok per Gudang",
         "stock_by_category": "Stok per Kategori",
         "stock_by_branch": "Stok per Cabang",
