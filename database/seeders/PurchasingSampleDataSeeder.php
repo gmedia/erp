@@ -1031,6 +1031,32 @@ class PurchasingSampleDataSeeder extends Seeder
         return [$purchaseRequests, $purchaseRequestItems];
     }
 
+    /**
+     * Dua produk dianggap dipasok supplier yang sama bila ada satu kategori supplier
+     * demo yang memasok keduanya (#459 butir 8).
+     */
+    private function sameSupplierCategory(Product $candidate, Product $reference): bool
+    {
+        return collect(DemoMasterData::SUPPLIER_PRODUCT_CATEGORY_MAP)
+            ->contains(fn (array $allowed) => $this->isInAllowedCategories($candidate, $allowed)
+                && $this->isInAllowedCategories($reference, $allowed));
+    }
+
+    private function supplierSuppliesProduct(Supplier $supplier, Product $product): bool
+    {
+        $allowed = DemoMasterData::SUPPLIER_PRODUCT_CATEGORY_MAP[$supplier->category?->name] ?? [];
+
+        return $this->isInAllowedCategories($product, $allowed);
+    }
+
+    /**
+     * @param  list<string>  $allowed
+     */
+    private function isInAllowedCategories(Product $product, array $allowed): bool
+    {
+        return in_array($product->category->name, $allowed, true);
+    }
+
     private function seedPurchaseOrders(
         int $adminUserId,
         Supplier $supplier,
@@ -1095,7 +1121,12 @@ class PurchasingSampleDataSeeder extends Seeder
             $sourceItems = $purchaseRequestItems[$definition['source_status']] ?? [];
 
             $firstProduct = $products[($index + 2) % $products->count()];
-            $secondProduct = $products[($index + 3) % $products->count()];
+            // Produk kedua harus dipasok supplier yang sama dengan produk pertama (#459 butir 8).
+            // Jika tidak ada pasangan yang sepemasok, produk pertama dipakai dua kali.
+            $secondProduct = $products->first(
+                fn (Product $candidate) => $candidate->id !== $firstProduct->id
+                    && $this->sameSupplierCategory($candidate, $firstProduct),
+            ) ?? $firstProduct;
 
             // Kuantitas bervariasi agar data demo tidak seragam (W5-23).
             $firstQuantity = (float) (6 + (($index * 5) % 17));
@@ -1117,13 +1148,12 @@ class PurchasingSampleDataSeeder extends Seeder
 
             // Rotasi supplier aktif agar tidak semua PO ke vendor yang sama. Produk
             // layanan SaaS hanya dipesan dari supplier kategori Jasa TI (W7-17).
-            $poSuppliers = Supplier::query()->orderBy('id')->get();
-            $isSoftwareOrder = $firstProduct->code === 'SW-CLD-001' || $secondProduct->code === 'SW-CLD-001';
-            $itServicesCategory = DemoMasterData::SUPPLIER_CATEGORY_IT_SERVICES;
-            $eligibleSuppliers = $isSoftwareOrder
-                ? $poSuppliers->filter(fn (Supplier $candidate) => $candidate->category?->name === $itServicesCategory)
-                : $poSuppliers->reject(fn (Supplier $candidate) => $candidate->category?->name === $itServicesCategory);
-            $eligibleSuppliers = $eligibleSuppliers->isEmpty() ? $poSuppliers : $eligibleSuppliers->values();
+            // Pemasok dipilih dari kategori barang PO agar pasangan pemasok–barang masuk akal (#459 butir 8).
+            $poSuppliers = Supplier::query()->with('category')->orderBy('id')->get();
+            $eligibleSuppliers = $poSuppliers->filter(
+                fn (Supplier $candidate) => $this->supplierSuppliesProduct($candidate, $firstProduct)
+                    && $this->supplierSuppliesProduct($candidate, $secondProduct),
+            )->values();
             $poSupplierId = $eligibleSuppliers->isEmpty()
                 ? $supplier->id
                 : $eligibleSuppliers[$index % $eligibleSuppliers->count()]->id;

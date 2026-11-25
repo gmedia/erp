@@ -891,6 +891,55 @@ invariant('W7-15 bank reconciliations are Completed only after the period ends',
     }
 });
 
+// #459 butir 7 — penerimaan AR draft harus punya invoice terbuka milik pelanggan yang sama.
+invariant('#459 draft AR receipts have an open invoice of the same customer', function () {
+    $openStatuses = ['sent', 'partially_paid', 'overdue'];
+
+    $drafts = DB::table('ar_receipts')->where('status', 'draft')->get(['id', 'receipt_number', 'customer_id']);
+
+    expect($drafts)->not->toBeEmpty('Demo data must include a draft AR receipt');
+
+    foreach ($drafts as $draft) {
+        $hasOpenInvoice = DB::table('customer_invoices')
+            ->where('customer_id', $draft->customer_id)
+            ->whereIn('status', $openStatuses)
+            ->where('amount_due', '>', 0)
+            ->exists();
+
+        expect($hasOpenInvoice)->toBeTrue(
+            "Draft receipt {$draft->receipt_number} must have an open invoice of its customer",
+        );
+    }
+});
+
+// #459 butir 8 — pemasok demo memasok kategori barang yang sesuai dengan kategorinya.
+invariant('#459 demo purchase orders match the supplier category to the product category', function () {
+    $pairs = DB::table('purchase_order_items')
+        ->join('purchase_orders', 'purchase_orders.id', '=', 'purchase_order_items.purchase_order_id')
+        ->join('suppliers', 'suppliers.id', '=', 'purchase_orders.supplier_id')
+        ->join('supplier_categories', 'supplier_categories.id', '=', 'suppliers.category_id')
+        ->join('products', 'products.id', '=', 'purchase_order_items.product_id')
+        ->join('product_categories', 'product_categories.id', '=', 'products.product_category_id')
+        ->get([
+            'purchase_orders.po_number',
+            'suppliers.name as supplier',
+            'supplier_categories.name as supplier_category',
+            'products.name as product',
+            'product_categories.name as product_category',
+        ]);
+
+    expect($pairs)->not->toBeEmpty('Demo data must include purchase order items');
+
+    foreach ($pairs as $pair) {
+        $allowed = DemoMasterData::SUPPLIER_PRODUCT_CATEGORY_MAP[$pair->supplier_category] ?? [];
+
+        expect(in_array($pair->product_category, $allowed, true))->toBeTrue(
+            "{$pair->po_number}: supplier {$pair->supplier} ({$pair->supplier_category}) "
+            . "must not supply {$pair->product} ({$pair->product_category})",
+        );
+    }
+});
+
 // W7-15 (keuangan) — recurring journal Monthly berjarak tepat satu bulan, dan nilainya wajar.
 invariant('W7-15 monthly recurring journals run one month apart with plausible amounts', function () {
     $journals = DB::table('recurring_journals')
