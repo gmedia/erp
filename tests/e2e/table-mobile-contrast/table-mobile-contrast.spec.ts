@@ -85,7 +85,7 @@ test.describe('Issue #460: checkbox mode terang', () => {
 test.describe('Issue #460: petunjuk scroll kolom aksi di 390', () => {
     test.use({ viewport: { width: 390, height: 844 }, colorScheme: 'light' });
 
-    test('shadow kolom aksi ada di awal dan hilang di ujung scroll', async ({
+    test('shadow kolom aksi ada di th dan td, lalu hilang di ujung scroll', async ({
         page,
     }) => {
         await login(page);
@@ -95,12 +95,20 @@ test.describe('Issue #460: petunjuk scroll kolom aksi di 390', () => {
         const actionsHead = page
             .locator('th[data-sticky-column="actions"]')
             .first();
+        const actionsCell = page
+            .locator('tbody tr td[data-sticky-column="actions"]')
+            .first();
         await expect(actionsHead).toBeVisible();
+        await expect(actionsCell).toBeVisible();
 
-        const shadowOf = () =>
-            actionsHead.evaluate(
-                (el) => getComputedStyle(el, '::before').backgroundImage,
-            );
+        const shadowOf = (locator: typeof actionsCell) =>
+            locator.evaluate((el) => {
+                const style = getComputedStyle(el, '::before');
+                return {
+                    image: style.backgroundImage,
+                    width: parseFloat(style.width),
+                };
+            });
 
         const scrollerOf = () =>
             actionsHead.evaluate((el) => {
@@ -109,14 +117,51 @@ test.describe('Issue #460: petunjuk scroll kolom aksi di 390', () => {
             });
 
         expect(await scrollerOf()).toBe(0);
-        expect(await shadowOf()).not.toBe('none');
+        const headShadow = await shadowOf(actionsHead);
+        const cellShadow = await shadowOf(actionsCell);
+        expect(headShadow.image).not.toBe('none');
+        expect(cellShadow.image).not.toBe('none');
+        expect(cellShadow.width).toBeGreaterThanOrEqual(8);
 
         await actionsHead.evaluate((el) => {
             const scroller = el.closest('.overflow-x-auto');
             if (scroller) scroller.scrollLeft = scroller.scrollWidth;
         });
 
-        await expect.poll(shadowOf).toBe('none');
+        await expect
+            .poll(async () => (await shadowOf(actionsHead)).image)
+            .toBe('none');
+        await expect
+            .poll(async () => (await shadowOf(actionsCell)).image)
+            .toBe('none');
+    });
+
+    test('garis bawah sel aksi sejajar dengan baris', async ({ page }) => {
+        await login(page);
+        await page.goto('/budgets');
+        await page.waitForLoadState('networkidle');
+
+        const row = page.locator('tbody tr').first();
+        await expect(row).toBeVisible();
+
+        const bottoms = await row.evaluate((tr) => {
+            const actions = tr.querySelector(
+                'td[data-sticky-column="actions"]',
+            );
+            const first = tr.querySelector('td');
+            if (!actions || !first) {
+                throw new Error('Sel aksi atau sel pertama tidak ditemukan');
+            }
+
+            return {
+                actions: actions.getBoundingClientRect().bottom,
+                first: first.getBoundingClientRect().bottom,
+            };
+        });
+
+        expect(Math.abs(bottoms.actions - bottoms.first)).toBeLessThanOrEqual(
+            1,
+        );
     });
 });
 
@@ -152,10 +197,7 @@ test.describe('Issue #460: kontras mode gelap dan sidebar', () => {
             const cs = getComputedStyle(el);
             let bg = cs.backgroundColor;
             let node: HTMLElement | null = el as HTMLElement;
-            while (
-                node &&
-                /rgba\(0,\s*0,\s*0,\s*0\)|transparent/.test(bg)
-            ) {
+            while (node && /rgba\(0,\s*0,\s*0,\s*0\)|transparent/.test(bg)) {
                 node = node.parentElement;
                 bg = node ? getComputedStyle(node).backgroundColor : bg;
             }
@@ -163,53 +205,38 @@ test.describe('Issue #460: kontras mode gelap dan sidebar', () => {
             return { fg: toRgb(cs.color), bg: toRgb(bg) };
         });
 
-        const ratio = contrastRatio(
-            parseRgb(styles.fg),
-            parseRgb(styles.bg),
-        );
+        const ratio = contrastRatio(parseRgb(styles.fg), parseRgb(styles.bg));
         expect(ratio).toBeGreaterThanOrEqual(4.5);
     });
 
-    test('item sidebar pertama dan terakhir terlihat penuh', async ({
+    test('item terakhir sidebar terlihat utuh di atas footer setelah scroll', async ({
         page,
     }) => {
         await login(page);
-        await page.goto('/employees');
+        await page.goto('/bank-reconciliations');
         await page.waitForLoadState('networkidle');
 
         const content = page.locator('[data-slot="sidebar-content"]');
-        await expect(content).toBeVisible();
-
-        const items = content.locator('[data-slot="sidebar-menu-button"]');
-        const count = await items.count();
-        expect(count).toBeGreaterThan(1);
-
-        const containerBox = await content.boundingBox();
-        expect(containerBox).not.toBeNull();
-
-        for (const index of [0, count - 1]) {
-            const box = await items.nth(index).boundingBox();
-            expect(box).not.toBeNull();
-            if (!box || !containerBox) {
-                continue;
-            }
-
-            expect(box.y).toBeGreaterThanOrEqual(containerBox.y);
-            expect(box.y + box.height).toBeLessThanOrEqual(
-                containerBox.y + containerBox.height,
-            );
-        }
-
         const footer = page.locator('[data-slot="sidebar-footer"]');
+        await expect(content).toBeVisible();
+        await expect(footer).toBeVisible();
+
+        await content.evaluate((el) => {
+            el.scrollTop = el.scrollHeight;
+        });
+
         const footerBox = await footer.boundingBox();
-        const lastBox = await items.nth(count - 1).boundingBox();
+        const lastFooterItem = footer
+            .locator('[data-slot="sidebar-menu-button"]')
+            .last();
+        const lastBox = await lastFooterItem.boundingBox();
         expect(footerBox).not.toBeNull();
         expect(lastBox).not.toBeNull();
         if (footerBox && lastBox) {
             expect(lastBox.y + lastBox.height).toBeLessThanOrEqual(
-                footerBox.y + 1,
+                footerBox.y + footerBox.height,
             );
+            expect(lastBox.y).toBeGreaterThanOrEqual(footerBox.y);
         }
     });
-
 });

@@ -37,10 +37,10 @@ const STICKY_EDGE_SHADOW =
 // Sel body aksi wajib berlatar solid: `bg-inherit` mewarisi transparan dari
 // <tr>, sehingga teks kolom lain tembus saat tabel di-scroll horizontal.
 const STICKY_ACTIONS_CELL = [
-    'sticky right-0 z-20 border-b border-border bg-background',
+    'sticky right-0 z-20 bg-background',
     'group-hover:bg-muted group-data-[state=selected]:bg-muted',
 ].join(' ');
-const STICKY_ACTIONS_HEAD = `sticky right-0 z-30 border-b border-border bg-background`;
+const STICKY_ACTIONS_HEAD = `sticky right-0 z-30 bg-background`;
 const STICKY_GRAND_TOTAL_CELL = `lg:sticky lg:right-14 lg:z-10 min-w-28 bg-background whitespace-nowrap ${STICKY_EDGE_SHADOW}`;
 const STICKY_GRAND_TOTAL_HEAD = `lg:sticky lg:right-14 lg:z-20 min-w-28 bg-background whitespace-nowrap ${STICKY_EDGE_SHADOW}`;
 
@@ -442,6 +442,10 @@ export function DataTable<T>({
                     return (
                         <TableCell
                             key={cell.id}
+                            data-sticky-column={stickyColumnAttr(
+                                cell.column.id,
+                                hasStickyGrandTotal,
+                            )}
                             className={cn(
                                 'border-border px-2 py-1.5',
                                 isNumericColumn(cell.column.columnDef) &&
