@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { login, expectResponseOk } from '../helpers';
 
 test.describe('Comparative Report', () => {
     test.setTimeout(90000);
@@ -39,14 +39,13 @@ test.describe('Comparative Report', () => {
             (r) => {
                 return r.url().includes('/api/reports/comparative') &&
                     !r.url().includes('/export') &&
-                    r.request().method() === 'GET' &&
-                    r.status() < 400;
+                    r.request().method() === 'GET';
             },
             { timeout: 30000 },
         );
 
         await yearOption.click({ force: true });
-        await refreshPromise;
+        await expectResponseOk(await refreshPromise);
 
         await expect(
             page.getByRole('heading', { name: 'Comparative Report' }),
@@ -67,18 +66,16 @@ test.describe('Comparative Report', () => {
         const options = page.locator('[role="option"]:visible');
         await expect(options.first()).toBeVisible({ timeout: 5000 });
 
-        await Promise.all([
-            page.waitForResponse(
-                (r) => {
-                    return r.url().includes('/api/reports/comparative') &&
+        const refreshPromise = page.waitForResponse(
+            (r) => {
+                return r.url().includes('/api/reports/comparative') &&
                     !r.url().includes('/export') &&
-                    r.request().method() === 'GET' &&
-                    r.status() < 400;
-                },
-                { timeout: 30000 },
-            ),
-            options.first().click({ force: true }),
-        ]);
+                    r.request().method() === 'GET';
+            },
+            { timeout: 30000 },
+        );
+        await options.first().click({ force: true });
+        await expectResponseOk(await refreshPromise);
 
         await expect(
             page.getByRole('heading', { name: 'Comparative Report' }),
@@ -97,27 +94,25 @@ test.describe('Comparative Report', () => {
         const branchesResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/branches') &&
-                r.status() < 400,
+                r.request().method() === 'GET',
             { timeout: 30000 },
         );
         await branchSelector.click();
-        await branchesResponse;
+        await expectResponseOk(await branchesResponse);
 
         const options = page.locator('ul.p-1 li button:visible');
         await expect(options.first()).toBeVisible({ timeout: 5000 });
 
-        await Promise.all([
-            page.waitForResponse(
-                (r) => {
-                    return r.url().includes('/api/reports/comparative') &&
+        const refreshPromise = page.waitForResponse(
+            (r) => {
+                return r.url().includes('/api/reports/comparative') &&
                     !r.url().includes('/export') &&
-                    r.request().method() === 'GET' &&
-                    r.status() < 400;
-                },
-                { timeout: 30000 },
-            ),
-            options.first().click({ force: true }),
-        ]);
+                    r.request().method() === 'GET';
+            },
+            { timeout: 30000 },
+        );
+        await options.first().click({ force: true });
+        await expectResponseOk(await refreshPromise);
 
         await expect(
             page.getByRole('heading', { name: 'Comparative Report' }),
@@ -131,10 +126,9 @@ test.describe('Comparative Report', () => {
             page.getByRole('heading', { name: 'Comparative Report' }),
         ).toBeVisible({ timeout: 30000 });
 
-        const [download] = await Promise.all([
-            page.waitForEvent('download', { timeout: 30000 }),
-            page.getByRole('button', { name: 'Export', exact: true }).click(),
-        ]);
+        const downloadPromise = page.waitForEvent('download', { timeout: 30000 });
+        await page.getByRole('button', { name: 'Export', exact: true }).click();
+        const download = await downloadPromise;
 
         const filename = download.suggestedFilename();
         expect(filename).toMatch(/^comparative_report_.*\.xlsx$/);

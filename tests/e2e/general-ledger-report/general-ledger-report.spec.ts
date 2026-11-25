@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { login, expectResponseOk } from '../helpers';
 
 test.describe('General Ledger Report', () => {
     test.setTimeout(90000);
@@ -64,16 +64,15 @@ test.describe('General Ledger Report', () => {
         await expect(option).toBeVisible({ timeout: 10000 });
         await option.click({ force: true });
 
-        await Promise.all([
-            page.waitForResponse(
-                (r) =>
-                    r.url().includes('/api/reports/general-ledger') &&
-                    !r.url().includes('/export') &&
-                    r.status() < 400,
-                { timeout: 30000 },
-            ),
-            filtersDialog.getByRole('button', { name: 'Apply Filters' }).click(),
-        ]);
+        const listResponse = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/reports/general-ledger') &&
+                !r.url().includes('/export') &&
+                r.request().method() === 'GET',
+            { timeout: 30000 },
+        );
+        await filtersDialog.getByRole('button', { name: 'Apply Filters' }).click();
+        await expectResponseOk(await listResponse);
     });
 
     test('can filter by date range', async ({ page }) => {
@@ -101,16 +100,15 @@ test.describe('General Ledger Report', () => {
             await dateInputs.nth(1).fill('2024-12-31');
         }
 
-        await Promise.all([
-            page.waitForResponse(
-                (r) =>
-                    r.url().includes('/api/reports/general-ledger') &&
-                    !r.url().includes('/export') &&
-                    r.status() < 400,
-                { timeout: 30000 },
-            ),
-            filtersDialog.getByRole('button', { name: 'Apply Filters' }).click(),
-        ]);
+        const listResponse = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/reports/general-ledger') &&
+                !r.url().includes('/export') &&
+                r.request().method() === 'GET',
+            { timeout: 30000 },
+        );
+        await filtersDialog.getByRole('button', { name: 'Apply Filters' }).click();
+        await expectResponseOk(await listResponse);
     });
 
     test('can export general ledger report', async ({ page }) => {
@@ -130,29 +128,28 @@ test.describe('General Ledger Report', () => {
         await expect(option).toBeVisible({ timeout: 10000 });
         await option.click({ force: true });
 
-        await Promise.all([
-            page.waitForResponse(
-                (r) =>
-                    r.url().includes('/api/reports/general-ledger') &&
-                    !r.url().includes('/export') &&
-                    r.status() < 400,
-                { timeout: 30000 },
-            ),
-            filtersDialog.getByRole('button', { name: 'Apply Filters' }).click(),
-        ]);
+        const listResponse = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/reports/general-ledger') &&
+                !r.url().includes('/export') &&
+                r.request().method() === 'GET',
+            { timeout: 30000 },
+        );
+        await filtersDialog.getByRole('button', { name: 'Apply Filters' }).click();
+        await expectResponseOk(await listResponse);
 
         const exportButton = page.getByRole('button', { name: /^Export$/i });
         await expect(exportButton).toBeEnabled({ timeout: 10000 });
 
-        const [response] = await Promise.all([
-            page.waitForResponse(
-                (r) =>
-                    r.url().includes('/api/reports/general-ledger/export') &&
-                    r.status() < 400,
-                { timeout: 30000 },
-            ),
-            exportButton.click(),
-        ]);
+        const exportResponse = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/reports/general-ledger/export') &&
+                r.request().method() === 'POST',
+            { timeout: 30000 },
+        );
+        await exportButton.click();
+        const response = await exportResponse;
+        await expectResponseOk(response);
 
         const body = await response.json();
         expect(body).toHaveProperty('url');
