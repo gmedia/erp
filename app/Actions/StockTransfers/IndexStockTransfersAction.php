@@ -20,7 +20,7 @@ class IndexStockTransfersAction
     {
         $query = StockTransfer::query()->with(['fromWarehouse', 'toWarehouse']);
 
-        return $this->handleIndexRequestWithStatusExclusion(
+        return $this->handleIndexRequest(
             $request,
             $query,
             $this->filterService,
@@ -46,7 +46,6 @@ class IndexStockTransfersAction
                 'created_at',
                 'updated_at',
             ],
-            'cancelled',
         );
     }
 }

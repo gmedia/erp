@@ -52,15 +52,26 @@ describe('Stock Transfer API Endpoints', function () {
             ]);
     });
 
-    test('index excludes cancelled transfers by default', function () {
+    test('index includes cancelled transfers by default (V8-13)', function () {
         StockTransfer::factory()->create(['status' => 'cancelled']);
         StockTransfer::factory()->create(['status' => 'draft']);
 
         $response = getJson('/api/stock-transfers');
         $response->assertOk();
 
-        expect($response->json('data'))->toHaveCount(1)
-            ->and($response->json('data.0.status'))->toBe('draft');
+        expect($response->json('data'))->toHaveCount(2)
+            ->and($response->json('data.*.status'))->toContain('cancelled', 'draft');
+    });
+
+    test('index default order is newest first (V8-44)', function () {
+        $older = StockTransfer::factory()->create(['status' => 'draft', 'created_at' => '2026-01-01 08:00:00']);
+        $newer = StockTransfer::factory()->create(['status' => 'draft', 'created_at' => '2026-03-01 08:00:00']);
+
+        $response = getJson('/api/stock-transfers');
+        $response->assertOk();
+
+        expect($response->json('data.0.id'))->toBe($newer->id)
+            ->and($response->json('data.1.id'))->toBe($older->id);
     });
 
     test('index can include cancelled transfers when filtered by status', function () {

@@ -20,7 +20,7 @@ class IndexInventoryStocktakesAction
     {
         $query = InventoryStocktake::query()->with(['warehouse', 'productCategory']);
 
-        return $this->handleIndexRequestWithStatusExclusion(
+        return $this->handleIndexRequest(
             $request,
             $query,
             $this->filterService,
@@ -43,7 +43,6 @@ class IndexInventoryStocktakesAction
                 'created_at',
                 'updated_at',
             ],
-            'cancelled',
         );
     }
 }
