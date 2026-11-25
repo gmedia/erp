@@ -110,22 +110,22 @@ async function selectPersistedAsyncOption(
 export async function createStockAdjustment(page: Page): Promise<string> {
     const adjustmentNumber = `SA-E2E-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
     const productCandidates: readonly AsyncOptionCandidate[] = [
-        { searchText: 'MDF Wood Panel', optionText: 'MDF Wood Panel' },
+        { searchText: 'Papan MDF', optionText: 'Papan MDF 120x240cm' },
         {
-            searchText: 'Executive Office Desk',
-            optionText: 'Executive Office Desk',
+            searchText: 'Meja Kerja Eksekutif',
+            optionText: 'Meja Kerja Eksekutif',
         },
-        { searchText: 'Wooden Table Legs', optionText: 'Wooden Table Legs' },
+        { searchText: 'Kaki Meja Kayu', optionText: 'Kaki Meja Kayu (Isi 4)' },
         {
             searchText: 'Inventory Sample Product',
             optionText: 'Inventory Sample Product',
         },
     ];
     const unitCandidates: readonly AsyncOptionCandidate[] = [
-        { searchText: 'Sheet', optionText: 'Sheet' },
+        { searchText: 'Lembar', optionText: 'Lembar' },
         { searchText: 'pcs', optionText: 'pcs' },
-        { searchText: 'Set', optionText: 'Set' },
-        { searchText: 'Box', optionText: 'Box' },
+        { searchText: 'Perangkat', optionText: 'Perangkat' },
+        { searchText: 'Kotak', optionText: 'Kotak' },
     ];
 
     const addButton = page.getByRole('button', { name: /Add/i });
@@ -148,7 +148,7 @@ export async function createStockAdjustment(page: Page): Promise<string> {
         page,
         dialog.getByRole('combobox', { name: /Warehouse/i }),
         'Main',
-        'Main Warehouse',
+        'Gudang Utama',
     );
 
     await dialog.getByRole('button', { name: /Add Item/i }).click();

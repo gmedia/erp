@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\Warehouse;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class InventoryStocktakeSampleDataSeeder extends Seeder
 {
@@ -21,19 +22,23 @@ class InventoryStocktakeSampleDataSeeder extends Seeder
             ->where('email', config('app.admin'))
             ->value('id') ?? User::query()->value('id');
 
-        $warehouse = Warehouse::query()->where('code', 'MAIN')->first();
+        $warehouse = Warehouse::query()->where('code', DemoMasterData::WAREHOUSE_MAIN_CODE)->first();
 
         if ($warehouse === null) {
-            $branchId = Branch::query()->where('name', 'Head Office')->value('id') ?? Branch::query()->value('id');
+            $branchId = Branch::query()
+                ->where('name', DemoMasterData::BRANCH_HEAD_OFFICE)
+                ->value('id') ?? Branch::query()->value('id');
             $warehouse = Warehouse::updateOrCreate(
-                ['branch_id' => $branchId, 'code' => 'MAIN'],
-                ['name' => 'Main Warehouse']
+                ['branch_id' => $branchId, 'code' => DemoMasterData::WAREHOUSE_MAIN_CODE],
+                ['name' => DemoMasterData::WAREHOUSE_MAIN_NAME]
             );
         }
 
         $branchIdForStock = $warehouse->branch_id ?? Branch::query()->value('id');
         $products = $this->ensureProductsWithStock($branchIdForStock);
-        $categoryId = $products->first()?->category_id ?? ProductCategory::query()->value('id');
+        // Kategori stocktake = kategori barang yang dihitung (semua baris berasal dari
+        // produk ini), bukan kategori pertama di master (PR #432 butir 1).
+        $categoryId = (int) $products->first()->product_category_id;
 
         $year = now()->format('Y');
 
@@ -150,56 +155,83 @@ class InventoryStocktakeSampleDataSeeder extends Seeder
             ->get();
 
         if ($products->count() >= 3) {
+            // Barang dagang demo (PR #432 butir 1): kategori Elektronik, harga jual wajar,
+            // kategori stocktake mengikuti kategori barangnya.
+            $electronicsId = ProductCategory::query()
+                ->where('name', DemoMasterData::PRODUCT_CATEGORY_ELECTRONICS)
+                ->value('id');
+
+            if ($electronicsId !== null) {
+                Product::query()
+                    ->whereIn('id', $products->pluck('id'))
+                    ->update([
+                        'product_category_id' => $electronicsId,
+                        'type' => 'finished_good',
+                        'selling_price' => DB::raw(
+                            'CASE WHEN selling_price > 0 THEN selling_price ELSE cost * 1.5 END'
+                        ),
+                    ]);
+                $products = $products->each(fn (Product $product) => $product->product_category_id = $electronicsId);
+            }
+
             return $products->take(3);
         }
 
-        $products = Product::query()->orderBy('id')->take(3)->get();
+        // Fallback: tiga barang fisik dari satu kategori yang sama, agar kategori stocktake
+        // konsisten dengan barang yang dihitung (PR #432 butir 1).
+        $fallbackCategoryId = Product::query()
+            ->where('type', '!=', 'service')
+            ->orderBy('id')
+            ->value('product_category_id');
+        $products = Product::query()
+            ->where('type', '!=', 'service')
+            ->where('product_category_id', $fallbackCategoryId)
+            ->orderBy('id')
+            ->take(3)
+            ->get();
         if ($products->count() >= 3) {
             return $products;
         }
 
-        $categoryId = ProductCategory::query()->value('id');
+        $categoryId = ProductCategory::query()
+            ->where('name', DemoMasterData::PRODUCT_CATEGORY_ELECTRONICS)
+            ->value('id')
+            ?? ProductCategory::query()->value('id');
         $unitId = Unit::query()->value('id');
 
         $samples = [
             [
                 'code' => 'INV-2026-001',
                 'name' => 'Kabel HDMI 2 Meter',
-                'type' => 'raw_material',
-                'cost' => 10000,
+                'cost' => 45000,
+                'price' => 75000,
             ],
             [
                 'code' => 'INV-2026-002',
                 'name' => 'Mouse Wireless M170',
-                'type' => 'raw_material',
-                'cost' => 15000,
+                'cost' => 110000,
+                'price' => 165000,
             ],
             [
                 'code' => 'INV-2026-003',
                 'name' => 'Keyboard Mekanik K2',
-                'type' => 'finished_good',
-                'cost' => 25000,
+                'cost' => 420000,
+                'price' => 650000,
             ],
         ];
 
         foreach ($samples as $sample) {
-            $product = Product::updateOrCreate(
+            Product::updateOrCreate(
                 ['code' => $sample['code']],
                 [
                     'name' => $sample['name'],
-                    'type' => $sample['type'],
-                    'category_id' => $categoryId,
+                    'type' => 'finished_good',
+                    'product_category_id' => $categoryId,
                     'unit_id' => $unitId,
                     'branch_id' => $branchId,
                     'cost' => $sample['cost'],
-                    'selling_price' => 0,
+                    'selling_price' => $sample['price'],
                     'billing_model' => 'one_time',
-                    'is_recurring' => false,
-                    'allow_one_time_purchase' => true,
-                    'is_manufactured' => false,
-                    'is_purchasable' => true,
-                    'is_sellable' => true,
-                    'is_taxable' => false,
                     'status' => 'active',
                 ]
             );

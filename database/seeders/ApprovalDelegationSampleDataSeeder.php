@@ -24,7 +24,7 @@ class ApprovalDelegationSampleDataSeeder extends Seeder
             'approvable_type' => null, // All types
             'start_date' => now()->subDays(2),
             'end_date' => now()->addDays(5),
-            'reason' => 'Annual Leave',
+            'reason' => 'Cuti tahunan',
             'is_active' => true,
         ]);
 
@@ -35,7 +35,7 @@ class ApprovalDelegationSampleDataSeeder extends Seeder
             'approvable_type' => 'App\Models\PurchaseRequest',
             'start_date' => now()->addMonths(1),
             'end_date' => now()->addMonths(1)->addDays(7),
-            'reason' => 'Overseas Duty',
+            'reason' => 'Tugas dinas luar negeri',
             'is_active' => true,
         ]);
     }

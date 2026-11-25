@@ -50,7 +50,7 @@ describe('Approval Delegation Export API Ending', function () {
     test('can export with search filter', function () {
         Carbon::setTestNow(Carbon::parse('2026-01-01 10:00:00'));
 
-        ApprovalDelegation::factory()->create(['reason' => 'Annual Leave']);
+        ApprovalDelegation::factory()->create(['reason' => 'Cuti tahunan']);
         ApprovalDelegation::factory()->create(['reason' => 'Business Trip']);
 
         $response = postJson('/api/approval-delegations/export', ['search' => 'Annual']);

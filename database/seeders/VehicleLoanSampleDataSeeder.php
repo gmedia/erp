@@ -448,8 +448,9 @@ class VehicleLoanSampleDataSeeder extends Seeder
 
         $companyId = Company::query()->value('id');
         $branchId = Branch::query()->orderBy('id')->value('id');
-        $departmentId = Department::query()->value('id');
-        $positionId = Position::query()->value('id');
+        // Driver kendaraan adalah staf operasional, bukan HR/Finance.
+        $departmentId = Department::query()->where('name', DemoMasterData::DEPARTMENT_OPERATIONS)->value('id');
+        $positionId = Position::query()->where('name', DemoMasterData::POSITION_DRIVER)->value('id');
 
         $drivers = [];
 
@@ -468,7 +469,8 @@ class VehicleLoanSampleDataSeeder extends Seeder
                 'name' => $person['name'],
                 'email' => $person['email'],
                 'phone' => $person['phone'],
-                'user_id' => $admin->id,
+                // Driver tidak punya akun login; jangan menumpang di akun admin.
+                'user_id' => null,
             ])->save();
 
             if ($companyId !== null) {
@@ -522,17 +524,31 @@ class VehicleLoanSampleDataSeeder extends Seeder
         }
 
         $vehicles = [
-            ['asset_code' => 'FA-000014', 'name' => 'Toyota Avanza 1.5 G', 'plate' => 'B 1234 XYZ', 'type' => 'car', 'capacity' => 5],
-            ['asset_code' => 'FA-000015', 'name' => 'Honda Vario 160 CBS', 'plate' => 'B 5678 ABC', 'type' => 'motorcycle', 'capacity' => 2],
-            ['asset_code' => 'FA-000013', 'name' => 'Mitsubishi L300 Pickup', 'plate' => 'B 9012 DEF', 'type' => 'car', 'capacity' => 3],
+            [
+                'asset_code' => 'FA-000014', 'name' => 'Toyota Avanza 1.5 G', 'plate' => 'B 1234 XYZ',
+                'type' => 'car', 'capacity' => 5, 'cost' => 265000000, 'months_ago' => 36, 'day' => 9,
+            ],
+            [
+                'asset_code' => 'FA-000015', 'name' => 'Honda Vario 160 CBS', 'plate' => 'B 5678 ABC',
+                'type' => 'motorcycle', 'capacity' => 2, 'cost' => 24500000, 'months_ago' => 30, 'day' => 17,
+            ],
+            [
+                'asset_code' => 'FA-000013', 'name' => 'Mitsubishi L300 Pickup', 'plate' => 'B 9012 DEF',
+                'type' => 'car', 'capacity' => 3, 'cost' => 310000000, 'months_ago' => 42, 'day' => 23,
+            ],
         ];
 
         // Kendaraan operasional berada di department Operations (W6-16).
-        $operationsDepartment = Department::query()->where('name', 'Operations')->first();
+        $operationsDepartment = Department::query()->where('name', DemoMasterData::DEPARTMENT_OPERATIONS)->first();
 
         $units = [];
 
         foreach ($vehicles as $vehicle) {
+            $purchaseDate = now()->startOfMonth()
+                ->subMonths($vehicle['months_ago'])
+                ->addDays($vehicle['day'] - 1)
+                ->toDateString();
+
             $asset = Asset::updateOrCreate(
                 ['asset_code' => $vehicle['asset_code']],
                 [
@@ -540,13 +556,13 @@ class VehicleLoanSampleDataSeeder extends Seeder
                     'asset_category_id' => $category->id,
                     'branch_id' => $branchId,
                     'department_id' => $operationsDepartment?->id,
-                    'purchase_date' => now()->subYears(3)->toDateString(),
-                    'purchase_cost' => 150000000,
+                    'purchase_date' => $purchaseDate,
+                    'purchase_cost' => $vehicle['cost'],
                     'currency' => 'IDR',
                     'status' => 'active',
                     'condition' => 'good',
                     'depreciation_method' => 'straight_line',
-                    'depreciation_start_date' => now()->subYears(3)->toDateString(),
+                    'depreciation_start_date' => $purchaseDate,
                     'useful_life_months' => 60,
                     'salvage_value' => 0,
                 ],

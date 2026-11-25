@@ -1,6 +1,6 @@
 # Visual Audit — Backlog
 
-**Last updated:** 2026-11-23 (#339 — audit independen wave-7)
+**Last updated:** 2026-11-24 (#345 langkah 8c — W7-G6 partial)
 **Source:** multimodal-looker Wave 0–1; audit light/dark × desktop/mobile 85 route (#296, lihat `FINDINGS.md`)  
 **Policy:** T1–T5 + EX themes on main. No **mass** Wave 2 (85 leaves). Prefer selective re-smoke via `VISUAL_AUDIT_PRESET` / `VISUAL_AUDIT_ROUTES`.
 
@@ -27,7 +27,7 @@ Kerjakan berurutan G1 → G6. Bukti fixed: invarian Pest `demo-integrity` (data/
 | W7-G3 | P1  | W7-05, W7-06                      | Aset tetap, depresiasi & angka lintas laporan                                          | **in review #354** (W7-05 fixed, W7-06 partial) |
 | W7-G4 | P1  | W7-07, W7-08, W7-09, W7-10, W7-11 | UI tabel & format: digit tertutup, nilai mentah, formatter, tone status, mobile        | partial #343 (sisa di FINDINGS) |
 | W7-G5 | P2  | W7-12, W7-13, W7-14               | UI shell, pola report & dashboard                                                      | partial #344 (W7-12a–e, W7-13 poin 4/5/6/11; W7-14 poin 1/2/10/12 fixed; sisa W7-13 terjemahan CRUD id & komponen filter, W7-14 Refresh Data & urutan toolbar; E2E full: 5 gagal di luar scope — social-login ×4, profile-name-change ×1, deterministik) |
-| W7-G6 | P2  | W7-15, W7-16, W7-17               | Seeder: nilai realistis, audit trail/approval, kode & bahasa                           | open #345 |
+| W7-G6 | P2  | W7-15, W7-16, W7-17               | Seeder: nilai realistis, audit trail/approval, kode & bahasa                           | partial #345 — sisa: W7-15 (gaji/anggaran verifikasi, `Admin User` sebagai karyawan, dominasi HR), W7-16 (timestamp audit trail visual, approval-flows), W7-17 (sequence kode, kode asset-location unik, mapping supplier–kategori, email/telepon supplier, `Created At` kosong) — lihat FINDINGS.md "Status W7-15/16/17 #345" |
 
 ## Wave 5 fix groups (dari `FINDINGS.md` W5-xx, #319)
 

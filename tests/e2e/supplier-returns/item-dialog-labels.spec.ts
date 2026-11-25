@@ -40,6 +40,8 @@ test.describe('Supplier Return item dialog labels', () => {
         await expect(itemDialog.getByPlaceholder('Item notes')).toBeVisible();
 
         await itemDialog.getByRole('button', { name: /Save Item/i }).click();
-        await expect(itemDialog.getByText('GR item is required.')).toBeVisible();
+        await expect(
+            itemDialog.getByText('GR item is required.'),
+        ).toBeVisible();
     });
 });

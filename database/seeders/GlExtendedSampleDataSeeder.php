@@ -10,6 +10,7 @@ use App\Models\PeriodClosing;
 use App\Models\RecurringJournal;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -57,7 +58,7 @@ class GlExtendedSampleDataSeeder extends Seeder
     private function seedRecurringJournals(FiscalYear $fiscalYear, Collection $accounts, User $user): void
     {
         $definitions = [
-            ['name' => 'Sewa Kantor Bulanan', 'amount' => 750000, 'frequency' => 'monthly'],
+            ['name' => 'Sewa Kantor Bulanan', 'amount' => 15000000, 'frequency' => 'monthly'],
             ['name' => 'Listrik dan Air', 'amount' => 1250000, 'frequency' => 'monthly'],
             ['name' => 'Internet dan Telepon', 'amount' => 2500000, 'frequency' => 'monthly'],
             ['name' => 'Jasa Kebersihan', 'amount' => 3750000, 'frequency' => 'monthly'],
@@ -96,7 +97,8 @@ class GlExtendedSampleDataSeeder extends Seeder
                     'reference_template' => 'RJ-{YYYY}-{MM}-{DD}-' . str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT),
                     'frequency' => $definition['frequency'],
                     // Selalu jadwal berikutnya, tidak pernah di masa lalu (W6-13).
-                    'next_run_date' => now()->startOfMonth()->addMonths($index + 1),
+                    // Semua jurnal bulanan berbagi satu bulan jadwal (W7-15).
+                    'next_run_date' => now()->startOfMonth()->addMonth(),
                     'total_amount' => $definition['amount'],
                     'created_by' => $user->id,
                 ],
@@ -117,10 +119,28 @@ class GlExtendedSampleDataSeeder extends Seeder
             ->where('code', '11110')
             ->first() ?? $accounts[0];
 
-        // Tidak ada periode masa depan (W5-21): bulan berjalan + bulan lalu.
-        foreach ([['in_progress', null], ['completed', now()]] as $index => [$status, $completedAt]) {
-            $periodStart = now()->startOfMonth()->subMonths(1 - $index);
-            $periodEnd = now()->startOfMonth()->subMonths(1 - $index)->endOfMonth();
+        // Bulan lalu sudah berakhir: Completed dengan selisih 0 (W7-15).
+        // Bulan berjalan belum berakhir dan belum selesai: In Progress dengan selisih nyata.
+        $periods = [
+            [
+                'status' => 'in_progress',
+                'period' => now()->startOfMonth(),
+                'balance' => 10500000,
+                'difference' => 25000,
+                'completedAt' => null,
+            ],
+            [
+                'status' => 'completed',
+                'period' => now()->startOfMonth()->subMonth(),
+                'balance' => 10000000,
+                'difference' => 0,
+                'completedAt' => now()->startOfMonth()->subMonth()->endOfMonth()->addDays(2),
+            ],
+        ];
+
+        foreach ($periods as $period) {
+            $periodStart = $period['period'];
+            $periodEnd = $periodStart->copy()->endOfMonth();
 
             $reconciliation = BankReconciliation::updateOrCreate(
                 [
@@ -131,21 +151,35 @@ class GlExtendedSampleDataSeeder extends Seeder
                 [
                     'fiscal_year_id' => $fiscalYear->id,
                     'reconciliation_date' => $periodEnd->toDateString(),
-                    'statement_balance' => 10000000 + ($index * 500000),
-                    'book_balance' => 10000000 + ($index * 500000),
-                    'reconciled_balance' => 10000000 + ($index * 500000),
-                    'difference' => 0,
-                    'status' => $status,
-                    'completed_by' => $completedAt ? $user->id : null,
-                    'completed_at' => $completedAt,
+                    'statement_balance' => $period['balance'],
+                    'book_balance' => $period['balance'] - $period['difference'],
+                    'reconciled_balance' => $period['balance'] - $period['difference'],
+                    'difference' => $period['difference'],
+                    'status' => $period['status'],
+                    'completed_by' => $period['completedAt'] ? $user->id : null,
+                    'completed_at' => $period['completedAt'],
                     'created_by' => $user->id,
                 ],
             );
 
             $reconciliation->items()->delete();
             $reconciliation->items()->createMany([
-                ['transaction_date' => $periodStart->toDateString(), 'description' => 'Bank fee', 'debit' => 0, 'credit' => 25000, 'type' => 'bank_fee', 'is_reconciled' => true],
-                ['transaction_date' => $periodEnd->toDateString(), 'description' => 'Interest income', 'debit' => 25000, 'credit' => 0, 'type' => 'interest', 'is_reconciled' => $status === 'completed'],
+                [
+                    'transaction_date' => $periodStart->toDateString(),
+                    'description' => 'Biaya administrasi bank',
+                    'debit' => 0,
+                    'credit' => 25000,
+                    'type' => 'bank_fee',
+                    'is_reconciled' => true,
+                ],
+                [
+                    'transaction_date' => $periodEnd->toDateString(),
+                    'description' => 'Pendapatan bunga bank',
+                    'debit' => 25000,
+                    'credit' => 0,
+                    'type' => 'interest',
+                    'is_reconciled' => $period['status'] === 'completed',
+                ],
             ]);
         }
     }
@@ -171,7 +205,8 @@ class GlExtendedSampleDataSeeder extends Seeder
                     ),
                     'retained_earnings_account_id' => $accounts[2]->id,
                     'closed_by' => $user->id,
-                    'closed_at' => now(),
+                    // Ditutup pada awal bulan berikutnya, bukan tanggal seed (W7-15).
+                    'closed_at' => Carbon::create($periodYear, $month, 1)->addMonth()->startOfDay(),
                     'created_by' => $user->id,
                 ],
             );

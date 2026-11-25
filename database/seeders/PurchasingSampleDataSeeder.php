@@ -43,7 +43,15 @@ class PurchasingSampleDataSeeder extends Seeder
         $adminUserId = User::query()->where('email', config('app.admin'))->value('id') ?? User::query()->value('id');
         $branchId = Branch::query()->value('id');
         $departmentId = Department::query()->value('id');
-        $requesterId = Employee::query()->value('id');
+        // Pengaju PR: karyawan yang user-nya bukan admin dan bukan approver flow pembelian,
+        // agar pelaku transisi (admin/penyetuju) tidak pernah sama dengan pengaju (W7-16).
+        $requesterId = Employee::query()
+            ->whereNotNull('user_id')
+            ->where('user_id', '!=', $adminUserId)
+            ->whereNotIn('user_id', DB::table('approval_flow_steps')->pluck('approver_user_id')->unique()->all())
+            ->orderBy('id')
+            ->value('id')
+            ?? Employee::query()->value('id');
 
         if (! $adminUserId || ! $branchId || ! $departmentId || ! $requesterId) {
             return;
@@ -51,9 +59,9 @@ class PurchasingSampleDataSeeder extends Seeder
 
         $legacySupplier = Supplier::where('email', 'purchasing.sample@vendor.local')->first();
 
-        if ($legacySupplier && ! Supplier::where('email', 'procurement@vendor.example')->exists()) {
+        if ($legacySupplier && ! Supplier::where('email', 'pengadaan@sumber-makmur.example')->exists()) {
             $legacySupplier->update([
-                'email' => 'procurement@vendor.example',
+                'email' => 'pengadaan@sumber-makmur.example',
                 'name' => 'PT Sumber Makmur Sejahtera',
                 'address' => 'Jl. Industri Raya No. 12, Tangerang',
             ]);
@@ -61,11 +69,11 @@ class PurchasingSampleDataSeeder extends Seeder
 
         // Beberapa supplier dengan kategori yang cocok (W5-23).
         $supplierSeeds = [
-            ['email' => 'procurement@vendor.example', 'name' => 'PT Sumber Makmur Sejahtera', 'category' => 'Office Supplies', 'phone' => '0215551234'],
-            ['email' => 'sales@nusantara-elektronik.example', 'name' => 'PT Nusantara Elektronik', 'category' => 'Electronics', 'phone' => '0215552345'],
-            ['email' => 'order@mebel-jaya.example', 'name' => 'CV Mebel Jaya Abadi', 'category' => 'Furniture', 'phone' => '0225553456'],
-            ['email' => 'kontak@logistik-cepat.example', 'name' => 'PT Logistik Cepat Nusantara', 'category' => 'Logistics', 'phone' => '0315554567'],
-            ['email' => 'it@solusi-digital.example', 'name' => 'PT Solusi Digital Teknologi', 'category' => 'IT Services', 'phone' => '0215555678'],
+            ['email' => 'pengadaan@sumber-makmur.example', 'name' => 'PT Sumber Makmur Sejahtera', 'category' => 'Perlengkapan Kantor', 'phone' => '0215558001'],
+            ['email' => 'sales@nusantara-elektronik.example', 'name' => 'PT Nusantara Elektronik', 'category' => 'Elektronik', 'phone' => '0215552345'],
+            ['email' => 'order@mebel-jaya.example', 'name' => 'CV Mebel Jaya Abadi', 'category' => 'Furnitur', 'phone' => '0225553456'],
+            ['email' => 'kontak@logistik-cepat.example', 'name' => 'PT Logistik Cepat Nusantara', 'category' => 'Logistik', 'phone' => '0315554567'],
+            ['email' => 'it@solusi-digital.example', 'name' => 'PT Solusi Digital Teknologi', 'category' => DemoMasterData::SUPPLIER_CATEGORY_IT_SERVICES, 'phone' => '0215555678'],
         ];
 
         foreach ($supplierSeeds as $seed) {
@@ -74,9 +82,12 @@ class PurchasingSampleDataSeeder extends Seeder
                 ->value('id')
                 ?? SupplierCategory::query()->value('id');
 
+            // Kunci: nama perusahaan (stabil). Email supplier demo berubah antar
+            // versi seed; mencari dengan email membuat baris supplier ganda.
             Supplier::updateOrCreate(
-                ['email' => $seed['email']],
+                ['name' => $seed['name']],
                 [
+                    'email' => $seed['email'],
                     'name' => $seed['name'],
                     'phone' => $seed['phone'],
                     'address' => 'Jl. Industri Raya No. 12, Tangerang',
@@ -100,10 +111,10 @@ class PurchasingSampleDataSeeder extends Seeder
             }
 
             $supplier = Supplier::updateOrCreate(
-                ['email' => 'procurement@vendor.example'],
+                ['email' => 'pengadaan@sumber-makmur.example'],
                 [
                     'name' => 'PT Sumber Makmur Sejahtera',
-                    'phone' => '0215551234',
+                    'phone' => '0215558001',
                     'address' => 'Jl. Industri Raya No. 12, Tangerang',
                     'branch_id' => $branchId,
                     'category_id' => $categoryId,
@@ -117,7 +128,8 @@ class PurchasingSampleDataSeeder extends Seeder
             return;
         }
 
-        $products = Product::query()->orderBy('id')->take(6)->get();
+        // Barang fisik saja: produk jasa (type=service) tidak menghasilkan penerimaan/stok.
+        $products = Product::query()->where('type', '!=', 'service')->orderBy('id')->take(6)->get();
         if ($products->isEmpty()) {
             return;
         }
@@ -129,6 +141,15 @@ class PurchasingSampleDataSeeder extends Seeder
 
         $pipelines = $this->seedPurchasingPipelines($adminUserId);
 
+        // Pengaju dokumen harus user yang bukan approver flow pembelian (W7-16). Pengaju PR
+        // adalah employee $requesterId; user-nya dipakai sebagai pengaju dokumen hanya bila
+        // bukan approver, agar approval dan pelaku transisi tidak pernah sama (PR #432).
+        $documentRequesterId = $this->nonApproverUserId($adminUserId);
+        $requesterUserId = (int) (DB::table('employees')->where('id', $requesterId)->value('user_id') ?? 0);
+        if ($requesterUserId > 0 && $requesterUserId !== $adminUserId && $this->isNonApprover($requesterUserId)) {
+            $documentRequesterId = $requesterUserId;
+        }
+
         [$purchaseRequests, $purchaseRequestItems] = $this->seedPurchaseRequests(
             $adminUserId,
             $branchId,
@@ -136,7 +157,8 @@ class PurchasingSampleDataSeeder extends Seeder
             $requesterId,
             $products,
             $fallbackUnitId,
-            $pipelines['pr']
+            $pipelines['pr'],
+            $documentRequesterId
         );
 
         [$purchaseOrders, $purchaseOrderItems] = $this->seedPurchaseOrders(
@@ -146,7 +168,8 @@ class PurchasingSampleDataSeeder extends Seeder
             $products,
             $fallbackUnitId,
             $purchaseRequestItems,
-            $pipelines['po']
+            $pipelines['po'],
+            $documentRequesterId
         );
 
         [$goodsReceipts, $goodsReceiptItems] = $this->seedGoodsReceipts(
@@ -174,12 +197,57 @@ class PurchasingSampleDataSeeder extends Seeder
         );
     }
 
+    /**
+     * User pengaju dokumen pembelian: bukan admin dan bukan approver flow pembelian,
+     * sehingga pengaju tidak pernah menyetujui dokumennya sendiri (W7-16).
+     */
+    private function nonApproverUserId(int $adminUserId): int
+    {
+        $approverIds = DB::table('approval_flow_steps')->pluck('approver_user_id')->unique()->all();
+
+        return (int) (User::query()
+            ->whereNotIn('id', array_merge([$adminUserId], $approverIds))
+            ->orderBy('id')
+            ->value('id') ?? $adminUserId);
+    }
+
+    private function isNonApprover(int $userId): bool
+    {
+        return ! DB::table('approval_flow_steps')->where('approver_user_id', $userId)->exists();
+    }
+
+    /**
+     * Daftar pelaku transisi demo: $performedBy plus user lain yang tersedia (deterministik).
+     *
+     * @return list<int>
+     */
+    private function transitionActorIds(int $performedBy, ?int $submittedBy = null): array
+    {
+        $excluded = array_filter([$performedBy, $submittedBy]);
+
+        $others = User::query()
+            ->whereNotIn('id', $excluded)
+            ->orderBy('id')
+            ->limit(2)
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        // Pengaju tidak boleh menjadi pelaku transisi lain pada dokumen yang sama (W7-16).
+        $actors = array_values(array_unique(array_merge([$performedBy], $others)));
+
+        return array_values(array_filter(
+            $actors,
+            fn (int $id) => $submittedBy === null || $id !== $submittedBy
+        )) ?: [$performedBy];
+    }
+
     private function seedPurchasingPipelines(int $adminUserId): array
     {
         $prPipeline = Pipeline::firstOrCreate(
             ['code' => 'pr_lifecycle'],
             [
-                'name' => 'Purchase Request Lifecycle',
+                'name' => 'Siklus Hidup Permintaan Pembelian',
                 'entity_type' => 'App\\Models\\PurchaseRequest',
                 'description' => 'Lifecycle pipeline for purchase request document',
                 'version' => 1,
@@ -409,7 +477,7 @@ class PurchasingSampleDataSeeder extends Seeder
         $poPipeline = Pipeline::firstOrCreate(
             ['code' => 'po_lifecycle'],
             [
-                'name' => 'Purchase Order Lifecycle',
+                'name' => 'Siklus Hidup Pesanan Pembelian',
                 'entity_type' => 'App\\Models\\PurchaseOrder',
                 'description' => 'Lifecycle pipeline for purchase order document',
                 'version' => 1,
@@ -792,7 +860,8 @@ class PurchasingSampleDataSeeder extends Seeder
         int $requesterId,
         $products,
         int $fallbackUnitId,
-        array $pipelineConfig
+        array $pipelineConfig,
+        int $documentRequesterId
     ): array {
         $year = now()->format('Y');
 
@@ -920,13 +989,18 @@ class PurchasingSampleDataSeeder extends Seeder
             $purchaseRequests[$status] = $purchaseRequest;
             $purchaseRequestItems[$status] = [$firstItem, $secondItem];
 
+            $documentDate = Carbon::parse($purchaseRequest->request_date);
+
             $this->syncEntityPipelineState(
                 $pipelineConfig,
                 'App\\Models\\PurchaseRequest',
                 $purchaseRequest->id,
                 $status,
                 $histories[$status] ?? [],
-                $adminUserId
+                $adminUserId,
+                $documentDate,
+                $adminUserId,
+                $documentRequesterId
             );
 
             $approvalRequestStatus = match ($status) {
@@ -937,17 +1011,17 @@ class PurchasingSampleDataSeeder extends Seeder
             };
 
             if ($approvalRequestStatus) {
-                $submittedAt = Carbon::parse($purchaseRequest->request_date)->setTime(9, 0);
+                $submittedAt = $documentDate->copy()->setTime(9, 0);
                 $completedAt = $approvalRequestStatus === 'pending'
                     ? null
-                    : Carbon::parse($purchaseRequest->request_date)->addDay()->setTime(15, 0);
+                    : $documentDate->copy()->addDay()->setTime(15, 0);
 
                 $this->syncApprovalRequest(
                     PurchaseRequest::class,
                     $purchaseRequest->id,
                     'purchase_request_default',
                     $approvalRequestStatus,
-                    $adminUserId,
+                    $documentRequesterId,
                     $submittedAt,
                     $completedAt,
                 );
@@ -964,7 +1038,8 @@ class PurchasingSampleDataSeeder extends Seeder
         $products,
         int $fallbackUnitId,
         array $purchaseRequestItems,
-        array $pipelineConfig
+        array $pipelineConfig,
+        int $documentRequesterId
     ): array {
         $year = now()->format('Y');
 
@@ -986,26 +1061,29 @@ class PurchasingSampleDataSeeder extends Seeder
             ['number' => "PO-{$year}-000105", 'status' => 'partially_received', 'source_status' => 'partially_ordered'],
             ['number' => "PO-{$year}-000106", 'status' => 'fully_received', 'source_status' => 'fully_ordered'],
             ['number' => "PO-{$year}-000107", 'status' => 'cancelled', 'source_status' => 'approved'],
-            ['number' => "PO-{$year}-000108", 'status' => 'closed', 'source_status' => 'fully_ordered'],
+            ['number' => "PO-{$year}-000108", 'status' => 'partially_received', 'source_status' => 'fully_ordered'],
         ];
 
         $histories = [
             'draft' => [],
             'pending_approval' => [['draft', 'pending_approval']],
-            'confirmed' => [['draft', 'confirmed']],
+            'confirmed' => [['draft', 'pending_approval'], ['pending_approval', 'confirmed']],
             'rejected' => [['draft', 'pending_approval'], ['pending_approval', 'rejected']],
-            'partially_received' => [['draft', 'confirmed'], ['confirmed', 'partially_received']],
+            'partially_received' => [
+                ['draft', 'pending_approval'],
+                ['pending_approval', 'confirmed'],
+                ['confirmed', 'partially_received'],
+            ],
             'fully_received' => [
-                ['draft', 'confirmed'],
+                ['draft', 'pending_approval'],
+                ['pending_approval', 'confirmed'],
                 ['confirmed', 'partially_received'],
                 ['partially_received', 'fully_received'],
             ],
-            'cancelled' => [['draft', 'confirmed'], ['confirmed', 'cancelled']],
-            'closed' => [
-                ['draft', 'confirmed'],
-                ['confirmed', 'partially_received'],
-                ['partially_received', 'fully_received'],
-                ['fully_received', 'closed'],
+            'cancelled' => [
+                ['draft', 'pending_approval'],
+                ['pending_approval', 'confirmed'],
+                ['confirmed', 'cancelled'],
             ],
         ];
 
@@ -1037,11 +1115,18 @@ class PurchasingSampleDataSeeder extends Seeder
 
             $approved = in_array($status, ['confirmed', 'partially_received', 'fully_received', 'closed'], true);
 
-            // Rotasi supplier aktif agar tidak semua PO ke vendor yang sama.
+            // Rotasi supplier aktif agar tidak semua PO ke vendor yang sama. Produk
+            // layanan SaaS hanya dipesan dari supplier kategori Jasa TI (W7-17).
             $poSuppliers = Supplier::query()->orderBy('id')->get();
-            $poSupplierId = $poSuppliers->isEmpty()
+            $isSoftwareOrder = $firstProduct->code === 'SW-CLD-001' || $secondProduct->code === 'SW-CLD-001';
+            $itServicesCategory = DemoMasterData::SUPPLIER_CATEGORY_IT_SERVICES;
+            $eligibleSuppliers = $isSoftwareOrder
+                ? $poSuppliers->filter(fn (Supplier $candidate) => $candidate->category?->name === $itServicesCategory)
+                : $poSuppliers->reject(fn (Supplier $candidate) => $candidate->category?->name === $itServicesCategory);
+            $eligibleSuppliers = $eligibleSuppliers->isEmpty() ? $poSuppliers : $eligibleSuppliers->values();
+            $poSupplierId = $eligibleSuppliers->isEmpty()
                 ? $supplier->id
-                : $poSuppliers[$index % $poSuppliers->count()]->id;
+                : $eligibleSuppliers[$index % $eligibleSuppliers->count()]->id;
 
             $purchaseOrder = PurchaseOrder::updateOrCreate(
                 ['po_number' => $definition['number']],
@@ -1067,6 +1152,13 @@ class PurchasingSampleDataSeeder extends Seeder
 
             $firstSourceItem = $sourceItems[0] ?? null;
             $secondSourceItem = $sourceItems[1] ?? null;
+
+            // Rotasi produk per PO bisa berubah saat seed ulang; buang baris lama
+            // agar kuantitas PO tidak menggandakan (legacy cleanup, idempotent).
+            $this->purgeStalePurchaseOrderItems(
+                $purchaseOrder->id,
+                [$firstProduct->id, $secondProduct->id],
+            );
 
             $firstItem = PurchaseOrderItem::updateOrCreate(
                 [
@@ -1104,8 +1196,10 @@ class PurchasingSampleDataSeeder extends Seeder
                 ]
             );
 
-            $purchaseOrders[$status] = $purchaseOrder;
-            $purchaseOrderItems[$status] = [$firstItem, $secondItem];
+            $purchaseOrders[$definition['number']] = $purchaseOrder;
+            $purchaseOrderItems[$definition['number']] = [$firstItem, $secondItem];
+
+            $documentDate = Carbon::parse($purchaseOrder->order_date);
 
             $this->syncEntityPipelineState(
                 $pipelineConfig,
@@ -1113,7 +1207,10 @@ class PurchasingSampleDataSeeder extends Seeder
                 $purchaseOrder->id,
                 $status,
                 $histories[$status] ?? [],
-                $adminUserId
+                $adminUserId,
+                $documentDate,
+                $adminUserId,
+                $documentRequesterId
             );
 
             $approvalRequestStatus = match ($status) {
@@ -1123,17 +1220,17 @@ class PurchasingSampleDataSeeder extends Seeder
             };
 
             if ($approvalRequestStatus) {
-                $submittedAt = Carbon::parse($purchaseOrder->order_date)->setTime(10, 0);
+                $submittedAt = $documentDate->copy()->setTime(10, 0);
                 $completedAt = $approvalRequestStatus === 'pending'
                     ? null
-                    : Carbon::parse($purchaseOrder->order_date)->addDay()->setTime(16, 0);
+                    : $documentDate->copy()->addDay()->setTime(16, 0);
 
                 $this->syncApprovalRequest(
                     PurchaseOrder::class,
                     $purchaseOrder->id,
                     'purchase_order_default',
                     $approvalRequestStatus,
-                    $adminUserId,
+                    $documentRequesterId,
                     $submittedAt,
                     $completedAt,
                 );
@@ -1141,6 +1238,36 @@ class PurchasingSampleDataSeeder extends Seeder
         }
 
         return [$purchaseOrders, $purchaseOrderItems];
+    }
+
+    /**
+     * Hapus baris item PO demo yang produknya sudah tidak dipakai. Dependen
+     * (retur dan penerimaan) dibersihkan dulu; seeder GR/retur membuatnya ulang.
+     *
+     * @param  array<int, int>  $keepProductIds
+     */
+    private function purgeStalePurchaseOrderItems(int $purchaseOrderId, array $keepProductIds): void
+    {
+        $staleItemIds = PurchaseOrderItem::query()
+            ->where('purchase_order_id', $purchaseOrderId)
+            ->whereNotIn('product_id', $keepProductIds)
+            ->pluck('id');
+
+        if ($staleItemIds->isEmpty()) {
+            return;
+        }
+
+        $receiptItemIds = GoodsReceiptItem::query()
+            ->whereIn('purchase_order_item_id', $staleItemIds)
+            ->pluck('id');
+
+        SupplierReturnItem::query()
+            ->whereIn('goods_receipt_item_id', $receiptItemIds)
+            ->delete();
+
+        GoodsReceiptItem::query()->whereIn('id', $receiptItemIds)->delete();
+
+        PurchaseOrderItem::query()->whereIn('id', $staleItemIds)->delete();
     }
 
     private function syncApprovalRequest(
@@ -1337,7 +1464,7 @@ class PurchasingSampleDataSeeder extends Seeder
             [
                 'number' => "GR-{$year}-000101",
                 'status' => 'draft',
-                'po_status' => 'confirmed',
+                'po_number' => "PO-{$year}-000103",
                 'items' => [
                     ['line' => 0, 'received' => 2.00, 'accepted' => 2.00],
                 ],
@@ -1345,7 +1472,7 @@ class PurchasingSampleDataSeeder extends Seeder
             [
                 'number' => "GR-{$year}-000102",
                 'status' => 'confirmed',
-                'po_status' => 'partially_received',
+                'po_number' => "PO-{$year}-000105",
                 'items' => [
                     ['line' => 0, 'received' => 4.00, 'accepted' => 3.00, 'rejected' => 1.00],
                 ],
@@ -1353,7 +1480,7 @@ class PurchasingSampleDataSeeder extends Seeder
             [
                 'number' => "GR-{$year}-000103",
                 'status' => 'confirmed',
-                'po_status' => 'fully_received',
+                'po_number' => "PO-{$year}-000106",
                 'items' => [
                     ['line' => 0, 'received' => null, 'accepted' => null],
                     ['line' => 1, 'received' => null, 'accepted' => null],
@@ -1362,7 +1489,7 @@ class PurchasingSampleDataSeeder extends Seeder
             [
                 'number' => "GR-{$year}-000104",
                 'status' => 'cancelled',
-                'po_status' => 'cancelled',
+                'po_number' => "PO-{$year}-000107",
                 'items' => [
                     ['line' => 0, 'received' => 0.00, 'accepted' => 0.00, 'rejected' => 0.00],
                 ],
@@ -1370,10 +1497,9 @@ class PurchasingSampleDataSeeder extends Seeder
             [
                 'number' => "GR-{$year}-000105",
                 'status' => 'confirmed',
-                'po_status' => 'closed',
+                'po_number' => "PO-{$year}-000108",
                 'items' => [
                     ['line' => 0, 'received' => null, 'accepted' => null],
-                    ['line' => 1, 'received' => null, 'accepted' => null],
                 ],
             ],
         ];
@@ -1382,8 +1508,8 @@ class PurchasingSampleDataSeeder extends Seeder
         $goodsReceiptItems = [];
 
         foreach ($definitions as $index => $definition) {
-            $purchaseOrder = $purchaseOrders[$definition['po_status']] ?? null;
-            $poItems = $purchaseOrderItems[$definition['po_status']] ?? [];
+            $purchaseOrder = $purchaseOrders[$definition['po_number']] ?? null;
+            $poItems = $purchaseOrderItems[$definition['po_number']] ?? [];
 
             if (! $purchaseOrder) {
                 continue;
@@ -1569,7 +1695,10 @@ class PurchasingSampleDataSeeder extends Seeder
         int $entityId,
         string $targetStateCode,
         array $history,
-        int $adminUserId
+        int $adminUserId,
+        Carbon $documentDate,
+        int $performedBy,
+        ?int $submittedBy = null
     ): void {
         $pipeline = $pipelineConfig['pipeline'];
         $states = $pipelineConfig['states'];
@@ -1582,39 +1711,27 @@ class PurchasingSampleDataSeeder extends Seeder
             return;
         }
 
-        $entityState = PipelineEntityState::updateOrCreate(
-            [
-                'pipeline_id' => $pipeline->id,
-                'entity_type' => $entityType,
-                'entity_id' => $entityId,
-            ],
-            [
-                'current_state_id' => $targetState->id,
-                'last_transitioned_by' => $adminUserId,
-                'last_transitioned_at' => now(),
-                'metadata' => null,
-            ]
-        );
-
         PipelineStateLog::query()
-            ->where('pipeline_entity_state_id', $entityState->id)
+            ->where('pipeline_entity_state_id', PipelineEntityState::query()
+                ->where('pipeline_id', $pipeline->id)
+                ->where('entity_type', $entityType)
+                ->where('entity_id', $entityId)
+                ->value('id') ?? 0)
             ->delete();
 
-        $baseDays = max(2, count($history) + 2);
+        // Timestamp mengikuti tanggal dokumen: transisi pertama di hari dokumen,
+        // lalu tiap transisi berikutnya berselang satu jam, tanpa now().
+        $cursor = $documentDate->copy()->startOfDay()->setTime(8, 0);
+        $logs = [];
 
-        PipelineStateLog::create([
-            'pipeline_entity_state_id' => $entityState->id,
-            'entity_type' => $entityType,
-            'entity_id' => $entityId,
+        $logs[] = [
             'from_state_id' => null,
             'to_state_id' => $initialState->id,
             'transition_id' => null,
-            'performed_by' => $adminUserId,
             'comment' => 'Initial pipeline assignment',
-            'created_at' => now()->subDays($baseDays)->subMinutes($baseDays * 11),
-        ]);
+            'created_at' => $cursor->copy(),
+        ];
 
-        $step = $baseDays - 1;
         foreach ($history as $transitionStep) {
             [$fromCode, $toCode] = $transitionStep;
 
@@ -1626,19 +1743,59 @@ class PurchasingSampleDataSeeder extends Seeder
                 continue;
             }
 
-            PipelineStateLog::create([
-                'pipeline_entity_state_id' => $entityState->id,
-                'entity_type' => $entityType,
-                'entity_id' => $entityId,
+            $cursor = $cursor->copy()->addHour();
+            $logs[] = [
                 'from_state_id' => $fromState->id,
                 'to_state_id' => $toState->id,
                 'transition_id' => $transition?->id,
-                'performed_by' => $adminUserId,
                 'comment' => null,
-                'created_at' => now()->subDays(max(1, $step))->subMinutes($step * 11),
-            ]);
+                'created_at' => $cursor->copy(),
+            ];
+        }
 
-            $step--;
+        $entityState = PipelineEntityState::updateOrCreate(
+            [
+                'pipeline_id' => $pipeline->id,
+                'entity_type' => $entityType,
+                'entity_id' => $entityId,
+            ],
+            [
+                'current_state_id' => $targetState->id,
+                'last_transitioned_by' => $performedBy,
+                'last_transitioned_at' => $cursor->copy(),
+                'metadata' => null,
+            ]
+        );
+
+        // Pengajuan (draft -> pending_approval) dilakukan pengaju; transisi lain
+        // dilakukan pelaku berwenang (admin). Dengan begitu pelaku tidak sama
+        // dengan pengaju pada dokumen yang melewati approval.
+        // Pelaku transisi bervariasi (PR #432 butir 3): transisi selain pengajuan dilakukan
+        // bergilir oleh pelaku berbeda (penyetuju, gudang, admin), bukan satu orang untuk semua.
+        $actors = $this->transitionActorIds($performedBy, $submittedBy);
+        // Pelaku non-pengajuan tidak boleh sama dengan pengaju (W7-16).
+        $actors = array_values(array_filter(
+            $actors,
+            fn (int $id) => $submittedBy === null || $id !== $submittedBy,
+        ));
+        if ($actors === []) {
+            $actors = [$adminUserId];
+        }
+        foreach ($logs as $index => $log) {
+            $isSubmission = $log['from_state_id'] === $states['draft']->id
+                && $log['to_state_id'] === $states['pending_approval']?->id;
+            // Pembuatan dan pengajuan dokumen dicatat atas nama admin pembuat (created_by).
+            // Pengaju tidak pernah menjadi pelaku transisi mana pun (W7-16, PR #432).
+            $actor = ($isSubmission || $log['from_state_id'] === null)
+                ? $adminUserId
+                : $actors[($entityId + $index) % count($actors)];
+
+            PipelineStateLog::create(array_merge($log, [
+                'pipeline_entity_state_id' => $entityState->id,
+                'entity_type' => $entityType,
+                'entity_id' => $entityId,
+                'performed_by' => $actor,
+            ]));
         }
     }
 }

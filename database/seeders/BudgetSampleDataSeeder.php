@@ -78,12 +78,12 @@ class BudgetSampleDataSeeder extends Seeder
                 'approved' => true,
                 'accounts' => $expenseAccounts,
                 'lines' => [
-                    ['account_offset' => 0, 'amount' => 80000000, 'period_start' => '2026-03-01', 'period_end' => '2026-03-31'],
-                    ['account_offset' => 1, 'amount' => 55000000, 'period_start' => '2026-03-01', 'period_end' => '2026-03-31'],
-                    ['account_offset' => 2, 'amount' => 40000000, 'period_start' => '2026-03-01', 'period_end' => '2026-03-31'],
-                    ['account_offset' => 3, 'amount' => 30000000, 'period_start' => '2026-04-01', 'period_end' => '2026-04-30'],
-                    ['account_offset' => 4, 'amount' => 20000000, 'period_start' => '2026-04-01', 'period_end' => '2026-04-30'],
-                    ['account_offset' => 0, 'amount' => 60000000, 'period_start' => '2026-05-01', 'period_end' => '2026-05-31'],
+                    ['account_offset' => 0, 'amount' => 25000000, 'period_start' => '2026-03-01', 'period_end' => '2026-03-31'],
+                    ['account_offset' => 1, 'amount' => 15000000, 'period_start' => '2026-03-01', 'period_end' => '2026-03-31'],
+                    ['account_offset' => 2, 'amount' => 10000000, 'period_start' => '2026-03-01', 'period_end' => '2026-03-31'],
+                    ['account_offset' => 3, 'amount' => 6000000, 'period_start' => '2026-04-01', 'period_end' => '2026-04-30'],
+                    ['account_offset' => 4, 'amount' => 4000000, 'period_start' => '2026-04-01', 'period_end' => '2026-04-30'],
+                    ['account_offset' => 0, 'amount' => 20000000, 'period_start' => '2026-05-01', 'period_end' => '2026-05-31'],
                 ],
             ],
             [

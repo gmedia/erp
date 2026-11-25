@@ -28,14 +28,14 @@ generateModuleTests({
     {
         filterName: 'Branch',
         filterType: 'combobox',
-        filterValue: 'Head Office',
-        expectedText: 'Head Office',
+        filterValue: 'Kantor Pusat',
+        expectedText: 'Kantor Pusat',
     },
     {
         filterName: 'Category',
         filterType: 'combobox',
-        filterValue: 'Office Supplies',
-        expectedText: 'Office Supplies',
+        filterValue: 'Perlengkapan Kantor',
+        expectedText: 'Perlengkapan Kantor',
     },
     {
         filterName: 'Status',

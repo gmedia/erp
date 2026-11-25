@@ -44,16 +44,19 @@ class VehicleLoanApprovalFlowSeeder extends Seeder
             }
         }
 
+        // Master dibuat sebelum transaksi pertama; created_at hanya saat insert (idempoten).
+        $isNew = ! ApprovalFlow::query()->where('code', $targetCode)->exists();
+
         $flow = ApprovalFlow::updateOrCreate(
             ['code' => $targetCode],
             [
-                'name' => 'Vehicle Loan Default Approval',
+                'name' => 'Persetujuan Default Peminjaman Kendaraan',
                 'approvable_type' => config('vehicle_loan.approvable_type'),
                 'description' => 'Default approval flow for vehicle loan requests.',
                 'is_active' => true,
                 'conditions' => null,
                 'created_by' => $approver->id,
-            ],
+            ] + ($isNew ? ['created_at' => now()->subDays(60)] : []),
         );
 
         ApprovalFlowStep::updateOrCreate(
@@ -62,7 +65,7 @@ class VehicleLoanApprovalFlowSeeder extends Seeder
                 'step_order' => 1,
             ],
             [
-                'name' => 'Vehicle Loan Approval',
+                'name' => 'Persetujuan Peminjaman Kendaraan',
                 'approver_type' => 'user',
                 'approver_user_id' => $approver->id,
                 'required_action' => 'approve',
