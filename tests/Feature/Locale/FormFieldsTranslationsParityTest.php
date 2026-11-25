@@ -560,3 +560,31 @@ test('budget, bank reconciliation, recurring journal and period closing validati
     expect($id['budget']['name_required'])->toBe('Nama wajib diisi.')
         ->and($id['period_closing']['period_month_range'])->toBe('Bulan periode harus antara 1 dan 12.');
 });
+
+test('simple entity form keys keep the english text and exist in both locales', function () {
+    $en = localeFormFieldTranslations('en.json');
+    $id = localeFormFieldTranslations('id.json');
+    $enValidation = localeValidationTranslations('en.json');
+    $idValidation = localeValidationTranslations('id.json');
+
+    foreach (['departments', 'positions', 'branches', 'customer_categories', 'supplier_categories'] as $module) {
+        expect(array_keys($en[$module]))->toEqual(array_keys($id[$module]), "form_fields.{$module} keys differ");
+
+        foreach (array_keys($en[$module]) as $field) {
+            expect($id[$module][$field])->not->toBe('', "form_fields.{$module}.{$field} empty");
+        }
+    }
+
+    expect($en['departments']['add_title'])->toBe('Add New Department')
+        ->and($en['departments']['edit_title'])->toBe('Edit Department')
+        ->and($en['departments']['name_placeholder'])->toBe('e.g., Department')
+        ->and($en['positions']['add_title'])->toBe('Add New Position')
+        ->and($en['branches']['edit_title'])->toBe('Edit Branch')
+        ->and($en['customer_categories']['add_title'])->toBe('Add New Customer Category')
+        ->and($en['supplier_categories']['name_placeholder'])->toBe('e.g., Supplier Category')
+        ->and($enValidation['simple_entity']['name_min_2'])->toBe('Name must be at least 2 characters.')
+        ->and($idValidation['simple_entity']['name_min_2'])->toBe('Nama minimal 2 karakter.');
+
+    expect($id['departments']['add_title'])->toBe('Tambah Departemen Baru')
+        ->and($id['customer_categories']['add_title'])->toBe('Tambah Kategori Pelanggan Baru');
+});

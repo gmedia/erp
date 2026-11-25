@@ -80,7 +80,9 @@ export const approvalDelegationFormSchema = z
 
 // Schema for simple entities (departments, positions)
 export const simpleEntitySchema = z.object({
-    name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
+    name: z.string().min(2, {
+        message: 'validation.simple_entity.name_min_2',
+    }),
 });
 
 export type SimpleEntityFormData = z.infer<typeof simpleEntitySchema>;

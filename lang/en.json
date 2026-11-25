@@ -2025,6 +2025,36 @@
             "name_placeholder": "e.g., Kilogram",
             "symbol": "Symbol",
             "symbol_placeholder": "e.g., kg"
+        },
+        "departments": {
+            "add_title": "Add New Department",
+            "edit_title": "Edit Department",
+            "name": "Name",
+            "name_placeholder": "e.g., Department"
+        },
+        "positions": {
+            "add_title": "Add New Position",
+            "edit_title": "Edit Position",
+            "name": "Name",
+            "name_placeholder": "e.g., Position"
+        },
+        "branches": {
+            "add_title": "Add New Branch",
+            "edit_title": "Edit Branch",
+            "name": "Name",
+            "name_placeholder": "e.g., Branch"
+        },
+        "customer_categories": {
+            "add_title": "Add New Customer Category",
+            "edit_title": "Edit Customer Category",
+            "name": "Name",
+            "name_placeholder": "e.g., Customer Category"
+        },
+        "supplier_categories": {
+            "add_title": "Add New Supplier Category",
+            "edit_title": "Edit Supplier Category",
+            "name": "Name",
+            "name_placeholder": "e.g., Supplier Category"
         }
     },
     "validation": {
@@ -2195,6 +2225,9 @@
             "name_min_2": "Name must be at least 2 characters.",
             "category_required": "Category is required.",
             "status_required": "Status is required."
+        },
+        "simple_entity": {
+            "name_min_2": "Name must be at least 2 characters."
         }
     },
     "item_dialog": {

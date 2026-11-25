@@ -2025,6 +2025,36 @@
             "name_placeholder": "mis., Kilogram",
             "symbol": "Simbol",
             "symbol_placeholder": "mis., kg"
+        },
+        "departments": {
+            "add_title": "Tambah Departemen Baru",
+            "edit_title": "Ubah Departemen",
+            "name": "Nama",
+            "name_placeholder": "contoh: Departemen"
+        },
+        "positions": {
+            "add_title": "Tambah Jabatan Baru",
+            "edit_title": "Ubah Jabatan",
+            "name": "Nama",
+            "name_placeholder": "contoh: Jabatan"
+        },
+        "branches": {
+            "add_title": "Tambah Cabang Baru",
+            "edit_title": "Ubah Cabang",
+            "name": "Nama",
+            "name_placeholder": "contoh: Cabang"
+        },
+        "customer_categories": {
+            "add_title": "Tambah Kategori Pelanggan Baru",
+            "edit_title": "Ubah Kategori Pelanggan",
+            "name": "Nama",
+            "name_placeholder": "contoh: Kategori Pelanggan"
+        },
+        "supplier_categories": {
+            "add_title": "Tambah Kategori Pemasok Baru",
+            "edit_title": "Ubah Kategori Pemasok",
+            "name": "Nama",
+            "name_placeholder": "contoh: Kategori Pemasok"
         }
     },
     "validation": {
@@ -2195,6 +2225,9 @@
             "name_min_2": "Nama minimal 2 karakter.",
             "category_required": "Kategori wajib diisi.",
             "status_required": "Status wajib diisi."
+        },
+        "simple_entity": {
+            "name_min_2": "Nama minimal 2 karakter."
         }
     },
     "item_dialog": {
