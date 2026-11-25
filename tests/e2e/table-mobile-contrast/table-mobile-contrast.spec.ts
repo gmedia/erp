@@ -29,6 +29,97 @@ function parseRgb(value: string): [number, number, number] {
     return [Number(match[1]), Number(match[2]), Number(match[3])];
 }
 
+test.describe('Issue #460: checkbox mode terang', () => {
+    test.use({ viewport: { width: 1440, height: 900 }, colorScheme: 'light' });
+
+    test('border checkbox kontras >= 3:1 terhadap latar', async ({ page }) => {
+        await login(page);
+        await page.goto('/budgets');
+        await page.waitForLoadState('networkidle');
+
+        const checkbox = page.locator('[data-slot="checkbox"]:visible').first();
+        await expect(checkbox).toBeVisible();
+
+        const colors = await checkbox.evaluate((el) => {
+            const toRgb = (value: string): string => {
+                const canvas = document.createElement('canvas');
+                canvas.width = 1;
+                canvas.height = 1;
+                const ctx = canvas.getContext('2d');
+                if (!ctx) {
+                    return value;
+                }
+                ctx.fillStyle = value;
+                ctx.fillRect(0, 0, 1, 1);
+                const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+
+                return `rgb(${r}, ${g}, ${b})`;
+            };
+
+            const bg = (node: Element | null): string => {
+                let current: Element | null = node;
+                while (current) {
+                    const value = getComputedStyle(current).backgroundColor;
+                    if (!/rgba\(0,\s*0,\s*0,\s*0\)|transparent/.test(value)) {
+                        return value;
+                    }
+                    current = current.parentElement;
+                }
+                return 'rgb(255, 255, 255)';
+            };
+
+            return {
+                border: toRgb(getComputedStyle(el).borderTopColor),
+                bg: toRgb(bg(el.parentElement)),
+            };
+        });
+
+        const ratio = contrastRatio(
+            parseRgb(colors.border),
+            parseRgb(colors.bg),
+        );
+        expect(ratio).toBeGreaterThanOrEqual(3);
+    });
+});
+
+test.describe('Issue #460: petunjuk scroll kolom aksi di 390', () => {
+    test.use({ viewport: { width: 390, height: 844 }, colorScheme: 'light' });
+
+    test('shadow kolom aksi ada di awal dan hilang di ujung scroll', async ({
+        page,
+    }) => {
+        await login(page);
+        await page.goto('/budgets');
+        await page.waitForLoadState('networkidle');
+
+        const actionsHead = page
+            .locator('th[data-sticky-column="actions"]')
+            .first();
+        await expect(actionsHead).toBeVisible();
+
+        const shadowOf = () =>
+            actionsHead.evaluate(
+                (el) => getComputedStyle(el, '::before').backgroundImage,
+            );
+
+        const scrollerOf = () =>
+            actionsHead.evaluate((el) => {
+                const scroller = el.closest('.overflow-x-auto');
+                return scroller ? scroller.scrollLeft : -1;
+            });
+
+        expect(await scrollerOf()).toBe(0);
+        expect(await shadowOf()).not.toBe('none');
+
+        await actionsHead.evaluate((el) => {
+            const scroller = el.closest('.overflow-x-auto');
+            if (scroller) scroller.scrollLeft = scroller.scrollWidth;
+        });
+
+        await expect.poll(shadowOf).toBe('none');
+    });
+});
+
 test.describe('Issue #460: kontras mode gelap dan sidebar', () => {
     test.use({ viewport: { width: 1440, height: 900 }, colorScheme: 'dark' });
 
@@ -108,5 +199,17 @@ test.describe('Issue #460: kontras mode gelap dan sidebar', () => {
                 containerBox.y + containerBox.height,
             );
         }
+
+        const footer = page.locator('[data-slot="sidebar-footer"]');
+        const footerBox = await footer.boundingBox();
+        const lastBox = await items.nth(count - 1).boundingBox();
+        expect(footerBox).not.toBeNull();
+        expect(lastBox).not.toBeNull();
+        if (footerBox && lastBox) {
+            expect(lastBox.y + lastBox.height).toBeLessThanOrEqual(
+                footerBox.y + 1,
+            );
+        }
     });
+
 });
