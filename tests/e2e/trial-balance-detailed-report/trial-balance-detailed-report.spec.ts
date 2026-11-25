@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { login, expectResponseOk } from '../helpers';
 
 test.describe('Trial Balance Detailed Report', () => {
     test.setTimeout(90000);
@@ -42,18 +42,16 @@ test.describe('Trial Balance Detailed Report', () => {
             .locator('[role="option"]:visible, ul[aria-busy]:visible button:visible')
             .first();
         await expect(option).toBeVisible({ timeout: 10000 });
+        const listResponse = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/reports/trial-balance-detailed') &&
+                !r.url().includes('/export') &&
+                r.request().method() === 'GET',
+            { timeout: 30000 },
+        );
         await option.click({ force: true });
-
-        await Promise.all([
-            page.waitForResponse(
-                (r) =>
-                    r.url().includes('/api/reports/trial-balance-detailed') &&
-                    !r.url().includes('/export') &&
-                    r.status() < 400,
-                { timeout: 30000 },
-            ),
-            filtersDialog.getByRole('button', { name: 'Apply Filters' }).click(),
-        ]);
+        await filtersDialog.getByRole('button', { name: 'Apply Filters' }).click();
+        await expectResponseOk(await listResponse);
     });
 
     test('can export trial balance detailed report', async ({ page }) => {
@@ -76,29 +74,28 @@ test.describe('Trial Balance Detailed Report', () => {
         await expect(option).toBeVisible({ timeout: 10000 });
         await option.click({ force: true });
 
-        await Promise.all([
-            page.waitForResponse(
-                (r) =>
-                    r.url().includes('/api/reports/trial-balance-detailed') &&
-                    !r.url().includes('/export') &&
-                    r.status() < 400,
-                { timeout: 30000 },
-            ),
-            filtersDialog.getByRole('button', { name: 'Apply Filters' }).click(),
-        ]);
+        const listResponse = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/reports/trial-balance-detailed') &&
+                !r.url().includes('/export') &&
+                r.request().method() === 'GET',
+            { timeout: 30000 },
+        );
+        await filtersDialog.getByRole('button', { name: 'Apply Filters' }).click();
+        await expectResponseOk(await listResponse);
 
         const exportButton = page.getByRole('button', { name: /^Export$/i });
         await expect(exportButton).toBeEnabled({ timeout: 10000 });
 
-        const [response] = await Promise.all([
-            page.waitForResponse(
-                (r) =>
-                    r.url().includes('/api/reports/trial-balance-detailed/export') &&
-                    r.status() < 400,
-                { timeout: 30000 },
-            ),
-            exportButton.click(),
-        ]);
+        const exportResponse = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/reports/trial-balance-detailed/export') &&
+                r.request().method() === 'POST',
+            { timeout: 30000 },
+        );
+        await exportButton.click();
+        const response = await exportResponse;
+        await expectResponseOk(response);
 
         const body = await response.json();
         expect(body).toHaveProperty('url');

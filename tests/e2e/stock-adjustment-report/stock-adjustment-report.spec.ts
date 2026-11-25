@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 
 test.describe('Stock Adjustment Report', () => {
     test.beforeEach(async ({ page }) => {
@@ -8,39 +8,36 @@ test.describe('Stock Adjustment Report', () => {
 
     test('can view report, sort, filter, and export', async ({ page }) => {
         const initialResponsePromise = page.waitForResponse(
-            (r) =>
-                r.url().includes('/api/reports/stock-adjustment') &&
-                r.status() < 400,
+            (r) => r.url().includes('/api/reports/stock-adjustment'),
             { timeout: 30000 },
         );
         await page.goto('/reports/stock-adjustment');
         await page.waitForURL('**/reports/stock-adjustment', { timeout: 15000 });
-        await initialResponsePromise;
+        await expectResponseOk(await initialResponsePromise);
 
         await expect(page.locator('table')).toBeVisible();
         await expect(page.locator('tbody tr').first()).toBeVisible();
 
-        await Promise.all([
+        const [sortResponse] = await Promise.all([
             page.waitForResponse(
                 (r) =>
                     r.url().includes('/api/reports/stock-adjustment') &&
-                    r.url().includes('sort_by=adjustment_type') &&
-                    r.status() < 400,
+                    r.url().includes('sort_by=adjustment_type'),
                 { timeout: 30000 },
             ),
             page
                 .getByRole('button', { name: 'Adjustment Type', exact: true })
                 .click(),
         ]);
+        await expectResponseOk(sortResponse);
 
-        await Promise.all([
-            page.waitForResponse(
-                (r) =>
-                    r.url().includes('/api/reports/stock-adjustment/export') &&
-                    r.status() < 400,
+        const [exportResponse] = await Promise.all([
+            page.waitForResponse((r) =>
+                r.url().includes('/api/reports/stock-adjustment/export'),
             ),
             page.getByRole('button', { name: /export/i }).click(),
         ]);
+        await expectResponseOk(exportResponse);
 
         await page.getByRole('button', { name: /filters/i }).click();
         const filtersDialog = page.getByRole('dialog');
@@ -58,13 +55,12 @@ test.describe('Stock Adjustment Report', () => {
         await expect(typeOption).toBeVisible({ timeout: 10000 });
         await typeOption.click({ force: true });
 
-        await Promise.all([
-            page.waitForResponse(
-                (r) =>
-                    r.url().includes('/api/reports/stock-adjustment') &&
-                    r.status() < 400,
+        const [filterResponse] = await Promise.all([
+            page.waitForResponse((r) =>
+                r.url().includes('/api/reports/stock-adjustment'),
             ),
             filtersDialog.getByRole('button', { name: 'Apply Filters' }).click(),
         ]);
+        await expectResponseOk(filterResponse);
     });
 });

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { login, searchAndWaitForApi } from '../helpers';
+import { expectResponseOk, login, searchAndWaitForApi } from '../helpers';
 import { createSupplierReturn } from './helpers';
 
 test.describe('Supplier Return item dialog labels', () => {
@@ -9,12 +9,11 @@ test.describe('Supplier Return item dialog labels', () => {
     }) => {
         await login(page, undefined, undefined, { requireDashboard: false });
         const listed = page.waitForResponse(
-            (r) =>
-                r.url().includes('/api/supplier-returns') && r.status() < 400,
+            (r) => r.url().includes('/api/supplier-returns'),
             { timeout: 30000 },
         );
         await page.goto('/supplier-returns');
-        await listed;
+        await expectResponseOk(await listed);
 
         const returnNumber = await createSupplierReturn(page);
         await searchAndWaitForApi(

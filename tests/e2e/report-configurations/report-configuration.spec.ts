@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 import { searchReportConfiguration } from './helpers';
 
 test.describe('Report Configuration E2E Tests', () => {
@@ -8,11 +8,11 @@ test.describe('Report Configuration E2E Tests', () => {
         const listResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/report-configurations') &&
-                r.status() < 400,
+                r.request().method() === 'GET',
             { timeout: 15000 },
         );
         await page.goto('/report-configurations');
-        await listResponse;
+        await expectResponseOk(await listResponse);
     });
 
     test('can view Report Configurations list with seeded defaults', async ({
@@ -79,10 +79,20 @@ test.describe('Report Configuration E2E Tests', () => {
                 .locator('thead')
                 .getByRole('button', { name: column, exact: true });
             await expect(sortButton).toBeVisible();
+            const ascSortResponse = page.waitForResponse(
+                (r) =>
+                    r.url().includes('/api/report-configurations') &&
+                    r.request().method() === 'GET',
+            );
             await sortButton.click();
-            await page.waitForTimeout(500);
+            await expectResponseOk(await ascSortResponse);
+            const descSortResponse = page.waitForResponse(
+                (r) =>
+                    r.url().includes('/api/report-configurations') &&
+                    r.request().method() === 'GET',
+            );
             await sortButton.click();
-            await page.waitForTimeout(500);
+            await expectResponseOk(await descSortResponse);
         }
     });
 });

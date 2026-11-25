@@ -1,5 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 import { searchAsset } from '../assets/helpers';
 
 /**
@@ -22,10 +22,10 @@ async function goToAssetProfile(page: Page, assetCode: string) {
   // Open actions dropdown → View
   await row.getByRole('button').last().click();
 
-  await Promise.all([
+  const [, profileResponse, entityStateResponse] = await Promise.all([
     page.waitForURL(/\/assets\/[^/]+$/, { timeout: 15000 }),
     page.waitForResponse(
-      r => /\/api\/assets\/[^/]+\/profile$/.test(r.url()) && r.status() < 400,
+      r => /\/api\/assets\/[^/]+\/profile$/.test(r.url()) && r.request().method() === 'GET',
       { timeout: 15000 }
     ),
     page.waitForResponse(
@@ -33,11 +33,13 @@ async function goToAssetProfile(page: Page, assetCode: string) {
         r.url().includes('/api/entity-states/asset/') &&
         !r.url().includes('/timeline') &&
         !r.url().includes('/approvals') &&
-        r.status() < 400,
+        r.request().method() === 'GET',
       { timeout: 15000 }
     ),
     page.getByRole('menuitem', { name: 'View' }).click(),
   ]);
+  await expectResponseOk(profileResponse);
+  await expectResponseOk(entityStateResponse);
 
   await expect(page.getByText(assetCode, { exact: true }).first()).toBeVisible({ timeout: 15000 });
 }
@@ -148,13 +150,14 @@ test.describe('Asset Pipeline Lifecycle — Per State', () => {
     await goToAssetProfile(page, 'FA-000007');
 
     // Navigate to Timeline tab
-    await Promise.all([
+    const [timelineResponse] = await Promise.all([
       page.waitForResponse(
-        r => r.url().includes('/api/entity-states/') && r.url().includes('/timeline') && r.status() < 400,
+        r => r.url().includes('/api/entity-states/') && r.url().includes('/timeline') && r.request().method() === 'GET',
         { timeout: 15000 }
       ),
       page.getByRole('tab', { name: 'Timeline' }).click(),
     ]);
+    await expectResponseOk(timelineResponse);
 
     // Should show state history entries
     // FA-000007 lifecycle: Draft → Active → Disposed

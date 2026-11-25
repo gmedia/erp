@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 
 function luminance(rgb: [number, number, number]): number {
     const [r, g, b] = rgb.map((c) => {
@@ -141,11 +141,11 @@ test.describe('Issue #460: petunjuk scroll kolom aksi di 390', () => {
         const listResponse = page.waitForResponse(
             (response) =>
                 response.url().includes('/api/budgets') &&
-                response.status() < 400,
+                response.request().method() === 'GET',
             { timeout: 15000 },
         );
         await page.goto('/budgets');
-        await listResponse;
+        await expectResponseOk(await listResponse);
         await page.evaluate(() => document.fonts.ready);
 
         const row = page.locator('tbody tr').first();

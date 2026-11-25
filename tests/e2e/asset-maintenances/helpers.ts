@@ -1,4 +1,5 @@
 import { Page, expect } from '@playwright/test';
+import { expectResponseOk } from '../helpers';
 
 export async function createAssetMaintenance(
   page: Page,
@@ -38,12 +39,11 @@ export async function createAssetMaintenance(
   const mutationResponsePromise = page.waitForResponse(
     response =>
       response.url().includes('/api/asset-maintenances') &&
-      ['POST', 'PUT', 'PATCH'].includes(response.request().method()) &&
-      response.status() < 400,
+      ['POST', 'PUT', 'PATCH'].includes(response.request().method()),
     { timeout: 15000 },
   );
   await submitBtn.click();
-  await mutationResponsePromise;
+  await expectResponseOk(await mutationResponsePromise);
 
   await expect(dialog).not.toBeVisible({ timeout: 15000 });
 
@@ -61,14 +61,13 @@ export async function searchAssetMaintenance(page: Page, query: string): Promise
   const responsePromise = page.waitForResponse(
     response =>
       response.url().includes('/api/asset-maintenances') &&
-      response.request().method() === 'GET' &&
-      response.status() < 400,
+      response.request().method() === 'GET',
     { timeout: 15000 },
   );
   await searchInput.clear();
   await searchInput.fill(normalizedQuery);
   await searchInput.press('Enter');
-  await responsePromise;
+  await expectResponseOk(await responsePromise);
 }
 
 export async function editAssetMaintenance(
@@ -98,13 +97,12 @@ export async function editAssetMaintenance(
   const updateResponsePromise = page.waitForResponse(
     response =>
       response.url().includes('/api/asset-maintenances') &&
-      ['PUT', 'PATCH'].includes(response.request().method()) &&
-      response.status() < 400,
+      ['PUT', 'PATCH'].includes(response.request().method()),
     { timeout: 15000 },
   );
 
   await dialog.getByRole('button', { name: /Update Maintenance|Save Maintenance|Update|Save/i }).last().click();
-  await updateResponsePromise;
+  await expectResponseOk(await updateResponsePromise);
   await expect(dialog).not.toBeVisible({ timeout: 15000 });
 }
 

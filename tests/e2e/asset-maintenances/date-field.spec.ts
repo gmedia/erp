@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { expectResponseOk } from '../helpers';
 
 import { changeDateFieldValue, openModule } from '../helpers';
 import { createAssetMaintenance, searchAssetMaintenance } from './helpers';
@@ -46,8 +47,7 @@ test.describe('Asset Maintenance date field', () => {
         const updateResponsePromise = page.waitForResponse(
             (response) =>
                 response.url().includes('/api/asset-maintenances/') &&
-                ['PUT', 'PATCH'].includes(response.request().method()) &&
-                response.status() < 400,
+                ['PUT', 'PATCH'].includes(response.request().method()),
         );
 
         await dialog
@@ -62,7 +62,7 @@ test.describe('Asset Maintenance date field', () => {
 
         expect(payload.scheduled_at).toBe(`${scheduledDate} 00:00:00`);
 
-        await updateResponsePromise;
+        await expectResponseOk(await updateResponsePromise);
         await expect(dialog).not.toBeVisible();
     });
 });

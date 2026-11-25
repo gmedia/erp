@@ -1,6 +1,14 @@
 import { test, expect, Page } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 import { searchAsset } from '../assets/helpers';
+
+function isAssetProfileUrl(url: string): boolean {
+  return /\/api\/assets\/[^/]+\/profile$/.test(url);
+}
+
+function isAssetEntityStateUrl(url: string): boolean {
+  return url.includes('/api/entity-states/asset/') && !url.includes('/timeline') && !url.includes('/approvals');
+}
 
 async function openAssetProfile(page: Page, assetName: string): Promise<void> {
   await page.goto('/assets');
@@ -11,42 +19,38 @@ async function openAssetProfile(page: Page, assetName: string): Promise<void> {
 
   await row.getByRole('button').last().click();
 
-  await Promise.all([
+  const [, profileResponse, entityStateResponse] = await Promise.all([
     page.waitForURL(/\/assets\/[^/]+$/, { timeout: 15000 }),
     page.waitForResponse(
-      response => /\/api\/assets\/[^/]+\/profile$/.test(response.url()) && response.status() < 400,
+      response => isAssetProfileUrl(response.url()) && response.request().method() === 'GET',
       { timeout: 15000 },
     ),
     page.waitForResponse(
-      response =>
-        response.url().includes('/api/entity-states/asset/') &&
-        !response.url().includes('/timeline') &&
-        !response.url().includes('/approvals') &&
-        response.status() < 400,
+      response => isAssetEntityStateUrl(response.url()) && response.request().method() === 'GET',
       { timeout: 15000 },
     ),
     page.getByRole('menuitem', { name: 'View' }).click(),
   ]);
+  await expectResponseOk(profileResponse);
+  await expectResponseOk(entityStateResponse);
 
   await expect(page.getByText(assetName, { exact: true }).first()).toBeVisible({ timeout: 15000 });
 }
 
 async function reloadAssetProfile(page: Page): Promise<void> {
-  await Promise.all([
+  const [profileResponse, entityStateResponse] = await Promise.all([
     page.waitForResponse(
-      response => /\/api\/assets\/[^/]+\/profile$/.test(response.url()) && response.status() < 400,
+      response => isAssetProfileUrl(response.url()) && response.request().method() === 'GET',
       { timeout: 15000 },
     ),
     page.waitForResponse(
-      response =>
-        response.url().includes('/api/entity-states/asset/') &&
-        !response.url().includes('/timeline') &&
-        !response.url().includes('/approvals') &&
-        response.status() < 400,
+      response => isAssetEntityStateUrl(response.url()) && response.request().method() === 'GET',
       { timeout: 15000 },
     ),
     page.reload(),
   ]);
+  await expectResponseOk(profileResponse);
+  await expectResponseOk(entityStateResponse);
 }
 
 test.describe('Entity State Timeline', () => {
@@ -70,28 +74,26 @@ test.describe('Entity State Timeline', () => {
       response =>
         response.url().includes('/api/entity-states/asset/') &&
         response.url().includes('/transition') &&
-        response.request().method() === 'POST' &&
-        response.status() < 400,
+        response.request().method() === 'POST',
       { timeout: 15000 },
     );
 
     await commentDialog.getByRole('button', { name: 'Submit' }).click();
-    await transitionResponsePromise;
+    await expectResponseOk(await transitionResponsePromise);
 
     await expect(page.getByText('Transition executed successfully')).toBeVisible();
     await reloadAssetProfile(page);
     await expect(page.getByText('Disposed', { exact: true }).first()).toBeVisible();
 
-    await Promise.all([
-      page.waitForResponse(
-        response =>
-          response.url().includes('/api/entity-states/asset/') &&
-          response.url().includes('/timeline') &&
-          response.status() < 400,
-        { timeout: 15000 },
-      ),
-      page.getByRole('tab', { name: 'Timeline' }).click(),
-    ]);
+    const timelineResponsePromise = page.waitForResponse(
+      response =>
+        response.url().includes('/api/entity-states/asset/') &&
+        response.url().includes('/timeline') &&
+        response.request().method() === 'GET',
+      { timeout: 15000 },
+    );
+    await page.getByRole('tab', { name: 'Timeline' }).click();
+    await expectResponseOk(await timelineResponsePromise);
 
     await expect(page.getByText('Initial pipeline assignment').first()).toBeVisible();
     await expect(page.getByText('Dispose').first()).toBeVisible();

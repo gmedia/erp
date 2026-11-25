@@ -1,11 +1,14 @@
 import { expect, Page } from '@playwright/test';
+import { expectResponseOk } from '../helpers';
 
 export async function waitForArOutstandingReportResponse(page: Page): Promise<void> {
-    await page.waitForResponse(
-        (response) =>
-            response.url().includes('/api/reports/ar-outstanding') &&
-            response.status() < 400,
+    const response = await page.waitForResponse(
+        (r) =>
+            r.request().method() === 'GET' &&
+            r.url().includes('/api/reports/ar-outstanding') &&
+            !r.url().includes('/export'),
     );
+    await expectResponseOk(response);
 }
 
 export async function openArOutstandingReport(page: Page): Promise<void> {

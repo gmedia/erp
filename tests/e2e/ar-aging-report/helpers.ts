@@ -1,11 +1,14 @@
 import { expect, Page } from '@playwright/test';
+import { expectResponseOk } from '../helpers';
 
 export async function waitForArAgingReportResponse(page: Page): Promise<void> {
-    await page.waitForResponse(
-        (response) =>
-            response.url().includes('/api/reports/ar-aging') &&
-            response.status() < 400,
+    const response = await page.waitForResponse(
+        (r) =>
+            r.request().method() === 'GET' &&
+            r.url().includes('/api/reports/ar-aging') &&
+            !r.url().includes('/export'),
     );
+    await expectResponseOk(response);
 }
 
 export async function openArAgingReport(page: Page): Promise<void> {

@@ -1,5 +1,5 @@
 import { APIRequestContext, Page, expect } from '@playwright/test';
-import { approveApprovableAsDelegate } from '../helpers';
+import { approveApprovableAsDelegate, expectResponseOk } from '../helpers';
 
 export const VEHICLE_LOAN_REQUEST_PATH = '/vehicle-loans/request';
 export const VEHICLE_LOAN_PICKUP_PATH = '/vehicle-loans/pickup';
@@ -37,12 +37,12 @@ export async function submitVehicleLoanRequest(
     const responsePromise = page.waitForResponse(
         (response) =>
             response.url().includes('/api/vehicle-loans') &&
-            response.request().method() === 'POST' &&
-            response.status() < 400,
+            response.request().method() === 'POST',
     );
 
     await page.getByRole('button', { name: 'Kirim Permintaan' }).click();
     const response = await responsePromise;
+    await expectResponseOk(response);
     const body = (await response.json()) as { data?: { id?: number }; id?: number };
     const id = body.data?.id ?? body.id;
     if (!id) throw new Error('Vehicle loan POST returned no id');
@@ -111,21 +111,23 @@ export async function seedApprovedLoan(page: Page): Promise<number> {
 
         await approveApprovableAsDelegate(page, id, 'E2ESeed approved', 'App\\Models\\VehicleLoan');
 
-    for (let attempt = 0; attempt < 20; attempt++) {
-        const check = await apiRequest(page, 'get', `/api/vehicle-loans/${id}`);
-        if (check.ok()) {
-            const detail = (await check.json()) as {
-                data?: { status?: string };
-                status?: string;
-            };
-            if ((detail.data?.status ?? detail.status) === 'approved') {
-                return id;
-            }
-        }
-        await page.waitForTimeout(250);
-    }
-
-    throw new Error(`Seeded loan ${id} did not reach approved status`);
+    await expect
+        .poll(
+            async () => {
+                const check = await apiRequest(page, 'get', `/api/vehicle-loans/${id}`);
+                if (!check.ok()) {
+                    return undefined;
+                }
+                const detail = (await check.json()) as {
+                    data?: { status?: string };
+                    status?: string;
+                };
+                return detail.data?.status ?? detail.status;
+            },
+            { message: `Seeded loan ${id} did not reach approved status`, timeout: 5000, intervals: [250] },
+        )
+        .toBe('approved');
+    return id;
 }
 
 function toDisplayDate(date: Date): string {
@@ -140,12 +142,12 @@ export async function submitVehicleLoanPickup(page: Page): Promise<void> {
     const loadResponse = page.waitForResponse(
         (response) =>
             response.url().includes('/api/vehicle-loans?status=approved') &&
-            response.status() < 400,
+            response.request().method() === 'GET',
     );
     await page
         .getByRole('button', { name: /Muat Permintaan Disetujui/i })
         .click();
-    await loadResponse;
+    await expectResponseOk(await loadResponse);
 
     const loanSelect = page.locator('#loan');
     await expect(loanSelect).toBeVisible();
@@ -169,10 +171,10 @@ export async function submitVehicleLoanPickup(page: Page): Promise<void> {
         (response) =>
             response.url().includes('/api/vehicle-loans/') &&
             response.url().includes('/pickups') &&
-            response.status() < 400,
+            response.request().method() === 'POST',
     );
     await page.getByRole('button', { name: 'Kirim Pengambilan' }).click();
-    await responsePromise;
+    await expectResponseOk(await responsePromise);
 }
 
 export async function seedHandedOverPickup(page: Page): Promise<number> {
@@ -231,12 +233,12 @@ export async function submitVehicleLoanReturn(page: Page): Promise<void> {
     const loadResponse = page.waitForResponse(
         (response) =>
             response.url().includes('/api/vehicle-loans/my') &&
-            response.status() < 400,
+            response.request().method() === 'GET',
     );
     await page
         .getByRole('button', { name: /Muat Data Pengambilan Saya/i })
         .click();
-    await loadResponse;
+    await expectResponseOk(await loadResponse);
 
     const pickupSelect = page.locator('#pickup');
     await expect(pickupSelect).toBeVisible();
@@ -262,9 +264,8 @@ export async function submitVehicleLoanReturn(page: Page): Promise<void> {
     const responsePromise = page.waitForResponse(
         (response) =>
             response.url().includes('/returns') &&
-            response.request().method() === 'POST' &&
-            response.status() < 400,
+            response.request().method() === 'POST',
     );
     await page.getByRole('button', { name: 'Kirim Pengembalian' }).click();
-    await responsePromise;
+    await expectResponseOk(await responsePromise);
 }

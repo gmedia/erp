@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 
+import { expectResponseOk } from '../helpers';
 import { generateModuleTests } from '../shared-test-factories';
 import {
   createAssetMovement,
@@ -76,11 +77,11 @@ test('uploads a supporting document with an asset movement', async ({ page }) =>
   const responsePromise = page.waitForResponse(
     (response) =>
       response.url().includes('/api/asset-movements') &&
-      response.request().method() === 'POST' &&
-      response.status() < 400,
+      response.request().method() === 'POST',
   );
   await dialog.getByRole('button', { name: /Record Movement/i }).last().click();
   const response = await responsePromise;
+  await expectResponseOk(response);
   const payload = await response.json();
   expect(payload.data.document_name).toBe('movement-proof.pdf');
   expect(payload.data.document_url).toContain('/storage/asset-movements/documents/');

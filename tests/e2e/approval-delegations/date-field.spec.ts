@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { changeDateFieldValue, openModule } from '../helpers';
+import { changeDateFieldValue, expectResponseOk, openModule } from '../helpers';
 import { createApprovalDelegation, searchApprovalDelegation } from './helpers';
 
 test.describe('Approval Delegation date fields', () => {
@@ -44,8 +44,7 @@ test.describe('Approval Delegation date fields', () => {
         const updateResponsePromise = page.waitForResponse(
             (response) =>
                 response.url().includes('/api/approval-delegations/') &&
-                ['PUT', 'PATCH'].includes(response.request().method()) &&
-                response.status() < 400,
+                ['PUT', 'PATCH'].includes(response.request().method()),
         );
 
         await dialog.getByRole('button', { name: /Update/i }).click();
@@ -57,7 +56,7 @@ test.describe('Approval Delegation date fields', () => {
 
         expect(payload.start_date).toBe(startDate);
 
-        await updateResponsePromise;
+        await expectResponseOk(await updateResponsePromise);
         await expect(dialog).not.toBeVisible();
     });
 });

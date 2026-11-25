@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 import {
     applyStatusFilter,
     ensureBudgetExists,
@@ -75,17 +75,18 @@ test.describe('Budget Variance Report', () => {
         await expect(option).toBeVisible({ timeout: 10000 });
         await option.click({ force: true });
 
-        await Promise.all([
+        const [response] = await Promise.all([
             page.waitForResponse(
                 (r) =>
+                    r.request().method() === 'GET' &&
                     r.url().includes('/api/reports/budget-variance') &&
                     !r.url().includes('/export') &&
-                    r.url().includes('account_type=') &&
-                    r.status() < 400,
+                    r.url().includes('account_type='),
                 { timeout: 30000 },
             ),
             filtersDialog.getByRole('button', { name: 'Apply Filters' }).click(),
         ]);
+        await expectResponseOk(response);
 
         await expect(page.locator('table').first()).toBeVisible();
     });
@@ -99,12 +100,13 @@ test.describe('Budget Variance Report', () => {
         const [response] = await Promise.all([
             page.waitForResponse(
                 (r) =>
-                    r.url().includes('/api/reports/budget-variance/export') &&
-                    r.status() < 400,
+                    r.request().method() === 'POST' &&
+                    r.url().includes('/api/reports/budget-variance/export'),
                 { timeout: 30000 },
             ),
             exportButton.click(),
         ]);
+        await expectResponseOk(response);
 
         const body = await response.json();
         expect(body).toHaveProperty('url');

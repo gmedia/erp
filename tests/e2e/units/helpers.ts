@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { Page, expect } from '@playwright/test';
+import { expectResponseOk } from '../helpers';
 
 /**
  * Create a new unit via the UI.
@@ -33,12 +34,12 @@ export async function createUnit(page: Page): Promise<string> {
 export async function searchUnit(page: Page, name: string): Promise<void> {
     const searchInput = page.getByPlaceholder('Search units...');
     const responsePromise = page.waitForResponse(
-        r => r.url().includes('/api/units') && r.status() < 400
+        r => r.url().includes('/api/units')
     );
     await searchInput.clear();
     await searchInput.fill(name);
     await searchInput.press('Enter');
-    await responsePromise;
+    await expectResponseOk(await responsePromise);
 }
 
 /**

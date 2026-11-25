@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 
 test.describe('Stock Movements (Kartu Stok)', () => {
     test.beforeEach(async ({ page }) => {
@@ -28,45 +28,42 @@ test.describe('Stock Movements (Kartu Stok)', () => {
         const searchResponsePromise = page.waitForResponse(
             (r) =>
                 r.url().includes('/stock-movements') &&
-                r.request().headers()['accept']?.includes('application/json') &&
-                r.status() < 400,
+                r.request().headers()['accept']?.includes('application/json') ===
+                true,
         );
         await searchInput.fill(refNumber);
         await searchInput.press('Enter');
-        await searchResponsePromise;
+        await expectResponseOk(await searchResponsePromise);
 
         await expect(page.getByText(refNumber).first()).toBeVisible();
 
         if (refNumber.toUpperCase().startsWith('ST-')) {
-            await Promise.all([
+            const [, drillResponse] = await Promise.all([
                 page.waitForURL(/\/stock-transfers\?search=/),
-                page.waitForResponse(
-                    (r) =>
-                        r.url().includes('/api/stock-transfers') &&
-                        r.status() < 400,
+                page.waitForResponse((r) =>
+                    r.url().includes('/api/stock-transfers'),
                 ),
                 refLink.click(),
             ]);
+            await expectResponseOk(drillResponse);
         } else if (refNumber.toUpperCase().startsWith('SA-')) {
-            await Promise.all([
+            const [, drillResponse] = await Promise.all([
                 page.waitForURL(/\/stock-adjustments\?search=/),
-                page.waitForResponse(
-                    (r) =>
-                        r.url().includes('/api/stock-adjustments') &&
-                        r.status() < 400,
+                page.waitForResponse((r) =>
+                    r.url().includes('/api/stock-adjustments'),
                 ),
                 refLink.click(),
             ]);
+            await expectResponseOk(drillResponse);
         } else {
-            await Promise.all([
+            const [, drillResponse] = await Promise.all([
                 page.waitForURL(/\/inventory-stocktakes\?search=/),
-                page.waitForResponse(
-                    (r) =>
-                        r.url().includes('/api/inventory-stocktakes') &&
-                        r.status() < 400,
+                page.waitForResponse((r) =>
+                    r.url().includes('/api/inventory-stocktakes'),
                 ),
                 refLink.click(),
             ]);
+            await expectResponseOk(drillResponse);
         }
 
         await expect(page.getByRole('textbox').first()).toHaveValue(refNumber);

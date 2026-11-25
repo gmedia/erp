@@ -1,6 +1,6 @@
 import { expect, Page, test } from '@playwright/test';
 
-import { login, searchAndWaitForApi } from '../helpers';
+import { expectResponseOk, login, searchAndWaitForApi } from '../helpers';
 
 interface SeedResult {
     returnNumber: string;
@@ -160,12 +160,11 @@ test.describe('Supplier Return header selects', () => {
         await login(page, undefined, undefined, { requireDashboard: false });
         fixtures ??= await seedSupplierReturnFixtures(page);
         const listed = page.waitForResponse(
-            (r) =>
-                r.url().includes('/api/supplier-returns') && r.status() < 400,
+            (r) => r.url().includes('/api/supplier-returns'),
             { timeout: 30000 },
         );
         await page.goto('/supplier-returns');
-        await listed;
+        await expectResponseOk(await listed);
     });
 
     test('edit dokumen lama menampilkan baris item yang terpilih', async ({

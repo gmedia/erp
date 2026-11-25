@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { login, expectResponseOk } from '../helpers';
 
 type ReportTarget = {
     name: string;
@@ -48,11 +48,11 @@ test.describe('Per-branch financial report filter', () => {
                 (r) =>
                     r.url().includes(report.api) &&
                     !r.url().includes('/export') &&
-                    r.status() < 400,
+                    r.request().method() === 'GET',
                 { timeout: 30000 },
             );
             await page.goto(report.route);
-            await initialResponse;
+            await expectResponseOk(await initialResponse);
 
             const branchSelect = page
                 .getByRole('combobox')
@@ -70,12 +70,11 @@ test.describe('Per-branch financial report filter', () => {
                     r.url().includes(report.api) &&
                     !r.url().includes('/export') &&
                     r.url().includes('branch_id=') &&
-                    r.request().method() === 'GET' &&
-                    r.status() < 400,
+                    r.request().method() === 'GET',
                 { timeout: 15000 },
             );
             await firstBranch.click();
-            await scopedRequest;
+            await expectResponseOk(await scopedRequest);
 
             await expect(page).toHaveURL(/branch_id=\d+/);
         });

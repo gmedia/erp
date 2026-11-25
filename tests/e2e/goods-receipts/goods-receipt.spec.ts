@@ -1,6 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 import {
     generateModuleTests,
     ModuleTestConfig,
@@ -97,11 +97,10 @@ test.describe('Goods Receipts Module', () => {
         await login(page, undefined, undefined, { requireDashboard: false });
         const listResponse = page.waitForResponse(
             (response) =>
-                response.url().includes('/api/goods-receipts') &&
-                response.status() < 400,
+                response.url().includes('/api/goods-receipts'),
         );
         await page.goto('/goods-receipts');
-        await listResponse;
+        await expectResponseOk(await listResponse);
     });
 
     test('add dialog starts with empty items and add item opens a dedicated dialog', async ({

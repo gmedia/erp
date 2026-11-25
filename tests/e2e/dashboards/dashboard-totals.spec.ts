@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 
 test.describe('Dashboard', () => {
   test('dashboard shows totals cards', async ({ page }) => {
@@ -36,10 +36,10 @@ test.describe('Dashboard', () => {
 
     const sidebarLink = page.getByRole('link', { name: 'Dashboard' }).first();
     const dashboardResponse = page.waitForResponse(
-      (r) => r.url().includes('/api/dashboard') && r.status() < 400,
+      (r) => r.url().includes('/api/dashboard'),
     );
     await sidebarLink.click();
-    await dashboardResponse;
+    await expectResponseOk(await dashboardResponse);
 
     await expect(page).toHaveURL(/\/dashboard/);
   });
@@ -48,10 +48,10 @@ test.describe('Dashboard', () => {
     await login(page, undefined, undefined, { requireDashboard: false });
 
     const dashboardResponse = page.waitForResponse(
-      (r) => r.url().includes('/api/dashboard') && r.status() < 400,
+      (r) => r.url().includes('/api/dashboard'),
     );
     await page.goto('/dashboard');
-    await dashboardResponse;
+    await expectResponseOk(await dashboardResponse);
 
     const cardLabels = [
       'Total Customer',
@@ -78,10 +78,10 @@ test.describe('Dashboard', () => {
     await login(page, undefined, undefined, { requireDashboard: false });
 
     const dashboardResponse = page.waitForResponse(
-      (r) => r.url().includes('/api/dashboard') && r.status() < 400,
+      (r) => r.url().includes('/api/dashboard'),
     );
     await page.goto('/dashboard');
-    await dashboardResponse;
+    await expectResponseOk(await dashboardResponse);
 
     await expect(page).toHaveTitle(/Dashboard/, { timeout: 10000 });
   });
@@ -92,10 +92,10 @@ test.describe('Dashboard', () => {
     await login(page, undefined, undefined, { requireDashboard: false });
 
     const dashboardResponse = page.waitForResponse(
-      (r) => r.url().includes('/api/dashboard') && r.status() < 400,
+      (r) => r.url().includes('/api/dashboard'),
     );
     await page.goto('/dashboard');
-    await dashboardResponse;
+    await expectResponseOk(await dashboardResponse);
 
     const shortcuts = page.getByTestId('dashboard-shortcuts');
     await expect(

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { login, searchAndWaitForApi } from '../helpers';
+import { expectResponseOk, login, searchAndWaitForApi } from '../helpers';
 import { createGoodsReceipt } from './helpers';
 
 test.describe('Goods Receipt item dialog labels', () => {
@@ -9,11 +9,11 @@ test.describe('Goods Receipt item dialog labels', () => {
     }) => {
         await login(page, undefined, undefined, { requireDashboard: false });
         const listed = page.waitForResponse(
-            (r) => r.url().includes('/api/goods-receipts') && r.status() < 400,
+            (r) => r.url().includes('/api/goods-receipts'),
             { timeout: 30000 },
         );
         await page.goto('/goods-receipts');
-        await listed;
+        await expectResponseOk(await listed);
 
         const receiptNumber = await createGoodsReceipt(page);
         await searchAndWaitForApi(

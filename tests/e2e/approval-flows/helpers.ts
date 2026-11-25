@@ -1,5 +1,6 @@
 import { Page, expect } from '@playwright/test';
 import * as fs from 'node:fs';
+import { expectResponseOk } from '../helpers';
 
 async function clickDropdownOption(
   page: Page,
@@ -78,12 +79,11 @@ export async function createApprovalFlow(
   const usersResponse = page.waitForResponse(
     response =>
       response.url().includes('/api/users') &&
-      response.request().method() === 'GET' &&
-      response.status() < 400,
+      response.request().method() === 'GET',
     { timeout: 10000 },
   );
   await userSearchInput.fill('Admin User');
-  await usersResponse;
+  await expectResponseOk(await usersResponse);
 
   await clickDropdownOption(page, 'Admin User');
   await expect(approverCombobox).toHaveText(/Admin User/);
@@ -99,14 +99,13 @@ export async function createApprovalFlow(
   const createResponsePromise = page.waitForResponse(
     response =>
       response.url().includes('/api/approval-flows') &&
-      response.request().method() === 'POST' &&
-      response.status() < 400,
+      response.request().method() === 'POST',
     { timeout: 15000 },
   );
   await submitButton.click();
 
   try {
-      await createResponsePromise;
+      await expectResponseOk(await createResponsePromise);
       await expect(dialog).not.toBeVisible({ timeout: 15000 });
   } catch (error) {
       console.error(`Dialog did not close after 15s. Likely validation error or backend failure.`);
@@ -186,11 +185,10 @@ export async function editApprovalFlow(
   const updateResponsePromise = page.waitForResponse(
     r =>
       r.url().includes('/api/approval-flows') &&
-      ['PUT', 'PATCH'].includes(r.request().method()) &&
-      r.status() < 400,
+      ['PUT', 'PATCH'].includes(r.request().method()),
   );
   await updateBtn.click();
-  await updateResponsePromise;
+  await expectResponseOk(await updateResponsePromise);
   
   await expect(dialog).not.toBeVisible({ timeout: 10000 });
 }

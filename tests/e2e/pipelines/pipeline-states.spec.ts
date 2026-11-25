@@ -47,9 +47,6 @@ test.describe('Pipeline State Configuration', () => {
     // Verify toast
     await expect(page.getByText('Pipeline state created successfully.')).toBeVisible();
     
-    // Wait for the states to reload
-    await page.waitForTimeout(500);
-
     // Verify row added
     await expect(page.locator('td', { hasText: 'state_one' })).toBeVisible();
     await expect(page.locator('td', { hasText: 'State One' })).toBeVisible();

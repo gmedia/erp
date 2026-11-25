@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 import {
     createPurchaseHistoryReportData,
     openPurchaseHistoryReport,
@@ -15,30 +15,29 @@ test.describe('Purchase History Report', () => {
         const poNumber = await createPurchaseHistoryReportData(page);
         await openPurchaseHistoryReport(page);
 
-        await Promise.all([
+        const [sortResponse] = await Promise.all([
             page.waitForResponse(
                 (response) =>
                     response.url().includes('/api/reports/purchase-history') &&
-                    response.url().includes('sort_by=product_name') &&
-                    response.status() < 400,
+                    response.url().includes('sort_by=product_name'),
             ),
             page
                 .getByRole('button', { name: 'Product', exact: true })
                 .click({ force: true }),
         ]);
+        await expectResponseOk(sortResponse);
 
-        await Promise.all([
-            page.waitForResponse(
-                (response) =>
-                    response
-                        .url()
-                        .includes('/api/reports/purchase-history/export') &&
-                    response.status() < 400,
+        const [exportResponse] = await Promise.all([
+            page.waitForResponse((response) =>
+                response
+                    .url()
+                    .includes('/api/reports/purchase-history/export'),
             ),
             page
                 .getByRole('button', { name: /export/i })
                 .click({ force: true }),
         ]);
+        await expectResponseOk(exportResponse);
 
         const searchInput = page.getByRole('textbox').first();
         await Promise.all([

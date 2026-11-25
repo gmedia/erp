@@ -1,4 +1,5 @@
 import { Page, expect } from '@playwright/test';
+import { expectResponseOk } from '../helpers';
 
 export async function createAssetStocktake(page: Page) {
     const formDialog = page.getByRole('dialog', {
@@ -46,13 +47,12 @@ export async function createAssetStocktake(page: Page) {
     const createResponsePromise = page.waitForResponse(
         (response) =>
             response.url().includes('/api/asset-stocktakes') &&
-            response.request().method() === 'POST' &&
-            response.status() < 400,
+            response.request().method() === 'POST',
         { timeout: 15000 },
     );
 
     await formDialog.locator('button[type="submit"]').click();
-    await createResponsePromise;
+    await expectResponseOk(await createResponsePromise);
 
     // Wait for dialog to close
     await expect(formDialog).not.toBeVisible();
@@ -70,14 +70,14 @@ export async function searchAssetStocktake(page: Page, reference: string) {
 
     const responsePromise = page
         .waitForResponse(
-            resp => resp.url().includes('/api/asset-stocktakes') && resp.status() < 400,
+            resp => resp.url().includes('/api/asset-stocktakes') && resp.request().method() === 'GET',
             { timeout: 5000 },
         )
         ;
     await searchInput.clear();
     await searchInput.fill(normalizedReference);
     await searchInput.press('Enter');
-    await responsePromise;
+    await expectResponseOk(await responsePromise);
 }
 
 export async function editAssetStocktake(
@@ -105,13 +105,12 @@ export async function editAssetStocktake(
     const updateResponsePromise = page.waitForResponse(
         (response) =>
             response.url().includes('/api/asset-stocktakes') &&
-            ['PUT', 'PATCH'].includes(response.request().method()) &&
-            response.status() < 400,
+            ['PUT', 'PATCH'].includes(response.request().method()),
         { timeout: 15000 },
     );
 
     await formDialog.locator('button[type="submit"]').click();
-    await updateResponsePromise;
+    await expectResponseOk(await updateResponsePromise);
     await expect(formDialog).not.toBeVisible({ timeout: 15000 });
 }
 

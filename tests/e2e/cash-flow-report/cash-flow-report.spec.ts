@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { login } from '../helpers';
+import { login, expectResponseOk } from '../helpers';
 
 test.describe('Cash Flow Report', () => {
     test.setTimeout(90000);
@@ -14,15 +14,14 @@ test.describe('Cash Flow Report', () => {
                 return (
                     r.url().includes('/api/reports/cash-flow') &&
                     !r.url().includes('/export') &&
-                    r.request().method() === 'GET' &&
-                    r.status() < 400
+                    r.request().method() === 'GET'
                 );
             },
             { timeout: 30000 },
         );
 
         await page.goto('/reports/cash-flow');
-        await responsePromise;
+        await expectResponseOk(await responsePromise);
 
         await expect(
             page.getByRole('heading', { name: 'Cash Flow' }),
@@ -36,15 +35,14 @@ test.describe('Cash Flow Report', () => {
                 return (
                     r.url().includes('/api/reports/cash-flow') &&
                     !r.url().includes('/export') &&
-                    r.request().method() === 'GET' &&
-                    r.status() < 400
+                    r.request().method() === 'GET'
                 );
             },
             { timeout: 30000 },
         );
 
         await page.goto('/reports/cash-flow');
-        await initialResponse;
+        await expectResponseOk(await initialResponse);
 
         const fiscalYearSelector = page.getByRole('combobox').first();
         await expect(fiscalYearSelector).toBeVisible();
@@ -62,15 +60,14 @@ test.describe('Cash Flow Report', () => {
                 return (
                     r.url().includes('/api/reports/cash-flow') &&
                     !r.url().includes('/export') &&
-                    r.request().method() === 'GET' &&
-                    r.status() < 400
+                    r.request().method() === 'GET'
                 );
             },
             { timeout: 15000 },
         );
 
         await targetOption.click({ force: true });
-        await refetchPromise;
+        await expectResponseOk(await refetchPromise);
     });
 
     test('can change branch selector', async ({ page }) => {
@@ -79,26 +76,26 @@ test.describe('Cash Flow Report', () => {
                 return (
                     r.url().includes('/api/reports/cash-flow') &&
                     !r.url().includes('/export') &&
-                    r.request().method() === 'GET' &&
-                    r.status() < 400
+                    r.request().method() === 'GET'
                 );
             },
             { timeout: 30000 },
         );
 
         await page.goto('/reports/cash-flow');
-        await initialResponse;
+        await expectResponseOk(await initialResponse);
 
         const branchSelector = page.getByRole('combobox').nth(1);
         await expect(branchSelector).toBeVisible();
-        await branchSelector.click();
 
         const branchesResponse = page.waitForResponse(
-            (r) => r.url().includes('/api/branches') && r.status() < 400,
+            (r) =>
+                r.url().includes('/api/branches') &&
+                r.request().method() === 'GET',
             { timeout: 15000 },
         );
-
-        await branchesResponse;
+        await branchSelector.click();
+        await expectResponseOk(await branchesResponse);
 
         const options = page.locator('ul.p-1 li button:visible');
         await expect(options.first()).toBeVisible({ timeout: 5000 });
@@ -108,15 +105,14 @@ test.describe('Cash Flow Report', () => {
                 return (
                     r.url().includes('/api/reports/cash-flow') &&
                     !r.url().includes('/export') &&
-                    r.request().method() === 'GET' &&
-                    r.status() < 400
+                    r.request().method() === 'GET'
                 );
             },
             { timeout: 15000 },
         );
 
         await options.first().click({ force: true });
-        await refetchPromise;
+        await expectResponseOk(await refetchPromise);
     });
 
     test('can export cash flow report', async ({ page }) => {
@@ -125,15 +121,14 @@ test.describe('Cash Flow Report', () => {
                 return (
                     r.url().includes('/api/reports/cash-flow') &&
                     !r.url().includes('/export') &&
-                    r.request().method() === 'GET' &&
-                    r.status() < 400
+                    r.request().method() === 'GET'
                 );
             },
             { timeout: 30000 },
         );
 
         await page.goto('/reports/cash-flow');
-        await initialResponse;
+        await expectResponseOk(await initialResponse);
 
         const downloadPromise = page.waitForEvent('download', {
             timeout: 30000,
@@ -155,8 +150,7 @@ test.describe('Cash Flow Report', () => {
                 return (
                     r.url().includes('/api/reports/cash-flow') &&
                     !r.url().includes('/export') &&
-                    r.request().method() === 'GET' &&
-                    r.status() < 400
+                    r.request().method() === 'GET'
                 );
             },
             { timeout: 30000 },
@@ -164,6 +158,7 @@ test.describe('Cash Flow Report', () => {
 
         await page.goto('/reports/cash-flow');
         const response = await responsePromise;
+        await expectResponseOk(response);
         const body = await response.json();
 
         expect(body).toHaveProperty('opening_cash_balance');
@@ -195,15 +190,14 @@ test.describe('Cash Flow Report', () => {
                 return (
                     r.url().includes('/api/reports/cash-flow') &&
                     !r.url().includes('/export') &&
-                    r.request().method() === 'GET' &&
-                    r.status() < 400
+                    r.request().method() === 'GET'
                 );
             },
             { timeout: 30000 },
         );
 
         await page.goto('/reports/cash-flow');
-        await responsePromise;
+        await expectResponseOk(await responsePromise);
 
         await expect(
             page.getByText('Cash Receipts and Payments', { exact: true }),

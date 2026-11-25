@@ -1,17 +1,17 @@
 import { expect, test } from '@playwright/test';
 
-import { login, searchAndWaitForApi } from '../helpers';
+import { expectResponseOk, login, searchAndWaitForApi } from '../helpers';
 import { createApPayment } from './helpers';
 
 test.describe('AP Payment allocation dialog labels', () => {
     test('label, placeholder, dan pesan validasi alokasi memakai terjemahan', async ({ page }) => {
         await login(page, undefined, undefined, { requireDashboard: false });
         const listed = page.waitForResponse(
-            (r) => r.url().includes('/api/ap-payments') && r.status() < 400,
+            (r) => r.url().includes('/api/ap-payments') && r.request().method() === 'GET',
             { timeout: 30000 },
         );
         await page.goto('/ap-payments');
-        await listed;
+        await expectResponseOk(await listed);
 
         const paymentNumber = await createApPayment(page);
         await searchAndWaitForApi(page, page.getByPlaceholder(/search/i), paymentNumber, '/api/ap-payments');

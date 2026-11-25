@@ -1,6 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 import {
     generateModuleTests,
     ModuleTestConfig,
@@ -94,13 +94,11 @@ test.describe('Purchase Requests Module', () => {
 
     test.beforeEach(async ({ page }) => {
         await login(page, undefined, undefined, { requireDashboard: false });
-        const listResponse = page.waitForResponse(
-            (response) =>
-                response.url().includes('/api/purchase-requests') &&
-                response.status() < 400,
+        const listResponse = page.waitForResponse((response) =>
+            response.url().includes('/api/purchase-requests'),
         );
         await page.goto('/purchase-requests');
-        await listResponse;
+        await expectResponseOk(await listResponse);
     });
 
     test('add dialog starts with empty items and add item button shows icon', async ({

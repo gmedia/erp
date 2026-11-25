@@ -1,16 +1,16 @@
 import { test, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 
 async function waitForPipelineDashboardData(
   page: Parameters<typeof test.beforeEach>[0]['page'],
 ) {
-  await page.waitForResponse(
+  const dataResponse = await page.waitForResponse(
     (response) =>
       response.url().includes('/api/pipeline-dashboard/data') &&
-      response.request().method() === 'GET' &&
-      response.status() < 400,
+      response.request().method() === 'GET',
     { timeout: 15000 },
   );
+  await expectResponseOk(dataResponse);
 }
 
 test.describe('Pipeline Dashboard', () => {
@@ -119,10 +119,10 @@ test.describe('Pipeline Dashboard', () => {
       (response) =>
         response.url().includes('/api/pipeline-dashboard/data') &&
         response.url().includes('branch_id=') &&
-        response.status() < 400,
+        response.request().method() === 'GET',
       { timeout: 15000 },
     );
     await firstBranch.click();
-    await scopedRequest;
+    await expectResponseOk(await scopedRequest);
   });
 });

@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { Page, expect } from '@playwright/test';
+import { expectResponseOk } from '../helpers';
 
 /**
  * Helper to pick a date from the DatePickerField.
@@ -72,14 +73,13 @@ export async function createFiscalYear(
   const createResponsePromise = page.waitForResponse(
     (response) =>
       response.url().includes('/api/fiscal-years') &&
-      response.request().method() === 'POST' &&
-      response.status() < 400,
+      response.request().method() === 'POST',
     { timeout: 15000 },
   );
 
   const submitButton = dialog.getByRole('button', { name: /Add/i }).last();
   await submitButton.click();
-  await createResponsePromise;
+  await expectResponseOk(await createResponsePromise);
 
   await expect(dialog).not.toBeVisible();
 
@@ -97,12 +97,12 @@ export async function searchFiscalYear(page: Page, name: string): Promise<void> 
   }
 
   const responsePromise = page.waitForResponse(
-    r => r.url().includes('/api/fiscal-years') && r.status() < 400
+    r => r.url().includes('/api/fiscal-years') && r.request().method() === 'GET'
   );
   await searchInput.clear();
   await searchInput.fill(name);
   await searchInput.press('Enter');
-  await responsePromise;
+  await expectResponseOk(await responsePromise);
 }
 
 /**
@@ -140,14 +140,13 @@ export async function editFiscalYear(
   const updateResponsePromise = page.waitForResponse(
     (response) =>
       response.url().includes('/api/fiscal-years') &&
-      ['PUT', 'PATCH'].includes(response.request().method()) &&
-      response.status() < 400,
+      ['PUT', 'PATCH'].includes(response.request().method()),
     { timeout: 15000 },
   );
 
   const updateBtn = dialog.getByRole('button', { name: /Update/i });
   await updateBtn.click();
-  await updateResponsePromise;
+  await expectResponseOk(await updateResponsePromise);
 
   await expect(dialog).not.toBeVisible();
 }

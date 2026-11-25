@@ -1,6 +1,6 @@
 import { expect, Page, test } from '@playwright/test';
 
-import { login, reloadAndWaitForApi, searchAndWaitForApi } from '../helpers';
+import { expectResponseOk, login, reloadAndWaitForApi, searchAndWaitForApi } from '../helpers';
 import { createCreditNote } from './helpers';
 
 type ApiBody = { data: { id: number; status?: string; journal_entry_id?: number | null; grand_total?: string; amount_due?: string; customer_invoice?: { id: number } } };
@@ -19,10 +19,10 @@ test.describe('Credit Note apply via UI', () => {
     test.beforeEach(async ({ page }) => {
         await login(page, undefined, undefined, { requireDashboard: false });
         const listResponse = page.waitForResponse(
-            (r) => r.url().includes('/api/credit-notes') && r.status() < 400,
+            (r) => r.url().includes('/api/credit-notes') && r.request().method() === 'GET',
         );
         await page.goto('/credit-notes');
-        await listResponse;
+        await expectResponseOk(await listResponse);
     });
 
     test('setting status Applied in the edit form posts journal and reduces invoice amount_due', async ({ page }) => {
@@ -55,10 +55,10 @@ test.describe('Credit Note apply via UI', () => {
         await page.getByRole('option', { name: 'Applied' }).click();
 
         const saveResponse = page.waitForResponse(
-            (r) => r.url().includes(`/api/credit-notes/${creditNoteId}`) && r.request().method() === 'PUT' && r.status() < 400,
+            (r) => r.url().includes(`/api/credit-notes/${creditNoteId}`) && r.request().method() === 'PUT',
         );
         await dialog.getByRole('button', { name: 'Update', exact: true }).click();
-        await saveResponse;
+        await expectResponseOk(await saveResponse);
 
         const after = await fetchJson(page, `/api/credit-notes/${creditNoteId}`);
         expect(after.data.status).toBe('applied');

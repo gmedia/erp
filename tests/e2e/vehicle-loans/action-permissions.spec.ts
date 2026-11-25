@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 import { VEHICLE_LOAN_REQUEST_PATH } from './helpers';
 
 const VIEWER_EMAIL = 'vehicle-loan-viewer@example.com';
@@ -51,10 +51,10 @@ test.describe('Vehicle loan action permissions', () => {
         const optionsResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/vehicle-loans/assignment-options') &&
-                r.status() < 400,
+                r.request().method() === 'GET',
         );
         await page.goto(VEHICLE_LOAN_REQUEST_PATH);
-        await optionsResponse;
+        await expectResponseOk(await optionsResponse);
 
         await expect(page.locator('#purpose')).toBeVisible();
         await expect(
@@ -75,10 +75,10 @@ test.describe('Vehicle loan action permissions', () => {
         const optionsResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/vehicle-loans/assignment-options') &&
-                r.status() < 400,
+                r.request().method() === 'GET',
         );
         await page.goto(VEHICLE_LOAN_REQUEST_PATH);
-        await optionsResponse;
+        await expectResponseOk(await optionsResponse);
 
         await expect(
             page.getByRole('button', { name: 'Kirim Permintaan' }),

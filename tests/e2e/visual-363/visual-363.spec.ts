@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 
 test.describe('Visual #363 review fixes', () => {
     test.beforeEach(async ({ page }) => {
@@ -11,10 +11,12 @@ test.describe('Visual #363 review fixes', () => {
     }) => {
         await page.setViewportSize({ width: 390, height: 844 });
         const usersResponse = page.waitForResponse(
-            (r) => r.url().includes('/api/users') && r.status() < 400,
+            (r) =>
+                r.url().includes('/api/users') &&
+                r.request().method() === 'GET',
         );
         await page.goto('/users');
-        await usersResponse;
+        await expectResponseOk(await usersResponse);
 
         const row = page.getByTestId('user-row').first();
         await expect(row).toBeVisible();
@@ -64,10 +66,10 @@ test.describe('Visual #363 review fixes', () => {
         const historyResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/ap-payment-history') &&
-                r.status() < 400,
+                r.request().method() === 'GET',
         );
         await page.goto('/reports/ap-payment-history');
-        await historyResponse;
+        await expectResponseOk(await historyResponse);
         await expect(page.locator('table')).toBeVisible();
 
         const chip = page
@@ -97,13 +99,13 @@ test.describe('Visual #363 review fixes', () => {
         const trialBalanceResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/trial-balance') &&
-                r.status() < 400,
+                r.request().method() === 'GET',
             {
                 timeout: 30000,
             },
         );
         await page.goto('/reports/trial-balance');
-        await trialBalanceResponse;
+        await expectResponseOk(await trialBalanceResponse);
 
         const creditCell = page
             .locator('table thead th', { hasText: 'Credit' })

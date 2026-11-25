@@ -2,6 +2,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test';
 
 import {
     approveViaScreenAsDelegate,
+    expectResponseOk,
     login,
     searchAndWaitForApi,
 } from '../helpers';
@@ -43,13 +44,11 @@ async function selectAsyncOption(
 }
 
 async function openCreateForm(page: Page): Promise<void> {
-    const listResponse = page.waitForResponse(
-        (response) =>
-            response.url().includes('/api/purchase-orders') &&
-            response.status() < 400,
+    const listResponse = page.waitForResponse((response) =>
+        response.url().includes('/api/purchase-orders'),
     );
     await page.goto('/purchase-orders');
-    await listResponse;
+    await expectResponseOk(await listResponse);
     await page.getByRole('button', { name: /^Add$/i }).first().click();
     await expect(
         page.getByRole('dialog', { name: /Add New Purchase Order/i }),
@@ -111,11 +110,12 @@ test.describe('Purchase Order approval flow (UI)', () => {
         const createResponse = page.waitForResponse(
             (response) =>
                 response.url().includes('/api/purchase-orders') &&
-                response.request().method() === 'POST' &&
-                response.status() < 400,
+                response.request().method() === 'POST',
         );
         await dialog.getByRole('button', { name: 'Add', exact: true }).click();
-        const createPayload = await (await createResponse).json();
+        const createResult = await createResponse;
+        await expectResponseOk(createResult);
+        const createPayload = await createResult.json();
         const poNumber = String(createPayload?.data?.po_number ?? '');
         expect(poNumber, 'PO number dari respons POST').not.toBe('');
 
@@ -134,13 +134,11 @@ test.describe('Purchase Order approval flow (UI)', () => {
             .click();
         await page.getByRole('menuitem', { name: /Details|View/i }).click();
 
-        const submitTransition = page.waitForResponse(
-            (response) =>
-                response.url().includes('/api/entity-states/') &&
-                response.status() < 400,
+        const submitTransition = page.waitForResponse((response) =>
+            response.url().includes('/api/entity-states/'),
         );
         await page.getByRole('button', { name: 'Submit', exact: true }).click();
-        await submitTransition;
+        await expectResponseOk(await submitTransition);
 
         await expect(page.getByText(/Pending Approval/i).first()).toBeVisible();
 

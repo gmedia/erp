@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { createAsset, deleteAsset, searchAsset } from '../assets/helpers';
+import { expectResponseOk } from '../helpers';
 
 test.describe('Approval History', () => {
   test('displays approval history tab on asset profile', async ({ page }) => {
@@ -33,10 +34,10 @@ test.describe('Approval History', () => {
     const approvalsTab = page.getByRole('tab', { name: /Approvals/i });
 
     const approvalsResponse = page.waitForResponse(
-        r => r.url().includes('/api/entity-states/asset/') && r.url().includes('/approvals') && r.status() < 400
+        r => r.url().includes('/api/entity-states/asset/') && r.url().includes('/approvals') && r.request().method() === 'GET'
     );
     await approvalsTab.click();
-    await approvalsResponse;
+    await expectResponseOk(await approvalsResponse);
 
     // Verify the tab panel is visible
     const tabContent = page.getByRole('tabpanel', { name: /Approvals/i });

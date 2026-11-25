@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 
 import {
     changeDateFieldValue,
+    expectResponseOk,
     openModule,
     reloadAndWaitForApi,
     searchAndWaitForApi,
@@ -100,8 +101,7 @@ test.describe('Recurring Journal date field', () => {
         const updateResponsePromise = page.waitForResponse(
             (response) =>
                 response.url().includes('/api/recurring-journals/') &&
-                ['PUT', 'PATCH'].includes(response.request().method()) &&
-                response.status() < 400,
+                ['PUT', 'PATCH'].includes(response.request().method()),
         );
 
         await dialog.getByRole('button', { name: /Update/i }).click();
@@ -113,7 +113,7 @@ test.describe('Recurring Journal date field', () => {
 
         expect(payload.next_run_date).toBe(expectedDate);
 
-        await updateResponsePromise;
+        await expectResponseOk(await updateResponsePromise);
         await expect(dialog).not.toBeVisible();
     });
 });

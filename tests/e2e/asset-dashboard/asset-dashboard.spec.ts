@@ -1,14 +1,14 @@
 import { test, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 
 async function waitForAssetDashboardData(page: Parameters<typeof test.beforeEach>[0]['page']) {
-  await page.waitForResponse(
+  const response = await page.waitForResponse(
     response =>
       response.url().includes('/api/asset-dashboard/data') &&
-      response.request().method() === 'GET' &&
-      response.status() < 400,
+      response.request().method() === 'GET',
     { timeout: 15000 },
   );
+  await expectResponseOk(response);
 }
 
 test.describe('Asset Dashboard', () => {

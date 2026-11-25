@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 
 const VIEWER_EMAIL = 'dept-viewer@example.com';
 const FULL_EMAIL = 'dept-full@example.com';
@@ -47,11 +47,10 @@ async function openDepartments(page: Page): Promise<void> {
     const listResponse = page.waitForResponse(
         (r) =>
             r.url().includes('/api/departments') &&
-            r.request().method() === 'GET' &&
-            r.status() < 400,
+            r.request().method() === 'GET',
     );
     await page.goto('/departments');
-    await listResponse;
+    await expectResponseOk(await listResponse);
 }
 
 test.describe('Department action permissions', () => {

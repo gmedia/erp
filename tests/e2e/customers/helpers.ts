@@ -1,5 +1,5 @@
 import { Page, expect } from '@playwright/test';
-import { createEntity, EntityConfig } from '../helpers';
+import { createEntity, EntityConfig, expectResponseOk } from '../helpers';
 
 /**
  * Create a new customer via the UI.
@@ -49,8 +49,7 @@ export async function createCustomer(
  * @param email - Email address to search for.
  */
 export async function searchCustomer(page: Page, email: string): Promise<void> {
-  // Wait a bit for the UI to stabilize after any previous actions (like dialog close)
-  await page.waitForTimeout(500);
+  await expect(page.getByRole('dialog')).toBeHidden();
   const searchInput = page.getByPlaceholder('Search customers...');
   await expect(searchInput).toBeVisible();
   const normalizedEmail = email.trim();
@@ -59,18 +58,15 @@ export async function searchCustomer(page: Page, email: string): Promise<void> {
   }
 
   const responsePromise = page.waitForResponse(
-    r => r.url().includes('/api/customers') && r.status() === 200
+    r => r.url().includes('/api/customers')
   );
   await searchInput.click();
   await searchInput.clear();
   await searchInput.type(normalizedEmail, { delay: 50 });
   await page.keyboard.press('Enter');
-  
+
   // Wait for the API response to ensure the table has updated
-  await responsePromise;
-  
-  // Wait a small amount for the table context to re-render
-  await page.waitForTimeout(500);
+  await expectResponseOk(await responsePromise);
 }
 
 /**
