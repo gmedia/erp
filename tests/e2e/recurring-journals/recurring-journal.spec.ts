@@ -1,16 +1,16 @@
 import { expect, test } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 
 test.describe('Recurring Journal E2E Tests', () => {
     test.beforeEach(async ({ page }) => {
         await login(page, undefined, undefined, { requireDashboard: false });
         const listResponse = page.waitForResponse(
             (r) =>
-                r.url().includes('/api/recurring-journals') && r.status() < 400,
+                r.url().includes('/api/recurring-journals') && r.request().method() === 'GET',
             { timeout: 15000 },
         );
         await page.goto('/recurring-journals');
-        await listResponse;
+        await expectResponseOk(await listResponse);
     });
 
     test('can view Recurring Journals list', async ({ page }) => {
@@ -24,11 +24,11 @@ test.describe('Recurring Journal E2E Tests', () => {
         await searchInput.fill('Sample');
         const searchResponse = page.waitForResponse(
             (r) =>
-                r.url().includes('/api/recurring-journals') && r.status() < 400,
+                r.url().includes('/api/recurring-journals') && r.request().method() === 'GET',
             { timeout: 15000 },
         );
         await searchInput.press('Enter');
-        await searchResponse;
+        await expectResponseOk(await searchResponse);
         await expect(page.locator('tbody tr').first()).toBeVisible();
     });
 

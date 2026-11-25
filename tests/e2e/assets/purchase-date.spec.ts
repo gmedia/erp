@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { expectResponseOk } from '../helpers';
 
 import { createAsset, searchAsset } from './helpers';
 
@@ -44,8 +45,7 @@ test('can change the purchase date of an existing asset', async ({ page }) => {
     const updateResponsePromise = page.waitForResponse(
         (response) =>
             response.url().includes('/api/assets') &&
-            ['PUT', 'PATCH'].includes(response.request().method()) &&
-            response.status() < 400,
+            ['PUT', 'PATCH'].includes(response.request().method()),
     );
 
     await dialog.getByRole('button', { name: /Save|Update/i }).click();
@@ -57,6 +57,6 @@ test('can change the purchase date of an existing asset', async ({ page }) => {
 
     expect(payload.purchase_date).toBe(expectedPurchaseDate);
 
-    await updateResponsePromise;
+    await expectResponseOk(await updateResponsePromise);
     await expect(dialog).not.toBeVisible();
 });

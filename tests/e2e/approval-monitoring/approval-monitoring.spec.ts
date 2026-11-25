@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { DEFAULT_E2E_EMAIL, login } from '../helpers';
+import { DEFAULT_E2E_EMAIL, expectResponseOk, login } from '../helpers';
 
 test.describe('Approval Monitoring Dashboard', () => {
     test.beforeEach(async ({ page }) => {
@@ -56,10 +56,10 @@ test.describe('Approval Monitoring Dashboard', () => {
         const dataResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/approval-monitoring/data') &&
-                r.status() < 400,
+                r.request().method() === 'GET',
         );
         await page.goto('/approval-monitoring');
-        await dataResponse;
+        await expectResponseOk(await dataResponse);
 
         // Find and click the status combobox
         const combobox = page.getByRole('combobox').first();
@@ -89,10 +89,10 @@ test.describe('Approval Monitoring Dashboard', () => {
         const dataResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/approval-monitoring/data') &&
-                r.status() < 400,
+                r.request().method() === 'GET',
         );
         await page.goto('/approval-monitoring');
-        await dataResponse;
+        await expectResponseOk(await dataResponse);
 
         // Verify "Pending Approvals" card has a numeric value
         const pendingCard = page
@@ -127,10 +127,10 @@ test.describe('Approval Monitoring Dashboard', () => {
         const dataResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/approval-monitoring/data') &&
-                r.status() < 400,
+                r.request().method() === 'GET',
         );
         await page.goto('/approval-monitoring');
-        await dataResponse;
+        await expectResponseOk(await dataResponse);
 
         // Verify "Overdue Approvals" section is visible
         await expect(
@@ -161,10 +161,10 @@ test.describe('Approval Monitoring Dashboard', () => {
         const dataResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/approval-monitoring/data') &&
-                r.status() < 400,
+                r.request().method() === 'GET',
         );
         await page.goto('/approval-monitoring');
-        await dataResponse;
+        await expectResponseOk(await dataResponse);
 
         const branchSelect = page
             .getByRole('combobox')
@@ -182,10 +182,10 @@ test.describe('Approval Monitoring Dashboard', () => {
             (r) =>
                 r.url().includes('/api/approval-monitoring/data') &&
                 r.url().includes('branch_id=') &&
-                r.status() < 400,
+                r.request().method() === 'GET',
             { timeout: 15000 },
         );
         await firstBranch.click();
-        await scopedRequest;
+        await expectResponseOk(await scopedRequest);
     });
 });

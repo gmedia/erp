@@ -1,6 +1,6 @@
 import { expect, Page } from '@playwright/test';
 
-import { ensureAppOrigin } from '../helpers';
+import { ensureAppOrigin, expectResponseOk } from '../helpers';
 
 export async function createPurchaseOrderReportData(
     page: Page,
@@ -74,24 +74,22 @@ export async function createPurchaseOrderReportData(
 export async function waitForPurchaseOrderStatusReportResponse(
     page: Page,
 ): Promise<void> {
-    await page.waitForResponse(
-        (response) =>
-            response.url().includes('/api/reports/purchase-order-status') &&
-            response.status() < 400,
+    await expectResponseOk(
+        await page.waitForResponse((response) =>
+            response.url().includes('/api/reports/purchase-order-status'),
+        ),
     );
 }
 
 export async function openPurchaseOrderStatusReport(page: Page): Promise<void> {
-    const initialResponse = page.waitForResponse(
-        (response) =>
-            response.url().includes('/api/reports/purchase-order-status') &&
-            response.status() < 400,
+    const initialResponse = page.waitForResponse((response) =>
+        response.url().includes('/api/reports/purchase-order-status'),
     );
     await page.goto('/reports/purchase-order-status');
     await page.waitForURL('**/reports/purchase-order-status', {
         timeout: 15000,
     });
-    await initialResponse;
+    await expectResponseOk(await initialResponse);
 
     await expect(page.locator('table')).toBeVisible();
     await expect(page.locator('tbody tr').first()).toBeVisible();

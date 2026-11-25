@@ -1,4 +1,5 @@
 import { Page, expect } from '@playwright/test';
+import { expectResponseOk } from '../helpers';
 
 /**
  * Create a new COA version via the UI.
@@ -59,13 +60,13 @@ export async function searchCoaVersion(page: Page, name: string): Promise<void> 
   }
 
   const responsePromise = page.waitForResponse(
-    r => r.url().includes('/api/coa-versions') && r.status() < 400
+    r => r.url().includes('/api/coa-versions') && r.request().method() === 'GET'
   );
   await searchInput.clear();
   await searchInput.fill(normalizedName);
   await searchInput.press('Enter');
   // Wait for response to ensure the table has updated
-  await responsePromise;
+  await expectResponseOk(await responsePromise);
 }
 
 /**

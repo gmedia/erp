@@ -1,6 +1,6 @@
 import { expect, Page, test } from '@playwright/test';
 
-import { login, searchAndWaitForApi } from '../helpers';
+import { expectResponseOk, login, searchAndWaitForApi } from '../helpers';
 
 interface SeedResult {
     customerId: number;
@@ -163,11 +163,11 @@ test.describe('AR Receipt allocation selects', () => {
         await login(page, undefined, undefined, { requireDashboard: false });
         fixtures ??= await seedAllocationFixtures(page);
         const listed = page.waitForResponse(
-            (r) => r.url().includes('/api/ar-receipts') && r.status() < 400,
+            (r) => r.url().includes('/api/ar-receipts') && r.request().method() === 'GET',
             { timeout: 30000 },
         );
         await page.goto('/ar-receipts');
-        await listed;
+        await expectResponseOk(await listed);
     });
 
     test('edit dokumen lama menampilkan label faktur', async ({ page }) => {
@@ -188,9 +188,9 @@ test.describe('AR Receipt allocation selects', () => {
         await page.getByRole('button', { name: 'Add Item' }).click();
         const allocationDialog = page.getByRole('dialog').last();
 
-        const listed = page.waitForResponse((r) => r.url().includes('/api/customer-invoices') && r.status() < 400);
+        const listed = page.waitForResponse((r) => r.url().includes('/api/customer-invoices') && r.request().method() === 'GET');
         await allocationDialog.getByRole('combobox', { name: /customer invoice/i }).click();
-        await listed;
+        await expectResponseOk(await listed);
 
         const hiddenNumbers = [
             fixtures.draftInvoiceNumber,

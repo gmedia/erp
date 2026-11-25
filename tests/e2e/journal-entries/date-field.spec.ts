@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { changeDateFieldValue, openModule } from '../helpers';
+import { changeDateFieldValue, expectResponseOk, openModule } from '../helpers';
 import { createJournalEntry, searchJournalEntry } from './helpers';
 
 test.describe('Journal Entry date field', () => {
@@ -34,8 +34,7 @@ test.describe('Journal Entry date field', () => {
         const updateResponsePromise = page.waitForResponse(
             (response) =>
                 response.url().includes('/api/journal-entries/') &&
-                ['PUT', 'PATCH'].includes(response.request().method()) &&
-                response.status() < 400,
+                ['PUT', 'PATCH'].includes(response.request().method()),
         );
 
         await dialog
@@ -51,7 +50,7 @@ test.describe('Journal Entry date field', () => {
 
         expect(payload.entry_date).toBe(expectedDate);
 
-        await updateResponsePromise;
+        await expectResponseOk(await updateResponsePromise);
         await expect(dialog).not.toBeVisible();
     });
 });

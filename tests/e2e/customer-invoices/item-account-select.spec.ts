@@ -1,17 +1,17 @@
 import { expect, test } from '@playwright/test';
 
-import { login, searchAndWaitForApi } from '../helpers';
+import { expectResponseOk, login, searchAndWaitForApi } from '../helpers';
 import { createCustomerInvoice } from './helpers';
 
 test.describe('Customer Invoice item account select', () => {
     test.beforeEach(async ({ page }) => {
         await login(page, undefined, undefined, { requireDashboard: false });
         const listed = page.waitForResponse(
-            (r) => r.url().includes('/api/customer-invoices') && r.status() < 400,
+            (r) => r.url().includes('/api/customer-invoices') && r.request().method() === 'GET',
             { timeout: 30000 },
         );
         await page.goto('/customer-invoices');
-        await listed;
+        await expectResponseOk(await listed);
     });
 
     test('edit dokumen lama menampilkan label akun pada item', async ({ page }) => {

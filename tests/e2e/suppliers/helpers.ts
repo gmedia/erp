@@ -1,5 +1,5 @@
 import { Page, expect } from '@playwright/test';
-import { createEntity, EntityConfig } from '../helpers';
+import { createEntity, EntityConfig, expectResponseOk } from '../helpers';
 
 /**
  * Create a new supplier via the UI.
@@ -56,18 +56,13 @@ export async function searchSupplier(page: Page, email: string): Promise<void> {
   }
 
   const responsePromise = page.waitForResponse(
-    r => r.url().includes('/api/suppliers') && r.status() === 200
+    r => r.url().includes('/api/suppliers')
   );
   await searchInput.clear();
   await searchInput.type(normalizedEmail);
   await page.keyboard.press('Enter');
-  
-  // Wait for the API response to ensure the table has updated
-  await responsePromise;
-  
-  // Wait a small amount for the table context to re-render
-  // This is the "passive" pattern to avoid intermittent timeouts
-  await page.waitForTimeout(500);
+
+  await expectResponseOk(await responsePromise);
 }
 
 /**

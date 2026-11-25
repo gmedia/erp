@@ -1,16 +1,18 @@
 import { expect, type Page } from '@playwright/test';
 import { createBudget } from '../budgets/helpers';
+import { expectResponseOk } from '../helpers';
 
 export async function waitForBudgetVarianceReportResponse(
     page: Page,
 ): Promise<void> {
-    await page.waitForResponse(
-        (response) =>
-            response.url().includes('/api/reports/budget-variance') &&
-            !response.url().includes('/export') &&
-            response.status() < 400,
+    const response = await page.waitForResponse(
+        (r) =>
+            r.request().method() === 'GET' &&
+            r.url().includes('/api/reports/budget-variance') &&
+            !r.url().includes('/export'),
         { timeout: 30000 },
     );
+    await expectResponseOk(response);
 }
 
 async function selectFirstComboboxOption(
@@ -39,7 +41,9 @@ async function selectFirstComboboxOption(
 export async function ensureBudgetExists(page: Page): Promise<string> {
     const budgetsResponse = page
         .waitForResponse(
-            (r) => r.url().includes('/api/budgets') && r.status() < 400,
+            (r) =>
+                r.request().method() === 'GET' &&
+                r.url().includes('/api/budgets'),
             { timeout: 30000 },
         )
         .catch(() => null);
@@ -122,15 +126,16 @@ export async function applyStatusFilter(
     await expect(option).toBeVisible({ timeout: 10000 });
     await option.click({ force: true });
 
-    await Promise.all([
+    const [response] = await Promise.all([
         page.waitForResponse(
             (r) =>
+                r.request().method() === 'GET' &&
                 r.url().includes('/api/reports/budget-variance') &&
                 !r.url().includes('/export') &&
-                r.url().includes('status=') &&
-                r.status() < 400,
+                r.url().includes('status='),
             { timeout: 30000 },
         ),
         filtersDialog.getByRole('button', { name: 'Apply Filters' }).click(),
     ]);
+    await expectResponseOk(response);
 }

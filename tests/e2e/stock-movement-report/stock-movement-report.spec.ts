@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 
 test.describe('Stock Movement Report', () => {
     test.beforeEach(async ({ page }) => {
@@ -8,39 +8,36 @@ test.describe('Stock Movement Report', () => {
 
     test('can view report, filter period, and export', async ({ page }) => {
         const initialResponsePromise = page.waitForResponse(
-            (r) =>
-                r.url().includes('/api/reports/stock-movement') &&
-                r.status() < 400,
+            (r) => r.url().includes('/api/reports/stock-movement'),
             { timeout: 30000 },
         );
 
         await page.goto('/reports/stock-movement');
         await page.waitForURL('**/reports/stock-movement', { timeout: 15000 });
-        await initialResponsePromise;
+        await expectResponseOk(await initialResponsePromise);
 
         await expect(page.locator('table')).toBeVisible();
         await expect(page.locator('tbody tr').first()).toBeVisible();
 
-        await Promise.all([
+        const [sortResponse] = await Promise.all([
             page.waitForResponse(
                 (r) =>
                     r.url().includes('/api/reports/stock-movement') &&
-                    r.url().includes('sort_by=product_category_name') &&
-                    r.status() < 400,
+                    r.url().includes('sort_by=product_category_name'),
                 { timeout: 30000 },
             ),
             page.getByRole('button', { name: 'Category', exact: true }).click(),
         ]);
+        await expectResponseOk(sortResponse);
 
-        await Promise.all([
+        const [exportResponse] = await Promise.all([
             page.waitForResponse(
-                (r) =>
-                    r.url().includes('/api/reports/stock-movement/export') &&
-                    r.status() < 400,
+                (r) => r.url().includes('/api/reports/stock-movement/export'),
                 { timeout: 30000 },
             ),
             page.getByRole('button', { name: /export/i }).click(),
         ]);
+        await expectResponseOk(exportResponse);
 
         await page.getByRole('button', { name: /filters/i }).click();
         const filtersDialog = page.getByRole('dialog');
@@ -64,17 +61,17 @@ test.describe('Stock Movement Report', () => {
         await categoryOption.click({ force: true });
         await expect(categoryFilter).toContainText(selectedCategory);
 
-        await Promise.all([
+        const [filterResponse] = await Promise.all([
             page.waitForResponse(
                 (r) =>
                     r.url().includes('/api/reports/stock-movement') &&
-                    r.url().includes('category_id=') &&
-                    r.status() < 400,
+                    r.url().includes('category_id='),
                 { timeout: 30000 },
             ),
             filtersDialog
                 .getByRole('button', { name: 'Apply Filters' })
                 .click(),
         ]);
+        await expectResponseOk(filterResponse);
     });
 });

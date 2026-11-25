@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 
 test.describe('Asset Depreciation Runs', () => {
     test.beforeEach(async ({ page }) => {
@@ -235,11 +235,16 @@ test.describe('Asset Depreciation Runs', () => {
     test('can post a calculated depreciation run to journal', async ({
         page,
     }) => {
+        const listResponse = page.waitForResponse(
+            (response) =>
+                response.url().includes('/api/asset-depreciation-runs') &&
+                response.request().method() === 'GET',
+        );
         await page.goto('/asset-depreciation-runs');
         await expect(page).toHaveTitle(/Asset Depreciation Runs/);
 
         // Wait for table to load
-        await page.waitForTimeout(1000);
+        await expectResponseOk(await listResponse);
 
         // We check if there's any 'calculated' run to post.
         // If not, we can just intercept the display or just check that the 'Post' button can be clicked when a calculated run exists.

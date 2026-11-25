@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { changeDateFieldValue, openModule } from '../helpers';
+import { changeDateFieldValue, expectResponseOk, openModule } from '../helpers';
 import { createEmployee, searchEmployee } from './helpers';
 
 test.describe('Employee date field', () => {
@@ -35,8 +35,7 @@ test.describe('Employee date field', () => {
         const updateResponsePromise = page.waitForResponse(
             (response) =>
                 response.url().includes('/api/employees/') &&
-                ['PUT', 'PATCH'].includes(response.request().method()) &&
-                response.status() < 400,
+                ['PUT', 'PATCH'].includes(response.request().method()),
         );
 
         await dialog.getByRole('button', { name: /Update/i }).click();
@@ -48,7 +47,7 @@ test.describe('Employee date field', () => {
 
         expect(payload.current_employment?.hire_date).toBe(expectedDate);
 
-        await updateResponsePromise;
+        await expectResponseOk(await updateResponsePromise);
         await expect(dialog).not.toBeVisible();
     });
 });

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { changeDateFieldValue, openModule } from '../helpers';
+import { changeDateFieldValue, expectResponseOk, openModule } from '../helpers';
 import { createSupplierBill, searchSupplierBill } from './helpers';
 
 test.describe('Supplier Bill date fields', () => {
@@ -37,8 +37,7 @@ test.describe('Supplier Bill date fields', () => {
         const updateResponsePromise = page.waitForResponse(
             (response) =>
                 response.url().includes('/api/supplier-bills/') &&
-                ['PUT', 'PATCH'].includes(response.request().method()) &&
-                response.status() < 400,
+                ['PUT', 'PATCH'].includes(response.request().method()),
         );
 
         await dialog.getByRole('button', { name: /Update/i }).click();
@@ -52,7 +51,7 @@ test.describe('Supplier Bill date fields', () => {
         expect(payload.bill_date).toBe(billDate);
         expect(payload.due_date).toBe(dueDate);
 
-        await updateResponsePromise;
+        await expectResponseOk(await updateResponsePromise);
         await expect(dialog).not.toBeVisible();
     });
 });

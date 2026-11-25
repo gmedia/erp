@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 
 test.describe('Inventory Valuation Report', () => {
     test.beforeEach(async ({ page }) => {
@@ -9,35 +9,35 @@ test.describe('Inventory Valuation Report', () => {
     test('can view report, search, filter, and export', async ({ page }) => {
         const initialResponse = page.waitForResponse(
             (r) =>
+                r.request().method() === 'GET' &&
                 r.url().includes('/api/reports/inventory-valuation') &&
-                r.request().headers()['accept']?.includes('application/json') &&
-                r.status() < 400,
+                r.request().headers()['accept']?.includes('application/json'),
         );
         await page.goto('/reports/inventory-valuation');
         await page.waitForURL('**/reports/inventory-valuation', { timeout: 15000 });
-        await initialResponse;
+        await expectResponseOk(await initialResponse);
 
         await expect(page.locator('table')).toBeVisible();
         await expect(page.locator('tbody tr').first()).toBeVisible();
 
         const exportResponse = page.waitForResponse(
             (r) =>
-                r.url().includes('/api/reports/inventory-valuation/export') &&
-                r.status() < 400,
+                r.request().method() === 'POST' &&
+                r.url().includes('/api/reports/inventory-valuation/export'),
         );
         await page.getByRole('button', { name: /export/i }).click();
-        await exportResponse;
+        await expectResponseOk(await exportResponse);
 
         const searchInput = page.getByRole('textbox').first();
         const searchResponse = page.waitForResponse(
             (r) =>
+                r.request().method() === 'GET' &&
                 r.url().includes('/api/reports/inventory-valuation') &&
-                r.request().headers()['accept']?.includes('application/json') &&
-                r.status() < 400,
+                r.request().headers()['accept']?.includes('application/json'),
         );
         await searchInput.fill('P-');
         await searchInput.press('Enter');
-        await searchResponse;
+        await expectResponseOk(await searchResponse);
 
         await page.getByRole('button', { name: /filters/i }).click();
         const filtersDialog = page.getByRole('dialog');
@@ -57,11 +57,11 @@ test.describe('Inventory Valuation Report', () => {
 
         const applyResponse = page.waitForResponse(
             (r) =>
+                r.request().method() === 'GET' &&
                 r.url().includes('/api/reports/inventory-valuation') &&
-                r.request().headers()['accept']?.includes('application/json') &&
-                r.status() < 400,
+                r.request().headers()['accept']?.includes('application/json'),
         );
         await filtersDialog.getByRole('button', { name: 'Apply Filters' }).click();
-        await applyResponse;
+        await expectResponseOk(await applyResponse);
     });
 });

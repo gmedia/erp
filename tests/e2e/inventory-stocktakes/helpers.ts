@@ -1,6 +1,6 @@
 import { Page, expect } from '@playwright/test';
 
-import { searchAndWaitForApi } from '../helpers';
+import { expectResponseOk, searchAndWaitForApi } from '../helpers';
 
 interface AsyncOptionCandidate {
     readonly searchText: string;
@@ -383,13 +383,12 @@ export async function editInventoryStocktake(
     const updateResponse = page.waitForResponse(
         (r) =>
             r.url().includes('/api/inventory-stocktakes/') &&
-            r.request().method() === 'PUT' &&
-            r.status() < 400,
+            r.request().method() === 'PUT',
         { timeout: 45000 },
     );
 
     await updateBtn.click();
-    await updateResponse;
+    await expectResponseOk(await updateResponse);
 
     try {
         await expect(dialog).not.toBeVisible({ timeout: 5000 });

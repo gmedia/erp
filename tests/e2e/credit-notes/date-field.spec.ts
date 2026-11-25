@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { changeDateFieldValue, openModule } from '../helpers';
+import { changeDateFieldValue, expectResponseOk, openModule } from '../helpers';
 import { createCreditNote, searchCreditNote } from './helpers';
 
 test.describe('Credit Note date field', () => {
@@ -40,8 +40,7 @@ test.describe('Credit Note date field', () => {
         const updateResponsePromise = page.waitForResponse(
             (response) =>
                 response.url().includes('/api/credit-notes/') &&
-                ['PUT', 'PATCH'].includes(response.request().method()) &&
-                response.status() < 400,
+                ['PUT', 'PATCH'].includes(response.request().method()),
         );
 
         await dialog.getByRole('button', { name: /Update/i }).click();
@@ -53,7 +52,7 @@ test.describe('Credit Note date field', () => {
 
         expect(payload.credit_note_date).toBe(creditNoteDate);
 
-        await updateResponsePromise;
+        await expectResponseOk(await updateResponsePromise);
         await expect(dialog).not.toBeVisible();
     });
 });

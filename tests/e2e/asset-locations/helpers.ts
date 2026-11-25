@@ -1,4 +1,5 @@
 import { Page, expect } from '@playwright/test';
+import { expectResponseOk } from '../helpers';
 
 /**
  * Create a new asset location via the UI.
@@ -46,11 +47,11 @@ export async function createAssetLocation(
   await expect(submitButton).toBeVisible();
   
   const responsePromise = page.waitForResponse(resp => 
-    resp.url().includes('/api/asset-locations') && resp.status() < 400
+    resp.url().includes('/api/asset-locations') && resp.request().method() === 'POST'
   );
 
   await submitButton.click();
-  await responsePromise;
+  await expectResponseOk(await responsePromise);
 
   // Wait for dialog to close
   await expect(dialog).not.toBeVisible({ timeout: 15000 });
@@ -70,7 +71,7 @@ export async function searchAssetLocation(page: Page, query: string): Promise<vo
 
   // Start listening for response before triggering search
   const responsePromise = page.waitForResponse(resp => 
-    resp.url().includes('/api/asset-locations') && resp.status() < 400
+    resp.url().includes('/api/asset-locations') && resp.request().method() === 'GET'
   );
 
   await searchInput.clear();
@@ -78,7 +79,7 @@ export async function searchAssetLocation(page: Page, query: string): Promise<vo
   await searchInput.press('Enter');
   
   // Wait for the table to refresh
-  await responsePromise;
+  await expectResponseOk(await responsePromise);
 }
 
 /**
@@ -122,11 +123,11 @@ export async function editAssetLocation(
   await expect(updateBtn).toBeVisible();
   
   const responsePromise = page.waitForResponse(resp => 
-    resp.url().includes('/api/asset-locations') && resp.status() < 400
+    resp.url().includes('/api/asset-locations') && resp.request().method() === 'PUT'
   );
 
   await updateBtn.click();
-  await responsePromise;
+  await expectResponseOk(await responsePromise);
 
   // Wait for dialog to close
   await expect(dialog).not.toBeVisible({ timeout: 15000 });
@@ -156,11 +157,11 @@ export async function deleteAssetLocation(page: Page, identifier: string): Promi
   const deleteBtnConfirm = page.getByRole('button', { name: /Delete|Confirm|Continue/i }).last();
   
   const responsePromise = page.waitForResponse(resp => 
-    resp.url().includes('/api/asset-locations') && resp.status() < 400
+    resp.url().includes('/api/asset-locations') && resp.request().method() === 'DELETE'
   );
   
   await deleteBtnConfirm.click();
-  await responsePromise;
+  await expectResponseOk(await responsePromise);
 
   // Wait for row to disappear
   await expect(row).not.toBeVisible({ timeout: 10000 });

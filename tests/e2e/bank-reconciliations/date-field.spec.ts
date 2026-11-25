@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { changeDateFieldValue, openModule } from '../helpers';
+import { changeDateFieldValue, expectResponseOk, openModule } from '../helpers';
 import { getReconcilableRow } from './helpers';
 
 test.describe('Bank Reconciliation date field', () => {
@@ -38,8 +38,7 @@ test.describe('Bank Reconciliation date field', () => {
         const updateResponsePromise = page.waitForResponse(
             (response) =>
                 response.url().includes('/api/bank-reconciliations/') &&
-                ['PUT', 'PATCH'].includes(response.request().method()) &&
-                response.status() < 400,
+                ['PUT', 'PATCH'].includes(response.request().method()),
         );
 
         await dialog.getByRole('button', { name: /Update/i }).click();
@@ -51,7 +50,7 @@ test.describe('Bank Reconciliation date field', () => {
 
         expect(payload.period_start).toBe(expectedDate);
 
-        await updateResponsePromise;
+        await expectResponseOk(await updateResponsePromise);
         await expect(dialog).not.toBeVisible();
     });
 });

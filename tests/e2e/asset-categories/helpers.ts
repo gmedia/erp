@@ -1,5 +1,5 @@
 import { Page, expect } from '@playwright/test';
-import { createEntity, EntityConfig } from '../helpers';
+import { createEntity, EntityConfig, expectResponseOk } from '../helpers';
 
 /**
  * Create a new asset category via the UI.
@@ -49,14 +49,14 @@ export async function searchAssetCategory(page: Page, query: string): Promise<vo
   }
 
   const responsePromise = page.waitForResponse(
-    r => r.url().includes('/api/asset-categories') && r.status() < 400
+    r => r.url().includes('/api/asset-categories') && r.request().method() === 'GET'
   );
   await searchInput.clear();
   await searchInput.fill(normalizedQuery);
   await searchInput.press('Enter');
   
   // Wait for API response
-  await responsePromise;
+  await expectResponseOk(await responsePromise);
 }
 
 /**

@@ -1,6 +1,6 @@
 import { Page, expect } from '@playwright/test';
 
-import { searchAndWaitForApi } from '../helpers';
+import { expectResponseOk, searchAndWaitForApi } from '../helpers';
 
 async function selectAsyncOption(
     page: Page,
@@ -444,13 +444,12 @@ export async function editStockTransfer(
     const updateResponse = page.waitForResponse(
         (r) =>
             r.url().includes('/api/stock-transfers/') &&
-            r.request().method() === 'PUT' &&
-            r.status() < 400,
+            r.request().method() === 'PUT',
         { timeout: 45000 },
     );
 
     await updateBtn.click();
-    await updateResponse;
+    await expectResponseOk(await updateResponse);
 
     try {
         await expect(dialog).not.toBeVisible({ timeout: 5000 });

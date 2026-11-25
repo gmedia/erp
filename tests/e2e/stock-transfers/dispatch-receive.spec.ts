@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
-import { ensureAppOrigin, openModule } from '../helpers';
+import { ensureAppOrigin, expectResponseOk, openModule } from '../helpers';
 import { approvePurchaseOrderFixture } from '../purchase-orders/helpers';
 import { createStockTransfer, searchStockTransfer } from './helpers';
 
@@ -91,12 +91,11 @@ async function changeStatusViaUi(page: Page, transferNumber: string, status: str
     const updateResponse = page.waitForResponse(
         (response) =>
             response.url().includes('/api/stock-transfers/') &&
-            ['PUT', 'PATCH'].includes(response.request().method()) &&
-            response.status() < 400,
+            ['PUT', 'PATCH'].includes(response.request().method()),
     );
 
     await dialog.getByRole('button', { name: /Update/i }).click();
-    await updateResponse;
+    await expectResponseOk(await updateResponse);
     await expect(dialog).toBeHidden();
 }
 

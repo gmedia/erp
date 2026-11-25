@@ -1,5 +1,5 @@
 import { Locator, Page, expect } from '@playwright/test';
-import { searchAndWaitForApi } from '../helpers';
+import { expectResponseOk, searchAndWaitForApi } from '../helpers';
 
 export function getReconcilableRow(page: Page): Locator {
     return page
@@ -107,7 +107,7 @@ export async function editBankReconciliation(
 
     const dialog = page.getByRole('dialog').first();
     await expect(dialog).toBeVisible();
-    await detailResponse;
+    await expectResponseOk(await detailResponse);
 
     if (updates.statement_balance) {
         await dialog.locator('input[name="statement_balance"]').fill(updates.statement_balance);
@@ -117,13 +117,12 @@ export async function editBankReconciliation(
     const updateResponse = page.waitForResponse(
         (r) =>
             r.url().includes('/api/bank-reconciliations/') &&
-            r.request().method() === 'PUT' &&
-            r.status() < 400,
+            r.request().method() === 'PUT',
         { timeout: 30000 },
     );
 
     await updateBtn.click();
-    await updateResponse;
+    await expectResponseOk(await updateResponse);
 
     try {
         await expect(dialog).not.toBeVisible({ timeout: 5000 });

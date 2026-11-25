@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { Page, expect } from '@playwright/test';
+import { expectResponseOk } from '../helpers';
 
 /**
  * Create a new supplier category via the UI.
@@ -32,12 +33,12 @@ export async function createSupplierCategory(page: Page): Promise<string> {
 export async function searchSupplierCategory(page: Page, name: string): Promise<void> {
     const searchInput = page.getByPlaceholder('Search supplier categories...');
     const responsePromise = page.waitForResponse(
-        r => r.url().includes('/api/supplier-categories') && r.status() < 400
+        r => r.url().includes('/api/supplier-categories')
     );
     await searchInput.clear();
     await searchInput.fill(name);
     await searchInput.press('Enter');
-    await responsePromise;
+    await expectResponseOk(await responsePromise);
 }
 
 /**

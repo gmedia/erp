@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { login, expectResponseOk } from '../helpers';
 
 test.describe('Trial Balance Report', () => {
     test.beforeEach(async ({ page }) => {
@@ -10,12 +10,12 @@ test.describe('Trial Balance Report', () => {
         const initialResponse = page.waitForResponse(
             (r) =>
                 r.url().includes('/api/reports/trial-balance') &&
-                r.status() < 400,
+                r.request().method() === 'GET',
             { timeout: 30000 },
         );
         await page.goto('/reports/trial-balance');
         await page.waitForURL('**/reports/trial-balance', { timeout: 15000 });
-        await initialResponse;
+        await expectResponseOk(await initialResponse);
 
         await expect(page.getByRole('heading', { name: 'Trial Balance' })).toBeVisible();
 
@@ -32,7 +32,9 @@ test.describe('Trial Balance Report', () => {
                 .first();
             if (await yearOption.isVisible({ timeout: 5000 }).catch(() => false)) {
                 await yearOption.click({ force: true });
-                await page.waitForTimeout(1000);
+                await expect(
+                    page.getByRole('heading', { name: 'Trial Balance' }),
+                ).toBeVisible();
             }
         }
     });
@@ -44,21 +46,21 @@ test.describe('Trial Balance Report', () => {
             (r) =>
                 r.url().includes('/api/reports/trial-balance') &&
                 !r.url().includes('/export') &&
-                r.status() < 400,
+                r.request().method() === 'GET',
             { timeout: 30000 },
         );
         await page.goto('/reports/trial-balance');
-        await initialResponse;
+        await expectResponseOk(await initialResponse);
 
-        const [exportResponse] = await Promise.all([
-            page.waitForResponse(
-                (r) =>
-                    r.url().includes('/api/reports/trial-balance/export') &&
-                    r.status() < 400,
-                { timeout: 30000 },
-            ),
-            page.getByRole('button', { name: /export/i }).click(),
-        ]);
+        const exportPromise = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/reports/trial-balance/export') &&
+                r.request().method() === 'POST',
+            { timeout: 30000 },
+        );
+        await page.getByRole('button', { name: /export/i }).click();
+        const exportResponse = await exportPromise;
+        await expectResponseOk(exportResponse);
 
         const body = await exportResponse.json();
         expect(body).toHaveProperty('url');

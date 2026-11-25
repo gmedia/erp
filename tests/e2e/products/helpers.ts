@@ -1,4 +1,5 @@
 import { Page, expect } from '@playwright/test';
+import { expectResponseOk } from '../helpers';
 
 async function closeVisibleAsyncSelectPopover(page: Page): Promise<void> {
     const openPopovers = page.locator('[role="listbox"]:visible, ul[aria-busy]:visible');
@@ -57,11 +58,11 @@ export async function createProduct(
         const catName = overrides.category_id ?? 'Elektronik';
     if (await catSearch.isVisible()) {
         const categoryResponsePromise = page.waitForResponse(
-            r => r.url().includes('/api/product-categories') && r.status() < 400,
+            r => r.url().includes('/api/product-categories'),
             { timeout: 15000 },
         );
         await catSearch.fill(catName);
-        await categoryResponsePromise;
+        await expectResponseOk(await categoryResponsePromise);
     }
     const categoryOption = catPopover
         .locator('[role="option"], button')
@@ -80,11 +81,11 @@ export async function createProduct(
         const unitName = overrides.unit_id ?? 'Buah';
     if (await unitSearch.isVisible()) {
         const unitResponsePromise = page.waitForResponse(
-            r => r.url().includes('/api/units') && r.status() < 400,
+            r => r.url().includes('/api/units'),
             { timeout: 15000 },
         );
         await unitSearch.fill(unitName);
-        await unitResponsePromise;
+        await expectResponseOk(await unitResponsePromise);
     }
     const unitOption = unitPopover
         .locator('[role="option"], button')
@@ -123,12 +124,12 @@ export async function createProduct(
 export async function searchProduct(page: Page, query: string): Promise<void> {
     const searchInput = page.getByPlaceholder('Search code, name...');
     const responsePromise = page.waitForResponse(
-        r => r.url().includes('/api/products') && r.status() < 400
+        r => r.url().includes('/api/products')
     );
     await searchInput.clear();
     await searchInput.fill(query);
     await searchInput.press('Enter');
-    await responsePromise;
+    await expectResponseOk(await responsePromise);
 }
 
 /**

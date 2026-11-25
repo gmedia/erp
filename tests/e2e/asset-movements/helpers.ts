@@ -1,4 +1,5 @@
 import { Page, expect } from '@playwright/test';
+import { expectResponseOk } from '../helpers';
 
 export async function pickFirstAsyncOption(page: Page, searchText?: string): Promise<void> {
   const list = page.locator('[role="listbox"]:visible, ul[aria-busy]:visible').last();
@@ -7,7 +8,6 @@ export async function pickFirstAsyncOption(page: Page, searchText?: string): Pro
   const searchInput = page.locator('input[placeholder="Search..."]:visible').last();
   if (searchText && (await searchInput.isVisible().catch(() => false))) {
     await searchInput.fill(searchText);
-    await page.waitForTimeout(500);
   }
 
   const option = list.locator('[role="option"], button').first();
@@ -98,12 +98,11 @@ export async function createAssetMovement(
   const createResponsePromise = page.waitForResponse(
     (response) =>
       response.url().includes('/api/asset-movements') &&
-      response.request().method() === 'POST' &&
-      response.status() < 400,
+      response.request().method() === 'POST',
   );
   const submitBtn = dialog.getByRole('button', { name: /Record Movement/i }).last();
   await submitBtn.click();
-  await createResponsePromise;
+  await expectResponseOk(await createResponsePromise);
 
   // Wait for dialog to disappear
   await expect(dialog).not.toBeVisible({ timeout: 15000 });
@@ -129,13 +128,12 @@ export async function searchAssetMovement(page: Page, query: string): Promise<vo
   const responsePromise = page.waitForResponse(
     (response) =>
       response.url().includes('/api/asset-movements') &&
-      response.request().method() === 'GET' &&
-      response.status() < 400,
+      response.request().method() === 'GET',
   );
   await searchInput.clear();
   await searchInput.fill(normalizedQuery);
   await searchInput.press('Enter');
-  await responsePromise;
+  await expectResponseOk(await responsePromise);
   // Passive wait: don't assert visibility of results here to allow "delete" tests to verify absence
 }
 
@@ -169,8 +167,7 @@ export async function editAssetMovement(
   const updateResponsePromise = page.waitForResponse(
     (response) =>
       response.url().includes('/api/asset-movements') &&
-      ['PUT', 'PATCH', 'POST'].includes(response.request().method()) &&
-      response.status() < 400,
+      ['PUT', 'PATCH', 'POST'].includes(response.request().method()),
     { timeout: 15000 },
   );
 
@@ -178,7 +175,7 @@ export async function editAssetMovement(
     .getByRole('button', { name: /Update Movement|Record Movement|Update|Save/i })
     .last()
     .click();
-  await updateResponsePromise;
+  await expectResponseOk(await updateResponsePromise);
   await expect(dialog).not.toBeVisible({ timeout: 15000 });
 }
 

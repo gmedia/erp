@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 import { openApAgingReport } from './helpers';
 
 test.describe('AP Aging Report', () => {
@@ -16,23 +16,23 @@ test.describe('AP Aging Report', () => {
         await openApAgingReport(page);
         const sortResponsePromise = page.waitForResponse(
             (response) =>
+                response.request().method() === 'GET' &&
                 response.url().includes('/api/reports/ap-aging') &&
-                response.url().includes('sort_by=') &&
-                response.status() < 400,
+                response.url().includes('sort_by='),
         );
         await page.getByRole('button', { name: 'Supplier', exact: true }).click({ force: true });
-        await sortResponsePromise;
+        await expectResponseOk(await sortResponsePromise);
     });
 
     test('can export report', async ({ page }) => {
         await openApAgingReport(page);
         const exportResponsePromise = page.waitForResponse(
             (response) =>
-                response.url().includes('/api/reports/ap-aging/export') &&
-                response.status() < 400,
+                response.request().method() === 'POST' &&
+                response.url().includes('/api/reports/ap-aging/export'),
         );
         await page.getByRole('button', { name: /export/i }).click({ force: true });
-        await exportResponsePromise;
+        await expectResponseOk(await exportResponsePromise);
     });
 
     test('can open filters dialog', async ({ page }) => {

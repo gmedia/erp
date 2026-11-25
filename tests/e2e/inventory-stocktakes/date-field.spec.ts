@@ -1,6 +1,10 @@
 import { expect, test } from '@playwright/test';
 
-import { changeDateFieldValue, openModule } from '../helpers';
+import {
+    changeDateFieldValue,
+    expectResponseOk,
+    openModule,
+} from '../helpers';
 import { createInventoryStocktake, searchInventoryStocktake } from './helpers';
 
 test.describe('Inventory Stocktake date field', () => {
@@ -44,8 +48,7 @@ test.describe('Inventory Stocktake date field', () => {
         const updateResponsePromise = page.waitForResponse(
             (response) =>
                 response.url().includes('/api/inventory-stocktakes/') &&
-                ['PUT', 'PATCH'].includes(response.request().method()) &&
-                response.status() < 400,
+                ['PUT', 'PATCH'].includes(response.request().method()),
         );
 
         await dialog.getByRole('button', { name: /Update/i }).click();
@@ -57,7 +60,7 @@ test.describe('Inventory Stocktake date field', () => {
 
         expect(payload.stocktake_date).toBe(stocktakeDate);
 
-        await updateResponsePromise;
+        await expectResponseOk(await updateResponsePromise);
         await expect(dialog).not.toBeVisible();
     });
 });

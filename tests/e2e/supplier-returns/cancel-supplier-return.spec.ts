@@ -1,6 +1,11 @@
 import { expect, test, type Page } from '@playwright/test';
 
-import { login, reloadAndWaitForApi, searchAndWaitForApi } from '../helpers';
+import {
+    expectResponseOk,
+    login,
+    reloadAndWaitForApi,
+    searchAndWaitForApi,
+} from '../helpers';
 import { createSupplierReturn } from './helpers';
 
 async function confirmSupplierReturnViaApi(
@@ -102,11 +107,10 @@ test.describe('Supplier Return cancel (confirmed)', () => {
         await login(page, undefined, undefined, { requireDashboard: false });
         const listResponse = page.waitForResponse(
             (response) =>
-                response.url().includes('/api/supplier-returns') &&
-                response.status() < 400,
+                response.url().includes('/api/supplier-returns'),
         );
         await page.goto('/supplier-returns');
-        await listResponse;
+        await expectResponseOk(await listResponse);
     });
 
     test('cancel confirmed supplier return from detail dialog reverses stock and status', async ({

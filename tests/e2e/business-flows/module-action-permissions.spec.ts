@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 
 const VIEWER_EMAIL = 'module-action-viewer@example.com';
 const FIXTURE_PASSWORD = 'password';
@@ -122,12 +122,10 @@ async function openListPage(
 ): Promise<void> {
     const listResponse = page.waitForResponse(
         (r) =>
-            r.url().includes(apiPath) &&
-            r.request().method() === 'GET' &&
-            r.status() < 400,
+            r.url().includes(apiPath) && r.request().method() === 'GET',
     );
     await page.goto(path);
-    await listResponse;
+    await expectResponseOk(await listResponse);
 }
 
 test.describe('Module action permissions (lihat-saja)', () => {
