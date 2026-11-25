@@ -5,8 +5,10 @@ import { cn } from "@/lib/utils"
 // Indikator tepi kanan (W4-03): strip gradient non-scrolling di tepi viewport
 // muncul hanya saat masih ada konten di luar viewport kanan. Sel terakhir diberi
 // ruang (W5-02) agar fade tidak menutupi angka/header.
-const TABLE_EDGE_RIGHT =
-  "after:pointer-events-none after:absolute after:inset-y-0 after:right-0 after:w-4 after:bg-linear-to-r after:from-background after:to-transparent"
+const TABLE_EDGE_RIGHT = [
+  "after:pointer-events-none after:absolute after:inset-y-0 after:right-0",
+  "after:z-10 after:w-6 after:bg-linear-to-r after:from-transparent after:to-background",
+].join(" ")
 
 const ACTIONS_SHADOW =
   "[&_[data-sticky-column=actions]]:before:content-[''] [&_[data-sticky-column=actions]]:before:pointer-events-none [&_[data-sticky-column=actions]]:before:absolute [&_[data-sticky-column=actions]]:before:inset-y-0 [&_[data-sticky-column=actions]]:before:-left-3 [&_[data-sticky-column=actions]]:before:w-3 [&_[data-sticky-column=actions]]:before:bg-linear-to-l [&_[data-sticky-column=actions]]:before:from-foreground/15 [&_[data-sticky-column=actions]]:before:to-transparent"
