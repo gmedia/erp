@@ -209,6 +209,43 @@ test.describe('Issue #460: kontras mode gelap dan sidebar', () => {
         expect(ratio).toBeGreaterThanOrEqual(4.5);
     });
 
+    test('badge Disposed (destructive-soft) memiliki kontras teks >= 4.5:1 di mode gelap', async ({
+        page,
+    }) => {
+        await login(page);
+        await page.goto('/assets?status=disposed');
+        await page.waitForLoadState('networkidle');
+
+        const badge = page
+            .locator('[data-slot="badge"]:visible', { hasText: 'Disposed' })
+            .first();
+        await expect(badge).toBeVisible();
+
+        const styles = await badge.evaluate((el) => {
+            const toRgb = (value: string): string => {
+                const canvas = document.createElement('canvas');
+                canvas.width = 1;
+                canvas.height = 1;
+                const ctx = canvas.getContext('2d');
+                if (!ctx) {
+                    return value;
+                }
+                ctx.fillStyle = value;
+                ctx.fillRect(0, 0, 1, 1);
+                const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+
+                return `rgb(${r}, ${g}, ${b})`;
+            };
+
+            const cs = getComputedStyle(el);
+
+            return { fg: toRgb(cs.color), bg: toRgb(cs.backgroundColor) };
+        });
+
+        const ratio = contrastRatio(parseRgb(styles.fg), parseRgb(styles.bg));
+        expect(ratio).toBeGreaterThanOrEqual(4.5);
+    });
+
     test('item terakhir sidebar terlihat utuh di atas footer setelah scroll', async ({
         page,
     }) => {
