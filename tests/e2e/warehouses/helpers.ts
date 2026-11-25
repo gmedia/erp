@@ -1,4 +1,5 @@
 import { Page, expect } from '@playwright/test';
+import { expectResponseOk } from '../helpers';
 
 export async function createWarehouse(page: Page): Promise<string> {
     const timestamp = Date.now();
@@ -24,11 +25,11 @@ export async function createWarehouse(page: Page): Promise<string> {
     await branchOption.click({ force: true });
 
     const responsePromise = page.waitForResponse(
-        (r) => r.url().includes('/api/warehouses') && r.status() < 400,
+        (r) => r.url().includes('/api/warehouses'),
     );
 
     await submitButton.click();
-    await responsePromise;
+    await expectResponseOk(await responsePromise);
 
     await expect(dialog).not.toBeVisible({ timeout: 15000 });
 
@@ -38,12 +39,12 @@ export async function createWarehouse(page: Page): Promise<string> {
 export async function searchWarehouse(page: Page, name: string): Promise<void> {
     const searchInput = page.getByPlaceholder('Search warehouses...');
     const responsePromise = page.waitForResponse(
-        r => r.url().includes('/api/warehouses') && r.status() < 400
+        r => r.url().includes('/api/warehouses')
     );
     await searchInput.clear();
     await searchInput.fill(name);
     await searchInput.press('Enter');
-    await responsePromise;
+    await expectResponseOk(await responsePromise);
 }
 
 export async function editWarehouse(
@@ -71,11 +72,11 @@ export async function editWarehouse(
     await expect(updateBtn).toBeVisible();
 
     const responsePromise = page.waitForResponse(
-        (r) => r.url().includes('/api/warehouses') && r.status() < 400,
+        (r) => r.url().includes('/api/warehouses'),
     );
 
     await updateBtn.click();
-    await responsePromise;
+    await expectResponseOk(await responsePromise);
 
     await expect(dialog).not.toBeVisible({ timeout: 15000 });
 }

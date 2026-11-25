@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 import { generateModuleTests } from '../shared-test-factories';
 import { createPosition, editPosition, searchPosition } from './helpers';
 
@@ -10,11 +10,11 @@ test.describe('Position default sort indicator', () => {
         await login(page, undefined, undefined, { requireDashboard: false });
 
         const responsePromise = page.waitForResponse(
-            (r) => r.url().includes('/api/positions') && r.status() < 400,
+            (r) => r.url().includes('/api/positions'),
             { timeout: 30000 },
         );
         await page.goto('/positions');
-        await responsePromise;
+        await expectResponseOk(await responsePromise);
 
         const createdAtSort = page
             .locator('thead')

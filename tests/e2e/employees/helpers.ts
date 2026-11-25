@@ -1,6 +1,6 @@
 import { expect, Page } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
-import { createEntity, EntityConfig } from '../helpers';
+import { createEntity, EntityConfig, expectResponseOk } from '../helpers';
 
 /**
  * Create a new employee via the UI.
@@ -86,17 +86,13 @@ export async function searchEmployee(page: Page, email: string): Promise<void> {
     }
 
     const responsePromise = page.waitForResponse(
-        (r) => r.url().includes('/api/employees') && r.status() === 200,
+        (r) => r.url().includes('/api/employees'),
     );
     await searchInput.clear();
     await searchInput.fill(normalizedEmail);
     await searchInput.press('Enter');
 
-    // Wait for API response
-    await responsePromise;
-
-    // Small delay for UI stabilization
-    await page.waitForTimeout(500);
+    await expectResponseOk(await responsePromise);
 }
 
 /**

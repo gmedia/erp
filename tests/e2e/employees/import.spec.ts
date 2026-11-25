@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 
 test.describe('Employee Import E2E Tests', () => {
     test.beforeEach(async ({ page }) => {
@@ -28,10 +28,10 @@ test.describe('Employee Import E2E Tests', () => {
 
         // 2. Navigate to Employees page
         const listResponse = page.waitForResponse(
-            (r) => r.url().includes('/api/employees') && r.status() === 200,
+            (r) => r.url().includes('/api/employees'),
         );
         await page.goto('/employees');
-        await listResponse;
+        await expectResponseOk(await listResponse);
 
         // 3. Open Import Dialog
         const importButton = page.getByRole('button', { name: /import/i });
@@ -87,10 +87,10 @@ test.describe('Employee Import E2E Tests', () => {
         const searchInput = page.getByPlaceholder('Search employees...');
         await searchInput.fill(uniqueEmail);
         const searchResponse = page.waitForResponse(
-            (r) => r.url().includes('/api/employees') && r.status() === 200,
+            (r) => r.url().includes('/api/employees'),
         );
         await searchInput.press('Enter');
-        await searchResponse;
+        await expectResponseOk(await searchResponse);
 
         await expect(page.getByText(uniqueEmail)).toBeVisible();
         await expect(

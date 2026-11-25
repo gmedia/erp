@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
@@ -30,9 +30,9 @@ test.describe('Supplier Import E2E Tests', () => {
         fs.writeFileSync(filePath, csvContent);
 
         // 2. Navigate to Suppliers page
-        const listResponse = page.waitForResponse(r => r.url().includes('/api/suppliers') && r.status() === 200);
+        const listResponse = page.waitForResponse(r => r.url().includes('/api/suppliers'));
         await page.goto('/suppliers');
-        await listResponse;
+        await expectResponseOk(await listResponse);
 
         // 3. Open Import Dialog
         const importButton = page.getByRole('button', { name: /import/i });
@@ -68,9 +68,9 @@ test.describe('Supplier Import E2E Tests', () => {
         // Search for the new supplier
         const searchInput = page.getByPlaceholder('Search suppliers...');
         await searchInput.fill(uniqueEmail);
-        const searchResponse = page.waitForResponse(r => r.url().includes('/api/suppliers') && r.status() === 200);
+        const searchResponse = page.waitForResponse(r => r.url().includes('/api/suppliers'));
         await searchInput.press('Enter');
-        await searchResponse;
+        await expectResponseOk(await searchResponse);
         
         await expect(page.getByText(uniqueEmail)).toBeVisible();
         await expect(page.getByText(`E2E Supplier ${timestamp}`)).toBeVisible();
