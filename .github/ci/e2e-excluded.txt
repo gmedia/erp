@@ -1,7 +1,2 @@
-aging-dashboard
-budget-variance-report
-financial-dashboard
-fiscal-year-auto-select
-per-branch-financial-reports
-vehicle-loans
+# visual-audit: harness screenshot audit visual (docs/visual-audit/), bukan test regresi.
 visual-audit
