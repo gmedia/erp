@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Actions\AccountingPosting\PostStockTransferJournalAction;
 use App\Models\Branch;
 use App\Models\Employee;
 use App\Models\Product;
@@ -192,18 +191,9 @@ class StockTransferSampleDataSeeder extends Seeder
                 ->whereNotIn('product_id', $productIds)
                 ->delete();
 
-            // Jurnal per tahap (issue #495) lewat jalur yang sama dengan controller.
-            $journals = app(PostStockTransferJournalAction::class);
-            $transfer->refresh();
-
-            if (in_array($transfer->status, ['in_transit', 'received'], true)) {
-                $journals->executeDispatch($transfer);
-            }
-
-            if ($transfer->status === 'received') {
-                $journals->executeReceive($transfer);
-                $journals->executeShortage($transfer);
-            }
+            // Jurnal transfer (issue #495) diposting di StockMovementSampleDataSeeder:
+            // biaya kirim diambil dari movement transfer_out yang baru ada setelah
+            // kartu stok diposting, jadi posting di sini akan menghasilkan nol.
         }
     }
 

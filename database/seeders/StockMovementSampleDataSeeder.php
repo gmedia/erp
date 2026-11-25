@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Actions\AccountingPosting\PostGoodsReceiptJournalAction;
 use App\Actions\AccountingPosting\PostStockAdjustmentJournalAction;
+use App\Actions\AccountingPosting\PostStockTransferJournalAction;
 use App\Actions\AccountingPosting\PostSupplierReturnJournalAction;
 use App\Actions\InventoryStocktakes\CreateStocktakeAdjustmentDraftAction;
 use App\Models\GoodsReceipt;
@@ -18,6 +19,7 @@ use App\Models\SupplierReturn;
 use App\Services\StockPostingService;
 use Database\Seeders\Concerns\ReopensDemoPeriodClosings;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Artisan;
 
 /**
  * Post stock movements for every demo document that changes stock, using the
@@ -90,6 +92,10 @@ class StockMovementSampleDataSeeder extends Seeder
             });
 
         $stockPosting->rebuildBalances();
+
+        // Backfill rata-rata tertimbang bergerak (Issue #495) lewat command yang sama
+        // dengan produksi, supaya seed demo dan deploy memakai satu jalur perhitungan.
+        Artisan::call('stock:recalculate-average-cost');
 
         // Qty sistem stok opname dan draft SA stocktake_result dibentuk setelah saldo
         // kartu stok tersedia (#459 butir 1-2). Urutan ini harus sebelum journal.
@@ -284,13 +290,17 @@ class StockMovementSampleDataSeeder extends Seeder
                     ->whereIn('source_id', $this->demoIds(SupplierReturn::class, 'return_number', self::SR_DEMO)))
                 ->orWhere(fn ($q) => $q
                     ->where('source_type', StockAdjustment::class)
-                    ->whereIn('source_id', $this->demoIds(StockAdjustment::class, 'adjustment_number', self::SA_DEMO))))
+                    ->whereIn('source_id', $this->demoIds(StockAdjustment::class, 'adjustment_number', self::SA_DEMO)))
+                ->orWhere(fn ($q) => $q
+                    ->where('source_type', StockTransfer::class)
+                    ->whereIn('source_id', $this->demoIds(StockTransfer::class, 'transfer_number', self::ST_DEMO))))
             ->pluck('id');
 
         if ($demoEntryIds->isNotEmpty()) {
             GoodsReceipt::query()->whereIn('journal_entry_id', $demoEntryIds)->update(['journal_entry_id' => null]);
             SupplierReturn::query()->whereIn('journal_entry_id', $demoEntryIds)->update(['journal_entry_id' => null]);
             StockAdjustment::query()->whereIn('journal_entry_id', $demoEntryIds)->update(['journal_entry_id' => null]);
+            StockTransfer::query()->whereIn('journal_entry_id', $demoEntryIds)->update(['journal_entry_id' => null]);
             JournalEntryLine::query()->whereIn('journal_entry_id', $demoEntryIds)->delete();
             JournalEntry::query()->whereIn('id', $demoEntryIds)->delete();
         }
@@ -319,5 +329,39 @@ class StockMovementSampleDataSeeder extends Seeder
             ->orderBy('id')
             ->get()
             ->each(fn (StockAdjustment $adjustment) => $postStockAdjustment->execute($adjustment->refresh()));
+
+        $this->postTransferJournals();
+    }
+
+    /**
+     * Jurnal transfer per tahap (issue #495): dispatch, receive, selisih kurang.
+     *
+     * Dijalankan di sini, bukan di StockTransferSampleDataSeeder, karena biaya kirim
+     * diambil dari movement `transfer_out` yang baru ada setelah kartu stok diposting.
+     * `journal_entry_id` transfer menunjuk jurnal selisih (kontrak data demo W9-494);
+     * transfer tanpa selisih tidak menautkan jurnal.
+     */
+    private function postTransferJournals(): void
+    {
+        $journals = app(PostStockTransferJournalAction::class);
+
+        StockTransfer::query()
+            ->whereIn('status', ['in_transit', 'received'])
+            ->where('transfer_number', 'like', self::ST_DEMO)
+            ->orderBy('transfer_date')
+            ->orderBy('id')
+            ->get()
+            ->each(function (StockTransfer $transfer) use ($journals): void {
+                $journals->executeDispatch($transfer->refresh());
+
+                $shortage = null;
+
+                if ($transfer->status === 'received') {
+                    $journals->executeReceive($transfer);
+                    $shortage = $journals->executeShortage($transfer);
+                }
+
+                $transfer->forceFill(['journal_entry_id' => $shortage?->id])->save();
+            });
     }
 }
