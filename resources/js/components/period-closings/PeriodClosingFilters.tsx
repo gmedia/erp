@@ -17,22 +17,26 @@ const closingTypeOptions = [
 
 export function createPeriodClosingFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', 'Search...'),
+        createTextFilterField(
+            'search',
+            { key: 'column.search', fallback: 'Search' },
+            'Search...',
+        ),
         createSelectFilterField(
             'status',
-            'Status',
+            { key: 'column.status', fallback: 'Status' },
             statusOptions,
             'Select Status',
         ),
         createSelectFilterField(
             'closing_type',
-            'Closing Type',
+            { key: 'column.closing_type', fallback: 'Closing Type' },
             closingTypeOptions,
             'Select Type',
         ),
         {
             name: 'fiscal_year_id',
-            label: 'Fiscal Year',
+            label: { key: 'column.fiscal_year', fallback: 'Fiscal Year' },
             component: (
                 <AsyncSelect
                     url="/api/fiscal-years"

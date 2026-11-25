@@ -16,7 +16,7 @@ export const bankReconciliationColumns: ColumnDef<BankReconciliation>[] = [
     createSelectColumn<BankReconciliation>(),
     {
         accessorKey: 'account_id',
-        ...createSortingHeader('Account'),
+        ...createSortingHeader({ key: 'column.account', fallback: 'Account' }),
         cell: ({ row }) => {
             const account = row.original.account;
             return (
@@ -31,7 +31,10 @@ export const bankReconciliationColumns: ColumnDef<BankReconciliation>[] = [
     },
     {
         accessorKey: 'period_start',
-        ...createSortingHeader('Period Start'),
+        ...createSortingHeader({
+            key: 'column.period_start',
+            fallback: 'Period Start',
+        }),
         cell: ({ row }) =>
             formatDateByRegionalSettings(
                 row.getValue('period_start') as string,
@@ -39,7 +42,10 @@ export const bankReconciliationColumns: ColumnDef<BankReconciliation>[] = [
     },
     {
         accessorKey: 'period_end',
-        ...createSortingHeader('Period End'),
+        ...createSortingHeader({
+            key: 'column.period_end',
+            fallback: 'Period End',
+        }),
         cell: ({ row }) =>
             formatDateByRegionalSettings(row.getValue('period_end') as string),
     },
@@ -47,23 +53,26 @@ export const bankReconciliationColumns: ColumnDef<BankReconciliation>[] = [
         BankReconciliation & { currency?: string | null }
     >({
         accessorKey: 'statement_balance',
-        label: 'Statement Balance',
+        label: {
+            key: 'column.statement_balance',
+            fallback: 'Statement Balance',
+        },
     }),
     createRowCurrencyAmountColumn<
         BankReconciliation & { currency?: string | null }
     >({
         accessorKey: 'book_balance',
-        label: 'Book Balance',
+        label: { key: 'column.book_balance', fallback: 'Book Balance' },
     }),
     createRowCurrencyAmountColumn<
         BankReconciliation & { currency?: string | null }
     >({
         accessorKey: 'difference',
-        label: 'Difference',
+        label: { key: 'column.difference', fallback: 'Difference' },
     }),
     {
         accessorKey: 'status',
-        ...createSortingHeader('Status'),
+        ...createSortingHeader({ key: 'column.status', fallback: 'Status' }),
         cell: ({ row }) => {
             const status = row.getValue('status') as string;
             return (

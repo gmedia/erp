@@ -85,6 +85,30 @@ test('products, warehouses and stock report column keys have translations', func
         ->and($en['low_stock_threshold'])->toBe('Low Stock Threshold');
 });
 
+test('accounting module column and filter keys have translations', function () {
+    $en = localeColumnTranslations('en.json');
+    $id = localeColumnTranslations('id.json');
+
+    $keys = [
+        'entry_number', 'description', 'total_amount', 'date', 'created_at',
+        'fiscal_year', 'source_account', 'target_account', 'notes', 'budget_type',
+        'statement_balance', 'book_balance', 'difference', 'account',
+        'period_start', 'period_end', 'frequency', 'next_run_date', 'auto_post',
+        'is_active', 'period_month', 'period_year', 'closing_type', 'closed_at',
+        'net_income', 'source_coa_version', 'target_coa_version', 'all_types',
+    ];
+
+    foreach ($keys as $key) {
+        expect($en)->toHaveKey($key)
+            ->and($id)->toHaveKey($key)
+            ->and($id[$key])->not->toBe($en[$key]);
+    }
+
+    expect($en['entry_number'])->toBe('Entry Number')
+        ->and($en['statement_balance'])->toBe('Statement Balance')
+        ->and($en['net_income'])->toBe('Net Income');
+});
+
 test('column translation values are non-empty strings', function () {
     foreach (['en.json', 'id.json'] as $file) {
         foreach (localeColumnTranslations($file) as $key => $value) {

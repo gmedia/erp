@@ -29,19 +29,25 @@ export const accountMappingColumns: ColumnDef<AccountMapping>[] = [
         id: 'source',
         accessorKey: 'source_account_id', // Add accessorKey to satisfy sorting requirements if needed
         enableSorting: true,
-        ...createSortingHeader('Source Account'),
+        ...createSortingHeader({
+            key: 'column.source_account',
+            fallback: 'Source Account',
+        }),
         cell: ({ row }) => formatAccountLabel(row.original.source_account),
     },
     {
         id: 'target',
         accessorKey: 'target_account_id', // Add accessorKey to satisfy sorting requirements if needed
         enableSorting: true,
-        ...createSortingHeader('Target Account'),
+        ...createSortingHeader({
+            key: 'column.target_account',
+            fallback: 'Target Account',
+        }),
         cell: ({ row }) => formatAccountLabel(row.original.target_account),
     },
     createBadgeColumn<AccountMapping>({
         accessorKey: 'type',
-        label: 'Type',
+        label: { key: 'column.type', fallback: 'Type' },
         colorMap: {
             rename: 'bg-muted text-foreground',
             merge: 'bg-info/10 text-info',
@@ -51,7 +57,7 @@ export const accountMappingColumns: ColumnDef<AccountMapping>[] = [
     {
         id: 'notes',
         accessorKey: 'notes',
-        ...createSortingHeader('Notes'),
+        ...createSortingHeader({ key: 'column.notes', fallback: 'Notes' }),
         cell: ({ row }) => {
             const notes = row.original.notes ?? '-';
             return (
@@ -63,7 +69,7 @@ export const accountMappingColumns: ColumnDef<AccountMapping>[] = [
     },
     createDateColumn<AccountMapping>({
         accessorKey: 'created_at',
-        label: 'Created At',
+        label: { key: 'column.created_at', fallback: 'Created At' },
     }),
     createActionsColumn<AccountMapping>(),
 ];

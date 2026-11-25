@@ -12,16 +12,20 @@ const statusOptions = [
 
 export function createBankReconciliationFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', 'Search...'),
+        createTextFilterField(
+            'search',
+            { key: 'column.search', fallback: 'Search' },
+            'Search...',
+        ),
         createSelectFilterField(
             'status',
-            'Status',
+            { key: 'column.status', fallback: 'Status' },
             statusOptions,
             'Select Status',
         ),
         {
             name: 'account_id',
-            label: 'Account',
+            label: { key: 'column.account', fallback: 'Account' },
             component: (
                 <AsyncSelect
                     url="/api/accounts?is_active=1&has_children=0"
