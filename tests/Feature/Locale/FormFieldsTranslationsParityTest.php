@@ -746,6 +746,8 @@ test('product, warehouse and asset depreciation calculation validation messages 
             'fiscal_year_required' => 'Fiscal year is required.',
             'period_start_required' => 'Start period is required.',
             'period_end_required' => 'End period is required.',
+            'period_start_date_required' => 'Start date is required',
+            'period_end_date_required' => 'End date is required',
         ])
         ->and($idValidation['product']['unit_required'])->toBe('Satuan wajib diisi.')
         ->and($idValidation['warehouse']['branch_required'])->toBe('Cabang wajib diisi.')
@@ -860,4 +862,14 @@ test('validation keys used by schemas.ts section B keep the english text and exi
         }
         expect(sortedKeys($en[$form]))->toEqual(sortedKeys($id[$form]), "validation.{$form} keys differ");
     }
+});
+
+test('calculate depreciation date validation messages keep the english text and are translated', function () {
+    $en = localeValidationTranslations('en.json');
+    $id = localeValidationTranslations('id.json');
+
+    expect($en['asset_depreciation_calculation']['period_start_date_required'])->toBe('Start date is required')
+        ->and($en['asset_depreciation_calculation']['period_end_date_required'])->toBe('End date is required')
+        ->and($id['asset_depreciation_calculation']['period_start_date_required'])->toBe('Tanggal mulai wajib diisi')
+        ->and($id['asset_depreciation_calculation']['period_end_date_required'])->toBe('Tanggal selesai wajib diisi');
 });

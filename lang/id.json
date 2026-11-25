@@ -2599,7 +2599,9 @@
         "asset_depreciation_calculation": {
             "fiscal_year_required": "Tahun fiskal wajib diisi.",
             "period_start_required": "Periode awal wajib diisi.",
-            "period_end_required": "Periode akhir wajib diisi."
+            "period_end_required": "Periode akhir wajib diisi.",
+            "period_start_date_required": "Tanggal mulai wajib diisi",
+            "period_end_date_required": "Tanggal selesai wajib diisi"
         },
         "budget_line": {
             "account_required": "Akun wajib diisi.",

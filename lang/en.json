@@ -2599,7 +2599,9 @@
         "asset_depreciation_calculation": {
             "fiscal_year_required": "Fiscal year is required.",
             "period_start_required": "Start period is required.",
-            "period_end_required": "End period is required."
+            "period_end_required": "End period is required.",
+            "period_start_date_required": "Start date is required",
+            "period_end_date_required": "End date is required"
         },
         "inventory_stocktake": {
             "product_required": "Product is required.",
