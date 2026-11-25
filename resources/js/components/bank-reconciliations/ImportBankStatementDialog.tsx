@@ -1,3 +1,4 @@
+import { FileUploadInput } from '@/components/common/FileUploadInput';
 import { ImportResultSummary } from '@/components/common/ImportResultSummary';
 import { memo, useState } from 'react';
 
@@ -11,7 +12,6 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -111,9 +111,9 @@ export const ImportBankStatementDialog = memo<ImportBankStatementDialogProps>(
             setResult(null);
         };
 
-        const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            if (e.target.files && e.target.files.length > 0) {
-                setFile(e.target.files[0] ?? null);
+        const handleFileChange = (selected: File | null) => {
+            if (selected) {
+                setFile(selected);
             }
         };
 
@@ -253,9 +253,9 @@ export const ImportBankStatementDialog = memo<ImportBankStatementDialogProps>(
                             <Label htmlFor="statement-file">
                                 Bank Statement File
                             </Label>
-                            <Input
+                            <FileUploadInput
                                 id="statement-file"
-                                type="file"
+                                value={file}
                                 accept=".csv, .xlsx, .xls"
                                 onChange={handleFileChange}
                             />

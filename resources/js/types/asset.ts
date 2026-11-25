@@ -37,6 +37,7 @@ export interface AssetMovement extends EntityWithId {
     sale_amount?: number | null;
     sale_account_id?: number | null;
     disposal_journal_id?: number | null;
+    disposal_journal_number?: string | null;
 }
 
 export interface AssetStocktakeItem extends EntityWithId {

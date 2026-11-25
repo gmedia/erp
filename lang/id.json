@@ -221,6 +221,14 @@
         "select_all": "Pilih semua",
         "selected": "dipilih"
     },
+    "file_upload": {
+        "choose": "Pilih Berkas",
+        "none": "Belum ada berkas dipilih",
+        "remove": "Hapus berkas",
+        "clear": "Hapus",
+        "current": "Saat ini: {name}",
+        "preview": "Pratinjau {name}"
+    },
     "shell": {
         "filters": "Filter",
         "add": "Tambah",

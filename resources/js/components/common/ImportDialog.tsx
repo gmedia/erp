@@ -1,3 +1,4 @@
+import { FileUploadInput } from '@/components/common/FileUploadInput';
 import { ImportResultSummary } from '@/components/common/ImportResultSummary';
 import { Button } from '@/components/ui/button';
 import {
@@ -9,7 +10,6 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useTranslation } from '@/contexts/i18n-context';
 import { usePermissions } from '@/hooks/usePermissions';
@@ -112,10 +112,10 @@ function ImportDialogContent({
         link.remove();
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files.length > 0) {
-            setFile(e.target.files[0] ?? null);
-            setResult(null); // Reset result when new file selected
+    const handleFileChange = (selected: File | null) => {
+        if (selected) {
+            setFile(selected);
+            setResult(null);
         }
     };
 
@@ -202,9 +202,9 @@ function ImportDialogContent({
 
                     <div className="grid w-full max-w-sm items-center gap-1.5">
                         <Label htmlFor="file">{t('shell.import_file')}</Label>
-                        <Input
+                        <FileUploadInput
                             id="file"
-                            type="file"
+                            value={file}
                             accept=".csv, .xlsx, .xls"
                             onChange={handleFileChange}
                         />
