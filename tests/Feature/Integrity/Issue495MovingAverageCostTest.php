@@ -1,9 +1,15 @@
 <?php
 
+use App\Actions\AccountingPosting\PostStockTransferJournalAction;
+use App\Models\Account;
+use App\Models\CoaVersion;
+use App\Models\FiscalYear;
 use App\Models\GoodsReceipt;
 use App\Models\GoodsReceiptItem;
+use App\Models\JournalEntryLine;
 use App\Models\Product;
 use App\Models\PurchaseOrder;
+use App\Models\Setting;
 use App\Models\StockAdjustment;
 use App\Models\StockAdjustmentItem;
 use App\Models\StockMovement;
@@ -172,36 +178,179 @@ test('dispatch transfer keluar memakai rata-rata gudang asal dan tidak mengubahn
         ->and((float) $dispatch->balance_after)->toBe(16.0);
 });
 
-test('penerimaan transfer menghitung rata-rata tujuan dengan biaya kirim', function () {
+/**
+ * Invarian GL persediaan + in-transit harus sama dengan Σ nilai kartu (qty × avg)
+ * per gudang, setelah tiap tahap. Akun dibaca dari setting in-transit dan kode 11300.
+ */
+/**
+ * Σ saldo GL persediaan + in-transit (jurnal posted) dan Σ nilai kartu (qty × avg).
+ *
+ * @return array{gl: float, card: float, transit: float}
+ */
+function issue495Snapshot(Product $product, array $warehouses, Account $inventory): array
+{
+    $transitAccountId = (int) Setting::get('inventory_in_transit_account_id');
+
+    // Saldo GL = jurnal berstatus posted saja, seperti laporan buku besar.
+    $glBalance = fn (int $accountId): float => JournalEntryLine::query()
+        ->where('account_id', $accountId)
+        ->whereHas('journalEntry', fn ($query) => $query->where('status', 'posted'))
+        ->get(['debit', 'credit'])
+        ->sum(fn (JournalEntryLine $line): float => (float) $line->debit - (float) $line->credit);
+
+    $card = collect($warehouses)->sum(function (Warehouse $warehouse) use ($product): float {
+        $last = issue495LastMovement($product, $warehouse);
+
+        return round((float) $last->balance_after * (float) $last->average_cost_after, 2);
+    });
+
+    $transit = $glBalance($transitAccountId);
+
+    return [
+        'gl' => round($glBalance($inventory->id) + $transit, 2),
+        'card' => round($card, 2),
+        'transit' => round($transit, 2),
+    ];
+}
+
+/**
+ * Invarian: GL persediaan + in-transit = Σ kartu (selisih terhadap snapshot awal,
+ * karena saldo awal GR tidak dijurnal di test ini) dan saldo in-transit sesuai harapan.
+ *
+ * @param  array{gl: float, card: float, transit: float}  $before
+ */
+function issue495AssertInvariant(array $before, array $after, float $expectedTransit): void
+{
+    // Nilai kartu + nilai dalam perjalanan harus sama dengan GL persediaan + in-transit.
+    expect(round($after['gl'] - $before['gl'], 2))
+        ->toBe(round(($after['card'] + $after['transit']) - ($before['card'] + $before['transit']), 2));
+    expect($after['transit'])->toBe(round($expectedTransit, 2));
+}
+
+test('transfer memakai biaya kirim avg asal, bukan item.unit_cost, lewat alur dispatch dan receive nyata', function () {
+    $accounts = makeIssue495TransferAccounts();
     $source = Warehouse::factory()->create();
     $destination = Warehouse::factory()->create();
     $product = Product::factory()->create(['cost' => 0]);
 
+    // Asal: avg 1500 (dua GR beda harga). Tujuan: avg 1000.
+    issue495Receipt($source, $product, 10, 1000, '2026-01-10');
+    issue495Receipt($source, $product, 10, 2000, '2026-01-11');
     issue495Receipt($destination, $product, 5, 1000, '2026-01-10');
 
     $transfer = StockTransfer::factory()->create([
         'from_warehouse_id' => $source->id,
         'to_warehouse_id' => $destination->id,
-        'transfer_date' => '2026-01-12',
-        'status' => 'received',
-        'received_at' => '2026-01-12 09:00:00',
+        'transfer_number' => 'ST-2026-495001',
+        'transfer_date' => '2026-01-13',
+        'status' => 'in_transit',
+        'journal_entry_id' => null,
     ]);
-    StockTransferItem::factory()->create([
+    $item = StockTransferItem::factory()->create([
         'stock_transfer_id' => $transfer->id,
         'product_id' => $product->id,
-        'quantity' => 5,
-        'quantity_received' => 5,
-        'unit_cost' => 2000,
+        'quantity' => 4,
+        'quantity_received' => 0,
+        'unit_cost' => 0,
     ]);
 
-    app(StockPostingService::class)->postStockTransferReceive($transfer->refresh());
+    $posting = app(StockPostingService::class);
+    $journals = app(PostStockTransferJournalAction::class);
+    $warehouses = [$source, $destination];
+    $before = issue495Snapshot($product, $warehouses, $accounts['inventory']);
 
-    $receive = StockMovement::query()
-        ->where('movement_type', 'transfer_in')
-        ->where('reference_id', $transfer->id)
+    // Dispatch: 4 keluar @1500 dari asal.
+    $posting->postStockTransferDispatch($transfer->refresh());
+    $journals->executeDispatch($transfer->refresh());
+
+    $dispatch = StockMovement::query()
+        ->where('movement_type', 'transfer_out')
+        ->where('source_line_id', $item->id)
         ->firstOrFail();
 
-    expect((float) $receive->average_cost_after)->toBe(1500.0)
-        ->and((float) $receive->balance_after)->toBe(10.0)
-        ->and((float) issue495LastMovement($product, $destination)->average_cost_after)->toBe(1500.0);
+    expect((float) $dispatch->unit_cost)->toBe(1500.0)
+        ->and((float) issue495LastMovement($product, $source)->balance_after)->toBe(16.0);
+
+    // Dispatch: in-transit 4 x 1500 = 6000; GL persediaan + in-transit mengikuti Σ kartu.
+    $afterDispatch = issue495Snapshot($product, $warehouses, $accounts['inventory']);
+    issue495AssertInvariant($before, $afterDispatch, 6000.0);
+
+    // Receive sebagian: 3 dari 4 diterima, 1 selisih.
+    $transfer->refresh()->forceFill([
+        'status' => 'received',
+        'received_at' => '2026-01-14 09:00:00',
+    ])->save();
+    $item->forceFill(['quantity_received' => 3])->saveQuietly();
+
+    $posting->postStockTransferReceive($transfer->refresh());
+    $receiveJournal = $journals->executeReceive($transfer->refresh());
+    $shortageJournal = $journals->executeShortage($transfer->refresh());
+
+    $transferIn = StockMovement::query()
+        ->where('movement_type', 'transfer_in')
+        ->where('source_line_id', $item->id)
+        ->firstOrFail();
+
+    // transfer_in memakai biaya kirim (avg asal saat dispatch), bukan item.unit_cost = 0.
+    expect((float) $transferIn->unit_cost)->toBe((float) $dispatch->unit_cost)
+        ->and((float) $transferIn->unit_cost)->toBe(1500.0)
+        // Avg tujuan = (5 x 1000 + 3 x 1500) / 8 = 1187.5.
+        ->and((float) $transferIn->average_cost_after)->toBe(1187.5)
+        ->and((float) $transferIn->balance_after)->toBe(8.0)
+        ->and((float) issue495LastMovement($product, $destination)->average_cost_after)->toBe(1187.5);
+
+    expect((float) $receiveJournal->total_debit)->toBe(4500.0)
+        ->and((float) $shortageJournal->total_debit)->toBe(1500.0);
+
+    // Setelah receive: in-transit 0 (6000 - 4500 - 1500); GL tetap sama dengan Σ kartu.
+    $afterReceive = issue495Snapshot($product, $warehouses, $accounts['inventory']);
+    issue495AssertInvariant($before, $afterReceive, 0.0);
 });
+
+/**
+ * Akun persediaan (11300), beban selisih, dan in-transit untuk jurnal transfer.
+ *
+ * @return array{inventory: Account, shortage: Account, transit: Account}
+ */
+function makeIssue495TransferAccounts(): array
+{
+    $fiscalYear = FiscalYear::factory()->create([
+        'name' => '2026',
+        'start_date' => '2026-01-01',
+        'end_date' => '2026-12-31',
+        'status' => 'open',
+    ]);
+    $coaVersion = CoaVersion::factory()->create([
+        'status' => 'active',
+        'fiscal_year_id' => $fiscalYear->id,
+    ]);
+
+    $inventory = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '11300',
+        'name' => 'Inventory',
+        'type' => 'asset',
+        'normal_balance' => 'debit',
+        'is_active' => true,
+    ]);
+    $shortage = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '51000',
+        'name' => 'Inventory Shortage Expense',
+        'type' => 'expense',
+        'normal_balance' => 'debit',
+        'is_active' => true,
+    ]);
+    $transit = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '11310',
+        'name' => 'Persediaan dalam Perjalanan',
+        'type' => 'asset',
+        'normal_balance' => 'debit',
+        'is_active' => true,
+    ]);
+
+    Setting::set('inventory_in_transit_account_id', (string) $transit->id);
+
+    return ['inventory' => $inventory, 'shortage' => $shortage, 'transit' => $transit];
+}

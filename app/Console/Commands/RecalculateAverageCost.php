@@ -117,17 +117,58 @@ class RecalculateAverageCost extends Command
             return self::SUCCESS;
         }
 
-        DB::transaction(function () use ($changes): void {
+        DB::transaction(function () use ($changes, $stockPosting): void {
             foreach ($changes as $change) {
                 $change['movement']->forceFill([
                     'average_cost_after' => $change['average_cost_after'],
                     'unit_cost' => $change['unit_cost'],
                 ])->saveQuietly();
             }
+
+            // Issue #495: transfer_in memakai biaya kirim = unit_cost transfer_out baris yang
+            // sama (avg asal saat dispatch). Setelah transfer_out dihitung ulang, sinkronkan
+            // lalu hitung ulang scope tujuan agar avg tujuan ikut benar.
+            $this->syncTransferInCosts($stockPosting);
         });
 
         $this->info('Selesai: ' . count($changes) . ' movement diperbarui.');
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Samakan unit_cost transfer_in dengan transfer_out baris yang sama (Issue #495),
+     * lalu hitung ulang scope tujuan. Idempoten: baris yang sudah sama tidak ditulis.
+     */
+    private function syncTransferInCosts(StockPostingService $stockPosting): void
+    {
+        $scopes = [];
+
+        StockMovement::query()
+            ->where('movement_type', 'transfer_in')
+            ->whereNotNull('source_line_id')
+            ->orderBy('id')
+            ->get()
+            ->each(function (StockMovement $transferIn) use (&$scopes): void {
+                $shipmentCost = StockMovement::query()
+                    ->where('reference_type', $transferIn->reference_type)
+                    ->where('reference_id', $transferIn->reference_id)
+                    ->where('movement_type', 'transfer_out')
+                    ->where('source_line_id', $transferIn->source_line_id)
+                    ->value('unit_cost');
+
+                $gap = abs((float) $transferIn->unit_cost - (float) $shipmentCost);
+
+                if ($shipmentCost === null || $gap < self::TOLERANCE) {
+                    return;
+                }
+
+                $transferIn->forceFill(['unit_cost' => round((float) $shipmentCost, 2)])->saveQuietly();
+                $scopes[] = [(int) $transferIn->product_id, (int) $transferIn->warehouse_id];
+            });
+
+        if ($scopes !== []) {
+            $stockPosting->rebuildBalances($scopes);
+        }
     }
 }

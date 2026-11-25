@@ -292,7 +292,9 @@ class StockPostingService
                 'product_id' => (int) $item->product_id,
                 'quantity_in' => $quantity,
                 'quantity_out' => 0,
-                'unit_cost' => $item->unit_cost,
+                // Issue #495: biaya kirim = avg asal saat dispatch (transfer_out baris yang sama),
+                // bukan item.unit_cost (isian form). Data lama tanpa dispatch memakai avg asal saat itu.
+                'unit_cost' => $this->transferShipmentUnitCost($stockTransfer, $item),
                 'notes' => $stockTransfer->notes,
                 'moved_at' => ($stockTransfer->received_at ?? $stockTransfer->transfer_date)->copy()->startOfDay(),
                 'created_by' => $stockTransfer->received_by ?? Auth::id(),
@@ -451,6 +453,35 @@ class StockPostingService
             'transfer_in',
             'transfer_in_reversal',
         );
+    }
+
+    /**
+     * Biaya kirim satu baris transfer (Issue #495). Sumber utama: unit_cost movement
+     * transfer_out baris yang sama. Fallback data lama tanpa dispatch: avg gudang asal
+     * pada movement terakhir hingga tanggal transfer, bukan item.unit_cost.
+     */
+    private function transferShipmentUnitCost(StockTransfer $stockTransfer, object $item): float
+    {
+        $dispatchCost = StockMovement::query()
+            ->where('reference_type', StockTransfer::class)
+            ->where('reference_id', $stockTransfer->id)
+            ->where('movement_type', 'transfer_out')
+            ->where('source_line_id', (int) $item->id)
+            ->value('unit_cost');
+
+        if ($dispatchCost !== null) {
+            return (float) $dispatchCost;
+        }
+
+        $sourceAverage = StockMovement::query()
+            ->where('product_id', (int) $item->product_id)
+            ->where('warehouse_id', (int) $stockTransfer->from_warehouse_id)
+            ->where('moved_at', '<=', $stockTransfer->transfer_date->copy()->endOfDay())
+            ->orderByDesc('moved_at')
+            ->orderByDesc('id')
+            ->value('average_cost_after');
+
+        return (float) ($sourceAverage ?? 0);
     }
 
     /**
