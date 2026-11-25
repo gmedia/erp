@@ -221,6 +221,14 @@
         "select_all": "Select all",
         "selected": "selected"
     },
+    "file_upload": {
+        "choose": "Choose File",
+        "none": "No file chosen",
+        "remove": "Remove file",
+        "clear": "Remove",
+        "current": "Current: {name}",
+        "preview": "Preview {name}"
+    },
     "shell": {
         "filters": "Filters",
         "add": "Add",
