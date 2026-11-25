@@ -856,6 +856,31 @@ test('products and purchase orders filter placeholders keep english and are tran
         );
 });
 
+test('journal entries and stock monitor search placeholders are translated to indonesian', function () {
+    $en = localePageTranslations('en.json');
+    $id = localePageTranslations('id.json');
+
+    expect($en['journal_entries']['search_placeholder'])->toBe('Search entry...')
+        ->and($id['journal_entries']['search_placeholder'])->toBe('Cari jurnal...')
+        ->and($en['stock_monitor']['search_placeholder'])->toBe('Search product, category, warehouse, branch...')
+        ->and($id['stock_monitor']['search_placeholder'])->toBe('Cari produk, kategori, gudang, cabang...');
+});
+
+test('asset statuses have translated status labels in both locales', function () {
+    $en = json_decode(File::get(lang_path('en.json')), true, 512, JSON_THROW_ON_ERROR)['status'];
+    $id = json_decode(File::get(lang_path('id.json')), true, 512, JSON_THROW_ON_ERROR)['status'];
+
+    foreach (['active', 'disposed', 'draft', 'lost', 'maintenance'] as $status) {
+        expect($en[$status])->toBeString()->not->toBeEmpty()
+            ->and($id[$status])->toBeString()->not->toBeEmpty();
+    }
+
+    expect($en['disposed'])->toBe('Disposed')
+        ->and($id['disposed'])->toBe('Dihapus Buku')
+        ->and($en['maintenance'])->toBe('Maintenance')
+        ->and($id['maintenance'])->toBe('Perawatan');
+});
+
 test('ap aging report title uses the sidebar menu label in both locales', function () {
     foreach (['en.json', 'id.json'] as $file) {
         $menu = json_decode(File::get(lang_path($file)), true, 512, JSON_THROW_ON_ERROR)['menu'];
