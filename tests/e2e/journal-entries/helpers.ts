@@ -71,7 +71,6 @@ export async function createJournalEntry(
         const searchInput = page.getByPlaceholder('Search...');
         if (await searchInput.isVisible()) {
             await searchInput.fill(line.account);
-            await page.waitForTimeout(500);
         }
 
         const option = page

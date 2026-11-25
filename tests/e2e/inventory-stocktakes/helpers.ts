@@ -28,7 +28,6 @@ async function selectAsyncOption(
             const searchInput = page.locator('input[placeholder="Search..."]:visible').last();
             if (await searchInput.isVisible().catch(() => false)) {
                 await searchInput.fill(searchText);
-                await page.waitForTimeout(250);
             }
         }
 
@@ -44,7 +43,7 @@ async function selectAsyncOption(
             return;
         } catch (e) {
             if (attempt === 2) throw e;
-            await page.waitForTimeout(200);
+            await expect(listbox).toBeHidden({ timeout: 2000 }).catch(() => null);
         }
     }
 }
@@ -184,7 +183,7 @@ export async function createInventoryStocktake(page: Page): Promise<string> {
             );
             await itemDialog.locator('input[name="system_quantity"]').fill('10');
             await itemDialog.locator('input[name="counted_quantity"]').fill('11');
-            await page.waitForTimeout(250);
+            await expect(itemDialog.locator('input[name="counted_quantity"]')).toHaveValue('11');
         }
     }
 
@@ -222,10 +221,13 @@ export async function createInventoryStocktake(page: Page): Promise<string> {
 
         for (let confirmAttempt = 1; confirmAttempt <= 4; confirmAttempt++) {
             await searchInventoryStocktake(page, stocktakeNumber).catch(() => null);
-            if (await createdRow.isVisible().catch(() => false)) {
+            const visible = await createdRow
+                .waitFor({ state: 'visible', timeout: 3000 })
+                .then(() => true)
+                .catch(() => false);
+            if (visible) {
                 return true;
             }
-            await page.waitForTimeout(300 * confirmAttempt);
         }
 
         return false;
@@ -243,7 +245,7 @@ export async function createInventoryStocktake(page: Page): Promise<string> {
             if (attempt === 3) {
                 throw new Error('Inventory stocktake dialog closed before creation could be confirmed.');
             }
-            await page.waitForTimeout(300 * attempt);
+            await expect(dialog).toBeHidden({ timeout: 3000 }).catch(() => null);
             continue;
         }
 
