@@ -85,6 +85,39 @@ test.describe('i18n column headers (locale id)', () => {
     });
 });
 
+test.describe('i18n column headers (locale id, asset and report)', () => {
+    test('assets column headers are Indonesian', async ({ page }) => {
+        await page.addInitScript((k) => {
+            localStorage.setItem(k, 'id');
+        }, LOCALE_KEY);
+
+        await login(page);
+        await page.goto('/assets', { waitUntil: 'domcontentloaded' });
+
+        await expect(
+            page.getByRole('button', { name: 'Kode', exact: true }),
+        ).toBeVisible({ timeout: 15000 });
+        await expect(page.getByRole('button', { name: 'Nama', exact: true })).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Code', exact: true })).toHaveCount(0);
+    });
+
+    test('ap aging report column headers are Indonesian', async ({ page }) => {
+        await page.addInitScript((k) => {
+            localStorage.setItem(k, 'id');
+        }, LOCALE_KEY);
+
+        await login(page);
+        await page.goto('/reports/ap-aging', { waitUntil: 'domcontentloaded' });
+
+        const thead = page.locator('table thead').first();
+        await expect(thead).toBeVisible({ timeout: 15000 });
+        await expect(
+            thead.getByText('Belum Jatuh Tempo', { exact: true }),
+        ).toBeVisible();
+        await expect(thead.getByText('Current', { exact: true })).toHaveCount(0);
+    });
+});
+
 test.describe('i18n column headers (locale en)', () => {
     test('supplier bills (AP) column headers keep English labels', async ({
         page,
