@@ -98,6 +98,23 @@ function postedBalance(int $accountId, bool $debitNormal): float
     return $debitNormal ? $debit - $credit : $credit - $debit;
 }
 
+/**
+ * Saldo kartu stok produk+gudang setelah seluruh movement pada tanggal tersebut
+ * (balance_after movement terakhir, urutan moved_at lalu id).
+ */
+function stockCardBalanceOn(int $productId, int $warehouseId, string $date): float
+{
+    $balance = DB::table('stock_movements')
+        ->where('product_id', $productId)
+        ->where('warehouse_id', $warehouseId)
+        ->whereDate('moved_at', '<=', $date)
+        ->orderByDesc('moved_at')
+        ->orderByDesc('id')
+        ->value('balance_after');
+
+    return (float) ($balance ?? 0.0);
+}
+
 beforeEach(function () {
     seedDemoData();
 });
@@ -1675,5 +1692,156 @@ test('PR432 demo users keep their permissions after seeding over legacy employee
 
         $granted = DB::table('employee_permission')->where('employee_id', $employee->id)->count();
         expect($granted)->toBe($permissionCount, "Karyawan demo {$email} harus punya seluruh izin");
+    }
+});
+
+// #459 butir 1 — qty sistem stok opname = saldo kartu stok produk+gudang pada tanggal opname.
+invariant('W8-459 stocktake system quantity equals the stock card balance on the stocktake date', function () {
+    $items = DB::table('inventory_stocktake_items')
+        ->join(
+            'inventory_stocktakes',
+            'inventory_stocktakes.id',
+            '=',
+            'inventory_stocktake_items.inventory_stocktake_id',
+        )
+        ->get([
+            'inventory_stocktakes.stocktake_number',
+            'inventory_stocktakes.warehouse_id',
+            'inventory_stocktakes.stocktake_date',
+            'inventory_stocktake_items.product_id',
+            'inventory_stocktake_items.system_quantity',
+            'inventory_stocktake_items.counted_quantity',
+            'inventory_stocktake_items.variance',
+        ]);
+
+    expect($items)->not->toBeEmpty('Demo data must include stocktake lines');
+
+    foreach ($items as $item) {
+        $label = "Stocktake {$item->stocktake_number} product {$item->product_id}";
+        $expected = round(stockCardBalanceOn(
+            (int) $item->product_id,
+            (int) $item->warehouse_id,
+            (string) $item->stocktake_date,
+        ), 2);
+
+        expect(round((float) $item->system_quantity, 2))
+            ->toBe($expected, "{$label} system quantity must equal the stock card balance");
+
+        if ($item->counted_quantity !== null) {
+            $countedVariance = (float) $item->counted_quantity - (float) $item->system_quantity;
+
+            expect(round((float) $item->variance, 2))
+                ->toBe(round($countedVariance, 2), "{$label} variance must equal counted minus system");
+        }
+    }
+});
+
+// #459 butir 2 — stock opname completed yang berselisih punya draft SA stocktake_result terhubung.
+invariant('W8-459 completed stocktakes with variance have a linked stocktake_result adjustment', function () {
+    $completed = DB::table('inventory_stocktakes')->where('status', 'completed')->get(['id', 'stocktake_number']);
+
+    expect($completed)->not->toBeEmpty('Demo data must include a completed stocktake');
+
+    foreach ($completed as $stocktake) {
+        $hasVariance = DB::table('inventory_stocktake_items')
+            ->where('inventory_stocktake_id', $stocktake->id)
+            ->whereNotNull('variance')
+            ->where('variance', '!=', 0)
+            ->exists();
+
+        if (! $hasVariance) {
+            continue;
+        }
+
+        $adjustment = DB::table('stock_adjustments')
+            ->where('inventory_stocktake_id', $stocktake->id)
+            ->where('adjustment_type', 'stocktake_result')
+            ->first(['id', 'status']);
+
+        expect($adjustment)->not->toBeNull(
+            "Completed stocktake {$stocktake->stocktake_number} must have a stocktake_result adjustment",
+        );
+    }
+});
+
+// #459 butir 2 — SA stocktake_result: quantity_before sama dengan saldo kartu stok, dan
+// quantity_adjusted sama dengan selisih stok opname.
+invariant('W8-459 stocktake_result adjustments match the stock card and the stocktake variance', function () {
+    $adjustments = DB::table('stock_adjustments')
+        ->join('inventory_stocktakes', 'inventory_stocktakes.id', '=', 'stock_adjustments.inventory_stocktake_id')
+        ->where('stock_adjustments.adjustment_type', 'stocktake_result')
+        ->whereNotNull('stock_adjustments.inventory_stocktake_id')
+        ->get([
+            'stock_adjustments.id',
+            'stock_adjustments.adjustment_number',
+            'stock_adjustments.warehouse_id',
+            'stock_adjustments.inventory_stocktake_id',
+            'inventory_stocktakes.stocktake_date',
+        ]);
+
+    expect($adjustments)->not->toBeEmpty('Demo data must include a stocktake_result adjustment');
+
+    foreach ($adjustments as $adjustment) {
+        $items = DB::table('stock_adjustment_items')
+            ->where('stock_adjustment_id', $adjustment->id)
+            ->get(['product_id', 'quantity_before', 'quantity_adjusted']);
+
+        foreach ($items as $item) {
+            $label = "Adjustment {$adjustment->adjustment_number} product {$item->product_id}";
+
+            $line = DB::table('inventory_stocktake_items')
+                ->where('inventory_stocktake_id', $adjustment->inventory_stocktake_id)
+                ->where('product_id', $item->product_id)
+                ->first(['system_quantity', 'variance']);
+
+            expect($line)->not->toBeNull("{$label} must come from a stocktake line");
+            expect(round((float) $item->quantity_adjusted, 2))
+                ->toBe(round((float) $line->variance, 2), "{$label} adjusted quantity must equal stocktake variance");
+            expect(round((float) $item->quantity_before, 2))->toBe(
+                round((float) $line->system_quantity, 2),
+                "{$label} quantity before must equal stocktake system quantity",
+            );
+
+            $cardBalance = stockCardBalanceOn(
+                (int) $item->product_id,
+                (int) $adjustment->warehouse_id,
+                (string) $adjustment->stocktake_date,
+            );
+
+            expect(round((float) $item->quantity_before, 2))->toBe(
+                round($cardBalance, 2),
+                "{$label} quantity before must equal the stock card balance on the stocktake date",
+            );
+        }
+    }
+});
+
+// #459 butir 3 — transfer_in memakai quantity_received (bukan quantity kirim).
+invariant('W8-459 partially received transfers post transfer_in equal to quantity received', function () {
+    $partial = DB::table('stock_transfer_items')
+        ->join('stock_transfers', 'stock_transfers.id', '=', 'stock_transfer_items.stock_transfer_id')
+        ->where('stock_transfers.status', 'received')
+        ->whereColumn('stock_transfer_items.quantity_received', '<', 'stock_transfer_items.quantity')
+        ->get([
+            'stock_transfer_items.stock_transfer_id',
+            'stock_transfer_items.product_id',
+            'stock_transfers.transfer_number',
+            'stock_transfer_items.quantity_received',
+        ]);
+
+    expect($partial)->not->toBeEmpty('Demo data must include a partially received transfer');
+
+    foreach ($partial as $line) {
+        $in = (float) DB::table('stock_movements')
+            ->where('reference_type', StockTransfer::class)
+            ->where('reference_id', $line->stock_transfer_id)
+            ->where('product_id', $line->product_id)
+            ->where('movement_type', 'transfer_in')
+            ->sum('quantity_in');
+
+        expect(round($in, 2))->toBe(
+            round((float) $line->quantity_received, 2),
+            "Transfer {$line->transfer_number} transfer_in must equal quantity received",
+        );
     }
 });
