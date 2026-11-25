@@ -3,6 +3,7 @@
 namespace App\Actions\StockMonitor;
 
 use App\Actions\Concerns\InteractsWithExportableQuery;
+use App\Actions\Concerns\InteractsWithInTransitBalance;
 use App\Actions\Concerns\InteractsWithStockSnapshotQuery;
 use App\Http\Requests\StockMonitor\IndexStockMonitorRequest;
 use App\Models\StockMovement;
@@ -11,6 +12,7 @@ use Illuminate\Support\Collection;
 class IndexStockMonitorAction
 {
     use InteractsWithExportableQuery;
+    use InteractsWithInTransitBalance;
     use InteractsWithStockSnapshotQuery;
 
     public function execute(IndexStockMonitorRequest $request): array
@@ -42,6 +44,7 @@ class IndexStockMonitorAction
                 'by_warehouse' => $this->buildWarehouseSummary($summaryRows),
                 'by_category' => $this->buildCategorySummary($summaryRows),
                 'by_branch' => $this->buildBranchSummary($summaryRows),
+                'in_transit' => $this->buildInTransitSummary($request),
             ],
         ];
     }

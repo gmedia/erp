@@ -17,7 +17,9 @@ class InventoryValuationReportController extends Controller
     ): InventoryValuationReportCollection {
         $valuations = $action->execute($request);
 
-        return new InventoryValuationReportCollection($valuations);
+        return new InventoryValuationReportCollection($valuations, [
+            'in_transit' => $action->inTransitSummary($request),
+        ]);
     }
 
     public function export(
