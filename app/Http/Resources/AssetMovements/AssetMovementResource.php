@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\AssetMovements;
 
+use App\Models\Asset;
 use App\Models\AssetMovement;
 use App\Models\JournalEntry;
 use App\Support\ExportStorage;
@@ -69,11 +70,17 @@ class AssetMovementResource extends JsonResource
      */
     private function disposalJournalId(): ?int
     {
-        if ($this->movement_type !== 'dispose' || ! $this->relationLoaded('asset') || $this->asset === null) {
+        if ($this->movement_type !== 'dispose' || ! $this->relationLoaded('asset')) {
             return null;
         }
 
-        $assetCode = $this->asset->asset_code;
+        $asset = $this->getRelation('asset');
+
+        if (! $asset instanceof Asset) {
+            return null;
+        }
+
+        $assetCode = $asset->asset_code;
 
         return JournalEntry::query()
             ->where('journal_type', 'system')
