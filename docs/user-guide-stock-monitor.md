@@ -40,7 +40,15 @@ Menampilkan jumlah total kuantitas seluruh produk di seluruh gudang. Angka ini m
 
 ### 1.3 Total Stock Value
 
-Menampilkan total nilai stok (quantity x average cost) dari seluruh produk di seluruh gudang. Nilai ini dihitung berdasarkan average cost per produk.
+Menampilkan total nilai stok (quantity x average cost) dari seluruh produk di seluruh gudang. Nilai ini dihitung berdasarkan average cost per produk dan per gudang (metode rata-rata tertimbang bergerak, lihat bagian metode biaya di bawah).
+
+### Metode Biaya Persediaan
+
+- Average cost dihitung per produk per gudang sebagai rata-rata tertimbang bergerak.
+- Setiap barang masuk (goods receipt, penyesuaian masuk, transfer masuk, retur, saldo awal) menghitung ulang average cost dari qty dan biaya masuk.
+- Setiap barang keluar dinilai dengan average cost yang berjalan saat itu. Average cost tidak berubah karena barang keluar.
+- Kolom Avg Cost, Stock Value, dan laporan valuasi memakai average cost terakhir, bukan harga master produk.
+- Barang dalam perjalanan (transfer In Transit) ditampilkan terpisah dan belum termasuk saldo stok gudang tujuan.
 
 [Screenshot: Kartu Total Stock Value dengan angka contoh]
 
