@@ -14,7 +14,7 @@ function columnIndexOf(head: Locator) {
     );
 }
 
-// Tepi kanan tombol sort di header harus sejajar dengan tepi kanan sel angka.
+// Tepi kanan tombol header dibandingkan dengan teks nilai, bukan tepi sel.
 async function expectNumericHeaderRightAligned(
     page: Page,
     label: string,
@@ -22,16 +22,16 @@ async function expectNumericHeaderRightAligned(
     const head = page.locator('th', { hasText: label }).first();
     await expect(head).toBeVisible();
     const index = await columnIndexOf(head);
-    const valueCell = page
-        .locator(`tbody tr:first-child td:nth-child(${index})`)
+    const valueText = page
+        .locator(`tbody tr:first-child td:nth-child(${index}) > div`)
         .first();
-    await expect(valueCell).toBeVisible();
+    await expect(valueText).toBeVisible();
 
     const headRight = await head
         .locator('button')
         .first()
         .evaluate((el) => el.getBoundingClientRect().right);
-    const valueRight = await valueCell.evaluate(
+    const valueRight = await valueText.evaluate(
         (el) => el.getBoundingClientRect().right,
     );
     expect(Math.abs(headRight - valueRight)).toBeLessThanOrEqual(4);

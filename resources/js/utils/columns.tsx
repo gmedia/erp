@@ -105,7 +105,7 @@ export function createSortingHeader(
                     variant="ghost"
                     className={cn(
                         '-ml-2 h-8 px-2',
-                        isRight && 'mr-0 ml-auto max-w-full',
+                        isRight && 'mr-2 ml-auto max-w-full pr-0',
                     )}
                     onClick={() =>
                         column.toggleSorting(column.getIsSorted() === 'asc')
