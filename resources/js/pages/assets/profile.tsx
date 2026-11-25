@@ -687,6 +687,9 @@ export default function AssetProfile() {
                                                                             href="/journal-entries"
                                                                             className="ml-2 text-primary underline"
                                                                             data-testid="disposal-journal-link"
+                                                                            data-journal-id={
+                                                                                m.disposal_journal_id
+                                                                            }
                                                                         >
                                                                             {t(
                                                                                 'assets.disposal.viewJournal',

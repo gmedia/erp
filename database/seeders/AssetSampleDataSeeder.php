@@ -528,7 +528,9 @@ class AssetSampleDataSeeder extends Seeder
             $pipelineStateCode = $data['pipeline_state'];
             $approvalFlowCode = $data['approval_flow_code'] ?? null;
             $approvalStatus = $data['approval_status'] ?? null;
-            $isDisposal = $data['is_disposal'] ?? false;
+            // Aset disposed wajib punya movement dispose (jalur resmi pelepasan,
+            // sumber jurnal pelepasan dan tautan di profil aset).
+            $isDisposal = $data['is_disposal'] ?? ($data['status'] === 'disposed');
 
             unset($data['pipeline_state']);
             unset($data['approval_flow_code']);

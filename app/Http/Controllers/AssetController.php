@@ -110,6 +110,7 @@ class AssetController extends Controller
             'department',
             'employee',
             'supplier',
+            'movements.asset',
             'movements.fromBranch',
             'movements.toBranch',
             'movements.fromLocation',

@@ -36,3 +36,46 @@ test('pelepasan tanpa hasil penjualan tidak menampilkan akun penerimaan dan ters
     await dialog.getByRole('button', { name: /Record Movement/i }).click();
     expect((await disposeResponse).status()).toBeLessThan(400);
 });
+
+test('profil aset disposed menampilkan hasil penjualan kosong dan tautan jurnal pelepasan', async ({
+    page,
+}) => {
+    await page.goto('/assets');
+    const adminToken = await page.evaluate(() =>
+        localStorage.getItem('api_token'),
+    );
+    expect(adminToken, 'api_token harus ada di localStorage').toBeTruthy();
+
+    const listResponse = await page.request.get(
+        '/api/assets?search=FA-000007',
+        {
+            headers: {
+                Accept: 'application/json',
+                Authorization: `Bearer ${adminToken}`,
+            },
+        },
+    );
+    expect(listResponse.status()).toBeLessThan(400);
+    const list = (await listResponse.json()) as {
+        data: { ulid: string; asset_code: string }[];
+    };
+    const asset = list.data.find((a) => a.asset_code === 'FA-000007');
+    expect(asset, 'aset FA-000007 hasil seed harus ada').toBeTruthy();
+
+    const profileResponse = page.waitForResponse(
+        (response) =>
+            response.url().includes(`/api/assets/${asset!.ulid}/profile`) &&
+            response.request().method() === 'GET',
+    );
+    await page.goto(`/assets/${asset!.ulid}`);
+    expect((await profileResponse).status()).toBeLessThan(400);
+
+    await page.getByRole('tab', { name: /Movements/ }).click();
+    await expect(page.getByText('No sale proceeds').first()).toBeVisible();
+    await expect(
+        page.getByTestId('disposal-journal-link').first(),
+    ).toBeVisible();
+    await expect(page.getByTestId('disposal-journal-link').first()).toHaveText(
+        /View disposal journal/i,
+    );
+});
