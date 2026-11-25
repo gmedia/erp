@@ -103,7 +103,10 @@ export function createSortingHeader(
             <div className={cn(isRight && 'flex justify-end')}>
                 <Button
                     variant="ghost"
-                    className={cn('-ml-2 h-8 px-2', isRight && '-mr-2 ml-0')}
+                    className={cn(
+                        '-ml-2 h-8 px-2',
+                        isRight && 'mr-0 ml-auto max-w-full',
+                    )}
                     onClick={() =>
                         column.toggleSorting(column.getIsSorted() === 'asc')
                     }
