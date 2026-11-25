@@ -15,8 +15,20 @@ import {
     formatNumberByRegionalSettings,
 } from '@/utils/number-format';
 import { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import type { ReactNode } from 'react';
+
+function SortDirectionIcon({ sorted }: { sorted: 'asc' | 'desc' | false }) {
+    if (sorted === 'asc') {
+        return <ArrowUp className="ml-2 h-4 w-4 shrink-0 text-foreground" />;
+    }
+    if (sorted === 'desc') {
+        return <ArrowDown className="ml-2 h-4 w-4 shrink-0 text-foreground" />;
+    }
+    return (
+        <ArrowUpDown className="ml-2 h-4 w-4 shrink-0 text-muted-foreground" />
+    );
+}
 
 // Type definitions for better type safety
 export type ColumnBuilderOptions<T = Record<string, unknown>> = {
@@ -98,7 +110,7 @@ export function createSortingHeader(
                     data-testid={`sort-${label.toLowerCase().replaceAll(/\s+/g, '-')}`}
                 >
                     {label}
-                    <ArrowUpDown className="ml-2 h-4 w-4 shrink-0" />
+                    <SortDirectionIcon sorted={column.getIsSorted()} />
                 </Button>
             </div>
         ),
