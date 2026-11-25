@@ -34,7 +34,7 @@ test('purchase orders and products page strings keep the english labels', functi
             'Orders sent to suppliers with receipt and billing progress.',
         )
         ->and($en['purchase_orders']['search_placeholder'])->toBe('Search purchase orders...')
-        ->and($en['products']['title'])->toBe('Product')
+        ->and($en['products']['title'])->toBe('Products')
         ->and($en['products']['description'])->toBe(
             'Products, materials, and services with pricing and stock settings.',
         )
@@ -87,9 +87,9 @@ test('journal entries and stock monitor page strings are translated to indonesia
 test('assets and employees page strings keep the english labels', function () {
     $en = localePageTranslations('en.json');
 
-    expect($en['assets']['title'])->toBe('Asset Data')
+    expect($en['assets']['title'])->toBe('Assets')
         ->and($en['assets']['description'])->toBe('Fixed asset register with cost, depreciation, and assignment.')
-        ->and($en['employees']['title'])->toBe('Employee')
+        ->and($en['employees']['title'])->toBe('Employees')
         ->and($en['employees']['description'])->toBe(
             'Staff records with employment, department, and position history.',
         );
@@ -109,20 +109,21 @@ test('assets and employees page strings are translated to indonesian', function 
         ->and($id['employees']['title'])->toBe('Karyawan');
 });
 
-test('assets and employees page titles match the sidebar menu labels', function () {
-    foreach (['en.json', 'id.json'] as $file) {
-        $menu = json_decode(File::get(lang_path($file)), true, 512, JSON_THROW_ON_ERROR)['menu'];
-        $page = localePageTranslations($file);
+test('assets and employees page titles are explicit exceptions to the menu labels', function () {
+    // Aturan (issue #462 <!-- decision --> terbaru): judul English dikunci ke nilai main,
+    // bukan menu.*. Keduanya pengecualian eksplisit (judul English berbeda dengan menu).
+    $en = json_decode(File::get(lang_path('en.json')), true, 512, JSON_THROW_ON_ERROR);
 
-        expect($page['assets']['title'])->toBe($menu['asset_data'])
-            ->and($page['employees']['title'])->toBe($menu['employee']);
-    }
+    expect($en['page']['assets']['title'])->toBe('Assets')
+        ->and($en['menu']['asset_data'])->toBe('Asset Data')
+        ->and($en['page']['employees']['title'])->toBe('Employees')
+        ->and($en['menu']['employee'])->toBe('Employee');
 });
 
 test('inventory and purchasing page strings keep the english labels', function () {
     $en = localePageTranslations('en.json');
 
-    expect($en['warehouses']['title'])->toBe('Warehouse')
+    expect($en['warehouses']['title'])->toBe('Warehouses')
         ->and($en['warehouses']['description'])->toBe('Storage locations that hold product stock.')
         ->and($en['stock_transfers']['title'])->toBe('Stock Transfers')
         ->and($en['stock_transfers']['description'])->toBe(
@@ -180,7 +181,6 @@ test('inventory and purchasing page strings are translated to indonesian', funct
 
 test('inventory and purchasing page titles match the sidebar menu labels', function () {
     $pairs = [
-        'warehouses' => 'warehouse',
         'stock_transfers' => 'stock_transfer',
         'stock_adjustments' => 'stock_adjustment',
         'inventory_stocktakes' => 'inventory_stocktake',
@@ -188,7 +188,6 @@ test('inventory and purchasing page titles match the sidebar menu labels', funct
         'purchase_requests' => 'purchase_request',
         'goods_receipts' => 'goods_receipt',
         'supplier_returns' => 'supplier_return',
-        'products' => 'product',
         'purchase_orders' => 'purchase_order',
         'stock_monitor' => 'stock_monitor',
     ];
@@ -201,6 +200,17 @@ test('inventory and purchasing page titles match the sidebar menu labels', funct
             expect($page[$pageKey]['title'])->toBe($menu[$menuKey], "page.{$pageKey}.title != menu.{$menuKey}");
         }
     }
+});
+
+test('warehouses and products page titles are explicit exceptions to the menu labels', function () {
+    // Aturan (issue #462 <!-- decision --> terbaru): judul English dikunci ke nilai main (plural),
+    // bukan menu.* (singular). Pengecualian eksplisit, tidak dilonggarkan.
+    $en = json_decode(File::get(lang_path('en.json')), true, 512, JSON_THROW_ON_ERROR);
+
+    expect($en['page']['warehouses']['title'])->toBe('Warehouses')
+        ->and($en['menu']['warehouse'])->toBe('Warehouse')
+        ->and($en['page']['products']['title'])->toBe('Products')
+        ->and($en['menu']['product'])->toBe('Product');
 });
 
 test('asset column labels keep english text and are translated to indonesian', function () {
@@ -277,8 +287,6 @@ test('accounting and ap/ar page titles match the sidebar menu labels', function 
     $pairs = [
         'accounts' => 'chart_of_accounts',
         'posting_journals' => 'posting_journal',
-        'fiscal_years' => 'fiscal_year',
-        'coa_versions' => 'coa_version',
         'account_mappings' => 'account_mapping',
         'budgets' => 'budget',
         'bank_reconciliations' => 'bank_reconciliation',
@@ -950,4 +958,47 @@ test('breadcrumb titles that match page titles reuse the page translation keys',
         ->and($en['asset_maintenances']['title'])->toBe('Asset Maintenances')
         ->and($en['approval_delegations']['title'])->toBe('Approval Delegations')
         ->and($id['customers']['title'])->toBe('Pelanggan');
+});
+
+test('six redesigned page titles keep the english text of main and are menu-label exceptions', function () {
+    // Judul English dikunci ke teks main (plural). Daftar eksplisit: hanya halaman yang
+    // diubah PR #487 ini. Judul berbeda dengan menu.* (singular), jadi tetap page.<slug>.title.
+    $expected = [
+        'warehouses' => ['title' => 'Warehouses', 'menu' => 'warehouse'],
+        'employees' => ['title' => 'Employees', 'menu' => 'employee'],
+        'products' => ['title' => 'Products', 'menu' => 'product'],
+        'fiscal_years' => ['title' => 'Fiscal Years', 'menu' => 'fiscal_year'],
+        'coa_versions' => ['title' => 'COA Versions', 'menu' => 'coa_version'],
+        'assets' => ['title' => 'Assets', 'menu' => 'asset_data'],
+    ];
+
+    $en = json_decode(File::get(lang_path('en.json')), true, 512, JSON_THROW_ON_ERROR);
+    $id = json_decode(File::get(lang_path('id.json')), true, 512, JSON_THROW_ON_ERROR);
+
+    foreach ($expected as $pageKey => $spec) {
+        expect($en['page'][$pageKey]['title'])->toBe($spec['title'], "en page.{$pageKey}.title drifted from main");
+        expect($en['menu'][$spec['menu']])->not->toBe($spec['title'], "menu.{$spec['menu']} now equals page title; drop exception");
+        expect($id['page'][$pageKey]['title'])->not->toBe($spec['title'], "page.{$pageKey}.title not translated");
+    }
+});
+
+test('six redesigned page breadcrumbs use the english page title of main', function () {
+    // Breadcrumb English keenam halaman harus sama dengan judul English main.
+    $configs = File::get(resource_path('js/utils/entityConfigs.ts'));
+
+    $breadcrumbs = [
+        'Warehouses' => 'page.warehouses.title',
+        'Employees' => 'page.employees.title',
+        'Products' => 'page.products.title',
+        'Fiscal Years' => 'page.fiscal_years.title',
+        'COA Versions' => 'page.coa_versions.title',
+        'Assets' => 'page.assets.title',
+    ];
+
+    foreach ($breadcrumbs as $title => $key) {
+        expect(preg_match("/title: '{$title}',\\s*titleKey: '{$key}',/", $configs))->toBe(
+            1,
+            "breadcrumb {$title} must use {$key}",
+        );
+    }
 });

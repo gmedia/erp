@@ -933,7 +933,7 @@
             "filter_search_placeholder": "Search PO number, payment terms, notes, or shipping address..."
         },
         "products": {
-            "title": "Product",
+            "title": "Products",
             "description": "Products, materials, and services with pricing and stock settings.",
             "search_placeholder": "Search products...",
             "filter_search_placeholder": "Search code, name..."
@@ -949,7 +949,7 @@
             "search_placeholder": "Search product, category, warehouse, branch..."
         },
         "assets": {
-            "title": "Asset Data",
+            "title": "Assets",
             "description": "Fixed asset register with cost, depreciation, and assignment.",
             "search_placeholder": "Search asset code, name, serial number..."
         },
@@ -977,12 +977,12 @@
             "description": "At-a-glance entity counts, operational shortcuts, and master-data mix. Financial KPIs stay on Financial Dashboard."
         },
         "employees": {
-            "title": "Employee",
+            "title": "Employees",
             "description": "Staff records with employment, department, and position history.",
             "search_placeholder": "Search employee..."
         },
         "warehouses": {
-            "title": "Warehouse",
+            "title": "Warehouses",
             "description": "Storage locations that hold product stock."
         },
         "stock_transfers": {
@@ -1022,11 +1022,11 @@
             "description": "Review draft journal entries and post them to the general ledger."
         },
         "fiscal_years": {
-            "title": "Fiscal Year",
+            "title": "Fiscal Years",
             "description": "Accounting periods that scope journals and financial reports."
         },
         "coa_versions": {
-            "title": "COA Version",
+            "title": "COA Versions",
             "description": "Chart of accounts versions per fiscal year."
         },
         "account_mappings": {

@@ -173,7 +173,7 @@ test.describe('i18n page titles (locale en)', () => {
         await expect(
             page.getByRole('heading', {
                 level: 1,
-                name: 'Product',
+                name: 'Products',
                 exact: true,
             }),
         ).toBeVisible({ timeout: 15000 });

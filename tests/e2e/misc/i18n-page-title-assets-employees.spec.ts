@@ -104,7 +104,7 @@ test.describe('i18n page titles (locale en) assets and employees', () => {
         await page.goto('/assets', { waitUntil: 'domcontentloaded' });
 
         await expect(
-            page.getByRole('heading', { level: 1, name: 'Asset Data' }),
+            page.getByRole('heading', { level: 1, name: 'Assets' }),
         ).toBeVisible({ timeout: 15000 });
         await expect(
             page.getByRole('heading', { level: 1, name: 'Data Aset' }),
@@ -120,7 +120,7 @@ test.describe('i18n page titles (locale en) assets and employees', () => {
         await page.goto('/employees', { waitUntil: 'domcontentloaded' });
 
         await expect(
-            page.getByRole('heading', { level: 1, name: 'Employee' }),
+            page.getByRole('heading', { level: 1, name: 'Employees' }),
         ).toBeVisible({ timeout: 15000 });
         await expect(
             page.getByRole('heading', { level: 1, name: 'Karyawan' }),

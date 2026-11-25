@@ -346,7 +346,7 @@ export const warehouseConfig = createComplexEntityConfig<Warehouse>({
     breadcrumbs: [
         {
             title: 'Warehouses',
-            titleKey: 'menu.warehouse',
+            titleKey: 'page.warehouses.title',
             href: '/warehouses',
         },
     ],
@@ -375,8 +375,8 @@ export const employeeConfig = createComplexEntityConfig({
     queryKey: ['employees'],
     breadcrumbs: [
         {
-            title: 'Employee',
-            titleKey: 'menu.employee',
+            title: 'Employees',
+            titleKey: 'page.employees.title',
             href: '/employees',
         },
     ],
@@ -853,12 +853,12 @@ export const productConfig = createComplexEntityConfig({
     apiEndpoint: '/api/products',
     exportEndpoint: '/api/products/export',
     queryKey: ['products'],
-    titleKey: 'menu.product',
+    titleKey: 'page.products.title',
     descriptionKey: 'page.products.description',
     breadcrumbs: [
         {
-            title: 'Product',
-            titleKey: 'menu.product',
+            title: 'Products',
+            titleKey: 'page.products.title',
             href: '/products',
         },
     ],
@@ -895,12 +895,12 @@ export const fiscalYearConfig = createComplexEntityConfig<FiscalYear>({
     permissionPrefix: 'fiscal_year',
     exportEndpoint: '/api/fiscal-years/export',
     queryKey: ['fiscal-years'],
-    titleKey: 'menu.fiscal_year',
+    titleKey: 'page.fiscal_years.title',
     descriptionKey: 'page.fiscal_years.description',
     breadcrumbs: [
         {
             title: 'Fiscal Years',
-            titleKey: 'menu.fiscal_year',
+            titleKey: 'page.fiscal_years.title',
             href: '/fiscal-years',
         },
     ],
@@ -928,12 +928,12 @@ export const coaVersionConfig = createComplexEntityConfig<CoaVersion>({
     permissionPrefix: 'coa_version',
     exportEndpoint: '/api/coa-versions/export',
     queryKey: ['coa-versions'],
-    titleKey: 'menu.coa_version',
+    titleKey: 'page.coa_versions.title',
     descriptionKey: 'page.coa_versions.description',
     breadcrumbs: [
         {
             title: 'COA Versions',
-            titleKey: 'menu.coa_version',
+            titleKey: 'page.coa_versions.title',
             href: '/coa-versions',
         },
     ],
@@ -1108,8 +1108,8 @@ export const assetConfig = createComplexEntityConfig<Asset>({
     identifierKey: 'ulid',
     breadcrumbs: [
         {
-            title: 'Asset Data',
-            titleKey: 'menu.asset_data',
+            title: 'Assets',
+            titleKey: 'page.assets.title',
             href: '/assets',
         },
     ],
