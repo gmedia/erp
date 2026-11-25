@@ -580,6 +580,16 @@
         "warehouse": "Warehouse",
         "master.data": "Master Data"
     },
+    "column": {
+        "po_number": "PO Number",
+        "supplier": "Supplier",
+        "warehouse": "Warehouse",
+        "order_date": "Order Date",
+        "expected_delivery": "Expected Delivery",
+        "currency": "Currency",
+        "status": "Status",
+        "grand_total": "Grand Total"
+    },
     "status": {
         "draft": "Draft",
         "pending": "Pending",
