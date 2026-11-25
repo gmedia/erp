@@ -94,11 +94,28 @@ export function SummaryCell({
     secondary: DisplayValue;
 }>) {
     return (
-        <div className="space-y-0.5">
-            <div className="font-medium">{resolveDisplayValue(primary)}</div>
-            <div className="text-xs text-muted-foreground">
-                {resolveDisplayValue(secondary)}
-            </div>
+        <div className="max-w-[16rem] space-y-0.5">
+            <TruncatedText className="font-medium" value={primary} />
+            <TruncatedText
+                className="text-xs text-muted-foreground"
+                value={secondary}
+            />
+        </div>
+    );
+}
+
+function TruncatedText({
+    value,
+    className,
+}: Readonly<{
+    value: DisplayValue;
+    className?: string;
+}>) {
+    const display = resolveDisplayValue(value);
+    const title = typeof display === 'string' ? display : undefined;
+    return (
+        <div className={cn('truncate', className)} title={title}>
+            {display}
         </div>
     );
 }
@@ -110,7 +127,12 @@ export function TextCell({
     value: DisplayValue;
     className?: string;
 }>) {
-    return <div className={className}>{resolveDisplayValue(value)}</div>;
+    return (
+        <TruncatedText
+            className={cn('max-w-[12rem]', className)}
+            value={value}
+        />
+    );
 }
 
 export function WarehouseSummaryCell({
@@ -184,12 +206,13 @@ function createReportDisplayColumn<TData>({
             id: columnId,
             accessorKey,
             cell,
+            meta: align === 'right' ? { numeric: true } : undefined,
             ...(align === 'right'
                 ? {
                       header: (
                           context: Parameters<typeof sortingHeader.header>[0],
                       ) => (
-                          <div className="flex justify-end">
+                          <div className="flex justify-end [&_button]:mr-0 [&_button]:ml-auto">
                               {sortingHeader.header(context)}
                           </div>
                       ),
@@ -199,21 +222,31 @@ function createReportDisplayColumn<TData>({
     }
 
     const plainHeader = () => <LabelText label={header} />;
+    const alignedHeader =
+        align === 'right'
+            ? () => (
+                  <div className="text-right">
+                      <LabelText label={header} />
+                  </div>
+              )
+            : plainHeader;
 
     if (accessorKey) {
         return {
             id: columnId,
             accessorKey,
             enableSorting: false,
-            header: plainHeader,
+            meta: align === 'right' ? { numeric: true } : undefined,
+            header: alignedHeader,
             cell,
         };
     }
 
     return {
         id: columnId,
+        meta: align === 'right' ? { numeric: true } : undefined,
         enableSorting: false,
-        header: plainHeader,
+        header: alignedHeader,
         cell,
     };
 }

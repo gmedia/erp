@@ -39,7 +39,6 @@ export default function PurchaseHistoryReportPage() {
                 purchase_order_expected_delivery_date: false,
                 receipt_count: false,
                 goods_receipt_last_receipt_date: false,
-                total_purchase_value: false,
             }}
             summaryColumns={[
                 { key: 'ordered_quantity', label: 'Ordered Qty' },
