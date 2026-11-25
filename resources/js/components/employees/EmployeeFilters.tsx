@@ -13,7 +13,10 @@ export function createEmployeeFilterFields(): FieldDescriptor[] {
         createTextFilterField(
             'search',
             { key: 'column.search', fallback: 'Search' },
-            'Search employees...',
+            {
+                key: 'page.employees.search_placeholder',
+                fallback: 'Search employee...',
+            },
         ),
         ...createEmployeeOrganizationFilterFields(),
         createEmploymentStatusFilterField(),

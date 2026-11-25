@@ -24,6 +24,9 @@ test.describe('i18n page titles (locale id) assets and employees', () => {
         await expect(
             page.getByRole('heading', { level: 1, name: 'Asset Data' }),
         ).toHaveCount(0);
+        await expect(
+            page.getByPlaceholder('Cari kode aset, nama, nomor seri...'),
+        ).toBeVisible();
     });
 
     test('employees page title is Indonesian', async ({ page }) => {

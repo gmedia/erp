@@ -832,6 +832,34 @@ test('approval and pipeline group page titles follow the menu-or-exception decis
     }
 });
 
+test('assets and employees search placeholders keep english and are translated to indonesian', function () {
+    $en = localePageTranslations('en.json');
+    $id = localePageTranslations('id.json');
+
+    expect($en['assets']['search_placeholder'])->toBe('Search asset code, name, serial number...')
+        ->and($en['employees']['search_placeholder'])->toBe('Search employee...')
+        ->and($id['assets']['search_placeholder'])->toBe('Cari kode aset, nama, nomor seri...')
+        ->and($id['employees']['search_placeholder'])->toBe('Cari karyawan...');
+});
+
+test('ap aging report title uses the sidebar menu label in both locales', function () {
+    foreach (['en.json', 'id.json'] as $file) {
+        $menu = json_decode(File::get(lang_path($file)), true, 512, JSON_THROW_ON_ERROR)['menu'];
+
+        expect($menu['ap_aging_report'])->not->toBeEmpty();
+    }
+
+    $en = json_decode(File::get(lang_path('en.json')), true, 512, JSON_THROW_ON_ERROR);
+    $id = json_decode(File::get(lang_path('id.json')), true, 512, JSON_THROW_ON_ERROR);
+
+    expect($en['menu']['ap_aging_report'])->toBe('AP Aging Report')
+        ->and($id['menu']['ap_aging_report'])->toBe('Laporan Umur Hutang')
+        ->and($en['page']['ap_aging']['description'])->toBe(
+            'Payables grouped by age bucket to show overdue supplier balances.',
+        )
+        ->and($id['page']['ap_aging']['description'])->not->toBe($en['page']['ap_aging']['description']);
+});
+
 test('page translation values are non-empty strings', function () {
     foreach (['en.json', 'id.json'] as $file) {
         foreach (localePageTranslations($file) as $module => $strings) {
