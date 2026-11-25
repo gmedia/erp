@@ -144,8 +144,7 @@ function TableHead({
     <th
       data-slot="table-head"
       className={cn(
-        "text-foreground min-h-10 px-2 text-left align-middle font-medium whitespace-normal line-clamp-2",
-        "[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+        "text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
         className
       )}
       {...props}

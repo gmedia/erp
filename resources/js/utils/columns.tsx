@@ -118,7 +118,9 @@ export function createSortingHeader(
                     }
                     data-testid={`sort-${testIdSource.toLowerCase().replaceAll(/\s+/g, '-')}`}
                 >
-                    <LabelText label={label} />
+                    <span className="line-clamp-2 max-w-full min-w-0 text-left whitespace-normal">
+                        <LabelText label={label} />
+                    </span>
                     <SortDirectionIcon sorted={column.getIsSorted()} />
                 </Button>
             </div>
