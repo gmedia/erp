@@ -73,6 +73,16 @@ test('purchase request and goods receipt form labels keep the english text', fun
         ->and($en['goods_receipts']['item_qty_rejected'])->toBe('Qty Rejected');
 });
 
+test('purchase request and goods receipt form field keys are complete in both locales', function () {
+    $en = localeFormFieldTranslations('en.json');
+    $id = localeFormFieldTranslations('id.json');
+
+    expect(array_keys($en['purchase_requests']))->toHaveCount(38)
+        ->and(array_keys($en['goods_receipts']))->toHaveCount(27)
+        ->and(array_keys($id['purchase_requests']))->toEqual(array_keys($en['purchase_requests']))
+        ->and(array_keys($id['goods_receipts']))->toEqual(array_keys($en['goods_receipts']));
+});
+
 test('purchase request and goods receipt form labels are translated to indonesian', function () {
     $en = localeFormFieldTranslations('en.json');
     $id = localeFormFieldTranslations('id.json');
