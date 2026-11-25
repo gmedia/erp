@@ -33,54 +33,60 @@ export interface AssetStocktakeVarianceItem {
 export const varianceColumns: ColumnDef<AssetStocktakeVarianceItem>[] = [
     createReportTextColumn<AssetStocktakeVarianceItem>({
         accessorKey: 'stocktake_reference',
-        header: 'Stocktake Ref',
+        header: { key: 'column.stocktake_ref', fallback: 'Stocktake Ref' },
         getValue: (item) => item.stocktake_reference,
         className: 'font-medium',
         sortable: true,
     }),
     createReportTextColumn<AssetStocktakeVarianceItem>({
         accessorKey: 'asset_code',
-        header: 'Asset Code',
+        header: { key: 'column.asset_code', fallback: 'Asset Code' },
         getValue: (item) => item.asset_code,
         sortable: true,
     }),
     createReportTextColumn<AssetStocktakeVarianceItem>({
         accessorKey: 'asset_name',
-        header: 'Asset Name',
+        header: { key: 'column.asset_name', fallback: 'Asset Name' },
         getValue: (item) => item.asset_name,
         sortable: true,
     }),
     createReportTextColumn<AssetStocktakeVarianceItem>({
         id: 'expected_branch',
         accessorKey: 'expected_branch_name',
-        header: 'Expected Branch',
+        header: {
+            key: 'column.expected_branch',
+            fallback: 'Expected Branch',
+        },
         getValue: (item) => item.expected_branch_name,
         sortable: true,
     }),
     createReportTextColumn<AssetStocktakeVarianceItem>({
         id: 'expected_location',
         accessorKey: 'expected_location_name',
-        header: 'Expected Location',
+        header: {
+            key: 'column.expected_location',
+            fallback: 'Expected Location',
+        },
         getValue: (item) => item.expected_location_name,
         sortable: true,
     }),
     createReportTextColumn<AssetStocktakeVarianceItem>({
         id: 'found_branch',
         accessorKey: 'found_branch_name',
-        header: 'Found Branch',
+        header: { key: 'column.found_branch', fallback: 'Found Branch' },
         getValue: (item) => item.found_branch_name,
         sortable: true,
     }),
     createReportTextColumn<AssetStocktakeVarianceItem>({
         id: 'found_location',
         accessorKey: 'found_location_name',
-        header: 'Found Location',
+        header: { key: 'column.found_location', fallback: 'Found Location' },
         getValue: (item) => item.found_location_name,
         sortable: true,
     }),
     {
         accessorKey: 'result',
-        ...createSortingHeader('Result'),
+        ...createSortingHeader({ key: 'column.result', fallback: 'Result' }),
         cell: ({ row }) => {
             const val = row.getValue('result') as string;
             if (!val) return '-';
@@ -93,18 +99,18 @@ export const varianceColumns: ColumnDef<AssetStocktakeVarianceItem>[] = [
     },
     createReportTextColumn<AssetStocktakeVarianceItem>({
         accessorKey: 'notes',
-        header: 'Notes',
+        header: { key: 'column.notes', fallback: 'Notes' },
         getValue: (item) => item.notes,
     }),
     createReportTextColumn<AssetStocktakeVarianceItem>({
         accessorKey: 'checked_at',
-        header: 'Checked At',
+        header: { key: 'column.checked_at', fallback: 'Checked At' },
         getValue: (item) => formatDateTimeByRegionalSettings(item.checked_at),
         sortable: true,
     }),
     createReportTextColumn<AssetStocktakeVarianceItem>({
         accessorKey: 'checked_by_name',
-        header: 'Checked By',
+        header: { key: 'column.checked_by', fallback: 'Checked By' },
         getValue: (item) => item.checked_by_name,
     }),
 ];

@@ -1,5 +1,6 @@
 import { AsyncSelect } from '@/components/common/AsyncSelect';
 import { ReportPageDescription } from '@/components/common/ReportDataTablePage';
+import { LabelText, TranslatedText } from '@/components/common/TranslatedText';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import {
@@ -359,13 +360,28 @@ export function FinancialTableCard<TItem extends FinancialTableRow>({
                                 <TableHeader className="sticky top-0 z-10 bg-background">
                                     <TableRow>
                                         <TableHead className="w-[120px]">
-                                            Code
+                                            <LabelText
+                                                label={{
+                                                    key: 'column.code',
+                                                    fallback: 'Code',
+                                                }}
+                                            />
                                         </TableHead>
                                         <TableHead className="min-w-[140px] md:min-w-0">
-                                            Account Name
+                                            <LabelText
+                                                label={{
+                                                    key: 'column.account_name',
+                                                    fallback: 'Account Name',
+                                                }}
+                                            />
                                         </TableHead>
                                         <TableHead className="hidden w-[120px] md:table-cell">
-                                            Type
+                                            <LabelText
+                                                label={{
+                                                    key: 'column.type',
+                                                    fallback: 'Type',
+                                                }}
+                                            />
                                         </TableHead>
                                         {amountColumns.map((column) => (
                                             <TableHead
@@ -458,7 +474,10 @@ export function FinancialTableCard<TItem extends FinancialTableRow>({
                                                 colSpan={footerColSpan}
                                                 className="text-right font-semibold"
                                             >
-                                                {footerLabel}
+                                                <TranslatedText
+                                                    k="column.total"
+                                                    fallback={footerLabel}
+                                                />
                                             </TableCell>
                                             {footerLeadingCell ?? (
                                                 <TableCell className="hidden md:table-cell" />

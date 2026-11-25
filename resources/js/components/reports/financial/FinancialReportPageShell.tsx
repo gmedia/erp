@@ -1,6 +1,7 @@
 import { AsyncSelect } from '@/components/common/AsyncSelect';
 import { PageHeader } from '@/components/common/PageHeader';
 import { ReportPageDescription } from '@/components/common/ReportDataTablePage';
+import { LabelText } from '@/components/common/TranslatedText';
 import { Badge } from '@/components/ui/badge';
 import {
     Select,
@@ -9,6 +10,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useTranslation } from '@/contexts/i18n-context';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
 import { formatStatusLabel } from '@/lib/status-badge';
@@ -63,6 +65,15 @@ type FinancialReportPageShellProps = {
     isLoading?: boolean;
     hasError?: boolean;
     children?: ReactNode;
+};
+
+const translateOr = (
+    t: (key: string) => string,
+    key: string,
+    fallback: string,
+): string => {
+    const translated = t(key);
+    return translated === key ? fallback : translated;
 };
 
 const buildBreadcrumbs = (title: string, path: string): BreadcrumbItem[] => [
@@ -284,6 +295,7 @@ export function FinancialReportPageShell({
     hasError = false,
     children,
 }: Readonly<FinancialReportPageShellProps>) {
+    const { t } = useTranslation();
     const breadcrumbs = buildBreadcrumbs(title, path);
 
     let content: ReactNode;
@@ -324,8 +336,20 @@ export function FinancialReportPageShell({
                                     value={String(selectedYearId)}
                                     onValueChange={onYearChange}
                                 >
-                                    <SelectTrigger aria-label="Fiscal Year">
-                                        <SelectValue placeholder="Fiscal Year" />
+                                    <SelectTrigger
+                                        aria-label={translateOr(
+                                            t,
+                                            'column.fiscal_year',
+                                            'Fiscal Year',
+                                        )}
+                                    >
+                                        <SelectValue
+                                            placeholder={translateOr(
+                                                t,
+                                                'column.fiscal_year',
+                                                'Fiscal Year',
+                                            )}
+                                        />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {fiscalYears.map((fiscalYear) => (
@@ -341,7 +365,12 @@ export function FinancialReportPageShell({
                             </div>
                             <div className="flex w-full flex-col gap-1 sm:w-[220px]">
                                 <span className="text-xs font-medium text-muted-foreground">
-                                    Compare
+                                    <LabelText
+                                        label={{
+                                            key: 'column.compare_fiscal_year',
+                                            fallback: 'Compare',
+                                        }}
+                                    />
                                 </span>
                                 <Select
                                     value={
@@ -352,14 +381,24 @@ export function FinancialReportPageShell({
                                     onValueChange={onComparisonChange}
                                 >
                                     <SelectTrigger
-                                        aria-label="Compare fiscal year"
+                                        aria-label={translateOr(
+                                            t,
+                                            'column.compare_fiscal_year',
+                                            'Compare fiscal year',
+                                        )}
                                         className={
                                             comparisonYearId
                                                 ? undefined
                                                 : 'text-muted-foreground'
                                         }
                                     >
-                                        <SelectValue placeholder="Compare With..." />
+                                        <SelectValue
+                                            placeholder={translateOr(
+                                                t,
+                                                'column.compare_with',
+                                                'Compare With...',
+                                            )}
+                                        />
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem
@@ -390,14 +429,27 @@ export function FinancialReportPageShell({
                             {onBranchChange && (
                                 <div className="flex w-full flex-col gap-1 sm:w-[200px]">
                                     <span className="text-xs font-medium text-muted-foreground">
-                                        Branch
+                                        <LabelText
+                                            label={{
+                                                key: 'column.branch',
+                                                fallback: 'Branch',
+                                            }}
+                                        />
                                     </span>
                                     <AsyncSelect
                                         url="/api/branches"
-                                        placeholder="All Branches"
+                                        placeholder={translateOr(
+                                            t,
+                                            'column.all_branches',
+                                            'All Branches',
+                                        )}
                                         value={branchId ?? ''}
                                         onValueChange={onBranchChange}
-                                        label="Branch"
+                                        label={translateOr(
+                                            t,
+                                            'column.branch',
+                                            'Branch',
+                                        )}
                                     />
                                 </div>
                             )}

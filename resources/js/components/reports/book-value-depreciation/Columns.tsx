@@ -1,4 +1,5 @@
 import { createReportTextColumn } from '@/components/common/ReportColumns';
+import { LabelText } from '@/components/common/TranslatedText';
 import { formatCurrency } from '@/lib/utils';
 import { createSortingHeader } from '@/utils/columns';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
@@ -22,37 +23,40 @@ export const bookValueDepreciationColumns: ColumnDef<BookValueDepreciationReport
     [
         createReportTextColumn<BookValueDepreciationReportItem>({
             accessorKey: 'asset_code',
-            header: 'Asset Code',
+            header: { key: 'column.asset_code', fallback: 'Asset Code' },
             getValue: (item) => item.asset_code,
             className: 'font-medium',
             sortable: true,
         }),
         createReportTextColumn<BookValueDepreciationReportItem>({
             accessorKey: 'name',
-            header: 'Asset Name',
+            header: { key: 'column.asset_name', fallback: 'Asset Name' },
             getValue: (item) => item.name,
             sortable: true,
         }),
         createReportTextColumn<BookValueDepreciationReportItem>({
             accessorKey: 'category_name',
-            header: 'Category',
+            header: { key: 'column.category', fallback: 'Category' },
             getValue: (item) => item.category_name,
         }),
         createReportTextColumn<BookValueDepreciationReportItem>({
             accessorKey: 'branch_name',
-            header: 'Branch',
+            header: { key: 'column.branch', fallback: 'Branch' },
             getValue: (item) => item.branch_name,
         }),
         createReportTextColumn<BookValueDepreciationReportItem>({
             accessorKey: 'purchase_date',
-            header: 'Purchase Date',
+            header: { key: 'column.purchase_date', fallback: 'Purchase Date' },
             getValue: (item) =>
                 formatDateByRegionalSettings(item.purchase_date),
             sortable: true,
         }),
         {
             accessorKey: 'purchase_cost',
-            ...createSortingHeader('Purchase Cost'),
+            ...createSortingHeader({
+                key: 'column.asset_purchase_cost',
+                fallback: 'Purchase Cost',
+            }),
             cell: ({ row }) => (
                 <div className="text-right">
                     {formatCurrency(row.getValue('purchase_cost'))}
@@ -61,7 +65,16 @@ export const bookValueDepreciationColumns: ColumnDef<BookValueDepreciationReport
         },
         {
             accessorKey: 'salvage_value',
-            header: () => <div className="text-right">Salvage Value</div>,
+            header: () => (
+                <div className="text-right">
+                    <LabelText
+                        label={{
+                            key: 'column.salvage_value',
+                            fallback: 'Salvage Value',
+                        }}
+                    />
+                </div>
+            ),
             cell: ({ row }) => (
                 <div className="text-right">
                     {formatCurrency(row.getValue('salvage_value'))}
@@ -71,7 +84,16 @@ export const bookValueDepreciationColumns: ColumnDef<BookValueDepreciationReport
         },
         {
             accessorKey: 'useful_life_months',
-            header: () => <div className="text-right">Useful Life (Mos)</div>,
+            header: () => (
+                <div className="text-right">
+                    <LabelText
+                        label={{
+                            key: 'column.useful_life_months',
+                            fallback: 'Useful Life (Mos)',
+                        }}
+                    />
+                </div>
+            ),
             cell: ({ row }) => (
                 <div className="text-right">
                     {row.getValue('useful_life_months')}
@@ -81,7 +103,10 @@ export const bookValueDepreciationColumns: ColumnDef<BookValueDepreciationReport
         },
         {
             accessorKey: 'accumulated_depreciation',
-            ...createSortingHeader('Accum. Depreciation'),
+            ...createSortingHeader({
+                key: 'column.accumulated_depreciation',
+                fallback: 'Accum. Depreciation',
+            }),
             cell: ({ row }) => (
                 <div className="text-right">
                     {formatCurrency(row.getValue('accumulated_depreciation'))}
@@ -90,7 +115,10 @@ export const bookValueDepreciationColumns: ColumnDef<BookValueDepreciationReport
         },
         {
             accessorKey: 'book_value',
-            ...createSortingHeader('Book Value'),
+            ...createSortingHeader({
+                key: 'column.book_value',
+                fallback: 'Book Value',
+            }),
             cell: ({ row }) => (
                 <div className="text-right font-medium">
                     {formatCurrency(row.getValue('book_value'))}

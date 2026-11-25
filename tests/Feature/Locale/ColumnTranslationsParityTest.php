@@ -347,6 +347,37 @@ test('purchasing report filter placeholders have translations', function () {
         ->and($id)->toHaveKey('search');
 });
 
+test('asset report, financial report shell and table column keys have translations', function () {
+    $en = localeColumnTranslations('en.json');
+    $id = localeColumnTranslations('id.json');
+
+    // "Vendor" dan "Total" memang sama di kedua bahasa, jadi hanya diuji keberadaannya.
+    $sameInBoth = ['vendor', 'total'];
+    $keys = [
+        'asset_code', 'asset_name', 'asset_purchase_cost', 'salvage_value',
+        'useful_life_months', 'accumulated_depreciation', 'book_value',
+        'scheduled_at', 'performed_at', 'stocktake_ref',
+        'expected_branch', 'expected_location', 'found_branch', 'found_location',
+        'checked_at', 'checked_by', 'maintenance_type', 'account_name',
+        'compare_fiscal_year', 'compare_with', 'all_branches',
+    ];
+
+    foreach ($sameInBoth as $key) {
+        expect($en)->toHaveKey($key)->and($id)->toHaveKey($key);
+    }
+
+    foreach ($keys as $key) {
+        expect($en)->toHaveKey($key)
+            ->and($id)->toHaveKey($key)
+            ->and($id[$key])->not->toBe($en[$key], "column.{$key} not translated");
+    }
+
+    expect($en['asset_purchase_cost'])->toBe('Purchase Cost')
+        ->and($en['book_value'])->toBe('Book Value')
+        ->and($en['useful_life_months'])->toBe('Useful Life (Mos)')
+        ->and($en['found_location'])->toBe('Found Location');
+});
+
 test('column translation values are non-empty strings', function () {
     foreach (['en.json', 'id.json'] as $file) {
         foreach (localeColumnTranslations($file) as $key => $value) {
