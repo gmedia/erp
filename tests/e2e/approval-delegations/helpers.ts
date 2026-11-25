@@ -8,7 +8,6 @@ async function pickAsyncOption(page: Page, value: string): Promise<void> {
   const searchInput = page.locator('input[placeholder="Search..."]:visible').last();
   if (await searchInput.isVisible().catch(() => false)) {
     await searchInput.fill(value);
-    await page.waitForTimeout(500);
   }
 
   const option = page
@@ -120,7 +119,7 @@ export async function searchApprovalDelegation(page: Page, query: string): Promi
   await searchInput.press('Enter');
   
   await responsePromise;
-  await page.waitForTimeout(500);
+  await expect(page.locator('tr').filter({ hasText: normalizedQuery }).first()).toBeVisible();
 }
 
 export async function editApprovalDelegation(

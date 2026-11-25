@@ -50,7 +50,6 @@ test.describe('Pipeline Audit Trail', () => {
         const filtersButton = page.getByRole('button', { name: 'Filters' });
         await expect(filtersButton).toBeVisible();
         await filtersButton.click();
-        await page.waitForTimeout(500); // Wait for transition
 
         page.getByRole('dialog').or(page.locator('.filter-container').first());
         await expect(page.getByText('Entity Type').last()).toBeVisible();
@@ -59,7 +58,7 @@ test.describe('Pipeline Audit Trail', () => {
 
         // Close filters to remove any overlays
         await filtersButton.click();
-        await page.waitForTimeout(500);
+        await expect(filtersButton).toBeVisible();
 
         // 5. Test opening Detail Modal (if rows exist)
         // Row actions use the standard "..." menu (W4-09)

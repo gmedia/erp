@@ -156,7 +156,7 @@ test.describe('User Management', () => {
         await expect(
             page.getByRole('button', { name: 'Save Changes' }),
         ).toBeEnabled({ timeout: 10000 });
-        await page.waitForTimeout(500);
+        await expect(page.locator('input#name')).toHaveValue(updatedName);
 
         await page.reload();
         await openEditForUser(page, updatedName);
