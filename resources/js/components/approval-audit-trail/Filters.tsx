@@ -8,11 +8,10 @@ import {
 
 export function createApprovalAuditTrailFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField(
-            'search',
-            'Search',
-            'Search IP, Document ID, user...',
-        ),
+        createTextFilterField('search', 'Search', {
+            key: 'page.approval_audit_trail.search_placeholder',
+            fallback: 'Search IP, Document ID, user...',
+        }),
         createTextFilterField(
             'approvable_type',
             'Document Type',

@@ -19,10 +19,16 @@ import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 
+import {
+    LabelText,
+    type TranslatableLabel,
+    useTranslatableText,
+} from './TranslatedText';
+
 interface DatePickerFieldProps {
     name: string;
-    label: string;
-    placeholder?: string;
+    label: TranslatableLabel;
+    placeholder?: TranslatableLabel;
     disabled?: (date: Date) => boolean;
     locked?: boolean;
     className?: string;
@@ -40,6 +46,7 @@ export function DatePickerField({
     locked = false,
     className,
 }: Readonly<DatePickerFieldProps>) {
+    const translatedPlaceholder = useTranslatableText(placeholder);
     return (
         <FormField
             name={name}
@@ -56,7 +63,9 @@ export function DatePickerField({
 
                 return (
                     <FormItem className={className}>
-                        <FormLabel>{label}</FormLabel>
+                        <FormLabel>
+                            <LabelText label={label} />
+                        </FormLabel>
                         <Popover>
                             <PopoverTrigger asChild>
                                 <FormControl>
@@ -74,7 +83,7 @@ export function DatePickerField({
                                                 new Date(field.value),
                                             )
                                         ) : (
-                                            <span>{placeholder}</span>
+                                            <span>{translatedPlaceholder}</span>
                                         )}
                                         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                     </Button>

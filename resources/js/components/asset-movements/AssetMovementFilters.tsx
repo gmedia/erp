@@ -9,7 +9,10 @@ export const createAssetMovementFilterFields = (): FieldDescriptor[] => [
     createTextFilterField(
         'search',
         { key: 'column.search', fallback: 'Search' },
-        'Search movements...',
+        {
+            key: 'page.asset_movements.search_placeholder',
+            fallback: 'Search movements...',
+        },
     ),
     createAsyncSelectFilterField(
         'asset_id',

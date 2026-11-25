@@ -9,7 +9,10 @@ export function createWarehouseFilterFields(): FieldDescriptor[] {
         createTextFilterField(
             'search',
             { key: 'column.search', fallback: 'Search' },
-            'Search warehouses...',
+            {
+                key: 'page.warehouses.search_placeholder',
+                fallback: 'Search warehouses...',
+            },
         ),
         createAsyncSelectFilterField(
             'branch_id',

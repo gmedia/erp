@@ -2,10 +2,11 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
-import { type Resolver, useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm, type Resolver } from 'react-hook-form';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
+import { DocumentNumberField } from '@/components/common/DocumentNumberField';
 import EntityForm from '@/components/common/EntityForm';
 import {
     EntityFormItemActionsCell,
@@ -13,17 +14,14 @@ import {
     EntityFormItemSectionHeader,
 } from '@/components/common/EntityFormItemTable';
 import { InputField } from '@/components/common/InputField';
-import SelectField from '@/components/common/SelectField';
-import { TextareaField } from '@/components/common/TextareaField';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+    ItemTableHeader,
+    type ItemTableColumn,
+} from '@/components/common/ItemTableHeader';
+import { NotesTextareaField } from '@/components/common/NotesTextareaField';
+import { StatusSelectField } from '@/components/common/StatusSelectField';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import { useTranslation } from '@/contexts/i18n-context';
 import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
@@ -50,6 +48,39 @@ interface GoodsReceiptFormProps {
 }
 
 const CONFIRMABLE_PO_STATUSES = ['confirmed', 'partially_received'];
+
+const GOODS_RECEIPT_STATUSES = [
+    ['draft', 'Draft'],
+    ['confirmed', 'Confirmed'],
+    ['cancelled', 'Cancelled'],
+] as const;
+
+const GOODS_RECEIPT_ITEM_COLUMNS: readonly ItemTableColumn[] = [
+    { key: 'item_product', fallback: 'Product', className: 'w-[220px]' },
+    { key: 'item_unit', fallback: 'Unit', className: 'w-[140px]' },
+    {
+        key: 'item_qty_received',
+        fallback: 'Qty Received',
+        className: 'w-[120px]',
+    },
+    {
+        key: 'item_qty_accepted',
+        fallback: 'Qty Accepted',
+        className: 'w-[120px]',
+    },
+    {
+        key: 'item_qty_rejected',
+        fallback: 'Qty Rejected',
+        className: 'w-[120px]',
+    },
+    { key: 'item_unit_price', fallback: 'Unit Price', className: 'w-[140px]' },
+    { key: 'item_notes', fallback: 'Notes' },
+    {
+        key: 'item_action',
+        fallback: 'Action',
+        className: 'w-[120px] text-right',
+    },
+];
 
 type PurchaseOrderOption = { po_number: string; status?: string };
 
@@ -131,6 +162,12 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
         isLoading = false,
     }) {
         const { t } = useTranslation();
+        const fl = (key: string, fallback: string) => {
+            const translated = t(`form_fields.goods_receipts.${key}`);
+            return translated === `form_fields.goods_receipts.${key}`
+                ? fallback
+                : translated;
+        };
         const activeGoodsReceipt = goodsReceipt || item || entity;
         const defaultValues = useMemo(
             () => getGoodsReceiptFormDefaults(activeGoodsReceipt),
@@ -227,37 +264,37 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
                 onOpenChange={onOpenChange}
                 title={
                     activeGoodsReceipt
-                        ? 'Edit Goods Receipt'
-                        : 'Add New Goods Receipt'
+                        ? fl('edit_title', 'Edit Goods Receipt')
+                        : fl('add_title', 'Add New Goods Receipt')
                 }
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
                 className="sm:max-w-[1100px]"
             >
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <InputField
+                    <DocumentNumberField
+                        fl={fl}
                         name="gr_number"
-                        label="GR Number"
-                        placeholder="Auto-generated if empty"
+                        label={fl('gr_number', 'GR Number')}
+                        placeholderKey="gr_number_placeholder"
                     />
 
-                    <SelectField
-                        name="status"
-                        label="Status"
-                        options={[
-                            { value: 'draft', label: 'Draft' },
-                            { value: 'confirmed', label: 'Confirmed' },
-                            { value: 'cancelled', label: 'Cancelled' },
-                        ]}
-                        placeholder="Select status"
+                    <StatusSelectField
+                        fl={fl}
+                        label={fl('status', 'Status')}
+                        placeholder={fl('status_placeholder', 'Select status')}
+                        statuses={GOODS_RECEIPT_STATUSES}
                     />
 
                     <div className="space-y-2">
                         <AsyncSelectField<PurchaseOrderOption>
                             name="purchase_order_id"
-                            label="Purchase Order"
+                            label={fl('purchase_order', 'Purchase Order')}
                             url={purchaseOrderListUrl}
-                            placeholder="Select purchase order"
+                            placeholder={fl(
+                                'purchase_order_placeholder',
+                                'Select purchase order',
+                            )}
                             labelFn={(po) => po.po_number}
                             onItemSelect={(po) =>
                                 setSelectedPoStatus(po.status)
@@ -274,34 +311,42 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
 
                     <AsyncSelectField
                         name="warehouse_id"
-                        label="Warehouse"
+                        label={fl('warehouse', 'Warehouse')}
                         url="/api/warehouses"
-                        placeholder="Select warehouse"
+                        placeholder={fl(
+                            'warehouse_placeholder',
+                            'Select warehouse',
+                        )}
                     />
 
-                    <DatePickerField name="receipt_date" label="Receipt Date" />
+                    <DatePickerField
+                        name="receipt_date"
+                        label={fl('receipt_date', 'Receipt Date')}
+                    />
 
                     <AsyncSelectField
                         name="received_by"
-                        label="Received By"
+                        label={fl('received_by', 'Received By')}
                         url="/api/employees"
-                        placeholder="Select employee"
+                        placeholder={fl(
+                            'received_by_placeholder',
+                            'Select employee',
+                        )}
                     />
 
                     <InputField
                         name="supplier_delivery_note"
-                        label="Supplier Delivery Note"
+                        label={fl(
+                            'supplier_delivery_note',
+                            'Supplier Delivery Note',
+                        )}
                         placeholder="SJ-0001"
                     />
 
-                    <div className="md:col-span-2">
-                        <TextareaField
-                            name="notes"
-                            label="Notes"
-                            placeholder="Notes"
-                            rows={2}
-                        />
-                    </div>
+                    <NotesTextareaField
+                        label={fl('notes', 'Notes')}
+                        placeholder={fl('notes_placeholder', 'Notes')}
+                    />
                 </div>
 
                 <div className="mt-2 space-y-3 border-t pt-4">
@@ -311,32 +356,10 @@ export const GoodsReceiptForm = memo<GoodsReceiptFormProps>(
 
                     <div className="rounded-md border">
                         <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[220px]">
-                                        Product
-                                    </TableHead>
-                                    <TableHead className="w-[140px]">
-                                        Unit
-                                    </TableHead>
-                                    <TableHead className="w-[120px]">
-                                        Qty Received
-                                    </TableHead>
-                                    <TableHead className="w-[120px]">
-                                        Qty Accepted
-                                    </TableHead>
-                                    <TableHead className="w-[120px]">
-                                        Qty Rejected
-                                    </TableHead>
-                                    <TableHead className="w-[140px]">
-                                        Unit Price
-                                    </TableHead>
-                                    <TableHead>Notes</TableHead>
-                                    <TableHead className="w-[120px] text-right">
-                                        Action
-                                    </TableHead>
-                                </TableRow>
-                            </TableHeader>
+                            <ItemTableHeader
+                                columns={GOODS_RECEIPT_ITEM_COLUMNS}
+                                translate={fl}
+                            />
                             <TableBody>
                                 {fields.map((field, index) => {
                                     const goodsReceiptItem =

@@ -47,7 +47,10 @@ import {
 
 export function createApprovalDelegationFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', 'Search reason...'),
+        createTextFilterField('search', 'Search', {
+            key: 'page.approval_delegations.search_placeholder',
+            fallback: 'Search reason...',
+        }),
         ...createApprovalDelegationUserFilterFields(),
         createBinaryStatusFilterField(
             'is_active',

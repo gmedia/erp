@@ -15,6 +15,7 @@ import {
 
 import { cn } from "@/lib/utils"
 import { Label } from "@/components/ui/label"
+import { useOptionalTranslation } from "@/contexts/i18n-context"
 
 const Form = FormProvider
 
@@ -149,12 +150,22 @@ function FormDescription({
   )
 }
 
+function translateValidationMessage(
+  message: string,
+  t: (key: string) => string
+): string {
+  return message ? t(message) : message
+}
+
 function FormMessage({
   className,
   ...props
 }: Readonly<React.ComponentProps<"p">>) {
   const { error, formMessageId } = useFormField()
-  const body = error ? String(error?.message ?? "") : props.children
+  const { t } = useOptionalTranslation()
+  const body = error
+    ? translateValidationMessage(String(error?.message ?? ""), t)
+    : props.children
 
   if (!body) {
     return null

@@ -11,7 +11,10 @@ export function createAssetStocktakeFilterFields(): FieldDescriptor[] {
         createTextFilterField(
             'search',
             { key: 'column.search', fallback: 'Search' },
-            'Search by reference...',
+            {
+                key: 'page.asset_stocktakes.search_placeholder',
+                fallback: 'Search by reference...',
+            },
         ),
         ...createAsyncSelectFilterFields([
             {

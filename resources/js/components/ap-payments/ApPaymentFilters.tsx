@@ -31,7 +31,10 @@ export function createApPaymentFilterFields(): FieldDescriptor[] {
         createTextFilterField(
             'search',
             { key: 'column.search', fallback: 'Search' },
-            'Search payment number, reference, or notes...',
+            {
+                key: 'page.ap_payments.search_placeholder',
+                fallback: 'Search payment number, reference, or notes...',
+            },
         ),
         createAsyncSelectFilterField(
             'supplier_id',

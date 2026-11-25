@@ -9,7 +9,10 @@ export function createAssetLocationFilterFields(): FieldDescriptor[] {
         createTextFilterField(
             'search',
             { key: 'column.search', fallback: 'Search' },
-            'Search asset locations...',
+            {
+                key: 'page.asset_locations.search_placeholder',
+                fallback: 'Search asset locations...',
+            },
         ),
         createAsyncSelectFilterField(
             'branch_id',

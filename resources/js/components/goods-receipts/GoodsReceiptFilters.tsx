@@ -12,11 +12,10 @@ import {
 
 export function createGoodsReceiptFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField(
-            'search',
-            'Search',
-            'Search GR number, supplier delivery note, or notes...',
-        ),
+        createTextFilterField('search', 'Search', {
+            key: 'page.goods_receipts.search_placeholder',
+            fallback: 'Search GR number, supplier delivery note, or notes...',
+        }),
         createPurchaseOrderFilterField(),
         ...createWarehouseStatusFilterFields(
             draftConfirmedCancelledStatusOptions,

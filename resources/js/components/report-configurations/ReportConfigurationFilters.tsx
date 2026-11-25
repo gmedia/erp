@@ -19,11 +19,10 @@ const activeStatusOptions = [
 
 export function createReportConfigurationFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField(
-            'search',
-            'Search',
-            'Search code, name, description...',
-        ),
+        createTextFilterField('search', 'Search', {
+            key: 'page.report_configurations.search_placeholder',
+            fallback: 'Search code, name, description...',
+        }),
         createSelectFilterField(
             'report_type',
             'Report Type',

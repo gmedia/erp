@@ -16,11 +16,10 @@ const arOutstandingStatusOptions = [
 
 export function createArOutstandingReportFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField(
-            'search',
-            'Search',
-            'Search invoice number, customer, or branch...',
-        ),
+        createTextFilterField('search', 'Search', {
+            key: 'page.ar_outstanding.search_placeholder',
+            fallback: 'Search invoice number, customer, or branch...',
+        }),
         createAsyncSelectFilterField(
             'customer_id',
             'Customer',

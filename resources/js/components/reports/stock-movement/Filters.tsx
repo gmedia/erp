@@ -10,7 +10,7 @@ export function createStockMovementReportFilterFields(): FieldDescriptor[] {
             'search',
             { key: 'column.search', fallback: 'Search' },
             {
-                key: 'filter.stock_movement_search_placeholder',
+                key: 'page.stock_movement.search_placeholder',
                 fallback: 'Search product, category, warehouse, branch...',
             },
         ),

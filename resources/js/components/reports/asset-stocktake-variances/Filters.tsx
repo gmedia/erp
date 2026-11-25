@@ -6,11 +6,10 @@ import {
 
 export function createVarianceFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField(
-            'search',
-            'Search',
-            'Search code, name, notes...',
-        ),
+        createTextFilterField('search', 'Search', {
+            key: 'page.asset_stocktake_variances.search_placeholder',
+            fallback: 'Search code, name, notes...',
+        }),
         ...createAssetStocktakeVarianceScopeFilterFields(),
     ];
 }
