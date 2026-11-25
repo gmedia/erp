@@ -69,12 +69,39 @@ class StockPostingService
 
         foreach ($grouped as $movements) {
             $balance = 0.0;
+            $averageCost = 0.0;
 
             foreach ($movements as $movement) {
-                $balance += (float) $movement->quantity_in - (float) $movement->quantity_out;
+                $quantityIn = (float) $movement->quantity_in;
+                $quantityOut = (float) $movement->quantity_out;
 
-                if ((float) $movement->balance_after !== $balance) {
-                    $movement->forceFill(['balance_after' => $balance])->saveQuietly();
+                // Issue #495: rata-rata tertimbang bergerak per produk+gudang.
+                // Masuk: avg baru = (saldo_positif × avg_lama + qty_masuk × biaya_masuk)
+                //        / (saldo_positif + qty_masuk).
+                // Keluar: dinilai dengan avg berjalan (unit_cost = avg) dan avg tidak berubah.
+                $positiveBalance = max($balance, 0.0);
+
+                if ($quantityIn > 0) {
+                    $unitCostIn = (float) $movement->unit_cost;
+                    $averageCost = $positiveBalance + $quantityIn > 0
+                        ? (($positiveBalance * $averageCost) + ($quantityIn * $unitCostIn))
+                            / ($positiveBalance + $quantityIn)
+                        : $unitCostIn;
+                } elseif ($quantityOut > 0) {
+                    $movement->unit_cost = round($averageCost, 2);
+                }
+
+                $balance += $quantityIn - $quantityOut;
+
+                $averageCostRounded = round($averageCost, 2);
+
+                if ((float) $movement->balance_after !== $balance
+                    || (float) $movement->average_cost_after !== $averageCostRounded
+                    || $movement->isDirty('unit_cost')) {
+                    $movement->forceFill([
+                        'balance_after' => $balance,
+                        'average_cost_after' => $averageCostRounded,
+                    ])->saveQuietly();
                 }
             }
         }
