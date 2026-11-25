@@ -7,6 +7,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { useTranslation } from '@/contexts/i18n-context';
 import { type NavItem } from '@/types';
 import { BookOpen } from 'lucide-react';
 import { type ComponentPropsWithoutRef } from 'react';
@@ -19,6 +20,8 @@ export function NavFooter({
 }: ComponentPropsWithoutRef<typeof SidebarGroup> & {
     items: NavItem[];
 }) {
+    const { t } = useTranslation();
+
     return (
         <SidebarGroup
             {...props}
@@ -37,7 +40,7 @@ export function NavFooter({
                             <Link to="/user-guide">
                                 <BookOpen className="h-5 w-5" />
                                 <span className="group-data-[collapsible=icon]:hidden">
-                                    User Guide
+                                    {t('shell.user_guide')}
                                 </span>
                             </Link>
                         </SidebarMenuButton>

@@ -23,7 +23,7 @@ export function createStockAdjustmentFilterFields(): FieldDescriptor[] {
         ),
         createSelectFilterField(
             'adjustment_type',
-            'Adjustment Type',
+            { key: 'column.adjustment_type', fallback: 'Adjustment Type' },
             stockAdjustmentTypeOptions,
             'Select type',
         ),

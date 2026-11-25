@@ -25,38 +25,45 @@ export const supplierBillColumns: ColumnDef<SupplierBill>[] = [
     createSelectColumn<SupplierBill>(),
     createTextColumn<SupplierBill>({
         accessorKey: 'bill_number',
-        label: 'Bill Number',
+        label: { key: 'column.bill_number', fallback: 'Bill Number' },
         primary: true,
     }),
     {
         accessorKey: 'supplier',
-        ...createSortingHeader('Supplier'),
+        ...createSortingHeader({
+            key: 'column.supplier',
+            fallback: 'Supplier',
+        }),
         cell: renderSupplierCell,
     },
     {
         accessorKey: 'branch',
-        ...createSortingHeader('Branch'),
+        ...createSortingHeader({ key: 'column.branch', fallback: 'Branch' }),
         cell: renderBranchCell,
     },
     createDateColumn<SupplierBill>({
         accessorKey: 'bill_date',
-        label: 'Bill Date',
+        label: { key: 'column.bill_date', fallback: 'Bill Date' },
     }),
     createDateColumn<SupplierBill>({
         accessorKey: 'due_date',
-        label: 'Due Date',
+        label: { key: 'column.due_date', fallback: 'Due Date' },
     }),
     createTextColumn<SupplierBill>({
         accessorKey: 'currency',
-        label: 'Currency',
+        label: { key: 'column.currency', fallback: 'Currency' },
     }),
     createStatusBadgeColumn<SupplierBill>({
         accessorKey: 'status',
-        label: 'Status',
+        label: { key: 'column.status', fallback: 'Status' },
     }),
     {
         accessorKey: 'grand_total',
-        ...createSortingHeader('Grand Total'),
+        meta: { numeric: true },
+        ...createSortingHeader(
+            { key: 'column.grand_total', fallback: 'Grand Total' },
+            { align: 'right' },
+        ),
         cell: ({ row }) => (
             <div className="text-right">
                 {formatCurrencyByRegionalSettings(row.original.grand_total, {
@@ -70,7 +77,11 @@ export const supplierBillColumns: ColumnDef<SupplierBill>[] = [
     },
     {
         accessorKey: 'amount_due',
-        ...createSortingHeader('Amount Due'),
+        meta: { numeric: true },
+        ...createSortingHeader(
+            { key: 'column.amount_due', fallback: 'Amount Due' },
+            { align: 'right' },
+        ),
         cell: ({ row }) => {
             const { status, amount_due: amountDue, currency } = row.original;
             const hasNoDue = ['draft', 'void', 'cancelled'].includes(

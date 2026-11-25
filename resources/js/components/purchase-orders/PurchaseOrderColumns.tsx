@@ -1,7 +1,6 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
-import { formatStatusLabel, statusBadgeVariant } from '@/lib/status-badge';
+import { StatusBadgeLabel } from '@/components/common/StatusBadgeLabel';
 import { PurchaseOrder } from '@/types/purchase-order';
 import {
     createActionsColumn,
@@ -22,48 +21,58 @@ const renderWarehouseCell = ({ row }: { row: { original: PurchaseOrder } }) => (
 );
 
 const renderStatusCell = ({ row }: { row: { original: PurchaseOrder } }) => (
-    <Badge variant={statusBadgeVariant(row.original.status)}>
-        {formatStatusLabel(row.original.status)}
-    </Badge>
+    <StatusBadgeLabel status={row.original.status} />
 );
 
 export const purchaseOrderColumns: ColumnDef<PurchaseOrder>[] = [
     createSelectColumn<PurchaseOrder>(),
     createTextColumn<PurchaseOrder>({
         accessorKey: 'po_number',
-        label: 'PO Number',
+        label: { key: 'column.po_number', fallback: 'PO Number' },
         primary: true,
     }),
     {
         accessorKey: 'supplier',
-        ...createSortingHeader('Supplier'),
+        ...createSortingHeader({
+            key: 'column.supplier',
+            fallback: 'Supplier',
+        }),
         cell: renderSupplierCell,
     },
     {
         accessorKey: 'warehouse',
-        ...createSortingHeader('Warehouse'),
+        ...createSortingHeader({
+            key: 'column.warehouse',
+            fallback: 'Warehouse',
+        }),
         cell: renderWarehouseCell,
     },
     createDateColumn<PurchaseOrder>({
         accessorKey: 'order_date',
-        label: 'Order Date',
+        label: { key: 'column.order_date', fallback: 'Order Date' },
     }),
     createDateColumn<PurchaseOrder>({
         accessorKey: 'expected_delivery_date',
-        label: 'Expected Delivery',
+        label: {
+            key: 'column.expected_delivery',
+            fallback: 'Expected Delivery',
+        },
     }),
     createTextColumn<PurchaseOrder>({
         accessorKey: 'currency',
-        label: 'Currency',
+        label: { key: 'column.currency', fallback: 'Currency' },
     }),
     {
         accessorKey: 'status',
-        ...createSortingHeader('Status'),
+        ...createSortingHeader({ key: 'column.status', fallback: 'Status' }),
         cell: renderStatusCell,
     },
     {
         accessorKey: 'grand_total',
-        ...createSortingHeader('Grand Total'),
+        ...createSortingHeader({
+            key: 'column.grand_total',
+            fallback: 'Grand Total',
+        }),
         cell: ({ row }) => (
             <div className="text-right">
                 {formatCurrencyByRegionalSettings(row.original.grand_total, {

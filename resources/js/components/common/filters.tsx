@@ -2,6 +2,7 @@
 
 import { AsyncSelect } from '@/components/common/AsyncSelect';
 import { FilterDatePicker } from '@/components/common/FilterDatePicker';
+import type { TranslatableLabel } from '@/components/common/TranslatedText';
 
 import { Input } from '@/components/ui/input';
 import {
@@ -15,7 +16,7 @@ import * as React from 'react';
 
 export type FieldDescriptor = {
     name: string;
-    label: string;
+    label: TranslatableLabel;
     component: React.ReactNode;
 };
 
@@ -227,21 +228,21 @@ export const assetStocktakeVarianceResultOptions: SelectOption[] = [
 
 export type AsyncSelectFilterConfig = {
     name: string;
-    label: string;
+    label: TranslatableLabel;
     url: string;
     placeholder: string;
 };
 
 export type SelectFilterConfig = {
     name: string;
-    label: string;
+    label: TranslatableLabel;
     options: SelectOption[];
     placeholder: string;
 };
 
 export type DateFilterConfig = {
     name: string;
-    label: string;
+    label: TranslatableLabel;
     placeholder: string;
 };
 
@@ -261,7 +262,7 @@ export function createSimpleEntityFilterFields(
 // Generic select filter field creator
 export function createSelectFilterField(
     name: string,
-    label: string,
+    label: TranslatableLabel,
     options: SelectOption[],
     placeholder: string,
 ): FieldDescriptor {
@@ -288,7 +289,7 @@ export function createSelectFilterField(
 // Generic text input filter field creator
 export function createTextFilterField(
     name: string,
-    label: string,
+    label: TranslatableLabel,
     placeholder: string,
 ): FieldDescriptor {
     return {
@@ -301,7 +302,7 @@ export function createTextFilterField(
 // Generic async select filter field creator
 export function createAsyncSelectFilterField(
     name: string,
-    label: string,
+    label: TranslatableLabel,
     url: string,
     placeholder: string,
 ): FieldDescriptor {
@@ -409,7 +410,7 @@ export function createProductFilterField(
 
 export function createEmployeeLookupFilterField(
     name = 'employee_id',
-    label = 'Employee',
+    label: TranslatableLabel = 'Employee',
     placeholder = 'Select employee',
 ): FieldDescriptor {
     return createAsyncSelectFilterField(
@@ -499,7 +500,7 @@ export function createSupplierCategoryFilterField(
 
 export function createProductCategoryFilterField(
     name = 'product_category_id',
-    label = 'Category',
+    label: TranslatableLabel = 'Category',
     placeholder = 'Select category',
 ): FieldDescriptor {
     return createAsyncSelectFilterField(
@@ -822,12 +823,12 @@ export function createInventoryStocktakeFilterSelectFields(): FieldDescriptor[] 
         createWarehouseFilterField('Select warehouse'),
         createProductCategoryFilterField(
             'product_category_id',
-            'Product Category',
+            { key: 'column.product_category', fallback: 'Product Category' },
             'Select category',
         ),
         createSelectFilterField(
             'status',
-            'Status',
+            { key: 'column.status', fallback: 'Status' },
             inventoryStocktakeStatusOptions,
             'Select status',
         ),

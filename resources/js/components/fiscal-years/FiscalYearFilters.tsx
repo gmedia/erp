@@ -8,7 +8,11 @@ import {
 
 export function createFiscalYearFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', 'Search fiscal years...'),
+        createTextFilterField(
+            'search',
+            { key: 'column.search', fallback: 'Search' },
+            'Search fiscal years...',
+        ),
         createFiscalYearStatusFilterField(),
     ];
 }

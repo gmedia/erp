@@ -33,19 +33,22 @@ export function createArReceiptFilterFields(): FieldDescriptor[] {
         ...createSelectFilterFields([
             {
                 name: 'status',
-                label: 'Status',
+                label: { key: 'column.status', fallback: 'Status' },
                 options: arReceiptStatusOptions,
                 placeholder: 'Select Status',
             },
             {
                 name: 'payment_method',
-                label: 'Payment Method',
+                label: {
+                    key: 'column.payment_method',
+                    fallback: 'Payment Method',
+                },
                 options: arReceiptPaymentMethodOptions,
                 placeholder: 'Select Payment Method',
             },
             {
                 name: 'currency',
-                label: 'Currency',
+                label: { key: 'column.currency', fallback: 'Currency' },
                 options: currencyOptions,
                 placeholder: 'Select Currency',
             },
@@ -53,12 +56,18 @@ export function createArReceiptFilterFields(): FieldDescriptor[] {
         ...createDateFilterFields([
             {
                 name: 'receipt_date_from',
-                label: 'Receipt Date From',
+                label: {
+                    key: 'column.receipt_date_from',
+                    fallback: 'Receipt Date From',
+                },
                 placeholder: 'Receipt Date From',
             },
             {
                 name: 'receipt_date_to',
-                label: 'Receipt Date To',
+                label: {
+                    key: 'column.receipt_date_to',
+                    fallback: 'Receipt Date To',
+                },
                 placeholder: 'Receipt Date To',
             },
         ]),

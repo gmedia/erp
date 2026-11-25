@@ -1,5 +1,9 @@
 'use client';
 
+import {
+    labelFallbackText,
+    LabelText,
+} from '@/components/common/TranslatedText';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -70,7 +74,7 @@ export function FilterModal({
                             const commonProps = {
                                 name: field.name,
                                 value: tempFilters[field.name] ?? '', // Always pass a defined string to prevent uncontrolled-to-controlled warning
-                                label: field.label,
+                                label: labelFallbackText(field.label),
                             };
 
                             const onChangeHandler = (
@@ -104,7 +108,7 @@ export function FilterModal({
                             return (
                                 <div key={field.name}>
                                     <label className="mb-2 block text-sm font-medium">
-                                        {field.label}
+                                        <LabelText label={field.label} />
                                     </label>
                                     {componentWithProps}
                                 </div>

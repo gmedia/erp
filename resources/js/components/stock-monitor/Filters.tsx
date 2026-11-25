@@ -18,36 +18,39 @@ export function createStockMonitorFilterFields(
     return [
         createTextFilterField(
             'search',
-            'Search',
+            { key: 'column.search', fallback: 'Search' },
             'Search product, category, warehouse, branch...',
         ),
         createSelectFilterField(
             'product_id',
-            'Product',
+            { key: 'column.product', fallback: 'Product' },
             options.products,
             'All products',
         ),
         createSelectFilterField(
             'warehouse_id',
-            'Warehouse',
+            { key: 'column.warehouse', fallback: 'Warehouse' },
             options.warehouses,
             'All warehouses',
         ),
         createSelectFilterField(
             'branch_id',
-            'Branch',
+            { key: 'column.branch', fallback: 'Branch' },
             options.branches,
             'All branches',
         ),
         createSelectFilterField(
             'category_id',
-            'Category',
+            { key: 'column.category', fallback: 'Category' },
             options.categories,
             'All categories',
         ),
         createTextFilterField(
             'low_stock_threshold',
-            'Low Stock Threshold',
+            {
+                key: 'column.low_stock_threshold',
+                fallback: 'Low Stock Threshold',
+            },
             'Example: 10',
         ),
     ];

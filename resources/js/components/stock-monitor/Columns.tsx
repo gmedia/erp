@@ -37,37 +37,40 @@ export function createStockMonitorColumns(): ColumnDef<StockMonitorItem>[] {
     return [
         createReportSummaryColumn<StockMonitorItem>({
             id: 'product_name',
-            header: 'Product',
+            header: { key: 'column.product', fallback: 'Product' },
             getPrimary: (item) => item.product?.name,
             getSecondary: (item) => item.product?.code,
         }),
         createReportTextColumn<StockMonitorItem>({
             id: 'category_name',
-            header: 'Category',
+            header: { key: 'column.category', fallback: 'Category' },
             getValue: (item) => item.product?.category?.name,
         }),
         createReportWarehouseColumn<StockMonitorItem>({
             id: 'warehouse_name',
-            header: 'Warehouse',
+            header: { key: 'column.warehouse', fallback: 'Warehouse' },
             getWarehouse: (item) => item.warehouse,
         }),
         createNumberColumn<StockMonitorItem>({
             accessorKey: 'quantity_on_hand',
-            label: 'Qty On Hand',
+            label: { key: 'column.qty_on_hand', fallback: 'Qty On Hand' },
             minimumFractionDigits: 0,
             maximumFractionDigits: 2,
         }),
         createCurrencyColumn<StockMonitorItem>({
             accessorKey: 'average_cost',
-            label: 'Avg Cost',
+            label: { key: 'column.avg_cost', fallback: 'Avg Cost' },
         }),
         createCurrencyColumn<StockMonitorItem>({
             accessorKey: 'stock_value',
-            label: 'Stock Value',
+            label: { key: 'column.stock_value', fallback: 'Stock Value' },
         }),
         createReportTextColumn<StockMonitorItem>({
             accessorKey: 'moved_at',
-            header: 'Last Movement',
+            header: {
+                key: 'column.last_movement',
+                fallback: 'Last Movement',
+            },
             getValue: (item) => formatDate(item.moved_at),
             sortable: true,
         }),

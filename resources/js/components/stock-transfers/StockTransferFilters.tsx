@@ -14,20 +14,23 @@ export function createStockTransferFilterFields(): FieldDescriptor[] {
         ...createAsyncSelectFilterFields([
             {
                 name: 'from_warehouse_id',
-                label: 'From Warehouse',
+                label: {
+                    key: 'column.from_warehouse',
+                    fallback: 'From Warehouse',
+                },
                 url: '/api/warehouses',
                 placeholder: 'Select warehouse',
             },
             {
                 name: 'to_warehouse_id',
-                label: 'To Warehouse',
+                label: { key: 'column.to_warehouse', fallback: 'To Warehouse' },
                 url: '/api/warehouses',
                 placeholder: 'Select warehouse',
             },
         ]),
         createSelectFilterField(
             'status',
-            'Status',
+            { key: 'column.status', fallback: 'Status' },
             stockTransferStatusOptions,
             'Select status',
         ),

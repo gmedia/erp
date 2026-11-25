@@ -33,43 +33,52 @@ export const purchaseRequestColumns: ColumnDef<PurchaseRequest>[] = [
     createSelectColumn<PurchaseRequest>(),
     createTextColumn<PurchaseRequest>({
         accessorKey: 'pr_number',
-        label: 'PR Number',
+        label: { key: 'column.pr_number', fallback: 'PR Number' },
         primary: true,
     }),
     {
         accessorKey: 'branch',
-        ...createSortingHeader('Branch'),
+        ...createSortingHeader({ key: 'column.branch', fallback: 'Branch' }),
         cell: renderBranchCell,
     },
     {
         accessorKey: 'department',
-        ...createSortingHeader('Department'),
+        ...createSortingHeader({
+            key: 'column.department',
+            fallback: 'Department',
+        }),
         cell: renderDepartmentCell,
     },
     {
         accessorKey: 'requester',
-        ...createSortingHeader('Requester'),
+        ...createSortingHeader({
+            key: 'column.requester',
+            fallback: 'Requester',
+        }),
         cell: renderRequesterCell,
     },
     createDateColumn<PurchaseRequest>({
         accessorKey: 'request_date',
-        label: 'Request Date',
+        label: { key: 'column.request_date', fallback: 'Request Date' },
     }),
     createDateColumn<PurchaseRequest>({
         accessorKey: 'required_date',
-        label: 'Required Date',
+        label: { key: 'column.required_date', fallback: 'Required Date' },
     }),
     createPriorityBadgeColumn<PurchaseRequest>({
         accessorKey: 'priority',
-        label: 'Priority',
+        label: { key: 'column.priority', fallback: 'Priority' },
     }),
     createStatusBadgeColumn<PurchaseRequest>({
         accessorKey: 'status',
-        label: 'Status',
+        label: { key: 'column.status', fallback: 'Status' },
     }),
     createCurrencyColumn<PurchaseRequest>({
         accessorKey: 'estimated_amount',
-        label: 'Estimated Amount',
+        label: {
+            key: 'column.estimated_amount',
+            fallback: 'Estimated Amount',
+        },
         currency: 'IDR',
         locale: 'id-ID',
         minimumFractionDigits: 0,

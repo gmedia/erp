@@ -7,7 +7,11 @@ import {
 
 export function createJournalEntryFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', 'Search entry...'),
+        createTextFilterField(
+            'search',
+            { key: 'column.search', fallback: 'Search' },
+            'Search entry...',
+        ),
         createJournalEntryStatusFilterField(),
         ...createDateRangeFilterFields(),
     ];

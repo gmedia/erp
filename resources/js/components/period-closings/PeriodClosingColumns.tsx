@@ -37,30 +37,42 @@ export const periodClosingColumns: ColumnDef<PeriodClosing>[] = [
     createSelectColumn<PeriodClosing>(),
     {
         accessorKey: 'fiscal_year_id',
-        ...createSortingHeader('Fiscal Year'),
+        ...createSortingHeader({
+            key: 'column.fiscal_year',
+            fallback: 'Fiscal Year',
+        }),
         cell: ({ row }) => row.original.fiscal_year?.name || '-',
     },
     {
         accessorKey: 'period_month',
-        ...createSortingHeader('Period Month'),
+        ...createSortingHeader({
+            key: 'column.period_month',
+            fallback: 'Period Month',
+        }),
         cell: ({ row }) => (
             <span>{formatMonthName(row.getValue('period_month'))}</span>
         ),
     },
     {
         accessorKey: 'period_year',
-        ...createSortingHeader('Period Year'),
+        ...createSortingHeader({
+            key: 'column.period_year',
+            fallback: 'Period Year',
+        }),
     },
     {
         accessorKey: 'closing_type',
-        ...createSortingHeader('Closing Type'),
+        ...createSortingHeader({
+            key: 'column.closing_type',
+            fallback: 'Closing Type',
+        }),
         cell: ({ row }) => (
             <ClosingTypeCell type={row.getValue('closing_type')} />
         ),
     },
     {
         accessorKey: 'status',
-        ...createSortingHeader('Status'),
+        ...createSortingHeader({ key: 'column.status', fallback: 'Status' }),
         cell: ({ row }) => {
             const status = row.getValue('status') as string;
             return (
@@ -72,7 +84,11 @@ export const periodClosingColumns: ColumnDef<PeriodClosing>[] = [
     },
     {
         accessorKey: 'net_income',
-        ...createSortingHeader('Net Income'),
+        meta: { numeric: true },
+        ...createSortingHeader(
+            { key: 'column.net_income', fallback: 'Net Income' },
+            { align: 'right' },
+        ),
         cell: ({ row }) => {
             const { status, net_income: netIncome } = row.original;
             const currency = (row.original as { currency?: string | null })
@@ -98,7 +114,10 @@ export const periodClosingColumns: ColumnDef<PeriodClosing>[] = [
     },
     {
         accessorKey: 'closed_at',
-        ...createSortingHeader('Closed At'),
+        ...createSortingHeader({
+            key: 'column.closed_at',
+            fallback: 'Closed At',
+        }),
         cell: ({ row }) => {
             const date = row.getValue('closed_at') as string | null;
             return date ? formatDateByRegionalSettings(date) : '-';

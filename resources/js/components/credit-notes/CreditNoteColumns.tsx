@@ -31,35 +31,47 @@ export const creditNoteColumns: ColumnDef<CreditNote>[] = [
     createSelectColumn<CreditNote>(),
     createTextColumn<CreditNote>({
         accessorKey: 'credit_note_number',
-        label: 'Credit Note Number',
+        label: {
+            key: 'column.credit_note_number',
+            fallback: 'Credit Note Number',
+        },
         primary: true,
     }),
     {
         accessorKey: 'customer',
-        ...createSortingHeader('Customer'),
+        ...createSortingHeader({
+            key: 'column.customer',
+            fallback: 'Customer',
+        }),
         cell: renderCustomerCell,
     },
     {
         accessorKey: 'branch',
-        ...createSortingHeader('Branch'),
+        ...createSortingHeader({ key: 'column.branch', fallback: 'Branch' }),
         cell: renderBranchCell,
     },
     createDateColumn<CreditNote>({
         accessorKey: 'credit_note_date',
-        label: 'Credit Note Date',
+        label: {
+            key: 'column.credit_note_date',
+            fallback: 'Credit Note Date',
+        },
     }),
     {
         accessorKey: 'reason',
-        ...createSortingHeader('Reason'),
+        ...createSortingHeader({ key: 'column.reason', fallback: 'Reason' }),
         cell: renderReasonCell,
     },
     createStatusBadgeColumn<CreditNote>({
         accessorKey: 'status',
-        label: 'Status',
+        label: { key: 'column.status', fallback: 'Status' },
     }),
     {
         accessorKey: 'grand_total',
-        ...createSortingHeader('Grand Total'),
+        ...createSortingHeader({
+            key: 'column.grand_total',
+            fallback: 'Grand Total',
+        }),
         cell: ({ row }) => (
             <div className="text-right">
                 {formatCurrencyByRegionalSettings(row.original.grand_total, {

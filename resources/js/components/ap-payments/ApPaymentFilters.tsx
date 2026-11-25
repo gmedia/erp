@@ -30,37 +30,40 @@ export function createApPaymentFilterFields(): FieldDescriptor[] {
     return [
         createTextFilterField(
             'search',
-            'Search',
+            { key: 'column.search', fallback: 'Search' },
             'Search payment number, reference, or notes...',
         ),
         createAsyncSelectFilterField(
             'supplier_id',
-            'Supplier',
+            { key: 'column.supplier', fallback: 'Supplier' },
             '/api/suppliers',
             'All suppliers',
         ),
         createAsyncSelectFilterField(
             'branch_id',
-            'Branch',
+            { key: 'column.branch', fallback: 'Branch' },
             '/api/branches',
             'All branches',
         ),
         ...createSelectFilterFields([
             {
                 name: 'status',
-                label: 'Status',
+                label: { key: 'column.status', fallback: 'Status' },
                 options: apPaymentStatusOptions,
                 placeholder: 'Select Status',
             },
             {
                 name: 'payment_method',
-                label: 'Payment Method',
+                label: {
+                    key: 'column.payment_method',
+                    fallback: 'Payment Method',
+                },
                 options: apPaymentMethodOptions,
                 placeholder: 'Select Payment Method',
             },
             {
                 name: 'currency',
-                label: 'Currency',
+                label: { key: 'column.currency', fallback: 'Currency' },
                 options: currencyOptions,
                 placeholder: 'Select Currency',
             },
@@ -68,12 +71,18 @@ export function createApPaymentFilterFields(): FieldDescriptor[] {
         ...createDateFilterFields([
             {
                 name: 'payment_date_from',
-                label: 'Payment Date From',
+                label: {
+                    key: 'column.payment_date_from',
+                    fallback: 'Payment Date From',
+                },
                 placeholder: 'Payment Date From',
             },
             {
                 name: 'payment_date_to',
-                label: 'Payment Date To',
+                label: {
+                    key: 'column.payment_date_to',
+                    fallback: 'Payment Date To',
+                },
                 placeholder: 'Payment Date To',
             },
         ]),

@@ -1,6 +1,11 @@
 'use client';
 
 import { GenericActions } from '@/components/common/ActionsDropdown';
+import {
+    labelFallbackText,
+    LabelText,
+    type TranslatableLabel,
+} from '@/components/common/TranslatedText';
 import { Badge, type BadgeVariant } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -33,7 +38,7 @@ function SortDirectionIcon({ sorted }: { sorted: 'asc' | 'desc' | false }) {
 // Type definitions for better type safety
 export type ColumnBuilderOptions<T = Record<string, unknown>> = {
     accessorKey: keyof T;
-    label: string;
+    label: TranslatableLabel;
     enableSorting?: boolean;
     className?: string;
 };
@@ -87,10 +92,11 @@ export type ActionsColumnOptions<T = Record<string, unknown>> = {
 
 // Helper function to create sorting header
 export function createSortingHeader(
-    label: string,
+    label: TranslatableLabel,
     options: { align?: 'left' | 'right' } = {},
 ) {
     const isRight = options.align === 'right';
+    const testIdSource = labelFallbackText(label);
     return {
         header: ({
             column,
@@ -110,10 +116,12 @@ export function createSortingHeader(
                     onClick={() =>
                         column.toggleSorting(column.getIsSorted() === 'asc')
                     }
-                    data-testid={`sort-${label.toLowerCase().replaceAll(/\s+/g, '-')}`}
+                    data-testid={`sort-${testIdSource.toLowerCase().replaceAll(/\s+/g, '-')}`}
                     data-sort-state={column.getIsSorted() || 'none'}
                 >
-                    {label}
+                    <span className="line-clamp-2 max-w-full min-w-0 text-left whitespace-normal">
+                        <LabelText label={label} />
+                    </span>
                     <SortDirectionIcon sorted={column.getIsSorted()} />
                 </Button>
             </div>
@@ -187,7 +195,7 @@ export function createTextColumn<T = Record<string, unknown>>(
     return {
         ...baseColumn,
         enableSorting: false,
-        header: label,
+        header: () => <LabelText label={label} />,
     };
 }
 
@@ -225,7 +233,7 @@ export function createDateColumn<T = Record<string, unknown>>(
     return {
         ...baseColumn,
         enableSorting: false,
-        header: label,
+        header: () => <LabelText label={label} />,
     };
 }
 
@@ -277,7 +285,11 @@ export function createCurrencyColumn<T = Record<string, unknown>>(
     return {
         ...baseColumn,
         enableSorting: false,
-        header: () => <div className="text-right">{label}</div>,
+        header: () => (
+            <div className="text-right">
+                <LabelText label={label} />
+            </div>
+        ),
     };
 }
 
@@ -326,7 +338,11 @@ export function createNumberColumn<T = Record<string, unknown>>(
     return {
         ...baseColumn,
         enableSorting: false,
-        header: () => <div className="text-right">{label}</div>,
+        header: () => (
+            <div className="text-right">
+                <LabelText label={label} />
+            </div>
+        ),
     };
 }
 
@@ -381,7 +397,7 @@ export function createLinkColumn<T = Record<string, unknown>>(
     return {
         ...baseColumn,
         enableSorting: false,
-        header: label,
+        header: () => <LabelText label={label} />,
     };
 }
 
@@ -568,7 +584,7 @@ export function createBadgeColumn<T = Record<string, unknown>>(
     return {
         ...baseColumn,
         enableSorting: false,
-        header: label,
+        header: () => <LabelText label={label} />,
     };
 }
 
@@ -617,7 +633,7 @@ export function createAdjustmentTypeBadgeColumn<T = Record<string, unknown>>(
     return {
         ...baseColumn,
         enableSorting: false,
-        header: label,
+        header: () => <LabelText label={label} />,
     };
 }
 
@@ -650,7 +666,7 @@ export function createPriorityBadgeColumn<T = Record<string, unknown>>(
     return {
         ...baseColumn,
         enableSorting: false,
-        header: label,
+        header: () => <LabelText label={label} />,
     };
 }
 
@@ -663,7 +679,7 @@ export function createRowCurrencyAmountColumn<
     T extends { currency?: string | null },
 >(options: {
     accessorKey: keyof T;
-    label: string;
+    label: TranslatableLabel;
     className?: string;
 }): ColumnDef<T> {
     const { accessorKey, label, className = 'text-right' } = options;

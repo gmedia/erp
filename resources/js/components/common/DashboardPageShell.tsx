@@ -1,6 +1,7 @@
 import { PageBanner } from '@/components/common/PageBanner';
 import { PageHeader } from '@/components/common/PageHeader';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/contexts/i18n-context';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { RefreshCw } from 'lucide-react';
@@ -35,6 +36,8 @@ export default function DashboardPageShell({
     refetch,
     children,
 }: Readonly<DashboardPageShellProps>) {
+    const { t } = useTranslation();
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Helmet>
@@ -60,7 +63,7 @@ export default function DashboardPageShell({
                                     <RefreshCw
                                         className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`}
                                     />
-                                    Refresh
+                                    {t('shell.refresh')}
                                 </Button>
                             </>
                         }

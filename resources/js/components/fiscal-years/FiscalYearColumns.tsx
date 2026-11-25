@@ -14,23 +14,23 @@ export const fiscalYearColumns: ColumnDef<FiscalYear>[] = [
     createSelectColumn<FiscalYear>(),
     createTextColumn<FiscalYear>({
         accessorKey: 'name',
-        label: 'Name',
+        label: { key: 'column.name', fallback: 'Name' },
         primary: true,
     }),
     createDateColumn<FiscalYear>({
         accessorKey: 'start_date',
-        label: 'Start Date',
+        label: { key: 'column.start_date', fallback: 'Start Date' },
     }),
     createDateColumn<FiscalYear>({
         accessorKey: 'end_date',
-        label: 'End Date',
+        label: { key: 'column.end_date', fallback: 'End Date' },
     }),
     // Konteks tahun fiskal: open = berjalan (sukses), closed = finalisasi
     // (netral), locked = terkunci (danger, dari peta umum). 'open'/'closed'
     // di sini beda makna dari status dokumen — jadi override via variantMap.
     createStatusBadgeColumn<FiscalYear>({
         accessorKey: 'status',
-        label: 'Status',
+        label: { key: 'column.status', fallback: 'Status' },
         variantMap: {
             open: 'info',
             closed: 'secondary',
@@ -39,7 +39,7 @@ export const fiscalYearColumns: ColumnDef<FiscalYear>[] = [
     }),
     createDateColumn<FiscalYear>({
         accessorKey: 'created_at',
-        label: 'Created At',
+        label: { key: 'column.created_at', fallback: 'Created At' },
     }),
     createActionsColumn<FiscalYear>(),
 ];

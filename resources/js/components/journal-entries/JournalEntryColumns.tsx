@@ -18,27 +18,30 @@ export const journalEntryColumns: ColumnDef<JournalEntry>[] = [
     createSelectColumn<JournalEntry>(),
     createTextColumn<JournalEntry>({
         accessorKey: 'entry_number',
-        label: 'Entry Number',
+        label: { key: 'column.entry_number', fallback: 'Entry Number' },
         primary: true,
         enableSorting: true,
     }),
     {
         accessorKey: 'entry_date',
-        ...createSortingHeader('Date'),
+        ...createSortingHeader({ key: 'column.date', fallback: 'Date' }),
         cell: ({ row }) =>
             formatDateByRegionalSettings(row.getValue('entry_date') as string),
     },
     createTextColumn<JournalEntry>({
         accessorKey: 'description',
-        label: 'Description',
+        label: { key: 'column.description', fallback: 'Description' },
     }),
     createTextColumn<JournalEntry>({
         accessorKey: 'reference',
-        label: 'Reference',
+        label: { key: 'column.reference', fallback: 'Reference' },
     }),
     {
         accessorKey: 'total_debit',
-        ...createSortingHeader('Total Amount'),
+        ...createSortingHeader({
+            key: 'column.total_amount',
+            fallback: 'Total Amount',
+        }),
         cell: ({ row }) => {
             const amount = Number.parseFloat(row.getValue('total_debit'));
             return (
@@ -53,7 +56,7 @@ export const journalEntryColumns: ColumnDef<JournalEntry>[] = [
     },
     {
         accessorKey: 'status',
-        ...createSortingHeader('Status'),
+        ...createSortingHeader({ key: 'column.status', fallback: 'Status' }),
         cell: ({ row }) => {
             const status = row.getValue('status') as string;
             return (

@@ -18,15 +18,18 @@ const renderBranchCell = ({ row }: { row: { original: Warehouse } }) => {
 
 export const warehouseColumns: ColumnDef<Warehouse>[] = [
     createSelectColumn<Warehouse>(),
-    createTextColumn<Warehouse>({ accessorKey: 'code', label: 'Code' }),
+    createTextColumn<Warehouse>({
+        accessorKey: 'code',
+        label: { key: 'column.code', fallback: 'Code' },
+    }),
     createTextColumn<Warehouse>({
         accessorKey: 'name',
-        label: 'Name',
+        label: { key: 'column.name', fallback: 'Name' },
         primary: true,
     }),
     {
         accessorKey: 'branch',
-        ...createSortingHeader('Branch'),
+        ...createSortingHeader({ key: 'column.branch', fallback: 'Branch' }),
         cell: renderBranchCell,
     },
     createActionsColumn<Warehouse>(),

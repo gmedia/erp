@@ -31,13 +31,13 @@ export function createCreditNoteFilterFields(): FieldDescriptor[] {
         ...createSelectFilterFields([
             {
                 name: 'reason',
-                label: 'Reason',
+                label: { key: 'column.reason', fallback: 'Reason' },
                 options: creditNoteReasonOptions,
                 placeholder: 'Select Reason',
             },
             {
                 name: 'status',
-                label: 'Status',
+                label: { key: 'column.status', fallback: 'Status' },
                 options: creditNoteStatusOptions,
                 placeholder: 'Select Status',
             },
@@ -45,12 +45,18 @@ export function createCreditNoteFilterFields(): FieldDescriptor[] {
         ...createDateFilterFields([
             {
                 name: 'credit_note_date_from',
-                label: 'Credit Note Date From',
+                label: {
+                    key: 'column.credit_note_date_from',
+                    fallback: 'Credit Note Date From',
+                },
                 placeholder: 'Credit Note Date From',
             },
             {
                 name: 'credit_note_date_to',
-                label: 'Credit Note Date To',
+                label: {
+                    key: 'column.credit_note_date_to',
+                    fallback: 'Credit Note Date To',
+                },
                 placeholder: 'Credit Note Date To',
             },
         ]),

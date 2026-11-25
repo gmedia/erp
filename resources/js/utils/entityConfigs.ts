@@ -61,6 +61,8 @@ export interface CustomEntityConfig<
     // hanya entity yang item-nya tidak ada di respons list (mis. stock transfer).
     readonly loadDetailOnEdit?: boolean;
     readonly detailLoadErrorMessage?: string;
+    readonly titleKey?: string;
+    readonly descriptionKey?: string;
 }
 
 // Union type for all entity configurations with improved typing
@@ -202,6 +204,8 @@ export interface ComplexEntityConfigOptions<T = Record<string, unknown>> {
     loadDetailOnEdit?: boolean;
     detailLoadErrorMessage?: string;
     permissionPrefix?: string;
+    titleKey?: string;
+    descriptionKey?: string;
 }
 
 // Factory to create a bound SimpleEntityViewModal for a specific entity
@@ -284,6 +288,8 @@ function createComplexEntityConfig<T = Record<string, unknown>>(
         loadDetailOnEdit: options.loadDetailOnEdit,
         detailLoadErrorMessage: options.detailLoadErrorMessage,
         permissionPrefix: options.permissionPrefix,
+        titleKey: options.titleKey,
+        descriptionKey: options.descriptionKey,
     };
 }
 
@@ -553,6 +559,8 @@ export const purchaseOrderConfig = createComplexEntityConfig<PurchaseOrder>({
     apiEndpoint: '/api/purchase-orders',
     exportEndpoint: '/api/purchase-orders/export',
     queryKey: ['purchase-orders'],
+    titleKey: 'page.purchase_orders.title',
+    descriptionKey: 'page.purchase_orders.description',
     breadcrumbs: [{ title: 'Purchase Orders', href: '/purchase-orders' }],
     initialFilters: {
         search: '',
@@ -731,7 +739,15 @@ export const productConfig = createComplexEntityConfig({
     apiEndpoint: '/api/products',
     exportEndpoint: '/api/products/export',
     queryKey: ['products'],
-    breadcrumbs: [{ title: 'Products', href: '/products' }],
+    titleKey: 'page.products.title',
+    descriptionKey: 'page.products.description',
+    breadcrumbs: [
+        {
+            title: 'Products',
+            titleKey: 'page.products.title',
+            href: '/products',
+        },
+    ],
     initialFilters: {
         search: '',
         product_category_id: '',

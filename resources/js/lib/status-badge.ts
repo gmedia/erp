@@ -186,6 +186,81 @@ export function stocktakeVarianceBadgeVariant(
     }
 }
 
+const STATUS_TRANSLATION_KEYS = new Set([
+    'draft',
+    'pending',
+    'pending_approval',
+    'confirmed',
+    'approved',
+    'auto_approved',
+    'rejected',
+    'cancelled',
+    'canceled',
+    'completed',
+    'closed',
+    'received',
+    'partially_received',
+    'fully_received',
+    'in_transit',
+    'in_progress',
+    'posted',
+    'sent',
+    'open',
+    'on_hold',
+    'returned',
+    'failed',
+    'overdue',
+    'active',
+    'inactive',
+    'archived',
+    'void',
+    'voided',
+    'partially_ordered',
+    'fully_ordered',
+    'partially_paid',
+    'paid',
+    'full_paid',
+    'outstanding',
+    'applied',
+    'reconciled',
+    'scheduled',
+    'reopened',
+    'stocktake_result',
+    'maintenance',
+    'idle',
+    'locked',
+    'expired',
+    'disposed',
+    'lost',
+    'discontinued',
+    'step_rejected',
+    'work_in_progress',
+    'intern',
+    'regular',
+    'partially_processed',
+    'damaged',
+    'missing',
+    'deficit',
+    'surplus',
+    'moved',
+    'urgent',
+    'high',
+    'normal',
+    'low',
+]);
+
+export function statusTranslationKey(
+    status: string | null | undefined,
+): string | null {
+    if (!status) {
+        return null;
+    }
+
+    const key = status.toLowerCase().replace(/\s+/g, '_');
+
+    return STATUS_TRANSLATION_KEYS.has(key) ? `status.${key}` : null;
+}
+
 // Nama class PHP/FQCN → label manusiawi (mis. App\Models\PurchaseRequest →
 // "Purchase Request", SupplierBill → "Supplier Bill") untuk kolom Entity/
 // Approvable/Document Type (W4-11).

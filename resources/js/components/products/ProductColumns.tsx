@@ -51,37 +51,43 @@ const renderStatusCell = ({ row }: { row: { original: Product } }) => {
 
 export const productColumns: ColumnDef<Product>[] = [
     createSelectColumn(),
-    createTextColumn<Product>({ accessorKey: 'code', label: 'Code' }),
+    createTextColumn<Product>({
+        accessorKey: 'code',
+        label: { key: 'column.code', fallback: 'Code' },
+    }),
     createTextColumn<Product>({
         accessorKey: 'name',
-        label: 'Name',
+        label: { key: 'column.name', fallback: 'Name' },
         primary: true,
     }),
     {
         accessorKey: 'type',
-        ...createSortingHeader('Type'),
+        ...createSortingHeader({ key: 'column.type', fallback: 'Type' }),
         cell: renderTypeCell,
     },
     {
         accessorKey: 'category',
-        ...createSortingHeader('Category'),
+        ...createSortingHeader({
+            key: 'column.category',
+            fallback: 'Category',
+        }),
         cell: renderCategoryCell,
     },
     createCurrencyColumn<Product>({
         accessorKey: 'cost',
-        label: 'Cost',
+        label: { key: 'column.cost', fallback: 'Cost' },
         currency: 'IDR',
         locale: 'id-ID',
     }),
     createCurrencyColumn<Product>({
         accessorKey: 'selling_price',
-        label: 'Price',
+        label: { key: 'column.price', fallback: 'Price' },
         currency: 'IDR',
         locale: 'id-ID',
     }),
     {
         accessorKey: 'status',
-        ...createSortingHeader('Status'),
+        ...createSortingHeader({ key: 'column.status', fallback: 'Status' }),
         cell: renderStatusCell,
     },
     createActionsColumn<Product>(),

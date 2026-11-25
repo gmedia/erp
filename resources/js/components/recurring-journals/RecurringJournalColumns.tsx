@@ -28,17 +28,23 @@ export const recurringJournalColumns: ColumnDef<RecurringJournal>[] = [
     createSelectColumn<RecurringJournal>(),
     createTextColumn<RecurringJournal>({
         accessorKey: 'name',
-        label: 'Name',
+        label: { key: 'column.name', fallback: 'Name' },
         enableSorting: true,
     }),
     {
         accessorKey: 'frequency',
-        ...createSortingHeader('Frequency'),
+        ...createSortingHeader({
+            key: 'column.frequency',
+            fallback: 'Frequency',
+        }),
         cell: ({ row }) => getFrequencyLabel(row.getValue('frequency')),
     },
     {
         accessorKey: 'next_run_date',
-        ...createSortingHeader('Next Run Date'),
+        ...createSortingHeader({
+            key: 'column.next_run_date',
+            fallback: 'Next Run Date',
+        }),
         cell: ({ row }) =>
             formatDateByRegionalSettings(
                 row.getValue('next_run_date') as string,
@@ -48,11 +54,14 @@ export const recurringJournalColumns: ColumnDef<RecurringJournal>[] = [
         RecurringJournal & { currency?: string | null }
     >({
         accessorKey: 'total_amount',
-        label: 'Total Amount',
+        label: { key: 'column.total_amount', fallback: 'Total Amount' },
     }),
     {
         accessorKey: 'auto_post',
-        ...createSortingHeader('Auto Post'),
+        ...createSortingHeader({
+            key: 'column.auto_post',
+            fallback: 'Auto Post',
+        }),
         cell: ({ row }) => (
             <Badge
                 variant={row.getValue('auto_post') ? 'default' : 'secondary'}
@@ -63,7 +72,10 @@ export const recurringJournalColumns: ColumnDef<RecurringJournal>[] = [
     },
     {
         accessorKey: 'is_active',
-        ...createSortingHeader('Is Active'),
+        ...createSortingHeader({
+            key: 'column.is_active',
+            fallback: 'Is Active',
+        }),
         cell: ({ row }) => (
             <Badge
                 variant={statusBadgeVariant(
@@ -76,7 +88,10 @@ export const recurringJournalColumns: ColumnDef<RecurringJournal>[] = [
     },
     {
         accessorKey: 'created_at',
-        ...createSortingHeader('Created At'),
+        ...createSortingHeader({
+            key: 'column.created_at',
+            fallback: 'Created At',
+        }),
         cell: ({ row }) =>
             formatDateByRegionalSettings(row.getValue('created_at') as string),
     },

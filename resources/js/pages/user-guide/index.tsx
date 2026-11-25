@@ -3,6 +3,7 @@
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { useTranslation } from '@/contexts/i18n-context';
 import AppLayout from '@/layouts/app-layout';
 import { getToken } from '@/lib/token-storage';
 import { cn } from '@/lib/utils';
@@ -24,11 +25,6 @@ interface GuideContent {
     content: string;
 }
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Dashboard', href: '/dashboard' },
-    { title: 'User Guide', href: '/user-guide' },
-];
-
 async function fetchWithAuth(url: string) {
     const apiToken = getToken() || '';
     return fetch(url, {
@@ -40,6 +36,11 @@ async function fetchWithAuth(url: string) {
 }
 
 export default function UserGuidePage() {
+    const { t } = useTranslation();
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: t('menu.dashboard'), href: '/dashboard' },
+        { title: t('shell.user_guide'), href: '/user-guide' },
+    ];
     const [guides, setGuides] = useState<GuideItem[]>([]);
     const [activeSlug, setActiveSlug] = useState<string | null>(null);
     const [content, setContent] = useState<GuideContent | null>(null);
@@ -107,12 +108,12 @@ export default function UserGuidePage() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Helmet>
-                <title>User Guide</title>
+                <title>{t('shell.user_guide')}</title>
             </Helmet>
 
             <div className="px-4 py-6">
                 <Heading
-                    title="User Guide"
+                    title={t('shell.user_guide')}
                     description="Panduan penggunaan aplikasi ERP"
                 />
 
