@@ -34,7 +34,9 @@ async function expectReportNumericHeaderRightAligned(
 }
 
 test.describe('Report Purchase History - lebar 1440', () => {
-    test('kolom Total Value terlihat tanpa geser di 1440', async ({ page }) => {
+    test('tabel digeser horizontal di 1440 dengan petunjuk geser, Total Value dan total sejajar di ujung', async ({
+        page,
+    }) => {
         await page.setViewportSize({ width: 1440, height: 900 });
         await openModule(
             page,
@@ -42,25 +44,72 @@ test.describe('Report Purchase History - lebar 1440', () => {
             '/api/reports/purchase-history',
         );
 
-        await page.getByTestId('columns-button').click();
-        await page
-            .getByRole('menuitemcheckbox', { name: 'total_purchase_value' })
-            .click();
-        await page.keyboard.press('Escape');
-
         const totalHead = page
             .locator('th', { hasText: 'Total Value' })
             .first();
         await expect(totalHead).toBeVisible();
-        const box = await totalHead.boundingBox();
-        expect(box).not.toBeNull();
-        expect(box!.x + box!.width).toBeLessThanOrEqual(1440);
 
-        const scroller = page.locator('.overflow-x-auto').first();
+        const scroller = totalHead.locator(
+            'xpath=ancestor::div[contains(concat(" ", normalize-space(@class), " "), " overflow-x-auto ")][1]',
+        );
+        await expect(scroller).toHaveCount(1);
+
         const overflows = await scroller.evaluate(
             (el) => el.scrollWidth > el.clientWidth,
         );
-        expect(overflows).toBe(false);
+        expect(overflows).toBe(true);
+        const tableContainer = page
+            .locator('[data-slot="table-container"]')
+            .first();
+        await expect(tableContainer).toHaveAttribute(
+            'data-overflow-right',
+            'true',
+        );
+
+        await scroller.evaluate((el) => {
+            el.scrollLeft = el.scrollWidth;
+        });
+        await expect
+            .poll(() =>
+                scroller.evaluate(
+                    (el) =>
+                        Math.abs(
+                            el.scrollWidth - el.clientWidth - el.scrollLeft,
+                        ) <= 1,
+                ),
+            )
+            .toBe(true);
+
+        const totalCell = page.getByTestId(
+            'report-total-cell-total_purchase_value',
+        );
+        await expect(totalCell).toBeVisible();
+
+        const rects = await scroller.evaluate((container, cellSelector) => {
+            const c = container.getBoundingClientRect();
+            const th = Array.from(container.querySelectorAll('th')).find((h) =>
+                (h.textContent ?? '').includes('Total Value'),
+            );
+            const td = document.querySelector(cellSelector);
+            return {
+                containerLeft: c.left,
+                containerRight: c.right,
+                headRight: th ? th.getBoundingClientRect().right : null,
+                headLeft: th ? th.getBoundingClientRect().left : null,
+                cellRight: td ? td.getBoundingClientRect().right : null,
+                cellLeft: td ? td.getBoundingClientRect().left : null,
+            };
+        }, '[data-testid="report-total-cell-total_purchase_value"]');
+
+        expect(rects.headLeft).not.toBeNull();
+        expect(rects.headLeft!).toBeGreaterThanOrEqual(rects.containerLeft - 1);
+        expect(rects.headRight!).toBeLessThanOrEqual(rects.containerRight + 1);
+        expect(rects.cellLeft!).toBeGreaterThanOrEqual(rects.containerLeft - 1);
+        expect(rects.cellRight!).toBeLessThanOrEqual(rects.containerRight + 1);
+        expect(
+            Math.abs(rects.headRight! - rects.cellRight!),
+            `Total Value head right=${rects.headRight} vs total cell right=${rects.cellRight}`,
+        ).toBeLessThanOrEqual(4);
     });
 });
 
