@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\Actions\AccountingPosting\PostAssetDisposalJournalAction;
 use App\Models\Account;
 use App\Models\AccountMapping;
 use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use App\Models\JournalEntryLine;
+use App\Models\Setting;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -143,7 +145,8 @@ class FinancialReportService
      * Baris lawan yang juga akun kas (transfer antar kas) saling meniadakan.
      *
      * Kelompok ditentukan dari akun lawan:
-     * - investasi: sub_type non_current_asset (aset tetap & akumulasi penyusutan)
+     * - investasi: akun laba/rugi pelepasan aset (pengaturan), atau sub_type
+     *   non_current_asset (aset tetap & akumulasi penyusutan)
      * - pendanaan: sub_type non_current_liability atau type equity
      * - operasi: selain itu
      *
@@ -152,6 +155,7 @@ class FinancialReportService
     public function getCashFlowActivityTotals(int $fiscalYearId, ?int $branchId = null): array
     {
         $totals = ['operating' => 0.0, 'investing' => 0.0, 'financing' => 0.0];
+        $disposalAccountIds = $this->assetDisposalAccountIds();
 
         // Himpunan jurnal sama dengan net_change (tanpa filter versi COA pada baris
         // lawan), agar jumlah aktivitas selalu sama dengan perubahan kas.
@@ -169,6 +173,7 @@ class FinancialReportService
                 'journal_entry_lines.debit',
                 'journal_entry_lines.credit',
                 'line_accounts.is_cash_flow',
+                'line_accounts.id as account_id',
                 'line_accounts.type as account_type',
                 'line_accounts.sub_type as account_sub_type',
             ]);
@@ -187,7 +192,9 @@ class FinancialReportService
                     continue;
                 }
 
-                $activity = $this->classifyCashFlowActivity($counter->account_type, $counter->account_sub_type);
+                $activity = in_array((int) $counter->account_id, $disposalAccountIds, true)
+                    ? 'investing'
+                    : $this->classifyCashFlowActivity($counter->account_type, $counter->account_sub_type);
                 $totals[$activity] += $contribution;
             }
         }
@@ -951,6 +958,25 @@ class FinancialReportService
         }
 
         return $chain;
+    }
+
+    /**
+     * Akun laba/rugi pelepasan aset (pengaturan, #442). Hasil penjualan aset masuk
+     * investasi (PSAK 2), sehingga laba/rugi pelepasan tidak masuk operasi.
+     *
+     * @return list<int>
+     */
+    private function assetDisposalAccountIds(): array
+    {
+        $ids = [
+            Setting::get(PostAssetDisposalJournalAction::GAIN_SETTING_KEY),
+            Setting::get(PostAssetDisposalJournalAction::LOSS_SETTING_KEY),
+        ];
+
+        return array_values(array_unique(array_map(
+            static fn (mixed $id): int => (int) $id,
+            array_filter($ids, static fn (mixed $id): bool => $id !== null && $id !== ''),
+        )));
     }
 
     private function classifyCashFlowActivity(?string $type, ?string $subType): string
