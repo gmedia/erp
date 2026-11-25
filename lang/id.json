@@ -217,6 +217,7 @@
     },
     "table": {
         "no_data": "Tidak ada data tersedia",
+        "no_results": "Tidak ada hasil.",
         "select_all": "Pilih semua",
         "selected": "dipilih"
     },
@@ -225,7 +226,24 @@
         "add": "Tambah",
         "export": "Ekspor",
         "columns": "Kolom",
-        "user_guide": "Panduan Pengguna"
+        "user_guide": "Panduan Pengguna",
+        "refresh": "Muat ulang",
+        "import": "Impor",
+        "import_title": "Impor Data",
+        "import_description": "Unggah file Excel atau CSV untuk mengimpor data.",
+        "import_template": "Templat",
+        "import_download_template": "Unduh Templat",
+        "import_file": "File",
+        "import_close": "Tutup",
+        "import_completed": "Impor Selesai",
+        "import_finished_with_errors": "Impor Selesai dengan Kesalahan",
+        "import_check_errors": "Periksa daftar kesalahan di bawah.",
+        "import_success_rows": "Berhasil mengimpor {count} baris.",
+        "import_no_data": "Tidak ada data yang diimpor.",
+        "import_validation_error": "Kesalahan Validasi",
+        "import_invalid_file": "File tidak valid.",
+        "import_failed": "Impor Gagal",
+        "import_unexpected_error": "Terjadi kesalahan tak terduga."
     },
     "language": {
         "switch": "Bahasa",

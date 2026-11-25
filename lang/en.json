@@ -217,6 +217,7 @@
     },
     "table": {
         "no_data": "No data available",
+        "no_results": "No results.",
         "select_all": "Select all",
         "selected": "selected"
     },
@@ -225,7 +226,24 @@
         "add": "Add",
         "export": "Export",
         "columns": "Columns",
-        "user_guide": "User Guide"
+        "user_guide": "User Guide",
+        "refresh": "Refresh",
+        "import": "Import",
+        "import_title": "Import Data",
+        "import_description": "Upload an Excel or CSV file to import data.",
+        "import_template": "Template",
+        "import_download_template": "Download Template",
+        "import_file": "File",
+        "import_close": "Close",
+        "import_completed": "Import Completed",
+        "import_finished_with_errors": "Import Finished with Errors",
+        "import_check_errors": "Check the error list below.",
+        "import_success_rows": "Successfully imported {count} rows.",
+        "import_no_data": "No data was imported.",
+        "import_validation_error": "Validation Error",
+        "import_invalid_file": "Invalid file.",
+        "import_failed": "Import Failed",
+        "import_unexpected_error": "An unexpected error occurred."
     },
     "language": {
         "switch": "Language",

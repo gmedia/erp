@@ -30,7 +30,23 @@ test('english shell translations keep the original english toolbar labels', func
         ->and($en['add'])->toBe('Add')
         ->and($en['export'])->toBe('Export')
         ->and($en['columns'])->toBe('Columns')
-        ->and($en['user_guide'])->toBe('User Guide');
+        ->and($en['user_guide'])->toBe('User Guide')
+        ->and($en['refresh'])->toBe('Refresh')
+        ->and($en['import'])->toBe('Import')
+        ->and($en['import_title'])->toBe('Import Data')
+        ->and($en['import_success_rows'])->toBe('Successfully imported {count} rows.');
+});
+
+test('english table empty state keeps the original text', function () {
+    $decoded = json_decode(File::get(lang_path('en.json')), true, 512, JSON_THROW_ON_ERROR);
+
+    expect($decoded['table']['no_results'] ?? null)->toBe('No results.');
+});
+
+test('indonesian locale keeps the import success placeholder', function () {
+    $id = localeShellTranslations('id.json');
+
+    expect($id['import_success_rows'])->toContain('{count}');
 });
 
 test('shell translation values are non-empty strings', function () {
