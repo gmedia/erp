@@ -44,7 +44,13 @@ class ReportController extends Controller
             $report = $this->reportService->getTrialBalance($selectedYearId, $branchId);
             $config = $this->configurationResolver->execute(ReportConfiguration::TYPE_TRIAL_BALANCE);
             if ($config) {
-                $computedSections = $this->evaluateSections->execute($config['sections'], $report['totals'] ?? []);
+                $totals = $this->reportService->getTrialBalanceTotals($selectedYearId, $branchId);
+                // Section tanpa filter akun membaca total berdasarkan kode section
+                // (lihat ReportConfigurationSeeder::seedTrialBalance).
+                $computedSections = $this->evaluateSections->execute($config['sections'], [
+                    'all_accounts' => $totals['total_debit'],
+                    'total_debit_credit' => $totals['total_debit'],
+                ]);
             }
         }
 

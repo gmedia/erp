@@ -104,6 +104,38 @@ test('EvaluateReportSectionsAction computes section values from report totals', 
         ->and($result[3]['value'])->toBe(6000000.0);
 });
 
+test('EvaluateReportSectionsAction mengambil nilai section tanpa formula dari total berdasarkan kode', function () {
+    $action = app(EvaluateReportSectionsAction::class);
+
+    $sections = [
+        [
+            'code' => 'all_accounts',
+            'name' => 'Semua Akun',
+            'section_type' => 'detail',
+            'account_type_filter' => null,
+            'account_sub_type_filter' => null,
+            'sign_convention' => 'normal',
+            'formula' => null,
+            'sort_order' => 1,
+        ],
+        [
+            'code' => 'total_debit_credit',
+            'name' => 'TOTAL',
+            'section_type' => 'total',
+            'account_type_filter' => null,
+            'account_sub_type_filter' => null,
+            'sign_convention' => 'normal',
+            'formula' => null,
+            'sort_order' => 2,
+        ],
+    ];
+
+    $result = $action->execute($sections, ['all_accounts' => 750.5, 'total_debit_credit' => 750.5]);
+
+    expect($result[0]['value'])->toBe(750.5)
+        ->and($result[1]['value'])->toBe(750.5);
+});
+
 test('EvaluateReportSectionsAction applies sign_convention reversed', function () {
     $action = app(EvaluateReportSectionsAction::class);
 
