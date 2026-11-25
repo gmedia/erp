@@ -30,6 +30,17 @@ final class DemoMasterData
 
     public const WAREHOUSE_PRODUCTION_NAME = 'Gudang Produksi';
 
+    /**
+     * Barang demo stok (opname, penyesuaian, transfer) memakai produk katalog yang sudah ada
+     * (#503 butir 1). Kode `INV-2026-*` lama adalah duplikat dan dibersihkan seeder.
+     *
+     * @var list<string>
+     */
+    public const STOCK_DEMO_PRODUCT_CODES = ['EL-PER-001', 'EL-PER-002'];
+
+    /** @var list<string> Kode duplikat lama (#503 butir 1). */
+    public const LEGACY_STOCK_DEMO_PRODUCT_CODES = ['INV-2026-001', 'INV-2026-002', 'INV-2026-003'];
+
     // Kategori produk demo (Bahasa Indonesia, W7-17).
     public const PRODUCT_CATEGORY_ELECTRONICS = 'Elektronik';
 

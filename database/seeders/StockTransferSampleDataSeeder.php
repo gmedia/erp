@@ -5,15 +5,14 @@ namespace Database\Seeders;
 use App\Models\Branch;
 use App\Models\Employee;
 use App\Models\Product;
-use App\Models\ProductCategory;
 use App\Models\StockTransfer;
 use App\Models\StockTransferItem;
-use App\Models\Unit;
 use App\Models\User;
 use App\Models\Warehouse;
 use Database\Seeders\Concerns\ReopensDemoPeriodClosings;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
+use RuntimeException;
 
 class StockTransferSampleDataSeeder extends Seeder
 {
@@ -48,8 +47,7 @@ class StockTransferSampleDataSeeder extends Seeder
             );
         }
 
-        $branchIdForStock = $fromWarehouse->branch_id ?? Branch::query()->value('id');
-        $products = $this->ensureProducts($branchIdForStock);
+        $products = $this->ensureProducts();
 
         $year = now()->format('Y');
 
@@ -197,74 +195,21 @@ class StockTransferSampleDataSeeder extends Seeder
         }
     }
 
-    private function renameLegacyProducts(): void
+    /**
+     * Barang transfer = produk katalog yang sudah ada (#503 butir 1), bukan `INV-2026-*` duplikat.
+     */
+    private function ensureProducts(): Collection
     {
-        $map = [
-            'INV-SMP-001' => 'INV-2026-001',
-            'INV-SMP-002' => 'INV-2026-002',
-            'INV-SMP-003' => 'INV-2026-003',
-        ];
+        $products = Product::query()
+            ->whereIn('code', DemoMasterData::STOCK_DEMO_PRODUCT_CODES)
+            ->orderBy('id')
+            ->get();
 
-        foreach ($map as $legacy => $current) {
-            if (Product::where('code', $current)->exists()) {
-                continue;
-            }
-
-            Product::where('code', $legacy)->update(['code' => $current]);
-        }
-    }
-
-    private function ensureProducts(int $branchId): Collection
-    {
-        $this->renameLegacyProducts();
-        $products = Product::query()->orderBy('id')->take(3)->get();
-
-        if ($products->count() >= 3) {
-            return $products;
+        if ($products->count() < count(DemoMasterData::STOCK_DEMO_PRODUCT_CODES)) {
+            throw new RuntimeException('Katalog demo belum lengkap; jalankan ProductSampleDataSeeder dulu.');
         }
 
-        $categoryId = ProductCategory::query()->value('id');
-        $unitId = Unit::query()->value('id');
-
-        $samples = [
-            [
-                'code' => 'INV-2026-001',
-                'name' => 'Kabel HDMI 2 Meter',
-                'type' => 'raw_material',
-                'cost' => 10000,
-            ],
-            [
-                'code' => 'INV-2026-002',
-                'name' => 'Mouse Wireless M170',
-                'type' => 'raw_material',
-                'cost' => 15000,
-            ],
-            [
-                'code' => 'INV-2026-003',
-                'name' => 'Keyboard Mekanik K2',
-                'type' => 'finished_good',
-                'cost' => 25000,
-            ],
-        ];
-
-        foreach ($samples as $sample) {
-            $product = Product::updateOrCreate(
-                ['code' => $sample['code']],
-                [
-                    'name' => $sample['name'],
-                    'type' => $sample['type'],
-                    'product_category_id' => $categoryId,
-                    'unit_id' => $unitId,
-                    'branch_id' => $branchId,
-                    'cost' => $sample['cost'],
-                    'selling_price' => 0,
-                    'billing_model' => 'one_time',
-                    'status' => 'active',
-                ]
-            );
-        }
-
-        return Product::query()->orderBy('id')->take(3)->get();
+        return $products->values();
     }
 
     private function makeTransferItems(Collection $products, bool $partialReceive): array
