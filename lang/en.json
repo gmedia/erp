@@ -710,6 +710,7 @@
         "amount_received": "Amount Received",
         "amount_paid": "Amount Paid",
         "allocated": "Allocated",
+        "running_balance": "Running Balance",
         "bank_account": "Bank Account",
         "credit_note_amount": "Credit Note Amount",
         "unallocated": "Unallocated",

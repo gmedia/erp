@@ -238,6 +238,16 @@ test('ap outstanding and payment history column keys have translations', functio
         ->and($en['allocated'])->toBe('Allocated');
 });
 
+test('customer statement running balance column key has translation', function () {
+    $en = localeColumnTranslations('en.json');
+    $id = localeColumnTranslations('id.json');
+
+    expect($en)->toHaveKey('running_balance')
+        ->and($id)->toHaveKey('running_balance')
+        ->and($id['running_balance'])->not->toBe($en['running_balance'])
+        ->and($en['running_balance'])->toBe('Running Balance');
+});
+
 test('column translation values are non-empty strings', function () {
     foreach (['en.json', 'id.json'] as $file) {
         foreach (localeColumnTranslations($file) as $key => $value) {

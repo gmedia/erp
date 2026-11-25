@@ -710,6 +710,7 @@
         "amount_received": "Jumlah Diterima",
         "amount_paid": "Jumlah Dibayar",
         "allocated": "Dialokasikan",
+        "running_balance": "Saldo Berjalan",
         "bank_account": "Rekening Bank",
         "credit_note_amount": "Jumlah Nota Kredit",
         "unallocated": "Belum Dialokasikan",
