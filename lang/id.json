@@ -1467,7 +1467,8 @@
             "item_qty": "Qty",
             "item_unit_cost": "Harga Satuan",
             "item_notes": "Catatan",
-            "item_action": "Aksi"
+            "item_action": "Aksi",
+            "item_quantity_label": "Kuantitas"
         },
         "stock_adjustments": {
             "add_title": "Tambah Penyesuaian Stok Baru",
@@ -1503,7 +1504,12 @@
             "item_qty_adjusted": "Qty Penyesuaian",
             "item_unit_cost": "Harga Satuan",
             "item_reason": "Alasan",
-            "item_action": "Aksi"
+            "item_action": "Aksi",
+            "item_quantity_before": "Kuantitas Sebelum",
+            "item_quantity_adjusted": "Kuantitas Penyesuaian",
+            "item_unit_cost_label": "Harga Satuan",
+            "item_reason_label": "Alasan",
+            "item_reason_placeholder": "Alasan item"
         },
         "inventory_stocktakes": {
             "add_title": "Tambah Stock Opname Persediaan Baru",
@@ -1528,7 +1534,9 @@
             "item_system_qty": "Qty Sistem",
             "item_counted_qty": "Qty Hitung",
             "item_notes": "Catatan",
-            "item_action": "Aksi"
+            "item_action": "Aksi",
+            "item_system_quantity": "Kuantitas Sistem",
+            "item_counted_quantity": "Kuantitas Hitung"
         },
         "products": {
             "add_title": "Tambah Produk/Layanan Baru",

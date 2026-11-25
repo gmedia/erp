@@ -283,3 +283,27 @@ test('stock adjustment and inventory stocktake form field keys are complete in b
         ->and($id['inventory_stocktakes']['add_title'])->toBe('Tambah Stock Opname Persediaan Baru')
         ->and($id['inventory_stocktakes']['item_counted_qty'])->toBe('Qty Hitung');
 });
+
+test('stock transfer item dialog labels keep the english text', function () {
+    $en = localeFormFieldTranslations('en.json');
+
+    expect($en['stock_transfers']['item_quantity_label'])->toBe('Quantity')
+        ->and($en['stock_transfers']['item_unit_cost'])->toBe('Unit Cost');
+});
+
+test('inventory stocktake item dialog labels keep the english text', function () {
+    $en = localeFormFieldTranslations('en.json');
+
+    expect($en['inventory_stocktakes']['item_system_quantity'])->toBe('System Quantity')
+        ->and($en['inventory_stocktakes']['item_counted_quantity'])->toBe('Counted Quantity');
+});
+
+test('stock adjustment item dialog labels keep the english text', function () {
+    $en = localeFormFieldTranslations('en.json');
+
+    expect($en['stock_adjustments']['item_quantity_before'])->toBe('Quantity Before')
+        ->and($en['stock_adjustments']['item_quantity_adjusted'])->toBe('Quantity Adjusted')
+        ->and($en['stock_adjustments']['item_unit_cost_label'])->toBe('Unit Cost')
+        ->and($en['stock_adjustments']['item_reason_label'])->toBe('Reason')
+        ->and($en['stock_adjustments']['item_reason_placeholder'])->toBe('Item reason');
+});

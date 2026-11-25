@@ -95,7 +95,10 @@ export function InventoryStocktakeItemFormDialog({
                 />
                 <InputField
                     name="system_quantity"
-                    label="System Quantity"
+                    label={{
+                        key: 'form_fields.inventory_stocktakes.item_system_quantity',
+                        fallback: 'System Quantity',
+                    }}
                     type="number"
                     min={0}
                     step="any"
@@ -103,7 +106,10 @@ export function InventoryStocktakeItemFormDialog({
                 />
                 <InputField
                     name="counted_quantity"
-                    label="Counted Quantity"
+                    label={{
+                        key: 'form_fields.inventory_stocktakes.item_counted_quantity',
+                        fallback: 'Counted Quantity',
+                    }}
                     type="number"
                     min={0}
                     step="any"

@@ -92,7 +92,10 @@ export function StockAdjustmentItemFormDialog({
                 />
                 <InputField
                     name="quantity_before"
-                    label="Quantity Before"
+                    label={{
+                        key: 'form_fields.stock_adjustments.item_quantity_before',
+                        fallback: 'Quantity Before',
+                    }}
                     type="number"
                     min={0}
                     step="any"
@@ -100,14 +103,20 @@ export function StockAdjustmentItemFormDialog({
                 />
                 <InputField
                     name="quantity_adjusted"
-                    label="Quantity Adjusted"
+                    label={{
+                        key: 'form_fields.stock_adjustments.item_quantity_adjusted',
+                        fallback: 'Quantity Adjusted',
+                    }}
                     type="number"
                     step="any"
                     placeholder="0"
                 />
                 <InputField
                     name="unit_cost"
-                    label="Unit Cost"
+                    label={{
+                        key: 'form_fields.stock_adjustments.item_unit_cost_label',
+                        fallback: 'Unit Cost',
+                    }}
                     type="number"
                     min={0}
                     step="any"
@@ -117,8 +126,14 @@ export function StockAdjustmentItemFormDialog({
 
             <TextareaField
                 name="reason"
-                label="Reason"
-                placeholder="Item reason"
+                label={{
+                    key: 'form_fields.stock_adjustments.item_reason_label',
+                    fallback: 'Reason',
+                }}
+                placeholder={{
+                    key: 'form_fields.stock_adjustments.item_reason_placeholder',
+                    fallback: 'Item reason',
+                }}
                 rows={3}
             />
         </ItemFormDialogShell>
