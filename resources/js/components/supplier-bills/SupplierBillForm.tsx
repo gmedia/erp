@@ -349,10 +349,7 @@ export const SupplierBillForm = memo<SupplierBillFormProps>(
                     <InputField
                         name="payment_terms"
                         label={fl('payment_terms', 'Payment Terms')}
-                        placeholder={fl(
-                            'payment_terms_placeholder',
-                            'Net 30',
-                        )}
+                        placeholder={fl('payment_terms_placeholder', 'Net 30')}
                     />
 
                     <div className="md:col-span-2">
@@ -376,7 +373,10 @@ export const SupplierBillForm = memo<SupplierBillFormProps>(
                             <TableHeader>
                                 <TableRow>
                                     <TableHead className="w-[220px]">
-                                        {fl('column_description', 'Description')}
+                                        {fl(
+                                            'column_description',
+                                            'Description',
+                                        )}
                                     </TableHead>
                                     <TableHead className="w-[140px]">
                                         {fl('column_account', 'Account')}

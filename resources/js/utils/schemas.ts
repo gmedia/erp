@@ -1157,7 +1157,8 @@ export const customerInvoiceFormSchema = z.object({
                 }),
                 ...linePricingFields({
                     quantity: 'validation.customer_invoice.quantity_gt_zero',
-                    unitPrice: 'validation.customer_invoice.unit_price_min_zero',
+                    unitPrice:
+                        'validation.customer_invoice.unit_price_min_zero',
                 }),
             }),
         )
