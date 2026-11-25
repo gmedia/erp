@@ -13,13 +13,19 @@
  *
  *   VISUAL_AUDIT_WAVE=wave-0   — PNG output dir under docs/visual-audit/waves/
  *
+ * Locale (optional):
+ *   VISUAL_AUDIT_LOCALE=id     — sets localStorage['app_locale'] (same mechanism
+ *                                as setLocale in i18n-context.tsx), reloads, captures,
+ *                                then restores the previous value. Output goes to
+ *                                `<outDir>/<locale>/` and report.jsonl records `locale`.
+ *
  * Matrix (optional, default light + desktop → `<slug>.png`):
  *   VISUAL_AUDIT_THEMES=light,dark          — via prefers-color-scheme (appearance "system")
  *   VISUAL_AUDIT_VIEWPORTS=desktop,mobile   — 1440×900 / 390×844
  *   Non-default combos → `<slug>--<theme>--<viewport>.png`. Per-capture metrics
  *   (horizontal overflow, console errors) → `<outDir>/report.jsonl`.
  */
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import { appendFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { login } from '../helpers';
@@ -29,6 +35,16 @@ const wave = process.env.VISUAL_AUDIT_WAVE ?? 'wave-0';
 const outDir = join('docs/visual-audit/waves', wave);
 const urlListPath = 'docs/visual-audit/url-list.json';
 const presetsPath = 'docs/visual-audit/presets.json';
+
+const LOCALE_KEY = 'app_locale';
+const SUPPORTED_LOCALES = ['en', 'id'];
+const auditLocale = process.env.VISUAL_AUDIT_LOCALE?.trim() ?? '';
+if (auditLocale && !SUPPORTED_LOCALES.includes(auditLocale)) {
+    throw new Error(
+        `VISUAL_AUDIT_LOCALE="${auditLocale}" tidak didukung. Pilihan: ${SUPPORTED_LOCALES.join(', ')}`,
+    );
+}
+const captureDir = auditLocale ? join(outDir, auditLocale) : outDir;
 
 type PresetsFile = {
     presets?: Record<string, { routes?: string[]; note?: string }>;
@@ -125,7 +141,160 @@ const viewports = parseList<ViewportName>(
     ['desktop', 'mobile'],
     'desktop',
 );
-const reportPath = join(outDir, 'report.jsonl');
+const reportPath = join(captureDir, 'report.jsonl');
+
+async function readLocale(page: Page): Promise<string | null> {
+    return page.evaluate((key) => localStorage.getItem(key), LOCALE_KEY);
+}
+
+async function writeLocale(page: Page, value: string | null): Promise<void> {
+    await page.evaluate(
+        ([key, next]) => {
+            if (next === null) {
+                localStorage.removeItem(key);
+            } else {
+                localStorage.setItem(key, next);
+            }
+        },
+        [LOCALE_KEY, value] as const,
+    );
+}
+
+async function captureRoute(
+    page: Page,
+    route: string,
+    slug: string,
+    consoleErrors: string[],
+): Promise<void> {
+    const gotoTarget = async (): Promise<void> => {
+        await page.goto(route, {
+            waitUntil: 'domcontentloaded',
+            timeout: 60_000,
+        });
+        await page
+            .waitForLoadState('networkidle', { timeout: 15_000 })
+            .catch(() => undefined);
+        // Harness screenshot: jeda render stabil (animasi/paint) sebelum capture; tidak ada elemen tunggal yang menandai kesiapan.
+        await page.waitForTimeout(500);
+    };
+
+    await gotoTarget();
+
+    if (route !== '/login' && page.url().includes('/login')) {
+        await login(page, undefined, undefined, {
+            requireDashboard: true,
+        });
+        await gotoTarget();
+    }
+
+    const url = page.url();
+    expect(url.includes('/login') && route !== '/login').toBeFalsy();
+
+    for (const viewport of viewports) {
+        await page.setViewportSize(VIEWPORTS[viewport]);
+
+        for (const theme of themes) {
+            await page.emulateMedia({ colorScheme: theme });
+            // Harness screenshot: jeda transisi tema (CSS) sebelum metrik dan capture.
+            await page.waitForTimeout(300);
+
+            const metrics = await page.evaluate(() => ({
+                dark: document.documentElement.classList.contains('dark'),
+                scrollWidth: document.documentElement.scrollWidth,
+                innerWidth: window.innerWidth,
+            }));
+
+            const isDefault = theme === 'light' && viewport === 'desktop';
+            const file = join(
+                captureDir,
+                isDefault
+                    ? `${slug}.png`
+                    : `${slug}--${theme}--${viewport}.png`,
+            );
+            await page.screenshot({ path: file, fullPage: false });
+
+            const clippedCells = await page.evaluate(() => {
+                const edgeFadeWidthPx = 16;
+                const out: string[] = [];
+                document
+                    .querySelectorAll<HTMLElement>(
+                        '[data-slot="table-container"]',
+                    )
+                    .forEach((container) => {
+                        const row = container.querySelector(
+                            'tbody tr[data-state], tbody tr',
+                        );
+                        if (!row) return;
+                        const containerRight =
+                            container.getBoundingClientRect().right;
+                        const fadeLeft = container.hasAttribute(
+                            'data-overflow-right',
+                        )
+                            ? containerRight - edgeFadeWidthPx
+                            : containerRight;
+                        const cells = Array.from(
+                            row.querySelectorAll<HTMLElement>(':scope > td'),
+                        );
+                        let stickyLeft = Infinity;
+                        for (const cell of cells) {
+                            if (getComputedStyle(cell).position === 'sticky') {
+                                const cellLeft =
+                                    cell.getBoundingClientRect().left;
+                                const pseudo = getComputedStyle(
+                                    cell,
+                                    '::before',
+                                );
+                                const hasPseudo =
+                                    pseudo.content !== 'none' &&
+                                    pseudo.content !== '';
+                                const pseudoLeft = hasPseudo
+                                    ? cellLeft + (parseFloat(pseudo.left) || 0)
+                                    : cellLeft;
+                                stickyLeft = Math.min(stickyLeft, pseudoLeft);
+                            }
+                        }
+                        const limit = Math.min(fadeLeft, stickyLeft);
+                        for (const cell of cells) {
+                            if (getComputedStyle(cell).position === 'sticky') {
+                                continue;
+                            }
+                            const range = document.createRange();
+                            range.selectNodeContents(cell);
+                            const textRight =
+                                range.getBoundingClientRect().right;
+                            const text = (cell.textContent ?? '')
+                                .trim()
+                                .slice(0, 40);
+                            if (text && textRight > limit + 0.5) {
+                                out.push(
+                                    `${text} (text right ${Math.round(textRight)} > limit ${Math.round(limit)})`,
+                                );
+                            }
+                        }
+                    });
+                return out;
+            });
+
+            appendFileSync(
+                reportPath,
+                JSON.stringify({
+                    route,
+                    locale: auditLocale || null,
+                    theme,
+                    viewport,
+                    file,
+                    darkClass: metrics.dark,
+                    horizontalOverflow: Math.max(
+                        0,
+                        metrics.scrollWidth - metrics.innerWidth,
+                    ),
+                    consoleErrors: [...consoleErrors],
+                    clippedCells,
+                }) + '\n',
+            );
+        }
+    }
+}
 
 test.describe('visual audit capture', () => {
     test.skip(!enabled, 'Set VISUAL_AUDIT=1 to run capture');
@@ -135,7 +304,7 @@ test.describe('visual audit capture', () => {
     });
 
     test.beforeAll(() => {
-        mkdirSync(outDir, { recursive: true });
+        mkdirSync(captureDir, { recursive: true });
     });
 
     for (const route of routes) {
@@ -154,146 +323,20 @@ test.describe('visual audit capture', () => {
             await login(page, undefined, undefined, { requireDashboard: true });
             await page.setViewportSize(VIEWPORTS.desktop);
 
-            const gotoTarget = async (): Promise<void> => {
-                await page.goto(route, {
-                    waitUntil: 'domcontentloaded',
-                    timeout: 60_000,
-                });
-                await page
-                    .waitForLoadState('networkidle', { timeout: 15_000 })
-                    .catch(() => undefined);
-                // Harness screenshot: jeda render stabil (animasi/paint) sebelum capture; tidak ada elemen tunggal yang menandai kesiapan.
-                await page.waitForTimeout(500);
-            };
+            const previousLocale = await readLocale(page);
+            const switchLocale =
+                auditLocale !== '' && previousLocale !== auditLocale;
 
-            await gotoTarget();
+            try {
+                if (switchLocale) {
+                    await writeLocale(page, auditLocale);
+                    await page.reload({ waitUntil: 'domcontentloaded' });
+                }
 
-            if (route !== '/login' && page.url().includes('/login')) {
-                await login(page, undefined, undefined, {
-                    requireDashboard: true,
-                });
-                await gotoTarget();
-            }
-
-            const url = page.url();
-            expect(url.includes('/login') && route !== '/login').toBeFalsy();
-
-            for (const viewport of viewports) {
-                await page.setViewportSize(VIEWPORTS[viewport]);
-
-                for (const theme of themes) {
-                    await page.emulateMedia({ colorScheme: theme });
-                    // Harness screenshot: jeda transisi tema (CSS) sebelum metrik dan capture.
-                    await page.waitForTimeout(300);
-
-                    const metrics = await page.evaluate(() => ({
-                        dark: document.documentElement.classList.contains(
-                            'dark',
-                        ),
-                        scrollWidth: document.documentElement.scrollWidth,
-                        innerWidth: window.innerWidth,
-                    }));
-
-                    const isDefault =
-                        theme === 'light' && viewport === 'desktop';
-                    const file = join(
-                        outDir,
-                        isDefault
-                            ? `${slug}.png`
-                            : `${slug}--${theme}--${viewport}.png`,
-                    );
-                    await page.screenshot({ path: file, fullPage: false });
-
-                    const clippedCells = await page.evaluate(() => {
-                        const edgeFadeWidthPx = 16;
-                        const out: string[] = [];
-                        document
-                            .querySelectorAll<HTMLElement>(
-                                '[data-slot="table-container"]',
-                            )
-                            .forEach((container) => {
-                                const row = container.querySelector(
-                                    'tbody tr[data-state], tbody tr',
-                                );
-                                if (!row) return;
-                                const containerRight =
-                                    container.getBoundingClientRect().right;
-                                const fadeLeft = container.hasAttribute(
-                                    'data-overflow-right',
-                                )
-                                    ? containerRight - edgeFadeWidthPx
-                                    : containerRight;
-                                const cells = Array.from(
-                                    row.querySelectorAll<HTMLElement>(
-                                        ':scope > td',
-                                    ),
-                                );
-                                let stickyLeft = Infinity;
-                                for (const cell of cells) {
-                                    if (
-                                        getComputedStyle(cell).position ===
-                                        'sticky'
-                                    ) {
-                                        const cellLeft =
-                                            cell.getBoundingClientRect().left;
-                                        const pseudo = getComputedStyle(
-                                            cell,
-                                            '::before',
-                                        );
-                                        const hasPseudo =
-                                            pseudo.content !== 'none' &&
-                                            pseudo.content !== '';
-                                        const pseudoLeft = hasPseudo
-                                            ? cellLeft +
-                                              (parseFloat(pseudo.left) || 0)
-                                            : cellLeft;
-                                        stickyLeft = Math.min(
-                                            stickyLeft,
-                                            pseudoLeft,
-                                        );
-                                    }
-                                }
-                                const limit = Math.min(fadeLeft, stickyLeft);
-                                for (const cell of cells) {
-                                    if (
-                                        getComputedStyle(cell).position ===
-                                        'sticky'
-                                    ) {
-                                        continue;
-                                    }
-                                    const range = document.createRange();
-                                    range.selectNodeContents(cell);
-                                    const textRight =
-                                        range.getBoundingClientRect().right;
-                                    const text = (cell.textContent ?? '')
-                                        .trim()
-                                        .slice(0, 40);
-                                    if (text && textRight > limit + 0.5) {
-                                        out.push(
-                                            `${text} (text right ${Math.round(textRight)} > limit ${Math.round(limit)})`,
-                                        );
-                                    }
-                                }
-                            });
-                        return out;
-                    });
-
-                    appendFileSync(
-                        reportPath,
-                        JSON.stringify({
-                            route,
-                            theme,
-                            viewport,
-                            file,
-                            darkClass: metrics.dark,
-                            horizontalOverflow: Math.max(
-                                0,
-                                metrics.scrollWidth - metrics.innerWidth,
-                            ),
-                            consoleErrors: [...consoleErrors],
-                            clippedCells,
-                        }) + '\n',
-                    );
+                await captureRoute(page, route, slug, consoleErrors);
+            } finally {
+                if (switchLocale) {
+                    await writeLocale(page, previousLocale);
                 }
             }
         });
