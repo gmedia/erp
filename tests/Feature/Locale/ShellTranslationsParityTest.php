@@ -43,6 +43,28 @@ test('english table empty state keeps the original text', function () {
     expect($decoded['table']['no_results'] ?? null)->toBe('No results.');
 });
 
+test('file upload translation keys exist in both locales with matching placeholders', function () {
+    $decode = fn (string $file): array => json_decode(
+        File::get(lang_path($file)),
+        true,
+        512,
+        JSON_THROW_ON_ERROR,
+    )['file_upload'] ?? [];
+    $en = $decode('en.json');
+    $id = $decode('id.json');
+
+    expect($en)->not->toBeEmpty();
+    expect(array_keys($en))->toEqualCanonicalizing(array_keys($id));
+    expect($en['choose'])->toBe('Choose File')
+        ->and($en['none'])->toBe('No file chosen')
+        ->and($id['choose'])->toBe('Pilih Berkas')
+        ->and($id['none'])->toBe('Belum ada berkas dipilih');
+
+    foreach (['current', 'preview'] as $key) {
+        expect($en[$key])->toContain('{name}')->and($id[$key])->toContain('{name}');
+    }
+});
+
 test('indonesian locale keeps the import success placeholder', function () {
     $id = localeShellTranslations('id.json');
 
