@@ -48,6 +48,12 @@ function isActionsColumn(columnId: string): boolean {
     return columnId === 'actions' || columnId === 'actions_custom';
 }
 
+function isNumericColumn(columnDef: object): boolean {
+    return (
+        (columnDef as { meta?: { numeric?: boolean } }).meta?.numeric === true
+    );
+}
+
 function stickyCellClass(
     columnId: string,
     hasGrandTotal: boolean,
@@ -438,6 +444,8 @@ export function DataTable<T>({
                             key={cell.id}
                             className={cn(
                                 'border-border px-2 py-1.5',
+                                isNumericColumn(cell.column.columnDef) &&
+                                    'pr-4',
                                 stickyCellClass(
                                     cell.column.id,
                                     hasStickyGrandTotal,

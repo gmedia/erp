@@ -281,6 +281,7 @@ export function createNumberColumn<T = Record<string, unknown>>(
 
     const baseColumn: ColumnDef<T> = {
         accessorKey: accessorKey as string,
+        meta: { numeric: true },
         cell: ({ row }) => {
             const value = Number.parseFloat(
                 row.getValue(accessorKey as string) as string,
@@ -653,6 +654,7 @@ export function createRowCurrencyAmountColumn<
 
     return {
         accessorKey: accessorKey as string,
+        meta: { numeric: true },
         ...createSortingHeader(label, { align: 'right' }),
         cell: ({ row }) => (
             <div className={className}>
