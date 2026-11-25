@@ -40,6 +40,23 @@ class FinancialReportService
         );
     }
 
+    /**
+     * Total trial balance untuk kartu ringkasan: jumlah debit dan kredit net per
+     * akun pada jurnal posted, mengikuti filter cabang. Bentuk `report` (list)
+     * tidak berubah; total ini hanya dipasok ke EvaluateReportSectionsAction.
+     *
+     * @return array{total_debit: float, total_credit: float}
+     */
+    public function getTrialBalanceTotals(int $fiscalYearId, ?int $branchId = null): array
+    {
+        $rows = $this->getTrialBalance($fiscalYearId, $branchId);
+
+        return [
+            'total_debit' => round((float) array_sum(array_column($rows, 'debit')), 2),
+            'total_credit' => round((float) array_sum(array_column($rows, 'credit')), 2),
+        ];
+    }
+
     public function getCashFlow(int $fiscalYearId, ?int $branchId = null): array
     {
         $coaVersion = $this->resolveRequiredCoaVersion($fiscalYearId);
