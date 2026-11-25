@@ -72,6 +72,8 @@ interface SettingsData {
         asset_disposal_gain_account_label?: string | null;
         asset_disposal_loss_account_id?: string | number | null;
         asset_disposal_loss_account_label?: string | null;
+        inventory_in_transit_account_id?: string | number | null;
+        inventory_in_transit_account_label?: string | null;
     };
 }
 
@@ -920,6 +922,9 @@ function AccountingSettings({
     const [lossId, setLossId] = useState(
         String(settings?.asset_disposal_loss_account_id ?? ''),
     );
+    const [inTransitId, setInTransitId] = useState(
+        String(settings?.inventory_in_transit_account_id ?? ''),
+    );
 
     const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -931,6 +936,7 @@ function AccountingSettings({
             await axiosInstance.put('/api/admin-settings', {
                 asset_disposal_gain_account_id: gainId || null,
                 asset_disposal_loss_account_id: lossId || null,
+                inventory_in_transit_account_id: inTransitId || null,
             });
             await onSaved?.();
             setRecentlySuccessful(true);
@@ -987,6 +993,18 @@ function AccountingSettings({
                     onChange={setLossId}
                     disabled={!canEdit}
                     error={errors.asset_disposal_loss_account_id}
+                />
+                <DisposalAccountField
+                    id="inventory_in_transit_account_id"
+                    label={t('admin.accounting.inTransitLabel')}
+                    description={t('admin.accounting.inTransitHint')}
+                    value={inTransitId}
+                    initialLabel={
+                        settings?.inventory_in_transit_account_label ?? ''
+                    }
+                    onChange={setInTransitId}
+                    disabled={!canEdit}
+                    error={errors.inventory_in_transit_account_id}
                 />
             </form>
         </SettingsSection>

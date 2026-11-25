@@ -88,6 +88,16 @@ Setelah transfer berstatus **In Transit**, barang dapat diterima di gudang tujua
 2. Klik tombol **Receive**
 3. Stok di gudang asal berkurang, stok di gudang tujuan bertambah
 
+### Nilai Persediaan Saat Transfer
+
+- Saat transfer dikirim (In Transit), nilai barang dipindahkan dari akun **Persediaan** gudang asal ke akun **Persediaan dalam Perjalanan**. Nilainya = qty kirim x average cost gudang asal.
+- Saat transfer diterima, nilai dipindahkan dari **Persediaan dalam Perjalanan** ke **Persediaan** gudang tujuan. Nilainya = qty terima x biaya kirim.
+- Gudang tujuan menghitung average cost barunya dengan biaya kirim tersebut.
+- Jika qty terima lebih kecil dari qty kirim, selisih kurang dicatat sebagai **Beban Selisih Persediaan** (qty kirim - qty terima) x biaya kirim.
+- Transfer yang dibatalkan sebelum diterima dijurnal pembalik, sehingga saldo **Persediaan dalam Perjalanan** kembali nol untuk transfer tersebut.
+- Akun Persediaan dalam Perjalanan diatur di **Admin Settings > Accounting**. Akun default tersedia di bagan akun (CoA) seed.
+- Saldo barang dalam perjalanan ditampilkan di Stock Monitor dan laporan valuasi persediaan.
+
 ## 5. Membatalkan Transfer
 
 Klik ikon **Delete** pada transfer berstatus **draft**. Sistem akan mengubah status menjadi **cancelled** (soft-cancel).

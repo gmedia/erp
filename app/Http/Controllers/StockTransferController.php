@@ -70,7 +70,7 @@ class StockTransferController extends Controller
         );
 
         // Create langsung berstatus received: jurnal selisih ikut diposting (Issue #357).
-        app(PostStockTransferJournalAction::class)->execute($transfer->refresh());
+        $this->postTransferJournals($transfer->refresh());
 
         $transfer->load(['fromWarehouse', 'toWarehouse', 'items.product', 'items.unit']);
 
@@ -151,6 +151,8 @@ class StockTransferController extends Controller
             // lewat satu jalur yang sama dengan DELETE (reverseTransfer).
             if ($wasDispatched && $nextStatus === 'cancelled') {
                 $stockPosting->reverseTransfer($stockTransfer->refresh());
+                // Issue #495: batal sebelum diterima membalik jurnal dispatch (in-transit).
+                app(PostStockTransferJournalAction::class)->executeDispatchReversal($stockTransfer->refresh());
 
                 return;
             }
@@ -213,7 +215,7 @@ class StockTransferController extends Controller
                 );
             }
 
-            app(PostStockTransferJournalAction::class)->execute($stockTransfer->refresh());
+            $this->postTransferJournals($stockTransfer->refresh());
         });
 
         $stockTransfer->load(['fromWarehouse', 'toWarehouse', 'items.product', 'items.unit']);
@@ -236,6 +238,24 @@ class StockTransferController extends Controller
      *
      * @return array<string, mixed>
      */
+    /**
+     * Issue #495: jurnal per tahap. Dispatch saat sudah dikirim, lalu receive dan
+     * selisih saat diterima. Tiap tahap idempoten, jadi aman dipanggil ulang.
+     */
+    private function postTransferJournals(StockTransfer $stockTransfer): void
+    {
+        $journals = app(PostStockTransferJournalAction::class);
+
+        if (in_array($stockTransfer->status, ['in_transit', 'received'], true)) {
+            $journals->executeDispatch($stockTransfer);
+        }
+
+        if ($stockTransfer->status === 'received') {
+            $journals->executeReceive($stockTransfer);
+            $journals->executeShortage($stockTransfer);
+        }
+    }
+
     private function workflowStampsFor(StockTransfer $stockTransfer, string $nextStatus): array
     {
         $now = now()->toIso8601String();

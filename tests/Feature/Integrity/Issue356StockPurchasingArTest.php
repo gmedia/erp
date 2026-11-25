@@ -199,6 +199,7 @@ describe('Issue #356 — baris 4: hapus transfer in_transit mengembalikan stok a
 
 describe('Issue #356 — baris 5: transfer received tanpa quantity_received = diterima penuh', function () {
     test('transfer received tanpa quantity_received memasukkan 5 unit ke gudang tujuan', function () {
+        createInTransitAccountFixture();
         $from = Warehouse::factory()->create();
         $to = Warehouse::factory()->create();
         $product = Product::factory()->create();

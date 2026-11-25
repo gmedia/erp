@@ -76,6 +76,9 @@ class CoaSeeder extends Seeder
         // COA yang sudah ada ikut memperoleh akun ini tanpa diseed ulang.
         $this->ensureAssetDisposalAccounts($coaVersion2026->id);
 
+        // Akun persediaan dalam perjalanan (#495), idempoten seperti akun pelepasan.
+        $this->ensureInventoryInTransitAccount($coaVersion2026->id);
+
         // Fetch account maps from database for reliability
         $accountMap2025 = Account::where('coa_version_id', $coaVersion2025->id)
             ->pluck('id', 'code')
@@ -181,6 +184,27 @@ class CoaSeeder extends Seeder
         Setting::updateOrCreate(
             ['key' => 'asset_disposal_loss_account_id'],
             ['group' => 'accounting', 'value' => (string) $loss->id, 'type' => 'string'],
+        );
+    }
+
+    /**
+     * Akun persediaan dalam perjalanan (#495), dipasang sebagai anak grup
+     * Current Assets (11000) di sebelah Inventory (11300) lalu diset ke Setting.
+     */
+    private function ensureInventoryInTransitAccount(int $coaVersionId): void
+    {
+        $inTransit = $this->firstOrCreateAccount($coaVersionId, '11000', [
+            'code' => '11310',
+            'name' => 'Persediaan dalam Perjalanan',
+            'type' => 'asset',
+            'sub_type' => 'current_asset',
+            'normal_balance' => 'debit',
+            'level' => 3,
+        ]);
+
+        Setting::updateOrCreate(
+            ['key' => 'inventory_in_transit_account_id'],
+            ['group' => 'accounting', 'value' => (string) $inTransit->id, 'type' => 'string'],
         );
     }
 

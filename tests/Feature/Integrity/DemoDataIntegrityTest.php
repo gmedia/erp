@@ -497,10 +497,12 @@ invariant('W7-04 only eligible document states produce stock movements', functio
     }
 });
 
-// W7-04 — inventory valuation equals GL 11300.
+// W7-04 / #495 — nilai kartu stok + barang dalam perjalanan = GL persediaan + GL in-transit.
 invariant('W7-04 inventory valuation equals GL inventory account', function () {
     $inventoryAccountId = activeCoaAccountId('11300');
+    $inTransitAccountId = activeCoaAccountId('11310');
     expect($inventoryAccountId)->not->toBeNull('Active COA must expose account 11300');
+    expect($inTransitAccountId)->not->toBeNull('Active COA must expose account 11310');
 
     $movements = DB::table('stock_movements')
         ->orderBy('product_id')
@@ -531,25 +533,34 @@ invariant('W7-04 inventory valuation equals GL inventory account', function () {
         ->selectRaw('COALESCE(SUM(stock_transfer_items.quantity * stock_transfer_items.unit_cost), 0) as value')
         ->value('value');
 
-    expect(round(postedBalance((int) $inventoryAccountId, true), 2))
-        ->toBe(round($valuation + $inTransit, 2), 'GL 11300 must equal stock movement valuation plus goods in transit');
+    // #495: barang dalam perjalanan punya akun sendiri (11310), jadi invarian
+    // membandingkan GL persediaan + in-transit dengan kartu + in-transit.
+    $glTotal = postedBalance((int) $inventoryAccountId, true) + postedBalance((int) $inTransitAccountId, true);
+
+    expect(round($glTotal, 2))
+        ->toBe(round($valuation + $inTransit, 2), 'GL 11300 + 11310 must equal stock movement valuation plus goods in transit');
 });
 
 // W7-04 — invarian 11300 harus menangkap kehilangan jurnal selisih transfer dan
 // barang in_transit yang tidak tercatat di GL (issue #357 review PR #384 butir 2).
 test('W7-04 11300 invariant fails when a transfer shortage journal is removed', function () {
     $inventoryAccountId = activeCoaAccountId('11300');
+    $inTransitAccountId = activeCoaAccountId('11310');
 
-    $shortageJournalIds = DB::table('stock_transfers')
-        ->whereNotNull('journal_entry_id')
-        ->pluck('journal_entry_id');
+    expect($inTransitAccountId)->not->toBeNull('Active COA must expose account 11310');
+
+    $shortageJournalIds = DB::table('journal_entries')
+        ->where('source_type', StockTransfer::class)
+        ->where('journal_type', 'st_shortage')
+        ->pluck('id');
 
     expect($shortageJournalIds)->not->toBeEmpty('Demo data must post at least one transfer shortage journal');
 
-    // Hapus jurnal kekurangan: GL 11300 kehilangan kreditnya, invarian harus merah.
+    // Hapus sisi in-transit jurnal kekurangan: GL in-transit tidak lagi turun
+    // sebesar selisih, sementara kartu stok tidak berubah, jadi invarian harus merah.
     DB::table('journal_entry_lines')
         ->whereIn('journal_entry_id', $shortageJournalIds)
-        ->where('account_id', $inventoryAccountId)
+        ->where('account_id', $inTransitAccountId)
         ->delete();
 
     $valuation = 0.0;
@@ -575,7 +586,9 @@ test('W7-04 11300 invariant fails when a transfer shortage journal is removed', 
         ->selectRaw('COALESCE(SUM(stock_transfer_items.quantity * stock_transfer_items.unit_cost), 0) as value')
         ->value('value');
 
-    expect(round(postedBalance((int) $inventoryAccountId, true), 2))
+    $glTotal = postedBalance((int) $inventoryAccountId, true) + postedBalance((int) $inTransitAccountId, true);
+
+    expect(round($glTotal, 2))
         ->not->toBe(round($valuation + $inTransit, 2), 'Invarian 11300 harus merah saat jurnal kekurangan hilang');
 });
 
