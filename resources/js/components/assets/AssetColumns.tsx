@@ -54,12 +54,7 @@ export const assetColumns: ColumnDef<Asset>[] = [
         accessorKey: 'name',
         ...createSortingHeader({ key: 'column.name', fallback: 'Name' }),
         cell: ({ row }) => {
-            const meta = [
-                row.original.category?.name,
-                row.original.model?.model_name,
-            ]
-                .filter(Boolean)
-                .join(' · ');
+            const meta = row.original.model?.model_name ?? '';
 
             return (
                 <div className="max-w-56 min-w-0">

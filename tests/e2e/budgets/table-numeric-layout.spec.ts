@@ -101,6 +101,60 @@ test.describe('Budgets - kolom angka & layout', () => {
     });
 });
 
+test.describe('Purchase Orders & Assets - kolom uang rata kanan', () => {
+    test('header Grand Total PO rata kanan dengan nilai di 1440', async ({
+        page,
+    }) => {
+        await page.setViewportSize({ width: 1440, height: 900 });
+        await openModule(page, '/purchase-orders', '/api/purchase-orders');
+        await expectNumericHeaderRightAligned(page, 'Grand Total');
+    });
+
+    test('header Cost Assets rata kanan dengan nilai di 1440', async ({
+        page,
+    }) => {
+        await page.setViewportSize({ width: 1440, height: 900 });
+        await openModule(page, '/assets', '/api/assets');
+        await expectNumericHeaderRightAligned(page, 'Cost');
+    });
+});
+
+test.describe('Meta baris kedua tidak menduplikasi kolom', () => {
+    test('Purchase Orders: meta memakai gudang, bukan supplier yang sudah punya kolom', async ({
+        page,
+    }) => {
+        await page.setViewportSize({ width: 1440, height: 900 });
+        await openModule(page, '/purchase-orders', '/api/purchase-orders');
+
+        const row = page.locator('tbody tr').first();
+        const poNumberHead = page.locator('th', { hasText: 'PO Number' }).first();
+        const poIndex = await columnIndexOf(poNumberHead);
+        const poCell = row.locator(`td:nth-child(${poIndex})`);
+        const meta = poCell.locator('div.text-xs').first();
+        await expect(meta).toBeVisible();
+
+        const apiToken = await page.evaluate(() =>
+            localStorage.getItem('api_token'),
+        );
+        expect(apiToken).toBeTruthy();
+        const apiRes = await page.request.get('/api/purchase-orders?per_page=1', {
+            headers: {
+                Accept: 'application/json',
+                Authorization: `Bearer ${apiToken}`,
+            },
+        });
+        expect(apiRes.ok()).toBeTruthy();
+        const apiJson = (await apiRes.json()) as Record<string, unknown>;
+        const list = (
+            Array.isArray(apiJson.data) ? apiJson.data : []
+        ) as Array<{ warehouse?: { name?: string } }>;
+        const warehouseName = list[0]?.warehouse?.name;
+        expect(warehouseName).toBeTruthy();
+
+        expect((await meta.innerText()).trim()).toBe(warehouseName);
+    });
+});
+
 test.describe('Bank reconciliations - kolom angka & layout', () => {
     test('header angka Statement, Book, Difference rata kanan di 1440', async ({
         page,

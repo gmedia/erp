@@ -68,10 +68,14 @@ export const creditNoteColumns: ColumnDef<CreditNote>[] = [
     }),
     {
         accessorKey: 'grand_total',
-        ...createSortingHeader({
-            key: 'column.grand_total',
-            fallback: 'Grand Total',
-        }),
+        meta: { numeric: true },
+        ...createSortingHeader(
+            {
+                key: 'column.grand_total',
+                fallback: 'Grand Total',
+            },
+            { align: 'right' },
+        ),
         cell: ({ row }) => (
             <div className="text-right">
                 {formatCurrencyByRegionalSettings(row.original.grand_total, {

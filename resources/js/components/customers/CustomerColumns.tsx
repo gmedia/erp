@@ -49,10 +49,6 @@ export const customerColumns: ColumnDef<Customer>[] = [
         accessorKey: 'name',
         label: { key: 'column.name', fallback: 'Name' },
         primary: true,
-        description: (row) =>
-            typeof row.category === 'object'
-                ? (row.category?.name ?? null)
-                : (row.category ?? null),
     }),
     createEmailColumn<Customer>({
         accessorKey: 'email',
