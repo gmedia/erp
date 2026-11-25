@@ -776,7 +776,22 @@
         "days_1_30": "1-30 Hari",
         "days_31_60": "31-60 Hari",
         "days_61_90": "61-90 Hari",
-        "days_over_90": "Lebih 90 Hari"
+        "days_over_90": "Lebih 90 Hari",
+        "system_qty": "Qty Sistem",
+        "counted_qty": "Qty Hitung",
+        "variance": "Selisih",
+        "result": "Hasil",
+        "counted_at": "Waktu Hitung",
+        "adjustment_count": "Jumlah Penyesuaian",
+        "total_qty_adjusted": "Total Qty Disesuaikan",
+        "increase_qty": "Qty Penambahan",
+        "decrease_qty": "Qty Pengurangan",
+        "total_adjustment_value": "Total Nilai Penyesuaian",
+        "adjustment_no": "No. Penyesuaian",
+        "unit": "Satuan",
+        "total_in": "Total Masuk",
+        "total_out": "Total Keluar",
+        "ending_balance": "Saldo Akhir"
     },
     "movement_type": {
         "transfer": "Pemindahan",
@@ -878,5 +893,11 @@
         "stock_by_category": "Stok per Kategori",
         "stock_by_branch": "Stok per Cabang",
         "no_data": "Tidak ada data"
+    },
+    "filter": {
+        "stock_movement_search_placeholder": "Cari produk, kategori, gudang, cabang...",
+        "stocktake_variance_search_placeholder": "Cari opname, produk, kategori, gudang...",
+        "valuation_search_placeholder": "Cari produk, kategori, gudang, cabang...",
+        "adjustment_search_placeholder": "Cari nomor, gudang, cabang, jenis, status..."
     }
 }

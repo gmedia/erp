@@ -11,8 +11,11 @@ export function createInventoryStocktakeVarianceFilterFields(): FieldDescriptor[
     return [
         createTextFilterField(
             'search',
-            'Search',
-            'Search stocktake, product, category, warehouse...',
+            { key: 'column.search', fallback: 'Search' },
+            {
+                key: 'filter.stocktake_variance_search_placeholder',
+                fallback: 'Search stocktake, product, category, warehouse...',
+            },
         ),
         createInventoryStocktakeReportFilterField(),
         ...createInventoryReportScopeFilterFields(),

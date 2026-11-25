@@ -776,7 +776,22 @@
         "days_1_30": "1-30 Days",
         "days_31_60": "31-60 Days",
         "days_61_90": "61-90 Days",
-        "days_over_90": "Over 90 Days"
+        "days_over_90": "Over 90 Days",
+        "system_qty": "System Qty",
+        "counted_qty": "Counted Qty",
+        "variance": "Variance",
+        "result": "Result",
+        "counted_at": "Counted At",
+        "adjustment_count": "Adjustment Count",
+        "total_qty_adjusted": "Total Qty Adjusted",
+        "increase_qty": "Increase Qty",
+        "decrease_qty": "Decrease Qty",
+        "total_adjustment_value": "Total Adjustment Value",
+        "adjustment_no": "Adjustment No.",
+        "unit": "Unit",
+        "total_in": "Total In",
+        "total_out": "Total Out",
+        "ending_balance": "Ending Balance"
     },
     "movement_type": {
         "transfer": "Transfer",
@@ -878,5 +893,11 @@
         "stock_by_category": "Stock by Category",
         "stock_by_branch": "Stock by Branch",
         "no_data": "No data"
+    },
+    "filter": {
+        "stock_movement_search_placeholder": "Search product, category, warehouse, branch...",
+        "stocktake_variance_search_placeholder": "Search stocktake, product, category, warehouse...",
+        "valuation_search_placeholder": "Search product, category, warehouse, branch...",
+        "adjustment_search_placeholder": "Search number, warehouse, branch, type, status..."
     }
 }

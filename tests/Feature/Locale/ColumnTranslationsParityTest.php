@@ -248,6 +248,45 @@ test('customer statement running balance column key has translation', function (
         ->and($en['running_balance'])->toBe('Running Balance');
 });
 
+test('stock movement, valuation, stocktake variance and adjustment report keys have translations', function () {
+    $en = localeColumnTranslations('en.json');
+    $id = localeColumnTranslations('id.json');
+
+    $keys = [
+        'system_qty', 'counted_qty', 'variance', 'result', 'counted_at', 'adjustment_count',
+        'total_qty_adjusted', 'increase_qty', 'decrease_qty', 'total_adjustment_value',
+        'adjustment_no', 'unit', 'total_in', 'total_out', 'ending_balance',
+    ];
+
+    foreach ($keys as $key) {
+        expect($en)->toHaveKey($key)
+            ->and($id)->toHaveKey($key)
+            ->and($id[$key])->not->toBe($en[$key], "column.{$key} not translated");
+    }
+
+    expect($en['system_qty'])->toBe('System Qty')
+        ->and($en['total_adjustment_value'])->toBe('Total Adjustment Value')
+        ->and($en['ending_balance'])->toBe('Ending Balance');
+});
+
+test('report filter placeholders have translations in both locales', function () {
+    $en = json_decode(File::get(lang_path('en.json')), true, 512, JSON_THROW_ON_ERROR)['filter'];
+    $id = json_decode(File::get(lang_path('id.json')), true, 512, JSON_THROW_ON_ERROR)['filter'];
+
+    $keys = [
+        'stock_movement_search_placeholder',
+        'stocktake_variance_search_placeholder',
+        'valuation_search_placeholder',
+        'adjustment_search_placeholder',
+    ];
+
+    foreach ($keys as $key) {
+        expect($en)->toHaveKey($key)
+            ->and($id)->toHaveKey($key)
+            ->and($id[$key])->not->toBe($en[$key], "filter.{$key} not translated");
+    }
+});
+
 test('column translation values are non-empty strings', function () {
     foreach (['en.json', 'id.json'] as $file) {
         foreach (localeColumnTranslations($file) as $key => $value) {
