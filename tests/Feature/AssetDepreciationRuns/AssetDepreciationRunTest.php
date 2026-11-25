@@ -179,11 +179,13 @@ test('depreciation posting attributes journal lines per asset branch and injects
 
     $assetA = Asset::factory()->create([
         'branch_id' => $branchA->id,
+        'status' => 'active',
         'depreciation_expense_account_id' => $expenseAccount->id,
         'accumulated_depr_account_id' => $accumulatedAccount->id,
     ]);
     $assetB = Asset::factory()->create([
         'branch_id' => $branchB->id,
+        'status' => 'active',
         'depreciation_expense_account_id' => $expenseAccount->id,
         'accumulated_depr_account_id' => $accumulatedAccount->id,
     ]);
