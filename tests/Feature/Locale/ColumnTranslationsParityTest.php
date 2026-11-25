@@ -378,6 +378,31 @@ test('asset report, financial report shell and table column keys have translatio
         ->and($en['found_location'])->toBe('Found Location');
 });
 
+test('journal entry and stock monitor header and filter keys have translations', function () {
+    $en = localeColumnTranslations('en.json');
+    $id = localeColumnTranslations('id.json');
+
+    // "Status" dan "Search" memang sama di kedua bahasa, jadi hanya diuji keberadaannya.
+    $sameInBoth = ['status', 'search'];
+    $keys = [
+        'reference', 'branch', 'category', 'warehouse', 'product',
+        'qty_on_hand', 'avg_cost', 'stock_value', 'last_movement', 'low_stock_threshold',
+    ];
+
+    foreach ($sameInBoth as $key) {
+        expect($en)->toHaveKey($key)->and($id)->toHaveKey($key);
+    }
+
+    foreach ($keys as $key) {
+        expect($en)->toHaveKey($key)
+            ->and($id)->toHaveKey($key)
+            ->and($id[$key])->not->toBe($en[$key], "column.{$key} not translated");
+    }
+
+    expect($en['last_movement'])->toBe('Last Movement')
+        ->and($id['stock_value'])->toBe('Nilai Stok');
+});
+
 test('column translation values are non-empty strings', function () {
     foreach (['en.json', 'id.json'] as $file) {
         foreach (localeColumnTranslations($file) as $key => $value) {
