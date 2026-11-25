@@ -48,4 +48,40 @@ test.describe('i18n shell (locale id)', () => {
         await expect(page.getByText('Rows per page')).toHaveCount(0);
         await expect(page.getByText('Showing ')).toHaveCount(0);
     });
+
+    test('purchase orders status badges use Indonesian labels', async ({
+        page,
+    }) => {
+        await page.addInitScript((k) => {
+            localStorage.setItem(k, 'id');
+        }, LOCALE_KEY);
+
+        await login(page);
+        await page.goto('/purchase-orders', { waitUntil: 'domcontentloaded' });
+
+        await expect(
+            page.getByRole('columnheader', { name: 'Status' }),
+        ).toBeVisible({ timeout: 15000 });
+        await expect(page.getByText('Draf', { exact: true }).first()).toBeVisible();
+        await expect(page.getByText('Draft', { exact: true })).toHaveCount(0);
+    });
+});
+
+test.describe('i18n shell (locale en)', () => {
+    test('purchase orders status badges keep English labels', async ({
+        page,
+    }) => {
+        await page.addInitScript((k) => {
+            localStorage.setItem(k, 'en');
+        }, LOCALE_KEY);
+
+        await login(page);
+        await page.goto('/purchase-orders', { waitUntil: 'domcontentloaded' });
+
+        await expect(
+            page.getByRole('columnheader', { name: 'Status' }),
+        ).toBeVisible({ timeout: 15000 });
+        await expect(page.getByText('Draft', { exact: true }).first()).toBeVisible();
+        await expect(page.getByText('Draf', { exact: true })).toHaveCount(0);
+    });
 });
