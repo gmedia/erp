@@ -4,16 +4,15 @@ namespace Database\Seeders;
 
 use App\Models\Branch;
 use App\Models\Product;
-use App\Models\ProductCategory;
 use App\Models\StockAdjustment;
 use App\Models\StockAdjustmentItem;
-use App\Models\Unit;
 use App\Models\User;
 use App\Models\Warehouse;
 use Database\Seeders\Concerns\ReopensDemoPeriodClosings;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use RuntimeException;
 
 class StockAdjustmentSampleDataSeeder extends Seeder
 {
@@ -38,7 +37,7 @@ class StockAdjustmentSampleDataSeeder extends Seeder
         }
 
         $branchIdForStock = $warehouse->branch_id ?? Branch::query()->value('id');
-        $products = $this->ensureProductsWithStock($branchIdForStock);
+        $products = $this->ensureProductsWithStock();
 
         $year = now()->format('Y');
 
@@ -151,86 +150,19 @@ class StockAdjustmentSampleDataSeeder extends Seeder
         }
     }
 
-    private function renameLegacyProducts(): void
+    /**
+     * Barang penyesuaian = produk katalog yang sudah ada (#503 butir 1). Duplikat `INV-2026-*`
+     * dialihkan dan dihapus oleh seeder opname yang berjalan lebih dulu.
+     */
+    private function ensureProductsWithStock(): Collection
     {
-        $map = [
-            'INV-SMP-001' => 'INV-2026-001',
-            'INV-SMP-002' => 'INV-2026-002',
-            'INV-SMP-003' => 'INV-2026-003',
-        ];
+        $products = DemoMasterData::stockDemoProducts();
 
-        foreach ($map as $legacy => $current) {
-            if (Product::where('code', $current)->exists()) {
-                continue;
-            }
-
-            Product::where('code', $legacy)->update(['code' => $current]);
-        }
-    }
-
-    private function ensureProductsWithStock(int $branchId): Collection
-    {
-        $this->renameLegacyProducts();
-        $products = Product::query()
-            ->whereIn('code', ['INV-2026-001', 'INV-2026-002', 'INV-2026-003'])
-            ->orderBy('id')
-            ->get();
-
-        if ($products->count() >= 3) {
-            return $products->take(3);
+        if ($products->count() < count(DemoMasterData::STOCK_DEMO_PRODUCT_CODES)) {
+            throw new RuntimeException('Katalog demo belum lengkap; jalankan ProductSampleDataSeeder dulu.');
         }
 
-        $products = Product::query()->orderBy('id')->take(3)->get();
-        if ($products->count() >= 3) {
-            return $products;
-        }
-
-        $categoryId = ProductCategory::query()->value('id');
-        $unitId = Unit::query()->value('id');
-
-        $samples = [
-            [
-                'code' => 'INV-2026-001',
-                'name' => 'Kabel HDMI 2 Meter',
-                'type' => 'raw_material',
-                'cost' => 10000,
-            ],
-            [
-                'code' => 'INV-2026-002',
-                'name' => 'Mouse Wireless M170',
-                'type' => 'raw_material',
-                'cost' => 15000,
-            ],
-            [
-                'code' => 'INV-2026-003',
-                'name' => 'Keyboard Mekanik K2',
-                'type' => 'finished_good',
-                'cost' => 25000,
-            ],
-        ];
-
-        foreach ($samples as $sample) {
-            $product = Product::updateOrCreate(
-                ['code' => $sample['code']],
-                [
-                    'name' => $sample['name'],
-                    'type' => $sample['type'],
-                    'product_category_id' => $categoryId,
-                    'unit_id' => $unitId,
-                    'branch_id' => $branchId,
-                    'cost' => $sample['cost'],
-                    'selling_price' => 0,
-                    'billing_model' => 'one_time',
-                    'status' => 'active',
-                ]
-            );
-        }
-
-        return Product::query()
-            ->whereIn('code', ['INV-2026-001', 'INV-2026-002', 'INV-2026-003'])
-            ->orderBy('id')
-            ->get()
-            ->take(3);
+        return $products;
     }
 
     /**

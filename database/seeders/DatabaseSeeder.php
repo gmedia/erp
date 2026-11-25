@@ -175,6 +175,10 @@ class DatabaseSeeder extends Seeder
             );
         }
 
+        // Batas id jurnal sebelum data demo: jurnal dengan id <= batas dibuat pengguna
+        // (atau run seeder sebelumnya) dan nomornya tidak boleh berubah (#503 butir 3).
+        $journalIdBoundary = (int) DB::table('journal_entries')->max('id');
+
         $this->call([
             PermissionSeeder::class,
             MenuSeeder::class,
@@ -203,6 +207,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->spreadIdenticalAuditTimestamps();
+        $this->renumberDemoJournalEntries($journalIdBoundary);
 
         // Assign all permissions to sample users for easy testing. Cari karyawan lewat
         // user_id: email karyawan bisa berbeda dari email user di data demo lama (PR432).
@@ -223,6 +228,52 @@ class DatabaseSeeder extends Seeder
             if ($employee) {
                 $employee->permissions()->sync($allPermissions);
             }
+        }
+    }
+
+    /**
+     * Nomor jurnal demo dibentuk saat posting, sehingga urutannya mengikuti urutan pembuatan,
+     * bukan tanggal jurnal. Nomor JV diurutkan ulang per tahun fiskal menurut tanggal jurnal
+     * (lalu id) agar naik sesuai tanggal (#503 butir 3). Dua pass karena entry_number unik.
+     *
+     * Nomor jurnal yang sudah diposting pengguna tidak boleh berubah: bila ada jurnal JV dengan
+     * created_by (dibuat pengguna) yang sudah ada sebelum run ini, renumber dilewati seluruhnya.
+     * Jurnal sistem/demo (created_by null) tidak dikunci.
+     */
+    private function renumberDemoJournalEntries(int $journalIdBoundary): void
+    {
+        $hasUserJournal = DB::table('journal_entries')
+            ->where('id', '<=', $journalIdBoundary)
+            ->where('entry_number', 'like', 'JV-%')
+            ->whereNotNull('created_by')
+            ->exists();
+
+        if ($hasUserJournal) {
+            return;
+        }
+
+        $entries = DB::table('journal_entries')
+            ->where('entry_number', 'like', 'JV-%')
+            ->orderBy('fiscal_year_id')
+            ->orderBy('entry_date')
+            ->orderBy('id')
+            ->get(['id', 'fiscal_year_id', 'entry_number']);
+
+        // Pass 1: nomor sementara agar tidak bentrok dengan unique constraint.
+        foreach ($entries as $entry) {
+            DB::table('journal_entries')->where('id', $entry->id)->update(['entry_number' => "TMP-{$entry->id}"]);
+        }
+
+        // Pass 2: nomor final per tahun fiskal, berurutan sesuai tanggal.
+        $sequenceByYear = [];
+        foreach ($entries as $entry) {
+            $year = substr($entry->entry_number, 3, 4);
+            $key = $entry->fiscal_year_id . '|' . $year;
+            $sequenceByYear[$key] = ($sequenceByYear[$key] ?? 0) + 1;
+
+            DB::table('journal_entries')
+                ->where('id', $entry->id)
+                ->update(['entry_number' => sprintf('JV-%s-%05d', $year, $sequenceByYear[$key])]);
         }
     }
 
