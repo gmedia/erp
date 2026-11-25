@@ -43,7 +43,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Master Data', href: '#' },
     {
         title: 'Chart of Accounts',
-        titleKey: 'page.accounts.title',
+        titleKey: 'menu.chart_of_accounts',
         href: '/accounts',
     },
 ];

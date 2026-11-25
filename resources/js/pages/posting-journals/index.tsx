@@ -42,7 +42,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
     {
         title: 'Posting Journals',
-        titleKey: 'page.posting_journals.title',
+        titleKey: 'menu.posting_journal',
         href: '/posting-journals',
     },
 ];
