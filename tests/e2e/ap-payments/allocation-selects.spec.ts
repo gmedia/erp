@@ -1,6 +1,6 @@
 import { expect, Page, test } from '@playwright/test';
 
-import { login, searchAndWaitForApi } from '../helpers';
+import { expectResponseOk, login, searchAndWaitForApi } from '../helpers';
 
 interface SeedResult {
     supplierId: number;
@@ -140,11 +140,11 @@ test.describe('AP Payment allocation selects', () => {
         await login(page, undefined, undefined, { requireDashboard: false });
         fixtures ??= await seedAllocationFixtures(page);
         const listed = page.waitForResponse(
-            (r) => r.url().includes('/api/ap-payments') && r.status() < 400,
+            (r) => r.url().includes('/api/ap-payments') && r.request().method() === 'GET',
             { timeout: 30000 },
         );
         await page.goto('/ap-payments');
-        await listed;
+        await expectResponseOk(await listed);
     });
 
     test('edit dokumen lama menampilkan nomor bill', async ({ page }) => {
@@ -162,9 +162,9 @@ test.describe('AP Payment allocation selects', () => {
         await formDialog.getByRole('button', { name: 'Add Item' }).click();
         const allocationDialog = page.getByRole('dialog').last();
 
-        const listed = page.waitForResponse((r) => r.url().includes('/api/supplier-bills') && r.status() < 400);
+        const listed = page.waitForResponse((r) => r.url().includes('/api/supplier-bills') && r.request().method() === 'GET');
         await allocationDialog.getByRole('combobox', { name: /bill/i }).first().click();
-        await listed;
+        await expectResponseOk(await listed);
 
         for (const hidden of [fixtures.draftBillNumber, fixtures.otherSupplierBillNumber]) {
             await expect(page.getByRole('button', { name: new RegExp(hidden) })).toHaveCount(0);

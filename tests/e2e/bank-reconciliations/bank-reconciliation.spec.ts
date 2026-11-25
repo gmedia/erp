@@ -1,16 +1,16 @@
 import { test, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 import { createBankReconciliation, getReconcilableRow } from './helpers';
 
 test.describe('Bank Reconciliation E2E Tests', () => {
     test.beforeEach(async ({ page }) => {
         await login(page, undefined, undefined, { requireDashboard: false });
         const listResponse = page.waitForResponse(
-            (r) => r.url().includes('/api/bank-reconciliations') && r.status() < 400,
+            (r) => r.url().includes('/api/bank-reconciliations') && r.request().method() === 'GET',
             { timeout: 15000 },
         );
         await page.goto('/bank-reconciliations');
-        await listResponse;
+        await expectResponseOk(await listResponse);
     });
 
     test('can view Bank Reconciliations list', async ({ page }) => {
@@ -23,11 +23,11 @@ test.describe('Bank Reconciliation E2E Tests', () => {
         await expect(searchInput).toBeVisible();
         await searchInput.fill('Cash');
         const searchResponse = page.waitForResponse(
-            (r) => r.url().includes('/api/bank-reconciliations') && r.status() < 400,
+            (r) => r.url().includes('/api/bank-reconciliations') && r.request().method() === 'GET',
             { timeout: 15000 },
         );
         await searchInput.press('Enter');
-        await searchResponse;
+        await expectResponseOk(await searchResponse);
         await expect(page.locator('tbody tr').first()).toBeVisible();
     });
 
@@ -92,11 +92,11 @@ test.describe('Bank Reconciliation Workflow', () => {
     test.beforeEach(async ({ page }) => {
         await login(page, undefined, undefined, { requireDashboard: false });
         const listResponse = page.waitForResponse(
-            (r) => r.url().includes('/api/bank-reconciliations') && r.status() < 400,
+            (r) => r.url().includes('/api/bank-reconciliations') && r.request().method() === 'GET',
             { timeout: 15000 },
         );
         await page.goto('/bank-reconciliations');
-        await listResponse;
+        await expectResponseOk(await listResponse);
     });
 
     test('can open View modal and see Import Statement button', async ({ page }) => {
@@ -271,12 +271,12 @@ test.describe('Bank Reconciliation Workflow', () => {
         await expect(autoMatchBtn).toBeVisible();
 
         const autoMatchResponse = page.waitForResponse(
-            (r) => r.url().includes('/auto-match') && r.status() < 400,
+            (r) => r.url().includes('/auto-match') && r.request().method() === 'POST',
             { timeout: 15000 },
         );
 
         await autoMatchBtn.click();
-        await autoMatchResponse;
+        await expectResponseOk(await autoMatchResponse);
 
         // Assert toast notification appears
         const toast = page.locator('[data-sonner-toast]').first();

@@ -1,15 +1,15 @@
 import { test, expect } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 
 test.describe('Period Closing E2E Tests', () => {
     test.beforeEach(async ({ page }) => {
         await login(page, undefined, undefined, { requireDashboard: false });
         const listResponse = page.waitForResponse(
-            (r) => r.url().includes('/api/period-closings') && r.status() < 400,
+            (r) => r.url().includes('/api/period-closings') && r.request().method() === 'GET',
             { timeout: 15000 },
         );
         await page.goto('/period-closings');
-        await listResponse;
+        await expectResponseOk(await listResponse);
     });
 
     test('can view Period Closings list', async ({ page }) => {
@@ -22,11 +22,11 @@ test.describe('Period Closing E2E Tests', () => {
         await expect(searchInput).toBeVisible();
         await searchInput.fill('2026');
         const searchResponse = page.waitForResponse(
-            (r) => r.url().includes('/api/period-closings') && r.status() < 400,
+            (r) => r.url().includes('/api/period-closings') && r.request().method() === 'GET',
             { timeout: 15000 },
         );
         await searchInput.press('Enter');
-        await searchResponse;
+        await expectResponseOk(await searchResponse);
     });
 
     test('can open actions menu for Period Closing', async ({ page }) => {

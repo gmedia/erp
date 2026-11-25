@@ -1,5 +1,6 @@
 import { Page, expect } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
+import { expectResponseOk } from '../helpers';
 
 /**
  * Create a new journal entry via the UI.
@@ -133,13 +134,15 @@ export async function searchJournalEntry(
     }
 
     const responsePromise = page.waitForResponse(
-        (r) => r.url().includes('/api/journal-entries') && r.status() === 200,
+        (r) =>
+            r.url().includes('/api/journal-entries') &&
+            r.request().method() === 'GET',
     );
     await searchInput.clear();
     await searchInput.fill(normalizedQuery);
     await searchInput.press('Enter');
 
-    await responsePromise;
+    await expectResponseOk(await responsePromise);
 }
 
 export async function editJournalEntry(
@@ -206,7 +209,7 @@ export async function deleteJournalEntry(
     const deleteResponse = page.waitForResponse(
         (r) =>
             r.url().includes('/api/journal-entries') &&
-            [200, 204].includes(r.status()),
+            r.request().method() === 'DELETE',
         { timeout: 10000 },
     );
     await page.getByRole('menuitem', { name: 'Delete' }).click();
@@ -220,5 +223,5 @@ export async function deleteJournalEntry(
         await confirmBtn.first().click();
     }
 
-    await deleteResponse;
+    await expectResponseOk(await deleteResponse);
 }

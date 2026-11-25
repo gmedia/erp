@@ -1,4 +1,5 @@
 import { Page, expect } from '@playwright/test';
+import { expectResponseOk } from '../helpers';
 
 function escapeRegExp(value: string): string {
     return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -307,12 +308,11 @@ export async function searchAccountMappings(
         const requestPromise = page.waitForResponse(
             (response) =>
                 response.url().includes('/api/account-mappings') &&
-                response.request().method() === 'GET' &&
-                response.status() < 400,
+                response.request().method() === 'GET',
             { timeout: 60000 },
         );
         await input.press('Enter');
-        await requestPromise;
+        await expectResponseOk(await requestPromise);
     } else {
         await input.press('Enter');
     }

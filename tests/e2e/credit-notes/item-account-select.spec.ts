@@ -1,17 +1,17 @@
 import { expect, test } from '@playwright/test';
 
-import { login, searchAndWaitForApi } from '../helpers';
+import { expectResponseOk, login, searchAndWaitForApi } from '../helpers';
 import { createCreditNote } from './helpers';
 
 test.describe('Credit Note item account select', () => {
     test.beforeEach(async ({ page }) => {
         await login(page, undefined, undefined, { requireDashboard: false });
         const listed = page.waitForResponse(
-            (r) => r.url().includes('/api/credit-notes') && r.status() < 400,
+            (r) => r.url().includes('/api/credit-notes') && r.request().method() === 'GET',
             { timeout: 30000 },
         );
         await page.goto('/credit-notes');
-        await listed;
+        await expectResponseOk(await listed);
     });
 
     test('edit dokumen lama menampilkan label akun pada item', async ({ page }) => {

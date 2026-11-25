@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 
 interface FiscalYearAutoSelectCase {
     readonly label: string;
@@ -32,7 +32,7 @@ const cases: readonly FiscalYearAutoSelectCase[] = [
 
 async function openAddDialog(page: Page, dialogTitle: RegExp): Promise<void> {
     const fiscalYearsResponse = page.waitForResponse(
-        (r) => r.url().includes('/api/fiscal-years') && r.status() < 400,
+        (r) => r.url().includes('/api/fiscal-years') && r.request().method() === 'GET',
         { timeout: 15000 },
     );
 
@@ -43,7 +43,7 @@ async function openAddDialog(page: Page, dialogTitle: RegExp): Promise<void> {
     const dialog = page.getByRole('dialog', { name: dialogTitle });
     await expect(dialog).toBeVisible({ timeout: 10000 });
 
-    await fiscalYearsResponse;
+    await expectResponseOk(await fiscalYearsResponse);
 }
 
 test.describe('Fiscal Year auto-select on financial transaction forms', () => {
@@ -59,11 +59,11 @@ test.describe('Fiscal Year auto-select on financial transaction forms', () => {
             const listResponse = page.waitForResponse(
                 (r) =>
                     r.url().includes(fyCase.route.replace(/^\//, '/api/')) &&
-                    r.status() < 400,
+                    r.request().method() === 'GET',
                 { timeout: 15000 },
             );
             await page.goto(fyCase.route);
-            await listResponse;
+            await expectResponseOk(await listResponse);
 
             await openAddDialog(page, fyCase.addDialogTitle);
 

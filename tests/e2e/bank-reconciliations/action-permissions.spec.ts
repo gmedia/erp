@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
-import { login } from '../helpers';
+import { expectResponseOk, login } from '../helpers';
 
 const VIEWER_EMAIL = 'bank-rec-viewer@example.com';
 const FULL_EMAIL = 'bank-rec-full@example.com';
@@ -47,11 +47,10 @@ async function openBankReconciliations(page: Page): Promise<void> {
     const listResponse = page.waitForResponse(
         (r) =>
             r.url().includes('/api/bank-reconciliations') &&
-            r.request().method() === 'GET' &&
-            r.status() < 400,
+            r.request().method() === 'GET',
     );
     await page.goto('/bank-reconciliations');
-    await listResponse;
+    await expectResponseOk(await listResponse);
 }
 
 test.describe('Bank reconciliation action permissions', () => {
