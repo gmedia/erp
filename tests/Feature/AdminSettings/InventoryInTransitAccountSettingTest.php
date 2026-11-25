@@ -65,7 +65,7 @@ test('seed COA menambahkan akun persediaan dalam perjalanan di bawah aset lancar
     $account = Account::query()->where('code', '11310')->first();
 
     expect($account)->not->toBeNull()
-        ->and($account->name)->toBe('Persediaan dalam Perjalanan')
+        ->and($account->name)->toBe('Inventory in Transit')
         ->and($account->type)->toBe('asset')
         ->and($account->normal_balance)->toBe('debit')
         ->and($account->parent?->code)->toBe('11000')

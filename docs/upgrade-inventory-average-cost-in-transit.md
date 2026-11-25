@@ -6,7 +6,7 @@ Dokumen ini untuk administrator dan tim yang mengoperasikan ERP setelah pembarua
 
 - Metode biaya: rata-rata tertimbang bergerak per produk per gudang. Average cost disimpan di `stock_movements.average_cost_after`. Laporan valuasi, stock monitor, opname, dan HPP memakai nilai ini, bukan `products.cost`.
 - Barang keluar dinilai dengan average cost yang berjalan saat itu.
-- Akun baru **Persediaan dalam Perjalanan** (kode 11310) ditambahkan di CoA seed. Setting `inventory_in_transit_account_id` diatur di Admin Settings > Accounting.
+- Akun baru **Persediaan dalam Perjalanan** (nama default seed: *Inventory in Transit*, kode 11310) ditambahkan di CoA seed. Setting `inventory_in_transit_account_id` diatur di Admin Settings > Accounting.
 - Transfer dijurnal per tahap: dispatch, receive (penuh atau sebagian), selisih kurang, dan batal (jurnal pembalik).
 - Stock monitor dan laporan valuasi menampilkan saldo barang dalam perjalanan.
 - Command baru `stock:recalculate-average-cost` untuk menghitung ulang kartu stok historis.
