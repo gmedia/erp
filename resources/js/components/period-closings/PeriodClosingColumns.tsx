@@ -7,11 +7,11 @@ import { formatStatusLabel, statusBadgeVariant } from '@/lib/status-badge';
 import { type PeriodClosing } from '@/types/period-closing';
 import {
     type CustomTableMeta,
-    createRowCurrencyAmountColumn,
     createSelectColumn,
     createSortingHeader,
 } from '@/utils/columns';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
+import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { type ColumnDef } from '@tanstack/react-table';
 
 function formatMonthName(value: unknown): string {
@@ -70,12 +70,32 @@ export const periodClosingColumns: ColumnDef<PeriodClosing>[] = [
             );
         },
     },
-    createRowCurrencyAmountColumn<PeriodClosing & { currency?: string | null }>(
-        {
-            accessorKey: 'net_income',
-            label: 'Net Income',
+    {
+        accessorKey: 'net_income',
+        ...createSortingHeader('Net Income'),
+        cell: ({ row }) => {
+            const { status, net_income: netIncome } = row.original;
+            const currency = (row.original as { currency?: string | null })
+                .currency;
+
+            if (status === 'draft') {
+                return <div className="text-right">-</div>;
+            }
+
+            return (
+                <div
+                    className={`text-right ${Number(netIncome) < 0 ? 'text-destructive' : ''}`}
+                >
+                    {formatCurrencyByRegionalSettings(netIncome, {
+                        locale: 'id-ID',
+                        currency: currency || undefined,
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 2,
+                    })}
+                </div>
+            );
         },
-    ),
+    },
     {
         accessorKey: 'closed_at',
         ...createSortingHeader('Closed At'),

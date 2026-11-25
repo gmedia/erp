@@ -71,16 +71,27 @@ export const supplierBillColumns: ColumnDef<SupplierBill>[] = [
     {
         accessorKey: 'amount_due',
         ...createSortingHeader('Amount Due'),
-        cell: ({ row }) => (
-            <div className="text-right">
-                {formatCurrencyByRegionalSettings(row.original.amount_due, {
-                    locale: 'id-ID',
-                    currency: row.original.currency || undefined,
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 2,
-                })}
-            </div>
-        ),
+        cell: ({ row }) => {
+            const { status, amount_due: amountDue, currency } = row.original;
+            const hasNoDue = ['draft', 'void', 'cancelled'].includes(
+                status ?? '',
+            );
+
+            return (
+                <div
+                    className={`text-right ${Number(amountDue) < 0 ? 'text-destructive' : ''}`}
+                >
+                    {hasNoDue
+                        ? '-'
+                        : formatCurrencyByRegionalSettings(amountDue, {
+                              locale: 'id-ID',
+                              currency: currency || undefined,
+                              minimumFractionDigits: 0,
+                              maximumFractionDigits: 2,
+                          })}
+                </div>
+            );
+        },
     },
     {
         id: 'actions_custom',

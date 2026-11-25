@@ -810,7 +810,8 @@ import { type AccountMapping } from '@/types/account-mapping';
 export const accountMappingConfig = createComplexEntityConfig<AccountMapping>({
     entityName: 'Account Mapping',
     entityNamePlural: 'Account Mappings',
-    description: 'Maps control accounts to transaction types.',
+    description:
+        'Pemetaan akun antarversi COA (rename, merge, split) untuk migrasi saldo dan referensi.',
     apiEndpoint: '/api/account-mappings',
     permissionPrefix: 'account_mapping',
     exportEndpoint: '/api/account-mappings/export',
