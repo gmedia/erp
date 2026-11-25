@@ -192,9 +192,17 @@ class StockTransferSampleDataSeeder extends Seeder
                 ->whereNotIn('product_id', $productIds)
                 ->delete();
 
-            // Selisih kekurangan diterima dijurnal lewat jalur yang sama dengan controller.
+            // Jurnal per tahap (issue #495) lewat jalur yang sama dengan controller.
+            $journals = app(PostStockTransferJournalAction::class);
+            $transfer->refresh();
+
+            if (in_array($transfer->status, ['in_transit', 'received'], true)) {
+                $journals->executeDispatch($transfer);
+            }
+
             if ($transfer->status === 'received') {
-                app(PostStockTransferJournalAction::class)->execute($transfer->refresh());
+                $journals->executeReceive($transfer);
+                $journals->executeShortage($transfer);
             }
         }
     }

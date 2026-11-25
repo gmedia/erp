@@ -336,6 +336,7 @@
         }
     },
     "accounting_posting.control_account_missing": "Akun kontrol :code tidak ditemukan di versi COA aktif.",
+    "accounting_posting.in_transit_account_missing": "Akun persediaan dalam perjalanan belum diatur atau tidak aktif di versi COA. Atur di Admin Settings > Accounting.",
     "accounting_posting.coa_none_active": "Tidak ada versi COA aktif untuk :date. Aktifkan satu versi COA sebelum posting.",
     "accounting_posting.disposal_accounts_missing": "Atur akun laba dan rugi pelepasan aset di pengaturan sebelum posting.",
     "accounting_posting.disposal_not_postable": "Aset :code berstatus :status dan tidak bisa dijurnal sebagai pelepasan.",
