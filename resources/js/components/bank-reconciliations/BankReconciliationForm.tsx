@@ -14,11 +14,9 @@ import * as z from 'zod';
 
 const bankReconciliationFormSchema = z
     .object({
-        account_id: z
-            .string()
-            .min(1, {
-                message: 'validation.bank_reconciliation.account_required',
-            }),
+        account_id: z.string().min(1, {
+            message: 'validation.bank_reconciliation.account_required',
+        }),
         fiscal_year_id: z.string().min(1, {
             message: 'validation.bank_reconciliation.fiscal_year_required',
         }),
