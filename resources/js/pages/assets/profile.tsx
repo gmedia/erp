@@ -282,7 +282,7 @@ export default function AssetProfile() {
                 />
 
                 <Tabs defaultValue="summary" className="w-full">
-                    <TabsList className="mb-2 grid !h-auto w-full grid-cols-2 gap-1 bg-muted/50 p-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
+                    <TabsList className="mb-2 flex !h-auto w-full justify-start gap-1 overflow-x-auto bg-muted/50 p-1 sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 [&>[data-slot=tabs-trigger]]:shrink-0">
                         <TabsTrigger
                             value="summary"
                             className="gap-1.5 text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm sm:text-sm"
@@ -682,9 +682,13 @@ export default function AssetProfile() {
                                                                             )}
                                                                         </span>
                                                                     )}
-                                                                    {m.disposal_journal_id ? (
-                                                                        <a
-                                                                            href="/journal-entries"
+                                                                     {m.disposal_journal_id ? (
+                                                                         <a
+                                                                             href={
+                                                                                 m.disposal_journal_number
+                                                                                     ? `/journal-entries?search=${encodeURIComponent(m.disposal_journal_number)}`
+                                                                                     : '/journal-entries'
+                                                                             }
                                                                             className="ml-2 text-primary underline"
                                                                             data-testid="disposal-journal-link"
                                                                             data-journal-id={

@@ -17,6 +17,7 @@ class AssetMovementResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $disposalJournal = $this->disposalJournal();
         $asset = $this->whenLoaded('asset');
         $assetPayload = null;
 
@@ -59,7 +60,8 @@ class AssetMovementResource extends JsonResource
                 : null,
             'sale_amount' => $this->sale_amount !== null ? (float) $this->sale_amount : null,
             'sale_account_id' => $this->sale_account_id,
-            'disposal_journal_id' => $this->disposalJournalId(),
+            'disposal_journal_id' => $disposalJournal?->id,
+            'disposal_journal_number' => $disposalJournal?->entry_number,
             'created_by' => $this->createdBy?->name,
             'created_at' => $this->created_at?->toIso8601String(),
         ];
@@ -68,7 +70,7 @@ class AssetMovementResource extends JsonResource
     /**
      * Jurnal pelepasan aset (DISP- atau LOSS-) untuk tautan di UI (#442).
      */
-    private function disposalJournalId(): ?int
+    private function disposalJournal(): ?JournalEntry
     {
         if ($this->movement_type !== 'dispose' || ! $this->relationLoaded('asset')) {
             return null;
@@ -85,6 +87,6 @@ class AssetMovementResource extends JsonResource
         return JournalEntry::query()
             ->where('journal_type', 'system')
             ->whereIn('reference', ['DISP-' . $assetCode, 'LOSS-' . $assetCode])
-            ->value('id');
+            ->first(['id', 'entry_number']);
     }
 }

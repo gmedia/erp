@@ -77,3 +77,75 @@ test('profil aset disposed tanpa jurnal menampilkan teks tanpa jurnal dan tanpa 
     );
     await expect(page.getByTestId('disposal-journal-link')).toHaveCount(0);
 });
+
+test('tautan jurnal pelepasan di profil aset menyaring daftar jurnal ke jurnal itu', async ({
+    page,
+}) => {
+    await page.goto('/assets');
+    const adminToken = await page.evaluate(() =>
+        localStorage.getItem('api_token'),
+    );
+    expect(adminToken, 'api_token harus ada di localStorage').toBeTruthy();
+
+    const journalsResponse = await page.request.get(
+        '/api/journal-entries?search=DISP-&per_page=5',
+        {
+            headers: {
+                Accept: 'application/json',
+                Authorization: `Bearer ${adminToken}`,
+            },
+        },
+    );
+    expect(journalsResponse.status()).toBeLessThan(400);
+    const journals = (await journalsResponse.json()) as {
+        data: { entry_number: string; reference: string }[];
+    };
+    const disposalJournal = journals.data.find((j) =>
+        /^DISP-/.test(j.reference ?? ''),
+    );
+    expect(
+        disposalJournal,
+        'jurnal DISP- hasil seed harus ada',
+    ).toBeTruthy();
+    const assetCode = disposalJournal!.reference.replace(/^DISP-/, '');
+
+    const listResponse = await page.request.get(
+        `/api/assets?search=${encodeURIComponent(assetCode)}`,
+        {
+            headers: {
+                Accept: 'application/json',
+                Authorization: `Bearer ${adminToken}`,
+            },
+        },
+    );
+    const list = (await listResponse.json()) as {
+        data: { ulid: string; asset_code: string }[];
+    };
+    const asset = list.data.find((a) => a.asset_code === assetCode);
+    expect(asset, 'aset pelepasan hasil seed harus ada').toBeTruthy();
+
+    const profileResponse = page.waitForResponse(
+        (response) =>
+            response.url().includes(`/api/assets/${asset!.ulid}/profile`) &&
+            response.request().method() === 'GET',
+    );
+    await page.goto(`/assets/${asset!.ulid}`);
+    expect((await profileResponse).status()).toBeLessThan(400);
+
+    await page.getByRole('tab', { name: /Movements/ }).click();
+    const link = page.getByTestId('disposal-journal-link').first();
+    await expect(link).toHaveAttribute(
+        'href',
+        `/journal-entries?search=${encodeURIComponent(disposalJournal!.entry_number)}`,
+    );
+
+    await link.click();
+    await expect(page).toHaveURL(
+        new RegExp(
+            `/journal-entries\\?search=${encodeURIComponent(disposalJournal!.entry_number)}`,
+        ),
+    );
+    await expect(
+        page.getByRole('searchbox').or(page.getByPlaceholder(/Search/i)).first(),
+    ).toHaveValue(disposalJournal!.entry_number);
+});

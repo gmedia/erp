@@ -9,6 +9,7 @@ import * as z from 'zod';
 import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
+import { FileUploadInput } from '@/components/common/FileUploadInput';
 import { InputField } from '@/components/common/InputField';
 import SelectField from '@/components/common/SelectField';
 import { TextareaField } from '@/components/common/TextareaField';
@@ -129,6 +130,7 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
         const effectiveAssetStatus = asset?.status ?? pickedAssetStatus;
 
         const movementType = form.watch('movement_type');
+        const referencePlaceholder = `e.g. ${movementType === 'dispose' ? 'DSP' : 'TRF'}-${new Date().getFullYear()}-001`;
         const toBranchId = form.watch('to_branch_id');
         const saleAmountValue = Number(form.watch('sale_amount') ?? '');
         const hasSaleProceeds = saleAmountValue > 0;
@@ -325,7 +327,7 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
                             <InputField
                                 name="reference"
                                 label="Reference / Document #"
-                                placeholder="e.g. TRF-2024-001"
+                                placeholder={referencePlaceholder}
                             />
                             <TextareaField
                                 name="notes"
@@ -339,16 +341,11 @@ export const AssetMovementForm = memo<AssetMovementFormProps>(
                                 >
                                     Supporting Document
                                 </label>
-                                <input
+                                <FileUploadInput
                                     id="movement-document"
-                                    type="file"
+                                    value={documentFile}
+                                    onChange={setDocumentFile}
                                     accept=".pdf,.jpg,.jpeg,.png"
-                                    className="block w-full text-sm text-muted-foreground file:mr-4 file:rounded-md file:border file:px-3 file:py-1 file:text-sm"
-                                    onChange={(event) =>
-                                        setDocumentFile(
-                                            event.target.files?.[0] ?? null,
-                                        )
-                                    }
                                 />
                                 {entity?.document_name && (
                                     <p className="text-xs text-muted-foreground">
