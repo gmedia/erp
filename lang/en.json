@@ -2815,5 +2815,13 @@
         "stocktake_items_fetch_failed": "Failed to fetch stocktake items.",
         "stocktake_items_saved": "Stocktake items saved successfully.",
         "stocktake_items_save_failed": "Failed to save items."
+    },
+    "page_toast": {
+        "approval_request_approved": "Request approved successfully",
+        "approval_request_rejected": "Request rejected successfully",
+        "approval_request_action_failed_approve": "Failed to approve request",
+        "approval_request_action_failed_reject": "Failed to reject request",
+        "recovery_codes_regenerated": "Recovery codes regenerated successfully.",
+        "recovery_codes_regenerate_failed": "Failed to regenerate recovery codes."
     }
 }

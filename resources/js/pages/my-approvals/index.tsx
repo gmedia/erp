@@ -26,6 +26,7 @@ import axios from '@/lib/axios';
 import { cn } from '@/lib/utils';
 import { ApprovalRequest, ApprovalRequestStep } from '@/types/approval';
 import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
+import { useToastTranslator } from '@/utils/i18nFallback';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { formatDistanceToNow, isValid, parseISO } from 'date-fns';
 import { Check, Clock, Eye, Loader2, UserRoundCheck, X } from 'lucide-react';
@@ -237,6 +238,7 @@ function DelegatedCount({ count }: Readonly<{ count: number }>) {
 
 export default function MyApprovalsPage() {
     const { t } = useTranslation();
+    const tToast = useToastTranslator('page_toast');
     const queryClient = useQueryClient();
     const [actionDialog, setActionDialog] = useState<{
         open: boolean;
@@ -360,10 +362,30 @@ export default function MyApprovalsPage() {
                 void queryClient.invalidateQueries({
                     queryKey: ['my-approvals'],
                 });
-                toast.success(`Request ${actionDialog.type}d successfully`);
+                const isApprove = actionDialog.type === 'approve';
+                toast.success(
+                    tToast(
+                        isApprove
+                            ? 'approval_request_approved'
+                            : 'approval_request_rejected',
+                        isApprove
+                            ? 'Request approved successfully'
+                            : 'Request rejected successfully',
+                    ),
+                );
             })
             .catch((err) => {
-                toast.error(`Failed to ${actionDialog.type} request`);
+                const isApprove = actionDialog.type === 'approve';
+                toast.error(
+                    tToast(
+                        isApprove
+                            ? 'approval_request_action_failed_approve'
+                            : 'approval_request_action_failed_reject',
+                        isApprove
+                            ? 'Failed to approve request'
+                            : 'Failed to reject request',
+                    ),
+                );
                 console.error(err);
             })
             .finally(() => {

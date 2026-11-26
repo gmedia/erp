@@ -2818,5 +2818,13 @@
         "stocktake_items_fetch_failed": "Gagal memuat item stock opname.",
         "stocktake_items_saved": "Item stock opname berhasil disimpan.",
         "stocktake_items_save_failed": "Gagal menyimpan item."
+    },
+    "page_toast": {
+        "approval_request_approved": "Permintaan berhasil disetujui",
+        "approval_request_rejected": "Permintaan berhasil ditolak",
+        "approval_request_action_failed_approve": "Gagal menyetujui permintaan",
+        "approval_request_action_failed_reject": "Gagal menolak permintaan",
+        "recovery_codes_regenerated": "Kode pemulihan berhasil dibuat ulang.",
+        "recovery_codes_regenerate_failed": "Gagal membuat ulang kode pemulihan."
     }
 }
