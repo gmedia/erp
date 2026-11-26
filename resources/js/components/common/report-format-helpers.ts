@@ -1,4 +1,5 @@
 import type { ViewModalItemsTableColumn } from '@/components/common/ViewModalItemsTable';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import {
     formatCurrencyByRegionalSettings,
     formatNumberByRegionalSettings,
@@ -54,7 +55,7 @@ export function createPricingColumns<T extends PricingItem>(
 export function createAmountFormatter(currency?: string) {
     return (value: FormatValueInput) =>
         formatCurrencyByRegionalSettings(value ?? 0, {
-            locale: 'id-ID',
+            locale: FORMAT_LOCALE,
             currency: currency || undefined,
             minimumFractionDigits: 0,
             maximumFractionDigits: 2,
@@ -63,7 +64,7 @@ export function createAmountFormatter(currency?: string) {
 
 export function formatQuantity(value: FormatValueInput) {
     return formatNumberByRegionalSettings(value ?? 0, {
-        locale: 'id-ID',
+        locale: FORMAT_LOCALE,
         minimumFractionDigits: 0,
         maximumFractionDigits: 2,
     });
@@ -71,7 +72,7 @@ export function formatQuantity(value: FormatValueInput) {
 
 export function formatPercent(value: FormatValueInput) {
     return `${formatNumberByRegionalSettings(value ?? 0, {
-        locale: 'id-ID',
+        locale: FORMAT_LOCALE,
         minimumFractionDigits: 0,
         maximumFractionDigits: 2,
     })}%`;

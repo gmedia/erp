@@ -3,7 +3,7 @@
 import { Badge } from '@/components/ui/badge';
 import { type BudgetVarianceItem } from '@/types/budget';
 import { createSortingHeader, createTextColumn } from '@/utils/columns';
-import { formatDateByRegionalSettings } from '@/utils/date-format';
+import { FORMAT_LOCALE, formatDate } from '@/utils/formatters';
 import {
     formatCurrencyByRegionalSettings,
     formatNumberByRegionalSettings,
@@ -46,16 +46,12 @@ export const budgetVarianceColumns: ColumnDef<BudgetVarianceItem>[] = [
     {
         accessorKey: 'period_start',
         ...createSortingHeader('Period Start'),
-        cell: ({ row }) =>
-            formatDateByRegionalSettings(
-                row.getValue('period_start') as string,
-            ),
+        cell: ({ row }) => formatDate(row.getValue('period_start') as string),
     },
     {
         accessorKey: 'period_end',
         ...createSortingHeader('Period End'),
-        cell: ({ row }) =>
-            formatDateByRegionalSettings(row.getValue('period_end') as string),
+        cell: ({ row }) => formatDate(row.getValue('period_end') as string),
     },
     {
         accessorKey: 'allocated',
@@ -64,8 +60,7 @@ export const budgetVarianceColumns: ColumnDef<BudgetVarianceItem>[] = [
             formatCurrencyByRegionalSettings(
                 row.getValue('allocated') as number,
                 {
-                    locale: 'id-ID',
-                    currency: 'IDR',
+                    locale: FORMAT_LOCALE,
                 },
             ),
     },
@@ -74,8 +69,7 @@ export const budgetVarianceColumns: ColumnDef<BudgetVarianceItem>[] = [
         ...createSortingHeader('Actual'),
         cell: ({ row }) =>
             formatCurrencyByRegionalSettings(row.getValue('actual') as number, {
-                locale: 'id-ID',
-                currency: 'IDR',
+                locale: FORMAT_LOCALE,
             }),
     },
     {
@@ -85,8 +79,7 @@ export const budgetVarianceColumns: ColumnDef<BudgetVarianceItem>[] = [
             formatCurrencyByRegionalSettings(
                 row.getValue('available') as number,
                 {
-                    locale: 'id-ID',
-                    currency: 'IDR',
+                    locale: FORMAT_LOCALE,
                 },
             ),
     },

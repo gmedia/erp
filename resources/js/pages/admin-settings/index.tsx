@@ -287,15 +287,13 @@ function RegionalSettings({
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
-    const [currency, setCurrency] = useState<string>(
-        settings?.currency ?? 'IDR',
-    );
+    const [currency, setCurrency] = useState<string>(settings?.currency ?? '');
     const [hideDecimal, setHideDecimal] = useState<boolean>(
         Boolean(settings?.number_format_hide_decimal),
     );
 
     useEffect(() => {
-        setCurrency(settings?.currency ?? 'IDR');
+        setCurrency(settings?.currency ?? '');
     }, [settings?.currency]);
 
     useEffect(() => {

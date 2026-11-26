@@ -5,7 +5,10 @@ import {
     createReportSummaryColumn,
     createReportTextColumn,
 } from '@/components/common/ReportColumns';
-import { formatDateByRegionalSettings } from '@/utils/date-format';
+import {
+    FORMAT_LOCALE,
+    formatDate as formatDateValue,
+} from '@/utils/formatters';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import type { ColumnDef } from '@tanstack/react-table';
 
@@ -41,14 +44,13 @@ export type ArAgingReportItem = {
 };
 
 function formatDate(value: string | null | undefined): string {
-    return formatDateByRegionalSettings(value);
+    return formatDateValue(value);
 }
 
 function formatCurrency(value: string | null | undefined): string {
     if (!value) return '-';
     return formatCurrencyByRegionalSettings(value, {
-        currency: 'IDR',
-        locale: 'id-ID',
+        locale: FORMAT_LOCALE,
         minimumFractionDigits: 0,
         maximumFractionDigits: 2,
     });

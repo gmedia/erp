@@ -3,6 +3,7 @@
 import { createReportTextColumn } from '@/components/common/ReportColumns';
 import { formatStatusLabel } from '@/lib/status-badge';
 import { createCurrencyColumn } from '@/utils/columns';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import type { ColumnDef } from '@tanstack/react-table';
 
 export type TrialBalanceDetailedItem = {
@@ -25,8 +26,7 @@ const currencyCol = (
     createCurrencyColumn<TrialBalanceDetailedItem>({
         accessorKey,
         label,
-        currency: 'IDR',
-        locale: 'id-ID',
+        locale: FORMAT_LOCALE,
         className: 'text-right',
     });
 

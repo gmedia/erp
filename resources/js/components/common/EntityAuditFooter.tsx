@@ -1,4 +1,4 @@
-import { formatDateByRegionalSettings } from '@/utils/date-format';
+import { formatDate } from '@/utils/formatters';
 
 type AuditStampPerson = { name?: string | null } | null;
 
@@ -19,9 +19,7 @@ export function EntityAuditFooter({
             {confirmedAt && (
                 <div>
                     Confirmed by: {confirmedBy?.name || 'System'} on{' '}
-                    {formatDateByRegionalSettings(confirmedAt, {
-                        locale: 'id-ID',
-                    })}
+                    {formatDate(confirmedAt)}
                 </div>
             )}
         </div>

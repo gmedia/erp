@@ -6,7 +6,7 @@ import {
     createReportWarehouseColumn,
 } from '@/components/common/ReportColumns';
 import { createCurrencyColumn, createNumberColumn } from '@/utils/columns';
-import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
+import { FORMAT_LOCALE, formatDateTime } from '@/utils/formatters';
 import type { ColumnDef } from '@tanstack/react-table';
 
 export type InventoryValuationItem = {
@@ -31,7 +31,7 @@ export type InventoryValuationItem = {
 };
 
 function formatDate(value: string | null | undefined): string {
-    return formatDateTimeByRegionalSettings(value);
+    return formatDateTime(value);
 }
 
 export const inventoryValuationColumns: ColumnDef<InventoryValuationItem>[] = [
@@ -65,14 +65,12 @@ export const inventoryValuationColumns: ColumnDef<InventoryValuationItem>[] = [
     createCurrencyColumn<InventoryValuationItem>({
         accessorKey: 'average_cost',
         label: { key: 'column.avg_cost', fallback: 'Avg Cost' },
-        currency: 'IDR',
-        locale: 'id-ID',
+        locale: FORMAT_LOCALE,
     }),
     createCurrencyColumn<InventoryValuationItem>({
         accessorKey: 'stock_value',
         label: { key: 'column.stock_value', fallback: 'Stock Value' },
-        currency: 'IDR',
-        locale: 'id-ID',
+        locale: FORMAT_LOCALE,
     }),
     createReportTextColumn<InventoryValuationItem>({
         accessorKey: 'moved_at',
