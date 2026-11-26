@@ -62,5 +62,15 @@ test.describe('AP Aging Report mobile layout (#504)', () => {
 
         const container = page.locator('[data-slot="table-container"]').first();
         await expect(container).toHaveAttribute('data-overflow-right', 'true');
+
+        const fade = await container.evaluate((el) => {
+            const style = getComputedStyle(el, '::after');
+            return {
+                width: parseFloat(style.width),
+                image: style.backgroundImage,
+            };
+        });
+        expect(fade.width).toBeGreaterThanOrEqual(16);
+        expect(fade.image).not.toBe('none');
     });
 });
