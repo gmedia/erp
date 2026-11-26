@@ -23,15 +23,32 @@ import { ColumnDef } from '@tanstack/react-table';
 import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import type { ReactNode } from 'react';
 
-function SortDirectionIcon({ sorted }: { sorted: 'asc' | 'desc' | false }) {
+function SortDirectionIcon({
+    sorted,
+    side = 'right',
+}: {
+    sorted: 'asc' | 'desc' | false;
+    side?: 'left' | 'right';
+}) {
+    const spacing = side === 'left' ? 'mr-2' : 'ml-2';
     if (sorted === 'asc') {
-        return <ArrowUp className="ml-2 h-4 w-4 shrink-0 text-foreground" />;
+        return (
+            <ArrowUp
+                className={`${spacing} h-4 w-4 shrink-0 text-foreground`}
+            />
+        );
     }
     if (sorted === 'desc') {
-        return <ArrowDown className="ml-2 h-4 w-4 shrink-0 text-foreground" />;
+        return (
+            <ArrowDown
+                className={`${spacing} h-4 w-4 shrink-0 text-foreground`}
+            />
+        );
     }
     return (
-        <ArrowUpDown className="ml-2 h-4 w-4 shrink-0 text-muted-foreground" />
+        <ArrowUpDown
+            className={`${spacing} h-4 w-4 shrink-0 text-muted-foreground`}
+        />
     );
 }
 
@@ -110,8 +127,9 @@ export function createSortingHeader(
                 <Button
                     variant="ghost"
                     className={cn(
-                        '-ml-2 h-8 px-2',
-                        isRight && 'ml-auto max-w-full pr-0',
+                        isRight
+                            ? 'ml-auto h-8 max-w-full justify-end px-0 has-[>svg]:px-0'
+                            : '-ml-2 h-8 px-2',
                     )}
                     onClick={() =>
                         column.toggleSorting(column.getIsSorted() === 'asc')
@@ -119,10 +137,23 @@ export function createSortingHeader(
                     data-testid={`sort-${testIdSource.toLowerCase().replaceAll(/\s+/g, '-')}`}
                     data-sort-state={column.getIsSorted() || 'none'}
                 >
-                    <span className="line-clamp-2 max-w-full min-w-0 text-left whitespace-normal">
+                    {isRight ? (
+                        <SortDirectionIcon
+                            sorted={column.getIsSorted()}
+                            side="left"
+                        />
+                    ) : null}
+                    <span
+                        className={cn(
+                            'line-clamp-2 max-w-full min-w-0 whitespace-normal',
+                            isRight ? 'text-right' : 'text-left',
+                        )}
+                    >
                         <LabelText label={label} />
                     </span>
-                    <SortDirectionIcon sorted={column.getIsSorted()} />
+                    {isRight ? null : (
+                        <SortDirectionIcon sorted={column.getIsSorted()} />
+                    )}
                 </Button>
             </div>
         ),

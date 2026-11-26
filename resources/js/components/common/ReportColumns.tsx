@@ -204,23 +204,12 @@ function createReportDisplayColumn<TData>({
     });
 
     if (sortable && accessorKey) {
-        const sortingHeader = createSortingHeader(header);
         return {
             id: columnId,
             accessorKey,
             cell,
             meta: align === 'right' ? { numeric: true } : undefined,
-            ...(align === 'right'
-                ? {
-                      header: (
-                          context: Parameters<typeof sortingHeader.header>[0],
-                      ) => (
-                          <div className="flex justify-end [&_button]:mr-0 [&_button]:ml-auto">
-                              {sortingHeader.header(context)}
-                          </div>
-                      ),
-                  }
-                : sortingHeader),
+            ...createSortingHeader(header, { align }),
         };
     }
 

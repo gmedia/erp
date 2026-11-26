@@ -7,7 +7,8 @@ import { cn } from "@/lib/utils"
 // ruang (W5-02) agar fade tidak menutupi angka/header.
 const TABLE_EDGE_RIGHT = [
   "after:pointer-events-none after:absolute after:inset-y-0 after:right-0",
-  "after:z-10 after:w-6 after:bg-linear-to-r after:from-transparent after:to-background",
+  "after:z-10 after:w-8 after:bg-linear-to-r after:from-transparent after:via-background/80 after:to-background",
+  "after:shadow-[inset_-1px_0_0_var(--border)]",
 ].join(" ")
 
 const ACTIONS_SHADOW =
