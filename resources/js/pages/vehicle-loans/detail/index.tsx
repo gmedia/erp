@@ -1,6 +1,7 @@
 import { PageHeader } from '@/components/common/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useVehicleLoanPageText } from '@/components/vehicle-loans/useVehicleLoanPageText';
 import { VehicleLoanStatusBadge } from '@/components/vehicle-loans/VehicleLoanStatusBadge';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
@@ -61,19 +62,43 @@ interface VehicleLoanDetail {
     returns?: { returned_at: string | null; incident: boolean } | null;
 }
 
-const ACTIVITY_LABELS: Record<string, string> = {
-    draft_created: 'Draf dibuat',
-    submitted: 'Permintaan dikirim',
-    approval_step_advanced: 'Persetujuan lanjutan',
-    approval_completed: 'Persetujuan selesai',
-    approval_rejected: 'Permintaan ditolak',
-    assignment_changed: 'Penugasan diubah',
-    cancelled: 'Permintaan dibatalkan',
-    pickup_submitted: 'Pengambilan dikirim',
-    key_handed_over: 'Kunci diserahkan',
-    return_submitted: 'Pengembalian dikirim',
-    return_overdue: 'Pengembalian terlambat',
-};
+type PageText = (
+    key: string,
+    fallback: string,
+    params?: Record<string, string>,
+) => string;
+
+function activityLabel(event: string, tPage: PageText): string {
+    switch (event) {
+        case 'draft_created':
+            return tPage('activity.draft_created', 'Draf dibuat');
+        case 'submitted':
+            return tPage('activity.submitted', 'Permintaan dikirim');
+        case 'approval_step_advanced':
+            return tPage(
+                'activity.approval_step_advanced',
+                'Persetujuan lanjutan',
+            );
+        case 'approval_completed':
+            return tPage('activity.approval_completed', 'Persetujuan selesai');
+        case 'approval_rejected':
+            return tPage('activity.approval_rejected', 'Permintaan ditolak');
+        case 'assignment_changed':
+            return tPage('activity.assignment_changed', 'Penugasan diubah');
+        case 'cancelled':
+            return tPage('activity.cancelled', 'Permintaan dibatalkan');
+        case 'pickup_submitted':
+            return tPage('activity.pickup_submitted', 'Pengambilan dikirim');
+        case 'key_handed_over':
+            return tPage('activity.key_handed_over', 'Kunci diserahkan');
+        case 'return_submitted':
+            return tPage('activity.return_submitted', 'Pengembalian dikirim');
+        case 'return_overdue':
+            return tPage('activity.return_overdue', 'Pengembalian terlambat');
+        default:
+            return event.replaceAll('_', ' ');
+    }
+}
 
 const STEP_STATUS_CLASS: Record<string, string> = {
     approved: 'bg-success-soft text-success',
@@ -82,11 +107,12 @@ const STEP_STATUS_CLASS: Record<string, string> = {
 
 function incidentLabel(
     returns: { incident?: boolean | null } | null | undefined,
+    texts: { yes: string; no: string },
 ): string | null {
     if (!returns) {
         return null;
     }
-    return returns.incident ? 'Ada insiden' : 'Tidak ada';
+    return returns.incident ? texts.yes : texts.no;
 }
 
 function Field({
@@ -103,6 +129,7 @@ function Field({
 
 export default function VehicleLoanDetailPage() {
     const { id } = useParams();
+    const tPage = useVehicleLoanPageText();
 
     const { data, isLoading } = useQuery<VehicleLoanDetail>({
         queryKey: ['vehicle-loans', 'detail', id],
@@ -120,18 +147,33 @@ export default function VehicleLoanDetailPage() {
         if (!data) return null;
         if (data.status === 'draft') {
             return {
-                label: 'Lanjutkan Permintaan',
+                label: tPage(
+                    'detail_page.action_request',
+                    'Lanjutkan Permintaan',
+                ),
                 to: '/vehicle-loans/request',
             };
         }
         if (data.status === 'pending' || data.status === 'in_progress') {
-            return { label: 'Buka My Approvals', to: '/my-approvals' };
+            return {
+                label: tPage(
+                    'detail_page.action_approvals',
+                    'Buka My Approvals',
+                ),
+                to: '/my-approvals',
+            };
         }
         if (data.status === 'approved') {
-            return { label: 'Buat Pengambilan', to: '/vehicle-loans/pickup' };
+            return {
+                label: tPage('detail_page.action_pickup', 'Buat Pengambilan'),
+                to: '/vehicle-loans/pickup',
+            };
         }
         if (data.status === 'pickup_done') {
-            return { label: 'Buat Pengembalian', to: '/vehicle-loans/return' };
+            return {
+                label: tPage('detail_page.action_return', 'Buat Pengembalian'),
+                to: '/vehicle-loans/return',
+            };
         }
         return null;
     })();
@@ -139,28 +181,47 @@ export default function VehicleLoanDetailPage() {
     return (
         <AppLayout
             breadcrumbs={[
-                { title: 'Detail Peminjaman', href: `/vehicle-loans/${id}` },
+                {
+                    title: tPage('detail_page.breadcrumb', 'Detail Peminjaman'),
+                    href: `/vehicle-loans/${id}`,
+                },
             ]}
         >
             <Helmet>
-                <title>Detail Peminjaman Kendaraan</title>
+                <title>
+                    {tPage(
+                        'detail_page.page_title',
+                        'Detail Peminjaman Kendaraan',
+                    )}
+                </title>
             </Helmet>
             <div className="mx-auto max-w-6xl space-y-4 p-4 md:p-6">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <PageHeader
-                        title={`Permintaan ${data?.code ?? ''}`}
-                        description="Detail permintaan, persetujuan, dan riwayat peminjaman."
+                        title={tPage(
+                            'detail_page.title_prefix',
+                            'Permintaan {code}',
+                            {
+                                code: data?.code ?? '',
+                            },
+                        )}
+                        description={tPage(
+                            'detail_page.description',
+                            'Detail permintaan, persetujuan, dan riwayat peminjaman.',
+                        )}
                     />
                     <div className="flex gap-2">
                         <Button variant="outline" size="sm" asChild>
-                            <Link to="/vehicle-loans/dashboard">Kembali</Link>
+                            <Link to="/vehicle-loans/dashboard">
+                                {tPage('detail_page.back', 'Kembali')}
+                            </Link>
                         </Button>
                         <Button
                             variant="outline"
                             size="sm"
                             onClick={() => window.print()}
                         >
-                            Cetak
+                            {tPage('detail_page.print', 'Cetak')}
                         </Button>
                     </div>
                 </div>
@@ -168,7 +229,10 @@ export default function VehicleLoanDetailPage() {
                 {isLoading && (
                     <Card>
                         <CardContent className="py-10 text-center text-sm text-muted-foreground">
-                            Memuat detail permintaan...
+                            {tPage(
+                                'detail_page.loading',
+                                'Memuat detail permintaan...',
+                            )}
                         </CardContent>
                     </Card>
                 )}
@@ -177,11 +241,16 @@ export default function VehicleLoanDetailPage() {
                     <Card>
                         <CardContent className="space-y-1 py-10 text-center">
                             <p className="font-medium">
-                                Permintaan tidak ditemukan
+                                {tPage(
+                                    'detail_page.not_found_title',
+                                    'Permintaan tidak ditemukan',
+                                )}
                             </p>
                             <p className="text-sm text-muted-foreground">
-                                Data mungkin sudah dihapus atau Anda tidak
-                                memiliki akses.
+                                {tPage(
+                                    'detail_page.not_found_description',
+                                    'Data mungkin sudah dihapus atau Anda tidak memiliki akses.',
+                                )}
                             </p>
                         </CardContent>
                     </Card>
@@ -194,37 +263,58 @@ export default function VehicleLoanDetailPage() {
                                 <Card>
                                     <CardHeader className="pb-3">
                                         <CardTitle className="text-base">
-                                            Informasi Peminjam
+                                            {tPage(
+                                                'detail_page.section_borrower',
+                                                'Informasi Peminjam',
+                                            )}
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
                                         <dl className="grid gap-4 sm:grid-cols-2">
                                             <Field
-                                                label="Peminjam"
+                                                label={tPage(
+                                                    'detail_page.requester_label',
+                                                    'Peminjam',
+                                                )}
                                                 value={data.requester_name}
                                             />
                                             <Field
-                                                label="Departemen"
+                                                label={tPage(
+                                                    'detail_page.department_label',
+                                                    'Departemen',
+                                                )}
                                                 value={data.department_name}
                                             />
                                             <Field
-                                                label="Mulai"
+                                                label={tPage(
+                                                    'detail_page.start_label',
+                                                    'Mulai',
+                                                )}
                                                 value={formatDateTimeByRegionalSettings(
                                                     data.start_at,
                                                 )}
                                             />
                                             <Field
-                                                label="Batas Pengembalian"
+                                                label={tPage(
+                                                    'detail_page.end_label',
+                                                    'Batas Pengembalian',
+                                                )}
                                                 value={formatDateTimeByRegionalSettings(
                                                     data.end_at,
                                                 )}
                                             />
                                             <Field
-                                                label="Tujuan"
+                                                label={tPage(
+                                                    'detail_page.purpose_label',
+                                                    'Tujuan',
+                                                )}
                                                 value={data.purpose}
                                             />
                                             <Field
-                                                label="Diajukan"
+                                                label={tPage(
+                                                    'detail_page.submitted_label',
+                                                    'Diajukan',
+                                                )}
                                                 value={formatDateTimeByRegionalSettings(
                                                     data.submitted_at,
                                                 )}
@@ -236,48 +326,82 @@ export default function VehicleLoanDetailPage() {
                                 <Card>
                                     <CardHeader className="pb-3">
                                         <CardTitle className="text-base">
-                                            Kendaraan & Pengemudi
+                                            {tPage(
+                                                'detail_page.section_vehicle',
+                                                'Kendaraan & Pengemudi',
+                                            )}
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
                                         <dl className="grid gap-4 sm:grid-cols-2">
                                             <Field
-                                                label="Pengemudi"
+                                                label={tPage(
+                                                    'detail_page.driver_label',
+                                                    'Pengemudi',
+                                                )}
                                                 value={data.driver_name}
                                             />
                                             <Field
-                                                label="Kendaraan"
+                                                label={tPage(
+                                                    'detail_page.vehicle_label',
+                                                    'Kendaraan',
+                                                )}
                                                 value={data.plate_number}
                                             />
                                             <Field
-                                                label="Kunci diserahkan"
+                                                label={tPage(
+                                                    'detail_page.key_handover_label',
+                                                    'Kunci diserahkan',
+                                                )}
                                                 value={formatDateTimeByRegionalSettings(
                                                     data.pickup
                                                         ?.key_handover_at,
                                                 )}
                                             />
                                             <Field
-                                                label="Dikembalikan"
+                                                label={tPage(
+                                                    'detail_page.returned_label',
+                                                    'Dikembalikan',
+                                                )}
                                                 value={formatDateTimeByRegionalSettings(
                                                     data.returns?.returned_at,
                                                 )}
                                             />
                                             <Field
-                                                label="Insiden"
+                                                label={tPage(
+                                                    'detail_page.incident_label',
+                                                    'Insiden',
+                                                )}
                                                 value={incidentLabel(
                                                     data.returns,
+                                                    {
+                                                        yes: tPage(
+                                                            'detail_page.incident_yes',
+                                                            'Ada insiden',
+                                                        ),
+                                                        no: tPage(
+                                                            'detail_page.incident_no',
+                                                            'Tidak ada',
+                                                        ),
+                                                    },
                                                 )}
                                             />
                                         </dl>
                                         {data.review_notes && (
                                             <p className="mt-4 rounded-md bg-muted/40 p-3 text-sm">
-                                                Catatan tinjauan:{' '}
+                                                {tPage(
+                                                    'detail_page.review_note_label',
+                                                    'Catatan tinjauan:',
+                                                )}{' '}
                                                 {data.review_notes}
                                             </p>
                                         )}
                                         {data.rejection_reason && (
                                             <p className="mt-4 rounded-md bg-destructive-soft p-3 text-sm text-destructive-foreground">
-                                                Alasan ditolak:{' '}
+                                                {tPage(
+                                                    'detail_page.reject_reason_label',
+                                                    'Alasan ditolak:',
+                                                )}{' '}
                                                 {data.rejection_reason}
                                             </p>
                                         )}
@@ -289,7 +413,10 @@ export default function VehicleLoanDetailPage() {
                                 <Card>
                                     <CardHeader className="pb-3">
                                         <CardTitle className="text-base">
-                                            Status
+                                            {tPage(
+                                                'detail_page.section_status',
+                                                'Status',
+                                            )}
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-3">
@@ -298,14 +425,19 @@ export default function VehicleLoanDetailPage() {
                                         />
                                         {data.is_overdue && (
                                             <p className="rounded-md bg-warning-soft p-2 text-xs font-medium text-warning">
-                                                Kendaraan melewati jadwal
-                                                pengembalian.
+                                                {tPage(
+                                                    'detail_page.overdue_notice',
+                                                    'Kendaraan melewati jadwal pengembalian.',
+                                                )}
                                             </p>
                                         )}
                                         <dl className="space-y-2 text-sm">
                                             <div className="flex justify-between gap-3">
                                                 <dt className="text-muted-foreground">
-                                                    Diajukan
+                                                    {tPage(
+                                                        'detail_page.submitted_label',
+                                                        'Diajukan',
+                                                    )}
                                                 </dt>
                                                 <dd>
                                                     {formatDateTimeByRegionalSettings(
@@ -315,7 +447,10 @@ export default function VehicleLoanDetailPage() {
                                             </div>
                                             <div className="flex justify-between gap-3">
                                                 <dt className="text-muted-foreground">
-                                                    Disetujui
+                                                    {tPage(
+                                                        'detail_page.approved_label',
+                                                        'Disetujui',
+                                                    )}
                                                 </dt>
                                                 <dd>
                                                     {formatDateTimeByRegionalSettings(
@@ -337,13 +472,19 @@ export default function VehicleLoanDetailPage() {
                                 <Card>
                                     <CardHeader className="pb-3">
                                         <CardTitle className="text-base">
-                                            Persetujuan
+                                            {tPage(
+                                                'detail_page.approval_heading',
+                                                'Persetujuan',
+                                            )}
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
                                         {!approval || steps.length === 0 ? (
                                             <p className="text-sm text-muted-foreground">
-                                                Belum ada langkah persetujuan.
+                                                {tPage(
+                                                    'detail_page.approval_empty',
+                                                    'Belum ada langkah persetujuan.',
+                                                )}
                                             </p>
                                         ) : (
                                             <ol className="space-y-4">
@@ -359,18 +500,25 @@ export default function VehicleLoanDetailPage() {
                                                         </span>
                                                         <div className="space-y-1">
                                                             <p className="text-sm font-medium">
-                                                                Langkah{' '}
-                                                                {
-                                                                    step.step_order
-                                                                }{' '}
-                                                                ·{' '}
-                                                                {vehicleLoanStatusLabel(
-                                                                    step.status,
+                                                                {tPage(
+                                                                    'detail_page.step_label',
+                                                                    'Langkah {order} · {status}',
+                                                                    {
+                                                                        order: String(
+                                                                            step.step_order,
+                                                                        ),
+                                                                        status: vehicleLoanStatusLabel(
+                                                                            step.status,
+                                                                        ),
+                                                                    },
                                                                 )}
                                                             </p>
                                                             <p className="text-xs text-muted-foreground">
                                                                 {step.approver_name ??
-                                                                    'Penyetuju'}
+                                                                    tPage(
+                                                                        'detail_page.approver_fallback',
+                                                                        'Penyetuju',
+                                                                    )}
                                                                 {step.acted_at
                                                                     ? ` · ${formatDateTimeByRegionalSettings(step.acted_at)}`
                                                                     : ''}
@@ -397,13 +545,19 @@ export default function VehicleLoanDetailPage() {
                         <Card>
                             <CardHeader className="pb-3">
                                 <CardTitle className="text-base">
-                                    Riwayat Aktivitas
+                                    {tPage(
+                                        'detail_page.activity_heading',
+                                        'Riwayat Aktivitas',
+                                    )}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
                                 {!data.activity_logs?.length ? (
                                     <p className="text-sm text-muted-foreground">
-                                        Belum ada aktivitas tercatat.
+                                        {tPage(
+                                            'detail_page.activity_empty',
+                                            'Belum ada aktivitas tercatat.',
+                                        )}
                                     </p>
                                 ) : (
                                     <ol className="space-y-3">
@@ -415,13 +569,10 @@ export default function VehicleLoanDetailPage() {
                                                 <span className="mt-1.5 size-2 shrink-0 rounded-full bg-muted-foreground" />
                                                 <div>
                                                     <p className="text-sm font-medium">
-                                                        {ACTIVITY_LABELS[
-                                                            log.event
-                                                        ] ??
-                                                            log.event.replaceAll(
-                                                                '_',
-                                                                ' ',
-                                                            )}
+                                                        {activityLabel(
+                                                            log.event,
+                                                            tPage,
+                                                        )}
                                                     </p>
                                                     <p className="text-xs text-muted-foreground">
                                                         {formatDateTimeByRegionalSettings(

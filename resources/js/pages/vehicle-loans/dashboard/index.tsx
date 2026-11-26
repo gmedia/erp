@@ -2,6 +2,7 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { VehicleLoanStatusBadge } from '@/components/vehicle-loans/VehicleLoanStatusBadge';
+import { useVehicleLoanPageText } from '@/components/vehicle-loans/useVehicleLoanPageText';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
 import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
@@ -31,6 +32,7 @@ interface DashboardLoan {
 }
 
 export default function VehicleLoanDashboardPage() {
+    const tPage = useVehicleLoanPageText();
     const { data, dataUpdatedAt, isLoading } = useQuery({
         queryKey: ['vehicle-loans', 'dashboard'],
         queryFn: async () => {
@@ -53,49 +55,49 @@ export default function VehicleLoanDashboardPage() {
 
     const statusCards = [
         {
-            label: 'Total permintaan',
+            label: tPage('dashboard.status_total', 'Total permintaan'),
             value: loans.length,
             icon: FileText,
             tone: 'text-muted-foreground bg-muted',
         },
         {
-            label: 'Draf',
+            label: tPage('dashboard.status_draft', 'Draf'),
             value: count('draft'),
             icon: FileText,
             tone: 'text-muted-foreground bg-muted',
         },
         {
-            label: 'Menunggu Persetujuan',
+            label: tPage('dashboard.status_pending', 'Menunggu Persetujuan'),
             value: count('pending') + count('in_progress'),
             icon: Clock3,
             tone: 'text-warning bg-warning-soft',
         },
         {
-            label: 'Disetujui',
+            label: tPage('dashboard.status_approved', 'Disetujui'),
             value: count('approved'),
             icon: CheckCircle2,
             tone: 'text-success bg-success-soft',
         },
         {
-            label: 'Ditolak',
+            label: tPage('dashboard.status_rejected', 'Ditolak'),
             value: count('rejected'),
             icon: XCircle,
             tone: 'text-destructive-foreground bg-destructive-soft',
         },
         {
-            label: 'Kendaraan Dipakai',
+            label: tPage('dashboard.status_in_use', 'Kendaraan Dipakai'),
             value: count('pickup_done'),
             icon: KeyRound,
             tone: 'text-info bg-info/10',
         },
         {
-            label: 'Selesai',
+            label: tPage('dashboard.status_completed', 'Selesai'),
             value: count('returned'),
             icon: CarFront,
             tone: 'text-success bg-success-soft',
         },
         {
-            label: 'Dibatalkan',
+            label: tPage('dashboard.status_cancelled', 'Dibatalkan'),
             value: count('cancelled'),
             icon: Ban,
             tone: 'text-muted-foreground bg-muted',
@@ -108,29 +110,48 @@ export default function VehicleLoanDashboardPage() {
         <AppLayout
             breadcrumbs={[
                 {
-                    title: 'Dashboard Peminjaman',
+                    title: tPage(
+                        'dashboard.breadcrumb',
+                        'Dashboard Peminjaman',
+                    ),
                     href: '/vehicle-loans/dashboard',
                 },
             ]}
         >
             <Helmet>
-                <title>Dashboard Peminjaman Kendaraan</title>
+                <title>
+                    {tPage('dashboard.title', 'Dashboard Peminjaman Kendaraan')}
+                </title>
             </Helmet>
             <div className="mx-auto max-w-7xl space-y-6 p-4 md:p-6">
                 <PageHeader
-                    title="Dashboard Peminjaman Kendaraan"
-                    description="Ringkasan status permintaan, keterlambatan, dan aktivitas terbaru."
+                    title={tPage(
+                        'dashboard.title',
+                        'Dashboard Peminjaman Kendaraan',
+                    )}
+                    description={tPage(
+                        'dashboard.description',
+                        'Ringkasan status permintaan, keterlambatan, dan aktivitas terbaru.',
+                    )}
                 />
 
                 <section className="space-y-3">
                     <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                         <h2 className="text-sm font-semibold">
-                            Status Permintaan
+                            {tPage(
+                                'dashboard.heading_status',
+                                'Status Permintaan',
+                            )}
                         </h2>
                         <p className="text-xs text-muted-foreground">
-                            Diperbarui{' '}
-                            {formatDateTimeByRegionalSettings(
-                                new Date(dataUpdatedAt).toISOString(),
+                            {tPage(
+                                'dashboard.updated_at',
+                                'Diperbarui {time}',
+                                {
+                                    time: formatDateTimeByRegionalSettings(
+                                        new Date(dataUpdatedAt).toISOString(),
+                                    ),
+                                },
                             )}
                         </p>
                     </div>
@@ -165,13 +186,19 @@ export default function VehicleLoanDashboardPage() {
                         <CardHeader className="pb-2">
                             <CardTitle className="flex items-center gap-2 text-sm">
                                 <AlertTriangle className="size-4 text-warning" />
-                                Terlambat dikembalikan
+                                {tPage(
+                                    'dashboard.overdue_card_title',
+                                    'Terlambat dikembalikan',
+                                )}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
                             <p className="text-3xl font-bold">{overdue}</p>
                             <p className="text-xs text-muted-foreground">
-                                Kendaraan melewati jadwal pengembalian.
+                                {tPage(
+                                    'dashboard.overdue_card_description',
+                                    'Kendaraan melewati jadwal pengembalian.',
+                                )}
                             </p>
                         </CardContent>
                     </Card>
@@ -179,14 +206,19 @@ export default function VehicleLoanDashboardPage() {
                         <CardHeader className="pb-2">
                             <CardTitle className="flex items-center gap-2 text-sm">
                                 <CarFront className="size-4 text-info" />
-                                Aktif (belum terlambat)
+                                {tPage(
+                                    'dashboard.active_card_title',
+                                    'Aktif (belum terlambat)',
+                                )}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
                             <p className="text-3xl font-bold">{active}</p>
                             <p className="text-xs text-muted-foreground">
-                                Kunci diserahkan, belum dikembalikan, dan belum
-                                melewati tenggat.
+                                {tPage(
+                                    'dashboard.active_card_description',
+                                    'Kunci diserahkan, belum dikembalikan, dan belum melewati tenggat.',
+                                )}
                             </p>
                         </CardContent>
                     </Card>
@@ -195,11 +227,14 @@ export default function VehicleLoanDashboardPage() {
                 <section className="space-y-3">
                     <div className="flex items-center justify-between">
                         <h2 className="text-sm font-semibold">
-                            Permintaan Terbaru
+                            {tPage(
+                                'dashboard.heading_recent',
+                                'Permintaan Terbaru',
+                            )}
                         </h2>
                         <Button variant="outline" size="sm" asChild>
                             <Link to="/vehicle-loans/security">
-                                Lihat Antrean
+                                {tPage('dashboard.view_queue', 'Lihat Antrean')}
                             </Link>
                         </Button>
                     </div>
@@ -207,7 +242,10 @@ export default function VehicleLoanDashboardPage() {
                         <CardContent className="divide-y py-0">
                             {recentLoans.length === 0 ? (
                                 <p className="py-8 text-center text-sm text-muted-foreground">
-                                    Belum ada permintaan peminjaman.
+                                    {tPage(
+                                        'dashboard.empty',
+                                        'Belum ada permintaan peminjaman.',
+                                    )}
                                 </p>
                             ) : (
                                 recentLoans.map((loan) => (
@@ -225,7 +263,10 @@ export default function VehicleLoanDashboardPage() {
                                             <p className="truncate text-xs text-muted-foreground">
                                                 {loan.requester_name ?? '-'} ·{' '}
                                                 {loan.plate_number ??
-                                                    'unit belum ditentukan'}
+                                                    tPage(
+                                                        'dashboard.unit_undetermined',
+                                                        'unit belum ditentukan',
+                                                    )}
                                             </p>
                                         </div>
                                         <p className="text-xs text-muted-foreground sm:whitespace-nowrap">
@@ -236,7 +277,10 @@ export default function VehicleLoanDashboardPage() {
                                         <div className="flex items-center gap-2 self-start sm:self-auto">
                                             {loan.is_overdue && (
                                                 <span className="rounded-full bg-destructive-soft px-2 py-1 text-xs font-medium text-destructive-foreground">
-                                                    Terlambat
+                                                    {tPage(
+                                                        'dashboard.overdue_badge',
+                                                        'Terlambat',
+                                                    )}
                                                 </span>
                                             )}
                                             <VehicleLoanStatusBadge

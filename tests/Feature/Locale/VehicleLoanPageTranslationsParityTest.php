@@ -28,8 +28,8 @@ test('vehicle_loan_page indonesian labels are translated, not copied from englis
     $en = localeVehicleLoanPageTranslations('en.json');
     $id = localeVehicleLoanPageTranslations('id.json');
 
-    // Pengecualian eksplisit: satuan yang sama di kedua bahasa (bukan teks yang belum diterjemahkan).
-    $sameAcrossLocales = ['return.odometer_unit'];
+    // Pengecualian eksplisit: kata/satuan yang sama di kedua bahasa (bukan teks yang belum diterjemahkan).
+    $sameAcrossLocales = ['return.odometer_unit', 'detail_page.section_status'];
 
     foreach (array_keys($en) as $key) {
         if (in_array($key, $sameAcrossLocales, true)) {
@@ -42,6 +42,8 @@ test('vehicle_loan_page indonesian labels are translated, not copied from englis
 
 test('vehicle loan page sources read vehicle_loan_page keys without raw ui text', function () {
     $sources = [
+        'pages/vehicle-loans/dashboard/index.tsx',
+        'pages/vehicle-loans/detail/index.tsx',
         'pages/vehicle-loans/pickup/index.tsx',
         'pages/vehicle-loans/request/index.tsx',
         'pages/vehicle-loans/return/index.tsx',

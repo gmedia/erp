@@ -25,10 +25,11 @@ const enLang = JSON.parse(
     readFileSync(resolve(process.cwd(), 'lang/en.json'), 'utf8'),
 ) as {
     vehicle_loan_toast: Record<string, string>;
-    vehicle_loan_page: Record<string, string>;
+    vehicle_loan_page: Record<string, Record<string, string>>;
 };
 const toastText = enLang.vehicle_loan_toast;
 const pageText = enLang.vehicle_loan_page;
+const dashboardText = pageText.dashboard;
 
 function escapeRegExp(value: string): string {
     return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -220,13 +221,19 @@ test.describe('Vehicle Loans', () => {
     }) => {
         await page.goto(VEHICLE_LOAN_DASHBOARD_PATH);
 
-        await expect(page).toHaveTitle(/Dashboard Peminjaman Kendaraan/);
+        await expect(page).toHaveTitle(
+            new RegExp(escapeRegExp(dashboardText.title)),
+        );
         await expect(
-            page.getByRole('heading', { name: 'Status Permintaan' }),
+            page.getByRole('heading', { name: dashboardText.heading_status }),
         ).toBeVisible();
-        await expect(page.getByText('Total permintaan')).toBeVisible();
-        await expect(page.getByText('Terlambat dikembalikan')).toBeVisible();
-        await expect(page.getByText('Permintaan Terbaru')).toBeVisible();
+        await expect(page.getByText(dashboardText.status_total)).toBeVisible();
+        await expect(
+            page.getByText(dashboardText.overdue_card_title),
+        ).toBeVisible();
+        await expect(
+            page.getByText(dashboardText.heading_recent),
+        ).toBeVisible();
     });
 
     test('QR panels on all three forms point to the configured base URL', async ({
