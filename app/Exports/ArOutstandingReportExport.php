@@ -31,6 +31,16 @@ class ArOutstandingReportExport extends AbstractReportIndexExport implements Wit
         ]);
     }
 
+    protected function currencyColumnHeadings(): array
+    {
+        return [
+            'Grand Total',
+            'Amount Received',
+            'Credit Note Amount',
+            'Amount Due',
+        ];
+    }
+
     protected function actionClass(): string
     {
         return IndexArOutstandingReportAction::class;

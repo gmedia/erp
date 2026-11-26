@@ -40,13 +40,22 @@ class ApPaymentHistoryReportExport extends AbstractReportIndexExport implements 
             $row->payment_method ?? '-',
             $row->bank_account_name ?? '-',
             $row->bank_account_number ?? '-',
-            $row->total_amount ?? 0,
-            $row->total_allocated ?? 0,
-            $row->total_unallocated ?? 0,
+            $this->numericValue($row->total_amount) ?? 0,
+            $this->numericValue($row->total_allocated) ?? 0,
+            $this->numericValue($row->total_unallocated) ?? 0,
             $row->reference ?? '-',
             $row->status ?? '-',
             $row->currency ?? '-',
             $row->notes ?? '-',
+        ];
+    }
+
+    protected function currencyColumnHeadings(): array
+    {
+        return [
+            'Total Amount',
+            'Allocated Amount',
+            'Unallocated Amount',
         ];
     }
 

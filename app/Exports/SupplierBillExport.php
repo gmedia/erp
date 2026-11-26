@@ -12,6 +12,8 @@ class SupplierBillExport extends BaseExport implements WithColumnFormatting
 {
     use ExportsNumberFormats;
 
+    protected array $defaultSortColumns = ['bill_date', 'bill_number'];
+
     public function query(): Builder
     {
         $query = SupplierBill::query()->with(['supplier', 'branch']);

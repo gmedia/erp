@@ -12,6 +12,8 @@ class ApPaymentExport extends BaseExport implements WithColumnFormatting
 {
     use ExportsNumberFormats;
 
+    protected array $defaultSortColumns = ['payment_date', 'payment_number'];
+
     public function query(): Builder
     {
         $query = ApPayment::query()->with(['supplier', 'branch', 'bankAccount']);

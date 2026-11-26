@@ -16,9 +16,9 @@ trait MapsSupplierBillExportRow
             $row->branch_name ?? '-',
             $row->bill_date?->format('Y-m-d') ?? '-',
             $row->due_date?->format('Y-m-d') ?? '-',
-            $row->grand_total ?? 0,
-            $row->amount_paid ?? 0,
-            $row->amount_due ?? 0,
+            $this->numericValue($row->grand_total) ?? 0,
+            $this->numericValue($row->amount_paid) ?? 0,
+            $this->numericValue($row->amount_due) ?? 0,
         ];
     }
 
