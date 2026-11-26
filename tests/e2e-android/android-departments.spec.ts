@@ -1,8 +1,15 @@
-import { writeFileSync } from 'node:fs';
+import { appendFileSync, writeFileSync } from 'node:fs';
 import { _android as android, expect, test } from '@playwright/test';
 import { APP_PKG, currentPage, launchApp, loginInWebView } from './android-helpers';
 
 test.describe.configure({ mode: 'serial' });
+
+const EVENTS_FILE = '/tmp/opencode/547-events.txt';
+const logEvent = (msg: string) => {
+  const line = `${new Date().toISOString()} ${msg}`;
+  console.log(line);
+  appendFileSync(EVENTS_FILE, `${line}\n`);
+};
 
 test('Departments memuat tabel dengan data', async () => {
   const [device] = await android.devices();
@@ -10,7 +17,24 @@ test('Departments memuat tabel dengan data', async () => {
 
   const session = await launchApp(device);
   try {
+    const instrument = (p: import('@playwright/test').Page, tag: string) => {
+      p.on('close', () => logEvent(`[${tag}] page close`));
+      p.on('load', () => logEvent(`[${tag}] page load url=${p.url()}`));
+      p.on('framenavigated', (f) => {
+        if (f === p.mainFrame()) logEvent(`[${tag}] framenavigated url=${f.url()}`);
+      });
+    };
+    instrument(session.page, 'page-initial');
+    session.webview.on('page', (p) => {
+      logEvent(`webview page event url=${p.url()}`);
+      instrument(p, 'page-new');
+    });
+
     await loginInWebView(session);
+    await new Promise((resolve) => setTimeout(resolve, 10000));
+    const probe = await currentPage(session);
+    logEvent(`post-login isClosed=${probe.isClosed()} url=${probe.url()} webViews=${device.webViews().length}`);
+
     const page = await currentPage(session);
     await expect(page).toHaveURL(/\/dashboard/, { timeout: 90000 });
     await page.waitForLoadState('networkidle');
