@@ -4,6 +4,7 @@ import { Pencil, Plus, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { TableCell, TableRow } from '@/components/ui/table';
+import { useTranslation } from '@/contexts/i18n-context';
 
 interface EntityFormItemSectionHeaderProps {
     readonly onAddItem: () => void;
@@ -28,9 +29,15 @@ interface EntityFormItemEmptyRowProps {
 export function EntityFormItemSectionHeader({
     onAddItem,
     title = 'Items',
-    addLabel = 'Add Item',
+    addLabel,
     locked = false,
 }: Readonly<EntityFormItemSectionHeaderProps>) {
+    const { t } = useTranslation();
+    const addItemKey = 'shell.add_item';
+    const translatedAddItem = t(addItemKey);
+    const defaultAddLabel =
+        translatedAddItem === addItemKey ? 'Add Item' : translatedAddItem;
+
     return (
         <div className="flex items-center justify-between">
             <div className="text-sm font-semibold">{title}</div>
@@ -41,7 +48,7 @@ export function EntityFormItemSectionHeader({
                 disabled={locked}
             >
                 <Plus className="mr-2 h-4 w-4" />
-                {addLabel}
+                {addLabel ?? defaultAddLabel}
             </Button>
         </div>
     );

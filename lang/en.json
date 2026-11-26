@@ -251,7 +251,8 @@
         "import_validation_error": "Validation Error",
         "import_invalid_file": "Invalid file.",
         "import_failed": "Import Failed",
-        "import_unexpected_error": "An unexpected error occurred."
+        "import_unexpected_error": "An unexpected error occurred.",
+        "add_item": "Add Item"
     },
     "language": {
         "switch": "Language",
@@ -1300,6 +1301,17 @@
         "goods_receipt_search_placeholder": "Search GR number, PO number, supplier, warehouse, or product..."
     },
     "form_fields": {
+        "asset_depreciation_runs": {
+            "calculate_title": "Calculate Depreciation",
+            "calculate_description": "Select the fiscal year and period to calculate asset depreciation.",
+            "fiscal_year": "Fiscal Year",
+            "fiscal_year_placeholder": "Select Fiscal Year...",
+            "period_start": "Period Start",
+            "period_start_placeholder": "Pick period start",
+            "period_end": "Period End",
+            "period_end_placeholder": "Pick period end",
+            "calculate": "Calculate"
+        },
         "purchase_orders": {
             "add_title": "Add New Purchase Order",
             "edit_title": "Edit Purchase Order",
@@ -2682,5 +2694,36 @@
         "save": "Save",
         "update": "Update",
         "cancel": "Cancel"
+    },
+    "dashboard": {
+        "total_customers": "Total Customers",
+        "total_employees": "Total Employees",
+        "total_suppliers": "Total Suppliers",
+        "total_assets": "Total Assets",
+        "shortcuts": "Shortcuts",
+        "shortcut_my_approvals_description": "Review pending requests",
+        "shortcut_purchase_orders_description": "Open the PO list",
+        "shortcut_stock_monitor_description": "On-hand quantity by warehouse",
+        "master_data_mix": "Master data mix",
+        "customers": "Customers",
+        "employees": "Employees",
+        "suppliers": "Suppliers",
+        "assets": "Assets",
+        "mix_footer": "Operational counts only. Financial KPIs stay on Financial Dashboard."
+    },
+    "api_error": {
+        "network": "Network connection failed. Please check your internet connection.",
+        "invalid_request": "Invalid request data.",
+        "unauthorized": "Authentication required. Please log in again.",
+        "forbidden": "You do not have permission to perform this action.",
+        "not_found": "The requested resource was not found.",
+        "validation_failed": "Validation failed.",
+        "server": "Server error. Please try again later.",
+        "unexpected": "An unexpected error occurred."
+    },
+    "asset_depreciation_runs_toast": {
+        "calculate_failed": "Failed to calculate depreciation",
+        "post_failed": "Failed to post to journal",
+        "void_failed": "Failed to void depreciation run"
     }
 }

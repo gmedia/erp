@@ -1,5 +1,21 @@
 import { toast } from 'sonner';
 
+type ErrorTranslator = (key: string) => string;
+
+let translateKey: ErrorTranslator | null = null;
+
+export function registerErrorTranslator(translator: ErrorTranslator | null) {
+    translateKey = translator;
+}
+
+function localizedError(key: string, fallback: string): string {
+    const translated = translateKey?.(`api_error.${key}`);
+
+    return translated && translated !== `api_error.${key}`
+        ? translated
+        : fallback;
+}
+
 // Error types for better error handling
 export enum ErrorType {
     NETWORK = 'network',
@@ -31,8 +47,10 @@ export function parseApiError(error: unknown): ApiError {
         // Network error
         return {
             type: ErrorType.NETWORK,
-            message:
+            message: localizedError(
+                'network',
                 'Network connection failed. Please check your internet connection.',
+            ),
         };
     }
 
@@ -42,7 +60,9 @@ export function parseApiError(error: unknown): ApiError {
         case 400:
             return {
                 type: ErrorType.VALIDATION,
-                message: data?.message || 'Invalid request data.',
+                message:
+                    data?.message ||
+                    localizedError('invalid_request', 'Invalid request data.'),
                 details: data?.errors,
                 statusCode: status,
             };
@@ -50,14 +70,20 @@ export function parseApiError(error: unknown): ApiError {
         case 401:
             return {
                 type: ErrorType.UNAUTHORIZED,
-                message: 'Authentication required. Please log in again.',
+                message: localizedError(
+                    'unauthorized',
+                    'Authentication required. Please log in again.',
+                ),
                 statusCode: status,
             };
 
         case 403:
             return {
                 type: ErrorType.FORBIDDEN,
-                message: 'You do not have permission to perform this action.',
+                message: localizedError(
+                    'forbidden',
+                    'You do not have permission to perform this action.',
+                ),
                 statusCode: status,
             };
 
@@ -65,14 +91,20 @@ export function parseApiError(error: unknown): ApiError {
             return {
                 type: ErrorType.NOT_FOUND,
                 message:
-                    data?.message || 'The requested resource was not found.',
+                    data?.message ||
+                    localizedError(
+                        'not_found',
+                        'The requested resource was not found.',
+                    ),
                 statusCode: status,
             };
 
         case 422:
             return {
                 type: ErrorType.VALIDATION,
-                message: data?.message || 'Validation failed.',
+                message:
+                    data?.message ||
+                    localizedError('validation_failed', 'Validation failed.'),
                 details: data?.errors,
                 statusCode: status,
             };
@@ -83,14 +115,22 @@ export function parseApiError(error: unknown): ApiError {
         case 504:
             return {
                 type: ErrorType.SERVER,
-                message: 'Server error. Please try again later.',
+                message: localizedError(
+                    'server',
+                    'Server error. Please try again later.',
+                ),
                 statusCode: status,
             };
 
         default:
             return {
                 type: ErrorType.UNKNOWN,
-                message: data?.message || 'An unexpected error occurred.',
+                message:
+                    data?.message ||
+                    localizedError(
+                        'unexpected',
+                        'An unexpected error occurred.',
+                    ),
                 statusCode: status,
             };
     }

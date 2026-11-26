@@ -251,7 +251,8 @@
         "import_validation_error": "Kesalahan Validasi",
         "import_invalid_file": "File tidak valid.",
         "import_failed": "Impor Gagal",
-        "import_unexpected_error": "Terjadi kesalahan tak terduga."
+        "import_unexpected_error": "Terjadi kesalahan tak terduga.",
+        "add_item": "Tambah Item"
     },
     "language": {
         "switch": "Bahasa",
@@ -1300,6 +1301,17 @@
         "goods_receipt_search_placeholder": "Cari no. GR, no. PO, pemasok, gudang, atau produk..."
     },
     "form_fields": {
+        "asset_depreciation_runs": {
+            "calculate_title": "Hitung Penyusutan",
+            "calculate_description": "Pilih tahun fiskal dan periode untuk menghitung penyusutan aset.",
+            "fiscal_year": "Tahun Fiskal",
+            "fiscal_year_placeholder": "Pilih Tahun Fiskal...",
+            "period_start": "Awal Periode",
+            "period_start_placeholder": "Pilih awal periode",
+            "period_end": "Akhir Periode",
+            "period_end_placeholder": "Pilih akhir periode",
+            "calculate": "Hitung"
+        },
         "purchase_orders": {
             "add_title": "Tambah Pesanan Pembelian Baru",
             "edit_title": "Ubah Pesanan Pembelian",
@@ -2682,5 +2694,36 @@
         "save": "Simpan",
         "update": "Perbarui",
         "cancel": "Batal"
+    },
+    "dashboard": {
+        "total_customers": "Total Pelanggan",
+        "total_employees": "Total Karyawan",
+        "total_suppliers": "Total Pemasok",
+        "total_assets": "Total Aset",
+        "shortcuts": "Pintasan",
+        "shortcut_my_approvals_description": "Tinjau permintaan yang menunggu",
+        "shortcut_purchase_orders_description": "Buka daftar PO",
+        "shortcut_stock_monitor_description": "Stok fisik per gudang",
+        "master_data_mix": "Komposisi data master",
+        "customers": "Pelanggan",
+        "employees": "Karyawan",
+        "suppliers": "Pemasok",
+        "assets": "Aset",
+        "mix_footer": "Hanya jumlah operasional. KPI keuangan ada di Dasbor Keuangan."
+    },
+    "api_error": {
+        "network": "Koneksi jaringan gagal. Periksa koneksi internet Anda.",
+        "invalid_request": "Data permintaan tidak valid.",
+        "unauthorized": "Autentikasi diperlukan. Silakan masuk kembali.",
+        "forbidden": "Anda tidak memiliki izin untuk melakukan tindakan ini.",
+        "not_found": "Sumber daya yang diminta tidak ditemukan.",
+        "validation_failed": "Validasi gagal.",
+        "server": "Kesalahan server. Silakan coba lagi nanti.",
+        "unexpected": "Terjadi kesalahan yang tidak terduga."
+    },
+    "asset_depreciation_runs_toast": {
+        "calculate_failed": "Gagal menghitung penyusutan",
+        "post_failed": "Gagal memposting ke jurnal",
+        "void_failed": "Gagal membatalkan proses penyusutan"
     }
 }

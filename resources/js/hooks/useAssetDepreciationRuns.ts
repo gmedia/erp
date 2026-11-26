@@ -1,3 +1,4 @@
+import { useOptionalTranslation } from '@/contexts/i18n-context';
 import { useCrudQuery } from '@/hooks/useCrudQuery';
 import axiosInstance from '@/lib/axios';
 import { AssetDepreciationRun } from '@/types/asset-depreciation-run';
@@ -6,8 +7,23 @@ import axios from 'axios';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
+function translateOr(
+    t: (key: string) => string,
+    key: string,
+    fallback: string,
+): string {
+    const translated = t(key);
+
+    return translated === key ? fallback : translated;
+}
+
 export function useAssetDepreciationRuns() {
     const queryClient = useQueryClient();
+    const { t } = useOptionalTranslation();
+    const tToast = (key: string, fallback: string) =>
+        translateOr(t, `asset_depreciation_runs_toast.${key}`, fallback);
+    const tErrorUnexpected = () =>
+        translateOr(t, 'api_error.unexpected', 'An unexpected error occurred');
 
     const [pagination, setPagination] = useState({ page: 1, per_page: 15 });
     const [filters, setFilters] = useState<Record<string, string | undefined>>(
@@ -61,14 +77,16 @@ export function useAssetDepreciationRuns() {
             if (axios.isAxiosError(error)) {
                 const message =
                     error.response?.data?.message ||
-                    'Failed to calculate depreciation';
+                    tToast(
+                        'calculate_failed',
+                        'Failed to calculate depreciation',
+                    );
                 if (error.response?.data?.errors) {
-                    // Return errors to be handled by form
                     return { errors: error.response.data.errors };
                 }
                 toast.error(message);
             } else {
-                toast.error('An unexpected error occurred');
+                toast.error(tErrorUnexpected());
             }
             return false;
         } finally {
@@ -91,10 +109,10 @@ export function useAssetDepreciationRuns() {
             if (axios.isAxiosError(error)) {
                 const message =
                     error.response?.data?.message ||
-                    'Failed to post to journal';
+                    tToast('post_failed', 'Failed to post to journal');
                 toast.error(message);
             } else {
-                toast.error('An unexpected error occurred');
+                toast.error(tErrorUnexpected());
             }
         } finally {
             setIsPosting(null);
@@ -118,10 +136,10 @@ export function useAssetDepreciationRuns() {
                 const message =
                     error.response?.data?.errors?.status?.[0] ||
                     error.response?.data?.message ||
-                    'Failed to void depreciation run';
+                    tToast('void_failed', 'Failed to void depreciation run');
                 toast.error(message);
             } else {
-                toast.error('An unexpected error occurred');
+                toast.error(tErrorUnexpected());
             }
             return false;
         } finally {

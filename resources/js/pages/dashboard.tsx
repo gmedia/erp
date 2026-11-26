@@ -1,6 +1,7 @@
 import DashboardPageShell from '@/components/common/DashboardPageShell';
 import { KpiCard } from '@/components/common/KpiCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useTranslation } from '@/contexts/i18n-context';
 import axios from '@/lib/axios';
 import { type BreadcrumbItem } from '@/types';
 import { formatNumberByRegionalSettings } from '@/utils/number-format';
@@ -16,13 +17,6 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-    },
-];
-
 type Totals = {
     customers: number;
     employees: number;
@@ -36,6 +30,17 @@ async function fetchDashboardTotals(): Promise<Totals> {
 }
 
 export default function Dashboard() {
+    const { t } = useTranslation();
+    const tx = (key: string, fallback: string): string => {
+        const translated = t(key);
+        return translated === key ? fallback : translated;
+    };
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: tx('menu.dashboard', 'Dashboard'),
+            href: '/dashboard',
+        },
+    ];
     const { data, isLoading, isError, error, refetch } = useQuery({
         queryKey: ['home-dashboard'],
         queryFn: fetchDashboardTotals,
@@ -51,25 +56,25 @@ export default function Dashboard() {
 
     const cards = [
         {
-            title: 'Total Customers',
+            title: tx('dashboard.total_customers', 'Total Customers'),
             icon: Users,
             iconColor: 'text-info',
             value: totals.customers,
         },
         {
-            title: 'Total Employees',
+            title: tx('dashboard.total_employees', 'Total Employees'),
             icon: Building2,
             iconColor: 'text-success',
             value: totals.employees,
         },
         {
-            title: 'Total Suppliers',
+            title: tx('dashboard.total_suppliers', 'Total Suppliers'),
             icon: Warehouse,
             iconColor: 'text-warning',
             value: totals.suppliers,
         },
         {
-            title: 'Total Assets',
+            title: tx('dashboard.total_assets', 'Total Assets'),
             icon: Boxes,
             iconColor: 'text-chart-3',
             value: totals.assets,
@@ -78,21 +83,30 @@ export default function Dashboard() {
 
     const shortcuts = [
         {
-            title: 'My Approvals',
+            title: tx('menu.my_approvals', 'My Approvals'),
             href: '/my-approvals',
-            description: 'Review pending requests',
+            description: tx(
+                'dashboard.shortcut_my_approvals_description',
+                'Review pending requests',
+            ),
             icon: ClipboardCheck,
         },
         {
-            title: 'Purchase Orders',
+            title: tx('menu.purchase_orders', 'Purchase Orders'),
             href: '/purchase-orders',
-            description: 'Open the PO list',
+            description: tx(
+                'dashboard.shortcut_purchase_orders_description',
+                'Open the PO list',
+            ),
             icon: ShoppingCart,
         },
         {
-            title: 'Stock Monitor',
+            title: tx('menu.stock_monitor', 'Stock Monitor'),
             href: '/stock-monitor',
-            description: 'On-hand quantity by warehouse',
+            description: tx(
+                'dashboard.shortcut_stock_monitor_description',
+                'On-hand quantity by warehouse',
+            ),
             icon: PackageSearch,
         },
     ] as const;
@@ -100,25 +114,25 @@ export default function Dashboard() {
     const composition = [
         {
             key: 'customers',
-            label: 'Customers',
+            label: tx('dashboard.customers', 'Customers'),
             value: totals.customers,
             barClass: 'bg-info',
         },
         {
             key: 'employees',
-            label: 'Employees',
+            label: tx('dashboard.employees', 'Employees'),
             value: totals.employees,
             barClass: 'bg-success',
         },
         {
             key: 'suppliers',
-            label: 'Suppliers',
+            label: tx('dashboard.suppliers', 'Suppliers'),
             value: totals.suppliers,
             barClass: 'bg-warning',
         },
         {
             key: 'assets',
-            label: 'Assets',
+            label: tx('dashboard.assets', 'Assets'),
             value: totals.assets,
             barClass: 'bg-chart-3',
         },
@@ -128,7 +142,7 @@ export default function Dashboard() {
 
     return (
         <DashboardPageShell
-            title="Dashboard"
+            title={tx('menu.dashboard', 'Dashboard')}
             heading="Dashboard"
             headingKey="menu.dashboard"
             description="At-a-glance entity counts, operational shortcuts, and master-data mix. Financial KPIs stay on Financial Dashboard."
@@ -169,7 +183,9 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                 <Card data-testid="dashboard-shortcuts">
                     <CardHeader>
-                        <CardTitle>Shortcuts</CardTitle>
+                        <CardTitle>
+                            {tx('dashboard.shortcuts', 'Shortcuts')}
+                        </CardTitle>
                     </CardHeader>
                     <CardContent className="grid gap-2">
                         {shortcuts.map((item) => (
@@ -194,7 +210,9 @@ export default function Dashboard() {
 
                 <Card data-testid="dashboard-mix">
                     <CardHeader>
-                        <CardTitle>Master data mix</CardTitle>
+                        <CardTitle>
+                            {tx('dashboard.master_data_mix', 'Master data mix')}
+                        </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                         {composition.map((row) => (
@@ -218,8 +236,10 @@ export default function Dashboard() {
                             </div>
                         ))}
                         <p className="text-xs text-muted-foreground">
-                            Operational counts only. Financial KPIs stay on
-                            Financial Dashboard.
+                            {tx(
+                                'dashboard.mix_footer',
+                                'Operational counts only. Financial KPIs stay on Financial Dashboard.',
+                            )}
                         </p>
                     </CardContent>
                 </Card>
