@@ -106,6 +106,8 @@ final class DemoMasterData
 
     public const DEPARTMENT_ENGINEERING = 'Teknik';
 
+    public const DEPARTMENT_SALES = 'Penjualan';
+
     public const POSITION_DRIVER = 'Pengemudi';
 
     public const POSITION_MANAGER = 'Manajer';

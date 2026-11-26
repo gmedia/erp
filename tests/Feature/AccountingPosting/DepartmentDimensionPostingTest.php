@@ -33,6 +33,7 @@ function deptPostingFixture(): array
         'status' => 'open',
     ]);
 
+    /** @var CoaVersion $coa */
     $coa = CoaVersion::factory()->create([
         'fiscal_year_id' => $fiscalYear->id,
         'status' => 'active',
@@ -72,6 +73,7 @@ describe('Posting customer invoice dengan departemen', function () {
     test('baris pendapatan mewarisi departemen, baris AR tetap null', function () {
         $f = deptPostingFixture();
 
+        /** @var CustomerInvoice $invoice */
         $invoice = CustomerInvoice::factory()->sent()->create([
             'customer_id' => Customer::factory(),
             'branch_id' => $f['branch']->id,
@@ -103,6 +105,7 @@ describe('Posting customer invoice dengan departemen', function () {
     test('tanpa departemen semua baris tetap null (jurnal identik dengan sebelumnya)', function () {
         $f = deptPostingFixture();
 
+        /** @var CustomerInvoice $invoice */
         $invoice = CustomerInvoice::factory()->sent()->create([
             'customer_id' => Customer::factory(),
             'branch_id' => $f['branch']->id,
@@ -137,6 +140,7 @@ describe('Posting supplier bill dengan departemen', function () {
     test('baris beban mewarisi departemen, baris AP tetap null', function () {
         $f = deptPostingFixture();
 
+        /** @var SupplierBill $bill */
         $bill = SupplierBill::factory()->confirmed()->create([
             'supplier_id' => Supplier::factory(),
             'branch_id' => $f['branch']->id,
@@ -167,6 +171,7 @@ describe('Posting supplier bill dengan departemen', function () {
     test('tanpa departemen semua baris tetap null', function () {
         $f = deptPostingFixture();
 
+        /** @var SupplierBill $bill */
         $bill = SupplierBill::factory()->confirmed()->create([
             'supplier_id' => Supplier::factory(),
             'branch_id' => $f['branch']->id,
@@ -199,6 +204,7 @@ describe('Posting credit note dengan departemen', function () {
         $f = deptPostingFixture();
         $other = Department::factory()->create();
 
+        /** @var CreditNote $note */
         $note = CreditNote::factory()->confirmed()->create([
             'customer_id' => Customer::factory(),
             'branch_id' => $f['branch']->id,
@@ -228,6 +234,7 @@ describe('Posting credit note dengan departemen', function () {
     test('bila kosong, mewarisi departemen dari invoice terkait', function () {
         $f = deptPostingFixture();
 
+        /** @var CustomerInvoice $invoice */
         $invoice = CustomerInvoice::factory()->sent()->create([
             'customer_id' => Customer::factory(),
             'branch_id' => $f['branch']->id,
@@ -236,6 +243,7 @@ describe('Posting credit note dengan departemen', function () {
             'invoice_date' => '2026-03-15',
         ]);
 
+        /** @var CreditNote $note */
         $note = CreditNote::factory()->confirmed()->create([
             'customer_id' => Customer::factory(),
             'customer_invoice_id' => $invoice->id,
@@ -265,6 +273,7 @@ describe('Posting credit note dengan departemen', function () {
     test('tanpa departemen dan tanpa invoice terkait, semua baris null', function () {
         $f = deptPostingFixture();
 
+        /** @var CreditNote $note */
         $note = CreditNote::factory()->confirmed()->create([
             'customer_id' => Customer::factory(),
             'customer_invoice_id' => null,
@@ -296,6 +305,7 @@ describe('Reversal menyalin departemen baris asal', function () {
     test('baris pembalik membawa department_id yang sama dengan baris asal', function () {
         $f = deptPostingFixture();
 
+        /** @var CustomerInvoice $invoice */
         $invoice = CustomerInvoice::factory()->sent()->create([
             'customer_id' => Customer::factory(),
             'branch_id' => $f['branch']->id,
