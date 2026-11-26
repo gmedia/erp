@@ -32,6 +32,7 @@ import {
     type UnmatchedJournalLine,
 } from '@/types/bank-reconciliation';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
+import { useToastTranslator } from '@/utils/i18nFallback';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { useQueryClient } from '@tanstack/react-query';
 import rawAxios from 'axios';
@@ -83,6 +84,7 @@ export const BankReconciliationWorkspace =
             onClose,
         }) {
             const queryClient = useQueryClient();
+            const tToast = useToastTranslator('bank_reconciliation_toast');
 
             const [items, setItems] = useState<BankReconciliationItem[]>(
                 bankReconciliation.items ?? [],
@@ -141,13 +143,18 @@ export const BankReconciliationWorkspace =
                     })
                     .catch(() => {
                         if (!cancelled)
-                            toast.error('Failed to load reconciliation items.');
+                            toast.error(
+                                tToast(
+                                    'items_load_failed',
+                                    'Failed to load reconciliation items.',
+                                ),
+                            );
                     });
 
                 return () => {
                     cancelled = true;
                 };
-            }, [open, bankReconciliation.id]);
+            }, [open, bankReconciliation.id, tToast]);
 
             useEffect(() => {
                 if (!matchDialogOpen) return;
@@ -165,7 +172,12 @@ export const BankReconciliationWorkspace =
                     })
                     .catch(() => {
                         if (!cancelled)
-                            toast.error('Failed to load journal entry lines.');
+                            toast.error(
+                                tToast(
+                                    'journal_lines_load_failed',
+                                    'Failed to load journal entry lines.',
+                                ),
+                            );
                     })
                     .finally(() => {
                         if (!cancelled) setJeLoading(false);
@@ -174,7 +186,12 @@ export const BankReconciliationWorkspace =
                 return () => {
                     cancelled = true;
                 };
-            }, [matchDialogOpen, debouncedSearch, bankReconciliation.id]);
+            }, [
+                matchDialogOpen,
+                debouncedSearch,
+                bankReconciliation.id,
+                tToast,
+            ]);
 
             useEffect(() => {
                 if (!assignDialogOpen) return;
@@ -190,7 +207,13 @@ export const BankReconciliationWorkspace =
                         if (!cancelled) setAccountOptions(res.data.data);
                     })
                     .catch(() => {
-                        if (!cancelled) toast.error('Failed to load accounts.');
+                        if (!cancelled)
+                            toast.error(
+                                tToast(
+                                    'accounts_load_failed',
+                                    'Failed to load accounts.',
+                                ),
+                            );
                     })
                     .finally(() => {
                         if (!cancelled) setAccountLoading(false);
@@ -199,7 +222,7 @@ export const BankReconciliationWorkspace =
                 return () => {
                     cancelled = true;
                 };
-            }, [assignDialogOpen, debouncedAccountSearch]);
+            }, [assignDialogOpen, debouncedAccountSearch, tToast]);
 
             const invalidate = useCallback(async () => {
                 await queryClient.invalidateQueries({
@@ -214,9 +237,19 @@ export const BankReconciliationWorkspace =
                         `/api/bank-reconciliations/${bankReconciliation.id}/auto-match`,
                     );
                     const { matched, unmatched } = res.data;
-                    toast.success('Auto Match Complete', {
-                        description: `Matched: ${matched}, Unmatched: ${unmatched}`,
-                    });
+                    toast.success(
+                        tToast('auto_match_complete', 'Auto Match Complete'),
+                        {
+                            description: tToast(
+                                'auto_match_result',
+                                `Matched: ${matched}, Unmatched: ${unmatched}`,
+                                {
+                                    matched: String(matched),
+                                    unmatched: String(unmatched),
+                                },
+                            ),
+                        },
+                    );
                     await invalidate();
                     const fresh = await axios.get<{ data: BankReconciliation }>(
                         `/api/bank-reconciliations/${bankReconciliation.id}`,
@@ -224,7 +257,12 @@ export const BankReconciliationWorkspace =
                     setItems(fresh.data.data.items);
                     setCurrentDifference(fresh.data.data.difference);
                 } catch {
-                    toast.error('Auto match failed. Please try again.');
+                    toast.error(
+                        tToast(
+                            'auto_match_failed',
+                            'Auto match failed. Please try again.',
+                        ),
+                    );
                 } finally {
                     setAutoMatchLoading(false);
                 }
@@ -270,7 +308,11 @@ export const BankReconciliationWorkspace =
                         ),
                     );
                     toast.success(
-                        `Account assigned: ${account.code} - ${account.name}`,
+                        tToast(
+                            'account_assigned',
+                            `Account assigned: ${account.code} - ${account.name}`,
+                            { code: account.code, name: account.name },
+                        ),
                     );
                     closeAssignDialog();
                     await invalidate();
@@ -283,7 +325,10 @@ export const BankReconciliationWorkspace =
                         rawAxios.isAxiosError(err) &&
                         err.response?.data?.message
                             ? (err.response.data.message as string)
-                            : 'Failed to assign account.';
+                            : tToast(
+                                  'assign_account_failed',
+                                  'Failed to assign account.',
+                              );
                     toast.error(msg);
                 } finally {
                     setLoadingItemId(null);
@@ -305,7 +350,9 @@ export const BankReconciliationWorkspace =
                             it.id === matchingItemId ? res.data.data : it,
                         ),
                     );
-                    toast.success('Item matched successfully.');
+                    toast.success(
+                        tToast('item_matched', 'Item matched successfully.'),
+                    );
                     closeMatchDialog();
                     await invalidate();
                     const freshMatch = await axios.get<{
@@ -317,7 +364,7 @@ export const BankReconciliationWorkspace =
                         rawAxios.isAxiosError(err) &&
                         err.response?.data?.message
                             ? (err.response.data.message as string)
-                            : 'Failed to match item.';
+                            : tToast('match_failed', 'Failed to match item.');
                     toast.error(msg);
                 } finally {
                     setLoadingItemId(null);
@@ -337,7 +384,7 @@ export const BankReconciliationWorkspace =
                             it.id === itemId ? res.data.data : it,
                         ),
                     );
-                    toast.success('Item unmatched.');
+                    toast.success(tToast('item_unmatched', 'Item unmatched.'));
                     await invalidate();
                     const freshUnmatch = await axios.get<{
                         data: BankReconciliation;
@@ -348,7 +395,10 @@ export const BankReconciliationWorkspace =
                         rawAxios.isAxiosError(err) &&
                         err.response?.data?.message
                             ? (err.response.data.message as string)
-                            : 'Failed to unmatch item.';
+                            : tToast(
+                                  'unmatch_failed',
+                                  'Failed to unmatch item.',
+                              );
                     toast.error(msg);
                 } finally {
                     setLoadingItemId(null);
@@ -361,10 +411,18 @@ export const BankReconciliationWorkspace =
                     await axios.post<{ data: BankReconciliation }>(
                         `/api/bank-reconciliations/${bankReconciliation.id}/complete`,
                     );
-                    toast.success('Reconciliation Completed', {
-                        description:
-                            'Bank reconciliation has been completed and journal entries posted.',
-                    });
+                    toast.success(
+                        tToast(
+                            'reconciliation_completed',
+                            'Reconciliation Completed',
+                        ),
+                        {
+                            description: tToast(
+                                'reconciliation_completed_description',
+                                'Bank reconciliation has been completed and journal entries posted.',
+                            ),
+                        },
+                    );
                     await invalidate();
                     onClose();
                 } catch (err: unknown) {
@@ -372,8 +430,13 @@ export const BankReconciliationWorkspace =
                         rawAxios.isAxiosError(err) &&
                         err.response?.data?.message
                             ? (err.response.data.message as string)
-                            : 'Failed to complete reconciliation.';
-                    toast.error('Complete Failed', { description: msg });
+                            : tToast(
+                                  'complete_failed_description',
+                                  'Failed to complete reconciliation.',
+                              );
+                    toast.error(tToast('complete_failed', 'Complete Failed'), {
+                        description: msg,
+                    });
                 } finally {
                     setCompleteLoading(false);
                 }

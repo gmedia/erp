@@ -2845,5 +2845,48 @@
         "approval_request_action_failed_reject": "Gagal menolak permintaan",
         "recovery_codes_regenerated": "Kode pemulihan berhasil dibuat ulang.",
         "recovery_codes_regenerate_failed": "Gagal membuat ulang kode pemulihan."
+    },
+    "settings_toast": {
+        "password_updated": "Kata sandi berhasil diperbarui",
+        "password_update_failed": "Terjadi kesalahan. Silakan coba lagi nanti.",
+        "two_factor_enable_failed": "Gagal mengaktifkan autentikasi dua faktor.",
+        "two_factor_disable_failed": "Gagal menonaktifkan autentikasi dua faktor."
+    },
+    "bank_reconciliation_toast": {
+        "items_load_failed": "Gagal memuat item rekonsiliasi.",
+        "journal_lines_load_failed": "Gagal memuat baris jurnal.",
+        "accounts_load_failed": "Gagal memuat akun.",
+        "auto_match_complete": "Pencocokan otomatis selesai",
+        "auto_match_result": "Cocok: {matched}, Belum cocok: {unmatched}",
+        "auto_match_failed": "Pencocokan otomatis gagal. Silakan coba lagi.",
+        "account_assigned": "Akun ditetapkan: {code} - {name}",
+        "assign_account_failed": "Gagal menetapkan akun.",
+        "item_matched": "Item berhasil dicocokkan.",
+        "match_failed": "Gagal mencocokkan item.",
+        "item_unmatched": "Pencocokan item dibatalkan.",
+        "unmatch_failed": "Gagal membatalkan pencocokan item.",
+        "reconciliation_completed": "Rekonsiliasi Selesai",
+        "reconciliation_completed_description": "Rekonsiliasi bank telah selesai dan jurnal telah diposting.",
+        "complete_failed": "Gagal Menyelesaikan",
+        "complete_failed_description": "Gagal menyelesaikan rekonsiliasi.",
+        "invalid_file": "Berkas Tidak Valid",
+        "unable_to_read_file": "Tidak dapat membaca berkas.",
+        "upload_failed": "Unggah Gagal",
+        "unexpected_error": "Terjadi kesalahan yang tidak terduga.",
+        "validation_error": "Kesalahan Validasi",
+        "invalid_data": "Data tidak valid.",
+        "import_failed": "Impor Gagal",
+        "incomplete_mapping": "Pemetaan Belum Lengkap",
+        "map_required_columns": "Silakan petakan semua kolom yang wajib.",
+        "import_completed": "Impor Selesai",
+        "import_success_count": "Berhasil mengimpor {count} transaksi.",
+        "import_finished_with_errors": "Impor Selesai dengan Kesalahan",
+        "check_error_list": "Periksa daftar kesalahan di bawah."
+    },
+    "push_toast": {
+        "enabled": "Notifikasi push diaktifkan.",
+        "register_device_failed": "Gagal mendaftarkan perangkat ini.",
+        "firebase_config_failed": "Gagal mengaktifkan notifikasi. Periksa konfigurasi Firebase.",
+        "new_notification": "Notifikasi baru"
     }
 }

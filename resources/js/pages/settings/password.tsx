@@ -14,6 +14,7 @@ import SettingsLayout from '@/layouts/settings/layout';
 import { type BreadcrumbItem } from '@/types';
 
 import { Input } from '@/components/ui/input';
+import { useToastTranslator } from '@/utils/i18nFallback';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -28,6 +29,7 @@ export default function Password() {
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const tToast = useToastTranslator('settings_toast');
 
     const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -51,7 +53,9 @@ export default function Password() {
             ) as HTMLInputElement;
             if (confirmInput) confirmInput.value = '';
 
-            toast.success('Password updated successfully');
+            toast.success(
+                tToast('password_updated', 'Password updated successfully'),
+            );
 
             setTimeout(() => setRecentlySuccessful(false), 2000);
         } catch (error: unknown) {
@@ -71,7 +75,12 @@ export default function Password() {
                     currentPasswordInput.current?.focus();
                 }
             } else {
-                toast.error('An error occurred. Please try again later.');
+                toast.error(
+                    tToast(
+                        'password_update_failed',
+                        'An error occurred. Please try again later.',
+                    ),
+                );
             }
         } finally {
             setProcessing(false);

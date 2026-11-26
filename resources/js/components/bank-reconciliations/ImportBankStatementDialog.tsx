@@ -30,6 +30,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import axios from '@/lib/axios';
+import { useToastTranslator } from '@/utils/i18nFallback';
 import { useQueryClient } from '@tanstack/react-query';
 import rawAxios from 'axios';
 import {
@@ -77,6 +78,7 @@ export const ImportBankStatementDialog = memo<ImportBankStatementDialogProps>(
         onSuccess,
     }) {
         const queryClient = useQueryClient();
+        const tToast = useToastTranslator('bank_reconciliation_toast');
         const [open, setOpen] = useState(false);
         const [step, setStep] = useState<1 | 2 | 3>(1);
         const [file, setFile] = useState<File | null>(null);
@@ -136,14 +138,20 @@ export const ImportBankStatementDialog = memo<ImportBankStatementDialogProps>(
                     rawAxios.isAxiosError(error) &&
                     error.response?.status === 422
                 ) {
-                    toast.error('Invalid File', {
+                    toast.error(tToast('invalid_file', 'Invalid File'), {
                         description:
                             error.response.data.message ||
-                            'Unable to read file.',
+                            tToast(
+                                'unable_to_read_file',
+                                'Unable to read file.',
+                            ),
                     });
                 } else {
-                    toast.error('Upload Failed', {
-                        description: 'An unexpected error occurred.',
+                    toast.error(tToast('upload_failed', 'Upload Failed'), {
+                        description: tToast(
+                            'unexpected_error',
+                            'An unexpected error occurred.',
+                        ),
                     });
                 }
             } finally {
@@ -189,14 +197,19 @@ export const ImportBankStatementDialog = memo<ImportBankStatementDialogProps>(
                 rawAxios.isAxiosError(error) &&
                 error.response?.status === 422
             ) {
-                toast.error('Validation Error', {
-                    description: error.response.data.message || 'Invalid data.',
+                toast.error(tToast('validation_error', 'Validation Error'), {
+                    description:
+                        error.response.data.message ||
+                        tToast('invalid_data', 'Invalid data.'),
                 });
                 return;
             }
 
-            toast.error('Import Failed', {
-                description: 'An unexpected error occurred.',
+            toast.error(tToast('import_failed', 'Import Failed'), {
+                description: tToast(
+                    'unexpected_error',
+                    'An unexpected error occurred.',
+                ),
             });
         };
 
@@ -204,9 +217,15 @@ export const ImportBankStatementDialog = memo<ImportBankStatementDialogProps>(
             if (!file) return;
 
             if (!isMappingValid()) {
-                toast.error('Incomplete Mapping', {
-                    description: 'Please map all required columns.',
-                });
+                toast.error(
+                    tToast('incomplete_mapping', 'Incomplete Mapping'),
+                    {
+                        description: tToast(
+                            'map_required_columns',
+                            'Please map all required columns.',
+                        ),
+                    },
+                );
                 return;
             }
 
@@ -221,17 +240,33 @@ export const ImportBankStatementDialog = memo<ImportBankStatementDialogProps>(
                 setStep(3);
 
                 if (response.data.imported > 0) {
-                    toast.success('Import Completed', {
-                        description: `Successfully imported ${response.data.imported} transactions.`,
-                    });
+                    toast.success(
+                        tToast('import_completed', 'Import Completed'),
+                        {
+                            description: tToast(
+                                'import_success_count',
+                                `Successfully imported ${response.data.imported} transactions.`,
+                                { count: String(response.data.imported) },
+                            ),
+                        },
+                    );
                     await queryClient.invalidateQueries({
                         queryKey: ['bank-reconciliations'],
                     });
                     if (onSuccess) onSuccess();
                 } else if (response.data.errors.length > 0) {
-                    toast.error('Import Finished with Errors', {
-                        description: 'Check the error list below.',
-                    });
+                    toast.error(
+                        tToast(
+                            'import_finished_with_errors',
+                            'Import Finished with Errors',
+                        ),
+                        {
+                            description: tToast(
+                                'check_error_list',
+                                'Check the error list below.',
+                            ),
+                        },
+                    );
                 }
             } catch (error: unknown) {
                 handleImportError(error);

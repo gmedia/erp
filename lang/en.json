@@ -2842,5 +2842,48 @@
         "approval_request_action_failed_reject": "Failed to reject request",
         "recovery_codes_regenerated": "Recovery codes regenerated successfully.",
         "recovery_codes_regenerate_failed": "Failed to regenerate recovery codes."
+    },
+    "settings_toast": {
+        "password_updated": "Password updated successfully",
+        "password_update_failed": "An error occurred. Please try again later.",
+        "two_factor_enable_failed": "Failed to enable two-factor authentication.",
+        "two_factor_disable_failed": "Failed to disable two-factor authentication."
+    },
+    "bank_reconciliation_toast": {
+        "items_load_failed": "Failed to load reconciliation items.",
+        "journal_lines_load_failed": "Failed to load journal entry lines.",
+        "accounts_load_failed": "Failed to load accounts.",
+        "auto_match_complete": "Auto Match Complete",
+        "auto_match_result": "Matched: {matched}, Unmatched: {unmatched}",
+        "auto_match_failed": "Auto match failed. Please try again.",
+        "account_assigned": "Account assigned: {code} - {name}",
+        "assign_account_failed": "Failed to assign account.",
+        "item_matched": "Item matched successfully.",
+        "match_failed": "Failed to match item.",
+        "item_unmatched": "Item unmatched.",
+        "unmatch_failed": "Failed to unmatch item.",
+        "reconciliation_completed": "Reconciliation Completed",
+        "reconciliation_completed_description": "Bank reconciliation has been completed and journal entries posted.",
+        "complete_failed": "Complete Failed",
+        "complete_failed_description": "Failed to complete reconciliation.",
+        "invalid_file": "Invalid File",
+        "unable_to_read_file": "Unable to read file.",
+        "upload_failed": "Upload Failed",
+        "unexpected_error": "An unexpected error occurred.",
+        "validation_error": "Validation Error",
+        "invalid_data": "Invalid data.",
+        "import_failed": "Import Failed",
+        "incomplete_mapping": "Incomplete Mapping",
+        "map_required_columns": "Please map all required columns.",
+        "import_completed": "Import Completed",
+        "import_success_count": "Successfully imported {count} transactions.",
+        "import_finished_with_errors": "Import Finished with Errors",
+        "check_error_list": "Check the error list below."
+    },
+    "push_toast": {
+        "enabled": "Push notifications enabled.",
+        "register_device_failed": "Failed to register this device.",
+        "firebase_config_failed": "Failed to enable notifications. Check the Firebase configuration.",
+        "new_notification": "New notification"
     }
 }

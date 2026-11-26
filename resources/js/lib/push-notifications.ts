@@ -1,9 +1,14 @@
 import axios from '@/lib/axios';
+import { translateRegistered } from '@/utils/errorHandling';
 import { Capacitor } from '@capacitor/core';
 import { PushNotifications, type Token } from '@capacitor/push-notifications';
 import { toast } from 'sonner';
 
 let listenersAttached = false;
+
+function pushToast(key: string, fallback: string): string {
+    return translateRegistered(`push_toast.${key}`, fallback);
+}
 
 export type PushRegistrationResult = 'registered' | 'denied' | 'unsupported';
 
@@ -37,23 +42,36 @@ export async function enablePushNotifications(): Promise<PushRegistrationResult>
                         token: token.value,
                         platform: Capacitor.getPlatform(),
                     });
-                    toast.success('Push notifications enabled.');
+                    toast.success(
+                        pushToast('enabled', 'Push notifications enabled.'),
+                    );
                 } catch {
-                    toast.error('Failed to register this device.');
+                    toast.error(
+                        pushToast(
+                            'register_device_failed',
+                            'Failed to register this device.',
+                        ),
+                    );
                 }
             },
         );
 
         await PushNotifications.addListener('registrationError', () => {
             toast.error(
-                'Failed to enable notifications. Check the Firebase configuration.',
+                pushToast(
+                    'firebase_config_failed',
+                    'Failed to enable notifications. Check the Firebase configuration.',
+                ),
             );
         });
 
         await PushNotifications.addListener(
             'pushNotificationReceived',
             (notification) => {
-                toast.info(notification.title ?? 'New notification');
+                toast.info(
+                    notification.title ??
+                        pushToast('new_notification', 'New notification'),
+                );
             },
         );
 
