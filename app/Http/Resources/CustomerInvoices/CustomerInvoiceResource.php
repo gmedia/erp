@@ -7,6 +7,7 @@ use App\Models\Branch;
 use App\Models\Customer;
 use App\Models\CustomerInvoice;
 use App\Models\CustomerInvoiceItem;
+use App\Models\Department;
 use App\Models\FiscalYear;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -25,6 +26,8 @@ class CustomerInvoiceResource extends JsonResource
         $customer = $this->resource->customer;
         /** @var Branch|null $branch */
         $branch = $this->resource->branch;
+        /** @var Department|null $department */
+        $department = $this->resource->department;
         /** @var FiscalYear|null $fiscalYear */
         $fiscalYear = $this->resource->fiscalYear;
         /** @var User|null $creator */
@@ -64,6 +67,10 @@ class CustomerInvoiceResource extends JsonResource
             'branch' => [
                 'id' => $this->resource->branch_id,
                 'name' => $branch?->name,
+            ],
+            'department' => [
+                'id' => $this->resource->department_id,
+                'name' => $department?->name,
             ],
             'fiscal_year' => [
                 'id' => $this->resource->fiscal_year_id,

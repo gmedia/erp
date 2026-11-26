@@ -33,6 +33,8 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Branch $branch
+ * @property int|null $department_id
+ * @property-read Department|null $department
  * @property-read User|null $confirmer
  * @property-read User|null $creator
  * @property-read Customer $customer
@@ -83,6 +85,7 @@ class CreditNote extends Model
         'customer_id',
         'customer_invoice_id',
         'branch_id',
+        'department_id',
         'fiscal_year_id',
         'credit_note_date',
         'reason',
@@ -105,6 +108,11 @@ class CreditNote extends Model
     public function branch(): BelongsTo
     {
         return $this->belongsTo(Branch::class);
+    }
+
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class);
     }
 
     public function fiscalYear(): BelongsTo

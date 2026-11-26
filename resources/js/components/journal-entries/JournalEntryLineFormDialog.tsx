@@ -21,6 +21,8 @@ const journalEntryLineSchema = z
         memo: z.string().optional(),
         branch_id: z.string().optional(),
         branch_name: z.string().optional(),
+        department_id: z.string().optional(),
+        department_name: z.string().optional(),
     })
     .refine(
         () => {
@@ -63,6 +65,8 @@ export function JournalEntryLineFormDialog({
                 memo: '',
                 branch_id: '',
                 branch_name: '',
+                department_id: '',
+                department_name: '',
             };
         }
 
@@ -75,6 +79,8 @@ export function JournalEntryLineFormDialog({
             memo: item.memo || '',
             branch_id: item.branch_id || '',
             branch_name: item.branch_name || '',
+            department_id: item.department_id ? String(item.department_id) : '',
+            department_name: item.department_name || '',
         };
     }, [item]);
 
@@ -112,6 +118,7 @@ export function JournalEntryLineFormDialog({
                 form={form}
                 open={open}
                 defaultValues={defaultValues}
+                showDepartment
             />
         </ItemFormDialogShell>
     );

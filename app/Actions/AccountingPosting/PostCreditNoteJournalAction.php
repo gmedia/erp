@@ -46,22 +46,32 @@ class PostCreditNoteJournalAction
             $entryDate = $creditNote->credit_note_date->format('Y-m-d');
             $arAccount = $this->resolveControlAccount->execute(self::AR_CONTROL_ACCOUNT_CODE, $entryDate);
 
+            // Departemen: pakai milik credit note; bila kosong, warisi dari invoice terkait.
+            $departmentId = $creditNote->department_id
+                ?? $creditNote->customerInvoice?->department_id;
+
             $debitGrouped = [];
             foreach ($creditNote->items as $item) {
                 $accountId = (int) $item->account_id;
-                $debitGrouped[$accountId] = ($debitGrouped[$accountId] ?? 0.0)
-                    + $this->roundLineAmount($item->line_total);
+                $key = $accountId . '|' . ($departmentId ?? '');
+                $debitGrouped[$key] = ($debitGrouped[$key] ?? [
+                    'account_id' => $accountId,
+                    'department_id' => $departmentId,
+                    'amount' => 0.0,
+                ]);
+                $debitGrouped[$key]['amount'] += $this->roundLineAmount($item->line_total);
             }
 
             $lines = [];
-            foreach ($debitGrouped as $accountId => $amount) {
-                if ($amount <= 0) {
+            foreach ($debitGrouped as $group) {
+                if ($group['amount'] <= 0) {
                     continue;
                 }
 
                 $lines[] = [
-                    'account_id' => $accountId,
-                    'debit' => $this->roundLineAmount($amount),
+                    'account_id' => $group['account_id'],
+                    'department_id' => $group['department_id'],
+                    'debit' => $this->roundLineAmount($group['amount']),
                     'credit' => 0,
                     'memo' => "Credit Note {$creditNote->credit_note_number}",
                 ];

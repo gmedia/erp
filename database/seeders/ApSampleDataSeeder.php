@@ -9,6 +9,7 @@ use App\Models\ApPayment;
 use App\Models\ApPaymentAllocation;
 use App\Models\Branch;
 use App\Models\CoaVersion;
+use App\Models\Department;
 use App\Models\FiscalYear;
 use App\Models\GoodsReceipt;
 use App\Models\JournalEntry;
@@ -123,6 +124,7 @@ class ApSampleDataSeeder extends Seeder
         $goodsReceipts
     ): array {
         $year = now()->format('Y');
+        $operationsDepartmentId = Department::query()->where('name', DemoMasterData::DEPARTMENT_OPERATIONS)->value('id');
 
         $billDefinitions = [
             [
@@ -222,6 +224,8 @@ class ApSampleDataSeeder extends Seeder
                 [
                     'supplier_id' => $supplier->id,
                     'branch_id' => $branchId,
+                    // Sebagian bill membawa departemen; sisanya sengaja tanpa departemen.
+                    'department_id' => $index % 2 === 0 ? $operationsDepartmentId : null,
                     'fiscal_year_id' => $fiscalYearId,
                     'purchase_order_id' => $purchaseOrder?->id,
                     'goods_receipt_id' => $goodsReceipt?->id,

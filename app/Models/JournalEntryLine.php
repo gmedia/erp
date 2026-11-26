@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
  * @property int $journal_entry_id
  * @property int $account_id
  * @property int|null $branch_id
+ * @property int|null $department_id
  * @property numeric $debit
  * @property numeric $credit
  * @property string|null $memo
@@ -20,6 +21,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property-read Account $account
  * @property-read Branch|null $branch
+ * @property-read Department|null $department
  * @property-read float $amount
  * @property-read float $net_amount
  * @property-read string $type
@@ -55,6 +57,7 @@ class JournalEntryLine extends Model
         'journal_entry_id',
         'account_id',
         'branch_id',
+        'department_id',
         'debit',
         'credit',
         'memo',
@@ -81,6 +84,11 @@ class JournalEntryLine extends Model
     public function branch(): BelongsTo
     {
         return $this->belongsTo(Branch::class);
+    }
+
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class);
     }
 
     /**

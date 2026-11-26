@@ -29,6 +29,7 @@ export interface SupplierBill extends BaseEntity {
     bill_number: string | null;
     supplier: SimpleEntity | null;
     branch: SimpleEntity | null;
+    department: SimpleEntity | null;
     fiscal_year: SimpleEntity | null;
     purchase_order: { id: number; po_number: string | null } | null;
     goods_receipt: { id: number; gr_number: string | null } | null;
@@ -57,6 +58,7 @@ export interface SupplierBillFormData {
     bill_number?: string;
     supplier_id: string;
     branch_id: string;
+    department_id?: string;
     fiscal_year_id: string;
     purchase_order_id?: string;
     goods_receipt_id?: string;

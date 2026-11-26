@@ -16,7 +16,7 @@ class CustomerInvoiceExport extends BaseExport implements WithColumnFormatting
 
     public function query(): Builder
     {
-        $query = CustomerInvoice::query()->with(['customer', 'branch', 'fiscalYear']);
+        $query = CustomerInvoice::query()->with(['customer', 'branch', 'department', 'fiscalYear']);
 
         $this->applyConfiguredFilters($query, $this->filters, ['invoice_number', 'payment_terms', 'notes'], [
             'customer' => 'customer_id',
@@ -51,6 +51,11 @@ class CustomerInvoiceExport extends BaseExport implements WithColumnFormatting
             'Invoice Number' => fn (CustomerInvoice $invoice): mixed => $invoice->invoice_number,
             'Customer' => fn (CustomerInvoice $invoice): mixed => $this->relatedAttribute($invoice, 'customer', 'name'),
             'Branch' => fn (CustomerInvoice $invoice): mixed => $this->relatedAttribute($invoice, 'branch', 'name'),
+            'Department' => fn (CustomerInvoice $invoice): mixed => $this->relatedAttribute(
+                $invoice,
+                'department',
+                'name'
+            ),
             'Fiscal Year' => fn (CustomerInvoice $invoice): mixed => $this->relatedAttribute(
                 $invoice,
                 'fiscalYear',

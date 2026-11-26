@@ -42,6 +42,8 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Branch $branch
+ * @property int|null $department_id
+ * @property-read Department|null $department
  * @property-read User|null $confirmer
  * @property-read User|null $creator
  * @property-read FiscalYear $fiscalYear
@@ -104,6 +106,7 @@ class SupplierBill extends Model
         'bill_number',
         'supplier_id',
         'branch_id',
+        'department_id',
         'fiscal_year_id',
         'purchase_order_id',
         'goods_receipt_id',
@@ -142,6 +145,11 @@ class SupplierBill extends Model
     public function branch(): BelongsTo
     {
         return $this->belongsTo(Branch::class);
+    }
+
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class);
     }
 
     public function fiscalYear(): BelongsTo

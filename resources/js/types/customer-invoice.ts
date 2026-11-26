@@ -30,6 +30,7 @@ export interface CustomerInvoice extends BaseEntity {
     invoice_number: string | null;
     customer: SimpleEntity | null;
     branch: SimpleEntity | null;
+    department: SimpleEntity | null;
     fiscal_year: SimpleEntity | null;
     invoice_date: string;
     due_date: string;
@@ -54,6 +55,7 @@ export interface CustomerInvoice extends BaseEntity {
 export interface CustomerInvoiceFormData {
     customer_id: string;
     branch_id: string;
+    department_id?: string;
     fiscal_year_id: string;
     invoice_date: string;
     due_date: string;

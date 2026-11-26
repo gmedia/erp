@@ -7,6 +7,7 @@ import { type Resolver, useFieldArray, useForm } from 'react-hook-form';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
+import { DocumentDimensionFields } from '@/components/common/DocumentDimensionFields';
 import EntityForm from '@/components/common/EntityForm';
 import {
     EntityFormItemActionsCell,
@@ -77,6 +78,7 @@ const getSupplierBillFormDefaults = (
             bill_number: '',
             supplier_id: '',
             branch_id: '',
+            department_id: '',
             fiscal_year_id: '',
             purchase_order_id: '',
             goods_receipt_id: '',
@@ -101,6 +103,9 @@ const getSupplierBillFormDefaults = (
             : '',
         branch_id: supplierBill.branch?.id
             ? String(supplierBill.branch.id)
+            : '',
+        department_id: supplierBill.department?.id
+            ? String(supplierBill.department.id)
             : '',
         fiscal_year_id: supplierBill.fiscal_year?.id
             ? String(supplierBill.fiscal_year.id)
@@ -258,22 +263,13 @@ export const SupplierBillForm = memo<SupplierBillFormProps>(
                         )}
                     />
 
-                    <AsyncSelectField
-                        name="branch_id"
-                        label={fl('branch', 'Branch')}
-                        url="/api/branches"
-                        placeholder={fl('branch_placeholder', 'Select branch')}
-                    />
-
-                    <AsyncSelectField
-                        name="fiscal_year_id"
-                        label={fl('fiscal_year', 'Fiscal Year')}
-                        url="/api/fiscal-years"
-                        placeholder={fl(
-                            'fiscal_year_placeholder',
-                            'Select fiscal year',
-                        )}
-                        preferredMetaKey="preferred_fiscal_year_id"
+                    <DocumentDimensionFields
+                        fl={fl}
+                        placeholders={{
+                            branch: 'Select branch',
+                            department: 'Select department (optional)',
+                            fiscalYear: 'Select fiscal year',
+                        }}
                     />
 
                     <AsyncSelectField

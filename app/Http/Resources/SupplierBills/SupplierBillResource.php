@@ -4,6 +4,7 @@ namespace App\Http\Resources\SupplierBills;
 
 use App\Http\Resources\Concerns\BuildsAuditStampResourceData;
 use App\Models\Branch;
+use App\Models\Department;
 use App\Models\FiscalYear;
 use App\Models\GoodsReceipt;
 use App\Models\PurchaseOrder;
@@ -26,6 +27,8 @@ class SupplierBillResource extends JsonResource
         $supplier = $this->resource->supplier;
         /** @var Branch|null $branch */
         $branch = $this->resource->branch;
+        /** @var Department|null $department */
+        $department = $this->resource->department;
         /** @var FiscalYear|null $fiscalYear */
         $fiscalYear = $this->resource->fiscalYear;
         /** @var PurchaseOrder|null $purchaseOrder */
@@ -69,6 +72,10 @@ class SupplierBillResource extends JsonResource
             'branch' => [
                 'id' => $this->resource->branch_id,
                 'name' => $branch?->name,
+            ],
+            'department' => [
+                'id' => $this->resource->department_id,
+                'name' => $department?->name,
             ],
             'fiscal_year' => [
                 'id' => $this->resource->fiscal_year_id,

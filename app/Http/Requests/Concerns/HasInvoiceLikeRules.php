@@ -16,6 +16,8 @@ trait HasInvoiceLikeRules
     {
         return [
             'branch_id' => $this->withSometimes(['required', 'integer', 'exists:branches,id']),
+            // Dimensi departemen opsional (#114): null = tanpa departemen.
+            'department_id' => $this->withSometimes(['nullable', 'integer', 'exists:departments,id']),
             'fiscal_year_id' => $this->withSometimes(['required', 'integer', 'exists:fiscal_years,id']),
             'payment_terms' => $this->withSometimes(['nullable', 'string', 'max:255']),
             'currency' => $this->withSometimes(['required', ...$this->supportedCurrencyRules()]),

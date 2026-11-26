@@ -76,27 +76,41 @@ class PostSupplierBillJournalAction
 
                 if ($grCreditAccountId !== null) {
                     $grValue = $this->grValueForBillItem($item);
-                    $expenseGrouped[$grCreditAccountId] = ($expenseGrouped[$grCreditAccountId] ?? 0.0) + $grValue;
+                    // Baris GR/IR bukan akun beban: selalu tanpa departemen.
+                    $grKey = $grCreditAccountId . '|';
+                    $expenseGrouped[$grKey] = ($expenseGrouped[$grKey] ?? [
+                        'account_id' => $grCreditAccountId,
+                        'department_id' => null,
+                        'amount' => 0.0,
+                    ]);
+                    $expenseGrouped[$grKey]['amount'] += $grValue;
                     $varianceAmount += $this->roundLineAmount($item->line_total) - $grValue;
 
                     continue;
                 }
 
+                // Departemen bill hanya diwariskan ke baris beban; baris GR/IR dan AP tetap null.
                 $accountId = (int) $item->account_id;
-                $expenseGrouped[$accountId] = ($expenseGrouped[$accountId] ?? 0.0)
-                    + $this->roundLineAmount($item->line_total);
+                $key = $accountId . '|' . ($supplierBill->department_id ?? '');
+                $expenseGrouped[$key] = ($expenseGrouped[$key] ?? [
+                    'account_id' => $accountId,
+                    'department_id' => $supplierBill->department_id,
+                    'amount' => 0.0,
+                ]);
+                $expenseGrouped[$key]['amount'] += $this->roundLineAmount($item->line_total);
             }
 
             $varianceAmount = $this->roundLineAmount($varianceAmount);
 
-            foreach ($expenseGrouped as $accountId => $amount) {
-                if ($amount <= 0) {
+            foreach ($expenseGrouped as $group) {
+                if ($group['amount'] <= 0) {
                     continue;
                 }
 
                 $debitLines[] = [
-                    'account_id' => $accountId,
-                    'debit' => $this->roundLineAmount($amount),
+                    'account_id' => $group['account_id'],
+                    'department_id' => $group['department_id'],
+                    'debit' => $this->roundLineAmount($group['amount']),
                     'credit' => 0,
                     'memo' => "Bill {$supplierBill->bill_number}",
                 ];
