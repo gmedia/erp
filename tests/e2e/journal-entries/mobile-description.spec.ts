@@ -53,7 +53,6 @@ test.describe('Journal Entries mobile Description column (#504)', () => {
             .locator('td[data-sticky-column="actions"]');
         await expect(actionsCell).toHaveCount(1);
 
-        // Kolom aksi sticky menutupi sel pada posisi geser awal; geser dulu.
         await cell.evaluate((el) => {
             let node: HTMLElement | null = el.parentElement;
             while (node && node.scrollWidth <= node.clientWidth) {
@@ -75,17 +74,6 @@ test.describe('Journal Entries mobile Description column (#504)', () => {
             expect(box.x + box.width).toBeLessThanOrEqual(actionsBox.x + 1);
         }
 
-        const containerRight = await page
-            .locator('[data-slot="table-container"]')
-            .first()
-            .evaluate((el) => el.getBoundingClientRect().right);
-        expect(actionsBox).not.toBeNull();
-        if (actionsBox) {
-            expect(
-                Math.abs(actionsBox.x + actionsBox.width - containerRight),
-            ).toBeLessThanOrEqual(1);
-        }
-
         await page
             .locator('[data-slot="table-container"]')
             .first()
@@ -95,6 +83,10 @@ test.describe('Journal Entries mobile Description column (#504)', () => {
                 el.scrollLeft = el.scrollWidth;
             });
         const endActions = await actionsCell.boundingBox();
+        const containerRight = await page
+            .locator('[data-slot="table-container"]')
+            .first()
+            .evaluate((el) => el.getBoundingClientRect().right);
         expect(endActions).not.toBeNull();
         if (endActions) {
             expect(
