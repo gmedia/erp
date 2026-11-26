@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Exceptions\ApiErrorException;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,9 +20,15 @@ class CheckPermission
         $employee = $request->user()?->employee;
 
         if (! $employee || ! $employee->hasPermission($permission)) {
-            return $isApi ? response()->json([
-                'message' => __('You do not have permission to perform this action.'),
-            ], 403) : abort(403);
+            if (! $isApi) {
+                abort(403);
+            }
+
+            throw ApiErrorException::translated(
+                403,
+                'permission.denied',
+                'You do not have permission to perform this action.',
+            );
         }
 
         return $next($request);
