@@ -12,6 +12,7 @@ on:
       - 'playwright.android.config.ts'
       - 'tests/e2e-android/**'
       - 'scripts/e2e-android.sh'
+      - 'scripts/ci/e2e-android-ci.sh'
       - 'resources/js/lib/axios.ts'
       - '.github/workflows/e2e-android.yml'
   schedule:
@@ -135,17 +136,7 @@ jobs:
           disable-animations: true
           emulator-options: -no-window -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim
             -camera-back none -camera-front none -memory 2048 -cores 2
-          script: |
-            set -e
-            # Emulator sudah berjalan dari android-emulator-runner: skip boot/matikan di script.
-            export E2E_ANDROID_SKIP_EMULATOR=1
-            bash scripts/e2e-android.sh || {
-              status=$?
-              mkdir -p android-artifacts
-              adb logcat -d > android-artifacts/logcat.txt 2>/dev/null || true
-              adb exec-out screencap -p > android-artifacts/screen.png 2>/dev/null || true
-              exit "$status"
-            }
+          script: bash scripts/ci/e2e-android-ci.sh
 
       - name: Upload Playwright report and test results on failure
         if: failure()
