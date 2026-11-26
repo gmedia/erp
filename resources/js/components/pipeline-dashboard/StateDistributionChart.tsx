@@ -1,3 +1,4 @@
+import { useTranslatableText } from '@/components/common/TranslatedText';
 import {
     Card,
     CardContent,
@@ -6,6 +7,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useTranslation } from '@/contexts/i18n-context';
 import { StateSummary } from '@/hooks/usePipelineDashboard';
 
 interface StateDistributionChartProps {
@@ -17,12 +19,41 @@ export function StateDistributionChart({
     data,
     isLoading,
 }: StateDistributionChartProps) {
+    const { t } = useTranslation();
+    const loadingChartLabel = useTranslatableText({
+        key: 'pipelineDashboard.loadingChart',
+        fallback: 'Loading Chart',
+    });
+    const stateDistributionLabel = useTranslatableText({
+        key: 'pipelineDashboard.stateDistribution',
+        fallback: 'State Distribution',
+    });
+    const entitiesMappedLabel = useTranslatableText({
+        key: 'pipelineDashboard.entitiesMapped',
+        fallback: 'Entities mapped by pipeline state',
+    });
+    const noEntitiesLabel = useTranslatableText({
+        key: 'pipelineDashboard.noEntitiesFound',
+        fallback: 'No entities found.',
+    });
+    const totalLabel = useTranslatableText({
+        key: 'pipelineDashboard.total',
+        fallback: 'Total',
+    });
+    const visualBreakdownText = (count: number) => {
+        const key = 'pipelineDashboard.visualBreakdown';
+        const translated = t(key, { count: String(count) });
+        return translated === key
+            ? `Visual breakdown of ${count} entities`
+            : translated;
+    };
+
     if (isLoading) {
         return (
             <Card className="h-[350px] animate-pulse">
                 <CardHeader>
                     <CardTitle className="w-48 rounded bg-muted text-transparent">
-                        Loading Chart
+                        {loadingChartLabel}
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="flex h-48 items-center justify-center">
@@ -38,13 +69,11 @@ export function StateDistributionChart({
         return (
             <Card className="h-full">
                 <CardHeader>
-                    <CardTitle>State Distribution</CardTitle>
-                    <CardDescription>
-                        Entities mapped by pipeline state
-                    </CardDescription>
+                    <CardTitle>{stateDistributionLabel}</CardTitle>
+                    <CardDescription>{entitiesMappedLabel}</CardDescription>
                 </CardHeader>
                 <CardContent className="flex h-[200px] items-center justify-center">
-                    <p className="text-muted-foreground">No entities found.</p>
+                    <p className="text-muted-foreground">{noEntitiesLabel}</p>
                 </CardContent>
             </Card>
         );
@@ -65,10 +94,8 @@ export function StateDistributionChart({
     return (
         <Card className="flex h-full flex-col overflow-hidden">
             <CardHeader className="pb-2">
-                <CardTitle>State Distribution</CardTitle>
-                <CardDescription>
-                    Visual breakdown of {total} entities
-                </CardDescription>
+                <CardTitle>{stateDistributionLabel}</CardTitle>
+                <CardDescription>{visualBreakdownText(total)}</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-1 flex-col items-center gap-6 py-4">
                 {/* CSS Donut Chart */}
@@ -83,7 +110,7 @@ export function StateDistributionChart({
                     <div className="absolute inset-0 z-10 m-auto flex h-24 w-24 flex-col items-center justify-center rounded-full bg-card shadow-inner">
                         <span className="text-2xl font-bold">{total}</span>
                         <span className="text-[10px] tracking-wider text-muted-foreground uppercase">
-                            Total
+                            {totalLabel}
                         </span>
                     </div>
                 </div>

@@ -98,7 +98,35 @@
         }
     },
     "pipelineDashboard": {
-        "entitiesInState": "entitas saat ini dalam status ini"
+        "entitiesInState": "entitas saat ini dalam status ini",
+        "branch": "Cabang",
+        "allBranches": "Semua Cabang",
+        "selectPipeline": "Pilih Pipeline",
+        "allActivePipelines": "Semua Pipeline Aktif",
+        "staleThreshold": "Ambang Batas Macet",
+        "selectDays": "Pilih hari",
+        "daysCount": "{count} Hari",
+        "staleEntities": "Entitas Macet",
+        "staleDescription": "Entitas yang tertahan di status antara lebih dari {days} hari",
+        "detected": "terdeteksi",
+        "noStaleEntities": "Tidak ada entitas macet.",
+        "allMovingSmoothly": "Semua entitas bergerak lancar melalui pipeline.",
+        "type": "Tipe",
+        "entity": "Entitas",
+        "currentState": "Status Saat Ini",
+        "lastTransition": "Perpindahan Terakhir",
+        "daysStale": "Hari Macet",
+        "by": "oleh",
+        "loadingChart": "Memuat Grafik",
+        "stateDistribution": "Distribusi Status",
+        "entitiesMapped": "Entitas dipetakan berdasarkan status pipeline",
+        "noEntitiesFound": "Tidak ada entitas.",
+        "visualBreakdown": "Rincian visual dari {count} entitas",
+        "total": "Jumlah",
+        "loadingState": "Memuat Status...",
+        "noStateData": "Tidak ada data status untuk pipeline yang dipilih.",
+        "noEntitiesYet": "Belum ada entitas di status mana pun",
+        "stateAppears": "Distribusi status akan muncul setelah data masuk ke pipeline ini."
     },
     "postingJournals": {
         "searchPlaceholder": "Cari jurnal..."
@@ -1005,7 +1033,7 @@
             "title": "Pesanan Pembelian",
             "description": "Pesanan yang dikirim ke pemasok beserta progres penerimaan dan penagihan.",
             "search_placeholder": "Cari pesanan pembelian...",
-            "filter_search_placeholder": "Cari no. PO, term pembayaran, catatan, atau alamat pengiriman..."
+            "filter_search_placeholder": "Cari no. PO, termin pembayaran, catatan, atau alamat pengiriman..."
         },
         "products": {
             "title": "Produk",

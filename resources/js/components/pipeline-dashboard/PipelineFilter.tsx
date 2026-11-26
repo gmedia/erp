@@ -1,4 +1,5 @@
 import { AsyncSelect } from '@/components/common/AsyncSelect';
+import { useTranslatableText } from '@/components/common/TranslatedText';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import {
@@ -8,6 +9,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useTranslation } from '@/contexts/i18n-context';
+
+const STALE_DAY_OPTIONS = [3, 7, 14, 30] as const;
 
 interface PipelineFilterProps {
     pipelines: Array<{ id: number; name: string }>;
@@ -28,6 +32,37 @@ export function PipelineFilter({
     selectedBranchId,
     onBranchChange,
 }: Readonly<PipelineFilterProps>) {
+    const { t } = useTranslation();
+    const daysLabel = (days: number) => {
+        const key = 'pipelineDashboard.daysCount';
+        const translated = t(key, { count: String(days) });
+        return translated === key ? `${days} Days` : translated;
+    };
+    const branchLabel = useTranslatableText({
+        key: 'pipelineDashboard.branch',
+        fallback: 'Branch',
+    });
+    const allBranchesLabel = useTranslatableText({
+        key: 'pipelineDashboard.allBranches',
+        fallback: 'All Branches',
+    });
+    const selectPipelineLabel = useTranslatableText({
+        key: 'pipelineDashboard.selectPipeline',
+        fallback: 'Select Pipeline',
+    });
+    const allActivePipelinesLabel = useTranslatableText({
+        key: 'pipelineDashboard.allActivePipelines',
+        fallback: 'All Active Pipelines',
+    });
+    const staleThresholdLabel = useTranslatableText({
+        key: 'pipelineDashboard.staleThreshold',
+        fallback: 'Stale Threshold',
+    });
+    const selectDaysLabel = useTranslatableText({
+        key: 'pipelineDashboard.selectDays',
+        fallback: 'Select days',
+    });
+
     return (
         <Card>
             <CardContent className="flex flex-col items-end gap-6 p-4 sm:flex-row">
@@ -36,11 +71,11 @@ export function PipelineFilter({
                         htmlFor="branch-filter"
                         className="text-sm font-medium text-muted-foreground"
                     >
-                        Branch
+                        {branchLabel}
                     </Label>
                     <AsyncSelect
                         url="/api/branches"
-                        placeholder="All Branches"
+                        placeholder={allBranchesLabel}
                         value={
                             selectedBranchId
                                 ? String(selectedBranchId)
@@ -55,18 +90,20 @@ export function PipelineFilter({
                         htmlFor="pipeline-filter"
                         className="text-sm font-medium text-muted-foreground"
                     >
-                        Select Pipeline
+                        {selectPipelineLabel}
                     </Label>
                     <Select
                         value={selectedPipelineId?.toString() || 'all'}
                         onValueChange={onChange}
                     >
                         <SelectTrigger id="pipeline-filter">
-                            <SelectValue placeholder="All Active Pipelines" />
+                            <SelectValue
+                                placeholder={allActivePipelinesLabel}
+                            />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">
-                                All Active Pipelines
+                                {allActivePipelinesLabel}
                             </SelectItem>
                             {pipelines.map((pipeline) => (
                                 <SelectItem
@@ -85,20 +122,21 @@ export function PipelineFilter({
                         htmlFor="stale-days"
                         className="text-sm font-medium text-muted-foreground"
                     >
-                        Stale Threshold
+                        {staleThresholdLabel}
                     </Label>
                     <Select
                         value={staleDays.toString()}
                         onValueChange={onStaleDaysChange}
                     >
                         <SelectTrigger id="stale-days">
-                            <SelectValue placeholder="Select days" />
+                            <SelectValue placeholder={selectDaysLabel} />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="3">3 Days</SelectItem>
-                            <SelectItem value="7">7 Days</SelectItem>
-                            <SelectItem value="14">14 Days</SelectItem>
-                            <SelectItem value="30">30 Days</SelectItem>
+                            {STALE_DAY_OPTIONS.map((days) => (
+                                <SelectItem key={days} value={String(days)}>
+                                    {daysLabel(days)}
+                                </SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
                 </div>

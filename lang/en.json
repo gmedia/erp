@@ -98,7 +98,35 @@
         }
     },
     "pipelineDashboard": {
-        "entitiesInState": "entities currently in state"
+        "entitiesInState": "entities currently in state",
+        "branch": "Branch",
+        "allBranches": "All Branches",
+        "selectPipeline": "Select Pipeline",
+        "allActivePipelines": "All Active Pipelines",
+        "staleThreshold": "Stale Threshold",
+        "selectDays": "Select days",
+        "daysCount": "{count} Days",
+        "staleEntities": "Stale Entities",
+        "staleDescription": "Entities stuck in intermediate states for more than {days} days",
+        "detected": "detected",
+        "noStaleEntities": "No stale entities found.",
+        "allMovingSmoothly": "Everything is moving smoothly through the pipeline.",
+        "type": "Type",
+        "entity": "Entity",
+        "currentState": "Current State",
+        "lastTransition": "Last Transition",
+        "daysStale": "Days Stale",
+        "by": "by",
+        "loadingChart": "Loading Chart",
+        "stateDistribution": "State Distribution",
+        "entitiesMapped": "Entities mapped by pipeline state",
+        "noEntitiesFound": "No entities found.",
+        "visualBreakdown": "Visual breakdown of {count} entities",
+        "total": "Total",
+        "loadingState": "Loading State...",
+        "noStateData": "No state data available for the selected pipeline.",
+        "noEntitiesYet": "No entities in any state yet",
+        "stateAppears": "State distribution appears once records enter these pipelines."
     },
     "postingJournals": {
         "searchPlaceholder": "Search journals..."

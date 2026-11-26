@@ -1,3 +1,4 @@
+import { useTranslatableText } from '@/components/common/TranslatedText';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTranslation } from '@/contexts/i18n-context';
 import { StateSummary } from '@/hooks/usePipelineDashboard';
@@ -12,6 +13,23 @@ export function StateSummaryCards({
     isLoading,
 }: Readonly<StateSummaryCardsProps>) {
     const { t } = useTranslation();
+    const loadingStateLabel = useTranslatableText({
+        key: 'pipelineDashboard.loadingState',
+        fallback: 'Loading State...',
+    });
+    const noStateDataLabel = useTranslatableText({
+        key: 'pipelineDashboard.noStateData',
+        fallback: 'No state data available for the selected pipeline.',
+    });
+    const noEntitiesYetLabel = useTranslatableText({
+        key: 'pipelineDashboard.noEntitiesYet',
+        fallback: 'No entities in any state yet',
+    });
+    const stateAppearsLabel = useTranslatableText({
+        key: 'pipelineDashboard.stateAppears',
+        fallback:
+            'State distribution appears once records enter these pipelines.',
+    });
 
     if (isLoading) {
         return (
@@ -20,7 +38,7 @@ export function StateSummaryCards({
                     <Card key={key} className="animate-pulse">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="rounded bg-muted text-sm font-medium text-transparent">
-                                Loading State...
+                                {loadingStateLabel}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -37,7 +55,7 @@ export function StateSummaryCards({
     if (!data || data.length === 0) {
         return (
             <div className="w-full rounded-lg border border-dashed p-8 text-center text-muted-foreground">
-                No state data available for the selected pipeline.
+                {noStateDataLabel}
             </div>
         );
     }
@@ -47,12 +65,9 @@ export function StateSummaryCards({
         return (
             <div className="w-full rounded-lg border border-dashed p-8 text-center text-muted-foreground">
                 <p className="font-medium text-foreground">
-                    No entities in any state yet
+                    {noEntitiesYetLabel}
                 </p>
-                <p className="mt-1 text-sm">
-                    State distribution appears once records enter these
-                    pipelines.
-                </p>
+                <p className="mt-1 text-sm">{stateAppearsLabel}</p>
             </div>
         );
     }
@@ -82,12 +97,9 @@ export function StateSummaryCards({
         return (
             <div className="w-full rounded-lg border border-dashed p-8 text-center text-muted-foreground">
                 <p className="font-medium text-foreground">
-                    No entities in any state yet
+                    {noEntitiesYetLabel}
                 </p>
-                <p className="mt-1 text-sm">
-                    State distribution appears once records enter these
-                    pipelines.
-                </p>
+                <p className="mt-1 text-sm">{stateAppearsLabel}</p>
             </div>
         );
     }

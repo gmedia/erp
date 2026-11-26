@@ -1,3 +1,4 @@
+import { useTranslatableText } from '@/components/common/TranslatedText';
 import { Badge } from '@/components/ui/badge';
 import {
     Card,
@@ -14,6 +15,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useTranslation } from '@/contexts/i18n-context';
 import { StaleEntity } from '@/hooks/usePipelineDashboard';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { AlertCircle, Clock } from 'lucide-react';
@@ -31,12 +33,66 @@ export function StaleEntitiesTable({
     isLoading,
     staleDaysThreshold,
 }: StaleEntitiesTableProps) {
+    const { t } = useTranslation();
+    const loadingLabel = useTranslatableText({
+        key: 'common.loading',
+        fallback: 'Loading...',
+    });
+    const staleEntitiesLabel = useTranslatableText({
+        key: 'pipelineDashboard.staleEntities',
+        fallback: 'Stale Entities',
+    });
+    const detectedLabel = useTranslatableText({
+        key: 'pipelineDashboard.detected',
+        fallback: 'detected',
+    });
+    const noStaleLabel = useTranslatableText({
+        key: 'pipelineDashboard.noStaleEntities',
+        fallback: 'No stale entities found.',
+    });
+    const smoothLabel = useTranslatableText({
+        key: 'pipelineDashboard.allMovingSmoothly',
+        fallback: 'Everything is moving smoothly through the pipeline.',
+    });
+    const typeLabel = useTranslatableText({
+        key: 'pipelineDashboard.type',
+        fallback: 'Type',
+    });
+    const entityLabel = useTranslatableText({
+        key: 'pipelineDashboard.entity',
+        fallback: 'Entity',
+    });
+    const currentStateLabel = useTranslatableText({
+        key: 'pipelineDashboard.currentState',
+        fallback: 'Current State',
+    });
+    const lastTransitionLabel = useTranslatableText({
+        key: 'pipelineDashboard.lastTransition',
+        fallback: 'Last Transition',
+    });
+    const daysStaleLabel = useTranslatableText({
+        key: 'pipelineDashboard.daysStale',
+        fallback: 'Days Stale',
+    });
+    const byLabel = useTranslatableText({
+        key: 'pipelineDashboard.by',
+        fallback: 'by',
+    });
+    const staleDescriptionKey = 'pipelineDashboard.staleDescription';
+    const staleDescriptionTranslated = t(staleDescriptionKey, {
+        days: String(staleDaysThreshold),
+    });
+    const staleDescriptionText =
+        staleDescriptionTranslated === staleDescriptionKey
+            ? `Entities stuck in intermediate states for more than ${staleDaysThreshold} days`
+            : staleDescriptionTranslated;
+
     if (isLoading) {
         return (
             <Card className="col-span-1 md:col-span-2 lg:col-span-3">
                 <CardHeader>
                     <CardTitle className="w-48 animate-pulse rounded bg-muted text-transparent">
-                        Loading...
+                        {loadingLabel}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -60,11 +116,10 @@ export function StaleEntitiesTable({
                     <div>
                         <CardTitle className="flex items-center gap-2 text-warning">
                             <AlertCircle className="h-5 w-5" />
-                            Stale Entities
+                            {staleEntitiesLabel}
                         </CardTitle>
                         <CardDescription>
-                            Entities stuck in intermediate states for more than{' '}
-                            {staleDaysThreshold} days
+                            {staleDescriptionText}
                         </CardDescription>
                     </div>
                     <div>
@@ -73,7 +128,7 @@ export function StaleEntitiesTable({
                             className="border-warning/30 bg-warning-soft font-mono text-xs text-warning"
                         >
                             {data.length} {data.length === 50 ? '+' : ''}{' '}
-                            detected
+                            {detectedLabel}
                         </Badge>
                     </div>
                 </div>
@@ -82,22 +137,20 @@ export function StaleEntitiesTable({
                 {data.length === 0 ? (
                     <div className="flex flex-col items-center justify-center rounded-lg border border-dashed bg-muted/50 p-8 text-center text-muted-foreground">
                         <Clock className="mb-2 h-8 w-8 text-muted-foreground/60" />
-                        <p>No stale entities found.</p>
-                        <p className="text-sm">
-                            Everything is moving smoothly through the pipeline.
-                        </p>
+                        <p>{noStaleLabel}</p>
+                        <p className="text-sm">{smoothLabel}</p>
                     </div>
                 ) : (
                     <div className="overflow-x-auto rounded-md border">
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>Type</TableHead>
-                                    <TableHead>Entity</TableHead>
-                                    <TableHead>Current State</TableHead>
-                                    <TableHead>Last Transition</TableHead>
+                                    <TableHead>{typeLabel}</TableHead>
+                                    <TableHead>{entityLabel}</TableHead>
+                                    <TableHead>{currentStateLabel}</TableHead>
+                                    <TableHead>{lastTransitionLabel}</TableHead>
                                     <TableHead className="text-right">
-                                        Days Stale
+                                        {daysStaleLabel}
                                     </TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -140,7 +193,7 @@ export function StaleEntitiesTable({
                                                     )}
                                                 </span>
                                                 <span className="text-xs text-muted-foreground">
-                                                    by{' '}
+                                                    {byLabel}{' '}
                                                     {
                                                         entity.last_transitioned_by
                                                     }
