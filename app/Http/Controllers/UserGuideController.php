@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\ApiErrorException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -35,7 +36,7 @@ class UserGuideController extends Controller
         $path = base_path("docs/user-guide-{$slug}.md");
 
         if (! File::exists($path)) {
-            return response()->json(['message' => __('user_guide_api.not_found')], 404);
+            throw ApiErrorException::translated(404, 'user_guide.not_found', 'user_guide_api.not_found');
         }
 
         $content = File::get($path);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\ApiErrorException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\DatabaseNotification;
@@ -49,7 +50,7 @@ class NotificationController extends Controller
         $notification = $this->findForCurrentUser($id);
 
         if (! $notification) {
-            abort(404, __('notification_api.not_found'));
+            throw ApiErrorException::translated(404, 'notification.not_found', 'notification_api.not_found');
         }
 
         $notification->update(['read_at' => now()]);

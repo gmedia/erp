@@ -6,6 +6,7 @@ use App\Actions\JournalEntries\CreateJournalEntryAction;
 use App\Actions\JournalEntries\ExportJournalEntriesAction;
 use App\Actions\JournalEntries\IndexJournalEntriesAction;
 use App\Actions\JournalEntries\UpdateJournalEntryAction;
+use App\Exceptions\ApiErrorException;
 use App\Http\Controllers\Concerns\ResolvesBranchScope;
 use App\Http\Requests\JournalEntries\IndexJournalEntryRequest;
 use App\Http\Requests\JournalEntries\StoreJournalEntryRequest;
@@ -65,7 +66,11 @@ class JournalEntryController extends Controller
     public function destroy(JournalEntry $journalEntry): JsonResponse
     {
         if ($journalEntry->status === 'posted') {
-            return response()->json(['message' => __('journal_entry_api.posted_cannot_be_deleted')], 403);
+            throw ApiErrorException::translated(
+                403,
+                'journal_entry.posted_cannot_be_deleted',
+                'journal_entry_api.posted_cannot_be_deleted',
+            );
         }
 
         $journalEntry->lines()->delete();

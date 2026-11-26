@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Budgets\StoreBudgetAction;
 use App\Actions\Budgets\UpdateBudgetAction;
 use App\Domain\Budgets\BudgetFilterService;
+use App\Exceptions\ApiErrorException;
 use App\Exports\BudgetExport;
 use App\Http\Controllers\Concerns\LoadsResourceRelations;
 use App\Http\Controllers\Concerns\StoresItemsInTransaction;
@@ -87,9 +88,7 @@ class BudgetController extends Controller
     public function destroy(Budget $budget): JsonResponse
     {
         if ($budget->status !== 'draft') {
-            return response()->json([
-                'message' => __('budget_api.only_draft_can_be_deleted'),
-            ], 422);
+            throw ApiErrorException::translated(422, 'budget.not_draft', 'budget_api.only_draft_can_be_deleted');
         }
 
         return $this->destroyModel($budget);
@@ -112,9 +111,7 @@ class BudgetController extends Controller
     public function approve(Budget $budget): JsonResponse
     {
         if ($budget->status !== 'draft') {
-            return response()->json([
-                'message' => __('budget_api.only_draft_can_be_approved'),
-            ], 422);
+            throw ApiErrorException::translated(422, 'budget.not_draft', 'budget_api.only_draft_can_be_approved');
         }
 
         $budget->update([
@@ -129,9 +126,7 @@ class BudgetController extends Controller
     public function lock(Budget $budget): JsonResponse
     {
         if ($budget->status !== 'approved') {
-            return response()->json([
-                'message' => __('budget_api.only_approved_can_be_locked'),
-            ], 422);
+            throw ApiErrorException::translated(422, 'budget.not_approved', 'budget_api.only_approved_can_be_locked');
         }
 
         $budget->update([

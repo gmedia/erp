@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Approvals\ApproveApprovalRequestAction;
 use App\Actions\Approvals\RejectApprovalRequestAction;
 use App\Actions\Approvals\ResolveApprovalStepActorAction;
+use App\Exceptions\ApiErrorException;
 use App\Http\Requests\MyApprovals\ApproveMyApprovalRequest;
 use App\Http\Requests\MyApprovals\RejectMyApprovalRequest;
 use App\Models\ApprovalRequest;
@@ -96,7 +97,11 @@ class MyApprovalController extends Controller
         $currentStep = $this->findCurrentPendingAssignedStep($approvalRequest, $userId);
 
         if (! $currentStep instanceof ApprovalRequestStep) {
-            abort(403, __('my_approval_api.not_authorized_for_step'));
+            throw ApiErrorException::translated(
+                403,
+                'my_approval.not_authorized_for_step',
+                'my_approval_api.not_authorized_for_step',
+            );
         }
 
         $action->execute($approvalRequest, $currentStep, $userId, $request->validated('comments'));
@@ -113,7 +118,11 @@ class MyApprovalController extends Controller
         $currentStep = $this->findCurrentPendingAssignedStep($approvalRequest, $userId);
 
         if (! $currentStep instanceof ApprovalRequestStep) {
-            abort(403, __('my_approval_api.not_authorized_for_step'));
+            throw ApiErrorException::translated(
+                403,
+                'my_approval.not_authorized_for_step',
+                'my_approval_api.not_authorized_for_step',
+            );
         }
 
         $action->execute($approvalRequest, $currentStep, $userId, $request->validated('comments'));
