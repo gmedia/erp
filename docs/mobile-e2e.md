@@ -20,7 +20,12 @@ Dokumen ini mencatat prasyarat dan langkah instalasi untuk smoke test dan E2E An
 | Build tools | `build-tools;34.0.0` | `~/Android/Sdk/build-tools` |
 | AVD | `erp_api34` (pixel_5) | `~/.android/avd` |
 
-KVM wajib: `/dev/kvm` harus bisa diakses user yang menjalankan emulator (grup `kvm` atau ACL). Tanpa itu emulator x86_64 menolak boot dengan pesan "requires hardware acceleration".
+KVM wajib: `/dev/kvm` harus bisa diakses user yang menjalankan emulator (grup `kvm` atau ACL). Tanpa itu emulator x86_64 menolak boot dengan pesan "requires hardware acceleration". Cek cepat: `test -r /dev/kvm && test -w /dev/kvm && echo OK`. `emulator -accel-check` harus melaporkan akselerasi KVM, bukan `LINE_NOT_FOUND`.
+
+Status verifikasi (per mesin, dicatat agar tidak diulang):
+- JDK 21 Temurin terpasang di `~/opt/jdk-21.0.13.1+2` (`java -version` OK).
+- cmdline-tools, platform-tools, emulator, `platforms;android-34`, `system-images;android-34;google_apis;x86_64`, `build-tools;34.0.0`, dan AVD `erp_api34` sudah ada di `~/Android/Sdk`.
+- Boot emulator BELUM bisa diverifikasi: user tidak punya akses `/dev/kvm` (owner `root:kvm`, user tidak di grup `kvm`). Menambah grup memerlukan sudo/admin dan tidak dilakukan dari sesi agent. Tindakan: admin menambahkan user ke grup `kvm`, lalu login ulang.
 
 ## Langkah instalasi (sekali per mesin)
 
