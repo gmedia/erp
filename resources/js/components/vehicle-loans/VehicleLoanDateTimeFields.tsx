@@ -68,9 +68,10 @@ export function VehicleLoanDateTimeFields({
             <RequiredLabel htmlFor={`${id}_date`} required={required}>
                 {label}
             </RequiredLabel>
-            <div className="grid grid-cols-[1fr_110px] gap-2">
+            <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(7.5rem,auto)] gap-2">
                 <Input
                     id={`${id}_date`}
+                    className="min-w-0"
                     inputMode="numeric"
                     placeholder="dd/mm/yyyy"
                     value={date}
@@ -82,6 +83,7 @@ export function VehicleLoanDateTimeFields({
                 <Input
                     id={`${id}_time`}
                     type="time"
+                    className="min-w-0"
                     value={time}
                     onChange={(event) => {
                         setTime(event.target.value);

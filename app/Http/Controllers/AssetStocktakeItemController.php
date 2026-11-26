@@ -49,7 +49,7 @@ class AssetStocktakeItemController extends Controller
         (new SyncAssetStocktakeItemsAction)->execute($assetStocktake, $request->validated());
 
         return response()->json([
-            'message' => 'Stocktake items updated successfully.',
+            'message' => __('asset_api.stocktake_items_updated'),
         ]);
     }
 }

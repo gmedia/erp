@@ -47,13 +47,13 @@ class AccountController extends Controller
     {
         if ($account->children()->count() > 0) {
             return response()->json([
-                'message' => 'Cannot delete account with child accounts.',
+                'message' => __('account_api.has_child_accounts'),
             ], 422);
         }
 
         if ($account->journalLines()->count() > 0) {
             return response()->json([
-                'message' => 'Cannot delete account with journal entries.',
+                'message' => __('account_api.has_journal_entries'),
             ], 422);
         }
 

@@ -44,7 +44,7 @@ class AssetController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'Asset created successfully',
+            'message' => __('asset_api.created'),
             'data' => new AssetResource($asset),
         ], 201);
     }
@@ -86,7 +86,7 @@ class AssetController extends Controller
         );
 
         return response()->json([
-            'message' => 'Asset updated successfully',
+            'message' => __('asset_api.updated'),
             'data' => new AssetResource($asset),
         ]);
     }
@@ -96,7 +96,7 @@ class AssetController extends Controller
         $asset->delete();
 
         return response()->json([
-            'message' => 'Asset deleted successfully',
+            'message' => __('asset_api.deleted'),
         ]);
     }
 

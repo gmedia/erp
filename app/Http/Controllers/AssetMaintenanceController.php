@@ -40,7 +40,7 @@ class AssetMaintenanceController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'Asset maintenance created successfully',
+            'message' => __('asset_api.maintenance_created'),
             'data' => new AssetMaintenanceResource($maintenance->load(['asset', 'supplier', 'createdBy'])),
         ], 201);
     }
@@ -66,7 +66,7 @@ class AssetMaintenanceController extends Controller
         $asset_maintenance->refresh();
 
         return response()->json([
-            'message' => 'Asset maintenance updated successfully',
+            'message' => __('asset_api.maintenance_updated'),
             'data' => new AssetMaintenanceResource($asset_maintenance->load(['asset', 'supplier', 'createdBy'])),
         ]);
     }
@@ -76,7 +76,7 @@ class AssetMaintenanceController extends Controller
         $asset_maintenance->delete();
 
         return response()->json([
-            'message' => 'Asset maintenance deleted successfully',
+            'message' => __('asset_api.maintenance_deleted'),
         ]);
     }
 
