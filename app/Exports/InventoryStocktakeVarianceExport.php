@@ -4,12 +4,16 @@ namespace App\Exports;
 
 use App\Actions\Reports\IndexInventoryStocktakeVarianceReportAction;
 use App\Exports\Concerns\AbstractActionCollectionExport;
+use App\Exports\Concerns\ExportsNumberFormats;
 use App\Http\Requests\Reports\IndexInventoryStocktakeVarianceReportRequest;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting as Formats;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 
-class InventoryStocktakeVarianceExport extends AbstractActionCollectionExport implements WithHeadings, WithMapping
+class InventoryStocktakeVarianceExport extends AbstractActionCollectionExport implements Formats, WithHeadings, WithMapping
 {
+    use ExportsNumberFormats;
+
     public function headings(): array
     {
         return [
@@ -39,13 +43,18 @@ class InventoryStocktakeVarianceExport extends AbstractActionCollectionExport im
             $row->category_name ?? '-',
             $row->warehouse_name ?? '-',
             $row->branch_name ?? '-',
-            $row->system_quantity ?? 0,
-            $row->counted_quantity ?? 0,
-            $row->variance ?? 0,
+            $this->numericValue($row->system_quantity) ?? 0,
+            $this->numericValue($row->counted_quantity) ?? 0,
+            $this->numericValue($row->variance) ?? 0,
             $row->result ?? '-',
             $row->counted_at?->format('Y-m-d H:i:s') ?? '-',
             $row->counted_by_name ?? '-',
         ];
+    }
+
+    protected function numericColumnHeadings(): array
+    {
+        return ['System Quantity', 'Counted Quantity', 'Variance'];
     }
 
     /**

@@ -4,11 +4,15 @@ namespace App\Exports;
 
 use App\Domain\Assets\AssetFilterService;
 use App\Exports\Concerns\BaseExport;
+use App\Exports\Concerns\ExportsNumberFormats;
 use App\Models\Asset;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 
-class AssetExport extends BaseExport
+class AssetExport extends BaseExport implements WithColumnFormatting
 {
+    use ExportsNumberFormats;
+
     public function query(): Builder
     {
         $query = Asset::query()->with([
@@ -81,7 +85,7 @@ class AssetExport extends BaseExport
             'Employee' => fn (Asset $a): mixed => $this->relatedAttribute($a, 'employee', 'name'),
             'Supplier' => fn (Asset $a): mixed => $this->relatedAttribute($a, 'supplier', 'name'),
             'Purchase Date' => fn (Asset $a): mixed => $this->formatDateValue($a->purchase_date, 'Y-m-d'),
-            'Purchase Cost' => fn (Asset $a): mixed => $a->purchase_cost,
+            'Purchase Cost' => fn (Asset $a): mixed => $this->numericValue($a->purchase_cost),
             'Currency' => fn (Asset $a): mixed => $a->currency,
             'Warranty End Date' => fn (Asset $a): mixed => $this->formatDateValue($a->warranty_end_date, 'Y-m-d'),
             'Status' => fn (Asset $a): mixed => $a->status,
@@ -90,5 +94,13 @@ class AssetExport extends BaseExport
             'Useful Life (Months)' => fn (Asset $a): mixed => $a->useful_life_months,
             'Created At' => fn (Asset $a): mixed => $this->formatIso8601($a->created_at),
         ];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function currencyColumnHeadings(): array
+    {
+        return ['Purchase Cost'];
     }
 }

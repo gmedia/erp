@@ -4,12 +4,16 @@ namespace App\Exports;
 
 use App\Actions\Reports\IndexMaintenanceCostReportAction;
 use App\Exports\Concerns\AbstractActionCollectionExport;
+use App\Exports\Concerns\ExportsNumberFormats;
 use App\Http\Requests\Reports\IndexMaintenanceCostRequest;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting as Formats;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 
-class MaintenanceCostExport extends AbstractActionCollectionExport implements WithHeadings, WithMapping
+class MaintenanceCostExport extends AbstractActionCollectionExport implements Formats, WithHeadings, WithMapping
 {
+    use ExportsNumberFormats;
+
     public function headings(): array
     {
         return [
@@ -39,9 +43,14 @@ class MaintenanceCostExport extends AbstractActionCollectionExport implements Wi
             $maintenance->scheduled_at?->format('Y-m-d H:i') ?? '-',
             $maintenance->performed_at?->format('Y-m-d H:i') ?? '-',
             $maintenance->supplier->name ?? '-',
-            $maintenance->cost,
+            $this->numericValue($maintenance->cost),
             $maintenance->notes ?? '-',
         ];
+    }
+
+    protected function currencyColumnHeadings(): array
+    {
+        return ['Cost'];
     }
 
     /**

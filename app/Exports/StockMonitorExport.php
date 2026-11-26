@@ -4,13 +4,17 @@ namespace App\Exports;
 
 use App\Actions\StockMonitor\IndexStockMonitorAction;
 use App\Exports\Concerns\AbstractActionCollectionExport;
+use App\Exports\Concerns\MapsStockValuationExportRow;
 use App\Http\Requests\StockMonitor\IndexStockMonitorRequest;
 use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting as Formats;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 
-class StockMonitorExport extends AbstractActionCollectionExport implements WithHeadings, WithMapping
+class StockMonitorExport extends AbstractActionCollectionExport implements Formats, WithHeadings, WithMapping
 {
+    use MapsStockValuationExportRow;
+
     public function headings(): array
     {
         return [
@@ -29,18 +33,7 @@ class StockMonitorExport extends AbstractActionCollectionExport implements WithH
 
     public function map($stock): array
     {
-        return [
-            $stock->product->code ?? '-',
-            $stock->product->name ?? '-',
-            $stock->product->category->name ?? '-',
-            $stock->warehouse->code ?? '-',
-            $stock->warehouse->name ?? '-',
-            $stock->warehouse->branch->name ?? '-',
-            $stock->quantity_on_hand ?? 0,
-            $stock->average_cost ?? 0,
-            $stock->stock_value ?? 0,
-            $stock->moved_at?->format('Y-m-d H:i:s') ?? '-',
-        ];
+        return $this->stockValuationRow($stock);
     }
 
     /**

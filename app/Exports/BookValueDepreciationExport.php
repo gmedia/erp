@@ -4,15 +4,19 @@ namespace App\Exports;
 
 use App\Actions\Reports\IndexBookValueDepreciationReportAction;
 use App\Exports\Concerns\AbstractActionCollectionExport;
+use App\Exports\Concerns\ExportsNumberFormats;
 use App\Http\Requests\Reports\IndexBookValueDepreciationRequest;
 use App\Models\Asset;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting as Formats;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 
-class BookValueDepreciationExport extends AbstractActionCollectionExport implements WithHeadings, WithMapping
+class BookValueDepreciationExport extends AbstractActionCollectionExport implements Formats, WithHeadings, WithMapping
 {
+    use ExportsNumberFormats;
+
     public function headings(): array
     {
         return [
@@ -40,12 +44,17 @@ class BookValueDepreciationExport extends AbstractActionCollectionExport impleme
             $asset->category->name ?? '-',
             $asset->branch->name ?? '-',
             $asset->purchase_date->format('Y-m-d'),
-            $asset->purchase_cost,
-            $asset->salvage_value,
+            $this->numericValue($asset->purchase_cost),
+            $this->numericValue($asset->salvage_value),
             $asset->useful_life_months,
-            $asset->accumulated_depreciation,
-            $asset->book_value,
+            $this->numericValue($asset->accumulated_depreciation),
+            $this->numericValue($asset->book_value),
         ];
+    }
+
+    protected function currencyColumnHeadings(): array
+    {
+        return ['Purchase Cost', 'Salvage Value', 'Accumulated Depreciation', 'Book Value'];
     }
 
     protected function actionClass(): string
