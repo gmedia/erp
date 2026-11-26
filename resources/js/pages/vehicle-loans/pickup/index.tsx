@@ -15,6 +15,7 @@ import { VehicleLoanQrPanel } from '@/components/vehicle-loans/VehicleLoanQrPane
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
 import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
+import { useToastTranslator } from '@/utils/i18nFallback';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { toast } from 'sonner';
@@ -38,6 +39,7 @@ export default function VehicleLoanPickupPage() {
     const [photo, setPhoto] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
     const [loaded, setLoaded] = useState(false);
+    const tToast = useToastTranslator('vehicle_loan_toast');
 
     async function loadApproved() {
         setLoading(true);
@@ -48,7 +50,9 @@ export default function VehicleLoanPickupPage() {
             setLoans(response.data.data);
             setLoaded(true);
         } catch {
-            toast.error('Gagal memuat daftar permintaan.');
+            toast.error(
+                tToast('pickup_load_failed', 'Gagal memuat daftar permintaan.'),
+            );
         } finally {
             setLoading(false);
         }
@@ -58,7 +62,12 @@ export default function VehicleLoanPickupPage() {
 
     async function submit() {
         if (!loanId || !photo) {
-            toast.error('Pilih permintaan dan unggah foto.');
+            toast.error(
+                tToast(
+                    'pickup_select_required',
+                    'Pilih permintaan dan unggah foto.',
+                ),
+            );
             return;
         }
 
@@ -70,12 +79,20 @@ export default function VehicleLoanPickupPage() {
         try {
             await axios.post(`/api/vehicle-loans/${loanId}/pickups`, body);
             toast.success(
-                'Form pengambilan dikirim. Ambil kunci di pos keamanan.',
+                tToast(
+                    'pickup_submitted',
+                    'Form pengambilan dikirim. Ambil kunci di pos keamanan.',
+                ),
             );
             setLoanId('');
             setPhoto(null);
         } catch {
-            toast.error('Gagal mengirim form pengambilan.');
+            toast.error(
+                tToast(
+                    'pickup_submit_failed',
+                    'Gagal mengirim form pengambilan.',
+                ),
+            );
         } finally {
             setLoading(false);
         }

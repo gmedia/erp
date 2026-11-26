@@ -16,6 +16,7 @@ import { VehicleLoanQrPanel } from '@/components/vehicle-loans/VehicleLoanQrPane
 import { usePermissions } from '@/hooks/usePermissions';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
+import { useToastTranslator } from '@/utils/i18nFallback';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -48,6 +49,7 @@ export default function VehicleLoanRequestPage() {
     const [loading, setLoading] = useState(false);
     const { can } = usePermissions();
     const canRequest = can('vehicle_loan.request');
+    const tToast = useToastTranslator('vehicle_loan_toast');
 
     const { data: options } = useQuery({
         queryKey: ['vehicle-loans', 'assignment-options'],
@@ -66,12 +68,22 @@ export default function VehicleLoanRequestPage() {
 
     function validate(): boolean {
         if (!form.start_at || !form.end_at || form.purpose.trim().length < 5) {
-            toast.error('Lengkapi jadwal dan tujuan perjalanan.');
+            toast.error(
+                tToast(
+                    'request_schedule_incomplete',
+                    'Lengkapi jadwal dan tujuan perjalanan.',
+                ),
+            );
             return false;
         }
 
         if (new Date(form.end_at) <= new Date(form.start_at)) {
-            toast.error('Waktu selesai harus setelah waktu mulai.');
+            toast.error(
+                tToast(
+                    'request_end_before_start',
+                    'Waktu selesai harus setelah waktu mulai.',
+                ),
+            );
             return false;
         }
 
@@ -84,10 +96,12 @@ export default function VehicleLoanRequestPage() {
             const response = await axios.post('/api/vehicle-loans', form);
             const id = Number(response.data.id ?? response.data.data?.id);
             setDraftId(id);
-            toast.success('Draft disimpan.');
+            toast.success(tToast('request_draft_saved', 'Draft disimpan.'));
             return id;
         } catch {
-            toast.error('Gagal menyimpan draft.');
+            toast.error(
+                tToast('request_draft_failed', 'Gagal menyimpan draft.'),
+            );
             return null;
         } finally {
             setLoading(false);
@@ -102,19 +116,32 @@ export default function VehicleLoanRequestPage() {
         const id = draftId ?? (await saveDraft());
 
         if (!id) {
-            toast.error('Draft tidak ditemukan. Simpan draft terlebih dahulu.');
+            toast.error(
+                tToast(
+                    'request_draft_missing',
+                    'Draft tidak ditemukan. Simpan draft terlebih dahulu.',
+                ),
+            );
             return;
         }
 
         setLoading(true);
         try {
             await axios.post(`/api/vehicle-loans/${id}/submit`);
-            toast.success('Permintaan dikirim untuk persetujuan.');
+            toast.success(
+                tToast(
+                    'request_submitted',
+                    'Permintaan dikirim untuk persetujuan.',
+                ),
+            );
             setForm(emptyForm);
             setDraftId(null);
         } catch {
             toast.error(
-                'Gagal mengirim permintaan. Periksa kembali data Anda.',
+                tToast(
+                    'request_submit_failed',
+                    'Gagal mengirim permintaan. Periksa kembali data Anda.',
+                ),
             );
         } finally {
             setLoading(false);

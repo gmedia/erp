@@ -17,9 +17,11 @@ import {
 } from '@/components/ui/input-otp';
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
 import AuthLayout from '@/layouts/auth-layout';
+import { useToastTranslator } from '@/utils/i18nFallback';
 
 export default function TwoFactorChallenge() {
     const navigate = useNavigate();
+    const tToast = useToastTranslator('auth_toast');
     const [searchParams] = useSearchParams();
     const socialTicket = searchParams.get('social_ticket') ?? '';
     const [showRecoveryInput, setShowRecoveryInput] = useState<boolean>(false);
@@ -100,7 +102,12 @@ export default function TwoFactorChallenge() {
                     setCode('');
                 }
             } else {
-                toast.error('An error occurred. Please try again.');
+                toast.error(
+                    tToast(
+                        'generic_retry',
+                        'An error occurred. Please try again.',
+                    ),
+                );
             }
         } finally {
             setProcessing(false);

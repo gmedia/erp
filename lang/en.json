@@ -2844,6 +2844,33 @@
         "recovery_codes_regenerated": "Recovery codes regenerated successfully.",
         "recovery_codes_regenerate_failed": "Failed to regenerate recovery codes."
     },
+    "vehicle_loan_toast": {
+        "pickup_load_failed": "Failed to load the request list.",
+        "pickup_select_required": "Select a request and upload a photo.",
+        "pickup_submitted": "Pickup form submitted. Collect the key at the security post.",
+        "pickup_submit_failed": "Failed to submit the pickup form.",
+        "request_schedule_incomplete": "Complete the schedule and trip purpose.",
+        "request_end_before_start": "End time must be after start time.",
+        "request_draft_saved": "Draft saved.",
+        "request_draft_failed": "Failed to save the draft.",
+        "request_draft_missing": "Draft not found. Save the draft first.",
+        "request_submitted": "Request sent for approval.",
+        "request_submit_failed": "Failed to send the request. Please check your data.",
+        "return_load_failed": "Failed to load pickup data.",
+        "return_incomplete": "Complete the pickup and both photos.",
+        "return_incident_note_short": "Incident description must be at least 5 characters.",
+        "return_recorded": "Return recorded successfully.",
+        "return_failed": "Failed to record the return.",
+        "security_key_handed_over": "Key handed over.",
+        "security_handover_failed": "Failed to hand over the key. Make sure the approval is final."
+    },
+    "auth_toast": {
+        "generic_retry": "An error occurred. Please try again.",
+        "reset_password_retry": "An error occurred. Please try again later.",
+        "verification_link_sent": "Verification link sent",
+        "verification_link_failed": "Failed to send verification link.",
+        "logout_failed": "Failed to log out."
+    },
     "settings_toast": {
         "password_updated": "Password updated successfully",
         "password_update_failed": "An error occurred. Please try again later.",

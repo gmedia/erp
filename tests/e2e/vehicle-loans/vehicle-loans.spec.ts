@@ -1,5 +1,12 @@
 import { expect, test } from '@playwright/test';
-import { DEFAULT_E2E_EMAIL, approveViaScreenAsDelegate, expectResponseOk, login } from '../helpers';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import {
+    DEFAULT_E2E_EMAIL,
+    approveViaScreenAsDelegate,
+    expectResponseOk,
+    login,
+} from '../helpers';
 import {
     VEHICLE_LOAN_DASHBOARD_PATH,
     VEHICLE_LOAN_PICKUP_PATH,
@@ -13,6 +20,11 @@ import {
     submitVehicleLoanRequest,
     submitVehicleLoanReturn,
 } from './helpers';
+
+const enLang = JSON.parse(
+    readFileSync(resolve(process.cwd(), 'lang/en.json'), 'utf8'),
+) as { vehicle_loan_toast: Record<string, string> };
+const toastText = enLang.vehicle_loan_toast;
 
 test.describe('Vehicle Loans', () => {
     test.beforeEach(async ({ page }) => {
@@ -100,7 +112,10 @@ test.describe('Vehicle Loans', () => {
     test('approver can review assignment and approve from My Approvals', async ({
         page,
     }) => {
-        const id = await submitVehicleLoanRequest(page, 'E2E review assignment');
+        const id = await submitVehicleLoanRequest(
+            page,
+            'E2E review assignment',
+        );
         const loan = await apiRequest(page, 'get', `/api/vehicle-loans/${id}`);
         expect(loan.ok()).toBeTruthy();
         const body = (await loan.json()) as {
@@ -126,7 +141,7 @@ test.describe('Vehicle Loans', () => {
     test('approved loan can be picked up with a selfie', async ({ page }) => {
         await seedApprovedLoan(page);
         await submitVehicleLoanPickup(page);
-        await expect(page.getByText('Form pengambilan dikirim')).toBeVisible();
+        await expect(page.getByText(toastText.pickup_submitted)).toBeVisible();
     });
 
     test('security queue verifies approval before handing over the key', async ({
@@ -134,7 +149,7 @@ test.describe('Vehicle Loans', () => {
     }) => {
         await seedApprovedLoan(page);
         await submitVehicleLoanPickup(page);
-        await expect(page.getByText('Form pengambilan dikirim')).toBeVisible();
+        await expect(page.getByText(toastText.pickup_submitted)).toBeVisible();
 
         await page.goto(VEHICLE_LOAN_SECURITY_PATH);
 
@@ -158,11 +173,15 @@ test.describe('Vehicle Loans', () => {
             .first();
         if (await handover.isVisible().catch(() => false)) {
             const handoverResponse = page.waitForResponse(
-                (r) => r.url().includes('/handover') && r.request().method() === 'POST',
+                (r) =>
+                    r.url().includes('/handover') &&
+                    r.request().method() === 'POST',
             );
             await handover.click();
             await expectResponseOk(await handoverResponse);
-            await expect(page.getByText('Kunci diserahkan.')).toBeVisible();
+            await expect(
+                page.getByText(toastText.security_key_handed_over),
+            ).toBeVisible();
         }
     });
 
@@ -171,9 +190,7 @@ test.describe('Vehicle Loans', () => {
     }) => {
         await seedHandedOverPickup(page);
         await submitVehicleLoanReturn(page);
-        await expect(
-            page.getByText('Pengembalian berhasil dicatat.'),
-        ).toBeVisible();
+        await expect(page.getByText(toastText.return_recorded)).toBeVisible();
     });
 
     test('dashboard shows summary cards for loan statuses', async ({

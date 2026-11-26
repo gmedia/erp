@@ -11,9 +11,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
+import { useToastTranslator } from '@/utils/i18nFallback';
 
 export default function ConfirmPassword() {
     const navigate = useNavigate();
+    const tToast = useToastTranslator('auth_toast');
     const location = useLocation();
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -40,7 +42,12 @@ export default function ConfirmPassword() {
                     document.getElementById('password') as HTMLInputElement
                 ).value = '';
             } else {
-                toast.error('An error occurred. Please try again.');
+                toast.error(
+                    tToast(
+                        'generic_retry',
+                        'An error occurred. Please try again.',
+                    ),
+                );
             }
         } finally {
             setProcessing(false);

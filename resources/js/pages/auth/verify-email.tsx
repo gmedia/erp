@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import AuthLayout from '@/layouts/auth-layout';
+import { useToastTranslator } from '@/utils/i18nFallback';
 
 interface VerifyEmailProps {
     readonly status?: string;
@@ -18,6 +19,7 @@ export default function VerifyEmail({
 }: VerifyEmailProps) {
     const { logout } = useAuth();
     const navigate = useNavigate();
+    const tToast = useToastTranslator('auth_toast');
     const [status, setStatus] = useState(initialStatus);
     const [processing, setProcessing] = useState(false);
 
@@ -28,9 +30,16 @@ export default function VerifyEmail({
         try {
             await axios.post('/email/verification-notification');
             setStatus('verification-link-sent');
-            toast.success('Verification link sent');
+            toast.success(
+                tToast('verification_link_sent', 'Verification link sent'),
+            );
         } catch {
-            toast.error('Failed to send verification link.');
+            toast.error(
+                tToast(
+                    'verification_link_failed',
+                    'Failed to send verification link.',
+                ),
+            );
         } finally {
             setProcessing(false);
         }
@@ -43,7 +52,7 @@ export default function VerifyEmail({
             void logout();
             void navigate('/login');
         } catch {
-            toast.error('Failed to log out.');
+            toast.error(tToast('logout_failed', 'Failed to log out.'));
         }
     };
 

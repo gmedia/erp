@@ -2847,6 +2847,33 @@
         "recovery_codes_regenerated": "Kode pemulihan berhasil dibuat ulang.",
         "recovery_codes_regenerate_failed": "Gagal membuat ulang kode pemulihan."
     },
+    "vehicle_loan_toast": {
+        "pickup_load_failed": "Gagal memuat daftar permintaan.",
+        "pickup_select_required": "Pilih permintaan dan unggah foto.",
+        "pickup_submitted": "Form pengambilan dikirim. Ambil kunci di pos keamanan.",
+        "pickup_submit_failed": "Gagal mengirim form pengambilan.",
+        "request_schedule_incomplete": "Lengkapi jadwal dan tujuan perjalanan.",
+        "request_end_before_start": "Waktu selesai harus setelah waktu mulai.",
+        "request_draft_saved": "Draft disimpan.",
+        "request_draft_failed": "Gagal menyimpan draft.",
+        "request_draft_missing": "Draft tidak ditemukan. Simpan draft terlebih dahulu.",
+        "request_submitted": "Permintaan dikirim untuk persetujuan.",
+        "request_submit_failed": "Gagal mengirim permintaan. Periksa kembali data Anda.",
+        "return_load_failed": "Gagal memuat data pengambilan.",
+        "return_incomplete": "Lengkapi pengambilan dan kedua foto.",
+        "return_incident_note_short": "Isi keterangan insiden minimal 5 karakter.",
+        "return_recorded": "Pengembalian berhasil dicatat.",
+        "return_failed": "Gagal mencatat pengembalian.",
+        "security_key_handed_over": "Kunci diserahkan.",
+        "security_handover_failed": "Gagal menyerahkan kunci. Pastikan persetujuan sudah final."
+    },
+    "auth_toast": {
+        "generic_retry": "Terjadi kesalahan. Silakan coba lagi.",
+        "reset_password_retry": "Terjadi kesalahan. Silakan coba lagi nanti.",
+        "verification_link_sent": "Tautan verifikasi telah dikirim",
+        "verification_link_failed": "Gagal mengirim tautan verifikasi.",
+        "logout_failed": "Gagal keluar."
+    },
     "settings_toast": {
         "password_updated": "Kata sandi berhasil diperbarui",
         "password_update_failed": "Terjadi kesalahan. Silakan coba lagi nanti.",
