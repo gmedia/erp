@@ -18,15 +18,16 @@ test('Departments memuat tabel dengan data', async () => {
 
     // Router aplikasi memakai BrowserRouter: pushState + popstate memicu navigasi React Router
     // tanpa reload WebView (reload memutus page dan memicu error "context has been closed").
+    const activePage = await currentPage(session);
     const [departmentsResponse] = await Promise.all([
-      page.waitForResponse(
+      activePage.waitForResponse(
         (r) =>
           new URL(r.url()).pathname === '/api/departments' &&
           r.request().method() === 'GET' &&
           r.status() === 200,
         { timeout: 60000 },
       ),
-      page.evaluate(() => {
+      activePage.evaluate(() => {
         window.history.pushState({}, '', '/departments');
         window.dispatchEvent(new PopStateEvent('popstate'));
       }),
