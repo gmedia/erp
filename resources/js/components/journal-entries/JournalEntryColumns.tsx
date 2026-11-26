@@ -11,6 +11,7 @@ import {
     type CustomTableMeta,
 } from '@/utils/columns';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { type ColumnDef } from '@tanstack/react-table';
 
@@ -62,8 +63,7 @@ export const journalEntryColumns: ColumnDef<JournalEntry>[] = [
             return (
                 <div className="text-right font-medium">
                     {formatCurrencyByRegionalSettings(amount, {
-                        locale: 'id-ID',
-                        currency: 'IDR',
+                        locale: FORMAT_LOCALE,
                     })}
                 </div>
             );
