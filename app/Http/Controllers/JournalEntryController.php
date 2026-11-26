@@ -65,7 +65,7 @@ class JournalEntryController extends Controller
     public function destroy(JournalEntry $journalEntry): JsonResponse
     {
         if ($journalEntry->status === 'posted') {
-            return response()->json(['message' => 'Cannot delete posted journal entry.'], 403);
+            return response()->json(['message' => __('journal_entry_api.posted_cannot_be_deleted')], 403);
         }
 
         $journalEntry->lines()->delete();
