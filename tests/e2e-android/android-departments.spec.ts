@@ -1,6 +1,6 @@
 import { writeFileSync } from 'node:fs';
 import { _android as android, expect, test } from '@playwright/test';
-import { APP_PKG, loginInWebView, openAppWebView } from './android-helpers';
+import { APP_PKG, currentPage, launchApp, loginInWebView } from './android-helpers';
 
 test.describe.configure({ mode: 'serial' });
 
@@ -8,25 +8,23 @@ test('Departments memuat tabel dengan data', async () => {
   const [device] = await android.devices();
   expect(device, 'emulator/device tidak terdeteksi').toBeDefined();
 
+  const session = await launchApp(device);
   try {
-    const loginPage = await openAppWebView(device);
-    await loginInWebView(loginPage);
-
-    // Page dari fase login bisa sudah tertutup setelah redirect ke dashboard;
-    // ambil ulang WebView aktif agar navigasi dan asersi memakai page yang hidup.
-    const webview = await device.webView({ pkg: APP_PKG });
-    const page = await webview.page();
-    await page.waitForLoadState('domcontentloaded');
+    await loginInWebView(session);
+    const page = await currentPage(session);
     await expect(page).toHaveURL(/\/dashboard/, { timeout: 90000 });
     await page.waitForLoadState('networkidle');
-    await page.screenshot({ path: '/tmp/opencode/547-webview-before-nav.png', fullPage: true });
+    await page.screenshot({ path: '/tmp/opencode/547-webview-before-nav.png' });
+
+    // Router aplikasi memakai BrowserRouter: pushState + popstate memicu navigasi React Router
+    // tanpa reload WebView (reload memutus page dan memicu error "context has been closed").
     const [departmentsResponse] = await Promise.all([
       page.waitForResponse(
         (r) =>
-          r.url().includes('/api/departments') &&
+          new URL(r.url()).pathname === '/api/departments' &&
           r.request().method() === 'GET' &&
           r.status() === 200,
-        { timeout: 90000 },
+        { timeout: 60000 },
       ),
       page.evaluate(() => {
         window.history.pushState({}, '', '/departments');
@@ -35,7 +33,7 @@ test('Departments memuat tabel dengan data', async () => {
     ]);
     expect(departmentsResponse.ok()).toBe(true);
 
-    const rows = page.locator('table tbody tr');
+    const rows = (await currentPage(session)).locator('table tbody tr');
     await expect(rows.first()).toBeVisible({ timeout: 60000 });
     expect(await rows.count()).toBeGreaterThan(0);
   } finally {

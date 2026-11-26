@@ -5,30 +5,55 @@ export const ADMIN_EMAIL = process.env.APP_ADMIN ?? 'admin@example.com';
 export const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD ?? 'password';
 
 type Device = Awaited<ReturnType<typeof android.devices>>[number];
+type WebView = Awaited<ReturnType<Device['webView']>>;
 
-export async function openAppWebView(device: Device): Promise<Page> {
+export interface AppSession {
+  webview: WebView;
+  page: Page;
+}
+
+/**
+ * Membuka aplikasi dan mengambil WebView sekali saja (device.webView dipanggil satu kali).
+ * Page yang dikembalikan dipakai sampai akhir spec; bila page berganti karena redirect,
+ * gunakan `currentPage()` (memanggil webview.page() pada objek yang sama).
+ */
+export async function launchApp(device: Device): Promise<AppSession> {
   await device.shell(`am force-stop ${APP_PKG}`);
   await device.shell(`pm clear ${APP_PKG}`);
   await device.shell(`am start -n ${APP_PKG}/.MainActivity`);
   const webview = await device.webView({ pkg: APP_PKG });
-  return webview.page();
+  const page = await webview.page();
+  return { webview, page };
 }
 
-export async function loginInWebView(page: Page): Promise<void> {
-  const emailInput = page.locator('input[name="email"]');
+export async function currentPage(session: AppSession): Promise<Page> {
+  session.page = await session.webview.page();
+  return session.page;
+}
+
+export async function loginInWebView(session: AppSession): Promise<void> {
+  const emailInput = (await currentPage(session)).locator('input[name="email"]');
   await expect
-    .poll(async () => (await emailInput.count()) > 0 || /\/dashboard/.test(page.url()), { timeout: 90000 })
+    .poll(
+      async () => {
+        const page = await currentPage(session);
+        return (await page.locator('input[name="email"]').count()) > 0 || /\/dashboard/.test(page.url());
+      },
+      { timeout: 90000 },
+    )
     .toBe(true);
-  if (/\/dashboard/.test(page.url())) {
+  if (/\/dashboard/.test((await currentPage(session)).url())) {
     return;
   }
-  await page.locator('input[name="email"]').fill(ADMIN_EMAIL);
-  await page.locator('input[name="password"]').fill(ADMIN_PASSWORD);
+  await emailInput.fill(ADMIN_EMAIL);
+  await (await currentPage(session)).locator('input[name="password"]').fill(ADMIN_PASSWORD);
 
+  const page = await currentPage(session);
   const loginResponse = page.waitForResponse(
-    (r) => r.url().includes('/api/login') && r.request().method() === 'POST',
+    (r) => new URL(r.url()).pathname === '/api/login' && r.request().method() === 'POST',
+    { timeout: 60000 },
   );
   await page.locator('[data-test="login-button"]').click();
   expect((await loginResponse).ok()).toBe(true);
-  await expect(page).toHaveURL(/\/dashboard/, { timeout: 90000 });
+  await expect.poll(async () => /\/dashboard/.test((await currentPage(session)).url()), { timeout: 90000 }).toBe(true);
 }
