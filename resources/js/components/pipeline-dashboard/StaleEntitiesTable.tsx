@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/table';
 import { useTranslation } from '@/contexts/i18n-context';
 import { StaleEntity } from '@/hooks/usePipelineDashboard';
+import { formatNumber } from '@/utils/formatters';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { AlertCircle, Clock } from 'lucide-react';
 
@@ -201,7 +202,12 @@ export function StaleEntitiesTable({
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-right font-bold text-warning">
-                                            {entity.days_in_state}
+                                            {formatNumber(
+                                                entity.days_in_state,
+                                                {
+                                                    maximumFractionDigits: 0,
+                                                },
+                                            )}
                                         </TableCell>
                                     </TableRow>
                                 ))}
