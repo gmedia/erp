@@ -69,10 +69,27 @@ export interface ModuleTestConfig {
 
 // ==================== HELPER FUNCTIONS ====================
 
-function waitForApiResponse(page: Page, apiPath: string): Promise<Response> {
-    return page.waitForResponse((r) => r.url().includes(apiPath), {
-        timeout: 30000,
-    });
+type ApiMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+
+function waitForApiResponse(
+    page: Page,
+    apiPath: string,
+    method: ApiMethod = 'GET',
+    itemTarget = false,
+): Promise<Response> {
+    const basePath = apiPath.replace(/\/+$/, '');
+    const itemPath = new RegExp(`^${basePath}/[^/]+$`);
+
+    return page.waitForResponse(
+        (r) => {
+            if (r.request().method() !== method) {
+                return false;
+            }
+            const pathname = new URL(r.url()).pathname.replace(/\/+$/, '');
+            return pathname === basePath || (itemTarget && itemPath.test(pathname));
+        },
+        { timeout: 30000 },
+    );
 }
 
 async function navigateToModule(
@@ -208,7 +225,12 @@ export function generateModuleTests(config: ModuleTestConfig) {
             const confirmButton = page.getByRole('button', {
                 name: /continue|confirm|delete|yes|hapus/i,
             });
-            const responsePromise = waitForApiResponse(page, config.apiPath);
+            const responsePromise = waitForApiResponse(
+                page,
+                config.apiPath,
+                'DELETE',
+                true,
+            );
             await confirmButton.first().click();
             await expectResponseOk(await responsePromise);
 
