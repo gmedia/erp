@@ -129,8 +129,7 @@ const getAssetFormDefaults = (asset?: Asset | null): AssetFormData => {
         ),
         purchase_date: toDateInputValue(asset.purchase_date),
         purchase_cost: asset.purchase_cost || '',
-        currency:
-            asset.currency || getRegionalNumberFormatSettings().currency,
+        currency: asset.currency || getRegionalNumberFormatSettings().currency,
         warranty_end_date: asset.warranty_end_date
             ? toDateInputValue(asset.warranty_end_date)
             : null,

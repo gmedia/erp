@@ -3,7 +3,6 @@
 import { StatusBadgeLabel } from '@/components/common/StatusBadgeLabel';
 import type { TranslatableLabel } from '@/components/common/TranslatedText';
 import { Asset } from '@/types/asset';
-import { FORMAT_LOCALE } from '@/utils/formatters';
 import {
     createActionsColumn,
     createCurrencyColumn,
@@ -12,6 +11,7 @@ import {
     createSortingHeader,
     createTextColumn,
 } from '@/utils/columns';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { ColumnDef } from '@tanstack/react-table';
 import { Link } from 'react-router-dom';
 

@@ -1,7 +1,6 @@
 'use client';
 
 import { PurchaseRequest } from '@/types/purchase-request';
-import { FORMAT_LOCALE } from '@/utils/formatters';
 import {
     createActionsColumn,
     createCurrencyColumn,
@@ -12,6 +11,7 @@ import {
     createStatusBadgeColumn,
     createTextColumn,
 } from '@/utils/columns';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { ColumnDef } from '@tanstack/react-table';
 
 const renderBranchCell = ({ row }: { row: { original: PurchaseRequest } }) => (
