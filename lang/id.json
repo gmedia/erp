@@ -1182,7 +1182,19 @@
         },
         "asset_depreciation_runs": {
             "title": "Penyusutan Aset",
-            "description": "Hitung dan tinjau penyusutan aset. Setelah diverifikasi, posting jumlah yang dihitung ke buku besar."
+            "description": "Hitung dan tinjau penyusutan aset. Setelah diverifikasi, posting jumlah yang dihitung ke buku besar.",
+            "run_calculation": "Jalankan Perhitungan",
+            "col_fiscal_year": "Tahun Fiskal",
+            "col_period": "Periode",
+            "col_lines": "Baris",
+            "col_status": "Keadaan",
+            "col_journal": "Jurnal",
+            "col_created_by": "Dibuat Oleh",
+            "period_to": "s.d.",
+            "lines_count": "{count} Aset",
+            "status_calculated": "Dihitung",
+            "status_posted": "Diposting",
+            "status_void": "Dibatalkan"
         },
         "balance_sheet": {
             "description": "Posisi keuangan pada suatu tanggal: aset, liabilitas, dan ekuitas."

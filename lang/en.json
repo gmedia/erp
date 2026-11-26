@@ -1182,7 +1182,19 @@
         },
         "asset_depreciation_runs": {
             "title": "Asset Depreciation Runs",
-            "description": "Calculate and review asset depreciation. Once verified, post the calculated amounts to the general ledger."
+            "description": "Calculate and review asset depreciation. Once verified, post the calculated amounts to the general ledger.",
+            "run_calculation": "Run Calculation",
+            "col_fiscal_year": "Fiscal Year",
+            "col_period": "Period",
+            "col_lines": "Lines",
+            "col_status": "Status",
+            "col_journal": "Journal",
+            "col_created_by": "Created By",
+            "period_to": "to",
+            "lines_count": "{count} Assets",
+            "status_calculated": "calculated",
+            "status_posted": "posted",
+            "status_void": "void"
         },
         "balance_sheet": {
             "description": "Financial position at a point in time: assets, liabilities, and equity."

@@ -48,6 +48,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function Index() {
     const { t } = useTranslation();
+    const tx = (key: string, fallback: string): string => {
+        const translated = t(key);
+        return translated === key ? fallback : translated;
+    };
     const {
         data,
         meta,
@@ -127,13 +131,17 @@ export default function Index() {
                             {formatDateByRegionalSettings(item.period_start)}
                         </span>
                         <span className="text-xs text-muted-foreground">
-                            to {formatDateByRegionalSettings(item.period_end)}
+                            {tx('page.asset_depreciation_runs.period_to', 'to')}{' '}
+                            {formatDateByRegionalSettings(item.period_end)}
                         </span>
                     </div>
                 </TableCell>
                 <TableCell>
                     <Badge variant="outline">
-                        {item.lines_count || 0} Assets
+                        {tx(
+                            'page.asset_depreciation_runs.lines_count',
+                            '{count} Assets',
+                        ).replace('{count}', String(item.lines_count || 0))}
                     </Badge>
                 </TableCell>
                 <TableCell className="whitespace-nowrap">
@@ -141,7 +149,10 @@ export default function Index() {
                         variant={statusBadgeVariant(item.status)}
                         className="capitalize"
                     >
-                        {item.status}
+                        {tx(
+                            `page.asset_depreciation_runs.status_${item.status}`,
+                            item.status,
+                        )}
                     </Badge>
                 </TableCell>
                 <TableCell>
@@ -234,7 +245,10 @@ export default function Index() {
                 canEdit ? (
                     <Button onClick={() => setIsCalcOpen(true)}>
                         <Calculator className="mr-2 h-4 w-4" />
-                        Run Calculation
+                        {tx(
+                            'page.asset_depreciation_runs.run_calculation',
+                            'Run Calculation',
+                        )}
                     </Button>
                 ) : undefined
             }
@@ -242,14 +256,42 @@ export default function Index() {
             <Table>
                 <TableHeader className="[&_th]:text-muted-foreground">
                     <TableRow>
-                        <TableHead>Fiscal Year</TableHead>
-                        <TableHead>Period</TableHead>
-                        <TableHead>Lines</TableHead>
-                        <TableHead className="whitespace-nowrap">
-                            Status
+                        <TableHead>
+                            {tx(
+                                'page.asset_depreciation_runs.col_fiscal_year',
+                                'Fiscal Year',
+                            )}
                         </TableHead>
-                        <TableHead>Journal</TableHead>
-                        <TableHead>Created By</TableHead>
+                        <TableHead>
+                            {tx(
+                                'page.asset_depreciation_runs.col_period',
+                                'Period',
+                            )}
+                        </TableHead>
+                        <TableHead>
+                            {tx(
+                                'page.asset_depreciation_runs.col_lines',
+                                'Lines',
+                            )}
+                        </TableHead>
+                        <TableHead className="whitespace-nowrap">
+                            {tx(
+                                'page.asset_depreciation_runs.col_status',
+                                'Status',
+                            )}
+                        </TableHead>
+                        <TableHead>
+                            {tx(
+                                'page.asset_depreciation_runs.col_journal',
+                                'Journal',
+                            )}
+                        </TableHead>
+                        <TableHead>
+                            {tx(
+                                'page.asset_depreciation_runs.col_created_by',
+                                'Created By',
+                            )}
+                        </TableHead>
                         <TableHead className="w-[60px] bg-background text-right md:sticky md:right-0 md:z-20">
                             <span className="sr-only">Actions</span>
                         </TableHead>
