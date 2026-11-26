@@ -45,6 +45,7 @@ test('Departments memuat tabel dengan data', async () => {
   const [device] = await android.devices();
   expect(device, 'emulator/device tidak terdeteksi').toBeDefined();
 
+  await device.shell('logcat -c');
   const session = await launchApp(device);
   try {
     const instrument = (p: import('@playwright/test').Page, tag: string) => {
@@ -64,37 +65,49 @@ test('Departments memuat tabel dengan data', async () => {
 
     await loginInWebView(session);
     await new Promise((resolve) => setTimeout(resolve, 10000));
-    const probe = await currentPage(session);
-    logEvent(`post-login isClosed=${probe.isClosed()} url=${probe.url()} webViews=${device.webViews().length}`);
+    logEvent(`post-login webViews=${device.webViews().length}`);
 
-    const page = await currentPage(session);
-    await expect(page).toHaveURL(/\/dashboard/, { timeout: 90000 });
-    await page.waitForLoadState('networkidle');
-    await page.screenshot({ path: '/tmp/opencode/547-webview-before-nav.png' });
+    await expect
+      .poll(async () => (await currentPage(session)).url(), { timeout: 90000 })
+      .toMatch(/\/dashboard/);
+    await (await currentPage(session)).waitForLoadState('networkidle');
 
     // Router aplikasi memakai BrowserRouter: pushState + popstate memicu navigasi React Router
     // tanpa reload WebView (reload memutus page dan memicu error "context has been closed").
-    const activePage = await currentPage(session);
-    const [departmentsResponse] = await Promise.all([
-      activePage.waitForResponse(
-        (r) =>
-          new URL(r.url()).pathname === '/api/departments' &&
-          r.request().method() === 'GET' &&
-          r.status() === 200,
-        { timeout: 60000 },
-      ),
-      activePage.evaluate(() => {
-        window.history.pushState({}, '', '/departments');
-        window.dispatchEvent(new PopStateEvent('popstate'));
-      }),
-    ]);
-    expect(departmentsResponse.ok()).toBe(true);
+    await expect
+      .poll(
+        async () => {
+          const navPage = await currentPage(session);
+          const [response] = await Promise.all([
+            navPage
+              .waitForResponse(
+                (r) =>
+                  new URL(r.url()).pathname === '/api/departments' &&
+                  r.request().method() === 'GET' &&
+                  r.status() === 200,
+                { timeout: 20000 },
+              )
+              .catch(() => null),
+            navPage
+              .evaluate(() => {
+                window.history.pushState({}, '', '/departments');
+                window.dispatchEvent(new PopStateEvent('popstate'));
+              })
+              .catch(() => null),
+          ]);
+          return response !== null;
+        },
+        { timeout: 90000 },
+      )
+      .toBe(true);
 
     const rows = (await currentPage(session)).locator('table tbody tr');
     await expect(rows.first()).toBeVisible({ timeout: 60000 });
     expect(await rows.count()).toBeGreaterThan(0);
   } finally {
-    const logcat = (await device.shell('logcat -d')).toString();
+    const full = (await device.shell('logcat -d -b all -v time')).toString();
+    writeFileSync('/tmp/opencode/547-logcat-full.txt', full);
+    const logcat = full;
     writeFileSync(
       '/tmp/opencode/547-logcat.txt',
       logcat

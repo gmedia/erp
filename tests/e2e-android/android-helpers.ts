@@ -8,6 +8,7 @@ type Device = Awaited<ReturnType<typeof android.devices>>[number];
 type WebView = Awaited<ReturnType<Device['webView']>>;
 
 export interface AppSession {
+  device: Device;
   webview: WebView;
   page: Page;
 }
@@ -23,11 +24,21 @@ export async function launchApp(device: Device): Promise<AppSession> {
   await device.shell(`am start -n ${APP_PKG}/.MainActivity`);
   const webview = await device.webView({ pkg: APP_PKG });
   const page = await webview.page();
-  return { webview, page };
+  return { device, webview, page };
 }
 
+// Activity bisa dibuat ulang oleh sistem (ThemeOverlayApplier mengubah asset paths di emulator);
+// WebView lama lalu tertutup, sehingga WebView baru diambil sekali di sini.
 export async function currentPage(session: AppSession): Promise<Page> {
-  session.page = await session.webview.page();
+  if (session.page.isClosed()) {
+    await expect
+      .poll(async () => {
+        session.webview = await session.device.webView({ pkg: APP_PKG });
+        session.page = await session.webview.page();
+        return session.page.url().startsWith('https://localhost');
+      }, { timeout: 60000 })
+      .toBe(true);
+  }
   return session.page;
 }
 
