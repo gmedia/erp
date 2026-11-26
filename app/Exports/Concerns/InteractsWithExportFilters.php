@@ -10,6 +10,14 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 trait InteractsWithExportFilters
 {
     /**
+     * Kolom urutan default ekspor bila pengguna tidak memilih sort (mis. tanggal, nomor dokumen).
+     * Export yang butuh urutan wajar meng-override properti ini; default kosong = hanya id.
+     *
+     * @var array<int, string>
+     */
+    protected array $defaultSortColumns = [];
+
+    /**
      * @return array<int, array<string, array<string, bool>>>
      */
     public function styles(Worksheet $sheet)
@@ -117,7 +125,7 @@ trait InteractsWithExportFilters
         }
 
         // Tanpa sort valid dari filter: urutan default deterministik (kolom default, lalu id).
-        $defaults = $this->defaultSortColumns();
+        $defaults = $this->defaultSortColumns;
 
         if ($defaults === []) {
             if (in_array('created_at', $allowedSortColumns, true)) {
@@ -132,17 +140,6 @@ trait InteractsWithExportFilters
         }
 
         $query->orderBy($query->getModel()->getQualifiedKeyName(), 'asc');
-    }
-
-    /**
-     * Kolom urutan default ekspor bila pengguna tidak memilih sort (mis. nomor dokumen, tanggal).
-     * Export yang butuh urutan wajar meng-override; default kosong = hanya id.
-     *
-     * @return array<int, string>
-     */
-    protected function defaultSortColumns(): array
-    {
-        return [];
     }
 
     /**
