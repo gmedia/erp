@@ -95,8 +95,7 @@ const getApPaymentFormDefaults = (
             ? String(apPayment.bank_account.id)
             : '',
         currency:
-            apPayment.currency ||
-            getRegionalNumberFormatSettings().currency,
+            apPayment.currency || getRegionalNumberFormatSettings().currency,
         total_amount: Number(apPayment.total_amount || 0),
         reference: apPayment.reference || '',
         status: apPayment.status,

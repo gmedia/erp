@@ -79,8 +79,7 @@ const getArReceiptFormDefaults = (
             ? String(arReceipt.bank_account.id)
             : '',
         currency:
-            arReceipt.currency ||
-            getRegionalNumberFormatSettings().currency,
+            arReceipt.currency || getRegionalNumberFormatSettings().currency,
         total_amount: Number(arReceipt.total_amount || 0),
         reference: arReceipt.reference || '',
         status: arReceipt.status,

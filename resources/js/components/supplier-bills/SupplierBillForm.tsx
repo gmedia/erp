@@ -123,8 +123,7 @@ const getSupplierBillFormDefaults = (
             : toDateInputValue(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)),
         payment_terms: supplierBill.payment_terms || '',
         currency:
-            supplierBill.currency ||
-            getRegionalNumberFormatSettings().currency,
+            supplierBill.currency || getRegionalNumberFormatSettings().currency,
         status: supplierBill.status,
         notes: supplierBill.notes || '',
         items: (supplierBill.items || []).length
