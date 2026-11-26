@@ -1,7 +1,9 @@
 'use client';
 
+import { useOptionalTranslation } from '@/contexts/i18n-context';
 import axios from '@/lib/axios';
 import { handleApiError, type ApiError } from '@/utils/errorHandling';
+import { translateOr } from '@/utils/i18nFallback';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -36,6 +38,10 @@ export function useCrudMutations<Entity, FormData>({
     onError,
 }: UseCrudMutationsOptions): UseCrudMutationsResult<Entity, FormData> {
     const queryClient = useQueryClient();
+    const { t } = useOptionalTranslation();
+    const entity = { entity: entityName };
+    const tToast = (key: string, fallback: string) =>
+        translateOr(t, `crud_toast.${key}`, fallback, entity);
 
     const createMutation = useMutation<Entity, Error, FormData>({
         mutationFn: async (data: FormData) => {
@@ -44,13 +50,15 @@ export function useCrudMutations<Entity, FormData>({
         },
         onSuccess: () => {
             void queryClient.invalidateQueries({ queryKey });
-            toast.success(`${entityName} created successfully`);
+            toast.success(
+                tToast('created', `${entityName} created successfully`),
+            );
             onSuccess?.();
         },
         onError: (error) => {
             const parsedError = handleApiError(
                 error,
-                `Failed to create ${entityName}`,
+                tToast('create_failed', `Failed to create ${entityName}`),
             );
             onError?.(parsedError);
         },
@@ -74,13 +82,15 @@ export function useCrudMutations<Entity, FormData>({
         },
         onSuccess: () => {
             void queryClient.invalidateQueries({ queryKey });
-            toast.success(`${entityName} updated successfully`);
+            toast.success(
+                tToast('updated', `${entityName} updated successfully`),
+            );
             onSuccess?.();
         },
         onError: (error) => {
             const parsedError = handleApiError(
                 error,
-                `Failed to update ${entityName}`,
+                tToast('update_failed', `Failed to update ${entityName}`),
             );
             onError?.(parsedError);
         },
@@ -92,13 +102,15 @@ export function useCrudMutations<Entity, FormData>({
         },
         onSuccess: () => {
             void queryClient.invalidateQueries({ queryKey });
-            toast.success(`${entityName} deleted successfully`);
+            toast.success(
+                tToast('deleted', `${entityName} deleted successfully`),
+            );
             onSuccess?.();
         },
         onError: (error) => {
             const parsedError = handleApiError(
                 error,
-                `Failed to delete ${entityName}`,
+                tToast('delete_failed', `Failed to delete ${entityName}`),
             );
             onError?.(parsedError);
         },

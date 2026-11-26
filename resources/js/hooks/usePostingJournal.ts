@@ -3,6 +3,7 @@
 import { useCrudQuery } from '@/hooks/useCrudQuery';
 import axiosInstance from '@/lib/axios';
 import { JournalEntry } from '@/types/journal-entry';
+import { useHookToast } from '@/utils/i18nFallback';
 import { useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { useEffect, useMemo, useState } from 'react';
@@ -12,6 +13,7 @@ type CheckboxCheckedState = boolean | 'indeterminate';
 
 export function usePostingJournal() {
     const queryClient = useQueryClient();
+    const tToast = useHookToast();
 
     const [pagination, setPagination] = useState({ page: 1, per_page: 15 });
     const [filters, setFilters] = useState<Record<string, string | undefined>>(
@@ -98,10 +100,13 @@ export function usePostingJournal() {
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
                 const message =
-                    error.response?.data?.message || 'Failed to post journals';
+                    error.response?.data?.message ||
+                    tToast('post_journals_failed', 'Failed to post journals');
                 toast.error(message);
             } else {
-                toast.error('An unexpected error occurred');
+                toast.error(
+                    tToast('unexpected_error', 'An unexpected error occurred'),
+                );
             }
         } finally {
             setIsPosting(false);

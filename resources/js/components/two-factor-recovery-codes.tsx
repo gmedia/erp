@@ -7,6 +7,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import axios from '@/lib/axios';
+import { useToastTranslator } from '@/utils/i18nFallback';
 import {
     Eye,
     EyeOff,
@@ -31,6 +32,7 @@ export default function TwoFactorRecoveryCodes({
 }: Readonly<TwoFactorRecoveryCodesProps>) {
     const [codesAreVisible, setCodesAreVisible] = useState<boolean>(false);
     const [processing, setProcessing] = useState(false);
+    const tToast = useToastTranslator('page_toast');
     const codesSectionRef = useRef<HTMLDivElement | null>(null);
     const canRegenerateCodes = recoveryCodesList.length > 0 && codesAreVisible;
 
@@ -63,9 +65,19 @@ export default function TwoFactorRecoveryCodes({
         try {
             await axios.post('/user/two-factor-recovery-codes');
             await fetchRecoveryCodes();
-            toast.success('Recovery codes regenerated successfully.');
+            toast.success(
+                tToast(
+                    'recovery_codes_regenerated',
+                    'Recovery codes regenerated successfully.',
+                ),
+            );
         } catch {
-            toast.error('Failed to regenerate recovery codes.');
+            toast.error(
+                tToast(
+                    'recovery_codes_regenerate_failed',
+                    'Failed to regenerate recovery codes.',
+                ),
+            );
         } finally {
             setProcessing(false);
         }

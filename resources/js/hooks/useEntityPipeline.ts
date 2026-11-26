@@ -1,4 +1,5 @@
 import axiosInstance from '@/lib/axios';
+import { useHookToast } from '@/utils/i18nFallback';
 import axios from 'axios';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
@@ -54,6 +55,7 @@ export function useEntityPipeline(
     const [loading, setLoading] = useState(false);
     const [timelineLoading, setTimelineLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const tToast = useHookToast();
 
     const fetchState = useCallback(async () => {
         setLoading(true);
@@ -69,20 +71,25 @@ export function useEntityPipeline(
                     err.response?.status !== 404 &&
                     err.response?.status !== 400
                 ) {
-                    setError(
-                        err.response?.data?.message ||
-                            'Failed to fetch entity state',
+                    const fetchFailed = tToast(
+                        'entity_state_fetch_failed',
+                        'Failed to fetch entity state',
                     );
-                    toast.error('Failed to fetch entity state');
+                    setError(err.response?.data?.message || fetchFailed);
+                    toast.error(fetchFailed);
                 }
             } else {
-                setError('An unexpected error occurred');
-                toast.error('An unexpected error occurred');
+                const unexpected = tToast(
+                    'unexpected_error',
+                    'An unexpected error occurred',
+                );
+                setError(unexpected);
+                toast.error(unexpected);
             }
         } finally {
             setLoading(false);
         }
-    }, [entityType, entityId]);
+    }, [entityType, entityId, tToast]);
 
     const fetchTimeline = useCallback(
         async (page = 1) => {
@@ -100,14 +107,19 @@ export function useEntityPipeline(
                         err.response?.status !== 404 &&
                         err.response?.status !== 400
                     ) {
-                        toast.error('Failed to fetch timeline');
+                        toast.error(
+                            tToast(
+                                'timeline_fetch_failed',
+                                'Failed to fetch timeline',
+                            ),
+                        );
                     }
                 }
             } finally {
                 setTimelineLoading(false);
             }
         },
-        [entityType, entityId],
+        [entityType, entityId, tToast],
     );
 
     const executeTransition = async (
@@ -132,10 +144,12 @@ export function useEntityPipeline(
                 const message =
                     err.response?.data?.message ||
                     err.response?.data?.errors?.guards?.[0] ||
-                    'Transition failed';
+                    tToast('transition_failed', 'Transition failed');
                 toast.error(message);
             } else {
-                toast.error('An unexpected error occurred');
+                toast.error(
+                    tToast('unexpected_error', 'An unexpected error occurred'),
+                );
             }
             return false;
         } finally {

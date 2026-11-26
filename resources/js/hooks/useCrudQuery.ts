@@ -1,7 +1,9 @@
 'use client';
 
+import { useOptionalTranslation } from '@/contexts/i18n-context';
 import axios from '@/lib/axios';
 import { handleApiError } from '@/utils/errorHandling';
+import { translateOr } from '@/utils/i18nFallback';
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 
 export interface PaginationState {
@@ -84,6 +86,7 @@ export function useCrudQuery<Entity>({
     filters = {},
     enabled = true,
 }: UseCrudQueryOptions): UseCrudQueryReturn<Entity> {
+    const { t } = useOptionalTranslation();
     const query = useQuery<ApiResponse<Entity>, Error>({
         queryKey: [...queryKey, pagination, filters],
         queryFn: async () => {
@@ -114,7 +117,15 @@ export function useCrudQuery<Entity>({
                           ),
                       };
             } catch (error) {
-                handleApiError(error, `Failed to load ${entityName}`);
+                handleApiError(
+                    error,
+                    translateOr(
+                        t,
+                        'crud_toast.load_failed',
+                        `Failed to load ${entityName}`,
+                        { entity: entityName },
+                    ),
+                );
                 return {
                     data: [],
                     meta: normalizeMeta(
