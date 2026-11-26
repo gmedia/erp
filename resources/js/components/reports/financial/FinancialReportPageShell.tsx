@@ -61,6 +61,8 @@ type FinancialReportPageShellProps = {
     onComparisonChange: (value: string) => void;
     branchId?: string | null;
     onBranchChange?: (value: string) => void;
+    departmentId?: string | null;
+    onDepartmentChange?: (value: string) => void;
     headerMeta?: ReactNode;
     headerActions?: ReactNode;
     isLoading?: boolean;
@@ -91,6 +93,7 @@ export function useComparisonReportSearchParams() {
     const urlYearId = searchParams.get('fiscal_year_id');
     const urlComparisonId = searchParams.get('comparison_year_id');
     const urlBranchId = searchParams.get('branch_id');
+    const urlDepartmentId = searchParams.get('department_id');
 
     const handleYearChange = (value: string) => {
         const params: Record<string, string> = { fiscal_year_id: value };
@@ -101,6 +104,10 @@ export function useComparisonReportSearchParams() {
 
         if (urlBranchId) {
             params.branch_id = urlBranchId;
+        }
+
+        if (urlDepartmentId) {
+            params.department_id = urlDepartmentId;
         }
 
         setSearchParams(params);
@@ -119,6 +126,10 @@ export function useComparisonReportSearchParams() {
             params.branch_id = urlBranchId;
         }
 
+        if (urlDepartmentId) {
+            params.department_id = urlDepartmentId;
+        }
+
         setSearchParams(params);
     };
 
@@ -135,6 +146,30 @@ export function useComparisonReportSearchParams() {
             params.branch_id = value;
         }
 
+        if (urlDepartmentId) {
+            params.department_id = urlDepartmentId;
+        }
+
+        setSearchParams(params);
+    };
+
+    const handleDepartmentChange = (value: string, selectedYearId: number) => {
+        const params: Record<string, string> = {
+            fiscal_year_id: String(selectedYearId),
+        };
+
+        if (urlComparisonId) {
+            params.comparison_year_id = urlComparisonId;
+        }
+
+        if (urlBranchId) {
+            params.branch_id = urlBranchId;
+        }
+
+        if (value) {
+            params.department_id = value;
+        }
+
         setSearchParams(params);
     };
 
@@ -142,9 +177,11 @@ export function useComparisonReportSearchParams() {
         urlYearId,
         urlComparisonId,
         urlBranchId,
+        urlDepartmentId,
         handleYearChange,
         handleComparisonChange,
         handleBranchChange,
+        handleDepartmentChange,
     };
 }
 
@@ -154,9 +191,16 @@ export function useComparisonFinancialReportQuery<TReport>(
     urlYearId: string | null,
     urlComparisonId: string | null,
     urlBranchId: string | null,
+    urlDepartmentId: string | null = null,
 ) {
     return useQuery<ComparisonReportResponse<TReport>>({
-        queryKey: [queryKey, urlYearId, urlComparisonId, urlBranchId],
+        queryKey: [
+            queryKey,
+            urlYearId,
+            urlComparisonId,
+            urlBranchId,
+            urlDepartmentId,
+        ],
         queryFn: async () => {
             const params = new URLSearchParams();
 
@@ -170,6 +214,10 @@ export function useComparisonFinancialReportQuery<TReport>(
 
             if (urlBranchId) {
                 params.append('branch_id', urlBranchId);
+            }
+
+            if (urlDepartmentId) {
+                params.append('department_id', urlDepartmentId);
             }
 
             const response = await axios.get(
@@ -203,9 +251,11 @@ export function useComparisonFinancialReportPage<TReport>({
         urlYearId,
         urlComparisonId,
         urlBranchId,
+        urlDepartmentId,
         handleYearChange,
         handleComparisonChange,
         handleBranchChange,
+        handleDepartmentChange,
     } = useComparisonReportSearchParams();
 
     const { data, isLoading, error } =
@@ -215,6 +265,7 @@ export function useComparisonFinancialReportPage<TReport>({
             urlYearId,
             urlComparisonId,
             urlBranchId,
+            urlDepartmentId,
         );
 
     const fiscalYears = data?.fiscalYears || [];
@@ -234,6 +285,7 @@ export function useComparisonFinancialReportPage<TReport>({
         selectedYearId,
         comparisonYearId,
         branchId: urlBranchId,
+        departmentId: urlDepartmentId,
         report,
         computedSections,
         selectedFiscalYear,
@@ -241,6 +293,7 @@ export function useComparisonFinancialReportPage<TReport>({
         handleYearChange,
         handleComparisonChange,
         handleBranchChange,
+        handleDepartmentChange,
         isLoading,
         error,
     };
@@ -295,6 +348,8 @@ export function FinancialReportPageShell({
     onComparisonChange,
     branchId,
     onBranchChange,
+    departmentId,
+    onDepartmentChange,
     headerMeta,
     headerActions,
     isLoading = false,
@@ -458,6 +513,41 @@ export function FinancialReportPageShell({
                                             t,
                                             'column.branch',
                                             'Branch',
+                                        )}
+                                    />
+                                </div>
+                            )}
+                            {onDepartmentChange && (
+                                <div className="flex w-full flex-col gap-1 sm:w-[200px]">
+                                    <span className="text-xs font-medium text-muted-foreground">
+                                        <LabelText
+                                            label={{
+                                                key: 'column.department',
+                                                fallback: 'Department',
+                                            }}
+                                        />
+                                    </span>
+                                    <AsyncSelect
+                                        url="/api/departments"
+                                        placeholder={translateOr(
+                                            t,
+                                            'column.all_departments',
+                                            'All Departments',
+                                        )}
+                                        value={departmentId ?? ''}
+                                        onValueChange={onDepartmentChange}
+                                        leadingOption={{
+                                            value: 'none',
+                                            label: translateOr(
+                                                t,
+                                                'column.without_department',
+                                                'Without Department',
+                                            ),
+                                        }}
+                                        label={translateOr(
+                                            t,
+                                            'column.department',
+                                            'Department',
                                         )}
                                     />
                                 </div>
