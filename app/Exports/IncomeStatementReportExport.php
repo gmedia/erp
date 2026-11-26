@@ -14,6 +14,8 @@ class IncomeStatementReportExport extends AbstractFinancialReportExport
             $this->resolveFiscalYearId(),
             $this->resolveComparisonYearId(),
             $this->resolveBranchId(),
+            $this->resolveDepartmentId(),
+            withoutDepartment: $this->resolveWithoutDepartment(),
         );
 
         $rows = [];
