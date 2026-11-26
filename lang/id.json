@@ -2765,5 +2765,14 @@
         "calculate_failed": "Gagal menghitung penyusutan",
         "post_failed": "Gagal memposting ke jurnal",
         "void_failed": "Gagal membatalkan proses penyusutan"
+    },
+    "crud_toast": {
+        "created": "{entity} berhasil dibuat",
+        "updated": "{entity} berhasil diperbarui",
+        "deleted": "{entity} berhasil dihapus",
+        "create_failed": "Gagal membuat {entity}",
+        "update_failed": "Gagal memperbarui {entity}",
+        "delete_failed": "Gagal menghapus {entity}",
+        "load_failed": "Gagal memuat {entity}"
     }
 }

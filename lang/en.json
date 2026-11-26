@@ -2762,5 +2762,14 @@
         "calculate_failed": "Failed to calculate depreciation",
         "post_failed": "Failed to post to journal",
         "void_failed": "Failed to void depreciation run"
+    },
+    "crud_toast": {
+        "created": "{entity} created successfully",
+        "updated": "{entity} updated successfully",
+        "deleted": "{entity} deleted successfully",
+        "create_failed": "Failed to create {entity}",
+        "update_failed": "Failed to update {entity}",
+        "delete_failed": "Failed to delete {entity}",
+        "load_failed": "Failed to load {entity}"
     }
 }
