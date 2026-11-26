@@ -2844,6 +2844,13 @@
         "recovery_codes_regenerated": "Recovery codes regenerated successfully.",
         "recovery_codes_regenerate_failed": "Failed to regenerate recovery codes."
     },
+    "auth_toast": {
+        "generic_retry": "An error occurred. Please try again.",
+        "reset_password_retry": "An error occurred. Please try again later.",
+        "verification_link_sent": "Verification link sent",
+        "verification_link_failed": "Failed to send verification link.",
+        "logout_failed": "Failed to log out."
+    },
     "settings_toast": {
         "password_updated": "Password updated successfully",
         "password_update_failed": "An error occurred. Please try again later.",

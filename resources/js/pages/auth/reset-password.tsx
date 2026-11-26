@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
 import { mapFirstValidationErrors } from '@/utils/errorHandling';
+import { useToastTranslator } from '@/utils/i18nFallback';
 
 interface ResetPasswordProps {
     token?: string;
@@ -22,6 +23,7 @@ export default function ResetPassword({
     email,
 }: Readonly<ResetPasswordProps>) {
     const navigate = useNavigate();
+    const tToast = useToastTranslator('auth_toast');
     const [searchParams] = useSearchParams();
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -56,7 +58,12 @@ export default function ResetPassword({
             if (Object.keys(formattedErrors).length > 0) {
                 setErrors(formattedErrors);
             } else {
-                toast.error('An error occurred. Please try again later.');
+                toast.error(
+                    tToast(
+                        'reset_password_retry',
+                        'An error occurred. Please try again later.',
+                    ),
+                );
             }
         } finally {
             setProcessing(false);

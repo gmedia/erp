@@ -2847,6 +2847,13 @@
         "recovery_codes_regenerated": "Kode pemulihan berhasil dibuat ulang.",
         "recovery_codes_regenerate_failed": "Gagal membuat ulang kode pemulihan."
     },
+    "auth_toast": {
+        "generic_retry": "Terjadi kesalahan. Silakan coba lagi.",
+        "reset_password_retry": "Terjadi kesalahan. Silakan coba lagi nanti.",
+        "verification_link_sent": "Tautan verifikasi telah dikirim",
+        "verification_link_failed": "Gagal mengirim tautan verifikasi.",
+        "logout_failed": "Gagal keluar."
+    },
     "settings_toast": {
         "password_updated": "Kata sandi berhasil diperbarui",
         "password_update_failed": "Terjadi kesalahan. Silakan coba lagi nanti.",
