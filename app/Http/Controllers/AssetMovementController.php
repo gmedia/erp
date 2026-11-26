@@ -110,7 +110,7 @@ class AssetMovementController extends Controller
                 }
 
                 return response()->json([
-                    'message' => 'Movement recorded successfully',
+                    'message' => __('asset_api.movement_recorded'),
                     'data' => new AssetMovementResource($movement->load([
                         'fromBranch', 'toBranch', 'fromLocation', 'toLocation',
                         'fromDepartment', 'toDepartment', 'fromEmployee', 'toEmployee', 'createdBy',
@@ -179,7 +179,7 @@ class AssetMovementController extends Controller
         }
 
         return response()->json([
-            'message' => 'Movement updated successfully',
+            'message' => __('asset_api.movement_updated'),
             'data' => new AssetMovementResource($asset_movement->load([
                 'asset', 'fromBranch', 'toBranch', 'fromLocation', 'toLocation',
                 'fromDepartment', 'toDepartment', 'fromEmployee', 'toEmployee', 'createdBy',
@@ -261,7 +261,7 @@ class AssetMovementController extends Controller
             }
 
             return response()->json([
-                'message' => 'Movement deleted successfully',
+                'message' => __('asset_api.movement_deleted'),
             ]);
         });
     }

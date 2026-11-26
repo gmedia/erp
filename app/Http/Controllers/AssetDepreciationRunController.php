@@ -31,7 +31,7 @@ class AssetDepreciationRunController extends Controller
         $run = $action->execute($request->validated());
 
         return response()->json([
-            'message' => 'Depreciation calculated successfully.',
+            'message' => __('asset_api.depreciation_calculated'),
             'run' => new AssetDepreciationRunResource($run),
         ]);
     }
@@ -52,7 +52,7 @@ class AssetDepreciationRunController extends Controller
         $action->execute($assetDepreciationRun);
 
         return response()->json([
-            'message' => 'Depreciation successfully posted to journal.',
+            'message' => __('asset_api.depreciation_posted'),
             'run' => new AssetDepreciationRunResource($assetDepreciationRun->fresh()),
         ]);
     }
