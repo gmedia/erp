@@ -40,13 +40,13 @@ export function createStockMonitorColumns(): ColumnDef<StockMonitorItem>[] {
             header: { key: 'column.product', fallback: 'Product' },
             getPrimary: (item) => item.product?.name,
             getSecondary: (item) => item.product?.code,
-            className: 'max-w-56',
+            className: 'max-w-44',
         }),
         createReportTextColumn<StockMonitorItem>({
             id: 'category_name',
             header: { key: 'column.category', fallback: 'Category' },
             getValue: (item) => item.product?.category?.name,
-            className: 'max-w-32',
+            className: 'max-w-40',
         }),
         createReportWarehouseColumn<StockMonitorItem>({
             id: 'warehouse_name',

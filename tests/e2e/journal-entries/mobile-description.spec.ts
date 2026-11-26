@@ -85,5 +85,21 @@ test.describe('Journal Entries mobile Description column (#504)', () => {
                 Math.abs(actionsBox.x + actionsBox.width - containerRight),
             ).toBeLessThanOrEqual(1);
         }
+
+        await page
+            .locator('[data-slot="table-container"]')
+            .first()
+            .locator('> div')
+            .first()
+            .evaluate((el: HTMLElement) => {
+                el.scrollLeft = el.scrollWidth;
+            });
+        const endActions = await actionsCell.boundingBox();
+        expect(endActions).not.toBeNull();
+        if (endActions) {
+            expect(
+                Math.abs(endActions.x + endActions.width - containerRight),
+            ).toBeLessThanOrEqual(1);
+        }
     });
 });
