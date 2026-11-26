@@ -9,23 +9,31 @@ test('Departments memuat tabel dengan data', async () => {
   expect(device, 'emulator/device tidak terdeteksi').toBeDefined();
 
   try {
-    const page = await openAppWebView(device);
-    await loginInWebView(page);
+    const loginPage = await openAppWebView(device);
+    await loginInWebView(loginPage);
 
+    // Page dari fase login bisa sudah tertutup setelah redirect ke dashboard;
+    // ambil ulang WebView aktif agar navigasi dan asersi memakai page yang hidup.
+    const webview = await device.webView({ pkg: APP_PKG });
+    const page = await webview.page();
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page).toHaveURL(/\/dashboard/, { timeout: 90000 });
     await page.waitForLoadState('networkidle');
     await page.screenshot({ path: '/tmp/opencode/547-webview-before-nav.png', fullPage: true });
-    const departmentsResponse = page.waitForResponse(
-      (r) =>
-        r.url().includes('/api/departments') &&
-        r.request().method() === 'GET' &&
-        r.status() === 200,
-      { timeout: 90000 },
-    );
-    await page.evaluate(() => {
-      window.history.pushState({}, '', '/departments');
-      window.dispatchEvent(new PopStateEvent('popstate'));
-    });
-    expect((await departmentsResponse).ok()).toBe(true);
+    const [departmentsResponse] = await Promise.all([
+      page.waitForResponse(
+        (r) =>
+          r.url().includes('/api/departments') &&
+          r.request().method() === 'GET' &&
+          r.status() === 200,
+        { timeout: 90000 },
+      ),
+      page.evaluate(() => {
+        window.history.pushState({}, '', '/departments');
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      }),
+    ]);
+    expect(departmentsResponse.ok()).toBe(true);
 
     const rows = page.locator('table tbody tr');
     await expect(rows.first()).toBeVisible({ timeout: 60000 });
