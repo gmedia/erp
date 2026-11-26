@@ -1,4 +1,3 @@
-import { FORMAT_LOCALE } from '@/utils/formatters';
 import { ViewField } from '@/components/common/ViewField';
 import {
     ViewModalItemsTable,
@@ -7,6 +6,7 @@ import {
 import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import React from 'react';
 
 import {

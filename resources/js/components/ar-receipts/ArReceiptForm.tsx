@@ -1,5 +1,4 @@
 'use client';
-import { FORMAT_LOCALE } from '@/utils/formatters';
 import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
@@ -25,6 +24,7 @@ import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type ArReceipt, type ArReceiptFormData } from '@/types/ar-receipt';
 import { toDateInputValue } from '@/utils/date-format';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import {
     formatCurrencyByRegionalSettings,
     getRegionalNumberFormatSettings,
