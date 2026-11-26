@@ -2682,5 +2682,21 @@
         "save": "Save",
         "update": "Update",
         "cancel": "Cancel"
+    },
+    "dashboard": {
+        "total_customers": "Total Customers",
+        "total_employees": "Total Employees",
+        "total_suppliers": "Total Suppliers",
+        "total_assets": "Total Assets",
+        "shortcuts": "Shortcuts",
+        "shortcut_my_approvals_description": "Review pending requests",
+        "shortcut_purchase_orders_description": "Open the PO list",
+        "shortcut_stock_monitor_description": "On-hand quantity by warehouse",
+        "master_data_mix": "Master data mix",
+        "customers": "Customers",
+        "employees": "Employees",
+        "suppliers": "Suppliers",
+        "assets": "Assets",
+        "mix_footer": "Operational counts only. Financial KPIs stay on Financial Dashboard."
     }
 }

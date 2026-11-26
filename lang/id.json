@@ -2682,5 +2682,21 @@
         "save": "Simpan",
         "update": "Perbarui",
         "cancel": "Batal"
+    },
+    "dashboard": {
+        "total_customers": "Total Pelanggan",
+        "total_employees": "Total Karyawan",
+        "total_suppliers": "Total Pemasok",
+        "total_assets": "Total Aset",
+        "shortcuts": "Pintasan",
+        "shortcut_my_approvals_description": "Tinjau permintaan yang menunggu",
+        "shortcut_purchase_orders_description": "Buka daftar PO",
+        "shortcut_stock_monitor_description": "Stok fisik per gudang",
+        "master_data_mix": "Komposisi data master",
+        "customers": "Pelanggan",
+        "employees": "Karyawan",
+        "suppliers": "Pemasok",
+        "assets": "Aset",
+        "mix_footer": "Hanya jumlah operasional. KPI keuangan ada di Dasbor Keuangan."
     }
 }
