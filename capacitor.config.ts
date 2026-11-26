@@ -10,6 +10,9 @@ const config: CapacitorConfig = {
     appName,
     webDir: 'dist',
     ...(process.env.NODE_ENV !== 'production' ? { loggingBehavior: 'debug' } : {}),
+    ...(process.env.E2E_ANDROID === '1'
+        ? { android: { allowMixedContent: true }, server: { cleartext: true } }
+        : {}),
 };
 
 export default config;
