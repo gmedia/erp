@@ -40,6 +40,14 @@ class CustomerInvoiceExport extends BaseExport implements WithColumnFormatting
     }
 
     /**
+     * @return array<int, string>
+     */
+    protected function defaultSortColumns(): array
+    {
+        return ['invoice_date', 'invoice_number'];
+    }
+
+    /**
      * @return array<string, callable(mixed): mixed>
      */
     protected function columns(): array

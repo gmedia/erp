@@ -107,12 +107,42 @@ trait InteractsWithExportFilters
      */
     protected function applySorting(Builder $query, array $filters, array $allowedSortColumns): void
     {
-        $sortBy = (string) ($filters['sort_by'] ?? 'created_at');
+        $sortBy = (string) ($filters['sort_by'] ?? '');
         $sortDirection = $this->normalizeSortDirection($filters);
 
-        if (in_array($sortBy, $allowedSortColumns)) {
+        if ($sortBy !== '' && in_array($sortBy, $allowedSortColumns)) {
             $query->orderBy($sortBy, $sortDirection);
+
+            return;
         }
+
+        // Tanpa sort valid dari filter: urutan default deterministik (kolom default, lalu id).
+        $defaults = $this->defaultSortColumns();
+
+        if ($defaults === []) {
+            if (in_array('created_at', $allowedSortColumns, true)) {
+                $query->orderBy('created_at', $sortDirection);
+            }
+
+            return;
+        }
+
+        foreach ($defaults as $column) {
+            $query->orderBy($column, 'asc');
+        }
+
+        $query->orderBy($query->getModel()->getQualifiedKeyName(), 'asc');
+    }
+
+    /**
+     * Kolom urutan default ekspor bila pengguna tidak memilih sort (mis. nomor dokumen, tanggal).
+     * Export yang butuh urutan wajar meng-override; default kosong = hanya id.
+     *
+     * @return array<int, string>
+     */
+    protected function defaultSortColumns(): array
+    {
+        return [];
     }
 
     /**

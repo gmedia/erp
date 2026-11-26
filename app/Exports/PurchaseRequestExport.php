@@ -38,6 +38,14 @@ class PurchaseRequestExport extends BaseExport implements WithColumnFormatting
     }
 
     /**
+     * @return array<int, string>
+     */
+    protected function defaultSortColumns(): array
+    {
+        return ['request_date', 'pr_number'];
+    }
+
+    /**
      * @return array<string, callable(mixed): mixed>
      */
     protected function columns(): array

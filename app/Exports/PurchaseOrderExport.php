@@ -49,6 +49,14 @@ class PurchaseOrderExport extends BaseExport implements WithColumnFormatting
     }
 
     /**
+     * @return array<int, string>
+     */
+    protected function defaultSortColumns(): array
+    {
+        return ['order_date', 'po_number'];
+    }
+
+    /**
      * @return array<string, callable(mixed): mixed>
      */
     protected function columns(): array

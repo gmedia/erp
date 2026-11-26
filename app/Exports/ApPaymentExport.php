@@ -39,6 +39,14 @@ class ApPaymentExport extends BaseExport implements WithColumnFormatting
     }
 
     /**
+     * @return array<int, string>
+     */
+    protected function defaultSortColumns(): array
+    {
+        return ['payment_date', 'payment_number'];
+    }
+
+    /**
      * @return array<string, callable(mixed): mixed>
      */
     protected function columns(): array

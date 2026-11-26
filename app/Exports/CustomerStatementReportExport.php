@@ -31,12 +31,23 @@ class CustomerStatementReportExport extends AbstractReportIndexExport implements
             $row->invoice_number ?? '-',
             $row->invoice_date ?? '-',
             $row->due_date ?? '-',
-            $row->grand_total ?? 0,
-            $row->amount_received ?? 0,
-            $row->credit_note_amount ?? 0,
-            $row->amount_due ?? 0,
+            $this->numericValue($row->grand_total) ?? 0,
+            $this->numericValue($row->amount_received) ?? 0,
+            $this->numericValue($row->credit_note_amount) ?? 0,
+            $this->numericValue($row->amount_due) ?? 0,
             $row->status ?? '-',
-            $row->running_balance ?? 0,
+            $this->numericValue($row->running_balance) ?? 0,
+        ];
+    }
+
+    protected function currencyColumnHeadings(): array
+    {
+        return [
+            'Grand Total',
+            'Amount Received',
+            'Credit Note Amount',
+            'Amount Due',
+            'Running Balance',
         ];
     }
 

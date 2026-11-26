@@ -4,12 +4,14 @@ namespace App\Exports\Concerns;
 
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-abstract class AbstractReportIndexExport implements FromCollection, ShouldAutoSize, WithCustomValueBinder, WithStyles
+abstract class AbstractReportIndexExport implements FromCollection, ShouldAutoSize, WithColumnFormatting, WithCustomValueBinder, WithStyles
 {
+    use ExportsNumberFormats;
     use WritesTextCells;
 
     protected array $filters;
@@ -30,12 +32,27 @@ abstract class AbstractReportIndexExport implements FromCollection, ShouldAutoSi
         return $action->execute($request);
     }
 
+    /**
+     * Laporan mendeklarasikan header lewat headings(), bukan columns().
+     *
+     * @return array<string, string>
+     */
+    public function columnFormats(): array
+    {
+        return $this->buildColumnFormats($this->headings());
+    }
+
     public function styles(Worksheet $sheet): array
     {
         return [
             1 => ['font' => ['bold' => true]],
         ];
     }
+
+    /**
+     * @return array<int, string>
+     */
+    abstract public function headings(): array;
 
     /**
      * @return class-string

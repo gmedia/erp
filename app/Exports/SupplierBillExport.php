@@ -47,6 +47,14 @@ class SupplierBillExport extends BaseExport implements WithColumnFormatting
     }
 
     /**
+     * @return array<int, string>
+     */
+    protected function defaultSortColumns(): array
+    {
+        return ['bill_date', 'bill_number'];
+    }
+
+    /**
      * @return array<string, callable(mixed): mixed>
      */
     protected function columns(): array

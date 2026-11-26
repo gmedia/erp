@@ -41,13 +41,28 @@ class PurchaseHistoryReportExport extends AbstractReportIndexExport implements W
             $row->warehouse_name ?? '-',
             $row->product_code ?? '-',
             $row->product_name ?? '-',
-            $row->ordered_quantity ?? 0,
-            $row->received_quantity ?? 0,
-            $row->outstanding_quantity ?? 0,
+            $this->numericValue($row->ordered_quantity) ?? 0,
+            $this->numericValue($row->received_quantity) ?? 0,
+            $this->numericValue($row->outstanding_quantity) ?? 0,
             $row->receipt_count ?? 0,
             $row->last_receipt_date?->format('Y-m-d') ?? '-',
-            $row->total_purchase_value ?? 0,
+            $this->numericValue($row->total_purchase_value) ?? 0,
         ];
+    }
+
+    protected function numericColumnHeadings(): array
+    {
+        return [
+            'Ordered Quantity',
+            'Received Quantity',
+            'Outstanding Quantity',
+            'Receipt Count',
+        ];
+    }
+
+    protected function currencyColumnHeadings(): array
+    {
+        return ['Total Purchase Value'];
     }
 
     protected function actionClass(): string

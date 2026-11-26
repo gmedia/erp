@@ -27,12 +27,27 @@ class ArAgingReportExport extends AbstractReportIndexExport implements WithHeadi
     public function map($row): array
     {
         return array_merge($this->mapBaseInvoiceColumns($row), [
-            $row->aging_buckets['current'] ?? 0,
-            $row->aging_buckets['1_30'] ?? 0,
-            $row->aging_buckets['31_60'] ?? 0,
-            $row->aging_buckets['61_90'] ?? 0,
-            $row->aging_buckets['over_90'] ?? 0,
+            $this->numericValue($row->aging_buckets['current'] ?? null) ?? 0,
+            $this->numericValue($row->aging_buckets['1_30'] ?? null) ?? 0,
+            $this->numericValue($row->aging_buckets['31_60'] ?? null) ?? 0,
+            $this->numericValue($row->aging_buckets['61_90'] ?? null) ?? 0,
+            $this->numericValue($row->aging_buckets['over_90'] ?? null) ?? 0,
         ]);
+    }
+
+    protected function currencyColumnHeadings(): array
+    {
+        return [
+            'Grand Total',
+            'Amount Received',
+            'Credit Note Amount',
+            'Amount Due',
+            'Current',
+            '1-30 Days',
+            '31-60 Days',
+            '61-90 Days',
+            'Over 90 Days',
+        ];
     }
 
     protected function actionClass(): string

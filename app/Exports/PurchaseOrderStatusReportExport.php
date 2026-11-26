@@ -40,12 +40,28 @@ class PurchaseOrderStatusReportExport extends AbstractReportIndexExport implemen
             $row->status ?? '-',
             $row->status_category ?? '-',
             $row->item_count ?? 0,
-            $row->ordered_quantity ?? 0,
-            $row->received_quantity ?? 0,
-            $row->outstanding_quantity ?? 0,
-            $row->receipt_progress_percent ?? 0,
-            $row->grand_total ?? 0,
+            $this->numericValue($row->ordered_quantity) ?? 0,
+            $this->numericValue($row->received_quantity) ?? 0,
+            $this->numericValue($row->outstanding_quantity) ?? 0,
+            $this->numericValue($row->receipt_progress_percent) ?? 0,
+            $this->numericValue($row->grand_total) ?? 0,
         ];
+    }
+
+    protected function numericColumnHeadings(): array
+    {
+        return [
+            'Item Count',
+            'Ordered Quantity',
+            'Received Quantity',
+            'Outstanding Quantity',
+            'Receipt Progress (%)',
+        ];
+    }
+
+    protected function currencyColumnHeadings(): array
+    {
+        return ['Grand Total'];
     }
 
     protected function actionClass(): string
