@@ -2710,5 +2710,15 @@
         "suppliers": "Suppliers",
         "assets": "Assets",
         "mix_footer": "Operational counts only. Financial KPIs stay on Financial Dashboard."
+    },
+    "api_error": {
+        "network": "Network connection failed. Please check your internet connection.",
+        "invalid_request": "Invalid request data.",
+        "unauthorized": "Authentication required. Please log in again.",
+        "forbidden": "You do not have permission to perform this action.",
+        "not_found": "The requested resource was not found.",
+        "validation_failed": "Validation failed.",
+        "server": "Server error. Please try again later.",
+        "unexpected": "An unexpected error occurred."
     }
 }

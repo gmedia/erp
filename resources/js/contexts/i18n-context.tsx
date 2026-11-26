@@ -3,11 +3,13 @@
 import { useAuth } from '@/contexts/auth-context';
 import { getStoredLocale, setStoredLocale } from '@/lib/locale-storage';
 import { type Translations } from '@/types/i18n';
+import { registerErrorTranslator } from '@/utils/errorHandling';
 import {
     createContext,
     ReactNode,
     useCallback,
     useContext,
+    useEffect,
     useMemo,
 } from 'react';
 
@@ -290,6 +292,12 @@ export function I18nProvider({
         },
         [translations],
     );
+
+    useEffect(() => {
+        registerErrorTranslator(t);
+
+        return () => registerErrorTranslator(null);
+    }, [t]);
 
     const contextValue = useMemo<I18nContextValue>(
         () => ({

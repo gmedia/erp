@@ -2710,5 +2710,15 @@
         "suppliers": "Pemasok",
         "assets": "Aset",
         "mix_footer": "Hanya jumlah operasional. KPI keuangan ada di Dasbor Keuangan."
+    },
+    "api_error": {
+        "network": "Koneksi jaringan gagal. Periksa koneksi internet Anda.",
+        "invalid_request": "Data permintaan tidak valid.",
+        "unauthorized": "Autentikasi diperlukan. Silakan masuk kembali.",
+        "forbidden": "Anda tidak memiliki izin untuk melakukan tindakan ini.",
+        "not_found": "Sumber daya yang diminta tidak ditemukan.",
+        "validation_failed": "Validasi gagal.",
+        "server": "Kesalahan server. Silakan coba lagi nanti.",
+        "unexpected": "Terjadi kesalahan yang tidak terduga."
     }
 }
