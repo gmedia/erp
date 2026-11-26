@@ -249,7 +249,7 @@ test.describe('Badge status - tone dibedakan', () => {
 });
 
 test.describe('Stock Monitor - header angka dan geser 1440', () => {
-    test('header Qty On Hand, Avg Cost, Stock Value sejajar nilai (<= 2px) dan kolom terakhir punya bayangan', async ({
+    test('header Qty On Hand, Avg Cost, Stock Value sejajar nilai (<= 2px) dan tabel muat tanpa geser', async ({
         page,
     }) => {
         await page.setViewportSize({ width: 1440, height: 900 });
@@ -258,6 +258,11 @@ test.describe('Stock Monitor - header angka dan geser 1440', () => {
         for (const label of ['Qty On Hand', 'Avg Cost', 'Stock Value']) {
             await expectReportNumericHeaderRightAligned(page, label);
         }
-        await expectRightEdgeShadowVisibleWhenOverflowing(page);
+        const fitsWithoutScroll = await page
+            .locator('[data-slot="table-container"]')
+            .first()
+            .locator('xpath=./div')
+            .evaluate((el) => el.scrollWidth <= el.clientWidth + 1);
+        expect(fitsWithoutScroll).toBe(true);
     });
 });
