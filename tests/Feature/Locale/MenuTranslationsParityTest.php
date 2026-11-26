@@ -72,3 +72,17 @@ test('every menu translation key exists in indonesian locale', function () {
     expect(array_diff(array_keys($en), array_keys($id)))->toBe([]);
     expect(array_diff(array_keys($id), array_keys($en)))->toBe([]);
 });
+
+test('asset and inventory stocktake variance menus have distinct indonesian labels', function () {
+    $en = localeMenuTranslations('en.json');
+    $id = localeMenuTranslations('id.json');
+
+    // Teks English tidak berubah dari main.
+    expect($en['stocktake_variance_report'])->toBe('Stocktake Variance')
+        ->and($en['inventory_stocktake_variance_report'])->toBe('Inventory Stocktake Variance');
+
+    // Label id dibedakan agar tidak ganda di sidebar (aset vs persediaan).
+    expect($id['stocktake_variance_report'])->toBe('Laporan Selisih Stock Opname Aset')
+        ->and($id['inventory_stocktake_variance_report'])->toBe('Laporan Selisih Stock Opname Persediaan')
+        ->and($id['stocktake_variance_report'])->not->toBe($id['inventory_stocktake_variance_report']);
+});
