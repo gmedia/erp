@@ -136,6 +136,18 @@ test.describe('Stock Monitor Dashboard', () => {
         expect(edges.containerRight).not.toBeNull();
         expect(edges.cellRight).not.toBeNull();
         expect(edges.cellRight!).toBeLessThanOrEqual(edges.containerRight! + 1);
+
+        await expect(page.locator('[data-slot="table-container"]').first()).not.toHaveAttribute(
+            'data-overflow-right',
+            'true',
+        );
+
+        const categoryWidth = await page.evaluate(() => {
+            const ths = Array.from(document.querySelectorAll('thead th'));
+            const index = ths.findIndex((th) => th.textContent?.includes('Category'));
+            return ths[index]?.getBoundingClientRect().width ?? 0;
+        });
+        expect(categoryWidth).toBeGreaterThanOrEqual(160);
     });
 
     test('petunjuk geser tampil di 390 saat tabel melebihi viewport', async ({ page }) => {

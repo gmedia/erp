@@ -73,4 +73,29 @@ test.describe('AP Aging Report mobile layout (#504)', () => {
         expect(fade.width).toBeGreaterThanOrEqual(16);
         expect(fade.image).not.toBe('none');
     });
+
+    test('last column aligns with container edge after scrolling to end', async ({
+        page,
+    }) => {
+        await openApAgingReport(page);
+
+        const container = page.locator('[data-slot="table-container"]').first();
+        const scroller = container.locator('> div').first();
+        await scroller.evaluate((el: HTMLElement) => {
+            el.scrollLeft = el.scrollWidth;
+        });
+        await expect(container).not.toHaveAttribute('data-overflow-right', 'true');
+
+        const edges = await page.evaluate(() => {
+            const c = document.querySelector(
+                '[data-slot="table-container"]',
+            ) as HTMLElement;
+            const lastTd = c.querySelector('tbody tr td:last-child');
+            return {
+                container: c.getBoundingClientRect().right,
+                cell: lastTd?.getBoundingClientRect().right ?? 0,
+            };
+        });
+        expect(Math.abs(edges.cell - edges.container)).toBeLessThanOrEqual(1);
+    });
 });
