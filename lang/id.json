@@ -2827,6 +2827,7 @@
         "entity_state_fetch_failed": "Gagal memuat status entitas",
         "timeline_fetch_failed": "Gagal memuat linimasa",
         "transition_failed": "Transisi gagal",
+        "transition_successful": "Transisi berhasil",
         "user_fetch_failed": "Gagal memuat data pengguna.",
         "user_saved": "Pengguna berhasil disimpan.",
         "user_validation_failed": "Harap perbaiki kesalahan validasi.",
