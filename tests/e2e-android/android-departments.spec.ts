@@ -11,6 +11,9 @@ test('Departments memuat tabel dengan data', async () => {
     const page = await openAppWebView(device);
     await loginInWebView(page);
 
+    const masterData = page.getByRole('button', { name: 'Master Data' }).first();
+    await masterData.waitFor({ timeout: 90000 });
+    await masterData.click();
     const menu = page.locator('a[href="/departments"]').first();
     await menu.waitFor({ timeout: 60000 });
     const departmentsResponse = page.waitForResponse(
