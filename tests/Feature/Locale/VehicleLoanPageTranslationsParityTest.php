@@ -50,6 +50,7 @@ test('vehicle loan page sources read vehicle_loan_page keys without raw ui text'
         'pages/vehicle-loans/security/index.tsx',
         'components/vehicle-loans/VehicleLoanQrPanel.tsx',
         'components/vehicle-loans/VehicleLoanStatusBadge.tsx',
+        'components/vehicle-loans/VehicleLoanSummaryCard.tsx',
         'utils/vehicle-loan-status.ts',
     ];
 

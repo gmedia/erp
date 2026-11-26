@@ -12,10 +12,10 @@ import {
 } from '@/components/ui/select';
 import { RequiredLabel } from '@/components/vehicle-loans/RequiredLabel';
 import { VehicleLoanQrPanel } from '@/components/vehicle-loans/VehicleLoanQrPanel';
+import { VehicleLoanSummaryCard } from '@/components/vehicle-loans/VehicleLoanSummaryCard';
 import { useVehicleLoanPageText } from '@/components/vehicle-loans/useVehicleLoanPageText';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
-import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import { useToastTranslator } from '@/utils/i18nFallback';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -192,39 +192,7 @@ export default function VehicleLoanPickupPage() {
                             )}
                         </div>
 
-                        {selected && (
-                            <div className="space-y-1 rounded-lg border bg-muted/30 p-3 text-sm">
-                                <p className="font-medium">{selected.code}</p>
-                                <p>
-                                    {tPage('detail.requester', 'Peminjam')}:{' '}
-                                    {selected.requester_name ?? '-'}
-                                </p>
-                                <p>
-                                    {tPage('detail.driver', 'Pengemudi')}:{' '}
-                                    {selected.driver_name ?? '-'}
-                                </p>
-                                <p>
-                                    {tPage('detail.vehicle', 'Kendaraan')}:{' '}
-                                    {selected.plate_number ?? '-'}
-                                </p>
-                                <p>
-                                    {tPage('detail.purpose', 'Tujuan')}:{' '}
-                                    {selected.purpose}
-                                </p>
-                                <p>
-                                    {tPage('detail.start', 'Mulai')}:{' '}
-                                    {formatDateTimeByRegionalSettings(
-                                        selected.start_at,
-                                    )}
-                                </p>
-                                <p>
-                                    {tPage('detail.end', 'Selesai')}:{' '}
-                                    {formatDateTimeByRegionalSettings(
-                                        selected.end_at,
-                                    )}
-                                </p>
-                            </div>
-                        )}
+                        {selected && <VehicleLoanSummaryCard loan={selected} />}
                     </CardContent>
                 </Card>
 
