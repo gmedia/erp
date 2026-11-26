@@ -109,4 +109,48 @@ test.describe('Stock Monitor Dashboard', () => {
             expect(gap!).toBeLessThanOrEqual(12);
         }
     });
+
+    test('kolom Last Movement terlihat utuh di viewport 1440 tanpa keluar kontainer', async ({ page }) => {
+        await page.setViewportSize({ width: 1440, height: 900 });
+        const responsePromise = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/stock-monitor') &&
+                !r.url().includes('export') &&
+                r.request().headers()['accept']?.includes('application/json'),
+        );
+        await page.goto('/stock-monitor');
+        await expectResponseOk(await responsePromise);
+        await expect(page.locator('tbody tr').first()).toBeVisible();
+
+        const edges = await page.evaluate(() => {
+            const container = document.querySelector('[data-slot="table-container"]');
+            const ths = Array.from(document.querySelectorAll('thead th'));
+            const lastTh = ths.find((th) => th.textContent?.includes('Last Movement'));
+            const index = ths.indexOf(lastTh as HTMLTableCellElement);
+            const cell = document.querySelector('tbody tr')?.querySelectorAll('td')[index];
+            return {
+                containerRight: container?.getBoundingClientRect().right ?? null,
+                cellRight: cell?.getBoundingClientRect().right ?? null,
+            };
+        });
+        expect(edges.containerRight).not.toBeNull();
+        expect(edges.cellRight).not.toBeNull();
+        expect(edges.cellRight!).toBeLessThanOrEqual(edges.containerRight! + 1);
+    });
+
+    test('petunjuk geser tampil di 390 saat tabel melebihi viewport', async ({ page }) => {
+        await page.setViewportSize({ width: 390, height: 844 });
+        const responsePromise = page.waitForResponse(
+            (r) =>
+                r.url().includes('/api/stock-monitor') &&
+                !r.url().includes('export') &&
+                r.request().headers()['accept']?.includes('application/json'),
+        );
+        await page.goto('/stock-monitor');
+        await expectResponseOk(await responsePromise);
+        await expect(page.locator('tbody tr').first()).toBeVisible();
+
+        const container = page.locator('[data-slot="table-container"]').first();
+        await expect(container).toHaveAttribute('data-overflow-right', 'true');
+    });
 });

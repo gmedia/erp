@@ -74,5 +74,16 @@ test.describe('Journal Entries mobile Description column (#504)', () => {
         if (box && actionsBox) {
             expect(box.x + box.width).toBeLessThanOrEqual(actionsBox.x + 1);
         }
+
+        const containerRight = await page
+            .locator('[data-slot="table-container"]')
+            .first()
+            .evaluate((el) => el.getBoundingClientRect().right);
+        expect(actionsBox).not.toBeNull();
+        if (actionsBox) {
+            expect(
+                Math.abs(actionsBox.x + actionsBox.width - containerRight),
+            ).toBeLessThanOrEqual(1);
+        }
     });
 });

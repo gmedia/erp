@@ -27,6 +27,7 @@ type SummaryColumnOptions<TData> = {
     getPrimary: (row: TData) => DisplayValue;
     getSecondary: (row: TData) => DisplayValue;
     sortable?: boolean;
+    className?: string;
 };
 
 type TextColumnOptions<TData> = {
@@ -89,12 +90,14 @@ export function formatWarehouseCodeLabel(
 export function SummaryCell({
     primary,
     secondary,
+    className,
 }: Readonly<{
     primary: DisplayValue;
     secondary: DisplayValue;
+    className?: string;
 }>) {
     return (
-        <div className="max-w-[16rem] space-y-0.5">
+        <div className={cn('max-w-[16rem] space-y-0.5', className)}>
             <TruncatedText className="font-medium" value={primary} />
             <TruncatedText
                 className="text-xs text-muted-foreground"
@@ -263,6 +266,7 @@ export function createReportSummaryColumn<TData>(
             <SummaryCell
                 primary={options.getPrimary(row)}
                 secondary={options.getSecondary(row)}
+                className={options.className}
             />
         ),
     });

@@ -40,11 +40,13 @@ export function createStockMonitorColumns(): ColumnDef<StockMonitorItem>[] {
             header: { key: 'column.product', fallback: 'Product' },
             getPrimary: (item) => item.product?.name,
             getSecondary: (item) => item.product?.code,
+            className: 'max-w-56',
         }),
         createReportTextColumn<StockMonitorItem>({
             id: 'category_name',
             header: { key: 'column.category', fallback: 'Category' },
             getValue: (item) => item.product?.category?.name,
+            className: 'max-w-32',
         }),
         createReportWarehouseColumn<StockMonitorItem>({
             id: 'warehouse_name',
@@ -73,7 +75,7 @@ export function createStockMonitorColumns(): ColumnDef<StockMonitorItem>[] {
             },
             getValue: (item) => formatDate(item.moved_at),
             sortable: true,
-            className: 'max-w-44 whitespace-nowrap',
+            className: 'max-w-28 whitespace-nowrap',
         }),
     ];
 }
