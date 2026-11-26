@@ -2772,6 +2772,16 @@
         "delete_failed": "Failed to delete {entity}",
         "load_failed": "Failed to load {entity}"
     },
+    "accounts_toast": {
+        "coa_versions_fetch_failed": "Failed to fetch COA versions",
+        "accounts_fetch_failed": "Failed to fetch accounts",
+        "account_updated": "Account updated successfully",
+        "account_created": "Account created successfully",
+        "account_save_failed": "Failed to save account",
+        "account_deleted": "Account deleted successfully",
+        "account_delete_failed": "Failed to delete account",
+        "unexpected_error": "An unexpected error occurred"
+    },
     "hook_toast": {
         "unexpected_error": "An unexpected error occurred",
         "approval_history_load_failed": "Failed to load approval history",

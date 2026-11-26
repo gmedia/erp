@@ -2775,6 +2775,16 @@
         "delete_failed": "Gagal menghapus {entity}",
         "load_failed": "Gagal memuat {entity}"
     },
+    "accounts_toast": {
+        "coa_versions_fetch_failed": "Gagal memuat versi bagan akun",
+        "accounts_fetch_failed": "Gagal memuat akun",
+        "account_updated": "Akun berhasil diperbarui",
+        "account_created": "Akun berhasil dibuat",
+        "account_save_failed": "Gagal menyimpan akun",
+        "account_deleted": "Akun berhasil dihapus",
+        "account_delete_failed": "Gagal menghapus akun",
+        "unexpected_error": "Terjadi kesalahan tak terduga"
+    },
     "hook_toast": {
         "unexpected_error": "Terjadi kesalahan tak terduga",
         "approval_history_load_failed": "Gagal memuat riwayat persetujuan",

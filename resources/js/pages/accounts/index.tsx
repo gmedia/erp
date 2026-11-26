@@ -36,6 +36,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { type Account } from '@/types/account';
 import { type CoaVersion } from '@/types/coa-version';
+import { useToastTranslator } from '@/utils/i18nFallback';
 import axios from 'axios';
 import { toast } from 'sonner';
 
@@ -74,6 +75,7 @@ function AccountSearchInput({
 
 export default function AccountIndex() {
     const { t } = useTranslation();
+    const tToast = useToastTranslator('accounts_toast');
     const [coaVersions, setCoaVersions] = useState<CoaVersion[]>([]);
     const [selectedVersionId, setSelectedVersionId] = useState<string | null>(
         null,
@@ -114,9 +116,14 @@ export default function AccountIndex() {
                 setSelectedVersionId((activeVersion || data[0]).id.toString());
             }
         } catch {
-            toast.error('Failed to fetch COA versions');
+            toast.error(
+                tToast(
+                    'coa_versions_fetch_failed',
+                    'Failed to fetch COA versions',
+                ),
+            );
         }
-    }, [selectedVersionId]);
+    }, [selectedVersionId, tToast]);
 
     const fetchAccounts = useCallback(
         async (searchTerm = search) => {
@@ -131,12 +138,14 @@ export default function AccountIndex() {
                 });
                 setAccounts(response.data.data);
             } catch {
-                toast.error('Failed to fetch accounts');
+                toast.error(
+                    tToast('accounts_fetch_failed', 'Failed to fetch accounts'),
+                );
             } finally {
                 setIsLoading(false);
             }
         },
-        [selectedVersionId, search],
+        [selectedVersionId, search, tToast],
     );
 
     useEffect(() => {
@@ -180,20 +189,27 @@ export default function AccountIndex() {
                     `/api/accounts/${selectedAccount.id}`,
                     data,
                 );
-                toast.success('Account updated successfully');
+                toast.success(
+                    tToast('account_updated', 'Account updated successfully'),
+                );
             } else {
                 await axiosInstance.post('/api/accounts', data);
-                toast.success('Account created successfully');
+                toast.success(
+                    tToast('account_created', 'Account created successfully'),
+                );
             }
             setIsFormOpen(false);
             void fetchAccounts();
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
                 toast.error(
-                    error.response?.data?.message || 'Failed to save account',
+                    error.response?.data?.message ||
+                        tToast('account_save_failed', 'Failed to save account'),
                 );
             } else {
-                toast.error('An unexpected error occurred');
+                toast.error(
+                    tToast('unexpected_error', 'An unexpected error occurred'),
+                );
             }
         } finally {
             setIsActionLoading(false);
@@ -205,16 +221,24 @@ export default function AccountIndex() {
         setIsActionLoading(true);
         try {
             await axiosInstance.delete(`/api/accounts/${accountToDelete.id}`);
-            toast.success('Account deleted successfully');
+            toast.success(
+                tToast('account_deleted', 'Account deleted successfully'),
+            );
             setIsDeleteDialogOpen(false);
             void fetchAccounts();
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
                 toast.error(
-                    error.response?.data?.message || 'Failed to delete account',
+                    error.response?.data?.message ||
+                        tToast(
+                            'account_delete_failed',
+                            'Failed to delete account',
+                        ),
                 );
             } else {
-                toast.error('An unexpected error occurred');
+                toast.error(
+                    tToast('unexpected_error', 'An unexpected error occurred'),
+                );
             }
         } finally {
             setIsActionLoading(false);

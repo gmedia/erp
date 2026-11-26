@@ -17,12 +17,18 @@ export function translateOr(
     return translated === key ? fallback : translated;
 }
 
-export function useHookToast(): (key: string, fallback: string) => string {
+export function useToastTranslator(
+    namespace: string,
+): (key: string, fallback: string) => string {
     const { t } = useOptionalTranslation();
 
     return useCallback(
         (key: string, fallback: string) =>
-            translateOr(t, `hook_toast.${key}`, fallback),
-        [t],
+            translateOr(t, `${namespace}.${key}`, fallback),
+        [t, namespace],
     );
+}
+
+export function useHookToast(): (key: string, fallback: string) => string {
+    return useToastTranslator('hook_toast');
 }
