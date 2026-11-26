@@ -453,6 +453,44 @@ class XxxExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping,
 
 ---
 
+## Format angka & tanggal
+
+Satu pintu: `resources/js/utils/formatters.ts`. Jangan memanggil `Intl.NumberFormat`, `toLocaleString`, atau literal `'id-ID'` / `'IDR'` langsung di komponen.
+
+Sumber nilai:
+- **Pemisah angka, simbol & digit mata uang, pola tanggal** → pengaturan regional perusahaan (`currency`, `number_format_decimal`, `number_format_thousand`, `number_format_hide_decimal`, `date_format`). Dibagikan dari `/api/me` oleh `auth-context.tsx` ke `utils/number-format.ts` dan `utils/date-format.ts`.
+- **Locale format tetap** `FORMAT_LOCALE = 'id-ID'` (dari `utils/formatters.ts`) dipakai untuk `formatNumber` dan `formatCurrency`. Ini hanya penentu posisi simbol; locale UI tidak dipakai.
+- **Nama bulan / teks tanggal** (`formatMonth`, nama bulan di `formatDate`/`formatDateTime`) → locale UI (`getStoredLocale()` dari `lib/locale-storage.ts`).
+- Locale UI **tidak** mengubah angka maupun simbol mata uang. Contoh: locale `en` dan `id` sama-sama menghasilkan `Rp 1.234.567`, bukan `IDR 1,234,567`.
+
+API:
+
+| Fungsi | Contoh hasil | Catatan |
+| ------ | ------------ | ------- |
+| `formatNumber(value, { minimumFractionDigits?, maximumFractionDigits? })` | `1.234,5` | Kosong / tidak valid → `-` |
+| `formatCurrency(value, { currency?, maximumFractionDigits? })` | `Rp 1.500` | `currency` kosong di Setting → angka tanpa simbol (tanpa fallback IDR) |
+| `formatDate(value, { fallback? })` | `26/11/2026` | Pola dari `date_format` |
+| `formatDateTime(value)` | `26/11/2026 14:30` | Tanggal + jam 24 jam |
+| `formatTime(value, { withSeconds? })` | `14:30` | |
+| `formatMonth(value)` | `Nov 2026` | Nama bulan mengikuti locale UI |
+| `formatRupiah(value)` | `Rp 2.000,00` (IDR) | **Deprecated**. Perilaku lama dikunci: locale `id-ID`, mata uang dari Setting, digit pecahan default mata uang. Tidak sama dengan `formatCurrency` (yang tanpa pecahan nol) |
+
+Pemakaian:
+
+```ts
+import { formatCurrency, formatDate, formatNumber } from '@/utils/formatters';
+
+formatCurrency(order.total);          // Setting currency + pemisah perusahaan
+formatNumber(item.quantity, { maximumFractionDigits: 2 });
+formatDate(order.created_at);
+```
+
+Test: pure function, tanpa page, di `tests/e2e/misc/format-helpers.spec.ts` (memakai `@playwright/test`, tanpa runner unit terpisah). Set Setting di test lewat `setRegionalNumberFormatSettings` / `setRegionalDateFormatSettings`.
+
+Migrasi pemanggil dilakukan bertahap per modul (lihat issue #527).
+
+---
+
 ## Helper Reference
 
 | Helper                       | Location                                            | Purpose                                  |
