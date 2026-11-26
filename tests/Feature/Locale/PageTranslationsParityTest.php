@@ -280,7 +280,7 @@ test('accounting and ap/ar page strings are translated to indonesian', function 
 
     expect($id['accounts']['title'])->toBe('Bagan Akun')
         ->and($id['journal_entries']['title'])->toBe('Jurnal Umum')
-        ->and($id['ap_payments']['title'])->toBe('Pembayaran Hutang');
+        ->and($id['ap_payments']['title'])->toBe('Pembayaran Utang');
 });
 
 test('accounting and ap/ar page titles match the sidebar menu labels', function () {
@@ -592,7 +592,7 @@ test('ap/ar and budget variance report page strings are translated to indonesian
         }
     }
 
-    expect($id['ap_outstanding']['title'])->toBe('Laporan Hutang Belum Lunas')
+    expect($id['ap_outstanding']['title'])->toBe('Laporan Utang Belum Lunas')
         ->and($id['budget_variance']['title'])->toBe('Laporan Selisih Anggaran');
 });
 
@@ -958,7 +958,7 @@ test('ap aging report title uses the sidebar menu label in both locales', functi
     $id = json_decode(File::get(lang_path('id.json')), true, 512, JSON_THROW_ON_ERROR);
 
     expect($en['menu']['ap_aging_report'])->toBe('AP Aging Report')
-        ->and($id['menu']['ap_aging_report'])->toBe('Laporan Umur Hutang')
+        ->and($id['menu']['ap_aging_report'])->toBe('Laporan Umur Utang')
         ->and($en['page']['ap_aging']['description'])->toBe(
             'Payables grouped by age bucket to show overdue supplier balances.',
         )

@@ -589,15 +589,15 @@
     "menu": {
         "account_mapping": "Pemetaan Akun",
         "accounting": "Akuntansi",
-        "accounts_payable": "Hutang Usaha",
+        "accounts_payable": "Utang Usaha",
         "accounts_receivable": "Piutang Usaha",
         "admin": "Admin",
         "admin_setting": "Pengaturan Admin",
         "aging_dashboard": "Dasbor Umur Piutang",
-        "ap_aging_report": "Laporan Umur Hutang",
-        "ap_outstanding_report": "Laporan Hutang Belum Lunas",
-        "ap_payment": "Pembayaran Hutang",
-        "ap_payment_history_report": "Laporan Riwayat Pembayaran Hutang",
+        "ap_aging_report": "Laporan Umur Utang",
+        "ap_outstanding_report": "Laporan Utang Belum Lunas",
+        "ap_payment": "Pembayaran Utang",
+        "ap_payment_history_report": "Laporan Riwayat Pembayaran Utang",
         "approval_audit_trail": "Jejak Audit Persetujuan",
         "approval_delegation": "Delegasi Persetujuan",
         "approval_flow": "Alur Persetujuan",
@@ -1148,11 +1148,11 @@
         },
         "supplier_bills": {
             "title": "Tagihan Pemasok",
-            "description": "Faktur pemasok yang membentuk hutang usaha.",
+            "description": "Faktur pemasok yang membentuk utang usaha.",
             "search_placeholder": "Cari no. tagihan, no. faktur pemasok, atau catatan..."
         },
         "ap_payments": {
-            "title": "Pembayaran Hutang",
+            "title": "Pembayaran Utang",
             "description": "Pembayaran ke pemasok yang dialokasikan ke tagihan yang belum lunas.",
             "search_placeholder": "Cari no. pembayaran, referensi, atau catatan..."
         },
@@ -1322,7 +1322,7 @@
             "search_placeholder": "Cari no. tagihan, faktur pemasok, pemasok, cabang, no. PO, no. GR, atau catatan..."
         },
         "ap_outstanding": {
-            "title": "Laporan Hutang Belum Lunas",
+            "title": "Laporan Utang Belum Lunas",
             "description": "Tagihan pemasok yang masih memiliki saldo belum dibayar.",
             "search_placeholder": "Cari no. tagihan, faktur pemasok, pemasok, cabang, no. PO, no. GR, atau catatan..."
         },
@@ -2855,7 +2855,7 @@
         "supplier_return": "Retur Pemasok",
         "account_mapping": "Pemetaan Akun",
         "supplier_bill": "Tagihan Pemasok",
-        "ap_payment": "Pembayaran Hutang",
+        "ap_payment": "Pembayaran Utang",
         "customer_invoice": "Faktur Pelanggan",
         "ar_receipt": "Penerimaan Piutang",
         "credit_note": "Nota Kredit",
