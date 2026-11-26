@@ -52,6 +52,44 @@ test.describe('Vehicle Loans', () => {
         ).toBeVisible();
     });
 
+    test('schedule inputs stay inside the form card at 390px', async ({
+        page,
+    }) => {
+        await page.setViewportSize({ width: 390, height: 844 });
+        await page.goto(VEHICLE_LOAN_REQUEST_PATH);
+
+        const card = page
+            .locator('#start_at_date')
+            .locator('xpath=ancestor::div[contains(@class,"rounded-xl")][1]');
+        await expect(card).toBeVisible();
+        const cardBox = await card.boundingBox();
+        if (!cardBox) throw new Error('Schedule card has no bounding box');
+
+        for (const id of [
+            '#start_at_date',
+            '#start_at_time',
+            '#end_at_date',
+            '#end_at_time',
+        ]) {
+            const box = await page.locator(id).boundingBox();
+            if (!box) throw new Error(`${id} has no bounding box`);
+            expect(box.x).toBeGreaterThanOrEqual(cardBox.x);
+            expect(box.x + box.width).toBeLessThanOrEqual(
+                cardBox.x + cardBox.width,
+            );
+
+            const overflows = await page
+                .locator(id)
+                .evaluate((el) => el.scrollWidth > el.clientWidth);
+            expect(overflows).toBe(false);
+        }
+
+        const pageOverflow = await page.evaluate(
+            () => document.documentElement.scrollWidth > window.innerWidth,
+        );
+        expect(pageOverflow).toBe(false);
+    });
+
     test('can save a draft then submit it for approval', async ({ page }) => {
         await page.goto(VEHICLE_LOAN_REQUEST_PATH);
 
