@@ -88,7 +88,7 @@ class BudgetController extends Controller
     {
         if ($budget->status !== 'draft') {
             return response()->json([
-                'message' => 'Only draft budgets can be deleted.',
+                'message' => __('budget_api.only_draft_can_be_deleted'),
             ], 422);
         }
 
@@ -113,7 +113,7 @@ class BudgetController extends Controller
     {
         if ($budget->status !== 'draft') {
             return response()->json([
-                'message' => 'Only draft budgets can be approved.',
+                'message' => __('budget_api.only_draft_can_be_approved'),
             ], 422);
         }
 
@@ -130,7 +130,7 @@ class BudgetController extends Controller
     {
         if ($budget->status !== 'approved') {
             return response()->json([
-                'message' => 'Only approved budgets can be locked.',
+                'message' => __('budget_api.only_approved_can_be_locked'),
             ], 422);
         }
 
