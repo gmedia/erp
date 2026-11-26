@@ -3,11 +3,15 @@
 namespace App\Exports;
 
 use App\Exports\Concerns\BaseExport;
+use App\Exports\Concerns\ExportsNumberFormats;
 use App\Models\Budget;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 
-class BudgetExport extends BaseExport
+class BudgetExport extends BaseExport implements WithColumnFormatting
 {
+    use ExportsNumberFormats;
+
     public function query(): Builder
     {
         $query = Budget::query()->with(['fiscalYear', 'creator']);
@@ -34,5 +38,13 @@ class BudgetExport extends BaseExport
             'Created By' => fn (Budget $b): mixed => $this->relatedAttribute($b, 'creator', 'name'),
             'Created At' => fn (Budget $b): mixed => $this->formatIso8601($b->created_at),
         ];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function currencyColumnHeadings(): array
+    {
+        return ['Total Amount'];
     }
 }
