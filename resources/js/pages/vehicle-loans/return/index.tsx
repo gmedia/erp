@@ -18,6 +18,7 @@ import { VehicleLoanQrPanel } from '@/components/vehicle-loans/VehicleLoanQrPane
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
 import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
+import { useToastTranslator } from '@/utils/i18nFallback';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { toast } from 'sonner';
@@ -44,6 +45,7 @@ export default function VehicleLoanReturnPage() {
     const [odometerEnd, setOdometerEnd] = useState('');
     const [loading, setLoading] = useState(false);
     const [loaded, setLoaded] = useState(false);
+    const tToast = useToastTranslator('vehicle_loan_toast');
 
     async function loadPickups() {
         setLoading(true);
@@ -82,7 +84,9 @@ export default function VehicleLoanReturnPage() {
             setPickups(items);
             setLoaded(true);
         } catch {
-            toast.error('Gagal memuat data pengambilan.');
+            toast.error(
+                tToast('return_load_failed', 'Gagal memuat data pengambilan.'),
+            );
         } finally {
             setLoading(false);
         }
@@ -92,12 +96,22 @@ export default function VehicleLoanReturnPage() {
 
     async function submit() {
         if (!pickupId || !handoverPhoto || !conditionPhoto) {
-            toast.error('Lengkapi pengambilan dan kedua foto.');
+            toast.error(
+                tToast(
+                    'return_incomplete',
+                    'Lengkapi pengambilan dan kedua foto.',
+                ),
+            );
             return;
         }
 
         if (incident && incidentNote.trim().length < 5) {
-            toast.error('Isi keterangan insiden minimal 5 karakter.');
+            toast.error(
+                tToast(
+                    'return_incident_note_short',
+                    'Isi keterangan insiden minimal 5 karakter.',
+                ),
+            );
             return;
         }
 
@@ -114,7 +128,9 @@ export default function VehicleLoanReturnPage() {
                 `/api/vehicle-loans/pickups/${pickupId}/returns`,
                 body,
             );
-            toast.success('Pengembalian berhasil dicatat.');
+            toast.success(
+                tToast('return_recorded', 'Pengembalian berhasil dicatat.'),
+            );
             setPickupId('');
             setHandoverPhoto(null);
             setConditionPhoto(null);
@@ -122,7 +138,9 @@ export default function VehicleLoanReturnPage() {
             setIncidentNote('');
             setOdometerEnd('');
         } catch {
-            toast.error('Gagal mencatat pengembalian.');
+            toast.error(
+                tToast('return_failed', 'Gagal mencatat pengembalian.'),
+            );
         } finally {
             setLoading(false);
         }

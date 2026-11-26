@@ -14,6 +14,7 @@ import { VehicleLoanStatusBadge } from '@/components/vehicle-loans/VehicleLoanSt
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
 import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
+import { useToastTranslator } from '@/utils/i18nFallback';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -40,6 +41,7 @@ export default function VehicleLoanSecurityPage() {
     const queryClient = useQueryClient();
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState<QueueFilter>('all');
+    const tToast = useToastTranslator('vehicle_loan_toast');
 
     const { data, isLoading } = useQuery({
         queryKey: ['vehicle-loans', 'security-queue'],
@@ -79,7 +81,9 @@ export default function VehicleLoanSecurityPage() {
     async function handover(pickupId: number) {
         try {
             await axios.post(`/api/vehicle-loans/pickups/${pickupId}/handover`);
-            toast.success('Kunci diserahkan.');
+            toast.success(
+                tToast('security_key_handed_over', 'Kunci diserahkan.'),
+            );
             void queryClient.invalidateQueries({
                 queryKey: ['vehicle-loans', 'security-queue'],
             });
@@ -88,7 +92,10 @@ export default function VehicleLoanSecurityPage() {
             });
         } catch {
             toast.error(
-                'Gagal menyerahkan kunci. Pastikan persetujuan sudah final.',
+                tToast(
+                    'security_handover_failed',
+                    'Gagal menyerahkan kunci. Pastikan persetujuan sudah final.',
+                ),
             );
         }
     }
