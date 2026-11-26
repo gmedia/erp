@@ -186,3 +186,22 @@ it('detects stale entities based on threshold', function () {
     expect($data['stale_entities'][0]['id'])->toBe($staleEntity->id);
     expect($data['stale_entities'][0]['days_in_state'])->toBeGreaterThanOrEqual(10);
 });
+
+it('returns days_in_state as an integer for fractional-hour transitions', function () {
+    // 10 hari + 12 jam: diffInDays() (Carbon 3) mengembalikan float, harus dibulatkan ke bawah.
+    PipelineEntityState::factory()->create([
+        'pipeline_id' => $this->pipeline->id,
+        'current_state_id' => $this->stateReview->id,
+        'last_transitioned_at' => Carbon::now()->subDays(10)->subHours(12),
+        'entity_type' => Asset::class,
+        'entity_id' => 3,
+    ]);
+
+    Sanctum::actingAs($this->user, ['*']);
+    $response = getJson('/api/pipeline-dashboard/data');
+
+    $response->assertOk();
+    $days = $response->json('stale_entities.0.days_in_state');
+
+    expect($days)->toBeInt()->toBe(10);
+});

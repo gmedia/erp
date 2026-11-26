@@ -1779,6 +1779,10 @@ class PurchasingSampleDataSeeder extends Seeder
             ];
         }
 
+        // last_transitioned_at relatif tanggal seed (1–45 hari lalu, deterministik per
+        // entitas). Riwayat log tetap mengikuti tanggal dokumen di atas.
+        $lastTransitionedAt = now()->subDays(($entityId % 45) + 1)->setTime(8, 0);
+
         $entityState = PipelineEntityState::updateOrCreate(
             [
                 'pipeline_id' => $pipeline->id,
@@ -1788,7 +1792,7 @@ class PurchasingSampleDataSeeder extends Seeder
             [
                 'current_state_id' => $targetState->id,
                 'last_transitioned_by' => $performedBy,
-                'last_transitioned_at' => $cursor->copy(),
+                'last_transitioned_at' => $lastTransitionedAt,
                 'metadata' => null,
             ]
         );
