@@ -38,14 +38,6 @@ class CreditNoteExport extends BaseExport implements WithColumnFormatting
     }
 
     /**
-     * @return array<string, string>
-     */
-    public function columnFormats(): array
-    {
-        return $this->buildColumnFormats(array_keys($this->columns()));
-    }
-
-    /**
      * @return array<string, callable(mixed): mixed>
      */
     protected function columns(): array
