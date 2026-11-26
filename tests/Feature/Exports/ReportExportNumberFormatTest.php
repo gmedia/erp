@@ -91,7 +91,7 @@ describe('ApAgingReportExport number formats', function () {
     test('money columns are numeric cells with currency code format', function () {
         // State confirmed() menetapkan amount_paid = 0 dan amount_due = grand_total; nilai input
         // lain akan ditimpa, jadi test memakai nilai yang konsisten dengan status tersebut.
-        $bill = SupplierBill::factory()->confirmed()->create([
+        SupplierBill::factory()->confirmed()->create([
             'bill_number' => 'BILL-EXP-0001',
             'supplier_id' => Supplier::factory()->create()->id,
             'due_date' => Carbon::now()->addDays(10)->format('Y-m-d'),
@@ -101,7 +101,7 @@ describe('ApAgingReportExport number formats', function () {
         $sheet = readReportExportSheet(new ApAgingReportExport([]));
 
         foreach (['Grand Total' => 1000000.50, 'Amount Due' => 1000000.50] as $heading => $value) {
-            $cell = reportExportCell($sheet, $heading, 'Bill Number', $bill->bill_number);
+            $cell = reportExportCell($sheet, $heading, 'Bill Number', 'BILL-EXP-0001');
 
             expect($cell->getValue())->toBeFloat()->toEqual($value)
                 ->and($cell->getStyle()->getNumberFormat()->getFormatCode())->toBe('"IDR" #,##0.00');
@@ -112,7 +112,7 @@ describe('ApAgingReportExport number formats', function () {
 describe('ArAgingReportExport number formats', function () {
 
     test('grand total and aging buckets are numeric cells with currency code format', function () {
-        $invoice = CustomerInvoice::factory()->sent()->create([
+        CustomerInvoice::factory()->sent()->create([
             'invoice_number' => 'INV-EXP-0001',
             'customer_id' => Customer::factory()->create()->id,
             'fiscal_year_id' => FiscalYear::factory()->create()->id,
@@ -123,7 +123,7 @@ describe('ArAgingReportExport number formats', function () {
 
         $sheet = readReportExportSheet(new ArAgingReportExport([]));
 
-        $cell = reportExportCell($sheet, 'Grand Total', 'Invoice Number', $invoice->invoice_number);
+        $cell = reportExportCell($sheet, 'Grand Total', 'Invoice Number', 'INV-EXP-0001');
 
         expect($cell->getValue())->toBeFloat()->toEqual(480000.75)
             ->and($cell->getStyle()->getNumberFormat()->getFormatCode())->toBe('"IDR" #,##0.00');
