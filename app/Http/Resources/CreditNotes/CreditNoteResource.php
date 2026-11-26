@@ -4,11 +4,11 @@ namespace App\Http\Resources\CreditNotes;
 
 use App\Http\Resources\Concerns\BuildsAuditStampResourceData;
 use App\Models\Branch;
-use App\Models\Department;
 use App\Models\CreditNote;
 use App\Models\CreditNoteItem;
 use App\Models\Customer;
 use App\Models\CustomerInvoice;
+use App\Models\Department;
 use App\Models\FiscalYear;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
