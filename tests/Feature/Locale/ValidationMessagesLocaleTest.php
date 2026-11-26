@@ -79,7 +79,7 @@ test('generic rule message is translated to indonesian with X-Locale id', functi
     ], ['X-Locale' => 'id']);
 
     $response->assertUnprocessable();
-    expect($response->json('errors.email.0'))->toBe(trans('validation.email', ['attribute' => 'surel'], 'id'));
+    expect($response->json('errors.email.0'))->toBe(trans('validation.email', ['attribute' => 'email'], 'id'));
 });
 
 test('validation lines english keep framework default wording', function () {

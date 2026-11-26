@@ -50,7 +50,7 @@ return [
     'doesnt_contain' => 'Kolom :attribute tidak boleh berisi salah satu dari: :values.',
     'doesnt_end_with' => 'Kolom :attribute tidak boleh diakhiri dengan salah satu dari: :values.',
     'doesnt_start_with' => 'Kolom :attribute tidak boleh diawali dengan salah satu dari: :values.',
-    'email' => 'Kolom :attribute harus berupa alamat surel yang valid.',
+    'email' => 'Kolom :attribute harus berupa alamat email yang valid.',
     'encoding' => 'Kolom :attribute harus dikodekan dalam :encoding.',
     'ends_with' => 'Kolom :attribute harus diakhiri dengan salah satu dari: :values.',
     'enum' => 'Nilai :attribute yang dipilih tidak valid.',
@@ -189,7 +189,7 @@ return [
 
     'attributes' => [
         'name' => 'nama',
-        'email' => 'surel',
+        'email' => 'email',
         'password' => 'kata sandi',
         'code' => 'kode',
         'description' => 'deskripsi',
@@ -201,7 +201,7 @@ return [
         'transaction_date' => 'tanggal transaksi',
         'entry_date' => 'tanggal jurnal',
         'start_date' => 'tanggal mulai',
-        'end_date' => 'tanggal selesai',
+        'end_date' => 'tanggal akhir',
         'branch_id' => 'cabang',
         'fiscal_year_id' => 'tahun fiskal',
         'warehouse_id' => 'gudang',
@@ -219,7 +219,7 @@ return [
         'reference' => 'referensi',
         'reason' => 'alasan',
         'currency_code' => 'kode mata uang',
-        'is_active' => 'status aktif',
+        'is_active' => 'aktif',
         'payment_method' => 'metode pembayaran',
         'items' => 'item',
         'lines' => 'baris',
@@ -243,9 +243,9 @@ return [
 
     'form_messages' => [
         'user_name_required' => 'Kolom nama wajib diisi.',
-        'user_email_required' => 'Kolom surel wajib diisi.',
-        'user_email_email' => 'Kolom surel harus berupa alamat surel yang valid.',
-        'user_email_unique' => 'Surel ini sudah digunakan.',
+        'user_email_required' => 'Kolom email wajib diisi.',
+        'user_email_email' => 'Kolom email harus berupa alamat email yang valid.',
+        'user_email_unique' => 'Email ini sudah digunakan.',
         'user_password_required' => 'Kolom kata sandi wajib diisi.',
         'user_password_min' => 'Kolom kata sandi minimal 8 karakter.',
         'permissions_array' => 'Izin harus berupa larik.',
