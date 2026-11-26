@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Exceptions\ApiErrorException;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,9 +41,11 @@ class CheckEntityStatePermission
             );
 
         if (! $allowed) {
-            return response()->json([
-                'message' => __('You do not have permission to perform this action.'),
-            ], 403);
+            throw ApiErrorException::translated(
+                403,
+                'permission.denied',
+                'You do not have permission to perform this action.',
+            );
         }
 
         return $next($request);

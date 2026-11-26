@@ -72,7 +72,10 @@ test('api error code docs list every code used by the backend', function () {
 
     expect($documented)->not->toBeEmpty();
 
-    $source = collect(File::allFiles(app_path('Http/Controllers')))
+    $source = collect([
+        ...File::allFiles(app_path('Http/Controllers')),
+        ...File::allFiles(app_path('Http/Middleware')),
+    ])
         ->map(fn ($file) => File::get($file->getPathname()))
         ->implode("\n");
 
