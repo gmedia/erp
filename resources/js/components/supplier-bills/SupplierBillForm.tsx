@@ -40,6 +40,7 @@ import {
 import {
     formatCurrencyByRegionalSettings,
     formatNumberByRegionalSettings,
+    getRegionalNumberFormatSettings,
 } from '@/utils/number-format';
 import { isPostedDocumentLocked } from '@/utils/posted-document-lock';
 import { supplierBillFormSchema } from '@/utils/schemas';
@@ -86,7 +87,7 @@ const getSupplierBillFormDefaults = (
                 new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
             ),
             payment_terms: '',
-            currency: 'IDR',
+            currency: getRegionalNumberFormatSettings().currency,
             status: 'draft',
             notes: '',
             items: [],
@@ -121,7 +122,9 @@ const getSupplierBillFormDefaults = (
             ? toDateInputValue(supplierBill.due_date)
             : toDateInputValue(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)),
         payment_terms: supplierBill.payment_terms || '',
-        currency: supplierBill.currency || 'IDR',
+        currency:
+            supplierBill.currency ||
+            getRegionalNumberFormatSettings().currency,
         status: supplierBill.status,
         notes: supplierBill.notes || '',
         items: (supplierBill.items || []).length
