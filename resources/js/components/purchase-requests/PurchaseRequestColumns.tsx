@@ -1,6 +1,7 @@
 'use client';
 
 import { PurchaseRequest } from '@/types/purchase-request';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import {
     createActionsColumn,
     createCurrencyColumn,
@@ -79,8 +80,7 @@ export const purchaseRequestColumns: ColumnDef<PurchaseRequest>[] = [
             key: 'column.estimated_amount',
             fallback: 'Estimated Amount',
         },
-        currency: 'IDR',
-        locale: 'id-ID',
+        locale: FORMAT_LOCALE,
         minimumFractionDigits: 0,
         maximumFractionDigits: 2,
     }),

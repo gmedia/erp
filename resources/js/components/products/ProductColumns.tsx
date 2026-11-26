@@ -12,6 +12,7 @@ import {
 import { ColumnDef } from '@tanstack/react-table';
 
 import { Product } from '@/types/entity';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 
 /**
  * Cell renderer for category column
@@ -77,14 +78,12 @@ export const productColumns: ColumnDef<Product>[] = [
     createCurrencyColumn<Product>({
         accessorKey: 'cost',
         label: { key: 'column.cost', fallback: 'Cost' },
-        currency: 'IDR',
-        locale: 'id-ID',
+        locale: FORMAT_LOCALE,
     }),
     createCurrencyColumn<Product>({
         accessorKey: 'selling_price',
         label: { key: 'column.price', fallback: 'Price' },
-        currency: 'IDR',
-        locale: 'id-ID',
+        locale: FORMAT_LOCALE,
     }),
     {
         accessorKey: 'status',

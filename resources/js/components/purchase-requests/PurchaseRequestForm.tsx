@@ -32,6 +32,7 @@ import {
     type PurchaseRequestFormData,
 } from '@/types/purchase-request';
 import { toDateInputValue } from '@/utils/date-format';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import {
     formatItemReference,
     omitItemDisplayLabels,
@@ -436,7 +437,7 @@ export const PurchaseRequestForm = memo<PurchaseRequestFormProps>(
                                                         purchaseRequestItem.quantity ??
                                                             0,
                                                         {
-                                                            locale: 'id-ID',
+                                                            locale: FORMAT_LOCALE,
                                                             minimumFractionDigits: 0,
                                                             maximumFractionDigits: 2,
                                                         },
@@ -447,7 +448,7 @@ export const PurchaseRequestForm = memo<PurchaseRequestFormProps>(
                                                         purchaseRequestItem.estimated_unit_price ??
                                                             0,
                                                         {
-                                                            locale: 'id-ID',
+                                                            locale: FORMAT_LOCALE,
                                                             minimumFractionDigits: 0,
                                                             maximumFractionDigits: 2,
                                                         },

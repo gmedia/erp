@@ -3,6 +3,7 @@
 import { StatusBadgeLabel } from '@/components/common/StatusBadgeLabel';
 import type { TranslatableLabel } from '@/components/common/TranslatedText';
 import { Asset } from '@/types/asset';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import {
     createActionsColumn,
     createCurrencyColumn,
@@ -105,8 +106,7 @@ export const assetColumns: ColumnDef<Asset>[] = [
     createCurrencyColumn<Asset>({
         accessorKey: 'purchase_cost',
         label: { key: 'column.purchase_cost', fallback: 'Cost' },
-        currency: 'IDR',
-        locale: 'id-ID',
+        locale: FORMAT_LOCALE,
         minimumFractionDigits: 0,
     }),
     createDateColumn<Asset>({

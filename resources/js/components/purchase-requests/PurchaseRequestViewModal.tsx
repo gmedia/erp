@@ -9,6 +9,7 @@ import { EntityStateActions } from '@/components/pipeline/EntityStateActions';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import {
     formatCurrencyByRegionalSettings,
     formatNumberByRegionalSettings,
@@ -29,14 +30,14 @@ interface PurchaseRequestViewModalProps {
 
 const formatAmount = (value: string | number | null | undefined): string =>
     formatCurrencyByRegionalSettings(value ?? 0, {
-        locale: 'id-ID',
+        locale: FORMAT_LOCALE,
         minimumFractionDigits: 0,
         maximumFractionDigits: 2,
     });
 
 const formatQuantity = (value: string | number | null | undefined): string =>
     formatNumberByRegionalSettings(value ?? 0, {
-        locale: 'id-ID',
+        locale: FORMAT_LOCALE,
         minimumFractionDigits: 0,
         maximumFractionDigits: 2,
     });
