@@ -36,10 +36,6 @@ jobs:
     permissions:
       contents: read
       packages: read
-    env:
-      PLAYWRIGHT_USE_SAIL: '1'
-      PLAYWRIGHT_BASE_URL: http://localhost:82
-
     steps:
       - name: Enable KVM for the emulator
         run: |
@@ -54,7 +50,8 @@ jobs:
         with:
           fetch-depth: 1
           persist-credentials: false
-          repository: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name || github.repository }}
+          repository: ${{ github.event_name == 'pull_request'
+            && github.event.pull_request.head.repo.full_name || github.repository }}
           ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
 
       - name: Setup PHP
@@ -120,7 +117,8 @@ jobs:
       - name: Resolve seeded admin for the emulator run
         run: |
           # Admin hasil seed = config('app.admin'). Nilai dikirim ke env tanpa dicetak ke log.
-          ADMIN_EMAIL="$(./vendor/bin/sail artisan tinker --execute='echo config("app.admin");' | tail -n 1 | tr -d '\r')"
+          ADMIN_EMAIL="$(./vendor/bin/sail artisan tinker --execute='echo config("app.admin");' \
+            | tail -n 1 | tr -d '\r')"
           if [ -z "$ADMIN_EMAIL" ]; then echo "::error::Admin seed tidak ditemukan"; exit 1; fi
           echo "APP_ADMIN=${ADMIN_EMAIL}" >> "$GITHUB_ENV"
 
@@ -135,7 +133,8 @@ jobs:
           arch: x86_64
           profile: pixel_5
           disable-animations: true
-          emulator-options: -no-window -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none -memory 2048 -cores 2
+          emulator-options: -no-window -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim
+            -camera-back none -camera-front none -memory 2048 -cores 2
           script: |
             set -e
             # Emulator sudah berjalan dari android-emulator-runner: skip boot/matikan di script.
