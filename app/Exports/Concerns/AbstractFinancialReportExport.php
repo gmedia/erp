@@ -2,6 +2,7 @@
 
 namespace App\Exports\Concerns;
 
+use App\Services\FinancialReportDepartmentFilter;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -122,5 +123,18 @@ abstract class AbstractFinancialReportExport implements FromCollection, ShouldAu
         }
 
         return (int) $branchId;
+    }
+
+    /**
+     * Departemen tertentu (id); 'none' dikembalikan sebagai null (lihat resolveWithoutDepartment).
+     */
+    protected function resolveDepartmentId(): ?int
+    {
+        return FinancialReportDepartmentFilter::departmentId($this->filters['department_id'] ?? null);
+    }
+
+    protected function resolveWithoutDepartment(): bool
+    {
+        return FinancialReportDepartmentFilter::withoutDepartment($this->filters['department_id'] ?? null);
     }
 }

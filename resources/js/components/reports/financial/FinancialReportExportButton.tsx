@@ -6,6 +6,7 @@ interface FinancialReportExportButtonProps {
     readonly selectedYearId: number;
     readonly comparisonYearId?: number;
     readonly branchId?: string | null;
+    readonly departmentId?: string | null;
     readonly onExport: (payload: Record<string, string>) => void;
 }
 
@@ -14,6 +15,7 @@ export function FinancialReportExportButton({
     selectedYearId,
     comparisonYearId,
     branchId,
+    departmentId,
     onExport,
 }: FinancialReportExportButtonProps) {
     return (
@@ -28,6 +30,7 @@ export function FinancialReportExportButton({
                         comparison_year_id: String(comparisonYearId),
                     }),
                     ...(branchId && { branch_id: branchId }),
+                    ...(departmentId && { department_id: departmentId }),
                 })
             }
         >

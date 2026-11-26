@@ -29,6 +29,7 @@ export interface AsyncSelectProps<T extends object = Record<string, unknown>> {
     preferredMetaKey?: string;
     filterItems?: (item: T) => boolean;
     disabled?: boolean;
+    leadingOption?: { value: string; label: string };
 }
 
 export function AsyncSelect<T extends object = Record<string, unknown>>({
@@ -46,6 +47,7 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
     preferredMetaKey,
     filterItems,
     disabled = false,
+    leadingOption,
 }: Readonly<AsyncSelectProps<T>>) {
     const [open, setOpen] = React.useState(false);
     const [search, setSearch] = React.useState('');
@@ -124,6 +126,7 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
                 value &&
                 value !== 'null' &&
                 value !== 'undefined' &&
+                value !== leadingOption?.value &&
                 !selectedLabel &&
                 !initialLoadDone &&
                 !initialLabel
@@ -149,7 +152,15 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
         };
 
         void fetchInitialLabel();
-    }, [value, url, selectedLabel, initialLoadDone, labelFn, initialLabel]);
+    }, [
+        value,
+        url,
+        selectedLabel,
+        initialLoadDone,
+        labelFn,
+        initialLabel,
+        leadingOption,
+    ]);
 
     // Fetch items on open or search
     React.useEffect(() => {
@@ -173,6 +184,12 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
         if (!value || value === 'null' || value === 'undefined')
             setSelectedLabel('');
     }, [value]);
+
+    React.useEffect(() => {
+        if (leadingOption && value === leadingOption.value) {
+            setSelectedLabel(leadingOption.label);
+        }
+    }, [value, leadingOption]);
 
     return (
         <Popover open={open && !disabled} onOpenChange={setOpen}>
@@ -216,6 +233,41 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
                                     <div className="flex items-center justify-center">
                                         <Loader2 className="h-4 w-4 animate-spin" />
                                     </div>
+                                </li>
+                            )}
+                            {!loading && leadingOption && !search && (
+                                <li className="list-none">
+                                    <button
+                                        type="button"
+                                        aria-pressed={
+                                            leadingOption.value === value
+                                        }
+                                        className={cn(
+                                            'relative flex w-full cursor-pointer items-center rounded-sm px-2 py-1.5 text-left text-sm outline-none select-none hover:bg-accent hover:text-accent-foreground',
+                                            leadingOption.value === value
+                                                ? 'bg-accent text-accent-foreground'
+                                                : '',
+                                        )}
+                                        onClick={() => {
+                                            onValueChange?.(
+                                                leadingOption.value,
+                                            );
+                                            setSelectedLabel(
+                                                leadingOption.label,
+                                            );
+                                            setOpen(false);
+                                        }}
+                                    >
+                                        <Check
+                                            className={cn(
+                                                'mr-2 h-4 w-4',
+                                                leadingOption.value === value
+                                                    ? 'opacity-100'
+                                                    : 'opacity-0',
+                                            )}
+                                        />
+                                        {leadingOption.label}
+                                    </button>
                                 </li>
                             )}
                             {!loading && items.length === 0 && (

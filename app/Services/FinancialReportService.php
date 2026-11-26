@@ -385,10 +385,16 @@ class FinancialReportService
         ];
     }
 
+    /**
+     * @param  bool  $withoutDepartment  Hanya baris jurnal tanpa departemen (department_id IS NULL).
+     *                                   Tidak bisa dikombinasikan dengan $departmentId.
+     */
     public function getIncomeStatement(
         int $fiscalYearId,
         ?int $comparisonFiscalYearId = null,
         ?int $branchId = null,
+        ?int $departmentId = null,
+        bool $withoutDepartment = false,
     ): array {
         $coaVersion = $this->resolveRequiredCoaVersion($fiscalYearId);
 
@@ -396,14 +402,22 @@ class FinancialReportService
             return $this->emptyIncomeStatementReport();
         }
 
+        $departmentFilter = ['departmentId' => $departmentId, 'withoutDepartment' => $withoutDepartment];
+
         /** @var Collection<int, Account> $accounts */
-        $accounts = $this->accountsWithPostedSums($coaVersion->id, $fiscalYearId, $branchId)
+        $accounts = $this->accountsWithPostedSums(
+            $coaVersion->id,
+            $fiscalYearId,
+            $branchId,
+            $departmentId,
+            $withoutDepartment,
+        )
             ->whereIn('type', ['revenue', 'expense'])
             ->orderBy('code')
             ->get();
 
         ['comparisonBalanceByCurrentAccountId' => $comparisonBalanceByCurrentAccountId]
-            = $this->prepareComparisonContext($accounts, $comparisonFiscalYearId, $branchId);
+            = $this->prepareComparisonContext($accounts, $comparisonFiscalYearId, $branchId, $departmentFilter);
 
         ['buckets' => $buckets, 'totals' => $totals] = $this->collectAccountBuckets(
             $accounts,
@@ -585,7 +599,8 @@ class FinancialReportService
         Collection $accounts,
         ?int $comparisonFiscalYearId,
         ?CoaVersion $comparisonCoaVersion,
-        ?int $branchId = null
+        ?int $branchId = null,
+        array $departmentFilter = [],
     ): array {
         if (! $comparisonFiscalYearId || ! $comparisonCoaVersion) {
             return [];
@@ -595,7 +610,8 @@ class FinancialReportService
             $accounts,
             $comparisonFiscalYearId,
             $comparisonCoaVersion,
-            $branchId
+            $branchId,
+            $departmentFilter,
         );
     }
 
@@ -607,6 +623,7 @@ class FinancialReportService
         Collection $accounts,
         ?int $comparisonFiscalYearId,
         ?int $branchId = null,
+        array $departmentFilter = [],
     ): array {
         $comparisonCoaVersion = $this->resolveComparisonCoaVersion($comparisonFiscalYearId);
 
@@ -617,6 +634,7 @@ class FinancialReportService
                 $comparisonFiscalYearId,
                 $comparisonCoaVersion,
                 $branchId,
+                $departmentFilter,
             ),
         ];
     }
@@ -868,7 +886,8 @@ class FinancialReportService
         Collection $currentAccounts,
         int $comparisonFiscalYearId,
         CoaVersion $comparisonCoaVersion,
-        ?int $branchId = null
+        ?int $branchId = null,
+        array $departmentFilter = [],
     ): array {
         $currentAccounts = $currentAccounts->values();
         $currentIds = $currentAccounts->pluck('id')->all();
@@ -876,7 +895,13 @@ class FinancialReportService
 
         /** @var Collection<int, Account> $comparisonAccounts */
         $comparisonAccounts = $this
-            ->accountsWithPostedSums($comparisonCoaVersion->id, $comparisonFiscalYearId, $branchId)
+            ->accountsWithPostedSums(
+                $comparisonCoaVersion->id,
+                $comparisonFiscalYearId,
+                $branchId,
+                $departmentFilter['departmentId'] ?? null,
+                $departmentFilter['withoutDepartment'] ?? false,
+            )
             ->whereIn('code', $codes)
             ->get();
 
@@ -897,7 +922,13 @@ class FinancialReportService
 
         $sourceIds = $mappings->pluck('source_account_id')->unique()->values()->all();
         /** @var Collection<int, Account> $sourceAccounts */
-        $sourceAccounts = $this->accountsWithPostedSums($comparisonCoaVersion->id, $comparisonFiscalYearId, $branchId)
+        $sourceAccounts = $this->accountsWithPostedSums(
+            $comparisonCoaVersion->id,
+            $comparisonFiscalYearId,
+            $branchId,
+            $departmentFilter['departmentId'] ?? null,
+            $departmentFilter['withoutDepartment'] ?? false,
+        )
             ->whereIn('id', $sourceIds)
             ->get();
 
@@ -1009,8 +1040,13 @@ class FinancialReportService
         return 'operating';
     }
 
-    private function accountsWithPostedSums(int $coaVersionId, int $fiscalYearId, ?int $branchId = null): Builder
-    {
+    private function accountsWithPostedSums(
+        int $coaVersionId,
+        int $fiscalYearId,
+        ?int $branchId = null,
+        ?int $departmentId = null,
+        bool $withoutDepartment = false,
+    ): Builder {
         // Alias columns to posted_*_sum (NOT total_debit/total_credit): the Account
         // model defines getTotalDebitAttribute/getTotalCreditAttribute accessors that
         // recompute unfiltered sums and would shadow any query column of that name.
@@ -1019,6 +1055,8 @@ class FinancialReportService
             ->where('journal_entries.fiscal_year_id', $fiscalYearId)
             ->where('journal_entries.status', 'posted')
             ->when($branchId !== null, fn ($q) => $q->where('journal_entry_lines.branch_id', $branchId))
+            ->when($departmentId !== null, fn ($q) => $q->where('journal_entry_lines.department_id', $departmentId))
+            ->when($withoutDepartment, fn ($q) => $q->whereNull('journal_entry_lines.department_id'))
             ->groupBy('journal_entry_lines.account_id')
             ->select('journal_entry_lines.account_id')
             ->selectRaw('SUM(journal_entry_lines.debit) as posted_debit_sum')
