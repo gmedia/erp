@@ -33,7 +33,7 @@ class ApprovalDelegationController extends Controller
         $delegation = ApprovalDelegation::create($request->validated());
 
         return response()->json([
-            'message' => 'Approval delegation created successfully',
+            'message' => __('approval_delegation_api.created'),
             'data' => new ApprovalDelegationResource($this->loadResourceRelations($delegation)),
         ], 201);
     }
@@ -52,7 +52,7 @@ class ApprovalDelegationController extends Controller
         $approvalDelegation->update($dto->toArray());
 
         return response()->json([
-            'message' => 'Approval delegation updated successfully',
+            'message' => __('approval_delegation_api.updated'),
             'data' => new ApprovalDelegationResource($this->loadResourceRelations($approvalDelegation)),
         ]);
     }
