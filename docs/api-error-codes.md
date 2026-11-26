@@ -33,6 +33,7 @@ Respons error domain menyertakan `error_code` yang stabil di samping `message`.
 | `entity_state.state_not_found` | 404 | `POST /api/entity-states/{entityType}/{entityId}/transition` | Entity state not found. |
 | `entity_state.transition_forbidden` | 403 | `POST /api/entity-states/{entityType}/{entityId}/transition` | Transition not allowed for your role. |
 | `entity_state.entity_not_found` | 404 | entity state endpoints | Entity not found. |
+| `permission.denied` | 403 | rute `permission:...,true` (`CheckPermission`) dan `entity-state-permission` | You do not have permission to perform this action. |
 
 Catatan: endpoint mengikuti `routes/api/*.php` (parameter route dalam `{}`); pesan en mengikuti `lang/en.json`.
 
