@@ -13,6 +13,7 @@ export interface CrudPageConfig<
 > {
     // Basic configuration
     entityName: string;
+    toastEntityName?: string;
     apiEndpoint: string;
     queryKey: string[];
     identifierKey?: string;
@@ -137,6 +138,7 @@ export function useCrudPage<
         endpoint: config.apiEndpoint,
         queryKey: config.queryKey,
         entityName: config.entityName,
+        toastEntityName: config.toastEntityName,
         identifierKey: config.identifierKey,
         onSuccess: () => {
             // Reset pagination to first page after create/update/delete
@@ -150,6 +152,7 @@ export function useCrudPage<
         endpoint: config.apiEndpoint,
         queryKey: config.queryKey,
         entityName: config.entityName,
+        toastEntityName: config.toastEntityName,
         pagination,
         filters,
     });

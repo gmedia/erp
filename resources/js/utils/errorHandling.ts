@@ -9,11 +9,13 @@ export function registerErrorTranslator(translator: ErrorTranslator | null) {
 }
 
 function localizedError(key: string, fallback: string): string {
-    const translated = translateKey?.(`api_error.${key}`);
+    return translateRegistered(`api_error.${key}`, fallback);
+}
 
-    return translated && translated !== `api_error.${key}`
-        ? translated
-        : fallback;
+export function translateRegistered(key: string, fallback: string): string {
+    const translated = translateKey?.(key);
+
+    return translated && translated !== key ? translated : fallback;
 }
 
 // Error types for better error handling

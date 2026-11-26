@@ -49,6 +49,7 @@ test('hook_toast english messages keep the original english text', function () {
         'entity_state_fetch_failed' => 'Failed to fetch entity state',
         'timeline_fetch_failed' => 'Failed to fetch timeline',
         'transition_failed' => 'Transition failed',
+        'transition_successful' => 'Transition successful',
         'user_fetch_failed' => 'Failed to fetch user data.',
         'user_saved' => 'User saved successfully.',
         'user_validation_failed' => 'Please fix the validation errors.',

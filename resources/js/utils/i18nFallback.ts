@@ -19,13 +19,30 @@ export function translateOr(
 
 export function useToastTranslator(
     namespace: string,
-): (key: string, fallback: string) => string {
+): (key: string, fallback: string, params?: Record<string, string>) => string {
     const { t } = useOptionalTranslation();
 
     return useCallback(
-        (key: string, fallback: string) =>
-            translateOr(t, `${namespace}.${key}`, fallback),
+        (key: string, fallback: string, params?: Record<string, string>) => {
+            const translated = translateOr(
+                t,
+                `${namespace}.${key}`,
+                fallback,
+                params,
+            );
+
+            return params && translated === fallback
+                ? interpolate(fallback, params)
+                : translated;
+        },
         [t, namespace],
+    );
+}
+
+function interpolate(template: string, params: Record<string, string>): string {
+    return Object.entries(params).reduce(
+        (text, [name, value]) => text.replaceAll(`{${name}}`, value),
+        template,
     );
 }
 

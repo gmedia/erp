@@ -136,7 +136,10 @@ export function useEntityPipeline(
                 comment,
             });
             setStateData(response.data.data);
-            toast.success(response.data.message || 'Transition successful');
+            toast.success(
+                response.data.message ||
+                    tToast('transition_successful', 'Transition successful'),
+            );
             void fetchTimeline(1); // Refresh timeline after transition
             return true;
         } catch (err: unknown) {

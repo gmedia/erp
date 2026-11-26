@@ -12,6 +12,7 @@ import { useTwoFactorAuth } from '@/hooks/use-two-factor-auth';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { type BreadcrumbItem } from '@/types';
+import { useToastTranslator } from '@/utils/i18nFallback';
 import { ShieldBan, ShieldCheck } from 'lucide-react';
 
 interface TwoFactorProps {
@@ -44,6 +45,7 @@ export default function TwoFactor({
     const [showSetupModal, setShowSetupModal] = useState<boolean>(false);
     const [enabling, setEnabling] = useState(false);
     const [disabling, setDisabling] = useState(false);
+    const tToast = useToastTranslator('settings_toast');
 
     const enableTwoFactor = async () => {
         setEnabling(true);
@@ -51,7 +53,12 @@ export default function TwoFactor({
             await axios.post('/user/two-factor-authentication');
             setShowSetupModal(true);
         } catch {
-            toast.error('Failed to enable two-factor authentication.');
+            toast.error(
+                tToast(
+                    'two_factor_enable_failed',
+                    'Failed to enable two-factor authentication.',
+                ),
+            );
         } finally {
             setEnabling(false);
         }
@@ -64,7 +71,12 @@ export default function TwoFactor({
             // Hard reload to reflect changes or manually update state
             globalThis.location.reload();
         } catch {
-            toast.error('Failed to disable two-factor authentication.');
+            toast.error(
+                tToast(
+                    'two_factor_disable_failed',
+                    'Failed to disable two-factor authentication.',
+                ),
+            );
         } finally {
             setDisabling(false);
         }
