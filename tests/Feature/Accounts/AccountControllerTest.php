@@ -2,6 +2,7 @@
 
 use App\Models\Account;
 use App\Models\CoaVersion;
+use App\Models\JournalEntryLine;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
@@ -173,7 +174,19 @@ describe('Account API Endpoints', function () {
         $response = deleteJson("/api/accounts/{$parent->id}");
 
         $response->assertStatus(422)
+            ->assertJsonPath('error_code', 'account.has_child_accounts')
             ->assertJsonPath('message', 'Cannot delete account with child accounts.');
+    });
+
+    test('destroy fails if account has journal entries', function () {
+        $account = Account::factory()->create(['coa_version_id' => $this->coaVersion->id]);
+        JournalEntryLine::factory()->create(['account_id' => $account->id]);
+
+        $response = deleteJson("/api/accounts/{$account->id}");
+
+        $response->assertStatus(422)
+            ->assertJsonPath('error_code', 'account.has_journal_entries')
+            ->assertJsonPath('message', 'Cannot delete account with journal entries.');
     });
 
     test('export returns url and filename', function () {

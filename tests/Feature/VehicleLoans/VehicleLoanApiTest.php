@@ -461,6 +461,59 @@ it('builds the generic notification mail', function () {
         ->and($notification->content()->with['companyName'])->toBe('Acme');
 });
 
+it('returns not_draft when updating a loan that is no longer draft', function () {
+    $loan = VehicleLoan::factory()->create([
+        'requester_id' => $this->user->id,
+        'status' => 'submitted',
+    ]);
+
+    putJson("/api/vehicle-loans/{$loan->id}", [
+        'purpose' => 'Perubahan setelah diajukan',
+    ])
+        ->assertStatus(422)
+        ->assertJsonPath('error_code', 'vehicle_loan.not_draft')
+        ->assertJsonPath('message', 'Only draft loans can be updated.');
+});
+
+it('returns not_cancellable when cancelling a loan that is not draft or rejected', function () {
+    $loan = VehicleLoan::factory()->create([
+        'requester_id' => $this->user->id,
+        'status' => 'approved',
+    ]);
+
+    deleteJson("/api/vehicle-loans/{$loan->id}")
+        ->assertStatus(422)
+        ->assertJsonPath('error_code', 'vehicle_loan.not_cancellable')
+        ->assertJsonPath('message', 'Only draft or rejected loans can be cancelled.');
+});
+
+it('returns approval_request_not_found when reviewing a loan without approval request', function () {
+    $loan = VehicleLoan::factory()->create([
+        'requester_id' => $this->user->id,
+        'status' => 'in_progress',
+    ]);
+
+    postJson("/api/vehicle-loans/{$loan->id}/review-assignment", [
+        'driver_id' => VehicleDriver::factory()->create()->id,
+        'vehicle_unit_id' => VehicleUnit::factory()->create()->id,
+    ])
+        ->assertStatus(404)
+        ->assertJsonPath('error_code', 'vehicle_loan.approval_request_not_found')
+        ->assertJsonPath('message', 'Approval request not found.');
+});
+
+it('returns only_requester_can_perform_action when another user submits the loan', function () {
+    $loan = VehicleLoan::factory()->create([
+        'requester_id' => User::factory()->create()->id,
+        'status' => 'draft',
+    ]);
+
+    postJson("/api/vehicle-loans/{$loan->id}/submit")
+        ->assertStatus(403)
+        ->assertJsonPath('error_code', 'vehicle_loan.only_requester_can_perform_action')
+        ->assertJsonPath('message', 'Only the requester can perform this action.');
+});
+
 it('exports vehicle loans as a spreadsheet', function () {
     Storage::fake('public');
 
