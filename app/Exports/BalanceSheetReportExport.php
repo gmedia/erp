@@ -53,22 +53,4 @@ class BalanceSheetReportExport extends AbstractFinancialReportExport
 
         return collect($rows);
     }
-
-    /**
-     * @param  array<string, mixed>  $totals
-     * @return array<int, mixed>
-     */
-    private function summaryRow(string $section, string $label, array $totals, string $key): array
-    {
-        return [
-            $section,
-            '',
-            $label,
-            0,
-            $totals[$key],
-            $totals['comparison_' . $key],
-            $totals['change_' . $key],
-            $totals['change_percentage_' . $key],
-        ];
-    }
 }

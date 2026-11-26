@@ -3,14 +3,17 @@
 namespace App\Exports;
 
 use App\Actions\Reports\GetGeneralLedgerReportAction;
+use App\Exports\Concerns\ExportsNumberFormats;
 use App\Exports\Concerns\WritesTextCells;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class GeneralLedgerReportExport implements FromCollection, ShouldAutoSize, WithCustomValueBinder, WithHeadings
+class GeneralLedgerReportExport implements FromCollection, ShouldAutoSize, WithColumnFormatting, WithCustomValueBinder, WithHeadings
 {
+    use ExportsNumberFormats;
     use WritesTextCells;
 
     public function __construct(
@@ -28,11 +31,19 @@ class GeneralLedgerReportExport implements FromCollection, ShouldAutoSize, WithC
                 $row['description'],
                 $row['account_code'],
                 $row['account_name'],
-                $row['debit'],
-                $row['credit'],
-                $row['running_balance'],
+                $this->numericValue($row['debit']),
+                $this->numericValue($row['credit']),
+                $this->numericValue($row['running_balance']),
                 $row['memo'],
             ]);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function columnFormats(): array
+    {
+        return $this->buildColumnFormats($this->headings());
     }
 
     public function headings(): array
@@ -49,5 +60,13 @@ class GeneralLedgerReportExport implements FromCollection, ShouldAutoSize, WithC
             'Running Balance',
             'Memo',
         ];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function currencyColumnHeadings(): array
+    {
+        return ['Debit', 'Credit', 'Running Balance'];
     }
 }

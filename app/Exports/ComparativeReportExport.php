@@ -38,10 +38,10 @@ class ComparativeReportExport extends AbstractFinancialReportExport
                 '',
                 'Total ' . $section,
                 0,
-                $totals[$key] ?? 0,
-                $totals['comparison_' . $key] ?? 0,
-                $totals['change_' . $key] ?? 0,
-                $totals['change_percentage_' . $key] ?? 0,
+                $this->numericValue($totals[$key] ?? 0),
+                $this->numericValue($totals['comparison_' . $key] ?? 0),
+                $this->numericValue($totals['change_' . $key] ?? 0),
+                $this->numericValue($totals['change_percentage_' . $key] ?? 0),
             ];
         }
 
