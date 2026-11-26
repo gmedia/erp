@@ -894,7 +894,10 @@
         "total": "Total",
         "compare_fiscal_year": "Compare fiscal year",
         "compare_with": "Compare With...",
-        "all_branches": "All Branches"
+        "all_branches": "All Branches",
+        "department": "Department",
+        "all_departments": "All Departments",
+        "without_department": "Without Department"
     },
     "movement_type": {
         "transfer": "Transfer",

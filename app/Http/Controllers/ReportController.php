@@ -98,6 +98,8 @@ class ReportController extends Controller
 
     public function incomeStatement(Request $request): JsonResponse
     {
+        $request->validate(['department_id' => IncomeStatementReportRequest::departmentIdRules()]);
+
         [
             'fiscalYears' => $fiscalYears,
             'selectedYearId' => $selectedYearId,
@@ -112,6 +114,8 @@ class ReportController extends Controller
                 $selectedYearId,
                 $comparisonYearId,
                 $branchId,
+                $this->resolveDepartmentId($request),
+                withoutDepartment: $this->resolveWithoutDepartment($request),
             );
             $config = $this->configurationResolver->execute(ReportConfiguration::TYPE_INCOME_STATEMENT);
             if ($config) {

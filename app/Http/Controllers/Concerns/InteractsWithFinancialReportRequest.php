@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Concerns;
 
 use App\Actions\FiscalYears\GetPreferredFiscalYearAction;
 use App\Models\FiscalYear;
+use App\Services\FinancialReportDepartmentFilter;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 
@@ -64,6 +65,20 @@ trait InteractsWithFinancialReportRequest
         }
 
         return (int) $branchId;
+    }
+
+    /**
+     * Departemen tertentu (id). Nilai 'none' (tanpa departemen) dikembalikan sebagai null
+     * dan ditangani terpisah lewat flag withoutDepartment.
+     */
+    protected function resolveDepartmentId(Request $request): ?int
+    {
+        return FinancialReportDepartmentFilter::departmentId($request->input('department_id'));
+    }
+
+    protected function resolveWithoutDepartment(Request $request): bool
+    {
+        return FinancialReportDepartmentFilter::withoutDepartment($request->input('department_id'));
     }
 
     /**
