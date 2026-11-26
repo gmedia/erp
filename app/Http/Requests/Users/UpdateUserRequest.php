@@ -45,12 +45,12 @@ class UpdateUserRequest extends AuthorizedFormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'The name field is required.',
-            'email.required' => 'The email field is required.',
-            'email.email' => 'The email field must be a valid email address.',
-            'email.unique' => 'The email has already been taken.',
-            'password.required' => 'The password field is required.',
-            'password.min' => 'The password field must be at least 8 characters.',
+            'name.required' => __('validation.form_messages.user_name_required'),
+            'email.required' => __('validation.form_messages.user_email_required'),
+            'email.email' => __('validation.form_messages.user_email_email'),
+            'email.unique' => __('validation.form_messages.user_email_unique'),
+            'password.required' => __('validation.form_messages.user_password_required'),
+            'password.min' => __('validation.form_messages.user_password_min'),
         ];
     }
 }

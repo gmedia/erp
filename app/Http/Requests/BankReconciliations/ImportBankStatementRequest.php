@@ -25,8 +25,8 @@ class ImportBankStatementRequest extends ImportFileRequest
     public function messages(): array
     {
         return [
-            'mapping.date.required' => 'The date column mapping is required.',
-            'mapping.description.required' => 'The description column mapping is required.',
+            'mapping.date.required' => __('validation.form_messages.bank_mapping_date_required'),
+            'mapping.description.required' => __('validation.form_messages.bank_mapping_description_required'),
         ];
     }
 

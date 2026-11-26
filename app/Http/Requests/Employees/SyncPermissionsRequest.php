@@ -33,8 +33,8 @@ class SyncPermissionsRequest extends AuthorizedFormRequest
     public function messages(): array
     {
         return [
-            'permissions.array' => 'The permissions must be an array.',
-            'permissions.*.exists' => 'One or more selected permissions do not exist.',
+            'permissions.array' => __('validation.form_messages.permissions_array'),
+            'permissions.*.exists' => __('validation.form_messages.permissions_exists'),
         ];
     }
 }
