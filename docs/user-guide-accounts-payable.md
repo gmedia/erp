@@ -2,7 +2,7 @@
 
 ## Gambaran Umum
 
-Modul Accounts Payable mengelola **siklus hutang lengkap** — dari pencatatan tagihan vendor (Supplier Bills) hingga pelunasan pembayaran (AP Payments). Modul ini terintegrasi dengan Purchasing (PO/GR), Pipeline, dan Chart of Accounts.
+Modul Accounts Payable mengelola **siklus utang lengkap** — dari pencatatan tagihan vendor (Supplier Bills) hingga pelunasan pembayaran (AP Payments). Modul ini terintegrasi dengan Purchasing (PO/GR), Pipeline, dan Chart of Accounts.
 
 ---
 
@@ -12,7 +12,7 @@ Modul Accounts Payable mengelola **siklus hutang lengkap** — dari pencatatan t
 |------|-----|--------|
 | Supplier Bills | `/supplier-bills` | Kelola tagihan dari supplier |
 | AP Payments | `/ap-payments` | Kelola pembayaran ke supplier |
-| AP Aging Report | `/reports/ap-aging-report` | Laporan umur hutang |
+| AP Aging Report | `/reports/ap-aging-report` | Laporan umur utang |
 | AP Outstanding Report | `/reports/ap-outstanding-report` | Daftar tagihan belum lunas |
 | AP Payment History | `/reports/ap-payment-history-report` | Riwayat pembayaran |
 
@@ -204,7 +204,7 @@ Pipeline memungkinkan:
 
 **Q:** Apa yang terjadi ketika payment dikonfirmasi (Confirmed)?
 
-**J:** Saat status diubah menjadi Confirmed, sistem otomatis mencatat siapa yang mengkonfirmasi dan kapan (confirmed_by, confirmed_at). Sistem juga otomatis memposting jurnal akuntansi (mendebit akun hutang supplier dan mengkredit akun bank/kas yang dipilih) melalui PostApPaymentJournalAction. Setelah confirmed, payment tidak bisa diedit bebas -- hanya bisa di-Void jika perlu dibatalkan.
+**J:** Saat status diubah menjadi Confirmed, sistem otomatis mencatat siapa yang mengkonfirmasi dan kapan (confirmed_by, confirmed_at). Sistem juga otomatis memposting jurnal akuntansi (mendebit akun utang supplier dan mengkredit akun bank/kas yang dipilih) melalui PostApPaymentJournalAction. Setelah confirmed, payment tidak bisa diedit bebas -- hanya bisa di-Void jika perlu dibatalkan.
 
 **Q:** Apa yang terjadi jika payment dibatalkan atau dihapus?
 

@@ -60,12 +60,12 @@ test.describe('i18n page titles (locale id) ap aging report', () => {
         await expect(
             page.getByRole('heading', {
                 level: 1,
-                name: 'Laporan Umur Hutang',
+                name: 'Laporan Umur Utang',
             }),
         ).toBeVisible({ timeout: 15000 });
         const breadcrumb = page.locator('nav[aria-label="breadcrumb"]').first();
         await expect(
-            breadcrumb.getByText('Laporan Umur Hutang', { exact: true }),
+            breadcrumb.getByText('Laporan Umur Utang', { exact: true }),
         ).toBeVisible();
         await expect(
             page.getByRole('heading', { level: 1, name: 'AP Aging Report' }),
@@ -88,7 +88,7 @@ test.describe('i18n page titles (locale en) ap aging report', () => {
         await expect(
             page.getByRole('heading', {
                 level: 1,
-                name: 'Laporan Umur Hutang',
+                name: 'Laporan Umur Utang',
             }),
         ).toHaveCount(0);
     });

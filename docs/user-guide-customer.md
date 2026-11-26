@@ -232,7 +232,7 @@ Terapkan filter yang diinginkan di halaman Customers (misalnya pilih Branch tert
 
 **Q: Apa bedanya customer dengan supplier?**
 
-Customer adalah pihak yang membeli dari perusahaan, tercatat di modul AR (Accounts Receivable), dan memiliki piutang. Supplier adalah pihak yang menjual ke perusahaan, tercatat di modul AP (Accounts Payable), dan memiliki hutang. Keduanya terpisah di sistem karena workflow, laporan, dan proses bisnisnya berbeda. Satu entitas bisa terdaftar sebagai customer dan supplier sekaligus jika memiliki hubungan bisnis dua arah.
+Customer adalah pihak yang membeli dari perusahaan, tercatat di modul AR (Accounts Receivable), dan memiliki piutang. Supplier adalah pihak yang menjual ke perusahaan, tercatat di modul AP (Accounts Payable), dan memiliki utang. Keduanya terpisah di sistem karena workflow, laporan, dan proses bisnisnya berbeda. Satu entitas bisa terdaftar sebagai customer dan supplier sekaligus jika memiliki hubungan bisnis dua arah.
 
 **Q: Field mana saja yang wajib diisi saat menambah customer?**
 

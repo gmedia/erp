@@ -86,3 +86,12 @@ test('asset and inventory stocktake variance menus have distinct indonesian labe
         ->and($id['inventory_stocktake_variance_report'])->toBe('Selisih Stock Opname Persediaan')
         ->and($id['stocktake_variance_report'])->not->toBe($id['inventory_stocktake_variance_report']);
 });
+
+test('accounts payable menu labels use the standard indonesian term utang', function () {
+    $id = localeMenuTranslations('id.json');
+
+    expect($id['ap_aging_report'])->toBe('Laporan Umur Utang')
+        ->and($id['ap_outstanding_report'])->toBe('Laporan Utang Belum Lunas')
+        ->and($id['ap_payment'])->toBe('Pembayaran Utang')
+        ->and($id['ap_payment_history_report'])->toBe('Riwayat Pembayaran Utang');
+});

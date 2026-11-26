@@ -2,7 +2,7 @@
 
 ## Gambaran Umum
 
-Aging Dashboard adalah halaman dashboard read-only yang menampilkan analisis aging piutang (AR) dan hutang (AP) per tanggal tertentu. Dashboard ini membantu tim keuangan mengidentifikasi prioritas penagihan dan urgensi pembayaran berdasarkan usia piutang/hutang.
+Aging Dashboard adalah halaman dashboard read-only yang menampilkan analisis aging piutang (AR) dan utang (AP) per tanggal tertentu. Dashboard ini membantu tim keuangan mengidentifikasi prioritas penagihan dan urgensi pembayaran berdasarkan usia piutang/utang.
 
 Dashboard menampilkan 4 kartu KPI utama, 2 grafik batang horizontal untuk bucket aging AR dan AP, serta 2 tabel top-10 overdue untuk pelanggan dan supplier. Data dapat difilter berdasarkan tanggal dan cabang.
 
@@ -23,7 +23,7 @@ Dashboard menampilkan 4 kartu KPI utama, 2 grafik batang horizontal untuk bucket
 | Filter Branch | Toolbar kiri atas | Memfilter data berdasarkan cabang |
 | KPI Cards | Bagian atas | Menampilkan ringkasan total dan overdue |
 | AR Aging Chart | Bagian tengah kiri | Grafik distribusi aging piutang |
-| AP Aging Chart | Bagian tengah kanan | Grafik distribusi aging hutang |
+| AP Aging Chart | Bagian tengah kanan | Grafik distribusi aging utang |
 | Top 10 Overdue Customers | Bagian bawah kiri | Tabel pelanggan dengan overdue tertinggi |
 | Top 10 Overdue Suppliers | Bagian bawah kanan | Tabel supplier dengan overdue tertinggi |
 
@@ -31,7 +31,7 @@ Dashboard menampilkan 4 kartu KPI utama, 2 grafik batang horizontal untuk bucket
 
 ## 1. Kartu KPI (Key Performance Indicators)
 
-Dashboard memiliki 4 kartu KPI yang menampilkan ringkasan kondisi piutang dan hutang:
+Dashboard memiliki 4 kartu KPI yang menampilkan ringkasan kondisi piutang dan utang:
 
 ### 1.1 Total Receivables
 
@@ -62,10 +62,10 @@ Menampilkan total piutang yang sudah melewati tanggal jatuh tempo.
 
 ### 1.3 Total Payables
 
-Menampilkan total saldo hutang ke supplier yang belum dibayarkan pada tanggal cutoff.
+Menampilkan total saldo utang ke supplier yang belum dibayarkan pada tanggal cutoff.
 
 **Informasi yang ditampilkan:**
-- Nominal total hutang dalam mata uang default perusahaan
+- Nominal total utang dalam mata uang default perusahaan
 - Dihitung dari semua bill supplier yang statusnya belum lunas
 
 **Cara membaca:**
@@ -74,10 +74,10 @@ Menampilkan total saldo hutang ke supplier yang belum dibayarkan pada tanggal cu
 
 ### 1.4 AP Overdue
 
-Menampilkan total hutang yang sudah melewati tanggal jatuh tempo.
+Menampilkan total utang yang sudah melewati tanggal jatuh tempo.
 
 **Informasi yang ditampilkan:**
-- Nominal total hutang overdue
+- Nominal total utang overdue
 - Badge persentase overdue terhadap total payables
 - Warna badge mengindikasikan tingkat urgensi pembayaran
 
@@ -91,7 +91,7 @@ Menampilkan total hutang yang sudah melewati tanggal jatuh tempo.
 
 ## 2. Grafik Aging (AR & AP Aging Buckets)
 
-Dashboard menampilkan 2 grafik batang horizontal yang menunjukkan distribusi piutang dan hutang berdasarkan bucket aging.
+Dashboard menampilkan 2 grafik batang horizontal yang menunjukkan distribusi piutang dan utang berdasarkan bucket aging.
 
 ### 2.1 Bucket Aging
 
@@ -122,10 +122,10 @@ Grafik ini menampilkan distribusi piutang pelanggan per bucket aging.
 
 ### 2.3 Grafik AP Aging
 
-Grafik ini menampilkan distribusi hutang ke supplier per bucket aging.
+Grafik ini menampilkan distribusi utang ke supplier per bucket aging.
 
 **Cara membaca:**
-- Bar paling panjang menunjukkan konsentrasi hutang
+- Bar paling panjang menunjukkan konsentrasi utang
 - Warna membantu identifikasi urgensi pembayaran
 - Bandingkan dengan jadwal arus kas untuk rencana pembayaran
 
@@ -162,19 +162,19 @@ Tabel ini menampilkan pelanggan dengan piutang overdue tertinggi.
 
 ### 3.2 Top 10 Overdue Suppliers
 
-Tabel ini menampilkan supplier dengan hutang overdue tertinggi.
+Tabel ini menampilkan supplier dengan utang overdue tertinggi.
 
 **Kolom yang ditampilkan:**
 | Kolom | Keterangan |
 |-------|------------|
 | Supplier | Nama supplier |
-| Total Overdue | Nominal total hutang yang sudah overdue |
+| Total Overdue | Nominal total utang yang sudah overdue |
 | Oldest Bill | Tanggal bill tertua yang belum dibayar |
 | Days Overdue | Jumlah hari sejak bill tertua melewati jatuh tempo |
 
 **Cara menggunakan:**
 - Gunakan sebagai prioritas pembayaran
-- Klik nama supplier untuk melihat detail hutang
+- Klik nama supplier untuk melihat detail utang
 - Koordinasikan dengan tim purchasing untuk negosiasi
 
 [Screenshot: Tabel Top 10 Overdue Suppliers dengan data contoh]
@@ -240,7 +240,7 @@ Dashboard menyediakan 2 filter untuk mempersempit data yang ditampilkan.
 **Indikator:**
 - Persentase AR Overdue 15-30%
 - Persentase AP Overdue 10-20%
-- Ada konsentrasi piutang/hutang pada bucket 31-60 days
+- Ada konsentrasi piutang/utang pada bucket 31-60 days
 
 **Tindak lanjut:**
 - Tingkatkan intensitas koleksi untuk pelanggan di tabel top 10
@@ -288,7 +288,7 @@ Aging Dashboard berada di bawah menu group Accounting.
 ## FAQ
 
 **Q: Apa perbedaan antara "Current" dan "Overdue"?**
-A: Current adalah piutang/hutang yang belum jatuh tempo (masih dalam periode pembayaran normal). Overdue adalah piutang/hutang yang sudah melewati tanggal jatuh tempo pembayaran.
+A: Current adalah piutang/utang yang belum jatuh tempo (masih dalam periode pembayaran normal). Overdue adalah piutang/utang yang sudah melewati tanggal jatuh tempo pembayaran.
 
 **Q: Bagaimana cara menghitung hari overdue?**
 A: Hari overdue dihitung dari tanggal jatuh tempo hingga tanggal "As Of Date" yang dipilih. Jika tanggal jatuh tempo adalah 1 Januari dan As Of Date adalah 31 Januari, maka hari overdue adalah 30 hari.
@@ -303,10 +303,10 @@ A: Pastikan filter tanggal dan cabang sama. Aging Dashboard menggunakan tanggal 
 A: Klik nama pelanggan atau supplier di tabel top 10 overdue untuk melihat detail transaksi. Atau navigasi ke modul Customer Invoice atau Supplier Bill untuk melihat daftar lengkap.
 
 **Q: Bagaimana cara menindaklanjuti piutang yang sudah overdue?**
-A: Prioritaskan berdasarkan bucket aging (Over 90 hari paling kritis). Hubungi pelanggan, kirim reminder pembayaran, atau eskalasi ke tim collection. Untuk hutang overdue, jadwalkan pembayaran segera untuk menghindari denda atau kerusakan hubungan dengan supplier.
+A: Prioritaskan berdasarkan bucket aging (Over 90 hari paling kritis). Hubungi pelanggan, kirim reminder pembayaran, atau eskalasi ke tim collection. Untuk utang overdue, jadwalkan pembayaran segera untuk menghindari denda atau kerusakan hubungan dengan supplier.
 
 **Q: Apa arti dari bucket aging (Current, 1-30, 31-60, 61-90, Over 90)?**
-A: Bucket mengelompokkan piutang/hutang berdasarkan umur keterlambatan sejak tanggal jatuh tempo. Current = belum jatuh tempo. 1-30 = overdue 1-30 hari. 31-60 = overdue 31-60 hari. 61-90 = overdue 61-90 hari. Over 90 = overdue lebih dari 90 hari (paling berisiko).
+A: Bucket mengelompokkan piutang/utang berdasarkan umur keterlambatan sejak tanggal jatuh tempo. Current = belum jatuh tempo. 1-30 = overdue 1-30 hari. 31-60 = overdue 31-60 hari. 61-90 = overdue 61-90 hari. Over 90 = overdue lebih dari 90 hari (paling berisiko).
 
 **Q: Bagaimana cara filter data per cabang?**
 A: Gunakan dropdown filter "Branch" di bagian atas dashboard. Pilih cabang yang diinginkan untuk melihat data aging khusus cabang tersebut. Default menampilkan semua cabang.
@@ -318,7 +318,7 @@ A: Data direfresh setiap kali halaman dibuka atau saat filter diubah (As Of Date
 A: Tabel "Top 10 Overdue" menampilkan 10 pelanggan/supplier dengan overdue tertinggi. Chart aging bucket menampilkan seluruh data yang sesuai filter. Untuk melihat seluruh daftar, navigasi ke modul Customer Invoice atau Supplier Bill.
 
 **Q: Apa hubungan Aging Dashboard dengan modul AP dan AR?**
-A: Aging Dashboard menyajikan ringkasan visual dari data yang sama yang digunakan modul AP Payment (hutang ke supplier) dan AR Receipt (piutang dari pelanggan). Data di dashboard ini bersumber dari invoice/bill yang belum lunas di kedua modul tersebut.
+A: Aging Dashboard menyajikan ringkasan visual dari data yang sama yang digunakan modul AP Payment (utang ke supplier) dan AR Receipt (piutang dari pelanggan). Data di dashboard ini bersumber dari invoice/bill yang belum lunas di kedua modul tersebut.
 
 **Q: Bagaimana cara mempercepat penagihan piutang?**
 A: Gunakan dashboard untuk identifikasi pelanggan dengan overdue tinggi. Terapkan kebijakan reminder otomatis, tetapkan batas kredit yang ketat, dan lakukan follow-up rutin mingguan. Data aging juga dapat digunakan sebagai bahan negosiasi termin pembayaran dengan pelanggan.
