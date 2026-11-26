@@ -3,11 +3,15 @@
 namespace App\Exports;
 
 use App\Exports\Concerns\BaseExport;
+use App\Exports\Concerns\ExportsNumberFormats;
 use App\Models\PurchaseRequest;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 
-class PurchaseRequestExport extends BaseExport
+class PurchaseRequestExport extends BaseExport implements WithColumnFormatting
 {
+    use ExportsNumberFormats;
+
     public function query(): Builder
     {
         $query = PurchaseRequest::query()->with(['branch', 'department', 'requester']);
@@ -33,6 +37,17 @@ class PurchaseRequestExport extends BaseExport
         return $query;
     }
 
+    /**
+     * @return array<string, string>
+     */
+    public function columnFormats(): array
+    {
+        return $this->buildColumnFormats(array_keys($this->columns()));
+    }
+
+    /**
+     * @return array<string, callable(mixed): mixed>
+     */
     protected function columns(): array
     {
         return [
@@ -45,9 +60,17 @@ class PurchaseRequestExport extends BaseExport
             'Required Date' => fn (PurchaseRequest $pr): mixed => $this->formatDateValue($pr->required_date, 'Y-m-d'),
             'Priority' => fn (PurchaseRequest $pr): mixed => $pr->priority,
             'Status' => fn (PurchaseRequest $pr): mixed => $pr->status,
-            'Estimated Amount' => fn (PurchaseRequest $pr): mixed => $pr->estimated_amount,
+            'Estimated Amount' => fn (PurchaseRequest $pr): mixed => $this->numericValue($pr->estimated_amount),
             'Notes' => fn (PurchaseRequest $pr): mixed => $pr->notes,
             'Created At' => fn (PurchaseRequest $pr): mixed => $this->formatIso8601($pr->created_at),
         ];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function currencyColumnHeadings(): array
+    {
+        return ['Estimated Amount'];
     }
 }

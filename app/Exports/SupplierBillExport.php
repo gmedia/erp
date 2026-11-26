@@ -3,11 +3,15 @@
 namespace App\Exports;
 
 use App\Exports\Concerns\BaseExport;
+use App\Exports\Concerns\ExportsNumberFormats;
 use App\Models\SupplierBill;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 
-class SupplierBillExport extends BaseExport
+class SupplierBillExport extends BaseExport implements WithColumnFormatting
 {
+    use ExportsNumberFormats;
+
     public function query(): Builder
     {
         $query = SupplierBill::query()->with(['supplier', 'branch']);
@@ -42,6 +46,17 @@ class SupplierBillExport extends BaseExport
         return $query;
     }
 
+    /**
+     * @return array<string, string>
+     */
+    public function columnFormats(): array
+    {
+        return $this->buildColumnFormats(array_keys($this->columns()));
+    }
+
+    /**
+     * @return array<string, callable(mixed): mixed>
+     */
     protected function columns(): array
     {
         return [
@@ -55,14 +70,29 @@ class SupplierBillExport extends BaseExport
             'Payment Terms' => fn (SupplierBill $bill): mixed => $bill->payment_terms,
             'Currency' => fn (SupplierBill $bill): mixed => $bill->currency,
             'Status' => fn (SupplierBill $bill): mixed => $bill->status,
-            'Subtotal' => fn (SupplierBill $bill): mixed => $bill->subtotal,
-            'Tax Amount' => fn (SupplierBill $bill): mixed => $bill->tax_amount,
-            'Discount Amount' => fn (SupplierBill $bill): mixed => $bill->discount_amount,
-            'Grand Total' => fn (SupplierBill $bill): mixed => $bill->grand_total,
-            'Amount Paid' => fn (SupplierBill $bill): mixed => $bill->amount_paid,
-            'Amount Due' => fn (SupplierBill $bill): mixed => $bill->amount_due,
+            'Subtotal' => fn (SupplierBill $bill): mixed => $this->numericValue($bill->subtotal),
+            'Tax Amount' => fn (SupplierBill $bill): mixed => $this->numericValue($bill->tax_amount),
+            'Discount Amount' => fn (SupplierBill $bill): mixed => $this->numericValue($bill->discount_amount),
+            'Grand Total' => fn (SupplierBill $bill): mixed => $this->numericValue($bill->grand_total),
+            'Amount Paid' => fn (SupplierBill $bill): mixed => $this->numericValue($bill->amount_paid),
+            'Amount Due' => fn (SupplierBill $bill): mixed => $this->numericValue($bill->amount_due),
             'Notes' => fn (SupplierBill $bill): mixed => $bill->notes,
             'Created At' => fn (SupplierBill $bill): mixed => $this->formatIso8601($bill->created_at),
+        ];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function currencyColumnHeadings(): array
+    {
+        return [
+            'Subtotal',
+            'Tax Amount',
+            'Discount Amount',
+            'Grand Total',
+            'Amount Paid',
+            'Amount Due',
         ];
     }
 }

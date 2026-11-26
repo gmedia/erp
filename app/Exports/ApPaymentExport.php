@@ -3,11 +3,15 @@
 namespace App\Exports;
 
 use App\Exports\Concerns\BaseExport;
+use App\Exports\Concerns\ExportsNumberFormats;
 use App\Models\ApPayment;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 
-class ApPaymentExport extends BaseExport
+class ApPaymentExport extends BaseExport implements WithColumnFormatting
 {
+    use ExportsNumberFormats;
+
     public function query(): Builder
     {
         $query = ApPayment::query()->with(['supplier', 'branch', 'bankAccount']);
@@ -35,6 +39,14 @@ class ApPaymentExport extends BaseExport
     }
 
     /**
+     * @return array<string, string>
+     */
+    public function columnFormats(): array
+    {
+        return $this->buildColumnFormats(array_keys($this->columns()));
+    }
+
+    /**
      * @return array<string, callable(mixed): mixed>
      */
     protected function columns(): array
@@ -53,12 +65,20 @@ class ApPaymentExport extends BaseExport
             'Payment Method' => fn (ApPayment $payment): mixed => $payment->payment_method,
             'Currency' => fn (ApPayment $payment): mixed => $payment->currency,
             'Status' => fn (ApPayment $payment): mixed => $payment->status,
-            'Total Amount' => fn (ApPayment $payment): mixed => $payment->total_amount,
-            'Total Allocated' => fn (ApPayment $payment): mixed => $payment->total_allocated,
-            'Total Unallocated' => fn (ApPayment $payment): mixed => $payment->total_unallocated,
+            'Total Amount' => fn (ApPayment $payment): mixed => $this->numericValue($payment->total_amount),
+            'Total Allocated' => fn (ApPayment $payment): mixed => $this->numericValue($payment->total_allocated),
+            'Total Unallocated' => fn (ApPayment $payment): mixed => $this->numericValue($payment->total_unallocated),
             'Reference' => fn (ApPayment $payment): mixed => $payment->reference,
             'Notes' => fn (ApPayment $payment): mixed => $payment->notes,
             'Created At' => fn (ApPayment $payment): mixed => $this->formatIso8601($payment->created_at),
         ];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function currencyColumnHeadings(): array
+    {
+        return ['Total Amount', 'Total Allocated', 'Total Unallocated'];
     }
 }

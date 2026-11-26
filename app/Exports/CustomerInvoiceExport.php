@@ -3,11 +3,15 @@
 namespace App\Exports;
 
 use App\Exports\Concerns\BaseExport;
+use App\Exports\Concerns\ExportsNumberFormats;
 use App\Models\CustomerInvoice;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 
-class CustomerInvoiceExport extends BaseExport
+class CustomerInvoiceExport extends BaseExport implements WithColumnFormatting
 {
+    use ExportsNumberFormats;
+
     public function query(): Builder
     {
         $query = CustomerInvoice::query()->with(['customer', 'branch', 'fiscalYear']);
@@ -35,6 +39,17 @@ class CustomerInvoiceExport extends BaseExport
         return $query;
     }
 
+    /**
+     * @return array<string, string>
+     */
+    public function columnFormats(): array
+    {
+        return $this->buildColumnFormats(array_keys($this->columns()));
+    }
+
+    /**
+     * @return array<string, callable(mixed): mixed>
+     */
     protected function columns(): array
     {
         return [
@@ -58,15 +73,33 @@ class CustomerInvoiceExport extends BaseExport
             'Payment Terms' => fn (CustomerInvoice $invoice): mixed => $invoice->payment_terms,
             'Currency' => fn (CustomerInvoice $invoice): mixed => $invoice->currency,
             'Status' => fn (CustomerInvoice $invoice): mixed => $invoice->status,
-            'Subtotal' => fn (CustomerInvoice $invoice): mixed => $invoice->subtotal,
-            'Tax Amount' => fn (CustomerInvoice $invoice): mixed => $invoice->tax_amount,
-            'Discount Amount' => fn (CustomerInvoice $invoice): mixed => $invoice->discount_amount,
-            'Grand Total' => fn (CustomerInvoice $invoice): mixed => $invoice->grand_total,
-            'Amount Received' => fn (CustomerInvoice $invoice): mixed => $invoice->amount_received,
-            'Credit Note Amount' => fn (CustomerInvoice $invoice): mixed => $invoice->credit_note_amount,
-            'Amount Due' => fn (CustomerInvoice $invoice): mixed => $invoice->amount_due,
+            'Subtotal' => fn (CustomerInvoice $invoice): mixed => $this->numericValue($invoice->subtotal),
+            'Tax Amount' => fn (CustomerInvoice $invoice): mixed => $this->numericValue($invoice->tax_amount),
+            'Discount Amount' => fn (CustomerInvoice $invoice): mixed => $this->numericValue($invoice->discount_amount),
+            'Grand Total' => fn (CustomerInvoice $invoice): mixed => $this->numericValue($invoice->grand_total),
+            'Amount Received' => fn (CustomerInvoice $invoice): mixed => $this->numericValue($invoice->amount_received),
+            'Credit Note Amount' => fn (CustomerInvoice $invoice): mixed => $this->numericValue(
+                $invoice->credit_note_amount
+            ),
+            'Amount Due' => fn (CustomerInvoice $invoice): mixed => $this->numericValue($invoice->amount_due),
             'Notes' => fn (CustomerInvoice $invoice): mixed => $invoice->notes,
             'Created At' => fn (CustomerInvoice $invoice): mixed => $this->formatIso8601($invoice->created_at),
+        ];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function currencyColumnHeadings(): array
+    {
+        return [
+            'Subtotal',
+            'Tax Amount',
+            'Discount Amount',
+            'Grand Total',
+            'Amount Received',
+            'Credit Note Amount',
+            'Amount Due',
         ];
     }
 }
