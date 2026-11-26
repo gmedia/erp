@@ -694,6 +694,7 @@ jobs:
     env:
       ANDROID_HOME: /usr/local/lib/android/sdk
       ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+      ANDROID_APP_ID: com.example.erp
 
     steps:
       - name: Download debug APK
@@ -717,9 +718,9 @@ jobs:
           script: |
             set -e
             adb install -r apk/app-debug.apk
-            adb shell am start -W -n com.contoh.erp/.MainActivity
+            adb shell am start -W -n "$ANDROID_APP_ID/.MainActivity"
             sleep 15
-            pid="$(adb shell pidof com.contoh.erp | tr -d '\r')"
+            pid="$(adb shell pidof "$ANDROID_APP_ID" | tr -d '\r')"
             if [ -z "$pid" ]; then
               echo "App process is not running after launch"
               exit 1
