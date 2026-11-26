@@ -9,11 +9,13 @@ const STORAGE_KEY = 'app.regional_number_format_settings';
 
 export const DEFAULT_REGIONAL_NUMBER_FORMAT_SETTINGS: RegionalNumberFormatSettings =
     {
-        currency: 'IDR',
+        currency: '',
         number_format_decimal: ',',
         number_format_thousand: '.',
         number_format_hide_decimal: false,
     };
+
+const LEGACY_CURRENCY_ALIAS = 'IDR';
 
 type GlobalNumberFormatHost = typeof globalThis & {
     __APP_REGIONAL_NUMBER_FORMAT_SETTINGS__?: RegionalNumberFormatSettings;
@@ -235,8 +237,7 @@ function resolveCurrencyCode(
         return settings.currency;
     }
 
-    // Backward-compatible: old modules hardcode IDR; treat it as app setting.
-    if (normalized === DEFAULT_REGIONAL_NUMBER_FORMAT_SETTINGS.currency) {
+    if (normalized === LEGACY_CURRENCY_ALIAS) {
         return settings.currency;
     }
 
@@ -295,6 +296,15 @@ export function formatCurrencyByRegionalSettings(
         minimumFractionDigits,
         maximumFractionDigits,
     );
+
+    if (!resolvedCurrency) {
+        return formatNumberByRegionalSettings(numberValue, {
+            locale,
+            minimumFractionDigits,
+            maximumFractionDigits,
+            useGrouping,
+        });
+    }
 
     const formatter = new Intl.NumberFormat(locale, {
         style: 'currency',
