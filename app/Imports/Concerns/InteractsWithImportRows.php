@@ -218,7 +218,7 @@ trait InteractsWithImportRows
         $this->errors[] = [
             'row' => $rowNumber,
             'field' => 'System',
-            'message' => 'Failed to save: ' . $exception->getMessage(),
+            'message' => __('import_rows.save_failed', ['detail' => $exception->getMessage()]),
         ];
     }
 

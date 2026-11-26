@@ -58,7 +58,7 @@ class AuthController extends Controller
     {
         $user = $request->user();
         if (! $user) {
-            return response()->json(['message' => 'Unauthenticated'], 401);
+            return response()->json(['message' => __('auth_api.unauthenticated')], 401);
         }
 
         $user->load('employee.permissions');
@@ -109,7 +109,7 @@ class AuthController extends Controller
             $token->delete();
         }
 
-        return response()->json(['message' => 'Successfully logged out']);
+        return response()->json(['message' => __('auth_api.logged_out')]);
     }
 
     /**

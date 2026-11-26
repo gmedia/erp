@@ -100,7 +100,7 @@ class AdminSettingController extends Controller
         });
 
         return response()->json([
-            'message' => 'Settings updated successfully.',
+            'message' => __('admin_setting_api.updated'),
             'company_logo_url' => $this->getCompanyLogoUrl(),
         ]);
     }
@@ -117,11 +117,13 @@ class AdminSettingController extends Controller
         try {
             Mail::to($request->input('test_email'))->send(new TestSmtpMail);
 
-            return response()->json(['message' => 'Test email sent successfully. Please check your inbox.']);
+            return response()->json(['message' => __('admin_setting_api.test_email_sent')]);
         } catch (Exception $e) {
+            $message = __('admin_setting_api.test_email_failed', ['detail' => $e->getMessage()]);
+
             return response()->json([
-                'message' => 'Failed to send email: ' . $e->getMessage(),
-                'errors' => ['test_email' => ['Failed to send email: ' . $e->getMessage()]],
+                'message' => $message,
+                'errors' => ['test_email' => [$message]],
             ], 422);
         }
     }
