@@ -1,6 +1,7 @@
 import axios from '@/lib/axios';
 import { useQuery } from '@tanstack/react-query';
 import { QRCodeSVG } from 'qrcode.react';
+import { useVehicleLoanPageText } from './useVehicleLoanPageText';
 
 interface MobileConfig {
     public_base_url: string;
@@ -25,6 +26,7 @@ export function VehicleLoanQrPanel({
         staleTime: 60 * 60 * 1000,
     });
 
+    const tPage = useVehicleLoanPageText();
     const base = (data?.public_base_url ?? '').replace(/\/$/, '');
     const path = data?.qr_paths?.[form] ?? `/vehicle-loans/${form}`;
     const url = `${base}${path}`;
@@ -36,22 +38,29 @@ export function VehicleLoanQrPanel({
                     <QRCodeSVG
                         value={url}
                         size={88}
-                        aria-label="QR untuk membuka form di loket security"
+                        aria-label={tPage(
+                            'qr_aria_label',
+                            'QR untuk membuka form di loket security',
+                        )}
                     />
                 ) : (
                     <span className="px-2 text-center text-[10px] text-muted-foreground">
-                        QR belum tersedia
+                        {tPage('qr_unavailable', 'QR belum tersedia')}
                     </span>
                 )}
             </div>
             <div className="space-y-1">
-                <p className="text-sm font-medium">QR Pos Keamanan</p>
+                <p className="text-sm font-medium">
+                    {tPage('qr_title', 'QR Pos Keamanan')}
+                </p>
                 <p className="text-xs text-muted-foreground">
-                    Cetak dan tempel QR ini di pos security. Peminjam scan,
-                    login, lalu form terbuka otomatis.
+                    {tPage(
+                        'qr_description',
+                        'Cetak dan tempel QR ini di pos security. Peminjam scan, login, lalu form terbuka otomatis.',
+                    )}
                 </p>
                 <span className="inline-flex rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-                    Hanya untuk kios / cetak
+                    {tPage('qr_kiosk_badge', 'Hanya untuk kios / cetak')}
                 </span>
             </div>
         </div>

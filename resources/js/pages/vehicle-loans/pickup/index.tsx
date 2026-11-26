@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/select';
 import { RequiredLabel } from '@/components/vehicle-loans/RequiredLabel';
 import { VehicleLoanQrPanel } from '@/components/vehicle-loans/VehicleLoanQrPanel';
+import { useVehicleLoanPageText } from '@/components/vehicle-loans/useVehicleLoanPageText';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
 import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
@@ -40,6 +41,7 @@ export default function VehicleLoanPickupPage() {
     const [loading, setLoading] = useState(false);
     const [loaded, setLoaded] = useState(false);
     const tToast = useToastTranslator('vehicle_loan_toast');
+    const tPage = useVehicleLoanPageText();
 
     async function loadApproved() {
         setLoading(true);
@@ -101,22 +103,28 @@ export default function VehicleLoanPickupPage() {
     return (
         <AppLayout
             breadcrumbs={[
-                { title: 'Pengambilan', href: '/vehicle-loans/pickup' },
+                {
+                    title: tPage('pickup.breadcrumb', 'Pengambilan'),
+                    href: '/vehicle-loans/pickup',
+                },
             ]}
         >
             <Helmet>
-                <title>Pengambilan Kendaraan</title>
+                <title>{tPage('pickup.title', 'Pengambilan Kendaraan')}</title>
             </Helmet>
             <div className="mx-auto max-w-2xl space-y-4 p-4 md:p-6">
                 <PageHeader
-                    title="Pengambilan Kendaraan"
-                    description="Pilih permintaan yang sudah disetujui, unggah bukti, lalu ambil kunci di pos security."
+                    title={tPage('pickup.title', 'Pengambilan Kendaraan')}
+                    description={tPage(
+                        'pickup.description',
+                        'Pilih permintaan yang sudah disetujui, unggah bukti, lalu ambil kunci di pos security.',
+                    )}
                 />
 
                 <Card>
                     <CardHeader className="pb-3">
                         <CardTitle className="text-base">
-                            Data Pengambilan
+                            {tPage('pickup.data_heading', 'Data Pengambilan')}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
@@ -127,13 +135,16 @@ export default function VehicleLoanPickupPage() {
                             className="min-h-11 w-full"
                         >
                             {loading
-                                ? 'Memuat...'
-                                : 'Muat Permintaan Disetujui'}
+                                ? tPage('pickup.loading_button', 'Memuat...')
+                                : tPage(
+                                      'pickup.load_button',
+                                      'Muat Permintaan Disetujui',
+                                  )}
                         </Button>
 
                         <div className="grid gap-2">
                             <RequiredLabel htmlFor="loan">
-                                Permintaan
+                                {tPage('pickup.request_label', 'Permintaan')}
                             </RequiredLabel>
                             <Select
                                 value={loanId || undefined}
@@ -144,8 +155,14 @@ export default function VehicleLoanPickupPage() {
                                     <SelectValue
                                         placeholder={
                                             loaded && !loans.length
-                                                ? 'Tidak ada permintaan disetujui'
-                                                : 'Pilih permintaan'
+                                                ? tPage(
+                                                      'pickup.request_empty_placeholder',
+                                                      'Tidak ada permintaan disetujui',
+                                                  )
+                                                : tPage(
+                                                      'pickup.request_placeholder',
+                                                      'Pilih permintaan',
+                                                  )
                                         }
                                     />
                                 </SelectTrigger>
@@ -157,15 +174,20 @@ export default function VehicleLoanPickupPage() {
                                         >
                                             {loan.code} —{' '}
                                             {loan.plate_number ??
-                                                'unit belum ditentukan'}
+                                                tPage(
+                                                    'pickup.unit_undetermined',
+                                                    'unit belum ditentukan',
+                                                )}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
                             {loaded && !loans.length && (
                                 <p className="text-sm text-muted-foreground">
-                                    Belum ada permintaan yang disetujui. Ajukan
-                                    permintaan terlebih dahulu.
+                                    {tPage(
+                                        'pickup.request_empty_hint',
+                                        'Belum ada permintaan yang disetujui. Ajukan permintaan terlebih dahulu.',
+                                    )}
                                 </p>
                             )}
                         </div>
@@ -174,19 +196,29 @@ export default function VehicleLoanPickupPage() {
                             <div className="space-y-1 rounded-lg border bg-muted/30 p-3 text-sm">
                                 <p className="font-medium">{selected.code}</p>
                                 <p>
-                                    Peminjam: {selected.requester_name ?? '-'}
+                                    {tPage('detail.requester', 'Peminjam')}:{' '}
+                                    {selected.requester_name ?? '-'}
                                 </p>
-                                <p>Pengemudi: {selected.driver_name ?? '-'}</p>
-                                <p>Kendaraan: {selected.plate_number ?? '-'}</p>
-                                <p>Tujuan: {selected.purpose}</p>
                                 <p>
-                                    Mulai:{' '}
+                                    {tPage('detail.driver', 'Pengemudi')}:{' '}
+                                    {selected.driver_name ?? '-'}
+                                </p>
+                                <p>
+                                    {tPage('detail.vehicle', 'Kendaraan')}:{' '}
+                                    {selected.plate_number ?? '-'}
+                                </p>
+                                <p>
+                                    {tPage('detail.purpose', 'Tujuan')}:{' '}
+                                    {selected.purpose}
+                                </p>
+                                <p>
+                                    {tPage('detail.start', 'Mulai')}:{' '}
                                     {formatDateTimeByRegionalSettings(
                                         selected.start_at,
                                     )}
                                 </p>
                                 <p>
-                                    Selesai:{' '}
+                                    {tPage('detail.end', 'Selesai')}:{' '}
                                     {formatDateTimeByRegionalSettings(
                                         selected.end_at,
                                     )}
@@ -198,11 +230,15 @@ export default function VehicleLoanPickupPage() {
 
                 <Card>
                     <CardHeader className="pb-3">
-                        <CardTitle className="text-base">Foto Bukti</CardTitle>
+                        <CardTitle className="text-base">
+                            {tPage('pickup.proof_heading', 'Foto Bukti')}
+                        </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="photo_mode">Jenis foto</Label>
+                            <Label htmlFor="photo_mode">
+                                {tPage('pickup.photo_mode_label', 'Jenis foto')}
+                            </Label>
                             <Select
                                 value={photoMode}
                                 onValueChange={setPhotoMode}
@@ -212,24 +248,36 @@ export default function VehicleLoanPickupPage() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="with_driver">
-                                        Selfie bersama pengemudi
+                                        {tPage(
+                                            'pickup.photo_mode_with_driver',
+                                            'Selfie bersama pengemudi',
+                                        )}
                                     </SelectItem>
                                     <SelectItem value="without_driver">
-                                        Selfie dengan SIM (tanpa driver)
+                                        {tPage(
+                                            'pickup.photo_mode_without_driver',
+                                            'Selfie dengan SIM (tanpa driver)',
+                                        )}
                                     </SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
                         <div className="grid gap-2">
                             <RequiredLabel htmlFor="selfie">
-                                Foto selfie
+                                {tPage('pickup.selfie_label', 'Foto selfie')}
                             </RequiredLabel>
                             <PhotoInput
                                 id="selfie"
                                 value={photo}
                                 onChange={setPhoto}
-                                buttonLabel="Ambil Selfie"
-                                hint="Format JPG/PNG, maksimal 5 MB. Pastikan wajah dan SIM terlihat jelas."
+                                buttonLabel={tPage(
+                                    'pickup.selfie_button',
+                                    'Ambil Selfie',
+                                )}
+                                hint={tPage(
+                                    'pickup.selfie_hint',
+                                    'Format JPG/PNG, maksimal 5 MB. Pastikan wajah dan SIM terlihat jelas.',
+                                )}
                                 capture
                             />
                         </div>
@@ -238,16 +286,22 @@ export default function VehicleLoanPickupPage() {
                             disabled={loading || !loanId || !photo}
                             className="min-h-11 w-full"
                         >
-                            Kirim Pengambilan
+                            {tPage('pickup.submit_button', 'Kirim Pengambilan')}
                         </Button>
                         {!loanId && (
                             <p className="text-center text-xs text-muted-foreground">
-                                Pilih permintaan terlebih dahulu.
+                                {tPage(
+                                    'pickup.select_first_hint',
+                                    'Pilih permintaan terlebih dahulu.',
+                                )}
                             </p>
                         )}
                         {loanId && !photo && (
                             <p className="text-center text-xs text-muted-foreground">
-                                Unggah foto untuk mengirim.
+                                {tPage(
+                                    'pickup.upload_first_hint',
+                                    'Unggah foto untuk mengirim.',
+                                )}
                             </p>
                         )}
                     </CardContent>

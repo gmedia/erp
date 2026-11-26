@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { RequiredLabel } from '@/components/vehicle-loans/RequiredLabel';
+import { useVehicleLoanPageText } from '@/components/vehicle-loans/useVehicleLoanPageText';
 import { VehicleLoanDateTimeFields } from '@/components/vehicle-loans/VehicleLoanDateTimeFields';
 import { VehicleLoanQrPanel } from '@/components/vehicle-loans/VehicleLoanQrPanel';
 import { usePermissions } from '@/hooks/usePermissions';
@@ -50,6 +51,7 @@ export default function VehicleLoanRequestPage() {
     const { can } = usePermissions();
     const canRequest = can('vehicle_loan.request');
     const tToast = useToastTranslator('vehicle_loan_toast');
+    const tPage = useVehicleLoanPageText();
 
     const { data: options } = useQuery({
         queryKey: ['vehicle-loans', 'assignment-options'],
@@ -152,63 +154,54 @@ export default function VehicleLoanRequestPage() {
         <AppLayout
             breadcrumbs={[
                 {
-                    title: 'Peminjaman Kendaraan',
+                    title: tPage('request.breadcrumb', 'Peminjaman Kendaraan'),
                     href: '/vehicle-loans/request',
                 },
             ]}
         >
             <Helmet>
-                <title>Permintaan Peminjaman Kendaraan</title>
+                <title>
+                    {tPage('request.title', 'Permintaan Peminjaman Kendaraan')}
+                </title>
             </Helmet>
             <div className="mx-auto max-w-2xl space-y-4 p-4 pb-24 md:p-6">
                 <PageHeader
-                    title="Permintaan Peminjaman Kendaraan"
-                    description="Isi jadwal dan tujuan perjalanan, simpan draf, lalu kirim untuk persetujuan."
+                    title={tPage(
+                        'request.title',
+                        'Permintaan Peminjaman Kendaraan',
+                    )}
+                    description={tPage(
+                        'request.description',
+                        'Isi jadwal dan tujuan perjalanan, simpan draf, lalu kirim untuk persetujuan.',
+                    )}
                 />
 
                 <Card>
                     <CardHeader className="pb-3">
-                        <CardTitle className="text-base">Jadwal</CardTitle>
+                        <CardTitle className="text-base">
+                            {tPage('request.schedule_heading', 'Jadwal')}
+                        </CardTitle>
                     </CardHeader>
                     <CardContent className="grid gap-4 sm:grid-cols-2">
                         <VehicleLoanDateTimeFields
                             id="start_at"
-                            label="Mulai"
+                            label={tPage('request.start_label', 'Mulai')}
                             value={form.start_at}
                             onChange={(value) => update('start_at', value)}
                             required
                         />
                         <VehicleLoanDateTimeFields
                             id="end_at"
-                            label="Selesai"
+                            label={tPage('request.end_label', 'Selesai')}
                             value={form.end_at}
                             onChange={(value) => update('end_at', value)}
                             required
                         />
                         <p className="text-xs text-muted-foreground sm:col-span-2">
-                            Format: tanggal/bulan/tahun, gunakan waktu 24 jam.
-                        </p>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="pb-3">
-                        <CardTitle className="text-base">Perjalanan</CardTitle>
-                    </CardHeader>
-                    <CardContent className="grid gap-2">
-                        <RequiredLabel htmlFor="purpose">
-                            Tujuan perjalanan
-                        </RequiredLabel>
-                        <Textarea
-                            id="purpose"
-                            value={form.purpose}
-                            placeholder="Contoh: kunjungan klien"
-                            onChange={(e) => update('purpose', e.target.value)}
-                            rows={3}
-                        />
-                        <p className="text-xs text-muted-foreground">
-                            Jelaskan tujuan singkat agar penyetuju mudah menilai
-                            permintaan.
+                            {tPage(
+                                'request.schedule_format_hint',
+                                'Format: tanggal/bulan/tahun, gunakan waktu 24 jam.',
+                            )}
                         </p>
                     </CardContent>
                 </Card>
@@ -216,12 +209,49 @@ export default function VehicleLoanRequestPage() {
                 <Card>
                     <CardHeader className="pb-3">
                         <CardTitle className="text-base">
-                            Penugasan (opsional)
+                            {tPage('request.trip_heading', 'Perjalanan')}
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="grid gap-2">
+                        <RequiredLabel htmlFor="purpose">
+                            {tPage(
+                                'request.purpose_label',
+                                'Tujuan perjalanan',
+                            )}
+                        </RequiredLabel>
+                        <Textarea
+                            id="purpose"
+                            value={form.purpose}
+                            placeholder={tPage(
+                                'request.purpose_placeholder',
+                                'Contoh: kunjungan klien',
+                            )}
+                            onChange={(e) => update('purpose', e.target.value)}
+                            rows={3}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                            {tPage(
+                                'request.purpose_hint',
+                                'Jelaskan tujuan singkat agar penyetuju mudah menilai permintaan.',
+                            )}
+                        </p>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader className="pb-3">
+                        <CardTitle className="text-base">
+                            {tPage(
+                                'request.assignment_heading',
+                                'Penugasan (opsional)',
+                            )}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="grid gap-4 sm:grid-cols-2">
                         <div className="grid gap-2">
-                            <Label htmlFor="driver_id">Pengemudi</Label>
+                            <Label htmlFor="driver_id">
+                                {tPage('request.driver_label', 'Pengemudi')}
+                            </Label>
                             <Select
                                 value={form.driver_id || 'none'}
                                 onValueChange={(value) =>
@@ -232,11 +262,19 @@ export default function VehicleLoanRequestPage() {
                                 }
                             >
                                 <SelectTrigger id="driver_id">
-                                    <SelectValue placeholder="Pilih driver" />
+                                    <SelectValue
+                                        placeholder={tPage(
+                                            'request.driver_placeholder',
+                                            'Pilih driver',
+                                        )}
+                                    />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="none">
-                                        Belum ditentukan (penyetuju melengkapi)
+                                        {tPage(
+                                            'request.undecided_option',
+                                            'Belum ditentukan (penyetuju melengkapi)',
+                                        )}
                                     </SelectItem>
                                     {options?.drivers.map((driver) => (
                                         <SelectItem
@@ -251,7 +289,7 @@ export default function VehicleLoanRequestPage() {
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="vehicle_unit_id">
-                                Unit kendaraan
+                                {tPage('request.unit_label', 'Unit kendaraan')}
                             </Label>
                             <Select
                                 value={form.vehicle_unit_id || 'none'}
@@ -263,11 +301,19 @@ export default function VehicleLoanRequestPage() {
                                 }
                             >
                                 <SelectTrigger id="vehicle_unit_id">
-                                    <SelectValue placeholder="Pilih unit kendaraan" />
+                                    <SelectValue
+                                        placeholder={tPage(
+                                            'request.unit_placeholder',
+                                            'Pilih unit kendaraan',
+                                        )}
+                                    />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="none">
-                                        Belum ditentukan (penyetuju melengkapi)
+                                        {tPage(
+                                            'request.undecided_option',
+                                            'Belum ditentukan (penyetuju melengkapi)',
+                                        )}
                                     </SelectItem>
                                     {options?.units.map((unit) => (
                                         <SelectItem
@@ -282,8 +328,10 @@ export default function VehicleLoanRequestPage() {
                             </Select>
                         </div>
                         <p className="text-xs text-muted-foreground sm:col-span-2">
-                            Boleh dikosongkan. Approver dapat menetapkan driver
-                            dan unit saat review.
+                            {tPage(
+                                'request.assignment_hint',
+                                'Boleh dikosongkan. Approver dapat menetapkan driver dan unit saat review.',
+                            )}
                         </p>
                     </CardContent>
                 </Card>
@@ -307,14 +355,14 @@ export default function VehicleLoanRequestPage() {
                             disabled={loading}
                             className="min-h-11 flex-1"
                         >
-                            Simpan Draf
+                            {tPage('request.save_draft_button', 'Simpan Draf')}
                         </Button>
                         <Button
                             onClick={() => void submit()}
                             disabled={loading}
                             className="min-h-11 flex-1"
                         >
-                            Kirim Permintaan
+                            {tPage('request.submit_button', 'Kirim Permintaan')}
                         </Button>
                     </div>
                 )}

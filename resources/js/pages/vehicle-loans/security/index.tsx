@@ -10,6 +10,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useVehicleLoanPageText } from '@/components/vehicle-loans/useVehicleLoanPageText';
 import { VehicleLoanStatusBadge } from '@/components/vehicle-loans/VehicleLoanStatusBadge';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
@@ -42,6 +43,7 @@ export default function VehicleLoanSecurityPage() {
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState<QueueFilter>('all');
     const tToast = useToastTranslator('vehicle_loan_toast');
+    const tPage = useVehicleLoanPageText();
 
     const { data, isLoading } = useQuery({
         queryKey: ['vehicle-loans', 'security-queue'],
@@ -103,33 +105,50 @@ export default function VehicleLoanSecurityPage() {
     return (
         <AppLayout
             breadcrumbs={[
-                { title: 'Antrean Keamanan', href: '/vehicle-loans/security' },
+                {
+                    title: tPage('security.breadcrumb', 'Antrean Keamanan'),
+                    href: '/vehicle-loans/security',
+                },
             ]}
         >
             <Helmet>
-                <title>Antrean Keamanan — Peminjaman Kendaraan</title>
+                <title>
+                    {tPage(
+                        'security.title_tag',
+                        'Antrean Keamanan — Peminjaman Kendaraan',
+                    )}
+                </title>
             </Helmet>
             <div className="mx-auto max-w-7xl space-y-4 p-4 md:p-6">
                 <PageHeader
-                    title="Antrean Keamanan"
-                    description="Verifikasi status persetujuan sebelum menyerahkan kunci kendaraan."
+                    title={tPage('security.title', 'Antrean Keamanan')}
+                    description={tPage(
+                        'security.description',
+                        'Verifikasi status persetujuan sebelum menyerahkan kunci kendaraan.',
+                    )}
                 />
 
                 <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_220px_auto] sm:items-end">
                     <div className="grid gap-1">
                         <Label htmlFor="security-search" className="text-xs">
-                            Cari
+                            {tPage('security.search_label', 'Cari')}
                         </Label>
                         <Input
                             id="security-search"
                             value={search}
                             onChange={(event) => setSearch(event.target.value)}
-                            placeholder="Cari kode atau plat"
+                            placeholder={tPage(
+                                'security.search_placeholder',
+                                'Cari kode atau plat',
+                            )}
                         />
                     </div>
                     <div className="grid gap-1">
                         <Label htmlFor="security-filter" className="text-xs">
-                            Status antrean
+                            {tPage(
+                                'security.queue_status_label',
+                                'Status antrean',
+                            )}
                         </Label>
                         <Select
                             value={filter}
@@ -142,13 +161,22 @@ export default function VehicleLoanSecurityPage() {
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="all">
-                                    Semua permintaan
+                                    {tPage(
+                                        'security.filter_all',
+                                        'Semua permintaan',
+                                    )}
                                 </SelectItem>
                                 <SelectItem value="ready">
-                                    Siap diserahkan
+                                    {tPage(
+                                        'security.filter_ready',
+                                        'Siap diserahkan',
+                                    )}
                                 </SelectItem>
                                 <SelectItem value="handed">
-                                    Sudah diserahkan
+                                    {tPage(
+                                        'security.filter_handed',
+                                        'Sudah diserahkan',
+                                    )}
                                 </SelectItem>
                             </SelectContent>
                         </Select>
@@ -157,14 +185,19 @@ export default function VehicleLoanSecurityPage() {
                         className="text-sm text-muted-foreground"
                         aria-live="polite"
                     >
-                        {filtered.length} permintaan
+                        {tPage('security.count_suffix', '{count} permintaan', {
+                            count: String(filtered.length),
+                        })}
                     </p>
                 </div>
 
                 {isLoading && (
                     <Card>
                         <CardContent className="py-10 text-center text-sm text-muted-foreground">
-                            Memuat antrean keamanan...
+                            {tPage(
+                                'security.loading',
+                                'Memuat antrean keamanan...',
+                            )}
                         </CardContent>
                     </Card>
                 )}
@@ -173,11 +206,16 @@ export default function VehicleLoanSecurityPage() {
                         <CardContent className="space-y-3 py-10 text-center">
                             <div>
                                 <p className="font-medium">
-                                    Tidak ada permintaan pada filter ini
+                                    {tPage(
+                                        'security.empty_title',
+                                        'Tidak ada permintaan pada filter ini',
+                                    )}
                                 </p>
                                 <p className="text-sm text-muted-foreground">
-                                    Ubah filter atau kata pencarian untuk
-                                    melihat antrean lain.
+                                    {tPage(
+                                        'security.empty_hint',
+                                        'Ubah filter atau kata pencarian untuk melihat antrean lain.',
+                                    )}
                                 </p>
                             </div>
                             <Button
@@ -188,7 +226,7 @@ export default function VehicleLoanSecurityPage() {
                                     setSearch('');
                                 }}
                             >
-                                Tampilkan Semua
+                                {tPage('security.show_all', 'Tampilkan Semua')}
                             </Button>
                         </CardContent>
                     </Card>
@@ -212,14 +250,20 @@ export default function VehicleLoanSecurityPage() {
                                                     {loan.code}
                                                 </p>
                                                 <p className="text-xs text-muted-foreground">
-                                                    Peminjam:{' '}
-                                                    {loan.requester_name}
+                                                    {tPage(
+                                                        'detail.requester',
+                                                        'Peminjam',
+                                                    )}
+                                                    : {loan.requester_name}
                                                 </p>
                                             </div>
                                             <div className="flex flex-wrap items-center justify-end gap-1">
                                                 {loan.is_overdue && (
                                                     <span className="rounded-full bg-destructive-soft px-2 py-1 text-xs font-medium text-destructive-foreground">
-                                                        Terlambat
+                                                        {tPage(
+                                                            'security.overdue_badge',
+                                                            'Terlambat',
+                                                        )}
                                                     </span>
                                                 )}
                                                 <VehicleLoanStatusBadge
@@ -229,15 +273,21 @@ export default function VehicleLoanSecurityPage() {
                                         </div>
                                         <dl className="grid grid-cols-2 gap-x-3 gap-y-1 text-sm">
                                             <dt className="text-muted-foreground">
-                                                Kendaraan
+                                                {tPage(
+                                                    'detail.vehicle',
+                                                    'Kendaraan',
+                                                )}
                                             </dt>
                                             <dd>{loan.plate_number ?? '-'}</dd>
                                             <dt className="text-muted-foreground">
-                                                Pengemudi
+                                                {tPage(
+                                                    'detail.driver',
+                                                    'Pengemudi',
+                                                )}
                                             </dt>
                                             <dd>{loan.driver_name ?? '-'}</dd>
                                             <dt className="text-muted-foreground">
-                                                Mulai
+                                                {tPage('detail.start', 'Mulai')}
                                             </dt>
                                             <dd>
                                                 {formatDateTimeByRegionalSettings(
@@ -245,7 +295,7 @@ export default function VehicleLoanSecurityPage() {
                                                 )}
                                             </dd>
                                             <dt className="text-muted-foreground">
-                                                Selesai
+                                                {tPage('detail.end', 'Selesai')}
                                             </dt>
                                             <dd>
                                                 {formatDateTimeByRegionalSettings(
@@ -253,7 +303,10 @@ export default function VehicleLoanSecurityPage() {
                                                 )}
                                             </dd>
                                             <dt className="text-muted-foreground">
-                                                Persetujuan
+                                                {tPage(
+                                                    'security.approval_label',
+                                                    'Persetujuan',
+                                                )}
                                             </dt>
                                             <dd>
                                                 {approvalStatus ? (
@@ -269,7 +322,10 @@ export default function VehicleLoanSecurityPage() {
                                             <div className="min-w-0">
                                                 {handed && (
                                                     <span className="inline-flex items-center rounded-full bg-success-soft px-2 py-1 text-xs font-medium text-success">
-                                                        Kunci sudah diserahkan
+                                                        {tPage(
+                                                            'security.key_handed_badge',
+                                                            'Kunci sudah diserahkan',
+                                                        )}
                                                     </span>
                                                 )}
                                                 {ready && (
@@ -282,12 +338,18 @@ export default function VehicleLoanSecurityPage() {
                                                             )
                                                         }
                                                     >
-                                                        Serahkan Kunci
+                                                        {tPage(
+                                                            'security.handover_button',
+                                                            'Serahkan Kunci',
+                                                        )}
                                                     </Button>
                                                 )}
                                                 {!handed && !ready && (
                                                     <span className="text-xs text-muted-foreground">
-                                                        Menunggu pengambilan
+                                                        {tPage(
+                                                            'security.waiting_pickup',
+                                                            'Menunggu pengambilan',
+                                                        )}
                                                     </span>
                                                 )}
                                             </div>
@@ -300,7 +362,10 @@ export default function VehicleLoanSecurityPage() {
                                                 <Link
                                                     to={`/vehicle-loans/${loan.id}`}
                                                 >
-                                                    Detail
+                                                    {tPage(
+                                                        'security.detail_button',
+                                                        'Detail',
+                                                    )}
                                                 </Link>
                                             </Button>
                                         </div>
