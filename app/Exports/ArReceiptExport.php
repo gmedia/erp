@@ -3,11 +3,15 @@
 namespace App\Exports;
 
 use App\Exports\Concerns\BaseExport;
+use App\Exports\Concerns\ExportsNumberFormats;
 use App\Models\ArReceipt;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 
-class ArReceiptExport extends BaseExport
+class ArReceiptExport extends BaseExport implements WithColumnFormatting
 {
+    use ExportsNumberFormats;
+
     public function query(): Builder
     {
         $query = ArReceipt::query()->with(['customer', 'branch', 'fiscalYear', 'bankAccount']);
@@ -35,6 +39,9 @@ class ArReceiptExport extends BaseExport
         return $query;
     }
 
+    /**
+     * @return array<string, callable(mixed): mixed>
+     */
     protected function columns(): array
     {
         return [
@@ -52,12 +59,20 @@ class ArReceiptExport extends BaseExport
             ),
             'Currency' => fn (ArReceipt $receipt): mixed => $receipt->currency,
             'Status' => fn (ArReceipt $receipt): mixed => $receipt->status,
-            'Total Amount' => fn (ArReceipt $receipt): mixed => $receipt->total_amount,
-            'Total Allocated' => fn (ArReceipt $receipt): mixed => $receipt->total_allocated,
-            'Total Unallocated' => fn (ArReceipt $receipt): mixed => $receipt->total_unallocated,
+            'Total Amount' => fn (ArReceipt $receipt): mixed => $this->numericValue($receipt->total_amount),
+            'Total Allocated' => fn (ArReceipt $receipt): mixed => $this->numericValue($receipt->total_allocated),
+            'Total Unallocated' => fn (ArReceipt $receipt): mixed => $this->numericValue($receipt->total_unallocated),
             'Reference' => fn (ArReceipt $receipt): mixed => $receipt->reference,
             'Notes' => fn (ArReceipt $receipt): mixed => $receipt->notes,
             'Created At' => fn (ArReceipt $receipt): mixed => $this->formatIso8601($receipt->created_at),
         ];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function currencyColumnHeadings(): array
+    {
+        return ['Total Amount', 'Total Allocated', 'Total Unallocated'];
     }
 }

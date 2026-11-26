@@ -3,11 +3,15 @@
 namespace App\Exports;
 
 use App\Exports\Concerns\BaseExport;
+use App\Exports\Concerns\ExportsNumberFormats;
 use App\Models\CreditNote;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 
-class CreditNoteExport extends BaseExport
+class CreditNoteExport extends BaseExport implements WithColumnFormatting
 {
+    use ExportsNumberFormats;
+
     public function query(): Builder
     {
         $query = CreditNote::query()->with(['customer', 'customerInvoice', 'branch', 'fiscalYear']);
@@ -33,6 +37,9 @@ class CreditNoteExport extends BaseExport
         return $query;
     }
 
+    /**
+     * @return array<string, callable(mixed): mixed>
+     */
     protected function columns(): array
     {
         return [
@@ -49,11 +56,19 @@ class CreditNoteExport extends BaseExport
             'Credit Note Date' => fn (CreditNote $cn): mixed => $this->formatDateValue($cn->credit_note_date, 'Y-m-d'),
             'Reason' => fn (CreditNote $cn): mixed => $cn->reason,
             'Status' => fn (CreditNote $cn): mixed => $cn->status,
-            'Subtotal' => fn (CreditNote $cn): mixed => $cn->subtotal,
-            'Tax Amount' => fn (CreditNote $cn): mixed => $cn->tax_amount,
-            'Grand Total' => fn (CreditNote $cn): mixed => $cn->grand_total,
+            'Subtotal' => fn (CreditNote $cn): mixed => $this->numericValue($cn->subtotal),
+            'Tax Amount' => fn (CreditNote $cn): mixed => $this->numericValue($cn->tax_amount),
+            'Grand Total' => fn (CreditNote $cn): mixed => $this->numericValue($cn->grand_total),
             'Notes' => fn (CreditNote $cn): mixed => $cn->notes,
             'Created At' => fn (CreditNote $cn): mixed => $this->formatIso8601($cn->created_at),
         ];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function currencyColumnHeadings(): array
+    {
+        return ['Subtotal', 'Tax Amount', 'Grand Total'];
     }
 }

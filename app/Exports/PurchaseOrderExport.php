@@ -3,11 +3,15 @@
 namespace App\Exports;
 
 use App\Exports\Concerns\BaseExport;
+use App\Exports\Concerns\ExportsNumberFormats;
 use App\Models\PurchaseOrder;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 
-class PurchaseOrderExport extends BaseExport
+class PurchaseOrderExport extends BaseExport implements WithColumnFormatting
 {
+    use ExportsNumberFormats;
+
     public function query(): Builder
     {
         $query = PurchaseOrder::query()->with(['supplier', 'warehouse']);
@@ -44,6 +48,9 @@ class PurchaseOrderExport extends BaseExport
         return $query;
     }
 
+    /**
+     * @return array<string, callable(mixed): mixed>
+     */
     protected function columns(): array
     {
         return [
@@ -59,12 +66,20 @@ class PurchaseOrderExport extends BaseExport
             'Payment Terms' => fn (PurchaseOrder $po): mixed => $po->payment_terms,
             'Currency' => fn (PurchaseOrder $po): mixed => $po->currency,
             'Status' => fn (PurchaseOrder $po): mixed => $po->status,
-            'Subtotal' => fn (PurchaseOrder $po): mixed => $po->subtotal,
-            'Tax Amount' => fn (PurchaseOrder $po): mixed => $po->tax_amount,
-            'Discount Amount' => fn (PurchaseOrder $po): mixed => $po->discount_amount,
-            'Grand Total' => fn (PurchaseOrder $po): mixed => $po->grand_total,
+            'Subtotal' => fn (PurchaseOrder $po): mixed => $this->numericValue($po->subtotal),
+            'Tax Amount' => fn (PurchaseOrder $po): mixed => $this->numericValue($po->tax_amount),
+            'Discount Amount' => fn (PurchaseOrder $po): mixed => $this->numericValue($po->discount_amount),
+            'Grand Total' => fn (PurchaseOrder $po): mixed => $this->numericValue($po->grand_total),
             'Notes' => fn (PurchaseOrder $po): mixed => $po->notes,
             'Created At' => fn (PurchaseOrder $po): mixed => $this->formatIso8601($po->created_at),
         ];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function currencyColumnHeadings(): array
+    {
+        return ['Subtotal', 'Tax Amount', 'Discount Amount', 'Grand Total'];
     }
 }

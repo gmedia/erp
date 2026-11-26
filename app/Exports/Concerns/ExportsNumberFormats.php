@@ -20,6 +20,16 @@ trait ExportsNumberFormats
     private const NUMBER_FORMAT = '#,##0.00';
 
     /**
+     * Format sel per kolom, dipakai WithColumnFormatting. Default-nya memetakan header dari columns().
+     *
+     * @return array<string, string> huruf kolom => pola format Excel
+     */
+    public function columnFormats(): array
+    {
+        return $this->buildColumnFormats(array_keys($this->columns()));
+    }
+
+    /**
      * Nama header kolom yang berisi angka biasa (mis. 'Quantity On Hand').
      *
      * @return array<int, string>
