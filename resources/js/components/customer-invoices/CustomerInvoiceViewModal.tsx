@@ -1,3 +1,4 @@
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { ViewField } from '@/components/common/ViewField';
 import {
     ViewModalItemsTable,
@@ -50,7 +51,7 @@ export const CustomerInvoiceViewModal = React.memo(
     ({ item, open, onClose }: CustomerInvoiceViewModalProps) => {
         if (!item) return null;
 
-        const formatAmount = createAmountFormatter(item.currency || 'IDR');
+        const formatAmount = createAmountFormatter(item.currency);
 
         const itemColumns = createCustomerInvoiceItemColumns(formatAmount);
 
@@ -85,14 +86,14 @@ export const CustomerInvoiceViewModal = React.memo(
                             value={formatDateByRegionalSettings(
                                 item.invoice_date,
                                 {
-                                    locale: 'id-ID',
+                                    locale: FORMAT_LOCALE,
                                 },
                             )}
                         />
                         <ViewField
                             label="Due Date"
                             value={formatDateByRegionalSettings(item.due_date, {
-                                locale: 'id-ID',
+                                locale: FORMAT_LOCALE,
                             })}
                         />
                         <ViewField
@@ -167,7 +168,7 @@ export const CustomerInvoiceViewModal = React.memo(
                             <div>
                                 Sent by: {item.sent_by?.name || 'System'} on{' '}
                                 {formatDateByRegionalSettings(item.sent_at, {
-                                    locale: 'id-ID',
+                                    locale: FORMAT_LOCALE,
                                 })}
                             </div>
                         )}

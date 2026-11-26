@@ -6,6 +6,7 @@ import {
 import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import React from 'react';
 
@@ -54,7 +55,7 @@ export const ApPaymentViewModal = React.memo(
 
         const formatAmount = (value: FormatValueInput) =>
             formatCurrencyByRegionalSettings(value ?? 0, {
-                locale: 'id-ID',
+                locale: FORMAT_LOCALE,
                 currency: item.currency || undefined,
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 2,

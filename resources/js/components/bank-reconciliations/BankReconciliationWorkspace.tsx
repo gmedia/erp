@@ -1,3 +1,4 @@
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { memo, useCallback, useEffect, useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
@@ -65,7 +66,7 @@ interface AccountOption {
     name: string;
 }
 
-const currencyOpts = { locale: 'id-ID', currency: 'IDR' } as const;
+const currencyOpts = { locale: FORMAT_LOCALE } as const;
 
 function useDebouncedValue(value: string, delay: number): string {
     const [debounced, setDebounced] = useState(value);

@@ -1,4 +1,5 @@
 import { formatDateByRegionalSettings } from '@/utils/date-format';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -21,7 +22,7 @@ export const formatCurrency = (
     }
 
     return formatCurrencyByRegionalSettings(value, {
-        locale: 'id-ID',
+        locale: FORMAT_LOCALE,
         minimumFractionDigits: 0,
         maximumFractionDigits,
     });

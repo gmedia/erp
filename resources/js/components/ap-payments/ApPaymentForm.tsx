@@ -1,5 +1,6 @@
 'use client';
 
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo, useRef } from 'react';
 import { type Resolver, useFieldArray, useForm } from 'react-hook-form';
@@ -372,7 +373,7 @@ export const ApPaymentForm = memo<ApPaymentFormProps>(function ApPaymentForm({
                                                 allocation.allocated_amount ??
                                                     0,
                                                 {
-                                                    locale: 'id-ID',
+                                                    locale: FORMAT_LOCALE,
                                                     currency:
                                                         selectedCurrency ||
                                                         undefined,
@@ -385,7 +386,7 @@ export const ApPaymentForm = memo<ApPaymentFormProps>(function ApPaymentForm({
                                             {formatCurrencyByRegionalSettings(
                                                 allocation.discount_taken ?? 0,
                                                 {
-                                                    locale: 'id-ID',
+                                                    locale: FORMAT_LOCALE,
                                                     currency:
                                                         selectedCurrency ||
                                                         undefined,

@@ -1,5 +1,6 @@
 'use client';
 
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { memo } from 'react';
 
 import {
@@ -13,7 +14,7 @@ import {
 } from '@/components/ui/table';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 
-const currencyOpts = { locale: 'id-ID', currency: 'IDR' } as const;
+const currencyOpts = { locale: FORMAT_LOCALE } as const;
 
 interface LineData {
     id?: number;

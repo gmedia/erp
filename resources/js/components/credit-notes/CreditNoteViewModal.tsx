@@ -1,3 +1,4 @@
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { EntityAuditFooter } from '@/components/common/EntityAuditFooter';
 import { ViewField } from '@/components/common/ViewField';
 import {
@@ -72,7 +73,7 @@ export const CreditNoteViewModal = React.memo(
     ({ item, open, onClose }: CreditNoteViewModalProps) => {
         if (!item) return null;
 
-        const formatAmount = createAmountFormatter('IDR');
+        const formatAmount = createAmountFormatter();
 
         const itemColumns = createCreditNoteItemColumns(formatAmount);
 
@@ -111,7 +112,7 @@ export const CreditNoteViewModal = React.memo(
                             value={formatDateByRegionalSettings(
                                 item.credit_note_date,
                                 {
-                                    locale: 'id-ID',
+                                    locale: FORMAT_LOCALE,
                                 },
                             )}
                         />

@@ -1,3 +1,4 @@
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { memo } from 'react';
 
 import { ViewField } from '@/components/common/ViewField';
@@ -22,7 +23,7 @@ const frequencyLabels: Record<string, string> = {
     annual: 'Yearly',
 };
 
-const currencyOpts = { locale: 'id-ID', currency: 'IDR' } as const;
+const currencyOpts = { locale: FORMAT_LOCALE } as const;
 
 export const RecurringJournalViewModal = memo<RecurringJournalViewModalProps>(
     function RecurringJournalViewModal({ item, open, onClose }) {

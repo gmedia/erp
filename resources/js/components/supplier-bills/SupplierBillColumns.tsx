@@ -10,6 +10,7 @@ import {
     createStatusBadgeColumn,
     createTextColumn,
 } from '@/utils/columns';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { ColumnDef } from '@tanstack/react-table';
 
@@ -67,7 +68,7 @@ export const supplierBillColumns: ColumnDef<SupplierBill>[] = [
         cell: ({ row }) => (
             <div className="text-right">
                 {formatCurrencyByRegionalSettings(row.original.grand_total, {
-                    locale: 'id-ID',
+                    locale: FORMAT_LOCALE,
                     currency: row.original.currency || undefined,
                     minimumFractionDigits: 0,
                     maximumFractionDigits: 2,
@@ -95,7 +96,7 @@ export const supplierBillColumns: ColumnDef<SupplierBill>[] = [
                     {hasNoDue
                         ? '-'
                         : formatCurrencyByRegionalSettings(amountDue, {
-                              locale: 'id-ID',
+                              locale: FORMAT_LOCALE,
                               currency: currency || undefined,
                               minimumFractionDigits: 0,
                               maximumFractionDigits: 2,

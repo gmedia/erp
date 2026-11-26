@@ -15,6 +15,7 @@ import { useTranslation } from '@/contexts/i18n-context';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type ArReceiptFormData } from '@/types/ar-receipt';
 import { type CustomerInvoice } from '@/types/customer-invoice';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 
 const OPEN_INVOICE_STATUSES: readonly string[] = [
@@ -41,8 +42,8 @@ const invoiceLabel = (invoice: CustomerInvoice): string =>
     `${invoice.invoice_number ?? String(invoice.id)} — ${formatCurrencyByRegionalSettings(
         invoice.amount_due,
         {
-            locale: 'id-ID',
-            currency: invoice.currency || 'IDR',
+            locale: FORMAT_LOCALE,
+            currency: invoice.currency,
             minimumFractionDigits: 0,
             maximumFractionDigits: 2,
         },

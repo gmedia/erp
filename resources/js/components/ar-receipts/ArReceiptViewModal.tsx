@@ -1,3 +1,4 @@
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { EntityAuditFooter } from '@/components/common/EntityAuditFooter';
 import { ViewField } from '@/components/common/ViewField';
 import {
@@ -46,7 +47,7 @@ export const ArReceiptViewModal = React.memo(
     ({ item, open, onClose }: ArReceiptViewModalProps) => {
         if (!item) return null;
 
-        const formatAmount = createAmountFormatter(item.currency || 'IDR');
+        const formatAmount = createAmountFormatter(item.currency);
 
         const allocationColumns =
             createArReceiptAllocationColumns(formatAmount);
@@ -82,7 +83,7 @@ export const ArReceiptViewModal = React.memo(
                             value={formatDateByRegionalSettings(
                                 item.receipt_date,
                                 {
-                                    locale: 'id-ID',
+                                    locale: FORMAT_LOCALE,
                                 },
                             )}
                         />

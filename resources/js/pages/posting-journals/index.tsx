@@ -1,5 +1,6 @@
 'use client';
 
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { GenericActions } from '@/components/common/ActionsDropdown';
 import { DataTablePagination } from '@/components/common/DataTablePagination';
 import {
@@ -199,14 +200,12 @@ export default function Index() {
 
                     <TableCell className="pt-4 text-right align-top">
                         {formatCurrencyByRegionalSettings(item.total_debit, {
-                            locale: 'id-ID',
-                            currency: 'IDR',
+                            locale: FORMAT_LOCALE,
                         })}
                     </TableCell>
                     <TableCell className="pt-4 text-right align-top">
                         {formatCurrencyByRegionalSettings(item.total_credit, {
-                            locale: 'id-ID',
-                            currency: 'IDR',
+                            locale: FORMAT_LOCALE,
                         })}
                     </TableCell>
 
@@ -303,16 +302,14 @@ export default function Index() {
                             {formatCurrencyByRegionalSettings(
                                 pageTotals.totals.debit,
                                 {
-                                    locale: 'id-ID',
-                                    currency: 'IDR',
+                                    locale: FORMAT_LOCALE,
                                 },
                             )}{' '}
                             /{' '}
                             {formatCurrencyByRegionalSettings(
                                 pageTotals.totals.credit,
                                 {
-                                    locale: 'id-ID',
-                                    currency: 'IDR',
+                                    locale: FORMAT_LOCALE,
                                 },
                             )}
                         </span>
@@ -334,16 +331,14 @@ export default function Index() {
                             {formatCurrencyByRegionalSettings(
                                 pageTotals.selectedTotals.debit,
                                 {
-                                    locale: 'id-ID',
-                                    currency: 'IDR',
+                                    locale: FORMAT_LOCALE,
                                 },
                             )}{' '}
                             /{' '}
                             {formatCurrencyByRegionalSettings(
                                 pageTotals.selectedTotals.credit,
                                 {
-                                    locale: 'id-ID',
-                                    currency: 'IDR',
+                                    locale: FORMAT_LOCALE,
                                 },
                             )}
                         </span>

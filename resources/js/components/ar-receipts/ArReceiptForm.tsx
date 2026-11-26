@@ -1,4 +1,5 @@
 'use client';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
 import EntityForm from '@/components/common/EntityForm';
@@ -335,10 +336,8 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
                                             {formatCurrencyByRegionalSettings(
                                                 field.allocated_amount,
                                                 {
-                                                    locale: 'id-ID',
-                                                    currency:
-                                                        selectedCurrency ||
-                                                        'IDR',
+                                                    locale: FORMAT_LOCALE,
+                                                    currency: selectedCurrency,
                                                     minimumFractionDigits: 0,
                                                     maximumFractionDigits: 2,
                                                 },
@@ -348,10 +347,8 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
                                             {formatCurrencyByRegionalSettings(
                                                 field.discount_given || 0,
                                                 {
-                                                    locale: 'id-ID',
-                                                    currency:
-                                                        selectedCurrency ||
-                                                        'IDR',
+                                                    locale: FORMAT_LOCALE,
+                                                    currency: selectedCurrency,
                                                     minimumFractionDigits: 0,
                                                     maximumFractionDigits: 2,
                                                 },

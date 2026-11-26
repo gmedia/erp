@@ -11,6 +11,7 @@ import {
 import { formatStatusLabel } from '@/lib/status-badge';
 import { PeriodClosing } from '@/types/period-closing';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { useState } from 'react';
 
@@ -114,8 +115,7 @@ export function PeriodClosingViewModal({
                 <ViewField
                     label="Net Income"
                     value={formatCurrencyByRegionalSettings(view.net_income, {
-                        locale: 'id-ID',
-                        currency: 'IDR',
+                        locale: FORMAT_LOCALE,
                     })}
                 />
                 <ViewField
