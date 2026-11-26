@@ -13,6 +13,7 @@ import {
     createTextColumn,
 } from '@/utils/columns';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { ColumnDef } from '@tanstack/react-table';
 
@@ -102,7 +103,7 @@ export const employeeColumns: ColumnDef<Employee>[] = [
             <div className="text-right tabular-nums">
                 {formatCurrencyByRegionalSettings(
                     row.original.current_employment?.salary ?? '',
-                    { locale: 'id-ID', currency: 'IDR' },
+                    { locale: FORMAT_LOCALE },
                 )}
             </div>
         ),

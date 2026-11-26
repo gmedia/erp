@@ -17,6 +17,7 @@ import { useTranslation } from '@/contexts/i18n-context';
 
 import { Asset } from '@/types/asset';
 import { toDateInputValue } from '@/utils/date-format';
+import { getRegionalNumberFormatSettings } from '@/utils/number-format';
 import { AssetFormData, assetFormSchema } from '@/utils/schemas';
 
 interface AssetFormProps {
@@ -82,7 +83,7 @@ const getAssetFormDefaults = (asset?: Asset | null): AssetFormData => {
             supplier_id: '',
             purchase_date: toDateInputValue(new Date()),
             purchase_cost: '',
-            currency: 'IDR',
+            currency: getRegionalNumberFormatSettings().currency,
             warranty_end_date: null,
             status: 'draft',
             condition: 'good',
@@ -128,7 +129,7 @@ const getAssetFormDefaults = (asset?: Asset | null): AssetFormData => {
         ),
         purchase_date: toDateInputValue(asset.purchase_date),
         purchase_cost: asset.purchase_cost || '',
-        currency: asset.currency || 'IDR',
+        currency: asset.currency || getRegionalNumberFormatSettings().currency,
         warranty_end_date: asset.warranty_end_date
             ? toDateInputValue(asset.warranty_end_date)
             : null,

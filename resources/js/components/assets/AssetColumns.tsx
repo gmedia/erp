@@ -11,6 +11,7 @@ import {
     createSortingHeader,
     createTextColumn,
 } from '@/utils/columns';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { ColumnDef } from '@tanstack/react-table';
 import { Link } from 'react-router-dom';
 
@@ -105,8 +106,7 @@ export const assetColumns: ColumnDef<Asset>[] = [
     createCurrencyColumn<Asset>({
         accessorKey: 'purchase_cost',
         label: { key: 'column.purchase_cost', fallback: 'Cost' },
-        currency: 'IDR',
-        locale: 'id-ID',
+        locale: FORMAT_LOCALE,
         minimumFractionDigits: 0,
     }),
     createDateColumn<Asset>({

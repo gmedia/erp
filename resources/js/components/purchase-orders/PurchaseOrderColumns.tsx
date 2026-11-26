@@ -9,6 +9,7 @@ import {
     createSortingHeader,
     createTextColumn,
 } from '@/utils/columns';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { ColumnDef } from '@tanstack/react-table';
 
@@ -81,7 +82,7 @@ export const purchaseOrderColumns: ColumnDef<PurchaseOrder>[] = [
         cell: ({ row }) => (
             <div className="text-right">
                 {formatCurrencyByRegionalSettings(row.original.grand_total, {
-                    locale: 'id-ID',
+                    locale: FORMAT_LOCALE,
                     currency: row.original.currency || undefined,
                 })}
             </div>

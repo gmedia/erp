@@ -34,9 +34,11 @@ import {
     formatItemReference,
     omitItemDisplayLabels,
 } from '@/utils/entity-form-item';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import {
     formatCurrencyByRegionalSettings,
     formatNumberByRegionalSettings,
+    getRegionalNumberFormatSettings,
 } from '@/utils/number-format';
 import { purchaseOrderFormSchema } from '@/utils/schemas';
 import { PurchaseOrderItemFormDialog } from './PurchaseOrderItemFormDialog';
@@ -91,7 +93,7 @@ const getPurchaseOrderFormDefaults = (
             order_date: toDateInputValue(new Date()),
             expected_delivery_date: null,
             payment_terms: '',
-            currency: 'IDR',
+            currency: getRegionalNumberFormatSettings().currency,
             status: 'draft',
             notes: '',
             shipping_address: '',
@@ -114,7 +116,9 @@ const getPurchaseOrderFormDefaults = (
             ? toDateInputValue(purchaseOrder.expected_delivery_date)
             : null,
         payment_terms: purchaseOrder.payment_terms || '',
-        currency: purchaseOrder.currency || 'IDR',
+        currency:
+            purchaseOrder.currency ||
+            getRegionalNumberFormatSettings().currency,
         status: purchaseOrder.status,
         notes: purchaseOrder.notes || '',
         shipping_address: purchaseOrder.shipping_address || '',
@@ -402,7 +406,7 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(
                                                         purchaseOrderItem.quantity ??
                                                             0,
                                                         {
-                                                            locale: 'id-ID',
+                                                            locale: FORMAT_LOCALE,
                                                             minimumFractionDigits: 0,
                                                             maximumFractionDigits: 2,
                                                         },
@@ -413,7 +417,7 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(
                                                         purchaseOrderItem.unit_price ??
                                                             0,
                                                         {
-                                                            locale: 'id-ID',
+                                                            locale: FORMAT_LOCALE,
                                                             currency:
                                                                 selectedCurrency ||
                                                                 undefined,
@@ -427,7 +431,7 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(
                                                         purchaseOrderItem.discount_percent ??
                                                             0,
                                                         {
-                                                            locale: 'id-ID',
+                                                            locale: FORMAT_LOCALE,
                                                             minimumFractionDigits: 0,
                                                             maximumFractionDigits: 2,
                                                         },
@@ -438,7 +442,7 @@ export const PurchaseOrderForm = memo<PurchaseOrderFormProps>(
                                                         purchaseOrderItem.tax_percent ??
                                                             0,
                                                         {
-                                                            locale: 'id-ID',
+                                                            locale: FORMAT_LOCALE,
                                                             minimumFractionDigits: 0,
                                                             maximumFractionDigits: 2,
                                                         },

@@ -36,6 +36,7 @@ import {
     formatItemReference,
     omitItemDisplayLabels,
 } from '@/utils/entity-form-item';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import {
     formatCurrencyByRegionalSettings,
     formatNumberByRegionalSettings,
@@ -436,7 +437,7 @@ export const PurchaseRequestForm = memo<PurchaseRequestFormProps>(
                                                         purchaseRequestItem.quantity ??
                                                             0,
                                                         {
-                                                            locale: 'id-ID',
+                                                            locale: FORMAT_LOCALE,
                                                             minimumFractionDigits: 0,
                                                             maximumFractionDigits: 2,
                                                         },
@@ -447,7 +448,7 @@ export const PurchaseRequestForm = memo<PurchaseRequestFormProps>(
                                                         purchaseRequestItem.estimated_unit_price ??
                                                             0,
                                                         {
-                                                            locale: 'id-ID',
+                                                            locale: FORMAT_LOCALE,
                                                             minimumFractionDigits: 0,
                                                             maximumFractionDigits: 2,
                                                         },

@@ -7,6 +7,7 @@ import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { useTranslation } from '@/contexts/i18n-context';
 import { type AssetMaintenance } from '@/types/asset-maintenance';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 
 interface AssetMaintenanceViewModalProps {
@@ -61,8 +62,7 @@ export const AssetMaintenanceViewModal = memo<AssetMaintenanceViewModalProps>(
                         value={formatCurrencyByRegionalSettings(
                             Number(item.cost || 0),
                             {
-                                locale: 'id-ID',
-                                currency: 'IDR',
+                                locale: FORMAT_LOCALE,
                                 minimumFractionDigits: 0,
                             },
                         )}

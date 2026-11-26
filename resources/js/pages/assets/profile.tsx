@@ -29,6 +29,7 @@ import {
 } from '@/types/asset';
 import { type AssetMaintenance } from '@/types/asset-maintenance';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -93,8 +94,8 @@ export default function AssetProfile() {
 
     const formatCurrency = (value: string | number) => {
         return formatCurrencyByRegionalSettings(value, {
-            locale: 'id-ID',
-            currency: item?.currency || 'IDR',
+            locale: FORMAT_LOCALE,
+            currency: item?.currency || undefined,
             minimumFractionDigits: 0,
         });
     };

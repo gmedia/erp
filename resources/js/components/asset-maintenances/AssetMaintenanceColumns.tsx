@@ -10,6 +10,7 @@ import {
     createStatusBadgeColumn,
 } from '@/utils/columns';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { type ColumnDef } from '@tanstack/react-table';
 
@@ -90,8 +91,7 @@ export const assetMaintenanceColumns: ColumnDef<AssetMaintenance>[] = [
             const cost = Number(row.original.cost);
             if (Number.isNaN(cost)) return '-';
             return formatCurrencyByRegionalSettings(cost, {
-                locale: 'id-ID',
-                currency: 'IDR',
+                locale: FORMAT_LOCALE,
                 minimumFractionDigits: 0,
             });
         },

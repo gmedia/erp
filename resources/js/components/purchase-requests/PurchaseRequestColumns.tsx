@@ -11,6 +11,7 @@ import {
     createStatusBadgeColumn,
     createTextColumn,
 } from '@/utils/columns';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { ColumnDef } from '@tanstack/react-table';
 
 const renderBranchCell = ({ row }: { row: { original: PurchaseRequest } }) => (
@@ -79,8 +80,7 @@ export const purchaseRequestColumns: ColumnDef<PurchaseRequest>[] = [
             key: 'column.estimated_amount',
             fallback: 'Estimated Amount',
         },
-        currency: 'IDR',
-        locale: 'id-ID',
+        locale: FORMAT_LOCALE,
         minimumFractionDigits: 0,
         maximumFractionDigits: 2,
     }),
