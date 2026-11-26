@@ -53,21 +53,28 @@ class PostCustomerInvoiceJournalAction
             $creditLines = [];
             $revenueGrouped = [];
 
+            // Departemen dokumen diwariskan ke baris pendapatan saja (akun revenue); AR tetap null.
             foreach ($invoice->items as $item) {
                 $accountId = (int) $item->account_id;
-                $revenueGrouped[$accountId] = ($revenueGrouped[$accountId] ?? 0.0)
-                    + $this->roundLineAmount($item->line_total);
+                $key = $accountId . '|' . ($invoice->department_id ?? '');
+                $revenueGrouped[$key] = ($revenueGrouped[$key] ?? [
+                    'account_id' => $accountId,
+                    'department_id' => $invoice->department_id,
+                    'amount' => 0.0,
+                ]);
+                $revenueGrouped[$key]['amount'] += $this->roundLineAmount($item->line_total);
             }
 
-            foreach ($revenueGrouped as $accountId => $amount) {
-                if ($amount <= 0) {
+            foreach ($revenueGrouped as $group) {
+                if ($group['amount'] <= 0) {
                     continue;
                 }
 
                 $creditLines[] = [
-                    'account_id' => $accountId,
+                    'account_id' => $group['account_id'],
+                    'department_id' => $group['department_id'],
                     'debit' => 0,
-                    'credit' => $this->roundLineAmount($amount),
+                    'credit' => $this->roundLineAmount($group['amount']),
                     'memo' => "Invoice {$invoice->invoice_number}",
                 ];
             }

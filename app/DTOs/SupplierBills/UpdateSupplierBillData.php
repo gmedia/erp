@@ -8,6 +8,7 @@ readonly class UpdateSupplierBillData
         public ?string $bill_number = null,
         public ?int $supplier_id = null,
         public ?int $branch_id = null,
+        public ?int $department_id = null,
         public ?int $fiscal_year_id = null,
         public ?int $purchase_order_id = null,
         public ?int $goods_receipt_id = null,
@@ -25,6 +26,8 @@ readonly class UpdateSupplierBillData
         public ?string $amount_due = null,
         public ?string $status = null,
         public ?string $notes = null,
+        // Departemen boleh dikosongkan (null) lewat update: dibedakan dari "tidak dikirim" (#114).
+        public bool $department_provided = false,
     ) {}
 
     public static function fromArray(array $data): self
@@ -33,6 +36,8 @@ readonly class UpdateSupplierBillData
             bill_number: $data['bill_number'] ?? null,
             supplier_id: $data['supplier_id'] ?? null,
             branch_id: $data['branch_id'] ?? null,
+            department_id: $data['department_id'] ?? null,
+            department_provided: array_key_exists('department_id', $data),
             fiscal_year_id: $data['fiscal_year_id'] ?? null,
             purchase_order_id: $data['purchase_order_id'] ?? null,
             goods_receipt_id: $data['goods_receipt_id'] ?? null,
@@ -65,6 +70,9 @@ readonly class UpdateSupplierBillData
         }
         if ($this->branch_id !== null) {
             $payload['branch_id'] = $this->branch_id;
+        }
+        if ($this->department_provided) {
+            $payload['department_id'] = $this->department_id;
         }
         if ($this->fiscal_year_id !== null) {
             $payload['fiscal_year_id'] = $this->fiscal_year_id;

@@ -36,7 +36,7 @@ trait LocksPostedDocumentValues
     protected function lockedHeaderFields(): array
     {
         return [
-            'customer_id', 'supplier_id', 'branch_id', 'fiscal_year_id', 'currency',
+            'customer_id', 'supplier_id', 'branch_id', 'department_id', 'fiscal_year_id', 'currency',
             'customer_invoice_id', 'goods_receipt_id', 'purchase_order_id', 'payment_method',
             'invoice_date', 'bill_date', 'receipt_date', 'payment_date', 'supplier_invoice_date',
             'credit_note_date', 'due_date', 'bank_account_id', 'account_id',

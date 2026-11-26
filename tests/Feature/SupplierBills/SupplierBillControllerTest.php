@@ -6,6 +6,7 @@ use App\Actions\JournalEntries\CreateJournalEntryAction;
 use App\Models\Account;
 use App\Models\Branch;
 use App\Models\CoaVersion;
+use App\Models\Department;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
 use App\Models\Product;
@@ -376,4 +377,18 @@ test('confirming supplier bill rolls back state when journal posting fails', fun
     expect($supplierBill->status)->toBe('draft');
     expect($supplierBill->confirmed_at)->toBeNull();
     expect($supplierBill->confirmed_by)->toBeNull();
+});
+
+test('update sets department on draft supplier bill', function () {
+    $supplierBill = SupplierBill::factory()->create(['status' => 'draft', 'department_id' => null]);
+    $department = Department::factory()->create();
+
+    putJson('/api/supplier-bills/' . $supplierBill->id, ['department_id' => $department->id])
+        ->assertOk()
+        ->assertJsonPath('data.department.id', $department->id);
+
+    assertDatabaseHas('supplier_bills', [
+        'id' => $supplierBill->id,
+        'department_id' => $department->id,
+    ]);
 });

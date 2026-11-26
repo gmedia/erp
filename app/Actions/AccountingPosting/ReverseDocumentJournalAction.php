@@ -65,6 +65,7 @@ class ReverseDocumentJournalAction
             $lines = $original->lines->map(fn ($line): array => [
                 'account_id' => $line->account_id,
                 'branch_id' => $line->branch_id,
+                'department_id' => $line->department_id,
                 'debit' => (float) $line->credit,
                 'credit' => (float) $line->debit,
                 'memo' => 'Pembalik: ' . ($line->memo ?? $reference),

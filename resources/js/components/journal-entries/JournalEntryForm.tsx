@@ -72,6 +72,8 @@ const getJournalEntryFormDefaults = (
             debit: Number(line.debit) || 0,
             credit: Number(line.credit) || 0,
             memo: line.memo || '',
+            department_id: line.department_id ? String(line.department_id) : '',
+            department_name: line.department_name || '',
         })),
     };
 };

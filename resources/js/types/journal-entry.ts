@@ -8,6 +8,8 @@ export interface JournalEntryLine {
     memo?: string;
     branch_id?: string;
     branch_name?: string;
+    department_id?: string | number | null;
+    department_name?: string | null;
 }
 
 export interface JournalEntry {

@@ -16,7 +16,7 @@ class SupplierBillExport extends BaseExport implements WithColumnFormatting
 
     public function query(): Builder
     {
-        $query = SupplierBill::query()->with(['supplier', 'branch']);
+        $query = SupplierBill::query()->with(['supplier', 'branch', 'department']);
 
         $this->applyConfiguredFilters(
             $query,
@@ -58,6 +58,7 @@ class SupplierBillExport extends BaseExport implements WithColumnFormatting
             'Bill Number' => fn (SupplierBill $bill): mixed => $bill->bill_number,
             'Supplier' => fn (SupplierBill $bill): mixed => $this->relatedAttribute($bill, 'supplier', 'name'),
             'Branch' => fn (SupplierBill $bill): mixed => $this->relatedAttribute($bill, 'branch', 'name'),
+            'Department' => fn (SupplierBill $bill): mixed => $this->relatedAttribute($bill, 'department', 'name'),
             'Bill Date' => fn (SupplierBill $bill): mixed => $this->formatDateValue($bill->bill_date, 'Y-m-d'),
             'Due Date' => fn (SupplierBill $bill): mixed => $this->formatDateValue($bill->due_date, 'Y-m-d'),
             'Supplier Invoice #' => fn (SupplierBill $bill): mixed => $bill->supplier_invoice_number,

@@ -21,6 +21,7 @@ abstract class AbstractCreditNoteRequest extends AuthorizedFormRequest
             'customer_id' => $this->withSometimes(['required', 'integer', 'exists:customers,id']),
             'customer_invoice_id' => $this->withSometimes(['nullable', 'integer', 'exists:customer_invoices,id']),
             'branch_id' => $this->withSometimes(['required', 'integer', 'exists:branches,id']),
+            'department_id' => $this->withSometimes(['nullable', 'integer', 'exists:departments,id']),
             'fiscal_year_id' => $this->withSometimes(['required', 'integer', 'exists:fiscal_years,id']),
             'credit_note_date' => $this->withSometimes(['required', 'date']),
             'reason' => $this->withSometimes([

@@ -196,7 +196,7 @@ class CreditNoteController extends Controller
     protected function resourceRelations(): array
     {
         return [
-            'customer', 'customerInvoice', 'branch', 'fiscalYear',
+            'customer', 'customerInvoice', 'branch', 'department', 'fiscalYear',
             'creator', 'confirmer', 'items.product', 'items.account',
         ];
     }

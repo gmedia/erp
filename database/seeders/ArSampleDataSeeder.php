@@ -16,6 +16,7 @@ use App\Models\Customer;
 use App\Models\CustomerCategory;
 use App\Models\CustomerInvoice;
 use App\Models\CustomerInvoiceItem;
+use App\Models\Department;
 use App\Models\FiscalYear;
 use App\Models\Product;
 use App\Models\Unit;
@@ -136,6 +137,7 @@ class ArSampleDataSeeder extends Seeder
     ): array {
         $invoices = [];
         $postJournal = app(PostCustomerInvoiceJournalAction::class);
+        $salesDepartmentId = Department::query()->where('name', DemoMasterData::DEPARTMENT_SALES)->value('id');
 
         $invoiceDefinitions = [
             [
@@ -241,6 +243,8 @@ class ArSampleDataSeeder extends Seeder
                 [
                     'customer_id' => $customer->id,
                     'branch_id' => $branch->id,
+                    // Sebagian invoice membawa departemen; sisanya sengaja tanpa departemen.
+                    'department_id' => $index % 2 === 0 ? $salesDepartmentId : null,
                     'fiscal_year_id' => $fiscalYear->id,
                     'invoice_date' => $invoiceDate->toDateString(),
                     'due_date' => $dueDate->toDateString(),

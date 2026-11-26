@@ -11,6 +11,8 @@ interface JournalLineFormFieldsProps<TFormValues extends FieldValues> {
     readonly defaultValues: TFormValues;
     readonly accountUrl?: string;
     readonly branchUrl?: string;
+    readonly showDepartment?: boolean;
+    readonly departmentUrl?: string;
 }
 
 export function JournalLineFormFields<TFormValues extends FieldValues>({
@@ -19,6 +21,8 @@ export function JournalLineFormFields<TFormValues extends FieldValues>({
     defaultValues,
     accountUrl = '/api/accounts?is_active=1&postable=1',
     branchUrl = '/api/branches',
+    showDepartment = false,
+    departmentUrl = '/api/departments',
 }: Readonly<JournalLineFormFieldsProps<TFormValues>>) {
     const accountId = (defaultValues as Record<string, unknown>).account_id;
     const accountKey =
@@ -80,6 +84,26 @@ export function JournalLineFormFields<TFormValues extends FieldValues>({
                         );
                     }}
                 />
+                {showDepartment ? (
+                    <AsyncSelectField<{ name: string }>
+                        key={`department-${keyBase}`}
+                        name={'department_id' as never}
+                        label="Department"
+                        url={departmentUrl}
+                        placeholder="Select department (optional)"
+                        initialLabel={
+                            ((defaultValues as Record<string, unknown>)
+                                .department_name as string) || ''
+                        }
+                        onItemSelect={(department) => {
+                            form.setValue(
+                                'department_name' as never,
+                                (department?.name || '') as never,
+                                { shouldDirty: true },
+                            );
+                        }}
+                    />
+                ) : null}
             </div>
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

@@ -1,6 +1,7 @@
 'use client';
 import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
+import { DocumentDimensionFields } from '@/components/common/DocumentDimensionFields';
 import EntityForm from '@/components/common/EntityForm';
 import { EntityFormItemSectionHeader } from '@/components/common/EntityFormItemTable';
 import { PostedDocumentLockNotice } from '@/components/common/PostedDocumentLockNotice';
@@ -37,6 +38,7 @@ const getCreditNoteFormDefaults = (
             customer_id: '',
             customer_invoice_id: '',
             branch_id: '',
+            department_id: '',
             fiscal_year_id: '',
             credit_note_date: toDateInputValue(new Date()),
             reason: 'return',
@@ -53,6 +55,9 @@ const getCreditNoteFormDefaults = (
             ? String(creditNote.customer_invoice.id)
             : '',
         branch_id: creditNote.branch?.id ? String(creditNote.branch.id) : '',
+        department_id: creditNote.department?.id
+            ? String(creditNote.department.id)
+            : '',
         fiscal_year_id: creditNote.fiscal_year?.id
             ? String(creditNote.fiscal_year.id)
             : '',
@@ -194,25 +199,7 @@ export const CreditNoteForm = memo<CreditNoteFormProps>(
                             }
                             valueFn={(invoice) => String(invoice.id)}
                         />
-                        <AsyncSelectField
-                            name="branch_id"
-                            label={fl('branch', 'Branch')}
-                            placeholder={fl(
-                                'branch_placeholder',
-                                'Select Branch',
-                            )}
-                            url="/api/branches"
-                        />
-                        <AsyncSelectField
-                            name="fiscal_year_id"
-                            label={fl('fiscal_year', 'Fiscal Year')}
-                            placeholder={fl(
-                                'fiscal_year_placeholder',
-                                'Select Fiscal Year',
-                            )}
-                            url="/api/fiscal-years"
-                            preferredMetaKey="preferred_fiscal_year_id"
-                        />
+                        <DocumentDimensionFields fl={fl} />
                         <DatePickerField
                             name="credit_note_date"
                             label={fl('credit_note_date', 'Credit Note Date')}

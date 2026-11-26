@@ -9,6 +9,7 @@ import {
     createPricingColumns,
 } from '@/components/common/report-format-helpers';
 import { Badge } from '@/components/ui/badge';
+import { useTranslation } from '@/contexts/i18n-context';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import React from 'react';
 
@@ -40,6 +41,8 @@ function createSupplierBillItemColumns(
 
 export const SupplierBillViewModal = React.memo(
     ({ item, open, onClose }: SupplierBillViewModalProps) => {
+        const { t } = useTranslation();
+
         if (!item) return null;
 
         const formatAmount = createAmountFormatter(item.currency);
@@ -68,6 +71,12 @@ export const SupplierBillViewModal = React.memo(
                             <ViewField
                                 label="Branch"
                                 value={item.branch?.name}
+                            />
+                            <ViewField
+                                label={t(
+                                    'form_fields.supplier_bills.department',
+                                )}
+                                value={item.department?.name}
                             />
                             <ViewField
                                 label="Fiscal Year"

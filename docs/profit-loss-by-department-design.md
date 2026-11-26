@@ -1,15 +1,51 @@
-# P&L by Department — Pre-Implementation Research
+# P&L by Department — Design & Keputusan
 
-**Status:** Read-only research, not yet committed to implementation.
-**Generated:** 2026-06-01
+**Status:** Fase 1 (#114) sedang diimplementasi. Keputusan pemilik tercatat di issue #114 (komentar `<!-- decision -->`, 2026-11-26).
+**Generated:** 2026-06-01 (riset awal); diperbarui 2026-11-26 (keputusan).
 
-## Executive Summary
+## Keputusan (#114, 2026-11-26)
+
+- **Sumber departemen**: dokumen sumber membawa `department_id` (opsional); baris jurnal mewarisinya. Jurnal manual boleh mengisi departemen per baris.
+- **Pola**: identik dengan `branch_id` di `journal_entries` / `journal_entry_lines` (migrasi `2026_06_18_000000` dan `2026_06_20_000000`).
+- **Nullable**: `department_id` selalu nullable. Perilaku tanpa departemen tidak berubah; laporan yang ada tetap sama.
+- **Jurnal lama / tanpa departemen**: tampil sebagai kelompok **"Tanpa Departemen"**. Tidak ada alokasi otomatis. Total tetap sama dengan Laba Rugi biasa.
+- **Cakupan akun**: dimensi departemen hanya bermakna untuk akun **pendapatan & beban**. Tidak ada neraca per departemen.
+
+### Tahapan
+
+1. **Fase 1 — fondasi data** (PR ini): `department_id` nullable (FK `nullOnDelete`, index) di `journal_entry_lines`, `customer_invoices`, `supplier_bills`, `credit_notes`. Form Journal Entry manual menerima departemen per baris. Posting action yang meneruskan departemen dari dokumen sumber dikerjakan di langkah berikutnya.
+2. **Fase 2 — filter**: filter departemen opsional di Laba Rugi (`/reports/income-statement`), pola filter cabang yang ada; pilihan "Tanpa Departemen".
+3. **Fase 3 — laporan pivot** (opsional): ditunda sampai data fase 1 terisi beberapa minggu.
+
+### Implementasi posting (fase 1, langkah 2)
+
+- **Customer Invoice, Supplier Bill, Credit Note**: `department_id` opsional di form, request (`nullable|exists`), resource (`department`), view modal, dan export (kolom Department). Hanya baris akun pendapatan/beban yang membawa departemen; baris AR/AP/pajak/persediaan/GR-IR tetap null.
+- **Credit Note**: pakai departemen credit note bila diisi; bila kosong, mewarisi dari invoice terkait.
+- **ReverseDocumentJournalAction**: baris pembalik menyalin `department_id` baris asal.
+- **Pembayaran AP/AR** (`PostApPaymentJournalAction`, `PostArReceiptJournalAction`): tidak menyentuh akun pendapatan/beban (hanya kas, AP, AR), sehingga tidak diubah.
+- Update DTO memakai flag `department_provided` agar departemen bisa dikosongkan (null) lewat update dan dibedakan dari "tidak dikirim".
+
+### Kebijakan: dokumen yang TETAP tanpa departemen (null)
+
+Berikut sengaja tidak diisi departemen (tidak ada sumber yang masuk akal):
+
+- **Depresiasi aset** (`PostDepreciationToJournalAction`): beban disusun per aset/akun, bukan per unit organisasi.
+- **Penyesuaian stok** (`PostStockAdjustmentJournalAction`) dan **transfer stok / inventory in-transit**: nilai persediaan berada di gudang/cabang, bukan departemen.
+- **Rekonsiliasi bank** (`PostBankReconciliationJournalAction`): selisih bank bersifat kas, bukan beban unit.
+- **Tutup periode** (`ClosePeriodAction`): jurnal penutup pendapatan/beban ke laba ditahan bersifat agregat.
+- **Inter-branch clearing** (`InterBranchClearingService`): akun antar-cabang netral terhadap departemen; baris yang disuntikkan otomatis tidak membawa departemen.
+
+Kebijakan ini mengikat fase berikutnya. Mengubahnya memerlukan keputusan baru di issue.
+
+## Executive Summary (riset awal, 2026-06-01 — sebagian usang)
+
+> Catatan: bagian A.1, B, D, dan E di bawah menggambarkan kondisi sebelum #114. `branch_id` pada jurnal sudah ada sejak migrasi 2026-06-18/20, dan Budget Management sudah selesai (lihat `budget-management-design.md`), sehingga rekomendasi "defer" dan urutan prioritas di bagian bawah tidak lagi berlaku.
 
 | | |
 |---|---|
 | Effort sizing | **LARGE** (7+ days) for full implementation |
-| Critical blocker | `journal_entry_lines` has NO `department_id` column. Schema migration + posting flow refactor required across 8 posting actions. |
-| Recommended next action | **Two-phase approach**: Phase 1 (~1 day) = data model migration + opt-in population; Phase 2 (~3-5 days) = service extension + frontend. Or defer entirely if department-level P&L isn't currently a high-priority business need. |
+| Critical blocker (usang) | `journal_entry_lines` tidak punya `department_id` — **diatasi di fase 1 #114**. |
+| Recommended next action (usang) | Digantikan oleh tahapan di atas. |
 
 The codebase has clean conventions to extend — `Department` model exists, `FinancialReportService::getIncomeStatement` is well-structured, posting actions follow uniform patterns. But the foundational dimension column is missing on the journal lines table. This means we cannot just "add a filter and frontend" — every source document → journal posting flow must learn to carry a department dimension.
 
