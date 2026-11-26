@@ -48,6 +48,15 @@ class ApOutstandingReportExport extends AbstractReportIndexExport implements Wit
         );
     }
 
+    protected function currencyColumnHeadings(): array
+    {
+        return [
+            'Grand Total',
+            'Amount Paid',
+            'Amount Due',
+        ];
+    }
+
     protected function actionClass(): string
     {
         return IndexApOutstandingReportAction::class;

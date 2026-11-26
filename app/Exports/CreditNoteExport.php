@@ -12,6 +12,8 @@ class CreditNoteExport extends BaseExport implements WithColumnFormatting
 {
     use ExportsNumberFormats;
 
+    protected array $defaultSortColumns = ['credit_note_date', 'credit_note_number'];
+
     public function query(): Builder
     {
         $query = CreditNote::query()->with(['customer', 'customerInvoice', 'branch', 'fiscalYear']);

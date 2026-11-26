@@ -12,6 +12,8 @@ class ArReceiptExport extends BaseExport implements WithColumnFormatting
 {
     use ExportsNumberFormats;
 
+    protected array $defaultSortColumns = ['receipt_date', 'receipt_number'];
+
     public function query(): Builder
     {
         $query = ArReceipt::query()->with(['customer', 'branch', 'fiscalYear', 'bankAccount']);

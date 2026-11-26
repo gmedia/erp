@@ -10,6 +10,14 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 trait InteractsWithExportFilters
 {
     /**
+     * Kolom urutan default ekspor bila pengguna tidak memilih sort (mis. tanggal, nomor dokumen).
+     * Export yang butuh urutan wajar meng-override properti ini; default kosong = hanya id.
+     *
+     * @var array<int, string>
+     */
+    protected array $defaultSortColumns = [];
+
+    /**
      * @return array<int, array<string, array<string, bool>>>
      */
     public function styles(Worksheet $sheet)
@@ -107,12 +115,31 @@ trait InteractsWithExportFilters
      */
     protected function applySorting(Builder $query, array $filters, array $allowedSortColumns): void
     {
-        $sortBy = (string) ($filters['sort_by'] ?? 'created_at');
+        $sortBy = (string) ($filters['sort_by'] ?? '');
         $sortDirection = $this->normalizeSortDirection($filters);
 
-        if (in_array($sortBy, $allowedSortColumns)) {
+        if ($sortBy !== '' && in_array($sortBy, $allowedSortColumns)) {
             $query->orderBy($sortBy, $sortDirection);
+
+            return;
         }
+
+        // Tanpa sort valid dari filter: urutan default deterministik (kolom default, lalu id).
+        $defaults = $this->defaultSortColumns;
+
+        if ($defaults === []) {
+            if (in_array('created_at', $allowedSortColumns, true)) {
+                $query->orderBy('created_at', $sortDirection);
+            }
+
+            return;
+        }
+
+        foreach ($defaults as $column) {
+            $query->orderBy($column, 'asc');
+        }
+
+        $query->orderBy($query->getModel()->getQualifiedKeyName(), 'asc');
     }
 
     /**

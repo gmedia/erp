@@ -12,6 +12,8 @@ class PurchaseOrderExport extends BaseExport implements WithColumnFormatting
 {
     use ExportsNumberFormats;
 
+    protected array $defaultSortColumns = ['order_date', 'po_number'];
+
     public function query(): Builder
     {
         $query = PurchaseOrder::query()->with(['supplier', 'warehouse']);

@@ -12,6 +12,8 @@ class CustomerInvoiceExport extends BaseExport implements WithColumnFormatting
 {
     use ExportsNumberFormats;
 
+    protected array $defaultSortColumns = ['invoice_date', 'invoice_number'];
+
     public function query(): Builder
     {
         $query = CustomerInvoice::query()->with(['customer', 'branch', 'fiscalYear']);

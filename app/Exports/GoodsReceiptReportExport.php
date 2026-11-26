@@ -37,11 +37,26 @@ class GoodsReceiptReportExport extends AbstractReportIndexExport implements With
             $row->supplier_name ?? '-',
             $row->warehouse_name ?? '-',
             $row->item_count ?? 0,
-            $row->total_received_quantity ?? 0,
-            $row->total_accepted_quantity ?? 0,
-            $row->total_rejected_quantity ?? 0,
-            $row->total_receipt_value ?? 0,
+            $this->numericValue($row->total_received_quantity) ?? 0,
+            $this->numericValue($row->total_accepted_quantity) ?? 0,
+            $this->numericValue($row->total_rejected_quantity) ?? 0,
+            $this->numericValue($row->total_receipt_value) ?? 0,
         ];
+    }
+
+    protected function numericColumnHeadings(): array
+    {
+        return [
+            'Item Count',
+            'Total Received Qty',
+            'Total Accepted Qty',
+            'Total Rejected Qty',
+        ];
+    }
+
+    protected function currencyColumnHeadings(): array
+    {
+        return ['Total Receipt Value'];
     }
 
     protected function actionClass(): string

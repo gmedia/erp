@@ -46,17 +46,31 @@ class ApAgingReportExport extends AbstractReportIndexExport implements WithHeadi
             [
                 $row->status ?? '-',
                 $row->currency ?? '-',
-                $row->current_amount ?? 0,
-                $row->days_1_30 ?? 0,
-                $row->days_31_60 ?? 0,
-                $row->days_61_90 ?? 0,
-                $row->days_over_90 ?? 0,
+                $this->numericValue($row->current_amount) ?? 0,
+                $this->numericValue($row->days_1_30) ?? 0,
+                $this->numericValue($row->days_31_60) ?? 0,
+                $this->numericValue($row->days_61_90) ?? 0,
+                $this->numericValue($row->days_over_90) ?? 0,
                 $row->payment_terms ?? '-',
                 $row->purchase_order_number ?? '-',
                 $row->goods_receipt_number ?? '-',
                 $row->notes ?? '-',
             ]
         );
+    }
+
+    protected function currencyColumnHeadings(): array
+    {
+        return [
+            'Grand Total',
+            'Amount Paid',
+            'Amount Due',
+            'Current',
+            '1-30 Days',
+            '31-60 Days',
+            '61-90 Days',
+            '>90 Days',
+        ];
     }
 
     protected function actionClass(): string

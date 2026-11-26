@@ -12,6 +12,8 @@ class PurchaseRequestExport extends BaseExport implements WithColumnFormatting
 {
     use ExportsNumberFormats;
 
+    protected array $defaultSortColumns = ['request_date', 'pr_number'];
+
     public function query(): Builder
     {
         $query = PurchaseRequest::query()->with(['branch', 'department', 'requester']);
