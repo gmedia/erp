@@ -45,12 +45,12 @@ class UpdateUserRequest extends AuthorizedFormRequest
     public function messages(): array
     {
         return [
-            'name.required' => __('validation.form_messages.user_name_required'),
-            'email.required' => __('validation.form_messages.user_email_required'),
-            'email.email' => __('validation.form_messages.user_email_email'),
-            'email.unique' => __('validation.form_messages.user_email_unique'),
-            'password.required' => __('validation.form_messages.user_password_required'),
-            'password.min' => __('validation.form_messages.user_password_min'),
+            'name.required' => __('form_validation.user_name_required'),
+            'email.required' => __('form_validation.user_email_required'),
+            'email.email' => __('form_validation.user_email_email'),
+            'email.unique' => __('form_validation.user_email_unique'),
+            'password.required' => __('form_validation.user_password_required'),
+            'password.min' => __('form_validation.user_password_min'),
         ];
     }
 }

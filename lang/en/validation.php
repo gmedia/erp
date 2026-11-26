@@ -186,29 +186,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Form Request Messages (project-specific)
-    |--------------------------------------------------------------------------
-    |
-    | Pesan spesifik per FormRequest. Dipisah dari 'custom' agar tidak
-    | menimpa pesan default framework secara global.
-    |
-    */
-
-    'form_messages' => [
-        'user_name_required' => 'The name field is required.',
-        'user_email_required' => 'The email field is required.',
-        'user_email_email' => 'The email field must be a valid email address.',
-        'user_email_unique' => 'The email has already been taken.',
-        'user_password_required' => 'The password field is required.',
-        'user_password_min' => 'The password field must be at least 8 characters.',
-        'permissions_array' => 'The permissions must be an array.',
-        'permissions_exists' => 'One or more selected permissions do not exist.',
-        'bank_mapping_date_required' => 'The date column mapping is required.',
-        'bank_mapping_description_required' => 'The description column mapping is required.',
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
     | Custom Validation Attributes
     |--------------------------------------------------------------------------
     |

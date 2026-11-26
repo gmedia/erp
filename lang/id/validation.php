@@ -235,23 +235,4 @@ return [
         'format' => 'format',
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Form Request Messages (project-specific)
-    |--------------------------------------------------------------------------
-    */
-
-    'form_messages' => [
-        'user_name_required' => 'Kolom nama wajib diisi.',
-        'user_email_required' => 'Kolom email wajib diisi.',
-        'user_email_email' => 'Kolom email harus berupa alamat email yang valid.',
-        'user_email_unique' => 'Email ini sudah digunakan.',
-        'user_password_required' => 'Kolom kata sandi wajib diisi.',
-        'user_password_min' => 'Kolom kata sandi minimal 8 karakter.',
-        'permissions_array' => 'Izin harus berupa larik.',
-        'permissions_exists' => 'Satu atau beberapa izin yang dipilih tidak ada.',
-        'bank_mapping_date_required' => 'Pemetaan kolom tanggal wajib diisi.',
-        'bank_mapping_description_required' => 'Pemetaan kolom keterangan wajib diisi.',
-    ],
-
 ];

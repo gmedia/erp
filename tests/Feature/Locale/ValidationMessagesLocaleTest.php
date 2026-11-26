@@ -55,8 +55,8 @@ test('validation 422 with X-Locale id returns indonesian messages', function () 
     ], ['X-Locale' => 'id']);
 
     $response->assertUnprocessable();
-    expect($response->json('errors.name.0'))->toBe(__('validation.form_messages.user_name_required', [], 'id'));
-    expect($response->json('errors.email.0'))->toBe(__('validation.form_messages.user_email_required', [], 'id'));
+    expect($response->json('errors.name.0'))->toBe(__('form_validation.user_name_required', [], 'id'));
+    expect($response->json('errors.email.0'))->toBe(__('form_validation.user_email_required', [], 'id'));
 });
 
 test('custom form request message is indonesian with X-Locale id', function () {
@@ -94,12 +94,23 @@ test('indonesian validation keys cover every english key except attributes', fun
     $en = localeValidationLines('en');
     $id = localeValidationLines('id');
 
-    $ignored = ['attributes', 'custom', 'form_messages'];
+    $ignored = ['attributes', 'custom'];
     $enKeys = array_values(array_diff(array_keys($en), $ignored));
     $idKeys = array_values(array_diff(array_keys($id), $ignored));
 
     expect(array_diff($enKeys, $idKeys))->toBe([]);
-    expect(array_diff(array_keys($en['form_messages'] ?? []), array_keys($id['form_messages'])))->toBe([]);
+});
+
+test('form validation flat json keys exist in english and indonesian', function () {
+    $en = json_decode(File::get(lang_path('en.json')), true);
+    $id = json_decode(File::get(lang_path('id.json')), true);
+
+    $keys = array_filter(array_keys($en), fn (string $key) => str_starts_with($key, 'form_validation.'));
+
+    expect($keys)->not->toBeEmpty();
+    foreach ($keys as $key) {
+        expect($id)->toHaveKey($key);
+    }
 });
 
 test('indonesian validation file exists and is a php array', function () {

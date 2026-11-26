@@ -25,8 +25,8 @@ class ImportBankStatementRequest extends ImportFileRequest
     public function messages(): array
     {
         return [
-            'mapping.date.required' => __('validation.form_messages.bank_mapping_date_required'),
-            'mapping.description.required' => __('validation.form_messages.bank_mapping_description_required'),
+            'mapping.date.required' => __('form_validation.bank_mapping_date_required'),
+            'mapping.description.required' => __('form_validation.bank_mapping_description_required'),
         ];
     }
 

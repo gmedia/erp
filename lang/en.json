@@ -497,6 +497,16 @@
             "notes_placeholder": "Allocation notes"
         }
     },
+    "form_validation.user_name_required": "The name field is required.",
+    "form_validation.user_email_required": "The email field is required.",
+    "form_validation.user_email_email": "The email field must be a valid email address.",
+    "form_validation.user_email_unique": "The email has already been taken.",
+    "form_validation.user_password_required": "The password field is required.",
+    "form_validation.user_password_min": "The password field must be at least 8 characters.",
+    "form_validation.permissions_array": "The permissions must be an array.",
+    "form_validation.permissions_exists": "One or more selected permissions do not exist.",
+    "form_validation.bank_mapping_date_required": "The date column mapping is required.",
+    "form_validation.bank_mapping_description_required": "The description column mapping is required.",
     "profile.updated": "Profile updated successfully.",
     "profile.name_required": "The name field is required.",
     "profile.name_string": "The name must be text.",
