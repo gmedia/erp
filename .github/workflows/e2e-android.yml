@@ -1,0 +1,180 @@
+# E2E Android headless (Playwright `_android`, PoC #547 / #550).
+# Di luar job `ci` dan tidak memblokir merge. Pemicu: PR yang menyentuh path mobile,
+# jadwal harian, dan workflow_dispatch. Lokal: scripts/e2e-android.sh (lihat docs/mobile-e2e.md).
+name: E2E Android
+
+on:
+  pull_request:
+    paths:
+      - 'android/**'
+      - 'capacitor.config.ts'
+      - 'vite.mobile.config.ts'
+      - 'playwright.android.config.ts'
+      - 'tests/e2e-android/**'
+      - 'scripts/e2e-android.sh'
+      - 'resources/js/lib/axios.ts'
+      - '.github/workflows/e2e-android.yml'
+  schedule:
+    - cron: '17 2 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI_SAIL_IMAGE: ghcr.io/${{ github.repository }}/ci-sail:8.4
+  ANDROID_APP_ID: com.example.erp
+  ANDROID_HOME: /usr/local/lib/android/sdk
+  ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+
+jobs:
+  e2e-android:
+    name: Playwright E2E Android (emulator)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      packages: read
+    env:
+      PLAYWRIGHT_USE_SAIL: '1'
+      PLAYWRIGHT_BASE_URL: http://localhost:82
+
+    steps:
+      - name: Enable KVM for the emulator
+        run: |
+          rule='KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"'
+          echo "$rule" | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          ls -l /dev/kvm
+
+      - name: Checkout source branch
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+          repository: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@d59004228537ca90c8dca680592a08a675bf52b6 # v2
+        with:
+          php-version: 8.4
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Setup Java
+        uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4.8.0
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          sed -i "s/^WWWUSER=.*/WWWUSER=$(id -u)/" .env
+          sed -i "s/^WWWGROUP=.*/WWWGROUP=$(id -g)/" .env
+          echo "DISABLE_RATE_LIMITING=true" >> .env
+          sed -i "s/^AWS_SECRET_ACCESS_KEY=.*/AWS_SECRET_ACCESS_KEY=password/" .env
+          mkdir -p storage/tmp
+          chmod -R u+rwX,g+rwX,o-rwx storage/tmp
+
+      - name: Bootstrap Sail dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Pull CI Sail image
+        shell: bash
+        timeout-minutes: 5
+        run: |
+          bash scripts/ci/pull-sail-image.sh
+
+      - name: Start Sail
+        run: |
+          docker volume rm erp_sail-mariadb 2>/dev/null || true
+          ./vendor/bin/sail up -d --wait
+
+      - name: Install npm dependencies on runner
+        run: npm ci --prefer-offline --no-audit --fund=false
+
+      - name: Generate application key
+        run: ./vendor/bin/sail artisan key:generate
+
+      - name: Run database migrations and seed
+        run: ./vendor/bin/sail artisan migrate:fresh --seed --force
+
+      - name: Resolve seeded admin for the emulator run
+        run: |
+          # Admin hasil seed = config('app.admin'). Nilai dikirim ke env tanpa dicetak ke log.
+          ADMIN_EMAIL="$(./vendor/bin/sail artisan tinker --execute='echo config("app.admin");' | tail -n 1 | tr -d '\r')"
+          if [ -z "$ADMIN_EMAIL" ]; then echo "::error::Admin seed tidak ditemukan"; exit 1; fi
+          echo "APP_ADMIN=${ADMIN_EMAIL}" >> "$GITHUB_ENV"
+
+      - name: Add Android platform tools to PATH
+        run: echo "$ANDROID_HOME/platform-tools" >> "$GITHUB_PATH"
+
+      - name: Launch emulator, build APK, and run Playwright _android
+        uses: ReactiveCircus/android-emulator-runner@e93c997dcab69054e999e3924af3d21c4a736e13 # v2.9.0
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_5
+          disable-animations: true
+          emulator-options: -no-window -no-snapshot -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none -memory 2048 -cores 2
+          script: |
+            set -e
+            # Emulator sudah berjalan dari android-emulator-runner: skip boot/matikan di script.
+            export E2E_ANDROID_SKIP_EMULATOR=1
+            bash scripts/e2e-android.sh || {
+              status=$?
+              mkdir -p android-artifacts
+              adb logcat -d > android-artifacts/logcat.txt 2>/dev/null || true
+              adb exec-out screencap -p > android-artifacts/screen.png 2>/dev/null || true
+              exit "$status"
+            }
+
+      - name: Upload Playwright report and test results on failure
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        continue-on-error: true
+        with:
+          name: e2e-android-report-${{ github.run_id }}
+          path: |
+            playwright-report
+            e2e/test-results-android
+            e2e/playwright-report
+            android-artifacts
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Upload Laravel logs on failure
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        continue-on-error: true
+        with:
+          name: e2e-android-laravel-logs-${{ github.run_id }}
+          path: storage/logs
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Stop Sail
+        if: always()
+        run: |
+          if [ -x ./vendor/bin/sail ]; then
+            ./vendor/bin/sail down -v
+          fi
