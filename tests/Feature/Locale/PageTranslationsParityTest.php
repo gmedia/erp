@@ -373,14 +373,22 @@ test('master data and asset page strings are translated to indonesian', function
         'asset_depreciation_runs',
     ];
 
+    // "Status" adalah istilah baku Indonesia yang sama dengan English; dikecualikan secara eksplisit.
+    $sameInBothLocales = ['asset_depreciation_runs.col_status'];
+
     foreach ($modules as $module) {
         foreach (array_keys($en[$module]) as $field) {
+            if (in_array("{$module}.{$field}", $sameInBothLocales, true)) {
+                continue;
+            }
+
             expect($id[$module][$field])->not->toBe($en[$module][$field], "page.{$module}.{$field} not translated");
         }
     }
 
     expect($id['customers']['title'])->toBe('Pelanggan')
-        ->and($id['asset_depreciation_runs']['title'])->toBe('Penyusutan Aset');
+        ->and($id['asset_depreciation_runs']['title'])->toBe('Penyusutan Aset')
+        ->and($id['asset_depreciation_runs']['col_status'])->toBe('Status');
 });
 
 test('master data and asset page titles follow the menu-or-exception decision', function () {

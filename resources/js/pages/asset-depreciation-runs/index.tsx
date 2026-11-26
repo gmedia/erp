@@ -36,22 +36,30 @@ import { type AssetDepreciationCalculationFormData } from '@/utils/schemas';
 import { Ban, Calculator, CheckCircle2, Loader2, Plus } from 'lucide-react';
 import { useState } from 'react';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Dashboard', href: '/dashboard' },
-    { title: 'Asset Management', href: '/assets' },
-    {
-        title: 'Depreciation Runs',
-        titleKey: 'menu.asset_depreciation_run',
-        href: '/asset-depreciation-runs',
-    },
-];
-
 export default function Index() {
     const { t } = useTranslation();
     const tx = (key: string, fallback: string): string => {
         const translated = t(key);
         return translated === key ? fallback : translated;
     };
+    const px = (key: string, fallback: string) =>
+        tx(`page.asset_depreciation_runs.${key}`, fallback);
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: px('breadcrumb_dashboard', 'Dashboard'),
+            href: '/dashboard',
+        },
+        {
+            title: px('breadcrumb_asset_management', 'Asset Management'),
+            href: '/assets',
+        },
+        {
+            title: px('breadcrumb_depreciation_runs', 'Depreciation Runs'),
+            titleKey: 'menu.asset_depreciation_run',
+            href: '/asset-depreciation-runs',
+        },
+    ];
     const {
         data,
         meta,
@@ -75,11 +83,14 @@ export default function Index() {
     const voidConfig: StatusActionConfig<'void'> | undefined = voidTarget
         ? {
               action: 'void',
-              label: 'Void',
-              title: 'Void depreciation run?',
-              description:
-                  'The run is cancelled and does not count toward depreciation. You can calculate the same period again.',
-              confirmLabel: 'Void run',
+              label: px('void_action', 'Void'),
+              title: px('void_title', 'Void depreciation run?'),
+              description: px(
+                  'void_description',
+                  'The run is cancelled and does not count toward depreciation. ' +
+                      'You can calculate the same period again.',
+              ),
+              confirmLabel: px('void_confirm', 'Void run'),
           }
         : undefined;
 
@@ -94,7 +105,7 @@ export default function Index() {
             <TableLoadingRow
                 colSpan={7}
                 icon={<Loader2 className="h-8 w-8 animate-spin text-primary" />}
-                message="Loading runs..."
+                message={px('loading_runs', 'Loading runs...')}
             />
         );
     } else if (data.length === 0) {
@@ -104,8 +115,11 @@ export default function Index() {
                 icon={
                     <Calculator className="h-10 w-10 text-muted-foreground" />
                 }
-                title="No runs found"
-                description="Start by running a new calculation."
+                title={px('no_runs_title', 'No runs found')}
+                description={px(
+                    'no_runs_description',
+                    'Start by running a new calculation.',
+                )}
                 action={
                     canEdit ? (
                         <Button
@@ -113,7 +127,8 @@ export default function Index() {
                             className="mt-4"
                             onClick={() => setIsCalcOpen(true)}
                         >
-                            <Plus className="mr-2 h-4 w-4" /> Calculate Now
+                            <Plus className="mr-2 h-4 w-4" />{' '}
+                            {px('calculate_now', 'Calculate Now')}
                         </Button>
                     ) : undefined
                 }
@@ -131,7 +146,7 @@ export default function Index() {
                             {formatDateByRegionalSettings(item.period_start)}
                         </span>
                         <span className="text-xs text-muted-foreground">
-                            {tx('page.asset_depreciation_runs.period_to', 'to')}{' '}
+                            {px('period_to', 'to')}{' '}
                             {formatDateByRegionalSettings(item.period_end)}
                         </span>
                     </div>
@@ -189,7 +204,7 @@ export default function Index() {
                                               ) : (
                                                   <CheckCircle2 className="mr-2 h-4 w-4 text-success" />
                                               )}
-                                              Post
+                                              {px('post_action', 'Post')}
                                           </DropdownMenuItem>,
                                           <DropdownMenuItem
                                               key="void"
@@ -203,7 +218,7 @@ export default function Index() {
                                               ) : (
                                                   <Ban className="mr-2 h-4 w-4 text-destructive" />
                                               )}
-                                              Void
+                                              {px('void_action', 'Void')}
                                           </DropdownMenuItem>,
                                       ]
                                     : undefined
@@ -245,10 +260,7 @@ export default function Index() {
                 canEdit ? (
                     <Button onClick={() => setIsCalcOpen(true)}>
                         <Calculator className="mr-2 h-4 w-4" />
-                        {tx(
-                            'page.asset_depreciation_runs.run_calculation',
-                            'Run Calculation',
-                        )}
+                        {px('run_calculation', 'Run Calculation')}
                     </Button>
                 ) : undefined
             }
@@ -257,43 +269,21 @@ export default function Index() {
                 <TableHeader className="[&_th]:text-muted-foreground">
                     <TableRow>
                         <TableHead>
-                            {tx(
-                                'page.asset_depreciation_runs.col_fiscal_year',
-                                'Fiscal Year',
-                            )}
+                            {px('col_fiscal_year', 'Fiscal Year')}
                         </TableHead>
-                        <TableHead>
-                            {tx(
-                                'page.asset_depreciation_runs.col_period',
-                                'Period',
-                            )}
-                        </TableHead>
-                        <TableHead>
-                            {tx(
-                                'page.asset_depreciation_runs.col_lines',
-                                'Lines',
-                            )}
-                        </TableHead>
+                        <TableHead>{px('col_period', 'Period')}</TableHead>
+                        <TableHead>{px('col_lines', 'Lines')}</TableHead>
                         <TableHead className="whitespace-nowrap">
-                            {tx(
-                                'page.asset_depreciation_runs.col_status',
-                                'Status',
-                            )}
+                            {px('col_status', 'Status')}
                         </TableHead>
+                        <TableHead>{px('col_journal', 'Journal')}</TableHead>
                         <TableHead>
-                            {tx(
-                                'page.asset_depreciation_runs.col_journal',
-                                'Journal',
-                            )}
-                        </TableHead>
-                        <TableHead>
-                            {tx(
-                                'page.asset_depreciation_runs.col_created_by',
-                                'Created By',
-                            )}
+                            {px('col_created_by', 'Created By')}
                         </TableHead>
                         <TableHead className="w-[60px] bg-background text-right md:sticky md:right-0 md:z-20">
-                            <span className="sr-only">Actions</span>
+                            <span className="sr-only">
+                                {px('actions_label', 'Actions')}
+                            </span>
                         </TableHead>
                     </TableRow>
                 </TableHeader>
@@ -323,7 +313,7 @@ export default function Index() {
             <StatusActionDialog
                 config={voidConfig}
                 processing={isVoiding !== null}
-                processingLabel="Voiding..."
+                processingLabel={px('voiding', 'Voiding...')}
                 onConfirm={async () => {
                     if (!voidTarget) return;
                     const ok = await voidRun(voidTarget.id);

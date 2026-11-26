@@ -1194,7 +1194,30 @@
             "lines_count": "{count} Assets",
             "status_calculated": "calculated",
             "status_posted": "posted",
-            "status_void": "void"
+            "status_void": "void",
+            "breadcrumb_dashboard": "Dashboard",
+            "breadcrumb_asset_management": "Asset Management",
+            "breadcrumb_depreciation_runs": "Depreciation Runs",
+            "void_action": "Void",
+            "void_title": "Void depreciation run?",
+            "void_description": "The run is cancelled and does not count toward depreciation. You can calculate the same period again.",
+            "void_confirm": "Void run",
+            "voiding": "Voiding...",
+            "loading_runs": "Loading runs...",
+            "no_runs_title": "No runs found",
+            "no_runs_description": "Start by running a new calculation.",
+            "calculate_now": "Calculate Now",
+            "post_action": "Post",
+            "actions_label": "Actions",
+            "run_lines_title": "Depreciation Run Lines",
+            "run_lines_description": "View detailed depreciation line items for the selected run.",
+            "loading_lines": "Loading lines...",
+            "no_lines": "No lines found.",
+            "col_asset": "Asset",
+            "col_amount": "Amount",
+            "col_accumulated_before": "Accumulated Before",
+            "col_accumulated_after": "Accumulated After",
+            "col_book_value_after": "Book Value After"
         },
         "balance_sheet": {
             "description": "Financial position at a point in time: assets, liabilities, and equity."
@@ -1322,7 +1345,9 @@
             "period_start_placeholder": "Pick period start",
             "period_end": "Period End",
             "period_end_placeholder": "Pick period end",
-            "calculate": "Calculate"
+            "calculate": "Calculate",
+            "cancel": "Cancel",
+            "calculate_fallback_error": "An error occurred."
         },
         "purchase_orders": {
             "add_title": "Add New Purchase Order",
