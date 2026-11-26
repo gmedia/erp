@@ -251,7 +251,8 @@
         "import_validation_error": "Validation Error",
         "import_invalid_file": "Invalid file.",
         "import_failed": "Import Failed",
-        "import_unexpected_error": "An unexpected error occurred."
+        "import_unexpected_error": "An unexpected error occurred.",
+        "add_item": "Add Item"
     },
     "language": {
         "switch": "Language",
@@ -1300,6 +1301,17 @@
         "goods_receipt_search_placeholder": "Search GR number, PO number, supplier, warehouse, or product..."
     },
     "form_fields": {
+        "asset_depreciation_runs": {
+            "calculate_title": "Calculate Depreciation",
+            "calculate_description": "Select the fiscal year and period to calculate asset depreciation.",
+            "fiscal_year": "Fiscal Year",
+            "fiscal_year_placeholder": "Select Fiscal Year...",
+            "period_start": "Period Start",
+            "period_start_placeholder": "Pick period start",
+            "period_end": "Period End",
+            "period_end_placeholder": "Pick period end",
+            "calculate": "Calculate"
+        },
         "purchase_orders": {
             "add_title": "Add New Purchase Order",
             "edit_title": "Edit Purchase Order",

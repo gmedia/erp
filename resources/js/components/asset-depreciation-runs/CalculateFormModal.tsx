@@ -10,6 +10,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Form } from '@/components/ui/form';
+import { useTranslation } from '@/contexts/i18n-context';
 import { type FiscalYear } from '@/types/fiscal-year';
 import { type AssetDepreciationCalculationFormData } from '@/utils/schemas';
 import { Loader2 } from 'lucide-react';
@@ -45,6 +46,13 @@ export function CalculateFormModal({
     });
 
     const { handleSubmit, setError, reset } = form;
+    const { t } = useTranslation();
+    const fl = (key: string, fallback: string) => {
+        const translated = t(`form_fields.asset_depreciation_runs.${key}`);
+        return translated === `form_fields.asset_depreciation_runs.${key}`
+            ? fallback
+            : translated;
+    };
 
     const handleFormSubmit = async (data: CalculateFormValues) => {
         if (!data.period_start) {
@@ -95,18 +103,28 @@ export function CalculateFormModal({
                 <Form {...form}>
                     <form onSubmit={handleSubmit(handleFormSubmit)}>
                         <DialogHeader>
-                            <DialogTitle>Calculate Depreciation</DialogTitle>
+                            <DialogTitle>
+                                {fl(
+                                    'calculate_title',
+                                    'Calculate Depreciation',
+                                )}
+                            </DialogTitle>
                             <DialogDescription>
-                                Select the fiscal year and period to calculate
-                                asset depreciation.
+                                {fl(
+                                    'calculate_description',
+                                    'Select the fiscal year and period to calculate asset depreciation.',
+                                )}
                             </DialogDescription>
                         </DialogHeader>
                         <div className="grid gap-4 py-4">
                             <AsyncSelectField<FiscalYear>
                                 name="fiscal_year_id"
-                                label="Fiscal Year"
+                                label={fl('fiscal_year', 'Fiscal Year')}
                                 url="/api/fiscal-years"
-                                placeholder="Select Fiscal Year..."
+                                placeholder={fl(
+                                    'fiscal_year_placeholder',
+                                    'Select Fiscal Year...',
+                                )}
                                 labelFn={(fy: FiscalYear) => fy.name}
                                 valueFn={(fy: FiscalYear) => fy.id.toString()}
                                 preferredMetaKey="preferred_fiscal_year_id"
@@ -115,13 +133,19 @@ export function CalculateFormModal({
                             <div className="grid grid-cols-2 gap-4">
                                 <DatePickerField
                                     name="period_start"
-                                    label="Period Start"
-                                    placeholder="Pick period start"
+                                    label={fl('period_start', 'Period Start')}
+                                    placeholder={fl(
+                                        'period_start_placeholder',
+                                        'Pick period start',
+                                    )}
                                 />
                                 <DatePickerField
                                     name="period_end"
-                                    label="Period End"
-                                    placeholder="Pick period end"
+                                    label={fl('period_end', 'Period End')}
+                                    placeholder={fl(
+                                        'period_end_placeholder',
+                                        'Pick period end',
+                                    )}
                                 />
                             </div>
                         </div>
@@ -138,7 +162,7 @@ export function CalculateFormModal({
                                 {loading && (
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                 )}
-                                Calculate
+                                {fl('calculate', 'Calculate')}
                             </Button>
                         </DialogFooter>
                     </form>

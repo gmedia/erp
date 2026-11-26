@@ -251,7 +251,8 @@
         "import_validation_error": "Kesalahan Validasi",
         "import_invalid_file": "File tidak valid.",
         "import_failed": "Impor Gagal",
-        "import_unexpected_error": "Terjadi kesalahan tak terduga."
+        "import_unexpected_error": "Terjadi kesalahan tak terduga.",
+        "add_item": "Tambah Item"
     },
     "language": {
         "switch": "Bahasa",
@@ -1300,6 +1301,17 @@
         "goods_receipt_search_placeholder": "Cari no. GR, no. PO, pemasok, gudang, atau produk..."
     },
     "form_fields": {
+        "asset_depreciation_runs": {
+            "calculate_title": "Hitung Penyusutan",
+            "calculate_description": "Pilih tahun fiskal dan periode untuk menghitung penyusutan aset.",
+            "fiscal_year": "Tahun Fiskal",
+            "fiscal_year_placeholder": "Pilih Tahun Fiskal...",
+            "period_start": "Awal Periode",
+            "period_start_placeholder": "Pilih awal periode",
+            "period_end": "Akhir Periode",
+            "period_end_placeholder": "Pilih akhir periode",
+            "calculate": "Hitung"
+        },
         "purchase_orders": {
             "add_title": "Tambah Pesanan Pembelian Baru",
             "edit_title": "Ubah Pesanan Pembelian",
