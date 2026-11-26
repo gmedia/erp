@@ -60,6 +60,6 @@ test('issue 552 touched components keep their english fallback strings', functio
 
     $filters = File::get(base_path('resources/js/components/common/filters.tsx'));
 
-    expect($filters)->toContain("statusLabel('partially_ordered', 'Partially Ordered')")
-        ->and($filters)->toContain("statusLabel('partially_received', 'Partially Received')");
+    expect($filters)->toContain("['partially_ordered', 'Partially Ordered']")
+        ->and($filters)->toContain("['partially_received', 'Partially Received']");
 });
