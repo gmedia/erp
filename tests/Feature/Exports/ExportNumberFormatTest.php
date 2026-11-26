@@ -29,7 +29,7 @@ function readExportSheet(object $export): Worksheet
 
 describe('ProductExport number formats', function () {
 
-    test('cost and selling price are written as numeric cells with IDR code by default', function () {
+    test('cost and selling price are written as numeric cells with IDR code from currency setting', function () {
         Setting::factory()->create(['key' => 'currency', 'value' => 'IDR', 'group' => 'regional']);
         Setting::factory()->create(['key' => 'number_format_decimal', 'value' => ',', 'group' => 'regional']);
         Setting::factory()->create(['key' => 'number_format_thousand', 'value' => '.', 'group' => 'regional']);
@@ -65,6 +65,41 @@ describe('ProductExport number formats', function () {
 
         expect($cell->getValue())->toBeFloat()->toEqual(99.5)
             ->and($cell->getStyle()->getNumberFormat()->getFormatCode())->toBe('"USD" #,##0.00');
+    });
+});
+
+describe('empty currency setting', function () {
+
+    test('currency column uses plain number format without symbol when currency setting is empty', function () {
+        Setting::factory()->create(['key' => 'currency', 'value' => '', 'group' => 'regional']);
+
+        $export = new InventoryValuationReportExport([]);
+        $formats = $export->columnFormats();
+
+        expect($formats)->toHaveKey('I', '#,##0.00')
+            ->and($formats)->toHaveKey('J', '#,##0.00');
+    });
+
+    test('currency column uses plain number format when currency setting is missing', function () {
+        $export = new InventoryValuationReportExport([]);
+        $formats = $export->columnFormats();
+
+        expect($formats)->toHaveKey('I', '#,##0.00')
+            ->and($formats)->toHaveKey('J', '#,##0.00');
+    });
+
+    test('product export cost cell has no currency literal when currency setting is empty', function () {
+        Setting::factory()->create(['key' => 'currency', 'value' => '', 'group' => 'regional']);
+        Product::factory()->create(['cost' => 500, 'selling_price' => 700]);
+
+        $sheet = readExportSheet(new ProductExport([]));
+        $headings = $sheet->rangeToArray('A1:J1', null, true, false)[0];
+        $costCol = array_search('Cost', $headings, true) + 1;
+
+        $cell = $sheet->getCell([$costCol, 2]);
+
+        expect($cell->getValue())->toBeFloat()->toEqual(500.0)
+            ->and($cell->getStyle()->getNumberFormat()->getFormatCode())->toBe('#,##0.00');
     });
 });
 

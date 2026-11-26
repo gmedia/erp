@@ -17,8 +17,6 @@ use App\Models\Setting;
  */
 trait ExportsNumberFormats
 {
-    private const DEFAULT_CURRENCY = 'IDR';
-
     private const NUMBER_FORMAT = '#,##0.00';
 
     /**
@@ -65,18 +63,24 @@ trait ExportsNumberFormats
 
     /**
      * Pola mata uang: kode dari Setting `currency` sebagai literal di depan angka.
+     * Bila Setting `currency` kosong, memakai format angka biasa tanpa simbol.
      */
     protected function excelCurrencyFormat(): string
     {
-        return '"' . $this->regionalCurrencyCode() . '" ' . self::NUMBER_FORMAT;
+        $code = $this->regionalCurrencyCode();
+
+        return $code === null ? self::NUMBER_FORMAT : '"' . $code . '" ' . self::NUMBER_FORMAT;
     }
 
-    protected function regionalCurrencyCode(): string
+    /**
+     * Kode mata uang perusahaan dari Setting `currency`, atau null bila belum diisi.
+     */
+    protected function regionalCurrencyCode(): ?string
     {
-        $raw = (string) Setting::get('currency', self::DEFAULT_CURRENCY);
+        $raw = (string) Setting::get('currency');
         $code = preg_replace('/[^A-Z]/', '', strtoupper(trim($raw)));
 
-        return $code !== '' ? $code : self::DEFAULT_CURRENCY;
+        return $code !== '' ? $code : null;
     }
 
     /**
