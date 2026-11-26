@@ -47,11 +47,18 @@ E2E_ANDROID=1 npx cap sync android
 echo "[3/6] gradle assembleDebug"
 (cd android && ./gradlew assembleDebug --no-daemon -q)
 
-echo "[4/6] boot emulator headless (${ANDROID_AVD})"
-emulator -avd "$ANDROID_AVD" -no-window -no-snapshot -no-audio -no-boot-anim \
-    -gpu swiftshader_indirect -memory 2048 -cores 2 -no-metrics >/dev/null 2>&1 &
-EMULATOR_PID=$!
-adb -s "$ADB_SERIAL" wait-for-device
+# E2E_ANDROID_SKIP_EMULATOR=1: pakai emulator yang sudah berjalan (mis. android-emulator-runner di CI);
+# script tidak boot maupun mematikan emulator.
+if [ "${E2E_ANDROID_SKIP_EMULATOR:-0}" = "1" ]; then
+    echo "[4/6] pakai emulator yang sudah berjalan (E2E_ANDROID_SKIP_EMULATOR=1)"
+    adb -s "$ADB_SERIAL" wait-for-device
+else
+    echo "[4/6] boot emulator headless (${ANDROID_AVD})"
+    emulator -avd "$ANDROID_AVD" -no-window -no-snapshot -no-audio -no-boot-anim \
+        -gpu swiftshader_indirect -memory 2048 -cores 2 -no-metrics >/dev/null 2>&1 &
+    EMULATOR_PID=$!
+    adb -s "$ADB_SERIAL" wait-for-device
+fi
 until [ "$(adb -s "$ADB_SERIAL" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = "1" ]; do
     sleep 5
 done
