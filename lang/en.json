@@ -1399,7 +1399,23 @@
         "valuation_search_placeholder": "Search product, category, warehouse, branch...",
         "adjustment_search_placeholder": "Search number, warehouse, branch, type, status...",
         "purchase_search_placeholder": "Search PO number, supplier, warehouse, or product...",
-        "goods_receipt_search_placeholder": "Search GR number, PO number, supplier, warehouse, or product..."
+        "goods_receipt_search_placeholder": "Search GR number, PO number, supplier, warehouse, or product...",
+        "movement_goods_receipt": "Goods Receipt",
+        "movement_supplier_return": "Supplier Return",
+        "movement_transfer_out": "Transfer Out",
+        "movement_transfer_in": "Transfer In",
+        "movement_adjustment_in": "Adjustment In",
+        "movement_adjustment_out": "Adjustment Out",
+        "movement_production_consume": "Production Consume",
+        "movement_production_output": "Production Output",
+        "movement_sales": "Sales",
+        "movement_sales_return": "Sales Return",
+        "approval_event_submitted": "Submitted",
+        "approval_event_escalated": "Escalated",
+        "approval_event_delegated": "Delegated",
+        "approval_event_resubmitted": "Resubmitted",
+        "approval_event_step_approved": "Step Approved",
+        "approval_event_step_skipped": "Step Skipped"
     },
     "form_fields": {
         "asset_depreciation_runs": {

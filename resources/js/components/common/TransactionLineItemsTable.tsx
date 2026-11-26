@@ -4,6 +4,7 @@ import {
     EntityFormItemActionsCell,
     EntityFormItemEmptyRow,
 } from '@/components/common/EntityFormItemTable';
+import { useTranslatableText } from '@/components/common/TranslatedText';
 import {
     Table,
     TableBody,
@@ -83,6 +84,10 @@ export function TransactionLineItemsTable<T extends TransactionLineItem>({
     locked = false,
 }: Readonly<TransactionLineItemsTableProps<T>>) {
     const colSpan = includeDiscount ? 9 : 8;
+    const actionsLabel = useTranslatableText({
+        key: 'common.actions',
+        fallback: 'Actions',
+    });
 
     if (items.length === 0) {
         return (
@@ -111,7 +116,7 @@ export function TransactionLineItemsTable<T extends TransactionLineItem>({
                     )}
                     <TableHead className="text-right">Tax %</TableHead>
                     <TableHead className="text-right">Line Total</TableHead>
-                    <TableHead className="w-20">Actions</TableHead>
+                    <TableHead className="w-20">{actionsLabel}</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>

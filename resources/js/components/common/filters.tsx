@@ -29,15 +29,32 @@ export type SelectOption = {
     label: TranslatableLabel;
 };
 
+function statusLabel(value: string, fallback: string): TranslatableLabel {
+    return { key: `status.${value}`, fallback };
+}
+
+function filterLabel(key: string, fallback: string): TranslatableLabel {
+    return { key: `filter.${key}`, fallback };
+}
+
 export const purchaseOrderStatusOptions: SelectOption[] = [
-    { value: 'draft', label: 'Draft' },
-    { value: 'pending_approval', label: 'Pending Approval' },
-    { value: 'confirmed', label: 'Confirmed' },
-    { value: 'rejected', label: 'Rejected' },
-    { value: 'partially_received', label: 'Partially Received' },
-    { value: 'fully_received', label: 'Fully Received' },
-    { value: 'cancelled', label: 'Cancelled' },
-    { value: 'closed', label: 'Closed' },
+    { value: 'draft', label: statusLabel('draft', 'Draft') },
+    {
+        value: 'pending_approval',
+        label: statusLabel('pending_approval', 'Pending Approval'),
+    },
+    { value: 'confirmed', label: statusLabel('confirmed', 'Confirmed') },
+    { value: 'rejected', label: statusLabel('rejected', 'Rejected') },
+    {
+        value: 'partially_received',
+        label: statusLabel('partially_received', 'Partially Received'),
+    },
+    {
+        value: 'fully_received',
+        label: statusLabel('fully_received', 'Fully Received'),
+    },
+    { value: 'cancelled', label: statusLabel('cancelled', 'Cancelled') },
+    { value: 'closed', label: statusLabel('closed', 'Closed') },
 ];
 
 export const currencyOptions: SelectOption[] = [
@@ -47,90 +64,159 @@ export const currencyOptions: SelectOption[] = [
 ];
 
 export const purchaseRequestPriorityOptions: SelectOption[] = [
-    { value: 'low', label: 'Low' },
-    { value: 'normal', label: 'Normal' },
-    { value: 'high', label: 'High' },
-    { value: 'urgent', label: 'Urgent' },
+    { value: 'low', label: statusLabel('low', 'Low') },
+    { value: 'normal', label: statusLabel('normal', 'Normal') },
+    { value: 'high', label: statusLabel('high', 'High') },
+    { value: 'urgent', label: statusLabel('urgent', 'Urgent') },
 ];
 
 export const purchaseRequestStatusOptions: SelectOption[] = [
-    { value: 'draft', label: 'Draft' },
-    { value: 'pending_approval', label: 'Pending Approval' },
-    { value: 'approved', label: 'Approved' },
-    { value: 'rejected', label: 'Rejected' },
-    { value: 'partially_ordered', label: 'Partially Ordered' },
-    { value: 'fully_ordered', label: 'Fully Ordered' },
-    { value: 'cancelled', label: 'Cancelled' },
+    { value: 'draft', label: statusLabel('draft', 'Draft') },
+    {
+        value: 'pending_approval',
+        label: statusLabel('pending_approval', 'Pending Approval'),
+    },
+    { value: 'approved', label: statusLabel('approved', 'Approved') },
+    { value: 'rejected', label: statusLabel('rejected', 'Rejected') },
+    {
+        value: 'partially_ordered',
+        label: statusLabel('partially_ordered', 'Partially Ordered'),
+    },
+    {
+        value: 'fully_ordered',
+        label: statusLabel('fully_ordered', 'Fully Ordered'),
+    },
+    { value: 'cancelled', label: statusLabel('cancelled', 'Cancelled') },
 ];
 
 export const purchaseOrderStatusCategoryOptions: SelectOption[] = [
-    { value: 'outstanding', label: 'Outstanding' },
-    { value: 'partially_received', label: 'Partially Received' },
-    { value: 'closed', label: 'Closed' },
+    { value: 'outstanding', label: statusLabel('outstanding', 'Outstanding') },
+    {
+        value: 'partially_received',
+        label: statusLabel('partially_received', 'Partially Received'),
+    },
+    { value: 'closed', label: statusLabel('closed', 'Closed') },
 ];
 
 export const fiscalYearStatusOptions: SelectOption[] = [
-    { label: 'Open', value: 'open' },
-    { label: 'Closed', value: 'closed' },
-    { label: 'Locked', value: 'locked' },
+    { label: statusLabel('open', 'Open'), value: 'open' },
+    { label: statusLabel('closed', 'Closed'), value: 'closed' },
+    { label: statusLabel('locked', 'Locked'), value: 'locked' },
 ];
 
 export const coaVersionStatusOptions: SelectOption[] = [
-    { label: 'Draft', value: 'draft' },
-    { label: 'Active', value: 'active' },
-    { label: 'Archived', value: 'archived' },
+    { label: statusLabel('draft', 'Draft'), value: 'draft' },
+    { label: statusLabel('active', 'Active'), value: 'active' },
+    { label: statusLabel('archived', 'Archived'), value: 'archived' },
 ];
 
 export const journalEntryStatusOptions: SelectOption[] = [
-    { value: 'draft', label: 'Draft' },
-    { value: 'posted', label: 'Posted' },
-    { value: 'void', label: 'Void' },
+    { value: 'draft', label: statusLabel('draft', 'Draft') },
+    { value: 'posted', label: statusLabel('posted', 'Posted') },
+    { value: 'void', label: statusLabel('void', 'Void') },
 ];
 
 export const approvalAuditEventOptions: SelectOption[] = [
-    { value: 'submitted', label: 'Submitted' },
-    { value: 'step_approved', label: 'Step Approved' },
-    { value: 'step_rejected', label: 'Step Rejected' },
-    { value: 'step_skipped', label: 'Step Skipped' },
-    { value: 'auto_approved', label: 'Auto Approved' },
-    { value: 'escalated', label: 'Escalated' },
-    { value: 'delegated', label: 'Delegated' },
-    { value: 'cancelled', label: 'Cancelled' },
-    { value: 'resubmitted', label: 'Resubmitted' },
-    { value: 'completed', label: 'Completed' },
+    {
+        value: 'submitted',
+        label: filterLabel('approval_event_submitted', 'Submitted'),
+    },
+    {
+        value: 'step_approved',
+        label: filterLabel('approval_event_step_approved', 'Step Approved'),
+    },
+    {
+        value: 'step_rejected',
+        label: statusLabel('step_rejected', 'Step Rejected'),
+    },
+    {
+        value: 'step_skipped',
+        label: filterLabel('approval_event_step_skipped', 'Step Skipped'),
+    },
+    {
+        value: 'auto_approved',
+        label: statusLabel('auto_approved', 'Auto Approved'),
+    },
+    {
+        value: 'escalated',
+        label: filterLabel('approval_event_escalated', 'Escalated'),
+    },
+    {
+        value: 'delegated',
+        label: filterLabel('approval_event_delegated', 'Delegated'),
+    },
+    { value: 'cancelled', label: statusLabel('cancelled', 'Cancelled') },
+    {
+        value: 'resubmitted',
+        label: filterLabel('approval_event_resubmitted', 'Resubmitted'),
+    },
+    { value: 'completed', label: statusLabel('completed', 'Completed') },
 ];
 
 export const maintenanceTypeOptions: SelectOption[] = [
-    { value: 'preventive', label: 'Preventive' },
-    { value: 'corrective', label: 'Corrective' },
-    { value: 'calibration', label: 'Calibration' },
-    { value: 'other', label: 'Other' },
+    {
+        value: 'preventive',
+        label: {
+            key: 'form_fields.asset_maintenances.maintenance_type_preventive',
+            fallback: 'Preventive',
+        },
+    },
+    {
+        value: 'corrective',
+        label: {
+            key: 'form_fields.asset_maintenances.maintenance_type_corrective',
+            fallback: 'Corrective',
+        },
+    },
+    {
+        value: 'calibration',
+        label: {
+            key: 'form_fields.asset_maintenances.maintenance_type_calibration',
+            fallback: 'Calibration',
+        },
+    },
+    {
+        value: 'other',
+        label: {
+            key: 'form_fields.asset_maintenances.maintenance_type_other',
+            fallback: 'Other',
+        },
+    },
 ];
 
 export const maintenanceStatusOptions: SelectOption[] = [
-    { value: 'scheduled', label: 'Scheduled' },
-    { value: 'in_progress', label: 'In Progress' },
-    { value: 'completed', label: 'Completed' },
-    { value: 'cancelled', label: 'Cancelled' },
+    { value: 'scheduled', label: statusLabel('scheduled', 'Scheduled') },
+    { value: 'in_progress', label: statusLabel('in_progress', 'In Progress') },
+    { value: 'completed', label: statusLabel('completed', 'Completed') },
+    { value: 'cancelled', label: statusLabel('cancelled', 'Cancelled') },
 ];
 
 export const assetStatusOptions: SelectOption[] = [
-    { value: 'draft', label: 'Draft' },
-    { value: 'active', label: 'Active' },
-    { value: 'maintenance', label: 'Maintenance' },
-    { value: 'disposed', label: 'Disposed' },
-    { value: 'lost', label: 'Lost' },
+    { value: 'draft', label: statusLabel('draft', 'Draft') },
+    { value: 'active', label: statusLabel('active', 'Active') },
+    { value: 'maintenance', label: statusLabel('maintenance', 'Maintenance') },
+    { value: 'disposed', label: statusLabel('disposed', 'Disposed') },
+    { value: 'lost', label: statusLabel('lost', 'Lost') },
 ];
 
 export const assetConditionOptions: SelectOption[] = [
-    { value: 'good', label: 'Good' },
-    { value: 'needs_repair', label: 'Needs Repair' },
-    { value: 'damaged', label: 'Damaged' },
+    {
+        value: 'good',
+        label: { key: 'form_fields.assets.condition_good', fallback: 'Good' },
+    },
+    {
+        value: 'needs_repair',
+        label: {
+            key: 'form_fields.assets.condition_needs_repair',
+            fallback: 'Needs Repair',
+        },
+    },
+    { value: 'damaged', label: statusLabel('damaged', 'Damaged') },
 ];
 
 export const activeInactiveStatusOptions: SelectOption[] = [
-    { value: 'active', label: 'Active' },
-    { value: 'inactive', label: 'Inactive' },
+    { value: 'active', label: statusLabel('active', 'Active') },
+    { value: 'inactive', label: statusLabel('inactive', 'Inactive') },
 ];
 
 export const employmentStatusOptions: SelectOption[] = [
@@ -142,95 +228,230 @@ export const employmentStatusOptions: SelectOption[] = [
 ];
 
 export const productTypeOptions: SelectOption[] = [
-    { value: 'raw_material', label: 'Raw Material' },
-    { value: 'work_in_progress', label: 'WIP' },
-    { value: 'finished_good', label: 'Finished Good' },
-    { value: 'purchased_good', label: 'Purchased Good' },
-    { value: 'service', label: 'Service' },
+    {
+        value: 'raw_material',
+        label: {
+            key: 'form_fields.products.type_raw_material',
+            fallback: 'Raw Material',
+        },
+    },
+    {
+        value: 'work_in_progress',
+        label: {
+            key: 'form_fields.products.type_work_in_progress',
+            fallback: 'WIP',
+        },
+    },
+    {
+        value: 'finished_good',
+        label: {
+            key: 'form_fields.products.type_finished_good',
+            fallback: 'Finished Good',
+        },
+    },
+    {
+        value: 'purchased_good',
+        label: {
+            key: 'form_fields.products.type_purchased_good',
+            fallback: 'Purchased Good',
+        },
+    },
+    {
+        value: 'service',
+        label: {
+            key: 'form_fields.products.type_service',
+            fallback: 'Service',
+        },
+    },
 ];
 
 export const productStatusOptions: SelectOption[] = [
-    { value: 'active', label: 'Active' },
-    { value: 'inactive', label: 'Inactive' },
-    { value: 'discontinued', label: 'Discontinued' },
+    { value: 'active', label: statusLabel('active', 'Active') },
+    { value: 'inactive', label: statusLabel('inactive', 'Inactive') },
+    {
+        value: 'discontinued',
+        label: statusLabel('discontinued', 'Discontinued'),
+    },
 ];
 
 export const inventoryStocktakeStatusOptions: SelectOption[] = [
-    { value: 'draft', label: 'Draft' },
-    { value: 'in_progress', label: 'In Progress' },
-    { value: 'completed', label: 'Completed' },
-    { value: 'cancelled', label: 'Cancelled' },
+    { value: 'draft', label: statusLabel('draft', 'Draft') },
+    { value: 'in_progress', label: statusLabel('in_progress', 'In Progress') },
+    { value: 'completed', label: statusLabel('completed', 'Completed') },
+    { value: 'cancelled', label: statusLabel('cancelled', 'Cancelled') },
 ];
 
 export const inventoryStocktakeVarianceResultOptions: SelectOption[] = [
-    { value: 'surplus', label: 'Surplus' },
-    { value: 'deficit', label: 'Deficit' },
+    { value: 'surplus', label: statusLabel('surplus', 'Surplus') },
+    { value: 'deficit', label: statusLabel('deficit', 'Deficit') },
 ];
 
 export const draftConfirmedCancelledStatusOptions: SelectOption[] = [
-    { value: 'draft', label: 'Draft' },
-    { value: 'confirmed', label: 'Confirmed' },
-    { value: 'cancelled', label: 'Cancelled' },
+    { value: 'draft', label: statusLabel('draft', 'Draft') },
+    { value: 'confirmed', label: statusLabel('confirmed', 'Confirmed') },
+    { value: 'cancelled', label: statusLabel('cancelled', 'Cancelled') },
 ];
 
 export const approvalWorkflowStatusOptions: SelectOption[] = [
-    { value: 'draft', label: 'Draft' },
-    { value: 'pending_approval', label: 'Pending Approval' },
-    { value: 'approved', label: 'Approved' },
-    { value: 'cancelled', label: 'Cancelled' },
+    { value: 'draft', label: statusLabel('draft', 'Draft') },
+    {
+        value: 'pending_approval',
+        label: statusLabel('pending_approval', 'Pending Approval'),
+    },
+    { value: 'approved', label: statusLabel('approved', 'Approved') },
+    { value: 'cancelled', label: statusLabel('cancelled', 'Cancelled') },
 ];
 
 export const stockTransferStatusOptions: SelectOption[] = [
-    { value: 'draft', label: 'Draft' },
-    { value: 'pending_approval', label: 'Pending Approval' },
-    { value: 'approved', label: 'Approved' },
-    { value: 'in_transit', label: 'In Transit' },
-    { value: 'received', label: 'Received' },
-    { value: 'cancelled', label: 'Cancelled' },
+    { value: 'draft', label: statusLabel('draft', 'Draft') },
+    {
+        value: 'pending_approval',
+        label: statusLabel('pending_approval', 'Pending Approval'),
+    },
+    { value: 'approved', label: statusLabel('approved', 'Approved') },
+    { value: 'in_transit', label: statusLabel('in_transit', 'In Transit') },
+    { value: 'received', label: statusLabel('received', 'Received') },
+    { value: 'cancelled', label: statusLabel('cancelled', 'Cancelled') },
 ];
 
 export const supplierReturnReasonOptions: SelectOption[] = [
-    { value: 'defective', label: 'Defective' },
-    { value: 'wrong_item', label: 'Wrong Item' },
-    { value: 'excess_quantity', label: 'Excess Quantity' },
-    { value: 'damaged', label: 'Damaged' },
-    { value: 'other', label: 'Other' },
+    {
+        value: 'defective',
+        label: {
+            key: 'form_fields.supplier_returns.reason_defective',
+            fallback: 'Defective',
+        },
+    },
+    {
+        value: 'wrong_item',
+        label: {
+            key: 'form_fields.supplier_returns.reason_wrong_item',
+            fallback: 'Wrong Item',
+        },
+    },
+    {
+        value: 'excess_quantity',
+        label: {
+            key: 'form_fields.supplier_returns.reason_excess_quantity',
+            fallback: 'Excess Quantity',
+        },
+    },
+    { value: 'damaged', label: statusLabel('damaged', 'Damaged') },
+    {
+        value: 'other',
+        label: {
+            key: 'form_fields.supplier_returns.reason_other',
+            fallback: 'Other',
+        },
+    },
 ];
 
 export const stockAdjustmentTypeOptions: SelectOption[] = [
-    { value: 'damage', label: 'Damage' },
-    { value: 'expired', label: 'Expired' },
-    { value: 'shrinkage', label: 'Shrinkage' },
-    { value: 'correction', label: 'Correction' },
-    { value: 'stocktake_result', label: 'Stocktake Result' },
-    { value: 'initial_stock', label: 'Initial Stock' },
-    { value: 'other', label: 'Other' },
+    {
+        value: 'damage',
+        label: {
+            key: 'form_fields.stock_adjustments.adjustment_type_damage',
+            fallback: 'Damage',
+        },
+    },
+    {
+        value: 'expired',
+        label: {
+            key: 'form_fields.stock_adjustments.adjustment_type_expired',
+            fallback: 'Expired',
+        },
+    },
+    {
+        value: 'shrinkage',
+        label: {
+            key: 'form_fields.stock_adjustments.adjustment_type_shrinkage',
+            fallback: 'Shrinkage',
+        },
+    },
+    {
+        value: 'correction',
+        label: {
+            key: 'form_fields.stock_adjustments.adjustment_type_correction',
+            fallback: 'Correction',
+        },
+    },
+    {
+        value: 'stocktake_result',
+        label: {
+            key: 'form_fields.stock_adjustments.adjustment_type_stocktake_result',
+            fallback: 'Stocktake Result',
+        },
+    },
+    {
+        value: 'initial_stock',
+        label: {
+            key: 'form_fields.stock_adjustments.adjustment_type_initial_stock',
+            fallback: 'Initial Stock',
+        },
+    },
+    {
+        value: 'other',
+        label: {
+            key: 'form_fields.stock_adjustments.adjustment_type_other',
+            fallback: 'Other',
+        },
+    },
 ];
 
 export const stockAdjustmentStatusOptions: SelectOption[] = [
-    { value: 'draft', label: 'Draft' },
-    { value: 'pending_approval', label: 'Pending Approval' },
-    { value: 'approved', label: 'Approved' },
-    { value: 'cancelled', label: 'Cancelled' },
+    { value: 'draft', label: statusLabel('draft', 'Draft') },
+    {
+        value: 'pending_approval',
+        label: statusLabel('pending_approval', 'Pending Approval'),
+    },
+    { value: 'approved', label: statusLabel('approved', 'Approved') },
+    { value: 'cancelled', label: statusLabel('cancelled', 'Cancelled') },
 ];
 
 export const stockMovementTypeOptions: SelectOption[] = [
-    { value: 'goods_receipt', label: 'Goods Receipt' },
-    { value: 'supplier_return', label: 'Supplier Return' },
-    { value: 'transfer_out', label: 'Transfer Out' },
-    { value: 'transfer_in', label: 'Transfer In' },
-    { value: 'adjustment_in', label: 'Adjustment In' },
-    { value: 'adjustment_out', label: 'Adjustment Out' },
-    { value: 'production_consume', label: 'Production Consume' },
-    { value: 'production_output', label: 'Production Output' },
-    { value: 'sales', label: 'Sales' },
-    { value: 'sales_return', label: 'Sales Return' },
+    {
+        value: 'goods_receipt',
+        label: filterLabel('movement_goods_receipt', 'Goods Receipt'),
+    },
+    {
+        value: 'supplier_return',
+        label: filterLabel('movement_supplier_return', 'Supplier Return'),
+    },
+    {
+        value: 'transfer_out',
+        label: filterLabel('movement_transfer_out', 'Transfer Out'),
+    },
+    {
+        value: 'transfer_in',
+        label: filterLabel('movement_transfer_in', 'Transfer In'),
+    },
+    {
+        value: 'adjustment_in',
+        label: filterLabel('movement_adjustment_in', 'Adjustment In'),
+    },
+    {
+        value: 'adjustment_out',
+        label: filterLabel('movement_adjustment_out', 'Adjustment Out'),
+    },
+    {
+        value: 'production_consume',
+        label: filterLabel('movement_production_consume', 'Production Consume'),
+    },
+    {
+        value: 'production_output',
+        label: filterLabel('movement_production_output', 'Production Output'),
+    },
+    { value: 'sales', label: filterLabel('movement_sales', 'Sales') },
+    {
+        value: 'sales_return',
+        label: filterLabel('movement_sales_return', 'Sales Return'),
+    },
 ];
 
 export const assetStocktakeVarianceResultOptions: SelectOption[] = [
-    { value: 'damaged', label: 'Damaged' },
-    { value: 'missing', label: 'Missing' },
-    { value: 'moved', label: 'Moved' },
+    { value: 'damaged', label: statusLabel('damaged', 'Damaged') },
+    { value: 'missing', label: statusLabel('missing', 'Missing') },
+    { value: 'moved', label: statusLabel('moved', 'Moved') },
 ];
 
 export type AsyncSelectFilterConfig = {
