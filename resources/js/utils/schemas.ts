@@ -468,7 +468,7 @@ export const assetFormSchema = z.object({
     purchase_cost: z.string().min(1, {
         message: 'validation.asset.purchase_cost_required',
     }),
-    currency: z.string().min(3).max(3).default('IDR'),
+    currency: z.string().min(3).max(3),
     warranty_end_date: z.string().optional().nullable(),
     status: z.enum(['draft', 'active', 'maintenance', 'disposed', 'lost'], {
         message: 'validation.asset.status_required',
