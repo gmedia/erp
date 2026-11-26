@@ -6,7 +6,10 @@ test.describe('Stock Adjustment Report', () => {
         await login(page, undefined, undefined, { requireDashboard: false });
     });
 
-    test('every visible column header has a label', async ({ page }) => {
+    test('every labelled column header is visibly rendered at 1440px', async ({
+        page,
+    }) => {
+        await page.setViewportSize({ width: 1440, height: 900 });
         const responsePromise = page.waitForResponse(
             (r) => r.url().includes('/api/reports/stock-adjustment'),
             { timeout: 30000 },
@@ -25,15 +28,30 @@ test.describe('Stock Adjustment Report', () => {
             if (label === '') {
                 continue;
             }
-            const visibleTextWidth = await header.evaluate((el) => {
+            const metrics = await header.evaluate((el) => {
                 const range = document.createRange();
                 range.selectNodeContents(el);
-                return range.getBoundingClientRect().width;
+                const textRect = range.getBoundingClientRect();
+                const cellRect = el.getBoundingClientRect();
+                return {
+                    textWidth: textRect.width,
+                    cellWidth: cellRect.width,
+                    scrollWidth: el.scrollWidth,
+                    clientWidth: el.clientWidth,
+                };
             });
             expect(
-                visibleTextWidth,
-                `header "${label}" tidak tampil`,
+                metrics.cellWidth,
+                `header "${label}" lebar sel 0`,
             ).toBeGreaterThan(0);
+            expect(
+                metrics.textWidth,
+                `header "${label}" teks tidak tampil (terpotong)`,
+            ).toBeGreaterThan(0);
+            expect(
+                metrics.scrollWidth,
+                `header "${label}" terpotong oleh overflow`,
+            ).toBeLessThanOrEqual(metrics.clientWidth + 1);
         }
     });
 
