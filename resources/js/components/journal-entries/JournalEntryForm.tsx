@@ -31,6 +31,7 @@ import {
 import { useTranslation } from '@/contexts/i18n-context';
 import { JournalEntry } from '@/types/journal-entry';
 import { toDateInputValue } from '@/utils/date-format';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { JournalEntryFormData, journalEntryFormSchema } from '@/utils/schemas';
 import { JournalEntryLineFormDialog } from './JournalEntryLineFormDialog';
@@ -274,8 +275,7 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                                                                 currentLine.debit,
                                                             ) || 0,
                                                             {
-                                                                locale: 'id-ID',
-                                                                currency: 'IDR',
+                                                                locale: FORMAT_LOCALE,
                                                             },
                                                         )}
                                                     </TableCell>
@@ -285,8 +285,7 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                                                                 currentLine.credit,
                                                             ) || 0,
                                                             {
-                                                                locale: 'id-ID',
-                                                                currency: 'IDR',
+                                                                locale: FORMAT_LOCALE,
                                                             },
                                                         )}
                                                     </TableCell>
@@ -342,8 +341,7 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                                             {formatCurrencyByRegionalSettings(
                                                 totalDebit,
                                                 {
-                                                    locale: 'id-ID',
-                                                    currency: 'IDR',
+                                                    locale: FORMAT_LOCALE,
                                                 },
                                             )}
                                         </TableCell>
@@ -351,8 +349,7 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                                             {formatCurrencyByRegionalSettings(
                                                 totalCredit,
                                                 {
-                                                    locale: 'id-ID',
-                                                    currency: 'IDR',
+                                                    locale: FORMAT_LOCALE,
                                                 },
                                             )}
                                         </TableCell>
@@ -371,8 +368,7 @@ export const JournalEntryForm = memo<JournalEntryFormProps>(
                                                 {formatCurrencyByRegionalSettings(
                                                     difference,
                                                     {
-                                                        locale: 'id-ID',
-                                                        currency: 'IDR',
+                                                        locale: FORMAT_LOCALE,
                                                     },
                                                 )}
                                             </span>

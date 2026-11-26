@@ -7,6 +7,7 @@ import {
 import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import React from 'react';
 
 import { createAmountFormatter } from '@/components/common/report-format-helpers';
@@ -46,7 +47,7 @@ export const ArReceiptViewModal = React.memo(
     ({ item, open, onClose }: ArReceiptViewModalProps) => {
         if (!item) return null;
 
-        const formatAmount = createAmountFormatter(item.currency || 'IDR');
+        const formatAmount = createAmountFormatter(item.currency);
 
         const allocationColumns =
             createArReceiptAllocationColumns(formatAmount);
@@ -82,7 +83,7 @@ export const ArReceiptViewModal = React.memo(
                             value={formatDateByRegionalSettings(
                                 item.receipt_date,
                                 {
-                                    locale: 'id-ID',
+                                    locale: FORMAT_LOCALE,
                                 },
                             )}
                         />

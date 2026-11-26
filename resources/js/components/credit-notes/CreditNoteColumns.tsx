@@ -12,6 +12,7 @@ import {
     createStatusBadgeColumn,
     createTextColumn,
 } from '@/utils/columns';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { ColumnDef } from '@tanstack/react-table';
 
@@ -79,8 +80,7 @@ export const creditNoteColumns: ColumnDef<CreditNote>[] = [
         cell: ({ row }) => (
             <div className="text-right">
                 {formatCurrencyByRegionalSettings(row.original.grand_total, {
-                    locale: 'id-ID',
-                    currency: 'IDR',
+                    locale: FORMAT_LOCALE,
                     minimumFractionDigits: 0,
                     maximumFractionDigits: 2,
                 })}

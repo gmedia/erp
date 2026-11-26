@@ -7,6 +7,7 @@ import {
 import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import React from 'react';
 
 import {
@@ -72,7 +73,7 @@ export const CreditNoteViewModal = React.memo(
     ({ item, open, onClose }: CreditNoteViewModalProps) => {
         if (!item) return null;
 
-        const formatAmount = createAmountFormatter('IDR');
+        const formatAmount = createAmountFormatter();
 
         const itemColumns = createCreditNoteItemColumns(formatAmount);
 
@@ -111,7 +112,7 @@ export const CreditNoteViewModal = React.memo(
                             value={formatDateByRegionalSettings(
                                 item.credit_note_date,
                                 {
-                                    locale: 'id-ID',
+                                    locale: FORMAT_LOCALE,
                                 },
                             )}
                         />

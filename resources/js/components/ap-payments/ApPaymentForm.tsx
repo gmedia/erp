@@ -1,5 +1,6 @@
 'use client';
 
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useEffect, useMemo, useRef } from 'react';
 import { type Resolver, useFieldArray, useForm } from 'react-hook-form';
@@ -31,7 +32,10 @@ import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues
 import { type ApPayment, type ApPaymentFormData } from '@/types/ap-payment';
 import { toDateInputValue } from '@/utils/date-format';
 import { formatItemReference } from '@/utils/entity-form-item';
-import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
+import {
+    formatCurrencyByRegionalSettings,
+    getRegionalNumberFormatSettings,
+} from '@/utils/number-format';
 import { isPostedDocumentLocked } from '@/utils/posted-document-lock';
 import { apPaymentFormSchema } from '@/utils/schemas';
 import { ApPaymentAllocationFormDialog } from './ApPaymentAllocationFormDialog';
@@ -65,7 +69,7 @@ const getApPaymentFormDefaults = (
             payment_date: toDateInputValue(new Date()),
             payment_method: 'bank_transfer',
             bank_account_id: '',
-            currency: 'IDR',
+            currency: getRegionalNumberFormatSettings().currency,
             total_amount: 0,
             reference: '',
             status: 'draft',
@@ -90,7 +94,8 @@ const getApPaymentFormDefaults = (
         bank_account_id: apPayment.bank_account?.id
             ? String(apPayment.bank_account.id)
             : '',
-        currency: apPayment.currency || 'IDR',
+        currency:
+            apPayment.currency || getRegionalNumberFormatSettings().currency,
         total_amount: Number(apPayment.total_amount || 0),
         reference: apPayment.reference || '',
         status: apPayment.status,
@@ -372,7 +377,7 @@ export const ApPaymentForm = memo<ApPaymentFormProps>(function ApPaymentForm({
                                                 allocation.allocated_amount ??
                                                     0,
                                                 {
-                                                    locale: 'id-ID',
+                                                    locale: FORMAT_LOCALE,
                                                     currency:
                                                         selectedCurrency ||
                                                         undefined,
@@ -385,7 +390,7 @@ export const ApPaymentForm = memo<ApPaymentFormProps>(function ApPaymentForm({
                                             {formatCurrencyByRegionalSettings(
                                                 allocation.discount_taken ?? 0,
                                                 {
-                                                    locale: 'id-ID',
+                                                    locale: FORMAT_LOCALE,
                                                     currency:
                                                         selectedCurrency ||
                                                         undefined,

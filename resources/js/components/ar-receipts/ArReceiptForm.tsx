@@ -24,7 +24,11 @@ import { useEntityFormItemDialog } from '@/hooks/useEntityFormItemDialog';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type ArReceipt, type ArReceiptFormData } from '@/types/ar-receipt';
 import { toDateInputValue } from '@/utils/date-format';
-import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
+import { FORMAT_LOCALE } from '@/utils/formatters';
+import {
+    formatCurrencyByRegionalSettings,
+    getRegionalNumberFormatSettings,
+} from '@/utils/number-format';
 import { isPostedDocumentLocked } from '@/utils/posted-document-lock';
 import { arReceiptFormSchema } from '@/utils/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -51,7 +55,7 @@ const getArReceiptFormDefaults = (
             receipt_date: toDateInputValue(new Date()),
             payment_method: 'bank_transfer',
             bank_account_id: '',
-            currency: 'IDR',
+            currency: getRegionalNumberFormatSettings().currency,
             total_amount: 0,
             reference: '',
             status: 'draft',
@@ -74,7 +78,8 @@ const getArReceiptFormDefaults = (
         bank_account_id: arReceipt.bank_account?.id
             ? String(arReceipt.bank_account.id)
             : '',
-        currency: arReceipt.currency || 'IDR',
+        currency:
+            arReceipt.currency || getRegionalNumberFormatSettings().currency,
         total_amount: Number(arReceipt.total_amount || 0),
         reference: arReceipt.reference || '',
         status: arReceipt.status,
@@ -335,10 +340,8 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
                                             {formatCurrencyByRegionalSettings(
                                                 field.allocated_amount,
                                                 {
-                                                    locale: 'id-ID',
-                                                    currency:
-                                                        selectedCurrency ||
-                                                        'IDR',
+                                                    locale: FORMAT_LOCALE,
+                                                    currency: selectedCurrency,
                                                     minimumFractionDigits: 0,
                                                     maximumFractionDigits: 2,
                                                 },
@@ -348,10 +351,8 @@ export const ArReceiptForm = memo<ArReceiptFormProps>(function ArReceiptForm({
                                             {formatCurrencyByRegionalSettings(
                                                 field.discount_given || 0,
                                                 {
-                                                    locale: 'id-ID',
-                                                    currency:
-                                                        selectedCurrency ||
-                                                        'IDR',
+                                                    locale: FORMAT_LOCALE,
+                                                    currency: selectedCurrency,
                                                     minimumFractionDigits: 0,
                                                     maximumFractionDigits: 2,
                                                 },

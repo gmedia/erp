@@ -13,6 +13,7 @@ import { useTranslation } from '@/contexts/i18n-context';
 import { useResetFormOnDefaultValues } from '@/hooks/useResetFormOnDefaultValues';
 import { type ApPaymentFormData } from '@/types/ap-payment';
 import { type SupplierBill } from '@/types/supplier-bill';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 
 type ApPaymentAllocationFormData = ApPaymentFormData['allocations'][number];
@@ -38,8 +39,8 @@ const billLabel = (bill: SupplierBill): string =>
     `${bill.bill_number ?? String(bill.id)} — ${formatCurrencyByRegionalSettings(
         bill.amount_due,
         {
-            locale: 'id-ID',
-            currency: bill.currency || 'IDR',
+            locale: FORMAT_LOCALE,
+            currency: bill.currency,
             minimumFractionDigits: 0,
             maximumFractionDigits: 2,
         },

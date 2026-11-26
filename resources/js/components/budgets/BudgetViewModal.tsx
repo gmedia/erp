@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/table';
 import { type Budget } from '@/types/budget';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 
 interface BudgetViewModalProps {
@@ -105,8 +106,7 @@ export const BudgetViewModal = memo<BudgetViewModalProps>(
                                     {formatCurrencyByRegionalSettings(
                                         item.total_amount,
                                         {
-                                            locale: 'id-ID',
-                                            currency: 'IDR',
+                                            locale: FORMAT_LOCALE,
                                         },
                                     )}
                                 </p>
@@ -187,8 +187,7 @@ export const BudgetViewModal = memo<BudgetViewModalProps>(
                                                     {formatCurrencyByRegionalSettings(
                                                         line.allocated_amount,
                                                         {
-                                                            locale: 'id-ID',
-                                                            currency: 'IDR',
+                                                            locale: FORMAT_LOCALE,
                                                         },
                                                     )}
                                                 </TableCell>
@@ -210,8 +209,7 @@ export const BudgetViewModal = memo<BudgetViewModalProps>(
                                                 {formatCurrencyByRegionalSettings(
                                                     totalAllocated,
                                                     {
-                                                        locale: 'id-ID',
-                                                        currency: 'IDR',
+                                                        locale: FORMAT_LOCALE,
                                                     },
                                                 )}
                                             </TableCell>

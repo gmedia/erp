@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/table';
 import { JournalEntry } from '@/types/journal-entry';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 
 interface JournalEntryViewModalProps {
@@ -112,19 +113,13 @@ export function JournalEntryViewModal({
                                         <TableCell className="text-right">
                                             {formatCurrencyByRegionalSettings(
                                                 line.debit,
-                                                {
-                                                    locale: 'id-ID',
-                                                    currency: 'IDR',
-                                                },
+                                                { locale: FORMAT_LOCALE },
                                             )}
                                         </TableCell>
                                         <TableCell className="text-right">
                                             {formatCurrencyByRegionalSettings(
                                                 line.credit,
-                                                {
-                                                    locale: 'id-ID',
-                                                    currency: 'IDR',
-                                                },
+                                                { locale: FORMAT_LOCALE },
                                             )}
                                         </TableCell>
                                         <TableCell>{line.memo}</TableCell>
@@ -139,19 +134,13 @@ export function JournalEntryViewModal({
                                     <TableCell className="text-right font-bold">
                                         {formatCurrencyByRegionalSettings(
                                             item.total_debit,
-                                            {
-                                                locale: 'id-ID',
-                                                currency: 'IDR',
-                                            },
+                                            { locale: FORMAT_LOCALE },
                                         )}
                                     </TableCell>
                                     <TableCell className="text-right font-bold">
                                         {formatCurrencyByRegionalSettings(
                                             item.total_credit,
-                                            {
-                                                locale: 'id-ID',
-                                                currency: 'IDR',
-                                            },
+                                            { locale: FORMAT_LOCALE },
                                         )}
                                     </TableCell>
                                     <TableCell></TableCell>

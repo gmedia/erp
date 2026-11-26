@@ -22,6 +22,7 @@ import {
 } from '@/types/customer-invoice';
 import { toDateInputValue } from '@/utils/date-format';
 import { omitItemDisplayLabels } from '@/utils/entity-form-item';
+import { getRegionalNumberFormatSettings } from '@/utils/number-format';
 import { isPostedDocumentLocked } from '@/utils/posted-document-lock';
 import { customerInvoiceFormSchema } from '@/utils/schemas';
 import { CustomerInvoiceItemFormDialog } from './CustomerInvoiceItemFormDialog';
@@ -47,7 +48,7 @@ const getCustomerInvoiceFormDefaults = (
             invoice_date: toDateInputValue(new Date()),
             due_date: toDateInputValue(new Date()),
             payment_terms: '',
-            currency: 'IDR',
+            currency: getRegionalNumberFormatSettings().currency,
             status: 'draft',
             notes: '',
             items: [],
@@ -71,7 +72,9 @@ const getCustomerInvoiceFormDefaults = (
             ? toDateInputValue(customerInvoice.due_date)
             : toDateInputValue(new Date()),
         payment_terms: customerInvoice.payment_terms || '',
-        currency: customerInvoice.currency || 'IDR',
+        currency:
+            customerInvoice.currency ||
+            getRegionalNumberFormatSettings().currency,
         status: customerInvoice.status,
         notes: customerInvoice.notes || '',
         items: (customerInvoice.items || []).length

@@ -1,5 +1,6 @@
 'use client';
 
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { memo, useMemo } from 'react';
 import { type Resolver, useFieldArray, useForm } from 'react-hook-form';
@@ -39,6 +40,7 @@ import {
 import {
     formatCurrencyByRegionalSettings,
     formatNumberByRegionalSettings,
+    getRegionalNumberFormatSettings,
 } from '@/utils/number-format';
 import { isPostedDocumentLocked } from '@/utils/posted-document-lock';
 import { supplierBillFormSchema } from '@/utils/schemas';
@@ -85,7 +87,7 @@ const getSupplierBillFormDefaults = (
                 new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
             ),
             payment_terms: '',
-            currency: 'IDR',
+            currency: getRegionalNumberFormatSettings().currency,
             status: 'draft',
             notes: '',
             items: [],
@@ -120,7 +122,8 @@ const getSupplierBillFormDefaults = (
             ? toDateInputValue(supplierBill.due_date)
             : toDateInputValue(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)),
         payment_terms: supplierBill.payment_terms || '',
-        currency: supplierBill.currency || 'IDR',
+        currency:
+            supplierBill.currency || getRegionalNumberFormatSettings().currency,
         status: supplierBill.status,
         notes: supplierBill.notes || '',
         items: (supplierBill.items || []).length
@@ -402,7 +405,7 @@ export const SupplierBillForm = memo<SupplierBillFormProps>(
                                                     supplierBillItem.quantity ??
                                                         0,
                                                     {
-                                                        locale: 'id-ID',
+                                                        locale: FORMAT_LOCALE,
                                                         minimumFractionDigits: 0,
                                                         maximumFractionDigits: 2,
                                                     },
@@ -413,7 +416,7 @@ export const SupplierBillForm = memo<SupplierBillFormProps>(
                                                     supplierBillItem.unit_price ??
                                                         0,
                                                     {
-                                                        locale: 'id-ID',
+                                                        locale: FORMAT_LOCALE,
                                                         currency:
                                                             selectedCurrency ||
                                                             undefined,
@@ -427,7 +430,7 @@ export const SupplierBillForm = memo<SupplierBillFormProps>(
                                                     supplierBillItem.discount_percent ??
                                                         0,
                                                     {
-                                                        locale: 'id-ID',
+                                                        locale: FORMAT_LOCALE,
                                                         minimumFractionDigits: 0,
                                                         maximumFractionDigits: 2,
                                                     },
@@ -438,7 +441,7 @@ export const SupplierBillForm = memo<SupplierBillFormProps>(
                                                     supplierBillItem.tax_percent ??
                                                         0,
                                                     {
-                                                        locale: 'id-ID',
+                                                        locale: FORMAT_LOCALE,
                                                         minimumFractionDigits: 0,
                                                         maximumFractionDigits: 2,
                                                     },

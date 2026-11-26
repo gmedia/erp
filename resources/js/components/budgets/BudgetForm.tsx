@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/table';
 import { useTranslation } from '@/contexts/i18n-context';
 import { type Budget } from '@/types/budget';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { budgetFormSchema, type BudgetFormData } from '@/utils/schemas';
 
@@ -359,8 +360,7 @@ export const BudgetForm = memo<BudgetFormProps>(function BudgetForm({
                                                                 current.allocated_amount,
                                                             ) || 0,
                                                             {
-                                                                locale: 'id-ID',
-                                                                currency: 'IDR',
+                                                                locale: FORMAT_LOCALE,
                                                             },
                                                         )}
                                                     </TableCell>
@@ -412,8 +412,7 @@ export const BudgetForm = memo<BudgetFormProps>(function BudgetForm({
                                             {formatCurrencyByRegionalSettings(
                                                 totalAllocated,
                                                 {
-                                                    locale: 'id-ID',
-                                                    currency: 'IDR',
+                                                    locale: FORMAT_LOCALE,
                                                 },
                                             )}
                                         </TableCell>

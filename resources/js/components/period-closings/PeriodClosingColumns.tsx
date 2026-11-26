@@ -11,6 +11,7 @@ import {
     createSortingHeader,
 } from '@/utils/columns';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
 import { type ColumnDef } from '@tanstack/react-table';
 
@@ -103,7 +104,7 @@ export const periodClosingColumns: ColumnDef<PeriodClosing>[] = [
                     className={`text-right ${Number(netIncome) < 0 ? 'text-destructive' : ''}`}
                 >
                     {formatCurrencyByRegionalSettings(netIncome, {
-                        locale: 'id-ID',
+                        locale: FORMAT_LOCALE,
                         currency: currency || undefined,
                         minimumFractionDigits: 0,
                         maximumFractionDigits: 2,

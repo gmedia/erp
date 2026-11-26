@@ -1,3 +1,4 @@
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import { memo, useState } from 'react';
 
 import { BankReconciliationWorkspace } from '@/components/bank-reconciliations/BankReconciliationWorkspace';
@@ -25,7 +26,7 @@ interface BankReconciliationViewModalProps {
     onClose: () => void;
 }
 
-const currencyOpts = { locale: 'id-ID', currency: 'IDR' } as const;
+const currencyOpts = { locale: FORMAT_LOCALE } as const;
 
 const itemColumns: ViewModalItemsTableColumn<BankReconciliationItem>[] = [
     {
