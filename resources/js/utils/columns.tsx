@@ -146,8 +146,10 @@ export function createSortingHeader(
                     ) : null}
                     <span
                         className={cn(
-                            'line-clamp-2 max-w-full min-w-0 whitespace-normal',
-                            isRight ? 'text-right' : 'text-left',
+                            'max-w-full min-w-0',
+                            isRight
+                                ? 'text-right whitespace-nowrap'
+                                : 'line-clamp-2 text-left whitespace-normal',
                         )}
                     >
                         <LabelText label={label} />
