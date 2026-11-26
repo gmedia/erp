@@ -2720,5 +2720,10 @@
         "validation_failed": "Validation failed.",
         "server": "Server error. Please try again later.",
         "unexpected": "An unexpected error occurred."
+    },
+    "asset_depreciation_runs_toast": {
+        "calculate_failed": "Failed to calculate depreciation",
+        "post_failed": "Failed to post to journal",
+        "void_failed": "Failed to void depreciation run"
     }
 }

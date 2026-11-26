@@ -2720,5 +2720,10 @@
         "validation_failed": "Validasi gagal.",
         "server": "Kesalahan server. Silakan coba lagi nanti.",
         "unexpected": "Terjadi kesalahan yang tidak terduga."
+    },
+    "asset_depreciation_runs_toast": {
+        "calculate_failed": "Gagal menghitung penyusutan",
+        "post_failed": "Gagal memposting ke jurnal",
+        "void_failed": "Gagal membatalkan proses penyusutan"
     }
 }

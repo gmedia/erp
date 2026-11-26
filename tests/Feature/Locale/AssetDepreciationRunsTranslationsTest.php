@@ -37,6 +37,17 @@ test('english asset depreciation run form labels keep the original english text'
         ->and($en['calculate'])->toBe('Calculate');
 });
 
+test('asset depreciation run toast keys exist in both locales with english text unchanged', function () {
+    $en = json_decode(File::get(lang_path('en.json')), true, 512, JSON_THROW_ON_ERROR);
+    $id = json_decode(File::get(lang_path('id.json')), true, 512, JSON_THROW_ON_ERROR);
+
+    expect(array_keys($en['asset_depreciation_runs_toast']))->toBe(array_keys($id['asset_depreciation_runs_toast']))
+        ->and($en['asset_depreciation_runs_toast']['calculate_failed'])->toBe('Failed to calculate depreciation')
+        ->and($en['asset_depreciation_runs_toast']['post_failed'])->toBe('Failed to post to journal')
+        ->and($en['asset_depreciation_runs_toast']['void_failed'])->toBe('Failed to void depreciation run')
+        ->and($id['asset_depreciation_runs_toast']['calculate_failed'])->not->toBe($en['asset_depreciation_runs_toast']['calculate_failed']);
+});
+
 test('english shared add item label keeps the original english text', function () {
     $en = json_decode(File::get(lang_path('en.json')), true, 512, JSON_THROW_ON_ERROR);
     $id = json_decode(File::get(lang_path('id.json')), true, 512, JSON_THROW_ON_ERROR);
