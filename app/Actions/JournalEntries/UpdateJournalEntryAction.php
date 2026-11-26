@@ -72,6 +72,7 @@ class UpdateJournalEntryAction
                 fn (array $line): array => [
                     'account_id' => $line['account_id'],
                     'branch_id' => $line['branch_id'] ?? $headerBranchId,
+                    'department_id' => $line['department_id'] ?? null,
                     'debit' => $line['debit'],
                     'credit' => $line['credit'],
                     'memo' => $line['memo'] ?? null,
@@ -87,6 +88,7 @@ class UpdateJournalEntryAction
                 $journalEntry->lines()->create([
                     'account_id' => $lineData['account_id'],
                     'branch_id' => $lineData['branch_id'] ?? null,
+                    'department_id' => $lineData['department_id'] ?? null,
                     'debit' => $lineData['debit'],
                     'credit' => $lineData['credit'],
                     'memo' => $lineData['memo'] ?? null,

@@ -92,6 +92,7 @@ export function JournalEntryViewModal({
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Account</TableHead>
+                                    <TableHead>Department</TableHead>
                                     <TableHead className="text-right">
                                         Debit
                                     </TableHead>
@@ -109,6 +110,9 @@ export function JournalEntryViewModal({
                                             <div className="text-sm text-muted-foreground">
                                                 {line.account_name}
                                             </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            {line.department_name || '-'}
                                         </TableCell>
                                         <TableCell className="text-right">
                                             {formatCurrencyByRegionalSettings(
@@ -131,6 +135,7 @@ export function JournalEntryViewModal({
                                     <TableCell className="font-bold">
                                         Total
                                     </TableCell>
+                                    <TableCell></TableCell>
                                     <TableCell className="text-right font-bold">
                                         {formatCurrencyByRegionalSettings(
                                             item.total_debit,

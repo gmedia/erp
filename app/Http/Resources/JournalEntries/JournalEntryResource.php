@@ -34,6 +34,8 @@ class JournalEntryResource extends JsonResource
                 'account_id' => $line->account_id,
                 'account_name' => $line->account?->name,
                 'account_code' => $line->account?->code,
+                'department_id' => $line->department_id,
+                'department_name' => $line->department?->name,
                 'debit' => (float) $line->debit,
                 'credit' => (float) $line->credit,
                 'memo' => $line->memo,

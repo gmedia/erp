@@ -48,7 +48,7 @@ class JournalEntryController extends Controller
 
     public function show(JournalEntry $journalEntry): JsonResponse
     {
-        $journalEntry->load(['lines.account', 'fiscalYear', 'branch', 'createdBy', 'postedBy']);
+        $journalEntry->load(['lines.account', 'lines.department', 'fiscalYear', 'branch', 'createdBy', 'postedBy']);
 
         return (new JournalEntryResource($journalEntry))->response();
     }

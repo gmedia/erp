@@ -300,6 +300,8 @@ export const journalEntryFormSchema = z.object({
                 account_code: z.string().optional(),
                 branch_id: z.string().optional(),
                 branch_name: z.string().optional(),
+                department_id: z.string().optional(),
+                department_name: z.string().optional(),
             }),
         )
         .min(2, { message: 'validation.journal_entry.lines_min_two' })

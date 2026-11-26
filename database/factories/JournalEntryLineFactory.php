@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Account;
+use App\Models\Department;
 use App\Models\JournalEntry;
 use App\Models\JournalEntryLine;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -22,9 +23,17 @@ class JournalEntryLineFactory extends Factory
         return [
             'journal_entry_id' => JournalEntry::factory(),
             'account_id' => Account::factory(),
+            'department_id' => null,
             'debit' => 0,
             'credit' => 0,
             'memo' => $this->faker->sentence,
         ];
+    }
+
+    public function withDepartment(): static
+    {
+        return $this->state(fn (): array => [
+            'department_id' => Department::factory(),
+        ]);
     }
 }
