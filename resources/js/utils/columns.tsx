@@ -127,8 +127,9 @@ export function createSortingHeader(
                 <Button
                     variant="ghost"
                     className={cn(
-                        '-ml-2 h-8 px-2',
-                        isRight && 'ml-auto max-w-full pr-0',
+                        isRight
+                            ? 'ml-auto h-8 max-w-full justify-end px-0 has-[>svg]:px-0'
+                            : '-ml-2 h-8 px-2',
                     )}
                     onClick={() =>
                         column.toggleSorting(column.getIsSorted() === 'asc')

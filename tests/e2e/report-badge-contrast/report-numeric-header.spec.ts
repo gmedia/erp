@@ -2,42 +2,47 @@ import { expect, test, type Page } from '@playwright/test';
 import { openModule } from '../helpers';
 
 // Standar repo (#463, budgets/table-numeric-layout.spec.ts) + keputusan
-// reviewer terbaru di #473:
-// - header SORTABLE: tepi kanan TOMBOL header (label + ikon sort) vs teks nilai, <= 4px
-// - header NON-sortable: tepi kanan teks LABEL vs teks nilai, <= 4px
+// reviewer #521 (butir 2): yang diukur adalah TEKS, bukan tombol.
+// - ujung kanan TEKS label header (span label, bukan button) vs ujung kanan
+//   TEKS nilai baris pertama, toleransi <= 2px.
+// Pengukuran tombol tidak dipakai karena ikon sort di kiri membuat selisih
+// teks ±13px lolos.
 async function expectReportNumericHeaderRightAligned(
     page: Page,
     label: string,
 ): Promise<void> {
     const head = page.locator('th', { hasText: label }).first();
+    const heads = await page.locator('thead th').allTextContents();
+    expect(
+        await head.count(),
+        `header "${label}" tidak ada; th tersedia: ${heads.join(' | ')}`,
+    ).toBeGreaterThan(0);
     await expect(head).toBeVisible();
     const index = await head.evaluate(
         (el) =>
             Array.prototype.indexOf.call(el.parentElement!.children, el) + 1,
     );
     const valueText = page
-        .locator(`tbody tr:first-child td:nth-child(${index}) > div`)
+        .locator(`tbody tr:first-child td:nth-child(${index})`)
         .first();
     await expect(valueText).toBeVisible();
 
-    const isSortable = (await head.locator('button').count()) > 0;
-    const headTarget = isSortable
-        ? head.locator('button').first()
-        : head.locator('div, span').first();
+    const sortLabel = head.locator('span.line-clamp-2').first();
+    const labelText =
+        (await sortLabel.count()) > 0 ? sortLabel : head.locator('div').first();
+    await expect(labelText).toBeVisible();
+
     const textRight = (el: Element) => {
         const range = document.createRange();
         range.selectNodeContents(el);
         return range.getBoundingClientRect().right;
     };
-    const buttonRight = (el: Element) => el.getBoundingClientRect().right;
-    const headRight = await headTarget.evaluate(
-        isSortable ? buttonRight : textRight,
-    );
+    const headRight = await labelText.evaluate(textRight);
     const valueRight = await valueText.evaluate(textRight);
     expect(
         Math.abs(headRight - valueRight),
-        `${label}: head right=${headRight} vs value text right=${valueRight}`,
-    ).toBeLessThanOrEqual(4);
+        `${label}: head text right=${headRight} vs value text right=${valueRight}`,
+    ).toBeLessThanOrEqual(2);
 }
 
 async function expectTotalAlignedWithFirstRow(
@@ -245,6 +250,26 @@ test.describe('Badge status - tone dibedakan', () => {
         expect(statusBadgeVariant('partially_received')).toBe('outline');
         expect(statusBadgeVariant('pending_approval')).toBe('warning');
         expect(statusBadgeVariant('cancelled')).toBe('destructive-soft');
+    });
+});
+
+test.describe('Header angka rata kanan - modul bersama 1440', () => {
+    test('Purchase Orders: header Grand Total sejajar teks nilai (<= 2px)', async ({
+        page,
+    }) => {
+        await page.setViewportSize({ width: 1440, height: 900 });
+        await openModule(page, '/purchase-orders', '/api/purchase-orders');
+
+        await expectReportNumericHeaderRightAligned(page, 'Grand Total');
+    });
+
+    test('AR Aging: header Amount Due (ReportColumns align kanan) sejajar teks nilai (<= 2px)', async ({
+        page,
+    }) => {
+        await page.setViewportSize({ width: 1440, height: 900 });
+        await openModule(page, '/reports/ar-aging', '/api/reports/ar-aging');
+
+        await expectReportNumericHeaderRightAligned(page, 'Amount Due');
     });
 });
 
