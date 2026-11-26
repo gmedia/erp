@@ -64,6 +64,6 @@ test('crud hooks use crud_toast keys with english fallbacks', function () {
 
     foreach ($en as $key => $template) {
         $fallback = str_replace('{entity}', '${entityName}', $template);
-        expect(str_contains($mutations.$query, "`{$fallback}`"))->toBeTrue("crud_toast.{$key} fallback drifted");
+        expect(str_contains($mutations . $query, "`{$fallback}`"))->toBeTrue("crud_toast.{$key} fallback drifted");
     }
 });
