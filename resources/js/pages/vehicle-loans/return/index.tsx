@@ -165,7 +165,8 @@ export default function VehicleLoanReturnPage() {
                     title={tPage('return.title', 'Pengembalian Kendaraan')}
                     description={tPage(
                         'return.description',
-                        'Pilih pengambilan, unggah bukti serah terima dan kondisi kendaraan, lalu catat insiden bila ada.',
+                        'Pilih pengambilan, unggah bukti serah terima dan kondisi kendaraan, ' +
+                            'lalu catat insiden bila ada.',
                     )}
                 />
 
@@ -234,7 +235,8 @@ export default function VehicleLoanReturnPage() {
                                 <p className="text-sm text-muted-foreground">
                                     {tPage(
                                         'return.pickup_empty_hint',
-                                        'Belum ada kendaraan yang sedang dipinjam. Pengembalian tersedia setelah kunci diserahkan security.',
+                                        'Belum ada kendaraan yang sedang dipinjam. ' +
+                                            'Pengembalian tersedia setelah kunci diserahkan security.',
                                     )}
                                 </p>
                             )}
