@@ -25,7 +25,8 @@ KVM wajib: `/dev/kvm` harus bisa diakses user yang menjalankan emulator (grup `k
 Status verifikasi (per mesin, dicatat agar tidak diulang):
 - JDK 21 Temurin terpasang di `~/opt/jdk-21.0.13.1+2` (`java -version` OK).
 - cmdline-tools, platform-tools, emulator, `platforms;android-34`, `system-images;android-34;google_apis;x86_64`, `build-tools;34.0.0`, dan AVD `erp_api34` sudah ada di `~/Android/Sdk`.
-- Boot emulator BELUM bisa diverifikasi: user tidak punya akses `/dev/kvm` (owner `root:kvm`, user tidak di grup `kvm`). Menambah grup memerlukan sudo/admin dan tidak dilakukan dari sesi agent. Tindakan: admin menambahkan user ke grup `kvm`, lalu login ulang.
+- Akses `/dev/kvm` sudah tersedia untuk user agent (verifikasi: `test -r /dev/kvm && test -w /dev/kvm`).
+- `bash scripts/e2e-android.sh` lulus di mesin ini: 2 passed (login + Departments), sekitar 140 dtk total dengan build, cap sync, gradle, boot emulator, dan install APK.
 
 ## Langkah instalasi (sekali per mesin)
 
