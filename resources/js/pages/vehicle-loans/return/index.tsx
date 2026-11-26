@@ -15,9 +15,10 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { RequiredLabel } from '@/components/vehicle-loans/RequiredLabel';
 import { VehicleLoanQrPanel } from '@/components/vehicle-loans/VehicleLoanQrPanel';
+import { VehicleLoanSummaryCard } from '@/components/vehicle-loans/VehicleLoanSummaryCard';
+import { useVehicleLoanPageText } from '@/components/vehicle-loans/useVehicleLoanPageText';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
-import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import { useToastTranslator } from '@/utils/i18nFallback';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -46,6 +47,7 @@ export default function VehicleLoanReturnPage() {
     const [loading, setLoading] = useState(false);
     const [loaded, setLoaded] = useState(false);
     const tToast = useToastTranslator('vehicle_loan_toast');
+    const tPage = useVehicleLoanPageText();
 
     async function loadPickups() {
         setLoading(true);
@@ -149,22 +151,29 @@ export default function VehicleLoanReturnPage() {
     return (
         <AppLayout
             breadcrumbs={[
-                { title: 'Pengembalian', href: '/vehicle-loans/return' },
+                {
+                    title: tPage('return.breadcrumb', 'Pengembalian'),
+                    href: '/vehicle-loans/return',
+                },
             ]}
         >
             <Helmet>
-                <title>Pengembalian Kendaraan</title>
+                <title>{tPage('return.title', 'Pengembalian Kendaraan')}</title>
             </Helmet>
             <div className="mx-auto max-w-2xl space-y-4 p-4 md:p-6">
                 <PageHeader
-                    title="Pengembalian Kendaraan"
-                    description="Pilih pengambilan, unggah bukti serah terima dan kondisi kendaraan, lalu catat insiden bila ada."
+                    title={tPage('return.title', 'Pengembalian Kendaraan')}
+                    description={tPage(
+                        'return.description',
+                        'Pilih pengambilan, unggah bukti serah terima dan kondisi kendaraan, ' +
+                            'lalu catat insiden bila ada.',
+                    )}
                 />
 
                 <Card>
                     <CardHeader className="pb-3">
                         <CardTitle className="text-base">
-                            Data Pengembalian
+                            {tPage('return.data_heading', 'Data Pengembalian')}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
@@ -175,13 +184,16 @@ export default function VehicleLoanReturnPage() {
                             className="min-h-11 w-full"
                         >
                             {loading
-                                ? 'Memuat...'
-                                : 'Muat Data Pengambilan Saya'}
+                                ? tPage('return.loading_button', 'Memuat...')
+                                : tPage(
+                                      'return.load_button',
+                                      'Muat Data Pengambilan Saya',
+                                  )}
                         </Button>
 
                         <div className="grid gap-2">
                             <RequiredLabel htmlFor="pickup">
-                                Pengambilan
+                                {tPage('return.pickup_label', 'Pengambilan')}
                             </RequiredLabel>
                             <Select
                                 value={pickupId || undefined}
@@ -192,8 +204,14 @@ export default function VehicleLoanReturnPage() {
                                     <SelectValue
                                         placeholder={
                                             loaded && !pickups.length
-                                                ? 'Tidak ada pengambilan aktif'
-                                                : 'Pilih pengambilan'
+                                                ? tPage(
+                                                      'return.pickup_empty_placeholder',
+                                                      'Tidak ada pengambilan aktif',
+                                                  )
+                                                : tPage(
+                                                      'return.pickup_placeholder',
+                                                      'Pilih pengambilan',
+                                                  )
                                         }
                                     />
                                 </SelectTrigger>
@@ -205,82 +223,89 @@ export default function VehicleLoanReturnPage() {
                                         >
                                             {pickup.code} —{' '}
                                             {pickup.plate_number ??
-                                                'unit belum ditentukan'}
+                                                tPage(
+                                                    'return.unit_undetermined',
+                                                    'unit belum ditentukan',
+                                                )}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
                             {loaded && !pickups.length && (
                                 <p className="text-sm text-muted-foreground">
-                                    Belum ada kendaraan yang sedang dipinjam.
-                                    Pengembalian tersedia setelah kunci
-                                    diserahkan security.
+                                    {tPage(
+                                        'return.pickup_empty_hint',
+                                        'Belum ada kendaraan yang sedang dipinjam. ' +
+                                            'Pengembalian tersedia setelah kunci diserahkan security.',
+                                    )}
                                 </p>
                             )}
                         </div>
 
-                        {selected && (
-                            <div className="space-y-1 rounded-lg border bg-muted/30 p-3 text-sm">
-                                <p className="font-medium">{selected.code}</p>
-                                <p>
-                                    Peminjam: {selected.requester_name ?? '-'}
-                                </p>
-                                <p>Pengemudi: {selected.driver_name ?? '-'}</p>
-                                <p>Kendaraan: {selected.plate_number ?? '-'}</p>
-                                <p>Tujuan: {selected.purpose ?? '-'}</p>
-                                <p>
-                                    Mulai:{' '}
-                                    {formatDateTimeByRegionalSettings(
-                                        selected.start_at,
-                                    )}
-                                </p>
-                                <p>
-                                    Selesai:{' '}
-                                    {formatDateTimeByRegionalSettings(
-                                        selected.end_at,
-                                    )}
-                                </p>
-                            </div>
-                        )}
+                        {selected && <VehicleLoanSummaryCard loan={selected} />}
                     </CardContent>
                 </Card>
 
                 <Card>
                     <CardHeader className="pb-3">
                         <CardTitle className="text-base">
-                            Bukti & Kondisi
+                            {tPage(
+                                'return.evidence_heading',
+                                'Bukti & Kondisi',
+                            )}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="grid gap-2">
                             <RequiredLabel htmlFor="handover">
-                                Foto bukti serah terima dengan petugas keamanan
+                                {tPage(
+                                    'return.handover_photo_label',
+                                    'Foto bukti serah terima dengan petugas keamanan',
+                                )}
                             </RequiredLabel>
                             <PhotoInput
                                 id="handover"
                                 value={handoverPhoto}
                                 onChange={setHandoverPhoto}
-                                buttonLabel="Ambil Foto Serah Terima"
-                                hint="Foto bersama petugas keamanan saat mengembalikan kunci. JPG/PNG, maks. 5 MB."
+                                buttonLabel={tPage(
+                                    'return.handover_photo_button',
+                                    'Ambil Foto Serah Terima',
+                                )}
+                                hint={tPage(
+                                    'return.handover_photo_hint',
+                                    'Foto bersama petugas keamanan saat mengembalikan kunci. JPG/PNG, maks. 5 MB.',
+                                )}
                                 capture
                             />
                         </div>
                         <div className="grid gap-2">
                             <RequiredLabel htmlFor="condition">
-                                Foto kondisi kendaraan
+                                {tPage(
+                                    'return.condition_photo_label',
+                                    'Foto kondisi kendaraan',
+                                )}
                             </RequiredLabel>
                             <PhotoInput
                                 id="condition"
                                 value={conditionPhoto}
                                 onChange={setConditionPhoto}
-                                buttonLabel="Ambil Foto Kondisi"
-                                hint="Ambil satu foto yang menunjukkan kondisi keseluruhan kendaraan."
+                                buttonLabel={tPage(
+                                    'return.condition_photo_button',
+                                    'Ambil Foto Kondisi',
+                                )}
+                                hint={tPage(
+                                    'return.condition_photo_hint',
+                                    'Ambil satu foto yang menunjukkan kondisi keseluruhan kendaraan.',
+                                )}
                                 capture
                             />
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="odometer">
-                                Odometer akhir (opsional)
+                                {tPage(
+                                    'return.odometer_label',
+                                    'Odometer akhir (opsional)',
+                                )}
                             </Label>
                             <div className="relative">
                                 <Input
@@ -293,7 +318,7 @@ export default function VehicleLoanReturnPage() {
                                     className="pr-10"
                                 />
                                 <span className="absolute inset-y-0 right-3 flex items-center text-xs text-muted-foreground">
-                                    km
+                                    {tPage('return.odometer_unit', 'km')}
                                 </span>
                             </div>
                         </div>
@@ -306,13 +331,19 @@ export default function VehicleLoanReturnPage() {
                                 }
                             />
                             <Label htmlFor="incident" className="font-normal">
-                                Ada insiden selama peminjaman
+                                {tPage(
+                                    'return.incident_label',
+                                    'Ada insiden selama peminjaman',
+                                )}
                             </Label>
                         </div>
                         {incident && (
                             <div className="grid gap-2">
                                 <RequiredLabel htmlFor="incident_note">
-                                    Keterangan insiden
+                                    {tPage(
+                                        'return.incident_note_label',
+                                        'Keterangan insiden',
+                                    )}
                                 </RequiredLabel>
                                 <Textarea
                                     id="incident_note"
@@ -321,7 +352,10 @@ export default function VehicleLoanReturnPage() {
                                         setIncidentNote(e.target.value)
                                     }
                                     rows={3}
-                                    placeholder="Jelaskan kejadian dan kondisi kendaraan"
+                                    placeholder={tPage(
+                                        'return.incident_note_placeholder',
+                                        'Jelaskan kejadian dan kondisi kendaraan',
+                                    )}
                                 />
                             </div>
                         )}
@@ -335,16 +369,25 @@ export default function VehicleLoanReturnPage() {
                             }
                             className="min-h-11 w-full"
                         >
-                            Kirim Pengembalian
+                            {tPage(
+                                'return.submit_button',
+                                'Kirim Pengembalian',
+                            )}
                         </Button>
                         {!pickupId && (
                             <p className="text-center text-xs text-muted-foreground">
-                                Pilih data pengembalian terlebih dahulu.
+                                {tPage(
+                                    'return.select_first_hint',
+                                    'Pilih data pengembalian terlebih dahulu.',
+                                )}
                             </p>
                         )}
                         {pickupId && (!handoverPhoto || !conditionPhoto) && (
                             <p className="text-center text-xs text-muted-foreground">
-                                Unggah kedua foto untuk mengirim.
+                                {tPage(
+                                    'return.upload_both_hint',
+                                    'Unggah kedua foto untuk mengirim.',
+                                )}
                             </p>
                         )}
                     </CardContent>

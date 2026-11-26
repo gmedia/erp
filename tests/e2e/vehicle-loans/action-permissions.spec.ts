@@ -1,7 +1,19 @@
 import { expect, test } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { expectResponseOk, login } from '../helpers';
 import { VEHICLE_LOAN_REQUEST_PATH } from './helpers';
+
+const enPage = (
+    JSON.parse(
+        readFileSync(resolve(process.cwd(), 'lang/en.json'), 'utf8'),
+    ) as {
+        vehicle_loan_page: Record<string, string>;
+    }
+).vehicle_loan_page;
+
+test.use({ locale: 'en-US' });
 
 const VIEWER_EMAIL = 'vehicle-loan-viewer@example.com';
 const REQUESTER_EMAIL = 'vehicle-loan-requester@example.com';
@@ -58,10 +70,14 @@ test.describe('Vehicle loan action permissions', () => {
 
         await expect(page.locator('#purpose')).toBeVisible();
         await expect(
-            page.getByRole('button', { name: 'Kirim Permintaan' }),
+            page.getByRole('button', {
+                name: enPage.request.submit_button,
+            }),
         ).toHaveCount(0);
         await expect(
-            page.getByRole('button', { name: 'Simpan Draf' }),
+            page.getByRole('button', {
+                name: enPage.request.save_draft_button,
+            }),
         ).toHaveCount(0);
     });
 
@@ -81,10 +97,14 @@ test.describe('Vehicle loan action permissions', () => {
         await expectResponseOk(await optionsResponse);
 
         await expect(
-            page.getByRole('button', { name: 'Kirim Permintaan' }),
+            page.getByRole('button', {
+                name: enPage.request.submit_button,
+            }),
         ).toBeVisible();
         await expect(
-            page.getByRole('button', { name: 'Simpan Draf' }),
+            page.getByRole('button', {
+                name: enPage.request.save_draft_button,
+            }),
         ).toBeVisible();
     });
 });

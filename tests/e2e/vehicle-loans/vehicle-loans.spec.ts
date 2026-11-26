@@ -23,10 +23,21 @@ import {
 
 const enLang = JSON.parse(
     readFileSync(resolve(process.cwd(), 'lang/en.json'), 'utf8'),
-) as { vehicle_loan_toast: Record<string, string> };
+) as {
+    vehicle_loan_toast: Record<string, string>;
+    vehicle_loan_page: Record<string, Record<string, string>>;
+};
 const toastText = enLang.vehicle_loan_toast;
+const pageText = enLang.vehicle_loan_page;
+const dashboardText = pageText.dashboard;
+
+function escapeRegExp(value: string): string {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 test.describe('Vehicle Loans', () => {
+    test.use({ locale: 'en-US' });
+
     test.beforeEach(async ({ page }) => {
         await login(page, DEFAULT_E2E_EMAIL, undefined, {
             requireDashboard: false,
@@ -38,17 +49,23 @@ test.describe('Vehicle Loans', () => {
     }) => {
         await page.goto(VEHICLE_LOAN_REQUEST_PATH);
 
-        await expect(page).toHaveTitle(/Permintaan Peminjaman Kendaraan/);
+        await expect(page).toHaveTitle(
+            new RegExp(escapeRegExp(pageText.request.title)),
+        );
         await expect(page.locator('#start_at_date')).toBeVisible();
         await expect(page.locator('#end_at_date')).toBeVisible();
         await expect(page.locator('#purpose')).toBeVisible();
         await expect(page.locator('#driver_id')).toBeVisible();
         await expect(page.locator('#vehicle_unit_id')).toBeVisible();
         await expect(
-            page.getByRole('button', { name: 'Simpan Draf' }),
+            page.getByRole('button', {
+                name: pageText.request.save_draft_button,
+            }),
         ).toBeVisible();
         await expect(
-            page.getByRole('button', { name: 'Kirim Permintaan' }),
+            page.getByRole('button', {
+                name: pageText.request.submit_button,
+            }),
         ).toBeVisible();
     });
 
@@ -104,7 +121,11 @@ test.describe('Vehicle Loans', () => {
                 response.url().endsWith('/api/vehicle-loans') &&
                 response.request().method() === 'POST',
         );
-        await page.getByRole('button', { name: 'Simpan Draf' }).click();
+        await page
+            .getByRole('button', {
+                name: pageText.request.save_draft_button,
+            })
+            .click();
         const draft = await draftResponse;
         await expectResponseOk(draft);
         expect(draft.status()).toBe(201);
@@ -114,7 +135,9 @@ test.describe('Vehicle Loans', () => {
                 response.url().includes('/submit') &&
                 response.request().method() === 'POST',
         );
-        await page.getByRole('button', { name: 'Kirim Permintaan' }).click();
+        await page
+            .getByRole('button', { name: pageText.request.submit_button })
+            .click();
         await expectResponseOk(await submitResponse);
     });
 
@@ -192,10 +215,10 @@ test.describe('Vehicle Loans', () => {
         await page.goto(VEHICLE_LOAN_SECURITY_PATH);
 
         await expect(page).toHaveTitle(
-            /Antrean Keamanan — Peminjaman Kendaraan/,
+            new RegExp(escapeRegExp(pageText.security.title_tag)),
         );
         await expect(
-            page.getByRole('heading', { name: 'Antrean Keamanan' }),
+            page.getByRole('heading', { name: pageText.security.title }),
         ).toBeVisible();
 
         const response = page.waitForResponse(
@@ -207,7 +230,7 @@ test.describe('Vehicle Loans', () => {
         await expectResponseOk(await response);
 
         const handover = page
-            .getByRole('button', { name: 'Serahkan Kunci' })
+            .getByRole('button', { name: pageText.security.handover_button })
             .first();
         if (await handover.isVisible().catch(() => false)) {
             const handoverResponse = page.waitForResponse(
@@ -236,13 +259,19 @@ test.describe('Vehicle Loans', () => {
     }) => {
         await page.goto(VEHICLE_LOAN_DASHBOARD_PATH);
 
-        await expect(page).toHaveTitle(/Dashboard Peminjaman Kendaraan/);
+        await expect(page).toHaveTitle(
+            new RegExp(escapeRegExp(dashboardText.title)),
+        );
         await expect(
-            page.getByRole('heading', { name: 'Status Permintaan' }),
+            page.getByRole('heading', { name: dashboardText.heading_status }),
         ).toBeVisible();
-        await expect(page.getByText('Total permintaan')).toBeVisible();
-        await expect(page.getByText('Terlambat dikembalikan')).toBeVisible();
-        await expect(page.getByText('Permintaan Terbaru')).toBeVisible();
+        await expect(page.getByText(dashboardText.status_total)).toBeVisible();
+        await expect(
+            page.getByText(dashboardText.overdue_card_title),
+        ).toBeVisible();
+        await expect(
+            page.getByText(dashboardText.heading_recent),
+        ).toBeVisible();
     });
 
     test('QR panels on all three forms point to the configured base URL', async ({
@@ -262,7 +291,9 @@ test.describe('Vehicle Loans', () => {
             VEHICLE_LOAN_RETURN_PATH,
         ]) {
             await page.goto(path);
-            await expect(page.getByText('QR Pos Keamanan')).toBeVisible();
+            await expect(
+                page.getByText(pageText.qr_title, { exact: true }),
+            ).toBeVisible();
             await expect(
                 page.locator('svg[height="88"][width="88"]').first(),
             ).toBeVisible();

@@ -5,6 +5,8 @@ import {
     vehicleLoanStatusVariant,
 } from '@/utils/vehicle-loan-status';
 
+import { useVehicleLoanPageText } from './useVehicleLoanPageText';
+
 const STATUS_STYLES: Record<string, string> = {
     draft: 'border-border bg-muted text-foreground',
     pending: 'border-warning/30 bg-warning-soft text-warning',
@@ -24,6 +26,7 @@ export function VehicleLoanStatusBadge({
     status: string | null | undefined;
     className?: string;
 }>) {
+    const tPage = useVehicleLoanPageText();
     const key = (status ?? '').toLowerCase().replace(/\s+/g, '_');
 
     return (
@@ -31,7 +34,7 @@ export function VehicleLoanStatusBadge({
             variant={vehicleLoanStatusVariant(status)}
             className={cn('border', STATUS_STYLES[key], className)}
         >
-            {vehicleLoanStatusLabel(status)}
+            {vehicleLoanStatusLabel(status, tPage)}
         </Badge>
     );
 }
