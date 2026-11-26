@@ -126,7 +126,7 @@ jobs:
         run: echo "$ANDROID_HOME/platform-tools" >> "$GITHUB_PATH"
 
       - name: Launch emulator, build APK, and run Playwright _android
-        uses: ReactiveCircus/android-emulator-runner@e93c997dcab69054e999e3924af3d21c4a736e13 # v2.9.0
+        uses: ReactiveCircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
         with:
           api-level: 34
           target: google_apis
