@@ -338,8 +338,11 @@ export async function openModule(
     apiPath: string,
 ): Promise<void> {
     await login(page, undefined, undefined, { requireDashboard: false });
+    const basePath = apiPath.replace(/\/+$/, '');
     const responsePromise = page.waitForResponse(
-        (response) => response.url().includes(apiPath),
+        (response) =>
+            response.request().method() === 'GET' &&
+            new URL(response.url()).pathname.replace(/\/+$/, '') === basePath,
         { timeout: 15000 },
     );
     await page.goto(route);
