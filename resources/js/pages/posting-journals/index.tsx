@@ -1,6 +1,5 @@
 'use client';
 
-import { FORMAT_LOCALE } from '@/utils/formatters';
 import { GenericActions } from '@/components/common/ActionsDropdown';
 import { DataTablePagination } from '@/components/common/DataTablePagination';
 import {
@@ -29,6 +28,7 @@ import { usePostingJournal } from '@/hooks/usePostingJournal';
 import { BreadcrumbItem } from '@/types';
 import { JournalEntry } from '@/types/journal-entry';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import {
     formatCurrencyByRegionalSettings,
     formatNumberByRegionalSettings,
