@@ -180,7 +180,7 @@ class SocialAuthController extends Controller
 
         $account->delete();
 
-        return response()->json(['message' => 'Social account unlinked.']);
+        return response()->json(['message' => __('social_auth_api.unlinked')]);
     }
 
     /**
@@ -196,7 +196,7 @@ class SocialAuthController extends Controller
         $user->password = Hash::make($validated['password']);
         $user->save();
 
-        return response()->json(['message' => 'Password set successfully.']);
+        return response()->json(['message' => __('social_auth_api.password_set')]);
     }
 
     /**

@@ -31,7 +31,7 @@ class PostingJournalController extends Controller
         $results = $action->execute($request->validated('ids'));
 
         return response()->json([
-            'message' => "Successfully posted {$results['success']} journal entries.",
+            'message' => __('posting_journal_api.posted', ['count' => $results['success']]),
             'success_count' => $results['success'],
             'failures' => $results['failures'],
         ]);

@@ -63,14 +63,22 @@ class BankStatementImport implements SkipsEmptyRows, ToCollection, WithHeadingRo
         $description = $this->getMappedValue($rowData, 'description');
 
         if (empty($dateRaw)) {
-            $this->errors[] = ['row' => $rowNumber, 'field' => 'date', 'message' => 'Transaction date is required.'];
+            $this->errors[] = [
+                'row' => $rowNumber,
+                'field' => 'date',
+                'message' => __('bank_statement_import.date_required'),
+            ];
             $this->skippedCount++;
 
             return null;
         }
 
         if (empty($description)) {
-            $this->errors[] = ['row' => $rowNumber, 'field' => 'description', 'message' => 'Description is required.'];
+            $this->errors[] = [
+                'row' => $rowNumber,
+                'field' => 'description',
+                'message' => __('bank_statement_import.description_required'),
+            ];
             $this->skippedCount++;
 
             return null;
@@ -81,7 +89,7 @@ class BankStatementImport implements SkipsEmptyRows, ToCollection, WithHeadingRo
             $this->errors[] = [
                 'row' => $rowNumber,
                 'field' => 'date',
-                'message' => "Invalid date format: '{$dateRaw}'.",
+                'message' => __('bank_statement_import.invalid_date', ['value' => $dateRaw]),
             ];
             $this->skippedCount++;
 
@@ -99,7 +107,7 @@ class BankStatementImport implements SkipsEmptyRows, ToCollection, WithHeadingRo
                 $this->errors[] = [
                     'row' => $rowNumber,
                     'field' => 'amount',
-                    'message' => "Invalid amount: '{$amountRaw}'.",
+                    'message' => __('bank_statement_import.invalid_amount', ['value' => $amountRaw]),
                 ];
                 $this->skippedCount++;
 
@@ -122,7 +130,7 @@ class BankStatementImport implements SkipsEmptyRows, ToCollection, WithHeadingRo
             $this->errors[] = [
                 'row' => $rowNumber,
                 'field' => 'amount',
-                'message' => 'At least one of debit or credit must be greater than zero.',
+                'message' => __('bank_statement_import.amount_required'),
             ];
             $this->skippedCount++;
 

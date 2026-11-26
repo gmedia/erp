@@ -134,6 +134,6 @@ class EmployeeController extends Controller
     {
         (new SyncEmployeePermissionsAction)->execute($employee, $request->validated('permissions', []));
 
-        return response()->json(['message' => 'Permissions updated successfully.']);
+        return response()->json(['message' => __('employee_api.permissions_updated')]);
     }
 }

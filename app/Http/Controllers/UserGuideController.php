@@ -35,7 +35,7 @@ class UserGuideController extends Controller
         $path = base_path("docs/user-guide-{$slug}.md");
 
         if (! File::exists($path)) {
-            return response()->json(['message' => 'Guide not found.'], 404);
+            return response()->json(['message' => __('user_guide_api.not_found')], 404);
         }
 
         $content = File::get($path);
