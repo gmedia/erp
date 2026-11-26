@@ -105,7 +105,7 @@ class UserController extends Controller
         $user = (new SyncUserForEmployeeAction)->execute($employee, $request->validated());
 
         return response()->json([
-            'message' => 'User updated successfully.',
+            'message' => __('user_api.updated'),
             'user' => new UserResource($user),
         ]);
     }
