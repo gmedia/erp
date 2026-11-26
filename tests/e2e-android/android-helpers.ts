@@ -32,20 +32,12 @@ export async function currentPage(session: AppSession): Promise<Page> {
 }
 
 export async function loginInWebView(session: AppSession): Promise<void> {
-  const emailInput = (await currentPage(session)).locator('input[name="email"]');
   await expect
-    .poll(
-      async () => {
-        const page = await currentPage(session);
-        return (await page.locator('input[name="email"]').count()) > 0 || /\/dashboard/.test(page.url());
-      },
-      { timeout: 90000 },
-    )
+    .poll(async () => (await (await currentPage(session)).locator('input[name="email"]').count()) > 0, {
+      timeout: 90000,
+    })
     .toBe(true);
-  if (/\/dashboard/.test((await currentPage(session)).url())) {
-    return;
-  }
-  await emailInput.fill(ADMIN_EMAIL);
+  await (await currentPage(session)).locator('input[name="email"]').fill(ADMIN_EMAIL);
   await (await currentPage(session)).locator('input[name="password"]').fill(ADMIN_PASSWORD);
 
   const page = await currentPage(session);

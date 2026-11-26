@@ -5,10 +5,40 @@ import { APP_PKG, currentPage, launchApp, loginInWebView } from './android-helpe
 test.describe.configure({ mode: 'serial' });
 
 const EVENTS_FILE = '/tmp/opencode/547-events.txt';
+const NET_FILE = '/tmp/opencode/547-net.txt';
 const logEvent = (msg: string) => {
   const line = `${new Date().toISOString()} ${msg}`;
   console.log(line);
   appendFileSync(EVENTS_FILE, `${line}\n`);
+};
+
+// Diagnosa jaringan: hanya metadata (method, path, status, ada/tidak header Authorization, scheme+host Origin).
+// Nilai token dan header lain TIDAK dicatat.
+const attachNetDiagnostics = (p: import('@playwright/test').Page, tag: string) => {
+  p.on('response', (r) => {
+    const url = new URL(r.url());
+    if (!url.pathname.includes('/api/')) return;
+    const headers = r.request().headers();
+    const origin = headers['origin'];
+    let originLabel = 'none';
+    if (origin) {
+      try {
+        const o = new URL(origin);
+        originLabel = `${o.protocol}//${o.host}`;
+      } catch {
+        originLabel = 'unparseable';
+      }
+    }
+    appendFileSync(
+      NET_FILE,
+      `${new Date().toISOString()} [${tag}] ${r.request().method()} ${url.pathname} status=${r.status()} ` +
+        `authorization=${'authorization' in headers} origin=${originLabel}\n`,
+    );
+  });
+  p.on('console', (m) => {
+    if (m.type() !== 'error') return;
+    appendFileSync(NET_FILE, `${new Date().toISOString()} [${tag}] console.error ${m.text().slice(0, 300)}\n`);
+  });
 };
 
 test('Departments memuat tabel dengan data', async () => {
@@ -25,9 +55,11 @@ test('Departments memuat tabel dengan data', async () => {
       });
     };
     instrument(session.page, 'page-initial');
+    attachNetDiagnostics(session.page, 'page-initial');
     session.webview.on('page', (p) => {
       logEvent(`webview page event url=${p.url()}`);
       instrument(p, 'page-new');
+      attachNetDiagnostics(p, 'page-new');
     });
 
     await loginInWebView(session);
