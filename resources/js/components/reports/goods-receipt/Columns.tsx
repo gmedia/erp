@@ -7,7 +7,10 @@ import {
     createReportWarehouseColumn,
 } from '@/components/common/ReportColumns';
 import { createCurrencyColumn, createNumberColumn } from '@/utils/columns';
-import { formatDateByRegionalSettings } from '@/utils/date-format';
+import {
+    FORMAT_LOCALE,
+    formatDate as formatDateValue,
+} from '@/utils/formatters';
 import type { ColumnDef } from '@tanstack/react-table';
 
 export type GoodsReceiptReportItem = {
@@ -38,7 +41,7 @@ export type GoodsReceiptReportItem = {
 };
 
 function formatDate(value: string | null | undefined): string {
-    return formatDateByRegionalSettings(value);
+    return formatDateValue(value);
 }
 
 export const goodsReceiptReportColumns: ColumnDef<GoodsReceiptReportItem>[] = [
@@ -99,8 +102,7 @@ export const goodsReceiptReportColumns: ColumnDef<GoodsReceiptReportItem>[] = [
     createCurrencyColumn<GoodsReceiptReportItem>({
         accessorKey: 'total_receipt_value',
         label: { key: 'column.total_value', fallback: 'Total Value' },
-        currency: 'IDR',
-        locale: 'id-ID',
+        locale: FORMAT_LOCALE,
         minimumFractionDigits: 0,
         maximumFractionDigits: 2,
     }),

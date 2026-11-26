@@ -12,6 +12,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import {
     formatCurrencyByRegionalSettings,
     formatNumberByRegionalSettings,
@@ -57,7 +58,7 @@ function computeLineTotal(item: TransactionLineItem, includeDiscount: boolean) {
 
 function formatQty(value: number) {
     return formatNumberByRegionalSettings(value, {
-        locale: 'id-ID',
+        locale: FORMAT_LOCALE,
         minimumFractionDigits: 0,
         maximumFractionDigits: 2,
     });
@@ -65,8 +66,8 @@ function formatQty(value: number) {
 
 function formatCurrency(value: number, currency?: string) {
     return formatCurrencyByRegionalSettings(value, {
-        locale: 'id-ID',
-        currency: currency || 'IDR',
+        locale: FORMAT_LOCALE,
+        currency: currency || undefined,
         minimumFractionDigits: 0,
         maximumFractionDigits: 2,
     });

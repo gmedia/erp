@@ -15,6 +15,7 @@ import {
     statusBadgeVariant,
 } from '@/lib/status-badge';
 import { cn, formatDate } from '@/lib/utils';
+import { FORMAT_LOCALE } from '@/utils/formatters';
 import {
     formatCurrencyByRegionalSettings,
     formatNumberByRegionalSettings,
@@ -277,7 +278,7 @@ export function createCurrencyColumn<T = Record<string, unknown>>(
         label,
         enableSorting = true,
         currency,
-        locale = 'id-ID',
+        locale = FORMAT_LOCALE,
         minimumFractionDigits = 0,
         maximumFractionDigits = 2,
         className = 'text-right font-medium tabular-nums',
@@ -724,7 +725,7 @@ export function createRowCurrencyAmountColumn<
                 {formatCurrencyByRegionalSettings(
                     row.getValue(accessorKey as string) as string | number,
                     {
-                        locale: 'id-ID',
+                        locale: FORMAT_LOCALE,
                         currency: row.original.currency || undefined,
                         minimumFractionDigits: 0,
                         maximumFractionDigits: 2,
