@@ -2915,6 +2915,16 @@
         "new_notification": "New notification"
     },
     "vehicle_loan_page": {
+        "status": {
+            "draft": "Draft",
+            "pending": "Pending",
+            "in_progress": "In Progress",
+            "approved": "Approved",
+            "rejected": "Rejected",
+            "pickup_done": "Vehicle In Use",
+            "returned": "Completed",
+            "cancelled": "Cancelled"
+        },
         "detail": {
             "driver": "Driver",
             "end": "End",

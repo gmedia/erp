@@ -2918,6 +2918,16 @@
         "new_notification": "Notifikasi baru"
     },
     "vehicle_loan_page": {
+        "status": {
+            "draft": "Draf",
+            "pending": "Menunggu",
+            "in_progress": "Diproses",
+            "approved": "Disetujui",
+            "rejected": "Ditolak",
+            "pickup_done": "Kendaraan Dipakai",
+            "returned": "Selesai",
+            "cancelled": "Dibatalkan"
+        },
         "detail": {
             "driver": "Pengemudi",
             "end": "Selesai",

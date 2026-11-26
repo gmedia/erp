@@ -509,6 +509,7 @@ export default function VehicleLoanDetailPage() {
                                                                         ),
                                                                         status: vehicleLoanStatusLabel(
                                                                             step.status,
+                                                                            tPage,
                                                                         ),
                                                                     },
                                                                 )}
