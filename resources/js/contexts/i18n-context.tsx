@@ -378,10 +378,12 @@ export function useOptionalTranslation(): {
     t: (key: string, params?: Record<string, string>) => string;
 } {
     const context = useContext(I18nContext);
-    return {
-        t: (key: string, params?: Record<string, string>) =>
+    const t = useCallback(
+        (key: string, params?: Record<string, string>) =>
             context ? context.t(key, params) : key,
-    };
+        [context],
+    );
+    return useMemo(() => ({ t }), [t]);
 }
 
 export function useTranslations(): Translations {
