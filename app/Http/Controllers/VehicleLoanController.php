@@ -10,6 +10,7 @@ use App\Actions\VehicleLoans\StoreVehicleLoanPhotoAction;
 use App\Actions\VehicleLoans\StoreVehicleLoanPickupAction;
 use App\Actions\VehicleLoans\StoreVehicleLoanReturnAction;
 use App\Actions\VehicleLoans\SubmitVehicleLoanAction;
+use App\Exceptions\ApiErrorException;
 use App\Http\Controllers\Concerns\ResolvesBranchScope;
 use App\Http\Requests\VehicleLoans\ExportVehicleLoansRequest;
 use App\Http\Requests\VehicleLoans\HandoverVehicleLoanKeyRequest;
@@ -86,7 +87,11 @@ class VehicleLoanController extends Controller
     public function update(UpdateVehicleLoanRequest $request, VehicleLoan $vehicleLoan): JsonResponse
     {
         if ($vehicleLoan->status !== 'draft') {
-            abort(422, __('vehicle_loan_api.only_draft_can_be_updated'));
+            throw ApiErrorException::translated(
+                422,
+                'vehicle_loan.not_draft',
+                'vehicle_loan_api.only_draft_can_be_updated',
+            );
         }
 
         $vehicleLoan->update($request->validated());
@@ -97,7 +102,11 @@ class VehicleLoanController extends Controller
     public function destroy(VehicleLoan $vehicleLoan): JsonResponse
     {
         if (! in_array($vehicleLoan->status, ['draft', 'rejected'], true)) {
-            abort(422, __('vehicle_loan_api.only_draft_or_rejected_can_be_cancelled'));
+            throw ApiErrorException::translated(
+                422,
+                'vehicle_loan.not_cancellable',
+                'vehicle_loan_api.only_draft_or_rejected_can_be_cancelled',
+            );
         }
 
         $vehicleLoan->update(['status' => 'cancelled']);
@@ -166,7 +175,11 @@ class VehicleLoanController extends Controller
         $approval = $vehicleLoan->approvalRequests()->latest()->first();
 
         if (! $approval) {
-            abort(404, __('vehicle_loan_api.approval_request_not_found'));
+            throw ApiErrorException::translated(
+                404,
+                'vehicle_loan.approval_request_not_found',
+                'vehicle_loan_api.approval_request_not_found',
+            );
         }
 
         $action->execute($vehicleLoan, $approval, $request->validated());
@@ -278,7 +291,11 @@ class VehicleLoanController extends Controller
     private function authorizeRequester(VehicleLoan $loan): void
     {
         if ($loan->requester_id !== Auth::id()) {
-            abort(403, __('vehicle_loan_api.only_requester_can_perform_action'));
+            throw ApiErrorException::translated(
+                403,
+                'vehicle_loan.only_requester_can_perform_action',
+                'vehicle_loan_api.only_requester_can_perform_action',
+            );
         }
     }
 }

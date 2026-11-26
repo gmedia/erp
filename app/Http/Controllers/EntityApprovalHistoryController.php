@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\ApiErrorException;
 use App\Models\ApprovalRequest;
 use App\Models\Asset;
 use App\Models\PurchaseOrder;
@@ -24,7 +25,11 @@ class EntityApprovalHistoryController extends Controller
         ];
 
         if (! isset($entityMap[$entityType])) {
-            return response()->json(['message' => __('entity_approval_history_api.entity_type_not_supported')], 400);
+            throw ApiErrorException::translated(
+                400,
+                'entity_approval_history.entity_type_not_supported',
+                'entity_approval_history_api.entity_type_not_supported',
+            );
         }
 
         $modelClass = $entityMap[$entityType];

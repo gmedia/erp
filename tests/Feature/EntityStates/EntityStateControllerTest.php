@@ -5,6 +5,7 @@ use App\Models\Pipeline;
 use App\Models\PipelineEntityState;
 use App\Models\PipelineState;
 use App\Models\PipelineTransition;
+use App\Models\PurchaseOrder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use function Pest\Laravel\actingAs;
@@ -202,6 +203,71 @@ it('executes update_field transition action', function () {
 
     // Asset should be updated by the action
     $this->assertEquals('good', $this->asset->fresh()->condition);
+});
+
+it('returns no_active_pipeline when entity type has no active pipeline', function () {
+    $purchaseOrder = PurchaseOrder::factory()->create();
+
+    actingAs($this->user)->getJson("/api/entity-states/purchase_order/{$purchaseOrder->id}")
+        ->assertStatus(404)
+        ->assertJsonPath('error_code', 'entity_state.no_active_pipeline')
+        ->assertJsonPath('message', 'No active pipeline configuration found for this entity type.');
+});
+
+it('returns state_not_found when executing a transition on an entity without state', function () {
+    actingAs($this->user)->postJson("/api/entity-states/asset/{$this->asset->ulid}/transition", [
+        'transition_id' => $this->transitionSubmit->id,
+    ])
+        ->assertStatus(404)
+        ->assertJsonPath('error_code', 'entity_state.state_not_found')
+        ->assertJsonPath('message', 'Entity state not found');
+});
+
+it('returns transition_forbidden for document-permission user on transition without permission', function () {
+    $pipeline = Pipeline::factory()->create([
+        'code' => 'po_forbidden_test',
+        'entity_type' => PurchaseOrder::class,
+        'is_active' => true,
+    ]);
+    $draft = PipelineState::factory()->create([
+        'pipeline_id' => $pipeline->id,
+        'code' => 'draft',
+        'type' => 'initial',
+        'sort_order' => 0,
+    ]);
+    $pending = PipelineState::factory()->create([
+        'pipeline_id' => $pipeline->id,
+        'code' => 'pending_approval',
+        'type' => 'intermediate',
+        'sort_order' => 10,
+    ]);
+    $submit = PipelineTransition::factory()->create([
+        'pipeline_id' => $pipeline->id,
+        'from_state_id' => $draft->id,
+        'to_state_id' => $pending->id,
+        'name' => 'Submit',
+        'code' => 'submit',
+        'required_permission' => null,
+    ]);
+
+    $purchaseOrder = PurchaseOrder::factory()->create(['status' => 'draft']);
+    $user = createTestUserWithPermissions(['purchase_order']);
+
+    actingAs($user)->getJson("/api/entity-states/purchase_order/{$purchaseOrder->id}")->assertSuccessful();
+
+    actingAs($user)->postJson("/api/entity-states/purchase_order/{$purchaseOrder->id}/transition", [
+        'transition_id' => $submit->id,
+    ])
+        ->assertStatus(403)
+        ->assertJsonPath('error_code', 'entity_state.transition_forbidden')
+        ->assertJsonPath('message', 'You do not have permission to execute this transition.');
+});
+
+it('returns entity_not_found for an unknown entity id', function () {
+    actingAs($this->user)->getJson('/api/entity-states/asset/01HZZZZZZZZZZZZZZZZZZZZZZZ')
+        ->assertStatus(404)
+        ->assertJsonPath('error_code', 'entity_state.entity_not_found')
+        ->assertJsonPath('message', 'Entity not found');
 });
 
 it('can get timeline', function () {

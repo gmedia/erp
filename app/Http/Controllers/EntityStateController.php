@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\EntityStates\AssignPipelineAction;
 use App\Actions\EntityStates\EvaluateGuardAction;
 use App\Actions\EntityStates\ExecuteTransitionAction;
+use App\Exceptions\ApiErrorException;
 use App\Http\Requests\EntityStates\ExecuteTransitionRequest;
 use App\Http\Resources\EntityStates\EntityStateResource;
 use App\Http\Resources\EntityStates\StateTimelineResource;
@@ -39,9 +40,11 @@ class EntityStateController extends Controller
         if (! $entityState) {
             $entityState = $this->assignPipelineAction->execute($entity);
             if (! $entityState) {
-                return response()->json([
-                    'message' => __('entity_state_api.no_active_pipeline'),
-                ], 404);
+                throw ApiErrorException::translated(
+                    404,
+                    'entity_state.no_active_pipeline',
+                    'entity_state_api.no_active_pipeline',
+                );
             }
             $entityState->load(['pipeline', 'currentState', 'lastTransitionedBy']);
         }
@@ -102,7 +105,11 @@ class EntityStateController extends Controller
 
         $entityState = $entity->pipelineEntityState()->first();
         if (! $entityState) {
-            abort(404, __('entity_state_api.state_not_found'));
+            throw ApiErrorException::translated(
+                404,
+                'entity_state.state_not_found',
+                'entity_state_api.state_not_found',
+            );
         }
 
         $transition = PipelineTransition::findOrFail($request->validated('transition_id'));
@@ -111,7 +118,11 @@ class EntityStateController extends Controller
         // may only run transitions that declare an explicit required_permission.
         $hasPipelinePermission = auth()->user()?->employee?->hasPermission('pipeline') ?? false;
         if (! $hasPipelinePermission && ! $transition->required_permission) {
-            abort(403, __('approval.transition_forbidden'));
+            throw ApiErrorException::translated(
+                403,
+                'entity_state.transition_forbidden',
+                'approval.transition_forbidden',
+            );
         }
 
         $updatedState = $this->executeTransitionAction->execute(
@@ -167,7 +178,11 @@ class EntityStateController extends Controller
         $entity = app($modelClass)->resolveRouteBinding($entityId) ?? app($modelClass)->find($entityId);
 
         if (! $entity) {
-            abort(404, __('entity_state_api.entity_not_found'));
+            throw ApiErrorException::translated(
+                404,
+                'entity_state.entity_not_found',
+                'entity_state_api.entity_not_found',
+            );
         }
 
         return $entity;

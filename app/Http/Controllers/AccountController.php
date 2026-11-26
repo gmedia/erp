@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Accounts\ExportAccountsAction;
 use App\Actions\Accounts\IndexAccountsAction;
+use App\Exceptions\ApiErrorException;
 use App\Http\Requests\Accounts\ExportAccountRequest;
 use App\Http\Requests\Accounts\IndexAccountRequest;
 use App\Http\Requests\Accounts\StoreAccountRequest;
@@ -46,15 +47,11 @@ class AccountController extends Controller
     public function destroy(Account $account): JsonResponse
     {
         if ($account->children()->count() > 0) {
-            return response()->json([
-                'message' => __('account_api.has_child_accounts'),
-            ], 422);
+            throw ApiErrorException::translated(422, 'account.has_child_accounts', 'account_api.has_child_accounts');
         }
 
         if ($account->journalLines()->count() > 0) {
-            return response()->json([
-                'message' => __('account_api.has_journal_entries'),
-            ], 422);
+            throw ApiErrorException::translated(422, 'account.has_journal_entries', 'account_api.has_journal_entries');
         }
 
         $account->delete();
