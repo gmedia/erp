@@ -458,9 +458,10 @@ class XxxExport implements FromQuery, ShouldAutoSize, WithHeadings, WithMapping,
 Satu pintu: `resources/js/utils/formatters.ts`. Jangan memanggil `Intl.NumberFormat`, `toLocaleString`, atau literal `'id-ID'` / `'IDR'` langsung di komponen.
 
 Sumber nilai:
-- **Pemisah angka, mata uang, pola tanggal** → pengaturan regional perusahaan (`currency`, `number_format_decimal`, `number_format_thousand`, `number_format_hide_decimal`, `date_format`). Dibagikan dari `/api/me` oleh `auth-context.tsx` ke `utils/number-format.ts` dan `utils/date-format.ts`.
-- **Nama bulan / teks tanggal** → locale UI (`getStoredLocale()` dari `lib/locale-storage.ts`).
-- Locale UI **tidak** mengubah pemisah angka.
+- **Pemisah angka, simbol & digit mata uang, pola tanggal** → pengaturan regional perusahaan (`currency`, `number_format_decimal`, `number_format_thousand`, `number_format_hide_decimal`, `date_format`). Dibagikan dari `/api/me` oleh `auth-context.tsx` ke `utils/number-format.ts` dan `utils/date-format.ts`.
+- **Locale format tetap** `FORMAT_LOCALE = 'id-ID'` (dari `utils/formatters.ts`) dipakai untuk `formatNumber` dan `formatCurrency`. Ini hanya penentu posisi simbol; locale UI tidak dipakai.
+- **Nama bulan / teks tanggal** (`formatMonth`, nama bulan di `formatDate`/`formatDateTime`) → locale UI (`getStoredLocale()` dari `lib/locale-storage.ts`).
+- Locale UI **tidak** mengubah angka maupun simbol mata uang. Contoh: locale `en` dan `id` sama-sama menghasilkan `Rp 1.234.567`, bukan `IDR 1,234,567`.
 
 API:
 
@@ -472,7 +473,7 @@ API:
 | `formatDateTime(value)` | `26/11/2026 14:30` | Tanggal + jam 24 jam |
 | `formatTime(value, { withSeconds? })` | `14:30` | |
 | `formatMonth(value)` | `Nov 2026` | Nama bulan mengikuti locale UI |
-| `formatRupiah(value)` | — | **Deprecated**, alias `formatCurrency`; dipertahankan sampai pemanggil dimigrasi |
+| `formatRupiah(value)` | `Rp 2.000,00` (IDR) | **Deprecated**. Perilaku lama dikunci: locale `id-ID`, mata uang dari Setting, digit pecahan default mata uang. Tidak sama dengan `formatCurrency` (yang tanpa pecahan nol) |
 
 Pemakaian:
 

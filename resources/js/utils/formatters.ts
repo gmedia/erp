@@ -14,6 +14,9 @@ export type FormatInput = string | number | null | undefined;
 
 const EMPTY_VALUE = '-';
 
+// Sengaja bukan locale UI: angka/uang mengikuti Setting perusahaan (keputusan pemilik #527).
+export const FORMAT_LOCALE = 'id-ID';
+
 /** Angka dengan pemisah dari Setting perusahaan. Kosong/tidak valid → `-`. */
 export function formatNumber(
     value: FormatInput,
@@ -24,7 +27,7 @@ export function formatNumber(
     }
 
     return formatNumberByRegionalSettings(value, {
-        locale: getStoredLocale(),
+        locale: FORMAT_LOCALE,
         ...options,
     });
 }
@@ -44,7 +47,7 @@ export function formatCurrency(
     const { maximumFractionDigits = 2, currency } = options;
 
     return formatCurrencyByRegionalSettings(value, {
-        locale: getStoredLocale(),
+        locale: FORMAT_LOCALE,
         currency,
         minimumFractionDigits: 0,
         maximumFractionDigits,
@@ -100,6 +103,8 @@ export function formatTime(
 }
 
 /** @deprecated Gunakan `formatCurrency`. Dipertahankan sampai pemanggil dimigrasi. */
-export function formatRupiah(value: FormatInput): string {
-    return formatCurrency(value);
+export function formatRupiah(value: string | number): string {
+    return formatCurrencyByRegionalSettings(value, {
+        locale: 'id-ID',
+    });
 }

@@ -42,8 +42,24 @@ function applyCompanySettings(
     });
 }
 
+function installLocalStorage() {
+    const store = new Map<string, string>();
+    const host = globalThis as Record<string, unknown>;
+    host.localStorage = {
+        getItem: (key: string) => store.get(key) ?? null,
+        setItem: (key: string, value: string) => store.set(key, String(value)),
+        removeItem: (key: string) => store.delete(key),
+        clear: () => store.clear(),
+    };
+}
+
 function setUiLocale(locale: string) {
-    globalThis.localStorage?.setItem('app_locale', locale);
+    globalThis.localStorage.setItem('app_locale', locale);
+}
+
+// Intl menyisipkan NBSP (U+00A0) antara simbol mata uang dan angka.
+function normalizeSpaces(value: string): string {
+    return value.replaceAll('\u00A0', ' ');
 }
 
 test.describe('format helpers - pengaturan regional perusahaan', () => {
@@ -51,6 +67,7 @@ test.describe('format helpers - pengaturan regional perusahaan', () => {
         const host = globalThis as Record<string, unknown>;
         delete host.__APP_REGIONAL_NUMBER_FORMAT_SETTINGS__;
         delete host.__APP_REGIONAL_DATE_FORMAT_SETTINGS__;
+        installLocalStorage();
     });
 
     test('formatNumber memakai pemisah dari Setting, bukan locale UI', async () => {
@@ -152,11 +169,61 @@ test.describe('format helpers - pengaturan regional perusahaan', () => {
         expect(formatters.formatMonth('bukan-tanggal')).toBe('-');
     });
 
-    test('formatRupiah tetap ada sebagai alias deprecated dan mengikuti Setting', async () => {
+    test('formatNumber dan formatCurrency identik untuk locale UI en dan id', async () => {
         const { formatters, numberFormat, dateFormat } = await loadModules();
-        applyCompanySettings(numberFormat, dateFormat, { currency: '' });
+        applyCompanySettings(numberFormat, dateFormat, { currency: 'IDR' });
 
-        expect(formatters.formatRupiah(2000)).toBe('2.000');
+        const render = () => [
+            formatters.formatNumber(1234567.5),
+            normalizeSpaces(formatters.formatCurrency(1234567)),
+        ];
+
+        setUiLocale('en');
+        const inEnglish = render();
+        setUiLocale('id');
+        const inIndonesian = render();
+
+        expect(inEnglish).toEqual(inIndonesian);
+        expect(inEnglish[1]).toBe('Rp 1.234.567');
+    });
+
+    test('formatMonth berbeda per locale UI', async () => {
+        const { formatters, numberFormat, dateFormat } = await loadModules();
+        applyCompanySettings(numberFormat, dateFormat);
+        const date = new Date(2026, 7, 17);
+
+        setUiLocale('en');
+        const inEnglish = formatters.formatMonth(date);
+        setUiLocale('id');
+        const inIndonesian = formatters.formatMonth(date);
+
+        expect(inEnglish).toBe(
+            new Intl.DateTimeFormat('en', { month: 'short', year: 'numeric' }).format(date),
+        );
+        expect(inIndonesian).toBe(
+            new Intl.DateTimeFormat('id', { month: 'short', year: 'numeric' }).format(date),
+        );
+        expect(inIndonesian).not.toBe(inEnglish);
+    });
+
+    test('formatRupiah mengunci perilaku lama: locale id-ID dan digit pecahan IDR ",00"', async () => {
+        const { formatters, numberFormat, dateFormat } = await loadModules();
+        applyCompanySettings(numberFormat, dateFormat, { currency: 'IDR' });
+
+        setUiLocale('en');
+        expect(normalizeSpaces(formatters.formatRupiah(2000))).toBe('Rp 2.000,00');
+        expect(normalizeSpaces(formatters.formatRupiah('1500.5'))).toBe('Rp 1.500,50');
+
+        setUiLocale('id');
+        expect(normalizeSpaces(formatters.formatRupiah(2000))).toBe('Rp 2.000,00');
+    });
+
+    test('formatRupiah tetap mengikuti Setting currency perusahaan', async () => {
+        const { formatters, numberFormat, dateFormat } = await loadModules();
+        applyCompanySettings(numberFormat, dateFormat, { currency: 'USD' });
+
+        expect(formatters.formatRupiah(2000)).toMatch(/US\$|\$/);
+        expect(formatters.formatRupiah(2000)).toContain('2.000,00');
     });
 
     test('locale UI yang didukung tercantum (sanity)', () => {
