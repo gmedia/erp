@@ -79,14 +79,19 @@ export async function createEmployee(
  */
 export async function searchEmployee(page: Page, email: string): Promise<void> {
     const searchInput = page.getByPlaceholder('Search employees...');
-    await expect(searchInput).toBeVisible();
+    await expect(searchInput).toBeVisible({ timeout: 15000 });
+    await expect(searchInput).toBeEnabled({ timeout: 15000 });
     const normalizedEmail = email.trim();
     if ((await searchInput.inputValue()).trim() === normalizedEmail) {
         return;
     }
 
     const responsePromise = page.waitForResponse(
-        (r) => r.url().includes('/api/employees'),
+        (r) =>
+            r.url().includes('/api/employees') &&
+            r.request().method() === 'GET' &&
+            r.url().includes('search='),
+        { timeout: 15000 },
     );
     await searchInput.clear();
     await searchInput.fill(normalizedEmail);

@@ -125,6 +125,9 @@ export async function createAsset(
   // Wait for dialog to disappear, using passive wait pattern
   await expect(dialog).not.toBeVisible({ timeout: 15000 });
   await expectResponseOk(await reloadResponsePromise);
+  await expect(page.getByPlaceholder(/Search assets.../i)).toBeVisible({
+    timeout: 15000,
+  });
 
   return assetName; // Returning name as it's often the primary column for verify
 }
@@ -134,7 +137,8 @@ export async function createAsset(
  */
 export async function searchAsset(page: Page, query: string): Promise<void> {
   const searchInput = page.getByPlaceholder(/Search assets.../i);
-  await expect(searchInput).toBeVisible();
+  await expect(searchInput).toBeVisible({ timeout: 15000 });
+  await expect(searchInput).toBeEnabled({ timeout: 15000 });
   const normalizedQuery = query.trim();
   if ((await searchInput.inputValue()).trim() === normalizedQuery) {
     return;
