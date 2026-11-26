@@ -14,6 +14,7 @@ import {
 } from '@/hooks/useCrudPage';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
+import { translateOr } from '@/utils/i18nFallback';
 
 // Extend the base DataTable props with additional required props for CRUD operations
 export interface DataTableProps<
@@ -45,6 +46,7 @@ export interface CrudPageConfig<
 > extends BaseCrudPageConfig<T, FilterType> {
     // UI configuration
     entityNamePlural: string;
+    entityNameKey?: string;
     /** Izin tombol aksi; undefined = semua tampil (perilaku lama). */
     actionAccess?: CrudPageActionAccess;
     /** Judul halaman memakai entityNamePlural; deskripsi opsional di bawahnya. */
@@ -115,9 +117,15 @@ export function CrudPage<
     FormData,
     FilterType extends FilterState = FilterState,
 >({ config }: Readonly<CrudPageProps<T, FormData, FilterType>>) {
+    const { t } = useTranslation();
+    const toastEntityName = config.entityNameKey
+        ? translateOr(t, config.entityNameKey, config.entityName)
+        : config.entityName;
+
     // Use the custom hook to manage all CRUD state and logic
     const crudState = useCrudPage<T, FormData, FilterType>({
         entityName: config.entityName,
+        toastEntityName,
         apiEndpoint: config.apiEndpoint,
         queryKey: config.queryKey,
         onCreateSuccess: config.onCreateSuccess,
@@ -132,7 +140,6 @@ export function CrudPage<
         detailLoadErrorMessage: config.detailLoadErrorMessage,
     });
 
-    const { t } = useTranslation();
     const translate = (key: string | undefined, fallback: string) => {
         if (!key) {
             return fallback;

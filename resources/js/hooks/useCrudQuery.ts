@@ -64,6 +64,7 @@ export interface UseCrudQueryOptions {
     endpoint: string;
     queryKey: string[];
     entityName: string;
+    toastEntityName?: string;
     pagination: PaginationState;
     filters?: FilterState;
     enabled?: boolean;
@@ -82,11 +83,13 @@ export function useCrudQuery<Entity>({
     endpoint,
     queryKey,
     entityName,
+    toastEntityName,
     pagination,
     filters = {},
     enabled = true,
 }: UseCrudQueryOptions): UseCrudQueryReturn<Entity> {
     const { t } = useOptionalTranslation();
+    const displayName = toastEntityName ?? entityName;
     const query = useQuery<ApiResponse<Entity>, Error>({
         queryKey: [...queryKey, pagination, filters],
         queryFn: async () => {
@@ -123,7 +126,7 @@ export function useCrudQuery<Entity>({
                         t,
                         'crud_toast.load_failed',
                         `Failed to load ${entityName}`,
-                        { entity: entityName },
+                        { entity: displayName },
                     ),
                 );
                 return {

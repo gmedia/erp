@@ -21,6 +21,7 @@ export interface BaseEntityConfig<
     FilterType extends FilterState = FilterState,
 > {
     readonly entityName: string;
+    readonly entityNameKey?: string;
     readonly entityNamePlural: string;
     /** Kalimat singkat tujuan halaman di bawah judul (W6-17). */
     readonly description?: string;
@@ -170,6 +171,7 @@ const createGenericDeleteMessage =
 // Configuration builder options
 export interface SimpleEntityConfigOptions<T = unknown> {
     entityName: string;
+    entityNameKey?: string;
     entityNamePlural: string;
     description?: string;
     apiBase: string;
@@ -186,6 +188,7 @@ export interface SimpleEntityConfigOptions<T = unknown> {
 
 export interface ComplexEntityConfigOptions<T = Record<string, unknown>> {
     entityName: string;
+    entityNameKey?: string;
     entityNamePlural: string;
     description?: string;
     apiEndpoint: string;
@@ -237,6 +240,7 @@ function createSimpleEntityConfig<
 ): CustomEntityConfig<T> {
     const {
         entityName,
+        entityNameKey,
         entityNamePlural,
         description,
         apiBase,
@@ -250,6 +254,7 @@ function createSimpleEntityConfig<
 
     return {
         entityName,
+        entityNameKey,
         entityNamePlural,
         description,
         permissionPrefix,
@@ -277,6 +282,7 @@ function createComplexEntityConfig<T = Record<string, unknown>>(
 ): CustomEntityConfig<T> {
     return {
         entityName: options.entityName,
+        entityNameKey: options.entityNameKey,
         entityNamePlural: options.entityNamePlural,
         description: options.description,
         apiEndpoint: options.apiEndpoint,
@@ -305,6 +311,7 @@ function createComplexEntityConfig<T = Record<string, unknown>>(
 // Predefined configurations for simple entities
 export const departmentConfig = createSimpleEntityConfig({
     entityName: 'Department',
+    entityNameKey: 'menu.department',
     entityNamePlural: 'Departments',
     description: 'Organizational units used to group employees and assets.',
     titleKey: 'page.departments.title',
@@ -320,6 +327,7 @@ export const departmentConfig = createSimpleEntityConfig({
 
 export const positionConfig = createSimpleEntityConfig({
     entityName: 'Position',
+    entityNameKey: 'menu.position',
     entityNamePlural: 'Positions',
     description: 'Job titles assignable to employees.',
     titleKey: 'page.positions.title',
@@ -336,6 +344,7 @@ export const positionConfig = createSimpleEntityConfig({
 
 export const branchConfig = createSimpleEntityConfig({
     entityName: 'Branch',
+    entityNameKey: 'menu.branch',
     entityNamePlural: 'Branches',
     description: 'Company branches used across transactions and reports.',
     titleKey: 'page.branches.title',
@@ -351,6 +360,7 @@ export const branchConfig = createSimpleEntityConfig({
 
 export const warehouseConfig = createComplexEntityConfig<Warehouse>({
     entityName: 'Warehouse',
+    entityNameKey: 'menu.warehouse',
     entityNamePlural: 'Warehouses',
     description: 'Storage locations that hold product stock.',
     apiEndpoint: '/api/warehouses',
@@ -380,6 +390,7 @@ export const warehouseConfig = createComplexEntityConfig<Warehouse>({
 // Configuration for complex entities (employees) - using factory for consistency
 export const employeeConfig = createComplexEntityConfig({
     entityName: 'Employee',
+    entityNameKey: 'menu.employee',
     entityNamePlural: 'Employees',
     description:
         'Staff records with employment, department, and position history.',
@@ -415,6 +426,7 @@ export const employeeConfig = createComplexEntityConfig({
 // Configuration for complex entities (customers) - using factory for consistency
 export const customerConfig = createComplexEntityConfig({
     entityName: 'Customer',
+    entityNameKey: 'menu.customer',
     entityNamePlural: 'Customers',
     description: 'Customer master data with billing and contact details.',
     titleKey: 'page.customers.title',
@@ -449,6 +461,7 @@ export const customerConfig = createComplexEntityConfig({
 // Configuration for complexes entities (suppliers) - using factory for consistency
 export const supplierConfig = createComplexEntityConfig({
     entityName: 'Supplier',
+    entityNameKey: 'menu.supplier',
     entityNamePlural: 'Suppliers',
     description: 'Vendor master data used by purchasing and payables.',
     titleKey: 'page.suppliers.title',
@@ -482,6 +495,7 @@ export const supplierConfig = createComplexEntityConfig({
 
 export const stockTransferConfig = createComplexEntityConfig<StockTransfer>({
     entityName: 'Stock Transfer',
+    entityNameKey: 'crud_entity.stock_transfer',
     entityNamePlural: 'Stock Transfers',
     description:
         'Move stock between warehouses with approval and receipt tracking.',
@@ -522,6 +536,7 @@ export const stockTransferConfig = createComplexEntityConfig<StockTransfer>({
 export const inventoryStocktakeConfig =
     createComplexEntityConfig<InventoryStocktake>({
         entityName: 'Inventory Stocktake',
+        entityNameKey: 'crud_entity.inventory_stocktake',
         entityNamePlural: 'Inventory Stocktakes',
         description:
             'Physical counts of warehouse stock with variance results.',
@@ -557,6 +572,7 @@ export const inventoryStocktakeConfig =
 export const stockAdjustmentConfig = createComplexEntityConfig<StockAdjustment>(
     {
         entityName: 'Stock Adjustment',
+        entityNameKey: 'crud_entity.stock_adjustment',
         entityNamePlural: 'Stock Adjustments',
         description:
             'Record stock corrections with approval and journal posting.',
@@ -594,6 +610,7 @@ export const stockAdjustmentConfig = createComplexEntityConfig<StockAdjustment>(
 export const purchaseRequestConfig = createComplexEntityConfig<PurchaseRequest>(
     {
         entityName: 'Purchase Request',
+        entityNameKey: 'crud_entity.purchase_request',
         entityNamePlural: 'Purchase Requests',
         description:
             'Internal requests for goods before a purchase order is raised.',
@@ -639,6 +656,7 @@ export const purchaseRequestConfig = createComplexEntityConfig<PurchaseRequest>(
 
 export const purchaseOrderConfig = createComplexEntityConfig<PurchaseOrder>({
     entityName: 'Purchase Order',
+    entityNameKey: 'crud_entity.purchase_order',
     entityNamePlural: 'Purchase Orders',
     description: 'Orders sent to suppliers with receipt and billing progress.',
     apiEndpoint: '/api/purchase-orders',
@@ -680,6 +698,7 @@ export const purchaseOrderConfig = createComplexEntityConfig<PurchaseOrder>({
 
 export const goodsReceiptConfig = createComplexEntityConfig<GoodsReceipt>({
     entityName: 'Goods Receipt',
+    entityNameKey: 'crud_entity.goods_receipt',
     entityNamePlural: 'Goods Receipts',
     description: 'Record received goods and update warehouse stock.',
     apiEndpoint: '/api/goods-receipts',
@@ -716,6 +735,7 @@ export const goodsReceiptConfig = createComplexEntityConfig<GoodsReceipt>({
 
 export const supplierReturnConfig = createComplexEntityConfig<SupplierReturn>({
     entityName: 'Supplier Return',
+    entityNameKey: 'crud_entity.supplier_return',
     entityNamePlural: 'Supplier Returns',
     description: 'Return received goods to suppliers with stock deduction.',
     apiEndpoint: '/api/supplier-returns',
@@ -759,6 +779,7 @@ export const supplierReturnConfig = createComplexEntityConfig<SupplierReturn>({
 
 export const supplierCategoryConfig = createSimpleEntityConfig({
     entityName: 'Supplier Category',
+    entityNameKey: 'menu.supplier_category',
     entityNamePlural: 'Supplier Categories',
     description: 'Categories used to group suppliers.',
     titleKey: 'page.supplier_categories.title',
@@ -774,6 +795,7 @@ export const supplierCategoryConfig = createSimpleEntityConfig({
 
 export const customerCategoryConfig = createSimpleEntityConfig({
     entityName: 'Customer Category',
+    entityNameKey: 'menu.customer_category',
     entityNamePlural: 'Customer Categories',
     description: 'Categories used to group customers.',
     titleKey: 'page.customer_categories.title',
@@ -789,6 +811,7 @@ export const customerCategoryConfig = createSimpleEntityConfig({
 
 export const assetCategoryConfig = createComplexEntityConfig<AssetCategory>({
     entityName: 'Asset Category',
+    entityNameKey: 'menu.asset_category',
     entityNamePlural: 'Asset Categories',
     description: 'Categories used to classify fixed assets.',
     titleKey: 'page.asset_categories.title',
@@ -820,6 +843,7 @@ export const assetCategoryConfig = createComplexEntityConfig<AssetCategory>({
 export const productCategoryConfig = createComplexEntityConfig<ProductCategory>(
     {
         entityName: 'Product Category',
+        entityNameKey: 'menu.product_category',
         entityNamePlural: 'Product Categories',
         description: 'Categories used to classify products and materials.',
         titleKey: 'page.product_categories.title',
@@ -851,6 +875,7 @@ export const productCategoryConfig = createComplexEntityConfig<ProductCategory>(
 
 export const unitConfig = createComplexEntityConfig<Unit>({
     entityName: 'Unit',
+    entityNameKey: 'menu.unit',
     entityNamePlural: 'Units',
     description: 'Units of measure used by products and transactions.',
     titleKey: 'page.units.title',
@@ -877,6 +902,7 @@ export const unitConfig = createComplexEntityConfig<Unit>({
 
 export const productConfig = createComplexEntityConfig({
     entityName: 'Product',
+    entityNameKey: 'menu.product',
     entityNamePlural: 'Products',
     description:
         'Products, materials, and services with pricing and stock settings.',
@@ -918,6 +944,7 @@ import { FiscalYearViewModal } from '@/components/fiscal-years/FiscalYearViewMod
 
 export const fiscalYearConfig = createComplexEntityConfig<FiscalYear>({
     entityName: 'Fiscal Year',
+    entityNameKey: 'menu.fiscal_year',
     entityNamePlural: 'Fiscal Years',
     description:
         'Accounting periods that scope journals and financial reports.',
@@ -952,6 +979,7 @@ import { type CoaVersion } from '@/types/coa-version';
 
 export const coaVersionConfig = createComplexEntityConfig<CoaVersion>({
     entityName: 'COA Version',
+    entityNameKey: 'menu.coa_version',
     entityNamePlural: 'COA Versions',
     description: 'Chart of accounts versions per fiscal year.',
     apiEndpoint: '/api/coa-versions',
@@ -985,6 +1013,7 @@ import { type AccountMapping } from '@/types/account-mapping';
 
 export const accountMappingConfig = createComplexEntityConfig<AccountMapping>({
     entityName: 'Account Mapping',
+    entityNameKey: 'crud_entity.account_mapping',
     entityNamePlural: 'Account Mappings',
     description:
         'Pemetaan akun antarversi COA (rename, merge, split) untuk migrasi saldo dan referensi.',
@@ -1030,6 +1059,7 @@ import { type JournalEntry } from '@/types/journal-entry';
 
 export const journalEntryConfig = createComplexEntityConfig<JournalEntry>({
     entityName: 'Journal Entry',
+    entityNameKey: 'menu.journal_entry',
     entityNamePlural: 'Journal Entries',
     description: 'Manual journal entries with debit and credit lines.',
     apiEndpoint: '/api/journal-entries',
@@ -1065,6 +1095,7 @@ import { type AssetModel } from '@/types/asset-model';
 
 export const assetModelConfig = createComplexEntityConfig<AssetModel>({
     entityName: 'Asset Model',
+    entityNameKey: 'menu.asset_model',
     entityNamePlural: 'Asset Models',
     description: 'Manufacturer models used as templates for assets.',
     titleKey: 'page.asset_models.title',
@@ -1099,6 +1130,7 @@ import { type AssetLocation } from '@/types/asset-location';
 
 export const assetLocationConfig = createComplexEntityConfig<AssetLocation>({
     entityName: 'Asset Location',
+    entityNameKey: 'menu.asset_location',
     entityNamePlural: 'Asset Locations',
     description: 'Physical locations within branches for asset placement.',
     titleKey: 'page.asset_locations.title',
@@ -1127,6 +1159,7 @@ export const assetLocationConfig = createComplexEntityConfig<AssetLocation>({
 
 export const assetConfig = createComplexEntityConfig<Asset>({
     entityName: 'Asset',
+    entityNameKey: 'menu.asset',
     entityNamePlural: 'Assets',
     description:
         'Fixed asset register with cost, depreciation, and assignment.',
@@ -1167,6 +1200,7 @@ export const assetConfig = createComplexEntityConfig<Asset>({
 
 export const assetMovementConfig = createComplexEntityConfig({
     entityName: 'Asset Movement',
+    entityNameKey: 'menu.asset_movement',
     entityNamePlural: 'Asset Movements',
     description: 'Transfer and assignment history of fixed assets.',
     titleKey: 'page.asset_movements.title',
@@ -1200,6 +1234,7 @@ export const assetMovementConfig = createComplexEntityConfig({
 export const assetMaintenanceConfig =
     createComplexEntityConfig<AssetMaintenance>({
         entityName: 'Asset Maintenance',
+        entityNameKey: 'menu.asset_maintenance',
         entityNamePlural: 'Asset Maintenances',
         description: 'Scheduled and performed maintenance for fixed assets.',
         titleKey: 'page.asset_maintenances.title',
@@ -1251,6 +1286,7 @@ import { type AssetStocktake } from '@/types/asset-stocktake';
 
 export const assetStocktakeConfig = createComplexEntityConfig<AssetStocktake>({
     entityName: 'Asset Stocktake',
+    entityNameKey: 'menu.asset_stocktake',
     entityNamePlural: 'Asset Stocktakes',
     description: 'Physical verification of fixed assets per branch.',
     titleKey: 'page.asset_stocktakes.title',
@@ -1291,6 +1327,7 @@ import { PipelineViewModal } from '@/components/pipelines/PipelineViewModal';
 
 export const pipelineConfig = createComplexEntityConfig<Pipeline>({
     entityName: 'Pipeline',
+    entityNameKey: 'menu.pipeline',
     entityNamePlural: 'Pipelines',
     description: 'Workflow pipelines and the states entities move through.',
     titleKey: 'page.pipelines.title',
@@ -1326,6 +1363,7 @@ import { type ApprovalFlow } from '@/types/approval';
 
 export const approvalFlowConfig = createComplexEntityConfig<ApprovalFlow>({
     entityName: 'Approval Flow',
+    entityNameKey: 'menu.approval_flow',
     entityNamePlural: 'Approval Flows',
     description: 'Approval definitions with ordered steps and approvers.',
     titleKey: 'page.approval_flows.title',
@@ -1371,6 +1409,7 @@ import { type SupplierBill } from '@/types/supplier-bill';
 
 export const supplierBillConfig = createComplexEntityConfig<SupplierBill>({
     entityName: 'Supplier Bill',
+    entityNameKey: 'crud_entity.supplier_bill',
     entityNamePlural: 'Supplier Bills',
     description: 'Supplier invoices that create accounts payable.',
     apiEndpoint: '/api/supplier-bills',
@@ -1414,6 +1453,7 @@ export const supplierBillConfig = createComplexEntityConfig<SupplierBill>({
 
 export const apPaymentConfig = createComplexEntityConfig<ApPayment>({
     entityName: 'AP Payment',
+    entityNameKey: 'crud_entity.ap_payment',
     entityNamePlural: 'AP Payments',
     description: 'Payments to suppliers allocated against outstanding bills.',
     apiEndpoint: '/api/ap-payments',
@@ -1461,6 +1501,7 @@ export const apPaymentConfig = createComplexEntityConfig<ApPayment>({
 export const approvalDelegationConfig =
     createComplexEntityConfig<ApprovalDelegation>({
         entityName: 'Approval Delegation',
+        entityNameKey: 'menu.approval_delegation',
         entityNamePlural: 'Approval Delegations',
         description:
             'Delegations that let another user approve on your behalf for a period.',
@@ -1517,6 +1558,7 @@ import { type CreditNote } from '@/types/credit-note';
 export const customerInvoiceConfig = createComplexEntityConfig<CustomerInvoice>(
     {
         entityName: 'Customer Invoice',
+        entityNameKey: 'crud_entity.customer_invoice',
         entityNamePlural: 'Customer Invoices',
         description: 'Customer invoices that create accounts receivable.',
         apiEndpoint: '/api/customer-invoices',
@@ -1561,6 +1603,7 @@ export const customerInvoiceConfig = createComplexEntityConfig<CustomerInvoice>(
 
 export const arReceiptConfig = createComplexEntityConfig<ArReceipt>({
     entityName: 'AR Receipt',
+    entityNameKey: 'crud_entity.ar_receipt',
     entityNamePlural: 'AR Receipts',
     description: 'Customer payments allocated against outstanding invoices.',
     apiEndpoint: '/api/ar-receipts',
@@ -1607,6 +1650,7 @@ export const arReceiptConfig = createComplexEntityConfig<ArReceipt>({
 
 export const creditNoteConfig = createComplexEntityConfig<CreditNote>({
     entityName: 'Credit Note',
+    entityNameKey: 'crud_entity.credit_note',
     entityNamePlural: 'Credit Notes',
     description: 'Credit notes that reduce customer invoice balances.',
     apiEndpoint: '/api/credit-notes',
@@ -1658,6 +1702,7 @@ import { type RecurringJournal } from '@/types/recurring-journal';
 export const recurringJournalConfig =
     createComplexEntityConfig<RecurringJournal>({
         entityName: 'Recurring Journal',
+        entityNameKey: 'crud_entity.recurring_journal',
         entityNamePlural: 'Recurring Journals',
         description: 'Templates for journals that repeat on a schedule.',
         apiEndpoint: '/api/recurring-journals',
@@ -1696,6 +1741,7 @@ import { type BankReconciliation } from '@/types/bank-reconciliation';
 export const bankReconciliationConfig =
     createComplexEntityConfig<BankReconciliation>({
         entityName: 'Bank Reconciliation',
+        entityNameKey: 'crud_entity.bank_reconciliation',
         entityNamePlural: 'Bank Reconciliations',
         description:
             'Match bank statement balances with the books for each account.',
@@ -1731,6 +1777,7 @@ import { type PeriodClosing } from '@/types/period-closing';
 
 export const periodClosingConfig = createComplexEntityConfig<PeriodClosing>({
     entityName: 'Period Closing',
+    entityNameKey: 'crud_entity.period_closing',
     entityNamePlural: 'Period Closings',
     description: 'Close accounting periods and carry balances forward.',
     apiEndpoint: '/api/period-closings',
@@ -1771,6 +1818,7 @@ import { type ReportConfiguration } from '@/types/report-configuration';
 export const reportConfigurationConfig =
     createComplexEntityConfig<ReportConfiguration>({
         entityName: 'Report Configuration',
+        entityNameKey: 'menu.report_configuration',
         entityNamePlural: 'Report Configurations',
         description:
             'Settings that define how each report is generated and displayed.',
@@ -1800,6 +1848,7 @@ export const reportConfigurationConfig =
 
 export const budgetConfig = createComplexEntityConfig<Budget>({
     entityName: 'Budget',
+    entityNameKey: 'crud_entity.budget',
     entityNamePlural: 'Budgets',
     description: 'Budget plans per account with period breakdown.',
     apiEndpoint: '/api/budgets',

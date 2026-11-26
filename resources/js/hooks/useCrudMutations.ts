@@ -11,6 +11,7 @@ export interface UseCrudMutationsOptions {
     endpoint: string;
     queryKey: string[];
     entityName: string;
+    toastEntityName?: string;
     identifierKey?: string;
     onSuccess?: () => void;
     onError?: (error: ApiError) => void;
@@ -34,12 +35,14 @@ export function useCrudMutations<Entity, FormData>({
     endpoint,
     queryKey,
     entityName,
+    toastEntityName,
     onSuccess,
     onError,
 }: UseCrudMutationsOptions): UseCrudMutationsResult<Entity, FormData> {
     const queryClient = useQueryClient();
     const { t } = useOptionalTranslation();
-    const entity = { entity: entityName };
+    const displayName = toastEntityName ?? entityName;
+    const entity = { entity: displayName };
     const tToast = (key: string, fallback: string) =>
         translateOr(t, `crud_toast.${key}`, fallback, entity);
 

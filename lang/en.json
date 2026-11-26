@@ -2772,6 +2772,25 @@
         "delete_failed": "Failed to delete {entity}",
         "load_failed": "Failed to load {entity}"
     },
+    "crud_entity": {
+        "stock_transfer": "Stock Transfer",
+        "inventory_stocktake": "Inventory Stocktake",
+        "purchase_request": "Purchase Request",
+        "purchase_order": "Purchase Order",
+        "supplier_return": "Supplier Return",
+        "account_mapping": "Account Mapping",
+        "supplier_bill": "Supplier Bill",
+        "ap_payment": "AP Payment",
+        "customer_invoice": "Customer Invoice",
+        "ar_receipt": "AR Receipt",
+        "credit_note": "Credit Note",
+        "recurring_journal": "Recurring Journal",
+        "bank_reconciliation": "Bank Reconciliation",
+        "period_closing": "Period Closing",
+        "budget": "Budget",
+        "stock_adjustment": "Stock Adjustment",
+        "goods_receipt": "Goods Receipt"
+    },
     "accounts_toast": {
         "coa_versions_fetch_failed": "Failed to fetch COA versions",
         "accounts_fetch_failed": "Failed to fetch accounts",

@@ -2775,6 +2775,25 @@
         "delete_failed": "Gagal menghapus {entity}",
         "load_failed": "Gagal memuat {entity}"
     },
+    "crud_entity": {
+        "stock_transfer": "Transfer Stok",
+        "inventory_stocktake": "Stock Opname Persediaan",
+        "purchase_request": "Permintaan Pembelian",
+        "purchase_order": "Pesanan Pembelian",
+        "supplier_return": "Retur Pemasok",
+        "account_mapping": "Pemetaan Akun",
+        "supplier_bill": "Tagihan Pemasok",
+        "ap_payment": "Pembayaran Hutang",
+        "customer_invoice": "Faktur Pelanggan",
+        "ar_receipt": "Penerimaan Piutang",
+        "credit_note": "Nota Kredit",
+        "recurring_journal": "Jurnal Berulang",
+        "bank_reconciliation": "Rekonsiliasi Bank",
+        "period_closing": "Penutupan Periode",
+        "budget": "Anggaran",
+        "stock_adjustment": "Penyesuaian Stok",
+        "goods_receipt": "Penerimaan Barang"
+    },
     "accounts_toast": {
         "coa_versions_fetch_failed": "Gagal memuat versi bagan akun",
         "accounts_fetch_failed": "Gagal memuat akun",
