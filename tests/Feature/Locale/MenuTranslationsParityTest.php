@@ -82,7 +82,7 @@ test('asset and inventory stocktake variance menus have distinct indonesian labe
         ->and($en['inventory_stocktake_variance_report'])->toBe('Inventory Stocktake Variance');
 
     // Label id dibedakan agar tidak ganda di sidebar (aset vs persediaan).
-    expect($id['stocktake_variance_report'])->toBe('Laporan Selisih Stock Opname Aset')
-        ->and($id['inventory_stocktake_variance_report'])->toBe('Laporan Selisih Stock Opname Persediaan')
+    expect($id['stocktake_variance_report'])->toBe('Selisih Stock Opname Aset')
+        ->and($id['inventory_stocktake_variance_report'])->toBe('Selisih Stock Opname Persediaan')
         ->and($id['stocktake_variance_report'])->not->toBe($id['inventory_stocktake_variance_report']);
 });
