@@ -1443,7 +1443,9 @@
         "approval_event_delegated": "Delegated",
         "approval_event_resubmitted": "Resubmitted",
         "approval_event_step_approved": "Step Approved",
-        "approval_event_step_skipped": "Step Skipped"
+        "approval_event_step_skipped": "Step Skipped",
+        "all_types": "All types",
+        "all_statuses": "All statuses"
     },
     "form_fields": {
         "asset_depreciation_runs": {

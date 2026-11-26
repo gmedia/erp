@@ -492,7 +492,7 @@ export function createSelectFilterField(
     name: string,
     label: TranslatableLabel,
     options: SelectOption[],
-    placeholder: string,
+    placeholder: TranslatableLabel,
 ): FieldDescriptor {
     return {
         name,
@@ -500,7 +500,9 @@ export function createSelectFilterField(
         component: (
             <Select>
                 <SelectTrigger className="border-border bg-background">
-                    <SelectValue placeholder={placeholder} />
+                    <SelectValue
+                        placeholder={<LabelText label={placeholder} />}
+                    />
                 </SelectTrigger>
                 <SelectContent className="border-border bg-background text-foreground">
                     {options.map((option) => (

@@ -23,13 +23,13 @@ export function createStockAdjustmentReportFilterFields(): FieldDescriptor[] {
             'adjustment_type',
             { key: 'column.adjustment_type', fallback: 'Adjustment Type' },
             stockAdjustmentTypeOptions,
-            'All types',
+            { key: 'filter.all_types', fallback: 'All types' },
         ),
         createSelectFilterField(
             'status',
             { key: 'column.status', fallback: 'Status' },
             stockAdjustmentStatusOptions,
-            'All statuses',
+            { key: 'filter.all_statuses', fallback: 'All statuses' },
         ),
         ...createDateRangeFilterFields(),
     ];

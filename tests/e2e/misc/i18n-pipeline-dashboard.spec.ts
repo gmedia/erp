@@ -48,6 +48,35 @@ test.describe('i18n pipeline dashboard', () => {
         ).toHaveCount(0);
     });
 
+    test('stock adjustment report filter labels are Indonesian (locale id)', async ({
+        page,
+    }) => {
+        await page.addInitScript((k) => {
+            localStorage.setItem(k, 'id');
+        }, LOCALE_KEY);
+
+        await login(page, undefined, undefined, { requireDashboard: false });
+
+        const reportPromise = page.waitForResponse(
+            (response) =>
+                response.url().includes('/api/reports/stock-adjustment') &&
+                response.request().method() === 'GET',
+            { timeout: 30000 },
+        );
+        await page.goto('/reports/stock-adjustment', {
+            waitUntil: 'domcontentloaded',
+        });
+        await expectResponseOk(await reportPromise);
+
+        await page.getByRole('button', { name: /filter/i }).click();
+        const filtersDialog = page.getByRole('dialog');
+        await expect(filtersDialog).toBeVisible();
+
+        await expect(
+            filtersDialog.getByText('All types', { exact: true }),
+        ).toHaveCount(0);
+    });
+
     test('pipeline dashboard labels keep the English text (locale en)', async ({
         page,
     }) => {

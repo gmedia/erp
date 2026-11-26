@@ -1446,7 +1446,9 @@
         "approval_event_delegated": "Didelegasikan",
         "approval_event_resubmitted": "Diajukan Ulang",
         "approval_event_step_approved": "Langkah Disetujui",
-        "approval_event_step_skipped": "Langkah Dilewati"
+        "approval_event_step_skipped": "Langkah Dilewati",
+        "all_types": "Semua Jenis",
+        "all_statuses": "Semua Status"
     },
     "form_fields": {
         "asset_depreciation_runs": {
