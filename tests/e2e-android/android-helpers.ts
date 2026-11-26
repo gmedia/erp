@@ -22,7 +22,8 @@ export async function launchApp(device: Device): Promise<AppSession> {
   await device.shell(`am force-stop ${APP_PKG}`);
   await device.shell(`pm clear ${APP_PKG}`);
   await device.shell(`am start -n ${APP_PKG}/.MainActivity`);
-  const webview = await device.webView({ pkg: APP_PKG });
+  // Setelah pm clear, WebView baru bisa butuh >30 dtk untuk muncul di emulator; beri batas lebih longgar.
+  const webview = await device.webView({ pkg: APP_PKG }, { timeout: 90000 });
   const page = await webview.page();
   return { device, webview, page };
 }
