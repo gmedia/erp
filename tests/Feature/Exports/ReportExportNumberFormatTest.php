@@ -2,16 +2,27 @@
 
 use App\Exports\ApAgingReportExport;
 use App\Exports\ArAgingReportExport;
+use App\Exports\AssetExport;
+use App\Exports\BookValueDepreciationExport;
 use App\Exports\CustomerStatementReportExport;
 use App\Exports\GoodsReceiptReportExport;
+use App\Exports\InventoryStocktakeVarianceExport;
+use App\Exports\MaintenanceCostExport;
 use App\Exports\PurchaseHistoryReportExport;
 use App\Exports\PurchaseOrderStatusReportExport;
+use App\Exports\StockAdjustmentReportExport;
+use App\Exports\StockMonitorExport;
+use App\Exports\StockMovementReportExport;
+use App\Exports\StockMovementsExport;
 use App\Models\Customer;
 use App\Models\CustomerInvoice;
 use App\Models\FiscalYear;
+use App\Models\Product;
 use App\Models\Setting;
+use App\Models\StockMovement;
 use App\Models\Supplier;
 use App\Models\SupplierBill;
+use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Maatwebsite\Excel\Excel as ExcelFormat;
@@ -148,6 +159,132 @@ describe('PurchaseOrderStatusReportExport number formats', function () {
         expect(array_values($formats))->toContain('"IDR" #,##0.00')
             ->and(array_values($formats))->toContain('#,##0.00')
             ->and($formats)->toHaveCount(6);
+    });
+});
+
+describe('StockMovementReportExport number formats', function () {
+
+    test('ending balance is a plain number and the row is found by product code', function () {
+        $product = Product::factory()->create(['code' => 'SM-RPT-0001']);
+        $warehouse = Warehouse::factory()->create(['code' => 'WH-SMR-01']);
+        StockMovement::factory()->create([
+            'product_id' => $product->id,
+            'warehouse_id' => $warehouse->id,
+            'quantity_in' => 15,
+            'quantity_out' => 0,
+            'balance_after' => 15,
+            'moved_at' => now(),
+        ]);
+
+        $sheet = readReportExportSheet(new StockMovementReportExport([]));
+
+        $cell = reportExportCell($sheet, 'Ending Balance', 'Product Code', 'SM-RPT-0001');
+
+        expect($cell->getValue())->toBeFloat()->toEqual(15.0)
+            ->and($cell->getStyle()->getNumberFormat()->getFormatCode())->toBe('#,##0.00');
+    });
+
+    test('quantity columns are plain number formats with no currency symbol', function () {
+        $formats = (new StockMovementReportExport([]))->columnFormats();
+
+        expect(array_values($formats))->each->toBe('#,##0.00')
+            ->and($formats)->toHaveCount(3);
+    });
+});
+
+describe('StockMovementsExport number formats', function () {
+
+    test('quantities are plain numbers and unit cost uses the currency format', function () {
+        $formats = (new StockMovementsExport([]))->columnFormats();
+
+        expect(array_values($formats))->toContain('#,##0.00')
+            ->and(array_values($formats))->toContain('"IDR" #,##0.00')
+            ->and($formats)->toHaveCount(5);
+    });
+});
+
+describe('StockMonitorExport number formats', function () {
+
+    test('stock value is a currency cell and quantity on hand is a plain number', function () {
+        $product = Product::factory()->create(['code' => 'SM-MON-0001']);
+        $warehouse = Warehouse::factory()->create(['code' => 'WH-SMM-01']);
+        StockMovement::factory()->create([
+            'product_id' => $product->id,
+            'warehouse_id' => $warehouse->id,
+            'quantity_in' => 8,
+            'quantity_out' => 0,
+            'balance_after' => 8,
+            'average_cost_after' => 2500,
+            'moved_at' => now(),
+        ]);
+
+        $sheet = readReportExportSheet(new StockMonitorExport([]));
+
+        // Format dibaca tepat setelah sel diambil: getStyle() pada sel lain di sheet yang sama
+        // dapat mengubah format sel yang sudah diambil sebelumnya.
+        $qty = reportExportCell($sheet, 'Quantity On Hand', 'Product Code', 'SM-MON-0001');
+        $qtyValue = $qty->getValue();
+        $qtyFormat = $qty->getStyle()->getNumberFormat()->getFormatCode();
+
+        $value = reportExportCell($sheet, 'Stock Value', 'Product Code', 'SM-MON-0001');
+        $valueValue = $value->getValue();
+        $valueFormat = $value->getStyle()->getNumberFormat()->getFormatCode();
+
+        expect($qtyValue)->toBeFloat()->toEqual(8.0)
+            ->and($qtyFormat)->toBe('#,##0.00')
+            ->and($valueValue)->toBeFloat()->toEqual(20000.0)
+            ->and($valueFormat)->toBe('"IDR" #,##0.00');
+    });
+});
+
+describe('InventoryStocktakeVarianceExport number formats', function () {
+
+    test('system, counted and variance quantities are plain numbers', function () {
+        $formats = (new InventoryStocktakeVarianceExport([]))->columnFormats();
+
+        expect(array_values($formats))->each->toBe('#,##0.00')
+            ->and($formats)->toHaveCount(3);
+    });
+});
+
+describe('StockAdjustmentReportExport number formats', function () {
+
+    test('total adjustment value is a currency format and adjusted quantity is plain', function () {
+        $formats = (new StockAdjustmentReportExport([]))->columnFormats();
+
+        expect(array_values($formats))->toContain('"IDR" #,##0.00')
+            ->and(array_values($formats))->toContain('#,##0.00')
+            ->and($formats)->toHaveCount(2);
+    });
+});
+
+describe('BookValueDepreciationExport number formats', function () {
+
+    test('money columns use the currency format and useful life stays a plain integer', function () {
+        $formats = (new BookValueDepreciationExport([]))->columnFormats();
+
+        expect(array_values($formats))->each->toBe('"IDR" #,##0.00')
+            ->and($formats)->toHaveCount(4);
+    });
+});
+
+describe('MaintenanceCostExport number formats', function () {
+
+    test('cost is a currency format', function () {
+        $formats = (new MaintenanceCostExport([]))->columnFormats();
+
+        expect(array_values($formats))->toBe(['"IDR" #,##0.00'])
+            ->and($formats)->toHaveCount(1);
+    });
+});
+
+describe('AssetExport number formats', function () {
+
+    test('purchase cost is a currency format', function () {
+        $formats = (new AssetExport([]))->columnFormats();
+
+        expect(array_values($formats))->toBe(['"IDR" #,##0.00'])
+            ->and($formats)->toHaveCount(1);
     });
 });
 

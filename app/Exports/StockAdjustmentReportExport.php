@@ -35,9 +35,19 @@ class StockAdjustmentReportExport extends AbstractReportIndexExport implements W
             $row->warehouse_name ?? '-',
             $row->branch_name ?? '-',
             $row->adjustment_count ?? 0,
-            $row->total_quantity_adjusted ?? 0,
-            $row->total_adjustment_value ?? 0,
+            $this->numericValue($row->total_quantity_adjusted) ?? 0,
+            $this->numericValue($row->total_adjustment_value) ?? 0,
         ];
+    }
+
+    protected function numericColumnHeadings(): array
+    {
+        return ['Total Quantity Adjusted'];
+    }
+
+    protected function currencyColumnHeadings(): array
+    {
+        return ['Total Adjustment Value'];
     }
 
     protected function actionClass(): string

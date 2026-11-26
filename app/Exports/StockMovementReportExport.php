@@ -35,11 +35,16 @@ class StockMovementReportExport extends AbstractReportIndexExport implements Wit
             $row->warehouse_code ?? '-',
             $row->warehouse_name ?? '-',
             $row->branch_name ?? '-',
-            $row->total_in ?? 0,
-            $row->total_out ?? 0,
-            $row->ending_balance ?? 0,
+            $this->numericValue($row->total_in) ?? 0,
+            $this->numericValue($row->total_out) ?? 0,
+            $this->numericValue($row->ending_balance) ?? 0,
             $row->last_moved_at?->format('Y-m-d H:i:s') ?? '-',
         ];
+    }
+
+    protected function numericColumnHeadings(): array
+    {
+        return ['Total In', 'Total Out', 'Ending Balance'];
     }
 
     protected function actionClass(): string

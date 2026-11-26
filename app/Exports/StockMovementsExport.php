@@ -4,12 +4,16 @@ namespace App\Exports;
 
 use App\Actions\StockMovements\IndexStockMovementsAction;
 use App\Exports\Concerns\AbstractActionCollectionExport;
+use App\Exports\Concerns\ExportsNumberFormats;
 use App\Http\Requests\StockMovements\IndexStockMovementRequest;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting as Formats;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 
-class StockMovementsExport extends AbstractActionCollectionExport implements WithHeadings, WithMapping
+class StockMovementsExport extends AbstractActionCollectionExport implements Formats, WithHeadings, WithMapping
 {
+    use ExportsNumberFormats;
+
     public function headings(): array
     {
         return [
@@ -42,14 +46,24 @@ class StockMovementsExport extends AbstractActionCollectionExport implements Wit
             $movement->warehouse->branch->name ?? '-',
             $movement->movement_type ?? '-',
             $movement->reference_number ?? '-',
-            $movement->quantity_in ?? 0,
-            $movement->quantity_out ?? 0,
-            $movement->balance_after ?? 0,
-            $movement->unit_cost ?? '-',
-            $movement->average_cost_after ?? '-',
+            $this->numericValue($movement->quantity_in) ?? 0,
+            $this->numericValue($movement->quantity_out) ?? 0,
+            $this->numericValue($movement->balance_after) ?? 0,
+            $this->numericValue($movement->unit_cost) ?? '-',
+            $this->numericValue($movement->average_cost_after) ?? '-',
             $movement->notes ?? '-',
             $movement->createdBy->name ?? '-',
         ];
+    }
+
+    protected function numericColumnHeadings(): array
+    {
+        return ['Qty In', 'Qty Out', 'Balance After'];
+    }
+
+    protected function currencyColumnHeadings(): array
+    {
+        return ['Unit Cost', 'Average Cost After'];
     }
 
     /**
