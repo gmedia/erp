@@ -4,12 +4,24 @@ namespace App\Exports;
 
 use App\Actions\Reports\IndexInventoryValuationReportAction;
 use App\Exports\Concerns\AbstractReportIndexExport;
+use App\Exports\Concerns\ExportsNumberFormats;
 use App\Http\Requests\Reports\IndexInventoryValuationReportRequest;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting as Formats;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 
-class InventoryValuationReportExport extends AbstractReportIndexExport implements WithHeadings, WithMapping
+class InventoryValuationReportExport extends AbstractReportIndexExport implements Formats, WithHeadings, WithMapping
 {
+    use ExportsNumberFormats;
+
+    /**
+     * @return array<string, string>
+     */
+    public function columnFormats(): array
+    {
+        return $this->buildColumnFormats($this->headings());
+    }
+
     public function headings(): array
     {
         return [
@@ -37,11 +49,21 @@ class InventoryValuationReportExport extends AbstractReportIndexExport implement
             $stock->warehouse->code ?? '-',
             $stock->warehouse->name ?? '-',
             $stock->warehouse->branch->name ?? '-',
-            $stock->quantity_on_hand ?? 0,
-            $stock->average_cost ?? 0,
-            $stock->stock_value ?? 0,
+            $this->numericValue($stock->quantity_on_hand) ?? 0,
+            $this->numericValue($stock->average_cost) ?? 0,
+            $this->numericValue($stock->stock_value) ?? 0,
             $stock->moved_at?->format('Y-m-d H:i:s') ?? '-',
         ];
+    }
+
+    protected function numericColumnHeadings(): array
+    {
+        return ['Quantity On Hand'];
+    }
+
+    protected function currencyColumnHeadings(): array
+    {
+        return ['Average Cost', 'Stock Value'];
     }
 
     protected function actionClass(): string

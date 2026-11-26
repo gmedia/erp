@@ -118,8 +118,8 @@ describe('ProductExport', function () {
             'finished_good',
             'Electronics',
             'Pcs',
-            '500.00',
-            '750.00',
+            500.0,
+            750.0,
             'active',
             '2023-01-01T10:00:00+00:00',
         ]);

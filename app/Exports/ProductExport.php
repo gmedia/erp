@@ -3,11 +3,15 @@
 namespace App\Exports;
 
 use App\Exports\Concerns\BaseExport;
+use App\Exports\Concerns\ExportsNumberFormats;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 
-class ProductExport extends BaseExport
+class ProductExport extends BaseExport implements WithColumnFormatting
 {
+    use ExportsNumberFormats;
+
     public function query(): Builder
     {
         $query = Product::query()->with(['category', 'unit', 'branch']);
@@ -25,6 +29,14 @@ class ProductExport extends BaseExport
     }
 
     /**
+     * @return array<string, string>
+     */
+    public function columnFormats(): array
+    {
+        return $this->buildColumnFormats(array_keys($this->columns()));
+    }
+
+    /**
      * @return array<string, callable(mixed): mixed>
      */
     protected function columns(): array
@@ -36,10 +48,18 @@ class ProductExport extends BaseExport
             'Type' => fn (Product $product): mixed => $product->type,
             'Category' => fn (Product $product): mixed => $this->relatedAttribute($product, 'category', 'name'),
             'Unit' => fn (Product $product): mixed => $this->relatedAttribute($product, 'unit', 'name'),
-            'Cost' => fn (Product $product): mixed => $product->cost,
-            'Selling Price' => fn (Product $product): mixed => $product->selling_price,
+            'Cost' => fn (Product $product): mixed => $this->numericValue($product->cost),
+            'Selling Price' => fn (Product $product): mixed => $this->numericValue($product->selling_price),
             'Status' => fn (Product $product): mixed => $product->status,
             'Created At' => fn (Product $product): mixed => $this->formatIso8601($product->created_at),
         ];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function currencyColumnHeadings(): array
+    {
+        return ['Cost', 'Selling Price'];
     }
 }
