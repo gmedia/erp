@@ -16,7 +16,7 @@ class CreditNoteExport extends BaseExport implements WithColumnFormatting
 
     public function query(): Builder
     {
-        $query = CreditNote::query()->with(['customer', 'customerInvoice', 'branch', 'fiscalYear']);
+        $query = CreditNote::query()->with(['customer', 'customerInvoice', 'branch', 'department', 'fiscalYear']);
 
         $this->applyConfiguredFilters($query, $this->filters, ['credit_note_number', 'notes'], [
             'customer' => 'customer_id',
@@ -54,6 +54,7 @@ class CreditNoteExport extends BaseExport implements WithColumnFormatting
                 'invoice_number'
             ),
             'Branch' => fn (CreditNote $cn): mixed => $this->relatedAttribute($cn, 'branch', 'name'),
+            'Department' => fn (CreditNote $cn): mixed => $this->relatedAttribute($cn, 'department', 'name'),
             'Fiscal Year' => fn (CreditNote $cn): mixed => $this->relatedAttribute($cn, 'fiscalYear', 'name'),
             'Credit Note Date' => fn (CreditNote $cn): mixed => $this->formatDateValue($cn->credit_note_date, 'Y-m-d'),
             'Reason' => fn (CreditNote $cn): mixed => $cn->reason,

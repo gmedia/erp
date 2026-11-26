@@ -33,6 +33,7 @@ export interface CreditNote extends BaseEntity {
     customer: SimpleEntity | null;
     customer_invoice: { id: number; invoice_number: string } | null;
     branch: SimpleEntity | null;
+    department: SimpleEntity | null;
     fiscal_year: SimpleEntity | null;
     credit_note_date: string;
     reason: CreditNoteReason;
@@ -52,6 +53,7 @@ export interface CreditNoteFormData {
     customer_id: string;
     customer_invoice_id?: string;
     branch_id: string;
+    department_id?: string;
     fiscal_year_id: string;
     credit_note_date: string;
     reason: CreditNoteReason;

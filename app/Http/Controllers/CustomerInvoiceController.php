@@ -167,7 +167,7 @@ class CustomerInvoiceController extends Controller
     protected function resourceRelations(): array
     {
         return [
-            'customer', 'branch', 'fiscalYear', 'creator', 'sender',
+            'customer', 'branch', 'department', 'fiscalYear', 'creator', 'sender',
             'items.product', 'items.account', 'items.unit',
         ];
     }

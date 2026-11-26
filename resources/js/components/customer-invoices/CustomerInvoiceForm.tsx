@@ -44,6 +44,7 @@ const getCustomerInvoiceFormDefaults = (
         return {
             customer_id: '',
             branch_id: '',
+            department_id: '',
             fiscal_year_id: '',
             invoice_date: toDateInputValue(new Date()),
             due_date: toDateInputValue(new Date()),
@@ -61,6 +62,9 @@ const getCustomerInvoiceFormDefaults = (
             : '',
         branch_id: customerInvoice.branch?.id
             ? String(customerInvoice.branch.id)
+            : '',
+        department_id: customerInvoice.department?.id
+            ? String(customerInvoice.department.id)
             : '',
         fiscal_year_id: customerInvoice.fiscal_year?.id
             ? String(customerInvoice.fiscal_year.id)
@@ -211,6 +215,15 @@ export const CustomerInvoiceForm = memo<CustomerInvoiceFormProps>(
                                 'Select Branch',
                             )}
                             url="/api/branches"
+                        />
+                        <AsyncSelectField
+                            name="department_id"
+                            label={fl('department', 'Department')}
+                            placeholder={fl(
+                                'department_placeholder',
+                                'Select Department (optional)',
+                            )}
+                            url="/api/departments"
                         />
                         <AsyncSelectField
                             name="fiscal_year_id"

@@ -161,6 +161,7 @@ class SupplierBillController extends Controller
         return [
             'supplier',
             'branch',
+            'department',
             'fiscalYear',
             'purchaseOrder',
             'goodsReceipt',

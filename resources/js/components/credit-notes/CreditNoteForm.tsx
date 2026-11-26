@@ -37,6 +37,7 @@ const getCreditNoteFormDefaults = (
             customer_id: '',
             customer_invoice_id: '',
             branch_id: '',
+            department_id: '',
             fiscal_year_id: '',
             credit_note_date: toDateInputValue(new Date()),
             reason: 'return',
@@ -53,6 +54,9 @@ const getCreditNoteFormDefaults = (
             ? String(creditNote.customer_invoice.id)
             : '',
         branch_id: creditNote.branch?.id ? String(creditNote.branch.id) : '',
+        department_id: creditNote.department?.id
+            ? String(creditNote.department.id)
+            : '',
         fiscal_year_id: creditNote.fiscal_year?.id
             ? String(creditNote.fiscal_year.id)
             : '',
@@ -202,6 +206,15 @@ export const CreditNoteForm = memo<CreditNoteFormProps>(
                                 'Select Branch',
                             )}
                             url="/api/branches"
+                        />
+                        <AsyncSelectField
+                            name="department_id"
+                            label={fl('department', 'Department')}
+                            placeholder={fl(
+                                'department_placeholder',
+                                'Select Department (optional)',
+                            )}
+                            url="/api/departments"
                         />
                         <AsyncSelectField
                             name="fiscal_year_id"

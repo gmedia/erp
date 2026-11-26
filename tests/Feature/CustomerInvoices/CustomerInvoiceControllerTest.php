@@ -8,6 +8,7 @@ use App\Models\Branch;
 use App\Models\CoaVersion;
 use App\Models\Customer;
 use App\Models\CustomerInvoice;
+use App\Models\Department;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
 use App\Models\Product;
@@ -246,4 +247,38 @@ test('destroy removes customer invoice', function () {
         ->assertNoContent();
 
     assertDatabaseMissing('customer_invoices', ['id' => $invoice->id]);
+});
+
+test('update saves and then clears the optional department (#114)', function () {
+    $department = Department::factory()->create();
+    [$customer, $branch] = createCustomerInvoiceWithItem();
+    $invoice = CustomerInvoice::factory()->create([
+        'customer_id' => $customer->id,
+        'branch_id' => $branch->id,
+        'status' => 'draft',
+        'department_id' => null,
+    ]);
+
+    putJson('/api/customer-invoices/' . $invoice->id, ['department_id' => $department->id])
+        ->assertOk()
+        ->assertJsonPath('data.department.id', $department->id);
+    expect($invoice->fresh()->department_id)->toBe($department->id);
+
+    putJson('/api/customer-invoices/' . $invoice->id, ['department_id' => null])
+        ->assertOk()
+        ->assertJsonPath('data.department.id', null);
+    expect($invoice->fresh()->department_id)->toBeNull();
+});
+
+test('update rejects a department id that does not exist (#114)', function () {
+    [$customer, $branch] = createCustomerInvoiceWithItem();
+    $invoice = CustomerInvoice::factory()->create([
+        'customer_id' => $customer->id,
+        'branch_id' => $branch->id,
+        'status' => 'draft',
+    ]);
+
+    putJson('/api/customer-invoices/' . $invoice->id, ['department_id' => 999999])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['department_id']);
 });

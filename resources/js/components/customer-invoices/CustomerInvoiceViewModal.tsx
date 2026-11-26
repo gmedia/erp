@@ -5,6 +5,7 @@ import {
 } from '@/components/common/ViewModalItemsTable';
 import { ViewModalShell } from '@/components/common/ViewModalShell';
 import { Badge } from '@/components/ui/badge';
+import { useTranslation } from '@/contexts/i18n-context';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { FORMAT_LOCALE } from '@/utils/formatters';
 import React from 'react';
@@ -49,6 +50,8 @@ function createCustomerInvoiceItemColumns(
 
 export const CustomerInvoiceViewModal = React.memo(
     ({ item, open, onClose }: CustomerInvoiceViewModalProps) => {
+        const { t } = useTranslation();
+
         if (!item) return null;
 
         const formatAmount = createAmountFormatter(item.currency);
@@ -76,6 +79,12 @@ export const CustomerInvoiceViewModal = React.memo(
                         <ViewField
                             label="Branch"
                             value={item.branch?.name || '-'}
+                        />
+                        <ViewField
+                            label={t(
+                                'form_fields.customer_invoices.department',
+                            )}
+                            value={item.department?.name || '-'}
                         />
                         <ViewField
                             label="Fiscal Year"

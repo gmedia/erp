@@ -4,6 +4,7 @@ namespace App\Http\Resources\CreditNotes;
 
 use App\Http\Resources\Concerns\BuildsAuditStampResourceData;
 use App\Models\Branch;
+use App\Models\Department;
 use App\Models\CreditNote;
 use App\Models\CreditNoteItem;
 use App\Models\Customer;
@@ -27,6 +28,8 @@ class CreditNoteResource extends JsonResource
         $customerInvoice = $this->resource->customerInvoice;
         /** @var Branch|null $branch */
         $branch = $this->resource->branch;
+        /** @var Department|null $department */
+        $department = $this->resource->department;
         /** @var FiscalYear|null $fiscalYear */
         $fiscalYear = $this->resource->fiscalYear;
 
@@ -68,6 +71,10 @@ class CreditNoteResource extends JsonResource
             'branch' => [
                 'id' => $this->resource->branch_id,
                 'name' => $branch?->name,
+            ],
+            'department' => [
+                'id' => $this->resource->department_id,
+                'name' => $department?->name,
             ],
             'fiscal_year' => [
                 'id' => $this->resource->fiscal_year_id,

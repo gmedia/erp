@@ -1155,6 +1155,7 @@ export const supplierBillFormSchema = z.object({
     branch_id: z
         .string()
         .min(1, { message: 'validation.supplier_bill.branch_required' }),
+    department_id: z.string().optional(),
     fiscal_year_id: z
         .string()
         .min(1, { message: 'validation.supplier_bill.fiscal_year_required' }),
@@ -1291,6 +1292,7 @@ export const customerInvoiceFormSchema = z.object({
     branch_id: z
         .string()
         .min(1, { message: 'validation.customer_invoice.branch_required' }),
+    department_id: z.string().optional(),
     fiscal_year_id: z.string().min(1, {
         message: 'validation.customer_invoice.fiscal_year_required',
     }),
@@ -1380,6 +1382,7 @@ export const creditNoteFormSchema = z.object({
     branch_id: z
         .string()
         .min(1, { message: 'validation.credit_note.branch_required' }),
+    department_id: z.string().optional(),
     fiscal_year_id: z
         .string()
         .min(1, { message: 'validation.credit_note.fiscal_year_required' }),

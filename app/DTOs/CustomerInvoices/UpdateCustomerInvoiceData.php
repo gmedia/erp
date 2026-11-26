@@ -8,6 +8,7 @@ readonly class UpdateCustomerInvoiceData
         public ?string $invoice_number = null,
         public ?int $customer_id = null,
         public ?int $branch_id = null,
+        public ?int $department_id = null,
         public ?int $fiscal_year_id = null,
         public ?string $invoice_date = null,
         public ?string $due_date = null,
@@ -25,6 +26,8 @@ readonly class UpdateCustomerInvoiceData
         public ?int $journal_entry_id = null,
         public ?int $sent_by = null,
         public ?string $sent_at = null,
+        // Departemen boleh dikosongkan (null) lewat update: dibedakan dari "tidak dikirim" (#114).
+        public bool $department_provided = false,
     ) {}
 
     public static function fromArray(array $data): self
@@ -33,6 +36,7 @@ readonly class UpdateCustomerInvoiceData
             invoice_number: $data['invoice_number'] ?? null,
             customer_id: $data['customer_id'] ?? null,
             branch_id: $data['branch_id'] ?? null,
+            department_id: $data['department_id'] ?? null,
             fiscal_year_id: $data['fiscal_year_id'] ?? null,
             invoice_date: $data['invoice_date'] ?? null,
             due_date: $data['due_date'] ?? null,
@@ -50,11 +54,22 @@ readonly class UpdateCustomerInvoiceData
             journal_entry_id: $data['journal_entry_id'] ?? null,
             sent_by: $data['sent_by'] ?? null,
             sent_at: $data['sent_at'] ?? null,
+            department_provided: array_key_exists('department_id', $data),
         );
     }
 
     public function toArray(): array
     {
-        return array_filter(get_object_vars($this), static fn (mixed $value): bool => $value !== null);
+        $values = array_filter(
+            get_object_vars($this),
+            static fn (mixed $value): bool => $value !== null,
+        );
+        unset($values['department_provided']);
+
+        if ($this->department_provided) {
+            $values['department_id'] = $this->department_id;
+        }
+
+        return $values;
     }
 }

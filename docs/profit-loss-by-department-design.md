@@ -17,6 +17,14 @@
 2. **Fase 2 — filter**: filter departemen opsional di Laba Rugi (`/reports/income-statement`), pola filter cabang yang ada; pilihan "Tanpa Departemen".
 3. **Fase 3 — laporan pivot** (opsional): ditunda sampai data fase 1 terisi beberapa minggu.
 
+### Implementasi posting (fase 1, langkah 2)
+
+- **Customer Invoice, Supplier Bill, Credit Note**: `department_id` opsional di form, request (`nullable|exists`), resource (`department`), view modal, dan export (kolom Department). Hanya baris akun pendapatan/beban yang membawa departemen; baris AR/AP/pajak/persediaan/GR-IR tetap null.
+- **Credit Note**: pakai departemen credit note bila diisi; bila kosong, mewarisi dari invoice terkait.
+- **ReverseDocumentJournalAction**: baris pembalik menyalin `department_id` baris asal.
+- **Pembayaran AP/AR** (`PostApPaymentJournalAction`, `PostArReceiptJournalAction`): tidak menyentuh akun pendapatan/beban (hanya kas, AP, AR), sehingga tidak diubah.
+- Update DTO memakai flag `department_provided` agar departemen bisa dikosongkan (null) lewat update dan dibedakan dari "tidak dikirim".
+
 ### Kebijakan: dokumen yang TETAP tanpa departemen (null)
 
 Berikut sengaja tidak diisi departemen (tidak ada sumber yang masuk akal):

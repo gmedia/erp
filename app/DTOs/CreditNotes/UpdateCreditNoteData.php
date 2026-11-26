@@ -9,6 +9,7 @@ readonly class UpdateCreditNoteData
         public ?int $customer_id = null,
         public ?int $customer_invoice_id = null,
         public ?int $branch_id = null,
+        public ?int $department_id = null,
         public ?int $fiscal_year_id = null,
         public ?string $credit_note_date = null,
         public ?string $reason = null,
@@ -20,6 +21,8 @@ readonly class UpdateCreditNoteData
         public ?int $journal_entry_id = null,
         public ?int $confirmed_by = null,
         public ?string $confirmed_at = null,
+        // Departemen boleh dikosongkan (null) lewat update: dibedakan dari "tidak dikirim" (#114).
+        public bool $department_provided = false,
     ) {}
 
     public static function fromArray(array $data): self
@@ -29,6 +32,8 @@ readonly class UpdateCreditNoteData
             customer_id: $data['customer_id'] ?? null,
             customer_invoice_id: $data['customer_invoice_id'] ?? null,
             branch_id: $data['branch_id'] ?? null,
+            department_id: $data['department_id'] ?? null,
+            department_provided: array_key_exists('department_id', $data),
             fiscal_year_id: $data['fiscal_year_id'] ?? null,
             credit_note_date: $data['credit_note_date'] ?? null,
             reason: $data['reason'] ?? null,
@@ -45,6 +50,16 @@ readonly class UpdateCreditNoteData
 
     public function toArray(): array
     {
-        return array_filter(get_object_vars($this), static fn (mixed $value): bool => $value !== null);
+        $values = array_filter(
+            get_object_vars($this),
+            static fn (mixed $value): bool => $value !== null,
+        );
+        unset($values['department_provided']);
+
+        if ($this->department_provided) {
+            $values['department_id'] = $this->department_id;
+        }
+
+        return $values;
     }
 }
