@@ -1,5 +1,6 @@
 import axiosInstance from '@/lib/axios';
 import { PipelineTransition } from '@/types/pipeline';
+import { useHookToast } from '@/utils/i18nFallback';
 import { PipelineTransitionFormData } from '@/utils/schemas';
 import axios from 'axios';
 import { useCallback, useState } from 'react';
@@ -8,6 +9,7 @@ import { toast } from 'sonner';
 export function usePipelineTransition(pipelineId: number) {
     const [transitions, setTransitions] = useState<PipelineTransition[]>([]);
     const [loading, setLoading] = useState(false);
+    const tToast = useHookToast();
 
     const fetchTransitions = useCallback(async () => {
         setLoading(true);
@@ -18,12 +20,15 @@ export function usePipelineTransition(pipelineId: number) {
             setTransitions(response.data.data);
         } catch {
             toast.error(
-                'Failed to fetch pipeline transitions. Please try again.',
+                tToast(
+                    'pipeline_transition_fetch_failed',
+                    'Failed to fetch pipeline transitions. Please try again.',
+                ),
             );
         } finally {
             setLoading(false);
         }
-    }, [pipelineId]);
+    }, [pipelineId, tToast]);
 
     const createTransition = async (data: PipelineTransitionFormData) => {
         try {
@@ -32,16 +37,26 @@ export function usePipelineTransition(pipelineId: number) {
                 data,
             );
             setTransitions((prev) => [...prev, response.data.data]);
-            toast.success('Pipeline transition created successfully.');
+            toast.success(
+                tToast(
+                    'pipeline_transition_created',
+                    'Pipeline transition created successfully.',
+                ),
+            );
             return true;
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
                 toast.error(
                     error.response?.data?.message ||
-                        'Failed to create pipeline transition.',
+                        tToast(
+                            'pipeline_transition_create_failed',
+                            'Failed to create pipeline transition.',
+                        ),
                 );
             } else {
-                toast.error('An unexpected error occurred');
+                toast.error(
+                    tToast('unexpected_error', 'An unexpected error occurred'),
+                );
             }
             return false;
         }
@@ -59,16 +74,26 @@ export function usePipelineTransition(pipelineId: number) {
             setTransitions((prev) =>
                 prev.map((t) => (t.id === id ? response.data.data : t)),
             );
-            toast.success('Pipeline transition updated successfully.');
+            toast.success(
+                tToast(
+                    'pipeline_transition_updated',
+                    'Pipeline transition updated successfully.',
+                ),
+            );
             return true;
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
                 toast.error(
                     error.response?.data?.message ||
-                        'Failed to update pipeline transition.',
+                        tToast(
+                            'pipeline_transition_update_failed',
+                            'Failed to update pipeline transition.',
+                        ),
                 );
             } else {
-                toast.error('An unexpected error occurred');
+                toast.error(
+                    tToast('unexpected_error', 'An unexpected error occurred'),
+                );
             }
             return false;
         }
@@ -80,16 +105,26 @@ export function usePipelineTransition(pipelineId: number) {
                 `/api/pipelines/${pipelineId}/transitions/${id}`,
             );
             setTransitions((prev) => prev.filter((t) => t.id !== id));
-            toast.success('Pipeline transition deleted successfully.');
+            toast.success(
+                tToast(
+                    'pipeline_transition_deleted',
+                    'Pipeline transition deleted successfully.',
+                ),
+            );
             return true;
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
                 toast.error(
                     error.response?.data?.message ||
-                        'Failed to delete pipeline transition.',
+                        tToast(
+                            'pipeline_transition_delete_failed',
+                            'Failed to delete pipeline transition.',
+                        ),
                 );
             } else {
-                toast.error('An unexpected error occurred');
+                toast.error(
+                    tToast('unexpected_error', 'An unexpected error occurred'),
+                );
             }
             return false;
         }

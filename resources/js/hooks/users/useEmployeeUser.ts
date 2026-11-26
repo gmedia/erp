@@ -1,4 +1,5 @@
 import axiosInstance from '@/lib/axios';
+import { useHookToast } from '@/utils/i18nFallback';
 import axios from 'axios';
 import { useCallback, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
@@ -21,6 +22,7 @@ export const useEmployeeUser = (form: UseFormReturn<UserFormData>) => {
     const [loading, setLoading] = useState(false);
     const [userExists, setUserExists] = useState(false);
     const [errors, setErrors] = useState<ValidationErrors>({});
+    const tToast = useHookToast();
 
     const fetchUser = useCallback(
         async (employeeId: string) => {
@@ -50,12 +52,14 @@ export const useEmployeeUser = (form: UseFormReturn<UserFormData>) => {
                 form.setValue('password', '');
             } catch (error) {
                 console.error('Failed to fetch user data', error);
-                toast.error('Failed to fetch user data.');
+                toast.error(
+                    tToast('user_fetch_failed', 'Failed to fetch user data.'),
+                );
             } finally {
                 setLoading(false);
             }
         },
-        [form],
+        [form, tToast],
     );
 
     const saveUser = useCallback(
@@ -70,7 +74,7 @@ export const useEmployeeUser = (form: UseFormReturn<UserFormData>) => {
                     email: data.email,
                     password: data.password || undefined,
                 });
-                toast.success('User saved successfully.');
+                toast.success(tToast('user_saved', 'User saved successfully.'));
                 setUserExists(true);
             } catch (error: unknown) {
                 console.error('Failed to save user', error);
@@ -80,20 +84,32 @@ export const useEmployeeUser = (form: UseFormReturn<UserFormData>) => {
                         error.response?.data?.errors
                     ) {
                         setErrors(error.response.data.errors);
-                        toast.error('Please fix the validation errors.');
+                        toast.error(
+                            tToast(
+                                'user_validation_failed',
+                                'Please fix the validation errors.',
+                            ),
+                        );
                     } else if (error.response?.data?.message) {
                         toast.error(error.response.data.message);
                     } else {
-                        toast.error('Failed to save user.');
+                        toast.error(
+                            tToast('user_save_failed', 'Failed to save user.'),
+                        );
                     }
                 } else {
-                    toast.error('An unexpected error occurred');
+                    toast.error(
+                        tToast(
+                            'unexpected_error',
+                            'An unexpected error occurred',
+                        ),
+                    );
                 }
             } finally {
                 setLoading(false);
             }
         },
-        [],
+        [tToast],
     );
 
     return {

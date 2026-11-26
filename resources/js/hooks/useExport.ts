@@ -1,6 +1,7 @@
 'use client';
 
 import axios from '@/lib/axios';
+import { useHookToast } from '@/utils/i18nFallback';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -14,6 +15,7 @@ export function useExport({
     filename,
 }: UseExportOptions = {}) {
     const [exporting, setExporting] = useState(false);
+    const tToast = useHookToast();
 
     const exportData = async (
         filters: Record<string, string | undefined> = {},
@@ -54,10 +56,17 @@ export function useExport({
             a.click();
             a.remove();
 
-            toast.success('Export completed successfully');
+            toast.success(
+                tToast('export_completed', 'Export completed successfully'),
+            );
         } catch (error) {
             console.error('Export failed:', error);
-            toast.error('Failed to export data. Please try again.');
+            toast.error(
+                tToast(
+                    'export_failed',
+                    'Failed to export data. Please try again.',
+                ),
+            );
         } finally {
             setExporting(false);
         }

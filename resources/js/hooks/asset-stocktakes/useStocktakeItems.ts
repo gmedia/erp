@@ -1,4 +1,5 @@
 import axiosInstance from '@/lib/axios';
+import { useHookToast } from '@/utils/i18nFallback';
 import axios from 'axios';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
@@ -32,28 +33,37 @@ const normalizeStocktakeResult = (
 export const useStocktakeItems = () => {
     const [loading, setLoading] = useState(false);
     const [items, setItems] = useState<StocktakeItem[]>([]);
+    const tToast = useHookToast();
 
-    const fetchItems = useCallback(async (identifier: string | number) => {
-        setLoading(true);
-        try {
-            const response = await axiosInstance.get(
-                `/api/asset-stocktakes/${identifier}/items`,
-            );
-            // Map the data so 'result' is initialized properly for form
-            const mappedItems: StocktakeItem[] = (
-                response.data.data as StocktakeItem[]
-            ).map((item) => ({
-                ...item,
-                result: normalizeStocktakeResult(item.result),
-            }));
-            setItems(mappedItems);
-        } catch (error) {
-            console.error('Failed to fetch items', error);
-            toast.error('Failed to fetch stocktake items.');
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+    const fetchItems = useCallback(
+        async (identifier: string | number) => {
+            setLoading(true);
+            try {
+                const response = await axiosInstance.get(
+                    `/api/asset-stocktakes/${identifier}/items`,
+                );
+                // Map the data so 'result' is initialized properly for form
+                const mappedItems: StocktakeItem[] = (
+                    response.data.data as StocktakeItem[]
+                ).map((item) => ({
+                    ...item,
+                    result: normalizeStocktakeResult(item.result),
+                }));
+                setItems(mappedItems);
+            } catch (error) {
+                console.error('Failed to fetch items', error);
+                toast.error(
+                    tToast(
+                        'stocktake_items_fetch_failed',
+                        'Failed to fetch stocktake items.',
+                    ),
+                );
+            } finally {
+                setLoading(false);
+            }
+        },
+        [tToast],
+    );
 
     const saveItems = useCallback(
         async (
@@ -66,23 +76,36 @@ export const useStocktakeItems = () => {
                     `/api/asset-stocktakes/${identifier}/items`,
                     data,
                 );
-                toast.success('Stocktake items saved successfully.');
+                toast.success(
+                    tToast(
+                        'stocktake_items_saved',
+                        'Stocktake items saved successfully.',
+                    ),
+                );
             } catch (error: unknown) {
                 console.error('Failed to save items', error);
                 if (axios.isAxiosError(error)) {
                     const msg =
                         error.response?.data?.message ||
-                        'Failed to save items.';
+                        tToast(
+                            'stocktake_items_save_failed',
+                            'Failed to save items.',
+                        );
                     toast.error(msg);
                 } else {
-                    toast.error('An unexpected error occurred');
+                    toast.error(
+                        tToast(
+                            'unexpected_error',
+                            'An unexpected error occurred',
+                        ),
+                    );
                 }
                 throw error;
             } finally {
                 setLoading(false);
             }
         },
-        [],
+        [tToast],
     );
 
     return {

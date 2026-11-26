@@ -1,3 +1,6 @@
+import { useOptionalTranslation } from '@/contexts/i18n-context';
+import { useCallback } from 'react';
+
 /**
  * Returns the translated string for `key`, or `fallback` when the key is
  * missing. `t` returns the key itself for missing translations, so comparing
@@ -12,4 +15,14 @@ export function translateOr(
     const translated = t(key, params);
 
     return translated === key ? fallback : translated;
+}
+
+export function useHookToast(): (key: string, fallback: string) => string {
+    const { t } = useOptionalTranslation();
+
+    return useCallback(
+        (key: string, fallback: string) =>
+            translateOr(t, `hook_toast.${key}`, fallback),
+        [t],
+    );
 }

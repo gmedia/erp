@@ -1,5 +1,6 @@
 import axios from '@/lib/axios';
 import { ApprovalRequest } from '@/types/approval';
+import { useHookToast } from '@/utils/i18nFallback';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -14,6 +15,7 @@ export function useEntityApprovalHistory({
 }: UseEntityApprovalHistoryProps) {
     const [history, setHistory] = useState<ApprovalRequest[]>([]);
     const [loading, setLoading] = useState(false);
+    const tToast = useHookToast();
 
     const fetchHistory = useCallback(async () => {
         setLoading(true);
@@ -24,11 +26,16 @@ export function useEntityApprovalHistory({
             setHistory(response.data.data);
         } catch (error) {
             console.error('Failed to fetch approval history:', error);
-            toast.error('Failed to load approval history');
+            toast.error(
+                tToast(
+                    'approval_history_load_failed',
+                    'Failed to load approval history',
+                ),
+            );
         } finally {
             setLoading(false);
         }
-    }, [entityType, entityId]);
+    }, [entityType, entityId, tToast]);
 
     return {
         history,
