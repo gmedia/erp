@@ -6,6 +6,7 @@ import { type Resolver, useFieldArray, useForm } from 'react-hook-form';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
+import { DocumentDimensionFields } from '@/components/common/DocumentDimensionFields';
 import EntityForm from '@/components/common/EntityForm';
 import { EntityFormItemSectionHeader } from '@/components/common/EntityFormItemTable';
 import { InputField } from '@/components/common/InputField';
@@ -207,34 +208,7 @@ export const CustomerInvoiceForm = memo<CustomerInvoiceFormProps>(
                             )}
                             url="/api/customers"
                         />
-                        <AsyncSelectField
-                            name="branch_id"
-                            label={fl('branch', 'Branch')}
-                            placeholder={fl(
-                                'branch_placeholder',
-                                'Select Branch',
-                            )}
-                            url="/api/branches"
-                        />
-                        <AsyncSelectField
-                            name="department_id"
-                            label={fl('department', 'Department')}
-                            placeholder={fl(
-                                'department_placeholder',
-                                'Select Department (optional)',
-                            )}
-                            url="/api/departments"
-                        />
-                        <AsyncSelectField
-                            name="fiscal_year_id"
-                            label={fl('fiscal_year', 'Fiscal Year')}
-                            placeholder={fl(
-                                'fiscal_year_placeholder',
-                                'Select Fiscal Year',
-                            )}
-                            url="/api/fiscal-years"
-                            preferredMetaKey="preferred_fiscal_year_id"
-                        />
+                        <DocumentDimensionFields fl={fl} />
                         <DatePickerField
                             name="invoice_date"
                             label={fl('invoice_date', 'Invoice Date')}

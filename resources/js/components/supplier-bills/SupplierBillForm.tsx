@@ -7,6 +7,7 @@ import { type Resolver, useFieldArray, useForm } from 'react-hook-form';
 
 import AsyncSelectField from '@/components/common/AsyncSelectField';
 import { DatePickerField } from '@/components/common/DatePickerField';
+import { DocumentDimensionFields } from '@/components/common/DocumentDimensionFields';
 import EntityForm from '@/components/common/EntityForm';
 import {
     EntityFormItemActionsCell,
@@ -262,32 +263,13 @@ export const SupplierBillForm = memo<SupplierBillFormProps>(
                         )}
                     />
 
-                    <AsyncSelectField
-                        name="branch_id"
-                        label={fl('branch', 'Branch')}
-                        url="/api/branches"
-                        placeholder={fl('branch_placeholder', 'Select branch')}
-                    />
-
-                    <AsyncSelectField
-                        name="department_id"
-                        label={fl('department', 'Department')}
-                        url="/api/departments"
-                        placeholder={fl(
-                            'department_placeholder',
-                            'Select department (optional)',
-                        )}
-                    />
-
-                    <AsyncSelectField
-                        name="fiscal_year_id"
-                        label={fl('fiscal_year', 'Fiscal Year')}
-                        url="/api/fiscal-years"
-                        placeholder={fl(
-                            'fiscal_year_placeholder',
-                            'Select fiscal year',
-                        )}
-                        preferredMetaKey="preferred_fiscal_year_id"
+                    <DocumentDimensionFields
+                        fl={fl}
+                        placeholders={{
+                            branch: 'Select branch',
+                            department: 'Select department (optional)',
+                            fiscalYear: 'Select fiscal year',
+                        }}
                     />
 
                     <AsyncSelectField

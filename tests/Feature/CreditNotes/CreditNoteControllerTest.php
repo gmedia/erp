@@ -9,6 +9,7 @@ use App\Models\CoaVersion;
 use App\Models\CreditNote;
 use App\Models\Customer;
 use App\Models\CustomerInvoice;
+use App\Models\Department;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
 use App\Models\Product;
@@ -584,5 +585,19 @@ test('apply rejects credit note that exceeds invoice outstanding amount', functi
     assertDatabaseHas('credit_notes', [
         'id' => $creditNote->id,
         'status' => 'confirmed',
+    ]);
+});
+
+test('update sets department on draft credit note', function () {
+    $creditNote = CreditNote::factory()->create(['status' => 'draft', 'department_id' => null]);
+    $department = Department::factory()->create();
+
+    putJson('/api/credit-notes/' . $creditNote->id, ['department_id' => $department->id])
+        ->assertOk()
+        ->assertJsonPath('data.department.id', $department->id);
+
+    assertDatabaseHas('credit_notes', [
+        'id' => $creditNote->id,
+        'department_id' => $department->id,
     ]);
 });
