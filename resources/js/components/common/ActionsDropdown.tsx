@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslatableText } from '@/components/common/TranslatedText';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -29,6 +30,11 @@ export function GenericActions<T>({
     onDelete,
     extraItems,
 }: Readonly<GenericActionsProps<T>>) {
+    const actionsLabel = useTranslatableText({
+        key: 'common.actions',
+        fallback: 'Actions',
+    });
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -38,11 +44,11 @@ export function GenericActions<T>({
                     className="size-8 text-muted-foreground hover:text-foreground"
                 >
                     <MoreHorizontal className="size-4" />
-                    <span className="sr-only">Actions</span>
+                    <span className="sr-only">{actionsLabel}</span>
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuLabel>{actionsLabel}</DropdownMenuLabel>
                 {extraItems && React.Children.toArray(extraItems)}
                 {viewUrl && (
                     <DropdownMenuItem asChild data-view-url={viewUrl}>

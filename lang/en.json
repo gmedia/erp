@@ -98,7 +98,35 @@
         }
     },
     "pipelineDashboard": {
-        "entitiesInState": "entities currently in state"
+        "entitiesInState": "entities currently in state",
+        "branch": "Branch",
+        "allBranches": "All Branches",
+        "selectPipeline": "Select Pipeline",
+        "allActivePipelines": "All Active Pipelines",
+        "staleThreshold": "Stale Threshold",
+        "selectDays": "Select days",
+        "daysCount": "{count} Days",
+        "staleEntities": "Stale Entities",
+        "staleDescription": "Entities stuck in intermediate states for more than {days} days",
+        "detected": "detected",
+        "noStaleEntities": "No stale entities found.",
+        "allMovingSmoothly": "Everything is moving smoothly through the pipeline.",
+        "type": "Type",
+        "entity": "Entity",
+        "currentState": "Current State",
+        "lastTransition": "Last Transition",
+        "daysStale": "Days Stale",
+        "by": "by",
+        "loadingChart": "Loading Chart",
+        "stateDistribution": "State Distribution",
+        "entitiesMapped": "Entities mapped by pipeline state",
+        "noEntitiesFound": "No entities found.",
+        "visualBreakdown": "Visual breakdown of {count} entities",
+        "total": "Total",
+        "loadingState": "Loading State...",
+        "noStateData": "No state data available for the selected pipeline.",
+        "noEntitiesYet": "No entities in any state yet",
+        "stateAppears": "State distribution appears once records enter these pipelines."
     },
     "postingJournals": {
         "searchPlaceholder": "Search journals..."
@@ -1399,7 +1427,25 @@
         "valuation_search_placeholder": "Search product, category, warehouse, branch...",
         "adjustment_search_placeholder": "Search number, warehouse, branch, type, status...",
         "purchase_search_placeholder": "Search PO number, supplier, warehouse, or product...",
-        "goods_receipt_search_placeholder": "Search GR number, PO number, supplier, warehouse, or product..."
+        "goods_receipt_search_placeholder": "Search GR number, PO number, supplier, warehouse, or product...",
+        "movement_goods_receipt": "Goods Receipt",
+        "movement_supplier_return": "Supplier Return",
+        "movement_transfer_out": "Transfer Out",
+        "movement_transfer_in": "Transfer In",
+        "movement_adjustment_in": "Adjustment In",
+        "movement_adjustment_out": "Adjustment Out",
+        "movement_production_consume": "Production Consume",
+        "movement_production_output": "Production Output",
+        "movement_sales": "Sales",
+        "movement_sales_return": "Sales Return",
+        "approval_event_submitted": "Submitted",
+        "approval_event_escalated": "Escalated",
+        "approval_event_delegated": "Delegated",
+        "approval_event_resubmitted": "Resubmitted",
+        "approval_event_step_approved": "Step Approved",
+        "approval_event_step_skipped": "Step Skipped",
+        "all_types": "All types",
+        "all_statuses": "All statuses"
     },
     "form_fields": {
         "asset_depreciation_runs": {

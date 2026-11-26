@@ -98,7 +98,35 @@
         }
     },
     "pipelineDashboard": {
-        "entitiesInState": "entitas saat ini dalam status ini"
+        "entitiesInState": "entitas saat ini dalam status ini",
+        "branch": "Cabang",
+        "allBranches": "Semua Cabang",
+        "selectPipeline": "Pilih Pipeline",
+        "allActivePipelines": "Semua Pipeline Aktif",
+        "staleThreshold": "Ambang Batas Macet",
+        "selectDays": "Pilih hari",
+        "daysCount": "{count} Hari",
+        "staleEntities": "Entitas Macet",
+        "staleDescription": "Entitas yang tertahan di status antara lebih dari {days} hari",
+        "detected": "terdeteksi",
+        "noStaleEntities": "Tidak ada entitas macet.",
+        "allMovingSmoothly": "Semua entitas bergerak lancar melalui pipeline.",
+        "type": "Tipe",
+        "entity": "Entitas",
+        "currentState": "Status Saat Ini",
+        "lastTransition": "Perpindahan Terakhir",
+        "daysStale": "Hari Macet",
+        "by": "oleh",
+        "loadingChart": "Memuat Grafik",
+        "stateDistribution": "Distribusi Status",
+        "entitiesMapped": "Entitas dipetakan berdasarkan status pipeline",
+        "noEntitiesFound": "Tidak ada entitas.",
+        "visualBreakdown": "Rincian visual dari {count} entitas",
+        "total": "Jumlah",
+        "loadingState": "Memuat Status...",
+        "noStateData": "Tidak ada data status untuk pipeline yang dipilih.",
+        "noEntitiesYet": "Belum ada entitas di status mana pun",
+        "stateAppears": "Distribusi status akan muncul setelah data masuk ke pipeline ini."
     },
     "postingJournals": {
         "searchPlaceholder": "Cari jurnal..."
@@ -1005,7 +1033,7 @@
             "title": "Pesanan Pembelian",
             "description": "Pesanan yang dikirim ke pemasok beserta progres penerimaan dan penagihan.",
             "search_placeholder": "Cari pesanan pembelian...",
-            "filter_search_placeholder": "Cari no. PO, term pembayaran, catatan, atau alamat pengiriman..."
+            "filter_search_placeholder": "Cari no. PO, termin pembayaran, catatan, atau alamat pengiriman..."
         },
         "products": {
             "title": "Produk",
@@ -1402,7 +1430,25 @@
         "valuation_search_placeholder": "Cari produk, kategori, gudang, cabang...",
         "adjustment_search_placeholder": "Cari nomor, gudang, cabang, jenis, status...",
         "purchase_search_placeholder": "Cari no. PO, pemasok, gudang, atau produk...",
-        "goods_receipt_search_placeholder": "Cari no. GR, no. PO, pemasok, gudang, atau produk..."
+        "goods_receipt_search_placeholder": "Cari no. GR, no. PO, pemasok, gudang, atau produk...",
+        "movement_goods_receipt": "Penerimaan Barang",
+        "movement_supplier_return": "Retur Pemasok",
+        "movement_transfer_out": "Transfer Keluar",
+        "movement_transfer_in": "Transfer Masuk",
+        "movement_adjustment_in": "Penyesuaian Masuk",
+        "movement_adjustment_out": "Penyesuaian Keluar",
+        "movement_production_consume": "Konsumsi Produksi",
+        "movement_production_output": "Hasil Produksi",
+        "movement_sales": "Penjualan",
+        "movement_sales_return": "Retur Penjualan",
+        "approval_event_submitted": "Diajukan",
+        "approval_event_escalated": "Dieskalasi",
+        "approval_event_delegated": "Didelegasikan",
+        "approval_event_resubmitted": "Diajukan Ulang",
+        "approval_event_step_approved": "Langkah Disetujui",
+        "approval_event_step_skipped": "Langkah Dilewati",
+        "all_types": "Semua Jenis",
+        "all_statuses": "Semua Status"
     },
     "form_fields": {
         "asset_depreciation_runs": {
