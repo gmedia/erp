@@ -62,12 +62,23 @@ function normalizeSpaces(value: string): string {
     return value.replaceAll('\u00A0', ' ');
 }
 
+function resetFormatState() {
+    const host = globalThis as Record<string, unknown>;
+    delete host.__APP_REGIONAL_NUMBER_FORMAT_SETTINGS__;
+    delete host.__APP_REGIONAL_DATE_FORMAT_SETTINGS__;
+    installLocalStorage();
+}
+
 test.describe('format helpers - pengaturan regional perusahaan', () => {
-    test.beforeEach(() => {
-        const host = globalThis as Record<string, unknown>;
-        delete host.__APP_REGIONAL_NUMBER_FORMAT_SETTINGS__;
-        delete host.__APP_REGIONAL_DATE_FORMAT_SETTINGS__;
-        installLocalStorage();
+    test.beforeEach(async () => {
+        resetFormatState();
+        const { numberFormat, dateFormat } = await loadModules();
+        applyCompanySettings(numberFormat, dateFormat);
+        setUiLocale('en');
+    });
+
+    test.afterEach(() => {
+        resetFormatState();
     });
 
     test('formatNumber memakai pemisah dari Setting, bukan locale UI', async () => {

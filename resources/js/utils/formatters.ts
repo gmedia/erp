@@ -109,5 +109,7 @@ export function formatTime(
 export function formatRupiah(value: string | number): string {
     return formatCurrencyByRegionalSettings(value, {
         locale: 'id-ID',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
     });
 }
