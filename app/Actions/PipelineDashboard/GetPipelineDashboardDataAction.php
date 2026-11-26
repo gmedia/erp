@@ -128,7 +128,7 @@ class GetPipelineDashboardDataAction
                     'name' => $state->currentState->name,
                     'color' => $state->currentState->color,
                 ],
-                'days_in_state' => Carbon::parse($state->last_transitioned_at)->diffInDays(Carbon::now()),
+                'days_in_state' => (int) floor(Carbon::parse($state->last_transitioned_at)->diffInDays(Carbon::now())),
                 'last_transitioned_at' => $state->last_transitioned_at->toISOString(),
                 'last_transitioned_by' => $state->lastTransitionedBy->name ?? 'System',
             ];

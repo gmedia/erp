@@ -60,6 +60,14 @@ Status verifikasi (per mesin, dicatat agar tidak diulang):
 
 Batas sumber daya mesin pengembangan: 4 CPU, sekitar 8 GB RAM. Hentikan Vite dev dan proses berat lain sebelum emulator jalan.
 
+## Workflow CI `e2e-android`
+
+- File: `.github/workflows/e2e-android.yml` (terpisah dari `tests.yml`, tidak masuk job `ci`, tidak memblokir merge). Issue: #550.
+- Pemicu: PR yang menyentuh path mobile (lihat `paths` di workflow), jadwal harian, dan `workflow_dispatch`.
+- Alur: aktifkan KVM via udev, Sail + `migrate:fresh --seed`, lalu `android-emulator-runner` (API 34, `-no-window`) yang memanggil `scripts/e2e-android.sh` dengan `E2E_ANDROID_SKIP_EMULATOR=1`. Backend untuk emulator = `http://10.0.2.2:82`.
+- Artefak saat gagal: laporan Playwright (`e2e/test-results-android`), logcat, screenshot, dan log Laravel.
+- `E2E_ANDROID_SKIP_EMULATOR=1` memakai emulator yang sudah berjalan (tidak boot dan tidak dimatikan oleh script). Default lokal tidak berubah.
+
 ## Batasan
 
 - Dialog native Android (izin, share sheet) tidak teruji oleh Playwright WebView.

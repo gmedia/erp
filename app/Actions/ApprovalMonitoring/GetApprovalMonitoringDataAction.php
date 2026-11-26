@@ -135,7 +135,7 @@ class GetApprovalMonitoringDataAction
                 'submitter_name' => $request->submitter->name ?? 'Unknown',
                 'step_name' => $step->flowStep->name ?? 'Unknown Step',
                 'due_at' => $step->due_at->toISOString(),
-                'hours_overdue' => Carbon::now()->diffInHours($step->due_at),
+                'hours_overdue' => (int) floor(Carbon::now()->diffInHours($step->due_at)),
             ];
         });
 

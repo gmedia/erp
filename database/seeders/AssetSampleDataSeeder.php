@@ -720,15 +720,15 @@ class AssetSampleDataSeeder extends Seeder
         $transitionHistory = [
             // FA-000001: draft → active (10 months ago)
             'FA-000001' => [
-                ['draft', 'active', null, 300],
+                ['draft', 'active', null, 21],
             ],
             // FA-000002: draft → active (6 months ago)
             'FA-000002' => [
-                ['draft', 'active', null, 180],
+                ['draft', 'active', null, 9],
             ],
             // FA-000003: draft → active (20 months ago)
             'FA-000003' => [
-                ['draft', 'active', null, 600],
+                ['draft', 'active', null, 35],
             ],
             // FA-000004: stays in draft (no transitions)
             'FA-000004' => [],
@@ -736,12 +736,12 @@ class AssetSampleDataSeeder extends Seeder
             'FA-000005' => [],
             // FA-000006: draft → active → maintenance
             'FA-000006' => [
-                ['draft', 'active', null, 540],
-                ['active', 'maintenance', null, 14],
+                ['draft', 'active', null, 45],
+                ['active', 'maintenance', null, 3],
             ],
             // FA-000007: draft → active → disposed
             'FA-000007' => [
-                ['draft', 'active', null, 1440],
+                ['draft', 'active', null, 70],
                 [
                     'active',
                     'disposed',
@@ -752,7 +752,7 @@ class AssetSampleDataSeeder extends Seeder
             ],
             // FA-000008: draft → active → lost
             'FA-000008' => [
-                ['draft', 'active', null, 700],
+                ['draft', 'active', null, 55],
                 [
                     'active',
                     'lost',
@@ -769,11 +769,11 @@ class AssetSampleDataSeeder extends Seeder
             'FA-000010' => [],
             // FA-000011: draft → active
             'FA-000011' => [
-                ['draft', 'active', null, 365],
+                ['draft', 'active', null, 28],
             ],
             // FA-000012: draft → active → disposed
             'FA-000012' => [
-                ['draft', 'active', null, 1460],
+                ['draft', 'active', null, 55],
                 ['active', 'disposed', 'Approved via seeder', 10],
             ],
         ];
@@ -812,6 +812,8 @@ class AssetSampleDataSeeder extends Seeder
                 ->where('pipeline_entity_state_id', $entityState->id)
                 ->delete();
 
+            // Transisi dihitung mundur dari tanggal seed (days_ago), berurutan
+            // dan tidak pernah lebih awal dari tanggal pembelian.
             $cursor = $purchaseDate->copy();
             $logs = [[
                 'from_state_id' => null,
@@ -822,7 +824,7 @@ class AssetSampleDataSeeder extends Seeder
             ]];
 
             foreach ($history as $step) {
-                [$fromCode, $toCode, $comment] = $step;
+                [$fromCode, $toCode, $comment, $daysAgo] = $step;
                 $fromState = $pipelineStates[$fromCode] ?? null;
                 $toState = $pipelineStates[$toCode] ?? null;
 
@@ -831,13 +833,18 @@ class AssetSampleDataSeeder extends Seeder
                 }
 
                 $transition = $transitionMap["{$fromCode}->{$toCode}"] ?? null;
-                $cursor = $cursor->copy()->addHour();
+                $transitionAt = now()->subDays($daysAgo)->setTime(8, 0);
+                if ($transitionAt->lt($cursor)) {
+                    $transitionAt = $cursor->copy()->addHour();
+                }
+                $cursor = $transitionAt->copy();
+
                 $logs[] = [
                     'from_state_id' => $fromState->id,
                     'to_state_id' => $toState->id,
                     'transition_id' => $transition?->id,
                     'comment' => $comment,
-                    'created_at' => $cursor->copy(),
+                    'created_at' => $transitionAt->copy(),
                 ];
             }
 
@@ -850,6 +857,8 @@ class AssetSampleDataSeeder extends Seeder
                 ]));
             }
 
+            // last_transitioned_at = transisi terakhir (relatif tanggal seed), bukan
+            // tanggal pembelian; sebagian melewati ambang stale default 7 hari.
             $entityState->update([
                 'current_state_id' => $targetState->id,
                 'last_transitioned_at' => $cursor->copy(),
