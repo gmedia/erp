@@ -1,14 +1,14 @@
 import { getStoredLocale } from '../lib/locale-storage';
 import {
-    formatCurrencyByRegionalSettings,
-    formatNumberByRegionalSettings,
-} from './number-format';
-import {
     formatDateByRegionalSettings,
     formatDateTimeByRegionalSettings,
     formatTimeByRegionalSettings,
     type RegionalDateFormatOptions,
 } from './date-format';
+import {
+    formatCurrencyByRegionalSettings,
+    formatNumberByRegionalSettings,
+} from './number-format';
 
 export type FormatInput = string | number | null | undefined;
 
@@ -17,7 +17,10 @@ const EMPTY_VALUE = '-';
 /** Angka dengan pemisah dari Setting perusahaan. Kosong/tidak valid → `-`. */
 export function formatNumber(
     value: FormatInput,
-    options: { minimumFractionDigits?: number; maximumFractionDigits?: number } = {},
+    options: {
+        minimumFractionDigits?: number;
+        maximumFractionDigits?: number;
+    } = {},
 ): string {
     if (value === null || value === undefined || value === '') {
         return EMPTY_VALUE;
