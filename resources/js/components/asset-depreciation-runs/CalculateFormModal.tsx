@@ -88,7 +88,9 @@ export function CalculateFormModal({
             Object.keys(errors).forEach((key) => {
                 setError(key as keyof CalculateFormValues, {
                     type: 'server',
-                    message: errors[key]?.[0] ?? 'An error occurred.',
+                    message:
+                        errors[key]?.[0] ??
+                        fl('calculate_fallback_error', 'An error occurred.'),
                 });
             });
         } else if (result) {
@@ -156,7 +158,7 @@ export function CalculateFormModal({
                                 onClick={onClose}
                                 disabled={loading}
                             >
-                                Cancel
+                                {fl('cancel', 'Cancel')}
                             </Button>
                             <Button type="submit" disabled={loading}>
                                 {loading && (

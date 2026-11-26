@@ -13,6 +13,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useTranslation } from '@/contexts/i18n-context';
 import axios from '@/lib/axios';
 import { AssetDepreciationLine } from '@/types/asset-depreciation-run';
 import { formatCurrencyByRegionalSettings } from '@/utils/number-format';
@@ -30,6 +31,13 @@ export function RunLinesModal({
     open,
     onClose,
 }: Readonly<RunLinesModalProps>) {
+    const { t } = useTranslation();
+    const px = (key: string, fallback: string) => {
+        const fullKey = `page.asset_depreciation_runs.${key}`;
+        const translated = t(fullKey);
+
+        return translated === fullKey ? fallback : translated;
+    };
     const { data: lines, isLoading } = useQuery<AssetDepreciationLine[]>({
         queryKey: ['asset-depreciation-run-lines', runId],
         queryFn: async () => {
@@ -56,7 +64,7 @@ export function RunLinesModal({
                     <div className="flex items-center justify-center gap-2">
                         <Loader2 className="h-6 w-6 animate-spin text-primary" />
                         <span className="text-muted-foreground">
-                            Loading lines...
+                            {px('loading_lines', 'Loading lines...')}
                         </span>
                     </div>
                 </TableCell>
@@ -69,7 +77,7 @@ export function RunLinesModal({
                     colSpan={5}
                     className="h-40 text-center text-muted-foreground"
                 >
-                    No lines found.
+                    {px('no_lines', 'No lines found.')}
                 </TableCell>
             </TableRow>
         );
@@ -102,10 +110,14 @@ export function RunLinesModal({
         <Dialog open={open} onOpenChange={(val) => !val && onClose()}>
             <DialogContent className="flex max-h-[90vh] max-w-[95vw] flex-col overflow-hidden sm:max-w-7xl">
                 <DialogHeader>
-                    <DialogTitle>Depreciation Run Lines</DialogTitle>
+                    <DialogTitle>
+                        {px('run_lines_title', 'Depreciation Run Lines')}
+                    </DialogTitle>
                     <DialogDescription>
-                        View detailed depreciation line items for the selected
-                        run.
+                        {px(
+                            'run_lines_description',
+                            'View detailed depreciation line items for the selected run.',
+                        )}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -113,18 +125,29 @@ export function RunLinesModal({
                     <Table className="min-w-[720px]">
                         <TableHeader className="sticky top-0 bg-muted">
                             <TableRow>
-                                <TableHead>Asset</TableHead>
-                                <TableHead className="text-right">
-                                    Amount
+                                <TableHead>
+                                    {px('col_asset', 'Asset')}
                                 </TableHead>
                                 <TableHead className="text-right">
-                                    Accumulated Before
+                                    {px('col_amount', 'Amount')}
                                 </TableHead>
                                 <TableHead className="text-right">
-                                    Accumulated After
+                                    {px(
+                                        'col_accumulated_before',
+                                        'Accumulated Before',
+                                    )}
                                 </TableHead>
                                 <TableHead className="text-right">
-                                    Book Value After
+                                    {px(
+                                        'col_accumulated_after',
+                                        'Accumulated After',
+                                    )}
+                                </TableHead>
+                                <TableHead className="text-right">
+                                    {px(
+                                        'col_book_value_after',
+                                        'Book Value After',
+                                    )}
                                 </TableHead>
                             </TableRow>
                         </TableHeader>

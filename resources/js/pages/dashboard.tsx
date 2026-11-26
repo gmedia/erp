@@ -92,7 +92,7 @@ export default function Dashboard() {
             icon: ClipboardCheck,
         },
         {
-            title: tx('menu.purchase_orders', 'Purchase Orders'),
+            title: tx('menu.purchase_order', 'Purchase Orders'),
             href: '/purchase-orders',
             description: tx(
                 'dashboard.shortcut_purchase_orders_description',
