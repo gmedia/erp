@@ -96,12 +96,12 @@ class MyApprovalController extends Controller
         $currentStep = $this->findCurrentPendingAssignedStep($approvalRequest, $userId);
 
         if (! $currentStep instanceof ApprovalRequestStep) {
-            abort(403, 'You are not authorized to act on this approval step.');
+            abort(403, __('my_approval_api.not_authorized_for_step'));
         }
 
         $action->execute($approvalRequest, $currentStep, $userId, $request->validated('comments'));
 
-        return response()->json(['message' => 'Request approved successfully.']);
+        return response()->json(['message' => __('my_approval_api.approved')]);
     }
 
     public function reject(
@@ -113,12 +113,12 @@ class MyApprovalController extends Controller
         $currentStep = $this->findCurrentPendingAssignedStep($approvalRequest, $userId);
 
         if (! $currentStep instanceof ApprovalRequestStep) {
-            abort(403, 'You are not authorized to act on this approval step.');
+            abort(403, __('my_approval_api.not_authorized_for_step'));
         }
 
         $action->execute($approvalRequest, $currentStep, $userId, $request->validated('comments'));
 
-        return response()->json(['message' => 'Request rejected.']);
+        return response()->json(['message' => __('my_approval_api.rejected')]);
     }
 
     private function findCurrentPendingAssignedStep(

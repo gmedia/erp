@@ -86,7 +86,7 @@ class VehicleLoanController extends Controller
     public function update(UpdateVehicleLoanRequest $request, VehicleLoan $vehicleLoan): JsonResponse
     {
         if ($vehicleLoan->status !== 'draft') {
-            abort(422, 'Only draft loans can be updated.');
+            abort(422, __('vehicle_loan_api.only_draft_can_be_updated'));
         }
 
         $vehicleLoan->update($request->validated());
@@ -97,12 +97,12 @@ class VehicleLoanController extends Controller
     public function destroy(VehicleLoan $vehicleLoan): JsonResponse
     {
         if (! in_array($vehicleLoan->status, ['draft', 'rejected'], true)) {
-            abort(422, 'Only draft or rejected loans can be cancelled.');
+            abort(422, __('vehicle_loan_api.only_draft_or_rejected_can_be_cancelled'));
         }
 
         $vehicleLoan->update(['status' => 'cancelled']);
 
-        return response()->json(['message' => 'Loan request cancelled.']);
+        return response()->json(['message' => __('vehicle_loan_api.cancelled')]);
     }
 
     public function assignmentOptions(): JsonResponse
@@ -166,7 +166,7 @@ class VehicleLoanController extends Controller
         $approval = $vehicleLoan->approvalRequests()->latest()->first();
 
         if (! $approval) {
-            abort(404, 'Approval request not found.');
+            abort(404, __('vehicle_loan_api.approval_request_not_found'));
         }
 
         $action->execute($vehicleLoan, $approval, $request->validated());
@@ -278,7 +278,7 @@ class VehicleLoanController extends Controller
     private function authorizeRequester(VehicleLoan $loan): void
     {
         if ($loan->requester_id !== Auth::id()) {
-            abort(403, 'Only the requester can perform this action.');
+            abort(403, __('vehicle_loan_api.only_requester_can_perform_action'));
         }
     }
 }

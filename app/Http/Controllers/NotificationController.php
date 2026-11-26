@@ -49,12 +49,12 @@ class NotificationController extends Controller
         $notification = $this->findForCurrentUser($id);
 
         if (! $notification) {
-            abort(404, 'Notification not found.');
+            abort(404, __('notification_api.not_found'));
         }
 
         $notification->update(['read_at' => now()]);
 
-        return response()->json(['message' => 'Notification marked as read.']);
+        return response()->json(['message' => __('notification_api.marked_read')]);
     }
 
     public function readAll(): JsonResponse
@@ -65,7 +65,7 @@ class NotificationController extends Controller
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
 
-        return response()->json(['message' => 'All notifications marked as read.']);
+        return response()->json(['message' => __('notification_api.all_marked_read')]);
     }
 
     private function findForCurrentUser(string $id): ?DatabaseNotification

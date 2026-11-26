@@ -24,7 +24,7 @@ class EntityApprovalHistoryController extends Controller
         ];
 
         if (! isset($entityMap[$entityType])) {
-            return response()->json(['message' => 'Entity type not supported for approvals.'], 400);
+            return response()->json(['message' => __('entity_approval_history_api.entity_type_not_supported')], 400);
         }
 
         $modelClass = $entityMap[$entityType];
