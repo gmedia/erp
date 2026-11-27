@@ -1,5 +1,5 @@
 import axios from '@/lib/axios';
-import { Check, ChevronsUpDown, Loader2, Search } from 'lucide-react';
+import { Check, ChevronDown, Loader2, Search } from 'lucide-react';
 import * as React from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -201,7 +201,7 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
                     aria-label={label}
                     aria-expanded={open}
                     className={cn(
-                        'h-8 w-full min-w-0 justify-between overflow-hidden rounded-[6px] border-transparent bg-secondary px-2.5 text-sm font-normal hover:bg-secondary focus-visible:ring-2 focus-visible:ring-[2px] focus-visible:ring-ring/40',
+                        'h-8 w-full min-w-0 justify-between overflow-hidden rounded-[6px] border border-transparent bg-secondary pr-2 pl-2.5 text-sm font-normal shadow-none hover:bg-secondary focus-visible:ring-2 focus-visible:ring-[2px] focus-visible:ring-ring/40',
                         !value && 'text-muted-foreground',
                         className,
                     )}
@@ -209,7 +209,7 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
                     <span className="flex-1 truncate text-left">
                         {selectedLabel || placeholder}
                     </span>
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    <ChevronDown className="ml-2 size-3.5 shrink-0 text-muted-foreground" />
                 </Button>
             </PopoverTrigger>
             <PopoverContent

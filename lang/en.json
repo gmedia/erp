@@ -17,6 +17,13 @@
         "actions": "Actions",
         "export": "Export",
         "reset_filters": "Reset Filters",
+        "filter_modal": {
+            "title": "Filters",
+            "description": "Apply filters to refine the results",
+            "reset": "Reset",
+            "clear_all": "Clear All",
+            "apply": "Apply Filters"
+        },
         "no_results": "No results found",
         "confirm": "Confirm",
         "success": "Success",
@@ -1055,7 +1062,9 @@
             "column_device": "Device",
             "select_user": "Select a user",
             "start_date": "Start Date",
-            "end_date": "End Date"
+            "end_date": "End Date",
+            "pick_date": "Pick a date",
+            "ip_placeholder": "e.g. 192.168.1.10"
         },
         "approval_audit_trail": {
             "description": "History of approval actions taken on requests.",
@@ -3353,6 +3362,11 @@
             "production_config": "Production config",
             "version": "Version",
             "container_resources": "Container CPU & memory"
+        },
+        "summary": {
+            "passed": "Passed",
+            "complete": "Complete",
+            "unavailable": "Unavailable"
         },
         "title": "System health",
         "description": "Component status, recent issues, and version information.",

@@ -17,6 +17,13 @@
         "actions": "Aksi",
         "export": "Ekspor",
         "reset_filters": "Reset Filter",
+        "filter_modal": {
+            "title": "Filter",
+            "description": "Terapkan filter untuk menyaring hasil",
+            "reset": "Atur ulang",
+            "clear_all": "Hapus semua",
+            "apply": "Terapkan filter"
+        },
         "no_results": "Tidak ada hasil",
         "confirm": "Konfirmasi",
         "success": "Berhasil",
@@ -1046,7 +1053,7 @@
         "security_logs": {
             "description": "Aktivitas login, logout, dan perubahan akses. Disimpan 1 tahun; data pribadi hanya dipakai untuk keamanan.",
             "search_placeholder": "Cari email, IP, pengguna...",
-            "select_event": "Pilih Kejadian",
+            "select_event": "Pilih kejadian",
             "column_date": "Waktu",
             "column_event": "Kejadian",
             "column_user": "Pengguna",
@@ -1055,7 +1062,9 @@
             "column_device": "Perangkat",
             "select_user": "Pilih pengguna",
             "start_date": "Tanggal mulai",
-            "end_date": "Tanggal selesai"
+            "end_date": "Tanggal selesai",
+            "pick_date": "Pilih tanggal",
+            "ip_placeholder": "mis. 192.168.1.10"
         },
         "approval_audit_trail": {
             "description": "Riwayat tindakan persetujuan pada permintaan.",
@@ -3356,6 +3365,11 @@
             "production_config": "Konfigurasi produksi",
             "version": "Versi",
             "container_resources": "CPU & memori kontainer"
+        },
+        "summary": {
+            "passed": "Lulus",
+            "complete": "Lengkap",
+            "unavailable": "Tidak tersedia"
         },
         "title": "Kesehatan sistem",
         "description": "Status komponen, riwayat masalah terakhir, dan informasi versi.",
