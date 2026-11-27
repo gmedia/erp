@@ -114,7 +114,7 @@ export function DataTableToolbar<T>({
             {/* Mobile: kontrol dalam satu baris bisa di-scroll, bukan 2-3 baris (W4-15). */}
             <div className="ml-auto flex w-full flex-nowrap items-center gap-2 overflow-x-auto pb-1 sm:w-auto sm:overflow-visible sm:pb-0">
                 <Button
-                    variant="outline"
+                    variant="secondary"
                     size="sm"
                     onClick={() => setIsFilterModalOpen(true)}
                     aria-label={t('shell.filters')}
@@ -154,7 +154,7 @@ export function DataTableToolbar<T>({
                 {extraActions}
 
                 <Button
-                    variant="outline"
+                    variant="secondary"
                     size="sm"
                     onClick={onExport}
                     disabled={exporting || exportDisabled}
@@ -176,7 +176,7 @@ export function DataTableToolbar<T>({
                         <TooltipTrigger asChild>
                             <DropdownMenuTrigger asChild>
                                 <Button
-                                    variant="outline"
+                                    variant="secondary"
                                     size="sm"
                                     aria-label={t('shell.columns')}
                                     data-testid="columns-button"

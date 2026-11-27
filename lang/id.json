@@ -54,6 +54,12 @@
     },
     "approval.status_manual_forbidden": "Status ini hanya dapat diisi melalui proses approval atau oleh sistem.",
     "approval.items_locked": "Item hanya dapat diubah selama dokumen masih draft.",
+    "settings": {
+        "appearance": {
+            "title": "Pengaturan tampilan",
+            "description": "Perbarui pengaturan tampilan akun Anda"
+        }
+    },
     "approval.flow_not_found": "Approval flow tidak ditemukan, tidak aktif, atau tidak memiliki langkah.",
     "status_transition.invalid": "Tidak dapat mengubah status dari :from ke :to.",
     "posted_document.values_locked": "Dokumen sudah diposting. Item dan nilainya terkunci; gunakan batal atau void.",
@@ -1443,7 +1449,14 @@
         },
         "general_ledger": {
             "title": "Laporan Buku Besar",
-            "description": "Setiap baris jurnal yang diposting ke akun dalam satu periode, dengan saldo berjalan."
+            "description": "Setiap baris jurnal yang diposting ke akun dalam satu periode, dengan saldo berjalan.",
+            "column_date": "Tanggal",
+            "column_entry_number": "No. Jurnal",
+            "column_description": "Deskripsi",
+            "column_reference": "Referensi",
+            "column_debit": "Debet",
+            "column_credit": "Kredit",
+            "column_running_balance": "Saldo Berjalan"
         },
         "financial_dashboard": {
             "description": "Pantau metrik keuangan utama, arus kas, dan tren beban."
