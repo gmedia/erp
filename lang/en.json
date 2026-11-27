@@ -1622,7 +1622,18 @@
         "filter_by_asset": "Filter by asset",
         "filter_by_type": "Filter by type",
         "filter_by_status": "Filter by status",
-        "filter_by_supplier": "Filter by supplier"
+        "filter_by_supplier": "Filter by supplier",
+        "gl_account_required": "Account (Required)",
+        "gl_select_account": "Select Account",
+        "gl_fiscal_year": "Fiscal Year",
+        "gl_select_fiscal_year": "Select Fiscal Year",
+        "gl_journal_type": "Journal Type",
+        "gl_select_journal_type": "Select Type",
+        "gl_journal_general": "General",
+        "gl_journal_sales": "Sales",
+        "gl_journal_purchase": "Purchase",
+        "gl_journal_cash_receipt": "Cash Receipt",
+        "gl_journal_cash_disbursement": "Cash Disbursement"
     },
     "form_fields": {
         "asset_depreciation_runs": {

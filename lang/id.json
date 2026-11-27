@@ -1625,7 +1625,18 @@
         "filter_by_asset": "Filter berdasarkan aset",
         "filter_by_type": "Filter berdasarkan jenis",
         "filter_by_status": "Filter berdasarkan status",
-        "filter_by_supplier": "Filter berdasarkan pemasok"
+        "filter_by_supplier": "Filter berdasarkan pemasok",
+        "gl_account_required": "Akun (Wajib)",
+        "gl_select_account": "Pilih Akun",
+        "gl_fiscal_year": "Tahun Fiskal",
+        "gl_select_fiscal_year": "Pilih Tahun Fiskal",
+        "gl_journal_type": "Jenis Jurnal",
+        "gl_select_journal_type": "Pilih Jenis",
+        "gl_journal_general": "Umum",
+        "gl_journal_sales": "Penjualan",
+        "gl_journal_purchase": "Pembelian",
+        "gl_journal_cash_receipt": "Penerimaan Kas",
+        "gl_journal_cash_disbursement": "Pengeluaran Kas"
     },
     "form_fields": {
         "asset_depreciation_runs": {
