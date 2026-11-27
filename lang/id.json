@@ -1559,7 +1559,16 @@
         "select_position": "Pilih jabatan",
         "select_type": "Pilih jenis",
         "select_status": "Pilih status",
-        "select_category_party": "Pilih kategori"
+        "select_category_party": "Pilih kategori",
+        "payment_method_bank_transfer": "Transfer Bank",
+        "payment_method_cash": "Tunai",
+        "payment_method_check": "Cek",
+        "payment_method_giro": "Giro",
+        "payment_method_credit_card": "Kartu Kredit",
+        "payment_method_other": "Lainnya",
+        "select_payment_method": "Pilih metode pembayaran",
+        "select_currency": "Pilih mata uang",
+        "all_suppliers": "Semua pemasok"
     },
     "form_fields": {
         "asset_depreciation_runs": {

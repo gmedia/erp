@@ -1556,7 +1556,16 @@
         "select_position": "Select a position",
         "select_type": "Select type",
         "select_status": "Select status",
-        "select_category_party": "Select Category"
+        "select_category_party": "Select Category",
+        "payment_method_bank_transfer": "Bank Transfer",
+        "payment_method_cash": "Cash",
+        "payment_method_check": "Check",
+        "payment_method_giro": "Giro",
+        "payment_method_credit_card": "Credit Card",
+        "payment_method_other": "Other",
+        "select_payment_method": "Select Payment Method",
+        "select_currency": "Select Currency",
+        "all_suppliers": "All suppliers"
     },
     "form_fields": {
         "asset_depreciation_runs": {

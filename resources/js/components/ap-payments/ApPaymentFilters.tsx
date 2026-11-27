@@ -10,20 +10,53 @@ import {
 } from '@/components/common/filters';
 
 export const apPaymentStatusOptions = [
-    { value: 'draft', label: 'Draft' },
-    { value: 'pending_approval', label: 'Pending Approval' },
-    { value: 'confirmed', label: 'Confirmed' },
-    { value: 'reconciled', label: 'Reconciled' },
-    { value: 'cancelled', label: 'Cancelled' },
-    { value: 'void', label: 'Void' },
+    { value: 'draft', label: { key: 'status.draft', fallback: 'Draft' } },
+    {
+        value: 'pending_approval',
+        label: {
+            key: 'status.pending_approval',
+            fallback: 'Pending Approval',
+        },
+    },
+    {
+        value: 'confirmed',
+        label: { key: 'status.confirmed', fallback: 'Confirmed' },
+    },
+    {
+        value: 'reconciled',
+        label: { key: 'status.reconciled', fallback: 'Reconciled' },
+    },
+    {
+        value: 'cancelled',
+        label: { key: 'status.cancelled', fallback: 'Cancelled' },
+    },
+    { value: 'void', label: { key: 'status.void', fallback: 'Void' } },
 ];
 
 export const apPaymentMethodOptions = [
-    { value: 'bank_transfer', label: 'Bank Transfer' },
-    { value: 'cash', label: 'Cash' },
-    { value: 'check', label: 'Check' },
-    { value: 'giro', label: 'Giro' },
-    { value: 'other', label: 'Other' },
+    {
+        value: 'bank_transfer',
+        label: {
+            key: 'filter.payment_method_bank_transfer',
+            fallback: 'Bank Transfer',
+        },
+    },
+    {
+        value: 'cash',
+        label: { key: 'filter.payment_method_cash', fallback: 'Cash' },
+    },
+    {
+        value: 'check',
+        label: { key: 'filter.payment_method_check', fallback: 'Check' },
+    },
+    {
+        value: 'giro',
+        label: { key: 'filter.payment_method_giro', fallback: 'Giro' },
+    },
+    {
+        value: 'other',
+        label: { key: 'filter.payment_method_other', fallback: 'Other' },
+    },
 ];
 
 export function createApPaymentFilterFields(): FieldDescriptor[] {
@@ -40,20 +73,23 @@ export function createApPaymentFilterFields(): FieldDescriptor[] {
             'supplier_id',
             { key: 'column.supplier', fallback: 'Supplier' },
             '/api/suppliers',
-            'All suppliers',
+            { key: 'filter.all_suppliers', fallback: 'All suppliers' },
         ),
         createAsyncSelectFilterField(
             'branch_id',
             { key: 'column.branch', fallback: 'Branch' },
             '/api/branches',
-            'All branches',
+            { key: 'filter.all_branches', fallback: 'All branches' },
         ),
         ...createSelectFilterFields([
             {
                 name: 'status',
                 label: { key: 'column.status', fallback: 'Status' },
                 options: apPaymentStatusOptions,
-                placeholder: 'Select Status',
+                placeholder: {
+                    key: 'filter.select_status',
+                    fallback: 'Select Status',
+                },
             },
             {
                 name: 'payment_method',
@@ -62,13 +98,19 @@ export function createApPaymentFilterFields(): FieldDescriptor[] {
                     fallback: 'Payment Method',
                 },
                 options: apPaymentMethodOptions,
-                placeholder: 'Select Payment Method',
+                placeholder: {
+                    key: 'filter.select_payment_method',
+                    fallback: 'Select Payment Method',
+                },
             },
             {
                 name: 'currency',
                 label: { key: 'column.currency', fallback: 'Currency' },
                 options: currencyOptions,
-                placeholder: 'Select Currency',
+                placeholder: {
+                    key: 'filter.select_currency',
+                    fallback: 'Select Currency',
+                },
             },
         ]),
         ...createDateFilterFields([
@@ -78,7 +120,10 @@ export function createApPaymentFilterFields(): FieldDescriptor[] {
                     key: 'column.payment_date_from',
                     fallback: 'Payment Date From',
                 },
-                placeholder: 'Payment Date From',
+                placeholder: {
+                    key: 'column.payment_date_from',
+                    fallback: 'Payment Date From',
+                },
             },
             {
                 name: 'payment_date_to',
@@ -86,7 +131,10 @@ export function createApPaymentFilterFields(): FieldDescriptor[] {
                     key: 'column.payment_date_to',
                     fallback: 'Payment Date To',
                 },
-                placeholder: 'Payment Date To',
+                placeholder: {
+                    key: 'column.payment_date_to',
+                    fallback: 'Payment Date To',
+                },
             },
         ]),
     ];

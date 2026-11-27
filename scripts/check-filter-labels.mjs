@@ -17,12 +17,10 @@ const componentsDir = resolve(root, 'resources/js/components');
 
 const pendingFiles = new Set([
     'account-mappings/AccountMappingFilters.tsx',
-    'ap-payments/ApPaymentFilters.tsx',
     'approval-audit-trail/Filters.tsx',
     'approval-delegations/ApprovalDelegationFilters.tsx',
     'approval-flows/ApprovalFlowFilters.tsx',
     'aging-dashboard/AgingFilters.tsx',
-    'ar-receipts/ArReceiptFilters.tsx',
     'asset-maintenances/AssetMaintenanceFilters.tsx',
     'asset-movements/AssetMovementFilters.tsx',
     'asset-stocktakes/AssetStocktakeFilters.tsx',

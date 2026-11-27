@@ -296,13 +296,13 @@ export type SelectFilterConfig = {
     name: string;
     label: TranslatableLabel;
     options: SelectOption[];
-    placeholder: string;
+    placeholder: TranslatableLabel;
 };
 
 export type DateFilterConfig = {
     name: string;
     label: TranslatableLabel;
-    placeholder: string;
+    placeholder: TranslatableLabel;
 };
 
 // Generic filter fields for simple entities
@@ -1134,13 +1134,20 @@ export function createSelectFilterFields(
     );
 }
 
+function TranslatedDatePicker({
+    placeholder,
+}: Readonly<{ placeholder: TranslatableLabel }>) {
+    const translatedPlaceholder = useTranslatableText(placeholder);
+    return <FilterDatePicker placeholder={translatedPlaceholder} />;
+}
+
 export function createDateFilterFields(
     configs: DateFilterConfig[],
 ): FieldDescriptor[] {
     return configs.map(({ name, label, placeholder }) => ({
         name,
         label,
-        component: <FilterDatePicker placeholder={placeholder} />,
+        component: <TranslatedDatePicker placeholder={placeholder} />,
     }));
 }
 
