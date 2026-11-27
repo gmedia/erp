@@ -2,6 +2,7 @@
 
 namespace App\Health\Checks;
 
+use App\Health\SystemHealthMessage;
 use App\Health\SystemHealthThresholds;
 use Spatie\Health\Checks\Check;
 use Spatie\Health\Checks\Result;
@@ -18,6 +19,7 @@ class DiskUsageHealthCheck extends Check
 
         if ($percent === null) {
             return Result::make()
+                ->meta(SystemHealthMessage::meta('system_health.disk.unavailable'))
                 ->shortSummary('Tidak tersedia')
                 ->warning('Pembacaan disk tidak tersedia.');
         }
@@ -26,18 +28,31 @@ class DiskUsageHealthCheck extends Check
         $failed = SystemHealthThresholds::get(SystemHealthThresholds::DISK_FAILED_PERCENT);
 
         $result = Result::make()
-            ->meta(['disk_used_percent' => $percent])
             ->shortSummary($percent . '%');
 
         if ($percent >= $failed) {
-            return $result->failed("Disk hampir penuh ({$percent}% terpakai, batas gagal {$failed}%).");
+            return $result
+                ->meta(['disk_used_percent' => $percent] + SystemHealthMessage::meta('system_health.disk.failed', [
+                    'percent' => $percent,
+                    'failed_at' => $failed,
+                ]))
+                ->failed("Disk hampir penuh ({$percent}% terpakai, batas gagal {$failed}%).");
         }
 
         if ($percent >= $warning) {
-            return $result->warning("Disk terpakai {$percent}% (batas peringatan {$warning}%).");
+            return $result
+                ->meta(['disk_used_percent' => $percent] + SystemHealthMessage::meta('system_health.disk.warning', [
+                    'percent' => $percent,
+                    'warning_at' => $warning,
+                ]))
+                ->warning("Disk terpakai {$percent}% (batas peringatan {$warning}%).");
         }
 
-        return $result->ok("Disk terpakai {$percent}%.");
+        return $result
+            ->meta(['disk_used_percent' => $percent] + SystemHealthMessage::meta('system_health.disk.ok', [
+                'percent' => $percent,
+            ]))
+            ->ok("Disk terpakai {$percent}%.");
     }
 
     private function usedPercent(): ?int

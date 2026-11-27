@@ -12,13 +12,12 @@ uses()->group('system-health');
  *
  * @return array<string, string>
  */
-function systemHealthTranslations(string $file): array
+function systemHealthTranslations(string $file, array $prefixes = ['queue.', 'schedule.']): array
 {
     $decoded = json_decode(File::get(lang_path($file)), true, 512, JSON_THROW_ON_ERROR);
 
     return collect(Arr::dot($decoded['system_health'] ?? []))
-        ->filter(fn ($value, $key) => str_starts_with((string) $key, 'queue.')
-            || str_starts_with((string) $key, 'schedule.'))
+        ->filter(fn ($value, $key) => collect($prefixes)->contains(fn (string $prefix) => str_starts_with((string) $key, $prefix)))
         ->mapWithKeys(fn ($value, $key) => ['system_health.' . $key => $value])
         ->all();
 }
@@ -85,6 +84,19 @@ test('message codes resolve as nested keys the way the frontend t() reads them',
 
             expect(Arr::get($decoded, $path))->toBeString("{$file} missing nested key {$path}");
         }
+    }
+});
+
+test('custom check message codes are registered in both locales and differ between them', function () {
+    $en = systemHealthTranslations('en.json', ['app_version.', 'database.', 'production.', 'migrations.', 'disk.', 'container.', 'storage.', 'redis.']);
+    $id = systemHealthTranslations('id.json', ['app_version.', 'database.', 'production.', 'migrations.', 'disk.', 'container.', 'storage.', 'redis.']);
+
+    expect($en)->not->toBeEmpty();
+    expect(array_diff(array_keys($en), array_keys($id)))->toBe([]);
+    expect(array_diff(array_keys($id), array_keys($en)))->toBe([]);
+
+    foreach (array_keys($en) as $key) {
+        expect($id[$key])->not->toBe($en[$key], "{$key} not translated");
     }
 });
 

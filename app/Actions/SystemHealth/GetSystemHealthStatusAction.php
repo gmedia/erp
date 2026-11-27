@@ -69,13 +69,15 @@ class GetSystemHealthStatusAction
     {
         $meta = (array) $stored->meta;
         $code = $meta['message_code'] ?? null;
-        $params = [];
+        $params = is_array($meta['message_params'] ?? null) ? $meta['message_params'] : [];
 
         if (! is_string($code)) {
             $resolved = SystemHealthMessage::fromPackage((string) $stored->notificationMessage, $meta);
             $code = $resolved['code'];
             $params = $resolved['params'];
         }
+
+        unset($meta['message_code'], $meta['message_params']);
 
         return [
             'name' => $stored->name,

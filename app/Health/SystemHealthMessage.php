@@ -23,10 +23,22 @@ final class SystemHealthMessage
     ];
 
     /**
+     * Kode + parameter yang ditaruh di meta hasil cek custom. Action membacanya sebagai
+     * `message_code` / `message_params` lalu tidak meneruskannya ke meta klien.
+     *
+     * @param  array<string, scalar|null>  $params
+     * @return array{message_code: string, message_params: array<string, scalar|null>}
+     */
+    public static function meta(string $code, array $params = []): array
+    {
+        return ['message_code' => $code, 'message_params' => $params];
+    }
+
+    /**
      * Memetakan pesan paket (teks Inggris) ke kode + parameter. Pesan kosong atau tidak
      * dikenal menghasilkan `code = null`, sehingga klien menampilkan teks yang sudah disanitasi.
      *
-     * @param  array<string, mixed>  $meta
+     * @param  array<array-key, mixed>  $meta
      * @return array{code: string|null, params: array<string, string>}
      */
     public static function fromPackage(string $message, array $meta = []): array

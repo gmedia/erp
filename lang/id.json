@@ -3331,6 +3331,46 @@
         "schedule": {
             "not_run_yet": "Scheduler belum pernah berjalan.",
             "stale": "Scheduler sudah lama tidak berjalan."
+        },
+        "app_version": {
+            "ok": "Versi aplikasi {version}."
+        },
+        "database": {
+            "ok": "Database dapat diakses.",
+            "unreachable": "Database tidak dapat diakses ({exception}).",
+            "connections_high": "Jumlah koneksi database ({connections}) mendekati batas peringatan ({warning_at})."
+        },
+        "production": {
+            "ok": "Konfigurasi environment sesuai.",
+            "debug_enabled": "APP_DEBUG aktif di production. Matikan agar detail error tidak tampil ke pengguna."
+        },
+        "migrations": {
+            "complete": "Semua migrasi sudah dijalankan.",
+            "pending": "Ada {pending} migrasi yang belum dijalankan.",
+            "unreadable": "Status migrasi tidak dapat dibaca ({exception})."
+        },
+        "disk": {
+            "ok": "Disk terpakai {percent}%.",
+            "warning": "Disk terpakai {percent}% (batas peringatan {warning_at}%).",
+            "failed": "Disk hampir penuh ({percent}% terpakai, batas gagal {failed_at}%).",
+            "unavailable": "Pembacaan disk tidak tersedia."
+        },
+        "container": {
+            "unavailable": "Pembacaan memori container tidak tersedia di lingkungan ini.",
+            "memory_ok": "Memori container terpakai {percent}%.",
+            "memory_warning": "Memori container terpakai {percent}% (batas peringatan {warning_at}%).",
+            "memory_failed": "Memori container terpakai {percent}% (batas gagal {failed_at}%)."
+        },
+        "storage": {
+            "ok": "Object storage dapat menulis, membaca, dan menghapus berkas.",
+            "write_failed": "Object storage gagal menulis berkas uji.",
+            "content_mismatch": "Object storage membaca isi berkas uji yang berbeda.",
+            "unreachable": "Object storage tidak dapat diakses ({exception})."
+        },
+        "redis": {
+            "ok": "Valkey/Redis merespons ping.",
+            "unreachable": "Valkey/Redis tidak dapat diakses ({exception}).",
+            "no_ping": "Valkey/Redis tidak merespons ping."
         }
     }
 }

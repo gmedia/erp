@@ -3328,6 +3328,46 @@
         "schedule": {
             "not_run_yet": "The scheduler has not run yet.",
             "stale": "The scheduler has not run recently."
+        },
+        "app_version": {
+            "ok": "Application version {version}."
+        },
+        "database": {
+            "ok": "Database is reachable.",
+            "unreachable": "Database is unreachable ({exception}).",
+            "connections_high": "Database connections ({connections}) are near the warning limit ({warning_at})."
+        },
+        "production": {
+            "ok": "Environment configuration is correct.",
+            "debug_enabled": "APP_DEBUG is enabled in production. Turn it off so error details are not shown to users."
+        },
+        "migrations": {
+            "complete": "All migrations have been run.",
+            "pending": "{pending} migration(s) have not been run.",
+            "unreadable": "Migration status could not be read ({exception})."
+        },
+        "disk": {
+            "ok": "Disk used {percent}%.",
+            "warning": "Disk used {percent}% (warning limit {warning_at}%).",
+            "failed": "Disk is almost full ({percent}% used, failure limit {failed_at}%).",
+            "unavailable": "Disk usage could not be read."
+        },
+        "container": {
+            "unavailable": "Container memory could not be read in this environment.",
+            "memory_ok": "Container memory used {percent}%.",
+            "memory_warning": "Container memory used {percent}% (warning limit {warning_at}%).",
+            "memory_failed": "Container memory used {percent}% (failure limit {failed_at}%)."
+        },
+        "storage": {
+            "ok": "Object storage can write, read, and delete files.",
+            "write_failed": "Object storage failed to write the test file.",
+            "content_mismatch": "Object storage returned different content for the test file.",
+            "unreachable": "Object storage is unreachable ({exception})."
+        },
+        "redis": {
+            "ok": "Valkey/Redis responded to ping.",
+            "unreachable": "Valkey/Redis is unreachable ({exception}).",
+            "no_ping": "Valkey/Redis did not respond to ping."
         }
     }
 }

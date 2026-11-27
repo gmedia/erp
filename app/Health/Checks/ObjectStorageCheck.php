@@ -2,6 +2,7 @@
 
 namespace App\Health\Checks;
 
+use App\Health\SystemHealthMessage;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Spatie\Health\Checks\Check;
@@ -26,11 +27,15 @@ class ObjectStorageCheck extends Check
             $storage = Storage::disk($disk);
 
             if (! $storage->put($path, $payload)) {
-                return Result::make()->failed('Object storage gagal menulis berkas uji.')->meta(['disk' => $disk]);
+                return Result::make()
+                    ->failed('Object storage gagal menulis berkas uji.')
+                    ->meta(['disk' => $disk] + SystemHealthMessage::meta('system_health.storage.write_failed'));
             }
 
             if ($storage->get($path) !== $payload) {
-                return Result::make()->failed('Object storage membaca isi berkas uji yang berbeda.')->meta(['disk' => $disk]);
+                return Result::make()
+                    ->failed('Object storage membaca isi berkas uji yang berbeda.')
+                    ->meta(['disk' => $disk] + SystemHealthMessage::meta('system_health.storage.content_mismatch'));
             }
 
             $storage->delete($path);
@@ -39,12 +44,14 @@ class ObjectStorageCheck extends Check
 
             return Result::make()
                 ->failed('Object storage tidak dapat diakses (' . class_basename($exception) . ').')
-                ->meta(['disk' => $disk]);
+                ->meta(['disk' => $disk] + SystemHealthMessage::meta('system_health.storage.unreachable', [
+                    'exception' => class_basename($exception),
+                ]));
         }
 
         return Result::make()
             ->ok('Object storage dapat menulis, membaca, dan menghapus berkas.')
-            ->meta(['disk' => $disk])
+            ->meta(['disk' => $disk] + SystemHealthMessage::meta('system_health.storage.ok'))
             ->shortSummary('Lulus');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Health\Checks;
 
+use App\Health\SystemHealthMessage;
 use Illuminate\Support\Facades\Redis;
 use Spatie\Health\Checks\Check;
 use Spatie\Health\Checks\Result;
@@ -31,13 +32,18 @@ class RedisHealthCheck extends Check
             report($exception);
 
             return Result::make()
-                ->failed('Valkey/Redis tidak dapat diakses (' . class_basename($exception) . ').');
+                ->failed('Valkey/Redis tidak dapat diakses (' . class_basename($exception) . ').')
+                ->meta(SystemHealthMessage::meta('system_health.redis.unreachable', [
+                    'exception' => class_basename($exception),
+                ]));
         }
 
         $alive = $pong === true || (is_string($pong) && str_contains(strtoupper($pong), 'PONG'));
 
         if (! $alive) {
-            return Result::make()->failed('Valkey/Redis tidak merespons ping.');
+            return Result::make()
+                ->failed('Valkey/Redis tidak merespons ping.')
+                ->meta(SystemHealthMessage::meta('system_health.redis.no_ping'));
         }
 
         $usedMemory = $this->usedMemoryBytes($info);
@@ -45,7 +51,7 @@ class RedisHealthCheck extends Check
         return Result::make()
             ->meta([
                 'used_memory_mb' => $usedMemory === null ? null : round($usedMemory / 1048576, 2),
-            ])
+            ] + SystemHealthMessage::meta('system_health.redis.ok'))
             ->shortSummary($usedMemory === null ? 'Lulus' : round($usedMemory / 1048576, 1) . ' MB')
             ->ok('Valkey/Redis merespons ping.');
     }

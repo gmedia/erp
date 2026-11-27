@@ -2,6 +2,7 @@
 
 namespace App\Health\Checks;
 
+use App\Health\SystemHealthMessage;
 use Spatie\Health\Checks\Check;
 use Spatie\Health\Checks\Result;
 
@@ -16,17 +17,21 @@ class ProductionConfigCheck extends Check
         $environment = (string) app()->environment();
         $debug = (bool) config('app.debug');
 
-        $result = Result::make()
-            ->meta([
-                'environment' => $environment,
-                'debug' => $debug,
-            ])
-            ->shortSummary($environment);
+        $baseMeta = [
+            'environment' => $environment,
+            'debug' => $debug,
+        ];
+
+        $result = Result::make()->shortSummary($environment);
 
         if ($environment === 'production' && $debug) {
-            return $result->failed('APP_DEBUG aktif di production. Matikan agar detail error tidak tampil ke pengguna.');
+            return $result
+                ->meta($baseMeta + SystemHealthMessage::meta('system_health.production.debug_enabled'))
+                ->failed('APP_DEBUG aktif di production. Matikan agar detail error tidak tampil ke pengguna.');
         }
 
-        return $result->ok('Konfigurasi environment sesuai.');
+        return $result
+            ->meta($baseMeta + SystemHealthMessage::meta('system_health.production.ok'))
+            ->ok('Konfigurasi environment sesuai.');
     }
 }
