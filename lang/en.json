@@ -1576,7 +1576,10 @@
         "budget_type_operational": "Operational",
         "budget_type_capital": "Capital",
         "budget_type_project": "Project",
-        "budget_type_revenue": "Revenue"
+        "budget_type_revenue": "Revenue",
+        "receipt_date_from": "Receipt Date From",
+        "receipt_date_to": "Receipt Date To",
+        "select_status_title": "Select Status"
     },
     "form_fields": {
         "asset_depreciation_runs": {

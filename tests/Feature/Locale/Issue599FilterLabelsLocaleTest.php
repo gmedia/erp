@@ -26,7 +26,31 @@ test('issue 599 period closing filter keys are translated in both locales', func
         ->and(issue599LocaleLookup($id, 'filter.period_closing_type_annual'))->toBe('Tahunan');
 });
 
+test('issue 599 goods receipt filter keys are translated in both locales', function () {
+    $en = issue599LocaleJson('en.json');
+    $id = issue599LocaleJson('id.json');
+
+    expect(issue599LocaleLookup($en, 'filter.receipt_date_from'))->toBe('Receipt Date From')
+        ->and(issue599LocaleLookup($id, 'filter.receipt_date_from'))->toBe('Tanggal Penerimaan Dari')
+        ->and(issue599LocaleLookup($en, 'filter.receipt_date_to'))->toBe('Receipt Date To')
+        ->and(issue599LocaleLookup($id, 'filter.receipt_date_to'))->toBe('Tanggal Penerimaan Sampai')
+        ->and(issue599LocaleLookup($en, 'filter.select_status_title'))->toBe('Select Status')
+        ->and(issue599LocaleLookup($id, 'filter.select_status_title'))->toBe('Pilih Status');
+});
+
 test('issue 599 migrated filter files no longer hardcode english labels', function () {
+    $goods = File::get(resource_path('js/components/goods-receipts/GoodsReceiptFilters.tsx'));
+    $stocktake = File::get(resource_path('js/components/inventory-stocktakes/InventoryStocktakeFilters.tsx'));
+
+    // Teks en tetap ada sebagai fallback { key, fallback }; yang dilarang literal polos (argumen/label).
+    expect($goods)->not->toContain("label: 'Receipt Date From'")
+        ->and($goods)->not->toContain("placeholder: 'Receipt Date From'")
+        ->and($goods)->not->toMatch("/^\\s*'Select a warehouse',\\s*$/m")
+        ->and($goods)->not->toMatch("/^\\s*'Select Status',\\s*$/m")
+        ->and($stocktake)->not->toContain("createTextFilterField('search', 'Search'");
+});
+
+test('issue 599 migrated budget and period closing filter files no longer hardcode english labels', function () {
     $budget = File::get(resource_path('js/components/budgets/BudgetFilters.tsx'));
     $period = File::get(resource_path('js/components/period-closings/PeriodClosingFilters.tsx'));
 

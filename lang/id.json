@@ -1579,7 +1579,10 @@
         "budget_type_operational": "Operasional",
         "budget_type_capital": "Modal",
         "budget_type_project": "Proyek",
-        "budget_type_revenue": "Pendapatan"
+        "budget_type_revenue": "Pendapatan",
+        "receipt_date_from": "Tanggal Penerimaan Dari",
+        "receipt_date_to": "Tanggal Penerimaan Sampai",
+        "select_status_title": "Pilih Status"
     },
     "form_fields": {
         "asset_depreciation_runs": {
