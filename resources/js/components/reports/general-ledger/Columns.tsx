@@ -20,36 +20,41 @@ export interface GeneralLedgerItem {
 
 type GLItemWithCurrency = GeneralLedgerItem & { currency?: string | null };
 
+const glLabel = (column: string, fallback: string) => ({
+    key: `page.general_ledger.column_${column}`,
+    fallback,
+});
+
 export const generalLedgerColumns: ColumnDef<GeneralLedgerItem>[] = [
     {
         accessorKey: 'entry_date',
-        ...createSortingHeader('Date'),
+        ...createSortingHeader(glLabel('date', 'Date')),
         cell: ({ row }) =>
             formatDateByRegionalSettings(row.getValue('entry_date') as string),
     },
     createTextColumn<GeneralLedgerItem>({
         accessorKey: 'entry_number',
-        label: 'Entry Number',
+        label: glLabel('entry_number', 'Entry Number'),
         enableSorting: true,
     }),
     createTextColumn<GeneralLedgerItem>({
         accessorKey: 'description',
-        label: 'Description',
+        label: glLabel('description', 'Description'),
     }),
     createTextColumn<GeneralLedgerItem>({
         accessorKey: 'reference',
-        label: 'Reference',
+        label: glLabel('reference', 'Reference'),
     }),
     createRowCurrencyAmountColumn<GLItemWithCurrency>({
         accessorKey: 'debit',
-        label: 'Debit',
+        label: glLabel('debit', 'Debit'),
     }),
     createRowCurrencyAmountColumn<GLItemWithCurrency>({
         accessorKey: 'credit',
-        label: 'Credit',
+        label: glLabel('credit', 'Credit'),
     }),
     createRowCurrencyAmountColumn<GLItemWithCurrency>({
         accessorKey: 'running_balance',
-        label: 'Running Balance',
+        label: glLabel('running_balance', 'Running Balance'),
     }),
 ];
