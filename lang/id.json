@@ -3037,6 +3037,8 @@
         "new_notification": "Notifikasi baru"
     },
     "vehicle_loan_page": {
+        "date_placeholder": "Pilih tanggal",
+        "time_invalid": "Gunakan format 24 jam HH:mm.",
         "status": {
             "draft": "Draf",
             "pending": "Menunggu",

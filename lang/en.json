@@ -3034,6 +3034,8 @@
         "new_notification": "New notification"
     },
     "vehicle_loan_page": {
+        "date_placeholder": "Pick a date",
+        "time_invalid": "Use 24-hour format HH:mm.",
         "status": {
             "draft": "Draft",
             "pending": "Pending",
