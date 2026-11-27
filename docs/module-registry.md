@@ -827,7 +827,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   route: /reports/ap-aging
   api: /api/reports/ap-aging
   view_type: page
-  note: "Non-CRUD laporan aging hutang (AP Aging). Menampilkan summary per supplier dengan bucket umur hutang (Current, 1-30, 31-60, 61-90, >90 hari)."
+  note: "Non-CRUD laporan aging utang (AP Aging). Menampilkan summary per supplier dengan bucket umur utang (Current, 1-30, 31-60, 61-90, >90 hari)."
   tests:
     - tests/e2e/ap-aging-report/ap-aging-report.spec.ts
 
@@ -835,7 +835,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   route: /reports/ap-outstanding
   api: /api/reports/ap-outstanding
   view_type: page
-  note: "Non-CRUD laporan outstanding hutang (AP Outstanding). Menampilkan daftar bill yang belum lunas per supplier dengan jumlah outstanding."
+  note: "Non-CRUD laporan outstanding utang (AP Outstanding). Menampilkan daftar bill yang belum lunas per supplier dengan jumlah outstanding."
   tests:
     - tests/e2e/ap-outstanding-report/ap-outstanding-report.spec.ts
 
@@ -843,7 +843,7 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   route: /reports/ap-payment-history
   api: /api/reports/ap-payment-history
   view_type: page
-  note: "Non-CRUD laporan riwayat pembayaran hutang (AP Payment History). Menampilkan daftar pembayaran yang telah dilakukan per supplier."
+  note: "Non-CRUD laporan riwayat pembayaran utang (AP Payment History). Menampilkan daftar pembayaran yang telah dilakukan per supplier."
   tests:
     - tests/e2e/ap-payment-history-report/ap-payment-history-report.spec.ts
 

@@ -513,12 +513,12 @@ Saat siap diintegrasikan dengan modul akuntansi, berikut posting jurnal yang umu
 | Akun | Debit | Kredit |
 | :--- | :--- | :--- |
 | Inventory / Stock (Persediaan) | ✓ | |
-| Accounts Payable (Hutang Dagang) | | ✓ |
+| Accounts Payable (Utang Dagang) | | ✓ |
 
 ### Saat Supplier Return Confirmed
 | Akun | Debit | Kredit |
 | :--- | :--- | :--- |
-| Accounts Payable (Hutang Dagang) | ✓ | |
+| Accounts Payable (Utang Dagang) | ✓ | |
 | Inventory / Stock (Persediaan) | | ✓ |
 
 > [!TIP]

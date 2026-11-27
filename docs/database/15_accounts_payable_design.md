@@ -1,15 +1,15 @@
 <!-- implementation-status: implemented -->
-# Desain Database: Accounts Payable (Hutang Usaha)
+# Desain Database: Accounts Payable (Utang Usaha)
 
-Dokumen ini menjelaskan struktur database untuk modul Accounts Payable (AP) dalam sistem ERP. Fokus utama: pencatatan tagihan vendor (supplier bills), penjadwalan pembayaran, pelunasan hutang, dan integrasi dengan jurnal akuntansi.
+Dokumen ini menjelaskan struktur database untuk modul Accounts Payable (AP) dalam sistem ERP. Fokus utama: pencatatan tagihan vendor (supplier bills), penjadwalan pembayaran, pelunasan utang, dan integrasi dengan jurnal akuntansi.
 
 ## 1. Gambaran Umum
 
 ### Filosofi Desain
 
-Modul AP mengelola **siklus hutang lengkap** — dari penerimaan tagihan vendor hingga pelunasan. Setiap tagihan (bill) terikat ke supplier dan secara opsional ke Purchase Order / Goods Receipt sebagai bukti transaksi. Pembayaran dicatat secara terpisah agar mendukung pembayaran parsial, multi-bill payment, dan rekonsiliasi bank.
+Modul AP mengelola **siklus utang lengkap** — dari penerimaan tagihan vendor hingga pelunasan. Setiap tagihan (bill) terikat ke supplier dan secara opsional ke Purchase Order / Goods Receipt sebagai bukti transaksi. Pembayaran dicatat secara terpisah agar mendukung pembayaran parsial, multi-bill payment, dan rekonsiliasi bank.
 
-### Alur Proses Hutang
+### Alur Proses Utang
 
 ```
 Goods Receipt (GR)  →  Supplier Bill  →  Payment Allocation  →  Bank Payment
@@ -28,7 +28,7 @@ Goods Receipt (GR)  →  Supplier Bill  →  Payment Allocation  →  Bank Payme
 | **General Ledger** | `17_general_ledger_design.md` | Rekonsiliasi bank memvalidasi pembayaran |
 
 ### Komponen Utama
-*   **Supplier Bill (Tagihan Vendor)**: Dokumen tagihan dari supplier yang menciptakan kewajiban bayar (hutang).
+*   **Supplier Bill (Tagihan Vendor)**: Dokumen tagihan dari supplier yang menciptakan kewajiban bayar (utang).
 *   **Bill Items**: Rincian item tagihan (dari GR atau manual input).
 *   **AP Payments (Pembayaran)**: Dokumen pembayaran untuk melunasi satu atau lebih tagihan.
 *   **Payment Allocations**: Alokasi pembayaran ke tagihan-tagihan tertentu (mendukung partial payment & multi-bill payment).
@@ -46,7 +46,7 @@ Goods Receipt (GR)  →  Supplier Bill  →  Payment Allocation  →  Bank Payme
 3.  **Partial Payment**: Satu bill bisa dibayar bertahap melalui beberapa payment.
 4.  **Multi-Bill Payment**: Satu payment bisa melunasi beberapa bill sekaligus.
 5.  **Auto Journal Posting**: Setiap bill confirmed dan payment confirmed secara otomatis membuat jurnal.
-6.  **Aging Ready**: Status dan tanggal jatuh tempo mendukung laporan aging hutang.
+6.  **Aging Ready**: Status dan tanggal jatuh tempo mendukung laporan aging utang.
 7.  **No Hard Delete**: Dokumen AP **tidak boleh di-delete**. Gunakan status `cancelled` / `void`.
 
 ---
@@ -165,7 +165,7 @@ Rincian item pada tagihan.
 
 ---
 
-### B. Pembayaran Hutang (AP Payments)
+### B. Pembayaran Utang (AP Payments)
 
 #### 3. `ap_payments`
 Header dokumen pembayaran ke supplier.
@@ -303,18 +303,18 @@ stateDiagram-v2
 | Akun | Debit | Kredit |
 | :--- | :--- | :--- |
 | Persediaan / Beban (per item `account_id`) | ✓ | |
-| Accounts Payable (Hutang Dagang) | | ✓ |
+| Accounts Payable (Utang Dagang) | | ✓ |
 
 #### Saat AP Payment Confirmed
 | Akun | Debit | Kredit |
 | :--- | :--- | :--- |
-| Accounts Payable (Hutang Dagang) | ✓ | |
+| Accounts Payable (Utang Dagang) | ✓ | |
 | Kas / Bank (`bank_account_id`) | | ✓ |
 
 #### Saat Supplier Bill Void
 | Akun | Debit | Kredit |
 | :--- | :--- | :--- |
-| Accounts Payable (Hutang Dagang) | ✓ | |
+| Accounts Payable (Utang Dagang) | ✓ | |
 | Persediaan / Beban (reverse per item) | | ✓ |
 
 ### Overdue Detection (Scheduler)
@@ -338,7 +338,7 @@ Format penomoran mengikuti konvensi existing (`document_sequences`):
 
 ## 5. Rekomendasi Menu & Tabel Terlibat
 
-### A. Operasional Hutang
+### A. Operasional Utang
 
 #### 1) Supplier Bills
 Tujuan: mencatat dan mengelola tagihan dari supplier.
@@ -393,7 +393,7 @@ Fitur khusus:
 ### B. Monitoring & Laporan
 
 #### 3) AP Aging Report
-Tujuan: laporan umur hutang per supplier (current, 30, 60, 90, >90 hari).
+Tujuan: laporan umur utang per supplier (current, 30, 60, 90, >90 hari).
 
 Jenis menu: Non-CRUD
 Agent skill: `feature-non-crud`
@@ -496,4 +496,4 @@ Tambahkan prefix baru:
 Tidak ada perubahan struktural. Bill mereferensi PO/GR via FK opsional.
 
 ### Tabel `accounts`
-Sub-type `current_liability` digunakan untuk akun AP default. Pastikan ada akun "Hutang Dagang / Accounts Payable" di seed data COA.
+Sub-type `current_liability` digunakan untuk akun AP default. Pastikan ada akun "Utang Dagang / Accounts Payable" di seed data COA.

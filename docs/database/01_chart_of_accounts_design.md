@@ -142,7 +142,7 @@ Mengelompokkan akun ke dalam kategori utama laporan keuangan (Neraca atau Laba R
 | Nilai | Penjelasan | Contoh |
 | :--- | :--- | :--- |
 | **`asset`** | Harta perusahaan. | Kas Besar, Bank BCA, Gedung Kantor. |
-| **`liability`** | Kewajiban / hutang. | Hutang Dagang, Hutang Bank. |
+| **`liability`** | Kewajiban / utang. | Utang Dagang, Utang Bank. |
 | **`equity`** | Modal / ekuitas pemilik. | Modal Disetor, Laba Ditahan. |
 | **`revenue`** | Pendapatan. | Penjualan Barang, Jasa Konsultasi. |
 | **`expense`** | Beban / biaya. | Gaji Karyawan, Beban Listrik. |
@@ -154,8 +154,8 @@ Klasifikasi spesifik dari `type` untuk penyajian laporan yang lebih terstruktur.
 | :--- | :--- | :--- |
 | `asset` | `current_asset` | Aset lancar (Kas, Bank, Piutang). |
 | `asset` | `fixed_asset` | Aset tetap (Gedung, Kendaraan). |
-| `liability` | `current_liability` | Hutang jangka pendek. |
-| `liability` | `long_term_liability` | Hutang jangka panjang. |
+| `liability` | `current_liability` | Utang jangka pendek. |
+| `liability` | `long_term_liability` | Utang jangka panjang. |
 | `expense` | `operating_expense` | Beban operasional. |
 | `expense` | `non_operating_expense` | Beban di luar operasional. |
 
@@ -165,7 +165,7 @@ Menentukan posisi normal saldo akun agar bernilai positif.
 | Nilai | Penjelasan | Contoh Akun |
 | :--- | :--- | :--- |
 | **`debit`** | Saldo bertambah di Debit. Digunakan untuk Asset & Expense. | Kas (Asset), Beban Gaji (Expense). |
-| **`credit`** | Saldo bertambah di Kredit. Digunakan untuk Liability, Equity & Revenue. | Hutang (Liability), Penjualan (Revenue). |
+| **`credit`** | Saldo bertambah di Kredit. Digunakan untuk Liability, Equity & Revenue. | Utang (Liability), Penjualan (Revenue). |
 
 ###### `level`
 Menunjukkan kedalaman hierarki akun dalam struktur pohon (tree) untuk indentasi laporan.
@@ -192,10 +192,10 @@ Menandai akun yang menjadi komponen Laporan Arus Kas (Operating, Investing, Fina
 
 ##### Contoh Data Baris
 
-| Column | Akun: Kas Bank BCA | Akun: Hutang Usaha | Akun: Penjualan Jasa |
+| Column | Akun: Kas Bank BCA | Akun: Utang Usaha | Akun: Penjualan Jasa |
 | :--- | :--- | :--- | :--- |
 | **code** | `1110-001` | `2100-001` | `4100-001` |
-| **name** | Bank BCA IDR | Hutang Supplier Lokal | Jasa Konsultasi IT |
+| **name** | Bank BCA IDR | Utang Supplier Lokal | Jasa Konsultasi IT |
 | **type** | `asset` | `liability` | `revenue` |
 | **sub_type** | `current_asset` | `current_liability` | `operating_revenue` |
 | **normal_balance** | `debit` | `credit` | `credit` |
