@@ -380,6 +380,7 @@
     "concurrency.conflict": "Data sedang diproses oleh pengguna lain. Muat ulang halaman lalu coba lagi.",
     "journal_entry.fiscal_year_closed": "Tahun fiskal untuk tanggal ini sudah ditutup atau dikunci. Buka kembali atau gunakan periode yang terbuka.",
     "journal_entry.line_one_side_only": "Setiap baris hanya boleh berisi nilai di debit atau kredit, tidak keduanya.",
+    "journal_entry.department_requires_revenue_or_expense": "Departemen hanya dapat diisi pada akun pendapatan atau beban.",
     "journal_entry.line_amount_required": "Setiap baris harus memiliki nilai debit atau kredit yang lebih besar dari 0.",
     "journal_entry.lines_not_balanced": "Total debit dan total kredit harus sama.",
     "accounting_posting.line_account_outside_coa": "Akun baris jurnal :code bukan bagian dari versi COA yang dipakai untuk :date.",

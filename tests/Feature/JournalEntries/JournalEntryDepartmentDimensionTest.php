@@ -67,7 +67,7 @@ describe('Department dimension (#114 fase 1)', function () {
 
     test('store saves department per line and keeps lines without department null', function () {
         $department = Department::factory()->create();
-        $account1 = Account::factory()->create();
+        $account1 = Account::factory()->create(['type' => 'expense']);
         $account2 = Account::factory()->create();
 
         $response = postJson('/api/journal-entries', [
@@ -132,7 +132,7 @@ describe('Department dimension (#114 fase 1)', function () {
     test('update replaces the department of each line', function () {
         $oldDepartment = Department::factory()->create();
         $newDepartment = Department::factory()->create();
-        $account1 = Account::factory()->create();
+        $account1 = Account::factory()->create(['type' => 'expense']);
         $account2 = Account::factory()->create();
 
         $entry = JournalEntry::factory()->create([
@@ -180,7 +180,7 @@ describe('Department dimension (#114 fase 1)', function () {
 
     test('show returns department id and name per line', function () {
         $department = Department::factory()->create(['name' => 'Keuangan']);
-        $account = Account::factory()->create();
+        $account = Account::factory()->create(['type' => 'expense']);
 
         $entry = JournalEntry::factory()->create(['status' => 'draft']);
         $entry->lines()->create([
