@@ -37,7 +37,7 @@ class GetSystemHealthStatusAction
             ->map(function (HealthCheckResultHistoryItem $item): array {
                 $resolved = SystemHealthMessage::fromPackage(
                     (string) $item->notification_message,
-                    is_array($item->meta) ? $item->meta : [],
+                    $item->meta,
                 );
 
                 return [

@@ -75,6 +75,7 @@ class SystemHealthNotifier
             return null;
         }
 
+        /** @var array<string, mixed> $meta */
         $meta = (array) $result->meta;
         $code = $meta['message_code'] ?? null;
         $params = is_array($meta['message_params'] ?? null) ? $meta['message_params'] : [];
