@@ -31,9 +31,8 @@
       "Bash(curl -s https://sonarcloud.io/api/:*)"
     ],
     "deny": [
-      "Read(./.env)",
-      "Read(./.env.local)",
       "Read(./.env.production)",
+      "Read(./.env.staging)",
       "Read(./.env.testing)"
     ]
   }

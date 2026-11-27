@@ -3364,8 +3364,10 @@
         "storage": {
             "ok": "Object storage dapat menulis, membaca, dan menghapus berkas.",
             "write_failed": "Object storage gagal menulis berkas uji.",
+            "write_failed_hint": "Object storage gagal menulis berkas uji. Penyebab umum: AWS_SECRET_ACCESS_KEY kosong di .env atau bucket belum dibuat (bash scripts/minio-bucket.sh).",
             "content_mismatch": "Object storage membaca isi berkas uji yang berbeda.",
-            "unreachable": "Object storage tidak dapat diakses ({exception})."
+            "unreachable": "Object storage tidak dapat diakses ({exception}).",
+            "unreachable_hint": "Object storage tidak dapat diakses ({exception}). Penyebab umum: AWS_SECRET_ACCESS_KEY kosong di .env atau bucket belum dibuat (bash scripts/minio-bucket.sh)."
         },
         "redis": {
             "ok": "Valkey/Redis merespons ping.",

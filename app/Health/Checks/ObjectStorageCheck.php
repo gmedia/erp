@@ -17,6 +17,9 @@ class ObjectStorageCheck extends Check
 {
     private const PROBE_DIRECTORY = 'health-probes';
 
+    private const HINT = 'Penyebab umum: AWS_SECRET_ACCESS_KEY kosong di .env '
+        . 'atau bucket belum dibuat (bash scripts/minio-bucket.sh).';
+
     public function run(): Result
     {
         $disk = (string) config('filesystems.default');
@@ -28,8 +31,8 @@ class ObjectStorageCheck extends Check
 
             if (! $storage->put($path, $payload)) {
                 return Result::make()
-                    ->failed('Object storage gagal menulis berkas uji.')
-                    ->meta(['disk' => $disk] + SystemHealthMessage::meta('system_health.storage.write_failed'));
+                    ->failed('Object storage gagal menulis berkas uji. ' . self::HINT)
+                    ->meta(['disk' => $disk] + SystemHealthMessage::meta('system_health.storage.write_failed_hint'));
             }
 
             if ($storage->get($path) !== $payload) {
@@ -43,8 +46,8 @@ class ObjectStorageCheck extends Check
             report($exception);
 
             return Result::make()
-                ->failed('Object storage tidak dapat diakses (' . class_basename($exception) . ').')
-                ->meta(['disk' => $disk] + SystemHealthMessage::meta('system_health.storage.unreachable', [
+                ->failed('Object storage tidak dapat diakses (' . class_basename($exception) . '). ' . self::HINT)
+                ->meta(['disk' => $disk] + SystemHealthMessage::meta('system_health.storage.unreachable_hint', [
                     'exception' => class_basename($exception),
                 ]));
         }
