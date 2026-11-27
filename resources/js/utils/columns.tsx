@@ -148,7 +148,7 @@ export function createSortingHeader(
                         className={cn(
                             isRight
                                 ? 'shrink-0 text-right whitespace-nowrap'
-                                : 'line-clamp-2 max-w-full min-w-0 text-left whitespace-normal',
+                                : 'block max-w-full min-w-0 truncate text-left',
                         )}
                     >
                         <LabelText label={label} />
