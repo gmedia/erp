@@ -3,6 +3,11 @@ import { login } from '../helpers';
 
 const LOCALE_KEY = 'app_locale';
 
+const APPLY_FILTERS_LABEL = {
+    en: 'Apply Filters',
+    id: 'Terapkan filter',
+} as const;
+
 test.describe('i18n shell (locale id)', () => {
     test('purchase orders shell shows breadcrumb, toolbar and pagination in Indonesian', async ({
         page,
@@ -262,7 +267,9 @@ test.describe('i18n filter inputs (locale id)', () => {
                 r.url().includes('/stock-monitor') &&
                 r.url().includes('low_stock_threshold=1000'),
         );
-        await page.getByRole('button', { name: 'Apply Filters' }).click();
+        await page
+            .getByRole('button', { name: APPLY_FILTERS_LABEL.id })
+            .click();
         await filterRequest;
     });
 });
