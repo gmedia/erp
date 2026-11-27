@@ -2,10 +2,13 @@
 
 import {
     createAsyncSelectFilterField,
+    createColumnDateFilterConfig,
+    createCurrencyFilterConfig,
     createDateFilterFields,
+    createPaymentMethodFilterConfig,
     createSelectFilterFields,
+    createStatusFilterConfig,
     createTextFilterField,
-    currencyOptions,
     type FieldDescriptor,
 } from '@/components/common/filters';
 
@@ -82,60 +85,16 @@ export function createApPaymentFilterFields(): FieldDescriptor[] {
             { key: 'filter.all_branches', fallback: 'All branches' },
         ),
         ...createSelectFilterFields([
-            {
-                name: 'status',
-                label: { key: 'column.status', fallback: 'Status' },
-                options: apPaymentStatusOptions,
-                placeholder: {
-                    key: 'filter.select_status',
-                    fallback: 'Select Status',
-                },
-            },
-            {
-                name: 'payment_method',
-                label: {
-                    key: 'column.payment_method',
-                    fallback: 'Payment Method',
-                },
-                options: apPaymentMethodOptions,
-                placeholder: {
-                    key: 'filter.select_payment_method',
-                    fallback: 'Select Payment Method',
-                },
-            },
-            {
-                name: 'currency',
-                label: { key: 'column.currency', fallback: 'Currency' },
-                options: currencyOptions,
-                placeholder: {
-                    key: 'filter.select_currency',
-                    fallback: 'Select Currency',
-                },
-            },
+            createStatusFilterConfig(apPaymentStatusOptions),
+            createPaymentMethodFilterConfig(apPaymentMethodOptions),
+            createCurrencyFilterConfig(),
         ]),
         ...createDateFilterFields([
-            {
-                name: 'payment_date_from',
-                label: {
-                    key: 'column.payment_date_from',
-                    fallback: 'Payment Date From',
-                },
-                placeholder: {
-                    key: 'column.payment_date_from',
-                    fallback: 'Payment Date From',
-                },
-            },
-            {
-                name: 'payment_date_to',
-                label: {
-                    key: 'column.payment_date_to',
-                    fallback: 'Payment Date To',
-                },
-                placeholder: {
-                    key: 'column.payment_date_to',
-                    fallback: 'Payment Date To',
-                },
-            },
+            createColumnDateFilterConfig(
+                'payment_date_from',
+                'Payment Date From',
+            ),
+            createColumnDateFilterConfig('payment_date_to', 'Payment Date To'),
         ]),
     ];
 }

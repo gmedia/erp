@@ -4,64 +4,29 @@ import {
     createCustomerFinancialFilterFields,
     createDateFilterFields,
     createSelectFilterFields,
+    translatedOptions,
     type FieldDescriptor,
 } from '@/components/common/filters';
 
 export function createCreditNoteFilterFields(): FieldDescriptor[] {
-    const creditNoteStatusOptions = [
-        { value: 'draft', label: { key: 'status.draft', fallback: 'Draft' } },
-        {
-            value: 'confirmed',
-            label: { key: 'status.confirmed', fallback: 'Confirmed' },
-        },
-        {
-            value: 'applied',
-            label: { key: 'status.applied', fallback: 'Applied' },
-        },
-        {
-            value: 'cancelled',
-            label: { key: 'status.cancelled', fallback: 'Cancelled' },
-        },
-        { value: 'void', label: { key: 'status.void', fallback: 'Void' } },
-    ];
+    const creditNoteStatusOptions = translatedOptions('status.', [
+        ['draft', 'Draft'],
+        ['confirmed', 'Confirmed'],
+        ['applied', 'Applied'],
+        ['cancelled', 'Cancelled'],
+        ['void', 'Void'],
+    ]);
 
-    const creditNoteReasonOptions = [
-        {
-            value: 'return',
-            label: {
-                key: 'form_fields.credit_notes.reason_return',
-                fallback: 'Return',
-            },
-        },
-        {
-            value: 'discount',
-            label: {
-                key: 'form_fields.credit_notes.reason_discount',
-                fallback: 'Discount',
-            },
-        },
-        {
-            value: 'correction',
-            label: {
-                key: 'form_fields.credit_notes.reason_correction',
-                fallback: 'Correction',
-            },
-        },
-        {
-            value: 'bad_debt',
-            label: {
-                key: 'form_fields.credit_notes.reason_bad_debt',
-                fallback: 'Bad Debt',
-            },
-        },
-        {
-            value: 'other',
-            label: {
-                key: 'form_fields.credit_notes.reason_other',
-                fallback: 'Other',
-            },
-        },
-    ];
+    const creditNoteReasonOptions = translatedOptions(
+        'form_fields.credit_notes.reason_',
+        [
+            ['return', 'Return'],
+            ['discount', 'Discount'],
+            ['correction', 'Correction'],
+            ['bad_debt', 'Bad Debt'],
+            ['other', 'Other'],
+        ],
+    );
 
     return [
         ...createCustomerFinancialFilterFields({

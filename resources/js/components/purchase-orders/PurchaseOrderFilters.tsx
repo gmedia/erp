@@ -1,11 +1,13 @@
 'use client';
 
 import {
+    createColumnDateFilterConfig,
+    createCurrencyFilterConfig,
     createDateFilterFields,
     createSelectFilterFields,
+    createStatusFilterConfig,
     createSupplierWarehouseFilterFields,
     createTextFilterField,
-    currencyOptions,
     purchaseOrderStatusOptions,
     type FieldDescriptor,
 } from '@/components/common/filters';
@@ -23,48 +25,12 @@ export function createPurchaseOrderFilterFields(): FieldDescriptor[] {
         ),
         ...createSupplierWarehouseFilterFields(),
         ...createSelectFilterFields([
-            {
-                name: 'status',
-                label: { key: 'column.status', fallback: 'Status' },
-                options: purchaseOrderStatusOptions,
-                placeholder: {
-                    key: 'filter.select_status',
-                    fallback: 'Select Status',
-                },
-            },
-            {
-                name: 'currency',
-                label: { key: 'column.currency', fallback: 'Currency' },
-                options: currencyOptions,
-                placeholder: {
-                    key: 'filter.select_currency',
-                    fallback: 'Select Currency',
-                },
-            },
+            createStatusFilterConfig(purchaseOrderStatusOptions),
+            createCurrencyFilterConfig(),
         ]),
         ...createDateFilterFields([
-            {
-                name: 'order_date_from',
-                label: {
-                    key: 'column.order_date_from',
-                    fallback: 'Order Date From',
-                },
-                placeholder: {
-                    key: 'column.order_date_from',
-                    fallback: 'Order Date From',
-                },
-            },
-            {
-                name: 'order_date_to',
-                label: {
-                    key: 'column.order_date_to',
-                    fallback: 'Order Date To',
-                },
-                placeholder: {
-                    key: 'column.order_date_to',
-                    fallback: 'Order Date To',
-                },
-            },
+            createColumnDateFilterConfig('order_date_from', 'Order Date From'),
+            createColumnDateFilterConfig('order_date_to', 'Order Date To'),
         ]),
     ];
 }

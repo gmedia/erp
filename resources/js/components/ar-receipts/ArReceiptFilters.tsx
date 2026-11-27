@@ -1,10 +1,13 @@
 'use client';
 
 import {
+    createColumnDateFilterConfig,
+    createCurrencyFilterConfig,
     createCustomerFinancialFilterFields,
     createDateFilterFields,
+    createPaymentMethodFilterConfig,
     createSelectFilterFields,
-    currencyOptions,
+    createStatusFilterConfig,
     type FieldDescriptor,
 } from '@/components/common/filters';
 
@@ -65,60 +68,16 @@ export function createArReceiptFilterFields(): FieldDescriptor[] {
             fallback: 'Search receipt number, customer, or reference...',
         }),
         ...createSelectFilterFields([
-            {
-                name: 'status',
-                label: { key: 'column.status', fallback: 'Status' },
-                options: arReceiptStatusOptions,
-                placeholder: {
-                    key: 'filter.select_status',
-                    fallback: 'Select Status',
-                },
-            },
-            {
-                name: 'payment_method',
-                label: {
-                    key: 'column.payment_method',
-                    fallback: 'Payment Method',
-                },
-                options: arReceiptPaymentMethodOptions,
-                placeholder: {
-                    key: 'filter.select_payment_method',
-                    fallback: 'Select Payment Method',
-                },
-            },
-            {
-                name: 'currency',
-                label: { key: 'column.currency', fallback: 'Currency' },
-                options: currencyOptions,
-                placeholder: {
-                    key: 'filter.select_currency',
-                    fallback: 'Select Currency',
-                },
-            },
+            createStatusFilterConfig(arReceiptStatusOptions),
+            createPaymentMethodFilterConfig(arReceiptPaymentMethodOptions),
+            createCurrencyFilterConfig(),
         ]),
         ...createDateFilterFields([
-            {
-                name: 'receipt_date_from',
-                label: {
-                    key: 'column.receipt_date_from',
-                    fallback: 'Receipt Date From',
-                },
-                placeholder: {
-                    key: 'column.receipt_date_from',
-                    fallback: 'Receipt Date From',
-                },
-            },
-            {
-                name: 'receipt_date_to',
-                label: {
-                    key: 'column.receipt_date_to',
-                    fallback: 'Receipt Date To',
-                },
-                placeholder: {
-                    key: 'column.receipt_date_to',
-                    fallback: 'Receipt Date To',
-                },
-            },
+            createColumnDateFilterConfig(
+                'receipt_date_from',
+                'Receipt Date From',
+            ),
+            createColumnDateFilterConfig('receipt_date_to', 'Receipt Date To'),
         ]),
     ];
 }

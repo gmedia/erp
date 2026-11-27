@@ -34,7 +34,7 @@ type OptionEntry = readonly [value: string, fallback: string, key?: string];
 
 // Builds translatable select options. The translation key is `${keyPrefix}${value}`
 // unless the entry supplies an explicit key as its third element.
-function translatedOptions(
+export function translatedOptions(
     keyPrefix: string,
     entries: ReadonlyArray<OptionEntry>,
 ): SelectOption[] {
@@ -76,6 +76,12 @@ export const purchaseRequestStatusOptions = translatedOptions('status.', [
     ['partially_ordered', 'Partially Ordered'],
     ['fully_ordered', 'Fully Ordered'],
     ['cancelled', 'Cancelled'],
+]);
+
+export const apBillStatusOptions = translatedOptions('status.', [
+    ['confirmed', 'Confirmed'],
+    ['partially_paid', 'Partially Paid'],
+    ['overdue', 'Overdue'],
 ]);
 
 export const purchaseOrderStatusCategoryOptions = translatedOptions('status.', [
@@ -425,6 +431,32 @@ export function createAsyncSelectFilterFields(
     return configs.map(({ name, label, url, placeholder }) =>
         createAsyncSelectFilterField(name, label, url, placeholder),
     );
+}
+
+export type AsyncLookupFilterTuple = readonly [
+    name: string,
+    entity: string,
+    url: string,
+];
+
+// Builds async select filters whose label/placeholder follow the shared
+// `column.<entity>` / `filter.select_<entity>` convention.
+export function createAsyncLookupFilterFields(
+    entries: ReadonlyArray<AsyncLookupFilterTuple>,
+): FieldDescriptor[] {
+    return entries.map(([name, entity, url]) => {
+        const labelFallback = entity.charAt(0).toUpperCase() + entity.slice(1);
+        const article = /^[aeiou]/i.test(entity) ? 'an' : 'a';
+        return createAsyncSelectFilterField(
+            name,
+            { key: `column.${entity}`, fallback: labelFallback },
+            url,
+            {
+                key: `filter.select_${entity}`,
+                fallback: `Select ${article} ${entity}`,
+            },
+        );
+    });
 }
 
 export function createBranchFilterField(
@@ -1323,6 +1355,107 @@ export function createSelectFilterFields(
     return configs.map(({ name, label, options, placeholder }) =>
         createSelectFilterField(name, label, options, placeholder),
     );
+}
+
+export function createColumnSelectConfig(
+    name: string,
+    labelFallback: string,
+    options: SelectOption[],
+    placeholderKey = `filter.select_${name}`,
+    placeholderFallback = `Select ${labelFallback}`,
+): SelectFilterConfig {
+    return {
+        name,
+        label: { key: `column.${name}`, fallback: labelFallback },
+        options,
+        placeholder: {
+            key: placeholderKey,
+            fallback: placeholderFallback,
+        },
+    };
+}
+
+export function createStatusFilterConfig(
+    options: SelectOption[],
+): SelectFilterConfig {
+    return createColumnSelectConfig('status', 'Status', options);
+}
+
+export function createCurrencyFilterConfig(): SelectFilterConfig {
+    return createColumnSelectConfig('currency', 'Currency', currencyOptions);
+}
+
+export function createPaymentMethodFilterConfig(
+    options: SelectOption[],
+): SelectFilterConfig {
+    return createColumnSelectConfig(
+        'payment_method',
+        'Payment Method',
+        options,
+    );
+}
+
+export function createColumnDateFilterConfig(
+    name: string,
+    fallback: string,
+): DateFilterConfig {
+    const label: TranslatableLabel = { key: `column.${name}`, fallback };
+    return { name, label, placeholder: label };
+}
+
+export type FilterFieldDateTuple = readonly [
+    name: string,
+    labelFallback: string,
+    placeholderKey: string,
+    placeholderFallback: string,
+];
+
+export function createFilterFieldDateFields(
+    entries: ReadonlyArray<FilterFieldDateTuple>,
+): FieldDescriptor[] {
+    return createDateFilterFields(
+        entries.map(
+            ([name, labelFallback, placeholderKey, placeholderFallback]) => ({
+                name,
+                label: { key: `filter_field.${name}`, fallback: labelFallback },
+                placeholder: {
+                    key: placeholderKey,
+                    fallback: placeholderFallback,
+                },
+            }),
+        ),
+    );
+}
+
+export function createFilterFieldStatusSelect(
+    options: SelectOption[],
+): FieldDescriptor {
+    return createSelectFilterField(
+        'status',
+        { key: 'filter_field.status', fallback: 'Status' },
+        options,
+        { key: 'filter.select_status', fallback: 'Select status' },
+    );
+}
+
+export function createApReportCommonFilterFields(
+    searchPlaceholderKey: string,
+    searchPlaceholderFallback: string,
+): FieldDescriptor[] {
+    return [
+        createTextFilterField(
+            'search',
+            { key: 'column.search', fallback: 'Search' },
+            {
+                key: searchPlaceholderKey,
+                fallback: searchPlaceholderFallback,
+            },
+        ),
+        ...createAsyncLookupFilterFields([
+            ['supplier_id', 'supplier', '/api/suppliers/select-options'],
+            ['branch_id', 'branch', '/api/branches/select-options'],
+        ]),
+    ];
 }
 
 function TranslatedDatePicker({

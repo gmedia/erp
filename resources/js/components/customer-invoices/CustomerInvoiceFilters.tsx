@@ -1,32 +1,26 @@
 'use client';
 
 import {
+    createColumnDateFilterConfig,
+    createCurrencyFilterConfig,
     createCustomerFinancialFilterFields,
     createDateFilterFields,
     createSelectFilterFields,
-    currencyOptions,
+    createStatusFilterConfig,
+    translatedOptions,
     type FieldDescriptor,
 } from '@/components/common/filters';
 
 export function createCustomerInvoiceFilterFields(): FieldDescriptor[] {
-    const customerInvoiceStatusOptions = [
-        { value: 'draft', label: { key: 'status.draft', fallback: 'Draft' } },
-        { value: 'sent', label: { key: 'status.sent', fallback: 'Sent' } },
-        {
-            value: 'partially_paid',
-            label: { key: 'status.partially_paid', fallback: 'Partially Paid' },
-        },
-        { value: 'paid', label: { key: 'status.paid', fallback: 'Paid' } },
-        {
-            value: 'overdue',
-            label: { key: 'status.overdue', fallback: 'Overdue' },
-        },
-        {
-            value: 'cancelled',
-            label: { key: 'status.cancelled', fallback: 'Cancelled' },
-        },
-        { value: 'void', label: { key: 'status.void', fallback: 'Void' } },
-    ];
+    const customerInvoiceStatusOptions = translatedOptions('status.', [
+        ['draft', 'Draft'],
+        ['sent', 'Sent'],
+        ['partially_paid', 'Partially Paid'],
+        ['paid', 'Paid'],
+        ['overdue', 'Overdue'],
+        ['cancelled', 'Cancelled'],
+        ['void', 'Void'],
+    ]);
 
     return [
         ...createCustomerFinancialFilterFields({
@@ -34,67 +28,17 @@ export function createCustomerInvoiceFilterFields(): FieldDescriptor[] {
             fallback: 'Search invoice number, customer, or notes...',
         }),
         ...createSelectFilterFields([
-            {
-                name: 'status',
-                label: { key: 'column.status', fallback: 'Status' },
-                options: customerInvoiceStatusOptions,
-                placeholder: {
-                    key: 'filter.select_status',
-                    fallback: 'Select Status',
-                },
-            },
-            {
-                name: 'currency',
-                label: { key: 'column.currency', fallback: 'Currency' },
-                options: currencyOptions,
-                placeholder: {
-                    key: 'filter.select_currency',
-                    fallback: 'Select Currency',
-                },
-            },
+            createStatusFilterConfig(customerInvoiceStatusOptions),
+            createCurrencyFilterConfig(),
         ]),
         ...createDateFilterFields([
-            {
-                name: 'invoice_date_from',
-                label: {
-                    key: 'column.invoice_date_from',
-                    fallback: 'Invoice Date From',
-                },
-                placeholder: {
-                    key: 'column.invoice_date_from',
-                    fallback: 'Invoice Date From',
-                },
-            },
-            {
-                name: 'invoice_date_to',
-                label: {
-                    key: 'column.invoice_date_to',
-                    fallback: 'Invoice Date To',
-                },
-                placeholder: {
-                    key: 'column.invoice_date_to',
-                    fallback: 'Invoice Date To',
-                },
-            },
-            {
-                name: 'due_date_from',
-                label: {
-                    key: 'column.due_date_from',
-                    fallback: 'Due Date From',
-                },
-                placeholder: {
-                    key: 'column.due_date_from',
-                    fallback: 'Due Date From',
-                },
-            },
-            {
-                name: 'due_date_to',
-                label: { key: 'column.due_date_to', fallback: 'Due Date To' },
-                placeholder: {
-                    key: 'column.due_date_to',
-                    fallback: 'Due Date To',
-                },
-            },
+            createColumnDateFilterConfig(
+                'invoice_date_from',
+                'Invoice Date From',
+            ),
+            createColumnDateFilterConfig('invoice_date_to', 'Invoice Date To'),
+            createColumnDateFilterConfig('due_date_from', 'Due Date From'),
+            createColumnDateFilterConfig('due_date_to', 'Due Date To'),
         ]),
     ];
 }

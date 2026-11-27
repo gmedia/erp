@@ -1,64 +1,28 @@
 import {
     createSelectFilterField,
     createTextFilterField,
+    translatedOptions,
     type FieldDescriptor,
-    type SelectOption,
 } from '@/components/common/filters';
 
-const reportTypeOptions: SelectOption[] = [
-    {
-        value: 'balance_sheet',
-        label: {
-            key: 'page.report_configurations.view_report_type_balance_sheet',
-            fallback: 'Balance Sheet',
-        },
-    },
-    {
-        value: 'income_statement',
-        label: {
-            key: 'page.report_configurations.view_report_type_income_statement',
-            fallback: 'Income Statement',
-        },
-    },
-    {
-        value: 'cash_flow',
-        label: {
-            key: 'page.report_configurations.view_report_type_cash_flow',
-            fallback: 'Cash Flow',
-        },
-    },
-    {
-        value: 'trial_balance',
-        label: {
-            key: 'page.report_configurations.view_report_type_trial_balance',
-            fallback: 'Trial Balance',
-        },
-    },
-    {
-        value: 'custom',
-        label: {
-            key: 'page.report_configurations.view_report_type_custom',
-            fallback: 'Custom',
-        },
-    },
-];
+const reportTypeOptions = translatedOptions(
+    'page.report_configurations.view_report_type_',
+    [
+        ['balance_sheet', 'Balance Sheet'],
+        ['income_statement', 'Income Statement'],
+        ['cash_flow', 'Cash Flow'],
+        ['trial_balance', 'Trial Balance'],
+        ['custom', 'Custom'],
+    ],
+);
 
-const activeStatusOptions: SelectOption[] = [
-    {
-        value: '1',
-        label: {
-            key: 'page.report_configurations.view_active',
-            fallback: 'Active',
-        },
-    },
-    {
-        value: '0',
-        label: {
-            key: 'page.report_configurations.view_inactive',
-            fallback: 'Inactive',
-        },
-    },
-];
+const activeStatusOptions = translatedOptions(
+    'page.report_configurations.view_',
+    [
+        ['1', 'Active', 'page.report_configurations.view_active'],
+        ['0', 'Inactive', 'page.report_configurations.view_inactive'],
+    ],
+);
 
 export function createReportConfigurationFilterFields(): FieldDescriptor[] {
     return [
