@@ -37,6 +37,10 @@ Perubahan warna dilakukan **di token**, bukan per halaman. Branding per perusaha
 
 - **Card/panel**: `Card` tanpa border dan tanpa bayangan — terisi `bg-card`, `rounded-xl`. Jangan menambah `border`/`shadow-*` pada card.
 - **Kontrol berbentuk pill** (`rounded-full`): `Button` semua varian, `Badge`, `TabsList`/`TabsTrigger` (segmented 24h/7d/30d), chip filter. Input, select, dan textarea tetap `rounded-md`.
+- **Button**: tinggi `h-8` untuk semua size, teks `13px font-semibold`, ikon `14px` (`size-3.5`) dengan gap `6px` (`gap-1.5`). Fokus: ring 2px `ring-ring/40`, tanpa border aksen. `outline` memakai `bg-background shadow-xs` tanpa border.
+- **Segmented/Tabs**: track pill `bg-secondary` (`p-[3px]`, tinggi `h-8`). Item aktif pill: light `bg-background shadow-xs`, dark `bg-accent`. Jangan menimpa track dengan `bg-muted`/`h-9` di pemakai.
+- **Checkbox**: `size-4 rounded-[4px]` dengan border netral tipis; saat dicentang `bg-primary`.
+- **Radio & switch**: wajib dipakai untuk pilihan tunggal dan toggle berikutnya (sebelumnya tidak ada konsumen; guard E2E ditambahkan saat konsumen pertama muncul). Switch: track pill, diam `bg-muted`, aktif `bg-primary`, tinggi `h-5`.
 - **Kontrol teks** (`ui/input`, `ui/textarea`, kolom search toolbar): tinggi `h-8`, teks 14px, terisi `bg-secondary` tanpa border saat diam (`border-transparent`), tanpa `shadow-xs`. Fokus: ring 2px `ring-ring/40` tanpa border aksen. Error (`aria-invalid`): ring 2px `ring-destructive/40`. Disabled: `opacity-50`. Search toolbar memakai `rounded-lg`. Jangan menimpa dengan `h-9`, `border-border`, atau `bg-background` di pemakai.
 - **Hierarki tombol**: satu `default` (hitam/terang) per area untuk aksi utama (Create, Save, Connect); aksi lain `secondary` (pill abu); aksi berbahaya `destructive-soft` (pill merah lembut + ikon). `destructive` solid hanya di dialog konfirmasi.
 - Tanpa bayangan pada komponen datar; bayangan hanya untuk lapisan melayang (popover, dropdown, dialog).

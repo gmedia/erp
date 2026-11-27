@@ -621,7 +621,7 @@ export default function MyApprovalsPage() {
                 {error && <LoadFailedAlert />}
 
                 <Tabs defaultValue="pending" className="w-full gap-3">
-                    <TabsList className="grid h-9 w-full grid-cols-4 lg:w-[28rem]">
+                    <TabsList className="grid h-8 w-full grid-cols-4 lg:w-[28rem]">
                         <TabsTrigger
                             value="pending"
                             className="group gap-1.5 text-xs sm:text-sm"
