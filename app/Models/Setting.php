@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\LogsFinancialActivity;
 use App\Services\SocialAuth\SocialLoginPolicy;
 use Database\Factories\SettingFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -35,7 +36,7 @@ use InvalidArgumentException;
 class Setting extends Model
 {
     /** @use HasFactory<SettingFactory> */
-    use HasFactory;
+    use HasFactory, LogsFinancialActivity;
 
     /**
      * The attributes that are mass assignable.
@@ -151,5 +152,21 @@ class Setting extends Model
             'json' => json_encode($value),
             default => (string) $value,
         };
+    }
+
+    /**
+     * Setting dengan key berisi kata rahasia tidak boleh masuk audit log (nilai lama/baru).
+     *
+     * @return list<string>
+     */
+    protected function auditExcludedAttributes(): array
+    {
+        $excluded = self::defaultAuditExcludedAttributes();
+
+        if (preg_match('/password|secret|token|api_?key|credential/i', (string) $this->key) === 1) {
+            $excluded[] = 'value';
+        }
+
+        return $excluded;
     }
 }
