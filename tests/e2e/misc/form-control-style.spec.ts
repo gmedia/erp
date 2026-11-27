@@ -183,6 +183,56 @@ for (const theme of ['light', 'dark'] as const) {
             }
         });
 
+        test('placeholder input, select, async select, dan datepicker memakai text-muted-foreground', async ({
+            page,
+        }) => {
+            await openAddEmployeeDialog(page);
+
+            // Trigger kosong (belum ada nilai) memakai kelas text-muted-foreground;
+            // warnanya harus sama dengan token muted-foreground.
+            const measured = await page.evaluate(() => {
+                const dialog = document.querySelector('[role="dialog"]');
+                if (!dialog) return null;
+                const probe = document.createElement('span');
+                probe.className = 'text-muted-foreground';
+                document.body.appendChild(probe);
+                const token = getComputedStyle(probe).color;
+                probe.remove();
+
+                const input = dialog.querySelector<HTMLInputElement>(
+                    'input[type="text"][placeholder]',
+                );
+                const triggers = Array.from(
+                    dialog.querySelectorAll<HTMLElement>(
+                        'button[role="combobox"].text-muted-foreground, button[aria-haspopup="dialog"].text-muted-foreground',
+                    ),
+                );
+                return {
+                    token,
+                    inputPlaceholder: input
+                        ? getComputedStyle(input, '::placeholder').color
+                        : 'missing',
+                    triggers: triggers.map((t) => ({
+                        label:
+                            t.getAttribute('aria-label') ??
+                            t.textContent?.trim() ??
+                            '',
+                        color: getComputedStyle(t).color,
+                    })),
+                };
+            });
+
+            console.log(
+                `[form-control] placeholder ${theme}: ${JSON.stringify(measured)}`,
+            );
+            expect(measured).not.toBeNull();
+            expect(measured!.inputPlaceholder).toBe(measured!.token);
+            expect(measured!.triggers.length).toBeGreaterThan(0);
+            for (const t of measured!.triggers) {
+                expect(t.color, t.label).toBe(measured!.token);
+            }
+        });
+
         test('input mendapat ring fokus 2px netral saat focus-visible', async ({
             page,
         }) => {
