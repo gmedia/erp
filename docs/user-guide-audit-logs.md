@@ -6,7 +6,7 @@ admin untuk menelusuri koreksi tanpa harus membuka setiap dokumen satu per satu.
 
 ## Siapa yang bisa membuka halaman ini
 
-Halaman hanya bisa diakses pengguna yang memiliki permission **`audit_log`**. Tombol **Export**
+Halaman hanya bisa diakses pengguna yang memiliki permission **`audit_log`**. Tombol **Ekspor**
 membutuhkan permission **`audit_log.export`**. Pengguna lain akan melihat pesan akses ditolak.
 Menu ada di grup **Admin > Audit Log**.
 
@@ -64,11 +64,11 @@ Gunakan panel filter untuk mempersempit data:
 Filter dapat dikombinasikan. Tekan **Terapkan filter** untuk menjalankan filter dan **Reset** untuk
 mengembalikan ke semua data.
 
-## Export
+## Ekspor
 
-Tombol **Export** mengunduh hasil sesuai filter dalam format Excel. Kolom yang diekspor: waktu,
+Tombol **Ekspor** mengunduh hasil sesuai filter dalam format Excel. Kolom yang diekspor: waktu,
 aksi, pengguna, modul, ID dokumen, ringkasan, dan rincian perubahan (JSON nilai lama → baru). File
-export memuat data pribadi, jadi simpan di tempat aman dan hapus bila tidak lagi diperlukan.
+ekspor memuat data pribadi, jadi simpan di tempat aman dan hapus bila tidak lagi diperlukan.
 
 ## Retensi dan pembersihan
 
@@ -77,7 +77,7 @@ export memuat data pribadi, jadi simpan di tempat aman dan hapus bila tidak lagi
   (`audit-logs:prune`).
 - Lama retensi dapat diubah administrator sistem melalui pengaturan `audit_log_retention_days`.
   Nilai harus lebih besar dari nol; bila kosong atau tidak valid, sistem memakai 365 hari.
-- Catatan yang sudah dihapus **tidak dapat dipulihkan**. Lakukan export sebelum menurunkan masa
+- Catatan yang sudah dihapus **tidak dapat dipulihkan**. Lakukan ekspor sebelum menurunkan masa
   retensi bila data lama masih dibutuhkan untuk audit.
 
 ## Privasi dan Undang-Undang Pelindungan Data Pribadi (UU PDP No. 27/2022)
