@@ -1,6 +1,18 @@
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
 import { Input } from '@/components/ui/input';
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
+import { formatDateByRegionalSettings } from '@/utils/date-format';
+import { format, isValid, parse } from 'date-fns';
+import { CalendarIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { RequiredLabel } from './RequiredLabel';
+import { useVehicleLoanPageText } from './useVehicleLoanPageText';
 
 interface VehicleLoanDateTimeFieldsProps {
     id: string;
@@ -10,31 +22,28 @@ interface VehicleLoanDateTimeFieldsProps {
     required?: boolean;
 }
 
-function toDisplay(value: string): { date: string; time: string } {
+const TIME_PATTERN = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
+function toParts(value: string): { date: Date | undefined; time: string } {
     if (!value) {
-        return { date: '', time: '' };
+        return { date: undefined, time: '' };
     }
 
     const [datePart = '', timePart = ''] = value.split('T');
-    const [year = '', month = '', day = ''] = datePart.split('-');
+    const parsed = parse(datePart, 'yyyy-MM-dd', new Date());
 
     return {
-        date: year && month && day ? `${day}/${month}/${year}` : '',
+        date: isValid(parsed) ? parsed : undefined,
         time: timePart.slice(0, 5),
     };
 }
 
-function toValue(date: string, time: string): string | null {
-    const dateMatch = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(date);
-    const timeMatch = /^(\d{2}):(\d{2})$/.exec(time);
-
-    if (!dateMatch || !timeMatch) {
+function toValue(date: Date | undefined, time: string): string | null {
+    if (!date || !TIME_PATTERN.test(time)) {
         return null;
     }
 
-    const [, day, month, year] = dateMatch;
-
-    return `${year}-${month}-${day}T${timeMatch[1]}:${timeMatch[2]}`;
+    return `${format(date, 'yyyy-MM-dd')}T${time}`;
 }
 
 export function VehicleLoanDateTimeFields({
@@ -44,18 +53,22 @@ export function VehicleLoanDateTimeFields({
     onChange,
     required = false,
 }: Readonly<VehicleLoanDateTimeFieldsProps>) {
-    const initial = toDisplay(value);
-    const [date, setDate] = useState(initial.date);
+    const tPage = useVehicleLoanPageText();
+    const initial = toParts(value);
+    const [date, setDate] = useState<Date | undefined>(initial.date);
     const [time, setTime] = useState(initial.time);
+    const [timeTouched, setTimeTouched] = useState(false);
+    const [open, setOpen] = useState(false);
 
     useEffect(() => {
         if (!value) {
-            setDate('');
+            setDate(undefined);
             setTime('');
+            setTimeTouched(false);
         }
     }, [value]);
 
-    function emit(nextDate: string, nextTime: string) {
+    function emit(nextDate: Date | undefined, nextTime: string) {
         const next = toValue(nextDate, nextTime);
 
         if (next) {
@@ -63,34 +76,70 @@ export function VehicleLoanDateTimeFields({
         }
     }
 
+    const timeInvalid = timeTouched && time !== '' && !TIME_PATTERN.test(time);
+
     return (
         <div className="grid gap-2">
             <RequiredLabel htmlFor={`${id}_date`} required={required}>
                 {label}
             </RequiredLabel>
             <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(7.5rem,auto)] gap-2">
-                <Input
-                    id={`${id}_date`}
-                    className="min-w-0"
-                    inputMode="numeric"
-                    placeholder="dd/mm/yyyy"
-                    value={date}
-                    onChange={(event) => {
-                        setDate(event.target.value);
-                        emit(event.target.value, time);
-                    }}
-                />
+                <Popover open={open} onOpenChange={setOpen}>
+                    <PopoverTrigger asChild>
+                        <Button
+                            id={`${id}_date`}
+                            type="button"
+                            variant="outline"
+                            className={cn(
+                                'w-full min-w-0 justify-start pl-3 text-left font-normal',
+                                !date && 'text-muted-foreground',
+                            )}
+                        >
+                            <span className="truncate">
+                                {date
+                                    ? formatDateByRegionalSettings(date)
+                                    : tPage(
+                                          'date_placeholder',
+                                          'Pilih tanggal',
+                                      )}
+                            </span>
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                            mode="single"
+                            selected={date}
+                            onSelect={(next) => {
+                                setDate(next);
+                                setOpen(false);
+                                emit(next, time);
+                            }}
+                            autoFocus
+                        />
+                    </PopoverContent>
+                </Popover>
                 <Input
                     id={`${id}_time`}
-                    type="time"
                     className="min-w-0"
+                    inputMode="numeric"
+                    placeholder="HH:mm"
+                    maxLength={5}
+                    aria-invalid={timeInvalid || undefined}
                     value={time}
                     onChange={(event) => {
-                        setTime(event.target.value);
-                        emit(date, event.target.value);
+                        const next = event.target.value;
+                        setTime(next);
+                        setTimeTouched(true);
+                        emit(date, next);
                     }}
                 />
             </div>
+            {timeInvalid && (
+                <p className="text-xs text-destructive">
+                    {tPage('time_invalid', 'Gunakan format 24 jam HH:mm.')}
+                </p>
+            )}
         </div>
     );
 }

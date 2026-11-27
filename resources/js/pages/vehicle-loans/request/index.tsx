@@ -265,7 +265,7 @@ export default function VehicleLoanRequestPage() {
                                     <SelectValue
                                         placeholder={tPage(
                                             'request.driver_placeholder',
-                                            'Pilih driver',
+                                            'Pilih pengemudi',
                                         )}
                                     />
                                 </SelectTrigger>
@@ -330,7 +330,7 @@ export default function VehicleLoanRequestPage() {
                         <p className="text-xs text-muted-foreground sm:col-span-2">
                             {tPage(
                                 'request.assignment_hint',
-                                'Boleh dikosongkan. Approver dapat menetapkan driver dan unit saat review.',
+                                'Boleh dikosongkan. Penyetuju dapat menetapkan pengemudi dan unit saat peninjauan.',
                             )}
                         </p>
                     </CardContent>

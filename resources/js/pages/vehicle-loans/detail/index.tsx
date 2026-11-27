@@ -6,13 +6,14 @@ import { VehicleLoanStatusBadge } from '@/components/vehicle-loans/VehicleLoanSt
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
 import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
-import { vehicleLoanStatusLabel } from '@/utils/vehicle-loan-status';
+import { approvalStepStatusLabel } from '@/utils/vehicle-loan-status';
 import { useQuery } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
 import { Link, useParams } from 'react-router-dom';
 
 interface ApprovalStep {
     step_order: number;
+    step_name: string | null;
     status: string;
     action: string | null;
     comments: string | null;
@@ -158,7 +159,7 @@ export default function VehicleLoanDetailPage() {
             return {
                 label: tPage(
                     'detail_page.action_approvals',
-                    'Buka My Approvals',
+                    'Buka Persetujuan Saya',
                 ),
                 to: '/my-approvals',
             };
@@ -170,6 +171,15 @@ export default function VehicleLoanDetailPage() {
             };
         }
         if (data.status === 'pickup_done') {
+            if (!data.pickup?.key_handover_at) {
+                return {
+                    label: tPage(
+                        'detail_page.action_security',
+                        'Buka Antrean Keamanan',
+                    ),
+                    to: '/vehicle-loans/security',
+                };
+            }
             return {
                 label: tPage('detail_page.action_return', 'Buat Pengembalian'),
                 to: '/vehicle-loans/return',
@@ -181,6 +191,10 @@ export default function VehicleLoanDetailPage() {
     return (
         <AppLayout
             breadcrumbs={[
+                {
+                    title: tPage('request.breadcrumb', 'Peminjaman Kendaraan'),
+                    href: '/vehicle-loans/request',
+                },
                 {
                     title: tPage('detail_page.breadcrumb', 'Detail Peminjaman'),
                     href: `/vehicle-loans/${id}`,
@@ -420,9 +434,7 @@ export default function VehicleLoanDetailPage() {
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-3">
-                                        <VehicleLoanStatusBadge
-                                            status={data.status}
-                                        />
+                                        <VehicleLoanStatusBadge loan={data} />
                                         {data.is_overdue && (
                                             <p className="rounded-md bg-warning-soft p-2 text-xs font-medium text-warning">
                                                 {tPage(
@@ -499,6 +511,13 @@ export default function VehicleLoanDetailPage() {
                                                             {step.step_order}
                                                         </span>
                                                         <div className="space-y-1">
+                                                            {step.step_name && (
+                                                                <p className="text-sm font-medium">
+                                                                    {
+                                                                        step.step_name
+                                                                    }
+                                                                </p>
+                                                            )}
                                                             <p className="text-sm font-medium">
                                                                 {tPage(
                                                                     'detail_page.step_label',
@@ -507,7 +526,7 @@ export default function VehicleLoanDetailPage() {
                                                                         order: String(
                                                                             step.step_order,
                                                                         ),
-                                                                        status: vehicleLoanStatusLabel(
+                                                                        status: approvalStepStatusLabel(
                                                                             step.status,
                                                                             tPage,
                                                                         ),
