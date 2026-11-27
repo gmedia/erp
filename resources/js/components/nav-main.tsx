@@ -76,8 +76,9 @@ export function NavMain({ items = [] }: Readonly<{ items: NavItem[] }>) {
 
             const activeRect = active.getBoundingClientRect();
             const containerRect = container.getBoundingClientRect();
+            const fadeTop = container.dataset.scrolledTop === 'true' ? 24 : 0;
             const safeTop = Math.max(
-                containerRect.top,
+                containerRect.top + fadeTop,
                 header.getBoundingClientRect().bottom,
             );
             const safeBottom = containerRect.bottom;
