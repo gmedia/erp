@@ -48,6 +48,26 @@ test.describe('issue 597 i18n polish (locale id)', () => {
         await expect(page.getByText('Appearance settings')).toHaveCount(0);
     });
 
+    test('toolbar secondary buttons share the same filled variant', async ({
+        page,
+    }) => {
+        await login(page);
+        await page.goto('/products', { waitUntil: 'domcontentloaded' });
+
+        const filter = page.getByTestId('filter-button');
+        await expect(filter).toBeVisible({ timeout: 15000 });
+        const fill = await filter.evaluate(
+            (el) => getComputedStyle(el).backgroundColor,
+        );
+        expect(fill).not.toBe('rgba(0, 0, 0, 0)');
+
+        for (const testId of ['export-button', 'columns-button']) {
+            const button = page.getByTestId(testId);
+            await expect(button).toBeVisible();
+            await expect(button).toHaveCSS('background-color', fill);
+        }
+    });
+
     test('pagination rows-per-page select has no outline border', async ({
         page,
     }) => {
