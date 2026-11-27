@@ -1,5 +1,6 @@
 'use client';
 
+import { LabelText } from '@/components/common/TranslatedText';
 import { Badge } from '@/components/ui/badge';
 import { formatStatusLabel, statusBadgeVariant } from '@/lib/status-badge';
 import {
@@ -25,17 +26,38 @@ const renderCategoryCell = ({ row }: { row: { original: Product } }) => {
 /**
  * Cell renderer for type column with badge
  */
+const PRODUCT_TYPE_LABELS: Record<string, { key: string; fallback: string }> = {
+    raw_material: {
+        key: 'form_fields.products.type_raw_material',
+        fallback: 'Raw Material',
+    },
+    work_in_progress: {
+        key: 'form_fields.products.type_work_in_progress',
+        fallback: 'WIP',
+    },
+    finished_good: {
+        key: 'form_fields.products.type_finished_good',
+        fallback: 'Finished Good',
+    },
+    purchased_good: {
+        key: 'form_fields.products.type_purchased_good',
+        fallback: 'Purchased Good',
+    },
+    service: {
+        key: 'form_fields.products.type_service',
+        fallback: 'Service',
+    },
+};
+
 const renderTypeCell = ({ row }: { row: { original: Product } }) => {
     const type = row.original.type;
-    const labels: Record<string, string> = {
-        raw_material: 'Raw Material',
-        work_in_progress: 'WIP',
-        finished_good: 'Finished Good',
-        purchased_good: 'Purchased Good',
-        service: 'Service',
-    };
+    const label = PRODUCT_TYPE_LABELS[type];
 
-    return <Badge variant="secondary">{labels[type] || type}</Badge>;
+    return (
+        <Badge variant="secondary">
+            {label ? <LabelText label={label} /> : type}
+        </Badge>
+    );
 };
 
 /**
