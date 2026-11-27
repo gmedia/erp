@@ -15,6 +15,8 @@ export interface SystemHealthComponent {
     status: SystemHealthStatus;
     summary: string | null;
     message: string | null;
+    message_code: string | null;
+    message_params: Record<string, string>;
     meta: Record<string, unknown>;
 }
 
@@ -22,6 +24,8 @@ export interface SystemHealthHistoryItem {
     check: string;
     status: SystemHealthStatus;
     message: string | null;
+    message_code: string | null;
+    message_params: Record<string, string>;
     checked_at: string;
 }
 
