@@ -1544,7 +1544,21 @@
         "approval_event_step_approved": "Langkah Disetujui",
         "approval_event_step_skipped": "Langkah Dilewati",
         "all_types": "Semua Jenis",
-        "all_statuses": "Semua Status"
+        "all_statuses": "Semua Status",
+        "all_branches": "Semua Cabang",
+        "all_warehouses": "Semua Gudang",
+        "all_locations": "Semua Lokasi",
+        "all_categories": "Semua Kategori",
+        "select_unit": "Pilih satuan",
+        "select_department": "Pilih departemen",
+        "select_category": "Pilih kategori",
+        "select_location": "Pilih lokasi",
+        "select_employee": "Pilih karyawan",
+        "select_supplier": "Pilih pemasok",
+        "select_branch": "Pilih cabang",
+        "select_position": "Pilih jabatan",
+        "select_type": "Pilih jenis",
+        "select_status": "Pilih status"
     },
     "form_fields": {
         "asset_depreciation_runs": {

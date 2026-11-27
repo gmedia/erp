@@ -1541,7 +1541,21 @@
         "approval_event_step_approved": "Step Approved",
         "approval_event_step_skipped": "Step Skipped",
         "all_types": "All types",
-        "all_statuses": "All statuses"
+        "all_statuses": "All statuses",
+        "all_branches": "All Branches",
+        "all_warehouses": "All Warehouses",
+        "all_locations": "All Locations",
+        "all_categories": "All Categories",
+        "select_unit": "Select unit",
+        "select_department": "Select a department",
+        "select_category": "Select a category",
+        "select_location": "Select a location",
+        "select_employee": "Select an employee",
+        "select_supplier": "Select a supplier",
+        "select_branch": "Select a branch",
+        "select_position": "Select a position",
+        "select_type": "Select type",
+        "select_status": "Select status"
     },
     "form_fields": {
         "asset_depreciation_runs": {

@@ -5,6 +5,7 @@ import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 import {
     LabelText,
     type TranslatableLabel,
+    useTranslatableText,
 } from '@/components/common/TranslatedText';
 import { useTranslation } from '@/contexts/i18n-context';
 
@@ -288,7 +289,7 @@ export type AsyncSelectFilterConfig = {
     name: string;
     label: TranslatableLabel;
     url: string;
-    placeholder: string;
+    placeholder: TranslatableLabel;
 };
 
 export type SelectFilterConfig = {
@@ -384,24 +385,33 @@ export function createTextFilterField(
     };
 }
 
-// Generic async select filter field creator
+function TranslatedAsyncSelect({
+    url,
+    placeholder,
+}: Readonly<{ url: string; placeholder: TranslatableLabel }>) {
+    const translatedPlaceholder = useTranslatableText(placeholder);
+    return <AsyncSelect url={url} placeholder={translatedPlaceholder} />;
+}
+
 export function createAsyncSelectFilterField(
     name: string,
     label: TranslatableLabel,
     url: string,
-    placeholder: string,
+    placeholder: TranslatableLabel,
 ): FieldDescriptor {
     return {
         name,
         label,
-        component: <AsyncSelect url={url} placeholder={placeholder} />,
+        component: (
+            <TranslatedAsyncSelect url={url} placeholder={placeholder} />
+        ),
     };
 }
 
 export function createUserFilterField(
     name: string,
-    label: string,
-    placeholder = 'Select a user',
+    label: TranslatableLabel,
+    placeholder: TranslatableLabel = 'Select a user',
 ): FieldDescriptor {
     return createAsyncSelectFilterField(name, label, '/api/users', placeholder);
 }
@@ -415,63 +425,78 @@ export function createAsyncSelectFilterFields(
 }
 
 export function createBranchFilterField(
-    placeholder = 'All branches',
+    placeholder: TranslatableLabel = {
+        key: 'filter.all_branches',
+        fallback: 'All branches',
+    },
 ): FieldDescriptor {
     return createAsyncSelectFilterField(
         'branch_id',
-        'Branch',
+        { key: 'column.branch', fallback: 'Branch' },
         '/api/branches',
         placeholder,
     );
 }
 
 export function createWarehouseFilterField(
-    placeholder = 'All warehouses',
+    placeholder: TranslatableLabel = {
+        key: 'filter.all_warehouses',
+        fallback: 'All warehouses',
+    },
 ): FieldDescriptor {
     return createAsyncSelectFilterField(
         'warehouse_id',
-        'Warehouse',
+        { key: 'column.warehouse', fallback: 'Warehouse' },
         '/api/warehouses',
         placeholder,
     );
 }
 
 export function createUnitFilterField(
-    placeholder = 'Select unit',
+    placeholder: TranslatableLabel = {
+        key: 'filter.select_unit',
+        fallback: 'Select unit',
+    },
 ): FieldDescriptor {
     return createAsyncSelectFilterField(
         'unit_id',
-        'Unit',
+        { key: 'column.unit', fallback: 'Unit' },
         '/api/units',
         placeholder,
     );
 }
 
 export function createDepartmentFilterField(
-    placeholder = 'Select a department',
+    placeholder: TranslatableLabel = {
+        key: 'filter.select_department',
+        fallback: 'Select a department',
+    },
 ): FieldDescriptor {
     return createAsyncSelectFilterField(
         'department_id',
-        'Department',
+        { key: 'column.department', fallback: 'Department' },
         '/api/departments',
         placeholder,
     );
 }
 
 export function createPositionFilterField(
-    placeholder = 'Select a position',
+    placeholder: TranslatableLabel = {
+        key: 'filter.select_position',
+        fallback: 'Select a position',
+    },
 ): FieldDescriptor {
     return createAsyncSelectFilterField(
         'position_id',
-        'Position',
+        { key: 'column.position', fallback: 'Position' },
         '/api/positions',
         placeholder,
     );
 }
 
 export function createSupplierFilterField(
-    placeholder = 'All suppliers',
-    label = 'Supplier',
+    placeholder: TranslatableLabel = 'All suppliers',
+    label: TranslatableLabel = 'Supplier',
 ): FieldDescriptor {
     return createAsyncSelectFilterField(
         'supplier_id',
@@ -482,8 +507,8 @@ export function createSupplierFilterField(
 }
 
 export function createProductFilterField(
-    placeholder = 'Select a product',
-    label = 'Product',
+    placeholder: TranslatableLabel = 'Select a product',
+    label: TranslatableLabel = 'Product',
 ): FieldDescriptor {
     return createAsyncSelectFilterField(
         'product_id',
@@ -496,7 +521,7 @@ export function createProductFilterField(
 export function createEmployeeLookupFilterField(
     name = 'employee_id',
     label: TranslatableLabel = 'Employee',
-    placeholder = 'Select employee',
+    placeholder: TranslatableLabel = 'Select employee',
 ): FieldDescriptor {
     return createAsyncSelectFilterField(
         name,
@@ -540,7 +565,10 @@ export function createAssetFilterField(
 }
 
 export function createAssetCategoryFilterField(
-    placeholder = 'Select a category',
+    placeholder: TranslatableLabel = {
+        key: 'filter.select_category',
+        fallback: 'Select a category',
+    },
 ): FieldDescriptor {
     return createAsyncSelectFilterField(
         'asset_category_id',
@@ -585,8 +613,11 @@ export function createSupplierCategoryFilterField(
 
 export function createProductCategoryFilterField(
     name = 'product_category_id',
-    label: TranslatableLabel = 'Category',
-    placeholder = 'Select category',
+    label: TranslatableLabel = { key: 'column.category', fallback: 'Category' },
+    placeholder: TranslatableLabel = {
+        key: 'filter.select_category',
+        fallback: 'Select category',
+    },
 ): FieldDescriptor {
     return createAsyncSelectFilterField(
         name,
@@ -851,7 +882,10 @@ export function createEmployeeOrganizationFilterFields(): FieldDescriptor[] {
     return [
         createDepartmentFilterField(),
         createPositionFilterField(),
-        createBranchFilterField('Select a branch'),
+        createBranchFilterField({
+            key: 'filter.select_branch',
+            fallback: 'Select a branch',
+        }),
     ];
 }
 
@@ -882,7 +916,10 @@ export function createSupplierFilterSelectFields(): FieldDescriptor[] {
 }
 
 export function createEmploymentStatusFilterField(
-    placeholder = 'Select status',
+    placeholder: TranslatableLabel = {
+        key: 'filter.select_status',
+        fallback: 'Select status',
+    },
 ): FieldDescriptor {
     return createSelectFilterField(
         'employment_status',
@@ -896,7 +933,10 @@ export function createProductCatalogAsyncFilterFields(): FieldDescriptor[] {
     return [
         createProductCategoryFilterField(),
         createUnitFilterField(),
-        createBranchFilterField('Select branch'),
+        createBranchFilterField({
+            key: 'filter.select_branch',
+            fallback: 'Select branch',
+        }),
     ];
 }
 
@@ -904,15 +944,15 @@ export function createProductTypeStatusFilterFields(): FieldDescriptor[] {
     return [
         createSelectFilterField(
             'type',
-            'Type',
+            { key: 'column.type', fallback: 'Type' },
             productTypeOptions,
-            'Select type',
+            { key: 'filter.select_type', fallback: 'Select type' },
         ),
         createSelectFilterField(
             'status',
-            'Status',
+            { key: 'column.status', fallback: 'Status' },
             productStatusOptions,
-            'Select status',
+            { key: 'filter.select_status', fallback: 'Select status' },
         ),
     ];
 }
