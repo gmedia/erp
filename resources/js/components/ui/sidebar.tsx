@@ -397,7 +397,9 @@ function SidebarContent({
       className={cn(
         // pb-8 memberi ruang agar item terakhir grup tidak tertutup footer;
         // mask fade bawah menandakan konten masih bisa di-scroll (W4-16).
-        "flex min-h-0 flex-1 flex-col gap-2 overflow-auto pt-2 pb-8 group-data-[collapsible=icon]:overflow-hidden group-data-[collapsible=icon]:pb-2 [mask-image:linear-gradient(to_bottom,black_calc(100%-0.75rem),transparent)]",
+        "flex min-h-0 flex-1 flex-col gap-2 overflow-auto pt-2 pb-8",
+        "group-data-[collapsible=icon]:overflow-hidden group-data-[collapsible=icon]:pb-2",
+        "[mask-image:linear-gradient(to_bottom,black_calc(100%-0.75rem),transparent)]",
         className
       )}
       {...props}
