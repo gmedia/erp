@@ -53,6 +53,7 @@ test('redis check is ok when ping succeeds', function () {
 
     expect((string) $result->status)->toBe('ok');
     expect($result->meta['used_memory_mb'])->toBe(2.0);
+    expect($result->shortSummary)->toBe('2');
 });
 
 test('redis check fails with a sanitized message when the connection throws', function () {

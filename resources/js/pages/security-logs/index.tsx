@@ -6,8 +6,11 @@ import {
     type SecurityLogItem,
 } from '@/components/security-logs/Columns';
 import { createSecurityLogFilterFields } from '@/components/security-logs/Filters';
+import { useTranslation } from '@/contexts/i18n-context';
 
 export default function SecurityLogs() {
+    const { t } = useTranslation();
+
     return (
         <ReportDataTablePage<SecurityLogItem>
             title="Security Logs"
@@ -22,7 +25,7 @@ export default function SecurityLogs() {
                 },
             ]}
             columns={createSecurityLogColumns()}
-            filterFields={createSecurityLogFilterFields()}
+            filterFields={createSecurityLogFilterFields(t)}
             initialFilters={{
                 search: '',
                 event: '',

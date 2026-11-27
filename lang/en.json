@@ -432,6 +432,8 @@
     "auth_api.logged_out": "Successfully logged out",
     "posting_journal_api.posted": "Successfully posted :count journal entries.",
     "admin_setting_api.updated": "Settings updated successfully.",
+    "system_health.notice.recovered": "Recovered: {label}",
+    "system_health.notice.degraded": "Warning: {label} ({status})",
     "system_health.check_completed": "Health check completed.",
     "system_health.backup.label": "Latest backup",
     "system_health.backup.unreachable": "Backup destination is unreachable (:error).",
@@ -1044,7 +1046,10 @@
             "column_user": "User",
             "column_attempted_email": "Attempted Email",
             "column_ip_address": "IP Address",
-            "column_device": "Device"
+            "column_device": "Device",
+            "select_user": "Select a user",
+            "start_date": "Start Date",
+            "end_date": "End Date"
         },
         "approval_audit_trail": {
             "description": "History of approval actions taken on requests.",
@@ -3322,6 +3327,18 @@
         }
     },
     "system_health": {
+        "components": {
+            "database": "Database",
+            "redis": "Valkey / Redis",
+            "object_storage": "Object storage",
+            "migrations": "Migrations",
+            "queue": "Queue",
+            "scheduler": "Scheduler",
+            "disk": "App disk",
+            "production_config": "Production config",
+            "version": "Version",
+            "container_resources": "Container CPU & memory"
+        },
         "title": "System health",
         "description": "Component status, recent issues, and version information.",
         "run_check": "Check now",
@@ -3351,7 +3368,8 @@
             "unknown": "No health data yet"
         },
         "queue": {
-            "jobs_failed": "Queue jobs failed on {count} queue(s). Check the queue worker."
+            "jobs_failed": "Queue jobs failed on {count} queue(s). Check the queue worker.",
+            "failed_unknown": "Queue jobs failed. Check the queue worker."
         },
         "schedule": {
             "not_run_yet": "The scheduler has not run yet.",
@@ -3398,6 +3416,17 @@
             "ok": "Valkey/Redis responded to ping.",
             "unreachable": "Valkey/Redis is unreachable ({exception}).",
             "no_ping": "Valkey/Redis did not respond to ping."
+        }
+    },
+    "security_logs": {
+        "export_headers": {
+            "date": "Date",
+            "event": "Event",
+            "user": "User",
+            "attempted_email": "Attempted Email",
+            "ip_address": "IP Address",
+            "user_agent": "User Agent",
+            "metadata": "Metadata"
         }
     }
 }

@@ -299,6 +299,10 @@ export function I18nProvider({
         return () => registerErrorTranslator(null);
     }, [t]);
 
+    useEffect(() => {
+        document.documentElement.lang = locale;
+    }, [locale]);
+
     const contextValue = useMemo<I18nContextValue>(
         () => ({
             locale,
