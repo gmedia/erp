@@ -154,7 +154,7 @@ test('every system health notice key exists in both english and indonesian local
 
 test('nested health message codes resolve to indonesian text, not raw keys', function () {
     expect(LocaleJsonTranslator::get('system_health.queue.jobs_failed', ['count' => '2'], 'id'))
-        ->toBe('Job antrian gagal pada 2 antrian. Periksa worker antrian.');
+        ->toBe('Tugas antrian gagal pada 2 antrian. Periksa pekerja antrian.');
     expect(LocaleJsonTranslator::get('system_health.queue.jobs_failed', ['count' => '2'], 'en'))
         ->toStartWith('Queue jobs failed on 2');
 });
@@ -164,6 +164,17 @@ test('component and scheduler terms use the indonesian vocabulary in id only', f
     expect(LocaleJsonTranslator::get('system_health.components.scheduler', [], 'id'))->toBe('Penjadwal');
     expect(LocaleJsonTranslator::get('system_health.components.object_storage', [], 'en'))->toBe('Object storage');
     expect(LocaleJsonTranslator::get('system_health.components.scheduler', [], 'en'))->toBe('Scheduler');
+});
+
+test('queue, container and environment wording uses indonesian terms in id', function () {
+    expect(LocaleJsonTranslator::get('system_health.queue.failed_unknown', [], 'id'))
+        ->toBe('Tugas antrian gagal. Periksa pekerja antrian.');
+    expect(LocaleJsonTranslator::get('system_health.container.memory_ok', ['percent' => 40], 'id'))
+        ->toBe('Memori kontainer terpakai 40%.');
+    expect(LocaleJsonTranslator::get('system_health.production.ok', [], 'id'))
+        ->toBe('Konfigurasi lingkungan sesuai.');
+    expect(LocaleJsonTranslator::get('system_health.storage.ok', [], 'id'))
+        ->toBe('Penyimpanan objek dapat menulis, membaca, dan menghapus berkas.');
 });
 
 test('unknown locale falls back to english for server-side translations', function () {

@@ -52,7 +52,7 @@ class RedisHealthCheck extends Check
             ->meta([
                 'used_memory_mb' => $usedMemory === null ? null : round($usedMemory / 1048576, 2),
             ] + SystemHealthMessage::meta('system_health.redis.ok'))
-            ->shortSummary($usedMemory === null ? 'Lulus' : round($usedMemory / 1048576, 1) . ' MB')
+            ->shortSummary($usedMemory === null ? '' : (string) round($usedMemory / 1048576, 1))
             ->ok('Valkey/Redis merespons ping.');
     }
 
