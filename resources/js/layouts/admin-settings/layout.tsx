@@ -40,6 +40,8 @@ const sidebarNavItems: NavItem[] = [
     {
         title: 'Kesehatan Sistem',
         href: '/admin-settings?group=system_health',
+        icon: null,
+    },
 ];
 
 export default function AdminSettingsLayout({
