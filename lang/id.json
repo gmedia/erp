@@ -1558,7 +1558,8 @@
         "select_branch": "Pilih cabang",
         "select_position": "Pilih jabatan",
         "select_type": "Pilih jenis",
-        "select_status": "Pilih status"
+        "select_status": "Pilih status",
+        "select_category_party": "Pilih kategori"
     },
     "form_fields": {
         "asset_depreciation_runs": {

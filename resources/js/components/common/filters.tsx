@@ -590,22 +590,28 @@ export function createAssetStocktakeFilterField(
 }
 
 export function createCustomerCategoryFilterField(
-    placeholder = 'Select Category',
+    placeholder: TranslatableLabel = {
+        key: 'filter.select_category_party',
+        fallback: 'Select Category',
+    },
 ): FieldDescriptor {
     return createAsyncSelectFilterField(
         'category_id',
-        'Category',
+        { key: 'column.category', fallback: 'Category' },
         '/api/customer-categories',
         placeholder,
     );
 }
 
 export function createSupplierCategoryFilterField(
-    placeholder = 'Select Category',
+    placeholder: TranslatableLabel = {
+        key: 'filter.select_category_party',
+        fallback: 'Select Category',
+    },
 ): FieldDescriptor {
     return createAsyncSelectFilterField(
         'category_id',
-        'Category',
+        { key: 'column.category', fallback: 'Category' },
         '/api/supplier-categories',
         placeholder,
     );
@@ -891,26 +897,32 @@ export function createEmployeeOrganizationFilterFields(): FieldDescriptor[] {
 
 export function createCustomerFilterSelectFields(): FieldDescriptor[] {
     return [
-        createBranchFilterField('Select a branch'),
+        createBranchFilterField({
+            key: 'filter.select_branch',
+            fallback: 'Select a branch',
+        }),
         createCustomerCategoryFilterField(),
         createSelectFilterField(
             'status',
-            'Status',
+            { key: 'column.status', fallback: 'Status' },
             activeInactiveStatusOptions,
-            'All statuses',
+            { key: 'filter.all_statuses', fallback: 'All statuses' },
         ),
     ];
 }
 
 export function createSupplierFilterSelectFields(): FieldDescriptor[] {
     return [
-        createBranchFilterField('Select a branch'),
+        createBranchFilterField({
+            key: 'filter.select_branch',
+            fallback: 'Select a branch',
+        }),
         createSupplierCategoryFilterField(),
         createSelectFilterField(
             'status',
-            'Status',
+            { key: 'column.status', fallback: 'Status' },
             activeInactiveStatusOptions,
-            'Select Status',
+            { key: 'filter.select_status', fallback: 'Select Status' },
         ),
     ];
 }

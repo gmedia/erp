@@ -110,8 +110,7 @@ const pendingHelperFunctions = new Set([
     'createAssetFilterField',
     'createAssetCategoryFilterField',
     'createAssetStocktakeFilterField',
-    'createCustomerCategoryFilterField',
-    'createSupplierCategoryFilterField',
+
     'createSupplierWarehouseProductFilterFields',
     'createPurchasingReportScopeFilterFields',
     'createGoodsReceiptStatusFilterField',
@@ -132,8 +131,7 @@ const pendingHelperFunctions = new Set([
     'createAssetCategoryBranchFilterFields',
     'createAssetReportScopeFilterFields',
     'createAssetStocktakeVarianceScopeFilterFields',
-    'createCustomerFilterSelectFields',
-    'createSupplierFilterSelectFields',
+
     'createInventoryStocktakeFilterSelectFields',
     'createAssetSupplierFilterFields',
     'createMaintenanceTypeStatusFilterFields',

@@ -1555,7 +1555,8 @@
         "select_branch": "Select a branch",
         "select_position": "Select a position",
         "select_type": "Select type",
-        "select_status": "Select status"
+        "select_status": "Select status",
+        "select_category_party": "Select Category"
     },
     "form_fields": {
         "asset_depreciation_runs": {

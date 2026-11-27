@@ -22,6 +22,12 @@ const cases = [
         labels: ['Kategori', 'Lokasi', 'Departemen', 'Karyawan', 'Pemasok', 'Cabang'],
         placeholders: ['Pilih kategori', 'Pilih lokasi', 'Pilih departemen'],
     },
+    {
+        path: '/customers',
+        slug: 'customers',
+        labels: ['Cabang', 'Kategori', 'Status'],
+        placeholders: ['Pilih cabang', 'Pilih kategori', 'Semua Status'],
+    },
 ];
 
 test.describe('filter labels i18n (locale id)', () => {
