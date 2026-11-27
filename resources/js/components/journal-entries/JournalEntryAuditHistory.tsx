@@ -24,6 +24,20 @@ function formatChangeValue(value: unknown): string {
     return String(value);
 }
 
+function translateAuditEvent(
+    t: (key: string) => string,
+    event: string | null,
+): string {
+    if (!event) {
+        return '-';
+    }
+
+    const key = `filter.audit_event_${event}`;
+    const translated = t(key);
+
+    return translated === key ? event : translated;
+}
+
 export const JournalEntryAuditHistory = memo(function JournalEntryAuditHistory({
     journalEntryId,
 }: Readonly<JournalEntryAuditHistoryProps>) {
@@ -68,9 +82,12 @@ export const JournalEntryAuditHistory = memo(function JournalEntryAuditHistory({
             {data.map((entry) => (
                 <li key={entry.id} className="rounded-md border p-3">
                     <div className="flex flex-wrap items-center gap-2 text-sm">
-                        <Badge variant="outline">{entry.event ?? '-'}</Badge>
+                        <Badge variant="outline">
+                            {translateAuditEvent(t, entry.event)}
+                        </Badge>
                         <span className="font-medium">
-                            {entry.causer_name ?? '-'}
+                            {entry.causer_name ??
+                                t('page.audit_logs.system_user')}
                         </span>
                         <span className="text-muted-foreground">
                             {formatDateTimeByRegionalSettings(entry.created_at)}

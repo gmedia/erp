@@ -28,8 +28,15 @@ class IndexAuditLogAction
         }
 
         if ($request->filled('subject_type')) {
-            // Terima nama singkat (mis. "JournalEntry") atau FQCN penuh.
-            $query->where('subject_type', 'like', '%' . $request->subject_type);
+            // Nama singkat (mis. "JournalEntry") dicocokkan sebagai substring;
+            // FQCN penuh dicocokkan persis karena backslash adalah escape LIKE MySQL.
+            $subjectType = $request->subject_type;
+
+            if (str_contains($subjectType, '\\')) {
+                $query->where('subject_type', $subjectType);
+            } else {
+                $query->where('subject_type', 'like', '%' . $subjectType);
+            }
         }
 
         if ($request->filled('causer_id')) {

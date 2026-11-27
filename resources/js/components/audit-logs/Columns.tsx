@@ -4,6 +4,7 @@ import {
 } from '@/components/common/TranslatedText';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/contexts/i18n-context';
 import { createSortingHeader } from '@/utils/columns';
 import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import type { ColumnDef } from '@tanstack/react-table';
@@ -37,6 +38,72 @@ function columnLabel(column: string, fallback: string): TranslatableLabel {
     return { key: `page.audit_logs.column_${column}`, fallback };
 }
 
+type Translate = (key: string, params?: Record<string, string>) => string;
+
+function auditFieldLabel(t: Translate, field: string): string {
+    const key = `page.audit_logs.field_${field}`;
+    const translated = t(key);
+
+    return translated === key ? field.replaceAll('_', ' ') : translated;
+}
+
+function auditSummary(t: Translate, item: AuditLogItem): string {
+    const changes = item.attribute_changes ?? {};
+    const oldValues = (changes.old ?? {}) as Record<string, unknown>;
+    const newValues = (changes.attributes ?? {}) as Record<string, unknown>;
+    const fields = Array.from(
+        new Set([...Object.keys(oldValues), ...Object.keys(newValues)]),
+    );
+
+    if (item.event === 'created') {
+        return t('page.audit_logs.summary_created');
+    }
+
+    if (item.event === 'deleted') {
+        return t('page.audit_logs.summary_deleted');
+    }
+
+    if (item.event === 'updated') {
+        if (fields.length === 0) {
+            return t('page.audit_logs.summary_updated_empty');
+        }
+
+        return t('page.audit_logs.summary_updated', {
+            count: String(fields.length),
+            fields: fields.map((field) => auditFieldLabel(t, field)).join(', '),
+        });
+    }
+
+    return t('page.audit_logs.summary_unknown');
+}
+
+function AuditUserCell({ name }: Readonly<{ name: string | null }>) {
+    const { t } = useTranslation();
+
+    return <div>{name ?? t('page.audit_logs.system_user')}</div>;
+}
+
+function AuditSummaryButton({
+    item,
+    onShowDetail,
+}: Readonly<{
+    item: AuditLogItem;
+    onShowDetail: (item: AuditLogItem) => void;
+}>) {
+    const { t } = useTranslation();
+
+    return (
+        <Button
+            type="button"
+            variant="link"
+            className="h-auto p-0 text-left"
+            onClick={() => onShowDetail(item)}
+        >
+            {auditSummary(t, item)}
+        </Button>
+    );
+}
+
 export const createAuditLogColumns = (
     onShowDetail: (item: AuditLogItem) => void,
 ): ColumnDef<AuditLogItem>[] => [
@@ -54,7 +121,7 @@ export const createAuditLogColumns = (
     {
         accessorKey: 'causer_name',
         header: () => <LabelText label={columnLabel('user', 'User')} />,
-        cell: ({ row }) => <div>{row.original.causer_name ?? '-'}</div>,
+        cell: ({ row }) => <AuditUserCell name={row.original.causer_name} />,
         enableSorting: false,
     },
     {
@@ -95,14 +162,10 @@ export const createAuditLogColumns = (
         accessorKey: 'description',
         header: () => <LabelText label={columnLabel('summary', 'Summary')} />,
         cell: ({ row }) => (
-            <Button
-                type="button"
-                variant="link"
-                className="h-auto p-0 text-left"
-                onClick={() => onShowDetail(row.original)}
-            >
-                {row.original.description}
-            </Button>
+            <AuditSummaryButton
+                item={row.original}
+                onShowDetail={onShowDetail}
+            />
         ),
         enableSorting: false,
     },

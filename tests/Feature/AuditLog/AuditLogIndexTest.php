@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\CustomerInvoice;
 use App\Models\Employee;
+use App\Models\JournalEntry;
 use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -41,6 +43,30 @@ it('lists activities with attribute changes for an authorized user', function ()
         ->assertJsonPath('data.0.subject_id', 42)
         ->assertJsonPath('data.0.attribute_changes.old.status', 'draft')
         ->assertJsonPath('data.0.attribute_changes.attributes.status', 'posted');
+});
+
+it('filters activities by a fully qualified subject type', function () {
+    Activity::query()->create([
+        'log_name' => 'finance',
+        'description' => 'updated',
+        'subject_type' => JournalEntry::class,
+        'subject_id' => 7,
+        'event' => 'updated',
+    ]);
+    Activity::query()->create([
+        'log_name' => 'finance',
+        'description' => 'updated',
+        'subject_type' => CustomerInvoice::class,
+        'subject_id' => 8,
+        'event' => 'updated',
+    ]);
+
+    Sanctum::actingAs($this->admin, ['*']);
+
+    getJson('/api/audit-logs?subject_type=' . urlencode(JournalEntry::class))
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.subject_id', 7);
 });
 
 it('filters activities by event', function () {
