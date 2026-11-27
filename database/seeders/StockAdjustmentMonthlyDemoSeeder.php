@@ -2,9 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\GoodsReceiptItem;
 use App\Models\Product;
 use App\Models\StockAdjustment;
 use App\Models\StockAdjustmentItem;
+use App\Models\SupplierReturnItem;
 use App\Models\User;
 use App\Models\Warehouse;
 use App\Support\Demo\DemoCalendar;
@@ -89,6 +91,14 @@ class StockAdjustmentMonthlyDemoSeeder extends Seeder
 
         foreach ($lines as $lineIndex => $product) {
             $quantity = $sign * (self::BASE_QUANTITY + $lineIndex);
+
+            // Penyesuaian keluar tidak boleh membuat saldo negatif pada tanggal itu.
+            // Bila saldo dokumen belum cukup (penerimaan bulan ini belum dibukukan),
+            // selisih dibalik menjadi penyesuaian masuk yang realistis.
+            if ($quantity < 0 && $this->balanceOn($product->id, $adjustment) < abs($quantity)) {
+                $quantity = abs($quantity);
+            }
+
             $unitCost = (float) $product->cost;
 
             StockAdjustmentItem::updateOrCreate(
@@ -111,5 +121,42 @@ class StockAdjustmentMonthlyDemoSeeder extends Seeder
         }
 
         $adjustment->items()->whereNotIn('product_id', $keptIds)->delete();
+    }
+
+    /**
+     * Saldo produk di gudang pada tanggal penyesuaian, dihitung dari dokumen yang
+     * sudah ada (penerimaan dikurangi retur, ditambah penyesuaian masuk, dikurangi
+     * penyesuaian keluar), tanpa bergantung pada urutan pembukuan stock movement.
+     */
+    private function balanceOn(int $productId, StockAdjustment $adjustment): float
+    {
+        $date = $adjustment->adjustment_date->toDateString();
+
+        $received = (float) GoodsReceiptItem::query()
+            ->join('goods_receipts', 'goods_receipts.id', '=', 'goods_receipt_items.goods_receipt_id')
+            ->where('goods_receipts.status', 'confirmed')
+            ->where('goods_receipts.warehouse_id', $adjustment->warehouse_id)
+            ->where('goods_receipt_items.product_id', $productId)
+            ->whereDate('goods_receipts.receipt_date', '<=', $date)
+            ->sum('goods_receipt_items.quantity_received');
+
+        $returned = (float) SupplierReturnItem::query()
+            ->join('supplier_returns', 'supplier_returns.id', '=', 'supplier_return_items.supplier_return_id')
+            ->where('supplier_returns.status', 'confirmed')
+            ->where('supplier_returns.warehouse_id', $adjustment->warehouse_id)
+            ->where('supplier_return_items.product_id', $productId)
+            ->whereDate('supplier_returns.return_date', '<=', $date)
+            ->sum('supplier_return_items.quantity_returned');
+
+        $adjusted = (float) StockAdjustmentItem::query()
+            ->join('stock_adjustments', 'stock_adjustments.id', '=', 'stock_adjustment_items.stock_adjustment_id')
+            ->where('stock_adjustments.status', 'approved')
+            ->where('stock_adjustments.warehouse_id', $adjustment->warehouse_id)
+            ->where('stock_adjustment_items.product_id', $productId)
+            ->where('stock_adjustments.id', '!=', $adjustment->id)
+            ->whereDate('stock_adjustments.adjustment_date', '<', $date)
+            ->sum('stock_adjustment_items.quantity_adjusted');
+
+        return $received - $returned + $adjusted;
     }
 }
