@@ -191,6 +191,7 @@ class DatabaseSeeder extends Seeder
             PurchasingSampleDataSeeder::class,
             ApSampleDataSeeder::class,
             ApMonthlyDemoSeeder::class,
+            PurchasingMonthlyDemoSeeder::class,
             AssetSampleDataSeeder::class,
             VehicleLoanSampleDataSeeder::class,
             StockTransferSampleDataSeeder::class,
