@@ -166,3 +166,14 @@ Schedule::command('health:schedule-check-heartbeat')
 Schedule::command('health:queue-check-heartbeat')
     ->everyFiveMinutes()
     ->name('system-health-queue-heartbeat');
+
+// Backup database harian (arsip di disk 'backups', terpisah dari bucket sumber), lalu cleanup
+// retensi bertingkat (config/backup.php). Notifikasi gagal lewat SystemHealthServiceProvider.
+Schedule::command('backup:run', ['--only-db'])
+    ->dailyAt('01:30')
+    ->withoutOverlapping()
+    ->name('backup-run-database');
+
+Schedule::command('backup:clean')
+    ->dailyAt('02:30')
+    ->name('backup-clean');
