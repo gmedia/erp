@@ -42,9 +42,12 @@ export function JournalLineFormFields<TFormValues extends FieldValues>({
                 }>
                     key={`account-${keyBase}`}
                     name={'account_id' as never}
-                    label="Account"
+                    label={{ key: 'itemForm.account', fallback: 'Account' }}
                     url={accountUrl}
-                    placeholder="Select Account"
+                    placeholder={{
+                        key: 'itemForm.account_placeholder',
+                        fallback: 'Select Account',
+                    }}
                     labelFn={(acc) =>
                         `${acc.code} - ${acc.name} (${acc.normal_balance})`
                     }
