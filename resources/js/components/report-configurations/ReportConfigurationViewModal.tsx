@@ -214,8 +214,8 @@ export const ReportConfigurationViewModal =
                                                             </span>
                                                             <span
                                                                 className={cn(
-                                                                    'mt-1 flex flex-wrap gap-1 text-xs text-muted-foreground',
-                                                                    'sm:hidden',
+                                                                    'mt-1 flex flex-wrap gap-1',
+                                                                    'text-xs text-muted-foreground sm:hidden',
                                                                 )}
                                                             >
                                                                 <span>
