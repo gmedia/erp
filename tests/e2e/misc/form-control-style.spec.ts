@@ -31,12 +31,18 @@ async function readControlStyle(
         .first()
         .evaluate((el) => {
             const cs = getComputedStyle(el);
+            const layers = cs.boxShadow
+                .split(/,(?![^(]*\))/)
+                .map((s) => s.trim())
+                .filter(
+                    (s) => s.length > 0 && !/^rgba\(0,\s*0,\s*0,\s*0\)/.test(s),
+                );
             return {
                 borderRadius: cs.borderRadius,
                 height: el.getBoundingClientRect().height,
                 borderColor: cs.borderTopColor,
                 borderWidth: cs.borderTopWidth,
-                boxShadow: cs.boxShadow,
+                boxShadow: layers.length === 0 ? 'none' : layers.join(', '),
             };
         });
 }
@@ -181,6 +187,236 @@ for (const theme of ['light', 'dark'] as const) {
                 expect(style.borderColor).toBe('rgba(0, 0, 0, 0)');
                 expect(style.boxShadow).toBe('none');
             }
+        });
+
+        test('placeholder input, select, async select, dan datepicker memakai text-muted-foreground', async ({
+            page,
+        }) => {
+            await openAddEmployeeDialog(page);
+
+            // Trigger kosong (belum ada nilai) memakai kelas text-muted-foreground;
+            // warnanya harus sama dengan token muted-foreground.
+            const measured = await page.evaluate(() => {
+                const dialog = document.querySelector('[role="dialog"]');
+                if (!dialog) return null;
+                const probe = document.createElement('span');
+                probe.className = 'text-muted-foreground';
+                document.body.appendChild(probe);
+                const token = getComputedStyle(probe).color;
+                probe.remove();
+
+                const input = dialog.querySelector<HTMLInputElement>(
+                    'input[type="text"][placeholder]',
+                );
+                const triggers = Array.from(
+                    dialog.querySelectorAll<HTMLElement>(
+                        'button[role="combobox"].text-muted-foreground, button[aria-haspopup="dialog"].text-muted-foreground',
+                    ),
+                );
+                return {
+                    token,
+                    inputPlaceholder: input
+                        ? getComputedStyle(input, '::placeholder').color
+                        : 'missing',
+                    triggers: triggers.map((t) => ({
+                        label:
+                            t.getAttribute('aria-label') ??
+                            t.textContent?.trim() ??
+                            '',
+                        color: getComputedStyle(t).color,
+                    })),
+                };
+            });
+
+            console.log(
+                `[form-control] placeholder ${theme}: ${JSON.stringify(measured)}`,
+            );
+            expect(measured).not.toBeNull();
+            expect(measured!.inputPlaceholder).toBe(measured!.token);
+            expect(measured!.triggers.length).toBeGreaterThan(0);
+            for (const t of measured!.triggers) {
+                expect(t.color, t.label).toBe(measured!.token);
+            }
+        });
+
+        test('checkbox kolom pilih tabel memakai 16px, radius 4px, dan bg primary saat dicentang', async ({
+            page,
+        }) => {
+            await page.goto('/products', { waitUntil: 'domcontentloaded' });
+            await page.waitForLoadState('networkidle').catch(() => undefined);
+            const row = page.locator('table tbody tr').first();
+            await expect(row).toBeVisible({ timeout: 15000 });
+            const checkbox = row.locator('[data-testid="select-row"]');
+            await expect(checkbox).toBeVisible();
+
+            const rest = await readControlStyle(
+                page,
+                'table tbody tr:first-child [data-testid="select-row"]',
+            );
+            expect(await checkbox.getAttribute('data-state')).toBe('unchecked');
+            expect(rest.height).toBeCloseTo(16, 0);
+            expect(rest.borderRadius).toBe('4px');
+            expect(rest.borderWidth).toBe('1px');
+            expect(rest.borderColor).not.toBe('rgba(0, 0, 0, 0)');
+            mkdirSync(EVIDENCE_DIR, { recursive: true });
+            await row.screenshot({
+                path: `${EVIDENCE_DIR}/checkbox-unchecked-${theme}.png`,
+            });
+
+            await checkbox.click();
+            await expect(checkbox).toHaveAttribute('data-state', 'checked');
+            await page.waitForTimeout(400);
+
+            const checked = await readControlStyle(
+                page,
+                'table tbody tr:first-child [data-testid="select-row"]',
+            );
+            const primary = await page.evaluate(() => {
+                const probe = document.createElement('span');
+                probe.className = 'bg-primary';
+                document.body.appendChild(probe);
+                const color = getComputedStyle(probe).backgroundColor;
+                probe.remove();
+                return color;
+            });
+            const checkedBg = await checkbox.evaluate(
+                (el) => getComputedStyle(el).backgroundColor,
+            );
+            console.log(
+                `[form-control] checkbox ${theme}: rest=${JSON.stringify(rest)} checked=${JSON.stringify(checked)} bg=${checkedBg} primary=${primary}`,
+            );
+            expect(checked.height).toBeCloseTo(16, 0);
+            expect(checked.borderRadius).toBe('4px');
+            expect(checkedBg).toBe(primary);
+            await row.screenshot({
+                path: `${EVIDENCE_DIR}/checkbox-checked-${theme}.png`,
+            });
+        });
+
+        test('button primary dan secondary memakai pill h-8 dan token warna (#584)', async ({
+            page,
+        }) => {
+            await page.goto('/employees', { waitUntil: 'domcontentloaded' });
+            await page.waitForLoadState('networkidle').catch(() => undefined);
+            const primary = page
+                .locator('button[data-slot="button"].bg-primary')
+                .first();
+            await expect(primary).toBeVisible({ timeout: 15000 });
+
+            const probe = await page.evaluate(() => {
+                const make = (cls: string) => {
+                    const span = document.createElement('span');
+                    span.className = cls;
+                    document.body.appendChild(span);
+                    const color = getComputedStyle(span).backgroundColor;
+                    span.remove();
+                    return color;
+                };
+                return {
+                    primary: make('bg-primary'),
+                    secondary: make('bg-secondary'),
+                };
+            });
+
+            const primaryStyle = await primary.evaluate((el) => {
+                const cs = getComputedStyle(el);
+                return {
+                    background: cs.backgroundColor,
+                    radius: cs.borderRadius,
+                    height: el.getBoundingClientRect().height,
+                    borderWidth: cs.borderTopWidth,
+                    boxShadow: cs.boxShadow,
+                };
+            });
+            expect(primaryStyle.background).toBe(probe.primary);
+            expect(parseFloat(primaryStyle.radius)).toBeGreaterThanOrEqual(
+                HEIGHT / 2,
+            );
+            expect(primaryStyle.height).toBeCloseTo(HEIGHT, 0);
+            expect(primaryStyle.borderWidth).toBe('0px');
+
+            const secondary = page
+                .locator('button[data-slot="button"].bg-secondary')
+                .first();
+            const secondaryCount = await secondary.count();
+            console.log(
+                `[form-control] button ${theme}: primary=${JSON.stringify(primaryStyle)} secondaryCount=${secondaryCount} probe=${JSON.stringify(probe)}`,
+            );
+            if (secondaryCount > 0) {
+                const secondaryStyle = await secondary.evaluate((el) => ({
+                    background: getComputedStyle(el).backgroundColor,
+                    height: el.getBoundingClientRect().height,
+                }));
+                expect(secondaryStyle.background).toBe(probe.secondary);
+                expect(secondaryStyle.height).toBeCloseTo(HEIGHT, 0);
+            }
+
+            mkdirSync(EVIDENCE_DIR, { recursive: true });
+            await page
+                .locator('main')
+                .first()
+                .screenshot({
+                    path: `${EVIDENCE_DIR}/buttons-${theme}.png`,
+                });
+        });
+
+        test('tabs: track bg-secondary pill dan item aktif sesuai tema (#584)', async ({
+            page,
+        }) => {
+            await page.goto('/my-approvals', { waitUntil: 'domcontentloaded' });
+            await page.waitForLoadState('networkidle').catch(() => undefined);
+            const list = page.locator('[data-slot="tabs-list"]').first();
+            await expect(list).toBeVisible({ timeout: 15000 });
+            const active = page
+                .locator('[data-slot="tabs-trigger"][data-state="active"]')
+                .first();
+            await expect(active).toBeVisible();
+
+            const measured = await page.evaluate(() => {
+                const make = (cls: string) => {
+                    const span = document.createElement('span');
+                    span.className = cls;
+                    document.body.appendChild(span);
+                    const color = getComputedStyle(span).backgroundColor;
+                    span.remove();
+                    return color;
+                };
+                return {
+                    secondary: make('bg-secondary'),
+                    background: make('bg-background'),
+                    accent: make('bg-accent'),
+                };
+            });
+            const listEl = await list.evaluate((el) => {
+                const cs = getComputedStyle(el);
+                return {
+                    background: cs.backgroundColor,
+                    radius: cs.borderRadius,
+                    height: el.getBoundingClientRect().height,
+                };
+            });
+            const activeEl = await active.evaluate((el) => ({
+                background: getComputedStyle(el).backgroundColor,
+                shadow: getComputedStyle(el).boxShadow,
+            }));
+
+            console.log(
+                `[form-control] tabs ${theme}: list=${JSON.stringify(listEl)} active=${JSON.stringify(activeEl)} probe=${JSON.stringify(measured)}`,
+            );
+            expect(listEl.background).toBe(measured.secondary);
+            expect(parseFloat(listEl.radius)).toBeGreaterThanOrEqual(
+                listEl.height / 2,
+            );
+            expect(listEl.height).toBeCloseTo(HEIGHT, 0);
+            expect(activeEl.background).toBe(
+                theme === 'dark' ? measured.accent : measured.background,
+            );
+            expect(activeEl.shadow).not.toBe('none');
+
+            mkdirSync(EVIDENCE_DIR, { recursive: true });
+            await list.screenshot({
+                path: `${EVIDENCE_DIR}/tabs-${theme}.png`,
+            });
         });
 
         test('input mendapat ring fokus 2px netral saat focus-visible', async ({

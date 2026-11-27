@@ -73,7 +73,7 @@ export function DatePickerField({
                                         variant="outline"
                                         disabled={locked}
                                         className={cn(
-                                            'h-8 w-full rounded-[6px] border-transparent bg-secondary px-2.5 text-left text-sm font-normal hover:bg-secondary focus-visible:ring-2 focus-visible:ring-[2px] focus-visible:ring-ring/40',
+                                            'h-8 w-full rounded-[6px] border border-transparent bg-secondary pr-2 pl-2.5 text-left text-sm font-normal shadow-none hover:bg-secondary focus-visible:ring-2 focus-visible:ring-[2px] focus-visible:ring-ring/40',
                                             !field.value &&
                                                 'text-muted-foreground',
                                         )}
@@ -85,7 +85,7 @@ export function DatePickerField({
                                         ) : (
                                             <span>{translatedPlaceholder}</span>
                                         )}
-                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                        <CalendarIcon className="ml-auto size-3.5 text-muted-foreground" />
                                     </Button>
                                 </FormControl>
                             </PopoverTrigger>
