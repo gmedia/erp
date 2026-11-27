@@ -201,7 +201,7 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
                     aria-label={label}
                     aria-expanded={open}
                     className={cn(
-                        'w-full min-w-0 justify-between overflow-hidden rounded-md font-normal',
+                        'h-8 w-full min-w-0 justify-between overflow-hidden rounded-[6px] border-transparent bg-secondary px-2.5 text-sm font-normal hover:bg-secondary focus-visible:ring-2 focus-visible:ring-[2px] focus-visible:ring-ring/40',
                         !value && 'text-muted-foreground',
                         className,
                     )}
