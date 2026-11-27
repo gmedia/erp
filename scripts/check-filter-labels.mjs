@@ -66,7 +66,8 @@ const pendingFiles = new Set([
 
 // Literal English label/placeholder: 'Branch', 'Select a category', 'All Statuses'.
 // Kode ISO mata uang (IDR/USD/EUR) bukan teks yang diterjemahkan, jadi dilewati.
-const englishLiteral = /^(?:[A-Z][a-zA-Z]*)(?:\s+[A-Za-z][a-zA-Z]*)*$|^(?:Select|All)\b/;
+const englishLiteral =
+    /^(?:[A-Z][a-zA-Z]*)(?:\s+[A-Za-z][a-zA-Z]*)*$|^(?:Select|All)\b/;
 const isoCurrencyCode = /^[A-Z]{3}$/;
 
 const literalPatterns = [
@@ -91,77 +92,11 @@ const scanned = [];
 
 const sharedHelper = resolve(componentsDir, 'common/filters.tsx');
 
-const pendingHelperFunctions = new Set([
-    'createSimpleEntityFilterFields',
-    'createSelectFilterField',
-    'createTextFilterField',
-    'createAsyncSelectFilterField',
-    'createUserFilterField',
-    'createSupplierFilterField',
-    'createProductFilterField',
-    'createEmployeeLookupFilterField',
-    'createPurchaseOrderFilterField',
-    'createGoodsReceiptFilterField',
-    'createAssetFilterField',
-    'createAssetCategoryFilterField',
-    'createAssetStocktakeFilterField',
-
-    'createSupplierWarehouseProductFilterFields',
-    'createPurchasingReportScopeFilterFields',
-    'createGoodsReceiptStatusFilterField',
-    'createPurchaseOrderStatusFilterField',
-    'createPurchaseOrderStatusCategoryFilterField',
-    'createBinaryStatusFilterField',
-    'createFiscalYearStatusFilterField',
-    'createCoaVersionStatusFilterField',
-    'createJournalEntryStatusFilterField',
-    'createApprovalAuditEventFilterField',
-    'createSecurityLogEventFilterField',
-    'createPipelineFilterField',
-    'createApprovalDelegationUserFilterFields',
-    'createSupplierWarehouseFilterFields',
-    'createPurchaseRequestContextFilterFields',
-    'createProductWarehouseFilterFields',
-    'createWarehouseStatusFilterFields',
-    'createAssetCategoryBranchFilterFields',
-    'createAssetReportScopeFilterFields',
-    'createAssetStocktakeVarianceScopeFilterFields',
-
-    'createInventoryStocktakeFilterSelectFields',
-    'createAssetSupplierFilterFields',
-    'createMaintenanceTypeStatusFilterFields',
-    'createAssetStatusConditionFilterFields',
-    'createWarehouseBranchFilterFields',
-    'createProductWarehouseBranchCategoryFilterFields',
-    'createInventoryReportScopeFilterFields',
-    'createCustomerFinancialFilterFields',
-    'createInventoryStocktakeReportFilterField',
-    'createInventoryStocktakeVarianceResultFilterField',
-    'createSelectFilterFields',
-    'createDateFilterFields',
-    'createDateRangeFilterFields',
-    'createCostRangeFilterFields',
-]);
-
-function helperFunctionSource(source) {
-    const blocks = [];
-    const header = /^export (?:function|const) (\w+)/gm;
-    const starts = [...source.matchAll(header)];
-    starts.forEach((m, i) => {
-        const end = i + 1 < starts.length ? starts[i + 1].index : source.length;
-        blocks.push({ name: m[1], start: m.index, body: source.slice(m.index, end) });
-    });
-    return blocks;
-}
-
-function scanFile(file, rel, source, skipFunction) {
+function scanFile(rel, source) {
     for (const pattern of literalPatterns) {
         for (const match of source.matchAll(pattern)) {
             const text = match[1];
             if (!englishLiteral.test(text) || isoCurrencyCode.test(text)) {
-                continue;
-            }
-            if (skipFunction && skipFunction(match.index)) {
                 continue;
             }
             const line = source.slice(0, match.index).split('\n').length;
@@ -178,18 +113,14 @@ for (const file of walk(componentsDir)) {
         continue;
     }
     scanned.push(rel);
-    scanFile(file, rel, readFileSync(file, 'utf8'), null);
+    scanFile(rel, readFileSync(file, 'utf8'));
 }
 
+// Helper bersama (Issue #599 sub-langkah A): sudah tanpa allowlist, wajib bersih.
 {
     const rel = relative(componentsDir, sharedHelper).split('\\').join('/');
-    const source = readFileSync(sharedHelper, 'utf8');
-    const blocks = helperFunctionSource(source);
     scanned.push(rel);
-    scanFile(sharedHelper, rel, source, (index) => {
-        const block = blocks.findLast((b) => b.start <= index);
-        return block !== undefined && pendingHelperFunctions.has(block.name);
-    });
+    scanFile(rel, readFileSync(sharedHelper, 'utf8'));
 }
 
 if (violations.length > 0) {
