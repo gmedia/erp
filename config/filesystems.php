@@ -64,6 +64,14 @@ return [
             'report' => false,
         ],
 
+        // Tujuan arsip backup. Sengaja terpisah dari bucket object storage sumber.
+        'backups' => [
+            'driver' => 'local',
+            'root' => env('BACKUP_LOCAL_ROOT', storage_path('app/backups')),
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

@@ -41,6 +41,10 @@ return [
             'label' => 'System health status changed',
             'channels' => ['database', 'mail'],
         ],
+        'system_health.backup.failed' => [
+            'label' => 'Scheduled backup failed',
+            'channels' => ['database', 'mail'],
+        ],
     ],
 
     'push' => [
