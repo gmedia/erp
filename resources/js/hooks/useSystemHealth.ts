@@ -1,7 +1,13 @@
 import axios from '@/lib/axios';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-export type SystemHealthStatus = 'ok' | 'warning' | 'failed' | 'crashed' | 'skipped' | 'unknown';
+export type SystemHealthStatus =
+    | 'ok'
+    | 'warning'
+    | 'failed'
+    | 'crashed'
+    | 'skipped'
+    | 'unknown';
 
 export interface SystemHealthComponent {
     name: string;

@@ -1,5 +1,8 @@
 import DashboardPageShell from '@/components/common/DashboardPageShell';
-import { PageBanner, type PageBannerTone } from '@/components/common/PageBanner';
+import {
+    PageBanner,
+    type PageBannerTone,
+} from '@/components/common/PageBanner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTranslation } from '@/contexts/i18n-context';
@@ -174,7 +177,9 @@ export default function SystemHealthPage() {
                                                     <span className="font-medium">
                                                         {item.check}
                                                     </span>
-                                                    <StatusLabel status={item.status} />
+                                                    <StatusLabel
+                                                        status={item.status}
+                                                    />
                                                 </div>
                                                 {item.message && (
                                                     <span className="text-sm text-muted-foreground">
@@ -182,7 +187,9 @@ export default function SystemHealthPage() {
                                                     </span>
                                                 )}
                                                 <span className="text-xs text-muted-foreground tabular-nums">
-                                                    {formatDateTime(item.checked_at)}
+                                                    {formatDateTime(
+                                                        item.checked_at,
+                                                    )}
                                                 </span>
                                             </li>
                                         ))}
@@ -202,15 +209,21 @@ export default function SystemHealthPage() {
                                     <dt className="text-muted-foreground">
                                         {t('system_health.version.app')}
                                     </dt>
-                                    <dd className="tabular-nums">{data.version.app}</dd>
+                                    <dd className="tabular-nums">
+                                        {data.version.app}
+                                    </dd>
                                     <dt className="text-muted-foreground">
                                         {t('system_health.version.php')}
                                     </dt>
-                                    <dd className="tabular-nums">{data.version.php}</dd>
+                                    <dd className="tabular-nums">
+                                        {data.version.php}
+                                    </dd>
                                     <dt className="text-muted-foreground">
                                         {t('system_health.version.laravel')}
                                     </dt>
-                                    <dd className="tabular-nums">{data.version.laravel}</dd>
+                                    <dd className="tabular-nums">
+                                        {data.version.laravel}
+                                    </dd>
                                 </dl>
                             </CardContent>
                         </Card>
