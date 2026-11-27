@@ -43,7 +43,7 @@ test('vehicle loan cancel message is indonesian with X-Locale id', function () {
 
     deleteJson("/api/vehicle-loans/{$loan->id}", [], ['X-Locale' => 'id'])
         ->assertOk()
-        ->assertJsonPath('message', 'Permintaan Pinjaman Kendaraan dibatalkan.');
+        ->assertJsonPath('message', 'Permintaan Peminjaman Kendaraan dibatalkan.');
 });
 
 test('vehicle loan update error is indonesian with X-Locale id', function () {
@@ -54,7 +54,7 @@ test('vehicle loan update error is indonesian with X-Locale id', function () {
 
     putJson("/api/vehicle-loans/{$loan->id}", ['purpose' => 'Perubahan'], ['X-Locale' => 'id'])
         ->assertStatus(422)
-        ->assertJsonPath('message', 'Hanya Pinjaman Kendaraan berstatus draf yang dapat diubah.');
+        ->assertJsonPath('message', 'Hanya Peminjaman Kendaraan berstatus draf yang dapat diubah.');
 });
 
 test('approval delegation created message is indonesian with X-Locale id', function () {

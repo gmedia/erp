@@ -40,7 +40,7 @@ export function VehicleLoanQrPanel({
                         size={88}
                         aria-label={tPage(
                             'qr_aria_label',
-                            'QR untuk membuka form di loket keamanan',
+                            'QR untuk membuka formulir di loket keamanan',
                         )}
                     />
                 ) : (

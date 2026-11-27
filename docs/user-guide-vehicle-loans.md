@@ -1,6 +1,6 @@
 # Peminjaman Kendaraan Perusahaan
 
-Modul ini mengelola permintaan, persetujuan, pengambilan, dan pengembalian kendaraan perusahaan. Semua form dapat diakses melalui QR yang tersedia di pos keamanan; halaman QR mensyaratkan login.
+Modul ini mengelola permintaan, persetujuan, pengambilan, dan pengembalian kendaraan perusahaan. Semua formulir dapat diakses melalui QR yang tersedia di pos keamanan; halaman QR mensyaratkan login.
 
 ## Alur singkat
 
@@ -9,7 +9,7 @@ Modul ini mengelola permintaan, persetujuan, pengambilan, dan pengembalian kenda
 3. **Penyetuju** menerima notifikasi, membuka **Persetujuan Saya**, dapat mengganti pengemudi/unit, lalu menyetujui atau menolak beserta alasan.
 4. Peminjam menerima notifikasi hasil persetujuan (termasuk alasan penolakan).
 5. Setelah disetujui, peminjam membuka `/vehicle-loans/pickup`, memilih permintaan, mengunggah foto (selfie + SIM bila tanpa pengemudi; selfie bersama pengemudi bila ada pengemudi), lalu mengambil kunci di pos keamanan.
-6. **Petugas keamanan** membuka `/vehicle-loans/security` (**Keamanan Peminjaman Kendaraan**), memastikan status persetujuan, lalu menyerahkan kunci.
+6. **Petugas keamanan** membuka `/vehicle-loans/security` (**Peminjaman Kendaraan** › Keamanan), memastikan status persetujuan, lalu menyerahkan kunci.
 7. Setelah selesai, peminjam membuka `/vehicle-loans/return`, mengunggah foto serah terima & kondisi kendaraan, serta mencatat insiden bila ada.
 
 ## Hak akses
