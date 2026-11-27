@@ -1158,7 +1158,28 @@
         "report_configurations": {
             "title": "Konfigurasi Laporan",
             "description": "Pengaturan yang menentukan cara setiap laporan dibuat dan ditampilkan.",
-            "search_placeholder": "Cari kode, nama, deskripsi..."
+            "search_placeholder": "Cari kode, nama, deskripsi...",
+            "view": {
+                "title": "Detail Konfigurasi Laporan",
+                "description": "Lihat konfigurasi lengkap termasuk bagian-bagiannya",
+                "code": "Kode",
+                "name": "Nama",
+                "report_type": "Jenis Laporan",
+                "status": "Status",
+                "description_label": "Deskripsi",
+                "sections": "Bagian",
+                "sections_count": "Bagian ({count})",
+                "no_sections": "Belum ada bagian.",
+                "order": "Urutan",
+                "type": "Tipe",
+                "account_type": "Tipe Akun",
+                "sub_type": "Sub Tipe",
+                "sign": "Tanda",
+                "formula": "Formula",
+                "active": "Aktif",
+                "inactive": "Nonaktif",
+                "close": "Tutup"
+            }
         },
         "bank_reconciliations": {
             "title": "Rekonsiliasi Bank",

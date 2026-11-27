@@ -11,6 +11,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { useTranslation } from '@/contexts/i18n-context';
 import { cn } from '@/lib/utils';
 
 interface ViewModalShellProps {
@@ -38,6 +39,8 @@ export function ViewModalShell({
     footer,
     hideFooter = false,
 }: Readonly<ViewModalShellProps>) {
+    const { t } = useTranslation();
+
     return (
         <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
             <DialogContent
@@ -58,7 +61,7 @@ export function ViewModalShell({
                     <DialogFooter className={cn('pt-1', footerClassName)}>
                         {footer ?? (
                             <Button type="button" onClick={onClose}>
-                                Close
+                                {t('common.close')}
                             </Button>
                         )}
                     </DialogFooter>

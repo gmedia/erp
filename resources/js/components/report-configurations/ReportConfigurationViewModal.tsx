@@ -11,6 +11,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useTranslation } from '@/contexts/i18n-context';
 import { formatClassName } from '@/lib/status-badge';
 import { type ReportConfiguration } from '@/types/report-configuration';
 
@@ -39,30 +40,52 @@ const sectionTypeLabels: Record<string, string> = {
 export const ReportConfigurationViewModal =
     memo<ReportConfigurationViewModalProps>(
         function ReportConfigurationViewModal({ item, open, onClose }) {
+            const { t } = useTranslation();
+
             if (!item) return null;
+
+            const sections = item.sections ?? [];
+            const sectionTypeLabel = (type: string) =>
+                sectionTypeLabels[type] ?? formatClassName(type);
 
             return (
                 <ViewModalShell
                     open={open}
                     onClose={onClose}
-                    title="Report Configuration Details"
-                    description="View full configuration including sections"
+                    title={t('page.report_configurations.view.title')}
+                    description={t(
+                        'page.report_configurations.view.description',
+                    )}
                     contentClassName="flex max-h-[90vh] max-w-[95vw] flex-col overflow-hidden sm:max-w-5xl"
                 >
                     <div className="min-h-0 flex-1 overflow-y-auto sm:pr-4">
                         <div className="space-y-6 py-2">
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                <ViewField label="Code" value={item.code} />
-                                <ViewField label="Name" value={item.name} />
                                 <ViewField
-                                    label="Report Type"
+                                    label={t(
+                                        'page.report_configurations.view.code',
+                                    )}
+                                    value={item.code}
+                                />
+                                <ViewField
+                                    label={t(
+                                        'page.report_configurations.view.name',
+                                    )}
+                                    value={item.name}
+                                />
+                                <ViewField
+                                    label={t(
+                                        'page.report_configurations.view.report_type',
+                                    )}
                                     value={
                                         reportTypeLabels[item.report_type] ??
                                         formatClassName(item.report_type)
                                     }
                                 />
                                 <ViewField
-                                    label="Status"
+                                    label={t(
+                                        'page.report_configurations.view.status',
+                                    )}
                                     value={
                                         <Badge
                                             variant={
@@ -72,14 +95,20 @@ export const ReportConfigurationViewModal =
                                             }
                                         >
                                             {item.is_active
-                                                ? 'Active'
-                                                : 'Inactive'}
+                                                ? t(
+                                                      'page.report_configurations.view.active',
+                                                  )
+                                                : t(
+                                                      'page.report_configurations.view.inactive',
+                                                  )}
                                         </Badge>
                                     }
                                 />
                                 <div className="sm:col-span-2">
                                     <ViewField
-                                        label="Description"
+                                        label={t(
+                                            'page.report_configurations.view.description_label',
+                                        )}
                                         value={item.description || '-'}
                                     />
                                 </div>
@@ -87,109 +116,159 @@ export const ReportConfigurationViewModal =
 
                             <div className="space-y-2">
                                 <h4 className="text-sm font-semibold">
-                                    Sections ({item.sections?.length ?? 0})
+                                    {t(
+                                        'page.report_configurations.view.sections_count',
+                                        {
+                                            count: String(sections.length),
+                                        },
+                                    )}
                                 </h4>
                                 <div className="rounded-md border">
                                     <Table>
                                         <TableHeader>
                                             <TableRow>
-                                                <TableHead>Order</TableHead>
-                                                <TableHead>Code</TableHead>
-                                                <TableHead>Name</TableHead>
-                                                <TableHead className="hidden sm:table-cell">
-                                                    Type
+                                                <TableHead>
+                                                    {t(
+                                                        'page.report_configurations.view.order',
+                                                    )}
+                                                </TableHead>
+                                                <TableHead>
+                                                    {t(
+                                                        'page.report_configurations.view.code',
+                                                    )}
+                                                </TableHead>
+                                                <TableHead>
+                                                    {t(
+                                                        'page.report_configurations.view.name',
+                                                    )}
                                                 </TableHead>
                                                 <TableHead className="hidden sm:table-cell">
-                                                    Account Type
+                                                    {t(
+                                                        'page.report_configurations.view.type',
+                                                    )}
                                                 </TableHead>
                                                 <TableHead className="hidden sm:table-cell">
-                                                    Sub Type
+                                                    {t(
+                                                        'page.report_configurations.view.account_type',
+                                                    )}
                                                 </TableHead>
                                                 <TableHead className="hidden sm:table-cell">
-                                                    Sign
+                                                    {t(
+                                                        'page.report_configurations.view.sub_type',
+                                                    )}
                                                 </TableHead>
-                                                <TableHead>Formula</TableHead>
+                                                <TableHead className="hidden sm:table-cell">
+                                                    {t(
+                                                        'page.report_configurations.view.sign',
+                                                    )}
+                                                </TableHead>
+                                                <TableHead>
+                                                    {t(
+                                                        'page.report_configurations.view.formula',
+                                                    )}
+                                                </TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {(item.sections ?? []).length ===
-                                            0 ? (
+                                            {sections.length === 0 ? (
                                                 <TableRow>
                                                     <TableCell
                                                         colSpan={8}
                                                         className="text-center text-muted-foreground"
                                                     >
-                                                        No sections defined.
+                                                        {t(
+                                                            'page.report_configurations.view.no_sections',
+                                                        )}
                                                     </TableCell>
                                                 </TableRow>
                                             ) : (
-                                                (item.sections ?? []).map(
-                                                    (section) => (
-                                                        <TableRow
-                                                            key={
-                                                                section.id ??
-                                                                section.code
-                                                            }
-                                                        >
-                                                            <TableCell>
-                                                                {
-                                                                    section.sort_order
+                                                sections.map((section) => (
+                                                    <TableRow
+                                                        key={
+                                                            section.id ??
+                                                            section.code
+                                                        }
+                                                    >
+                                                        <TableCell>
+                                                            {section.sort_order}
+                                                        </TableCell>
+                                                        <TableCell className="max-w-24 font-mono text-xs">
+                                                            <span
+                                                                className="block truncate"
+                                                                title={
+                                                                    section.code
                                                                 }
-                                                            </TableCell>
-                                                            <TableCell className="max-w-24 font-mono text-xs">
-                                                                <span
-                                                                    className="block truncate"
-                                                                    title={
-                                                                        section.code
-                                                                    }
-                                                                >
-                                                                    {
-                                                                        section.code
-                                                                    }
-                                                                </span>
-                                                            </TableCell>
-                                                            <TableCell>
+                                                            >
+                                                                {section.code}
+                                                            </span>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <span
+                                                                className="block max-w-48 truncate sm:max-w-none"
+                                                                title={
+                                                                    section.name
+                                                                }
+                                                            >
                                                                 {section.name}
-                                                            </TableCell>
-                                                            <TableCell className="hidden sm:table-cell">
-                                                                <Badge variant="outline">
-                                                                    {sectionTypeLabels[
-                                                                        section
-                                                                            .section_type
-                                                                    ] ??
-                                                                        formatClassName(
-                                                                            section.section_type,
-                                                                        )}
-                                                                </Badge>
-                                                            </TableCell>
-                                                            <TableCell className="hidden sm:table-cell">
-                                                                {section.account_type_filter ||
-                                                                    '-'}
-                                                            </TableCell>
-                                                            <TableCell className="hidden sm:table-cell">
-                                                                {section.account_sub_type_filter ||
-                                                                    '-'}
-                                                            </TableCell>
-                                                            <TableCell className="hidden sm:table-cell">
-                                                                {
-                                                                    section.sign_convention
-                                                                }
-                                                            </TableCell>
-                                                            <TableCell className="max-w-48 font-mono text-xs">
-                                                                <span
-                                                                    className="block truncate"
-                                                                    title={
-                                                                        section.formula ||
-                                                                        undefined
-                                                                    }
-                                                                >
-                                                                    {section.formula ||
+                                                            </span>
+                                                            <span className="mt-1 flex flex-wrap gap-1 text-xs text-muted-foreground sm:hidden">
+                                                                <span>
+                                                                    {sectionTypeLabel(
+                                                                        section.section_type,
+                                                                    )}
+                                                                </span>
+                                                                <span>·</span>
+                                                                <span>
+                                                                    {section.account_type_filter ||
                                                                         '-'}
                                                                 </span>
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    ),
-                                                )
+                                                                <span>·</span>
+                                                                <span>
+                                                                    {section.account_sub_type_filter ||
+                                                                        '-'}
+                                                                </span>
+                                                                <span>·</span>
+                                                                <span>
+                                                                    {
+                                                                        section.sign_convention
+                                                                    }
+                                                                </span>
+                                                            </span>
+                                                        </TableCell>
+                                                        <TableCell className="hidden sm:table-cell">
+                                                            <Badge variant="outline">
+                                                                {sectionTypeLabel(
+                                                                    section.section_type,
+                                                                )}
+                                                            </Badge>
+                                                        </TableCell>
+                                                        <TableCell className="hidden sm:table-cell">
+                                                            {section.account_type_filter ||
+                                                                '-'}
+                                                        </TableCell>
+                                                        <TableCell className="hidden sm:table-cell">
+                                                            {section.account_sub_type_filter ||
+                                                                '-'}
+                                                        </TableCell>
+                                                        <TableCell className="hidden sm:table-cell">
+                                                            {
+                                                                section.sign_convention
+                                                            }
+                                                        </TableCell>
+                                                        <TableCell className="max-w-48 font-mono text-xs">
+                                                            <span
+                                                                className="block truncate"
+                                                                title={
+                                                                    section.formula ||
+                                                                    undefined
+                                                                }
+                                                            >
+                                                                {section.formula ||
+                                                                    '-'}
+                                                            </span>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))
                                             )}
                                         </TableBody>
                                     </Table>

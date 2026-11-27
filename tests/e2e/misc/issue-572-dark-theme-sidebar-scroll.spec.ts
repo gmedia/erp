@@ -126,17 +126,55 @@ test.describe('issue #572 appearance, sidebar scroll, report sections', () => {
             .click();
         const dialog = page.getByRole('dialog');
         await expect(dialog).toBeVisible();
+        await expect
+            .poll(() => dialog.evaluate((el) => getComputedStyle(el).opacity))
+            .toBe('1');
 
         const clipped = await dialog
-            .locator('table th, table td')
+            .locator('table th, table td, table td span')
             .evaluateAll((cells) =>
                 cells
                     .map((c) => ({
                         text: c.textContent?.trim() ?? '',
                         overflow: c.scrollWidth > c.clientWidth + 1,
+                        titled:
+                            c.hasAttribute('title') ||
+                            !!c.querySelector('[title]'),
                     }))
-                    .filter((c) => c.overflow),
+                    .filter((c) => c.overflow && !c.titled),
             );
         expect(clipped).toEqual([]);
+
+        const bgAlpha = await dialog.evaluate((el) => {
+            const css = getComputedStyle(el).backgroundColor;
+            const ctx = document.createElement('canvas').getContext('2d');
+            if (!ctx) return 0;
+            ctx.clearRect(0, 0, 1, 1);
+            ctx.fillStyle = css;
+            ctx.fillRect(0, 0, 1, 1);
+            return ctx.getImageData(0, 0, 1, 1).data[3] / 255;
+        });
+        expect(bgAlpha).toBe(1);
+
+        await expect(
+            dialog.getByText('Detail Konfigurasi Laporan'),
+        ).toBeVisible();
+        await expect(
+            dialog.getByRole('columnheader', { name: 'Urutan' }),
+        ).toBeVisible();
+        await expect(
+            dialog.getByRole('columnheader', { name: 'Order' }),
+        ).toHaveCount(0);
+        await expect(
+            dialog.getByText('Report Configuration Details'),
+        ).toHaveCount(0);
+        await expect(
+            dialog.getByRole('button', { name: 'Tutup', exact: true }),
+        ).toBeVisible();
+        await expect(
+            dialog
+                .locator('[data-slot="dialog-footer"]')
+                .getByRole('button', { name: 'Close', exact: true }),
+        ).toHaveCount(0);
     });
 });

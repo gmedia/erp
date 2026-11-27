@@ -1158,7 +1158,28 @@
         "report_configurations": {
             "title": "Report Configurations",
             "description": "Settings that define how each report is generated and displayed.",
-            "search_placeholder": "Search code, name, description..."
+            "search_placeholder": "Search code, name, description...",
+            "view": {
+                "title": "Report Configuration Details",
+                "description": "View full configuration including sections",
+                "code": "Code",
+                "name": "Name",
+                "report_type": "Report Type",
+                "status": "Status",
+                "description_label": "Description",
+                "sections": "Sections",
+                "sections_count": "Sections ({count})",
+                "no_sections": "No sections defined.",
+                "order": "Order",
+                "type": "Type",
+                "account_type": "Account Type",
+                "sub_type": "Sub Type",
+                "sign": "Sign",
+                "formula": "Formula",
+                "active": "Active",
+                "inactive": "Inactive",
+                "close": "Close"
+            }
         },
         "bank_reconciliations": {
             "title": "Bank Reconciliations",
