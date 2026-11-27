@@ -624,6 +624,7 @@
         "accounts_receivable": "Piutang Usaha",
         "admin": "Admin",
         "admin_setting": "Pengaturan Admin",
+        "system_health": "Kesehatan Sistem",
         "aging_dashboard": "Dasbor Umur Piutang",
         "ap_aging_report": "Laporan Umur Utang",
         "ap_outstanding_report": "Laporan Utang Belum Lunas",

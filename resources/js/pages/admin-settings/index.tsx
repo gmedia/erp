@@ -1015,7 +1015,10 @@ const SYSTEM_HEALTH_NUMBER_FIELDS = [
         key: 'system_health_disk_warning_percent',
         label: 'Disk: peringatan di atas (%)',
     },
-    { key: 'system_health_disk_failed_percent', label: 'Disk: gagal di atas (%)' },
+    {
+        key: 'system_health_disk_failed_percent',
+        label: 'Disk: gagal di atas (%)',
+    },
     {
         key: 'system_health_memory_warning_percent',
         label: 'Memori container: peringatan di atas (%)',
@@ -1105,7 +1108,8 @@ function SystemHealthSettings({
                         type="email"
                         disabled={!canEdit}
                         defaultValue={
-                            (settings?.system_health_alert_email as string) ?? ''
+                            (settings?.system_health_alert_email as string) ??
+                            ''
                         }
                     />
                 </SettingsRow>

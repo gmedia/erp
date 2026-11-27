@@ -9,7 +9,10 @@ const HEALTH_FIXTURE_PASSWORD = 'password';
 function ensureSystemHealthFixtures(): void {
     const php = [
         `$hash = \\Illuminate\\Support\\Facades\\Hash::make('${HEALTH_FIXTURE_PASSWORD}');`,
-        `$perm = \\App\\Models\\Permission::updateOrCreate(['name' => 'system_health'], ['display_name' => 'System Health', 'parent_id' => null]);`,
+        `$perm = \\App\\Models\\Permission::updateOrCreate(`,
+        `    ['name' => 'system_health'],`,
+        `    ['display_name' => 'System Health', 'parent_id' => null],`,
+        `);`,
         `$make = function (string $email, string $name, array $permIds) use ($hash) {`,
         `    $user = \\App\\Models\\User::updateOrCreate(['email' => $email], [`,
         `        'name' => $name, 'password' => $hash, 'email_verified_at' => now(),`,
@@ -22,11 +25,16 @@ function ensureSystemHealthFixtures(): void {
         `};`,
         `$make('${HEALTH_VIEWER_EMAIL}', 'System Health Viewer', [$perm->id]);`,
         `$make('${NO_HEALTH_EMAIL}', 'No Health Access', []);`,
+        `app(\\App\\Health\\SystemHealthRunner::class)->run();`,
     ].join('\n');
 
-    execFileSync('./vendor/bin/sail', ['artisan', 'tinker', `--execute=${php}`], {
-        stdio: 'inherit',
-    });
+    execFileSync(
+        './vendor/bin/sail',
+        ['artisan', 'tinker', `--execute=${php}`],
+        {
+            stdio: 'inherit',
+        },
+    );
 }
 
 function waitForSystemHealthResponse(
@@ -45,7 +53,9 @@ test.describe('System Health', () => {
         ensureSystemHealthFixtures();
     });
 
-    test('halaman tampil dengan kartu status dan info versi', async ({ page }) => {
+    test('halaman tampil dengan kartu status dan info versi', async ({
+        page,
+    }) => {
         await login(page);
 
         const responsePromise = waitForSystemHealthResponse(page, 'GET');
@@ -56,8 +66,10 @@ test.describe('System Health', () => {
             page.getByRole('heading', { name: 'System Health', exact: true }),
         ).toBeVisible();
         await expect(page.getByTestId('system-health-overall')).toBeVisible();
-        await expect(page.getByTestId('system-health-card').first()).toBeVisible();
-        await expect(page.getByRole('heading', { name: 'Versi' })).toBeVisible();
+        await expect(
+            page.getByTestId('system-health-card').first(),
+        ).toBeVisible();
+        await expect(page.getByText('Version', { exact: true })).toBeVisible();
         await expect(page.getByText('Laravel', { exact: true })).toBeVisible();
     });
 
@@ -73,7 +85,7 @@ test.describe('System Health', () => {
         await expectResponseOk(await runPromise);
 
         await expect(page.getByTestId('system-health-overall')).toContainText(
-            'Diperiksa pada',
+            'Checked at',
         );
     });
 

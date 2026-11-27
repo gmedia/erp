@@ -624,6 +624,7 @@
         "accounts_receivable": "Accounts Receivable",
         "admin": "Admin",
         "admin_setting": "Settings",
+        "system_health": "System Health",
         "aging_dashboard": "Aging Dashboard",
         "ap_aging_report": "AP Aging Report",
         "ap_outstanding_report": "AP Outstanding",
