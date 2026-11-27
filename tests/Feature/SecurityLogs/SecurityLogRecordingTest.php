@@ -2,12 +2,14 @@
 
 use App\Actions\Employees\SyncEmployeePermissionsAction;
 use App\Actions\SecurityLogs\RecordSecurityLogAction;
+use App\Actions\SocialAuth\CreateSocialLoginTicketAction;
 use App\Models\Permission;
 use App\Models\SecurityLog;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
 
 use function Pest\Laravel\postJson;
 
@@ -70,6 +72,32 @@ describe('authentication events', function () {
 
         expect(SecurityLog::query()->where('event', SecurityLog::EVENT_LOGOUT)->where('user_id', $user->id)->exists())
             ->toBeTrue();
+    });
+
+    it('records a social login when a ticket is exchanged for a token', function () {
+        $user = User::factory()->create();
+        $ticketRequest = Request::create('/api/social/exchange', 'POST', [], [], [], [
+            'REMOTE_ADDR' => '127.0.0.1',
+            'HTTP_USER_AGENT' => 'PHPUnit',
+        ]);
+        $ticketToken = app(CreateSocialLoginTicketAction::class)->execute(
+            $user,
+            $ticketRequest,
+            'nonce-social-1',
+            'google',
+            'workspace',
+        );
+
+        // The ticket is bound to the IP and user agent it was issued for; send the same ones.
+        $this->withServerVariables(['REMOTE_ADDR' => '127.0.0.1', 'HTTP_USER_AGENT' => 'PHPUnit'])
+            ->withHeader('X-Social-Ticket-Token', $ticketToken)
+            ->postJson('/api/social/exchange')
+            ->assertOk();
+
+        $log = SecurityLog::query()->where('event', SecurityLog::EVENT_LOGIN_SUCCESS)->where('user_id', $user->id)->first();
+
+        expect($log)->not->toBeNull()
+            ->and($log->metadata)->toBe(['method' => 'social']);
     });
 
     it('records a password reset', function () {
