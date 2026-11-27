@@ -13,6 +13,7 @@ import { Link, useParams } from 'react-router-dom';
 
 interface ApprovalStep {
     step_order: number;
+    step_name: string | null;
     status: string;
     action: string | null;
     comments: string | null;
@@ -506,6 +507,13 @@ export default function VehicleLoanDetailPage() {
                                                             {step.step_order}
                                                         </span>
                                                         <div className="space-y-1">
+                                                            {step.step_name && (
+                                                                <p className="text-sm font-medium">
+                                                                    {
+                                                                        step.step_name
+                                                                    }
+                                                                </p>
+                                                            )}
                                                             <p className="text-sm font-medium">
                                                                 {tPage(
                                                                     'detail_page.step_label',
