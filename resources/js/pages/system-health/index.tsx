@@ -40,12 +40,17 @@ const OVERALL_TONE: Record<SystemHealthData['overall'], PageBannerTone> = {
     unknown: 'info',
 };
 
-function formatDateTime(value: string | null | undefined): string {
+function formatDateTime(
+    value: string | null | undefined,
+    locale: string,
+): string {
     if (!value) {
         return '-';
     }
     const date = new Date(value);
-    return Number.isNaN(date.getTime()) ? '-' : date.toLocaleString();
+    return Number.isNaN(date.getTime())
+        ? '-'
+        : date.toLocaleString(locale === 'id' ? 'id-ID' : 'en-US');
 }
 
 function StatusLabel({ status }: Readonly<{ status: SystemHealthStatus }>) {
@@ -62,7 +67,10 @@ function ComponentCard({
     component,
     checkedAt,
 }: Readonly<{ component: SystemHealthComponent; checkedAt: string | null }>) {
-    const { t } = useTranslation();
+    const { t, locale } = useTranslation();
+    const message = component.message_code
+        ? t(component.message_code, component.message_params)
+        : component.message;
 
     return (
         <Card className="gap-3 bg-card p-5" data-testid="system-health-card">
@@ -78,13 +86,12 @@ function ComponentCard({
                         {component.summary}
                     </p>
                 )}
-                {component.message && (
-                    <p className="text-sm text-muted-foreground">
-                        {component.message}
-                    </p>
+                {message && (
+                    <p className="text-sm text-muted-foreground">{message}</p>
                 )}
                 <p className="text-xs text-muted-foreground">
-                    {t('system_health.checked_at')}: {formatDateTime(checkedAt)}
+                    {t('system_health.checked_at')}:{' '}
+                    {formatDateTime(checkedAt, locale)}
                 </p>
             </CardContent>
         </Card>
@@ -92,7 +99,7 @@ function ComponentCard({
 }
 
 export default function SystemHealthPage() {
-    const { t } = useTranslation();
+    const { t, locale } = useTranslation();
     const query = useSystemHealth();
     const runCheck = useRunSystemHealthCheck();
     const data = query.data;
@@ -139,7 +146,7 @@ export default function SystemHealthPage() {
                     <div data-testid="system-health-overall">
                         <PageBanner tone={overallTone} title={overallTitle}>
                             {data.checked_at
-                                ? `${t('system_health.checked_at')}: ${formatDateTime(data.checked_at)}`
+                                ? `${t('system_health.checked_at')}: ${formatDateTime(data.checked_at, locale)}`
                                 : t('system_health.never_checked')}
                         </PageBanner>
                     </div>
@@ -181,14 +188,21 @@ export default function SystemHealthPage() {
                                                         status={item.status}
                                                     />
                                                 </div>
-                                                {item.message && (
+                                                {(item.message_code ||
+                                                    item.message) && (
                                                     <span className="text-sm text-muted-foreground">
-                                                        {item.message}
+                                                        {item.message_code
+                                                            ? t(
+                                                                  item.message_code,
+                                                                  item.message_params,
+                                                              )
+                                                            : item.message}
                                                     </span>
                                                 )}
                                                 <span className="text-xs text-muted-foreground tabular-nums">
                                                     {formatDateTime(
                                                         item.checked_at,
+                                                        locale,
                                                     )}
                                                 </span>
                                             </li>

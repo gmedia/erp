@@ -2,6 +2,7 @@
 
 namespace App\Health\Checks;
 
+use App\Health\SystemHealthMessage;
 use Spatie\Health\Checks\Check;
 use Spatie\Health\Checks\Result;
 
@@ -19,7 +20,7 @@ class AppVersionCheck extends Check
                 'app_version' => $appVersion,
                 'php_version' => PHP_VERSION,
                 'laravel_version' => app()->version(),
-            ])
+            ] + SystemHealthMessage::meta('system_health.app_version.ok', ['version' => $appVersion]))
             ->shortSummary($appVersion)
             ->ok('Versi aplikasi ' . $appVersion . '.');
     }
