@@ -40,6 +40,31 @@ const SECTION_TYPE_KEYS = [
 
 const SIGN_KEYS = ['normal', 'reversed'] as const;
 
+const ACCOUNT_TYPE_KEYS = [
+    'asset',
+    'liability',
+    'equity',
+    'revenue',
+    'expense',
+] as const;
+
+const SUB_TYPE_KEYS = [
+    'current_asset',
+    'fixed_asset',
+    'other_asset',
+    'current_liability',
+    'long_term_liability',
+    'paid_in_capital',
+    'retained_earnings',
+    'operating_revenue',
+    'non_operating_revenue',
+    'cost_of_goods_sold',
+    'operating_expense',
+    'depreciation_expense',
+    'non_operating_expense',
+    'tax_expense',
+] as const;
+
 const isKnown = <T extends string>(
     keys: readonly T[],
     value: string,
@@ -55,27 +80,39 @@ export const ReportConfigurationViewModal =
             const sections = item.sections ?? [];
             const reportTypeLabel = isKnown(REPORT_TYPE_KEYS, item.report_type)
                 ? t(
-                      `page.report_configurations.view.report_type_labels.${item.report_type}`,
+                      `page.report_configurations.view_report_type_${item.report_type}`,
                   )
                 : formatClassName(item.report_type);
             const sectionTypeLabel = (type: string) =>
                 isKnown(SECTION_TYPE_KEYS, type)
-                    ? t(
-                          `page.report_configurations.view.section_type_labels.${type}`,
-                      )
+                    ? t(`page.report_configurations.view_section_type_${type}`)
                     : formatClassName(type);
             const signLabel = (sign: string) =>
                 isKnown(SIGN_KEYS, sign)
-                    ? t(`page.report_configurations.view.sign_labels.${sign}`)
+                    ? t(`page.report_configurations.view_sign_${sign}`)
                     : sign;
+            const accountTypeLabel = (value?: string | null) =>
+                value
+                    ? isKnown(ACCOUNT_TYPE_KEYS, value)
+                        ? t(
+                              `page.report_configurations.view_account_type_${value}`,
+                          )
+                        : formatClassName(value)
+                    : '-';
+            const subTypeLabel = (value?: string | null) =>
+                value
+                    ? isKnown(SUB_TYPE_KEYS, value)
+                        ? t(`page.report_configurations.view_sub_type_${value}`)
+                        : formatClassName(value)
+                    : '-';
 
             return (
                 <ViewModalShell
                     open={open}
                     onClose={onClose}
-                    title={t('page.report_configurations.view.title')}
+                    title={t('page.report_configurations.view_title')}
                     description={t(
-                        'page.report_configurations.view.description',
+                        'page.report_configurations.view_description',
                     )}
                     contentClassName="flex max-h-[90vh] max-w-[95vw] flex-col overflow-hidden sm:max-w-5xl"
                 >
@@ -84,25 +121,25 @@ export const ReportConfigurationViewModal =
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <ViewField
                                     label={t(
-                                        'page.report_configurations.view.code',
+                                        'page.report_configurations.view_code',
                                     )}
                                     value={item.code}
                                 />
                                 <ViewField
                                     label={t(
-                                        'page.report_configurations.view.name',
+                                        'page.report_configurations.view_name',
                                     )}
                                     value={item.name}
                                 />
                                 <ViewField
                                     label={t(
-                                        'page.report_configurations.view.report_type',
+                                        'page.report_configurations.view_report_type',
                                     )}
                                     value={reportTypeLabel}
                                 />
                                 <ViewField
                                     label={t(
-                                        'page.report_configurations.view.status',
+                                        'page.report_configurations.view_status',
                                     )}
                                     value={
                                         <Badge
@@ -114,10 +151,10 @@ export const ReportConfigurationViewModal =
                                         >
                                             {item.is_active
                                                 ? t(
-                                                      'page.report_configurations.view.active',
+                                                      'page.report_configurations.view_active',
                                                   )
                                                 : t(
-                                                      'page.report_configurations.view.inactive',
+                                                      'page.report_configurations.view_inactive',
                                                   )}
                                         </Badge>
                                     }
@@ -125,7 +162,7 @@ export const ReportConfigurationViewModal =
                                 <div className="sm:col-span-2">
                                     <ViewField
                                         label={t(
-                                            'page.report_configurations.view.description_label',
+                                            'page.report_configurations.view_description_label',
                                         )}
                                         value={item.description || '-'}
                                     />
@@ -135,7 +172,7 @@ export const ReportConfigurationViewModal =
                             <div className="space-y-2">
                                 <h4 className="text-sm font-semibold">
                                     {t(
-                                        'page.report_configurations.view.sections_count',
+                                        'page.report_configurations.view_sections_count',
                                         {
                                             count: String(sections.length),
                                         },
@@ -147,42 +184,42 @@ export const ReportConfigurationViewModal =
                                             <TableRow>
                                                 <TableHead>
                                                     {t(
-                                                        'page.report_configurations.view.order',
+                                                        'page.report_configurations.view_order',
                                                     )}
                                                 </TableHead>
                                                 <TableHead>
                                                     {t(
-                                                        'page.report_configurations.view.code',
+                                                        'page.report_configurations.view_code',
                                                     )}
                                                 </TableHead>
                                                 <TableHead>
                                                     {t(
-                                                        'page.report_configurations.view.name',
+                                                        'page.report_configurations.view_name',
                                                     )}
                                                 </TableHead>
                                                 <TableHead className="hidden sm:table-cell">
                                                     {t(
-                                                        'page.report_configurations.view.type',
+                                                        'page.report_configurations.view_type',
                                                     )}
                                                 </TableHead>
                                                 <TableHead className="hidden sm:table-cell">
                                                     {t(
-                                                        'page.report_configurations.view.account_type',
+                                                        'page.report_configurations.view_account_type',
                                                     )}
                                                 </TableHead>
                                                 <TableHead className="hidden sm:table-cell">
                                                     {t(
-                                                        'page.report_configurations.view.sub_type',
+                                                        'page.report_configurations.view_sub_type',
                                                     )}
                                                 </TableHead>
                                                 <TableHead className="hidden sm:table-cell">
                                                     {t(
-                                                        'page.report_configurations.view.sign',
+                                                        'page.report_configurations.view_sign',
                                                     )}
                                                 </TableHead>
                                                 <TableHead>
                                                     {t(
-                                                        'page.report_configurations.view.formula',
+                                                        'page.report_configurations.view_formula',
                                                     )}
                                                 </TableHead>
                                             </TableRow>
@@ -195,7 +232,7 @@ export const ReportConfigurationViewModal =
                                                         className="text-center text-muted-foreground"
                                                     >
                                                         {t(
-                                                            'page.report_configurations.view.no_sections',
+                                                            'page.report_configurations.view_no_sections',
                                                         )}
                                                     </TableCell>
                                                 </TableRow>
@@ -237,13 +274,15 @@ export const ReportConfigurationViewModal =
                                                                 </span>
                                                                 <span>·</span>
                                                                 <span className="max-w-full truncate">
-                                                                    {section.account_type_filter ||
-                                                                        '-'}
+                                                                    {accountTypeLabel(
+                                                                        section.account_type_filter,
+                                                                    )}
                                                                 </span>
                                                                 <span>·</span>
                                                                 <span className="max-w-full truncate">
-                                                                    {section.account_sub_type_filter ||
-                                                                        '-'}
+                                                                    {subTypeLabel(
+                                                                        section.account_sub_type_filter,
+                                                                    )}
                                                                 </span>
                                                                 <span>·</span>
                                                                 <span className="max-w-full truncate">
@@ -261,12 +300,14 @@ export const ReportConfigurationViewModal =
                                                             </Badge>
                                                         </TableCell>
                                                         <TableCell className="hidden sm:table-cell">
-                                                            {section.account_type_filter ||
-                                                                '-'}
+                                                            {accountTypeLabel(
+                                                                section.account_type_filter,
+                                                            )}
                                                         </TableCell>
                                                         <TableCell className="hidden sm:table-cell">
-                                                            {section.account_sub_type_filter ||
-                                                                '-'}
+                                                            {subTypeLabel(
+                                                                section.account_sub_type_filter,
+                                                            )}
                                                         </TableCell>
                                                         <TableCell className="hidden sm:table-cell">
                                                             {signLabel(
