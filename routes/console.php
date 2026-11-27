@@ -6,6 +6,7 @@ use App\Actions\VehicleLoans\CleanupVehicleLoansAction;
 use App\Actions\VehicleLoans\NotifyOverdueVehicleLoansAction;
 use App\Console\Commands\CleanupSocialLoginTickets;
 use App\Console\Commands\PruneStaleDeviceTokens;
+use App\Console\Commands\RunSystemHealthChecks;
 use App\Models\RecurringJournal;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -150,3 +151,18 @@ Artisan::command('approvals:repair-missing-steps {--dry-run : Audit only without
 Schedule::call(fn () => Artisan::call('approvals:repair-missing-steps'))
     ->daily()
     ->name('repair-missing-approval-steps');
+
+// Kesehatan sistem: pemeriksaan tiap 5 menit. Heartbeat scheduler & antrian dipakai cek
+// "scheduler terakhir jalan" dan "worker hidup".
+Schedule::command(RunSystemHealthChecks::class)
+    ->everyFiveMinutes()
+    ->withoutOverlapping()
+    ->name('system-health-run');
+
+Schedule::command('health:schedule-check-heartbeat')
+    ->everyMinute()
+    ->name('system-health-schedule-heartbeat');
+
+Schedule::command('health:queue-check-heartbeat')
+    ->everyFiveMinutes()
+    ->name('system-health-queue-heartbeat');

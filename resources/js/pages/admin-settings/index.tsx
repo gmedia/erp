@@ -75,6 +75,7 @@ interface SettingsData {
         inventory_in_transit_account_id?: string | number | null;
         inventory_in_transit_account_label?: string | null;
     };
+    system_health?: Record<string, string | number | null | undefined>;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -1009,6 +1010,114 @@ function AccountingSettings({
     );
 }
 
+const SYSTEM_HEALTH_NUMBER_FIELDS = [
+    {
+        key: 'system_health_disk_warning_percent',
+        label: 'Disk: peringatan di atas (%)',
+    },
+    {
+        key: 'system_health_disk_failed_percent',
+        label: 'Disk: gagal di atas (%)',
+    },
+    {
+        key: 'system_health_memory_warning_percent',
+        label: 'Memori container: peringatan di atas (%)',
+    },
+    {
+        key: 'system_health_memory_failed_percent',
+        label: 'Memori container: gagal di atas (%)',
+    },
+    {
+        key: 'system_health_queue_failed_jobs_warning',
+        label: 'Antrian: job gagal peringatan (jumlah)',
+    },
+    {
+        key: 'system_health_scheduler_stale_minutes',
+        label: 'Scheduler: tidak berjalan lebih dari (menit)',
+    },
+    {
+        key: 'system_health_db_connections_warning',
+        label: 'Database: koneksi aktif peringatan (jumlah)',
+    },
+] as const;
+
+function SystemHealthSettings({
+    settings,
+}: Readonly<{ settings: SettingsData['system_health'] }>) {
+    const { can } = usePermissions();
+    const canEdit = can('admin_setting.edit');
+    const [processing, setProcessing] = useState(false);
+    const [recentlySuccessful, setRecentlySuccessful] = useState(false);
+    const [errors, setErrors] = useState<Record<string, string>>({});
+
+    const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) =>
+        submitJsonAdminSettings(
+            e,
+            setProcessing,
+            setErrors,
+            setRecentlySuccessful,
+        );
+
+    return (
+        <SettingsSection
+            title="Kesehatan Sistem"
+            description="Ambang peringatan dan alamat notifikasi untuk pemeriksaan kesehatan sistem"
+            actions={
+                <SettingsSaveButton
+                    formId="system-health-settings-form"
+                    processing={processing}
+                    recentlySuccessful={recentlySuccessful}
+                    testId="save-system-health-settings"
+                    hidden={!canEdit}
+                />
+            }
+        >
+            <form
+                id="system-health-settings-form"
+                onSubmit={handleSubmit}
+                data-testid="system-health-settings-form"
+            >
+                {SYSTEM_HEALTH_NUMBER_FIELDS.map((field) => (
+                    <SettingsRow
+                        key={field.key}
+                        label={field.label}
+                        htmlFor={field.key}
+                        error={errors[field.key]}
+                    >
+                        <Input
+                            id={field.key}
+                            name={field.key}
+                            type="number"
+                            inputMode="numeric"
+                            min={0}
+                            disabled={!canEdit}
+                            defaultValue={settings?.[field.key] ?? ''}
+                        />
+                    </SettingsRow>
+                ))}
+
+                <SettingsRow
+                    label="Email notifikasi"
+                    htmlFor="system_health_alert_email"
+                    description="Alamat admin IT yang menerima notifikasi saat status berubah. Kosongkan untuk tidak mengirim email."
+                    error={errors.system_health_alert_email}
+                >
+                    <Input
+                        id="system_health_alert_email"
+                        name="system_health_alert_email"
+                        type="email"
+                        disabled={!canEdit}
+                        defaultValue={
+                            (settings?.system_health_alert_email as string) ??
+                            ''
+                        }
+                    />
+                </SettingsRow>
+            </form>
+        </SettingsSection>
+    );
+}
+
 export default function AdminSettings() {
     const [searchParams] = useSearchParams();
     const currentGroup = searchParams.get('group') || 'general';
@@ -1088,6 +1197,11 @@ export default function AdminSettings() {
                     <AccountingSettings
                         settings={data?.settings?.accounting}
                         onSaved={handleGeneralSettingsSaved}
+                    />
+                )}
+                {currentGroup === 'system_health' && (
+                    <SystemHealthSettings
+                        settings={data?.settings?.system_health}
                     />
                 )}
             </AdminSettingsLayout>

@@ -33,6 +33,10 @@ return [
             'label' => 'Vehicle return due',
             'channels' => ['database', 'push'],
         ],
+        'system_health.status.changed' => [
+            'label' => 'System health status changed',
+            'channels' => ['database', 'mail'],
+        ],
     ],
 
     'push' => [
