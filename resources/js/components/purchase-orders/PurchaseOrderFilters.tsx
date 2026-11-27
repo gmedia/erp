@@ -27,13 +27,19 @@ export function createPurchaseOrderFilterFields(): FieldDescriptor[] {
                 name: 'status',
                 label: { key: 'column.status', fallback: 'Status' },
                 options: purchaseOrderStatusOptions,
-                placeholder: 'Select Status',
+                placeholder: {
+                    key: 'filter.select_status',
+                    fallback: 'Select Status',
+                },
             },
             {
                 name: 'currency',
                 label: { key: 'column.currency', fallback: 'Currency' },
                 options: currencyOptions,
-                placeholder: 'Select Currency',
+                placeholder: {
+                    key: 'filter.select_currency',
+                    fallback: 'Select Currency',
+                },
             },
         ]),
         ...createDateFilterFields([
@@ -43,7 +49,10 @@ export function createPurchaseOrderFilterFields(): FieldDescriptor[] {
                     key: 'column.order_date_from',
                     fallback: 'Order Date From',
                 },
-                placeholder: 'Order Date From',
+                placeholder: {
+                    key: 'column.order_date_from',
+                    fallback: 'Order Date From',
+                },
             },
             {
                 name: 'order_date_to',
@@ -51,7 +60,10 @@ export function createPurchaseOrderFilterFields(): FieldDescriptor[] {
                     key: 'column.order_date_to',
                     fallback: 'Order Date To',
                 },
-                placeholder: 'Order Date To',
+                placeholder: {
+                    key: 'column.order_date_to',
+                    fallback: 'Order Date To',
+                },
             },
         ]),
     ];

@@ -16,7 +16,6 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const componentsDir = resolve(root, 'resources/js/components');
 
 const pendingFiles = new Set([
-    'account-mappings/AccountMappingFilters.tsx',
     'approval-audit-trail/Filters.tsx',
     'approval-delegations/ApprovalDelegationFilters.tsx',
     'approval-flows/ApprovalFlowFilters.tsx',
@@ -24,21 +23,15 @@ const pendingFiles = new Set([
     'asset-maintenances/AssetMaintenanceFilters.tsx',
     'asset-movements/AssetMovementFilters.tsx',
     'asset-stocktakes/AssetStocktakeFilters.tsx',
-    'bank-reconciliations/BankReconciliationFilters.tsx',
-
 
     'pipeline-audit-trail/Filters.tsx',
     'pipelines/PipelineFilters.tsx',
-    'purchase-orders/PurchaseOrderFilters.tsx',
-    'purchase-requests/PurchaseRequestFilters.tsx',
-    'recurring-journals/RecurringJournalFilters.tsx',
     'report-configurations/ReportConfigurationFilters.tsx',
     'security-logs/Filters.tsx',
     'stock-adjustments/StockAdjustmentFilters.tsx',
     'stock-monitor/Filters.tsx',
     'stock-movements/Filters.tsx',
     'stock-transfers/StockTransferFilters.tsx',
-    'supplier-returns/SupplierReturnFilters.tsx',
     'reports/general-ledger/Filters.tsx',
     'reports/inventory-valuation/Filters.tsx',
     'reports/purchase-order-status/Filters.tsx',

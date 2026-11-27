@@ -1582,7 +1582,27 @@
         "budget_type_revenue": "Pendapatan",
         "receipt_date_from": "Tanggal Penerimaan Dari",
         "receipt_date_to": "Tanggal Penerimaan Sampai",
-        "select_status_title": "Pilih Status"
+        "select_status_title": "Pilih Status",
+        "select_priority": "Pilih Prioritas",
+        "select_account": "Pilih Akun",
+        "select_source_coa_version": "Pilih versi COA sumber",
+        "select_target_coa_version": "Pilih versi COA tujuan",
+        "supplier_returns_select_goods_receipt": "Pilih penerimaan barang",
+        "supplier_returns_select_supplier": "Pilih pemasok",
+        "supplier_returns_select_warehouse": "Pilih gudang",
+        "supplier_returns_select_reason": "Pilih alasan",
+        "supplier_returns_select_status": "Pilih status",
+        "recurring_select_frequency": "Pilih Frekuensi",
+        "recurring_frequency_daily": "Harian",
+        "recurring_frequency_weekly": "Mingguan",
+        "recurring_frequency_monthly": "Bulanan",
+        "recurring_frequency_quarterly": "Triwulanan",
+        "recurring_frequency_annual": "Tahunan",
+        "reconciliation_status_in_progress": "Sedang Berjalan",
+        "reconciliation_status_completed": "Selesai",
+        "account_mapping_type_rename": "Ubah Nama",
+        "account_mapping_type_merge": "Gabung",
+        "account_mapping_type_split": "Pecah"
     },
     "form_fields": {
         "asset_depreciation_runs": {

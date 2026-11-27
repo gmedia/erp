@@ -1579,7 +1579,27 @@
         "budget_type_revenue": "Revenue",
         "receipt_date_from": "Receipt Date From",
         "receipt_date_to": "Receipt Date To",
-        "select_status_title": "Select Status"
+        "select_status_title": "Select Status",
+        "select_priority": "Select Priority",
+        "select_account": "Select Account",
+        "select_source_coa_version": "Select source COA version",
+        "select_target_coa_version": "Select target COA version",
+        "supplier_returns_select_goods_receipt": "Select goods receipt",
+        "supplier_returns_select_supplier": "Select supplier",
+        "supplier_returns_select_warehouse": "Select warehouse",
+        "supplier_returns_select_reason": "Select reason",
+        "supplier_returns_select_status": "Select status",
+        "recurring_select_frequency": "Select Frequency",
+        "recurring_frequency_daily": "Daily",
+        "recurring_frequency_weekly": "Weekly",
+        "recurring_frequency_monthly": "Monthly",
+        "recurring_frequency_quarterly": "Quarterly",
+        "recurring_frequency_annual": "Yearly",
+        "reconciliation_status_in_progress": "In Progress",
+        "reconciliation_status_completed": "Completed",
+        "account_mapping_type_rename": "Rename",
+        "account_mapping_type_merge": "Merge",
+        "account_mapping_type_split": "Split"
     },
     "form_fields": {
         "asset_depreciation_runs": {

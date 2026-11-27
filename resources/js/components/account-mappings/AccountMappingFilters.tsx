@@ -21,11 +21,29 @@ export function createAccountMappingFilterFields(): FieldDescriptor[] {
             'type',
             { key: 'column.type', fallback: 'Type' },
             [
-                { label: 'Rename', value: 'rename' },
-                { label: 'Merge', value: 'merge' },
-                { label: 'Split', value: 'split' },
+                {
+                    label: {
+                        key: 'filter.account_mapping_type_rename',
+                        fallback: 'Rename',
+                    },
+                    value: 'rename',
+                },
+                {
+                    label: {
+                        key: 'filter.account_mapping_type_merge',
+                        fallback: 'Merge',
+                    },
+                    value: 'merge',
+                },
+                {
+                    label: {
+                        key: 'filter.account_mapping_type_split',
+                        fallback: 'Split',
+                    },
+                    value: 'split',
+                },
             ],
-            'All Types',
+            { key: 'filter.all_types', fallback: 'All Types' },
         ),
         createAsyncSelectFilterField(
             'source_coa_version_id',
@@ -34,7 +52,10 @@ export function createAccountMappingFilterFields(): FieldDescriptor[] {
                 fallback: 'Source COA Version',
             },
             '/api/coa-versions',
-            'Select source COA version',
+            {
+                key: 'filter.select_source_coa_version',
+                fallback: 'Select source COA version',
+            },
         ),
         createAsyncSelectFilterField(
             'target_coa_version_id',
@@ -43,7 +64,10 @@ export function createAccountMappingFilterFields(): FieldDescriptor[] {
                 fallback: 'Target COA Version',
             },
             '/api/coa-versions',
-            'Select target COA version',
+            {
+                key: 'filter.select_target_coa_version',
+                fallback: 'Select target COA version',
+            },
         ),
     ];
 }
