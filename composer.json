@@ -23,6 +23,7 @@
         "maatwebsite/excel": "^3.1",
         "sentry/sentry-laravel": "^4.20",
         "socialiteproviders/microsoft": "^4.3",
+        "spatie/laravel-backup": "^9",
         "spatie/laravel-health": "^1.42"
     },
     "require-dev": {
