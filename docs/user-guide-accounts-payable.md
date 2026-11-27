@@ -89,6 +89,8 @@ Cancelled              Overdue (jika melewati due date)
    - Isi **Discount Taken** jika ada diskon pembayaran dini (opsional)
 4. Klik **Save** — payment dibuat dengan nomor otomatis (PAY-2026-000001)
 
+> **Catatan departemen:** AP Payment tidak memiliki departemen. Jurnal pembayaran hanya menyentuh akun kas/bank dan utang, sehingga tidak masuk ke laporan Laba Rugi per departemen. Departemen dicatat pada Supplier Bill (baris beban).
+
 ### Multi-Bill Payment
 
 Satu pembayaran bisa melunasi **beberapa tagihan sekaligus**:

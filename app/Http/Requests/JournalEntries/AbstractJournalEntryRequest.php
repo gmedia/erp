@@ -3,6 +3,7 @@
 namespace App\Http\Requests\JournalEntries;
 
 use App\Http\Requests\AuthorizedFormRequest;
+use App\Support\Accounting\DepartmentPostingRule;
 
 abstract class AbstractJournalEntryRequest extends AuthorizedFormRequest
 {
@@ -50,6 +51,27 @@ abstract class AbstractJournalEntryRequest extends AuthorizedFormRequest
 
             if (bccomp((string) $totalDebit, (string) $totalCredit, 2) !== 0) {
                 $validator->errors()->add('lines', __('journal_entry.lines_not_balanced'));
+            }
+
+            // #563: departemen hanya untuk akun pendapatan/beban.
+            $accountIds = collect($lines)
+                ->filter(fn ($line): bool => ! empty($line['department_id']))
+                ->pluck('account_id');
+            $accountTypes = DepartmentPostingRule::accountTypesById($accountIds);
+
+            foreach ($lines as $index => $line) {
+                if (empty($line['department_id'])) {
+                    continue;
+                }
+
+                $accountType = $accountTypes[(int) ($line['account_id'] ?? 0)] ?? null;
+
+                if ($accountType !== null && ! DepartmentPostingRule::appliesTo($accountType)) {
+                    $validator->errors()->add(
+                        "lines.{$index}.department_id",
+                        __('journal_entry.department_requires_revenue_or_expense'),
+                    );
+                }
             }
         });
     }

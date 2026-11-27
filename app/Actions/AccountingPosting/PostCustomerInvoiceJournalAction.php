@@ -6,6 +6,7 @@ use App\Actions\Concerns\RoundsLineAmounts;
 use App\Actions\JournalEntries\CreateJournalEntryAction;
 use App\Models\CustomerInvoice;
 use App\Models\JournalEntry;
+use App\Support\Accounting\DepartmentPostingRule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -53,13 +54,19 @@ class PostCustomerInvoiceJournalAction
             $creditLines = [];
             $revenueGrouped = [];
 
-            // Departemen dokumen diwariskan ke baris pendapatan saja (akun revenue); AR tetap null.
+            // Departemen dokumen diwariskan ke baris pendapatan saja (#563); AR tetap null.
+            $accountTypes = DepartmentPostingRule::accountTypesById($invoice->items->pluck('account_id'));
+
             foreach ($invoice->items as $item) {
                 $accountId = (int) $item->account_id;
-                $key = $accountId . '|' . ($invoice->department_id ?? '');
+                $departmentId = DepartmentPostingRule::resolve(
+                    $invoice->department_id,
+                    $accountTypes[$accountId] ?? null,
+                );
+                $key = $accountId . '|' . ($departmentId ?? '');
                 $revenueGrouped[$key] = ($revenueGrouped[$key] ?? [
                     'account_id' => $accountId,
-                    'department_id' => $invoice->department_id,
+                    'department_id' => $departmentId,
                     'amount' => 0.0,
                 ]);
                 $revenueGrouped[$key]['amount'] += $this->roundLineAmount($item->line_total);

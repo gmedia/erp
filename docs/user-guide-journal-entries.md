@@ -232,6 +232,13 @@ Setiap jurnal harus memenuhi prinsip double-entry:
 - Untuk sistem multi-cabang, setiap baris jurnal dapat terkait dengan cabang tertentu
 - Transaksi antar cabang akan otomatis menghasilkan jurnal inter-branch clearing
 
+### 7.5 Departemen (Laba Rugi per Departemen)
+
+- Departemen hanya berlaku untuk baris akun **pendapatan** dan **beban**
+- Baris akun aset, utang, dan ekuitas tidak dapat diisi departemen; isian departemen pada baris tersebut ditolak (422)
+- Dokumen sumber (Customer Invoice, Supplier Bill, Credit Note) hanya meneruskan departemen ke baris pendapatan/beban
+- AP Payment dan AR Receipt tidak membawa departemen, karena hanya menyentuh akun kas/bank, utang, dan piutang
+
 ---
 
 ## 8. Integrasi dengan Modul Lain

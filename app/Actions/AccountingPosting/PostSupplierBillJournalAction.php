@@ -10,6 +10,7 @@ use App\Models\JournalEntry;
 use App\Models\JournalEntryLine;
 use App\Models\SupplierBill;
 use App\Models\SupplierBillItem;
+use App\Support\Accounting\DepartmentPostingRule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -68,6 +69,7 @@ class PostSupplierBillJournalAction
             // GR/IR dikosongkan sebesar nilai penerimaan untuk qty yang ditagih (harga GR);
             // selisih harga bill vs GR masuk 51000.
             $varianceAmount = 0.0;
+            $accountTypes = DepartmentPostingRule::accountTypesById($supplierBill->items->pluck('account_id'));
 
             foreach ($supplierBill->items as $item) {
                 $grCreditAccountId = $item->goods_receipt_item_id !== null
@@ -89,12 +91,16 @@ class PostSupplierBillJournalAction
                     continue;
                 }
 
-                // Departemen bill hanya diwariskan ke baris beban; baris GR/IR dan AP tetap null.
+                // Departemen bill hanya diwariskan ke baris beban (#563); akun aset tetap null.
                 $accountId = (int) $item->account_id;
-                $key = $accountId . '|' . ($supplierBill->department_id ?? '');
+                $departmentId = DepartmentPostingRule::resolve(
+                    $supplierBill->department_id,
+                    $accountTypes[$accountId] ?? null,
+                );
+                $key = $accountId . '|' . ($departmentId ?? '');
                 $expenseGrouped[$key] = ($expenseGrouped[$key] ?? [
                     'account_id' => $accountId,
-                    'department_id' => $supplierBill->department_id,
+                    'department_id' => $departmentId,
                     'amount' => 0.0,
                 ]);
                 $expenseGrouped[$key]['amount'] += $this->roundLineAmount($item->line_total);

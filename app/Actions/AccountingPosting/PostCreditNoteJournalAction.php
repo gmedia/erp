@@ -6,6 +6,7 @@ use App\Actions\Concerns\RoundsLineAmounts;
 use App\Actions\JournalEntries\CreateJournalEntryAction;
 use App\Models\CreditNote;
 use App\Models\JournalEntry;
+use App\Support\Accounting\DepartmentPostingRule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -50,13 +51,19 @@ class PostCreditNoteJournalAction
             $departmentId = $creditNote->department_id
                 ?? $creditNote->customerInvoice?->department_id;
 
+            $accountTypes = DepartmentPostingRule::accountTypesById($creditNote->items->pluck('account_id'));
+
             $debitGrouped = [];
             foreach ($creditNote->items as $item) {
                 $accountId = (int) $item->account_id;
-                $key = $accountId . '|' . ($departmentId ?? '');
+                $lineDepartmentId = DepartmentPostingRule::resolve(
+                    $departmentId,
+                    $accountTypes[$accountId] ?? null,
+                );
+                $key = $accountId . '|' . ($lineDepartmentId ?? '');
                 $debitGrouped[$key] = ($debitGrouped[$key] ?? [
                     'account_id' => $accountId,
-                    'department_id' => $departmentId,
+                    'department_id' => $lineDepartmentId,
                     'amount' => 0.0,
                 ]);
                 $debitGrouped[$key]['amount'] += $this->roundLineAmount($item->line_total);
