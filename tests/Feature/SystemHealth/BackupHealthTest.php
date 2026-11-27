@@ -23,6 +23,16 @@ beforeEach(function () {
     Storage::fake('backups');
 });
 
+test('backup check label follows the request locale', function () {
+    $check = new BackupFreshnessHealthCheck;
+
+    app()->setLocale('id');
+    expect($check->getLabel())->toBe('Backup terakhir');
+
+    app()->setLocale('en');
+    expect($check->getLabel())->toBe('Latest backup');
+});
+
 test('backup check fails when no archive exists yet', function () {
     $result = (new BackupFreshnessHealthCheck)->run();
 

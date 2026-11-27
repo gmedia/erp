@@ -16,6 +16,14 @@ class BackupFreshnessHealthCheck extends Check
 {
     public const MAX_AGE_HOURS = 26;
 
+    /**
+     * Label diterjemahkan saat dibaca (bukan saat boot), agar mengikuti locale request.
+     */
+    public function getLabel(): string
+    {
+        return __('system_health.backup.label');
+    }
+
     public function run(): Result
     {
         try {
