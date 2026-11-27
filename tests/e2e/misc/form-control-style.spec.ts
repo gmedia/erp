@@ -146,9 +146,15 @@ for (const theme of ['light', 'dark'] as const) {
                 select: '[role="dialog"] button[role="combobox"]',
                 datepicker:
                     '[role="dialog"] button[aria-haspopup="dialog"]:has(svg.lucide-calendar)',
+                asyncSelect:
+                    '[role="dialog"] button[role="combobox"]:not([data-slot="select-trigger"])',
             };
             const selectStyle = await readControlStyle(page, triggers.select);
             const dateStyle = await readControlStyle(page, triggers.datepicker);
+            const asyncStyle = await readControlStyle(
+                page,
+                triggers.asyncSelect,
+            );
 
             mkdirSync(EVIDENCE_DIR, { recursive: true });
             await page
@@ -168,7 +174,7 @@ for (const theme of ['light', 'dark'] as const) {
                     path: `${EVIDENCE_DIR}/datepicker-trigger-${theme}.png`,
                 });
 
-            for (const style of [selectStyle, dateStyle]) {
+            for (const style of [selectStyle, dateStyle, asyncStyle]) {
                 expect(style.borderRadius).toBe(RADIUS_INPUT);
                 expect(style.height).toBeCloseTo(HEIGHT, 0);
                 expect(style.borderWidth).toBe('1px');
