@@ -8,6 +8,11 @@ import {
 
 type ApiResponseMatcher = string | RegExp | ((url: string) => boolean);
 
+export const APPLY_FILTERS_LABEL = {
+    en: 'Apply Filters',
+    id: 'Terapkan filter',
+} as const;
+
 export async function expectResponseOk(response: PlaywrightResponse): Promise<void> {
     const status = response.status();
     if (status < 400) {

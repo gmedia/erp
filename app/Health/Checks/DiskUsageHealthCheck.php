@@ -19,7 +19,7 @@ class DiskUsageHealthCheck extends Check
 
         if ($percent === null) {
             return Result::make()
-                ->meta(SystemHealthMessage::meta('system_health.disk.unavailable'))
+                ->meta(['summary_code' => 'system_health.summary.unavailable'] + SystemHealthMessage::meta('system_health.disk.unavailable'))
                 ->shortSummary('Tidak tersedia')
                 ->warning('Pembacaan disk tidak tersedia.');
         }

@@ -1,8 +1,10 @@
 'use client';
 
+import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 import {
     labelFallbackText,
     LabelText,
+    TranslatedText,
 } from '@/components/common/TranslatedText';
 import { Button } from '@/components/ui/button';
 import {
@@ -49,9 +51,17 @@ export function FilterModal({
             <DialogContent className="flex max-h-[90vh] flex-col overflow-hidden border-border bg-background p-0 text-foreground sm:max-w-[425px]">
                 <div className="shrink-0 p-6 pb-2">
                     <DialogHeader>
-                        <DialogTitle>Filters</DialogTitle>
+                        <DialogTitle>
+                            <TranslatedText
+                                k="common.filter_modal.title"
+                                fallback="Filters"
+                            />
+                        </DialogTitle>
                         <DialogDescription className="text-muted-foreground">
-                            Apply filters to refine the results
+                            <TranslatedText
+                                k="common.filter_modal.description"
+                                fallback="Apply filters to refine the results"
+                            />
                         </DialogDescription>
                     </DialogHeader>
                 </div>
@@ -71,10 +81,17 @@ export function FilterModal({
                                     (element.type as { displayName?: string })
                                         ?.displayName === 'AsyncSelect');
 
+                            const isDatePicker =
+                                element?.type === FilterDatePicker;
+
                             const commonProps = {
                                 name: field.name,
                                 value: tempFilters[field.name] ?? '', // Always pass a defined string to prevent uncontrolled-to-controlled warning
-                                label: labelFallbackText(field.label),
+                                ...(isDatePicker
+                                    ? {}
+                                    : {
+                                          label: labelFallbackText(field.label),
+                                      }),
                             };
 
                             const onChangeHandler = (
@@ -119,12 +136,23 @@ export function FilterModal({
                 <div className="shrink-0 p-6 pt-2">
                     <DialogFooter>
                         <Button variant="outline" onClick={onReset}>
-                            Reset
+                            <TranslatedText
+                                k="common.filter_modal.reset"
+                                fallback="Reset"
+                            />
                         </Button>
                         <Button variant="outline" onClick={onClearAll}>
-                            Clear All
+                            <TranslatedText
+                                k="common.filter_modal.clear_all"
+                                fallback="Clear All"
+                            />
                         </Button>
-                        <Button onClick={onApply}>Apply Filters</Button>
+                        <Button onClick={onApply}>
+                            <TranslatedText
+                                k="common.filter_modal.apply"
+                                fallback="Apply Filters"
+                            />
+                        </Button>
                     </DialogFooter>
                 </div>
             </DialogContent>

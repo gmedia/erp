@@ -54,8 +54,15 @@ function formatDateTime(
         : date.toLocaleString(locale === 'id' ? 'id-ID' : 'en-US');
 }
 
-function formatSummary(component: SystemHealthComponent): string | null {
-    const { summary, name } = component;
+function formatSummary(
+    component: SystemHealthComponent,
+    t: (key: string) => string,
+): string | null {
+    const { summary, summary_code: summaryCode, name } = component;
+
+    if (summaryCode) {
+        return t(summaryCode);
+    }
 
     if (!summary) {
         return null;
@@ -88,7 +95,7 @@ function ComponentCard({
     checkedAt,
 }: Readonly<{ component: SystemHealthComponent; checkedAt: string | null }>) {
     const { t, locale } = useTranslation();
-    const summary = formatSummary(component);
+    const summary = formatSummary(component, t);
     const message = component.message_code
         ? t(component.message_code, component.message_params)
         : component.message;
