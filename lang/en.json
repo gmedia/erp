@@ -3220,6 +3220,7 @@
             "assignment_heading": "Assignment (optional)",
             "assignment_hint": "Can be left empty. Approvers can assign the driver and unit during review.",
             "breadcrumb": "Vehicle Loans",
+            "breadcrumb_leaf": "Vehicle Loan Request",
             "description": "Fill in the schedule and trip purpose, save the draft, then submit for approval.",
             "driver_label": "Driver",
             "driver_placeholder": "Select driver",
@@ -3255,6 +3256,7 @@
             "load_button": "Load My Pickups",
             "loading_button": "Loading...",
             "odometer_label": "Final odometer (optional)",
+            "odometer_placeholder": "e.g. 45230",
             "odometer_unit": "km",
             "pickup_empty_hint": "No vehicle is currently on loan. Returns become available once security hands over the key.",
             "pickup_empty_placeholder": "No active pickups",
@@ -3268,6 +3270,7 @@
         },
         "security": {
             "approval_label": "Approval",
+            "approval_same_as_status": "Same as status",
             "breadcrumb": "Security Queue",
             "count_suffix": "{count} requests",
             "description": "Verify the approval status before handing over the vehicle key.",

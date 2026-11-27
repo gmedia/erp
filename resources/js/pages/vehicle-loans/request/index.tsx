@@ -36,6 +36,9 @@ interface AssignmentOptions {
     units: Array<{ id: number; plate_number: string; vehicle_type: string }>;
 }
 
+const ASSIGNMENT_TRIGGER_CLASS =
+    'min-w-0 text-left [&_[data-slot=select-value]]:block [&_[data-slot=select-value]]:truncate [&_[data-slot=select-value]]:whitespace-nowrap';
+
 const emptyForm: LoanForm = {
     start_at: '',
     end_at: '',
@@ -157,6 +160,13 @@ export default function VehicleLoanRequestPage() {
                     title: tPage('request.breadcrumb', 'Peminjaman Kendaraan'),
                     href: '/vehicle-loans/request',
                 },
+                {
+                    title: tPage(
+                        'request.breadcrumb_leaf',
+                        'Permintaan Peminjaman Kendaraan',
+                    ),
+                    href: '/vehicle-loans/request',
+                },
             ]}
         >
             <Helmet>
@@ -248,7 +258,7 @@ export default function VehicleLoanRequestPage() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="grid gap-4 sm:grid-cols-2">
-                        <div className="grid gap-2">
+                        <div className="grid min-w-0 gap-2">
                             <Label htmlFor="driver_id">
                                 {tPage('request.driver_label', 'Pengemudi')}
                             </Label>
@@ -261,7 +271,18 @@ export default function VehicleLoanRequestPage() {
                                     )
                                 }
                             >
-                                <SelectTrigger id="driver_id">
+                                <SelectTrigger
+                                    id="driver_id"
+                                    className={ASSIGNMENT_TRIGGER_CLASS}
+                                    title={
+                                        form.driver_id
+                                            ? undefined
+                                            : tPage(
+                                                  'request.undecided_option',
+                                                  'Belum ditentukan (penyetuju melengkapi)',
+                                              )
+                                    }
+                                >
                                     <SelectValue
                                         placeholder={tPage(
                                             'request.driver_placeholder',
@@ -270,7 +291,13 @@ export default function VehicleLoanRequestPage() {
                                     />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="none">
+                                    <SelectItem
+                                        value="none"
+                                        title={tPage(
+                                            'request.undecided_option',
+                                            'Belum ditentukan (penyetuju melengkapi)',
+                                        )}
+                                    >
                                         {tPage(
                                             'request.undecided_option',
                                             'Belum ditentukan (penyetuju melengkapi)',
@@ -287,7 +314,7 @@ export default function VehicleLoanRequestPage() {
                                 </SelectContent>
                             </Select>
                         </div>
-                        <div className="grid gap-2">
+                        <div className="grid min-w-0 gap-2">
                             <Label htmlFor="vehicle_unit_id">
                                 {tPage('request.unit_label', 'Unit kendaraan')}
                             </Label>
@@ -300,7 +327,18 @@ export default function VehicleLoanRequestPage() {
                                     )
                                 }
                             >
-                                <SelectTrigger id="vehicle_unit_id">
+                                <SelectTrigger
+                                    id="vehicle_unit_id"
+                                    className={ASSIGNMENT_TRIGGER_CLASS}
+                                    title={
+                                        form.vehicle_unit_id
+                                            ? undefined
+                                            : tPage(
+                                                  'request.undecided_option',
+                                                  'Belum ditentukan (penyetuju melengkapi)',
+                                              )
+                                    }
+                                >
                                     <SelectValue
                                         placeholder={tPage(
                                             'request.unit_placeholder',
@@ -309,7 +347,13 @@ export default function VehicleLoanRequestPage() {
                                     />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="none">
+                                    <SelectItem
+                                        value="none"
+                                        title={tPage(
+                                            'request.undecided_option',
+                                            'Belum ditentukan (penyetuju melengkapi)',
+                                        )}
+                                    >
                                         {tPage(
                                             'request.undecided_option',
                                             'Belum ditentukan (penyetuju melengkapi)',
