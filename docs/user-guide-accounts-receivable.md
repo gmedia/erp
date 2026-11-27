@@ -89,6 +89,8 @@ Cancelled         Overdue (jika melewati due date)
    - Isi **Discount Given** jika ada diskon pembayaran dini (opsional)
 4. Klik **Save** — receipt dibuat dengan nomor otomatis (RCV-2026-000001)
 
+> **Catatan departemen:** AR Receipt tidak memiliki departemen. Jurnal penerimaan hanya menyentuh akun kas/bank dan piutang, sehingga tidak masuk ke laporan Laba Rugi per departemen. Departemen dicatat pada Customer Invoice (baris pendapatan).
+
 ### Multi-Invoice Receipt
 
 Satu penerimaan bisa melunasi **beberapa invoice sekaligus**:
