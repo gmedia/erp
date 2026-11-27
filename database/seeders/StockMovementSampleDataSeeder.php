@@ -18,6 +18,7 @@ use App\Models\StockTransfer;
 use App\Models\SupplierReturn;
 use App\Services\StockPostingService;
 use Database\Seeders\Concerns\ReopensDemoPeriodClosings;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Artisan;
 
@@ -46,6 +47,9 @@ class StockMovementSampleDataSeeder extends Seeder
     // sudah di-rename oleh seeder masing-masing, jadi pola lama tidak dipakai lagi.
     private const SA_DEMO = 'SA-____-00000_';
 
+    /** Penyesuaian bulanan SA-YYYYMM-NNNN (StockAdjustmentMonthlyDemoSeeder). */
+    private const SA_MONTHLY_DEMO = 'SA-______-____';
+
     private const ST_DEMO = 'ST-____-00000_';
 
     protected function seedDemoData(): void
@@ -72,9 +76,8 @@ class StockMovementSampleDataSeeder extends Seeder
             ->orderBy('id')
             ->each(fn (SupplierReturn $return) => $stockPosting->postSupplierReturn($return));
 
-        StockAdjustment::query()
+        $this->demoAdjustmentsQuery()
             ->where('status', 'approved')
-            ->where('adjustment_number', 'like', self::SA_DEMO)
             ->with('items')
             ->orderBy('adjustment_date')
             ->orderBy('id')
@@ -125,6 +128,16 @@ class StockMovementSampleDataSeeder extends Seeder
                 }
             }
         }
+    }
+
+    /**
+     * Dokumen SA demo: pola nomor lama (SA-YYYY-00000N) dan penyesuaian bulanan.
+     */
+    private function demoAdjustmentsQuery(): Builder
+    {
+        return StockAdjustment::query()->where(fn ($query) => $query
+            ->where('adjustment_number', 'like', self::SA_DEMO)
+            ->orWhere('adjustment_number', 'like', self::SA_MONTHLY_DEMO));
     }
 
     /**
@@ -241,7 +254,7 @@ class StockMovementSampleDataSeeder extends Seeder
         $demoIds = [
             GoodsReceipt::class => $this->demoIds(GoodsReceipt::class, 'gr_number', self::GR_DEMO),
             SupplierReturn::class => $this->demoIds(SupplierReturn::class, 'return_number', self::SR_DEMO),
-            StockAdjustment::class => $this->demoIds(StockAdjustment::class, 'adjustment_number', self::SA_DEMO),
+            StockAdjustment::class => $this->demoAdjustmentsQuery()->pluck('id')->all(),
             StockTransfer::class => $this->demoIds(StockTransfer::class, 'transfer_number', self::ST_DEMO),
         ];
 
@@ -290,7 +303,7 @@ class StockMovementSampleDataSeeder extends Seeder
                     ->whereIn('source_id', $this->demoIds(SupplierReturn::class, 'return_number', self::SR_DEMO)))
                 ->orWhere(fn ($q) => $q
                     ->where('source_type', StockAdjustment::class)
-                    ->whereIn('source_id', $this->demoIds(StockAdjustment::class, 'adjustment_number', self::SA_DEMO)))
+                    ->whereIn('source_id', $this->demoAdjustmentsQuery()->pluck('id')))
                 ->orWhere(fn ($q) => $q
                     ->where('source_type', StockTransfer::class)
                     ->whereIn('source_id', $this->demoIds(StockTransfer::class, 'transfer_number', self::ST_DEMO))))
@@ -323,9 +336,8 @@ class StockMovementSampleDataSeeder extends Seeder
             ->get()
             ->each(fn (SupplierReturn $return) => $postSupplierReturn->execute($return->refresh()));
 
-        StockAdjustment::query()
+        $this->demoAdjustmentsQuery()
             ->where('status', 'approved')
-            ->where('adjustment_number', 'like', self::SA_DEMO)
             ->orderBy('id')
             ->get()
             ->each(fn (StockAdjustment $adjustment) => $postStockAdjustment->execute($adjustment->refresh()));

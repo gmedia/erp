@@ -197,6 +197,7 @@ class DatabaseSeeder extends Seeder
             StockTransferSampleDataSeeder::class,
             InventoryStocktakeSampleDataSeeder::class,
             StockAdjustmentSampleDataSeeder::class,
+            StockAdjustmentMonthlyDemoSeeder::class,
             StockMovementSampleDataSeeder::class,
             ArSampleDataSeeder::class,
             ArMonthlyDemoSeeder::class,
