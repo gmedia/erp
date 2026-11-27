@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { login } from '../helpers';
+import { APPLY_FILTERS_LABEL, login } from '../helpers';
 
 const LOCALE_KEY = 'app_locale';
 
@@ -262,7 +262,9 @@ test.describe('i18n filter inputs (locale id)', () => {
                 r.url().includes('/stock-monitor') &&
                 r.url().includes('low_stock_threshold=1000'),
         );
-        await page.getByRole('button', { name: 'Apply Filters' }).click();
+        await page
+            .getByRole('button', { name: APPLY_FILTERS_LABEL.id })
+            .click();
         await filterRequest;
     });
 });
