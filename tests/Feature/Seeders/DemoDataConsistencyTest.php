@@ -2,6 +2,7 @@
 
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
+use App\Support\Demo\DemoCalendar;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -12,12 +13,16 @@ uses(RefreshDatabase::class)->group('sample-data-seeders');
 
 function glBalance(string $code): float
 {
-    $fiscalYear = FiscalYear::query()->where('status', 'open')->firstOrFail();
+    // Jendela demo 13 bulan lintas tahun fiskal (#571): saldo GL = seluruh FY demo,
+    // sebanding dengan subledger yang juga tidak dibatasi FY.
+    $fiscalYearIds = FiscalYear::query()
+        ->whereIn('name', array_map('strval', DemoCalendar::fiscalYears()))
+        ->pluck('id');
 
     $row = DB::table('journal_entry_lines')
         ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
         ->join('accounts', 'accounts.id', '=', 'journal_entry_lines.account_id')
-        ->where('journal_entries.fiscal_year_id', $fiscalYear->id)
+        ->whereIn('journal_entries.fiscal_year_id', $fiscalYearIds)
         ->where('journal_entries.status', 'posted')
         ->where('accounts.code', $code)
         ->selectRaw('COALESCE(SUM(journal_entry_lines.debit),0) as debit, COALESCE(SUM(journal_entry_lines.credit),0) as credit')

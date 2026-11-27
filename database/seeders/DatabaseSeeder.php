@@ -211,6 +211,10 @@ class DatabaseSeeder extends Seeder
         $this->spreadIdenticalAuditTimestamps();
         $this->renumberDemoJournalEntries($journalIdBoundary);
 
+        // Penutupan tahun lalu paling akhir: jurnal penutup dibentuk setelah semua
+        // transaksi demo tercatat, karena penutupan annual mengunci seluruh FY (#571).
+        $this->call(DemoPeriodClosingSeeder::class);
+
         // Assign all permissions to sample users for easy testing. Cari karyawan lewat
         // user_id: email karyawan bisa berbeda dari email user di data demo lama (PR432).
         $allPermissions = Permission::all();

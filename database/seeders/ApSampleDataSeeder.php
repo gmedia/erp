@@ -10,7 +10,6 @@ use App\Models\ApPaymentAllocation;
 use App\Models\Branch;
 use App\Models\CoaVersion;
 use App\Models\Department;
-use App\Models\FiscalYear;
 use App\Models\GoodsReceipt;
 use App\Models\JournalEntry;
 use App\Models\JournalEntryLine;
@@ -20,23 +19,21 @@ use App\Models\Supplier;
 use App\Models\SupplierBill;
 use App\Models\SupplierBillItem;
 use App\Models\User;
-use Database\Seeders\Concerns\ReopensDemoPeriodClosings;
+use App\Support\Demo\DemoCalendar;
 use Illuminate\Database\Seeder;
 
 class ApSampleDataSeeder extends Seeder
 {
-    use ReopensDemoPeriodClosings;
-
     /** Pola nomor dokumen AP demo yang dibuat seeder ini. */
     private const BILL_DEMO = 'BILL-____-00000%';
 
     private const PAYMENT_DEMO = 'PAY-____-00000%';
 
-    protected function seedDemoData(): void
+    public function run(): void
     {
         $adminUserId = User::query()->where('email', config('app.admin'))->value('id') ?? User::query()->value('id');
         $branchId = Branch::query()->value('id');
-        $fiscalYear = FiscalYear::query()->where('status', 'open')->first();
+        $fiscalYear = DemoCalendar::currentFiscalYear();
 
         if (! $adminUserId || ! $branchId || ! $fiscalYear) {
             return;
@@ -399,7 +396,7 @@ class ApSampleDataSeeder extends Seeder
 
         foreach ($paymentDefinitions as $index => $definition) {
             // Pihak pembayaran = pihak tagihan yang dialokasikan (AP allocation harus satu supplier).
-            $allocatedBill = $supplierBills[$definition['allocations'][0]['bill_index'] ?? -1] ?? null;
+            $allocatedBill = $supplierBills[$definition['allocations'][0]['bill_index']] ?? null;
             $supplier = $allocatedBill !== null
                 ? $suppliers->firstWhere('id', $allocatedBill->supplier_id)
                 : $suppliers[$definition['supplier_index'] % $suppliers->count()];

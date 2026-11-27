@@ -9,8 +9,8 @@ use App\Models\FiscalYear;
 use App\Models\PeriodClosing;
 use App\Models\RecurringJournal;
 use App\Models\User;
+use App\Support\Demo\DemoCalendar;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -19,7 +19,7 @@ class GlExtendedSampleDataSeeder extends Seeder
     public function run(): void
     {
         $user = User::query()->first() ?? User::factory()->create();
-        $fiscalYear = FiscalYear::where('status', 'open')->first() ?? FiscalYear::factory()->create([
+        $fiscalYear = DemoCalendar::currentFiscalYear() ?? FiscalYear::factory()->create([
             'name' => 'FY 2026',
             'start_date' => '2026-01-01',
             'end_date' => '2026-12-31',
@@ -197,21 +197,13 @@ class GlExtendedSampleDataSeeder extends Seeder
                     'closing_type' => 'monthly',
                 ],
                 [
-                    'status' => 'closed',
-                    'net_income' => $this->monthlyNetIncome(
-                        $fiscalYear,
-                        $month,
-                        $periodYear,
-                    ),
+                    // Draft: penutupan dilakukan DemoPeriodClosingSeeder lewat ClosePeriodAction
+                    // setelah semua transaksi tercatat (#571).
+                    'status' => 'draft',
                     'retained_earnings_account_id' => $accounts[2]->id,
-                    'closed_by' => $user->id,
-                    // Ditutup pada awal bulan berikutnya, bukan tanggal seed (W7-15).
-                    'closed_at' => Carbon::create($periodYear, $month, 1)->addMonth()->startOfDay(),
                     'created_by' => $user->id,
                 ],
             );
-
-            $this->alignPostedAtWithPeriodClose($fiscalYear, $periodYear, $month);
         }
 
         PeriodClosing::updateOrCreate(
@@ -227,52 +219,6 @@ class GlExtendedSampleDataSeeder extends Seeder
                 'created_by' => $user->id,
             ],
         );
-    }
-
-    /**
-     * Jurnal demo di periode yang sudah ditutup harus tercatat sebelum penutupannya.
-     * Posting dijalankan saat seed (posted_at = sekarang), jadi posted_at dibatasi
-     * ke tanggal jurnal pada jam kerja agar tidak melewati closed_at (W9-04, #494).
-     */
-    private function alignPostedAtWithPeriodClose(FiscalYear $fiscalYear, int $periodYear, int $month): void
-    {
-        DB::table('journal_entries')
-            ->where('fiscal_year_id', $fiscalYear->id)
-            ->where('status', 'posted')
-            ->whereYear('entry_date', $periodYear)
-            ->whereMonth('entry_date', $month)
-            ->whereRaw('posted_at > ?', [Carbon::create($periodYear, $month, 1)->addMonth()->startOfDay()])
-            ->update([
-                'posted_at' => DB::raw('DATE_ADD(entry_date, INTERVAL 16 HOUR)'),
-            ]);
-    }
-
-    /**
-     * Laba bersih bulanan dari jurnal posted (revenue - expense), agar
-     * period closing hasil seed tidak menampilkan Rp 0 (W5-16).
-     */
-    private function monthlyNetIncome(
-        FiscalYear $fiscalYear,
-        int $month,
-        int $year,
-    ): float {
-        $row = DB::table('journal_entry_lines')
-            ->join('journal_entries', 'journal_entry_lines.journal_entry_id', '=', 'journal_entries.id')
-            ->join('accounts', 'accounts.id', '=', 'journal_entry_lines.account_id')
-            ->where('journal_entries.fiscal_year_id', $fiscalYear->id)
-            ->where('journal_entries.status', 'posted')
-            ->where('journal_entries.journal_type', '<>', 'closing')
-            ->whereIn('accounts.type', ['revenue', 'expense'])
-            ->whereYear('journal_entries.entry_date', $year)
-            ->whereMonth('journal_entries.entry_date', $month)
-            // revenue normal kredit, expense normal debit → credit - debit
-            // sudah merupakan laba bersih.
-            ->selectRaw(
-                'COALESCE(SUM(journal_entry_lines.credit - journal_entry_lines.debit), 0) as net',
-            )
-            ->first();
-
-        return round((float) ($row->net ?? 0), 2);
     }
 
     private function seedAccountBalances(FiscalYear $fiscalYear, Collection $accounts): void

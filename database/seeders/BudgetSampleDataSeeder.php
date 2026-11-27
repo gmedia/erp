@@ -7,6 +7,7 @@ use App\Models\Budget;
 use App\Models\BudgetLine;
 use App\Models\FiscalYear;
 use App\Models\User;
+use App\Support\Demo\DemoCalendar;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -23,7 +24,7 @@ class BudgetSampleDataSeeder extends Seeder
         }
 
         $adminUserId = User::query()->where('email', config('app.admin'))->value('id') ?? User::query()->value('id');
-        $fiscalYear = FiscalYear::query()->where('status', 'open')->first();
+        $fiscalYear = DemoCalendar::currentFiscalYear();
 
         if (! $adminUserId || ! $fiscalYear) {
             return;

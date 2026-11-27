@@ -15,6 +15,7 @@ use App\Models\FiscalYear;
 use App\Models\JournalEntry;
 use App\Models\JournalEntryLine;
 use App\Models\User;
+use App\Support\Demo\DemoCalendar;
 use Database\Seeders\Concerns\ReopensDemoPeriodClosings;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
@@ -36,7 +37,7 @@ class AssetDepreciationNormalizationSeeder extends Seeder
 
     protected function seedDemoData(): void
     {
-        $fiscalYear = FiscalYear::query()->where('status', 'open')->orderBy('start_date')->first();
+        $fiscalYear = DemoCalendar::currentFiscalYear();
 
         if (! $fiscalYear) {
             return;

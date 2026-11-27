@@ -43,20 +43,9 @@ class ApMonthlyDemoSeeder extends Seeder
 
     public function run(): void
     {
-        // FY tahun lalu berstatus closed (CoaSeeder). Jurnal ditolak bila FY tidak open, jadi
-        // FY jendela demo dibuka sementara lalu dikembalikan. Sama seperti ArMonthlyDemoSeeder.
-        $closedYears = FiscalYear::query()
-            ->whereIn('name', array_map('strval', DemoCalendar::fiscalYears()))
-            ->where('status', 'closed')
-            ->get();
-
-        $closedYears->each(fn (FiscalYear $year) => $year->update(['status' => 'open']));
-
-        try {
-            $this->seedWindow();
-        } finally {
-            $closedYears->each(fn (FiscalYear $year) => $year->update(['status' => 'closed']));
-        }
+        // FY jendela berstatus open (CoaSeeder). Penutupan tahun lalu dilakukan sekali di
+        // akhir seed oleh DemoPeriodClosingSeeder, setelah semua transaksi tercatat (#571).
+        $this->seedWindow();
     }
 
     private function seedWindow(): void

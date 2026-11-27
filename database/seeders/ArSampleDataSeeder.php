@@ -21,6 +21,7 @@ use App\Models\FiscalYear;
 use App\Models\Product;
 use App\Models\Unit;
 use App\Models\User;
+use App\Support\Demo\DemoCalendar;
 use Database\Seeders\Concerns\ReopensDemoPeriodClosings;
 use Illuminate\Database\Seeder;
 
@@ -53,7 +54,7 @@ class ArSampleDataSeeder extends Seeder
         }
 
         $branch = Branch::query()->first();
-        $fiscalYear = FiscalYear::query()->where('status', 'open')->first();
+        $fiscalYear = DemoCalendar::currentFiscalYear();
         $products = Product::query()->take(5)->get();
         $units = Unit::query()->take(3)->get();
         $activeCoaVersionId = CoaVersion::query()->where('status', 'active')->value('id');
@@ -239,9 +240,7 @@ class ArSampleDataSeeder extends Seeder
             $customer = $customers[$index % $customers->count()];
             // Tanggal dokumen lebih tua untuk invoice overdue agar jatuh
             // tempo tetap setelah tanggal dokumen (W5-20).
-            $invoiceDate = now()->subDays(
-                $definition['invoice_date_days_ago'] ?? (60 - $index * 5),
-            );
+            $invoiceDate = now()->subDays($definition['invoice_date_days_ago']);
             $dueDate = $invoiceDate->copy()->addDays($definition['due_date_offset']);
 
             $subtotal = $definition['grand_total'] * 0.9;

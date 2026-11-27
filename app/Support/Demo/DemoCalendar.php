@@ -2,6 +2,7 @@
 
 namespace App\Support\Demo;
 
+use App\Models\FiscalYear;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 
@@ -121,6 +122,17 @@ final class DemoCalendar
         }
 
         return array_values($years);
+    }
+
+    /**
+     * FY tahun berjalan (nama = tahun kalender bulan berjalan). Dipakai seeder transaksi agar
+     * memilih FY secara deterministik, bukan "FY open pertama" yang bisa jatuh ke tahun lalu.
+     */
+    public static function currentFiscalYear(?Carbon $anchor = null): ?FiscalYear
+    {
+        return FiscalYear::query()
+            ->where('name', (string) ($anchor ?? now())->year)
+            ->first();
     }
 
     private static function assertIndex(int $index): void

@@ -18,8 +18,11 @@ class CoaSeeder extends Seeder
     public function run(): void
     {
         // ==========================================
-        // 2025 Data (Tahun Lalu - Closed)
+        // 2025 Data (Tahun Lalu - dibuat open, ditutup DemoPeriodClosingSeeder)
         // ==========================================
+        // FY tahun lalu dibuat open agar transaksi demo bisa diposting lewat validasi
+        // yang ada. Penutupannya dilakukan sekali di akhir seed oleh alur penutupan periode
+        // aplikasi (ClosePeriodAction), bukan dengan membuka-tutup FY per seeder (#571).
         // Idempoten (#357): db:seed kedua tidak menambah FY/COA/akun, dan COA
         // buatan pengguna dengan nama lain tidak tersentuh.
         $fiscalYear2025 = FiscalYear::firstOrCreate(
@@ -27,7 +30,7 @@ class CoaSeeder extends Seeder
             [
                 'start_date' => '2025-01-01',
                 'end_date' => '2025-12-31',
-                'status' => 'closed',
+                'status' => 'open',
             ],
         );
 
