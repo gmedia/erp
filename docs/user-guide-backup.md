@@ -86,5 +86,5 @@ Halaman **Kesehatan Sistem** menampilkan kartu **Backup terakhir**:
 ## 9. Batasan yang diketahui
 
 - Object storage dibaca lewat staging lokal; bucket besar memerlukan batas env dan ruang disk yang cukup.
-- Uji restore lengkap ke database sementara belum dijalankan di server ini (lihat laporan PR).
+- Uji restore sudah dijalankan sekali pada salinan DB (MariaDB Sail): dump dari `backup:run --only-db` diimpor ke database sementara lalu jumlah baris 5 tabel inti (`users` 8, `branches` 4, `assets` 15, `journal_entries` 44, `approval_requests` 20) sama dengan database asli. Database sementara sudah dihapus. Restore object storage belum diuji.
 - Panduan restore ini belum mencakup restore ke server produksi otomatis.
