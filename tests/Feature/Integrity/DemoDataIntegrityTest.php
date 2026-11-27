@@ -13,11 +13,15 @@ use App\Models\StockTransfer;
 use App\Models\SupplierBill;
 use App\Models\SupplierReturn;
 use Database\Seeders\DemoMasterData;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Tests\Concerns\RefreshDatabaseSeededOnce;
 
-uses(RefreshDatabase::class)->group('demo-integrity');
+uses(RefreshDatabaseSeededOnce::class)->group('demo-integrity');
+
+// Seed is shared across this file's tests; reset migration state so the next file re-migrates.
+afterAll(fn () => RefreshDatabaseState::$migrated = false);
 
 /**
  * Seed the full demo dataset. Invariants below must hold for the data that
@@ -114,10 +118,6 @@ function stockCardBalanceOn(int $productId, int $warehouseId, string $date): flo
 
     return (float) ($balance ?? 0.0);
 }
-
-beforeEach(function () {
-    seedDemoData();
-});
 
 // W7-01 — void/cancelled/draft documents must not carry an outstanding balance.
 // Read the raw column, not the model accessor, so a corrupted DB value cannot hide behind it.
