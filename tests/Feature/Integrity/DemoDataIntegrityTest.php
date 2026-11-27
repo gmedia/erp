@@ -1369,7 +1369,7 @@ invariant('W7-06 no journal line posts to a group account', function () {
 
 // Issue #357 (PR #384): every invariant above must also hold after a second `db:seed`.
 // One test seeds twice and runs the registered read-only checks against that state.
-// It seeds only once more than the beforeEach, so the extra cost is one seed run.
+// It seeds once more on top of the shared run seed, so the extra cost is one seed run.
 test('all demo invariants also hold after a second db:seed', function () {
     seedDemoData();
 
