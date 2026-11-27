@@ -3215,6 +3215,7 @@
         },
         "security": {
             "approval_label": "Approval",
+            "approval_same_as_status": "Same as status",
             "breadcrumb": "Security Queue",
             "count_suffix": "{count} requests",
             "description": "Verify the approval status before handing over the vehicle key.",

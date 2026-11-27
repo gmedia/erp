@@ -157,6 +157,13 @@ export default function VehicleLoanRequestPage() {
                     title: tPage('request.breadcrumb', 'Peminjaman Kendaraan'),
                     href: '/vehicle-loans/request',
                 },
+                {
+                    title: tPage(
+                        'request.title',
+                        'Permintaan Peminjaman Kendaraan',
+                    ),
+                    href: '/vehicle-loans/request',
+                },
             ]}
         >
             <Helmet>
@@ -248,7 +255,7 @@ export default function VehicleLoanRequestPage() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="grid gap-4 sm:grid-cols-2">
-                        <div className="grid gap-2">
+                        <div className="grid min-w-0 gap-2">
                             <Label htmlFor="driver_id">
                                 {tPage('request.driver_label', 'Pengemudi')}
                             </Label>
@@ -263,6 +270,7 @@ export default function VehicleLoanRequestPage() {
                             >
                                 <SelectTrigger id="driver_id">
                                     <SelectValue
+                                        className="min-w-0 truncate"
                                         placeholder={tPage(
                                             'request.driver_placeholder',
                                             'Pilih pengemudi',
@@ -270,7 +278,13 @@ export default function VehicleLoanRequestPage() {
                                     />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="none">
+                                    <SelectItem
+                                        value="none"
+                                        title={tPage(
+                                            'request.undecided_option',
+                                            'Belum ditentukan (penyetuju melengkapi)',
+                                        )}
+                                    >
                                         {tPage(
                                             'request.undecided_option',
                                             'Belum ditentukan (penyetuju melengkapi)',
@@ -287,7 +301,7 @@ export default function VehicleLoanRequestPage() {
                                 </SelectContent>
                             </Select>
                         </div>
-                        <div className="grid gap-2">
+                        <div className="grid min-w-0 gap-2">
                             <Label htmlFor="vehicle_unit_id">
                                 {tPage('request.unit_label', 'Unit kendaraan')}
                             </Label>
@@ -302,6 +316,7 @@ export default function VehicleLoanRequestPage() {
                             >
                                 <SelectTrigger id="vehicle_unit_id">
                                     <SelectValue
+                                        className="min-w-0 truncate"
                                         placeholder={tPage(
                                             'request.unit_placeholder',
                                             'Pilih unit kendaraan',
@@ -309,7 +324,13 @@ export default function VehicleLoanRequestPage() {
                                     />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="none">
+                                    <SelectItem
+                                        value="none"
+                                        title={tPage(
+                                            'request.undecided_option',
+                                            'Belum ditentukan (penyetuju melengkapi)',
+                                        )}
+                                    >
                                         {tPage(
                                             'request.undecided_option',
                                             'Belum ditentukan (penyetuju melengkapi)',

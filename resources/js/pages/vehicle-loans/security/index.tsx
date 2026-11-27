@@ -17,6 +17,7 @@ import axios from '@/lib/axios';
 import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import { useToastTranslator } from '@/utils/i18nFallback';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { CheckCircle2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
@@ -244,31 +245,33 @@ export default function VehicleLoanSecurityPage() {
                             return (
                                 <Card key={loan.id} className="flex flex-col">
                                     <CardContent className="flex flex-1 flex-col gap-3 pt-4">
-                                        <div className="flex items-start justify-between gap-2">
-                                            <div>
-                                                <p className="font-semibold">
-                                                    {loan.code}
-                                                </p>
-                                                <p className="text-xs text-muted-foreground">
-                                                    {tPage(
-                                                        'detail.requester',
-                                                        'Peminjam',
-                                                    )}
-                                                    : {loan.requester_name}
-                                                </p>
+                                        <div className="flex min-h-14 flex-col gap-2">
+                                            <div className="flex min-w-0 items-start justify-between gap-2">
+                                                <div className="min-w-0">
+                                                    <p className="font-semibold">
+                                                        {loan.code}
+                                                    </p>
+                                                    <p className="truncate text-xs text-muted-foreground">
+                                                        {tPage(
+                                                            'detail.requester',
+                                                            'Peminjam',
+                                                        )}
+                                                        : {loan.requester_name}
+                                                    </p>
+                                                </div>
+                                                <VehicleLoanStatusBadge
+                                                    loan={loan}
+                                                />
                                             </div>
-                                            <div className="flex flex-wrap items-center justify-end gap-1">
+                                            <div className="min-h-6">
                                                 {loan.is_overdue && (
-                                                    <span className="rounded-full bg-destructive-soft px-2 py-1 text-xs font-medium text-destructive-foreground">
+                                                    <span className="inline-flex rounded-full bg-destructive-soft px-2 py-1 text-xs font-medium text-destructive-foreground">
                                                         {tPage(
                                                             'security.overdue_badge',
                                                             'Terlambat',
                                                         )}
                                                     </span>
                                                 )}
-                                                <VehicleLoanStatusBadge
-                                                    loan={loan}
-                                                />
                                             </div>
                                         </div>
                                         <dl className="grid grid-cols-2 gap-x-3 gap-y-1 text-sm">
@@ -310,9 +313,21 @@ export default function VehicleLoanSecurityPage() {
                                             </dt>
                                             <dd>
                                                 {approvalStatus ? (
-                                                    <VehicleLoanStatusBadge
-                                                        status={approvalStatus}
-                                                    />
+                                                    approvalStatus ===
+                                                    loan.status ? (
+                                                        <span className="text-muted-foreground">
+                                                            {tPage(
+                                                                'security.approval_same_as_status',
+                                                                'Sama dengan status',
+                                                            )}
+                                                        </span>
+                                                    ) : (
+                                                        <VehicleLoanStatusBadge
+                                                            status={
+                                                                approvalStatus
+                                                            }
+                                                        />
+                                                    )
                                                 ) : (
                                                     '-'
                                                 )}
@@ -321,7 +336,11 @@ export default function VehicleLoanSecurityPage() {
                                         <div className="mt-auto flex items-center justify-between gap-2 border-t pt-3">
                                             <div className="min-w-0">
                                                 {handed && (
-                                                    <span className="inline-flex items-center rounded-full bg-success-soft px-2 py-1 text-xs font-medium text-success">
+                                                    <span className="inline-flex items-center gap-1 text-xs font-medium text-success">
+                                                        <CheckCircle2
+                                                            className="size-4"
+                                                            aria-hidden="true"
+                                                        />
                                                         {tPage(
                                                             'security.key_handed_badge',
                                                             'Kunci sudah diserahkan',

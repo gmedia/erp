@@ -708,9 +708,9 @@
         "unit": "Satuan",
         "user": "Pengguna",
         "vehicle_loan": "Peminjaman Kendaraan",
-        "vehicle_loan_dashboard": "Dasbor Peminjaman Kendaraan",
-        "vehicle_loan_request": "Permintaan Peminjaman Kendaraan",
-        "vehicle_loan_security": "Keamanan Peminjaman Kendaraan",
+        "vehicle_loan_dashboard": "Dasbor",
+        "vehicle_loan_request": "Permintaan",
+        "vehicle_loan_security": "Antrean Keamanan",
         "warehouse": "Gudang",
         "master.data": "Data Master"
     },
@@ -3218,6 +3218,7 @@
         },
         "security": {
             "approval_label": "Persetujuan",
+            "approval_same_as_status": "Sama dengan status",
             "breadcrumb": "Antrean Keamanan",
             "count_suffix": "{count} permintaan",
             "description": "Verifikasi status persetujuan sebelum menyerahkan kunci kendaraan.",

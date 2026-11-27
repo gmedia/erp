@@ -27,7 +27,7 @@ test('sidebar highlights the vehicle loan module on pickup page', async ({
         '[data-slot="sidebar-content"] [data-active="true"]',
     );
     await expect(active).toHaveCount(1);
-    await expect(active).toContainText('Permintaan Peminjaman Kendaraan');
+    await expect(active).toContainText('Permintaan');
 });
 
 test('pickup page in id locale does not show English approval wording', async ({
