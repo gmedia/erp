@@ -68,6 +68,35 @@ test.describe('issue 597 i18n polish (locale id)', () => {
         }
     });
 
+    test('numeric column sort icon sits after the label and right-aligned', async ({
+        page,
+    }) => {
+        await login(page);
+        await page.goto('/products', { waitUntil: 'domcontentloaded' });
+
+        const sortButton = page.getByTestId('sort-cost');
+        await expect(sortButton).toBeVisible({ timeout: 15000 });
+        const { iconAfterLabel, buttonRight, headerRight } =
+            await sortButton.evaluate((button) => {
+                const label = button.querySelector('span');
+                const icon = button.querySelector('svg');
+                const labelBox = label?.getBoundingClientRect();
+                const iconBox = icon?.getBoundingClientRect();
+                const header = button.closest('th')?.getBoundingClientRect();
+                const buttonBox = button.getBoundingClientRect();
+                return {
+                    iconAfterLabel:
+                        !!labelBox &&
+                        !!iconBox &&
+                        iconBox.left >= labelBox.right - 1,
+                    buttonRight: buttonBox.right,
+                    headerRight: header?.right ?? 0,
+                };
+            });
+        expect(iconAfterLabel).toBe(true);
+        expect(headerRight - buttonRight).toBeLessThan(16);
+    });
+
     test('pagination rows-per-page select has no outline border', async ({
         page,
     }) => {
