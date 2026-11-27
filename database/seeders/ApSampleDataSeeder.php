@@ -4,11 +4,11 @@ namespace Database\Seeders;
 
 use App\Actions\AccountingPosting\PostApPaymentJournalAction;
 use App\Actions\AccountingPosting\PostSupplierBillJournalAction;
+use App\Actions\AccountingPosting\ResolveControlAccountAction;
 use App\Models\Account;
 use App\Models\ApPayment;
 use App\Models\ApPaymentAllocation;
 use App\Models\Branch;
-use App\Models\CoaVersion;
 use App\Models\Department;
 use App\Models\GoodsReceipt;
 use App\Models\JournalEntry;
@@ -49,8 +49,8 @@ class ApSampleDataSeeder extends Seeder
             return;
         }
 
-        // Hanya akun dari COA version aktif: akun COA archived tidak boleh dipakai posting.
-        $activeCoaVersionId = CoaVersion::query()->where('status', 'active')->value('id');
+        // Hanya akun dari COA version aktif FY berjalan: akun COA archived tidak boleh dipakai posting.
+        $activeCoaVersionId = DemoCalendar::currentCoaVersionId();
 
         $expenseAccounts = Account::query()
             ->where('coa_version_id', $activeCoaVersionId)
@@ -382,16 +382,6 @@ class ApSampleDataSeeder extends Seeder
             ],
         ];
 
-        // Akun bank harus dari COA version aktif agar posting sejalan dengan laporan
-        // (W6-06). Transfer bank memakai akun bank (11110), bukan Cash.
-        $activeCoaVersionId = CoaVersion::query()->where('status', 'active')->value('id');
-
-        $bankAccount = Account::query()
-            ->where('coa_version_id', $activeCoaVersionId)
-            ->where('code', '11110')
-            ->where('is_active', true)
-            ->first();
-
         $billAllocations = [];
 
         foreach ($paymentDefinitions as $index => $definition) {
@@ -401,6 +391,9 @@ class ApSampleDataSeeder extends Seeder
                 ? $suppliers->firstWhere('id', $allocatedBill->supplier_id)
                 : $suppliers[$definition['supplier_index'] % $suppliers->count()];
             $paymentDate = now()->subDays(30 - $index);
+            // Akun bank (11110) dari COA yang berlaku pada tanggal pembayaran (#571).
+            $bankAccount = app(ResolveControlAccountAction::class)
+                ->execute('11110', $paymentDate->toDateString());
 
             $apPayment = ApPayment::updateOrCreate(
                 ['payment_number' => $definition['number']],
@@ -410,7 +403,7 @@ class ApSampleDataSeeder extends Seeder
                     'fiscal_year_id' => $fiscalYearId,
                     'payment_date' => $paymentDate->toDateString(),
                     'payment_method' => 'bank_transfer',
-                    'bank_account_id' => $bankAccount?->id,
+                    'bank_account_id' => $bankAccount->id,
                     'currency' => 'IDR',
                     'total_amount' => $definition['total_amount'],
                     'total_allocated' => $definition['total_amount'],

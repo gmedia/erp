@@ -2,6 +2,7 @@
 
 namespace App\Support\Demo;
 
+use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
@@ -133,6 +134,24 @@ final class DemoCalendar
         return FiscalYear::query()
             ->where('name', (string) ($anchor ?? now())->year)
             ->first();
+    }
+
+    /**
+     * COA version aktif untuk FY berjalan. Seeder dokumen memakai ini, bukan "COA active
+     * pertama": COA tahun lalu juga active sampai DemoPeriodClosingSeeder mengarsipkannya (#571).
+     */
+    public static function currentCoaVersionId(?Carbon $anchor = null): ?int
+    {
+        $fiscalYear = self::currentFiscalYear($anchor);
+
+        if ($fiscalYear === null) {
+            return null;
+        }
+
+        return CoaVersion::query()
+            ->where('fiscal_year_id', $fiscalYear->id)
+            ->where('status', 'active')
+            ->value('id');
     }
 
     private static function assertIndex(int $index): void

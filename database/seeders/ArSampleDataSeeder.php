@@ -4,12 +4,12 @@ namespace Database\Seeders;
 
 use App\Actions\AccountingPosting\PostArReceiptJournalAction;
 use App\Actions\AccountingPosting\PostCustomerInvoiceJournalAction;
+use App\Actions\AccountingPosting\ResolveControlAccountAction;
 use App\Actions\CreditNotes\ApplyCreditNoteAction;
 use App\Models\Account;
 use App\Models\ArReceipt;
 use App\Models\ArReceiptAllocation;
 use App\Models\Branch;
-use App\Models\CoaVersion;
 use App\Models\CreditNote;
 use App\Models\CreditNoteItem;
 use App\Models\Customer;
@@ -57,7 +57,7 @@ class ArSampleDataSeeder extends Seeder
         $fiscalYear = DemoCalendar::currentFiscalYear();
         $products = Product::query()->take(5)->get();
         $units = Unit::query()->take(3)->get();
-        $activeCoaVersionId = CoaVersion::query()->where('status', 'active')->value('id');
+        $activeCoaVersionId = DemoCalendar::currentCoaVersionId();
         $revenueAccount = Account::query()
             ->where('coa_version_id', $activeCoaVersionId)
             ->where('type', 'revenue')
@@ -346,13 +346,9 @@ class ArSampleDataSeeder extends Seeder
         $receipts = [];
         $postReceiptJournal = app(PostArReceiptJournalAction::class);
 
-        $bankAccount = Account::query()
-            ->where('coa_version_id', CoaVersion::query()->where('status', 'active')->value('id'))
-            ->where('code', '11110')
-            ->where('is_active', true)
-            ->first();
+        $resolveControlAccount = app(ResolveControlAccountAction::class);
 
-        if (! $bankAccount) {
+        if (! Account::query()->where('code', '11110')->exists()) {
             return [];
         }
 
@@ -393,6 +389,8 @@ class ArSampleDataSeeder extends Seeder
                 ? $customers->firstWhere('id', $allocatedInvoice->customer_id)
                 : $this->customerWithOpenInvoice($customers, $invoices);
             $receiptDate = now()->subDays(30 - $index * 3);
+            // Akun bank (11110) dari COA yang berlaku pada tanggal penerimaan (#571).
+            $bankAccount = $resolveControlAccount->execute('11110', $receiptDate->toDateString());
 
             $receipt = ArReceipt::updateOrCreate(
                 ['receipt_number' => $definition['number']],

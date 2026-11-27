@@ -57,6 +57,15 @@ class DemoPeriodClosingSeeder extends Seeder
         // Status FY ikut closed setelah seluruh periodenya ditutup, sama seperti kondisi
         // awal data demo (CoaSeeder). Penutupan periode tetap lewat ClosePeriodAction.
         $fiscalYear->update(['status' => 'closed']);
+
+        // COA tahun lalu diarsipkan setelah FY-nya ditutup (siklus hidup tunggal, #571).
+        // Tidak ada action khusus untuk status COA: halaman COA Versions juga mengubah
+        // status lewat update model (CoaVersionController::update), jadi jalur yang sama.
+        CoaVersion::query()
+            ->where('fiscal_year_id', $fiscalYear->id)
+            ->where('status', 'active')
+            ->get()
+            ->each(fn (CoaVersion $coaVersion) => $coaVersion->update(['status' => 'archived']));
     }
 
     /**

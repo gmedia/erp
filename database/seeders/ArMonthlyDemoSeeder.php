@@ -4,11 +4,11 @@ namespace Database\Seeders;
 
 use App\Actions\AccountingPosting\PostArReceiptJournalAction;
 use App\Actions\AccountingPosting\PostCustomerInvoiceJournalAction;
+use App\Actions\AccountingPosting\ResolveControlAccountAction;
 use App\Models\Account;
 use App\Models\ArReceipt;
 use App\Models\ArReceiptAllocation;
 use App\Models\Branch;
-use App\Models\CoaVersion;
 use App\Models\Customer;
 use App\Models\CustomerInvoice;
 use App\Models\CustomerInvoiceItem;
@@ -57,22 +57,10 @@ class ArMonthlyDemoSeeder extends Seeder
         $branch = Branch::query()->first();
         $products = Product::query()->orderBy('id')->take(5)->get();
         $units = Unit::query()->orderBy('id')->take(3)->get();
-        $bankAccount = Account::query()
-            ->where('coa_version_id', CoaVersion::query()->where('status', 'active')->value('id'))
-            ->where('code', '11110')
-            ->where('is_active', true)
-            ->first();
-        $revenueAccount = Account::query()
-            ->where('coa_version_id', CoaVersion::query()->where('status', 'active')->value('id'))
-            ->where('type', 'revenue')
-            ->where('is_active', true)
-            ->whereDoesntHave('children')
-            ->orderBy('code')
-            ->first();
         $customers = Customer::query()->where('status', 'active')->orderBy('id')->take(5)->get();
 
         if (! $adminUserId || ! $branch || $products->isEmpty() || $units->isEmpty()
-            || ! $bankAccount || ! $revenueAccount || $customers->isEmpty()) {
+            || $customers->isEmpty()) {
             return;
         }
 
@@ -95,8 +83,6 @@ class ArMonthlyDemoSeeder extends Seeder
                 $customers,
                 $products,
                 $units,
-                $bankAccount,
-                $revenueAccount,
             );
         }
     }
@@ -110,11 +96,10 @@ class ArMonthlyDemoSeeder extends Seeder
         $customers,
         $products,
         $units,
-        Account $bankAccount,
-        Account $revenueAccount,
     ): void {
         $postInvoice = app(PostCustomerInvoiceJournalAction::class);
         $postReceipt = app(PostArReceiptJournalAction::class);
+        $resolveControlAccount = app(ResolveControlAccountAction::class);
         $code = $month->format('Ym');
         $count = DemoCalendar::volume($index, self::INVOICES_PER_MONTH);
 
@@ -152,8 +137,14 @@ class ArMonthlyDemoSeeder extends Seeder
                 ],
             );
 
+            // Akun pendapatan dari COA yang berlaku pada tanggal invoice (#571).
+            $revenueAccount = $this->revenueAccount($invoiceDate->toDateString());
             $this->seedInvoiceItems($invoice, $grandTotal, $index + $n, $products, $units, $revenueAccount);
             $postInvoice->execute($invoice->refresh());
+
+            $receiptDate = $invoiceDate->copy()->addDays(5);
+            // Akun bank (11110) dari COA yang berlaku pada tanggal penerimaan (#571).
+            $bankAccount = $resolveControlAccount->execute('11110', $receiptDate->toDateString());
 
             $receipt = ArReceipt::updateOrCreate(
                 ['receipt_number' => sprintf('%s%s-%04d', self::RECEIPT_PREFIX, $code, $n)],
@@ -161,7 +152,7 @@ class ArMonthlyDemoSeeder extends Seeder
                     'customer_id' => $customer->id,
                     'branch_id' => $branch->id,
                     'fiscal_year_id' => $fiscalYear->id,
-                    'receipt_date' => $invoiceDate->copy()->addDays(5)->toDateString(),
+                    'receipt_date' => $receiptDate->toDateString(),
                     'payment_method' => 'bank_transfer',
                     'bank_account_id' => $bankAccount->id,
                     'currency' => 'IDR',
@@ -194,6 +185,22 @@ class ArMonthlyDemoSeeder extends Seeder
 
             $postReceipt->execute($receipt->refresh());
         }
+    }
+
+    /**
+     * Akun pendapatan pertama (daun) dari COA version yang berlaku pada tanggal invoice (#571).
+     */
+    private function revenueAccount(string $entryDate): Account
+    {
+        $coaVersionId = app(ResolveControlAccountAction::class)->resolveVersion($entryDate)->id;
+
+        return Account::query()
+            ->where('coa_version_id', $coaVersionId)
+            ->where('type', 'revenue')
+            ->where('is_active', true)
+            ->whereDoesntHave('children')
+            ->orderBy('code')
+            ->firstOrFail();
     }
 
     private function seedInvoiceItems(

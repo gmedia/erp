@@ -37,16 +37,27 @@ class AssetDepreciationNormalizationSeeder extends Seeder
 
     protected function seedDemoData(): void
     {
-        $fiscalYear = DemoCalendar::currentFiscalYear();
+        // Jendela 13 bulan bisa lintas tahun: depresiasi tahun lalu (sebelum penutupan
+        // DemoPeriodClosingSeeder) ikut diposting lewat alur yang sama (#571).
+        $adminUserId = User::query()
+            ->where('email', config('app.admin'))
+            ->value('id') ?? User::query()->value('id');
 
-        if (! $fiscalYear) {
-            return;
+        $fiscalYears = collect(DemoCalendar::fiscalYears())
+            ->map(fn (int $year) => FiscalYear::query()->where('name', (string) $year)->first())
+            ->filter();
+
+        foreach ($fiscalYears as $fiscalYear) {
+            $this->postDemoDepreciation($fiscalYear, $adminUserId);
         }
 
-        $this->postDemoDepreciation($fiscalYear);
+        // Register final (akumulasi + nilai buku) dihitung sekali setelah seluruh bulan
+        // jendela diposting, lalu jurnal pelepasan/hilang memakai nilai itu (#357, #442).
+        $this->syncRegisterFromPostedSources();
+        $this->postDisposalAndLossJournals();
     }
 
-    private function postDemoDepreciation(FiscalYear $fiscalYear): void
+    private function postDemoDepreciation(FiscalYear $fiscalYear, ?int $adminUserId): void
     {
         $expenseAccountId = $this->accountId($fiscalYear, '53000');
         $accumulatedAccountId = $this->accountId($fiscalYear, '12200');
@@ -54,10 +65,6 @@ class AssetDepreciationNormalizationSeeder extends Seeder
         if (! $expenseAccountId || ! $accumulatedAccountId) {
             return;
         }
-
-        $adminUserId = User::query()
-            ->where('email', config('app.admin'))
-            ->value('id') ?? User::query()->value('id');
 
         $this->stampAssetMetadata($expenseAccountId, $accumulatedAccountId);
 
@@ -68,14 +75,16 @@ class AssetDepreciationNormalizationSeeder extends Seeder
         for ($cursor = $fiscalStart->copy(); $cursor->lessThanOrEqualTo($fiscalEnd) && $cursor->lessThanOrEqualTo($lastClosedMonth); $cursor->addMonth()) {
             $this->postMonthlyRun($fiscalYear, $cursor->copy(), $adminUserId);
         }
+    }
 
-        $this->syncRegisterFromPostedSources();
-
-        // Jurnal pelepasan (disposed) dan aset hilang hanya setelah akumulasi
-        // register final. Dipost lebih awal, akun 12200 tidak ikut didebit (#357, #442).
-        // Hanya aset yang dikapitalisasi di GL (punya jurnal ACQ) yang dijurnal.
-        // Aset yang diperoleh dan dilepas sebelum FY terbuka tidak pernah ada di
-        // buku besar, sehingga pelepasannya tidak dijurnal (keputusan reviewer #442).
+    /**
+     * Jurnal pelepasan (disposed) dan aset hilang. Dipost setelah register final, karena
+     * dipost lebih awal akun 12200 tidak ikut didebit (#357, #442). Hanya aset yang
+     * dikapitalisasi di GL (punya jurnal ACQ) yang dijurnal; aset yang diperoleh dan dilepas
+     * sebelum FY terbuka tidak pernah ada di buku besar (keputusan reviewer #442).
+     */
+    private function postDisposalAndLossJournals(): void
+    {
         $this->demoAssets()->get()->each(function (Asset $asset): void {
             if (! $this->hasAcquisitionJournal($asset)) {
                 return;

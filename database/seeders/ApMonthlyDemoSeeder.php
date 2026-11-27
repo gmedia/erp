@@ -4,11 +4,11 @@ namespace Database\Seeders;
 
 use App\Actions\AccountingPosting\PostApPaymentJournalAction;
 use App\Actions\AccountingPosting\PostSupplierBillJournalAction;
+use App\Actions\AccountingPosting\ResolveControlAccountAction;
 use App\Models\Account;
 use App\Models\ApPayment;
 use App\Models\ApPaymentAllocation;
 use App\Models\Branch;
-use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use App\Models\Product;
 use App\Models\Supplier;
@@ -55,22 +55,9 @@ class ApMonthlyDemoSeeder extends Seeder
         $branch = Branch::query()->first();
         $suppliers = Supplier::query()->orderBy('id')->take(3)->get();
         $products = Product::query()->orderBy('id')->take(6)->get();
-        $activeCoaVersionId = CoaVersion::query()->where('status', 'active')->value('id');
-        $expenseAccount = Account::query()
-            ->where('coa_version_id', $activeCoaVersionId)
-            ->where('type', 'expense')
-            ->where('is_active', true)
-            ->whereDoesntHave('children')
-            ->orderBy('code')
-            ->first();
-        $bankAccount = Account::query()
-            ->where('coa_version_id', $activeCoaVersionId)
-            ->where('code', '11110')
-            ->where('is_active', true)
-            ->first();
+        $resolveControlAccount = app(ResolveControlAccountAction::class);
 
-        if (! $adminUserId || ! $branch || $suppliers->isEmpty() || $products->isEmpty()
-            || ! $expenseAccount || ! $bankAccount) {
+        if (! $adminUserId || ! $branch || $suppliers->isEmpty() || $products->isEmpty()) {
             return;
         }
 
@@ -123,10 +110,13 @@ class ApMonthlyDemoSeeder extends Seeder
                     ],
                 );
 
+                // Akun beban dan bank harus dari COA yang sama dengan tanggal jurnalnya (#571).
+                $expenseAccount = $this->expenseAccount($billDate->toDateString());
                 $this->seedBillItem($bill, $products, $expenseAccount, $grandTotal, $index + $n);
                 $postBill->execute($bill->refresh());
 
                 $paymentDate = $billDate->copy()->addDays(5);
+                $bankAccount = $resolveControlAccount->execute('11110', $paymentDate->toDateString());
                 $payment = ApPayment::updateOrCreate(
                     ['payment_number' => sprintf('%s%s-%04d', self::PAYMENT_PREFIX, $code, $n)],
                     [
@@ -167,6 +157,22 @@ class ApMonthlyDemoSeeder extends Seeder
                 $postPayment->execute($payment->refresh());
             }
         }
+    }
+
+    /**
+     * Akun beban pertama (daun) dari COA version yang berlaku pada tanggal bill (#571).
+     */
+    private function expenseAccount(string $entryDate): Account
+    {
+        $coaVersionId = app(ResolveControlAccountAction::class)->resolveVersion($entryDate)->id;
+
+        return Account::query()
+            ->where('coa_version_id', $coaVersionId)
+            ->where('type', 'expense')
+            ->where('is_active', true)
+            ->whereDoesntHave('children')
+            ->orderBy('code')
+            ->firstOrFail();
     }
 
     private function seedBillItem(
