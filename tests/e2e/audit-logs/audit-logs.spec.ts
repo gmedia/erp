@@ -143,6 +143,18 @@ test.describe('Audit Log', () => {
         await expect(auditRow).toContainText('Mengubah');
         await expect(auditRow).toContainText('deskripsi');
 
+        const systemCauserRow = page
+            .locator('tbody tr')
+            .filter({ hasText: 'Sistem' })
+            .first();
+        await expect(systemCauserRow).toBeVisible();
+        await expect(
+            systemCauserRow.getByRole('cell', {
+                name: 'Sistem',
+                exact: true,
+            }),
+        ).toBeVisible();
+
         await page.goto('/journal-entries');
         const searchInput = page.getByPlaceholder(/Cari jurnal/i).first();
         await expect(searchInput).toBeVisible();
@@ -154,10 +166,7 @@ test.describe('Audit Log', () => {
             .filter({ hasText: newDescription })
             .first();
         await expect(journalRow).toBeVisible();
-        await journalRow
-            .getByRole('button', { name: 'Aksi' })
-            .first()
-            .click();
+        await journalRow.getByRole('button', { name: 'Aksi' }).first().click();
         // Row action labels are hardcoded English in ActionsDropdown.
         await page.getByRole('menuitem', { name: 'View' }).click();
 
@@ -166,10 +175,14 @@ test.describe('Audit Log', () => {
         });
         await expect(viewDialog).toBeVisible();
         await expect(viewDialog.getByText('Riwayat perubahan')).toBeVisible();
+        await expect(viewDialog.getByText('Diubah').first()).toBeVisible({
+            timeout: 15000,
+        });
         await expect(
-            viewDialog.getByText('Diubah').first(),
-        ).toBeVisible({ timeout: 15000 });
-        await expect(viewDialog.getByText(oldDescription).first()).toBeVisible();
-        await expect(viewDialog.getByText(newDescription).first()).toBeVisible();
+            viewDialog.getByText(oldDescription).first(),
+        ).toBeVisible();
+        await expect(
+            viewDialog.getByText(newDescription).first(),
+        ).toBeVisible();
     });
 });
