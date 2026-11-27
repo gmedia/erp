@@ -4,10 +4,12 @@ use App\Health\Checks\AppVersionCheck;
 use App\Health\Checks\ContainerResourcesCheck;
 use App\Health\Checks\DatabaseHealthCheck;
 use App\Health\Checks\DiskUsageHealthCheck;
+use App\Health\Checks\PendingMigrationsCheck;
 use App\Health\Checks\ProductionConfigCheck;
 use App\Health\Checks\RedisHealthCheck;
 use App\Health\SystemHealthThresholds;
 use App\Models\Setting;
+use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
@@ -118,6 +120,30 @@ test('production config check ignores debug outside production', function () {
     $result = (new ProductionConfigCheck)->run();
 
     expect((string) $result->status)->toBe('ok');
+});
+
+test('pending migrations check is ok when every migration file has run', function () {
+    $result = (new PendingMigrationsCheck)->run();
+
+    expect((string) $result->status)->toBe('ok');
+    expect($result->meta['pending'])->toBe(0);
+});
+
+test('pending migrations check warns when a migration file has not run', function () {
+    $migrator = Mockery::mock(Migrator::class);
+    $migrator->shouldReceive('getMigrationFiles')->andReturn([
+        '2099_01_01_000000_future_a' => '/tmp/a.php',
+        '2099_01_01_000001_future_b' => '/tmp/b.php',
+    ]);
+    $repository = Mockery::mock();
+    $repository->shouldReceive('getRan')->andReturn(['2099_01_01_000000_future_a']);
+    $migrator->shouldReceive('getRepository')->andReturn($repository);
+    app()->instance(Migrator::class, $migrator);
+
+    $result = (new PendingMigrationsCheck)->run();
+
+    expect((string) $result->status)->toBe('warning');
+    expect($result->meta['pending'])->toBe(1);
 });
 
 test('version check reports app php and laravel versions without failing', function () {

@@ -7,6 +7,7 @@ use App\Health\Checks\ContainerResourcesCheck;
 use App\Health\Checks\DatabaseHealthCheck;
 use App\Health\Checks\DiskUsageHealthCheck;
 use App\Health\Checks\ObjectStorageCheck;
+use App\Health\Checks\PendingMigrationsCheck;
 use App\Health\Checks\ProductionConfigCheck;
 use App\Health\Checks\RedisHealthCheck;
 use Illuminate\Support\ServiceProvider;
@@ -22,6 +23,7 @@ class SystemHealthServiceProvider extends ServiceProvider
             DatabaseHealthCheck::new()->name('database')->label('Database'),
             RedisHealthCheck::new()->name('redis')->label('Valkey / Redis'),
             ObjectStorageCheck::new()->name('object_storage')->label('Object storage'),
+            PendingMigrationsCheck::new()->name('migrations')->label('Migrasi'),
             QueueCheck::new()->name('queue')->label('Antrian')->onQueue('default'),
             ScheduleCheck::new()->name('scheduler')->label('Scheduler'),
             DiskUsageHealthCheck::new()->name('disk')->label('Disk aplikasi'),
