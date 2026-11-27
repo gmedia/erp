@@ -15,7 +15,14 @@ import {
 } from '@/components/ui/tooltip';
 import { useTranslation } from '@/contexts/i18n-context';
 import { Table } from '@tanstack/react-table';
-import { Columns3, Download, Filter, Loader2, PlusCircle } from 'lucide-react';
+import {
+    Columns3,
+    Download,
+    Filter,
+    Loader2,
+    PlusCircle,
+    Search,
+} from 'lucide-react';
 import * as React from 'react';
 import { FilterModal } from './FilterModal';
 import type { FieldDescriptor } from './filters';
@@ -89,14 +96,20 @@ export function DataTableToolbar<T>({
 
     return (
         <div className="flex flex-wrap items-center gap-2 py-4">
-            <Input
-                placeholder={searchPlaceholder}
-                value={searchValue}
-                onChange={handleSearchChange}
-                onKeyDown={handleSearchKeyDown}
-                className="h-9 w-full min-w-0 border-border bg-background text-ellipsis placeholder:text-muted-foreground sm:max-w-sm sm:flex-1"
-                data-testid="search-input"
-            />
+            <div className="relative w-full min-w-0 sm:max-w-sm sm:flex-1">
+                <Search
+                    aria-hidden="true"
+                    className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground"
+                />
+                <Input
+                    placeholder={searchPlaceholder}
+                    value={searchValue}
+                    onChange={handleSearchChange}
+                    onKeyDown={handleSearchKeyDown}
+                    className="rounded-[8px] pl-8 text-ellipsis"
+                    data-testid="search-input"
+                />
+            </div>
 
             {/* Mobile: kontrol dalam satu baris bisa di-scroll, bukan 2-3 baris (W4-15). */}
             <div className="ml-auto flex w-full flex-nowrap items-center gap-2 overflow-x-auto pb-1 sm:w-auto sm:overflow-visible sm:pb-0">
