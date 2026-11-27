@@ -47,7 +47,7 @@ test('user with system_health permission reads status with components and histor
             'checked_at',
             'overall',
             'components' => [[
-                'name', 'label', 'status', 'summary', 'message',
+                'name', 'label', 'status', 'summary', 'summary_code', 'message',
                 'message_code', 'message_params', 'meta',
             ]],
             'history',
