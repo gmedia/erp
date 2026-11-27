@@ -1433,15 +1433,13 @@
         "general_ledger": {
             "title": "Laporan Buku Besar",
             "description": "Setiap baris jurnal yang diposting ke akun dalam satu periode, dengan saldo berjalan.",
-            "columns": {
-                "date": "Tanggal",
-                "entry_number": "No. Jurnal",
-                "description": "Deskripsi",
-                "reference": "Referensi",
-                "debit": "Debit",
-                "credit": "Kredit",
-                "running_balance": "Saldo Berjalan"
-            }
+            "column_date": "Tanggal",
+            "column_entry_number": "No. Jurnal",
+            "column_description": "Deskripsi",
+            "column_reference": "Referensi",
+            "column_debit": "Debet",
+            "column_credit": "Kredit",
+            "column_running_balance": "Saldo Berjalan"
         },
         "financial_dashboard": {
             "description": "Pantau metrik keuangan utama, arus kas, dan tren beban."

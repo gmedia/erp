@@ -1430,15 +1430,13 @@
         "general_ledger": {
             "title": "General Ledger Report",
             "description": "Every journal line posted to an account within a period, with running balance.",
-            "columns": {
-                "date": "Date",
-                "entry_number": "Entry Number",
-                "description": "Description",
-                "reference": "Reference",
-                "debit": "Debit",
-                "credit": "Credit",
-                "running_balance": "Running Balance"
-            }
+            "column_date": "Date",
+            "column_entry_number": "Entry Number",
+            "column_description": "Description",
+            "column_reference": "Reference",
+            "column_debit": "Debit",
+            "column_credit": "Credit",
+            "column_running_balance": "Running Balance"
         },
         "financial_dashboard": {
             "description": "Monitor key financial metrics, cash flow, and expense trends."

@@ -21,7 +21,7 @@ export interface GeneralLedgerItem {
 type GLItemWithCurrency = GeneralLedgerItem & { currency?: string | null };
 
 const glLabel = (column: string, fallback: string) => ({
-    key: `page.general_ledger.columns.${column}`,
+    key: `page.general_ledger.column_${column}`,
     fallback,
 });
 
