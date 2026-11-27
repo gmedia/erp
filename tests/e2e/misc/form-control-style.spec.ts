@@ -1,5 +1,8 @@
 import { expect, test, type Page } from '@playwright/test';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { login } from '../helpers';
+
+const EVIDENCE_DIR = 'e2e/e2e-full/form-control';
 
 /**
  * Guard gaya kontrol teks (#582): input, textarea, dan kolom search toolbar
@@ -78,6 +81,17 @@ for (const theme of ['light', 'dark'] as const) {
                 .first()
                 .click();
             await page.waitForTimeout(800);
+            const rest = await page.evaluate(() => {
+                const node = document.activeElement as HTMLElement | null;
+                return {
+                    tag: node?.tagName ?? '',
+                    type: node?.getAttribute('type') ?? '',
+                    focusVisible: node?.matches(':focus-visible') ?? false,
+                };
+            });
+            console.log(
+                `[form-control] rest-focus ${theme}: ${JSON.stringify(rest)}`,
+            );
             const focusedField = await page.evaluate(() =>
                 document.activeElement?.matches(
                     '[role="dialog"] input[type="text"]',
@@ -89,6 +103,13 @@ for (const theme of ['light', 'dark'] as const) {
                 page,
                 '[role="dialog"] input[type="text"]',
             );
+            mkdirSync(EVIDENCE_DIR, { recursive: true });
+            await page
+                .getByRole('dialog')
+                .first()
+                .screenshot({
+                    path: `${EVIDENCE_DIR}/dialog-rest-${theme}.png`,
+                });
 
             expect(input.borderRadius).toBe(RADIUS_INPUT);
             expect(input.height).toBeCloseTo(HEIGHT, 0);
@@ -123,7 +144,13 @@ for (const theme of ['light', 'dark'] as const) {
 
             const dialog = page.getByRole('dialog').first();
             await dialog.getByRole('heading').first().click();
+            await page.waitForTimeout(800);
+            const fieldLocator = page
+                .locator('[role="dialog"] input[type="text"]')
+                .first();
+            const restPng = await fieldLocator.screenshot();
             await page.keyboard.press('Tab');
+            await page.waitForTimeout(800);
 
             const focused = await page.evaluate(() => {
                 const node = document.activeElement as HTMLElement | null;
@@ -135,9 +162,22 @@ for (const theme of ['light', 'dark'] as const) {
                     shadow: getComputedStyle(node).boxShadow,
                 };
             });
+            console.log(
+                `[form-control] focus ${theme}: ${JSON.stringify(focused)}`,
+            );
             expect(focused.isField).toBe(true);
             expect(focused.visible).toBe(true);
             expect(focused.shadow).toContain('2px');
+            mkdirSync(EVIDENCE_DIR, { recursive: true });
+            const focusPng = await fieldLocator.screenshot();
+            writeFileSync(`${EVIDENCE_DIR}/field-rest-${theme}.png`, restPng);
+            writeFileSync(`${EVIDENCE_DIR}/field-focus-${theme}.png`, focusPng);
+            await page
+                .getByRole('dialog')
+                .first()
+                .screenshot({
+                    path: `${EVIDENCE_DIR}/dialog-focus-${theme}.png`,
+                });
         });
     });
 }
