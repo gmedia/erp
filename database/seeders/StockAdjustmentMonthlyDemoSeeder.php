@@ -16,7 +16,7 @@ use Illuminate\Support\Collection;
 /**
  * Penyesuaian stok bulanan untuk jendela demo 13 bulan (#571).
  *
- * Tiap bulan mendapat satu penyesuaian `approved` (SA-YYYYMM-NNNN) di gudang utama. Pergerakan
+ * Tiap bulan mendapat satu penyesuaian `approved` (SA-YYYY-0001NN) di gudang utama. Pergerakan
  * dibukukan oleh StockMovementSampleDataSeeder lewat StockPostingService, sehingga kartu stok
  * dan jurnal persediaan berasal dari jalur yang sama dengan aplikasi. Selisih bergantian
  * (koreksi, rusak, susut) dengan nilai kecil agar saldo tetap positif.
@@ -28,6 +28,9 @@ class StockAdjustmentMonthlyDemoSeeder extends Seeder
 {
     /** Pola nomor SA bulanan; dipakai juga oleh StockMovementSampleDataSeeder. */
     public const MONTHLY_PREFIX = 'SA-';
+
+    /** Sequence awal nomor bulanan per tahun (nomor pertama = FIRST_SEQUENCE + 1). */
+    private const FIRST_SEQUENCE = 100;
 
     /** Pola jenis penyesuaian per bulan (nilai enum stock_adjustments.adjustment_type). */
     private const TYPES = ['correction', 'damage', 'shrinkage', 'expired'];
@@ -52,9 +55,15 @@ class StockAdjustmentMonthlyDemoSeeder extends Seeder
             return;
         }
 
+        $sequenceByYear = [];
+
         foreach (DemoCalendar::months() as $index => $month) {
             $adjustmentDate = DemoCalendar::dateInMonth($index, 22);
-            $number = sprintf('%s%s-%04d', self::MONTHLY_PREFIX, $month->format('Ym'), 1);
+            $year = $month->format('Y');
+            $sequenceByYear[$year] = ($sequenceByYear[$year] ?? 0) + 1;
+            // Nomor mengikuti pola produksi SA-YYYY-NNNNNN (W7-17). Rentang 100+ dipakai agar
+            // tidak bentrok dengan nomor SA-YYYY-000001..000005 dari StockAdjustmentSampleDataSeeder.
+            $number = sprintf('%s%s-%06d', self::MONTHLY_PREFIX, $year, self::FIRST_SEQUENCE + $sequenceByYear[$year]);
             $type = self::TYPES[$index % count(self::TYPES)];
 
             $adjustment = StockAdjustment::updateOrCreate(

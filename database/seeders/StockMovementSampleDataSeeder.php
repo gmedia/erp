@@ -50,8 +50,8 @@ class StockMovementSampleDataSeeder extends Seeder
     // sudah di-rename oleh seeder masing-masing, jadi pola lama tidak dipakai lagi.
     private const SA_DEMO = 'SA-____-00000_';
 
-    /** Penyesuaian bulanan SA-YYYYMM-NNNN (StockAdjustmentMonthlyDemoSeeder). */
-    private const SA_MONTHLY_DEMO = 'SA-______-____';
+    /** Penyesuaian bulanan SA-YYYY-0001NN (StockAdjustmentMonthlyDemoSeeder). */
+    private const SA_MONTHLY_DEMO = 'SA-____-0001__';
 
     private const ST_DEMO = 'ST-____-00000_';
 
