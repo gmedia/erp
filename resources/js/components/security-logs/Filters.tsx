@@ -31,14 +31,17 @@ export function createSecurityLogFilterFields(
                 key: 'page.security_logs.column_ip_address',
                 fallback: 'IP Address',
             },
-            'e.g. 192.168.1.10',
+            {
+                key: 'page.security_logs.ip_placeholder',
+                fallback: 'e.g. 192.168.1.10',
+            },
         ),
         {
             name: 'start_date',
             label: t('page.security_logs.start_date'),
             component: (
                 <FilterDatePicker
-                    placeholder={t('page.security_logs.start_date')}
+                    placeholder={t('page.security_logs.pick_date')}
                 />
             ),
         },
@@ -47,7 +50,7 @@ export function createSecurityLogFilterFields(
             label: t('page.security_logs.end_date'),
             component: (
                 <FilterDatePicker
-                    placeholder={t('page.security_logs.end_date')}
+                    placeholder={t('page.security_logs.pick_date')}
                 />
             ),
         },

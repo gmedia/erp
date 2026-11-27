@@ -14,6 +14,7 @@ export interface SystemHealthComponent {
     label: string;
     status: SystemHealthStatus;
     summary: string | null;
+    summary_code: string | null;
     message: string | null;
     message_code: string | null;
     message_params: Record<string, string>;

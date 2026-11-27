@@ -29,6 +29,7 @@ class ContainerResourcesCheck extends Check
                     'scope' => 'container',
                     'cpu_load_1m' => $this->loadAverage(),
                     'cpu_load_scope' => 'kernel',
+                    'summary_code' => 'system_health.summary.unavailable',
                 ] + SystemHealthMessage::meta('system_health.container.unavailable'))
                 ->shortSummary('Tidak tersedia')
                 ->warning('Pembacaan memori kontainer tidak tersedia di lingkungan ini.');

@@ -35,7 +35,7 @@ class PendingMigrationsCheck extends Check
         $baseMeta = [
             'pending' => $pending,
             'ran' => count($ran),
-        ];
+        ] + ($pending === 0 ? ['summary_code' => 'system_health.summary.complete'] : []);
 
         $result = Result::make()
             ->shortSummary($pending === 0 ? 'Lengkap' : $pending . ' tertunda');
