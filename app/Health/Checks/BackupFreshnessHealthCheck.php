@@ -23,10 +23,9 @@ class BackupFreshnessHealthCheck extends Check
 
             if (! $destination->isReachable()) {
                 $error = $destination->connectionError();
+                $name = $error ? class_basename($error) : __('system_health.backup.no_disk');
 
-                return Result::make()->failed(
-                    'Tujuan backup tidak dapat dijangkau (' . ($error ? class_basename($error) : 'disk tidak ada') . ').',
-                );
+                return Result::make()->failed(__('system_health.backup.unreachable', ['error' => $name]));
             }
 
             $newest = $destination->newestBackup();
@@ -34,11 +33,13 @@ class BackupFreshnessHealthCheck extends Check
             report($exception);
             Log::warning('Backup freshness check could not read the backup destination.');
 
-            return Result::make()->failed('Tujuan backup tidak dapat dibaca (' . class_basename($exception) . ').');
+            return Result::make()->failed(
+                __('system_health.backup.unreadable', ['error' => class_basename($exception)]),
+            );
         }
 
         if ($newest === null) {
-            return Result::make()->failed('Belum ada arsip backup.');
+            return Result::make()->failed(__('system_health.backup.none'));
         }
 
         $sizeBytes = (int) $newest->sizeInBytes();
@@ -50,16 +51,16 @@ class BackupFreshnessHealthCheck extends Check
                 'age_hours' => $ageHours,
                 'size_bytes' => $sizeBytes,
             ])
-            ->shortSummary($ageHours . ' jam lalu');
+            ->shortSummary(__('system_health.backup.age', ['hours' => $ageHours]));
 
         if ($sizeBytes <= 0) {
-            return $result->failed('Arsip backup terakhir berukuran 0 byte.');
+            return $result->failed(__('system_health.backup.empty'));
         }
 
         if ($ageHours >= self::MAX_AGE_HOURS) {
-            return $result->failed('Backup terakhir lebih dari ' . self::MAX_AGE_HOURS . ' jam lalu.');
+            return $result->failed(__('system_health.backup.stale', ['hours' => self::MAX_AGE_HOURS]));
         }
 
-        return $result->ok('Backup terakhir berhasil dibuat.');
+        return $result->ok(__('system_health.backup.ok'));
     }
 }

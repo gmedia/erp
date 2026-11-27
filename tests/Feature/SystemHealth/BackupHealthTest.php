@@ -27,7 +27,7 @@ test('backup check fails when no archive exists yet', function () {
     $result = (new BackupFreshnessHealthCheck)->run();
 
     expect((string) $result->status)->toBe('failed');
-    expect($result->getNotificationMessage())->toContain('Belum ada arsip backup');
+    expect($result->getNotificationMessage())->toBe(__('system_health.backup.none'));
 });
 
 test('backup check is ok when the newest archive is fresh and non-empty', function () {
@@ -48,7 +48,7 @@ test('backup check fails when the newest archive is older than 26 hours', functi
     $result = (new BackupFreshnessHealthCheck)->run();
 
     expect((string) $result->status)->toBe('failed');
-    expect($result->getNotificationMessage())->toContain('26 jam');
+    expect($result->getNotificationMessage())->toBe(__('system_health.backup.stale', ['hours' => 26]));
 });
 
 test('backup check fails when the newest archive is empty', function () {
@@ -58,7 +58,7 @@ test('backup check fails when the newest archive is empty', function () {
     $result = (new BackupFreshnessHealthCheck)->run();
 
     expect((string) $result->status)->toBe('failed');
-    expect($result->getNotificationMessage())->toContain('0 byte');
+    expect($result->getNotificationMessage())->toBe(__('system_health.backup.empty'));
 });
 
 test('backup check fails with a sanitized message when the disk is unreachable', function () {
@@ -79,13 +79,14 @@ test('scheduled backup and cleanup are registered in the scheduler', function ()
         ->implode("\n");
 
     expect($commands)
+        ->toContain('backup:stage-object-storage')
         ->toContain('backup:run')
-        ->toContain('--only-db')
         ->toContain('backup:clean');
 });
 
-test('backup source is the database only and archives go to a separate disk', function () {
-    expect(config('backup.backup.source.files.include'))->toBe([]);
+test('backup source includes the staged object storage and archives go to a separate disk', function () {
+    expect(config('backup.backup.source.files.include'))
+        ->toBe([storage_path('app/backup-staging/object-storage')]);
     expect(config('backup.backup.destination.disks'))->toBe(['backups']);
     expect(config('filesystems.disks.backups.driver'))->toBe('local');
 });

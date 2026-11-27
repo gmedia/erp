@@ -20,9 +20,11 @@ return [
                 /*
                  * The list of directories and files that will be included in the backup.
                  */
-                // Langkah ini hanya backup database (artisan backup:run --only-db).
-                // Object storage (S3/MinIO) tidak dibaca paket ini; lihat docs backup.
-                'include' => [],
+                // Object storage disalin dulu ke folder staging oleh backup:stage-object-storage
+                // (lihat 'staging' di bawah), lalu ikut diarsipkan sebagai berkas lokal.
+                'include' => [
+                    storage_path('app/backup-staging/object-storage'),
+                ],
 
                 /*
                  * These directories and files will be excluded from the backup.
@@ -196,6 +198,16 @@ return [
          * Set to `0` for none
          */
         'retry_delay' => 0,
+    ],
+
+    /*
+     * Staging object storage sebelum backup. Batas melindungi host dari bucket besar:
+     * bila terlampaui, sisa berkas dilewati dan tercatat di output command.
+     */
+    'staging' => [
+        'path' => storage_path('app/backup-staging/object-storage'),
+        'max_files' => (int) env('BACKUP_STAGING_MAX_FILES', 20000),
+        'max_bytes' => (int) env('BACKUP_STAGING_MAX_BYTES', 5 * 1024 * 1024 * 1024),
     ],
 
     /*

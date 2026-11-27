@@ -29,7 +29,7 @@ class SystemHealthServiceProvider extends ServiceProvider
         );
 
         Health::checks([
-            BackupFreshnessHealthCheck::new()->name('backup')->label('Backup terakhir'),
+            BackupFreshnessHealthCheck::new()->name('backup')->label(__('system_health.backup.label')),
             DatabaseHealthCheck::new()->name('database')->label('Database'),
             RedisHealthCheck::new()->name('redis')->label('Valkey / Redis'),
             ObjectStorageCheck::new()->name('object_storage')->label('Object storage'),

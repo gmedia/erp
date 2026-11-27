@@ -180,12 +180,22 @@ Schedule::command('health:queue-check-heartbeat')
     ->everyFiveMinutes()
     ->name('system-health-queue-heartbeat');
 
-// Backup database harian (arsip di disk 'backups', terpisah dari bucket sumber), lalu cleanup
-// retensi bertingkat (config/backup.php). Notifikasi gagal lewat SystemHealthServiceProvider.
-Schedule::command('backup:run', ['--only-db'])
+// Backup harian: salin object storage ke staging lokal, backup DB + staging ke disk 'backups'
+// (terpisah dari bucket sumber), lalu hapus staging. Cleanup retensi di 02:30 (config/backup.php).
+// Notifikasi gagal lewat SystemHealthServiceProvider.
+Schedule::command('backup:stage-object-storage')
+    ->dailyAt('01:25')
+    ->withoutOverlapping()
+    ->name('backup-stage-object-storage');
+
+Schedule::command('backup:run')
     ->dailyAt('01:30')
     ->withoutOverlapping()
     ->name('backup-run-database');
+
+Schedule::command('backup:stage-object-storage', ['--clear'])
+    ->dailyAt('01:45')
+    ->name('backup-clear-staging');
 
 Schedule::command('backup:clean')
     ->dailyAt('02:30')
