@@ -40,14 +40,21 @@ test.describe('issue 599 filter dialog labels (locale id)', () => {
             await login(page);
             await page.goto(c.path, { waitUntil: 'domcontentloaded' });
 
-            await page.getByRole('button', { name: /filter/i }).first().click();
+            await page
+                .getByRole('button', { name: /filter/i })
+                .first()
+                .click();
             const dialog = page.getByRole('dialog');
             await expect(dialog).toBeVisible({ timeout: 15000 });
 
             for (const label of c.labels) {
-                await expect(dialog.getByText(label, { exact: true }).first()).toBeVisible();
+                await expect(
+                    dialog.getByText(label, { exact: true }).first(),
+                ).toBeVisible();
             }
-            await expect(dialog.getByText('Supplier', { exact: true })).toHaveCount(0);
+            await expect(
+                dialog.getByText('Supplier', { exact: true }),
+            ).toHaveCount(0);
 
             await dialog.screenshot({
                 path: `${SHOT_DIR}/${c.slug}-id.png`,
