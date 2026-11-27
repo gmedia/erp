@@ -2,10 +2,12 @@
 
 use App\Actions\AuditLog\PruneAuditLogAction;
 use App\Models\Account;
+use App\Models\JournalEntry;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Laravel\Sanctum\Sanctum;
 use Spatie\Activitylog\Models\Activity;
 
 uses(RefreshDatabase::class)->group('audit-log');
@@ -13,7 +15,7 @@ uses(RefreshDatabase::class)->group('audit-log');
 describe('recording financial changes', function () {
     it('records old and new values only for changed attributes', function () {
         $user = User::factory()->create();
-        $this->actingAs($user);
+        Sanctum::actingAs($user);
 
         $setting = Setting::factory()->create([
             'key' => 'company_name',
@@ -68,6 +70,30 @@ describe('recording financial changes', function () {
         expect($activity)->not->toBeNull()
             ->and($activity->attribute_changes['old']['name'])->toBe('Kas Lama')
             ->and($activity->attribute_changes['attributes']['name'])->toBe('Kas Baru');
+    });
+
+    it('records a journal entry change so it appears in the audit list', function () {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        $entry = JournalEntry::factory()->create([
+            'description' => 'Deskripsi Lama',
+            'status' => 'draft',
+        ]);
+
+        $entry->update(['description' => 'Deskripsi Baru']);
+
+        $activity = Activity::query()
+            ->where('subject_type', JournalEntry::class)
+            ->where('subject_id', $entry->id)
+            ->where('event', 'updated')
+            ->latest('id')
+            ->first();
+
+        expect($activity)->not->toBeNull()
+            ->and($activity->causer_id)->toBe($user->id)
+            ->and($activity->attribute_changes['old']['description'])->toBe('Deskripsi Lama')
+            ->and($activity->attribute_changes['attributes']['description'])->toBe('Deskripsi Baru');
     });
 });
 
