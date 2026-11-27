@@ -42,11 +42,9 @@ fi
 # Running migrations
 ./vendor/bin/sail artisan migrate:fresh --seed
 
-# Configure MinIO and create bucket
+# Configure MinIO and create bucket (idempoten; lihat scripts/minio-bucket.sh)
 echo "Configuring MinIO bucket..."
-./vendor/bin/sail exec -T minio mc alias set myminio http://localhost:9000 sail password
-./vendor/bin/sail exec -T minio mc mb myminio/local || true
-./vendor/bin/sail exec -T minio mc anonymous set download myminio/local || true
+bash scripts/minio-bucket.sh local
 
 # Create symbolic link for storage
 ./vendor/bin/sail run rm -rf public/storage
