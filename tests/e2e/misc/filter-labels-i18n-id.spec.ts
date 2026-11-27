@@ -1,7 +1,11 @@
 import { expect, test } from '@playwright/test';
+import { mkdirSync } from 'node:fs';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
 import { login } from '../helpers';
 
 const LOCALE_KEY = 'app_locale';
+const SHOT_DIR = join(homedir(), '.erp-agent', 'shots-599');
 
 const cases = [
     {
@@ -19,7 +23,14 @@ const cases = [
     {
         path: '/assets',
         slug: 'assets',
-        labels: ['Kategori', 'Lokasi', 'Departemen', 'Karyawan', 'Pemasok', 'Cabang'],
+        labels: [
+            'Kategori',
+            'Lokasi',
+            'Departemen',
+            'Karyawan',
+            'Pemasok',
+            'Cabang',
+        ],
         placeholders: ['Pilih kategori', 'Pilih lokasi', 'Pilih departemen'],
     },
     {
@@ -27,6 +38,23 @@ const cases = [
         slug: 'customers',
         labels: ['Cabang', 'Kategori', 'Status'],
         placeholders: ['Pilih cabang', 'Pilih kategori', 'Semua Status'],
+    },
+    {
+        path: '/purchase-orders',
+        slug: 'purchase-orders',
+        labels: [
+            'Status',
+            'Mata Uang',
+            'Tanggal Pesan Dari',
+            'Tanggal Pesan Sampai',
+        ],
+        placeholders: ['Pilih status', 'Pilih mata uang'],
+    },
+    {
+        path: '/reports/ap-aging',
+        slug: 'reports-ap-aging',
+        labels: ['Pemasok', 'Cabang', 'Status'],
+        placeholders: ['Pilih pemasok', 'Pilih cabang'],
     },
 ];
 
@@ -47,18 +75,31 @@ test.describe('filter labels i18n (locale id)', () => {
             await expect(dialog).toBeVisible({ timeout: 15000 });
 
             for (const label of c.labels) {
-                await expect(dialog.getByText(label, { exact: true }).first()).toBeVisible();
+                await expect(
+                    dialog.getByText(label, { exact: true }).first(),
+                ).toBeVisible();
             }
             for (const placeholder of c.placeholders) {
-                await expect(dialog.getByText(placeholder).first()).toBeVisible();
+                await expect(
+                    dialog.getByText(placeholder).first(),
+                ).toBeVisible();
             }
 
-            for (const english of ['Category', 'Unit', 'Branch', 'Select category', 'Select unit']) {
-                await expect(dialog.getByText(english, { exact: true })).toHaveCount(0);
+            for (const english of [
+                'Category',
+                'Unit',
+                'Branch',
+                'Select category',
+                'Select unit',
+            ]) {
+                await expect(
+                    dialog.getByText(english, { exact: true }),
+                ).toHaveCount(0);
             }
 
+            mkdirSync(SHOT_DIR, { recursive: true });
             await page.screenshot({
-                path: `/tmp/opencode/a599-filter-${c.slug}-id.png`,
+                path: join(SHOT_DIR, `filter-${c.slug}-id.png`),
                 fullPage: false,
             });
         });
