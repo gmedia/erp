@@ -643,6 +643,7 @@
         "ap_payment_history_report": "Riwayat Pembayaran Utang",
         "approval_audit_trail": "Jejak Audit Persetujuan",
         "security_log": "Log Keamanan",
+        "audit_log": "Audit Log",
         "approval_delegation": "Delegasi Persetujuan",
         "approval_flow": "Alur Persetujuan",
         "approval_monitoring": "Pemantauan Persetujuan",
@@ -1050,6 +1051,19 @@
             "select_user": "Pilih pengguna",
             "start_date": "Tanggal mulai",
             "end_date": "Tanggal selesai"
+        },
+        "audit_logs": {
+            "description": "Riwayat perubahan data keuangan dan pengaturan: siapa mengubah apa, kapan, dan nilai lama → baru.",
+            "search_placeholder": "Cari ringkasan, ID dokumen...",
+            "select_user": "Pilih pengguna",
+            "start_date": "Tanggal mulai",
+            "end_date": "Tanggal selesai",
+            "column_date": "Waktu",
+            "column_user": "Pengguna",
+            "column_module": "Modul",
+            "column_document_id": "ID Dokumen",
+            "column_action": "Aksi",
+            "column_summary": "Ringkasan"
         },
         "approval_audit_trail": {
             "description": "Riwayat tindakan persetujuan pada permintaan.",
@@ -1506,6 +1520,9 @@
     },
     "filter": {
         "security_event_login_success": "Login Berhasil",
+        "audit_event_created": "Dibuat",
+        "audit_event_updated": "Diubah",
+        "audit_event_deleted": "Dihapus",
         "security_event_login_failed": "Login Gagal",
         "security_event_logout": "Logout",
         "security_event_password_reset": "Atur Ulang Kata Sandi",
@@ -3430,6 +3447,17 @@
             "ip_address": "Alamat IP",
             "user_agent": "User Agent",
             "metadata": "Metadata"
+        }
+    },
+    "audit_logs": {
+        "export_headers": {
+            "date": "Waktu",
+            "event": "Aksi",
+            "user": "Pengguna",
+            "module": "Modul",
+            "document_id": "ID Dokumen",
+            "summary": "Ringkasan",
+            "changes": "Perubahan"
         }
     }
 }

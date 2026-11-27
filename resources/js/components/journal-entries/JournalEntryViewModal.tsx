@@ -1,4 +1,5 @@
 import { ViewModalShell } from '@/components/common/ViewModalShell';
+import { JournalEntryAuditHistory } from '@/components/journal-entries/JournalEntryAuditHistory';
 import { Badge } from '@/components/ui/badge';
 import {
     Table,
@@ -152,6 +153,13 @@ export function JournalEntryViewModal({
                                 </TableRow>
                             </TableFooter>
                         </Table>
+                    </div>
+
+                    <div className="space-y-2">
+                        <p className="text-sm font-medium text-muted-foreground">
+                            Riwayat perubahan
+                        </p>
+                        <JournalEntryAuditHistory journalEntryId={item.id} />
                     </div>
                 </div>
             </div>

@@ -643,6 +643,7 @@
         "ap_payment_history_report": "AP Payment History",
         "approval_audit_trail": "Approval Audit Trail",
         "security_log": "Security Log",
+        "audit_log": "Audit Log",
         "approval_delegation": "Approval Delegation",
         "approval_flow": "Approval Flow",
         "approval_monitoring": "Approval Monitoring",
@@ -1050,6 +1051,19 @@
             "select_user": "Select a user",
             "start_date": "Start Date",
             "end_date": "End Date"
+        },
+        "audit_logs": {
+            "description": "History of changes to financial and settings data: who changed what, when, and old → new values.",
+            "search_placeholder": "Search summary, document ID...",
+            "select_user": "Select user",
+            "start_date": "Start date",
+            "end_date": "End date",
+            "column_date": "Date",
+            "column_user": "User",
+            "column_module": "Module",
+            "column_document_id": "Document ID",
+            "column_action": "Action",
+            "column_summary": "Summary"
         },
         "approval_audit_trail": {
             "description": "History of approval actions taken on requests.",
@@ -1503,6 +1517,9 @@
     },
     "filter": {
         "security_event_login_success": "Login Success",
+        "audit_event_created": "Created",
+        "audit_event_updated": "Updated",
+        "audit_event_deleted": "Deleted",
         "security_event_login_failed": "Login Failed",
         "security_event_logout": "Logout",
         "security_event_password_reset": "Password Reset",
@@ -3427,6 +3444,17 @@
             "ip_address": "IP Address",
             "user_agent": "User Agent",
             "metadata": "Metadata"
+        }
+    },
+    "audit_logs": {
+        "export_headers": {
+            "date": "Date",
+            "event": "Action",
+            "user": "User",
+            "module": "Module",
+            "document_id": "Document ID",
+            "summary": "Summary",
+            "changes": "Changes"
         }
     }
 }
