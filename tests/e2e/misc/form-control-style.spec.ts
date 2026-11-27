@@ -233,6 +233,60 @@ for (const theme of ['light', 'dark'] as const) {
             }
         });
 
+        test('checkbox kolom pilih tabel memakai 16px, radius 4px, dan bg primary saat dicentang', async ({
+            page,
+        }) => {
+            await page.goto('/products', { waitUntil: 'domcontentloaded' });
+            await page.waitForLoadState('networkidle').catch(() => undefined);
+            const row = page.locator('table tbody tr').first();
+            await expect(row).toBeVisible({ timeout: 15000 });
+            const checkbox = row.locator('[data-testid="select-row"]');
+            await expect(checkbox).toBeVisible();
+
+            const rest = await readControlStyle(
+                page,
+                'table tbody tr:first-child [data-testid="select-row"]',
+            );
+            expect(await checkbox.getAttribute('data-state')).toBe('unchecked');
+            expect(rest.height).toBeCloseTo(16, 0);
+            expect(rest.borderRadius).toBe('4px');
+            expect(rest.borderWidth).toBe('1px');
+            expect(rest.borderColor).not.toBe('rgba(0, 0, 0, 0)');
+            mkdirSync(EVIDENCE_DIR, { recursive: true });
+            await row.screenshot({
+                path: `${EVIDENCE_DIR}/checkbox-unchecked-${theme}.png`,
+            });
+
+            await checkbox.click();
+            await expect(checkbox).toHaveAttribute('data-state', 'checked');
+            await page.waitForTimeout(400);
+
+            const checked = await readControlStyle(
+                page,
+                'table tbody tr:first-child [data-testid="select-row"]',
+            );
+            const primary = await page.evaluate(() => {
+                const probe = document.createElement('span');
+                probe.className = 'bg-primary';
+                document.body.appendChild(probe);
+                const color = getComputedStyle(probe).backgroundColor;
+                probe.remove();
+                return color;
+            });
+            const checkedBg = await checkbox.evaluate(
+                (el) => getComputedStyle(el).backgroundColor,
+            );
+            console.log(
+                `[form-control] checkbox ${theme}: rest=${JSON.stringify(rest)} checked=${JSON.stringify(checked)} bg=${checkedBg} primary=${primary}`,
+            );
+            expect(checked.height).toBeCloseTo(16, 0);
+            expect(checked.borderRadius).toBe('4px');
+            expect(checkedBg).toBe(primary);
+            await row.screenshot({
+                path: `${EVIDENCE_DIR}/checkbox-checked-${theme}.png`,
+            });
+        });
+
         test('input mendapat ring fokus 2px netral saat focus-visible', async ({
             page,
         }) => {
