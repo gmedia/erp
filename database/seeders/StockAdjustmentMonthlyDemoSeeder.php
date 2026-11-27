@@ -55,6 +55,8 @@ class StockAdjustmentMonthlyDemoSeeder extends Seeder
             return;
         }
 
+        $this->purgeLegacyMonthlyNumbers();
+
         $sequenceByYear = [];
 
         foreach (DemoCalendar::months() as $index => $month) {
@@ -83,6 +85,25 @@ class StockAdjustmentMonthlyDemoSeeder extends Seeder
 
             $this->seedItems($adjustment, $products, $index);
         }
+    }
+
+    /**
+     * Format nomor bulanan berubah dari SA-YYYYMM-0001 ke SA-YYYY-0001NN (W7-17). Hapus baris
+     * lama yang masih berpola itu (beserta itemnya) agar re-seed tidak meninggalkan yatim.
+     * Hanya pola lama yang khas demo ini; dokumen buatan pengguna tidak cocok dengan pola ini.
+     */
+    private function purgeLegacyMonthlyNumbers(): void
+    {
+        $legacyIds = StockAdjustment::query()
+            ->where('adjustment_number', 'like', 'SA-______-0001')
+            ->pluck('id');
+
+        if ($legacyIds->isEmpty()) {
+            return;
+        }
+
+        StockAdjustmentItem::query()->whereIn('stock_adjustment_id', $legacyIds)->delete();
+        StockAdjustment::query()->whereIn('id', $legacyIds)->delete();
     }
 
     /**

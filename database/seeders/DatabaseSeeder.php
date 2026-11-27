@@ -7,6 +7,7 @@ use App\Models\Company;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Employment;
+use App\Models\PeriodClosing;
 use App\Models\Permission;
 use App\Models\Position;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -218,6 +219,10 @@ class DatabaseSeeder extends Seeder
         // transaksi demo tercatat, karena penutupan annual mengunci seluruh FY (#571).
         $this->call(DemoPeriodClosingSeeder::class);
 
+        // Jurnal penutup tahunan dibuat ACTION dengan prefix CL-; setelah ditutup, nomornya
+        // disamakan ke urutan JV demo agar tetap naik sesuai tanggal (#503 butir 3).
+        $this->renumberDemoJournalEntries($journalIdBoundary, includeClosingEntries: true);
+
         // Assign all permissions to sample users for easy testing. Cari karyawan lewat
         // user_id: email karyawan bisa berbeda dari email user di data demo lama (PR432).
         $allPermissions = Permission::all();
@@ -249,7 +254,7 @@ class DatabaseSeeder extends Seeder
      * created_by (dibuat pengguna) yang sudah ada sebelum run ini, renumber dilewati seluruhnya.
      * Jurnal sistem/demo (created_by null) tidak dikunci.
      */
-    private function renumberDemoJournalEntries(int $journalIdBoundary): void
+    private function renumberDemoJournalEntries(int $journalIdBoundary, bool $includeClosingEntries = false): void
     {
         $hasUserJournal = DB::table('journal_entries')
             ->where('id', '<=', $journalIdBoundary)
@@ -262,11 +267,20 @@ class DatabaseSeeder extends Seeder
         }
 
         $entries = DB::table('journal_entries')
-            ->where('entry_number', 'like', 'JV-%')
+            ->where(function ($query) use ($includeClosingEntries): void {
+                $query->where('entry_number', 'like', 'JV-%');
+
+                if ($includeClosingEntries) {
+                    $query->orWhere(fn ($closing) => $closing
+                        ->where('entry_number', 'like', 'CL-%')
+                        ->where('journal_type', 'closing')
+                        ->where('source_type', PeriodClosing::class));
+                }
+            })
             ->orderBy('fiscal_year_id')
             ->orderBy('entry_date')
             ->orderBy('id')
-            ->get(['id', 'fiscal_year_id', 'entry_number']);
+            ->get(['id', 'fiscal_year_id', 'entry_number', 'entry_date']);
 
         // Pass 1: nomor sementara agar tidak bentrok dengan unique constraint.
         foreach ($entries as $entry) {
@@ -276,7 +290,7 @@ class DatabaseSeeder extends Seeder
         // Pass 2: nomor final per tahun fiskal, berurutan sesuai tanggal.
         $sequenceByYear = [];
         foreach ($entries as $entry) {
-            $year = substr($entry->entry_number, 3, 4);
+            $year = Carbon::parse($entry->entry_date)->format('Y');
             $key = $entry->fiscal_year_id . '|' . $year;
             $sequenceByYear[$key] = ($sequenceByYear[$key] ?? 0) + 1;
 

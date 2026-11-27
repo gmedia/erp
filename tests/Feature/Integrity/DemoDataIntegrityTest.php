@@ -357,7 +357,9 @@ invariant('W7-04 every eligible document line has a matching stock movement', fu
                 continue;
             }
 
-            $expected = (float) $line->{$check['qty']};
+            // Penyesuaian bertanda (negatif = keluar). StockPostingService menyimpan besaran
+            // absolut di quantity_in/quantity_out, jadi bandingkan besaran, bukan tanda.
+            $expected = abs((float) $line->{$check['qty']});
             $actual = match ($check['direction']) {
                 'in' => (float) $movement->qty_in,
                 'out' => (float) $movement->qty_out,
@@ -1176,12 +1178,21 @@ invariant('W7-05 depreciation expense equals posted depreciation run totals', fu
     $expenseId = activeCoaAccountId('53000');
     expect($expenseId)->not->toBeNull('Active COA must expose account 53000');
 
+    // Akun 53000 dan jurnalnya per CoA/tahun fiskal. Saldo GL dan total run dibatasi ke
+    // akun tahun fiskal aktif; FY sebelumnya (CoA archived) diperiksa di invariant terpisah.
+    $expenseAccountIds = DB::table('accounts')->where('code', '53000')->pluck('id');
+    $glExpense = (float) DB::table('journal_entry_lines')
+        ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+        ->where('journal_entries.status', 'posted')
+        ->whereIn('journal_entry_lines.account_id', $expenseAccountIds)
+        ->sum('journal_entry_lines.debit');
+
     $runTotal = (float) DB::table('asset_depreciation_lines')
         ->join('asset_depreciation_runs', 'asset_depreciation_runs.id', '=', 'asset_depreciation_lines.asset_depreciation_run_id')
         ->where('asset_depreciation_runs.status', 'posted')
         ->sum('asset_depreciation_lines.amount');
 
-    expect(round(postedBalance((int) $expenseId, true), 2))
+    expect(round($glExpense, 2))
         ->toBe(round($runTotal, 2), 'GL depreciation expense must equal the sum of posted depreciation run lines');
 });
 

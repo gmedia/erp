@@ -9,6 +9,7 @@ use App\Models\FiscalYear;
 use App\Models\PeriodClosing;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -116,6 +117,11 @@ class DemoPeriodClosingSeeder extends Seeder
         }
 
         $this->close->execute($closing);
+
+        // Penutupan bulanan dicatat pada awal bulan berikutnya, bukan saat seed dijalankan.
+        $closing->forceFill([
+            'closed_at' => Carbon::create($periodYear, $month, 1)->addMonth()->startOfDay(),
+        ])->saveQuietly();
     }
 
     private function closeYear(
