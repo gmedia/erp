@@ -34,11 +34,14 @@ class CoaSeeder extends Seeder
             ],
         );
 
+        // COA tahun lalu dibuat active (#571): posting demo tahun lalu memakai resolver
+        // yang sama dengan produksi. Diarsipkan sekali oleh DemoPeriodClosingSeeder setelah
+        // seluruh transaksinya tercatat, sehingga siklus hidup COA tetap tunggal.
         $coaVersion2025 = CoaVersion::firstOrCreate(
             ['name' => 'COA 2025 Standard'],
             [
                 'fiscal_year_id' => $fiscalYear2025->id,
-                'status' => 'archived',
+                'status' => 'active',
             ],
         );
 
