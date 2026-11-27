@@ -432,6 +432,8 @@
     "auth_api.logged_out": "Successfully logged out",
     "posting_journal_api.posted": "Successfully posted :count journal entries.",
     "admin_setting_api.updated": "Settings updated successfully.",
+    "system_health.check_completed": "Health check completed.",
+    "system_health.threshold_order": "The failed threshold must be greater than the warning threshold.",
     "admin_setting_api.test_email_sent": "Test email sent successfully. Please check your inbox.",
     "admin_setting_api.test_email_failed": "Failed to send email: :detail",
     "bank_statement_import.date_required": "Transaction date is required.",
