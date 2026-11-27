@@ -55,7 +55,8 @@ class DiskUsageHealthCheck extends Check
             ->ok("Disk terpakai {$percent}%.");
     }
 
-    private function usedPercent(): ?int
+    // protected: seam uji (test meng-override pembacaan disk tanpa menjalankan df sungguhan).
+    protected function usedPercent(): ?int
     {
         $path = storage_path();
 

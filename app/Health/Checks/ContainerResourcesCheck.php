@@ -78,6 +78,18 @@ class ContainerResourcesCheck extends Check
             ->ok("Memori container terpakai {$percent}%.");
     }
 
+    // protected: seam uji (test meng-override pembacaan cgroup/loadavg tanpa menyentuh /sys asli).
+    protected function readFile(string $path): ?string
+    {
+        if (! is_readable($path)) {
+            return null;
+        }
+
+        $value = trim((string) file_get_contents($path));
+
+        return $value === '' ? null : $value;
+    }
+
     /**
      * @return array{0: float, 1: float, 2: int}|null
      */
@@ -136,16 +148,5 @@ class ContainerResourcesCheck extends Check
         $value = $this->readFile($path);
 
         return $value !== null && is_numeric($value) ? (int) $value : null;
-    }
-
-    private function readFile(string $path): ?string
-    {
-        if (! is_readable($path)) {
-            return null;
-        }
-
-        $value = trim((string) file_get_contents($path));
-
-        return $value === '' ? null : $value;
     }
 }
