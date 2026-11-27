@@ -439,6 +439,8 @@
     "auth_api.logged_out": "Berhasil keluar",
     "posting_journal_api.posted": "Berhasil memposting :count entri jurnal.",
     "admin_setting_api.updated": "Pengaturan berhasil diperbarui.",
+    "system_health.check_completed": "Pemeriksaan kesehatan selesai.",
+    "system_health.threshold_order": "Ambang gagal harus lebih besar dari ambang peringatan.",
     "admin_setting_api.test_email_sent": "Email uji berhasil dikirim. Silakan periksa kotak masuk Anda.",
     "admin_setting_api.test_email_failed": "Gagal mengirim email: :detail",
     "bank_statement_import.date_required": "Tanggal transaksi wajib diisi.",
@@ -622,12 +624,14 @@
         "accounts_receivable": "Piutang Usaha",
         "admin": "Admin",
         "admin_setting": "Pengaturan Admin",
+        "system_health": "Kesehatan Sistem",
         "aging_dashboard": "Dasbor Umur Piutang",
         "ap_aging_report": "Laporan Umur Utang",
         "ap_outstanding_report": "Laporan Utang Belum Lunas",
         "ap_payment": "Pembayaran Utang",
         "ap_payment_history_report": "Riwayat Pembayaran Utang",
         "approval_audit_trail": "Jejak Audit Persetujuan",
+        "security_log": "Log Keamanan",
         "approval_delegation": "Delegasi Persetujuan",
         "approval_flow": "Alur Persetujuan",
         "approval_monitoring": "Pemantauan Persetujuan",
@@ -708,9 +712,9 @@
         "unit": "Satuan",
         "user": "Pengguna",
         "vehicle_loan": "Peminjaman Kendaraan",
-        "vehicle_loan_dashboard": "Dasbor Peminjaman Kendaraan",
-        "vehicle_loan_request": "Permintaan Peminjaman Kendaraan",
-        "vehicle_loan_security": "Keamanan Peminjaman Kendaraan",
+        "vehicle_loan_dashboard": "Dasbor",
+        "vehicle_loan_request": "Permintaan",
+        "vehicle_loan_security": "Antrean Keamanan",
         "warehouse": "Gudang",
         "master.data": "Data Master"
     },
@@ -1021,6 +1025,17 @@
         },
         "approval_monitoring": {
             "description": "Pantau alur persetujuan dan tugas yang melewati tenggat."
+        },
+        "security_logs": {
+            "description": "Aktivitas login, logout, dan perubahan akses. Disimpan 1 tahun; data pribadi hanya dipakai untuk keamanan.",
+            "search_placeholder": "Cari email, IP, pengguna...",
+            "select_event": "Pilih Kejadian",
+            "column_date": "Waktu",
+            "column_event": "Kejadian",
+            "column_user": "Pengguna",
+            "column_attempted_email": "Email yang Dicoba",
+            "column_ip_address": "Alamat IP",
+            "column_device": "Perangkat"
         },
         "approval_audit_trail": {
             "description": "Riwayat tindakan persetujuan pada permintaan.",
@@ -1476,6 +1491,13 @@
         "no_data": "Tidak ada data"
     },
     "filter": {
+        "security_event_login_success": "Login Berhasil",
+        "security_event_login_failed": "Login Gagal",
+        "security_event_logout": "Logout",
+        "security_event_password_reset": "Atur Ulang Kata Sandi",
+        "security_event_role_changed": "Hak Akses Diubah",
+        "security_event_user_created": "Pengguna Dibuat",
+        "security_event_user_deactivated": "Pengguna Dinonaktifkan",
         "stock_movement_search_placeholder": "Cari produk, kategori, gudang, cabang...",
         "stocktake_variance_search_placeholder": "Cari opname, produk, kategori, gudang...",
         "valuation_search_placeholder": "Cari produk, kategori, gudang, cabang...",
@@ -3158,7 +3180,7 @@
             "approval_heading": "Persetujuan",
             "approved_label": "Disetujui",
             "approver_fallback": "Penyetuju",
-            "back": "Kembali",
+            "back": "Kembali ke daftar",
             "breadcrumb": "Detail Peminjaman",
             "department_label": "Departemen",
             "description": "Detail permintaan, persetujuan, dan riwayat peminjaman.",
@@ -3220,6 +3242,7 @@
             "assignment_heading": "Penugasan (opsional)",
             "assignment_hint": "Boleh dikosongkan. Penyetuju dapat menetapkan pengemudi dan unit saat peninjauan.",
             "breadcrumb": "Peminjaman Kendaraan",
+            "breadcrumb_leaf": "Permintaan Peminjaman Kendaraan",
             "description": "Isi jadwal dan tujuan perjalanan, simpan draf, lalu kirim untuk persetujuan.",
             "driver_label": "Pengemudi",
             "driver_placeholder": "Pilih pengemudi",
@@ -3247,7 +3270,7 @@
             "description": "Pilih pengambilan, unggah bukti serah terima dan kondisi kendaraan, lalu catat insiden bila ada.",
             "evidence_heading": "Bukti & Kondisi",
             "handover_photo_button": "Ambil Foto Serah Terima",
-            "handover_photo_hint": "Foto bersama petugas keamanan saat mengembalikan kunci. JPG/PNG, maks. 5 MB.",
+            "handover_photo_hint": "Foto bersama petugas keamanan saat mengembalikan kunci. Format JPG/PNG, maksimal 5 MB.",
             "handover_photo_label": "Foto bukti serah terima dengan petugas keamanan",
             "incident_label": "Ada insiden selama peminjaman",
             "incident_note_label": "Keterangan insiden",
@@ -3255,6 +3278,7 @@
             "load_button": "Muat Data Pengambilan Saya",
             "loading_button": "Memuat...",
             "odometer_label": "Odometer akhir (opsional)",
+            "odometer_placeholder": "Contoh: 45230",
             "odometer_unit": "km",
             "pickup_empty_hint": "Belum ada kendaraan yang sedang dipinjam. Pengembalian tersedia setelah kunci diserahkan petugas keamanan.",
             "pickup_empty_placeholder": "Tidak ada pengambilan aktif",
@@ -3268,6 +3292,7 @@
         },
         "security": {
             "approval_label": "Persetujuan",
+            "approval_same_as_status": "Sama dengan status",
             "breadcrumb": "Antrean Keamanan",
             "count_suffix": "{count} permintaan",
             "description": "Verifikasi status persetujuan sebelum menyerahkan kunci kendaraan.",
@@ -3288,6 +3313,85 @@
             "title": "Antrean Keamanan",
             "title_tag": "Antrean Keamanan — Peminjaman Kendaraan",
             "waiting_pickup": "Menunggu pengambilan"
+        }
+    },
+    "system_health": {
+        "title": "Kesehatan sistem",
+        "description": "Status komponen, riwayat masalah terakhir, dan informasi versi.",
+        "run_check": "Periksa sekarang",
+        "checked_at": "Diperiksa pada",
+        "never_checked": "Belum pernah diperiksa. Tekan \"Periksa sekarang\".",
+        "load_failed": "Gagal memuat kesehatan sistem.",
+        "history_title": "Riwayat masalah terakhir",
+        "history_empty": "Belum ada masalah yang tercatat.",
+        "version_title": "Versi",
+        "version": {
+            "app": "Aplikasi",
+            "php": "PHP",
+            "laravel": "Laravel"
+        },
+        "status": {
+            "ok": "Sehat",
+            "warning": "Peringatan",
+            "failed": "Gagal",
+            "crashed": "Crash",
+            "skipped": "Dilewati",
+            "unknown": "Belum diketahui"
+        },
+        "overall": {
+            "ok": "Semua komponen sehat",
+            "warning": "Ada komponen yang perlu diperhatikan",
+            "failed": "Ada komponen yang gagal",
+            "unknown": "Belum ada data kesehatan"
+        },
+        "queue": {
+            "jobs_failed": "Job antrian gagal pada {count} antrian. Periksa worker antrian."
+        },
+        "schedule": {
+            "not_run_yet": "Scheduler belum pernah berjalan.",
+            "stale": "Scheduler sudah lama tidak berjalan."
+        },
+        "app_version": {
+            "ok": "Versi aplikasi {version}."
+        },
+        "database": {
+            "ok": "Database dapat diakses.",
+            "unreachable": "Database tidak dapat diakses ({exception}).",
+            "connections_high": "Jumlah koneksi database ({connections}) mendekati batas peringatan ({warning_at})."
+        },
+        "production": {
+            "ok": "Konfigurasi environment sesuai.",
+            "debug_enabled": "APP_DEBUG aktif di production. Matikan agar detail error tidak tampil ke pengguna."
+        },
+        "migrations": {
+            "complete": "Semua migrasi sudah dijalankan.",
+            "pending": "Ada {pending} migrasi yang belum dijalankan.",
+            "unreadable": "Status migrasi tidak dapat dibaca ({exception})."
+        },
+        "disk": {
+            "ok": "Disk terpakai {percent}%.",
+            "warning": "Disk terpakai {percent}% (batas peringatan {warning_at}%).",
+            "failed": "Disk hampir penuh ({percent}% terpakai, batas gagal {failed_at}%).",
+            "unavailable": "Pembacaan disk tidak tersedia."
+        },
+        "container": {
+            "unavailable": "Pembacaan memori container tidak tersedia di lingkungan ini.",
+            "memory_ok": "Memori container terpakai {percent}%.",
+            "memory_warning": "Memori container terpakai {percent}% (batas peringatan {warning_at}%).",
+            "memory_failed": "Memori container terpakai {percent}% (batas gagal {failed_at}%)."
+        },
+        "storage": {
+            "ok": "Object storage dapat menulis, membaca, dan menghapus berkas.",
+            "write_failed": "Object storage gagal menulis berkas uji.",
+            "write_failed_hint": "Object storage gagal menulis berkas uji. Penyebab umum: AWS_SECRET_ACCESS_KEY kosong di .env atau bucket belum dibuat (bash scripts/minio-bucket.sh).",
+            "content_mismatch": "Object storage membaca isi berkas uji yang berbeda.",
+            "unreachable": "Object storage tidak dapat diakses ({exception}).",
+            "unreachable_hint": "Object storage tidak dapat diakses ({exception}). Penyebab umum: AWS_SECRET_ACCESS_KEY kosong di .env atau bucket belum dibuat (bash scripts/minio-bucket.sh)."
+        },
+        "redis": {
+            "ok": "Valkey/Redis merespons ping.",
+            "unreachable": "Valkey/Redis tidak dapat diakses ({exception}).",
+            "no_ping": "Valkey/Redis tidak merespons ping."
         }
     }
 }

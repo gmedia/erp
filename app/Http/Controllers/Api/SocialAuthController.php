@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Actions\SecurityLogs\RecordSecurityLogAction;
 use App\Actions\SocialAuth\CreateSocialLoginTicketAction;
 use App\Actions\SocialAuth\ResolveSocialUserAction;
 use App\Exceptions\SocialAuthException;
 use App\Http\Controllers\Controller;
+use App\Models\SecurityLog;
 use App\Models\SocialAccount;
 use App\Models\SocialLoginTicket;
 use App\Models\User;
@@ -146,6 +148,14 @@ class SocialAuthController extends Controller
 
         $user = User::query()->findOrFail($ticket->user_id);
         $token = $user->createToken('social_login');
+
+        // Social login mints a Sanctum token directly and does not dispatch Laravel's Login event.
+        app(RecordSecurityLogAction::class)->execute(
+            SecurityLog::EVENT_LOGIN_SUCCESS,
+            userId: $user->id,
+            metadata: ['method' => 'social'],
+            request: $request,
+        );
 
         return response()->json([
             'token' => $token->plainTextToken,

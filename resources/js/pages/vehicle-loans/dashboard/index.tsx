@@ -203,7 +203,7 @@ export default function VehicleLoanDashboardPage() {
                 <section className="grid gap-3 md:grid-cols-2">
                     <Card>
                         <CardHeader className="pb-2">
-                            <CardTitle className="flex items-center gap-2 text-sm">
+                            <CardTitle className="flex items-center gap-2 text-base">
                                 <AlertTriangle className="size-4 text-warning" />
                                 {tPage(
                                     'dashboard.overdue_card_title',
@@ -223,7 +223,7 @@ export default function VehicleLoanDashboardPage() {
                     </Card>
                     <Card>
                         <CardHeader className="pb-2">
-                            <CardTitle className="flex items-center gap-2 text-sm">
+                            <CardTitle className="flex items-center gap-2 text-base">
                                 <CarFront className="size-4 text-info" />
                                 {tPage(
                                     'dashboard.active_card_title',
@@ -288,12 +288,12 @@ export default function VehicleLoanDashboardPage() {
                                                     )}
                                             </p>
                                         </div>
-                                        <p className="text-xs text-muted-foreground sm:whitespace-nowrap">
+                                        <p className="text-xs text-muted-foreground tabular-nums sm:w-36 sm:shrink-0 sm:whitespace-nowrap">
                                             {formatDateTimeByRegionalSettings(
                                                 loan.start_at,
                                             )}
                                         </p>
-                                        <div className="flex items-center gap-2 self-start sm:self-auto">
+                                        <div className="flex items-center gap-2 self-start sm:w-56 sm:shrink-0 sm:justify-end sm:self-auto">
                                             {loan.is_overdue && (
                                                 <span className="rounded-full bg-destructive-soft px-2 py-1 text-xs font-medium text-destructive-foreground">
                                                     {tPage(

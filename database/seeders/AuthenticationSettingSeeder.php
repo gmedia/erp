@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Actions\SecurityLogs\DetectFailedLoginBurstAction;
+use App\Actions\SecurityLogs\PruneSecurityLogsAction;
 use App\Models\Setting;
 use Illuminate\Database\Seeder;
 
@@ -23,6 +25,24 @@ class AuthenticationSettingSeeder extends Seeder
             'social_login_allowed_tenants' => $defaults['allowed_tenants'] ?? [],
             'password_login_enabled' => $defaults['password_login_enabled'] ?? true,
         ];
+
+        $integerSettings = [
+            'security_log_retention_days' => PruneSecurityLogsAction::DEFAULT_RETENTION_DAYS,
+            'security_log_failed_login_threshold' => DetectFailedLoginBurstAction::DEFAULT_THRESHOLD,
+            'security_log_failed_login_window_minutes' => DetectFailedLoginBurstAction::DEFAULT_WINDOW_MINUTES,
+        ];
+
+        foreach ($integerSettings as $key => $value) {
+            Setting::firstOrCreate(
+                ['key' => $key],
+                [
+                    'group' => 'security',
+                    'key' => $key,
+                    'value' => (string) $value,
+                    'type' => 'integer',
+                ]
+            );
+        }
 
         foreach ($settings as $key => $value) {
             Setting::firstOrCreate(

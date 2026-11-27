@@ -1051,6 +1051,8 @@ class MenuSeeder extends Seeder
                     'approval_delegation',
                     'approval_monitoring',
                     'approval_audit_trail',
+                    'security_log',
+                    'system_health',
                 ],
                 'icon' => 'Shield',
                 'url' => null,
@@ -1064,6 +1066,16 @@ class MenuSeeder extends Seeder
                         ],
                         'icon' => 'Settings',
                         'url' => 'admin-settings',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'system_health',
+                        'display_name' => 'System Health',
+                        'permissions' => [
+                            'system_health',
+                        ],
+                        'icon' => 'HeartPulse',
+                        'url' => 'system-health',
                         'child' => [],
                     ],
                     [
@@ -1163,6 +1175,16 @@ class MenuSeeder extends Seeder
                         ],
                         'icon' => 'FileSearch',
                         'url' => 'approval-audit-trail',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'security_log',
+                        'display_name' => 'Security Log',
+                        'permissions' => [
+                            'security_log',
+                        ],
+                        'icon' => 'ShieldCheck',
+                        'url' => 'security-logs',
                         'child' => [],
                     ],
                 ],

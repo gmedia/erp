@@ -2,10 +2,12 @@
 
 use App\Actions\Approvals\RepairMissingApprovalStepsAction;
 use App\Actions\RecurringJournals\ExecuteRecurringJournalAction;
+use App\Actions\SecurityLogs\PruneSecurityLogsAction;
 use App\Actions\VehicleLoans\CleanupVehicleLoansAction;
 use App\Actions\VehicleLoans\NotifyOverdueVehicleLoansAction;
 use App\Console\Commands\CleanupSocialLoginTickets;
 use App\Console\Commands\PruneStaleDeviceTokens;
+use App\Console\Commands\RunSystemHealthChecks;
 use App\Models\RecurringJournal;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -55,6 +57,18 @@ Schedule::command('recurring-journals:execute')->daily();
 Schedule::command(CleanupSocialLoginTickets::class)
     ->everyFiveMinutes()
     ->name('cleanup-social-login-tickets');
+
+Artisan::command('security-logs:prune', function () {
+    $deleted = app(PruneSecurityLogsAction::class)->execute();
+
+    $this->info("Security logs pruned: {$deleted}");
+
+    return Command::SUCCESS;
+})->purpose('Delete security logs older than the retention setting');
+
+Schedule::command('security-logs:prune')
+    ->daily()
+    ->name('prune-security-logs');
 
 Schedule::command(PruneStaleDeviceTokens::class)
     ->daily()
@@ -150,3 +164,18 @@ Artisan::command('approvals:repair-missing-steps {--dry-run : Audit only without
 Schedule::call(fn () => Artisan::call('approvals:repair-missing-steps'))
     ->daily()
     ->name('repair-missing-approval-steps');
+
+// Kesehatan sistem: pemeriksaan tiap 5 menit. Heartbeat scheduler & antrian dipakai cek
+// "scheduler terakhir jalan" dan "worker hidup".
+Schedule::command(RunSystemHealthChecks::class)
+    ->everyFiveMinutes()
+    ->withoutOverlapping()
+    ->name('system-health-run');
+
+Schedule::command('health:schedule-check-heartbeat')
+    ->everyMinute()
+    ->name('system-health-schedule-heartbeat');
+
+Schedule::command('health:queue-check-heartbeat')
+    ->everyFiveMinutes()
+    ->name('system-health-queue-heartbeat');

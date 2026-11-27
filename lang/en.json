@@ -432,6 +432,8 @@
     "auth_api.logged_out": "Successfully logged out",
     "posting_journal_api.posted": "Successfully posted :count journal entries.",
     "admin_setting_api.updated": "Settings updated successfully.",
+    "system_health.check_completed": "Health check completed.",
+    "system_health.threshold_order": "The failed threshold must be greater than the warning threshold.",
     "admin_setting_api.test_email_sent": "Test email sent successfully. Please check your inbox.",
     "admin_setting_api.test_email_failed": "Failed to send email: :detail",
     "bank_statement_import.date_required": "Transaction date is required.",
@@ -622,12 +624,14 @@
         "accounts_receivable": "Accounts Receivable",
         "admin": "Admin",
         "admin_setting": "Settings",
+        "system_health": "System Health",
         "aging_dashboard": "Aging Dashboard",
         "ap_aging_report": "AP Aging Report",
         "ap_outstanding_report": "AP Outstanding",
         "ap_payment": "AP Payments",
         "ap_payment_history_report": "AP Payment History",
         "approval_audit_trail": "Approval Audit Trail",
+        "security_log": "Security Log",
         "approval_delegation": "Approval Delegation",
         "approval_flow": "Approval Flow",
         "approval_monitoring": "Approval Monitoring",
@@ -1021,6 +1025,17 @@
         },
         "approval_monitoring": {
             "description": "Monitor approval workflows and overdue tasks."
+        },
+        "security_logs": {
+            "description": "Login, logout, and access-change activity. Retained for 1 year; personal data is used for security purposes only.",
+            "search_placeholder": "Search email, IP, user...",
+            "select_event": "Select Event",
+            "column_date": "Date",
+            "column_event": "Event",
+            "column_user": "User",
+            "column_attempted_email": "Attempted Email",
+            "column_ip_address": "IP Address",
+            "column_device": "Device"
         },
         "approval_audit_trail": {
             "description": "History of approval actions taken on requests.",
@@ -1473,6 +1488,13 @@
         "no_data": "No data"
     },
     "filter": {
+        "security_event_login_success": "Login Success",
+        "security_event_login_failed": "Login Failed",
+        "security_event_logout": "Logout",
+        "security_event_password_reset": "Password Reset",
+        "security_event_role_changed": "Role Changed",
+        "security_event_user_created": "User Created",
+        "security_event_user_deactivated": "User Deactivated",
         "stock_movement_search_placeholder": "Search product, category, warehouse, branch...",
         "stocktake_variance_search_placeholder": "Search stocktake, product, category, warehouse...",
         "valuation_search_placeholder": "Search product, category, warehouse, branch...",
@@ -3217,6 +3239,7 @@
             "assignment_heading": "Assignment (optional)",
             "assignment_hint": "Can be left empty. Approvers can assign the driver and unit during review.",
             "breadcrumb": "Vehicle Loans",
+            "breadcrumb_leaf": "Vehicle Loan Request",
             "description": "Fill in the schedule and trip purpose, save the draft, then submit for approval.",
             "driver_label": "Driver",
             "driver_placeholder": "Select driver",
@@ -3252,6 +3275,7 @@
             "load_button": "Load My Pickups",
             "loading_button": "Loading...",
             "odometer_label": "Final odometer (optional)",
+            "odometer_placeholder": "e.g. 45230",
             "odometer_unit": "km",
             "pickup_empty_hint": "No vehicle is currently on loan. Returns become available once security hands over the key.",
             "pickup_empty_placeholder": "No active pickups",
@@ -3265,6 +3289,7 @@
         },
         "security": {
             "approval_label": "Approval",
+            "approval_same_as_status": "Same as status",
             "breadcrumb": "Security Queue",
             "count_suffix": "{count} requests",
             "description": "Verify the approval status before handing over the vehicle key.",
@@ -3285,6 +3310,85 @@
             "title": "Security Queue",
             "title_tag": "Security Queue — Vehicle Loans",
             "waiting_pickup": "Waiting for pickup"
+        }
+    },
+    "system_health": {
+        "title": "System health",
+        "description": "Component status, recent issues, and version information.",
+        "run_check": "Check now",
+        "checked_at": "Checked at",
+        "never_checked": "Not checked yet. Press \"Check now\".",
+        "load_failed": "Failed to load system health.",
+        "history_title": "Recent issues",
+        "history_empty": "No issues recorded.",
+        "version_title": "Version",
+        "version": {
+            "app": "Application",
+            "php": "PHP",
+            "laravel": "Laravel"
+        },
+        "status": {
+            "ok": "Healthy",
+            "warning": "Warning",
+            "failed": "Failed",
+            "crashed": "Crashed",
+            "skipped": "Skipped",
+            "unknown": "Unknown"
+        },
+        "overall": {
+            "ok": "All components are healthy",
+            "warning": "Some components need attention",
+            "failed": "Some components have failed",
+            "unknown": "No health data yet"
+        },
+        "queue": {
+            "jobs_failed": "Queue jobs failed on {count} queue(s). Check the queue worker."
+        },
+        "schedule": {
+            "not_run_yet": "The scheduler has not run yet.",
+            "stale": "The scheduler has not run recently."
+        },
+        "app_version": {
+            "ok": "Application version {version}."
+        },
+        "database": {
+            "ok": "Database is reachable.",
+            "unreachable": "Database is unreachable ({exception}).",
+            "connections_high": "Database connections ({connections}) are near the warning limit ({warning_at})."
+        },
+        "production": {
+            "ok": "Environment configuration is correct.",
+            "debug_enabled": "APP_DEBUG is enabled in production. Turn it off so error details are not shown to users."
+        },
+        "migrations": {
+            "complete": "All migrations have been run.",
+            "pending": "{pending} migration(s) have not been run.",
+            "unreadable": "Migration status could not be read ({exception})."
+        },
+        "disk": {
+            "ok": "Disk used {percent}%.",
+            "warning": "Disk used {percent}% (warning limit {warning_at}%).",
+            "failed": "Disk is almost full ({percent}% used, failure limit {failed_at}%).",
+            "unavailable": "Disk usage could not be read."
+        },
+        "container": {
+            "unavailable": "Container memory could not be read in this environment.",
+            "memory_ok": "Container memory used {percent}%.",
+            "memory_warning": "Container memory used {percent}% (warning limit {warning_at}%).",
+            "memory_failed": "Container memory used {percent}% (failure limit {failed_at}%)."
+        },
+        "storage": {
+            "ok": "Object storage can write, read, and delete files.",
+            "write_failed": "Object storage failed to write the test file.",
+            "write_failed_hint": "Object storage failed to write the test file. Common cause: AWS_SECRET_ACCESS_KEY is empty in .env or the bucket has not been created (bash scripts/minio-bucket.sh).",
+            "content_mismatch": "Object storage returned different content for the test file.",
+            "unreachable": "Object storage is unreachable ({exception}).",
+            "unreachable_hint": "Object storage is unreachable ({exception}). Common cause: AWS_SECRET_ACCESS_KEY is empty in .env or the bucket has not been created (bash scripts/minio-bucket.sh)."
+        },
+        "redis": {
+            "ok": "Valkey/Redis responded to ping.",
+            "unreachable": "Valkey/Redis is unreachable ({exception}).",
+            "no_ping": "Valkey/Redis did not respond to ping."
         }
     }
 }

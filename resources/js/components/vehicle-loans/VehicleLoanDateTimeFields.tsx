@@ -83,7 +83,7 @@ export function VehicleLoanDateTimeFields({
             <RequiredLabel htmlFor={`${id}_date`} required={required}>
                 {label}
             </RequiredLabel>
-            <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(7.5rem,auto)] gap-2">
+            <div className="grid min-w-0 grid-cols-[minmax(9.5rem,1fr)_minmax(5.5rem,6rem)] gap-2">
                 <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
                         <Button

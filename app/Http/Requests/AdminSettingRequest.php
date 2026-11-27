@@ -6,6 +6,7 @@ use App\Http\Requests\Concerns\HasSupportedCurrencyRules;
 use App\Models\Account;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Validation\Validator;
 
 class AdminSettingRequest extends AuthorizedFormRequest
 {
@@ -48,13 +49,50 @@ class AdminSettingRequest extends AuthorizedFormRequest
             'social_login_allowed_domains' => ['nullable', 'string', 'max:4000'],
             'social_login_allowed_tenants' => ['nullable', 'string', 'max:4000'],
 
+            'security_log_retention_days' => ['nullable', 'integer', 'min:30', 'max:3650'],
+            'security_log_failed_login_threshold' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'security_log_failed_login_window_minutes' => ['nullable', 'integer', 'min:1', 'max:1440'],
+
             // Akun laba/rugi pelepasan aset (#442): id akun daun di COA aktif.
             'asset_disposal_gain_account_id' => ['nullable', 'integer', 'exists:accounts,id'],
             'asset_disposal_loss_account_id' => ['nullable', 'integer', 'exists:accounts,id'],
 
             // Akun persediaan dalam perjalanan (#495): akun daun aktif di COA aktif.
             'inventory_in_transit_account_id' => ['nullable', 'integer', $this->postableAccountRule()],
+
+            // Kesehatan sistem: ambang pemeriksaan (grup system_health) dan alamat admin notifikasi.
+            'system_health_disk_warning_percent' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'system_health_disk_failed_percent' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'system_health_memory_warning_percent' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'system_health_memory_failed_percent' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'system_health_queue_failed_jobs_warning' => ['nullable', 'integer', 'min:0', 'max:100000'],
+            'system_health_scheduler_stale_minutes' => ['nullable', 'integer', 'min:1', 'max:1440'],
+            'system_health_db_connections_warning' => ['nullable', 'integer', 'min:1', 'max:100000'],
+            'system_health_alert_email' => ['nullable', 'string', 'email', 'max:255'],
         ];
+    }
+
+    /**
+     * Ambang "gagal" harus lebih besar dari ambang "peringatan" (disk dan memori).
+     */
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            foreach ([
+                'system_health_disk' => ['system_health_disk_warning_percent', 'system_health_disk_failed_percent'],
+                'system_health_memory' => ['system_health_memory_warning_percent', 'system_health_memory_failed_percent'],
+            ] as $pair) {
+                [$warning, $failed] = $pair;
+
+                if (! $this->filled($warning) || ! $this->filled($failed)) {
+                    continue;
+                }
+
+                if ((int) $this->input($failed) <= (int) $this->input($warning)) {
+                    $validator->errors()->add($failed, __('system_health.threshold_order'));
+                }
+            }
+        });
     }
 
     /**

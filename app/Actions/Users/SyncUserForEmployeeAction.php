@@ -2,7 +2,9 @@
 
 namespace App\Actions\Users;
 
+use App\Actions\SecurityLogs\RecordSecurityLogAction;
 use App\Models\Employee;
+use App\Models\SecurityLog;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
@@ -37,6 +39,13 @@ class SyncUserForEmployeeAction
                 $user = User::create($userData);
 
                 $employee->update(['user_id' => $user->id]);
+
+                app(RecordSecurityLogAction::class)->execute(
+                    SecurityLog::EVENT_USER_CREATED,
+                    userId: $user->id,
+                    metadata: ['employee_id' => $employee->id],
+                    request: request(),
+                );
             }
 
             return $user;
