@@ -69,7 +69,9 @@ test.describe('System Health', () => {
         await expect(
             page.getByTestId('system-health-card').first(),
         ).toBeVisible();
-        await expect(page.getByText('Version', { exact: true })).toBeVisible();
+        await expect(
+            page.getByText('Version', { exact: true }).last(),
+        ).toBeVisible();
         await expect(page.getByText('Laravel', { exact: true })).toBeVisible();
     });
 

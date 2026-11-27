@@ -439,6 +439,8 @@
     "auth_api.logged_out": "Berhasil keluar",
     "posting_journal_api.posted": "Berhasil memposting :count entri jurnal.",
     "admin_setting_api.updated": "Pengaturan berhasil diperbarui.",
+    "system_health.notice.recovered": "Pulih: {label}",
+    "system_health.notice.degraded": "Peringatan: {label} ({status})",
     "system_health.check_completed": "Pemeriksaan kesehatan selesai.",
     "system_health.threshold_order": "Ambang gagal harus lebih besar dari ambang peringatan.",
     "admin_setting_api.test_email_sent": "Email uji berhasil dikirim. Silakan periksa kotak masuk Anda.",
@@ -1035,7 +1037,10 @@
             "column_user": "Pengguna",
             "column_attempted_email": "Email yang Dicoba",
             "column_ip_address": "Alamat IP",
-            "column_device": "Perangkat"
+            "column_device": "Perangkat",
+            "select_user": "Pilih pengguna",
+            "start_date": "Tanggal mulai",
+            "end_date": "Tanggal selesai"
         },
         "approval_audit_trail": {
             "description": "Riwayat tindakan persetujuan pada permintaan.",
@@ -3316,6 +3321,18 @@
         }
     },
     "system_health": {
+        "components": {
+            "database": "Database",
+            "redis": "Valkey / Redis",
+            "object_storage": "Penyimpanan objek",
+            "migrations": "Migrasi",
+            "queue": "Antrian",
+            "scheduler": "Penjadwal",
+            "disk": "Disk aplikasi",
+            "production_config": "Konfigurasi produksi",
+            "version": "Versi",
+            "container_resources": "CPU & memori kontainer"
+        },
         "title": "Kesehatan sistem",
         "description": "Status komponen, riwayat masalah terakhir, dan informasi versi.",
         "run_check": "Periksa sekarang",
@@ -3345,7 +3362,8 @@
             "unknown": "Belum ada data kesehatan"
         },
         "queue": {
-            "jobs_failed": "Job antrian gagal pada {count} antrian. Periksa worker antrian."
+            "jobs_failed": "Job antrian gagal pada {count} antrian. Periksa worker antrian.",
+            "failed_unknown": "Job antrian gagal. Periksa worker antrian."
         },
         "schedule": {
             "not_run_yet": "Scheduler belum pernah berjalan.",
@@ -3392,6 +3410,17 @@
             "ok": "Valkey/Redis merespons ping.",
             "unreachable": "Valkey/Redis tidak dapat diakses ({exception}).",
             "no_ping": "Valkey/Redis tidak merespons ping."
+        }
+    },
+    "security_logs": {
+        "export_headers": {
+            "date": "Tanggal",
+            "event": "Peristiwa",
+            "user": "Pengguna",
+            "attempted_email": "Email yang dicoba",
+            "ip_address": "Alamat IP",
+            "user_agent": "User Agent",
+            "metadata": "Metadata"
         }
     }
 }

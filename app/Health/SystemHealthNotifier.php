@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Notifiables\SystemHealthStatusEvent;
 use App\Notifications\GenericAppNotification;
 use App\Services\NotificationService;
+use App\Support\LocaleJsonTranslator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -21,6 +22,10 @@ use Throwable;
  * memburuk (ok -> warning/failed/crashed) dan pulih (-> ok). Transisi yang tidak berubah
  * tidak mengirim apa pun. Penerima: pengguna ber-permission system_health (in-app) dan
  * alamat admin IT dari Pengaturan (email).
+ */
+/**
+ * @phpstan-type Transition array{name: string, label: string, from: string|null, to: string, message: string,
+ *     body: string|null}
  */
 class SystemHealthNotifier
 {
@@ -54,7 +59,7 @@ class SystemHealthNotifier
     }
 
     /**
-     * @return array{name: string, label: string, from: string|null, to: string, message: string}|null
+     * @return Transition|null
      */
     private function transitionFor(Result $result, ?string $previousStatus): ?array
     {
@@ -70,29 +75,56 @@ class SystemHealthNotifier
             return null;
         }
 
+        $meta = (array) $result->meta;
+        $code = $meta['message_code'] ?? null;
+        $params = is_array($meta['message_params'] ?? null) ? $meta['message_params'] : [];
+
+        if (! is_string($code)) {
+            $resolved = SystemHealthMessage::fromPackage((string) $result->getNotificationMessage(), $meta);
+            $code = $resolved['code'];
+            $params = $resolved['params'];
+        }
+
         return [
             'name' => $result->check->getName(),
             'label' => $result->check->getLabel(),
             'from' => $from,
             'to' => $to,
             'message' => $result->getNotificationMessage() ?: $result->getShortSummary(),
+            'body' => $code === null ? null : LocaleJsonTranslator::get($code, $params, $this->recipientLocale()),
         ];
     }
 
     /**
-     * @param  array{name: string, label: string, from: string|null, to: string, message: string}  $transition
+     * Locale notifikasi: belum ada preferensi bahasa per pengguna di database, jadi memakai
+     * locale default aplikasi/perusahaan (APP_LOCALE), dibatasi ke locale yang didukung.
+     */
+    private function recipientLocale(): string
+    {
+        $default = (string) config('app.locale', 'en');
+        $available = (array) config('app.available_locales', ['en', 'id']);
+
+        return in_array($default, $available, true) ? $default : 'en';
+    }
+
+    /**
+     * @param  Transition  $transition
      * @param  Collection<int, User>  $audience
      */
     private function dispatchTransition(array $transition, string $runId, Collection $audience): void
     {
+        $locale = $this->recipientLocale();
         $recovered = $transition['to'] === 'ok';
         $title = $recovered
-            ? "Pulih: {$transition['label']}"
-            : "Peringatan: {$transition['label']} ({$transition['to']})";
+            ? LocaleJsonTranslator::get('system_health.notice.recovered', ['label' => $transition['label']], $locale)
+            : LocaleJsonTranslator::get('system_health.notice.degraded', [
+                'label' => $transition['label'],
+                'status' => $transition['to'],
+            ], $locale);
 
         $payload = [
             'title' => $title,
-            'body' => $transition['message'],
+            'body' => $transition['body'] ?? $transition['message'],
             'check' => $transition['name'],
             'from' => $transition['from'],
             'to' => $transition['to'],
