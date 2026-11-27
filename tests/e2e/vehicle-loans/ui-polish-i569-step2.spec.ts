@@ -163,3 +163,26 @@ test('form pages keep a narrow max width and list pages a wide one', async ({
     expect(list?.width ?? 0).toBeLessThanOrEqual(1280);
     expect(list?.width ?? 0).toBeGreaterThan(672);
 });
+
+test('security queue cards in the same grid row share a top edge', async ({
+    page,
+}) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await login(page);
+    await seedApprovedLoan(page);
+    await seedApprovedLoan(page);
+    await seedApprovedLoan(page);
+    await page.goto(VEHICLE_LOAN_SECURITY_PATH);
+
+    const cards = page.locator('[data-slot="card"]');
+    await expect(cards).toHaveCount(3, { timeout: 15_000 });
+
+    const tops: number[] = [];
+    for (let i = 0; i < 3; i++) {
+        const box = await cards.nth(i).boundingBox();
+        tops.push(Math.round(box?.y ?? -1));
+    }
+
+    expect(tops[1]).toBe(tops[0]);
+    expect(tops[2]).toBe(tops[0]);
+});
