@@ -28,25 +28,25 @@ export function createStockMonitorFilterFields(
             'product_id',
             { key: 'column.product', fallback: 'Product' },
             options.products,
-            'All products',
+            { key: 'filter_field.all_products', fallback: 'All products' },
         ),
         createSelectFilterField(
             'warehouse_id',
             { key: 'column.warehouse', fallback: 'Warehouse' },
             options.warehouses,
-            'All warehouses',
+            { key: 'filter_field.all_warehouses', fallback: 'All warehouses' },
         ),
         createSelectFilterField(
             'branch_id',
             { key: 'column.branch', fallback: 'Branch' },
             options.branches,
-            'All branches',
+            { key: 'filter_field.all_branches', fallback: 'All branches' },
         ),
         createSelectFilterField(
             'category_id',
             { key: 'column.category', fallback: 'Category' },
             options.categories,
-            'All categories',
+            { key: 'filter_field.all_categories', fallback: 'All categories' },
         ),
         createTextFilterField(
             'low_stock_threshold',
@@ -54,7 +54,7 @@ export function createStockMonitorFilterFields(
                 key: 'column.low_stock_threshold',
                 fallback: 'Low Stock Threshold',
             },
-            'Example: 10',
+            { key: 'filter.example_10', fallback: 'Example: 10' },
         ),
     ];
 }

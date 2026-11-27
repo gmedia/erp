@@ -21,7 +21,10 @@ export function createAssetStocktakeFilterFields(): FieldDescriptor[] {
                 name: 'branch_id',
                 label: { key: 'column.branch', fallback: 'Branch' },
                 url: '/api/branches',
-                placeholder: 'All Branches',
+                placeholder: {
+                    key: 'filter.all_branches',
+                    fallback: 'All Branches',
+                },
             },
         ]),
         ...createSelectFilterFields([
@@ -55,7 +58,10 @@ export function createAssetStocktakeFilterFields(): FieldDescriptor[] {
                         },
                     },
                 ],
-                placeholder: 'All Statuses',
+                placeholder: {
+                    key: 'filter.all_statuses_title',
+                    fallback: 'All Statuses',
+                },
             },
         ]),
         ...createDateFilterFields([
@@ -65,12 +71,18 @@ export function createAssetStocktakeFilterFields(): FieldDescriptor[] {
                     key: 'column.planned_from',
                     fallback: 'Planned From',
                 },
-                placeholder: 'Planned From',
+                placeholder: {
+                    key: 'column.planned_from',
+                    fallback: 'Planned From',
+                },
             },
             {
                 name: 'planned_at_to',
                 label: { key: 'column.planned_to', fallback: 'Planned To' },
-                placeholder: 'Planned To',
+                placeholder: {
+                    key: 'column.planned_to',
+                    fallback: 'Planned To',
+                },
             },
         ]),
     ];

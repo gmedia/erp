@@ -1,5 +1,5 @@
-import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 import {
+    createDateFilterFields,
     createProductWarehouseFilterFields,
     createSelectFilterField,
     createTextFilterField,
@@ -22,17 +22,25 @@ export function createStockMovementsFilterFields(): FieldDescriptor[] {
             'movement_type',
             { key: 'column.movement_type', fallback: 'Movement Type' },
             stockMovementTypeOptions,
-            'Select movement type',
+            {
+                key: 'filter.select_movement_type',
+                fallback: 'Select movement type',
+            },
         ),
-        {
-            name: 'start_date',
-            label: { key: 'column.start_date', fallback: 'Start Date' },
-            component: <FilterDatePicker placeholder="Start Date" />,
-        },
-        {
-            name: 'end_date',
-            label: { key: 'column.end_date', fallback: 'End Date' },
-            component: <FilterDatePicker placeholder="End Date" />,
-        },
+        ...createDateFilterFields([
+            {
+                name: 'start_date',
+                label: { key: 'column.start_date', fallback: 'Start Date' },
+                placeholder: {
+                    key: 'column.start_date',
+                    fallback: 'Start Date',
+                },
+            },
+            {
+                name: 'end_date',
+                label: { key: 'column.end_date', fallback: 'End Date' },
+                placeholder: { key: 'column.end_date', fallback: 'End Date' },
+            },
+        ]),
     ];
 }

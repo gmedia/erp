@@ -1605,7 +1605,14 @@
         "reconciliation_status_completed": "Selesai",
         "account_mapping_type_rename": "Ubah Nama",
         "account_mapping_type_merge": "Gabung",
-        "account_mapping_type_split": "Pecah"
+        "account_mapping_type_split": "Pecah",
+        "select_movement_type": "Pilih jenis pergerakan",
+        "all_statuses_title": "Semua Status",
+        "example_10": "Contoh: 10",
+        "filter_by_asset": "Filter berdasarkan aset",
+        "filter_by_type": "Filter berdasarkan jenis",
+        "filter_by_status": "Filter berdasarkan status",
+        "filter_by_supplier": "Filter berdasarkan pemasok"
     },
     "form_fields": {
         "asset_depreciation_runs": {

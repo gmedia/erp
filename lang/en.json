@@ -1602,7 +1602,14 @@
         "reconciliation_status_completed": "Completed",
         "account_mapping_type_rename": "Rename",
         "account_mapping_type_merge": "Merge",
-        "account_mapping_type_split": "Split"
+        "account_mapping_type_split": "Split",
+        "select_movement_type": "Select movement type",
+        "all_statuses_title": "All Statuses",
+        "example_10": "Example: 10",
+        "filter_by_asset": "Filter by asset",
+        "filter_by_type": "Filter by type",
+        "filter_by_status": "Filter by status",
+        "filter_by_supplier": "Filter by supplier"
     },
     "form_fields": {
         "asset_depreciation_runs": {
