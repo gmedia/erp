@@ -154,12 +154,18 @@ test('form pages keep a narrow max width and list pages a wide one', async ({
 
     // Form page: max-w-2xl (672px).
     await page.goto(VEHICLE_LOAN_REQUEST_PATH);
-    const form = await page.locator('div.mx-auto.max-w-2xl').first().boundingBox();
+    const form = await page
+        .locator('div.mx-auto.max-w-2xl')
+        .first()
+        .boundingBox();
     expect(form?.width ?? 0).toBeLessThanOrEqual(672);
 
     // Full-width list page: max-w-7xl (1280px).
     await page.goto(VEHICLE_LOAN_SECURITY_PATH);
-    const list = await page.locator('div.mx-auto.max-w-7xl').first().boundingBox();
+    const list = await page
+        .locator('div.mx-auto.max-w-7xl')
+        .first()
+        .boundingBox();
     expect(list?.width ?? 0).toBeLessThanOrEqual(1280);
     expect(list?.width ?? 0).toBeGreaterThan(672);
 });
@@ -174,8 +180,13 @@ test('security queue cards in the same grid row share a top edge', async ({
     await seedApprovedLoan(page);
     await page.goto(VEHICLE_LOAN_SECURITY_PATH);
 
-    const cards = page.locator('[data-slot="card"]');
-    await expect(cards).toHaveCount(3, { timeout: 15_000 });
+    const queueGrid = page
+        .locator('[data-slot="card"]')
+        .first()
+        .locator('xpath=..');
+    const cards = queueGrid.locator(':scope > [data-slot="card"]');
+    await expect(cards.first()).toBeVisible({ timeout: 15_000 });
+    await expect(cards.nth(2)).toBeVisible();
 
     const tops: number[] = [];
     for (let i = 0; i < 3; i++) {

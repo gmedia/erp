@@ -50,5 +50,16 @@ test('assignment select placeholder stays on one line', async ({ page }) => {
             (el) => el.getBoundingClientRect().height,
         );
         expect(height).toBeLessThanOrEqual(40);
+
+        const valueLines = await trigger
+            .locator('[data-slot="select-value"]')
+            .evaluate((el) => {
+                const lineHeight =
+                    parseFloat(getComputedStyle(el).lineHeight) || 20;
+                return Math.round(
+                    el.getBoundingClientRect().height / lineHeight,
+                );
+            });
+        expect(valueLines).toBeLessThanOrEqual(1);
     }
 });

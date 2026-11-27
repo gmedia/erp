@@ -36,6 +36,9 @@ interface AssignmentOptions {
     units: Array<{ id: number; plate_number: string; vehicle_type: string }>;
 }
 
+const ASSIGNMENT_TRIGGER_CLASS =
+    'min-w-0 text-left [&_[data-slot=select-value]]:block [&_[data-slot=select-value]]:truncate [&_[data-slot=select-value]]:whitespace-nowrap';
+
 const emptyForm: LoanForm = {
     start_at: '',
     end_at: '',
@@ -270,7 +273,7 @@ export default function VehicleLoanRequestPage() {
                             >
                                 <SelectTrigger
                                     id="driver_id"
-                                    className="min-w-0 text-left"
+                                    className={ASSIGNMENT_TRIGGER_CLASS}
                                     title={
                                         form.driver_id
                                             ? undefined
@@ -281,7 +284,6 @@ export default function VehicleLoanRequestPage() {
                                     }
                                 >
                                     <SelectValue
-                                        className="min-w-0 truncate"
                                         placeholder={tPage(
                                             'request.driver_placeholder',
                                             'Pilih pengemudi',
@@ -327,7 +329,7 @@ export default function VehicleLoanRequestPage() {
                             >
                                 <SelectTrigger
                                     id="vehicle_unit_id"
-                                    className="min-w-0 text-left"
+                                    className={ASSIGNMENT_TRIGGER_CLASS}
                                     title={
                                         form.vehicle_unit_id
                                             ? undefined
@@ -338,7 +340,6 @@ export default function VehicleLoanRequestPage() {
                                     }
                                 >
                                     <SelectValue
-                                        className="min-w-0 truncate"
                                         placeholder={tPage(
                                             'request.unit_placeholder',
                                             'Pilih unit kendaraan',
