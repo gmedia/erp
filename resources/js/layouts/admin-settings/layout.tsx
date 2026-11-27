@@ -37,6 +37,9 @@ const sidebarNavItems: NavItem[] = [
         href: '/admin-settings?group=security-logs',
         icon: null,
     },
+    {
+        title: 'Kesehatan Sistem',
+        href: '/admin-settings?group=system_health',
 ];
 
 export default function AdminSettingsLayout({

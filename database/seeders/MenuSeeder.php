@@ -1052,6 +1052,7 @@ class MenuSeeder extends Seeder
                     'approval_monitoring',
                     'approval_audit_trail',
                     'security_log',
+                    'system_health',
                 ],
                 'icon' => 'Shield',
                 'url' => null,
@@ -1065,6 +1066,16 @@ class MenuSeeder extends Seeder
                         ],
                         'icon' => 'Settings',
                         'url' => 'admin-settings',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'system_health',
+                        'display_name' => 'System Health',
+                        'permissions' => [
+                            'system_health',
+                        ],
+                        'icon' => 'HeartPulse',
+                        'url' => 'system-health',
                         'child' => [],
                     ],
                     [

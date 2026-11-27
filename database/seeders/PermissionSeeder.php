@@ -1101,6 +1101,11 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'system_health',
+                'display_name' => 'System Health',
+                'child' => [],
+            ],
+            [
                 'name' => 'view_all_branches',
                 'display_name' => 'View All Branches (Cross-Branch Admin)',
                 'child' => [],

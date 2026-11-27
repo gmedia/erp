@@ -93,6 +93,7 @@ Route::middleware('auth:sanctum')->group(function () {
     require __DIR__ . '/api/supplier-categories.php';
     require __DIR__ . '/api/supplier-returns.php';
     require __DIR__ . '/api/suppliers.php';
+    require __DIR__ . '/api/system-health.php';
     require __DIR__ . '/api/units.php';
     require __DIR__ . '/api/users.php';
     require __DIR__ . '/api/notifications.php';
