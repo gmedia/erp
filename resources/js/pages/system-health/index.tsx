@@ -6,7 +6,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTranslation } from '@/contexts/i18n-context';
-import { formatNumber } from '@/utils/formatters';
 import {
     useRunSystemHealthCheck,
     useSystemHealth,
@@ -15,6 +14,7 @@ import {
     type SystemHealthStatus,
 } from '@/hooks/useSystemHealth';
 import { BreadcrumbItem } from '@/types';
+import { formatNumber } from '@/utils/formatters';
 import { Loader2, Play } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
