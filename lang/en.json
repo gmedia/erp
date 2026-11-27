@@ -450,6 +450,7 @@
     "concurrency.conflict": "The data is being processed by another user. Reload the page and try again.",
     "journal_entry.fiscal_year_closed": "The fiscal year for this date is closed or locked. Reopen it or use an open period.",
     "journal_entry.line_one_side_only": "Each line must have an amount on either debit or credit, not both.",
+    "journal_entry.department_requires_revenue_or_expense": "Department can only be set on revenue or expense accounts.",
     "journal_entry.line_amount_required": "Each line must have a debit or credit amount greater than 0.",
     "journal_entry.lines_not_balanced": "Total debit and total credit must be equal.",
     "stock.insufficient": "Insufficient stock for :product in :warehouse (available :available, required :required).",
