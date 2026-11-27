@@ -15,7 +15,7 @@
 
 Pembayaran yang terposting **sebelum #437** dan punya diskon tersimpan, tetapi tidak dijurnal,
 **tidak** mengurangi sisa. Sisa dokumen tetap seperti sebelumnya, sehingga refresh dokumen
-tidak tiba-tiba menurunkan saldo piutang/hutang.
+tidak tiba-tiba menurunkan saldo piutang/utang.
 
 Konsekuensinya: diskon lama tersebut tidak diakui sebagai pelunasan di laporan sampai ada
 keputusan terpisah (mis. backfill jurnal diskon). Jangan menjalankan backfill otomatis tanpa

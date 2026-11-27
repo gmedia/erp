@@ -18,7 +18,7 @@ Laporan keuangan **tidak memerlukan tabel baru** — semua data bersumber dari t
 | :--- | :--- | :--- |
 | **COA** | `01_chart_of_accounts_design.md` | `accounts` (hierarki akun, type, sub_type) |
 | **General Ledger** | `17_general_ledger_design.md` | `account_balances` (saldo per akun per bulan), `journal_entries` |
-| **Accounts Payable** | `15_accounts_payable_design.md` | `supplier_bills` (aging hutang) |
+| **Accounts Payable** | `15_accounts_payable_design.md` | `supplier_bills` (aging utang) |
 | **Accounts Receivable** | `16_accounts_receivable_design.md` | `customer_invoices` (aging piutang) |
 | **Asset Management** | `12_asset_management_design.md` | `assets` (nilai buku aset) |
 | **Inventory** | `14_inventory_design.md` | `product_stocks` (nilai persediaan) |
@@ -139,12 +139,12 @@ TOTAL ASET                             = SUM(semua aset)
 
 KEWAJIBAN
 ├── Kewajiban Lancar                     (type: liability, sub_type: current_liability)
-│   ├── Hutang Usaha (AP)
-│   ├── Hutang Pajak
-│   ├── Hutang Lainnya
+│   ├── Utang Usaha (AP)
+│   ├── Utang Pajak
+│   ├── Utang Lainnya
 │   Subtotal Kewajiban Lancar         = SUM
 ├── Kewajiban Jangka Panjang             (type: liability, sub_type: long_term_liability)
-│   ├── Hutang Bank
+│   ├── Utang Bank
 │   Subtotal Kewajiban Jangka Panjang = SUM
 TOTAL KEWAJIBAN                        = SUM(semua kewajiban)
 
@@ -263,7 +263,7 @@ ARUS KAS DARI AKTIVITAS OPERASIONAL
 │   ├── (+) Amortisasi                   (non-cash expense)
 │   ├── (+/-) Perubahan Piutang Usaha    (current period - prior period)
 │   ├── (+/-) Perubahan Persediaan       (current period - prior period)
-│   ├── (+/-) Perubahan Hutang Usaha     (current period - prior period)
+│   ├── (+/-) Perubahan Utang Usaha     (current period - prior period)
 │   ├── (+/-) Perubahan Aset/Liabilitas Lancar Lainnya
 Arus Kas Bersih dari Operasional       = SUM
 
@@ -438,7 +438,7 @@ Sudah didesain di `17_general_ledger_design.md` (bagian 5.B.6).
 #### 5) General Ledger (Buku Besar)
 Sudah didesain di `17_general_ledger_design.md` (bagian 5.B.5).
 
-#### 6) AP Aging Report (Umur Hutang)
+#### 6) AP Aging Report (Umur Utang)
 Sudah didesain di `15_accounts_payable_design.md` (bagian 5.B.3).
 
 #### 7) AR Aging Report (Umur Piutang)

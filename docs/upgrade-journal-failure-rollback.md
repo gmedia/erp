@@ -18,7 +18,7 @@ Akibatnya, dokumen, stok, dan status tidak berubah bila jurnal gagal. Tidak ada 
 
 Dokumen di atas hanya bisa diposting bila:
 
-1. **COA lengkap.** Semua akun yang dipakai posting (persediaan, hutang, selisih stok, dan akun pendukung lain) harus ada di versi COA yang berlaku untuk tanggal dokumen. COA ambigu juga menolak dokumen.
+1. **COA lengkap.** Semua akun yang dipakai posting (persediaan, utang, selisih stok, dan akun pendukung lain) harus ada di versi COA yang berlaku untuk tanggal dokumen. COA ambigu juga menolak dokumen.
 2. **Tahun fiskal tersedia dan terbuka.** Harus ada tahun fiskal yang mencakup tanggal dokumen dan tidak berstatus tertutup atau terkunci.
 3. **Status PO sesuai (GR).** GR hanya bisa dikonfirmasi bila purchase order sudah `confirmed` atau `partially_received`.
 

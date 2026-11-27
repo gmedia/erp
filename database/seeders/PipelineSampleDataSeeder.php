@@ -108,7 +108,7 @@ class PipelineSampleDataSeeder extends Seeder
                 'name' => 'Siklus Hidup Pembayaran Supplier',
                 'code' => 'ap_payment_lifecycle',
                 'entity_type' => 'App\Models\ApPayment',
-                'description' => 'Mengelola siklus hidup pembayaran hutang — dari draft, approval, confirmed, hingga reconciled atau void.',
+                'description' => 'Mengelola siklus hidup pembayaran utang — dari draft, approval, confirmed, hingga reconciled atau void.',
                 'version' => 1,
                 'is_active' => true,
                 'conditions' => null,
