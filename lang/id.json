@@ -3170,7 +3170,7 @@
             "assignment_heading": "Penugasan (opsional)",
             "assignment_hint": "Boleh dikosongkan. Penyetuju dapat menetapkan pengemudi dan unit saat peninjauan.",
             "breadcrumb": "Peminjaman Kendaraan",
-            "breadcrumb_leaf": "Permintaan",
+            "breadcrumb_leaf": "Permintaan Peminjaman Kendaraan",
             "description": "Isi jadwal dan tujuan perjalanan, simpan draf, lalu kirim untuk persetujuan.",
             "driver_label": "Pengemudi",
             "driver_placeholder": "Pilih pengemudi",

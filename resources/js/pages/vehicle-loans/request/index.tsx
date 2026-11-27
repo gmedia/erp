@@ -158,7 +158,10 @@ export default function VehicleLoanRequestPage() {
                     href: '/vehicle-loans/request',
                 },
                 {
-                    title: tPage('request.breadcrumb_leaf', 'Permintaan'),
+                    title: tPage(
+                        'request.breadcrumb_leaf',
+                        'Permintaan Peminjaman Kendaraan',
+                    ),
                     href: '/vehicle-loans/request',
                 },
             ]}

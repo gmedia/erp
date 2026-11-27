@@ -44,9 +44,9 @@ test('detail page keeps the activity timeline in the right column', async ({
     expect(approvalBox).not.toBeNull();
     // Right column: activity sits at the same x as the approval card, and
     // below it, not beside the left column content.
-    expect(Math.abs((activityBox?.x ?? 0) - (approvalBox?.x ?? 0))).toBeLessThan(
-        4,
-    );
+    expect(
+        Math.abs((activityBox?.x ?? 0) - (approvalBox?.x ?? 0)),
+    ).toBeLessThan(4);
 });
 
 test('dashboard latest list aligns the date column across rows', async ({
@@ -74,7 +74,9 @@ test('dashboard latest list aligns the date column across rows', async ({
             nodes.map((node) => Math.round(node.getBoundingClientRect().left)),
         );
     expect(xs.length).toBeGreaterThan(0);
-    expect(new Set(xs).size).toBe(1);
+    expect(new Set(xs).size, `date column x positions: ${xs.join(',')}`).toBe(
+        1,
+    );
 });
 
 test('no mismatched "maks." vs "maksimal" wording on photo hints', async ({
@@ -92,15 +94,17 @@ test('sidebar submenu uses Permintaan, Dasbor and Antrean Keamanan', async ({
     await login(page);
     await page.goto(VEHICLE_LOAN_REQUEST_PATH);
 
-    const sidebar = page.locator('[data-sidebar="menu"]').first();
-    await expect(sidebar.getByText('Permintaan', { exact: true })).toBeVisible();
+    const sidebar = page.locator('[data-slot="sidebar-content"]').first();
+    await expect(
+        sidebar.getByText('Permintaan', { exact: true }),
+    ).toBeVisible();
     await expect(sidebar.getByText('Dasbor', { exact: true })).toBeVisible();
     await expect(
         sidebar.getByText('Antrean Keamanan', { exact: true }),
     ).toBeVisible();
 });
 
-test('request form breadcrumb leaf is Permintaan, not a duplicate title', async ({
+test('request form breadcrumb leaf matches the page title', async ({
     page,
 }) => {
     await login(page);
@@ -109,5 +113,5 @@ test('request form breadcrumb leaf is Permintaan, not a duplicate title', async 
     const breadcrumb = page.locator('nav[data-slot="breadcrumb"]');
     await expect(
         breadcrumb.locator('[data-slot="breadcrumb-page"]'),
-    ).toHaveText('Permintaan');
+    ).toHaveText('Permintaan Peminjaman Kendaraan');
 });
