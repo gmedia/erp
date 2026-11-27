@@ -175,6 +175,34 @@ it('keeps every fiscal year of the demo window closed or open as it was before p
         ->and(FiscalYear::query()->where('name', '2026')->value('status'))->toBe('open');
 });
 
+it('archives the CoA of the closed prior year and keeps the current year CoA active', function () {
+    seed(DatabaseSeeder::class);
+
+    $priorYearId = FiscalYear::query()->where('name', '2025')->value('id');
+    $currentYearId = FiscalYear::query()->where('name', '2026')->value('id');
+
+    expect(DB::table('coa_versions')->where('fiscal_year_id', $priorYearId)->pluck('status')->unique()->all())
+        ->toBe(['archived'])
+        ->and(DB::table('coa_versions')->where('fiscal_year_id', $currentYearId)->where('status', 'active')->exists())
+        ->toBeTrue();
+});
+
+it('closes the prior year once and keeps its period closings unchanged on re-seed', function () {
+    seed(DatabaseSeeder::class);
+
+    $priorYearId = FiscalYear::query()->where('name', '2025')->value('id');
+    $closingsBefore = DB::table('period_closings')->where('fiscal_year_id', $priorYearId)
+        ->orderBy('id')->get(['id', 'status', 'closing_type', 'period_month'])->all();
+    $journalsBefore = JournalEntry::query()->count();
+
+    seed(DatabaseSeeder::class);
+
+    expect(DB::table('period_closings')->where('fiscal_year_id', $priorYearId)
+        ->orderBy('id')->get(['id', 'status', 'closing_type', 'period_month'])->all())
+        ->toEqual($closingsBefore)
+        ->and(JournalEntry::query()->count())->toBe($journalsBefore);
+});
+
 /**
  * Saldo GL satu akun aktif (COA aktif) dari jurnal posted.
  * $side 'debit' = dr-cr, 'credit' = cr-dr.
