@@ -55,7 +55,7 @@ export function FilterDatePicker({
                     <Button
                         variant="outline"
                         className={cn(
-                            'w-full justify-start text-left font-normal',
+                            'h-8 w-full justify-start rounded-[6px] border-transparent bg-secondary px-2.5 text-left text-sm font-normal hover:bg-secondary focus-visible:ring-2 focus-visible:ring-[2px] focus-visible:ring-ring/40',
                             !date && 'text-muted-foreground',
                             className,
                         )}
