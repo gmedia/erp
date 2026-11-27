@@ -204,6 +204,7 @@ class DatabaseSeeder extends Seeder
             GlExtendedSampleDataSeeder::class,
             ReportConfigurationSeeder::class,
             BudgetSampleDataSeeder::class,
+            SecurityLogSampleDataSeeder::class,
         ]);
 
         $this->spreadIdenticalAuditTimestamps();

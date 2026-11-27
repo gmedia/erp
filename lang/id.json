@@ -631,6 +631,7 @@
         "ap_payment": "Pembayaran Utang",
         "ap_payment_history_report": "Riwayat Pembayaran Utang",
         "approval_audit_trail": "Jejak Audit Persetujuan",
+        "security_log": "Log Keamanan",
         "approval_delegation": "Delegasi Persetujuan",
         "approval_flow": "Alur Persetujuan",
         "approval_monitoring": "Pemantauan Persetujuan",
@@ -1024,6 +1025,17 @@
         },
         "approval_monitoring": {
             "description": "Pantau alur persetujuan dan tugas yang melewati tenggat."
+        },
+        "security_logs": {
+            "description": "Aktivitas login, logout, dan perubahan akses. Disimpan 1 tahun; data pribadi hanya dipakai untuk keamanan.",
+            "search_placeholder": "Cari email, IP, pengguna...",
+            "select_event": "Pilih Kejadian",
+            "column_date": "Waktu",
+            "column_event": "Kejadian",
+            "column_user": "Pengguna",
+            "column_attempted_email": "Email yang Dicoba",
+            "column_ip_address": "Alamat IP",
+            "column_device": "Perangkat"
         },
         "approval_audit_trail": {
             "description": "Riwayat tindakan persetujuan pada permintaan.",
@@ -1479,6 +1491,13 @@
         "no_data": "Tidak ada data"
     },
     "filter": {
+        "security_event_login_success": "Login Berhasil",
+        "security_event_login_failed": "Login Gagal",
+        "security_event_logout": "Logout",
+        "security_event_password_reset": "Atur Ulang Kata Sandi",
+        "security_event_role_changed": "Hak Akses Diubah",
+        "security_event_user_created": "Pengguna Dibuat",
+        "security_event_user_deactivated": "Pengguna Dinonaktifkan",
         "stock_movement_search_placeholder": "Cari produk, kategori, gudang, cabang...",
         "stocktake_variance_search_placeholder": "Cari opname, produk, kategori, gudang...",
         "valuation_search_placeholder": "Cari produk, kategori, gudang, cabang...",
