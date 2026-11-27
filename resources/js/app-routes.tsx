@@ -146,6 +146,7 @@ const SettingsPassword = lazy(() => import('./pages/settings/password'));
 const SettingsAppearance = lazy(() => import('./pages/settings/appearance'));
 const SettingsTwoFactor = lazy(() => import('./pages/settings/two-factor'));
 const AdminSettings = lazy(() => import('./pages/admin-settings/index'));
+const SystemHealth = lazy(() => import('./pages/system-health/index'));
 
 // Reports
 const BalanceSheet = lazy(() => import('./pages/reports/balance-sheet/index'));
@@ -867,6 +868,14 @@ export default function AppRoutes() {
                     element={
                         <P>
                             <AdminSettings />
+                        </P>
+                    }
+                />
+                <Route
+                    path="/system-health"
+                    element={
+                        <P>
+                            <SystemHealth />
                         </P>
                     }
                 />

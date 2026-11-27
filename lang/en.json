@@ -432,6 +432,8 @@
     "auth_api.logged_out": "Successfully logged out",
     "posting_journal_api.posted": "Successfully posted :count journal entries.",
     "admin_setting_api.updated": "Settings updated successfully.",
+    "system_health.check_completed": "Health check completed.",
+    "system_health.threshold_order": "The failed threshold must be greater than the warning threshold.",
     "admin_setting_api.test_email_sent": "Test email sent successfully. Please check your inbox.",
     "admin_setting_api.test_email_failed": "Failed to send email: :detail",
     "bank_statement_import.date_required": "Transaction date is required.",
@@ -622,6 +624,7 @@
         "accounts_receivable": "Accounts Receivable",
         "admin": "Admin",
         "admin_setting": "Settings",
+        "system_health": "System Health",
         "aging_dashboard": "Aging Dashboard",
         "ap_aging_report": "AP Aging Report",
         "ap_outstanding_report": "AP Outstanding",
@@ -3286,6 +3289,36 @@
             "title": "Security Queue",
             "title_tag": "Security Queue — Vehicle Loans",
             "waiting_pickup": "Waiting for pickup"
+        }
+    },
+    "system_health": {
+        "title": "System health",
+        "description": "Component status, recent issues, and version information.",
+        "run_check": "Check now",
+        "checked_at": "Checked at",
+        "never_checked": "Not checked yet. Press \"Check now\".",
+        "load_failed": "Failed to load system health.",
+        "history_title": "Recent issues",
+        "history_empty": "No issues recorded.",
+        "version_title": "Version",
+        "version": {
+            "app": "Application",
+            "php": "PHP",
+            "laravel": "Laravel"
+        },
+        "status": {
+            "ok": "Healthy",
+            "warning": "Warning",
+            "failed": "Failed",
+            "crashed": "Crashed",
+            "skipped": "Skipped",
+            "unknown": "Unknown"
+        },
+        "overall": {
+            "ok": "All components are healthy",
+            "warning": "Some components need attention",
+            "failed": "Some components have failed",
+            "unknown": "No health data yet"
         }
     }
 }

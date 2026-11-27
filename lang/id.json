@@ -439,6 +439,8 @@
     "auth_api.logged_out": "Berhasil keluar",
     "posting_journal_api.posted": "Berhasil memposting :count entri jurnal.",
     "admin_setting_api.updated": "Pengaturan berhasil diperbarui.",
+    "system_health.check_completed": "Pemeriksaan kesehatan selesai.",
+    "system_health.threshold_order": "Ambang gagal harus lebih besar dari ambang peringatan.",
     "admin_setting_api.test_email_sent": "Email uji berhasil dikirim. Silakan periksa kotak masuk Anda.",
     "admin_setting_api.test_email_failed": "Gagal mengirim email: :detail",
     "bank_statement_import.date_required": "Tanggal transaksi wajib diisi.",
@@ -622,6 +624,7 @@
         "accounts_receivable": "Piutang Usaha",
         "admin": "Admin",
         "admin_setting": "Pengaturan Admin",
+        "system_health": "Kesehatan Sistem",
         "aging_dashboard": "Dasbor Umur Piutang",
         "ap_aging_report": "Laporan Umur Utang",
         "ap_outstanding_report": "Laporan Utang Belum Lunas",
@@ -3291,6 +3294,36 @@
             "title": "Antrean Keamanan",
             "title_tag": "Antrean Keamanan — Peminjaman Kendaraan",
             "waiting_pickup": "Menunggu pengambilan"
+        }
+    },
+    "system_health": {
+        "title": "Kesehatan sistem",
+        "description": "Status komponen, riwayat masalah terakhir, dan informasi versi.",
+        "run_check": "Periksa sekarang",
+        "checked_at": "Diperiksa pada",
+        "never_checked": "Belum pernah diperiksa. Tekan \"Periksa sekarang\".",
+        "load_failed": "Gagal memuat kesehatan sistem.",
+        "history_title": "Riwayat masalah terakhir",
+        "history_empty": "Belum ada masalah yang tercatat.",
+        "version_title": "Versi",
+        "version": {
+            "app": "Aplikasi",
+            "php": "PHP",
+            "laravel": "Laravel"
+        },
+        "status": {
+            "ok": "Sehat",
+            "warning": "Peringatan",
+            "failed": "Gagal",
+            "crashed": "Crash",
+            "skipped": "Dilewati",
+            "unknown": "Belum diketahui"
+        },
+        "overall": {
+            "ok": "Semua komponen sehat",
+            "warning": "Ada komponen yang perlu diperhatikan",
+            "failed": "Ada komponen yang gagal",
+            "unknown": "Belum ada data kesehatan"
         }
     }
 }
