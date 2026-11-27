@@ -31,7 +31,7 @@ class ContainerResourcesCheck extends Check
                     'cpu_load_scope' => 'kernel',
                 ] + SystemHealthMessage::meta('system_health.container.unavailable'))
                 ->shortSummary('Tidak tersedia')
-                ->warning('Pembacaan memori container tidak tersedia di lingkungan ini.');
+                ->warning('Pembacaan memori kontainer tidak tersedia di lingkungan ini.');
         }
 
         [$usedMb, $limitMb, $percent] = $memory;
@@ -59,7 +59,7 @@ class ContainerResourcesCheck extends Check
                     'percent' => $percent,
                     'failed_at' => $failed,
                 ]))
-                ->failed("Memori container terpakai {$percent}% (batas gagal {$failed}%).");
+                ->failed("Memori kontainer terpakai {$percent}% (batas gagal {$failed}%).");
         }
 
         if ($percent >= $warning) {
@@ -68,14 +68,14 @@ class ContainerResourcesCheck extends Check
                     'percent' => $percent,
                     'warning_at' => $warning,
                 ]))
-                ->warning("Memori container terpakai {$percent}% (batas peringatan {$warning}%).");
+                ->warning("Memori kontainer terpakai {$percent}% (batas peringatan {$warning}%).");
         }
 
         return $result
             ->meta($baseMeta + SystemHealthMessage::meta('system_health.container.memory_ok', [
                 'percent' => $percent,
             ]))
-            ->ok("Memori container terpakai {$percent}%.");
+            ->ok("Memori kontainer terpakai {$percent}%.");
     }
 
     // protected: seam uji (test meng-override pembacaan cgroup/loadavg tanpa menyentuh /sys asli).

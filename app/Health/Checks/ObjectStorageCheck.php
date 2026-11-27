@@ -31,13 +31,13 @@ class ObjectStorageCheck extends Check
 
             if (! $storage->put($path, $payload)) {
                 return Result::make()
-                    ->failed('Object storage gagal menulis berkas uji. ' . self::HINT)
+                    ->failed('Penyimpanan objek gagal menulis berkas uji. ' . self::HINT)
                     ->meta(['disk' => $disk] + SystemHealthMessage::meta('system_health.storage.write_failed_hint'));
             }
 
             if ($storage->get($path) !== $payload) {
                 return Result::make()
-                    ->failed('Object storage membaca isi berkas uji yang berbeda.')
+                    ->failed('Penyimpanan objek membaca isi berkas uji yang berbeda.')
                     ->meta(['disk' => $disk] + SystemHealthMessage::meta('system_health.storage.content_mismatch'));
             }
 
@@ -46,14 +46,14 @@ class ObjectStorageCheck extends Check
             report($exception);
 
             return Result::make()
-                ->failed('Object storage tidak dapat diakses (' . class_basename($exception) . '). ' . self::HINT)
+                ->failed('Penyimpanan objek tidak dapat diakses (' . class_basename($exception) . '). ' . self::HINT)
                 ->meta(['disk' => $disk] + SystemHealthMessage::meta('system_health.storage.unreachable_hint', [
                     'exception' => class_basename($exception),
                 ]));
         }
 
         return Result::make()
-            ->ok('Object storage dapat menulis, membaca, dan menghapus berkas.')
+            ->ok('Penyimpanan objek dapat menulis, membaca, dan menghapus berkas.')
             ->meta(['disk' => $disk] + SystemHealthMessage::meta('system_health.storage.ok'))
             ->shortSummary('Lulus');
     }

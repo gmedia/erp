@@ -5,6 +5,7 @@ namespace App\Actions\SystemHealth;
 use App\Health\SystemHealthMessage;
 use App\Health\SystemHealthSanitizer;
 use App\Health\SystemHealthThresholds;
+use App\Support\LocaleJsonTranslator;
 use Spatie\Health\Models\HealthCheckResultHistoryItem;
 use Spatie\Health\ResultStores\EloquentHealthResultStore;
 use Spatie\Health\ResultStores\StoredCheckResults\StoredCheckResult;
@@ -34,10 +35,13 @@ class GetSystemHealthStatusAction
             ->limit(self::HISTORY_LIMIT)
             ->get()
             ->map(function (HealthCheckResultHistoryItem $item): array {
-                $resolved = SystemHealthMessage::fromPackage((string) $item->notification_message);
+                $resolved = SystemHealthMessage::fromPackage(
+                    (string) $item->notification_message,
+                    $item->meta,
+                );
 
                 return [
-                    'check' => $item->check_label,
+                    'check' => $this->componentLabel($item->check_name, $item->check_label),
                     'status' => $item->status,
                     'message' => SystemHealthSanitizer::message($item->notification_message),
                     'message_code' => $resolved['code'],
@@ -81,7 +85,7 @@ class GetSystemHealthStatusAction
 
         return [
             'name' => $stored->name,
-            'label' => $stored->label,
+            'label' => $this->componentLabel($stored->name, $stored->label),
             'status' => (string) $stored->status,
             'summary' => $this->summary($stored->shortSummary),
             'message' => SystemHealthSanitizer::message($stored->notificationMessage),
@@ -89,6 +93,13 @@ class GetSystemHealthStatusAction
             'message_params' => $params,
             'meta' => SystemHealthSanitizer::meta($meta),
         ];
+    }
+
+    private function componentLabel(string $name, string $fallback): string
+    {
+        $translated = LocaleJsonTranslator::get("system_health.components.{$name}");
+
+        return $translated === "system_health.components.{$name}" ? $fallback : $translated;
     }
 
     /**

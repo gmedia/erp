@@ -439,6 +439,8 @@
     "auth_api.logged_out": "Berhasil keluar",
     "posting_journal_api.posted": "Berhasil memposting :count entri jurnal.",
     "admin_setting_api.updated": "Pengaturan berhasil diperbarui.",
+    "system_health.notice.recovered": "Pulih: {label}",
+    "system_health.notice.degraded": "Peringatan: {label} ({status})",
     "system_health.check_completed": "Pemeriksaan kesehatan selesai.",
     "system_health.backup.label": "Backup terakhir",
     "system_health.backup.unreachable": "Tujuan backup tidak dapat dijangkau (:error).",
@@ -1044,7 +1046,10 @@
             "column_user": "Pengguna",
             "column_attempted_email": "Email yang Dicoba",
             "column_ip_address": "Alamat IP",
-            "column_device": "Perangkat"
+            "column_device": "Perangkat",
+            "select_user": "Pilih pengguna",
+            "start_date": "Tanggal mulai",
+            "end_date": "Tanggal selesai"
         },
         "approval_audit_trail": {
             "description": "Riwayat tindakan persetujuan pada permintaan.",
@@ -3325,6 +3330,18 @@
         }
     },
     "system_health": {
+        "components": {
+            "database": "Database",
+            "redis": "Valkey / Redis",
+            "object_storage": "Penyimpanan objek",
+            "migrations": "Migrasi",
+            "queue": "Antrian",
+            "scheduler": "Penjadwal",
+            "disk": "Disk aplikasi",
+            "production_config": "Konfigurasi produksi",
+            "version": "Versi",
+            "container_resources": "CPU & memori kontainer"
+        },
         "title": "Kesehatan sistem",
         "description": "Status komponen, riwayat masalah terakhir, dan informasi versi.",
         "run_check": "Periksa sekarang",
@@ -3354,11 +3371,12 @@
             "unknown": "Belum ada data kesehatan"
         },
         "queue": {
-            "jobs_failed": "Job antrian gagal pada {count} antrian. Periksa worker antrian."
+            "jobs_failed": "Tugas antrian gagal pada {count} antrian. Periksa pekerja antrian.",
+            "failed_unknown": "Tugas antrian gagal. Periksa pekerja antrian."
         },
         "schedule": {
-            "not_run_yet": "Scheduler belum pernah berjalan.",
-            "stale": "Scheduler sudah lama tidak berjalan."
+            "not_run_yet": "Penjadwal belum pernah berjalan.",
+            "stale": "Penjadwal sudah lama tidak berjalan."
         },
         "app_version": {
             "ok": "Versi aplikasi {version}."
@@ -3369,7 +3387,7 @@
             "connections_high": "Jumlah koneksi database ({connections}) mendekati batas peringatan ({warning_at})."
         },
         "production": {
-            "ok": "Konfigurasi environment sesuai.",
+            "ok": "Konfigurasi lingkungan sesuai.",
             "debug_enabled": "APP_DEBUG aktif di production. Matikan agar detail error tidak tampil ke pengguna."
         },
         "migrations": {
@@ -3384,23 +3402,34 @@
             "unavailable": "Pembacaan disk tidak tersedia."
         },
         "container": {
-            "unavailable": "Pembacaan memori container tidak tersedia di lingkungan ini.",
-            "memory_ok": "Memori container terpakai {percent}%.",
-            "memory_warning": "Memori container terpakai {percent}% (batas peringatan {warning_at}%).",
-            "memory_failed": "Memori container terpakai {percent}% (batas gagal {failed_at}%)."
+            "unavailable": "Pembacaan memori kontainer tidak tersedia di lingkungan ini.",
+            "memory_ok": "Memori kontainer terpakai {percent}%.",
+            "memory_warning": "Memori kontainer terpakai {percent}% (batas peringatan {warning_at}%).",
+            "memory_failed": "Memori kontainer terpakai {percent}% (batas gagal {failed_at}%)."
         },
         "storage": {
-            "ok": "Object storage dapat menulis, membaca, dan menghapus berkas.",
-            "write_failed": "Object storage gagal menulis berkas uji.",
-            "write_failed_hint": "Object storage gagal menulis berkas uji. Penyebab umum: AWS_SECRET_ACCESS_KEY kosong di .env atau bucket belum dibuat (bash scripts/minio-bucket.sh).",
-            "content_mismatch": "Object storage membaca isi berkas uji yang berbeda.",
-            "unreachable": "Object storage tidak dapat diakses ({exception}).",
-            "unreachable_hint": "Object storage tidak dapat diakses ({exception}). Penyebab umum: AWS_SECRET_ACCESS_KEY kosong di .env atau bucket belum dibuat (bash scripts/minio-bucket.sh)."
+            "ok": "Penyimpanan objek dapat menulis, membaca, dan menghapus berkas.",
+            "write_failed": "Penyimpanan objek gagal menulis berkas uji.",
+            "write_failed_hint": "Penyimpanan objek gagal menulis berkas uji. Penyebab umum: AWS_SECRET_ACCESS_KEY kosong di .env atau bucket belum dibuat (bash scripts/minio-bucket.sh).",
+            "content_mismatch": "Penyimpanan objek membaca isi berkas uji yang berbeda.",
+            "unreachable": "Penyimpanan objek tidak dapat diakses ({exception}).",
+            "unreachable_hint": "Penyimpanan objek tidak dapat diakses ({exception}). Penyebab umum: AWS_SECRET_ACCESS_KEY kosong di .env atau bucket belum dibuat (bash scripts/minio-bucket.sh)."
         },
         "redis": {
             "ok": "Valkey/Redis merespons ping.",
             "unreachable": "Valkey/Redis tidak dapat diakses ({exception}).",
             "no_ping": "Valkey/Redis tidak merespons ping."
+        }
+    },
+    "security_logs": {
+        "export_headers": {
+            "date": "Tanggal",
+            "event": "Peristiwa",
+            "user": "Pengguna",
+            "attempted_email": "Email yang dicoba",
+            "ip_address": "Alamat IP",
+            "user_agent": "User Agent",
+            "metadata": "Metadata"
         }
     }
 }

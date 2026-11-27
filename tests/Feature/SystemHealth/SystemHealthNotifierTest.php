@@ -102,6 +102,8 @@ test('runner does not notify again while the status stays the same', function ()
 });
 
 test('runner notifies recovery when a failed component returns to ok', function () {
+    // Judul notifikasi mengikuti locale default perusahaan (id: "Pulih: ...").
+    config(['app.locale' => 'id']);
     $permissionUser = createTestUserWithPermissions(['system_health']);
 
     Health::clearChecks();
