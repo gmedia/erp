@@ -190,6 +190,7 @@ class DatabaseSeeder extends Seeder
             ProductSampleDataSeeder::class,
             PurchasingSampleDataSeeder::class,
             ApSampleDataSeeder::class,
+            ApMonthlyDemoSeeder::class,
             AssetSampleDataSeeder::class,
             VehicleLoanSampleDataSeeder::class,
             StockTransferSampleDataSeeder::class,
@@ -197,6 +198,7 @@ class DatabaseSeeder extends Seeder
             StockAdjustmentSampleDataSeeder::class,
             StockMovementSampleDataSeeder::class,
             ArSampleDataSeeder::class,
+            ArMonthlyDemoSeeder::class,
             // Normalisasi depresiasi aset (semua aset, termasuk kendaraan, sudah
             // ada) sebelum rekonsiliasi GL (W7-05). Harus sebelum GlExtendedSampleDataSeeder,
             // karena periode bulan yang diposting di sini ditutup di seeder tersebut (#423).
