@@ -1,5 +1,6 @@
 import type { AuditLogItem } from '@/components/audit-logs/Columns';
 import { Badge } from '@/components/ui/badge';
+import { useTranslation } from '@/contexts/i18n-context';
 import axios from '@/lib/axios';
 import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import { useQuery } from '@tanstack/react-query';
@@ -26,6 +27,7 @@ function formatChangeValue(value: unknown): string {
 export const JournalEntryAuditHistory = memo(function JournalEntryAuditHistory({
     journalEntryId,
 }: Readonly<JournalEntryAuditHistoryProps>) {
+    const { t } = useTranslation();
     const { data, isLoading } = useQuery({
         queryKey: ['audit-logs', 'journal-entry', journalEntryId],
         queryFn: async () => {
@@ -46,13 +48,17 @@ export const JournalEntryAuditHistory = memo(function JournalEntryAuditHistory({
     });
 
     if (isLoading) {
-        return <p className="text-sm text-muted-foreground">Memuat riwayat…</p>;
+        return (
+            <p className="text-sm text-muted-foreground">
+                {t('page.journal_entries.audit_history_loading')}
+            </p>
+        );
     }
 
     if (!data || data.length === 0) {
         return (
             <p className="text-sm text-muted-foreground">
-                Belum ada riwayat perubahan.
+                {t('page.journal_entries.audit_history_empty')}
             </p>
         );
     }

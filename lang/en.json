@@ -1097,7 +1097,10 @@
         "journal_entries": {
             "title": "Journal Entries",
             "description": "Manual journal entries with debit and credit lines.",
-            "search_placeholder": "Search entry..."
+            "search_placeholder": "Search entry...",
+            "audit_history_title": "Change history",
+            "audit_history_loading": "Loading history…",
+            "audit_history_empty": "No change history yet."
         },
         "stock_monitor": {
             "title": "Stock Monitor",

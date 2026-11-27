@@ -1097,7 +1097,10 @@
         "journal_entries": {
             "title": "Jurnal Umum",
             "description": "Jurnal manual dengan baris debit dan kredit.",
-            "search_placeholder": "Cari jurnal..."
+            "search_placeholder": "Cari jurnal...",
+            "audit_history_title": "Riwayat perubahan",
+            "audit_history_loading": "Memuat riwayat…",
+            "audit_history_empty": "Belum ada riwayat perubahan."
         },
         "stock_monitor": {
             "title": "Pemantauan Stok",
