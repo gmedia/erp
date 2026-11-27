@@ -81,13 +81,16 @@ class GetSystemHealthStatusAction
             $params = $resolved['params'];
         }
 
-        unset($meta['message_code'], $meta['message_params']);
+        $summaryCode = is_string($meta['summary_code'] ?? null) ? $meta['summary_code'] : null;
+
+        unset($meta['message_code'], $meta['message_params'], $meta['summary_code']);
 
         return [
             'name' => $stored->name,
             'label' => $this->componentLabel($stored->name, $stored->label),
             'status' => (string) $stored->status,
             'summary' => $this->summary($stored->shortSummary),
+            'summary_code' => $summaryCode,
             'message' => SystemHealthSanitizer::message($stored->notificationMessage),
             'message_code' => $code,
             'message_params' => $params,

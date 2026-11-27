@@ -54,7 +54,7 @@ class ObjectStorageCheck extends Check
 
         return Result::make()
             ->ok('Penyimpanan objek dapat menulis, membaca, dan menghapus berkas.')
-            ->meta(['disk' => $disk] + SystemHealthMessage::meta('system_health.storage.ok'))
+            ->meta(['disk' => $disk, 'summary_code' => 'system_health.summary.passed'] + SystemHealthMessage::meta('system_health.storage.ok'))
             ->shortSummary('Lulus');
     }
 }
