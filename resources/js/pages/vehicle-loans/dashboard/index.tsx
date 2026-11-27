@@ -6,6 +6,10 @@ import { useVehicleLoanPageText } from '@/components/vehicle-loans/useVehicleLoa
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
 import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
+import {
+    AWAITING_KEY_HANDOVER,
+    vehicleLoanDisplayStatus,
+} from '@/utils/vehicle-loan-status';
 import { useQuery } from '@tanstack/react-query';
 import {
     AlertTriangle,
@@ -29,6 +33,7 @@ interface DashboardLoan {
     plate_number: string | null;
     start_at: string | null;
     end_at: string | null;
+    pickup?: { key_handover_at: string | null } | null;
 }
 
 export default function VehicleLoanDashboardPage() {
@@ -44,10 +49,14 @@ export default function VehicleLoanDashboardPage() {
     const loans = data ?? [];
     const count = (status: string) =>
         loans.filter((loan) => loan.status === status).length;
+    const awaitingKeyHandover = loans.filter(
+        (loan) => vehicleLoanDisplayStatus(loan) === AWAITING_KEY_HANDOVER,
+    ).length;
+    const handedOver = count('pickup_done') - awaitingKeyHandover;
     const overdue = loans.filter((loan) => loan.is_overdue).length;
     const active = loans.filter(
         (loan) =>
-            loan.status === 'pickup_done' &&
+            vehicleLoanDisplayStatus(loan) === 'pickup_done' &&
             !loan.is_overdue &&
             loan.end_at !== null &&
             new Date(loan.end_at) >= new Date(),
@@ -85,8 +94,17 @@ export default function VehicleLoanDashboardPage() {
             tone: 'text-destructive-foreground bg-destructive-soft',
         },
         {
+            label: tPage(
+                'dashboard.status_awaiting_key',
+                'Menunggu Serah Kunci',
+            ),
+            value: awaitingKeyHandover,
+            icon: KeyRound,
+            tone: 'text-warning bg-warning-soft',
+        },
+        {
             label: tPage('dashboard.status_in_use', 'Kendaraan Dipakai'),
-            value: count('pickup_done'),
+            value: handedOver,
             icon: KeyRound,
             tone: 'text-info bg-info/10',
         },
@@ -284,7 +302,7 @@ export default function VehicleLoanDashboardPage() {
                                                 </span>
                                             )}
                                             <VehicleLoanStatusBadge
-                                                status={loan.status}
+                                                loan={loan}
                                             />
                                         </div>
                                     </div>

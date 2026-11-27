@@ -131,6 +131,20 @@ export async function seedApprovedLoan(page: Page): Promise<number> {
         'App\\Models\\VehicleLoan',
     );
 
+    const afterFirst = await apiRequest(page, 'get', `/api/vehicle-loans/${id}`);
+    const afterFirstBody = (await afterFirst.json()) as {
+        data?: { status?: string };
+        status?: string;
+    };
+    if ((afterFirstBody.data?.status ?? afterFirstBody.status) === 'in_progress') {
+        await approveApprovableAsDelegate(
+            page,
+            id,
+            'E2ESeed approved final',
+            'App\\Models\\VehicleLoan',
+        );
+    }
+
     await expect
         .poll(
             async () => {

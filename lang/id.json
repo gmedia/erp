@@ -3044,6 +3044,7 @@
             "approved": "Disetujui",
             "rejected": "Ditolak",
             "pickup_done": "Kendaraan Dipakai",
+            "awaiting_key_handover": "Menunggu Serah Kunci",
             "returned": "Selesai",
             "cancelled": "Dibatalkan"
         },
@@ -3068,6 +3069,7 @@
             "status_approved": "Disetujui",
             "status_cancelled": "Dibatalkan",
             "status_draft": "Draf",
+            "status_awaiting_key": "Menunggu Serah Kunci",
             "status_in_use": "Kendaraan Dipakai",
             "status_pending": "Menunggu Persetujuan",
             "status_completed": "Selesai",
@@ -3096,6 +3098,7 @@
             "action_approvals": "Buka My Approvals",
             "action_pickup": "Buat Pengambilan",
             "action_request": "Lanjutkan Permintaan",
+            "action_security": "Buka Antrean Keamanan",
             "action_return": "Buat Pengembalian",
             "activity_empty": "Belum ada aktivitas tercatat.",
             "activity_heading": "Riwayat Aktivitas",

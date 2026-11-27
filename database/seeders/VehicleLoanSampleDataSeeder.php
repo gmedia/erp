@@ -187,6 +187,11 @@ class VehicleLoanSampleDataSeeder extends Seeder
             return;
         }
 
+        // Permintaan `in_progress`: langkah 1 sudah disetujui, langkah 2 masih menunggu.
+        // Status lain: langkah 1 menentukan hasil akhir (single-step terminal).
+        $isInProgress = $status === 'in_progress';
+        $currentStepOrder = $isInProgress ? 2 : 1;
+
         $approvalStatus = match ($status) {
             'pending', 'in_progress' => 'pending',
             'rejected' => 'rejected',
@@ -200,7 +205,7 @@ class VehicleLoanSampleDataSeeder extends Seeder
             ],
             [
                 'approval_flow_id' => $flow->id,
-                'current_step_order' => 1,
+                'current_step_order' => $currentStepOrder,
                 'status' => $approvalStatus,
                 'submitted_by' => $loan->requester_id,
                 'submitted_at' => $loan->submitted_at ?? now(),
@@ -210,31 +215,44 @@ class VehicleLoanSampleDataSeeder extends Seeder
             ],
         );
 
-        $stepStatus = match ($status) {
-            'pending' => 'pending',
-            'in_progress' => 'approved',
-            'rejected' => 'rejected',
-            default => 'approved',
-        };
+        $steps = ApprovalFlowStep::where('approval_flow_id', $flow->id)
+            ->orderBy('step_order')
+            ->get();
 
-        ApprovalRequestStep::updateOrCreate(
-            [
-                'approval_request_id' => $approval->id,
-                'approval_flow_step_id' => $flowStep->id,
-            ],
-            [
-                'step_order' => $flowStep->step_order,
-                'status' => $stepStatus,
-                'acted_by' => $stepStatus === 'pending' ? null : $this->approverId(),
-                'action' => $stepStatus === 'pending' ? null : ($stepStatus === 'rejected' ? 'reject' : 'approve'),
-                'comments' => $status === 'rejected'
-                    ? 'Jadwal bentrok dengan kebutuhan unit lain pada jam yang sama.'
-                    : ($status === 'in_progress' ? 'Driver dan unit diperbarui oleh atasan.' : null),
-                'acted_at' => $stepStatus === 'pending' ? null : ($loan->approved_at ?? now()),
-            ],
-        );
+        $rejectedComment = 'Jadwal bentrok dengan kebutuhan unit lain pada jam yang sama.';
 
-        if ($status === 'in_progress') {
+        foreach ($steps as $step) {
+            $stepStatus = match (true) {
+                $status === 'rejected' && $step->step_order === 1 => 'rejected',
+                $isInProgress && $step->step_order === 1 => 'approved',
+                $isInProgress => 'pending',
+                $status === 'pending' => 'pending',
+                default => 'approved',
+            };
+
+            $acted = $stepStatus !== 'pending';
+
+            ApprovalRequestStep::updateOrCreate(
+                [
+                    'approval_request_id' => $approval->id,
+                    'approval_flow_step_id' => $step->id,
+                ],
+                [
+                    'step_order' => $step->step_order,
+                    'status' => $stepStatus,
+                    'acted_by' => $acted ? $this->approverId() : null,
+                    'action' => $acted ? ($stepStatus === 'rejected' ? 'reject' : 'approve') : null,
+                    'comments' => match (true) {
+                        $status === 'rejected' && $step->step_order === 1 => $rejectedComment,
+                        $isInProgress && $step->step_order === 1 => 'Driver dan unit sudah sesuai jadwal operasional.',
+                        default => null,
+                    },
+                    'acted_at' => $acted ? ($loan->approved_at ?? now()) : null,
+                ],
+            );
+        }
+
+        if ($isInProgress) {
             $loan->update([
                 'review_notes' => 'Penugasan driver dan unit diperbarui oleh atasan.',
             ]);

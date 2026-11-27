@@ -3041,6 +3041,7 @@
             "approved": "Approved",
             "rejected": "Rejected",
             "pickup_done": "Vehicle In Use",
+            "awaiting_key_handover": "Awaiting Key Handover",
             "returned": "Completed",
             "cancelled": "Cancelled"
         },
@@ -3065,6 +3066,7 @@
             "status_approved": "Approved",
             "status_cancelled": "Cancelled",
             "status_draft": "Draft",
+            "status_awaiting_key": "Awaiting Key Handover",
             "status_in_use": "Vehicle In Use",
             "status_pending": "Awaiting Approval",
             "status_completed": "Completed",
@@ -3093,6 +3095,7 @@
             "action_approvals": "Open My Approvals",
             "action_pickup": "Create Pickup",
             "action_request": "Continue Request",
+            "action_security": "Open Security Queue",
             "action_return": "Create Return",
             "activity_empty": "No activity recorded yet.",
             "activity_heading": "Activity History",
