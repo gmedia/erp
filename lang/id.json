@@ -3321,6 +3321,13 @@
             "warning": "Ada komponen yang perlu diperhatikan",
             "failed": "Ada komponen yang gagal",
             "unknown": "Belum ada data kesehatan"
+        },
+        "queue": {
+            "jobs_failed": "Job antrian gagal pada {count} antrian. Periksa worker antrian."
+        },
+        "schedule": {
+            "not_run_yet": "Scheduler belum pernah berjalan.",
+            "stale": "Scheduler sudah lama tidak berjalan."
         }
     }
 }

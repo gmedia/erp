@@ -3318,6 +3318,13 @@
             "warning": "Some components need attention",
             "failed": "Some components have failed",
             "unknown": "No health data yet"
+        },
+        "queue": {
+            "jobs_failed": "Queue jobs failed on {count} queue(s). Check the queue worker."
+        },
+        "schedule": {
+            "not_run_yet": "The scheduler has not run yet.",
+            "stale": "The scheduler has not run recently."
         }
     }
 }

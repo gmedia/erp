@@ -44,14 +44,26 @@ test('user with system_health permission reads status with components and histor
         ->assertJsonStructure([
             'checked_at',
             'overall',
-            'components' => [['name', 'label', 'status', 'summary', 'message', 'meta']],
+            'components' => [[
+                'name', 'label', 'status', 'summary', 'message',
+                'message_code', 'message_params', 'meta',
+            ]],
             'history',
             'thresholds',
             'version' => ['app', 'php', 'laravel'],
         ]);
 
     expect(collect($response->json('components'))->pluck('name')->all())
-        ->toContain('database', 'redis', 'object_storage', 'queue', 'scheduler', 'disk', 'production_config', 'version', 'container_resources');
+        ->toContain(
+            'database', 'redis', 'object_storage', 'queue', 'scheduler',
+            'disk', 'production_config', 'version', 'container_resources',
+        );
+
+    foreach ($response->json('components') as $component) {
+        if (is_string($component['message_code'])) {
+            expect($component['message_code'])->toStartWith('system_health.');
+        }
+    }
 });
 
 test('run endpoint refreshes the checked timestamp', function () {
