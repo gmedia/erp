@@ -56,7 +56,12 @@ final class SystemHealthMessage
 
         if ($code === 'system_health.queue.jobs_failed') {
             // QueueCheck menyimpan satu entri per antrian yang gagal di meta (list berindeks).
-            return ['code' => $code, 'params' => ['count' => (string) count($meta)]];
+            // Tanpa entri (riwayat lama tanpa meta) jangan tampil "gagal pada 0 antrian".
+            $count = count($meta);
+
+            return $count === 0
+                ? ['code' => 'system_health.queue.failed_unknown', 'params' => []]
+                : ['code' => $code, 'params' => ['count' => (string) $count]];
         }
 
         return ['code' => $code, 'params' => []];

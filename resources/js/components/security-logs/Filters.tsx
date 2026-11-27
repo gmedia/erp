@@ -1,12 +1,14 @@
+import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 import {
     createAsyncSelectFilterField,
-    createDateRangeFilterFields,
     createSecurityLogEventFilterField,
     createTextFilterField,
     type FieldDescriptor,
 } from '@/components/common/filters';
 
-export function createSecurityLogFilterFields(): FieldDescriptor[] {
+export function createSecurityLogFilterFields(
+    t: (key: string) => string,
+): FieldDescriptor[] {
     return [
         createTextFilterField(
             'search',
@@ -21,7 +23,7 @@ export function createSecurityLogFilterFields(): FieldDescriptor[] {
             'user_id',
             { key: 'page.security_logs.column_user', fallback: 'User' },
             '/api/users',
-            'Select a user',
+            t('page.security_logs.select_user'),
         ),
         createTextFilterField(
             'ip_address',
@@ -31,6 +33,23 @@ export function createSecurityLogFilterFields(): FieldDescriptor[] {
             },
             'e.g. 192.168.1.10',
         ),
-        ...createDateRangeFilterFields(),
+        {
+            name: 'start_date',
+            label: t('page.security_logs.start_date'),
+            component: (
+                <FilterDatePicker
+                    placeholder={t('page.security_logs.start_date')}
+                />
+            ),
+        },
+        {
+            name: 'end_date',
+            label: t('page.security_logs.end_date'),
+            component: (
+                <FilterDatePicker
+                    placeholder={t('page.security_logs.end_date')}
+                />
+            ),
+        },
     ];
 }

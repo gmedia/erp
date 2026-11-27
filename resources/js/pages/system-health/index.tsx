@@ -14,6 +14,7 @@ import {
     type SystemHealthStatus,
 } from '@/hooks/useSystemHealth';
 import { BreadcrumbItem } from '@/types';
+import { formatNumber } from '@/utils/formatters';
 import { Loader2, Play } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -53,6 +54,25 @@ function formatDateTime(
         : date.toLocaleString(locale === 'id' ? 'id-ID' : 'en-US');
 }
 
+function formatSummary(component: SystemHealthComponent): string | null {
+    const { summary, name } = component;
+
+    if (!summary) {
+        return null;
+    }
+
+    if (name === 'redis' && /^\d+(\.\d+)?$/.test(summary)) {
+        return `${formatNumber(summary, { maximumFractionDigits: 1 })} MB`;
+    }
+
+    const percent = /^(\d+)% memori$/.exec(summary);
+    if (percent) {
+        return `${formatNumber(percent[1])}% memori`;
+    }
+
+    return summary;
+}
+
 function StatusLabel({ status }: Readonly<{ status: SystemHealthStatus }>) {
     const { t } = useTranslation();
 
@@ -68,6 +88,7 @@ function ComponentCard({
     checkedAt,
 }: Readonly<{ component: SystemHealthComponent; checkedAt: string | null }>) {
     const { t, locale } = useTranslation();
+    const summary = formatSummary(component);
     const message = component.message_code
         ? t(component.message_code, component.message_params)
         : component.message;
@@ -81,9 +102,9 @@ function ComponentCard({
                 <StatusLabel status={component.status} />
             </CardHeader>
             <CardContent className="space-y-1 p-0">
-                {component.summary && (
+                {summary && (
                     <p className="text-2xl font-semibold tabular-nums">
-                        {component.summary}
+                        {summary}
                     </p>
                 )}
                 {message && (
@@ -112,7 +133,7 @@ export default function SystemHealthPage() {
 
     return (
         <DashboardPageShell
-            title="System Health"
+            title={t('system_health.title')}
             heading="System Health"
             headingKey="menu.system_health"
             description="Status komponen sistem, riwayat masalah, dan informasi versi."
