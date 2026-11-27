@@ -73,7 +73,7 @@ export function DatePickerField({
                                         variant="outline"
                                         disabled={locked}
                                         className={cn(
-                                            'w-full pl-3 text-left font-normal',
+                                            'h-8 w-full rounded-[6px] border-transparent bg-secondary px-2.5 text-left text-sm font-normal hover:bg-secondary focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:ring-[2px]',
                                             !field.value &&
                                                 'text-muted-foreground',
                                         )}
