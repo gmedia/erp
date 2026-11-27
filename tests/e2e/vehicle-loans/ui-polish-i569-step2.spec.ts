@@ -93,13 +93,6 @@ test('sidebar submenu uses Permintaan, Dasbor and Antrean Keamanan', async ({
     await page.goto(VEHICLE_LOAN_REQUEST_PATH);
 
     const sidebar = page.locator('[data-sidebar="menu"]').first();
-    const group = sidebar
-        .locator('[data-state]')
-        .filter({ hasText: 'Peminjaman Kendaraan' })
-        .first();
-    if ((await group.getAttribute('data-state')) !== 'open') {
-        await group.click();
-    }
     await expect(sidebar.getByText('Permintaan', { exact: true })).toBeVisible();
     await expect(sidebar.getByText('Dasbor', { exact: true })).toBeVisible();
     await expect(
