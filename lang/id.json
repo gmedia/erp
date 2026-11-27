@@ -1569,7 +1569,17 @@
         "select_payment_method": "Pilih metode pembayaran",
         "select_currency": "Pilih mata uang",
         "select_reason": "Pilih alasan",
-        "all_suppliers": "Semua pemasok"
+        "all_suppliers": "Semua pemasok",
+        "all_fiscal_years": "Semua tahun fiskal",
+        "period_closing_type_monthly": "Bulanan",
+        "period_closing_type_annual": "Tahunan",
+        "period_select_status": "Pilih Status",
+        "period_select_type": "Pilih Tipe",
+        "period_select_fiscal_year": "Pilih Tahun Fiskal",
+        "budget_type_operational": "Operasional",
+        "budget_type_capital": "Modal",
+        "budget_type_project": "Proyek",
+        "budget_type_revenue": "Pendapatan"
     },
     "form_fields": {
         "asset_depreciation_runs": {

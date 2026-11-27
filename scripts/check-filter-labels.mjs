@@ -25,13 +25,10 @@ const pendingFiles = new Set([
     'asset-movements/AssetMovementFilters.tsx',
     'asset-stocktakes/AssetStocktakeFilters.tsx',
     'bank-reconciliations/BankReconciliationFilters.tsx',
-    'budgets/BudgetFilters.tsx',
-    'coa-versions/CoaVersionFilters.tsx',
-    'fiscal-years/FiscalYearFilters.tsx',
+
     'goods-receipts/GoodsReceiptFilters.tsx',
     'inventory-stocktakes/InventoryStocktakeFilters.tsx',
-    'journal-entries/JournalEntryFilters.tsx',
-    'period-closings/PeriodClosingFilters.tsx',
+
     'pipeline-audit-trail/Filters.tsx',
     'pipelines/PipelineFilters.tsx',
     'purchase-orders/PurchaseOrderFilters.tsx',

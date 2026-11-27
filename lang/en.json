@@ -1566,7 +1566,17 @@
         "select_payment_method": "Select Payment Method",
         "select_currency": "Select Currency",
         "select_reason": "Select Reason",
-        "all_suppliers": "All suppliers"
+        "all_suppliers": "All suppliers",
+        "all_fiscal_years": "All fiscal years",
+        "period_closing_type_monthly": "Monthly",
+        "period_closing_type_annual": "Annual",
+        "period_select_status": "Select Status",
+        "period_select_type": "Select Type",
+        "period_select_fiscal_year": "Select Fiscal Year",
+        "budget_type_operational": "Operational",
+        "budget_type_capital": "Capital",
+        "budget_type_project": "Project",
+        "budget_type_revenue": "Revenue"
     },
     "form_fields": {
         "asset_depreciation_runs": {

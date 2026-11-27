@@ -4,19 +4,57 @@ import {
     createTextFilterField,
     type FieldDescriptor,
 } from '@/components/common/filters';
+import {
+    type TranslatableLabel,
+    useTranslatableText,
+} from '@/components/common/TranslatedText';
+
+function FiscalYearFilterSelect({
+    placeholder,
+}: Readonly<{ placeholder: TranslatableLabel }>) {
+    const translatedPlaceholder = useTranslatableText(placeholder);
+    return (
+        <AsyncSelect
+            url="/api/fiscal-years"
+            placeholder={translatedPlaceholder}
+            preferredMetaKey="preferred_fiscal_year_id"
+        />
+    );
+}
 
 const budgetStatusOptions = [
-    { value: 'draft', label: 'Draft' },
-    { value: 'approved', label: 'Approved' },
-    { value: 'locked', label: 'Locked' },
-    { value: 'cancelled', label: 'Cancelled' },
+    { value: 'draft', label: { key: 'status.draft', fallback: 'Draft' } },
+    {
+        value: 'approved',
+        label: { key: 'status.approved', fallback: 'Approved' },
+    },
+    { value: 'locked', label: { key: 'status.locked', fallback: 'Locked' } },
+    {
+        value: 'cancelled',
+        label: { key: 'status.cancelled', fallback: 'Cancelled' },
+    },
 ];
 
 const budgetTypeOptions = [
-    { value: 'operational', label: 'Operational' },
-    { value: 'capital', label: 'Capital' },
-    { value: 'project', label: 'Project' },
-    { value: 'revenue', label: 'Revenue' },
+    {
+        value: 'operational',
+        label: {
+            key: 'filter.budget_type_operational',
+            fallback: 'Operational',
+        },
+    },
+    {
+        value: 'capital',
+        label: { key: 'filter.budget_type_capital', fallback: 'Capital' },
+    },
+    {
+        value: 'project',
+        label: { key: 'filter.budget_type_project', fallback: 'Project' },
+    },
+    {
+        value: 'revenue',
+        label: { key: 'filter.budget_type_revenue', fallback: 'Revenue' },
+    },
 ];
 
 export function createBudgetFilterFields(): FieldDescriptor[] {
@@ -33,22 +71,23 @@ export function createBudgetFilterFields(): FieldDescriptor[] {
             'status',
             { key: 'column.status', fallback: 'Status' },
             budgetStatusOptions,
-            'All statuses',
+            { key: 'filter.all_statuses', fallback: 'All statuses' },
         ),
         createSelectFilterField(
             'budget_type',
             { key: 'column.budget_type', fallback: 'Budget Type' },
             budgetTypeOptions,
-            'All types',
+            { key: 'filter.all_types', fallback: 'All types' },
         ),
         {
             name: 'fiscal_year_id',
             label: { key: 'column.fiscal_year', fallback: 'Fiscal Year' },
             component: (
-                <AsyncSelect
-                    url="/api/fiscal-years"
-                    placeholder="All fiscal years"
-                    preferredMetaKey="preferred_fiscal_year_id"
+                <FiscalYearFilterSelect
+                    placeholder={{
+                        key: 'filter.all_fiscal_years',
+                        fallback: 'All fiscal years',
+                    }}
                 />
             ),
         },
