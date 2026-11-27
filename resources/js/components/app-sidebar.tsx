@@ -14,13 +14,29 @@ import { useTranslation } from '@/contexts/i18n-context';
 import { getIcon } from '@/lib/icon-map';
 
 import { useAuth } from '@/contexts/auth-context';
+import {
+    rememberSidebarScroll,
+    restoreSidebarScroll,
+} from '@/lib/sidebar-scroll';
 import { type NavItem } from '@/types';
+import { useLayoutEffect } from 'react';
 import { Link } from 'react-router-dom';
 import AppLogo from './app-logo';
 
 export function AppSidebar() {
     const { t } = useTranslation();
     const { menus } = useAuth();
+
+    useLayoutEffect(() => {
+        const el = document.querySelector<HTMLElement>(
+            '[data-sidebar="content"]',
+        );
+        if (!el) return;
+        restoreSidebarScroll(el);
+        const onScroll = () => rememberSidebarScroll(el);
+        el.addEventListener('scroll', onScroll, { passive: true });
+        return () => el.removeEventListener('scroll', onScroll);
+    }, [menus]);
 
     const menuTitle = (name: string, displayName: string): string => {
         const key = `menu.${name}`;

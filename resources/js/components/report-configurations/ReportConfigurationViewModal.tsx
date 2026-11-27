@@ -96,12 +96,18 @@ export const ReportConfigurationViewModal =
                                                 <TableHead>Order</TableHead>
                                                 <TableHead>Code</TableHead>
                                                 <TableHead>Name</TableHead>
-                                                <TableHead>Type</TableHead>
-                                                <TableHead>
+                                                <TableHead className="hidden sm:table-cell">
+                                                    Type
+                                                </TableHead>
+                                                <TableHead className="hidden sm:table-cell">
                                                     Account Type
                                                 </TableHead>
-                                                <TableHead>Sub Type</TableHead>
-                                                <TableHead>Sign</TableHead>
+                                                <TableHead className="hidden sm:table-cell">
+                                                    Sub Type
+                                                </TableHead>
+                                                <TableHead className="hidden sm:table-cell">
+                                                    Sign
+                                                </TableHead>
                                                 <TableHead>Formula</TableHead>
                                             </TableRow>
                                         </TableHeader>
@@ -130,13 +136,22 @@ export const ReportConfigurationViewModal =
                                                                     section.sort_order
                                                                 }
                                                             </TableCell>
-                                                            <TableCell className="font-mono text-xs">
-                                                                {section.code}
+                                                            <TableCell className="max-w-24 font-mono text-xs">
+                                                                <span
+                                                                    className="block truncate"
+                                                                    title={
+                                                                        section.code
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        section.code
+                                                                    }
+                                                                </span>
                                                             </TableCell>
                                                             <TableCell>
                                                                 {section.name}
                                                             </TableCell>
-                                                            <TableCell>
+                                                            <TableCell className="hidden sm:table-cell">
                                                                 <Badge variant="outline">
                                                                     {sectionTypeLabels[
                                                                         section
@@ -147,22 +162,30 @@ export const ReportConfigurationViewModal =
                                                                         )}
                                                                 </Badge>
                                                             </TableCell>
-                                                            <TableCell>
+                                                            <TableCell className="hidden sm:table-cell">
                                                                 {section.account_type_filter ||
                                                                     '-'}
                                                             </TableCell>
-                                                            <TableCell>
+                                                            <TableCell className="hidden sm:table-cell">
                                                                 {section.account_sub_type_filter ||
                                                                     '-'}
                                                             </TableCell>
-                                                            <TableCell>
+                                                            <TableCell className="hidden sm:table-cell">
                                                                 {
                                                                     section.sign_convention
                                                                 }
                                                             </TableCell>
-                                                            <TableCell className="font-mono text-xs">
-                                                                {section.formula ||
-                                                                    '-'}
+                                                            <TableCell className="max-w-48 font-mono text-xs">
+                                                                <span
+                                                                    className="block truncate"
+                                                                    title={
+                                                                        section.formula ||
+                                                                        undefined
+                                                                    }
+                                                                >
+                                                                    {section.formula ||
+                                                                        '-'}
+                                                                </span>
                                                             </TableCell>
                                                         </TableRow>
                                                     ),
