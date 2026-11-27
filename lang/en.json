@@ -3238,5 +3238,35 @@
             "title_tag": "Security Queue — Vehicle Loans",
             "waiting_pickup": "Waiting for pickup"
         }
+    },
+    "system_health": {
+        "title": "System health",
+        "description": "Component status, recent issues, and version information.",
+        "run_check": "Check now",
+        "checked_at": "Checked at",
+        "never_checked": "Not checked yet. Press \"Check now\".",
+        "load_failed": "Failed to load system health.",
+        "history_title": "Recent issues",
+        "history_empty": "No issues recorded.",
+        "version_title": "Version",
+        "version": {
+            "app": "Application",
+            "php": "PHP",
+            "laravel": "Laravel"
+        },
+        "status": {
+            "ok": "Healthy",
+            "warning": "Warning",
+            "failed": "Failed",
+            "crashed": "Crashed",
+            "skipped": "Skipped",
+            "unknown": "Unknown"
+        },
+        "overall": {
+            "ok": "All components are healthy",
+            "warning": "Some components need attention",
+            "failed": "Some components have failed",
+            "unknown": "No health data yet"
+        }
     }
 }

@@ -3241,5 +3241,35 @@
             "title_tag": "Antrean Keamanan — Peminjaman Kendaraan",
             "waiting_pickup": "Menunggu pengambilan"
         }
+    },
+    "system_health": {
+        "title": "Kesehatan sistem",
+        "description": "Status komponen, riwayat masalah terakhir, dan informasi versi.",
+        "run_check": "Periksa sekarang",
+        "checked_at": "Diperiksa pada",
+        "never_checked": "Belum pernah diperiksa. Tekan \"Periksa sekarang\".",
+        "load_failed": "Gagal memuat kesehatan sistem.",
+        "history_title": "Riwayat masalah terakhir",
+        "history_empty": "Belum ada masalah yang tercatat.",
+        "version_title": "Versi",
+        "version": {
+            "app": "Aplikasi",
+            "php": "PHP",
+            "laravel": "Laravel"
+        },
+        "status": {
+            "ok": "Sehat",
+            "warning": "Peringatan",
+            "failed": "Gagal",
+            "crashed": "Crash",
+            "skipped": "Dilewati",
+            "unknown": "Belum diketahui"
+        },
+        "overall": {
+            "ok": "Semua komponen sehat",
+            "warning": "Ada komponen yang perlu diperhatikan",
+            "failed": "Ada komponen yang gagal",
+            "unknown": "Belum ada data kesehatan"
+        }
     }
 }
