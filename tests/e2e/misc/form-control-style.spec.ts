@@ -137,6 +137,46 @@ for (const theme of ['light', 'dark'] as const) {
             expect(search.boxShadow).toBe('none');
         });
 
+        test('trigger select, datepicker, dan async select memakai gaya referensi (#583)', async ({
+            page,
+        }) => {
+            await openAddEmployeeDialog(page);
+
+            const triggers = {
+                select: '[role="dialog"] button[role="combobox"]',
+                datepicker:
+                    '[role="dialog"] button[aria-haspopup="dialog"]:has(svg.lucide-calendar)',
+            };
+            const selectStyle = await readControlStyle(page, triggers.select);
+            const dateStyle = await readControlStyle(page, triggers.datepicker);
+
+            mkdirSync(EVIDENCE_DIR, { recursive: true });
+            await page
+                .locator(triggers.datepicker)
+                .first()
+                .scrollIntoViewIfNeeded();
+            await page
+                .getByRole('dialog')
+                .first()
+                .screenshot({
+                    path: `${EVIDENCE_DIR}/select-date-${theme}.png`,
+                });
+            await page
+                .locator(triggers.datepicker)
+                .first()
+                .screenshot({
+                    path: `${EVIDENCE_DIR}/datepicker-trigger-${theme}.png`,
+                });
+
+            for (const style of [selectStyle, dateStyle]) {
+                expect(style.borderRadius).toBe(RADIUS_INPUT);
+                expect(style.height).toBeCloseTo(HEIGHT, 0);
+                expect(style.borderWidth).toBe('1px');
+                expect(style.borderColor).toBe('rgba(0, 0, 0, 0)');
+                expect(style.boxShadow).toBe('none');
+            }
+        });
+
         test('input mendapat ring fokus 2px netral saat focus-visible', async ({
             page,
         }) => {
