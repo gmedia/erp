@@ -91,7 +91,7 @@ export function VehicleLoanDateTimeFields({
                             type="button"
                             variant="outline"
                             className={cn(
-                                'h-8 w-full min-w-0 justify-start rounded-[6px] border-transparent bg-secondary px-2.5 text-left text-sm font-normal hover:bg-secondary focus-visible:ring-2 focus-visible:ring-[2px] focus-visible:ring-ring/40',
+                                'h-8 w-full min-w-0 justify-start rounded-[6px] border border-transparent bg-secondary shadow-none px-2.5 text-left text-sm font-normal hover:bg-secondary focus-visible:ring-2 focus-visible:ring-[2px] focus-visible:ring-ring/40',
                                 !date && 'text-muted-foreground',
                             )}
                         >

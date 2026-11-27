@@ -45,6 +45,22 @@ Perubahan warna dilakukan **di token**, bukan per halaman. Branding per perusaha
 - **Hierarki tombol**: satu `default` (hitam/terang) per area untuk aksi utama (Create, Save, Connect); aksi lain `secondary` (pill abu); aksi berbahaya `destructive-soft` (pill merah lembut + ikon). `destructive` solid hanya di dialog konfirmasi.
 - Tanpa bayangan pada komponen datar; bayangan hanya untuk lapisan melayang (popover, dropdown, dialog).
 
+**Tabel spesifikasi kontrol form (acuan light & dark):**
+
+| Kontrol | Bentuk | Tinggi | Isian / warna | Border saat diam | Fokus (`focus-visible`) | Error (`aria-invalid`) | Disabled |
+|---|---|---|---|---|---|---|---|
+| Input teks/angka, Select trigger, Textarea, trigger DatePicker/AsyncSelect/Combobox | `rounded-md` | `h-8` (textarea min-h) | `bg-secondary`, teks 13–14px, placeholder `text-muted-foreground`, chevron 14px muted di kanan | tidak ada (`border-transparent`) | ring 2px `ring-ring/40`, tanpa offset, border tetap transparan | ring 2px `ring-destructive/40` + teks bantuan merah | `opacity-50`, `cursor-not-allowed` |
+| Kolom pencarian toolbar | `rounded-lg` | `h-8` | sama dengan input | tidak ada | sama dengan input | sama dengan input | sama dengan input |
+| Input + satuan (mis. angka + unit) | satu kontrol, tanpa pemisah | `h-8` | sama dengan input | tidak ada | sama dengan input | sama dengan input | sama dengan input |
+| Checkbox | `size-4 rounded-[4px]` | 16px | tidak dicentang: putih/transparan + border 1px netral; dicentang: `bg-primary` + `text-primary-foreground` | 1px netral | ring 2px `ring-ring/40` | ring 2px `ring-destructive/40`, border destructive | `opacity-50` |
+| Radio | lingkaran `size-4`, border gaya checkbox | 16px | titik `bg-primary` saat dipilih | 1px netral | ring 2px `ring-ring/40` | ring 2px `ring-destructive/40` | `opacity-50` |
+| Switch | track pill | `h-5` | diam `bg-muted`, aktif `bg-primary`, thumb putih | tidak ada | ring 2px `ring-ring/40` | ring 2px `ring-destructive/40` | `opacity-50` |
+| Button (semua varian) | `rounded-full` (pill) | `h-8` | primary `bg-primary`; secondary `bg-secondary`; destructive-soft merah lembut | tidak ada | ring 2px `ring-ring/40` | — | `opacity-60`, `pointer-events-none` |
+| Segmented / Tabs | track pill `bg-secondary`, `p-[3px]` | `h-8` | item aktif: light `bg-background shadow-xs`, dark `bg-accent` | tidak ada | ring 2px netral pada item | — | `opacity-50` |
+| Tombol ikon (⋯, reset, pagination) | `rounded-md` saat hover | 28px persegi | transparan; hover `bg-accent` | tidak ada | ring 2px `ring-ring/40` | — | `opacity-50` |
+
+Aturan pilihan kontrol: **radio-group** dan **switch** wajib dipakai untuk pilihan tunggal dan toggle berikutnya (komponen sudah tersedia di `components/ui/`). Guard E2E untuk keduanya ditambahkan saat konsumen pertama muncul.
+
 ### 0.3 Tipografi & angka
 
 - H1 halaman: `text-2xl font-semibold`, tanpa ikon dekoratif.
@@ -213,6 +229,8 @@ Gunakan checklist ini saat diminta "review UI", "cek konsistensi modul X", atau 
 - [ ] Tidak ada hex/rgb/`oklch` atau `dark:bg-…` manual di komponen; semua lewat token.
 - [ ] `npm run check:raw-colors` lolos (0 kelas palet mentah).
 - [ ] Card tanpa border/bayangan; kontrol (Button, Badge, Tabs, chip) berbentuk pill.
+- [ ] Kontrol form sesuai tabel spesifikasi §0.2 (tinggi, isian, border diam, ring fokus 2px netral, error, disabled); tidak ada `h-9`/`border`/`shadow-xs` tertinggal di input, select, atau search.
+- [ ] Pilihan tunggal memakai `radio-group`; toggle memakai `switch` (bukan checkbox/button dua-state).
 - [ ] Satu tombol utama per area; aksi berbahaya `destructive-soft`.
 - [ ] Angka KPI/tabel `tabular-nums`; tabel tanpa garis vertikal/zebra; aksi baris lewat menu `⋯`.
 - [ ] Dicek di light **dan** dark.

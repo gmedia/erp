@@ -31,12 +31,18 @@ async function readControlStyle(
         .first()
         .evaluate((el) => {
             const cs = getComputedStyle(el);
+            const layers = cs.boxShadow
+                .split(/,(?![^(]*\))/)
+                .map((s) => s.trim())
+                .filter(
+                    (s) => s.length > 0 && !/^rgba\(0,\s*0,\s*0,\s*0\)/.test(s),
+                );
             return {
                 borderRadius: cs.borderRadius,
                 height: el.getBoundingClientRect().height,
                 borderColor: cs.borderTopColor,
                 borderWidth: cs.borderTopWidth,
-                boxShadow: cs.boxShadow,
+                boxShadow: layers.length === 0 ? 'none' : layers.join(', '),
             };
         });
 }
@@ -284,6 +290,132 @@ for (const theme of ['light', 'dark'] as const) {
             expect(checkedBg).toBe(primary);
             await row.screenshot({
                 path: `${EVIDENCE_DIR}/checkbox-checked-${theme}.png`,
+            });
+        });
+
+        test('button primary dan secondary memakai pill h-8 dan token warna (#584)', async ({
+            page,
+        }) => {
+            await page.goto('/employees', { waitUntil: 'domcontentloaded' });
+            await page.waitForLoadState('networkidle').catch(() => undefined);
+            const primary = page
+                .locator('button[data-slot="button"].bg-primary')
+                .first();
+            await expect(primary).toBeVisible({ timeout: 15000 });
+
+            const probe = await page.evaluate(() => {
+                const make = (cls: string) => {
+                    const span = document.createElement('span');
+                    span.className = cls;
+                    document.body.appendChild(span);
+                    const color = getComputedStyle(span).backgroundColor;
+                    span.remove();
+                    return color;
+                };
+                return {
+                    primary: make('bg-primary'),
+                    secondary: make('bg-secondary'),
+                };
+            });
+
+            const primaryStyle = await primary.evaluate((el) => {
+                const cs = getComputedStyle(el);
+                return {
+                    background: cs.backgroundColor,
+                    radius: cs.borderRadius,
+                    height: el.getBoundingClientRect().height,
+                    borderWidth: cs.borderTopWidth,
+                    boxShadow: cs.boxShadow,
+                };
+            });
+            expect(primaryStyle.background).toBe(probe.primary);
+            expect(parseFloat(primaryStyle.radius)).toBeGreaterThanOrEqual(
+                HEIGHT / 2,
+            );
+            expect(primaryStyle.height).toBeCloseTo(HEIGHT, 0);
+            expect(primaryStyle.borderWidth).toBe('0px');
+
+            const secondary = page
+                .locator('button[data-slot="button"].bg-secondary')
+                .first();
+            const secondaryCount = await secondary.count();
+            console.log(
+                `[form-control] button ${theme}: primary=${JSON.stringify(primaryStyle)} secondaryCount=${secondaryCount} probe=${JSON.stringify(probe)}`,
+            );
+            if (secondaryCount > 0) {
+                const secondaryStyle = await secondary.evaluate((el) => ({
+                    background: getComputedStyle(el).backgroundColor,
+                    height: el.getBoundingClientRect().height,
+                }));
+                expect(secondaryStyle.background).toBe(probe.secondary);
+                expect(secondaryStyle.height).toBeCloseTo(HEIGHT, 0);
+            }
+
+            mkdirSync(EVIDENCE_DIR, { recursive: true });
+            await page
+                .locator('main')
+                .first()
+                .screenshot({
+                    path: `${EVIDENCE_DIR}/buttons-${theme}.png`,
+                });
+        });
+
+        test('tabs: track bg-secondary pill dan item aktif sesuai tema (#584)', async ({
+            page,
+        }) => {
+            await page.goto('/my-approvals', { waitUntil: 'domcontentloaded' });
+            await page.waitForLoadState('networkidle').catch(() => undefined);
+            const list = page.locator('[data-slot="tabs-list"]').first();
+            await expect(list).toBeVisible({ timeout: 15000 });
+            const active = page
+                .locator('[data-slot="tabs-trigger"][data-state="active"]')
+                .first();
+            await expect(active).toBeVisible();
+
+            const measured = await page.evaluate(() => {
+                const make = (cls: string) => {
+                    const span = document.createElement('span');
+                    span.className = cls;
+                    document.body.appendChild(span);
+                    const color = getComputedStyle(span).backgroundColor;
+                    span.remove();
+                    return color;
+                };
+                return {
+                    secondary: make('bg-secondary'),
+                    background: make('bg-background'),
+                    accent: make('bg-accent'),
+                };
+            });
+            const listEl = await list.evaluate((el) => {
+                const cs = getComputedStyle(el);
+                return {
+                    background: cs.backgroundColor,
+                    radius: cs.borderRadius,
+                    height: el.getBoundingClientRect().height,
+                };
+            });
+            const activeEl = await active.evaluate((el) => ({
+                background: getComputedStyle(el).backgroundColor,
+                shadow: getComputedStyle(el).boxShadow,
+            }));
+
+            console.log(
+                `[form-control] tabs ${theme}: list=${JSON.stringify(listEl)} active=${JSON.stringify(activeEl)} probe=${JSON.stringify(measured)}`,
+            );
+            expect(listEl.background).toBe(measured.secondary);
+            expect(parseFloat(listEl.radius)).toBeGreaterThanOrEqual(
+                listEl.height / 2,
+            );
+            expect(listEl.height).toBeCloseTo(HEIGHT, 0);
+            expect(activeEl.background).toBe(
+                theme === 'dark' ? measured.accent : measured.background,
+            );
+            expect(activeEl.shadow).not.toBe('none');
+
+            mkdirSync(EVIDENCE_DIR, { recursive: true });
+            await list.screenshot({
+                path: `${EVIDENCE_DIR}/tabs-${theme}.png`,
             });
         });
 
