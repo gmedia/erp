@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/table';
 import { useTranslation } from '@/contexts/i18n-context';
 import { formatClassName } from '@/lib/status-badge';
+import { cn } from '@/lib/utils';
 import { type ReportConfiguration } from '@/types/report-configuration';
 
 interface ReportConfigurationViewModalProps {
@@ -211,7 +212,12 @@ export const ReportConfigurationViewModal =
                                                             >
                                                                 {section.name}
                                                             </span>
-                                                            <span className="mt-1 flex flex-wrap gap-1 text-xs text-muted-foreground sm:hidden">
+                                                            <span
+                                                                className={cn(
+                                                                    'mt-1 flex flex-wrap gap-1 text-xs text-muted-foreground',
+                                                                    'sm:hidden',
+                                                                )}
+                                                            >
                                                                 <span>
                                                                     {sectionTypeLabel(
                                                                         section.section_type,
