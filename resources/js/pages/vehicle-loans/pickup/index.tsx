@@ -13,6 +13,7 @@ import {
 import { RequiredLabel } from '@/components/vehicle-loans/RequiredLabel';
 import { VehicleLoanQrPanel } from '@/components/vehicle-loans/VehicleLoanQrPanel';
 import { VehicleLoanSummaryCard } from '@/components/vehicle-loans/VehicleLoanSummaryCard';
+import { submitVehicleLoanFormData } from '@/components/vehicle-loans/submitVehicleLoanFormData';
 import { useVehicleLoanPageText } from '@/components/vehicle-loans/useVehicleLoanPageText';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
@@ -77,27 +78,23 @@ export default function VehicleLoanPickupPage() {
         body.append('photo_mode', photoMode);
         body.append('selfie_photo', photo);
 
-        setLoading(true);
-        try {
-            await axios.post(`/api/vehicle-loans/${loanId}/pickups`, body);
-            toast.success(
-                tToast(
-                    'pickup_submitted',
-                    'Form pengambilan dikirim. Ambil kunci di pos keamanan.',
-                ),
-            );
-            setLoanId('');
-            setPhoto(null);
-        } catch {
-            toast.error(
-                tToast(
-                    'pickup_submit_failed',
-                    'Gagal mengirim form pengambilan.',
-                ),
-            );
-        } finally {
-            setLoading(false);
-        }
+        await submitVehicleLoanFormData({
+            url: `/api/vehicle-loans/${loanId}/pickups`,
+            body,
+            setLoading,
+            successMessage: tToast(
+                'pickup_submitted',
+                'Form pengambilan dikirim. Ambil kunci di pos keamanan.',
+            ),
+            failureMessage: tToast(
+                'pickup_submit_failed',
+                'Gagal mengirim form pengambilan.',
+            ),
+            onSuccess: () => {
+                setLoanId('');
+                setPhoto(null);
+            },
+        });
     }
 
     return (
