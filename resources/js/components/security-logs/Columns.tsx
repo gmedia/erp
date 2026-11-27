@@ -1,4 +1,7 @@
-import { LabelText } from '@/components/common/TranslatedText';
+import {
+    LabelText,
+    type TranslatableLabel,
+} from '@/components/common/TranslatedText';
 import { Badge } from '@/components/ui/badge';
 import { securityEventBadgeVariant } from '@/lib/status-badge';
 import { createSortingHeader } from '@/utils/columns';
@@ -27,6 +30,10 @@ const EVENT_LABELS: Record<string, string> = {
     user_deactivated: 'User Deactivated',
 };
 
+function columnLabel(column: string, fallback: string): TranslatableLabel {
+    return { key: `page.security_logs.column_${column}`, fallback };
+}
+
 export function summarizeUserAgent(userAgent: string | null): string {
     if (!userAgent) {
         return '-';
@@ -40,7 +47,7 @@ export function summarizeUserAgent(userAgent: string | null): string {
 export const createSecurityLogColumns = (): ColumnDef<SecurityLogItem>[] => [
     {
         accessorKey: 'created_at',
-        ...createSortingHeader('Date'),
+        ...createSortingHeader(columnLabel('date', 'Date')),
         cell: ({ row }) => (
             <div>
                 {formatDateTimeByRegionalSettings(
@@ -51,7 +58,7 @@ export const createSecurityLogColumns = (): ColumnDef<SecurityLogItem>[] => [
     },
     {
         accessorKey: 'event',
-        ...createSortingHeader('Event'),
+        ...createSortingHeader(columnLabel('event', 'Event')),
         cell: ({ row }) => {
             const event = row.getValue('event') as string;
             return (
@@ -68,25 +75,31 @@ export const createSecurityLogColumns = (): ColumnDef<SecurityLogItem>[] => [
     },
     {
         accessorKey: 'user_name',
-        header: 'User',
+        header: () => <LabelText label={columnLabel('user', 'User')} />,
         cell: ({ row }) => <div>{row.original.user_name ?? '-'}</div>,
         enableSorting: false,
     },
     {
         accessorKey: 'attempted_email',
-        header: 'Attempted Email',
+        header: () => (
+            <LabelText
+                label={columnLabel('attempted_email', 'Attempted Email')}
+            />
+        ),
         cell: ({ row }) => <div>{row.original.attempted_email ?? '-'}</div>,
         enableSorting: false,
     },
     {
         accessorKey: 'ip_address',
-        header: 'IP Address',
+        header: () => (
+            <LabelText label={columnLabel('ip_address', 'IP Address')} />
+        ),
         cell: ({ row }) => <div>{row.original.ip_address ?? '-'}</div>,
         enableSorting: false,
     },
     {
         accessorKey: 'user_agent',
-        header: 'Device',
+        header: () => <LabelText label={columnLabel('device', 'Device')} />,
         cell: ({ row }) => (
             <div title={row.original.user_agent ?? undefined}>
                 {summarizeUserAgent(row.original.user_agent)}

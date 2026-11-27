@@ -631,7 +631,7 @@
         "ap_payment": "AP Payments",
         "ap_payment_history_report": "AP Payment History",
         "approval_audit_trail": "Approval Audit Trail",
-        "security_log": "Security Logs",
+        "security_log": "Security Log",
         "approval_delegation": "Approval Delegation",
         "approval_flow": "Approval Flow",
         "approval_monitoring": "Approval Monitoring",
@@ -1028,7 +1028,13 @@
         },
         "security_logs": {
             "description": "Login, logout, and access-change activity. Retained for 1 year; personal data is used for security purposes only.",
-            "search_placeholder": "Search email, IP, user..."
+            "search_placeholder": "Search email, IP, user...",
+            "column_date": "Date",
+            "column_event": "Event",
+            "column_user": "User",
+            "column_attempted_email": "Attempted Email",
+            "column_ip_address": "IP Address",
+            "column_device": "Device"
         },
         "approval_audit_trail": {
             "description": "History of approval actions taken on requests.",

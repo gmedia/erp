@@ -14,7 +14,14 @@ export function createSecurityLogFilterFields(): FieldDescriptor[] {
         }),
         createSecurityLogEventFilterField(),
         createUserFilterField('user_id', 'User'),
-        createTextFilterField('ip_address', 'IP Address', 'e.g. 192.168.1.10'),
+        createTextFilterField(
+            'ip_address',
+            {
+                key: 'page.security_logs.column_ip_address',
+                fallback: 'IP Address',
+            },
+            'e.g. 192.168.1.10',
+        ),
         ...createDateRangeFilterFields(),
     ];
 }

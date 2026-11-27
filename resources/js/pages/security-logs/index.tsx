@@ -15,7 +15,11 @@ export default function SecurityLogs() {
             descriptionKey="page.security_logs.description"
             breadcrumbs={[
                 { title: 'Admin', href: '#' },
-                { title: 'Security Logs', href: '/security-logs' },
+                {
+                    title: 'Security Logs',
+                    titleKey: 'menu.security_log',
+                    href: '/security-logs',
+                },
             ]}
             columns={createSecurityLogColumns()}
             filterFields={createSecurityLogFilterFields()}

@@ -91,6 +91,25 @@ test.describe('Security Logs', () => {
         await exportRequest;
     });
 
+    test('id locale shows translated headers and breadcrumb', async ({
+        page,
+    }) => {
+        await page.addInitScript(() =>
+            localStorage.setItem('app_locale', 'id'),
+        );
+        await login(page, undefined, undefined, { requireDashboard: false });
+        await page.goto('/security-logs');
+        await expect(page.locator('table')).toBeVisible();
+
+        const headers = page.locator('thead');
+        await expect(headers.getByText('Waktu', { exact: true })).toBeVisible();
+        await expect(headers.getByText('Kejadian', { exact: true })).toBeVisible();
+        await expect(headers.getByText('Alamat IP', { exact: true })).toBeVisible();
+        await expect(
+            page.getByRole('navigation').getByText('Log Keamanan').first(),
+        ).toBeVisible();
+    });
+
     test('unauthenticated requests to the security log API are rejected', async ({
         request,
     }) => {
