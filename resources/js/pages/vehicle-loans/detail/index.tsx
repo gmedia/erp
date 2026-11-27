@@ -159,7 +159,7 @@ export default function VehicleLoanDetailPage() {
             return {
                 label: tPage(
                     'detail_page.action_approvals',
-                    'Buka My Approvals',
+                    'Buka Persetujuan Saya',
                 ),
                 to: '/my-approvals',
             };
@@ -191,6 +191,10 @@ export default function VehicleLoanDetailPage() {
     return (
         <AppLayout
             breadcrumbs={[
+                {
+                    title: tPage('request.breadcrumb', 'Peminjaman Kendaraan'),
+                    href: '/vehicle-loans/request',
+                },
                 {
                     title: tPage('detail_page.breadcrumb', 'Detail Peminjaman'),
                     href: `/vehicle-loans/${id}`,

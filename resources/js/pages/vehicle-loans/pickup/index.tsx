@@ -104,6 +104,10 @@ export default function VehicleLoanPickupPage() {
         <AppLayout
             breadcrumbs={[
                 {
+                    title: tPage('request.breadcrumb', 'Peminjaman Kendaraan'),
+                    href: '/vehicle-loans/request',
+                },
+                {
                     title: tPage('pickup.breadcrumb', 'Pengambilan'),
                     href: '/vehicle-loans/pickup',
                 },
@@ -117,7 +121,7 @@ export default function VehicleLoanPickupPage() {
                     title={tPage('pickup.title', 'Pengambilan Kendaraan')}
                     description={tPage(
                         'pickup.description',
-                        'Pilih permintaan yang sudah disetujui, unggah bukti, lalu ambil kunci di pos security.',
+                        'Pilih permintaan yang sudah disetujui, unggah bukti, lalu ambil kunci di pos keamanan.',
                     )}
                 />
 
@@ -224,7 +228,7 @@ export default function VehicleLoanPickupPage() {
                                     <SelectItem value="without_driver">
                                         {tPage(
                                             'pickup.photo_mode_without_driver',
-                                            'Selfie dengan SIM (tanpa driver)',
+                                            'Selfie dengan SIM (tanpa pengemudi)',
                                         )}
                                     </SelectItem>
                                 </SelectContent>

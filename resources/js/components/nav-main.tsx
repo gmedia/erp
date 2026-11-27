@@ -20,7 +20,11 @@ import {
 } from '@/components/ui/tooltip';
 import { useAuth } from '@/contexts/auth-context';
 import { useTranslation } from '@/contexts/i18n-context';
-import { isNavHrefActive, pathMatchesNavHref } from '@/lib/nav-active';
+import {
+    isNavHrefActive,
+    pathMatchesNavHref,
+    resolveNavPathname,
+} from '@/lib/nav-active';
 import { type NavItem } from '@/types';
 import { ChevronRight } from 'lucide-react';
 import { useEffect, useMemo } from 'react';
@@ -100,7 +104,7 @@ export function NavMain({ items = [] }: Readonly<{ items: NavItem[] }>) {
                             asChild
                             defaultOpen={item.children.some((child) =>
                                 pathMatchesNavHref(
-                                    location.pathname,
+                                    resolveNavPathname(location.pathname),
                                     child.href,
                                 ),
                             )}

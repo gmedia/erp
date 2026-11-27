@@ -128,24 +128,25 @@ export default function VehicleLoanDashboardPage() {
         <AppLayout
             breadcrumbs={[
                 {
-                    title: tPage(
-                        'dashboard.breadcrumb',
-                        'Dashboard Peminjaman',
-                    ),
+                    title: tPage('request.breadcrumb', 'Peminjaman Kendaraan'),
+                    href: '/vehicle-loans/request',
+                },
+                {
+                    title: tPage('dashboard.breadcrumb', 'Dasbor Peminjaman'),
                     href: '/vehicle-loans/dashboard',
                 },
             ]}
         >
             <Helmet>
                 <title>
-                    {tPage('dashboard.title', 'Dashboard Peminjaman Kendaraan')}
+                    {tPage('dashboard.title', 'Dasbor Peminjaman Kendaraan')}
                 </title>
             </Helmet>
             <div className="mx-auto max-w-7xl space-y-6 p-4 md:p-6">
                 <PageHeader
                     title={tPage(
                         'dashboard.title',
-                        'Dashboard Peminjaman Kendaraan',
+                        'Dasbor Peminjaman Kendaraan',
                     )}
                     description={tPage(
                         'dashboard.description',

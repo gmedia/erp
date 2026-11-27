@@ -152,6 +152,10 @@ export default function VehicleLoanReturnPage() {
         <AppLayout
             breadcrumbs={[
                 {
+                    title: tPage('request.breadcrumb', 'Peminjaman Kendaraan'),
+                    href: '/vehicle-loans/request',
+                },
+                {
                     title: tPage('return.breadcrumb', 'Pengembalian'),
                     href: '/vehicle-loans/return',
                 },
@@ -236,7 +240,7 @@ export default function VehicleLoanReturnPage() {
                                     {tPage(
                                         'return.pickup_empty_hint',
                                         'Belum ada kendaraan yang sedang dipinjam. ' +
-                                            'Pengembalian tersedia setelah kunci diserahkan security.',
+                                            'Pengembalian tersedia setelah kunci diserahkan petugas keamanan.',
                                     )}
                                 </p>
                             )}
