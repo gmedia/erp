@@ -628,6 +628,7 @@
         "ap_payment": "AP Payments",
         "ap_payment_history_report": "AP Payment History",
         "approval_audit_trail": "Approval Audit Trail",
+        "security_log": "Security Logs",
         "approval_delegation": "Approval Delegation",
         "approval_flow": "Approval Flow",
         "approval_monitoring": "Approval Monitoring",
@@ -1021,6 +1022,10 @@
         },
         "approval_monitoring": {
             "description": "Monitor approval workflows and overdue tasks."
+        },
+        "security_logs": {
+            "description": "Login, logout, and access-change activity. Retained for 1 year; personal data is used for security purposes only.",
+            "search_placeholder": "Search email, IP, user..."
         },
         "approval_audit_trail": {
             "description": "History of approval actions taken on requests.",
@@ -1473,6 +1478,13 @@
         "no_data": "No data"
     },
     "filter": {
+        "security_event_login_success": "Login Success",
+        "security_event_login_failed": "Login Failed",
+        "security_event_logout": "Logout",
+        "security_event_password_reset": "Password Reset",
+        "security_event_role_changed": "Role Changed",
+        "security_event_user_created": "User Created",
+        "security_event_user_deactivated": "User Deactivated",
         "stock_movement_search_placeholder": "Search product, category, warehouse, branch...",
         "stocktake_variance_search_placeholder": "Search stocktake, product, category, warehouse...",
         "valuation_search_placeholder": "Search product, category, warehouse, branch...",

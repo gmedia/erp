@@ -32,6 +32,11 @@ const sidebarNavItems: NavItem[] = [
         href: '/admin-settings?group=accounting',
         icon: null,
     },
+    {
+        title: 'Security Logs',
+        href: '/admin-settings?group=security-logs',
+        icon: null,
+    },
 ];
 
 export default function AdminSettingsLayout({
