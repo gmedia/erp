@@ -1,12 +1,7 @@
 import { expect, test } from '@playwright/test';
-import { login } from '../helpers';
+import { APPLY_FILTERS_LABEL, login } from '../helpers';
 
 const LOCALE_KEY = 'app_locale';
-
-const APPLY_FILTERS_LABEL = {
-    en: 'Apply Filters',
-    id: 'Terapkan filter',
-} as const;
 
 test.describe('i18n shell (locale id)', () => {
     test('purchase orders shell shows breadcrumb, toolbar and pagination in Indonesian', async ({
