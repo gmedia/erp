@@ -2,6 +2,7 @@
 
 use App\Mail\TestSmtpMail;
 use App\Models\Setting;
+use Database\Seeders\AuthenticationSettingSeeder;
 use Database\Seeders\SettingSampleDataSeeder;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -14,6 +15,7 @@ uses(RefreshDatabase::class)->group('admin-settings');
 
 beforeEach(function () {
     $this->seed(SettingSampleDataSeeder::class);
+    $this->seed(AuthenticationSettingSeeder::class);
 });
 
 describe('AdminSettingController@index', function () {
@@ -79,6 +81,36 @@ describe('AdminSettingController@update', function () {
             'company_name' => 'Test',
         ]);
         $response->assertStatus(401);
+    });
+
+    test('user with edit permission can update security log settings', function () {
+        $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
+
+        Sanctum::actingAs($user, ['*']);
+        $this->putJson('/api/admin-settings', [
+            'security_log_retention_days' => 730,
+            'security_log_failed_login_threshold' => 8,
+            'security_log_failed_login_window_minutes' => 30,
+        ])->assertOk();
+
+        expect(Setting::get('security_log_retention_days'))->toBe(730);
+        expect(Setting::get('security_log_failed_login_threshold'))->toBe(8);
+        expect(Setting::get('security_log_failed_login_window_minutes'))->toBe(30);
+    });
+
+    test('security log settings outside allowed range are rejected', function () {
+        $user = createTestUserWithPermissions(['admin_setting', 'admin_setting.edit']);
+
+        Sanctum::actingAs($user, ['*']);
+        $this->putJson('/api/admin-settings', [
+            'security_log_retention_days' => 7,
+            'security_log_failed_login_threshold' => 0,
+            'security_log_failed_login_window_minutes' => 2000,
+        ])->assertStatus(422)->assertJsonValidationErrors([
+            'security_log_retention_days',
+            'security_log_failed_login_threshold',
+            'security_log_failed_login_window_minutes',
+        ]);
     });
 
     test('user with edit permission can update general settings', function () {

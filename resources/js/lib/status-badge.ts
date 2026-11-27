@@ -162,6 +162,23 @@ export function approvalEventBadgeVariant(
     return statusBadgeVariant(key);
 }
 
+export function securityEventBadgeVariant(
+    event: string | null | undefined,
+): BadgeVariant {
+    switch (event) {
+        case 'login_success':
+            return POSITIVE;
+        case 'login_failed':
+        case 'user_deactivated':
+            return DANGER;
+        case 'role_changed':
+        case 'password_reset':
+            return PENDING;
+        default:
+            return NEUTRAL;
+    }
+}
+
 // Hasil selisih stocktake aset: hilang/rusak = danger, dipindah = info.
 export function stocktakeVarianceBadgeVariant(
     result: string | null | undefined,

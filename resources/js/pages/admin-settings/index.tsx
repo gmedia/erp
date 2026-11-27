@@ -5,6 +5,10 @@ import {
     SettingsSaveButton,
     SettingsSection,
 } from '@/components/common/settings';
+import {
+    SecurityLogSettings,
+    type SecurityLogSettingsData,
+} from '@/components/security-logs/SecurityLogSettings';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -67,6 +71,7 @@ interface SettingsData {
         social_login_allowed_domains?: string[];
         social_login_allowed_tenants?: string[];
     };
+    security?: SecurityLogSettingsData;
     accounting?: {
         asset_disposal_gain_account_id?: string | number | null;
         asset_disposal_gain_account_label?: string | null;
@@ -1196,6 +1201,12 @@ export default function AdminSettings() {
                 {currentGroup === 'accounting' && (
                     <AccountingSettings
                         settings={data?.settings?.accounting}
+                        onSaved={handleGeneralSettingsSaved}
+                    />
+                )}
+                {currentGroup === 'security-logs' && (
+                    <SecurityLogSettings
+                        settings={data?.settings?.security}
                         onSaved={handleGeneralSettingsSaved}
                     />
                 )}

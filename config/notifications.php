@@ -25,6 +25,10 @@ return [
             'label' => 'Approval request rejected',
             'channels' => ['database', 'mail', 'push'],
         ],
+        'security.failed_login_burst' => [
+            'label' => 'Repeated failed login attempts',
+            'channels' => ['database', 'mail'],
+        ],
         'vehicle_loan.pickup.due' => [
             'label' => 'Vehicle pickup scheduled',
             'channels' => ['database', 'push'],
