@@ -1565,6 +1565,7 @@
         "payment_method_other": "Other",
         "select_payment_method": "Select Payment Method",
         "select_currency": "Select Currency",
+        "select_reason": "Select Reason",
         "all_suppliers": "All suppliers"
     },
     "form_fields": {

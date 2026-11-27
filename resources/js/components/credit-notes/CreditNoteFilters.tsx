@@ -9,19 +9,58 @@ import {
 
 export function createCreditNoteFilterFields(): FieldDescriptor[] {
     const creditNoteStatusOptions = [
-        { value: 'draft', label: 'Draft' },
-        { value: 'confirmed', label: 'Confirmed' },
-        { value: 'applied', label: 'Applied' },
-        { value: 'cancelled', label: 'Cancelled' },
-        { value: 'void', label: 'Void' },
+        { value: 'draft', label: { key: 'status.draft', fallback: 'Draft' } },
+        {
+            value: 'confirmed',
+            label: { key: 'status.confirmed', fallback: 'Confirmed' },
+        },
+        {
+            value: 'applied',
+            label: { key: 'status.applied', fallback: 'Applied' },
+        },
+        {
+            value: 'cancelled',
+            label: { key: 'status.cancelled', fallback: 'Cancelled' },
+        },
+        { value: 'void', label: { key: 'status.void', fallback: 'Void' } },
     ];
 
     const creditNoteReasonOptions = [
-        { value: 'return', label: 'Return' },
-        { value: 'discount', label: 'Discount' },
-        { value: 'correction', label: 'Correction' },
-        { value: 'bad_debt', label: 'Bad Debt' },
-        { value: 'other', label: 'Other' },
+        {
+            value: 'return',
+            label: {
+                key: 'form_fields.credit_notes.reason_return',
+                fallback: 'Return',
+            },
+        },
+        {
+            value: 'discount',
+            label: {
+                key: 'form_fields.credit_notes.reason_discount',
+                fallback: 'Discount',
+            },
+        },
+        {
+            value: 'correction',
+            label: {
+                key: 'form_fields.credit_notes.reason_correction',
+                fallback: 'Correction',
+            },
+        },
+        {
+            value: 'bad_debt',
+            label: {
+                key: 'form_fields.credit_notes.reason_bad_debt',
+                fallback: 'Bad Debt',
+            },
+        },
+        {
+            value: 'other',
+            label: {
+                key: 'form_fields.credit_notes.reason_other',
+                fallback: 'Other',
+            },
+        },
     ];
 
     return [
@@ -34,13 +73,19 @@ export function createCreditNoteFilterFields(): FieldDescriptor[] {
                 name: 'reason',
                 label: { key: 'column.reason', fallback: 'Reason' },
                 options: creditNoteReasonOptions,
-                placeholder: 'Select Reason',
+                placeholder: {
+                    key: 'filter.select_reason',
+                    fallback: 'Select Reason',
+                },
             },
             {
                 name: 'status',
                 label: { key: 'column.status', fallback: 'Status' },
                 options: creditNoteStatusOptions,
-                placeholder: 'Select Status',
+                placeholder: {
+                    key: 'filter.select_status',
+                    fallback: 'Select Status',
+                },
             },
         ]),
         ...createDateFilterFields([
@@ -50,7 +95,10 @@ export function createCreditNoteFilterFields(): FieldDescriptor[] {
                     key: 'column.credit_note_date_from',
                     fallback: 'Credit Note Date From',
                 },
-                placeholder: 'Credit Note Date From',
+                placeholder: {
+                    key: 'column.credit_note_date_from',
+                    fallback: 'Credit Note Date From',
+                },
             },
             {
                 name: 'credit_note_date_to',
@@ -58,7 +106,10 @@ export function createCreditNoteFilterFields(): FieldDescriptor[] {
                     key: 'column.credit_note_date_to',
                     fallback: 'Credit Note Date To',
                 },
-                placeholder: 'Credit Note Date To',
+                placeholder: {
+                    key: 'column.credit_note_date_to',
+                    fallback: 'Credit Note Date To',
+                },
             },
         ]),
     ];

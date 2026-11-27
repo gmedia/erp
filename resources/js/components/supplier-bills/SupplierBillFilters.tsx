@@ -10,13 +10,25 @@ import {
 } from '@/components/common/filters';
 
 export const supplierBillStatusOptions = [
-    { value: 'draft', label: 'Draft' },
-    { value: 'confirmed', label: 'Confirmed' },
-    { value: 'partially_paid', label: 'Partially Paid' },
-    { value: 'paid', label: 'Paid' },
-    { value: 'overdue', label: 'Overdue' },
-    { value: 'cancelled', label: 'Cancelled' },
-    { value: 'void', label: 'Void' },
+    { value: 'draft', label: { key: 'status.draft', fallback: 'Draft' } },
+    {
+        value: 'confirmed',
+        label: { key: 'status.confirmed', fallback: 'Confirmed' },
+    },
+    {
+        value: 'partially_paid',
+        label: { key: 'status.partially_paid', fallback: 'Partially Paid' },
+    },
+    { value: 'paid', label: { key: 'status.paid', fallback: 'Paid' } },
+    {
+        value: 'overdue',
+        label: { key: 'status.overdue', fallback: 'Overdue' },
+    },
+    {
+        value: 'cancelled',
+        label: { key: 'status.cancelled', fallback: 'Cancelled' },
+    },
+    { value: 'void', label: { key: 'status.void', fallback: 'Void' } },
 ];
 
 export function createSupplierBillFilterFields(): FieldDescriptor[] {
@@ -34,26 +46,32 @@ export function createSupplierBillFilterFields(): FieldDescriptor[] {
             'supplier_id',
             { key: 'column.supplier', fallback: 'Supplier' },
             '/api/suppliers',
-            'All suppliers',
+            { key: 'filter.all_suppliers', fallback: 'All suppliers' },
         ),
         createAsyncSelectFilterField(
             'branch_id',
             { key: 'column.branch', fallback: 'Branch' },
             '/api/branches',
-            'All branches',
+            { key: 'filter.all_branches', fallback: 'All branches' },
         ),
         ...createSelectFilterFields([
             {
                 name: 'status',
                 label: { key: 'column.status', fallback: 'Status' },
                 options: supplierBillStatusOptions,
-                placeholder: 'Select Status',
+                placeholder: {
+                    key: 'filter.select_status',
+                    fallback: 'Select Status',
+                },
             },
             {
                 name: 'currency',
                 label: { key: 'column.currency', fallback: 'Currency' },
                 options: currencyOptions,
-                placeholder: 'Select Currency',
+                placeholder: {
+                    key: 'filter.select_currency',
+                    fallback: 'Select Currency',
+                },
             },
         ]),
         ...createDateFilterFields([
@@ -63,12 +81,18 @@ export function createSupplierBillFilterFields(): FieldDescriptor[] {
                     key: 'column.bill_date_from',
                     fallback: 'Bill Date From',
                 },
-                placeholder: 'Bill Date From',
+                placeholder: {
+                    key: 'column.bill_date_from',
+                    fallback: 'Bill Date From',
+                },
             },
             {
                 name: 'bill_date_to',
                 label: { key: 'column.bill_date_to', fallback: 'Bill Date To' },
-                placeholder: 'Bill Date To',
+                placeholder: {
+                    key: 'column.bill_date_to',
+                    fallback: 'Bill Date To',
+                },
             },
             {
                 name: 'due_date_from',
@@ -76,12 +100,18 @@ export function createSupplierBillFilterFields(): FieldDescriptor[] {
                     key: 'column.due_date_from',
                     fallback: 'Due Date From',
                 },
-                placeholder: 'Due Date From',
+                placeholder: {
+                    key: 'column.due_date_from',
+                    fallback: 'Due Date From',
+                },
             },
             {
                 name: 'due_date_to',
                 label: { key: 'column.due_date_to', fallback: 'Due Date To' },
-                placeholder: 'Due Date To',
+                placeholder: {
+                    key: 'column.due_date_to',
+                    fallback: 'Due Date To',
+                },
             },
         ]),
     ];

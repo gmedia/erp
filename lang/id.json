@@ -1568,6 +1568,7 @@
         "payment_method_other": "Lainnya",
         "select_payment_method": "Pilih metode pembayaran",
         "select_currency": "Pilih mata uang",
+        "select_reason": "Pilih alasan",
         "all_suppliers": "Semua pemasok"
     },
     "form_fields": {

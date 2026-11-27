@@ -1088,18 +1088,25 @@ export function createCustomerFinancialFilterFields(
     searchPlaceholder: TranslatableLabel,
 ): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', searchPlaceholder),
+        createTextFilterField(
+            'search',
+            { key: 'column.search', fallback: 'Search' },
+            searchPlaceholder,
+        ),
         createAsyncSelectFilterField(
             'customer_id',
-            'Customer',
+            { key: 'column.customer', fallback: 'Customer' },
             '/api/customers',
-            'Select Customer',
+            {
+                key: 'form_fields.customer_invoices.customer_placeholder',
+                fallback: 'Select Customer',
+            },
         ),
         createAsyncSelectFilterField(
             'branch_id',
-            'Branch',
+            { key: 'column.branch', fallback: 'Branch' },
             '/api/branches',
-            'Select Branch',
+            { key: 'filter.select_branch', fallback: 'Select Branch' },
         ),
     ];
 }
