@@ -47,12 +47,26 @@ export function resolveActiveNavHref(
     return best;
 }
 
+const VEHICLE_LOAN_PREFIX = '/vehicle-loans';
+const VEHICLE_LOAN_PARENT_HREF = '/vehicle-loans/request';
+
+export function resolveNavPathname(pathname: string): string {
+    const path = normalizeNavPath(pathname);
+    const rest = path.startsWith(`${VEHICLE_LOAN_PREFIX}/`)
+        ? path.slice(VEHICLE_LOAN_PREFIX.length + 1)
+        : '';
+    const isFlowPage =
+        rest === 'pickup' || rest === 'return' || /^\d+$/.test(rest);
+
+    return isFlowPage ? VEHICLE_LOAN_PARENT_HREF : path;
+}
+
 export function isNavHrefActive(
     pathname: string,
     href: string,
     allHrefs: readonly string[],
 ): boolean {
-    const active = resolveActiveNavHref(pathname, allHrefs);
+    const active = resolveActiveNavHref(resolveNavPathname(pathname), allHrefs);
     if (!active) {
         return false;
     }

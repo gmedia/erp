@@ -59,18 +59,25 @@ class VehicleLoanApprovalFlowSeeder extends Seeder
             ] + ($isNew ? ['created_at' => now()->subDays(60)] : []),
         );
 
-        ApprovalFlowStep::updateOrCreate(
-            [
-                'approval_flow_id' => $flow->id,
-                'step_order' => 1,
-            ],
-            [
-                'name' => 'Persetujuan Peminjaman Kendaraan',
-                'approver_type' => 'user',
-                'approver_user_id' => $approver->id,
-                'required_action' => 'approve',
-                'can_reject' => true,
-            ],
-        );
+        $steps = [
+            1 => 'Verifikasi Atasan Peminjaman Kendaraan',
+            2 => 'Persetujuan Final Peminjaman Kendaraan',
+        ];
+
+        foreach ($steps as $stepOrder => $stepName) {
+            ApprovalFlowStep::updateOrCreate(
+                [
+                    'approval_flow_id' => $flow->id,
+                    'step_order' => $stepOrder,
+                ],
+                [
+                    'name' => $stepName,
+                    'approver_type' => 'user',
+                    'approver_user_id' => $approver->id,
+                    'required_action' => 'approve',
+                    'can_reject' => true,
+                ],
+            );
+        }
     }
 }

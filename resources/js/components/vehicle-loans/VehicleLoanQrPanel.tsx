@@ -40,7 +40,7 @@ export function VehicleLoanQrPanel({
                         size={88}
                         aria-label={tPage(
                             'qr_aria_label',
-                            'QR untuk membuka form di loket security',
+                            'QR untuk membuka formulir di loket keamanan',
                         )}
                     />
                 ) : (
@@ -56,7 +56,7 @@ export function VehicleLoanQrPanel({
                 <p className="text-xs text-muted-foreground">
                     {tPage(
                         'qr_description',
-                        'Cetak dan tempel QR ini di pos security. Peminjam scan, login, lalu form terbuka otomatis.',
+                        'Cetak dan tempel QR ini di pos keamanan. Peminjam pindai, masuk, lalu formulir terbuka otomatis.',
                     )}
                 </p>
                 <span className="inline-flex rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">

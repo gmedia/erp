@@ -38,9 +38,9 @@ export async function submitVehicleLoanRequest(
     const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
     const dayAfter = new Date(tomorrow.getTime() + 3 * 60 * 60 * 1000);
 
-    await startDate.fill(toDisplayDate(tomorrow));
+    await pickVehicleLoanDate(page, 'start_at', tomorrow);
     await startTime.fill('08:00');
-    await endDate.fill(toDisplayDate(dayAfter));
+    await pickVehicleLoanDate(page, 'end_at', dayAfter);
     await endTime.fill('11:00');
     await page.locator('#purpose').fill(purpose);
 
@@ -131,6 +131,26 @@ export async function seedApprovedLoan(page: Page): Promise<number> {
         'App\\Models\\VehicleLoan',
     );
 
+    const afterFirst = await apiRequest(
+        page,
+        'get',
+        `/api/vehicle-loans/${id}`,
+    );
+    const afterFirstBody = (await afterFirst.json()) as {
+        data?: { status?: string };
+        status?: string;
+    };
+    if (
+        (afterFirstBody.data?.status ?? afterFirstBody.status) === 'in_progress'
+    ) {
+        await approveApprovableAsDelegate(
+            page,
+            id,
+            'E2ESeed approved final',
+            'App\\Models\\VehicleLoan',
+        );
+    }
+
     await expect
         .poll(
             async () => {
@@ -158,9 +178,22 @@ export async function seedApprovedLoan(page: Page): Promise<number> {
     return id;
 }
 
-function toDisplayDate(date: Date): string {
-    const pad = (value: number) => String(value).padStart(2, '0');
-    return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()}`;
+export async function pickVehicleLoanDate(
+    page: Page,
+    fieldId: 'start_at' | 'end_at',
+    date: Date,
+): Promise<void> {
+    const trigger = page.locator(`#${fieldId}_date`);
+    await trigger.click();
+
+    const iso = [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, '0'),
+        String(date.getDate()).padStart(2, '0'),
+    ].join('-');
+    await page.locator(`button[data-date="${iso}"]`).first().click();
+
+    await expect(trigger).not.toContainText(/Pick a date|Pilih tanggal/);
 }
 
 /** Upload a tiny valid PNG via the file input, then submit the form. */
