@@ -55,6 +55,48 @@ test.describe('Stock Adjustment Report', () => {
         }
     });
 
+    test('numeric headers are not clipped in Indonesian locale at 1440px', async ({
+        page,
+    }) => {
+        await page.addInitScript(() =>
+            localStorage.setItem('app_locale', 'id'),
+        );
+        await page.setViewportSize({ width: 1440, height: 900 });
+        const responsePromise = page.waitForResponse(
+            (r) => r.url().includes('/api/reports/stock-adjustment'),
+            { timeout: 30000 },
+        );
+        await page.goto('/reports/stock-adjustment');
+        await expectResponseOk(await responsePromise);
+        await expect(page.locator('thead th').first()).toBeVisible();
+
+        for (const label of [
+            'Qty Pengurangan',
+            'Qty Penambahan',
+            'Total Nilai Penyesuaian',
+        ]) {
+            const header = page
+                .locator('thead th')
+                .filter({ hasText: label })
+                .first();
+            await expect(header, `header "${label}" tampil`).toBeVisible();
+            const metrics = await header
+                .locator('button span')
+                .first()
+                .evaluate((el) => ({
+                    spanWidth: el.getBoundingClientRect().width,
+                    scrollWidth: el.scrollWidth,
+                }));
+            expect(
+                metrics.spanWidth,
+                `header "${label}" terpotong`,
+            ).toBeGreaterThanOrEqual(metrics.scrollWidth - 1);
+            expect(metrics.spanWidth, `header "${label}" lebar 0`).toBeGreaterThan(
+                0,
+            );
+        }
+    });
+
     test('can view report, sort, filter, and export', async ({ page }) => {
         const initialResponsePromise = page.waitForResponse(
             (r) => r.url().includes('/api/reports/stock-adjustment'),

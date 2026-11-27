@@ -129,7 +129,7 @@ export function createSortingHeader(
                     variant="ghost"
                     className={cn(
                         isRight
-                            ? 'ml-auto h-8 max-w-full justify-end px-0 has-[>svg]:px-0'
+                            ? 'ml-auto h-8 shrink-0 justify-end px-0 has-[>svg]:px-0'
                             : '-ml-2 h-8 px-2',
                     )}
                     onClick={() =>
@@ -146,10 +146,9 @@ export function createSortingHeader(
                     ) : null}
                     <span
                         className={cn(
-                            'max-w-full min-w-0',
                             isRight
-                                ? 'text-right whitespace-nowrap'
-                                : 'line-clamp-2 text-left whitespace-normal',
+                                ? 'shrink-0 text-right whitespace-nowrap'
+                                : 'max-w-full min-w-0 line-clamp-2 text-left whitespace-normal',
                         )}
                     >
                         <LabelText label={label} />
